@@ -4,7 +4,7 @@ UNISC is a unified, common syntax for a exploratory research in a new wave of
 programming languages, targetted specifically at computational science (scientific computing)
 applications, e.g., modelling, data processing, data analysis, and visualisation. 
 
-UNISC is heavily inspired by Python, which is popular across the sciences; UNISC is a
+UNISC is heavily inspired by Python, which is popular across the sciences; it can be seen as
 a pure (i.e., mutation free) subset of Python. The UNISC language standards defines a versioned formal grammar
 for the language, a formal semantics, and a reference interpreter.
 
