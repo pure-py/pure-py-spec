@@ -5,7 +5,7 @@ programming languages, targetted specifically at computational science (scientif
 applications, e.g., modelling, data processing, data analysis, and visualisation. 
 
 UNISC is heavily inspired by Python, which is popular across the sciences; it can be seen as
-a pure (i.e., mutation free) subset of Python. The UNISC language standards defines a versioned formal grammar
+a pure (i.e., mutation free) subset of Python. The UNISC language standard defines a (versioned) formal grammar
 for the language, a formal semantics, and a reference interpreter.
 
 All languages which are UNISC-compliant must accept any valid UNISC program and are
