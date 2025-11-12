@@ -1,4 +1,4 @@
-UNISC - The Unified Syntax for Computational Science
+UNISC - A Unified Syntax for Computational Science
 ----------
 UNISC is a unified, common syntax for a exploratory research in a new wave of
 programming languages, targetted specifically at computational science (scientific computing)
