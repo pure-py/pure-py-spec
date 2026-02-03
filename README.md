@@ -10,12 +10,14 @@ All languages which are PurePy-compliant must accept any valid PurePy program an
 expected to behave in a way which conforms to, or at least coheres with, the formal semantics.
 Such languages are allowed to have additional behaviours and syntax beyond the PurePy spec, as long as they maintain compatibility with the PurePy subset. For example, Python itself supports many additional features, like mutable variables and exceptions; Fluid has a matrix literal notation and allows functions to be defined by pattern-matching clauses.
 
-Languages/language implementations we would like to be PurePy-1.0.0 compliant:
+Languages/language implementations we would like to be PurePy compliant:
 
 - CPython
 - JAX
-- [Fluid](https://github.com/explorable-viz/fluid) -- will require some changes 
+- [Fluid](https://github.com/explorable-viz/fluid)
 - fortl
+
+Fluid will require some changes to be PurePy-compliant, especially with regard to lists, which in some ways look in some ways like Python lists, but behave quite differently. (There is no equivalent of "cons" in Python.)
 
 The longer-term aim is to stimulate new language developments to support science. Centering around a common syntax
 eases adoption and engagement with these new language techniques and ideas. In later version we may add support for type annotations, [Python array API](https://data-apis.org/array-api/latest/)-compatible arrays, and other features. 
