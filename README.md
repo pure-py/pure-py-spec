@@ -10,11 +10,11 @@ All languages which are PurePy-compliant must accept any valid PurePy program an
 expected to behave in a way which conforms to, or at least coheres with, the formal semantics.
 Such languages are allowed to have additional behaviours and syntax beyond the PurePy spec, as long as they maintain compatibility with the PurePy subset.
 
-Languages/language implementations which are currently PurePy-1.0.0 compliant:
+Languages/language implementations we would like to be PurePy-1.0.0 compliant:
 
 - CPython
 - JAX
-- [Fluid](https://github.com/explorable-viz/fluid)
+- [Fluid](https://github.com/explorable-viz/fluid) -- will require some changes 
 - fortl
 
 The longer-term aim is to stimulate new language developments to support science. Centering around a common syntax
