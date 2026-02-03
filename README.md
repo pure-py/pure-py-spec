@@ -24,6 +24,9 @@ eases adoption and engagement with these new language techniques and ideas. In l
 
 One risk is that it is easy for users to get
 confused about what is, and is not, valid PurePy syntax, e.g., writing Python code in another
-PurePy-compliant language which does not accept non-PurePy Python features (such as exceptions).
-We think this cost is worth the benefits, enabling a flourishing of new language
+PurePy-compliant language which does not accept non-PurePy Python features (such as exceptions). These points can be quite subtle, and could also cause problems in the other direction. For example, in Python one cannot efficiently construct a list by writing
+```python
+[x, *xs]
+```
+since `xs` is always copied. In a pure language with no assignment, this can be efficiently implemented by sharing `xs` into the new list. But encouraging users of PurePy to write list-manipulating code in this FP style might not be a good idea, since taking that style back to standard Python would result in non-idiomatic, unperformant code. Neverthless, we think a pure dialect of Python is a fruitful direction to explore, potentially enabling a flourishing of new language
 ideas to benefit science in a way that reduces friction and barriers to entry.
