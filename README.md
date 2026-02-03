@@ -8,7 +8,7 @@ for the language, a formal semantics, and a reference interpreter.
 
 All languages which are PurePy-compliant must accept any valid PurePy program and are
 expected to behave in a way which conforms to, or at least coheres with, the formal semantics.
-Such languages are allowed to have additional behaviours and syntax beyond the PurePy spec, as long as they maintain compatibility with the PurePy subset.
+Such languages are allowed to have additional behaviours and syntax beyond the PurePy spec, as long as they maintain compatibility with the PurePy subset. For example, Python itself supports many additional features, like mutable variables and exceptions; Fluid has a matrix literal notation and allows functions to be defined by pattern-matching clauses.
 
 Languages/language implementations we would like to be PurePy-1.0.0 compliant:
 
