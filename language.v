@@ -30,15 +30,15 @@ with s : Set :=
 
 (* defns Judgements *)
 Inductive OpSemantics : s -> Prop :=    (* defn OpSemantics *)
- | Returns_return : forall (e5:e),
+ | DefinitelyRet_return : forall (e5:e),
      OpSemantics (StatementReturn e5)
- | Returns_seq_1 : forall (s2 s1:s),
+ | DefinitelyRet_seq_1 : forall (s2 s1:s),
      OpSemantics s1 ->
      OpSemantics (StatementSeq s2 s2)
- | Returns_seq_2 : forall (s2:s),
+ | DefinitelyRet_seq_2 : forall (s2:s),
      OpSemantics s2 ->
      OpSemantics (StatementSeq s2 s2)
- | Returns_if_else : forall (s1 s2:s),
+ | DefinitelyRet_if_else : forall (s1 s2:s),
      OpSemantics s1 ->
      OpSemantics s2 ->
      OpSemantics (StatementIfElse s1 s2).

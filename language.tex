@@ -81,42 +81,42 @@
 % defnss
 % defns Judgements
 %% defn OpSemantics
-\newcommand{\ottdruleReturnsXXreturn}[1]{\ottdrule[#1]{%
+\newcommand{\ottdruleDefinitelyRetXXreturn}[1]{\ottdrule[#1]{%
 }{
 \ottkw{return} \, \ottnt{e} \, \ottkw{DefinitelyRet}}{%
-{\ottdrulename{Returns\_return}}{}%
+{\ottdrulename{DefinitelyRet\_return}}{}%
 }}
 
 
-\newcommand{\ottdruleReturnsXXseqXXOne}[1]{\ottdrule[#1]{%
+\newcommand{\ottdruleDefinitelyRetXXseqXXOne}[1]{\ottdrule[#1]{%
 \ottpremise{\ottnt{s_{{\mathrm{1}}}} \, \ottkw{DefinitelyRet}}%
 }{
 \ottnt{s_{{\mathrm{2}}}} \, \ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}{%
-{\ottdrulename{Returns\_seq\_1}}{}%
+{\ottdrulename{DefinitelyRet\_seq\_1}}{}%
 }}
 
 
-\newcommand{\ottdruleReturnsXXseqXXTwo}[1]{\ottdrule[#1]{%
+\newcommand{\ottdruleDefinitelyRetXXseqXXTwo}[1]{\ottdrule[#1]{%
 \ottpremise{\ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}%
 }{
 \ottnt{s_{{\mathrm{2}}}} \, \ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}{%
-{\ottdrulename{Returns\_seq\_2}}{}%
+{\ottdrulename{DefinitelyRet\_seq\_2}}{}%
 }}
 
 
-\newcommand{\ottdruleReturnsXXifXXelse}[1]{\ottdrule[#1]{%
+\newcommand{\ottdruleDefinitelyRetXXifXXelse}[1]{\ottdrule[#1]{%
 \ottpremise{\ottnt{s_{{\mathrm{1}}}} \, \ottkw{DefinitelyRet}}%
 \ottpremise{\ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}%
 }{
 \ottkw{if\_else} \, \ottsym{e:}  \ottnt{s_{{\mathrm{1}}}} \, \ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}{%
-{\ottdrulename{Returns\_if\_else}}{}%
+{\ottdrulename{DefinitelyRet\_if\_else}}{}%
 }}
 
 \newcommand{\ottdefnOpSemantics}[1]{\begin{ottdefnblock}[#1]{$\ottnt{s} \, \ottkw{DefinitelyRet}$}{}
-\ottusedrule{\ottdruleReturnsXXreturn{}}
-\ottusedrule{\ottdruleReturnsXXseqXXOne{}}
-\ottusedrule{\ottdruleReturnsXXseqXXTwo{}}
-\ottusedrule{\ottdruleReturnsXXifXXelse{}}
+\ottusedrule{\ottdruleDefinitelyRetXXreturn{}}
+\ottusedrule{\ottdruleDefinitelyRetXXseqXXOne{}}
+\ottusedrule{\ottdruleDefinitelyRetXXseqXXTwo{}}
+\ottusedrule{\ottdruleDefinitelyRetXXifXXelse{}}
 \end{ottdefnblock}}
 
 

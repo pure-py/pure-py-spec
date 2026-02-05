@@ -23,7 +23,7 @@ defns
 
 
 defn
-s DefinitelyRet :: :: OpSemantics :: 'Returns_'
+s DefinitelyRet :: :: OpSemantics :: 'DefinitelyRet_'
 by
 
 ------------------- :: return
