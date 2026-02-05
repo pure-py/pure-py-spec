@@ -7,5 +7,7 @@ e :: 'Expression' ::=
 
 s :: 'Statement' ::=
   | assign x e  :: :: Assign
-  | s1 s2       :: :: Seq
-  | return e    :: :: Return
+  | s1 s2 :: :: Seq
+  | return e :: :: Return
+  | if e s :: :: If
+  | ifElse e s1 s2 :: :: IfElse

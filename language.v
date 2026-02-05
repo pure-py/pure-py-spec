@@ -12,7 +12,9 @@ Inductive e : Set :=
 Inductive s : Set := 
  | StatementAssign (x5:x) (e5:e)
  | StatementSeq (s1:s) (s2:s)
- | StatementReturn (e5:e).
+ | StatementReturn (e5:e)
+ | StatementIf (e5:e) (s5:s)
+ | StatementIfElse (e5:e) (s1:s) (s2:s).
 
 (* EXPERIMENTAL *)
 (** auxiliary functions on the new list types *)
