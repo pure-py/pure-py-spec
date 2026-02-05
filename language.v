@@ -32,8 +32,11 @@ with s : Set :=
 Inductive OpSemantics : s -> Prop :=    (* defn OpSemantics *)
  | Returns_return : forall (e5:e),
      OpSemantics (StatementReturn e5)
- | Returns_seq : forall (s2 s1:s),
+ | Returns_seq_1 : forall (s2 s1:s),
      OpSemantics s1 ->
+     OpSemantics (StatementSeq s2 s2)
+ | Returns_seq_2 : forall (s2:s),
+     OpSemantics s2 ->
      OpSemantics (StatementSeq s2 s2)
  | Returns_if_else : forall (s1 s2:s),
      OpSemantics s1 ->

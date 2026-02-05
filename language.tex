@@ -88,11 +88,19 @@
 }}
 
 
-\newcommand{\ottdruleReturnsXXseq}[1]{\ottdrule[#1]{%
+\newcommand{\ottdruleReturnsXXseqXXOne}[1]{\ottdrule[#1]{%
 \ottpremise{\ottnt{s_{{\mathrm{1}}}} \, \ottkw{DefinitelyRet}}%
 }{
 \ottnt{s_{{\mathrm{2}}}} \, \ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}{%
-{\ottdrulename{Returns\_seq}}{}%
+{\ottdrulename{Returns\_seq\_1}}{}%
+}}
+
+
+\newcommand{\ottdruleReturnsXXseqXXTwo}[1]{\ottdrule[#1]{%
+\ottpremise{\ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}%
+}{
+\ottnt{s_{{\mathrm{2}}}} \, \ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}{%
+{\ottdrulename{Returns\_seq\_2}}{}%
 }}
 
 
@@ -106,7 +114,8 @@
 
 \newcommand{\ottdefnOpSemantics}[1]{\begin{ottdefnblock}[#1]{$\ottnt{s} \, \ottkw{DefinitelyRet}$}{}
 \ottusedrule{\ottdruleReturnsXXreturn{}}
-\ottusedrule{\ottdruleReturnsXXseq{}}
+\ottusedrule{\ottdruleReturnsXXseqXXOne{}}
+\ottusedrule{\ottdruleReturnsXXseqXXTwo{}}
 \ottusedrule{\ottdruleReturnsXXifXXelse{}}
 \end{ottdefnblock}}
 
@@ -126,7 +135,7 @@
 \ottall
 
 \begin{verbatim}
-Definition rules:        3 good    0 bad
-Definition rule clauses: 6 good    0 bad
+Definition rules:        4 good    0 bad
+Definition rule clauses: 8 good    0 bad
 \end{verbatim}
 \end{document}

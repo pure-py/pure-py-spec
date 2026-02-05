@@ -30,8 +30,13 @@ by
  return e DefinitelyRet
 
 s1 DefinitelyRet
-------------------- :: seq
+------------------- :: seq_1
 s2 s2 DefinitelyRet
+
+s2 DefinitelyRet
+------------------- :: seq_2
+s2 s2 DefinitelyRet
+
 
 s1 DefinitelyRet
 s2 DefinitelyRet
