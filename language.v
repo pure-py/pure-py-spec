@@ -7,8 +7,11 @@ Require Import Ott.ott_list_core.
 
 
 
+Inductive e : Set := 
+ | ExpressionUnit : e.
+
 Inductive s : Set := 
  | StatementSeq (s1:s) (s2:s)
- | StatementReturn : s.
+ | StatementReturn (e5:e).
 
 

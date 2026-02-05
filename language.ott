@@ -1,8 +1,8 @@
 grammar
 
 e :: 'Expression' ::=
-  unit :: :: Unit
+  | unit :: :: Unit
 
 s :: 'Statement' ::=
-  | s1 s2   :: :: Seq
-  | return  :: :: Return
+  | s1 s2    :: :: Seq
+  | return e :: :: Return

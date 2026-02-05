@@ -38,10 +38,14 @@
 
 }}
 
+\newcommand{\otte}{
+\ottrulehead{\ottnt{e}}{::=}{}\ottprodnewline
+\ottfirstprodline{|}{\ottkw{unit}}{}{}{}{}}
+
 \newcommand{\otts}{
 \ottrulehead{\ottnt{s}}{::=}{}\ottprodnewline
 \ottfirstprodline{|}{\ottnt{s_{{\mathrm{1}}}} \, \ottnt{s_{{\mathrm{2}}}}}{}{}{}{}\ottprodnewline
-\ottprodline{|}{\ottkw{return}}{}{}{}{}}
+\ottprodline{|}{\ottkw{return} \, \ottnt{e}}{}{}{}{}}
 
 \newcommand{\ottformula}{
 \ottrulehead{\ottnt{formula}}{::=}{}\ottprodnewline
@@ -52,9 +56,11 @@
 
 \newcommand{\ottuserXXsyntax}{
 \ottrulehead{\ottnt{user\_syntax}}{::=}{}\ottprodnewline
-\ottfirstprodline{|}{\ottnt{s}}{}{}{}{}}
+\ottfirstprodline{|}{\ottnt{e}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottnt{s}}{}{}{}{}}
 
 \newcommand{\ottgrammar}{\ottgrammartabular{
+\otte\ottinterrule
 \otts\ottinterrule
 \ottformula\ottinterrule
 \ottjudgement\ottinterrule
