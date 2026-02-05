@@ -40,39 +40,91 @@
 
 \newcommand{\otte}{
 \ottrulehead{\ottnt{e}}{::=}{}\ottprodnewline
-\ottfirstprodline{|}{\ottkw{unit}}{}{}{}{}}
+\ottfirstprodline{|}{\ottkw{def} \, \ottsym{f(x):}  \ottnt{s}}{}{}{}{}}
 
 \newcommand{\otts}{
 \ottrulehead{\ottnt{s}}{::=}{}\ottprodnewline
-\ottfirstprodline{|}{\ottkw{assign} \, \ottmv{x} \, \ottnt{e}}{}{}{}{}\ottprodnewline
+\ottfirstprodline{|}{\ottmv{x}  \ottsym{=}  \ottnt{e}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{s_{{\mathrm{1}}}} \, \ottnt{s_{{\mathrm{2}}}}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottkw{return} \, \ottnt{e}}{}{}{}{}\ottprodnewline
-\ottprodline{|}{\ottkw{if} \, \ottnt{e} \, \ottnt{s}}{}{}{}{}\ottprodnewline
-\ottprodline{|}{\ottkw{ifElse} \, \ottnt{e} \, \ottnt{s_{{\mathrm{1}}}} \, \ottnt{s_{{\mathrm{2}}}}}{}{}{}{}}
+\ottprodline{|}{\ottkw{if} \, \ottsym{e:}  \ottnt{s}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottkw{if\_else} \, \ottsym{e:}  \ottnt{s_{{\mathrm{1}}}} \, \ottnt{s_{{\mathrm{2}}}}}{}{}{}{}}
 
 \newcommand{\ottformula}{
 \ottrulehead{\ottnt{formula}}{::=}{}\ottprodnewline
 \ottfirstprodline{|}{\ottnt{judgement}}{}{}{}{}}
 
+\newcommand{\ottJudgements}{
+\ottrulehead{\ottnt{Judgements}}{::=}{}\ottprodnewline
+\ottfirstprodline{|}{\ottnt{s} \, \ottkw{DefinitelyRet}}{}{}{}{}}
+
 \newcommand{\ottjudgement}{
-\ottrulehead{\ottnt{judgement}}{::=}{}}
+\ottrulehead{\ottnt{judgement}}{::=}{}\ottprodnewline
+\ottfirstprodline{|}{\ottnt{Judgements}}{}{}{}{}}
 
 \newcommand{\ottuserXXsyntax}{
 \ottrulehead{\ottnt{user\_syntax}}{::=}{}\ottprodnewline
 \ottfirstprodline{|}{\ottmv{x}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{e}}{}{}{}{}\ottprodnewline
-\ottprodline{|}{\ottnt{s}}{}{}{}{}}
+\ottprodline{|}{\ottnt{s}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottnt{formula}}{}{}{}{}}
 
 \newcommand{\ottgrammar}{\ottgrammartabular{
 \otte\ottinterrule
 \otts\ottinterrule
 \ottformula\ottinterrule
+\ottJudgements\ottinterrule
 \ottjudgement\ottinterrule
 \ottuserXXsyntax\ottafterlastrule
 }}
 
 % defnss
+% defns Judgements
+%% defn OpSemantics
+\newcommand{\ottdruleDefinitelyRetXXreturn}[1]{\ottdrule[#1]{%
+}{
+\ottkw{return} \, \ottnt{e} \, \ottkw{DefinitelyRet}}{%
+{\ottdrulename{DefinitelyRet\_return}}{}%
+}}
+
+
+\newcommand{\ottdruleDefinitelyRetXXseqXXOne}[1]{\ottdrule[#1]{%
+\ottpremise{\ottnt{s_{{\mathrm{1}}}} \, \ottkw{DefinitelyRet}}%
+}{
+\ottnt{s_{{\mathrm{2}}}} \, \ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}{%
+{\ottdrulename{DefinitelyRet\_seq\_1}}{}%
+}}
+
+
+\newcommand{\ottdruleDefinitelyRetXXseqXXTwo}[1]{\ottdrule[#1]{%
+\ottpremise{\ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}%
+}{
+\ottnt{s_{{\mathrm{2}}}} \, \ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}{%
+{\ottdrulename{DefinitelyRet\_seq\_2}}{}%
+}}
+
+
+\newcommand{\ottdruleDefinitelyRetXXifXXelse}[1]{\ottdrule[#1]{%
+\ottpremise{\ottnt{s_{{\mathrm{1}}}} \, \ottkw{DefinitelyRet}}%
+\ottpremise{\ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}%
+}{
+\ottkw{if\_else} \, \ottsym{e:}  \ottnt{s_{{\mathrm{1}}}} \, \ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}{%
+{\ottdrulename{DefinitelyRet\_if\_else}}{}%
+}}
+
+\newcommand{\ottdefnOpSemantics}[1]{\begin{ottdefnblock}[#1]{$\ottnt{s} \, \ottkw{DefinitelyRet}$}{}
+\ottusedrule{\ottdruleDefinitelyRetXXreturn{}}
+\ottusedrule{\ottdruleDefinitelyRetXXseqXXOne{}}
+\ottusedrule{\ottdruleDefinitelyRetXXseqXXTwo{}}
+\ottusedrule{\ottdruleDefinitelyRetXXifXXelse{}}
+\end{ottdefnblock}}
+
+
+\newcommand{\ottdefnsJudgements}{
+\ottdefnOpSemantics{}}
+
 \newcommand{\ottdefnss}{
+\ottdefnsJudgements
 }
 
 \newcommand{\ottall}{\ottmetavars\\[0pt]
@@ -83,5 +135,7 @@
 \ottall
 
 \begin{verbatim}
+Definition rules:        4 good    0 bad
+Definition rule clauses: 8 good    0 bad
 \end{verbatim}
 \end{document}

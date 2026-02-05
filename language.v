@@ -7,14 +7,13 @@ Require Import Ott.ott_list_core.
 Definition x : Set := var. (* term variable *)
 
 Inductive e : Set := 
- | ExpressionUnit : e.
-
-Inductive s : Set := 
+ | ExpressionFunction (s5:s)
+with s : Set := 
  | StatementAssign (x5:x) (e5:e)
  | StatementSeq (s1:s) (s2:s)
  | StatementReturn (e5:e)
- | StatementIf (e5:e) (s5:s)
- | StatementIfElse (e5:e) (s1:s) (s2:s).
+ | StatementIf (s5:s)
+ | StatementIfElse (s1:s) (s2:s).
 
 (* EXPERIMENTAL *)
 (** auxiliary functions on the new list types *)
@@ -29,7 +28,23 @@ Inductive s : Set :=
 
 (* definitions *)
 
+(* defns Judgements *)
+Inductive OpSemantics : s -> Prop :=    (* defn OpSemantics *)
+ | DefinitelyRet_return : forall (e5:e),
+     OpSemantics (StatementReturn e5)
+ | DefinitelyRet_seq_1 : forall (s2 s1:s),
+     OpSemantics s1 ->
+     OpSemantics (StatementSeq s2 s2)
+ | DefinitelyRet_seq_2 : forall (s2:s),
+     OpSemantics s2 ->
+     OpSemantics (StatementSeq s2 s2)
+ | DefinitelyRet_if_else : forall (s1 s2:s),
+     OpSemantics s1 ->
+     OpSemantics s2 ->
+     OpSemantics (StatementIfElse s1 s2).
+
 
 (** infrastructure *)
+#[export] Hint Constructors OpSemantics : core.
 
 
