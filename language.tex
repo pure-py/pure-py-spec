@@ -35,7 +35,7 @@
 \newcommand{\ottafterlastrule}{\\}
 \newcommand{\ottmetavars}{
 \ottmetavartabular{
-
+ $ \ottmv{x} $ & \ottcom{term variable} \\
 }}
 
 \newcommand{\otte}{
@@ -44,7 +44,8 @@
 
 \newcommand{\otts}{
 \ottrulehead{\ottnt{s}}{::=}{}\ottprodnewline
-\ottfirstprodline{|}{\ottnt{s_{{\mathrm{1}}}} \, \ottnt{s_{{\mathrm{2}}}}}{}{}{}{}\ottprodnewline
+\ottfirstprodline{|}{\ottkw{assign} \, \ottmv{x} \, \ottnt{e}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottnt{s_{{\mathrm{1}}}} \, \ottnt{s_{{\mathrm{2}}}}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottkw{return} \, \ottnt{e}}{}{}{}{}}
 
 \newcommand{\ottformula}{
@@ -56,7 +57,8 @@
 
 \newcommand{\ottuserXXsyntax}{
 \ottrulehead{\ottnt{user\_syntax}}{::=}{}\ottprodnewline
-\ottfirstprodline{|}{\ottnt{e}}{}{}{}{}\ottprodnewline
+\ottfirstprodline{|}{\ottmv{x}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottnt{e}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{s}}{}{}{}{}}
 
 \newcommand{\ottgrammar}{\ottgrammartabular{
