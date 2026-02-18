@@ -31,24 +31,27 @@ with s : Set :=  (* Statement *)
 (* definitions *)
 
 (* defns Judgements *)
-Inductive OpSemantics : s -> Prop :=    (* defn OpSemantics *)
+Inductive DefinitelyRet : s -> Prop :=    (* defn DefinitelyRet *)
  | DefinitelyRet_return : forall (e5:e),
-     OpSemantics (StatementReturn e5)
+     DefinitelyRet (StatementReturn e5)
  | DefinitelyRet_seq_1 : forall (s2 s1:s),
-     OpSemantics s1 ->
-     OpSemantics (StatementSeq s2 s2)
+     DefinitelyRet s1 ->
+     DefinitelyRet (StatementSeq s2 s2)
  | DefinitelyRet_seq_2 : forall (s2:s),
-     OpSemantics s2 ->
-     OpSemantics (StatementSeq s2 s2)
+     DefinitelyRet s2 ->
+     DefinitelyRet (StatementSeq s2 s2)
  | DefinitelyRet_if_else : forall (e_s_list:list (e*s)) (e_5:e) (s_5:s) (e':e) (s':s),
-     OpSemantics s_5 ->
-     (forall s_, In s_ (map (fun (pat_: (e*s)) => match pat_ with (e_,s_) => s_ end) e_s_list) -> (OpSemantics s_)) ->
-     OpSemantics s' ->
-     OpSemantics (StatementIfElseNew e_5 s_5 e_s_list e' s').
+     DefinitelyRet s_5 ->
+     (forall s_, In s_ (map (fun (pat_: (e*s)) => match pat_ with (e_,s_) => s_ end) e_s_list) -> (DefinitelyRet s_)) ->
+     DefinitelyRet s' ->
+     DefinitelyRet (StatementIfElseNew e_5 s_5 e_s_list e' s')
+with DefinitelyAssigns : s -> Prop :=    (* defn DefinitelyAssigns *)
+ | DefinitelyAssigns_assign : forall (x5:x) (e5:e),
+     DefinitelyAssigns (StatementAssign x5 e5).
 
 
 (** infrastructure *)
-#[export] Hint Constructors OpSemantics : core.
+#[export] Hint Constructors DefinitelyRet DefinitelyAssigns : core.
 
 
 (** induction principles *)

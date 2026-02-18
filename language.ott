@@ -25,7 +25,7 @@ defns
 
 
 defn
-s DefinitelyRet :: :: OpSemantics :: 'DefinitelyRet_'
+s DefinitelyRet :: :: DefinitelyRet :: 'DefinitelyRet_'
 {{ tex \mathsf{DefinitelyRet}([[ s ]]) }}
 by
 
@@ -45,3 +45,11 @@ s1 DefinitelyRet .. sn DefinitelyRet
 s' DefinitelyRet
 ------------------- :: if_else
 if e : s elif e1 : s1 .. elif en : sn else e' : s' DefinitelyRet
+
+defn
+s DefinitelyAssigns :: :: DefinitelyAssigns :: 'DefinitelyAssigns_'
+{{ tex \mathsf{DefinitelyAssigns}([[ s ]]) }}
+by
+
+------------------- :: assign
+ x = e DefinitelyAssigns
