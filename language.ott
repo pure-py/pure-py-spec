@@ -27,31 +27,31 @@ defns
   Judgements :: '' ::=
 
 defn
-s DefinitelyRet :: :: DefinitelyRet :: 'DefinitelyRet_'
-{{ tex \mathsf{DefinitelyRet}([[ s ]]) }}
+  DefinitelyRet s :: :: DefinitelyRet :: 'DefinitelyRet_'
+  {{ tex \mathsf{DefinitelyRet}([[ s ]]) }}
 by
 
 ------------------- :: return
- return e DefinitelyRet
+ DefinitelyRet return e
 
-s1 DefinitelyRet
+DefinitelyRet s1
 ------------------- :: seq_1
-s2 s2 DefinitelyRet
+DefinitelyRet s2 s2
 
-s2 DefinitelyRet
+DefinitelyRet s2
 ------------------- :: seq_2
-s2 s2 DefinitelyRet
+DefinitelyRet s2 s2
 
-s DefinitelyRet
-s1 DefinitelyRet .. sn DefinitelyRet
-s' DefinitelyRet
+DefinitelyRet s
+DefinitelyRet s1 .. DefinitelyRet sn
+DefinitelyRet s'
 ------------------- :: if_else
-if e : s elif e1 : s1 .. elif en : sn else e' : s' DefinitelyRet
+DefinitelyRet if e : s elif e1 : s1 .. elif en : sn else e' : s'
 
 defn
-s DefinitelyAssigns :: :: DefinitelyAssigns :: 'DefinitelyAssigns_'
-{{ tex \mathsf{DefinitelyAssigns}([[ s ]]) }}
+  DefinitelyAssigns s :: :: DefinitelyAssigns :: 'DefinitelyAssigns_'
+  {{ tex \mathsf{DefinitelyAssigns}([[ s ]]) }}
 by
 
 ------------------- :: assign
- x = e DefinitelyAssigns
+DefinitelyAssigns x = e
