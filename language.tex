@@ -125,32 +125,45 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
 \begin{mathpar}
 \inferrule*[right=assign]
 {
-  \wellFormed{\Gamma}{e}
+  \wf{\Gamma}{e}
 }
 {
-  \wellFormedNew{\Gamma}{x = e}{\{x\}}
+  \wfStmt{\Gamma}{x = e}{\{x\}}
 }
 \and
 \inferrule*[right=seq]
 {
-  \wellFormedNew{\Gamma}{s_1}{\Delta_1} \\
-  \wellFormedNew{\Gamma \cup \Delta_1}{s_2}{\Delta_2}
+  \wfStmt{\Gamma}{s_1}{\Delta_1} \\
+  \wfStmt{\Gamma \cup \Delta_1}{s_2}{\Delta_2}
 }
 {
-  \wellFormedNew{\Gamma}{s_1\;s_2}{\Delta_1 \cup \Delta_2}
+  \wfStmt{\Gamma}{s_1\;s_2}{\Delta_1 \cup \Delta_2}
+}
+\and
+\inferrule*[right=if]
+{
+  \wf{\Gamma}{e} \\
+  \wfStmt{\Gamma}{s}{\Delta_0} \\
+  \wf{\Gamma}{e_i} \\
+  \wfStmt{\Gamma}{s_i}{\Delta_i} \quad (\text{for } i \in \{1, \ldots, n\})
+  \\
+}
+{
+  \wfStmt{\Gamma}{\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n}{\varnothing}
 }
 \and
 \inferrule*[right=if\_else]
 {
-  \wellFormed{\Gamma}{s} \\
-  \wellFormed{\Gamma_1}{s_1} \\
+  \wf{\Gamma}{e} \\
+  \wfStmt{\Gamma}{s}{\Delta} \\
+  \wf{\Gamma_1}{s_1} \\
   \cdots \\
-  \wellFormed{\Gamma_n}{s_n} \\
-  \wellFormed{\Gamma'}{s'}
+  \wf{\Gamma_n}{s_n} \\
+  \wf{\Gamma'}{s'}
 }
 {
-  \Gamma \vdash
-  \texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'
+  \wfStmt{\Gamma}
+         {\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'}
 }
 \end{mathpar}
 \caption{Well-formed statements}
