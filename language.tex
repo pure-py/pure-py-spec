@@ -1,12 +1,48 @@
-\documentclass{article}
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
+\documentclass{scrartcl}
+
+\usepackage{libertine}
+\usepackage[authoryear,round]{natbib}
+\usepackage{enumitem}
+\usepackage{titling}
+\usepackage{microtype}
+\usepackage{xcolor}
 \usepackage{amsmath,amssymb}
 \usepackage{mathpartir}
 
 \input{macros}
 
+\raggedbottom
+\setlength{\droptitle}{-8ex}
+\setlist[itemize]{leftmargin=*}
+
+\title{\textbf{PurePy: A Functional Subset of Python}}
+\author{Nikolaus Huber\textsuperscript{1} \and Dominic Orchard\textsuperscript{3,1} \and Jacob Pake\textsuperscript{3} \and Roly Perera\textsuperscript{1,2}}
+\date{}
+
+\newcommand{\affiliations}{%
+    \textsuperscript{1}\textit{Department of Computer Science and Technology, University of Cambridge, UK}\\
+    \textsuperscript{2}\textit{School of Computer Science, University of Bristol, UK}\\
+    \textsuperscript{3}\textit{School of Computing,University of Kent, UK}
+}
+
+% Override maketitle to avoid internal tabular conflicts
+\renewcommand{\maketitle}{%
+    \vspace*{\droptitle}
+    \begin{flushleft}
+        {\LARGE\bfseries \thetitle \par}
+        \vspace{1ex}
+        {\Large \theauthor \par}
+        \vspace{1ex}
+        {\affiliations \par}
+    \end{flushleft}
+    \vspace{2ex}
+}
+
 \begin{document}
+
+\pagestyle{plain}
+
+\maketitle
 
 \section*{Syntax}
 
