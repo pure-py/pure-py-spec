@@ -76,20 +76,32 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
 \section*{Judgements}
 
 \subsection*{DefinitelyRet}
-\[
+\begin{mathpar}
 \inferrule*[right=return]
-{}
-{\DefRet{\texttt{return}\;e}}
-\]
+{
+   \strut
+}
+{
+   \DefRet{\texttt{return}\;e}
+}
+\and
+\inferrule*[right=seq\_1]
+{
+  \DefRet{s_1}
+}
+{
+   \DefRet{s_1\;s_2}
+}
+\end{mathpar}
 
 \[
-\inferrule*[right=seq\_1]
-{\DefRet{s_1}}
-{\DefRet{s_2\;s_2}}
-\qquad
 \inferrule*[right=seq\_2]
-{\DefRet{s_2}}
-{\DefRet{s_2\;s_2}}
+{
+  \DefRet{s_2}
+}
+{
+  \DefRet{s_2\;s_2}
+}
 \]
 
 \[
@@ -105,8 +117,11 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
 \subsection*{DefinitelyAssigns}
 \[
 \inferrule*[right=assign]
-{}
-{\DefAssigns{\varepsilon, x}{x = e}}
+{
+}
+{
+   \DefAssigns{\varepsilon, x}{x = e}
+}
 \]
 
 \[
