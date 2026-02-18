@@ -1,10 +1,10 @@
 default: language.pdf
 
 %.pdf: %.tex
-	pdflatex $<
-	pdflatex $<   # second pass for refs, if needed
+	latexmk -pdf $<
 
 clean:
-	rm -f *.pdf *.aux *.log *.out
+	latexmk -C
+	rm -f *.pdf
 
-.PHONY: all clean
+.PHONY: default clean
