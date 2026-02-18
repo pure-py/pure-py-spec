@@ -9,13 +9,20 @@ Definition f : Set := var. (* function name *)
 Definition n : Set := nat. (* index *)
 
 Inductive e : Set :=  (* Expression *)
- | ExpressionFunction (s5:s)
-with s : Set :=  (* Statement *)
- | StatementAssign (x5:x) (e5:e) (* Assign *)
- | StatementSeq (s1:s) (s2:s) (* Sequence *)
- | StatementReturn (e5:e) (* Return *)
- | StatementIfNew (e_5:e) (s_5:s) (_:list (e*s)) (* If *)
- | StatementIfElseNew (e_5:e) (s_5:s) (_:list (e*s)) (e':e) (s':s) (* If/Else *).
+ | ExpressionVar_b (_:nat) (* variable *)
+ | ExpressionVar_f (x5:x) (* variable *).
+
+Inductive G : Set :=  (* Environment *)
+ | EnvEmpty : G (* empty *)
+ | EnvExtend (G5:G) (x5:x) (* extend *).
+
+Inductive s : Set :=  (* Statement *)
+ | StatementAssign (x5:x) (e5:e) (* assign *)
+ | StatementSeq (s1:s) (s2:s) (* sequence *)
+ | StatementReturn (e5:e) (* return *)
+ | StatementIfNew (e_5:e) (s_5:s) (_:list (e*s)) (* if *)
+ | StatementIfElseNew (e_5:e) (s_5:s) (_:list (e*s)) (e':e) (s':s) (* if/else *)
+ | StatementFunction (s5:s) (* function definition *).
 
 (* EXPERIMENTAL *)
 (** auxiliary functions on the new list types *)
@@ -23,8 +30,48 @@ with s : Set :=  (* Statement *)
 (** subrules *)
 (** arities *)
 (** opening up abstractions *)
+Fixpoint open_s_wrt_e_rec (k:nat) (e__6:e) (s__6:s) {struct s__6}: s :=
+  match s__6 with
+  | (StatementAssign x5 e5) => StatementAssign x5 e5
+  | (StatementSeq s1 s2) => StatementSeq (open_s_wrt_e_rec k e__6 s1) (open_s_wrt_e_rec k e__6 s2)
+  | (StatementReturn e5) => StatementReturn e5
+  | (StatementIfNew e_5 s_5 e_s_list) => StatementIfNew e_5 (open_s_wrt_e_rec k e__6 s_5) (map (fun (pat_:(e*s)) => match pat_ with (e_,s_) => (e_,(open_s_wrt_e_rec k e__6 s_)) end) e_s_list)
+  | (StatementIfElseNew e_5 s_5 e_s_list e' s') => StatementIfElseNew e_5 (open_s_wrt_e_rec k e__6 s_5) (map (fun (pat_:(e*s)) => match pat_ with (e_,s_) => (e_,(open_s_wrt_e_rec k e__6 s_)) end) e_s_list) e' (open_s_wrt_e_rec k e__6 s')
+  | (StatementFunction s5) => StatementFunction (open_s_wrt_e_rec k e__6 s5)
+end.
+
+Definition open_s_wrt_e e__6 s__6 := open_s_wrt_e_rec 0 s__6 e__6.
+
 (** terms are locally-closed pre-terms *)
 (* definitions *)
+
+(* defns LC_e *)
+Inductive lc_e : e -> Prop :=    (* defn lc_e *)
+ | lc_ExpressionVar_f : forall (x5:x),
+     (lc_e (ExpressionVar_f x5)).
+
+(* defns LC_s *)
+Inductive lc_s : s -> Prop :=    (* defn lc_s *)
+ | lc_StatementAssign : forall (x5:x) (e5:e),
+     (lc_s (StatementAssign x5 e5))
+ | lc_StatementSeq : forall (s1 s2:s),
+     (lc_s s1) ->
+     (lc_s s2) ->
+     (lc_s (StatementSeq s1 s2))
+ | lc_StatementReturn : forall (e5:e),
+     (lc_s (StatementReturn e5))
+ | lc_StatementIfNew : forall (e_s_list:list (e*s)) (e_5:e) (s_5:s),
+     (lc_s s_5) ->
+     (forall s_, In s_ (map (fun (pat_: (e*s)) => match pat_ with (e_,s_) => s_ end) e_s_list) -> (lc_s s_)) ->
+     (lc_s (StatementIfNew e_5 s_5 e_s_list))
+ | lc_StatementIfElseNew : forall (e_s_list:list (e*s)) (e_5:e) (s_5:s) (e':e) (s':s),
+     (lc_s s_5) ->
+     (lc_s s') ->
+     (forall s_, In s_ (map (fun (pat_: (e*s)) => match pat_ with (e_,s_) => s_ end) e_s_list) -> (lc_s s_)) ->
+     (lc_s (StatementIfElseNew e_5 s_5 e_s_list e' s'))
+ | lc_StatementFunction : forall (s5:s),
+     (lc_s s5) ->
+     (lc_s (StatementFunction s5)).
 (** free variables *)
 (** substitutions *)
 
@@ -33,57 +80,58 @@ with s : Set :=  (* Statement *)
 (* defns Judgements *)
 Inductive DefinitelyRet : s -> Prop :=    (* defn DefinitelyRet *)
  | DefinitelyRet_return : forall (e5:e),
+     lc_e e5 ->
      DefinitelyRet (StatementReturn e5)
  | DefinitelyRet_seq_1 : forall (s2 s1:s),
+     lc_s s2 ->
      DefinitelyRet s1 ->
      DefinitelyRet (StatementSeq s2 s2)
  | DefinitelyRet_seq_2 : forall (s2:s),
      DefinitelyRet s2 ->
      DefinitelyRet (StatementSeq s2 s2)
  | DefinitelyRet_if_else : forall (e_s_list:list (e*s)) (e_5:e) (s_5:s) (e':e) (s':s),
+     lc_e e_5 ->
+     lc_e e' ->
      DefinitelyRet s_5 ->
      (forall s_, In s_ (map (fun (pat_: (e*s)) => match pat_ with (e_,s_) => s_ end) e_s_list) -> (DefinitelyRet s_)) ->
      DefinitelyRet s' ->
      DefinitelyRet (StatementIfElseNew e_5 s_5 e_s_list e' s')
 with DefinitelyAssigns : s -> Prop :=    (* defn DefinitelyAssigns *)
  | DefinitelyAssigns_assign : forall (x5:x) (e5:e),
+     lc_e e5 ->
      DefinitelyAssigns (StatementAssign x5 e5).
 
 
 (** infrastructure *)
-#[export] Hint Constructors DefinitelyRet DefinitelyAssigns : core.
+#[export] Hint Constructors DefinitelyRet DefinitelyAssigns lc_e lc_s : core.
 
 
 (** induction principles *)
-Section s_e_rect.
+Section s_rect.
 
 Variables
   (P_list_e_s : list (e*s) -> Prop)
-  (P_e : e -> Prop)
   (P_s : s -> Prop).
 
 Hypothesis
-  (H_StatementAssign : forall (x5:x), forall (e5:e), P_e e5 -> P_s (StatementAssign x5 e5))
+  (H_StatementAssign : forall (x5:x), forall (e5:e), P_s (StatementAssign x5 e5))
   (H_StatementSeq : forall (s1:s), P_s s1 -> forall (s2:s), P_s s2 -> P_s (StatementSeq s1 s2))
-  (H_StatementReturn : forall (e5:e), P_e e5 -> P_s (StatementReturn e5))
-  (H_StatementIfNew : forall (e_s_list:list (e*s)), P_list_e_s e_s_list -> forall (e_5:e), P_e e_5 -> forall (s_5:s), P_s s_5 -> P_s (StatementIfNew e_5 s_5 e_s_list))
-  (H_StatementIfElseNew : forall (e_s_list:list (e*s)), P_list_e_s e_s_list -> forall (e_5:e), P_e e_5 -> forall (s_5:s), P_s s_5 -> forall (e':e), P_e e' -> forall (s':s), P_s s' -> P_s (StatementIfElseNew e_5 s_5 e_s_list e' s'))
-  (H_ExpressionFunction : forall (s5:s), P_s s5 -> P_e (ExpressionFunction s5))
+  (H_StatementReturn : forall (e5:e), P_s (StatementReturn e5))
+  (H_StatementIfNew : forall (e_s_list:list (e*s)), P_list_e_s e_s_list -> forall (e_5:e), forall (s_5:s), P_s s_5 -> P_s (StatementIfNew e_5 s_5 e_s_list))
+  (H_StatementIfElseNew : forall (e_s_list:list (e*s)), P_list_e_s e_s_list -> forall (e_5:e), forall (s_5:s), P_s s_5 -> forall (e':e), forall (s':s), P_s s' -> P_s (StatementIfElseNew e_5 s_5 e_s_list e' s'))
+  (H_StatementFunction : forall (s5:s), P_s s5 -> P_s (StatementFunction s5))
   (H_list_e_s_nil : P_list_e_s nil)
-  (H_list_e_s_cons : forall (e0:e), P_e e0 -> forall (s0:s), P_s s0 -> forall (e_s_l:list (e*s)), P_list_e_s e_s_l -> P_list_e_s (cons (e0,s0) e_s_l)).
+  (H_list_e_s_cons : forall (e0:e), forall (s0:s), P_s s0 -> forall (e_s_l:list (e*s)), P_list_e_s e_s_l -> P_list_e_s (cons (e0,s0) e_s_l)).
 
-Fixpoint e_ott_ind (n:e) : P_e n :=
-  match n as x return P_e x with
-  | (ExpressionFunction s5) => H_ExpressionFunction s5 (s_ott_ind s5)
-end
-with s_ott_ind (n:s) : P_s n :=
+Fixpoint s_ott_ind (n:s) : P_s n :=
   match n as x return P_s x with
-  | (StatementAssign x5 e5) => H_StatementAssign x5 e5 (e_ott_ind e5)
+  | (StatementAssign x5 e5) => H_StatementAssign x5 e5
   | (StatementSeq s1 s2) => H_StatementSeq s1 (s_ott_ind s1) s2 (s_ott_ind s2)
-  | (StatementReturn e5) => H_StatementReturn e5 (e_ott_ind e5)
-  | (StatementIfNew e_5 s_5 e_s_list) => H_StatementIfNew e_s_list (((fix e_s_list_ott_ind (e_s_l:list (e*s)) : P_list_e_s e_s_l := match e_s_l as x return P_list_e_s x with nil => H_list_e_s_nil | cons (e1,s1) xl => H_list_e_s_cons e1(e_ott_ind e1) s1(s_ott_ind s1)xl (e_s_list_ott_ind xl) end)) e_s_list) e_5 (e_ott_ind e_5) s_5 (s_ott_ind s_5)
-  | (StatementIfElseNew e_5 s_5 e_s_list e' s') => H_StatementIfElseNew e_s_list (((fix e_s_list_ott_ind (e_s_l:list (e*s)) : P_list_e_s e_s_l := match e_s_l as x return P_list_e_s x with nil => H_list_e_s_nil | cons (e2,s2) xl => H_list_e_s_cons e2(e_ott_ind e2) s2(s_ott_ind s2)xl (e_s_list_ott_ind xl) end)) e_s_list) e_5 (e_ott_ind e_5) s_5 (s_ott_ind s_5) e' (e_ott_ind e') s' (s_ott_ind s')
+  | (StatementReturn e5) => H_StatementReturn e5
+  | (StatementIfNew e_5 s_5 e_s_list) => H_StatementIfNew e_s_list (((fix e_s_list_ott_ind (e_s_l:list (e*s)) : P_list_e_s e_s_l := match e_s_l as x return P_list_e_s x with nil => H_list_e_s_nil | cons (e1,s1) xl => H_list_e_s_cons e1  s1(s_ott_ind s1)xl (e_s_list_ott_ind xl) end)) e_s_list) e_5 s_5 (s_ott_ind s_5)
+  | (StatementIfElseNew e_5 s_5 e_s_list e' s') => H_StatementIfElseNew e_s_list (((fix e_s_list_ott_ind (e_s_l:list (e*s)) : P_list_e_s e_s_l := match e_s_l as x return P_list_e_s x with nil => H_list_e_s_nil | cons (e2,s2) xl => H_list_e_s_cons e2  s2(s_ott_ind s2)xl (e_s_list_ott_ind xl) end)) e_s_list) e_5 s_5 (s_ott_ind s_5) e' s' (s_ott_ind s')
+  | (StatementFunction s5) => H_StatementFunction s5 (s_ott_ind s5)
 end.
 
-End s_e_rect.
+End s_rect.
 

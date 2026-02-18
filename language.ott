@@ -5,14 +5,19 @@ indexvar n ::=  {{ coq nat }} {{ com index }}
 grammar
 
 e :: 'Expression' ::= {{ com Expression }}
-  | def f(x): s :: :: Function
+  | x :: :: Var {{ com variable }}
 
 s :: 'Statement' ::= {{ com Statement }}
-  | x = e  :: :: Assign {{ com Assign }}
-  | s1 s2 :: :: Seq {{ com Sequence }}
-  | return e :: :: Return {{ com Return }}
-  | if e : s elif e1 : s1 .. elif en : sn :: :: IfNew {{ com If }}
-  | if e : s elif e1 : s1 .. elif en : sn else e' : s' :: :: IfElseNew {{ com If/Else }}
+  | x = e  :: :: Assign {{ com assign }}
+  | s1 s2 :: :: Seq {{ com sequence }}
+  | return e :: :: Return {{ com return }}
+  | if e : s elif e1 : s1 .. elif en : sn :: :: IfNew {{ com if }}
+  | if e : s elif e1 : s1 .. elif en : sn else e' : s' :: :: IfElseNew {{ com if/else }}
+  | def f(x): s :: :: Function {{ com function definition }}
+
+G {{ tex \Gamma }} :: 'Env' ::= {{ com Environment }}
+  | empty ::   :: Empty {{ tex \varepsilon }} {{ com empty }}
+  | G , x ::   :: Extend {{ com extend }}
 
 %%%
 
