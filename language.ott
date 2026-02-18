@@ -1,22 +1,24 @@
-metavar x ::= {{ repr-locally-nameless }} {{ com  term variable  }}
+metavar x ::= {{ repr-locally-nameless }} {{ com variable }}
+metavar f ::= {{ repr-locally-nameless }} {{ com function name }}
+indexvar n ::=  {{ coq nat }} {{ com index }}
 
 grammar
 
-e :: 'Expression' ::=
+e :: 'Expression' ::= {{ com Expression }}
   | def f(x): s :: :: Function
 
-s :: 'Statement' ::=
-  | x = e  :: :: Assign
-  | s1 s2 :: :: Seq
-  | return e :: :: Return
-  | if e: s :: :: If
-  | if_else e: s1 s2 :: :: IfElse
-
+s :: 'Statement' ::= {{ com Statement }}
+  | x = e  :: :: Assign {{ com Assign }}
+  | s1 s2 :: :: Seq {{ com Sequence }}
+  | return e :: :: Return {{ com Return }}
+  | if e : s elif e1 : s1 .. elif en : sn :: :: IfNew {{ com If }}
+  | if e : s elif e1 : s1 .. elif en : sn else e' : s' :: :: IfElseNew {{ com If/Else }}
 
 %%%
 
-formula :: 'formula_' ::=
- | judgement                  ::   :: judgement
+formula :: formula_ ::=
+|  judgement                       ::   :: judgement
+|  formula1 .. formulan            ::   :: dots
 
 defns
   Judgements :: '' ::=
@@ -24,6 +26,7 @@ defns
 
 defn
 s DefinitelyRet :: :: OpSemantics :: 'DefinitelyRet_'
+{{ tex \mathsf{DefinitelyRet}([[ s ]]) }}
 by
 
 ------------------- :: return
@@ -37,8 +40,8 @@ s2 DefinitelyRet
 ------------------- :: seq_2
 s2 s2 DefinitelyRet
 
-
-s1 DefinitelyRet
-s2 DefinitelyRet
+s DefinitelyRet
+s1 DefinitelyRet .. sn DefinitelyRet
+s' DefinitelyRet
 ------------------- :: if_else
-if_else e: s1 s2 DefinitelyRet
+if e : s elif e1 : s1 .. elif en : sn else e' : s' DefinitelyRet

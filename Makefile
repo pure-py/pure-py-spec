@@ -1,9 +1,13 @@
-all: language.tex
+default: language.pdf
 
-language.tex: language.ott
-	ott -i language.ott -o language.tex -o language.v
+%.tex %.v: %.ott
+	ott -i $< -o $*.tex -o $*.v
+
+%.pdf: %.tex
+	pdflatex $<
+	pdflatex $<   # second pass for refs, if needed
 
 clean:
-	rm -f language.tex
+	rm -f *.tex *.v *.pdf *.aux *.log *.out
 
 .PHONY: all clean

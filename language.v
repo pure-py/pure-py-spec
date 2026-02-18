@@ -4,16 +4,18 @@ Require Import Metalib.Metatheory.
 Require Import List.
 Require Import Ott.ott_list_core.
 (** syntax *)
-Definition x : Set := var. (* term variable *)
+Definition x : Set := var. (* variable *)
+Definition f : Set := var. (* function name *)
+Definition n : Set := nat. (* index *)
 
-Inductive e : Set := 
+Inductive e : Set :=  (* Expression *)
  | ExpressionFunction (s5:s)
-with s : Set := 
- | StatementAssign (x5:x) (e5:e)
- | StatementSeq (s1:s) (s2:s)
- | StatementReturn (e5:e)
- | StatementIf (s5:s)
- | StatementIfElse (s1:s) (s2:s).
+with s : Set :=  (* Statement *)
+ | StatementAssign (x5:x) (e5:e) (* Assign *)
+ | StatementSeq (s1:s) (s2:s) (* Sequence *)
+ | StatementReturn (e5:e) (* Return *)
+ | StatementIfNew (e_5:e) (s_5:s) (_:list (e*s)) (* If *)
+ | StatementIfElseNew (e_5:e) (s_5:s) (_:list (e*s)) (e':e) (s':s) (* If/Else *).
 
 (* EXPERIMENTAL *)
 (** auxiliary functions on the new list types *)
@@ -38,13 +40,47 @@ Inductive OpSemantics : s -> Prop :=    (* defn OpSemantics *)
  | DefinitelyRet_seq_2 : forall (s2:s),
      OpSemantics s2 ->
      OpSemantics (StatementSeq s2 s2)
- | DefinitelyRet_if_else : forall (s1 s2:s),
-     OpSemantics s1 ->
-     OpSemantics s2 ->
-     OpSemantics (StatementIfElse s1 s2).
+ | DefinitelyRet_if_else : forall (e_s_list:list (e*s)) (e_5:e) (s_5:s) (e':e) (s':s),
+     OpSemantics s_5 ->
+     (forall s_, In s_ (map (fun (pat_: (e*s)) => match pat_ with (e_,s_) => s_ end) e_s_list) -> (OpSemantics s_)) ->
+     OpSemantics s' ->
+     OpSemantics (StatementIfElseNew e_5 s_5 e_s_list e' s').
 
 
 (** infrastructure *)
 #[export] Hint Constructors OpSemantics : core.
 
+
+(** induction principles *)
+Section s_e_rect.
+
+Variables
+  (P_list_e_s : list (e*s) -> Prop)
+  (P_e : e -> Prop)
+  (P_s : s -> Prop).
+
+Hypothesis
+  (H_StatementAssign : forall (x5:x), forall (e5:e), P_e e5 -> P_s (StatementAssign x5 e5))
+  (H_StatementSeq : forall (s1:s), P_s s1 -> forall (s2:s), P_s s2 -> P_s (StatementSeq s1 s2))
+  (H_StatementReturn : forall (e5:e), P_e e5 -> P_s (StatementReturn e5))
+  (H_StatementIfNew : forall (e_s_list:list (e*s)), P_list_e_s e_s_list -> forall (e_5:e), P_e e_5 -> forall (s_5:s), P_s s_5 -> P_s (StatementIfNew e_5 s_5 e_s_list))
+  (H_StatementIfElseNew : forall (e_s_list:list (e*s)), P_list_e_s e_s_list -> forall (e_5:e), P_e e_5 -> forall (s_5:s), P_s s_5 -> forall (e':e), P_e e' -> forall (s':s), P_s s' -> P_s (StatementIfElseNew e_5 s_5 e_s_list e' s'))
+  (H_ExpressionFunction : forall (s5:s), P_s s5 -> P_e (ExpressionFunction s5))
+  (H_list_e_s_nil : P_list_e_s nil)
+  (H_list_e_s_cons : forall (e0:e), P_e e0 -> forall (s0:s), P_s s0 -> forall (e_s_l:list (e*s)), P_list_e_s e_s_l -> P_list_e_s (cons (e0,s0) e_s_l)).
+
+Fixpoint e_ott_ind (n:e) : P_e n :=
+  match n as x return P_e x with
+  | (ExpressionFunction s5) => H_ExpressionFunction s5 (s_ott_ind s5)
+end
+with s_ott_ind (n:s) : P_s n :=
+  match n as x return P_s x with
+  | (StatementAssign x5 e5) => H_StatementAssign x5 e5 (e_ott_ind e5)
+  | (StatementSeq s1 s2) => H_StatementSeq s1 (s_ott_ind s1) s2 (s_ott_ind s2)
+  | (StatementReturn e5) => H_StatementReturn e5 (e_ott_ind e5)
+  | (StatementIfNew e_5 s_5 e_s_list) => H_StatementIfNew e_s_list (((fix e_s_list_ott_ind (e_s_l:list (e*s)) : P_list_e_s e_s_l := match e_s_l as x return P_list_e_s x with nil => H_list_e_s_nil | cons (e1,s1) xl => H_list_e_s_cons e1(e_ott_ind e1) s1(s_ott_ind s1)xl (e_s_list_ott_ind xl) end)) e_s_list) e_5 (e_ott_ind e_5) s_5 (s_ott_ind s_5)
+  | (StatementIfElseNew e_5 s_5 e_s_list e' s') => H_StatementIfElseNew e_s_list (((fix e_s_list_ott_ind (e_s_l:list (e*s)) : P_list_e_s e_s_l := match e_s_l as x return P_list_e_s x with nil => H_list_e_s_nil | cons (e2,s2) xl => H_list_e_s_cons e2(e_ott_ind e2) s2(s_ott_ind s2)xl (e_s_list_ott_ind xl) end)) e_s_list) e_5 (e_ott_ind e_5) s_5 (s_ott_ind s_5) e' (e_ott_ind e') s' (s_ott_ind s')
+end.
+
+End s_e_rect.
 
