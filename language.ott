@@ -16,8 +16,9 @@ s :: 'Statement' ::= {{ com Statement }}
 
 %%%
 
-formula :: 'formula_' ::=
- | judgement                  ::   :: judgement
+formula :: formula_ ::=
+|  judgement                       ::   :: judgement
+|  formula1 .. formulan            ::   :: dots
 
 defns
   Judgements :: '' ::=
@@ -39,7 +40,8 @@ s2 DefinitelyRet
 ------------------- :: seq_2
 s2 s2 DefinitelyRet
 
-s1 DefinitelyRet
-s2 DefinitelyRet
+s DefinitelyRet
+s1 DefinitelyRet .. sn DefinitelyRet
+s' DefinitelyRet
 ------------------- :: if_else
 if e : s elif e1 : s1 .. elif en : sn else e' : s' DefinitelyRet
