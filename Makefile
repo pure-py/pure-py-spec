@@ -1,10 +1,12 @@
+TEXFILES := $(wildcard *.tex) $(wildcard fig/*.tex)
+
 default: language.pdf
 
-%.pdf: %.tex
-	latexmk -pdf $<
+%.pdf: %.tex $(TEXFILES)
+	pdflatex $<
+	pdflatex $<   # second pass for refs
 
 clean:
-	latexmk -C
-	rm -f *.pdf
+	rm -f *.pdf *.aux *.log *.out
 
 .PHONY: default clean

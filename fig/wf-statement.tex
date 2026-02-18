@@ -48,11 +48,11 @@
 \and
 \inferrule*[right=function]
 {
-  \wfStmt{\Gamma, x}{s}{\Delta} \\
+  \wfStmt{\Gamma, f, \vec{x}}{s}{\Delta} \\
   x \notin \Delta
 }
 {
-  \wfStmt{\Gamma}{\texttt{def}\;f(x):\;s}{\{f\}}
+  \wfStmt{\Gamma}{\texttt{def}\;f(\vec{x}):\;s}{\{f\}}
 }
 \end{mathpar}
 \caption{Well-formed statements}
