@@ -1,6 +1,6 @@
 metavar x ::= {{ repr-locally-nameless }} {{ com variable }}
 metavar f ::= {{ repr-locally-nameless }} {{ com function name }}
-indexvar index, n ::=  {{ hol num }} {{ coq nat }}
+indexvar n ::=  {{ coq nat }} {{ com index }}
 
 grammar
 
