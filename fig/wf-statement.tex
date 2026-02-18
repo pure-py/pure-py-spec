@@ -22,13 +22,13 @@
   \wf{\Gamma}{e}
 }
 {
-  \wfStmt{\Gamma}{\texttt{return}\;e}{\varnothing}
+  \wfStmt{\Gamma}{\texttt{return}\;e}{\Var}
 }
 \and
 \inferrule*[right=if]
 {
   \wf{\Gamma}{e_i} \quad (\text{for } i \in \{0, \ldots, n\}) \\
-  \wfStmt{\Gamma}{s_i}{\Delta_i} \quad (\text{for } i \in \{1, \ldots, n + 1\})
+  \wfStmt{\Gamma}{s_i}{\Delta_i} \quad (\text{for } i \in \{0, \ldots, n + 1\})
   \\
 }
 {
