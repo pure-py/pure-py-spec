@@ -54,4 +54,4 @@ defn
 by
 
 ------------------- :: assign
-DefinitelyAssigns G x = e
+DefinitelyAssigns G (x = e)
