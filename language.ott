@@ -3,15 +3,15 @@ metavar f ::= {{ repr-locally-nameless }} {{ com  function name  }}
 
 grammar
 
-e :: 'Expression' ::=
+e :: 'Expression' ::= {{ com Expression }}
   | def f(x): s :: :: Function
 
-s :: 'Statement' ::=
-  | x = e  :: :: Assign
-  | s1 s2 :: :: Seq
-  | return e :: :: Return
-  | if e : s :: :: If
-  | if e : s1 else : s2 :: :: IfElse
+s :: 'Statement' ::= {{ com Statement }}
+  | x = e  :: :: Assign {{ com Assign }}
+  | s1 s2 :: :: Seq {{ com Sequence }}
+  | return e :: :: Return {{ com Return }}
+  | if e : s :: :: If {{ com If }}
+  | if e : s1 else : s2 :: :: IfElse {{ com If/Else }}
 
 
 %%%

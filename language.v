@@ -7,14 +7,14 @@ Require Import Ott.ott_list_core.
 Definition x : Set := var. (* variable *)
 Definition f : Set := var. (* function name *)
 
-Inductive e : Set := 
+Inductive e : Set :=  (* Expression *)
  | ExpressionFunction (s5:s)
-with s : Set := 
- | StatementAssign (x5:x) (e5:e)
- | StatementSeq (s1:s) (s2:s)
- | StatementReturn (e5:e)
- | StatementIf (e5:e) (s5:s)
- | StatementIfElse (e5:e) (s1:s) (s2:s).
+with s : Set :=  (* Statement *)
+ | StatementAssign (x5:x) (e5:e) (* Assign *)
+ | StatementSeq (s1:s) (s2:s) (* Sequence *)
+ | StatementReturn (e5:e) (* Return *)
+ | StatementIf (e5:e) (s5:s) (* If *)
+ | StatementIfElse (e5:e) (s1:s) (s2:s) (* If/Else *).
 
 (* EXPERIMENTAL *)
 (** auxiliary functions on the new list types *)
