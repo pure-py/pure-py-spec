@@ -133,18 +133,11 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
 \and
 \inferrule*[right=seq]
 {
-  \wellFormedNew{\Gamma_1}{s_1}{\Delta_1} \\
-  \wellFormed{\Gamma_2}{s_2}
+  \wellFormedNew{\Gamma}{s_1}{\Delta_1} \\
+  \wellFormedNew{\Gamma \cup \Delta_1}{s_2}{\Delta_2}
 }
 {
-  \wellFormed{\Gamma_1 \cup \Gamma_2}{s_1\;s_2}
-}
-\and
-{
-  \strut
-}
-{
-  \wellFormed{\varepsilon, x}{x = e}
+  \wellFormedNew{\Gamma}{s_1\;s_2}{\Delta_1 \cup \Delta_2}
 }
 \and
 \inferrule*[right=if\_else]
