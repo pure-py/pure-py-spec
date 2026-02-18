@@ -35,7 +35,8 @@
 \newcommand{\ottafterlastrule}{\\}
 \newcommand{\ottmetavars}{
 \ottmetavartabular{
- $ \ottmv{x} $ & \ottcom{term variable} \\
+ $ \ottmv{x} $ & \ottcom{variable} \\
+ $ \ottmv{f} $ & \ottcom{function name} \\
 }}
 
 \newcommand{\otte}{
@@ -47,8 +48,8 @@
 \ottfirstprodline{|}{\ottmv{x}  \ottsym{=}  \ottnt{e}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{s_{{\mathrm{1}}}} \, \ottnt{s_{{\mathrm{2}}}}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottkw{return} \, \ottnt{e}}{}{}{}{}\ottprodnewline
-\ottprodline{|}{\ottkw{if} \, \ottsym{e:}  \ottnt{s}}{}{}{}{}\ottprodnewline
-\ottprodline{|}{\ottkw{if} \, \ottsym{e:}  \ottnt{s_{{\mathrm{1}}}}  \ottsym{else:}  \ottnt{s_{{\mathrm{2}}}}}{}{}{}{}}
+\ottprodline{|}{\ottkw{if} \, \ottnt{e}  \ottsym{:}  \ottnt{s}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottkw{if} \, \ottnt{e}  \ottsym{:}  \ottnt{s_{{\mathrm{1}}}} \, \ottkw{else} \, \ottsym{:}  \ottnt{s_{{\mathrm{2}}}}}{}{}{}{}}
 
 \newcommand{\ottformula}{
 \ottrulehead{\ottnt{formula}}{::=}{}\ottprodnewline
@@ -65,6 +66,7 @@
 \newcommand{\ottuserXXsyntax}{
 \ottrulehead{\ottnt{user\_syntax}}{::=}{}\ottprodnewline
 \ottfirstprodline{|}{\ottmv{x}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottmv{f}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{e}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{s}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{formula}}{}{}{}{}}
@@ -108,7 +110,7 @@
 \ottpremise{\ottnt{s_{{\mathrm{1}}}} \, \ottkw{DefinitelyRet}}%
 \ottpremise{\ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}%
 }{
-\ottkw{if} \, \ottsym{e:}  \ottnt{s_{{\mathrm{1}}}}  \ottsym{else:}  \ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}{%
+\ottkw{if} \, \ottnt{e}  \ottsym{:}  \ottnt{s_{{\mathrm{1}}}} \, \ottkw{else} \, \ottsym{:}  \ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}{%
 {\ottdrulename{DefinitelyRet\_if\_else}}{}%
 }}
 

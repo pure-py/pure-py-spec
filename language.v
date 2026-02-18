@@ -4,7 +4,8 @@ Require Import Metalib.Metatheory.
 Require Import List.
 Require Import Ott.ott_list_core.
 (** syntax *)
-Definition x : Set := var. (* term variable *)
+Definition x : Set := var. (* variable *)
+Definition f : Set := var. (* function name *)
 
 Inductive e : Set := 
  | ExpressionFunction (s5:s)
@@ -12,8 +13,8 @@ with s : Set :=
  | StatementAssign (x5:x) (e5:e)
  | StatementSeq (s1:s) (s2:s)
  | StatementReturn (e5:e)
- | StatementIf (s5:s)
- | StatementIfElse (s1:s) (s2:s).
+ | StatementIf (e5:e) (s5:s)
+ | StatementIfElse (e5:e) (s1:s) (s2:s).
 
 (* EXPERIMENTAL *)
 (** auxiliary functions on the new list types *)
@@ -38,10 +39,10 @@ Inductive OpSemantics : s -> Prop :=    (* defn OpSemantics *)
  | DefinitelyRet_seq_2 : forall (s2:s),
      OpSemantics s2 ->
      OpSemantics (StatementSeq s2 s2)
- | DefinitelyRet_if_else : forall (s1 s2:s),
+ | DefinitelyRet_if_else : forall (e5:e) (s1 s2:s),
      OpSemantics s1 ->
      OpSemantics s2 ->
-     OpSemantics (StatementIfElse s1 s2).
+     OpSemantics (StatementIfElse e5 s1 s2).
 
 
 (** infrastructure *)
