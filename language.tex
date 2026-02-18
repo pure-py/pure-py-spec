@@ -4,6 +4,7 @@
 \usepackage[authoryear,round]{natbib}
 \usepackage{enumitem}
 \usepackage{titling}
+\usepackage{beramono}
 \usepackage{microtype}
 \usepackage{xcolor}
 \usepackage{amsmath,amssymb}
@@ -102,12 +103,16 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
 }
 \and
 \inferrule*[right=if\_else]
-{\DefRet{s} \\
- \DefRet{s_1} \\
- \cdots \\
- \DefRet{s_n} \\
- \DefRet{s'}}
-{\DefRet{\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'}}
+{
+  \DefRet{s} \\
+  \DefRet{s_1} \\
+  \cdots \\
+  \DefRet{s_n} \\
+  \DefRet{s'}
+}
+{
+  \DefRet{\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'}
+}
 \end{mathpar}
 
 \subsection*{DefinitelyAssigns}
