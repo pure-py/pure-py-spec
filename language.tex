@@ -48,7 +48,7 @@
 \ottprodline{|}{\ottnt{s_{{\mathrm{1}}}} \, \ottnt{s_{{\mathrm{2}}}}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottkw{return} \, \ottnt{e}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottkw{if} \, \ottsym{e:}  \ottnt{s}}{}{}{}{}\ottprodnewline
-\ottprodline{|}{\ottkw{if\_else} \, \ottsym{e:}  \ottnt{s_{{\mathrm{1}}}} \, \ottnt{s_{{\mathrm{2}}}}}{}{}{}{}}
+\ottprodline{|}{\ottkw{if} \, \ottsym{e:}  \ottnt{s_{{\mathrm{1}}}}  \ottsym{else:}  \ottnt{s_{{\mathrm{2}}}}}{}{}{}{}}
 
 \newcommand{\ottformula}{
 \ottrulehead{\ottnt{formula}}{::=}{}\ottprodnewline
@@ -108,7 +108,7 @@
 \ottpremise{\ottnt{s_{{\mathrm{1}}}} \, \ottkw{DefinitelyRet}}%
 \ottpremise{\ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}%
 }{
-\ottkw{if\_else} \, \ottsym{e:}  \ottnt{s_{{\mathrm{1}}}} \, \ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}{%
+\ottkw{if} \, \ottsym{e:}  \ottnt{s_{{\mathrm{1}}}}  \ottsym{else:}  \ottnt{s_{{\mathrm{2}}}} \, \ottkw{DefinitelyRet}}{%
 {\ottdrulename{DefinitelyRet\_if\_else}}{}%
 }}
 

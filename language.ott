@@ -10,7 +10,7 @@ s :: 'Statement' ::=
   | s1 s2 :: :: Seq
   | return e :: :: Return
   | if e: s :: :: If
-  | if_else e: s1 s2 :: :: IfElse
+  | if e: s1 else: s2 :: :: IfElse
 
 
 %%%
@@ -37,8 +37,7 @@ s2 DefinitelyRet
 ------------------- :: seq_2
 s2 s2 DefinitelyRet
 
-
 s1 DefinitelyRet
 s2 DefinitelyRet
 ------------------- :: if_else
-if_else e: s1 s2 DefinitelyRet
+if e: s1 else: s2 DefinitelyRet
