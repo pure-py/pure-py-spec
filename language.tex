@@ -60,8 +60,8 @@ $e$ & $::=$ & $x$ & (Var)
 $s$ & $::=$ & $x = e$ & (Assign) \\
     & $\mid$ & $s_1\;s_2$ & (Seq) \\
     & $\mid$ & $\texttt{return}\;e$ & (Return) \\
-    & $\mid$ & $\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n$ & (IfNew) \\
-    & $\mid$ & $\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'$ & (IfElseNew) \\
+    & $\mid$ & $\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n$ & (If) \\
+    & $\mid$ & $\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'$ & (IfElse) \\
     & $\mid$ & $\texttt{def}\;f(x):\;s$ & (Function)
 \end{tabular}
 \end{center}
@@ -76,7 +76,9 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
 
 \section*{Judgements}
 
-\subsection*{DefinitelyRet}
+\subsection*{Definitely returns}
+
+\begin{figure}
 \begin{mathpar}
 \inferrule*[right=return]
 {
@@ -114,15 +116,35 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
   \DefRet{\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'}
 }
 \end{mathpar}
+\caption{Definitely returns}
+\end{figure}
 
-\subsection*{DefinitelyAssigns}
+\subsection*{Definitely assigns}
 
+\begin{figure}
 \begin{mathpar}
 \inferrule*[right=assign]
 {
+  \strut
 }
 {
-   \DefAssigns{\varepsilon, x}{x = e}
+  \DefAssigns{\varepsilon, x}{x = e}
+}
+\and
+\inferrule*[right=seq]
+{
+  \DefAssigns{\Gamma_1}{s_1} \\
+  \DefAssigns{\Gamma_2}{s_2}
+}
+{
+  \DefAssigns{\Gamma_1 \cup \Gamma_2}{s_1\;s_2}
+}
+\and
+{
+  \strut
+}
+{
+  \DefAssigns{\varepsilon, x}{x = e}
 }
 \and
 \inferrule*[right=if\_else]
@@ -134,9 +156,24 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
   \DefAssigns{\Gamma'}{s'}
 }
 {
-  \DefAssigns{\bigcap(\Gamma,\Gamma_1,\cdots,\Gamma_n,\Gamma')}
-  {\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'}
+  \DefAssigns{\bigcap\{\Gamma,\Gamma_1,\cdots,\Gamma_n,\Gamma'\}}
+  \texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'
 }
 \end{mathpar}
+\caption{Definitely assigns}
+\end{figure}
+
+\begin{figure}
+\begin{mathpar}
+\inferrule*[right=var]
+{
+  x \in \Gamma
+}
+{
+  \Gamma \vdash x
+}
+\end{mathpar}
+\caption{Well-formed expressions}
+\end{figure}
 
 \end{document}
