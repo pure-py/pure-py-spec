@@ -92,9 +92,7 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
 {
    \DefRet{s_1\;s_2}
 }
-\end{mathpar}
-
-\[
+\and
 \inferrule*[right=seq\_2]
 {
   \DefRet{s_2}
@@ -102,9 +100,7 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
 {
   \DefRet{s_2\;s_2}
 }
-\]
-
-\[
+\and
 \inferrule*[right=if\_else]
 {\DefRet{s} \\
  \DefRet{s_1} \\
@@ -112,7 +108,7 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
  \DefRet{s_n} \\
  \DefRet{s'}}
 {\DefRet{\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'}}
-\]
+\end{mathpar}
 
 \subsection*{DefinitelyAssigns}
 \[
