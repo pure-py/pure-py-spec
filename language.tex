@@ -125,42 +125,42 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
 \begin{mathpar}
 \inferrule*[right=assign]
 {
-  \strut
+  \wellFormed{\Gamma}{e}
 }
 {
-  \DefAssigns{\varepsilon, x}{x = e}
+  \wellFormedNew{\Gamma}{x = e}{\{x\}}
 }
 \and
 \inferrule*[right=seq]
 {
-  \DefAssigns{\Gamma_1}{s_1} \\
-  \DefAssigns{\Gamma_2}{s_2}
+  \wellFormed{\Gamma_1}{s_1} \\
+  \wellFormed{\Gamma_2}{s_2}
 }
 {
-  \DefAssigns{\Gamma_1 \cup \Gamma_2}{s_1\;s_2}
+  \wellFormed{\Gamma_1 \cup \Gamma_2}{s_1\;s_2}
 }
 \and
 {
   \strut
 }
 {
-  \DefAssigns{\varepsilon, x}{x = e}
+  \wellFormed{\varepsilon, x}{x = e}
 }
 \and
 \inferrule*[right=if\_else]
 {
-  \DefAssigns{\Gamma}{s} \\
-  \DefAssigns{\Gamma_1}{s_1} \\
+  \wellFormed{\Gamma}{s} \\
+  \wellFormed{\Gamma_1}{s_1} \\
   \cdots \\
-  \DefAssigns{\Gamma_n}{s_n} \\
-  \DefAssigns{\Gamma'}{s'}
+  \wellFormed{\Gamma_n}{s_n} \\
+  \wellFormed{\Gamma'}{s'}
 }
 {
-  \DefAssigns{\bigcap\{\Gamma,\Gamma_1,\cdots,\Gamma_n,\Gamma'\}}
+  \wellFormed{\bigcap\{\Gamma,\Gamma_1,\cdots,\Gamma_n,\Gamma'\}}
   \texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'
 }
 \end{mathpar}
-\caption{Definitely assigns}
+\caption{Well-formed statements}
 \end{figure}
 
 \begin{figure}
