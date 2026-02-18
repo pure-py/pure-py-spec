@@ -4,8 +4,7 @@
 \usepackage{amsmath,amssymb}
 \usepackage{mathpartir}
 
-\newcommand{\DefRet}[1]{\mathsf{DefinitelyRet}(#1)}
-\newcommand{\DefAssigns}[2]{#1 \vdash #2}
+\input{macros}
 
 \begin{document}
 
@@ -34,8 +33,7 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
 \[
 \begin{array}{rcll}
 \Gamma &::=& \varepsilon & (\text{Empty})\\
-       &\mid& \Gamma, x & (\text{Extend})\\
-       &\mid& \mathrm{intersection}\;\Gamma_1\;\cdots\;\Gamma_n & (\text{Intersection})
+    &\mid& \Gamma, x & (\text{Extend})
 \end{array}
 \]
 
@@ -82,7 +80,7 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
  \cdots \\
  \DefAssigns{\Gamma_n}{s_n} \\
  \DefAssigns{\Gamma'}{s'}}
-{\DefAssigns{\mathrm{intersection}\;\Gamma\;\Gamma_1\;\cdots\;\Gamma_n\;\Gamma'}
+{\DefAssigns{\bigcap(\Gamma,\Gamma_1,\cdots,\Gamma_n,\Gamma')}
              {\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'}}
 \]
 
