@@ -1,0 +1,89 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{mathpartir}
+
+\newcommand{\DefRet}[1]{\mathsf{DefinitelyRet}(#1)}
+\newcommand{\DefAssigns}[2]{#1 \vdash #2}
+
+\begin{document}
+
+\section*{Syntax}
+
+\subsection*{Expressions}
+\begin{center}
+\begin{tabular}{rcll}
+$e$ & $::=$ & $x$ & (Var)
+\end{tabular}
+\end{center}
+
+\subsection*{Statements}
+\begin{center}
+\begin{tabular}{rcll}
+$s$ & $::=$ & $x = e$ & (Assign) \\
+    & $\mid$ & $s_1\;s_2$ & (Seq) \\
+    & $\mid$ & $\texttt{return}\;e$ & (Return) \\
+    & $\mid$ & $\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n$ & (IfNew) \\
+    & $\mid$ & $\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'$ & (IfElseNew) \\
+    & $\mid$ & $\texttt{def}\;f(x):\;s$ & (Function)
+\end{tabular}
+\end{center}
+
+\subsection*{Environments}
+\[
+\begin{array}{rcll}
+\Gamma &::=& \varepsilon & (\text{Empty})\\
+       &\mid& \Gamma, x & (\text{Extend})\\
+       &\mid& \mathrm{intersection}\;\Gamma_1\;\cdots\;\Gamma_n & (\text{Intersection})
+\end{array}
+\]
+
+\section*{Judgements}
+
+\subsection*{DefinitelyRet}
+\[
+\inferrule*[right=return]
+{}
+{\DefRet{\texttt{return}\;e}}
+\]
+
+\[
+\inferrule*[right=seq\_1]
+{\DefRet{s_1}}
+{\DefRet{s_2\;s_2}}
+\qquad
+\inferrule*[right=seq\_2]
+{\DefRet{s_2}}
+{\DefRet{s_2\;s_2}}
+\]
+
+\[
+\inferrule*[right=if\_else]
+{\DefRet{s} \\
+ \DefRet{s_1} \\
+ \cdots \\
+ \DefRet{s_n} \\
+ \DefRet{s'}}
+{\DefRet{\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'}}
+\]
+
+\subsection*{DefinitelyAssigns}
+\[
+\inferrule*[right=assign]
+{}
+{\DefAssigns{\varepsilon, x}{x = e}}
+\]
+
+\[
+\inferrule*[right=if\_else]
+{\DefAssigns{\Gamma}{s} \\
+ \DefAssigns{\Gamma_1}{s_1} \\
+ \cdots \\
+ \DefAssigns{\Gamma_n}{s_n} \\
+ \DefAssigns{\Gamma'}{s'}}
+{\DefAssigns{\mathrm{intersection}\;\Gamma\;\Gamma_1\;\cdots\;\Gamma_n\;\Gamma'}
+             {\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'}}
+\]
+
+\end{document}
