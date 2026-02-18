@@ -19,15 +19,12 @@ G {{ tex \Gamma }} :: 'Env' ::= {{ com Environment }}
   | empty ::   :: Empty {{ tex \varepsilon }} {{ com empty }}
   | G , x ::   :: Extend {{ com extend }}
 
-%%%
-
 formula :: formula_ ::=
 |  judgement                       ::   :: judgement
 |  formula1 .. formulan            ::   :: dots
 
 defns
   Judgements :: '' ::=
-
 
 defn
 s DefinitelyRet :: :: DefinitelyRet :: 'DefinitelyRet_'
