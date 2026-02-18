@@ -49,9 +49,9 @@ DefinitelyRet s'
 DefinitelyRet if e : s elif e1 : s1 .. elif en : sn else e' : s'
 
 defn
-  DefinitelyAssigns s :: :: DefinitelyAssigns :: 'DefinitelyAssigns_'
+  DefinitelyAssigns G s :: :: DefinitelyAssigns :: 'DefinitelyAssigns_'
   {{ tex \mathsf{DefinitelyAssigns}([[ s ]]) }}
 by
 
 ------------------- :: assign
-DefinitelyAssigns x = e
+DefinitelyAssigns G x = e
