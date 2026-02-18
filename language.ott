@@ -11,9 +11,8 @@ s :: 'Statement' ::= {{ com Statement }}
   | x = e  :: :: Assign {{ com Assign }}
   | s1 s2 :: :: Seq {{ com Sequence }}
   | return e :: :: Return {{ com Return }}
-  | if e : s :: :: If {{ com If }}
-  | if e : s1 else : s2 :: :: IfElse {{ com If/Else }}
-  | ifNew e : s elif e1 : s1 .. elif en : sn :: :: IfNew {{ com If }}
+  | if e : s elif e1 : s1 .. elif en : sn :: :: IfNew {{ com If }}
+  | if e : s elif e1 : s1 .. elif en : sn else e' : s' :: :: IfElseNew {{ com If/Else }}
 
 %%%
 
@@ -43,4 +42,4 @@ s2 s2 DefinitelyRet
 s1 DefinitelyRet
 s2 DefinitelyRet
 ------------------- :: if_else
-if e : s1 else : s2 DefinitelyRet
+if e : s elif e1 : s1 .. elif en : sn else e' : s' DefinitelyRet
