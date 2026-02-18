@@ -25,6 +25,7 @@ defns
 
 defn
 s DefinitelyRet :: :: OpSemantics :: 'DefinitelyRet_'
+{{ tex \mathsf{DefinitelyRet}([[ s ]]) }}
 by
 
 ------------------- :: return
