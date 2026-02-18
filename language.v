@@ -96,10 +96,10 @@ Inductive DefinitelyRet : s -> Prop :=    (* defn DefinitelyRet *)
      (forall s_, In s_ (map (fun (pat_: (e*s)) => match pat_ with (e_,s_) => s_ end) e_s_list) -> (DefinitelyRet s_)) ->
      DefinitelyRet s' ->
      DefinitelyRet (StatementIfElseNew e_5 s_5 e_s_list e' s')
-with DefinitelyAssigns : s -> Prop :=    (* defn DefinitelyAssigns *)
- | DefinitelyAssigns_assign : forall (x5:x) (e5:e),
+with DefinitelyAssigns : G -> s -> Prop :=    (* defn DefinitelyAssigns *)
+ | DefinitelyAssigns_assign : forall (G5:G) (x5:x) (e5:e),
      lc_e e5 ->
-     DefinitelyAssigns (StatementAssign x5 e5).
+     DefinitelyAssigns G5 (StatementAssign x5 e5).
 
 
 (** infrastructure *)

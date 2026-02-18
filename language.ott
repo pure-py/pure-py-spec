@@ -50,7 +50,7 @@ DefinitelyRet if e : s elif e1 : s1 .. elif en : sn else e' : s'
 
 defn
   DefinitelyAssigns G s :: :: DefinitelyAssigns :: 'DefinitelyAssigns_'
-  {{ tex \mathsf{DefinitelyAssigns}([[ s ]]) }}
+  {{ tex [[ G ]] \vdash [[ s ]] }}
 by
 
 ------------------- :: assign
