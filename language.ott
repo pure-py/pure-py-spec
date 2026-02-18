@@ -14,7 +14,7 @@ s :: 'Statement' ::= {{ com Statement }}
   | return e :: :: Return {{ com Return }}
   | if e : s :: :: If {{ com If }}
   | if e : s1 else : s2 :: :: IfElse {{ com If/Else }}
-  | ifNew e : s { l1 = e1 ,  .. , ln = en } :: :: IfNew {{ com If }}
+  | ifNew e : s elif = e1 ,  .. , elif = en :: :: IfNew {{ com If }}
 
 %%%
 
