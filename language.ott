@@ -1,3 +1,4 @@
+metavar label, l ::= {{ hol string }} {{ coq nat }}
 metavar x ::= {{ repr-locally-nameless }} {{ com variable }}
 metavar f ::= {{ repr-locally-nameless }} {{ com function name }}
 indexvar index, n ::=  {{ hol num }} {{ coq nat }}
@@ -13,8 +14,7 @@ s :: 'Statement' ::= {{ com Statement }}
   | return e :: :: Return {{ com Return }}
   | if e : s :: :: If {{ com If }}
   | if e : s1 else : s2 :: :: IfElse {{ com If/Else }}
-%%%  | ifNew e : s { l1 = t1 ,  .. , ln = tn } :: :: IfNew {{ com If }}
-  | { l1 = t1 ,  .. , ln = tn }      :: :: record
+  | ifNew e : s { l1 = e1 ,  .. , ln = en } :: :: IfNew {{ com If }}
 
 %%%
 
