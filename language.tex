@@ -116,24 +116,27 @@ $s$ & $::=$ & $x = e$ & (Assign) \\
 \end{mathpar}
 
 \subsection*{DefinitelyAssigns}
-\[
+
+\begin{mathpar}
 \inferrule*[right=assign]
 {
 }
 {
    \DefAssigns{\varepsilon, x}{x = e}
 }
-\]
-
-\[
+\and
 \inferrule*[right=if\_else]
-{\DefAssigns{\Gamma}{s} \\
- \DefAssigns{\Gamma_1}{s_1} \\
- \cdots \\
- \DefAssigns{\Gamma_n}{s_n} \\
- \DefAssigns{\Gamma'}{s'}}
-{\DefAssigns{\bigcap(\Gamma,\Gamma_1,\cdots,\Gamma_n,\Gamma')}
-             {\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'}}
-\]
+{
+  \DefAssigns{\Gamma}{s} \\
+  \DefAssigns{\Gamma_1}{s_1} \\
+  \cdots \\
+  \DefAssigns{\Gamma_n}{s_n} \\
+  \DefAssigns{\Gamma'}{s'}
+}
+{
+  \DefAssigns{\bigcap(\Gamma,\Gamma_1,\cdots,\Gamma_n,\Gamma')}
+  {\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'}
+}
+\end{mathpar}
 
 \end{document}
