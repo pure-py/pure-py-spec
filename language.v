@@ -14,7 +14,8 @@ Inductive e : Set :=  (* Expression *)
 
 Inductive G : Set :=  (* Environment *)
  | EnvEmpty : G (* empty *)
- | EnvExtend (G5:G) (x5:x) (* extend *).
+ | EnvExtend (G5:G) (x5:x) (* extend *)
+ | EnvIntersection (_:list G) (* intersection *).
 
 Inductive s : Set :=  (* Statement *)
  | StatementAssign (x5:x) (e5:e) (* assign *)
@@ -97,9 +98,16 @@ Inductive DefinitelyRet : s -> Prop :=    (* defn DefinitelyRet *)
      DefinitelyRet s' ->
      DefinitelyRet (StatementIfElseNew e_5 s_5 e_s_list e' s')
 with DefinitelyAssigns : G -> s -> Prop :=    (* defn DefinitelyAssigns *)
- | DefinitelyAssigns_assign : forall (G5:G) (x5:x) (e5:e),
+ | DefinitelyAssigns_assign : forall (x5:x) (e5:e),
      lc_e e5 ->
-     DefinitelyAssigns G5 (StatementAssign x5 e5).
+     DefinitelyAssigns (EnvExtend EnvEmpty x5) (StatementAssign x5 e5)
+ | DefinitelyAssigns_if_else : forall (G_e_s_list:list (G*e*s)) (G_5 G':G) (e_5:e) (s_5:s) (e':e) (s':s),
+     lc_e e_5 ->
+     lc_e e' ->
+     DefinitelyAssigns G_5 s_5 ->
+     (forall G_ s_, In (G_,s_) (map (fun (pat_: (G*e*s)) => match pat_ with (G_,e_,s_) => (G_,s_) end) G_e_s_list) -> (DefinitelyAssigns G_ s_)) ->
+     DefinitelyAssigns G' s' ->
+     DefinitelyAssigns (EnvIntersection ((app (cons G_5 nil) (app (map (fun (pat_:(G*e*s)) => match pat_ with (G_,e_,s_) => G_ end ) G_e_s_list) (app (cons G' nil) nil))))) (StatementIfElseNew e_5 s_5 (map (fun (pat_:(G*e*s)) => match pat_ with (G_,e_,s_) => (e_,s_) end ) G_e_s_list) e' s').
 
 
 (** infrastructure *)
@@ -134,4 +142,27 @@ Fixpoint s_ott_ind (n:s) : P_s n :=
 end.
 
 End s_rect.
+
+
+Section G_rect.
+
+Variables
+  (P_G : G -> Prop)
+  (P_list_G : list G -> Prop).
+
+Hypothesis
+  (H_EnvEmpty : P_G EnvEmpty)
+  (H_EnvExtend : forall (G5:G), P_G G5 -> forall (x5:x), P_G (EnvExtend G5 x5))
+  (H_EnvIntersection : forall (G_list:list G), P_list_G G_list -> P_G (EnvIntersection G_list))
+  (H_list_G_nil : P_list_G nil)
+  (H_list_G_cons : forall (G0:G), P_G G0 -> forall (G_l:list G), P_list_G G_l -> P_list_G (cons G0 G_l)).
+
+Fixpoint G_ott_ind (n:G) : P_G n :=
+  match n as x return P_G x with
+  | EnvEmpty => H_EnvEmpty 
+  | (EnvExtend G5 x5) => H_EnvExtend G5 (G_ott_ind G5) x5
+  | (EnvIntersection G_list) => H_EnvIntersection G_list (((fix G_list_ott_ind (G_l:list G) : P_list_G G_l := match G_l as x return P_list_G x with nil => H_list_G_nil | cons G1 xl => H_list_G_cons G1(G_ott_ind G1)xl (G_list_ott_ind xl) end)) G_list)
+end.
+
+End G_rect.
 

@@ -16,12 +16,13 @@ s :: 'Statement' ::= {{ com Statement }}
   | def f(x): s :: :: Function {{ com function definition }}
 
 G {{ tex \Gamma }} :: 'Env' ::= {{ com Environment }}
-  | empty ::   :: Empty {{ tex \varepsilon }} {{ com empty }}
-  | G , x ::   :: Extend {{ com extend }}
+  | empty :: :: Empty {{ tex \varepsilon }} {{ com empty }}
+  | G , x :: :: Extend {{ com extend }}
+  | intersection G1 .. Gn :: :: Intersection {{ com intersection }}
 
 formula :: formula_ ::=
-|  judgement                       ::   :: judgement
-|  formula1 .. formulan            ::   :: dots
+  | judgement                       ::   :: judgement
+  | formula1 .. formulan            ::   :: dots
 
 defns
   Judgements :: '' ::=
@@ -54,4 +55,10 @@ defn
 by
 
 ------------------- :: assign
-DefinitelyAssigns G (x = e)
+DefinitelyAssigns empty , x x = e
+
+DefinitelyAssigns G s
+DefinitelyAssigns G1 s1 .. DefinitelyAssigns Gn sn
+DefinitelyAssigns G' s'
+------------------- :: if_else
+DefinitelyAssigns intersection G G1 .. Gn G' if e : s elif e1 : s1 .. elif en : sn else e' : s'
