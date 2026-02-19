@@ -1,0 +1,42 @@
+% Base16 Tomorrow Light colors
+\definecolor{base00}{HTML}{ffffff} % Background
+\definecolor{base01}{HTML}{e0e0e0} % Lighter background
+\definecolor{base02}{HTML}{d6d6d6} % Selection
+\definecolor{base03}{HTML}{8e908c} % Comments
+\definecolor{base04}{HTML}{969896} % Dark foreground
+\definecolor{base05}{HTML}{4d4d4c} % Default foreground
+\definecolor{base06}{HTML}{282a2e} % Light foreground
+\definecolor{base07}{HTML}{1d1f21} % Black
+\definecolor{base08}{HTML}{c82829} % Red
+\definecolor{base09}{HTML}{f5871f} % Orange
+\definecolor{base0A}{HTML}{eab700} % Yellow
+\definecolor{base0B}{HTML}{718c00} % Green
+\definecolor{base0C}{HTML}{3e999f} % Cyan
+\definecolor{base0D}{HTML}{4271ae} % Blue
+\definecolor{base0E}{HTML}{8959a8} % Purple
+\definecolor{base0F}{HTML}{a3685a} % Brown
+
+% Listings style for Python (force pure monospace everywhere)
+\lstdefinestyle{base16python}{
+  language=Python,
+  backgroundcolor=\color{base00},
+  basicstyle={\renewcommand\ttdefault{cmtt}\ttfamily\small\color{base05}},
+  keywordstyle=\color{base0E},
+  commentstyle=\color{base03},
+  stringstyle=\color{base0B},
+  numberstyle=\scriptsize\color{base03},
+  identifierstyle=\color{base05},
+  showstringspaces=false,
+  breaklines=true,
+  postbreak=\space,
+  frame=none,
+  rulecolor=\color{base01},
+  tabsize=4,
+  columns=fullflexible,
+  keepspaces=true,
+  moredelim=[l][\color{base0B}]{@}
+}
+
+% Easy-to-use Python environment and command
+\lstnewenvironment{python}[1][]{\lstset{style=base16python,#1}}{}
+\newcommand{\pyinline}[1]{\lstinline[style=base16python]!#1!}

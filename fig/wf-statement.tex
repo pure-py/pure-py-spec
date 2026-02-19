@@ -1,5 +1,6 @@
 \begin{figure}
 \begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\wfStmt{\Gamma}{s}{\Delta}$}
 \begin{mathpar}
 \inferrule*[right=assign]
 {
@@ -11,11 +12,11 @@
 \and
 \inferrule*[right=seq]
 {
-  \wfStmt{\Gamma}{s_1}{\Delta_1} \\
-  \wfStmt{\Gamma \cup \Delta_1}{s_2}{\Delta_2}
+  \wfStmt{\Gamma'}{s_1}{\Gamma} \\
+  \wfStmt{\Gamma}{s_2}{\Delta}
 }
 {
-  \wfStmt{\Gamma}{\exSeq{s_1}{s_2}}{\Delta_1 \cup \Delta_2}
+  \wfStmt{\Gamma'}{\exSeq{s_1}{s_2}}{\Delta}
 }
 \and
 \inferrule*[right=return]
@@ -58,6 +59,7 @@
 \caption{Statements $s$ demanding $\Gamma$ and providing $\Delta$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\defRet{\Gamma}{s}$}
 \begin{mathpar}
 \inferrule*[right=return]
 {

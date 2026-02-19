@@ -1,4 +1,4 @@
-TEXFILES := $(wildcard *.tex) $(wildcard fig/*.tex)
+TEXFILES := $(wildcard *.tex) $(wildcard tex/*.tex fig/*.tex)
 
 default: language.pdf
 
