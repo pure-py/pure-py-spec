@@ -47,13 +47,13 @@
 \and
 \inferrule*[right=if\_else]
 {
-  \wf{\Gamma}{e_i} \quad (\text{for } i \in \{0, \ldots, n\}) \\
-  \wfStmt{\Gamma}{s_i}{\Delta_i} \quad (\text{for } i \in \{0, \ldots, n + 1\}) \\
+  \wf{\Gamma'}{\vec{e}} \\
+  \wfStmt{\Gamma}{\vec{s}}{\Delta} \\
 }
 {
-  \wfStmt{\Gamma}
-         {\exIfElse{e_0}{s_0}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}{s_{n + 1}}}
-         {\bigcap\{\Delta_0, \ldots, \Delta_{n + 1}\}}
+  \wfStmt{\Gamma \cup \Gamma'}
+         {\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n + 2}}}
+         {\Delta}
 }
 \end{mathpar}
 \caption{Statements $s$ demanding $\Gamma$ and providing $\Delta$}
