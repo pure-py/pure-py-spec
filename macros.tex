@@ -1,11 +1,13 @@
 \newcommand*{\Lang}{PurePy\xspace}
 
 \newcommand*{\DefRet}[1]{#1\;\mathsf{returns}}
+\newcommand*{\DefRetNew}[2]{#1 \vdash #2\;\mathsf{returns}}
 \newcommand*{\wf}[2]{#1 \vdash #2}
 \newcommand*{\wfStmt}[3]{#1 \vdash #2\;\mathsf{assigns}\;#3}
 \newcommand*{\Var}{\mathsf{Var}}
 
 \newcommand*{\exAssign}[2]{#1 = #2}
+\newcommand*{\exDef}[3]{\texttt{def}\;#1(#2):\;#3}
 \newcommand*{\exIfElse}{\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}:\;s_{n + 1}}
 \newcommand*{\exReturn}[1]{\texttt{return}\;#1}
-\newcommand*{\exDef}[3]{\texttt{def}\;#1(#2):\;#3}
+\newcommand*{\exSeq}[2]{#1\;#2}

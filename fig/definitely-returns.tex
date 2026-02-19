@@ -2,26 +2,20 @@
 \begin{mathpar}
 \inferrule*[right=return]
 {
-   \strut
+   \wf{\Gamma}{e}
 }
 {
-   \DefRet{\exReturn{e}}
-}
-\and
-\inferrule*[right=seq\_1]
-{
-  \DefRet{s_1}
-}
-{
-   \DefRet{s_1\;s_2}
+   \DefRetNew{\Gamma}{\exReturn{e}}
 }
 \and
 \inferrule*[right=seq\_2]
 {
+  \wfStmt{\Gamma}{s_1}{\varnothing}
+  \\
   \DefRet{s_2}
 }
 {
-  \DefRet{s_2\;s_2}
+  \DefRetNew{\Gamma}{\exSeq{s_1}{s_2}}
 }
 \and
 \inferrule*[right=if\_else]
