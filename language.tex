@@ -1,5 +1,6 @@
 \documentclass{scrartcl}
 
+\usepackage{etoolbox}
 \usepackage{libertine}
 \usepackage[authoryear,round]{natbib}
 \usepackage{enumitem}
@@ -44,7 +45,9 @@
 \begin{document}
 
 \pagestyle{plain}
-
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
 \maketitle
 
 \section*{Syntax}
