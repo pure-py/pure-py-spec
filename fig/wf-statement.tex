@@ -48,8 +48,7 @@
 \and
 \inferrule*[right=function]
 {
-  \wfStmt{\Gamma, f, \vec{x}}{s}{\Delta} \\
-  x \notin \Delta
+  \defRet{\Gamma, f, \vec{x}}{s}
 }
 {
   \wfStmt{\Gamma}{\exDef{f}{\vec{x}}{s}}{\{f\}}
