@@ -5,25 +5,25 @@
    \wf{\Gamma}{e}
 }
 {
-   \DefRet{\Gamma}{\exReturn{e}}
+   \defRet{\Gamma}{\exReturn{e}}
 }
 \and
 \inferrule*[right=seq\_2]
 {
   \wfStmt{\Gamma}{s_1}{\varnothing}
   \\
-  \DefRet{\Gamma}{s_2}
+  \defRet{\Gamma}{s_2}
 }
 {
-  \DefRet{\Gamma}{\exSeq{s_1}{s_2}}
+  \defRet{\Gamma}{\exSeq{s_1}{s_2}}
 }
 \and
 \inferrule*[right=if\_else]
 {
-  \DefRet{\Gamma}{s_i} \quad (\text{for } i \in \{0, \ldots, n + 1\})
+  \defRet{\Gamma}{s_i} \quad (\text{for } i \in \{0, \ldots, n + 1\})
 }
 {
-  \DefRet{\Gamma}{\texttt{if}\;e_0:\;s_0\;\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}\;\texttt{else}:\;s_{n + 1}}
+  \defRet{\Gamma}{\exIfElse{e_0}{s_0}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}{s_{n + 1}}}
 }
 \end{mathpar}
 \caption{Definitely returns}
