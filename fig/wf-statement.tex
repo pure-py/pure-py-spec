@@ -55,7 +55,7 @@
   \wfStmt{\Gamma}{\exDef{f}{\vec{x}}{s}}{\{f\}}
 }
 \end{mathpar}
-\caption{Definitely assigns}
+\caption{Statements $s$ demanding $\Gamma$ and providing $\Delta$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
 \begin{mathpar}
@@ -79,15 +79,15 @@
 \and
 \inferrule*[right=if\_else]
 {
-  \wf{\Gamma}{e_i} \quad (\forall i \in \{0, \ldots, n\})
+  \wf{\Delta_i}{e_i} \quad (\forall i \in \{0\ldots n\})
   \\
-  \defRet{\Gamma}{s_i} \quad (\forall i \in \{0, \ldots, n + 1\})
+  \defRet{\Gamma_i}{s_i} \quad (\forall i \in \{0\ldots n + 1\})
 }
 {
-  \defRet{\Gamma}{\exIfElse{e_0}{s_0}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}{s_{n + 1}}}
+  \defRet{\bigcup\{\vec{\Gamma}, \vec{\Delta}\}}{\exIfElse{e_0}{s_0}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}{s_{n + 1}}}
 }
 \end{mathpar}
-\caption{Definitely returns}
+\caption{Statements $s$ demanding $\Gamma$ and guaranteeing a return}
 \end{subfigure}
-\caption{Well-formed statements}
+\caption{Definitely assigns and definitely returns predicates}
 \end{figure}
