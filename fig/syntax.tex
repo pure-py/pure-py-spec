@@ -5,7 +5,7 @@ $s$ & $::=$ & $\exAssign{x}{e}$ & (Assign) \\
     & $\mid$ & $s_1\;s_2$ & (Seq) \\
     & $\mid$ & $\exReturn{e}$ & (Return) \\
     & $\mid$ & $\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n$ & (If) \\
-    & $\mid$ & $\texttt{if}\;e:\;s\;\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n\;\texttt{else}\;e':\;s'$ & (IfElse) \\
+    & $\mid$ & $\exIfElse{e}{s}{\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n}{s'}$ & (IfElse) \\
     & $\mid$ & $\exDef{f}{\vec{x}}{s}$ & (Function)
    \\[3mm]
 $e$ & $::=$ & $x$ & (Var)
