@@ -1,4 +1,5 @@
 \begin{figure}
+\begin{subfigure}{\textwidth}
 \begin{mathpar}
 \inferrule*[right=assign]
 {
@@ -54,5 +55,39 @@
   \wfStmt{\Gamma}{\exDef{f}{\vec{x}}{s}}{\{f\}}
 }
 \end{mathpar}
+\caption{Definitely assigns}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\begin{mathpar}
+\inferrule*[right=return]
+{
+   \wf{\Gamma}{e}
+}
+{
+   \defRet{\Gamma}{\exReturn{e}}
+}
+\and
+\inferrule*[right=seq\_2]
+{
+  \wfStmt{\Gamma}{s_1}{\varnothing}
+  \\
+  \defRet{\Gamma}{s_2}
+}
+{
+  \defRet{\Gamma}{\exSeq{s_1}{s_2}}
+}
+\and
+\inferrule*[right=if\_else]
+{
+  \wf{\Gamma}{e_i} \quad (\forall i \in \{0, \ldots, n\})
+  \\
+  \defRet{\Gamma}{s_i} \quad (\forall i \in \{0, \ldots, n + 1\})
+}
+{
+  \defRet{\Gamma}{\exIfElse{e_0}{s_0}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}{s_{n + 1}}}
+}
+\end{mathpar}
+\caption{Definitely returns}
+\end{subfigure}
 \caption{Well-formed statements}
 \end{figure}

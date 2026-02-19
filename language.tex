@@ -9,6 +9,7 @@
 \usepackage{xcolor}
 \usepackage{amsmath,amssymb}
 \usepackage{mathpartir}
+\usepackage{subcaption}
 \usepackage{xspace}
 
 \input{macros}
@@ -48,32 +49,9 @@
 
 \section*{Syntax}
 
-\subsection*{Expressions}
-\begin{center}
-\begin{tabular}{rcll}
-$e$ & $::=$ & $x$ & (Var)
-\end{tabular}
-\end{center}
-
-\subsection*{Statements}
-
 \input{fig/syntax}
 
-\subsection*{Environments}
-\[
-\begin{array}{rcll}
-\Gamma &::=& \varepsilon & (\text{Empty})\\
-    &\mid& \Gamma, x & (\text{Extend})
-\end{array}
-\]
-
-\section*{Judgements}
-
-\subsection*{Definitely returns}
-
-\input{fig/definitely-returns}
-
-\subsection*{Well-formed statements}
+\subsection*{Well-formedness}
 
 \input{fig/wf-statement}
 \input{fig/wf}
