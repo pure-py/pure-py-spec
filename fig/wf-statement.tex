@@ -69,12 +69,12 @@
 \and
 \inferrule*[right=seq\_2]
 {
-  \wfStmt{\Gamma}{s_1}{\varnothing}
+  \wfStmt{\Gamma'}{s_1}{\Gamma}
   \\
   \defRet{\Gamma}{s_2}
 }
 {
-  \defRet{\Gamma}{\exSeq{s_1}{s_2}}
+  \defRet{\Gamma'}{\exSeq{s_1}{s_2}}
 }
 \and
 \inferrule*[right=if\_else]
