@@ -6,7 +6,7 @@
   \wf{\Gamma}{e}
 }
 {
-  \wfStmt{\Gamma}{\exAssign{x}{e}}{\{x\}}
+  \wfStmt{\Gamma \cup (\Delta \setminus \{x\})}{\exAssign{x}{e}}{\Delta}
 }
 \and
 \inferrule*[right=seq]
