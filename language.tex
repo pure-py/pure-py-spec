@@ -45,9 +45,16 @@
 \begin{document}
 
 \pagestyle{plain}
+
+% Otherwise custom \maketitle allows floats to appear above title
 \makeatletter
-\def\fps@figure{htbp}
+\let\orig@maketitle\maketitle
+\renewcommand{\maketitle}{%
+  \orig@maketitle
+  \global\@topnum=0
+}
 \makeatother
+
 \maketitle
 
 \section*{Syntax}
