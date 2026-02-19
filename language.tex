@@ -59,22 +59,45 @@
 
 \maketitle
 
-\section*{Syntax}
+\section{Syntax}
 
 \input{fig/syntax}
 
-\subsection*{Well-formedness}
+\subsection{Well-formedness}
 
 \input{fig/wf-statement}
 \input{fig/wf}
 
-\subsection*{Examples}
-Unreachable code is currently permitted (but could easily be outlawed):
+\subsection{Examples}
+\subsubsection{Unreachable code}
+Currently permitted (but could easily be outlawed):
 
 \begin{python}
 def foo(x):
   return x + 1
   return y    # y undefined, but ok since this code is unreachable
+\end{python}
+
+\subsubsection{Conditionals without \texttt{else} clauses}
+
+This is well-formed:
+
+\begin{python}
+def foo(x):
+  if b:
+    x = 3
+  return x
+\end{python}
+
+\noindent because it is equivalent to
+
+\begin{python}
+def foo(x):
+  if b:
+    x = 3
+    return x
+  else:
+    return x
 \end{python}
 
 \end{document}
