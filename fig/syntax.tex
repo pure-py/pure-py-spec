@@ -4,8 +4,8 @@
 $s$ & $::=$ & $\exAssign{x}{e}$ & (Assign) \\
     & $\mid$ & $s_1\;s_2$ & (Seq) \\
     & $\mid$ & $\exReturn{e}$ & (Return) \\
-    & $\mid$ & $\exIf{e}{s}{\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n}$ & (If) \\
-    & $\mid$ & $\exIfElse{e}{s}{\texttt{elif}\;e_1:\;s_1\;\cdots\;\texttt{elif}\;e_n:\;s_n}{s'}$ & (IfElse) \\
+    & $\mid$ & $\exIf{e}{s}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}$ & (If) \\
+    & $\mid$ & $\exIfElse{e}{s}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}{s'}$ & (IfElse) \\
     & $\mid$ & $\exDef{f}{\vec{x}}{s}$ & (Function)
    \\[3mm]
 $e$ & $::=$ & $x$ & (Var)
