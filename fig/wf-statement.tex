@@ -10,6 +10,14 @@
   \wfStmt{\Gamma \cup (\Delta \setminus \{x\})}{\exAssign{x}{e}}{\Delta}
 }
 \and
+\inferrule*[right=def]
+{
+  \defRet{\Gamma}{s}
+}
+{
+  \wfStmt{\Gamma \cup (\Delta \setminus \{f, \vec{x}\})}{\exDef{f}{\vec{x}}{s}}{\Delta}
+}
+\and
 \inferrule*[right=seq]
 {
   \wfStmt{\Gamma'}{s_1}{\Gamma} \\
@@ -46,14 +54,6 @@
   \wfStmt{\Gamma}
          {\exIfElse{e_0}{s_0}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}{s_{n + 1}}}
          {\bigcap\{\Delta_0, \ldots, \Delta_{n + 1}\}}
-}
-\and
-\inferrule*[right=function]
-{
-  \defRet{\Gamma, f, \vec{x}}{s}
-}
-{
-  \wfStmt{\Gamma}{\exDef{f}{\vec{x}}{s}}{\{f\}}
 }
 \end{mathpar}
 \caption{Statements $s$ demanding $\Gamma$ and providing $\Delta$}
