@@ -80,24 +80,26 @@ def foo(x):
 
 \subsubsection{Conditionals without \texttt{else} clauses}
 
-This is well-formed:
+I'm inclined to say this should be ill-formed, because \texttt{x} is not definitely assigned by the
+\texttt{if} statement.
 
 \begin{python}
-def foo(x):
+def foo():
+  x = 6
   if b:
     x = 3
-  return x
+  return x  # needs to be "lexically scoped", but which x is being referred to?
 \end{python}
 
-\noindent because it is equivalent to
+\noindent But this should be ok, because the \texttt{if} branch returns:
 
 \begin{python}
-def foo(x):
+def foo():
+  x = 6
   if b:
     x = 3
     return x
-  else:
-    return x
+  return x
 \end{python}
 
 \end{document}
