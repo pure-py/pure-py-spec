@@ -19,7 +19,8 @@
 
 \raggedbottom
 \setlength{\droptitle}{-8ex}
-\setlist[itemize]{leftmargin=*}
+\setlist[itemize]{leftmargin=*, nosep}
+\setlist[enumerate]{nosep}
 
 \title{\textbf{\Lang: A Functional Subset of Python}}
 \author{Nikolaus Huber\textsuperscript{1} \and Dominic Orchard\textsuperscript{2,1} \and Jacob Pake\textsuperscript{2} \and Roly Perera\textsuperscript{1,3}}
@@ -104,8 +105,8 @@ function would return \code{3}, so this idea doesn't work.
 
 Options:
 \begin{enumerate}
-\item Require
-\item
+\item Require \code{x} to be defined in each branch of the conditional; this feels too restrictive.
+\item ?
 \end{enumerate}
 
 \end{document}
