@@ -18,6 +18,16 @@
 {
   \wf{\Gamma}{\exAssign{x}{e}}
 }
+\and
+\inferrule*[lab={\ruleName{wf-def}}]
+{
+  \wf{\Gamma, f : \top, x_1 : \top, \ldots, x_n : \top}{s}
+  \\
+  \returns{s}
+}
+{
+  \wf{\Gamma}{\exDef{f}{\vec{x}}{s}}
+}
 \end{mathpar}
 \caption{Statement $s$ is well-formed in $\Gamma$}
 \end{subfigure}

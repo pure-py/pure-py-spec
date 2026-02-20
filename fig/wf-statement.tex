@@ -3,14 +3,6 @@
 \flushleft \shadebox{$\wfStmt{\Gamma}{s}{\Delta}$}
 \begin{mathpar}
 \small
-\inferrule*[right=def]
-{
-  \defRet{\Gamma}{s}
-}
-{
-  \wfStmt{\Gamma \cup (\Delta \setminus \set{f, \vec{x}})}{\exDef{f}{\vec{x}}{s}}{\Delta}
-}
-\and
 \inferrule*[right=seq]
 {
   \wfStmt{\Gamma'}{s_1}{\Gamma} \\
