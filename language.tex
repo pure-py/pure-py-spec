@@ -83,11 +83,10 @@ degenerate types (``any'' and ``none''). The definite assignment terminology is 
 \paragraph{Environment operations.}
 
 Write $\top$ for the environment that maps every variable to $\statusDefAssigned$, and $\Gamma \runion \Delta$
-for the right-based map union of $\Gamma$ and $\Delta$. Also define
+(``override'') for the right-based map union of $\Gamma$ and $\Delta$. Also define the following semigroup
+operation $\merge$ (``merge'') on environments:
 %
 \[\Gamma \merge \Delta := \set{x: \bot \mid \forall x \in (\Gamma \setminus \Delta) \cup (\Delta \setminus \Gamma)} \cup \set{x: \Gamma(x) \meet \Delta(x) \mid x \in \Gamma \cap \Delta}\]
-
-\noindent The $\top$ environment is the left and right unit for $\merge$.
 
 \input{fig/syntax}
 

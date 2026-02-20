@@ -39,6 +39,7 @@
 \inferrule*[lab={\ruleName{assigns-if-else}}]
 {
   \assigns{\set{s_1 \ldots s_{n + 2}}}{\Delta} \\
+%  \bigoplus\set{\Delta \mid i \in \set{1 \ldots n + 2} \wedge \assigns{s_i}{\Delta}}
 }
 {
   \assigns{\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n + 2}}}
