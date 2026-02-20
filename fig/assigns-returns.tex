@@ -103,12 +103,10 @@
 \and
 \inferrule*[lab={\ruleName{returns-if-else}}]
 {
-  \wf{\Delta_i}{e_i} \quad (\forall i \in \set{0\ldots n})
-  \\
-  \defRet{\Gamma_i}{s_i} \quad (\forall i \in \set{0\ldots n + 1})
+  \returns{s_i} \quad (\forall i \in \set{1\ldots n + 2})
 }
 {
-  \defRet{\bigcup\set{\vec{\Gamma}, \vec{\Delta}}}{\exIfElse{e_0}{s_0}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}{s_{n + 1}}}
+  \returns{\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}}}
 }
 \end{mathpar}
 \caption{Statements $s$ demanding $\Gamma$ and guaranteeing a return}
