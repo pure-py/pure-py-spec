@@ -37,6 +37,16 @@
   moredelim=[l][\color{base0B}]{@}
 }
 
-% Easy-to-use Python environment and command
 \lstnewenvironment{python}[1][]{\lstset{style=base16python,#1}}{}
-\newcommand{\pyinline}[1]{\lstinline[style=base16python]!#1!}
+
+% for use in inferrule
+\newcommand{\pytext}[1]{%
+  {\renewcommand\ttdefault{cmtt}\ttfamily\small\color{base05}#1}%
+}
+\newcommand{\pyinline}[1]{%
+  \ifmmode
+    \text{\pytext{#1}}%
+  \else
+    \lstinline[style=base16python]{#1}%
+  \fi
+}
