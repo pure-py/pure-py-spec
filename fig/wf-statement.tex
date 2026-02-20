@@ -3,15 +3,6 @@
 \flushleft \shadebox{$\wfStmt{\Gamma}{s}{\Delta}$}
 \begin{mathpar}
 \small
-\inferrule*[right=seq]
-{
-  \wfStmt{\Gamma'}{s_1}{\Gamma} \\
-  \wfStmt{\Gamma}{s_2}{\Delta}
-}
-{
-  \wfStmt{\Gamma'}{\exSeq{s_1}{s_2}}{\Delta}
-}
-\and
 \inferrule*[right=return]
 {
   \wf{\Gamma}{e}

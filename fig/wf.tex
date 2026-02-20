@@ -38,6 +38,16 @@
 {
   \wf{\Gamma}{\exDef{f}{\vec{x}}{s}}
 }
+\and
+\inferrule*[lab={\ruleName{wf-seq}}]
+{
+  \wf{\Gamma}{s_1} \\
+  \assigns{s_1}{\Delta} \\
+  \wf{\Gamma \runion \Delta}{s_2}
+}
+{
+  \wf{\Gamma}{\exSeq{s_1}{s_2}}
+}
 \end{mathpar}
 \caption{Statement $s$ is well-formed in $\Gamma$}
 \end{subfigure}
