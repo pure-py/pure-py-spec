@@ -3,13 +3,6 @@
 \flushleft \shadebox{$\wfStmt{\Gamma}{s}{\Delta}$}
 \begin{mathpar}
 \small
-\inferrule*[right=return]
-{
-  \wf{\Gamma}{e}
-}
-{
-  \wfStmt{\Gamma}{\exReturn{e}}{\Delta}
-}
 % \and
 % \inferrule*[right=if]
 % {
@@ -19,7 +12,6 @@
 % {
 %   \wfStmt{\Gamma \cup \Gamma'}{\exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}}{\varnothing}
 % }
-\and
 \inferrule*[right=if\_else]
 {
   \wf{\Gamma'}{\vec{e}} \\

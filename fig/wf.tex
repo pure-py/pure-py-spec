@@ -39,6 +39,14 @@
   \wf{\Gamma}{\exDef{f}{\vec{x}}{s}}
 }
 \and
+\inferrule*[lab={\ruleName{wf-return}}]
+{
+  \wf{\Gamma}{e}
+}
+{
+  \wf{\Gamma}{\exReturn{e}}
+}
+\and
 \inferrule*[lab={\ruleName{wf-seq}}]
 {
   \wf{\Gamma}{s_1} \\
