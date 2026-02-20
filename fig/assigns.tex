@@ -1,0 +1,74 @@
+\begin{figure}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\assigns{s}{\Delta}$}
+\begin{mathpar}
+\small
+\inferrule*[right=assign]
+{
+  \strut
+}
+{
+  \assigns{\exAssign{x}{e}}{\set{x}}
+}
+\and
+\inferrule*[right=def]
+{
+  \strut
+}
+{
+  \assigns{\exDef{f}{\vec{x}}{s}}{\set{f}}
+}
+\and
+\inferrule*[right=seq]
+{
+  \assigns{s_1}{\Delta_1} \\
+  \assigns{s_2}{\Delta_2}
+}
+{
+  \assigns{\exSeq{s_1}{s_2}}{\Delta_1 \runion \Delta_2}
+}
+\and
+\inferrule*[right=if]
+{
+  \strut
+}
+{
+  \assigns{\exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}}{\varnothing}
+}
+\and
+\inferrule*[right=if\_else]
+{
+  \assigns{\set{\vec{s}}}{\Delta} \\
+}
+{
+  \assigns{\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n + 2}}}
+          {\Delta}
+}
+\end{mathpar}
+\caption{Statement $s$ assigns $\Delta$}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\assigns{\vec{s}}{\Delta}$}
+\begin{mathpar}
+\small
+\inferrule*
+{
+   \assigns{s}{\Delta} \\
+   \assigns{\vec{s}}{\Delta}
+}
+{
+   \assigns{s \cons \vec{s}}{\Delta \merge \Delta'}
+}
+\and
+\inferrule*
+{
+   \returns{s} \\
+   \assigns{\vec{s}}{\Delta}
+}
+{
+   \assigns{s \cons \vec{s}}{\Delta}
+}
+\end{mathpar}
+\end{subfigure}
+\caption{Non-empty set of statements $\vec{s}$ assigns $\Delta$}
+\end{figure}

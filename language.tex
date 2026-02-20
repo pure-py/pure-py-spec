@@ -75,8 +75,8 @@
 \subsection{Environments}
 
 Environments $\Gamma, \Delta$ are (not necessarily finite) maps from sets of variables to their \emph{definite
-assignment} status, which is an element of the 2-point Boolean lattice $\{\statusDefAssigned,
-\statusNotDefAssigned\}$. The top element $\statusDefAssigned$ indicates \emph{definitely assigned}, and the
+assignment} status, which is an element of the 2-point Boolean lattice $\set{\statusDefAssigned,
+\statusNotDefAssigned}$. The top element $\statusDefAssigned$ indicates \emph{definitely assigned}, and the
 bottom element $\statusNotDefAssigned$ indicates \emph{not definitely assigned}; we can think of these as
 degenerate types (``any'' and ``none''). The definite assignment terminology is borrowed from Java.
 
@@ -85,7 +85,7 @@ degenerate types (``any'' and ``none''). The definite assignment terminology is 
 Write $\top$ for the environment that maps every variable to $\statusDefAssigned$, and $\Gamma \runion \Delta$
 for the right-based map union of $\Gamma$ and $\Delta$. Also define
 %
-\[\Gamma \merge \Delta := \{x: \bot \mid \forall x \in (\Gamma \setminus \Delta) \cup (\Delta \setminus \Gamma)\} \cup \{x: \Gamma(x) \meet \Delta(x) \mid x \in \Gamma \cap \Delta\}\]
+\[\Gamma \merge \Delta := \set{x: \bot \mid \forall x \in (\Gamma \setminus \Delta) \cup (\Delta \setminus \Gamma)} \cup \set{x: \Gamma(x) \meet \Delta(x) \mid x \in \Gamma \cap \Delta}\]
 
 \noindent The $\top$ environment is the left and right unit for $\merge$.
 
