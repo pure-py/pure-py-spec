@@ -3,16 +3,18 @@
 \definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
 \newcommand*{\shadebox}[1]{\fcolorbox{lightgray}{shadecolor}{\raisebox{0pt}[0.60\baselineskip][0.05\baselineskip]{#1}}}
 
+\newcommand*{\code}[1]{\texttt{#1}}
+
 \newcommand*{\defRet}[2]{#1 \vdash #2\;\mathsf{returns}}
 \newcommand*{\wf}[2]{#1 \vdash #2}
 \newcommand*{\wfStmt}[3]{#1 \vdash #2\;\mathsf{assigns}\;#3}
 \newcommand*{\wfStmtNew}[4]{#1, #2 \vdash #3\;\mathsf{assigns}\;#4}
 
 \newcommand*{\exAssign}[2]{#1 = #2}
-\newcommand*{\exDef}[3]{\texttt{def}\;#1(#2):\;#3}
-\newcommand*{\exElif}[2]{\texttt{elif}\;#1:\;#2}
-\newcommand*{\exIf}[3]{\texttt{if}\;#1:\;#2\;#3}
-\newcommand*{\exIfElse}[4]{\texttt{if}\;#1:\;#2\;#3\;\texttt{else}:\;#4}
-\newcommand*{\exPass}{\texttt{pass}}
-\newcommand*{\exReturn}[1]{\texttt{return}\;#1}
+\newcommand*{\exDef}[3]{\code{def}\;#1(#2):\;#3}
+\newcommand*{\exElif}[2]{\code{elif}\;#1:\;#2}
+\newcommand*{\exIf}[3]{\code{if}\;#1:\;#2\;#3}
+\newcommand*{\exIfElse}[4]{\code{if}\;#1:\;#2\;#3\;\code{else}:\;#4}
+\newcommand*{\exPass}{\code{pass}}
+\newcommand*{\exReturn}[1]{\code{return}\;#1}
 \newcommand*{\exSeq}[2]{#1\;#2}
