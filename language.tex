@@ -74,11 +74,11 @@
 
 \subsection{Environments}
 
-Borrowing terminology from Java, environments $\Gamma, \Delta$ are (not necessarily finite) maps from sets of
-variables to their \emph{definite assignment} status, which is an element of the 2-point Boolean lattice
-$\{\statusDefAssigned, \statusNotDefAssigned\}$. The top element $\statusDefAssigned$ indicates
-\emph{definitely assigned}, and the bottom element $\statusNotDefAssigned$ indicates \emph{not definitely
-assigned}; we can think of these as degenerate types (``any'' and ``none'').
+Environments $\Gamma, \Delta$ are (not necessarily finite) maps from sets of variables to their \emph{definite
+assignment} status, which is an element of the 2-point Boolean lattice $\{\statusDefAssigned,
+\statusNotDefAssigned\}$. The top element $\statusDefAssigned$ indicates \emph{definitely assigned}, and the
+bottom element $\statusNotDefAssigned$ indicates \emph{not definitely assigned}; we can think of these as
+degenerate types (``any'' and ``none''). The definite assignment terminology is borrowed from Java.
 
 \paragraph{Environment operations.}
 
@@ -93,6 +93,7 @@ for the right-based map union of $\Gamma$ and $\Delta$. Also define
 
 \subsection{Well-formedness}
 
+\input{fig/assigns}
 \input{fig/wf-statement}
 \input{fig/wf}
 

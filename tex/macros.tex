@@ -3,10 +3,14 @@
 \definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
 \newcommand*{\shadebox}[1]{\fcolorbox{lightgray}{shadecolor}{\raisebox{0pt}[0.60\baselineskip][0.05\baselineskip]{#1}}}
 
+\newcommand*{\cons}{\cdot}
+
 \newcommand*{\defRet}[2]{#1 \vdash #2\;\mathsf{returns}}
 \newcommand*{\wf}[2]{#1 \vdash #2}
 \newcommand*{\wfStmt}[3]{#1 \vdash #2\;\mathsf{assigns}\;#3}
 \newcommand*{\wfStmtNew}[4]{#1, #2 \vdash #3\;\mathsf{assigns}\;#4}
+\newcommand*{\assigns}[2]{#1 \mathrel{\mathsf{assigns}} #2}
+\newcommand*{\returns}[1]{#1 \mathrel{\mathsf{returns}}}
 
 \newcommand*{\exAssign}[2]{#1 = #2}
 \newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
