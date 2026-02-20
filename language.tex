@@ -156,18 +156,12 @@ def foo():
 \end{subfigure}
 \end{figure}
 
-\noindent The \pyinline{x} in \pyinline{return x} refers to the outer \pyinline{x}, and so even when \pyinline{b} is
-\pyinline{True}, the function would return \pyinline{6}. However, in Python the function would return \pyinline{3}, so the
-same program would have different meanings in Python and \Lang.
-
-Options:
-\begin{enumerate}
-\item Require \pyinline{x} to be defined in each branch of the conditional (quite restrictive);
-\item Rule out the use of \pyinline{x} after the conditional, because it is only ``partially shadowed''
-\end{enumerate}
-
-\noindent (2) would still support (apparently) branch-local variables, but they are not really: they
-\emph{always} shadow variables from the enclosing scope, either partially or completely. Partial shadowing is
-permitted as long as the variable is not used after the conditional.
+\noindent However such variables only appear to be branch-local; they are actually implicitly defined (but
+bound to $\bot$) in any branches that do not explicitly define them. Thus the right-hand variant above is
+ill-formed, despite the enclosing assignment \pyinline{x = 6}, because in \pyinline{return x} that outer
+assignment is shadowed by the inner one, but that inner assignment is only \emph{partial}. If we were to allow
+the program on the right, there would be no straightforward way to assign it a pure semantics that agrees with
+Python. (In Python the right-hand example would return \pyinline{3} in the case where \pyinline{b} is
+\pyinline{True}.)
 
 \end{document}
