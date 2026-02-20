@@ -1,4 +1,19 @@
 \begin{figure}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\wf{\Gamma}{s}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{wf-pass}}]
+{
+  \strut
+}
+{
+  \wf{\Gamma}{\exPass}
+}
+\end{mathpar}
+\caption{Statement $s$ is well-formed in $\Gamma$}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\wf{\Gamma}{e}$}
 \begin{mathpar}
 \small
@@ -10,5 +25,6 @@
   \wf{\set{x}}{x}
 }
 \end{mathpar}
-\caption{Expressions $e$ demanding $\Gamma$}
+\caption{Expression $e$ is well-formed in $\Gamma$}
+\end{subfigure}
 \end{figure}
