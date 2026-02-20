@@ -85,8 +85,8 @@ assigned}; we can think of these as degenerate types (the ``any'' type and the `
 Write:
 \begin{itemize}
 \item $\top$ for the environment that maps every variable to $\statusDefAssigned$
-\item $\Gamma \runion \Delta$ for the right-biased union of $\Gamma$ and $\Delta$
-\item $\Gamma \meet \Delta$ for the pointwise meet of $\Gamma$ and $\Delta$
+\item $\Gamma \runion \Delta$ for the map union of $\Gamma$ and $\Delta$ with $\lambda x y.x$ as the combining operation
+\item $\Gamma \merge \Delta$ for the map union of $\Gamma$ and $\Delta$ with $\meet$ as the combining operation
 \end{itemize}
 The $\top$ environment is the left and right unit for $\meet$.
 
