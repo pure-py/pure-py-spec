@@ -3,6 +3,14 @@
 \flushleft \shadebox{$\assigns{s}{\Delta}$}
 \begin{mathpar}
 \small
+\inferrule*[lab={\ruleName{assigns-pass}}]
+{
+  \strut
+}
+{
+  \assigns{\exPass}{\varnothing}
+}
+\and
 \inferrule*[lab={\ruleName{assigns-assign}}]
 {
   \strut
