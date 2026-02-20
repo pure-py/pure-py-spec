@@ -38,7 +38,7 @@
 \and
 \inferrule*[right=if\_else]
 {
-  \assigns{\set{\vec{s}}}{\Delta} \\
+  \assigns{\set{s_1 \ldots s_{n + 2}}}{\Delta} \\
 }
 {
   \assigns{\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n + 2}}}
@@ -48,27 +48,69 @@
 \caption{Statement $s$ assigns $\Delta$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\assigns{\vec{s}}{\Delta}$}
+\flushleft \shadebox{$\assigns{S}{\Delta}$}
 \begin{mathpar}
 \small
 \inferrule*
 {
-   \assigns{s}{\Delta} \\
-   \assigns{\vec{s}}{\Delta}
+   \assigns{s}{\Delta}
 }
 {
-   \assigns{s \cons \vec{s}}{\Delta \merge \Delta'}
+   \assigns{\set{s}}{\Delta}
+}
+\and
+\inferrule*
+{
+   \assigns{s}{\Delta} \\
+   \assigns{S}{\Delta}
+}
+{
+   \assigns{\set{s} \disjunion S}{\Delta \merge \Delta'}
 }
 \and
 \inferrule*
 {
    \returns{s} \\
-   \assigns{\vec{s}}{\Delta}
+   \assigns{S}{\Delta}
 }
 {
-   \assigns{s \cons \vec{s}}{\Delta}
+   \assigns{s \disjunion S}{\Delta}
 }
 \end{mathpar}
+\caption{Non-empty set of statements $S$ assigns $\Delta$}
 \end{subfigure}
-\caption{Non-empty set of statements $\vec{s}$ assigns $\Delta$}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\defRet{\Gamma}{s}$}
+\begin{mathpar}
+\small
+\inferrule*[right=return]
+{
+   \wf{\Gamma}{e}
+}
+{
+   \defRet{\Gamma}{\exReturn{e}}
+}
+\and
+\inferrule*[right=seq\_2]
+{
+  \wfStmt{\Gamma'}{s_1}{\Gamma}
+  \\
+  \defRet{\Gamma}{s_2}
+}
+{
+  \defRet{\Gamma'}{\exSeq{s_1}{s_2}}
+}
+\and
+\inferrule*[right=if\_else]
+{
+  \wf{\Delta_i}{e_i} \quad (\forall i \in \set{0\ldots n})
+  \\
+  \defRet{\Gamma_i}{s_i} \quad (\forall i \in \set{0\ldots n + 1})
+}
+{
+  \defRet{\bigcup\set{\vec{\Gamma}, \vec{\Delta}}}{\exIfElse{e_0}{s_0}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}{s_{n + 1}}}
+}
+\end{mathpar}
+\caption{Statements $s$ demanding $\Gamma$ and guaranteeing a return}
+\end{subfigure}
 \end{figure}
