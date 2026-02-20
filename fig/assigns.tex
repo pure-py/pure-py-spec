@@ -3,7 +3,7 @@
 \flushleft \shadebox{$\assigns{s}{\Delta}$}
 \begin{mathpar}
 \small
-\inferrule*[right=assign]
+\inferrule*[lab={\ruleName{assigns-assign}}]
 {
   \strut
 }
@@ -11,7 +11,7 @@
   \assigns{\exAssign{x}{e}}{\set{x}}
 }
 \and
-\inferrule*[right=def]
+\inferrule*[lab={\ruleName{assigns-def}}]
 {
   \strut
 }
@@ -19,7 +19,7 @@
   \assigns{\exDef{f}{\vec{x}}{s}}{\set{f}}
 }
 \and
-\inferrule*[right=seq]
+\inferrule*[lab={\ruleName{assigns-seq}}]
 {
   \assigns{s_1}{\Delta_1} \\
   \assigns{s_2}{\Delta_2}
@@ -28,7 +28,7 @@
   \assigns{\exSeq{s_1}{s_2}}{\Delta_1 \runion \Delta_2}
 }
 \and
-\inferrule*[right=if]
+\inferrule*[lab={\ruleName{assigns-if}}]
 {
   \strut
 }
@@ -36,7 +36,7 @@
   \assigns{\exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}}{\varnothing}
 }
 \and
-\inferrule*[right=if\_else]
+\inferrule*[lab={\ruleName{assigns-if-else}}]
 {
   \assigns{\set{s_1 \ldots s_{n + 2}}}{\Delta} \\
 }
@@ -51,7 +51,7 @@
 \flushleft \shadebox{$\assigns{S}{\Delta}$}
 \begin{mathpar}
 \small
-\inferrule*
+\inferrule*[lab={\ruleName{assigns-one}}]
 {
    \assigns{s}{\Delta}
 }
@@ -59,7 +59,7 @@
    \assigns{\set{s}}{\Delta}
 }
 \and
-\inferrule*
+\inferrule*[lab={\ruleName{assigns-assigns}}]
 {
    \assigns{s}{\Delta} \\
    \assigns{S}{\Delta}
@@ -68,7 +68,7 @@
    \assigns{\set{s} \disjunion S}{\Delta \merge \Delta'}
 }
 \and
-\inferrule*
+\inferrule*[lab={\ruleName{assigns-returns}}]
 {
    \returns{s} \\
    \assigns{S}{\Delta}
@@ -80,28 +80,28 @@
 \caption{Non-empty set of statements $S$ assigns $\Delta$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\defRet{\Gamma}{s}$}
+\flushleft \shadebox{$\returns{s}$}
 \begin{mathpar}
 \small
-\inferrule*[right=return]
+\inferrule*[lab={\ruleName{returns-return}}]
 {
-   \wf{\Gamma}{e}
+   \strut
 }
 {
-   \defRet{\Gamma}{\exReturn{e}}
+   \returns{\exReturn{e}}
 }
 \and
-\inferrule*[right=seq\_2]
+\inferrule*[lab={\ruleName{returns-seq}}]
 {
-  \wfStmt{\Gamma'}{s_1}{\Gamma}
+  \assigns{s_1}{\Delta}
   \\
-  \defRet{\Gamma}{s_2}
+  \returns{s_2}
 }
 {
-  \defRet{\Gamma'}{\exSeq{s_1}{s_2}}
+  \returns{\exSeq{s_1}{s_2}}
 }
 \and
-\inferrule*[right=if\_else]
+\inferrule*[lab={\ruleName{returns-if-else}}]
 {
   \wf{\Delta_i}{e_i} \quad (\forall i \in \set{0\ldots n})
   \\
