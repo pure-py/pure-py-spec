@@ -82,13 +82,12 @@ assigned}; we can think of these as degenerate types (the ``any'' type and the `
 
 \paragraph{Environment operations.}
 
-Write:
-\begin{itemize}
-\item $\top$ for the environment that maps every variable to $\statusDefAssigned$
-\item $\Gamma \runion \Delta$ for the map union of $\Gamma$ and $\Delta$ with $\lambda x y.x$ as the combining operation
-\item $\Gamma \merge \Delta$ for the map union of $\Gamma$ and $\Delta$ with $\meet$ as the combining operation
-\end{itemize}
-The $\top$ environment is the left and right unit for $\meet$.
+Write $\top$ for the environment that maps every variable to $\statusDefAssigned$, and $\Gamma \runion \Delta$
+for the right-based map union of $\Gamma$ and $\Delta$. Also define
+%
+\[\Gamma \merge \Delta := \{x: \bot \mid \forall x \in (\Gamma \setminus \Delta) \cup (\Delta \setminus \Gamma)\} \cup \{x: \Gamma(x) \meet \Delta(x) \mid x \in \Gamma \cap \Delta\}\]
+
+\noindent The $\top$ environment is the left and right unit for $\meet$.
 
 \input{fig/syntax}
 
