@@ -10,6 +10,14 @@
 {
   \wf{\Gamma}{\exPass}
 }
+\and
+\inferrule*[lab={\ruleName{wf-assign}}]
+{
+  \wf{\Gamma}{e}
+}
+{
+  \wf{\Gamma}{\exAssign{x}{e}}
+}
 \end{mathpar}
 \caption{Statement $s$ is well-formed in $\Gamma$}
 \end{subfigure}

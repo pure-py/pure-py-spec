@@ -3,14 +3,6 @@
 \flushleft \shadebox{$\wfStmt{\Gamma}{s}{\Delta}$}
 \begin{mathpar}
 \small
-\inferrule*[right=assign]
-{
-  \wf{\Gamma}{e}
-}
-{
-  \wfStmt{\Gamma \cup (\Delta \setminus \set{x})}{\exAssign{x}{e}}{\Delta}
-}
-\and
 \inferrule*[right=def]
 {
   \defRet{\Gamma}{s}
