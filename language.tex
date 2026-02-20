@@ -72,6 +72,24 @@
 
 \section{Syntax}
 
+\subsection{Environments}
+
+Borrowing terminology from Java, environments $\Gamma, \Delta$ are (not necessarily finite) maps from sets of
+variables to their \emph{definite assignment} status, which is an element of the 2-point Boolean lattice
+$\{\statusDefAssigned, \statusNotDefAssigned\}$. The top element $\statusDefAssigned$ indicates
+\emph{definitely assigned}, and the bottom element $\statusNotDefAssigned$ indicates \emph{not definitely
+assigned}; we can think of these as degenerate types (the ``any'' type and the ``none'' type).
+
+\paragraph{Environment operations.}
+
+Write:
+\begin{itemize}
+\item $\top$ for the environment that maps every variable to $\statusDefAssigned$
+\item $\Gamma \runion \Delta$ for the right-biased union of $\Gamma$ and $\Delta$
+\item $\Gamma \meet \Delta$ for the pointwise meet of $\Gamma$ and $\Delta$
+\end{itemize}
+The $\top$ environment is the left and right unit for $\meet$.
+
 \input{fig/syntax}
 
 \subsection{Well-formedness}
