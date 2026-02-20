@@ -93,7 +93,7 @@ for the right-based map union of $\Gamma$ and $\Delta$. Also define
 
 \subsection{Well-formedness}
 
-\input{fig/assigns}
+\input{fig/assigns-returns}
 \input{fig/wf-statement}
 \input{fig/wf}
 
@@ -111,8 +111,8 @@ def foo(x):
 
 \subsubsection{Conditionals without \pyinline{else} clauses}
 
-An \pyinline{if} statement without an \pyinline{else} clause is equivalent to an \pyinline{if}
-statement with an \pyinline{else} clause whose body is a $\exPass$ statement.
+An \pyinline{if} statement without an \pyinline{else} clause is equivalent to an \pyinline{if} statement with
+an \pyinline{else} clause whose body is a $\exPass$ statement; such a statement never returns.
 
 \subsubsection{Local assignment in conditional clauses}
 

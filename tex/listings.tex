@@ -16,9 +16,9 @@
 \definecolor{base0E}{HTML}{8959a8} % Purple
 \definecolor{base0F}{HTML}{a3685a} % Brown
 
-% Listings style for Python (force pure monospace everywhere)
 \lstdefinestyle{base16python}{
   language=Python,
+  morekeywords={pass} % doesn't seem to work..
   backgroundcolor=\color{base00},
   basicstyle={\renewcommand\ttdefault{cmtt}\ttfamily\small\color{base05}},
   keywordstyle=\color{base0E},
@@ -34,7 +34,7 @@
   tabsize=4,
   columns=fullflexible,
   keepspaces=true,
-  moredelim=[l][\color{base0B}]{@}
+  moredelim=[l][\color{base0B}]{@},
 }
 
 \lstnewenvironment{python}[1][]{\lstset{style=base16python,#1}}{}
