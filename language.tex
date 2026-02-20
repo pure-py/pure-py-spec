@@ -80,26 +80,26 @@ def foo(x):
 
 \subsubsection{Conditionals without \texttt{else} clauses}
 
-I'm inclined to say this should be ill-formed, because \texttt{x} is not definitely assigned by the
-\texttt{if} statement.
+An \texttt{if} statement without an \texttt{else} clause is equivalent to an \texttt{if}
+statement with an \texttt{else} clause whose body is a $\exPass$ statement.
+
+\subsubsection{Local assignment in conditional clauses}
+
+We would like the ``inner'' (shadowing) assignment of \texttt{x} to be permitted and remain local to that
+branch of the conditional:
 
 \begin{python}
 def foo():
   x = 6
   if b:
     x = 3
+    y = x + 1
+  else:
+    y = 0
   return x  # needs to be "lexically scoped", but which x is being referred to?
 \end{python}
 
-\noindent But this should be ok, because the \texttt{if} branch returns:
-
-\begin{python}
-def foo():
-  x = 6
-  if b:
-    x = 3
-    return x
-  return x
-\end{python}
+\noindent Even if \texttt{b} is \texttt{True}, the function would return \texttt{6}. But in Python the
+function would return \texttt{3}, so this idea doesn't work.
 
 \end{document}
