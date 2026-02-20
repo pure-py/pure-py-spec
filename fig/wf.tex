@@ -19,11 +19,21 @@
   \wf{\Gamma}{\exAssign{x}{e}}
 }
 \and
-\inferrule*[lab={\ruleName{wf-def}}]
+\inferrule*[lab={\ruleName{wf-def-returns}}]
 {
   \wf{\Gamma, f : \top, x_1 : \top, \ldots, x_n : \top}{s}
   \\
   \returns{s}
+}
+{
+  \wf{\Gamma}{\exDef{f}{\vec{x}}{s}}
+}
+\and
+\inferrule*[lab={\ruleName{wf-def-assigns}}]
+{
+  \wf{\Gamma, f : \top, x_1 : \top, \ldots, x_n : \top}{s}
+  \\
+  \assigns{s}{\Delta}
 }
 {
   \wf{\Gamma}{\exDef{f}{\vec{x}}{s}}
