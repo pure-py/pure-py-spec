@@ -24,7 +24,7 @@
 \setlist[itemize]{leftmargin=*, nosep}
 \setlist[enumerate]{nosep}
 
-\title{\textbf{\Lang: A Functional Subset of Python}}
+\title{\textbf{\PurePy: A Functional Subset of Python}}
 \author{Nikolaus Huber\textsuperscript{1} \and Dominic Orchard\textsuperscript{2,1} \and Jacob Pake\textsuperscript{2} \and Roly Perera\textsuperscript{1,3}}
 \date{}
 
@@ -65,9 +65,10 @@
 \section{Introduction}
 
 \begin{itemize}
-\item Define syntactic subset of Python called \Lang
-\item Define pure semantics for \Lang
-\item Semantics of \Lang program should be identical to its semantics in Python
+\item Define subset of Python called \PurePy, defined as a syntactic subset further restricted by a
+well-formedness predicate
+\item Define a semantics for \PurePy such that the semantics of a \PurePy program is identical to its
+semantics in Python
 \end{itemize}
 
 \section{Syntax}
@@ -120,9 +121,34 @@ A \pyinline{return} statement without an expression is equivalent to \pyinline{r
 A function whose body $s$ assigns rather than returns is equivalent to a function whose body is $s$ followed
 by \pyinline{return None}. This ensures every function returns, even if it is not explicitly specified.
 
+\subsubsection{Assignment as definition}
+
+Although \PurePy is pure and all variables are well-scoped, local variables are introduced using an
+\emph{assignment statement}, for compatibility with Python. If a variable is definitely assigned in a branch
+of a conditional, it must be definitely assigned in \emph{every} branch of the conditional if it is to be used
+after the conditional, unless that branch definitely returns.
+
+\begin{python}
+if a < b:
+   comp = "smaller"
+else:
+   comp = "bigger"
+return comp
+\end{python}
+
+The following is permitted:
+
+\begin{python}
+if a < b:
+   return "smaller"
+else:
+   comp = "bigger"
+return comp
+\end{python}
+
 \subsubsection{Local assignment in conditional clauses}
 
-For flexibility, we permit ``branch-local'' variables. The assignment of \pyinline{x} below (left) is
+For flexibility, we permit \emph{branch-local} variables. The assignment of \pyinline{x} below (left) is
 permitted, and can be used locally in that branch of the conditional:
 
 \begin{figure}[H]
