@@ -96,9 +96,9 @@ define the following semigroup operation $\merge$ (``merge'') on environments:
 
 \subsection{Examples}
 \subsubsection{Unreachable code}
-Every well-formed statement either \emph{returns}, or \emph{assigns} a set of variables $\Delta$, which may be
-empty. Every function body must return; and a non-empty sequence of statements returns only if the last
-statement returns, and all preceding statements assign. Thus the following is illegal:
+Every well-formed statement may either \emph{definitely return}, or \emph{definitely assign} a set of
+variables $\Delta$, which may be empty. A non-empty sequence of statements returns only if the last statement
+returns, and all preceding statements assign. Thus the following is illegal:
 
 \begin{python}
 def foo(x):
@@ -113,9 +113,12 @@ an \pyinline{else} clause whose body is a $\exPass$ statement; such a statement 
 
 \subsubsection{Implicit \pyinline{None}}
 
-A \pyinline{return} statement without an expression is equivalent to \pyinline{return None}. A function whose
-body $s$ assigns rather than returns is equivalent to a function whose body is $s$ followed by
-\pyinline{return None}.
+A \pyinline{return} statement without an expression is equivalent to \pyinline{return None}.
+
+\subsubsection{Implicit \pyinline{return}}
+
+A function whose body $s$ assigns rather than returns is equivalent to a function whose body is $s$ followed
+by \pyinline{return None}. This ensures every function returns, even if it is not explicitly specified.
 
 \subsubsection{Local assignment in conditional clauses}
 
