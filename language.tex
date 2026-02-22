@@ -123,11 +123,16 @@ by \pyinline{return None}. This ensures every function returns, even if it is no
 
 \subsubsection{Assignment as definition}
 
-Although \PurePy is pure and all variables are well-scoped, local variables are introduced using an
-\emph{assignment statement}, for compatibility with Python. If a variable is definitely assigned in a branch
-of a conditional, it must be definitely assigned in \emph{every} branch of the conditional if it is to be used
-after the conditional, unless that branch definitely returns.
+Although \PurePy is pure and all variable usage is well-scoped, local variables are introduced using an
+\emph{assignment statement}, for compatibility with Python. If a variable is definitely assigned in any branch
+of a conditional, then in order for that variable to be usable after the conditional, every other branch of
+the conditional must either also definitely assign that variable, or definitely return. Thus the following are
+both well-formed:
 
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.48\textwidth}
+\centering
 \begin{python}
 if a < b:
    comp = "smaller"
@@ -135,9 +140,10 @@ else:
    comp = "bigger"
 return comp
 \end{python}
-
-The following is permitted:
-
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+\centering
 \begin{python}
 if a < b:
    return "smaller"
@@ -145,6 +151,8 @@ else:
    comp = "bigger"
 return comp
 \end{python}
+\end{subfigure}
+\end{figure}
 
 \subsubsection{Local assignment in conditional clauses}
 
