@@ -194,12 +194,12 @@ def foo():
 
 \noindent However such variables only appear to be branch-local. The definition of $\merge$ actually ensures
 that a variable assigned in any branch is considered assigned by the conditional; however unless it is
-assigned in \emph{every} branch, it will be bound to $\bot$ in the corresponding environment. Any attempt to
-refer to such a variable is illegal, as it represents a variable which is only partially assigned. (Thus the
-right-hand program is ill-formed, despite the enclosing \pyinline{x = 6}, because in the \pyinline{return x}
-statement that outer assignment is shadowed by the inner one, and that inner assignment is only partial.) If
-we were to allow the program on the right, there would be no straightforward way to assign it a semantics
-which is both pure, and in agreement with Python, since in Python the function returns \pyinline{3} in the
-case where \pyinline{b} is \pyinline{True}.
+assigned in \emph{every} branch that does not definitely return, it will be bound to $\bot$ in the
+corresponding environment. Any attempt to refer to such a variable is illegal, as it refers to a variable
+which may not be assigned. (Thus the right-hand program is ill-formed, despite the enclosing \pyinline{x = 6},
+because in the \pyinline{return x} statement, the inner assignment shadows the the outer one, and the inner
+assignment is only partial.) If we were to allow the program on the right, there would be no straightforward
+way to assign it a semantics which is both pure, and in agreement with Python, since in Python the function
+returns \pyinline{3} in the case where \pyinline{b} is \pyinline{True}.
 
 \end{document}
