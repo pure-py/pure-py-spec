@@ -74,15 +74,15 @@
 
 \subsection{Environments}
 
-Environments $\Gamma, \Delta$ are (not necessarily finite) maps from sets of variables to their \emph{definite
-assignment} status, which is an element of the 2-point Boolean lattice $\set{\statusDefAssigned,
-\statusNotDefAssigned}$. The top element $\statusDefAssigned$ indicates \emph{definitely assigned}, and the
-bottom element $\statusNotDefAssigned$ indicates \emph{not definitely assigned}; we can think of these as
-degenerate types (``any'' and ``none''). The definite assignment terminology is borrowed from Java.
+Environments $\Gamma, \Delta$ are finite maps from sets of variables to their \emph{definite assignment}
+status, which is an element of the 2-point Boolean lattice $\set{\statusDefAssigned, \statusNotDefAssigned}$.
+The top element $\statusDefAssigned$ indicates \emph{definitely assigned}, and the bottom element
+$\statusNotDefAssigned$ indicates \emph{not definitely assigned}; we can think of these as degenerate types
+(``any'' and ``none''). The definite assignment terminology is borrowed from Java.
 
 \paragraph{Environment operations.}
 
-Write $\Gamma \runion \Delta$ (``override'') for the right-baised map union of $\Gamma$ and $\Delta$. Also
+Write $\Gamma \runion \Delta$ (``override'') for the right-biased map union of $\Gamma$ and $\Delta$. Also
 define the following semigroup operation $\merge$ (``merge'') on environments:
 %
 \[\Gamma \merge \Delta := \set{x: \bot \mid \forall x \in (\Gamma \setminus \Delta) \cup (\Delta \setminus \Gamma)} \cup \set{x: \Gamma(x) \meet \Delta(x) \mid x \in \Gamma \cap \Delta}\]
