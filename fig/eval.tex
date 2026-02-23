@@ -19,27 +19,27 @@ R ::= \Assigns{\rho} \mid \Returns{v}
 \small
 \inferrule*[right=assign]
 {
-  \rho \vdash e \Rightarrow v
+  \rho, e \Rightarrow v
 }
 {
-  \rho \vdash \exAssign{x}{e} \Rightarrow \Assigns{\{x \mapsto v\}}
+  \rho, \exAssign{x}{e} \Rightarrow \Assigns{\{x \mapsto v\}}
 }
 \and
 \inferrule*[right=return]
 {
-  \strut
+  \rho, e \Rightarrow v
 }
 {
-  \rho \vdash \exReturn{e} \Rightarrow \Returns{v}
+  \rho, \exReturn{e} \Rightarrow \Returns{v}
 }
 \and
 \inferrule*[right=seq]
 {
-  \rho \vdash s_1 \Rightarrow \Assigns{\rho'} \\
-  \rho' \vdash s_2 \Rightarrow R
+  \rho, s_1 \Rightarrow \Assigns{\rho'} \\
+  \rho \runion \rho', s_2 \Rightarrow R
 }
 {
-  \rho \vdash \exSeq{s_1}{s_2} \Rightarrow R
+  \rho, \exSeq{s_1}{s_2} \Rightarrow R
 }
 \and
 \inferrule*[right=fun]
@@ -47,7 +47,7 @@ R ::= \Assigns{\rho} \mid \Returns{v}
   \strut
 }
 {
-  \rho \vdash \exDef{f}{x}{s} \Rightarrow \Assigns{\{f \mapsto \texttt{fun}\}}
+  \rho, \exDef{f}{x}{s} \Rightarrow \Assigns{\{f \mapsto \texttt{fun}\}}
 }
 \end{mathpar}
 \end{subfigure}

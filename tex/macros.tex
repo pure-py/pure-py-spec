@@ -12,7 +12,9 @@
 \newcommand*{\assigns}[2]{#1 \mathrel{\mathsf{assigns}} #2}
 \newcommand*{\returns}[1]{#1 \mathrel{\mathsf{returns}}}
 
+% expressions, statements and values
 \newcommand*{\exAssign}[2]{#1 = #2}
+\newcommand*{\exClosure}[3]{\langle #1, #2, #3 \rangle}
 \newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
 \newcommand*{\exElif}[2]{\pyinline{elif}\;#1:\;#2}
 \newcommand*{\exFunCall}[2]{#1(#2)}
@@ -28,5 +30,6 @@
 \newcommand*{\meet}{\wedge}
 \newcommand*{\merge}{\oplus}
 
+% operational semantics
 \newcommand{\Assigns}[1]{\mathsf{Assigns}(#1)}
 \newcommand{\Returns}[1]{\mathsf{Returns}(#1)}
