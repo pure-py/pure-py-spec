@@ -1,0 +1,82 @@
+\begin{figure}
+\begin{subfigure}{\textwidth}
+\small
+\begin{center}
+\begin{tabular}{rcll}
+$R$ & $::=$ & $\Assigns{\rho}$ \\
+  & $\mid$ & $\Returns{v}$ \\
+\end{tabular}
+\end{center}
+\caption{Evaluation results}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$s \Rightarrow R$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-pass}}]
+{
+  \strut
+}
+{
+  \rho, \exPass \Rightarrow \Assigns{\set{\varnothing}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-assign}}]
+{
+  \rho, e \Rightarrow v
+}
+{
+  \rho, \exAssign{x}{e} \Rightarrow \Assigns{\set{x \mapsto v}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-return}}]
+{
+  \rho, e \Rightarrow v
+}
+{
+  \rho, \exReturn{e} \Rightarrow \Returns{v}
+}
+\and
+\inferrule*[lab={\ruleName{eval-seq-assigns}}]
+{
+  \rho, s_1 \Rightarrow \Assigns{\rho_1} \\
+  \rho \runion \rho', s_2 \Rightarrow \Assigns{\rho_2}
+}
+{
+  \rho, \exSeq{s_1}{s_2} \Rightarrow \Assigns{\rho_1 \runion \rho_2}
+}
+\and
+\inferrule*[lab={\ruleName{eval-seq-returns}}]
+{
+  \rho, s_1 \Rightarrow \Assigns{\rho'} \\
+  \rho \runion \rho', s_2 \Rightarrow \Returns{v}
+}
+{
+  \rho, \exSeq{s_1}{s_2} \Rightarrow \Returns{v}
+}
+\and
+\inferrule*[lab={\ruleName{eval-def}}]
+{
+  \strut
+}
+{
+  \rho, \exDef{f}{x}{s} \Rightarrow \Assigns{\set{f \mapsto \exClosure{\rho}{s}}}
+}
+\end{mathpar}
+\end{subfigure}
+\caption{Statement evaluation}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\rho, e \Rightarrow v$}
+\begin{mathpar}
+\small
+\inferrule*[right=var]
+{
+   \strut
+}
+{
+  \rho, x \Rightarrow \rho(x)
+}
+\end{mathpar}
+\end{subfigure}
+\caption{Expression evaluation}
+\end{figure}

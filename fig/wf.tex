@@ -21,7 +21,7 @@
 \and
 \inferrule*[lab={\ruleName{wf-def-returns}}]
 {
-  \wf{\Gamma, f : \top, x_1 : \top, \ldots, x_n : \top}{s}
+  \wf{\Gamma, x_1 : \top, \ldots, x_n : \top}{s}
   \\
   \returns{s}
 }
@@ -31,7 +31,7 @@
 \and
 \inferrule*[lab={\ruleName{wf-def-assigns}}]
 {
-  \wf{\Gamma, f : \top, x_1 : \top, \ldots, x_n : \top}{s}
+  \wf{\Gamma, x_1 : \top, \ldots, x_n : \top}{s}
   \\
   \assigns{s}{\Delta}
 }
