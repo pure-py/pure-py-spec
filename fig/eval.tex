@@ -11,12 +11,20 @@ R ::= \Assigns{\rho} \mid \Returns{v}
 \flushleft \shadebox{$s \Rightarrow R$}
 \begin{mathpar}
 \small
+\inferrule*[right=pass]
+{
+  \strut
+}
+{
+  \rho, \exPass \Rightarrow \Assigns{\set{\varnothing}}
+}
+\and
 \inferrule*[right=assign]
 {
   \rho, e \Rightarrow v
 }
 {
-  \rho, \exAssign{x}{e} \Rightarrow \Assigns{\{x \mapsto v\}}
+  \rho, \exAssign{x}{e} \Rightarrow \Assigns{\set{x \mapsto v}}
 }
 \and
 \inferrule*[right=return]
