@@ -19,7 +19,7 @@ R ::= \Assigns{\rho} \mid \Returns{v}
 \small
 \inferrule*[right=assign]
 {
-  \strut
+  \rho \vdash e \Rightarrow v
 }
 {
   \rho \vdash \exAssign{x}{e} \Rightarrow \Assigns{\{x \mapsto v\}}
