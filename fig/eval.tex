@@ -1,17 +1,19 @@
-\subsection*{Results}
-
-\[
-R ::= \Assigns{\rho} \mid \Returns{v}
-\]
-
-\subsection*{Big-Step Operational Semantics}
-
 \begin{figure}
+\begin{subfigure}{\textwidth}
+\small
+\begin{center}
+\begin{tabular}{rcll}
+$R$ & $::=$ & $\Assigns{\rho}$ \\
+  & $\mid$ & $\Returns{v}$ \\
+\end{tabular}
+\end{center}
+\caption{Evaluation results}
+\end{subfigure}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$s \Rightarrow R$}
 \begin{mathpar}
 \small
-\inferrule*[right=pass]
+\inferrule*[lab={\ruleName{eval-pass}}]
 {
   \strut
 }
@@ -19,7 +21,7 @@ R ::= \Assigns{\rho} \mid \Returns{v}
   \rho, \exPass \Rightarrow \Assigns{\set{\varnothing}}
 }
 \and
-\inferrule*[right=assign]
+\inferrule*[lab={\ruleName{eval-assign}}]
 {
   \rho, e \Rightarrow v
 }
@@ -27,7 +29,7 @@ R ::= \Assigns{\rho} \mid \Returns{v}
   \rho, \exAssign{x}{e} \Rightarrow \Assigns{\set{x \mapsto v}}
 }
 \and
-\inferrule*[right=return]
+\inferrule*[lab={\ruleName{eval-return}}]
 {
   \rho, e \Rightarrow v
 }
@@ -35,21 +37,30 @@ R ::= \Assigns{\rho} \mid \Returns{v}
   \rho, \exReturn{e} \Rightarrow \Returns{v}
 }
 \and
-\inferrule*[right=seq]
+\inferrule*[lab={\ruleName{eval-seq-assigns}}]
 {
-  \rho, s_1 \Rightarrow \Assigns{\rho'} \\
-  \rho \runion \rho', s_2 \Rightarrow R
+  \rho, s_1 \Rightarrow \Assigns{\rho_1} \\
+  \rho \runion \rho', s_2 \Rightarrow \Assigns{\rho_2}
 }
 {
-  \rho, \exSeq{s_1}{s_2} \Rightarrow R
+  \rho, \exSeq{s_1}{s_2} \Rightarrow \Assigns{\rho_1 \runion \rho_2}
 }
 \and
-\inferrule*[right=fun]
+\inferrule*[lab={\ruleName{eval-seq-returns}}]
+{
+  \rho, s_1 \Rightarrow \Assigns{\rho'} \\
+  \rho \runion \rho', s_2 \Rightarrow \Returns{v}
+}
+{
+  \rho, \exSeq{s_1}{s_2} \Rightarrow \Returns{v}
+}
+\and
+\inferrule*[lab={\ruleName{eval-def}}]
 {
   \strut
 }
 {
-  \rho, \exDef{f}{x}{s} \Rightarrow \Assigns{\{f \mapsto \exClosure{\rho}{s}\}}
+  \rho, \exDef{f}{x}{s} \Rightarrow \Assigns{\set{f \mapsto \exClosure{\rho}{s}}}
 }
 \end{mathpar}
 \end{subfigure}

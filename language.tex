@@ -79,6 +79,7 @@ To do:
 \item Operators and precedence
 \item Expression grammar
 \item Recursion and mutual recursion
+\item Operational semantics of \pyinline{if} statements
 \item Data classes and \pyinline{match}
 \end{itemize}
 
@@ -212,6 +213,20 @@ way to assign it a semantics which is both pure, and in agreement with Python, s
 returns \pyinline{3} in the case where \pyinline{b} is \pyinline{True}.
 
 \section{Operational semantics}
+
+For a statement $s$, the result $\Assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated
+environment $\rho$; the result $\Returns{v}$ represents \emph{abrupt completion} of $s$ with return value $v$.
+Composing statements sequentially composes their results according to the following monoidal operation:
+{\small
+\begin{align*}
+\Assigns{\rho} \runion \Assigns{\rho'} & = \Assigns{\rho \runion \rho'} \\
+\Assigns{\rho} \runion \Returns{v} & = \Returns{v} \\
+\Returns{v} \runion \Assigns{\rho} & = \Returns{v}
+\end{align*}}
+
+\noindent with $\Assigns{\varnothing}$ as left and right unit; however the well-formedness rules ensure that
+the third case never arises. Function definitions delimite the scope of these effects, so functions themselves
+are always pure.
 
 \input{fig/eval}
 
