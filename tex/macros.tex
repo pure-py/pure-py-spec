@@ -15,6 +15,7 @@
 \newcommand*{\exAssign}[2]{#1 = #2}
 \newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
 \newcommand*{\exElif}[2]{\pyinline{elif}\;#1:\;#2}
+\newcommand*{\exFunCall}[2]{#1(#2)}
 \newcommand*{\exIf}[3]{\pyinline{if}\;#1:\;#2\;#3}
 \newcommand*{\exIfElse}[4]{\pyinline{if}\;#1:\;#2\;#3\;\pyinline{else}:\;#4}
 \newcommand*{\exPass}{\pyinline{pass}}
@@ -26,3 +27,6 @@
 \newcommand*{\runion}{\triangleleft}
 \newcommand*{\meet}{\wedge}
 \newcommand*{\merge}{\oplus}
+
+\newcommand{\Assigns}[1]{\mathsf{Assigns}(#1)}
+\newcommand{\Returns}[1]{\mathsf{Returns}(#1)}

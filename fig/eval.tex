@@ -1,0 +1,55 @@
+\subsection*{Results}
+
+\[
+R ::= \Assigns{\rho} \mid \Returns{v}
+\]
+
+\subsection*{Big-Step Operational Semantics}
+
+\[
+\begin{array}{c}
+\rho \vdash s \Rightarrow R
+\end{array}
+\]
+
+\begin{figure}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$s \Rightarrow R$}
+\begin{mathpar}
+\small
+\inferrule*[right=assign]
+{
+  \strut
+}
+{
+  \rho \vdash \exAssign{x}{e} \Rightarrow \Assigns{\{x \mapsto v\}}
+}
+\and
+\inferrule*[right=return]
+{
+  \strut
+}
+{
+  \rho \vdash \exReturn{e} \Rightarrow \Returns{v}
+}
+\and
+\inferrule*[right=seq]
+{
+  \rho \vdash s_1 \Rightarrow \Assigns{\rho'} \\
+  \rho' \vdash s_2 \Rightarrow R
+}
+{
+  \rho \vdash \exSeq{s_1}{s_2} \Rightarrow R
+}
+\and
+\inferrule*[right=fun]
+{
+  \strut
+}
+{
+  \rho \vdash \exDef{f}{x}{s} \Rightarrow \Assigns{\{f \mapsto \texttt{fun}\}}
+}
+\end{mathpar}
+\end{subfigure}
+\caption{Statement evaluation}
+\end{figure}
