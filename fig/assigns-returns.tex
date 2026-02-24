@@ -81,7 +81,7 @@
   \exDef{f}{\vec{x}}{s} : \assigns{\set{f}}
 }
 \end{mathpar}
-\caption{Statement $s$ assigns $\Delta$ or returns}
+\caption{Statement $s$ is well-formed in $\Gamma$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\vec{s} : R$}
@@ -114,5 +114,19 @@
 }
 \end{mathpar}
 \caption{Non-empty sequence of branches $\vec{s}$ assigns $\Delta$ or returns}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\wf{\Gamma}{e}$}
+\begin{mathpar}
+\small
+\inferrule*[right=var]
+{
+  x : \top \in \Gamma
+}
+{
+  \wf{\Gamma}{x}
+}
+\end{mathpar}
+\caption{Expression $e$ is well-formed in $\Gamma$}
 \end{subfigure}
 \end{figure}
