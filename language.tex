@@ -220,7 +220,7 @@ environment $\rho$; the result $\Returns{v}$ represents \emph{abrupt completion}
 Composing statements sequentially composes their results according to the following monoidal operation:
 {\small
 \begin{align*}
-\Assigns{\rho} \runion \Assigns{\rho'} & = \Assigns{\rho \runion \rho'} \\
+\Assigns{\rho} \runion \Assigns{\rho'} & = \Assigns{(\rho \runion \rho')} \\
 \Assigns{\rho} \runion \Returns{v} & = \Returns{v} \\
 \Returns{v} \runion \Assigns{\rho} & = \Returns{v}
 \end{align*}}

@@ -43,7 +43,7 @@ $r$ & $::=$ & $\Assigns{\rho}$ \\
   \rho \runion \rho_1, s_2 \Rightarrow \Assigns{\rho_2}
 }
 {
-  \rho, \exSeq{s_1}{s_2} \Rightarrow \Assigns{\rho_1 \runion \rho_2}
+  \rho, \exSeq{s_1}{s_2} \Rightarrow \Assigns{(\rho_1 \runion \rho_2)}
 }
 \and
 \inferrule*[lab={\ruleName{eval-seq-returns}}]
