@@ -83,15 +83,15 @@
 \caption{Statement $s$ assigns $\Delta$ or returns}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$S : \assigns{\Delta}$}
+\flushleft \shadebox{$S : R$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{assigns-one}}]
+\inferrule*[lab={\ruleName{singleton}}]
 {
-   s : \assigns{\Delta}
+   s : R
 }
 {
-   \set{s} : \assigns{\Delta}
+   \set{s} : R
 }
 \and
 \inferrule*[lab={\ruleName{assigns-assigns}}]
@@ -106,12 +106,12 @@
 \inferrule*[lab={\ruleName{assigns-returns}}]
 {
    s : \returns \\
-   S : \assigns{\Delta}
+   S : R
 }
 {
-   s \disjunion S : \assigns{\Delta}
+   s \disjunion S : R
 }
 \end{mathpar}
-\caption{Non-empty set of statements $S$ assigns $\Delta$}
+\caption{Non-empty set of branches $\set{s_1 \ldots s_{n + 1}}$ assigns $\Delta$ or returns}
 \end{subfigure}
 \end{figure}
