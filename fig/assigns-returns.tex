@@ -109,7 +109,7 @@
    \Gamma \vdash \vec{s} : \assigns{\Delta'}
 }
 {
-   \Gamma \vdash \set{s} \cons \vec{s} : \assigns{\Delta \merge \Delta'}
+   \Gamma \vdash s \cons \vec{s} : \assigns{\Delta \merge \Delta'}
 }
 \and
 \inferrule*[lab={\ruleName{head-returns}}]
@@ -118,10 +118,10 @@
    \Gamma \vdash \vec{s} : R
 }
 {
-   \Gamma \vdash s \disjunion \vec{s} : R
+   \Gamma \vdash s \cons \vec{s} : R
 }
 \end{mathpar}
-\caption{Non-empty sequence of branches is well-formed in $\Gamma$}
+\caption{Non-empty sequence of branches $\vec{s}$ is well-formed in $\Gamma$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\wf{\Gamma}{e}$}
