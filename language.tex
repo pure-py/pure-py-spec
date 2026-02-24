@@ -69,6 +69,8 @@
 well-formedness predicate
 \item Define a semantics for \PurePy such that the semantics of a \PurePy program is identical to its
 semantics in Python
+\item Some well-formedness and evaluation rules could be given by a desugaring, but for now we avoid having
+two separate syntaxes
 \end{itemize}
 
 \section{Syntax}
@@ -102,8 +104,7 @@ define the following semigroup operation $\merge$ (``merge'') on environments:
 
 \subsection{Well-formedness}
 
-\input{fig/assigns-returns}
-\input{fig/wf}
+\input{fig/well-formed}
 
 \subsection{Examples}
 \subsubsection{Unreachable code}
@@ -219,7 +220,7 @@ environment $\rho$; the result $\Returns{v}$ represents \emph{abrupt completion}
 Composing statements sequentially composes their results according to the following monoidal operation:
 {\small
 \begin{align*}
-\Assigns{\rho} \runion \Assigns{\rho'} & = \Assigns{\rho \runion \rho'} \\
+\Assigns{\rho} \runion \Assigns{\rho'} & = \Assigns{(\rho \runion \rho')} \\
 \Assigns{\rho} \runion \Returns{v} & = \Returns{v} \\
 \Returns{v} \runion \Assigns{\rho} & = \Returns{v}
 \end{align*}}

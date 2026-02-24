@@ -9,8 +9,8 @@
 \newcommand*{\set}[1]{\{#1\}}
 
 \newcommand*{\wf}[2]{#1 \vdash #2}
-\newcommand*{\assigns}[2]{#1 \mathrel{\mathsf{assigns}} #2}
-\newcommand*{\returns}[1]{#1 \mathrel{\mathsf{returns}}}
+\newcommand*{\assigns}[1]{\mathsf{assigns}\;#1}
+\newcommand*{\returns}{\mathsf{returns}}
 
 % expressions, statements and values
 \newcommand*{\exAssign}[2]{#1 = #2}
@@ -31,5 +31,5 @@
 \newcommand*{\merge}{\oplus}
 
 % operational semantics
-\newcommand{\Assigns}[1]{\mathsf{Assigns}(#1)}
-\newcommand{\Returns}[1]{\mathsf{Returns}(#1)}
+\newcommand{\Assigns}[1]{\mathsf{Assigns}\;#1}
+\newcommand{\Returns}[1]{\mathsf{Returns}\;#1}
