@@ -3,14 +3,14 @@
 \small
 \begin{center}
 \begin{tabular}{rcll}
-$R$ & $::=$ & $\Assigns{\rho}$ \\
+$r$ & $::=$ & $\Assigns{\rho}$ \\
   & $\mid$ & $\Returns{v}$ \\
 \end{tabular}
 \end{center}
 \caption{Evaluation results}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$s \Rightarrow R$}
+\flushleft \shadebox{$s \Rightarrow r$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-pass}}]
@@ -40,7 +40,7 @@ $R$ & $::=$ & $\Assigns{\rho}$ \\
 \inferrule*[lab={\ruleName{eval-seq-assigns}}]
 {
   \rho, s_1 \Rightarrow \Assigns{\rho_1} \\
-  \rho \runion \rho', s_2 \Rightarrow \Assigns{\rho_2}
+  \rho \runion \rho_1, s_2 \Rightarrow \Assigns{\rho_2}
 }
 {
   \rho, \exSeq{s_1}{s_2} \Rightarrow \Assigns{\rho_1 \runion \rho_2}
