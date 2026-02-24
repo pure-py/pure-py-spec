@@ -29,21 +29,21 @@
 \and
 \inferrule*[lab={\ruleName{seq-assigns}}]
 {
-  s_1 : \assigns{\Delta_1} \\
-  s_2 : \assigns{\Delta_2}
+  \Gamma \vdash s_1 : \assigns{\Delta_1} \\
+  \Gamma \runion \Delta_1 \vdash s_2 : \assigns{\Delta_2}
 }
 {
-  \exSeq{s_1}{s_2} : \assigns{\Delta_1 \runion \Delta_2}
+  \Gamma \vdash \exSeq{s_1}{s_2} : \assigns{\Delta_1 \runion \Delta_2}
 }
 \and
 \inferrule*[lab={\ruleName{seq-returns}}]
 {
-  s_1 : \assigns{\Delta}
+  \Gamma \vdash s_1 : \assigns{\Delta}
   \\
-  s_2 : \returns
+  \Gamma \runion \Delta \vdash s_2 : \returns
 }
 {
-  \exSeq{s_1}{s_2} : \returns
+  \Gamma \vdash \exSeq{s_1}{s_2} : \returns
 }
 \and
 \inferrule*[lab={\ruleName{if-assigns}}]
