@@ -23,7 +23,7 @@
 {
   \wf{\Gamma, x_1 : \top, \ldots, x_n : \top}{s}
   \\
-  s \returns
+  s : \returns
 }
 {
   \wf{\Gamma}{\exDef{f}{\vec{x}}{s}}
@@ -33,7 +33,7 @@
 {
   \wf{\Gamma, x_1 : \top, \ldots, x_n : \top}{s}
   \\
-  \assigns{s}{\Delta}
+  s : \assigns{\Delta}
 }
 {
   \wf{\Gamma}{\exDef{f}{\vec{x}}{s}}
@@ -50,7 +50,7 @@
 \inferrule*[lab={\ruleName{wf-seq}}]
 {
   \wf{\Gamma}{s_1} \\
-  \assigns{s_1}{\Delta} \\
+  s_1 : \assigns{\Delta} \\
   \wf{\Gamma \runion \Delta}{s_2}
 }
 {
