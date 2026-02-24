@@ -3,7 +3,7 @@
 \flushleft \shadebox{$s : R$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{assigns-pass}}]
+\inferrule*[lab={\ruleName{pass-assigns}}]
 {
   \strut
 }
@@ -11,7 +11,7 @@
   \exPass : \assigns{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{assigns-assign}}]
+\inferrule*[lab={\ruleName{assign-assigns}}]
 {
   \strut
 }
@@ -19,15 +19,15 @@
   \exAssign{x}{e} : \assigns{\set{x}}
 }
 \and
-\inferrule*[lab={\ruleName{assigns-def}}]
+\inferrule*[lab={\ruleName{return-returns}}]
 {
-  \strut
+   \strut
 }
 {
-  \exDef{f}{\vec{x}}{s} : \assigns{\set{f}}
+   \exReturn{e} : \returns
 }
 \and
-\inferrule*[lab={\ruleName{assigns-seq}}]
+\inferrule*[lab={\ruleName{seq-assigns}}]
 {
   s_1 : \assigns{\Delta_1} \\
   s_2 : \assigns{\Delta_2}
@@ -36,7 +36,7 @@
   \exSeq{s_1}{s_2} : \assigns{\Delta_1 \runion \Delta_2}
 }
 \and
-\inferrule*[lab={\ruleName{assigns-if}}]
+\inferrule*[lab={\ruleName{if-assigns}}]
 {
   \strut
 }
@@ -44,12 +44,20 @@
   \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}} : \assigns{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{assigns-if-else}}]
+\inferrule*[lab={\ruleName{if-else-assigns}}]
 {
   \set{s_1 \ldots s_{n + 2}} : \assigns{\Delta}
 }
 {
   \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n + 2}} : \assigns{\Delta}
+}
+\and
+\inferrule*[lab={\ruleName{def-assigns}}]
+{
+  \strut
+}
+{
+  \exDef{f}{\vec{x}}{s} : \assigns{\set{f}}
 }
 \end{mathpar}
 \caption{Statement $s$ assigns $\Delta$}
@@ -90,14 +98,6 @@
 \flushleft \shadebox{$s : \returns$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{returns-return}}]
-{
-   \strut
-}
-{
-   \exReturn{e} : \returns
-}
-\and
 \inferrule*[lab={\ruleName{returns-seq}}]
 {
   s_1 : \assigns{\Delta}
