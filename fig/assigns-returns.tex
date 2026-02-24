@@ -1,6 +1,6 @@
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\assigns{s}{\Delta}$}
+\flushleft \shadebox{$s : R$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{assigns-pass}}]
@@ -79,7 +79,7 @@
 \and
 \inferrule*[lab={\ruleName{assigns-returns}}]
 {
-   \returns{s} \\
+   s \returns \\
    \assigns{S}{\Delta}
 }
 {
@@ -89,7 +89,7 @@
 \caption{Non-empty set of statements $S$ assigns $\Delta$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\returns{s}$}
+\flushleft \shadebox{$s \returns$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{returns-return}}]
@@ -97,26 +97,25 @@
    \strut
 }
 {
-   \returns{\exReturn{e}}
+   \exReturn{e} \returns
 }
 \and
 \inferrule*[lab={\ruleName{returns-seq}}]
 {
   \assigns{s_1}{\Delta}
   \\
-  \returns{s_2}
+  s_2 \returns
 }
 {
-  \returns{\exSeq{s_1}{s_2}}
+  \exSeq{s_1}{s_2} \returns
 }
 \and
 \inferrule*[lab={\ruleName{returns-if-else}}]
 {
-  % \returns{s_i} \quad (\forall i \in \set{1\ldots n + 2})
-  \returns{\vec{s}}
+  \vec{s} \returns
 }
 {
-  \returns{\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}}}
+  \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \returns
 }
 \end{mathpar}
 \caption{Statement $s$ returns}
