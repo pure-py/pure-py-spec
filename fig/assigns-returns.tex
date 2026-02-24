@@ -8,7 +8,7 @@
   \strut
 }
 {
-  \assigns{\exPass}{\varnothing}
+  \exPass : \assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assigns-assign}}]
@@ -16,7 +16,7 @@
   \strut
 }
 {
-  \assigns{\exAssign{x}{e}}{\set{x}}
+  \exAssign{x}{e} : \assigns{\set{x}}
 }
 \and
 \inferrule*[lab={\ruleName{assigns-def}}]
@@ -24,16 +24,16 @@
   \strut
 }
 {
-  \assigns{\exDef{f}{\vec{x}}{s}}{\set{f}}
+  \exDef{f}{\vec{x}}{s} : \assigns{\set{f}}
 }
 \and
 \inferrule*[lab={\ruleName{assigns-seq}}]
 {
-  \assigns{s_1}{\Delta_1} \\
-  \assigns{s_2}{\Delta_2}
+  s_1 : \assigns{\Delta_1} \\
+  s_2 : \assigns{\Delta_2}
 }
 {
-  \assigns{\exSeq{s_1}{s_2}}{\Delta_1 \runion \Delta_2}
+  \exSeq{s_1}{s_2} : \assigns{\Delta_1 \runion \Delta_2}
 }
 \and
 \inferrule*[lab={\ruleName{assigns-if}}]
@@ -41,49 +41,47 @@
   \strut
 }
 {
-  \assigns{\exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}}{\varnothing}
+  \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}} : \assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assigns-if-else}}]
 {
-  \assigns{\set{s_1 \ldots s_{n + 2}}}{\Delta} \\
-%  \bigoplus\set{\Delta \mid i \in \set{1 \ldots n + 2} \wedge \assigns{s_i}{\Delta}}
+  \set{s_1 \ldots s_{n + 2}} : \assigns{\Delta}
 }
 {
-  \assigns{\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n + 2}}}
-          {\Delta}
+  \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n + 2}} : \assigns{\Delta}
 }
 \end{mathpar}
 \caption{Statement $s$ assigns $\Delta$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\assigns{S}{\Delta}$}
+\flushleft \shadebox{$S : \assigns{\Delta}$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{assigns-one}}]
 {
-   \assigns{s}{\Delta}
+   s : \assigns{\Delta}
 }
 {
-   \assigns{\set{s}}{\Delta}
+   \set{s} : \assigns{\Delta}
 }
 \and
 \inferrule*[lab={\ruleName{assigns-assigns}}]
 {
-   \assigns{s}{\Delta} \\
-   \assigns{S}{\Delta}
+   s : \assigns{\Delta} \\
+   S : \assigns{\Delta'}
 }
 {
-   \assigns{\set{s} \disjunion S}{\Delta \merge \Delta'}
+   \set{s} \disjunion S : \assigns{\Delta \merge \Delta'}
 }
 \and
 \inferrule*[lab={\ruleName{assigns-returns}}]
 {
-   s \returns \\
-   \assigns{S}{\Delta}
+   s : \returns \\
+   S : \assigns{\Delta}
 }
 {
-   \assigns{s \disjunion S}{\Delta}
+   s \disjunion S : \assigns{\Delta}
 }
 \end{mathpar}
 \caption{Non-empty set of statements $S$ assigns $\Delta$}
@@ -97,25 +95,27 @@
    \strut
 }
 {
-   \exReturn{e} \returns
+   \exReturn{e} : \returns
 }
 \and
 \inferrule*[lab={\ruleName{returns-seq}}]
 {
-  \assigns{s_1}{\Delta}
+  s_1 : \assigns{\Delta}
   \\
-  s_2 \returns
+  s_2 : \returns
 }
 {
-  \exSeq{s_1}{s_2} \returns
+  \exSeq{s_1}{s_2} : \returns
 }
 \and
 \inferrule*[lab={\ruleName{returns-if-else}}]
 {
-  \vec{s} \returns
+  s_1 : \returns \\
+  \ldots \\
+  s_{n + 2} : \returns
 }
 {
-  \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \returns
+  \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : \returns
 }
 \end{mathpar}
 \caption{Statement $s$ returns}
