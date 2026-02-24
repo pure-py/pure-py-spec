@@ -30,6 +30,8 @@ Fluid will require some changes to be PurePy-compliant, especially with regard t
 The longer-term aim is to stimulate new language developments to support science. Centering around a common syntax
 eases adoption and engagement with these new language techniques and ideas. In later version we may add support for type annotations, [Python array API](https://data-apis.org/array-api/latest/)-compatible arrays, and other features. 
 
+## Design concerns
+
 One risk is that it is easy for users to get
 confused about what is, and is not, valid PurePy syntax, e.g., writing Python code in another
 PurePy-compliant language which does not accept non-PurePy Python features (such as exceptions). These points can be quite subtle, and could also cause problems in the other direction. For example, in Python one cannot efficiently construct a list by writing
