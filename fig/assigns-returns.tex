@@ -73,12 +73,20 @@
   \Gamma \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : \returns
 }
 \and
-\inferrule*[lab={\ruleName{def-assigns}}]
+\inferrule*[lab={\ruleName{def-returns}}]
 {
-  \strut
+  \Gamma, x_1 : \top, \ldots, x_n : \top \vdash s : \returns
 }
 {
-  \exDef{f}{\vec{x}}{s} : \assigns{\set{f}}
+  \Gamma \vdash \exDef{f}{\vec{x}}{s} : \assigns{\set{f}}
+}
+\and
+\inferrule*[lab={\ruleName{def-assigns}}]
+{
+  \Gamma, x_1 : \top, \ldots, x_n : \top \vdash s : \assigns{\Delta}
+}
+{
+  \Gamma \vdash \exDef{f}{\vec{x}}{s} : \assigns{\set{f}}
 }
 \end{mathpar}
 \caption{Statement $s$ is well-formed in $\Gamma$}
@@ -113,7 +121,7 @@
    s \disjunion \vec{s} : R
 }
 \end{mathpar}
-\caption{Non-empty sequence of branches $\vec{s}$ assigns $\Delta$ or returns}
+\caption{Non-empty sequence of branches is well-formed in $\Gamma$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\wf{\Gamma}{e}$}

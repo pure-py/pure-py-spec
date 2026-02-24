@@ -69,6 +69,8 @@
 well-formedness predicate
 \item Define a semantics for \PurePy such that the semantics of a \PurePy program is identical to its
 semantics in Python
+\item Some well-formedness and evaluation rules could be given by a desugaring, but for now we avoid having
+two separate syntaxes
 \end{itemize}
 
 \section{Syntax}
@@ -103,7 +105,6 @@ define the following semigroup operation $\merge$ (``merge'') on environments:
 \subsection{Well-formedness}
 
 \input{fig/assigns-returns}
-\input{fig/wf}
 
 \subsection{Examples}
 \subsubsection{Unreachable code}
