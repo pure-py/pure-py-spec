@@ -33,7 +33,7 @@
   \Gamma \runion \Delta_1 \vdash s_2 : \assigns{\Delta_2}
 }
 {
-  \Gamma \vdash \exSeq{s_1}{s_2} : \assigns{\Delta_1 \runion \Delta_2}
+  \Gamma \vdash \exSeq{s_1}{s_2} : \assigns{(\Delta_1 \runion \Delta_2)}
 }
 \and
 \inferrule*[lab={\ruleName{seq-returns}}]
@@ -109,7 +109,7 @@
    \Gamma \vdash \vec{s} : \assigns{\Delta'}
 }
 {
-   \Gamma \vdash s \cons \vec{s} : \assigns{\Delta \merge \Delta'}
+   \Gamma \vdash s \cons \vec{s} : \assigns{(\Delta \merge \Delta')}
 }
 \and
 \inferrule*[lab={\ruleName{head-returns}}]
