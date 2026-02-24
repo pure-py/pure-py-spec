@@ -6,7 +6,7 @@
 \usepackage{enumitem}
 \usepackage{etoolbox}
 \usepackage{float}
-\usepackage{libertine}
+\usepackage{ebgaramond}
 \usepackage{listings}
 \usepackage{mathpartir}
 \usepackage{microtype}
@@ -25,6 +25,8 @@
 \setlist[enumerate]{nosep}
 
 \title{\textbf{\PurePy: A Functional Subset of Python}}
+\version{0}{1}{0}
+
 \author{Nikolaus Huber\textsuperscript{1} \and Dominic Orchard\textsuperscript{2,1} \and Jacob Pake\textsuperscript{2} \and Roly Perera\textsuperscript{1,3}}
 \date{}
 
@@ -35,17 +37,23 @@
 }
 
 % Override maketitle to avoid internal tabular conflicts
+\makeatletter
 \renewcommand{\maketitle}{%
     \vspace*{\droptitle}
     \begin{flushleft}
-        {\LARGE\bfseries \thetitle \par}
+        {\LARGE\bfseries\thetitle\par}
+        \ifx\versionstring\@empty\else
+            \vspace{0.5ex}
+            {\Large\normalfont\versionstring\par}
+        \fi
         \vspace{1ex}
-        {\Large \theauthor \par}
+        {\Large\theauthor\par}
         \vspace{1ex}
-        {\affiliations \par}
+        {\affiliations\par}
     \end{flushleft}
     \vspace{2ex}
 }
+\makeatother
 
 \begin{document}
 
