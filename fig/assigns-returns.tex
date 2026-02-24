@@ -92,33 +92,33 @@
 \caption{Statement $s$ is well-formed in $\Gamma$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vec{s} : R$}
+\flushleft \shadebox{$\Gamma \vdash \vec{s} : R$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{singleton}}]
 {
-   s : R
+   \Gamma \vdash s : R
 }
 {
-   \set{s} : R
+   \Gamma \vdash \set{s} : R
 }
 \and
 \inferrule*[lab={\ruleName{head-assigns}}]
 {
-   s : \assigns{\Delta} \\
-   \vec{s} : \assigns{\Delta'}
+   \Gamma \vdash s : \assigns{\Delta} \\
+   \Gamma \vdash \vec{s} : \assigns{\Delta'}
 }
 {
-   \set{s} \cons \vec{s} : \assigns{\Delta \merge \Delta'}
+   \Gamma \vdash \set{s} \cons \vec{s} : \assigns{\Delta \merge \Delta'}
 }
 \and
 \inferrule*[lab={\ruleName{head-returns}}]
 {
-   s : \returns \\
-   \vec{s} : R
+   \Gamma \vdash s : \returns \\
+   \Gamma \vdash \vec{s} : R
 }
 {
-   s \disjunion \vec{s} : R
+   \Gamma \vdash s \disjunion \vec{s} : R
 }
 \end{mathpar}
 \caption{Non-empty sequence of branches is well-formed in $\Gamma$}
