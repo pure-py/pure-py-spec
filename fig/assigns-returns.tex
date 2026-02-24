@@ -36,6 +36,16 @@
   \exSeq{s_1}{s_2} : \assigns{\Delta_1 \runion \Delta_2}
 }
 \and
+\inferrule*[lab={\ruleName{seq-returns}}]
+{
+  s_1 : \assigns{\Delta}
+  \\
+  s_2 : \returns
+}
+{
+  \exSeq{s_1}{s_2} : \returns
+}
+\and
 \inferrule*[lab={\ruleName{if-assigns}}]
 {
   \strut
@@ -98,17 +108,7 @@
 \flushleft \shadebox{$s : \returns$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{returns-seq}}]
-{
-  s_1 : \assigns{\Delta}
-  \\
-  s_2 : \returns
-}
-{
-  \exSeq{s_1}{s_2} : \returns
-}
-\and
-\inferrule*[lab={\ruleName{returns-if-else}}]
+\inferrule*[lab={\ruleName{if-else-returns}}]
 {
   s_1 : \returns \\
   \ldots \\
