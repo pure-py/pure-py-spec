@@ -1,6 +1,6 @@
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$s : R$}
+\flushleft \shadebox{$\Gamma \vdash s : R$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{pass-assigns}}]
@@ -8,7 +8,7 @@
   \strut
 }
 {
-  \exPass : \assigns{\varnothing}
+  \Gamma \vdash \exPass : \assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assign-assigns}}]
