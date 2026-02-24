@@ -21,10 +21,10 @@
 \and
 \inferrule*[lab={\ruleName{return-returns}}]
 {
-   \strut
+  \Gamma \vdash e
 }
 {
-   \exReturn{e} : \returns
+  \Gamma \vdash \exReturn{e} : \returns
 }
 \and
 \inferrule*[lab={\ruleName{seq-assigns}}]
