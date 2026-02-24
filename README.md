@@ -1,10 +1,9 @@
 # PurePy - A Pure Functional Subset of Python
+
+## [v0.1.0](https://github.com/pure-py/pure-py-spec/releases/download/v0.1.0/language.pdf)
+
 PurePy defines a pure (side-effect free) subset of Python, intended initially for use by researchers in 
 programming languages and programming pedagogy, with a view to evolving it into a common language for scientific computing, supporting efficient, portable applications in modelling, data processing, data analysis and visualisation. 
-
-## Latest version
-
-[v0.1.0 spec](https://github.com/pure-py/pure-py-spec/releases/download/v0.1.0/language.pdf)
 
 The PurePy language standard will define a (versioned) formal grammar for the language, a formal semantics, and a reference interpreter.
 All languages which are PurePy-compliant must accept any valid PurePy program and are
