@@ -87,16 +87,16 @@ To do:
 
 \subsection{Environments}
 
-Environments $\Gamma, \Delta$ are finite maps from sets of variables to their \emph{definite assignment}
-status, which is an element of the 2-point Boolean lattice $\set{\statusDefAssigned, \statusNotDefAssigned}$.
-The top element $\statusDefAssigned$ indicates \emph{definitely assigned}, and the bottom element
-$\statusNotDefAssigned$ indicates \emph{not definitely assigned}; we can think of these as degenerate types
-(``any'' and ``none''). The definite assignment terminology is borrowed from Java.
+Environments $\Gamma, \Delta$ are finite maps from sets of variables to a \emph{definite assignment} status
+chosen from the 2-point Boolean lattice $\set{\statusDefAssigned, \statusNotDefAssigned}$, where
+$\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ indicates \emph{not
+definitely assigned}. (Or think of these as degenerate types ``any'' and ``none''.) The definite assignment
+terminology is borrowed from Java.
 
 \paragraph{Environment operations.}
 
-Write $\Gamma \runion \Delta$ (``override'') for the right-biased map union of $\Gamma$ and $\Delta$. Also
-define the following semigroup operation $\merge$ (``merge'') on environments:
+Environments admit a monoid of sequential composition $\Gamma \runion \Delta$ (``override''), defined as
+right-biased map union, and a semigroup of parallel composition $\merge$ (``merge'') defined as follows:
 %
 \[\Gamma \merge \Delta := \set{x: \bot \mid \forall x \in (\Gamma \setminus \Delta) \cup (\Delta \setminus \Gamma)} \cup \set{x: \Gamma(x) \meet \Delta(x) \mid x \in \Gamma \cap \Delta}\]
 
