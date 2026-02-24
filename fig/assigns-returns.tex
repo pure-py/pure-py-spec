@@ -13,10 +13,10 @@
 \and
 \inferrule*[lab={\ruleName{assign-assigns}}]
 {
-  \strut
+  \Gamma \vdash e
 }
 {
-  \exAssign{x}{e} : \assigns{\set{x}}
+  \Gamma \vdash \exAssign{x}{e} : \assigns{\set{x}}
 }
 \and
 \inferrule*[lab={\ruleName{return-returns}}]

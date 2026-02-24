@@ -3,14 +3,6 @@
 \flushleft \shadebox{$\wf{\Gamma}{s}$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{wf-assign}}]
-{
-  \wf{\Gamma}{e}
-}
-{
-  \wf{\Gamma}{\exAssign{x}{e}}
-}
-\and
 \inferrule*[lab={\ruleName{wf-def-returns}}]
 {
   \wf{\Gamma, x_1 : \top, \ldots, x_n : \top}{s}
