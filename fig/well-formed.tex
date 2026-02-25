@@ -19,6 +19,14 @@
   \Gamma \vdash \exAssign{x}{e} : \assigns{\set{x}}
 }
 \and
+\inferrule*[lab={\ruleName{return-none-returns}}]
+{
+  \strut
+}
+{
+  \Gamma \vdash \exReturn{} : \returns
+}
+\and
 \inferrule*[lab={\ruleName{return-returns}}]
 {
   \Gamma \vdash e
@@ -49,7 +57,7 @@
 \inferrule*[lab={\ruleName{if-assigns}}]
 {
   \Gamma \vdash \vec{e} \\
-  \Gamma \vdash \vec{s}
+  \Gamma \vdash \vec{s} : R
 }
 {
   \Gamma \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}} : \assigns{\varnothing}
