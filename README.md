@@ -1,9 +1,9 @@
 # PurePy - A Pure Functional Subset of Python
 
-## [v0.1.0](https://github.com/pure-py/pure-py-spec/releases/download/v0.1.0/language.pdf)
+## [v0.1.1](https://github.com/pure-py/pure-py-spec/releases/download/v0.1.1/language.pdf)
 
-PurePy defines a pure (side-effect free) subset of Python, intended initially for use by researchers in 
-programming languages and programming pedagogy, with a view to evolving it into a common language for scientific computing, supporting efficient, portable applications in modelling, data processing, data analysis and visualisation. 
+PurePy defines a pure (side-effect free) subset of Python, intended initially for use by researchers in
+programming languages and programming pedagogy, with a view to evolving it into a common language for scientific computing, supporting efficient, portable applications in modelling, data processing, data analysis and visualisation.
 
 The PurePy language standard will define a (versioned) formal grammar for the language, a formal semantics, and a reference interpreter.
 All languages which are PurePy-compliant must accept any valid PurePy program and are
@@ -27,7 +27,7 @@ Fluid will require some changes to be PurePy-compliant, especially with regard t
 ## Long-term aims
 
 The longer-term aim is to stimulate new language developments to support science. Centering around a common syntax
-eases adoption and engagement with these new language techniques and ideas. In later version we may add support for type annotations, [Python array API](https://data-apis.org/array-api/latest/)-compatible arrays, and other features. 
+eases adoption and engagement with these new language techniques and ideas. In later version we may add support for type annotations, [Python array API](https://data-apis.org/array-api/latest/)-compatible arrays, and other features.
 
 ## Design concerns
 
