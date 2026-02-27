@@ -81,17 +81,9 @@
   \Gamma \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : \returns
 }
 \and
-\inferrule*[lab={\ruleName{def-returns}}]
+\inferrule*[lab={\ruleName{def}}]
 {
-  \Gamma, x_1 : \top, \ldots, x_n : \top \vdash s : \returns
-}
-{
-  \Gamma \vdash \exDef{f}{\vec{x}}{s} : \assigns{\set{f}}
-}
-\and
-\inferrule*[lab={\ruleName{def-assigns}}]
-{
-  \Gamma, x_1 : \top, \ldots, x_n : \top \vdash s : \assigns{\Delta}
+  \Gamma, x_1 : \top, \ldots, x_n : \top \vdash s : R
 }
 {
   \Gamma \vdash \exDef{f}{\vec{x}}{s} : \assigns{\set{f}}
