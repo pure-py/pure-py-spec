@@ -108,6 +108,8 @@ right-biased map union, and a semigroup of parallel composition $\merge$ (``merg
 %
 \[\Gamma \merge \Delta := \set{x: \bot \mid \forall x \in (\Gamma \setminus \Delta) \cup (\Delta \setminus \Gamma)} \cup \set{x: \Gamma(x) \meet \Delta(x) \mid x \in \Gamma \cap \Delta}\]
 
+\noindent where $\dom(\Gamma \merge \Delta) = \dom(\Gamma) \cup \dom(\Delta)$.
+
 \input{fig/syntax}
 
 \subsection{Well-formedness}
