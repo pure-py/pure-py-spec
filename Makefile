@@ -1,6 +1,6 @@
 TEXFILES := $(wildcard *.tex) $(wildcard tex/*.tex fig/*.tex)
 
-default: language.pdf
+default: PurePy-spec.pdf
 
 %.pdf: %.tex $(TEXFILES)
 	pdflatex $<

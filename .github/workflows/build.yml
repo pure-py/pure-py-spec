@@ -21,10 +21,10 @@ jobs:
       - name: Build LaTeX document
         uses: xu-cheng/latex-action@v4
         with:
-          root_file: language.tex
+          root_file: PurePy-spec.tex
 
       - name: Upload PDF to GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: language.pdf
+          files: PurePy-spec.pdf
