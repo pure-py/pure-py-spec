@@ -57,10 +57,10 @@
 \inferrule*[lab={\ruleName{if-assigns}}]
 {
   \Gamma \vdash \vec{e} \\
-  \Gamma \vdash \vec{s} : R
+  \Gamma \vdash \vec{s} \cons \exPass : \assigns{\Delta}
 }
 {
-  \Gamma \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}} : \assigns{\varnothing}
+  \Gamma \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}} : \assigns{\Delta}
 }
 \and
 \inferrule*[lab={\ruleName{if-else-assigns}}]
