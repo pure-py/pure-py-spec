@@ -112,9 +112,9 @@ right-biased map union, and a semigroup of parallel composition $\merge$ (``merg
 
 \subsection{Well-formedness}
 
-Every well-formed statement may either \emph{definitely return}, or \emph{definitely assign} a set of
-variables $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and
-\pyinline{x = e} definitely assigns $\set{\pyinline{x}}$.
+Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a set of variables
+$\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
+= e} definitely assigns $\set{\pyinline{x}}$.
 
 \input{fig/well-formed}
 
