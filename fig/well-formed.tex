@@ -63,22 +63,13 @@
   \Gamma \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}} : \assigns{\Delta}
 }
 \and
-\inferrule*[lab={\ruleName{if-else-assigns}}]
+\inferrule*[lab={\ruleName{if-else}}]
 {
   \Gamma \vdash \vec{e} \\
-  \Gamma \vdash \vec{s} : \assigns{\Delta}
+  \Gamma \vdash \vec{s} : \vec{R}
 }
 {
-  \Gamma \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n + 2}} : \assigns{\Delta}
-}
-\and
-\inferrule*[lab={\ruleName{if-else-returns}}]
-{
-  \Gamma \vdash \vec{e} \\
-  \Gamma \vdash \vec{s} : \returns
-}
-{
-  \Gamma \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : \returns
+  \Gamma \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \merge \cdots \merge R_{n+2}
 }
 \and
 \inferrule*[lab={\ruleName{def}}]
