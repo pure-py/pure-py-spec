@@ -128,24 +128,24 @@ unit because the neutral element for any $\Gamma$ has the same domain as $\Gamma
 \end{lemma}
 
 Context operations $\runion$ and $\merge$ lift to a partial semiring over result types $R$, with
-$\assignsTmp{\varnothing}$ as left and right unit for $\runion$ and $\returnsTmp$ as unit for $\merge$ and zero for
-$\runion$. Sequential composition is defined only when the left-hand result type is not $\returnsTmp$.
+$\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero for
+$\runion$. Sequential composition is defined only when the left-hand result type is not $\Returns$.
 
 \begin{definition}[Partial semiring of result types]
 {\small
 \begin{align*}
-\assignsTmp{\Delta} \merge \assignsTmp{\Delta'} & = \assignsTmp{(\Delta \merge \Delta')} \\
-\assignsTmp{\Delta} \merge \returnsTmp & = \assignsTmp{\Delta} \\
-\returnsTmp \merge \assignsTmp{\Delta} & = \assignsTmp{\Delta} \\
+\Assigns{\Delta} \merge \Assigns{\Delta'} & = \Assigns{(\Delta \merge \Delta')} \\
+\Assigns{\Delta} \merge \Returns & = \Assigns{\Delta} \\
+\Returns \merge \Assigns{\Delta} & = \Assigns{\Delta} \\
 \\
-\assignsTmp{\Delta} \runion \assignsTmp{\Delta'} & = \assignsTmp{(\Delta \runion \Delta')} \\
-% \returnsTmp \runion R & = \returnsTmp \\
-\assignsTmp{\Delta} \runion \returnsTmp & = \returnsTmp
+\Assigns{\Delta} \runion \Assigns{\Delta'} & = \Assigns{(\Delta \runion \Delta')} \\
+% \Returns \runion R & = \Returns \\
+\Assigns{\Delta} \runion \Returns & = \Returns
 \end{align*}}
 \end{definition}
 
 \begin{lemma}[Distributivity]
-When the relevant terms are defined (i.e.~neither $R$ nor $R'$ is $\returnsTmp$):
+When the relevant terms are defined (i.e.~neither $R$ nor $R'$ is $\Returns$):
 \[
 (R \merge R') \runion S = (R \runion S) \merge (R' \runion S)
 \]

@@ -37,22 +37,13 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \rho, \exReturn{e} \Rightarrow \returns{v}
 }
 \and
-\inferrule*[lab={\ruleName{eval-seq-assigns}}]
+\inferrule*[lab={\ruleName{eval-seq}}]
 {
-  \rho, s_1 \Rightarrow \assigns{\rho_1} \\
-  \rho \runion \rho_1, s_2 \Rightarrow \assigns{\rho_2}
+  \rho, s_1 \Rightarrow r \\
+  \rho \runion \rho_1, s_2 \Rightarrow r'
 }
 {
-  \rho, \exSeq{s_1}{s_2} \Rightarrow \assigns{(\rho_1 \runion \rho_2)}
-}
-\and
-\inferrule*[lab={\ruleName{eval-seq-returns}}]
-{
-  \rho, s_1 \Rightarrow \assigns{\rho'} \\
-  \rho \runion \rho', s_2 \Rightarrow \returns{v}
-}
-{
-  \rho, \exSeq{s_1}{s_2} \Rightarrow \returns{v}
+  \rho, \exSeq{s_1}{s_2} \Rightarrow r \runion r'
 }
 \and
 \inferrule*[lab={\ruleName{eval-def}}]
