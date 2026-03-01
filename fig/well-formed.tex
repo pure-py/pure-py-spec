@@ -54,13 +54,13 @@
   \Gamma \vdash \exSeq{s_1}{s_2} : \returns
 }
 \and
-\inferrule*[lab={\ruleName{if-assigns}}]
+\inferrule*[lab={\ruleName{if}}]
 {
   \Gamma \vdash \vec{e} \\
-  \Gamma \vdash \vec{s} \cons \exPass : \assigns{\Delta}
+  \Gamma \vdash \vec{s} : \vec{R}
 }
 {
-  \Gamma \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}} : \assigns{\Delta}
+  \Gamma \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \merge \ldots R_{n + 1} \merge \ldots \merge \assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{if-else}}]
