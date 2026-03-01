@@ -21,6 +21,7 @@
 \input{tex/listings}
 
 \newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
 
 \raggedbottom
 \setlength{\droptitle}{-8ex}
@@ -123,6 +124,27 @@ unit because the neutral element for any $\Gamma$ has the same domain as $\Gamma
 \begin{lemma}[Distributivity]
 \[
 (\Delta \merge \Delta') \runion \Gamma = (\Delta \runion \Gamma) \merge (\Delta' \runion \Gamma).
+\]
+\end{lemma}
+
+\begin{definition}[Semiring of result types]
+Context operations $\runion$ and $\merge$ lift to a semiring over result types $R$, with
+$\assigns{\varnothing}$ as left and right unit for $\runion$ and $\returns$ as unit for $\merge$ and zero for
+$\runion$. {\small
+\begin{align*}
+\assigns{\Delta} \merge \assigns{\Delta'} & = \assigns{(\Delta \merge \Delta')} \\
+\assigns{\Delta} \merge \returns & = \assigns{\Delta} \\
+\returns \merge \assigns{\Delta} & = \assigns{\Delta} \\
+\\
+\assigns{\Delta} \runion \assigns{\Delta'} & = \assigns{(\Delta \runion \Delta')} \\
+\returns \runion R & = \returns \\
+R \runion \returns & = \returns
+\end{align*}}
+\end{definition}
+
+\begin{lemma}[Distributivity]
+\[
+(R \merge R') \runion S = (R \runion S) \merge (R' \runion S)
 \]
 \end{lemma}
 
