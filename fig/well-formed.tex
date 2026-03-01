@@ -35,23 +35,13 @@
   \Gamma \vdash \exReturn{e} : \returns
 }
 \and
-\inferrule*[lab={\ruleName{seq-assigns}}]
+\inferrule*[lab={\ruleName{seq}}]
 {
-  \Gamma \vdash s_1 : \assigns{\Delta_1} \\
-  \Gamma \runion \Delta_1 \vdash s_2 : \assigns{\Delta_2}
+  \Gamma \vdash s_1 : R \\
+  \Gamma \runion \Delta_1 \vdash s_2 : S
 }
 {
-  \Gamma \vdash \exSeq{s_1}{s_2} : \assigns{(\Delta_1 \runion \Delta_2)}
-}
-\and
-\inferrule*[lab={\ruleName{seq-returns}}]
-{
-  \Gamma \vdash s_1 : \assigns{\Delta}
-  \\
-  \Gamma \runion \Delta \vdash s_2 : \returns
-}
-{
-  \Gamma \vdash \exSeq{s_1}{s_2} : \returns
+  \Gamma \vdash \exSeq{s_1}{s_2} : R \runion S
 }
 \and
 \inferrule*[lab={\ruleName{if}}]
