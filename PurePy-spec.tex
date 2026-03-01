@@ -274,16 +274,16 @@ by \pyinline{return None}. This ensures every function returns, even if it is no
 
 \section{Operational semantics}
 
-For a statement $s$, the result $\Assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated
-environment $\rho$; the result $\Returns{v}$ represents \emph{abrupt completion} of $s$ with return value $v$.
+For a statement $s$, the result $\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated
+environment $\rho$; the result $\returns{v}$ represents \emph{abrupt completion} of $s$ with return value $v$.
 Composing statements sequentially composes their results according to the following partial monoid, analogous to sequential composition of result types:
 {\small
 \begin{align*}
-\Assigns{\rho} \runion \Assigns{\rho'} & = \Assigns{(\rho \runion \rho')} \\
-\Assigns{\rho} \runion \Returns{v} & = \Returns{v}
+\assigns{\rho} \runion \assigns{\rho'} & = \assigns{(\rho \runion \rho')} \\
+\assigns{\rho} \runion \returns{v} & = \returns{v}
 \end{align*}}
 
-\noindent with $\Assigns{\varnothing}$ as left and right unit. Function definitions delimit the scope of these
+\noindent with $\assigns{\varnothing}$ as left and right unit. Function definitions delimit the scope of these
 effects, so as black boxes, functions are always pure.
 
 \input{fig/eval}
