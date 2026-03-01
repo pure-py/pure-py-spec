@@ -8,7 +8,7 @@
   \strut
 }
 {
-  \Gamma \vdash \exPass : \assigns{\varnothing}
+  \Gamma \vdash \exPass : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assign-assigns}}]
@@ -16,7 +16,7 @@
   \Gamma \vdash e
 }
 {
-  \Gamma \vdash \exAssign{x}{e} : \assigns{\set{x}}
+  \Gamma \vdash \exAssign{x}{e} : \Assigns{\set{x}}
 }
 \and
 \inferrule*[lab={\ruleName{return-none-returns}}]
@@ -24,7 +24,7 @@
   \strut
 }
 {
-  \Gamma \vdash \exReturn{} : \returns
+  \Gamma \vdash \exReturn{} : \Returns
 }
 \and
 \inferrule*[lab={\ruleName{return-returns}}]
@@ -32,53 +32,34 @@
   \Gamma \vdash e
 }
 {
-  \Gamma \vdash \exReturn{e} : \returns
+  \Gamma \vdash \exReturn{e} : \Returns
 }
 \and
-\inferrule*[lab={\ruleName{seq-assigns}}]
+\inferrule*[lab={\ruleName{seq}}]
 {
-  \Gamma \vdash s_1 : \assigns{\Delta_1} \\
-  \Gamma \runion \Delta_1 \vdash s_2 : \assigns{\Delta_2}
+  \Gamma \vdash s_1 : R \\
+  \Gamma \runion \Delta_1 \vdash s_2 : S
 }
 {
-  \Gamma \vdash \exSeq{s_1}{s_2} : \assigns{(\Delta_1 \runion \Delta_2)}
-}
-\and
-\inferrule*[lab={\ruleName{seq-returns}}]
-{
-  \Gamma \vdash s_1 : \assigns{\Delta}
-  \\
-  \Gamma \runion \Delta \vdash s_2 : \returns
-}
-{
-  \Gamma \vdash \exSeq{s_1}{s_2} : \returns
+  \Gamma \vdash \exSeq{s_1}{s_2} : R \runion S
 }
 \and
-\inferrule*[lab={\ruleName{if-assigns}}]
+\inferrule*[lab={\ruleName{if}}]
 {
   \Gamma \vdash \vec{e} \\
-  \Gamma \vdash \vec{s} \cons \exPass : \assigns{\Delta}
+  \Gamma \vdash \vec{s} : \vec{R}
 }
 {
-  \Gamma \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}} : \assigns{\Delta}
-}
-\and
-\inferrule*[lab={\ruleName{if-else-assigns}}]
-{
-  \Gamma \vdash \vec{e} \\
-  \Gamma \vdash \vec{s} : \assigns{\Delta}
-}
-{
-  \Gamma \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n + 2}} : \assigns{\Delta}
+  \Gamma \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \merge \ldots R_{n + 1} \merge \ldots \merge \Assigns{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{if-else-returns}}]
+\inferrule*[lab={\ruleName{if-else}}]
 {
   \Gamma \vdash \vec{e} \\
-  \Gamma \vdash \vec{s} : \returns
+  \Gamma \vdash \vec{s} : \vec{R}
 }
 {
-  \Gamma \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : \returns
+  \Gamma \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \merge \cdots \merge R_{n+2}
 }
 \and
 \inferrule*[lab={\ruleName{def}}]
@@ -86,42 +67,10 @@
   \Gamma, x_1 : \top, \ldots, x_n : \top \vdash s : R
 }
 {
-  \Gamma \vdash \exDef{f}{\vec{x}}{s} : \assigns{\set{f}}
+  \Gamma \vdash \exDef{f}{\vec{x}}{s} : \Assigns{\set{f}}
 }
 \end{mathpar}
 \caption{Statement $s$ is well-formed in $\Gamma$}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash \vec{s} : R$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{singleton}}]
-{
-   \Gamma \vdash s : R
-}
-{
-   \Gamma \vdash s \cons \varepsilon : R
-}
-\and
-\inferrule*[lab={\ruleName{head-assigns}}]
-{
-   \Gamma \vdash s : \assigns{\Delta} \\
-   \Gamma \vdash \vec{s} : \assigns{\Delta'}
-}
-{
-   \Gamma \vdash s \cons \vec{s} : \assigns{(\Delta \merge \Delta')}
-}
-\and
-\inferrule*[lab={\ruleName{head-returns}}]
-{
-   \Gamma \vdash s : \returns \\
-   \Gamma \vdash \vec{s} : R
-}
-{
-   \Gamma \vdash s \cons \vec{s} : R
-}
-\end{mathpar}
-\caption{Non-empty sequence of branches $\vec{s}$ is well-formed in $\Gamma$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\wf{\Gamma}{e}$}

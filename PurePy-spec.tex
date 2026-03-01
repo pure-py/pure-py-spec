@@ -2,6 +2,7 @@
 
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{amsthm}
 \usepackage{beramono}
 \usepackage{enumitem}
 \usepackage{etoolbox}
@@ -19,13 +20,16 @@
 \input{tex/macros}
 \input{tex/listings}
 
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+
 \raggedbottom
 \setlength{\droptitle}{-8ex}
 \setlist[itemize]{leftmargin=*, nosep}
 \setlist[enumerate]{nosep}
 
 \title{\textbf{\PurePy: A Functional Subset of Python}}
-\version{0}{1}{2}
+\version{0}{1}{3}
 
 \author{
    Nikolaus Huber\textsuperscript{1} \and
@@ -98,22 +102,54 @@ To do:
 \item Data classes and \pyinline{match}
 \end{itemize}
 
-\subsection{Environments}
+\subsection{Contexts}
 
-Environments $\Gamma, \Delta$ are finite maps from sets of variables to a \emph{definite assignment} status
+Contexts $\Gamma, \Delta$ are finite maps from sets of variables to a \emph{definite assignment} status
 chosen from the 2-point Boolean lattice $\set{\statusDefAssigned, \statusNotDefAssigned}$, where
 $\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ indicates \emph{not
 definitely assigned}. (Or think of these as degenerate types ``any'' and ``none''.) The definite assignment
 terminology is borrowed from Java.
 
-\paragraph{Environment operations.}
+\paragraph{Context operations.}
 
-Environments admit a monoid of sequential composition $\Gamma \runion \Delta$ (``override''), defined as
-right-biased map union, and a semigroup of parallel composition $\merge$ (``merge'') defined as follows:
+Contexts admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override''),
+defined as right-biased map union with $\varnothing$ as left and right unit, and an idempotent commutative
+semigroup of parallel composition $\merge$ (``merge'') defined as follows:
 %
 \[\Gamma \merge \Delta := \set{x: \bot \mid \forall x \in (\Gamma \setminus \Delta) \cup (\Delta \setminus \Gamma)} \cup \set{x: \Gamma(x) \meet \Delta(x) \mid x \in \Gamma \cap \Delta}\]
 
-\noindent where $\dom(\Gamma \merge \Delta) = \dom(\Gamma) \cup \dom(\Delta)$.
+\noindent where $\dom(\Gamma \merge \Delta) = \dom(\Gamma) \cup \dom(\Delta)$. The $\merge$ operator lacks a
+unit because the neutral element for any $\Gamma$ has the same domain as $\Gamma$.
+
+\begin{lemma}[Distributivity]
+\[
+(\Delta \merge \Delta') \runion \Gamma = (\Delta \runion \Gamma) \merge (\Delta' \runion \Gamma).
+\]
+\end{lemma}
+
+Context operations $\runion$ and $\merge$ lift to a partial semiring over result types $R$, with
+$\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero for
+$\runion$. Sequential composition is defined only when the left-hand result type is not $\Returns$.
+
+\begin{definition}[Partial semiring of result types]
+{\small
+\begin{align*}
+\Assigns{\Delta} \merge \Assigns{\Delta'} & = \Assigns{(\Delta \merge \Delta')} \\
+\Assigns{\Delta} \merge \Returns & = \Assigns{\Delta} \\
+\Returns \merge \Assigns{\Delta} & = \Assigns{\Delta} \\
+\\
+\Assigns{\Delta} \runion \Assigns{\Delta'} & = \Assigns{(\Delta \runion \Delta')} \\
+% \Returns \runion R & = \Returns \\
+\Assigns{\Delta} \runion \Returns & = \Returns
+\end{align*}}
+\end{definition}
+
+\begin{lemma}[Distributivity]
+When the relevant terms are defined (i.e.~neither $R$ nor $R'$ is $\Returns$):
+\[
+(R \merge R') \runion S = (R \runion S) \merge (R' \runion S)
+\]
+\end{lemma}
 
 \input{fig/syntax}
 
@@ -238,19 +274,17 @@ by \pyinline{return None}. This ensures every function returns, even if it is no
 
 \section{Operational semantics}
 
-For a statement $s$, the result $\Assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated
-environment $\rho$; the result $\Returns{v}$ represents \emph{abrupt completion} of $s$ with return value $v$.
-Composing statements sequentially composes their results according to the following monoidal operation:
+For a statement $s$, the result $\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated
+environment $\rho$; the result $\returns{v}$ represents \emph{abrupt completion} of $s$ with return value $v$.
+Composing statements sequentially composes their results according to the following partial monoid, analogous to sequential composition of result types:
 {\small
 \begin{align*}
-\Assigns{\rho} \runion \Assigns{\rho'} & = \Assigns{(\rho \runion \rho')} \\
-\Assigns{\rho} \runion \Returns{v} & = \Returns{v} \\
-\Returns{v} \runion \Assigns{\rho} & = \Returns{v}
+\assigns{\rho} \runion \assigns{\rho'} & = \assigns{(\rho \runion \rho')} \\
+\assigns{\rho} \runion \returns{v} & = \returns{v}
 \end{align*}}
 
-\noindent with $\Assigns{\varnothing}$ as left and right unit; however the well-formedness rules ensure that
-the third case never arises. Function definitions delimit the scope of these effects, so functions themselves
-are always pure.
+\noindent with $\assigns{\varnothing}$ as left and right unit. Function definitions delimit the scope of these
+effects, so as black boxes functions are always pure.
 
 \input{fig/eval}
 

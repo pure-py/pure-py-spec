@@ -3,8 +3,8 @@
 \small
 \begin{center}
 \begin{tabular}{rcll}
-$r$ & $::=$ & $\Assigns{\rho}$ \\
-  & $\mid$ & $\Returns{v}$ \\
+$r$ & $::=$ & $\assigns{\rho}$ \\
+  & $\mid$ & $\returns{v}$ \\
 \end{tabular}
 \end{center}
 \caption{Evaluation results}
@@ -18,7 +18,7 @@ $r$ & $::=$ & $\Assigns{\rho}$ \\
   \strut
 }
 {
-  \rho, \exPass \Rightarrow \Assigns{\set{\varnothing}}
+  \rho, \exPass \Rightarrow \assigns{\set{\varnothing}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-assign}}]
@@ -26,7 +26,7 @@ $r$ & $::=$ & $\Assigns{\rho}$ \\
   \rho, e \Rightarrow v
 }
 {
-  \rho, \exAssign{x}{e} \Rightarrow \Assigns{\set{x \mapsto v}}
+  \rho, \exAssign{x}{e} \Rightarrow \assigns{\set{x \mapsto v}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-return}}]
@@ -34,25 +34,16 @@ $r$ & $::=$ & $\Assigns{\rho}$ \\
   \rho, e \Rightarrow v
 }
 {
-  \rho, \exReturn{e} \Rightarrow \Returns{v}
+  \rho, \exReturn{e} \Rightarrow \returns{v}
 }
 \and
-\inferrule*[lab={\ruleName{eval-seq-assigns}}]
+\inferrule*[lab={\ruleName{eval-seq}}]
 {
-  \rho, s_1 \Rightarrow \Assigns{\rho_1} \\
-  \rho \runion \rho_1, s_2 \Rightarrow \Assigns{\rho_2}
+  \rho, s_1 \Rightarrow r \\
+  \rho \runion \rho_1, s_2 \Rightarrow r'
 }
 {
-  \rho, \exSeq{s_1}{s_2} \Rightarrow \Assigns{(\rho_1 \runion \rho_2)}
-}
-\and
-\inferrule*[lab={\ruleName{eval-seq-returns}}]
-{
-  \rho, s_1 \Rightarrow \Assigns{\rho'} \\
-  \rho \runion \rho', s_2 \Rightarrow \Returns{v}
-}
-{
-  \rho, \exSeq{s_1}{s_2} \Rightarrow \Returns{v}
+  \rho, \exSeq{s_1}{s_2} \Rightarrow r \runion r'
 }
 \and
 \inferrule*[lab={\ruleName{eval-def}}]
@@ -60,7 +51,7 @@ $r$ & $::=$ & $\Assigns{\rho}$ \\
   \strut
 }
 {
-  \rho, \exDef{f}{x}{s} \Rightarrow \Assigns{\set{f \mapsto \exClosure{\rho}{s}}}
+  \rho, \exDef{f}{x}{s} \Rightarrow \assigns{\set{f \mapsto \exClosure{\rho}{s}}}
 }
 \end{mathpar}
 \end{subfigure}
