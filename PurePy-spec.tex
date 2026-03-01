@@ -112,12 +112,13 @@ terminology is borrowed from Java.
 \paragraph{Context operations.}
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override''),
-defined as right-biased map union with $\varnothing$ as left and right unit, and an idempotent semigroup of
-parallel composition $\merge$ (``merge'') defined as follows:
+defined as right-biased map union with $\varnothing$ as left and right unit, and an idempotent commutative
+semigroup of parallel composition $\merge$ (``merge'') defined as follows:
 %
 \[\Gamma \merge \Delta := \set{x: \bot \mid \forall x \in (\Gamma \setminus \Delta) \cup (\Delta \setminus \Gamma)} \cup \set{x: \Gamma(x) \meet \Delta(x) \mid x \in \Gamma \cap \Delta}\]
 
-\noindent where $\dom(\Gamma \merge \Delta) = \dom(\Gamma) \cup \dom(\Delta)$.
+\noindent where $\dom(\Gamma \merge \Delta) = \dom(\Gamma) \cup \dom(\Delta)$. The $\merge$ operator lacks a
+unit because the neutral element for any $\Gamma$ has the same domain as $\Gamma$.
 
 \begin{lemma}[Distributivity]
 \[
