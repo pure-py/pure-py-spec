@@ -83,38 +83,6 @@
 \caption{Statement $s$ is well-formed in $\Gamma$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash \vec{s} : R$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{singleton}}]
-{
-   \Gamma \vdash s : R
-}
-{
-   \Gamma \vdash s \cons \varepsilon : R
-}
-\and
-\inferrule*[lab={\ruleName{head-assigns}}]
-{
-   \Gamma \vdash s : \assigns{\Delta} \\
-   \Gamma \vdash \vec{s} : \assigns{\Delta'}
-}
-{
-   \Gamma \vdash s \cons \vec{s} : \assigns{(\Delta \merge \Delta')}
-}
-\and
-\inferrule*[lab={\ruleName{head-returns}}]
-{
-   \Gamma \vdash s : \returns \\
-   \Gamma \vdash \vec{s} : R
-}
-{
-   \Gamma \vdash s \cons \vec{s} : R
-}
-\end{mathpar}
-\caption{Non-empty sequence of branches $\vec{s}$ is well-formed in $\Gamma$}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\wf{\Gamma}{e}$}
 \begin{mathpar}
 \small
