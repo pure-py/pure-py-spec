@@ -101,17 +101,17 @@ To do:
 \item Data classes and \pyinline{match}
 \end{itemize}
 
-\subsection{Environments}
+\subsection{Contexts}
 
-Environments $\Gamma, \Delta$ are finite maps from sets of variables to a \emph{definite assignment} status
+Contexts $\Gamma, \Delta$ are finite maps from sets of variables to a \emph{definite assignment} status
 chosen from the 2-point Boolean lattice $\set{\statusDefAssigned, \statusNotDefAssigned}$, where
 $\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ indicates \emph{not
 definitely assigned}. (Or think of these as degenerate types ``any'' and ``none''.) The definite assignment
 terminology is borrowed from Java.
 
-\paragraph{Environment operations.}
+\paragraph{Context operations.}
 
-Environments admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override''),
+Contexts admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override''),
 defined as right-biased map union with $\varnothing$ as left and right unit, and an idempotent semigroup of
 parallel composition $\merge$ (``merge'') defined as follows:
 %
