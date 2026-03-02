@@ -9,6 +9,22 @@ The PurePy language standard will define a (versioned) formal grammar for the la
 All languages which are PurePy-compliant must accept any valid PurePy program and are
 expected to behave in a way which conforms to, or at least coheres with, the formal semantics.
 
+## Building
+
+Build the PDF with:
+
+```sh
+make
+```
+
+Create an arXiv upload archive with:
+
+```sh
+make arXiv
+```
+
+This produces `PurePy-spec-arXiv.zip`.
+
 ## Extensions
 
 Implementations are allowed to have additional behaviours and syntax beyond the PurePy spec, as long as they maintain compatibility with the PurePy subset. For example, Python itself supports many additional features, like mutable variables and exceptions; Fluid has a matrix literal notation and allows functions to be defined by pattern-matching clauses.
