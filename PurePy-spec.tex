@@ -51,7 +51,8 @@
     \vspace*{\droptitle}
     \begin{flushleft}
         {\LARGE\bfseries\thetitle\par}
-        \ifx\versionstring\@empty\else
+        \ifx\versionstring\@empty
+        \else
             \vspace{0.5ex}
             {\Large\normalfont version \versionstring\par}
         \fi
@@ -78,6 +79,16 @@
 \makeatother
 
 \maketitle
+
+\begin{abstract}
+\noindent \PurePy is a pure functional subset of Python, providing a common functional language for use by
+researchers in programming languages and pedagogy, while providing a front-end familiar and accessible to the
+Python community. This specification defines a versioned standard with formal syntax, well-formedness rules
+based on a definite assignment analysis, and an operational semantics intended to preserve the meaning of
+well-formed \PurePy programs in Python. By combining functional programming with Python-compatible surface
+syntax, \PurePy aims to support portable implementations and lower-friction adoption of new language ideas for
+modelling, data processing, analysis, and visualisation.
+\end{abstract}
 
 \section{Introduction}
 
