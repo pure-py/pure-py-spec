@@ -11,7 +11,7 @@ default: PurePy-spec.pdf
 
 %.pdf: %.tex $(TEXFILES)
 	pdflatex $<
-	pdflatex $<   # second pass for refs
+	pdflatex $<
 
 clean:
 	rm -f *.pdf *.aux *.log *.out $(ARXIV_ZIP)
