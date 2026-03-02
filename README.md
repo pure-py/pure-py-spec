@@ -9,21 +9,11 @@ The PurePy language standard will define a (versioned) formal grammar for the la
 All languages which are PurePy-compliant must accept any valid PurePy program and are
 expected to behave in a way which conforms to, or at least coheres with, the formal semantics.
 
-## Building
+## Release workflow
 
-Build the PDF with:
-
-```sh
-make
-```
-
-Create an arXiv upload archive with:
-
-```sh
-make arXiv
-```
-
-This produces `PurePy-spec-arXiv.zip`.
+Run the `Sync version numbers` GitHub Action manually with a version like `0.1.4`.
+This updates version numbers on `main`, commits them, and then creates and pushes tag `v0.1.4`.
+The tag push triggers the build workflow, which uploads `PurePy-spec.pdf` to the GitHub Release.
 
 ## Extensions
 
