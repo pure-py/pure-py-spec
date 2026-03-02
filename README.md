@@ -11,7 +11,7 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 
 ## Release workflow
 
-Run the `Sync version numbers` GitHub Action manually with a version like `0.1.4`.
+Run the `Bump version` GitHub Action manually with a version like `0.1.4`.
 This updates version numbers on `main`, commits them, and then creates and pushes tag `v0.1.4`.
 The tag push triggers the build workflow, which uploads `PurePy-spec.pdf` to the GitHub Release.
 
