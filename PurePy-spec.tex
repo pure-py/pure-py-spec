@@ -51,7 +51,7 @@
     \vspace*{\droptitle}
     \begin{flushleft}
         {\LARGE\bfseries\thetitle\par}
-        \ifx\versionstring\@empty\else
+        \ifx\versionstring\@empty\\noindent else
             \vspace{0.5ex}
             {\Large\normalfont version \versionstring\par}
         \fi
@@ -78,6 +78,13 @@
 \makeatother
 
 \maketitle
+
+\begin{abstract}
+\noindent \PurePy is a pure, functional subset of Python. This specification presents the language syntax, a
+definite-assignment style well-formedness system, and an operational semantics designed so that every
+well-formed \PurePy program has the same meaning as in Python. The aim is to provide a precise, versioned
+foundation for compatible implementations.
+\end{abstract}
 
 \section{Introduction}
 
