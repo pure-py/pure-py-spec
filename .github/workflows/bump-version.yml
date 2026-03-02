@@ -29,26 +29,13 @@ jobs:
             echo "Version must be in the form x.y.z (no leading v)"
             exit 1
           fi
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
           TAG="v$VERSION"
-          MAJOR=$(echo "$VERSION" | cut -d. -f1)
-          MINOR=$(echo "$VERSION" | cut -d. -f2)
-          PATCH=$(echo "$VERSION" | cut -d. -f3)
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "major=$MAJOR" >> "$GITHUB_OUTPUT"
-          echo "minor=$MINOR" >> "$GITHUB_OUTPUT"
-          echo "patch=$PATCH" >> "$GITHUB_OUTPUT"
 
-      - name: Update version in LaTeX document
-        run: |
-          MAJOR="${{ steps.version.outputs.major }}"
-          MINOR="${{ steps.version.outputs.minor }}"
-          PATCH="${{ steps.version.outputs.patch }}"
           sed -i "s/\\\\version{[0-9]*}{[0-9]*}{[0-9]*}/\\\\version{$MAJOR}{$MINOR}{$PATCH}/" PurePy-spec.tex
-
-      - name: Update version in README
-        run: |
-          TAG="${{ steps.version.outputs.tag }}"
           sed -i "s|## \[v[0-9]*\.[0-9]*\.[0-9]*\](https://github.com/pure-py/pure-py-spec/releases/download/v[0-9]*\.[0-9]*\.[0-9]*/PurePy-spec.pdf)|## [$TAG](https://github.com/pure-py/pure-py-spec/releases/download/$TAG/PurePy-spec.pdf)|" README.md
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Commit and push version changes
         run: |
@@ -69,3 +56,19 @@ jobs:
           fi
           git tag -a "$TAG" -m "Release $TAG"
           git push origin "$TAG"
+
+      - name: Checkout tagged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.version.outputs.tag }}
+
+      - name: Build LaTeX document
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: PurePy-spec.tex
+
+      - name: Create release and upload PDF
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          files: PurePy-spec.pdf
