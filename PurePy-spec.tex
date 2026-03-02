@@ -80,10 +80,13 @@
 \maketitle
 
 \begin{abstract}
-\noindent \PurePy is a pure, functional subset of Python. This specification presents the language syntax, a
-definite-assignment style well-formedness system, and an operational semantics designed so that every
-well-formed \PurePy program has the same meaning as in Python. The aim is to provide a precise, versioned
-foundation for compatible implementations.
+\noindent \PurePy is a pure, side-effect-free functional subset of Python, motivated by the need for a common
+language that is accessible to researchers in programming languages and pedagogy while remaining familiar to
+the wider scientific Python community. This specification defines a versioned standard with formal syntax,
+well-formedness rules based on definite assignment, and an operational semantics intended to preserve the
+meaning of well-formed \PurePy programs in Python. By combining formal precision with Python-compatible
+surface syntax, \PurePy aims to support portable implementations and lower-friction adoption of new language
+ideas for modelling, data processing, analysis, and visualisation.
 \end{abstract}
 
 \section{Introduction}
