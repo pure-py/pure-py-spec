@@ -11,12 +11,10 @@ default: PurePy-spec.pdf
 
 %.pdf: %.tex $(TEXFILES)
 	pdflatex $<
-	bibtex "$*"
-	pdflatex $<
 	pdflatex $<
 
 clean:
-	rm -f *.pdf *.aux *.log *.out *.bbl *.blg $(ARXIV_ZIP)
+	rm -f *.pdf *.aux *.log *.out $(ARXIV_ZIP)
 
 arXiv: $(ARXIV_ZIP)
 

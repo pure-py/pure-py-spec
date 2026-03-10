@@ -3,37 +3,37 @@
 Subsets of programming languages have been defined for various purposes in the research literature:
 
 Even though the syntax of programming languages if often described precisely, essentially none of the
-languages in mainstream use today formally define their behaviour. Therefore, various well-defined 
-subsets of programming languages were constructed to equip languages with formal (often even mechanised) semantics. 
-Examples of this include work on Java~\cite{igarashi_featherweight_2001}, OCaml~\cite{seassau_formal_2025}, 
-JavaScript~\cite{bodin_trusted_2014,guha_essence_2010,park_kjs_2015,politz_tested_2012}, 
-PHP~\cite{hutchison_executable_2014}, Rust~\cite{jung_stacked_2020,jung_rustbelt_2018}, and even lower-level 
-languages and intermediate representations such as WebAssembly~\cite{watt_mechanising_2021,huisman_two_2021,watt_wasmref-isabelle_2023} 
-and LLVM-IR~\cite{zakowski_modular_2021,zhao_formalizing_2012}. A particular success story of this line of work is the  formalisation of a 
+languages in mainstream use today formally define their behaviour. Therefore, various well-defined
+subsets of programming languages were constructed to equip languages with formal (often even mechanised) semantics.
+Examples of this include work on Java~\cite{igarashi_featherweight_2001}, OCaml~\cite{seassau_formal_2025},
+JavaScript~\cite{bodin_trusted_2014,guha_essence_2010,park_kjs_2015,politz_tested_2012},
+PHP~\cite{hutchison_executable_2014}, Rust~\cite{jung_stacked_2020,jung_rustbelt_2018}, and even lower-level
+languages and intermediate representations such as WebAssembly~\cite{watt_mechanising_2021,huisman_two_2021,watt_wasmref-isabelle_2023}
+and LLVM-IR~\cite{zakowski_modular_2021,zhao_formalizing_2012}. A particular success story of this line of work is the  formalisation of a
 substantial subset of the C programming language, called Clight~\cite{blazy_mechanized_2009}, which lead to the development of a
 verified compiler~\cite{leroy_formal_2009}. In a similar manner, the CakeML project~\cite{kumar_cakeml_2014} produced a verified
-implementation of a fragment of the ML language~\cite{milner_definition_1997}, based on previous efforts~\cite{lee_towards_2007} of 
-mechanising its semantics. Previous work on formalising the semantics of Python include an embedding~\cite{guth_formal_2013} within the 
-$\mathbb{K}$ semantics framework~\cite{rosu_overview_2010}, a definition of structural operational semantics~\cite{kohl_executable_2021}, 
+implementation of a fragment of the ML language~\cite{milner_definition_1997}, based on previous efforts~\cite{lee_towards_2007} of
+mechanising its semantics. Previous work on formalising the semantics of Python include an embedding~\cite{guth_formal_2013} within the
+$\mathbb{K}$ semantics framework~\cite{rosu_overview_2010}, a definition of structural operational semantics~\cite{kohl_executable_2021},
 and a reduction of most of the language to a core calculus~\cite{politz_python_2013}.
 
-A different line of work concerns the delineation of language subsets for a particular purpose. A prominent example is the 
+A different line of work concerns the delineation of language subsets for a particular purpose. A prominent example is the
 \emph{Source} family of languages~\cite{anderson_shrinking_2021}, which are progressively extended subsets of JavaScript specifically
 geared towards introducing first-year computer science students to the foundations of computing. It is based on a new edition of a
 classic introductory text book~\cite{abelson_structure_2022}, in which all program examples (which had previously been in Scheme)
 are illustrated in JavaScript. By successively increasing the allowed language fragment with each chapter (corresponding to different
 versions of the Source language), it allows to put focus on the particular aspects the authors are trying to convey, while disallowing
-students with prior knowledge of programming to take short-cuts by utilising more complex language features. The authors 
-of~\cite{anderson_shrinking_2021} also remark, that the choice of JavaScript as a language was a pragmatic one: 
-A previous study~\cite{simon_language_2018} showed that \emph{industrial relevance} is perceived as the second-most important factor 
+students with prior knowledge of programming to take short-cuts by utilising more complex language features. The authors
+of~\cite{anderson_shrinking_2021} also remark, that the choice of JavaScript as a language was a pragmatic one:
+A previous study~\cite{simon_language_2018} showed that \emph{industrial relevance} is perceived as the second-most important factor
 in choosing a programming language for introductory courses by educators in Australiasia and the UK.
 
 Likewise, various subsets of Python have been defined for different purposes in the past. ChocoPy~\cite{padhye_chocopy_2019} describes a
 subset specifically defined as a source language for the final project in courses on compiler construction, as most students are already
 familiar with the Python language by the time they take such a course. By restricting the language to a statically typed fragment, most
-student compilers can produce code that usually even outperforms the CPython reference interpreter. In a similar manner, Restricted Python 
+student compilers can produce code that usually even outperforms the CPython reference interpreter. In a similar manner, Restricted Python
 (RPython)~\cite{ancona_rpython_2007} was defined as a strictly typed subset of Python, which removes some of the more dynamic features of
-the language. As part of the PyPy project~\cite{rigo_pypys_2006}, this allows RPython to be more easily compiled to common language 
+the language. As part of the PyPy project~\cite{rigo_pypys_2006}, this allows RPython to be more easily compiled to common language
 runtimes, such as JVM and CLI/.NET.
 
 We are aware of only one other work~\cite{sunderraman_functional_2025} specifically targetting a functional subset of Python, with
@@ -43,4 +43,4 @@ Python language, as their work doesn't allow for control structures such as cond
 While it is not our goal to change Python towards a more functional programming language, it is interesting to notice that there
 are movements within the Python community for inclusion of programming principles commonly found in functional languages. An example
 of this is the inclusion of \emph{lambda expressions} already in Python 1.0, and a more recent PEP draft~\cite{johnson_pep_2025}
-advocating for \emph{deeply immutable objects}. 
+advocating for \emph{deeply immutable objects}.
