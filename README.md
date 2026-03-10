@@ -14,6 +14,14 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 Run the `Bump version` GitHub Action manually with a version in the form `x.y.z` (for example, `0.1.4`).
 This updates version numbers on `main`, commits them, creates and pushes tag `v0.1.4`, then builds `PurePy-spec.pdf` and uploads it to the GitHub Release for that tag.
 
+### Zotero export settings
+
+Use the [PurePy Zotero library](https://www.zotero.org/groups/6458996/purepy/library) for bibliography
+management. Install the Better BibTeX plugin, with the following modifications to the default settings to
+avoid spurious diffs:
+- Citation key formula: auth.lower + year
+- Fields to omit from export: abstract, keywords
+
 ## Extensions
 
 Implementations are allowed to have additional behaviours and syntax beyond the PurePy spec, as long as they maintain compatibility with the PurePy subset. For example, Python itself supports many additional features, like mutable variables and exceptions; Fluid has a matrix literal notation and allows functions to be defined by pattern-matching clauses.
