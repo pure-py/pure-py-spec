@@ -1,0 +1,59 @@
+name: Python interpreter diff-testing
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  discover-tests:
+    runs-on: ubuntu-latest
+    outputs:
+      tests: ${{ steps.collect.outputs.tests }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: collect
+        run: |
+          tests=$(find test -type f -name "*.py" \
+            | jq -R -s -c 'split("\n")[:-1]')
+          echo "tests=$tests" >> $GITHUB_OUTPUT
+
+  test:
+    needs: discover-tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test_file: ${{ fromJson(needs.discover-tests.outputs.tests) }}
+        python-version:
+          - '3.10'
+          - 'pypy3.10'
+          - 'graalpy-24.0'
+    name: test (${{ matrix.python-version }} • ${{ matrix.test_file }})
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run test
+        run: |
+          script="${{ matrix.test_file }}"
+          expected="${script%.py}.expected"
+          pyver=$(python --version)
+
+          python "$script" > actual.txt
+
+          if ! diff -u "$expected" actual.txt > diff.txt; then
+            echo "::error file=$script::Test failed for $script using $pyver"
+            echo "----- Expected output -----"
+            cat "$expected"
+            echo "----- Actual output -----"
+            cat actual.txt
+            echo "----- Diff -----"
+            cat diff.txt
+            exit 1
+          fi
