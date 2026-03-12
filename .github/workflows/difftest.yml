@@ -40,23 +40,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Run test
-        run: |
-          script="${{ matrix.test_file }}"
-          expected="${script%.py}.expected"
-          pyver=$(python --version)
-
-          python "$script" > actual.txt
-
-          if ! diff -u "$expected" actual.txt > diff.txt; then
-            echo "::error file=$script::Test failed for $script using $pyver"
-            echo "----- Expected output -----"
-            cat "$expected"
-            echo "----- Actual output -----"
-            cat actual.txt
-            echo "----- Diff -----"
-            cat diff.txt
-            exit 1
-          fi
+        uses: ./.github/actions/run-test
+        with:
+          interpreter: 'python'
+          file: ${{ matrix.test_file }}
 
   test-ironpython:
     needs: discover-tests
@@ -80,23 +67,10 @@ jobs:
           echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Run test
-        run: |
-          script="${{ matrix.test_file }}"
-          expected="${script%.py}.expected"
-          pyver=$(ipy --version)
-
-          ipy "$script" > actual.txt
-
-          if ! diff -u "$expected" actual.txt > diff.txt; then
-            echo "::error file=$script::Test failed for $script using $pyver"
-            echo "----- Expected output -----"
-            cat "$expected"
-            echo "----- Actual output -----"
-            cat actual.txt
-            echo "----- Diff -----"
-            cat diff.txt
-            exit 1
-          fi
+        uses: ./.github/actions/run-test
+        with:
+          interpreter: 'ipy'
+          file: ${{ matrix.test_file }}
 
   test-jython:
     needs: discover-tests
@@ -115,23 +89,10 @@ jobs:
           jython-version: '2.7.3'
         
       - name: Run test
-        run: |
-          script="${{ matrix.test_file }}"
-          expected="${script%.py}.expected"
-          pyver=$(jython --version)
-
-          jython "$script" > actual.txt
-
-          if ! diff -u "$expected" actual.txt > diff.txt; then
-            echo "::error file=$script::Test failed for $script using $pyver"
-            echo "----- Expected output -----"
-            cat "$expected"
-            echo "----- Actual output -----"
-            cat actual.txt
-            echo "----- Diff -----"
-            cat diff.txt
-            exit 1
-          fi
+        uses: ./.github/actions/run-test
+        with:
+          interpreter: 'jython'
+          file: ${{ matrix.test_file }}
       
 
       
