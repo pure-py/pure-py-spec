@@ -1,4 +1,4 @@
-name: Litmus test
+name: Litmus tests
 
 on:
   push:
