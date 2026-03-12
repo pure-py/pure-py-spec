@@ -1,4 +1,4 @@
-name: Python interpreter diff-testing
+name: Litmus tests
 
 on:
   push:
@@ -40,10 +40,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Run test
-        uses: ./.github/actions/run-test
-        with:
-          interpreter: 'python'
-          file: ${{ matrix.test_file }}
+        run: test/run-test.sh python ${{ matrix.test_file }}
 
   test-ironpython:
     needs: discover-tests
@@ -67,10 +64,7 @@ jobs:
           echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Run test
-        uses: ./.github/actions/run-test
-        with:
-          interpreter: 'ipy'
-          file: ${{ matrix.test_file }}
+        run: test/run-test.sh ipy ${{ matrix.test_file }}
 
   test-jython:
     needs: discover-tests
@@ -89,10 +83,7 @@ jobs:
           jython-version: '2.7.3'
         
       - name: Run test
-        uses: ./.github/actions/run-test
-        with:
-          interpreter: 'jython'
-          file: ${{ matrix.test_file }}
+        run: test/run-test.sh jython ${{ matrix.test_file }}
       
 
       
