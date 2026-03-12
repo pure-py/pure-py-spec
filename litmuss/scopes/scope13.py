@@ -1,6 +1,0 @@
-def f():
-    x = 6
-    def g():
-        return x
-    return g
-print(f()())
