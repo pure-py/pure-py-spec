@@ -1,4 +1,4 @@
-name: Python interpreter diff-testing
+name: Litmus test
 
 on:
   push:
