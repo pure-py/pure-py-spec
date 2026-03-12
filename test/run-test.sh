@@ -5,16 +5,17 @@ interpreter="$1"
 script="$2"
 expected="${script%.py}.expected"
 pyver=$("$interpreter" --version)
+dir="$(dirname "$0")"
 
-"$interpreter" "$script" > actual.txt
+"$interpreter" "$script" > "$dir/actual.txt"
 
-if ! diff -u "$expected" actual.txt > diff.txt; then
+if ! diff -u "$expected" "$dir/actual.txt" > "$dir/diff.txt"; then
   echo "::error file=$script::Test failed for $script using $pyver"
   echo "----- Expected output -----"
   cat "$expected"
   echo "----- Actual output -----"
-  cat actual.txt
+  cat "$dir/actual.txt"
   echo "----- Diff -----"
-  cat diff.txt
+  cat "$dir/diff.txt"
   exit 1
 fi
