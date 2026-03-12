@@ -97,3 +97,41 @@ jobs:
             cat diff.txt
             exit 1
           fi
+
+  test-jython:
+    needs: discover-tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test_file: ${{ fromJson(needs.discover-tests.outputs.tests) }}
+    name: test (Jython • ${{ matrix.test_file }})
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Jython
+        uses: LukeSavefrogs/setup-jython@v3
+        with:
+          jython-version: '2.7.3'
+        
+      - name: Run test
+        run: |
+          script="${{ matrix.test_file }}"
+          expected="${script%.py}.expected"
+          pyver=$(jython --version)
+
+          jython "$script" > actual.txt
+
+          if ! diff -u "$expected" actual.txt > diff.txt; then
+            echo "::error file=$script::Test failed for $script using $pyver"
+            echo "----- Expected output -----"
+            cat "$expected"
+            echo "----- Actual output -----"
+            cat actual.txt
+            echo "----- Diff -----"
+            cat diff.txt
+            exit 1
+          fi
+      
+
+      
