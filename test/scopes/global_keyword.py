@@ -2,7 +2,9 @@ y = 7
 
 def f():
     global y
-    x = y # UnboundLocalError: cannot access local variable 'y'
+    x = y
     y = 8
+    return x
 
-f()
+print(f())  # 7: x captured global y before reassignment
+print(y)    # 8: global y was updated by f
