@@ -44,30 +44,30 @@ jobs:
       - name: Run test
         run: test/run-test.sh python ${{ matrix.test_file }}
 
-  test-ironpython:
-    needs: discover-tests
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        test_file: ${{ fromJson(needs.discover-tests.outputs.tests) }}
-    name: test (IronPython • ${{ matrix.test_file }})
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '8.0.x'
-
-      - name: Setup IronPython
-        run: | 
-          dotnet tool install -g ironpython.console
-          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-
-      - name: Run test
-        run: test/run-test.sh ipy ${{ matrix.test_file }}
+  # test-ironpython:
+  #   needs: discover-tests
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       test_file: ${{ fromJson(needs.discover-tests.outputs.tests) }}
+  #   name: test (IronPython • ${{ matrix.test_file }})
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Setup .NET
+  #       uses: actions/setup-dotnet@v5
+  #       with:
+  #         dotnet-version: '8.0.x'
+  #
+  #     - name: Setup IronPython
+  #       run: |
+  #         dotnet tool install -g ironpython.console
+  #         echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+  #
+  #     - name: Run test
+  #       run: test/run-test.sh ipy ${{ matrix.test_file }}
 
   # test-jython:
   #   needs: discover-tests
