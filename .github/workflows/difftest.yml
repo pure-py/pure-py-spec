@@ -57,3 +57,43 @@ jobs:
             cat diff.txt
             exit 1
           fi
+
+  test-ironpython:
+    needs: discover-tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test_file: ${{ fromJson(needs.discover-tests.outputs.tests) }}
+    name: test (IronPython • ${{ matrix.test_file }})
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Setup IronPython
+        run: | 
+          dotnet tool install -g ironpython.console
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: Run test
+        run: |
+          script="${{ matrix.test_file }}"
+          expected="${script%.py}.expected"
+          pyver=$(ipy --version)
+
+          ipy "$script" > actual.txt
+
+          if ! diff -u "$expected" actual.txt > diff.txt; then
+            echo "::error file=$script::Test failed for $script using $pyver"
+            echo "----- Expected output -----"
+            cat "$expected"
+            echo "----- Actual output -----"
+            cat actual.txt
+            echo "----- Diff -----"
+            cat diff.txt
+            exit 1
+          fi
