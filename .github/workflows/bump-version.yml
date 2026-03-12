@@ -1,0 +1,74 @@
+name: Bump version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (x.y.z, e.g. 0.1.4)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Parse and validate version
+        id: version
+        run: |
+          VERSION="${{ inputs.version }}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version must be in the form x.y.z (no leading v)"
+            exit 1
+          fi
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          TAG="v$VERSION"
+
+          sed -i "s/\\\\version{[0-9]*}{[0-9]*}{[0-9]*}/\\\\version{$MAJOR}{$MINOR}{$PATCH}/" PurePy-spec.tex
+          sed -i "s|## \[v[0-9]*\.[0-9]*\.[0-9]*\](https://github.com/pure-py/pure-py-spec/releases/download/v[0-9]*\.[0-9]*\.[0-9]*/PurePy-spec.pdf)|## [$TAG](https://github.com/pure-py/pure-py-spec/releases/download/$TAG/PurePy-spec.pdf)|" README.md
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push version changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add PurePy-spec.tex README.md
+          git diff --cached --quiet || git commit -m "Bump version to ${{ steps.version.outputs.tag }}"
+          git pull --rebase origin main
+          git push origin HEAD:refs/heads/main
+
+      - name: Create and push tag
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          git fetch --tags origin
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists"
+            exit 1
+          fi
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "$TAG"
+
+      - name: Checkout tagged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.version.outputs.tag }}
+
+      - name: Build LaTeX document
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: PurePy-spec.tex
+
+      - name: Create release and upload PDF
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          files: PurePy-spec.pdf

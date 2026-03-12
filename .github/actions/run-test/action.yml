@@ -1,0 +1,29 @@
+name: 'Run Python difftest'
+description: 'Run a python script and compare its output against an expected output'
+inputs:
+  interpreter:
+    required: true
+  file:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        script="${{ inputs.file }}"
+        expected="${script%.py}.expected"
+        pyver=$(${{ inputs.interpreter }} --version)
+
+        ${{ inputs.interpreter }} "$script" > actual.txt
+
+        if ! diff -u "$expected" actual.txt > diff.txt; then
+          echo "::error file=$script::Test failed for $script using $pyver"
+          echo "----- Expected output -----"
+          cat "$expected"
+          echo "----- Actual output -----"
+          cat actual.txt
+          echo "----- Diff -----"
+          cat diff.txt
+          exit 1
+        fi

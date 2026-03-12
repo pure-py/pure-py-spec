@@ -10,7 +10,7 @@ on:
       - README.md
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   make:
@@ -23,9 +23,3 @@ jobs:
         uses: xu-cheng/latex-action@v4
         with:
           root_file: PurePy-spec.tex
-
-      - name: Upload PDF to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: PurePy-spec.pdf

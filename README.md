@@ -1,6 +1,6 @@
 # PurePy - A Pure Functional Subset of Python
 
-## [v0.1.3](https://github.com/pure-py/pure-py-spec/releases/download/v0.1.3/PurePy-spec.pdf)
+## [v0.1.4](https://github.com/pure-py/pure-py-spec/releases/download/v0.1.4/PurePy-spec.pdf)
 
 PurePy defines a pure (side-effect free) subset of Python, intended initially for use by researchers in
 programming languages and programming pedagogy, with a view to evolving it into a common language for scientific computing, supporting efficient, portable applications in modelling, data processing, data analysis and visualisation.
@@ -8,6 +8,19 @@ programming languages and programming pedagogy, with a view to evolving it into 
 The PurePy language standard will define a (versioned) formal grammar for the language, a formal semantics, and a reference interpreter.
 All languages which are PurePy-compliant must accept any valid PurePy program and are
 expected to behave in a way which conforms to, or at least coheres with, the formal semantics.
+
+## Release workflow
+
+Run the `Bump version` GitHub Action manually with a version in the form `x.y.z` (for example, `0.1.4`).
+This updates version numbers on `main`, commits them, creates and pushes tag `v0.1.4`, then builds `PurePy-spec.pdf` and uploads it to the GitHub Release for that tag.
+
+### Zotero export settings
+
+Use the [PurePy Zotero library](https://www.zotero.org/groups/6458996/purepy/library) for bibliography
+management. Install the Better BibTeX plugin, with the following modifications to the default settings to
+avoid spurious diffs:
+- Citation key formula: auth.lower + year
+- Fields to omit from export: abstract, keywords
 
 ## Extensions
 
