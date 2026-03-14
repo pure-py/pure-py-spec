@@ -3,7 +3,7 @@ module Distributivity where
 open import Data.Bool using (Bool; true; false; _∧_)
 open import Data.Bool.Properties using (∧-idem)
 open import Data.Maybe using (Maybe; just; nothing)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; sym; cong)
+open import Relation.Binary.PropositionalEquality using (_≡_; _≗_; refl; sym; cong)
 
 -- Status of a variable in a context: nothing = absent, just true = ⊤, just false = ⊥
 Status : Set
@@ -32,3 +32,18 @@ just a  ⊕ just b  = just (a ∧ b)
 ·-distribᵣ-⊕ (just _) nothing  (just c) = cong just (sym (∧-idem c))
 ·-distribᵣ-⊕ (just _) (just _) nothing  = refl
 ·-distribᵣ-⊕ (just _) (just _) (just c) = cong just (sym (∧-idem c))
+
+-- Trivial lifting of pointwise right-distributivity to contexts
+Cxt : Set → Set
+Cxt Var = Var → Status
+
+module _ {Var : Set} where
+
+  _·ᶜ_ : Cxt Var → Cxt Var → Cxt Var
+  (Γ ·ᶜ Δ) x = Γ x · Δ x
+
+  _⊕ᶜ_ : Cxt Var → Cxt Var → Cxt Var
+  (Γ ⊕ᶜ Δ) x = Γ x ⊕ Δ x
+
+  ·ᶜ-distribᵣ-⊕ᶜ : ∀ (Δ Δ' Γ : Cxt Var) → (Δ ⊕ᶜ Δ') ·ᶜ Γ ≗ (Δ ·ᶜ Γ) ⊕ᶜ (Δ' ·ᶜ Γ)
+  ·ᶜ-distribᵣ-⊕ᶜ Δ Δ' Γ x = ·-distribᵣ-⊕ (Δ x) (Δ' x) (Γ x)
