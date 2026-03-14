@@ -11,7 +11,20 @@ $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exIfElse{e}{s}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}{s'}$ & (IfElse) \\
     & $\mid$ & $\exDef{f}{\vec{x}}{s}$ & (Def)
    \\[3mm]
-$e$ & $::=$ & $x$ & (Var)
+$e$ & $::=$ & $x$ & (Var) \\
+    & $\mid$ & $n$ & (Literal) \\
+    & $\mid$ & $\exApp{e}{\vec{e}}$ & (Call) \\
+    & $\mid$ & $\exDict{\vec{\bind{x}{e}}}$ & (Dict) \\
+    & $\mid$ & $\exProject{e}{x}$ & (Lookup) \\
+    & $\mid$ & $\exDProject{e}{e'}$ & (Subscript) \\
+    & $\mid$ & $\exBinaryApp{e}{\odot}{e'}$ & (BinOp) \\
+    & $\mid$ & $\exCondExpr{e_1}{e}{e_2}$ & (CondExpr) \\
+    & $\mid$ & $\exList{\vec{e}}$ & (List) \\
+    & $\mid$ & $\exListComp{e}{\vec{q}}$ & (ListComp) \\
+    & $\mid$ & $\exLambda{\vec{x}}{e}$ & (Lambda)
+   \\[3mm]
+$q$ & $::=$ & $\qualGuard{e}$ & (Guard) \\
+    & $\mid$ & $\qualGenerator{x}{e}$ & (Generator)
    \\[3mm]
 $b$ & $::=$ & $\statusDefAssigned$ & (Definitely assigned) \\
     & $\mid$ & $\statusNotDefAssigned$ & (Not definitely assigned)

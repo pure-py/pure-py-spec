@@ -18,7 +18,23 @@
 \newcommand*{\Assigns}[1]{\mathsf{Assigns}\;#1}
 \newcommand*{\Returns}{\mathsf{Returns}}
 
-% expressions, statements and values
+% expressions
+\newcommand*{\exApp}[2]{#1(#2)}
+\newcommand*{\exBinaryApp}[3]{#1 \mathbin{#2} #3}
+\newcommand*{\exDict}[1]{\{#1\}}
+\newcommand*{\exProject}[2]{#1\mathord{.}#2}
+\newcommand*{\exDProject}[2]{#1[#2]}
+\newcommand*{\exCondExpr}[3]{#1\;\pyinline{if}\;#2\;\pyinline{else}\;#3}
+\newcommand*{\exList}[1]{[#1]}
+\newcommand*{\exListComp}[2]{[\,#1\;#2]}
+\newcommand*{\exLambda}[2]{\pyinline{lambda}\;#1\mathord{:}\;#2}
+\newcommand*{\bind}[2]{#1\mathord{:}\,#2}
+
+% qualifiers
+\newcommand*{\qualGuard}[1]{\pyinline{if}\;#1}
+\newcommand*{\qualGenerator}[2]{\pyinline{for}\;#1\;\pyinline{in}\;#2}
+
+% statements and values
 \newcommand*{\exAssign}[2]{#1 = #2}
 \newcommand*{\exClosure}[2]{\langle#1, #2\rangle}
 \newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
