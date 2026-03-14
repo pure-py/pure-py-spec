@@ -83,6 +83,14 @@
 {
   \wf{\Gamma}{x}
 }
+\and
+\inferrule*[right=lambda]
+{
+  \Gamma, x_1 : \top, \ldots, x_n : \top \vdash e
+}
+{
+  \wf{\Gamma}{\exLambda{\vec{x}}{e}}
+}
 \end{mathpar}
 \caption{Expression $e$ is well-formed in $\Gamma$}
 \end{subfigure}
