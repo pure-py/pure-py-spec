@@ -4,7 +4,7 @@ ARXIV_FILES := \
 	PurePy-spec.tex \
 	$(wildcard tex/*.tex) \
 	$(wildcard fig/*.tex) \
-	$(wildcard *.bbl *.bib *.bst) \
+	$(wildcard *.bbl *.bst tex/*.bib) \
 	$(wildcard fig/*.pdf fig/*.png fig/*.jpg fig/*.jpeg fig/*.eps)
 
 default: PurePy-spec.pdf

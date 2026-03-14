@@ -21,13 +21,14 @@ nothing ⊕ just _  = just false
 just _  ⊕ nothing = just false
 just a  ⊕ just b  = just (a ∧ b)
 
--- Distributivity: (a ⊕ b) · c ≡ (a · c) ⊕ (b · c)
-·-distribˡ-⊕ : ∀ (a b c : Status) → (a ⊕ b) · c ≡ (a · c) ⊕ (b · c)
-·-distribˡ-⊕ nothing  nothing  nothing  = refl
-·-distribˡ-⊕ nothing  nothing  (just c) = cong just (sym (∧-idem c))
-·-distribˡ-⊕ nothing  (just _) nothing  = refl
-·-distribˡ-⊕ nothing  (just _) (just c) = cong just (sym (∧-idem c))
-·-distribˡ-⊕ (just _) nothing  nothing  = refl
-·-distribˡ-⊕ (just _) nothing  (just c) = cong just (sym (∧-idem c))
-·-distribˡ-⊕ (just _) (just _) nothing  = refl
-·-distribˡ-⊕ (just _) (just _) (just c) = cong just (sym (∧-idem c))
+-- Right distributivity of · over ⊕: (a ⊕ b) · c ≡ (a · c) ⊕ (b · c)
+-- Left distributivity doesn't hold; see paper for counterexample.
+·-distribᵣ-⊕ : ∀ (a b c : Status) → (a ⊕ b) · c ≡ (a · c) ⊕ (b · c)
+·-distribᵣ-⊕ nothing  nothing  nothing  = refl
+·-distribᵣ-⊕ nothing  nothing  (just c) = cong just (sym (∧-idem c))
+·-distribᵣ-⊕ nothing  (just _) nothing  = refl
+·-distribᵣ-⊕ nothing  (just _) (just c) = cong just (sym (∧-idem c))
+·-distribᵣ-⊕ (just _) nothing  nothing  = refl
+·-distribᵣ-⊕ (just _) nothing  (just c) = cong just (sym (∧-idem c))
+·-distribᵣ-⊕ (just _) (just _) nothing  = refl
+·-distribᵣ-⊕ (just _) (just _) (just c) = cong just (sym (∧-idem c))
