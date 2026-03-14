@@ -37,11 +37,11 @@
 \and
 \inferrule*[lab={\ruleName{seq}}]
 {
-  \Gamma \vdash s_1 : R \\
-  \Gamma \runion \Delta_1 \vdash s_2 : S
+  \Gamma \vdash s_1 : \Assigns{\Delta} \\
+  \Gamma \runion \Delta \vdash s_2 : S
 }
 {
-  \Gamma \vdash \exSeq{s_1}{s_2} : R \runion S
+  \Gamma \vdash \exSeq{s_1}{s_2} : \Assigns{\Delta} \runion S
 }
 \and
 \inferrule*[lab={\ruleName{if}}]
@@ -64,7 +64,7 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \Gamma, x_1 : \top, \ldots, x_n : \top \vdash s : R
+  \Gamma, x_1 : \top, \ldots, x_n : \top, \locals(s) : \bot \vdash s : R
 }
 {
   \Gamma \vdash \exDef{f}{\vec{x}}{s} : \Assigns{\set{f}}

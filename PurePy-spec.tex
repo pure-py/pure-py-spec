@@ -166,6 +166,25 @@ When the relevant terms are defined (i.e.~neither $R$ nor $R'$ is $\Returns$):
 
 \subsection{Well-formedness}
 
+\paragraph{Local variables.}
+
+The function $\locals(s)$ collects the set of variables assigned anywhere in a statement $s$, without
+descending into nested function definitions (which have their own scope):
+%
+{\small
+\begin{align*}
+\locals(\exPass) &= \varnothing \\
+\locals(\exAssign{x}{e}) &= \set{x} \\
+\locals(\exSeq{s_1}{s_2}) &= \locals(s_1) \cup \locals(s_2) \\
+\locals(\exReturn{}) &= \varnothing \\
+\locals(\exReturn{e}) &= \varnothing \\
+\locals(\exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}) &= \locals(\vec{s}) \\
+\locals(\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}}) &= \locals(\vec{s}) \\
+\locals(\exDef{f}{\vec{x}}{s}) &= \set{f}
+\end{align*}}
+
+\paragraph{Well-formedness judgement.}
+
 Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a set of variables
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
 = e} definitely assigns $\set{\pyinline{x}}$.
