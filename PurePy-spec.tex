@@ -107,7 +107,6 @@ To do:
 \begin{itemize}
 \item Reserved words
 \item Operators and precedence
-\item Expression grammar
 \item Recursion and mutual recursion
 \item Operational semantics of \pyinline{if} statements
 \item Data classes and \pyinline{match}
@@ -277,6 +276,29 @@ because in the \pyinline{return x} statement, the inner assignment shadows the t
 assignment is only partial.) If we were to allow the program on the right, there would be no straightforward
 way to assign it a semantics which is both pure, and in agreement with Python, since in Python the function
 returns \pyinline{3} in the case where \pyinline{b} is \pyinline{True}.
+
+\subsubsection{Function-level scoping of local variables}
+
+In Python, all local variables are scoped to the entire function body, not just from the point of
+assignment onwards. The $\locals$ function in the \ruleName{def} rule reflects this: all variables
+assigned anywhere in the function body are introduced at $\bot$ before the body is checked. This means
+the following program is statically rejected by \PurePy, whereas Python rejects it at runtime with an
+\pyinline{UnboundLocalError}:
+
+\begin{python}
+y = 7
+
+def f():
+    x = y  # error: y is local (due to assignment below)
+    y = 8
+
+f()
+\end{python}
+
+\noindent Because \pyinline{y} appears on the left-hand side of an assignment in \pyinline{f}, it is in
+$\locals(s)$ for the body of \pyinline{f}, and is therefore introduced at $\bot$ at the top of the
+function. The reference to \pyinline{y} in \pyinline{x = y} then fails the well-formedness check, since
+$\pyinline{y} : \bot \in \Gamma$ rather than $\pyinline{y} : \top \in \Gamma$.
 
 \subsubsection{Unreachable code}
 A non-empty sequence of statements returns only if the last statement returns, and all preceding statements
