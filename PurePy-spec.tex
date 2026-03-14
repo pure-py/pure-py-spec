@@ -124,18 +124,52 @@ terminology is borrowed from Java.
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override''),
 defined as right-biased map union with $\varnothing$ as left and right unit, and an idempotent commutative
-semigroup of parallel composition $\merge$ (``merge'') defined as follows:
+semigroup of parallel composition $\merge$ (``merge'') defined as follows. Together these form a
+\emph{right near-semiring}~\cite{vanhoorn1967}: $\runion$ right-distributes over $\merge$ (Lemma~1), but
+left distributivity does not hold.
 %
 \[\Gamma \merge \Delta := \set{x: \bot \mid \forall x \in (\Gamma \setminus \Delta) \cup (\Delta \setminus \Gamma)} \cup \set{x: \Gamma(x) \meet \Delta(x) \mid x \in \Gamma \cap \Delta}\]
 
 \noindent where $\dom(\Gamma \merge \Delta) = \dom(\Gamma) \cup \dom(\Delta)$. The $\merge$ operator lacks a
 unit because the neutral element for any $\Gamma$ has the same domain as $\Gamma$.
 
-\begin{lemma}[Distributivity]
+\begin{lemma}[Right distributivity]
 \[
 (\Delta \merge \Delta') \runion \Gamma = (\Delta \runion \Gamma) \merge (\Delta' \runion \Gamma).
 \]
 \end{lemma}
+
+\noindent Left distributivity ($\Gamma \runion (\Delta \merge \Delta') = (\Gamma \runion \Delta) \merge
+(\Gamma \runion \Delta')$) does not hold. If it did, the following two programs would be equivalent, since
+sequential composition with a preceding assignment could be distributed into the branches of a conditional.
+But they are not: the left program is ill-formed, because a variable assigned before a conditional does not
+remain definitely assigned if only some branches assign it (see also \S\ref{sec:local-assignment}).
+\vspace{-\medskipamount}
+
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+def f(b):
+    x = 1
+    if b:
+        x = 2
+    else:
+        pass
+    return x  # error
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+def f(b):
+    if b:
+        x = 1
+        x = 2
+    else:
+        x = 1
+        pass
+    return x  # ok
+\end{python}
+\end{minipage}
 
 Context operations $\runion$ and $\merge$ lift to a partial semiring over result types $R$, with
 $\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero for
@@ -154,7 +188,7 @@ $\runion$. Sequential composition is defined only when the left-hand result type
 \end{align*}}
 \end{definition}
 
-\begin{lemma}[Distributivity]
+\begin{lemma}[Right distributivity]
 When the relevant terms are defined (i.e.~neither $R$ nor $R'$ is $\Returns$):
 \[
 (R \merge R') \runion S = (R \runion S) \merge (R' \runion S)
@@ -230,6 +264,7 @@ is calculated by merging the definite assignment sets for all branches which def
 $\merge$ operator on environments.
 
 \subsubsection{Local assignment in conditional clauses}
+\label{sec:local-assignment}
 
 For flexibility, we permit \emph{branch-local} variables. The assignment of \pyinline{x} below (left) is
 permitted, and can be used locally in that branch of the conditional:
@@ -343,6 +378,6 @@ effects, so as black boxes functions are always pure.
 \input{tex/related-work}
 
 \bibliographystyle{plain}
-\bibliography{refs}
+\bibliography{tex/refs,tex/additional-refs}
 
 \end{document}
