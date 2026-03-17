@@ -114,13 +114,13 @@ To do:
 
 \subsection{Contexts}
 
-Contexts $\Gamma, \Delta$ are functions from variables to a \emph{definite assignment} status in
-$\Bplus = \set{\statusDefAssigned, \statusNotDefAssigned, \bot}$. Here $\statusDefAssigned$ indicates
-\emph{definitely assigned}, $\statusNotDefAssigned$ indicates \emph{not definitely assigned}, and $\bot$
-indicates \emph{not in scope}. (Or think of $\statusDefAssigned$ and $\statusNotDefAssigned$ as degenerate
-types ``any'' and ``none''.) The definite assignment terminology is borrowed from
-Java~\cite[\S16]{gosling2025}. We write $\Gamma, x : a$ for the context that sends $x$ to $a$ and otherwise
-agrees with $\Gamma$, and define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$.
+Contexts $\Gamma, \Delta$ are functions from variables to a \emph{definite assignment} status in $\Bplus =
+\set{\statusDefAssigned, \statusNotDefAssigned, \bot}$. Here $\statusDefAssigned$ indicates \emph{definitely
+assigned}, $\statusNotDefAssigned$ indicates \emph{not definitely assigned}, and $\bot$ indicates
+\emph{undefined}. (Or think of $\statusDefAssigned$ and $\statusNotDefAssigned$ as degenerate types ``any''
+and ``none''.) The definite assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}. We write
+$\Gamma, x : a$ for the context that sends $x$ to $a$ and otherwise agrees with $\Gamma$, and define
+$\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$.
 
 \paragraph{Context operations.}
 
@@ -138,9 +138,8 @@ a \merge b &= \begin{cases} a \meet b & \text{if } a, b \neq \bot \\ \statusNotD
 \end{definition}
 
 \noindent The $\runion$ operation is right-biased with $\bot$ as left and right unit. The $\merge$ operation
-uses $\bot$ as unit; when exactly one argument is in scope, the result is $\statusNotDefAssigned$; when both are
-in scope, it returns their meet ($\statusDefAssigned \meet \statusDefAssigned = \statusDefAssigned$, otherwise
-$\statusNotDefAssigned$).
+also has $\bot$ as unit; when exactly one argument is defined, the result is $\statusNotDefAssigned$; when
+both are defined, it returns the conjunction of their Boolean values.
 
 \begin{lemma}[Right distributivity]
 \[
