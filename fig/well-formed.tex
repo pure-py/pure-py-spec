@@ -64,7 +64,7 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \Gamma, x_1 : \top, \ldots, x_n : \top, \locals(s) : \bot \vdash s : R
+  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned, \locals(s) : \statusNotDefAssigned \vdash s : R
 }
 {
   \Gamma \vdash \exDef{f}{\vec{x}}{s} : \Assigns{\set{f}}
@@ -78,7 +78,7 @@
 \small
 \inferrule*[right=var]
 {
-  x : \top \in \Gamma
+  \Gamma(x) = \statusDefAssigned
 }
 {
   \wf{\Gamma}{x}
@@ -86,7 +86,7 @@
 \and
 \inferrule*[right=lambda]
 {
-  \Gamma, x_1 : \top, \ldots, x_n : \top \vdash e
+  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned \vdash e
 }
 {
   \wf{\Gamma}{\exLambda{\vec{x}}{e}}
