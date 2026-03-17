@@ -114,24 +114,33 @@ To do:
 
 \subsection{Contexts}
 
-Contexts $\Gamma, \Delta$ are finite maps from sets of variables to a \emph{definite assignment} status
-chosen from the 2-point Boolean lattice $\set{\statusDefAssigned, \statusNotDefAssigned}$, where
-$\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ indicates \emph{not
-definitely assigned}. (Or think of these as degenerate types ``any'' and ``none''.) The definite assignment
-terminology is borrowed from Java~\cite[\S16]{gosling2025}.
+Contexts $\Gamma, \Delta$ are functions from variables to a \emph{definite assignment} status in
+$\Bplus = \set{\statusDefAssigned, \statusNotDefAssigned, \bot}$. Here $\statusDefAssigned$ indicates
+\emph{definitely assigned}, $\statusNotDefAssigned$ indicates \emph{not definitely assigned}, and $\bot$
+indicates \emph{not in scope}. (Or think of $\statusDefAssigned$ and $\statusNotDefAssigned$ as degenerate
+types ``any'' and ``none''.) The definite assignment terminology is borrowed from
+Java~\cite[\S16]{gosling2025}. We write $\Gamma, x : a$ for the context that sends $x$ to $a$ and otherwise
+agrees with $\Gamma$, and define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$.
 
 \paragraph{Context operations.}
 
-Contexts admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override''),
-defined as right-biased map union with $\varnothing$ as left and right unit, and an idempotent commutative
-semigroup of parallel composition $\merge$ (``merge'') defined as follows. Together these form a
-\emph{right near-semiring}~\cite{vanhoorn1967}: $\runion$ right-distributes over $\merge$ (Lemma~1), but
-left distributivity does not hold.
+Contexts admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override'') and an
+idempotent commutative monoid of parallel composition $\merge$ (``merge''). Together these form a \emph{right
+near-semiring}~\cite{vanhoorn1967}: $\runion$ right-distributes over $\merge$ (Lemma~1), but left
+distributivity does not hold. Both operations are defined pointwise, via operations on $\Bplus$:
 %
-\[\Gamma \merge \Delta := \set{x: \bot \mid \forall x \in (\Gamma \setminus \Delta) \cup (\Delta \setminus \Gamma)} \cup \set{x: \Gamma(x) \meet \Delta(x) \mid x \in \Gamma \cap \Delta}\]
+\begin{definition}[Override and merge]
+{\small
+\begin{align*}
+a \runion b &= \begin{cases} b & \text{if } b \neq \bot \\ a & \text{otherwise} \end{cases} &
+a \merge b &= \begin{cases} a \meet b & \text{if } a, b \neq \bot \\ \statusNotDefAssigned & \text{if } a \neq \bot \text{ or } b \neq \bot \\ \bot & \text{otherwise} \end{cases}
+\end{align*}}
+\end{definition}
 
-\noindent where $\dom(\Gamma \merge \Delta) = \dom(\Gamma) \cup \dom(\Delta)$. The $\merge$ operator lacks a
-unit because the neutral element for any $\Gamma$ has the same domain as $\Gamma$.
+\noindent The $\runion$ operation is right-biased with $\bot$ as left and right unit. The $\merge$ operation
+uses $\bot$ as unit; when exactly one argument is in scope, the result is $\statusNotDefAssigned$; when both are
+in scope, it returns their meet ($\statusDefAssigned \meet \statusDefAssigned = \statusDefAssigned$, otherwise
+$\statusNotDefAssigned$).
 
 \begin{lemma}[Right distributivity]
 \[
@@ -172,8 +181,9 @@ def f(b):
 \end{minipage}
 
 Context operations $\runion$ and $\merge$ lift to a partial semiring over result types $R$, with
-$\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero for
-$\runion$. Sequential composition is defined only when the left-hand result type is not $\Returns$.
+$\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero
+for $\runion$. (Here $\varnothing$ denotes the everywhere-$\bot$ context.) Sequential composition is
+defined only when the left-hand result type is not $\Returns$.
 
 \begin{definition}[Partial semiring of result types]
 {\small
@@ -304,7 +314,7 @@ def foo():
 
 \noindent However such variables only appear to be branch-local. The definition of $\merge$ actually ensures
 that a variable assigned in any branch is considered assigned by the conditional; however unless it is
-assigned in \emph{every} branch that does not definitely return, it will be bound to $\bot$ in the
+assigned in \emph{every} branch that does not definitely return, it will be bound to $\statusNotDefAssigned$ in the
 corresponding environment. Any attempt to refer to such a variable is illegal, as it refers to a variable
 which may not be assigned. (Thus the right-hand program is ill-formed, despite the enclosing \pyinline{x = 6},
 because in the \pyinline{return x} statement, the inner assignment shadows the the outer one, and the inner
@@ -316,7 +326,7 @@ returns \pyinline{3} in the case where \pyinline{b} is \pyinline{True}.
 
 In Python, all local variables are scoped to the entire function body, not just from the point of
 assignment onwards. The $\locals$ function in the \ruleName{def} rule reflects this: all variables
-assigned anywhere in the function body are introduced at $\bot$ before the body is checked. This means
+assigned anywhere in the function body are introduced at $\statusNotDefAssigned$ before the body is checked. This means
 the following program is statically rejected by \PurePy, whereas Python rejects it at runtime with an
 \pyinline{UnboundLocalError}:
 
@@ -331,9 +341,9 @@ f()
 \end{python}
 
 \noindent Because \pyinline{y} appears on the left-hand side of an assignment in \pyinline{f}, it is in
-$\locals(s)$ for the body of \pyinline{f}, and is therefore introduced at $\bot$ at the top of the
+$\locals(s)$ for the body of \pyinline{f}, and is therefore introduced at $\statusNotDefAssigned$ at the top of the
 function. The reference to \pyinline{y} in \pyinline{x = y} then fails the well-formedness check, since
-$\pyinline{y} : \bot \in \Gamma$ rather than $\pyinline{y} : \top \in \Gamma$.
+$\Gamma(\pyinline{y}) = \statusNotDefAssigned$ rather than $\Gamma(\pyinline{y}) = \statusDefAssigned$.
 
 \subsubsection{Unreachable code}
 A non-empty sequence of statements returns only if the last statement returns, and all preceding statements
