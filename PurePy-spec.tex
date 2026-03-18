@@ -114,20 +114,21 @@ To do:
 
 \subsection{Contexts}
 
-Contexts $\Gamma, \Delta$ are functions from variables to a \emph{definite assignment} status in $\Bplus =
-\set{\statusDefAssigned, \statusNotDefAssigned, \bot}$. Here $\statusDefAssigned$ indicates \emph{definitely
-assigned}, $\statusNotDefAssigned$ indicates \emph{not definitely assigned}, and $\bot$ indicates
-\emph{undefined}. (Or think of $\statusDefAssigned$ and $\statusNotDefAssigned$ as degenerate types ``any''
-and ``none''.) The definite assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}. We write
-$\Gamma, x : a$ for the context that sends $x$ to $a$ and otherwise agrees with $\Gamma$, and define
-$\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$.
+Contexts $\Gamma, \Delta$ are partial functions from sets of variables to a \emph{definite assignment} status
+in $\B = \set{\statusDefAssigned, \statusNotDefAssigned}$, with $\statusDefAssigned$ indicating
+\emph{definitely assigned} and $\statusNotDefAssigned$ indicating \emph{not definitely assigned}. The definite
+assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}. (Or think of $\statusDefAssigned$ and
+$\statusNotDefAssigned$ as degenerate types ``any'' and ``none''.)  It is useful to represent contexts as
+total functions from the set of all variables to $\B_{\bot} = \B \cup \set{\bot}$, with $\bot$ indicating
+\emph{undefined}. We write $\Gamma, x : a$ for the context that sends $x$ to $a$ and otherwise agrees with
+$\Gamma$, and define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$.
 
 \paragraph{Context operations.}
 
-Contexts admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override'') and an
-idempotent commutative monoid of parallel composition $\merge$ (``merge''). Together these form a \emph{right
-near-semiring}~\cite{vanhoorn1967}: $\runion$ right-distributes over $\merge$ (Lemma~1), but left
-distributivity does not hold. Both operations are defined pointwise, via operations on $\Bplus$:
+Contexts admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override'') and
+an idempotent commutative monoid of parallel composition $\merge$ (``merge''). Together these form a
+\emph{right near-semiring}~\cite{vanhoorn1967}: $\runion$ right-distributes over $\merge$ (Lemma~1), but left
+distributivity does not hold. Both operations are defined pointwise via operations on $\B_{\bot}$:
 %
 \begin{definition}[Override and merge]
 {\small
@@ -137,9 +138,9 @@ a \merge b &= \begin{cases} a \meet b & \text{if } a, b \neq \bot \\ \statusNotD
 \end{align*}}
 \end{definition}
 
-\noindent The $\runion$ operation is right-biased with $\bot$ as left and right unit. The $\merge$ operation
-also has $\bot$ as unit; when exactly one argument is defined, the result is $\statusNotDefAssigned$; when
-both are defined, it returns the conjunction of their Boolean values.
+\noindent The $\runion$ operation is right-biased and has $\bot$ as left and right unit. The $\merge$
+operation also has $\bot$ as unit; when exactly one argument is defined, the result is
+$\statusNotDefAssigned$; when both are defined, it returns the conjunction of their Boolean values.
 
 \begin{lemma}[Right distributivity]
 \[
