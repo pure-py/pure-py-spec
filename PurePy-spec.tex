@@ -181,10 +181,10 @@ def f(b):
 \end{python}
 \end{minipage}
 
-Context operations $\runion$ and $\merge$ lift to a partial right near-semiring over result types $R$, with
-$\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero
-for $\runion$. Sequential composition is
-defined only when the left-hand result type is not $\Returns$.
+Context operations $\runion$ and $\merge$ lift to a partial right semiring over result types $R$, with
+$\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero for
+$\runion$. Partiality arises because sequential composition is defined only when the left-hand result type is
+not $\Returns$.
 
 \begin{definition}[Override and merge on result types]
 {\small
@@ -375,7 +375,8 @@ by \pyinline{return None}. This ensures every function returns, even if it is no
 
 For a statement $s$, the result $\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated
 environment $\rho$; the result $\returns{v}$ represents \emph{abrupt completion} of $s$ with return value $v$.
-Composing statements sequentially composes their results according to the following partial monoid, analogous to sequential composition of result types:
+Composing statements sequentially composes their results according to the following partial monoid, analogous
+to sequential composition of result types:
 {\small
 \begin{align*}
 \assigns{\rho} \runion \assigns{\rho'} & = \assigns{(\rho \runion \rho')} \\
