@@ -114,32 +114,34 @@ To do:
 
 \subsection{Contexts}
 
-Contexts $\Gamma, \Delta$ are functions from variables to a \emph{definite assignment} status in $\Bplus =
-\set{\statusDefAssigned, \statusNotDefAssigned, \bot}$. Here $\statusDefAssigned$ indicates \emph{definitely
-assigned}, $\statusNotDefAssigned$ indicates \emph{not definitely assigned}, and $\bot$ indicates
-\emph{undefined}. (Or think of $\statusDefAssigned$ and $\statusNotDefAssigned$ as degenerate types ``any''
-and ``none''.) The definite assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}. We write
-$\Gamma, x : a$ for the context that sends $x$ to $a$ and otherwise agrees with $\Gamma$, and define
-$\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$.
+Contexts $\Gamma, \Delta$ are partial functions from sets of variables to a \emph{definite assignment} status
+in $\B = \set{\statusDefAssigned, \statusNotDefAssigned}$, with $\statusDefAssigned$ indicating
+\emph{definitely assigned} and $\statusNotDefAssigned$ indicating \emph{not definitely assigned}. The definite
+assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}. (Or think of $\statusDefAssigned$ and
+$\statusNotDefAssigned$ as degenerate types ``any'' and ``none''.)  It is useful to represent contexts as
+total functions from the set of all variables to $\B_{\bot} = \B \cup \set{\bot}$, with $\bot$ indicating
+\emph{undefined}. We write $\Gamma, x : a$ for the context that sends $x$ to $a$ and otherwise agrees with
+$\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context
+where all variables are undefined.
 
 \paragraph{Context operations.}
 
-Contexts admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override'') and an
-idempotent commutative monoid of parallel composition $\merge$ (``merge''). Together these form a \emph{right
-near-semiring}~\cite{vanhoorn1967}: $\runion$ right-distributes over $\merge$ (Lemma~1), but left
-distributivity does not hold. Both operations are defined pointwise, via operations on $\Bplus$:
+Contexts admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override'') and
+an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
+\emph{right near-semiring}~\cite{vanhoorn1967}: $\runion$ right-distributes over $\merge$ (Lemma~1), but left
+distributivity does not hold. Both operations are defined pointwise via operations on $\B_{\bot}$:
 %
 \begin{definition}[Override and merge]
 {\small
 \begin{align*}
-a \runion b &= \begin{cases} b & \text{if } b \neq \bot \\ a & \text{otherwise} \end{cases} &
-a \merge b &= \begin{cases} a \meet b & \text{if } a, b \neq \bot \\ \statusNotDefAssigned & \text{if } a \neq \bot \text{ or } b \neq \bot \\ \bot & \text{otherwise} \end{cases}
+a \runion b &= \begin{cases} a & \text{if } b = \bot \\ b & \text{otherwise} \end{cases} &
+a \merge b &= \begin{cases} \bot & \text{if } a = \bot \text{ and } b = \bot \\ \statusNotDefAssigned & \text{if } a = \bot \text{ or } b = \bot \\ a \meet b & \text{otherwise} \end{cases}
 \end{align*}}
 \end{definition}
 
-\noindent The $\runion$ operation is right-biased with $\bot$ as left and right unit. The $\merge$ operation
-also has $\bot$ as unit; when exactly one argument is defined, the result is $\statusNotDefAssigned$; when
-both are defined, it returns the conjunction of their Boolean values.
+\noindent The $\runion$ operation is right-biased and has $\bot$ as left and right unit. The $\merge$
+operation lacks a unit; when exactly one argument is defined, the result is $\statusNotDefAssigned$; when
+both are defined, it returns the conjunction of their values in $\B$.
 
 \begin{lemma}[Right distributivity]
 \[
@@ -179,17 +181,18 @@ def f(b):
 \end{python}
 \end{minipage}
 
-Context operations $\runion$ and $\merge$ lift to a partial semiring over result types $R$, with
-$\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero
-for $\runion$. (Here $\varnothing$ denotes the everywhere-$\bot$ context.) Sequential composition is
-defined only when the left-hand result type is not $\Returns$.
+Context operations $\runion$ and $\merge$ lift to a partial right semiring over result types $R$, with
+$\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero for
+$\runion$. Partiality arises because sequential composition is defined only when the left-hand result type is
+not $\Returns$.
 
-\begin{definition}[Partial semiring of result types]
+\begin{definition}[Override and merge on result types]
 {\small
 \begin{align*}
 \Assigns{\Delta} \merge \Assigns{\Delta'} & = \Assigns{(\Delta \merge \Delta')} \\
 \Assigns{\Delta} \merge \Returns & = \Assigns{\Delta} \\
 \Returns \merge \Assigns{\Delta} & = \Assigns{\Delta} \\
+\Returns \merge \Returns & = \Returns \\
 \\
 \Assigns{\Delta} \runion \Assigns{\Delta'} & = \Assigns{(\Delta \runion \Delta')} \\
 % \Returns \runion R & = \Returns \\
@@ -372,7 +375,8 @@ by \pyinline{return None}. This ensures every function returns, even if it is no
 
 For a statement $s$, the result $\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated
 environment $\rho$; the result $\returns{v}$ represents \emph{abrupt completion} of $s$ with return value $v$.
-Composing statements sequentially composes their results according to the following partial monoid, analogous to sequential composition of result types:
+Composing statements sequentially composes their results according to the following partial monoid, analogous
+to sequential composition of result types:
 {\small
 \begin{align*}
 \assigns{\rho} \runion \assigns{\rho'} & = \assigns{(\rho \runion \rho')} \\
