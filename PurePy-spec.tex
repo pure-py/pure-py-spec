@@ -133,8 +133,8 @@ distributivity does not hold. Both operations are defined pointwise via operatio
 \begin{definition}[Override and merge]
 {\small
 \begin{align*}
-a \runion b &= \begin{cases} b & \text{if } b \neq \bot \\ a & \text{otherwise} \end{cases} &
-a \merge b &= \begin{cases} a \meet b & \text{if } a, b \neq \bot \\ \statusNotDefAssigned & \text{if } a \neq \bot \text{ or } b \neq \bot \\ \bot & \text{otherwise} \end{cases}
+a \runion b &= \begin{cases} a & \text{if } b = \bot \\ b & \text{otherwise} \end{cases} &
+a \merge b &= \begin{cases} \bot & \text{if } a = \bot \text{ and } b = \bot \\ \statusNotDefAssigned & \text{if } a = \bot \text{ or } b = \bot \\ a \meet b & \text{otherwise} \end{cases}
 \end{align*}}
 \end{definition}
 
