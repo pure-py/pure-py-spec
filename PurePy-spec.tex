@@ -121,12 +121,13 @@ assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}. (Or think
 $\statusNotDefAssigned$ as degenerate types ``any'' and ``none''.)  It is useful to represent contexts as
 total functions from the set of all variables to $\B_{\bot} = \B \cup \set{\bot}$, with $\bot$ indicating
 \emph{undefined}. We write $\Gamma, x : a$ for the context that sends $x$ to $a$ and otherwise agrees with
-$\Gamma$, and define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$.
+$\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context
+where all variables are undefined.
 
 \paragraph{Context operations.}
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override'') and
-an idempotent commutative monoid of parallel composition $\merge$ (``merge''). Together these form a
+an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\runion$ right-distributes over $\merge$ (Lemma~1), but left
 distributivity does not hold. Both operations are defined pointwise via operations on $\B_{\bot}$:
 %
@@ -139,8 +140,8 @@ a \merge b &= \begin{cases} \bot & \text{if } a = \bot \text{ and } b = \bot \\ 
 \end{definition}
 
 \noindent The $\runion$ operation is right-biased and has $\bot$ as left and right unit. The $\merge$
-operation also has $\bot$ as unit; when exactly one argument is defined, the result is
-$\statusNotDefAssigned$; when both are defined, it returns the conjunction of their Boolean values.
+operation lacks a unit; when exactly one argument is defined, the result is $\statusNotDefAssigned$; when
+both are defined, it returns the conjunction of their values in $\B$.
 
 \begin{lemma}[Right distributivity]
 \[
@@ -180,17 +181,18 @@ def f(b):
 \end{python}
 \end{minipage}
 
-Context operations $\runion$ and $\merge$ lift to a partial semiring over result types $R$, with
+Context operations $\runion$ and $\merge$ lift to a partial right near-semiring over result types $R$, with
 $\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero
-for $\runion$. (Here $\varnothing$ denotes the everywhere-$\bot$ context.) Sequential composition is
+for $\runion$. Sequential composition is
 defined only when the left-hand result type is not $\Returns$.
 
-\begin{definition}[Partial semiring of result types]
+\begin{definition}[Override and merge on result types]
 {\small
 \begin{align*}
 \Assigns{\Delta} \merge \Assigns{\Delta'} & = \Assigns{(\Delta \merge \Delta')} \\
 \Assigns{\Delta} \merge \Returns & = \Assigns{\Delta} \\
 \Returns \merge \Assigns{\Delta} & = \Assigns{\Delta} \\
+\Returns \merge \Returns & = \Returns \\
 \\
 \Assigns{\Delta} \runion \Assigns{\Delta'} & = \Assigns{(\Delta \runion \Delta')} \\
 % \Returns \runion R & = \Returns \\
