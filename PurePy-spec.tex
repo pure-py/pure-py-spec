@@ -132,10 +132,12 @@ an idempotent commutative semigroup of parallel composition $\merge$ (``merge'')
 distributivity does not hold. Both operations are defined pointwise via operations on $\B_{\bot}$:
 %
 \begin{definition}[Override and merge]
+For $a, b \in \B$:
 {\small
 \begin{align*}
-a \runion b &= \begin{cases} a & \text{if } b = \bot \\ b & \text{otherwise} \end{cases} &
-a \merge b &= \begin{cases} \bot & \text{if } a = \bot \text{ and } b = \bot \\ \statusNotDefAssigned & \text{if } a = \bot \text{ or } b = \bot \\ a \meet b & \text{otherwise} \end{cases}
+\bot \runion b &= b & \bot \merge \bot &= \bot \\
+b \runion \bot &= b & b \merge \bot = \bot \merge b &= \statusNotDefAssigned \\
+a \runion b &= b & a \merge b &= a \meet b
 \end{align*}}
 \end{definition}
 
