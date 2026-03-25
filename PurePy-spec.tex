@@ -228,6 +228,31 @@ descending into nested function definitions (which have their own scope):
 \locals(\exDef{f}{\vec{x}}{s}) &= \set{f}
 \end{align*}}
 
+\paragraph{Captured variables.}
+
+The function $\mathrm{captures}(s)$ collects the set of variables from the enclosing scope that are
+captured by a closure (lambda or nested function definition) within $s$:
+%
+{\small
+\begin{align*}
+\mathrm{captures}(\exPass) &= \varnothing \\
+\mathrm{captures}(\exAssign{x}{e}) &= \mathrm{captures}(e) \\
+\mathrm{captures}(\exSeq{s_1}{s_2}) &= \mathrm{captures}(s_1) \cup \mathrm{captures}(s_2) \\
+\mathrm{captures}(\exReturn{}) &= \varnothing \\
+\mathrm{captures}(\exReturn{e}) &= \mathrm{captures}(e) \\
+\mathrm{captures}(\exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{s}) \\
+\mathrm{captures}(\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{s}) \\
+\mathrm{captures}(\exDef{f}{\vec{x}}{s}) &= \mathrm{fv}(s) \setminus (\set{\vec{x}} \cup \locals(s))
+\end{align*}}
+
+\noindent The function extends to expressions in the obvious way, with the following interesting cases:
+%
+{\small
+\begin{align*}
+\mathrm{captures}(x) &= \varnothing \\
+\mathrm{captures}(\exLambda{\vec{x}}{e}) &= \mathrm{fv}(e) \setminus \set{\vec{x}}
+\end{align*}}
+
 \paragraph{Well-formedness judgement.}
 
 Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a set of variables

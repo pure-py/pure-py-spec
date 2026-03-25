@@ -38,10 +38,11 @@
 \inferrule*[lab={\ruleName{seq}}]
 {
   \Gamma \vdash s_1 : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash s_2 : S
+  \Gamma \runion \Delta \vdash s_2 : R \\
+  \mathrm{captures}(s_1) \cap \locals(s_2) = \varnothing
 }
 {
-  \Gamma \vdash \exSeq{s_1}{s_2} : \Assigns{\Delta} \runion S
+  \Gamma \vdash \exSeq{s_1}{s_2} : \Assigns{\Delta} \runion R
 }
 \and
 \inferrule*[lab={\ruleName{if}}]
