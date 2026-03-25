@@ -13,7 +13,8 @@
 \and
 \inferrule*[lab={\ruleName{assign}}]
 {
-  \Gamma \vdash e
+  \Gamma \vdash e \\
+  x \notin \mathrm{captures}(e)
 }
 {
   \Gamma \vdash \exAssign{x}{e} : \Assigns{\set{x : \statusDefAssigned}}
@@ -65,7 +66,8 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned, \locals(s) : \statusNotDefAssigned \vdash s : R
+  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned, \locals(s) : \statusNotDefAssigned \vdash s : R \\
+  f \notin \mathrm{captures}(\exDef{f}{\vec{x}}{s})
 }
 {
   \Gamma \vdash \exDef{f}{\vec{x}}{s} : \Assigns{\set{f : \statusDefAssigned}}

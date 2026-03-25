@@ -395,11 +395,22 @@ def f():
 would be \pyinline{11}. To preserve agreement with a subset of Python, we exclude this program from
 \PurePy: the side condition in the \ruleName{seq} rule requires that no variable captured by $s_1$ is
 reassigned by $s_2$. Here \pyinline{x} is captured by
-the definition of \pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected.
+the definition of \pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected. This is
+analogous to Java's requirement that local variables captured by a lambda must be \emph{effectively
+final}~\cite[\S15.27.2]{gosling2025}: local variables are allocated on the stack, and so only the value
+of a local variable can be captured by a closure.
 
-This is analogous to Java's requirement that local variables captured by a lambda must be effectively
-final~\cite[\S15.27.2]{gosling2025}: local variables are allocated on the stack, and so only the value of a local variable can be captured by
-a closure.
+The same issue arises when a variable is captured and reassigned in the \emph{same} statement:
+
+\begin{python}
+x = 5
+x = lambda: x
+x()  # Python: returns the lambda (late binding); pure: returns 5
+\end{python}
+
+\noindent To preserve agreement with Python until such time as recursion is supported, side
+conditions on the \ruleName{assign} and \ruleName{def} rules reject programs like this, requiring that the
+variable being bound is not captured by the expression or function body respectively.
 
 \subsubsection{Unreachable code}
 \label{sec:unreachable}
