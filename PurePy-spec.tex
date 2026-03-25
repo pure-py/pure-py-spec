@@ -135,9 +135,9 @@ distributivity does not hold. Both operations are defined pointwise via operatio
 For $a, b \in \B$:
 {\small
 \begin{align*}
-\bot \runion b &= b & \bot \merge \bot &= \bot \\
-b \runion \bot &= b & b \merge \bot = \bot \merge b &= \statusNotDefAssigned \\
-a \runion b &= b & a \merge b &= a \meet b
+\bot \runion b = b \runion \bot &= b & \bot \merge \bot &= \bot \\
+a \runion b &= b & b \merge \bot = \bot \merge b &= \statusNotDefAssigned \\
+& & a \merge b &= a \meet b
 \end{align*}}
 \end{definition}
 
@@ -183,27 +183,25 @@ def f(b):
 \end{python}
 \end{minipage}
 
-Context operations $\runion$ and $\merge$ lift to a partial right semiring over result types $R$, with
+Context operations $\runion$ and $\merge$ lift to a right semiring over result types $R$, with
 $\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero for
-$\runion$. Partiality arises because sequential composition is defined only when the left-hand result type is
-not $\Returns$.
+$\runion$.
 
 \begin{definition}[Override and merge on result types]
 {\small
 \begin{align*}
 \Assigns{\Delta} \merge \Assigns{\Delta'} & = \Assigns{(\Delta \merge \Delta')} \\
-\Assigns{\Delta} \merge \Returns & = \Assigns{\Delta} \\
-\Returns \merge \Assigns{\Delta} & = \Assigns{\Delta} \\
-\Returns \merge \Returns & = \Returns \\
+R \merge \Returns = \Returns \merge R & = R \\
 \\
 \Assigns{\Delta} \runion \Assigns{\Delta'} & = \Assigns{(\Delta \runion \Delta')} \\
-% \Returns \runion R & = \Returns \\
-\Assigns{\Delta} \runion \Returns & = \Returns
+R \runion \Returns = \Returns \runion R & = \Returns
 \end{align*}}
 \end{definition}
 
+\noindent The $\Returns \runion R$ case never arises because the well-formedness judgement prohibits
+unreachable statements (\S\ref{sec:unreachable}).
+
 \begin{lemma}[Right distributivity]
-When the relevant terms are defined (i.e.~neither $R$ nor $R'$ is $\Returns$):
 \[
 (R \merge R') \runion S = (R \runion S) \merge (R' \runion S)
 \]
@@ -216,18 +214,45 @@ When the relevant terms are defined (i.e.~neither $R$ nor $R'$ is $\Returns$):
 \paragraph{Local variables.}
 
 The function $\locals(s)$ collects the set of variables assigned anywhere in a statement $s$, without
-descending into nested function definitions (which have their own scope):
+descending into nested function definitions (which have their own scope). If $s : \Assigns{\Delta}$, then
+$\locals(s) = \dom(\Delta)$; $\locals$ is a syntactic approximation needed to set up the context
+before checking $s$.
 %
 {\small
 \begin{align*}
 \locals(\exPass) &= \varnothing \\
 \locals(\exAssign{x}{e}) &= \set{x} \\
 \locals(\exSeq{s_1}{s_2}) &= \locals(s_1) \cup \locals(s_2) \\
-\locals(\exReturn{}) &= \varnothing \\
+\locals(\exReturnNone) &= \varnothing \\
 \locals(\exReturn{e}) &= \varnothing \\
 \locals(\exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}) &= \locals(\vec{s}) \\
 \locals(\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}}) &= \locals(\vec{s}) \\
 \locals(\exDef{f}{\vec{x}}{s}) &= \set{f}
+\end{align*}}
+
+\paragraph{Captured variables.}
+
+The function $\mathrm{captures}(s)$ collects the set of variables from the enclosing scope that are
+captured by a closure (lambda or nested function definition) within $s$:
+%
+{\small
+\begin{align*}
+\mathrm{captures}(\exPass) &= \varnothing \\
+\mathrm{captures}(\exAssign{x}{e}) &= \mathrm{captures}(e) \\
+\mathrm{captures}(\exSeq{s_1}{s_2}) &= \mathrm{captures}(s_1) \cup \mathrm{captures}(s_2) \\
+\mathrm{captures}(\exReturnNone) &= \varnothing \\
+\mathrm{captures}(\exReturn{e}) &= \mathrm{captures}(e) \\
+\mathrm{captures}(\exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{s}) \\
+\mathrm{captures}(\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{s}) \\
+\mathrm{captures}(\exDef{f}{\vec{x}}{s}) &= \mathrm{fv}(s) \setminus (\set{\vec{x}} \cup \locals(s))
+\end{align*}}
+
+\noindent The function extends to expressions in the obvious way, with the following interesting cases:
+%
+{\small
+\begin{align*}
+\mathrm{captures}(x) &= \varnothing \\
+\mathrm{captures}(\exLambda{\vec{x}}{e}) &= \mathrm{fv}(e) \setminus \set{\vec{x}}
 \end{align*}}
 
 \paragraph{Well-formedness judgement.}
@@ -349,7 +374,47 @@ $\locals(s)$ for the body of \pyinline{f}, and is therefore introduced at $\stat
 function. The reference to \pyinline{y} in \pyinline{x = y} then fails the well-formedness check, since
 $\Gamma(\pyinline{y}) = \statusNotDefAssigned$ rather than $\Gamma(\pyinline{y}) = \statusDefAssigned$.
 
+\subsubsection{Shadowing of captured variables}
+\label{sec:captured-vars}
+
+Once a variable has been captured by a closure, it cannot be reassigned in the enclosing scope, because
+its Python semantics would depend on mutation. Consider the following program:
+
+\begin{python}
+def f():
+    x = 5
+    def g():
+        return x
+    x = 6
+    return x + g()
+\end{python}
+
+\noindent In Python, \pyinline{g} closes over the \emph{mutable binding} of \pyinline{x}, so
+\pyinline{g()} returns \pyinline{6} and the result is \pyinline{12}. In a pure semantics where
+\pyinline{x = 6} shadows the earlier binding, \pyinline{g()} would return \pyinline{5} and the result
+would be \pyinline{11}. To preserve agreement with a subset of Python, we exclude this program from
+\PurePy: the side condition in the \ruleName{seq} rule requires that no variable captured by $s_1$ is
+reassigned by $s_2$. Here \pyinline{x} is captured by
+the definition of \pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected. This is
+analogous to Java's requirement that local variables captured by a lambda must be \emph{effectively
+final}~\cite[\S15.27.2]{gosling2025}: local variables are allocated on the stack, and so only the value
+of a local variable can be captured by a closure.
+
+The same issue arises when a variable is captured and reassigned in the \emph{same} statement:
+
+\begin{python}
+x = 5
+def x():
+    return x
+x()  # Python: returns the function (late binding); pure: returns 5
+\end{python}
+
+\noindent To preserve agreement with Python until such time as recursion is supported, side
+conditions on the \ruleName{assign} and \ruleName{def} rules reject programs like this, requiring that the
+variable being bound is not captured by the expression or function body respectively.
+
 \subsubsection{Unreachable code}
+\label{sec:unreachable}
 A non-empty sequence of statements returns only if the last statement returns, and all preceding statements
 assign. Thus the following is illegal:
 

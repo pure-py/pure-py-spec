@@ -3,7 +3,7 @@
 \flushleft \shadebox{$\Gamma \vdash s : R$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{pass-assigns}}]
+\inferrule*[lab={\ruleName{pass}}]
 {
   \strut
 }
@@ -11,23 +11,24 @@
   \Gamma \vdash \exPass : \Assigns{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{assign-assigns}}]
+\inferrule*[lab={\ruleName{assign}}]
 {
-  \Gamma \vdash e
+  \Gamma \vdash e \\
+  x \notin \mathrm{captures}(e)
 }
 {
-  \Gamma \vdash \exAssign{x}{e} : \Assigns{\set{x}}
+  \Gamma \vdash \exAssign{x}{e} : \Assigns{\set{x : \statusDefAssigned}}
 }
 \and
-\inferrule*[lab={\ruleName{return-none-returns}}]
+\inferrule*[lab={\ruleName{return-none}}]
 {
   \strut
 }
 {
-  \Gamma \vdash \exReturn{} : \Returns
+  \Gamma \vdash \exReturnNone : \Returns
 }
 \and
-\inferrule*[lab={\ruleName{return-returns}}]
+\inferrule*[lab={\ruleName{return}}]
 {
   \Gamma \vdash e
 }
@@ -38,10 +39,11 @@
 \inferrule*[lab={\ruleName{seq}}]
 {
   \Gamma \vdash s_1 : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash s_2 : S
+  \Gamma \runion \Delta \vdash s_2 : R \\
+  \mathrm{captures}(s_1) \cap \locals(s_2) = \varnothing
 }
 {
-  \Gamma \vdash \exSeq{s_1}{s_2} : \Assigns{\Delta} \runion S
+  \Gamma \vdash \exSeq{s_1}{s_2} : \Assigns{\Delta} \runion R
 }
 \and
 \inferrule*[lab={\ruleName{if}}]
@@ -64,10 +66,11 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned, \locals(s) : \statusNotDefAssigned \vdash s : R
+  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned, \locals(s) : \statusNotDefAssigned \vdash s : R \\
+  f \notin \mathrm{captures}(\exDef{f}{\vec{x}}{s})
 }
 {
-  \Gamma \vdash \exDef{f}{\vec{x}}{s} : \Assigns{\set{f}}
+  \Gamma \vdash \exDef{f}{\vec{x}}{s} : \Assigns{\set{f : \statusDefAssigned}}
 }
 \end{mathpar}
 \caption{Statement $s$ is well-formed in $\Gamma$}
