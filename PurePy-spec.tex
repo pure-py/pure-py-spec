@@ -183,10 +183,9 @@ def f(b):
 \end{python}
 \end{minipage}
 
-Context operations $\runion$ and $\merge$ lift to a partial right semiring over result types $R$, with
+Context operations $\runion$ and $\merge$ lift to a right semiring over result types $R$, with
 $\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero for
-$\runion$. Partiality arises because sequential composition is defined only when the left-hand result type is
-not $\Returns$.
+$\runion$.
 
 \begin{definition}[Override and merge on result types]
 {\small
@@ -195,13 +194,14 @@ not $\Returns$.
 R \merge \Returns = \Returns \merge R & = R \\
 \\
 \Assigns{\Delta} \runion \Assigns{\Delta'} & = \Assigns{(\Delta \runion \Delta')} \\
-% \Returns \runion R & = \Returns \\
-\Assigns{\Delta} \runion \Returns & = \Returns
+R \runion \Returns = \Returns \runion R & = \Returns
 \end{align*}}
 \end{definition}
 
+\noindent The $\Returns \runion R$ case never arises because the well-formedness judgement prohibits
+unreachable statements (\S\ref{sec:unreachable}).
+
 \begin{lemma}[Right distributivity]
-When the relevant terms are defined (i.e.~neither $R$ nor $R'$ is $\Returns$):
 \[
 (R \merge R') \runion S = (R \runion S) \merge (R' \runion S)
 \]
@@ -402,6 +402,7 @@ final~\cite[\S15.27.2]{gosling2025}: local variables are allocated on the stack,
 a closure.
 
 \subsubsection{Unreachable code}
+\label{sec:unreachable}
 A non-empty sequence of statements returns only if the last statement returns, and all preceding statements
 assign. Thus the following is illegal:
 
