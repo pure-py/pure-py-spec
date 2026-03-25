@@ -372,6 +372,33 @@ $\locals(s)$ for the body of \pyinline{f}, and is therefore introduced at $\stat
 function. The reference to \pyinline{y} in \pyinline{x = y} then fails the well-formedness check, since
 $\Gamma(\pyinline{y}) = \statusNotDefAssigned$ rather than $\Gamma(\pyinline{y}) = \statusDefAssigned$.
 
+\subsubsection{Shadowing of captured variables}
+\label{sec:captured-vars}
+
+Once a variable has been captured by a closure, it cannot be reassigned in the enclosing scope, because
+its Python semantics would depend on mutation. Consider the following program:
+
+\begin{python}
+def f():
+    x = 5
+    def g():
+        return x
+    x = 6
+    return x + g()
+\end{python}
+
+\noindent In Python, \pyinline{g} closes over the \emph{mutable binding} of \pyinline{x}, so
+\pyinline{g()} returns \pyinline{6} and the result is \pyinline{12}. In a pure semantics where
+\pyinline{x = 6} shadows the earlier binding, \pyinline{g()} would return \pyinline{5} and the result
+would be \pyinline{11}. To preserve agreement with a subset of Python, we exclude this program from
+\PurePy: the side condition in the \ruleName{seq} rule requires that no variable captured by $s_1$ is
+reassigned by $s_2$. Here \pyinline{x} is captured by
+the definition of \pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected.
+
+This is analogous to Java's requirement that local variables captured by a lambda must be effectively
+final~\cite[\S15.27.2]{gosling2025}: local variables are allocated on the stack, and so only the value of a local variable can be captured by
+a closure.
+
 \subsubsection{Unreachable code}
 A non-empty sequence of statements returns only if the last statement returns, and all preceding statements
 assign. Thus the following is illegal:
