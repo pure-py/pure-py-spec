@@ -223,7 +223,7 @@ before checking $s$.
 \locals(\exPass) &= \varnothing \\
 \locals(\exAssign{x}{e}) &= \set{x} \\
 \locals(\exSeq{s_1}{s_2}) &= \locals(s_1) \cup \locals(s_2) \\
-\locals(\exReturn{}) &= \varnothing \\
+\locals(\exReturnNone) &= \varnothing \\
 \locals(\exReturn{e}) &= \varnothing \\
 \locals(\exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}) &= \locals(\vec{s}) \\
 \locals(\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}}) &= \locals(\vec{s}) \\
@@ -240,7 +240,7 @@ captured by a closure (lambda or nested function definition) within $s$:
 \mathrm{captures}(\exPass) &= \varnothing \\
 \mathrm{captures}(\exAssign{x}{e}) &= \mathrm{captures}(e) \\
 \mathrm{captures}(\exSeq{s_1}{s_2}) &= \mathrm{captures}(s_1) \cup \mathrm{captures}(s_2) \\
-\mathrm{captures}(\exReturn{}) &= \varnothing \\
+\mathrm{captures}(\exReturnNone) &= \varnothing \\
 \mathrm{captures}(\exReturn{e}) &= \mathrm{captures}(e) \\
 \mathrm{captures}(\exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{s}) \\
 \mathrm{captures}(\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{s}) \\
