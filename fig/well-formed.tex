@@ -16,7 +16,7 @@
   \Gamma \vdash e
 }
 {
-  \Gamma \vdash \exAssign{x}{e} : \Assigns{\set{x}}
+  \Gamma \vdash \exAssign{x}{e} : \Assigns{\set{x : \statusDefAssigned}}
 }
 \and
 \inferrule*[lab={\ruleName{return-none}}]
@@ -68,7 +68,7 @@
   \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned, \locals(s) : \statusNotDefAssigned \vdash s : R
 }
 {
-  \Gamma \vdash \exDef{f}{\vec{x}}{s} : \Assigns{\set{f}}
+  \Gamma \vdash \exDef{f}{\vec{x}}{s} : \Assigns{\set{f : \statusDefAssigned}}
 }
 \end{mathpar}
 \caption{Statement $s$ is well-formed in $\Gamma$}
