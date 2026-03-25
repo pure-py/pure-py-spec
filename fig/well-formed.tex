@@ -3,7 +3,7 @@
 \flushleft \shadebox{$\Gamma \vdash s : R$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{pass-assigns}}]
+\inferrule*[lab={\ruleName{pass}}]
 {
   \strut
 }
@@ -11,7 +11,7 @@
   \Gamma \vdash \exPass : \Assigns{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{assign-assigns}}]
+\inferrule*[lab={\ruleName{assign}}]
 {
   \Gamma \vdash e
 }
@@ -19,7 +19,7 @@
   \Gamma \vdash \exAssign{x}{e} : \Assigns{\set{x}}
 }
 \and
-\inferrule*[lab={\ruleName{return-none-returns}}]
+\inferrule*[lab={\ruleName{return-none}}]
 {
   \strut
 }
@@ -27,7 +27,7 @@
   \Gamma \vdash \exReturn{} : \Returns
 }
 \and
-\inferrule*[lab={\ruleName{return-returns}}]
+\inferrule*[lab={\ruleName{return}}]
 {
   \Gamma \vdash e
 }
