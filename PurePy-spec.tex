@@ -404,8 +404,9 @@ The same issue arises when a variable is captured and reassigned in the \emph{sa
 
 \begin{python}
 x = 5
-x = lambda: x
-x()  # Python: returns the lambda (late binding); pure: returns 5
+def x():
+    return x
+x()  # Python: returns the function (late binding); pure: returns 5
 \end{python}
 
 \noindent To preserve agreement with Python until such time as recursion is supported, side
