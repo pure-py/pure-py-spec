@@ -7,3 +7,4 @@
 *.pdf
 *.zip
 agda/_build/
+.venv/
