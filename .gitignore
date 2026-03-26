@@ -8,3 +8,5 @@
 *.zip
 agda/_build/
 .venv/
+
+.claude/settings.local.json
