@@ -33,6 +33,12 @@ formula :: formula_ ::=
   | judgement                       ::   :: judgement
   | formula1 .. formulan            ::   :: dots
 
+v :: 'Val' ::=
+
+b :: 'BVal' ::=
+  | bot :: :: Undefined {{ tex \bot }}
+  | v    :: :: Val
+
 defns
   Judgements :: '' ::=
 
@@ -71,3 +77,15 @@ DefinitelyAssigns G1 s1 .. DefinitelyAssigns Gn sn
 DefinitelyAssigns G' s'
 ------------------- :: if_else
 DefinitelyAssigns intersection G G1 .. Gn G' if e : s elif e1 : s1 .. elif en : sn else e' : s'
+
+defn
+  Dot b1 b2 = b3 :: :: Dot :: 'Dot_'
+  {{ tex [[ b1 ]] \cdot [[ b2 ]] = [[ b3 ]] }}
+  {{ com Override }}
+by
+
+------------------- :: override_r
+Dot b bot = b
+
+------------------- :: override_l
+Dot b v = v
