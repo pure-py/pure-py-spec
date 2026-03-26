@@ -16,6 +16,7 @@
 \usepackage{subcaption}
 \usepackage{xcolor}
 \usepackage{xspace}
+\usepackage{hyperref}
 
 \input{tex/macros}
 \input{tex/listings}
@@ -103,14 +104,26 @@ two separate syntaxes
 
 \section{Syntax}
 
-To do:
-\begin{itemize}
-\item Reserved words
-\item Operators and precedence
-\item Recursion and mutual recursion
-\item Operational semantics of \pyinline{if} statements
-\item Data classes and \pyinline{match}
-\end{itemize}
+{\small
+\begin{tabular}{ll}
+\textbf{To do} & \\
+Reserved words & \issue{9} \\
+Operators and precedence & \issue{50} \\
+Recursion and mutual recursion & \issue{12} \\
+Operational semantics of \pyinline{if} statements & \\
+Data classes and \pyinline{match} & \issue{8} \\
+N-ary tuples & \issue{51} \\
+Set and dict comprehensions & \issue{52} \\
+\pyinline{import} & \issue{53} \\[1mm]
+\textbf{Under consideration} & \\
+Destructuring assignment & \issue{54} \\
+f-strings & \issue{55} \\
+Default arguments & \issue{56} \\
+\pyinline{*args} and \pyinline{**kwargs} & \issue{57} \\
+Decorators & \issue{58} \\
+Slicing & \issue{59} \\
+\pyinline{assert} & \issue{60} \\
+\end{tabular}}
 
 \subsection{Contexts}
 
@@ -437,6 +450,23 @@ A \pyinline{return} statement without an expression is equivalent to \pyinline{r
 
 A function whose body $s$ assigns rather than returns is equivalent to a function whose body is $s$ followed
 by \pyinline{return None}. This ensures every function returns, even if it is not explicitly specified.
+
+\subsection{Unsupported Python features}
+
+The following Python features are excluded from \PurePy as they are incompatible with purity or
+functional programming:
+\begin{itemize}
+\item \pyinline{while} loops, \pyinline{for} loops, \pyinline{break}, \pyinline{continue}
+\item \pyinline{async}/\pyinline{await}
+\item \pyinline{global}, \pyinline{nonlocal}
+\item \pyinline{del}
+\item \pyinline{try}/\pyinline{except}/\pyinline{raise}
+\item Augmented assignment (\pyinline{+=}, \pyinline{-=}, etc.)
+\item Walrus operator (\pyinline{:=})
+\item \pyinline{yield}/\pyinline{yield from}
+\item \pyinline{class} definitions (dataclasses may be added; see \S2 to-do list)
+\item \pyinline{with} statements
+\end{itemize}
 
 \section{Operational semantics}
 
