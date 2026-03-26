@@ -42,16 +42,18 @@ Fluid will require some changes to be PurePy-compliant, especially with regard t
 The longer-term aim is to stimulate new language developments to support science. Centering around a common syntax
 eases adoption and engagement with these new language techniques and ideas. In later version we may add support for type annotations, [Python array API](https://data-apis.org/array-api/latest/)-compatible arrays, and other features.
 
-## Claude Code setup
+## GitHub CLI (`gh`) setup
 
-To use `gh` CLI via Claude Code, create `.claude/settings.local.json` (gitignored) with a fine-grained PAT for the `pure-py` org:
+When working across multiple GitHub organisations, set `GH_TOKEN` per terminal session to avoid keyring conflicts:
+
+```bash
+export GH_TOKEN=<your-pure-py-pat>
+```
+
+For Claude Code, this can be configured automatically via `.claude/settings.local.json` (gitignored):
 
 ```json
-{
-  "env": {
-    "GH_TOKEN": "<your-pure-py-pat>"
-  }
-}
+{"env": {"GH_TOKEN": "<your-pure-py-pat>"}}
 ```
 
 ## Design concerns
