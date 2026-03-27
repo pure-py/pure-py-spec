@@ -9,6 +9,43 @@ The PurePy language standard will define a (versioned) formal grammar for the la
 All languages which are PurePy-compliant must accept any valid PurePy program and are
 expected to behave in a way which conforms to, or at least coheres with, the formal semantics.
 
+## Project structure
+
+- `PurePy-spec.tex` — main spec document
+- `tex/` — macros, listings config, related work
+- `fig/` — syntax, well-formedness rules, operational semantics
+- `agda/` — Agda mechanisation (distributivity proof)
+- `src/purepy_parse.py` — reference parser (Python `ast`-based subset checker)
+- `test/` — litmus tests
+
+## Building the spec
+
+```
+latexmk -pdf PurePy-spec.tex
+```
+
+## Running tests
+
+```
+test/run-all.sh
+```
+
+Sets up a `.venv` automatically. Targets Python 3.12+ ([#39](https://github.com/pure-py/pure-py-spec/issues/39)).
+
+Test categories:
+- `test/well-formed/` — accepted by `purepy_parse.py`, runs correctly in Python
+- `test/well-formed/pending/` — will be accepted once features are implemented
+- `test/ill-formed/semantic/` — syntactically valid but violates well-formedness rules
+- `test/ill-formed/unsupported/` — permanently excluded Python features
+
+## Reference parser (`src/purepy_parse.py`)
+
+Decides whether a Python program belongs to the PurePy subset, using the `ast` module.
+
+- Exit 0: accepted
+- Exit 1: unsupported (permanently excluded)
+- Exit 2: not yet supported (planned, linked to a GitHub issue)
+
 ## Release workflow
 
 Run the `Bump version` GitHub Action manually with a version in the form `x.y.z` (for example, `0.1.4`).
