@@ -4,15 +4,16 @@
 \begin{center}
 \begin{tabular}{rcll}
 $\tau$ & $\subseteq$ & $\mathbb{V}$ & (open term type) \\
-$\Psi$ & $::=$ & $\Sigma \times \Gamma$ & (closure frame) \\
+$\Psi$ & $::=$ & $\Sigma \times \Gamma$ & (frame) \\
 $\Sigma$ & $::=$ & $\{ x \}$ & (closure variables) \\
-$\Gamma$ & $::=$ & $\mathbb{V} \rightarrow \mathcal{P}(\mathbb{V})$ & (closure environment) \\
-$\Delta$ & $::=$ & $\Delta : \Gamma$ & (closure frame stack) \\
+$\Gamma$ & $::=$ & $\mathbb{V} \rightarrow \mathcal{P}(\mathbb{V})$ & (environment) \\
+$\Delta$ & $::=$ & $\Delta : \Psi$ & (frame stack) \\
  & $\mid$ & $\varnothing$ & (empty stack)
 \end{tabular}
 \end{center}
 \end{subfigure}
 \caption{Open-term types}
+\label{fig:open-term-types}
 
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Delta \vdash s \carrow{n} \tau, \Delta'$}
@@ -31,7 +32,7 @@ $\Delta$ & $::=$ & $\Delta : \Gamma$ & (closure frame stack) \\
 }
 {
     \Delta : (\Sigma, \Gamma) \vdash \exAssign{x}{e} \carrow{n} \gamma \setminus \{ x \},  
-    \Delta' : (\Sigma', \Gamma'[x \mapsto \gamma \setminus \{ x \}]) 
+    \Delta' : (\Sigma', \mathrm{close}(\Gamma'[x \mapsto \gamma], x)) 
 }
 \and%
 \inferrule*[lab={\ruleName{def}}]
@@ -40,7 +41,7 @@ $\Delta$ & $::=$ & $\Delta : \Gamma$ & (closure frame stack) \\
     \Delta' : (\Sigma', \Gamma') : \underline{\;\;}
 }
 {
-    \Delta \vdash \exDef{f}{\bar{x}}{s} \carrow{n} \tau, \Delta' : (\Sigma', \Gamma'[f \mapsto \tau])
+    \Delta \vdash \exDef{f}{\bar{x}}{s} \carrow{n} \tau, \Delta' : (\Sigma', \mathrm{close}(\Gamma'[f \mapsto \tau], f))
 }
 \and%
 \inferrule*[lab={\ruleName{return}}]
@@ -69,6 +70,7 @@ $\Delta$ & $::=$ & $\Delta : \Gamma$ & (closure frame stack) \\
 \end{mathpar}
 \end{subfigure}
 \caption{Open statements typing rules}
+\label{fig:open-stmts-type-rules}
 
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Delta \vdash e \carrow{n} \tau, \Delta'$}
@@ -103,7 +105,7 @@ $\Delta$ & $::=$ & $\Delta : \Gamma$ & (closure frame stack) \\
     x \notin \mathrm{dom}(\Gamma)
 }
 {
-    \varnothing : (\Sigma, \Gamma) \vdash x \carrow{0} \varnothing, \varnothing : (\Sigma, \Gamma) 
+    \varnothing : (\Sigma, \Gamma) \vdash x \carrow{0} \{x\}, \varnothing : (\Sigma, \Gamma) 
 }
 \and%
 \inferrule*[lab={\ruleName{lambda}}]
@@ -124,14 +126,14 @@ $\Delta$ & $::=$ & $\Delta : \Gamma$ & (closure frame stack) \\
 \and%
 \inferrule*[lab={\ruleName{funcApp2}}]
 {
-    \Delta \vdash e_1 \carrow{n} \gamma_1, \Delta^{[1]} \qquad \Delta^{[1]} \vdash e_2 \carrow{n} \gamma_2, 
+    n > 0 \qquad \Delta \vdash e_1 \carrow{n} \gamma_1, \Delta^{[1]} \qquad \Delta^{[1]} \vdash e_2 \carrow{n} \gamma_2, 
     \Delta^{[2]} \qquad \cdots
 }
 {
-    \Delta \vdash e_1 (e_2, \dots, e_n) \rightarrow  \bigcup \gamma_i, \Delta^{[n]}
+    \Delta \vdash e_1 (e_2, \dots, e_n) \carrow{n}  \bigcup \gamma_i, \Delta^{[n]}
 }
 \end{mathpar}
 \end{subfigure}
 \caption{Open expressions typing rules}
-\label{fig:open-term-typing}
+\label{fig:open-expr-type-rules}
 \end{figure}
