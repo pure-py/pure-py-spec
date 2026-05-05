@@ -1,0 +1,137 @@
+\begin{figure}
+\begin{subfigure}{\textwidth}
+\small
+\begin{center}
+\begin{tabular}{rcll}
+$\tau$ & $\subseteq$ & $\mathbb{V}$ & (open term type) \\
+$\Psi$ & $::=$ & $\Sigma \times \Gamma$ & (closure frame) \\
+$\Sigma$ & $::=$ & $\{ x \}$ & (closure variables) \\
+$\Gamma$ & $::=$ & $\mathbb{V} \rightarrow \mathcal{P}(\mathbb{V})$ & (closure environment) \\
+$\Delta$ & $::=$ & $\Delta : \Gamma$ & (closure frame stack) \\
+ & $\mid$ & $\varnothing$ & (empty stack)
+\end{tabular}
+\end{center}
+\end{subfigure}
+\caption{Open-term types}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Delta \vdash s \carrow{n} \tau, \Delta'$}
+\begin{mathpar}
+\inferrule*[lab={\ruleName{pass}}]
+{
+    \strut
+}
+{
+    \Delta \vdash \exPass \carrow{n} \Delta
+}
+\and%
+\inferrule*[lab={\ruleName{assign}}]
+{
+    x \notin \Sigma \qquad \Delta : (\Sigma, \Gamma) \vdash e \carrow{n} \tau, \Delta' : (\Sigma', \Gamma')  
+}
+{
+    \Delta : (\Sigma, \Gamma) \vdash \exAssign{x}{e} \carrow{n} \gamma \setminus \{ x \},  
+    \Delta' : (\Sigma', \Gamma'[x \mapsto \gamma \setminus \{ x \}]) 
+}
+\and%
+\inferrule*[lab={\ruleName{def}}]
+{
+    \Delta : (\varnothing, [f \mapsto \varnothing, \overline{x} \mapsto \varnothing]) \vdash s \carrow{n+1} \tau, 
+    \Delta' : (\Sigma', \Gamma') : \underline{\;\;}
+}
+{
+    \Delta \vdash \exDef{f}{\bar{x}}{s} \carrow{n} \tau, \Delta' : (\Sigma', \Gamma'[f \mapsto \tau])
+}
+\and%
+\inferrule*[lab={\ruleName{return}}]
+{
+    n > 0 \qquad \Delta \vdash e \carrow{n} \tau, \Delta'
+}
+{
+    \Delta \vdash \exReturn{e} \carrow{n} \tau, \Delta'
+}
+\and%
+\inferrule*[lab={\ruleName{returnNone}}]
+{
+    n > 0
+}
+{
+    \Delta \vdash \exReturnNone \carrow{n} \varnothing, \Delta
+}
+\and%
+\inferrule*[lab={\ruleName{seq}}]
+{
+    \Delta \vdash s_1 \carrow{n} \tau_1, \Delta' \qquad \Delta' \vdash s_2 \carrow{n} \tau_2, \Delta''
+}
+{
+    \Delta \vdash \exSeq{s_1}{s_2} \carrow{n} \tau_1 \cup \tau_2, \Delta''
+}
+\end{mathpar}
+\end{subfigure}
+\caption{Open statements typing rules}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Delta \vdash e \carrow{n} \tau, \Delta'$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{const}}]
+{
+    \strut
+}
+{
+    \Delta \vdash n \carrow{n} \varnothing, \Delta
+}
+\and%
+\inferrule*[lab={\ruleName{var1}}]
+{
+    x \in \mathrm{dom}(\Gamma)
+}
+{
+    \Delta : (\Sigma, \Gamma) \vdash x \carrow{n} \Gamma (x), \Delta : (\Sigma \cup \{ x \}, \Gamma)
+}
+\and%
+\inferrule*[lab={\ruleName{var2}}]
+{
+    x \notin \mathrm{dom}(\Gamma) \qquad \Delta \vdash x \carrow{n-1} \tau, \Delta'
+}
+{
+    \Delta : \Psi \vdash x \carrow{n} \tau, \Delta' : \Psi
+}
+\and%
+\inferrule*[lab={\ruleName{var3}}]
+{
+    x \notin \mathrm{dom}(\Gamma)
+}
+{
+    \varnothing : (\Sigma, \Gamma) \vdash x \carrow{0} \varnothing, \varnothing : (\Sigma, \Gamma) 
+}
+\and%
+\inferrule*[lab={\ruleName{lambda}}]
+{
+    \Delta : (\varnothing, [\overline{x} \mapsto \varnothing]) \vdash e \carrow{n+1} \tau, \Delta'
+}
+{
+    \Delta \vdash \exLambda{\overline{x}}{e} \carrow{n} \tau, \Delta'
+}
+\and%
+\inferrule*[lab={\ruleName{funcApp1}}]
+{
+    \forall i: \Delta \vdash e_i \carrow{0} \varnothing, \Delta
+}
+{
+    \Delta \vdash e_1 (e_2, \dots, c_n) \carrow{0} \varnothing, \Delta
+}
+\and%
+\inferrule*[lab={\ruleName{funcApp2}}]
+{
+    \Delta \vdash e_1 \carrow{n} \gamma_1, \Delta^{[1]} \qquad \Delta^{[1]} \vdash e_2 \carrow{n} \gamma_2, 
+    \Delta^{[2]} \qquad \cdots
+}
+{
+    \Delta \vdash e_1 (e_2, \dots, e_n) \rightarrow  \bigcup \gamma_i, \Delta^{[n]}
+}
+\end{mathpar}
+\end{subfigure}
+\caption{Open expressions typing rules}
+\label{fig:open-term-typing}
+\end{figure}

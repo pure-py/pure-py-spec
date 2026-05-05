@@ -451,6 +451,10 @@ A \pyinline{return} statement without an expression is equivalent to \pyinline{r
 A function whose body $s$ assigns rather than returns is equivalent to a function whose body is $s$ followed
 by \pyinline{return None}. This ensures every function returns, even if it is not explicitly specified.
 
+\subsubsection{Late binding and mutual recursion}
+
+\input{fig/open-term-typing}
+
 \subsection{Unsupported Python features}
 
 The following Python features are excluded from \PurePy as they are incompatible with purity or
