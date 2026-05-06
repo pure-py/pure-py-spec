@@ -12,70 +12,13 @@ $\Delta$ & $::=$ & $\Delta : \Psi$ & (frame stack) \\
 \end{tabular}
 \end{center}
 \end{subfigure}
-\caption{Open-term types}
+\caption{Open term types}
 \label{fig:open-term-types}
-
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Delta \vdash s \carrow{n} \tau, \Delta'$}
-\begin{mathpar}
-\inferrule*[lab={\ruleName{pass}}]
-{
-    \strut
-}
-{
-    \Delta \vdash \exPass \carrow{n} \Delta
-}
-\and%
-\inferrule*[lab={\ruleName{assign}}]
-{
-    x \notin \Sigma \qquad \Delta : (\Sigma, \Gamma) \vdash e \carrow{n} \tau, \Delta' : (\Sigma', \Gamma')  
-}
-{
-    \Delta : (\Sigma, \Gamma) \vdash \exAssign{x}{e} \carrow{n} \gamma \setminus \{ x \},  
-    \Delta' : (\Sigma', \mathrm{close}(\Gamma'[x \mapsto \gamma], x)) 
-}
-\and%
-\inferrule*[lab={\ruleName{def}}]
-{
-    \Delta : (\varnothing, [f \mapsto \varnothing, \overline{x} \mapsto \varnothing]) \vdash s \carrow{n+1} \tau, 
-    \Delta' : (\Sigma', \Gamma') : \underline{\;\;}
-}
-{
-    \Delta \vdash \exDef{f}{\bar{x}}{s} \carrow{n} \tau, \Delta' : (\Sigma', \mathrm{close}(\Gamma'[f \mapsto \tau], f))
-}
-\and%
-\inferrule*[lab={\ruleName{return}}]
-{
-    n > 0 \qquad \Delta \vdash e \carrow{n} \tau, \Delta'
-}
-{
-    \Delta \vdash \exReturn{e} \carrow{n} \tau, \Delta'
-}
-\and%
-\inferrule*[lab={\ruleName{returnNone}}]
-{
-    n > 0
-}
-{
-    \Delta \vdash \exReturnNone \carrow{n} \varnothing, \Delta
-}
-\and%
-\inferrule*[lab={\ruleName{seq}}]
-{
-    \Delta \vdash s_1 \carrow{n} \tau_1, \Delta' \qquad \Delta' \vdash s_2 \carrow{n} \tau_2, \Delta''
-}
-{
-    \Delta \vdash \exSeq{s_1}{s_2} \carrow{n} \tau_1 \cup \tau_2, \Delta''
-}
-\end{mathpar}
-\end{subfigure}
-\caption{Open statements typing rules}
-\label{fig:open-stmts-type-rules}
 
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Delta \vdash e \carrow{n} \tau, \Delta'$}
 \begin{mathpar}
-\small
+\footnotesize
 \inferrule*[lab={\ruleName{const}}]
 {
     \strut
@@ -136,4 +79,79 @@ $\Delta$ & $::=$ & $\Delta : \Psi$ & (frame stack) \\
 \end{subfigure}
 \caption{Open expressions typing rules}
 \label{fig:open-expr-type-rules}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Delta \vdash s \carrow{n} \tau, \Delta'$}
+\begin{mathpar}
+\footnotesize
+\inferrule*[lab={\ruleName{pass}}]
+{
+    \strut
+}
+{
+    \Delta \vdash \exPass \carrow{n} \Delta
+}
+\and%
+\inferrule*[lab={\ruleName{assign}}]
+{
+    x \notin \Sigma \qquad \Delta : (\Sigma, \Gamma) \vdash e \carrow{n} \tau, \Delta' : (\Sigma', \Gamma')  
+}
+{
+    \Delta : (\Sigma, \Gamma) \vdash \exAssign{x}{e} \carrow{n} \gamma \setminus \{ x \},  
+    \Delta' : (\Sigma', \mathrm{close}(\Gamma'[x \mapsto \gamma], x)) 
+}
+\and%
+\inferrule*[lab={\ruleName{if1}}]
+{
+    n > 0 \qquad \Delta \vdash e_1 \carrow{n} \gamma_1, \Delta^{[1]} \qquad \Delta^{[1]} \vdash s_1 \carrow{n} \gamma_2, 
+    \Delta^{[2]} \qquad \cdots \qquad \Delta^{[n-1]} \vdash e_n \carrow{n} \gamma_n,  \Delta^{[n]}
+}
+{
+    \Delta \vdash \exIfElse{e_1}{s_1}{[\exElif{e_i}{s_i}]}{e_n} \carrow{n} \bigcup \gamma_i, \Delta^{[n]}
+}
+\and%
+\inferrule*[lab={\ruleName{if2}}]
+{
+     \forall i: \Delta \vdash e_i / s_i \carrow{0} \varnothing, \Delta
+}
+{
+    \Delta \vdash \exIfElse{e_1}{s_1}{[\exElif{e_i}{s_i}]}{e_n} \carrow{0} \varnothing, \Delta
+}
+\and%
+\inferrule*[lab={\ruleName{def}}]
+{
+    \Delta : (\varnothing, [f \mapsto \varnothing, \overline{x} \mapsto \varnothing]) \vdash s \carrow{n+1} \tau, 
+    \Delta' : (\Sigma', \Gamma') : \underline{\;\;}
+}
+{
+    \Delta \vdash \exDef{f}{\bar{x}}{s} \carrow{n} \tau, \Delta' : (\Sigma', \mathrm{close}(\Gamma'[f \mapsto \tau], f))
+}
+\and%
+\inferrule*[lab={\ruleName{return}}]
+{
+    n > 0 \qquad \Delta \vdash e \carrow{n} \tau, \Delta'
+}
+{
+    \Delta \vdash \exReturn{e} \carrow{n} \tau, \Delta'
+}
+\and%
+\inferrule*[lab={\ruleName{returnNone}}]
+{
+    n > 0
+}
+{
+    \Delta \vdash \exReturnNone \carrow{n} \varnothing, \Delta
+}
+\and%
+\inferrule*[lab={\ruleName{seq}}]
+{
+    \Delta \vdash s_1 \carrow{n} \tau_1, \Delta' \qquad \Delta' \vdash s_2 \carrow{n} \tau_2, \Delta''
+}
+{
+    \Delta \vdash \exSeq{s_1}{s_2} \carrow{n} \tau_1 \cup \tau_2, \Delta''
+}
+\end{mathpar}
+\end{subfigure}
+\caption{Open statements typing rules}
+\label{fig:open-stmts-type-rules}
 \end{figure}

@@ -527,6 +527,11 @@ closure variables at the current scoping level. The returned type is the type of
 the name currently being defined. The function $\mathrm{close}$ removes the second argument from all bindings in the
 updated environment.
 
+The rules for conditional evaluation ($\ruleName{if1}$ and $\ruleName{if2}$) follow a similar structure to the ones for
+function evaluation. If the conditional statement is on the global scope (i.e., $\carrow{0}$), then all sub-expressions
+and sub-statements must be closed. If it is inside a nested scope, each sub-term is typed in sequence, and the
+returned type is again the union of the open term types of the sub-terms.  
+
 The rule for function definition $\ruleName{def}$ works similarly to the one for lambda expressions, with the added step of
 closing the environment by the function name $f$ in the returned environment stack.
 
