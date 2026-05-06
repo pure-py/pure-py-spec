@@ -504,9 +504,9 @@ variables $\Sigma$ at any nesting depth (e.g., a free variable might be closed b
 enclosing scope).
 
 We will start by illustrating the typing rules for expressions. A constant has an empty type, and does not change
-the stack. For variables, there are three different cases. In $\ruleName{var1}$, a variable is evaluated which is
-already bound by the current scope $\Gamma$. Therefore, its type can be read from the environment, and the
-variable itself is added to the set of closure variables at the current scope (to circumvent the issue explained in
+the stack. For variables, there are three different cases. In $\ruleName{var1}$, the variable is
+already bound in the current scope $\Gamma$. Therefore, its type can be read from the environment, and the
+variable itself is added to the set of closure variables at the current scope level (to circumvent the issue explained in
 Section~\ref{sec:captured-vars}). If the variable is not bound in the current environment, it is typed at the
 surrounding scope as shown in $\ruleName{var2}$. The base-case is illustrated by $\ruleName{var3}$, where a variable
 is typed at the global scope (i.e. $\carrow{0}$). If the variable is not defined at the global scope either, it receives
@@ -525,7 +525,7 @@ the returned stack the one of the last typing judgement.
 For statements, the $\ruleName{pass}$ is trivial. For an assignment, the assigned variable cannot be part of the set of
 closure variables at the current scoping level. The returned type is the type of the right-hand side expression without
 the name currently being defined. The function $\mathrm{close}$ removes the second argument from all bindings in the
-updated environment.
+updated environment (i.e., $\mathrm{close}(\Gamma, x)(y) = \Gamma(y) \setminus \{x\}$).
 
 The rules for conditional evaluation ($\ruleName{if1}$ and $\ruleName{if2}$) follow a similar structure to the ones for
 function evaluation. If the conditional statement is on the global scope (i.e., $\carrow{0}$), then all sub-expressions
