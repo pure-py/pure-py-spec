@@ -3,12 +3,11 @@
 \small
 \begin{center}
 \begin{tabular}{rcll}
-$\tau$ & $\subseteq$ & $\mathbb{V}$ & (open term type) \\
-$\Psi$ & $::=$ & $\Sigma \times \Gamma$ & (frame) \\
-$\Sigma$ & $::=$ & $\{ x \}$ & (closure variables) \\
-$\Gamma$ & $::=$ & $\mathbb{V} \rightarrow \mathcal{P}(\mathbb{V})$ & (environment) \\
-$\Delta$ & $::=$ & $\Delta : \Psi$ & (frame stack) \\
- & $\mid$ & $\varnothing$ & (empty stack)
+$\tau$ & $::=$ & $\{ \seq{x} \}$ & (open term type) \\
+$\Sigma$ & $::=$ & $\{ \seq{x} \}$ & (captured variables) \\
+$\Gamma$ & $::=$ & $\{ \seq{x : \tau} \}$ & (environment) \\
+$\Delta$ & $::=$ & $\Delta : (\Sigma, \Gamma)$ & (frame stack) \\
+& $\mid$ & $\varnothing$ &  
 \end{tabular}
 \end{center}
 \end{subfigure}
@@ -24,7 +23,15 @@ $\Delta$ & $::=$ & $\Delta : \Psi$ & (frame stack) \\
     \strut
 }
 {
-    \Delta \vdash n \carrow{n} \varnothing, \Delta
+    \Delta \vdash c \carrow{n} \varnothing, \Delta
+}
+\and%
+\inferrule*[lab={\ruleName{lambda}}]
+{
+    \Delta : (\varnothing, [\overline{x} \mapsto \varnothing]) \vdash e \carrow{n+1} \tau, \underline{\;\;}
+}
+{
+    \Delta \vdash \exLambda{\overline{x}}{e} \carrow{n} \tau, \Delta
 }
 \and%
 \inferrule*[lab={\ruleName{var1}}]
@@ -32,31 +39,23 @@ $\Delta$ & $::=$ & $\Delta : \Psi$ & (frame stack) \\
     x \in \mathrm{dom}(\Gamma)
 }
 {
-    \Delta : (\Sigma, \Gamma) \vdash x \carrow{n} \Gamma (x), \Delta : (\Sigma \cup \{ x \}, \Gamma)
+    \Delta : (\Sigma, \Gamma) \vdash x \carrow{n} \Gamma (x), \Delta : (\Sigma, \Gamma)
 }
 \and%
 \inferrule*[lab={\ruleName{var2}}]
 {
-    x \notin \mathrm{dom}(\Gamma) \qquad \Delta \vdash x \carrow{n-1} \tau, \Delta'
+    x \notin \mathrm{dom}(\Gamma) \qquad \mathrm{bound}(\Delta, x) = \hat{\Gamma}
 }
 {
-    \Delta : \Psi \vdash x \carrow{n} \tau, \Delta' : \Psi
+    \Delta : (\Sigma, \Gamma) \vdash x \carrow{n} \hat{\Gamma}(x), \mathrm{mark}(\Delta, x) : (\Sigma, \Gamma)
 }
 \and%
 \inferrule*[lab={\ruleName{var3}}]
 {
-    x \notin \mathrm{dom}(\Gamma)
+    n > 0 \qquad x \notin \mathrm{dom}(\Gamma) \qquad \nexists\, \hat{\Gamma} \,.\, \mathrm{bound}(\Delta, x) = \hat{\Gamma}
 }
 {
-    \varnothing : (\Sigma, \Gamma) \vdash x \carrow{0} \{x\}, \varnothing : (\Sigma, \Gamma) 
-}
-\and%
-\inferrule*[lab={\ruleName{lambda}}]
-{
-    \Delta : (\varnothing, [\overline{x} \mapsto \varnothing]) \vdash e \carrow{n+1} \tau, \Delta'
-}
-{
-    \Delta \vdash \exLambda{\overline{x}}{e} \carrow{n} \tau, \Delta'
+    \Delta : (\Sigma, \Gamma) \vdash x \carrow{n} \{x\}, \Delta : (\Sigma \cup \{ x \}, \Gamma)
 }
 \and%
 \inferrule*[lab={\ruleName{funcApp1}}]
@@ -69,11 +68,10 @@ $\Delta$ & $::=$ & $\Delta : \Psi$ & (frame stack) \\
 \and%
 \inferrule*[lab={\ruleName{funcApp2}}]
 {
-    n > 0 \qquad \Delta \vdash e_1 \carrow{n} \gamma_1, \Delta^{[1]} \qquad \Delta^{[1]} \vdash e_2 \carrow{n} \gamma_2, 
-    \Delta^{[2]} \qquad \cdots
+    n > 0 \qquad \forall_{i = 1 \dots n} : \Delta_{[i-1]} \vdash e_i \carrow{n} \tau_i, \Delta_{[i]}
 }
 {
-    \Delta \vdash e_1 (e_2, \dots, e_n) \carrow{n}  \bigcup \gamma_i, \Delta^{[n]}
+    \Delta_{[0]} \vdash e_1 (e_2, \dots, e_n) \carrow{n}  \bigcup \tau_i, \Delta_{[n]}
 }
 \end{mathpar}
 \end{subfigure}
@@ -89,25 +87,24 @@ $\Delta$ & $::=$ & $\Delta : \Psi$ & (frame stack) \\
     \strut
 }
 {
-    \Delta \vdash \exPass \carrow{n} \Delta
+    \Delta \vdash \exPass \carrow{n} \varnothing, \Delta
 }
 \and%
 \inferrule*[lab={\ruleName{assign}}]
 {
-    x \notin \Sigma \qquad \Delta : (\Sigma, \Gamma) \vdash e \carrow{n} \tau, \Delta' : (\Sigma', \Gamma')  
+    (\nexists\, y \,.\, x \in \Gamma(y)) \lor \lnot\, \mathrm{captured}(\Delta, x) \qquad \Delta : (\Sigma, \Gamma) \vdash e \carrow{n} \tau, \Delta' : (\Sigma', \Gamma')
 }
 {
-    \Delta : (\Sigma, \Gamma) \vdash \exAssign{x}{e} \carrow{n} \gamma \setminus \{ x \},  
-    \Delta' : (\Sigma', \mathrm{close}(\Gamma'[x \mapsto \gamma], x)) 
+    \Delta \vdash \exAssign{x}{e} \carrow{n} \tau \setminus \{ x \}, \Delta' : (\Sigma', \mathrm{close}(\Gamma'[x \mapsto \tau], x))
 }
 \and%
 \inferrule*[lab={\ruleName{if1}}]
 {
-    n > 0 \qquad \Delta \vdash e_1 \carrow{n} \gamma_1, \Delta^{[1]} \qquad \Delta^{[1]} \vdash s_1 \carrow{n} \gamma_2, 
-    \Delta^{[2]} \qquad \cdots \qquad \Delta^{[n-1]} \vdash e_n \carrow{n} \gamma_n,  \Delta^{[n]}
+    n > 0 \qquad \Delta \vdash e_1 \carrow{n} \gamma_1, \Delta_{[1]} \qquad \Delta_{[1]} \vdash s_1 \carrow{n} \gamma_2, 
+    \Delta_{[2]} \qquad \cdots \qquad \Delta_{[n-1]} \vdash e_n \carrow{n} \gamma_n,  \Delta_{[n]}
 }
 {
-    \Delta \vdash \exIfElse{e_1}{s_1}{[\exElif{e_i}{s_i}]}{e_n} \carrow{n} \bigcup \gamma_i, \Delta^{[n]}
+    \Delta \vdash \exIfElse{e_1}{s_1}{[\exElif{e_i}{s_i}]}{e_n} \carrow{n} \bigcup \gamma_i, \Delta_{[n]}
 }
 \and%
 \inferrule*[lab={\ruleName{if2}}]
@@ -154,4 +151,73 @@ $\Delta$ & $::=$ & $\Delta : \Psi$ & (frame stack) \\
 \end{subfigure}
 \caption{Open statements typing rules}
 \label{fig:open-stmts-type-rules}
+\end{figure}
+
+\begin{figure}
+\begin{mathpar}
+\footnotesize
+\inferrule
+{
+    x \in \Sigma
+}
+{
+    \mathrm{captured}(\Delta : (\Sigma, \Gamma), x)
+}
+\and%
+\inferrule
+{
+    x \notin \Sigma \qquad \mathrm{captured}(\Delta, x)
+}
+{
+    \mathrm{captured}(\Delta : (\Sigma, \Gamma), x)
+}
+\end{mathpar}
+\newline
+\begin{mathpar}
+\footnotesize
+\inferrule
+{
+    x \in \mathrm{dom}(\Gamma)
+}
+{
+    \mathrm{bound}(\Delta : (\Sigma, \Gamma), x) = \Gamma
+}
+\and%
+\inferrule
+{
+    x \notin \mathrm{dom}(\Gamma) \qquad \mathrm{bound}(\Delta, x) = \hat{\Gamma}
+}
+{
+    \mathrm{bound}(\Delta : (\Sigma, \Gamma), x) = \hat{\Gamma}
+}
+\end{mathpar}
+\newline
+\begin{mathpar}
+\footnotesize
+\inferrule
+{
+    \strut
+}
+{
+    \mathrm{mark}(\varnothing, x) = \varnothing
+}
+\and%
+\inferrule
+{
+    x \in \mathrm{dom}(\Gamma)
+}
+{
+    \mathrm{mark}(\Delta : (\Sigma, \Gamma), x) = \Delta : (\Sigma \cup \{ x \}, \Gamma)
+}
+\and%
+\inferrule
+{
+    x \notin \mathrm{dom}(\Gamma) \qquad \mathrm{mark}(\Delta, x) = \Delta'
+}
+{
+    \mathrm{mark}(\Delta : (\Sigma, \Gamma), x) = \Delta' : (\Sigma, \Gamma)
+}
+\end{mathpar}
+\caption{Auxiliary definitions for open term typing}
+\label{fig:var-capture}
 \end{figure}
