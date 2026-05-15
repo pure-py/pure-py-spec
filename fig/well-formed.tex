@@ -66,27 +66,17 @@
   \Gamma \vdash \exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}} : \Assigns{\statusDefAssigned(\seq{f})}
 }
 \and
-\inferrule*[lab={\ruleName{seq-statement}}]
+\inferrule*[lab={\ruleName{seq}}]
 {
-  \Gamma \vdash t : \Assigns{\Delta} \\
+  \Gamma \vdash s : \Assigns{\Delta} \\
   \Gamma \runion \Delta \vdash b : R \\
-  \mathrm{captures}(t) \cap \assignsF(b) = \varnothing
+  \mathrm{captures}(s) \cap \assignsF(b) = \varnothing
 }
 {
-  \Gamma \vdash t \cons b : \Assigns{\Delta} \runion R
-}
-\and
-\inferrule*[lab={\ruleName{seq-block}}]
-{
-  \Gamma \vdash \seq{d} : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash c : R \\
-  \mathrm{captures}(\seq{d}) \cap \assignsF(c) = \varnothing
-}
-{
-  \Gamma \vdash \seq{d} \cons c : \Assigns{\Delta} \runion R
+  \Gamma \vdash s \cons b : \Assigns{\Delta} \runion R
 }
 \end{mathpar}
-\caption{Well-formedness of statement sequences}
+\caption{Blocks $b$ is well-formed in $\Gamma$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\wf{\Gamma}{e}$}
