@@ -52,12 +52,12 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \rho, \exSeq{s_1}{s_2} \Rightarrow r \runion r'
 }
 \and
-\inferrule*[lab={\ruleName{eval-def}}]
+\inferrule*[lab={\ruleName{eval-mutual}}]
 {
-  \strut
+  \seq{d} = \exDef{f_1}{\vec{x}_1}{\seq{s}_1} \cons \ldots \cons \exDef{f_n}{\vec{x}_n}{\seq{s}_n}
 }
 {
-  \rho, \exDef{f}{\vec{x}}{s} \Rightarrow \assigns{\set{f \mapsto \exClosure{\rho}{\vec{x}}{s}}}
+  \rho, \seq{d} \Rightarrow \assigns{\set{f_1 \mapsto \exDefClosure{\rho}{\seq{d}}{1}, \ldots, f_n \mapsto \exDefClosure{\rho}{\seq{d}}{n}}}
 }
 \end{mathpar}
 \caption{Statement evaluation}
