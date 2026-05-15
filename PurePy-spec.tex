@@ -226,20 +226,20 @@ unreachable statements (\S\ref{sec:unreachable}).
 
 \paragraph{Local variables.}
 
-The function $\locals(s)$ collects the set of variables assigned anywhere in a statement $s$, without
+The function $\assignsF(s)$ collects the set of variables assigned anywhere in a statement $s$, without
 descending into nested function definitions (which have their own scope). If $s : \Assigns{\Delta}$, then
-$\locals(s) = \dom(\Delta)$; $\locals$ is a syntactic approximation needed to set up the context
+$\assignsF(s) = \dom(\Delta)$; $\assignsF$ is a syntactic approximation needed to set up the context
 before checking $s$.
 %
 {\small
 \begin{align*}
-\locals(\exPass) &= \varnothing \\
-\locals(\exAssign{x}{e}) &= \set{x} \\
-\locals(\exReturnNone) &= \varnothing \\
-\locals(\exReturn{e}) &= \varnothing \\
-\locals(\exIf{e_1}{\seq{s}_1}{\exElif{e_2}{\seq{s}_2}\;\ldots\;\exElif{e_{n+1}}{\seq{s}_{n+1}}}) &= \locals(\vec{s}) \\
-\locals(\exIfElse{e_1}{\seq{s}_1}{\exElif{e_2}{\seq{s}_2}\;\ldots\;\exElif{e_{n+1}}{\seq{s}_{n+1}}}{\seq{s}_{n+2}}) &= \locals(\vec{s}) \\
-\locals(\exDef{f_1}{\vec{x}_1}{\seq{s}_1} \cons \ldots \cons \exDef{f_n}{\vec{x}_n}{\seq{s}_n}) &= \set{f_1, \ldots, f_n}
+\assignsF(\exPass) &= \varnothing \\
+\assignsF(\exAssign{x}{e}) &= \set{x} \\
+\assignsF(\exReturnNone) &= \varnothing \\
+\assignsF(\exReturn{e}) &= \varnothing \\
+\assignsF(\exIf{e_1}{\seq{s}_1}{\exElif{e_2}{\seq{s}_2}\;\ldots\;\exElif{e_{n+1}}{\seq{s}_{n+1}}}) &= \assignsF(\vec{s}) \\
+\assignsF(\exIfElse{e_1}{\seq{s}_1}{\exElif{e_2}{\seq{s}_2}\;\ldots\;\exElif{e_{n+1}}{\seq{s}_{n+1}}}{\seq{s}_{n+2}}) &= \assignsF(\vec{s}) \\
+\assignsF(\exDef{f_1}{\vec{x}_1}{\seq{s}_1} \cons \ldots \cons \exDef{f_n}{\vec{x}_n}{\seq{s}_n}) &= \set{f_1, \ldots, f_n}
 \end{align*}}
 
 \paragraph{Captured variables.}
@@ -255,13 +255,13 @@ captured by closures (lambdas or nested function definitions) within $s$:
 \mathrm{captures}(\exReturn{e}) &= \mathrm{captures}(e) \\
 \mathrm{captures}(\exIf{e_1}{\seq{s}_1}{\exElif{e_2}{\seq{s}_2}\;\ldots\;\exElif{e_{n+1}}{\seq{s}_{n+1}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{s}) \\
 \mathrm{captures}(\exIfElse{e_1}{\seq{s}_1}{\exElif{e_2}{\seq{s}_2}\;\ldots\;\exElif{e_{n+1}}{\seq{s}_{n+1}}}{\seq{s}_{n+2}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{s}) \\
-\mathrm{captures}(\exDef{f_1}{\vec{x}_1}{\seq{s}_1} \cons \ldots \cons \exDef{f_n}{\vec{x}_n}{\seq{s}_n}) &= \textstyle\bigcup_i \big(\mathrm{fv}(\seq{s}_i) \setminus (\set{\vec{x}_i} \cup \locals(\seq{s}_i))\big) \\
+\mathrm{captures}(\exDef{f_1}{\vec{x}_1}{\seq{s}_1} \cons \ldots \cons \exDef{f_n}{\vec{x}_n}{\seq{s}_n}) &= \textstyle\bigcup_i \big(\mathrm{fv}(\seq{s}_i) \setminus (\set{\vec{x}_i} \cup \assignsF(\seq{s}_i))\big) \\
 & \quad \setminus \set{f_1, \ldots, f_n}
 \end{align*}}
 
-\noindent Both $\locals$ and $\mathrm{captures}$ extend to statement sequences with
-$\locals(\varepsilon) = \mathrm{captures}(\varepsilon) = \varnothing$ and
-$\locals(s \cons \seq{s}\,') = \locals(s) \cup \locals(\seq{s}\,')$ (similarly for $\mathrm{captures}$).
+\noindent Both $\assignsF$ and $\mathrm{captures}$ extend to statement sequences with
+$\assignsF(\varepsilon) = \mathrm{captures}(\varepsilon) = \varnothing$ and
+$\assignsF(s \cons \seq{s}\,') = \assignsF(s) \cup \assignsF(\seq{s}\,')$ (similarly for $\mathrm{captures}$).
 The function $\mathrm{captures}$ extends to expressions in the obvious way, with the following interesting cases:
 %
 {\small
@@ -369,7 +369,7 @@ returns \pyinline{3} in the case where \pyinline{b} is \pyinline{True}.
 \subsubsection{Function-level scoping of local variables}
 
 In Python, all local variables are scoped to the entire function body, not just from the point of
-assignment onwards. The $\locals$ function in the \ruleName{mutual} rule reflects this: all variables
+assignment onwards. The $\assignsF$ function in the \ruleName{mutual} rule reflects this: all variables
 assigned anywhere in the function body are introduced at $\statusNotDefAssigned$ before the body is checked. This means
 the following program is statically rejected by \PurePy, whereas Python rejects it at runtime with an
 \pyinline{UnboundLocalError}:
@@ -385,7 +385,7 @@ f()
 \end{python}
 
 \noindent Because \pyinline{y} appears on the left-hand side of an assignment in \pyinline{f}, it is in
-$\locals(\seq{s})$ for the body of \pyinline{f}, and is therefore introduced at $\statusNotDefAssigned$ at the top of the
+$\assignsF(\seq{s})$ for the body of \pyinline{f}, and is therefore introduced at $\statusNotDefAssigned$ at the top of the
 function. The reference to \pyinline{y} in \pyinline{x = y} then fails the well-formedness check, since
 $\Gamma(\pyinline{y}) = \statusNotDefAssigned$ rather than $\Gamma(\pyinline{y}) = \statusDefAssigned$.
 
