@@ -39,7 +39,8 @@ sounds intense and/or problematic.
 
 [Aside: from a _typing_ point of view, implementors that want to layer non-trivial type systems on top of
 PurePy would have to contend with multiple definitions of the same function -- so perhaps supporting this
-feature is misguided.]
+feature is misguided. But note that we already have that problem: a non-def variable might have function type,
+and might be assigned different functional in different branches.]
 
 Just ruling them out entirely is one option, but would mean we can no longer define branch-local functions.
 
@@ -130,3 +131,59 @@ structure. (Perhaps Proposal 2 could be understood as a rewriting into a degener
 all statements prior to the last function definition to the beginning of the module.) The advantage over
 Proposal 1 is that breaking a usage cycle within a contiguous block _doesn't_ break forward-references within
 the block, which could be surprising and tedious.
+
+So the runtime picture is: the first statement block is executed, establishing additional assignments as
+normal; then the first mutual block is processed simultaneously, establishing additional function assignments;
+then repeat until the final statement block.
+
+A key consideration is what happens with branch-local statements. I think they can be processed in exactly the
+same way. So for example, the following would be permitted (ignoring non-termination for the purposes of this
+example!):
+
+```python
+if b:
+   def f ():
+      g()
+
+   def g():
+      f()
+
+   # f and g defined mutually; both usable here
+else:
+   def f():
+      pass
+
+   def g():
+      pass
+
+   # f and g defined independently; both usable here
+# both usable here too
+```
+
+whereas:
+
+```python
+if b:
+   def f():
+      g()         # illegal -- g not part of f's contiguous (implicit mutual) block
+
+   if b2:
+      def g():
+         pass
+```
+
+What about _redefining_ existing functions, i.e. if a branch-local `f` tries to forward-reference a
+branch-local `g`, when `g` is already definitely assigned? I think this is covered by the prohibition of
+reassignment of captured variables:
+
+```python
+def g ():
+   pass
+
+if b:
+   def f():
+      g()
+
+   def g():    # illegal; attempt to reassign captured variable
+      f()
+```
