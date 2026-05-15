@@ -56,11 +56,10 @@
 \and
 \inferrule*[lab={\ruleName{mutual}}]
 {
-  \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_{1}) \runion
-  \statusNotDefAssigned(\assignsF(b_1) \setminus \seq{x}_1) \vdash b_1 : R_1
-   \quad\ldots\quad
-   \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_{n+1}) \runion
-   \statusNotDefAssigned(\assignsF(b_{n+1}) \setminus \seq{x}_{n+1}) \vdash b_{n+1} : R_{n+1} \\
+  \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_{i}) \runion
+  \statusNotDefAssigned(\assignsF(b_i) \setminus \seq{x}_i) \vdash b_i : R_i
+  \quad (\forall i)
+  \\
   f_1, \ldots, f_{n+1} \text{ distinct}
 }
 {
