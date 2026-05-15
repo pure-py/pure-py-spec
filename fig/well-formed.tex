@@ -66,8 +66,7 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned, \locals(s) : \statusNotDefAssigned \vdash s : R \\
-  f \notin \mathrm{captures}(\exDef{f}{\vec{x}}{s})
+  \Gamma, f : \statusDefAssigned, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned, \locals(s) : \statusNotDefAssigned \vdash s : R
 }
 {
   \Gamma \vdash \exDef{f}{\vec{x}}{s} : \Assigns{\set{f : \statusDefAssigned}}

@@ -109,7 +109,7 @@ two separate syntaxes
 \textbf{To do} & \\
 Reserved words & \issue{9} \\
 Operators and precedence & \issue{50} \\
-Recursion and mutual recursion & \issue{12} \\
+Mutual recursion & \issue{12} \\
 Operational semantics of \pyinline{if} statements & \\
 Data classes and \pyinline{match} & \issue{8} \\
 N-ary tuples & \issue{51} \\
@@ -422,9 +422,10 @@ def x():
 x()  # Python: returns the function (late binding); pure: returns 5
 \end{python}
 
-\noindent To preserve agreement with Python until such time as recursion is supported, side
-conditions on the \ruleName{assign} and \ruleName{def} rules reject programs like this, requiring that the
-variable being bound is not captured by the expression or function body respectively.
+\noindent The side condition on the \ruleName{assign} rule rejects programs like this, requiring that the
+variable being bound is not captured by the expression. The \ruleName{def} rule, by contrast, binds $f$ in
+the typing context for the body, so $f$ may legitimately appear in $\mathrm{captures}(s)$. This is what
+permits self-recursion.
 
 \subsubsection{Unreachable code}
 \label{sec:unreachable}
