@@ -1,6 +1,6 @@
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash s : R$}
+\flushleft \shadebox{$\Gamma \vdash b : R$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{pass}}]
@@ -59,29 +59,15 @@
   \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_{1}) \runion
   \statusNotDefAssigned(\assignsF(b_1) \setminus \seq{x}_1) \vdash b_1 : R_1
    \quad\ldots\quad
-   \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_{n}) \runion
-   \statusNotDefAssigned(\assignsF(b_n) \setminus \seq{x}_n) \vdash b_n : R_n \\
-  f_1, \ldots, f_n \text{ distinct}
+   \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_{n+1}) \runion
+   \statusNotDefAssigned(\assignsF(b_{n+1}) \setminus \seq{x}_{n+1}) \vdash b_{n+1} : R_{n+1} \\
+  f_1, \ldots, f_{n+1} \text{ distinct}
 }
 {
-  \Gamma \vdash \exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_n}{\vec{x}_n}{b_n} : \Assigns{\statusDefAssigned(\seq{f})}
-}
-\end{mathpar}
-\caption{Statement $s$ is well-formed in $\Gamma$}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash b : R$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{empty}}]
-{
-  \strut
-}
-{
-  \Gamma \vdash \varepsilon : \Assigns{\varnothing}
+  \Gamma \vdash \exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}} : \Assigns{\statusDefAssigned(\seq{f})}
 }
 \and
-\inferrule*[lab={\ruleName{cons-statement}}]
+\inferrule*[lab={\ruleName{seq-statement}}]
 {
   \Gamma \vdash t : \Assigns{\Delta} \\
   \Gamma \runion \Delta \vdash b : R \\
@@ -91,15 +77,17 @@
   \Gamma \vdash t \cons b : \Assigns{\Delta} \runion R
 }
 \and
-\inferrule*[lab={\ruleName{cons-block-final}}]
+\inferrule*[lab={\ruleName{seq-block-then-leaf}}]
 {
-  \Gamma \vdash \seq{d} : \Assigns{\Delta}
+  \Gamma \vdash \seq{d} : \Assigns{\Delta} \\
+  \Gamma \runion \Delta \vdash t : R \\
+  \mathrm{captures}(\seq{d}) \cap \assignsF(t) = \varnothing
 }
 {
-  \Gamma \vdash \seq{d} \cons \varepsilon : \Assigns{\Delta}
+  \Gamma \vdash \seq{d} \cons t : \Assigns{\Delta} \runion R
 }
 \and
-\inferrule*[lab={\ruleName{cons-block-cont}}]
+\inferrule*[lab={\ruleName{seq-block-then-cons}}]
 {
   \Gamma \vdash \seq{d} : \Assigns{\Delta} \\
   \Gamma \runion \Delta \vdash t \cons b : R \\
@@ -109,7 +97,7 @@
   \Gamma \vdash \seq{d} \cons t \cons b : \Assigns{\Delta} \runion R
 }
 \end{mathpar}
-\caption{Statement sequence $b$ is well-formed in $\Gamma$}
+\caption{Well-formedness of statement sequences}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\wf{\Gamma}{e}$}
