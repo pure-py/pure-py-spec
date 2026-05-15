@@ -3,7 +3,9 @@ def even(n):
         return True
     return odd(n - 1)
 
-x = even(0)  # ok; doesn't call odd (late binding)
+# ok in Python; doesn't call odd (late binding)
+# but we will probably reject under any formulation of mutual recursion because statically even uses odd
+x = even(0)
 print(x)
 
 def odd(n):
