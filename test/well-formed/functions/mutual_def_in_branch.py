@@ -4,7 +4,7 @@ if b:
     def f():
         return g()
     def g():
-        return "via mutual block"
+        return "via mutual region"
 else:
     def f():
         return "f independent"

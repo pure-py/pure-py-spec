@@ -477,7 +477,7 @@ if b:
     def f():
         return g()
     def g():
-        return "via mutual block"
+        return "via mutual region"
 else:
     def f():
         return "f independent"
@@ -507,8 +507,8 @@ second \pyinline{def g}.)
 Wrapping the second \pyinline{def f; def g} pair in a conditional sidesteps the duplicate-name issue:
 the outer \pyinline{def g} and the inner \pyinline{def g} are now in different blocks, so they no longer
 fall in the same region. One might still expect a captured-variable problem, since the inner
-\pyinline{def g} could be seen as rebinding the outer \pyinline{g} that \pyinline{f} captures. But it is
-not:
+\pyinline{def g} could be seen as rebinding the outer \pyinline{g} that \pyinline{f} captures. No such
+problem arises:
 
 \begin{python}
 def g():
