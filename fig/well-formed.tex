@@ -56,14 +56,15 @@
 \and
 \inferrule*[lab={\ruleName{mutual}}]
 {
-  \Delta = \set{\seq{f : \statusDefAssigned}} \\
-  \Gamma \runion \Delta, x_{1,1} : \statusDefAssigned, \ldots, x_{1,k_1} : \statusDefAssigned, \seq{\assigns(\seq{s}_1) : \statusNotDefAssigned} \vdash \seq{s}_1 : R_1
+  \Gamma \runion \statusDefAssigned(\seq{f}), \statusDefAssigned(\seq{x}_{1}),
+  \statusNotDefAssigned(\assignsF(\seq{s}_1)) \vdash \seq{s}_1 : R_1
    \quad\ldots\quad
-   \Gamma \runion \Delta, x_{n,1} : \statusDefAssigned, \ldots, x_{n,k_n} : \statusDefAssigned, \assigns(\seq{s}_n) : \statusNotDefAssigned \vdash \seq{s}_n : R_n \\
+   \Gamma \runion \statusDefAssigned(\seq{f}), \statusDefAssigned(\seq{x}_{n}),
+   \statusNotDefAssigned(\assignsF(\seq{s}_n)) \vdash \seq{s}_n : R_n \\
   f_1, \ldots, f_n \text{ distinct}
 }
 {
-  \Gamma \vdash \exDef{f_1}{\vec{x}_1}{\seq{s}_1} \cons \ldots \cons \exDef{f_n}{\vec{x}_n}{\seq{s}_n} : \Assigns{\Delta}
+  \Gamma \vdash \exDef{f_1}{\vec{x}_1}{\seq{s}_1} \cons \ldots \cons \exDef{f_n}{\vec{x}_n}{\seq{s}_n} : \Assigns{\statusDefAssigned(\seq{f})}
 }
 \end{mathpar}
 \caption{Statement $s$ is well-formed in $\Gamma$}
@@ -84,7 +85,7 @@
 {
   \Gamma \vdash s : \Assigns{\Delta} \\
   \Gamma \runion \Delta \vdash \seq{s}\,' : R \\
-  \mathrm{captures}(s) \cap \assigns(\seq{s}\,') = \varnothing \\
+  \mathrm{captures}(s) \cap \assignsF(\seq{s}\,') = \varnothing \\
   \neg(s \text{ is a mutual block} \wedge \seq{s}\,' \text{ begins with a mutual block})
 }
 {
