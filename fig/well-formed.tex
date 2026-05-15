@@ -76,24 +76,14 @@
   \Gamma \vdash t \cons b : \Assigns{\Delta} \runion R
 }
 \and
-\inferrule*[lab={\ruleName{seq-block-then-leaf}}]
+\inferrule*[lab={\ruleName{seq-block}}]
 {
   \Gamma \vdash \seq{d} : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash t : R \\
-  \mathrm{captures}(\seq{d}) \cap \assignsF(t) = \varnothing
+  \Gamma \runion \Delta \vdash c : R \\
+  \mathrm{captures}(\seq{d}) \cap \assignsF(c) = \varnothing
 }
 {
-  \Gamma \vdash \seq{d} \cons t : \Assigns{\Delta} \runion R
-}
-\and
-\inferrule*[lab={\ruleName{seq-block-then-cons}}]
-{
-  \Gamma \vdash \seq{d} : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash t \cons b : R \\
-  \mathrm{captures}(\seq{d}) \cap \assignsF(t \cons b) = \varnothing
-}
-{
-  \Gamma \vdash \seq{d} \cons t \cons b : \Assigns{\Delta} \runion R
+  \Gamma \vdash \seq{d} \cons c : \Assigns{\Delta} \runion R
 }
 \end{mathpar}
 \caption{Well-formedness of statement sequences}

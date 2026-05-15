@@ -2,21 +2,17 @@
 \small
 \begin{center}
 \begin{tabular}{rcll}
-$t$ & $::=$ & $\exPass$ & (Pass) \\
+$s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exAssign{x}{e}$ & (Assign) \\
     & $\mid$ & $\exReturnNone$ & (ReturnNone) \\
     & $\mid$ & $\exReturn{e}$ & (Return) \\
     & $\mid$ & $\exIf{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}$ & (If) \\
-    & $\mid$ & $\exIfElse{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}{b'}$ & (IfElse)
+    & $\mid$ & $\exIfElse{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}{b'}$ & (IfElse) \\
+    & $\mid$ & $d_1 \;\ldots\; d_{n+1}$ & (MutualDefs)
+   \\[3mm]
+$b$ & $::=$ & $s_1 \;\ldots\; s_{n+1}$ & (Block)
    \\[3mm]
 $d$ & $::=$ & $\exDef{f}{\vec{x}}{b}$ & (Def)
-   \\[3mm]
-$b$ & $::=$ & $c$ & (StatementHeaded) \\
-    & $\mid$ & $d_1 \;\ldots\; d_{n+1}$ & (MutualBlock) \\
-    & $\mid$ & $d_1 \;\ldots\; d_{n+1} \cons c$ & (MutualBlockCons)
-   \\[3mm]
-$c$ & $::=$ & $t$ & (Statement) \\
-    & $\mid$ & $t \cons b$ & (StatementCons)
    \\[3mm]
 $e$ & $::=$ & $x$ & (Var) \\
     & $\mid$ & $n$ & (Literal) \\
@@ -39,4 +35,5 @@ $R, S$ & $::=$ & $\Returns$ & \\
 \end{tabular}
 \end{center}
 \caption{Syntax of statements, expressions and contexts}
+\label{fig:syntax}
 \end{figure}
