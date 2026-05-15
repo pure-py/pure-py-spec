@@ -94,10 +94,10 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \and
 \inferrule*[right=call-def]
 {
-  \rho, e \Rightarrow \exDefClosure{\rho'}{\seq{d}}{i} \\
+  \rho, e \Rightarrow \exDefClosure{\rho'}{\seq{d}}{j} \\
   d_i = \exDef{f_i}{\vec{x}_i}{\seq{s}_i} \quad (\forall i) \\
   \rho, \vec{e} \Rightarrow \vec{v} \\
-  \rho' \runion \set{f_1 \mapsto \exDefClosure{\rho'}{\seq{d}}{1}, \ldots, f_n \mapsto \exDefClosure{\rho'}{\seq{d}}{n}} \runion \set{x_{i,1} \mapsto v_1, \ldots, x_{i,k_i} \mapsto v_{k_i}}, \seq{s}_i \Rightarrow \returns{v'}
+  \rho' \runion \set{f_1 \mapsto \exDefClosure{\rho'}{\seq{d}}{1}, \ldots, f_n \mapsto \exDefClosure{\rho'}{\seq{d}}{n}} \runion \set{\seq{x}_j \mapsto \seq{v}}, \seq{s}_j \Rightarrow \returns{v'}
 }
 {
   \rho, \exApp{e}{\vec{e}} \Rightarrow v'
