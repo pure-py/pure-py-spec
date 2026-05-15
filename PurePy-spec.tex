@@ -451,6 +451,97 @@ A \pyinline{return} statement without an expression is equivalent to \pyinline{r
 A function whose body $s$ assigns rather than returns is equivalent to a function whose body is $s$ followed
 by \pyinline{return None}. This ensures every function returns, even if it is not explicitly specified.
 
+\subsubsection{Late binding and mutual recursion}
+
+Python uses a form of \emph{late binding}, where most variables only need to be defined at execution time. For example, 
+the following program is valid: 
+
+\begin{python}
+def foo():
+    return x
+
+x = 10
+y = foo()
+\end{python}
+
+While \pyinline{x} is not defined before its usage inside the definition of \pyinline{foo}, it is defined by the
+time the function is called. Therefore, Python uses a limited form of \emph{dynamic scoping}. In PurePy, we would
+like to restrict this form of scoping to something that is easier to statically analyse, and less error-prone 
+(see Section~\ref{sec:captured-vars}). However, some forms of late binding must be allowed, as we could otherwise not
+define (mutually) recursive functions:
+
+\begin{python}
+def even(n):
+    if n == 0: return True
+    else: odd (n-1)
+
+def odd(n):
+    if n == 0: return False
+    else: return even (n-1)
+\end{python}
+
+The function \pyinline{even} refers to \pyinline{odd} before that function is defined. We restrict the
+allowed forms of late binding by the introduction of a type system, which uses \emph{open term types},
+i.e., a term is allowed to be dependent on yet undefined variables.
+
+Figure~\ref{fig:open-term-types} introduces several auxiliary symbols we need for the typing rules. Each
+open term (i.e, statement or expression) has an \emph{open term type} $\tau$, which denotes the set of
+variable names that are unbound in the respective term.
+
+As with other programming languages, scoping in Python and PurePy has nesting, i.e., each \pyinline{def}
+and \pyinline{lambda} opens a new scope. Therefore, the typing rules are expressed in terms of 
+\emph{frames} $\Psi$, which correspond to the different nesting levels. A particular frame $\Psi$ consists
+of the set of \emph{closure variables} $\Sigma$, i.e., the set of variables defined in the current frame
+that are used within a closure (see Section~\ref{sec:captured-vars}), and an \emph{environment} $\Gamma$,
+which maps variable names to open term types. Finally, a \emph{frame stack} $\Delta$ holds the nested
+scoping frames.
+
+Figures~\ref{fig:open-stmts-type-rules} and \ref{fig:open-expr-type-rules} illustrate the typing relation for statements
+and expressions respectively. Both have the same shape, where a statement or an expression evaluates under a
+stack $\Delta$ to an open type $\tau$ and an updated stack $\Delta'$. Statements can change the stack by introducing
+new bindings in $\Gamma$ through assignments at the top-most frame, while expressions can change the set of closure 
+variables $\Sigma$ at any nesting depth (e.g., a free variable might be closed by a binding which is defined at any 
+enclosing scope).
+
+We will start by illustrating the typing rules for expressions. A constant has an empty type, and does not change
+the stack. For variables, there are three different cases. In $\ruleName{var1}$, the variable is
+already bound in the current scope $\Gamma$. Therefore, its type can be read from the environment, and the
+variable itself is added to the set of closure variables at the current scope level (to circumvent the issue explained in
+Section~\ref{sec:captured-vars}). If the variable is not bound in the current environment, it is typed at the
+surrounding scope as shown in $\ruleName{var2}$. The base-case is illustrated by $\ruleName{var3}$, where a variable
+is typed at the global scope (i.e. $\carrow{0}$). If the variable is not defined at the global scope either, it receives
+itself as an open term type.
+
+Lambdas introduce a new frame onto the stack, where the set of closure variables is empty, and the environment only
+maps the bound parameters of the lambda to empty open types. The body of the lambda term is then typed at a nested
+scope (i.e., $\carrow{n+1}$).
+
+For function application, two different rules apply. If the function application happens at global scope (i.e.,
+$\carrow{0}$), then all terms of the application must have empty open types (i.e., they cannot depend on variables
+that are not yet defined). If the application is inside a nested scope (e.g., under a \pyinline{def} or \pyinline{lambda})
+then each individual term is typed in sequence, where the returned type is then the union of the open term types, and
+the returned stack the one of the last typing judgement.
+
+For statements, the $\ruleName{pass}$ is trivial. For an assignment, the assigned variable cannot be part of the set of
+closure variables at the current scoping level. The returned type is the type of the right-hand side expression without
+the name currently being defined. The function $\mathrm{close}$ removes the second argument from all bindings in the
+updated environment (i.e., $\mathrm{close}(\Gamma, x)(y) = \Gamma(y) \setminus \{x\}$).
+
+The rules for conditional evaluation ($\ruleName{if1}$ and $\ruleName{if2}$) follow a similar structure to the ones for
+function evaluation. If the conditional statement is on the global scope (i.e., $\carrow{0}$), then all sub-expressions
+and sub-statements must be closed. If it is inside a nested scope, each sub-term is typed in sequence, and the
+returned type is again the union of the open term types of the sub-terms.  
+
+The rule for function definition $\ruleName{def}$ works similarly to the one for lambda expressions, with the added step of
+closing the environment by the function name $f$ in the returned environment stack.
+
+The rules for return and empty return are trivial again, they have a restriction on the nesting depth, so that they can only
+appear inside function definitions and not on a global scope.
+
+The rule for statement sequence is also trivial.
+
+\input{fig/open-term-typing}
+
 \subsection{Unsupported Python features}
 
 The following Python features are excluded from \PurePy as they are incompatible with purity or
