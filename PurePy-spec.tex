@@ -145,12 +145,12 @@ an idempotent commutative semigroup of parallel composition $\merge$ (``merge'')
 distributivity does not hold. Both operations are defined pointwise via operations on $\B_{\bot}$:
 %
 \begin{definition}[Override and merge]
-For $a, b \in \B$:
+For $a, a' \in \B$:
 {\small
 \begin{align*}
-\bot \runion b = b \runion \bot &= b & \bot \merge \bot &= \bot \\
-a \runion b &= b & b \merge \bot = \bot \merge b &= \statusNotDefAssigned \\
-& & a \merge b &= a \meet b
+\bot \runion a = a \runion \bot &= a & \bot \merge \bot &= \bot \\
+a \runion a' &= a' & a \merge \bot = \bot \merge a &= \statusNotDefAssigned \\
+& & a \merge a' &= a \meet a'
 \end{align*}}
 \end{definition}
 
@@ -235,32 +235,34 @@ before checking $s$.
 \begin{align*}
 \locals(\exPass) &= \varnothing \\
 \locals(\exAssign{x}{e}) &= \set{x} \\
-\locals(\exSeq{s_1}{s_2}) &= \locals(s_1) \cup \locals(s_2) \\
 \locals(\exReturnNone) &= \varnothing \\
 \locals(\exReturn{e}) &= \varnothing \\
-\locals(\exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}) &= \locals(\vec{s}) \\
-\locals(\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}}) &= \locals(\vec{s}) \\
-\locals(\exDef{f}{\vec{x}}{s}) &= \set{f}
+\locals(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\cdots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \locals(\vec{b}) \\
+\locals(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\cdots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \locals(\vec{b}) \\
+\locals(\exDef{f_1}{\vec{x}_1}{b_1} \cons \cdots \cons \exDef{f_n}{\vec{x}_n}{b_n}) &= \set{f_1, \ldots, f_n}
 \end{align*}}
 
 \paragraph{Captured variables.}
 
 The function $\mathrm{captures}(s)$ collects the set of variables from the enclosing scope that are
-captured by a closure (lambda or nested function definition) within $s$:
+captured by closures (lambdas or nested function definitions) within $s$:
 %
 {\small
 \begin{align*}
 \mathrm{captures}(\exPass) &= \varnothing \\
 \mathrm{captures}(\exAssign{x}{e}) &= \mathrm{captures}(e) \\
-\mathrm{captures}(\exSeq{s_1}{s_2}) &= \mathrm{captures}(s_1) \cup \mathrm{captures}(s_2) \\
 \mathrm{captures}(\exReturnNone) &= \varnothing \\
 \mathrm{captures}(\exReturn{e}) &= \mathrm{captures}(e) \\
-\mathrm{captures}(\exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{s}) \\
-\mathrm{captures}(\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{s}) \\
-\mathrm{captures}(\exDef{f}{\vec{x}}{s}) &= \mathrm{fv}(s) \setminus (\set{\vec{x}} \cup \locals(s))
+\mathrm{captures}(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\cdots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{b}) \\
+\mathrm{captures}(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\cdots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{b}) \\
+\mathrm{captures}(\exDef{f_1}{\vec{x}_1}{b_1} \cons \cdots \cons \exDef{f_n}{\vec{x}_n}{b_n}) &= \textstyle\bigcup_i \big(\mathrm{fv}(b_i) \setminus (\set{\vec{x}_i} \cup \locals(b_i))\big) \\
+& \quad \setminus \set{f_1, \ldots, f_n}
 \end{align*}}
 
-\noindent The function extends to expressions in the obvious way, with the following interesting cases:
+\noindent Both $\locals$ and $\mathrm{captures}$ extend to statement sequences with
+$\locals(\varepsilon) = \mathrm{captures}(\varepsilon) = \varnothing$ and
+$\locals(s \cons b) = \locals(s) \cup \locals(b)$ (similarly for $\mathrm{captures}$).
+The function $\mathrm{captures}$ extends to expressions in the obvious way, with the following interesting cases:
 %
 {\small
 \begin{align*}
@@ -367,7 +369,7 @@ returns \pyinline{3} in the case where \pyinline{b} is \pyinline{True}.
 \subsubsection{Function-level scoping of local variables}
 
 In Python, all local variables are scoped to the entire function body, not just from the point of
-assignment onwards. The $\locals$ function in the \ruleName{def} rule reflects this: all variables
+assignment onwards. The $\locals$ function in the \ruleName{mutual} rule reflects this: all variables
 assigned anywhere in the function body are introduced at $\statusNotDefAssigned$ before the body is checked. This means
 the following program is statically rejected by \PurePy, whereas Python rejects it at runtime with an
 \pyinline{UnboundLocalError}:
@@ -383,7 +385,7 @@ f()
 \end{python}
 
 \noindent Because \pyinline{y} appears on the left-hand side of an assignment in \pyinline{f}, it is in
-$\locals(s)$ for the body of \pyinline{f}, and is therefore introduced at $\statusNotDefAssigned$ at the top of the
+$\locals(b)$ for the body of \pyinline{f}, and is therefore introduced at $\statusNotDefAssigned$ at the top of the
 function. The reference to \pyinline{y} in \pyinline{x = y} then fails the well-formedness check, since
 $\Gamma(\pyinline{y}) = \statusNotDefAssigned$ rather than $\Gamma(\pyinline{y}) = \statusDefAssigned$.
 
@@ -406,8 +408,8 @@ def f():
 \pyinline{g()} returns \pyinline{6} and the result is \pyinline{12}. In a pure semantics where
 \pyinline{x = 6} shadows the earlier binding, \pyinline{g()} would return \pyinline{5} and the result
 would be \pyinline{11}. To preserve agreement with a subset of Python, we exclude this program from
-\PurePy: the side condition in the \ruleName{seq} rule requires that no variable captured by $s_1$ is
-reassigned by $s_2$. Here \pyinline{x} is captured by
+\PurePy: the side condition in the \ruleName{cons} rule requires that no variable captured by $s$ is
+reassigned in the rest of the sequence $b$. Here \pyinline{x} is captured by
 the definition of \pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected. This is
 analogous to Java's requirement that local variables captured by a lambda must be \emph{effectively
 final}~\cite[\S15.27.2]{gosling2025}: local variables are allocated on the stack, and so only the value
@@ -423,9 +425,10 @@ x()  # Python: returns the function (late binding); pure: returns 5
 \end{python}
 
 \noindent The side condition on the \ruleName{assign} rule rejects programs like this, requiring that the
-variable being bound is not captured by the expression. The \ruleName{def} rule, by contrast, binds $f$ in
-the typing context for the body, so $f$ may legitimately appear in $\mathrm{captures}(s)$. This is what
-permits self-recursion.
+variable being bound is not captured by the expression. The \ruleName{mutual} rule, by contrast, binds
+each $f_i$ in the typing context for every body $b_i$, so the function names may legitimately appear in
+$\mathrm{captures}$ of those bodies. This is what permits self-recursion (the singleton-block case) and
+mutual recursion within a block.
 
 \subsubsection{Unreachable code}
 \label{sec:unreachable}
