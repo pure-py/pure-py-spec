@@ -4,12 +4,15 @@
 \begin{tabular}{rcll}
 $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exAssign{x}{e}$ & (Assign) \\
-    & $\mid$ & $\exSeq{s_1}{s_2}$ & (Seq) \\
     & $\mid$ & $\exReturnNone$ & (ReturnNone) \\
     & $\mid$ & $\exReturn{e}$ & (Return) \\
-    & $\mid$ & $\exIf{e}{s}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}$ & (If) \\
-    & $\mid$ & $\exIfElse{e}{s}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}{s'}$ & (IfElse) \\
-    & $\mid$ & $\exDef{f}{\vec{x}}{s}$ & (Def)
+    & $\mid$ & $\exIf{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}$ & (If) \\
+    & $\mid$ & $\exIfElse{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}{b'}$ & (IfElse) \\
+    & $\mid$ & $d_1 \;\ldots\; d_{n+1}$ & (MutualRegion)
+   \\[3mm]
+$b$ & $::=$ & $s_1 \;\ldots\; s_{n+1}$ & (Block)
+   \\[3mm]
+$d$ & $::=$ & $\exDef{f}{\vec{x}}{b}$ & (Def)
    \\[3mm]
 $e$ & $::=$ & $x$ & (Var) \\
     & $\mid$ & $n$ & (Literal) \\
@@ -26,13 +29,11 @@ $e$ & $::=$ & $x$ & (Var) \\
 $q$ & $::=$ & $\qualGuard{e}$ & (Guard) \\
     & $\mid$ & $\qualGenerator{x}{e}$ & (Generator)
    \\[3mm]
-$b$ & $::=$ & $\statusDefAssigned$ & (Definitely assigned) \\
-    & $\mid$ & $\statusNotDefAssigned$ & (Not definitely assigned)
-   \\[3mm]
-$\Gamma, \Delta$ & $::=$ & $\set{\vec{x:b}}$ \\[3mm]
+$\Gamma, \Delta$ & $::=$ & $\set{\vec{x:\B}}$ & \\[3mm]
 $R, S$ & $::=$ & $\Returns$ & \\
-    & $\mid$ & $\Assigns{}{\Delta}$ &
+    & $\mid$ & $\Assigns{\Delta}$ &
 \end{tabular}
 \end{center}
 \caption{Syntax of statements, expressions and contexts}
+\label{fig:syntax}
 \end{figure}

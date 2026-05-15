@@ -6,6 +6,9 @@
   \gdef\versionstring{#1.#2.#3}%
 }
 
+\newcommand*{\figref}[1]{Figure~\ref{fig:#1}}
+\newcommand*{\figrefTwo}[2]{Figures \ref{fig:#1} and \ref{fig:#2}}
+
 \definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
 \newcommand*{\shadebox}[1]{\fcolorbox{lightgray}{shadecolor}{\raisebox{0pt}[0.60\baselineskip][0.05\baselineskip]{#1}}}
 \newcommand*{\ruleName}[1]{\textcolor{gray}{\textnormal{\textsf{#1}}}}
@@ -15,7 +18,7 @@
 \newcommand*{\disjunion}{\uplus}
 \newcommand*{\set}[1]{\{#1\}}
 
-\newcommand*{\locals}{\mathrm{assigns}}
+\newcommand*{\assignsF}{\mathrm{assigns}}
 \newcommand*{\wf}[2]{#1 \vdash #2}
 \newcommand*{\Assigns}[1]{\mathsf{Assigns}\;#1}
 \newcommand*{\Returns}{\mathsf{Returns}}
@@ -39,6 +42,7 @@
 % statements and values
 \newcommand*{\exAssign}[2]{#1 = #2}
 \newcommand*{\exClosure}[3]{\langle#1, #2, #3\rangle}
+\newcommand*{\exDefClosure}[3]{\langle#1, #2, #3\rangle}
 \newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
 \newcommand*{\exElif}[2]{\pyinline{elif}\;#1:\;#2}
 \newcommand*{\exFunCall}[2]{#1(#2)}
@@ -55,6 +59,7 @@
 \newcommand*{\meet}{\wedge}
 \newcommand*{\merge}{\oplus}
 \newcommand*{\B}{\mathbb{B}}
+\newcommand*{\seq}[1]{\vec{#1}}
 
 % operational semantics
 \newcommand{\assigns}[1]{\mathsf{assigns}\;#1}

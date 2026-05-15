@@ -104,12 +104,19 @@ two separate syntaxes
 
 \section{Syntax}
 
+The syntax of the language is given in \figref{syntax}. A \emph{block} is a non-empty sequence of
+statements; either a top-level statement, a \pyinline{def} body, or a branch of a conditional. A
+\emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal contiguous non-empty sequence of \pyinline{def}
+statements in a block: any non-\pyinline{def} statement in that block, by definition, separates mutual
+regions. Maximality is not enforced by the grammar in \figref{syntax}; the parser is responsible for
+grouping consecutive \pyinline{def}s into a single region. The well-formedness rules treat each region as
+one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
+
 {\small
 \begin{tabular}{ll}
 \textbf{To do} & \\
 Reserved words & \issue{9} \\
 Operators and precedence & \issue{50} \\
-Recursion and mutual recursion & \issue{12} \\
 Operational semantics of \pyinline{if} statements & \\
 Data classes and \pyinline{match} & \issue{8} \\
 N-ary tuples & \issue{51} \\
@@ -145,12 +152,12 @@ an idempotent commutative semigroup of parallel composition $\merge$ (``merge'')
 distributivity does not hold. Both operations are defined pointwise via operations on $\B_{\bot}$:
 %
 \begin{definition}[Override and merge]
-For $a, b \in \B$:
+For $a, a' \in \B$:
 {\small
 \begin{align*}
-\bot \runion b = b \runion \bot &= b & \bot \merge \bot &= \bot \\
-a \runion b &= b & b \merge \bot = \bot \merge b &= \statusNotDefAssigned \\
-& & a \merge b &= a \meet b
+\bot \runion a = a \runion \bot &= a & \bot \merge \bot &= \bot \\
+a \runion a' &= a' & a \merge \bot = \bot \merge a &= \statusNotDefAssigned \\
+& & a \merge a' &= a \meet a'
 \end{align*}}
 \end{definition}
 
@@ -226,41 +233,43 @@ unreachable statements (\S\ref{sec:unreachable}).
 
 \paragraph{Local variables.}
 
-The function $\locals(s)$ collects the set of variables assigned anywhere in a statement $s$, without
+The function $\assignsF(s)$ collects the set of variables assigned anywhere in a statement $s$, without
 descending into nested function definitions (which have their own scope). If $s : \Assigns{\Delta}$, then
-$\locals(s) = \dom(\Delta)$; $\locals$ is a syntactic approximation needed to set up the context
+$\assignsF(s) = \dom(\Delta)$; $\assignsF$ is a syntactic approximation needed to set up the context
 before checking $s$.
 %
 {\small
 \begin{align*}
-\locals(\exPass) &= \varnothing \\
-\locals(\exAssign{x}{e}) &= \set{x} \\
-\locals(\exSeq{s_1}{s_2}) &= \locals(s_1) \cup \locals(s_2) \\
-\locals(\exReturnNone) &= \varnothing \\
-\locals(\exReturn{e}) &= \varnothing \\
-\locals(\exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}) &= \locals(\vec{s}) \\
-\locals(\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}}) &= \locals(\vec{s}) \\
-\locals(\exDef{f}{\vec{x}}{s}) &= \set{f}
+\assignsF(\exPass) &= \varnothing \\
+\assignsF(\exAssign{x}{e}) &= \set{x} \\
+\assignsF(\exReturnNone) &= \varnothing \\
+\assignsF(\exReturn{e}) &= \varnothing \\
+\assignsF(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \assignsF(\vec{b}) \\
+\assignsF(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \assignsF(\vec{b}) \\
+\assignsF(\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}) &= \set{f_1, \ldots, f_{n+1}}
 \end{align*}}
 
 \paragraph{Captured variables.}
 
 The function $\mathrm{captures}(s)$ collects the set of variables from the enclosing scope that are
-captured by a closure (lambda or nested function definition) within $s$:
+captured by closures (lambdas or nested function definitions) within $s$:
 %
 {\small
 \begin{align*}
 \mathrm{captures}(\exPass) &= \varnothing \\
 \mathrm{captures}(\exAssign{x}{e}) &= \mathrm{captures}(e) \\
-\mathrm{captures}(\exSeq{s_1}{s_2}) &= \mathrm{captures}(s_1) \cup \mathrm{captures}(s_2) \\
 \mathrm{captures}(\exReturnNone) &= \varnothing \\
 \mathrm{captures}(\exReturn{e}) &= \mathrm{captures}(e) \\
-\mathrm{captures}(\exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{s}) \\
-\mathrm{captures}(\exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{s}) \\
-\mathrm{captures}(\exDef{f}{\vec{x}}{s}) &= \mathrm{fv}(s) \setminus (\set{\vec{x}} \cup \locals(s))
+\mathrm{captures}(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{b}) \\
+\mathrm{captures}(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{b}) \\
+\mathrm{captures}(\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}) &= \textstyle\bigcup_i \big(\mathrm{fv}(b_i) \setminus (\set{\vec{x}_i} \cup \assignsF(b_i))\big) \\
+& \quad \setminus \set{f_1, \ldots, f_{n+1}}
 \end{align*}}
 
-\noindent The function extends to expressions in the obvious way, with the following interesting cases:
+\noindent Both $\assignsF$ and $\mathrm{captures}$ extend to blocks via
+$\assignsF(s \cons b) = \assignsF(s) \cup \assignsF(b)$ (similarly for $\mathrm{captures}$), with the
+singleton block $s$ giving $\assignsF(s)$ as already defined.
+The function $\mathrm{captures}$ extends to expressions in the obvious way, with the following interesting cases:
 %
 {\small
 \begin{align*}
@@ -270,9 +279,9 @@ captured by a closure (lambda or nested function definition) within $s$:
 
 \paragraph{Well-formedness judgement.}
 
-Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a set of variables
+Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
-= e} definitely assigns $\set{\pyinline{x}}$.
+= e} definitely assigns $\set{\pyinline{x} : \statusDefAssigned}$.
 
 \input{fig/well-formed}
 
@@ -367,7 +376,7 @@ returns \pyinline{3} in the case where \pyinline{b} is \pyinline{True}.
 \subsubsection{Function-level scoping of local variables}
 
 In Python, all local variables are scoped to the entire function body, not just from the point of
-assignment onwards. The $\locals$ function in the \ruleName{def} rule reflects this: all variables
+assignment onwards. The $\assignsF$ function in the \ruleName{mutual} rule reflects this: all variables
 assigned anywhere in the function body are introduced at $\statusNotDefAssigned$ before the body is checked. This means
 the following program is statically rejected by \PurePy, whereas Python rejects it at runtime with an
 \pyinline{UnboundLocalError}:
@@ -383,11 +392,11 @@ f()
 \end{python}
 
 \noindent Because \pyinline{y} appears on the left-hand side of an assignment in \pyinline{f}, it is in
-$\locals(s)$ for the body of \pyinline{f}, and is therefore introduced at $\statusNotDefAssigned$ at the top of the
+$\assignsF(b)$ for the body of \pyinline{f}, and is therefore introduced at $\statusNotDefAssigned$ at the top of the
 function. The reference to \pyinline{y} in \pyinline{x = y} then fails the well-formedness check, since
 $\Gamma(\pyinline{y}) = \statusNotDefAssigned$ rather than $\Gamma(\pyinline{y}) = \statusDefAssigned$.
 
-\subsubsection{Shadowing of captured variables}
+\subsubsection{Reassignment of captured variables}
 \label{sec:captured-vars}
 
 Once a variable has been captured by a closure, it cannot be reassigned in the enclosing scope, because
@@ -406,8 +415,8 @@ def f():
 \pyinline{g()} returns \pyinline{6} and the result is \pyinline{12}. In a pure semantics where
 \pyinline{x = 6} shadows the earlier binding, \pyinline{g()} would return \pyinline{5} and the result
 would be \pyinline{11}. To preserve agreement with a subset of Python, we exclude this program from
-\PurePy: the side condition in the \ruleName{seq} rule requires that no variable captured by $s_1$ is
-reassigned by $s_2$. Here \pyinline{x} is captured by
+\PurePy: the side condition in the \ruleName{seq} rule requires that no variable captured by
+$s$ is reassigned in the rest of the block $b$. Here \pyinline{x} is captured by
 the definition of \pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected. This is
 analogous to Java's requirement that local variables captured by a lambda must be \emph{effectively
 final}~\cite[\S15.27.2]{gosling2025}: local variables are allocated on the stack, and so only the value
@@ -422,9 +431,100 @@ def x():
 x()  # Python: returns the function (late binding); pure: returns 5
 \end{python}
 
-\noindent To preserve agreement with Python until such time as recursion is supported, side
-conditions on the \ruleName{assign} and \ruleName{def} rules reject programs like this, requiring that the
-variable being bound is not captured by the expression or function body respectively.
+\noindent The side condition on the \ruleName{assign} rule rejects programs like this, requiring that the
+variable being bound is not captured by the expression. The \ruleName{mutual} rule, by contrast, binds
+each $f_i$ in the typing context for every body $b_i$, so the function names may legitimately appear in
+$\mathrm{captures}$ of those bodies. This is what permits self-recursion (the singleton-region case) and
+mutual recursion within a region.
+
+\subsubsection{Mutual recursion}
+\label{sec:mutual-recursion}
+
+The \ruleName{mutual} rule binds the names $f_1, \ldots, f_{n+1}$ of a mutual region $d_1 \ldots d_{n+1}$
+simultaneously. Each body $b_i$ is checked in a context that includes all the $f_j$ as definitely
+assigned, so any $f_j$ may reference any other $f_k$ within the region (the singleton case $n = 0$
+permits self-recursion). The names in a region must be distinct.
+
+Inserting any non-\pyinline{def} statement between two \pyinline{def}s splits them into separate regions,
+breaking the mutual reference:
+
+\begin{python}
+def even(n):
+    if n == 0:
+        return True
+    return odd(n - 1)
+
+x = even(0)  # intervening statement separates the regions
+
+def odd(n):
+    if n == 0:
+        return False
+    return even(n - 1)
+\end{python}
+
+\noindent This program is rejected statically: \pyinline{even} forms a singleton region in which
+\pyinline{odd} is not yet bound, so the reference to \pyinline{odd} in its body fails the
+\ruleName{var} rule. Python accepts it: the call \pyinline{even(0)} does not actually reach
+\pyinline{odd}, and Python's late binding means \pyinline{odd} is only looked up when needed.
+
+Each branch of a conditional may contain its own mutual regions, subject to the usual definite assignment
+rules. The following is well-formed because both branches define both names:
+
+\begin{python}
+b = True
+
+if b:
+    def f():
+        return g()
+    def g():
+        return "via mutual region"
+else:
+    def f():
+        return "f independent"
+    def g():
+        return "g independent"
+
+print(f())
+print(g())
+\end{python}
+
+A region containing two definitions of the same name is rejected directly by the \ruleName{mutual}
+rule's distinct-names side condition:
+
+\begin{python}
+def g():
+    return 0
+
+def f():
+    return g()
+def g():     # error: g defined twice in the same region
+    return 1
+\end{python}
+
+\noindent (Python accepts this; late binding makes \pyinline{f}'s call to \pyinline{g} resolve to the
+second \pyinline{def g}.)
+
+Wrapping the second \pyinline{def f; def g} pair in a conditional sidesteps the duplicate-name issue:
+the outer \pyinline{def g} and the inner \pyinline{def g} are now in different blocks, so they no longer
+fall in the same region. One might still expect a captured-variable problem, since the inner
+\pyinline{def g} could be seen as rebinding the outer \pyinline{g} that \pyinline{f} captures. No such
+problem arises:
+
+\begin{python}
+def g():
+    return 0
+
+if b:
+    def f():
+        return g()
+    def g():
+        return 1
+\end{python}
+
+\noindent The inner \pyinline{def f; def g} form a branch-local mutual region, so \pyinline{f}'s body
+resolves \pyinline{g} to its sibling rather than to the outer \pyinline{g}. The two are bound
+simultaneously, so \pyinline{f} cannot be called before the inner \pyinline{g} exists, and the value
+\pyinline{f} sees is the same as the value Python's late binding finds at call time.
 
 \subsubsection{Unreachable code}
 \label{sec:unreachable}

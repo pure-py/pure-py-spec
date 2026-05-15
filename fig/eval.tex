@@ -4,9 +4,10 @@
 \begin{center}
 \begin{tabular}{rcll}
 $v$ & $::=$ & $n$ & (Literal) \\
-    & $\mid$ & $\exClosure{\rho}{\vec{x}}{s}$ & (Closure)
+    & $\mid$ & $\exClosure{\rho}{\vec{x}}{e}$ & (LambdaClosure) \\
+    & $\mid$ & $\exDefClosure{\rho}{\seq{d}}{i}$ & (DefClosure)
    \\[3mm]
-$\rho$ & $::=$ & $\set{\vec{x \mapsto v}}$ & (Environment)
+$\rho$ & $::=$ & $\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}$ & (Environment)
    \\[3mm]
 $r$ & $::=$ & $\assigns{\rho}$ \\
   & $\mid$ & $\returns{v}$ \\
@@ -15,7 +16,7 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \caption{Values, environments and evaluation results}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$s \Rightarrow r$}
+\flushleft \shadebox{$\rho, b \Rightarrow r$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-pass}}]
@@ -23,7 +24,7 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \strut
 }
 {
-  \rho, \exPass \Rightarrow \assigns{\set{\varnothing}}
+  \rho, \exPass \Rightarrow \assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{eval-assign}}]
@@ -42,25 +43,26 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \rho, \exReturn{e} \Rightarrow \returns{v}
 }
 \and
-\inferrule*[lab={\ruleName{eval-seq}}]
+\inferrule*[lab={\ruleName{eval-mutual}}]
 {
-  \rho, s_1 \Rightarrow r \\
-  \rho \runion \rho_1, s_2 \Rightarrow r'
+  d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
+  v_i = \exDefClosure{\rho}{\seq{d}}{i} \quad (\forall i)
 }
 {
-  \rho, \exSeq{s_1}{s_2} \Rightarrow r \runion r'
+  \rho, \seq{d} \Rightarrow \assigns{\set{\seq{f} \mapsto \seq{v}}}
 }
 \and
-\inferrule*[lab={\ruleName{eval-def}}]
+\inferrule*[lab={\ruleName{eval-seq}}]
 {
-  \strut
+  \rho, s \Rightarrow \assigns{\rho'} \\
+  \rho \runion \rho', b \Rightarrow r
 }
 {
-  \rho, \exDef{f}{\vec{x}}{s} \Rightarrow \assigns{\set{f \mapsto \exClosure{\rho}{\vec{x}}{s}}}
+  \rho, s \cons b \Rightarrow \assigns{\rho'} \runion r
 }
 \end{mathpar}
+\caption{Block evaluation}
 \end{subfigure}
-\caption{Statement evaluation}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
 \begin{mathpar}
@@ -78,19 +80,32 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \strut
 }
 {
-  \rho, \exLambda{\vec{x}}{e} \Rightarrow \exClosure{\rho}{\vec{x}}{\exReturn{e}}
+  \rho, \exLambda{\vec{x}}{e} \Rightarrow \exClosure{\rho}{\vec{x}}{e}
 }
 \and
-\inferrule*[right=call]
+\inferrule*[right=call-lambda]
 {
-  \rho, e \Rightarrow \exClosure{\rho'}{\vec{x}}{s} \\
-  \rho, \vec{e}\,' \Rightarrow \vec{v} \\
-  \rho' \runion \set{\vec{x \mapsto v}}, s \Rightarrow \returns{v'}
+  \rho, e \Rightarrow \exClosure{\rho'}{\vec{x}}{e'} \\
+  \rho, \vec{e} \Rightarrow \vec{u} \\
+  \rho' \runion \set{\seq{x} \mapsto \seq{u}}, e' \Rightarrow v
 }
 {
-  \rho, \exApp{e}{\vec{e}\,'} \Rightarrow v'
+  \rho, \exApp{e}{\vec{e}} \Rightarrow v
+}
+\and
+\inferrule*[right=call-def]
+{
+  \rho, e \Rightarrow \exDefClosure{\rho'}{\seq{d}}{j} \\
+  d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
+  v_i = \exDefClosure{\rho'}{\seq{d}}{i} \quad (\forall i) \\
+  \rho, \vec{e} \Rightarrow \vec{u} \\
+  \rho' \runion \set{\seq{f} \mapsto \seq{v}} \runion \set{\seq{x}_j \mapsto \seq{u}}, b_j \Rightarrow \returns{v}
+}
+{
+  \rho, \exApp{e}{\vec{e}} \Rightarrow v
 }
 \end{mathpar}
-\end{subfigure}
 \caption{Expression evaluation}
+\end{subfigure}
+\caption{Operational semantics}
 \end{figure}
