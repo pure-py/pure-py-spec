@@ -95,7 +95,7 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \inferrule*[right=call-def]
 {
   \rho, e \Rightarrow \exDefClosure{\rho'}{\seq{d}}{i} \\
-  \seq{d} = \exDef{f_1}{\vec{x}_1}{\seq{s}_1} \cons \ldots \cons \exDef{f_n}{\vec{x}_n}{\seq{s}_n} \\
+  d_i = \exDef{f_i}{\vec{x}_i}{\seq{s}_i} \quad (\forall i) \\
   \rho, \vec{e} \Rightarrow \vec{v} \\
   \rho' \runion \set{f_1 \mapsto \exDefClosure{\rho'}{\seq{d}}{1}, \ldots, f_n \mapsto \exDefClosure{\rho'}{\seq{d}}{n}} \runion \set{x_{i,1} \mapsto v_1, \ldots, x_{i,k_i} \mapsto v_{k_i}}, \seq{s}_i \Rightarrow \returns{v'}
 }
