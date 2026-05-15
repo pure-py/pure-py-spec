@@ -104,15 +104,20 @@ two separate syntaxes
 
 \section{Syntax}
 
-The syntax of the language is given in \figref{syntax}. This is not enforced by the grammar but sequences of
-mutual definitions are assumed to be maximal; no two such sequences are adjacent.
+The syntax of the language is given in \figref{syntax}. A \emph{block} is a non-empty sequence of statements;
+either a top-level statement, a `def` body, or a branch of a conditional. A \emph{mutual region} is $d_1
+\ldots d_{n + 1}$ is a maximal contiguous non-empty sequence of \pyinline{def} statements in a block.
+(Maximality is not enforced by the grammar given in \figref{syntax}.) Any non-\pyinline{def} statements in
+that scope, by definition, separate mutual regions. Within mutual regions, all function names are bound
+simultaneously and may mutually reference each other; with mutual regions in the same scope, ordinary
+sequential scoping applies. A static well-formedness rule requires the \pyinline{def} names in a given region
+to be unique.
 
 {\small
 \begin{tabular}{ll}
 \textbf{To do} & \\
 Reserved words & \issue{9} \\
 Operators and precedence & \issue{50} \\
-Mutual recursion & \issue{12} \\
 Operational semantics of \pyinline{if} statements & \\
 Data classes and \pyinline{match} & \issue{8} \\
 N-ary tuples & \issue{51} \\
