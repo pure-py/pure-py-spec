@@ -39,7 +39,7 @@
 \inferrule*[lab={\ruleName{if}}]
 {
   \Gamma \vdash \vec{e} \\
-  \Gamma \vdash \seq{s}_1 : R_1 \;\ldots\; \Gamma \vdash \seq{s}_{n+1} : R_{n+1}
+  \Gamma \vdash \seq{s}_1 : R_1 \quad\ldots\quad \Gamma \vdash \seq{s}_{n+1} : R_{n+1}
 }
 {
   \Gamma \vdash \exIf{e_1}{\seq{s}_1}{\exElif{e_2}{\seq{s}_2}\;\ldots\;\exElif{e_{n+1}}{\seq{s}_{n+1}}} : R_1 \merge \ldots R_{n + 1} \merge \ldots \merge \Assigns{\varnothing}
@@ -48,7 +48,7 @@
 \inferrule*[lab={\ruleName{if-else}}]
 {
   \Gamma \vdash \vec{e} \\
-  \Gamma \vdash \seq{s}_1 : R_1 \;\ldots\; \Gamma \vdash \seq{s}_{n+2} : R_{n+2}
+  \Gamma \vdash \seq{s}_1 : R_1 \quad\ldots\quad \Gamma \vdash \seq{s}_{n+2} : R_{n+2}
 }
 {
   \Gamma \vdash \exIfElse{e_1}{\seq{s}_1}{\exElif{e_2}{\seq{s}_2}\;\ldots\;\exElif{e_{n+1}}{\seq{s}_{n+1}}}{\seq{s}_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
@@ -83,13 +83,30 @@
 \and
 \inferrule*[lab={\ruleName{cons}}]
 {
-  \Gamma \vdash s : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash \seq{s}\,' : R \\
-  \mathrm{captures}(s) \cap \assignsF(\seq{s}\,') = \varnothing \\
-  \neg(s \text{ is a mutual block} \wedge \seq{s}\,' \text{ begins with a mutual block})
+  \Gamma \vdash t : \Assigns{\Delta} \\
+  \Gamma \runion \Delta \vdash \seq{s} : R \\
+  \mathrm{captures}(t) \cap \assignsF(\seq{s}) = \varnothing
 }
 {
-  \Gamma \vdash s \cons \seq{s}\,' : \Assigns{\Delta} \runion R
+  \Gamma \vdash t \cons \seq{s} : \Assigns{\Delta} \runion R
+}
+\and
+\inferrule*[lab={\ruleName{cons-block-final}}]
+{
+  \Gamma \vdash \seq{d} : \Assigns{\Delta}
+}
+{
+  \Gamma \vdash \seq{d} \cons \varepsilon : \Assigns{\Delta}
+}
+\and
+\inferrule*[lab={\ruleName{cons-block-cont}}]
+{
+  \Gamma \vdash \seq{d} : \Assigns{\Delta} \\
+  \Gamma \runion \Delta \vdash t \cons \seq{s} : R \\
+  \mathrm{captures}(\seq{d}) \cap \assignsF(t \cons \seq{s}) = \varnothing
+}
+{
+  \Gamma \vdash \seq{d} \cons t \cons \seq{s} : \Assigns{\Delta} \runion R
 }
 \end{mathpar}
 \caption{Statement sequence $\seq{s}$ is well-formed in $\Gamma$}

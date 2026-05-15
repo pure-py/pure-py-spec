@@ -2,13 +2,15 @@
 \small
 \begin{center}
 \begin{tabular}{rcll}
-$s$ & $::=$ & $\exPass$ & (Pass) \\
+$t$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exAssign{x}{e}$ & (Assign) \\
     & $\mid$ & $\exReturnNone$ & (ReturnNone) \\
     & $\mid$ & $\exReturn{e}$ & (Return) \\
     & $\mid$ & $\exIf{e}{\seq{s}}{\exElif{e_1}{\seq{s}_1}\;\ldots\;\exElif{e_n}{\seq{s}_n}}$ & (If) \\
-    & $\mid$ & $\exIfElse{e}{\seq{s}}{\exElif{e_1}{\seq{s}_1}\;\ldots\;\exElif{e_n}{\seq{s}_n}}{\seq{s}'}$ & (IfElse) \\
-    & $\mid$ & $\seq{d}$ & (MutualBlock; $n \geq 1$)
+    & $\mid$ & $\exIfElse{e}{\seq{s}}{\exElif{e_1}{\seq{s}_1}\;\ldots\;\exElif{e_n}{\seq{s}_n}}{\seq{s}\,'}$ & (IfElse)
+   \\[3mm]
+$s$ & $::=$ & $t$ & (Statement) \\
+    & $\mid$ & $d_1 \;\ldots\; d_n$ & (MutualBlock; $n \geq 1$)
    \\[3mm]
 $d$ & $::=$ & $\exDef{f}{\vec{x}}{\seq{s}}$ & (Def)
    \\[3mm]
