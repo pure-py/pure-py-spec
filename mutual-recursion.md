@@ -2,10 +2,46 @@
 
 ## General considerations
 
-- Functions (even _def_) can be defined arbitrarily deep inside conditional code -- that code needs to execute
-  to even determine the definition of the function. This seems incompatible with the idea of statically
-  determining the "calls" relation. On the other hand, if a function is "definitely assigned" then all its
-  "candidate definitions" are statically known so we could over-approximate its "calls" set (by unioning).
+### Conditional `def` (branch-local functions)
+
+Functions (even _def_) can be defined arbitrarily deep inside conditional code -- that code needs to execute
+to even determine the definition of the function. This seems somewhat incompatible with the idea of statically
+determining the "calls" relation; on the other hand if a function is "definitely assigned" then all its
+"candidate definitions" are statically known, so we could over-approximate its "calls" set (by unioning). So
+let's put that issue to one side.
+
+A residual issue is resolving how these conditional defs at runtime, in the presence of mutual recursion. I
+think this question is independent of the granularity of mutual blocks. Consider the following:
+
+```python
+def g():
+   f(false)
+
+if b1:
+  def f(b2):
+     if b2:
+        g()     # mutual with g
+else:
+  def f(b2):
+     pass       # not mutual, but let's over-approximate and assume {f, g} form a SCC
+```
+
+Currently, we build closures when we evaluate a `def`. With mutual recursion, we need to build each closure
+for a given function with _at least_ the SCC containing that function, plus any other prior bindings used by
+the SCC as a whole. (Coarser granularities are possible; see Proposals 1-3 below.) So here, suitably
+approximated, {f, g} is an SCC and we need to build the closures for f and g simultaneously, including the
+definitions of f and g into the closures. But here the conditional code surrounding the definition of `f` gets
+in the way. There's a cycle: to know what the static body of 'f' is (needed to build the closures), I need to
+evaluate the statement; but evaluating the statement may involve calling 'f' (after all, being able to call
+'f' locally is the main reason for wanting branch-local definitions). To break the cycle, we'd need to bundle
+all that top-level conditional code as part of the definition of `f` that goes into the closure, but that
+sounds intense and/or problematic.
+
+[Aside: from a _typing_ point of view, implementors that want to layer non-trivial type systems on top of
+PurePy would have to contend with multiple definitions of the same function -- so perhaps supporting this
+feature is misguided.]
+
+Just ruling them out entirely is one option, but would mean we can no longer define branch-local functions.
 
 ## Proposal 1: SCC picture
 
@@ -79,14 +115,18 @@ Options:
 ## Proposal 2: one big mutual block
 
 This goes "maximal" rather than minimal and says that _all_ function definitions in a given scope are mutually
-recursive. I think this would need a delineation between statements that occur before or within the block
-(that would be executed before closure creation) and those that occur after. Otherwise there'd be no way to
-define a module with a statement that called one of the functions in the module (e.g. `main`).
+recursive. I think this would need provision for:
+- allowing other statements _within_ the block (that would need to be executed _before_ closure creation,
+  making them available to all functions), to support important idioms e.g. defining constants which are used
+  by functions
+- statements coming _after_ the block, otherwise there would be no way to define a module with a statement
+  that called one of the functions in the module (e.g. `main`).
 
 ## Proposal 3: mutual blocks delimited by non-function statements
 
-Middle ground where mutual blocks are maximal _contiguous_ blocks of function definitions. All statements
-_within_ the block are executed before closure creation, as Proposal 2, so that any additional variable
-definitions are in scope for the closures. So really this is just a more granular version of Proposal 2. On
-the other hand it's less granular than Proposal 1, which has the advantage that breaking a usage cycle within
-a contiguous block _doesn't_ break forward-references within the block, which could be surprising and tedious.
+Middle ground where mutual blocks are maximal _contiguous_ blocks of function definitions. By definition there
+are no statements _within_ a mutual block; the presence of statements is exactly what determines the block
+structure. (Perhaps Proposal 2 could be understood as a rewriting into a degenerate Proposal 3 format, pulling
+all statements prior to the last function definition to the beginning of the module.) The advantage over
+Proposal 1 is that breaking a usage cycle within a contiguous block _doesn't_ break forward-references within
+the block, which could be surprising and tedious.
