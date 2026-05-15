@@ -54,7 +54,8 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \and
 \inferrule*[lab={\ruleName{eval-mutual}}]
 {
-  d_i = \exDef{f_i}{\vec{x}_i}{\seq{s}_i}, \;\; v_i = \exDefClosure{\rho}{\seq{d}}{i} \quad (\forall i)
+  d_i = \exDef{f_i}{\vec{x}_i}{\seq{s}_i} \quad (\forall i) \\
+  v_i = \exDefClosure{\rho}{\seq{d}}{i} \quad (\forall i)
 }
 {
   \rho, \seq{d} \Rightarrow \assigns{\set{\seq{f} \mapsto \seq{v}}}
@@ -85,22 +86,23 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \inferrule*[right=call-lambda]
 {
   \rho, e \Rightarrow \exClosure{\rho'}{\vec{x}}{e'} \\
-  \rho, \vec{e} \Rightarrow \vec{v} \\
-  \rho' \runion \set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}, e' \Rightarrow v'
+  \rho, \vec{e} \Rightarrow \vec{u} \\
+  \rho' \runion \set{\seq{x} \mapsto \seq{u}}, e' \Rightarrow v
 }
 {
-  \rho, \exApp{e}{\vec{e}} \Rightarrow v'
+  \rho, \exApp{e}{\vec{e}} \Rightarrow v
 }
 \and
 \inferrule*[right=call-def]
 {
   \rho, e \Rightarrow \exDefClosure{\rho'}{\seq{d}}{j} \\
-  d_i = \exDef{f_i}{\vec{x}_i}{\seq{s}_i}, \;\; v_i = \exDefClosure{\rho'}{\seq{d}}{i} \quad (\forall i) \\
+  d_i = \exDef{f_i}{\vec{x}_i}{\seq{s}_i} \quad (\forall i) \\
+  v_i = \exDefClosure{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \vec{e} \Rightarrow \vec{u} \\
-  \rho' \runion \set{\seq{f} \mapsto \seq{v}} \runion \set{\seq{x}_j \mapsto \seq{u}}, \seq{s}_j \Rightarrow \returns{v'}
+  \rho' \runion \set{\seq{f} \mapsto \seq{v}} \runion \set{\seq{x}_j \mapsto \seq{u}}, \seq{s}_j \Rightarrow \returns{v}
 }
 {
-  \rho, \exApp{e}{\vec{e}} \Rightarrow v'
+  \rho, \exApp{e}{\vec{e}} \Rightarrow v
 }
 \end{mathpar}
 \caption{Expression evaluation}
