@@ -15,6 +15,11 @@ See README.md for project structure, build, test, and release docs.
 - Always rebuild the paper after every change to verify no build errors.
 - Put primes outside `\vec`, not inside (e.g. `\vec{e}'` not `\vec{e'}`).
 
+## Git process
+
+- Always work on a new branch when starting a new issue.
+- Push with `-u` to set up tracking: `git push -u origin <branch-name>`.
+
 ## GitHub CLI
 
 - Never run `gh auth refresh` or `gh auth login` without `--with-token` — this overwrites the fine-grained PAT with a new OAuth token that lacks private repo access.
