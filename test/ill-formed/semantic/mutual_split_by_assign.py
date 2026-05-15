@@ -3,9 +3,7 @@ def f(n):
         return 0
     return g(n - 1)
 
-# natural place to put a constant g uses, but this assignment splits
-# what would otherwise be a contiguous mutual block of {f, g}
-c = 100
+c = 100  # PurePy: error (assignment splits mutual block of {f, g}); Python: ok
 
 def g(n):
     if n == 0:
