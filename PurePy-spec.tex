@@ -237,9 +237,9 @@ before checking $s$.
 \locals(\exAssign{x}{e}) &= \set{x} \\
 \locals(\exReturnNone) &= \varnothing \\
 \locals(\exReturn{e}) &= \varnothing \\
-\locals(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\cdots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \locals(\vec{b}) \\
-\locals(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\cdots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \locals(\vec{b}) \\
-\locals(\exDef{f_1}{\vec{x}_1}{b_1} \cons \cdots \cons \exDef{f_n}{\vec{x}_n}{b_n}) &= \set{f_1, \ldots, f_n}
+\locals(\exIf{e_1}{\seq{s_1}}{\exElif{e_2}{\seq{s_2}}\;\cdots\;\exElif{e_{n+1}}{\seq{s_{n+1}}}}) &= \locals(\vec{\seq{s}}) \\
+\locals(\exIfElse{e_1}{\seq{s_1}}{\exElif{e_2}{\seq{s_2}}\;\cdots\;\exElif{e_{n+1}}{\seq{s_{n+1}}}}{\seq{s_{n+2}}}) &= \locals(\vec{\seq{s}}) \\
+\locals(\exDef{f_1}{\vec{x}_1}{\seq{s_1}} \cons \cdots \cons \exDef{f_n}{\vec{x}_n}{\seq{s_n}}) &= \set{f_1, \ldots, f_n}
 \end{align*}}
 
 \paragraph{Captured variables.}
@@ -253,15 +253,15 @@ captured by closures (lambdas or nested function definitions) within $s$:
 \mathrm{captures}(\exAssign{x}{e}) &= \mathrm{captures}(e) \\
 \mathrm{captures}(\exReturnNone) &= \varnothing \\
 \mathrm{captures}(\exReturn{e}) &= \mathrm{captures}(e) \\
-\mathrm{captures}(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\cdots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{b}) \\
-\mathrm{captures}(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\cdots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{b}) \\
-\mathrm{captures}(\exDef{f_1}{\vec{x}_1}{b_1} \cons \cdots \cons \exDef{f_n}{\vec{x}_n}{b_n}) &= \textstyle\bigcup_i \big(\mathrm{fv}(b_i) \setminus (\set{\vec{x}_i} \cup \locals(b_i))\big) \\
+\mathrm{captures}(\exIf{e_1}{\seq{s_1}}{\exElif{e_2}{\seq{s_2}}\;\cdots\;\exElif{e_{n+1}}{\seq{s_{n+1}}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{\seq{s}}) \\
+\mathrm{captures}(\exIfElse{e_1}{\seq{s_1}}{\exElif{e_2}{\seq{s_2}}\;\cdots\;\exElif{e_{n+1}}{\seq{s_{n+1}}}}{\seq{s_{n+2}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{\seq{s}}) \\
+\mathrm{captures}(\exDef{f_1}{\vec{x}_1}{\seq{s_1}} \cons \cdots \cons \exDef{f_n}{\vec{x}_n}{\seq{s_n}}) &= \textstyle\bigcup_i \big(\mathrm{fv}(\seq{s_i}) \setminus (\set{\vec{x}_i} \cup \locals(\seq{s_i}))\big) \\
 & \quad \setminus \set{f_1, \ldots, f_n}
 \end{align*}}
 
 \noindent Both $\locals$ and $\mathrm{captures}$ extend to statement sequences with
 $\locals(\varepsilon) = \mathrm{captures}(\varepsilon) = \varnothing$ and
-$\locals(s \cons b) = \locals(s) \cup \locals(b)$ (similarly for $\mathrm{captures}$).
+$\locals(s \cons \seq{s}\,') = \locals(s) \cup \locals(\seq{s}\,')$ (similarly for $\mathrm{captures}$).
 The function $\mathrm{captures}$ extends to expressions in the obvious way, with the following interesting cases:
 %
 {\small
@@ -385,7 +385,7 @@ f()
 \end{python}
 
 \noindent Because \pyinline{y} appears on the left-hand side of an assignment in \pyinline{f}, it is in
-$\locals(b)$ for the body of \pyinline{f}, and is therefore introduced at $\statusNotDefAssigned$ at the top of the
+$\locals(\seq{s})$ for the body of \pyinline{f}, and is therefore introduced at $\statusNotDefAssigned$ at the top of the
 function. The reference to \pyinline{y} in \pyinline{x = y} then fails the well-formedness check, since
 $\Gamma(\pyinline{y}) = \statusNotDefAssigned$ rather than $\Gamma(\pyinline{y}) = \statusDefAssigned$.
 
@@ -409,7 +409,7 @@ def f():
 \pyinline{x = 6} shadows the earlier binding, \pyinline{g()} would return \pyinline{5} and the result
 would be \pyinline{11}. To preserve agreement with a subset of Python, we exclude this program from
 \PurePy: the side condition in the \ruleName{cons} rule requires that no variable captured by $s$ is
-reassigned in the rest of the sequence $b$. Here \pyinline{x} is captured by
+reassigned in the rest of the sequence $\seq{s}\,'$. Here \pyinline{x} is captured by
 the definition of \pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected. This is
 analogous to Java's requirement that local variables captured by a lambda must be \emph{effectively
 final}~\cite[\S15.27.2]{gosling2025}: local variables are allocated on the stack, and so only the value
@@ -426,8 +426,8 @@ x()  # Python: returns the function (late binding); pure: returns 5
 
 \noindent The side condition on the \ruleName{assign} rule rejects programs like this, requiring that the
 variable being bound is not captured by the expression. The \ruleName{mutual} rule, by contrast, binds
-each $f_i$ in the typing context for every body $b_i$, so the function names may legitimately appear in
-$\mathrm{captures}$ of those bodies. This is what permits self-recursion (the singleton-block case) and
+each $f_i$ in the typing context for every body $\seq{s_i}$, so the function names may legitimately appear
+in $\mathrm{captures}$ of those bodies. This is what permits self-recursion (the singleton-block case) and
 mutual recursion within a block.
 
 \subsubsection{Unreachable code}

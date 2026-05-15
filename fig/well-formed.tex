@@ -39,34 +39,34 @@
 \inferrule*[lab={\ruleName{if}}]
 {
   \Gamma \vdash \vec{e} \\
-  \Gamma \vdash \vec{b} : \vec{R}
+  \Gamma \vdash \vec{\seq{s}} : \vec{R}
 }
 {
-  \Gamma \vdash \exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\cdots\;\exElif{e_{n+1}}{b_{n+1}}} : R_1 \merge \ldots R_{n + 1} \merge \ldots \merge \Assigns{\varnothing}
+  \Gamma \vdash \exIf{e_1}{\seq{s_1}}{\exElif{e_2}{\seq{s_2}}\;\cdots\;\exElif{e_{n+1}}{\seq{s_{n+1}}}} : R_1 \merge \ldots R_{n + 1} \merge \ldots \merge \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{if-else}}]
 {
   \Gamma \vdash \vec{e} \\
-  \Gamma \vdash \vec{b} : \vec{R}
+  \Gamma \vdash \vec{\seq{s}} : \vec{R}
 }
 {
-  \Gamma \vdash \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\cdots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} : R_1 \merge \cdots \merge R_{n+2}
+  \Gamma \vdash \exIfElse{e_1}{\seq{s_1}}{\exElif{e_2}{\seq{s_2}}\;\cdots\;\exElif{e_{n+1}}{\seq{s_{n+1}}}}{\seq{s_{n+2}}} : R_1 \merge \cdots \merge R_{n+2}
 }
 \and
 \inferrule*[lab={\ruleName{mutual}}]
 {
-  \forall i \in \set{1, \ldots, n} : \Gamma, f_1 : \statusDefAssigned, \ldots, f_n : \statusDefAssigned, x_{i,1} : \statusDefAssigned, \ldots, x_{i,k_i} : \statusDefAssigned, \locals(b_i) : \statusNotDefAssigned \vdash b_i : R_i \\
+  \forall i \in \set{1, \ldots, n} : \Gamma, f_1 : \statusDefAssigned, \ldots, f_n : \statusDefAssigned, x_{i,1} : \statusDefAssigned, \ldots, x_{i,k_i} : \statusDefAssigned, \locals(\seq{s_i}) : \statusNotDefAssigned \vdash \seq{s_i} : R_i \\
   f_1, \ldots, f_n \text{ distinct}
 }
 {
-  \Gamma \vdash \exDef{f_1}{\vec{x}_1}{b_1} \cons \cdots \cons \exDef{f_n}{\vec{x}_n}{b_n} : \Assigns{\set{f_1 : \statusDefAssigned, \ldots, f_n : \statusDefAssigned}}
+  \Gamma \vdash \exDef{f_1}{\vec{x}_1}{\seq{s_1}} \cons \cdots \cons \exDef{f_n}{\vec{x}_n}{\seq{s_n}} : \Assigns{\set{f_1 : \statusDefAssigned, \ldots, f_n : \statusDefAssigned}}
 }
 \end{mathpar}
 \caption{Statement $s$ is well-formed in $\Gamma$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash b : R$}
+\flushleft \shadebox{$\Gamma \vdash \seq{s} : R$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{empty}}]
@@ -80,15 +80,15 @@
 \inferrule*[lab={\ruleName{cons}}]
 {
   \Gamma \vdash s : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash b : R \\
-  \mathrm{captures}(s) \cap \locals(b) = \varnothing \\
-  \neg(s \text{ is a mutual block} \wedge b \text{ begins with a mutual block})
+  \Gamma \runion \Delta \vdash \seq{s}\,' : R \\
+  \mathrm{captures}(s) \cap \locals(\seq{s}\,') = \varnothing \\
+  \neg(s \text{ is a mutual block} \wedge \seq{s}\,' \text{ begins with a mutual block})
 }
 {
-  \Gamma \vdash s \cons b : \Assigns{\Delta} \runion R
+  \Gamma \vdash s \cons \seq{s}\,' : \Assigns{\Delta} \runion R
 }
 \end{mathpar}
-\caption{Statement sequence $b$ is well-formed in $\Gamma$}
+\caption{Statement sequence $\seq{s}$ is well-formed in $\Gamma$}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\wf{\Gamma}{e}$}
