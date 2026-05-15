@@ -408,8 +408,8 @@ def f():
 \pyinline{g()} returns \pyinline{6} and the result is \pyinline{12}. In a pure semantics where
 \pyinline{x = 6} shadows the earlier binding, \pyinline{g()} would return \pyinline{5} and the result
 would be \pyinline{11}. To preserve agreement with a subset of Python, we exclude this program from
-\PurePy: the side condition in the \ruleName{cons} rule requires that no variable captured by $s$ is
-reassigned in the rest of the sequence $\seq{s}\,'$. Here \pyinline{x} is captured by
+\PurePy: the side condition in the \ruleName{cons-statement} rule requires that no variable captured by
+$t$ is reassigned in the rest of the sequence $\seq{s}$. Here \pyinline{x} is captured by
 the definition of \pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected. This is
 analogous to Java's requirement that local variables captured by a lambda must be \emph{effectively
 final}~\cite[\S15.27.2]{gosling2025}: local variables are allocated on the stack, and so only the value
