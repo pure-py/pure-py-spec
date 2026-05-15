@@ -16,7 +16,7 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \caption{Values, environments and evaluation results}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\rho, \seq{s} \Rightarrow r$}
+\flushleft \shadebox{$\rho, b \Rightarrow r$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-pass}}]
@@ -45,7 +45,7 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \and
 \inferrule*[lab={\ruleName{eval-mutual}}]
 {
-  d_i = \exDef{f_i}{\vec{x}_i}{\seq{s}_i} \quad (\forall i) \\
+  d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
   v_i = \exDefClosure{\rho}{\seq{d}}{i} \quad (\forall i)
 }
 {
@@ -55,10 +55,10 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \inferrule*[lab={\ruleName{eval-seq}}]
 {
   \rho, s \Rightarrow \assigns{\rho'} \\
-  \rho \runion \rho', \seq{s} \Rightarrow r
+  \rho \runion \rho', b \Rightarrow r
 }
 {
-  \rho, s \cons \seq{s} \Rightarrow \assigns{\rho'} \runion r
+  \rho, s \cons b \Rightarrow \assigns{\rho'} \runion r
 }
 \end{mathpar}
 \caption{Statement sequence evaluation}
@@ -96,10 +96,10 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \inferrule*[right=call-def]
 {
   \rho, e \Rightarrow \exDefClosure{\rho'}{\seq{d}}{j} \\
-  d_i = \exDef{f_i}{\vec{x}_i}{\seq{s}_i} \quad (\forall i) \\
+  d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
   v_i = \exDefClosure{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \vec{e} \Rightarrow \vec{u} \\
-  \rho' \runion \set{\seq{f} \mapsto \seq{v}} \runion \set{\seq{x}_j \mapsto \seq{u}}, \seq{s}_j \Rightarrow \returns{v}
+  \rho' \runion \set{\seq{f} \mapsto \seq{v}} \runion \set{\seq{x}_j \mapsto \seq{u}}, b_j \Rightarrow \returns{v}
 }
 {
   \rho, \exApp{e}{\vec{e}} \Rightarrow v
