@@ -6,8 +6,8 @@ $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exAssign{x}{e}$ & (Assign) \\
     & $\mid$ & $\exReturnNone$ & (ReturnNone) \\
     & $\mid$ & $\exReturn{e}$ & (Return) \\
-    & $\mid$ & $\exIf{e}{\seq{s}}{\exElif{e_1}{\seq{s_1}}\;\cdots\;\exElif{e_n}{\seq{s_n}}}$ & (If) \\
-    & $\mid$ & $\exIfElse{e}{\seq{s}}{\exElif{e_1}{\seq{s_1}}\;\cdots\;\exElif{e_n}{\seq{s_n}}}{\seq{s'}}$ & (IfElse) \\
+    & $\mid$ & $\exIf{e}{\seq{s}}{\exElif{e_1}{\seq{s}_1}\;\cdots\;\exElif{e_n}{\seq{s}_n}}$ & (If) \\
+    & $\mid$ & $\exIfElse{e}{\seq{s}}{\exElif{e_1}{\seq{s}_1}\;\cdots\;\exElif{e_n}{\seq{s}_n}}{\seq{s}'}$ & (IfElse) \\
     & $\mid$ & $m$ & (MutualBlock)
    \\[3mm]
 $m$ & $::=$ & $\seq{d}$ & ($n \geq 1$)

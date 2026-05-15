@@ -237,9 +237,9 @@ before checking $s$.
 \locals(\exAssign{x}{e}) &= \set{x} \\
 \locals(\exReturnNone) &= \varnothing \\
 \locals(\exReturn{e}) &= \varnothing \\
-\locals(\exIf{e_1}{\seq{s_1}}{\exElif{e_2}{\seq{s_2}}\;\cdots\;\exElif{e_{n+1}}{\seq{s_{n+1}}}}) &= \locals(\vec{\seq{s}}) \\
-\locals(\exIfElse{e_1}{\seq{s_1}}{\exElif{e_2}{\seq{s_2}}\;\cdots\;\exElif{e_{n+1}}{\seq{s_{n+1}}}}{\seq{s_{n+2}}}) &= \locals(\vec{\seq{s}}) \\
-\locals(\exDef{f_1}{\vec{x}_1}{\seq{s_1}} \cons \cdots \cons \exDef{f_n}{\vec{x}_n}{\seq{s_n}}) &= \set{f_1, \ldots, f_n}
+\locals(\exIf{e_1}{\seq{s}_1}{\exElif{e_2}{\seq{s}_2}\;\cdots\;\exElif{e_{n+1}}{\seq{s}_{n+1}}}) &= \locals(\vec{\seq{s}}) \\
+\locals(\exIfElse{e_1}{\seq{s}_1}{\exElif{e_2}{\seq{s}_2}\;\cdots\;\exElif{e_{n+1}}{\seq{s}_{n+1}}}{\seq{s}_{n+2}}) &= \locals(\vec{\seq{s}}) \\
+\locals(\exDef{f_1}{\vec{x}_1}{\seq{s}_1} \cons \cdots \cons \exDef{f_n}{\vec{x}_n}{\seq{s}_n}) &= \set{f_1, \ldots, f_n}
 \end{align*}}
 
 \paragraph{Captured variables.}
@@ -253,9 +253,9 @@ captured by closures (lambdas or nested function definitions) within $s$:
 \mathrm{captures}(\exAssign{x}{e}) &= \mathrm{captures}(e) \\
 \mathrm{captures}(\exReturnNone) &= \varnothing \\
 \mathrm{captures}(\exReturn{e}) &= \mathrm{captures}(e) \\
-\mathrm{captures}(\exIf{e_1}{\seq{s_1}}{\exElif{e_2}{\seq{s_2}}\;\cdots\;\exElif{e_{n+1}}{\seq{s_{n+1}}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{\seq{s}}) \\
-\mathrm{captures}(\exIfElse{e_1}{\seq{s_1}}{\exElif{e_2}{\seq{s_2}}\;\cdots\;\exElif{e_{n+1}}{\seq{s_{n+1}}}}{\seq{s_{n+2}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{\seq{s}}) \\
-\mathrm{captures}(\exDef{f_1}{\vec{x}_1}{\seq{s_1}} \cons \cdots \cons \exDef{f_n}{\vec{x}_n}{\seq{s_n}}) &= \textstyle\bigcup_i \big(\mathrm{fv}(\seq{s_i}) \setminus (\set{\vec{x}_i} \cup \locals(\seq{s_i}))\big) \\
+\mathrm{captures}(\exIf{e_1}{\seq{s}_1}{\exElif{e_2}{\seq{s}_2}\;\cdots\;\exElif{e_{n+1}}{\seq{s}_{n+1}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{\seq{s}}) \\
+\mathrm{captures}(\exIfElse{e_1}{\seq{s}_1}{\exElif{e_2}{\seq{s}_2}\;\cdots\;\exElif{e_{n+1}}{\seq{s}_{n+1}}}{\seq{s}_{n+2}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{\seq{s}}) \\
+\mathrm{captures}(\exDef{f_1}{\vec{x}_1}{\seq{s}_1} \cons \cdots \cons \exDef{f_n}{\vec{x}_n}{\seq{s}_n}) &= \textstyle\bigcup_i \big(\mathrm{fv}(\seq{s}_i) \setminus (\set{\vec{x}_i} \cup \locals(\seq{s}_i))\big) \\
 & \quad \setminus \set{f_1, \ldots, f_n}
 \end{align*}}
 
@@ -426,7 +426,7 @@ x()  # Python: returns the function (late binding); pure: returns 5
 
 \noindent The side condition on the \ruleName{assign} rule rejects programs like this, requiring that the
 variable being bound is not captured by the expression. The \ruleName{mutual} rule, by contrast, binds
-each $f_i$ in the typing context for every body $\seq{s_i}$, so the function names may legitimately appear
+each $f_i$ in the typing context for every body $\seq{s}_i$, so the function names may legitimately appear
 in $\mathrm{captures}$ of those bodies. This is what permits self-recursion (the singleton-block case) and
 mutual recursion within a block.
 
