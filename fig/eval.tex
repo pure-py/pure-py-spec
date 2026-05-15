@@ -54,10 +54,10 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \and
 \inferrule*[lab={\ruleName{eval-mutual}}]
 {
-  d_i = \exDef{f_i}{\vec{x}_i}{\seq{s}_i} \quad (\forall i)
+  d_i = \exDef{f_i}{\vec{x}_i}{\seq{s}_i}, \;\; v_i = \exDefClosure{\rho}{\seq{d}}{i} \quad (\forall i)
 }
 {
-  \rho, \seq{d} \Rightarrow \assigns{\set{f_1 \mapsto \exDefClosure{\rho}{\seq{d}}{1}, \ldots, f_n \mapsto \exDefClosure{\rho}{\seq{d}}{n}}}
+  \rho, \seq{d} \Rightarrow \assigns{\set{\seq{f} \mapsto \seq{v}}}
 }
 \end{mathpar}
 \caption{Statement evaluation}
