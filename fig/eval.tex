@@ -4,9 +4,10 @@
 \begin{center}
 \begin{tabular}{rcll}
 $v$ & $::=$ & $n$ & (Literal) \\
-    & $\mid$ & $\exClosure{\rho}{\vec{x}}{s}$ & (Closure)
+    & $\mid$ & $\exClosure{\rho}{\vec{x}}{t}$ & (LambdaClosure) \\
+    & $\mid$ & $\exDefClosure{\rho}{\seq{d}}{i}$ & (DefClosure)
    \\[3mm]
-$\rho$ & $::=$ & $\set{\vec{x \mapsto v}}$ & (Environment)
+$\rho$ & $::=$ & $\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}$ & (Environment)
    \\[3mm]
 $r$ & $::=$ & $\assigns{\rho}$ \\
   & $\mid$ & $\returns{v}$ \\
@@ -85,7 +86,7 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 {
   \rho, e \Rightarrow \exClosure{\rho'}{\vec{x}}{s} \\
   \rho, \vec{e}\,' \Rightarrow \vec{v} \\
-  \rho' \runion \set{\vec{x \mapsto v}}, s \Rightarrow \returns{v'}
+  \rho' \runion \set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}, s \Rightarrow \returns{v'}
 }
 {
   \rho, \exApp{e}{\vec{e}\,'} \Rightarrow v'
