@@ -81,6 +81,14 @@
   \Gamma \vdash \varepsilon : \Assigns{\varnothing}
 }
 \and
+\inferrule*[lab={\ruleName{cons-block-final}}]
+{
+  \Gamma \vdash \seq{d} : \Assigns{\Delta}
+}
+{
+  \Gamma \vdash \seq{d} \cons \varepsilon : \Assigns{\Delta}
+}
+\and
 \inferrule*[lab={\ruleName{cons}}]
 {
   \Gamma \vdash t : \Assigns{\Delta} \\
@@ -89,14 +97,6 @@
 }
 {
   \Gamma \vdash t \cons \seq{s} : \Assigns{\Delta} \runion R
-}
-\and
-\inferrule*[lab={\ruleName{cons-block-final}}]
-{
-  \Gamma \vdash \seq{d} : \Assigns{\Delta}
-}
-{
-  \Gamma \vdash \seq{d} \cons \varepsilon : \Assigns{\Delta}
 }
 \and
 \inferrule*[lab={\ruleName{cons-block-cont}}]
