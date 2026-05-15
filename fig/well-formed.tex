@@ -57,7 +57,9 @@
 \inferrule*[lab={\ruleName{mutual}}]
 {
   \Delta = \set{\seq{f : \statusDefAssigned}} \\
-  \Gamma \runion \Delta, x_{1,1} : \statusDefAssigned, \ldots, x_{1,k_1} : \statusDefAssigned, \locals(\seq{s}_1) : \statusNotDefAssigned \vdash \seq{s}_1 : R_1 \;\ldots\; \Gamma \runion \Delta, x_{n,1} : \statusDefAssigned, \ldots, x_{n,k_n} : \statusDefAssigned, \locals(\seq{s}_n) : \statusNotDefAssigned \vdash \seq{s}_n : R_n \\
+  \Gamma \runion \Delta, x_{1,1} : \statusDefAssigned, \ldots, x_{1,k_1} : \statusDefAssigned, \locals(\seq{s}_1) : \statusNotDefAssigned \vdash \seq{s}_1 : R_1
+   \quad\ldots\quad
+   \Gamma \runion \Delta, x_{n,1} : \statusDefAssigned, \ldots, x_{n,k_n} : \statusDefAssigned, \locals(\seq{s}_n) : \statusNotDefAssigned \vdash \seq{s}_n : R_n \\
   f_1, \ldots, f_n \text{ distinct}
 }
 {
