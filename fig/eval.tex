@@ -16,7 +16,7 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \caption{Values, environments and evaluation results}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$s \Rightarrow r$}
+\flushleft \shadebox{$\rho, \seq{s} \Rightarrow r$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-pass}}]
@@ -24,7 +24,7 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \strut
 }
 {
-  \rho, \exPass \Rightarrow \assigns{\set{\varnothing}}
+  \rho, \exPass \Rightarrow \assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{eval-assign}}]
@@ -43,15 +43,6 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \rho, \exReturn{e} \Rightarrow \returns{v}
 }
 \and
-\inferrule*[lab={\ruleName{eval-seq}}]
-{
-  \rho, s_1 \Rightarrow \assigns{\rho_1} \\
-  \rho \runion \rho_1, s_2 \Rightarrow r
-}
-{
-  \rho, \exSeq{s_1}{s_2} \Rightarrow \assigns{\rho_1} \runion r
-}
-\and
 \inferrule*[lab={\ruleName{eval-mutual}}]
 {
   d_i = \exDef{f_i}{\vec{x}_i}{\seq{s}_i} \quad (\forall i) \\
@@ -60,8 +51,17 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 {
   \rho, \seq{d} \Rightarrow \assigns{\set{\seq{f} \mapsto \seq{v}}}
 }
+\and
+\inferrule*[lab={\ruleName{eval-seq}}]
+{
+  \rho, s \Rightarrow \assigns{\rho'} \\
+  \rho \runion \rho', \seq{s} \Rightarrow r
+}
+{
+  \rho, s \cons \seq{s} \Rightarrow \assigns{\rho'} \runion r
+}
 \end{mathpar}
-\caption{Statement evaluation}
+\caption{Statement sequence evaluation}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
