@@ -2,14 +2,12 @@
 \small
 \begin{center}
 \begin{tabular}{rcll}
-$t$ & $::=$ & $\exPass$ & (Pass) \\
+$s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exAssign{x}{e}$ & (Assign) \\
     & $\mid$ & $\exReturnNone$ & (ReturnNone) \\
     & $\mid$ & $\exReturn{e}$ & (Return) \\
     & $\mid$ & $\exIf{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}$ & (If) \\
-    & $\mid$ & $\exIfElse{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}{b'}$ & (IfElse)
-   \\[3mm]
-$s$ & $::=$ & $t$ & (Statement) \\
+    & $\mid$ & $\exIfElse{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}{b'}$ & (IfElse) \\
     & $\mid$ & $d_1 \;\ldots\; d_{n+1}$ & (MutualBlock)
    \\[3mm]
 $d$ & $::=$ & $\exDef{f}{\vec{x}}{b}$ & (Def)
