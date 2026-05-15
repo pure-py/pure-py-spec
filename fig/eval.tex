@@ -4,7 +4,7 @@
 \begin{center}
 \begin{tabular}{rcll}
 $v$ & $::=$ & $n$ & (Literal) \\
-    & $\mid$ & $\exClosure{\rho}{\vec{x}}{t}$ & (LambdaClosure) \\
+    & $\mid$ & $\exClosure{\rho}{\vec{x}}{e}$ & (LambdaClosure) \\
     & $\mid$ & $\exDefClosure{\rho}{\seq{d}}{i}$ & (DefClosure)
    \\[3mm]
 $\rho$ & $::=$ & $\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}$ & (Environment)
@@ -79,17 +79,17 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \strut
 }
 {
-  \rho, \exLambda{\vec{x}}{e} \Rightarrow \exClosure{\rho}{\vec{x}}{\exReturn{e}}
+  \rho, \exLambda{\vec{x}}{e} \Rightarrow \exClosure{\rho}{\vec{x}}{e}
 }
 \and
-\inferrule*[right=call]
+\inferrule*[right=call-lambda]
 {
-  \rho, e \Rightarrow \exClosure{\rho'}{\vec{x}}{s} \\
-  \rho, \vec{e}\,' \Rightarrow \vec{v} \\
-  \rho' \runion \set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}, s \Rightarrow \returns{v'}
+  \rho, e \Rightarrow \exClosure{\rho'}{\vec{x}}{e'} \\
+  \rho, \vec{e} \Rightarrow \vec{v} \\
+  \rho' \runion \set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}, e' \Rightarrow v'
 }
 {
-  \rho, \exApp{e}{\vec{e}\,'} \Rightarrow v'
+  \rho, \exApp{e}{\vec{e}} \Rightarrow v'
 }
 \end{mathpar}
 \caption{Expression evaluation}
