@@ -22,6 +22,7 @@ process a PurePy representation of the AST (e.g. via dataclasses).
 
 import ast
 import sys
+from dataclasses import dataclass
 
 
 # --- Result type ---------------------------------------------------------------
@@ -39,12 +40,28 @@ def is_ok(result):
     return result is None
 
 
-# --- Contexts (Γ) and result types (R) ----------------------------------------
+# --- Contexts (Γ) and result types ---------------------------------------------
 # Γ is a mapping from variable names to a definite-assignment status (tt/ff).
-# R is either ('assigns', Δ) or ('returns',), per fig/syntax.tex.
+# A statement's result type is one of TyReturns or TyAssigns (modelled after
+# Fluid's WellFormed.purs). TyAssigns will eventually carry a Δ.
 
 TT = "tt"
 FF = "ff"
+
+
+@dataclass(frozen=True)
+class TyReturns:
+    pass
+
+
+@dataclass(frozen=True)
+class TyAssigns:
+    # Future: a Δ mapping var names to TT/FF. Empty for now.
+    pass
+
+
+TY_RETURNS = TyReturns()
+TY_ASSIGNS = TyAssigns()
 
 
 def empty_context():
@@ -58,27 +75,43 @@ def extend(gamma, delta):
     return new
 
 
-def assigns(delta):
-    return ("assigns", delta)
+def merge_results(rs):
+    """Returns is identity for merge: all-Returns ⇒ Returns, else Assigns."""
+    if all(isinstance(r, TyReturns) for r in rs):
+        return TY_RETURNS
+    return TY_ASSIGNS
 
 
-def returns():
-    return ("returns",)
+def result_type(node):
+    """Classify a statement node's result type per fig/well-formed.tex.
+    Pure analysis; does not check well-formedness."""
+    if isinstance(node, ast.Pass):
+        return TY_ASSIGNS
+    if isinstance(node, ast.Assign):
+        return TY_ASSIGNS
+    if isinstance(node, ast.Expr):
+        return TY_ASSIGNS                       # expr-stmt
+    if isinstance(node, ast.Assert):
+        return TY_ASSIGNS
+    if isinstance(node, ast.Return):
+        return TY_RETURNS                       # return / return-none
+    if isinstance(node, ast.FunctionDef):
+        return TY_ASSIGNS                       # mutual rule binds the f names
+    if isinstance(node, ast.If):
+        # Merge of branch result types, plus implicit Assigns ∅ if no else.
+        branches = [result_type_of_block(node.body)]
+        if node.orelse:
+            branches.append(result_type_of_block(node.orelse))
+        else:
+            branches.append(TY_ASSIGNS)
+        return merge_results(branches)
+    return TY_ASSIGNS
 
 
-def is_assigns(r):
-    return r[0] == "assigns"
-
-
-def is_returns(r):
-    return r[0] == "returns"
-
-
-def bindings(r):
-    """Extract Δ from Assigns Δ; empty for Returns."""
-    if is_assigns(r):
-        return r[1]
-    return {}
+def result_type_of_block(block):
+    """Result type of a (well-formed) non-empty block is its last item's
+    result type: seq forces all earlier items to Assigns."""
+    return result_type(block[-1])
 
 
 # --- Well-formedness check -----------------------------------------------------
@@ -88,83 +121,150 @@ def bindings(r):
 
 
 def check_block(block, gamma):
-    """Γ ⊢ b : R. Skeleton: recurse over the cons structure of the block."""
-    if len(block) == 1:
-        # singleton (leaf): just the statement's result
-        return check_stmt(block[0], gamma)
-    # cons: s :: tail. (seq rule)
-    head = block[0]
-    tail = block[1:]
-    r_head, err = check_stmt(head, gamma)
+    """Check that a block is well-formed. Recurses over items, where an item
+    is either a single non-FunctionDef statement or a list of contiguous
+    FunctionDefs (a mutual region)."""
+    items = items_of_block(block)
+    return check_items(items, gamma)
+
+
+def check_items(items, gamma):
+    if len(items) == 1:
+        return check_item(items[0], gamma)
+    # cons: item :: tail. (seq rule)
+    head = items[0]
+    tail = items[1:]
+    err = check_item(head, gamma)
     if not is_ok(err):
-        return r_head, err
+        return err
+    # seq rule pattern-matches `Γ ⊢ s : Assigns Δ` on the head, so a returning
+    # head with a non-empty tail is ill-formed (unreachable code).
+    if isinstance(item_result_type(head), TyReturns):
+        first_unreachable = tail[0]
+        node = first_unreachable[0] if isinstance(first_unreachable, list) else first_unreachable
+        return ill_formed(node, "unreachable statement")
     # TODO: enforce captures(head) ∩ assigns(tail) = ∅ side condition
-    gamma_ = extend(gamma, bindings(r_head))
-    r_tail, err = check_block(tail, gamma_)
+    # TODO: extend gamma with bindings of head before checking tail
+    return check_items(tail, gamma)
+
+
+def item_result_type(item):
+    """Result type of an item: a mutual region always Assigns; otherwise
+    delegate to result_type on the AST node."""
+    if isinstance(item, list):
+        return TY_ASSIGNS
+    return result_type(item)
+
+
+def items_of_block(block):
+    """Group a flat statement list into items: single non-def stmts and
+    contiguous-def regions (each represented as a list of FunctionDefs)."""
+    if not block:
+        return []
+    head = block[0]
+    rest = block[1:]
+    if isinstance(head, ast.FunctionDef):
+        return _extend_region([head], rest)
+    return [head] + items_of_block(rest)
+
+
+def _extend_region(region, rest):
+    if not rest:
+        return [region]
+    head = rest[0]
+    if isinstance(head, ast.FunctionDef):
+        return _extend_region(region + [head], rest[1:])
+    return [region] + items_of_block(rest)
+
+
+def check_item(item, gamma):
+    if isinstance(item, list):
+        return check_mutual_region(item, gamma)
+    return check_stmt(item, gamma)
+
+
+def check_mutual_region(defs, gamma):
+    """mutual rule (fig/well-formed.tex). Each region is non-empty."""
+    err = check_distinct_names(defs, set())
     if not is_ok(err):
-        return r_tail, err
-    # TODO: combine via R ⊕ R (the runion semiring on result types)
-    return r_tail, ok()
+        return err
+    return check_bodies(defs, gamma)
+
+
+def check_bodies(defs, gamma):
+    """Recurse into each def's body. TODO: extend gamma with f_i (as tt),
+    params (as tt), and assigns(body_i) \\ params_i (as ff); subtract params
+    from assigns before introducing ff to avoid the param-shadow-by-local trap.
+    For now, body is checked in the outer gamma."""
+    if not defs:
+        return ok()
+    err = check_block(defs[0].body, gamma)
+    if not is_ok(err):
+        return err
+    return check_bodies(defs[1:], gamma)
+
+
+def check_assign_targets(targets, captured):
+    """assign rule's `x ∉ captures(e)` side condition for each target."""
+    if not targets:
+        return ok()
+    t = targets[0]
+    if isinstance(t, ast.Name) and t.id in captured:
+        return ill_formed(t, f"'{t.id}' captured by right-hand side")
+    return check_assign_targets(targets[1:], captured)
+
+
+def check_distinct_names(defs, seen):
+    """mutual rule's distinct-names side condition."""
+    if not defs:
+        return ok()
+    head = defs[0]
+    if head.name in seen:
+        return ill_formed(head, f"duplicate name '{head.name}' in mutual region")
+    return check_distinct_names(defs[1:], seen | {head.name})
 
 
 def check_stmt(s, gamma):
-    """Γ ⊢ s : R. Each branch implements one rule from fig/well-formed.tex."""
-    # Mutual-region grouping happens at check_block level (contiguous defs);
-    # for now treat each FunctionDef in isolation.
+    """Check that s is well-formed. Each branch implements one rule from
+    fig/well-formed.tex (its non-result-type obligations)."""
     if isinstance(s, ast.Pass):
-        # pass rule: Γ ⊢ pass : Assigns ∅
-        return assigns({}), ok()
+        return ok()
     if isinstance(s, ast.Assign):
-        # assign rule: Γ ⊢ e ; x ∉ captures(e) ⟹ Γ ⊢ x = e : Assigns {x:tt}
+        # assign rule: Γ ⊢ e ; x ∉ captures(e)
         err = check_expr(s.value, gamma)
         if not is_ok(err):
-            return assigns({}), err
-        delta = {target.id: TT for target in s.targets if isinstance(target, ast.Name)}
-        return assigns(delta), ok()
+            return err
+        captured = captures(s.value)
+        return check_assign_targets(s.targets, captured)
     if isinstance(s, ast.Expr):
-        # expr-stmt rule: Γ ⊢ e ⟹ Γ ⊢ e : Assigns ∅
-        err = check_expr(s.value, gamma)
-        return assigns({}), err
+        # expr-stmt rule: Γ ⊢ e
+        return check_expr(s.value, gamma)
     if isinstance(s, ast.Return):
-        # return / return-none rules
         if s.value is not None:
-            err = check_expr(s.value, gamma)
-            if not is_ok(err):
-                return returns(), err
-        return returns(), ok()
+            return check_expr(s.value, gamma)
+        return ok()
     if isinstance(s, ast.If):
-        # if / if-else rules: condition well-formed; each branch well-formed
+        # if / if-else rules: condition well-formed; each branch well-formed.
         err = check_expr(s.test, gamma)
         if not is_ok(err):
-            return assigns({}), err
-        # Recurse into the two branches (Python flattens elif into nested If).
-        # TODO: merge branch results via R₁ ⊕ R₂ ⊕ ... ⊕ Assigns ∅ (if no else)
-        r_then, err = check_block(s.body, gamma)
+            return err
+        err = check_block(s.body, gamma)
         if not is_ok(err):
-            return r_then, err
+            return err
         if s.orelse:
-            r_else, err = check_block(s.orelse, gamma)
-            if not is_ok(err):
-                return r_else, err
-        return assigns({}), ok()
-    if isinstance(s, ast.FunctionDef):
-        # mutual rule (treating a single def as a singleton region for now).
-        # TODO: group contiguous FunctionDefs into a single region; bind all
-        # f_i in each body's context; enforce distinct names.
-        # TODO: subtract params from assigns(body) before introducing ff.
-        return assigns({s.name: TT}), ok()
+            return check_block(s.orelse, gamma)
+        return ok()
     if isinstance(s, ast.Assert):
-        # assert rule: Γ ⊢ e ; Γ ⊢ e' ⟹ Γ ⊢ assert e, e' : Assigns ∅
+        # assert rule: Γ ⊢ e ; Γ ⊢ e'
         err = check_expr(s.test, gamma)
         if not is_ok(err):
-            return assigns({}), err
+            return err
         if s.msg is not None:
-            err = check_expr(s.msg, gamma)
-            if not is_ok(err):
-                return assigns({}), err
-        return assigns({}), ok()
-    # Unrecognised statement form: should have been rejected by purepy_parse.
-    return assigns({}), ok()
+            return check_expr(s.msg, gamma)
+        return ok()
+    # FunctionDef should be handled via check_mutual_region (items grouping).
+    # Unrecognised forms: should have been rejected by purepy_parse.
+    return ok()
 
 
 def check_expr(e, gamma):
@@ -175,13 +275,95 @@ def check_expr(e, gamma):
     return ok()
 
 
+# --- Free variables and captures (metafunctions over expressions) -------------
+# Per fig/well-formed.tex prose: `fv` is the standard free-variables function;
+# `captures(e)` is the set of variables captured by closures (lambdas / nested
+# defs) within `e`. For a non-lambda expression, captures distributes over
+# subexpressions; for a lambda, captures(lambda x⃗: e') = fv(e') \ {x⃗}.
+
+
+def fv(e):
+    """Free variables of an expression."""
+    if isinstance(e, ast.Name):
+        return {e.id}
+    if isinstance(e, ast.Constant):
+        return set()
+    if isinstance(e, ast.Lambda):
+        params = {a.arg for a in e.args.args}
+        return fv(e.body) - params
+    if isinstance(e, ast.Call):
+        return fv(e.func) | fv_list(e.args)
+    if isinstance(e, ast.BinOp):
+        return fv(e.left) | fv(e.right)
+    if isinstance(e, ast.UnaryOp):
+        return fv(e.operand)
+    if isinstance(e, ast.BoolOp):
+        return fv_list(e.values)
+    if isinstance(e, ast.Compare):
+        return fv(e.left) | fv_list(e.comparators)
+    if isinstance(e, ast.IfExp):
+        return fv(e.test) | fv(e.body) | fv(e.orelse)
+    if isinstance(e, ast.Attribute):
+        return fv(e.value)
+    if isinstance(e, ast.Subscript):
+        return fv(e.value) | fv(e.slice)
+    if isinstance(e, (ast.List, ast.Tuple)):
+        return fv_list(e.elts)
+    if isinstance(e, ast.Dict):
+        return fv_list([k for k in e.keys if k is not None]) | fv_list(e.values)
+    return set()
+
+
+def fv_list(es):
+    if not es:
+        return set()
+    return fv(es[0]) | fv_list(es[1:])
+
+
+def captures(e):
+    """Variables captured by closures within e."""
+    if isinstance(e, ast.Lambda):
+        params = {a.arg for a in e.args.args}
+        return fv(e.body) - params
+    if isinstance(e, ast.Name):
+        return set()
+    if isinstance(e, ast.Constant):
+        return set()
+    if isinstance(e, ast.Call):
+        return captures(e.func) | captures_list(e.args)
+    if isinstance(e, ast.BinOp):
+        return captures(e.left) | captures(e.right)
+    if isinstance(e, ast.UnaryOp):
+        return captures(e.operand)
+    if isinstance(e, ast.BoolOp):
+        return captures_list(e.values)
+    if isinstance(e, ast.Compare):
+        return captures(e.left) | captures_list(e.comparators)
+    if isinstance(e, ast.IfExp):
+        return captures(e.test) | captures(e.body) | captures(e.orelse)
+    if isinstance(e, ast.Attribute):
+        return captures(e.value)
+    if isinstance(e, ast.Subscript):
+        return captures(e.value) | captures(e.slice)
+    if isinstance(e, (ast.List, ast.Tuple)):
+        return captures_list(e.elts)
+    if isinstance(e, ast.Dict):
+        return captures_list([k for k in e.keys if k is not None]) | captures_list(e.values)
+    return set()
+
+
+def captures_list(es):
+    if not es:
+        return set()
+    return captures(es[0]) | captures_list(es[1:])
+
+
 def check_module(tree):
     """Top-level entry: check the module body as a block in the empty context."""
     if not tree.body:
         # empty module is trivially well-formed
         return ok()
-    _, err = check_block(tree.body, empty_context())
-    return err
+    return check_block(tree.body, empty_context())
 
 
 # --- I/O -----------------------------------------------------------------------
