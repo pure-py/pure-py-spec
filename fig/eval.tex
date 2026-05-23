@@ -69,6 +69,25 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \rho, \seq{d} \Rightarrow \assigns{\set{\seq{f} \mapsto \seq{v}}}
 }
 \and
+\inferrule*[lab={\ruleName{eval-if}}]
+{
+  \rho, e_j \Rightarrow \pyinline{False} \quad (\forall j < i) \\
+  \rho, e_i \Rightarrow \pyinline{True} \\
+  \rho, b_i \Rightarrow r
+}
+{
+  \rho, \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} \Rightarrow r
+}
+\and
+\inferrule*[lab={\ruleName{eval-else}}]
+{
+  \rho, e_j \Rightarrow \pyinline{False} \quad (\forall j \in \set{1, \ldots, n+1}) \\
+  \rho, b_{n+2} \Rightarrow r
+}
+{
+  \rho, \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} \Rightarrow r
+}
+\and
 \inferrule*[lab={\ruleName{eval-seq}}]
 {
   \rho, s \Rightarrow \assigns{\rho'} \\
