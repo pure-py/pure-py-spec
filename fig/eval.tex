@@ -35,6 +35,23 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \rho, \exAssign{x}{e} \Rightarrow \assigns{\set{x \mapsto v}}
 }
 \and
+\inferrule*[lab={\ruleName{eval-expr-stmt}}]
+{
+  \rho, e \Rightarrow v
+}
+{
+  \rho, e \Rightarrow \assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{eval-assert}}]
+{
+  \rho, e \Rightarrow v \\
+  v \neq \pyinline{False}
+}
+{
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \assigns{\varnothing}
+}
+\and
 \inferrule*[lab={\ruleName{eval-return}}]
 {
   \rho, e \Rightarrow v

@@ -20,6 +20,23 @@
   \Gamma \vdash \exAssign{x}{e} : \Assigns{\set{x : \statusDefAssigned}}
 }
 \and
+\inferrule*[lab={\ruleName{expr-stmt}}]
+{
+  \Gamma \vdash e
+}
+{
+  \Gamma \vdash e : \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{assert}}]
+{
+  \Gamma \vdash e \\
+  \Gamma \vdash e'
+}
+{
+  \Gamma \vdash \exAssertMsg{e}{e'} : \Assigns{\varnothing}
+}
+\and
 \inferrule*[lab={\ruleName{return-none}}]
 {
   \strut

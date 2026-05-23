@@ -129,7 +129,6 @@ Default arguments & \issue{56} \\
 \pyinline{*args} and \pyinline{**kwargs} & \issue{57} \\
 Decorators & \issue{58} \\
 Slicing & \issue{59} \\
-\pyinline{assert} & \issue{60} \\
 \end{tabular}}
 
 \subsection{Contexts}
@@ -242,6 +241,8 @@ before checking $s$.
 \begin{align*}
 \assignsF(\exPass) &= \varnothing \\
 \assignsF(\exAssign{x}{e}) &= \set{x} \\
+\assignsF(e) &= \varnothing \\
+\assignsF(\exAssertMsg{e}{e'}) &= \varnothing \\
 \assignsF(\exReturnNone) &= \varnothing \\
 \assignsF(\exReturn{e}) &= \varnothing \\
 \assignsF(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \assignsF(\vec{b}) \\
@@ -258,6 +259,8 @@ captured by closures (lambdas or nested function definitions) within $s$:
 \begin{align*}
 \mathrm{captures}(\exPass) &= \varnothing \\
 \mathrm{captures}(\exAssign{x}{e}) &= \mathrm{captures}(e) \\
+\mathrm{captures}(e) &= \mathrm{captures}(e) \\
+\mathrm{captures}(\exAssertMsg{e}{e'}) &= \mathrm{captures}(e) \cup \mathrm{captures}(e') \\
 \mathrm{captures}(\exReturnNone) &= \varnothing \\
 \mathrm{captures}(\exReturn{e}) &= \mathrm{captures}(e) \\
 \mathrm{captures}(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{b}) \\
@@ -550,6 +553,12 @@ A \pyinline{return} statement without an expression is equivalent to \pyinline{r
 
 A function whose body $s$ assigns rather than returns is equivalent to a function whose body is $s$ followed
 by \pyinline{return None}. This ensures every function returns, even if it is not explicitly specified.
+
+\subsubsection{\pyinline{assert} without a message}
+
+An \pyinline{assert e} statement without a message is equivalent to \pyinline{assert e, ""}. The grammar
+in \figref{syntax} admits only the two-argument form; the parser supplies the empty string when the
+message is omitted.
 
 \subsection{Unsupported Python features}
 

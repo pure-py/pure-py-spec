@@ -4,6 +4,8 @@
 \begin{tabular}{rcll}
 $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exAssign{x}{e}$ & (Assign) \\
+    & $\mid$ & $e$ & (ExprStmt) \\
+    & $\mid$ & $\exAssertMsg{e}{e'}$ & (Assert) \\
     & $\mid$ & $\exReturnNone$ & (ReturnNone) \\
     & $\mid$ & $\exReturn{e}$ & (Return) \\
     & $\mid$ & $\exIf{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}$ & (If) \\

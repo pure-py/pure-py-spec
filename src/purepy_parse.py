@@ -79,11 +79,17 @@ def check_stmt(node):
         return check_body(node.body)
 
     if isinstance(node, ast.Expr):
-        # Expression statement (e.g. bare function call). PurePy doesn't have
-        # expression statements since they imply discarding a value, which is
-        # an imperative pattern. However we permit them at the module level
-        # for now (e.g. print(...) in test scripts).
+        # Expression statement (e.g. bare function call): the expression is
+        # evaluated and its value discarded. See #66.
         return check_expr(node.value)
+
+    if isinstance(node, ast.Assert):
+        # assert <test> [, <msg>]. The msg expression, if present, is only
+        # evaluated on failure (#60).
+        check_expr(node.test)
+        if node.msg is not None:
+            check_expr(node.msg)
+        return
 
     # --- Excluded statement forms ---
 
@@ -119,9 +125,6 @@ def check_stmt(node):
 
     if isinstance(node, ast.Try):
         return unsupported(node, "try/except not supported")
-
-    if isinstance(node, ast.Assert):
-        return not_yet(node, "assert not yet supported (#60)")
 
     if isinstance(node, ast.Import):
         return not_yet(node, "import not yet supported (#53)")
