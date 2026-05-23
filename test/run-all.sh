@@ -66,6 +66,7 @@ echo "well-formed"
 for f in test/well-formed/*.py test/well-formed/conditionals/*.py test/well-formed/functions/*.py test/well-formed/scopes/*.py; do
   [ -f "$f" ] || continue
   run "$f (parse)" python3 src/purepy_parse.py "$f"
+  run "$f (check)" python3 src/purepy_check.py "$f"
   run "$f (run)"   test/run-test.sh "$interpreter" "$f"
 done
 
