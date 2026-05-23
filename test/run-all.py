@@ -28,6 +28,9 @@ SEMANTIC_CAUGHT = {
     "unreachable",
     "self_capture",
     "self_capture_lambda",
+    "shadow_captured",
+    "shadow_captured_global",
+    "shadow_captured_mutual",
 }
 
 

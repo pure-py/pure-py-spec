@@ -22,7 +22,7 @@ process a PurePy representation of the AST (e.g. via dataclasses).
 
 import ast
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 # --- Result type ---------------------------------------------------------------
@@ -56,12 +56,11 @@ class TyReturns:
 
 @dataclass(frozen=True)
 class TyAssigns:
-    # Future: a Δ mapping var names to TT/FF. Empty for now.
-    pass
+    delta: dict = field(default_factory=dict)
 
 
 TY_RETURNS = TyReturns()
-TY_ASSIGNS = TyAssigns()
+TY_ASSIGNS = TyAssigns()                       # convenience: empty Δ
 
 
 def empty_context():
@@ -75,11 +74,51 @@ def extend(gamma, delta):
     return new
 
 
+def meet(a, b):
+    """∧ on B: tt ∧ tt = tt; else ff."""
+    if a == TT and b == TT:
+        return TT
+    return FF
+
+
+def merge_delta(d1, d2):
+    """Pointwise merge: k in both → meet; k in only one → ff."""
+    result = {}
+    for k in set(d1.keys()) | set(d2.keys()):
+        if k in d1 and k in d2:
+            result[k] = meet(d1[k], d2[k])
+        else:
+            result[k] = FF
+    return result
+
+
 def merge_results(rs):
-    """Returns is identity for merge: all-Returns ⇒ Returns, else Assigns."""
-    if all(isinstance(r, TyReturns) for r in rs):
+    """Returns is unit for merge; otherwise merge the Δs of the Assigns branches."""
+    assigns_branches = [r for r in rs if isinstance(r, TyAssigns)]
+    if not assigns_branches:
         return TY_RETURNS
-    return TY_ASSIGNS
+    delta = assigns_branches[0].delta
+    return TyAssigns(_fold_merge(delta, assigns_branches[1:]))
+
+
+def _fold_merge(acc, branches):
+    if not branches:
+        return acc
+    return _fold_merge(merge_delta(acc, branches[0].delta), branches[1:])
+
+
+def runion_delta(d1, d2):
+    """Right-biased override on Δ."""
+    return {**d1, **d2}
+
+
+def runion_results(r1, r2):
+    """Sequential composition on result types (the seq case)."""
+    if isinstance(r1, TyReturns):
+        return r1                              # Returns absorbs anything that follows
+    if isinstance(r2, TyReturns):
+        return r2                              # Assigns Δ runion Returns = Returns
+    return TyAssigns(runion_delta(r1.delta, r2.delta))
 
 
 def result_type(node):
@@ -88,7 +127,7 @@ def result_type(node):
     if isinstance(node, ast.Pass):
         return TY_ASSIGNS
     if isinstance(node, ast.Assign):
-        return TY_ASSIGNS
+        return TyAssigns({t.id: TT for t in node.targets if isinstance(t, ast.Name)})
     if isinstance(node, ast.Expr):
         return TY_ASSIGNS                       # expr-stmt
     if isinstance(node, ast.Assert):
@@ -96,7 +135,7 @@ def result_type(node):
     if isinstance(node, ast.Return):
         return TY_RETURNS                       # return / return-none
     if isinstance(node, ast.FunctionDef):
-        return TY_ASSIGNS                       # mutual rule binds the f names
+        return TyAssigns({node.name: TT})       # singleton mutual region
     if isinstance(node, ast.If):
         # Merge of branch result types, plus implicit Assigns ∅ if no else.
         branches = [result_type_of_block(node.body)]
@@ -109,9 +148,17 @@ def result_type(node):
 
 
 def result_type_of_block(block):
-    """Result type of a (well-formed) non-empty block is its last item's
-    result type: seq forces all earlier items to Assigns."""
-    return result_type(block[-1])
+    """Result type of a non-empty block: fold runion_results over the items.
+    Per seq, an earlier-returning head forces Returns; otherwise Δ accumulates."""
+    if len(block) == 1:
+        return _result_type_of_item(block[0])
+    return runion_results(_result_type_of_item(block[0]), result_type_of_block(block[1:]))
+
+
+def _result_type_of_item(stmt):
+    """At this level the input is a raw ast statement (block is flat from
+    Python's ast). Mutual regions are grouped at check-time, not here."""
+    return result_type(stmt)
 
 
 # --- Well-formedness check -----------------------------------------------------
@@ -143,16 +190,23 @@ def check_items(items, gamma):
         first_unreachable = tail[0]
         node = first_unreachable[0] if isinstance(first_unreachable, list) else first_unreachable
         return ill_formed(node, "unreachable statement")
-    # TODO: enforce captures(head) ∩ assigns(tail) = ∅ side condition
-    # TODO: extend gamma with bindings of head before checking tail
-    return check_items(tail, gamma)
+    # seq rule's captures(s) ∩ assignsF(b) = ∅ side condition
+    reassigned = captures_item(head) & assigns_items(tail)
+    if reassigned:
+        name = sorted(reassigned)[0]
+        node = find_first_reassigning(tail, reassigned)
+        return ill_formed(node, f"'{name}' captured by previous statement, reassigned here")
+    # Extend Γ by the head's Δ before checking the tail.
+    head_result = item_result_type(head)
+    delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
+    return check_items(tail, extend(gamma, delta))
 
 
 def item_result_type(item):
-    """Result type of an item: a mutual region always Assigns; otherwise
+    """Result type of an item: a mutual region Assigns its def names; otherwise
     delegate to result_type on the AST node."""
     if isinstance(item, list):
-        return TY_ASSIGNS
+        return TyAssigns({d.name: TT for d in item})
     return result_type(item)
 
 
@@ -356,6 +410,123 @@ def captures_list(es):
     if not es:
         return set()
     return captures(es[0]) | captures_list(es[1:])
+
+
+# --- fv / assignsF / captures lifted to statements and blocks -----------------
+
+
+def fv_stmt(s):
+    if isinstance(s, ast.Pass):
+        return set()
+    if isinstance(s, ast.Assign):
+        return fv(s.value)
+    if isinstance(s, ast.Expr):
+        return fv(s.value)
+    if isinstance(s, ast.Return):
+        return fv(s.value) if s.value is not None else set()
+    if isinstance(s, ast.Assert):
+        result = fv(s.test)
+        if s.msg is not None:
+            result = result | fv(s.msg)
+        return result
+    if isinstance(s, ast.If):
+        return fv(s.test) | fv_block(s.body) | fv_block(s.orelse)
+    if isinstance(s, ast.FunctionDef):
+        params = {a.arg for a in s.args.args}
+        return fv_block(s.body) - params - {s.name}
+    return set()
+
+
+def fv_block(block):
+    if not block:
+        return set()
+    return fv_stmt(block[0]) | fv_block(block[1:])
+
+
+def assigns_stmt(s):
+    """assignsF on a statement (see fig/well-formed.tex equations)."""
+    if isinstance(s, ast.Assign):
+        return {t.id for t in s.targets if isinstance(t, ast.Name)}
+    if isinstance(s, ast.If):
+        return assigns_block(s.body) | assigns_block(s.orelse)
+    if isinstance(s, ast.FunctionDef):
+        return {s.name}
+    return set()
+
+
+def assigns_block(block):
+    if not block:
+        return set()
+    return assigns_stmt(block[0]) | assigns_block(block[1:])
+
+
+def captures_stmt(s):
+    if isinstance(s, ast.Pass):
+        return set()
+    if isinstance(s, ast.Assign):
+        return captures(s.value)
+    if isinstance(s, ast.Expr):
+        return captures(s.value)
+    if isinstance(s, ast.Return):
+        return captures(s.value) if s.value is not None else set()
+    if isinstance(s, ast.Assert):
+        result = captures(s.test)
+        if s.msg is not None:
+            result = result | captures(s.msg)
+        return result
+    if isinstance(s, ast.If):
+        return captures(s.test) | captures_block(s.body) | captures_block(s.orelse)
+    if isinstance(s, ast.FunctionDef):
+        return captures_region([s])
+    return set()
+
+
+def captures_block(block):
+    if not block:
+        return set()
+    return captures_stmt(block[0]) | captures_block(block[1:])
+
+
+def captures_region(defs):
+    """captures of a mutual region (fig/well-formed.tex equation)."""
+    f_names = {d.name for d in defs}
+    return _captures_region_bodies(defs) - f_names
+
+
+def _captures_region_bodies(defs):
+    if not defs:
+        return set()
+    d = defs[0]
+    params = {a.arg for a in d.args.args}
+    own = fv_block(d.body) - params - assigns_block(d.body)
+    return own | _captures_region_bodies(defs[1:])
+
+
+def captures_item(item):
+    if isinstance(item, list):
+        return captures_region(item)
+    return captures_stmt(item)
+
+
+def assigns_item(item):
+    if isinstance(item, list):
+        return {d.name for d in item}
+    return assigns_stmt(item)
+
+
+def assigns_items(items):
+    if not items:
+        return set()
+    return assigns_item(items[0]) | assigns_items(items[1:])
+
+
+def find_first_reassigning(items, names):
+    """Return the AST node of the first item that assigns any name in `names`."""
+    if not items:
+        return None
+    if assigns_item(items[0]) & names:
+        return items[0][0] if isinstance(items[0], list) else items[0]
+    return find_first_reassigning(items[1:], names)
 
 
 def check_module(tree):
