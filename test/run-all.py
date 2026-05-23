@@ -31,6 +31,13 @@ SEMANTIC_CAUGHT = {
     "shadow_captured",
     "shadow_captured_global",
     "shadow_captured_mutual",
+    "cond_partial_def",
+    "mutual_split_by_assign",
+    "mutual_split_by_call_late_binding",
+    "mutual_split_by_call_nameerror",
+    "mutual_def_block_local",
+    "no_else",
+    "unbound_local",
 }
 
 

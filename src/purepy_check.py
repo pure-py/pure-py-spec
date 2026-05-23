@@ -63,6 +63,14 @@ TY_RETURNS = TyReturns()
 TY_ASSIGNS = TyAssigns()                       # convenience: empty Δ
 
 
+BUILTINS = {
+    "print": TT,
+    "type": TT,
+    "range": TT,
+    "len": TT,
+}
+
+
 def empty_context():
     return {}
 
@@ -246,16 +254,28 @@ def check_mutual_region(defs, gamma):
 
 
 def check_bodies(defs, gamma):
-    """Recurse into each def's body. TODO: extend gamma with f_i (as tt),
-    params (as tt), and assigns(body_i) \\ params_i (as ff); subtract params
-    from assigns before introducing ff to avoid the param-shadow-by-local trap.
-    For now, body is checked in the outer gamma."""
+    """Per the mutual rule, each body b_i is checked in
+        Γ ⨄ tt(\\seq{f}) ⨄ tt(\\seq{x}_i) ⨄ ff(assigns(b_i) \\ \\seq{x}_i).
+    Subtract params from assigns before introducing ff so parameters stay tt
+    even if reassigned in the body."""
+    f_names = {d.name: TT for d in defs}
+    return _check_bodies(defs, gamma, f_names)
+
+
+def _check_bodies(defs, gamma, f_names):
     if not defs:
         return ok()
-    err = check_block(defs[0].body, gamma)
+    d = defs[0]
+    params = {a.arg for a in d.args.args}
+    locals_ = assigns_block(d.body) - params
+    body_gamma = extend(
+        extend(extend(gamma, f_names), {p: TT for p in params}),
+        {x: FF for x in locals_},
+    )
+    err = check_block(d.body, body_gamma)
     if not is_ok(err):
         return err
-    return check_bodies(defs[1:], gamma)
+    return _check_bodies(defs[1:], gamma, f_names)
 
 
 def check_assign_targets(targets, captured):
@@ -322,11 +342,69 @@ def check_stmt(s, gamma):
 
 
 def check_expr(e, gamma):
-    """Γ ⊢ e. Skeleton: always accept.
-
-    TODO: implement var rule (Γ(x) = tt), lambda rule (typing in extended Γ).
-    """
+    """Γ ⊢ e. Implements the var rule (Γ(x) = tt) and recursive descent."""
+    if isinstance(e, ast.Name):
+        if gamma.get(e.id) != TT:
+            return ill_formed(e, f"'{e.id}' is not definitely assigned")
+        return ok()
+    if isinstance(e, ast.Constant):
+        return ok()
+    if isinstance(e, ast.Lambda):
+        # lambda rule: type body in Γ extended with params at tt
+        params = {a.arg for a in e.args.args}
+        gamma_ = extend(gamma, {p: TT for p in params})
+        return check_expr(e.body, gamma_)
+    if isinstance(e, ast.Call):
+        err = check_expr(e.func, gamma)
+        if not is_ok(err):
+            return err
+        return check_exprs(e.args, gamma)
+    if isinstance(e, ast.BinOp):
+        err = check_expr(e.left, gamma)
+        if not is_ok(err):
+            return err
+        return check_expr(e.right, gamma)
+    if isinstance(e, ast.UnaryOp):
+        return check_expr(e.operand, gamma)
+    if isinstance(e, ast.BoolOp):
+        return check_exprs(e.values, gamma)
+    if isinstance(e, ast.Compare):
+        err = check_expr(e.left, gamma)
+        if not is_ok(err):
+            return err
+        return check_exprs(e.comparators, gamma)
+    if isinstance(e, ast.IfExp):
+        err = check_expr(e.test, gamma)
+        if not is_ok(err):
+            return err
+        err = check_expr(e.body, gamma)
+        if not is_ok(err):
+            return err
+        return check_expr(e.orelse, gamma)
+    if isinstance(e, ast.Attribute):
+        return check_expr(e.value, gamma)
+    if isinstance(e, ast.Subscript):
+        err = check_expr(e.value, gamma)
+        if not is_ok(err):
+            return err
+        return check_expr(e.slice, gamma)
+    if isinstance(e, (ast.List, ast.Tuple)):
+        return check_exprs(e.elts, gamma)
+    if isinstance(e, ast.Dict):
+        err = check_exprs([k for k in e.keys if k is not None], gamma)
+        if not is_ok(err):
+            return err
+        return check_exprs(e.values, gamma)
     return ok()
+
+
+def check_exprs(es, gamma):
+    if not es:
+        return ok()
+    err = check_expr(es[0], gamma)
+    if not is_ok(err):
+        return err
+    return check_exprs(es[1:], gamma)
 
 
 # --- Free variables and captures (metafunctions over expressions) -------------
@@ -530,11 +608,11 @@ def find_first_reassigning(items, names):
 
 
 def check_module(tree):
-    """Top-level entry: check the module body as a block in the empty context."""
+    """Top-level entry: check the module body as a block. Γ starts populated
+    with the built-in names we support (see BUILTINS)."""
     if not tree.body:
-        # empty module is trivially well-formed
         return ok()
-    return check_block(tree.body, empty_context())
+    return check_block(tree.body, dict(BUILTINS))
 
 
 # --- I/O -----------------------------------------------------------------------
