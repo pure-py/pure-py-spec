@@ -152,6 +152,18 @@ def result_type(node):
         else:
             branches.append(TY_ASSIGNS)
         return merge_results(branches)
+    if isinstance(node, ast.Match):
+        branches = [
+            runion_results(
+                TyAssigns({x: TT for x in binds(case.pattern)}),
+                result_type_of_block(case.body)
+            )
+            for case in node.cases
+        ]
+        # match-partial: last pattern not a catch-all → append Assigns(∅) tail
+        if not _is_catch_all(node.cases[-1].pattern):
+            branches.append(TY_ASSIGNS)
+        return merge_results(branches)
     return TY_ASSIGNS
 
 
@@ -427,6 +439,11 @@ def check_exprs(es, gamma):
 
 
 # --- Pattern metafunctions -----------------------------------------------------
+
+
+def _is_catch_all(p):
+    """Var or wildcard pattern — matches any value."""
+    return isinstance(p, ast.MatchAs) and p.pattern is None
 
 
 def _literal_value(pat):
