@@ -426,6 +426,23 @@ def check_exprs(es, gamma):
     return check_exprs(es[1:], gamma)
 
 
+# --- Pattern metafunctions -----------------------------------------------------
+
+
+def binds(pattern):
+    """Set of variable names introduced by a pattern (spec: fig:aux)."""
+    if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
+        return set()
+    if isinstance(pattern, ast.MatchAs) and pattern.pattern is None:
+        return {pattern.name} if pattern.name else set()
+    if isinstance(pattern, ast.MatchSequence):
+        result = set()
+        for p in pattern.patterns:
+            result |= binds(p)
+        return result
+    raise AssertionError(f"unexpected pattern: {type(pattern).__name__}")
+
+
 # --- Free variables and captures (metafunctions over expressions) -------------
 # Per fig/well-formed.tex prose: `fv` is the standard free-variables function;
 # `captures(e)` is the set of variables captured by closures (lambdas / nested
