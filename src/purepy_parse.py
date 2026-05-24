@@ -229,7 +229,7 @@ def check_expr(node):
         return check_all(node.values, check_expr)
 
     if isinstance(node, ast.Set):
-        return check_all(node.elts, check_expr)
+        return not_yet(node, "set literals not yet supported (#52)")
 
     if isinstance(node, ast.Attribute):
         return check_expr(node.value)
@@ -247,32 +247,13 @@ def check_expr(node):
         return check_all(node.generators, check_comprehension)
 
     if isinstance(node, ast.DictComp):
-        # #52
-        key_result = check_expr(node.key)
-        if not is_ok(key_result):
-            return key_result
-        value_result = check_expr(node.value)
-        if not is_ok(value_result):
-            return value_result
-        return check_all(node.generators, check_comprehension)
+        return not_yet(node, "dict comprehensions not yet supported (#52)")
 
     if isinstance(node, ast.SetComp):
-        # #52
-        elt_result = check_expr(node.elt)
-        if not is_ok(elt_result):
-            return elt_result
-        return check_all(node.generators, check_comprehension)
+        return not_yet(node, "set comprehensions not yet supported (#52)")
 
     if isinstance(node, ast.Slice):
-        # Slicing (#59) — accepted for now
-        lower_result = check_expr(node.lower) if node.lower is not None else ok()
-        if not is_ok(lower_result):
-            return lower_result
-        upper_result = check_expr(node.upper) if node.upper is not None else ok()
-        if not is_ok(upper_result):
-            return upper_result
-        step_result = check_expr(node.step) if node.step is not None else ok()
-        return step_result
+        return not_yet(node, "slicing not yet supported (#59)")
 
     # --- Excluded expression forms ---
 

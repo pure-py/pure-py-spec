@@ -1,3 +1,4 @@
+# rule: var
 def foo(b):
     x = 6
     if b:

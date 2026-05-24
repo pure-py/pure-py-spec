@@ -1,3 +1,4 @@
+# rule: seq
 x = 6
 def g():
     return x

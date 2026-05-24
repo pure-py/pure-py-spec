@@ -1,3 +1,4 @@
+# rule: assign
 def f():
     x = 5
     x = lambda: x  # PurePy: error (x captured and reassigned in same statement); Python: late binding

@@ -1,3 +1,4 @@
+# rule: seq
 def g():
     return 0
 

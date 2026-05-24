@@ -1,3 +1,4 @@
+# rule: var
 y = 7
 
 def f():

@@ -197,13 +197,13 @@ def check_items(items, gamma):
     if isinstance(item_result_type(head), TyReturns):
         first_unreachable = tail[0]
         node = first_unreachable[0] if isinstance(first_unreachable, list) else first_unreachable
-        return ill_formed(node, "unreachable statement")
+        return ill_formed(node, "[seq] unreachable statement")
     # seq rule's captures(s) ∩ assignsF(b) = ∅ side condition
     reassigned = captures_item(head) & assigns_items(tail)
     if reassigned:
         name = sorted(reassigned)[0]
         node = find_first_reassigning(tail, reassigned)
-        return ill_formed(node, f"'{name}' captured by previous statement, reassigned here")
+        return ill_formed(node, f"[seq] '{name}' captured by previous statement, reassigned here")
     # Extend Γ by the head's Δ before checking the tail.
     head_result = item_result_type(head)
     delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
@@ -284,7 +284,7 @@ def check_assign_targets(targets, captured):
         return ok()
     t = targets[0]
     if isinstance(t, ast.Name) and t.id in captured:
-        return ill_formed(t, f"'{t.id}' captured by right-hand side")
+        return ill_formed(t, f"[assign] '{t.id}' captured by right-hand side")
     return check_assign_targets(targets[1:], captured)
 
 
@@ -294,7 +294,7 @@ def check_distinct_names(defs, seen):
         return ok()
     head = defs[0]
     if head.name in seen:
-        return ill_formed(head, f"duplicate name '{head.name}' in mutual region")
+        return ill_formed(head, f"[mutual] duplicate name '{head.name}' in mutual region")
     return check_distinct_names(defs[1:], seen | {head.name})
 
 
@@ -345,7 +345,7 @@ def check_expr(e, gamma):
     """Γ ⊢ e. Implements the var rule (Γ(x) = tt) and recursive descent."""
     if isinstance(e, ast.Name):
         if gamma.get(e.id) != TT:
-            return ill_formed(e, f"'{e.id}' is not definitely assigned")
+            return ill_formed(e, f"[var] '{e.id}' is not definitely assigned")
         return ok()
     if isinstance(e, ast.Constant):
         return ok()
@@ -395,7 +395,26 @@ def check_expr(e, gamma):
         if not is_ok(err):
             return err
         return check_exprs(e.values, gamma)
+    if isinstance(e, ast.ListComp):
+        return check_comprehension(e.elt, e.generators, gamma)
     return ok()
+
+
+def check_comprehension(elt, generators, gamma):
+    """Check a comprehension `elt for g_1 ... g_n` in Γ. Each generator's iter
+    is checked in the current Γ; its target is bound, and guards / remaining
+    generators / the elt are checked in the extended Γ."""
+    if not generators:
+        return check_expr(elt, gamma)
+    g = generators[0]
+    err = check_expr(g.iter, gamma)
+    if not is_ok(err):
+        return err
+    gamma_ = extend(gamma, {n: TT for n in names_in_target(g.target)})
+    err = check_exprs(g.ifs, gamma_)
+    if not is_ok(err):
+        return err
+    return check_comprehension(elt, generators[1:], gamma_)
 
 
 def check_exprs(es, gamma):
@@ -443,6 +462,8 @@ def fv(e):
         return fv_list(e.elts)
     if isinstance(e, ast.Dict):
         return fv_list([k for k in e.keys if k is not None]) | fv_list(e.values)
+    if isinstance(e, ast.ListComp):
+        return fv_comprehension(e.elt, e.generators)
     return set()
 
 
@@ -450,6 +471,33 @@ def fv_list(es):
     if not es:
         return set()
     return fv(es[0]) | fv_list(es[1:])
+
+
+def fv_comprehension(elt, generators):
+    """fv of `elt for g_1 ... g_n`. Each generator's iter is evaluated in the
+    enclosing scope (before its target binds); guards and remaining generators
+    see the bound names."""
+    if not generators:
+        return fv(elt)
+    g = generators[0]
+    target_names = names_in_target(g.target)
+    rest = fv_list(g.ifs) | fv_comprehension(elt, generators[1:])
+    return fv(g.iter) | (rest - target_names)
+
+
+def names_in_target(target):
+    """Names bound by a comprehension/for target (single Name or Tuple thereof)."""
+    if isinstance(target, ast.Name):
+        return {target.id}
+    if isinstance(target, ast.Tuple):
+        return _names_in_targets(target.elts)
+    return set()
+
+
+def _names_in_targets(targets):
+    if not targets:
+        return set()
+    return names_in_target(targets[0]) | _names_in_targets(targets[1:])
 
 
 def captures(e):
@@ -481,6 +529,8 @@ def captures(e):
         return captures_list(e.elts)
     if isinstance(e, ast.Dict):
         return captures_list([k for k in e.keys if k is not None]) | captures_list(e.values)
+    if isinstance(e, ast.ListComp):
+        return captures_comprehension(e.elt, e.generators)
     return set()
 
 
@@ -488,6 +538,15 @@ def captures_list(es):
     if not es:
         return set()
     return captures(es[0]) | captures_list(es[1:])
+
+
+def captures_comprehension(elt, generators):
+    if not generators:
+        return captures(elt)
+    g = generators[0]
+    target_names = names_in_target(g.target)
+    rest = captures_list(g.ifs) | captures_comprehension(elt, generators[1:])
+    return captures(g.iter) | (rest - target_names)
 
 
 # --- fv / assignsF / captures lifted to statements and blocks -----------------

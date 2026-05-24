@@ -1,3 +1,4 @@
+# rule: var
 b = True
 
 if b:
