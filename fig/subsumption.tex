@@ -7,7 +7,7 @@
   \strut
 }
 {
-  n \subsumed n
+  \ell \subsumed \ell
 }
 \and
 \inferrule*[lab={\ruleName{sub-var}}]
@@ -26,15 +26,7 @@
   p \subsumed \patWild
 }
 \and
-\inferrule*[lab={\ruleName{sub-tuple}}]
-{
-  p_i \subsumed q_i \quad (\forall i)
-}
-{
-  \exTuple{p_1, \ldots, p_n} \subsumed \exTuple{q_1, \ldots, q_n}
-}
-\and
-\inferrule*[lab={\ruleName{sub-list}}]
+\inferrule*[lab={\ruleName{sub-seq}}]
 {
   p_i \subsumed q_i \quad (\forall i)
 }

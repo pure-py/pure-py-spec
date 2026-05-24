@@ -19,7 +19,7 @@ $b$ & $::=$ & $s_1 \;\ldots\; s_{n+1}$ & (Block)
 $d$ & $::=$ & $\exDef{f}{x_1, \ldots, x_n}{b}$ & (Def)
    \\[3mm]
 $e$ & $::=$ & $x$ & (Var) \\
-    & $\mid$ & $n$ & (Literal) \\
+    & $\mid$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exApp{e}{e_1, \ldots, e_n}$ & (Call) \\
     & $\mid$ & $\exDict{x_1 \mathord{:} e_1, \ldots, x_n \mathord{:} e_n}$ & (Dict) \\
     & $\mid$ & $\exProject{e}{x}$ & (Lookup) \\
@@ -35,11 +35,15 @@ $e$ & $::=$ & $x$ & (Var) \\
 $q$ & $::=$ & $\qualGuard{e}$ & (Guard) \\
     & $\mid$ & $\qualGenerator{x}{e}$ & (Generator)
    \\[3mm]
-$p$ & $::=$ & $n$ & (PatLiteral) \\
+$\ell$ & $::=$ & $n$ & (Number) \\
+    & $\mid$ & $\pyinline{True}$ & (True) \\
+    & $\mid$ & $\pyinline{False}$ & (False) \\
+    & $\mid$ & $\pyinline{None}$ & (None)
+   \\[3mm]
+$p$ & $::=$ & $\ell$ & (PatLiteral) \\
     & $\mid$ & $x$ & (PatVar) \\
     & $\mid$ & $\patWild$ & (PatWildcard) \\
-    & $\mid$ & $\exTuple{p_1, \ldots, p_n}$ & (PatTuple) \\
-    & $\mid$ & $\exList{p_1, \ldots, p_n}$ & (PatList)
+    & $\mid$ & $\exList{p_1, \ldots, p_n}$ & (PatSeq)
    \\[3mm]
 $\Gamma, \Delta$ & $::=$ & $\set{x_1 \mathord{:} \B, \ldots, x_n \mathord{:} \B}$ & \\[3mm]
 $R, S$ & $::=$ & $\Returns$ & \\

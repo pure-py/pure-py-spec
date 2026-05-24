@@ -12,10 +12,9 @@
 \assignsS(\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}) &= \set{f_1, \ldots, f_{n+1}} \\
 \assignsS(\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}) &= \textstyle\bigcup_i \big(\binds(p_i) \cup \assignsS(b_i)\big) \\
 \\
-\binds(n) &= \varnothing \\
+\binds(\ell) &= \varnothing \\
 \binds(x) &= \set{x} \\
 \binds(\patWild) &= \varnothing \\
-\binds(\exTuple{p_1, \ldots, p_n}) &= \textstyle\bigcup_i \binds(p_i) \\
 \binds(\exList{p_1, \ldots, p_n}) &= \textstyle\bigcup_i \binds(p_i) \\
 \\
 \capturesS(\exPass) &= \varnothing \\
