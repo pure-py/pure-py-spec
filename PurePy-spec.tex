@@ -580,6 +580,11 @@ to sequential composition of result types:
 effects, so as black boxes functions are always pure.
 
 \input{fig/eval}
+
+\noindent The pattern-matching judgement $p, v \matches \rho$ is a deterministic partial function on $(p,
+v)$. We write $p, v \notmatches$ (with no right-hand side) for $\nexists \rho.\, p, v \matches \rho$, i.e.\
+matching is undefined at $(p, v)$.
+
 \input{fig/match}
 
 \input{tex/related-work}

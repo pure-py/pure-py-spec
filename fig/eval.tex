@@ -17,7 +17,13 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \end{figure}
 
 \begin{figure}
-\begin{subfigure}{\textwidth}
+\small
+\begin{align*}
+\dispatch(v, \varepsilon) &= (\varnothing, \exPass) \\
+\dispatch(v, \exCase{p}{b} \cons \mathit{cs}) &= (\rho', b) && \text{if } p, v \matches \rho' \\
+\dispatch(v, \exCase{p}{b} \cons \mathit{cs}) &= \dispatch(v, \mathit{cs}) && \text{if } p, v \notmatches
+\end{align*}
+
 \flushleft \shadebox{$\rho, b \Rightarrow r$}
 \begin{mathpar}
 \small
@@ -99,6 +105,16 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \rho, \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} \Rightarrow r
 }
 \and
+\inferrule*[lab={\ruleName{eval-match}}]
+{
+  \rho, e \Rightarrow v \\
+  \dispatch(v, \exCase{p_1}{b_1} \cons \ldots \cons \exCase{p_{n+1}}{b_{n+1}}) = (\rho', b) \\
+  \rho \runion \rho', b \Rightarrow r
+}
+{
+  \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow r
+}
+\and
 \inferrule*[lab={\ruleName{eval-seq}}]
 {
   \rho, s \Rightarrow \assigns{\rho'} \\
@@ -109,12 +125,20 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 }
 \end{mathpar}
 \caption{Block evaluation}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
+\label{fig:eval}
+\end{figure}
+
+\begin{figure}
+\small
+\begin{align*}
+\unwrap(\returns{v}) &= v \\
+\unwrap(\assigns{\rho}) &= \pyinline{None}
+\end{align*}
+
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
 \begin{mathpar}
 \small
-\inferrule*[right=var]
+\inferrule*[lab={\ruleName{eval-var}}]
 {
    \strut
 }
@@ -122,7 +146,7 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \rho, x \Rightarrow \rho(x)
 }
 \and
-\inferrule*[right=lambda]
+\inferrule*[lab={\ruleName{eval-lambda}}]
 {
   \strut
 }
@@ -130,7 +154,7 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \rho, \exLambda{x_1, \ldots, x_n}{e} \Rightarrow \exClosure{\rho}{\vec{x}}{e}
 }
 \and
-\inferrule*[right=call-lambda]
+\inferrule*[lab={\ruleName{eval-call-lambda}}]
 {
   \rho, e \Rightarrow \exClosure{\rho'}{\vec{x}}{e'} \\
   \rho, \vec{e} \Rightarrow \vec{u} \\
@@ -140,31 +164,19 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow v
 }
 \and
-\inferrule*[right=call-def]
+\inferrule*[lab={\ruleName{eval-call-def}}]
 {
   \rho, e \Rightarrow \exDefClosure{\rho'}{\seq{d}}{j} \\
   d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
   v_i = \exDefClosure{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \vec{e} \Rightarrow \vec{u} \\
-  \rho' \runion \set{\seq{f} \mapsto \seq{v}} \runion \set{\seq{x}_j \mapsto \seq{u}}, b_j \Rightarrow \returns{v}
+  \rho' \runion \set{\seq{f} \mapsto \seq{v}} \runion \set{\seq{x}_j \mapsto \seq{u}}, b_j \Rightarrow r
 }
 {
-  \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow v
-}
-\and
-\inferrule*[right=call-def-fallthrough]
-{
-  \rho, e \Rightarrow \exDefClosure{\rho'}{\seq{d}}{j} \\
-  d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
-  v_i = \exDefClosure{\rho'}{\seq{d}}{i} \quad (\forall i) \\
-  \rho, \vec{e} \Rightarrow \vec{u} \\
-  \rho' \runion \set{\seq{f} \mapsto \seq{v}} \runion \set{\seq{x}_j \mapsto \seq{u}}, b_j \Rightarrow \assigns{\rho''}
-}
-{
-  \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow \pyinline{None}
+  \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow \unwrap(r)
 }
 \end{mathpar}
 \caption{Expression evaluation}
-\end{subfigure}
-\caption{Operational semantics}
+\label{fig:eval-expr}
 \end{figure}
+
