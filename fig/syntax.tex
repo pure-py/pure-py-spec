@@ -44,8 +44,8 @@ $p$ & $::=$ & $\ell$ & (PatLiteral) \\
     & $\mid$ & $-n$ & (PatNegLit) \\
     & $\mid$ & $x$ & (PatVar) \\
     & $\mid$ & $\patWild$ & (PatWildcard) \\
-    & $\mid$ & $\exList{p_1, \ldots, p_n}$ & (PatSeq) \\
-    & $\mid$ & $\exTuple{p_1, \ldots, p_n}$ & (PatSeq) \\
+    & $\mid$ & $\patList{p_1, \ldots, p_n}$ & (PatSeq) \\
+    & $\mid$ & $\patTuple{p_1, \ldots, p_n}$ & (PatSeq) \\
     & $\mid$ & $p\;\pyinline{as}\;x$ & (PatAs)
    \\[3mm]
 $\Gamma, \Delta$ & $::=$ & $\set{x_1 \mathord{:} \B, \ldots, x_n \mathord{:} \B}$ & \\[3mm]
