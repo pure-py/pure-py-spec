@@ -8,6 +8,7 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 ## Style
 
 - Minimal. State the thing; stop.
+- No weasel-words like "honest", "clean", "obvious", "simply". They smuggle persuasion in place of substance.
 - No defensive coding. If a case shouldn't arise, assert it; don't silently return a safe default.
 
 ## Git
