@@ -94,22 +94,24 @@
 {
   \Gamma \vdash e \\
   \Gamma \runion \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
+  S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \runion R_i \quad (\forall i) \\
   \vdash p_1, \ldots, p_{n+1} \\
-  \exists i.\, p_i \in \set{x, \patWild}
+  p_{n+1} \in \set{x, \patWild}
 }
 {
-  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : \big(\Assigns{\statusDefAssigned(\binds(p_1))} \runion R_1\big) \merge \ldots \merge \big(\Assigns{\statusDefAssigned(\binds(p_{n+1}))} \runion R_{n+1}\big)
+  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : S_1 \merge \ldots \merge S_{n+1}
 }
 \and
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Gamma \vdash e \\
   \Gamma \runion \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
+  S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \runion R_i \quad (\forall i) \\
   \vdash p_1, \ldots, p_{n+1} \\
-  \neg\exists i.\, p_i \in \set{x, \patWild}
+  p_{n+1} \notin \set{x, \patWild}
 }
 {
-  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : \big(\Assigns{\statusDefAssigned(\binds(p_1))} \runion R_1\big) \merge \ldots \merge \big(\Assigns{\statusDefAssigned(\binds(p_{n+1}))} \runion R_{n+1}\big) \merge \Assigns{\varnothing}
+  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : S_1 \merge \ldots \merge S_{n+1} \merge \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{seq}}]
