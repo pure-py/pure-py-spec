@@ -116,7 +116,6 @@ one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
 \begin{tabular}{ll}
 \textbf{To do} & \\
 Reserved words & \issue{9} \\
-Operators and precedence & \issue{50} \\
 Data classes and \pyinline{match} & \issue{8} \\
 N-ary tuples & \issue{51} \\
 Set and dict comprehensions & \issue{52} \\
@@ -227,65 +226,56 @@ unreachable statements (\S\ref{sec:unreachable}).
 
 \input{fig/syntax}
 
+\paragraph{Operators.}
+
+The metavariable $\odot$ ranges over the supported binary operators and $\ominus$ over the supported unary
+operators, both enumerated in \figref{precedence}. The grammar of \figref{syntax} is intentionally ambiguous
+on operator forms; disambiguation is by the precedence and associativity given in \figref{precedence},
+which follow Python.
+
+\input{fig/precedence}
+
 \subsection{Well-formedness}
 
-\paragraph{Local variables.}
+\paragraph{Auxiliary metafunctions.}
 
-The function $\assignsF(s)$ collects the set of variables assigned anywhere in a statement $s$, without
-descending into nested function definitions (which have their own scope). If $s : \Assigns{\Delta}$, then
-$\assignsF(s) = \dom(\Delta)$; $\assignsF$ is a syntactic approximation needed to set up the context
-before checking $s$.
-%
-{\small
-\begin{align*}
-\assignsF(\exPass) &= \varnothing \\
-\assignsF(\exAssign{x}{e}) &= \set{x} \\
-\assignsF(e) &= \varnothing \\
-\assignsF(\exAssertMsg{e}{e'}) &= \varnothing \\
-\assignsF(\exReturnNone) &= \varnothing \\
-\assignsF(\exReturn{e}) &= \varnothing \\
-\assignsF(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \assignsF(\vec{b}) \\
-\assignsF(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \assignsF(\vec{b}) \\
-\assignsF(\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}) &= \set{f_1, \ldots, f_{n+1}}
-\end{align*}}
+Three syntactic analyses support the well-formedness rules: $\assignsS(s)$, the set of variables assigned
+anywhere in $s$ (without descending into nested function definitions, which have their own scope, so that
+$\assignsS(s) = \dom(\Delta)$ when $s : \Assigns{\Delta}$); $\binds(p)$, the set of variables introduced by a
+pattern $p$; and $\capturesS(s)$, the set of variables from the enclosing scope that are captured by closures
+(lambdas or nested function definitions) within $s$, with companion $\capturesE(e)$ on expressions. All are
+defined in \figref{aux}. The functions $\assignsS$ and $\capturesS$ extend pointwise to blocks via
+$\assignsS(s \cons b) = \assignsS(s) \cup \assignsS(b)$ (similarly $\capturesS$), with the singleton block $s$
+identifying with the underlying statement.
 
-\paragraph{Captured variables.}
+\input{fig/aux}
 
-The function $\mathrm{captures}(s)$ collects the set of variables from the enclosing scope that are
-captured by closures (lambdas or nested function definitions) within $s$:
-%
-{\small
-\begin{align*}
-\mathrm{captures}(\exPass) &= \varnothing \\
-\mathrm{captures}(\exAssign{x}{e}) &= \mathrm{captures}(e) \\
-\mathrm{captures}(e) &= \mathrm{captures}(e) \\
-\mathrm{captures}(\exAssertMsg{e}{e'}) &= \mathrm{captures}(e) \cup \mathrm{captures}(e') \\
-\mathrm{captures}(\exReturnNone) &= \varnothing \\
-\mathrm{captures}(\exReturn{e}) &= \mathrm{captures}(e) \\
-\mathrm{captures}(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{b}) \\
-\mathrm{captures}(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \mathrm{captures}(\vec{e}) \cup \mathrm{captures}(\vec{b}) \\
-\mathrm{captures}(\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}) &= \textstyle\bigcup_i \big(\mathrm{fv}(b_i) \setminus (\set{\vec{x}_i} \cup \assignsF(b_i))\big) \\
-& \quad \setminus \set{f_1, \ldots, f_{n+1}}
-\end{align*}}
+\paragraph{Pattern subsumption.}
 
-\noindent Both $\assignsF$ and $\mathrm{captures}$ extend to blocks via
-$\assignsF(s \cons b) = \assignsF(s) \cup \assignsF(b)$ (similarly for $\mathrm{captures}$), with the
-singleton block $s$ giving $\assignsF(s)$ as already defined.
-The function $\mathrm{captures}$ extends to expressions in the obvious way, with the following interesting cases:
-%
-{\small
-\begin{align*}
-\mathrm{captures}(x) &= \varnothing \\
-\mathrm{captures}(\exLambda{\vec{x}}{e}) &= \mathrm{fv}(e) \setminus \set{\vec{x}}
-\end{align*}}
+The preorder $p \subsumed p'$, defined in \figref{subsumption}, holds when every value matched by $p$ is also
+matched by $p'$. It is used by the well-formedness rule for $\pyinline{match}$ to rule out unreachable cases,
+and to check exhaustiveness: with the current pattern set, this reduces to requiring a catch-all (var or
+wildcard) case.
+
+\input{fig/subsumption}
+
+\paragraph{Well-formed pattern lists.}
+
+A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is linear (no repeated variable
+names) and no earlier pattern subsumes a later one. The \pyinline{match} well-formedness rules use this
+judgement to enforce reachability and linearity of case patterns.
+
+\input{fig/well-formed-pat}
 
 \paragraph{Well-formedness judgement.}
 
 Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
-= e} definitely assigns $\set{\pyinline{x} : \statusDefAssigned}$.
+= e} definitely assigns $\set{\pyinline{x} : \statusDefAssigned}$. Block well-formedness is given in
+\figref{well-formed}; expression well-formedness in \figref{well-formed-expr}.
 
 \input{fig/well-formed}
+\input{fig/well-formed-expr}
 
 \subsection{Examples}
 
@@ -378,7 +368,7 @@ returns \pyinline{3} in the case where \pyinline{b} is \pyinline{True}.
 \subsubsection{Function-level scoping of local variables}
 
 In Python, all local variables are scoped to the entire function body, not just from the point of
-assignment onwards. The $\assignsF$ function in the \ruleName{mutual} rule reflects this: all variables
+assignment onwards. The $\assignsS$ function in the \ruleName{mutual} rule reflects this: all variables
 assigned anywhere in the function body are introduced at $\statusNotDefAssigned$ before the body is checked. This means
 the following program is statically rejected by \PurePy, whereas Python rejects it at runtime with an
 \pyinline{UnboundLocalError}:
@@ -394,7 +384,7 @@ f()
 \end{python}
 
 \noindent Because \pyinline{y} appears on the left-hand side of an assignment in \pyinline{f}, it is in
-$\assignsF(b)$ for the body of \pyinline{f}, and is therefore introduced at $\statusNotDefAssigned$ at the top of the
+$\assignsS(b)$ for the body of \pyinline{f}, and is therefore introduced at $\statusNotDefAssigned$ at the top of the
 function. The reference to \pyinline{y} in \pyinline{x = y} then fails the well-formedness check, since
 $\Gamma(\pyinline{y}) = \statusNotDefAssigned$ rather than $\Gamma(\pyinline{y}) = \statusDefAssigned$.
 
@@ -436,7 +426,7 @@ x()  # Python: returns the function (late binding); pure: returns 5
 \noindent The side condition on the \ruleName{assign} rule rejects programs like this, requiring that the
 variable being bound is not captured by the expression. The \ruleName{mutual} rule, by contrast, binds
 each $f_i$ in the typing context for every body $b_i$, so the function names may legitimately appear in
-$\mathrm{captures}$ of those bodies. This is what permits self-recursion (the singleton-region case) and
+$\capturesS$ of those bodies. This is what permits self-recursion (the singleton-region case) and
 mutual recursion within a region.
 
 \subsubsection{Mutual recursion}
@@ -555,9 +545,7 @@ by \pyinline{return None}. This ensures every function returns, even if it is no
 
 \subsubsection{\pyinline{assert} without a message}
 
-An \pyinline{assert e} statement without a message is equivalent to \pyinline{assert e, ""}. The grammar
-in \figref{syntax} admits only the two-argument form; the parser supplies the empty string when the
-message is omitted.
+An \pyinline{assert e} statement without a message is equivalent to \pyinline{assert e, ""}.
 
 \subsection{Unsupported Python features}
 
@@ -592,6 +580,7 @@ to sequential composition of result types:
 effects, so as black boxes functions are always pure.
 
 \input{fig/eval}
+\input{fig/match}
 
 \input{tex/related-work}
 

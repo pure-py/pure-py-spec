@@ -1,0 +1,39 @@
+\begin{figure}
+\small
+\begin{align*}
+\assignsS(\exPass) &= \varnothing \\
+\assignsS(\exAssign{x}{e}) &= \set{x} \\
+\assignsS(e) &= \varnothing \\
+\assignsS(\exAssertMsg{e}{e'}) &= \varnothing \\
+\assignsS(\exReturnNone) &= \varnothing \\
+\assignsS(\exReturn{e}) &= \varnothing \\
+\assignsS(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \assignsS(\vec{b}) \\
+\assignsS(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \assignsS(\vec{b}) \\
+\assignsS(\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}) &= \set{f_1, \ldots, f_{n+1}} \\
+\assignsS(\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}) &= \textstyle\bigcup_i \big(\binds(p_i) \cup \assignsS(b_i)\big) \\
+\\
+\binds(n) &= \varnothing \\
+\binds(x) &= \set{x} \\
+\binds(\patWild) &= \varnothing \\
+\binds(\exTuple{p_1, \ldots, p_n}) &= \textstyle\bigcup_i \binds(p_i) \\
+\binds(\exList{p_1, \ldots, p_n}) &= \textstyle\bigcup_i \binds(p_i) \\
+\\
+\capturesS(\exPass) &= \varnothing \\
+\capturesS(\exAssign{x}{e}) &= \capturesE(e) \\
+\capturesS(e) &= \capturesE(e) \\
+\capturesS(\exAssertMsg{e}{e'}) &= \capturesE(e) \cup \capturesE(e') \\
+\capturesS(\exReturnNone) &= \varnothing \\
+\capturesS(\exReturn{e}) &= \capturesE(e) \\
+\capturesS(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \capturesE(\vec{e}) \cup \capturesS(\vec{b}) \\
+\capturesS(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \capturesE(\vec{e}) \cup \capturesS(\vec{b}) \\
+\capturesS(\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}) &= \textstyle\bigcup_i \big(\fvS(b_i) \setminus (\set{\vec{x}_i} \cup \assignsS(b_i))\big) \\
+& \quad \setminus \set{f_1, \ldots, f_{n+1}} \\
+\capturesS(\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}) &= \capturesE(e) \cup {} \\
+& \quad \textstyle\bigcup_i \big(\capturesS(b_i) \setminus \binds(p_i)\big) \\
+\\
+\capturesE(x) &= \varnothing \\
+\capturesE(\exLambda{\vec{x}}{e}) &= \fvE(e) \setminus \set{\vec{x}}
+\end{align*}
+\caption{Assigned, bound, and captured variables (remaining expression cases of $\capturesE$ are the obvious pointwise union).}
+\label{fig:aux}
+\end{figure}

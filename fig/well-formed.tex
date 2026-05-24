@@ -1,5 +1,4 @@
 \begin{figure}
-\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Gamma \vdash b : R$}
 \begin{mathpar}
 \small
@@ -14,7 +13,7 @@
 \inferrule*[lab={\ruleName{assign}}]
 {
   \Gamma \vdash e \\
-  x \notin \mathrm{captures}(e)
+  x \notin \capturesE(e)
 }
 {
   \Gamma \vdash \exAssign{x}{e} : \Assigns{\set{x : \statusDefAssigned}}
@@ -29,6 +28,14 @@
 }
 \and
 \inferrule*[lab={\ruleName{assert}}]
+{
+  \Gamma \vdash e
+}
+{
+  \Gamma \vdash \exAssert{e} : \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{assert-msg}}]
 {
   \Gamma \vdash e \\
   \Gamma \vdash e'
@@ -74,7 +81,7 @@
 \inferrule*[lab={\ruleName{mutual}}]
 {
   \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_{i}) \runion
-  \statusNotDefAssigned(\assignsF(b_i) \setminus \seq{x}_i) \vdash b_i : R_i
+  \statusNotDefAssigned(\assignsS(b_i) \setminus \seq{x}_i) \vdash b_i : R_i
   \quad (\forall i)
   \\
   f_1, \ldots, f_{n+1} \text{ distinct}
@@ -83,39 +90,38 @@
   \Gamma \vdash \exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}} : \Assigns{\statusDefAssigned(\seq{f})}
 }
 \and
+\inferrule*[lab={\ruleName{match}}]
+{
+  \Gamma \vdash e \\
+  \Gamma \runion \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
+  \vdash p_1, \ldots, p_{n+1} \\
+  \exists i.\, p_i \in \set{x, \patWild}
+}
+{
+  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : R_1 \merge \ldots \merge R_{n+1}
+}
+\and
+\inferrule*[lab={\ruleName{match-partial}}]
+{
+  \Gamma \vdash e \\
+  \Gamma \runion \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
+  \vdash p_1, \ldots, p_{n+1} \\
+  \neg\exists i.\, p_i \in \set{x, \patWild}
+}
+{
+  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : R_1 \merge \ldots \merge R_{n+1} \merge \Assigns{\varnothing}
+}
+\and
 \inferrule*[lab={\ruleName{seq}}]
 {
   \Gamma \vdash s : \Assigns{\Delta} \\
   \Gamma \runion \Delta \vdash b : R \\
-  \mathrm{captures}(s) \cap \assignsF(b) = \varnothing
+  \capturesS(s) \cap \assignsS(b) = \varnothing
 }
 {
   \Gamma \vdash s \cons b : \Assigns{\Delta} \runion R
 }
 \end{mathpar}
 \caption{Block $b$ is well-formed in $\Gamma$}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\wf{\Gamma}{e}$}
-\begin{mathpar}
-\small
-\inferrule*[right=var]
-{
-  \Gamma(x) = \statusDefAssigned
-}
-{
-  \wf{\Gamma}{x}
-}
-\and
-\inferrule*[right=lambda]
-{
-  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned \vdash e
-}
-{
-  \wf{\Gamma}{\exLambda{\vec{x}}{e}}
-}
-\end{mathpar}
-\caption{Expression $e$ is well-formed in $\Gamma$}
-\end{subfigure}
-\caption{Well-formedness rules}
+\label{fig:well-formed}
 \end{figure}

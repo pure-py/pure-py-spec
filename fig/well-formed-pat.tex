@@ -1,0 +1,16 @@
+\begin{figure}
+\flushleft \shadebox{$\vdash p_1, \ldots, p_{n+1}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{pat-list}}]
+{
+  \text{variables in } p_i \text{ distinct} \quad (\forall i) \\
+  p_i \not\subsumed p_j \quad (\forall i)(\forall j < i)
+}
+{
+  \vdash p_1, \ldots, p_n
+}
+\end{mathpar}
+\caption{Pattern list $p_1, \ldots, p_n$ is well-formed}
+\label{fig:well-formed-pat}
+\end{figure}

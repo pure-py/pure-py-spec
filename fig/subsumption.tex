@@ -1,0 +1,47 @@
+\begin{figure}
+\flushleft \shadebox{$p \subsumed p'$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{sub-lit}}]
+{
+  \strut
+}
+{
+  n \subsumed n
+}
+\and
+\inferrule*[lab={\ruleName{sub-var}}]
+{
+  \strut
+}
+{
+  p \subsumed x
+}
+\and
+\inferrule*[lab={\ruleName{sub-wild}}]
+{
+  \strut
+}
+{
+  p \subsumed \patWild
+}
+\and
+\inferrule*[lab={\ruleName{sub-tuple}}]
+{
+  p_i \subsumed q_i \quad (\forall i)
+}
+{
+  \exTuple{p_1, \ldots, p_n} \subsumed \exTuple{q_1, \ldots, q_n}
+}
+\and
+\inferrule*[lab={\ruleName{sub-list}}]
+{
+  p_i \subsumed q_i \quad (\forall i)
+}
+{
+  \exList{p_1, \ldots, p_n} \subsumed \exList{q_1, \ldots, q_n}
+}
+\end{mathpar}
+\caption{Pattern $p$ is subsumed by pattern $p'$.}
+\label{fig:subsumption}
+\end{figure}

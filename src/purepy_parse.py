@@ -170,6 +170,9 @@ def check_expr(node):
         return ok()
 
     if isinstance(node, ast.BinOp):
+        allowed = (ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv, ast.Mod, ast.Pow)
+        if not isinstance(node.op, allowed):
+            return unsupported(node, f"binary operator not in PurePy: {type(node.op).__name__}")
         left_result = check_expr(node.left)
         if not is_ok(left_result):
             return left_result
@@ -183,9 +186,18 @@ def check_expr(node):
         return unsupported(node, f"unsupported unary operator: {type(node.op).__name__}")
 
     if isinstance(node, ast.BoolOp):
+        if len(node.values) > 2:
+            return not_yet(node, "chained boolean operator not yet supported (#82)")
         return check_all(node.values, check_expr)
 
     if isinstance(node, ast.Compare):
+        if len(node.ops) > 1:
+            return not_yet(node, "chained comparison not yet supported (#82)")
+        for op in node.ops:
+            if isinstance(op, (ast.In, ast.NotIn)):
+                return not_yet(node, "membership operator (in/not in) not yet supported (#80)")
+            if isinstance(op, (ast.Is, ast.IsNot)):
+                return not_yet(node, "identity operator (is/is not) not yet supported (#81)")
         left_result = check_expr(node.left)
         if not is_ok(left_result):
             return left_result

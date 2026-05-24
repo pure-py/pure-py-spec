@@ -1,5 +1,4 @@
 \begin{figure}
-\begin{subfigure}{\textwidth}
 \small
 \begin{center}
 \begin{tabular}{rcll}
@@ -14,7 +13,10 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \end{tabular}
 \end{center}
 \caption{Values, environments and evaluation results}
-\end{subfigure}
+\label{fig:values}
+\end{figure}
+
+\begin{figure}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\rho, b \Rightarrow r$}
 \begin{mathpar}
@@ -44,6 +46,15 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 }
 \and
 \inferrule*[lab={\ruleName{eval-assert}}]
+{
+  \rho, e \Rightarrow v \\
+  v \neq \pyinline{False}
+}
+{
+  \rho, \exAssert{e} \Rightarrow \assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{eval-assert-msg}}]
 {
   \rho, e \Rightarrow v \\
   v \neq \pyinline{False}
@@ -116,7 +127,7 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \strut
 }
 {
-  \rho, \exLambda{\vec{x}}{e} \Rightarrow \exClosure{\rho}{\vec{x}}{e}
+  \rho, \exLambda{x_1, \ldots, x_n}{e} \Rightarrow \exClosure{\rho}{\vec{x}}{e}
 }
 \and
 \inferrule*[right=call-lambda]
@@ -126,7 +137,7 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \rho' \runion \set{\seq{x} \mapsto \seq{u}}, e' \Rightarrow v
 }
 {
-  \rho, \exApp{e}{\vec{e}} \Rightarrow v
+  \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow v
 }
 \and
 \inferrule*[right=call-def]
@@ -138,7 +149,19 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   \rho' \runion \set{\seq{f} \mapsto \seq{v}} \runion \set{\seq{x}_j \mapsto \seq{u}}, b_j \Rightarrow \returns{v}
 }
 {
-  \rho, \exApp{e}{\vec{e}} \Rightarrow v
+  \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow v
+}
+\and
+\inferrule*[right=call-def-fallthrough]
+{
+  \rho, e \Rightarrow \exDefClosure{\rho'}{\seq{d}}{j} \\
+  d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
+  v_i = \exDefClosure{\rho'}{\seq{d}}{i} \quad (\forall i) \\
+  \rho, \vec{e} \Rightarrow \vec{u} \\
+  \rho' \runion \set{\seq{f} \mapsto \seq{v}} \runion \set{\seq{x}_j \mapsto \seq{u}}, b_j \Rightarrow \assigns{\rho''}
+}
+{
+  \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow \pyinline{None}
 }
 \end{mathpar}
 \caption{Expression evaluation}

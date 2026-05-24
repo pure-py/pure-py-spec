@@ -1,0 +1,21 @@
+\begin{figure}
+\small
+\begin{center}
+\begin{tabular}{rlll}
+\hline
+Level & Operators & Arity & Associativity \\
+\hline
+1 (lowest)  & \pyinline{or}                                                              & binary & left \\
+2           & \pyinline{and}                                                             & binary & left \\
+3           & \pyinline{not}                                                             & unary  & --- \\
+4           & \pyinline{==}\quad\pyinline{!=}\quad\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & binary & left \\
+5           & \pyinline{+}\quad\pyinline{-}                                                & binary & left \\
+6           & \pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}                & binary & left \\
+7           & \pyinline{+}\quad\pyinline{-}                                                & unary  & --- \\
+8 (highest) & \pyinline{**}                                                              & binary & right \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Operator precedence (lowest binds loosest); follows Python.}
+\label{fig:precedence}
+\end{figure}
