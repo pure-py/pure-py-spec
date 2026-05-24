@@ -15,8 +15,8 @@ def ok():
 def unsupported(node, msg):
     return {"line": getattr(node, "lineno", None), "col": getattr(node, "col_offset", None), "msg": msg, "kind": UNSUPPORTED}
 
-def not_yet(node, msg):
-    return {"line": getattr(node, "lineno", None), "col": getattr(node, "col_offset", None), "msg": msg, "kind": NOT_YET}
+def not_yet(node, msg, issue):
+    return {"line": getattr(node, "lineno", None), "col": getattr(node, "col_offset", None), "msg": f"{msg} (#{issue})", "kind": NOT_YET}
 
 def is_ok(result):
     return result is None
@@ -50,7 +50,7 @@ def check_stmt(node):
             return unsupported(node, "multiple assignment targets")
         target = node.targets[0]
         if not isinstance(target, ast.Name):
-            return not_yet(node, "destructuring assignment not yet supported (#54)")
+            return not_yet(node, "destructuring assignment not yet supported", 54)
         return check_expr(node.value)
 
     if isinstance(node, ast.Return):
@@ -73,7 +73,7 @@ def check_stmt(node):
         if not is_ok(args_result):
             return args_result
         if len(node.decorator_list) > 0:
-            return not_yet(node, "decorators not yet supported (#58)")
+            return not_yet(node, "decorators not yet supported", 58)
         if node.returns is not None:
             return unsupported(node, "return type annotations not supported")
         return check_body(node.body)
@@ -127,22 +127,34 @@ def check_stmt(node):
         return unsupported(node, "try/except not supported")
 
     if isinstance(node, ast.Import):
-        return not_yet(node, "import not yet supported (#53)")
+        return not_yet(node, "import not yet supported", 53)
 
     if isinstance(node, ast.ImportFrom):
-        return not_yet(node, "import not yet supported (#53)")
+        return not_yet(node, "import not yet supported", 53)
 
     if isinstance(node, ast.Global):
-        return not_yet(node, "global not yet supported (#40)")
+        return not_yet(node, "global not yet supported", 40)
 
     if isinstance(node, ast.Nonlocal):
         return unsupported(node, "nonlocal not supported")
 
     if isinstance(node, ast.ClassDef):
-        return not_yet(node, "class definitions not yet supported (#8)")
+        return not_yet(node, "class definitions not yet supported", 8)
 
     if isinstance(node, ast.Match):
-        return not_yet(node, "match not yet supported (#8)")
+        subj_result = check_expr(node.subject)
+        if not is_ok(subj_result):
+            return subj_result
+        for case in node.cases:
+            if case.guard is not None:
+                return not_yet(case, "case guards not yet supported", 83)
+            pat_result = check_pattern(case.pattern)
+            if not is_ok(pat_result):
+                return pat_result
+            body_result = check_body(case.body)
+            if not is_ok(body_result):
+                return body_result
+        return ok()
 
     if isinstance(node, ast.Break):
         return unsupported(node, "break not supported")
@@ -151,6 +163,63 @@ def check_stmt(node):
         return unsupported(node, "continue not supported")
 
     return unsupported(node, f"unknown statement type: {type(node).__name__}")
+
+
+# --- Pattern checking ----------------------------------------------------------
+
+def check_pattern(node):
+    """Check whether a match pattern is in the PurePy subset."""
+
+    # PatLiteral: numeric/string literals
+    if isinstance(node, ast.MatchValue):
+        v = node.value
+        # Constant literal (int, float, str)
+        if isinstance(v, ast.Constant) and isinstance(v.value, (int, float, str)):
+            return ok()
+        # Negative numeric literal: UnaryOp(USub, Constant)
+        if (isinstance(v, ast.UnaryOp)
+                and isinstance(v.op, (ast.UAdd, ast.USub))
+                and isinstance(v.operand, ast.Constant)
+                and isinstance(v.operand.value, (int, float))):
+            return ok()
+        # Attribute access (Color.RED) — enum/attribute value patterns
+        if isinstance(v, ast.Attribute):
+            return not_yet(node, "attribute value patterns not yet supported", 86)
+        return not_yet(node, "complex value patterns not yet supported", 83)
+
+    # PatLiteral: None / True / False
+    if isinstance(node, ast.MatchSingleton):
+        return ok()
+
+    # PatVar / PatWildcard / AS
+    if isinstance(node, ast.MatchAs):
+        if node.pattern is None:
+            # MatchAs with no sub-pattern: PatVar (name) or PatWildcard (no name)
+            return ok()
+        # AS pattern: bind matched value to a name
+        return not_yet(node, "AS patterns not yet supported", 83)
+
+    # PatSeq
+    if isinstance(node, ast.MatchSequence):
+        for p in node.patterns:
+            if isinstance(p, ast.MatchStar):
+                return not_yet(node, "star patterns not yet supported", 84)
+            r = check_pattern(p)
+            if not is_ok(r):
+                return r
+        return ok()
+
+    # Rejected forms
+    if isinstance(node, ast.MatchClass):
+        return not_yet(node, "class patterns not yet supported", 8)
+    if isinstance(node, ast.MatchMapping):
+        return not_yet(node, "mapping patterns not yet supported", 87)
+    if isinstance(node, ast.MatchOr):
+        return not_yet(node, "or-patterns not yet supported", 85)
+    if isinstance(node, ast.MatchStar):
+        return not_yet(node, "star patterns not yet supported", 84)
+
+    return unsupported(node, f"unknown pattern type: {type(node).__name__}")
 
 
 # --- Expression checking -------------------------------------------------------
@@ -187,17 +256,17 @@ def check_expr(node):
 
     if isinstance(node, ast.BoolOp):
         if len(node.values) > 2:
-            return not_yet(node, "chained boolean operator not yet supported (#82)")
+            return not_yet(node, "chained boolean operator not yet supported", 82)
         return check_all(node.values, check_expr)
 
     if isinstance(node, ast.Compare):
         if len(node.ops) > 1:
-            return not_yet(node, "chained comparison not yet supported (#82)")
+            return not_yet(node, "chained comparison not yet supported", 82)
         for op in node.ops:
             if isinstance(op, (ast.In, ast.NotIn)):
-                return not_yet(node, "membership operator (in/not in) not yet supported (#80)")
+                return not_yet(node, "membership operator (in/not in) not yet supported", 80)
             if isinstance(op, (ast.Is, ast.IsNot)):
-                return not_yet(node, "identity operator (is/is not) not yet supported (#81)")
+                return not_yet(node, "identity operator (is/is not) not yet supported", 81)
         left_result = check_expr(node.left)
         if not is_ok(left_result):
             return left_result
@@ -241,7 +310,7 @@ def check_expr(node):
         return check_all(node.values, check_expr)
 
     if isinstance(node, ast.Set):
-        return not_yet(node, "set literals not yet supported (#52)")
+        return not_yet(node, "set literals not yet supported", 52)
 
     if isinstance(node, ast.Attribute):
         return check_expr(node.value)
@@ -259,13 +328,13 @@ def check_expr(node):
         return check_all(node.generators, check_comprehension)
 
     if isinstance(node, ast.DictComp):
-        return not_yet(node, "dict comprehensions not yet supported (#52)")
+        return not_yet(node, "dict comprehensions not yet supported", 52)
 
     if isinstance(node, ast.SetComp):
-        return not_yet(node, "set comprehensions not yet supported (#52)")
+        return not_yet(node, "set comprehensions not yet supported", 52)
 
     if isinstance(node, ast.Slice):
-        return not_yet(node, "slicing not yet supported (#59)")
+        return not_yet(node, "slicing not yet supported", 59)
 
     # --- Excluded expression forms ---
 
@@ -288,10 +357,10 @@ def check_expr(node):
         return unsupported(node, "yield not supported")
 
     if isinstance(node, ast.JoinedStr):
-        return not_yet(node, "f-strings not yet supported (#55)")
+        return not_yet(node, "f-strings not yet supported", 55)
 
     if isinstance(node, ast.FormattedValue):
-        return not_yet(node, "f-strings not yet supported (#55)")
+        return not_yet(node, "f-strings not yet supported", 55)
 
     return unsupported(node, f"unknown expression type: {type(node).__name__}")
 
@@ -311,7 +380,7 @@ def check_comprehension(node):
     if node.is_async:
         return unsupported(node, "async comprehensions not supported")
     if not isinstance(node.target, ast.Name):
-        return not_yet(node, "destructuring in comprehensions not yet supported (#54)")
+        return not_yet(node, "destructuring in comprehensions not yet supported", 54)
     iter_result = check_expr(node.iter)
     if not is_ok(iter_result):
         return iter_result
@@ -320,15 +389,15 @@ def check_comprehension(node):
 def check_arguments(node):
     """Check function/lambda arguments are simple (no defaults, *args, **kwargs, etc.)."""
     if node.vararg is not None:
-        return not_yet(node, "*args not yet supported (#57)")
+        return not_yet(node, "*args not yet supported", 57)
     if node.kwarg is not None:
-        return not_yet(node, "**kwargs not yet supported (#57)")
+        return not_yet(node, "**kwargs not yet supported", 57)
     if len(node.kwonlyargs) > 0:
         return unsupported(node, "keyword-only arguments not supported")
     if len(node.defaults) > 0:
-        return not_yet(node, "default arguments not yet supported (#56)")
+        return not_yet(node, "default arguments not yet supported", 56)
     if len(node.kw_defaults) > 0:
-        return not_yet(node, "default arguments not yet supported (#56)")
+        return not_yet(node, "default arguments not yet supported", 56)
     if len(node.posonlyargs) > 0:
         return unsupported(node, "positional-only arguments not supported")
     return ok()
