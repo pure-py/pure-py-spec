@@ -16,6 +16,8 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 
 ## GitHub issues
 
+- New issues: add to the PurePy project with Status either Planned or Proposed.
+
 - When an issue references other issues or external resources, add a **See also** paragraph at the end with a bullet list of links. Example:
 
   ```
