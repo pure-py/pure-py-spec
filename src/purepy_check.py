@@ -348,8 +348,27 @@ def check_stmt(s, gamma):
         if s.msg is not None:
             return check_expr(s.msg, gamma)
         return ok()
+    if isinstance(s, ast.Match):
+        # match / match-partial rules
+        err = check_expr(s.subject, gamma)
+        if not is_ok(err):
+            return err
+        patterns = [c.pattern for c in s.cases]
+        err = check_pattern_list(patterns, s)
+        if not is_ok(err):
+            return err
+        return _check_match_cases(s.cases, gamma)
     # FunctionDef should be handled via check_mutual_region (items grouping).
     # Unrecognised forms: should have been rejected by purepy_parse.
+    return ok()
+
+
+def _check_match_cases(cases, gamma):
+    for case in cases:
+        case_gamma = extend(gamma, {x: TT for x in binds(case.pattern)})
+        err = check_block(case.body, case_gamma)
+        if not is_ok(err):
+            return err
     return ok()
 
 
