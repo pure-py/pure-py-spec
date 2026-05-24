@@ -455,6 +455,32 @@ def subsumes(p, q):
     return False
 
 
+def _pattern_vars(p):
+    """Multiset of variable names occurring in p (for linearity check)."""
+    if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
+        return []
+    if isinstance(p, ast.MatchAs) and p.pattern is None:
+        return [p.name] if p.name else []
+    if isinstance(p, ast.MatchSequence):
+        result = []
+        for sub in p.patterns:
+            result.extend(_pattern_vars(sub))
+        return result
+    raise AssertionError(f"unexpected pattern: {type(p).__name__}")
+
+
+def check_pattern_list(patterns, node):
+    """Spec rule pat-list: variables in each p_i distinct; no p_i ⊑ p_j for j<i."""
+    for i, p in enumerate(patterns):
+        vars_ = _pattern_vars(p)
+        if len(vars_) != len(set(vars_)):
+            return ill_formed(node, f"repeated variable in pattern {i+1}")
+        for j in range(i):
+            if subsumes(p, patterns[j]):
+                return ill_formed(node, f"case {i+1} unreachable: subsumed by case {j+1}")
+    return ok()
+
+
 def binds(pattern):
     """Set of variable names introduced by a pattern (spec: fig:aux)."""
     if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
