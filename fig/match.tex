@@ -34,7 +34,7 @@
   \patWild, v \matches \varnothing
 }
 \and
-\inferrule*[lab={\ruleName{pat-seq-list}}]
+\inferrule*[lab={\ruleName{pat-list-list}}]
 {
   p_i, v_i \matches \rho_i \quad (\forall i)
 }
@@ -42,12 +42,28 @@
   \patList{p_1, \ldots, p_n}, \exList{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
 }
 \and
-\inferrule*[lab={\ruleName{pat-seq-tuple}}]
+\inferrule*[lab={\ruleName{pat-list-tuple}}]
 {
   p_i, v_i \matches \rho_i \quad (\forall i)
 }
 {
   \patList{p_1, \ldots, p_n}, \exTuple{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
+}
+\and
+\inferrule*[lab={\ruleName{pat-tuple-list}}]
+{
+  p_i, v_i \matches \rho_i \quad (\forall i)
+}
+{
+  \patTuple{p_1, \ldots, p_n}, \exList{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
+}
+\and
+\inferrule*[lab={\ruleName{pat-tuple-tuple}}]
+{
+  p_i, v_i \matches \rho_i \quad (\forall i)
+}
+{
+  \patTuple{p_1, \ldots, p_n}, \exTuple{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
 }
 \and
 \inferrule*[lab={\ruleName{pat-as}}]
