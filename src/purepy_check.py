@@ -429,6 +429,32 @@ def check_exprs(es, gamma):
 # --- Pattern metafunctions -----------------------------------------------------
 
 
+def _literal_value(pat):
+    """Underlying value of a MatchValue pattern (handles negative numerics)."""
+    v = pat.value
+    if isinstance(v, ast.Constant):
+        return v.value
+    if isinstance(v, ast.UnaryOp) and isinstance(v.operand, ast.Constant):
+        return -v.operand.value if isinstance(v.op, ast.USub) else v.operand.value
+    raise AssertionError(f"unexpected MatchValue payload: {type(v).__name__}")
+
+
+def subsumes(p, q):
+    """True iff p ⊑ q (every value matched by p is also matched by q).
+    Spec: fig:subsumption."""
+    if isinstance(q, ast.MatchAs) and q.pattern is None:
+        return True
+    if isinstance(p, ast.MatchValue) and isinstance(q, ast.MatchValue):
+        return _literal_value(p) == _literal_value(q)
+    if isinstance(p, ast.MatchSingleton) and isinstance(q, ast.MatchSingleton):
+        return p.value is q.value
+    if isinstance(p, ast.MatchSequence) and isinstance(q, ast.MatchSequence):
+        if len(p.patterns) != len(q.patterns):
+            return False
+        return all(subsumes(pi, qi) for pi, qi in zip(p.patterns, q.patterns))
+    return False
+
+
 def binds(pattern):
     """Set of variable names introduced by a pattern (spec: fig:aux)."""
     if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
