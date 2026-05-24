@@ -462,10 +462,7 @@ def _pattern_vars(p):
     if isinstance(p, ast.MatchAs) and p.pattern is None:
         return [p.name] if p.name else []
     if isinstance(p, ast.MatchSequence):
-        result = []
-        for sub in p.patterns:
-            result.extend(_pattern_vars(sub))
-        return result
+        return [v for sub in p.patterns for v in _pattern_vars(sub)]
     raise AssertionError(f"unexpected pattern: {type(p).__name__}")
 
 
@@ -488,10 +485,7 @@ def binds(pattern):
     if isinstance(pattern, ast.MatchAs) and pattern.pattern is None:
         return {pattern.name} if pattern.name else set()
     if isinstance(pattern, ast.MatchSequence):
-        result = set()
-        for p in pattern.patterns:
-            result |= binds(p)
-        return result
+        return set().union(*(binds(p) for p in pattern.patterns))
     raise AssertionError(f"unexpected pattern: {type(pattern).__name__}")
 
 
@@ -637,6 +631,10 @@ def fv_stmt(s):
         return result
     if isinstance(s, ast.If):
         return fv(s.test) | fv_block(s.body) | fv_block(s.orelse)
+    if isinstance(s, ast.Match):
+        return fv(s.subject) | set().union(
+            *(fv_block(case.body) - binds(case.pattern) for case in s.cases)
+        )
     if isinstance(s, ast.FunctionDef):
         params = {a.arg for a in s.args.args}
         return fv_block(s.body) - params - {s.name}
@@ -655,6 +653,10 @@ def assigns_stmt(s):
         return {t.id for t in s.targets if isinstance(t, ast.Name)}
     if isinstance(s, ast.If):
         return assigns_block(s.body) | assigns_block(s.orelse)
+    if isinstance(s, ast.Match):
+        return set().union(
+            *(binds(case.pattern) | assigns_block(case.body) for case in s.cases)
+        )
     if isinstance(s, ast.FunctionDef):
         return {s.name}
     return set()
@@ -682,6 +684,10 @@ def captures_stmt(s):
         return result
     if isinstance(s, ast.If):
         return captures(s.test) | captures_block(s.body) | captures_block(s.orelse)
+    if isinstance(s, ast.Match):
+        return captures(s.subject) | set().union(
+            *(captures_block(case.body) - binds(case.pattern) for case in s.cases)
+        )
     if isinstance(s, ast.FunctionDef):
         return captures_region([s])
     return set()
