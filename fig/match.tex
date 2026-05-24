@@ -41,6 +41,14 @@
 {
   \exList{p_1, \ldots, p_n}, \exList{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
 }
+\and
+\inferrule*[lab={\ruleName{pat-as}}]
+{
+  p, v \matches \rho
+}
+{
+  p\;\pyinline{as}\;x, v \matches \rho \disjunion \set{x \mapsto v}
+}
 \end{mathpar}
 \caption{Pattern matching}
 \label{fig:match}

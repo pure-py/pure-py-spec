@@ -191,13 +191,13 @@ def check_pattern(node):
     if isinstance(node, ast.MatchSingleton):
         return ok()
 
-    # PatVar / PatWildcard / AS
+    # PatVar / PatWildcard / PatAs
     if isinstance(node, ast.MatchAs):
         if node.pattern is None:
             # MatchAs with no sub-pattern: PatVar (name) or PatWildcard (no name)
             return ok()
-        # AS pattern: bind matched value to a name
-        return not_yet(node, "AS patterns not yet supported", 83)
+        # PatAs: bind matched value to a name; sub-pattern must be valid
+        return check_pattern(node.pattern)
 
     # PatSeq
     if isinstance(node, ast.MatchSequence):

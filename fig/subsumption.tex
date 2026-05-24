@@ -41,6 +41,22 @@
 {
   \exList{p_1, \ldots, p_n} \subsumed \exList{q_1, \ldots, q_n}
 }
+\and
+\inferrule*[lab={\ruleName{sub-as-l}}]
+{
+  p \subsumed q
+}
+{
+  p\;\pyinline{as}\;x \subsumed q
+}
+\and
+\inferrule*[lab={\ruleName{sub-as-r}}]
+{
+  p \subsumed q
+}
+{
+  p \subsumed q\;\pyinline{as}\;y
+}
 \end{mathpar}
 \caption{Pattern $p$ is subsumed by pattern $p'$.}
 \label{fig:subsumption}

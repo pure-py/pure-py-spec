@@ -478,6 +478,12 @@ def _literal_value(pat):
 def subsumes(p, q):
     """True iff p ⊑ q (every value matched by p is also matched by q).
     Spec: fig:subsumption."""
+    # PatAs is transparent w.r.t. matching: strip from either side.
+    if isinstance(q, ast.MatchAs) and q.pattern is not None:
+        return subsumes(p, q.pattern)
+    if isinstance(p, ast.MatchAs) and p.pattern is not None:
+        return subsumes(p.pattern, q)
+    # Var or wildcard on RHS absorbs anything.
     if isinstance(q, ast.MatchAs) and q.pattern is None:
         return True
     if isinstance(p, ast.MatchValue) and isinstance(q, ast.MatchValue):
@@ -495,8 +501,9 @@ def _pattern_vars(p):
     """Multiset of variable names occurring in p (for linearity check)."""
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
         return []
-    if isinstance(p, ast.MatchAs) and p.pattern is None:
-        return [p.name] if p.name else []
+    if isinstance(p, ast.MatchAs):
+        sub = _pattern_vars(p.pattern) if p.pattern is not None else []
+        return sub + ([p.name] if p.name else [])
     if isinstance(p, ast.MatchSequence):
         return [v for sub in p.patterns for v in _pattern_vars(sub)]
     raise AssertionError(f"unexpected pattern: {type(p).__name__}")
@@ -518,8 +525,9 @@ def binds(pattern):
     """Set of variable names introduced by a pattern (spec: fig:aux)."""
     if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
         return set()
-    if isinstance(pattern, ast.MatchAs) and pattern.pattern is None:
-        return {pattern.name} if pattern.name else set()
+    if isinstance(pattern, ast.MatchAs):
+        sub = binds(pattern.pattern) if pattern.pattern is not None else set()
+        return sub | ({pattern.name} if pattern.name else set())
     if isinstance(pattern, ast.MatchSequence):
         return set().union(*(binds(p) for p in pattern.patterns))
     raise AssertionError(f"unexpected pattern: {type(pattern).__name__}")

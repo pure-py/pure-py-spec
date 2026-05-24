@@ -17,6 +17,7 @@
 \binds(x) &= \set{x} \\
 \binds(\patWild) &= \varnothing \\
 \binds(\exList{p_1, \ldots, p_n}) &= \textstyle\bigcup_i \binds(p_i) \\
+\binds(p\;\pyinline{as}\;x) &= \binds(p) \cup \set{x} \\
 \\
 \capturesS(\exPass) &= \varnothing \\
 \capturesS(\exAssign{x}{e}) &= \capturesE(e) \\
