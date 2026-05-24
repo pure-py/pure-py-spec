@@ -20,8 +20,8 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \small
 \begin{align*}
 \dispatch(v, \varepsilon) &= (\varnothing, \exPass) \\
-\dispatch(v, \exCase{p}{b} \cons \mathit{cs}) &= (\rho', b) && \text{if } p, v \matches \rho' \\
-\dispatch(v, \exCase{p}{b} \cons \mathit{cs}) &= \dispatch(v, \mathit{cs}) && \text{if } p, v \notmatches
+\dispatch(v, (\exCase{p}{b}) \cons \seq{c}) &= (\rho, b) && \text{if } p, v \matches \rho \\
+\dispatch(v, (\exCase{p}{b}) \cons \seq{c}) &= \dispatch(v, \seq{c}) && \text{if } p, v \notmatches
 \end{align*}
 
 \flushleft \shadebox{$\rho, b \Rightarrow r$}
