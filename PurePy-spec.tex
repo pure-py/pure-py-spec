@@ -102,6 +102,40 @@ semantics in Python
 two separate syntaxes
 \end{itemize}
 
+{\small
+\begin{center}
+\begin{minipage}[t]{0.4\textwidth}
+\vspace{0pt}
+\begin{tabular}{ll}
+\textbf{To do} & \\
+Reserved words & \issue{9} \\
+Dataclasses & \issue{8} \\
+Set and dict comprehensions & \issue{52} \\
+Set and dict literals & \issue{87} \\
+\pyinline{import} & \issue{53} \\
+Membership operator (\pyinline{in}) & \issue{80} \\
+Identity operator (\pyinline{is}) & \issue{81} \\
+Chained comparison & \issue{82} \\
+\pyinline{match} statement & \issue{83} \\
+Enums & \issue{86} \\
+\end{tabular}
+\end{minipage}\hspace{2em}
+\begin{minipage}[t]{0.4\textwidth}
+\vspace{0pt}
+\begin{tabular}{ll}
+\textbf{Under consideration} & \\
+Destructuring assignment & \issue{54} \\
+f-strings & \issue{55} \\
+Default arguments & \issue{56} \\
+\pyinline{*args} and \pyinline{**kwargs} & \issue{57} \\
+Decorators & \issue{58} \\
+Slicing & \issue{59} \\
+Star patterns & \issue{84} \\
+Or patterns & \issue{85} \\
+\end{tabular}
+\end{minipage}
+\end{center}}
+
 \section{Syntax}
 
 The syntax of the language is given in \figref{syntax}. A \emph{block} is a non-empty sequence of
@@ -111,23 +145,6 @@ statements in a block: any non-\pyinline{def} statement in that block, by defini
 regions. Maximality is not enforced by the grammar in \figref{syntax}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single region. The well-formedness rules treat each region as
 one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
-
-{\small
-\begin{tabular}{ll}
-\textbf{To do} & \\
-Reserved words & \issue{9} \\
-Data classes and \pyinline{match} & \issue{8} \\
-N-ary tuples & \issue{51} \\
-Set and dict comprehensions & \issue{52} \\
-\pyinline{import} & \issue{53} \\[1mm]
-\textbf{Under consideration} & \\
-Destructuring assignment & \issue{54} \\
-f-strings & \issue{55} \\
-Default arguments & \issue{56} \\
-\pyinline{*args} and \pyinline{**kwargs} & \issue{57} \\
-Decorators & \issue{58} \\
-Slicing & \issue{59} \\
-\end{tabular}}
 
 \subsection{Contexts}
 

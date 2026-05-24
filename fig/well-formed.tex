@@ -98,7 +98,7 @@
   \exists i.\, p_i \in \set{x, \patWild}
 }
 {
-  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : R_1 \merge \ldots \merge R_{n+1}
+  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : \big(\Assigns{\statusDefAssigned(\binds(p_1))} \runion R_1\big) \merge \ldots \merge \big(\Assigns{\statusDefAssigned(\binds(p_{n+1}))} \runion R_{n+1}\big)
 }
 \and
 \inferrule*[lab={\ruleName{match-partial}}]
@@ -109,7 +109,7 @@
   \neg\exists i.\, p_i \in \set{x, \patWild}
 }
 {
-  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : R_1 \merge \ldots \merge R_{n+1} \merge \Assigns{\varnothing}
+  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : \big(\Assigns{\statusDefAssigned(\binds(p_1))} \runion R_1\big) \merge \ldots \merge \big(\Assigns{\statusDefAssigned(\binds(p_{n+1}))} \runion R_{n+1}\big) \merge \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{seq}}]
