@@ -1,7 +1,9 @@
 import ast
 import sys
 from dataclasses import dataclass
-from typing import Optional
+from typing import Callable, Optional, TypeVar
+
+T = TypeVar('T')
 
 UNSUPPORTED = 1
 NOT_YET = 2
@@ -30,13 +32,10 @@ def not_yet(node: ast.AST, msg: str, issue: int) -> Result:
 def is_ok(result: Result) -> bool:
     return result is None
 
-def first_err(results) -> Result:
-    for r in results:
-        if not is_ok(r):
-            return r
-    return ok()
+def first_err(results: list[Result]) -> Result:
+    return next((r for r in results if not is_ok(r)), ok())
 
-def check_all(nodes, checker) -> Result:
+def check_all(nodes: list[T], checker: Callable[[T], Result]) -> Result:
     return first_err([checker(node) for node in nodes])
 
 def check_stmt(node: ast.stmt) -> Result:
@@ -76,7 +75,7 @@ def check_stmt(node: ast.stmt) -> Result:
         check_expr(node.test)
         if node.msg is not None:
             check_expr(node.msg)
-        return
+        return ok()
     if isinstance(node, ast.AugAssign):
         return unsupported(node, 'augmented assignment (+=, etc.) not supported')
     if isinstance(node, ast.AnnAssign):
@@ -270,13 +269,13 @@ def check_expr(node: ast.expr) -> Result:
         return not_yet(node, 'f-strings not yet supported', 55)
     return unsupported(node, f'unknown expression type: {type(node).__name__}')
 
-def check_body(stmts):
+def check_body(stmts: list[ast.stmt]) -> Result:
     return check_all(stmts, check_stmt)
 
-def check_keyword(node):
+def check_keyword(node: ast.keyword) -> Result:
     return check_expr(node.value)
 
-def check_comprehension(node):
+def check_comprehension(node: ast.comprehension) -> Result:
     if node.is_async:
         return unsupported(node, 'async comprehensions not supported')
     if not isinstance(node.target, ast.Name):
@@ -286,7 +285,7 @@ def check_comprehension(node):
         return iter_result
     return check_all(node.ifs, check_expr)
 
-def check_arguments(node):
+def check_arguments(node: ast.arguments) -> Result:
     if node.vararg is not None:
         return not_yet(node, '*args not yet supported', 57)
     if node.kwarg is not None:
@@ -301,7 +300,7 @@ def check_arguments(node):
         return unsupported(node, 'positional-only arguments not supported')
     return ok()
 
-def check_module(node):
+def check_module(node: ast.AST) -> Result:
     if not isinstance(node, ast.Module):
         return unsupported(node, 'expected a module')
     return check_body(node.body)
@@ -311,9 +310,10 @@ def check_file(filename: str) -> Result:
     tree = ast.parse(source, filename=filename)
     return check_module(tree)
 
-def format_result(result, filename):
+def format_result(result: Result, filename: str) -> str:
     if is_ok(result):
         return f'{filename}: ok'
+    assert result is not None
     line = result.line
     col = result.col
     msg = result.msg
@@ -321,7 +321,7 @@ def format_result(result, filename):
         return f'{filename}:{line}:{col}: {msg}'
     return f'{filename}: {msg}'
 
-def main():
+def main() -> None:
     if len(sys.argv) < 2:
         print('Usage: purepy_parse.py <file.py> [<file.py> ...]')
         sys.exit(1)
@@ -330,6 +330,7 @@ def main():
         result = check_file(filename)
         print(format_result(result, filename))
         if not is_ok(result):
+            assert result is not None
             exit_code = result.kind
     sys.exit(exit_code)
 if __name__ == '__main__':
