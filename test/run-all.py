@@ -99,6 +99,14 @@ def main():
     base = ROOT / "test"
     wf = base / "well-formed"
 
+    print("mypy --strict src/")
+    sources = [str(ROOT / "src" / "purepy_parse.py"), str(ROOT / "src" / "purepy_check.py")]
+    proc = subprocess.run(["mypy", "--strict", *sources], capture_output=True)
+    if proc.returncode == 0:
+        ok("src/")
+    else:
+        bad("src/", proc.stdout.decode("utf-8", errors="replace").strip()[:400])
+
     print("well-formed")
     files = sorted(wf.glob("*.py"))
     for sub in ("conditionals", "functions", "scopes"):
