@@ -117,7 +117,7 @@ def result_type(node: ast.stmt) -> ResultTy:
         if not _is_catch_all(node.cases[-1].pattern):
             branches.append(TY_ASSIGNS)
         return merge_results(branches)
-    return TY_ASSIGNS
+    raise AssertionError(f'unexpected statement: {type(node).__name__}')
 
 def result_type_of_block(block: list[ast.stmt]) -> ResultTy:
     if len(block) == 1:
@@ -259,7 +259,7 @@ def check_stmt(s: ast.stmt, gamma: Context) -> Result:
         if not is_ok(err):
             return err
         return _check_match_cases(s.cases, gamma)
-    return ok()
+    raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def _check_match_cases(cases: list[ast.match_case], gamma: Context) -> Result:
     for case in cases:
@@ -321,9 +321,11 @@ def check_expr(e: ast.expr, gamma: Context) -> Result:
         if not is_ok(err):
             return err
         return check_exprs(e.values, gamma)
+    if isinstance(e, (ast.List, ast.Tuple)):
+        return check_exprs(e.elts, gamma)
     if isinstance(e, ast.ListComp):
         return check_comprehension(e.elt, e.generators, gamma)
-    return ok()
+    raise AssertionError(f'unexpected expression: {type(e).__name__}')
 
 def check_comprehension(elt: ast.expr, generators: list[ast.comprehension], gamma: Context) -> Result:
     if not generators:
@@ -436,7 +438,7 @@ def fv(e: ast.expr) -> set[str]:
         return fv_list([k for k in e.keys if k is not None]) | fv_list(e.values)
     if isinstance(e, ast.ListComp):
         return fv_comprehension(e.elt, e.generators)
-    return set()
+    raise AssertionError(f'unexpected expression: {type(e).__name__}')
 
 def fv_list(es: list[ast.expr]) -> set[str]:
     if not es:
@@ -493,7 +495,7 @@ def captures(e: ast.expr) -> set[str]:
         return captures_list([k for k in e.keys if k is not None]) | captures_list(e.values)
     if isinstance(e, ast.ListComp):
         return captures_comprehension(e.elt, e.generators)
-    return set()
+    raise AssertionError(f'unexpected expression: {type(e).__name__}')
 
 def captures_list(es: list[ast.expr]) -> set[str]:
     if not es:
@@ -529,7 +531,7 @@ def fv_stmt(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.FunctionDef):
         params = {a.arg for a in s.args.args}
         return fv_block(s.body) - params - {s.name}
-    return set()
+    raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def fv_block(block: list[ast.stmt]) -> set[str]:
     if not block:
@@ -537,6 +539,8 @@ def fv_block(block: list[ast.stmt]) -> set[str]:
     return fv_stmt(block[0]) | fv_block(block[1:])
 
 def assigns_stmt(s: ast.stmt) -> set[str]:
+    if isinstance(s, (ast.Pass, ast.Expr, ast.Return, ast.Assert)):
+        return set()
     if isinstance(s, ast.Assign):
         return {t.id for t in s.targets if isinstance(t, ast.Name)}
     if isinstance(s, ast.If):
@@ -545,7 +549,7 @@ def assigns_stmt(s: ast.stmt) -> set[str]:
         return set().union(*(binds(case.pattern) | assigns_block(case.body) for case in s.cases))
     if isinstance(s, ast.FunctionDef):
         return {s.name}
-    return set()
+    raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def assigns_block(block: list[ast.stmt]) -> set[str]:
     if not block:
@@ -572,7 +576,7 @@ def captures_stmt(s: ast.stmt) -> set[str]:
         return captures(s.subject) | set().union(*(captures_block(case.body) - binds(case.pattern) for case in s.cases))
     if isinstance(s, ast.FunctionDef):
         return captures_region([s])
-    return set()
+    raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def captures_block(block: list[ast.stmt]) -> set[str]:
     if not block:
