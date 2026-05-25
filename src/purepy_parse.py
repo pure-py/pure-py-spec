@@ -1,30 +1,45 @@
 import ast
 import sys
+from dataclasses import dataclass
+from typing import Optional
+
 UNSUPPORTED = 1
 NOT_YET = 2
 
-def ok():
+
+@dataclass(frozen=True)
+class Error:
+    line: Optional[int]
+    col: Optional[int]
+    msg: str
+    kind: int
+
+
+Result = Optional[Error]
+
+
+def ok() -> Result:
     return None
 
-def unsupported(node, msg):
-    return {'line': getattr(node, 'lineno', None), 'col': getattr(node, 'col_offset', None), 'msg': msg, 'kind': UNSUPPORTED}
+def unsupported(node: ast.AST, msg: str) -> Result:
+    return Error(getattr(node, 'lineno', None), getattr(node, 'col_offset', None), msg, UNSUPPORTED)
 
-def not_yet(node, msg, issue):
-    return {'line': getattr(node, 'lineno', None), 'col': getattr(node, 'col_offset', None), 'msg': f'{msg} (#{issue})', 'kind': NOT_YET}
+def not_yet(node: ast.AST, msg: str, issue: int) -> Result:
+    return Error(getattr(node, 'lineno', None), getattr(node, 'col_offset', None), f'{msg} (#{issue})', NOT_YET)
 
-def is_ok(result):
+def is_ok(result: Result) -> bool:
     return result is None
 
-def first_err(results):
+def first_err(results) -> Result:
     for r in results:
         if not is_ok(r):
             return r
     return ok()
 
-def check_all(nodes, checker):
+def check_all(nodes, checker) -> Result:
     return first_err([checker(node) for node in nodes])
 
-def check_stmt(node):
+def check_stmt(node: ast.stmt) -> Result:
     if isinstance(node, ast.Pass):
         return ok()
     if isinstance(node, ast.Assign):
@@ -114,7 +129,7 @@ def check_stmt(node):
         return unsupported(node, 'continue not supported')
     return unsupported(node, f'unknown statement type: {type(node).__name__}')
 
-def check_pattern(node):
+def check_pattern(node: ast.pattern) -> Result:
     if isinstance(node, ast.MatchValue):
         v = node.value
         if isinstance(v, ast.Constant) and isinstance(v.value, (int, float, str)):
@@ -148,7 +163,7 @@ def check_pattern(node):
         return not_yet(node, 'star patterns not yet supported', 84)
     return unsupported(node, f'unknown pattern type: {type(node).__name__}')
 
-def check_expr(node):
+def check_expr(node: ast.expr) -> Result:
     if isinstance(node, ast.Constant):
         if isinstance(node.value, (int, float, str, bool, type(None))):
             return ok()
@@ -291,7 +306,7 @@ def check_module(node):
         return unsupported(node, 'expected a module')
     return check_body(node.body)
 
-def check_file(filename):
+def check_file(filename: str) -> Result:
     source = open(filename).read()
     tree = ast.parse(source, filename=filename)
     return check_module(tree)
@@ -299,9 +314,9 @@ def check_file(filename):
 def format_result(result, filename):
     if is_ok(result):
         return f'{filename}: ok'
-    line = result['line']
-    col = result['col']
-    msg = result['msg']
+    line = result.line
+    col = result.col
+    msg = result.msg
     if line is not None:
         return f'{filename}:{line}:{col}: {msg}'
     return f'{filename}: {msg}'
@@ -315,7 +330,7 @@ def main():
         result = check_file(filename)
         print(format_result(result, filename))
         if not is_ok(result):
-            exit_code = result['kind']
+            exit_code = result.kind
     sys.exit(exit_code)
 if __name__ == '__main__':
     main()

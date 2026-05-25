@@ -1,18 +1,36 @@
 import ast
 import sys
 from dataclasses import dataclass, field
+from typing import Optional, Union
+
 ILL_FORMED = 3
 
-def ok():
+
+@dataclass(frozen=True)
+class Error:
+    line: Optional[int]
+    col: Optional[int]
+    msg: str
+    kind: int
+
+
+Result = Optional[Error]
+
+
+def ok() -> Result:
     return None
 
-def ill_formed(node, msg):
-    return {'line': getattr(node, 'lineno', None), 'col': getattr(node, 'col_offset', None), 'msg': msg, 'kind': ILL_FORMED}
+def ill_formed(node: ast.AST, msg: str) -> Result:
+    return Error(getattr(node, 'lineno', None), getattr(node, 'col_offset', None), msg, ILL_FORMED)
 
-def is_ok(result):
+def is_ok(result: Result) -> bool:
     return result is None
 TT = 'tt'
 FF = 'ff'
+
+Status = str                          # "tt" or "ff"
+Context = dict[str, Status]           # Γ, Δ
+
 
 @dataclass(frozen=True)
 class TyReturns:
@@ -20,25 +38,29 @@ class TyReturns:
 
 @dataclass(frozen=True)
 class TyAssigns:
-    delta: dict = field(default_factory=dict)
+    delta: Context = field(default_factory=dict)
+
+
+ResultTy = Union[TyReturns, TyAssigns]
+
 TY_RETURNS = TyReturns()
 TY_ASSIGNS = TyAssigns()
-BUILTINS = {'print': TT, 'type': TT, 'range': TT, 'len': TT}
+BUILTINS: Context = {'print': TT, 'type': TT, 'range': TT, 'len': TT}
 
-def empty_context():
+def empty_context() -> Context:
     return {}
 
-def extend(gamma, delta):
+def extend(gamma: Context, delta: Context) -> Context:
     new = dict(gamma)
     new.update(delta)
     return new
 
-def meet(a, b):
+def meet(a: Status, b: Status) -> Status:
     if a == TT and b == TT:
         return TT
     return FF
 
-def merge_delta(d1, d2):
+def merge_delta(d1: Context, d2: Context) -> Context:
     result = {}
     for k in set(d1.keys()) | set(d2.keys()):
         if k in d1 and k in d2:
@@ -47,29 +69,29 @@ def merge_delta(d1, d2):
             result[k] = FF
     return result
 
-def merge_results(rs):
+def merge_results(rs: list[ResultTy]) -> ResultTy:
     assigns_branches = [r for r in rs if isinstance(r, TyAssigns)]
     if not assigns_branches:
         return TY_RETURNS
     delta = assigns_branches[0].delta
     return TyAssigns(_fold_merge(delta, assigns_branches[1:]))
 
-def _fold_merge(acc, branches):
+def _fold_merge(acc: Context, branches: list[TyAssigns]) -> Context:
     if not branches:
         return acc
     return _fold_merge(merge_delta(acc, branches[0].delta), branches[1:])
 
-def runion_delta(d1, d2):
+def runion_delta(d1: Context, d2: Context) -> Context:
     return {**d1, **d2}
 
-def runion_results(r1, r2):
+def runion_results(r1: ResultTy, r2: ResultTy) -> ResultTy:
     if isinstance(r1, TyReturns):
         return r1
     if isinstance(r2, TyReturns):
         return r2
     return TyAssigns(runion_delta(r1.delta, r2.delta))
 
-def result_type(node):
+def result_type(node: ast.stmt) -> ResultTy:
     if isinstance(node, ast.Pass):
         return TY_ASSIGNS
     if isinstance(node, ast.Assign):
@@ -96,7 +118,7 @@ def result_type(node):
         return merge_results(branches)
     return TY_ASSIGNS
 
-def result_type_of_block(block):
+def result_type_of_block(block: list[ast.stmt]) -> ResultTy:
     if len(block) == 1:
         return _result_type_of_item(block[0])
     return runion_results(_result_type_of_item(block[0]), result_type_of_block(block[1:]))
@@ -104,7 +126,7 @@ def result_type_of_block(block):
 def _result_type_of_item(stmt):
     return result_type(stmt)
 
-def check_block(block, gamma):
+def check_block(block: list[ast.stmt], gamma: Context) -> Result:
     items = items_of_block(block)
     return check_items(items, gamma)
 
@@ -156,13 +178,13 @@ def check_item(item, gamma):
         return check_mutual_region(item, gamma)
     return check_stmt(item, gamma)
 
-def check_mutual_region(defs, gamma):
+def check_mutual_region(defs: list[ast.FunctionDef], gamma: Context) -> Result:
     err = check_distinct_names(defs, set())
     if not is_ok(err):
         return err
     return check_bodies(defs, gamma)
 
-def check_bodies(defs, gamma):
+def check_bodies(defs: list[ast.FunctionDef], gamma: Context) -> Result:
     f_names = {d.name: TT for d in defs}
     return _check_bodies(defs, gamma, f_names)
 
@@ -178,7 +200,7 @@ def _check_bodies(defs, gamma, f_names):
         return err
     return _check_bodies(defs[1:], gamma, f_names)
 
-def check_assign_targets(targets, captured):
+def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> Result:
     if not targets:
         return ok()
     t = targets[0]
@@ -186,7 +208,7 @@ def check_assign_targets(targets, captured):
         return ill_formed(t, f"[assign] '{t.id}' captured by right-hand side")
     return check_assign_targets(targets[1:], captured)
 
-def check_distinct_names(defs, seen):
+def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> Result:
     if not defs:
         return ok()
     head = defs[0]
@@ -194,7 +216,7 @@ def check_distinct_names(defs, seen):
         return ill_formed(head, f"[mutual] duplicate name '{head.name}' in mutual region")
     return check_distinct_names(defs[1:], seen | {head.name})
 
-def check_stmt(s, gamma):
+def check_stmt(s: ast.stmt, gamma: Context) -> Result:
     if isinstance(s, ast.Pass):
         return ok()
     if isinstance(s, ast.Assign):
@@ -245,7 +267,7 @@ def _check_match_cases(cases, gamma):
             return err
     return ok()
 
-def check_expr(e, gamma):
+def check_expr(e: ast.expr, gamma: Context) -> Result:
     if isinstance(e, ast.Name):
         if gamma.get(e.id) != TT:
             return ill_formed(e, f"[var] '{e.id}' is not definitely assigned")
@@ -314,7 +336,7 @@ def check_comprehension(elt, generators, gamma):
         return err
     return check_comprehension(elt, generators[1:], gamma_)
 
-def check_exprs(es, gamma):
+def check_exprs(es: list[ast.expr], gamma: Context) -> Result:
     if not es:
         return ok()
     err = check_expr(es[0], gamma)
@@ -322,7 +344,7 @@ def check_exprs(es, gamma):
         return err
     return check_exprs(es[1:], gamma)
 
-def _is_catch_all(p):
+def _is_catch_all(p: ast.pattern) -> bool:
     return isinstance(p, ast.MatchAs) and p.pattern is None
 
 def _literal_value(pat):
@@ -333,7 +355,7 @@ def _literal_value(pat):
         return -v.operand.value if isinstance(v.op, ast.USub) else v.operand.value
     raise AssertionError(f'unexpected MatchValue payload: {type(v).__name__}')
 
-def subsumes(p, q):
+def subsumes(p: ast.pattern, q: ast.pattern) -> bool:
     if isinstance(q, ast.MatchAs) and q.pattern is not None:
         return subsumes(p, q.pattern)
     if isinstance(p, ast.MatchAs) and p.pattern is not None:
@@ -360,7 +382,7 @@ def _pattern_vars(p):
         return [v for sub in p.patterns for v in _pattern_vars(sub)]
     raise AssertionError(f'unexpected pattern: {type(p).__name__}')
 
-def check_pattern_list(patterns, node):
+def check_pattern_list(patterns: list[ast.pattern], node: ast.AST) -> Result:
     for i, p in enumerate(patterns):
         vars_ = _pattern_vars(p)
         if len(vars_) != len(set(vars_)):
@@ -370,7 +392,7 @@ def check_pattern_list(patterns, node):
                 return ill_formed(node, f'case {i + 1} unreachable: subsumed by case {j + 1}')
     return ok()
 
-def binds(pattern):
+def binds(pattern: ast.pattern) -> set[str]:
     if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
         return set()
     if isinstance(pattern, ast.MatchAs):
@@ -380,7 +402,7 @@ def binds(pattern):
         return set().union(*(binds(p) for p in pattern.patterns))
     raise AssertionError(f'unexpected pattern: {type(pattern).__name__}')
 
-def fv(e):
+def fv(e: ast.expr) -> set[str]:
     if isinstance(e, ast.Name):
         return {e.id}
     if isinstance(e, ast.Constant):
@@ -437,7 +459,7 @@ def _names_in_targets(targets):
         return set()
     return names_in_target(targets[0]) | _names_in_targets(targets[1:])
 
-def captures(e):
+def captures(e: ast.expr) -> set[str]:
     if isinstance(e, ast.Lambda):
         params = {a.arg for a in e.args.args}
         return fv(e.body) - params
@@ -482,7 +504,7 @@ def captures_comprehension(elt, generators):
     rest = captures_list(g.ifs) | captures_comprehension(elt, generators[1:])
     return captures(g.iter) | rest - target_names
 
-def fv_stmt(s):
+def fv_stmt(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.Pass):
         return set()
     if isinstance(s, ast.Assign):
@@ -505,12 +527,12 @@ def fv_stmt(s):
         return fv_block(s.body) - params - {s.name}
     return set()
 
-def fv_block(block):
+def fv_block(block: list[ast.stmt]) -> set[str]:
     if not block:
         return set()
     return fv_stmt(block[0]) | fv_block(block[1:])
 
-def assigns_stmt(s):
+def assigns_stmt(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.Assign):
         return {t.id for t in s.targets if isinstance(t, ast.Name)}
     if isinstance(s, ast.If):
@@ -521,12 +543,12 @@ def assigns_stmt(s):
         return {s.name}
     return set()
 
-def assigns_block(block):
+def assigns_block(block: list[ast.stmt]) -> set[str]:
     if not block:
         return set()
     return assigns_stmt(block[0]) | assigns_block(block[1:])
 
-def captures_stmt(s):
+def captures_stmt(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.Pass):
         return set()
     if isinstance(s, ast.Assign):
@@ -548,12 +570,12 @@ def captures_stmt(s):
         return captures_region([s])
     return set()
 
-def captures_block(block):
+def captures_block(block: list[ast.stmt]) -> set[str]:
     if not block:
         return set()
     return captures_stmt(block[0]) | captures_block(block[1:])
 
-def captures_region(defs):
+def captures_region(defs: list[ast.FunctionDef]) -> set[str]:
     f_names = {d.name for d in defs}
     return _captures_region_bodies(defs) - f_names
 
@@ -600,9 +622,9 @@ def check_file(filename):
 def format_result(result, filename):
     if is_ok(result):
         return f'{filename}: ok'
-    line = result['line']
-    col = result['col']
-    msg = result['msg']
+    line = result.line
+    col = result.col
+    msg = result.msg
     if line is not None:
         return f'{filename}:{line}:{col}: {msg}'
     return f'{filename}: {msg}'
@@ -616,7 +638,7 @@ def main():
         result = check_file(filename)
         print(format_result(result, filename))
         if not is_ok(result):
-            exit_code = result['kind']
+            exit_code = result.kind
     sys.exit(exit_code)
 if __name__ == '__main__':
     main()
