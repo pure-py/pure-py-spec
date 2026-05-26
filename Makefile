@@ -15,6 +15,14 @@ default: PurePy-spec.pdf
 	pdflatex $<
 	pdflatex $<
 
+PurePy-spec-full.pdf: PurePy-spec.tex $(TEXFILES)
+	pdflatex -jobname=PurePy-spec-full "\def\openterms{1}\input{PurePy-spec}"
+	bibtex PurePy-spec-full
+	pdflatex -jobname=PurePy-spec-full "\def\openterms{1}\input{PurePy-spec}"
+	pdflatex -jobname=PurePy-spec-full "\def\openterms{1}\input{PurePy-spec}"
+
+full: PurePy-spec-full.pdf
+
 clean:
 	rm -f *.pdf *.aux *.log *.out *.bbl *.blg $(ARXIV_ZIP)
 
@@ -24,4 +32,4 @@ $(ARXIV_ZIP): $(ARXIV_FILES)
 	rm -f $@
 	zip -9 $@ $^
 
-.PHONY: default clean arXiv
+.PHONY: default full clean arXiv
