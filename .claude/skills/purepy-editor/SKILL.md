@@ -32,3 +32,9 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
   Use this for: cross-references to related issues, links to the Python language reference, links to other external specs.
 
 - When linking to another GitHub issue in a bullet list, write just the bare `#N` reference — GitHub renders the issue title inline.
+
+## Meetings
+
+- Meeting issues are titled `YYYY-MM-DD`.
+- Body sections: `## Adjacent meetings` (links to previous), then `## To discuss` containing `### Resolved since [date]`, `### New issues since [date]`, `### Work since [date]`.
+- Bullet lists of bare `#N` for issues; brief notes for work items.

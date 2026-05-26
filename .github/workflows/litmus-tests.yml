@@ -26,6 +26,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install mypy
+        if: matrix.python-version == '3.12'
         run: pip install mypy
 
       - name: Run all tests

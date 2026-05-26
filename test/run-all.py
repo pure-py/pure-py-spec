@@ -6,6 +6,7 @@ Walks the test directories, runs each test through the appropriate steps
 """
 
 import pathlib
+import shutil
 import subprocess
 import sys
 
@@ -99,13 +100,16 @@ def main():
     base = ROOT / "test"
     wf = base / "well-formed"
 
-    print("mypy --strict src/")
-    sources = [str(ROOT / "src" / "purepy_parse.py"), str(ROOT / "src" / "purepy_check.py")]
-    proc = subprocess.run(["mypy", "--strict", *sources], capture_output=True)
-    if proc.returncode == 0:
-        ok("src/")
+    if shutil.which("mypy"):
+        print("mypy --strict src/")
+        sources = [str(ROOT / "src" / "purepy_parse.py"), str(ROOT / "src" / "purepy_check.py")]
+        proc = subprocess.run(["mypy", "--strict", *sources], capture_output=True)
+        if proc.returncode == 0:
+            ok("src/")
+        else:
+            bad("src/", proc.stdout.decode("utf-8", errors="replace").strip()[:400])
     else:
-        bad("src/", proc.stdout.decode("utf-8", errors="replace").strip()[:400])
+        print("mypy --strict src/ (skipped: mypy not installed)")
 
     print("well-formed")
     files = sorted(wf.glob("*.py"))
