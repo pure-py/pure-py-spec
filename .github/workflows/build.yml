@@ -19,7 +19,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build LaTeX document
+      - name: Build LaTeX document (main)
         uses: xu-cheng/latex-action@v4
         with:
           root_file: PurePy-spec.tex
+
+      - name: Build LaTeX document (with appendix)
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: PurePy-spec-full.tex
