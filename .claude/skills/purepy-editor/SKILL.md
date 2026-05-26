@@ -35,6 +35,6 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 
 ## Meetings
 
-- Meeting issues are titled `YYYY-MM-DD`.
+- Meeting issues are titled `YYYY-MM-DD`; set Type to `Meeting`.
 - Body sections: `## Adjacent meetings` (links to previous), then `## To discuss` containing `### Resolved since [date]`, `### New issues since [date]`, `### Work since [date]`.
 - Bullet lists of bare `#N` for issues; brief notes for work items.
