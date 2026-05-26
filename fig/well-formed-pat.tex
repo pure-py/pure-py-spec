@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\vdash p_1, \ldots, p_{n+1}$}
+\flushleft \shadebox{$\vdash p_1 \cons \ldots \cons p_{n+1}$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{pat-list}}]
@@ -8,7 +8,7 @@
   p_i \not\subsumed p_j \quad (\forall i)(\forall j < i)
 }
 {
-  \vdash p_1, \ldots, p_n
+  \vdash p_1 \cons \ldots \cons p_n
 }
 \end{mathpar}
 \caption{Pattern list $p_1, \ldots, p_n$ is well-formed}
