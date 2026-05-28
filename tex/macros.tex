@@ -6,6 +6,9 @@
   \gdef\versionstring{#1.#2.#3}%
 }
 
+\newcommand*{\figref}[1]{Figure~\ref{fig:#1}}
+\newcommand*{\figrefTwo}[2]{Figures \ref{fig:#1} and \ref{fig:#2}}
+
 \definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
 \newcommand*{\shadebox}[1]{\fcolorbox{lightgray}{shadecolor}{\raisebox{0pt}[0.60\baselineskip][0.05\baselineskip]{#1}}}
 \newcommand*{\ruleName}[1]{\textcolor{gray}{\textnormal{\textsf{#1}}}}
@@ -15,7 +18,8 @@
 \newcommand*{\disjunion}{\uplus}
 \newcommand*{\set}[1]{\{#1\}}
 
-\newcommand*{\locals}{\mathrm{assigns}}
+\newcommand*{\assignsF}{\mathrm{assigns}}
+\newcommand*{\assignsS}{\mathrm{assigns}_{\mathsf{s}}}
 \newcommand*{\wf}[2]{#1 \vdash #2}
 \newcommand*{\Assigns}[1]{\mathsf{Assigns}\;#1}
 \newcommand*{\Returns}{\mathsf{Returns}}
@@ -23,11 +27,13 @@
 % expressions
 \newcommand*{\exApp}[2]{#1(#2)}
 \newcommand*{\exBinaryApp}[3]{#1 \mathbin{#2} #3}
+\newcommand*{\exUnaryApp}[2]{#1\,#2}
 \newcommand*{\exDict}[1]{\{#1\}}
 \newcommand*{\exProject}[2]{#1\mathord{.}#2}
 \newcommand*{\exDProject}[2]{#1[#2]}
 \newcommand*{\exCondExpr}[3]{#1\;\pyinline{if}\;#2\;\pyinline{else}\;#3}
 \newcommand*{\exList}[1]{[#1]}
+\newcommand*{\exTuple}[1]{(#1)}
 \newcommand*{\exListComp}[2]{[\,#1\;#2]}
 \newcommand*{\exLambda}[2]{\pyinline{lambda}\;#1\mathord{:}\;#2}
 \newcommand*{\bind}[2]{#1\mathord{:}\,#2}
@@ -38,12 +44,20 @@
 
 % statements and values
 \newcommand*{\exAssign}[2]{#1 = #2}
+\newcommand*{\exAssert}[1]{\pyinline{assert}\;#1}
+\newcommand*{\exAssertMsg}[2]{\pyinline{assert}\;#1, #2}
 \newcommand*{\exClosure}[3]{\langle#1, #2, #3\rangle}
+\newcommand*{\exDefClosure}[3]{\langle#1, #2, #3\rangle}
 \newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
 \newcommand*{\exElif}[2]{\pyinline{elif}\;#1:\;#2}
 \newcommand*{\exFunCall}[2]{#1(#2)}
 \newcommand*{\exIf}[3]{\pyinline{if}\;#1:\;#2\;#3}
 \newcommand*{\exIfElse}[4]{\pyinline{if}\;#1:\;#2\;#3\;\pyinline{else}:\;#4}
+\newcommand*{\exMatch}[2]{\pyinline{match}\;#1\mathord{:}\;#2}
+\newcommand*{\exCase}[2]{\pyinline{case}\;#1\mathord{:}\;#2}
+\newcommand*{\patWild}{\text{\pytext{\textunderscore}}}
+\newcommand*{\patList}[1]{[#1]}
+\newcommand*{\patTuple}[1]{(#1)}
 \newcommand*{\exPass}{\pyinline{pass}}
 \newcommand*{\exReturn}[1]{\pyinline{return}\;#1}
 \newcommand*{\exReturnNone}{\pyinline{return}}
@@ -55,7 +69,21 @@
 \newcommand*{\meet}{\wedge}
 \newcommand*{\merge}{\oplus}
 \newcommand*{\B}{\mathbb{B}}
+\newcommand*{\seq}[1]{\vec{#1}}
+\newcommand*{\capturesS}{\mathrm{captures}_{\mathsf{s}}}
+\newcommand*{\capturesE}{\mathrm{captures}_{\mathsf{e}}}
+\newcommand*{\fvE}{\mathrm{fv}_{\mathsf{e}}}
+\newcommand*{\fvS}{\mathrm{fv}_{\mathsf{s}}}
+\newcommand*{\binds}{\mathrm{binds}}
+\newcommand*{\unwrap}{\mathrm{unwrap}}
+\newcommand*{\dispatch}{\mathrm{dispatch}}
+\newcommand*{\subsumed}{\sqsubseteq}
+\newcommand*{\matches}{\rightsquigarrow}
+\newcommand*{\notmatches}{\not\rightsquigarrow}
 
 % operational semantics
 \newcommand{\assigns}[1]{\mathsf{assigns}\;#1}
 \newcommand{\returns}[1]{\mathsf{returns}\;#1}
+
+% open term typing arrow
+\newcommand{\carrow}[1]{\xrightarrow{\; #1\; }}

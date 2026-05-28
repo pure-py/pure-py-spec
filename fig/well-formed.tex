@@ -1,6 +1,5 @@
 \begin{figure}
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash s : R$}
+\flushleft \shadebox{$\Gamma \vdash b : R$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{pass}}]
@@ -14,10 +13,35 @@
 \inferrule*[lab={\ruleName{assign}}]
 {
   \Gamma \vdash e \\
-  x \notin \mathrm{captures}(e)
+  x \notin \capturesE(e)
 }
 {
   \Gamma \vdash \exAssign{x}{e} : \Assigns{\set{x : \statusDefAssigned}}
+}
+\and
+\inferrule*[lab={\ruleName{expr-stmt}}]
+{
+  \Gamma \vdash e
+}
+{
+  \Gamma \vdash e : \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{assert}}]
+{
+  \Gamma \vdash e
+}
+{
+  \Gamma \vdash \exAssert{e} : \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{assert-msg}}]
+{
+  \Gamma \vdash e \\
+  \Gamma \vdash e'
+}
+{
+  \Gamma \vdash \exAssertMsg{e}{e'} : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{return-none}}]
@@ -36,65 +60,70 @@
   \Gamma \vdash \exReturn{e} : \Returns
 }
 \and
-\inferrule*[lab={\ruleName{seq}}]
-{
-  \Gamma \vdash s_1 : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash s_2 : R \\
-  \mathrm{captures}(s_1) \cap \locals(s_2) = \varnothing
-}
-{
-  \Gamma \vdash \exSeq{s_1}{s_2} : \Assigns{\Delta} \runion R
-}
-\and
 \inferrule*[lab={\ruleName{if}}]
 {
-  \Gamma \vdash \vec{e} \\
-  \Gamma \vdash \vec{s} : \vec{R}
+  \Gamma \vdash e_i \quad (\forall i) \\
+  \Gamma \vdash b_i : R_i \quad (\forall i)
 }
 {
-  \Gamma \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \merge \ldots R_{n + 1} \merge \ldots \merge \Assigns{\varnothing}
+  \Gamma \vdash \exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}} : R_1 \merge \ldots R_{n + 1} \merge \ldots \merge \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{if-else}}]
 {
-  \Gamma \vdash \vec{e} \\
-  \Gamma \vdash \vec{s} : \vec{R}
+  \Gamma \vdash e_i \quad (\forall i) \\
+  \Gamma \vdash b_i : R_i \quad (\forall i)
 }
 {
-  \Gamma \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\cdots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \merge \cdots \merge R_{n+2}
+  \Gamma \vdash \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
 }
 \and
-\inferrule*[lab={\ruleName{def}}]
+\inferrule*[lab={\ruleName{mutual}}]
 {
-  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned, \locals(s) : \statusNotDefAssigned \vdash s : R \\
-  f \notin \mathrm{captures}(\exDef{f}{\vec{x}}{s})
+  \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_{i}) \runion
+  \statusNotDefAssigned(\assignsS(b_i) \setminus \seq{x}_i) \vdash b_i : R_i
+  \quad (\forall i)
+  \\
+  f_1, \ldots, f_{n+1} \text{ distinct}
 }
 {
-  \Gamma \vdash \exDef{f}{\vec{x}}{s} : \Assigns{\set{f : \statusDefAssigned}}
-}
-\end{mathpar}
-\caption{Statement $s$ is well-formed in $\Gamma$}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\wf{\Gamma}{e}$}
-\begin{mathpar}
-\small
-\inferrule*[right=var]
-{
-  \Gamma(x) = \statusDefAssigned
-}
-{
-  \wf{\Gamma}{x}
+  \Gamma \vdash \exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}} : \Assigns{\statusDefAssigned(\seq{f})}
 }
 \and
-\inferrule*[right=lambda]
+\inferrule*[lab={\ruleName{match}}]
 {
-  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned \vdash e
+  \Gamma \vdash e \\
+  \Gamma \runion \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
+  S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \runion R_i \quad (\forall i) \\
+  \vdash p_1 \cons \ldots \cons p_{n+1} \\
+  p_{n+1} \in \set{x, \patWild}
 }
 {
-  \wf{\Gamma}{\exLambda{\vec{x}}{e}}
+  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : S_1 \merge \ldots \merge S_{n+1}
+}
+\and
+\inferrule*[lab={\ruleName{match-partial}}]
+{
+  \Gamma \vdash e \\
+  \Gamma \runion \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
+  S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \runion R_i \quad (\forall i) \\
+  \vdash p_1 \cons \ldots \cons p_{n+1} \\
+  p_{n+1} \notin \set{x, \patWild}
+}
+{
+  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : S_1 \merge \ldots \merge S_{n+1} \merge \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{seq}}]
+{
+  \Gamma \vdash s : \Assigns{\Delta} \\
+  \Gamma \runion \Delta \vdash b : R \\
+  \capturesS(s) \cap \assignsS(b) = \varnothing
+}
+{
+  \Gamma \vdash s \cons b : \Assigns{\Delta} \runion R
 }
 \end{mathpar}
-\caption{Expression $e$ is well-formed in $\Gamma$}
-\end{subfigure}
+\caption{Block $b$ is well-formed in $\Gamma$}
+\label{fig:well-formed}
 \end{figure}

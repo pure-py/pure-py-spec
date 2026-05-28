@@ -1,3 +1,4 @@
+# rule: seq
 def f():
     x = 5
     def g():

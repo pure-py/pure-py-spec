@@ -1,0 +1,23 @@
+\begin{figure}
+\flushleft \shadebox{$\wf{\Gamma}{e}$}
+\begin{mathpar}
+\small
+\inferrule*[right=var]
+{
+  \Gamma(x) = \statusDefAssigned
+}
+{
+  \wf{\Gamma}{x}
+}
+\and
+\inferrule*[right=lambda]
+{
+  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned \vdash e
+}
+{
+  \wf{\Gamma}{\exLambda{x_1, \ldots, x_n}{e}}
+}
+\end{mathpar}
+\caption{Expression $e$ is well-formed in $\Gamma$}
+\label{fig:well-formed-expr}
+\end{figure}

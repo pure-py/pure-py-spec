@@ -1,0 +1,87 @@
+\begin{figure}
+\flushleft \shadebox{$p \subsumed p'$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{sub-lit}}]
+{
+  \strut
+}
+{
+  \ell \subsumed \ell
+}
+\and
+\inferrule*[lab={\ruleName{sub-neg-lit}}]
+{
+  \strut
+}
+{
+  -n \subsumed -n
+}
+\and
+\inferrule*[lab={\ruleName{sub-var}}]
+{
+  \strut
+}
+{
+  p \subsumed x
+}
+\and
+\inferrule*[lab={\ruleName{sub-wild}}]
+{
+  \strut
+}
+{
+  p \subsumed \patWild
+}
+\and
+\inferrule*[lab={\ruleName{sub-list-list}}]
+{
+  p_i \subsumed q_i \quad (\forall i)
+}
+{
+  \patList{p_1, \ldots, p_n} \subsumed \patList{q_1, \ldots, q_n}
+}
+\and
+\inferrule*[lab={\ruleName{sub-list-tuple}}]
+{
+  p_i \subsumed q_i \quad (\forall i)
+}
+{
+  \patList{p_1, \ldots, p_n} \subsumed \patTuple{q_1, \ldots, q_n}
+}
+\and
+\inferrule*[lab={\ruleName{sub-tuple-list}}]
+{
+  p_i \subsumed q_i \quad (\forall i)
+}
+{
+  \patTuple{p_1, \ldots, p_n} \subsumed \patList{q_1, \ldots, q_n}
+}
+\and
+\inferrule*[lab={\ruleName{sub-tuple-tuple}}]
+{
+  p_i \subsumed q_i \quad (\forall i)
+}
+{
+  \patTuple{p_1, \ldots, p_n} \subsumed \patTuple{q_1, \ldots, q_n}
+}
+\and
+\inferrule*[lab={\ruleName{sub-as-l}}]
+{
+  p \subsumed q
+}
+{
+  p\;\pyinline{as}\;x \subsumed q
+}
+\and
+\inferrule*[lab={\ruleName{sub-as-r}}]
+{
+  p \subsumed q
+}
+{
+  p \subsumed q\;\pyinline{as}\;y
+}
+\end{mathpar}
+\caption{Pattern $p$ is subsumed by pattern $p'$.}
+\label{fig:subsumption}
+\end{figure}

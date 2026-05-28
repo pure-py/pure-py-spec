@@ -1,0 +1,79 @@
+\begin{figure}
+\flushleft \shadebox{$p, v \matches \rho$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{pat-lit}}]
+{
+  \strut
+}
+{
+  \ell, \ell \matches \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{pat-neg-lit}}]
+{
+  \strut
+}
+{
+  -n, -n \matches \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{pat-var}}]
+{
+  \strut
+}
+{
+  x, v \matches \set{x \mapsto v}
+}
+\and
+\inferrule*[lab={\ruleName{pat-wild}}]
+{
+  \strut
+}
+{
+  \patWild, v \matches \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{pat-list-list}}]
+{
+  p_i, v_i \matches \rho_i \quad (\forall i)
+}
+{
+  \patList{p_1, \ldots, p_n}, \exList{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
+}
+\and
+\inferrule*[lab={\ruleName{pat-list-tuple}}]
+{
+  p_i, v_i \matches \rho_i \quad (\forall i)
+}
+{
+  \patList{p_1, \ldots, p_n}, \exTuple{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
+}
+\and
+\inferrule*[lab={\ruleName{pat-tuple-list}}]
+{
+  p_i, v_i \matches \rho_i \quad (\forall i)
+}
+{
+  \patTuple{p_1, \ldots, p_n}, \exList{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
+}
+\and
+\inferrule*[lab={\ruleName{pat-tuple-tuple}}]
+{
+  p_i, v_i \matches \rho_i \quad (\forall i)
+}
+{
+  \patTuple{p_1, \ldots, p_n}, \exTuple{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
+}
+\and
+\inferrule*[lab={\ruleName{pat-as}}]
+{
+  p, v \matches \rho
+}
+{
+  p\;\pyinline{as}\;x, v \matches \rho \disjunion \set{x \mapsto v}
+}
+\end{mathpar}
+\caption{Pattern matching}
+\label{fig:match}
+\end{figure}

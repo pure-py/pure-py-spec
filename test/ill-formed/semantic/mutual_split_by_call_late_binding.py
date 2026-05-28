@@ -1,9 +1,10 @@
+# rule: var
 def even(n):
     if n == 0:
         return True
     return odd(n - 1)
 
-x = even(0)  # ok; doesn't call odd (late binding)
+x = even(0)  # PurePy: error (intervening call splits mutual block); Python: ok (late binding, doesn't reach odd)
 print(x)
 
 def odd(n):

@@ -4,35 +4,55 @@
 \begin{tabular}{rcll}
 $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exAssign{x}{e}$ & (Assign) \\
-    & $\mid$ & $\exSeq{s_1}{s_2}$ & (Seq) \\
+    & $\mid$ & $e$ & (ExprStmt) \\
+    & $\mid$ & $\exAssert{e}$ & (Assert) \\
+    & $\mid$ & $\exAssertMsg{e}{e'}$ & (AssertMsg) \\
     & $\mid$ & $\exReturnNone$ & (ReturnNone) \\
     & $\mid$ & $\exReturn{e}$ & (Return) \\
-    & $\mid$ & $\exIf{e}{s}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}$ & (If) \\
-    & $\mid$ & $\exIfElse{e}{s}{\exElif{e_1}{s_1}\;\cdots\;\exElif{e_n}{s_n}}{s'}$ & (IfElse) \\
-    & $\mid$ & $\exDef{f}{\vec{x}}{s}$ & (Def)
+    & $\mid$ & $\exIf{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}$ & (If) \\
+    & $\mid$ & $\exIfElse{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}{b'}$ & (IfElse) \\
+    & $\mid$ & $\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}$ & (Match) \\
+    & $\mid$ & $d_1 \;\ldots\; d_{n+1}$ & (MutualRegion)
+   \\[3mm]
+$b$ & $::=$ & $s_1 \;\ldots\; s_{n+1}$ & (Block)
+   \\[3mm]
+$d$ & $::=$ & $\exDef{f}{x_1, \ldots, x_n}{b}$ & (Def)
    \\[3mm]
 $e$ & $::=$ & $x$ & (Var) \\
-    & $\mid$ & $n$ & (Literal) \\
-    & $\mid$ & $\exApp{e}{\vec{e}}$ & (Call) \\
-    & $\mid$ & $\exDict{\vec{\bind{x}{e}}}$ & (Dict) \\
+    & $\mid$ & $\ell$ & (Literal) \\
+    & $\mid$ & $\exApp{e}{e_1, \ldots, e_n}$ & (Call) \\
+    & $\mid$ & $\exDict{x_1 \mathord{:} e_1, \ldots, x_n \mathord{:} e_n}$ & (Dict) \\
     & $\mid$ & $\exProject{e}{x}$ & (Lookup) \\
     & $\mid$ & $\exDProject{e}{e'}$ & (Subscript) \\
     & $\mid$ & $\exBinaryApp{e}{\odot}{e'}$ & (BinOp) \\
+    & $\mid$ & $\exUnaryApp{\ominus}{e}$ & (UnaryOp) \\
     & $\mid$ & $\exCondExpr{e_1}{e}{e_2}$ & (CondExpr) \\
-    & $\mid$ & $\exList{\vec{e}}$ & (List) \\
-    & $\mid$ & $\exListComp{e}{\vec{q}}$ & (ListComp) \\
-    & $\mid$ & $\exLambda{\vec{x}}{e}$ & (Lambda)
+    & $\mid$ & $\exList{e_1, \ldots, e_n}$ & (List) \\
+    & $\mid$ & $\exTuple{e_1, \ldots, e_n}$ & (Tuple) \\
+    & $\mid$ & $\exListComp{e}{q_1\;\ldots\;q_n}$ & (ListComp) \\
+    & $\mid$ & $\exLambda{x_1, \ldots, x_n}{e}$ & (Lambda)
    \\[3mm]
 $q$ & $::=$ & $\qualGuard{e}$ & (Guard) \\
     & $\mid$ & $\qualGenerator{x}{e}$ & (Generator)
    \\[3mm]
-$b$ & $::=$ & $\statusDefAssigned$ & (Definitely assigned) \\
-    & $\mid$ & $\statusNotDefAssigned$ & (Not definitely assigned)
+$\ell$ & $::=$ & $n$ & (Number) \\
+    & $\mid$ & $\pyinline{True}$ & (True) \\
+    & $\mid$ & $\pyinline{False}$ & (False) \\
+    & $\mid$ & $\pyinline{None}$ & (None)
    \\[3mm]
-$\Gamma, \Delta$ & $::=$ & $\set{\vec{x:b}}$ \\[3mm]
+$p$ & $::=$ & $\ell$ & (PatLiteral) \\
+    & $\mid$ & $-n$ & (PatNegLit) \\
+    & $\mid$ & $x$ & (PatVar) \\
+    & $\mid$ & $\patWild$ & (PatWildcard) \\
+    & $\mid$ & $\patList{p_1, \ldots, p_n}$ & (PatList) \\
+    & $\mid$ & $\patTuple{p_1, \ldots, p_n}$ & (PatTuple) \\
+    & $\mid$ & $p\;\pyinline{as}\;x$ & (PatAs)
+   \\[3mm]
+$\Gamma, \Delta$ & $::=$ & $\set{x_1 \mathord{:} \B, \ldots, x_n \mathord{:} \B}$ & \\[3mm]
 $R, S$ & $::=$ & $\Returns$ & \\
-    & $\mid$ & $\Assigns{}{\Delta}$ &
+    & $\mid$ & $\Assigns{\Delta}$ &
 \end{tabular}
 \end{center}
 \caption{Syntax of statements, expressions and contexts}
+\label{fig:syntax}
 \end{figure}

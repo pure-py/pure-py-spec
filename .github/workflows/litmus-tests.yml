@@ -25,5 +25,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install mypy
+        if: matrix.python-version == '3.12'
+        run: pip install mypy
+
       - name: Run all tests
-        run: test/run-all.sh python
+        run: |
+          if [ "${{ matrix.python-version }}" = "3.12" ]; then
+            test/run-all.sh python
+          else
+            test/run-all.sh python --no-mypy
+          fi

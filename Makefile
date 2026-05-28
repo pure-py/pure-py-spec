@@ -15,6 +15,8 @@ default: PurePy-spec.pdf
 	pdflatex $<
 	pdflatex $<
 
+full: PurePy-spec-full.pdf
+
 clean:
 	rm -f *.pdf *.aux *.log *.out *.bbl *.blg $(ARXIV_ZIP)
 
@@ -24,4 +26,4 @@ $(ARXIV_ZIP): $(ARXIV_FILES)
 	rm -f $@
 	zip -9 $@ $^
 
-.PHONY: default clean arXiv
+.PHONY: default full clean arXiv
