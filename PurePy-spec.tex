@@ -536,6 +536,25 @@ resolves \pyinline{g} to its sibling rather than to the outer \pyinline{g}. The 
 simultaneously, so \pyinline{f} cannot be called before the inner \pyinline{g} exists, and the value
 \pyinline{f} sees is the same as the value Python's late binding finds at call time.
 
+\subsubsection{Pattern variables escape the match}
+
+A variable bound by a \pyinline{case} pattern is in scope after the \pyinline{match} statement, just as
+a variable assigned inside a conditional branch is in scope after the conditional. Python treats matching
+this way; \PurePy follows.
+
+\begin{python}
+v = 5
+match v:
+    case x:
+        pass
+print(x)    # prints 5
+\end{python}
+
+Here the catch-all \pyinline{case x:} binds \pyinline{x} in the body's scope, and the binding survives into
+the enclosing scope. Definite assignment after the match follows the same merge logic as a conditional: if
+every case binds the variable (or returns), it is definitely assigned afterwards; otherwise it is not (see
+also \S\ref{sec:local-assignment}).
+
 \subsubsection{Unreachable code}
 \label{sec:unreachable}
 A non-empty sequence of statements returns only if the last statement returns, and all preceding statements
