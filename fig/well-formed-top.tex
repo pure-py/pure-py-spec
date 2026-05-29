@@ -1,0 +1,31 @@
+\begin{figure}
+\flushleft \shadebox{$\Gamma \vdash t : R$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{t-stmt}}]
+{
+  \Gamma \vdash s : R
+}
+{
+  \Gamma \vdash s : R
+}
+\and
+\inferrule*[lab={\ruleName{import}}]
+{
+  M = x_1.x_2.\ldots.x_{n+1}
+}
+{
+  \Gamma \vdash \exImport{M} : \Assigns{\statusDefAssigned(\set{x_1})}
+}
+\and
+\inferrule*[lab={\ruleName{from-import}}]
+{
+  \strut
+}
+{
+  \Gamma \vdash \exFromImport{M}{x_1, \ldots, x_{n+1}} : \Assigns{\statusDefAssigned(\set{x_1, \ldots, x_{n+1}})}
+}
+\end{mathpar}
+\caption{Top-level statement $t$ is well-formed in $\Gamma$ (\ruleName{t-stmt} delegates to the $s$ rules).}
+\label{fig:well-formed-top}
+\end{figure}

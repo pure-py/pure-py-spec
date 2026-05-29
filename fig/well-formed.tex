@@ -35,22 +35,6 @@
   \Gamma \vdash \exAssert{e} : \Assigns{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{import}}]
-{
-  M = x_1.x_2.\ldots.x_{n+1}
-}
-{
-  \Gamma \vdash \exImport{M} : \Assigns{\statusDefAssigned(\set{x_1})}
-}
-\and
-\inferrule*[lab={\ruleName{from-import}}]
-{
-  \strut
-}
-{
-  \Gamma \vdash \exFromImport{M}{x_1, \ldots, x_{n+1}} : \Assigns{\statusDefAssigned(\set{x_1, \ldots, x_{n+1}})}
-}
-\and
 \inferrule*[lab={\ruleName{assert-msg}}]
 {
   \Gamma \vdash e \\

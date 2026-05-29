@@ -12,11 +12,13 @@ $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exIf{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}$ & (If) \\
     & $\mid$ & $\exIfElse{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}{b'}$ & (IfElse) \\
     & $\mid$ & $\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}$ & (Match) \\
-    & $\mid$ & $d_1 \;\ldots\; d_{n+1}$ & (MutualRegion) \\
-    & $\mid$ & $\exImport{M}$ & (Import) \\
-    & $\mid$ & $\exFromImport{M}{x_1, \ldots, x_{n+1}}$ & (FromImport)
+    & $\mid$ & $d_1 \;\ldots\; d_{n+1}$ & (MutualRegion)
    \\[3mm]
 $b$ & $::=$ & $s_1 \;\ldots\; s_{n+1}$ & (Block)
+   \\[3mm]
+$t$ & $::=$ & $s$ & (Stmt) \\
+    & $\mid$ & $\exImport{M}$ & (Import) \\
+    & $\mid$ & $\exFromImport{M}{x_1, \ldots, x_{n+1}}$ & (FromImport)
    \\[3mm]
 $M$ & $::=$ & $x_1.x_2.\ldots.x_{n+1}$ & (FullyQualifiedName)
    \\[3mm]

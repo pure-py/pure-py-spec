@@ -262,9 +262,12 @@ which follow Python.
 \subsection{Modules and entry point}
 
 A \PurePy execution context (or \emph{program}) $\langle E, \mathcal{M} \rangle$ consists of a finite map
-$\mathcal{M}$ from \emph{fully-qualified names} $M$ (\figref{syntax}) to blocks (the \emph{modules}), together
-with a designated \emph{entry point} $E \in \dom(\mathcal{M})$. The map $\mathcal{M}$ is prefix-closed: if $M
-\in \dom(\mathcal{M})$ then $\parents(M) \subseteq \dom(\mathcal{M})$. For each $(M \mapsto b) \in
+$\mathcal{M}$ from \emph{fully-qualified names} $M$ (\figref{syntax}) to sequences of top-level statements
+$t_1, \ldots, t_n$ (the \emph{modules}), together with a designated \emph{entry point} $E \in
+\dom(\mathcal{M})$. The map $\mathcal{M}$ is prefix-closed: if $M \in \dom(\mathcal{M})$ then $\parents(M)
+\subseteq \dom(\mathcal{M})$. The top-level form $t$ (\figref{syntax}) extends the statement form $s$ with
+the \pyinline{import} and \pyinline{from} forms; these forms can therefore appear only at the
+top level of a module, not inside function bodies, conditional branches, or other nested contexts. For each $(M \mapsto b) \in
 \mathcal{M}$, well-formedness of $b$ is checked under the initial context $\Gamma_M$ which binds at status
 $\statusDefAssigned$ the names of \figref{predefined}: the names of the predefined module
 \pyinline{builtins}; and the variable \pyinline{__name__}, set to \pyinline{"__main__"} if $M = E$ and to
@@ -339,6 +342,7 @@ $\Delta$, which may be empty. The base cases are that \pyinline{return e} defini
 
 \input{fig/well-formed}
 \input{fig/well-formed-expr}
+\input{fig/well-formed-top}
 
 \subsection{Examples}
 
