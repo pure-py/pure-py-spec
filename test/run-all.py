@@ -53,7 +53,7 @@ def bad(label, msg):
 
 
 def expect_exit(label, cmd, expected):
-    proc = subprocess.run(cmd, capture_output=True)
+    proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode == expected:
         ok(label)
     else:
@@ -76,25 +76,23 @@ def run_python(label, interpreter, path, cwd=None, expected_path=None):
         expected_path = path.with_suffix(".expected")
     exception_path = path.with_suffix(".exception.expected")
     cmd_path = path.name if cwd is not None else str(path)
-    proc = subprocess.run([interpreter, cmd_path], cwd=cwd, capture_output=True)
-    stderr = proc.stderr.decode("utf-8", errors="replace")
+    proc = subprocess.run([interpreter, cmd_path], cwd=cwd, capture_output=True, text=True)
 
     if exception_path.exists():
         expected = exception_path.read_text().strip()
         if proc.returncode == 0:
             bad(label, f"expected {expected} but script succeeded")
-        elif expected not in stderr:
-            bad(label, f"expected {expected}, got: {stderr.strip()[:200]}")
+        elif expected not in proc.stderr:
+            bad(label, f"expected {expected}, got: {proc.stderr.strip()[:200]}")
         else:
             ok(label)
         return
 
     if proc.returncode != 0:
-        bad(label, f"exit {proc.returncode}: {stderr.strip()[:200]}")
+        bad(label, f"exit {proc.returncode}: {proc.stderr.strip()[:200]}")
         return
     expected = expected_path.read_text() if expected_path.exists() else ""
-    actual = proc.stdout.decode("utf-8", errors="replace")
-    if actual != expected:
+    if proc.stdout != expected:
         bad(label, "output mismatch")
     else:
         ok(label)
@@ -111,11 +109,11 @@ def main():
     if not skip_mypy:
         print("mypy --strict src/")
         sources = [str(ROOT / "src" / "purepy_parse.py"), str(ROOT / "src" / "purepy_check.py")]
-        proc = subprocess.run(["mypy", "--strict", *sources], capture_output=True)
+        proc = subprocess.run(["mypy", "--strict", *sources], capture_output=True, text=True)
         if proc.returncode == 0:
             ok("src/")
         else:
-            bad("src/", proc.stdout.decode("utf-8", errors="replace").strip()[:400])
+            bad("src/", proc.stdout.strip()[:400])
 
     print("well-formed")
     files = sorted(wf.glob("*.py"))
@@ -129,7 +127,8 @@ def main():
 
     print("well-formed/multi-file")
     mf_root = wf / "multi-file"
-    for d in sorted(p for p in mf_root.iterdir() if p.is_dir()) if mf_root.exists() else []:
+    mf_dirs = sorted(p for p in mf_root.iterdir() if p.is_dir()) if mf_root.exists() else []
+    for d in mf_dirs:
         rel = d.relative_to(ROOT)
         main_py = d / "main.py"
         if main_py.exists():
@@ -155,9 +154,8 @@ def main():
 
     print("syntactic-only")
     for p in sorted((base / "syntactic-only").glob("*.py")):
-        if p.name.startswith("_"):
-            continue
-        expect_exit(str(p.relative_to(ROOT)), ["python3", str(p)], 0)
+        if not p.name.startswith("_"):
+            expect_exit(str(p.relative_to(ROOT)), [interpreter, str(p)], 0)
 
     total = passed + failed
     print()
