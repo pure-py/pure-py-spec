@@ -6,7 +6,8 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exList{v_1, \ldots, v_n}$ & (List) \\
     & $\mid$ & $\exTuple{v_1, \ldots, v_n}$ & (Tuple) \\
     & $\mid$ & $\exClosure{\rho}{\vec{x}}{e}$ & (LambdaClosure) \\
-    & $\mid$ & $\exDefClosure{\rho}{\seq{d}}{i}$ & (DefClosure)
+    & $\mid$ & $\exDefClosure{\rho}{\seq{d}}{i}$ & (DefClosure) \\
+    & $\mid$ & $\exModuleClosure{\rho}$ & (ModuleClosure)
    \\[3mm]
 $\rho$ & $::=$ & $\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}$ & (Environment)
    \\[3mm]
