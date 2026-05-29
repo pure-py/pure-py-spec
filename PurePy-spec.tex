@@ -261,11 +261,14 @@ which follow Python.
 
 \subsection{Modules}
 
+A \PurePy execution context (or \emph{program}) is a finite set of modules, each identified by a
+\emph{fully-qualified name}: a non-empty sequence of identifiers separated by dots, e.g. $x_1.x_2.\ldots.x_k$.
+One module is designated as the entry point.
+
 A \PurePy module $m$ is the contents of a single source file (\figref{syntax}). Well-formedness of $m$ is
 checked under the initial context $\Gamma_m$, which binds at status $\statusDefAssigned$ the names of
 \figref{predefined}: the names of the predefined module \pyinline{builtins}; and the variable
-\pyinline{__name__}, set to \pyinline{"__main__"} if $m$ is the entry-point module and to the name of $m$
-otherwise.
+\pyinline{__name__}, set to \pyinline{"__main__"} if $m$ is the entry point and to the name of $m$ otherwise.
 
 \begin{figure}[H]
 \small
