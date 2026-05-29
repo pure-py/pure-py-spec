@@ -68,6 +68,10 @@ def check_cmd(path):
     return ["python3", str(ROOT / "src" / "purepy_check.py"), str(path)]
 
 
+def check_program_cmd(path):
+    return ["python3", str(ROOT / "src" / "purepy_check_program.py"), str(path)]
+
+
 def run_python(label, interpreter, path, cwd=None, expected_path=None):
     """Run a script under Python; compare output to .expected, or check stderr
     for the class named in .exception.expected. cwd defaults to current; if set,
@@ -108,7 +112,11 @@ def main():
 
     if not skip_mypy:
         print("mypy --strict src/")
-        sources = [str(ROOT / "src" / "purepy_parse.py"), str(ROOT / "src" / "purepy_check.py")]
+        sources = [
+            str(ROOT / "src" / "purepy_parse.py"),
+            str(ROOT / "src" / "purepy_check.py"),
+            str(ROOT / "src" / "purepy_check_program.py"),
+        ]
         proc = subprocess.run(["mypy", "--strict", *sources], capture_output=True, text=True)
         if proc.returncode == 0:
             ok("src/")
@@ -132,6 +140,7 @@ def main():
         rel = d.relative_to(ROOT)
         main_py = d / "main.py"
         if main_py.exists():
+            expect_exit(f"{rel} (check)", check_program_cmd(main_py), 0)
             run_python(f"{rel} (run)", interpreter, main_py, cwd=d, expected_path=d / "expected")
         else:
             bad(str(rel), "missing main.py")
