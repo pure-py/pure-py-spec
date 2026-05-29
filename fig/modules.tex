@@ -13,19 +13,31 @@
 \parents(M.x) &= \parents(M) \cup \set{M}
 \end{align*}
 
+\flushleft \shadebox{$\vdash_{\mathcal{M}} M$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{module}}]
+{
+  \Gamma_M \vdash \mathcal{M}(M) : R \\
+  \imports(\mathcal{M}(M)) \cup \parents(M) \subseteq \dom(\mathcal{M})
+}
+{
+  \vdash_{\mathcal{M}} M
+}
+\end{mathpar}
+
 \flushleft \shadebox{$\vdash \langle E, \mathcal{M} \rangle$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{program}}]
 {
-  \Gamma_{M_i} \vdash \mathcal{M}(M_i) : R_i \quad (\forall M_i \in \dom(\mathcal{M})) \\
-  \imports(\mathcal{M}(M_i)) \cup \parents(M_i) \subseteq \dom(\mathcal{M}) \quad (\forall M_i \in \dom(\mathcal{M})) \\
+  \vdash_{\mathcal{M}} M_i \quad (\forall M_i \in \dom(\mathcal{M})) \\
   G_{\mathcal{M}} \text{ acyclic}
 }
 {
   \vdash \langle E, \mathcal{M} \rangle
 }
 \end{mathpar}
-\caption{$\imports$ and $\parents$ metafunctions; program well-formedness.}
+\caption{$\imports$ and $\parents$ metafunctions; module and program well-formedness.}
 \label{fig:modules}
 \end{figure}
