@@ -631,10 +631,31 @@ def find_first_reassigning(items: list[Item], names: set[str]) -> Optional[ast.A
         return items[0][0] if isinstance(items[0], list) else items[0]
     return find_first_reassigning(items[1:], names)
 
+def _find_nested_import(stmts: list[ast.stmt]) -> ast.AST | None:
+    """Return the first import statement nested inside a non-top-level construct."""
+    for s in stmts:
+        if isinstance(s, ast.FunctionDef):
+            for inner in ast.walk(s):
+                if isinstance(inner, (ast.Import, ast.ImportFrom)):
+                    return inner
+        if isinstance(s, ast.If):
+            r = _find_nested_import(s.body) or _find_nested_import(s.orelse)
+            if r is not None:
+                return r
+        if isinstance(s, ast.Match):
+            for case in s.cases:
+                r = _find_nested_import(case.body)
+                if r is not None:
+                    return r
+    return None
+
 def check_module(tree: ast.AST) -> Result:
     assert isinstance(tree, ast.Module)
     if not tree.body:
         return ok()
+    nested = _find_nested_import(tree.body)
+    if nested is not None:
+        return ill_formed(nested, '[import] import only allowed at module top level')
     return check_block(tree.body, dict(BUILTINS))
 
 def check_file(filename: str) -> Result:

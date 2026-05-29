@@ -2,6 +2,14 @@
 \flushleft \shadebox{$\Gamma \vdash m : R$}
 \begin{mathpar}
 \small
+\inferrule*[lab={\ruleName{empty}}]
+{
+  \strut
+}
+{
+  \Gamma \vdash \varepsilon : \Assigns{\varnothing}
+}
+\and
 \inferrule*[lab={\ruleName{import}}]
 {
   M = x_1.x_2.\ldots.x_{n+1}

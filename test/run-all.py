@@ -30,6 +30,8 @@ SEMANTIC_CAUGHT = {
     "mutual_def_block_local",
     "no_else",
     "unbound_local",
+    "import_in_def",
+    "import_in_if",
 }
 
 
