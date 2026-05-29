@@ -262,7 +262,7 @@ which follow Python.
 \subsection{Modules and entry point}
 
 A \PurePy execution context (or \emph{program}) is a finite set of \emph{modules}, each identified by a
-\emph{fully-qualified name} $x_1.x_2.\ldots.x_{n+1}$. One module is designated as the \emph{entry point}.
+\emph{fully-qualified name} $M$ (\figref{syntax}). One module is designated as the \emph{entry point}.
 A module $m$ is a block $b$ (\figref{syntax}). Well-formedness of $m$ is checked
 under the initial context $\Gamma_m$, which binds at status $\statusDefAssigned$ the names of
 \figref{predefined}: the names of the predefined module \pyinline{builtins}; and the variable
