@@ -102,6 +102,11 @@ semantics in Python
 two separate syntaxes
 \end{itemize}
 
+Python interoperability is a key goal, but \PurePy is also motivated by the desire to carve out a well-behaved
+discipline for scientific programming \emph{within} Python: a sublanguage in which permissive Python idioms
+that invite confusion are tightened or excluded, even where doing so departs from strict Python compatibility
+at the margins.
+
 {\small
 \begin{center}
 \begin{minipage}[t]{0.4\textwidth}
@@ -599,6 +604,7 @@ functional programming:
 \item \pyinline{yield}/\pyinline{yield from}
 \item \pyinline{class} definitions (dataclasses may be added; see \S2 to-do list)
 \item \pyinline{with} statements
+\item Cross-bracket sequence pattern matching: \pyinline{case [a, b]:} only matches lists, and \pyinline{case (a, b):} only matches tuples. Python admits either pattern against either kind of sequence; \PurePy keeps them type-strict (the bracket form is significant).
 \end{itemize}
 
 \section{Operational semantics}
