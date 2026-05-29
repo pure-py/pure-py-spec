@@ -603,7 +603,7 @@ functional programming:
 \item \pyinline{yield}/\pyinline{yield from}
 \item \pyinline{class} definitions (dataclasses may be added; see \S2 to-do list)
 \item \pyinline{with} statements
-\item Cross-bracket sequence pattern matching: \pyinline{case [a, b]:} only matches lists, and \pyinline{case (a, b):} only matches tuples. Python admits either pattern against either kind of sequence; \PurePy keeps them type-strict (the bracket form is significant).
+\item List patterns matching tuple values, or tuple patterns matching list values. In \PurePy a list pattern matches only a list, and a tuple pattern matches only a tuple. Python permits either pattern against either kind of sequence.
 \end{itemize}
 
 \section{Operational semantics}
