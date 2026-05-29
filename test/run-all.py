@@ -124,6 +124,27 @@ def main():
         expect_exit(f"{rel} (check)", check_cmd(p), 0)
         run_python(f"{rel} (run)", interpreter, p)
 
+    print("well-formed/multi-file")
+    for d in sorted((wf / "multi-file").iterdir()) if (wf / "multi-file").exists() else []:
+        if not d.is_dir():
+            continue
+        main_py = d / "main.py"
+        expected_path = d / "expected"
+        rel = d.relative_to(ROOT)
+        if not main_py.exists():
+            bad(str(rel), "missing main.py")
+            continue
+        proc = subprocess.run([interpreter, "main.py"], cwd=d, capture_output=True)
+        if proc.returncode != 0:
+            bad(f"{rel} (run)", f"exit {proc.returncode}: {proc.stderr.decode('utf-8', errors='replace').strip()[:200]}")
+            continue
+        expected = expected_path.read_text() if expected_path.exists() else ""
+        actual = proc.stdout.decode("utf-8", errors="replace")
+        if actual != expected:
+            bad(f"{rel} (run)", "output mismatch")
+        else:
+            ok(f"{rel} (run)")
+
     print("well-formed/pending")
     for p in sorted((wf / "pending").glob("*.py")):
         expect_exit(str(p.relative_to(ROOT)), parse_cmd(p), 2)
