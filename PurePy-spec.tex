@@ -284,6 +284,12 @@ Module-local & \pyinline{__name__} \\
 \label{fig:predefined}
 \end{figure}
 
+The metafunction $\imports$ (\figref{imports}) extracts the set of modules a given module depends on,
+by collecting the module names mentioned in $\pyinline{import}$ and $\pyinline{from M import \ldots}$
+statements anywhere in the module body.
+
+\input{fig/imports}
+
 \subsection{Well-formedness}
 
 \paragraph{Auxiliary metafunctions.}
