@@ -288,8 +288,8 @@ Module-local & \pyinline{__name__} \\
 The metafunction $\imports$ (\figref{modules}) extracts the set of modules a given module depends on,
 by collecting the module names mentioned in $\pyinline{import}$ and $\pyinline{from M import \ldots}$
 statements anywhere in the module body. $\imports$ extends to blocks the same way $\assignsS$ does:
-$\imports(s \cons b) = \imports(s) \cup \imports(b)$. Loading a module $M$ also requires loading each of its
-\emph{parents} (proper prefixes of $M$).
+$\imports(s \cons b) = \imports(s) \cup \imports(b)$. The metafunction $\parents$ collects the proper
+prefixes of a fully-qualified name.
 
 \input{fig/modules}
 
