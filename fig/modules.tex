@@ -12,6 +12,19 @@
 \parents(x) &= \varnothing \\
 \parents(M.x) &= \parents(M) \cup \set{M}
 \end{align*}
-\caption{Modules imported by a statement; proper prefixes of a fully-qualified module name.}
-\label{fig:imports}
+
+\flushleft \shadebox{$\vdash P$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{program}}]
+{
+  \Gamma_{m_i} \vdash m_i : R_i \quad (\forall M_i \in \dom(\mathcal{M})) \\
+  G_P \text{ acyclic}
+}
+{
+  \vdash \langle E, \mathcal{M} \rangle
+}
+\end{mathpar}
+\caption{Imports and parents metafunctions; program well-formedness.}
+\label{fig:modules}
 \end{figure}

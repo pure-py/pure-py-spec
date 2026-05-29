@@ -284,17 +284,18 @@ Module-local & \pyinline{__name__} \\
 \label{fig:predefined}
 \end{figure}
 
-The metafunction $\imports$ (\figref{imports}) extracts the set of modules a given module depends on,
+The metafunction $\imports$ (\figref{modules}) extracts the set of modules a given module depends on,
 by collecting the module names mentioned in $\pyinline{import}$ and $\pyinline{from M import \ldots}$
 statements anywhere in the module body. $\imports$ extends to blocks the same way $\assignsS$ does:
 $\imports(s \cons b) = \imports(s) \cup \imports(b)$. Loading a module $M$ also requires loading each of its
 \emph{parents} (proper prefixes of $M$).
 
-\input{fig/imports}
+\input{fig/modules}
 
 The \emph{dependency graph} $G_P$ of a program $P = \langle E, \mathcal{M} \rangle$ is the directed graph
 whose edges $(M, M')$ are those for which either $M \in \dom(\mathcal{M})$ and $M' \in \imports(\mathcal{M}(M))$,
-or $M' \in \parents(M)$.
+or $M' \in \parents(M)$. Program well-formedness $\vdash P$ (\figref{modules}) requires every module in
+$\mathcal{M}$ to be well-formed in its initial context, and $G_P$ to be acyclic.
 
 \subsection{Well-formedness}
 
