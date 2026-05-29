@@ -286,9 +286,10 @@ Module-local & \pyinline{__name__} \\
 
 The metafunction $\imports$ (\figref{imports}) extracts the set of modules a given module depends on,
 by collecting the module names mentioned in $\pyinline{import}$ and $\pyinline{from M import \ldots}$
-statements anywhere in the module body. Loading a module $M$ also requires loading each of its
-\emph{parents} (proper prefixes of $M$); the program-level dependency graph used for cycle-checking
-combines $\imports$ with $\parents$ edges.
+statements anywhere in the module body. $\imports$ extends to blocks the same way $\assignsS$ does:
+$\imports(s \cons b) = \imports(s) \cup \imports(b)$. Loading a module $M$ also requires loading each of its
+\emph{parents} (proper prefixes of $M$); the program-level dependency graph used for cycle-checking combines
+$\imports$ with $\parents$ edges.
 
 \input{fig/imports}
 
@@ -301,7 +302,7 @@ anywhere in $s$ (without descending into nested function definitions, which have
 $\assignsS(s) = \dom(\Delta)$ when $s : \Assigns{\Delta}$); $\binds(p)$, the set of variables introduced by a
 pattern $p$; and $\capturesS(s)$, the set of variables from the enclosing scope that are captured by closures
 (lambdas or nested function definitions) within $s$, with companion $\capturesE(e)$ on expressions. All are
-defined in \figref{aux}. The functions $\assignsS$ and $\capturesS$ extend pointwise to blocks via
+defined in \figref{aux}. The functions $\assignsS$ and $\capturesS$ extend to blocks as follows:
 $\assignsS(s \cons b) = \assignsS(s) \cup \assignsS(b)$ (similarly $\capturesS$), with the singleton block $s$
 identifying with the underlying statement.
 
