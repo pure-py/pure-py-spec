@@ -266,7 +266,8 @@ A \PurePy execution context (or \emph{program}) is a finite set of \emph{modules
 A module $m$ is a block $b$ (\figref{syntax}). Well-formedness of $m$ is checked
 under the initial context $\Gamma_m$, which binds at status $\statusDefAssigned$ the names of
 \figref{predefined}: the names of the predefined module \pyinline{builtins}; and the variable
-\pyinline{__name__}, set to \pyinline{"__main__"} if $m$ is the entry point and to the name of $m$ otherwise.
+\pyinline{__name__}, set to \pyinline{"__main__"} if $m$ is the entry point and to the fully-qualified name
+of $m$ otherwise.
 
 \begin{figure}[H]
 \small
