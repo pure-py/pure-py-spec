@@ -5,7 +5,7 @@ from typing import Optional
 
 import purepy_parse
 import purepy_check
-from purepy_check import Error, Result, ok, is_ok, ill_formed
+from purepy_check import Error, Result, ok, is_ok
 
 
 ILL_FORMED_PROGRAM = 4
@@ -82,9 +82,9 @@ def _has_cycle(graph: dict[str, set[str]]) -> Optional[list[str]]:
 
 def check_program(entry_path: pathlib.Path) -> Result:
     base_dir = entry_path.parent
-    entry_name = entry_path.stem
     modules: dict[str, ast.Module] = {}
-    queue: list[str] = [entry_name]
+    imports_by_module: dict[str, set[str]] = {}  # cached _imports_of(modules[name])
+    queue: list[str] = [entry_path.stem]
     while queue:
         name = queue.pop()
         if name in modules:
@@ -94,37 +94,19 @@ def check_program(entry_path: pathlib.Path) -> Result:
             return err
         assert tree is not None
         modules[name] = tree
-        for imp in _imports_of(tree):
-            if imp not in modules:
-                queue.append(imp)
-            for parent in _parents(imp):
-                if parent not in modules:
-                    queue.append(parent)
+        imports_by_module[name] = _imports_of(tree)
+        for imp in imports_by_module[name]:
+            queue.extend({imp} | _parents(imp))
 
     # Per-module well-formedness.
-    for name, tree in modules.items():
+    for tree in modules.values():
         err = purepy_check.check_module(tree)
         if not is_ok(err):
             return err
 
-    # Resolution: every imported name must be in the program.
-    for name, tree in modules.items():
-        for imp in _imports_of(tree):
-            if imp not in modules:
-                return _program_error(f"module {name!r} imports {imp!r}, which is not in the program")
-            for parent in _parents(imp):
-                if parent not in modules:
-                    return _program_error(f"module {imp!r} requires parent {parent!r}, not in the program")
-
-    # Acyclicity.
-    graph: dict[str, set[str]] = {}
-    for name, tree in modules.items():
-        deps: set[str] = set()
-        for imp in _imports_of(tree):
-            deps.add(imp)
-            deps.update(_parents(imp))
-        deps.update(_parents(name))
-        graph[name] = deps
+    # Acyclicity. (Resolution is already guaranteed by the walk loop above.)
+    graph = {name: imps | _parents(name) | set().union(*(_parents(i) for i in imps))
+             for name, imps in imports_by_module.items()}
     cycle = _has_cycle(graph)
     if cycle is not None:
         return _program_error(f"import cycle: {' -> '.join(cycle)}")
