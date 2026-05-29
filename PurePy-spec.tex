@@ -150,30 +150,6 @@ regions. Maximality is not enforced by the grammar in \figref{syntax}; the parse
 grouping consecutive \pyinline{def}s into a single region. The well-formedness rules treat each region as
 one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
 
-\subsection{Modules}
-
-A \PurePy module is the contents of a single source file. \PurePy provides a predefined module
-\pyinline{builtins}, whose names are available implicitly in every other module without an explicit
-\pyinline{import}. In addition, each module receives a \emph{module-local} variable \pyinline{__name__}, set
-by the import machinery to \pyinline{"__main__"} in the entry-point module and to the module's own name
-otherwise.
-\figref{predefined} lists the names provided by these two sources.
-
-\begin{figure}[H]
-\small
-\centering
-\begin{tabular}{lp{0.6\textwidth}}
-\hline
-\textbf{Source} & \textbf{Names} \\
-\hline
-\pyinline{builtins} module & \pyinline{print}, \pyinline{len}, \pyinline{range}, \pyinline{type}, \pyinline{True}, \pyinline{False}, \pyinline{None} \\
-Module-local & \pyinline{__name__} \\
-\hline
-\end{tabular}
-\caption{Predefined names available in every \PurePy module.}
-\label{fig:predefined}
-\end{figure}
-
 \subsection{Contexts}
 
 Contexts $\Gamma, \Delta$ are partial functions from sets of variables to a \emph{definite assignment} status
@@ -280,6 +256,29 @@ on operator forms; disambiguation is by the precedence and associativity given i
 which follow Python.
 
 \input{fig/precedence}
+
+\subsection{Modules}
+
+A \PurePy module is the contents of a single source file. Well-formedness of a module is checked under an
+initial context $\Gamma$ in which the names of \figref{predefined} are bound at status $\statusDefAssigned$.
+Of these, the names of the predefined module \pyinline{builtins} are bound in every \PurePy module without
+an explicit \pyinline{import}; the variable \pyinline{__name__} is bound separately per module, taking the
+value \pyinline{"__main__"} in the entry-point module and the module's own name otherwise.
+
+\begin{figure}[H]
+\small
+\centering
+\begin{tabular}{lp{0.6\textwidth}}
+\hline
+\textbf{Source} & \textbf{Names} \\
+\hline
+\pyinline{builtins} module & \pyinline{print}, \pyinline{len}, \pyinline{range}, \pyinline{type}, \pyinline{True}, \pyinline{False}, \pyinline{None} \\
+Module-local & \pyinline{__name__} \\
+\hline
+\end{tabular}
+\caption{Predefined names available in every \PurePy module.}
+\label{fig:predefined}
+\end{figure}
 
 \subsection{Well-formedness}
 
