@@ -631,20 +631,23 @@ def find_first_reassigning(items: list[Item], names: set[str]) -> Optional[ast.A
         return items[0][0] if isinstance(items[0], list) else items[0]
     return find_first_reassigning(items[1:], names)
 
-def _find_nested_import(stmts: list[ast.stmt]) -> ast.AST | None:
-    """Return the first import statement nested inside a non-top-level construct."""
+def _find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST | None:
+    """Return the first import statement appearing in a non-top-level context.
+    nested=True means stmts themselves are inside a non-top-level body."""
     for s in stmts:
+        if nested and isinstance(s, (ast.Import, ast.ImportFrom)):
+            return s
         if isinstance(s, ast.FunctionDef):
-            for inner in ast.walk(s):
-                if isinstance(inner, (ast.Import, ast.ImportFrom)):
-                    return inner
+            r = _find_nested_import(s.body, nested=True)
+            if r is not None:
+                return r
         if isinstance(s, ast.If):
-            r = _find_nested_import(s.body) or _find_nested_import(s.orelse)
+            r = _find_nested_import(s.body, nested=True) or _find_nested_import(s.orelse, nested=True)
             if r is not None:
                 return r
         if isinstance(s, ast.Match):
             for case in s.cases:
-                r = _find_nested_import(case.body)
+                r = _find_nested_import(case.body, nested=True)
                 if r is not None:
                     return r
     return None

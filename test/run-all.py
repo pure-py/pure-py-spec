@@ -32,6 +32,7 @@ SEMANTIC_CAUGHT = {
     "unbound_local",
     "import_in_def",
     "import_in_if",
+    "import_in_match_case",
 }
 
 
