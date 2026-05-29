@@ -286,7 +286,9 @@ Module-local & \pyinline{__name__} \\
 
 The metafunction $\imports$ (\figref{imports}) extracts the set of modules a given module depends on,
 by collecting the module names mentioned in $\pyinline{import}$ and $\pyinline{from M import \ldots}$
-statements anywhere in the module body.
+statements anywhere in the module body. Loading a module $M$ also requires loading each of its
+\emph{parents} (proper prefixes of $M$); the program-level dependency graph used for cycle-checking
+combines $\imports$ with $\parents$ edges.
 
 \input{fig/imports}
 
