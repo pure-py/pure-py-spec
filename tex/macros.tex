@@ -45,9 +45,12 @@
 % statements and values
 \newcommand*{\exAssign}[2]{#1 = #2}
 \newcommand*{\exAssert}[1]{\pyinline{assert}\;#1}
+\newcommand*{\exImport}[1]{\pyinline{import}\;#1}
+\newcommand*{\exFromImport}[2]{\pyinline{from}\;#1\;\pyinline{import}\;#2}
 \newcommand*{\exAssertMsg}[2]{\pyinline{assert}\;#1, #2}
 \newcommand*{\exClosure}[3]{\langle#1, #2, #3\rangle}
 \newcommand*{\exDefClosure}[3]{\langle#1, #2, #3\rangle}
+\newcommand*{\exModuleClosure}[1]{\langle#1\rangle}
 \newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
 \newcommand*{\exElif}[2]{\pyinline{elif}\;#1:\;#2}
 \newcommand*{\exFunCall}[2]{#1(#2)}
@@ -75,6 +78,8 @@
 \newcommand*{\fvE}{\mathrm{fv}_{\mathsf{e}}}
 \newcommand*{\fvS}{\mathrm{fv}_{\mathsf{s}}}
 \newcommand*{\binds}{\mathrm{binds}}
+\newcommand*{\imports}{\mathrm{imports}}
+\newcommand*{\parents}{\mathrm{parents}}
 \newcommand*{\unwrap}{\mathrm{unwrap}}
 \newcommand*{\dispatch}{\mathrm{dispatch}}
 \newcommand*{\subsumed}{\sqsubseteq}

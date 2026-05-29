@@ -1,0 +1,41 @@
+\begin{figure}
+\flushleft \shadebox{$\Gamma \vdash m : R$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{empty}}]
+{
+  \strut
+}
+{
+  \Gamma \vdash \varepsilon : \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{import}}]
+{
+  M = x_1.x_2.\ldots.x_{n+1}
+}
+{
+  \Gamma \vdash \exImport{M} : \Assigns{\statusDefAssigned(\set{x_1})}
+}
+\and
+\inferrule*[lab={\ruleName{from-import}}]
+{
+  \strut
+}
+{
+  \Gamma \vdash \exFromImport{M}{x_1, \ldots, x_{n+1}} : \Assigns{\statusDefAssigned(\set{x_1, \ldots, x_{n+1}})}
+}
+\and
+\inferrule*[lab={\ruleName{seq}}]
+{
+  \Gamma \vdash t : \Assigns{\Delta} \\
+  \Gamma \runion \Delta \vdash m : R \\
+  \capturesS(t) \cap \assignsS(m) = \varnothing
+}
+{
+  \Gamma \vdash t \cons m : \Assigns{\Delta} \runion R
+}
+\end{mathpar}
+\caption{Module body $m$ is well-formed in $\Gamma$; when $t$ is a statement $s$, the rules of \figref{well-formed} apply.}
+\label{fig:well-formed-top}
+\end{figure}

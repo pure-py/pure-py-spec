@@ -102,6 +102,10 @@ semantics in Python
 two separate syntaxes
 \end{itemize}
 
+Python interoperability is a key goal, but \PurePy is also motivated by the desire to carve out a well-behaved
+discipline for scientific programming \emph{within} Python: a sublanguage in which permissive Python idioms
+that invite confusion are tightened or excluded.
+
 {\small
 \begin{center}
 \begin{minipage}[t]{0.4\textwidth}
@@ -148,7 +152,7 @@ one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
 
 \subsection{Contexts}
 
-Contexts $\Gamma, \Delta$ are partial functions from sets of variables to a \emph{definite assignment} status
+The grammar of contexts and result types is given in \figref{contexts}. Contexts $\Gamma, \Delta$ are partial functions from sets of variables to a \emph{definite assignment} status
 in $\B = \set{\statusDefAssigned, \statusNotDefAssigned}$, with $\statusDefAssigned$ indicating
 \emph{definitely assigned} and $\statusNotDefAssigned$ indicating \emph{not definitely assigned}. The definite
 assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}. (Or think of $\statusDefAssigned$ and
@@ -158,6 +162,8 @@ total functions from the set of all variables to $\B_{\bot} = \B \cup \set{\bot}
 $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context
 where all variables are undefined. For a set of variables $X$, write $\statusDefAssigned(X)$ for the context
 $\set{x : \statusDefAssigned \mid x \in X}$; similarly $\statusNotDefAssigned(X)$.
+
+\input{fig/contexts}
 
 \paragraph{Context operations.}
 
@@ -253,6 +259,49 @@ which follow Python.
 
 \input{fig/precedence}
 
+\subsection{Modules and entry point}
+
+A \PurePy execution context (or \emph{program}) $\langle E, \mathcal{M} \rangle$ consists of a finite map
+$\mathcal{M}$ from \emph{fully-qualified names} $M$ (\figref{syntax}) to \emph{modules} $m$ (each a sequence
+of top-level statements $t_1 \ldots t_{n+1}$), together with a designated \emph{entry point} $E \in
+\dom(\mathcal{M})$. The map $\mathcal{M}$ is prefix-closed: if $M \in \dom(\mathcal{M})$ then $\parents(M)
+\subseteq \dom(\mathcal{M})$. The top-level form $t$ (\figref{syntax}) extends the statement form $s$ with
+the \pyinline{import} and \pyinline{from} forms; these forms can therefore appear only at the
+top level of a module, not inside function bodies, conditional branches, or other nested contexts. For each $(M \mapsto b) \in
+\mathcal{M}$, well-formedness of $b$ is checked under the initial context $\Gamma_M$ which binds at status
+$\statusDefAssigned$ the names of \figref{predefined}: the names of the predefined module
+\pyinline{builtins}; and the variable \pyinline{__name__}, set to \pyinline{"__main__"} if $M = E$ and to
+$M$ otherwise.
+
+\begin{figure}[H]
+\small
+\centering
+\begin{tabular}{lp{0.6\textwidth}}
+\hline
+\textbf{Source} & \textbf{Names} \\
+\hline
+\pyinline{builtins} module & \pyinline{print}, \pyinline{len}, \pyinline{range}, \pyinline{type}, \pyinline{True}, \pyinline{False}, \pyinline{None} \\
+Module-local & \pyinline{__name__} \\
+\hline
+\end{tabular}
+\caption{Predefined names available in every \PurePy module.}
+\label{fig:predefined}
+\end{figure}
+
+The metafunction $\imports$ (\figref{modules}) extracts the set of modules a given module depends on,
+by collecting the module names mentioned in $\pyinline{import}$ and $\pyinline{from M import \ldots}$
+statements anywhere in the module body. $\imports$ extends to blocks the same way $\assignsS$ does:
+$\imports(s \cons b) = \imports(s) \cup \imports(b)$, and likewise to module bodies $m$ via
+$\imports(t \cons m) = \imports(t) \cup \imports(m)$. The metafunction $\parents$ collects the proper
+prefixes of a fully-qualified name.
+
+\input{fig/modules}
+
+The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(M, M')$ iff
+$M' \in \imports(\mathcal{M}(M)) \cup \parents(M)$. Program well-formedness (\figref{modules}) requires every
+module in $\mathcal{M}$ to be well-formed in its initial context, every imported name to be in
+$\dom(\mathcal{M})$, and $G_{\mathcal{M}}$ to be acyclic.
+
 \subsection{Well-formedness}
 
 \paragraph{Auxiliary metafunctions.}
@@ -262,7 +311,7 @@ anywhere in $s$ (without descending into nested function definitions, which have
 $\assignsS(s) = \dom(\Delta)$ when $s : \Assigns{\Delta}$); $\binds(p)$, the set of variables introduced by a
 pattern $p$; and $\capturesS(s)$, the set of variables from the enclosing scope that are captured by closures
 (lambdas or nested function definitions) within $s$, with companion $\capturesE(e)$ on expressions. All are
-defined in \figref{aux}. The functions $\assignsS$ and $\capturesS$ extend pointwise to blocks via
+defined in \figref{aux}. The functions $\assignsS$ and $\capturesS$ extend to blocks as follows:
 $\assignsS(s \cons b) = \assignsS(s) \cup \assignsS(b)$ (similarly $\capturesS$), with the singleton block $s$
 identifying with the underlying statement.
 
@@ -294,6 +343,7 @@ $\Delta$, which may be empty. The base cases are that \pyinline{return e} defini
 
 \input{fig/well-formed}
 \input{fig/well-formed-expr}
+\input{fig/well-formed-top}
 
 \subsection{Examples}
 
@@ -599,6 +649,7 @@ functional programming:
 \item \pyinline{yield}/\pyinline{yield from}
 \item \pyinline{class} definitions (dataclasses may be added; see \S2 to-do list)
 \item \pyinline{with} statements
+\item List patterns matching tuple values, or tuple patterns matching list values. In \PurePy a list pattern matches only a list, and a tuple pattern matches only a tuple. Python permits either pattern against either kind of sequence.
 \end{itemize}
 
 \section{Operational semantics}

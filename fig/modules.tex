@@ -1,0 +1,43 @@
+\begin{figure}
+\small
+\begin{align*}
+\imports(\exImport{M}) &= \set{M} \\
+\imports(\exFromImport{M}{x_1, \ldots, x_{n+1}}) &= \set{M} \\
+\imports(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \textstyle\bigcup_i \imports(b_i) \\
+\imports(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \textstyle\bigcup_i \imports(b_i) \\
+\imports(\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}) &= \textstyle\bigcup_i \imports(b_i) \\
+\imports(\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}) &= \textstyle\bigcup_i \imports(b_i) \\
+\imports(s) &= \varnothing & \text{otherwise} \\
+\\
+\parents(x) &= \varnothing \\
+\parents(M.x) &= \parents(M) \cup \set{M}
+\end{align*}
+
+\flushleft \shadebox{$\vdash_{\mathcal{M}} M$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{module}}]
+{
+  \Gamma_M \vdash \mathcal{M}(M) : \Assigns{\Delta} \\
+  \imports(\mathcal{M}(M)) \subseteq \dom(\mathcal{M})
+}
+{
+  \vdash_{\mathcal{M}} M
+}
+\end{mathpar}
+
+\flushleft \shadebox{$\vdash \langle E, \mathcal{M} \rangle$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{program}}]
+{
+  \vdash_{\mathcal{M}} M_i \quad (\forall M_i \in \dom(\mathcal{M})) \\
+  G_{\mathcal{M}} \text{ acyclic}
+}
+{
+  \vdash \langle E, \mathcal{M} \rangle
+}
+\end{mathpar}
+\caption{$\imports$ and $\parents$ metafunctions; module and program well-formedness.}
+\label{fig:modules}
+\end{figure}

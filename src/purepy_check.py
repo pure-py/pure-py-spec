@@ -105,6 +105,10 @@ def result_type(node: ast.stmt) -> ResultTy:
         return TY_RETURNS
     if isinstance(node, ast.FunctionDef):
         return TyAssigns({node.name: TT})
+    if isinstance(node, ast.Import):
+        return TyAssigns({node.names[0].name.split('.')[0]: TT})
+    if isinstance(node, ast.ImportFrom):
+        return TyAssigns({a.name: TT for a in node.names})
     if isinstance(node, ast.If):
         branches = [result_type_of_block(node.body)]
         if node.orelse:
@@ -249,6 +253,12 @@ def check_stmt(s: ast.stmt, gamma: Context) -> Result:
             return err
         if s.msg is not None:
             return check_expr(s.msg, gamma)
+        return ok()
+    if isinstance(s, ast.Import):
+        return ok()
+    if isinstance(s, ast.ImportFrom):
+        if not s.names:
+            return ill_formed(s, '[from-import] empty name list')
         return ok()
     if isinstance(s, ast.Match):
         err = check_expr(s.subject, gamma)
@@ -531,6 +541,8 @@ def fv_stmt(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.FunctionDef):
         params = {a.arg for a in s.args.args}
         return fv_block(s.body) - params - {s.name}
+    if isinstance(s, (ast.Import, ast.ImportFrom)):
+        return set()
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def fv_block(block: list[ast.stmt]) -> set[str]:
@@ -549,6 +561,10 @@ def assigns_stmt(s: ast.stmt) -> set[str]:
         return set().union(*(binds(case.pattern) | assigns_block(case.body) for case in s.cases))
     if isinstance(s, ast.FunctionDef):
         return {s.name}
+    if isinstance(s, ast.Import):
+        return {s.names[0].name.split('.')[0]}
+    if isinstance(s, ast.ImportFrom):
+        return {a.name for a in s.names}
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def assigns_block(block: list[ast.stmt]) -> set[str]:
@@ -576,6 +592,8 @@ def captures_stmt(s: ast.stmt) -> set[str]:
         return captures(s.subject) | set().union(*(captures_block(case.body) - binds(case.pattern) for case in s.cases))
     if isinstance(s, ast.FunctionDef):
         return captures_region([s])
+    if isinstance(s, (ast.Import, ast.ImportFrom)):
+        return set()
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def captures_block(block: list[ast.stmt]) -> set[str]:
@@ -617,11 +635,42 @@ def find_first_reassigning(items: list[Item], names: set[str]) -> Optional[ast.A
         return items[0][0] if isinstance(items[0], list) else items[0]
     return find_first_reassigning(items[1:], names)
 
+def _find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST | None:
+    """Return the first import statement appearing in a non-top-level context.
+    nested=True means stmts themselves are inside a non-top-level body."""
+    for s in stmts:
+        if nested and isinstance(s, (ast.Import, ast.ImportFrom)):
+            return s
+        if isinstance(s, ast.FunctionDef):
+            r = _find_nested_import(s.body, nested=True)
+            if r is not None:
+                return r
+        if isinstance(s, ast.If):
+            r = _find_nested_import(s.body, nested=True) or _find_nested_import(s.orelse, nested=True)
+            if r is not None:
+                return r
+        if isinstance(s, ast.Match):
+            for case in s.cases:
+                r = _find_nested_import(case.body, nested=True)
+                if r is not None:
+                    return r
+    return None
+
 def check_module(tree: ast.AST) -> Result:
     assert isinstance(tree, ast.Module)
     if not tree.body:
         return ok()
-    return check_block(tree.body, dict(BUILTINS))
+    nested = _find_nested_import(tree.body)
+    if nested is not None:
+        return ill_formed(nested, '[import] import only allowed at module top level')
+    ctx = dict(BUILTINS)
+    ctx['__name__'] = TT
+    err = check_block(tree.body, ctx)
+    if not is_ok(err):
+        return err
+    if isinstance(result_type_of_block(tree.body), TyReturns):
+        return ill_formed(tree.body[0], '[module] top-level return not allowed (module body must not return)')
+    return ok()
 
 def check_file(filename: str) -> Result:
     source = open(filename).read()

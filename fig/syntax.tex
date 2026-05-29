@@ -16,6 +16,14 @@ $s$ & $::=$ & $\exPass$ & (Pass) \\
    \\[3mm]
 $b$ & $::=$ & $s_1 \;\ldots\; s_{n+1}$ & (Block)
    \\[3mm]
+$t$ & $::=$ & $s$ & (Stmt) \\
+    & $\mid$ & $\exImport{M}$ & (Import) \\
+    & $\mid$ & $\exFromImport{M}{x_1, \ldots, x_{n+1}}$ & (FromImport)
+   \\[3mm]
+$m$ & $::=$ & $t_1 \;\ldots\; t_n$ & (Module)
+   \\[3mm]
+$M$ & $::=$ & $x_1.x_2.\ldots.x_{n+1}$ & (FullyQualifiedName)
+   \\[3mm]
 $d$ & $::=$ & $\exDef{f}{x_1, \ldots, x_n}{b}$ & (Def)
    \\[3mm]
 $e$ & $::=$ & $x$ & (Var) \\
@@ -47,12 +55,8 @@ $p$ & $::=$ & $\ell$ & (PatLiteral) \\
     & $\mid$ & $\patList{p_1, \ldots, p_n}$ & (PatList) \\
     & $\mid$ & $\patTuple{p_1, \ldots, p_n}$ & (PatTuple) \\
     & $\mid$ & $p\;\pyinline{as}\;x$ & (PatAs)
-   \\[3mm]
-$\Gamma, \Delta$ & $::=$ & $\set{x_1 \mathord{:} \B, \ldots, x_n \mathord{:} \B}$ & \\[3mm]
-$R, S$ & $::=$ & $\Returns$ & \\
-    & $\mid$ & $\Assigns{\Delta}$ &
 \end{tabular}
 \end{center}
-\caption{Syntax of statements, expressions and contexts}
+\caption{Syntax of statements, modules, expressions, and patterns}
 \label{fig:syntax}
 \end{figure}

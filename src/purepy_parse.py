@@ -99,9 +99,22 @@ def check_stmt(node: ast.stmt) -> Result:
     if isinstance(node, ast.Try):
         return unsupported(node, 'try/except not supported')
     if isinstance(node, ast.Import):
-        return not_yet(node, 'import not yet supported', 53)
+        if len(node.names) != 1:
+            return not_yet(node, 'multi-target import (import a, b) not yet supported', 53)
+        if node.names[0].asname is not None:
+            return not_yet(node, 'import-as not yet supported', 53)
+        return ok()
     if isinstance(node, ast.ImportFrom):
-        return not_yet(node, 'import not yet supported', 53)
+        if node.level > 0:
+            return not_yet(node, 'relative imports not yet supported', 53)
+        if node.module is None:
+            return not_yet(node, 'from-import with no module not yet supported', 53)
+        for alias in node.names:
+            if alias.name == '*':
+                return not_yet(node, 'from M import * not yet supported', 53)
+            if alias.asname is not None:
+                return not_yet(node, 'from-import-as not yet supported', 53)
+        return ok()
     if isinstance(node, ast.Global):
         return not_yet(node, 'global not yet supported', 40)
     if isinstance(node, ast.Nonlocal):

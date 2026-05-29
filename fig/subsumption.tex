@@ -42,22 +42,6 @@
   \patList{p_1, \ldots, p_n} \subsumed \patList{q_1, \ldots, q_n}
 }
 \and
-\inferrule*[lab={\ruleName{sub-list-tuple}}]
-{
-  p_i \subsumed q_i \quad (\forall i)
-}
-{
-  \patList{p_1, \ldots, p_n} \subsumed \patTuple{q_1, \ldots, q_n}
-}
-\and
-\inferrule*[lab={\ruleName{sub-tuple-list}}]
-{
-  p_i \subsumed q_i \quad (\forall i)
-}
-{
-  \patTuple{p_1, \ldots, p_n} \subsumed \patList{q_1, \ldots, q_n}
-}
-\and
 \inferrule*[lab={\ruleName{sub-tuple-tuple}}]
 {
   p_i \subsumed q_i \quad (\forall i)
