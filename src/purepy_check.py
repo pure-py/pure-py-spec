@@ -663,7 +663,9 @@ def check_module(tree: ast.AST) -> Result:
     nested = _find_nested_import(tree.body)
     if nested is not None:
         return ill_formed(nested, '[import] import only allowed at module top level')
-    err = check_block(tree.body, dict(BUILTINS))
+    ctx = dict(BUILTINS)
+    ctx['__name__'] = TT
+    err = check_block(tree.body, ctx)
     if not is_ok(err):
         return err
     if isinstance(result_type_of_block(tree.body), TyReturns):

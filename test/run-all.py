@@ -14,25 +14,15 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 GREEN, RED, RESET = "\033[32m", "\033[31m", "\033[0m"
 
 
-# ill-formed/semantic tests that purepy_check.py currently rejects (exit 3).
-SEMANTIC_CAUGHT = {
-    "duplicate_def_in_region",
-    "unreachable",
-    "self_capture",
-    "self_capture_lambda",
-    "shadow_captured",
-    "shadow_captured_global",
-    "shadow_captured_mutual",
-    "cond_partial_def",
-    "mutual_split_by_assign",
-    "mutual_split_by_call_late_binding",
-    "mutual_split_by_call_nameerror",
-    "mutual_def_block_local",
-    "no_else",
-    "unbound_local",
-    "import_in_def",
-    "import_in_if",
-    "import_in_match_case",
+# ill-formed/semantic tests the checker does NOT yet reject; everything else
+# must exit 3. Add a stem here to stage a test for a not-yet-implemented check.
+SEMANTIC_PENDING = {
+    "currying",
+    "match_int_pat_on_list",
+    "match_list_pat_on_tuple",
+    "match_str_pat_on_int",
+    "match_tuple_pat_on_int",
+    "match_tuple_pat_on_list",
 }
 
 
@@ -153,7 +143,7 @@ def main():
     for p in sorted((base / "ill-formed" / "semantic").glob("*.py")):
         rel = p.relative_to(ROOT)
         expect_exit(f"{rel} (parse)", parse_cmd(p), 0)
-        if p.stem in SEMANTIC_CAUGHT:
+        if p.stem not in SEMANTIC_PENDING:
             expect_exit(f"{rel} (check)", check_cmd(p), 3)
         run_python(f"{rel} (run)", interpreter, p)
 
@@ -167,6 +157,9 @@ def main():
             exit_file = d / "expected_exit"
             expected = int(exit_file.read_text().strip()) if exit_file.exists() else 4
             expect_exit(f"{rel} (check)", check_program_cmd(main_py), expected)
+            expected_path = d / "expected"
+            if expected_path.exists():
+                run_python(f"{rel} (run)", interpreter, main_py, cwd=d, expected_path=expected_path)
         else:
             bad(str(rel), "missing main.py")
 
