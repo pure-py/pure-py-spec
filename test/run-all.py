@@ -68,12 +68,15 @@ def check_cmd(path):
     return ["python3", str(ROOT / "src" / "purepy_check.py"), str(path)]
 
 
-def run_python(label, interpreter, path):
+def run_python(label, interpreter, path, cwd=None, expected_path=None):
     """Run a script under Python; compare output to .expected, or check stderr
-    for the class named in .exception.expected."""
-    expected_path = path.with_suffix(".expected")
+    for the class named in .exception.expected. cwd defaults to current; if set,
+    path is passed as its filename (relative to cwd)."""
+    if expected_path is None:
+        expected_path = path.with_suffix(".expected")
     exception_path = path.with_suffix(".exception.expected")
-    proc = subprocess.run([interpreter, str(path)], capture_output=True)
+    cmd_path = path.name if cwd is not None else str(path)
+    proc = subprocess.run([interpreter, cmd_path], cwd=cwd, capture_output=True)
     stderr = proc.stderr.decode("utf-8", errors="replace")
 
     if exception_path.exists():
@@ -125,25 +128,14 @@ def main():
         run_python(f"{rel} (run)", interpreter, p)
 
     print("well-formed/multi-file")
-    for d in sorted((wf / "multi-file").iterdir()) if (wf / "multi-file").exists() else []:
-        if not d.is_dir():
-            continue
-        main_py = d / "main.py"
-        expected_path = d / "expected"
+    mf_root = wf / "multi-file"
+    for d in sorted(p for p in mf_root.iterdir() if p.is_dir()) if mf_root.exists() else []:
         rel = d.relative_to(ROOT)
-        if not main_py.exists():
-            bad(str(rel), "missing main.py")
-            continue
-        proc = subprocess.run([interpreter, "main.py"], cwd=d, capture_output=True)
-        if proc.returncode != 0:
-            bad(f"{rel} (run)", f"exit {proc.returncode}: {proc.stderr.decode('utf-8', errors='replace').strip()[:200]}")
-            continue
-        expected = expected_path.read_text() if expected_path.exists() else ""
-        actual = proc.stdout.decode("utf-8", errors="replace")
-        if actual != expected:
-            bad(f"{rel} (run)", "output mismatch")
+        main_py = d / "main.py"
+        if main_py.exists():
+            run_python(f"{rel} (run)", interpreter, main_py, cwd=d, expected_path=d / "expected")
         else:
-            ok(f"{rel} (run)")
+            bad(str(rel), "missing main.py")
 
     print("well-formed/pending")
     for p in sorted((wf / "pending").glob("*.py")):
