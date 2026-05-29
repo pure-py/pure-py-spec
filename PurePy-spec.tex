@@ -152,7 +152,7 @@ one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
 
 \subsection{Contexts}
 
-Contexts $\Gamma, \Delta$ are partial functions from sets of variables to a \emph{definite assignment} status
+The grammar of contexts and result types is given in \figref{contexts}. Contexts $\Gamma, \Delta$ are partial functions from sets of variables to a \emph{definite assignment} status
 in $\B = \set{\statusDefAssigned, \statusNotDefAssigned}$, with $\statusDefAssigned$ indicating
 \emph{definitely assigned} and $\statusNotDefAssigned$ indicating \emph{not definitely assigned}. The definite
 assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}. (Or think of $\statusDefAssigned$ and
@@ -162,6 +162,8 @@ total functions from the set of all variables to $\B_{\bot} = \B \cup \set{\bot}
 $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context
 where all variables are undefined. For a set of variables $X$, write $\statusDefAssigned(X)$ for the context
 $\set{x : \statusDefAssigned \mid x \in X}$; similarly $\statusNotDefAssigned(X)$.
+
+\input{fig/contexts}
 
 \paragraph{Context operations.}
 
@@ -259,11 +261,11 @@ which follow Python.
 
 \subsection{Modules}
 
-A \PurePy module is the contents of a single source file. Well-formedness of a module is checked under an
-initial context $\Gamma$ in which the names of \figref{predefined} are bound at status $\statusDefAssigned$.
-Of these, the names of the predefined module \pyinline{builtins} are bound in every \PurePy module without
-an explicit \pyinline{import}; the variable \pyinline{__name__} is bound separately per module, taking the
-value \pyinline{"__main__"} in the entry-point module and the module's own name otherwise.
+A \PurePy module $m$ is the contents of a single source file (\figref{syntax}). Well-formedness of $m$ is
+checked under the initial context $\Gamma_m$, which binds at status $\statusDefAssigned$ the names of
+\figref{predefined}: the names of the predefined module \pyinline{builtins}, available in every \PurePy
+module without an explicit \pyinline{import}; and the variable \pyinline{__name__}, set per module to
+\pyinline{"__main__"} in the entry-point module and the module's own name otherwise.
 
 \begin{figure}[H]
 \small
