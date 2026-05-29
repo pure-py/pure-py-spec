@@ -292,10 +292,10 @@ $\imports(s \cons b) = \imports(s) \cup \imports(b)$. Loading a module $M$ also 
 
 \input{fig/modules}
 
-The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map is the directed graph whose edges $(M, M')$ are
-those for which either $M \in \dom(\mathcal{M})$ and $M' \in \imports(\mathcal{M}(M))$, or $M' \in
-\parents(M)$. Program well-formedness (\figref{modules}) requires every module in $\mathcal{M}$ to be
-well-formed in its initial context, and $G_{\mathcal{M}}$ to be acyclic.
+The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(M, M')$ iff
+$M' \in \imports(\mathcal{M}(M)) \cup \parents(M)$. Program well-formedness (\figref{modules}) requires every
+module in $\mathcal{M}$ to be well-formed in its initial context, every imported and parent name to be in
+$\dom(\mathcal{M})$, and $G_{\mathcal{M}}$ to be acyclic.
 
 \subsection{Well-formedness}
 

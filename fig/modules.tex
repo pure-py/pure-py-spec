@@ -19,6 +19,7 @@
 \inferrule*[lab={\ruleName{program}}]
 {
   \Gamma_{M_i} \vdash \mathcal{M}(M_i) : R_i \quad (\forall M_i \in \dom(\mathcal{M})) \\
+  \imports(\mathcal{M}(M_i)) \cup \parents(M_i) \subseteq \dom(\mathcal{M}) \quad (\forall M_i \in \dom(\mathcal{M})) \\
   G_{\mathcal{M}} \text{ acyclic}
 }
 {
