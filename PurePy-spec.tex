@@ -154,9 +154,9 @@ one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
 
 A \PurePy module is the contents of a single source file. \PurePy provides a predefined module
 \pyinline{builtins}, whose names are available implicitly in every other module without an explicit
-\pyinline{import}. In addition, each module receives certain \emph{module-local} names, set by the import
-machinery; \pyinline{__name__} takes the value \pyinline{"__main__"} in the entry-point module and the
-module's own name otherwise. \figref{predefined} lists the names provided by these two sources.
+\pyinline{import}. In addition, each module receives a \emph{module-local} \pyinline{__name__}, set by the
+import machinery to \pyinline{"__main__"} in the entry-point module and to the module's own name otherwise.
+\figref{predefined} lists the names provided by these two sources.
 
 \begin{figure}[H]
 \small
