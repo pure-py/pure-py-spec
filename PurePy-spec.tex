@@ -261,13 +261,13 @@ which follow Python.
 
 \subsection{Modules and entry point}
 
-A \PurePy execution context (or \emph{program}) $P = \langle E, \mathcal{M} \rangle$ consists of a finite map
-$\mathcal{M}$ from \emph{fully-qualified names} $M$ (\figref{syntax}) to \emph{modules}, together with a
-designated \emph{entry point} $E \in \dom(\mathcal{M})$. A module $m$ is a block $b$. Well-formedness of $m$
-is checked under the initial context $\Gamma_m$ which binds at status $\statusDefAssigned$ the names of
-\figref{predefined}: the names of the predefined module \pyinline{builtins}; and the variable
-\pyinline{__name__}, set to \pyinline{"__main__"} if $m$ is the entry point and to the fully-qualified name
-of $m$ otherwise.
+A \PurePy execution context (or \emph{program}) $\langle E, \mathcal{M} \rangle$ consists of a finite map
+$\mathcal{M}$ from \emph{fully-qualified names} $M$ (\figref{syntax}) to blocks (the \emph{modules}),
+together with a designated \emph{entry point} $E \in \dom(\mathcal{M})$. For each $(M \mapsto b) \in
+\mathcal{M}$, well-formedness of $b$ is checked under the initial context $\Gamma_M$ which binds at status
+$\statusDefAssigned$ the names of \figref{predefined}: the names of the predefined module
+\pyinline{builtins}; and the variable \pyinline{__name__}, set to \pyinline{"__main__"} if $M = E$ and to
+$M$ otherwise.
 
 \begin{figure}[H]
 \small
@@ -292,10 +292,10 @@ $\imports(s \cons b) = \imports(s) \cup \imports(b)$. Loading a module $M$ also 
 
 \input{fig/modules}
 
-The \emph{dependency graph} $G_P$ of a program $P = \langle E, \mathcal{M} \rangle$ is the directed graph
-whose edges $(M, M')$ are those for which either $M \in \dom(\mathcal{M})$ and $M' \in \imports(\mathcal{M}(M))$,
-or $M' \in \parents(M)$. Program well-formedness $\vdash P$ (\figref{modules}) requires every module in
-$\mathcal{M}$ to be well-formed in its initial context, and $G_P$ to be acyclic.
+The \emph{dependency graph} $G_{\langle E, \mathcal{M} \rangle}$ of a program is the directed graph whose
+edges $(M, M')$ are those for which either $M \in \dom(\mathcal{M})$ and $M' \in \imports(\mathcal{M}(M))$,
+or $M' \in \parents(M)$. Program well-formedness (\figref{modules}) requires every module in $\mathcal{M}$
+to be well-formed in its initial context, and the dependency graph to be acyclic.
 
 \subsection{Well-formedness}
 

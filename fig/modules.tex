@@ -13,13 +13,13 @@
 \parents(M.x) &= \parents(M) \cup \set{M}
 \end{align*}
 
-\flushleft \shadebox{$\vdash P$}
+\flushleft \shadebox{$\vdash \langle E, \mathcal{M} \rangle$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{program}}]
 {
-  \Gamma_{m_i} \vdash m_i : R_i \quad (\forall M_i \in \dom(\mathcal{M})) \\
-  G_P \text{ acyclic}
+  \Gamma_{M_i} \vdash \mathcal{M}(M_i) : R_i \quad (\forall M_i \in \dom(\mathcal{M})) \\
+  G_{\langle E, \mathcal{M} \rangle} \text{ acyclic}
 }
 {
   \vdash \langle E, \mathcal{M} \rangle
