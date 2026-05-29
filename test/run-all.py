@@ -157,6 +157,17 @@ def main():
             expect_exit(f"{rel} (check)", check_cmd(p), 3)
         run_python(f"{rel} (run)", interpreter, p)
 
+    print("ill-formed/multi-file")
+    ifmf_root = base / "ill-formed" / "multi-file"
+    ifmf_dirs = sorted(p for p in ifmf_root.iterdir() if p.is_dir()) if ifmf_root.exists() else []
+    for d in ifmf_dirs:
+        rel = d.relative_to(ROOT)
+        main_py = d / "main.py"
+        if main_py.exists():
+            expect_exit(f"{rel} (check)", check_program_cmd(main_py), 4)
+        else:
+            bad(str(rel), "missing main.py")
+
     print("ill-formed/unsupported")
     for p in sorted((base / "ill-formed" / "unsupported").glob("*.py")):
         expect_exit(str(p.relative_to(ROOT)), parse_cmd(p), 1)
