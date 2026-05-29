@@ -2,7 +2,7 @@
 \flushleft \shadebox{$\Gamma \vdash t : R$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{t-stmt}}]
+\inferrule*[lab={\ruleName{stmt}}]
 {
   \Gamma \vdash s : R
 }
@@ -26,6 +26,6 @@
   \Gamma \vdash \exFromImport{M}{x_1, \ldots, x_{n+1}} : \Assigns{\statusDefAssigned(\set{x_1, \ldots, x_{n+1}})}
 }
 \end{mathpar}
-\caption{Top-level statement $t$ is well-formed in $\Gamma$ (\ruleName{t-stmt} delegates to the $s$ rules).}
+\caption{Top-level statement $t$ is well-formed in $\Gamma$ (\ruleName{stmt} delegates to the $s$ rules).}
 \label{fig:well-formed-top}
 \end{figure}
