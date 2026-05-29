@@ -17,6 +17,16 @@
 {
   \Gamma \vdash \exFromImport{M}{x_1, \ldots, x_{n+1}} : \Assigns{\statusDefAssigned(\set{x_1, \ldots, x_{n+1}})}
 }
+\and
+\inferrule*[lab={\ruleName{seq}}]
+{
+  \Gamma \vdash t : \Assigns{\Delta} \\
+  \Gamma \runion \Delta \vdash b : R \\
+  \capturesS(t) \cap \assignsS(b) = \varnothing
+}
+{
+  \Gamma \vdash t \cons b : \Assigns{\Delta} \runion R
+}
 \end{mathpar}
 \caption{Top-level statement $t$ is well-formed in $\Gamma$; when $t$ is a statement $s$, the rules of \figref{well-formed} apply.}
 \label{fig:well-formed-top}
