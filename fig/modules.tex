@@ -19,7 +19,7 @@
 \inferrule*[lab={\ruleName{module}}]
 {
   \Gamma_M \vdash \mathcal{M}(M) : R \\
-  \imports(\mathcal{M}(M)) \cup \parents(M) \subseteq \dom(\mathcal{M})
+  \imports(\mathcal{M}(M)) \subseteq \dom(\mathcal{M})
 }
 {
   \vdash_{\mathcal{M}} M
