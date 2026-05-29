@@ -32,13 +32,23 @@ def _parents(name: str) -> set[str]:
     return {".".join(parts[:i]) for i in range(1, len(parts))}
 
 
+def _resolve(name: str, base_dir: pathlib.Path) -> Optional[pathlib.Path]:
+    """Find the file backing module `name`: either `name.py` or `name/__init__.py`
+    (dots in `name` become directory separators)."""
+    stem = name.replace('.', '/')
+    for candidate in (base_dir / f"{stem}.py", base_dir / stem / "__init__.py"):
+        if candidate.exists():
+            return candidate
+    return None
+
+
 def _load(name: str, base_dir: pathlib.Path) -> tuple[Optional[ast.Module], Result]:
     """Load module `name` from base_dir. Returns (tree, ok()) on success;
     (None, error) if missing or fails to parse; (tree, error) if the syntactic
     subset rejects."""
-    path = base_dir / f"{name.replace('.', '/')}.py"
-    if not path.exists():
-        return None, _program_error(f"module {name!r} not found at {path}")
+    path = _resolve(name, base_dir)
+    if path is None:
+        return None, _program_error(f"module {name!r} not found under {base_dir}")
     try:
         tree = ast.parse(path.read_text(), filename=str(path))
     except SyntaxError as e:
@@ -82,7 +92,7 @@ def _has_cycle(graph: dict[str, set[str]]) -> Optional[list[str]]:
 
 def check_program(entry_path: pathlib.Path) -> Result:
     base_dir = entry_path.parent
-    modules: dict[str, ast.Module] = {}
+    modules: dict[str, tuple[pathlib.Path, ast.Module]] = {}
     imports_by_module: dict[str, set[str]] = {}  # cached _imports_of(modules[name])
     queue: list[str] = [entry_path.stem]
     while queue:
@@ -93,16 +103,19 @@ def check_program(entry_path: pathlib.Path) -> Result:
         if not is_ok(err):
             return err
         assert tree is not None
-        modules[name] = tree
+        path = _resolve(name, base_dir)
+        assert path is not None
+        modules[name] = (path, tree)
         imports_by_module[name] = _imports_of(tree)
         for imp in imports_by_module[name]:
             queue.extend({imp} | _parents(imp))
 
     # Per-module well-formedness.
-    for tree in modules.values():
+    for path, tree in modules.values():
         err = purepy_check.check_module(tree)
         if not is_ok(err):
-            return err
+            assert err is not None
+            return Error(line=err.line, col=err.col, msg=f"{path}: {err.msg}", kind=err.kind)
 
     # Acyclicity. (Resolution is already guaranteed by the walk loop above.)
     graph = {name: imps | _parents(name) | set().union(*(_parents(i) for i in imps))
@@ -124,7 +137,7 @@ def main() -> None:
         print(f"{entry}: ok")
         sys.exit(0)
     assert result is not None
-    print(f"{entry}: {result.msg}")
+    print(result.msg)
     sys.exit(result.kind)
 
 

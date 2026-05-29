@@ -164,7 +164,9 @@ def main():
         rel = d.relative_to(ROOT)
         main_py = d / "main.py"
         if main_py.exists():
-            expect_exit(f"{rel} (check)", check_program_cmd(main_py), 4)
+            exit_file = d / "expected_exit"
+            expected = int(exit_file.read_text().strip()) if exit_file.exists() else 4
+            expect_exit(f"{rel} (check)", check_program_cmd(main_py), expected)
         else:
             bad(str(rel), "missing main.py")
 
