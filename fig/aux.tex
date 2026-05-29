@@ -34,8 +34,16 @@
 & \quad \textstyle\bigcup_i \big(\capturesS(b_i) \setminus \binds(p_i)\big) \\
 \\
 \capturesE(x) &= \varnothing \\
-\capturesE(\exLambda{\vec{x}}{e}) &= \fvE(e) \setminus \set{\vec{x}}
+\capturesE(\exLambda{\vec{x}}{e}) &= \fvE(e) \setminus \set{\vec{x}} \\
+\\
+\imports(\exImport{M}) &= \set{M} \\
+\imports(\exFromImport{M}{x_1, \ldots, x_{n+1}}) &= \set{M} \\
+\imports(s) &= \varnothing & \text{otherwise, for atomic $s$} \\
+\imports(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \textstyle\bigcup_i \imports(b_i) \\
+\imports(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \textstyle\bigcup_i \imports(b_i) \\
+\imports(\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}) &= \textstyle\bigcup_i \imports(b_i) \\
+\imports(\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}) &= \textstyle\bigcup_i \imports(b_i)
 \end{align*}
-\caption{Assigned, bound, and captured variables (remaining expression cases of $\capturesE$ are the obvious pointwise union).}
+\caption{Assigned, bound, captured, and imported variables (remaining expression cases of $\capturesE$ are the obvious pointwise union; $\imports$ extends pointwise to blocks).}
 \label{fig:aux}
 \end{figure}
