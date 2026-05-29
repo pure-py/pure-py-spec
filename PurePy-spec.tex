@@ -150,6 +150,28 @@ regions. Maximality is not enforced by the grammar in \figref{syntax}; the parse
 grouping consecutive \pyinline{def}s into a single region. The well-formedness rules treat each region as
 one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
 
+\paragraph{Predefined names.}
+
+Every \PurePy module has implicit access to the predefined names of \figref{predefined}. \emph{Builtins} are
+provided by \PurePy and are available in every scope without explicit \pyinline{import}. \emph{Module-local}
+names are set per module by the import machinery; \pyinline{__name__} has the value \pyinline{"__main__"} in
+the entry-point module and the module's own name otherwise.
+
+\begin{figure}[H]
+\small
+\centering
+\begin{tabular}{lp{0.6\textwidth}}
+\hline
+\textbf{Source} & \textbf{Names} \\
+\hline
+Builtins & \pyinline{print}, \pyinline{len}, \pyinline{range}, \pyinline{type}, \pyinline{True}, \pyinline{False}, \pyinline{None} \\
+Module-local & \pyinline{__name__} \\
+\hline
+\end{tabular}
+\caption{Predefined names available in every \PurePy module.}
+\label{fig:predefined}
+\end{figure}
+
 \subsection{Contexts}
 
 Contexts $\Gamma, \Delta$ are partial functions from sets of variables to a \emph{definite assignment} status
