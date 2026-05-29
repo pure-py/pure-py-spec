@@ -140,6 +140,12 @@ def main():
     for p in sorted((base / "ill-formed" / "unsupported").glob("*.py")):
         expect_exit(str(p.relative_to(ROOT)), parse_cmd(p), 1)
 
+    print("syntactic-only")
+    for p in sorted((base / "syntactic-only").glob("*.py")):
+        if p.name.startswith("_"):
+            continue
+        expect_exit(str(p.relative_to(ROOT)), ["python3", str(p)], 0)
+
     total = passed + failed
     print()
     if failed:

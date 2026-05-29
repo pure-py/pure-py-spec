@@ -254,7 +254,11 @@ def check_stmt(s: ast.stmt, gamma: Context) -> Result:
         if s.msg is not None:
             return check_expr(s.msg, gamma)
         return ok()
-    if isinstance(s, (ast.Import, ast.ImportFrom)):
+    if isinstance(s, ast.Import):
+        return ok()
+    if isinstance(s, ast.ImportFrom):
+        if not s.names:
+            return ill_formed(s, '[from-import] empty name list')
         return ok()
     if isinstance(s, ast.Match):
         err = check_expr(s.subject, gamma)
@@ -659,7 +663,12 @@ def check_module(tree: ast.AST) -> Result:
     nested = _find_nested_import(tree.body)
     if nested is not None:
         return ill_formed(nested, '[import] import only allowed at module top level')
-    return check_block(tree.body, dict(BUILTINS))
+    err = check_block(tree.body, dict(BUILTINS))
+    if not is_ok(err):
+        return err
+    if isinstance(result_type_of_block(tree.body), TyReturns):
+        return ill_formed(tree.body[0], '[module] top-level return not allowed (module body must not return)')
+    return ok()
 
 def check_file(filename: str) -> Result:
     source = open(filename).read()
