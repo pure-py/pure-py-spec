@@ -264,7 +264,7 @@ which follow Python.
 A \PurePy execution context (or \emph{program}) $P = \langle E, \mathcal{M} \rangle$ consists of a finite map
 $\mathcal{M}$ from \emph{fully-qualified names} $M$ (\figref{syntax}) to \emph{modules}, together with a
 designated \emph{entry point} $E \in \dom(\mathcal{M})$. A module $m$ is a block $b$. Well-formedness of $m$
-is checked under the initial context $\Gamma_m$, which binds at status $\statusDefAssigned$ the names of
+is checked under the initial context $\Gamma_m$ which binds at status $\statusDefAssigned$ the names of
 \figref{predefined}: the names of the predefined module \pyinline{builtins}; and the variable
 \pyinline{__name__}, set to \pyinline{"__main__"} if $m$ is the entry point and to the fully-qualified name
 of $m$ otherwise.
