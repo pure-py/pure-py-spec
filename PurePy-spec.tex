@@ -261,10 +261,10 @@ which follow Python.
 
 \subsection{Modules and entry point}
 
-A \PurePy execution context (or \emph{program}) $\langle E, \mathcal{M} \rangle$ consists of a finite,
-\emph{prefix-closed} map $\mathcal{M}$ from \emph{fully-qualified names} $M$ (\figref{syntax}) to blocks (the
-\emph{modules})---i.e., if $M \in \dom(\mathcal{M})$ then $\parents(M) \subseteq \dom(\mathcal{M})$---together
-with a designated \emph{entry point} $E \in \dom(\mathcal{M})$. For each $(M \mapsto b) \in
+A \PurePy execution context (or \emph{program}) $\langle E, \mathcal{M} \rangle$ consists of a finite map
+$\mathcal{M}$ from \emph{fully-qualified names} $M$ (\figref{syntax}) to blocks (the \emph{modules}), together
+with a designated \emph{entry point} $E \in \dom(\mathcal{M})$. The map $\mathcal{M}$ is prefix-closed: if $M
+\in \dom(\mathcal{M})$ then $\parents(M) \subseteq \dom(\mathcal{M})$. For each $(M \mapsto b) \in
 \mathcal{M}$, well-formedness of $b$ is checked under the initial context $\Gamma_M$ which binds at status
 $\statusDefAssigned$ the names of \figref{predefined}: the names of the predefined module
 \pyinline{builtins}; and the variable \pyinline{__name__}, set to \pyinline{"__main__"} if $M = E$ and to
