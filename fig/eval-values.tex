@@ -1,0 +1,22 @@
+\begin{figure}
+\small
+\begin{center}
+\begin{tabular}{rcll}
+$v$ & $::=$ & $\ell$ & (Literal) \\
+    & $\mid$ & $\exList{v_1, \ldots, v_n}$ & (List) \\
+    & $\mid$ & $\exTuple{v_1, \ldots, v_n}$ & (Tuple) \\
+    & $\mid$ & $\exClosure{\rho}{\vec{x}}{e}$ & (LambdaClosure) \\
+    & $\mid$ & $\exDefClosure{\rho}{\seq{d}}{i}$ & (DefClosure) \\
+    & $\mid$ & $\exObj{\rho}$ & (Object)
+   \\[3mm]
+$\rho$ & $::=$ & $\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}$ & (Environment)
+   \\[3mm]
+$r$ & $::=$ & $\assigns{\rho}$ \\
+  & $\mid$ & $\returns{v}$
+   \\[3mm]
+$\mu$ & $::=$ & $\set{M_1 \mapsto \exObj{\rho_1}, \ldots, M_n \mapsto \exObj{\rho_n}}$ & (ModuleCache) \\
+\end{tabular}
+\end{center}
+\caption{Values, environments and evaluation results}
+\label{fig:values}
+\end{figure}

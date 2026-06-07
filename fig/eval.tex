@@ -1,26 +1,5 @@
 \begin{figure}
 \small
-\begin{center}
-\begin{tabular}{rcll}
-$v$ & $::=$ & $\ell$ & (Literal) \\
-    & $\mid$ & $\exList{v_1, \ldots, v_n}$ & (List) \\
-    & $\mid$ & $\exTuple{v_1, \ldots, v_n}$ & (Tuple) \\
-    & $\mid$ & $\exClosure{\rho}{\vec{x}}{e}$ & (LambdaClosure) \\
-    & $\mid$ & $\exDefClosure{\rho}{\seq{d}}{i}$ & (DefClosure) \\
-    & $\mid$ & $\exModuleClosure{\rho}$ & (ModuleClosure)
-   \\[3mm]
-$\rho$ & $::=$ & $\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}$ & (Environment)
-   \\[3mm]
-$r$ & $::=$ & $\assigns{\rho}$ \\
-  & $\mid$ & $\returns{v}$ \\
-\end{tabular}
-\end{center}
-\caption{Values, environments and evaluation results}
-\label{fig:values}
-\end{figure}
-
-\begin{figure}
-\small
 \begin{align*}
 \dispatch(v, \varepsilon) &= (\varnothing, \exPass) \\
 \dispatch(v, (\exCase{p}{b}) \cons \seq{c}) &= (\rho, b) && \text{if } p, v \matches \rho \\
@@ -177,6 +156,14 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 }
 {
   \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow \unwrap(r)
+}
+\and
+\inferrule*[lab={\ruleName{eval-attr}}]
+{
+  \rho, e \Rightarrow \exObj{\rho'}
+}
+{
+  \rho, \exProject{e}{x} \Rightarrow \rho'(x)
 }
 \end{mathpar}
 \caption{Expression evaluation}

@@ -25,12 +25,21 @@ $m$ & $::=$ & $t_1 \;\ldots\; t_n$ & (Module)
 $M$ & $::=$ & $x_1.x_2.\ldots.x_{n+1}$ & (FullyQualifiedName)
    \\[3mm]
 $d$ & $::=$ & $\exDef{f}{x_1, \ldots, x_n}{b}$ & (Def)
-   \\[3mm]
+\end{tabular}
+\end{center}
+\caption{Modules and blocks}
+\label{fig:syntax-stmt}
+\end{figure}
+
+\begin{figure}
+\small
+\begin{center}
+\begin{tabular}{rcll}
 $e$ & $::=$ & $x$ & (Var) \\
     & $\mid$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exApp{e}{e_1, \ldots, e_n}$ & (Call) \\
     & $\mid$ & $\exDict{x_1 \mathord{:} e_1, \ldots, x_n \mathord{:} e_n}$ & (Dict) \\
-    & $\mid$ & $\exProject{e}{x}$ & (Lookup) \\
+    & $\mid$ & $\exProject{e}{x}$ & (Attribute) \\
     & $\mid$ & $\exDProject{e}{e'}$ & (Subscript) \\
     & $\mid$ & $\exBinaryApp{e}{\odot}{e'}$ & (BinOp) \\
     & $\mid$ & $\exUnaryApp{\ominus}{e}$ & (UnaryOp) \\
@@ -57,6 +66,6 @@ $p$ & $::=$ & $\ell$ & (PatLiteral) \\
     & $\mid$ & $p\;\pyinline{as}\;x$ & (PatAs)
 \end{tabular}
 \end{center}
-\caption{Syntax of statements, modules, expressions, and patterns}
-\label{fig:syntax}
+\caption{Expressions and patterns}
+\label{fig:syntax-expr}
 \end{figure}

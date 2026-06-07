@@ -1,0 +1,97 @@
+\begin{figure}
+\flushleft \shadebox{$\mu, \rho, m \Rightarrow \mu', r$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-empty}}]
+{
+  \strut
+}
+{
+  \mu, \rho, \varepsilon \Rightarrow \mu, \assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{eval-stmt}}]
+{
+  \rho, s \Rightarrow r
+}
+{
+  \mu, \rho, s \Rightarrow \mu, r
+}
+\and
+\inferrule*[lab={\ruleName{eval-seq}}]
+{
+  \mu, \rho, t \Rightarrow \mu', \assigns{\rho'} \\
+  \mu', \rho \runion \rho', m \Rightarrow \mu'', r
+}
+{
+  \mu, \rho, t \cons m \Rightarrow \mu'', \assigns{\rho'} \runion r
+}
+\and
+\inferrule*[lab={\ruleName{eval-import}}]
+{
+  \mu, M \Rightarrow_{\mathsf{load}} \mu' \\
+  M = x_1.x_2.\ldots.x_{n+1}
+}
+{
+  \mu, \rho, \exImport{M} \Rightarrow \mu', \assigns{\set{x_1 \mapsto \mu'(x_1)}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-from-import}}]
+{
+  \mu, M \Rightarrow_{\mathsf{load}} \mu' \\
+  \mu'(M) = \exObj{\rho''}
+}
+{
+  \mu, \rho, \exFromImport{M}{x_1, \ldots, x_{n+1}} \Rightarrow \mu', \assigns{\set{x_1 \mapsto \rho''(x_1), \ldots, x_{n+1} \mapsto \rho''(x_{n+1})}}
+}
+\end{mathpar}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\mu, M \Rightarrow_{\mathsf{load}} \mu'$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{load-cached}}]
+{
+  M \in \dom(\mu)
+}
+{
+  \mu, M \Rightarrow_{\mathsf{load}} \mu
+}
+\and
+\inferrule*[lab={\ruleName{load-unqualified}}]
+{
+  x \notin \dom(\mu) \\
+  \mu, \rho_x, \mathcal{M}(x) \Rightarrow \mu', \assigns{\rho}
+}
+{
+  \mu, x \Rightarrow_{\mathsf{load}} \mu' \runion \set{x \mapsto \exObj{\rho}}
+}
+\and
+\inferrule*[lab={\ruleName{load-qualified}}]
+{
+  M.x \notin \dom(\mu) \\
+  \mu, M \Rightarrow_{\mathsf{load}} \mu' \\
+  \mu', \rho_{M.x}, \mathcal{M}(M.x) \Rightarrow \mu'', \assigns{\rho}
+}
+{
+  \mu, M.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{M.x \mapsto \exObj{\rho}}
+}
+\end{mathpar}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\langle E, \mathcal{M} \rangle \Rightarrow n$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-program}}]
+{
+  \varnothing, \rho_E, \mathcal{M}(E) \Rightarrow \mu, \assigns{\rho}
+}
+{
+  \langle E, \mathcal{M} \rangle \Rightarrow 0
+}
+\end{mathpar}
+\caption{Module and program evaluation}
+\label{fig:eval-modules}
+\end{figure}

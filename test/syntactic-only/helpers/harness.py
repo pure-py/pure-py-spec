@@ -4,7 +4,7 @@ import ast
 import pathlib
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
+ROOT = pathlib.Path(__file__).resolve().parent.parent.parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from purepy_check import check_module

@@ -31,6 +31,7 @@
 \small
 \inferrule*[lab={\ruleName{program}}]
 {
+  \pyinline{builtins} \in \dom(\mathcal{M}) \\
   \vdash_{\mathcal{M}} M_i \quad (\forall M_i \in \dom(\mathcal{M})) \\
   G_{\mathcal{M}} \text{ acyclic}
 }
@@ -38,6 +39,6 @@
   \vdash \langle E, \mathcal{M} \rangle
 }
 \end{mathpar}
-\caption{$\imports$ and $\parents$ metafunctions; module and program well-formedness.}
+\caption{$\imports$ and $\parents$ metafunctions; module and program well-formedness}
 \label{fig:modules}
 \end{figure}

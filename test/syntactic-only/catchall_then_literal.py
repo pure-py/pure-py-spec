@@ -1,7 +1,7 @@
 """case x: ...; case 1: ... — Python: SyntaxError 'name capture x makes remaining
 patterns unreachable'. PurePy: pat-list rejects via reachability premise."""
 import ast
-from _harness import expect_rejected
+from helpers.harness import expect_rejected
 
 match_stmt = ast.Match(
     subject=ast.Name(id="v", ctx=ast.Load()),
