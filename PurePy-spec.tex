@@ -142,11 +142,11 @@ Or patterns & \issue{85} \\
 
 \section{Syntax}
 
-The syntax of the language is given in \figref{syntax}. A \emph{block} is a non-empty sequence of
+The syntax of the language is given in \figref{syntax-stmt} and \figref{syntax-expr}. A \emph{block} is a non-empty sequence of
 statements; either a top-level statement, a \pyinline{def} body, or a branch of a conditional. A
 \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal contiguous non-empty sequence of \pyinline{def}
 statements in a block: any non-\pyinline{def} statement in that block, by definition, separates mutual
-regions. Maximality is not enforced by the grammar in \figref{syntax}; the parser is responsible for
+regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single region. The well-formedness rules treat each region as
 one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
 
@@ -253,7 +253,7 @@ unreachable statements (\S\ref{sec:unreachable}).
 \paragraph{Operators.}
 
 The metavariable $\odot$ ranges over the supported binary operators and $\ominus$ over the supported unary
-operators, both enumerated in \figref{precedence}. The grammar of \figref{syntax} is intentionally ambiguous
+operators, both enumerated in \figref{precedence}. The grammar of \figref{syntax-expr} is intentionally ambiguous
 on operator forms; disambiguation is by the precedence and associativity given in \figref{precedence},
 which follow Python.
 
@@ -262,12 +262,16 @@ which follow Python.
 \subsection{Modules and entry point}
 
 A \PurePy execution context (or \emph{program}) $\langle E, \mathcal{M} \rangle$ consists of a finite map
-$\mathcal{M}$ from \emph{fully-qualified names} $M$ (\figref{syntax}) to \emph{modules} $m$ (each a sequence
+$\mathcal{M}$ from \emph{fully-qualified names} $M$ (\figref{syntax-stmt}) to \emph{modules} $m$ (each a sequence
 of top-level statements $t_1 \ldots t_{n+1}$), together with a designated \emph{entry point} $E \in
 \dom(\mathcal{M})$. The map $\mathcal{M}$ is prefix-closed: if $M \in \dom(\mathcal{M})$ then $\parents(M)
-\subseteq \dom(\mathcal{M})$. The top-level form $t$ (\figref{syntax}) extends the statement form $s$ with
+\subseteq \dom(\mathcal{M})$. The top-level form $t$ (\figref{syntax-stmt}) extends the statement form $s$ with
 the \pyinline{import} and \pyinline{from} forms; these forms can therefore appear only at the
-top level of a module, not inside function bodies, conditional branches, or other nested contexts. For each $(M \mapsto b) \in
+top level of a module, not inside function bodies, conditional branches, or other nested contexts.
+This restriction prevents side-effects of module execution, currently divergence or runtime errors, from
+implicitly becoming side-effects of a function. A module executes at most once per program; the restriction
+keeps that execution at the top level, where its effects occur at known points rather than on whichever
+function call happens to trigger the import first. For each $(M \mapsto b) \in
 \mathcal{M}$, well-formedness of $b$ is checked under the initial context $\Gamma_M$ which binds at status
 $\statusDefAssigned$ the names of \figref{predefined}: the names of the predefined module
 \pyinline{builtins}; and the variable \pyinline{__name__}, set to \pyinline{"__main__"} if $M = E$ and to
@@ -290,7 +294,7 @@ Module-local & \pyinline{__name__} \\
 
 The metafunction $\imports$ (\figref{modules}) extracts the set of modules a given module depends on,
 by collecting the module names mentioned in $\pyinline{import}$ and $\pyinline{from M import \ldots}$
-statements anywhere in the module body. $\imports$ extends to blocks the same way $\assignsS$ does:
+statements anywhere in the module body. It extends to blocks the same way $\assignsS$ does:
 $\imports(s \cons b) = \imports(s) \cup \imports(b)$, and likewise to module bodies $m$ via
 $\imports(t \cons m) = \imports(t) \cup \imports(m)$. The metafunction $\parents$ collects the proper
 prefixes of a fully-qualified name.

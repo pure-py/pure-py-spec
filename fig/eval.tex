@@ -12,7 +12,9 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
 $\rho$ & $::=$ & $\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}$ & (Environment)
    \\[3mm]
 $r$ & $::=$ & $\assigns{\rho}$ \\
-  & $\mid$ & $\returns{v}$ \\
+  & $\mid$ & $\returns{v}$
+   \\[3mm]
+$\mu$ & $::=$ & $\set{M_1 \mapsto \exModuleClosure{\rho_1}, \ldots, M_n \mapsto \exModuleClosure{\rho_n}}$ & (ModuleCache) \\
 \end{tabular}
 \end{center}
 \caption{Values, environments and evaluation results}
@@ -129,6 +131,39 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 \end{mathpar}
 \caption{Block evaluation}
 \label{fig:eval}
+\end{figure}
+
+\begin{figure}
+\flushleft \shadebox{$\mu, \rho, m \Rightarrow \mu', r$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-empty}}]
+{
+  \strut
+}
+{
+  \mu, \rho, \varepsilon \Rightarrow \mu, \assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{eval-stmt}}]
+{
+  \rho, s \Rightarrow r
+}
+{
+  \mu, \rho, s \Rightarrow \mu, r
+}
+\and
+\inferrule*[lab={\ruleName{eval-seq}}]
+{
+  \mu, \rho, t \Rightarrow \mu', \assigns{\rho'} \\
+  \mu', \rho \runion \rho', m \Rightarrow \mu'', r
+}
+{
+  \mu, \rho, t \cons m \Rightarrow \mu'', \assigns{\rho'} \runion r
+}
+\end{mathpar}
+\caption{Module evaluation.}
+\label{fig:eval-top}
 \end{figure}
 
 \begin{figure}
