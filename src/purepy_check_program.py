@@ -10,6 +10,9 @@ from purepy_check import Error, Result, ok, is_ok
 
 ILL_FORMED_PROGRAM = 4
 
+# Modules the runtime provides if the user has no file of the same name.
+PREDEFINED_MODULES = {'builtins', 'math', 'sys'}
+
 
 def _program_error(msg: str) -> Error:
     return Error(line=None, col=None, msg=msg, kind=ILL_FORMED_PROGRAM)
@@ -94,17 +97,20 @@ def check_program(entry_path: pathlib.Path) -> Result:
     base_dir = entry_path.parent
     modules: dict[str, tuple[pathlib.Path, ast.Module]] = {}
     imports_by_module: dict[str, set[str]] = {}  # cached _imports_of(modules[name])
-    queue: list[str] = [entry_path.stem]
+    queue: list[str] = [entry_path.stem, *PREDEFINED_MODULES]
     while queue:
         name = queue.pop()
         if name in modules:
             continue
+        path = _resolve(name, base_dir)
+        if path is None and name in PREDEFINED_MODULES:
+            modules[name] = (pathlib.Path(f"<{name}>"), ast.Module(body=[], type_ignores=[]))
+            imports_by_module[name] = set()
+            continue
         tree, err = _load(name, base_dir)
         if not is_ok(err):
             return err
-        assert tree is not None
-        path = _resolve(name, base_dir)
-        assert path is not None
+        assert tree is not None and path is not None
         modules[name] = (path, tree)
         imports_by_module[name] = _imports_of(tree)
         for imp in imports_by_module[name]:

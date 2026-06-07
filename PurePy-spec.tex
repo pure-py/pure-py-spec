@@ -261,7 +261,7 @@ which follow Python.
 
 \subsection{Modules and entry point}
 
-A \PurePy execution context (or \emph{program}) $\langle E, \mathcal{M} \rangle$ consists of a finite map
+A \PurePy \emph{program} $\langle E, \mathcal{M} \rangle$ consists of a finite map
 $\mathcal{M}$ from \emph{fully-qualified names} $M$ (\figref{syntax-stmt}) to \emph{modules} $m$ (each a sequence
 of top-level statements $t_1 \ldots t_{n+1}$), together with a designated \emph{entry point} $E \in
 \dom(\mathcal{M})$. The map $\mathcal{M}$ is prefix-closed: if $M \in \dom(\mathcal{M})$ then $\parents(M)
@@ -272,23 +272,23 @@ This restriction prevents side-effects of module execution, currently divergence
 implicitly becoming side-effects of a function. A module executes at most once per program; the restriction
 keeps that execution at the top level, where its effects occur at known points rather than on whichever
 function call happens to trigger the import first. For each $(M \mapsto b) \in
-\mathcal{M}$, well-formedness of $b$ is checked under the initial context $\Gamma_M$ which binds at status
-$\statusDefAssigned$ the names of \figref{predefined}: the names of the predefined module
-\pyinline{builtins}; and the variable \pyinline{__name__}, set to \pyinline{"__main__"} if $M = E$ and to
-$M$ otherwise.
+\mathcal{M}$, well-formedness of $b$ is checked under the initial context $\Gamma_M = \Gamma_{\text{\pyinline{builtins}}}
+\runion \set{\text{\pyinline{__name__}} \mapsto \statusDefAssigned}$, where $\Gamma_{\text{\pyinline{builtins}}}$
+binds at status $\statusDefAssigned$ the names of the predefined module \pyinline{builtins} (\figref{predefined}).
 
 \begin{figure}[H]
 \small
 \centering
 \begin{tabular}{lp{0.6\textwidth}}
 \hline
-\textbf{Source} & \textbf{Names} \\
+\textbf{Module} & \textbf{Defined names} \\
 \hline
-\pyinline{builtins} module & \pyinline{print}, \pyinline{len}, \pyinline{range}, \pyinline{type}, \pyinline{True}, \pyinline{False}, \pyinline{None} \\
-Module-local & \pyinline{__name__} \\
+\pyinline{builtins} & \pyinline{True}, \pyinline{False}, \pyinline{None}, \pyinline{int}, \pyinline{float}, \pyinline{str}, \pyinline{bool}, \pyinline{list}, \pyinline{tuple}, \pyinline{set}, \pyinline{dict}, \pyinline{abs}, \pyinline{round}, \pyinline{len}, \pyinline{min}, \pyinline{max}, \pyinline{sum}, \pyinline{all}, \pyinline{any}, \pyinline{sorted}, \pyinline{reversed}, \pyinline{range}, \pyinline{enumerate}, \pyinline{zip}, \pyinline{map}, \pyinline{filter}, \pyinline{type}, \pyinline{isinstance} \\
+\pyinline{math} & \pyinline{pi}, \pyinline{e}, \pyinline{sqrt}, \pyinline{sin}, \pyinline{cos}, \pyinline{tan}, \pyinline{log}, \pyinline{exp}, \pyinline{floor}, \pyinline{ceil} \\
+\pyinline{sys} & \pyinline{argv}, \pyinline{exit}, \pyinline{stdin}, \pyinline{stdout} \\
 \hline
 \end{tabular}
-\caption{Predefined names available in every \PurePy module.}
+\caption{Predefined modules guaranteed to be in $\mathcal{M}$}
 \label{fig:predefined}
 \end{figure}
 
@@ -304,7 +304,8 @@ prefixes of a fully-qualified name.
 The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(M, M')$ iff
 $M' \in \imports(\mathcal{M}(M)) \cup \parents(M)$. Program well-formedness (\figref{modules}) requires every
 module in $\mathcal{M}$ to be well-formed in its initial context, every imported name to be in
-$\dom(\mathcal{M})$, and $G_{\mathcal{M}}$ to be acyclic.
+$\dom(\mathcal{M})$, and $G_{\mathcal{M}}$ to be acyclic. The predefined module \pyinline{builtins} is required
+to be in $\dom(\mathcal{M})$; the runtime provides it.
 
 \subsection{Well-formedness}
 
@@ -668,8 +669,13 @@ to sequential composition of result types:
 \assigns{\rho} \runion \returns{v} & = \returns{v}
 \end{align*}}
 
-\noindent with $\assigns{\varnothing}$ as left and right unit. Function definitions delimit the scope of these
+with $\assigns{\varnothing}$ as left and right unit. Function definitions delimit the scope of these
 effects, so as black boxes functions are always pure.
+
+For each $(M \mapsto b) \in \mathcal{M}$, evaluation of $b$ begins under the initial environment
+$\rho_M = \rho_{\text{\pyinline{builtins}}} \runion \set{\text{\pyinline{__name__}} \mapsto v}$, where $v$ is
+\pyinline{"__main__"} if $M = E$ and $M$ otherwise. The environment $\rho_{\text{\pyinline{builtins}}}$ binds
+the names listed for \pyinline{builtins} in \figref{predefined} to their values.
 
 \input{fig/eval}
 
