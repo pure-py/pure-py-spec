@@ -1,4 +1,5 @@
 import builtins
 import math
 import sys
-print("ok")
+print(builtins.len([1, 2, 3]))
+print(math.pi)
