@@ -2,7 +2,7 @@
 PurePy: module rule requires the body's result type to be Assigns(Δ); a top-level
 return would give Returns and fail the rule."""
 import ast
-from _harness import expect_rejected
+from helpers.harness import expect_rejected
 
 tree = ast.Module(
     body=[ast.Return(value=ast.Constant(value=42))],

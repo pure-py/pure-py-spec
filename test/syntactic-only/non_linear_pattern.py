@@ -1,7 +1,7 @@
 """case (x, x): — Python: SyntaxError 'multiple assignments to name x in pattern'.
 PurePy: pat-list rejects via linearity premise."""
 import ast
-from _harness import expect_rejected
+from helpers.harness import expect_rejected
 
 # match v:
 #     case (x, x):
