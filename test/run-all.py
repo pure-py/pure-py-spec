@@ -124,16 +124,10 @@ def main():
         run_python(f"{rel} (run)", interpreter, p)
 
     print("well-formed/multi-file")
-    mf_root = wf / "multi-file"
-    mf_dirs = sorted(p for p in mf_root.iterdir() if p.is_dir()) if mf_root.exists() else []
-    for d in mf_dirs:
-        rel = d.relative_to(ROOT)
-        main_py = d / "main.py"
-        if main_py.exists():
-            expect_exit(f"{rel} (check)", check_program_cmd(main_py), 0)
-            run_python(f"{rel} (run)", interpreter, main_py, cwd=d, expected_path=d / "expected")
-        else:
-            bad(str(rel), "missing main.py")
+    for d in sorted(p for p in (wf / "multi-file").iterdir() if p.is_dir()):
+        if not (d / "expected").exists():
+            bad(f"{d.relative_to(ROOT)} (run)", "missing expected")
+    run_multi_file_tests(wf / "multi-file", 0, interpreter)
 
     print("well-formed/pending")
     for p in sorted((wf / "pending").glob("*.py")):

@@ -1,28 +1,5 @@
 \begin{figure}
 \small
-\begin{center}
-\begin{tabular}{rcll}
-$v$ & $::=$ & $\ell$ & (Literal) \\
-    & $\mid$ & $\exList{v_1, \ldots, v_n}$ & (List) \\
-    & $\mid$ & $\exTuple{v_1, \ldots, v_n}$ & (Tuple) \\
-    & $\mid$ & $\exClosure{\rho}{\vec{x}}{e}$ & (LambdaClosure) \\
-    & $\mid$ & $\exDefClosure{\rho}{\seq{d}}{i}$ & (DefClosure) \\
-    & $\mid$ & $\exModuleClosure{\rho}$ & (ModuleClosure)
-   \\[3mm]
-$\rho$ & $::=$ & $\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}$ & (Environment)
-   \\[3mm]
-$r$ & $::=$ & $\assigns{\rho}$ \\
-  & $\mid$ & $\returns{v}$
-   \\[3mm]
-$\mu$ & $::=$ & $\set{M_1 \mapsto \exModuleClosure{\rho_1}, \ldots, M_n \mapsto \exModuleClosure{\rho_n}}$ & (ModuleCache) \\
-\end{tabular}
-\end{center}
-\caption{Values, environments and evaluation results}
-\label{fig:values}
-\end{figure}
-
-\begin{figure}
-\small
 \begin{align*}
 \dispatch(v, \varepsilon) &= (\varnothing, \exPass) \\
 \dispatch(v, (\exCase{p}{b}) \cons \seq{c}) &= (\rho, b) && \text{if } p, v \matches \rho \\
@@ -134,39 +111,6 @@ $\mu$ & $::=$ & $\set{M_1 \mapsto \exModuleClosure{\rho_1}, \ldots, M_n \mapsto 
 \end{figure}
 
 \begin{figure}
-\flushleft \shadebox{$\mu, \rho, m \Rightarrow \mu', r$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{eval-empty}}]
-{
-  \strut
-}
-{
-  \mu, \rho, \varepsilon \Rightarrow \mu, \assigns{\varnothing}
-}
-\and
-\inferrule*[lab={\ruleName{eval-stmt}}]
-{
-  \rho, s \Rightarrow r
-}
-{
-  \mu, \rho, s \Rightarrow \mu, r
-}
-\and
-\inferrule*[lab={\ruleName{eval-seq}}]
-{
-  \mu, \rho, t \Rightarrow \mu', \assigns{\rho'} \\
-  \mu', \rho \runion \rho', m \Rightarrow \mu'', r
-}
-{
-  \mu, \rho, t \cons m \Rightarrow \mu'', \assigns{\rho'} \runion r
-}
-\end{mathpar}
-\caption{Module evaluation}
-\label{fig:eval-top}
-\end{figure}
-
-\begin{figure}
 \small
 \begin{align*}
 \unwrap(\returns{v}) &= v \\
@@ -212,6 +156,14 @@ $\mu$ & $::=$ & $\set{M_1 \mapsto \exModuleClosure{\rho_1}, \ldots, M_n \mapsto 
 }
 {
   \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow \unwrap(r)
+}
+\and
+\inferrule*[lab={\ruleName{eval-attr}}]
+{
+  \rho, e \Rightarrow \exObj{\rho'}
+}
+{
+  \rho, \exProject{e}{x} \Rightarrow \rho'(x)
 }
 \end{mathpar}
 \caption{Expression evaluation}

@@ -264,14 +264,13 @@ which follow Python.
 A \PurePy \emph{program} $\langle E, \mathcal{M} \rangle$ consists of a finite map
 $\mathcal{M}$ from \emph{fully-qualified names} $M$ (\figref{syntax-stmt}) to \emph{modules} $m$ (each a sequence
 of top-level statements $t_1 \ldots t_{n+1}$), together with a designated \emph{entry point} $E \in
-\dom(\mathcal{M})$. The pair $\langle E, \mathcal{M} \rangle$ is fixed and ambient in all definitions that follow. The map $\mathcal{M}$ is prefix-closed: if $M \in \dom(\mathcal{M})$ then $\parents(M)
-\subseteq \dom(\mathcal{M})$. The top-level form $t$ (\figref{syntax-stmt}) extends the statement form $s$ with
+\dom(\mathcal{M})$. The pair $\langle E, \mathcal{M} \rangle$ is fixed and ambient in all definitions that follow. The map $\mathcal{M}$ is prefix-closed: if $M \in \dom(\mathcal{M})$ then $\parents(M) \subseteq \dom(\mathcal{M})$. The top-level form $t$ (\figref{syntax-stmt}) extends the statement form $s$ with
 the \pyinline{import} and \pyinline{from} forms; these forms can therefore appear only at the
 top level of a module, not inside function bodies, conditional branches, or other nested contexts.
 This restriction prevents side-effects of module execution, currently divergence or runtime errors, from
 implicitly becoming side-effects of a function. A module executes at most once per program; the restriction
 keeps that execution at the top level, where its effects occur at known points rather than on whichever
-function call happens to trigger the import first. For each $(M \mapsto b) \in
+function call happens to trigger the import first. For any $(M \mapsto b) \in
 \mathcal{M}$, well-formedness of $b$ is checked under the initial context $\Gamma_M = \Gamma_{\pyinline{builtins}}
 \runion \set{\text{\pyinline{__name__}} \mapsto \statusDefAssigned}$, where $\Gamma_{\pyinline{builtins}}$
 binds at status $\statusDefAssigned$ the names of the predefined module \pyinline{builtins} (\figref{predefined}).
@@ -659,8 +658,9 @@ functional programming:
 
 \section{Operational semantics}
 
-For a statement $s$, the result $\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated
-environment $\rho$; the result $\returns{v}$ represents \emph{abrupt completion} of $s$ with return value $v$.
+Values, environments, and evaluation results are given in \figref{values}. For a statement $s$, the result
+$\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the result
+$\returns{v}$ represents \emph{abrupt completion} of $s$ with return value $v$.
 Composing statements sequentially composes their results according to the following partial monoid, analogous
 to sequential composition of result types:
 {\small
@@ -669,19 +669,27 @@ to sequential composition of result types:
 \assigns{\rho} \runion \returns{v} & = \returns{v}
 \end{align*}}
 
-with $\assigns{\varnothing}$ as left and right unit. Function definitions delimit the scope of these
-effects, so as black boxes functions are always pure.
+with $\assigns{\varnothing}$ as left and right unit.
 
-For each $(M \mapsto b) \in \mathcal{M}$, evaluation of $b$ begins under the initial environment
-$\rho_M = \rho_{\pyinline{builtins}} \runion \set{\text{\pyinline{__name__}} \mapsto v}$, where $v$ is
-\pyinline{"__main__"} if $M = E$ and the string literal corresponding to $M$ otherwise. The environment $\rho_{\pyinline{builtins}}$ binds
-the names listed for \pyinline{builtins} in \figref{predefined} to their values.
+\input{fig/eval-values}
+
+Program and module evaluation are given in \figref{eval-modules}. A program evaluates to a non-negative integer
+exit code $n$, with $0$ denoting successful termination. For any $(M \mapsto b) \in \mathcal{M}$, evaluation of
+$b$ begins under the initial environment $\rho_M = \rho_{\pyinline{builtins}} \runion \set{\text{\pyinline{__name__}}
+\mapsto v}$, where $v$ is \pyinline{"__main__"} if $M = E$ and the string literal corresponding to $M$ otherwise.
+The environment $\rho_{\pyinline{builtins}}$ binds the names listed for \pyinline{builtins} in \figref{predefined}
+to their values.
+
+\input{fig/eval-modules}
+
+Block evaluation $\rho, b \Rightarrow r$ is given in \figref{eval}. Function definitions delimit the scope of
+sequential-composition effects, so as black boxes functions are always pure.
 
 \input{fig/eval}
 
-The pattern-matching judgement $p, v \matches \rho$ is a deterministic partial function on $(p,
-v)$. We write $p, v \notmatches$ (with no right-hand side) for $\nexists \rho.\, p, v \matches \rho$, i.e.\
-matching is undefined.
+Expression evaluation $\rho, e \Rightarrow v$ is given in \figref{eval-expr}. The pattern-matching judgement
+$p, v \matches \rho$ (\figref{match}) is a deterministic partial function; we write $p, v \notmatches$
+(with no right-hand side) for $\nexists \rho.\, p, v \matches \rho$, i.e.\ matching is undefined.
 
 \input{fig/match}
 
