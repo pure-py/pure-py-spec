@@ -43,9 +43,14 @@
 \newcommand{\pytext}[1]{%
   {\renewcommand\ttdefault{cmtt}\ttfamily\small\color{base05}#1}%
 }
+\newcommand{\pyinlinetext}[2]{\text{{\renewcommand\ttdefault{cmtt}\ttfamily#1\color{base05}#2}}}
 \newcommand{\pyinline}[1]{%
   \ifmmode
-    \text{\pytext{#1}}%
+    \mathchoice
+      {\pyinlinetext{}{#1}}%
+      {\pyinlinetext{}{#1}}%
+      {\pyinlinetext{\scriptsize}{#1}}%
+      {\pyinlinetext{\tiny}{#1}}%
   \else
     \mbox{\lstinline[style=base16python]{#1}}%
   \fi

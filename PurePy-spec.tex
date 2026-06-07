@@ -264,7 +264,7 @@ which follow Python.
 A \PurePy \emph{program} $\langle E, \mathcal{M} \rangle$ consists of a finite map
 $\mathcal{M}$ from \emph{fully-qualified names} $M$ (\figref{syntax-stmt}) to \emph{modules} $m$ (each a sequence
 of top-level statements $t_1 \ldots t_{n+1}$), together with a designated \emph{entry point} $E \in
-\dom(\mathcal{M})$. The map $\mathcal{M}$ is prefix-closed: if $M \in \dom(\mathcal{M})$ then $\parents(M)
+\dom(\mathcal{M})$. The pair $\langle E, \mathcal{M} \rangle$ is fixed and ambient in all definitions that follow. The map $\mathcal{M}$ is prefix-closed: if $M \in \dom(\mathcal{M})$ then $\parents(M)
 \subseteq \dom(\mathcal{M})$. The top-level form $t$ (\figref{syntax-stmt}) extends the statement form $s$ with
 the \pyinline{import} and \pyinline{from} forms; these forms can therefore appear only at the
 top level of a module, not inside function bodies, conditional branches, or other nested contexts.
@@ -272,8 +272,8 @@ This restriction prevents side-effects of module execution, currently divergence
 implicitly becoming side-effects of a function. A module executes at most once per program; the restriction
 keeps that execution at the top level, where its effects occur at known points rather than on whichever
 function call happens to trigger the import first. For each $(M \mapsto b) \in
-\mathcal{M}$, well-formedness of $b$ is checked under the initial context $\Gamma_M = \Gamma_{\text{\pyinline{builtins}}}
-\runion \set{\text{\pyinline{__name__}} \mapsto \statusDefAssigned}$, where $\Gamma_{\text{\pyinline{builtins}}}$
+\mathcal{M}$, well-formedness of $b$ is checked under the initial context $\Gamma_M = \Gamma_{\pyinline{builtins}}
+\runion \set{\text{\pyinline{__name__}} \mapsto \statusDefAssigned}$, where $\Gamma_{\pyinline{builtins}}$
 binds at status $\statusDefAssigned$ the names of the predefined module \pyinline{builtins} (\figref{predefined}).
 
 \begin{figure}[H]
@@ -673,13 +673,13 @@ with $\assigns{\varnothing}$ as left and right unit. Function definitions delimi
 effects, so as black boxes functions are always pure.
 
 For each $(M \mapsto b) \in \mathcal{M}$, evaluation of $b$ begins under the initial environment
-$\rho_M = \rho_{\text{\pyinline{builtins}}} \runion \set{\text{\pyinline{__name__}} \mapsto v}$, where $v$ is
-\pyinline{"__main__"} if $M = E$ and $M$ otherwise. The environment $\rho_{\text{\pyinline{builtins}}}$ binds
+$\rho_M = \rho_{\pyinline{builtins}} \runion \set{\text{\pyinline{__name__}} \mapsto v}$, where $v$ is
+\pyinline{"__main__"} if $M = E$ and the string literal corresponding to $M$ otherwise. The environment $\rho_{\pyinline{builtins}}$ binds
 the names listed for \pyinline{builtins} in \figref{predefined} to their values.
 
 \input{fig/eval}
 
-\noindent The pattern-matching judgement $p, v \matches \rho$ is a deterministic partial function on $(p,
+The pattern-matching judgement $p, v \matches \rho$ is a deterministic partial function on $(p,
 v)$. We write $p, v \notmatches$ (with no right-hand side) for $\nexists \rho.\, p, v \matches \rho$, i.e.\
 matching is undefined.
 
