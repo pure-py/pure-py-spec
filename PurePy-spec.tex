@@ -645,9 +645,10 @@ functional programming:
 \item Augmented assignment (\pyinline{+=}, \pyinline{-=}, etc.)
 \item Walrus operator (\pyinline{:=})
 \item \pyinline{yield}/\pyinline{yield from}
-\item \pyinline{class} definitions (dataclasses may be added; see \S2 to-do list)
+\item \pyinline{class} definitions other than dataclasses
 \item \pyinline{with} statements
 \item List patterns matching tuple values, or tuple patterns matching list values. In \PurePy a list pattern matches only a list, and a tuple pattern matches only a tuple. Python permits either pattern against either kind of sequence.
+\item Positional class patterns matching fewer sub-patterns than the class's field arity. \PurePy requires exact arity; Python permits any number from $0$ up to the class's arity.
 \item Wildcard imports (\pyinline{from M import *}); PEP 8 recommends avoiding these\footnote{\url{https://peps.python.org/pep-0008/}}.
 \end{itemize}
 
