@@ -264,13 +264,12 @@ which follow Python.
 A \PurePy \emph{program} $\langle E, \mathcal{M} \rangle$ consists of a finite map
 $\mathcal{M}$ from \emph{fully-qualified names} $M$ (\figref{syntax-stmt}) to \emph{modules} $m$ (each a sequence
 of top-level statements $t_1 \ldots t_{n+1}$), together with a designated \emph{entry point} $E \in
-\dom(\mathcal{M})$. The pair $\langle E, \mathcal{M} \rangle$ is fixed and ambient in all definitions that follow. The map $\mathcal{M}$ is prefix-closed: if $M \in \dom(\mathcal{M})$ then $\parents(M) \subseteq \dom(\mathcal{M})$. The top-level form $t$ (\figref{syntax-stmt}) extends the statement form $s$ with
-the \pyinline{import} and \pyinline{from} forms; these forms can therefore appear only at the
-top level of a module, not inside function bodies, conditional branches, or other nested contexts.
-This restriction prevents side-effects of module execution, currently divergence or runtime errors, from
-implicitly becoming side-effects of a function. A module executes at most once per program; the restriction
-keeps that execution at the top level, where its effects occur at known points rather than on whichever
-function call happens to trigger the import first. For any $(M \mapsto b) \in
+\dom(\mathcal{M})$. $\mathcal{M}$ always includes the predefined modules of \figref{predefined} and is prefix-closed:
+if $M \in \dom(\mathcal{M})$ then $\parents(M) \subseteq \dom(\mathcal{M})$. The pair $\langle E, \mathcal{M} \rangle$
+is fixed and ambient in all definitions that follow.
+The top-level form $t$ (\figref{syntax-stmt}) extends the statement form $s$ with the \pyinline{import} and
+\pyinline{from} forms; these forms can therefore appear only as a contiguous prefix of a module body, before any
+other statement. This confines module-loading side-effects (currently only divergence or runtime errors) to a single zone at the start of each module body. For any $(M \mapsto b) \in
 \mathcal{M}$, well-formedness of $b$ is checked under the initial context $\Gamma_M = \Gamma_{\pyinline{builtins}}
 \runion \set{\text{\pyinline{__name__}} \mapsto \statusDefAssigned}$, where $\Gamma_{\pyinline{builtins}}$
 binds at status $\statusDefAssigned$ the names of the predefined module \pyinline{builtins} (\figref{predefined}).
@@ -303,8 +302,7 @@ prefixes of a fully-qualified name.
 The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(M, M')$ iff
 $M' \in \imports(\mathcal{M}(M)) \cup \parents(M)$. Program well-formedness (\figref{modules}) requires every
 module in $\mathcal{M}$ to be well-formed in its initial context, every imported name to be in
-$\dom(\mathcal{M})$, and $G_{\mathcal{M}}$ to be acyclic. The predefined module \pyinline{builtins} is required
-to be in $\dom(\mathcal{M})$; the runtime provides it.
+$\dom(\mathcal{M})$, and $G_{\mathcal{M}}$ to be acyclic.
 
 \subsection{Well-formedness}
 
