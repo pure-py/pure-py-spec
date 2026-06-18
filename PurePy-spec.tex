@@ -150,8 +150,7 @@ one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
 
 \subsection{Contexts}
 
-The grammar of contexts and result types is given in \figref{contexts}. The metavariable $x$ ranges over
-variables and $f$ over function names. Contexts $\Gamma, \Delta$ are partial functions from sets of variables to a \emph{definite assignment} status
+The grammar of contexts and result types is given in \figref{contexts}. Metavariable $x$ ranges over variables and $f$ over function names. Contexts $\Gamma, \Delta$ are partial functions from sets of variables to a \emph{definite assignment} status
 in $\B = \set{\statusDefAssigned, \statusNotDefAssigned}$, with $\statusDefAssigned$ indicating
 \emph{definitely assigned} and $\statusNotDefAssigned$ indicating \emph{not definitely assigned}. The definite
 assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}. (Or think of $\statusDefAssigned$ and
@@ -261,8 +260,9 @@ which follow Python.
 
 \subsection{Class contexts}
 
-Class contexts $\Lambda$ are finite maps from class names to pairs $(F, B)$, where $F$ is a set of field
-names and $B$ is either a class name or $\bot$ (no base). The metavariables $C$ and $B$ range over class names.
+Class contexts $\Lambda$ are finite maps from class names to pairs $(F, C)$, where $F$ is a set of field
+names and $C$ names the base class (or $\bot$ for no base). Metavariables $C$ and $B$ range over class names.
+Union of class contexts is undefined when the operands disagree on a shared key.
 
 \subsection{Modules and entry point}
 
