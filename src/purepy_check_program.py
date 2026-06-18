@@ -11,7 +11,7 @@ from purepy_check import Error, Result, ok, is_ok
 ILL_FORMED_PROGRAM = 4
 
 # Modules the runtime provides if the user has no file of the same name.
-PREDEFINED_MODULES = {'builtins', 'math', 'sys'}
+PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
 
 
 def _program_error(msg: str) -> Error:

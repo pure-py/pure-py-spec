@@ -120,7 +120,7 @@ def check_stmt(node: ast.stmt) -> Result:
     if isinstance(node, ast.Nonlocal):
         return unsupported(node, 'nonlocal not supported')
     if isinstance(node, ast.ClassDef):
-        return not_yet(node, 'class definitions not yet supported', 8)
+        return check_classdef(node)
     if isinstance(node, ast.Match):
         subj_result = check_expr(node.subject)
         if not is_ok(subj_result):
@@ -140,6 +140,34 @@ def check_stmt(node: ast.stmt) -> Result:
     if isinstance(node, ast.Continue):
         return unsupported(node, 'continue not supported')
     return unsupported(node, f'unknown statement type: {type(node).__name__}')
+
+def check_classdef(node: ast.ClassDef) -> Result:
+    if any(isinstance(b, ast.Name) and b.id == 'Enum' for b in node.bases):
+        return not_yet(node, 'enum classes not yet supported', 86)
+    if len(node.decorator_list) != 1:
+        return unsupported(node, 'class must have exactly the @dataclass decorator')
+    deco = node.decorator_list[0]
+    if not (isinstance(deco, ast.Name) and deco.id == 'dataclass'):
+        return unsupported(node, 'only the @dataclass decorator is supported on classes')
+    if len(node.bases) > 1:
+        return unsupported(node, 'at most one base class is supported')
+    for base in node.bases:
+        if not isinstance(base, ast.Name):
+            return unsupported(node, 'base class must be a simple name')
+    if len(node.keywords) > 0:
+        return unsupported(node, 'class keyword arguments not supported')
+    if len(node.body) == 1 and isinstance(node.body[0], ast.Pass):
+        return ok()
+    for stmt in node.body:
+        if not isinstance(stmt, ast.AnnAssign):
+            return unsupported(node, 'dataclass body may contain only field declarations')
+        if not isinstance(stmt.target, ast.Name):
+            return unsupported(node, 'field target must be a simple name')
+        if stmt.value is not None:
+            return unsupported(node, 'field default values not supported')
+        if not (isinstance(stmt.annotation, ast.Name) and stmt.annotation.id == 'Any'):
+            return unsupported(node, 'field type annotation must be Any')
+    return ok()
 
 def check_pattern(node: ast.pattern) -> Result:
     if isinstance(node, ast.MatchValue):

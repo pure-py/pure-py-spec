@@ -1,15 +1,18 @@
 from dataclasses import dataclass
+from typing import Any
 
-class Expr: ...
+@dataclass
+class Expr:
+    pass
 
 @dataclass
 class IntExpr(Expr):
-    val: int
+    val: Any
 
 @dataclass
 class AddExpr(Expr):
-    left: Expr
-    right: Expr
+    left: Any
+    right: Any
 
 def eval(e):
     match e:

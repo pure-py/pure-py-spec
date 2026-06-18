@@ -34,6 +34,15 @@ Item = Union[ast.stmt, list[ast.FunctionDef]]   # statement or grouped mutual re
 
 
 @dataclass(frozen=True)
+class ClassInfo:
+    fields: frozenset[str]
+    base: Optional[str]
+
+
+ClassContext = dict[str, ClassInfo]   # Λ_M
+
+
+@dataclass(frozen=True)
 class TyReturns:
     pass
 
@@ -121,6 +130,8 @@ def result_type(node: ast.stmt) -> ResultTy:
         if not _is_catch_all(node.cases[-1].pattern):
             branches.append(TY_ASSIGNS)
         return merge_results(branches)
+    if isinstance(node, ast.ClassDef):
+        return TY_ASSIGNS
     raise AssertionError(f'unexpected statement: {type(node).__name__}')
 
 def result_type_of_block(block: list[ast.stmt]) -> ResultTy:
@@ -269,6 +280,8 @@ def check_stmt(s: ast.stmt, gamma: Context) -> Result:
         if not is_ok(err):
             return err
         return _check_match_cases(s.cases, gamma)
+    if isinstance(s, ast.ClassDef):
+        return ok()
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def _check_match_cases(cases: list[ast.match_case], gamma: Context) -> Result:
@@ -543,6 +556,8 @@ def fv_stmt(s: ast.stmt) -> set[str]:
         return fv_block(s.body) - params - {s.name}
     if isinstance(s, (ast.Import, ast.ImportFrom)):
         return set()
+    if isinstance(s, ast.ClassDef):
+        return set()
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def fv_block(block: list[ast.stmt]) -> set[str]:
@@ -565,6 +580,8 @@ def assigns_stmt(s: ast.stmt) -> set[str]:
         return {s.names[0].name.split('.')[0]}
     if isinstance(s, ast.ImportFrom):
         return {a.name for a in s.names}
+    if isinstance(s, ast.ClassDef):
+        return set()
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def assigns_block(block: list[ast.stmt]) -> set[str]:
@@ -593,6 +610,8 @@ def captures_stmt(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.FunctionDef):
         return captures_region([s])
     if isinstance(s, (ast.Import, ast.ImportFrom)):
+        return set()
+    if isinstance(s, ast.ClassDef):
         return set()
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
@@ -656,6 +675,56 @@ def _find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST 
                     return r
     return None
 
+def _class_field_names(node: ast.ClassDef) -> list[str]:
+    names = []
+    for t in node.body:
+        if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name):
+            names.append(t.target.id)
+    return names
+
+def build_class_context(body: list[ast.stmt]) -> Union[ClassContext, Error]:
+    lambda_m: ClassContext = {}
+    for s in body:
+        if isinstance(s, ast.ClassDef):
+            if s.name in lambda_m:
+                return Error(getattr(s, 'lineno', None), getattr(s, 'col_offset', None),
+                             f"[class] duplicate class name '{s.name}' in module", ILL_FORMED)
+            base = s.bases[0].id if s.bases and isinstance(s.bases[0], ast.Name) else None
+            lambda_m[s.name] = ClassInfo(fields=frozenset(_class_field_names(s)), base=base)
+    return lambda_m
+
+def fields_of(lambda_m: ClassContext, c: str) -> frozenset[str]:
+    info = lambda_m[c]
+    if info.base is None:
+        return info.fields
+    return info.fields | fields_of(lambda_m, info.base)
+
+def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> Result:
+    names = _class_field_names(node)
+    seen: set[str] = set()
+    for n in names:
+        if n in seen:
+            return ill_formed(node, f"[class] duplicate field name '{n}' in class '{node.name}'")
+        seen.add(n)
+    if node.bases:
+        base = node.bases[0]
+        assert isinstance(base, ast.Name)
+        if base.id not in lambda_m:
+            return ill_formed(node, f"[class] base class '{base.id}' is not declared in this module")
+        clash = seen & fields_of(lambda_m, base.id)
+        if clash:
+            name = sorted(clash)[0]
+            return ill_formed(node, f"[class] field '{name}' clashes with inherited field from '{base.id}'")
+    return ok()
+
+def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> Result:
+    for s in body:
+        if isinstance(s, ast.ClassDef):
+            err = check_class_decl(s, lambda_m)
+            if not is_ok(err):
+                return err
+    return ok()
+
 def check_module(tree: ast.AST) -> Result:
     assert isinstance(tree, ast.Module)
     if not tree.body:
@@ -663,6 +732,12 @@ def check_module(tree: ast.AST) -> Result:
     nested = _find_nested_import(tree.body)
     if nested is not None:
         return ill_formed(nested, '[import] import only allowed at module top level')
+    cc = build_class_context(tree.body)
+    if isinstance(cc, Error):
+        return cc
+    err = check_class_decls(tree.body, cc)
+    if not is_ok(err):
+        return err
     ctx = dict(BUILTINS)
     ctx['__name__'] = TT
     err = check_block(tree.body, ctx)
