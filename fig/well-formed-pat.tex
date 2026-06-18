@@ -1,9 +1,26 @@
 \begin{figure}
+\flushleft \shadebox{$\vdash p$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{pat-class}}]
+{
+  C \in \dom(\Lambda_M) \\
+  \fields_M(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+k} \\
+  y_1, \ldots, y_m \text{ distinct} \subseteq \set{x_{n+1}, \ldots, x_{n+k}} \\
+  \vdash p_i \quad (\forall i)
+}
+{
+  \vdash \patClass{C}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}}
+}
+\end{mathpar}
+(Remaining $p$ cases hold trivially.)
+
 \flushleft \shadebox{$\vdash p_1 \cons \ldots \cons p_{n+1}$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{pat-list}}]
 {
+  \vdash p_i \quad (\forall i) \\
   \text{variables in } p_i \text{ distinct} \quad (\forall i) \\
   p_i \not\subsumed p_j \quad (\forall i)(\forall j < i)
 }
@@ -11,6 +28,6 @@
   \vdash p_1 \cons \ldots \cons p_n
 }
 \end{mathpar}
-\caption{Pattern list $p_1 \cons \ldots \cons p_n$ is well-formed}
+\caption{Patterns are well-formed}
 \label{fig:well-formed-pat}
 \end{figure}

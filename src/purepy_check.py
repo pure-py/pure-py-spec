@@ -35,7 +35,7 @@ Item = Union[ast.stmt, list[ast.FunctionDef]]   # statement or grouped mutual re
 
 @dataclass(frozen=True)
 class ClassInfo:
-    fields: frozenset[str]
+    fields: tuple[str, ...]
     base: Optional[str]
 
 
@@ -690,14 +690,14 @@ def build_class_context(body: list[ast.stmt]) -> Union[ClassContext, Error]:
                 return Error(getattr(s, 'lineno', None), getattr(s, 'col_offset', None),
                              f"[class] duplicate class name '{s.name}' in module", ILL_FORMED)
             base = s.bases[0].id if s.bases and isinstance(s.bases[0], ast.Name) else None
-            lambda_m[s.name] = ClassInfo(fields=frozenset(_class_field_names(s)), base=base)
+            lambda_m[s.name] = ClassInfo(fields=tuple(_class_field_names(s)), base=base)
     return lambda_m
 
-def fields_of(lambda_m: ClassContext, c: str) -> frozenset[str]:
+def fields_of(lambda_m: ClassContext, c: str) -> tuple[str, ...]:
     info = lambda_m[c]
     if info.base is None:
         return info.fields
-    return info.fields | fields_of(lambda_m, info.base)
+    return fields_of(lambda_m, info.base) + info.fields
 
 def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> Result:
     names = _class_field_names(node)
@@ -711,7 +711,7 @@ def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> Result:
         assert isinstance(base, ast.Name)
         if base.id not in lambda_m:
             return ill_formed(node, f"[class] base class '{base.id}' is not declared in this module")
-        clash = seen & fields_of(lambda_m, base.id)
+        clash = seen & set(fields_of(lambda_m, base.id))
         if clash:
             name = sorted(clash)[0]
             return ill_formed(node, f"[class] field '{name}' clashes with inherited field from '{base.id}'")

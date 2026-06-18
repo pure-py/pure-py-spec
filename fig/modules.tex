@@ -23,13 +23,13 @@
 \centering
 \small
 \begin{align*}
-\classes(\exDataclass{C}{\exField{x_1} \;\ldots\; \exField{x_n}}) &= \set{C \mapsto (\set{x_1, \ldots, x_n}, \bot)} \\
-\classes(\exDataclassExtend{C}{B}{\exField{x_1} \;\ldots\; \exField{x_n}}) &= \set{C \mapsto (\set{x_1, \ldots, x_n}, B)} \\
+\classes(\exDataclass{C}{\exField{x_1} \;\ldots\; \exField{x_n}}) &= \set{C \mapsto (x_1 \ldots x_n, \bot)} \\
+\classes(\exDataclassExtend{C}{B}{\exField{x_1} \;\ldots\; \exField{x_n}}) &= \set{C \mapsto (x_1 \ldots x_n, B)} \\
 \classes(s) &= \varnothing \quad \text{otherwise} \\
 \\
 \fields_M(C) &= \begin{cases}
-  F & \text{if } \Lambda_M(C) = (F, \bot) \\
-  F \cup \fields_M(B) & \text{if } \Lambda_M(C) = (F, B)
+  \vec{x} & \text{if } \Lambda_M(C) = (\vec{x}, \bot) \\
+  \fields_M(B) \mathbin{\cdot} \vec{x} & \text{if } \Lambda_M(C) = (\vec{x}, B)
 \end{cases}
 \end{align*}
 \subcaption{$\classes$ and $\fields_M$ metafunctions}

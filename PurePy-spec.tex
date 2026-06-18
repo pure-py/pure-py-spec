@@ -260,8 +260,8 @@ which follow Python.
 
 \subsection{Class contexts}
 
-Class contexts $\Lambda$ are finite maps from class names to pairs $(F, C)$, where $F$ is a set of field
-names and $C$ names the base class (or $\bot$ for no base). Metavariables $C$ and $B$ range over class names.
+Class contexts $\Lambda$ are finite maps from class names to pairs $(\vec{x}, C)$, where $\vec{x}$ is a sequence of distinct
+field names (in declaration order) and $C$ names the base class (or $\bot$ for no base). Metavariables $C$ and $B$ range over class names.
 Union of class contexts is undefined when the operands disagree on a shared key.
 
 \subsection{Modules and entry point}
