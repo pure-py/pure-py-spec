@@ -7,15 +7,19 @@
 \imports(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \textstyle\bigcup_i \imports(b_i) \\
 \imports(\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}) &= \textstyle\bigcup_i \imports(b_i) \\
 \imports(\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}) &= \textstyle\bigcup_i \imports(b_i) \\
-\imports(s) &= \varnothing & \text{otherwise} \\
+\imports(s) &= \varnothing \quad \text{otherwise} \\
 \\
 \parents(x) &= \varnothing \\
 \parents(M.x) &= \parents(M) \cup \set{M} \\
 \\
-\classes(\varepsilon) &= \varnothing \\
-\classes(\exDataclass{C}{f_1 \;\ldots\; f_n} \cons m) &= \set{C \mapsto (\set{f_1, \ldots, f_n}, \bot)} \cup \classes(m) \\
-\classes(\exDataclassExtend{C}{B}{f_1 \;\ldots\; f_n} \cons m) &= \set{C \mapsto (\set{f_1, \ldots, f_n}, B)} \cup \classes(m) \\
-\classes(s \cons m) &= \classes(m) & \text{otherwise}
+\classes(\exDataclass{C}{\exField{x_1} \;\ldots\; \exField{x_n}}) &= \set{C \mapsto (\set{x_1, \ldots, x_n}, \bot)} \\
+\classes(\exDataclassExtend{C}{B}{\exField{x_1} \;\ldots\; \exField{x_n}}) &= \set{C \mapsto (\set{x_1, \ldots, x_n}, B)} \\
+\classes(s) &= \varnothing \quad \text{otherwise} \\
+\\
+\fields_M(C) &= \begin{cases}
+  F & \text{if } \Lambda_M(C) = (F, \bot) \\
+  F \cup \fields_M(B) & \text{if } \Lambda_M(C) = (F, B)
+\end{cases}
 \end{align*}
 
 \flushleft \shadebox{$\vdash_{\mathcal{M}} M$}
@@ -23,7 +27,7 @@
 \small
 \inferrule*[lab={\ruleName{module}}]
 {
-  \Gamma_M \vdash \mathcal{M}(M) : \Delta \\
+  \Gamma_M \vdash_M \mathcal{M}(M) : \Delta \\
   \imports(\mathcal{M}(M)) \subseteq \dom(\mathcal{M})
 }
 {
