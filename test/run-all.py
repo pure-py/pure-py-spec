@@ -103,7 +103,8 @@ def main():
         sys.argv.remove("--no-mypy")
     interpreter = sys.argv[1] if len(sys.argv) > 1 else "python3"
     base = ROOT / "test"
-    wf = base / "well-formed"
+    module = base / "module-level"
+    program = base / "program-level"
     r = Runner()
 
     if not skip_mypy:
@@ -119,11 +120,8 @@ def main():
         else:
             r.bad("src/", proc.stdout.strip()[:400])
 
-    print("well-formed")
-    files = sorted(
-        p for p in wf.rglob("*.py")
-        if "multi-file" not in p.parts and "pending" not in p.parts
-    )
+    print("module-level/well-formed")
+    files = sorted((module / "well-formed").rglob("*.py"))
     for p in files:
         rel = p.relative_to(ROOT)
         if not p.with_suffix(".expected").exists():
@@ -133,34 +131,34 @@ def main():
         r.expect_exit(f"{rel} (check)", script_cmd("purepy_check.py", p), 0)
         r.run_python(f"{rel} (run)", interpreter, p)
 
-    print("well-formed/multi-file")
-    for d in sorted(p for p in (wf / "multi-file").iterdir() if p.is_dir()):
-        if not (d / "expected").exists():
-            r.bad(f"{d.relative_to(ROOT)} (run)", "missing expected")
-    r.run_multi_file_tests(wf / "multi-file", interpreter)
-
-    print("well-formed/pending")
-    for p in sorted((wf / "pending").glob("*.py")):
+    print("module-level/pending")
+    for p in sorted((module / "pending").glob("*.py")):
         r.expect_exit(str(p.relative_to(ROOT)), script_cmd("purepy_parse.py", p), 2)
 
-    print("ill-formed/semantic")
-    for p in sorted((base / "ill-formed" / "semantic").glob("*.py")):
+    print("module-level/ill-formed/semantic")
+    for p in sorted((module / "ill-formed" / "semantic").glob("*.py")):
         rel = p.relative_to(ROOT)
         r.expect_exit(f"{rel} (parse)", script_cmd("purepy_parse.py", p), 0)
         if p.stem not in SEMANTIC_PENDING:
             r.expect_exit(f"{rel} (check)", script_cmd("purepy_check.py", p), 3)
         r.run_python(f"{rel} (run)", interpreter, p)
 
-    print("ill-formed/multi-file")
-    r.run_multi_file_tests(base / "ill-formed" / "multi-file", interpreter)
-
-    print("ill-formed/unsupported")
-    for p in sorted((base / "ill-formed" / "unsupported").glob("*.py")):
+    print("module-level/ill-formed/unsupported")
+    for p in sorted((module / "ill-formed" / "unsupported").glob("*.py")):
         r.expect_exit(str(p.relative_to(ROOT)), script_cmd("purepy_parse.py", p), 1)
 
-    print("syntactic-only")
-    for p in sorted((base / "syntactic-only").glob("*.py")):
+    print("module-level/ill-formed/syntactic-only")
+    for p in sorted((module / "ill-formed" / "syntactic-only").glob("*.py")):
         r.expect_exit(str(p.relative_to(ROOT)), [interpreter, str(p)], 0)
+
+    print("program-level/well-formed")
+    for d in sorted(p for p in (program / "well-formed").iterdir() if p.is_dir()):
+        if not (d / "expected").exists():
+            r.bad(f"{d.relative_to(ROOT)} (run)", "missing expected")
+    r.run_multi_file_tests(program / "well-formed", interpreter)
+
+    print("program-level/ill-formed")
+    r.run_multi_file_tests(program / "ill-formed", interpreter)
 
     r.summary()
 
