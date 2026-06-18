@@ -1,0 +1,35 @@
+\begin{figure}
+\small
+\begin{center}
+\begin{tabular}{rcll}
+$s$ & $::=$ & $\exPass$ & (Pass) \\
+    & $\mid$ & $\exAssign{x}{e}$ & (Assign) \\
+    & $\mid$ & $e$ & (ExprStmt) \\
+    & $\mid$ & $\exAssert{e}$ & (Assert) \\
+    & $\mid$ & $\exAssertMsg{e}{e'}$ & (AssertMsg) \\
+    & $\mid$ & $\exReturnNone$ & (ReturnNone) \\
+    & $\mid$ & $\exReturn{e}$ & (Return) \\
+    & $\mid$ & $\exIf{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}$ & (If) \\
+    & $\mid$ & $\exIfElse{e}{b}{\exElif{e_1}{b_1}\;\ldots\;\exElif{e_n}{b_n}}{b'}$ & (IfElse) \\
+    & $\mid$ & $\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}$ & (Match) \\
+    & $\mid$ & $d_1 \;\ldots\; d_{n+1}$ & (MutualRegion) \\
+    & $\mid$ & $\exDataclass{C}{f_1 \;\ldots\; f_n}$ & (Dataclass) \\
+    & $\mid$ & $\exDataclassExtend{C}{B}{f_1 \;\ldots\; f_n}$ & (DataclassExtend)
+   \\[3mm]
+$b$ & $::=$ & $s_1 \;\ldots\; s_{n+1}$ & (Block)
+   \\[3mm]
+$t$ & $::=$ & $\exImport{M}$ & (Import) \\
+    & $\mid$ & $\exFromImport{M}{x_1, \ldots, x_{n+1}}$ & (FromImport)
+   \\[3mm]
+$m$ & $::=$ & $t_1 \;\ldots\; t_n \; s_1 \;\ldots\; s_k$ & (Module)
+   \\[3mm]
+$M$ & $::=$ & $x_1.x_2.\ldots.x_{n+1}$ & (FullyQualifiedName)
+   \\[3mm]
+$d$ & $::=$ & $\exDef{f}{x_1, \ldots, x_n}{b}$ & (Def)
+   \\[3mm]
+$f$ & $::=$ & $\exField{x}$ & (Field)
+\end{tabular}
+\end{center}
+\caption{Modules and blocks}
+\label{fig:syntax-stmt}
+\end{figure}

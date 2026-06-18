@@ -246,7 +246,8 @@ unreachable statements (\S\ref{sec:unreachable}).
 \]
 \end{lemma}
 
-\input{fig/syntax}
+\input{fig/syntax-stmt}
+\input{fig/syntax-expr}
 
 \paragraph{Operators.}
 
@@ -650,6 +651,7 @@ functional programming:
 \item List patterns matching tuple values, or tuple patterns matching list values. In \PurePy a list pattern matches only a list, and a tuple pattern matches only a tuple. Python permits either pattern against either kind of sequence.
 \item Positional class patterns matching fewer sub-patterns than the class's field arity. \PurePy requires exact arity; Python permits any number from $0$ up to the class's arity.
 \item Wildcard imports (\pyinline{from M import *}); PEP 8 recommends avoiding these\footnote{\url{https://peps.python.org/pep-0008/}}.
+\item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.
 \end{itemize}
 
 \section{Operational semantics}
