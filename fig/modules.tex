@@ -10,7 +10,12 @@
 \imports(s) &= \varnothing & \text{otherwise} \\
 \\
 \parents(x) &= \varnothing \\
-\parents(M.x) &= \parents(M) \cup \set{M}
+\parents(M.x) &= \parents(M) \cup \set{M} \\
+\\
+\classes(\varepsilon) &= \varnothing \\
+\classes(\exDataclass{C}{f_1 \;\ldots\; f_n} \cons m) &= \set{C \mapsto (\set{f_1, \ldots, f_n}, \bot)} \cup \classes(m) \\
+\classes(\exDataclassExtend{C}{B}{f_1 \;\ldots\; f_n} \cons m) &= \set{C \mapsto (\set{f_1, \ldots, f_n}, B)} \cup \classes(m) \\
+\classes(s \cons m) &= \classes(m) & \text{otherwise}
 \end{align*}
 
 \flushleft \shadebox{$\vdash_{\mathcal{M}} M$}
