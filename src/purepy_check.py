@@ -25,6 +25,9 @@ def ill_formed(node: ast.AST, msg: str) -> Result:
 
 def is_ok(result: Result) -> bool:
     return result is None
+
+def first_err(results: list[Result]) -> Result:
+    return next((r for r in results if not is_ok(r)), ok())
 TT = 'tt'
 FF = 'ff'
 
@@ -273,7 +276,7 @@ def check_stmt(s: ast.stmt, ctx: Context) -> Result:
     if isinstance(s, ast.Import):
         return ok()
     if isinstance(s, ast.ImportFrom):
-        if not s.names:
+        if len(s.names) == 0:
             return ill_formed(s, '[from-import] empty name list')
         return ok()
     if isinstance(s, ast.Match):
@@ -290,12 +293,8 @@ def check_stmt(s: ast.stmt, ctx: Context) -> Result:
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def _check_match_cases(cases: list[ast.match_case], ctx: Context) -> Result:
-    for case in cases:
-        case_ctx = extend_var(ctx, {x: TT for x in binds(case.pattern)})
-        err = check_block(case.body, case_ctx)
-        if not is_ok(err):
-            return err
-    return ok()
+    return first_err([check_block(case.body, extend_var(ctx, {x: TT for x in binds(case.pattern)}))
+                      for case in cases])
 
 def check_expr(e: ast.expr, ctx: Context) -> Result:
     if isinstance(e, ast.Name):
@@ -447,11 +446,7 @@ def check_pattern_wf(p: ast.pattern, ctx: Context) -> Result:
         subs = [p.pattern]
     else:
         subs = []
-    for sub in subs:
-        err = check_pattern_wf(sub, ctx)
-        if not is_ok(err):
-            return err
-    return ok()
+    return first_err([check_pattern_wf(sub, ctx) for sub in subs])
 
 def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: Context) -> Result:
     for i, p in enumerate(patterns):
@@ -745,33 +740,26 @@ def fields_of(lambda_m: ClassContext, c: str) -> tuple[str, ...]:
 
 def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> Result:
     names = _class_field_names(node)
-    seen: set[str] = set()
-    for n in names:
-        if n in seen:
-            return ill_formed(node, f"[class] duplicate field name '{n}' in class '{node.name}'")
-        seen.add(n)
-    if node.bases:
-        base = node.bases[0]
-        assert isinstance(base, ast.Name)
-        if base.id not in lambda_m:
-            return ill_formed(node, f"[class] base class '{base.id}' is not declared in this module")
-        clash = seen & set(fields_of(lambda_m, base.id))
-        if clash:
-            name = sorted(clash)[0]
-            return ill_formed(node, f"[class] field '{name}' clashes with inherited field from '{base.id}'")
-    return ok()
+    dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
+    if dup is not None:
+        return ill_formed(node, f"[class] duplicate field name '{dup}' in class '{node.name}'")
+    if len(node.bases) == 0:
+        return ok()
+    base = node.bases[0]
+    assert isinstance(base, ast.Name)
+    if base.id not in lambda_m:
+        return ill_formed(node, f"[class] base class '{base.id}' is not declared in this module")
+    clash = set(names) & set(fields_of(lambda_m, base.id))
+    if len(clash) == 0:
+        return ok()
+    return ill_formed(node, f"[class] field '{sorted(clash)[0]}' clashes with inherited field from '{base.id}'")
 
 def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> Result:
-    for s in body:
-        if isinstance(s, ast.ClassDef):
-            err = check_class_decl(s, lambda_m)
-            if not is_ok(err):
-                return err
-    return ok()
+    return first_err([check_class_decl(s, lambda_m) for s in body if isinstance(s, ast.ClassDef)])
 
 def check_module(tree: ast.AST) -> Result:
     assert isinstance(tree, ast.Module)
-    if not tree.body:
+    if len(tree.body) == 0:
         return ok()
     nested = _find_nested_import(tree.body)
     if nested is not None:
