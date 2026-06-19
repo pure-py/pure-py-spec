@@ -18,7 +18,7 @@
   \wf{\Gamma}{\exLambda{x_1, \ldots, x_n}{e}}
 }
 \and
-\inferrule*[lab={\ruleName{construct}}]
+\inferrule*[lab={\ruleName{constr}}]
 {
   \fields_M(C) = x_1, \ldots, x_n \\
   \wf{\Gamma}{e_i} \quad (\forall i)
@@ -27,6 +27,6 @@
   \wf{\Gamma}{\exConstruct{C}{e_1, \ldots, e_n}}
 }
 \end{mathpar}
-\caption{Expression $e$ is well-formed in $\Gamma$}
+\caption{Expression $e$ of module $M$ is well-formed in $\Gamma$}
 \label{fig:well-formed-expr}
 \end{figure}
