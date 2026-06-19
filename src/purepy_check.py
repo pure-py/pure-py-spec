@@ -71,13 +71,8 @@ def meet(a: Status, b: Status) -> Status:
     return FF
 
 def merge_delta(d1: Context, d2: Context) -> Context:
-    result = {}
-    for k in set(d1.keys()) | set(d2.keys()):
-        if k in d1 and k in d2:
-            result[k] = meet(d1[k], d2[k])
-        else:
-            result[k] = FF
-    return result
+    return {k: meet(d1[k], d2[k]) if k in d1 and k in d2 else FF
+            for k in set(d1.keys()) | set(d2.keys())}
 
 def merge_results(rs: list[ResultTy]) -> ResultTy:
     assigns_branches = [r for r in rs if isinstance(r, TyAssigns)]
@@ -470,10 +465,7 @@ def binds(pattern: ast.pattern) -> set[str]:
     if isinstance(pattern, ast.MatchSequence):
         return set().union(*(binds(p) for p in pattern.patterns))
     if isinstance(pattern, ast.MatchClass):
-        result: set[str] = set()
-        for p in list(pattern.patterns) + list(pattern.kwd_patterns):
-            result |= binds(p)
-        return result
+        return set().union(*(binds(p) for p in list(pattern.patterns) + list(pattern.kwd_patterns)))
     raise AssertionError(f'unexpected pattern: {type(pattern).__name__}')
 
 def fv(e: ast.expr) -> set[str]:
@@ -721,11 +713,8 @@ def _find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST 
     return None
 
 def _class_field_names(node: ast.ClassDef) -> list[str]:
-    names = []
-    for t in node.body:
-        if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name):
-            names.append(t.target.id)
-    return names
+    return [t.target.id for t in node.body
+            if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)]
 
 def build_class_context(body: list[ast.stmt]) -> Union[ClassContext, Error]:
     lambda_m: ClassContext = {}
