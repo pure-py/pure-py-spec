@@ -14,18 +14,6 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 GREEN, RED, RESET = "\033[32m", "\033[31m", "\033[0m"
 
 
-# ill-formed/semantic tests the checker does NOT yet reject; everything else
-# must exit 3. Add a stem here to stage a test for a not-yet-implemented check.
-SEMANTIC_PENDING = {
-    "currying",
-    "match_int_pat_on_list",
-    "match_list_pat_on_tuple",
-    "match_str_pat_on_int",
-    "match_tuple_pat_on_int",
-    "match_tuple_pat_on_list",
-}
-
-
 def script_cmd(script, path):
     return ["python3", str(ROOT / "src" / script), str(path)]
 
@@ -121,7 +109,7 @@ def main():
             r.bad("src/", proc.stdout.strip()[:400])
 
     print("module-level/well-formed")
-    files = sorted((module / "well-formed").rglob("*.py"))
+    files = sorted(p for p in (module / "well-formed").rglob("*.py") if "pending" not in p.parts)
     for p in files:
         rel = p.relative_to(ROOT)
         if not p.with_suffix(".expected").exists():
@@ -131,16 +119,22 @@ def main():
         r.expect_exit(f"{rel} (check)", script_cmd("purepy_check.py", p), 0)
         r.run_python(f"{rel} (run)", interpreter, p)
 
-    print("module-level/pending")
-    for p in sorted((module / "pending").glob("*.py")):
+    print("module-level/well-formed/pending")
+    for p in sorted((module / "well-formed" / "pending").glob("*.py")):
         r.expect_exit(str(p.relative_to(ROOT)), script_cmd("purepy_parse.py", p), 2)
 
     print("module-level/ill-formed/semantic")
     for p in sorted((module / "ill-formed" / "semantic").glob("*.py")):
         rel = p.relative_to(ROOT)
         r.expect_exit(f"{rel} (parse)", script_cmd("purepy_parse.py", p), 0)
-        if p.stem not in SEMANTIC_PENDING:
-            r.expect_exit(f"{rel} (check)", script_cmd("purepy_check.py", p), 3)
+        r.expect_exit(f"{rel} (check)", script_cmd("purepy_check.py", p), 3)
+        r.run_python(f"{rel} (run)", interpreter, p)
+
+    print("module-level/ill-formed/semantic/pending")
+    for p in sorted((module / "ill-formed" / "semantic" / "pending").glob("*.py")):
+        rel = p.relative_to(ROOT)
+        r.expect_exit(f"{rel} (parse)", script_cmd("purepy_parse.py", p), 0)
+        r.expect_exit(f"{rel} (check)", script_cmd("purepy_check.py", p), 0)
         r.run_python(f"{rel} (run)", interpreter, p)
 
     print("module-level/ill-formed/unsupported")
