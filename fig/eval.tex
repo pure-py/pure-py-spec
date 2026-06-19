@@ -160,10 +160,19 @@
 \and
 \inferrule*[lab={\ruleName{eval-attr}}]
 {
-  \rho, e \Rightarrow \exObj{\rho'}
+  \rho, e \Rightarrow \exObj{D}{\rho'}
 }
 {
   \rho, \exProject{e}{x} \Rightarrow \rho'(x)
+}
+\and
+\inferrule*[lab={\ruleName{eval-construct}}]
+{
+  \rho, e_i \Rightarrow v_i \quad (\forall i) \\
+  \fields(M.C) = x_1, \ldots, x_n
+}
+{
+  \rho, \exConstruct{C}{e_1, \ldots, e_n} \Rightarrow \exObj{M.C}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
 }
 \end{mathpar}
 \caption{Expression evaluation}

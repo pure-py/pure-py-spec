@@ -39,7 +39,7 @@
 \inferrule*[lab={\ruleName{eval-from-import}}]
 {
   \mu, M \Rightarrow_{\mathsf{load}} \mu' \\
-  \mu'(M) = \exObj{\rho''}
+  \mu'(M) = \exObj{\bot}{\rho''}
 }
 {
   \mu, \rho, \exFromImport{M}{x_1, \ldots, x_{n+1}} \Rightarrow \mu', \set{x_1 \mapsto \rho''(x_1), \ldots, x_{n+1} \mapsto \rho''(x_{n+1})}
@@ -65,7 +65,7 @@
   \mu, \rho_x, \mathcal{M}(x) \Rightarrow \mu', \rho
 }
 {
-  \mu, x \Rightarrow_{\mathsf{load}} \mu' \runion \set{x \mapsto \exObj{\rho}}
+  \mu, x \Rightarrow_{\mathsf{load}} \mu' \runion \set{x \mapsto \exObj{\bot}{\rho}}
 }
 \and
 \inferrule*[lab={\ruleName{load-qualified}}]
@@ -75,7 +75,7 @@
   \mu', \rho_{M.x}, \mathcal{M}(M.x) \Rightarrow \mu'', \rho
 }
 {
-  \mu, M.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{M.x \mapsto \exObj{\rho}}
+  \mu, M.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{M.x \mapsto \exObj{\bot}{\rho}}
 }
 \end{mathpar}
 

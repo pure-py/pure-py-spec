@@ -57,6 +57,16 @@
 {
   p\;\pyinline{as}\;x, v \matches \rho \disjunion \set{x \mapsto v}
 }
+\and
+\inferrule*[lab={\ruleName{pat-class-obj}}]
+{
+  \fields(M.C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m} \\
+  p_i, \rho'(x_i) \matches \rho_i \quad (\forall i, 1 \le i \le n) \\
+  p_{n+j}, \rho'(y_j) \matches \rho_{n+j} \quad (\forall j, 1 \le j \le m)
+}
+{
+  \patClass{C}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}}, \exObj{M.C}{\rho'} \matches \rho_1 \disjunion \ldots \disjunion \rho_{n+m}
+}
 \end{mathpar}
 \caption{Pattern matching}
 \label{fig:match}
