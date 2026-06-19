@@ -151,21 +151,23 @@ def check_classdef(node: ast.ClassDef) -> Result:
         return unsupported(node, 'only the @dataclass decorator is supported on classes')
     if len(node.bases) > 1:
         return unsupported(node, 'at most one base class is supported')
-    if node.bases and not isinstance(node.bases[0], ast.Name):
+    if len(node.bases) > 0 and not isinstance(node.bases[0], ast.Name):
         return unsupported(node, 'base class must be a simple name')
     if len(node.keywords) > 0:
         return unsupported(node, 'class keyword arguments not supported')
     if len(node.body) == 1 and isinstance(node.body[0], ast.Pass):
         return ok()
-    for stmt in node.body:
-        if not isinstance(stmt, ast.AnnAssign):
-            return unsupported(node, 'dataclass body may contain only field declarations')
-        if not isinstance(stmt.target, ast.Name):
-            return unsupported(node, 'field target must be a simple name')
-        if stmt.value is not None:
-            return unsupported(node, 'field default values not supported')
-        if not (isinstance(stmt.annotation, ast.Name) and stmt.annotation.id == 'Any'):
-            return unsupported(node, 'field type annotation must be Any')
+    return check_all(node.body, check_field)
+
+def check_field(stmt: ast.stmt) -> Result:
+    if not isinstance(stmt, ast.AnnAssign):
+        return unsupported(stmt, 'dataclass body may contain only field declarations')
+    if not isinstance(stmt.target, ast.Name):
+        return unsupported(stmt, 'field target must be a simple name')
+    if stmt.value is not None:
+        return unsupported(stmt, 'field default values not supported')
+    if not (isinstance(stmt.annotation, ast.Name) and stmt.annotation.id == 'Any'):
+        return unsupported(stmt, 'field type annotation must be Any')
     return ok()
 
 def check_pattern(node: ast.pattern) -> Result:
