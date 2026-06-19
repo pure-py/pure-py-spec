@@ -86,13 +86,13 @@ def merge_delta(d1: VarContext, d2: VarContext) -> VarContext:
 
 def merge_results(rs: list[ResultTy]) -> ResultTy:
     assigns_branches = [r for r in rs if isinstance(r, TyAssigns)]
-    if not assigns_branches:
+    if len(assigns_branches) == 0:
         return TY_RETURNS
     delta = assigns_branches[0].delta
     return TyAssigns(_fold_merge(delta, assigns_branches[1:]))
 
 def _fold_merge(acc: VarContext, branches: list[TyAssigns]) -> VarContext:
-    if not branches:
+    if len(branches) == 0:
         return acc
     return _fold_merge(merge_delta(acc, branches[0].delta), branches[1:])
 
@@ -179,7 +179,7 @@ def item_result_type(item: Item) -> ResultTy:
     return result_type(item)
 
 def items_of_block(block: list[ast.stmt]) -> list[Item]:
-    if not block:
+    if len(block) == 0:
         return []
     head = block[0]
     rest = block[1:]
@@ -188,7 +188,7 @@ def items_of_block(block: list[ast.stmt]) -> list[Item]:
     return [head] + items_of_block(rest)
 
 def _extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[Item]:
-    if not rest:
+    if len(rest) == 0:
         return [region]
     head = rest[0]
     if isinstance(head, ast.FunctionDef):
@@ -211,7 +211,7 @@ def check_bodies(defs: list[ast.FunctionDef], ctx: Context) -> Result:
     return _check_bodies(defs, ctx, f_names)
 
 def _check_bodies(defs: list[ast.FunctionDef], ctx: Context, f_names: VarContext) -> Result:
-    if not defs:
+    if len(defs) == 0:
         return ok()
     d = defs[0]
     params = {a.arg for a in d.args.args}
@@ -223,7 +223,7 @@ def _check_bodies(defs: list[ast.FunctionDef], ctx: Context, f_names: VarContext
     return _check_bodies(defs[1:], ctx, f_names)
 
 def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> Result:
-    if not targets:
+    if len(targets) == 0:
         return ok()
     t = targets[0]
     if isinstance(t, ast.Name) and t.id in captured:
@@ -231,7 +231,7 @@ def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> Result:
     return check_assign_targets(targets[1:], captured)
 
 def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> Result:
-    if not defs:
+    if len(defs) == 0:
         return ok()
     head = defs[0]
     if head.name in seen:
@@ -361,7 +361,7 @@ def check_expr(e: ast.expr, ctx: Context) -> Result:
     raise AssertionError(f'unexpected expression: {type(e).__name__}')
 
 def check_comprehension(elt: ast.expr, generators: list[ast.comprehension], ctx: Context) -> Result:
-    if not generators:
+    if len(generators) == 0:
         return check_expr(elt, ctx)
     g = generators[0]
     err = check_expr(g.iter, ctx)
@@ -374,7 +374,7 @@ def check_comprehension(elt: ast.expr, generators: list[ast.comprehension], ctx:
     return check_comprehension(elt, generators[1:], ctx_)
 
 def check_exprs(es: list[ast.expr], ctx: Context) -> Result:
-    if not es:
+    if len(es) == 0:
         return ok()
     err = check_expr(es[0], ctx)
     if not is_ok(err):
@@ -511,12 +511,12 @@ def fv(e: ast.expr) -> set[str]:
     raise AssertionError(f'unexpected expression: {type(e).__name__}')
 
 def fv_list(es: list[ast.expr]) -> set[str]:
-    if not es:
+    if len(es) == 0:
         return set()
     return fv(es[0]) | fv_list(es[1:])
 
 def fv_comprehension(elt: ast.expr, generators: list[ast.comprehension]) -> set[str]:
-    if not generators:
+    if len(generators) == 0:
         return fv(elt)
     g = generators[0]
     target_names = names_in_target(g.target)
@@ -531,7 +531,7 @@ def names_in_target(target: ast.expr) -> set[str]:
     return set()
 
 def _names_in_targets(targets: list[ast.expr]) -> set[str]:
-    if not targets:
+    if len(targets) == 0:
         return set()
     return names_in_target(targets[0]) | _names_in_targets(targets[1:])
 
@@ -568,12 +568,12 @@ def captures(e: ast.expr) -> set[str]:
     raise AssertionError(f'unexpected expression: {type(e).__name__}')
 
 def captures_list(es: list[ast.expr]) -> set[str]:
-    if not es:
+    if len(es) == 0:
         return set()
     return captures(es[0]) | captures_list(es[1:])
 
 def captures_comprehension(elt: ast.expr, generators: list[ast.comprehension]) -> set[str]:
-    if not generators:
+    if len(generators) == 0:
         return captures(elt)
     g = generators[0]
     target_names = names_in_target(g.target)
@@ -608,7 +608,7 @@ def fv_stmt(s: ast.stmt) -> set[str]:
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def fv_block(block: list[ast.stmt]) -> set[str]:
-    if not block:
+    if len(block) == 0:
         return set()
     return fv_stmt(block[0]) | fv_block(block[1:])
 
@@ -632,7 +632,7 @@ def assigns_stmt(s: ast.stmt) -> set[str]:
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def assigns_block(block: list[ast.stmt]) -> set[str]:
-    if not block:
+    if len(block) == 0:
         return set()
     return assigns_stmt(block[0]) | assigns_block(block[1:])
 
@@ -663,7 +663,7 @@ def captures_stmt(s: ast.stmt) -> set[str]:
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def captures_block(block: list[ast.stmt]) -> set[str]:
-    if not block:
+    if len(block) == 0:
         return set()
     return captures_stmt(block[0]) | captures_block(block[1:])
 
@@ -672,7 +672,7 @@ def captures_region(defs: list[ast.FunctionDef]) -> set[str]:
     return _captures_region_bodies(defs) - f_names
 
 def _captures_region_bodies(defs: list[ast.FunctionDef]) -> set[str]:
-    if not defs:
+    if len(defs) == 0:
         return set()
     d = defs[0]
     params = {a.arg for a in d.args.args}
@@ -690,12 +690,12 @@ def assigns_item(item: Item) -> set[str]:
     return assigns_stmt(item)
 
 def assigns_items(items: list[Item]) -> set[str]:
-    if not items:
+    if len(items) == 0:
         return set()
     return assigns_item(items[0]) | assigns_items(items[1:])
 
 def find_first_reassigning(items: list[Item], names: set[str]) -> Optional[ast.AST]:
-    if not items:
+    if len(items) == 0:
         return None
     if assigns_item(items[0]) & names:
         return items[0][0] if isinstance(items[0], list) else items[0]
