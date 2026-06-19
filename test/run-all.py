@@ -31,12 +31,17 @@ class Runner:
         self.failed += 1
         print(f"  {RED}✗{RESET} {label} ({msg})")
 
-    def expect_exit(self, label, cmd, expected):
+    def expect_exit(self, label, cmd, expected, error_substr=None):
         proc = subprocess.run(cmd, capture_output=True, text=True)
-        if proc.returncode == expected:
-            self.ok(label)
-        else:
+        if proc.returncode != expected:
             self.bad(label, f"expected exit {expected}, got {proc.returncode}")
+            return
+        if error_substr is not None:
+            output = proc.stdout + proc.stderr
+            if error_substr not in output:
+                self.bad(label, f"expected output containing {error_substr!r}, got: {output.strip()}")
+                return
+        self.ok(label)
 
     def run_python(self, label, interpreter, path, cwd=None, expected_path=None):
         """Run a script under Python; compare stdout to expected_path, or check
@@ -127,7 +132,9 @@ def main():
     for p in sorted((module / "ill-formed" / "semantic").glob("*.py")):
         rel = p.relative_to(ROOT)
         r.expect_exit(f"{rel} (parse)", script_cmd("purepy_parse.py", p), 0)
-        r.expect_exit(f"{rel} (check)", script_cmd("purepy_check.py", p), 3)
+        err_path = p.with_suffix(".error.expected")
+        err_substr = err_path.read_text().strip() if err_path.exists() else None
+        r.expect_exit(f"{rel} (check)", script_cmd("purepy_check.py", p), 3, error_substr=err_substr)
         r.run_python(f"{rel} (run)", interpreter, p)
 
     print("module-level/ill-formed/semantic/pending")
@@ -139,7 +146,9 @@ def main():
 
     print("module-level/ill-formed/unsupported")
     for p in sorted((module / "ill-formed" / "unsupported").glob("*.py")):
-        r.expect_exit(str(p.relative_to(ROOT)), script_cmd("purepy_parse.py", p), 1)
+        err_path = p.with_suffix(".error.expected")
+        err_substr = err_path.read_text().strip() if err_path.exists() else None
+        r.expect_exit(str(p.relative_to(ROOT)), script_cmd("purepy_parse.py", p), 1, error_substr=err_substr)
 
     print("module-level/ill-formed/syntactic-only")
     for p in sorted((module / "ill-formed" / "syntactic-only").glob("*.py")):
