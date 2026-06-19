@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma \vdash_M m : \Delta$}
+\flushleft \shadebox{$\Gamma \vdash m : \Delta$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{empty}}]
@@ -7,7 +7,7 @@
   \strut
 }
 {
-  \Gamma \vdash_M \varepsilon : \varnothing
+  \Gamma \vdash \varepsilon : \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{import}}]
@@ -15,7 +15,7 @@
   M' = x_1.x_2.\ldots.x_{n+1}
 }
 {
-  \Gamma \vdash_M \exImport{M'} : \statusDefAssigned(\set{x_1})
+  \Gamma \vdash \exImport{M'} : \statusDefAssigned(\set{x_1})
 }
 \and
 \inferrule*[lab={\ruleName{from-import}}]
@@ -23,48 +23,48 @@
   \strut
 }
 {
-  \Gamma \vdash_M \exFromImport{M'}{x_1, \ldots, x_{n+1}} : \statusDefAssigned(\set{x_1, \ldots, x_{n+1}})
+  \Gamma \vdash \exFromImport{M'}{x_1, \ldots, x_{n+1}} : \statusDefAssigned(\set{x_1, \ldots, x_{n+1}})
 }
 \and
 \inferrule*[lab={\ruleName{seq}}]
 {
-  \Gamma \vdash_M t : \Delta \\
-  \Gamma \runion \Delta \vdash_M m : \Delta' \\
+  \Gamma \vdash t : \Delta \\
+  \Gamma \runion \Delta \vdash m : \Delta' \\
   \capturesS(t) \cap \assignsS(m) = \varnothing
 }
 {
-  \Gamma \vdash_M t \cons m : \Delta \runion \Delta'
+  \Gamma \vdash t \cons m : \Delta \runion \Delta'
 }
 \and
 \inferrule*[lab={\ruleName{stmt-tail}}]
 {
   \Gamma \vdash s : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash_M m : \Delta' \\
+  \Gamma \runion \Delta \vdash m : \Delta' \\
   \capturesS(s) \cap \assignsS(m) = \varnothing
 }
 {
-  \Gamma \vdash_M s \cons m : \Delta \runion \Delta'
+  \Gamma \vdash s \cons m : \Delta \runion \Delta'
 }
 \and
 \inferrule*[lab={\ruleName{class-tail}}]
 {
   x_1, \ldots, x_n \text{ distinct} \\
-  \Gamma \vdash_M m : \Delta
+  \Gamma \vdash m : \Delta
 }
 {
-  \Gamma \vdash_M \exDataclass{C}{\exField{x_1} \;\ldots\; \exField{x_n}} \cons m : \Delta
+  \Gamma \vdash \exDataclass{C}{\exField{x_1} \;\ldots\; \exField{x_n}} \cons m : \Delta
 }
 \and
 \inferrule*[lab={\ruleName{class-extend-tail}}]
 {
   B \in \dom(\Lambda_M) \\
   x_1, \ldots, x_n \text{ distinct and disjoint from } \fields_M(B) \\
-  \Gamma \vdash_M m : \Delta
+  \Gamma \vdash m : \Delta
 }
 {
-  \Gamma \vdash_M \exDataclassExtend{C}{B}{\exField{x_1} \;\ldots\; \exField{x_n}} \cons m : \Delta
+  \Gamma \vdash \exDataclassExtend{C}{B}{\exField{x_1} \;\ldots\; \exField{x_n}} \cons m : \Delta
 }
 \end{mathpar}
-\caption{Module body $m$ of $M$ is well-formed in $\Gamma$}
+\caption{Body $m$ of module $M$ is well-formed in $\Gamma$}
 \label{fig:well-formed-top}
 \end{figure}
