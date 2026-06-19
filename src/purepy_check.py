@@ -41,6 +41,8 @@ class ClassInfo:
 
 ClassContext = dict[str, ClassInfo]   # Λ_M
 
+_LAMBDA_M: ClassContext = {}          # ambient class context (set per module)
+
 
 @dataclass(frozen=True)
 class TyReturns:
@@ -304,6 +306,11 @@ def check_expr(e: ast.expr, gamma: Context) -> Result:
         gamma_ = extend(gamma, {p: TT for p in params})
         return check_expr(e.body, gamma_)
     if isinstance(e, ast.Call):
+        if isinstance(e.func, ast.Name) and e.func.id in _LAMBDA_M:
+            arity = len(fields_of(_LAMBDA_M, e.func.id))
+            if len(e.args) != arity:
+                return ill_formed(e, f"[constr] '{e.func.id}' expects {arity} positional argument(s), got {len(e.args)}")
+            return check_exprs(e.args, gamma)
         err = check_expr(e.func, gamma)
         if not is_ok(err):
             return err
@@ -409,10 +416,45 @@ def _pattern_vars(p: ast.pattern) -> list[str]:
         return sub + ([p.name] if p.name else [])
     if isinstance(p, ast.MatchSequence):
         return [v for sub in p.patterns for v in _pattern_vars(sub)]
+    if isinstance(p, ast.MatchClass):
+        return [v for sub in p.patterns for v in _pattern_vars(sub)] + \
+               [v for sub in p.kwd_patterns for v in _pattern_vars(sub)]
     raise AssertionError(f'unexpected pattern: {type(p).__name__}')
+
+def check_pattern_wf(p: ast.pattern) -> Result:
+    if isinstance(p, ast.MatchClass):
+        assert isinstance(p.cls, ast.Name)
+        c = p.cls.id
+        if c not in _LAMBDA_M:
+            return ill_formed(p, f"[pat-class] '{c}' is not a declared class")
+        fields = fields_of(_LAMBDA_M, c)
+        n, m = len(p.patterns), len(p.kwd_patterns)
+        if n + m != len(fields):
+            return ill_formed(p, f"[pat-class] '{c}' expects {len(fields)} sub-pattern(s) (saturated), got {n + m}")
+        remaining = set(fields[n:])
+        kwds = list(p.kwd_attrs)
+        if len(kwds) != len(set(kwds)):
+            return ill_formed(p, f"[pat-class] duplicate keyword in pattern for '{c}'")
+        if set(kwds) != remaining:
+            return ill_formed(p, f"[pat-class] keyword names for '{c}' must be exactly {sorted(remaining)}")
+        subs = list(p.patterns) + list(p.kwd_patterns)
+    elif isinstance(p, ast.MatchSequence):
+        subs = list(p.patterns)
+    elif isinstance(p, ast.MatchAs) and p.pattern is not None:
+        subs = [p.pattern]
+    else:
+        subs = []
+    for sub in subs:
+        err = check_pattern_wf(sub)
+        if not is_ok(err):
+            return err
+    return ok()
 
 def check_pattern_list(patterns: list[ast.pattern], node: ast.AST) -> Result:
     for i, p in enumerate(patterns):
+        err = check_pattern_wf(p)
+        if not is_ok(err):
+            return err
         vars_ = _pattern_vars(p)
         if len(vars_) != len(set(vars_)):
             return ill_formed(node, f'repeated variable in pattern {i + 1}')
@@ -429,6 +471,11 @@ def binds(pattern: ast.pattern) -> set[str]:
         return sub | ({pattern.name} if pattern.name else set())
     if isinstance(pattern, ast.MatchSequence):
         return set().union(*(binds(p) for p in pattern.patterns))
+    if isinstance(pattern, ast.MatchClass):
+        result: set[str] = set()
+        for p in list(pattern.patterns) + list(pattern.kwd_patterns):
+            result |= binds(p)
+        return result
     raise AssertionError(f'unexpected pattern: {type(pattern).__name__}')
 
 def fv(e: ast.expr) -> set[str]:
@@ -738,6 +785,8 @@ def check_module(tree: ast.AST) -> Result:
     err = check_class_decls(tree.body, cc)
     if not is_ok(err):
         return err
+    global _LAMBDA_M
+    _LAMBDA_M = cc
     ctx = dict(BUILTINS)
     ctx['__name__'] = TT
     err = check_block(tree.body, ctx)

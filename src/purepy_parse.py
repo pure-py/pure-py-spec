@@ -151,9 +151,8 @@ def check_classdef(node: ast.ClassDef) -> Result:
         return unsupported(node, 'only the @dataclass decorator is supported on classes')
     if len(node.bases) > 1:
         return unsupported(node, 'at most one base class is supported')
-    for base in node.bases:
-        if not isinstance(base, ast.Name):
-            return unsupported(node, 'base class must be a simple name')
+    if node.bases and not isinstance(node.bases[0], ast.Name):
+        return unsupported(node, 'base class must be a simple name')
     if len(node.keywords) > 0:
         return unsupported(node, 'class keyword arguments not supported')
     if len(node.body) == 1 and isinstance(node.body[0], ast.Pass):
@@ -194,7 +193,9 @@ def check_pattern(node: ast.pattern) -> Result:
                 return r
         return ok()
     if isinstance(node, ast.MatchClass):
-        return not_yet(node, 'class patterns not yet supported', 8)
+        if not isinstance(node.cls, ast.Name):
+            return unsupported(node, 'class pattern head must be a simple name')
+        return check_all(list(node.patterns) + list(node.kwd_patterns), check_pattern)
     if isinstance(node, ast.MatchMapping):
         return not_yet(node, 'mapping patterns not yet supported', 87)
     if isinstance(node, ast.MatchOr):
