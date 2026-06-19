@@ -41,8 +41,6 @@ class ClassInfo:
 
 ClassContext = dict[str, ClassInfo]   # Λ_M
 
-_LAMBDA_M: ClassContext = {}          # ambient class context (set per module)
-
 
 @dataclass(frozen=True)
 class TyReturns:
@@ -62,8 +60,8 @@ BUILTINS: Context = {'print': TT, 'type': TT, 'range': TT, 'len': TT}
 def empty_context() -> Context:
     return {}
 
-def extend(gamma: Context, delta: Context) -> Context:
-    new = dict(gamma)
+def extend(var_ctx: Context, delta: Context) -> Context:
+    new = dict(var_ctx)
     new.update(delta)
     return new
 
@@ -144,16 +142,16 @@ def result_type_of_block(block: list[ast.stmt]) -> ResultTy:
 def _result_type_of_item(stmt: ast.stmt) -> ResultTy:
     return result_type(stmt)
 
-def check_block(block: list[ast.stmt], gamma: Context) -> Result:
+def check_block(block: list[ast.stmt], var_ctx: Context, class_ctx: ClassContext) -> Result:
     items = items_of_block(block)
-    return check_items(items, gamma)
+    return check_items(items, var_ctx, class_ctx)
 
-def check_items(items: list[Item], gamma: Context) -> Result:
+def check_items(items: list[Item], var_ctx: Context, class_ctx: ClassContext) -> Result:
     if len(items) == 1:
-        return check_item(items[0], gamma)
+        return check_item(items[0], var_ctx, class_ctx)
     head = items[0]
     tail = items[1:]
-    err = check_item(head, gamma)
+    err = check_item(head, var_ctx, class_ctx)
     if not is_ok(err):
         return err
     if isinstance(item_result_type(head), TyReturns):
@@ -168,7 +166,7 @@ def check_items(items: list[Item], gamma: Context) -> Result:
         return ill_formed(ra_node, f"[seq] '{name}' captured by previous statement, reassigned here")
     head_result = item_result_type(head)
     delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
-    return check_items(tail, extend(gamma, delta))
+    return check_items(tail, extend(var_ctx, delta), class_ctx)
 
 def item_result_type(item: Item) -> ResultTy:
     if isinstance(item, list):
@@ -192,32 +190,32 @@ def _extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[
         return _extend_region(region + [head], rest[1:])
     return [region] + items_of_block(rest)
 
-def check_item(item: Item, gamma: Context) -> Result:
+def check_item(item: Item, var_ctx: Context, class_ctx: ClassContext) -> Result:
     if isinstance(item, list):
-        return check_mutual_region(item, gamma)
-    return check_stmt(item, gamma)
+        return check_mutual_region(item, var_ctx, class_ctx)
+    return check_stmt(item, var_ctx, class_ctx)
 
-def check_mutual_region(defs: list[ast.FunctionDef], gamma: Context) -> Result:
+def check_mutual_region(defs: list[ast.FunctionDef], var_ctx: Context, class_ctx: ClassContext) -> Result:
     err = check_distinct_names(defs, set())
     if not is_ok(err):
         return err
-    return check_bodies(defs, gamma)
+    return check_bodies(defs, var_ctx, class_ctx)
 
-def check_bodies(defs: list[ast.FunctionDef], gamma: Context) -> Result:
+def check_bodies(defs: list[ast.FunctionDef], var_ctx: Context, class_ctx: ClassContext) -> Result:
     f_names = {d.name: TT for d in defs}
-    return _check_bodies(defs, gamma, f_names)
+    return _check_bodies(defs, var_ctx, f_names, class_ctx)
 
-def _check_bodies(defs: list[ast.FunctionDef], gamma: Context, f_names: Context) -> Result:
+def _check_bodies(defs: list[ast.FunctionDef], var_ctx: Context, f_names: Context, class_ctx: ClassContext) -> Result:
     if not defs:
         return ok()
     d = defs[0]
     params = {a.arg for a in d.args.args}
     locals_ = assigns_block(d.body) - params
-    body_gamma = extend(extend(extend(gamma, f_names), {p: TT for p in params}), {x: FF for x in locals_})
-    err = check_block(d.body, body_gamma)
+    body_var_ctx = extend(extend(extend(var_ctx, f_names), {p: TT for p in params}), {x: FF for x in locals_})
+    err = check_block(d.body, body_var_ctx, class_ctx)
     if not is_ok(err):
         return err
-    return _check_bodies(defs[1:], gamma, f_names)
+    return _check_bodies(defs[1:], var_ctx, f_names, class_ctx)
 
 def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> Result:
     if not targets:
@@ -235,37 +233,37 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> Result:
         return ill_formed(head, f"[mutual] duplicate name '{head.name}' in mutual region")
     return check_distinct_names(defs[1:], seen | {head.name})
 
-def check_stmt(s: ast.stmt, gamma: Context) -> Result:
+def check_stmt(s: ast.stmt, var_ctx: Context, class_ctx: ClassContext) -> Result:
     if isinstance(s, ast.Pass):
         return ok()
     if isinstance(s, ast.Assign):
-        err = check_expr(s.value, gamma)
+        err = check_expr(s.value, var_ctx, class_ctx)
         if not is_ok(err):
             return err
         captured = captures(s.value)
         return check_assign_targets(s.targets, captured)
     if isinstance(s, ast.Expr):
-        return check_expr(s.value, gamma)
+        return check_expr(s.value, var_ctx, class_ctx)
     if isinstance(s, ast.Return):
         if s.value is not None:
-            return check_expr(s.value, gamma)
+            return check_expr(s.value, var_ctx, class_ctx)
         return ok()
     if isinstance(s, ast.If):
-        err = check_expr(s.test, gamma)
+        err = check_expr(s.test, var_ctx, class_ctx)
         if not is_ok(err):
             return err
-        err = check_block(s.body, gamma)
+        err = check_block(s.body, var_ctx, class_ctx)
         if not is_ok(err):
             return err
         if s.orelse:
-            return check_block(s.orelse, gamma)
+            return check_block(s.orelse, var_ctx, class_ctx)
         return ok()
     if isinstance(s, ast.Assert):
-        err = check_expr(s.test, gamma)
+        err = check_expr(s.test, var_ctx, class_ctx)
         if not is_ok(err):
             return err
         if s.msg is not None:
-            return check_expr(s.msg, gamma)
+            return check_expr(s.msg, var_ctx, class_ctx)
         return ok()
     if isinstance(s, ast.Import):
         return ok()
@@ -274,109 +272,109 @@ def check_stmt(s: ast.stmt, gamma: Context) -> Result:
             return ill_formed(s, '[from-import] empty name list')
         return ok()
     if isinstance(s, ast.Match):
-        err = check_expr(s.subject, gamma)
+        err = check_expr(s.subject, var_ctx, class_ctx)
         if not is_ok(err):
             return err
         patterns = [c.pattern for c in s.cases]
-        err = check_pattern_list(patterns, s)
+        err = check_pattern_list(patterns, s, class_ctx)
         if not is_ok(err):
             return err
-        return _check_match_cases(s.cases, gamma)
+        return _check_match_cases(s.cases, var_ctx, class_ctx)
     if isinstance(s, ast.ClassDef):
         return ok()
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
-def _check_match_cases(cases: list[ast.match_case], gamma: Context) -> Result:
+def _check_match_cases(cases: list[ast.match_case], var_ctx: Context, class_ctx: ClassContext) -> Result:
     for case in cases:
-        case_gamma = extend(gamma, {x: TT for x in binds(case.pattern)})
-        err = check_block(case.body, case_gamma)
+        case_gamma = extend(var_ctx, {x: TT for x in binds(case.pattern)})
+        err = check_block(case.body, case_gamma, class_ctx)
         if not is_ok(err):
             return err
     return ok()
 
-def check_expr(e: ast.expr, gamma: Context) -> Result:
+def check_expr(e: ast.expr, var_ctx: Context, class_ctx: ClassContext) -> Result:
     if isinstance(e, ast.Name):
-        if gamma.get(e.id) != TT:
+        if var_ctx.get(e.id) != TT:
             return ill_formed(e, f"[var] '{e.id}' is not definitely assigned")
         return ok()
     if isinstance(e, ast.Constant):
         return ok()
     if isinstance(e, ast.Lambda):
         params = {a.arg for a in e.args.args}
-        gamma_ = extend(gamma, {p: TT for p in params})
-        return check_expr(e.body, gamma_)
+        gamma_ = extend(var_ctx, {p: TT for p in params})
+        return check_expr(e.body, gamma_, class_ctx)
     if isinstance(e, ast.Call):
-        if isinstance(e.func, ast.Name) and e.func.id in _LAMBDA_M:
-            arity = len(fields_of(_LAMBDA_M, e.func.id))
+        if isinstance(e.func, ast.Name) and e.func.id in class_ctx:
+            arity = len(fields_of(class_ctx, e.func.id))
             if len(e.args) != arity:
                 return ill_formed(e, f"[constr] '{e.func.id}' expects {arity} positional argument(s), got {len(e.args)}")
-            return check_exprs(e.args, gamma)
-        err = check_expr(e.func, gamma)
+            return check_exprs(e.args, var_ctx, class_ctx)
+        err = check_expr(e.func, var_ctx, class_ctx)
         if not is_ok(err):
             return err
-        return check_exprs(e.args, gamma)
+        return check_exprs(e.args, var_ctx, class_ctx)
     if isinstance(e, ast.BinOp):
-        err = check_expr(e.left, gamma)
+        err = check_expr(e.left, var_ctx, class_ctx)
         if not is_ok(err):
             return err
-        return check_expr(e.right, gamma)
+        return check_expr(e.right, var_ctx, class_ctx)
     if isinstance(e, ast.UnaryOp):
-        return check_expr(e.operand, gamma)
+        return check_expr(e.operand, var_ctx, class_ctx)
     if isinstance(e, ast.BoolOp):
-        return check_exprs(e.values, gamma)
+        return check_exprs(e.values, var_ctx, class_ctx)
     if isinstance(e, ast.Compare):
-        err = check_expr(e.left, gamma)
+        err = check_expr(e.left, var_ctx, class_ctx)
         if not is_ok(err):
             return err
-        return check_exprs(e.comparators, gamma)
+        return check_exprs(e.comparators, var_ctx, class_ctx)
     if isinstance(e, ast.IfExp):
-        err = check_expr(e.test, gamma)
+        err = check_expr(e.test, var_ctx, class_ctx)
         if not is_ok(err):
             return err
-        err = check_expr(e.body, gamma)
+        err = check_expr(e.body, var_ctx, class_ctx)
         if not is_ok(err):
             return err
-        return check_expr(e.orelse, gamma)
+        return check_expr(e.orelse, var_ctx, class_ctx)
     if isinstance(e, ast.Attribute):
-        return check_expr(e.value, gamma)
+        return check_expr(e.value, var_ctx, class_ctx)
     if isinstance(e, ast.Subscript):
-        err = check_expr(e.value, gamma)
+        err = check_expr(e.value, var_ctx, class_ctx)
         if not is_ok(err):
             return err
-        return check_expr(e.slice, gamma)
+        return check_expr(e.slice, var_ctx, class_ctx)
     if isinstance(e, (ast.List, ast.Tuple)):
-        return check_exprs(e.elts, gamma)
+        return check_exprs(e.elts, var_ctx, class_ctx)
     if isinstance(e, ast.Dict):
-        err = check_exprs([k for k in e.keys if k is not None], gamma)
+        err = check_exprs([k for k in e.keys if k is not None], var_ctx, class_ctx)
         if not is_ok(err):
             return err
-        return check_exprs(e.values, gamma)
+        return check_exprs(e.values, var_ctx, class_ctx)
     if isinstance(e, (ast.List, ast.Tuple)):
-        return check_exprs(e.elts, gamma)
+        return check_exprs(e.elts, var_ctx, class_ctx)
     if isinstance(e, ast.ListComp):
-        return check_comprehension(e.elt, e.generators, gamma)
+        return check_comprehension(e.elt, e.generators, var_ctx, class_ctx)
     raise AssertionError(f'unexpected expression: {type(e).__name__}')
 
-def check_comprehension(elt: ast.expr, generators: list[ast.comprehension], gamma: Context) -> Result:
+def check_comprehension(elt: ast.expr, generators: list[ast.comprehension], var_ctx: Context, class_ctx: ClassContext) -> Result:
     if not generators:
-        return check_expr(elt, gamma)
+        return check_expr(elt, var_ctx, class_ctx)
     g = generators[0]
-    err = check_expr(g.iter, gamma)
+    err = check_expr(g.iter, var_ctx, class_ctx)
     if not is_ok(err):
         return err
-    gamma_ = extend(gamma, {n: TT for n in names_in_target(g.target)})
-    err = check_exprs(g.ifs, gamma_)
+    gamma_ = extend(var_ctx, {n: TT for n in names_in_target(g.target)})
+    err = check_exprs(g.ifs, gamma_, class_ctx)
     if not is_ok(err):
         return err
-    return check_comprehension(elt, generators[1:], gamma_)
+    return check_comprehension(elt, generators[1:], gamma_, class_ctx)
 
-def check_exprs(es: list[ast.expr], gamma: Context) -> Result:
+def check_exprs(es: list[ast.expr], var_ctx: Context, class_ctx: ClassContext) -> Result:
     if not es:
         return ok()
-    err = check_expr(es[0], gamma)
+    err = check_expr(es[0], var_ctx, class_ctx)
     if not is_ok(err):
         return err
-    return check_exprs(es[1:], gamma)
+    return check_exprs(es[1:], var_ctx, class_ctx)
 
 def _is_catch_all(p: ast.pattern) -> bool:
     return isinstance(p, ast.MatchAs) and p.pattern is None
@@ -421,13 +419,13 @@ def _pattern_vars(p: ast.pattern) -> list[str]:
                [v for sub in p.kwd_patterns for v in _pattern_vars(sub)]
     raise AssertionError(f'unexpected pattern: {type(p).__name__}')
 
-def check_pattern_wf(p: ast.pattern) -> Result:
+def check_pattern_wf(p: ast.pattern, class_ctx: ClassContext) -> Result:
     if isinstance(p, ast.MatchClass):
         assert isinstance(p.cls, ast.Name)
         c = p.cls.id
-        if c not in _LAMBDA_M:
+        if c not in class_ctx:
             return ill_formed(p, f"[pat-class] '{c}' is not a declared class")
-        fields = fields_of(_LAMBDA_M, c)
+        fields = fields_of(class_ctx, c)
         n, m = len(p.patterns), len(p.kwd_patterns)
         if n + m != len(fields):
             return ill_formed(p, f"[pat-class] '{c}' expects {len(fields)} sub-pattern(s) (saturated), got {n + m}")
@@ -445,14 +443,14 @@ def check_pattern_wf(p: ast.pattern) -> Result:
     else:
         subs = []
     for sub in subs:
-        err = check_pattern_wf(sub)
+        err = check_pattern_wf(sub, class_ctx)
         if not is_ok(err):
             return err
     return ok()
 
-def check_pattern_list(patterns: list[ast.pattern], node: ast.AST) -> Result:
+def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, class_ctx: ClassContext) -> Result:
     for i, p in enumerate(patterns):
-        err = check_pattern_wf(p)
+        err = check_pattern_wf(p, class_ctx)
         if not is_ok(err):
             return err
         vars_ = _pattern_vars(p)
@@ -779,17 +777,15 @@ def check_module(tree: ast.AST) -> Result:
     nested = _find_nested_import(tree.body)
     if nested is not None:
         return ill_formed(nested, '[import] import only allowed at module top level')
-    cc = build_class_context(tree.body)
-    if isinstance(cc, Error):
-        return cc
-    err = check_class_decls(tree.body, cc)
+    class_ctx = build_class_context(tree.body)
+    if isinstance(class_ctx, Error):
+        return class_ctx
+    err = check_class_decls(tree.body, class_ctx)
     if not is_ok(err):
         return err
-    global _LAMBDA_M
-    _LAMBDA_M = cc
     ctx = dict(BUILTINS)
     ctx['__name__'] = TT
-    err = check_block(tree.body, ctx)
+    err = check_block(tree.body, ctx, class_ctx)
     if not is_ok(err):
         return err
     if isinstance(result_type_of_block(tree.body), TyReturns):
