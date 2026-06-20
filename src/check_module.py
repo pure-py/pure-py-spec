@@ -484,13 +484,8 @@ def names_in_target(target: ast.expr) -> set[str]:
     if isinstance(target, ast.Name):
         return {target.id}
     if isinstance(target, ast.Tuple):
-        return names_in_targets(target.elts)
+        return {n for t in target.elts for n in names_in_target(t)}
     return set()
-
-def names_in_targets(targets: list[ast.expr]) -> set[str]:
-    if len(targets) == 0:
-        return set()
-    return names_in_target(targets[0]) | names_in_targets(targets[1:])
 
 def captures(e: ast.expr) -> set[str]:
     if isinstance(e, ast.Lambda):
@@ -673,10 +668,10 @@ def find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST |
             if r is not None:
                 return r
         if isinstance(s, ast.Match):
-            for case in s.cases:
-                r = find_nested_import(case.body, nested=True)
-                if r is not None:
-                    return r
+            results = (find_nested_import(case.body, nested=True) for case in s.cases)
+            r = next((x for x in results if x is not None), None)
+            if r is not None:
+                return r
     return None
 
 def class_field_names(node: ast.ClassDef) -> list[str]:
