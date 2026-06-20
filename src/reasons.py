@@ -74,7 +74,7 @@ class PatternArityMismatch:
     expected: int
     got: int
     def message(self) -> str:
-        return f"'{self.cls}' expects {self.expected} sub-pattern(s) (saturated), got {self.got}"
+        return f"pattern for '{self.cls}' expects {self.expected} sub-patterns, got {self.got}"
 
 
 @dataclass(frozen=True)
@@ -89,7 +89,7 @@ class UnknownFieldInPattern:
     cls: str
     expected_fields: tuple[str, ...]
     def message(self) -> str:
-        return f"keyword names for '{self.cls}' must be exactly {list(self.expected_fields)}"
+        return f"pattern keywords for '{self.cls}' must be {', '.join(self.expected_fields)}"
 
 
 @dataclass(frozen=True)

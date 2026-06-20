@@ -1,1 +1,1 @@
-keyword names for 'Point' must be exactly ['x', 'y']
+pattern keywords for 'Point' must be x, y
