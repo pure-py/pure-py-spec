@@ -1,1 +1,1 @@
-[NestedImport]
+import only allowed at module top level

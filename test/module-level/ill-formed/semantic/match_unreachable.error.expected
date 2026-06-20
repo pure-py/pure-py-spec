@@ -1,1 +1,1 @@
-[UnreachableCase]
+case 2 unreachable: subsumed by case 1

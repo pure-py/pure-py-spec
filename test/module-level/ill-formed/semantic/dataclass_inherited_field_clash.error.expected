@@ -1,1 +1,1 @@
-[InheritedFieldClash]
+field 'x' clashes with inherited field from 'Base'

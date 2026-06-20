@@ -1,1 +1,1 @@
-[UnknownFieldInPattern]
+keyword names for 'Point' must be exactly ['x', 'y']
