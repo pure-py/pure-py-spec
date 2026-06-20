@@ -14,46 +14,45 @@
 {
   \mu, M \Rightarrow_{\mathsf{load}} \mu' \\
   M = x_1.x_2.\ldots.x_{n+1} \\
-  \mu', \rho \runion \set{x_1 \mapsto \mu'(x_1)}, m \Rightarrow \mu'', \rho_m
+  \mu', \rho \runion \set{x_1 \mapsto \mu'(x_1)}, m \Rightarrow \mu'', \rho'
 }
 {
-  \mu, \rho, \exImport{M} \cons m \Rightarrow \mu'', \set{x_1 \mapsto \mu'(x_1)} \runion \rho_m
+  \mu, \rho, \exImport{M} \cons m \Rightarrow \mu'', \set{x_1 \mapsto \mu'(x_1)} \runion \rho'
 }
 \and
 \inferrule*[lab={\ruleName{eval-from-import}}]
 {
   \mu, M \Rightarrow_{\mathsf{load}} \mu' \\
-  \mu'(M) = \exObj{\bot}{\rho''} \\
-  \rho_t = \set{x_1 \mapsto \rho''(x_1), \ldots, x_{n+1} \mapsto \rho''(x_{n+1})} \\
-  \mu', \rho \runion \rho_t, m \Rightarrow \mu'', \rho_m
+  \mu'(M) = \exObj{\bot}{\rho'} \\
+  \mu', \rho \runion \set{x_1 \mapsto \rho'(x_1), \ldots, x_{n+1} \mapsto \rho'(x_{n+1})}, m \Rightarrow \mu'', \rho''
 }
 {
-  \mu, \rho, \exFromImport{M}{x_1, \ldots, x_{n+1}} \cons m \Rightarrow \mu'', \rho_t \runion \rho_m
+  \mu, \rho, \exFromImport{M}{x_1, \ldots, x_{n+1}} \cons m \Rightarrow \mu'', \set{x_1 \mapsto \rho'(x_1), \ldots, x_{n+1} \mapsto \rho'(x_{n+1})} \runion \rho''
 }
 \and
 \inferrule*[lab={\ruleName{eval-statement}}]
 {
-  \rho, s \Rightarrow \assigns{\rho_s} \\
-  \mu, \rho \runion \rho_s, m \Rightarrow \mu', \rho_m
+  \rho, s \Rightarrow \assigns{\rho'} \\
+  \mu, \rho \runion \rho', m \Rightarrow \mu', \rho''
 }
 {
-  \mu, \rho, s \cons m \Rightarrow \mu', \rho_s \runion \rho_m
+  \mu, \rho, s \cons m \Rightarrow \mu', \rho' \runion \rho''
 }
 \and
 \inferrule*[lab={\ruleName{eval-class}}]
 {
-  \mu, \rho, m \Rightarrow \mu', \rho_m
+  \mu, \rho, m \Rightarrow \mu', \rho'
 }
 {
-  \mu, \rho, \exDataclass{C}{\phi} \cons m \Rightarrow \mu', \rho_m
+  \mu, \rho, \exDataclass{C}{\phi} \cons m \Rightarrow \mu', \rho'
 }
 \and
 \inferrule*[lab={\ruleName{eval-class-extend}}]
 {
-  \mu, \rho, m \Rightarrow \mu', \rho_m
+  \mu, \rho, m \Rightarrow \mu', \rho'
 }
 {
-  \mu, \rho, \exDataclassExtend{C}{B}{\phi} \cons m \Rightarrow \mu', \rho_m
+  \mu, \rho, \exDataclassExtend{C}{B}{\phi} \cons m \Rightarrow \mu', \rho'
 }
 \end{mathpar}
 
