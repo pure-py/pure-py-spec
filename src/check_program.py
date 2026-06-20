@@ -4,8 +4,7 @@ import sys
 from typing import Optional
 
 import parse
-import check_module
-from check_module import IllFormed, IllFormedModule, Result
+from check_module import IllFormed, IllFormedModule, Result, walk_module
 
 
 # Modules the runtime provides if the user has no file of the same name.
@@ -46,22 +45,20 @@ def resolve(name: str, base_dir: pathlib.Path) -> Optional[pathlib.Path]:
     return None
 
 
-def load(name: str, base_dir: pathlib.Path) -> tuple[Optional[ast.Module], Result]:
-    """Load module `name` from base_dir. Returns (tree, ok()) on success;
-    (None, error) if missing or fails to parse; (tree, error) if the syntactic
-    subset rejects."""
+def load(name: str, base_dir: pathlib.Path) -> ast.Module:
+    """Load and syntactically-check module `name`. Raises IllFormedProgram if
+    the file is missing, fails to parse, or violates the PurePy subset."""
     path = resolve(name, base_dir)
     if path is None:
-        return None, IllFormedProgram(f"module {name!r} not found under {base_dir}")
+        raise IllFormedProgram(f"module {name!r} not found under {base_dir}")
     try:
         tree = ast.parse(path.read_text(), filename=str(path))
     except SyntaxError as e:
-        return None, IllFormedProgram(f"{path}: parse error: {e}")
+        raise IllFormedProgram(f"{path}: parse error: {e}") from e
     parse_err = parse.check_module(tree)
     if parse_err is not None:
-        assert parse_err is not None
-        return tree, IllFormedProgram(f"{path}: {parse_err.msg}")
-    return tree, None
+        raise IllFormedProgram(f"{path}: {parse_err.msg}")
+    return tree
 
 
 def has_cycle(graph: dict[str, set[str]]) -> list[str]:
@@ -95,6 +92,13 @@ def has_cycle(graph: dict[str, set[str]]) -> list[str]:
 
 
 def check_program(entry_path: pathlib.Path) -> Result:
+    try:
+        walk_program(entry_path)
+        return None
+    except IllFormed as e:
+        return e
+
+def walk_program(entry_path: pathlib.Path) -> None:
     base_dir = entry_path.parent
     modules: dict[str, tuple[pathlib.Path, ast.Module]] = {}
     imports_by_module: dict[str, set[str]] = {}  # cached imports_of(modules[name])
@@ -108,10 +112,8 @@ def check_program(entry_path: pathlib.Path) -> Result:
             modules[name] = (pathlib.Path(f"<{name}>"), ast.Module(body=[], type_ignores=[]))
             imports_by_module[name] = set()
             continue
-        tree, err = load(name, base_dir)
-        if err is not None:
-            return err
-        assert tree is not None and path is not None
+        tree = load(name, base_dir)
+        assert path is not None
         modules[name] = (path, tree)
         imports_by_module[name] = imports_of(tree)
         for imp in imports_by_module[name]:
@@ -119,18 +121,18 @@ def check_program(entry_path: pathlib.Path) -> Result:
 
     # Per-module well-formedness.
     for path, tree in modules.values():
-        err = check_module.check_module(tree)
-        if isinstance(err, IllFormedModule):
-            err.msg = f"{path}: {err.msg}"
-            return err
+        try:
+            walk_module(tree)
+        except IllFormedModule as e:
+            e.msg = f"{path}: {e.msg}"
+            raise
 
     # Acyclicity. (Resolution is already guaranteed by the walk loop above.)
     graph = {name: imps | parents(name) | set().union(*(parents(i) for i in imps))
              for name, imps in imports_by_module.items()}
     cycle = has_cycle(graph)
     if len(cycle) > 0:
-        return IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
-    return None
+        raise IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
 
 
 def main() -> None:

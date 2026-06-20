@@ -140,11 +140,8 @@ def result_type(node: ast.stmt) -> ResultTy:
 
 def result_type_of_block(block: list[ast.stmt]) -> ResultTy:
     if len(block) == 1:
-        return result_type_of_item(block[0])
-    return runion_results(result_type_of_item(block[0]), result_type_of_block(block[1:]))
-
-def result_type_of_item(stmt: ast.stmt) -> ResultTy:
-    return result_type(stmt)
+        return result_type(block[0])
+    return runion_results(result_type(block[0]), result_type_of_block(block[1:]))
 
 def check_block(block: list[ast.stmt], ctx: Context) -> None:
     check_items(items_of_block(block), ctx)
@@ -725,9 +722,9 @@ def check_module(tree: ast.AST) -> Result:
     assert isinstance(tree, ast.Module)
     try:
         walk_module(tree)
+        return None
     except IllFormed as e:
         return e
-    return None
 
 def walk_module(tree: ast.Module) -> None:
     if len(tree.body) == 0:
