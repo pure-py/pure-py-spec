@@ -3,9 +3,9 @@ import pathlib
 import sys
 from typing import Optional
 
-import purepy_parse
-import purepy_check
-from purepy_check import IllFormed, Result, ok, is_ok
+import parse
+import check_module
+from check_module import IllFormed, Result, ok, is_ok
 
 
 ILL_FORMED_PROGRAM = 4
@@ -56,8 +56,8 @@ def _load(name: str, base_dir: pathlib.Path) -> tuple[Optional[ast.Module], Resu
         tree = ast.parse(path.read_text(), filename=str(path))
     except SyntaxError as e:
         return None, _program_error(f"{path}: parse error: {e}")
-    parse_err = purepy_parse.check_module(tree)
-    if not purepy_parse.is_ok(parse_err):
+    parse_err = parse.check_module(tree)
+    if not parse.is_ok(parse_err):
         assert parse_err is not None
         return tree, _program_error(f"{path}: {parse_err.msg}")
     return tree, ok()
@@ -118,7 +118,7 @@ def check_program(entry_path: pathlib.Path) -> Result:
 
     # Per-module well-formedness.
     for path, tree in modules.values():
-        err = purepy_check.check_module(tree)
+        err = check_module.check_module(tree)
         if not is_ok(err):
             assert err is not None
             return IllFormed(line=err.line, col=err.col, msg=f"{path}: {err.msg}", kind=err.kind)
@@ -135,7 +135,7 @@ def check_program(entry_path: pathlib.Path) -> Result:
 
 def main() -> None:
     if len(sys.argv) != 2:
-        print("Usage: purepy_check_program.py <entry-file>")
+        print("Usage: check_program.py <entry-file>")
         sys.exit(1)
     entry = pathlib.Path(sys.argv[1])
     result = check_program(entry)

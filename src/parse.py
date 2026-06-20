@@ -367,7 +367,7 @@ def format_result(result: Result, filename: str) -> str:
 
 def main() -> None:
     if len(sys.argv) < 2:
-        print('Usage: purepy_parse.py <file.py> [<file.py> ...]')
+        print('Usage: parse.py <file.py> [<file.py> ...]')
         sys.exit(1)
     exit_code = 0
     for filename in sys.argv[1:]:

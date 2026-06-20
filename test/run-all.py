@@ -76,7 +76,7 @@ class Runner:
             rel = d.relative_to(ROOT)
             main_py = d / "main.py"
             expected_exit_code = int((d / "expected_exit").read_text().strip())
-            self.expect_exit(f"{rel} (check)", script_cmd("purepy_check_program.py", main_py), expected_exit_code)
+            self.expect_exit(f"{rel} (check)", script_cmd("check_program.py", main_py), expected_exit_code)
             expected_path = d / "expected"
             if expected_path.exists():
                 self.run_python(f"{rel} (run)", interpreter, main_py, cwd=d, expected_path=expected_path)
@@ -103,9 +103,9 @@ def main():
     if not skip_mypy:
         print("mypy --strict src/")
         sources = [
-            str(ROOT / "src" / "purepy_parse.py"),
-            str(ROOT / "src" / "purepy_check.py"),
-            str(ROOT / "src" / "purepy_check_program.py"),
+            str(ROOT / "src" / "parse.py"),
+            str(ROOT / "src" / "check_module.py"),
+            str(ROOT / "src" / "check_program.py"),
         ]
         proc = subprocess.run(["mypy", "--strict", *sources], capture_output=True, text=True)
         if proc.returncode == 0:
@@ -120,35 +120,35 @@ def main():
         if not p.with_suffix(".expected").exists():
             r.bad(f"{rel} (run)", "missing .expected")
             continue
-        r.expect_exit(f"{rel} (parse)", script_cmd("purepy_parse.py", p), 0)
-        r.expect_exit(f"{rel} (check)", script_cmd("purepy_check.py", p), 0)
+        r.expect_exit(f"{rel} (parse)", script_cmd("parse.py", p), 0)
+        r.expect_exit(f"{rel} (check)", script_cmd("check_module.py", p), 0)
         r.run_python(f"{rel} (run)", interpreter, p)
 
     print("module-level/well-formed/pending")
     for p in sorted((module / "well-formed" / "pending").glob("*.py")):
-        r.expect_exit(str(p.relative_to(ROOT)), script_cmd("purepy_parse.py", p), 2)
+        r.expect_exit(str(p.relative_to(ROOT)), script_cmd("parse.py", p), 2)
 
     print("module-level/ill-formed/semantic")
     for p in sorted((module / "ill-formed" / "semantic").glob("*.py")):
         rel = p.relative_to(ROOT)
-        r.expect_exit(f"{rel} (parse)", script_cmd("purepy_parse.py", p), 0)
+        r.expect_exit(f"{rel} (parse)", script_cmd("parse.py", p), 0)
         err_path = p.with_suffix(".error.expected")
         err_substr = err_path.read_text().strip() if err_path.exists() else None
-        r.expect_exit(f"{rel} (check)", script_cmd("purepy_check.py", p), 3, error_substr=err_substr)
+        r.expect_exit(f"{rel} (check)", script_cmd("check_module.py", p), 3, error_substr=err_substr)
         r.run_python(f"{rel} (run)", interpreter, p)
 
     print("module-level/ill-formed/semantic/pending")
     for p in sorted((module / "ill-formed" / "semantic" / "pending").glob("*.py")):
         rel = p.relative_to(ROOT)
-        r.expect_exit(f"{rel} (parse)", script_cmd("purepy_parse.py", p), 0)
-        r.expect_exit(f"{rel} (check)", script_cmd("purepy_check.py", p), 0)
+        r.expect_exit(f"{rel} (parse)", script_cmd("parse.py", p), 0)
+        r.expect_exit(f"{rel} (check)", script_cmd("check_module.py", p), 0)
         r.run_python(f"{rel} (run)", interpreter, p)
 
     print("module-level/ill-formed/unsupported")
     for p in sorted((module / "ill-formed" / "unsupported").glob("*.py")):
         err_path = p.with_suffix(".error.expected")
         err_substr = err_path.read_text().strip() if err_path.exists() else None
-        r.expect_exit(str(p.relative_to(ROOT)), script_cmd("purepy_parse.py", p), 1, error_substr=err_substr)
+        r.expect_exit(str(p.relative_to(ROOT)), script_cmd("parse.py", p), 1, error_substr=err_substr)
 
     print("module-level/ill-formed/syntactic-only")
     for p in sorted((module / "ill-formed" / "syntactic-only").glob("*.py")):

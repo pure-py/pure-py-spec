@@ -7,7 +7,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(ROOT / "src"))
 
-from purepy_check import check_module
+from check_module import check_module
 
 
 def expect_rejected(tree: ast.Module, msg_contains: str = "") -> None:

@@ -4,8 +4,8 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Optional, Union
 
-import purepy_reasons
-from purepy_reasons import Reason
+import reasons
+from reasons import Reason
 
 ILL_FORMED = 3
 
@@ -175,13 +175,13 @@ def check_items(items: list[Item], ctx: Context) -> Result:
     if isinstance(item_result_type(head), TyReturns):
         first_unreachable = tail[0]
         node: ast.AST = first_unreachable[0] if isinstance(first_unreachable, list) else first_unreachable
-        return ill_formed(node, purepy_reasons.UnreachableStatement())
+        return ill_formed(node, reasons.UnreachableStatement())
     reassigned = captures_item(head) & assigns_items(tail)
     if reassigned:
         name = sorted(reassigned)[0]
         ra_node = find_first_reassigning(tail, reassigned)
         assert ra_node is not None
-        return ill_formed(ra_node, purepy_reasons.CapturedReassignment(name))
+        return ill_formed(ra_node, reasons.CapturedReassignment(name))
     head_result = item_result_type(head)
     delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
     return check_items(tail, extend_var(ctx, delta))
@@ -240,7 +240,7 @@ def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> Result:
         return ok()
     t = targets[0]
     if isinstance(t, ast.Name) and t.id in captured:
-        return ill_formed(t, purepy_reasons.SelfCaptureAssignment(t.id))
+        return ill_formed(t, reasons.SelfCaptureAssignment(t.id))
     return check_assign_targets(targets[1:], captured)
 
 def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> Result:
@@ -248,7 +248,7 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> Result:
         return ok()
     head = defs[0]
     if head.name in seen:
-        return ill_formed(head, purepy_reasons.DuplicateMutualName(head.name))
+        return ill_formed(head, reasons.DuplicateMutualName(head.name))
     return check_distinct_names(defs[1:], seen | {head.name})
 
 def check_stmt(s: ast.stmt, ctx: Context) -> Result:
@@ -287,7 +287,7 @@ def check_stmt(s: ast.stmt, ctx: Context) -> Result:
         return ok()
     if isinstance(s, ast.ImportFrom):
         if len(s.names) == 0:
-            return ill_formed(s, purepy_reasons.EmptyFromImport())
+            return ill_formed(s, reasons.EmptyFromImport())
         return ok()
     if isinstance(s, ast.Match):
         err = check_expr(s.subject, ctx)
@@ -309,7 +309,7 @@ def _check_match_cases(cases: list[ast.match_case], ctx: Context) -> Result:
 def check_expr(e: ast.expr, ctx: Context) -> Result:
     if isinstance(e, ast.Name):
         if ctx.var.get(e.id) != TT:
-            return ill_formed(e, purepy_reasons.UnassignedVariable(e.id))
+            return ill_formed(e, reasons.UnassignedVariable(e.id))
         return ok()
     if isinstance(e, ast.Constant):
         return ok()
@@ -321,7 +321,7 @@ def check_expr(e: ast.expr, ctx: Context) -> Result:
         if isinstance(e.func, ast.Name) and e.func.id in ctx.cls:
             arity = len(fields_of(ctx.cls, e.func.id))
             if len(e.args) != arity:
-                return ill_formed(e, purepy_reasons.ConstructorArityMismatch(e.func.id, arity, len(e.args)))
+                return ill_formed(e, reasons.ConstructorArityMismatch(e.func.id, arity, len(e.args)))
             return check_exprs(e.args, ctx)
         err = check_expr(e.func, ctx)
         if not is_ok(err):
@@ -438,17 +438,17 @@ def check_pattern_wf(p: ast.pattern, ctx: Context) -> Result:
         assert isinstance(p.cls, ast.Name)
         c = p.cls.id
         if c not in ctx.cls:
-            return ill_formed(p, purepy_reasons.UnknownClassInPattern(c))
+            return ill_formed(p, reasons.UnknownClassInPattern(c))
         fields = fields_of(ctx.cls, c)
         n, m = len(p.patterns), len(p.kwd_patterns)
         if n + m != len(fields):
-            return ill_formed(p, purepy_reasons.PatternArityMismatch(c, len(fields), n + m))
+            return ill_formed(p, reasons.PatternArityMismatch(c, len(fields), n + m))
         remaining = set(fields[n:])
         kwds = list(p.kwd_attrs)
         if len(kwds) != len(set(kwds)):
-            return ill_formed(p, purepy_reasons.DuplicatePatternKeyword(c))
+            return ill_formed(p, reasons.DuplicatePatternKeyword(c))
         if set(kwds) != remaining:
-            return ill_formed(p, purepy_reasons.UnknownFieldInPattern(c, tuple(sorted(remaining))))
+            return ill_formed(p, reasons.UnknownFieldInPattern(c, tuple(sorted(remaining))))
         subs = list(p.patterns) + list(p.kwd_patterns)
     elif isinstance(p, ast.MatchSequence):
         subs = list(p.patterns)
@@ -465,10 +465,10 @@ def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: Context)
             return err
         vars_ = _pattern_vars(p)
         if len(vars_) != len(set(vars_)):
-            return ill_formed(node, purepy_reasons.NonlinearPattern(i + 1))
+            return ill_formed(node, reasons.NonlinearPattern(i + 1))
         for j in range(i):
             if subsumes(p, patterns[j]):
-                return ill_formed(node, purepy_reasons.UnreachableCase(i + 1, j + 1))
+                return ill_formed(node, reasons.UnreachableCase(i + 1, j + 1))
     return ok()
 
 def binds(pattern: ast.pattern) -> set[str]:
@@ -736,7 +736,7 @@ def build_class_context(body: list[ast.stmt]) -> Union[ClassContext, IllFormed]:
     for s in body:
         if isinstance(s, ast.ClassDef):
             if s.name in lambda_m:
-                err = ill_formed(s, purepy_reasons.DuplicateClassName(s.name))
+                err = ill_formed(s, reasons.DuplicateClassName(s.name))
                 assert err is not None
                 return err
             base = s.bases[0].id if s.bases and isinstance(s.bases[0], ast.Name) else None
@@ -753,17 +753,17 @@ def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> Result:
     names = _class_field_names(node)
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
-        return ill_formed(node, purepy_reasons.DuplicateFieldName(dup, node.name))
+        return ill_formed(node, reasons.DuplicateFieldName(dup, node.name))
     if len(node.bases) == 0:
         return ok()
     base = node.bases[0]
     assert isinstance(base, ast.Name)
     if base.id not in lambda_m:
-        return ill_formed(node, purepy_reasons.UnknownBaseClass(base.id))
+        return ill_formed(node, reasons.UnknownBaseClass(base.id))
     clash = set(names) & set(fields_of(lambda_m, base.id))
     if len(clash) == 0:
         return ok()
-    return ill_formed(node, purepy_reasons.InheritedFieldClash(sorted(clash)[0], base.id))
+    return ill_formed(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
 
 def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> Result:
     return first_err([check_class_decl(s, lambda_m) for s in body if isinstance(s, ast.ClassDef)])
@@ -774,7 +774,7 @@ def check_module(tree: ast.AST) -> Result:
         return ok()
     nested = _find_nested_import(tree.body)
     if nested is not None:
-        return ill_formed(nested, purepy_reasons.NestedImport())
+        return ill_formed(nested, reasons.NestedImport())
     class_ctx = build_class_context(tree.body)
     if isinstance(class_ctx, IllFormed):
         return class_ctx
@@ -787,7 +787,7 @@ def check_module(tree: ast.AST) -> Result:
     if not is_ok(err):
         return err
     if isinstance(result_type_of_block(tree.body), TyReturns):
-        return ill_formed(tree.body[0], purepy_reasons.TopLevelReturn())
+        return ill_formed(tree.body[0], reasons.TopLevelReturn())
     return ok()
 
 def check_file(filename: str) -> Result:
@@ -808,7 +808,7 @@ def format_result(result: Result, filename: str) -> str:
 
 def main() -> None:
     if len(sys.argv) < 2:
-        print('Usage: purepy_check.py <file.py> [<file.py> ...]')
+        print('Usage: check_module.py <file.py> [<file.py> ...]')
         sys.exit(1)
     exit_code = 0
     for filename in sys.argv[1:]:
