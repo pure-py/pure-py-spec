@@ -207,17 +207,11 @@ def check_mutual_region(defs: list[ast.FunctionDef], ctx: Context) -> None:
 
 def check_bodies(defs: list[ast.FunctionDef], ctx: Context) -> None:
     f_names = {d.name: TT for d in defs}
-    _check_bodies(defs, ctx, f_names)
-
-def _check_bodies(defs: list[ast.FunctionDef], ctx: Context, f_names: VarContext) -> None:
-    if len(defs) == 0:
-        return
-    d = defs[0]
-    params = {a.arg for a in d.args.args}
-    locals_ = assigns_block(d.body) - params
-    body_ctx = extend_var(extend_var(extend_var(ctx, f_names), {p: TT for p in params}), {x: FF for x in locals_})
-    check_block(d.body, body_ctx)
-    _check_bodies(defs[1:], ctx, f_names)
+    for d in defs:
+        params = {a.arg for a in d.args.args}
+        locals_ = assigns_block(d.body) - params
+        body_ctx = extend_var(extend_var(extend_var(ctx, f_names), {p: TT for p in params}), {x: FF for x in locals_})
+        check_block(d.body, body_ctx)
 
 def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> None:
     if len(targets) == 0:
