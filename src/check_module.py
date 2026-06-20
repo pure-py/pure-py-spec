@@ -402,15 +402,16 @@ def check_pattern_wf(p: ast.pattern, ctx: Context) -> None:
             raise IllFormedModule(p, reasons.DuplicatePatternKeyword(c))
         if set(kwds) != remaining:
             raise IllFormedModule(p, reasons.UnknownFieldInPattern(c, tuple(sorted(remaining))))
-        subs = list(p.patterns) + list(p.kwd_patterns)
-    elif isinstance(p, ast.MatchSequence):
-        subs = list(p.patterns)
-    elif isinstance(p, ast.MatchAs) and p.pattern is not None:
-        subs = [p.pattern]
-    else:
-        subs = []
-    for sub in subs:
-        check_pattern_wf(sub, ctx)
+        for sub in list(p.patterns) + list(p.kwd_patterns):
+            check_pattern_wf(sub, ctx)
+        return
+    if isinstance(p, ast.MatchSequence):
+        for sub in p.patterns:
+            check_pattern_wf(sub, ctx)
+        return
+    if isinstance(p, ast.MatchAs) and p.pattern is not None:
+        check_pattern_wf(p.pattern, ctx)
+        return
 
 def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: Context) -> None:
     for i, p in enumerate(patterns):
