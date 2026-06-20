@@ -8,10 +8,12 @@ import reasons
 from reasons import Reason
 
 class IllFormed(Exception):
+    exit_code: int   # overridden by subclass
     msg: str
 
 
 class IllFormedModule(IllFormed):
+    exit_code = 3
     def __init__(self, node: ast.AST, reason: Reason):
         self.line: Optional[int] = getattr(node, 'lineno', None)
         self.col: Optional[int] = getattr(node, 'col_offset', None)
@@ -753,8 +755,6 @@ def check_file(filename: str) -> Result:
     tree = ast.parse(source, filename=filename)
     return check_module(tree)
 
-ILL_FORMED = 3   # exit code for module-level wf failure
-
 def format_result(result: Result, filename: str) -> str:
     if is_ok(result):
         return f'{filename}: ok'
@@ -770,7 +770,7 @@ def main() -> None:
         result = check_file(filename)
         print(format_result(result, filename))
         if isinstance(result, IllFormed):
-            exit_code = ILL_FORMED
+            exit_code = result.exit_code
     sys.exit(exit_code)
 if __name__ == '__main__':
     main()

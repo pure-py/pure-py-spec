@@ -8,13 +8,12 @@ import check_module
 from check_module import IllFormed, IllFormedModule, Result, ok, is_ok
 
 
-ILL_FORMED_PROGRAM = 4
-
 # Modules the runtime provides if the user has no file of the same name.
 PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
 
 
 class IllFormedProgram(IllFormed):
+    exit_code = 4
     def __init__(self, msg: str):
         self.msg = msg
         super().__init__(msg)
@@ -146,7 +145,7 @@ def main() -> None:
         sys.exit(0)
     assert result is not None
     print(result.msg)
-    sys.exit(check_module.ILL_FORMED if isinstance(result, IllFormedModule) else ILL_FORMED_PROGRAM)
+    sys.exit(result.exit_code)
 
 
 if __name__ == "__main__":
