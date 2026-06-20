@@ -156,13 +156,13 @@ def result_type_of_block(block: list[ast.stmt]) -> ResultTy:
 def _result_type_of_item(stmt: ast.stmt) -> ResultTy:
     return result_type(stmt)
 
-def check_block(block: list[ast.stmt], ctx: Context) -> Result:
-    items = items_of_block(block)
-    return check_items(items, ctx)
+def check_block(block: list[ast.stmt], ctx: Context) -> None:
+    check_items(items_of_block(block), ctx)
 
-def check_items(items: list[Item], ctx: Context) -> Result:
+def check_items(items: list[Item], ctx: Context) -> None:
     if len(items) == 1:
-        return check_item(items[0], ctx)
+        check_item(items[0], ctx)
+        return
     head = items[0]
     tail = items[1:]
     check_item(head, ctx)
@@ -178,7 +178,7 @@ def check_items(items: list[Item], ctx: Context) -> Result:
         raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
     head_result = item_result_type(head)
     delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
-    return check_items(tail, extend_var(ctx, delta))
+    check_items(tail, extend_var(ctx, delta))
 
 def item_result_type(item: Item) -> ResultTy:
     if isinstance(item, list):
@@ -202,152 +202,164 @@ def _extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[
         return _extend_region(region + [head], rest[1:])
     return [region] + items_of_block(rest)
 
-def check_item(item: Item, ctx: Context) -> Result:
+def check_item(item: Item, ctx: Context) -> None:
     if isinstance(item, list):
-        return check_mutual_region(item, ctx)
-    return check_stmt(item, ctx)
+        check_mutual_region(item, ctx)
+    else:
+        check_stmt(item, ctx)
 
-def check_mutual_region(defs: list[ast.FunctionDef], ctx: Context) -> Result:
+def check_mutual_region(defs: list[ast.FunctionDef], ctx: Context) -> None:
     check_distinct_names(defs, set())
-    return check_bodies(defs, ctx)
+    check_bodies(defs, ctx)
 
-def check_bodies(defs: list[ast.FunctionDef], ctx: Context) -> Result:
+def check_bodies(defs: list[ast.FunctionDef], ctx: Context) -> None:
     f_names = {d.name: TT for d in defs}
-    return _check_bodies(defs, ctx, f_names)
+    _check_bodies(defs, ctx, f_names)
 
-def _check_bodies(defs: list[ast.FunctionDef], ctx: Context, f_names: VarContext) -> Result:
+def _check_bodies(defs: list[ast.FunctionDef], ctx: Context, f_names: VarContext) -> None:
     if len(defs) == 0:
-        return ok()
+        return
     d = defs[0]
     params = {a.arg for a in d.args.args}
     locals_ = assigns_block(d.body) - params
     body_ctx = extend_var(extend_var(extend_var(ctx, f_names), {p: TT for p in params}), {x: FF for x in locals_})
     check_block(d.body, body_ctx)
-    return _check_bodies(defs[1:], ctx, f_names)
+    _check_bodies(defs[1:], ctx, f_names)
 
-def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> Result:
+def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> None:
     if len(targets) == 0:
-        return ok()
+        return
     t = targets[0]
     if isinstance(t, ast.Name) and t.id in captured:
         raise IllFormedModule(t, reasons.SelfCaptureAssignment(t.id))
-    return check_assign_targets(targets[1:], captured)
+    check_assign_targets(targets[1:], captured)
 
-def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> Result:
+def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
     if len(defs) == 0:
-        return ok()
+        return
     head = defs[0]
     if head.name in seen:
         raise IllFormedModule(head, reasons.DuplicateMutualName(head.name))
-    return check_distinct_names(defs[1:], seen | {head.name})
+    check_distinct_names(defs[1:], seen | {head.name})
 
-def check_stmt(s: ast.stmt, ctx: Context) -> Result:
+def check_stmt(s: ast.stmt, ctx: Context) -> None:
     if isinstance(s, ast.Pass):
-        return ok()
+        return
     if isinstance(s, ast.Assign):
         check_expr(s.value, ctx)
-        captured = captures(s.value)
-        return check_assign_targets(s.targets, captured)
+        check_assign_targets(s.targets, captures(s.value))
+        return
     if isinstance(s, ast.Expr):
-        return check_expr(s.value, ctx)
+        check_expr(s.value, ctx)
+        return
     if isinstance(s, ast.Return):
         if s.value is not None:
-            return check_expr(s.value, ctx)
-        return ok()
+            check_expr(s.value, ctx)
+        return
     if isinstance(s, ast.If):
         check_expr(s.test, ctx)
         check_block(s.body, ctx)
         if s.orelse:
-            return check_block(s.orelse, ctx)
-        return ok()
+            check_block(s.orelse, ctx)
+        return
     if isinstance(s, ast.Assert):
         check_expr(s.test, ctx)
         if s.msg is not None:
-            return check_expr(s.msg, ctx)
-        return ok()
+            check_expr(s.msg, ctx)
+        return
     if isinstance(s, ast.Import):
-        return ok()
+        return
     if isinstance(s, ast.ImportFrom):
         if len(s.names) == 0:
             raise IllFormedModule(s, reasons.EmptyFromImport())
-        return ok()
+        return
     if isinstance(s, ast.Match):
         check_expr(s.subject, ctx)
-        patterns = [c.pattern for c in s.cases]
-        check_pattern_list(patterns, s, ctx)
-        return _check_match_cases(s.cases, ctx)
+        check_pattern_list([c.pattern for c in s.cases], s, ctx)
+        _check_match_cases(s.cases, ctx)
+        return
     if isinstance(s, ast.ClassDef):
-        return ok()
+        return
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
-def _check_match_cases(cases: list[ast.match_case], ctx: Context) -> Result:
+def _check_match_cases(cases: list[ast.match_case], ctx: Context) -> None:
     for case in cases:
         check_block(case.body, extend_var(ctx, {x: TT for x in binds(case.pattern)}))
-    return ok()
 
-def check_expr(e: ast.expr, ctx: Context) -> Result:
+def check_expr(e: ast.expr, ctx: Context) -> None:
     if isinstance(e, ast.Name):
         if ctx.var.get(e.id) != TT:
             raise IllFormedModule(e, reasons.UnassignedVariable(e.id))
-        return ok()
+        return
     if isinstance(e, ast.Constant):
-        return ok()
+        return
     if isinstance(e, ast.Lambda):
         params = {a.arg for a in e.args.args}
-        ctx_ = extend_var(ctx, {p: TT for p in params})
-        return check_expr(e.body, ctx_)
+        check_expr(e.body, extend_var(ctx, {p: TT for p in params}))
+        return
     if isinstance(e, ast.Call):
         if isinstance(e.func, ast.Name) and e.func.id in ctx.cls:
             arity = len(fields_of(ctx.cls, e.func.id))
             if len(e.args) != arity:
                 raise IllFormedModule(e, reasons.ConstructorArityMismatch(e.func.id, arity, len(e.args)))
-            return check_exprs(e.args, ctx)
+            check_exprs(e.args, ctx)
+            return
         check_expr(e.func, ctx)
-        return check_exprs(e.args, ctx)
+        check_exprs(e.args, ctx)
+        return
     if isinstance(e, ast.BinOp):
         check_expr(e.left, ctx)
-        return check_expr(e.right, ctx)
+        check_expr(e.right, ctx)
+        return
     if isinstance(e, ast.UnaryOp):
-        return check_expr(e.operand, ctx)
+        check_expr(e.operand, ctx)
+        return
     if isinstance(e, ast.BoolOp):
-        return check_exprs(e.values, ctx)
+        check_exprs(e.values, ctx)
+        return
     if isinstance(e, ast.Compare):
         check_expr(e.left, ctx)
-        return check_exprs(e.comparators, ctx)
+        check_exprs(e.comparators, ctx)
+        return
     if isinstance(e, ast.IfExp):
         check_expr(e.test, ctx)
         check_expr(e.body, ctx)
-        return check_expr(e.orelse, ctx)
+        check_expr(e.orelse, ctx)
+        return
     if isinstance(e, ast.Attribute):
-        return check_expr(e.value, ctx)
+        check_expr(e.value, ctx)
+        return
     if isinstance(e, ast.Subscript):
         check_expr(e.value, ctx)
-        return check_expr(e.slice, ctx)
+        check_expr(e.slice, ctx)
+        return
     if isinstance(e, (ast.List, ast.Tuple)):
-        return check_exprs(e.elts, ctx)
+        check_exprs(e.elts, ctx)
+        return
     if isinstance(e, ast.Dict):
         check_exprs([k for k in e.keys if k is not None], ctx)
-        return check_exprs(e.values, ctx)
-    if isinstance(e, (ast.List, ast.Tuple)):
-        return check_exprs(e.elts, ctx)
+        check_exprs(e.values, ctx)
+        return
     if isinstance(e, ast.ListComp):
-        return check_comprehension(e.elt, e.generators, ctx)
+        check_comprehension(e.elt, e.generators, ctx)
+        return
     raise AssertionError(f'unexpected expression: {type(e).__name__}')
 
-def check_comprehension(elt: ast.expr, generators: list[ast.comprehension], ctx: Context) -> Result:
+def check_comprehension(elt: ast.expr, generators: list[ast.comprehension], ctx: Context) -> None:
     if len(generators) == 0:
-        return check_expr(elt, ctx)
+        check_expr(elt, ctx)
+        return
     g = generators[0]
     check_expr(g.iter, ctx)
     ctx_ = extend_var(ctx, {n: TT for n in names_in_target(g.target)})
     check_exprs(g.ifs, ctx_)
-    return check_comprehension(elt, generators[1:], ctx_)
+    check_comprehension(elt, generators[1:], ctx_)
 
-def check_exprs(es: list[ast.expr], ctx: Context) -> Result:
+def check_exprs(es: list[ast.expr], ctx: Context) -> None:
     if len(es) == 0:
-        return ok()
+        return
     check_expr(es[0], ctx)
-    return check_exprs(es[1:], ctx)
+    check_exprs(es[1:], ctx)
 
 def _is_catch_all(p: ast.pattern) -> bool:
     return isinstance(p, ast.MatchAs) and p.pattern is None
@@ -392,7 +404,7 @@ def _pattern_vars(p: ast.pattern) -> list[str]:
                [v for sub in p.kwd_patterns for v in _pattern_vars(sub)]
     raise AssertionError(f'unexpected pattern: {type(p).__name__}')
 
-def check_pattern_wf(p: ast.pattern, ctx: Context) -> Result:
+def check_pattern_wf(p: ast.pattern, ctx: Context) -> None:
     if isinstance(p, ast.MatchClass):
         assert isinstance(p.cls, ast.Name)
         c = p.cls.id
@@ -417,9 +429,8 @@ def check_pattern_wf(p: ast.pattern, ctx: Context) -> Result:
         subs = []
     for sub in subs:
         check_pattern_wf(sub, ctx)
-    return ok()
 
-def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: Context) -> Result:
+def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: Context) -> None:
     for i, p in enumerate(patterns):
         check_pattern_wf(p, ctx)
         vars_ = _pattern_vars(p)
@@ -428,7 +439,6 @@ def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: Context)
         for j in range(i):
             if subsumes(p, patterns[j]):
                 raise IllFormedModule(node, reasons.UnreachableCase(i + 1, j + 1))
-    return ok()
 
 def binds(pattern: ast.pattern) -> set[str]:
     if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
@@ -706,27 +716,25 @@ def fields_of(lambda_m: ClassContext, c: str) -> tuple[str, ...]:
         return info.fields
     return fields_of(lambda_m, info.base) + info.fields
 
-def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> Result:
+def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> None:
     names = _class_field_names(node)
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
         raise IllFormedModule(node, reasons.DuplicateFieldName(dup, node.name))
     if len(node.bases) == 0:
-        return ok()
+        return
     base = node.bases[0]
     assert isinstance(base, ast.Name)
     if base.id not in lambda_m:
         raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
     clash = set(names) & set(fields_of(lambda_m, base.id))
-    if len(clash) == 0:
-        return ok()
-    raise IllFormedModule(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
+    if len(clash) > 0:
+        raise IllFormedModule(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
 
-def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> Result:
+def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> None:
     for s in body:
         if isinstance(s, ast.ClassDef):
             check_class_decl(s, lambda_m)
-    return ok()
 
 def check_module(tree: ast.AST) -> Result:
     assert isinstance(tree, ast.Module)
