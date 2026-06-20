@@ -23,13 +23,6 @@ class IllFormedModule(IllFormed):
 
 
 Result = Optional[IllFormed]
-
-
-def ok() -> Result:
-    return None
-
-def is_ok(result: Result) -> bool:
-    return result is None
 class Status(Enum):
     TT = auto()
     FF = auto()
@@ -740,9 +733,9 @@ def check_module(tree: ast.AST) -> Result:
     assert isinstance(tree, ast.Module)
     try:
         _check_module(tree)
-        return ok()
     except IllFormed as e:
         return e
+    return None
 
 def _check_module(tree: ast.Module) -> None:
     if len(tree.body) == 0:
@@ -764,7 +757,7 @@ def check_file(filename: str) -> Result:
     return check_module(tree)
 
 def format_result(result: Result, filename: str) -> str:
-    if is_ok(result):
+    if result is None:
         return f'{filename}: ok'
     assert isinstance(result, IllFormedModule)
     return f'{filename}:{result.line}:{result.col}: {result.msg}'
@@ -777,7 +770,7 @@ def main() -> None:
     for filename in sys.argv[1:]:
         result = check_file(filename)
         print(format_result(result, filename))
-        if isinstance(result, IllFormed):
+        if result is not None:
             exit_code = result.exit_code
     sys.exit(exit_code)
 if __name__ == '__main__':

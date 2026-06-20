@@ -5,7 +5,7 @@ from typing import Optional
 
 import parse
 import check_module
-from check_module import IllFormed, IllFormedModule, Result, ok, is_ok
+from check_module import IllFormed, IllFormedModule, Result
 
 
 # Modules the runtime provides if the user has no file of the same name.
@@ -58,10 +58,10 @@ def _load(name: str, base_dir: pathlib.Path) -> tuple[Optional[ast.Module], Resu
     except SyntaxError as e:
         return None, IllFormedProgram(f"{path}: parse error: {e}")
     parse_err = parse.check_module(tree)
-    if not parse.is_ok(parse_err):
+    if parse_err is not None:
         assert parse_err is not None
         return tree, IllFormedProgram(f"{path}: {parse_err.msg}")
-    return tree, ok()
+    return tree, None
 
 
 def _has_cycle(graph: dict[str, set[str]]) -> Optional[list[str]]:
@@ -109,7 +109,7 @@ def check_program(entry_path: pathlib.Path) -> Result:
             imports_by_module[name] = set()
             continue
         tree, err = _load(name, base_dir)
-        if not is_ok(err):
+        if err is not None:
             return err
         assert tree is not None and path is not None
         modules[name] = (path, tree)
@@ -130,8 +130,7 @@ def check_program(entry_path: pathlib.Path) -> Result:
     cycle = _has_cycle(graph)
     if cycle is not None:
         return IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
-
-    return ok()
+    return None
 
 
 def main() -> None:
@@ -140,7 +139,7 @@ def main() -> None:
         sys.exit(1)
     entry = pathlib.Path(sys.argv[1])
     result = check_program(entry)
-    if is_ok(result):
+    if result is None:
         print(f"{entry}: ok")
         sys.exit(0)
     assert result is not None
