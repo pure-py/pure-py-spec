@@ -2,7 +2,7 @@
 \flushleft \shadebox{$\Gamma \vdash m : \Delta$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{nil}}]
+\inferrule*[lab={\ruleName{empty}}]
 {
   \strut
 }
@@ -12,31 +12,22 @@
 \and
 \inferrule*[lab={\ruleName{import}}]
 {
-  M' = x_1.x_2.\ldots.x_{n+1}
+  M' = x_1.x_2.\ldots.x_{n+1} \\
+  \Gamma \runion \statusDefAssigned(\set{x_1}) \vdash m : \Delta'
 }
 {
-  \Gamma \vdash \exImport{M'} : \statusDefAssigned(\set{x_1})
+  \Gamma \vdash \exImport{M'} \cons m : \statusDefAssigned(\set{x_1}) \runion \Delta'
 }
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
-  \strut
+  \Gamma \runion \statusDefAssigned(\set{x_1, \ldots, x_{n+1}}) \vdash m : \Delta'
 }
 {
-  \Gamma \vdash \exFromImport{M'}{x_1, \ldots, x_{n+1}} : \statusDefAssigned(\set{x_1, \ldots, x_{n+1}})
+  \Gamma \vdash \exFromImport{M'}{x_1, \ldots, x_{n+1}} \cons m : \statusDefAssigned(\set{x_1, \ldots, x_{n+1}}) \runion \Delta'
 }
 \and
-\inferrule*[lab={\ruleName{cons}}]
-{
-  \Gamma \vdash t : \Delta \\
-  \Gamma \runion \Delta \vdash m : \Delta' \\
-  \capturesS(t) \cap \assignsS(m) = \varnothing
-}
-{
-  \Gamma \vdash t \cons m : \Delta \runion \Delta'
-}
-\and
-\inferrule*[lab={\ruleName{stmt-tail}}]
+\inferrule*[lab={\ruleName{statement}}]
 {
   \Gamma \vdash s : \Assigns{\Delta} \\
   \Gamma \runion \Delta \vdash m : \Delta' \\
@@ -46,7 +37,7 @@
   \Gamma \vdash s \cons m : \Delta \runion \Delta'
 }
 \and
-\inferrule*[lab={\ruleName{class-tail}}]
+\inferrule*[lab={\ruleName{class}}]
 {
   \decls(\phi) = x_1, \ldots, x_n \\
   x_1, \ldots, x_n \text{ distinct} \\
@@ -56,7 +47,7 @@
   \Gamma \vdash \exDataclass{C}{\phi} \cons m : \Delta
 }
 \and
-\inferrule*[lab={\ruleName{class-extend-tail}}]
+\inferrule*[lab={\ruleName{class-extend}}]
 {
   B \in \dom(\Lambda_M) \\
   \decls(\phi) = x_1, \ldots, x_n \\
