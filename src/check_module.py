@@ -726,21 +726,24 @@ def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> None:
 def check_module(tree: ast.AST) -> Result:
     assert isinstance(tree, ast.Module)
     try:
-        if len(tree.body) == 0:
-            return None
-        nested = find_nested_import(tree.body)
-        if nested is not None:
-            raise IllFormedModule(nested, reasons.NestedImport())
-        class_ctx = build_class_context(tree.body)
-        check_class_decls(tree.body, class_ctx)
-        var_ctx = dict(BUILTINS)
-        var_ctx['__name__'] = TT
-        check_block(tree.body, Context(var=var_ctx, cls=class_ctx))
-        if isinstance(result_type_of_block(tree.body), TyReturns):
-            raise IllFormedModule(tree.body[0], reasons.TopLevelReturn())
+        walk_module(tree)
     except IllFormed as e:
         return e
     return None
+
+def walk_module(tree: ast.Module) -> None:
+    if len(tree.body) == 0:
+        return
+    nested = find_nested_import(tree.body)
+    if nested is not None:
+        raise IllFormedModule(nested, reasons.NestedImport())
+    class_ctx = build_class_context(tree.body)
+    check_class_decls(tree.body, class_ctx)
+    var_ctx = dict(BUILTINS)
+    var_ctx['__name__'] = TT
+    check_block(tree.body, Context(var=var_ctx, cls=class_ctx))
+    if isinstance(result_type_of_block(tree.body), TyReturns):
+        raise IllFormedModule(tree.body[0], reasons.TopLevelReturn())
 
 def check_file(filename: str) -> Result:
     source = open(filename).read()
