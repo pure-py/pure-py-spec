@@ -7,28 +7,17 @@ from typing import Optional, Union
 import reasons
 from reasons import Reason
 
-ILL_FORMED = 3
-
-
 class IllFormed(Exception):
+    msg: str
+
+
+class IllFormedModule(IllFormed):
     def __init__(self, node: ast.AST, reason: Reason):
         self.line: Optional[int] = getattr(node, 'lineno', None)
         self.col: Optional[int] = getattr(node, 'col_offset', None)
-        self.reason: Optional[Reason] = reason
-        self.msg: str = reason.message()
-        self.kind: int = ILL_FORMED
+        self.reason: Reason = reason
+        self.msg = reason.message()
         super().__init__(self.msg)
-
-    @classmethod
-    def raw(cls, line: Optional[int], col: Optional[int], msg: str, kind: int) -> 'IllFormed':
-        obj = cls.__new__(cls)
-        obj.line = line
-        obj.col = col
-        obj.reason = None
-        obj.msg = msg
-        obj.kind = kind
-        Exception.__init__(obj, msg)
-        return obj
 
 
 Result = Optional[IllFormed]
@@ -178,13 +167,13 @@ def check_items(items: list[Item], ctx: Context) -> Result:
     if isinstance(item_result_type(head), TyReturns):
         first_unreachable = tail[0]
         node: ast.AST = first_unreachable[0] if isinstance(first_unreachable, list) else first_unreachable
-        raise IllFormed(node, reasons.UnreachableStatement())
+        raise IllFormedModule(node, reasons.UnreachableStatement())
     reassigned = captures_item(head) & assigns_items(tail)
     if reassigned:
         name = sorted(reassigned)[0]
         ra_node = find_first_reassigning(tail, reassigned)
         assert ra_node is not None
-        raise IllFormed(ra_node, reasons.CapturedReassignment(name))
+        raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
     head_result = item_result_type(head)
     delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
     return check_items(tail, extend_var(ctx, delta))
@@ -239,7 +228,7 @@ def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> Result:
         return ok()
     t = targets[0]
     if isinstance(t, ast.Name) and t.id in captured:
-        raise IllFormed(t, reasons.SelfCaptureAssignment(t.id))
+        raise IllFormedModule(t, reasons.SelfCaptureAssignment(t.id))
     return check_assign_targets(targets[1:], captured)
 
 def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> Result:
@@ -247,7 +236,7 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> Result:
         return ok()
     head = defs[0]
     if head.name in seen:
-        raise IllFormed(head, reasons.DuplicateMutualName(head.name))
+        raise IllFormedModule(head, reasons.DuplicateMutualName(head.name))
     return check_distinct_names(defs[1:], seen | {head.name})
 
 def check_stmt(s: ast.stmt, ctx: Context) -> Result:
@@ -278,7 +267,7 @@ def check_stmt(s: ast.stmt, ctx: Context) -> Result:
         return ok()
     if isinstance(s, ast.ImportFrom):
         if len(s.names) == 0:
-            raise IllFormed(s, reasons.EmptyFromImport())
+            raise IllFormedModule(s, reasons.EmptyFromImport())
         return ok()
     if isinstance(s, ast.Match):
         check_expr(s.subject, ctx)
@@ -297,7 +286,7 @@ def _check_match_cases(cases: list[ast.match_case], ctx: Context) -> Result:
 def check_expr(e: ast.expr, ctx: Context) -> Result:
     if isinstance(e, ast.Name):
         if ctx.var.get(e.id) != TT:
-            raise IllFormed(e, reasons.UnassignedVariable(e.id))
+            raise IllFormedModule(e, reasons.UnassignedVariable(e.id))
         return ok()
     if isinstance(e, ast.Constant):
         return ok()
@@ -309,7 +298,7 @@ def check_expr(e: ast.expr, ctx: Context) -> Result:
         if isinstance(e.func, ast.Name) and e.func.id in ctx.cls:
             arity = len(fields_of(ctx.cls, e.func.id))
             if len(e.args) != arity:
-                raise IllFormed(e, reasons.ConstructorArityMismatch(e.func.id, arity, len(e.args)))
+                raise IllFormedModule(e, reasons.ConstructorArityMismatch(e.func.id, arity, len(e.args)))
             return check_exprs(e.args, ctx)
         check_expr(e.func, ctx)
         return check_exprs(e.args, ctx)
@@ -406,17 +395,17 @@ def check_pattern_wf(p: ast.pattern, ctx: Context) -> Result:
         assert isinstance(p.cls, ast.Name)
         c = p.cls.id
         if c not in ctx.cls:
-            raise IllFormed(p, reasons.UnknownClassInPattern(c))
+            raise IllFormedModule(p, reasons.UnknownClassInPattern(c))
         fields = fields_of(ctx.cls, c)
         n, m = len(p.patterns), len(p.kwd_patterns)
         if n + m != len(fields):
-            raise IllFormed(p, reasons.PatternArityMismatch(c, len(fields), n + m))
+            raise IllFormedModule(p, reasons.PatternArityMismatch(c, len(fields), n + m))
         remaining = set(fields[n:])
         kwds = list(p.kwd_attrs)
         if len(kwds) != len(set(kwds)):
-            raise IllFormed(p, reasons.DuplicatePatternKeyword(c))
+            raise IllFormedModule(p, reasons.DuplicatePatternKeyword(c))
         if set(kwds) != remaining:
-            raise IllFormed(p, reasons.UnknownFieldInPattern(c, tuple(sorted(remaining))))
+            raise IllFormedModule(p, reasons.UnknownFieldInPattern(c, tuple(sorted(remaining))))
         subs = list(p.patterns) + list(p.kwd_patterns)
     elif isinstance(p, ast.MatchSequence):
         subs = list(p.patterns)
@@ -433,10 +422,10 @@ def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: Context)
         check_pattern_wf(p, ctx)
         vars_ = _pattern_vars(p)
         if len(vars_) != len(set(vars_)):
-            raise IllFormed(node, reasons.NonlinearPattern(i + 1))
+            raise IllFormedModule(node, reasons.NonlinearPattern(i + 1))
         for j in range(i):
             if subsumes(p, patterns[j]):
-                raise IllFormed(node, reasons.UnreachableCase(i + 1, j + 1))
+                raise IllFormedModule(node, reasons.UnreachableCase(i + 1, j + 1))
     return ok()
 
 def binds(pattern: ast.pattern) -> set[str]:
@@ -704,7 +693,7 @@ def build_class_context(body: list[ast.stmt]) -> ClassContext:
     for s in body:
         if isinstance(s, ast.ClassDef):
             if s.name in lambda_m:
-                raise IllFormed(s, reasons.DuplicateClassName(s.name))
+                raise IllFormedModule(s, reasons.DuplicateClassName(s.name))
             base = s.bases[0].id if s.bases and isinstance(s.bases[0], ast.Name) else None
             lambda_m[s.name] = ClassInfo(fields=tuple(_class_field_names(s)), base=base)
     return lambda_m
@@ -719,17 +708,17 @@ def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> Result:
     names = _class_field_names(node)
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
-        raise IllFormed(node, reasons.DuplicateFieldName(dup, node.name))
+        raise IllFormedModule(node, reasons.DuplicateFieldName(dup, node.name))
     if len(node.bases) == 0:
         return ok()
     base = node.bases[0]
     assert isinstance(base, ast.Name)
     if base.id not in lambda_m:
-        raise IllFormed(node, reasons.UnknownBaseClass(base.id))
+        raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
     clash = set(names) & set(fields_of(lambda_m, base.id))
     if len(clash) == 0:
         return ok()
-    raise IllFormed(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
+    raise IllFormedModule(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
 
 def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> Result:
     for s in body:
@@ -750,30 +739,27 @@ def _check_module(tree: ast.Module) -> None:
         return
     nested = _find_nested_import(tree.body)
     if nested is not None:
-        raise IllFormed(nested, reasons.NestedImport())
+        raise IllFormedModule(nested, reasons.NestedImport())
     class_ctx = build_class_context(tree.body)
     check_class_decls(tree.body, class_ctx)
     var_ctx = dict(BUILTINS)
     var_ctx['__name__'] = TT
     check_block(tree.body, Context(var=var_ctx, cls=class_ctx))
     if isinstance(result_type_of_block(tree.body), TyReturns):
-        raise IllFormed(tree.body[0], reasons.TopLevelReturn())
+        raise IllFormedModule(tree.body[0], reasons.TopLevelReturn())
 
 def check_file(filename: str) -> Result:
     source = open(filename).read()
     tree = ast.parse(source, filename=filename)
     return check_module(tree)
 
+ILL_FORMED = 3   # exit code for module-level wf failure
+
 def format_result(result: Result, filename: str) -> str:
     if is_ok(result):
         return f'{filename}: ok'
-    assert result is not None
-    line = result.line
-    col = result.col
-    msg = result.msg
-    if line is not None:
-        return f'{filename}:{line}:{col}: {msg}'
-    return f'{filename}: {msg}'
+    assert isinstance(result, IllFormedModule)
+    return f'{filename}:{result.line}:{result.col}: {result.msg}'
 
 def main() -> None:
     if len(sys.argv) < 2:
@@ -783,9 +769,8 @@ def main() -> None:
     for filename in sys.argv[1:]:
         result = check_file(filename)
         print(format_result(result, filename))
-        if not is_ok(result):
-            assert result is not None
-            exit_code = result.kind
+        if isinstance(result, IllFormed):
+            exit_code = ILL_FORMED
     sys.exit(exit_code)
 if __name__ == '__main__':
     main()

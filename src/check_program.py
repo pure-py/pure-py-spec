@@ -5,7 +5,7 @@ from typing import Optional
 
 import parse
 import check_module
-from check_module import IllFormed, Result, ok, is_ok
+from check_module import IllFormed, IllFormedModule, Result, ok, is_ok
 
 
 ILL_FORMED_PROGRAM = 4
@@ -14,8 +14,10 @@ ILL_FORMED_PROGRAM = 4
 PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
 
 
-def _program_error(msg: str) -> IllFormed:
-    return IllFormed.raw(None, None, msg, ILL_FORMED_PROGRAM)
+class IllFormedProgram(IllFormed):
+    def __init__(self, msg: str):
+        self.msg = msg
+        super().__init__(msg)
 
 
 def _imports_of(tree: ast.Module) -> set[str]:
@@ -51,15 +53,15 @@ def _load(name: str, base_dir: pathlib.Path) -> tuple[Optional[ast.Module], Resu
     subset rejects."""
     path = _resolve(name, base_dir)
     if path is None:
-        return None, _program_error(f"module {name!r} not found under {base_dir}")
+        return None, IllFormedProgram(f"module {name!r} not found under {base_dir}")
     try:
         tree = ast.parse(path.read_text(), filename=str(path))
     except SyntaxError as e:
-        return None, _program_error(f"{path}: parse error: {e}")
+        return None, IllFormedProgram(f"{path}: parse error: {e}")
     parse_err = parse.check_module(tree)
     if not parse.is_ok(parse_err):
         assert parse_err is not None
-        return tree, _program_error(f"{path}: {parse_err.msg}")
+        return tree, IllFormedProgram(f"{path}: {parse_err.msg}")
     return tree, ok()
 
 
@@ -119,16 +121,16 @@ def check_program(entry_path: pathlib.Path) -> Result:
     # Per-module well-formedness.
     for path, tree in modules.values():
         err = check_module.check_module(tree)
-        if not is_ok(err):
-            assert err is not None
-            return IllFormed.raw(err.line, err.col, f"{path}: {err.msg}", err.kind)
+        if isinstance(err, IllFormedModule):
+            err.msg = f"{path}: {err.msg}"
+            return err
 
     # Acyclicity. (Resolution is already guaranteed by the walk loop above.)
     graph = {name: imps | _parents(name) | set().union(*(_parents(i) for i in imps))
              for name, imps in imports_by_module.items()}
     cycle = _has_cycle(graph)
     if cycle is not None:
-        return _program_error(f"import cycle: {' -> '.join(cycle)}")
+        return IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
 
     return ok()
 
@@ -144,7 +146,7 @@ def main() -> None:
         sys.exit(0)
     assert result is not None
     print(result.msg)
-    sys.exit(result.kind)
+    sys.exit(check_module.ILL_FORMED if isinstance(result, IllFormedModule) else ILL_FORMED_PROGRAM)
 
 
 if __name__ == "__main__":
