@@ -48,21 +48,23 @@
 \and
 \inferrule*[lab={\ruleName{class-tail}}]
 {
+  \decls(\phi) = x_1, \ldots, x_n \\
   x_1, \ldots, x_n \text{ distinct} \\
   \Gamma \vdash m : \Delta
 }
 {
-  \Gamma \vdash \exDataclass{C}{\exField{x_1} \;\ldots\; \exField{x_n}} \cons m : \Delta
+  \Gamma \vdash \exDataclass{C}{\phi} \cons m : \Delta
 }
 \and
 \inferrule*[lab={\ruleName{class-extend-tail}}]
 {
   B \in \dom(\Lambda_M) \\
+  \decls(\phi) = x_1, \ldots, x_n \\
   x_1, \ldots, x_n \text{ distinct and disjoint from } \fields(M.B) \\
   \Gamma \vdash m : \Delta
 }
 {
-  \Gamma \vdash \exDataclassExtend{C}{B}{\exField{x_1} \;\ldots\; \exField{x_n}} \cons m : \Delta
+  \Gamma \vdash \exDataclassExtend{C}{B}{\phi} \cons m : \Delta
 }
 \end{mathpar}
 \caption{Body $m$ of module $M$ is well-formed in $\Gamma$}
