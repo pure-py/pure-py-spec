@@ -44,6 +44,22 @@
 {
   \mu, \rho, \exFromImport{M}{x_1, \ldots, x_{n+1}} \Rightarrow \mu', \set{x_1 \mapsto \rho''(x_1), \ldots, x_{n+1} \mapsto \rho''(x_{n+1})}
 }
+\and
+\inferrule*[lab={\ruleName{eval-class}}]
+{
+  \mu, \rho, m \Rightarrow \mu', \rho'
+}
+{
+  \mu, \rho, \exDataclass{C}{\phi} \cons m \Rightarrow \mu', \rho'
+}
+\and
+\inferrule*[lab={\ruleName{eval-class-extend}}]
+{
+  \mu, \rho, m \Rightarrow \mu', \rho'
+}
+{
+  \mu, \rho, \exDataclassExtend{C}{B}{\phi} \cons m \Rightarrow \mu', \rho'
+}
 \end{mathpar}
 
 \vspace{2mm}
