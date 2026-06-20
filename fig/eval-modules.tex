@@ -2,7 +2,7 @@
 \flushleft \shadebox{$\mu, \rho, m \Rightarrow \mu', \rho'$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{eval-empty}}]
+\inferrule*[lab={\ruleName{eval-nil}}]
 {
   \strut
 }
@@ -10,7 +10,7 @@
   \mu, \rho, \varepsilon \Rightarrow \mu, \varnothing
 }
 \and
-\inferrule*[lab={\ruleName{eval-seq}}]
+\inferrule*[lab={\ruleName{eval-cons}}]
 {
   \mu, \rho, t \Rightarrow \mu', \rho_t \\
   \mu', \rho \runion \rho_t, m \Rightarrow \mu'', \rho_m

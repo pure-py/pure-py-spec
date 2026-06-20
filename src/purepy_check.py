@@ -165,13 +165,13 @@ def check_items(items: list[Item], ctx: Context) -> Result:
     if isinstance(item_result_type(head), TyReturns):
         first_unreachable = tail[0]
         node: ast.AST = first_unreachable[0] if isinstance(first_unreachable, list) else first_unreachable
-        return ill_formed(node, '[seq] unreachable statement')
+        return ill_formed(node, '[cons] unreachable statement')
     reassigned = captures_item(head) & assigns_items(tail)
     if reassigned:
         name = sorted(reassigned)[0]
         ra_node = find_first_reassigning(tail, reassigned)
         assert ra_node is not None
-        return ill_formed(ra_node, f"[seq] '{name}' captured by previous statement, reassigned here")
+        return ill_formed(ra_node, f"[cons] '{name}' captured by previous statement, reassigned here")
     head_result = item_result_type(head)
     delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
     return check_items(tail, extend_var(ctx, delta))

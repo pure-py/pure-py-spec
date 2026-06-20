@@ -2,7 +2,7 @@
 \flushleft \shadebox{$\Gamma \vdash m : \Delta$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{empty}}]
+\inferrule*[lab={\ruleName{nil}}]
 {
   \strut
 }
@@ -26,7 +26,7 @@
   \Gamma \vdash \exFromImport{M'}{x_1, \ldots, x_{n+1}} : \statusDefAssigned(\set{x_1, \ldots, x_{n+1}})
 }
 \and
-\inferrule*[lab={\ruleName{seq}}]
+\inferrule*[lab={\ruleName{cons}}]
 {
   \Gamma \vdash t : \Delta \\
   \Gamma \runion \Delta \vdash m : \Delta' \\
