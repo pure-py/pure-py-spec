@@ -28,9 +28,6 @@ class Status(Enum):
     FF = auto()
 
 
-TT = Status.TT
-FF = Status.FF
-
 VarContext = dict[str, Status]           # Γ, Δ
 Item = Union[ast.stmt, list[ast.FunctionDef]]   # statement or grouped mutual region
 
@@ -67,7 +64,7 @@ ResultTy = Union[TyReturns, TyAssigns]
 
 TY_RETURNS = TyReturns()
 TY_ASSIGNS = TyAssigns()
-BUILTINS: VarContext = {'print': TT, 'type': TT, 'range': TT, 'len': TT}
+BUILTINS: VarContext = {'print': Status.TT, 'type': Status.TT, 'range': Status.TT, 'len': Status.TT}
 
 def empty_context() -> VarContext:
     return {}
@@ -78,12 +75,12 @@ def extend(var_ctx: VarContext, delta: VarContext) -> VarContext:
     return new
 
 def meet(a: Status, b: Status) -> Status:
-    if a == TT and b == TT:
-        return TT
-    return FF
+    if a == Status.TT and b == Status.TT:
+        return Status.TT
+    return Status.FF
 
 def merge_delta(d1: VarContext, d2: VarContext) -> VarContext:
-    return {k: meet(d1[k], d2[k]) if k in d1 and k in d2 else FF
+    return {k: meet(d1[k], d2[k]) if k in d1 and k in d2 else Status.FF
             for k in set(d1.keys()) | set(d2.keys())}
 
 def merge_results(rs: list[ResultTy]) -> ResultTy:
@@ -112,7 +109,7 @@ def result_type(node: ast.stmt) -> ResultTy:
     if isinstance(node, ast.Pass):
         return TY_ASSIGNS
     if isinstance(node, ast.Assign):
-        return TyAssigns({t.id: TT for t in node.targets if isinstance(t, ast.Name)})
+        return TyAssigns({t.id: Status.TT for t in node.targets if isinstance(t, ast.Name)})
     if isinstance(node, ast.Expr):
         return TY_ASSIGNS
     if isinstance(node, ast.Assert):
@@ -120,11 +117,11 @@ def result_type(node: ast.stmt) -> ResultTy:
     if isinstance(node, ast.Return):
         return TY_RETURNS
     if isinstance(node, ast.FunctionDef):
-        return TyAssigns({node.name: TT})
+        return TyAssigns({node.name: Status.TT})
     if isinstance(node, ast.Import):
-        return TyAssigns({node.names[0].name.split('.')[0]: TT})
+        return TyAssigns({node.names[0].name.split('.')[0]: Status.TT})
     if isinstance(node, ast.ImportFrom):
-        return TyAssigns({a.name: TT for a in node.names})
+        return TyAssigns({a.name: Status.TT for a in node.names})
     if isinstance(node, ast.If):
         branches = [result_type_of_block(node.body)]
         if node.orelse:
@@ -133,7 +130,7 @@ def result_type(node: ast.stmt) -> ResultTy:
             branches.append(TY_ASSIGNS)
         return merge_results(branches)
     if isinstance(node, ast.Match):
-        branches = [runion_results(TyAssigns({x: TT for x in binds(case.pattern)}), result_type_of_block(case.body)) for case in node.cases]
+        branches = [runion_results(TyAssigns({x: Status.TT for x in binds(case.pattern)}), result_type_of_block(case.body)) for case in node.cases]
         if not is_catch_all(node.cases[-1].pattern):
             branches.append(TY_ASSIGNS)
         return merge_results(branches)
@@ -175,7 +172,7 @@ def check_items(items: list[Item], ctx: Context) -> None:
 
 def item_result_type(item: Item) -> ResultTy:
     if isinstance(item, list):
-        return TyAssigns({d.name: TT for d in item})
+        return TyAssigns({d.name: Status.TT for d in item})
     return result_type(item)
 
 def items_of_block(block: list[ast.stmt]) -> list[Item]:
@@ -206,11 +203,11 @@ def check_mutual_region(defs: list[ast.FunctionDef], ctx: Context) -> None:
     check_bodies(defs, ctx)
 
 def check_bodies(defs: list[ast.FunctionDef], ctx: Context) -> None:
-    f_names = {d.name: TT for d in defs}
+    f_names = {d.name: Status.TT for d in defs}
     for d in defs:
         params = {a.arg for a in d.args.args}
         locals_ = assigns_block(d.body) - params
-        body_ctx = extend_var(extend_var(extend_var(ctx, f_names), {p: TT for p in params}), {x: FF for x in locals_})
+        body_ctx = extend_var(extend_var(extend_var(ctx, f_names), {p: Status.TT for p in params}), {x: Status.FF for x in locals_})
         check_block(d.body, body_ctx)
 
 def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> None:
@@ -271,18 +268,18 @@ def check_stmt(s: ast.stmt, ctx: Context) -> None:
 
 def check_match_cases(cases: list[ast.match_case], ctx: Context) -> None:
     for case in cases:
-        check_block(case.body, extend_var(ctx, {x: TT for x in binds(case.pattern)}))
+        check_block(case.body, extend_var(ctx, {x: Status.TT for x in binds(case.pattern)}))
 
 def check_expr(e: ast.expr, ctx: Context) -> None:
     if isinstance(e, ast.Name):
-        if ctx.var.get(e.id) != TT:
+        if ctx.var.get(e.id) != Status.TT:
             raise IllFormedModule(e, reasons.UnassignedVariable(e.id))
         return
     if isinstance(e, ast.Constant):
         return
     if isinstance(e, ast.Lambda):
         params = {a.arg for a in e.args.args}
-        check_expr(e.body, extend_var(ctx, {p: TT for p in params}))
+        check_expr(e.body, extend_var(ctx, {p: Status.TT for p in params}))
         return
     if isinstance(e, ast.Call):
         if isinstance(e.func, ast.Name) and e.func.id in ctx.cls:
@@ -338,7 +335,7 @@ def check_comprehension(elt: ast.expr, generators: list[ast.comprehension], ctx:
         return
     g = generators[0]
     check_expr(g.iter, ctx)
-    ctx_ = extend_var(ctx, {n: TT for n in names_in_target(g.target)})
+    ctx_ = extend_var(ctx, {n: Status.TT for n in names_in_target(g.target)})
     check_exprs(g.ifs, ctx_)
     check_comprehension(elt, generators[1:], ctx_)
 
@@ -740,7 +737,7 @@ def walk_module(tree: ast.Module) -> None:
     class_ctx = build_class_context(tree.body)
     check_class_decls(tree.body, class_ctx)
     var_ctx = dict(BUILTINS)
-    var_ctx['__name__'] = TT
+    var_ctx['__name__'] = Status.TT
     check_block(tree.body, Context(var=var_ctx, cls=class_ctx))
     if isinstance(result_type_of_block(tree.body), TyReturns):
         raise IllFormedModule(tree.body[0], reasons.TopLevelReturn())
