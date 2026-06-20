@@ -758,5 +758,7 @@ def main() -> None:
         if result is not None:
             exit_code = result.exit_code
     sys.exit(exit_code)
+
+
 if __name__ == '__main__':
     main()
