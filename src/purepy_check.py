@@ -53,10 +53,14 @@ def is_ok(result: Result) -> bool:
 
 def first_err(results: list[Result]) -> Result:
     return next((r for r in results if not is_ok(r)), ok())
-TT = 'tt'
-FF = 'ff'
+class Status(Enum):
+    TT = auto()
+    FF = auto()
 
-Status = str                          # "tt" or "ff"
+
+TT = Status.TT
+FF = Status.FF
+
 VarContext = dict[str, Status]           # Γ, Δ
 Item = Union[ast.stmt, list[ast.FunctionDef]]   # statement or grouped mutual region
 
