@@ -207,7 +207,8 @@ def check_bodies(defs: list[ast.FunctionDef], ctx: Context) -> None:
     for d in defs:
         params = {a.arg for a in d.args.args}
         locals_ = assigns_block(d.body) - params
-        body_ctx = extend_var(extend_var(extend_var(ctx, f_names), {p: Status.TT for p in params}), {x: Status.FF for x in locals_})
+        delta = f_names | {p: Status.TT for p in params} | {x: Status.FF for x in locals_}
+        body_ctx = extend_var(ctx, delta)
         check_block(d.body, body_ctx)
 
 def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> None:
