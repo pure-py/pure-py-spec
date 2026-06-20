@@ -10,13 +10,25 @@ from reasons import Reason
 ILL_FORMED = 3
 
 
-@dataclass(frozen=True)
-class IllFormed:
-    line: Optional[int]
-    col: Optional[int]
-    msg: str
-    kind: int
-    reason: Optional[Reason] = None
+class IllFormed(Exception):
+    def __init__(self, node: ast.AST, reason: Reason):
+        self.line: Optional[int] = getattr(node, 'lineno', None)
+        self.col: Optional[int] = getattr(node, 'col_offset', None)
+        self.reason: Optional[Reason] = reason
+        self.msg: str = reason.message()
+        self.kind: int = ILL_FORMED
+        super().__init__(self.msg)
+
+    @classmethod
+    def raw(cls, line: Optional[int], col: Optional[int], msg: str, kind: int) -> 'IllFormed':
+        obj = cls.__new__(cls)
+        obj.line = line
+        obj.col = col
+        obj.reason = None
+        obj.msg = msg
+        obj.kind = kind
+        Exception.__init__(obj, msg)
+        return obj
 
 
 Result = Optional[IllFormed]
@@ -25,15 +37,8 @@ Result = Optional[IllFormed]
 def ok() -> Result:
     return None
 
-def ill_formed(node: ast.AST, reason: Reason) -> Result:
-    return IllFormed(getattr(node, 'lineno', None), getattr(node, 'col_offset', None),
-                     reason.message(), ILL_FORMED, reason)
-
 def is_ok(result: Result) -> bool:
     return result is None
-
-def first_err(results: list[Result]) -> Result:
-    return next((r for r in results if not is_ok(r)), ok())
 class Status(Enum):
     TT = auto()
     FF = auto()
@@ -169,19 +174,17 @@ def check_items(items: list[Item], ctx: Context) -> Result:
         return check_item(items[0], ctx)
     head = items[0]
     tail = items[1:]
-    err = check_item(head, ctx)
-    if not is_ok(err):
-        return err
+    check_item(head, ctx)
     if isinstance(item_result_type(head), TyReturns):
         first_unreachable = tail[0]
         node: ast.AST = first_unreachable[0] if isinstance(first_unreachable, list) else first_unreachable
-        return ill_formed(node, reasons.UnreachableStatement())
+        raise IllFormed(node, reasons.UnreachableStatement())
     reassigned = captures_item(head) & assigns_items(tail)
     if reassigned:
         name = sorted(reassigned)[0]
         ra_node = find_first_reassigning(tail, reassigned)
         assert ra_node is not None
-        return ill_formed(ra_node, reasons.CapturedReassignment(name))
+        raise IllFormed(ra_node, reasons.CapturedReassignment(name))
     head_result = item_result_type(head)
     delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
     return check_items(tail, extend_var(ctx, delta))
@@ -214,9 +217,7 @@ def check_item(item: Item, ctx: Context) -> Result:
     return check_stmt(item, ctx)
 
 def check_mutual_region(defs: list[ast.FunctionDef], ctx: Context) -> Result:
-    err = check_distinct_names(defs, set())
-    if not is_ok(err):
-        return err
+    check_distinct_names(defs, set())
     return check_bodies(defs, ctx)
 
 def check_bodies(defs: list[ast.FunctionDef], ctx: Context) -> Result:
@@ -230,9 +231,7 @@ def _check_bodies(defs: list[ast.FunctionDef], ctx: Context, f_names: VarContext
     params = {a.arg for a in d.args.args}
     locals_ = assigns_block(d.body) - params
     body_ctx = extend_var(extend_var(extend_var(ctx, f_names), {p: TT for p in params}), {x: FF for x in locals_})
-    err = check_block(d.body, body_ctx)
-    if not is_ok(err):
-        return err
+    check_block(d.body, body_ctx)
     return _check_bodies(defs[1:], ctx, f_names)
 
 def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> Result:
@@ -240,7 +239,7 @@ def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> Result:
         return ok()
     t = targets[0]
     if isinstance(t, ast.Name) and t.id in captured:
-        return ill_formed(t, reasons.SelfCaptureAssignment(t.id))
+        raise IllFormed(t, reasons.SelfCaptureAssignment(t.id))
     return check_assign_targets(targets[1:], captured)
 
 def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> Result:
@@ -248,16 +247,14 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> Result:
         return ok()
     head = defs[0]
     if head.name in seen:
-        return ill_formed(head, reasons.DuplicateMutualName(head.name))
+        raise IllFormed(head, reasons.DuplicateMutualName(head.name))
     return check_distinct_names(defs[1:], seen | {head.name})
 
 def check_stmt(s: ast.stmt, ctx: Context) -> Result:
     if isinstance(s, ast.Pass):
         return ok()
     if isinstance(s, ast.Assign):
-        err = check_expr(s.value, ctx)
-        if not is_ok(err):
-            return err
+        check_expr(s.value, ctx)
         captured = captures(s.value)
         return check_assign_targets(s.targets, captured)
     if isinstance(s, ast.Expr):
@@ -267,19 +264,13 @@ def check_stmt(s: ast.stmt, ctx: Context) -> Result:
             return check_expr(s.value, ctx)
         return ok()
     if isinstance(s, ast.If):
-        err = check_expr(s.test, ctx)
-        if not is_ok(err):
-            return err
-        err = check_block(s.body, ctx)
-        if not is_ok(err):
-            return err
+        check_expr(s.test, ctx)
+        check_block(s.body, ctx)
         if s.orelse:
             return check_block(s.orelse, ctx)
         return ok()
     if isinstance(s, ast.Assert):
-        err = check_expr(s.test, ctx)
-        if not is_ok(err):
-            return err
+        check_expr(s.test, ctx)
         if s.msg is not None:
             return check_expr(s.msg, ctx)
         return ok()
@@ -287,29 +278,26 @@ def check_stmt(s: ast.stmt, ctx: Context) -> Result:
         return ok()
     if isinstance(s, ast.ImportFrom):
         if len(s.names) == 0:
-            return ill_formed(s, reasons.EmptyFromImport())
+            raise IllFormed(s, reasons.EmptyFromImport())
         return ok()
     if isinstance(s, ast.Match):
-        err = check_expr(s.subject, ctx)
-        if not is_ok(err):
-            return err
+        check_expr(s.subject, ctx)
         patterns = [c.pattern for c in s.cases]
-        err = check_pattern_list(patterns, s, ctx)
-        if not is_ok(err):
-            return err
+        check_pattern_list(patterns, s, ctx)
         return _check_match_cases(s.cases, ctx)
     if isinstance(s, ast.ClassDef):
         return ok()
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def _check_match_cases(cases: list[ast.match_case], ctx: Context) -> Result:
-    return first_err([check_block(case.body, extend_var(ctx, {x: TT for x in binds(case.pattern)}))
-                      for case in cases])
+    for case in cases:
+        check_block(case.body, extend_var(ctx, {x: TT for x in binds(case.pattern)}))
+    return ok()
 
 def check_expr(e: ast.expr, ctx: Context) -> Result:
     if isinstance(e, ast.Name):
         if ctx.var.get(e.id) != TT:
-            return ill_formed(e, reasons.UnassignedVariable(e.id))
+            raise IllFormed(e, reasons.UnassignedVariable(e.id))
         return ok()
     if isinstance(e, ast.Constant):
         return ok()
@@ -321,47 +309,33 @@ def check_expr(e: ast.expr, ctx: Context) -> Result:
         if isinstance(e.func, ast.Name) and e.func.id in ctx.cls:
             arity = len(fields_of(ctx.cls, e.func.id))
             if len(e.args) != arity:
-                return ill_formed(e, reasons.ConstructorArityMismatch(e.func.id, arity, len(e.args)))
+                raise IllFormed(e, reasons.ConstructorArityMismatch(e.func.id, arity, len(e.args)))
             return check_exprs(e.args, ctx)
-        err = check_expr(e.func, ctx)
-        if not is_ok(err):
-            return err
+        check_expr(e.func, ctx)
         return check_exprs(e.args, ctx)
     if isinstance(e, ast.BinOp):
-        err = check_expr(e.left, ctx)
-        if not is_ok(err):
-            return err
+        check_expr(e.left, ctx)
         return check_expr(e.right, ctx)
     if isinstance(e, ast.UnaryOp):
         return check_expr(e.operand, ctx)
     if isinstance(e, ast.BoolOp):
         return check_exprs(e.values, ctx)
     if isinstance(e, ast.Compare):
-        err = check_expr(e.left, ctx)
-        if not is_ok(err):
-            return err
+        check_expr(e.left, ctx)
         return check_exprs(e.comparators, ctx)
     if isinstance(e, ast.IfExp):
-        err = check_expr(e.test, ctx)
-        if not is_ok(err):
-            return err
-        err = check_expr(e.body, ctx)
-        if not is_ok(err):
-            return err
+        check_expr(e.test, ctx)
+        check_expr(e.body, ctx)
         return check_expr(e.orelse, ctx)
     if isinstance(e, ast.Attribute):
         return check_expr(e.value, ctx)
     if isinstance(e, ast.Subscript):
-        err = check_expr(e.value, ctx)
-        if not is_ok(err):
-            return err
+        check_expr(e.value, ctx)
         return check_expr(e.slice, ctx)
     if isinstance(e, (ast.List, ast.Tuple)):
         return check_exprs(e.elts, ctx)
     if isinstance(e, ast.Dict):
-        err = check_exprs([k for k in e.keys if k is not None], ctx)
-        if not is_ok(err):
-            return err
+        check_exprs([k for k in e.keys if k is not None], ctx)
         return check_exprs(e.values, ctx)
     if isinstance(e, (ast.List, ast.Tuple)):
         return check_exprs(e.elts, ctx)
@@ -373,21 +347,15 @@ def check_comprehension(elt: ast.expr, generators: list[ast.comprehension], ctx:
     if len(generators) == 0:
         return check_expr(elt, ctx)
     g = generators[0]
-    err = check_expr(g.iter, ctx)
-    if not is_ok(err):
-        return err
+    check_expr(g.iter, ctx)
     ctx_ = extend_var(ctx, {n: TT for n in names_in_target(g.target)})
-    err = check_exprs(g.ifs, ctx_)
-    if not is_ok(err):
-        return err
+    check_exprs(g.ifs, ctx_)
     return check_comprehension(elt, generators[1:], ctx_)
 
 def check_exprs(es: list[ast.expr], ctx: Context) -> Result:
     if len(es) == 0:
         return ok()
-    err = check_expr(es[0], ctx)
-    if not is_ok(err):
-        return err
+    check_expr(es[0], ctx)
     return check_exprs(es[1:], ctx)
 
 def _is_catch_all(p: ast.pattern) -> bool:
@@ -438,17 +406,17 @@ def check_pattern_wf(p: ast.pattern, ctx: Context) -> Result:
         assert isinstance(p.cls, ast.Name)
         c = p.cls.id
         if c not in ctx.cls:
-            return ill_formed(p, reasons.UnknownClassInPattern(c))
+            raise IllFormed(p, reasons.UnknownClassInPattern(c))
         fields = fields_of(ctx.cls, c)
         n, m = len(p.patterns), len(p.kwd_patterns)
         if n + m != len(fields):
-            return ill_formed(p, reasons.PatternArityMismatch(c, len(fields), n + m))
+            raise IllFormed(p, reasons.PatternArityMismatch(c, len(fields), n + m))
         remaining = set(fields[n:])
         kwds = list(p.kwd_attrs)
         if len(kwds) != len(set(kwds)):
-            return ill_formed(p, reasons.DuplicatePatternKeyword(c))
+            raise IllFormed(p, reasons.DuplicatePatternKeyword(c))
         if set(kwds) != remaining:
-            return ill_formed(p, reasons.UnknownFieldInPattern(c, tuple(sorted(remaining))))
+            raise IllFormed(p, reasons.UnknownFieldInPattern(c, tuple(sorted(remaining))))
         subs = list(p.patterns) + list(p.kwd_patterns)
     elif isinstance(p, ast.MatchSequence):
         subs = list(p.patterns)
@@ -456,19 +424,19 @@ def check_pattern_wf(p: ast.pattern, ctx: Context) -> Result:
         subs = [p.pattern]
     else:
         subs = []
-    return first_err([check_pattern_wf(sub, ctx) for sub in subs])
+    for sub in subs:
+        check_pattern_wf(sub, ctx)
+    return ok()
 
 def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: Context) -> Result:
     for i, p in enumerate(patterns):
-        err = check_pattern_wf(p, ctx)
-        if not is_ok(err):
-            return err
+        check_pattern_wf(p, ctx)
         vars_ = _pattern_vars(p)
         if len(vars_) != len(set(vars_)):
-            return ill_formed(node, reasons.NonlinearPattern(i + 1))
+            raise IllFormed(node, reasons.NonlinearPattern(i + 1))
         for j in range(i):
             if subsumes(p, patterns[j]):
-                return ill_formed(node, reasons.UnreachableCase(i + 1, j + 1))
+                raise IllFormed(node, reasons.UnreachableCase(i + 1, j + 1))
     return ok()
 
 def binds(pattern: ast.pattern) -> set[str]:
@@ -731,14 +699,12 @@ def _class_field_names(node: ast.ClassDef) -> list[str]:
     return [t.target.id for t in node.body
             if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)]
 
-def build_class_context(body: list[ast.stmt]) -> Union[ClassContext, IllFormed]:
+def build_class_context(body: list[ast.stmt]) -> ClassContext:
     lambda_m: ClassContext = {}
     for s in body:
         if isinstance(s, ast.ClassDef):
             if s.name in lambda_m:
-                err = ill_formed(s, reasons.DuplicateClassName(s.name))
-                assert err is not None
-                return err
+                raise IllFormed(s, reasons.DuplicateClassName(s.name))
             base = s.bases[0].id if s.bases and isinstance(s.bases[0], ast.Name) else None
             lambda_m[s.name] = ClassInfo(fields=tuple(_class_field_names(s)), base=base)
     return lambda_m
@@ -753,42 +719,45 @@ def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> Result:
     names = _class_field_names(node)
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
-        return ill_formed(node, reasons.DuplicateFieldName(dup, node.name))
+        raise IllFormed(node, reasons.DuplicateFieldName(dup, node.name))
     if len(node.bases) == 0:
         return ok()
     base = node.bases[0]
     assert isinstance(base, ast.Name)
     if base.id not in lambda_m:
-        return ill_formed(node, reasons.UnknownBaseClass(base.id))
+        raise IllFormed(node, reasons.UnknownBaseClass(base.id))
     clash = set(names) & set(fields_of(lambda_m, base.id))
     if len(clash) == 0:
         return ok()
-    return ill_formed(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
+    raise IllFormed(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
 
 def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> Result:
-    return first_err([check_class_decl(s, lambda_m) for s in body if isinstance(s, ast.ClassDef)])
+    for s in body:
+        if isinstance(s, ast.ClassDef):
+            check_class_decl(s, lambda_m)
+    return ok()
 
 def check_module(tree: ast.AST) -> Result:
     assert isinstance(tree, ast.Module)
-    if len(tree.body) == 0:
+    try:
+        _check_module(tree)
         return ok()
+    except IllFormed as e:
+        return e
+
+def _check_module(tree: ast.Module) -> None:
+    if len(tree.body) == 0:
+        return
     nested = _find_nested_import(tree.body)
     if nested is not None:
-        return ill_formed(nested, reasons.NestedImport())
+        raise IllFormed(nested, reasons.NestedImport())
     class_ctx = build_class_context(tree.body)
-    if isinstance(class_ctx, IllFormed):
-        return class_ctx
-    err = check_class_decls(tree.body, class_ctx)
-    if not is_ok(err):
-        return err
+    check_class_decls(tree.body, class_ctx)
     var_ctx = dict(BUILTINS)
     var_ctx['__name__'] = TT
-    err = check_block(tree.body, Context(var=var_ctx, cls=class_ctx))
-    if not is_ok(err):
-        return err
+    check_block(tree.body, Context(var=var_ctx, cls=class_ctx))
     if isinstance(result_type_of_block(tree.body), TyReturns):
-        return ill_formed(tree.body[0], reasons.TopLevelReturn())
-    return ok()
+        raise IllFormed(tree.body[0], reasons.TopLevelReturn())
 
 def check_file(filename: str) -> Result:
     source = open(filename).read()

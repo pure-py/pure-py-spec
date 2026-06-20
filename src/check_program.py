@@ -15,7 +15,7 @@ PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
 
 
 def _program_error(msg: str) -> IllFormed:
-    return IllFormed(line=None, col=None, msg=msg, kind=ILL_FORMED_PROGRAM)
+    return IllFormed.raw(None, None, msg, ILL_FORMED_PROGRAM)
 
 
 def _imports_of(tree: ast.Module) -> set[str]:
@@ -121,7 +121,7 @@ def check_program(entry_path: pathlib.Path) -> Result:
         err = check_module.check_module(tree)
         if not is_ok(err):
             assert err is not None
-            return IllFormed(line=err.line, col=err.col, msg=f"{path}: {err.msg}", kind=err.kind)
+            return IllFormed.raw(err.line, err.col, f"{path}: {err.msg}", err.kind)
 
     # Acyclicity. (Resolution is already guaranteed by the walk loop above.)
     graph = {name: imps | _parents(name) | set().union(*(_parents(i) for i in imps))
