@@ -91,12 +91,12 @@ def merge_results(rs: list[ResultTy]) -> ResultTy:
     if len(assigns_branches) == 0:
         return TY_RETURNS
     delta = assigns_branches[0].delta
-    return TyAssigns(_fold_merge(delta, assigns_branches[1:]))
+    return TyAssigns(fold_merge(delta, assigns_branches[1:]))
 
-def _fold_merge(acc: VarContext, branches: list[TyAssigns]) -> VarContext:
+def fold_merge(acc: VarContext, branches: list[TyAssigns]) -> VarContext:
     if len(branches) == 0:
         return acc
-    return _fold_merge(merge_delta(acc, branches[0].delta), branches[1:])
+    return fold_merge(merge_delta(acc, branches[0].delta), branches[1:])
 
 def runion_delta(d1: VarContext, d2: VarContext) -> VarContext:
     return {**d1, **d2}
@@ -134,7 +134,7 @@ def result_type(node: ast.stmt) -> ResultTy:
         return merge_results(branches)
     if isinstance(node, ast.Match):
         branches = [runion_results(TyAssigns({x: TT for x in binds(case.pattern)}), result_type_of_block(case.body)) for case in node.cases]
-        if not _is_catch_all(node.cases[-1].pattern):
+        if not is_catch_all(node.cases[-1].pattern):
             branches.append(TY_ASSIGNS)
         return merge_results(branches)
     if isinstance(node, ast.ClassDef):
@@ -143,10 +143,10 @@ def result_type(node: ast.stmt) -> ResultTy:
 
 def result_type_of_block(block: list[ast.stmt]) -> ResultTy:
     if len(block) == 1:
-        return _result_type_of_item(block[0])
-    return runion_results(_result_type_of_item(block[0]), result_type_of_block(block[1:]))
+        return result_type_of_item(block[0])
+    return runion_results(result_type_of_item(block[0]), result_type_of_block(block[1:]))
 
-def _result_type_of_item(stmt: ast.stmt) -> ResultTy:
+def result_type_of_item(stmt: ast.stmt) -> ResultTy:
     return result_type(stmt)
 
 def check_block(block: list[ast.stmt], ctx: Context) -> None:
@@ -184,15 +184,15 @@ def items_of_block(block: list[ast.stmt]) -> list[Item]:
     head = block[0]
     rest = block[1:]
     if isinstance(head, ast.FunctionDef):
-        return _extend_region([head], rest)
+        return extend_region([head], rest)
     return [head] + items_of_block(rest)
 
-def _extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[Item]:
+def extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[Item]:
     if len(rest) == 0:
         return [region]
     head = rest[0]
     if isinstance(head, ast.FunctionDef):
-        return _extend_region(region + [head], rest[1:])
+        return extend_region(region + [head], rest[1:])
     return [region] + items_of_block(rest)
 
 def check_item(item: Item, ctx: Context) -> None:
@@ -263,13 +263,13 @@ def check_stmt(s: ast.stmt, ctx: Context) -> None:
     if isinstance(s, ast.Match):
         check_expr(s.subject, ctx)
         check_pattern_list([c.pattern for c in s.cases], s, ctx)
-        _check_match_cases(s.cases, ctx)
+        check_match_cases(s.cases, ctx)
         return
     if isinstance(s, ast.ClassDef):
         return
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
-def _check_match_cases(cases: list[ast.match_case], ctx: Context) -> None:
+def check_match_cases(cases: list[ast.match_case], ctx: Context) -> None:
     for case in cases:
         check_block(case.body, extend_var(ctx, {x: TT for x in binds(case.pattern)}))
 
@@ -348,10 +348,10 @@ def check_exprs(es: list[ast.expr], ctx: Context) -> None:
     check_expr(es[0], ctx)
     check_exprs(es[1:], ctx)
 
-def _is_catch_all(p: ast.pattern) -> bool:
+def is_catch_all(p: ast.pattern) -> bool:
     return isinstance(p, ast.MatchAs) and p.pattern is None
 
-def _literal_value(pat: ast.MatchValue) -> object:
+def literal_value(pat: ast.MatchValue) -> object:
     v = pat.value
     if isinstance(v, ast.Constant):
         return v.value
@@ -369,7 +369,7 @@ def subsumes(p: ast.pattern, q: ast.pattern) -> bool:
     if isinstance(q, ast.MatchAs) and q.pattern is None:
         return True
     if isinstance(p, ast.MatchValue) and isinstance(q, ast.MatchValue):
-        return _literal_value(p) == _literal_value(q)
+        return literal_value(p) == literal_value(q)
     if isinstance(p, ast.MatchSingleton) and isinstance(q, ast.MatchSingleton):
         return p.value is q.value
     if isinstance(p, ast.MatchSequence) and isinstance(q, ast.MatchSequence):
@@ -378,17 +378,17 @@ def subsumes(p: ast.pattern, q: ast.pattern) -> bool:
         return all((subsumes(pi, qi) for pi, qi in zip(p.patterns, q.patterns)))
     return False
 
-def _pattern_vars(p: ast.pattern) -> list[str]:
+def pattern_vars(p: ast.pattern) -> list[str]:
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
         return []
     if isinstance(p, ast.MatchAs):
-        sub = _pattern_vars(p.pattern) if p.pattern is not None else []
+        sub = pattern_vars(p.pattern) if p.pattern is not None else []
         return sub + ([p.name] if p.name else [])
     if isinstance(p, ast.MatchSequence):
-        return [v for sub in p.patterns for v in _pattern_vars(sub)]
+        return [v for sub in p.patterns for v in pattern_vars(sub)]
     if isinstance(p, ast.MatchClass):
-        return [v for sub in p.patterns for v in _pattern_vars(sub)] + \
-               [v for sub in p.kwd_patterns for v in _pattern_vars(sub)]
+        return [v for sub in p.patterns for v in pattern_vars(sub)] + \
+               [v for sub in p.kwd_patterns for v in pattern_vars(sub)]
     raise AssertionError(f'unexpected pattern: {type(p).__name__}')
 
 def check_pattern_wf(p: ast.pattern, ctx: Context) -> None:
@@ -420,7 +420,7 @@ def check_pattern_wf(p: ast.pattern, ctx: Context) -> None:
 def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: Context) -> None:
     for i, p in enumerate(patterns):
         check_pattern_wf(p, ctx)
-        vars_ = _pattern_vars(p)
+        vars_ = pattern_vars(p)
         if len(vars_) != len(set(vars_)):
             raise IllFormedModule(node, reasons.NonlinearPattern(i + 1))
         for j in range(i):
@@ -488,13 +488,13 @@ def names_in_target(target: ast.expr) -> set[str]:
     if isinstance(target, ast.Name):
         return {target.id}
     if isinstance(target, ast.Tuple):
-        return _names_in_targets(target.elts)
+        return names_in_targets(target.elts)
     return set()
 
-def _names_in_targets(targets: list[ast.expr]) -> set[str]:
+def names_in_targets(targets: list[ast.expr]) -> set[str]:
     if len(targets) == 0:
         return set()
-    return names_in_target(targets[0]) | _names_in_targets(targets[1:])
+    return names_in_target(targets[0]) | names_in_targets(targets[1:])
 
 def captures(e: ast.expr) -> set[str]:
     if isinstance(e, ast.Lambda):
@@ -630,15 +630,15 @@ def captures_block(block: list[ast.stmt]) -> set[str]:
 
 def captures_region(defs: list[ast.FunctionDef]) -> set[str]:
     f_names = {d.name for d in defs}
-    return _captures_region_bodies(defs) - f_names
+    return captures_region_bodies(defs) - f_names
 
-def _captures_region_bodies(defs: list[ast.FunctionDef]) -> set[str]:
+def captures_region_bodies(defs: list[ast.FunctionDef]) -> set[str]:
     if len(defs) == 0:
         return set()
     d = defs[0]
     params = {a.arg for a in d.args.args}
     own = fv_block(d.body) - params - assigns_block(d.body)
-    return own | _captures_region_bodies(defs[1:])
+    return own | captures_region_bodies(defs[1:])
 
 def captures_item(item: Item) -> set[str]:
     if isinstance(item, list):
@@ -662,28 +662,28 @@ def find_first_reassigning(items: list[Item], names: set[str]) -> Optional[ast.A
         return items[0][0] if isinstance(items[0], list) else items[0]
     return find_first_reassigning(items[1:], names)
 
-def _find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST | None:
+def find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST | None:
     """Return the first import statement appearing in a non-top-level context.
     nested=True means stmts themselves are inside a non-top-level body."""
     for s in stmts:
         if nested and isinstance(s, (ast.Import, ast.ImportFrom)):
             return s
         if isinstance(s, ast.FunctionDef):
-            r = _find_nested_import(s.body, nested=True)
+            r = find_nested_import(s.body, nested=True)
             if r is not None:
                 return r
         if isinstance(s, ast.If):
-            r = _find_nested_import(s.body, nested=True) or _find_nested_import(s.orelse, nested=True)
+            r = find_nested_import(s.body, nested=True) or find_nested_import(s.orelse, nested=True)
             if r is not None:
                 return r
         if isinstance(s, ast.Match):
             for case in s.cases:
-                r = _find_nested_import(case.body, nested=True)
+                r = find_nested_import(case.body, nested=True)
                 if r is not None:
                     return r
     return None
 
-def _class_field_names(node: ast.ClassDef) -> list[str]:
+def class_field_names(node: ast.ClassDef) -> list[str]:
     return [t.target.id for t in node.body
             if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)]
 
@@ -694,7 +694,7 @@ def build_class_context(body: list[ast.stmt]) -> ClassContext:
             if s.name in lambda_m:
                 raise IllFormedModule(s, reasons.DuplicateClassName(s.name))
             base = s.bases[0].id if s.bases and isinstance(s.bases[0], ast.Name) else None
-            lambda_m[s.name] = ClassInfo(fields=tuple(_class_field_names(s)), base=base)
+            lambda_m[s.name] = ClassInfo(fields=tuple(class_field_names(s)), base=base)
     return lambda_m
 
 def fields_of(lambda_m: ClassContext, c: str) -> tuple[str, ...]:
@@ -704,7 +704,7 @@ def fields_of(lambda_m: ClassContext, c: str) -> tuple[str, ...]:
     return fields_of(lambda_m, info.base) + info.fields
 
 def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> None:
-    names = _class_field_names(node)
+    names = class_field_names(node)
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
         raise IllFormedModule(node, reasons.DuplicateFieldName(dup, node.name))
@@ -726,24 +726,21 @@ def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> None:
 def check_module(tree: ast.AST) -> Result:
     assert isinstance(tree, ast.Module)
     try:
-        _check_module(tree)
+        if len(tree.body) == 0:
+            return None
+        nested = find_nested_import(tree.body)
+        if nested is not None:
+            raise IllFormedModule(nested, reasons.NestedImport())
+        class_ctx = build_class_context(tree.body)
+        check_class_decls(tree.body, class_ctx)
+        var_ctx = dict(BUILTINS)
+        var_ctx['__name__'] = TT
+        check_block(tree.body, Context(var=var_ctx, cls=class_ctx))
+        if isinstance(result_type_of_block(tree.body), TyReturns):
+            raise IllFormedModule(tree.body[0], reasons.TopLevelReturn())
     except IllFormed as e:
         return e
     return None
-
-def _check_module(tree: ast.Module) -> None:
-    if len(tree.body) == 0:
-        return
-    nested = _find_nested_import(tree.body)
-    if nested is not None:
-        raise IllFormedModule(nested, reasons.NestedImport())
-    class_ctx = build_class_context(tree.body)
-    check_class_decls(tree.body, class_ctx)
-    var_ctx = dict(BUILTINS)
-    var_ctx['__name__'] = TT
-    check_block(tree.body, Context(var=var_ctx, cls=class_ctx))
-    if isinstance(result_type_of_block(tree.body), TyReturns):
-        raise IllFormedModule(tree.body[0], reasons.TopLevelReturn())
 
 def check_file(filename: str) -> Result:
     source = open(filename).read()

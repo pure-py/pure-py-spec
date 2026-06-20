@@ -19,7 +19,7 @@ class IllFormedProgram(IllFormed):
         super().__init__(msg)
 
 
-def _imports_of(tree: ast.Module) -> set[str]:
+def imports_of(tree: ast.Module) -> set[str]:
     """Module names appearing in top-level (or any) import statements in the module."""
     result: set[str] = set()
     for node in ast.walk(tree):
@@ -31,12 +31,12 @@ def _imports_of(tree: ast.Module) -> set[str]:
     return result
 
 
-def _parents(name: str) -> set[str]:
+def parents(name: str) -> set[str]:
     parts = name.split(".")
     return {".".join(parts[:i]) for i in range(1, len(parts))}
 
 
-def _resolve(name: str, base_dir: pathlib.Path) -> Optional[pathlib.Path]:
+def resolve(name: str, base_dir: pathlib.Path) -> Optional[pathlib.Path]:
     """Find the file backing module `name`: either `name.py` or `name/__init__.py`
     (dots in `name` become directory separators)."""
     stem = name.replace('.', '/')
@@ -46,11 +46,11 @@ def _resolve(name: str, base_dir: pathlib.Path) -> Optional[pathlib.Path]:
     return None
 
 
-def _load(name: str, base_dir: pathlib.Path) -> tuple[Optional[ast.Module], Result]:
+def load(name: str, base_dir: pathlib.Path) -> tuple[Optional[ast.Module], Result]:
     """Load module `name` from base_dir. Returns (tree, ok()) on success;
     (None, error) if missing or fails to parse; (tree, error) if the syntactic
     subset rejects."""
-    path = _resolve(name, base_dir)
+    path = resolve(name, base_dir)
     if path is None:
         return None, IllFormedProgram(f"module {name!r} not found under {base_dir}")
     try:
@@ -64,7 +64,7 @@ def _load(name: str, base_dir: pathlib.Path) -> tuple[Optional[ast.Module], Resu
     return tree, None
 
 
-def _has_cycle(graph: dict[str, set[str]]) -> list[str]:
+def has_cycle(graph: dict[str, set[str]]) -> list[str]:
     """DFS cycle detection. Returns a cycle (as a list of names) if one exists, else []."""
     WHITE, GRAY, BLACK = 0, 1, 2
     color: dict[str, int] = {n: WHITE for n in graph}
@@ -97,25 +97,25 @@ def _has_cycle(graph: dict[str, set[str]]) -> list[str]:
 def check_program(entry_path: pathlib.Path) -> Result:
     base_dir = entry_path.parent
     modules: dict[str, tuple[pathlib.Path, ast.Module]] = {}
-    imports_by_module: dict[str, set[str]] = {}  # cached _imports_of(modules[name])
+    imports_by_module: dict[str, set[str]] = {}  # cached imports_of(modules[name])
     queue: list[str] = [entry_path.stem, *PREDEFINED_MODULES]
     while queue:
         name = queue.pop()
         if name in modules:
             continue
-        path = _resolve(name, base_dir)
+        path = resolve(name, base_dir)
         if path is None and name in PREDEFINED_MODULES:
             modules[name] = (pathlib.Path(f"<{name}>"), ast.Module(body=[], type_ignores=[]))
             imports_by_module[name] = set()
             continue
-        tree, err = _load(name, base_dir)
+        tree, err = load(name, base_dir)
         if err is not None:
             return err
         assert tree is not None and path is not None
         modules[name] = (path, tree)
-        imports_by_module[name] = _imports_of(tree)
+        imports_by_module[name] = imports_of(tree)
         for imp in imports_by_module[name]:
-            queue.extend({imp} | _parents(imp))
+            queue.extend({imp} | parents(imp))
 
     # Per-module well-formedness.
     for path, tree in modules.values():
@@ -125,9 +125,9 @@ def check_program(entry_path: pathlib.Path) -> Result:
             return err
 
     # Acyclicity. (Resolution is already guaranteed by the walk loop above.)
-    graph = {name: imps | _parents(name) | set().union(*(_parents(i) for i in imps))
+    graph = {name: imps | parents(name) | set().union(*(parents(i) for i in imps))
              for name, imps in imports_by_module.items()}
-    cycle = _has_cycle(graph)
+    cycle = has_cycle(graph)
     if len(cycle) > 0:
         return IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
     return None
