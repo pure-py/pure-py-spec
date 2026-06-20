@@ -1,353 +1,343 @@
 import ast
 import sys
-from dataclasses import dataclass
-from typing import Callable, Optional, TypeVar
-
-T = TypeVar('T')
-
-UNSUPPORTED = 1
-NOT_YET = 2
+from typing import Optional
 
 
-@dataclass(frozen=True)
-class Error:
-    line: Optional[int]
-    col: Optional[int]
+class ParseError(Exception):
+    exit_code: int   # overridden by subclass
     msg: str
-    kind: int
+
+    def __init__(self, node: ast.AST, msg: str):
+        self.line: Optional[int] = getattr(node, 'lineno', None)
+        self.col: Optional[int] = getattr(node, 'col_offset', None)
+        self.msg = msg
+        super().__init__(msg)
 
 
-Result = Optional[Error]
+class Unsupported(ParseError):
+    exit_code = 1
 
 
-def ok() -> Result:
-    return None
+class NotYet(ParseError):
+    exit_code = 2
 
-def unsupported(node: ast.AST, msg: str) -> Result:
-    return Error(getattr(node, 'lineno', None), getattr(node, 'col_offset', None), msg, UNSUPPORTED)
+    def __init__(self, node: ast.AST, msg: str, issue: int):
+        super().__init__(node, f'{msg} (#{issue})')
 
-def not_yet(node: ast.AST, msg: str, issue: int) -> Result:
-    return Error(getattr(node, 'lineno', None), getattr(node, 'col_offset', None), f'{msg} (#{issue})', NOT_YET)
 
-def is_ok(result: Result) -> bool:
-    return result is None
+Result = Optional[ParseError]
 
-def first_err(results: list[Result]) -> Result:
-    return next((r for r in results if not is_ok(r)), ok())
 
-def check_all(nodes: list[T], checker: Callable[[T], Result]) -> Result:
-    return first_err([checker(node) for node in nodes])
-
-def check_stmt(node: ast.stmt) -> Result:
+def check_stmt(node: ast.stmt) -> None:
     if isinstance(node, ast.Pass):
-        return ok()
+        return
     if isinstance(node, ast.Assign):
         if len(node.targets) != 1:
-            return unsupported(node, 'multiple assignment targets')
+            raise Unsupported(node, 'multiple assignment targets')
         target = node.targets[0]
         if not isinstance(target, ast.Name):
-            return not_yet(node, 'destructuring assignment not yet supported', 54)
-        return check_expr(node.value)
+            raise NotYet(node, 'destructuring assignment not yet supported', 54)
+        check_expr(node.value)
+        return
     if isinstance(node, ast.Return):
-        if node.value is None:
-            return ok()
-        return check_expr(node.value)
+        if node.value is not None:
+            check_expr(node.value)
+        return
     if isinstance(node, ast.If):
-        test_result = check_expr(node.test)
-        if not is_ok(test_result):
-            return test_result
-        body_result = check_body(node.body)
-        if not is_ok(body_result):
-            return body_result
-        return check_body(node.orelse)
+        check_expr(node.test)
+        check_body(node.body)
+        check_body(node.orelse)
+        return
     if isinstance(node, ast.FunctionDef):
-        args_result = check_arguments(node.args)
-        if not is_ok(args_result):
-            return args_result
+        check_arguments(node.args)
         if len(node.decorator_list) > 0:
-            return not_yet(node, 'decorators not yet supported', 58)
+            raise NotYet(node, 'decorators not yet supported', 58)
         if node.returns is not None:
-            return unsupported(node, 'return type annotations not supported')
-        return check_body(node.body)
+            raise Unsupported(node, 'return type annotations not supported')
+        check_body(node.body)
+        return
     if isinstance(node, ast.Expr):
-        return check_expr(node.value)
+        check_expr(node.value)
+        return
     if isinstance(node, ast.Assert):
         check_expr(node.test)
         if node.msg is not None:
             check_expr(node.msg)
-        return ok()
+        return
     if isinstance(node, ast.AugAssign):
-        return unsupported(node, 'augmented assignment (+=, etc.) not supported')
+        raise Unsupported(node, 'augmented assignment (+=, etc.) not supported')
     if isinstance(node, ast.AnnAssign):
-        return unsupported(node, 'annotated assignment not supported')
+        raise Unsupported(node, 'annotated assignment not supported')
     if isinstance(node, ast.Delete):
-        return unsupported(node, 'del not supported')
+        raise Unsupported(node, 'del not supported')
     if isinstance(node, ast.For):
-        return unsupported(node, 'for loops not supported (use list comprehensions)')
+        raise Unsupported(node, 'for loops not supported (use list comprehensions)')
     if isinstance(node, ast.While):
-        return unsupported(node, 'while loops not supported')
+        raise Unsupported(node, 'while loops not supported')
     if isinstance(node, ast.With):
-        return unsupported(node, 'with statements not supported')
+        raise Unsupported(node, 'with statements not supported')
     if isinstance(node, ast.AsyncFunctionDef):
-        return unsupported(node, 'async not supported')
+        raise Unsupported(node, 'async not supported')
     if isinstance(node, ast.AsyncFor):
-        return unsupported(node, 'async not supported')
+        raise Unsupported(node, 'async not supported')
     if isinstance(node, ast.AsyncWith):
-        return unsupported(node, 'async not supported')
+        raise Unsupported(node, 'async not supported')
     if isinstance(node, ast.Raise):
-        return unsupported(node, 'raise not supported')
+        raise Unsupported(node, 'raise not supported')
     if isinstance(node, ast.Try):
-        return unsupported(node, 'try/except not supported')
+        raise Unsupported(node, 'try/except not supported')
     if isinstance(node, ast.Import):
         if len(node.names) != 1:
-            return not_yet(node, 'multi-target import (import a, b) not yet supported', 53)
+            raise NotYet(node, 'multi-target import (import a, b) not yet supported', 53)
         if node.names[0].asname is not None:
-            return not_yet(node, 'import-as not yet supported', 53)
-        return ok()
+            raise NotYet(node, 'import-as not yet supported', 53)
+        return
     if isinstance(node, ast.ImportFrom):
         if node.level > 0:
-            return not_yet(node, 'relative imports not yet supported', 53)
+            raise NotYet(node, 'relative imports not yet supported', 53)
         if node.module is None:
-            return not_yet(node, 'from-import with no module not yet supported', 53)
+            raise NotYet(node, 'from-import with no module not yet supported', 53)
         for alias in node.names:
             if alias.name == '*':
-                return not_yet(node, 'from M import * not yet supported', 53)
+                raise NotYet(node, 'from M import * not yet supported', 53)
             if alias.asname is not None:
-                return not_yet(node, 'from-import-as not yet supported', 53)
-        return ok()
+                raise NotYet(node, 'from-import-as not yet supported', 53)
+        return
     if isinstance(node, ast.Global):
-        return not_yet(node, 'global not yet supported', 40)
+        raise NotYet(node, 'global not yet supported', 40)
     if isinstance(node, ast.Nonlocal):
-        return unsupported(node, 'nonlocal not supported')
+        raise Unsupported(node, 'nonlocal not supported')
     if isinstance(node, ast.ClassDef):
-        return check_classdef(node)
+        check_classdef(node)
+        return
     if isinstance(node, ast.Match):
-        subj_result = check_expr(node.subject)
-        if not is_ok(subj_result):
-            return subj_result
+        check_expr(node.subject)
         for case in node.cases:
             if case.guard is not None:
-                return not_yet(case, 'case guards not yet supported', 83)
-            pat_result = check_pattern(case.pattern)
-            if not is_ok(pat_result):
-                return pat_result
-            body_result = check_body(case.body)
-            if not is_ok(body_result):
-                return body_result
-        return ok()
+                raise NotYet(case, 'case guards not yet supported', 83)
+            check_pattern(case.pattern)
+            check_body(case.body)
+        return
     if isinstance(node, ast.Break):
-        return unsupported(node, 'break not supported')
+        raise Unsupported(node, 'break not supported')
     if isinstance(node, ast.Continue):
-        return unsupported(node, 'continue not supported')
-    return unsupported(node, f'unknown statement type: {type(node).__name__}')
+        raise Unsupported(node, 'continue not supported')
+    raise Unsupported(node, f'unknown statement type: {type(node).__name__}')
 
-def check_classdef(node: ast.ClassDef) -> Result:
+def check_classdef(node: ast.ClassDef) -> None:
     if any(isinstance(b, ast.Name) and b.id == 'Enum' for b in node.bases):
-        return not_yet(node, 'enum classes not yet supported', 86)
+        raise NotYet(node, 'enum classes not yet supported', 86)
     if len(node.decorator_list) != 1:
-        return unsupported(node, 'class must have exactly the @dataclass decorator')
+        raise Unsupported(node, 'class must have exactly the @dataclass decorator')
     deco = node.decorator_list[0]
     if not (isinstance(deco, ast.Name) and deco.id == 'dataclass'):
-        return unsupported(node, 'only the @dataclass decorator is supported on classes')
+        raise Unsupported(node, 'only the @dataclass decorator is supported on classes')
     if len(node.bases) > 1:
-        return unsupported(node, 'at most one base class is supported')
+        raise Unsupported(node, 'at most one base class is supported')
     if len(node.bases) > 0 and not isinstance(node.bases[0], ast.Name):
-        return unsupported(node, 'base class must be a simple name')
+        raise Unsupported(node, 'base class must be a simple name')
     if len(node.keywords) > 0:
-        return unsupported(node, 'class keyword arguments not supported')
+        raise Unsupported(node, 'class keyword arguments not supported')
     if len(node.body) == 1 and isinstance(node.body[0], ast.Pass):
-        return ok()
-    return check_all(node.body, check_field)
+        return
+    for stmt in node.body:
+        check_field(stmt)
 
-def check_field(stmt: ast.stmt) -> Result:
+def check_field(stmt: ast.stmt) -> None:
     if not isinstance(stmt, ast.AnnAssign):
-        return unsupported(stmt, 'dataclass body may contain only field declarations')
+        raise Unsupported(stmt, 'dataclass body may contain only field declarations')
     if not isinstance(stmt.target, ast.Name):
-        return unsupported(stmt, 'field target must be a simple name')
+        raise Unsupported(stmt, 'field target must be a simple name')
     if stmt.value is not None:
-        return unsupported(stmt, 'field default values not supported')
+        raise Unsupported(stmt, 'field default values not supported')
     if not (isinstance(stmt.annotation, ast.Name) and stmt.annotation.id == 'Any'):
-        return unsupported(stmt, 'field type annotation must be Any')
-    return ok()
+        raise Unsupported(stmt, 'field type annotation must be Any')
 
-def check_pattern(node: ast.pattern) -> Result:
+def check_pattern(node: ast.pattern) -> None:
     if isinstance(node, ast.MatchValue):
         v = node.value
         if isinstance(v, ast.Constant) and isinstance(v.value, (int, float, str)):
-            return ok()
+            return
         if isinstance(v, ast.UnaryOp) and isinstance(v.op, (ast.UAdd, ast.USub)) and isinstance(v.operand, ast.Constant) and isinstance(v.operand.value, (int, float)):
-            return ok()
+            return
         if isinstance(v, ast.Attribute):
-            return not_yet(node, 'attribute value patterns not yet supported', 86)
-        return not_yet(node, 'complex value patterns not yet supported', 83)
+            raise NotYet(node, 'attribute value patterns not yet supported', 86)
+        raise NotYet(node, 'complex value patterns not yet supported', 83)
     if isinstance(node, ast.MatchSingleton):
-        return ok()
+        return
     if isinstance(node, ast.MatchAs):
-        if node.pattern is None:
-            return ok()
-        return check_pattern(node.pattern)
+        if node.pattern is not None:
+            check_pattern(node.pattern)
+        return
     if isinstance(node, ast.MatchSequence):
         for p in node.patterns:
             if isinstance(p, ast.MatchStar):
-                return not_yet(node, 'star patterns not yet supported', 84)
-            r = check_pattern(p)
-            if not is_ok(r):
-                return r
-        return ok()
+                raise NotYet(node, 'star patterns not yet supported', 84)
+            check_pattern(p)
+        return
     if isinstance(node, ast.MatchClass):
         if not isinstance(node.cls, ast.Name):
-            return unsupported(node, 'class pattern head must be a simple name')
-        return check_all(list(node.patterns) + list(node.kwd_patterns), check_pattern)
+            raise Unsupported(node, 'class pattern head must be a simple name')
+        for p in list(node.patterns) + list(node.kwd_patterns):
+            check_pattern(p)
+        return
     if isinstance(node, ast.MatchMapping):
-        return not_yet(node, 'mapping patterns not yet supported', 87)
+        raise NotYet(node, 'mapping patterns not yet supported', 87)
     if isinstance(node, ast.MatchOr):
-        return not_yet(node, 'or-patterns not yet supported', 85)
+        raise NotYet(node, 'or-patterns not yet supported', 85)
     if isinstance(node, ast.MatchStar):
-        return not_yet(node, 'star patterns not yet supported', 84)
-    return unsupported(node, f'unknown pattern type: {type(node).__name__}')
+        raise NotYet(node, 'star patterns not yet supported', 84)
+    raise Unsupported(node, f'unknown pattern type: {type(node).__name__}')
 
-def check_expr(node: ast.expr) -> Result:
+def check_expr(node: ast.expr) -> None:
     if isinstance(node, ast.Constant):
         if isinstance(node.value, (int, float, str, bool, type(None))):
-            return ok()
+            return
         if isinstance(node.value, (bytes, complex)):
-            return unsupported(node, f'{type(node.value).__name__} literals not supported')
-        return unsupported(node, f'unsupported literal type: {type(node.value).__name__}')
+            raise Unsupported(node, f'{type(node.value).__name__} literals not supported')
+        raise Unsupported(node, f'unsupported literal type: {type(node.value).__name__}')
     if isinstance(node, ast.Name):
-        return ok()
+        return
     if isinstance(node, ast.BinOp):
         allowed = (ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv, ast.Mod, ast.Pow)
         if not isinstance(node.op, allowed):
-            return unsupported(node, f'binary operator not in PurePy: {type(node.op).__name__}')
-        left_result = check_expr(node.left)
-        if not is_ok(left_result):
-            return left_result
-        return check_expr(node.right)
+            raise Unsupported(node, f'binary operator not in PurePy: {type(node.op).__name__}')
+        check_expr(node.left)
+        check_expr(node.right)
+        return
     if isinstance(node, ast.UnaryOp):
         if isinstance(node.op, ast.Not):
-            return check_expr(node.operand)
+            check_expr(node.operand)
+            return
         if isinstance(node.op, (ast.UAdd, ast.USub)):
-            return check_expr(node.operand)
-        return unsupported(node, f'unsupported unary operator: {type(node.op).__name__}')
+            check_expr(node.operand)
+            return
+        raise Unsupported(node, f'unsupported unary operator: {type(node.op).__name__}')
     if isinstance(node, ast.BoolOp):
         if len(node.values) > 2:
-            return not_yet(node, 'chained boolean operator not yet supported', 82)
-        return check_all(node.values, check_expr)
+            raise NotYet(node, 'chained boolean operator not yet supported', 82)
+        for v in node.values:
+            check_expr(v)
+        return
     if isinstance(node, ast.Compare):
         if len(node.ops) > 1:
-            return not_yet(node, 'chained comparison not yet supported', 82)
+            raise NotYet(node, 'chained comparison not yet supported', 82)
         for op in node.ops:
             if isinstance(op, (ast.In, ast.NotIn)):
-                return not_yet(node, 'membership operator (in/not in) not yet supported', 80)
+                raise NotYet(node, 'membership operator (in/not in) not yet supported', 80)
             if isinstance(op, (ast.Is, ast.IsNot)):
-                return not_yet(node, 'identity operator (is/is not) not yet supported', 81)
-        left_result = check_expr(node.left)
-        if not is_ok(left_result):
-            return left_result
-        return check_all(node.comparators, check_expr)
+                raise NotYet(node, 'identity operator (is/is not) not yet supported', 81)
+        check_expr(node.left)
+        for c in node.comparators:
+            check_expr(c)
+        return
     if isinstance(node, ast.Call):
-        func_result = check_expr(node.func)
-        if not is_ok(func_result):
-            return func_result
-        args_result = check_all(node.args, check_expr)
-        if not is_ok(args_result):
-            return args_result
-        return check_all(node.keywords, check_keyword)
+        check_expr(node.func)
+        for a in node.args:
+            check_expr(a)
+        for k in node.keywords:
+            check_keyword(k)
+        return
     if isinstance(node, ast.IfExp):
-        test_result = check_expr(node.test)
-        if not is_ok(test_result):
-            return test_result
-        body_result = check_expr(node.body)
-        if not is_ok(body_result):
-            return body_result
-        return check_expr(node.orelse)
+        check_expr(node.test)
+        check_expr(node.body)
+        check_expr(node.orelse)
+        return
     if isinstance(node, ast.Lambda):
-        args_result = check_arguments(node.args)
-        if not is_ok(args_result):
-            return args_result
-        return check_expr(node.body)
+        check_arguments(node.args)
+        check_expr(node.body)
+        return
     if isinstance(node, ast.List):
-        return check_all(node.elts, check_expr)
+        for e in node.elts:
+            check_expr(e)
+        return
     if isinstance(node, ast.Tuple):
-        return check_all(node.elts, check_expr)
+        for e in node.elts:
+            check_expr(e)
+        return
     if isinstance(node, ast.Dict):
-        keys_result = check_all([k for k in node.keys if k is not None], check_expr)
-        if not is_ok(keys_result):
-            return keys_result
-        return check_all(node.values, check_expr)
+        for key in node.keys:
+            if key is not None:
+                check_expr(key)
+        for v in node.values:
+            check_expr(v)
+        return
     if isinstance(node, ast.Set):
-        return not_yet(node, 'set literals not yet supported', 52)
+        raise NotYet(node, 'set literals not yet supported', 52)
     if isinstance(node, ast.Attribute):
-        return check_expr(node.value)
+        check_expr(node.value)
+        return
     if isinstance(node, ast.Subscript):
-        value_result = check_expr(node.value)
-        if not is_ok(value_result):
-            return value_result
-        return check_expr(node.slice)
+        check_expr(node.value)
+        check_expr(node.slice)
+        return
     if isinstance(node, ast.ListComp):
-        elt_result = check_expr(node.elt)
-        if not is_ok(elt_result):
-            return elt_result
-        return check_all(node.generators, check_comprehension)
+        check_expr(node.elt)
+        for g in node.generators:
+            check_comprehension(g)
+        return
     if isinstance(node, ast.DictComp):
-        return not_yet(node, 'dict comprehensions not yet supported', 52)
+        raise NotYet(node, 'dict comprehensions not yet supported', 52)
     if isinstance(node, ast.SetComp):
-        return not_yet(node, 'set comprehensions not yet supported', 52)
+        raise NotYet(node, 'set comprehensions not yet supported', 52)
     if isinstance(node, ast.Slice):
-        return not_yet(node, 'slicing not yet supported', 59)
+        raise NotYet(node, 'slicing not yet supported', 59)
     if isinstance(node, ast.GeneratorExp):
-        return unsupported(node, 'generator expressions not supported (use list comprehensions)')
+        raise Unsupported(node, 'generator expressions not supported (use list comprehensions)')
     if isinstance(node, ast.NamedExpr):
-        return unsupported(node, 'walrus operator (:=) not supported (#27)')
+        raise Unsupported(node, 'walrus operator (:=) not supported (#27)')
     if isinstance(node, ast.Starred):
-        return unsupported(node, 'starred expressions not supported')
+        raise Unsupported(node, 'starred expressions not supported')
     if isinstance(node, ast.Await):
-        return unsupported(node, 'async not supported')
+        raise Unsupported(node, 'async not supported')
     if isinstance(node, ast.Yield):
-        return unsupported(node, 'yield not supported')
+        raise Unsupported(node, 'yield not supported')
     if isinstance(node, ast.YieldFrom):
-        return unsupported(node, 'yield not supported')
+        raise Unsupported(node, 'yield not supported')
     if isinstance(node, ast.JoinedStr):
-        return not_yet(node, 'f-strings not yet supported', 55)
+        raise NotYet(node, 'f-strings not yet supported', 55)
     if isinstance(node, ast.FormattedValue):
-        return not_yet(node, 'f-strings not yet supported', 55)
-    return unsupported(node, f'unknown expression type: {type(node).__name__}')
+        raise NotYet(node, 'f-strings not yet supported', 55)
+    raise Unsupported(node, f'unknown expression type: {type(node).__name__}')
 
-def check_body(stmts: list[ast.stmt]) -> Result:
-    return check_all(stmts, check_stmt)
+def check_body(stmts: list[ast.stmt]) -> None:
+    for s in stmts:
+        check_stmt(s)
 
-def check_keyword(node: ast.keyword) -> Result:
-    return check_expr(node.value)
+def check_keyword(node: ast.keyword) -> None:
+    check_expr(node.value)
 
-def check_comprehension(node: ast.comprehension) -> Result:
+def check_comprehension(node: ast.comprehension) -> None:
     if node.is_async:
-        return unsupported(node, 'async comprehensions not supported')
+        raise Unsupported(node, 'async comprehensions not supported')
     if not isinstance(node.target, ast.Name):
-        return not_yet(node, 'destructuring in comprehensions not yet supported', 54)
-    iter_result = check_expr(node.iter)
-    if not is_ok(iter_result):
-        return iter_result
-    return check_all(node.ifs, check_expr)
+        raise NotYet(node, 'destructuring in comprehensions not yet supported', 54)
+    check_expr(node.iter)
+    for i in node.ifs:
+        check_expr(i)
 
-def check_arguments(node: ast.arguments) -> Result:
+def check_arguments(node: ast.arguments) -> None:
     if node.vararg is not None:
-        return not_yet(node, '*args not yet supported', 57)
+        raise NotYet(node, '*args not yet supported', 57)
     if node.kwarg is not None:
-        return not_yet(node, '**kwargs not yet supported', 57)
+        raise NotYet(node, '**kwargs not yet supported', 57)
     if len(node.kwonlyargs) > 0:
-        return unsupported(node, 'keyword-only arguments not supported')
+        raise Unsupported(node, 'keyword-only arguments not supported')
     if len(node.defaults) > 0:
-        return not_yet(node, 'default arguments not yet supported', 56)
+        raise NotYet(node, 'default arguments not yet supported', 56)
     if len(node.kw_defaults) > 0:
-        return not_yet(node, 'default arguments not yet supported', 56)
+        raise NotYet(node, 'default arguments not yet supported', 56)
     if len(node.posonlyargs) > 0:
-        return unsupported(node, 'positional-only arguments not supported')
-    return ok()
+        raise Unsupported(node, 'positional-only arguments not supported')
 
 def check_module(node: ast.AST) -> Result:
-    if not isinstance(node, ast.Module):
-        return unsupported(node, 'expected a module')
-    return check_body(node.body)
+    try:
+        if not isinstance(node, ast.Module):
+            raise Unsupported(node, 'expected a module')
+        check_body(node.body)
+        return None
+    except ParseError as e:
+        return e
 
 def check_file(filename: str) -> Result:
     source = open(filename).read()
@@ -355,15 +345,11 @@ def check_file(filename: str) -> Result:
     return check_module(tree)
 
 def format_result(result: Result, filename: str) -> str:
-    if is_ok(result):
+    if result is None:
         return f'{filename}: ok'
-    assert result is not None
-    line = result.line
-    col = result.col
-    msg = result.msg
-    if line is not None:
-        return f'{filename}:{line}:{col}: {msg}'
-    return f'{filename}: {msg}'
+    if result.line is not None:
+        return f'{filename}:{result.line}:{result.col}: {result.msg}'
+    return f'{filename}: {result.msg}'
 
 def main() -> None:
     if len(sys.argv) < 2:
@@ -373,9 +359,8 @@ def main() -> None:
     for filename in sys.argv[1:]:
         result = check_file(filename)
         print(format_result(result, filename))
-        if not is_ok(result):
-            assert result is not None
-            exit_code = result.kind
+        if result is not None:
+            exit_code = result.exit_code
     sys.exit(exit_code)
 if __name__ == '__main__':
     main()
