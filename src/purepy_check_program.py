@@ -5,7 +5,7 @@ from typing import Optional
 
 import purepy_parse
 import purepy_check
-from purepy_check import Error, Result, ok, is_ok
+from purepy_check import IllFormed, Result, ok, is_ok
 
 
 ILL_FORMED_PROGRAM = 4
@@ -14,8 +14,8 @@ ILL_FORMED_PROGRAM = 4
 PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
 
 
-def _program_error(msg: str) -> Error:
-    return Error(line=None, col=None, msg=msg, kind=ILL_FORMED_PROGRAM)
+def _program_error(msg: str) -> IllFormed:
+    return IllFormed(line=None, col=None, msg=msg, kind=ILL_FORMED_PROGRAM)
 
 
 def _imports_of(tree: ast.Module) -> set[str]:
@@ -121,7 +121,7 @@ def check_program(entry_path: pathlib.Path) -> Result:
         err = purepy_check.check_module(tree)
         if not is_ok(err):
             assert err is not None
-            return Error(line=err.line, col=err.col, msg=f"{path}: {err.msg}", kind=err.kind)
+            return IllFormed(line=err.line, col=err.col, msg=f"{path}: {err.msg}", kind=err.kind)
 
     # Acyclicity. (Resolution is already guaranteed by the walk loop above.)
     graph = {name: imps | _parents(name) | set().union(*(_parents(i) for i in imps))
