@@ -47,7 +47,8 @@
 \inferrule*[lab={\ruleName{module}}]
 {
   \Gamma_M \vdash_M \mathcal{M}(M) : \Delta \\
-  \imports(\mathcal{M}(M)) \subseteq \dom(\mathcal{M})
+  \imports(\mathcal{M}(M)) \subseteq \dom(\mathcal{M}) \\
+  G_{\Lambda_M} \text{ acyclic}
 }
 {
   \vdash_{\mathcal{M}} M

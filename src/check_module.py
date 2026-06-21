@@ -679,13 +679,48 @@ def class_field_names(node: ast.ClassDef) -> list[str]:
 
 def build_class_context(body: list[ast.stmt]) -> ClassContext:
     lambda_m: ClassContext = {}
+    class_nodes: dict[str, ast.ClassDef] = {}
     for s in body:
         if isinstance(s, ast.ClassDef):
             if s.name in lambda_m:
                 raise IllFormedModule(s, reasons.DuplicateClassName(s.name))
             base = s.bases[0].id if s.bases and isinstance(s.bases[0], ast.Name) else None
             lambda_m[s.name] = ClassInfo(fields=tuple(class_field_names(s)), base=base)
+            class_nodes[s.name] = s
+    # G_{Λ_M} acyclic: edge (C, B) iff Λ_M(C) = (_, B)
+    graph = {c: {info.base} if info.base is not None else set() for c, info in lambda_m.items()}
+    cycle = has_cycle(graph)
+    if len(cycle) > 0:
+        raise IllFormedModule(class_nodes[cycle[0]], reasons.CyclicInheritance(tuple(cycle)))
     return lambda_m
+
+def has_cycle(graph: dict[str, set[str]]) -> list[str]:
+    """DFS cycle detection. Returns a cycle (as a list of names) if one exists, else []."""
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color: dict[str, int] = {n: WHITE for n in graph}
+    stack: list[str] = []
+
+    def visit(node: str) -> list[str]:
+        color[node] = GRAY
+        stack.append(node)
+        for neighbour in graph.get(node, set()):
+            if color.get(neighbour, WHITE) == GRAY:
+                idx = stack.index(neighbour)
+                return stack[idx:] + [neighbour]
+            if color.get(neighbour, WHITE) == WHITE:
+                cycle = visit(neighbour)
+                if len(cycle) > 0:
+                    return cycle
+        stack.pop()
+        color[node] = BLACK
+        return []
+
+    for node in graph:
+        if color[node] == WHITE:
+            cycle = visit(node)
+            if len(cycle) > 0:
+                return cycle
+    return []
 
 def fields_of(lambda_m: ClassContext, c: str) -> tuple[str, ...]:
     info = lambda_m[c]

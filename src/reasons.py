@@ -25,6 +25,13 @@ class UnknownBaseClass:
 
 
 @dataclass(frozen=True)
+class CyclicInheritance:
+    cycle: tuple[str, ...]
+    def message(self) -> str:
+        return f"cyclic inheritance: {' -> '.join(self.cycle)}"
+
+
+@dataclass(frozen=True)
 class InheritedFieldClash:
     field: str
     base: str
@@ -141,6 +148,7 @@ class EmptyFromImport:
 
 Reason = Union[
     DuplicateClassName, DuplicateFieldName, UnknownBaseClass, InheritedFieldClash,
+    CyclicInheritance,
     UnassignedVariable, CapturedReassignment, SelfCaptureAssignment,
     UnreachableStatement, ConstructorArityMismatch, PatternArityMismatch,
     UnknownClassInPattern, UnknownFieldInPattern, DuplicatePatternKeyword,
