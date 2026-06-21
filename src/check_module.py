@@ -147,12 +147,13 @@ def check_block(block: list[ast.stmt], ctx: Context) -> None:
     check_items(items_of_block(block), ctx)
 
 def check_items(items: list[Item], ctx: Context) -> None:
-    if len(items) == 1:
-        check_item(items[0], ctx)
+    if len(items) == 0:
         return
     head = items[0]
     tail = items[1:]
     check_item(head, ctx)
+    if len(tail) == 0:
+        return
     if isinstance(item_result_type(head), TyReturns):
         first_unreachable = tail[0]
         node: ast.AST = first_unreachable[0] if isinstance(first_unreachable, list) else first_unreachable
