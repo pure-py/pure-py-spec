@@ -3,6 +3,13 @@ import sys
 from typing import Optional
 
 
+OP_SYMBOLS: dict[type, str] = {
+    ast.BitOr: '|', ast.BitAnd: '&', ast.BitXor: '^',
+    ast.LShift: '<<', ast.RShift: '>>', ast.MatMult: '@',
+    ast.Invert: '~',
+}
+
+
 class ParseError(Exception):
     exit_code: int   # overridden by subclass
     msg: str
@@ -133,7 +140,7 @@ def check_classdef(node: ast.ClassDef) -> None:
     if not (isinstance(deco, ast.Name) and deco.id == 'dataclass'):
         raise Unsupported(node, 'only the @dataclass decorator is supported on classes')
     if len(node.bases) > 1:
-        raise Unsupported(node, 'at most one base class is supported')
+        raise Unsupported(node, 'multiple inheritance not supported')
     if len(node.bases) > 0 and not isinstance(node.bases[0], ast.Name):
         raise Unsupported(node, 'base class must be a simple name')
     if len(node.keywords) > 0:
@@ -201,7 +208,8 @@ def check_expr(node: ast.expr) -> None:
     if isinstance(node, ast.BinOp):
         allowed = (ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv, ast.Mod, ast.Pow)
         if not isinstance(node.op, allowed):
-            raise Unsupported(node, f'binary operator not in PurePy: {type(node.op).__name__}')
+            sym = OP_SYMBOLS.get(type(node.op), type(node.op).__name__)
+            raise Unsupported(node, f"binary operator '{sym}' not supported")
         check_expr(node.left)
         check_expr(node.right)
         return
@@ -212,7 +220,8 @@ def check_expr(node: ast.expr) -> None:
         if isinstance(node.op, (ast.UAdd, ast.USub)):
             check_expr(node.operand)
             return
-        raise Unsupported(node, f'unsupported unary operator: {type(node.op).__name__}')
+        sym = OP_SYMBOLS.get(type(node.op), type(node.op).__name__)
+        raise Unsupported(node, f"unary operator '{sym}' not supported")
     if isinstance(node, ast.BoolOp):
         if len(node.values) > 2:
             raise NotYet(node, 'chained boolean operator not yet supported', 82)
