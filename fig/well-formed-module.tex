@@ -1,0 +1,63 @@
+\begin{figure}
+\flushleft \shadebox{$\Gamma \vdash m : \Delta$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{empty}}]
+{
+  \strut
+}
+{
+  \Gamma \vdash \varepsilon : \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{import}}]
+{
+  M' = x_1.x_2.\ldots.x_{n+1} \\
+  \Gamma \runion \statusDefAssigned(\set{x_1}) \vdash m : \Delta'
+}
+{
+  \Gamma \vdash \exImport{M'} \cons m : \statusDefAssigned(\set{x_1}) \runion \Delta'
+}
+\and
+\inferrule*[lab={\ruleName{from-import}}]
+{
+  \Gamma \runion \statusDefAssigned(\set{x_1, \ldots, x_{n+1}}) \vdash m : \Delta'
+}
+{
+  \Gamma \vdash \exFromImport{M'}{x_1, \ldots, x_{n+1}} \cons m : \statusDefAssigned(\set{x_1, \ldots, x_{n+1}}) \runion \Delta'
+}
+\and
+\inferrule*[lab={\ruleName{statement}}]
+{
+  \Gamma \vdash s : \Assigns{\Delta} \\
+  \Gamma \runion \Delta \vdash m : \Delta' \\
+  \capturesS(s) \cap \assignsS(m) = \varnothing
+}
+{
+  \Gamma \vdash s \cons m : \Delta \runion \Delta'
+}
+\and
+\inferrule*[lab={\ruleName{class}}]
+{
+  \decls(\phi) = x_1, \ldots, x_n \\
+  x_1, \ldots, x_n \text{ distinct} \\
+  \Gamma \vdash m : \Delta
+}
+{
+  \Gamma \vdash \exDataclass{C}{\phi} \cons m : \Delta
+}
+\and
+\inferrule*[lab={\ruleName{class-extend}}]
+{
+  B \in \dom(\Lambda_M) \\
+  \decls(\phi) = x_1, \ldots, x_n \\
+  x_1, \ldots, x_n \text{ distinct and disjoint from } \fields(M.B) \\
+  \Gamma \vdash m : \Delta
+}
+{
+  \Gamma \vdash \exDataclassExtend{C}{B}{\phi} \cons m : \Delta
+}
+\end{mathpar}
+\caption{Body $m$ of module $M$ is well-formed in $\Gamma$}
+\label{fig:well-formed-module}
+\end{figure}

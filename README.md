@@ -32,11 +32,14 @@ test/run-all.sh
 
 Sets up a `.venv` automatically. Targets Python 3.12+ ([#39](https://github.com/pure-py/pure-py-spec/issues/39)).
 
-Test categories:
-- `test/well-formed/` — accepted by `purepy_parse.py`, runs correctly in Python
-- `test/well-formed/pending/` — will be accepted once features are implemented
-- `test/ill-formed/semantic/` — syntactically valid but violates well-formedness rules
-- `test/ill-formed/unsupported/` — permanently excluded Python features
+Test categories mirror the two judgement tiers in the spec (per-module $\Gamma \vdash_M m : \Delta$ and program-level $\vdash \langle E, \mathcal{M} \rangle$):
+- `test/module-level/well-formed/` — accepted by the checker, runs correctly in Python
+- `test/module-level/ill-formed/semantic/` — parser accepts but well-formedness rejects
+- `test/module-level/ill-formed/unsupported/` — parser rejects (permanently excluded Python features)
+- `test/module-level/ill-formed/syntactic-only/` — rejected by well-formedness but cannot be expressed as `.py` source; tested via direct AST construction
+- `test/module-level/pending/` — will be accepted once features are implemented
+- `test/program-level/well-formed/` — multi-module programs accepted end-to-end
+- `test/program-level/ill-formed/` — programs rejected by whole-program checks (missing modules, cycles, etc.)
 
 ## Reference parser (`src/purepy_parse.py`)
 

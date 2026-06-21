@@ -1,4 +1,6 @@
 \begin{figure}
+\begin{subfigure}{\textwidth}
+\centering
 \small
 \begin{align*}
 \imports(\exImport{M}) &= \set{M} \\
@@ -7,18 +9,44 @@
 \imports(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \textstyle\bigcup_i \imports(b_i) \\
 \imports(\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}) &= \textstyle\bigcup_i \imports(b_i) \\
 \imports(\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}) &= \textstyle\bigcup_i \imports(b_i) \\
-\imports(s) &= \varnothing & \text{otherwise} \\
+\imports(s) &= \varnothing \quad \text{otherwise} \\
 \\
 \parents(x) &= \varnothing \\
 \parents(M.x) &= \parents(M) \cup \set{M}
 \end{align*}
+\subcaption{$\imports$ and $\parents$ metafunctions}
+\end{subfigure}
 
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\centering
+\small
+\begin{align*}
+\classes(\exDataclass{C}{\phi}) &= \set{C \mapsto (\decls(\phi), \bot)} \\
+\classes(\exDataclassExtend{C}{B}{\phi}) &= \set{C \mapsto (\decls(\phi), B)} \\
+\classes(s) &= \varnothing \quad \text{otherwise} \\
+\\
+\decls(\exField{x_1} \;\ldots\; \exField{x_{n+1}}) &= x_1 \ldots x_{n+1} \\
+\decls(\pyinline{pass}) &= \varepsilon \\
+\\
+\fields(M.C) &= \begin{cases}
+  \vec{x} & \text{if } \Lambda_M(C) = (\vec{x}, \bot) \\
+  \fields(M.B) \mathbin{\cdot} \vec{x} & \text{if } \Lambda_M(C) = (\vec{x}, B)
+\end{cases}
+\end{align*}
+\subcaption{$\classes$ and $\fields$ metafunctions}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\vdash_{\mathcal{M}} M$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{module}}]
 {
-  \Gamma_M \vdash \mathcal{M}(M) : \Delta \\
+  \Gamma_M \vdash_M \mathcal{M}(M) : \Delta \\
   \imports(\mathcal{M}(M)) \subseteq \dom(\mathcal{M})
 }
 {
@@ -38,6 +66,8 @@
   \vdash \langle E, \mathcal{M} \rangle
 }
 \end{mathpar}
-\caption{$\imports$ and $\parents$ metafunctions; module and program well-formedness}
+\subcaption{Module and program well-formedness}
+\end{subfigure}
+\caption{Module structure}
 \label{fig:modules}
 \end{figure}

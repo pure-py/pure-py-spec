@@ -1,16 +1,60 @@
 \begin{figure}
-\flushleft \shadebox{$\vdash p_1 \cons \ldots \cons p_{n+1}$}
+\flushleft \shadebox{$\vdash p_1 \cons \ldots \cons p_n$}
 \begin{mathpar}
 \small
+\inferrule*[lab={\ruleName{pat-lit}}]
+{ \strut }
+{ \vdash \ell }
+\and
+\inferrule*[lab={\ruleName{pat-neg-lit}}]
+{ \strut }
+{ \vdash -n }
+\and
+\inferrule*[lab={\ruleName{pat-var}}]
+{ \strut }
+{ \vdash x }
+\and
+\inferrule*[lab={\ruleName{pat-wild}}]
+{ \strut }
+{ \vdash \patWild }
+\and
 \inferrule*[lab={\ruleName{pat-list}}]
+{ \vdash p_i \quad (\forall i) }
+{ \vdash \patList{p_1, \ldots, p_n} }
+\and
+\inferrule*[lab={\ruleName{pat-tuple}}]
+{ \vdash p_i \quad (\forall i) }
+{ \vdash \patTuple{p_1, \ldots, p_n} }
+\and
+\inferrule*[lab={\ruleName{pat-as}}]
+{ \vdash p }
+{ \vdash p\;\pyinline{as}\;x }
+\and
+\inferrule*[lab={\ruleName{pat-class}}]
 {
-  \text{variables in } p_i \text{ distinct} \quad (\forall i) \\
-  p_i \not\subsumed p_j \quad (\forall i)(\forall j < i)
+  \fields(M.C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m} \\
+  \set{y_1, \ldots, y_m} = \set{x_{n+1}, \ldots, x_{n+m}} \\
+  \vdash p_i \quad (\forall i)
 }
 {
-  \vdash p_1 \cons \ldots \cons p_n
+  \vdash \patClass{C}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}}
+}
+\and
+\inferrule*[lab={\ruleName{cases-nil}}]
+{ \strut }
+{ \vdash \varepsilon }
+\and
+\inferrule*[lab={\ruleName{cases-cons}}]
+{
+  \vdash p_1 \\
+  \vdash p_2 \cons \ldots \cons p_n \\
+  \text{variables in } p_1 \text{ distinct} \\
+  p_i \not\subsumed p_1 \quad (\forall i.\, 2 \le i \le n)
+}
+{
+  \vdash p_1 \cons p_2 \cons \ldots \cons p_n
 }
 \end{mathpar}
-\caption{Pattern list $p_1 \cons \ldots \cons p_n$ is well-formed}
+\caption{Case patterns of module $M$ are well-formed}
 \label{fig:well-formed-pat}
 \end{figure}

@@ -113,7 +113,6 @@ that invite confusion are tightened or excluded.
 \begin{tabular}{ll}
 \textbf{To do} & \\
 Reserved words & \issue{9} \\
-Dataclasses & \issue{8} \\
 Set and dict comprehensions & \issue{52} \\
 Set and dict literals & \issue{87} \\
 Membership operator (\pyinline{in}) & \issue{80} \\
@@ -150,7 +149,7 @@ one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
 
 \subsection{Contexts}
 
-The grammar of contexts and result types is given in \figref{contexts}. Contexts $\Gamma, \Delta$ are partial functions from sets of variables to a \emph{definite assignment} status
+The grammar of contexts and result types is given in \figref{contexts}. Metavariable $x$ ranges over variables and $f$ over function names. Contexts $\Gamma, \Delta$ are partial functions from sets of variables to a \emph{definite assignment} status
 in $\B = \set{\statusDefAssigned, \statusNotDefAssigned}$, with $\statusDefAssigned$ indicating
 \emph{definitely assigned} and $\statusNotDefAssigned$ indicating \emph{not definitely assigned}. The definite
 assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}. (Or think of $\statusDefAssigned$ and
@@ -246,7 +245,8 @@ unreachable statements (\S\ref{sec:unreachable}).
 \]
 \end{lemma}
 
-\input{fig/syntax}
+\input{fig/syntax-stmt}
+\input{fig/syntax-expr}
 
 \paragraph{Operators.}
 
@@ -257,6 +257,12 @@ which follow Python.
 
 \input{fig/precedence}
 
+\subsection{Class contexts}
+
+Class contexts $\Lambda$ are finite maps from class names to pairs $(\vec{x}, C)$, where $\vec{x}$ is a sequence of distinct
+field names (in declaration order) and $C$ names the base class (or $\bot$ for no base). Metavariables $C$ and $B$ range over class names.
+Union of class contexts is undefined when the operands disagree on a shared key.
+
 \subsection{Modules and entry point}
 
 A \PurePy \emph{program} $\langle E, \mathcal{M} \rangle$ consists of a finite map
@@ -266,10 +272,17 @@ of top-level statements $t_1 \ldots t_{n+1}$), together with a designated \emph{
 if $M \in \dom(\mathcal{M})$ then $\parents(M) \subseteq \dom(\mathcal{M})$. The pair $\langle E, \mathcal{M} \rangle$
 is fixed and ambient in all definitions that follow.
 \pyinline{import} statements appear only as a contiguous prefix of a module body, before any other statement. This confines module-loading side-effects (currently only divergence or runtime
-errors) to a single zone at the start of each module body. For any $(M \mapsto b) \in
-\mathcal{M}$, well-formedness of $b$ is checked under the initial context $\Gamma_M = \Gamma_{\pyinline{builtins}}
-\runion \set{\text{\pyinline{__name__}} \mapsto \statusDefAssigned}$, where $\Gamma_{\pyinline{builtins}}$
-binds at status $\statusDefAssigned$ the names of the predefined module \pyinline{builtins} (\figref{predefined}).
+errors) to a single zone at the start of each module body.
+
+\begin{definition}[Module well-formedness context]
+For any $(M \mapsto b) \in \mathcal{M}$, $b$ is checked under the following per-module contexts:
+\begin{enumerate}
+\item variable context $\Gamma_M = \Gamma_{\textup{\pyinline{builtins}}} \runion
+\set{\text{\pyinline{__name__}} \mapsto \statusDefAssigned}$, with $\Gamma_{\textup{\pyinline{builtins}}}$ binding the
+names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined});
+\item class context $\Lambda_M = \classes(b)$ (\figref{modules}).
+\end{enumerate}
+\end{definition}
 
 \begin{figure}[H]
 \small
@@ -278,20 +291,20 @@ binds at status $\statusDefAssigned$ the names of the predefined module \pyinlin
 \hline
 \textbf{Module} & \textbf{Defined names} \\
 \hline
-\pyinline{builtins} & \pyinline{True}, \pyinline{False}, \pyinline{None}, \pyinline{int}, \pyinline{float}, \pyinline{str}, \pyinline{bool}, \pyinline{list}, \pyinline{tuple}, \pyinline{set}, \pyinline{dict}, \pyinline{abs}, \pyinline{round}, \pyinline{len}, \pyinline{min}, \pyinline{max}, \pyinline{sum}, \pyinline{all}, \pyinline{any}, \pyinline{sorted}, \pyinline{reversed}, \pyinline{range}, \pyinline{enumerate}, \pyinline{zip}, \pyinline{map}, \pyinline{filter}, \pyinline{type}, \pyinline{isinstance} \\
+\textup{\pyinline{builtins}} & \pyinline{True}, \pyinline{False}, \pyinline{None}, \pyinline{int}, \pyinline{float}, \pyinline{str}, \pyinline{bool}, \pyinline{list}, \pyinline{tuple}, \pyinline{set}, \pyinline{dict}, \pyinline{abs}, \pyinline{round}, \pyinline{len}, \pyinline{min}, \pyinline{max}, \pyinline{sum}, \pyinline{all}, \pyinline{any}, \pyinline{sorted}, \pyinline{reversed}, \pyinline{range}, \pyinline{enumerate}, \pyinline{zip}, \pyinline{map}, \pyinline{filter}, \pyinline{type}, \pyinline{isinstance} \\
 \pyinline{math} & \pyinline{pi}, \pyinline{e}, \pyinline{sqrt}, \pyinline{sin}, \pyinline{cos}, \pyinline{tan}, \pyinline{log}, \pyinline{exp}, \pyinline{floor}, \pyinline{ceil} \\
 \pyinline{sys} & \pyinline{argv}, \pyinline{exit}, \pyinline{stdin}, \pyinline{stdout} \\
+\pyinline{typing} & \pyinline{Any} \\
+\pyinline{dataclasses} & \pyinline{dataclass} \\
 \hline
 \end{tabular}
 \caption{Predefined modules guaranteed to be in $\mathcal{M}$}
 \label{fig:predefined}
 \end{figure}
 
-The metafunction $\imports$ (\figref{modules}) extracts the set of modules a given module depends on,
-by collecting the module names mentioned in \pyinline{import} statements anywhere in the module body. It extends to blocks the same way $\assignsS$ does:
-$\imports(s \cons b) = \imports(s) \cup \imports(b)$, and likewise to module bodies $m$ via
-$\imports(t \cons m) = \imports(t) \cup \imports(m)$. The metafunction $\parents$ collects the proper
-prefixes of a fully-qualified name.
+The metafunctions $\imports$, $\classes$ (\figref{modules}), and $\assignsS$ extend from individual statements
+to blocks and module bodies by union. The metafunction $\parents$ collects the proper prefixes of a
+fully-qualified name.
 
 \input{fig/modules}
 
@@ -309,9 +322,8 @@ anywhere in $s$ (without descending into nested function definitions, which have
 $\assignsS(s) = \dom(\Delta)$ when $s : \Assigns{\Delta}$); $\binds(p)$, the set of variables introduced by a
 pattern $p$; and $\capturesS(s)$, the set of variables from the enclosing scope that are captured by closures
 (lambdas or nested function definitions) within $s$, with companion $\capturesE(e)$ on expressions. All are
-defined in \figref{aux}. The functions $\assignsS$ and $\capturesS$ extend to blocks as follows:
-$\assignsS(s \cons b) = \assignsS(s) \cup \assignsS(b)$ (similarly $\capturesS$), with the singleton block $s$
-identifying with the underlying statement.
+defined in \figref{aux}. $\capturesS$ extends to blocks and module bodies by union (like $\assignsS$),
+with the singleton block identified with its statement.
 
 \input{fig/aux}
 
@@ -341,7 +353,7 @@ $\Delta$, which may be empty. The base cases are that \pyinline{return e} defini
 
 \input{fig/well-formed}
 \input{fig/well-formed-expr}
-\input{fig/well-formed-top}
+\input{fig/well-formed-module}
 
 \subsection{Examples}
 
@@ -650,6 +662,7 @@ functional programming:
 \item List patterns matching tuple values, or tuple patterns matching list values. In \PurePy a list pattern matches only a list, and a tuple pattern matches only a tuple. Python permits either pattern against either kind of sequence.
 \item Positional class patterns matching fewer sub-patterns than the class's field arity. \PurePy requires exact arity; Python permits any number from $0$ up to the class's arity.
 \item Wildcard imports (\pyinline{from M import *}); PEP 8 recommends avoiding these\footnote{\url{https://peps.python.org/pep-0008/}}.
+\item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.
 \end{itemize}
 
 \section{Operational semantics}
@@ -671,9 +684,9 @@ with $\assigns{\varnothing}$ as left and right unit.
 
 Program and module evaluation are given in \figref{eval-modules}. A program evaluates to a non-negative integer
 exit code $n$, with $0$ denoting successful termination. For any $(M \mapsto b) \in \mathcal{M}$, evaluation of
-$b$ begins under the initial environment $\rho_M = \rho_{\pyinline{builtins}} \runion \set{\text{\pyinline{__name__}}
+$b$ begins under the initial environment $\rho_M = \rho_{\textup{\pyinline{builtins}}} \runion \set{\text{\pyinline{__name__}}
 \mapsto v}$, where $v$ is \pyinline{"__main__"} if $M = E$ and the string literal corresponding to $M$ otherwise.
-The environment $\rho_{\pyinline{builtins}}$ binds the names listed for \pyinline{builtins} in \figref{predefined}
+The environment $\rho_{\textup{\pyinline{builtins}}}$ binds the names listed for \textup{\pyinline{builtins}} in \figref{predefined}
 to their values.
 
 \input{fig/eval-modules}

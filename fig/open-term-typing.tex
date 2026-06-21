@@ -140,7 +140,7 @@ $\Delta$ & $::=$ & $\Delta : (\Sigma, \Gamma)$ & (frame stack) \\
     \Delta \vdash \exReturnNone \carrow{n} \varnothing, \Delta
 }
 \and%
-\inferrule*[lab={\ruleName{seq}}]
+\inferrule*[lab={\ruleName{cons}}]
 {
     \Delta \vdash s_1 \carrow{n} \tau_1, \Delta' \qquad \Delta' \vdash s_2 \carrow{n} \tau_2, \Delta''
 }
