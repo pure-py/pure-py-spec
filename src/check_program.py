@@ -4,7 +4,7 @@ import sys
 from typing import Optional
 
 import parse
-from check_module import IllFormed, IllFormedModule, walk_module
+from check_module import IllFormed, IllFormedModule, has_cycle, walk_module
 
 
 # Modules the runtime provides if the user has no file of the same name.
@@ -59,36 +59,6 @@ def load(name: str, base_dir: pathlib.Path) -> ast.Module:
     if parse_err is not None:
         raise IllFormedProgram(f"{path}: {parse_err.msg}")
     return tree
-
-
-def has_cycle(graph: dict[str, set[str]]) -> list[str]:
-    """DFS cycle detection. Returns a cycle (as a list of names) if one exists, else []."""
-    WHITE, GRAY, BLACK = 0, 1, 2
-    color: dict[str, int] = {n: WHITE for n in graph}
-    stack: list[str] = []
-
-    def visit(node: str) -> list[str]:
-        color[node] = GRAY
-        stack.append(node)
-        for neighbour in graph.get(node, set()):
-            if color.get(neighbour, WHITE) == GRAY:
-                # cycle: from neighbour through stack back to neighbour
-                idx = stack.index(neighbour)
-                return stack[idx:] + [neighbour]
-            if color.get(neighbour, WHITE) == WHITE:
-                cycle = visit(neighbour)
-                if len(cycle) > 0:
-                    return cycle
-        stack.pop()
-        color[node] = BLACK
-        return []
-
-    for node in graph:
-        if color[node] == WHITE:
-            cycle = visit(node)
-            if len(cycle) > 0:
-                return cycle
-    return []
 
 
 def check_program(entry_path: pathlib.Path) -> Optional[IllFormed]:
