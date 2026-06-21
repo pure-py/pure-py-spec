@@ -1,1 +1,1 @@
-@dataclass decorator
+class must have exactly the @dataclass decorator

@@ -76,7 +76,9 @@ class Runner:
             rel = d.relative_to(ROOT)
             main_py = d / "main.py"
             expected_exit_code = int((d / "expected_exit").read_text().strip())
-            self.expect_exit(f"{rel} (check)", script_cmd("check_program.py", main_py), expected_exit_code)
+            err_path = d / "expected_error"
+            err_substr = err_path.read_text().strip() if err_path.exists() else None
+            self.expect_exit(f"{rel} (check)", script_cmd("check_program.py", main_py), expected_exit_code, error_substr=err_substr)
             expected_path = d / "expected"
             if expected_path.exists():
                 self.run_python(f"{rel} (run)", interpreter, main_py, cwd=d, expected_path=expected_path)
