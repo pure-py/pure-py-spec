@@ -7,7 +7,11 @@ class Point:
     x: Any
     y: Any
 
-p = Point(1, 2)
+# Subject isn't a Point: Python skips the keyword lookup; GraalPy doesn't
+# propagate AttributeError. PurePy rejects the pattern statically regardless.
+p = None
 match p:
-    case Point(x=a, z=b):  # PurePy: error ('z' not a field); Python: AttributeError
+    case Point(x=a, z=b):  # PurePy: error ('z' not a field)
+        pass
+    case _:
         pass
