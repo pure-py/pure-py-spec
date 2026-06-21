@@ -65,7 +65,7 @@ class ConstructorArityMismatch:
     expected: int
     got: int
     def message(self) -> str:
-        return f"'{self.cls}' expects {self.expected} positional argument(s), got {self.got}"
+        return f"constructor for '{self.cls}' expects {self.expected} arguments, got {self.got}"
 
 
 @dataclass(frozen=True)
