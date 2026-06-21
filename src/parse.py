@@ -75,7 +75,7 @@ def check_stmt(node: ast.stmt) -> None:
     if isinstance(node, ast.Delete):
         raise Unsupported(node, 'del not supported')
     if isinstance(node, ast.For):
-        raise Unsupported(node, 'for loops not supported (use list comprehensions)')
+        raise Unsupported(node, 'for loops not supported')
     if isinstance(node, ast.While):
         raise Unsupported(node, 'while loops not supported')
     if isinstance(node, ast.With):
@@ -289,7 +289,7 @@ def check_expr(node: ast.expr) -> None:
     if isinstance(node, ast.Slice):
         raise NotYetSupported(node, 'slicing', 59)
     if isinstance(node, ast.GeneratorExp):
-        raise Unsupported(node, 'generator expressions not supported (use list comprehensions)')
+        raise Unsupported(node, 'generator expressions not supported')
     if isinstance(node, ast.NamedExpr):
         raise Unsupported(node, 'walrus operator (:=) not supported (#27)')
     if isinstance(node, ast.Starred):
