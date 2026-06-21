@@ -291,7 +291,7 @@ def check_expr(node: ast.expr) -> None:
     if isinstance(node, ast.GeneratorExp):
         raise Unsupported(node, 'generator expressions not supported')
     if isinstance(node, ast.NamedExpr):
-        raise Unsupported(node, 'walrus operator (:=) not supported (#27)')
+        raise NotYetSupported(node, 'walrus operator (:=)', 27)
     if isinstance(node, ast.Starred):
         raise Unsupported(node, 'starred expressions not supported')
     if isinstance(node, ast.Await):
