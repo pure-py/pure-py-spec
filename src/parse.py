@@ -32,9 +32,6 @@ class NotYetSupported(ParseError):
         super().__init__(node, f'{feature} not yet supported (#{issue})')
 
 
-Result = Optional[ParseError]
-
-
 def check_stmt(node: ast.stmt) -> None:
     if isinstance(node, ast.Pass):
         return
@@ -339,19 +336,19 @@ def check_arguments(node: ast.arguments) -> None:
     if len(node.posonlyargs) > 0:
         raise Unsupported(node, 'positional-only arguments not supported')
 
-def check_module(node: ast.Module) -> Result:
+def check_module(node: ast.Module) -> Optional[ParseError]:
     try:
         check_body(node.body)
         return None
     except ParseError as e:
         return e
 
-def check_file(filename: str) -> Result:
+def check_file(filename: str) -> Optional[ParseError]:
     source = open(filename).read()
     tree = ast.parse(source, filename=filename)
     return check_module(tree)
 
-def format_result(result: Result, filename: str) -> str:
+def format_result(result: Optional[ParseError], filename: str) -> str:
     if result is None:
         return f'{filename}: ok'
     if result.line is not None:

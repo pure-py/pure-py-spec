@@ -4,7 +4,7 @@ import sys
 from typing import Optional
 
 import parse
-from check_module import IllFormed, IllFormedModule, Result, walk_module
+from check_module import IllFormed, IllFormedModule, walk_module
 
 
 # Modules the runtime provides if the user has no file of the same name.
@@ -91,7 +91,7 @@ def has_cycle(graph: dict[str, set[str]]) -> list[str]:
     return []
 
 
-def check_program(entry_path: pathlib.Path) -> Result:
+def check_program(entry_path: pathlib.Path) -> Optional[IllFormed]:
     try:
         walk_program(entry_path)
         return None

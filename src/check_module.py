@@ -22,7 +22,6 @@ class IllFormedModule(IllFormed):
         super().__init__(self.msg)
 
 
-Result = Optional[IllFormed]
 class Status(Enum):
     TT = auto()
     FF = auto()
@@ -714,7 +713,7 @@ def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> None:
         if isinstance(s, ast.ClassDef):
             check_class_decl(s, lambda_m)
 
-def check_module(tree: ast.Module) -> Result:
+def check_module(tree: ast.Module) -> Optional[IllFormed]:
     try:
         walk_module(tree)
         return None
@@ -735,12 +734,12 @@ def walk_module(tree: ast.Module) -> None:
     if isinstance(result_type_of_block(tree.body), TyReturns):
         raise IllFormedModule(tree.body[0], reasons.TopLevelReturn())
 
-def check_file(filename: str) -> Result:
+def check_file(filename: str) -> Optional[IllFormed]:
     source = open(filename).read()
     tree = ast.parse(source, filename=filename)
     return check_module(tree)
 
-def format_result(result: Result, filename: str) -> str:
+def format_result(result: Optional[IllFormed], filename: str) -> str:
     if result is None:
         return f'{filename}: ok'
     assert isinstance(result, IllFormedModule)
