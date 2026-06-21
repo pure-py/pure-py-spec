@@ -150,23 +150,22 @@ def check_items(items: list[Item], ctx: Context) -> None:
     if len(items) == 0:
         return
     head = items[0]
-    tail = items[1:]
     check_item(head, ctx)
-    if len(tail) == 0:
-        return
-    if isinstance(item_result_type(head), TyReturns):
-        first_unreachable = tail[0]
-        node: ast.AST = first_unreachable[0] if isinstance(first_unreachable, list) else first_unreachable
-        raise IllFormedModule(node, reasons.UnreachableStatement())
-    reassigned = captures_item(head) & assigns_items(tail)
-    if reassigned:
-        name = sorted(reassigned)[0]
-        ra_node = find_first_reassigning(tail, reassigned)
-        assert ra_node is not None
-        raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
-    head_result = item_result_type(head)
-    delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
-    check_items(tail, extend_var(ctx, delta))
+    if len(items) > 1:
+        tail = items[1:]
+        if isinstance(item_result_type(head), TyReturns):
+            first_unreachable = tail[0]
+            node: ast.AST = first_unreachable[0] if isinstance(first_unreachable, list) else first_unreachable
+            raise IllFormedModule(node, reasons.UnreachableStatement())
+        reassigned = captures_item(head) & assigns_items(tail)
+        if reassigned:
+            name = sorted(reassigned)[0]
+            ra_node = find_first_reassigning(tail, reassigned)
+            assert ra_node is not None
+            raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
+        head_result = item_result_type(head)
+        delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
+        check_items(tail, extend_var(ctx, delta))
 
 def item_result_type(item: Item) -> ResultTy:
     if isinstance(item, list):
