@@ -25,11 +25,11 @@ class Unsupported(ParseError):
     exit_code = 1
 
 
-class NotYet(ParseError):
+class NotYetSupported(ParseError):
     exit_code = 2
 
-    def __init__(self, node: ast.AST, msg: str, issue: int):
-        super().__init__(node, f'{msg} (#{issue})')
+    def __init__(self, node: ast.AST, feature: str, issue: int):
+        super().__init__(node, f'{feature} not yet supported (#{issue})')
 
 
 Result = Optional[ParseError]
@@ -43,7 +43,7 @@ def check_stmt(node: ast.stmt) -> None:
             raise Unsupported(node, 'multiple assignment targets')
         target = node.targets[0]
         if not isinstance(target, ast.Name):
-            raise NotYet(node, 'destructuring assignment not yet supported', 54)
+            raise NotYetSupported(node, 'destructuring assignment', 54)
         check_expr(node.value)
         return
     if isinstance(node, ast.Return):
@@ -58,7 +58,7 @@ def check_stmt(node: ast.stmt) -> None:
     if isinstance(node, ast.FunctionDef):
         check_arguments(node.args)
         if len(node.decorator_list) > 0:
-            raise NotYet(node, 'decorators not yet supported', 58)
+            raise NotYetSupported(node, 'decorators', 58)
         if node.returns is not None:
             raise Unsupported(node, 'return type annotations not supported')
         check_body(node.body)
@@ -95,23 +95,23 @@ def check_stmt(node: ast.stmt) -> None:
         raise Unsupported(node, 'try/except not supported')
     if isinstance(node, ast.Import):
         if len(node.names) != 1:
-            raise NotYet(node, 'multi-target import (import a, b) not yet supported', 53)
+            raise NotYetSupported(node, 'multi-target import (import a, b)', 53)
         if node.names[0].asname is not None:
-            raise NotYet(node, 'import-as not yet supported', 53)
+            raise NotYetSupported(node, 'import-as', 53)
         return
     if isinstance(node, ast.ImportFrom):
         if node.level > 0:
-            raise NotYet(node, 'relative imports not yet supported', 53)
+            raise NotYetSupported(node, 'relative imports', 53)
         if node.module is None:
-            raise NotYet(node, 'from-import with no module not yet supported', 53)
+            raise NotYetSupported(node, 'from-import with no module', 53)
         for alias in node.names:
             if alias.name == '*':
-                raise NotYet(node, 'from M import * not yet supported', 53)
+                raise NotYetSupported(node, 'from M import *', 53)
             if alias.asname is not None:
-                raise NotYet(node, 'from-import-as not yet supported', 53)
+                raise NotYetSupported(node, 'from-import-as', 53)
         return
     if isinstance(node, ast.Global):
-        raise NotYet(node, 'global not yet supported', 40)
+        raise NotYetSupported(node, 'global', 40)
     if isinstance(node, ast.Nonlocal):
         raise Unsupported(node, 'nonlocal not supported')
     if isinstance(node, ast.ClassDef):
@@ -121,7 +121,7 @@ def check_stmt(node: ast.stmt) -> None:
         check_expr(node.subject)
         for case in node.cases:
             if case.guard is not None:
-                raise NotYet(case, 'case guards not yet supported', 83)
+                raise NotYetSupported(case, 'case guards', 83)
             check_pattern(case.pattern)
             check_body(case.body)
         return
@@ -133,7 +133,7 @@ def check_stmt(node: ast.stmt) -> None:
 
 def check_classdef(node: ast.ClassDef) -> None:
     if any(isinstance(b, ast.Name) and b.id == 'Enum' for b in node.bases):
-        raise NotYet(node, 'enum classes not yet supported', 86)
+        raise NotYetSupported(node, 'enum classes', 86)
     if len(node.decorator_list) != 1:
         raise Unsupported(node, 'class must have exactly the @dataclass decorator')
     deco = node.decorator_list[0]
@@ -168,8 +168,8 @@ def check_pattern(node: ast.pattern) -> None:
         if isinstance(v, ast.UnaryOp) and isinstance(v.op, (ast.UAdd, ast.USub)) and isinstance(v.operand, ast.Constant) and isinstance(v.operand.value, (int, float)):
             return
         if isinstance(v, ast.Attribute):
-            raise NotYet(node, 'attribute value patterns not yet supported', 86)
-        raise NotYet(node, 'complex value patterns not yet supported', 83)
+            raise NotYetSupported(node, 'attribute value patterns', 86)
+        raise NotYetSupported(node, 'complex value patterns', 83)
     if isinstance(node, ast.MatchSingleton):
         return
     if isinstance(node, ast.MatchAs):
@@ -179,7 +179,7 @@ def check_pattern(node: ast.pattern) -> None:
     if isinstance(node, ast.MatchSequence):
         for p in node.patterns:
             if isinstance(p, ast.MatchStar):
-                raise NotYet(node, 'star patterns not yet supported', 84)
+                raise NotYetSupported(node, 'star patterns', 84)
             check_pattern(p)
         return
     if isinstance(node, ast.MatchClass):
@@ -189,11 +189,11 @@ def check_pattern(node: ast.pattern) -> None:
             check_pattern(p)
         return
     if isinstance(node, ast.MatchMapping):
-        raise NotYet(node, 'mapping patterns not yet supported', 87)
+        raise NotYetSupported(node, 'mapping patterns', 87)
     if isinstance(node, ast.MatchOr):
-        raise NotYet(node, 'or-patterns not yet supported', 85)
+        raise NotYetSupported(node, 'or-patterns', 85)
     if isinstance(node, ast.MatchStar):
-        raise NotYet(node, 'star patterns not yet supported', 84)
+        raise NotYetSupported(node, 'star patterns', 84)
     raise Unsupported(node, f'unknown pattern type: {type(node).__name__}')
 
 def check_expr(node: ast.expr) -> None:
@@ -224,18 +224,18 @@ def check_expr(node: ast.expr) -> None:
         raise Unsupported(node, f"unary operator '{sym}' not supported")
     if isinstance(node, ast.BoolOp):
         if len(node.values) > 2:
-            raise NotYet(node, 'chained boolean operator not yet supported', 82)
+            raise NotYetSupported(node, 'chained boolean operator', 82)
         for v in node.values:
             check_expr(v)
         return
     if isinstance(node, ast.Compare):
         if len(node.ops) > 1:
-            raise NotYet(node, 'chained comparison not yet supported', 82)
+            raise NotYetSupported(node, 'chained comparison', 82)
         for op in node.ops:
             if isinstance(op, (ast.In, ast.NotIn)):
-                raise NotYet(node, 'membership operator (in/not in) not yet supported', 80)
+                raise NotYetSupported(node, 'membership operator (in/not in)', 80)
             if isinstance(op, (ast.Is, ast.IsNot)):
-                raise NotYet(node, 'identity operator (is/is not) not yet supported', 81)
+                raise NotYetSupported(node, 'identity operator (is/is not)', 81)
         check_expr(node.left)
         for c in node.comparators:
             check_expr(c)
@@ -272,7 +272,7 @@ def check_expr(node: ast.expr) -> None:
             check_expr(v)
         return
     if isinstance(node, ast.Set):
-        raise NotYet(node, 'set literals not yet supported', 52)
+        raise NotYetSupported(node, 'set literals', 52)
     if isinstance(node, ast.Attribute):
         check_expr(node.value)
         return
@@ -286,11 +286,11 @@ def check_expr(node: ast.expr) -> None:
             check_comprehension(g)
         return
     if isinstance(node, ast.DictComp):
-        raise NotYet(node, 'dict comprehensions not yet supported', 52)
+        raise NotYetSupported(node, 'dict comprehensions', 52)
     if isinstance(node, ast.SetComp):
-        raise NotYet(node, 'set comprehensions not yet supported', 52)
+        raise NotYetSupported(node, 'set comprehensions', 52)
     if isinstance(node, ast.Slice):
-        raise NotYet(node, 'slicing not yet supported', 59)
+        raise NotYetSupported(node, 'slicing', 59)
     if isinstance(node, ast.GeneratorExp):
         raise Unsupported(node, 'generator expressions not supported (use list comprehensions)')
     if isinstance(node, ast.NamedExpr):
@@ -304,9 +304,9 @@ def check_expr(node: ast.expr) -> None:
     if isinstance(node, ast.YieldFrom):
         raise Unsupported(node, 'yield not supported')
     if isinstance(node, ast.JoinedStr):
-        raise NotYet(node, 'f-strings not yet supported', 55)
+        raise NotYetSupported(node, 'f-strings', 55)
     if isinstance(node, ast.FormattedValue):
-        raise NotYet(node, 'f-strings not yet supported', 55)
+        raise NotYetSupported(node, 'f-strings', 55)
     raise Unsupported(node, f'unknown expression type: {type(node).__name__}')
 
 def check_body(stmts: list[ast.stmt]) -> None:
@@ -320,22 +320,22 @@ def check_comprehension(node: ast.comprehension) -> None:
     if node.is_async:
         raise Unsupported(node, 'async comprehensions not supported')
     if not isinstance(node.target, ast.Name):
-        raise NotYet(node, 'destructuring in comprehensions not yet supported', 54)
+        raise NotYetSupported(node, 'destructuring in comprehensions', 54)
     check_expr(node.iter)
     for i in node.ifs:
         check_expr(i)
 
 def check_arguments(node: ast.arguments) -> None:
     if node.vararg is not None:
-        raise NotYet(node, '*args not yet supported', 57)
+        raise NotYetSupported(node, '*args', 57)
     if node.kwarg is not None:
-        raise NotYet(node, '**kwargs not yet supported', 57)
+        raise NotYetSupported(node, '**kwargs', 57)
     if len(node.kwonlyargs) > 0:
         raise Unsupported(node, 'keyword-only arguments not supported')
     if len(node.defaults) > 0:
-        raise NotYet(node, 'default arguments not yet supported', 56)
+        raise NotYetSupported(node, 'default arguments', 56)
     if len(node.kw_defaults) > 0:
-        raise NotYet(node, 'default arguments not yet supported', 56)
+        raise NotYetSupported(node, 'default arguments', 56)
     if len(node.posonlyargs) > 0:
         raise Unsupported(node, 'positional-only arguments not supported')
 
