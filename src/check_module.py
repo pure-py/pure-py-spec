@@ -714,8 +714,7 @@ def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> None:
         if isinstance(s, ast.ClassDef):
             check_class_decl(s, lambda_m)
 
-def check_module(tree: ast.AST) -> Result:
-    assert isinstance(tree, ast.Module)
+def check_module(tree: ast.Module) -> Result:
     try:
         walk_module(tree)
         return None

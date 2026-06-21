@@ -339,10 +339,8 @@ def check_arguments(node: ast.arguments) -> None:
     if len(node.posonlyargs) > 0:
         raise Unsupported(node, 'positional-only arguments not supported')
 
-def check_module(node: ast.AST) -> Result:
+def check_module(node: ast.Module) -> Result:
     try:
-        if not isinstance(node, ast.Module):
-            raise Unsupported(node, 'expected a module')
         check_body(node.body)
         return None
     except ParseError as e:
