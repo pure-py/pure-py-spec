@@ -108,7 +108,7 @@ def check_stmt(node: ast.stmt) -> None:
                 raise NotYetSupported(node, 'from-import-as', 53)
         return
     if isinstance(node, ast.Global):
-        raise NotYetSupported(node, 'global', 40)
+        raise Unsupported(node, 'global not supported')
     if isinstance(node, ast.Nonlocal):
         raise Unsupported(node, 'nonlocal not supported')
     if isinstance(node, ast.ClassDef):
