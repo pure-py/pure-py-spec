@@ -261,7 +261,6 @@ which follow Python.
 
 Class contexts $\Lambda$ are finite maps from class names to pairs $(\vec{x}, C)$, where $\vec{x}$ is a sequence of distinct
 field names (in declaration order) and $C$ names the base class (or $\bot$ for no base). Metavariables $C$ and $B$ range over class names.
-Union of class contexts is undefined when the operands disagree on a shared key.
 The \emph{inheritance graph} $G_{\Lambda_M}$ of a class context has an edge $(C, B)$ iff $\Lambda_M(C) = (\vec{x}, B)$ for some $\vec{x}$.
 
 \subsection{Modules and entry point}
@@ -303,8 +302,7 @@ names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined}
 \label{fig:predefined}
 \end{figure}
 
-The metafunctions $\imports$, $\classes$ (\figref{modules}), and $\assignsS$ extend from individual statements
-to blocks and module bodies by union. The metafunction $\parents$ collects the proper prefixes of a
+The metafunctions $\imports$ and $\assignsS$ extend from individual statements to blocks and module bodies by union. The metafunction $\classes$ (\figref{modules}) extends similarly, provided the class names declared are distinct. The metafunction $\parents$ collects the proper prefixes of a
 fully-qualified name.
 
 \input{fig/modules}
