@@ -13,18 +13,18 @@
 \inferrule*[lab={\ruleName{import}}]
 {
   M' = x_1.x_2.\ldots.x_{n+1} \\
-  \Gamma \runion \statusDefAssigned(\set{x_1}) \vdash m : \Delta'
+  \Gamma \runion \statusDefAssigned(\set{x_1}) \vdash m : \Delta
 }
 {
-  \Gamma \vdash \exImport{M'} \cons m : \statusDefAssigned(\set{x_1}) \runion \Delta'
+  \Gamma \vdash \exImport{M'} \cons m : \statusDefAssigned(\set{x_1}) \runion \Delta
 }
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
-  \Gamma \runion \statusDefAssigned(\set{x_1, \ldots, x_{n+1}}) \vdash m : \Delta'
+  \Gamma \runion \statusDefAssigned(\set{x_1, \ldots, x_{n+1}}) \vdash m : \Delta
 }
 {
-  \Gamma \vdash \exFromImport{M'}{x_1, \ldots, x_{n+1}} \cons m : \statusDefAssigned(\set{x_1, \ldots, x_{n+1}}) \runion \Delta'
+  \Gamma \vdash \exFromImport{M'}{x_1, \ldots, x_{n+1}} \cons m : \statusDefAssigned(\set{x_1, \ldots, x_{n+1}}) \runion \Delta
 }
 \and
 \inferrule*[lab={\ruleName{statement}}]
