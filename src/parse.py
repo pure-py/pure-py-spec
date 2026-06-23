@@ -157,6 +157,9 @@ def check_field(stmt: ast.stmt) -> None:
     if not (isinstance(stmt.annotation, ast.Name) and stmt.annotation.id == 'Any'):
         raise Unsupported(stmt, 'field type annotation must be Any')
 
+def is_qualified_name(node: ast.expr) -> bool:
+    return isinstance(node, ast.Name) or (isinstance(node, ast.Attribute) and is_qualified_name(node.value))
+
 def check_pattern(node: ast.pattern) -> None:
     if isinstance(node, ast.MatchValue):
         v = node.value
@@ -180,8 +183,8 @@ def check_pattern(node: ast.pattern) -> None:
             check_pattern(p)
         return
     if isinstance(node, ast.MatchClass):
-        if not (isinstance(node.cls, ast.Name) or (isinstance(node.cls, ast.Attribute) and isinstance(node.cls.value, ast.Name))):
-            raise Unsupported(node, 'class pattern head must be a simple name or single-level qualified name')
+        if not is_qualified_name(node.cls):
+            raise Unsupported(node, 'class pattern head must be a qualified name')
         for p in list(node.patterns) + list(node.kwd_patterns):
             check_pattern(p)
         return

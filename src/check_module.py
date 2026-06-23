@@ -387,20 +387,27 @@ def pattern_vars(p: ast.pattern) -> list[str]:
                [v for sub in p.kwd_patterns for v in pattern_vars(sub)]
     raise AssertionError(f'unexpected pattern: {type(p).__name__}')
 
+def qualified_name(e: ast.expr) -> str:
+    if isinstance(e, ast.Name):
+        return e.id
+    assert isinstance(e, ast.Attribute)
+    return qualified_name(e.value) + '.' + e.attr
+
 def resolve_class_head(head: ast.expr, ctx: Context, node: ast.AST) -> tuple[str, ClassContext]:
     if isinstance(head, ast.Name):
         if head.id not in ctx.cls:
             raise IllFormedModule(node, reasons.UnknownClassInPattern(head.id))
         return head.id, ctx.cls
-    if isinstance(head, ast.Attribute) and isinstance(head.value, ast.Name):
-        mod, c = head.value.id, head.attr
-        if mod not in ctx.modules:
-            raise IllFormedModule(node, reasons.UnknownClassInPattern(f'{mod}.{c}'))
-        mod_cls = ctx.module_classes.get(mod, {})
-        if c not in mod_cls:
-            raise IllFormedModule(node, reasons.UnknownClassInPattern(f'{mod}.{c}'))
-        return c, mod_cls
-    raise IllFormedModule(node, reasons.UnknownClassInPattern(ast.unparse(head)))
+    assert isinstance(head, ast.Attribute)
+    full = qualified_name(head)
+    mod_path = qualified_name(head.value)
+    root = mod_path.split('.')[0]
+    if root not in ctx.modules or mod_path not in ctx.module_classes:
+        raise IllFormedModule(node, reasons.UnknownClassInPattern(full))
+    mod_cls = ctx.module_classes[mod_path]
+    if head.attr not in mod_cls:
+        raise IllFormedModule(node, reasons.UnknownClassInPattern(full))
+    return head.attr, mod_cls
 
 def check_pattern_wf(p: ast.pattern, ctx: Context) -> None:
     if isinstance(p, ast.MatchClass):
