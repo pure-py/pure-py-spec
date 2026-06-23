@@ -180,8 +180,8 @@ def check_pattern(node: ast.pattern) -> None:
             check_pattern(p)
         return
     if isinstance(node, ast.MatchClass):
-        if not isinstance(node.cls, ast.Name):
-            raise Unsupported(node, 'class pattern head must be a simple name')
+        if not (isinstance(node.cls, ast.Name) or (isinstance(node.cls, ast.Attribute) and isinstance(node.cls.value, ast.Name))):
+            raise Unsupported(node, 'class pattern head must be a simple name or single-level qualified name')
         for p in list(node.patterns) + list(node.kwd_patterns):
             check_pattern(p)
         return

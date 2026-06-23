@@ -387,22 +387,34 @@ def pattern_vars(p: ast.pattern) -> list[str]:
                [v for sub in p.kwd_patterns for v in pattern_vars(sub)]
     raise AssertionError(f'unexpected pattern: {type(p).__name__}')
 
+def resolve_class_head(head: ast.expr, ctx: Context, node: ast.AST) -> tuple[str, ClassContext]:
+    if isinstance(head, ast.Name):
+        if head.id not in ctx.cls:
+            raise IllFormedModule(node, reasons.UnknownClassInPattern(head.id))
+        return head.id, ctx.cls
+    if isinstance(head, ast.Attribute) and isinstance(head.value, ast.Name):
+        mod, c = head.value.id, head.attr
+        if mod not in ctx.modules:
+            raise IllFormedModule(node, reasons.UnknownClassInPattern(f'{mod}.{c}'))
+        mod_cls = ctx.module_classes.get(mod, {})
+        if c not in mod_cls:
+            raise IllFormedModule(node, reasons.UnknownClassInPattern(f'{mod}.{c}'))
+        return c, mod_cls
+    raise IllFormedModule(node, reasons.UnknownClassInPattern(ast.unparse(head)))
+
 def check_pattern_wf(p: ast.pattern, ctx: Context) -> None:
     if isinstance(p, ast.MatchClass):
-        assert isinstance(p.cls, ast.Name)
-        c = p.cls.id
-        if c not in ctx.cls:
-            raise IllFormedModule(p, reasons.UnknownClassInPattern(c))
-        fields = fields_of(ctx.cls, c)
+        c_name, c_lambda = resolve_class_head(p.cls, ctx, p)
+        fields = fields_of(c_lambda, c_name)
         n, m = len(p.patterns), len(p.kwd_patterns)
         if n + m != len(fields):
-            raise IllFormedModule(p, reasons.PatternArityMismatch(c, len(fields), n + m))
+            raise IllFormedModule(p, reasons.PatternArityMismatch(c_name, len(fields), n + m))
         remaining = set(fields[n:])
         kwds = list(p.kwd_attrs)
         if len(kwds) != len(set(kwds)):
-            raise IllFormedModule(p, reasons.DuplicatePatternKeyword(c))
+            raise IllFormedModule(p, reasons.DuplicatePatternKeyword(c_name))
         if set(kwds) != remaining:
-            raise IllFormedModule(p, reasons.UnknownFieldInPattern(c, tuple(sorted(remaining))))
+            raise IllFormedModule(p, reasons.UnknownFieldInPattern(c_name, tuple(sorted(remaining))))
         for sub in list(p.patterns) + list(p.kwd_patterns):
             check_pattern_wf(sub, ctx)
         return
@@ -767,9 +779,13 @@ def walk_module(tree: ast.Module, module_classes: dict[str, ClassContext]) -> No
     check_class_decls(tree.body, class_ctx)
     var_ctx = dict(BUILTINS)
     var_ctx['__name__'] = Status.TT
-    check_block(tree.body, Context(var=var_ctx, cls=class_ctx))
+    modules = frozenset(top_level_imports(tree.body))
+    check_block(tree.body, Context(var=var_ctx, cls=class_ctx, modules=modules, module_classes=module_classes))
     if isinstance(result_type_of_block(tree.body), TyReturns):
         raise IllFormedModule(tree.body[0], reasons.TopLevelReturn())
+
+def top_level_imports(body: list[ast.stmt]) -> set[str]:
+    return {s.names[0].name.split('.')[0] for s in body if isinstance(s, ast.Import)}
 
 def check_file(filename: str) -> Optional[IllFormed]:
     source = open(filename).read()
