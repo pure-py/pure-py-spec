@@ -160,13 +160,21 @@ class UnknownModule:
         return f"unknown module {self.q!r}"
 
 
+@dataclass(frozen=True)
+class UnknownMember:
+    x: str
+    q: str
+    def message(self) -> str:
+        return f"module {self.q!r} has no member {self.x!r}"
+
+
 Reason = Union[
     DuplicateClassName, DuplicateFieldName, UnknownBaseClass, InheritedFieldClash,
     CyclicInheritance,
     UnassignedVariable, CapturedReassignment, SelfCaptureAssignment,
     UnreachableStatement, ConstructorArityMismatch, PatternArityMismatch,
     UnknownClassInPattern, UnknownFieldInPattern, DuplicatePatternKeyword,
-    SelfImport, UnknownModule,
+    SelfImport, UnknownModule, UnknownMember,
     NonlinearPattern, UnreachableCase, DuplicateMutualName,
     NestedImport, TopLevelReturn, EmptyFromImport,
 ]

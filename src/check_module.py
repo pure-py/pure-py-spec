@@ -236,6 +236,17 @@ def check_import(s: ast.stmt, q_prime: str, ctx: Context) -> None:
         raise IllFormedModule(s, reasons.UnknownModule(q_prime))
     check_module(ctx.M[q_prime], ctx.M, q_prime)
 
+def check_imports_R(s: ast.stmt, q_prime: str, names: list[str], ctx: Context) -> None:
+    if not ctx.M:
+        return
+    body = ctx.M[q_prime].body
+    if len(body) == 0:
+        return
+    members = assigns_block(body) | set(build_class_context(body).keys()) | set(BUILTINS.keys()) | {'__name__'}
+    unknown = next((x for x in names if x not in members and f'{q_prime}.{x}' not in ctx.M), None)
+    if unknown is not None:
+        raise IllFormedModule(s, reasons.UnknownMember(unknown, q_prime))
+
 def check_stmt(s: ast.stmt, ctx: Context) -> None:
     if isinstance(s, ast.Pass):
         return
@@ -269,6 +280,7 @@ def check_stmt(s: ast.stmt, ctx: Context) -> None:
             raise IllFormedModule(s, reasons.EmptyFromImport())
         assert s.module is not None
         check_import(s, s.module, ctx)
+        check_imports_R(s, s.module, [a.name for a in s.names], ctx)
         return
     if isinstance(s, ast.Match):
         check_expr(s.subject, ctx)
