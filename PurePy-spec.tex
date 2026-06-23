@@ -257,24 +257,6 @@ which follow Python.
 
 \input{fig/precedence}
 
-\subsection{Local contexts}
-
-Metavariables $C$ and $B$ range over \emph{simple} class names; $D$ ranges over \emph{fully-qualified} class names of the form $M.C$.
-
-\begin{definition}[Local context]
-A local context $\Lambda$ is a finite map whose entries are either:
-\begin{itemize}
-\item simple class names $C$ bound to \emph{class entries} $(D(\vec{x}), B)$, where $\vec{x}$ is a sequence of distinct field names (in declaration order) and $B$ names the base class (or $\bot$ for no base);
-\item simple identifiers $x$ bound to \emph{module references} $M$, fully-qualified module names.
-\end{itemize}
-\end{definition}
-
-\noindent Class entries cover both locally-declared and imported classes; module references arise from import statements.
-
-\begin{definition}[Inheritance graph]
-$G_{\Lambda_M}$ has an edge $(C, B)$ iff $\Lambda_M(C) = (D(\vec{x}), B)$ for some $D, \vec{x}$.
-\end{definition}
-
 \subsection{Modules and entry point}
 
 A \PurePy \emph{program} $\langle E, \mathcal{M} \rangle$ consists of a finite map
@@ -286,11 +268,12 @@ is fixed and ambient in all definitions that follow.
 Import statements appear only as a contiguous prefix of a module body, before any other statement. This confines module-loading side-effects (currently only divergence or runtime
 errors) to a single zone at the start of each module body.
 
-\begin{definition}[Module well-formedness context]
-For any $(M \mapsto b) \in \mathcal{M}$, $b$ is checked under the initial variable context $\Gamma_M^0 = \Gamma_{\textup{\pyinline{builtins}}} \runion
-\set{\text{\pyinline{__name__}} \mapsto \statusDefAssigned}$, with $\Gamma_{\textup{\pyinline{builtins}}}$ binding the
-names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined}). For a well-formed module $M$, the \emph{variable context} $\Gamma_M = \Gamma_M^0 \runion \Delta$ and \emph{local context} $\Lambda_M$ are the contexts produced as outputs of $M$'s body well-formedness (\figref{well-formed-module}).
+\begin{definition}[Initial variable context]
+For any $M \in \dom(\mathcal{M})$, the \emph{initial variable context} of $M$ is $\Gamma_M^0 = \Gamma_{\textup{\pyinline{builtins}}} \runion
+\set{\text{\pyinline{__name__}} \mapsto \statusDefAssigned}$, where $\Gamma_{\textup{\pyinline{builtins}}}$ binds the
+names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined}).
 \end{definition}
+
 
 \begin{figure}[H]
 \small
@@ -320,7 +303,7 @@ $M' \in \imports(\mathcal{M}(M)) \cup \parents(M)$. Program well-formedness (\fi
 
 \subsection{Well-formedness}
 
-\paragraph{Auxiliary metafunctions.}
+\subsubsection{Auxiliary definitions}
 
 Three syntactic analyses support the well-formedness rules: $\assignsS(s)$, the set of variables assigned
 anywhere in $s$ (without descending into nested function definitions, which have their own scope, so that
@@ -332,33 +315,50 @@ with the singleton block identified with its statement.
 
 \input{fig/aux}
 
-\paragraph{Pattern subsumption.}
+\begin{definition}[Pattern subsumption]
+The preorder $p \subsumed p'$ (\figref{subsumption}) holds when every value matched by $p$ is also matched by $p'$.
+\end{definition}
 
-The preorder $p \subsumed p'$, defined in \figref{subsumption}, holds when every value matched by $p$ is also
-matched by $p'$. It is used by the well-formedness rule for $\pyinline{match}$ to rule out unreachable cases,
-and to check exhaustiveness: with the current pattern set, this reduces to requiring a catch-all (var or
-wildcard) case.
+\noindent Subsumption is used by the well-formedness rule for $\pyinline{match}$ to rule out unreachable cases and to check exhaustiveness; with the current pattern set, the latter reduces to requiring a catch-all (var or wildcard) case.
 
 \input{fig/subsumption}
 
-\paragraph{Well-formed pattern lists.}
+\subsubsection{Well-formedness rules}
 
-A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is linear (no repeated variable
-names) and no earlier pattern subsumes a later one. The \pyinline{match} well-formedness rules use this
-judgement to enforce reachability and linearity of case patterns.
+A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is linear (no repeated variable names) and no earlier pattern subsumes a later one. The \pyinline{match} well-formedness rules use this judgement to enforce reachability and linearity of case patterns.
 
 \input{fig/well-formed-pat}
-
-\paragraph{Well-formedness judgement.}
 
 Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
 = e} definitely assigns $\set{\pyinline{x} : \statusDefAssigned}$. Block well-formedness is given in
 \figref{well-formed}; expression well-formedness in \figref{well-formed-expr}.
 
+\paragraph{Class/module contexts.}
+
+Metavariables $C$ and $B$ range over \emph{simple} class names; $D$ ranges over \emph{fully-qualified} class names of the form $M.C$.
+
+\begin{definition}[Class/module context]
+A class/module context $\Lambda$ is a finite map whose entries are either:
+\begin{itemize}
+\item simple class names $C$ bound to \emph{class entries} $(D(\vec{x}), B)$, where $\vec{x}$ is a sequence of distinct field names (in declaration order) and $B$ names the base class (or $\bot$ for no base);
+\item simple identifiers $x$ bound to \emph{module references} $M$, fully-qualified module names.
+\end{itemize}
+\end{definition}
+
+\noindent Class entries cover both locally-declared and imported classes; module references arise from import statements.
+
+\begin{definition}[Inheritance graph]
+$G_{\Lambda_M}$ has an edge $(C, B)$ iff $\Lambda_M(C) = (D(\vec{x}), B)$ for some $D, \vec{x}$.
+\end{definition}
+
 \input{fig/well-formed}
 \input{fig/well-formed-expr}
 \input{fig/well-formed-module}
+
+\begin{definition}[Variable and local contexts of a well-formed module]
+For a well-formed module $M$, i.e.\ where $\Gamma_M^0; \varnothing \vdash \mathcal{M}(M) : \Delta; \Lambda$ for some $\Delta, \Lambda$, the \emph{variable context} of $M$ is $\Gamma_M = \Gamma_M^0 \runion \Delta$ and the \emph{local context} of $M$ is $\Lambda_M = \Lambda$.
+\end{definition}
 
 \subsection{Examples}
 
