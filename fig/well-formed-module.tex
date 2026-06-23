@@ -1,5 +1,4 @@
 \begin{figure}
-\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\vec{x} \importsR_M \Delta; \Lambda$}
 \begin{mathpar}
 \small
@@ -38,11 +37,11 @@
   x \cons \vec{x} \importsR_M \Delta; \Lambda, x : M.x
 }
 \end{mathpar}
-\subcaption{Names $\vec{x}$ imported from module $M$ produce bindings $\Delta$ and $\Lambda$}
-\end{subfigure}
+\caption{Names $\vec{x}$ imported from module $M$ produce bindings $\Delta$ and $\Lambda$}
+\label{fig:imports}
+\end{figure}
 
-\vspace{2mm}
-
+\begin{figure}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Gamma; \Lambda \vdash m : \Delta; \Lambda'$}
 \begin{mathpar}
@@ -60,6 +59,7 @@
   M' = x_1.x_2.\ldots.x_{n+1} \\
   M' \in \dom(\mathcal{M}) \\
   M' \neq M \\
+  \vdash_{\mathcal{M}} M' \\
   \Gamma; \Lambda, x_1 : M' \vdash m : \Delta; \Lambda'
 }
 {
@@ -70,6 +70,7 @@
 {
   M' \in \dom(\mathcal{M}) \\
   M' \neq M \\
+  \vdash_{\mathcal{M}} M' \\
   \vec{x} \importsR_{M'} \Delta'; \Lambda'' \\
   \Gamma \runion \Delta'; \Lambda \runion \Lambda'' \vdash m : \Delta; \Lambda'
 }
@@ -109,6 +110,37 @@
 \end{mathpar}
 \subcaption{Body $m$ of module $M$ is well-formed in $\Gamma$ and $\Lambda$}
 \end{subfigure}
-\caption{Module body well-formedness}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\vdash_{\mathcal{M}} M$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{module}}]
+{
+  \Gamma_M; \varnothing \vdash \mathcal{M}(M) : \Delta; \Lambda \\
+  G_{\Lambda} \text{ acyclic}
+}
+{
+  \vdash_{\mathcal{M}} M
+}
+\end{mathpar}
+
+\flushleft \shadebox{$\vdash \langle E, \mathcal{M} \rangle$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{program}}]
+{
+  \vdash_{\mathcal{M}} E \\
+  G_{\mathcal{M}} \text{ acyclic}
+}
+{
+  \vdash \langle E, \mathcal{M} \rangle
+}
+\end{mathpar}
+\subcaption{Module and program well-formedness}
+\end{subfigure}
+\caption{Module well-formedness}
 \label{fig:well-formed-module}
 \end{figure}

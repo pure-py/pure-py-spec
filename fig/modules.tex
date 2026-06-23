@@ -34,36 +34,6 @@
 \subcaption{$\decls$ and $\fields$ metafunctions}
 \end{subfigure}
 
-\vspace{2mm}
-
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash_{\mathcal{M}} M$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{module}}]
-{
-  \Gamma_M; \varnothing \vdash \mathcal{M}(M) : \Delta; \Lambda \\
-  G_{\Lambda} \text{ acyclic}
-}
-{
-  \vdash_{\mathcal{M}} M
-}
-\end{mathpar}
-
-\flushleft \shadebox{$\vdash \langle E, \mathcal{M} \rangle$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{program}}]
-{
-  \vdash_{\mathcal{M}} M_i \quad (\forall M_i \in \dom(\mathcal{M})) \\
-  G_{\mathcal{M}} \text{ acyclic}
-}
-{
-  \vdash \langle E, \mathcal{M} \rangle
-}
-\end{mathpar}
-\subcaption{Module and program well-formedness}
-\end{subfigure}
-\caption{Module structure}
+\caption{Module-related metafunctions}
 \label{fig:modules}
 \end{figure}

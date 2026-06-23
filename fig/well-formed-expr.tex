@@ -5,37 +5,37 @@
 \small
 \inferrule*[lab={\ruleName{simple-module}}]
 {
-  x : M' \in \Lambda
+  x : M \in \Lambda
 }
 {
-  \Lambda \vdash x \names M'
+  \Lambda \vdash x \names M
 }
 \and
 \inferrule*[lab={\ruleName{simple-class}}]
 {
-  C : (D(x_1, \ldots, x_n), B) \in \Lambda
+  C : (D(\vec{x}), B) \in \Lambda
 }
 {
-  \Lambda \vdash C \names D(x_1, \ldots, x_n)
+  \Lambda \vdash C \names D(\vec{x})
 }
 \and
 \inferrule*[lab={\ruleName{qualified-module}}]
 {
-  \Lambda \vdash Q \names M' \\
-  M'.x \in \dom(\mathcal{M})
+  \Lambda \vdash Q \names M \\
+  M.x \in \dom(\mathcal{M})
 }
 {
-  \Lambda \vdash Q.x \names M'.x
+  \Lambda \vdash Q.x \names M.x
 }
 \and
 \inferrule*[lab={\ruleName{qualified-class}}]
 {
-  \Lambda \vdash Q \names M' \\
-  \Lambda_{M'}(C) = (M'.C(\vec{y}), B) \\
-  \fields(M'.C) = x_1, \ldots, x_n
+  \Lambda \vdash Q \names M \\
+  \Lambda_{M}(C) = (M.C(\vec{y}), B) \\
+  \fields(M.C) = \vec{x}
 }
 {
-  \Lambda \vdash Q.C \names M'.C(x_1, \ldots, x_n)
+  \Lambda \vdash Q.C \names M.C(\vec{x})
 }
 \end{mathpar}
 \subcaption{Name $Q$ resolves to $T$ under $\Lambda$}
@@ -65,7 +65,7 @@
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
-  \Lambda \vdash Q \names D(x_1, \ldots, x_n) \\
+  \Lambda \vdash Q \names D(\vec{x}) \\
   \Gamma; \Lambda \vdash e_i \quad (\forall i)
 }
 {
@@ -74,8 +74,8 @@
 \and
 \inferrule*[lab={\ruleName{attr-module}}]
 {
-  \Lambda \vdash e \names M' \\
-  y \in \vars(\mathcal{M}(M'))
+  \Lambda \vdash e \names M \\
+  y \in \vars(\mathcal{M}(M))
 }
 {
   \Gamma; \Lambda \vdash e.y
