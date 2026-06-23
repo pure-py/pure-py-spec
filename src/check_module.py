@@ -53,6 +53,13 @@ class Context:
 def extend_var(ctx: 'Context', delta: VarContext) -> 'Context':
     return Context(var=extend(ctx.var, delta), cls=ctx.cls, modules=ctx.modules, M=ctx.M, q=ctx.q)
 
+def extend_cls(ctx: 'Context', c: str, info: 'ClassInfo') -> 'Context':
+    return Context(var=ctx.var, cls={**ctx.cls, c: info}, modules=ctx.modules, M=ctx.M, q=ctx.q)
+
+def class_info_for(node: ast.ClassDef) -> 'ClassInfo':
+    base = node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
+    return ClassInfo(fields=tuple(class_field_names(node)), base=base)
+
 
 @dataclass(frozen=True)
 class TyReturns:
@@ -146,29 +153,36 @@ def result_type_of_block(block: list[ast.stmt]) -> ResultTy:
         return result_type(block[0])
     return runion_results(result_type(block[0]), result_type_of_block(block[1:]))
 
-def check_block(block: list[ast.stmt], ctx: Context) -> None:
-    check_items(items_of_block(block), ctx)
+def check_block(block: list[ast.stmt], ctx: Context) -> Context:
+    return check_items(items_of_block(block), ctx)
 
-def check_items(items: list[Item], ctx: Context) -> None:
+def check_items(items: list[Item], ctx: Context) -> Context:
     if len(items) == 0:
-        return
+        return ctx
     head = items[0]
     check_item(head, ctx)
-    if len(items) > 1:
-        tail = items[1:]
-        if isinstance(item_result_type(head), TyReturns):
-            first_unreachable = tail[0]
-            node: ast.AST = first_unreachable[0] if isinstance(first_unreachable, list) else first_unreachable
-            raise IllFormedModule(node, reasons.UnreachableStatement())
-        reassigned = captures_item(head) & assigns_items(tail)
-        if reassigned:
-            name = sorted(reassigned)[0]
-            ra_node = find_first_reassigning(tail, reassigned)
-            assert ra_node is not None
-            raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
-        head_result = item_result_type(head)
-        delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
-        check_items(tail, extend_var(ctx, delta))
+    if len(items) == 1:
+        return next_ctx_after(head, ctx)
+    tail = items[1:]
+    if isinstance(item_result_type(head), TyReturns):
+        first_unreachable = tail[0]
+        node: ast.AST = first_unreachable[0] if isinstance(first_unreachable, list) else first_unreachable
+        raise IllFormedModule(node, reasons.UnreachableStatement())
+    reassigned = captures_item(head) & assigns_items(tail)
+    if reassigned:
+        name = sorted(reassigned)[0]
+        ra_node = find_first_reassigning(tail, reassigned)
+        assert ra_node is not None
+        raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
+    return check_items(tail, next_ctx_after(head, ctx))
+
+def next_ctx_after(head: Item, ctx: Context) -> Context:
+    head_result = item_result_type(head)
+    delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
+    next_ctx = extend_var(ctx, delta)
+    if isinstance(head, ast.ClassDef):
+        next_ctx = extend_cls(next_ctx, head.name, class_info_for(head))
+    return next_ctx
 
 def item_result_type(item: Item) -> ResultTy:
     if isinstance(item, list):
@@ -242,7 +256,7 @@ def check_imports_R(s: ast.stmt, q_prime: str, names: list[str], ctx: Context) -
     body = ctx.M[q_prime].body
     if len(body) == 0:
         return
-    members = assigns_block(body) | set(build_class_context(body).keys()) | set(BUILTINS.keys()) | {'__name__'}
+    members = assigns_block(body) | {s.name for s in body if isinstance(s, ast.ClassDef)} | set(BUILTINS.keys()) | {'__name__'}
     unknown = next((x for x in names if x not in members and f'{q_prime}.{x}' not in ctx.M), None)
     if unknown is not None:
         raise IllFormedModule(s, reasons.UnknownMember(unknown, q_prime))
@@ -288,6 +302,7 @@ def check_stmt(s: ast.stmt, ctx: Context) -> None:
         check_match_cases(s.cases, ctx)
         return
     if isinstance(s, ast.ClassDef):
+        check_class_decl(s, ctx.cls)
         return
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
@@ -723,23 +738,6 @@ def class_field_names(node: ast.ClassDef) -> list[str]:
     return [t.target.id for t in node.body
             if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)]
 
-def build_class_context(body: list[ast.stmt]) -> ClassContext:
-    lambda_m: ClassContext = {}
-    class_nodes: dict[str, ast.ClassDef] = {}
-    for s in body:
-        if isinstance(s, ast.ClassDef):
-            if s.name in lambda_m:
-                raise IllFormedModule(s, reasons.DuplicateClassName(s.name))
-            base = s.bases[0].id if s.bases and isinstance(s.bases[0], ast.Name) else None
-            lambda_m[s.name] = ClassInfo(fields=tuple(class_field_names(s)), base=base)
-            class_nodes[s.name] = s
-    # G_{Λ_M} acyclic: edge (C, B) iff Λ_M(C) = (_, B)
-    graph = {c: {info.base} if info.base is not None else set() for c, info in lambda_m.items()}
-    cycle = has_cycle(graph)
-    if len(cycle) > 0:
-        raise IllFormedModule(class_nodes[cycle[0]], reasons.CyclicInheritance(tuple(cycle)))
-    return lambda_m
-
 def has_cycle(graph: dict[str, set[str]]) -> list[str]:
     """DFS cycle detection. Returns a cycle (as a list of names) if one exists, else []."""
     WHITE, GRAY, BLACK = 0, 1, 2
@@ -789,11 +787,6 @@ def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> None:
     if len(clash) > 0:
         raise IllFormedModule(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
 
-def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> None:
-    for s in body:
-        if isinstance(s, ast.ClassDef):
-            check_class_decl(s, lambda_m)
-
 def check_module(m: ast.Module, M: Optional[dict[str, ast.Module]] = None, q: str = '') -> ClassContext:
     try:
         return check_module_body(m, M or {}, q)
@@ -808,15 +801,13 @@ def check_module_body(m: ast.Module, M: dict[str, ast.Module], q: str) -> ClassC
     nested = find_nested_import(m.body)
     if nested is not None:
         raise IllFormedModule(nested, reasons.NestedImport())
-    class_ctx = build_class_context(m.body)
-    check_class_decls(m.body, class_ctx)
     var_ctx = dict(BUILTINS)
     var_ctx['__name__'] = Status.TT
     modules = frozenset(top_level_imports(m.body))
-    check_block(m.body, Context(var=var_ctx, cls=class_ctx, modules=modules, M=M, q=q))
+    final_ctx = check_block(m.body, Context(var=var_ctx, cls={}, modules=modules, M=M, q=q))
     if isinstance(result_type_of_block(m.body), TyReturns):
         raise IllFormedModule(m.body[0], reasons.TopLevelReturn())
-    return class_ctx
+    return final_ctx.cls
 
 def module_result(m: ast.Module, M: Optional[dict[str, ast.Module]] = None, q: str = '') -> Optional[IllFormed]:
     try:

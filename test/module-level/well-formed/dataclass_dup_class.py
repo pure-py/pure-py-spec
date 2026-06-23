@@ -1,4 +1,3 @@
-# rule: class
 from dataclasses import dataclass
 
 @dataclass
@@ -6,7 +5,7 @@ class C:
     pass
 
 @dataclass
-class C:  # PurePy: error (duplicate class name); Python: ok (rebinds C)
+class C:  # second declaration shadows the first (matches Python)
     pass
 
 print("ok")

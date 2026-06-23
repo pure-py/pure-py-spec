@@ -3,13 +3,6 @@ from typing import Union
 
 
 @dataclass(frozen=True)
-class DuplicateClassName:
-    name: str
-    def message(self) -> str:
-        return f"duplicate class name '{self.name}' in module"
-
-
-@dataclass(frozen=True)
 class DuplicateFieldName:
     name: str
     cls: str
@@ -22,13 +15,6 @@ class UnknownBaseClass:
     base: str
     def message(self) -> str:
         return f"base class '{self.base}' is not declared in this module"
-
-
-@dataclass(frozen=True)
-class CyclicInheritance:
-    cycle: tuple[str, ...]
-    def message(self) -> str:
-        return f"cyclic inheritance: {' -> '.join(self.cycle)}"
 
 
 @dataclass(frozen=True)
@@ -169,8 +155,7 @@ class UnknownMember:
 
 
 Reason = Union[
-    DuplicateClassName, DuplicateFieldName, UnknownBaseClass, InheritedFieldClash,
-    CyclicInheritance,
+    DuplicateFieldName, UnknownBaseClass, InheritedFieldClash,
     UnassignedVariable, CapturedReassignment, SelfCaptureAssignment,
     UnreachableStatement, ConstructorArityMismatch, PatternArityMismatch,
     UnknownClassInPattern, UnknownFieldInPattern, DuplicatePatternKeyword,
