@@ -1,5 +1,50 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma \vdash m : \Delta$}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\vec{x} \importsR_M \Delta; \Lambda$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{imp-empty}}]
+{
+  \strut
+}
+{
+  \varepsilon \importsR_M \varnothing; \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{imp-var}}]
+{
+  x \in \vars(M) \\
+  \vec{x} \importsR_M \Delta; \Lambda
+}
+{
+  x \cons \vec{x} \importsR_M \set{x : \statusDefAssigned} \runion \Delta; \Lambda
+}
+\and
+\inferrule*[lab={\ruleName{imp-class}}]
+{
+  x : (D(\vec{y}), B) \in \Lambda_M \\
+  \vec{x} \importsR_M \Delta; \Lambda
+}
+{
+  x \cons \vec{x} \importsR_M \Delta; \Lambda, x : (D(\vec{y}), B)
+}
+\and
+\inferrule*[lab={\ruleName{imp-module}}]
+{
+  M.x \in \dom(\mathcal{M}) \\
+  \vec{x} \importsR_M \Delta; \Lambda
+}
+{
+  x \cons \vec{x} \importsR_M \Delta; \Lambda, x : M.x
+}
+\end{mathpar}
+\subcaption{Names $\vec{x}$ imported from module $M$ produce bindings $\Delta$ and $\Lambda$}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Gamma; \Lambda \vdash m : \Delta; \Lambda'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{empty}}]
@@ -7,57 +52,64 @@
   \strut
 }
 {
-  \Gamma \vdash \varepsilon : \varnothing
+  \Gamma; \Lambda \vdash \varepsilon : \varnothing; \Lambda
 }
 \and
 \inferrule*[lab={\ruleName{import}}]
 {
   M' = x_1.x_2.\ldots.x_{n+1} \\
-  \Gamma \runion \statusDefAssigned(\set{x_1}) \vdash m : \Delta
+  M' \in \dom(\mathcal{M}) \\
+  M' \neq M \\
+  \Gamma; \Lambda, x_1 : M' \vdash m : \Delta; \Lambda'
 }
 {
-  \Gamma \vdash \exImport{M'} \cons m : \statusDefAssigned(\set{x_1}) \runion \Delta
+  \Gamma; \Lambda \vdash \exImport{M'} \cons m : \Delta; \Lambda'
 }
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
-  \Gamma \runion \statusDefAssigned(\set{x_1, \ldots, x_{n+1}}) \vdash m : \Delta
+  M' \in \dom(\mathcal{M}) \\
+  M' \neq M \\
+  x_1, \ldots, x_{n+1} \importsR_{M'} \Delta'; \Lambda'' \\
+  \Gamma \runion \Delta'; \Lambda \runion \Lambda'' \vdash m : \Delta; \Lambda'
 }
 {
-  \Gamma \vdash \exFromImport{M'}{x_1, \ldots, x_{n+1}} \cons m : \statusDefAssigned(\set{x_1, \ldots, x_{n+1}}) \runion \Delta
+  \Gamma; \Lambda \vdash \exFromImport{M'}{x_1, \ldots, x_{n+1}} \cons m : \Delta' \runion \Delta; \Lambda'
 }
 \and
 \inferrule*[lab={\ruleName{statement}}]
 {
-  \Gamma \vdash s : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash m : \Delta' \\
+  \Gamma; \Lambda \vdash s : \Assigns{\Delta} \\
+  \Gamma \runion \Delta; \Lambda \vdash m : \Delta'; \Lambda' \\
   \capturesS(s) \cap \assignsS(m) = \varnothing
 }
 {
-  \Gamma \vdash s \cons m : \Delta \runion \Delta'
+  \Gamma; \Lambda \vdash s \cons m : \Delta \runion \Delta'; \Lambda'
 }
 \and
 \inferrule*[lab={\ruleName{class}}]
 {
   \decls(\phi) = x_1, \ldots, x_n \\
   x_1, \ldots, x_n \text{ distinct} \\
-  \Gamma \vdash m : \Delta
+  \Gamma; \Lambda, C : (M.C(x_1, \ldots, x_n), \bot) \vdash m : \Delta; \Lambda'
 }
 {
-  \Gamma \vdash \exDataclass{C}{\phi} \cons m : \Delta
+  \Gamma; \Lambda \vdash \exDataclass{C}{\phi} \cons m : \Delta; \Lambda'
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  B \in \dom(\Lambda_M) \\
+  \Lambda(B) = (D'(\vec{x}'), B') \\
   \decls(\phi) = x_1, \ldots, x_n \\
   x_1, \ldots, x_n \text{ distinct and disjoint from } \fields(M.B) \\
-  \Gamma \vdash m : \Delta
+  \Gamma; \Lambda, C : (M.C(x_1, \ldots, x_n), B) \vdash m : \Delta; \Lambda'
 }
 {
-  \Gamma \vdash \exDataclassExtend{C}{B}{\phi} \cons m : \Delta
+  \Gamma; \Lambda \vdash \exDataclassExtend{C}{B}{\phi} \cons m : \Delta; \Lambda'
 }
 \end{mathpar}
-\caption{Body $m$ of module $M$ is well-formed in $\Gamma$}
+\subcaption{Body $m$ of module $M$ is well-formed in $\Gamma$ and $\Lambda$}
+\end{subfigure}
+\caption{Module body well-formedness}
 \label{fig:well-formed-module}
 \end{figure}

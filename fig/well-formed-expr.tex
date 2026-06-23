@@ -1,6 +1,6 @@
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash Q \names T$}
+\flushleft \shadebox{$Q \names T$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{simple-module}}]
@@ -8,34 +8,34 @@
   x : M' \in \Lambda_M
 }
 {
-  \vdash x \names M'
+  x \names M'
 }
 \and
 \inferrule*[lab={\ruleName{simple-class}}]
 {
-  C : D(x_1, \ldots, x_n) \in \Lambda_M
+  C : (D(x_1, \ldots, x_n), B) \in \Lambda_M
 }
 {
-  \vdash C \names D(x_1, \ldots, x_n)
+  C \names D(x_1, \ldots, x_n)
 }
 \and
 \inferrule*[lab={\ruleName{qualified-module}}]
 {
-  \vdash Q \names M' \\
+  Q \names M' \\
   M'.x \in \dom(\mathcal{M})
 }
 {
-  \vdash Q.x \names M'.x
+  Q.x \names M'.x
 }
 \and
 \inferrule*[lab={\ruleName{qualified-class}}]
 {
-  \vdash Q \names M' \\
+  Q \names M' \\
   C \in \classes(\mathcal{M}(M')) \\
   \fields(M'.C) = x_1, \ldots, x_n
 }
 {
-  \vdash Q.C \names M'.C(x_1, \ldots, x_n)
+  Q.C \names M'.C(x_1, \ldots, x_n)
 }
 \end{mathpar}
 \subcaption{Name $Q$ in module $M$ resolves to $T$}
@@ -65,7 +65,7 @@
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
-  \vdash Q \names D(x_1, \ldots, x_n) \\
+  Q \names D(x_1, \ldots, x_n) \\
   \wf{\Gamma}{e_i} \quad (\forall i)
 }
 {
@@ -74,14 +74,14 @@
 \and
 \inferrule*[lab={\ruleName{attr-module}}]
 {
-  \vdash e \names M' \\
+  e \names M' \\
   y \in \vars(\mathcal{M}(M'))
 }
 {
   \wf{\Gamma}{e.y}
 }
 \and
-\inferrule*[lab={\ruleName{attr-dyn}}]
+\inferrule*[lab={\ruleName{attr-object}}]
 {
   \wf{\Gamma}{e}
 }

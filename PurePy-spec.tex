@@ -264,7 +264,7 @@ Metavariables $C$ and $B$ range over \emph{simple} class names; $D$ ranges over 
 \begin{definition}[Local context]
 A local context $\Lambda$ is a finite map whose entries are either:
 \begin{itemize}
-\item simple class names $C$ bound to \emph{class entries} $D(\vec{x}, B)$, where $\vec{x}$ is a sequence of distinct field names (in declaration order) and $B$ names the base class (or $\bot$ for no base);
+\item simple class names $C$ bound to \emph{class entries} $(D(\vec{x}), B)$, where $\vec{x}$ is a sequence of distinct field names (in declaration order) and $B$ names the base class (or $\bot$ for no base);
 \item simple identifiers $x$ bound to \emph{module references} $M$, fully-qualified module names.
 \end{itemize}
 \end{definition}
@@ -272,7 +272,7 @@ A local context $\Lambda$ is a finite map whose entries are either:
 \noindent Class entries cover both locally-declared and imported classes; module references arise from import statements.
 
 \begin{definition}[Inheritance graph]
-$G_{\Lambda_M}$ has an edge $(C, B)$ iff $\Lambda_M(C) = D(\vec{x}, B)$ for some $D, \vec{x}$.
+$G_{\Lambda_M}$ has an edge $(C, B)$ iff $\Lambda_M(C) = (D(\vec{x}), B)$ for some $D, \vec{x}$.
 \end{definition}
 
 \subsection{Modules and entry point}
@@ -287,13 +287,9 @@ is fixed and ambient in all definitions that follow.
 errors) to a single zone at the start of each module body.
 
 \begin{definition}[Module well-formedness context]
-For any $(M \mapsto b) \in \mathcal{M}$, $b$ is checked under the following per-module contexts:
-\begin{enumerate}
-\item variable context $\Gamma_M = \Gamma_{\textup{\pyinline{builtins}}} \runion
+For any $(M \mapsto b) \in \mathcal{M}$, $b$ is checked under the initial variable context $\Gamma_M = \Gamma_{\textup{\pyinline{builtins}}} \runion
 \set{\text{\pyinline{__name__}} \mapsto \statusDefAssigned}$, with $\Gamma_{\textup{\pyinline{builtins}}}$ binding the
-names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined});
-\item class context $\Lambda_M = \classes(b)$ (\figref{modules}).
-\end{enumerate}
+names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined}). For a well-formed module $M$, the \emph{local context $\Lambda_M$} is the local context produced as an output of $M$'s body well-formedness (\figref{well-formed-module}).
 \end{definition}
 
 \begin{figure}[H]
@@ -321,8 +317,7 @@ fully-qualified name.
 
 The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(M, M')$ iff
 $M' \in \imports(\mathcal{M}(M)) \cup \parents(M)$. Program well-formedness (\figref{modules}) requires every
-module in $\mathcal{M}$ to be well-formed in its initial context, every imported name to be in
-$\dom(\mathcal{M})$, and $G_{\mathcal{M}}$ to be acyclic.
+module in $\mathcal{M}$ to be well-formed in its initial context and $G_{\mathcal{M}}$ to be acyclic.
 
 \subsection{Well-formedness}
 
