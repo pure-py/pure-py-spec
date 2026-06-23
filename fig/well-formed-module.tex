@@ -89,9 +89,9 @@
 \and
 \inferrule*[lab={\ruleName{class}}]
 {
-  \decls(\phi) = x_1, \ldots, x_n \\
-  x_1, \ldots, x_n \text{ distinct} \\
-  \Gamma; \Lambda, C : (M.C(x_1, \ldots, x_n), \bot) \vdash m : \Delta; \Lambda'
+  \decls(\phi) = \vec{x} \\
+  \vec{x} \text{ distinct} \\
+  \Gamma; \Lambda, C : (M.C(\vec{x}), \bot) \vdash m : \Delta; \Lambda'
 }
 {
   \Gamma; \Lambda \vdash \exDataclass{C}{\phi} \cons m : \Delta; \Lambda'
@@ -99,10 +99,10 @@
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \Lambda(B) = (D'(\vec{x}'), B') \\
-  \decls(\phi) = x_1, \ldots, x_n \\
-  x_1, \ldots, x_n \text{ distinct and disjoint from } \fields(M.B) \\
-  \Gamma; \Lambda, C : (M.C(x_1, \ldots, x_n), B) \vdash m : \Delta; \Lambda'
+  \Lambda(B) = (D(\vec{y}), B') \\
+  \decls(\phi) = \vec{x} \\
+  \vec{x} \text{ distinct and disjoint from } \fields(M.B) \\
+  \Gamma; \Lambda, C : (M.C(\vec{x}), B) \vdash m : \Delta; \Lambda'
 }
 {
   \Gamma; \Lambda \vdash \exDataclassExtend{C}{B}{\phi} \cons m : \Delta; \Lambda'
