@@ -263,21 +263,21 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
         raise IllFormedModule(head, reasons.DuplicateMutualName(head.name))
     check_distinct_names(defs[1:], seen | {head.name})
 
-def check_import(s: ast.stmt, q_prime: str, ctx: Context) -> None:
-    if q_prime == ctx.q:
-        raise IllFormedModule(s, reasons.SelfImport(q_prime))
-    if q_prime not in ctx.M:
-        raise IllFormedModule(s, reasons.UnknownModule(q_prime))
-    check_module(ctx.M[q_prime], ctx.M, q_prime)
+def check_import(s: ast.stmt, q: str, ctx: Context) -> None:
+    if q == ctx.q:
+        raise IllFormedModule(s, reasons.SelfImport(q))
+    if q not in ctx.M:
+        raise IllFormedModule(s, reasons.UnknownModule(q))
+    check_module(ctx.M[q], ctx.M, q)
 
-def imports(s: ast.stmt, q_prime: str, names: list[str], ctx: Context) -> None:
-    body = ctx.M[q_prime].body
+def imports(s: ast.stmt, q: str, names: list[str], ctx: Context) -> None:
+    body = ctx.M[q].body
     if len(body) == 0:
         return
-    members = module_members(body, ctx.M, q_prime)
+    members = module_members(body, ctx.M, q)
     unknown = next((x for x in names if x not in members), None)
     if unknown is not None:
-        raise IllFormedModule(s, reasons.UnknownMember(unknown, q_prime))
+        raise IllFormedModule(s, reasons.UnknownMember(unknown, q))
 
 def module_members(body: list[ast.stmt], M: dict[str, ast.Module], q: str) -> set[str]:
     submodules = {name[len(q) + 1:].split('.')[0] for name in M if name.startswith(f'{q}.')}
@@ -488,7 +488,7 @@ def names_class(head: ast.expr, ctx: Context) -> Optional[tuple[str, tuple[str, 
         return head.attr, fields_of(mod_cls, head.attr)
     return None
 
-def check_pattern_wf(p: ast.pattern, ctx: Context) -> None:
+def check_pattern(p: ast.pattern, ctx: Context) -> None:
     if isinstance(p, ast.MatchClass):
         sig = names_class(p.cls, ctx)
         if sig is None:
@@ -504,19 +504,19 @@ def check_pattern_wf(p: ast.pattern, ctx: Context) -> None:
         if set(kwds) != remaining:
             raise IllFormedModule(p, reasons.UnknownFieldInPattern(c_name, tuple(sorted(remaining))))
         for sub in list(p.patterns) + list(p.kwd_patterns):
-            check_pattern_wf(sub, ctx)
+            check_pattern(sub, ctx)
         return
     if isinstance(p, ast.MatchSequence):
         for sub in p.patterns:
-            check_pattern_wf(sub, ctx)
+            check_pattern(sub, ctx)
         return
     if isinstance(p, ast.MatchAs) and p.pattern is not None:
-        check_pattern_wf(p.pattern, ctx)
+        check_pattern(p.pattern, ctx)
         return
 
 def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: Context) -> None:
     for i, p in enumerate(patterns):
-        check_pattern_wf(p, ctx)
+        check_pattern(p, ctx)
         vars_ = pattern_vars(p)
         if len(vars_) != len(set(vars_)):
             raise IllFormedModule(node, reasons.NonlinearPattern(i + 1))
@@ -830,13 +830,13 @@ def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> None:
 
 def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> ClassContext:
     try:
-        return check_module_body(m, M, q)
+        return check_module_(m, M, q)
     except IllFormedModule as e:
         if e.module is None:
             e.module = q
         raise
 
-def check_module_body(m: ast.Module, M: dict[str, ast.Module], q: str) -> ClassContext:
+def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> ClassContext:
     if len(m.body) == 0:
         return {}
     nested = find_nested_import(m.body)
