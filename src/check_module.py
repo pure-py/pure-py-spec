@@ -45,11 +45,11 @@ class Context:
     var: VarContext
     cls: ClassContext
     modules: frozenset[str] = frozenset()
-    module_classes: dict[str, ClassContext] = field(default_factory=dict)
+    M: dict[str, ast.Module] = field(default_factory=dict)
 
 
 def extend_var(ctx: 'Context', delta: VarContext) -> 'Context':
-    return Context(var=extend(ctx.var, delta), cls=ctx.cls, modules=ctx.modules, module_classes=ctx.module_classes)
+    return Context(var=extend(ctx.var, delta), cls=ctx.cls, modules=ctx.modules, M=ctx.M)
 
 
 @dataclass(frozen=True)
@@ -401,10 +401,9 @@ def resolve_class_head(head: ast.expr, ctx: Context, node: ast.AST) -> tuple[str
     assert isinstance(head, ast.Attribute)
     full = qualified_name(head)
     mod_path = qualified_name(head.value)
-    root = mod_path.split('.')[0]
-    if root not in ctx.modules or mod_path not in ctx.module_classes:
+    if mod_path.split('.')[0] not in ctx.modules or mod_path not in ctx.M:
         raise IllFormedModule(node, reasons.UnknownClassInPattern(full))
-    mod_cls = ctx.module_classes[mod_path]
+    mod_cls = check_module(ctx.M[mod_path], ctx.M)
     if head.attr not in mod_cls:
         raise IllFormedModule(node, reasons.UnknownClassInPattern(full))
     return head.attr, mod_cls
@@ -769,27 +768,28 @@ def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> None:
         if isinstance(s, ast.ClassDef):
             check_class_decl(s, lambda_m)
 
-def check_module(tree: ast.Module, module_classes: Optional[dict[str, ClassContext]] = None) -> Optional[IllFormed]:
+def check_module(m: ast.Module, M: Optional[dict[str, ast.Module]] = None) -> ClassContext:
+    if len(m.body) == 0:
+        return {}
+    nested = find_nested_import(m.body)
+    if nested is not None:
+        raise IllFormedModule(nested, reasons.NestedImport())
+    class_ctx = build_class_context(m.body)
+    check_class_decls(m.body, class_ctx)
+    var_ctx = dict(BUILTINS)
+    var_ctx['__name__'] = Status.TT
+    modules = frozenset(top_level_imports(m.body))
+    check_block(m.body, Context(var=var_ctx, cls=class_ctx, modules=modules, M=M or {}))
+    if isinstance(result_type_of_block(m.body), TyReturns):
+        raise IllFormedModule(m.body[0], reasons.TopLevelReturn())
+    return class_ctx
+
+def module_result(m: ast.Module, M: Optional[dict[str, ast.Module]] = None) -> Optional[IllFormed]:
     try:
-        walk_module(tree, module_classes or {})
+        check_module(m, M)
         return None
     except IllFormed as e:
         return e
-
-def walk_module(tree: ast.Module, module_classes: dict[str, ClassContext]) -> None:
-    if len(tree.body) == 0:
-        return
-    nested = find_nested_import(tree.body)
-    if nested is not None:
-        raise IllFormedModule(nested, reasons.NestedImport())
-    class_ctx = build_class_context(tree.body)
-    check_class_decls(tree.body, class_ctx)
-    var_ctx = dict(BUILTINS)
-    var_ctx['__name__'] = Status.TT
-    modules = frozenset(top_level_imports(tree.body))
-    check_block(tree.body, Context(var=var_ctx, cls=class_ctx, modules=modules, module_classes=module_classes))
-    if isinstance(result_type_of_block(tree.body), TyReturns):
-        raise IllFormedModule(tree.body[0], reasons.TopLevelReturn())
 
 def top_level_imports(body: list[ast.stmt]) -> set[str]:
     return {s.names[0].name.split('.')[0] for s in body if isinstance(s, ast.Import)}
@@ -797,7 +797,7 @@ def top_level_imports(body: list[ast.stmt]) -> set[str]:
 def check_file(filename: str) -> Optional[IllFormed]:
     source = open(filename).read()
     tree = ast.parse(source, filename=filename)
-    return check_module(tree)
+    return module_result(tree)
 
 def format_result(result: Optional[IllFormed], filename: str) -> str:
     if result is None:

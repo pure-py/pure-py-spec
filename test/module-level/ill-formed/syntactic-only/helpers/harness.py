@@ -7,11 +7,11 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(ROOT / "src"))
 
-from check_module import check_module
+from check_module import module_result
 
 
 def expect_rejected(tree: ast.Module, msg_contains: str = "") -> None:
-    result = check_module(tree)
+    result = module_result(tree)
     if result is None:
         print("FAIL: expected rejection but got ok", file=sys.stderr)
         sys.exit(1)

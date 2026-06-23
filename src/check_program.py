@@ -4,7 +4,7 @@ import sys
 from typing import Optional
 
 import parse
-from check_module import ClassContext, IllFormed, IllFormedModule, build_class_context, has_cycle, walk_module
+from check_module import IllFormed, IllFormedModule, check_module, has_cycle
 
 
 # Modules the runtime provides if the user has no file of the same name.
@@ -89,22 +89,19 @@ def walk_program(entry_path: pathlib.Path) -> None:
         for imp in imports_by_module[name]:
             queue.extend({imp} | parents(imp))
 
-    module_classes: dict[str, ClassContext] = {name: build_class_context(tree.body) for name, (_, tree) in modules.items()}
-
-    # Per-module well-formedness.
-    for path, tree in modules.values():
-        try:
-            walk_module(tree, module_classes)
-        except IllFormedModule as e:
-            e.msg = f"{path}: {e.msg}"
-            raise
-
-    # Acyclicity. (Resolution is already guaranteed by the walk loop above.)
     graph = {name: imps | parents(name) | set().union(*(parents(i) for i in imps))
              for name, imps in imports_by_module.items()}
     cycle = has_cycle(graph)
     if len(cycle) > 0:
         raise IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
+
+    M = {name: tree for name, (_, tree) in modules.items()}
+    for path, tree in modules.values():
+        try:
+            check_module(tree, M)
+        except IllFormedModule as e:
+            e.msg = f"{path}: {e.msg}"
+            raise
 
 
 def main() -> None:
