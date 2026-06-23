@@ -12,11 +12,11 @@
 \and
 \inferrule*[lab={\ruleName{imp-var}}]
 {
-  x \in \vars(M) \\
+  x : a \in \Gamma_M \\
   \vec{x} \importsR_M \Delta; \Lambda
 }
 {
-  x \cons \vec{x} \importsR_M \set{x : \statusDefAssigned} \runion \Delta; \Lambda
+  x \cons \vec{x} \importsR_M \set{x : a} \runion \Delta; \Lambda
 }
 \and
 \inferrule*[lab={\ruleName{imp-class}}]
@@ -119,7 +119,7 @@
 \small
 \inferrule*[lab={\ruleName{module}}]
 {
-  \Gamma_M; \varnothing \vdash \mathcal{M}(M) : \Delta; \Lambda \\
+  \Gamma_M^0; \varnothing \vdash \mathcal{M}(M) : \Delta; \Lambda \\
   G_{\Lambda} \text{ acyclic}
 }
 {

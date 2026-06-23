@@ -75,7 +75,7 @@
 \inferrule*[lab={\ruleName{attr-module}}]
 {
   \Lambda \vdash e \names M \\
-  y \in \vars(\mathcal{M}(M))
+  y \in \dom(\Gamma_M)
 }
 {
   \Gamma; \Lambda \vdash e.y

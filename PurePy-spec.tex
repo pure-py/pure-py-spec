@@ -287,9 +287,9 @@ Import statements appear only as a contiguous prefix of a module body, before an
 errors) to a single zone at the start of each module body.
 
 \begin{definition}[Module well-formedness context]
-For any $(M \mapsto b) \in \mathcal{M}$, $b$ is checked under the initial variable context $\Gamma_M = \Gamma_{\textup{\pyinline{builtins}}} \runion
+For any $(M \mapsto b) \in \mathcal{M}$, $b$ is checked under the initial variable context $\Gamma_M^0 = \Gamma_{\textup{\pyinline{builtins}}} \runion
 \set{\text{\pyinline{__name__}} \mapsto \statusDefAssigned}$, with $\Gamma_{\textup{\pyinline{builtins}}}$ binding the
-names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined}). For a well-formed module $M$, the \emph{local context $\Lambda_M$} is the local context produced as an output of $M$'s body well-formedness (\figref{well-formed-module}).
+names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined}). For a well-formed module $M$, the \emph{variable context} $\Gamma_M = \Gamma_M^0 \runion \Delta$ and \emph{local context} $\Lambda_M$ are the contexts produced as outputs of $M$'s body well-formedness (\figref{well-formed-module}).
 \end{definition}
 
 \begin{figure}[H]
@@ -316,8 +316,7 @@ fully-qualified name.
 \input{fig/modules}
 
 The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(M, M')$ iff
-$M' \in \imports(\mathcal{M}(M)) \cup \parents(M)$. Program well-formedness (\figref{modules}) requires every
-module in $\mathcal{M}$ to be well-formed in its initial context and $G_{\mathcal{M}}$ to be acyclic.
+$M' \in \imports(\mathcal{M}(M)) \cup \parents(M)$. Program well-formedness (\figref{well-formed-module}) requires the entry module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$ to be acyclic.
 
 \subsection{Well-formedness}
 
