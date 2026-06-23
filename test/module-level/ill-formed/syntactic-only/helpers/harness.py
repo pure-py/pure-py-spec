@@ -7,11 +7,14 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(ROOT / "src"))
 
-from check_module import module_result
+from check_module import PREDEFINED_MODULES, module_result
 
 
 def expect_rejected(tree: ast.Module, msg_contains: str = "") -> None:
-    result = module_result(tree)
+    q = '<test>'
+    M = {p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES}
+    M[q] = tree
+    result = module_result(tree, M, q)
     if result is None:
         print("FAIL: expected rejection but got ok", file=sys.stderr)
         sys.exit(1)

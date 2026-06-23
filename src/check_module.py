@@ -264,17 +264,13 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
     check_distinct_names(defs[1:], seen | {head.name})
 
 def check_import(s: ast.stmt, q_prime: str, ctx: Context) -> None:
-    if not ctx.M:
-        return
     if q_prime == ctx.q:
         raise IllFormedModule(s, reasons.SelfImport(q_prime))
     if q_prime not in ctx.M:
         raise IllFormedModule(s, reasons.UnknownModule(q_prime))
     check_module(ctx.M[q_prime], ctx.M, q_prime)
 
-def check_imports_R(s: ast.stmt, q_prime: str, names: list[str], ctx: Context) -> None:
-    if not ctx.M:
-        return
+def imports(s: ast.stmt, q_prime: str, names: list[str], ctx: Context) -> None:
     body = ctx.M[q_prime].body
     if len(body) == 0:
         return
@@ -330,7 +326,7 @@ def check_stmt(s: ast.stmt, ctx: Context) -> None:
             raise IllFormedModule(s, reasons.EmptyFromImport())
         assert s.module is not None
         check_import(s, s.module, ctx)
-        check_imports_R(s, s.module, [a.name for a in s.names], ctx)
+        imports(s, s.module, [a.name for a in s.names], ctx)
         return
     if isinstance(s, ast.Match):
         check_expr(s.subject, ctx)
@@ -358,7 +354,7 @@ def check_expr(e: ast.expr, ctx: Context) -> None:
         check_expr(e.body, extend_var(ctx, {p: Status.TT for p in params}))
         return
     if isinstance(e, ast.Call):
-        sig = resolve_class(e.func, ctx)
+        sig = names_class(e.func, ctx)
         if sig is not None:
             c_name, fields = sig
             if len(e.args) != len(fields):
@@ -477,7 +473,7 @@ def qualified_name(e: ast.expr) -> str:
     assert isinstance(e, ast.Attribute)
     return qualified_name(e.value) + '.' + e.attr
 
-def resolve_class(head: ast.expr, ctx: Context) -> Optional[tuple[str, tuple[str, ...]]]:
+def names_class(head: ast.expr, ctx: Context) -> Optional[tuple[str, tuple[str, ...]]]:
     if isinstance(head, ast.Name):
         entry = class_of(ctx, head.id)
         return (head.id, fields_of(gamma_classes(ctx), head.id)) if entry is not None else None
@@ -494,7 +490,7 @@ def resolve_class(head: ast.expr, ctx: Context) -> Optional[tuple[str, tuple[str
 
 def check_pattern_wf(p: ast.pattern, ctx: Context) -> None:
     if isinstance(p, ast.MatchClass):
-        sig = resolve_class(p.cls, ctx)
+        sig = names_class(p.cls, ctx)
         if sig is None:
             raise IllFormedModule(p, reasons.UnknownClassInPattern(qualified_name(p.cls) if isinstance(p.cls, (ast.Name, ast.Attribute)) else ast.unparse(p.cls)))
         c_name, fields = sig
@@ -832,9 +828,9 @@ def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> None:
     if len(clash) > 0:
         raise IllFormedModule(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
 
-def check_module(m: ast.Module, M: Optional[dict[str, ast.Module]] = None, q: str = '') -> ClassContext:
+def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> ClassContext:
     try:
-        return check_module_body(m, M or {}, q)
+        return check_module_body(m, M, q)
     except IllFormedModule as e:
         if e.module is None:
             e.module = q
@@ -852,7 +848,7 @@ def check_module_body(m: ast.Module, M: dict[str, ast.Module], q: str) -> ClassC
         raise IllFormedModule(m.body[0], reasons.TopLevelReturn())
     return gamma_classes(final_ctx)
 
-def module_result(m: ast.Module, M: Optional[dict[str, ast.Module]] = None, q: str = '') -> Optional[IllFormed]:
+def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> Optional[IllFormed]:
     try:
         check_module(m, M, q)
         return None
