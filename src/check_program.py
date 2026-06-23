@@ -96,9 +96,9 @@ def walk_program(entry_path: pathlib.Path) -> None:
         raise IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
 
     M = {name: tree for name, (_, tree) in modules.items()}
-    for path, tree in modules.values():
+    for name, (path, tree) in modules.items():
         try:
-            check_module(tree, M)
+            check_module(tree, M, name)
         except IllFormedModule as e:
             e.msg = f"{path}: {e.msg}"
             raise

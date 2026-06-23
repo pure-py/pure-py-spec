@@ -46,10 +46,11 @@ class Context:
     cls: ClassContext
     modules: frozenset[str] = frozenset()
     M: dict[str, ast.Module] = field(default_factory=dict)
+    q: str = ''
 
 
 def extend_var(ctx: 'Context', delta: VarContext) -> 'Context':
-    return Context(var=extend(ctx.var, delta), cls=ctx.cls, modules=ctx.modules, M=ctx.M)
+    return Context(var=extend(ctx.var, delta), cls=ctx.cls, modules=ctx.modules, M=ctx.M, q=ctx.q)
 
 
 @dataclass(frozen=True)
@@ -768,7 +769,7 @@ def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> None:
         if isinstance(s, ast.ClassDef):
             check_class_decl(s, lambda_m)
 
-def check_module(m: ast.Module, M: Optional[dict[str, ast.Module]] = None) -> ClassContext:
+def check_module(m: ast.Module, M: Optional[dict[str, ast.Module]] = None, q: str = '') -> ClassContext:
     if len(m.body) == 0:
         return {}
     nested = find_nested_import(m.body)
@@ -779,14 +780,14 @@ def check_module(m: ast.Module, M: Optional[dict[str, ast.Module]] = None) -> Cl
     var_ctx = dict(BUILTINS)
     var_ctx['__name__'] = Status.TT
     modules = frozenset(top_level_imports(m.body))
-    check_block(m.body, Context(var=var_ctx, cls=class_ctx, modules=modules, M=M or {}))
+    check_block(m.body, Context(var=var_ctx, cls=class_ctx, modules=modules, M=M or {}, q=q))
     if isinstance(result_type_of_block(m.body), TyReturns):
         raise IllFormedModule(m.body[0], reasons.TopLevelReturn())
     return class_ctx
 
-def module_result(m: ast.Module, M: Optional[dict[str, ast.Module]] = None) -> Optional[IllFormed]:
+def module_result(m: ast.Module, M: Optional[dict[str, ast.Module]] = None, q: str = '') -> Optional[IllFormed]:
     try:
-        check_module(m, M)
+        check_module(m, M, q)
         return None
     except IllFormed as e:
         return e
