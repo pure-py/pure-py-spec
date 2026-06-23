@@ -19,6 +19,7 @@ class IllFormedModule(IllFormed):
         self.col: Optional[int] = getattr(node, 'col_offset', None)
         self.reason: Reason = reason
         self.msg = reason.message()
+        self.module: Optional[str] = None
         super().__init__(self.msg)
 
 
@@ -226,6 +227,15 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
         raise IllFormedModule(head, reasons.DuplicateMutualName(head.name))
     check_distinct_names(defs[1:], seen | {head.name})
 
+def check_import(s: ast.stmt, q_prime: str, ctx: Context) -> None:
+    if not ctx.M:
+        return
+    if q_prime == ctx.q:
+        raise IllFormedModule(s, reasons.SelfImport(q_prime))
+    if q_prime not in ctx.M:
+        raise IllFormedModule(s, reasons.UnknownModule(q_prime))
+    check_module(ctx.M[q_prime], ctx.M, q_prime)
+
 def check_stmt(s: ast.stmt, ctx: Context) -> None:
     if isinstance(s, ast.Pass):
         return
@@ -252,10 +262,13 @@ def check_stmt(s: ast.stmt, ctx: Context) -> None:
             check_expr(s.msg, ctx)
         return
     if isinstance(s, ast.Import):
+        check_import(s, s.names[0].name, ctx)
         return
     if isinstance(s, ast.ImportFrom):
         if len(s.names) == 0:
             raise IllFormedModule(s, reasons.EmptyFromImport())
+        assert s.module is not None
+        check_import(s, s.module, ctx)
         return
     if isinstance(s, ast.Match):
         check_expr(s.subject, ctx)
@@ -770,6 +783,14 @@ def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> None:
             check_class_decl(s, lambda_m)
 
 def check_module(m: ast.Module, M: Optional[dict[str, ast.Module]] = None, q: str = '') -> ClassContext:
+    try:
+        return check_module_body(m, M or {}, q)
+    except IllFormedModule as e:
+        if e.module is None:
+            e.module = q
+        raise
+
+def check_module_body(m: ast.Module, M: dict[str, ast.Module], q: str) -> ClassContext:
     if len(m.body) == 0:
         return {}
     nested = find_nested_import(m.body)
@@ -780,7 +801,7 @@ def check_module(m: ast.Module, M: Optional[dict[str, ast.Module]] = None, q: st
     var_ctx = dict(BUILTINS)
     var_ctx['__name__'] = Status.TT
     modules = frozenset(top_level_imports(m.body))
-    check_block(m.body, Context(var=var_ctx, cls=class_ctx, modules=modules, M=M or {}, q=q))
+    check_block(m.body, Context(var=var_ctx, cls=class_ctx, modules=modules, M=M, q=q))
     if isinstance(result_type_of_block(m.body), TyReturns):
         raise IllFormedModule(m.body[0], reasons.TopLevelReturn())
     return class_ctx
