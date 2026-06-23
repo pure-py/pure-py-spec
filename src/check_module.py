@@ -44,10 +44,12 @@ ClassContext = dict[str, ClassInfo]   # Λ_M
 class Context:
     var: VarContext
     cls: ClassContext
+    modules: frozenset[str] = frozenset()
+    module_classes: dict[str, ClassContext] = field(default_factory=dict)
 
 
 def extend_var(ctx: 'Context', delta: VarContext) -> 'Context':
-    return Context(var=extend(ctx.var, delta), cls=ctx.cls)
+    return Context(var=extend(ctx.var, delta), cls=ctx.cls, modules=ctx.modules, module_classes=ctx.module_classes)
 
 
 @dataclass(frozen=True)
@@ -748,14 +750,14 @@ def check_class_decls(body: list[ast.stmt], lambda_m: ClassContext) -> None:
         if isinstance(s, ast.ClassDef):
             check_class_decl(s, lambda_m)
 
-def check_module(tree: ast.Module) -> Optional[IllFormed]:
+def check_module(tree: ast.Module, module_classes: Optional[dict[str, ClassContext]] = None) -> Optional[IllFormed]:
     try:
-        walk_module(tree)
+        walk_module(tree, module_classes or {})
         return None
     except IllFormed as e:
         return e
 
-def walk_module(tree: ast.Module) -> None:
+def walk_module(tree: ast.Module, module_classes: dict[str, ClassContext]) -> None:
     if len(tree.body) == 0:
         return
     nested = find_nested_import(tree.body)

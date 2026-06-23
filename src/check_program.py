@@ -4,7 +4,7 @@ import sys
 from typing import Optional
 
 import parse
-from check_module import IllFormed, IllFormedModule, has_cycle, walk_module
+from check_module import ClassContext, IllFormed, IllFormedModule, build_class_context, has_cycle, walk_module
 
 
 # Modules the runtime provides if the user has no file of the same name.
@@ -89,10 +89,12 @@ def walk_program(entry_path: pathlib.Path) -> None:
         for imp in imports_by_module[name]:
             queue.extend({imp} | parents(imp))
 
+    module_classes: dict[str, ClassContext] = {name: build_class_context(tree.body) for name, (_, tree) in modules.items()}
+
     # Per-module well-formedness.
     for path, tree in modules.values():
         try:
-            walk_module(tree)
+            walk_module(tree, module_classes)
         except IllFormedModule as e:
             e.msg = f"{path}: {e.msg}"
             raise
