@@ -13,10 +13,10 @@
 \and
 \inferrule*[lab={\ruleName{simple-class}}]
 {
-  C : (D(\vec{x}), B) \in \Lambda
+  c : (d(\vec{x}), c') \in \Lambda
 }
 {
-  \Lambda \vdash C \names D(\vec{x})
+  \Lambda \vdash c \names d(\vec{x})
 }
 \and
 \inferrule*[lab={\ruleName{qualified-module}}]
@@ -31,11 +31,11 @@
 \inferrule*[lab={\ruleName{qualified-class}}]
 {
   \Lambda \vdash Q \names M \\
-  \Lambda_{M}(C) = (M.C(\vec{y}), B) \\
-  \fields(M.C) = \vec{x}
+  \Lambda_{M}(c) = (M.c(\vec{y}), c') \\
+  \fields(M.c) = \vec{x}
 }
 {
-  \Lambda \vdash Q.C \names M.C(\vec{x})
+  \Lambda \vdash Q.c \names M.c(\vec{x})
 }
 \end{mathpar}
 \subcaption{Name $Q$ resolves to $T$ under $\Lambda$}
@@ -65,7 +65,7 @@
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
-  \Lambda \vdash Q \names D(\vec{x}) \\
+  \Lambda \vdash Q \names d(\vec{x}) \\
   \Gamma; \Lambda \vdash e_i \quad (\forall i)
 }
 {

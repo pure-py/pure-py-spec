@@ -149,25 +149,27 @@ one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
 
 \subsection{Contexts}
 
-The grammar of contexts and result types is given in \figref{contexts}. Metavariable $x$ ranges over variables and $f$ over function names. Contexts $\Gamma, \Delta$ are partial functions from sets of variables to a \emph{definite assignment} status
-in $\B = \set{\statusDefAssigned, \statusNotDefAssigned}$. $\statusDefAssigned$ indicates
-\emph{definitely assigned} and $\statusNotDefAssigned$ indicates \emph{not definitely assigned}. The definite
-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}. (Or think of $\statusDefAssigned$ and
-$\statusNotDefAssigned$ as degenerate types ``any'' and ``none''.)  It is useful to represent contexts as
-total functions from the set of all variables to $\B_{\bot} = \B \cup \set{\bot}$, with $\bot$ indicating
-\emph{undefined}. We write $\Gamma, x : a$ for the context that sends $x$ to $a$ and otherwise agrees with
-$\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context
-where all variables are undefined. For a set of variables $X$, write $\statusDefAssigned(X)$ for the context
-$\set{x : \statusDefAssigned \mid x \in X}$; similarly $\statusNotDefAssigned(X)$.
+Metavariables $x$, $f$, $c$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function and $c$ when it is expected to denote a class.
 
-\input{fig/contexts}
+\begin{definition}[Context]
+A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of:
+\begin{itemize}
+\item a \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$, with $\statusDefAssigned$ indicating \emph{definitely assigned} and $\statusNotDefAssigned$ \emph{not definitely assigned};
+\item a \emph{module reference}: a fully-qualified module name $M$;
+\item a \emph{class entry}: a pair $(\vec{x}, c)$ of a sequence of distinct field names in declaration order and a base class $c$ (or $\bot$ for no base).
+\end{itemize}
+\end{definition}
+
+\noindent Class entries cover both locally-declared and imported classes; module references arise from import statements. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}; one can also think of $\statusDefAssigned$ and $\statusNotDefAssigned$ as degenerate types ``any'' and ``none''. Result types $R$ are either $\Returns$ or $\Assigns{\Delta}$ for some $\Delta$.
+
+It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, x : v$ for the context that sends $x$ to $v$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusDefAssigned(X)$ for the context $\set{x : \statusDefAssigned \mid x \in X}$; similarly $\statusNotDefAssigned(X)$.
 
 \paragraph{Context operations.}
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override'') and
 an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\runion$ right-distributes over $\merge$ (Lemma~1), but left
-distributivity does not hold. Both operations are defined pointwise via operations on $\B_{\bot}$:
+distributivity does not hold. Both operations are defined pointwise; on $\B_{\bot}$:
 %
 \begin{definition}[Override and merge]
 For $a, a' \in \B$:
@@ -177,11 +179,12 @@ For $a, a' \in \B$:
 a \runion a' &= a' & a \merge \bot = \bot \merge a &= \statusNotDefAssigned \\
 & & a \merge a' &= a \meet a'
 \end{align*}}
+For $v \in \V \setminus \B$ (module reference or class entry): $\bot \runion v = v \runion \bot = v$ and $v \runion v' = v'$ for any $v' \in \V$. Merge is undefined when either argument is in $\V \setminus \B$, and never invoked at such arguments in practice (only assignments contribute to branching contexts).
 \end{definition}
 
 \noindent The $\runion$ operation is right-biased and has $\bot$ as left and right unit. The $\merge$
-operation lacks a unit; when exactly one argument is defined, the result is $\statusNotDefAssigned$; when
-both are defined, it returns the conjunction of their values in $\B$.
+operation lacks a unit; when exactly one argument is defined and in $\B$, the result is $\statusNotDefAssigned$; when
+both are defined and in $\B$, it returns the conjunction of their values in $\B$.
 
 \begin{lemma}[Right distributivity]
 \[
@@ -336,20 +339,20 @@ $\Delta$, which may be empty. The base cases are that \pyinline{return e} defini
 
 \paragraph{Class/module contexts.}
 
-Metavariables $C$ and $B$ range over \emph{simple} class names; $D$ ranges over \emph{fully-qualified} class names of the form $M.C$.
+Metavariable $d$ ranges over \emph{fully-qualified} class names of the form $M.c$.
 
 \begin{definition}[Class/module context]
 A class/module context $\Lambda$ is a finite map whose entries are either:
 \begin{itemize}
-\item simple class names $C$ bound to \emph{class entries} $(D(\vec{x}), B)$, where $\vec{x}$ is a sequence of distinct field names (in declaration order) and $B$ names the base class (or $\bot$ for no base);
-\item simple identifiers $x$ bound to \emph{module references} $M$, fully-qualified module names.
+\item class names $c$ bound to \emph{class entries} $(d(\vec{x}), c')$, where $\vec{x}$ is a sequence of distinct field names in declaration order and $c'$ names the base class (or $\bot$ for no base);
+\item variables $x$ bound to \emph{module references} $M$, fully-qualified module names.
 \end{itemize}
 \end{definition}
 
 \noindent Class entries cover both locally-declared and imported classes; module references arise from import statements.
 
 \begin{definition}[Inheritance graph]
-$G_{\Lambda_M}$ has an edge $(C, B)$ iff $\Lambda_M(C) = (D(\vec{x}), B)$ for some $D, \vec{x}$.
+$G_{\Lambda_M}$ has an edge $(c, c')$ iff $\Lambda_M(c) = (d(\vec{x}), c')$ for some $d, \vec{x}$.
 \end{definition}
 
 \input{fig/well-formed}

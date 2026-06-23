@@ -21,11 +21,11 @@
 \and
 \inferrule*[lab={\ruleName{imp-class}}]
 {
-  x : (D(\vec{y}), B) \in \Lambda_M \\
+  x : (d(\vec{y}), c') \in \Lambda_M \\
   \vec{x} \importsR_M \Delta; \Lambda
 }
 {
-  x \cons \vec{x} \importsR_M \Delta; \Lambda, x : (D(\vec{y}), B)
+  x \cons \vec{x} \importsR_M \Delta; \Lambda, x : (d(\vec{y}), c')
 }
 \and
 \inferrule*[lab={\ruleName{imp-module}}]
@@ -91,21 +91,21 @@
 \inferrule*[lab={\ruleName{class}}]
 {
   \decls(\phi) = \vec{x} \text{ distinct} \\
-  \Gamma; \Lambda, C : (M.C(\vec{x}), \bot) \vdash m : \Delta; \Lambda'
+  \Gamma; \Lambda, c : (M.c(\vec{x}), \bot) \vdash m : \Delta; \Lambda'
 }
 {
-  \Gamma; \Lambda \vdash \exDataclass{C}{\phi} \cons m : \Delta; \Lambda'
+  \Gamma; \Lambda \vdash \exDataclass{c}{\phi} \cons m : \Delta; \Lambda'
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \Lambda(B) = (M.B(\vec{y}), B') \\
+  \Lambda(c') = (M.c'(\vec{y}), c'') \\
   \decls(\phi) = \vec{x} \text{ distinct} \\
-  \vec{x} \cap \fields(M.B) = \varnothing \\
-  \Gamma; \Lambda, C : (M.C(\vec{x}), B) \vdash m : \Delta; \Lambda'
+  \vec{x} \cap \fields(M.c') = \varnothing \\
+  \Gamma; \Lambda, c : (M.c(\vec{x}), c') \vdash m : \Delta; \Lambda'
 }
 {
-  \Gamma; \Lambda \vdash \exDataclassExtend{C}{B}{\phi} \cons m : \Delta; \Lambda'
+  \Gamma; \Lambda \vdash \exDataclassExtend{c}{c'}{\phi} \cons m : \Delta; \Lambda'
 }
 \end{mathpar}
 \subcaption{Body $m$ of module $M$ is well-formed in $\Gamma$ and $\Lambda$}
