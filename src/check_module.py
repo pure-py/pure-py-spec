@@ -33,12 +33,12 @@ BlockElement = Union[ast.stmt, list[ast.FunctionDef]]   # statement or grouped m
 
 
 @dataclass(frozen=True)
-class ClassInfo:
+class ClassEntry:
     fields: tuple[str, ...]
     base: Optional[str]
 
 
-ClassContext = dict[str, ClassInfo]   # Λ_M
+ClassContext = dict[str, ClassEntry]   # Λ_M
 
 
 @dataclass(frozen=True)
@@ -53,12 +53,12 @@ class Context:
 def extend_var(ctx: 'Context', delta: VarContext) -> 'Context':
     return Context(var=extend(ctx.var, delta), cls=ctx.cls, modules=ctx.modules, M=ctx.M, q=ctx.q)
 
-def extend_cls(ctx: 'Context', c: str, info: 'ClassInfo') -> 'Context':
+def extend_cls(ctx: 'Context', c: str, info: 'ClassEntry') -> 'Context':
     return Context(var=ctx.var, cls={**ctx.cls, c: info}, modules=ctx.modules, M=ctx.M, q=ctx.q)
 
-def class_info_for(node: ast.ClassDef) -> 'ClassInfo':
+def class_entry_for(node: ast.ClassDef) -> 'ClassEntry':
     base = node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
-    return ClassInfo(fields=tuple(class_field_names(node)), base=base)
+    return ClassEntry(fields=tuple(class_field_names(node)), base=base)
 
 
 @dataclass(frozen=True)
@@ -181,7 +181,7 @@ def next_ctx_after(head: BlockElement, ctx: Context) -> Context:
     delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
     next_ctx = extend_var(ctx, delta)
     if isinstance(head, ast.ClassDef):
-        next_ctx = extend_cls(next_ctx, head.name, class_info_for(head))
+        next_ctx = extend_cls(next_ctx, head.name, class_entry_for(head))
     return next_ctx
 
 def block_element_result_type(item: BlockElement) -> ResultTy:
@@ -265,11 +265,11 @@ def module_members(body: list[ast.stmt], M: dict[str, ast.Module], q: str) -> se
     submodules = {name[len(q) + 1:].split('.')[0] for name in M if name.startswith(f'{q}.')}
     return assigns_block(body) | {s.name for s in body if isinstance(s, ast.ClassDef)} | set(BUILTINS.keys()) | {'__name__'} | submodules
 
-def resolve_module(e: ast.expr, ctx: Context) -> Optional[str]:
+def names_module(e: ast.expr, ctx: Context) -> Optional[str]:
     if isinstance(e, ast.Name):
         return e.id if e.id in ctx.modules and e.id in ctx.M else None
     if isinstance(e, ast.Attribute):
-        parent = resolve_module(e.value, ctx)
+        parent = names_module(e.value, ctx)
         full = f'{parent}.{e.attr}' if parent is not None else None
         return full if full is not None and full in ctx.M else None
     return None
@@ -365,7 +365,7 @@ def check_expr(e: ast.expr, ctx: Context) -> None:
         check_expr(e.orelse, ctx)
         return
     if isinstance(e, ast.Attribute):
-        mod = resolve_module(e.value, ctx)
+        mod = names_module(e.value, ctx)
         if mod is not None:
             body = ctx.M[mod].body
             if len(body) > 0 and e.attr not in module_members(body, ctx.M, mod):
