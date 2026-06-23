@@ -244,17 +244,17 @@ which follow Python.
 
 \subsection{Modules and entry point}
 
-A \PurePy \emph{program} $\langle E, \mathcal{q} \rangle$ consists of a finite map
-$\mathcal{q}$ from \emph{fully-qualified module names} $q$ (\figref{syntax-stmt}) to \emph{modules} $m$ (each a sequence
+A \PurePy \emph{program} $\langle E, \mathcal{M} \rangle$ consists of a finite map
+$\mathcal{M}$ from \emph{fully-qualified module names} $q$ (\figref{syntax-stmt}) to \emph{modules} $m$ (each a sequence
 of top-level statements $t_1 \ldots t_{n+1}$), together with a designated \emph{entry point} $E \in
-\dom(\mathcal{q})$. $\mathcal{q}$ always includes the predefined modules of \figref{predefined} and is prefix-closed:
-if $q \in \dom(\mathcal{q})$ then $\parents(q) \subseteq \dom(\mathcal{q})$. The pair $\langle E, \mathcal{q} \rangle$
+\dom(\mathcal{M})$. $\mathcal{M}$ always includes the predefined modules of \figref{predefined} and is prefix-closed:
+if $q \in \dom(\mathcal{M})$ then $\parents(q) \subseteq \dom(\mathcal{M})$. The pair $\langle E, \mathcal{M} \rangle$
 is fixed and ambient in all definitions that follow.
 Import statements appear only as a contiguous prefix of a module body, before any other statement. This confines module-loading side-effects (currently only divergence or runtime
 errors) to a single zone at the start of each module body.
 
 \begin{definition}[Initial variable context]
-For any $q \in \dom(\mathcal{q})$, the \emph{initial variable context} of $q$ is $\Gamma_q^0 = \Gamma_{\textup{\pyinline{builtins}}} \runion
+For any $q \in \dom(\mathcal{M})$, the \emph{initial variable context} of $q$ is $\Gamma_q^0 = \Gamma_{\textup{\pyinline{builtins}}} \runion
 \set{\text{\pyinline{__name__}} \mapsto \statusDefAssigned}$, where $\Gamma_{\textup{\pyinline{builtins}}}$ binds the
 names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined}).
 \end{definition}
@@ -274,7 +274,7 @@ names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined}
 \pyinline{dataclasses} & \pyinline{dataclass} \\
 \hline
 \end{tabular}
-\caption{Predefined modules guaranteed to be in $\mathcal{q}$}
+\caption{Predefined modules guaranteed to be in $\mathcal{M}$}
 \label{fig:predefined}
 \end{figure}
 
@@ -283,8 +283,8 @@ fully-qualified name.
 
 \input{fig/modules}
 
-The \emph{dependency graph} $G_{\mathcal{q}}$ of a module map has an edge $(q, q')$ iff
-$q' \in \imports(\mathcal{q}(q)) \cup \parents(q)$. Program well-formedness (\figref{well-formed-module}) requires the entry module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{q}}$ to be acyclic.
+The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(q, q')$ iff
+$q' \in \imports(\mathcal{M}(q)) \cup \parents(q)$. Program well-formedness (\figref{well-formed-module}) requires the entry module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$ to be acyclic.
 
 \subsection{Well-formedness}
 
@@ -340,30 +340,18 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \]
 \end{lemma}
 
-\paragraph{Class/module contexts.}
-
 Metavariable $d$ ranges over \emph{fully-qualified} class names of the form $q.c$.
 
-\begin{definition}[Class/module context]
-A class/module context $\Lambda$ is a finite map whose entries are either:
-\begin{itemize}
-\item class names $c$ bound to \emph{class entries} $(d(\vec{x}), c')$, where $\vec{x}$ is a sequence of distinct field names in declaration order and $c'$ names the base class (or $\bot$ for no base);
-\item variables $x$ bound to \emph{module references} $q$, fully-qualified module names.
-\end{itemize}
-\end{definition}
-
-\noindent Class entries cover both locally-declared and imported classes; module references arise from import statements.
-
 \begin{definition}[Inheritance graph]
-$G_{\Lambda_q}$ has an edge $(c, c')$ iff $\Lambda_q(c) = (d(\vec{x}), c')$ for some $d, \vec{x}$.
+$G_{\Gamma_q}$ has an edge $(c, c')$ iff $\Gamma_q(c) = (d(\vec{x}), c')$ for some $d, \vec{x}$.
 \end{definition}
 
 \input{fig/well-formed}
 \input{fig/well-formed-expr}
 \input{fig/well-formed-module}
 
-\begin{definition}[Variable and local contexts of a well-formed module]
-For a well-formed module $q$, i.e.\ where $\Gamma_q^0; \varnothing \vdash \mathcal{q}(q) : \Delta; \Lambda$ for some $\Delta, \Lambda$, the \emph{variable context} of $q$ is $\Gamma_q = \Gamma_q^0 \runion \Delta$ and the \emph{local context} of $q$ is $\Lambda_q = \Lambda$.
+\begin{definition}[Variable context of a well-formed module]
+For a well-formed module $q$, i.e.\ where $\Gamma_q^0 \vdash \mathcal{M}(q) : \Delta$ for some $\Delta$, the \emph{variable context} of $q$ is $\Gamma_q = \Gamma_q^0 \runion \Delta$.
 \end{definition}
 
 \subsection{Examples}
@@ -694,7 +682,7 @@ with $\assigns{\varnothing}$ as left and right unit.
 \input{fig/eval-values}
 
 Program and module evaluation are given in \figref{eval-modules}. A program evaluates to a non-negative integer
-exit code $n$, with $0$ denoting successful termination. For any $(q \mapsto b) \in \mathcal{q}$, evaluation of
+exit code $n$, with $0$ denoting successful termination. For any $(q \mapsto b) \in \mathcal{M}$, evaluation of
 $b$ begins under the initial environment $\rho_q = \rho_{\textup{\pyinline{builtins}}} \runion \set{\text{\pyinline{__name__}}
 \mapsto v}$, where $v$ is \pyinline{"__main__"} if $q = E$ and the string literal corresponding to $q$ otherwise.
 The environment $\rho_{\textup{\pyinline{builtins}}}$ binds the names listed for \textup{\pyinline{builtins}} in \figref{predefined}

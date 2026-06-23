@@ -1,50 +1,50 @@
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Lambda \vdash q \names T$}
+\flushleft \shadebox{$\Gamma \vdash q \names \theta$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{simple-module}}]
 {
-  x : q \in \Lambda
+  x : q \in \Gamma
 }
 {
-  \Lambda \vdash x \names q
+  \Gamma \vdash x \names q
 }
 \and
 \inferrule*[lab={\ruleName{simple-class}}]
 {
-  c : (d(\vec{x}), c') \in \Lambda
+  c : (d(\vec{x}), c') \in \Gamma
 }
 {
-  \Lambda \vdash c \names d(\vec{x})
+  \Gamma \vdash c \names d(\vec{x})
 }
 \and
 \inferrule*[lab={\ruleName{qualified-module}}]
 {
-  \Lambda \vdash q \names q \\
-  q.x \in \dom(\mathcal{q})
+  \Gamma \vdash q \names q' \\
+  q'.x \in \dom(\mathcal{M})
 }
 {
-  \Lambda \vdash q.x \names q.x
+  \Gamma \vdash q.x \names q'.x
 }
 \and
 \inferrule*[lab={\ruleName{qualified-class}}]
 {
-  \Lambda \vdash q \names q \\
-  \Lambda_{q}(c) = (q.c(\vec{y}), c') \\
-  \fields(q.c) = \vec{x}
+  \Gamma \vdash q \names q' \\
+  \Gamma_{q'}(c) = (q'.c(\vec{y}), c'') \\
+  \fields(q'.c) = \vec{x}
 }
 {
-  \Lambda \vdash q.c \names q.c(\vec{x})
+  \Gamma \vdash q.c \names q'.c(\vec{x})
 }
 \end{mathpar}
-\subcaption{Name $q$ resolves to $T$ under $\Lambda$}
+\subcaption{Name $q$ resolves to context entry $\theta$ under $\Gamma$}
 \end{subfigure}
 
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma; \Lambda \vdash e$}
+\flushleft \shadebox{$\Gamma \vdash e$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{var}}]
@@ -52,44 +52,44 @@
   \Gamma(x) = \statusDefAssigned
 }
 {
-  \Gamma; \Lambda \vdash x
+  \Gamma \vdash x
 }
 \and
 \inferrule*[lab={\ruleName{lambda}}]
 {
-  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned; \Lambda \vdash e
+  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned \vdash e
 }
 {
-  \Gamma; \Lambda \vdash \exLambda{x_1, \ldots, x_n}{e}
+  \Gamma \vdash \exLambda{x_1, \ldots, x_n}{e}
 }
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
-  \Lambda \vdash q \names d(\vec{x}) \\
-  \Gamma; \Lambda \vdash e_i \quad (\forall i)
+  \Gamma \vdash q \names d(\vec{x}) \\
+  \Gamma \vdash e_i \quad (\forall i)
 }
 {
-  \Gamma; \Lambda \vdash \exConstruct{q}{e_1, \ldots, e_n}
+  \Gamma \vdash \exConstruct{q}{e_1, \ldots, e_n}
 }
 \and
 \inferrule*[lab={\ruleName{attr-module}}]
 {
-  \Lambda \vdash e \names q \\
+  \Gamma \vdash e \names q \\
   y \in \dom(\Gamma_q)
 }
 {
-  \Gamma; \Lambda \vdash e.y
+  \Gamma \vdash e.y
 }
 \and
 \inferrule*[lab={\ruleName{attr-object}}]
 {
-  \Gamma; \Lambda \vdash e
+  \Gamma \vdash e
 }
 {
-  \Gamma; \Lambda \vdash e.y
+  \Gamma \vdash e.y
 }
 \end{mathpar}
-\subcaption{Expression $e$ is well-formed under $\Gamma$ and $\Lambda$}
+\subcaption{Expression $e$ is well-formed under $\Gamma$}
 \end{subfigure}
 \caption{Expression well-formedness}
 \label{fig:well-formed-expr}
