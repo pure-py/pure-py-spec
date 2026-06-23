@@ -3,7 +3,7 @@
 \flushleft \shadebox{$\vdash Q \names T$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{name-mod}}]
+\inferrule*[lab={\ruleName{simple-module}}]
 {
   x : M' \in \Lambda_M
 }
@@ -11,7 +11,7 @@
   \vdash x \names M'
 }
 \and
-\inferrule*[lab={\ruleName{name-cls}}]
+\inferrule*[lab={\ruleName{simple-class}}]
 {
   C : D(x_1, \ldots, x_n) \in \Lambda_M
 }
@@ -19,16 +19,16 @@
   \vdash C \names D(x_1, \ldots, x_n)
 }
 \and
-\inferrule*[lab={\ruleName{attr-mod}}]
+\inferrule*[lab={\ruleName{qualified-module}}]
 {
   \vdash Q \names M' \\
-  M'.y \in \dom(\mathcal{M})
+  M'.x \in \dom(\mathcal{M})
 }
 {
-  \vdash Q.y \names M'.y
+  \vdash Q.x \names M'.x
 }
 \and
-\inferrule*[lab={\ruleName{attr-cls}}]
+\inferrule*[lab={\ruleName{qualified-class}}]
 {
   \vdash Q \names M' \\
   C \in \classes(\mathcal{M}(M')) \\
@@ -72,7 +72,7 @@
   \wf{\Gamma}{\exConstruct{Q}{e_1, \ldots, e_n}}
 }
 \and
-\inferrule*[lab={\ruleName{attr-mod}}]
+\inferrule*[lab={\ruleName{attr-module}}]
 {
   \vdash e \names M' \\
   y \in \vars(\mathcal{M}(M'))

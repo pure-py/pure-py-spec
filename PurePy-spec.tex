@@ -257,11 +257,23 @@ which follow Python.
 
 \input{fig/precedence}
 
-\subsection{Class contexts}
+\subsection{Local contexts}
 
-Class contexts $\Lambda$ are finite maps from class names to pairs $(\vec{x}, C)$, where $\vec{x}$ is a sequence of distinct
-field names (in declaration order) and $C$ names the base class (or $\bot$ for no base). Metavariables $C$ and $B$ range over class names; $D$ ranges over \emph{fully-qualified class names} of the form $M.C$.
-The \emph{inheritance graph} $G_{\Lambda_M}$ of a class context has an edge $(C, B)$ iff $\Lambda_M(C) = (\vec{x}, B)$ for some $\vec{x}$.
+Metavariables $C$ and $B$ range over \emph{simple} class names; $D$ ranges over \emph{fully-qualified} class names of the form $M.C$.
+
+\begin{definition}[Local context]
+A local context $\Lambda$ is a finite map whose entries are either:
+\begin{itemize}
+\item simple class names $C$ bound to \emph{class entries} $D(\vec{x}, B)$, where $\vec{x}$ is a sequence of distinct field names (in declaration order) and $B$ names the base class (or $\bot$ for no base);
+\item simple identifiers $x$ bound to \emph{module references} $M$, fully-qualified module names.
+\end{itemize}
+\end{definition}
+
+\noindent Class entries cover both locally-declared and imported classes; module references arise from import statements.
+
+\begin{definition}[Inheritance graph]
+$G_{\Lambda_M}$ has an edge $(C, B)$ iff $\Lambda_M(C) = D(\vec{x}, B)$ for some $D, \vec{x}$.
+\end{definition}
 
 \subsection{Modules and entry point}
 
