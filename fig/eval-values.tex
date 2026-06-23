@@ -9,7 +9,7 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exDefClosure{\rho}{\seq{d}}{i}$ & (DefClosure) \\
     & $\mid$ & $\exObj{d}{\rho}$ & (Object)
    \\[3mm]
-$d$ & $::=$ & $M.c$ & (QualifiedClassName) \\
+$d$ & $::=$ & $q.c$ & (QualifiedClassName) \\
     & $\mid$ & $\bot$ & (Module)
    \\[3mm]
 $\rho$ & $::=$ & $\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}$ & (Environment)
@@ -17,7 +17,7 @@ $\rho$ & $::=$ & $\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}$ & (Environment
 $r$ & $::=$ & $\assigns{\rho}$ \\
   & $\mid$ & $\returns{v}$
    \\[3mm]
-$\mu$ & $::=$ & $\set{M_1 \mapsto \exObj{\bot}{\rho_1}, \ldots, M_n \mapsto \exObj{\bot}{\rho_n}}$ & (ModuleCache) \\
+$\mu$ & $::=$ & $\set{q_1 \mapsto \exObj{\bot}{\rho_1}, \ldots, q_n \mapsto \exObj{\bot}{\rho_n}}$ & (ModuleCache) \\
 \end{tabular}
 \end{center}
 \caption{Values, environments and evaluation results}

@@ -32,12 +32,12 @@
 \and
 \inferrule*[lab={\ruleName{pat-class}}]
 {
-  \Lambda \vdash Q \names D(x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}) \\
+  \Lambda \vdash q \names D(x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}) \\
   \set{y_1, \ldots, y_m} = \set{x_{n+1}, \ldots, x_{n+m}} \\
   \Lambda \vdash p_i \quad (\forall i)
 }
 {
-  \Lambda \vdash \patClass{Q}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}}
+  \Lambda \vdash \patClass{q}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}}
 }
 \and
 \inferrule*[lab={\ruleName{cases-nil}}]

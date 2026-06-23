@@ -1,14 +1,14 @@
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Lambda \vdash Q \names T$}
+\flushleft \shadebox{$\Lambda \vdash q \names T$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{simple-module}}]
 {
-  x : M \in \Lambda
+  x : q \in \Lambda
 }
 {
-  \Lambda \vdash x \names M
+  \Lambda \vdash x \names q
 }
 \and
 \inferrule*[lab={\ruleName{simple-class}}]
@@ -21,24 +21,24 @@
 \and
 \inferrule*[lab={\ruleName{qualified-module}}]
 {
-  \Lambda \vdash Q \names M \\
-  M.x \in \dom(\mathcal{M})
+  \Lambda \vdash q \names q \\
+  q.x \in \dom(\mathcal{q})
 }
 {
-  \Lambda \vdash Q.x \names M.x
+  \Lambda \vdash q.x \names q.x
 }
 \and
 \inferrule*[lab={\ruleName{qualified-class}}]
 {
-  \Lambda \vdash Q \names M \\
-  \Lambda_{M}(c) = (M.c(\vec{y}), c') \\
-  \fields(M.c) = \vec{x}
+  \Lambda \vdash q \names q \\
+  \Lambda_{q}(c) = (q.c(\vec{y}), c') \\
+  \fields(q.c) = \vec{x}
 }
 {
-  \Lambda \vdash Q.c \names M.c(\vec{x})
+  \Lambda \vdash q.c \names q.c(\vec{x})
 }
 \end{mathpar}
-\subcaption{Name $Q$ resolves to $T$ under $\Lambda$}
+\subcaption{Name $q$ resolves to $T$ under $\Lambda$}
 \end{subfigure}
 
 \vspace{2mm}
@@ -65,17 +65,17 @@
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
-  \Lambda \vdash Q \names d(\vec{x}) \\
+  \Lambda \vdash q \names d(\vec{x}) \\
   \Gamma; \Lambda \vdash e_i \quad (\forall i)
 }
 {
-  \Gamma; \Lambda \vdash \exConstruct{Q}{e_1, \ldots, e_n}
+  \Gamma; \Lambda \vdash \exConstruct{q}{e_1, \ldots, e_n}
 }
 \and
 \inferrule*[lab={\ruleName{attr-module}}]
 {
-  \Lambda \vdash e \names M \\
-  y \in \dom(\Gamma_M)
+  \Lambda \vdash e \names q \\
+  y \in \dom(\Gamma_q)
 }
 {
   \Gamma; \Lambda \vdash e.y

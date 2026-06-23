@@ -3,8 +3,8 @@
 \centering
 \small
 \begin{align*}
-\imports(\exImport{M}) &= \set{M} \\
-\imports(\exFromImport{M}{x_1, \ldots, x_{n+1}}) &= \set{M} \\
+\imports(\exImport{q}) &= \set{q} \\
+\imports(\exFromImport{q}{x_1, \ldots, x_{n+1}}) &= \set{q} \\
 \imports(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \textstyle\bigcup_i \imports(b_i) \\
 \imports(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \textstyle\bigcup_i \imports(b_i) \\
 \imports(\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}) &= \textstyle\bigcup_i \imports(b_i) \\
@@ -12,7 +12,7 @@
 \imports(s) &= \varnothing \quad \text{otherwise} \\
 \\
 \parents(x) &= \varnothing \\
-\parents(M.x) &= \parents(M) \cup \set{M}
+\parents(q.x) &= \parents(q) \cup \set{q}
 \end{align*}
 \subcaption{$\imports$ and $\parents$ metafunctions}
 \end{subfigure}
@@ -26,9 +26,9 @@
 \decls(\exField{x_1} \;\ldots\; \exField{x_{n+1}}) &= x_1, \ldots, x_{n+1} \\
 \decls(\pyinline{pass}) &= \varepsilon \\
 \\
-\fields(M.c) &= \begin{cases}
-  \vec{x} & \text{if } \Lambda_M(c) = (d(\vec{x}), \bot) \\
-  \fields(M.c') \mathbin{\cdot} \vec{x} & \text{if } \Lambda_M(c) = (d(\vec{x}), c')
+\fields(q.c) &= \begin{cases}
+  \vec{x} & \text{if } \Lambda_q(c) = (d(\vec{x}), \bot) \\
+  \fields(q.c') \mathbin{\cdot} \vec{x} & \text{if } \Lambda_q(c) = (d(\vec{x}), c')
 \end{cases}
 \end{align*}
 \subcaption{$\decls$ and $\fields$ metafunctions}

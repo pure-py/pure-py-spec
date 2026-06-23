@@ -169,10 +169,10 @@
 \inferrule*[lab={\ruleName{eval-construct}}]
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i) \\
-  \fields(M.c) = x_1, \ldots, x_n
+  \fields(q.c) = x_1, \ldots, x_n
 }
 {
-  \rho, \exConstruct{c}{e_1, \ldots, e_n} \Rightarrow \exObj{M.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
+  \rho, \exConstruct{c}{e_1, \ldots, e_n} \Rightarrow \exObj{q.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
 }
 \end{mathpar}
 \caption{Expression evaluation}

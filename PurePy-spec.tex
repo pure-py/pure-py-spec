@@ -152,39 +152,45 @@ one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
 Metavariables $x$, $f$, $c$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function and $c$ when it is expected to denote a class.
 
 \begin{definition}[Context]
-A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of:
+A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the following \emph{context entries} $\theta$:
 \begin{itemize}
-\item a \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$, with $\statusDefAssigned$ indicating \emph{definitely assigned} and $\statusNotDefAssigned$ \emph{not definitely assigned};
-\item a \emph{module reference}: a fully-qualified module name $M$;
-\item a \emph{class entry}: a pair $(\vec{x}, c)$ of a sequence of distinct field names in declaration order and a base class $c$ (or $\bot$ for no base).
+\item \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
+\item \emph{module reference}: a fully-qualified module name $q$;
+\item \emph{class entry}: a pair $(\vec{x}, c)$ of a sequence of distinct field names and a base class $c$ (or $\bot$ for no base).
 \end{itemize}
 \end{definition}
 
-\noindent Class entries cover both locally-declared and imported classes; module references arise from import statements. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}; one can also think of $\statusDefAssigned$ and $\statusNotDefAssigned$ as degenerate types ``any'' and ``none''. Result types $R$ are either $\Returns$ or $\Assigns{\Delta}$ for some $\Delta$.
-
-It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, x : v$ for the context that sends $x$ to $v$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusDefAssigned(X)$ for the context $\set{x : \statusDefAssigned \mid x \in X}$; similarly $\statusNotDefAssigned(X)$.
+\noindent Class entries cover both locally-declared and imported classes; module references arise from import statements. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}; $\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ \emph{not definitely assigned} (or, equivalently, degenerate types ``any'' and ``none'').
+It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, x : \theta$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusDefAssigned(X)$ for the context $\set{x : \statusDefAssigned \mid x \in X}$; similarly $\statusNotDefAssigned(X)$.
 
 \paragraph{Context operations.}
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override'') and
 an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\runion$ right-distributes over $\merge$ (Lemma~1), but left
-distributivity does not hold. Both operations are defined pointwise; on $\B_{\bot}$:
+distributivity does not hold. Both operations are defined pointwise.
 %
-\begin{definition}[Override and merge]
-For $a, a' \in \B$:
+\begin{definition}[Override]
 {\small
 \begin{align*}
-\bot \runion a = a \runion \bot &= a & \bot \merge \bot &= \bot \\
-a \runion a' &= a' & a \merge \bot = \bot \merge a &= \statusNotDefAssigned \\
-& & a \merge a' &= a \meet a'
+\bot \runion \theta &= \theta \runion \bot = \theta \\
+\theta \runion \theta' &= \theta' \quad (\text{when } \theta' \neq \bot)
 \end{align*}}
-For $v \in \V \setminus \B$ (module reference or class entry): $\bot \runion v = v \runion \bot = v$ and $v \runion v' = v'$ for any $v' \in \V$. Merge is undefined when either argument is in $\V \setminus \B$, and never invoked at such arguments in practice (only assignments contribute to branching contexts).
 \end{definition}
 
-\noindent The $\runion$ operation is right-biased and has $\bot$ as left and right unit. The $\merge$
-operation lacks a unit; when exactly one argument is defined and in $\B$, the result is $\statusNotDefAssigned$; when
-both are defined and in $\B$, it returns the conjunction of their values in $\B$.
+\noindent Override is thus right-biased and has $\bot$ as both left and right unit.
+
+\begin{definition}[Merge]
+For definite-assignment statuses $a, a' \in \B$:
+{\small
+\begin{align*}
+\bot \merge \bot &= \bot \\
+a \merge \bot = \bot \merge a &= \statusNotDefAssigned \\
+a \merge a' &= a \meet a'
+\end{align*}}
+\end{definition}
+
+\noindent Merge is otherwise undefined. Restricted to $\B$, it returns $\statusNotDefAssigned$ when exactly one argument is defined and the conjunction otherwise; so $\bot$ is not a unit.
 
 \begin{lemma}[Right distributivity]
 \[
@@ -224,30 +230,6 @@ def f(b):
 \end{python}
 \end{minipage}
 
-Context operations $\runion$ and $\merge$ lift to a right semiring over result types $R$, with
-$\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero for
-$\runion$.
-
-\begin{definition}[Override and merge on result types]
-{\small
-\begin{align*}
-\Assigns{\Delta} \merge \Assigns{\Delta'} & = \Assigns{(\Delta \merge \Delta')} \\
-R \merge \Returns = \Returns \merge R & = R \\
-\\
-\Assigns{\Delta} \runion \Assigns{\Delta'} & = \Assigns{(\Delta \runion \Delta')} \\
-R \runion \Returns = \Returns \runion R & = \Returns
-\end{align*}}
-\end{definition}
-
-\noindent The $\Returns \runion R$ case never arises because the well-formedness judgement prohibits
-unreachable statements (\S\ref{sec:unreachable}).
-
-\begin{lemma}[Right distributivity]
-\[
-(R \merge R') \runion S = (R \runion S) \merge (R' \runion S)
-\]
-\end{lemma}
-
 \input{fig/syntax-stmt}
 \input{fig/syntax-expr}
 
@@ -262,17 +244,17 @@ which follow Python.
 
 \subsection{Modules and entry point}
 
-A \PurePy \emph{program} $\langle E, \mathcal{M} \rangle$ consists of a finite map
-$\mathcal{M}$ from \emph{fully-qualified module names} $M$ (\figref{syntax-stmt}) to \emph{modules} $m$ (each a sequence
+A \PurePy \emph{program} $\langle E, \mathcal{q} \rangle$ consists of a finite map
+$\mathcal{q}$ from \emph{fully-qualified module names} $q$ (\figref{syntax-stmt}) to \emph{modules} $m$ (each a sequence
 of top-level statements $t_1 \ldots t_{n+1}$), together with a designated \emph{entry point} $E \in
-\dom(\mathcal{M})$. $\mathcal{M}$ always includes the predefined modules of \figref{predefined} and is prefix-closed:
-if $M \in \dom(\mathcal{M})$ then $\parents(M) \subseteq \dom(\mathcal{M})$. The pair $\langle E, \mathcal{M} \rangle$
+\dom(\mathcal{q})$. $\mathcal{q}$ always includes the predefined modules of \figref{predefined} and is prefix-closed:
+if $q \in \dom(\mathcal{q})$ then $\parents(q) \subseteq \dom(\mathcal{q})$. The pair $\langle E, \mathcal{q} \rangle$
 is fixed and ambient in all definitions that follow.
 Import statements appear only as a contiguous prefix of a module body, before any other statement. This confines module-loading side-effects (currently only divergence or runtime
 errors) to a single zone at the start of each module body.
 
 \begin{definition}[Initial variable context]
-For any $M \in \dom(\mathcal{M})$, the \emph{initial variable context} of $M$ is $\Gamma_M^0 = \Gamma_{\textup{\pyinline{builtins}}} \runion
+For any $q \in \dom(\mathcal{q})$, the \emph{initial variable context} of $q$ is $\Gamma_q^0 = \Gamma_{\textup{\pyinline{builtins}}} \runion
 \set{\text{\pyinline{__name__}} \mapsto \statusDefAssigned}$, where $\Gamma_{\textup{\pyinline{builtins}}}$ binds the
 names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined}).
 \end{definition}
@@ -292,7 +274,7 @@ names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined}
 \pyinline{dataclasses} & \pyinline{dataclass} \\
 \hline
 \end{tabular}
-\caption{Predefined modules guaranteed to be in $\mathcal{M}$}
+\caption{Predefined modules guaranteed to be in $\mathcal{q}$}
 \label{fig:predefined}
 \end{figure}
 
@@ -301,8 +283,8 @@ fully-qualified name.
 
 \input{fig/modules}
 
-The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(M, M')$ iff
-$M' \in \imports(\mathcal{M}(M)) \cup \parents(M)$. Program well-formedness (\figref{well-formed-module}) requires the entry module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$ to be acyclic.
+The \emph{dependency graph} $G_{\mathcal{q}}$ of a module map has an edge $(q, q')$ iff
+$q' \in \imports(\mathcal{q}(q)) \cup \parents(q)$. Program well-formedness (\figref{well-formed-module}) requires the entry module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{q}}$ to be acyclic.
 
 \subsection{Well-formedness}
 
@@ -334,25 +316,46 @@ A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is li
 
 Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
-= e} definitely assigns $\set{\pyinline{x} : \statusDefAssigned}$. Block well-formedness is given in
+= e} definitely assigns $\set{\pyinline{x} : \statusDefAssigned}$. \emph{Result types} $R$ classify these outcomes: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$). Block well-formedness is given in
 \figref{well-formed}; expression well-formedness in \figref{well-formed-expr}.
+
+Context operations $\runion$ and $\merge$ lift to a right semiring over result types $R$, with $\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero for $\runion$.
+
+\begin{definition}[Override and merge on result types]
+{\small
+\begin{align*}
+\Assigns{\Delta} \merge \Assigns{\Delta'} & = \Assigns{(\Delta \merge \Delta')} \\
+R \merge \Returns = \Returns \merge R & = R \\
+\\
+\Assigns{\Delta} \runion \Assigns{\Delta'} & = \Assigns{(\Delta \runion \Delta')} \\
+R \runion \Returns = \Returns \runion R & = \Returns
+\end{align*}}
+\end{definition}
+
+\noindent The $\Returns \runion R$ case never arises because the well-formedness judgement prohibits unreachable statements (\S\ref{sec:unreachable}).
+
+\begin{lemma}[Right distributivity (result types)]
+\[
+(R \merge R') \runion S = (R \runion S) \merge (R' \runion S)
+\]
+\end{lemma}
 
 \paragraph{Class/module contexts.}
 
-Metavariable $d$ ranges over \emph{fully-qualified} class names of the form $M.c$.
+Metavariable $d$ ranges over \emph{fully-qualified} class names of the form $q.c$.
 
 \begin{definition}[Class/module context]
 A class/module context $\Lambda$ is a finite map whose entries are either:
 \begin{itemize}
 \item class names $c$ bound to \emph{class entries} $(d(\vec{x}), c')$, where $\vec{x}$ is a sequence of distinct field names in declaration order and $c'$ names the base class (or $\bot$ for no base);
-\item variables $x$ bound to \emph{module references} $M$, fully-qualified module names.
+\item variables $x$ bound to \emph{module references} $q$, fully-qualified module names.
 \end{itemize}
 \end{definition}
 
 \noindent Class entries cover both locally-declared and imported classes; module references arise from import statements.
 
 \begin{definition}[Inheritance graph]
-$G_{\Lambda_M}$ has an edge $(c, c')$ iff $\Lambda_M(c) = (d(\vec{x}), c')$ for some $d, \vec{x}$.
+$G_{\Lambda_q}$ has an edge $(c, c')$ iff $\Lambda_q(c) = (d(\vec{x}), c')$ for some $d, \vec{x}$.
 \end{definition}
 
 \input{fig/well-formed}
@@ -360,7 +363,7 @@ $G_{\Lambda_M}$ has an edge $(c, c')$ iff $\Lambda_M(c) = (d(\vec{x}), c')$ for 
 \input{fig/well-formed-module}
 
 \begin{definition}[Variable and local contexts of a well-formed module]
-For a well-formed module $M$, i.e.\ where $\Gamma_M^0; \varnothing \vdash \mathcal{M}(M) : \Delta; \Lambda$ for some $\Delta, \Lambda$, the \emph{variable context} of $M$ is $\Gamma_M = \Gamma_M^0 \runion \Delta$ and the \emph{local context} of $M$ is $\Lambda_M = \Lambda$.
+For a well-formed module $q$, i.e.\ where $\Gamma_q^0; \varnothing \vdash \mathcal{q}(q) : \Delta; \Lambda$ for some $\Delta, \Lambda$, the \emph{variable context} of $q$ is $\Gamma_q = \Gamma_q^0 \runion \Delta$ and the \emph{local context} of $q$ is $\Lambda_q = \Lambda$.
 \end{definition}
 
 \subsection{Examples}
@@ -669,7 +672,7 @@ functional programming:
 \item \pyinline{with} statements
 \item List patterns matching tuple values, or tuple patterns matching list values. In \PurePy a list pattern matches only a list, and a tuple pattern matches only a tuple. Python permits either pattern against either kind of sequence.
 \item Positional class patterns matching fewer sub-patterns than the class's field arity. \PurePy requires exact arity; Python permits any number from $0$ up to the class's arity.
-\item Wildcard imports (\pyinline{from M import *}); PEP 8 recommends avoiding these\footnote{\url{https://peps.python.org/pep-0008/}}.
+\item Wildcard imports (\pyinline{from q import *}); PEP 8 recommends avoiding these\footnote{\url{https://peps.python.org/pep-0008/}}.
 \item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.
 \end{itemize}
 
@@ -691,9 +694,9 @@ with $\assigns{\varnothing}$ as left and right unit.
 \input{fig/eval-values}
 
 Program and module evaluation are given in \figref{eval-modules}. A program evaluates to a non-negative integer
-exit code $n$, with $0$ denoting successful termination. For any $(M \mapsto b) \in \mathcal{M}$, evaluation of
-$b$ begins under the initial environment $\rho_M = \rho_{\textup{\pyinline{builtins}}} \runion \set{\text{\pyinline{__name__}}
-\mapsto v}$, where $v$ is \pyinline{"__main__"} if $M = E$ and the string literal corresponding to $M$ otherwise.
+exit code $n$, with $0$ denoting successful termination. For any $(q \mapsto b) \in \mathcal{q}$, evaluation of
+$b$ begins under the initial environment $\rho_q = \rho_{\textup{\pyinline{builtins}}} \runion \set{\text{\pyinline{__name__}}
+\mapsto v}$, where $v$ is \pyinline{"__main__"} if $q = E$ and the string literal corresponding to $q$ otherwise.
 The environment $\rho_{\textup{\pyinline{builtins}}}$ binds the names listed for \textup{\pyinline{builtins}} in \figref{predefined}
 to their values.
 

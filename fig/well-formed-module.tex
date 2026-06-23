@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\vec{x} \importsR_M \Delta; \Lambda$}
+\flushleft \shadebox{$\vec{x} \importsR_q \Delta; \Lambda$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{imp-empty}}]
@@ -7,37 +7,37 @@
   \strut
 }
 {
-  \varepsilon \importsR_M \varnothing; \varnothing
+  \varepsilon \importsR_q \varnothing; \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{imp-var}}]
 {
-  x : a \in \Gamma_M \\
-  \vec{x} \importsR_M \Delta; \Lambda
+  x : a \in \Gamma_q \\
+  \vec{x} \importsR_q \Delta; \Lambda
 }
 {
-  x \cons \vec{x} \importsR_M \set{x : a} \runion \Delta; \Lambda
+  x \cons \vec{x} \importsR_q \set{x : a} \runion \Delta; \Lambda
 }
 \and
 \inferrule*[lab={\ruleName{imp-class}}]
 {
-  x : (d(\vec{y}), c') \in \Lambda_M \\
-  \vec{x} \importsR_M \Delta; \Lambda
+  x : (d(\vec{y}), c') \in \Lambda_q \\
+  \vec{x} \importsR_q \Delta; \Lambda
 }
 {
-  x \cons \vec{x} \importsR_M \Delta; \Lambda, x : (d(\vec{y}), c')
+  x \cons \vec{x} \importsR_q \Delta; \Lambda, x : (d(\vec{y}), c')
 }
 \and
 \inferrule*[lab={\ruleName{imp-module}}]
 {
-  M.x \in \dom(\mathcal{M}) \\
-  \vec{x} \importsR_M \Delta; \Lambda
+  q.x \in \dom(\mathcal{q}) \\
+  \vec{x} \importsR_q \Delta; \Lambda
 }
 {
-  x \cons \vec{x} \importsR_M \Delta; \Lambda, x : M.x
+  x \cons \vec{x} \importsR_q \Delta; \Lambda, x : q.x
 }
 \end{mathpar}
-\caption{Names $\vec{x}$ imported from module $M$ produce bindings $\Delta$ and $\Lambda$}
+\caption{Names $\vec{x}$ imported from module $q$ produce bindings $\Delta$ and $\Lambda$}
 \label{fig:imports}
 \end{figure}
 
@@ -56,26 +56,26 @@
 \and
 \inferrule*[lab={\ruleName{import}}]
 {
-  M' = x_1.x_2.\ldots.x_{n+1} \\
-  M' \in \dom(\mathcal{M}) \\
-  M' \neq M \\
-  \vdash_{\mathcal{M}} M' \\
-  \Gamma; \Lambda, x_1 : M' \vdash m : \Delta; \Lambda'
+  q' = x_1.x_2.\ldots.x_{n+1} \\
+  q' \in \dom(\mathcal{q}) \\
+  q' \neq q \\
+  \vdash_{\mathcal{q}} q' \\
+  \Gamma; \Lambda, x_1 : q' \vdash m : \Delta; \Lambda'
 }
 {
-  \Gamma; \Lambda \vdash \exImport{M'} \cons m : \Delta; \Lambda'
+  \Gamma; \Lambda \vdash \exImport{q'} \cons m : \Delta; \Lambda'
 }
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
-  M' \in \dom(\mathcal{M}) \\
-  M' \neq M \\
-  \vdash_{\mathcal{M}} M' \\
-  \vec{x} \importsR_{M'} \Delta'; \Lambda'' \\
+  q' \in \dom(\mathcal{q}) \\
+  q' \neq q \\
+  \vdash_{\mathcal{q}} q' \\
+  \vec{x} \importsR_{q'} \Delta'; \Lambda'' \\
   \Gamma \runion \Delta'; \Lambda \runion \Lambda'' \vdash m : \Delta; \Lambda'
 }
 {
-  \Gamma; \Lambda \vdash \exFromImport{M'}{\vec{x}} \cons m : \Delta' \runion \Delta; \Lambda'
+  \Gamma; \Lambda \vdash \exFromImport{q'}{\vec{x}} \cons m : \Delta' \runion \Delta; \Lambda'
 }
 \and
 \inferrule*[lab={\ruleName{statement}}]
@@ -91,7 +91,7 @@
 \inferrule*[lab={\ruleName{class}}]
 {
   \decls(\phi) = \vec{x} \text{ distinct} \\
-  \Gamma; \Lambda, c : (M.c(\vec{x}), \bot) \vdash m : \Delta; \Lambda'
+  \Gamma; \Lambda, c : (q.c(\vec{x}), \bot) \vdash m : \Delta; \Lambda'
 }
 {
   \Gamma; \Lambda \vdash \exDataclass{c}{\phi} \cons m : \Delta; \Lambda'
@@ -99,44 +99,44 @@
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \Lambda(c') = (M.c'(\vec{y}), c'') \\
+  \Lambda(c') = (q.c'(\vec{y}), c'') \\
   \decls(\phi) = \vec{x} \text{ distinct} \\
-  \vec{x} \cap \fields(M.c') = \varnothing \\
-  \Gamma; \Lambda, c : (M.c(\vec{x}), c') \vdash m : \Delta; \Lambda'
+  \vec{x} \cap \fields(q.c') = \varnothing \\
+  \Gamma; \Lambda, c : (q.c(\vec{x}), c') \vdash m : \Delta; \Lambda'
 }
 {
   \Gamma; \Lambda \vdash \exDataclassExtend{c}{c'}{\phi} \cons m : \Delta; \Lambda'
 }
 \end{mathpar}
-\subcaption{Body $m$ of module $M$ is well-formed in $\Gamma$ and $\Lambda$}
+\subcaption{Body $m$ of module $q$ is well-formed in $\Gamma$ and $\Lambda$}
 \end{subfigure}
 
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash_{\mathcal{M}} M$}
+\flushleft \shadebox{$\vdash_{\mathcal{q}} q$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{module}}]
 {
-  \Gamma_M^0; \varnothing \vdash \mathcal{M}(M) : \Delta; \Lambda \\
+  \Gamma_q^0; \varnothing \vdash \mathcal{q}(q) : \Delta; \Lambda \\
   G_{\Lambda} \text{ acyclic}
 }
 {
-  \vdash_{\mathcal{M}} M
+  \vdash_{\mathcal{q}} q
 }
 \end{mathpar}
 
-\flushleft \shadebox{$\vdash \langle E, \mathcal{M} \rangle$}
+\flushleft \shadebox{$\vdash \langle E, \mathcal{q} \rangle$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{program}}]
 {
-  \vdash_{\mathcal{M}} E \\
-  G_{\mathcal{M}} \text{ acyclic}
+  \vdash_{\mathcal{q}} E \\
+  G_{\mathcal{q}} \text{ acyclic}
 }
 {
-  \vdash \langle E, \mathcal{M} \rangle
+  \vdash \langle E, \mathcal{q} \rangle
 }
 \end{mathpar}
 \subcaption{Module and program well-formedness}
