@@ -256,10 +256,23 @@ def check_imports_R(s: ast.stmt, q_prime: str, names: list[str], ctx: Context) -
     body = ctx.M[q_prime].body
     if len(body) == 0:
         return
-    members = assigns_block(body) | {s.name for s in body if isinstance(s, ast.ClassDef)} | set(BUILTINS.keys()) | {'__name__'}
-    unknown = next((x for x in names if x not in members and f'{q_prime}.{x}' not in ctx.M), None)
+    members = module_members(body, ctx.M, q_prime)
+    unknown = next((x for x in names if x not in members), None)
     if unknown is not None:
         raise IllFormedModule(s, reasons.UnknownMember(unknown, q_prime))
+
+def module_members(body: list[ast.stmt], M: dict[str, ast.Module], q: str) -> set[str]:
+    submodules = {name[len(q) + 1:].split('.')[0] for name in M if name.startswith(f'{q}.')}
+    return assigns_block(body) | {s.name for s in body if isinstance(s, ast.ClassDef)} | set(BUILTINS.keys()) | {'__name__'} | submodules
+
+def resolve_module(e: ast.expr, ctx: Context) -> Optional[str]:
+    if isinstance(e, ast.Name):
+        return e.id if e.id in ctx.modules and e.id in ctx.M else None
+    if isinstance(e, ast.Attribute):
+        parent = resolve_module(e.value, ctx)
+        full = f'{parent}.{e.attr}' if parent is not None else None
+        return full if full is not None and full in ctx.M else None
+    return None
 
 def check_stmt(s: ast.stmt, ctx: Context) -> None:
     if isinstance(s, ast.Pass):
@@ -351,6 +364,12 @@ def check_expr(e: ast.expr, ctx: Context) -> None:
         check_expr(e.orelse, ctx)
         return
     if isinstance(e, ast.Attribute):
+        mod = resolve_module(e.value, ctx)
+        if mod is not None:
+            body = ctx.M[mod].body
+            if len(body) > 0 and e.attr not in module_members(body, ctx.M, mod):
+                raise IllFormedModule(e, reasons.UnknownMember(e.attr, mod))
+            return
         check_expr(e.value, ctx)
         return
     if isinstance(e, ast.Subscript):
