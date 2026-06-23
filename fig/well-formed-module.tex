@@ -60,7 +60,7 @@
   M' = x_1.x_2.\ldots.x_{n+1} \\
   M' \in \dom(\mathcal{M}) \\
   M' \neq M \\
-  \Gamma \setminus \set{x_1}; \Lambda, x_1 : M' \vdash m : \Delta; \Lambda'
+  \Gamma; \Lambda, x_1 : M' \vdash m : \Delta; \Lambda'
 }
 {
   \Gamma; \Lambda \vdash \exImport{M'} \cons m : \Delta; \Lambda'
@@ -71,7 +71,7 @@
   M' \in \dom(\mathcal{M}) \\
   M' \neq M \\
   \vec{x} \importsR_{M'} \Delta'; \Lambda'' \\
-  (\Gamma \setminus \Lambda'') \runion \Delta'; (\Lambda \setminus \Delta') \runion \Lambda'' \vdash m : \Delta; \Lambda'
+  \Gamma \runion \Delta'; \Lambda \runion \Lambda'' \vdash m : \Delta; \Lambda'
 }
 {
   \Gamma; \Lambda \vdash \exFromImport{M'}{\vec{x}} \cons m : \Delta' \runion \Delta; \Lambda'
@@ -80,7 +80,7 @@
 \inferrule*[lab={\ruleName{statement}}]
 {
   \Gamma; \Lambda \vdash s : \Assigns{\Delta} \\
-  \Gamma \runion \Delta; \Lambda \setminus \Delta \vdash m : \Delta'; \Lambda' \\
+  \Gamma \runion \Delta; \Lambda \vdash m : \Delta'; \Lambda' \\
   \capturesS(s) \cap \assignsS(m) = \varnothing
 }
 {
@@ -90,7 +90,7 @@
 \inferrule*[lab={\ruleName{class}}]
 {
   \decls(\phi) = \vec{x} \text{ distinct} \\
-  \Gamma; \Lambda \vdash m : \Delta; \Lambda'
+  \Gamma; \Lambda, C : (M.C(\vec{x}), \bot) \vdash m : \Delta; \Lambda'
 }
 {
   \Gamma; \Lambda \vdash \exDataclass{C}{\phi} \cons m : \Delta; \Lambda'
@@ -101,7 +101,7 @@
   \Lambda(B) = (M.B(\vec{y}), B') \\
   \decls(\phi) = \vec{x} \text{ distinct} \\
   \vec{x} \cap \fields(M.B) = \varnothing \\
-  \Gamma; \Lambda \vdash m : \Delta; \Lambda'
+  \Gamma; \Lambda, C : (M.C(\vec{x}), B) \vdash m : \Delta; \Lambda'
 }
 {
   \Gamma; \Lambda \vdash \exDataclassExtend{C}{B}{\phi} \cons m : \Delta; \Lambda'

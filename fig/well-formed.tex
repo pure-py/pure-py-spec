@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma \vdash b : R$}
+\flushleft \shadebox{$\Gamma; \Lambda \vdash b : R$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{pass}}]
@@ -7,41 +7,41 @@
   \strut
 }
 {
-  \Gamma \vdash \exPass : \Assigns{\varnothing}
+  \Gamma; \Lambda \vdash \exPass : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assign}}]
 {
-  \Gamma \vdash e \\
+  \Gamma; \Lambda \vdash e \\
   x \notin \capturesE(e)
 }
 {
-  \Gamma \vdash \exAssign{x}{e} : \Assigns{\set{x : \statusDefAssigned}}
+  \Gamma; \Lambda \vdash \exAssign{x}{e} : \Assigns{\set{x : \statusDefAssigned}}
 }
 \and
 \inferrule*[lab={\ruleName{expr-stmt}}]
 {
-  \Gamma \vdash e
+  \Gamma; \Lambda \vdash e
 }
 {
-  \Gamma \vdash e : \Assigns{\varnothing}
+  \Gamma; \Lambda \vdash e : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assert}}]
 {
-  \Gamma \vdash e
+  \Gamma; \Lambda \vdash e
 }
 {
-  \Gamma \vdash \exAssert{e} : \Assigns{\varnothing}
+  \Gamma; \Lambda \vdash \exAssert{e} : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assert-msg}}]
 {
-  \Gamma \vdash e \\
-  \Gamma \vdash e'
+  \Gamma; \Lambda \vdash e \\
+  \Gamma; \Lambda \vdash e'
 }
 {
-  \Gamma \vdash \exAssertMsg{e}{e'} : \Assigns{\varnothing}
+  \Gamma; \Lambda \vdash \exAssertMsg{e}{e'} : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{return-none}}]
@@ -49,81 +49,81 @@
   \strut
 }
 {
-  \Gamma \vdash \exReturnNone : \Returns
+  \Gamma; \Lambda \vdash \exReturnNone : \Returns
 }
 \and
 \inferrule*[lab={\ruleName{return}}]
 {
-  \Gamma \vdash e
+  \Gamma; \Lambda \vdash e
 }
 {
-  \Gamma \vdash \exReturn{e} : \Returns
+  \Gamma; \Lambda \vdash \exReturn{e} : \Returns
 }
 \and
 \inferrule*[lab={\ruleName{if}}]
 {
-  \Gamma \vdash e_i \quad (\forall i) \\
-  \Gamma \vdash b_i : R_i \quad (\forall i)
+  \Gamma; \Lambda \vdash e_i \quad (\forall i) \\
+  \Gamma; \Lambda \vdash b_i : R_i \quad (\forall i)
 }
 {
-  \Gamma \vdash \exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}} : R_1 \merge \ldots R_{n + 1} \merge \ldots \merge \Assigns{\varnothing}
+  \Gamma; \Lambda \vdash \exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}} : R_1 \merge \ldots R_{n + 1} \merge \ldots \merge \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{if-else}}]
 {
-  \Gamma \vdash e_i \quad (\forall i) \\
-  \Gamma \vdash b_i : R_i \quad (\forall i)
+  \Gamma; \Lambda \vdash e_i \quad (\forall i) \\
+  \Gamma; \Lambda \vdash b_i : R_i \quad (\forall i)
 }
 {
-  \Gamma \vdash \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
+  \Gamma; \Lambda \vdash \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
 }
 \and
 \inferrule*[lab={\ruleName{mutual}}]
 {
   \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_{i}) \runion
-  \statusNotDefAssigned(\assignsS(b_i) \setminus \seq{x}_i) \vdash b_i : R_i
+  \statusNotDefAssigned(\assignsS(b_i) \setminus \seq{x}_i); \Lambda \vdash b_i : R_i
   \quad (\forall i)
   \\
   f_1, \ldots, f_{n+1} \text{ distinct}
 }
 {
-  \Gamma \vdash \exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}} : \Assigns{\statusDefAssigned(\seq{f})}
+  \Gamma; \Lambda \vdash \exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}} : \Assigns{\statusDefAssigned(\seq{f})}
 }
 \and
 \inferrule*[lab={\ruleName{match}}]
 {
-  \Gamma \vdash e \\
-  \Gamma \runion \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
+  \Gamma; \Lambda \vdash e \\
+  \Gamma \runion \statusDefAssigned(\binds(p_i)); \Lambda \vdash b_i : R_i \quad (\forall i) \\
   S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \runion R_i \quad (\forall i) \\
-  \vdash p_1 \cons \ldots \cons p_{n+1} \\
+  \Lambda \vdash p_1 \cons \ldots \cons p_{n+1} \\
   p_{n+1} \in \set{x, \patWild}
 }
 {
-  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : S_1 \merge \ldots \merge S_{n+1}
+  \Gamma; \Lambda \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : S_1 \merge \ldots \merge S_{n+1}
 }
 \and
 \inferrule*[lab={\ruleName{match-partial}}]
 {
-  \Gamma \vdash e \\
-  \Gamma \runion \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
+  \Gamma; \Lambda \vdash e \\
+  \Gamma \runion \statusDefAssigned(\binds(p_i)); \Lambda \vdash b_i : R_i \quad (\forall i) \\
   S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \runion R_i \quad (\forall i) \\
-  \vdash p_1 \cons \ldots \cons p_{n+1} \\
+  \Lambda \vdash p_1 \cons \ldots \cons p_{n+1} \\
   p_{n+1} \notin \set{x, \patWild}
 }
 {
-  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : S_1 \merge \ldots \merge S_{n+1} \merge \Assigns{\varnothing}
+  \Gamma; \Lambda \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : S_1 \merge \ldots \merge S_{n+1} \merge \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{cons}}]
 {
-  \Gamma \vdash s : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash b : R \\
+  \Gamma; \Lambda \vdash s : \Assigns{\Delta} \\
+  \Gamma \runion \Delta; \Lambda \vdash b : R \\
   \capturesS(s) \cap \assignsS(b) = \varnothing
 }
 {
-  \Gamma \vdash s \cons b : \Assigns{\Delta} \runion R
+  \Gamma; \Lambda \vdash s \cons b : \Assigns{\Delta} \runion R
 }
 \end{mathpar}
-\caption{Block $b$ of module $M$ is well-formed in $\Gamma$}
+\caption{Block $b$ is well-formed in $\Gamma$ and $\Lambda$}
 \label{fig:well-formed}
 \end{figure}

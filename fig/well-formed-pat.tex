@@ -1,60 +1,60 @@
 \begin{figure}
-\flushleft \shadebox{$\vdash p_1 \cons \ldots \cons p_n$}
+\flushleft \shadebox{$\Lambda \vdash p_1 \cons \ldots \cons p_n$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{pat-lit}}]
 { \strut }
-{ \vdash \ell }
+{ \Lambda \vdash \ell }
 \and
 \inferrule*[lab={\ruleName{pat-neg-lit}}]
 { \strut }
-{ \vdash -n }
+{ \Lambda \vdash -n }
 \and
 \inferrule*[lab={\ruleName{pat-var}}]
 { \strut }
-{ \vdash x }
+{ \Lambda \vdash x }
 \and
 \inferrule*[lab={\ruleName{pat-wild}}]
 { \strut }
-{ \vdash \patWild }
+{ \Lambda \vdash \patWild }
 \and
 \inferrule*[lab={\ruleName{pat-list}}]
-{ \vdash p_i \quad (\forall i) }
-{ \vdash \patList{p_1, \ldots, p_n} }
+{ \Lambda \vdash p_i \quad (\forall i) }
+{ \Lambda \vdash \patList{p_1, \ldots, p_n} }
 \and
 \inferrule*[lab={\ruleName{pat-tuple}}]
-{ \vdash p_i \quad (\forall i) }
-{ \vdash \patTuple{p_1, \ldots, p_n} }
+{ \Lambda \vdash p_i \quad (\forall i) }
+{ \Lambda \vdash \patTuple{p_1, \ldots, p_n} }
 \and
 \inferrule*[lab={\ruleName{pat-as}}]
-{ \vdash p }
-{ \vdash p\;\pyinline{as}\;x }
+{ \Lambda \vdash p }
+{ \Lambda \vdash p\;\pyinline{as}\;x }
 \and
 \inferrule*[lab={\ruleName{pat-class}}]
 {
-  \fields(M.C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m} \\
+  \Lambda \vdash Q \names D(x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}) \\
   \set{y_1, \ldots, y_m} = \set{x_{n+1}, \ldots, x_{n+m}} \\
-  \vdash p_i \quad (\forall i)
+  \Lambda \vdash p_i \quad (\forall i)
 }
 {
-  \vdash \patClass{C}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}}
+  \Lambda \vdash \patClass{Q}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}}
 }
 \and
 \inferrule*[lab={\ruleName{cases-nil}}]
 { \strut }
-{ \vdash \varepsilon }
+{ \Lambda \vdash \varepsilon }
 \and
 \inferrule*[lab={\ruleName{cases-cons}}]
 {
-  \vdash p_1 \\
-  \vdash p_2 \cons \ldots \cons p_n \\
+  \Lambda \vdash p_1 \\
+  \Lambda \vdash p_2 \cons \ldots \cons p_n \\
   \text{variables in } p_1 \text{ distinct} \\
   p_i \not\subsumed p_1 \quad (\forall i.\, 2 \le i \le n)
 }
 {
-  \vdash p_1 \cons p_2 \cons \ldots \cons p_n
+  \Lambda \vdash p_1 \cons p_2 \cons \ldots \cons p_n
 }
 \end{mathpar}
-\caption{Case patterns of module $M$ are well-formed}
+\caption{Case patterns are well-formed under $\Lambda$}
 \label{fig:well-formed-pat}
 \end{figure}

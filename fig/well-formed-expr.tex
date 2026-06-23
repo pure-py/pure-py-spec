@@ -1,50 +1,50 @@
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$Q \names T$}
+\flushleft \shadebox{$\Lambda \vdash Q \names T$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{simple-module}}]
 {
-  x : M' \in \Lambda_M
+  x : M' \in \Lambda
 }
 {
-  x \names M'
+  \Lambda \vdash x \names M'
 }
 \and
 \inferrule*[lab={\ruleName{simple-class}}]
 {
-  C : (D(x_1, \ldots, x_n), B) \in \Lambda_M
+  C : (D(x_1, \ldots, x_n), B) \in \Lambda
 }
 {
-  C \names D(x_1, \ldots, x_n)
+  \Lambda \vdash C \names D(x_1, \ldots, x_n)
 }
 \and
 \inferrule*[lab={\ruleName{qualified-module}}]
 {
-  Q \names M' \\
+  \Lambda \vdash Q \names M' \\
   M'.x \in \dom(\mathcal{M})
 }
 {
-  Q.x \names M'.x
+  \Lambda \vdash Q.x \names M'.x
 }
 \and
 \inferrule*[lab={\ruleName{qualified-class}}]
 {
-  Q \names M' \\
-  C \in \classes(\mathcal{M}(M')) \\
+  \Lambda \vdash Q \names M' \\
+  \Lambda_{M'}(C) = (M'.C(\vec{y}), B) \\
   \fields(M'.C) = x_1, \ldots, x_n
 }
 {
-  Q.C \names M'.C(x_1, \ldots, x_n)
+  \Lambda \vdash Q.C \names M'.C(x_1, \ldots, x_n)
 }
 \end{mathpar}
-\subcaption{Name $Q$ in module $M$ resolves to $T$}
+\subcaption{Name $Q$ resolves to $T$ under $\Lambda$}
 \end{subfigure}
 
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\wf{\Gamma}{e}$}
+\flushleft \shadebox{$\Gamma; \Lambda \vdash e$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{var}}]
@@ -52,45 +52,45 @@
   \Gamma(x) = \statusDefAssigned
 }
 {
-  \wf{\Gamma}{x}
+  \Gamma; \Lambda \vdash x
 }
 \and
 \inferrule*[lab={\ruleName{lambda}}]
 {
-  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned \vdash e
+  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned; \Lambda \vdash e
 }
 {
-  \wf{\Gamma}{\exLambda{x_1, \ldots, x_n}{e}}
+  \Gamma; \Lambda \vdash \exLambda{x_1, \ldots, x_n}{e}
 }
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
-  Q \names D(x_1, \ldots, x_n) \\
-  \wf{\Gamma}{e_i} \quad (\forall i)
+  \Lambda \vdash Q \names D(x_1, \ldots, x_n) \\
+  \Gamma; \Lambda \vdash e_i \quad (\forall i)
 }
 {
-  \wf{\Gamma}{\exConstruct{Q}{e_1, \ldots, e_n}}
+  \Gamma; \Lambda \vdash \exConstruct{Q}{e_1, \ldots, e_n}
 }
 \and
 \inferrule*[lab={\ruleName{attr-module}}]
 {
-  e \names M' \\
+  \Lambda \vdash e \names M' \\
   y \in \vars(\mathcal{M}(M'))
 }
 {
-  \wf{\Gamma}{e.y}
+  \Gamma; \Lambda \vdash e.y
 }
 \and
 \inferrule*[lab={\ruleName{attr-object}}]
 {
-  \wf{\Gamma}{e}
+  \Gamma; \Lambda \vdash e
 }
 {
-  \wf{\Gamma}{e.y}
+  \Gamma; \Lambda \vdash e.y
 }
 \end{mathpar}
-\subcaption{Expression $e$ of module $M$ is well-formed in $\Gamma$}
+\subcaption{Expression $e$ is well-formed under $\Gamma$ and $\Lambda$}
 \end{subfigure}
-\caption{Expressions in module $M$}
+\caption{Expression well-formedness}
 \label{fig:well-formed-expr}
 \end{figure}

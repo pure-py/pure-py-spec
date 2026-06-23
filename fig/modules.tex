@@ -23,10 +23,6 @@
 \centering
 \small
 \begin{align*}
-\classes_M(\exDataclass{C}{\phi}) &= \set{C \mapsto (M.C(\decls(\phi)), \bot)} \\
-\classes_M(\exDataclassExtend{C}{B}{\phi}) &= \set{C \mapsto (M.C(\decls(\phi)), B)} \\
-\classes_M(s) &= \varnothing \quad \text{otherwise} \\
-\\
 \decls(\exField{x_1} \;\ldots\; \exField{x_{n+1}}) &= x_1, \ldots, x_{n+1} \\
 \decls(\pyinline{pass}) &= \varepsilon \\
 \\
@@ -35,7 +31,7 @@
   \fields(M.B) \mathbin{\cdot} \vec{x} & \text{if } \Lambda_M(C) = (D(\vec{x}), B)
 \end{cases}
 \end{align*}
-\subcaption{$\classes$ and $\fields$ metafunctions}
+\subcaption{$\decls$ and $\fields$ metafunctions}
 \end{subfigure}
 
 \vspace{2mm}
@@ -46,8 +42,7 @@
 \small
 \inferrule*[lab={\ruleName{module}}]
 {
-  \Lambda = \classes_M(\mathcal{M}(M)) \\
-  \Gamma_M; \Lambda \vdash \mathcal{M}(M) : \Delta; \Lambda' \\
+  \Gamma_M; \varnothing \vdash \mathcal{M}(M) : \Delta; \Lambda \\
   G_{\Lambda} \text{ acyclic}
 }
 {
