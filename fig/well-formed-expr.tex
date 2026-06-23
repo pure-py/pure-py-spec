@@ -1,4 +1,49 @@
 \begin{figure}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\vdash Q \names T$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{name-mod}}]
+{
+  x : M' \in \Lambda_M
+}
+{
+  \vdash x \names M'
+}
+\and
+\inferrule*[lab={\ruleName{name-cls}}]
+{
+  C : D(x_1, \ldots, x_n) \in \Lambda_M
+}
+{
+  \vdash C \names D(x_1, \ldots, x_n)
+}
+\and
+\inferrule*[lab={\ruleName{attr-mod}}]
+{
+  \vdash Q \names M' \\
+  M'.y \in \dom(\mathcal{M})
+}
+{
+  \vdash Q.y \names M'.y
+}
+\and
+\inferrule*[lab={\ruleName{attr-cls}}]
+{
+  \vdash Q \names M' \\
+  C \in \classes(\mathcal{M}(M')) \\
+  \fields(M'.C) = x_1, \ldots, x_n
+}
+{
+  \vdash Q.C \names M'.C(x_1, \ldots, x_n)
+}
+\end{mathpar}
+\subcaption{Name $Q$ in module $M$ resolves to $T$}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\wf{\Gamma}{e}$}
 \begin{mathpar}
 \small
@@ -20,13 +65,32 @@
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
-  \fields(M.C) = x_1, \ldots, x_n \\
+  \vdash Q \names D(x_1, \ldots, x_n) \\
   \wf{\Gamma}{e_i} \quad (\forall i)
 }
 {
-  \wf{\Gamma}{\exConstruct{C}{e_1, \ldots, e_n}}
+  \wf{\Gamma}{\exConstruct{Q}{e_1, \ldots, e_n}}
+}
+\and
+\inferrule*[lab={\ruleName{attr-mod}}]
+{
+  \vdash e \names M' \\
+  y \in \vars(\mathcal{M}(M'))
+}
+{
+  \wf{\Gamma}{e.y}
+}
+\and
+\inferrule*[lab={\ruleName{attr-dyn}}]
+{
+  \wf{\Gamma}{e}
+}
+{
+  \wf{\Gamma}{e.y}
 }
 \end{mathpar}
-\caption{Expression $e$ of module $M$ is well-formed in $\Gamma$}
+\subcaption{Expression $e$ of module $M$ is well-formed in $\Gamma$}
+\end{subfigure}
+\caption{Expressions in module $M$}
 \label{fig:well-formed-expr}
 \end{figure}

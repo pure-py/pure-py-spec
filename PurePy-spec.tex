@@ -260,7 +260,7 @@ which follow Python.
 \subsection{Class contexts}
 
 Class contexts $\Lambda$ are finite maps from class names to pairs $(\vec{x}, C)$, where $\vec{x}$ is a sequence of distinct
-field names (in declaration order) and $C$ names the base class (or $\bot$ for no base). Metavariables $C$ and $B$ range over class names.
+field names (in declaration order) and $C$ names the base class (or $\bot$ for no base). Metavariables $C$ and $B$ range over class names; $D$ ranges over \emph{fully-qualified class names} of the form $M.C$.
 The \emph{inheritance graph} $G_{\Lambda_M}$ of a class context has an edge $(C, B)$ iff $\Lambda_M(C) = (\vec{x}, B)$ for some $\vec{x}$.
 
 \subsection{Modules and entry point}

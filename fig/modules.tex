@@ -27,7 +27,7 @@
 \classes(\exDataclassExtend{C}{B}{\phi}) &= \set{C \mapsto (\decls(\phi), B)} \\
 \classes(s) &= \varnothing \quad \text{otherwise} \\
 \\
-\decls(\exField{x_1} \;\ldots\; \exField{x_{n+1}}) &= x_1 \ldots x_{n+1} \\
+\decls(\exField{x_1} \;\ldots\; \exField{x_{n+1}}) &= x_1, \ldots, x_{n+1} \\
 \decls(\pyinline{pass}) &= \varepsilon \\
 \\
 \fields(M.C) &= \begin{cases}
@@ -48,7 +48,8 @@
 {
   \Gamma_M \vdash_M \mathcal{M}(M) : \Delta \\
   \imports(\mathcal{M}(M)) \subseteq \dom(\mathcal{M}) \\
-  G_{\Lambda_M} \text{ acyclic}
+  G_{\Lambda_M} \text{ acyclic} \\
+  \dom(\Gamma_M \runion \Delta) \cap \dom(\Lambda_M) = \varnothing
 }
 {
   \vdash_{\mathcal{M}} M
