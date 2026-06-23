@@ -29,7 +29,7 @@ class Status(Enum):
 
 
 VarContext = dict[str, Status]           # Γ, Δ
-Item = Union[ast.stmt, list[ast.FunctionDef]]   # statement or grouped mutual region
+BlockElement = Union[ast.stmt, list[ast.FunctionDef]]   # statement or grouped mutual region
 
 
 @dataclass(frozen=True)
@@ -154,59 +154,59 @@ def result_type_of_block(block: list[ast.stmt]) -> ResultTy:
     return runion_results(result_type(block[0]), result_type_of_block(block[1:]))
 
 def check_block(block: list[ast.stmt], ctx: Context) -> Context:
-    return check_items(items_of_block(block), ctx)
+    return check_elements(elements_of_block(block), ctx)
 
-def check_items(items: list[Item], ctx: Context) -> Context:
+def check_elements(items: list[BlockElement], ctx: Context) -> Context:
     if len(items) == 0:
         return ctx
     head = items[0]
-    check_item(head, ctx)
+    check_element(head, ctx)
     if len(items) == 1:
         return next_ctx_after(head, ctx)
     tail = items[1:]
-    if isinstance(item_result_type(head), TyReturns):
+    if isinstance(block_element_result_type(head), TyReturns):
         first_unreachable = tail[0]
         node: ast.AST = first_unreachable[0] if isinstance(first_unreachable, list) else first_unreachable
         raise IllFormedModule(node, reasons.UnreachableStatement())
-    reassigned = captures_item(head) & assigns_items(tail)
+    reassigned = captures_element(head) & assigns_elements(tail)
     if reassigned:
         name = sorted(reassigned)[0]
         ra_node = find_first_reassigning(tail, reassigned)
         assert ra_node is not None
         raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
-    return check_items(tail, next_ctx_after(head, ctx))
+    return check_elements(tail, next_ctx_after(head, ctx))
 
-def next_ctx_after(head: Item, ctx: Context) -> Context:
-    head_result = item_result_type(head)
+def next_ctx_after(head: BlockElement, ctx: Context) -> Context:
+    head_result = block_element_result_type(head)
     delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
     next_ctx = extend_var(ctx, delta)
     if isinstance(head, ast.ClassDef):
         next_ctx = extend_cls(next_ctx, head.name, class_info_for(head))
     return next_ctx
 
-def item_result_type(item: Item) -> ResultTy:
+def block_element_result_type(item: BlockElement) -> ResultTy:
     if isinstance(item, list):
         return TyAssigns({d.name: Status.TT for d in item})
     return result_type(item)
 
-def items_of_block(block: list[ast.stmt]) -> list[Item]:
+def elements_of_block(block: list[ast.stmt]) -> list[BlockElement]:
     if len(block) == 0:
         return []
     head = block[0]
     rest = block[1:]
     if isinstance(head, ast.FunctionDef):
         return extend_region([head], rest)
-    return [head] + items_of_block(rest)
+    return [head] + elements_of_block(rest)
 
-def extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[Item]:
+def extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[BlockElement]:
     if len(rest) == 0:
         return [region]
     head = rest[0]
     if isinstance(head, ast.FunctionDef):
         return extend_region(region + [head], rest[1:])
-    return [region] + items_of_block(rest)
+    return [region] + elements_of_block(rest)
 
-def check_item(item: Item, ctx: Context) -> None:
+def check_element(item: BlockElement, ctx: Context) -> None:
     if isinstance(item, list):
         check_mutual_region(item, ctx)
     else:
@@ -335,10 +335,11 @@ def check_expr(e: ast.expr, ctx: Context) -> None:
         check_expr(e.body, extend_var(ctx, {p: Status.TT for p in params}))
         return
     if isinstance(e, ast.Call):
-        if isinstance(e.func, ast.Name) and e.func.id in ctx.cls:
-            arity = len(fields_of(ctx.cls, e.func.id))
-            if len(e.args) != arity:
-                raise IllFormedModule(e, reasons.ConstructorArityMismatch(e.func.id, arity, len(e.args)))
+        sig = resolve_class(e.func, ctx)
+        if sig is not None:
+            c_name, fields = sig
+            if len(e.args) != len(fields):
+                raise IllFormedModule(e, reasons.ConstructorArityMismatch(c_name, len(fields), len(e.args)))
             check_exprs(e.args, ctx)
             return
         check_expr(e.func, ctx)
@@ -453,25 +454,25 @@ def qualified_name(e: ast.expr) -> str:
     assert isinstance(e, ast.Attribute)
     return qualified_name(e.value) + '.' + e.attr
 
-def resolve_class_head(head: ast.expr, ctx: Context, node: ast.AST) -> tuple[str, ClassContext]:
-    if isinstance(head, ast.Name):
-        if head.id not in ctx.cls:
-            raise IllFormedModule(node, reasons.UnknownClassInPattern(head.id))
-        return head.id, ctx.cls
-    assert isinstance(head, ast.Attribute)
-    full = qualified_name(head)
-    mod_path = qualified_name(head.value)
-    if mod_path.split('.')[0] not in ctx.modules or mod_path not in ctx.M:
-        raise IllFormedModule(node, reasons.UnknownClassInPattern(full))
-    mod_cls = check_module(ctx.M[mod_path], ctx.M)
-    if head.attr not in mod_cls:
-        raise IllFormedModule(node, reasons.UnknownClassInPattern(full))
-    return head.attr, mod_cls
+def resolve_class(head: ast.expr, ctx: Context) -> Optional[tuple[str, tuple[str, ...]]]:
+    if isinstance(head, ast.Name) and head.id in ctx.cls:
+        return head.id, fields_of(ctx.cls, head.id)
+    if isinstance(head, ast.Attribute) and isinstance(head.value, (ast.Name, ast.Attribute)):
+        mod_path = qualified_name(head.value)
+        if mod_path.split('.')[0] not in ctx.modules or mod_path not in ctx.M:
+            return None
+        mod_cls = check_module(ctx.M[mod_path], ctx.M, mod_path)
+        if head.attr not in mod_cls:
+            return None
+        return head.attr, fields_of(mod_cls, head.attr)
+    return None
 
 def check_pattern_wf(p: ast.pattern, ctx: Context) -> None:
     if isinstance(p, ast.MatchClass):
-        c_name, c_lambda = resolve_class_head(p.cls, ctx, p)
-        fields = fields_of(c_lambda, c_name)
+        sig = resolve_class(p.cls, ctx)
+        if sig is None:
+            raise IllFormedModule(p, reasons.UnknownClassInPattern(qualified_name(p.cls) if isinstance(p.cls, (ast.Name, ast.Attribute)) else ast.unparse(p.cls)))
+        c_name, fields = sig
         n, m = len(p.patterns), len(p.kwd_patterns)
         if n + m != len(fields):
             raise IllFormedModule(p, reasons.PatternArityMismatch(c_name, len(fields), n + m))
@@ -710,25 +711,25 @@ def captures_region_bodies(defs: list[ast.FunctionDef]) -> set[str]:
     own = fv_block(d.body) - params - assigns_block(d.body)
     return own | captures_region_bodies(defs[1:])
 
-def captures_item(item: Item) -> set[str]:
+def captures_element(item: BlockElement) -> set[str]:
     if isinstance(item, list):
         return captures_region(item)
     return captures_stmt(item)
 
-def assigns_item(item: Item) -> set[str]:
+def assigns_element(item: BlockElement) -> set[str]:
     if isinstance(item, list):
         return {d.name for d in item}
     return assigns_stmt(item)
 
-def assigns_items(items: list[Item]) -> set[str]:
+def assigns_elements(items: list[BlockElement]) -> set[str]:
     if len(items) == 0:
         return set()
-    return assigns_item(items[0]) | assigns_items(items[1:])
+    return assigns_element(items[0]) | assigns_elements(items[1:])
 
-def find_first_reassigning(items: list[Item], names: set[str]) -> Optional[ast.AST]:
+def find_first_reassigning(items: list[BlockElement], names: set[str]) -> Optional[ast.AST]:
     if len(items) == 0:
         return None
-    if assigns_item(items[0]) & names:
+    if assigns_element(items[0]) & names:
         return items[0][0] if isinstance(items[0], list) else items[0]
     return find_first_reassigning(items[1:], names)
 
