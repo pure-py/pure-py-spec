@@ -13,11 +13,11 @@
 \and
 \inferrule*[lab={\ruleName{simple-class}}]
 {
-  c : (d(\vec{y}), c') \in \Gamma \\
-  \fields(d) = \vec{x}
+  c : (q', \vec{y}, c') \in \Gamma \\
+  \fields(q'.c) = \vec{x}
 }
 {
-  \Gamma \vdash c \names d(\vec{x})
+  \Gamma \vdash c \names q'.c(\vec{x})
 }
 \and
 \inferrule*[lab={\ruleName{qualified-module}}]
@@ -32,7 +32,7 @@
 \inferrule*[lab={\ruleName{qualified-class}}]
 {
   \Gamma \vdash q \names q' \\
-  \Gamma_{q'}(c) = (q'.c(\vec{y}), c'') \\
+  \Gamma_{q'}(c) = (q', \vec{y}, c'') \\
   \fields(q'.c) = \vec{x}
 }
 {
