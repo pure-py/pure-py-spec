@@ -3,6 +3,6 @@ v = 1
 match v:
     case 1:
         import sys
-        print(sys.platform != "")
+        print(sys.argv != "")
     case _:
         print("other")

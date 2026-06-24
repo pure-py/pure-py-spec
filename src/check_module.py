@@ -8,7 +8,7 @@ import reasons
 from reasons import Reason
 
 class IllFormed(Exception):
-    exit_code: int   # overridden by subclass
+    exit_code: int
     msg: str
 
 
@@ -28,11 +28,12 @@ class Status(Enum):
     FF = auto()
 
 
-BlockElement = Union[ast.stmt, list[ast.FunctionDef]]   # statement or grouped mutual region
+BlockElement = Union[ast.stmt, list[ast.FunctionDef]]
 
 
 @dataclass(frozen=True)
 class ClassEntry:
+    module: str
     fields: tuple[str, ...]
     base: Optional[str]
 
@@ -43,8 +44,8 @@ class ModuleRef:
 
 
 ContextEntry = Union[Status, ModuleRef, ClassEntry]
-VarContext = dict[str, Status]           # Δ (assignment context: var-only)
-ClassContext = dict[str, ClassEntry]     # syntactic subset of Γ for cross-module lookup
+VarContext = dict[str, Status]
+ClassContext = dict[str, ClassEntry]
 
 
 @dataclass(frozen=True)
@@ -60,9 +61,9 @@ def extend_gamma(ctx: 'Context', delta: dict[str, ContextEntry]) -> 'Context':
 def extend_var(ctx: 'Context', delta: VarContext) -> 'Context':
     return extend_gamma(ctx, dict(delta))
 
-def class_entry_for(node: ast.ClassDef) -> 'ClassEntry':
+def class_entry_for(node: ast.ClassDef, q: str) -> 'ClassEntry':
     base = node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
-    return ClassEntry(fields=tuple(class_field_names(node)), base=base)
+    return ClassEntry(module=q, fields=tuple(class_field_names(node)), base=base)
 
 def var_status(ctx: 'Context', x: str) -> Optional[Status]:
     v = ctx.gamma.get(x)
@@ -93,7 +94,8 @@ ResultTy = Union[TyReturns, TyAssigns]
 
 TY_RETURNS = TyReturns()
 TY_ASSIGNS = TyAssigns()
-BUILTINS: VarContext = {'print': Status.TT, 'type': Status.TT, 'range': Status.TT, 'len': Status.TT}
+BUILTINS: VarContext = {'print': Status.TT, 'len': Status.TT, 'range': Status.TT}
+PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
 
 def empty_context() -> VarContext:
     return {}
@@ -200,10 +202,14 @@ def next_ctx_after(head: BlockElement, ctx: Context) -> Context:
     delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
     next_ctx = extend_var(ctx, delta)
     if isinstance(head, ast.ClassDef):
-        next_ctx = extend_gamma(next_ctx, {head.name: class_entry_for(head)})
+        next_ctx = extend_gamma(next_ctx, {head.name: class_entry_for(head, ctx.q)})
     if isinstance(head, ast.Import):
         head_seg = head.names[0].name.split('.')[0]
         next_ctx = extend_gamma(next_ctx, {head_seg: ModuleRef(head_seg)})
+    if isinstance(head, ast.ImportFrom):
+        assert head.module is not None
+        bindings = imports(head, head.module, [a.name for a in head.names], ctx)
+        next_ctx = extend_gamma(next_ctx, bindings)
     return next_ctx
 
 def block_element_result_type(item: BlockElement) -> ResultTy:
@@ -270,14 +276,22 @@ def check_import(s: ast.stmt, q: str, ctx: Context) -> None:
         raise IllFormedModule(s, reasons.UnknownModule(q))
     check_module(ctx.M[q], ctx.M, q)
 
-def imports(s: ast.stmt, q: str, names: list[str], ctx: Context) -> None:
-    body = ctx.M[q].body
-    if len(body) == 0:
-        return
-    members = module_members(body, ctx.M, q)
-    unknown = next((x for x in names if x not in members), None)
-    if unknown is not None:
-        raise IllFormedModule(s, reasons.UnknownMember(unknown, q))
+def imports(s: ast.stmt, q: str, names: list[str], ctx: Context) -> dict[str, ContextEntry]:
+    if q in PREDEFINED_MODULES:
+        return {x: Status.TT for x in names}
+    classes = check_module(ctx.M[q], ctx.M, q)
+    members = module_members(ctx.M[q].body, ctx.M, q)
+    return {x: imported_entry(s, x, q, classes, members, ctx) for x in names}
+
+def imported_entry(s: ast.stmt, x: str, q: str, classes: ClassContext,
+                   members: set[str], ctx: Context) -> ContextEntry:
+    if x in classes:
+        return ClassEntry(module=q, fields=fields_of(classes, x), base=None)
+    if f'{q}.{x}' in ctx.M:
+        return ModuleRef(f'{q}.{x}')
+    if x in members:
+        return Status.TT
+    raise IllFormedModule(s, reasons.UnknownMember(x, q))
 
 def module_members(body: list[ast.stmt], M: dict[str, ast.Module], q: str) -> set[str]:
     submodules = {name[len(q) + 1:].split('.')[0] for name in M if name.startswith(f'{q}.')}
@@ -334,7 +348,7 @@ def check_stmt(s: ast.stmt, ctx: Context) -> None:
         check_match_cases(s.cases, ctx)
         return
     if isinstance(s, ast.ClassDef):
-        check_class_decl(s, gamma_classes(ctx))
+        check_class_decl(s, gamma_classes(ctx), ctx.q)
         return
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
@@ -386,8 +400,7 @@ def check_expr(e: ast.expr, ctx: Context) -> None:
     if isinstance(e, ast.Attribute):
         mod = names_module(e.value, ctx)
         if mod is not None:
-            body = ctx.M[mod].body
-            if len(body) > 0 and e.attr not in module_members(body, ctx.M, mod):
+            if mod not in PREDEFINED_MODULES and e.attr not in module_members(ctx.M[mod].body, ctx.M, mod):
                 raise IllFormedModule(e, reasons.UnknownMember(e.attr, mod))
             return
         check_expr(e.value, ctx)
@@ -755,8 +768,6 @@ def find_first_reassigning(items: list[BlockElement], names: set[str]) -> Option
     return find_first_reassigning(items[1:], names)
 
 def find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST | None:
-    """Return the first import statement appearing in a non-top-level context.
-    nested=True means stmts themselves are inside a non-top-level body."""
     for s in stmts:
         if nested and isinstance(s, (ast.Import, ast.ImportFrom)):
             return s
@@ -780,7 +791,6 @@ def class_field_names(node: ast.ClassDef) -> list[str]:
             if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)]
 
 def has_cycle(graph: dict[str, set[str]]) -> list[str]:
-    """DFS cycle detection. Returns a cycle (as a list of names) if one exists, else []."""
     WHITE, GRAY, BLACK = 0, 1, 2
     color: dict[str, int] = {n: WHITE for n in graph}
     stack: list[str] = []
@@ -813,7 +823,7 @@ def fields_of(lambda_m: ClassContext, c: str) -> tuple[str, ...]:
         return info.fields
     return fields_of(lambda_m, info.base) + info.fields
 
-def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> None:
+def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext, q: str) -> None:
     names = class_field_names(node)
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
@@ -822,7 +832,8 @@ def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext) -> None:
         return
     base = node.bases[0]
     assert isinstance(base, ast.Name)
-    if base.id not in lambda_m:
+    entry = lambda_m.get(base.id)
+    if entry is None or entry.module != q:
         raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
     clash = set(names) & set(fields_of(lambda_m, base.id))
     if len(clash) > 0:
@@ -854,9 +865,6 @@ def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> Optional[I
         return None
     except IllFormed as e:
         return e
-
-
-PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
 
 def check_file(filename: str) -> Optional[IllFormed]:
     source = open(filename).read()

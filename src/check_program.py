@@ -7,7 +7,6 @@ import parse
 from check_module import IllFormed, IllFormedModule, check_module, has_cycle
 
 
-# Modules the runtime provides if the user has no file of the same name.
 PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
 
 
@@ -19,7 +18,6 @@ class IllFormedProgram(IllFormed):
 
 
 def imports_of(tree: ast.Module) -> set[str]:
-    """Module names appearing in top-level (or any) import statements in the module."""
     result: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
@@ -36,8 +34,6 @@ def parents(name: str) -> set[str]:
 
 
 def resolve(name: str, base_dir: pathlib.Path) -> Optional[pathlib.Path]:
-    """Find the file backing module `name`: either `name.py` or `name/__init__.py`
-    (dots in `name` become directory separators)."""
     stem = name.replace('.', '/')
     for candidate in (base_dir / f"{stem}.py", base_dir / stem / "__init__.py"):
         if candidate.exists():
@@ -46,8 +42,6 @@ def resolve(name: str, base_dir: pathlib.Path) -> Optional[pathlib.Path]:
 
 
 def load(name: str, base_dir: pathlib.Path) -> ast.Module:
-    """Load and syntactically-check module `name`. Raises IllFormedProgram if
-    the file is missing, fails to parse, or violates the PurePy subset."""
     path = resolve(name, base_dir)
     if path is None:
         raise IllFormedProgram(f"module {name!r} not found under {base_dir}")
@@ -71,7 +65,7 @@ def check_program(entry_path: pathlib.Path) -> Optional[IllFormed]:
 def walk_program(entry_path: pathlib.Path) -> None:
     base_dir = entry_path.parent
     modules: dict[str, tuple[pathlib.Path, ast.Module]] = {}
-    imports_by_module: dict[str, set[str]] = {}  # cached imports_of(modules[name])
+    imports_by_module: dict[str, set[str]] = {}
     queue: list[str] = [entry_path.stem, *PREDEFINED_MODULES]
     while queue:
         name = queue.pop()
