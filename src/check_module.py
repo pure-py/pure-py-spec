@@ -63,7 +63,7 @@ def extend_var(ctx: 'Context', delta: VarContext) -> 'Context':
 
 def class_entry_for(node: ast.ClassDef, q: str) -> 'ClassEntry':
     base = node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
-    return ClassEntry(module=q, fields=tuple(class_field_names(node)), base=base)
+    return ClassEntry(module=q, fields=tuple(own_fields_of(node)), base=base)
 
 def var_status(ctx: 'Context', x: str) -> Optional[Status]:
     v = ctx.gamma.get(x)
@@ -799,7 +799,7 @@ def find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST |
                 return r
     return None
 
-def class_field_names(node: ast.ClassDef) -> list[str]:
+def own_fields_of(node: ast.ClassDef) -> list[str]:
     return [t.target.id for t in node.body
             if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)]
 
@@ -837,7 +837,7 @@ def fields_of(lambda_m: ClassContext, c: str) -> tuple[str, ...]:
     return fields_of(lambda_m, info.base) + info.fields
 
 def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext, q: str) -> None:
-    names = class_field_names(node)
+    names = own_fields_of(node)
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
         raise IllFormedModule(node, reasons.DuplicateFieldName(dup, node.name))
