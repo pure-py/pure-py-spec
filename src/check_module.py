@@ -95,7 +95,14 @@ ResultTy = Union[TyReturns, TyAssigns]
 TY_RETURNS = TyReturns()
 TY_ASSIGNS = TyAssigns()
 BUILTINS: VarContext = {'print': Status.TT, 'len': Status.TT, 'range': Status.TT}
-PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
+PREDEFINED_MEMBERS: dict[str, set[str]] = {
+    'builtins': set(BUILTINS),
+    'math': set(),
+    'sys': {'argv', 'exit'},
+    'typing': {'Any'},
+    'dataclasses': {'dataclass'},
+}
+PREDEFINED_MODULES = set(PREDEFINED_MEMBERS)
 
 def empty_context() -> VarContext:
     return {}
@@ -277,8 +284,6 @@ def check_import(s: ast.stmt, q: str, ctx: Context) -> None:
     check_module(ctx.M[q], ctx.M, q)
 
 def imports(s: ast.stmt, q: str, names: list[str], ctx: Context) -> dict[str, ContextEntry]:
-    if q in PREDEFINED_MODULES:
-        return {x: Status.TT for x in names}
     classes = check_module(ctx.M[q], ctx.M, q)
     members = module_members(ctx.M[q].body, ctx.M, q)
     return {x: imported_entry(s, x, q, classes, members, ctx) for x in names}
@@ -295,7 +300,9 @@ def imported_entry(s: ast.stmt, x: str, q: str, classes: ClassContext,
 
 def module_members(body: list[ast.stmt], M: dict[str, ast.Module], q: str) -> set[str]:
     submodules = {name[len(q) + 1:].split('.')[0] for name in M if name.startswith(f'{q}.')}
-    return assigns_block(body) | {s.name for s in body if isinstance(s, ast.ClassDef)} | set(BUILTINS.keys()) | {'__name__'} | submodules
+    own = PREDEFINED_MEMBERS[q] if q in PREDEFINED_MEMBERS else \
+        assigns_block(body) | {s.name for s in body if isinstance(s, ast.ClassDef)}
+    return own | set(BUILTINS.keys()) | {'__name__'} | submodules
 
 def names_module(e: ast.expr, ctx: Context) -> Optional[str]:
     if isinstance(e, ast.Name):
@@ -400,7 +407,7 @@ def check_expr(e: ast.expr, ctx: Context) -> None:
     if isinstance(e, ast.Attribute):
         mod = names_module(e.value, ctx)
         if mod is not None:
-            if mod not in PREDEFINED_MODULES and e.attr not in module_members(ctx.M[mod].body, ctx.M, mod):
+            if e.attr not in module_members(ctx.M[mod].body, ctx.M, mod):
                 raise IllFormedModule(e, reasons.UnknownMember(e.attr, mod))
             return
         check_expr(e.value, ctx)
