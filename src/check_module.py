@@ -94,15 +94,18 @@ ResultTy = Union[TyReturns, TyAssigns]
 
 TY_RETURNS = TyReturns()
 TY_ASSIGNS = TyAssigns()
-BUILTINS: VarContext = {'print': Status.TT, 'len': Status.TT, 'range': Status.TT}
 PREDEFINED_MEMBERS: dict[str, set[str]] = {
-    'builtins': set(BUILTINS),
+    'builtins': {'print', 'len', 'range'},
     'math': set(),
     'sys': {'argv', 'exit'},
     'typing': {'Any'},
     'dataclasses': {'dataclass'},
 }
 PREDEFINED_MODULES = set(PREDEFINED_MEMBERS)
+
+def gamma_zero() -> dict[str, ContextEntry]:
+    builtins: dict[str, ContextEntry] = {x: Status.TT for x in PREDEFINED_MEMBERS['builtins']}
+    return {**builtins, '__name__': Status.TT}
 
 def empty_context() -> VarContext:
     return {}
@@ -302,7 +305,7 @@ def module_members(body: list[ast.stmt], M: dict[str, ast.Module], q: str) -> se
     submodules = {name[len(q) + 1:].split('.')[0] for name in M if name.startswith(f'{q}.')}
     own = PREDEFINED_MEMBERS[q] if q in PREDEFINED_MEMBERS else \
         assigns_block(body) | {s.name for s in body if isinstance(s, ast.ClassDef)}
-    return own | set(BUILTINS.keys()) | {'__name__'} | submodules
+    return own | PREDEFINED_MEMBERS['builtins'] | {'__name__'} | submodules
 
 def names_module(e: ast.expr, ctx: Context) -> Optional[str]:
     if isinstance(e, ast.Name):
@@ -860,8 +863,7 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> ClassConte
     nested = find_nested_import(m.body)
     if nested is not None:
         raise IllFormedModule(nested, reasons.NestedImport())
-    gamma: dict[str, ContextEntry] = {**BUILTINS, '__name__': Status.TT}
-    final_ctx = check_block(m.body, Context(gamma=gamma, M=M, q=q))
+    final_ctx = check_block(m.body, Context(gamma=gamma_zero(), M=M, q=q))
     if isinstance(result_type_of_block(m.body), TyReturns):
         raise IllFormedModule(m.body[0], reasons.TopLevelReturn())
     return gamma_classes(final_ctx)
