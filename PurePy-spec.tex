@@ -160,7 +160,7 @@ A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the fo
 \end{itemize}
 \end{definition}
 
-\noindent Class entries cover both locally-declared and imported classes; module references arise from import statements. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}; $\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ \emph{not definitely assigned} (or, equivalently, degenerate types ``any'' and ``none'').
+\noindent Module references arise from import statements. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}; $\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ \emph{not definitely assigned} (or, equivalently, degenerate types ``any'' and ``none'').
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, x : \theta$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusDefAssigned(X)$ for the context $\set{x : \statusDefAssigned \mid x \in X}$; similarly $\statusNotDefAssigned(X)$.
 
 \paragraph{Context operations.}
