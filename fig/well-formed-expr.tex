@@ -58,10 +58,10 @@
 \and
 \inferrule*[lab={\ruleName{lambda}}]
 {
-  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned \vdash e
+  \Gamma \runion \statusDefAssigned(\seq{x}) \vdash e
 }
 {
-  \Gamma \vdash \exLambda{x_1, \ldots, x_n}{e}
+  \Gamma \vdash \exLambda{\seq{x}}{e}
 }
 \and
 \inferrule*[lab={\ruleName{constr}}]

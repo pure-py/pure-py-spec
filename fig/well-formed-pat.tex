@@ -19,12 +19,12 @@
 { \Gamma \vdash \patWild }
 \and
 \inferrule*[lab={\ruleName{pat-list}}]
-{ \Gamma \vdash p_i \quad (\forall i) }
-{ \Gamma \vdash \patList{p_1, \ldots, p_n} }
+{ \Gamma \vdash p \quad (\forall p \in \seq{p}) }
+{ \Gamma \vdash \patList{\seq{p}} }
 \and
 \inferrule*[lab={\ruleName{pat-tuple}}]
-{ \Gamma \vdash p_i \quad (\forall i) }
-{ \Gamma \vdash \patTuple{p_1, \ldots, p_n} }
+{ \Gamma \vdash p \quad (\forall p \in \seq{p}) }
+{ \Gamma \vdash \patTuple{\seq{p}} }
 \and
 \inferrule*[lab={\ruleName{pat-as}}]
 { \Gamma \vdash p }
