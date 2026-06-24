@@ -32,8 +32,8 @@
 \and
 \inferrule*[lab={\ruleName{pat-class}}]
 {
-  \Gamma \vdash q \names d(x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}) \\
-  \set{y_1, \ldots, y_m} = \set{x_{n+1}, \ldots, x_{n+m}} \\
+  \Gamma \vdash q \names d(\seq{x} \mathbin{\cdot} \seq{x}') \\
+  \set{\seq{y}} = \set{\seq{x}'} \\
   \Gamma \vdash p_i \quad (\forall i)
 }
 {
