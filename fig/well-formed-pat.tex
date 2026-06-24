@@ -47,12 +47,12 @@
 \inferrule*[lab={\ruleName{cases-cons}}]
 {
   \Gamma \vdash p_1 \\
-  \Gamma \vdash p_2 \cons \ldots \cons p_n \\
+  \Gamma \vdash \seq{p}' \\
   \text{variables in } p_1 \text{ distinct} \\
-  p_i \not\subsumed p_1 \quad (\forall i.\, 2 \le i \le n)
+  p \not\subsumed p_1 \quad (\forall p \in \seq{p}')
 }
 {
-  \Gamma \vdash p_1 \cons p_2 \cons \ldots \cons p_n
+  \Gamma \vdash p_1 \cons \seq{p}'
 }
 \end{mathpar}
 \caption{Case patterns are well-formed under $\Gamma$}
