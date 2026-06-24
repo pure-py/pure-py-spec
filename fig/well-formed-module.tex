@@ -90,7 +90,7 @@
 \and
 \inferrule*[lab={\ruleName{class}}]
 {
-  \decls(\phi) = \vec{x} \text{ distinct} \\
+  \ownFields(\phi) = \vec{x} \text{ distinct} \\
   \Gamma, c : (q, \vec{x}, \bot) \vdash m : \Delta
 }
 {
@@ -100,7 +100,7 @@
 \inferrule*[lab={\ruleName{class-extend}}]
 {
   \Gamma(c') = (q, \vec{y}, c'') \\
-  \decls(\phi) = \vec{x} \text{ distinct} \\
+  \ownFields(\phi) = \vec{x} \text{ distinct} \\
   \vec{x} \cap \fields(q.c') = \varnothing \\
   \Gamma, c : (q, \vec{x}, c') \vdash m : \Delta
 }

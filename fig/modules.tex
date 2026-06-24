@@ -23,15 +23,15 @@
 \centering
 \small
 \begin{align*}
-\decls(\exField{x_1} \;\ldots\; \exField{x_{n+1}}) &= x_1, \ldots, x_{n+1} \\
-\decls(\pyinline{pass}) &= \varepsilon \\
+\ownFields(\exField{x_1} \;\ldots\; \exField{x_{n+1}}) &= x_1, \ldots, x_{n+1} \\
+\ownFields(\pyinline{pass}) &= \varepsilon \\
 \\
 \fields(q.c) &= \begin{cases}
   \vec{x} & \text{if } \Gamma_q(c) = (q, \vec{x}, \bot) \\
   \fields(q.c') \mathbin{\cdot} \vec{x} & \text{if } \Gamma_q(c) = (q, \vec{x}, c')
 \end{cases}
 \end{align*}
-\subcaption{$\decls$ and $\fields$ metafunctions}
+\subcaption{$\ownFields$ and $\fields$ metafunctions}
 \end{subfigure}
 
 \caption{Module-related metafunctions}
