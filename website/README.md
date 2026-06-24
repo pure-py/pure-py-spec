@@ -3,9 +3,9 @@
 The PurePy project site, built with SvelteKit and `adapter-static` (deployed to GitHub Pages).
 
 ```
-npm install
-npm run dev      # local dev server
-npm run build    # static output in build/
+yarn install
+yarn dev      # local dev server
+yarn build    # static output in build/
 ```
 
 The logo is a placeholder wordmark (`PurePy` in the header / `static/favicon.svg`); drop in the real

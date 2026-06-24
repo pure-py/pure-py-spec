@@ -25,13 +25,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: yarn
+          cache-dependency-path: website/yarn.lock
       - name: Install and build
         working-directory: website
         env:
           BASE_PATH: /${{ github.event.repository.name }}
         run: |
-          npm ci
-          npm run build
+          yarn install --frozen-lockfile
+          yarn build
       - uses: actions/upload-pages-artifact@v3
         with:
           path: website/build
