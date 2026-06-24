@@ -267,14 +267,14 @@ names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined}
 \hline
 \textbf{Module} & \textbf{Defined names} \\
 \hline
-\textup{\pyinline{builtins}} & \pyinline{True}, \pyinline{False}, \pyinline{None}, \pyinline{int}, \pyinline{float}, \pyinline{str}, \pyinline{bool}, \pyinline{list}, \pyinline{tuple}, \pyinline{set}, \pyinline{dict}, \pyinline{abs}, \pyinline{round}, \pyinline{len}, \pyinline{min}, \pyinline{max}, \pyinline{sum}, \pyinline{all}, \pyinline{any}, \pyinline{sorted}, \pyinline{reversed}, \pyinline{range}, \pyinline{enumerate}, \pyinline{zip}, \pyinline{map}, \pyinline{filter}, \pyinline{type}, \pyinline{isinstance} \\
-\pyinline{math} & \pyinline{pi}, \pyinline{e}, \pyinline{sqrt}, \pyinline{sin}, \pyinline{cos}, \pyinline{tan}, \pyinline{log}, \pyinline{exp}, \pyinline{floor}, \pyinline{ceil} \\
-\pyinline{sys} & \pyinline{argv}, \pyinline{exit}, \pyinline{stdin}, \pyinline{stdout} \\
+\textup{\pyinline{builtins}} & \pyinline{print}, \pyinline{len}, \pyinline{range} \\
+\pyinline{math} & \textit{(members specified in a later revision)} \\
+\pyinline{sys} & \pyinline{argv}, \pyinline{exit} \\
 \pyinline{typing} & \pyinline{Any} \\
 \pyinline{dataclasses} & \pyinline{dataclass} \\
 \hline
 \end{tabular}
-\caption{Predefined modules guaranteed to be in $\mathcal{M}$}
+\caption{Predefined modules and their guaranteed members. An implementation may provide additional modules and members; portable programs rely only on those listed here.}
 \label{fig:predefined}
 \end{figure}
 

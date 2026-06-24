@@ -94,7 +94,7 @@
   \Gamma, c : (q.c(\vec{x}), \bot) \vdash m : \Delta
 }
 {
-  \Gamma \vdash \exDataclass{c}{\phi} \cons m : \Delta
+  \Gamma \vdash \exDataclass{c}{\phi} \cons m : \set{c : (q.c(\vec{x}), \bot)} \runion \Delta
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
@@ -105,7 +105,7 @@
   \Gamma, c : (q.c(\vec{x}), c') \vdash m : \Delta
 }
 {
-  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons m : \Delta
+  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons m : \set{c : (q.c(\vec{x}), c')} \runion \Delta
 }
 \end{mathpar}
 \subcaption{Body $m$ of module $q$ is well-formed in $\Gamma$}

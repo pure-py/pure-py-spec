@@ -13,7 +13,8 @@
 \and
 \inferrule*[lab={\ruleName{simple-class}}]
 {
-  c : (d(\vec{x}), c') \in \Gamma
+  c : (d(\vec{y}), c') \in \Gamma \\
+  \fields(d) = \vec{x}
 }
 {
   \Gamma \vdash c \names d(\vec{x})
