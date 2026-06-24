@@ -303,9 +303,13 @@ def imported_entry(s: ast.stmt, x: str, q: str, classes: ClassContext,
 
 def module_members(body: list[ast.stmt], M: dict[str, ast.Module], q: str) -> set[str]:
     submodules = {name[len(q) + 1:].split('.')[0] for name in M if name.startswith(f'{q}.')}
-    own = PREDEFINED_MEMBERS[q] if q in PREDEFINED_MEMBERS else \
-        assigns_block(body) | {s.name for s in body if isinstance(s, ast.ClassDef)}
-    return own | PREDEFINED_MEMBERS['builtins'] | {'__name__'} | submodules
+    return own_members(body, q) | PREDEFINED_MEMBERS['builtins'] | {'__name__'} | submodules
+
+def own_members(body: list[ast.stmt], q: str) -> set[str]:
+    if q in PREDEFINED_MEMBERS:
+        return PREDEFINED_MEMBERS[q]
+    aliases = {s.names[0].name.split('.')[0] for s in body if isinstance(s, ast.Import)}
+    return (assigns_block(body) - aliases) | {s.name for s in body if isinstance(s, ast.ClassDef)}
 
 def names_module(e: ast.expr, ctx: Context) -> Optional[str]:
     if isinstance(e, ast.Name):
