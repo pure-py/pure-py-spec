@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$q, \vec{x} \importsR \Delta$}
+\flushleft \shadebox{$q, \vec{x} \importsR \Gamma$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{imp-empty}}]
@@ -13,31 +13,31 @@
 \inferrule*[lab={\ruleName{imp-var}}]
 {
   x : a \in \Gamma_q \\
-  q, \vec{x} \importsR \Delta
+  q, \vec{x} \importsR \Gamma
 }
 {
-  q, x \cons \vec{x} \importsR \set{x : a} \runion \Delta
+  q, x \cons \vec{x} \importsR \set{x : a} \runion \Gamma
 }
 \and
 \inferrule*[lab={\ruleName{imp-class}}]
 {
   x : (d(\vec{y}), c') \in \Gamma_q \\
-  q, \vec{x} \importsR \Delta
+  q, \vec{x} \importsR \Gamma
 }
 {
-  q, x \cons \vec{x} \importsR \Delta \runion \set{x : (d(\vec{y}), c')}
+  q, x \cons \vec{x} \importsR \Gamma \runion \set{x : (d(\vec{y}), c')}
 }
 \and
 \inferrule*[lab={\ruleName{imp-module}}]
 {
   q.x \in \dom(\mathcal{M}) \\
-  q, \vec{x} \importsR \Delta
+  q, \vec{x} \importsR \Gamma
 }
 {
-  q, x \cons \vec{x} \importsR \Delta \runion \set{x : q.x}
+  q, x \cons \vec{x} \importsR \Gamma \runion \set{x : q.x}
 }
 \end{mathpar}
-\caption{Names $\vec{x}$ imported from module $q$ produce bindings $\Delta$}
+\caption{Names $\vec{x}$ imported from module $q$ produce bindings $\Gamma$}
 \label{fig:imports}
 \end{figure}
 
@@ -71,11 +71,11 @@
   q' \in \dom(\mathcal{M}) \\
   q' \neq q \\
   \vdash_{\mathcal{M}} q' \\
-  q', \vec{x} \importsR \Delta' \\
-  \Gamma \runion \Delta' \vdash m : \Delta
+  q', \vec{x} \importsR \Gamma' \\
+  \Gamma \runion \Gamma' \vdash m : \Delta
 }
 {
-  \Gamma \vdash \exFromImport{q'}{\vec{x}} \cons m : \Delta' \runion \Delta
+  \Gamma \vdash \exFromImport{q'}{\vec{x}} \cons m : \Gamma' \runion \Delta
 }
 \and
 \inferrule*[lab={\ruleName{statement}}]
