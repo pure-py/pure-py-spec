@@ -32,8 +32,8 @@
 \and
 \inferrule*[lab={\ruleName{pat-class}}]
 {
-  \Gamma \vdash q \names d(x_1, \ldots, x_n \mathbin{\cdot} \seq{x}') \\
-  \set{\seq{y}} = \set{\seq{x}'} \\
+  \Gamma \vdash q \names d(x_1, \ldots, x_n \mathbin{\cdot} \seq{x}\,') \\
+  \set{\seq{y}} = \set{\seq{x}\,'} \\
   \Gamma \vdash p_i \quad (\forall i)
 }
 {
@@ -47,12 +47,12 @@
 \inferrule*[lab={\ruleName{cases-cons}}]
 {
   \Gamma \vdash p_1 \\
-  \Gamma \vdash \seq{p}' \\
+  \Gamma \vdash \seq{p}\,' \\
   \text{variables in } p_1 \text{ distinct} \\
-  p \not\subsumed p_1 \quad (\forall p \in \seq{p}')
+  p \not\subsumed p_1 \quad (\forall p \in \seq{p}\,')
 }
 {
-  \Gamma \vdash p_1 \cons \seq{p}'
+  \Gamma \vdash p_1 \cons \seq{p}\,'
 }
 \end{mathpar}
 \caption{Case patterns are well-formed under $\Gamma$}
