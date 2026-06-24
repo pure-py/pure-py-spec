@@ -8,7 +8,7 @@
 
 <section id="top" class="hero">
 	<h1><img class="hero-logo" src={logo} alt="PurePy" /></h1>
-	<p class="tagline">A pure, functional subset of Python for scientific computing.</p>
+	<p class="tagline">A pure, functional subset of Python for scientific computing</p>
 	<p class="lede">
 		A versioned standard with a formal grammar, formal semantics, and a reference checker for a
 		side-effect-free subset of Python.
@@ -75,7 +75,10 @@
 		</div>
 		<div class="card">
 			<h3>Portable</h3>
-			<p>Python dialects are compliant by definition; research languages like Fluid and Fortl can be too.</p>
+			<p>
+				Python dialects are compliant by definition, checked on CPython, PyPy, and GraalPy.
+				Research languages like Fluid and Fortl can be too.
+			</p>
 		</div>
 		<div class="card">
 			<h3>For science</h3>

@@ -88,7 +88,7 @@ section {
 
 /* Hero */
 .hero {
-	text-align: center;
+	text-align: left;
 	padding-top: 4rem;
 	padding-bottom: 3rem;
 }
@@ -102,18 +102,18 @@ section {
 }
 .hero .tagline {
 	font-size: clamp(1.1rem, 3vw, 1.5rem);
-	margin: 0 auto 1rem;
+	margin: 0 0 1rem;
 	max-width: 34ch;
 }
 .hero .lede {
 	color: var(--muted);
 	max-width: 58ch;
-	margin: 0 auto 2rem;
+	margin: 0 0 2rem;
 }
 .cta {
 	display: flex;
 	gap: 0.75rem;
-	justify-content: center;
+	justify-content: flex-start;
 	flex-wrap: wrap;
 }
 
