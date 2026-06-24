@@ -350,7 +350,6 @@ def check_stmt(s: ast.stmt, ctx: Context) -> None:
             raise IllFormedModule(s, reasons.EmptyFromImport())
         assert s.module is not None
         check_import(s, s.module, ctx)
-        imports(s, s.module, [a.name for a in s.names], ctx)
         return
     if isinstance(s, ast.Match):
         check_expr(s.subject, ctx)
