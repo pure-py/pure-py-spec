@@ -1,12 +1,13 @@
 <script lang="ts">
 	import '$lib/styles.css';
 	import { headerLinks } from '$lib/config/nav';
+	import logo from '$lib/assets/image/logo.png';
 
 	let { children } = $props();
 </script>
 
 <header class="site-header">
-	<a class="brand" href="#top">Pure<span class="brand-accent">Py</span></a>
+	<a class="brand" href="#top"><img class="brand-logo" src={logo} alt="PurePy" /></a>
 	<nav class="site-nav">
 		{#each headerLinks as { url, title } (url)}
 			<a href={url}>{title}</a>

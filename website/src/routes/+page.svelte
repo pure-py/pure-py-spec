@@ -1,9 +1,13 @@
+<script lang="ts">
+	import logo from '$lib/assets/image/logo.png';
+</script>
+
 <svelte:head>
 	<title>PurePy — a pure, functional subset of Python</title>
 </svelte:head>
 
 <section id="top" class="hero">
-	<h1>Pure<span class="brand-accent">Py</span></h1>
+	<h1><img class="hero-logo" src={logo} alt="PurePy" /></h1>
 	<p class="tagline">A pure, functional subset of Python — for science.</p>
 	<p class="lede">
 		A versioned standard — grammar, formal semantics, and a reference checker — for a
