@@ -3,15 +3,15 @@
 </script>
 
 <svelte:head>
-	<title>PurePy — a pure, functional subset of Python</title>
+	<title>PurePy: a pure, functional subset of Python</title>
 </svelte:head>
 
 <section id="top" class="hero">
 	<h1><img class="hero-logo" src={logo} alt="PurePy" /></h1>
-	<p class="tagline">A pure, functional subset of Python — for science.</p>
+	<p class="tagline">A pure, functional subset of Python for scientific computing.</p>
 	<p class="lede">
-		A versioned standard — grammar, formal semantics, and a reference checker — for a
-		side-effect-free Python you can reason about, and run on any PurePy-compliant implementation.
+		A versioned standard with a formal grammar, formal semantics, and a reference checker for a
+		side-effect-free subset of Python.
 	</p>
 	<div class="cta">
 		<a class="button primary" href="https://github.com/pure-py/pure-py-spec/releases/latest"
@@ -24,35 +24,35 @@
 <section id="overview" class="prose">
 	<h2>Overview</h2>
 	<p>
-		PurePy defines a pure, side-effect-free subset of Python, aimed initially at researchers in
-		programming languages and pedagogy, and intended to grow into a common language for scientific
-		computing — efficient, portable applications in modelling, data processing, analysis and
-		visualisation.
+		PurePy defines a pure, side-effect-free subset of Python. It is aimed initially at researchers
+		in programming languages and pedagogy, and is intended to grow into a common language for
+		scientific computing, supporting portable applications in modelling, data processing, analysis,
+		and visualisation.
 	</p>
 	<p>
-		The standard defines a (versioned) formal grammar, a formal semantics, and a reference checker.
-		Every PurePy-compliant language must accept any valid PurePy program and behave in accordance
-		with the formal semantics — so the same program runs the same way everywhere.
+		The standard defines a versioned formal grammar, a formal semantics, and a reference checker.
+		Every compliant implementation accepts any valid PurePy program and behaves according to the
+		formal semantics.
 	</p>
 </section>
 
 <section class="code-sample">
-	<pre><code>from dataclasses import dataclass
-from typing import Any
+	<pre><code><span class="tok-kw">from</span> dataclasses <span class="tok-kw">import</span> dataclass
+<span class="tok-kw">from</span> typing <span class="tok-kw">import</span> <span class="tok-type">Any</span>
 
-@dataclass
-class Point:
-    x: Any
-    y: Any
+<span class="tok-decorator">@dataclass</span>
+<span class="tok-kw">class</span> <span class="tok-class">Point</span>:
+    x: <span class="tok-type">Any</span>
+    y: <span class="tok-type">Any</span>
 
-def describe(p):
-    match p:
-        case Point(0, 0):
-            return "origin"
-        case Point(x, y):
-            return "point"
+<span class="tok-kw">def</span> <span class="tok-fn">describe</span>(p):
+    <span class="tok-kw">match</span> p:
+        <span class="tok-kw">case</span> <span class="tok-class">Point</span>(<span class="tok-num">0</span>, <span class="tok-num">0</span>):
+            <span class="tok-kw">return</span> <span class="tok-str">"origin"</span>
+        <span class="tok-kw">case</span> <span class="tok-class">Point</span>(x, y):
+            <span class="tok-kw">return</span> <span class="tok-str">"point"</span>
 
-print(describe(Point(3, 4)))</code></pre>
+<span class="tok-builtin">print</span>(<span class="tok-fn">describe</span>(<span class="tok-class">Point</span>(<span class="tok-num">3</span>, <span class="tok-num">4</span>)))</code></pre>
 </section>
 
 <section id="features" class="features">
@@ -60,11 +60,14 @@ print(describe(Point(3, 4)))</code></pre>
 	<div class="grid">
 		<div class="card">
 			<h3>Pure &amp; functional</h3>
-			<p>No side effects: functions are referentially transparent and easy to reason about.</p>
+			<p>No side effects. Functions are referentially transparent.</p>
 		</div>
 		<div class="card">
 			<h3>Pythonic</h3>
-			<p>A strict subset — every valid PurePy program is valid Python.</p>
+			<p>
+				A strict subset of Python: every valid PurePy program is valid Python, and runs with
+				exactly the same runtime behaviour.
+			</p>
 		</div>
 		<div class="card">
 			<h3>Formally specified</h3>
@@ -72,15 +75,15 @@ print(describe(Point(3, 4)))</code></pre>
 		</div>
 		<div class="card">
 			<h3>Portable</h3>
-			<p>One standard, many compliant implementations — CPython, JAX, Fluid, and more.</p>
+			<p>Python dialects are compliant by definition; research languages like Fluid and Fortl can be too.</p>
 		</div>
 		<div class="card">
 			<h3>For science</h3>
-			<p>Designed for modelling, data processing, analysis and visualisation.</p>
+			<p>Reproducible, deterministic, and easy to reason about.</p>
 		</div>
 		<div class="card">
 			<h3>Checkable</h3>
-			<p>An executable reference checker decides membership of the subset.</p>
+			<p>A reference checker decides membership of the subset and flags use of unassigned variables.</p>
 		</div>
 	</div>
 </section>

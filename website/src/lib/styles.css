@@ -164,6 +164,26 @@ section {
 	line-height: 1.55;
 	margin: 0;
 }
+.code-sample .tok-kw {
+	color: #c678dd;
+}
+.code-sample .tok-str {
+	color: #98c379;
+}
+.code-sample .tok-num {
+	color: #d19a66;
+}
+.code-sample .tok-class,
+.code-sample .tok-type {
+	color: #e5c07b;
+}
+.code-sample .tok-fn,
+.code-sample .tok-builtin {
+	color: #61afef;
+}
+.code-sample .tok-decorator {
+	color: #56b6c2;
+}
 
 /* Features */
 .features .grid {
