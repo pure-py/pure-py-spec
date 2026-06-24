@@ -77,7 +77,7 @@
 			<h3>Portable</h3>
 			<p>
 				Python dialects are compliant by definition, checked on CPython, PyPy, and GraalPy.
-				Research languages like Fluid and Fortl can be too.
+				Research languages like <a href="https://f.luid.org">Fluid</a> and Fortl can be too.
 			</p>
 		</div>
 		<div class="card">
