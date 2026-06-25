@@ -63,37 +63,35 @@
 \small
 \inferrule*[lab={\ruleName{env-var}}]
 {
-  x : a \in \Gamma \\
   \vdash v
 }
 {
-  \Gamma \vdash \set{x \mapsto v}
+  \set{x : a} \vdash \set{x \mapsto v}
 }
 \and
 \inferrule*[lab={\ruleName{env-module}}]
 {
-  x : \modEntry{q} \in \Gamma \\
-  \Delta \vdash \rho'
+  \Delta \vdash \rho
 }
 {
-  \Gamma \vdash \set{x \mapsto \exObj[\Delta]{\bot}{\rho'}}
+  \set{x : \modEntry{q}} \vdash \set{x \mapsto \exObj[\Delta]{\bot}{\rho}}
 }
 \and
 \inferrule*[lab={\ruleName{env-class}}]
 {
-  x : \clsEntry{q}{\vec{y}}{c} \in \Gamma
+  \strut
 }
 {
-  \Gamma \vdash \set{x \mapsto \clsEntry{q}{\vec{y}}{c}}
+  \set{x : \clsEntry{q}{\vec{y}}{c}} \vdash \set{x \mapsto \clsEntry{q}{\vec{y}}{c}}
 }
 \and
 \inferrule*[lab={\ruleName{env-cons}}]
 {
   \Gamma \vdash \set{x \mapsto w} \\
-  \Gamma \vdash \rho
+  \Gamma' \vdash \rho
 }
 {
-  \Gamma \vdash \set{x \mapsto w} \runion \rho
+  \Gamma \runion \Gamma' \vdash \set{x \mapsto w} \runion \rho
 }
 \end{mathpar}
 \caption{Well-formed values and environments}
