@@ -6,7 +6,7 @@
 \dispatch(\rho, v, (\exCase{p}{b}) \cons \seq{c}) &= \dispatch(\rho, v, \seq{c}) && \text{if } \rho, p, v \notmatches
 \end{align*}
 
-\flushleft \shadebox{$\rho, b \Rightarrow r$}
+\flushleft \shadebox{$\Gamma, \rho, b \Rightarrow r$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-pass}}]
@@ -62,7 +62,7 @@
 \inferrule*[lab={\ruleName{eval-mutual}}]
 {
   d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
-  v_i = \exDefClosure{\rho}{\seq{d}}{i} \quad (\forall i)
+  v_i = \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} \quad (\forall i)
 }
 {
   \rho, \seq{d} \Rightarrow \assigns{\set{\seq{f} \mapsto \seq{v}}}
@@ -117,7 +117,7 @@
 \unwrap(\assigns{\rho}) &= \pyinline{None}
 \end{align*}
 
-\flushleft \shadebox{$\rho, e \Rightarrow v$}
+\flushleft \shadebox{$\Gamma, \rho, e \Rightarrow v$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-var}}]
@@ -133,7 +133,7 @@
   \strut
 }
 {
-  \rho, \exLambda{x_1, \ldots, x_n}{e} \Rightarrow \exClosure{\rho}{\vec{x}}{e}
+  \rho, \exLambda{x_1, \ldots, x_n}{e} \Rightarrow \exClosure[\Gamma]{\rho}{\vec{x}}{e}
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-lambda}}]
@@ -148,9 +148,9 @@
 \and
 \inferrule*[lab={\ruleName{eval-call-def}}]
 {
-  \rho, e \Rightarrow \exDefClosure{\rho'}{\seq{d}}{j} \\
+  \rho, e \Rightarrow \exDefClosure[\Gamma']{\rho'}{\seq{d}}{j} \\
   d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
-  v_i = \exDefClosure{\rho'}{\seq{d}}{i} \quad (\forall i) \\
+  v_i = \exDefClosure[\Gamma']{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \vec{e} \Rightarrow \vec{u} \\
   \rho' \runion \set{\seq{f} \mapsto \seq{v}} \runion \set{\seq{x}_j \mapsto \seq{u}}, b_j \Rightarrow r
 }
@@ -172,7 +172,7 @@
   \fields(\Gamma_q(c)) = x_1, \ldots, x_n
 }
 {
-  \rho, \exConstruct{c}{e_1, \ldots, e_n} \Rightarrow \exObj{q.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
+  \rho, \exConstruct{c}{e_1, \ldots, e_n} \Rightarrow \exObj[\Gamma]{q.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
 }
 \end{mathpar}
 \caption{Expression evaluation}

@@ -54,6 +54,14 @@
 {
   \vdash \exObj[\Gamma]{d}{\rho}
 }
+\and
+\inferrule*[lab={\ruleName{val-class}}]
+{
+  \strut
+}
+{
+  \vdash \clsEntry{q}{\vec{x}}{c}
+}
 \end{mathpar}
 
 \vspace{2mm}
@@ -87,11 +95,11 @@
 \and
 \inferrule*[lab={\ruleName{env-cons}}]
 {
-  \Gamma \vdash \set{x \mapsto w} \\
-  \Gamma' \vdash \rho
+  \set{x : \theta} \vdash \set{x \mapsto v} \\
+  \Gamma \vdash \rho
 }
 {
-  \Gamma \runion \Gamma' \vdash \set{x \mapsto w} \runion \rho
+  \set{x : \theta} \runion \Gamma \vdash \set{x \mapsto v} \runion \rho
 }
 \end{mathpar}
 \caption{Well-formed values and environments}
