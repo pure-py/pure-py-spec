@@ -148,9 +148,9 @@
 \and
 \inferrule*[lab={\ruleName{eval-call-def}}]
 {
-  \rho, e \Rightarrow \exDefClosure[\Gamma']{\rho'}{\seq{d}}{j} \\
+  \rho, e \Rightarrow \exDefClosure[\Delta]{\rho'}{\seq{d}}{j} \\
   d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
-  v_i = \exDefClosure[\Gamma']{\rho'}{\seq{d}}{i} \quad (\forall i) \\
+  v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \vec{e} \Rightarrow \vec{u} \\
   \rho' \runion \set{\seq{f} \mapsto \seq{v}} \runion \set{\seq{x}_j \mapsto \seq{u}}, b_j \Rightarrow r
 }
@@ -169,7 +169,8 @@
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i) \\
-  \fields(\Gamma(c)) = x_1, \ldots, x_n
+  \Gamma(c) = \clsEntry{q}{\vec{z}}{c'} \\
+  \fields(\clsEntry{q}{\vec{z}}{c'}) = x_1, \ldots, x_n
 }
 {
   \rho, \exConstruct{c}{e_1, \ldots, e_n} \Rightarrow \exObj[\Delta]{q.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
