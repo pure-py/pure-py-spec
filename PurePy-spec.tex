@@ -691,12 +691,12 @@ to their values.
 
 \input{fig/eval-modules}
 
-Block evaluation $\Gamma, \rho, b \Rightarrow r$ is given in \figref{eval}. Function definitions delimit the scope of
+Block evaluation $\rho, b \Rightarrow r$ is given in \figref{eval}. Function definitions delimit the scope of
 sequential-composition effects, so as black boxes functions are always pure.
 
 \input{fig/eval}
 
-Expression evaluation $\Gamma, \rho, e \Rightarrow v$ is given in \figref{eval-expr}. The pattern-matching judgement
+Expression evaluation $\rho, e \Rightarrow v$ is given in \figref{eval-expr}. The pattern-matching judgement
 $\rho, p, v \matches \rho'$ (\figref{match}) is a deterministic partial function; we write $\rho, p, v \notmatches$
 (with no right-hand side) for $\nexists \rho'.\, \rho, p, v \matches \rho'$, i.e.\ matching is undefined.
 

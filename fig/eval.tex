@@ -6,7 +6,7 @@
 \dispatch(\rho, v, (\exCase{p}{b}) \cons \seq{c}) &= \dispatch(\rho, v, \seq{c}) && \text{if } \rho, p, v \notmatches
 \end{align*}
 
-\flushleft \shadebox{$\Gamma, \rho, b \Rightarrow r$}
+\flushleft \shadebox{$\rho, b \Rightarrow r$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-pass}}]
@@ -106,7 +106,7 @@
   \rho, s \cons b \Rightarrow \assigns{\rho'} \runion r
 }
 \end{mathpar}
-\caption{Block evaluation}
+\caption{Block evaluation in an ambient context $\Gamma$ with $\Gamma \vdash \rho$}
 \label{fig:eval}
 \end{figure}
 
@@ -117,7 +117,7 @@
 \unwrap(\assigns{\rho}) &= \pyinline{None}
 \end{align*}
 
-\flushleft \shadebox{$\Gamma, \rho, e \Rightarrow v$}
+\flushleft \shadebox{$\rho, e \Rightarrow v$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-var}}]
@@ -175,7 +175,7 @@
   \rho, \exConstruct{c}{e_1, \ldots, e_n} \Rightarrow \exObj[\Gamma]{q.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
 }
 \end{mathpar}
-\caption{Expression evaluation}
+\caption{Expression evaluation in an ambient context $\Gamma$ with $\Gamma \vdash \rho$}
 \label{fig:eval-expr}
 \end{figure}
 
