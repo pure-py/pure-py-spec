@@ -1,9 +1,9 @@
 \begin{figure}
 \small
 \begin{align*}
-\dispatch(v, \varepsilon) &= (\varnothing, \exPass) \\
-\dispatch(v, (\exCase{p}{b}) \cons \seq{c}) &= (\rho, b) && \text{if } p, v \matches \rho \\
-\dispatch(v, (\exCase{p}{b}) \cons \seq{c}) &= \dispatch(v, \seq{c}) && \text{if } p, v \notmatches
+\dispatch(\rho, v, \varepsilon) &= (\varnothing, \exPass) \\
+\dispatch(\rho, v, (\exCase{p}{b}) \cons \seq{c}) &= (\rho_m, b) && \text{if } \rho \vdash p, v \matches \rho_m \\
+\dispatch(\rho, v, (\exCase{p}{b}) \cons \seq{c}) &= \dispatch(\rho, v, \seq{c}) && \text{if } \rho \vdash p, v \notmatches
 \end{align*}
 
 \flushleft \shadebox{$\rho, b \Rightarrow r$}
@@ -90,7 +90,7 @@
 \inferrule*[lab={\ruleName{eval-match}}]
 {
   \rho, e \Rightarrow v \\
-  \dispatch(v, \exCase{p_1}{b_1} \cons \ldots \cons \exCase{p_{n+1}}{b_{n+1}}) = (\rho', b) \\
+  \dispatch(\rho, v, \exCase{p_1}{b_1} \cons \ldots \cons \exCase{p_{n+1}}{b_{n+1}}) = (\rho', b) \\
   \rho \runion \rho', b \Rightarrow r
 }
 {
