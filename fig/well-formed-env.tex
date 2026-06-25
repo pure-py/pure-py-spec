@@ -1,10 +1,70 @@
 \begin{figure}
+\flushleft \shadebox{$\vdash v$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{val-lit}}]
+{
+  \strut
+}
+{
+  \vdash \ell
+}
+\and
+\inferrule*[lab={\ruleName{val-list}}]
+{
+  \vdash v_i \quad (\forall i)
+}
+{
+  \vdash \exList{v_1, \ldots, v_n}
+}
+\and
+\inferrule*[lab={\ruleName{val-tuple}}]
+{
+  \vdash v_i \quad (\forall i)
+}
+{
+  \vdash \exTuple{v_1, \ldots, v_n}
+}
+\and
+\inferrule*[lab={\ruleName{val-lambda}}]
+{
+  \Gamma \vdash \rho \\
+  \Gamma \runion \statusDefAssigned(\seq{x}) \vdash e
+}
+{
+  \vdash \exClosure[\Gamma]{\rho}{\seq{x}}{e}
+}
+\and
+\inferrule*[lab={\ruleName{val-def}}]
+{
+  \Gamma \vdash \rho \\
+  d_j = \exDef{f_j}{\vec{x}_j}{b_j} \quad (\forall j) \\
+  \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_j) \runion
+  \statusNotDefAssigned(\assignsS(b_j) \setminus \seq{x}_j) \vdash b_j : R_j \quad (\forall j) \\
+  \seq{f} \text{ distinct}
+}
+{
+  \vdash \exDefClosure[\Gamma]{\rho}{\seq{d}}{i}
+}
+\and
+\inferrule*[lab={\ruleName{val-obj}}]
+{
+  \Gamma \vdash \rho
+}
+{
+  \vdash \exObj[\Gamma]{d}{\rho}
+}
+\end{mathpar}
+
+\vspace{2mm}
+
 \flushleft \shadebox{$\Gamma \vdash \rho$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{env-var}}]
 {
-  x : a \in \Gamma
+  x : a \in \Gamma \\
+  \vdash v
 }
 {
   \Gamma \vdash \set{x \mapsto v}
@@ -12,29 +72,30 @@
 \and
 \inferrule*[lab={\ruleName{env-module}}]
 {
-  x : \modEntry{q} \in \Gamma
+  x : \modEntry{q} \in \Gamma \\
+  \Delta \vdash \rho'
 }
 {
-  \Gamma \vdash \set{x \mapsto \exObj{\bot}{\rho'}}
+  \Gamma \vdash \set{x \mapsto \exObj[\Delta]{\bot}{\rho'}}
 }
 \and
 \inferrule*[lab={\ruleName{env-class}}]
 {
-  x : \clsEntry{q}{\vec{y}}{c'} \in \Gamma
+  x : \clsEntry{q}{\vec{y}}{c} \in \Gamma
 }
 {
-  \Gamma \vdash \set{x \mapsto \clsEntry{q}{\vec{y}}{c'}}
+  \Gamma \vdash \set{x \mapsto \clsEntry{q}{\vec{y}}{c}}
 }
 \and
 \inferrule*[lab={\ruleName{env-cons}}]
 {
-  \Gamma \vdash \rho \\
-  \Gamma \vdash \rho'
+  \Gamma \vdash \set{x \mapsto w} \\
+  \Gamma \vdash \rho
 }
 {
-  \Gamma \vdash \rho \disjunion \rho'
+  \Gamma \vdash \set{x \mapsto w} \runion \rho
 }
 \end{mathpar}
-\caption{Well-formed environment}
+\caption{Well-formed values and environments}
 \label{fig:well-formed-env}
 \end{figure}

@@ -5,15 +5,17 @@
 $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exList{v_1, \ldots, v_n}$ & (List) \\
     & $\mid$ & $\exTuple{v_1, \ldots, v_n}$ & (Tuple) \\
-    & $\mid$ & $\exClosure{\rho}{\vec{x}}{e}$ & (LambdaClosure) \\
-    & $\mid$ & $\exDefClosure{\rho}{\seq{d}}{i}$ & (DefClosure) \\
-    & $\mid$ & $\exObj{d}{\rho}$ & (Object) \\
-    & $\mid$ & $\clsEntry{q}{\vec{x}}{c'}$ & (Class)
+    & $\mid$ & $\exClosure[\Gamma]{\rho}{\vec{x}}{e}$ & (LambdaClosure) \\
+    & $\mid$ & $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$ & (DefClosure) \\
+    & $\mid$ & $\exObj[\Gamma]{d}{\rho}$ & (Object)
    \\[3mm]
 $d$ & $::=$ & $q.c$ & (QualifiedClassName) \\
     & $\mid$ & $\bot$ & (Module)
    \\[3mm]
-$\rho$ & $::=$ & $\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}$ & (Environment)
+$w$ & $::=$ & $v$ & (Value) \\
+    & $\mid$ & $\clsEntry{q}{\vec{x}}{c'}$ & (class entry)
+   \\[3mm]
+$\rho$ & $::=$ & $\set{x_1 \mapsto w_1, \ldots, x_n \mapsto w_n}$ & (Environment)
    \\[3mm]
 $r$ & $::=$ & $\assigns{\rho}$ \\
   & $\mid$ & $\returns{v}$

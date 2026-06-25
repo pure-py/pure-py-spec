@@ -51,9 +51,9 @@
 \newcommand*{\exImport}[1]{\pyinline{import}\;#1}
 \newcommand*{\exFromImport}[2]{\pyinline{from}\;#1\;\pyinline{import}\;#2}
 \newcommand*{\exAssertMsg}[2]{\pyinline{assert}\;#1, #2}
-\newcommand*{\exClosure}[3]{\langle#1, #2, #3\rangle}
-\newcommand*{\exDefClosure}[3]{\langle#1, #2, #3\rangle}
-\newcommand*{\exObj}[2]{\mathsf{Obj}(#1, #2)}
+\newcommand*{\exClosure}[4][]{\langle#2, #3, #4\rangle_{#1}}
+\newcommand*{\exDefClosure}[4][]{\langle#2, #3, #4\rangle_{#1}}
+\newcommand*{\exObj}[3][]{\mathsf{Obj}_{#1}(#2, #3)}
 \newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
 \newcommand*{\exDataclass}[2]{@\pyinline{dataclass}\;\pyinline{class}\;#1:\;#2}
 \newcommand*{\exDataclassExtend}[3]{@\pyinline{dataclass}\;\pyinline{class}\;#1(#2):\;#3}
