@@ -28,7 +28,7 @@
 \and
 \inferrule*[lab={\ruleName{val-lambda}}]
 {
-  \Gamma \vdash \rho \\
+  \vdash \rho : \Gamma \\
   \Gamma \runion \statusDefAssigned(\seq{x}) \vdash e
 }
 {
@@ -37,7 +37,7 @@
 \and
 \inferrule*[lab={\ruleName{val-def}}]
 {
-  \Gamma \vdash \rho \\
+  \vdash \rho : \Gamma \\
   d_j = \exDef{f_j}{\vec{x}_j}{b_j} \quad (\forall j) \\
   \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_j) \runion
   \statusNotDefAssigned(\assignsS(b_j) \setminus \seq{x}_j) \vdash b_j : R_j \quad (\forall j) \\
@@ -49,7 +49,7 @@
 \and
 \inferrule*[lab={\ruleName{val-obj}}]
 {
-  \Gamma \vdash \rho
+  \vdash \rho : \Gamma
 }
 {
   \vdash \exObj[\Gamma]{d}{\rho}
@@ -66,7 +66,7 @@
 
 \vspace{2mm}
 
-\flushleft \shadebox{$\Gamma \vdash \rho$}
+\flushleft \shadebox{$\vdash \rho : \Gamma$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{env-var}}]
@@ -74,15 +74,15 @@
   \vdash v
 }
 {
-  \set{x : a} \vdash \set{x \mapsto v}
+  \vdash \set{x \mapsto v} : \set{x : a}
 }
 \and
 \inferrule*[lab={\ruleName{env-module}}]
 {
-  \Delta \vdash \rho
+  \vdash \rho : \Delta
 }
 {
-  \set{x : \modEntry{q}} \vdash \set{x \mapsto \exObj[\Delta]{\bot}{\rho}}
+  \vdash \set{x \mapsto \exObj[\Delta]{\bot}{\rho}} : \set{x : \modEntry{q}}
 }
 \and
 \inferrule*[lab={\ruleName{env-class}}]
@@ -90,16 +90,16 @@
   \strut
 }
 {
-  \set{x : \clsEntry{q}{\vec{y}}{c}} \vdash \set{x \mapsto \clsEntry{q}{\vec{y}}{c}}
+  \vdash \set{x \mapsto \clsEntry{q}{\vec{y}}{c}} : \set{x : \clsEntry{q}{\vec{y}}{c}}
 }
 \and
 \inferrule*[lab={\ruleName{env-cons}}]
 {
-  \set{x : \theta} \vdash \set{x \mapsto v} \\
-  \Gamma \vdash \rho
+  \vdash \set{x \mapsto v} : \set{x : \theta} \\
+  \vdash \rho : \Gamma
 }
 {
-  \set{x : \theta} \runion \Gamma \vdash \set{x \mapsto v} \runion \rho
+  \vdash \set{x \mapsto v} \runion \rho : \set{x : \theta} \runion \Gamma
 }
 \end{mathpar}
 \caption{Well-formed values and environments}
