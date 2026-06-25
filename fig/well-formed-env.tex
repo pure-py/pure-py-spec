@@ -1,0 +1,40 @@
+\begin{figure}
+\flushleft \shadebox{$\Gamma \vdash \rho$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{env-var}}]
+{
+  x : a \in \Gamma
+}
+{
+  \Gamma \vdash \set{x \mapsto v}
+}
+\and
+\inferrule*[lab={\ruleName{env-module}}]
+{
+  x : \modEntry{q} \in \Gamma
+}
+{
+  \Gamma \vdash \set{x \mapsto \exObj{\bot}{\rho'}}
+}
+\and
+\inferrule*[lab={\ruleName{env-class}}]
+{
+  x : \clsEntry{q}{\vec{y}}{c'} \in \Gamma
+}
+{
+  \Gamma \vdash \set{x \mapsto \clsEntry{q}{\vec{y}}{c'}}
+}
+\and
+\inferrule*[lab={\ruleName{env-cons}}]
+{
+  \Gamma \vdash \rho \\
+  \Gamma \vdash \rho'
+}
+{
+  \Gamma \vdash \rho \disjunion \rho'
+}
+\end{mathpar}
+\caption{Well-formed environment}
+\label{fig:well-formed-env}
+\end{figure}

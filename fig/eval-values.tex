@@ -7,7 +7,8 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exTuple{v_1, \ldots, v_n}$ & (Tuple) \\
     & $\mid$ & $\exClosure{\rho}{\vec{x}}{e}$ & (LambdaClosure) \\
     & $\mid$ & $\exDefClosure{\rho}{\seq{d}}{i}$ & (DefClosure) \\
-    & $\mid$ & $\exObj{d}{\rho}$ & (Object)
+    & $\mid$ & $\exObj{d}{\rho}$ & (Object) \\
+    & $\mid$ & $\clsEntry{q}{\vec{x}}{c'}$ & (Class)
    \\[3mm]
 $d$ & $::=$ & $q.c$ & (QualifiedClassName) \\
     & $\mid$ & $\bot$ & (Module)
