@@ -106,7 +106,7 @@
   \rho, s \cons b \Rightarrow \assigns{\rho'} \runion r
 }
 \end{mathpar}
-\caption{Block evaluation in an ambient context $\Gamma$ with $\Gamma \vdash \rho$}
+\caption{Block $b$ evaluates to result $r$ under $\rho$, where $\Gamma \vdash \rho$}
 \label{fig:eval}
 \end{figure}
 
@@ -138,7 +138,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-call-lambda}}]
 {
-  \rho, e \Rightarrow \exClosure{\rho'}{\vec{x}}{e'} \\
+  \rho, e \Rightarrow \exClosure[\Gamma']{\rho'}{\vec{x}}{e'} \\
   \rho, \vec{e} \Rightarrow \vec{u} \\
   \rho' \runion \set{\seq{x} \mapsto \seq{u}}, e' \Rightarrow v
 }
@@ -160,7 +160,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-attr}}]
 {
-  \rho, e \Rightarrow \exObj{d}{\rho'}
+  \rho, e \Rightarrow \exObj[\Gamma']{d}{\rho'}
 }
 {
   \rho, \exProject{e}{x} \Rightarrow \rho'(x)
@@ -175,7 +175,7 @@
   \rho, \exConstruct{c}{e_1, \ldots, e_n} \Rightarrow \exObj[\Gamma]{q.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
 }
 \end{mathpar}
-\caption{Expression evaluation in an ambient context $\Gamma$ with $\Gamma \vdash \rho$}
+\caption{Expression $e$ evaluates to value $v$ under $\rho$, where $\Gamma \vdash \rho$}
 \label{fig:eval-expr}
 \end{figure}
 
