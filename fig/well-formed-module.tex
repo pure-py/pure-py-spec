@@ -21,11 +21,11 @@
 \and
 \inferrule*[lab={\ruleName{imp-class}}]
 {
-  x : (q', \vec{y}, c') \in \Gamma_q \\
+  x : \clsEntry{q'}{\vec{y}}{c'} \in \Gamma_q \\
   q, \vec{x} \importsR \Gamma
 }
 {
-  q, x \cons \vec{x} \importsR \Gamma \runion \set{x : (q', \vec{y}, c')}
+  q, x \cons \vec{x} \importsR \Gamma \runion \set{x : \clsEntry{q'}{\vec{y}}{c'}}
 }
 \and
 \inferrule*[lab={\ruleName{imp-module}}]
@@ -34,7 +34,7 @@
   q, \vec{x} \importsR \Gamma
 }
 {
-  q, x \cons \vec{x} \importsR \Gamma \runion \set{x : q.x}
+  q, x \cons \vec{x} \importsR \Gamma \runion \set{x : \modEntry{q.x}}
 }
 \end{mathpar}
 \caption{Names $\vec{x}$ imported from module $q$ produce bindings $\Gamma$}
@@ -60,7 +60,7 @@
   q' \in \dom(\mathcal{M}) \\
   q' \neq q \\
   \vdash_{\mathcal{M}} q' \\
-  \Gamma, x_1 : q' \vdash m : \Delta
+  \Gamma, x_1 : \modEntry{q'} \vdash m : \Delta
 }
 {
   \Gamma \vdash \exImport{q'} \cons m : \Delta
@@ -91,21 +91,21 @@
 \inferrule*[lab={\ruleName{class}}]
 {
   \ownFields(\phi) = \vec{x} \text{ distinct} \\
-  \Gamma, c : (q, \vec{x}, \bot) \vdash m : \Delta
+  \Gamma, c : \clsEntry{q}{\vec{x}}{\bot} \vdash m : \Delta
 }
 {
-  \Gamma \vdash \exDataclass{c}{\phi} \cons m : \set{c : (q, \vec{x}, \bot)} \runion \Delta
+  \Gamma \vdash \exDataclass{c}{\phi} \cons m : \set{c : \clsEntry{q}{\vec{x}}{\bot}} \runion \Delta
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \Gamma(c') = (q, \vec{y}, c'') \\
+  \Gamma(c') = \clsEntry{q}{\vec{y}}{c''} \\
   \ownFields(\phi) = \vec{x} \text{ distinct} \\
-  \vec{x} \cap \fields(q.c') = \varnothing \\
-  \Gamma, c : (q, \vec{x}, c') \vdash m : \Delta
+  \vec{x} \cap \fields(\Gamma(c')) = \varnothing \\
+  \Gamma, c : \clsEntry{q}{\vec{x}}{c'} \vdash m : \Delta
 }
 {
-  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons m : \set{c : (q, \vec{x}, c')} \runion \Delta
+  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons m : \set{c : \clsEntry{q}{\vec{x}}{c'}} \runion \Delta
 }
 \end{mathpar}
 \subcaption{Body $m$ of module $q$ is well-formed in $\Gamma$}

@@ -155,8 +155,8 @@ Metavariables $x$, $f$, $c$ range over \emph{variables}; idiomatically $f$ is us
 A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the following \emph{context entries} $\theta$:
 \begin{itemize}
 \item \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
-\item \emph{module reference}: a fully-qualified module name $q$;
-\item \emph{class entry}: a triple $(q, \vec{x}, c')$ of the defining module $q$, a sequence of distinct field names $\vec{x}$, and a base class $c'$ (or $\bot$ for no base).
+\item \emph{module reference} $\modEntry{q}$, for a fully-qualified module name $q$;
+\item \emph{class entry} $\clsEntry{q}{\vec{x}}{c'}$, of the defining module $q$, a sequence of distinct field names $\vec{x}$, and a base class $c'$ (or $\bot$ for no base).
 \end{itemize}
 \end{definition}
 
@@ -661,6 +661,8 @@ functional programming:
 \end{itemize}
 
 \section{Operational semantics}
+
+A module is evaluated only after it has been judged well-formed (\figref{well-formed-module}). Well-formedness of a module $q$ holds in its variable context $\Gamma_q$, whose entries are definite-assignment statuses, module references, and class entries. Evaluation instead proceeds in a runtime environment $\rho$ binding names to values. The two are related by the projection $\lfloor \Gamma \rfloor$, which removes the class entries of $\Gamma$ and keeps its statuses and module references: a module well-formed in $\Gamma_q$ is evaluated in an environment with domain $\dom(\lfloor \Gamma_q \rfloor)$. Classes are therefore compile-time only. They are consulted when checking construction and pattern matching, but are never bound at runtime (\ruleName{eval-class} and \ruleName{eval-class-extend} extend the environment by nothing), since classes are not first-class values.
 
 Values, environments, and evaluation results are given in \figref{values}. For a statement $s$, the result
 $\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the result

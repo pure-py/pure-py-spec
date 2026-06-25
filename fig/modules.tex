@@ -26,10 +26,8 @@
 \ownFields(\exField{x_1} \;\ldots\; \exField{x_{n+1}}) &= x_1, \ldots, x_{n+1} \\
 \ownFields(\pyinline{pass}) &= \varepsilon \\
 \\
-\fields(q.c) &= \begin{cases}
-  \vec{x} & \text{if } \Gamma_q(c) = (q, \vec{x}, \bot) \\
-  \fields(q.c') \mathbin{\cdot} \vec{x} & \text{if } \Gamma_q(c) = (q, \vec{x}, c')
-\end{cases}
+\fields(\clsEntry{q}{\vec{x}}{\bot}) &= \vec{x} \\
+\fields(\clsEntry{q}{\vec{x}}{c'}) &= \fields(\Gamma_q(c')) \mathbin{\cdot} \vec{x}
 \end{align*}
 \subcaption{$\ownFields$ and $\fields$ metafunctions}
 \end{subfigure}

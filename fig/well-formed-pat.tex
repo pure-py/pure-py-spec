@@ -32,7 +32,8 @@
 \and
 \inferrule*[lab={\ruleName{pat-class}}]
 {
-  \Gamma \vdash q \names d(x_1, \ldots, x_n \mathbin{\cdot} \seq{x}\,') \\
+  \Gamma \vdash q \names \theta \\
+  \fields(\theta) = x_1, \ldots, x_n \mathbin{\cdot} \seq{x}\,' \\
   \set{\seq{y}} = \set{\seq{x}\,'} \\
   \Gamma \vdash p_i \quad (\forall i)
 }

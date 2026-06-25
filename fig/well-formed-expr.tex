@@ -5,38 +5,36 @@
 \small
 \inferrule*[lab={\ruleName{simple-module}}]
 {
-  x : q \in \Gamma
+  x : \modEntry{q} \in \Gamma
 }
 {
-  \Gamma \vdash x \names q
+  \Gamma \vdash x \names \modEntry{q}
 }
 \and
 \inferrule*[lab={\ruleName{simple-class}}]
 {
-  c : (q', \vec{y}, c') \in \Gamma \\
-  \fields(q'.c) = \vec{x}
+  c : \clsEntry{q'}{\vec{y}}{c'} \in \Gamma
 }
 {
-  \Gamma \vdash c \names q'.c(\vec{x})
+  \Gamma \vdash c \names \clsEntry{q'}{\vec{y}}{c'}
 }
 \and
 \inferrule*[lab={\ruleName{qualified-module}}]
 {
-  \Gamma \vdash q \names q' \\
+  \Gamma \vdash q \names \modEntry{q'} \\
   q'.x \in \dom(\mathcal{M})
 }
 {
-  \Gamma \vdash q.x \names q'.x
+  \Gamma \vdash q.x \names \modEntry{q'.x}
 }
 \and
 \inferrule*[lab={\ruleName{qualified-class}}]
 {
-  \Gamma \vdash q \names q' \\
-  \Gamma_{q'}(c) = (q', \vec{y}, c'') \\
-  \fields(q'.c) = \vec{x}
+  \Gamma \vdash q \names \modEntry{q'} \\
+  \Gamma_{q'}(c) = \clsEntry{q'}{\vec{y}}{c''}
 }
 {
-  \Gamma \vdash q.c \names q'.c(\vec{x})
+  \Gamma \vdash q.c \names \clsEntry{q'}{\vec{y}}{c''}
 }
 \end{mathpar}
 \subcaption{Name $q$ resolves to context entry $\theta$ under $\Gamma$}
@@ -66,7 +64,8 @@
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
-  \Gamma \vdash q \names d(x_1, \ldots, x_n) \\
+  \Gamma \vdash q \names \theta \\
+  \fields(\theta) = x_1, \ldots, x_n \\
   \Gamma \vdash e_i \quad (\forall i)
 }
 {
@@ -75,7 +74,7 @@
 \and
 \inferrule*[lab={\ruleName{attr-module}}]
 {
-  \Gamma \vdash e \names q \\
+  \Gamma \vdash e \names \modEntry{q} \\
   y \in \dom(\Gamma_q)
 }
 {
