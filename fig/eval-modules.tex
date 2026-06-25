@@ -1,4 +1,5 @@
 \begin{figure}
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\mu, \rho, m \Rightarrow \mu', \rho'$}
 \begin{mathpar}
 \small
@@ -55,9 +56,31 @@
   \mu, \rho, \exDataclassExtend{c}{c'}{\phi} \cons m \Rightarrow \mu', \rho'
 }
 \end{mathpar}
+\subcaption{Module body $m$ evaluates under store $\mu$ and environment $\rho$}
+\end{subfigure}
 
 \vspace{2mm}
 
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\langle E, \mathcal{M} \rangle \Rightarrow n$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-program}}]
+{
+  \varnothing, \rho_E^0, \mathcal{M}(E) \Rightarrow \mu, \rho
+}
+{
+  \langle E, \mathcal{M} \rangle \Rightarrow 0
+}
+\end{mathpar}
+\subcaption{Program $\langle E, \mathcal{M} \rangle$ evaluates to exit code $n$}
+\end{subfigure}
+\caption{Module and program evaluation}
+\label{fig:eval-modules}
+\end{figure}
+
+\begin{figure}
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\mu, q \Rightarrow_{\mathsf{load}} \mu'$}
 \begin{mathpar}
 \small
@@ -88,9 +111,12 @@
   \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{q.x \mapsto \exObj{\bot}{\rho}}
 }
 \end{mathpar}
+\subcaption{Module $q$ is loaded into the store $\mu$}
+\end{subfigure}
 
 \vspace{2mm}
 
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\mu, q, \vec{x} \importsR \mu', \rho$}
 \begin{mathpar}
 \small
@@ -135,20 +161,8 @@
   \mu, q, x \cons \vec{x} \importsR \mu'', \set{x \mapsto \mu'(q.x)} \runion \rho
 }
 \end{mathpar}
-
-\vspace{2mm}
-
-\flushleft \shadebox{$\langle E, \mathcal{M} \rangle \Rightarrow n$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{eval-program}}]
-{
-  \varnothing, \rho_E^0, \mathcal{M}(E) \Rightarrow \mu, \rho
-}
-{
-  \langle E, \mathcal{M} \rangle \Rightarrow 0
-}
-\end{mathpar}
-\caption{Module and program evaluation}
-\label{fig:eval-modules}
+\subcaption{Names $\vec{x}$ imported from module $q$ produce bindings $\rho$}
+\end{subfigure}
+\caption{Module loading and importing}
+\label{fig:eval-load}
 \end{figure}

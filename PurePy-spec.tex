@@ -679,7 +679,8 @@ with $\assigns{\varnothing}$ as left and right unit.
 
 \input{fig/eval-values}
 
-Program and module evaluation are given in \figref{eval-modules}. A program evaluates to a non-negative integer
+Program and module evaluation are given in \figref{eval-modules}, with module loading and importing in
+\figref{eval-load}. A program evaluates to a non-negative integer
 exit code $n$, with $0$ denoting successful termination. For any $(q \mapsto b) \in \mathcal{M}$, evaluation of
 $b$ begins under the initial environment $\rho_q^0 = \rho_{\textup{\pyinline{builtins}}} \runion \set{\text{\pyinline{__name__}}
 \mapsto v}$, where $v$ is \pyinline{"__main__"} if $q = E$ and the string literal corresponding to $q$ otherwise.
