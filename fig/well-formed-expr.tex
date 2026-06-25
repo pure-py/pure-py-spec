@@ -64,8 +64,8 @@
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
-  \Gamma \vdash q \names \theta \\
-  \fields(\theta) = x_1, \ldots, x_n \\
+  \Gamma \vdash q \names \clsEntry{q'}{\vec{z}}{c'} \\
+  \fields(\clsEntry{q'}{\vec{z}}{c'}) = x_1, \ldots, x_n \\
   \Gamma \vdash e_i \quad (\forall i)
 }
 {
