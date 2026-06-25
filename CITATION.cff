@@ -1,0 +1,6 @@
+cff-version: 1.2.0
+authors:
+  - name: "PurePy contributors"
+title: "PurePy: a functional subset of Python"
+url: "https://github.com/pure-py/pure-py-spec"
+date-released: 2026
