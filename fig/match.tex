@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\rho \vdash p, v \matches \rho'$}
+\flushleft \shadebox{$\rho, p, v \matches \rho'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{pat-lit}}]
@@ -7,7 +7,7 @@
   \strut
 }
 {
-  \rho \vdash \ell, \ell \matches \varnothing
+  \rho, \ell, \ell \matches \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{pat-neg-lit}}]
@@ -15,7 +15,7 @@
   \strut
 }
 {
-  \rho \vdash -n, -n \matches \varnothing
+  \rho, -n, -n \matches \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{pat-var}}]
@@ -23,7 +23,7 @@
   \strut
 }
 {
-  \rho \vdash x, v \matches \set{x \mapsto v}
+  \rho, x, v \matches \set{x \mapsto v}
 }
 \and
 \inferrule*[lab={\ruleName{pat-wild}}]
@@ -31,41 +31,41 @@
   \strut
 }
 {
-  \rho \vdash \patWild, v \matches \varnothing
+  \rho, \patWild, v \matches \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{pat-list}}]
 {
-  \rho \vdash p_i, v_i \matches \rho_i \quad (\forall i)
+  \rho, p_i, v_i \matches \rho_i \quad (\forall i)
 }
 {
-  \rho \vdash \patList{p_1, \ldots, p_n}, \exList{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
+  \rho, \patList{p_1, \ldots, p_n}, \exList{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
 }
 \and
 \inferrule*[lab={\ruleName{pat-tuple}}]
 {
-  \rho \vdash p_i, v_i \matches \rho_i \quad (\forall i)
+  \rho, p_i, v_i \matches \rho_i \quad (\forall i)
 }
 {
-  \rho \vdash \patTuple{p_1, \ldots, p_n}, \exTuple{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
+  \rho, \patTuple{p_1, \ldots, p_n}, \exTuple{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
 }
 \and
 \inferrule*[lab={\ruleName{pat-as}}]
 {
-  \rho \vdash p, v \matches \rho'
+  \rho, p, v \matches \rho'
 }
 {
-  \rho \vdash p\;\pyinline{as}\;x, v \matches \rho' \disjunion \set{x \mapsto v}
+  \rho, p\;\pyinline{as}\;x, v \matches \rho' \disjunion \set{x \mapsto v}
 }
 \and
 \inferrule*[lab={\ruleName{pat-class}}]
 {
   \fields(\Gamma_q(c)) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m} \\
-  \rho \vdash p_i, \rho_o(x_i) \matches \rho_i \quad (\forall i.\, 1 \le i \le n) \\
-  \rho \vdash p_{n+j}, \rho_o(y_j) \matches \rho_{n+j} \quad (\forall j.\, 1 \le j \le m)
+  \rho, p_i, \rho_o(x_i) \matches \rho_i \quad (\forall i.\, 1 \le i \le n) \\
+  \rho, p_{n+j}, \rho_o(y_j) \matches \rho_{n+j} \quad (\forall j.\, 1 \le j \le m)
 }
 {
-  \rho \vdash \patClass{c}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}}, \exObj{q.c}{\rho_o} \matches \rho_1 \disjunion \ldots \disjunion \rho_{n+m}
+  \rho, \patClass{c}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}}, \exObj{q.c}{\rho_o} \matches \rho_1 \disjunion \ldots \disjunion \rho_{n+m}
 }
 \end{mathpar}
 \caption{Pattern matching}

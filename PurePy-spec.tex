@@ -695,8 +695,8 @@ sequential-composition effects, so as black boxes functions are always pure.
 \input{fig/eval}
 
 Expression evaluation $\rho, e \Rightarrow v$ is given in \figref{eval-expr}. The pattern-matching judgement
-$\rho \vdash p, v \matches \rho'$ (\figref{match}) is a deterministic partial function; we write $\rho \vdash p, v \notmatches$
-(with no right-hand side) for $\nexists \rho'.\, \rho \vdash p, v \matches \rho'$, i.e.\ matching is undefined.
+$\rho, p, v \matches \rho'$ (\figref{match}) is a deterministic partial function; we write $\rho, p, v \notmatches$
+(with no right-hand side) for $\nexists \rho'.\, \rho, p, v \matches \rho'$, i.e.\ matching is undefined.
 
 \input{fig/match}
 
