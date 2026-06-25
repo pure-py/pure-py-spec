@@ -31,10 +31,10 @@
 \inferrule*[lab={\ruleName{qualified-class}}]
 {
   \Gamma \vdash q \names \modEntry{q'} \\
-  \Gamma_{q'}(c) = \clsEntry{q'}{\vec{y}}{c''}
+  \Gamma_{q'}(c) = \clsEntry{q'}{\vec{y}}{c'}
 }
 {
-  \Gamma \vdash q.c \names \clsEntry{q'}{\vec{y}}{c''}
+  \Gamma \vdash q.c \names \clsEntry{q'}{\vec{y}}{c'}
 }
 \end{mathpar}
 \subcaption{Name $q$ resolves to context entry $\theta$ under $\Gamma$}
