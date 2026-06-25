@@ -138,7 +138,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-call-lambda}}]
 {
-  \rho, e \Rightarrow \exClosure[\Gamma']{\rho'}{\vec{x}}{e'} \\
+  \rho, e \Rightarrow \exClosure[\Delta]{\rho'}{\vec{x}}{e'} \\
   \rho, \vec{e} \Rightarrow \vec{u} \\
   \rho' \runion \set{\seq{x} \mapsto \seq{u}}, e' \Rightarrow v
 }
@@ -160,7 +160,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-attr}}]
 {
-  \rho, e \Rightarrow \exObj[\Gamma']{d}{\rho'}
+  \rho, e \Rightarrow \exObj[\Delta]{d}{\rho'}
 }
 {
   \rho, \exProject{e}{x} \Rightarrow \rho'(x)
@@ -172,7 +172,7 @@
   \fields(\Gamma(c)) = x_1, \ldots, x_n
 }
 {
-  \rho, \exConstruct{c}{e_1, \ldots, e_n} \Rightarrow \exObj[\Gamma]{q.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
+  \rho, \exConstruct{c}{e_1, \ldots, e_n} \Rightarrow \exObj[\Delta]{q.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
 }
 \end{mathpar}
 \caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$}
