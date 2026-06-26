@@ -350,6 +350,8 @@ Metavariable $d$ ranges over \emph{fully-qualified} class names of the form $q.c
 For a well-formed module $q$, i.e.\ where $\Gamma_q^0 \vdash \mathcal{M}(q) : \Delta$ for some $\Delta$, the \emph{exports} of $q$ are $\Gamma_q = \Delta$.
 \end{definition}
 
+\noindent Exports comprise the classes and variables a module defines, not modules, since a module name enters scope only via an import, which is a private dependency rather than part of the module's interface.
+
 \subsection{Examples}
 
 \subsubsection{Assignment as definition}
