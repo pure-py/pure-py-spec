@@ -871,8 +871,8 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
 
 def module_exports(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context:
     if q in PREDEFINED_MEMBERS:
-        return {name: Status.TT for name in PREDEFINED_MEMBERS[q]}
-    return {name: final_ctx.gamma[name] for name in own_members(body, q)}
+        return {name: Status.TT for name in PREDEFINED_MEMBERS[q] | {'__name__'}}
+    return {name: final_ctx.gamma[name] for name in own_members(body, q) | {'__name__'}}
 
 def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> Optional[IllFormed]:
     try:

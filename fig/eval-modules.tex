@@ -98,7 +98,7 @@
   \mu, \rho_x^0, \mathcal{M}(x) \Rightarrow \mu', \rho
 }
 {
-  \mu, x \Rightarrow_{\mathsf{load}} \mu' \runion \set{x \mapsto \exObj{\bot}{\rho}}
+  \mu, x \Rightarrow_{\mathsf{load}} \mu' \runion \set{x \mapsto \exObj{\bot}{\set{\text{\pyinline{__name__}} \mapsto \rho_x^0(\text{\pyinline{__name__}})} \runion \rho}}
 }
 \and
 \inferrule*[lab={\ruleName{load-qualified}}]
@@ -108,7 +108,7 @@
   \mu', \rho_{q.x}^0, \mathcal{M}(q.x) \Rightarrow \mu'', \rho
 }
 {
-  \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{q.x \mapsto \exObj{\bot}{\rho}}
+  \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{q.x \mapsto \exObj{\bot}{\set{\text{\pyinline{__name__}} \mapsto \rho_{q.x}^0(\text{\pyinline{__name__}})} \runion \rho}}
 }
 \end{mathpar}
 \subcaption{Module $q$ is loaded into the store $\mu$}
