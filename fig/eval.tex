@@ -169,11 +169,12 @@
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i) \\
-  \rho(q) = \clsEntry{\Delta}{q'}{\vec{z}}{c'} \\
+  \rho, q \Rightarrow \clsEntry{\Delta}{q'}{\vec{z}}{c'} \\
+  q = q''.c'' \\
   \fields(\clsEntry{\Delta}{q'}{\vec{z}}{c'}) = x_1, \ldots, x_n
 }
 {
-  \rho, \exConstruct{q}{e_1, \ldots, e_n} \Rightarrow \exObj[\Delta']{q'.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
+  \rho, \exConstruct{q}{e_1, \ldots, e_n} \Rightarrow \exObj[\Delta']{q'.c''}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
 }
 \end{mathpar}
 \caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$}
