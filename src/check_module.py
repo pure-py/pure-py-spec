@@ -33,7 +33,7 @@ BlockElement = Union[ast.stmt, list[ast.FunctionDef]]
 
 @dataclass(frozen=True)
 class ClassEntry:
-    context: 'ClassContext'
+    context: 'dict[str, ContextEntry]'
     module: str
     fields: tuple[str, ...]
     base: Optional[str]
@@ -46,7 +46,6 @@ class ModuleRef:
 
 ContextEntry = Union[Status, ModuleRef, ClassEntry]
 VarContext = dict[str, Status]
-ClassContext = dict[str, ClassEntry]
 
 
 @dataclass(frozen=True)
@@ -62,7 +61,7 @@ def extend_gamma(ctx: 'Context', delta: dict[str, ContextEntry]) -> 'Context':
 def extend_var(ctx: 'Context', delta: VarContext) -> 'Context':
     return extend_gamma(ctx, dict(delta))
 
-def class_entry_for(node: ast.ClassDef, q: str, context: 'ClassContext') -> 'ClassEntry':
+def class_entry_for(node: ast.ClassDef, q: str, context: dict[str, ContextEntry]) -> 'ClassEntry':
     base = node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
     return ClassEntry(context=context, module=q, fields=tuple(own_fields_of(node)), base=base)
 
@@ -77,9 +76,6 @@ def class_of(ctx: 'Context', c: str) -> Optional[ClassEntry]:
 def module_of(ctx: 'Context', x: str) -> Optional[ModuleRef]:
     v = ctx.gamma.get(x)
     return v if isinstance(v, ModuleRef) else None
-
-def gamma_classes(ctx: 'Context') -> ClassContext:
-    return {k: v for k, v in ctx.gamma.items() if isinstance(v, ClassEntry)}
 
 
 @dataclass(frozen=True)
@@ -213,7 +209,7 @@ def next_ctx_after(head: BlockElement, ctx: Context) -> Context:
     delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
     next_ctx = extend_var(ctx, delta)
     if isinstance(head, ast.ClassDef):
-        next_ctx = extend_gamma(next_ctx, {head.name: class_entry_for(head, ctx.q, gamma_classes(ctx))})
+        next_ctx = extend_gamma(next_ctx, {head.name: class_entry_for(head, ctx.q, ctx.gamma)})
     if isinstance(head, ast.Import):
         head_seg = head.names[0].name.split('.')[0]
         next_ctx = extend_gamma(next_ctx, {head_seg: ModuleRef(head_seg)})
@@ -363,7 +359,7 @@ def check_stmt(s: ast.stmt, ctx: Context, module_body: bool = False) -> None:
     if isinstance(s, ast.ClassDef):
         if not module_body:
             raise IllFormedModule(s, reasons.NonTopLevelClass())
-        check_class_decl(s, gamma_classes(ctx), ctx.q)
+        check_class_decl(s, ctx.gamma, ctx.q)
         return
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
@@ -835,9 +831,11 @@ def has_cycle(graph: dict[str, set[str]]) -> list[str]:
 def fields_of(entry: ClassEntry) -> tuple[str, ...]:
     if entry.base is None:
         return entry.fields
-    return fields_of(entry.context[entry.base]) + entry.fields
+    base_entry = entry.context[entry.base]
+    assert isinstance(base_entry, ClassEntry)
+    return fields_of(base_entry) + entry.fields
 
-def check_class_decl(node: ast.ClassDef, classes: ClassContext, q: str) -> None:
+def check_class_decl(node: ast.ClassDef, gamma: dict[str, ContextEntry], q: str) -> None:
     names = own_fields_of(node)
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
@@ -846,8 +844,8 @@ def check_class_decl(node: ast.ClassDef, classes: ClassContext, q: str) -> None:
         return
     base = node.bases[0]
     assert isinstance(base, ast.Name)
-    entry = classes.get(base.id)
-    if entry is None or entry.module != q:
+    entry = gamma.get(base.id)
+    if not isinstance(entry, ClassEntry) or entry.module != q:
         raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
     clash = set(names) & set(fields_of(entry))
     if len(clash) > 0:
