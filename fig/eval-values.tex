@@ -8,7 +8,7 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exClosure[\Gamma]{\rho}{\vec{x}}{e}$ & (LambdaClosure) \\
     & $\mid$ & $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$ & (DefClosure) \\
     & $\mid$ & $\exObj[\Gamma]{d}{\rho}$ & (Object) \\
-    & $\mid$ & $\clsEntry{q}{\vec{x}}{c'}$ & (Class)
+    & $\mid$ & $\clsClosure[\Gamma]{\rho}{q}{\vec{x}}{c'}$ & (Class)
    \\[3mm]
 $d$ & $::=$ & $q.c$ & (QualifiedClassName) \\
     & $\mid$ & $\bot$ & (Module)

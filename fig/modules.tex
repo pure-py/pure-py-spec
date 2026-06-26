@@ -27,7 +27,9 @@
 \ownFields(\pyinline{pass}) &= \varepsilon \\
 \\
 \fields(\clsEntry{q}{\vec{x}}{\bot}) &= \vec{x} \\
-\fields(\clsEntry{q}{\vec{x}}{c'}) &= \fields(\Gamma_q(c')) \mathbin{\cdot} \vec{x}
+\fields(\clsEntry{q}{\vec{x}}{c'}) &= \fields(\Gamma_q(c')) \mathbin{\cdot} \vec{x} \\
+\fields(\clsClosure[\Gamma]{\rho}{q}{\vec{x}}{\bot}) &= \vec{x} \\
+\fields(\clsClosure[\Gamma]{\rho}{q}{\vec{x}}{c'}) &= \fields(\rho(c')) \mathbin{\cdot} \vec{x}
 \end{align*}
 \subcaption{$\ownFields$ and $\fields$ metafunctions, for a module $q$}
 \end{subfigure}

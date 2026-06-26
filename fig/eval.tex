@@ -169,8 +169,8 @@
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i) \\
-  \Gamma(c) = \clsEntry{q}{\vec{z}}{c'} \\
-  \fields(\clsEntry{q}{\vec{z}}{c'}) = x_1, \ldots, x_n
+  \rho(c) = \clsClosure[\Delta']{\rho'}{q}{\vec{z}}{c'} \\
+  \fields(\clsClosure[\Delta']{\rho'}{q}{\vec{z}}{c'}) = x_1, \ldots, x_n
 }
 {
   \rho, \exConstruct{c}{e_1, \ldots, e_n} \Rightarrow \exObj[\Delta]{q.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
