@@ -156,7 +156,7 @@ A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the fo
 \begin{itemize}
 \item \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
 \item \emph{module reference} $\modEntry{q}$, for a fully-qualified module name $q$;
-\item \emph{class entry} $\clsEntry{q}{\vec{x}}{c'}$, of the defining module $q$, a sequence of distinct field names $\vec{x}$, and a base class $c'$ (or $\bot$ for no base).
+\item \emph{class entry} $\clsEntry{\Gamma}{q}{\vec{x}}{c'}$, recording the declaring context $\Gamma$, defining module $q$, a sequence of distinct field names $\vec{x}$, and a base class $c'$ (or $\bot$ for no base).
 \end{itemize}
 \end{definition}
 
