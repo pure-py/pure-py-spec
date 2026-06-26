@@ -33,6 +33,7 @@ BlockElement = Union[ast.stmt, list[ast.FunctionDef]]
 
 @dataclass(frozen=True)
 class ClassEntry:
+    context: 'ClassContext'
     module: str
     fields: tuple[str, ...]
     base: Optional[str]
@@ -61,9 +62,9 @@ def extend_gamma(ctx: 'Context', delta: dict[str, ContextEntry]) -> 'Context':
 def extend_var(ctx: 'Context', delta: VarContext) -> 'Context':
     return extend_gamma(ctx, dict(delta))
 
-def class_entry_for(node: ast.ClassDef, q: str) -> 'ClassEntry':
+def class_entry_for(node: ast.ClassDef, q: str, context: 'ClassContext') -> 'ClassEntry':
     base = node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
-    return ClassEntry(module=q, fields=tuple(own_fields_of(node)), base=base)
+    return ClassEntry(context=context, module=q, fields=tuple(own_fields_of(node)), base=base)
 
 def var_status(ctx: 'Context', x: str) -> Optional[Status]:
     v = ctx.gamma.get(x)
@@ -212,7 +213,7 @@ def next_ctx_after(head: BlockElement, ctx: Context) -> Context:
     delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
     next_ctx = extend_var(ctx, delta)
     if isinstance(head, ast.ClassDef):
-        next_ctx = extend_gamma(next_ctx, {head.name: class_entry_for(head, ctx.q)})
+        next_ctx = extend_gamma(next_ctx, {head.name: class_entry_for(head, ctx.q, gamma_classes(ctx))})
     if isinstance(head, ast.Import):
         head_seg = head.names[0].name.split('.')[0]
         next_ctx = extend_gamma(next_ctx, {head_seg: ModuleRef(head_seg)})
@@ -287,18 +288,16 @@ def check_import(s: ast.stmt, q: str, ctx: Context) -> None:
     check_module(ctx.M[q], ctx.M, q)
 
 def imports(s: ast.stmt, q: str, names: list[str], ctx: Context) -> dict[str, ContextEntry]:
-    classes = check_module(ctx.M[q], ctx.M, q)
-    members = module_members(ctx.M[q].body, ctx.M, q)
-    return {x: imported_entry(s, x, q, classes, members, ctx) for x in names}
+    gamma_q = check_module(ctx.M[q], ctx.M, q)
+    return {x: imported_entry(s, x, q, gamma_q, ctx) for x in names}
 
-def imported_entry(s: ast.stmt, x: str, q: str, classes: ClassContext,
-                   members: set[str], ctx: Context) -> ContextEntry:
-    if x in classes:
-        return ClassEntry(module=q, fields=fields_of(classes, x), base=None)
+def imported_entry(s: ast.stmt, x: str, q: str, gamma_q: dict[str, ContextEntry],
+                   ctx: Context) -> ContextEntry:
+    entry = gamma_q.get(x)
+    if entry is not None:
+        return entry
     if f'{q}.{x}' in ctx.M:
         return ModuleRef(f'{q}.{x}')
-    if x in members:
-        return Status.TT
     raise IllFormedModule(s, reasons.UnknownMember(x, q))
 
 def module_members(body: list[ast.stmt], M: dict[str, ast.Module], q: str) -> set[str]:
@@ -505,16 +504,16 @@ def qualified_name(e: ast.expr) -> str:
 def names_class(head: ast.expr, ctx: Context) -> Optional[tuple[str, tuple[str, ...]]]:
     if isinstance(head, ast.Name):
         entry = class_of(ctx, head.id)
-        return (head.id, fields_of(gamma_classes(ctx), head.id)) if entry is not None else None
+        return (head.id, fields_of(entry)) if entry is not None else None
     if isinstance(head, ast.Attribute) and isinstance(head.value, (ast.Name, ast.Attribute)):
         mod_path = qualified_name(head.value)
         root = mod_path.split('.')[0]
         if module_of(ctx, root) is None or mod_path not in ctx.M:
             return None
-        mod_cls = check_module(ctx.M[mod_path], ctx.M, mod_path)
-        if head.attr not in mod_cls:
+        member = check_module(ctx.M[mod_path], ctx.M, mod_path).get(head.attr)
+        if not isinstance(member, ClassEntry):
             return None
-        return head.attr, fields_of(mod_cls, head.attr)
+        return head.attr, fields_of(member)
     return None
 
 def check_pattern(p: ast.pattern, ctx: Context) -> None:
@@ -833,13 +832,12 @@ def has_cycle(graph: dict[str, set[str]]) -> list[str]:
                 return cycle
     return []
 
-def fields_of(lambda_m: ClassContext, c: str) -> tuple[str, ...]:
-    info = lambda_m[c]
-    if info.base is None:
-        return info.fields
-    return fields_of(lambda_m, info.base) + info.fields
+def fields_of(entry: ClassEntry) -> tuple[str, ...]:
+    if entry.base is None:
+        return entry.fields
+    return fields_of(entry.context[entry.base]) + entry.fields
 
-def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext, q: str) -> None:
+def check_class_decl(node: ast.ClassDef, classes: ClassContext, q: str) -> None:
     names = own_fields_of(node)
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
@@ -848,14 +846,14 @@ def check_class_decl(node: ast.ClassDef, lambda_m: ClassContext, q: str) -> None
         return
     base = node.bases[0]
     assert isinstance(base, ast.Name)
-    entry = lambda_m.get(base.id)
+    entry = classes.get(base.id)
     if entry is None or entry.module != q:
         raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
-    clash = set(names) & set(fields_of(lambda_m, base.id))
+    clash = set(names) & set(fields_of(entry))
     if len(clash) > 0:
         raise IllFormedModule(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
 
-def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> ClassContext:
+def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> dict[str, ContextEntry]:
     try:
         return check_module_(m, M, q)
     except IllFormedModule as e:
@@ -863,16 +861,19 @@ def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> ClassContex
             e.module = q
         raise
 
-def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> ClassContext:
-    if len(m.body) == 0:
-        return {}
+def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> dict[str, ContextEntry]:
     nested = find_nested_import(m.body)
     if nested is not None:
         raise IllFormedModule(nested, reasons.NonTopLevelImport())
     final_ctx = check_block(m.body, Context(gamma=gamma_zero(), M=M, q=q), module_body=True)
-    if isinstance(result_type_of_block(m.body), TyReturns):
+    if m.body and isinstance(result_type_of_block(m.body), TyReturns):
         raise IllFormedModule(m.body[0], reasons.TopLevelReturn())
-    return gamma_classes(final_ctx)
+    return module_exports(m.body, final_ctx, q)
+
+def module_exports(body: list[ast.stmt], final_ctx: Context, q: str) -> dict[str, ContextEntry]:
+    if q in PREDEFINED_MEMBERS:
+        return {name: Status.TT for name in PREDEFINED_MEMBERS[q]}
+    return {name: final_ctx.gamma[name] for name in own_members(body, q)}
 
 def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> Optional[IllFormed]:
     try:
