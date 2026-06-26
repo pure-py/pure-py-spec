@@ -17,7 +17,7 @@ class IllFormedProgram(IllFormed):
         super().__init__(msg)
 
 
-def imports_of(tree: ast.Module) -> set[str]:
+def imports_of(tree: ast.Module, base_dir: pathlib.Path) -> set[str]:
     result: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
@@ -25,6 +25,10 @@ def imports_of(tree: ast.Module) -> set[str]:
         elif isinstance(node, ast.ImportFrom):
             if node.module is not None:
                 result.add(node.module)
+                for alias in node.names:
+                    candidate = f"{node.module}.{alias.name}"
+                    if resolve(candidate, base_dir) is not None:
+                        result.add(candidate)
     return result
 
 
@@ -79,7 +83,7 @@ def walk_program(entry_path: pathlib.Path) -> None:
         tree = load(name, base_dir)
         assert path is not None
         modules[name] = (path, tree)
-        imports_by_module[name] = imports_of(tree)
+        imports_by_module[name] = imports_of(tree, base_dir)
         for imp in imports_by_module[name]:
             queue.extend({imp} | parents(imp))
 
