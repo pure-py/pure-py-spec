@@ -87,10 +87,10 @@
 \and
 \inferrule*[lab={\ruleName{env-class}}]
 {
-  \vdash \rho : \Delta
+  \vdash \rho : \Gamma
 }
 {
-  \vdash \set{x \mapsto \clsClosure[\Delta]{\rho}{q}{\vec{y}}{c}} : \set{x : \clsEntry{q}{\vec{y}}{c}}
+  \vdash \set{x \mapsto \clsClosure[\Gamma]{\rho}{q}{\vec{y}}{c}} : \set{x : \clsEntry{q}{\vec{y}}{c}}
 }
 \and
 \inferrule*[lab={\ruleName{env-cons}}]
