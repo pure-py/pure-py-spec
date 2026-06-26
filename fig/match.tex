@@ -60,8 +60,8 @@
 \and
 \inferrule*[lab={\ruleName{pat-class}}]
 {
-  \rho(c) = \clsClosure[\Delta]{\rho'}{q}{\vec{z}}{c'} \\
-  \fields(\clsClosure[\Delta]{\rho'}{q}{\vec{z}}{c'}) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m} \\
+  \rho(c) = \clsEntry{\Delta}{q}{\vec{z}}{c'} \\
+  \fields(\clsEntry{\Delta}{q}{\vec{z}}{c'}) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m} \\
   \rho, p_i, \rho_o(x_i) \matches \rho_i \quad (\forall i.\, 1 \le i \le n) \\
   \rho, p_{n+j}, \rho_o(y_j) \matches \rho_{n+j} \quad (\forall j.\, 1 \le j \le m)
 }
