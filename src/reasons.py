@@ -115,9 +115,15 @@ class DuplicateMutualName:
 
 
 @dataclass(frozen=True)
-class NestedImport:
+class NonTopLevelImport:
     def message(self) -> str:
         return "import only allowed at module top level"
+
+
+@dataclass(frozen=True)
+class NonTopLevelClass:
+    def message(self) -> str:
+        return "class definition only allowed at module top level"
 
 
 @dataclass(frozen=True)
@@ -161,5 +167,5 @@ Reason = Union[
     UnknownClassInPattern, UnknownFieldInPattern, DuplicatePatternKeyword,
     SelfImport, UnknownModule, UnknownMember,
     NonlinearPattern, UnreachableCase, DuplicateMutualName,
-    NestedImport, TopLevelReturn, EmptyFromImport,
+    NonTopLevelImport, NonTopLevelClass, TopLevelReturn, EmptyFromImport,
 ]

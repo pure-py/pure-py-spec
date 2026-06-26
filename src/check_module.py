@@ -184,14 +184,14 @@ def result_type_of_block(block: list[ast.stmt]) -> ResultTy:
         return result_type(block[0])
     return runion_results(result_type(block[0]), result_type_of_block(block[1:]))
 
-def check_block(block: list[ast.stmt], ctx: Context) -> Context:
-    return check_elements(elements_of_block(block), ctx)
+def check_block(block: list[ast.stmt], ctx: Context, module_body: bool = False) -> Context:
+    return check_elements(elements_of_block(block), ctx, module_body)
 
-def check_elements(items: list[BlockElement], ctx: Context) -> Context:
+def check_elements(items: list[BlockElement], ctx: Context, module_body: bool = False) -> Context:
     if len(items) == 0:
         return ctx
     head = items[0]
-    check_element(head, ctx)
+    check_element(head, ctx, module_body)
     if len(items) == 1:
         return next_ctx_after(head, ctx)
     tail = items[1:]
@@ -205,7 +205,7 @@ def check_elements(items: list[BlockElement], ctx: Context) -> Context:
         ra_node = find_first_reassigning(tail, reassigned)
         assert ra_node is not None
         raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
-    return check_elements(tail, next_ctx_after(head, ctx))
+    return check_elements(tail, next_ctx_after(head, ctx), module_body)
 
 def next_ctx_after(head: BlockElement, ctx: Context) -> Context:
     head_result = block_element_result_type(head)
@@ -244,11 +244,11 @@ def extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[B
         return extend_region(region + [head], rest[1:])
     return [region] + elements_of_block(rest)
 
-def check_element(item: BlockElement, ctx: Context) -> None:
+def check_element(item: BlockElement, ctx: Context, module_body: bool = False) -> None:
     if isinstance(item, list):
         check_mutual_region(item, ctx)
     else:
-        check_stmt(item, ctx)
+        check_stmt(item, ctx, module_body)
 
 def check_mutual_region(defs: list[ast.FunctionDef], ctx: Context) -> None:
     check_distinct_names(defs, set())
@@ -321,7 +321,7 @@ def names_module(e: ast.expr, ctx: Context) -> Optional[str]:
         return full if full is not None and full in ctx.M else None
     return None
 
-def check_stmt(s: ast.stmt, ctx: Context) -> None:
+def check_stmt(s: ast.stmt, ctx: Context, module_body: bool = False) -> None:
     if isinstance(s, ast.Pass):
         return
     if isinstance(s, ast.Assign):
@@ -361,6 +361,8 @@ def check_stmt(s: ast.stmt, ctx: Context) -> None:
         check_match_cases(s.cases, ctx)
         return
     if isinstance(s, ast.ClassDef):
+        if not module_body:
+            raise IllFormedModule(s, reasons.NonTopLevelClass())
         check_class_decl(s, gamma_classes(ctx), ctx.q)
         return
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
@@ -865,8 +867,8 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> ClassConte
         return {}
     nested = find_nested_import(m.body)
     if nested is not None:
-        raise IllFormedModule(nested, reasons.NestedImport())
-    final_ctx = check_block(m.body, Context(gamma=gamma_zero(), M=M, q=q))
+        raise IllFormedModule(nested, reasons.NonTopLevelImport())
+    final_ctx = check_block(m.body, Context(gamma=gamma_zero(), M=M, q=q), module_body=True)
     if isinstance(result_type_of_block(m.body), TyReturns):
         raise IllFormedModule(m.body[0], reasons.TopLevelReturn())
     return gamma_classes(final_ctx)
