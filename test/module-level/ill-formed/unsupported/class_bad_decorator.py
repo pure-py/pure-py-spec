@@ -1,0 +1,3 @@
+@deco
+class C:
+    pass
