@@ -79,10 +79,10 @@
 \and
 \inferrule*[lab={\ruleName{env-module}}]
 {
-  \vdash \rho : \Delta
+  \vdash \rho : \Gamma
 }
 {
-  \vdash \set{x \mapsto \exObj[\Delta]{\bot}{\rho}} : \set{x : \modEntry{q}}
+  \vdash \set{x \mapsto \exObj[\Gamma]{\bot}{\rho}} : \set{x : \modEntry{q}}
 }
 \and
 \inferrule*[lab={\ruleName{env-class}}]
