@@ -52,7 +52,7 @@
   \vdash \rho : \Gamma
 }
 {
-  \vdash \exObj[\Gamma]{d}{\rho}
+  \vdash \exObj{\Gamma}{d}{\rho}
 }
 \and
 \inferrule*[lab={\ruleName{val-class}}]
@@ -82,7 +82,7 @@
   \vdash \rho : \Gamma
 }
 {
-  \vdash \set{x \mapsto \exObj[\Gamma]{\bot}{\rho}} : \set{x : \modEntry{q}}
+  \vdash \set{x \mapsto \exObj{\Gamma}{\bot}{\rho}} : \set{x : \modEntry{q}}
 }
 \and
 \inferrule*[lab={\ruleName{env-class}}]
