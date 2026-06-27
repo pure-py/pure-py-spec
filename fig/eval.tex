@@ -116,11 +116,11 @@
 \unwrap(\returns{v}) &= v \\
 \unwrap(\assigns{\rho}) &= \pyinline{None} \\
 \\
-\modEnv(\rho, x) &= \rho' && \text{where } \rho(x) = \exObj{\bot}{\rho'} \\
-\modEnv(\rho, q.x) &= \rho' && \text{where } \modEnv(\rho, q)(x) = \exObj{\bot}{\rho'} \\
+\resolveModule(\rho, x) &= \rho(x) \\
+\resolveModule(\rho, q.x) &= \rho'(x) && \text{where } \resolveModule(\rho, q) = \exObj{\bot}{\rho'} \\
 \\
 \resolveClass(\rho, c) &= (c, \clsEntry{\Delta}{q}{\vec{z}}{c'}) && \text{where } \rho(c) = \clsEntry{\Delta}{q}{\vec{z}}{c'} \\
-\resolveClass(\rho, q.c) &= (c, \clsEntry{\Delta}{q'}{\vec{z}}{c'}) && \text{where } \modEnv(\rho, q)(c) = \clsEntry{\Delta}{q'}{\vec{z}}{c'}
+\resolveClass(\rho, q.c) &= (c, \clsEntry{\Delta}{q'}{\vec{z}}{c'}) && \text{where } \resolveModule(\rho, q) = \exObj{\bot}{\rho'},\ \rho'(c) = \clsEntry{\Delta}{q'}{\vec{z}}{c'}
 \end{align*}
 
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
