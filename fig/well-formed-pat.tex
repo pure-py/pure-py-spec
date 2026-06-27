@@ -30,7 +30,7 @@
 { \Gamma \vdash p }
 { \Gamma \vdash p\;\pyinline{as}\;x }
 \and
-\inferrule*[lab={\ruleName{pat-class}}]
+\inferrule*[lab={\ruleName{pat-constr}}]
 {
   \Gamma \vdash q \names \clsEntry{\Delta}{q'}{\vec{z}}{c'} \\
   \fields(\clsEntry{\Delta}{q'}{\vec{z}}{c'}) = x_1, \ldots, x_n \mathbin{\cdot} \seq{x}\,' \\
