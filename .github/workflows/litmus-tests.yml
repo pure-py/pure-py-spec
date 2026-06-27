@@ -11,11 +11,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version:
-          - '3.12'
-          - 'pypy3.10'
-          - 'graalpy-24.0'
-    name: test (${{ matrix.python-version }})
+        include:
+          - runtime: CPython
+            cli: python
+            version: '3.12'
+
+          - runtime: PyPy
+            cli: python --no-mypy
+            version: 'pypy3.10'
+
+          - runtime: GraalPy
+            cli: python --no-mypy
+            version: 'graalpy-24.0'
+
+          - runtime: Pyodide
+            cli: $PYODIDE_PYTHON --no-mypy
+            version: '3.12'
+
+    name: test (${{ matrix.runtime }})
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,16 +36,25 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.version }}
 
       - name: Install mypy
-        if: matrix.python-version == '3.12'
+        if: matrix.runtime == 'CPython'
         run: pip install mypy
 
+      - name: Install uv
+        if: matrix.runtime == 'Pyodide'
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install Pyodide
+        if: matrix.runtime == 'Pyodide'
+        run: |
+          uv python install cpython-3.14.2-emscripten-wasm32-musl
+          PYODIDE_PYTHON=$(uv python find cpython-3.14.2-emscripten-wasm32-musl)
+          echo "PYODIDE_PYTHON=$PYODIDE_PYTHON" >> "$GITHUB_ENV"
+          
       - name: Run all tests
         run: |
-          if [ "${{ matrix.python-version }}" = "3.12" ]; then
-            test/run-all.sh python
-          else
-            test/run-all.sh python --no-mypy
-          fi
+          test/run-all.sh ${{ matrix.cli }}
+          
+
