@@ -114,7 +114,10 @@
 \small
 \begin{align*}
 \unwrap(\returns{v}) &= v \\
-\unwrap(\assigns{\rho}) &= \pyinline{None}
+\unwrap(\assigns{\rho}) &= \pyinline{None} \\
+\\
+\resolveClass(\rho, c) &= (c, \clsEntry{\Delta}{q'}{\vec{z}}{c'}) && \text{where } \rho(c) = \clsEntry{\Delta}{q'}{\vec{z}}{c'} \\
+\resolveClass(\rho, q.c) &= (c, \clsEntry{\Delta}{q'}{\vec{z}}{c'}) && \text{where } \rho, q \Rightarrow \exObj{\bot}{\rho_q},\ \rho_q(c) = \clsEntry{\Delta}{q'}{\vec{z}}{c'}
 \end{align*}
 
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
@@ -169,12 +172,11 @@
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i) \\
-  \rho, q \Rightarrow \clsEntry{\Delta}{q'}{\vec{z}}{c'} \\
-  q = q''.c'' \\
+  \resolveClass(\rho, q) = (c, \clsEntry{\Delta}{q'}{\vec{z}}{c'}) \\
   \fields(\clsEntry{\Delta}{q'}{\vec{z}}{c'}) = x_1, \ldots, x_n
 }
 {
-  \rho, \exConstruct{q}{e_1, \ldots, e_n} \Rightarrow \exObj[\Delta']{q'.c''}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
+  \rho, \exConstruct{q}{e_1, \ldots, e_n} \Rightarrow \exObj[\Delta']{q'.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
 }
 \end{mathpar}
 \caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$}
