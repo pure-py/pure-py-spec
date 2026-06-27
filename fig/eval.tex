@@ -116,8 +116,8 @@
 \unwrap(\returns{v}) &= v \\
 \unwrap(\assigns{\rho}) &= \pyinline{None} \\
 \\
-\modEnv(\rho, m) &= \rho' && \text{where } \rho(m) = \exObj{\bot}{\rho'} \\
-\modEnv(\rho, q.s) &= \rho' && \text{where } \modEnv(\rho, q)(s) = \exObj{\bot}{\rho'} \\
+\modEnv(\rho, x) &= \rho' && \text{where } \rho(x) = \exObj{\bot}{\rho'} \\
+\modEnv(\rho, q.x) &= \rho' && \text{where } \modEnv(\rho, q)(x) = \exObj{\bot}{\rho'} \\
 \\
 \resolveClass(\rho, c) &= (c, \clsEntry{\Delta}{q}{\vec{z}}{c'}) && \text{where } \rho(c) = \clsEntry{\Delta}{q}{\vec{z}}{c'} \\
 \resolveClass(\rho, q.c) &= (c, \clsEntry{\Delta}{q'}{\vec{z}}{c'}) && \text{where } \modEnv(\rho, q)(c) = \clsEntry{\Delta}{q'}{\vec{z}}{c'}
