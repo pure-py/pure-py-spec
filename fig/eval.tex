@@ -164,9 +164,17 @@
   \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow \unwrap(r)
 }
 \and
-\inferrule*[lab={\ruleName{eval-attr}}]
+\inferrule*[lab={\ruleName{eval-attr-module}}]
 {
-  \rho, e \Rightarrow \exObj{\Delta}{d}{\rho'}
+  \resolveModule(\rho, q) = \exObj{\Gamma}{\bot}{\rho'}
+}
+{
+  \rho, \exProject{q}{x} \Rightarrow \rho'(x)
+}
+\and
+\inferrule*[lab={\ruleName{eval-attr-object}}]
+{
+  \rho, e \Rightarrow \exObj{\Delta}{q'.c}{\rho'}
 }
 {
   \rho, \exProject{e}{x} \Rightarrow \rho'(x)
