@@ -38,13 +38,11 @@
 \inferrule*[lab={\ruleName{val-def}}]
 {
   \vdash \rho : \Gamma \\
-  d_j = \exDef{f_j}{\vec{x}_j}{b_j} \quad (\forall j) \\
-  \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_j) \runion
-  \statusNotDefAssigned(\assignsS(b_j) \setminus \seq{x}_j) \vdash b_j : R_j \quad (\forall j) \\
+  \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_j) \runion \statusNotDefAssigned(\assignsS(b_j) \setminus \seq{x}_j) \vdash b_j : R_j \quad (\forall j) \\
   \seq{f} \text{ distinct}
 }
 {
-  \vdash \exDefClosure[\Gamma]{\rho}{\seq{d}}{i}
+  \vdash \exDefClosure[\Gamma]{\rho}{\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}}{i}
 }
 \and
 \inferrule*[lab={\ruleName{val-obj}}]
@@ -52,7 +50,15 @@
   \vdash \rho : \Gamma
 }
 {
-  \vdash \exObj{\Gamma}{d}{\rho}
+  \vdash \exObj{\Gamma}{q.c}{\rho}
+}
+\and
+\inferrule*[lab={\ruleName{val-mod}}]
+{
+  \vdash \rho : \Gamma
+}
+{
+  \vdash \exMod{\Gamma}{\rho}
 }
 \and
 \inferrule*[lab={\ruleName{val-class}}]
@@ -69,33 +75,17 @@
 \flushleft \shadebox{$\vdash \rho : \Gamma$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{env-var}}]
-{
-  \vdash v
-}
-{
-  \vdash \set{x \mapsto v} : \set{x : a}
-}
-\and
-\inferrule*[lab={\ruleName{env-module}}]
-{
-  \vdash \rho : \Gamma
-}
-{
-  \vdash \set{x \mapsto \exObj{\Gamma}{\bot}{\rho}} : \set{x : \modEntry{q}}
-}
-\and
-\inferrule*[lab={\ruleName{env-class}}]
+\inferrule*[lab={\ruleName{env-nil}}]
 {
   \strut
 }
 {
-  \vdash \set{x \mapsto \clsEntry{\Gamma}{q}{\vec{y}}{c}} : \set{x : \clsEntry{\Gamma}{q}{\vec{y}}{c}}
+  \vdash \varnothing : \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{env-cons}}]
 {
-  \vdash \set{x \mapsto v} : \set{x : \theta} \\
+  \vdash v \\
   \vdash \rho : \Gamma
 }
 {

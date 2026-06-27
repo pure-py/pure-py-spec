@@ -117,10 +117,10 @@
 \unwrap(\assigns{\rho}) &= \pyinline{None} \\
 \\
 \resolveModule(\rho, x) &= \rho(x) \\
-\resolveModule(\rho, q.x) &= \rho'(x) && \text{where } \resolveModule(\rho, q) = \exObj{\Gamma}{\bot}{\rho'} \\
+\resolveModule(\rho, q.x) &= \rho'(x) && \text{where } \resolveModule(\rho, q) = \exMod{\Gamma}{\rho'} \\
 \\
 \resolveClass(\rho, c) &= (c, \clsEntry{\Delta}{q}{\vec{z}}{c'}) && \text{where } \rho(c) = \clsEntry{\Delta}{q}{\vec{z}}{c'} \\
-\resolveClass(\rho, q.c) &= (c, \clsEntry{\Delta}{q'}{\vec{z}}{c'}) && \text{where } \resolveModule(\rho, q) = \exObj{\Gamma}{\bot}{\rho'},\ \rho'(c) = \clsEntry{\Delta}{q'}{\vec{z}}{c'}
+\resolveClass(\rho, q.c) &= (c, \clsEntry{\Delta}{q'}{\vec{z}}{c'}) && \text{where } \resolveModule(\rho, q) = \exMod{\Gamma}{\rho'},\ \rho'(c) = \clsEntry{\Delta}{q'}{\vec{z}}{c'}
 \end{align*}
 
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
@@ -166,7 +166,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-attr-module}}]
 {
-  \resolveModule(\rho, q) = \exObj{\Delta}{\bot}{\rho'}
+  \resolveModule(\rho, q) = \exMod{\Delta}{\rho'}
 }
 {
   \rho, \exProject{q}{x} \Rightarrow \rho'(x)
