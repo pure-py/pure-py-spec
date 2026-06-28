@@ -15,7 +15,7 @@
 {
   \mu, q \Rightarrow_{\mathsf{load}} \mu' \\
   q = x_1.x_2.\ldots.x_{n+1} \\
-  \mu', \rho \runion \set{\bind{x_1}{\mu'(x_1)}}, m \Rightarrow \mu'', \rho'
+  \mu', \rho \runion \set{\bind{x_1}{\exMod{\Gamma_{x_1}}{\mu'(x_1)}}}, m \Rightarrow \mu'', \rho'
 }
 {
   \mu, \rho, \exImport{q} \cons m \Rightarrow \mu'', \rho'
@@ -100,7 +100,7 @@
   \mu, \rho_x^0, \mathcal{M}(x) \Rightarrow \mu', \rho
 }
 {
-  \mu, x \Rightarrow_{\mathsf{load}} \mu' \runion \set{\bind{x}{\exMod{\Gamma_x}{\set{\bind{\text{\pyinline{__name__}}}{\rho_x^0(\text{\pyinline{__name__}})}} \runion \rho}}}
+  \mu, x \Rightarrow_{\mathsf{load}} \mu' \runion \set{\bind{x}{\set{\bind{\text{\pyinline{__name__}}}{\rho_x^0(\text{\pyinline{__name__}})}} \runion \rho}}
 }
 \and
 \inferrule*[lab={\ruleName{load-qualified}}]
@@ -110,7 +110,7 @@
   \mu', \rho_{q.x}^0, \mathcal{M}(q.x) \Rightarrow \mu'', \rho
 }
 {
-  \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{\bind{q.x}{\exMod{\Gamma_{q.x}}{\set{\bind{\text{\pyinline{__name__}}}{\rho_{q.x}^0(\text{\pyinline{__name__}})}} \runion \rho}}}
+  \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{\bind{q.x}{\set{\bind{\text{\pyinline{__name__}}}{\rho_{q.x}^0(\text{\pyinline{__name__}})}} \runion \rho}}
 }
 \end{mathpar}
 \subcaption{Module $q$ is loaded into the store $\mu$}
@@ -132,7 +132,7 @@
 \and
 \inferrule*[lab={\ruleName{imp-var}}]
 {
-  \mu(q) = \exMod{\Gamma_q}{\rho_q} \\
+  \mu(q) = \rho_q \\
   x \in \dom(\rho_q) \\
   \mu, q, \vec{x} \importsR \mu', \rho
 }
@@ -142,7 +142,7 @@
 \and
 \inferrule*[lab={\ruleName{imp-class}}]
 {
-  \mu(q) = \exMod{\Gamma_q}{\rho_q} \\
+  \mu(q) = \rho_q \\
   x \notin \dom(\rho_q) \\
   q.x \notin \dom(\mathcal{M}) \\
   \mu, q, \vec{x} \importsR \mu', \rho
@@ -153,7 +153,7 @@
 \and
 \inferrule*[lab={\ruleName{imp-module}}]
 {
-  \mu(q) = \exMod{\Gamma_q}{\rho_q} \\
+  \mu(q) = \rho_q \\
   x \notin \dom(\rho_q) \\
   q.x \in \dom(\mathcal{M}) \\
   \mu, q.x \Rightarrow_{\mathsf{load}} \mu' \\
