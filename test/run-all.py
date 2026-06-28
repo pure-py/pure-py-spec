@@ -23,7 +23,8 @@ MODULE_LEVEL, PROGRAM_LEVEL = "module-level", "program-level"
 
 # Verdict / stage directory names: a test's path is its specification
 WELL_FORMED, UNSUPPORTED, ILL_FORMED = "well-formed", "unsupported", "ill-formed"
-SYNTACTIC, SEMANTIC, SYNTACTIC_ONLY = "syntactic", "semantic", "syntactic-only"
+SYNTACTIC, STATIC_SEMANTIC, DYNAMIC_SEMANTIC = "syntactic", "static-semantic", "dynamic-semantic"
+SYNTACTIC_ONLY = "syntactic-only"
 PENDING, HELPERS = "pending", "helpers"
 
 # Checker entry points under src/
@@ -128,9 +129,11 @@ class Runner:
         """Assert a module-level test from its path: <verdict>[/<stage>].
 
         verdict in {well-formed, unsupported, ill-formed} fixes how PurePy and
-        CPython must each respond; stage in {syntactic, semantic} fixes where
-        PurePy rejects. unsupported vs ill-formed is marked by whether CPython
-        accepts (.expected) or rejects (.exception.expected).
+        CPython must each respond; stage in {syntactic, static-semantic,
+        dynamic-semantic} fixes where PurePy rejects (dynamic-semantic = checker
+        accepts, but evaluation is stuck and CPython raises). unsupported vs
+        ill-formed is marked by whether CPython accepts (.expected) or rejects
+        (.exception.expected).
         """
         rel = p.relative_to(ROOT)
         dirs = p.parent.relative_to(module).parts
@@ -142,7 +145,7 @@ class Runner:
         if dirs == (WELL_FORMED, PENDING):
             self.expect_exit(str(rel), script_cmd(PARSE, p), NOT_YET)
             return
-        if dirs == (ILL_FORMED, SEMANTIC, PENDING):
+        if dirs == (ILL_FORMED, STATIC_SEMANTIC, PENDING):
             self.expect_exit(f"{rel} (parse)", script_cmd(PARSE, p), 0)
             self.expect_exit(f"{rel} (check)", script_cmd(CHECK, p), 0)
             self.run_python(f"{rel} (run)", interpreter, p)
@@ -159,9 +162,12 @@ class Runner:
             self.expect_exit(f"{rel} (check)", script_cmd(CHECK, p), 0)
         elif stage == SYNTACTIC:
             self.expect_exit(f"{rel} (parse)", script_cmd(PARSE, p), REJECT_PARSE, error_substr=err)
-        elif stage == SEMANTIC:
+        elif stage == STATIC_SEMANTIC:
             self.expect_exit(f"{rel} (parse)", script_cmd(PARSE, p), 0)
             self.expect_exit(f"{rel} (check)", script_cmd(CHECK, p), REJECT_CHECK, error_substr=err)
+        elif stage == DYNAMIC_SEMANTIC:
+            self.expect_exit(f"{rel} (parse)", script_cmd(PARSE, p), 0)
+            self.expect_exit(f"{rel} (check)", script_cmd(CHECK, p), 0)
 
         if verdict in (WELL_FORMED, UNSUPPORTED):
             if has_exception:
