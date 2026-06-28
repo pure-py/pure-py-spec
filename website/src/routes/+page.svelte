@@ -76,7 +76,7 @@
 		<div class="card">
 			<h3>Portable</h3>
 			<p>
-				Python dialects are compliant by definition, checked on CPython, PyPy, and GraalPy.
+				Python dialects are compliant by definition, checked on CPython, PyPy, GraalPy and Pyodide.
 				Research languages like <a href="https://f.luid.org">Fluid</a> and
 				<a href="https://github.com/plas4sci/fortl">Fortl</a> can be too.
 			</p>
