@@ -5,7 +5,7 @@
 $e$ & $::=$ & $x$ & (Var) \\
     & $\mid$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exApp{e}{e_1, \ldots, e_n}$ & (Call) \\
-    & $\mid$ & $\exConstr{q}{e_1, \ldots, e_n}$ & (Constr) \\
+    & $\mid$ & $\exConstr{q}{e_1, \ldots, e_n, x_{n+1} \mathord{=} e_{n+1}, \ldots, x_{n+m} \mathord{=} e_{n+m}}$ & (Constr) \\
     & $\mid$ & $\exDict{x_1 \mathord{:} e_1, \ldots, x_n \mathord{:} e_n}$ & (Dict) \\
     & $\mid$ & $\exProject{e}{x}$ & (Attribute) \\
     & $\mid$ & $\exDProject{e}{e'}$ & (Subscript) \\

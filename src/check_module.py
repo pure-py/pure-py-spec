@@ -387,9 +387,13 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
         sig = names_class(e.func, ctx)
         if sig is not None:
             c_name, fields = sig
-            if len(e.args) != len(fields):
-                raise IllFormedModule(e, reasons.ConstructorArityMismatch(c_name, len(fields), len(e.args)))
+            n, m = len(e.args), len(e.keywords)
+            if n + m != len(fields):
+                raise IllFormedModule(e, reasons.ConstructorArityMismatch(c_name, len(fields), n + m))
+            if {k.arg for k in e.keywords} != set(fields[n:]):
+                raise IllFormedModule(e, reasons.UnknownConstructorKeyword(c_name, tuple(sorted(set(fields[n:])))))
             check_exprs(e.args, ctx)
+            check_exprs([k.value for k in e.keywords], ctx)
             return
         check_expr(e.func, ctx)
         check_exprs(e.args, ctx)

@@ -62,6 +62,14 @@ class ConstructorArityMismatch:
 
 
 @dataclass(frozen=True)
+class UnknownConstructorKeyword:
+    cls: str
+    expected_fields: tuple[str, ...]
+    def message(self) -> str:
+        return f"constructor keywords for '{self.cls}' must be {', '.join(self.expected_fields)}"
+
+
+@dataclass(frozen=True)
 class PatternArityMismatch:
     cls: str
     expected: int
@@ -173,6 +181,7 @@ Reason = Union[
     UnreachableStatement, ConstructorArityMismatch, PatternArityMismatch,
     UnknownClassInPattern, UnknownFieldInPattern, DuplicatePatternKeyword,
     SelfImport, UnknownModule, UnknownMember, ModuleAsValue,
+    UnknownConstructorKeyword,
     NonlinearPattern, UnreachableCase, DuplicateMutualName,
     NonTopLevelImport, NonTopLevelClass, TopLevelReturn, EmptyFromImport,
 ]

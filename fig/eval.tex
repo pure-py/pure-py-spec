@@ -184,10 +184,10 @@
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i) \\
   \resolveClass(\rho, q) = (c, \clsEntry{\Delta}{q'}{\vec{z}}{c'}) \\
-  \fields(\clsEntry{\Delta}{q'}{\vec{z}}{c'}) = x_1, \ldots, x_n
+  \fields(\clsEntry{\Delta}{q'}{\vec{z}}{c'}) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}
 }
 {
-  \rho, \exConstr{q}{e_1, \ldots, e_n} \Rightarrow \exObj{\Delta'}{q'.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
+  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \exObj{\Delta'}{q'.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n, y_1 \mapsto v_{n+1}, \ldots, y_m \mapsto v_{n+m}}}
 }
 \end{mathpar}
 \caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$}
