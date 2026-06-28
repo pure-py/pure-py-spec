@@ -24,7 +24,7 @@ $b$ & $::=$ & $s_1 \;\ldots\; s_{n+1}$ & (Block)
 $t$ & $::=$ & $\exImport{q}$ & (Import) \\
     & $\mid$ & $\exFromImport{q}{x_1, \ldots, x_{n+1}}$ & (FromImport)
    \\[3mm]
-$m$ & $::=$ & $t_1 \;\ldots\; t_n \; s_1 \;\ldots\; s_k$ & (Module)
+$m$ & $::=$ & $\varepsilon \mid t \cons m \mid s \cons m$ & (Module)
    \\[3mm]
 $q$ & $::=$ & $x_1.x_2.\ldots.x_{n+1}$ & (Name)
    \\[3mm]
