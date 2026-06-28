@@ -63,11 +63,18 @@
 \and
 \inferrule*[lab={\ruleName{val-class}}]
 {
-  C = \clsEntry{\Gamma}{q}{\vec{x}}{c} \\
-  c = \bot \lor \bind{c}{C'} \in \Gamma
+  \strut
 }
 {
-  \vdash C
+  \vdash \clsEntry{\Gamma}{q}{\vec{x}}{\bot}
+}
+\and
+\inferrule*[lab={\ruleName{val-class-extend}}]
+{
+  \bind{c}{C'} \in \Gamma
+}
+{
+  \vdash \clsEntry{\Gamma}{q}{\vec{x}}{c}
 }
 \end{mathpar}
 
