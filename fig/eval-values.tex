@@ -11,12 +11,12 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exMod{\Gamma}{\rho}$ & (Module) \\
     & $\mid$ & $\clsEntry{\Gamma}{q}{\vec{x}}{c'}$ & (Class)
    \\[3mm]
-$\rho$ & $::=$ & $\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}$ & (Environment)
+$\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & (Environment)
    \\[3mm]
 $r$ & $::=$ & $\assigns{\rho}$ \\
   & $\mid$ & $\returns{v}$
    \\[3mm]
-$\mu$ & $::=$ & $\set{q_1 \mapsto \exMod{\Gamma_{q_1}}{\rho_1}, \ldots, q_n \mapsto \exMod{\Gamma_{q_n}}{\rho_n}}$ & (ModuleCache) \\
+$\mu$ & $::=$ & $\set{\bind{q_1}{\exMod{\Gamma_{q_1}}{\rho_1}}, \ldots, \bind{q_n}{\exMod{\Gamma_{q_n}}{\rho_n}}}$ & (ModuleCache) \\
 \end{tabular}
 \end{center}
 \caption{Values, environments and evaluation results}

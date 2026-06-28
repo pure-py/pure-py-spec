@@ -22,7 +22,7 @@
   \rho, e \Rightarrow v
 }
 {
-  \rho, \exAssign{x}{e} \Rightarrow \assigns{\set{x \mapsto v}}
+  \rho, \exAssign{x}{e} \Rightarrow \assigns{\set{\bind{x}{v}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-expr-stmt}}]
@@ -65,7 +65,7 @@
   v_i = \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} \quad (\forall i)
 }
 {
-  \rho, \seq{d} \Rightarrow \assigns{\set{\seq{f} \mapsto \seq{v}}}
+  \rho, \seq{d} \Rightarrow \assigns{\set{\bind{\seq{f}}{\seq{v}}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-if}}]
@@ -146,7 +146,7 @@
 {
   \rho, e \Rightarrow \exClosure[\Delta]{\rho'}{\vec{x}}{e'} \\
   \rho, \vec{e} \Rightarrow \vec{u} \\
-  \rho' \runion \set{\seq{x} \mapsto \seq{u}}, e' \Rightarrow v
+  \rho' \runion \set{\bind{\seq{x}}{\seq{u}}}, e' \Rightarrow v
 }
 {
   \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow v
@@ -158,7 +158,7 @@
   d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
   v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \vec{e} \Rightarrow \vec{u} \\
-  \rho' \runion \set{\seq{f} \mapsto \seq{v}} \runion \set{\seq{x}_j \mapsto \seq{u}}, b_j \Rightarrow r
+  \rho' \runion \set{\bind{\seq{f}}{\seq{v}}} \runion \set{\bind{\seq{x}_j}{\seq{u}}}, b_j \Rightarrow r
 }
 {
   \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow \unwrap(r)
@@ -188,7 +188,7 @@
   \fields(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}
 }
 {
-  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \exObj{\Delta'}{q'.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n, y_1 \mapsto v_{n+1}, \ldots, y_m \mapsto v_{n+m}}}
+  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \exObj{\Delta'}{q'.c}{\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}, \bind{y_1}{v_{n+1}}, \ldots, \bind{y_m}{v_{n+m}}}}
 }
 \end{mathpar}
 \caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$}

@@ -23,7 +23,7 @@
   \strut
 }
 {
-  \rho, x, v \matches \set{x \mapsto v}
+  \rho, x, v \matches \set{\bind{x}{v}}
 }
 \and
 \inferrule*[lab={\ruleName{pat-wild}}]
@@ -55,7 +55,7 @@
   \rho, p, v \matches \rho'
 }
 {
-  \rho, p\;\pyinline{as}\;x, v \matches \rho' \disjunion \set{x \mapsto v}
+  \rho, p\;\pyinline{as}\;x, v \matches \rho' \disjunion \set{\bind{x}{v}}
 }
 \and
 \inferrule*[lab={\ruleName{pat-constr}}]

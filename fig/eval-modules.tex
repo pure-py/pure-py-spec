@@ -15,7 +15,7 @@
 {
   \mu, q \Rightarrow_{\mathsf{load}} \mu' \\
   q = x_1.x_2.\ldots.x_{n+1} \\
-  \mu', \rho \runion \set{x_1 \mapsto \mu'(x_1)}, m \Rightarrow \mu'', \rho'
+  \mu', \rho \runion \set{\bind{x_1}{\mu'(x_1)}}, m \Rightarrow \mu'', \rho'
 }
 {
   \mu, \rho, \exImport{q} \cons m \Rightarrow \mu'', \rho'
@@ -43,19 +43,19 @@
 \inferrule*[lab={\ruleName{eval-class}}]
 {
   C = \clsEntry{\Gamma}{q}{\ownFields(\phi)}{\bot} \\
-  \mu, \rho \runion \set{c \mapsto C}, m \Rightarrow \mu', \rho'
+  \mu, \rho \runion \set{\bind{c}{C}}, m \Rightarrow \mu', \rho'
 }
 {
-  \mu, \rho, \exDataclass{c}{\phi} \cons m \Rightarrow \mu', \set{c \mapsto C} \runion \rho'
+  \mu, \rho, \exDataclass{c}{\phi} \cons m \Rightarrow \mu', \set{\bind{c}{C}} \runion \rho'
 }
 \and
 \inferrule*[lab={\ruleName{eval-class-extend}}]
 {
   C = \clsEntry{\Gamma}{q}{\ownFields(\phi)}{c'} \\
-  \mu, \rho \runion \set{c \mapsto C}, m \Rightarrow \mu', \rho'
+  \mu, \rho \runion \set{\bind{c}{C}}, m \Rightarrow \mu', \rho'
 }
 {
-  \mu, \rho, \exDataclassExtend{c}{c'}{\phi} \cons m \Rightarrow \mu', \set{c \mapsto C} \runion \rho'
+  \mu, \rho, \exDataclassExtend{c}{c'}{\phi} \cons m \Rightarrow \mu', \set{\bind{c}{C}} \runion \rho'
 }
 \end{mathpar}
 \subcaption{Module body $m$ of module $q$ evaluates under store $\mu$ and environment $\rho : \Gamma$}
@@ -100,7 +100,7 @@
   \mu, \rho_x^0, \mathcal{M}(x) \Rightarrow \mu', \rho
 }
 {
-  \mu, x \Rightarrow_{\mathsf{load}} \mu' \runion \set{x \mapsto \exMod{\Gamma_x}{\set{\text{\pyinline{__name__}} \mapsto \rho_x^0(\text{\pyinline{__name__}})} \runion \rho}}
+  \mu, x \Rightarrow_{\mathsf{load}} \mu' \runion \set{\bind{x}{\exMod{\Gamma_x}{\set{\bind{\text{\pyinline{__name__}}}{\rho_x^0(\text{\pyinline{__name__}})}} \runion \rho}}}
 }
 \and
 \inferrule*[lab={\ruleName{load-qualified}}]
@@ -110,7 +110,7 @@
   \mu', \rho_{q.x}^0, \mathcal{M}(q.x) \Rightarrow \mu'', \rho
 }
 {
-  \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{q.x \mapsto \exMod{\Gamma_{q.x}}{\set{\text{\pyinline{__name__}} \mapsto \rho_{q.x}^0(\text{\pyinline{__name__}})} \runion \rho}}
+  \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{\bind{q.x}{\exMod{\Gamma_{q.x}}{\set{\bind{\text{\pyinline{__name__}}}{\rho_{q.x}^0(\text{\pyinline{__name__}})}} \runion \rho}}}
 }
 \end{mathpar}
 \subcaption{Module $q$ is loaded into the store $\mu$}
@@ -137,7 +137,7 @@
   \mu, q, \vec{x} \importsR \mu', \rho
 }
 {
-  \mu, q, x \cons \vec{x} \importsR \mu', \set{x \mapsto \rho_q(x)} \runion \rho
+  \mu, q, x \cons \vec{x} \importsR \mu', \set{\bind{x}{\rho_q(x)}} \runion \rho
 }
 \and
 \inferrule*[lab={\ruleName{imp-class}}]
@@ -160,7 +160,7 @@
   \mu', q, \vec{x} \importsR \mu'', \rho
 }
 {
-  \mu, q, x \cons \vec{x} \importsR \mu'', \set{x \mapsto \mu'(q.x)} \runion \rho
+  \mu, q, x \cons \vec{x} \importsR \mu'', \set{\bind{x}{\mu'(q.x)}} \runion \rho
 }
 \end{mathpar}
 \subcaption{Names $\vec{x}$ imported from module $q$ produce bindings $\rho$}
