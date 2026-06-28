@@ -280,8 +280,6 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
     check_distinct_names(defs[1:], seen | {head.name})
 
 def check_import(s: ast.stmt, q: str, ctx: ModuleContext) -> None:
-    if q == ctx.q:
-        raise IllFormedModule(s, reasons.SelfImport(q))
     if q not in ctx.M:
         raise IllFormedModule(s, reasons.UnknownModule(q))
     check_module(ctx.M[q], ctx.M, q)

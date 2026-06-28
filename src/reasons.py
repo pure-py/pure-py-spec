@@ -147,13 +147,6 @@ class EmptyFromImport:
 
 
 @dataclass(frozen=True)
-class SelfImport:
-    q: str
-    def message(self) -> str:
-        return f"module {self.q!r} imports itself"
-
-
-@dataclass(frozen=True)
 class UnknownModule:
     q: str
     def message(self) -> str:
@@ -180,7 +173,7 @@ Reason = Union[
     UnassignedVariable, CapturedReassignment, SelfCaptureAssignment,
     UnreachableStatement, ConstructorArityMismatch, PatternArityMismatch,
     UnknownClassInPattern, UnknownFieldInPattern, DuplicatePatternKeyword,
-    SelfImport, UnknownModule, UnknownMember, ModuleAsValue,
+    UnknownModule, UnknownMember, ModuleAsValue,
     UnknownConstructorKeyword,
     NonlinearPattern, UnreachableCase, DuplicateMutualName,
     NonTopLevelImport, NonTopLevelClass, TopLevelReturn, EmptyFromImport,
