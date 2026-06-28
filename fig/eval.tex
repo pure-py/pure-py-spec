@@ -119,8 +119,8 @@
 \resolveModule(\rho, x) &= \rho(x) \\
 \resolveModule(\rho, q.x) &= \rho'(x) && \text{where } \resolveModule(\rho, q) = \exMod{\Gamma}{\rho'} \\
 \\
-\resolveClass(\rho, c) &= (c, \clsEntry{\Delta}{q}{\vec{z}}{c'}) && \text{where } \rho(c) = \clsEntry{\Delta}{q}{\vec{z}}{c'} \\
-\resolveClass(\rho, q.c) &= (c, \clsEntry{\Delta}{q'}{\vec{z}}{c'}) && \text{where } \resolveModule(\rho, q) = \exMod{\Gamma}{\rho'},\ \rho'(c) = \clsEntry{\Delta}{q'}{\vec{z}}{c'}
+\resolveClass(\rho, c) &= (c, C) && \text{where } \rho(c) = C \\
+\resolveClass(\rho, q.c) &= (c, C) && \text{where } \resolveModule(\rho, q) = \exMod{\Gamma}{\rho'},\ \rho'(c) = C
 \end{align*}
 
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
@@ -183,8 +183,9 @@
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i) \\
-  \resolveClass(\rho, q) = (c, \clsEntry{\Delta}{q'}{\vec{z}}{c'}) \\
-  \fields(\clsEntry{\Delta}{q'}{\vec{z}}{c'}) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}
+  \resolveClass(\rho, q) = (c, C) \\
+  C = \clsEntry{\Delta}{q'}{\vec{z}}{c'} \\
+  \fields(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}
 }
 {
   \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \exObj{\Delta'}{q'.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n, y_1 \mapsto v_{n+1}, \ldots, y_m \mapsto v_{n+m}}}

@@ -42,18 +42,20 @@
 \and
 \inferrule*[lab={\ruleName{eval-class}}]
 {
-  \mu, \rho \runion \set{c \mapsto \clsEntry{\Gamma}{q}{\ownFields(\phi)}{\bot}}, m \Rightarrow \mu', \rho'
+  C = \clsEntry{\Gamma}{q}{\ownFields(\phi)}{\bot} \\
+  \mu, \rho \runion \set{c \mapsto C}, m \Rightarrow \mu', \rho'
 }
 {
-  \mu, \rho, \exDataclass{c}{\phi} \cons m \Rightarrow \mu', \set{c \mapsto \clsEntry{\Gamma}{q}{\ownFields(\phi)}{\bot}} \runion \rho'
+  \mu, \rho, \exDataclass{c}{\phi} \cons m \Rightarrow \mu', \set{c \mapsto C} \runion \rho'
 }
 \and
 \inferrule*[lab={\ruleName{eval-class-extend}}]
 {
-  \mu, \rho \runion \set{c \mapsto \clsEntry{\Gamma}{q}{\ownFields(\phi)}{c'}}, m \Rightarrow \mu', \rho'
+  C = \clsEntry{\Gamma}{q}{\ownFields(\phi)}{c'} \\
+  \mu, \rho \runion \set{c \mapsto C}, m \Rightarrow \mu', \rho'
 }
 {
-  \mu, \rho, \exDataclassExtend{c}{c'}{\phi} \cons m \Rightarrow \mu', \set{c \mapsto \clsEntry{\Gamma}{q}{\ownFields(\phi)}{c'}} \runion \rho'
+  \mu, \rho, \exDataclassExtend{c}{c'}{\phi} \cons m \Rightarrow \mu', \set{c \mapsto C} \runion \rho'
 }
 \end{mathpar}
 \subcaption{Module body $m$ of module $q$ evaluates under store $\mu$ and environment $\rho : \Gamma$}

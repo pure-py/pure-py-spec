@@ -13,10 +13,10 @@
 \and
 \inferrule*[lab={\ruleName{simple-class}}]
 {
-  \bind{c}{\clsEntry{\Delta}{q}{\vec{x}}{c'}} \in \Gamma
+  \bind{c}{C} \in \Gamma
 }
 {
-  \Gamma \vdash c \names \clsEntry{\Delta}{q}{\vec{x}}{c'}
+  \Gamma \vdash c \names C
 }
 \and
 \inferrule*[lab={\ruleName{qualified-module}}]
@@ -31,10 +31,10 @@
 \inferrule*[lab={\ruleName{qualified-class}}]
 {
   \Gamma \vdash q \names \modEntry{q'} \\
-  \bind{c}{\clsEntry{\Delta}{q'}{\vec{x}}{c'}} \in \Gamma_{q'}
+  \bind{c}{C} \in \Gamma_{q'}
 }
 {
-  \Gamma \vdash q.c \names \clsEntry{\Delta}{q'}{\vec{x}}{c'}
+  \Gamma \vdash q.c \names C
 }
 \end{mathpar}
 \subcaption{Name $q$ resolves to context entry $\theta$ under $\Gamma$}
@@ -64,8 +64,8 @@
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
-  \Gamma \vdash q \names \clsEntry{\Delta}{q'}{\vec{z}}{c'} \\
-  \fields(\clsEntry{\Delta}{q'}{\vec{z}}{c'}) = x_1, \ldots, x_n \mathbin{\cdot} \seq{x}\,' \\
+  \Gamma \vdash q \names C \\
+  \fields(C) = x_1, \ldots, x_n \mathbin{\cdot} \seq{x}\,' \\
   \set{\seq{y}} = \set{\seq{x}\,'} \\
   \Gamma \vdash e_i \quad (\forall i)
 }

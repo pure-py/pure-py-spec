@@ -157,12 +157,12 @@ A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the fo
 \begin{itemize}
 \item \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
 \item \emph{module reference} $\modEntry{q}$, for a fully-qualified module name $q$;
-\item \emph{class entry} $\clsEntry{\Gamma}{q}{\vec{x}}{c}$, recording the declaring context $\Gamma$, defining module $q$, sequence of distinct field names $\vec{x}$, and base class $c$ (or $\bot$ for no base).
+\item \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q}{\vec{x}}{c}$, recording the declaring context $\Gamma$, defining module $q$, sequence of distinct field names $\vec{x}$, and base class $c$ (or $\bot$ for no base).
 \end{itemize}
 \end{definition}
 
 \noindent Module references arise from import statements. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}; $\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ \emph{not definitely assigned} (or, equivalently, degenerate types ``any'' and ``none'').
-It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, x : \theta$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusDefAssigned(X)$ for the context $\set{x : \statusDefAssigned \mid x \in X}$; similarly $\statusNotDefAssigned(X)$.
+It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusDefAssigned(X)$ for the context $\set{\bind{x}{\statusDefAssigned} \mid x \in X}$; similarly $\statusNotDefAssigned(X)$.
 
 \paragraph{Context operations.}
 
@@ -256,7 +256,7 @@ errors) to a single zone at the start of each module body.
 
 \begin{definition}[Initial variable context]
 For any $q \in \dom(\mathcal{M})$, the \emph{initial variable context} of $q$ is $\Gamma_q^0 = \Gamma_{\textup{\pyinline{builtins}}} \runion
-\set{\text{\pyinline{__name__}} : \statusDefAssigned}$, where $\Gamma_{\textup{\pyinline{builtins}}}$ binds the
+\set{\bind{\text{\pyinline{__name__}}}{\statusDefAssigned}}$, where $\Gamma_{\textup{\pyinline{builtins}}}$ binds the
 names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined}).
 \end{definition}
 
@@ -317,7 +317,7 @@ A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is li
 
 Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
-= e} definitely assigns $\set{\pyinline{x} : \statusDefAssigned}$. \emph{Result types} $R$ classify these outcomes: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$). Block well-formedness is given in
+= e} definitely assigns $\set{\bind{\pyinline{x}}{\statusDefAssigned}}$. \emph{Result types} $R$ classify these outcomes: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$). Block well-formedness is given in
 \figref{well-formed}; expression well-formedness in \figref{well-formed-expr}.
 
 Context operations $\runion$ and $\merge$ lift to a right semiring over result types $R$, with $\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero for $\runion$.
@@ -346,7 +346,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \input{fig/well-formed-module}
 
 \begin{definition}[Exports of a well-formed module]
-Suppose $\Gamma_q^0 \vdash \mathcal{M}(q) : \Delta$. Define the \emph{exports} of $q$ as $\Gamma_q = \set{\text{\pyinline{__name__}} : \statusDefAssigned} \runion \Delta$.
+Suppose $\Gamma_q^0 \vdash \mathcal{M}(q) : \Delta$. Define the \emph{exports} of $q$ as $\Gamma_q = \set{\bind{\text{\pyinline{__name__}}}{\statusDefAssigned}} \runion \Delta$.
 \end{definition}
 
 \noindent Exports comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. In particular a module never exports a module, since module names enter scope only via imports.

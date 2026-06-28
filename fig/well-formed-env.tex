@@ -66,7 +66,7 @@
   \strut
 }
 {
-  \vdash \clsEntry{\Gamma}{q}{\vec{x}}{c}
+  \vdash C
 }
 \end{mathpar}
 
@@ -89,7 +89,7 @@
   \vdash \rho : \Gamma
 }
 {
-  \vdash \set{x \mapsto v} \runion \rho : \set{x : \theta} \runion \Gamma
+  \vdash \set{x \mapsto v} \runion \rho : \set{\bind{x}{\theta}} \runion \Gamma
 }
 \end{mathpar}
 \caption{Well-formed values and environments}
