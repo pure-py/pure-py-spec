@@ -60,7 +60,6 @@
 {
   q' = x_1.x_2.\ldots.x_{n+1} \\
   q' \in \dom(\mathcal{M}) \\
-  q' \neq q \\
   \varnothing \vdash \mathcal{M}(q') : \Delta' \\
   \Gamma, \bind{x_1}{\modEntry{q'}} \vdash m : \Delta
 }
@@ -71,7 +70,6 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   q' \in \dom(\mathcal{M}) \\
-  q' \neq q \\
   \varnothing \vdash \mathcal{M}(q') : \Delta' \\
   q', \vec{x} \importsR \Gamma' \\
   \Gamma \runion \Gamma' \vdash m : \Delta
