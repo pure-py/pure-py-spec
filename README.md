@@ -32,14 +32,13 @@ test/run-all.sh
 
 Sets up a `.venv` automatically. Targets Python 3.12+ ([#39](https://github.com/pure-py/pure-py-spec/issues/39)).
 
-Test categories mirror the two judgement tiers in the spec (per-module $\Gamma \vdash_M m : \Delta$ and program-level $\vdash \langle E, \mathcal{M} \rangle$):
-- `test/module-level/well-formed/` — accepted by the checker, runs correctly in Python
-- `test/module-level/ill-formed/semantic/` — parser accepts but well-formedness rejects
-- `test/module-level/ill-formed/unsupported/` — parser rejects (permanently excluded Python features)
-- `test/module-level/ill-formed/syntactic-only/` — rejected by well-formedness but cannot be expressed as `.py` source; tested via direct AST construction
-- `test/module-level/pending/` — will be accepted once features are implemented
-- `test/program-level/well-formed/` — multi-module programs accepted end-to-end
-- `test/program-level/ill-formed/` — programs rejected by whole-program checks (missing modules, cycles, etc.)
+Tests are organised by tier (per-module $\Gamma \vdash_M m : \Delta$ and program-level $\vdash \langle E, \mathcal{M} \rangle$) and then by verdict. The verdict directory *is* the test's specification: the runner derives every assertion from the path.
+- `well-formed/` — PurePy accepts; CPython runs it
+- `unsupported/` — PurePy rejects but CPython accepts (valid Python excluded by design); `syntactic/` is rejected at parse, `semantic/` at check
+- `ill-formed/` — PurePy rejects *and* CPython rejects (a genuine error); `semantic/` carries the CPython exception, `syntactic-only/` is tested via AST construction (not expressible as `.py`)
+- `pending/` — not yet implemented; will become well-formed
+
+The invariant — `unsupported` ⇒ CPython runs it, `ill-formed` ⇒ CPython rejects it — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails.
 
 ## Reference parser (`src/purepy_parse.py`)
 

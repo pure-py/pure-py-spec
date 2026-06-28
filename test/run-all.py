@@ -83,6 +83,62 @@ class Runner:
             if expected_path.exists():
                 self.run_python(f"{rel} (run)", interpreter, main_py, cwd=d, expected_path=expected_path)
 
+    def module_test(self, p, module, interpreter):
+        """Assert a module-level test from its path: <verdict>[/<stage>].
+
+        verdict in {well-formed, unsupported, ill-formed} fixes how PurePy and
+        CPython must each respond; stage in {syntactic, semantic} fixes where
+        PurePy rejects. unsupported vs ill-formed is marked by whether CPython
+        accepts (.expected) or rejects (.exception.expected).
+        """
+        rel = p.relative_to(ROOT)
+        dirs = p.parent.relative_to(module).parts
+        has_expected = p.with_suffix(".expected").exists()
+        has_exception = p.with_suffix(".exception.expected").exists()
+        err_file = p.with_suffix(".error.expected")
+        err = err_file.read_text().strip() if err_file.exists() else None
+
+        if dirs == ("well-formed", "pending"):
+            self.expect_exit(str(rel), script_cmd("parse.py", p), 2)
+            return
+        if dirs == ("ill-formed", "semantic", "pending"):
+            self.expect_exit(f"{rel} (parse)", script_cmd("parse.py", p), 0)
+            self.expect_exit(f"{rel} (check)", script_cmd("check_module.py", p), 0)
+            self.run_python(f"{rel} (run)", interpreter, p)
+            return
+        if dirs == ("ill-formed", "syntactic-only"):
+            self.expect_exit(str(rel), [interpreter, str(p)], 0)
+            return
+
+        verdict = dirs[0]
+        stage = dirs[1] if len(dirs) > 1 else None
+
+        if verdict == "well-formed":
+            self.expect_exit(f"{rel} (parse)", script_cmd("parse.py", p), 0)
+            self.expect_exit(f"{rel} (check)", script_cmd("check_module.py", p), 0)
+        elif stage == "syntactic":
+            self.expect_exit(f"{rel} (parse)", script_cmd("parse.py", p), 1, error_substr=err)
+        elif stage == "semantic":
+            self.expect_exit(f"{rel} (parse)", script_cmd("parse.py", p), 0)
+            self.expect_exit(f"{rel} (check)", script_cmd("check_module.py", p), 3, error_substr=err)
+
+        if verdict in ("well-formed", "unsupported"):
+            if has_exception:
+                self.bad(f"{rel} (run)", "must not have .exception.expected")
+            elif stage == "syntactic":
+                self.expect_exit(f"{rel} (python)", [interpreter, str(p)], 0)
+            elif not has_expected:
+                self.bad(f"{rel} (run)", "missing .expected")
+            else:
+                self.run_python(f"{rel} (run)", interpreter, p)
+        else:
+            if has_expected:
+                self.bad(f"{rel} (run)", "ill-formed must not have .expected")
+            elif not has_exception:
+                self.bad(f"{rel} (run)", "missing .exception.expected")
+            else:
+                self.run_python(f"{rel} (run)", interpreter, p)
+
     def summary(self):
         total = self.passed + self.failed
         print()
@@ -115,48 +171,15 @@ def main():
         else:
             r.bad("src/", proc.stdout.strip()[:400])
 
-    print("module-level/well-formed")
-    files = sorted(p for p in (module / "well-formed").rglob("*.py") if "pending" not in p.parts)
-    for p in files:
-        rel = p.relative_to(ROOT)
-        if not p.with_suffix(".expected").exists():
-            r.bad(f"{rel} (run)", "missing .expected")
+    last = None
+    for p in sorted(module.rglob("*.py"), key=lambda p: (p.parent.as_posix(), p.name)):
+        if "helpers" in p.parts:
             continue
-        r.expect_exit(f"{rel} (parse)", script_cmd("parse.py", p), 0)
-        r.expect_exit(f"{rel} (check)", script_cmd("check_module.py", p), 0)
-        r.run_python(f"{rel} (run)", interpreter, p)
-
-    print("module-level/well-formed/pending")
-    for p in sorted((module / "well-formed" / "pending").glob("*.py")):
-        r.expect_exit(str(p.relative_to(ROOT)), script_cmd("parse.py", p), 2)
-
-    print("module-level/ill-formed/semantic")
-    for p in sorted((module / "ill-formed" / "semantic").glob("*.py")):
-        rel = p.relative_to(ROOT)
-        r.expect_exit(f"{rel} (parse)", script_cmd("parse.py", p), 0)
-        err_path = p.with_suffix(".error.expected")
-        err_substr = err_path.read_text().strip() if err_path.exists() else None
-        r.expect_exit(f"{rel} (check)", script_cmd("check_module.py", p), 3, error_substr=err_substr)
-        r.run_python(f"{rel} (run)", interpreter, p)
-
-    print("module-level/ill-formed/semantic/pending")
-    for p in sorted((module / "ill-formed" / "semantic" / "pending").glob("*.py")):
-        rel = p.relative_to(ROOT)
-        r.expect_exit(f"{rel} (parse)", script_cmd("parse.py", p), 0)
-        r.expect_exit(f"{rel} (check)", script_cmd("check_module.py", p), 0)
-        r.run_python(f"{rel} (run)", interpreter, p)
-
-    print("module-level/ill-formed/unsupported")
-    for p in sorted((module / "ill-formed" / "unsupported").glob("*.py")):
-        rel = p.relative_to(ROOT)
-        err_path = p.with_suffix(".error.expected")
-        err_substr = err_path.read_text().strip() if err_path.exists() else None
-        r.expect_exit(f"{rel} (parse)", script_cmd("parse.py", p), 1, error_substr=err_substr)
-        r.expect_exit(f"{rel} (python)", [interpreter, str(p)], 0)
-
-    print("module-level/ill-formed/syntactic-only")
-    for p in sorted((module / "ill-formed" / "syntactic-only").glob("*.py")):
-        r.expect_exit(str(p.relative_to(ROOT)), [interpreter, str(p)], 0)
+        header = p.parent.relative_to(base)
+        if header != last:
+            print(header)
+            last = header
+        r.module_test(p, module, interpreter)
 
     print("program-level/well-formed")
     for d in sorted(p for p in (program / "well-formed").iterdir() if p.is_dir()):
