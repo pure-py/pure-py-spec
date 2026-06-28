@@ -101,8 +101,11 @@ PREDEFINED_MEMBERS: dict[str, set[str]] = {
 }
 PREDEFINED_MODULES = set(PREDEFINED_MEMBERS)
 
-def gamma_zero() -> Context:
-    return {'__name__': Status.TT}
+def name_assign(q: str) -> ast.stmt:
+    return ast.parse(f'__name__ = {q!r}').body[0]
+
+def module_body(M: dict[str, ast.Module], q: str) -> list[ast.stmt]:
+    return [name_assign(q)] + M[q].body
 
 def empty_context() -> VarContext:
     return {}
@@ -298,9 +301,11 @@ def imported_entry(s: ast.stmt, x: str, q: str, gamma_q: Context,
         return ModuleRef(sub)
     raise IllFormedModule(s, reasons.UnknownMember(x, q))
 
-def module_members(body: list[ast.stmt], M: dict[str, ast.Module], q: str) -> set[str]:
+def module_members(M: dict[str, ast.Module], q: str) -> set[str]:
     submodules = {name[len(q) + 1:].split('.')[0] for name in M if name.startswith(f'{q}.')}
-    return own_members(body, q) | {'__name__'} | submodules
+    if q in PREDEFINED_MEMBERS:
+        return PREDEFINED_MEMBERS[q] | {'__name__'} | submodules
+    return own_members(module_body(M, q), q) | submodules
 
 def own_members(body: list[ast.stmt], q: str) -> set[str]:
     if q in PREDEFINED_MEMBERS:
@@ -421,7 +426,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
     if isinstance(e, ast.Attribute):
         mod = names_module(e.value, ctx)
         if mod is not None:
-            if e.attr not in module_members(ctx.M[mod].body, ctx.M, mod):
+            if e.attr not in module_members(ctx.M, mod):
                 raise IllFormedModule(e, reasons.UnknownMember(e.attr, mod))
             return
         check_expr(e.value, ctx)
@@ -873,15 +878,16 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     nested = find_nested_import(m.body)
     if nested is not None:
         raise IllFormedModule(nested, reasons.NonTopLevelImport())
-    final_ctx = check_block(m.body, ModuleContext(gamma=gamma_zero(), M=M, q=q), module_body=True)
+    body = module_body(M, q)
+    final_ctx = check_block(body, ModuleContext(gamma={}, M=M, q=q), module_body=True)
     if m.body and isinstance(result_type_of_block(m.body), TyReturns):
         raise IllFormedModule(m.body[0], reasons.TopLevelReturn())
-    return module_exports(m.body, final_ctx, q)
+    return module_exports(body, final_ctx, q)
 
 def module_exports(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context:
     if q in PREDEFINED_MEMBERS:
         return {name: Status.TT for name in PREDEFINED_MEMBERS[q] | {'__name__'}}
-    return {name: final_ctx.gamma[name] for name in own_members(body, q) | {'__name__'}}
+    return {name: final_ctx.gamma[name] for name in own_members(body, q)}
 
 def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> Optional[IllFormed]:
     try:

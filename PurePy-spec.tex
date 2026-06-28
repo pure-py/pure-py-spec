@@ -252,8 +252,7 @@ $\mathcal{M}$ from \emph{fully-qualified module names} (\figref{syntax-stmt}) to
 the parents of any module in $\dom(\mathcal{M})$ are themselves in $\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$ by mapping each leaf module to a \pyinline{.py} file and each package to an \pyinline{__init__.py}; prefix-closure then requires an \pyinline{__init__.py} for every enclosing package.} The map $\mathcal{M}$
 is fixed and ambient in all definitions that follow.
 
-\begin{definition}[Initial variable context]
-The \emph{initial variable context} is $\Gamma_{\pymath{\_\_name\_\_}} = \set{\bind{\pymath{\_\_name\_\_}}{\statusDefAssigned}}$, and
+\begin{definition}[Builtins context]
 $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\pyinline{builtins}}
 (\figref{predefined}).
 \end{definition}
@@ -278,7 +277,7 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \end{figure}
 
 The metafunction $\assignsS$ extends from individual statements to blocks and module bodies by union, and $\imports$ to module bodies. The metafunction $\parents$ collects the proper prefixes of a
-fully-qualified name.
+fully-qualified name, and $\nameOf(q)$ is the string literal naming $q$.
 
 \input{fig/modules}
 
@@ -344,7 +343,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \input{fig/well-formed-module}
 
 \begin{definition}[Exports of a well-formed module]
-Suppose $\Gamma_{\pymath{\_\_name\_\_}} \vdash \mathcal{M}(q) : \Delta$. Define the \emph{exports} of $q$ as $\Gamma_q = \set{\bind{\pymath{\_\_name\_\_}}{\statusDefAssigned}} \runion \Delta$.
+Suppose $\varnothing \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \mathcal{M}(q) : \Delta$. Define the \emph{exports} of $q$ as $\Gamma_q = \Delta$.
 \end{definition}
 
 \noindent Exports comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. In particular a module never exports a module, since module names enter scope only via imports.
@@ -682,8 +681,7 @@ with $\assigns{\varnothing}$ as left and right unit.
 \input{fig/well-formed-env}
 
 Program and module evaluation are given in \figref{eval-modules}, with module loading and importing in
-\figref{eval-load}. These use the initial environment $\rho_{\pymath{\_\_name\_\_}}(q) = \set{\bind{\pymath{\_\_name\_\_}}{v}}$, where
-$v$ is the string literal naming $q$, and the environment $\rho_{\pymath{builtins}}$ binding the names of
+\figref{eval-load}. These use the environment $\rho_{\pymath{builtins}}$ binding the names of
 \figref{predefined}.
 
 \input{fig/eval-modules}

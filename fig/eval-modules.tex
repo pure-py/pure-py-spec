@@ -69,7 +69,7 @@
 \small
 \inferrule*[lab={\ruleName{eval-program}}]
 {
-  \varnothing, \set{\bind{\pymath{\_\_name\_\_}}{\pymath{"\_\_main\_\_"}}}, \mathcal{M}(q) \Rightarrow \mu, \rho
+  \varnothing, \varnothing, (\exAssign{\pymath{\_\_name\_\_}}{\pymath{"\_\_main\_\_"}}) \cons \mathcal{M}(q) \Rightarrow \mu, \rho
 }
 {
   \langle q, \mathcal{M} \rangle \Rightarrow 0
@@ -97,20 +97,20 @@
 \inferrule*[lab={\ruleName{load-unqualified}}]
 {
   x \notin \dom(\mu) \\
-  \mu, \rho_{\pymath{\_\_name\_\_}}(x), \mathcal{M}(x) \Rightarrow \mu', \rho
+  \mu, \varnothing, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(x)}) \cons \mathcal{M}(x) \Rightarrow \mu', \rho
 }
 {
-  \mu, x \Rightarrow_{\mathsf{load}} \mu' \runion \set{\bind{x}{\rho_{\pymath{\_\_name\_\_}}(x) \runion \rho}}
+  \mu, x \Rightarrow_{\mathsf{load}} \mu' \runion \set{\bind{x}{\rho}}
 }
 \and
 \inferrule*[lab={\ruleName{load-qualified}}]
 {
   q.x \notin \dom(\mu) \\
   \mu, q \Rightarrow_{\mathsf{load}} \mu' \\
-  \mu', \rho_{\pymath{\_\_name\_\_}}(q.x), \mathcal{M}(q.x) \Rightarrow \mu'', \rho
+  \mu', \varnothing, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q.x)}) \cons \mathcal{M}(q.x) \Rightarrow \mu'', \rho
 }
 {
-  \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{\bind{q.x}{\rho_{\pymath{\_\_name\_\_}}(q.x) \runion \rho}}
+  \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{\bind{q.x}{\rho}}
 }
 \end{mathpar}
 \subcaption{Module $q$ is loaded into the store $\mu$}

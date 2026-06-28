@@ -123,7 +123,7 @@
 \small
 \inferrule*[lab={\ruleName{module}}]
 {
-  \Gamma_{\pymath{\_\_name\_\_}} \vdash \mathcal{M}(q) : \Delta
+  \varnothing \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \mathcal{M}(q) : \Delta
 }
 {
   \vdash_{\mathcal{M}} q
