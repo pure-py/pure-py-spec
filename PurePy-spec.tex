@@ -256,9 +256,9 @@ Import statements appear only as a contiguous prefix of a module body, before an
 errors) to a single zone at the start of each module body.
 
 \begin{definition}[Initial variable context]
-For any $q \in \dom(\mathcal{M})$, the \emph{initial variable context} of $q$ is $\Gamma_q^0 =
-\set{\bind{\pymath{\_\_name\_\_}}{\statusDefAssigned}}$, and $\Gamma_{\pymath{builtins}}$ binds the names of the
-predefined module \textup{\pyinline{builtins}} (\figref{predefined}).
+The \emph{initial variable context} is $\Gamma^0 = \set{\bind{\pymath{\_\_name\_\_}}{\statusDefAssigned}}$, and
+$\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\pyinline{builtins}}
+(\figref{predefined}).
 \end{definition}
 
 
@@ -347,7 +347,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \input{fig/well-formed-module}
 
 \begin{definition}[Exports of a well-formed module]
-Suppose $\Gamma_q^0 \vdash \mathcal{M}(q) : \Delta$. Define the \emph{exports} of $q$ as $\Gamma_q = \set{\bind{\pymath{\_\_name\_\_}}{\statusDefAssigned}} \runion \Delta$.
+Suppose $\Gamma^0 \vdash \mathcal{M}(q) : \Delta$. Define the \emph{exports} of $q$ as $\Gamma_q = \set{\bind{\pymath{\_\_name\_\_}}{\statusDefAssigned}} \runion \Delta$.
 \end{definition}
 
 \noindent Exports comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. In particular a module never exports a module, since module names enter scope only via imports.
