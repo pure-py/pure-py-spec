@@ -31,7 +31,7 @@
 \inferrule*[lab={\ruleName{qualified-class}}]
 {
   \Gamma \vdash q \names \modEntry{q'} \\
-  \Gamma_{q'}(c) = \clsEntry{\Delta}{q'}{\vec{x}}{c'}
+  c : \clsEntry{\Delta}{q'}{\vec{x}}{c'} \in \Gamma_{q'}
 }
 {
   \Gamma \vdash q.c \names \clsEntry{\Delta}{q'}{\vec{x}}{c'}

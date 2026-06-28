@@ -346,7 +346,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \input{fig/well-formed-module}
 
 \begin{definition}[Exports of a well-formed module]
-For a well-formed module $q$, i.e.\ where $\Gamma_q^0 \vdash \mathcal{M}(q) : \Delta$ for some $\Delta$, the \emph{exports} of $q$ are $\Gamma_q = \set{\text{\pyinline{__name__}} : \statusDefAssigned} \runion \Delta$.
+Suppose $\Gamma_q^0 \vdash \mathcal{M}(q) : \Delta$. Define the \emph{exports} of $q$ as $\Gamma_q = \set{\text{\pyinline{__name__}} : \statusDefAssigned} \runion \Delta$.
 \end{definition}
 
 \noindent Exports comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. In particular a module never exports a module, since module names enter scope only via imports.
