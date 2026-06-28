@@ -98,8 +98,8 @@ class Runner:
 
     def run_multi_file_tests(self, category_root, interpreter):
         """Each subdir is a test: main.py, expected_exit, plus fixtures and the
-        CPython-side evidence. The verdict (the category directory name) fixes
-        whether CPython must accept (expected) or reject (main.exception.expected)."""
+        Python-side evidence. The verdict (the category directory name) fixes
+        whether Python must accept (expected) or reject (main.exception.expected)."""
         verdict = category_root.name
         for d in sorted(p for p in category_root.iterdir() if p.is_dir()):
             rel = d.relative_to(ROOT)
@@ -129,10 +129,10 @@ class Runner:
         """Assert a module-level test from its path: <verdict>[/<stage>].
 
         verdict in {well-formed, unsupported, ill-formed} fixes how PurePy and
-        CPython must each respond; stage in {syntactic, static-semantic,
+        Python must each respond; stage in {syntactic, static-semantic,
         dynamic-semantic} fixes where PurePy rejects (dynamic-semantic = checker
-        accepts, but evaluation is stuck and CPython raises). unsupported vs
-        ill-formed is marked by whether CPython accepts (.expected) or rejects
+        accepts, but evaluation is stuck and Python raises). unsupported vs
+        ill-formed is marked by whether Python accepts (.expected) or rejects
         (.exception.expected).
         """
         rel = p.relative_to(ROOT)

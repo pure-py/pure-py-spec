@@ -33,12 +33,12 @@ test/run-all.sh
 Sets up a `.venv` automatically. Targets Python 3.12+ ([#39](https://github.com/pure-py/pure-py-spec/issues/39)).
 
 Tests are organised by tier (per-module $\Gamma \vdash_M m : \Delta$ and program-level $\vdash \langle E, \mathcal{M} \rangle$) and then by verdict. The verdict directory *is* the test's specification: the runner derives every assertion from the path.
-- `well-formed/` — PurePy accepts; CPython runs it
-- `unsupported/` — PurePy rejects but CPython accepts (valid Python excluded by design); `syntactic/` is rejected at parse, `semantic/` at check
-- `ill-formed/` — PurePy rejects *and* CPython rejects (a genuine error); `semantic/` carries the CPython exception, `syntactic-only/` is tested via AST construction (not expressible as `.py`)
+- `well-formed/` — PurePy accepts; Python runs it
+- `unsupported/` — PurePy rejects but Python accepts (valid Python excluded by design); `syntactic/` is rejected at parse, `semantic/` at check
+- `ill-formed/` — PurePy rejects *and* Python rejects (a genuine error); `semantic/` carries the Python exception, `syntactic-only/` is tested via AST construction (not expressible as `.py`)
 - `pending/` — not yet implemented; will become well-formed
 
-The invariant — `unsupported` ⇒ CPython runs it, `ill-formed` ⇒ CPython rejects it — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails.
+The invariant — `unsupported` ⇒ Python runs it, `ill-formed` ⇒ Python rejects it — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails.
 
 ## Reference parser (`src/purepy_parse.py`)
 
@@ -69,7 +69,7 @@ Implementations are allowed to have additional behaviours and syntax beyond the 
 
 Languages/language implementations we would like to be PurePy compliant:
 
-- CPython
+- Python
 - JAX
 - [Fluid](https://github.com/explorable-viz/fluid)
 - fortl
