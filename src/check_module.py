@@ -293,8 +293,10 @@ def imported_entry(s: ast.stmt, x: str, q: str, gamma_q: Context,
     entry = gamma_q.get(x)
     if entry is not None:
         return entry
-    if f'{q}.{x}' in ctx.M:
-        return ModuleRef(f'{q}.{x}')
+    sub = f'{q}.{x}'
+    if sub in ctx.M:
+        check_module(ctx.M[sub], ctx.M, sub)
+        return ModuleRef(sub)
     raise IllFormedModule(s, reasons.UnknownMember(x, q))
 
 def module_members(body: list[ast.stmt], M: dict[str, ast.Module], q: str) -> set[str]:

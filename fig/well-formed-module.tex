@@ -30,7 +30,9 @@
 \and
 \inferrule*[lab={\ruleName{imp-module}}]
 {
+  x \notin \dom(\Gamma_q) \\
   q.x \in \dom(\mathcal{M}) \\
+  \vdash_{\mathcal{M}} q.x \\
   q, \vec{x} \importsR \Gamma
 }
 {
