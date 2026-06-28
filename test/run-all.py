@@ -96,7 +96,10 @@ class Runner:
             self.ok(label)
 
     def run_multi_file_tests(self, category_root, interpreter):
-        """Each subdir is a test: main.py, expected_exit, plus optional fixtures and expected file."""
+        """Each subdir is a test: main.py, expected_exit, plus fixtures and the
+        CPython-side evidence. The verdict (the category directory name) fixes
+        whether CPython must accept (expected) or reject (main.exception.expected)."""
+        verdict = category_root.name
         for d in sorted(p for p in category_root.iterdir() if p.is_dir()):
             rel = d.relative_to(ROOT)
             main_py = d / MAIN
@@ -104,9 +107,22 @@ class Runner:
             err_path = d / EXPECTED_ERROR
             err_substr = err_path.read_text().strip() if err_path.exists() else None
             self.expect_exit(f"{rel} (check)", script_cmd(CHECK_PROGRAM, main_py), expected_exit_code, error_substr=err_substr)
-            expected_path = d / EXPECTED_FILE
-            if expected_path.exists():
-                self.run_python(f"{rel} (run)", interpreter, main_py, cwd=d, expected_path=expected_path)
+            has_expected = (d / EXPECTED_FILE).exists()
+            has_exception = main_py.with_suffix(EXCEPTION_EXPECTED).exists()
+            if verdict == ILL_FORMED:
+                if has_expected:
+                    self.bad(f"{rel} (run)", f"ill-formed must not have {EXPECTED_FILE}")
+                elif not has_exception:
+                    self.bad(f"{rel} (run)", f"missing {EXCEPTION_EXPECTED}")
+                else:
+                    self.run_python(f"{rel} (run)", interpreter, main_py, cwd=d)
+            else:
+                if has_exception:
+                    self.bad(f"{rel} (run)", f"must not have {EXCEPTION_EXPECTED}")
+                elif not has_expected:
+                    self.bad(f"{rel} (run)", f"missing {EXPECTED_FILE}")
+                else:
+                    self.run_python(f"{rel} (run)", interpreter, main_py, cwd=d, expected_path=d / EXPECTED_FILE)
 
     def module_test(self, p, module, interpreter):
         """Assert a module-level test from its path: <verdict>[/<stage>].
@@ -202,14 +218,9 @@ def main():
             last = header
         r.module_test(p, module, interpreter)
 
-    print(f"{PROGRAM_LEVEL}/{WELL_FORMED}")
-    for d in sorted(p for p in (program / WELL_FORMED).iterdir() if p.is_dir()):
-        if not (d / EXPECTED_FILE).exists():
-            r.bad(f"{d.relative_to(ROOT)} (run)", f"missing {EXPECTED_FILE}")
-    r.run_multi_file_tests(program / WELL_FORMED, interpreter)
-
-    print(f"{PROGRAM_LEVEL}/{ILL_FORMED}")
-    r.run_multi_file_tests(program / ILL_FORMED, interpreter)
+    for verdict in (WELL_FORMED, UNSUPPORTED, ILL_FORMED):
+        print(f"{PROGRAM_LEVEL}/{verdict}")
+        r.run_multi_file_tests(program / verdict, interpreter)
 
     r.summary()
 

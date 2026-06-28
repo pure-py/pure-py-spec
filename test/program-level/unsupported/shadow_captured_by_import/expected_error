@@ -1,0 +1,1 @@
+test/program-level/unsupported/shadow_captured_by_import/main.py: 'helper' captured by previous statement, reassigned here
