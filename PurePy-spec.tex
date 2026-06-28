@@ -655,6 +655,7 @@ functional programming:
 \item \pyinline{with} statements
 \item List patterns matching tuple values, or tuple patterns matching list values. In \PurePy a list pattern matches only a list, and a tuple pattern matches only a tuple. Python permits either pattern against either kind of sequence.
 \item Positional class patterns matching fewer sub-patterns than the class's field arity. \PurePy requires exact arity; Python permits any number from $0$ up to the class's arity.
+\item Local imports: an \pyinline{import} or \pyinline{from} statement inside a function or other block. \PurePy permits imports only at module level; Python allows them anywhere.
 \item Wildcard imports (\pyinline{from q import *}); PEP 8 recommends avoiding these\footnote{\url{https://peps.python.org/pep-0008/}}.
 \item A submodule importing itself through its parent (\pyinline{from a import b} inside module \pyinline{a.b}). \PurePy treats the from-imported submodule as a dependency, so this is an import cycle and is rejected; Python permits it, binding the partially-loaded module.
 \item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.
