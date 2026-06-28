@@ -128,10 +128,10 @@
 \small
 \inferrule*[lab={\ruleName{eval-var}}]
 {
-   \strut
+  \bind{x}{v} \in \rho
 }
 {
-  \rho, x \Rightarrow \rho(x)
+  \rho, x \Rightarrow v
 }
 \and
 \inferrule*[lab={\ruleName{eval-lambda}}]
