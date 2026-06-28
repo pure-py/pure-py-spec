@@ -19,6 +19,7 @@
 \binds(\patList{p_1, \ldots, p_n}) &= \textstyle\bigcup_i \binds(p_i) \\
 \binds(\patTuple{p_1, \ldots, p_n}) &= \textstyle\bigcup_i \binds(p_i) \\
 \binds(p\;\pyinline{as}\;x) &= \binds(p) \cup \set{x} \\
+\binds(\patConstr{q}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}}) &= \textstyle\bigcup_i \binds(p_i) \\
 \\
 \capturesS(\exPass) &= \varnothing \\
 \capturesS(\exAssign{x}{e}) &= \capturesE(e) \\
