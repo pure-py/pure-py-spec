@@ -663,6 +663,7 @@ functional programming:
 \item \pyinline{yield}/\pyinline{yield from}
 \item \pyinline{class} definitions other than dataclasses
 \item \pyinline{with} statements
+\item Truthiness: a non-boolean value used as a condition (the test of an \pyinline{if} or conditional expression, or an \pyinline{assert}). Python coerces any value to \pyinline{bool}; \PurePy requires the condition to be boolean.
 \item List patterns matching tuple values, or tuple patterns matching list values. In \PurePy a list pattern matches only a list, and a tuple pattern matches only a tuple. Python permits either pattern against either kind of sequence.
 \item Positional class patterns matching fewer sub-patterns than the class's field arity. \PurePy requires exact arity; Python permits any number from $0$ up to the class's arity.
 \item Local imports: an \pyinline{import} or \pyinline{from} statement inside a function or other block. \PurePy permits imports only at module level; Python allows them anywhere.
