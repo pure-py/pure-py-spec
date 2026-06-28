@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
+import sys
+
 @dataclass
 class C:
-    a.b: Any
+    sys.path: Any

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 @dataclass
-class C(metaclass=M):
+class C(metaclass=type):
     pass

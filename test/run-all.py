@@ -148,9 +148,11 @@ def main():
 
     print("module-level/ill-formed/unsupported")
     for p in sorted((module / "ill-formed" / "unsupported").glob("*.py")):
+        rel = p.relative_to(ROOT)
         err_path = p.with_suffix(".error.expected")
         err_substr = err_path.read_text().strip() if err_path.exists() else None
-        r.expect_exit(str(p.relative_to(ROOT)), script_cmd("parse.py", p), 1, error_substr=err_substr)
+        r.expect_exit(f"{rel} (parse)", script_cmd("parse.py", p), 1, error_substr=err_substr)
+        r.expect_exit(f"{rel} (python)", [interpreter, str(p)], 0)
 
     print("module-level/ill-formed/syntactic-only")
     for p in sorted((module / "ill-formed" / "syntactic-only").glob("*.py")):

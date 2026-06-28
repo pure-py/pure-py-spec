@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+import builtins
+
 @dataclass
-class C(a.b):
+class C(builtins.object):
     pass
