@@ -134,6 +134,15 @@
   \rho, x \Rightarrow v
 }
 \and
+\inferrule*[lab={\ruleName{eval-var-builtin}}]
+{
+  x \notin \dom(\rho) \\
+  \bind{x}{v} \in \rho_{\pymath{builtins}}
+}
+{
+  \rho, x \Rightarrow v
+}
+\and
 \inferrule*[lab={\ruleName{eval-lambda}}]
 {
   \strut

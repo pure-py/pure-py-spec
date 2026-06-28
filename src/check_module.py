@@ -102,8 +102,7 @@ PREDEFINED_MEMBERS: dict[str, set[str]] = {
 PREDEFINED_MODULES = set(PREDEFINED_MEMBERS)
 
 def gamma_zero() -> Context:
-    builtins: Context = {x: Status.TT for x in PREDEFINED_MEMBERS['builtins']}
-    return {**builtins, '__name__': Status.TT}
+    return {'__name__': Status.TT}
 
 def empty_context() -> VarContext:
     return {}
@@ -373,6 +372,8 @@ def check_match_cases(cases: list[ast.match_case], ctx: ModuleContext) -> None:
 def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
     if isinstance(e, ast.Name):
         if var_status(ctx, e.id) != Status.TT:
+            if e.id not in ctx.gamma and e.id in PREDEFINED_MEMBERS['builtins']:
+                return
             if module_of(ctx, e.id) is not None:
                 raise IllFormedModule(e, reasons.ModuleAsValue(e.id))
             raise IllFormedModule(e, reasons.UnassignedVariable(e.id))

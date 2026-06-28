@@ -54,6 +54,15 @@
   \Gamma \vdash x
 }
 \and
+\inferrule*[lab={\ruleName{var-builtin}}]
+{
+  x \notin \dom(\Gamma) \\
+  \bind{x}{\statusDefAssigned} \in \Gamma_{\pymath{builtins}}
+}
+{
+  \Gamma \vdash x
+}
+\and
 \inferrule*[lab={\ruleName{lambda}}]
 {
   \Gamma \runion \statusDefAssigned(\seq{x}) \vdash e
