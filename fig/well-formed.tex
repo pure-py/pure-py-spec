@@ -78,11 +78,9 @@
   \Gamma \vdash \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
 }
 \and
-\inferrule*[lab={\ruleName{mutual}}]
+\inferrule*[lab={\ruleName{def}}]
 {
-  \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_{i}) \runion
-  \statusNotDefAssigned(\assignsS(b_i) \setminus \seq{x}_i) \vdash b_i : R_i
-  \quad (\forall i)
+  \Gamma \runion \statusDefAssigned(\seq{f} \cons \seq{x}_i) \runion \statusNotDefAssigned(\assignsS(b_i) \setminus \seq{x}_i) \vdash b_i : R_i \quad (\forall i)
   \\
   \seq{f} \text{ distinct}
 }

@@ -13,10 +13,10 @@
 \and
 \inferrule*[lab={\ruleName{simple-class}}]
 {
-  c : \clsEntry{\Delta}{q'}{\vec{y}}{c'} \in \Gamma
+  c : \clsEntry{\Delta}{q}{\vec{x}}{c'} \in \Gamma
 }
 {
-  \Gamma \vdash c \names \clsEntry{\Delta}{q'}{\vec{y}}{c'}
+  \Gamma \vdash c \names \clsEntry{\Delta}{q}{\vec{x}}{c'}
 }
 \and
 \inferrule*[lab={\ruleName{qualified-module}}]
@@ -31,10 +31,10 @@
 \inferrule*[lab={\ruleName{qualified-class}}]
 {
   \Gamma \vdash q \names \modEntry{q'} \\
-  \Gamma_{q'}(c) = \clsEntry{\Delta}{q'}{\vec{y}}{c'}
+  \Gamma_{q'}(c) = \clsEntry{\Delta}{q'}{\vec{x}}{c'}
 }
 {
-  \Gamma \vdash q.c \names \clsEntry{\Delta}{q'}{\vec{y}}{c'}
+  \Gamma \vdash q.c \names \clsEntry{\Delta}{q'}{\vec{x}}{c'}
 }
 \end{mathpar}
 \subcaption{Name $q$ resolves to context entry $\theta$ under $\Gamma$}
@@ -69,7 +69,7 @@
   \Gamma \vdash e_i \quad (\forall i)
 }
 {
-  \Gamma \vdash \exConstruct{q}{e_1, \ldots, e_n}
+  \Gamma \vdash \exConstr{q}{e_1, \ldots, e_n}
 }
 \and
 \inferrule*[lab={\ruleName{attr-module}}]

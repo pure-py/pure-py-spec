@@ -38,7 +38,7 @@
 \inferrule*[lab={\ruleName{val-def}}]
 {
   \vdash \rho : \Gamma \\
-  \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_j) \runion \statusNotDefAssigned(\assignsS(b_j) \setminus \seq{x}_j) \vdash b_j : R_j \quad (\forall j) \\
+  \Gamma \runion \statusDefAssigned(\seq{f} \cons \seq{x}_j) \runion \statusNotDefAssigned(\assignsS(b_j) \setminus \seq{x}_j) \vdash b_j : R_j \quad (\forall j) \\
   \seq{f} \text{ distinct}
 }
 {

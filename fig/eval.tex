@@ -59,7 +59,7 @@
   \rho, \exReturn{e} \Rightarrow \returns{v}
 }
 \and
-\inferrule*[lab={\ruleName{eval-mutual}}]
+\inferrule*[lab={\ruleName{eval-def}}]
 {
   d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
   v_i = \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} \quad (\forall i)
@@ -187,7 +187,7 @@
   \fields(\clsEntry{\Delta}{q'}{\vec{z}}{c'}) = x_1, \ldots, x_n
 }
 {
-  \rho, \exConstruct{q}{e_1, \ldots, e_n} \Rightarrow \exObj{\Delta'}{q'.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
+  \rho, \exConstr{q}{e_1, \ldots, e_n} \Rightarrow \exObj{\Delta'}{q'.c}{\set{x_1 \mapsto v_1, \ldots, x_n \mapsto v_n}}
 }
 \end{mathpar}
 \caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$}

@@ -5,7 +5,7 @@
 $e$ & $::=$ & $x$ & (Var) \\
     & $\mid$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exApp{e}{e_1, \ldots, e_n}$ & (Call) \\
-    & $\mid$ & $\exConstruct{q}{e_1, \ldots, e_n}$ & (Construct) \\
+    & $\mid$ & $\exConstr{q}{e_1, \ldots, e_n}$ & (Constr) \\
     & $\mid$ & $\exDict{x_1 \mathord{:} e_1, \ldots, x_n \mathord{:} e_n}$ & (Dict) \\
     & $\mid$ & $\exProject{e}{x}$ & (Attribute) \\
     & $\mid$ & $\exDProject{e}{e'}$ & (Subscript) \\
@@ -31,7 +31,7 @@ $p$ & $::=$ & $\ell$ & (PatLiteral) \\
     & $\mid$ & $\patWild$ & (PatWildcard) \\
     & $\mid$ & $\patList{p_1, \ldots, p_n}$ & (PatList) \\
     & $\mid$ & $\patTuple{p_1, \ldots, p_n}$ & (PatTuple) \\
-    & $\mid$ & $\patClass{q}{p_1, \ldots, p_n, x_{n+1} \mathord{=} p_{n+1}, \ldots, x_{n+m} \mathord{=} p_{n+m}}$ & (PatClass) \\
+    & $\mid$ & $\patConstr{q}{p_1, \ldots, p_n, x_{n+1} \mathord{=} p_{n+1}, \ldots, x_{n+m} \mathord{=} p_{n+m}}$ & (PatConstr) \\
     & $\mid$ & $p\;\pyinline{as}\;x$ & (PatAs)
 \end{tabular}
 \end{center}
