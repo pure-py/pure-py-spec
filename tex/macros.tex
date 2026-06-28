@@ -51,8 +51,8 @@
 \newcommand*{\exImport}[1]{\pyinline{import}\;#1}
 \newcommand*{\exFromImport}[2]{\pyinline{from}\;#1\;\pyinline{import}\;#2}
 \newcommand*{\exAssertMsg}[2]{\pyinline{assert}\;#1, #2}
-\newcommand*{\exClosure}[4][]{\langle#2, #3, #4\rangle_{#1}}
-\newcommand*{\exDefClosure}[4][]{\langle#2, #3, #4\rangle_{#1}}
+\newcommand*{\exClosure}[4][]{\mathsf{Lam}_{#1}(#2, #3, #4)}
+\newcommand*{\exDefClosure}[4][]{\mathsf{Def}_{#1}(#2, #3, #4)}
 \newcommand*{\exObj}[3]{\mathsf{Obj}_{#1}(#2, #3)}
 \newcommand*{\exMod}[2]{\mathsf{Mod}_{#1}(#2)}
 \newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
@@ -76,7 +76,7 @@
 \newcommand*{\statusDefAssigned}{\mathsf{tt}}
 \newcommand*{\statusNotDefAssigned}{\mathsf{ff}}
 \newcommand*{\modEntry}[1]{#1}
-\newcommand*{\clsEntry}[4]{\langle #2, #3, #4 \rangle_{#1}}
+\newcommand*{\clsEntry}[4]{\mathsf{Cls}_{#1}(#2, #3, #4)}
 \newcommand*{\runion}{\cdot}
 \newcommand*{\meet}{\wedge}
 \newcommand*{\merge}{\oplus}
