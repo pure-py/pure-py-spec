@@ -32,7 +32,7 @@
 {
   x \notin \dom(\Gamma_q) \\
   q.x \in \dom(\mathcal{M}) \\
-  \vdash_{\mathcal{M}} q.x \\
+  \varnothing \vdash \mathcal{M}(q.x) : \Delta \\
   q, \vec{x} \importsR \Gamma
 }
 {
@@ -61,7 +61,7 @@
   q' = x_1.x_2.\ldots.x_{n+1} \\
   q' \in \dom(\mathcal{M}) \\
   q' \neq q \\
-  \vdash_{\mathcal{M}} q' \\
+  \varnothing \vdash \mathcal{M}(q') : \Delta' \\
   \Gamma, \bind{x_1}{\modEntry{q'}} \vdash m : \Delta
 }
 {
@@ -72,7 +72,7 @@
 {
   q' \in \dom(\mathcal{M}) \\
   q' \neq q \\
-  \vdash_{\mathcal{M}} q' \\
+  \varnothing \vdash \mathcal{M}(q') : \Delta' \\
   q', \vec{x} \importsR \Gamma' \\
   \Gamma \runion \Gamma' \vdash m : \Delta
 }
@@ -118,31 +118,19 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash_{\mathcal{M}} q$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{module}}]
-{
-  \varnothing \vdash \mathcal{M}(q) : \Delta
-}
-{
-  \vdash_{\mathcal{M}} q
-}
-\end{mathpar}
-
 \flushleft \shadebox{$\vdash \mathcal{M}$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{program}}]
 {
-  \vdash_{\mathcal{M}} \pymath{\_\_main\_\_} \\
+  \varnothing \vdash \mathcal{M}(\pymath{\_\_main\_\_}) : \Delta \\
   G_{\mathcal{M}} \text{ acyclic}
 }
 {
   \vdash \mathcal{M}
 }
 \end{mathpar}
-\subcaption{Module and program well-formedness}
+\subcaption{Program well-formedness}
 \end{subfigure}
 \caption{Module well-formedness}
 \label{fig:well-formed-module}
