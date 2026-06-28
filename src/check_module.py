@@ -23,6 +23,13 @@ class IllFormedModule(IllFormed):
         super().__init__(self.msg)
 
 
+class IllFormedProgram(IllFormed):
+    exit_code = 4
+    def __init__(self, msg: str):
+        self.msg = msg
+        super().__init__(msg)
+
+
 class Status(Enum):
     TT = auto()
     FF = auto()
@@ -894,19 +901,31 @@ def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> Optional[I
     except IllFormed as e:
         return e
 
+def imported_modules(tree: ast.Module) -> set[str]:
+    result: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            result.update(a.name for a in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module is not None:
+            result.add(node.module)
+    return result
+
 def check_file(filename: str) -> Optional[IllFormed]:
     source = open(filename).read()
     tree = ast.parse(source, filename=filename)
-    q = filename.rsplit('/', 1)[-1].rsplit('.', 1)[0]
     M: dict[str, ast.Module] = {p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES}
-    M[q] = tree
-    return module_result(tree, M, q)
+    M['__main__'] = tree
+    cycle = has_cycle({'__main__': imported_modules(tree)})
+    if len(cycle) > 0:
+        return IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
+    return module_result(tree, M, '__main__')
 
 def format_result(result: Optional[IllFormed], filename: str) -> str:
     if result is None:
         return f'{filename}: ok'
-    assert isinstance(result, IllFormedModule)
-    return f'{filename}:{result.line}:{result.col}: {result.msg}'
+    if isinstance(result, IllFormedModule):
+        return f'{filename}:{result.line}:{result.col}: {result.msg}'
+    return f'{filename}: {result.msg}'
 
 def main() -> None:
     if len(sys.argv) < 2:

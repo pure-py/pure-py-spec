@@ -4,17 +4,10 @@ import sys
 from typing import Optional
 
 import parse
-from check_module import IllFormed, IllFormedModule, check_module, has_cycle
+from check_module import IllFormed, IllFormedModule, IllFormedProgram, check_module, has_cycle
 
 
 PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
-
-
-class IllFormedProgram(IllFormed):
-    exit_code = 4
-    def __init__(self, msg: str):
-        self.msg = msg
-        super().__init__(msg)
 
 
 def imports_of(tree: ast.Module, base_dir: pathlib.Path) -> set[str]:
