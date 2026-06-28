@@ -64,7 +64,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\mu, q \Rightarrow_{\mathsf{mod}} \mu', \rho$}
+\flushleft \shadebox{$\mu, q \Rightarrow \mu', \rho$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-module}}]
@@ -72,7 +72,7 @@
   \mu, \varnothing, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \mathcal{M}(q) \Rightarrow \mu', \rho
 }
 {
-  \mu, q \Rightarrow_{\mathsf{mod}} \mu', \rho
+  \mu, q \Rightarrow \mu', \rho
 }
 \end{mathpar}
 
@@ -81,7 +81,7 @@
 \small
 \inferrule*[lab={\ruleName{eval-program}}]
 {
-  \varnothing, \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{mod}} \mu, \rho
+  \varnothing, \pymath{\_\_main\_\_} \Rightarrow \mu, \rho
 }
 {
   \mathcal{M} \Rightarrow 0
@@ -109,7 +109,7 @@
 \inferrule*[lab={\ruleName{load-unqualified}}]
 {
   x \notin \dom(\mu) \\
-  \mu, x \Rightarrow_{\mathsf{mod}} \mu', \rho
+  \mu, x \Rightarrow \mu', \rho
 }
 {
   \mu, x \Rightarrow_{\mathsf{load}} \mu' \runion \set{\bind{x}{\rho}}
@@ -119,7 +119,7 @@
 {
   q.x \notin \dom(\mu) \\
   \mu, q \Rightarrow_{\mathsf{load}} \mu' \\
-  \mu', q.x \Rightarrow_{\mathsf{mod}} \mu'', \rho
+  \mu', q.x \Rightarrow \mu'', \rho
 }
 {
   \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{\bind{q.x}{\rho}}
