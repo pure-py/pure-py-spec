@@ -246,11 +246,11 @@ which follow Python.
 
 \subsection{Modules and entry point}
 
-A \PurePy \emph{program} $\langle E, \mathcal{M} \rangle$ consists of a finite map
+A \PurePy \emph{program} $\langle q_{\mathsf{e}}, \mathcal{M} \rangle$ consists of a finite map
 $\mathcal{M}$ from \emph{fully-qualified module names} $q$ (\figref{syntax-stmt}) to \emph{modules} $m$ (each a sequence
-of top-level statements $t_1 \ldots t_{n+1}$), together with a designated \emph{entry point} $E \in
+of top-level statements $t_1 \ldots t_{n+1}$), together with a designated \emph{entry point} $q_{\mathsf{e}} \in
 \dom(\mathcal{M})$. $\mathcal{M}$ always includes the predefined modules of \figref{predefined} and is prefix-closed:
-if $q \in \dom(\mathcal{M})$ then $\parents(q) \subseteq \dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$ by mapping each leaf module to a \pyinline{.py} file and each package to an \pyinline{__init__.py}; prefix-closure then requires an \pyinline{__init__.py} for every enclosing package.} The pair $\langle E, \mathcal{M} \rangle$
+if $q \in \dom(\mathcal{M})$ then $\parents(q) \subseteq \dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$ by mapping each leaf module to a \pyinline{.py} file and each package to an \pyinline{__init__.py}; prefix-closure then requires an \pyinline{__init__.py} for every enclosing package.} The pair $\langle q_{\mathsf{e}}, \mathcal{M} \rangle$
 is fixed and ambient in all definitions that follow.
 Import statements appear only as a contiguous prefix of a module body, before any other statement. This confines module-loading side-effects (currently only divergence or runtime
 errors) to a single zone at the start of each module body.
@@ -688,7 +688,7 @@ with $\assigns{\varnothing}$ as left and right unit.
 Program and module evaluation are given in \figref{eval-modules}, with module loading and importing in
 \figref{eval-load}. A program evaluates to a non-negative integer
 exit code $n$, with $0$ denoting successful termination. For any $(\bind{q}{b}) \in \mathcal{M}$, evaluation of
-$b$ begins under the initial environment $\rho_q^0 = \rho_{\textup{\pyinline{builtins}}} \runion \set{\bind{\text{\pyinline{__name__}}}{v}}$, where $v$ is \pyinline{"__main__"} if $q = E$ and the string literal corresponding to $q$ otherwise.
+$b$ begins under the initial environment $\rho_q^0 = \rho_{\textup{\pyinline{builtins}}} \runion \set{\bind{\text{\pyinline{__name__}}}{v}}$, where $v$ is \pyinline{"__main__"} if $q = q_{\mathsf{e}}$ and the string literal corresponding to $q$ otherwise.
 The environment $\rho_{\textup{\pyinline{builtins}}}$ binds the names listed for \textup{\pyinline{builtins}} in \figref{predefined}
 to their values.
 

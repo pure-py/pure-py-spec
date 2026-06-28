@@ -64,18 +64,18 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\langle E, \mathcal{M} \rangle \Rightarrow n$}
+\flushleft \shadebox{$\langle q_{\mathsf{e}}, \mathcal{M} \rangle \Rightarrow n$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-program}}]
 {
-  \varnothing, \rho_E^0, \mathcal{M}(E) \Rightarrow \mu, \rho
+  \varnothing, \rho_{q_{\mathsf{e}}}^0, \mathcal{M}(q_{\mathsf{e}}) \Rightarrow \mu, \rho
 }
 {
-  \langle E, \mathcal{M} \rangle \Rightarrow 0
+  \langle q_{\mathsf{e}}, \mathcal{M} \rangle \Rightarrow 0
 }
 \end{mathpar}
-\subcaption{Program $\langle E, \mathcal{M} \rangle$ evaluates to exit code $n$}
+\subcaption{Program $\langle q_{\mathsf{e}}, \mathcal{M} \rangle$ evaluates to exit code $n$}
 \end{subfigure}
 \caption{Module and program evaluation}
 \label{fig:eval-modules}
