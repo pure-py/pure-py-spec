@@ -18,6 +18,9 @@ EXPECTED = ".expected"
 EXCEPTION_EXPECTED = f".exception{EXPECTED}"
 ERROR_EXPECTED = f".error{EXPECTED}"
 
+# Tier directory names
+MODULE_LEVEL, PROGRAM_LEVEL = "module-level", "program-level"
+
 # Verdict / stage directory names: a test's path is its specification
 WELL_FORMED, UNSUPPORTED, ILL_FORMED = "well-formed", "unsupported", "ill-formed"
 SYNTACTIC, SEMANTIC, SYNTACTIC_ONLY = "syntactic", "semantic", "syntactic-only"
@@ -176,8 +179,8 @@ def main():
         sys.argv.remove("--no-mypy")
     interpreter = sys.argv[1] if len(sys.argv) > 1 else "python3"
     base = ROOT / "test"
-    module = base / "module-level"
-    program = base / "program-level"
+    module = base / MODULE_LEVEL
+    program = base / PROGRAM_LEVEL
     r = Runner()
 
     if not skip_mypy:
@@ -199,14 +202,14 @@ def main():
             last = header
         r.module_test(p, module, interpreter)
 
-    print("program-level/well-formed")
-    for d in sorted(p for p in (program / "well-formed").iterdir() if p.is_dir()):
+    print(f"{PROGRAM_LEVEL}/{WELL_FORMED}")
+    for d in sorted(p for p in (program / WELL_FORMED).iterdir() if p.is_dir()):
         if not (d / EXPECTED_FILE).exists():
-            r.bad(f"{d.relative_to(ROOT)} (run)", "missing expected")
-    r.run_multi_file_tests(program / "well-formed", interpreter)
+            r.bad(f"{d.relative_to(ROOT)} (run)", f"missing {EXPECTED_FILE}")
+    r.run_multi_file_tests(program / WELL_FORMED, interpreter)
 
-    print("program-level/ill-formed")
-    r.run_multi_file_tests(program / "ill-formed", interpreter)
+    print(f"{PROGRAM_LEVEL}/{ILL_FORMED}")
+    r.run_multi_file_tests(program / ILL_FORMED, interpreter)
 
     r.summary()
 
