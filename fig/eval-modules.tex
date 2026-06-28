@@ -58,7 +58,7 @@
   \mu, \rho, \exDataclassExtend{c}{c'}{\phi} \cons m \Rightarrow \mu', \set{\bind{c}{C}} \runion \rho'
 }
 \end{mathpar}
-\subcaption{Module body $m$ of module $q$ evaluates under store $\mu$ and environment $\rho : \Gamma$}
+\subcaption{Module body $m$ of module $q$ evaluates under module cache $\mu$ and environment $\rho : \Gamma$}
 \end{subfigure}
 
 \vspace{2mm}
@@ -113,7 +113,7 @@
   \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{\bind{q.x}{\rho}}
 }
 \end{mathpar}
-\subcaption{Module $q$ is loaded into the store $\mu$}
+\subcaption{Module $q$ is loaded into the module cache $\mu$}
 \end{subfigure}
 
 \vspace{2mm}
