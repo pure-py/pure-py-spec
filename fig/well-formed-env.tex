@@ -116,11 +116,11 @@
 \and
 \inferrule*[lab={\ruleName{cache-cons}}]
 {
-  \vdash \rho_q : \Gamma_q \\
+  \vdash \rho : \Gamma \\
   \vdash \mu
 }
 {
-  \vdash \set{\bind{q}{\rho_q}} \runion \mu
+  \vdash \set{\bind{q}{\rho}} \runion \mu
 }
 \end{mathpar}
 \caption{Well-formed values, environments, and module cache}
