@@ -156,9 +156,9 @@ Metavariables $x$, $f$, $c$ range over \emph{variables}; idiomatically $f$ is us
 \begin{definition}[Context]
 A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the following \emph{context entries} $\theta$:
 \begin{itemize}
-\item \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
-\item \emph{module reference} $\modEntry{q}$, for a fully-qualified module name $q$;
-\item \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q}{\vec{x}}{c}$, recording the declaring context $\Gamma$, defining module $q$, sequence of distinct field names $\vec{x}$, and base class $c$ (or $\bot$ for no base).
+\item the variable's \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
+\item a \emph{module reference} $\modEntry{q}$, for a fully-qualified module name $q$;
+\item a \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q}{\vec{x}}{c}$, recording the declaring context $\Gamma$, defining module $q$, sequence of distinct field names $\vec{x}$, and base class $c$ (or $\bot$ for no base).
 \end{itemize}
 \end{definition}
 
@@ -246,10 +246,14 @@ which follow Python.
 
 \subsection{Modules and programs}
 
-A \PurePy \emph{program} is a finite map
-$\mathcal{M}$ from \emph{fully-qualified module names} (\figref{syntax-stmt}) to \emph{modules} $m$, the \emph{entry module} being the one under the distinguished name $\pymath{\_\_main\_\_} \in \dom(\mathcal{M})$. $\mathcal{M}$ always includes the predefined modules of \figref{predefined} and is prefix-closed:
-the parents of any module in $\dom(\mathcal{M})$ are themselves in $\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$ by mapping each leaf module to a \pyinline{.py} file and each package to an \pyinline{__init__.py}; prefix-closure then requires an \pyinline{__init__.py} for every enclosing package.} The map $\mathcal{M}$
-is fixed and ambient in all definitions that follow.
+A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
+(\figref{syntax-stmt}) to \emph{modules} $m$, of which one is a distinguished \emph{main module} with name
+$\pymath{\_\_main\_\_}$. $\mathcal{M}$ additionally always includes the predefined modules of
+\figref{predefined} and is prefix-closed: the parent of any module in $\dom(\mathcal{M})$ is itself in
+$\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$ by mapping each leaf module to a
+\texttt{.py} file and each package to an \texttt{\_\_init\_\_.py}; prefix-closure then requires an
+\texttt{\_\_init\_\_.py} for every enclosing package.} The map $\mathcal{M}$ is fixed and ambient in all
+definitions that follow.
 
 \begin{definition}[Builtins context]
 $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\pyinline{builtins}}
@@ -280,8 +284,10 @@ fully-qualified name, and $\nameOf(q)$ is the string literal naming $q$. Each mo
 
 \input{fig/modules}
 
-The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(q, q')$ iff
-$q' \in \imports(\mathcal{M}(q)) \cup \parents(q)$. Program well-formedness (\figref{well-formed-module}) requires the entry module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$ to be acyclic.
+The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(q, q')$ iff $q' \in
+\imports(\mathcal{M}(q)) \cup \parents(q)$. Program well-formedness (\figref{well-formed-module}) requires the
+main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
+to be acyclic.
 
 \subsection{Well-formedness}
 

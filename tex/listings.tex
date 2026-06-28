@@ -43,7 +43,7 @@
 \newcommand{\pytext}[1]{%
   {\renewcommand\ttdefault{cmtt}\ttfamily\small\color{base05}#1}%
 }
-\newcommand{\pyinlinetext}[2]{\text{{\renewcommand\ttdefault{cmtt}\ttfamily#1\color{base05}#2}}}
+\newcommand{\pyinlinetext}[2]{\text{{\renewcommand\ttdefault{cmtt}\ttfamily\upshape#1\color{base05}#2}}}
 % \pymath: math-safe inline code (no \lstinline, so it works inside an
 % inferrule). Unlike \pyinline it does not read its argument verbatim, so the
 % caller escapes special characters, e.g. \pymath{\_\_name\_\_}.
