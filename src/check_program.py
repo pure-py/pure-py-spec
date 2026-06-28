@@ -4,7 +4,7 @@ import sys
 from typing import Optional
 
 import parse
-from check_module import IllFormed, IllFormedModule, IllFormedProgram, check_module, has_cycle
+from check_module import IllFormed, IllFormedModule, IllFormedProgram, annotate_seq_kinds, check_module, has_cycle
 
 
 PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
@@ -42,13 +42,15 @@ def load(name: str, base_dir: pathlib.Path) -> ast.Module:
     path = resolve(name, base_dir)
     if path is None:
         raise IllFormedProgram(f"module {name!r} not found under {base_dir}")
+    source = path.read_text()
     try:
-        tree = ast.parse(path.read_text(), filename=str(path))
+        tree = ast.parse(source, filename=str(path))
     except SyntaxError as e:
         raise IllFormedProgram(f"{path}: parse error: {e}") from e
     parse_err = parse.check_module(tree)
     if parse_err is not None:
         raise IllFormedProgram(f"{path}: {parse_err.msg}")
+    annotate_seq_kinds(tree, source)
     return tree
 
 

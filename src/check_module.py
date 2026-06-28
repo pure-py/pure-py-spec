@@ -481,6 +481,12 @@ def literal_value(pat: ast.MatchValue) -> object:
         return -operand_value if isinstance(v.op, ast.USub) else operand_value
     raise AssertionError(f'unexpected MatchValue payload: {type(v).__name__}')
 
+def annotate_seq_kinds(tree: ast.AST, source: str) -> None:
+    for node in ast.walk(tree):
+        if isinstance(node, ast.MatchSequence):
+            segment = ast.get_source_segment(source, node)
+            setattr(node, 'is_list_pattern', segment is not None and segment.lstrip().startswith('['))
+
 def subsumes(p: ast.pattern, q: ast.pattern) -> bool:
     if isinstance(q, ast.MatchAs) and q.pattern is not None:
         return subsumes(p, q.pattern)
@@ -493,6 +499,8 @@ def subsumes(p: ast.pattern, q: ast.pattern) -> bool:
     if isinstance(p, ast.MatchSingleton) and isinstance(q, ast.MatchSingleton):
         return p.value is q.value
     if isinstance(p, ast.MatchSequence) and isinstance(q, ast.MatchSequence):
+        if bool(getattr(p, 'is_list_pattern', False)) != bool(getattr(q, 'is_list_pattern', False)):
+            return False
         if len(p.patterns) != len(q.patterns):
             return False
         return all((subsumes(pi, qi) for pi, qi in zip(p.patterns, q.patterns)))
@@ -913,6 +921,7 @@ def imported_modules(tree: ast.Module) -> set[str]:
 def check_file(filename: str) -> Optional[IllFormed]:
     source = open(filename).read()
     tree = ast.parse(source, filename=filename)
+    annotate_seq_kinds(tree, source)
     M: dict[str, ast.Module] = {p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES}
     M['__main__'] = tree
     cycle = has_cycle({'__main__': imported_modules(tree)})
