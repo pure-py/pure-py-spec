@@ -70,7 +70,12 @@ def walk_program(entry_path: pathlib.Path) -> None:
     base_dir = entry_path.parent
     modules: dict[str, tuple[pathlib.Path, ast.Module]] = {}
     imports_by_module: dict[str, set[str]] = {}
-    queue: list[str] = [entry_path.stem, *PREDEFINED_MODULES]
+    entry_tree = load(entry_path.stem, base_dir)
+    modules['__main__'] = (entry_path, entry_tree)
+    imports_by_module['__main__'] = imports_of(entry_tree, base_dir)
+    queue: list[str] = [*PREDEFINED_MODULES]
+    for imp in imports_by_module['__main__']:
+        queue.extend({imp} | parents(imp))
     while queue:
         name = queue.pop()
         if name in modules:
@@ -94,11 +99,10 @@ def walk_program(entry_path: pathlib.Path) -> None:
         raise IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
 
     M = {name: tree for name, (_, tree) in modules.items()}
-    entry = entry_path.stem
     try:
-        check_module(modules[entry][1], M, entry)
+        check_module(modules['__main__'][1], M, '__main__')
     except IllFormedModule as e:
-        path = modules[e.module or entry][0]
+        path = modules[e.module or '__main__'][0]
         e.msg = f"{path}: {e.msg}"
         raise
 

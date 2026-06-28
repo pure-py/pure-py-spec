@@ -123,23 +123,23 @@
 \small
 \inferrule*[lab={\ruleName{module}}]
 {
-  \varnothing \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \mathcal{M}(q) : \Delta
+  \varnothing \vdash \mathcal{M}(q) : \Delta
 }
 {
   \vdash_{\mathcal{M}} q
 }
 \end{mathpar}
 
-\flushleft \shadebox{$\vdash \langle q, \mathcal{M} \rangle$}
+\flushleft \shadebox{$\vdash \mathcal{M}$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{program}}]
 {
-  \vdash_{\mathcal{M}} q \\
+  \vdash_{\mathcal{M}} \pymath{\_\_main\_\_} \\
   G_{\mathcal{M}} \text{ acyclic}
 }
 {
-  \vdash \langle q, \mathcal{M} \rangle
+  \vdash \mathcal{M}
 }
 \end{mathpar}
 \subcaption{Module and program well-formedness}

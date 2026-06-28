@@ -246,9 +246,8 @@ which follow Python.
 
 \subsection{Modules and entry point}
 
-A \PurePy \emph{program} $\langle q, \mathcal{M} \rangle$ consists of a finite map
-$\mathcal{M}$ from \emph{fully-qualified module names} (\figref{syntax-stmt}) to \emph{modules} $m$, together with a designated \emph{entry point} $q \in
-\dom(\mathcal{M})$. $\mathcal{M}$ always includes the predefined modules of \figref{predefined} and is prefix-closed:
+A \PurePy \emph{program} is a finite map
+$\mathcal{M}$ from \emph{fully-qualified module names} (\figref{syntax-stmt}) to \emph{modules} $m$, the \emph{entry module} being the one under the distinguished name $\pymath{\_\_main\_\_} \in \dom(\mathcal{M})$. $\mathcal{M}$ always includes the predefined modules of \figref{predefined} and is prefix-closed:
 the parents of any module in $\dom(\mathcal{M})$ are themselves in $\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$ by mapping each leaf module to a \pyinline{.py} file and each package to an \pyinline{__init__.py}; prefix-closure then requires an \pyinline{__init__.py} for every enclosing package.} The map $\mathcal{M}$
 is fixed and ambient in all definitions that follow.
 
@@ -277,7 +276,7 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \end{figure}
 
 The metafunction $\assignsS$ extends from individual statements to blocks and module bodies by union, and $\imports$ to module bodies. The metafunction $\parents$ collects the proper prefixes of a
-fully-qualified name, and $\nameOf(q)$ is the string literal naming $q$.
+fully-qualified name, and $\nameOf(q)$ is the string literal naming $q$. Each module body $\mathcal{M}(q)$ begins with the assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$, so $\mathcal{M}(\pymath{\_\_main\_\_})$ binds $\pymath{\_\_name\_\_}$ to $\pymath{"\_\_main\_\_"}$.
 
 \input{fig/modules}
 
@@ -343,7 +342,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \input{fig/well-formed-module}
 
 \begin{definition}[Exports of a well-formed module]
-Suppose $\varnothing \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \mathcal{M}(q) : \Delta$. Define the \emph{exports} of $q$ as $\Gamma_q = \Delta$.
+Suppose $\varnothing \vdash \mathcal{M}(q) : \Delta$. Define the \emph{exports} of $q$ as $\Gamma_q = \Delta$.
 \end{definition}
 
 \noindent Exports comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. In particular a module never exports a module, since module names enter scope only via imports.
