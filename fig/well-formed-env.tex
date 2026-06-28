@@ -63,7 +63,8 @@
 \and
 \inferrule*[lab={\ruleName{val-class}}]
 {
-  \strut
+  C = \clsEntry{\Gamma}{q}{\vec{x}}{c} \\
+  c = \bot \lor \bind{c}{C'} \in \Gamma
 }
 {
   \vdash C
