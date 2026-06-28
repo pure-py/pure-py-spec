@@ -246,18 +246,18 @@ which follow Python.
 
 \subsection{Modules and entry point}
 
-A \PurePy \emph{program} $\langle q_{\mathsf{e}}, \mathcal{M} \rangle$ consists of a finite map
-$\mathcal{M}$ from \emph{fully-qualified module names} $q$ (\figref{syntax-stmt}) to \emph{modules} $m$ (each a sequence
-of top-level statements $t_1 \ldots t_{n+1}$), together with a designated \emph{entry point} $q_{\mathsf{e}} \in
+A \PurePy \emph{program} $\langle q, \mathcal{M} \rangle$ consists of a finite map
+$\mathcal{M}$ from \emph{fully-qualified module names} (\figref{syntax-stmt}) to \emph{modules} $m$ (each a sequence
+of top-level statements $t_1 \ldots t_{n+1}$), together with a designated \emph{entry point} $q \in
 \dom(\mathcal{M})$. $\mathcal{M}$ always includes the predefined modules of \figref{predefined} and is prefix-closed:
-if $q \in \dom(\mathcal{M})$ then $\parents(q) \subseteq \dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$ by mapping each leaf module to a \pyinline{.py} file and each package to an \pyinline{__init__.py}; prefix-closure then requires an \pyinline{__init__.py} for every enclosing package.} The pair $\langle q_{\mathsf{e}}, \mathcal{M} \rangle$
+the parents of any module in $\dom(\mathcal{M})$ are themselves in $\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$ by mapping each leaf module to a \pyinline{.py} file and each package to an \pyinline{__init__.py}; prefix-closure then requires an \pyinline{__init__.py} for every enclosing package.} The map $\mathcal{M}$
 is fixed and ambient in all definitions that follow.
 Import statements appear only as a contiguous prefix of a module body, before any other statement. This confines module-loading side-effects (currently only divergence or runtime
 errors) to a single zone at the start of each module body.
 
 \begin{definition}[Initial variable context]
-For any $q \in \dom(\mathcal{M})$, the \emph{initial variable context} of $q$ is $\Gamma_q^0 = \Gamma_{\textup{\pyinline{builtins}}} \runion
-\set{\bind{\text{\pyinline{__name__}}}{\statusDefAssigned}}$, where $\Gamma_{\textup{\pyinline{builtins}}}$ binds the
+For any $q \in \dom(\mathcal{M})$, the \emph{initial variable context} of $q$ is $\Gamma_q^0 = \Gamma_{\pymath{builtins}} \runion
+\set{\bind{\pymath{\_\_name\_\_}}{\statusDefAssigned}}$, where $\Gamma_{\pymath{builtins}}$ binds the
 names of the predefined module \textup{\pyinline{builtins}} (\figref{predefined}).
 \end{definition}
 
@@ -347,7 +347,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \input{fig/well-formed-module}
 
 \begin{definition}[Exports of a well-formed module]
-Suppose $\Gamma_q^0 \vdash \mathcal{M}(q) : \Delta$. Define the \emph{exports} of $q$ as $\Gamma_q = \set{\bind{\text{\pyinline{__name__}}}{\statusDefAssigned}} \runion \Delta$.
+Suppose $\Gamma_q^0 \vdash \mathcal{M}(q) : \Delta$. Define the \emph{exports} of $q$ as $\Gamma_q = \set{\bind{\pymath{\_\_name\_\_}}{\statusDefAssigned}} \runion \Delta$.
 \end{definition}
 
 \noindent Exports comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. In particular a module never exports a module, since module names enter scope only via imports.
@@ -666,8 +666,6 @@ functional programming:
 
 \section{Operational semantics}
 
-A module is evaluated only after it has been judged well-formed (\figref{well-formed-module}) in a context $\Gamma_q$. Its runtime environment $\rho_q$ is well-formed under $\Gamma_q$ (\figref{well-formed-env}): each binding is the runtime counterpart of its context entry.
-
 Values, environments, and evaluation results are given in \figref{values}. For a statement $s$, the result
 $\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the result
 $\returns{v}$ represents \emph{abrupt completion} of $s$ with return value $v$.
@@ -686,11 +684,10 @@ with $\assigns{\varnothing}$ as left and right unit.
 \input{fig/well-formed-env}
 
 Program and module evaluation are given in \figref{eval-modules}, with module loading and importing in
-\figref{eval-load}. A program evaluates to a non-negative integer
-exit code $n$, with $0$ denoting successful termination. For any $(\bind{q}{b}) \in \mathcal{M}$, evaluation of
-$b$ begins under the initial environment $\rho_q^0 = \rho_{\textup{\pyinline{builtins}}} \runion \set{\bind{\text{\pyinline{__name__}}}{v}}$, where $v$ is \pyinline{"__main__"} if $q = q_{\mathsf{e}}$ and the string literal corresponding to $q$ otherwise.
-The environment $\rho_{\textup{\pyinline{builtins}}}$ binds the names listed for \textup{\pyinline{builtins}} in \figref{predefined}
-to their values.
+\figref{eval-load}. A module body is evaluated under the initial environment $\rho_q^0 = \rho_{\pymath{builtins}}
+\runion \set{\bind{\pymath{\_\_name\_\_}}{v}}$, where $v$ is the string literal naming $q$, except that the entry
+module binds \pyinline{__name__} to \pyinline{"__main__"}. The environment $\rho_{\pymath{builtins}}$ binds the
+names listed for \pyinline{builtins} in \figref{predefined}.
 
 \input{fig/eval-modules}
 

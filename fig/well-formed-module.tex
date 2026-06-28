@@ -130,16 +130,16 @@
 }
 \end{mathpar}
 
-\flushleft \shadebox{$\vdash \langle q_{\mathsf{e}}, \mathcal{M} \rangle$}
+\flushleft \shadebox{$\vdash \langle q, \mathcal{M} \rangle$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{program}}]
 {
-  \vdash_{\mathcal{M}} q_{\mathsf{e}} \\
+  \vdash_{\mathcal{M}} q \\
   G_{\mathcal{M}} \text{ acyclic}
 }
 {
-  \vdash \langle q_{\mathsf{e}}, \mathcal{M} \rangle
+  \vdash \langle q, \mathcal{M} \rangle
 }
 \end{mathpar}
 \subcaption{Module and program well-formedness}
