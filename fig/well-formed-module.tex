@@ -31,7 +31,6 @@
 \inferrule*[lab={\ruleName{imp-module}}]
 {
   x \notin \dom(\Gamma_q) \\
-  q.x \in \dom(\mathcal{M}) \\
   \vdash_{\mathcal{M}} q.x \\
   q, \vec{x} \importsR \Gamma
 }
@@ -45,7 +44,7 @@
 
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash m : \Delta$}
+\flushleft \shadebox{$\Gamma \vdash t : \Delta$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{nil}}]
@@ -59,43 +58,41 @@
 \inferrule*[lab={\ruleName{import}}]
 {
   q' = x_1.x_2.\ldots.x_{n+1} \\
-  q' \in \dom(\mathcal{M}) \\
   \vdash_{\mathcal{M}} q' \\
-  \Gamma, \bind{x_1}{\modEntry{q'}} \vdash m : \Delta
+  \Gamma, \bind{x_1}{\modEntry{x_1}} \vdash t : \Delta
 }
 {
-  \Gamma \vdash \exImport{q'} \cons m : \Delta
+  \Gamma \vdash \exImport{q'} \cons t : \Delta
 }
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
-  q' \in \dom(\mathcal{M}) \\
   \vdash_{\mathcal{M}} q' \\
   q', \vec{x} \importsR \Gamma' \\
-  \Gamma \runion \Gamma' \vdash m : \Delta
+  \Gamma \runion \Gamma' \vdash t : \Delta
 }
 {
-  \Gamma \vdash \exFromImport{q'}{\vec{x}} \cons m : \Delta
+  \Gamma \vdash \exFromImport{q'}{\vec{x}} \cons t : \Delta
 }
 \and
 \inferrule*[lab={\ruleName{statement}}]
 {
   \Gamma \vdash s : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash m : \Delta' \\
-  \capturesS(s) \cap \assignsS(m) = \varnothing
+  \Gamma \runion \Delta \vdash t : \Delta' \\
+  \capturesS(s) \cap \assignsS(t) = \varnothing
 }
 {
-  \Gamma \vdash s \cons m : \Delta \runion \Delta'
+  \Gamma \vdash s \cons t : \Delta \runion \Delta'
 }
 \and
 \inferrule*[lab={\ruleName{class}}]
 {
   \ownFields(\phi) = \vec{x} \text{ distinct} \\
   C = \clsEntry{\Gamma}{q}{\vec{x}}{\bot} \\
-  \Gamma, \bind{c}{C} \vdash m : \Delta
+  \Gamma, \bind{c}{C} \vdash t : \Delta
 }
 {
-  \Gamma \vdash \exDataclass{c}{\phi} \cons m : \set{\bind{c}{C}} \runion \Delta
+  \Gamma \vdash \exDataclass{c}{\phi} \cons t : \set{\bind{c}{C}} \runion \Delta
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
@@ -104,13 +101,13 @@
   \ownFields(\phi) = \vec{x} \text{ distinct} \\
   \vec{x} \cap \fields(\Gamma(c')) = \varnothing \\
   C = \clsEntry{\Gamma}{q}{\vec{x}}{c'} \\
-  \Gamma, \bind{c}{C} \vdash m : \Delta
+  \Gamma, \bind{c}{C} \vdash t : \Delta
 }
 {
-  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons m : \set{\bind{c}{C}} \runion \Delta
+  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons t : \set{\bind{c}{C}} \runion \Delta
 }
 \end{mathpar}
-\subcaption{Body $m$ of module $q$ is well-formed in $\Gamma$}
+\subcaption{Body $t$ of module $q$ is well-formed in $\Gamma$}
 \end{subfigure}
 
 \vspace{2mm}

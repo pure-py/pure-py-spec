@@ -249,7 +249,7 @@ which follow Python.
 \subsection{Modules and programs}
 
 A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
-(\figref{syntax-stmt}) to \emph{module bodies} $m$, of which one is a distinguished \emph{main module} named
+(\figref{syntax-stmt}) to \emph{module bodies} $t$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
 $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. The well-formedness and evaluation rules check and
 evaluate each body $\mathcal{M}(q)$ with the assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$
