@@ -100,29 +100,6 @@
   \vdash \set{\bind{x}{v}} \runion \rho : \set{\bind{x}{\theta}} \runion \Gamma
 }
 \end{mathpar}
-
-\vspace{2mm}
-
-\flushleft \shadebox{$\vdash \mu$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{cache-nil}}]
-{
-  \strut
-}
-{
-  \vdash \varnothing
-}
-\and
-\inferrule*[lab={\ruleName{cache-cons}}]
-{
-  \vdash \rho : \Gamma \\
-  \vdash \mu
-}
-{
-  \vdash \set{\bind{q}{\rho}} \runion \mu
-}
-\end{mathpar}
-\caption{Well-formed values, environments, and module cache}
+\caption{Well-formed values and environments}
 \label{fig:well-formed-env}
 \end{figure}
