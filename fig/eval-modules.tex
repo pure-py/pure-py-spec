@@ -122,7 +122,7 @@
   \mu', q.x \Rightarrow \mu'', \rho
 }
 {
-  \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{\bind{q.x}{\rho}}
+  \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{\bind{q.x}{\rho}} \runion \set{\bind{q}{\mu''(q) \runion \set{\bind{x}{\exMod{\Gamma_{q.x}}{\rho}}}}}
 }
 \end{mathpar}
 \subcaption{Module $q$ is loaded into the module cache $\mu$}
@@ -142,7 +142,7 @@
   \mu, q, \varepsilon \importsR \mu, \varnothing
 }
 \and
-\inferrule*[lab={\ruleName{imp-var-class}}]
+\inferrule*[lab={\ruleName{imp-member}}]
 {
   \bind{x}{v} \in \mu(q) \\
   \mu, q, \vec{x} \importsR \mu', \rho
@@ -154,12 +154,11 @@
 \inferrule*[lab={\ruleName{imp-module}}]
 {
   x \notin \dom(\mu(q)) \\
-  q.x \in \dom(\mathcal{M}) \\
   \mu, q.x \Rightarrow_{\mathsf{load}} \mu' \\
   \mu', q, \vec{x} \importsR \mu'', \rho
 }
 {
-  \mu, q, x \cons \vec{x} \importsR \mu'', \set{\bind{x}{\exMod{\Gamma_{q.x}}{\mu'(q.x)}}} \runion \rho
+  \mu, q, x \cons \vec{x} \importsR \mu'', \set{\bind{x}{\mu'(q)(x)}} \runion \rho
 }
 \end{mathpar}
 \subcaption{Names $\vec{x}$ imported from loaded module $q$ produce bindings $\rho$}

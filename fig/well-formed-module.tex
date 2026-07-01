@@ -10,32 +10,13 @@
   q, \varepsilon \importsR \varnothing
 }
 \and
-\inferrule*[lab={\ruleName{imp-var}}]
+\inferrule*[lab={\ruleName{imp-member}}]
 {
   \bind{x}{a} \in \Gamma_q \\
   q, \vec{x} \importsR \Gamma
 }
 {
   q, x \cons \vec{x} \importsR \set{\bind{x}{a}} \runion \Gamma
-}
-\and
-\inferrule*[lab={\ruleName{imp-class}}]
-{
-  \bind{x}{C} \in \Gamma_q \\
-  q, \vec{x} \importsR \Gamma
-}
-{
-  q, x \cons \vec{x} \importsR \set{\bind{x}{C}} \runion \Gamma
-}
-\and
-\inferrule*[lab={\ruleName{imp-module}}]
-{
-  x \notin \dom(\Gamma_q) \\
-  \vdash_{\mathcal{M}} q.x \\
-  q, \vec{x} \importsR \Gamma
-}
-{
-  q, x \cons \vec{x} \importsR \set{\bind{x}{\modEntry{q.x}}} \runion \Gamma
 }
 \end{mathpar}
 \caption{Names $\vec{x}$ imported from module $q$ produce bindings $\Gamma$}

@@ -353,11 +353,11 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \input{fig/well-formed-expr}
 \input{fig/well-formed-module}
 
-\begin{definition}[Exports of a well-formed module]
-Suppose $\varnothing \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \mathcal{M}(q) : \Delta$. Define the \emph{exports} of $q$ as $\Gamma_q = \Delta$.
+\begin{definition}[Context of a well-formed module]
+Suppose $\varnothing \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \mathcal{M}(q) : \Delta$. Define the \emph{exports} of $q$ as $\Delta$, and the \emph{context} of $q$ as $\Gamma_q = \Delta \runion \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})}$.
 \end{definition}
 
-\noindent Exports comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. In particular a module never exports a module, since module names enter scope only via imports.
+\noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. The context $\Gamma_q$ also contains an entry for each submodule $q.x$.
 
 \subsection{Examples}
 
