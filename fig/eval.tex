@@ -116,6 +116,8 @@
 \unwrap(\returns{v}) &= v \\
 \unwrap(\assigns{\rho}) &= \pyinline{None} \\
 \\
+\bodyOf(q) &= (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \mathcal{M}(q) \\
+\\
 \cacheEnv(\rho, x) &= \rho' && \text{where } \rho(x) = \exMod{\Gamma}{\rho'} \\
 \cacheEnv(\rho, q.x) &= \cacheEnv(\cacheEnv(\rho, q), x) \\
 \\
