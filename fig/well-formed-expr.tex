@@ -3,20 +3,12 @@
 \flushleft \shadebox{$\Gamma \vdash q \names \theta$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{simple-module}}]
+\inferrule*[lab={\ruleName{simple}}]
 {
-  \bind{x}{\modEntry{q}} \in \Gamma
+  \bind{x}{\theta} \in \Gamma
 }
 {
-  \Gamma \vdash x \names \modEntry{q}
-}
-\and
-\inferrule*[lab={\ruleName{simple-class}}]
-{
-  \bind{c}{C} \in \Gamma
-}
-{
-  \Gamma \vdash c \names C
+  \Gamma \vdash x \names \theta
 }
 \and
 \inferrule*[lab={\ruleName{qualified}}]
