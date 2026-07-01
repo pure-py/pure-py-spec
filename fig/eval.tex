@@ -116,13 +116,11 @@
 \unwrap(\returns{v}) &= v \\
 \unwrap(\assigns{\rho}) &= \pyinline{None} \\
 \\
-\resolveModule(\rho, x) &= \rho(x) \\
-\resolveModule(\rho, q.x) &= \rho'(x) && \text{where } \resolveModule(\rho, q) = \exMod{\Gamma}{\rho'} \\
+\cacheEnv(\rho, x) &= \rho' && \text{where } \rho(x) = \exMod{\Gamma}{\rho'} \\
+\cacheEnv(\rho, q.x) &= \cacheEnv(\cacheEnv(\rho, q), x) \\
 \\
-\resolveClass(\rho, c) &= (c, C) && \text{where } \rho(c) = C \\
-\resolveClass(\rho, q.c) &= (c, C) && \text{where } \resolveModule(\rho, q) = \exMod{\Gamma}{\rho'},\ \rho'(c) = C \\
-\\
-\cacheEnv(\mu, q) &= \rho && \text{where } \resolveModule(\mu, q) = \exMod{\Gamma}{\rho} \\
+\resolveClass(\rho, c) &= (c, \rho(c)) \\
+\resolveClass(\rho, q.c) &= (c, \cacheEnv(\rho, q)(c)) \\
 \\
 \loadSubmodule(\mu, x, v) &= \mu \runion \set{\bind{x}{v}} \\
 \loadSubmodule(\mu, q.x, v) &= \loadSubmodule(\mu, q, v') && \text{where } v' = \exMod{\Gamma_q}{\cacheEnv(\mu, q) \runion \set{\bind{x}{v}}}
@@ -180,7 +178,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-attr-module}}]
 {
-  \resolveModule(\rho, q) = \exMod{\Delta}{\rho'}
+  \cacheEnv(\rho, q) = \rho'
 }
 {
   \rho, \exProject{q}{x} \Rightarrow \rho'(x)
