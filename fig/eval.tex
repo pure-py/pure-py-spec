@@ -117,6 +117,7 @@
 \unwrap(\assigns{\rho}) &= \pyinline{None} \\
 \\
 \bodyOf(q) &= (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \mathcal{M}(q) \\
+\submodules(q) &= \set{\bind{x}{\exMod{\Gamma_{q.x}}{\star}} \mid q.x \in \dom(\mathcal{M})} \\
 \\
 \cacheEnv(\rho, x) &= \rho' && \text{where } \rho(x) = \exMod{\Gamma}{\rho'} \\
 \cacheEnv(\rho, q.x) &= \cacheEnv(\cacheEnv(\rho, q), x) \\
@@ -180,7 +181,8 @@
 \and
 \inferrule*[lab={\ruleName{eval-attr-module}}]
 {
-  \cacheEnv(\rho, q) = \rho'
+  \cacheEnv(\rho, q) = \rho' \\
+  \rho'(x) \neq \exMod{\Gamma'}{\star}
 }
 {
   \rho, \exProject{q}{x} \Rightarrow \rho'(x)
