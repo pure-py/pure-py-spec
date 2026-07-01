@@ -118,7 +118,8 @@
 \small
 \inferrule*[lab={\ruleName{module}}]
 {
-  \varnothing \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \mathcal{M}(q) : \Delta
+  \bind{q}{t} \in \mathcal{M} \\
+  \varnothing \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons t : \Delta
 }
 {
   \vdash_{\mathcal{M}} q
