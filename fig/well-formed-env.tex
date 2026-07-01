@@ -53,20 +53,12 @@
   \vdash \exObj{\Gamma}{q.c}{\rho}
 }
 \and
-\inferrule*[lab={\ruleName{val-mod}}]
+\inferrule*[lab={\ruleName{val-mod-ref}}]
 {
-  \vdash \rho : \Gamma
+  q \in \dom(\mathcal{M})
 }
 {
-  \vdash \exMod{\Gamma}{\rho}
-}
-\and
-\inferrule*[lab={\ruleName{val-unloaded}}]
-{
-  \strut
-}
-{
-  \vdash \exMod{\Gamma}{\star}
+  \vdash \exModRef{q}
 }
 \and
 \inferrule*[lab={\ruleName{val-class}}]
@@ -108,6 +100,37 @@
   \vdash \set{\bind{x}{v}} \runion \rho : \set{\bind{x}{\theta}} \runion \Gamma
 }
 \end{mathpar}
-\caption{Well-formed values and environments}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\vdash \mu$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{store-nil}}]
+{
+  \strut
+}
+{
+  \vdash \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{store-loaded}}]
+{
+  \vdash \rho : \Gamma_q \\
+  \vdash \mu
+}
+{
+  \vdash \set{\bind{q}{\rho}} \runion \mu
+}
+\and
+\inferrule*[lab={\ruleName{store-unloaded}}]
+{
+  \vdash \mu
+}
+{
+  \vdash \set{\bind{q}{\star}} \runion \mu
+}
+\end{mathpar}
+\caption{Well-formed values, environments, and module store}
 \label{fig:well-formed-env}
 \end{figure}

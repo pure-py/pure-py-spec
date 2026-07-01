@@ -8,8 +8,7 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exClosure[\Gamma]{\rho}{\vec{x}}{e}$ & (LambdaClosure) \\
     & $\mid$ & $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$ & (DefClosure) \\
     & $\mid$ & $\exObj{\Gamma}{q.c}{\rho}$ & (Object) \\
-    & $\mid$ & $\exMod{\Gamma}{\rho}$ & (Module) \\
-    & $\mid$ & $\exMod{\Gamma}{\star}$ & (Unloaded module) \\
+    & $\mid$ & $\exModRef{q}$ & (Module reference) \\
     & $\mid$ & $\clsEntry{\Gamma}{q}{\vec{x}}{c'}$ & (Class)
    \\[3mm]
 $\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & (Environment)
@@ -17,7 +16,9 @@ $\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & (Environment
 $r$ & $::=$ & $\assigns{\rho}$ \\
   & $\mid$ & $\returns{v}$
    \\[3mm]
-$\mu$ & $::=$ & $\rho$ & (Module environment) \\
+$s$ & $::=$ & $\rho \mid \star$ & (Module state)
+   \\[3mm]
+$\mu$ & $::=$ & $\set{\bind{q_1}{s_1}, \ldots, \bind{q_n}{s_n}}$ & (Module store) \\
 \end{tabular}
 \end{center}
 \caption{Values, environments and evaluation results}

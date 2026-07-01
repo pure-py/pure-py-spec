@@ -106,7 +106,7 @@
   \rho, s \cons b \Rightarrow \assigns{\rho'} \runion r
 }
 \end{mathpar}
-\caption{Block $b$ evaluates to result $r$ under environment $\rho : \Gamma$}
+\caption{Block $b$ evaluates to result $r$ under environment $\rho : \Gamma$ and ambient module store $\mu$}
 \label{fig:eval}
 \end{figure}
 
@@ -117,16 +117,13 @@
 \unwrap(\assigns{\rho}) &= \pyinline{None} \\
 \\
 \bodyOf(q) &= (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \mathcal{M}(q) \\
-\submodules(q) &= \set{\bind{x}{\exMod{\Gamma_{q.x}}{\star}} \mid q.x \in \dom(\mathcal{M})} \\
+\submodules(q) &= \set{\bind{x}{\exModRef{q.x}} \mid q.x \in \dom(\mathcal{M})} \\
 \\
-\cacheEnv(\rho, x) &= \rho' && \text{where } \rho(x) = \exMod{\Gamma}{\rho'} \\
-\cacheEnv(\rho, q.x) &= \cacheEnv(\cacheEnv(\rho, q), x) \\
+\cacheEnv(\mu, \rho, x) &= \mu(q') && \text{where } \rho(x) = \exModRef{q'} \\
+\cacheEnv(\mu, \rho, q.x) &= \mu(q'') && \text{where } \cacheEnv(\mu, \rho, q)(x) = \exModRef{q''} \\
 \\
-\resolveClass(\rho, c) &= (c, \rho(c)) \\
-\resolveClass(\rho, q.c) &= (c, \cacheEnv(\rho, q)(c)) \\
-\\
-\loadSubmodule(\rho, x, v) &= \rho \runion \set{\bind{x}{v}} \\
-\loadSubmodule(\rho, q.x, v) &= \loadSubmodule(\rho, q, v') && \text{where } v' = \exMod{\Gamma_q}{\cacheEnv(\rho, q) \runion \set{\bind{x}{v}}}
+\resolveClass(\mu, \rho, c) &= (c, \rho(c)) \\
+\resolveClass(\mu, \rho, q.c) &= (c, \cacheEnv(\mu, \rho, q)(c))
 \end{align*}
 
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
@@ -179,13 +176,24 @@
   \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow \unwrap(r)
 }
 \and
-\inferrule*[lab={\ruleName{eval-attr-module}}]
+\inferrule*[lab={\ruleName{eval-attr-member}}]
 {
-  \cacheEnv(\rho, q) = \rho' \\
-  \rho'(x) \neq \exMod{\Gamma'}{\star}
+  \rho, e \Rightarrow \exModRef{q'} \\
+  \mu(q')(x) = v \\
+  v \neq \exModRef{q''}
 }
 {
-  \rho, \exProject{q}{x} \Rightarrow \rho'(x)
+  \rho, \exProject{e}{x} \Rightarrow v
+}
+\and
+\inferrule*[lab={\ruleName{eval-attr-submodule}}]
+{
+  \rho, e \Rightarrow \exModRef{q'} \\
+  \mu(q')(x) = \exModRef{q''} \\
+  \mu(q'') = \rho''
+}
+{
+  \rho, \exProject{e}{x} \Rightarrow \exModRef{q''}
 }
 \and
 \inferrule*[lab={\ruleName{eval-attr-object}}]
@@ -199,7 +207,7 @@
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i) \\
-  \resolveClass(\rho, q) = (c, C) \\
+  \resolveClass(\mu, \rho, q) = (c, C) \\
   C = \clsEntry{\Delta}{q'}{\vec{z}}{c'} \\
   \fields(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}
 }
@@ -207,7 +215,7 @@
   \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \exObj{\Gamma}{q'.c}{\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}, \bind{y_1}{v_{n+1}}, \ldots, \bind{y_m}{v_{n+m}}}}
 }
 \end{mathpar}
-\caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$}
+\caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$ and ambient module store $\mu$}
 \label{fig:eval-expr}
 \end{figure}
 
