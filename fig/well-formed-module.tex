@@ -12,11 +12,11 @@
 \and
 \inferrule*[lab={\ruleName{imp-member}}]
 {
-  \bind{x}{a} \in \Gamma_q \\
+  \bind{x}{\theta} \in \Gamma_q \\
   q, \vec{x} \importsR \Gamma
 }
 {
-  q, x \cons \vec{x} \importsR \set{\bind{x}{a}} \runion \Gamma
+  q, x \cons \vec{x} \importsR \set{\bind{x}{\theta}} \runion \Gamma
 }
 \end{mathpar}
 \caption{Names $\vec{x}$ imported from module $q$ produce bindings $\Gamma$}
