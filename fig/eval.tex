@@ -122,8 +122,8 @@
 \resolveClass(\rho, c) &= (c, \rho(c)) \\
 \resolveClass(\rho, q.c) &= (c, \cacheEnv(\rho, q)(c)) \\
 \\
-\loadSubmodule(\mu, x, v) &= \mu \runion \set{\bind{x}{v}} \\
-\loadSubmodule(\mu, q.x, v) &= \loadSubmodule(\mu, q, v') && \text{where } v' = \exMod{\Gamma_q}{\cacheEnv(\mu, q) \runion \set{\bind{x}{v}}}
+\loadSubmodule(\rho, x, v) &= \rho \runion \set{\bind{x}{v}} \\
+\loadSubmodule(\rho, q.x, v) &= \loadSubmodule(\rho, q, v') && \text{where } v' = \exMod{\Gamma_q}{\cacheEnv(\rho, q) \runion \set{\bind{x}{v}}}
 \end{align*}
 
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
