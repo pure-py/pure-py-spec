@@ -100,7 +100,7 @@
   \mu, \varnothing, \bodyOf(x) \Rightarrow \mu', \rho
 }
 {
-  \mu, x \Rightarrow_{\mathsf{load}} \mu' \runion \set{\bind{x}{\rho \runion \submodules(x)}}
+  \mu, x \Rightarrow_{\mathsf{load}} \mu' \runion \set{\bind{x}{\submodules(x) \runion \rho}}
 }
 \and
 \inferrule*[lab={\ruleName{load-qualified}}]
@@ -110,7 +110,7 @@
   \mu', \varnothing, \bodyOf(q.x) \Rightarrow \mu'', \rho
 }
 {
-  \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{\bind{q.x}{\rho \runion \submodules(q.x)}}
+  \mu, q.x \Rightarrow_{\mathsf{load}} \mu'' \runion \set{\bind{q.x}{\submodules(q.x) \runion \rho}}
 }
 \end{mathpar}
 \subcaption{Module $q$ is loaded into the module store $\mu$}
