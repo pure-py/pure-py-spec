@@ -25,7 +25,7 @@
   q, \vec{x} \importsR \Gamma
 }
 {
-  q, x \cons \vec{x} \importsR \Gamma \runion \set{\bind{x}{C}}
+  q, x \cons \vec{x} \importsR \set{\bind{x}{C}} \runion \Gamma
 }
 \and
 \inferrule*[lab={\ruleName{imp-module}}]
@@ -35,7 +35,7 @@
   q, \vec{x} \importsR \Gamma
 }
 {
-  q, x \cons \vec{x} \importsR \Gamma \runion \set{\bind{x}{\modEntry{q.x}}}
+  q, x \cons \vec{x} \importsR \set{\bind{x}{\modEntry{q.x}}} \runion \Gamma
 }
 \end{mathpar}
 \caption{Names $\vec{x}$ imported from module $q$ produce bindings $\Gamma$}
