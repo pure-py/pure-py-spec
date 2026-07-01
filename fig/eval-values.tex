@@ -16,7 +16,8 @@ $\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & (Environment
 $r$ & $::=$ & $\assigns{\rho}$ \\
   & $\mid$ & $\returns{v}$
    \\[3mm]
-$\sigma$ & $::=$ & $\rho \mid \star$ & (Module state)
+$\sigma$ & $::=$ & $\rho$ & (Loaded) \\
+     & $\mid$ & $\star$ & (Unloaded)
    \\[3mm]
 $\mu$ & $::=$ & $\set{\bind{q_1}{\sigma_1}, \ldots, \bind{q_n}{\sigma_n}}$ & (Module store) \\
 \end{tabular}
