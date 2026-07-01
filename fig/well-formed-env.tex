@@ -53,12 +53,12 @@
   \vdash \exObj{\Gamma}{q.c}{\rho}
 }
 \and
-\inferrule*[lab={\ruleName{val-mod-ref}}]
+\inferrule*[lab={\ruleName{val-mod}}]
 {
   q \in \dom(\mathcal{M})
 }
 {
-  \vdash \exModRef{q}
+  \vdash \exMod{q}
 }
 \and
 \inferrule*[lab={\ruleName{val-class}}]
@@ -131,6 +131,6 @@
   \vdash \set{\bind{q}{\star}} \runion \mu
 }
 \end{mathpar}
-\caption{Well-formed values, environments, and module store}
+\caption{Well-formed values, environments, and module stores}
 \label{fig:well-formed-env}
 \end{figure}

@@ -117,10 +117,10 @@
 \unwrap(\assigns{\rho}) &= \pyinline{None} \\
 \\
 \bodyOf(q) &= (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \mathcal{M}(q) \\
-\submodules(q) &= \set{\bind{x}{\exModRef{q.x}} \mid q.x \in \dom(\mathcal{M})} \\
+\submodules(q) &= \set{\bind{x}{\exMod{q.x}} \mid q.x \in \dom(\mathcal{M})} \\
 \\
-\cacheEnv(\mu, \rho, x) &= \mu(q') && \text{where } \rho(x) = \exModRef{q'} \\
-\cacheEnv(\mu, \rho, q.x) &= \mu(q'') && \text{where } \cacheEnv(\mu, \rho, q)(x) = \exModRef{q''} \\
+\cacheEnv(\mu, \rho, x) &= \mu(q') && \text{where } \rho(x) = \exMod{q'} \\
+\cacheEnv(\mu, \rho, q.x) &= \mu(q'') && \text{where } \cacheEnv(\mu, \rho, q)(x) = \exMod{q''} \\
 \\
 \resolveClass(\mu, \rho, c) &= (c, \rho(c)) \\
 \resolveClass(\mu, \rho, q.c) &= (c, \cacheEnv(\mu, \rho, q)(c))
@@ -178,9 +178,9 @@
 \and
 \inferrule*[lab={\ruleName{eval-attr-member}}]
 {
-  \rho, e \Rightarrow \exModRef{q'} \\
+  \rho, e \Rightarrow \exMod{q'} \\
   \mu(q')(x) = v \\
-  v \neq \exModRef{q''}
+  v \neq \exMod{q''}
 }
 {
   \rho, \exProject{e}{x} \Rightarrow v
@@ -188,12 +188,12 @@
 \and
 \inferrule*[lab={\ruleName{eval-attr-submodule}}]
 {
-  \rho, e \Rightarrow \exModRef{q'} \\
-  \mu(q')(x) = \exModRef{q''} \\
+  \rho, e \Rightarrow \exMod{q'} \\
+  \mu(q')(x) = \exMod{q''} \\
   \mu(q'') = \rho''
 }
 {
-  \rho, \exProject{e}{x} \Rightarrow \exModRef{q''}
+  \rho, \exProject{e}{x} \Rightarrow \exMod{q''}
 }
 \and
 \inferrule*[lab={\ruleName{eval-attr-object}}]
