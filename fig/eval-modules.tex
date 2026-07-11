@@ -14,7 +14,7 @@
 \and
 \inferrule*[lab={\ruleName{imp-member}}]
 {
-  \bind{x}{v} \in \rho_q \\
+  \bind{x}{v} \in \cacheEnv(q) \\
   v \neq \exMod{q'} \\
   q, \vec{x} \importsR \rho
 }
@@ -24,7 +24,7 @@
 \and
 \inferrule*[lab={\ruleName{imp-module}}]
 {
-  \bind{x}{\exMod{q'}} \in \rho_q \\
+  \bind{x}{\exMod{q'}} \in \cacheEnv(q) \\
   q' \Rightarrow_{\mathsf{load}} \rho' \\
   q, \vec{x} \importsR \rho
 }

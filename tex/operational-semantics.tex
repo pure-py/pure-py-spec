@@ -21,8 +21,9 @@ with $\assigns{\varnothing}$ as left and right unit.
 \figref{eval-imports}. The loading judgement $q \Rightarrow_{\mathsf{load}} \rho$ evaluates the import prefix
 of $q$ and then its statements, mirroring the well-formedness judgement $\vdash_{\mathcal{M}} q$; the mutual
 recursion between loading and evaluation is grounded by the acyclicity of $G_{\mathcal{M}}$. Loading is
-deterministic; write $\rho_q$ for the unique $\rho$ such that $q \Rightarrow_{\mathsf{load}} \rho$. Loading
-mirrors the static structure: for a well-formed module $q$, $\vdash \rho_q : \members(q)$
+deterministic, so the metafunction $\cacheEnv(q)$, the unique $\rho$ such that $q \Rightarrow_{\mathsf{load}}
+\rho$, is well-defined (\figref{eval-expr}). Loading
+mirrors the static structure: for a well-formed module $q$, $\vdash \cacheEnv(q) : \members(q)$
 (\figref{well-formed-env}), and the bindings produced by the import prefix conform to the context produced by
 its well-formedness judgement. Since
 imports precede statements, every module a statement can reference is loaded before the statement runs, and

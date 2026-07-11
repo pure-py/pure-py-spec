@@ -119,8 +119,9 @@
 \bodyOf(q) &= (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons {\color{blue}\vec{s}}\,{\color{deletedgray}\mathcal{M}(q)} && {\color{blue}\text{where } \mathcal{M}(q) = \vec{\iota}\;\vec{s}} \\
 \submodules(q) &= \set{\bind{x}{\exMod{q.x}} \mid q.x \in \dom(\mathcal{M})} \\
 \\
-{\color{blue}\cacheEnv(\rho, x)} &= {\color{blue}\rho_{q'}} && {\color{blue}\text{where } \rho(x) = \exMod{q'}} \\
-{\color{blue}\cacheEnv(\rho, q.x)} &= {\color{blue}\rho_{q''}} && {\color{blue}\text{where } \cacheEnv(\rho, q)(x) = \exMod{q''}} \\
+{\color{blue}\cacheEnv(q)} &= {\color{blue}\rho} && {\color{blue}\text{where } q \Rightarrow_{\mathsf{load}} \rho} \\
+{\color{blue}\cacheEnv(\rho, x)} &= {\color{blue}\cacheEnv(q')} && {\color{blue}\text{where } \rho(x) = \exMod{q'}} \\
+{\color{blue}\cacheEnv(\rho, q.x)} &= {\color{blue}\cacheEnv(q'')} && {\color{blue}\text{where } \cacheEnv(\rho, q)(x) = \exMod{q''}} \\
 {\color{deletedgray}\cacheEnv(\mu, \rho, x)} &= {\color{deletedgray}\mu(q')} && {\color{deletedgray}\text{where } \rho(x) = \exMod{q'}} \\
 {\color{deletedgray}\cacheEnv(\mu, \rho, q.x)} &= {\color{deletedgray}\mu(q'')} && {\color{deletedgray}\text{where } \cacheEnv(\mu, \rho, q)(x) = \exMod{q''}} \\
 \\
@@ -182,7 +183,7 @@
 \inferrule*[lab={\ruleName{eval-attr-module}}]
 {
   \rho, e \Rightarrow \exMod{q'} \\
-  \bind{x}{v} \in \rho_{q'}
+  \bind{x}{v} \in \cacheEnv(q')
 }
 {
   \rho, \exProject{e}{x} \Rightarrow v
