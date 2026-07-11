@@ -742,7 +742,7 @@ attribute, are outside the scope of well-formedness.
 \hline
 \textbf{Python error} & \textbf{Prevented by} & \textbf{Notes} \\
 \hline
-\pyinline{NameError}, \pyinline{UnboundLocalError} & \ruleName{var} (\figref{well-formed-expr}); branch merge in \ruleName{if}, \ruleName{if-else}, \ruleName{match} (\figref{well-formed}) & Definite assignment ensures a unique lexical referent, which is stricter (\S\ref{sec:assignment-as-definition}). \\[1mm]
+\pyinline{NameError}, \pyinline{UnboundLocalError} & \ruleName{var} (\figref{well-formed-expr}); branch merge in \ruleName{if}, \ruleName{if-else}, \ruleName{match} (\figref{well-formed}) & Definite assignment enforces a lexical scoping discipline, which happens to rule out entirely unassigned variables (\S\ref{sec:assignment-as-definition}). \\[1mm]
 \pyinline{ModuleNotFoundError} & \ruleName{import}, \ruleName{from-import} (\figref{well-formed-module}, premise $\vdash_{\mathcal{M}} q'$) & \\[1mm]
 \pyinline{ImportError} & \ruleName{imp-member} (\figref{imports}); \ruleName{program} (\figref{well-formed-module}, $G_{\mathcal{M}}$ acyclic) & A Python import cycle may run or fail, depending on the order in which the participants access one another's members. \\[1mm]
 \pyinline{AttributeError} & \ruleName{qualified}, \ruleName{qualified-submodule}, \ruleName{attr-module} (\figref{well-formed-expr}) & Not prevented for a member that is not definitely assigned; Python raises \pyinline{AttributeError} when it is unset. \\[1mm]
