@@ -738,15 +738,15 @@ attribute, are outside the scope of well-formedness.
 
 \begin{center}
 \small
-\begin{tabular}{p{0.24\textwidth}p{0.28\textwidth}p{0.38\textwidth}}
+\begin{tabular}{p{0.24\textwidth}p{0.44\textwidth}p{0.2\textwidth}}
 \hline
-\textbf{Python error} & \textbf{Prevented by} & \textbf{Notes} \\
+\textbf{Python error} & \textbf{Notes} & \textbf{Figures} \\
 \hline
-\pyinline{NameError}, \pyinline{UnboundLocalError} & \ruleName{var} (\figref{well-formed-expr}); branch merge in \ruleName{if}, \ruleName{if-else}, \ruleName{match} (\figref{well-formed}) & Definite assignment enforces a lexical scoping discipline, which happens to rule out entirely unassigned variables (\S\ref{sec:assignment-as-definition}). \\[1mm]
-\pyinline{ModuleNotFoundError} & \ruleName{import}, \ruleName{from-import} (\figref{well-formed-module}, premise $\vdash_{\mathcal{M}} q'$) & \\[1mm]
-\pyinline{ImportError} & \ruleName{imp-member} (\figref{imports}); \ruleName{program} (\figref{well-formed-module}, $G_{\mathcal{M}}$ acyclic) & A Python import cycle may run or fail, depending on the order in which the participants access one another's members. \\[1mm]
-\pyinline{AttributeError} & \ruleName{qualified}, \ruleName{qualified-submodule}, \ruleName{attr-module} (\figref{well-formed-expr}) & Not prevented for a member that is not definitely assigned; Python raises \pyinline{AttributeError} when it is unset. \\[1mm]
-\pyinline{TypeError} & \ruleName{constr} (\figref{well-formed-expr}); pattern arity (\figref{well-formed-pat}) & A class pattern with fewer positional sub-patterns than fields is permitted by Python and unsupported (\S\ref{sec:unsupported}) rather than prevented. \\
+\pyinline{NameError}, \pyinline{UnboundLocalError} & Definite assignment enforces a lexical scoping discipline, which happens to rule out entirely unassigned variables (\S\ref{sec:assignment-as-definition}). & \figref{well-formed}, \figref{well-formed-expr} \\[1mm]
+\pyinline{ModuleNotFoundError} & An import requires its target to be a module of the program. & \figref{well-formed-module} \\[1mm]
+\pyinline{ImportError} & A from-import requires each imported name to be a member of the source module. Import cycles are rejected; a Python cycle may run or fail, depending on the order in which the participants access one another's members. & \figref{imports}, \figref{well-formed-module} \\[1mm]
+\pyinline{AttributeError} & A module attribute reference must resolve to a member, or to a submodule among the referring module's dependencies. Not prevented for a member that is not definitely assigned; Python raises \pyinline{AttributeError} when it is unset. & \figref{well-formed-expr} \\[1mm]
+\pyinline{TypeError} & A constructor must supply exactly the class's fields, and a class pattern must match the class's arity. A pattern with fewer positional sub-patterns than fields is permitted by Python and unsupported (\S\ref{sec:unsupported}) rather than prevented. & \figref{well-formed-expr}, \figref{well-formed-pat} \\
 \hline
 \end{tabular}
 \end{center}
