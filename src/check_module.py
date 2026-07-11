@@ -323,7 +323,7 @@ def parents_of(q: str) -> set[str]:
     parts = q.split('.')
     return {'.'.join(parts[:i]) for i in range(1, len(parts))}
 
-def import_closure(M: dict[str, ast.Module], q: str) -> set[str]:
+def deps(M: dict[str, ast.Module], q: str) -> set[str]:
     seen: set[str] = set()
     frontier = module_imports(M[q], M) | parents_of(q)
     while frontier:
@@ -371,7 +371,7 @@ def names_module(e: ast.expr, ctx: ModuleContext) -> Optional[str]:
         if parent is None:
             return None
         full = f'{parent}.{e.attr}'
-        return full if full in ctx.M and full in import_closure(ctx.M, ctx.q) else None
+        return full if full in ctx.M and full in deps(ctx.M, ctx.q) else None
     return None
 
 def check_stmt(s: ast.stmt, ctx: ModuleContext, module_body: bool = False) -> None:
@@ -469,7 +469,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
         if mod is not None:
             full = f'{mod}.{e.attr}'
             if full in ctx.M:
-                if full not in import_closure(ctx.M, ctx.q):
+                if full not in deps(ctx.M, ctx.q):
                     raise IllFormedModule(e, reasons.SubmoduleNotImported(full))
                 return
             if e.attr not in module_members(ctx.M, mod):
