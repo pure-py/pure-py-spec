@@ -305,8 +305,8 @@ The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(q, q
 \imports(\mathcal{M}(q)) \cup \parents(q)$. Program well-formedness (\figref{well-formed-module}) requires the
 main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
 to be acyclic. \Added{The \emph{dependencies} $\deps(q)$ of a module $q$ are the modules reachable from
-$q$ in $G_{\mathcal{M}}$. Since imports precede statements, in Python every module in $\deps(q)$ is loaded
-before any statement of $q$ runs.}
+$q$ in $G_{\mathcal{M}}$. Since imports precede statements, when a \PurePy program runs under Python, every
+module in $\deps(q)$ is loaded before any statement of $q$ runs.}
 
 \subsection{Well-formedness}
 
