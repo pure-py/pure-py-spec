@@ -732,12 +732,13 @@ overwrites the assignment. The name \pyinline{pkg.sub} has no load-order-indepen
 \subsection{Python errors prevented by well-formedness}
 \label{sec:ruled-out}
 
-A well-formed \PurePy program avoids the following classes of Python runtime error by construction. (The
-previous section is the complementary list: programs Python runs that \PurePy rejects.) Errors from ill-typed
-operations, such as wrong operand types, calling a non-function, or attribute access on an object lacking the
-attribute, are outside the scope of well-formedness.
+A well-formed \PurePy program avoids the classes of Python runtime error listed in \figref{prevented-errors}
+by construction. (The previous section is the complementary list: programs Python runs that \PurePy rejects.)
+Errors from ill-typed operations, such as wrong operand types, calling a non-function, or attribute access on
+an object lacking the attribute, are outside the scope of well-formedness.
 
-\begin{center}
+\begin{figure}[H]
+\centering
 \small
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.48\textwidth}>{\raggedright\arraybackslash}p{0.16\textwidth}}
 \hline
@@ -750,7 +751,9 @@ attribute, are outside the scope of well-formedness.
 \pyinline{TypeError} & A constructor must supply exactly the class's fields, and a class pattern must match the class's arity. A pattern with fewer positional sub-patterns than fields is permitted by Python and unsupported (\S\ref{sec:unsupported}) rather than prevented. & \figref{well-formed-expr}, \figref{well-formed-pat} \\
 \hline
 \end{tabular}
-\end{center}
+\caption{Python errors prevented by well-formedness}
+\label{fig:prevented-errors}
+\end{figure}
 \end{AddedBlock}
 
 \section{Operational semantics}
