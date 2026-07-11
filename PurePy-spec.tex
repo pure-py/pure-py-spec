@@ -372,7 +372,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 
 \noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. \Replaced{The members $\members(q)$ also contain}{The context $\Gamma_q$ also contains} an entry for each submodule $q.x$\Added{; the two parts are disjoint, because the \ruleName{module} rule prohibits a module from binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash})}.
 
-\Added{Rule \ruleName{qualified-submodule} requires the submodule to be among the dependencies $\deps(q_0)$ of the referring module $q_0$. This ensures it is loaded wherever the reference can be evaluated; Python raises \pyinline{AttributeError} on the attribute path of an unloaded submodule.}
+\Added{Rule \ruleName{qualified-submodule} requires the submodule to be among the dependencies $\deps(q_0)$ of the referring module $q_0$, ensuring it is loaded wherever the reference can be evaluated (\S\ref{sec:attribute-error}).}
 
 \subsection{Examples}
 
@@ -691,14 +691,12 @@ functional programming:
 \end{itemize}
 
 \begin{AddedBlock}
-\subsubsection{A variable and a submodule with the same name}
+\subsubsection{Variable and submodule with the same name}
 \label{sec:submodule-clash}
 
-In Python, an attribute of a package can be bound in two ways: by an assignment in the package's own body,
-and by a load of a same-named submodule, since loading \pyinline{pkg.sub} assigns the new module to attribute
-\pyinline{sub} of \pyinline{pkg}. Which binding is visible depends on which loads have executed. Suppose the
-body of \pyinline{pkg} is the single assignment \pyinline{sub = 1}, and \pyinline{pkg} also has a submodule
-\pyinline{pkg.sub}. The following two programs are identical except for their imports:
+In Python, an attribute of a package can be bound by an assignment in the package's own body, and by a load
+of the same-named submodule, which assigns the new module to the attribute. Suppose the body of \pyinline{pkg}
+is the single assignment \pyinline{sub = 1}, and \pyinline{pkg} also has a submodule \pyinline{pkg.sub}:
 \vspace{-\medskipamount}
 
 \begin{minipage}[t]{0.48\textwidth}
@@ -715,12 +713,53 @@ print(pkg.sub)  # <module 'pkg.sub'>
 \end{python}
 \end{minipage}
 
-On the left, \pyinline{pkg.sub} is never loaded, so the assignment in \pyinline{pkg} is visible. On the
-right, \pyinline{pkg.sub} is loaded after \pyinline{pkg}, and the load overwrites the assignment. The same
-attribute can even change meaning during a run, when a later import loads the submodule. So the name
-\pyinline{pkg.sub} has no load-order-independent meaning, and \PurePy rejects the clash: the
-\ruleName{module} rule prohibits a module from binding (by import or by assignment) a name that is also the
-name of one of its submodules.
+On the left, \pyinline{pkg.sub} is never loaded, so the assignment is visible; on the right, the load
+overwrites the assignment. The name \pyinline{pkg.sub} has no load-order-independent meaning, so the
+\ruleName{module} rule prohibits a module from binding a name that is also the name of one of its submodules.
+\end{AddedBlock}
+
+\begin{AddedBlock}
+\subsection{Ruled-out errors}
+\label{sec:ruled-out}
+
+A well-formed \PurePy program avoids several classes of Python runtime error by construction; this section
+collects them, with the rules responsible. (The previous section is the complementary list: programs Python
+runs that \PurePy rejects.) Errors from ill-typed operations, such as wrong operand types, calling a
+non-function, or attribute access on an object lacking the attribute, are outside the scope of
+well-formedness; \PurePy defers these to the mypy type system.
+
+\subsubsection{NameError and UnboundLocalError}
+
+Referencing a variable that is not definitely assigned is ill-formed (rule \ruleName{var}): conditionals and
+\pyinline{match} statements merge their branches' contexts, so a variable assigned in only some branches
+cannot be referenced afterwards (\S\ref{sec:local-assignment}). Python raises \pyinline{NameError} at module
+level and \pyinline{UnboundLocalError} inside a function when the unassigned path is taken.
+
+\subsubsection{ModuleNotFoundError and ImportError}
+
+Importing a module outside $\dom(\mathcal{M})$ is ill-formed (rule \ruleName{module}), as is from-importing a
+name that is neither a member nor a submodule of the source module (rules \ruleName{imp-member},
+\ruleName{imp-module}); Python raises \pyinline{ModuleNotFoundError} and \pyinline{ImportError} respectively.
+Cyclic imports are rejected outright (rule \ruleName{program}); in Python a cycle may run or raise
+\pyinline{ImportError}, depending on the order in which the participants access one another's members.
+
+\subsubsection{AttributeError}
+\label{sec:attribute-error}
+
+A module attribute reference resolves only to a member (rules \ruleName{attr-module}, \ruleName{qualified})
+or to a submodule among the referring module's dependencies (rule \ruleName{qualified-submodule}); Python
+raises \pyinline{AttributeError} when the attribute is absent, and whether a submodule attribute is present
+depends on global load state. One case is not ruled out: a member
+that is not definitely assigned (bound in only some branches of a top-level conditional) may still be
+referenced by attribute, and Python raises \pyinline{AttributeError} when it is unset.
+
+\subsubsection{TypeError}
+
+A constructor must supply exactly the class's fields, with keywords matching the trailing fields (rule
+\ruleName{constr}); Python's generated \pyinline{__init__} raises \pyinline{TypeError} on arity or keyword
+mismatch. A class pattern with more positional sub-patterns than the class has fields is likewise a Python
+\pyinline{TypeError} and is ill-formed (\figref{well-formed-pat}); a pattern with fewer is permitted by
+Python and appears under unsupported features instead.
 \end{AddedBlock}
 
 \section{Operational semantics}
