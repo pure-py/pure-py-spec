@@ -140,15 +140,27 @@
 \inferrule*[lab={\ruleName{module}}]
 {
   {\color{deletedgray} q \in \dom(\mathcal{M})} \\
-  {\color{blue} \vdash_{\mathcal{M}} q' \quad (\forall q' \in \parents(q))} \\
-  {\color{blue} \mathcal{M}(q) = \vec{\iota}\;\vec{s}} \\
+  {\color{blue} \mathcal{M}(x) = \vec{\iota}\;\vec{s}} \\
   {\color{blue} \vdash \vec{\iota} : \Gamma} \\
-  {\color{blue}\Gamma}\,{\color{deletedgray}\varnothing} \vdash \bodyOf(q) : \Delta \\
-  {\color{blue} (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{x \mid q.x \in \dom(\mathcal{M})} = \varnothing}
+  {\color{blue}\Gamma}\,{\color{deletedgray}\varnothing} \vdash \bodyOf(x) : \Delta \\
+  {\color{blue} (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{x' \mid x.x' \in \dom(\mathcal{M})} = \varnothing}
 }
 {
-  \vdash_{\mathcal{M}} q
+  \vdash_{\mathcal{M}} {\color{blue}x}\,{\color{deletedgray}q}
 }
+\and
+{\color{blue}
+\inferrule*[lab={\ruleName{module-sub}}]
+{
+  \vdash_{\mathcal{M}} q \\
+  \mathcal{M}(q.x) = \vec{\iota}\;\vec{s} \\
+  \vdash \vec{\iota} : \Gamma \\
+  \Gamma \vdash \bodyOf(q.x) : \Delta \\
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{x' \mid q.x.x' \in \dom(\mathcal{M})} = \varnothing
+}
+{
+  \vdash_{\mathcal{M}} q.x
+}}
 \end{mathpar}
 
 \flushleft \shadebox{$\vdash \mathcal{M}$}

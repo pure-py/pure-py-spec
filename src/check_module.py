@@ -915,7 +915,8 @@ def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
         raise
 
 def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
-    for parent in sorted(parents_of(q), key=len):
+    if '.' in q:
+        parent = q.rsplit('.', 1)[0]
         check_module(M[parent], M, parent)
     nested = find_nested_import(m.body)
     if nested is not None:
