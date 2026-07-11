@@ -14,7 +14,7 @@
 \inferrule*[lab={\ruleName{qualified}}]
 {
   \Gamma \vdash q \names \modEntry{q'} \\
-  \bind{x}{\theta} \in \Gamma_{q'} \\
+  \bind{x}{\theta} \in {\color{blue}\members(q')}\,{\color{deletedgray}\Gamma_{q'}} \\
   {\color{blue} \theta \neq \modEntry{q''}}
 }
 {

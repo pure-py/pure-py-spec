@@ -366,13 +366,13 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \input{fig/well-formed-expr}
 \input{fig/well-formed-module}
 
-\begin{definition}[Context of a well-formed module]
-\Replaced{Suppose $\mathcal{M}(q) = \vec{\iota}\;\vec{s}$ with $\vdash \vec{\iota} : \Gamma$ and $\Gamma \vdash \bodyOf(q) : \Delta$.}{Suppose $\varnothing \vdash \bodyOf(q) : \Delta$.} Define the \emph{exports} of $q$ as $\Delta$, and the \emph{context} of $q$ as $\Gamma_q = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \Delta$.
+\begin{definition}[Members of a well-formed module]
+\Replaced{Suppose $\mathcal{M}(q) = \vec{\iota}\;\vec{s}$ with $\vdash \vec{\iota} : \Gamma$ and $\Gamma \vdash \bodyOf(q) : \Delta$.}{Suppose $\varnothing \vdash \bodyOf(q) : \Delta$.} Define the \emph{exports} of $q$ as $\Delta$, and the \Replaced{\emph{members} of $q$ as $\members(q)$}{\emph{context} of $q$ as $\Gamma_q$} $= \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \Delta$.
 \end{definition}
 
-\noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. The context $\Gamma_q$ also contains an entry for each submodule $q.x$\Added{; the two parts are disjoint, because the \ruleName{module} rule prohibits a module from binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash})}.
+\noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. \Replaced{The members $\members(q)$ also contain}{The context $\Gamma_q$ also contains} an entry for each submodule $q.x$\Added{; the two parts are disjoint, because the \ruleName{module} rule prohibits a module from binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash})}.
 
-\Added{A submodule entry of $\Gamma_{q'}$ is accessible from another module $q_0$ (rule \ruleName{qualified-submodule}) only when the submodule is among the dependencies $\deps(q_0)$ of the accessing module: only then is it guaranteed to be loaded. Python raises \pyinline{AttributeError} when the attribute path of an unloaded submodule is accessed.}
+\Added{A submodule entry of $\members(q')$ is accessible from another module $q_0$ (rule \ruleName{qualified-submodule}) only when the submodule is among the dependencies $\deps(q_0)$ of the accessing module: only then is it guaranteed to be loaded. Python raises \pyinline{AttributeError} when the attribute path of an unloaded submodule is accessed.}
 
 \subsection{Examples}
 
