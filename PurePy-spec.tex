@@ -259,7 +259,7 @@ which follow Python.
 A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
 (\figref{syntax-stmt}) to \emph{module bodies} $t$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
-$\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. \Added{A module body is a sequence of imports
+$\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. \Added{We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$.} \Added{A module body is a sequence of imports
 $\vec{\iota}$ followed by a sequence of statements $\vec{s}$; since imports are not statements, they can
 appear neither in blocks (and hence not in function bodies) nor after the first non-import statement.} The
 well-formedness and evaluation rules check and evaluate \Added{the statements of} each body $\mathcal{M}(q)$ with the
@@ -306,7 +306,7 @@ The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(q, q
 main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
 to be acyclic. \Added{The \emph{import closure} of a module $q$ is the set of modules reachable from $q$ in
 $G_{\mathcal{M}}$; in rules concerning the body of $q$, the metavariable $I$ denotes its import closure. Since
-imports precede statements, every module in $I$ is loaded before any statement of $q$ runs.}
+imports precede statements, in Python every module in $I$ is loaded before any statement of $q$ runs.}
 
 \subsection{Well-formedness}
 
