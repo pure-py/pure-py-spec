@@ -548,8 +548,8 @@ functional programming:
 \item \Added{Referring to a submodule the referring module does not itself import: \pyinline{import a} followed by \pyinline{a.b.f()} is rejected unless \pyinline{a.b} is among the module's own dependencies. Python permits the reference whenever some earlier import, anywhere in the program, loaded \pyinline{a.b}.}
 \end{itemize}
 
-\Added{Complementing the list above (programs Python runs that \PurePy rejects), a well-formed \PurePy
-program avoids the classes of Python runtime error listed in \figref{prevented-errors}. Errors from ill-typed
+\Added{Complementing the list above (programs Python runs that \PurePy rejects), well-formedness partly
+precludes the classes of Python runtime error listed in \figref{prevented-errors}. Errors from ill-typed
 operations, such as wrong operand types, calling a non-function, or attribute access on an object lacking the
 attribute, are outside the scope of well-formedness.}
 
@@ -596,6 +596,6 @@ overwrites the assignment. The name \pyinline{pkg.sub} has no load-order-indepen
 \pyinline{TypeError} & A constructor must supply exactly the class's fields, and a class pattern must match the class's arity. Only excess sub-patterns are a Python error; a pattern with fewer is prohibited even though Python permits it. & \figref{well-formed-expr}, \figref{well-formed-pat} \\
 \hline
 \end{tabular}
-\caption{Python errors prevented by well-formedness}
+\caption{Python errors partly precluded by well-formedness}
 \label{fig:prevented-errors}
 \end{figure}
