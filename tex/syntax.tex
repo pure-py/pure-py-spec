@@ -224,7 +224,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \end{enumerate}
 \end{definition}
 
-\noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. \Replaced{The members $\members(q)$ also contain}{The context $\Gamma_q$ also contains} an entry for each submodule $q.x$\Added{; the two parts are disjoint, because the \ruleName{module} rule prohibits a module from binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash})}.
+\noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. \Replaced{The members $\members(q)$ also contain}{The context $\Gamma_q$ also contains} an entry for each submodule $q.x$\Added{; the two parts are disjoint, because the module rules prohibit a module from binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash})}.
 
 \Added{Rule \ruleName{qualified-submodule} requires the submodule to be among the dependencies $\deps(q_0)$ of the referring module $q_0$, ensuring it is loaded wherever the reference can be evaluated (\figref{prevented-errors}).}
 
@@ -582,7 +582,7 @@ print(pkg.sub)  # <module 'pkg.sub'>
 
 On the left, \pyinline{pkg.sub} is never loaded, so the assignment is visible; on the right, the load
 overwrites the assignment. The name \pyinline{pkg.sub} has no load-order-independent meaning, so the
-\ruleName{module} rule prohibits a module from binding a name that is also the name of one of its submodules.
+module rules prohibit a module from binding a name that is also the name of one of its submodules.
 \end{AddedBlock}
 
 \begin{figure}

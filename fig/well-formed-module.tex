@@ -137,7 +137,7 @@
 \flushleft \shadebox{$\vdash_{\mathcal{M}} q$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{module}}]
+\inferrule*[lab={\ruleName{module-simple}}]
 {
   {\color{deletedgray} q \in \dom(\mathcal{M})} \\
   {\color{blue} \mathcal{M}(x) = \vec{\iota}\;\vec{s}} \\
@@ -150,7 +150,7 @@
 }
 \and
 {\color{blue}
-\inferrule*[lab={\ruleName{module-sub}}]
+\inferrule*[lab={\ruleName{module-qualified}}]
 {
   \vdash_{\mathcal{M}} q \\
   \mathcal{M}(q.x) = \vec{\iota}\;\vec{s} \\

@@ -159,7 +159,7 @@
 \flushleft \shadebox{$q \Rightarrow_{\mathsf{load}} \rho$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{load}}]
+\inferrule*[lab={\ruleName{load-simple}}]
 {
   \mathcal{M}(x) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} \Rightarrow \rho' \\
@@ -169,7 +169,7 @@
   x \Rightarrow_{\mathsf{load}} \submodules(x) \runion \rho
 }
 \and
-\inferrule*[lab={\ruleName{load-sub}}]
+\inferrule*[lab={\ruleName{load-qualified}}]
 {
   q \Rightarrow_{\mathsf{load}} \rho'' \\
   \mathcal{M}(q.x) = \vec{\iota}\;\vec{s} \\
