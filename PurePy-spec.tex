@@ -374,7 +374,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 
 \noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. \Replaced{The members $\members(q)$ also contain}{The context $\Gamma_q$ also contains} an entry for each submodule $q.x$\Added{; the two parts are disjoint, because the \ruleName{module} rule prohibits a module from binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash})}.
 
-\Added{Rule \ruleName{qualified-submodule} requires the submodule to be among the dependencies $\deps(q_0)$ of the referring module $q_0$, ensuring it is loaded wherever the reference can be evaluated (\S\ref{sec:ruled-out}).}
+\Added{Rule \ruleName{qualified-submodule} requires the submodule to be among the dependencies $\deps(q_0)$ of the referring module $q_0$, ensuring it is loaded wherever the reference can be evaluated (\figref{prevented-errors}).}
 
 \subsection{Examples}
 
@@ -700,6 +700,11 @@ functional programming:
 \item \Added{Referring to a submodule the referring module does not itself import: \pyinline{import a} followed by \pyinline{a.b.f()} is rejected unless \pyinline{a.b} is among the module's own dependencies. Python permits the reference whenever some earlier import, anywhere in the program, loaded \pyinline{a.b}.}
 \end{itemize}
 
+\Added{Complementing the list above (programs Python runs that \PurePy rejects), a well-formed \PurePy
+program avoids the classes of Python runtime error listed in \figref{prevented-errors}. Errors from ill-typed
+operations, such as wrong operand types, calling a non-function, or attribute access on an object lacking the
+attribute, are outside the scope of well-formedness.}
+
 \begin{AddedBlock}
 \subsubsection{Variable and submodule with the same name}
 \label{sec:submodule-clash}
@@ -728,16 +733,8 @@ overwrites the assignment. The name \pyinline{pkg.sub} has no load-order-indepen
 \ruleName{module} rule prohibits a module from binding a name that is also the name of one of its submodules.
 \end{AddedBlock}
 
-\begin{AddedBlock}
-\subsection{Python errors prevented by well-formedness}
-\label{sec:ruled-out}
-
-A well-formed \PurePy program avoids the classes of Python runtime error listed in \figref{prevented-errors}
-by construction. (The previous section is the complementary list: programs Python runs that \PurePy rejects.)
-Errors from ill-typed operations, such as wrong operand types, calling a non-function, or attribute access on
-an object lacking the attribute, are outside the scope of well-formedness.
-
-\begin{figure}[H]
+\begin{figure}
+\color{blue}
 \centering
 \small
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.48\textwidth}>{\raggedright\arraybackslash}p{0.16\textwidth}}
@@ -754,7 +751,6 @@ an object lacking the attribute, are outside the scope of well-formedness.
 \caption{Python errors prevented by well-formedness}
 \label{fig:prevented-errors}
 \end{figure}
-\end{AddedBlock}
 
 \section{Operational semantics}
 
