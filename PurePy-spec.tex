@@ -360,7 +360,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 Suppose $\mathcal{M}(q) = \vec{\iota}\;\vec{s}$ with $\vdash \vec{\iota} : \Gamma$ and $\Gamma \vdash \bodyOf(q) : \Delta$. Define the \emph{exports} of $q$ as $\Delta$, and the \emph{context} of $q$ as $\Gamma_q = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \Delta$.
 \end{definition}
 
-\noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. The context $\Gamma_q$ also contains an entry for each submodule $q.x$.
+\noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. The context $\Gamma_q$ also contains an entry for each submodule $q.x$; the two parts are disjoint, because the \ruleName{module} rule prohibits a module from binding (by import or by assignment) a name that is also the name of one of its submodules. In Python, whether such a binding or the submodule wins depends on the order in which the assignment and the submodule's load occur, so no static account of the clash is faithful.
 
 \subsection{Examples}
 

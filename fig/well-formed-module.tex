@@ -118,7 +118,8 @@
 {
   \mathcal{M}(q) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} : \Gamma \\
-  \Gamma \vdash \bodyOf(q) : \Delta
+  \Gamma \vdash \bodyOf(q) : \Delta \\
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{x \mid q.x \in \dom(\mathcal{M})} = \varnothing
 }
 {
   \vdash_{\mathcal{M}} q
