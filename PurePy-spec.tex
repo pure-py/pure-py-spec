@@ -378,6 +378,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \subsection{Examples}
 
 \subsubsection{Assignment as definition}
+\label{sec:assignment-as-definition}
 
 Although \PurePy is pure and all variable usage is well-scoped, local variables are introduced using an
 \emph{assignment statement}, for compatibility with Python. If a variable is definitely assigned in any branch
@@ -734,9 +735,13 @@ well-formedness.
 Referencing a variable that is not definitely assigned is ill-formed (rule \ruleName{var}): conditionals and
 \pyinline{match} statements merge their branches' contexts, so a variable assigned in only some branches
 cannot be referenced afterwards (\S\ref{sec:local-assignment}). Python raises \pyinline{NameError} at module
-level and \pyinline{UnboundLocalError} inside a function when the unassigned path is taken. The analysis is
-conservative: it also rejects programs in which every run assigns the variable before the reference, such as
-the left-hand program of \S\ref{sec:contexts}.
+level and \pyinline{UnboundLocalError} inside a function when the unassigned path is taken. Definite
+assignment gives each reference a unique lexical referent: a variable is introduced by an assignment
+(\S\ref{sec:assignment-as-definition}), possibly jointly by the branches of a conditional, and a name may be
+referenced only where one such introduction is in scope on every path. This is stricter than avoiding the
+errors above: the left-hand program of \S\ref{sec:contexts} assigns \pyinline{x} on every run, but is
+rejected because the reference would denote the branch-local variable on one path and the variable it hides
+on the other.
 
 \subsubsection{ModuleNotFoundError and ImportError}
 
