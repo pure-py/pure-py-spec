@@ -129,6 +129,27 @@ class NonTopLevelImport:
 
 
 @dataclass(frozen=True)
+class ImportAfterStatement:
+    def message(self) -> str:
+        return "imports must precede all other statements"
+
+
+@dataclass(frozen=True)
+class SubmoduleNameClash:
+    name: str
+    submodule: str
+    def message(self) -> str:
+        return f"binding '{self.name}' clashes with submodule '{self.submodule}'"
+
+
+@dataclass(frozen=True)
+class SubmoduleNotImported:
+    q: str
+    def message(self) -> str:
+        return f"submodule '{self.q}' is not imported"
+
+
+@dataclass(frozen=True)
 class NonTopLevelClass:
     def message(self) -> str:
         return "class definition only allowed at module top level"
@@ -177,4 +198,5 @@ Reason = Union[
     UnknownConstructorKeyword,
     NonlinearPattern, UnreachableCase, DuplicateMutualName,
     NonTopLevelImport, NonTopLevelClass, TopLevelReturn, EmptyFromImport,
+    ImportAfterStatement, SubmoduleNameClash, SubmoduleNotImported,
 ]
