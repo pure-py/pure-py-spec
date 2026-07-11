@@ -160,6 +160,7 @@ grouping consecutive \pyinline{def}s into a single region. The well-formedness r
 one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
 
 \subsection{Contexts}
+\label{sec:contexts}
 
 Metavariables $x$, $f$, $c$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function and $c$ when it is expected to denote a class.
 
@@ -733,7 +734,9 @@ well-formedness.
 Referencing a variable that is not definitely assigned is ill-formed (rule \ruleName{var}): conditionals and
 \pyinline{match} statements merge their branches' contexts, so a variable assigned in only some branches
 cannot be referenced afterwards (\S\ref{sec:local-assignment}). Python raises \pyinline{NameError} at module
-level and \pyinline{UnboundLocalError} inside a function when the unassigned path is taken.
+level and \pyinline{UnboundLocalError} inside a function when the unassigned path is taken. The analysis is
+conservative: it also rejects programs in which every run assigns the variable before the reference, such as
+the left-hand program of \S\ref{sec:contexts}.
 
 \subsubsection{ModuleNotFoundError and ImportError}
 
