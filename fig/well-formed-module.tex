@@ -143,7 +143,7 @@
   {\color{blue} \mathcal{M}(x) = \vec{\iota}\;\vec{s}} \\
   {\color{blue} \vdash \vec{\iota} : \Gamma} \\
   {\color{blue}\Gamma}\,{\color{deletedgray}\varnothing} \vdash \bodyOf(x) : \Delta \\
-  {\color{blue} (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{x' \mid x.x' \in \dom(\mathcal{M})} = \varnothing}
+  {\color{blue} (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{y \mid x.y \in \dom(\mathcal{M})} = \varnothing}
 }
 {
   \vdash_{\mathcal{M}} {\color{blue}x}\,{\color{deletedgray}q}
@@ -156,7 +156,7 @@
   \mathcal{M}(q.x) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} : \Gamma \\
   \Gamma \vdash \bodyOf(q.x) : \Delta \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{x' \mid q.x.x' \in \dom(\mathcal{M})} = \varnothing
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{y \mid q.x.y \in \dom(\mathcal{M})} = \varnothing
 }
 {
   \vdash_{\mathcal{M}} q.x
