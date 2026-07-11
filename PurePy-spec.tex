@@ -730,7 +730,7 @@ runs that \PurePy rejects.) Errors from ill-typed operations, such as wrong oper
 non-function, or attribute access on an object lacking the attribute, are outside the scope of
 well-formedness.
 
-\subsubsection{NameError and UnboundLocalError}
+\subsubsection{\pyinline{NameError} and \pyinline{UnboundLocalError}}
 
 Referencing a variable that is not definitely assigned is ill-formed (rule \ruleName{var}): conditionals and
 \pyinline{match} statements merge their branches' contexts, so a variable assigned in only some branches
@@ -743,7 +743,7 @@ errors above: the left-hand program of \S\ref{sec:contexts} assigns \pyinline{x}
 rejected because the reference would denote the branch-local variable on one path and the variable it hides
 on the other.
 
-\subsubsection{ModuleNotFoundError and ImportError}
+\subsubsection{\pyinline{ModuleNotFoundError} and \pyinline{ImportError}}
 
 Importing a module outside $\dom(\mathcal{M})$ is ill-formed (rule \ruleName{module}), as is from-importing a
 name that is neither a member nor a submodule of the source module (rules \ruleName{imp-member},
@@ -751,7 +751,7 @@ name that is neither a member nor a submodule of the source module (rules \ruleN
 Cyclic imports are rejected outright (rule \ruleName{program}); in Python a cycle may run or raise
 \pyinline{ImportError}, depending on the order in which the participants access one another's members.
 
-\subsubsection{AttributeError}
+\subsubsection{\pyinline{AttributeError}}
 \label{sec:attribute-error}
 
 A module attribute reference resolves only to a member (rules \ruleName{attr-module}, \ruleName{qualified})
@@ -761,7 +761,7 @@ depends on global load state. One case is not ruled out: a member
 that is not definitely assigned (bound in only some branches of a top-level conditional) may still be
 referenced by attribute, and Python raises \pyinline{AttributeError} when it is unset.
 
-\subsubsection{TypeError}
+\subsubsection{\pyinline{TypeError}}
 
 A constructor must supply exactly the class's fields, with keywords matching the trailing fields (rule
 \ruleName{constr}); Python's generated \pyinline{__init__} raises \pyinline{TypeError} on arity or keyword
