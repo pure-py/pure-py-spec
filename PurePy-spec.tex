@@ -260,8 +260,8 @@ A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualifie
 (\figref{syntax-stmt}) to \emph{module bodies} $t$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
 $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. \Added{A module body is a sequence of imports
-$\vec{\iota}$ followed by a sequence of statements $\vec{s}$; since imports are not statements, they cannot
-appear in blocks, and hence not in function bodies or after the first non-import statement.} The
+$\vec{\iota}$ followed by a sequence of statements $\vec{s}$; since imports are not statements, they can
+appear neither in blocks (and hence not in function bodies) nor after the first non-import statement.} The
 well-formedness and evaluation rules check and evaluate \Added{the statements of} each body $\mathcal{M}(q)$ with the
 assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended \Added{(metafunction $\bodyOf$,
 \figref{eval-expr})}, modelling the $\pymath{\_\_name\_\_}$ binding the runtime supplies automatically rather
