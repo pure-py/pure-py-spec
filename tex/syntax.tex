@@ -151,7 +151,7 @@ fully-qualified name.
 
 \input{fig/modules}
 
-The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(q, q')$ iff $q' \in
+The \emph{dependency graph} $G_{\mathcal{M}}$ \Replaced{of a program}{of a module map} has an edge $(q, q')$ iff $q' \in
 \imports(\mathcal{M}(q)) \cup \parents(q)$. Program well-formedness (\figref{well-formed-module}) requires the
 main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
 to be acyclic. \Added{The \emph{dependencies} $\deps(q)$ of a module $q$ (\figref{modules}) are the modules
