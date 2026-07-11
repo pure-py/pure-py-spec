@@ -296,7 +296,7 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \label{fig:predefined}
 \end{figure}
 
-The metafunction $\assignsS$ extends from individual statements to blocks and module bodies by union, and $\imports$ \Replaced{from individual imports to module bodies by union over the import prefix}{to module bodies}. The metafunction $\parents$ collects the proper prefixes of a
+\Replaced{The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ from individual imports to import sequences; on a module body $\vec{\iota}\;\vec{s}$, they act on $\vec{s}$ and $\vec{\iota}$ respectively.}{The metafunction $\assignsS$ extends from individual statements to blocks and module bodies by union, and $\imports$ to module bodies.} The metafunction $\parents$ collects the proper prefixes of a
 fully-qualified name.
 
 \input{fig/modules}
