@@ -14,17 +14,19 @@ $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}$ & (Match) \\
     & $\mid$ & $d_1 \;\ldots\; d_{n+1}$ & (MutualRegion) \\
     & $\mid$ & $\exDataclass{c}{\phi}$ & (Dataclass) \\
-    & $\mid$ & $\exDataclassExtend{c}{c'}{\phi}$ & (DataclassExtend)
+    & $\mid$ & $\exDataclassExtend{c}{c'}{\phi}$ & (DataclassExtend) \\
+    & \textcolor{deletedgray}{$\mid$} & \textcolor{deletedgray}{$\exImport{q}$} & \textcolor{deletedgray}{(Import)} \\
+    & \textcolor{deletedgray}{$\mid$} & \textcolor{deletedgray}{$\exFromImport{q}{x_1, \ldots, x_{n+1}}$} & \textcolor{deletedgray}{(FromImport)}
    \\[3mm]
-$\iota$ & $::=$ & $\exImport{q}$ & (Import) \\
-    & $\mid$ & $\exFromImport{q}{x_1, \ldots, x_{n+1}}$ & (FromImport)
+\textcolor{blue}{$\iota$} & \textcolor{blue}{$::=$} & \textcolor{blue}{$\exImport{q}$} & \textcolor{blue}{(Import)} \\
+    & \textcolor{blue}{$\mid$} & \textcolor{blue}{$\exFromImport{q}{x_1, \ldots, x_{n+1}}$} & \textcolor{blue}{(FromImport)}
    \\[3mm]
 $\phi$ & $::=$ & $\exField{x_1} \;\ldots\; \exField{x_{n+1}}$ & (FieldList) \\
     & $\mid$ & $\pyinline{pass}$ & (EmptyFieldList)
    \\[3mm]
 $b$ & $::=$ & $s_1 \;\ldots\; s_{n+1}$ & (Block)
    \\[3mm]
-$t$ & $::=$ & $\iota_1 \;\ldots\; \iota_m \;\; s_1 \;\ldots\; s_n$ & (ModuleBody)
+$t$ & $::=$ & ${\color{blue}\iota_1 \;\ldots\; \iota_m} \;\; s_1 \;\ldots\; s_n$ & (ModuleBody)
    \\[3mm]
 $q$ & $::=$ & $x_1.x_2.\ldots.x_{n+1}$ & (Name)
    \\[3mm]

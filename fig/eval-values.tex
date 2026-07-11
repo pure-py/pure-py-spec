@@ -15,6 +15,11 @@ $\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & (Environment
    \\[3mm]
 $r$ & $::=$ & $\assigns{\rho}$ \\
   & $\mid$ & $\returns{v}$
+   \\[3mm]
+\textcolor{deletedgray}{$\sigma$} & \textcolor{deletedgray}{$::=$} & \textcolor{deletedgray}{$\rho$} & \textcolor{deletedgray}{(Loaded)} \\
+     & \textcolor{deletedgray}{$\mid$} & \textcolor{deletedgray}{$\star$} & \textcolor{deletedgray}{(Unloaded)}
+   \\[3mm]
+\textcolor{deletedgray}{$\mu$} & \textcolor{deletedgray}{$::=$} & \textcolor{deletedgray}{$\set{\bind{q_1}{\sigma_1}, \ldots, \bind{q_n}{\sigma_n}}$} & \textcolor{deletedgray}{(Module store)} \\
 \end{tabular}
 \end{center}
 \caption{Values, environments and evaluation results}

@@ -25,6 +25,7 @@
 
 \begin{figure}
 \begin{subfigure}{\textwidth}
+\color{blue}
 \flushleft \shadebox{$\vdash \vec{\iota} : \Gamma$}
 \begin{mathpar}
 \small
@@ -56,13 +57,13 @@
   \vdash \exFromImport{q'}{\vec{x}} \cons \vec{\iota} : \Gamma' \runion \Gamma
 }
 \end{mathpar}
-\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$}
+\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$ (previously part of the body judgement below)}
 \end{subfigure}
 
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash \vec{s} : \Delta$}
+\flushleft \shadebox{$\Gamma \vdash {\color{blue}\vec{s}}\,{\color{deletedgray}t} : \Delta$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{nil}}]
@@ -72,6 +73,28 @@
 {
   \Gamma \vdash \varepsilon : \varnothing
 }
+\and
+{\color{deletedgray}
+\inferrule*[lab={\ruleName{import}}]
+{
+  q' = x_1.x_2.\ldots.x_{n+1} \\
+  \vdash_{\mathcal{M}} q' \\
+  \Gamma, \bind{x_1}{\modEntry{x_1}} \vdash t : \Delta
+}
+{
+  \Gamma \vdash \exImport{q'} \cons t : \Delta
+}}
+\and
+{\color{deletedgray}
+\inferrule*[lab={\ruleName{from-import}}]
+{
+  \vdash_{\mathcal{M}} q' \\
+  q', \vec{x} \importsR \Gamma' \\
+  \Gamma \runion \Gamma' \vdash t : \Delta
+}
+{
+  \Gamma \vdash \exFromImport{q'}{\vec{x}} \cons t : \Delta
+}}
 \and
 \inferrule*[lab={\ruleName{statement}}]
 {
@@ -105,7 +128,7 @@
   \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons \vec{s} : \set{\bind{c}{C}} \runion \Delta
 }
 \end{mathpar}
-\subcaption{Statements $\vec{s}$ of module $q$ are well-formed in $\Gamma$}
+\subcaption{{\color{blue}Statements $\vec{s}$}\,{\color{deletedgray}Body $t$} of module $q$ {\color{blue}are}\,{\color{deletedgray}is} well-formed in $\Gamma$}
 \end{subfigure}
 
 \vspace{2mm}
@@ -116,11 +139,12 @@
 \small
 \inferrule*[lab={\ruleName{module}}]
 {
-  \vdash_{\mathcal{M}} q' \quad (\forall q' \in \parents(q)) \\
-  \mathcal{M}(q) = \vec{\iota}\;\vec{s} \\
-  \vdash \vec{\iota} : \Gamma \\
-  \Gamma \vdash \bodyOf(q) : \Delta \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{x \mid q.x \in \dom(\mathcal{M})} = \varnothing
+  {\color{deletedgray} q \in \dom(\mathcal{M})} \\
+  {\color{blue} \vdash_{\mathcal{M}} q' \quad (\forall q' \in \parents(q))} \\
+  {\color{blue} \mathcal{M}(q) = \vec{\iota}\;\vec{s}} \\
+  {\color{blue} \vdash \vec{\iota} : \Gamma} \\
+  {\color{blue}\Gamma}\,{\color{deletedgray}\varnothing} \vdash \bodyOf(q) : \Delta \\
+  {\color{blue} (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{x \mid q.x \in \dom(\mathcal{M})} = \varnothing}
 }
 {
   \vdash_{\mathcal{M}} q
