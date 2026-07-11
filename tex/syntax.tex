@@ -217,10 +217,10 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \input{fig/well-formed-module}
 
 \begin{definition}[Members and exports]
-\Replaced{Suppose $\mathcal{M}(q) = \vec{\iota}\;\vec{s}$ with $\vdash \vec{\iota} : \Gamma$ and $\Gamma \vdash \bodyOf(q) : \Delta$.}{Suppose $\varnothing \vdash \bodyOf(q) : \Delta$.} Define:
+\Replaced{Suppose $\mathcal{M}(q) = \vec{\iota}\;\vec{s}$ with $\vdash \vec{\iota} : \Gamma$ and $\Gamma \vdash \bodyOf(q) : \Delta$.}{Suppose $\varnothing \vdash \bodyOf(q) : \Delta$.} \Replaced{Define the \emph{exports} of $q$ and the \emph{members} of $q$ as the following functions:}{Define the \emph{exports} of $q$ as $\Delta$, and the \emph{context} of $q$ as $\Gamma_q = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \Delta$.}
 \begin{enumerate}
-\item the \emph{exports} of $q$ as \Added{$\exportsOf(q) =$} $\Delta$;
-\item the \Replaced{\emph{members} of $q$ as $\members(q)$}{\emph{context} of $q$ as $\Gamma_q$} $= \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion {\color{blue}\exportsOf(q)}\,{\color{deletedgray}\Delta}$.
+\item {\color{blue}$\exportsOf(q) = \Delta$;}
+\item {\color{blue}$\members(q) = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \exportsOf(q)$.}
 \end{enumerate}
 \end{definition}
 
