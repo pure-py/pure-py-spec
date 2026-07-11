@@ -116,6 +116,7 @@
 \small
 \inferrule*[lab={\ruleName{module}}]
 {
+  \vdash_{\mathcal{M}} q' \quad (\forall q' \in \parents(q)) \\
   \mathcal{M}(q) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} : \Gamma \\
   \Gamma \vdash \bodyOf(q) : \Delta \\
