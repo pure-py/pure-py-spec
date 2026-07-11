@@ -8,9 +8,11 @@
 {\color{deletedgray}\imports(s)} &= {\color{deletedgray}\varnothing \quad \text{otherwise}} \\
 \\
 \parents(x) &= \varnothing \\
-\parents(q.x) &= \parents(q) \cup \set{q}
+\parents(q.x) &= \parents(q) \cup \set{q} \\
+\\
+{\color{blue}\deps(q)} &= {\color{blue}\textstyle\bigcup\,\set{\set{q'} \cup \parents(q') \mid q' \in \imports(\mathcal{M}(q))}}
 \end{align*}
-\subcaption{$\imports$ and $\parents$ metafunctions}
+\subcaption{$\imports$, $\parents${\color{blue}, and $\deps$} metafunctions}
 \end{subfigure}
 
 \vspace{2mm}

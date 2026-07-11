@@ -304,9 +304,9 @@ fully-qualified name.
 The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(q, q')$ iff $q' \in
 \imports(\mathcal{M}(q)) \cup \parents(q)$. Program well-formedness (\figref{well-formed-module}) requires the
 main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
-to be acyclic. \Added{The \emph{dependencies} $\deps(q)$ of a module $q$ are the modules reachable from
-$q$ in $G_{\mathcal{M}}$. Since imports precede statements, when a \PurePy program runs under Python, every
-module in $\deps(q)$ is loaded before any statement of $q$ runs.}
+to be acyclic. \Added{The \emph{dependencies} $\deps(q)$ of a module $q$ (\figref{modules}) are the modules
+its import prefix imports, together with their parents. Since imports precede statements, when a \PurePy
+program runs under Python, every module in $\deps(q)$ is loaded before any statement of $q$ runs.}
 
 \subsection{Well-formedness}
 
@@ -372,7 +372,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 
 \noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. \Replaced{The members $\members(q)$ also contain}{The context $\Gamma_q$ also contains} an entry for each submodule $q.x$\Added{; the two parts are disjoint, because the \ruleName{module} rule prohibits a module from binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash})}.
 
-\Added{A submodule entry of $\members(q')$ is accessible from another module $q_0$ (rule \ruleName{qualified-submodule}) only when the submodule is among the dependencies $\deps(q_0)$ of the accessing module: only then is it guaranteed to be loaded. Python raises \pyinline{AttributeError} when the attribute path of an unloaded submodule is accessed.}
+\Added{Rule \ruleName{qualified-submodule} requires the submodule to be among the dependencies of the referring module $q_0$. This ensures it is loaded wherever the reference can be evaluated; Python raises \pyinline{AttributeError} on the attribute path of an unloaded submodule.}
 
 \subsection{Examples}
 
@@ -687,6 +687,7 @@ functional programming:
 \item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.
 \item First-class modules: in Python, modules are values. In \PurePy a module name may be projected (member access) but not used as a value.
 \item \Added{A module binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).}
+\item \Added{Referring to a submodule the referring module does not itself import: \pyinline{import a} followed by \pyinline{a.b.f()} is rejected unless \pyinline{a.b} is among the module's own dependencies. Python permits the reference whenever some earlier import, anywhere in the program, loaded \pyinline{a.b}.}
 \end{itemize}
 
 \begin{AddedBlock}

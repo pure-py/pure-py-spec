@@ -324,15 +324,10 @@ def parents_of(q: str) -> set[str]:
     return {'.'.join(parts[:i]) for i in range(1, len(parts))}
 
 def deps(M: dict[str, ast.Module], q: str) -> set[str]:
-    seen: set[str] = set()
-    frontier = module_imports(M[q], M) | parents_of(q)
-    while frontier:
-        q_next = frontier.pop()
-        if q_next in seen or q_next not in M:
-            continue
-        seen.add(q_next)
-        frontier |= module_imports(M[q_next], M) | parents_of(q_next)
-    return seen
+    result: set[str] = set()
+    for q_imp in module_imports(M[q], M):
+        result |= {q_imp} | parents_of(q_imp)
+    return result
 
 def submodule_names(M: dict[str, ast.Module], q: str) -> set[str]:
     return {name[len(q) + 1:].split('.')[0] for name in M if name.startswith(f'{q}.')}
