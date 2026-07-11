@@ -106,7 +106,7 @@
   \rho, s \cons b \Rightarrow \assigns{\rho'} \runion r
 }
 \end{mathpar}
-\caption{Block $b$ evaluates to result $r$ under environment $\rho : \Gamma$ and ambient module store $\mu$}
+\caption{Block $b$ evaluates to result $r$ under environment $\rho : \Gamma$}
 \label{fig:eval}
 \end{figure}
 
@@ -119,11 +119,11 @@
 \bodyOf(q) &= (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \vec{s} && \text{where } \mathcal{M}(q) = \vec{\iota}\;\vec{s} \\
 \submodules(q) &= \set{\bind{x}{\exMod{q.x}} \mid q.x \in \dom(\mathcal{M})} \\
 \\
-\cacheEnv(\mu, \rho, x) &= \mu(q') && \text{where } \rho(x) = \exMod{q'} \\
-\cacheEnv(\mu, \rho, q.x) &= \mu(q'') && \text{where } \cacheEnv(\mu, \rho, q)(x) = \exMod{q''} \\
+\cacheEnv(\rho, x) &= \rho_{q'} && \text{where } \rho(x) = \exMod{q'} \\
+\cacheEnv(\rho, q.x) &= \rho_{q''} && \text{where } \cacheEnv(\rho, q)(x) = \exMod{q''} \\
 \\
-\resolveClass(\mu, \rho, c) &= (c, \rho(c)) \\
-\resolveClass(\mu, \rho, q.c) &= (c, \cacheEnv(\mu, \rho, q)(c))
+\resolveClass(\rho, c) &= (c, \rho(c)) \\
+\resolveClass(\rho, q.c) &= (c, \cacheEnv(\rho, q)(c))
 \end{align*}
 
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
@@ -176,24 +176,13 @@
   \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow \unwrap(r)
 }
 \and
-\inferrule*[lab={\ruleName{eval-attr-member}}]
+\inferrule*[lab={\ruleName{eval-attr-module}}]
 {
   \rho, e \Rightarrow \exMod{q'} \\
-  \mu(q')(x) = v \\
-  v \neq \exMod{q''}
+  \bind{x}{v} \in \rho_{q'}
 }
 {
   \rho, \exProject{e}{x} \Rightarrow v
-}
-\and
-\inferrule*[lab={\ruleName{eval-attr-submodule}}]
-{
-  \rho, e \Rightarrow \exMod{q'} \\
-  \mu(q')(x) = \exMod{q''} \\
-  \mu(q'') = \rho''
-}
-{
-  \rho, \exProject{e}{x} \Rightarrow \exMod{q''}
 }
 \and
 \inferrule*[lab={\ruleName{eval-attr-object}}]
@@ -207,7 +196,7 @@
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i) \\
-  \resolveClass(\mu, \rho, q) = (c, C) \\
+  \resolveClass(\rho, q) = (c, C) \\
   C = \clsEntry{\Delta}{q'}{\vec{z}}{c'} \\
   \fields(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}
 }
@@ -215,7 +204,7 @@
   \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \exObj{\Gamma}{q'.c}{\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}, \bind{y_1}{v_{n+1}}, \ldots, \bind{y_m}{v_{n+m}}}}
 }
 \end{mathpar}
-\caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$ and ambient module store $\mu$}
+\caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$}
 \label{fig:eval-expr}
 \end{figure}
 
