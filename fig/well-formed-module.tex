@@ -40,7 +40,7 @@
 \inferrule*[lab={\ruleName{import}}]
 {
   q' = x_1.x_2.\ldots.x_{n+1} \\
-  \vdash_{\mathcal{M}} q' \\
+  \vdash_{\mathcal{M}} q' : \Delta \\
   \vdash \vec{\iota} : \Gamma
 }
 {
@@ -49,7 +49,7 @@
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
-  \vdash_{\mathcal{M}} q' \\
+  \vdash_{\mathcal{M}} q' : \Delta \\
   q', \vec{x} \importsR \Gamma' \\
   \vdash \vec{\iota} : \Gamma
 }
@@ -134,7 +134,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash_{\mathcal{M}} q$}
+\flushleft \shadebox{$\vdash_{\mathcal{M}} q {\color{blue}\,: \Delta}$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{module-simple}}]
@@ -146,20 +146,20 @@
   {\color{blue} (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{y \mid x.y \in \dom(\mathcal{M})} = \varnothing}
 }
 {
-  \vdash_{\mathcal{M}} {\color{blue}x}\,{\color{deletedgray}q}
+  \vdash_{\mathcal{M}} {\color{blue}x}\,{\color{deletedgray}q} {\color{blue}: \Delta}
 }
 \and
 {\color{blue}
 \inferrule*[lab={\ruleName{module-qualified}}]
 {
-  \vdash_{\mathcal{M}} q \\
+  \vdash_{\mathcal{M}} q : \Delta' \\
   \mathcal{M}(q.x) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} : \Gamma \\
   \Gamma \vdash \bodyOf(q.x) : \Delta \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{y \mid q.x.y \in \dom(\mathcal{M})} = \varnothing
 }
 {
-  \vdash_{\mathcal{M}} q.x
+  \vdash_{\mathcal{M}} q.x : \Delta
 }}
 \end{mathpar}
 
@@ -168,7 +168,7 @@
 \small
 \inferrule*[lab={\ruleName{program}}]
 {
-  \vdash_{\mathcal{M}} \pymath{\_\_main\_\_} \\
+  \vdash_{\mathcal{M}} \pymath{\_\_main\_\_} {\color{blue}: \Delta} \\
   G_{\mathcal{M}} \text{ acyclic}
 }
 {

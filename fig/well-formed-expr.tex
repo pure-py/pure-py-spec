@@ -14,7 +14,8 @@
 \inferrule*[lab={\ruleName{qualified}}]
 {
   \Gamma \vdash q \names \modEntry{q'} \\
-  \bind{x}{\theta} \in {\color{blue}\exportsOf(q')}\,{\color{deletedgray}\Gamma_{q'}}
+  {\color{blue}\vdash_{\mathcal{M}} q' : \Delta} \\
+  \bind{x}{\theta} \in {\color{blue}\Delta}\,{\color{deletedgray}\Gamma_{q'}}
 }
 {
   \Gamma \vdash q.x \names \theta

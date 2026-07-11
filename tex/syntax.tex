@@ -217,11 +217,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \input{fig/well-formed-module}
 
 \begin{definition}[Members and exports]
-\Replaced{Suppose $\mathcal{M}(q) = \vec{\iota}\;\vec{s}$ with $\vdash \vec{\iota} : \Gamma$ and $\Gamma \vdash \bodyOf(q) : \Delta$.}{Suppose $\varnothing \vdash \bodyOf(q) : \Delta$.} \Replaced{Define the \emph{exports} of $q$ and the \emph{members} of $q$ as the following functions:}{Define the \emph{exports} of $q$ as $\Delta$, and the \emph{context} of $q$ as $\Gamma_q = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \Delta$.}
-\begin{enumerate}
-\item {\color{blue}$\exportsOf(q) = \Delta$;}
-\item {\color{blue}$\members(q) = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \exportsOf(q)$.}
-\end{enumerate}
+\Replaced{Suppose $\vdash_{\mathcal{M}} q : \Delta$, where we call $\Delta$ the \emph{exports} of $q$. Define the \emph{members} of $q$ as $\members(q) = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \Delta$.}{Suppose $\varnothing \vdash \bodyOf(q) : \Delta$. Define the \emph{exports} of $q$ as $\Delta$, and the \emph{context} of $q$ as $\Gamma_q = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \Delta$.}
 \end{definition}
 
 \noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. \Replaced{The members $\members(q)$ also contain}{The context $\Gamma_q$ also contains} an entry for each submodule $q.x$\Added{; the two parts are disjoint, because the module rules prohibit a module from binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash})}.

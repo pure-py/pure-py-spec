@@ -19,7 +19,7 @@ with $\assigns{\varnothing}$ as left and right unit.
 
 \Replaced{Module and program evaluation are given in \figref{eval-modules}; importing names from a loaded module in
 \figref{eval-imports}. The loading judgement $q \Rightarrow_{\mathsf{load}} \rho$ evaluates the import prefix
-of $q$ and then its statements, mirroring the well-formedness judgement $\vdash_{\mathcal{M}} q$
+of $q$ and then its statements, mirroring the well-formedness judgement $\vdash_{\mathcal{M}} q : \Delta$
 (\figref{well-formed-module}); the mutual
 recursion between loading and evaluation is grounded by the acyclicity of $G_{\mathcal{M}}$. Loading is
 deterministic, so the metafunction $\cacheEnv(q)$, the unique $\rho$ such that $q \Rightarrow_{\mathsf{load}}
