@@ -251,10 +251,13 @@ which follow Python.
 A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
 (\figref{syntax-stmt}) to \emph{module bodies} $t$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
-$\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. The well-formedness and evaluation rules check and
-evaluate each body $\mathcal{M}(q)$ with the assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$
-prepended, modelling the $\pymath{\_\_name\_\_}$ binding the runtime supplies automatically rather than one
-written in the source. $\mathcal{M}$ additionally always includes the predefined modules of
+$\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. A module body is a sequence of imports
+$\vec{\iota}$ followed by a sequence of statements $\vec{s}$; since imports are not statements, they cannot
+appear in blocks, and hence not in function bodies or after the first non-import statement. The
+well-formedness and evaluation rules check and evaluate the statements of each body $\mathcal{M}(q)$ with the
+assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended (metafunction $\bodyOf$,
+\figref{eval-expr}), modelling the $\pymath{\_\_name\_\_}$ binding the runtime supplies automatically rather
+than one written in the source. $\mathcal{M}$ additionally always includes the predefined modules of
 \figref{predefined} and is prefix-closed: the parent of any module in $\dom(\mathcal{M})$ is itself in
 $\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$ by mapping each leaf module to a
 \texttt{.py} file and each package to an \texttt{\_\_init\_\_.py}; prefix-closure then requires an
@@ -285,7 +288,7 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \label{fig:predefined}
 \end{figure}
 
-The metafunction $\assignsS$ extends from individual statements to blocks and module bodies by union, and $\imports$ to module bodies. The metafunction $\parents$ collects the proper prefixes of a
+The metafunction $\assignsS$ extends from individual statements to blocks and module bodies by union, and $\imports$ from individual imports to module bodies by union over the import prefix. The metafunction $\parents$ collects the proper prefixes of a
 fully-qualified name.
 
 \input{fig/modules}
@@ -354,7 +357,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \input{fig/well-formed-module}
 
 \begin{definition}[Context of a well-formed module]
-Suppose $\varnothing \vdash \bodyOf(q) : \Delta$. Define the \emph{exports} of $q$ as $\Delta$, and the \emph{context} of $q$ as $\Gamma_q = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \Delta$.
+Suppose $\mathcal{M}(q) = \vec{\iota}\;\vec{s}$ with $\vdash \vec{\iota} : \Gamma$ and $\Gamma \vdash \bodyOf(q) : \Delta$. Define the \emph{exports} of $q$ as $\Delta$, and the \emph{context} of $q$ as $\Gamma_q = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \Delta$.
 \end{definition}
 
 \noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. The context $\Gamma_q$ also contains an entry for each submodule $q.x$.
@@ -666,7 +669,7 @@ functional programming:
 \item Truthiness: a non-boolean value used as a condition (the test of an \pyinline{if} or conditional expression, or an \pyinline{assert}). Python coerces any value to \pyinline{bool}; \PurePy requires the condition to be boolean.
 \item List patterns matching tuple values, or tuple patterns matching list values. In \PurePy a list pattern matches only a list, and a tuple pattern matches only a tuple. Python permits either pattern against either kind of sequence.
 \item Positional class patterns matching fewer sub-patterns than the class's field arity. \PurePy requires exact arity; Python permits any number from $0$ up to the class's arity.
-\item Local imports: an \pyinline{import} or \pyinline{from} statement inside a function or other block. \PurePy permits imports only at module level; Python allows them anywhere.
+\item Local or interleaved imports: an \pyinline{import} or \pyinline{from} statement inside a function or other block, or after a non-import statement. \PurePy permits imports only at the start of a module; Python allows them anywhere.
 \item Wildcard imports (\pyinline{from q import *}); PEP 8 recommends avoiding these\footnote{\url{https://peps.python.org/pep-0008/}}.
 \item A submodule importing itself through its parent (\pyinline{from a import b} inside module \pyinline{a.b}). \PurePy treats the from-imported submodule as a dependency, so this is an import cycle and is rejected; Python permits it, binding the partially-loaded module.
 \item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.

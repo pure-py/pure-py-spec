@@ -116,7 +116,7 @@
 \unwrap(\returns{v}) &= v \\
 \unwrap(\assigns{\rho}) &= \pyinline{None} \\
 \\
-\bodyOf(q) &= (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \mathcal{M}(q) \\
+\bodyOf(q) &= (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \vec{s} && \text{where } \mathcal{M}(q) = \vec{\iota}\;\vec{s} \\
 \submodules(q) &= \set{\bind{x}{\exMod{q.x}} \mid q.x \in \dom(\mathcal{M})} \\
 \\
 \cacheEnv(\mu, \rho, x) &= \mu(q') && \text{where } \rho(x) = \exMod{q'} \\

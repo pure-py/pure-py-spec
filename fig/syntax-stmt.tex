@@ -14,8 +14,9 @@ $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}$ & (Match) \\
     & $\mid$ & $d_1 \;\ldots\; d_{n+1}$ & (MutualRegion) \\
     & $\mid$ & $\exDataclass{c}{\phi}$ & (Dataclass) \\
-    & $\mid$ & $\exDataclassExtend{c}{c'}{\phi}$ & (DataclassExtend) \\
-    & $\mid$ & $\exImport{q}$ & (Import) \\
+    & $\mid$ & $\exDataclassExtend{c}{c'}{\phi}$ & (DataclassExtend)
+   \\[3mm]
+$\iota$ & $::=$ & $\exImport{q}$ & (Import) \\
     & $\mid$ & $\exFromImport{q}{x_1, \ldots, x_{n+1}}$ & (FromImport)
    \\[3mm]
 $\phi$ & $::=$ & $\exField{x_1} \;\ldots\; \exField{x_{n+1}}$ & (FieldList) \\
@@ -23,7 +24,7 @@ $\phi$ & $::=$ & $\exField{x_1} \;\ldots\; \exField{x_{n+1}}$ & (FieldList) \\
    \\[3mm]
 $b$ & $::=$ & $s_1 \;\ldots\; s_{n+1}$ & (Block)
    \\[3mm]
-$t$ & $::=$ & $s_1 \;\ldots\; s_n$ & (ModuleBody)
+$t$ & $::=$ & $\iota_1 \;\ldots\; \iota_m \;\; s_1 \;\ldots\; s_n$ & (ModuleBody)
    \\[3mm]
 $q$ & $::=$ & $x_1.x_2.\ldots.x_{n+1}$ & (Name)
    \\[3mm]

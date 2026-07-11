@@ -25,7 +25,44 @@
 
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash t : \Delta$}
+\flushleft \shadebox{$\vdash \vec{\iota} : \Gamma$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{imports-nil}}]
+{
+  \strut
+}
+{
+  \vdash \varepsilon : \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{import}}]
+{
+  q' = x_1.x_2.\ldots.x_{n+1} \\
+  \vdash_{\mathcal{M}} q' \\
+  \vdash \vec{\iota} : \Gamma
+}
+{
+  \vdash \exImport{q'} \cons \vec{\iota} : \set{\bind{x_1}{\modEntry{x_1}}} \runion \Gamma
+}
+\and
+\inferrule*[lab={\ruleName{from-import}}]
+{
+  \vdash_{\mathcal{M}} q' \\
+  q', \vec{x} \importsR \Gamma' \\
+  \vdash \vec{\iota} : \Gamma
+}
+{
+  \vdash \exFromImport{q'}{\vec{x}} \cons \vec{\iota} : \Gamma' \runion \Gamma
+}
+\end{mathpar}
+\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Gamma \vdash \vec{s} : \Delta$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{nil}}]
@@ -36,44 +73,24 @@
   \Gamma \vdash \varepsilon : \varnothing
 }
 \and
-\inferrule*[lab={\ruleName{import}}]
-{
-  q' = x_1.x_2.\ldots.x_{n+1} \\
-  \vdash_{\mathcal{M}} q' \\
-  \Gamma, \bind{x_1}{\modEntry{x_1}} \vdash t : \Delta
-}
-{
-  \Gamma \vdash \exImport{q'} \cons t : \Delta
-}
-\and
-\inferrule*[lab={\ruleName{from-import}}]
-{
-  \vdash_{\mathcal{M}} q' \\
-  q', \vec{x} \importsR \Gamma' \\
-  \Gamma \runion \Gamma' \vdash t : \Delta
-}
-{
-  \Gamma \vdash \exFromImport{q'}{\vec{x}} \cons t : \Delta
-}
-\and
 \inferrule*[lab={\ruleName{statement}}]
 {
   \Gamma \vdash s : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash t : \Delta' \\
-  \capturesS(s) \cap \assignsS(t) = \varnothing
+  \Gamma \runion \Delta \vdash \vec{s} : \Delta' \\
+  \capturesS(s) \cap \assignsS(\vec{s}) = \varnothing
 }
 {
-  \Gamma \vdash s \cons t : \Delta \runion \Delta'
+  \Gamma \vdash s \cons \vec{s} : \Delta \runion \Delta'
 }
 \and
 \inferrule*[lab={\ruleName{class}}]
 {
   \ownFields(\phi) = \vec{x} \text{ distinct} \\
   C = \clsEntry{\Gamma}{q}{\vec{x}}{\bot} \\
-  \Gamma, \bind{c}{C} \vdash t : \Delta
+  \Gamma, \bind{c}{C} \vdash \vec{s} : \Delta
 }
 {
-  \Gamma \vdash \exDataclass{c}{\phi} \cons t : \set{\bind{c}{C}} \runion \Delta
+  \Gamma \vdash \exDataclass{c}{\phi} \cons \vec{s} : \set{\bind{c}{C}} \runion \Delta
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
@@ -82,13 +99,13 @@
   \ownFields(\phi) = \vec{x} \text{ distinct} \\
   \vec{x} \cap \fields(\Gamma(c')) = \varnothing \\
   C = \clsEntry{\Gamma}{q}{\vec{x}}{c'} \\
-  \Gamma, \bind{c}{C} \vdash t : \Delta
+  \Gamma, \bind{c}{C} \vdash \vec{s} : \Delta
 }
 {
-  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons t : \set{\bind{c}{C}} \runion \Delta
+  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons \vec{s} : \set{\bind{c}{C}} \runion \Delta
 }
 \end{mathpar}
-\subcaption{Body $t$ of module $q$ is well-formed in $\Gamma$}
+\subcaption{Statements $\vec{s}$ of module $q$ are well-formed in $\Gamma$}
 \end{subfigure}
 
 \vspace{2mm}
@@ -99,8 +116,9 @@
 \small
 \inferrule*[lab={\ruleName{module}}]
 {
-  q \in \dom(\mathcal{M}) \\
-  \varnothing \vdash \bodyOf(q) : \Delta
+  \mathcal{M}(q) = \vec{\iota}\;\vec{s} \\
+  \vdash \vec{\iota} : \Gamma \\
+  \Gamma \vdash \bodyOf(q) : \Delta
 }
 {
   \vdash_{\mathcal{M}} q
