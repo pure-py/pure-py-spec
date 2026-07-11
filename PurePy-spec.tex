@@ -362,7 +362,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 Suppose $\mathcal{M}(q) = \vec{\iota}\;\vec{s}$ with $\vdash \vec{\iota} : \Gamma$ and $\Gamma \vdash \bodyOf(q) : \Delta$. Define the \emph{exports} of $q$ as $\Delta$, and the \emph{context} of $q$ as $\Gamma_q = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \Delta$.
 \end{definition}
 
-\noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. The context $\Gamma_q$ also contains an entry for each submodule $q.x$; the two parts are disjoint, because the \ruleName{module} rule prohibits a module from binding (by import or by assignment) a name that is also the name of one of its submodules. In Python, whether such a binding or the submodule wins depends on the order in which the assignment and the submodule's load occur, so no static account of the clash is faithful.
+\noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. The context $\Gamma_q$ also contains an entry for each submodule $q.x$; the two parts are disjoint, because the \ruleName{module} rule prohibits a module from binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).
 
 A submodule entry of $\Gamma_{q'}$ is accessible from another module (rule \ruleName{qualified-submodule}) only when the submodule is in the import closure $I$ of the accessing module: only then is it guaranteed to be loaded. Python raises \pyinline{AttributeError} when the attribute path of an unloaded submodule is accessed.
 
@@ -678,7 +678,39 @@ functional programming:
 \item A submodule importing itself through its parent (\pyinline{from a import b} inside module \pyinline{a.b}). \PurePy treats the from-imported submodule as a dependency, so this is an import cycle and is rejected; Python permits it, binding the partially-loaded module.
 \item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.
 \item First-class modules: in Python, modules are values. In \PurePy a module name may be projected (member access) but not used as a value.
+\item A module binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).
 \end{itemize}
+
+\subsubsection{A variable and a submodule with the same name}
+\label{sec:submodule-clash}
+
+In Python, an attribute of a package can be bound in two ways: by an assignment in the package's own body,
+and by a load of a same-named submodule, since loading \pyinline{pkg.sub} assigns the new module to attribute
+\pyinline{sub} of \pyinline{pkg}. Which binding is visible depends on which loads have executed. Suppose the
+body of \pyinline{pkg} is the single assignment \pyinline{sub = 1}, and \pyinline{pkg} also has a submodule
+\pyinline{pkg.sub}. The following two programs are identical except for their imports:
+\vspace{-\medskipamount}
+
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+import pkg
+print(pkg.sub)  # 1
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+import pkg.sub
+print(pkg.sub)  # <module 'pkg.sub'>
+\end{python}
+\end{minipage}
+
+On the left, \pyinline{pkg.sub} is never loaded, so the assignment in \pyinline{pkg} is visible. On the
+right, \pyinline{pkg.sub} is loaded after \pyinline{pkg}, and the load overwrites the assignment. The same
+attribute can even change meaning during a run, when a later import loads the submodule. So the name
+\pyinline{pkg.sub} has no load-order-independent meaning, and \PurePy rejects the clash: the
+\ruleName{module} rule prohibits a module from binding (by import or by assignment) a name that is also the
+name of one of its submodules.
 
 \section{Operational semantics}
 
