@@ -296,7 +296,9 @@ fully-qualified name.
 The \emph{dependency graph} $G_{\mathcal{M}}$ of a module map has an edge $(q, q')$ iff $q' \in
 \imports(\mathcal{M}(q)) \cup \parents(q)$. Program well-formedness (\figref{well-formed-module}) requires the
 main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
-to be acyclic.
+to be acyclic. The \emph{import closure} of a module $q$ is the set of modules reachable from $q$ in
+$G_{\mathcal{M}}$; in rules concerning the body of $q$, the metavariable $I$ denotes its import closure. Since
+imports precede statements, every module in $I$ is loaded before any statement of $q$ runs.
 
 \subsection{Well-formedness}
 
@@ -361,6 +363,8 @@ Suppose $\mathcal{M}(q) = \vec{\iota}\;\vec{s}$ with $\vdash \vec{\iota} : \Gamm
 \end{definition}
 
 \noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484,\footnote{\url{https://peps.python.org/pep-0484/}} an imported name is a private dependency, not re-exported as part of the interface. The context $\Gamma_q$ also contains an entry for each submodule $q.x$; the two parts are disjoint, because the \ruleName{module} rule prohibits a module from binding (by import or by assignment) a name that is also the name of one of its submodules. In Python, whether such a binding or the submodule wins depends on the order in which the assignment and the submodule's load occur, so no static account of the clash is faithful.
+
+A submodule entry of $\Gamma_{q'}$ is accessible from another module (rule \ruleName{qualified-submodule}) only when the submodule is in the import closure $I$ of the accessing module: only then is it guaranteed to be loaded. Python raises \pyinline{AttributeError} when the attribute path of an unloaded submodule is accessed.
 
 \subsection{Examples}
 

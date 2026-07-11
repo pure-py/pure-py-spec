@@ -14,13 +14,24 @@
 \inferrule*[lab={\ruleName{qualified}}]
 {
   \Gamma \vdash q \names \modEntry{q'} \\
-  \bind{x}{\theta} \in \Gamma_{q'}
+  \bind{x}{\theta} \in \Gamma_{q'} \\
+  \theta \neq \modEntry{q''}
 }
 {
   \Gamma \vdash q.x \names \theta
 }
+\and
+\inferrule*[lab={\ruleName{qualified-submodule}}]
+{
+  \Gamma \vdash q \names \modEntry{q'} \\
+  q'.x \in \dom(\mathcal{M}) \\
+  q'.x \in I
+}
+{
+  \Gamma \vdash q.x \names \modEntry{q'.x}
+}
 \end{mathpar}
-\subcaption{Name $q$ resolves to context entry $\theta$ under $\Gamma$}
+\subcaption{Name $q$ resolves to context entry $\theta$ under $\Gamma$ and ambient import closure $I$}
 \end{subfigure}
 
 \vspace{2mm}
@@ -67,11 +78,10 @@
 \and
 \inferrule*[lab={\ruleName{attr-module}}]
 {
-  \Gamma \vdash e \names \modEntry{q} \\
-  y \in \dom(\Gamma_q)
+  \Gamma \vdash \exProject{e}{y} \names \theta
 }
 {
-  \Gamma \vdash e.y
+  \Gamma \vdash \exProject{e}{y}
 }
 \and
 \inferrule*[lab={\ruleName{attr-object}}]
