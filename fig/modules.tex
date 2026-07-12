@@ -5,14 +5,13 @@
 \begin{align*}
 \imports(\exImport{q}) &= \set{q} \\
 \imports(\exFromImport{q}{x_1, \ldots, x_{n+1}}) &= \set{q} \cup \set{q.x_i \mid q.x_i \in \dom(\mathcal{M})} \\
-{\color{deletedgray}\imports(s)} &= {\color{deletedgray}\varnothing \quad \text{otherwise}} \\
 \\
 \parents(x) &= \varnothing \\
 \parents(q.x) &= \parents(q) \cup \set{q} \\
 \\
-{\color{blue}\deps(q)} &= {\color{blue}\textstyle\bigcup\,\set{\set{q'} \cup \parents(q') \mid q' \in \imports(\mathcal{M}(q))}}
+\deps(q) &= \textstyle\bigcup\,\set{\set{q'} \cup \parents(q') \mid q' \in \imports(\mathcal{M}(q))}
 \end{align*}
-\subcaption{$\imports$, $\parents${\color{blue}, and $\deps$} metafunctions}
+\subcaption{$\imports$, $\parents$, and $\deps$ metafunctions}
 \end{subfigure}
 
 \vspace{2mm}

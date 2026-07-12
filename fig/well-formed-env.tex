@@ -100,40 +100,6 @@
   \vdash \set{\bind{x}{v}} \runion \rho : \set{\bind{x}{\theta}} \runion \Gamma
 }
 \end{mathpar}
-
-\begingroup
-\color{deletedgray}
-\vspace{2mm}
-
-\flushleft \shadebox{$\vdash \mu$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{store-nil}}]
-{
-  \strut
-}
-{
-  \vdash \varnothing
-}
-\and
-\inferrule*[lab={\ruleName{store-loaded}}]
-{
-  \vdash \rho : \Gamma_q \\
-  \vdash \mu
-}
-{
-  \vdash \set{\bind{q}{\rho}} \runion \mu
-}
-\and
-\inferrule*[lab={\ruleName{store-unloaded}}]
-{
-  \vdash \mu
-}
-{
-  \vdash \set{\bind{q}{\star}} \runion \mu
-}
-\end{mathpar}
-\endgroup
-\caption{Well-formed values and environments\textcolor{deletedgray}{, and module stores}}
+\caption{Well-formed values and environments}
 \label{fig:well-formed-env}
 \end{figure}

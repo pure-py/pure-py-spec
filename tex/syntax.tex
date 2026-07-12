@@ -109,13 +109,13 @@ which follow Python.
 A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
 (\figref{syntax-stmt}) to \emph{module bodies} $t$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
-$\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. \Added{We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$.} \Added{A module body is a sequence of imports
+$\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
 $\vec{\iota}$ followed by a sequence of statements $\vec{s}$; since imports are not statements, they can
-appear neither in blocks (and hence not in function bodies) nor after the first non-import statement.} The
-well-formedness and evaluation rules check and evaluate \Added{the statements of} each body $\mathcal{M}(q)$ with the
-assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended \Added{(metafunction $\bodyOf$,
-\figref{eval-expr})}, modelling the $\pymath{\_\_name\_\_}$ binding the runtime supplies
-automatically\Deleted{\ rather than one written in the source}. $\mathcal{M}$ additionally always includes the predefined modules of
+appear neither in blocks (and hence not in function bodies) nor after the first non-import statement. The
+well-formedness and evaluation rules check and evaluate the statements of each body $\mathcal{M}(q)$ with the
+assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended (metafunction $\bodyOf$,
+\figref{eval-expr}), modelling the $\pymath{\_\_name\_\_}$ binding the runtime supplies
+automatically. $\mathcal{M}$ additionally always includes the predefined modules of
 \figref{predefined} and is prefix-closed: the parent of any module in $\dom(\mathcal{M})$ is itself in
 $\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$ by mapping each leaf module to a
 \texttt{.py} file and each package to an \texttt{\_\_init\_\_.py}; prefix-closure then requires an
@@ -146,17 +146,17 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \label{fig:predefined}
 \end{figure}
 
-\Replaced{The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ from individual imports to import sequences; on a module body $\vec{\iota}\;\vec{s}$, they act on $\vec{s}$ and $\vec{\iota}$ respectively.}{The metafunction $\assignsS$ extends from individual statements to blocks and module bodies by union, and $\imports$ to module bodies.} The metafunction $\parents$ collects the proper prefixes of a
+The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ from individual imports to import sequences; on a module body $\vec{\iota}\;\vec{s}$, they act on $\vec{s}$ and $\vec{\iota}$ respectively. The metafunction $\parents$ collects the proper prefixes of a
 fully-qualified name.
 
 \input{fig/modules}
 
-The \emph{dependency graph} $G_{\mathcal{M}}$ \Replaced{of a program}{of a module map} has an edge $(q, q')$ iff $q' \in
+The \emph{dependency graph} $G_{\mathcal{M}}$ of a program has an edge $(q, q')$ iff $q' \in
 \imports(\mathcal{M}(q)) \cup \parents(q)$. Program well-formedness (\figref{well-formed-module}) requires the
 main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
-to be acyclic. \Added{The \emph{dependencies} $\deps(q)$ of a module $q$ (\figref{modules}) are the modules
+to be acyclic. The \emph{dependencies} $\deps(q)$ of a module $q$ (\figref{modules}) are the modules
 its import prefix imports, together with their parents. Since imports precede statements, when a \PurePy
-program runs under Python, every module in $\deps(q)$ is loaded before any statement of $q$ runs.}
+program runs under Python, every module in $\deps(q)$ is loaded before any statement of $q$ runs.
 
 \subsection{Well-formedness}
 
@@ -217,12 +217,12 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \input{fig/well-formed-module}
 
 \begin{definition}[Members and exports]
-\Replaced{Suppose $\vdash_{\mathcal{M}} q : \Delta$, where we call $\Delta$ the \emph{exports} of $q$. Define the \emph{members} of $q$ as $\members(q) = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \Delta$.}{Suppose $\varnothing \vdash \bodyOf(q) : \Delta$. Define the \emph{exports} of $q$ as $\Delta$, and the \emph{context} of $q$ as $\Gamma_q = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \Delta$.}
+Suppose $\vdash_{\mathcal{M}} q : \Delta$, where we call $\Delta$ the \emph{exports} of $q$. Define the \emph{members} of $q$ as $\members(q) = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \Delta$.
 \end{definition}
 
-\noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. \Replaced{The members $\members(q)$ also contain}{The context $\Gamma_q$ also contains} an entry for each submodule $q.x$\Added{; the two parts are disjoint, because the module rules prohibit a module from binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash})}.
+\noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. The members $\members(q)$ also contain an entry for each submodule $q.x$; the two parts are disjoint, because the module rules prohibit a module from binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).
 
-\Added{Rule \ruleName{qualified-submodule} requires the submodule to be among the dependencies $\deps(q_0)$ of the referring module $q_0$, ensuring it is loaded wherever the reference can be evaluated (\figref{prevented-errors}).}
+Rule \ruleName{qualified-submodule} requires the submodule to be among the dependencies $\deps(q_0)$ of the referring module $q_0$, ensuring it is loaded wherever the reference can be evaluated (\figref{prevented-errors}).
 
 \subsection{Examples}
 
@@ -264,11 +264,11 @@ return comp
 is calculated by merging the definite assignment sets for all branches which definitely assign, using the
 $\merge$ operator on environments.
 
-\Added{Definite assignment thus gives each reference a unique lexical referent: a variable is introduced by
+Definite assignment thus gives each reference a unique lexical referent: a variable is introduced by
 an assignment, possibly jointly by the branches of a conditional, and a name may be referenced only where one
 such introduction covers every path. This is stricter than avoiding Python's \pyinline{NameError}: the
 left-hand program of \S\ref{sec:contexts} assigns \pyinline{x} on every run, but is rejected because the
-reference would denote the branch-local variable on one path and the variable it hides on the other.}
+reference would denote the branch-local variable on one path and the variable it hides on the other.
 
 \subsubsection{Local assignment in conditional clauses}
 \label{sec:local-assignment}
@@ -520,7 +520,7 @@ by \pyinline{return None}. This ensures every function returns, even if it is no
 
 An \pyinline{assert e} statement without a message is equivalent to \pyinline{assert e, ""}.
 
-\subsection{\texorpdfstring{{\color{blue}Prohibited}\,{\color{deletedgray}Unsupported}}{Prohibited} Python features}
+\subsection{Prohibited Python features}
 \label{sec:unsupported}
 
 The following Python features are excluded from \PurePy as they are incompatible with purity or
@@ -539,21 +539,20 @@ functional programming:
 \item Truthiness: a non-boolean value used as a condition (the test of an \pyinline{if} or conditional expression, or an \pyinline{assert}). Python coerces any value to \pyinline{bool}; \PurePy requires the condition to be boolean.
 \item List patterns matching tuple values, or tuple patterns matching list values. In \PurePy a list pattern matches only a list, and a tuple pattern matches only a tuple. Python permits either pattern against either kind of sequence.
 \item Positional class patterns matching fewer sub-patterns than the class's field arity. \PurePy requires exact arity; Python permits any number from $0$ up to the class's arity.
-\item \Replaced{Local or interleaved imports: an \pyinline{import} or \pyinline{from} statement inside a function or other block, or after a non-import statement. \PurePy permits imports only at the start of a module; Python allows them anywhere.}{Local imports: an \pyinline{import} or \pyinline{from} statement inside a function or other block. \PurePy permits imports only at module level; Python allows them anywhere.}
+\item Local or interleaved imports: an \pyinline{import} or \pyinline{from} statement inside a function or other block, or after a non-import statement. \PurePy permits imports only at the start of a module; Python allows them anywhere.
 \item Wildcard imports (\pyinline{from q import *}); PEP 8 recommends avoiding these\footnote{\url{https://peps.python.org/pep-0008/}}.
 \item A submodule importing itself through its parent (\pyinline{from a import b} inside module \pyinline{a.b}). \PurePy treats the from-imported submodule as a dependency, so this is an import cycle and is rejected; Python permits it, binding the partially-loaded module.
 \item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.
 \item First-class modules: in Python, modules are values. In \PurePy a module name may be projected (member access) but not used as a value.
-\item \Added{A module binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).}
-\item \Added{Referring to a submodule the referring module does not itself import: \pyinline{import a} followed by \pyinline{a.b.f()} is rejected unless \pyinline{a.b} is among the module's own dependencies. Python permits the reference whenever some earlier import, anywhere in the program, loaded \pyinline{a.b}.}
+\item A module binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).
+\item Referring to a submodule the referring module does not itself import: \pyinline{import a} followed by \pyinline{a.b.f()} is rejected unless \pyinline{a.b} is among the module's own dependencies. Python permits the reference whenever some earlier import, anywhere in the program, loaded \pyinline{a.b}.
 \end{itemize}
 
-\Added{Complementing the list above (programs Python runs that \PurePy rejects), a well-formed \PurePy
+Complementing the list above (programs Python runs that \PurePy rejects), a well-formed \PurePy
 program avoids the Python runtime errors listed in \figref{prevented-errors}, under the conditions noted
 there. Errors from ill-typed operations, such as wrong operand types, calling a non-function, or attribute
-access on an object lacking the attribute, are outside the scope of well-formedness.}
+access on an object lacking the attribute, are outside the scope of well-formedness.
 
-\begin{AddedBlock}
 \subsubsection{Variable and submodule with the same name}
 \label{sec:submodule-clash}
 
@@ -579,10 +578,8 @@ print(pkg.sub)  # <module 'pkg.sub'>
 On the left, \pyinline{pkg.sub} is never loaded, so the assignment is visible; on the right, the load
 overwrites the assignment. The name \pyinline{pkg.sub} has no load-order-independent meaning, so the
 module rules prohibit a module from binding a name that is also the name of one of its submodules.
-\end{AddedBlock}
 
 \begin{figure}
-\color{blue}
 \centering
 \small
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.52\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}}

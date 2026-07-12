@@ -12,7 +12,7 @@
 \and
 \inferrule*[lab={\ruleName{imp-member}}]
 {
-  \bind{x}{\theta} \in {\color{blue}\members(q)}\,{\color{deletedgray}\Gamma_q} \\
+  \bind{x}{\theta} \in \members(q) \\
   q, \vec{x} \importsR \Gamma
 }
 {
@@ -25,7 +25,6 @@
 
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\color{blue}
 \flushleft \shadebox{$\vdash \vec{\iota} : \Gamma$}
 \begin{mathpar}
 \small
@@ -57,13 +56,13 @@
   \vdash \exFromImport{q'}{\vec{x}} \cons \vec{\iota} : \Gamma' \runion \Gamma
 }
 \end{mathpar}
-\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$ (previously part of the body judgement below)}
+\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$}
 \end{subfigure}
 
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash {\color{blue}\vec{s}}\,{\color{deletedgray}t} : \Delta$}
+\flushleft \shadebox{$\Gamma \vdash \vec{s} : \Delta$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{nil}}]
@@ -73,28 +72,6 @@
 {
   \Gamma \vdash \varepsilon : \varnothing
 }
-\and
-{\color{deletedgray}
-\inferrule*[lab={\ruleName{import}}]
-{
-  q' = x_1.x_2.\ldots.x_{n+1} \\
-  \vdash_{\mathcal{M}} q' \\
-  \Gamma, \bind{x_1}{\modEntry{x_1}} \vdash t : \Delta
-}
-{
-  \Gamma \vdash \exImport{q'} \cons t : \Delta
-}}
-\and
-{\color{deletedgray}
-\inferrule*[lab={\ruleName{from-import}}]
-{
-  \vdash_{\mathcal{M}} q' \\
-  q', \vec{x} \importsR \Gamma' \\
-  \Gamma \runion \Gamma' \vdash t : \Delta
-}
-{
-  \Gamma \vdash \exFromImport{q'}{\vec{x}} \cons t : \Delta
-}}
 \and
 \inferrule*[lab={\ruleName{statement}}]
 {
@@ -128,28 +105,26 @@
   \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons \vec{s} : \set{\bind{c}{C}} \runion \Delta
 }
 \end{mathpar}
-\subcaption{{\color{blue}Statements $\vec{s}$}\,{\color{deletedgray}Body $t$} of module $q$ {\color{blue}are}\,{\color{deletedgray}is} well-formed in $\Gamma$}
+\subcaption{Statements $\vec{s}$ of module $q$ are well-formed in $\Gamma$}
 \end{subfigure}
 
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash_{\mathcal{M}} q {\color{blue}\,: \Delta}$}
+\flushleft \shadebox{$\vdash_{\mathcal{M}} q : \Delta$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{module-simple}}]
 {
-  {\color{deletedgray} q \in \dom(\mathcal{M})} \\
-  {\color{blue} \mathcal{M}(x) = \vec{\iota}\;\vec{s}} \\
-  {\color{blue} \vdash \vec{\iota} : \Gamma} \\
-  {\color{blue}\Gamma}\,{\color{deletedgray}\varnothing} \vdash \bodyOf(x) : \Delta \\
-  {\color{blue} (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{y \mid x.y \in \dom(\mathcal{M})} = \varnothing}
+  \mathcal{M}(x) = \vec{\iota}\;\vec{s} \\
+  \vdash \vec{\iota} : \Gamma \\
+  \Gamma \vdash \bodyOf(x) : \Delta \\
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{y \mid x.y \in \dom(\mathcal{M})} = \varnothing
 }
 {
-  \vdash_{\mathcal{M}} {\color{blue}x}\,{\color{deletedgray}q} {\color{blue}: \Delta}
+  \vdash_{\mathcal{M}} x : \Delta
 }
 \and
-{\color{blue}
 \inferrule*[lab={\ruleName{module-qualified}}]
 {
   \vdash_{\mathcal{M}} q : \Delta' \\
@@ -160,7 +135,7 @@
 }
 {
   \vdash_{\mathcal{M}} q.x : \Delta
-}}
+}
 \end{mathpar}
 
 \flushleft \shadebox{$\vdash \mathcal{M}$}
@@ -168,7 +143,7 @@
 \small
 \inferrule*[lab={\ruleName{program}}]
 {
-  \vdash_{\mathcal{M}} \pymath{\_\_main\_\_} {\color{blue}: \Delta} \\
+  \vdash_{\mathcal{M}} \pymath{\_\_main\_\_} : \Delta \\
   G_{\mathcal{M}} \text{ acyclic}
 }
 {

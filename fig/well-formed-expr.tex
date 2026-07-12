@@ -14,14 +14,13 @@
 \inferrule*[lab={\ruleName{qualified}}]
 {
   \Gamma \vdash q \names \modEntry{q'} \\
-  {\color{blue}\vdash_{\mathcal{M}} q' : \Delta} \\
-  \bind{x}{\theta} \in {\color{blue}\Delta}\,{\color{deletedgray}\Gamma_{q'}}
+  \vdash_{\mathcal{M}} q' : \Delta \\
+  \bind{x}{\theta} \in \Delta
 }
 {
   \Gamma \vdash q.x \names \theta
 }
 \and
-{\color{blue}
 \inferrule*[lab={\ruleName{qualified-submodule}}]
 {
   \Gamma \vdash q \names \modEntry{q'} \\
@@ -30,9 +29,9 @@
 }
 {
   \Gamma \vdash q.x \names \modEntry{q'.x}
-}}
+}
 \end{mathpar}
-\subcaption{Name $q$ resolves to context entry $\theta$ under $\Gamma${\color{blue}, in the body of module $q_0$}}
+\subcaption{Name $q$ resolves to context entry $\theta$ under $\Gamma$, in the body of module $q_0$}
 \end{subfigure}
 
 \vspace{2mm}
@@ -77,24 +76,13 @@
   \Gamma \vdash \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}}
 }
 \and
-{\color{blue}
 \inferrule*[lab={\ruleName{attr-module}}]
 {
   \Gamma \vdash \exProject{e}{y} \names \theta
 }
 {
   \Gamma \vdash \exProject{e}{y}
-}}
-\and
-{\color{deletedgray}
-\inferrule*[lab={\ruleName{attr-module}}]
-{
-  \Gamma \vdash e \names \modEntry{q} \\
-  y \in \dom(\Gamma_q)
 }
-{
-  \Gamma \vdash e.y
-}}
 \and
 \inferrule*[lab={\ruleName{attr-object}}]
 {

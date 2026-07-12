@@ -17,7 +17,7 @@ with $\assigns{\varnothing}$ as left and right unit.
 
 \input{fig/well-formed-env}
 
-\Replaced{Module and program evaluation are given in \figref{eval-modules}; importing names from a loaded module in
+Module and program evaluation are given in \figref{eval-modules}; importing names from a loaded module in
 \figref{eval-imports}. The loading judgement $q \Rightarrow_{\mathsf{load}} \rho$ evaluates the import prefix
 of $q$ and then its statements, mirroring the well-formedness judgement $\vdash_{\mathcal{M}} q : \Delta$
 (\figref{well-formed-module}); the mutual
@@ -29,7 +29,7 @@ mirrors the static structure: for a well-formed module $q$, $\vdash \cacheEnv(q)
 its well-formedness judgement. Since
 imports precede statements, every module a statement can reference is loaded before the statement runs, and
 since loading has no observable effects, reloading a module is unobservable; the semantics therefore needs no
-cache of loaded modules.}{Program and module evaluation are given in \figref{eval-modules}, with module loading and importing in a separate figure.} These rules use the environment $\rho_{\pymath{builtins}}$ binding the names of
+cache of loaded modules. These rules use the environment $\rho_{\pymath{builtins}}$ binding the names of
 \figref{predefined}.
 
 \input{fig/eval-modules}
