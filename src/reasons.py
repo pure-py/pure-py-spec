@@ -150,6 +150,14 @@ class SubmoduleNotImported:
 
 
 @dataclass(frozen=True)
+class UnassignedMember:
+    x: str
+    q: str
+    def message(self) -> str:
+        return f"member '{self.x}' of module '{self.q}' is not definitely assigned"
+
+
+@dataclass(frozen=True)
 class NonTopLevelClass:
     def message(self) -> str:
         return "class definition only allowed at module top level"
@@ -199,4 +207,5 @@ Reason = Union[
     NonlinearPattern, UnreachableCase, DuplicateMutualName,
     NonTopLevelImport, NonTopLevelClass, TopLevelReturn, EmptyFromImport,
     ImportAfterStatement, SubmoduleNameClash, SubmoduleNotImported,
+    UnassignedMember,
 ]
