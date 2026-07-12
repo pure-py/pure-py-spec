@@ -55,6 +55,9 @@
 \newcommand*{\exDefClosure}[4][]{\mathsf{Def}_{#1}(#2, #3, #4)}
 \newcommand*{\exObj}[3]{\mathsf{Obj}_{#1}(#2, #3)}
 \newcommand*{\exMod}[1]{\mathsf{Mod}(#1)}
+\newcommand*{\exModF}[2]{\mathsf{Mod}(#1, #2)}
+\newcommand*{\join}{\sqcup}
+\newcommand*{\usable}{\mathrm{usable}}
 \newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
 \newcommand*{\exDataclass}[2]{@\pyinline{dataclass}\;\pyinline{class}\;#1:\;#2}
 \newcommand*{\exDataclassExtend}[3]{@\pyinline{dataclass}\;\pyinline{class}\;#1(#2):\;#3}
@@ -101,6 +104,7 @@
 \newcommand*{\loadSubmodule}{\mathrm{load\text{-}submod}}
 \newcommand*{\names}{\mathrel{\mathsf{names}}}
 \newcommand*{\importsR}{\mathrel{\mathsf{imports}}}
+\newcommand*{\wraps}{\mathrel{\mathsf{wraps}}}
 \newcommand*{\ownFields}{\mathrm{own\text{-}fields}}
 \newcommand*{\unwrap}{\mathrm{unwrap}}
 \newcommand*{\dispatch}{\mathrm{dispatch}}

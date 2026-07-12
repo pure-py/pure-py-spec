@@ -9,9 +9,10 @@
 \parents(x) &= \varnothing \\
 \parents(q.x) &= \parents(q) \cup \set{q} \\
 \\
-\deps(q) &= \textstyle\bigcup\,\set{\set{q'} \cup \parents(q') \mid q' \in \imports(\mathcal{M}(q))}
+{\color{deletedgray}\deps(q)} &= {\color{deletedgray}\textstyle\bigcup\,\set{\set{q'} \cup \parents(q') \mid q' \in \imports(\mathcal{M}(q))}} \\
+{\color{blue}\submodules(q)} &= {\color{blue}\set{\bind{x}{\exMod{q.x}} \mid q.x \in \dom(\mathcal{M})}}
 \end{align*}
-\subcaption{$\imports$, $\parents$, and $\deps$ metafunctions}
+\subcaption{$\imports$, $\parents$\textcolor{deletedgray}{, $\deps$}, and \textcolor{blue}{$\submodules$} metafunctions}
 \end{subfigure}
 
 \vspace{2mm}

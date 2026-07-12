@@ -1,4 +1,40 @@
 \begin{figure}
+\begingroup
+\color{blue}
+\flushleft \shadebox{$\Gamma, \vec{x} \importsR \Gamma'$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{imp-nil}}]
+{
+  \strut
+}
+{
+  \Gamma, \varepsilon \importsR \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{imp-member}}]
+{
+  \bind{x}{\theta} \in \Gamma \\
+  \theta \neq \exMod{q} \\
+  \Gamma, \vec{x} \importsR \Gamma'
+}
+{
+  \Gamma, x \cons \vec{x} \importsR \set{\bind{x}{\theta}} \runion \Gamma'
+}
+\and
+\inferrule*[lab={\ruleName{imp-submodule}}]
+{
+  \bind{x}{\exMod{q}} \in \Gamma \\
+  \vdash_{\mathcal{M}} q : \Gamma'' \\
+  \Gamma, \vec{x} \importsR \Gamma'
+}
+{
+  \Gamma, x \cons \vec{x} \importsR \set{\bind{x}{\exModF{q}{\Gamma''}}} \runion \Gamma'
+}
+\end{mathpar}
+\endgroup
+
+{\color{deletedgray}
 \flushleft \shadebox{$q, \vec{x} \importsR \Gamma$}
 \begin{mathpar}
 \small
@@ -18,8 +54,8 @@
 {
   q, x \cons \vec{x} \importsR \set{\bind{x}{\theta}} \runion \Gamma
 }
-\end{mathpar}
-\caption{Names $\vec{x}$ imported from module $q$ produce bindings $\Gamma$}
+\end{mathpar}}
+\caption{Names $\vec{x}$ imported from \textcolor{blue}{a source context $\Gamma$}\textcolor{deletedgray}{ module $q$} produce bindings $\Gamma'$}
 \label{fig:imports}
 \end{figure}
 
@@ -36,6 +72,28 @@
   \vdash \varepsilon : \varnothing
 }
 \and
+{\color{blue}
+\inferrule*[lab={\ruleName{import}}]
+{
+  \vdash_{\mathcal{M}} q' : \Gamma'' \\
+  q', \exModF{q'}{\Gamma''} \wraps \Gamma' \\
+  \vdash \vec{\iota} : \Gamma
+}
+{
+  \vdash \exImport{q'} \cons \vec{\iota} : \Gamma' \join \Gamma
+}}
+\and
+\inferrule*[lab={\ruleName{from-import}}]
+{
+  \vdash_{\mathcal{M}} q' : {\color{blue}\Gamma''}\,{\color{deletedgray}\Delta} \\
+  {\color{blue}\Gamma''}\,{\color{deletedgray}q'}, \vec{x} \importsR \Gamma' \\
+  \vdash \vec{\iota} : \Gamma
+}
+{
+  \vdash \exFromImport{q'}{\vec{x}} \cons \vec{\iota} : \Gamma' {\color{blue}\join}\,{\color{deletedgray}\runion} \Gamma
+}
+\and
+{\color{deletedgray}
 \inferrule*[lab={\ruleName{import}}]
 {
   q' = x_1.x_2.\ldots.x_{n+1} \\
@@ -44,19 +102,33 @@
 }
 {
   \vdash \exImport{q'} \cons \vec{\iota} : \set{\bind{x_1}{\modEntry{x_1}}} \runion \Gamma
+}}
+\end{mathpar}
+
+\begingroup
+\color{blue}
+\flushleft \shadebox{$q, \theta \wraps \Gamma$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{wrap-simple}}]
+{
+  \strut
+}
+{
+  x, \theta \wraps \set{\bind{x}{\theta}}
 }
 \and
-\inferrule*[lab={\ruleName{from-import}}]
+\inferrule*[lab={\ruleName{wrap-qualified}}]
 {
-  \vdash_{\mathcal{M}} q' : \Delta \\
-  q', \vec{x} \importsR \Gamma' \\
-  \vdash \vec{\iota} : \Gamma
+  \vdash_{\mathcal{M}} q : \Gamma' \\
+  q, \exModF{q}{\Gamma' \join \set{\bind{x}{\theta}}} \wraps \Gamma
 }
 {
-  \vdash \exFromImport{q'}{\vec{x}} \cons \vec{\iota} : \Gamma' \runion \Gamma
+  q.x, \theta \wraps \Gamma
 }
 \end{mathpar}
-\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$}
+\endgroup
+\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$; \textcolor{blue}{full reference $\theta$ for module $q$ wraps into a binding for the head of $q$}}
 \end{subfigure}
 
 \vspace{2mm}
@@ -111,7 +183,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash_{\mathcal{M}} q : \Delta$}
+\flushleft \shadebox{$\vdash_{\mathcal{M}} q : {\color{blue}\Gamma}\,{\color{deletedgray}\Delta}$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{module-simple}}]
@@ -122,19 +194,19 @@
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{y \mid x.y \in \dom(\mathcal{M})} = \varnothing
 }
 {
-  \vdash_{\mathcal{M}} x : \Delta
+  \vdash_{\mathcal{M}} x : {\color{blue}\submodules(x) \runion} \Delta
 }
 \and
 \inferrule*[lab={\ruleName{module-qualified}}]
 {
-  \vdash_{\mathcal{M}} q : \Delta' \\
+  \vdash_{\mathcal{M}} q : \Gamma'' \\
   \mathcal{M}(q.x) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} : \Gamma \\
   \Gamma \vdash \bodyOf(q.x) : \Delta \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{y \mid q.x.y \in \dom(\mathcal{M})} = \varnothing
 }
 {
-  \vdash_{\mathcal{M}} q.x : \Delta
+  \vdash_{\mathcal{M}} q.x : {\color{blue}\submodules(q.x) \runion} \Delta
 }
 \end{mathpar}
 

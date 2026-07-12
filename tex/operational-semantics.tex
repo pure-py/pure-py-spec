@@ -1,4 +1,5 @@
 \section{Operational semantics}
+\label{sec:opsem}
 
 Values, environments, and evaluation results are given in \figref{values}. For a statement $s$, the result
 $\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the result
@@ -19,14 +20,14 @@ with $\assigns{\varnothing}$ as left and right unit.
 
 Module and program evaluation are given in \figref{eval-modules}; importing names from a loaded module in
 \figref{eval-imports}. The loading judgement $q \Rightarrow_{\mathsf{load}} \rho$ evaluates the import prefix
-of $q$ and then its statements, mirroring the well-formedness judgement $\vdash_{\mathcal{M}} q : \Delta$
+of $q$ and then its statements, mirroring the well-formedness judgement $\vdash_{\mathcal{M}} q : {\color{blue}\Gamma}\,{\color{deletedgray}\Delta}$
 (\figref{well-formed-module}); the mutual
-recursion between loading and evaluation is grounded by the acyclicity of $G_{\mathcal{M}}$. Loading is
-deterministic, so the metafunction $\cacheEnv(q)$, the unique $\rho$ such that $q \Rightarrow_{\mathsf{load}}
-\rho$, is well-defined (\figref{eval-expr}). Loading
+recursion between loading and evaluation is grounded by the acyclicity of $G_{\mathcal{M}}$.
+\Deleted{Loading is deterministic, so the metafunction $\cacheEnv(q)$, the unique $\rho$ such that $q \Rightarrow_{\mathsf{load}} \rho$, is well-defined (\figref{eval-expr}).}
+\Replaced{Loading mirrors the static structure: if $\vdash_{\mathcal{M}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \rho$ then $\vdash \rho : \Gamma$ (\figref{well-formed-env}).}{Loading
 mirrors the static structure: for a well-formed module $q$, $\vdash \cacheEnv(q) : \members(q)$
 (\figref{well-formed-env}), and the bindings produced by the import prefix conform to the context produced by
-its well-formedness judgement. Since
+its well-formedness judgement.} Since
 imports precede statements, every module a statement can reference is loaded before the statement runs, and
 since loading has no observable effects, reloading a module is unobservable; the semantics therefore needs no
 cache of loaded modules. These rules use the environment $\rho_{\pymath{builtins}}$ binding the names of

@@ -17,7 +17,7 @@ Metavariables $x$, $f$, $c$ range over \emph{variables}; idiomatically $f$ is us
 A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the following \emph{context entries} $\theta$:
 \begin{itemize}
 \item the variable's \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
-\item a \emph{module reference} $\modEntry{q}$, for a fully-qualified module name $q$;
+\item a \emph{module reference}, for a fully-qualified module name $q$: \Replaced{either a \emph{stub} $\exMod{q}$, or a \emph{full} reference $\exModF{q}{\Gamma}$, which also carries the member context $\Gamma$ of $q$}{$\modEntry{q}$};
 \item a \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q}{\vec{x}}{c}$, recording the declaring context $\Gamma$, defining module $q$, sequence of distinct field names $\vec{x}$, and base class $c$ (or $\bot$ for no base).
 \end{itemize}
 \end{definition}
@@ -53,6 +53,20 @@ a \merge a' &= a \meet a'
 \end{definition}
 
 \noindent Merge is otherwise undefined. Restricted to $\B$, it returns $\statusNotDefAssigned$ when exactly one argument is defined and the conjunction otherwise; so $\bot$ is not a unit.
+
+\begin{AddedBlock}
+\begin{definition}[Join]
+{\small
+\begin{align*}
+\exModF{q}{\Gamma} \join \exModF{q}{\Gamma'} &= \exModF{q}{\Gamma \join \Gamma'} \\
+\exMod{q} \join \exModF{q}{\Gamma} = \exModF{q}{\Gamma} \join \exMod{q} &= \exModF{q}{\Gamma} \\
+\theta \join \theta' &= \theta' \quad (\text{otherwise, when } \theta' \neq \bot) \\
+\bot \join \theta = \theta \join \bot &= \theta
+\end{align*}}
+\end{definition}
+
+\noindent Join combines module references for the same module recursively, preferring full references to stubs, and is otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted at the same package must combine rather than shadow; it applies identically to module values (\S\ref{sec:opsem}).
+\end{AddedBlock}
 
 \begin{lemma}[Right distributivity]
 \[
@@ -154,9 +168,9 @@ fully-qualified name.
 The \emph{dependency graph} $G_{\mathcal{M}}$ of a program has an edge $(q, q')$ iff $q' \in
 \imports(\mathcal{M}(q)) \cup \parents(q)$. Program well-formedness (\figref{well-formed-module}) requires the
 main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
-to be acyclic. The \emph{dependencies} $\deps(q)$ of a module $q$ (\figref{modules}) are the modules
+to be acyclic. \Deleted{The \emph{dependencies} $\deps(q)$ of a module $q$ (\figref{modules}) are the modules
 its import prefix imports, together with their parents. Since imports precede statements, when a \PurePy
-program runs under Python, every module in $\deps(q)$ is loaded before any statement of $q$ runs.
+program runs under Python, every module in $\deps(q)$ is loaded before any statement of $q$ runs.}
 
 \subsection{Well-formedness}
 
@@ -212,17 +226,27 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \]
 \end{lemma}
 
+\begin{AddedBlock}
+\begin{definition}[Usable entry]
+An entry $\theta$ is \emph{usable}, written $\usable(\theta)$, unless it is $\statusNotDefAssigned$ or a stub.
+\end{definition}
+
+\noindent Rule \ruleName{attr-module} requires the resolved entry to be usable: Python raises \pyinline{AttributeError} both for a member that is not definitely assigned and for a submodule that has not been imported (\figref{prevented-errors}).
+\end{AddedBlock}
+
 \input{fig/well-formed}
 \input{fig/well-formed-expr}
 \input{fig/well-formed-module}
 
+\begin{DeletedBlock}
 \begin{definition}[Members and exports]
 Suppose $\vdash_{\mathcal{M}} q : \Delta$, where we call $\Delta$ the \emph{exports} of $q$. Define the \emph{members} of $q$ as $\members(q) = \set{\bind{x}{\modEntry{q.x}} \mid q.x \in \dom(\mathcal{M})} \runion \Delta$.
 \end{definition}
+\end{DeletedBlock}
 
-\noindent The exports $\Delta$ comprise the classes and variables a module defines, together with its intrinsic \pyinline{__name__}, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. The members $\members(q)$ also contain an entry for each submodule $q.x$; the two parts are disjoint, because the module rules prohibit a module from binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).
+\noindent \Replaced{The output context $\Gamma$ of the module judgement comprises}{The exports $\Delta$ comprise} the classes and variables a module defines, together with its intrinsic \pyinline{__name__} \Added{and a stub for each submodule}, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. \Replaced{The stubs and the module's own bindings are disjoint}{The members $\members(q)$ also contain an entry for each submodule $q.x$; the two parts are disjoint}, because the module rules prohibit a module from binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).
 
-Rule \ruleName{qualified-submodule} requires the submodule to be among the dependencies $\deps(q_0)$ of the referring module $q_0$, ensuring it is loaded wherever the reference can be evaluated (\figref{prevented-errors}).
+\Deleted{Rule \ruleName{qualified-submodule} requires the submodule to be among the dependencies $\deps(q_0)$ of the referring module $q_0$, ensuring it is loaded wherever the reference can be evaluated (\figref{prevented-errors}).}
 
 \subsection{Examples}
 
@@ -545,7 +569,7 @@ functional programming:
 \item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.
 \item First-class modules: in Python, modules are values. In \PurePy a module name may be projected (member access) but not used as a value.
 \item A module binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).
-\item Referring to a submodule the referring module does not itself import: \pyinline{import a} followed by \pyinline{a.b.f()} is rejected unless \pyinline{a.b} is among the module's own dependencies. Python permits the reference whenever some earlier import, anywhere in the program, loaded \pyinline{a.b}.
+\item Referring to a submodule the referring module does not itself import: \pyinline{import a} followed by \pyinline{a.b.f()} is rejected \Replaced{unless the module also imports \pyinline{a.b}}{unless \pyinline{a.b} is among the module's own dependencies}. Python permits the reference whenever some earlier import, anywhere in the program, loaded \pyinline{a.b}.
 \end{itemize}
 
 Complementing the list above (programs Python runs that \PurePy rejects), a well-formed \PurePy
@@ -589,7 +613,7 @@ module rules prohibit a module from binding a name that is also the name of one 
 \pyinline{NameError}, \pyinline{UnboundLocalError} & Always: a variable may be referenced only where it is definitely assigned. & \figref{well-formed}, \figref{well-formed-expr} \\[1mm]
 \pyinline{ModuleNotFoundError} & Always: an import requires its target to be a module of the program. & \figref{well-formed-module} \\[1mm]
 \pyinline{ImportError} & Always: a from-import requires each imported name to be a member of the source module, and import cycles are rejected. (A Python cycle may run or fail, depending on where the cycle is entered.) & \figref{imports}, \figref{well-formed-module} \\[1mm]
-\pyinline{AttributeError} & The attribute is a module member that is definitely assigned, or a submodule among the referring module's dependencies. & \figref{well-formed-expr} \\[1mm]
+\pyinline{AttributeError} & {\color{blue}Always: a module attribute reference must resolve to a usable entry: a definitely assigned member, or an imported submodule.} {\color{deletedgray}The attribute is a module member that is definitely assigned, or a submodule among the referring module's dependencies.} & \figref{well-formed-expr} \\[1mm]
 \pyinline{TypeError} & The operation is a constructor call or class pattern, which must match the class's arity exactly. (Only excess sub-patterns are a Python error; a pattern with fewer is prohibited even though Python permits it.) & \figref{well-formed-expr}, \figref{well-formed-pat} \\
 \hline
 \end{tabular}

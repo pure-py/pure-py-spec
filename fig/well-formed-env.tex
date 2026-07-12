@@ -61,6 +61,16 @@
   \vdash \exMod{q}
 }
 \and
+{\color{blue}
+\inferrule*[lab={\ruleName{val-mod-loaded}}]
+{
+  q \in \dom(\mathcal{M}) \\
+  \vdash \rho : \Gamma
+}
+{
+  \vdash \exModF{q}{\rho}
+}}
+\and
 \inferrule*[lab={\ruleName{val-class}}]
 {
   \strut
