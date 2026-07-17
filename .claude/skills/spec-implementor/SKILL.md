@@ -73,3 +73,9 @@ verdict" filters out every divergence that changes no verdict: misnamed
 functions, displaced terminology, dead helpers, stale taxonomy. Those are
 visible only to the inventory comparison above, so run it even when all tests
 pass.
+
+## Tooling
+
+A list of things to check goes stale silently: point checkers at whole
+directories rather than named files, and occasionally verify that every
+checker still sees everything it should.
