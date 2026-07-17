@@ -10,7 +10,7 @@ from check_module import IllFormed, IllFormedModule, IllFormedProgram, annotate_
 PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
 
 
-def imports_of(tree: ast.Module, base_dir: pathlib.Path) -> set[str]:
+def imports(tree: ast.Module, base_dir: pathlib.Path) -> set[str]:
     result: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
@@ -67,7 +67,7 @@ def walk_program(entry_path: pathlib.Path) -> None:
     imports_by_module: dict[str, set[str]] = {}
     entry_tree = load(entry_path.stem, base_dir)
     modules['__main__'] = (entry_path, entry_tree)
-    imports_by_module['__main__'] = imports_of(entry_tree, base_dir)
+    imports_by_module['__main__'] = imports(entry_tree, base_dir)
     queue: list[str] = [*PREDEFINED_MODULES]
     for imp in imports_by_module['__main__']:
         queue.extend({imp} | parents(imp))
@@ -83,7 +83,7 @@ def walk_program(entry_path: pathlib.Path) -> None:
         tree = load(name, base_dir)
         assert path is not None
         modules[name] = (path, tree)
-        imports_by_module[name] = imports_of(tree, base_dir)
+        imports_by_module[name] = imports(tree, base_dir)
         for imp in imports_by_module[name]:
             queue.extend({imp} | parents(imp))
 

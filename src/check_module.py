@@ -69,11 +69,11 @@ class ModuleContext:
     q: str = ''
 
 
-def extend_gamma(ctx: 'ModuleContext', delta: Context) -> 'ModuleContext':
+def override_gamma(ctx: 'ModuleContext', delta: Context) -> 'ModuleContext':
     return ModuleContext(gamma={**ctx.gamma, **delta}, M=ctx.M, q=ctx.q)
 
-def extend_var(ctx: 'ModuleContext', delta: VarContext) -> 'ModuleContext':
-    return extend_gamma(ctx, dict(delta))
+def override_var(ctx: 'ModuleContext', delta: VarContext) -> 'ModuleContext':
+    return override_gamma(ctx, dict(delta))
 
 def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> 'ClassEntry':
     base = node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
@@ -126,18 +126,6 @@ def split_imports(body: list[ast.stmt]) -> tuple[list[ast.stmt], list[ast.stmt]]
 def find_import(stmts: list[ast.stmt]) -> Optional[ast.stmt]:
     return next((s for s in stmts if isinstance(s, (ast.Import, ast.ImportFrom))), None)
 
-def module_body(M: dict[str, ast.Module], q: str) -> list[ast.stmt]:
-    _, rest = split_imports(M[q].body)
-    return [name_assign(q)] + rest
-
-def empty_context() -> VarContext:
-    return {}
-
-def extend(var_ctx: VarContext, delta: VarContext) -> VarContext:
-    new = dict(var_ctx)
-    new.update(delta)
-    return new
-
 def meet(a: Status, b: Status) -> Status:
     if a == Status.TT and b == Status.TT:
         return Status.TT
@@ -159,15 +147,15 @@ def fold_merge(acc: VarContext, branches: list[TyAssigns]) -> VarContext:
         return acc
     return fold_merge(merge_delta(acc, branches[0].delta), branches[1:])
 
-def runion_delta(d1: VarContext, d2: VarContext) -> VarContext:
+def override_delta(d1: VarContext, d2: VarContext) -> VarContext:
     return {**d1, **d2}
 
-def runion_results(r1: ResultTy, r2: ResultTy) -> ResultTy:
+def override_results(r1: ResultTy, r2: ResultTy) -> ResultTy:
     if isinstance(r1, TyReturns):
         return r1
     if isinstance(r2, TyReturns):
         return r2
-    return TyAssigns(runion_delta(r1.delta, r2.delta))
+    return TyAssigns(override_delta(r1.delta, r2.delta))
 
 def result_type(node: ast.stmt) -> ResultTy:
     if isinstance(node, ast.Pass):
@@ -190,7 +178,7 @@ def result_type(node: ast.stmt) -> ResultTy:
             branches.append(TY_ASSIGNS)
         return merge_results(branches)
     if isinstance(node, ast.Match):
-        branches = [runion_results(TyAssigns({x: Status.TT for x in binds(case.pattern)}), result_type_of_block(case.body)) for case in node.cases]
+        branches = [override_results(TyAssigns({x: Status.TT for x in binds(case.pattern)}), result_type_of_block(case.body)) for case in node.cases]
         if not is_catch_all(node.cases[-1].pattern):
             branches.append(TY_ASSIGNS)
         return merge_results(branches)
@@ -201,7 +189,7 @@ def result_type(node: ast.stmt) -> ResultTy:
 def result_type_of_block(block: list[ast.stmt]) -> ResultTy:
     if len(block) == 1:
         return result_type(block[0])
-    return runion_results(result_type(block[0]), result_type_of_block(block[1:]))
+    return override_results(result_type(block[0]), result_type_of_block(block[1:]))
 
 def check_block(block: list[ast.stmt], ctx: ModuleContext, module_body: bool = False) -> ModuleContext:
     return check_elements(elements_of_block(block), ctx, module_body)
@@ -229,9 +217,9 @@ def check_elements(items: list[BlockElement], ctx: ModuleContext, module_body: b
 def next_ctx_after(head: BlockElement, ctx: ModuleContext) -> ModuleContext:
     head_result = block_element_result_type(head)
     delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
-    next_ctx = extend_var(ctx, delta)
+    next_ctx = override_var(ctx, delta)
     if isinstance(head, ast.ClassDef):
-        next_ctx = extend_gamma(next_ctx, {head.name: class_entry_for(head, ctx.q, ctx.gamma)})
+        next_ctx = override_gamma(next_ctx, {head.name: class_entry_for(head, ctx.q, ctx.gamma)})
     return next_ctx
 
 def block_element_result_type(item: BlockElement) -> ResultTy:
@@ -272,7 +260,7 @@ def check_bodies(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
         params = {a.arg for a in d.args.args}
         locals_ = assigns_block(d.body) - params
         delta = f_names | {p: Status.TT for p in params} | {x: Status.FF for x in locals_}
-        body_ctx = extend_var(ctx, delta)
+        body_ctx = override_var(ctx, delta)
         check_block(d.body, body_ctx)
 
 def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> None:
@@ -304,14 +292,17 @@ def extend_context(g1: Context, g2: Context) -> Context:
         out[x] = extend_entry(out[x], e) if x in out else e
     return out
 
-def import_entry(q: str, ctx: ModuleContext) -> tuple[str, ContextEntry]:
+def wraps(q: str, theta: ContextEntry, ctx: ModuleContext) -> Context:
     parts = q.split('.')
-    entry: ContextEntry = ModuleLoaded(q, check_module(ctx.M[q], ctx.M, q))
     for i in range(len(parts) - 1, 0, -1):
         parent = '.'.join(parts[:i])
         parent_ctx = check_module(ctx.M[parent], ctx.M, parent)
-        entry = ModuleLoaded(parent, extend_context(parent_ctx, {parts[i]: entry}))
-    return parts[0], entry
+        theta = ModuleLoaded(parent, extend_context(parent_ctx, {parts[i]: theta}))
+    return {parts[0]: theta}
+
+def imports(s: ast.ImportFrom, gamma_src: Context, ctx: ModuleContext) -> Context:
+    assert s.module is not None
+    return {a.name: imported_entry(s, a.name, s.module, gamma_src, ctx) for a in s.names}
 
 def check_imports_prefix(prefix: list[ast.stmt], ctx: ModuleContext) -> Context:
     gamma: Context = {}
@@ -320,8 +311,8 @@ def check_imports_prefix(prefix: list[ast.stmt], ctx: ModuleContext) -> Context:
             q_imp = s.names[0].name
             if q_imp not in ctx.M:
                 raise IllFormedModule(s, reasons.UnknownModule(q_imp))
-            head_seg, entry = import_entry(q_imp, ctx)
-            gamma = extend_context(gamma, {head_seg: entry})
+            delta = check_module(ctx.M[q_imp], ctx.M, q_imp)
+            gamma = extend_context(gamma, wraps(q_imp, ModuleLoaded(q_imp, delta), ctx))
         else:
             assert isinstance(s, ast.ImportFrom)
             if len(s.names) == 0:
@@ -329,17 +320,10 @@ def check_imports_prefix(prefix: list[ast.stmt], ctx: ModuleContext) -> Context:
             assert s.module is not None
             if s.module not in ctx.M:
                 raise IllFormedModule(s, reasons.UnknownModule(s.module))
-            gamma_src = check_module(ctx.M[s.module], ctx.M, s.module)
-            check_ancestors(s.module, ctx)
-            bindings = {a.name: imported_entry(s, a.name, s.module, gamma_src, ctx) for a in s.names}
-            gamma = extend_context(gamma, bindings)
+            delta = check_module(ctx.M[s.module], ctx.M, s.module)
+            wraps(s.module, ModuleLoaded(s.module, delta), ctx)
+            gamma = extend_context(gamma, imports(s, delta, ctx))
     return gamma
-
-def check_ancestors(q: str, ctx: ModuleContext) -> None:
-    parts = q.split('.')
-    for i in range(len(parts) - 1, 0, -1):
-        parent = '.'.join(parts[:i])
-        check_module(ctx.M[parent], ctx.M, parent)
 
 def submodules(M: dict[str, ast.Module], q: str) -> Context:
     return {x: ModuleStub(f'{q}.{x}')
@@ -361,11 +345,11 @@ def own_members(body: list[ast.stmt], q: str) -> set[str]:
         return PREDEFINED_MEMBERS[q]
     return assigns_block(body) | {s.name for s in body if isinstance(s, ast.ClassDef)}
 
-def resolve_entry(e: ast.expr, ctx: ModuleContext) -> Optional[ContextEntry]:
+def names(e: ast.expr, ctx: ModuleContext) -> Optional[ContextEntry]:
     if isinstance(e, ast.Name):
         return ctx.gamma.get(e.id)
     if isinstance(e, ast.Attribute):
-        parent = resolve_entry(e.value, ctx)
+        parent = names(e.value, ctx)
         if isinstance(parent, ModuleLoaded):
             return parent.members.get(e.attr)
         return None
@@ -410,7 +394,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, module_body: bool = False) -> No
 
 def check_match_cases(cases: list[ast.match_case], ctx: ModuleContext) -> None:
     for case in cases:
-        check_block(case.body, extend_var(ctx, {x: Status.TT for x in binds(case.pattern)}))
+        check_block(case.body, override_var(ctx, {x: Status.TT for x in binds(case.pattern)}))
 
 def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
     if isinstance(e, ast.Name):
@@ -427,7 +411,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
         return
     if isinstance(e, ast.Lambda):
         params = {a.arg for a in e.args.args}
-        check_expr(e.body, extend_var(ctx, {p: Status.TT for p in params}))
+        check_expr(e.body, override_var(ctx, {p: Status.TT for p in params}))
         return
     if isinstance(e, ast.Call):
         sig = names_class(e.func, ctx)
@@ -464,7 +448,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
         check_expr(e.orelse, ctx)
         return
     if isinstance(e, ast.Attribute):
-        parent = resolve_entry(e.value, ctx)
+        parent = names(e.value, ctx)
         if isinstance(parent, ModuleLoaded):
             entry = parent.members.get(e.attr)
             if entry is None:
@@ -504,7 +488,7 @@ def check_comprehension(elt: ast.expr, generators: list[ast.comprehension], ctx:
         return
     g = generators[0]
     check_expr(g.iter, ctx)
-    ctx_ = extend_var(ctx, {n: Status.TT for n in names_in_target(g.target)})
+    ctx_ = override_var(ctx, {n: Status.TT for n in names_in_target(g.target)})
     check_exprs(g.ifs, ctx_)
     check_comprehension(elt, generators[1:], ctx_)
 
@@ -576,7 +560,7 @@ def names_class(head: ast.expr, ctx: ModuleContext) -> Optional[tuple[str, tuple
         entry = class_of(ctx, head.id)
         return (head.id, fields_of(entry)) if entry is not None else None
     if isinstance(head, ast.Attribute):
-        parent = resolve_entry(head.value, ctx)
+        parent = names(head.value, ctx)
         if not isinstance(parent, ModuleLoaded):
             return None
         member = parent.members.get(head.attr)
@@ -916,11 +900,11 @@ def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
     if len(clash) > 0:
         raise IllFormedModule(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
 
-_exports_cache: dict[tuple[int, str], Context] = {}
+_module_contexts: dict[tuple[int, str], Context] = {}
 
 def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     key = (id(M), q)
-    cached = _exports_cache.get(key)
+    cached = _module_contexts.get(key)
     if cached is not None:
         return cached
     try:
@@ -929,7 +913,7 @@ def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
         if e.module is None:
             e.module = q
         raise
-    _exports_cache[key] = result
+    _module_contexts[key] = result
     return result
 
 def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
@@ -946,7 +930,7 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     if rest and isinstance(result_type_of_block(rest), TyReturns):
         raise IllFormedModule(rest[0], reasons.TopLevelReturn())
     check_submodule_clash(m, gamma0, body, M, q)
-    return module_exports(body, final_ctx, q)
+    return module_context(body, final_ctx, q)
 
 def check_submodule_clash(m: ast.Module, gamma0: Context, body: list[ast.stmt],
                           M: dict[str, ast.Module], q: str) -> None:
@@ -972,7 +956,7 @@ def find_binder(stmts: list[ast.stmt], x: str) -> Optional[ast.stmt]:
             return s
     return None
 
-def module_exports(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context:
+def module_context(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context:
     stubs: Context = submodules(final_ctx.M, q)
     if q in PREDEFINED_MEMBERS:
         own: Context = {name: Status.TT for name in PREDEFINED_MEMBERS[q] | {'__name__'}}

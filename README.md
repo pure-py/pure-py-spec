@@ -34,18 +34,18 @@ Sets up a `.venv` automatically. Targets Python 3.12+ ([#39](https://github.com/
 
 Tests are organised by tier (per-module $\Gamma \vdash_M m : \Delta$ and program-level $\vdash \langle E, \mathcal{M} \rangle$) and then by verdict. The verdict directory *is* the test's specification: the runner derives every assertion from the path.
 - `well-formed/` — PurePy accepts; Python runs it
-- `unsupported/` — PurePy rejects but Python accepts (valid Python excluded by design); `syntactic/` is rejected at parse, `semantic/` at check
+- `prohibited/` — PurePy rejects but Python accepts (valid Python excluded by design); `syntactic/` is rejected at parse, `semantic/` at check
 - `ill-formed/` — PurePy rejects *and* Python rejects (a genuine error); `semantic/` carries the Python exception, `syntactic-only/` is tested via AST construction (not expressible as `.py`)
 - `pending/` — not yet implemented; will become well-formed
 
-The invariant — `unsupported` ⇒ Python runs it, `ill-formed` ⇒ Python rejects it — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails.
+The invariant — `prohibited` ⇒ Python runs it, `ill-formed` ⇒ Python rejects it — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails.
 
 ## Reference parser (`src/purepy_parse.py`)
 
 Decides whether a Python program belongs to the PurePy subset, using the `ast` module.
 
 - Exit 0: accepted
-- Exit 1: unsupported (permanently excluded)
+- Exit 1: prohibited (permanently excluded)
 - Exit 2: not yet supported (planned, linked to a GitHub issue)
 
 ## Release workflow

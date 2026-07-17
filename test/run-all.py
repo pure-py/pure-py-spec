@@ -23,7 +23,7 @@ ERROR_EXPECTED = f".error{EXPECTED}"
 MODULE_LEVEL, PROGRAM_LEVEL = "module-level", "program-level"
 
 # Verdict / stage directory names: a test's path is its specification
-WELL_FORMED, UNSUPPORTED, ILL_FORMED = "well-formed", "unsupported", "ill-formed"
+WELL_FORMED, PROHIBITED, ILL_FORMED = "well-formed", "prohibited", "ill-formed"
 SYNTACTIC, STATIC_SEMANTIC, DYNAMIC_SEMANTIC = "syntactic", "static-semantic", "dynamic-semantic"
 SYNTACTIC_ONLY = "syntactic-only"
 PENDING, HELPERS = "pending", "helpers"
@@ -36,7 +36,7 @@ MAIN = "main.py"
 EXPECTED_FILE, EXPECTED_EXIT, EXPECTED_ERROR = "expected", "expected_exit", "expected_error"
 
 # PurePy non-zero exit codes (0 = accepted / ran clean)
-REJECT_PARSE = 1   # parse.py: unsupported syntactic form
+REJECT_PARSE = 1   # parse.py: prohibited syntactic form
 NOT_YET = 2        # parse.py: planned, not yet supported
 REJECT_CHECK = 3   # check_module.py: ill-formed
 
@@ -141,10 +141,10 @@ class Runner:
     def module_test(self, p, module, interpreter):
         """Assert a module-level test from its path: <verdict>[/<stage>].
 
-        verdict in {well-formed, unsupported, ill-formed} fixes how PurePy and
+        verdict in {well-formed, prohibited, ill-formed} fixes how PurePy and
         Python must each respond; stage in {syntactic, static-semantic,
         dynamic-semantic} fixes where PurePy rejects (dynamic-semantic = checker
-        accepts, but evaluation is stuck and Python raises). unsupported vs
+        accepts, but evaluation is stuck and Python raises). prohibited vs
         ill-formed is marked by whether Python accepts (.expected) or rejects
         (.exception.expected).
         """
@@ -183,7 +183,7 @@ class Runner:
                 self.expect_exit("parse", script_cmd(PARSE, p), 0)
                 self.expect_exit("check", script_cmd(CHECK, p), 0)
 
-            if verdict in (WELL_FORMED, UNSUPPORTED):
+            if verdict in (WELL_FORMED, PROHIBITED):
                 if has_exception:
                     self._fail("run", f"must not have {EXCEPTION_EXPECTED}")
                 elif stage == SYNTACTIC:
@@ -238,7 +238,7 @@ def main():
             last = header
         r.module_test(p, module, interpreter)
 
-    for verdict in (WELL_FORMED, UNSUPPORTED, ILL_FORMED):
+    for verdict in (WELL_FORMED, PROHIBITED, ILL_FORMED):
         print(f"{PROGRAM_LEVEL}/{verdict}")
         r.run_multi_file_tests(program / verdict, interpreter)
 
