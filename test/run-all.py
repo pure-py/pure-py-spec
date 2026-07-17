@@ -45,6 +45,10 @@ def script_cmd(script, path):
     return ["python3", str(ROOT / "src" / script), str(path)]
 
 
+def substr(path):
+    return path.read_text().strip() if path.exists() else None
+
+
 class Runner:
     def __init__(self):
         self.passed = 0
@@ -85,58 +89,57 @@ class Runner:
             if error_substr not in output:
                 self._fail(phase, f"expected output containing {error_substr!r}, got: {output.strip()}")
 
-    def run_python(self, phase, interpreter, path, cwd=None, expected_path=None):
-        """Run a script under Python; compare stdout to expected_path, or check
-        stderr for the class named in the .exception.expected sibling."""
-        if expected_path is None:
-            expected_path = path.with_suffix(EXPECTED)
-        exception_path = path.with_suffix(EXCEPTION_EXPECTED)
+    def _run(self, interpreter, path, cwd):
         cmd_path = path.name if cwd is not None else str(path)
-        proc = subprocess.run([interpreter, cmd_path], cwd=cwd, capture_output=True, text=True)
+        return subprocess.run([interpreter, cmd_path], cwd=cwd, capture_output=True, text=True)
 
-        if exception_path.exists():
-            expected = exception_path.read_text().strip()
-            if proc.returncode == 0:
-                self._fail(phase, f"expected {expected} but script succeeded")
-            elif expected not in proc.stderr:
-                self._fail(phase, f"expected {expected}, got: {proc.stderr.strip()}")
-            return
-
+    def run_expecting_output(self, phase, interpreter, path, expected_path, cwd=None):
+        proc = self._run(interpreter, path, cwd)
         if proc.returncode != 0:
             self._fail(phase, f"exit {proc.returncode}: {proc.stderr.strip()}")
-            return
-        if proc.stdout != expected_path.read_text():
+        elif proc.stdout != expected_path.read_text():
             self._fail(phase, "output mismatch")
+
+    def run_expecting_exception(self, phase, interpreter, path, exception_path, cwd=None):
+        expected = exception_path.read_text().strip()
+        proc = self._run(interpreter, path, cwd)
+        if proc.returncode == 0:
+            self._fail(phase, f"expected {expected} but script succeeded")
+        elif expected not in proc.stderr:
+            self._fail(phase, f"expected {expected}, got: {proc.stderr.strip()}")
+
+    def python_evidence(self, interpreter, path, python_accepts, expected_path, cwd=None):
+        """Python must corroborate the verdict: run with the expected output
+        (python_accepts) or raise the exception named in the sibling file. A
+        test must carry the one piece of evidence and not the other."""
+        exception_path = path.with_suffix(EXCEPTION_EXPECTED)
+        if python_accepts:
+            if exception_path.exists():
+                self._fail("run", f"must not have {EXCEPTION_EXPECTED}")
+            elif not expected_path.exists():
+                self._fail("run", f"missing {expected_path.name}")
+            else:
+                self.run_expecting_output("run", interpreter, path, expected_path, cwd=cwd)
+        else:
+            if expected_path.exists():
+                self._fail("run", f"ill-formed must not have {expected_path.name}")
+            elif not exception_path.exists():
+                self._fail("run", f"missing {EXCEPTION_EXPECTED}")
+            else:
+                self.run_expecting_exception("run", interpreter, path, exception_path, cwd=cwd)
 
     def run_multi_file_tests(self, category_root, interpreter):
         """Each subdir is a test: main.py, expected_exit, plus fixtures and the
-        Python-side evidence. The verdict (the category directory name) fixes
-        whether Python must accept (expected) or reject (main.exception.expected)."""
-        verdict = category_root.name
+        Python-side evidence fixed by the verdict (the category directory name)."""
+        python_accepts = category_root.name != ILL_FORMED
         for d in sorted(p for p in category_root.iterdir() if p.is_dir()):
-            rel = d.relative_to(ROOT)
-            with self.test(rel):
+            with self.test(d.relative_to(ROOT)):
                 main_py = d / MAIN
-                expected_exit_code = int((d / EXPECTED_EXIT).read_text().strip())
-                err_path = d / EXPECTED_ERROR
-                err_substr = err_path.read_text().strip() if err_path.exists() else None
-                self.expect_exit("check", script_cmd(CHECK_PROGRAM, main_py), expected_exit_code, error_substr=err_substr)
-                has_expected = (d / EXPECTED_FILE).exists()
-                has_exception = main_py.with_suffix(EXCEPTION_EXPECTED).exists()
-                if verdict == ILL_FORMED:
-                    if has_expected:
-                        self._fail("run", f"ill-formed must not have {EXPECTED_FILE}")
-                    elif not has_exception:
-                        self._fail("run", f"missing {EXCEPTION_EXPECTED}")
-                    else:
-                        self.run_python("run", interpreter, main_py, cwd=d)
-                else:
-                    if has_exception:
-                        self._fail("run", f"must not have {EXCEPTION_EXPECTED}")
-                    elif not has_expected:
-                        self._fail("run", f"missing {EXPECTED_FILE}")
-                    else:
-                        self.run_python("run", interpreter, main_py, cwd=d, expected_path=d / EXPECTED_FILE)
+                self.expect_exit("check", script_cmd(CHECK_PROGRAM, main_py),
+                                 int((d / EXPECTED_EXIT).read_text().strip()),
+                                 error_substr=substr(d / EXPECTED_ERROR))
+                self.python_evidence(interpreter, main_py, python_accepts,
+                                     expected_path=d / EXPECTED_FILE, cwd=d)
 
     def module_test(self, p, module, interpreter):
         """Assert a module-level test from its path: <verdict>[/<stage>].
@@ -144,17 +147,11 @@ class Runner:
         verdict in {well-formed, prohibited, ill-formed} fixes how PurePy and
         Python must each respond; stage in {syntactic, static-semantic,
         dynamic-semantic} fixes where PurePy rejects (dynamic-semantic = checker
-        accepts, but evaluation is stuck and Python raises). prohibited vs
-        ill-formed is marked by whether Python accepts (.expected) or rejects
-        (.exception.expected).
-        """
+        accepts, but evaluation is stuck and Python raises)."""
         rel = p.relative_to(ROOT)
         with self.test(rel):
             dirs = p.parent.relative_to(module).parts
-            has_expected = p.with_suffix(EXPECTED).exists()
-            has_exception = p.with_suffix(EXCEPTION_EXPECTED).exists()
-            err_file = p.with_suffix(ERROR_EXPECTED)
-            err = err_file.read_text().strip() if err_file.exists() else None
+            err = substr(p.with_suffix(ERROR_EXPECTED))
 
             if dirs == (WELL_FORMED, PENDING):
                 self.expect_exit("parse", script_cmd(PARSE, p), NOT_YET)
@@ -162,7 +159,8 @@ class Runner:
             if dirs == (ILL_FORMED, STATIC_SEMANTIC, PENDING):
                 self.expect_exit("parse", script_cmd(PARSE, p), 0)
                 self.expect_exit("check", script_cmd(CHECK, p), 0)
-                self.run_python("run", interpreter, p)
+                self.python_evidence(interpreter, p, not p.with_suffix(EXCEPTION_EXPECTED).exists(),
+                                     expected_path=p.with_suffix(EXPECTED))
                 return
             if dirs == (ILL_FORMED, SYNTACTIC_ONLY):
                 self.expect_exit("python", [interpreter, str(p)], 0)
@@ -176,29 +174,20 @@ class Runner:
                 self.expect_exit("check", script_cmd(CHECK, p), 0)
             elif stage == SYNTACTIC:
                 self.expect_exit("parse", script_cmd(PARSE, p), REJECT_PARSE, error_substr=err)
-            elif stage == STATIC_SEMANTIC:
-                self.expect_exit("parse", script_cmd(PARSE, p), 0)
-                self.expect_exit("check", script_cmd(CHECK, p), REJECT_CHECK, error_substr=err)
-            elif stage == DYNAMIC_SEMANTIC:
-                self.expect_exit("parse", script_cmd(PARSE, p), 0)
-                self.expect_exit("check", script_cmd(CHECK, p), 0)
-
-            if verdict in (WELL_FORMED, PROHIBITED):
-                if has_exception:
-                    self._fail("run", f"must not have {EXCEPTION_EXPECTED}")
-                elif stage == SYNTACTIC:
-                    self.expect_exit("python", [interpreter, str(p)], 0)
-                elif not has_expected:
-                    self._fail("run", f"missing {EXPECTED}")
-                else:
-                    self.run_python("run", interpreter, p)
             else:
-                if has_expected:
-                    self._fail("run", f"ill-formed must not have {EXPECTED}")
-                elif not has_exception:
-                    self._fail("run", f"missing {EXCEPTION_EXPECTED}")
+                self.expect_exit("parse", script_cmd(PARSE, p), 0)
+                self.expect_exit("check", script_cmd(CHECK, p),
+                                 REJECT_CHECK if stage == STATIC_SEMANTIC else 0,
+                                 error_substr=err if stage == STATIC_SEMANTIC else None)
+
+            if verdict != ILL_FORMED and stage == SYNTACTIC:
+                if p.with_suffix(EXCEPTION_EXPECTED).exists():
+                    self._fail("run", f"must not have {EXCEPTION_EXPECTED}")
                 else:
-                    self.run_python("run", interpreter, p)
+                    self.expect_exit("python", [interpreter, str(p)], 0)
+            else:
+                self.python_evidence(interpreter, p, verdict != ILL_FORMED,
+                                     expected_path=p.with_suffix(EXPECTED))
 
     def summary(self):
         total = self.passed + self.failed
@@ -216,7 +205,6 @@ def main():
     interpreter = sys.argv[1] if len(sys.argv) > 1 else "python3"
     base = ROOT / "test"
     module = base / MODULE_LEVEL
-    program = base / PROGRAM_LEVEL
     r = Runner()
 
     if not skip_mypy:
@@ -240,7 +228,7 @@ def main():
 
     for verdict in (WELL_FORMED, PROHIBITED, ILL_FORMED):
         print(f"{PROGRAM_LEVEL}/{verdict}")
-        r.run_multi_file_tests(program / verdict, interpreter)
+        r.run_multi_file_tests(base / PROGRAM_LEVEL / verdict, interpreter)
 
     r.summary()
 
