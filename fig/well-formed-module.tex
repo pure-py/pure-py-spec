@@ -24,7 +24,7 @@
 \inferrule*[lab={\ruleName{imp-submodule}}]
 {
   \bind{x}{\exMod{q}} \in \Gamma \\
-  \vdash_{\mathcal{M}} q : \Delta \\
+  \vdash_{\mathsf{load}} q : \Delta \\
   \Gamma, \vec{x} \importsR \Gamma'
 }
 {
@@ -74,7 +74,7 @@
 {\color{blue}
 \inferrule*[lab={\ruleName{import}}]
 {
-  \vdash_{\mathcal{M}} q : \Delta \\
+  \vdash_{\mathsf{load}} q : \Delta \\
   q, \exModF{q}{\Delta} \wraps \Gamma' \\
   \vdash \vec{\iota} : \Gamma
 }
@@ -84,7 +84,7 @@
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
-  \vdash_{\mathcal{M}} q : \Delta \\
+  \vdash_{\mathsf{load}} q : \Delta \\
   {\color{blue}\Delta}\,{\color{deletedgray}q'}, \vec{x} \importsR \Gamma' \\
   \vdash \vec{\iota} : \Gamma
 }
@@ -119,7 +119,7 @@
 \and
 \inferrule*[lab={\ruleName{wrap-qualified}}]
 {
-  \vdash_{\mathcal{M}} q : \Gamma' \\
+  \vdash_{\mathsf{load}} q : \Gamma' \\
   q, \exModF{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \wraps \Gamma
 }
 {
@@ -127,7 +127,7 @@
 }
 \end{mathpar}
 \endgroup
-\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$; \textcolor{blue}{full reference $\theta$ for module $q$ wraps into a binding for the head of $q$}}
+\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$; \textcolor{blue}{loaded reference $\theta$ for module $q$ wraps into a binding for the head of $q$}}
 \end{subfigure}
 
 \vspace{2mm}
@@ -182,7 +182,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash_{\mathcal{M}} {\color{blue}\seq{x}}\,{\color{deletedgray}q} : {\color{blue}\Gamma}\,{\color{deletedgray}\Delta}$}
+\flushleft \shadebox{$\vdash_{{\color{blue}\mathsf{load}}\,{\color{deletedgray}\mathcal{M}}} {\color{blue}\seq{x}}\,{\color{deletedgray}q} : {\color{blue}\Gamma}\,{\color{deletedgray}\Delta}$}
 \begin{mathpar}
 \small
 {\color{blue}
@@ -191,20 +191,20 @@
   \strut
 }
 {
-  \vdash_{\mathcal{M}} \varepsilon : \varnothing
+  \vdash_{\mathsf{load}} \varepsilon : \varnothing
 }}
 \and
 {\color{blue}
 \inferrule*[lab={\ruleName{module-cons}}]
 {
-  \vdash_{\mathcal{M}} \seq{x} : \Delta' \\
+  \vdash_{\mathsf{load}} \seq{x} : \Delta' \\
   \mathcal{M}(\seq{x} \cons y) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} : \Gamma \\
   \Gamma \vdash \bodyOf(\seq{x} \cons y) : \Delta \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submodules(\seq{x} \cons y)) = \varnothing
 }
 {
-  \vdash_{\mathcal{M}} \seq{x} \cons y : \submodules(\seq{x} \cons y) \runion \Delta
+  \vdash_{\mathsf{load}} \seq{x} \cons y : \submodules(\seq{x} \cons y) \runion \Delta
 }}
 \and
 {\color{deletedgray}
@@ -238,7 +238,7 @@
 \small
 \inferrule*[lab={\ruleName{program}}]
 {
-  \vdash_{\mathcal{M}} \pymath{\_\_main\_\_} : \Delta \\
+  \vdash_{\mathsf{load}} \pymath{\_\_main\_\_} : \Delta \\
   G_{\mathcal{M}} \text{ acyclic}
 }
 {

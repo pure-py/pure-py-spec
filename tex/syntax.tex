@@ -17,7 +17,7 @@ Metavariables $x$, $f$, $c$ range over \emph{variables}; idiomatically $f$ is us
 A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the following \emph{context entries} $\theta$:
 \begin{itemize}
 \item the variable's \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
-\item a \emph{module reference}, for a fully-qualified module name $q$: \Replaced{either a \emph{stub} $\exMod{q}$, or a \emph{full} reference $\exModF{q}{\Gamma}$, which also carries the member context $\Gamma$ of $q$}{$\modEntry{q}$};
+\item a \emph{module reference}, for a fully-qualified module name $q$: \Replaced{either a \emph{stub} $\exMod{q}$, or a \emph{loaded} reference $\exModF{q}{\Gamma}$, which also carries the member context $\Gamma$ of $q$}{$\modEntry{q}$};
 \item a \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q}{\vec{x}}{c}$, recording the declaring context $\Gamma$, defining module $q$, sequence of distinct field names $\vec{x}$, and base class $c$ (or $\bot$ for no base).
 \end{itemize}
 \end{definition}
@@ -66,7 +66,7 @@ a \merge a' &= a \meet a'
 \end{align*}}
 \end{definition}
 
-\noindent Extend combines module references for the same module recursively, preferring full references to stubs, and is otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted at the same package must combine rather than shadow.
+\noindent Extend combines module references for the same module recursively, preferring loaded references to stubs, and is otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted at the same package must combine rather than shadow.
 \end{AddedBlock}
 
 \begin{lemma}[Right distributivity]
