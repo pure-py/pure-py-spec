@@ -521,9 +521,9 @@ also \S\ref{sec:local-assignment}).
 \label{sec:uninitialised-members}
 
 In Python, an attribute of a module can be missing at runtime in two ways; \PurePy rejects both
-statically. First, a member assigned only in some branches of the module body is not definitely assigned
-(its entry has status $\statusNotDefAssigned$); on a run that takes no assigning branch, the module ends up
-without the attribute. Here \pyinline{b} is \pyinline{False}, so \pyinline{x} is never assigned:
+statically. First, a member that is not definitely assigned may end a run without ever being assigned,
+leaving the module without the attribute. Here \pyinline{b} is \pyinline{False}, so \pyinline{x} is never
+assigned:
 \vspace{-\medskipamount}
 
 \begin{minipage}[t]{0.48\textwidth}
