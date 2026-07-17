@@ -50,7 +50,8 @@ def substr(path):
 
 
 class Runner:
-    def __init__(self):
+    def __init__(self, interpreter):
+        self.interpreter = interpreter
         self.passed = 0
         self.failed = 0
         self._failures = []
@@ -91,28 +92,37 @@ class Runner:
             if error_substr not in output:
                 self._fail(phase, f"expected output containing {error_substr!r}, got: {output.strip()}")
 
-    def _run(self, interpreter, path, cwd):
-        cmd_path = path.name if cwd is not None else str(path)
-        return subprocess.run([interpreter, cmd_path], cwd=cwd, capture_output=True, text=True)
+    def parse(self, path, expected, err=None):
+        self.expect_exit(script_cmd(PARSE, path), expected, error_substr=err)
 
-    def run_expecting_output(self, interpreter, path, expected_path, cwd=None):
+    def check(self, path, expected, err=None):
+        self.expect_exit(script_cmd(CHECK, path), expected, error_substr=err)
+
+    def python(self, path, expected=0):
+        self.expect_exit([self.interpreter, str(path)], expected)
+
+    def _run(self, path, cwd):
+        cmd_path = path.name if cwd is not None else str(path)
+        return subprocess.run([self.interpreter, cmd_path], cwd=cwd, capture_output=True, text=True)
+
+    def run_expecting_output(self, path, expected_path, cwd=None):
         phase = "run"
-        proc = self._run(interpreter, path, cwd)
+        proc = self._run(path, cwd)
         if proc.returncode != 0:
             self._fail(phase, f"exit {proc.returncode}: {proc.stderr.strip()}")
         elif proc.stdout != expected_path.read_text():
             self._fail(phase, "output mismatch")
 
-    def run_expecting_exception(self, interpreter, path, exception_path, cwd=None):
+    def run_expecting_exception(self, path, exception_path, cwd=None):
         phase = "run"
         expected = exception_path.read_text().strip()
-        proc = self._run(interpreter, path, cwd)
+        proc = self._run(path, cwd)
         if proc.returncode == 0:
             self._fail(phase, f"expected {expected} but script succeeded")
         elif expected not in proc.stderr:
             self._fail(phase, f"expected {expected}, got: {proc.stderr.strip()}")
 
-    def python_evidence(self, interpreter, path, python_accepts, expected_path, cwd=None):
+    def python_evidence(self, path, python_accepts, expected_path, cwd=None):
         """Python must corroborate the verdict: run with the expected output
         (python_accepts) or raise the exception named in the sibling file. A
         test must carry the one piece of evidence and not the other."""
@@ -123,16 +133,16 @@ class Runner:
             elif not expected_path.exists():
                 self._fail("run", f"missing {expected_path.name}")
             else:
-                self.run_expecting_output(interpreter, path, expected_path, cwd=cwd)
+                self.run_expecting_output(path, expected_path, cwd=cwd)
         else:
             if expected_path.exists():
                 self._fail("run", f"ill-formed must not have {expected_path.name}")
             elif not exception_path.exists():
                 self._fail("run", f"missing {EXCEPTION_EXPECTED}")
             else:
-                self.run_expecting_exception(interpreter, path, exception_path, cwd=cwd)
+                self.run_expecting_exception(path, exception_path, cwd=cwd)
 
-    def run_multi_file_tests(self, category_root, interpreter):
+    def run_multi_file_tests(self, category_root):
         """Each subdir is a test: main.py, expected_exit, plus fixtures and the
         Python-side evidence fixed by the verdict (the category directory name)."""
         python_accepts = category_root.name != ILL_FORMED
@@ -142,10 +152,10 @@ class Runner:
                 self.expect_exit(script_cmd(CHECK_PROGRAM, main_py),
                                  int((d / EXPECTED_EXIT).read_text().strip()),
                                  error_substr=substr(d / EXPECTED_ERROR))
-                self.python_evidence(interpreter, main_py, python_accepts,
+                self.python_evidence(main_py, python_accepts,
                                      expected_path=d / EXPECTED_FILE, cwd=d)
 
-    def module_test(self, p, module, interpreter):
+    def module_test(self, p, module):
         """Assert a module-level test from its path: <verdict>[/<stage>].
 
         verdict in {well-formed, prohibited, ill-formed} fixes how PurePy and
@@ -158,39 +168,38 @@ class Runner:
             err = substr(p.with_suffix(ERROR_EXPECTED))
 
             if dirs == (WELL_FORMED, PENDING):
-                self.expect_exit(script_cmd(PARSE, p), NOT_YET)
+                self.parse(p, NOT_YET)
                 return
             if dirs == (ILL_FORMED, STATIC_SEMANTIC, PENDING):
-                self.expect_exit(script_cmd(PARSE, p), 0)
-                self.expect_exit(script_cmd(CHECK, p), 0)
-                self.python_evidence(interpreter, p, not p.with_suffix(EXCEPTION_EXPECTED).exists(),
+                self.parse(p, 0)
+                self.check(p, 0)
+                self.python_evidence(p, not p.with_suffix(EXCEPTION_EXPECTED).exists(),
                                      expected_path=p.with_suffix(EXPECTED))
                 return
             if dirs == (ILL_FORMED, SYNTACTIC_ONLY):
-                self.expect_exit([interpreter, str(p)], 0)
+                self.python(p)
                 return
 
             verdict = dirs[0]
             stage = dirs[1] if len(dirs) > 1 else None
 
             if verdict == WELL_FORMED:
-                self.expect_exit(script_cmd(PARSE, p), 0)
-                self.expect_exit(script_cmd(CHECK, p), 0)
+                self.parse(p, 0)
+                self.check(p, 0)
             elif stage == SYNTACTIC:
-                self.expect_exit(script_cmd(PARSE, p), REJECT_PARSE, error_substr=err)
+                self.parse(p, REJECT_PARSE, err)
             else:
-                self.expect_exit(script_cmd(PARSE, p), 0)
-                self.expect_exit(script_cmd(CHECK, p),
-                                 REJECT_CHECK if stage == STATIC_SEMANTIC else 0,
-                                 error_substr=err if stage == STATIC_SEMANTIC else None)
+                self.parse(p, 0)
+                self.check(p, REJECT_CHECK if stage == STATIC_SEMANTIC else 0,
+                           err if stage == STATIC_SEMANTIC else None)
 
             if verdict != ILL_FORMED and stage == SYNTACTIC:
                 if p.with_suffix(EXCEPTION_EXPECTED).exists():
                     self._fail("run", f"must not have {EXCEPTION_EXPECTED}")
                 else:
-                    self.expect_exit([interpreter, str(p)], 0)
+                    self.python(p)
             else:
-                self.python_evidence(interpreter, p, verdict != ILL_FORMED,
+                self.python_evidence(p, verdict != ILL_FORMED,
                                      expected_path=p.with_suffix(EXPECTED))
 
     def summary(self):
@@ -209,7 +218,7 @@ def main():
     interpreter = sys.argv[1] if len(sys.argv) > 1 else "python3"
     base = ROOT / "test"
     module = base / MODULE_LEVEL
-    r = Runner()
+    r = Runner(interpreter)
 
     if not skip_mypy:
         print("mypy --strict src/")
@@ -228,11 +237,11 @@ def main():
         if header != last:
             print(header)
             last = header
-        r.module_test(p, module, interpreter)
+        r.module_test(p, module)
 
     for verdict in (WELL_FORMED, PROHIBITED, ILL_FORMED):
         print(f"{PROGRAM_LEVEL}/{verdict}")
-        r.run_multi_file_tests(base / PROGRAM_LEVEL / verdict, interpreter)
+        r.run_multi_file_tests(base / PROGRAM_LEVEL / verdict)
 
     r.summary()
 
