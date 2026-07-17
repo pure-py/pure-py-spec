@@ -61,6 +61,17 @@ def check_program(entry_path: pathlib.Path) -> Optional[IllFormed]:
     except IllFormed as e:
         return e
 
+def source_tree(base_dir: pathlib.Path, entry_path: pathlib.Path) -> set[str]:
+    names: set[str] = set()
+    for path in base_dir.rglob('*.py'):
+        if path == entry_path:
+            continue
+        rel = path.relative_to(base_dir)
+        parts = rel.parent.parts if rel.name == '__init__.py' else rel.with_suffix('').parts
+        if parts:
+            names.add('.'.join(parts))
+    return names
+
 def walk_program(entry_path: pathlib.Path) -> None:
     base_dir = entry_path.parent
     modules: dict[str, tuple[pathlib.Path, ast.Module]] = {}
@@ -68,7 +79,7 @@ def walk_program(entry_path: pathlib.Path) -> None:
     entry_tree = load(entry_path.stem, base_dir)
     modules['__main__'] = (entry_path, entry_tree)
     imports_by_module['__main__'] = imports(entry_tree, base_dir)
-    queue: list[str] = [*PREDEFINED_MODULES]
+    queue: list[str] = [*PREDEFINED_MODULES, *source_tree(base_dir, entry_path)]
     for imp in imports_by_module['__main__']:
         queue.extend({imp} | parents(imp))
     while queue:

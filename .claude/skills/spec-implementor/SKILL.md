@@ -35,18 +35,36 @@ directions.
 Spec first, then tests, then implementation. When the spec changes, write or
 adjust the failing test before touching the checker.
 
-## Test coverage
+## Testing
 
-Rule-level coverage (each rule accepts once, each reason rejects once) does not
-cover operators and metafunctions: also exercise every defining equation. The
-distinguishing equations often need interacting inputs (two statements with
-overlapping names) that no single-rule test produces.
+A test is a small program with an expected outcome: accepted, rejected, or
+producing particular output when run. Nothing else is observable, so nothing
+else is tested.
 
-- When a change swaps one operator for another, write the test that separates
-  them; the suite must fail if the old operator is restored.
-- The spec's rationale sentence for a definition typically names the separating
-  scenario ("imports rooted at the same package must combine rather than
-  shadow"); make that scenario a test.
+- **Differential**: every program also runs under the reference
+  implementation, and the test's category states the required relationship
+  (well-formed: both accept; ill-formed: both reject; prohibited: reference
+  accepts, we reject). A misfiled test is itself a failure.
+- **Metamorphic**: when the spec says a change is harmless (a commutative or
+  idempotent operation), apply it to a passing program: swap sibling imports,
+  repeat an import. Verdict and output must not change.
+- **Differing pairs**: when the spec says a difference matters (a biased
+  operation, a law noted not to hold), the two programs must come out
+  differently; the spec's own counterexample is usually the pair to use.
+- **Minimal pairs**: for each condition in a rule, two programs differing as
+  little as possible, one just meeting it and one just missing it. Error
+  messages are not the unit of coverage; one message can arise from several
+  unrelated situations, each needing its own pair.
+- **Whole-program conditions**: test both sides of the boundary, the smallest
+  broken case and the largest legal case that resembles one (a self-import
+  and a two-module cycle against a diamond).
+- **The spec's prose is a test plan the authors already wrote**: every worked
+  example, counterexample, and justifying sentence describes a program; each
+  should exist as a test.
+- Use programs large enough that recursive rules actually recurse; a
+  one-level example can pass for the wrong reason.
+- Audit the suite by mutation: deliberately weaken the implementation and
+  confirm a test fails; a green suite has a hole.
 
 ## Why behavioral auditing misses this
 
