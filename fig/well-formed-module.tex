@@ -190,7 +190,7 @@
   \mathcal{M}(x) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} : \Gamma \\
   \Gamma \vdash \bodyOf(x) : \Delta \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{y \mid x.y \in \dom(\mathcal{M})} = \varnothing
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap {\color{blue}\dom(\submodules(x))}\,{\color{deletedgray}\set{y \mid x.y \in \dom(\mathcal{M})}} = \varnothing
 }
 {
   \vdash_{\mathcal{M}} x : {\color{blue}\submodules(x) \runion} \Delta
@@ -202,7 +202,7 @@
   \mathcal{M}(q.x) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} : \Gamma \\
   \Gamma \vdash \bodyOf(q.x) : \Delta \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{y \mid q.x.y \in \dom(\mathcal{M})} = \varnothing
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap {\color{blue}\dom(\submodules(q.x))}\,{\color{deletedgray}\set{y \mid q.x.y \in \dom(\mathcal{M})}} = \varnothing
 }
 {
   \vdash_{\mathcal{M}} q.x : {\color{blue}\submodules(q.x) \runion} \Delta
