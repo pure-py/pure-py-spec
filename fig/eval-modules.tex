@@ -14,7 +14,7 @@
 \inferrule*[lab={\ruleName{imp-member}}]
 {
   \bind{x}{v} \in \rho \\
-  v \neq \exMod{q'} \\
+  v \neq \exMod{q'} \quad (\forall q') \\
   \rho, \vec{x} \importsR \rho'
 }
 {
