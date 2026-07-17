@@ -520,9 +520,10 @@ also \S\ref{sec:local-assignment}).
 \subsubsection{Uninitialised module members}
 \label{sec:uninitialised-members}
 
-An attribute of a module can be missing at runtime in two ways. First, a member bound on only some paths
-through the module body is not definitely assigned (its entry has status $\statusNotDefAssigned$), and the
-attribute is missing when no binding path ran:
+An attribute of a module can be missing at runtime in two ways. First, a member assigned only in some
+branches of the module body is not definitely assigned (its entry has status $\statusNotDefAssigned$); on a
+run that takes no assigning branch, the module ends up without the attribute. Here \pyinline{b} is
+\pyinline{False}, so \pyinline{x} is never assigned:
 \vspace{-\medskipamount}
 
 \begin{minipage}[t]{0.48\textwidth}
