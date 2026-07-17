@@ -19,7 +19,7 @@ with $\assigns{\varnothing}$ as left and right unit.
 \input{fig/well-formed-env}
 
 Module and program evaluation are given in \figref{eval-modules}; importing names from a loaded module in
-\figref{eval-imports}. Extend (Definition~\ref{def:extend}) extends to module values by reading its equations with a loaded reference $\loaded{q}{\rho}$ carrying an environment in place of a context. The loading judgement $q \Rightarrow_{\mathsf{load}} \rho$ evaluates the import prefix
+\figref{eval-imports}. Extend (Definition~\ref{def:extend}) extends to module values by reading its equations with a loaded reference $\modLoaded{q}{\rho}$ carrying an environment in place of a context. The loading judgement $q \Rightarrow_{\mathsf{load}} \rho$ evaluates the import prefix
 of $q$ and then its statements, mirroring the well-formedness judgement $\vdash_{\mathsf{load}} q : \Gamma$
 (\figref{well-formed-module}); as with the static rules, the mutual
 recursion between loading and evaluation is grounded by the acyclicity of $G_{\mathcal{M}}$.

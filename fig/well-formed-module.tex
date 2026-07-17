@@ -21,12 +21,12 @@
 \and
 \inferrule*[lab={\ruleName{imp-submodule}}]
 {
-  \bind{x}{\stub{q}} \in \Gamma \\
+  \bind{x}{\modStub{q}} \in \Gamma \\
   \vdash_{\mathsf{load}} q : \Delta \\
   \Gamma, \vec{x} \importsR \Gamma'
 }
 {
-  \Gamma, x \cons \vec{x} \importsR \set{\bind{x}{\loaded{q}{\Delta}}} \override \Gamma'
+  \Gamma, x \cons \vec{x} \importsR \set{\bind{x}{\modLoaded{q}{\Delta}}} \override \Gamma'
 }
 \end{mathpar}
 
@@ -52,7 +52,7 @@
 {
   q = x \cons \seq{x} \\
   \vdash_{\mathsf{load}} q : \Delta \\
-  q, \loaded{q}{\Delta} \loadsTo \theta \\
+  q, \modLoaded{q}{\Delta} \loadsTo \theta \\
   \vdash \vec{\iota} : \Gamma
 }
 {
@@ -62,7 +62,7 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q : \Delta \\
-  q, \loaded{q}{\Delta} \loadsTo \theta \\
+  q, \modLoaded{q}{\Delta} \loadsTo \theta \\
   \Delta, \vec{x} \importsR \Gamma' \\
   \vdash \vec{\iota} : \Gamma
 }
@@ -86,7 +86,7 @@
 \inferrule*[lab={\ruleName{loads-to-qualified}}]
 {
   \vdash_{\mathsf{load}} q : \Gamma' \\
-  q, \loaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo \theta'
+  q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo \theta'
 }
 {
   q.x, \theta \loadsTo \theta'

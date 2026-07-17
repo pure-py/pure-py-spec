@@ -117,8 +117,8 @@
 \unwrap(\assigns{\rho}) &= \pyinline{None} \\
 \\
 \\
-\env(\rho, x) &= \rho' && \text{where } \rho(x) = \loaded{q'}{\rho'} \\
-\env(\rho, q.x) &= \rho' && \text{where } \env(\rho, q)(x) = \loaded{q'}{\rho'} \\
+\env(\rho, x) &= \rho' && \text{where } \rho(x) = \modLoaded{q'}{\rho'} \\
+\env(\rho, q.x) &= \rho' && \text{where } \env(\rho, q)(x) = \modLoaded{q'}{\rho'} \\
 \\
 \resolveClass(\rho, c) &= (c, \rho(c)) \\
 \resolveClass(\rho, q.c) &= (c, \env(\rho, q)(c))
@@ -176,7 +176,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-attr-module}}]
 {
-  \rho, e \Rightarrow \loaded{q'}{\rho'} \\
+  \rho, e \Rightarrow \modLoaded{q'}{\rho'} \\
   \bind{x}{v} \in \rho'
 }
 {

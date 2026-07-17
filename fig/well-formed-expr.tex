@@ -15,10 +15,10 @@
 
 \inferrule*[lab={\ruleName{simple-module}}]
 {
-  \bind{x}{\loaded{q}{\Gamma'}} \in \Gamma
+  \bind{x}{\modLoaded{q}{\Gamma'}} \in \Gamma
 }
 {
-  \Gamma \vdash x \names \loaded{q}{\Gamma'}
+  \Gamma \vdash x \names \modLoaded{q}{\Gamma'}
 }
 \and
 
@@ -33,7 +33,7 @@
 
 \inferrule*[lab={\ruleName{qualified}}]
 {
-  \Gamma \vdash q \names \loaded{q'}{\Gamma'} \\
+  \Gamma \vdash q \names \modLoaded{q'}{\Gamma'} \\
   \Gamma' \vdash x \names \theta
 }
 {

@@ -17,7 +17,7 @@ Metavariables $x$, $f$, $c$ range over \emph{variables}; idiomatically $f$ is us
 A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the following \emph{context entries} $\theta$:
 \begin{itemize}
 \item the variable's \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
-\item a \emph{module reference}, for a fully-qualified module name $q$: either a \emph{stub} $\stub{q}$, or \emph{loaded} reference $\loaded{q}{\Gamma}$, which also carries the member context $\Gamma$ of $q$;
+\item a \emph{module reference}, for a fully-qualified module name $q$: either a \emph{stub} $\modStub{q}$, or \emph{loaded} reference $\modLoaded{q}{\Gamma}$, which also carries the member context $\Gamma$ of $q$;
 \item a \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q}{\vec{x}}{c}$, recording the declaring context $\Gamma$, defining module $q$, sequence of distinct field names $\vec{x}$, and base class $c$ (or $\bot$ for no base).
 \end{itemize}
 \end{definition}
@@ -58,8 +58,8 @@ a \merge a' &= a \meet a'
 \label{def:extend}
 {\small
 \begin{align*}
-\loaded{q}{\Gamma} \extend \loaded{q}{\Gamma'} &= \loaded{q}{\Gamma \extend \Gamma'} \\
-\stub{q} \extend \loaded{q}{\Gamma} = \loaded{q}{\Gamma} \extend \stub{q} &= \loaded{q}{\Gamma} \\
+\modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} &= \modLoaded{q}{\Gamma \extend \Gamma'} \\
+\modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} &= \modLoaded{q}{\Gamma} \\
 \bot \extend \theta = \theta \extend \bot &= \theta \\
 \theta \extend \theta' &= \theta' \quad (\text{otherwise})
 \end{align*}}

@@ -14,7 +14,7 @@
 \inferrule*[lab={\ruleName{imp-member}}]
 {
   \bind{x}{v} \in \rho \\
-  v \neq \stub{q'} \quad (\forall q') \\
+  v \neq \modStub{q'} \quad (\forall q') \\
   \rho, \vec{x} \importsR \rho'
 }
 {
@@ -24,12 +24,12 @@
 
 \inferrule*[lab={\ruleName{imp-submodule}}]
 {
-  \bind{x}{\stub{q'}} \in \rho \\
+  \bind{x}{\modStub{q'}} \in \rho \\
   q' \Rightarrow_{\mathsf{load}} \rho'' \\
   \rho, \vec{x} \importsR \rho'
 }
 {
-  \rho, x \cons \vec{x} \importsR \set{\bind{x}{\loaded{q'}{\rho''}}} \override \rho'
+  \rho, x \cons \vec{x} \importsR \set{\bind{x}{\modLoaded{q'}{\rho''}}} \override \rho'
 }
 
 \end{mathpar}
@@ -56,7 +56,7 @@
 {
   q = x \cons \seq{x} \\
   q \Rightarrow_{\mathsf{load}} \rho \\
-  q, \loaded{q}{\rho} \loadsTo v \\
+  q, \modLoaded{q}{\rho} \loadsTo v \\
   \vdash \vec{\iota} \Rightarrow \rho'
 }
 {
@@ -89,7 +89,7 @@
 \inferrule*[lab={\ruleName{loads-to-qualified}}]
 {
   q \Rightarrow_{\mathsf{load}} \rho \\
-  q, \loaded{q}{\rho \extend \set{\bind{x}{v}}} \loadsTo v'
+  q, \modLoaded{q}{\rho \extend \set{\bind{x}{v}}} \loadsTo v'
 }
 {
   q.x, v \loadsTo v'

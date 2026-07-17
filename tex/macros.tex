@@ -7,6 +7,7 @@
 }
 
 \newcommand*{\figref}[1]{Figure~\ref{fig:#1}}
+\newcommand*{\figrefTwo}[2]{Figures \ref{fig:#1} and \ref{fig:#2}}
 
 \definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
 \newcommand*{\shadebox}[1]{\fcolorbox{lightgray}{shadecolor}{\raisebox{0pt}[0.60\baselineskip][0.05\baselineskip]{#1}}}
@@ -50,8 +51,8 @@
 \newcommand*{\exLamClosure}[4][]{\mathsf{Lam}_{#1}(#2, #3, #4)}
 \newcommand*{\exDefClosure}[4][]{\mathsf{Def}_{#1}(#2, #3, #4)}
 \newcommand*{\exObj}[3]{\mathsf{Obj}_{#1}(#2, #3)}
-\newcommand*{\stub}[1]{\mathsf{Mod}(#1)}
-\newcommand*{\loaded}[2]{\mathsf{Mod}(#1, #2)}
+\newcommand*{\modStub}[1]{\mathsf{Mod}(#1)}
+\newcommand*{\modLoaded}[2]{\mathsf{Mod}(#1, #2)}
 \newcommand*{\extend}{\lhd}
 \newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
 \newcommand*{\exDataclass}[2]{@\pyinline{dataclass}\;\pyinline{class}\;#1:\;#2}

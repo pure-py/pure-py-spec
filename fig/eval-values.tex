@@ -8,8 +8,8 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exLamClosure[\Gamma]{\rho}{\vec{x}}{e}$ & (LambdaClosure) \\
     & $\mid$ & $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$ & (DefClosure) \\
     & $\mid$ & $\exObj{\Gamma}{q.c}{\rho}$ & (Object) \\
-    & $\mid$ & $\stub{q}$ & (Module stub) \\
-    & $\mid$ & $\loaded{q}{\rho}$ & (Loaded module) \\
+    & $\mid$ & $\modStub{q}$ & (Module stub) \\
+    & $\mid$ & $\modLoaded{q}{\rho}$ & (Loaded module) \\
     & $\mid$ & $\clsEntry{\Gamma}{q}{\vec{x}}{c'}$ & (Class)
    \\[3mm]
 $\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & (Environment)
