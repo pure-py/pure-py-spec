@@ -193,7 +193,7 @@
   (\dom(\Gamma) \cup \dom(\Delta)) \cap {\color{blue}\dom(\submodules(x))}\,{\color{deletedgray}\set{y \mid x.y \in \dom(\mathcal{M})}} = \varnothing
 }
 {
-  \vdash_{\mathcal{M}} x : {\color{blue}\submodules(x) \runion} \Delta
+  \vdash_{\mathcal{M}} x : {\color{blue}\submodules(x)} \mathbin{\color{blue}\runion} \Delta
 }
 \and
 \inferrule*[lab={\ruleName{module-qualified}}]
@@ -205,7 +205,7 @@
   (\dom(\Gamma) \cup \dom(\Delta)) \cap {\color{blue}\dom(\submodules(q.x))}\,{\color{deletedgray}\set{y \mid q.x.y \in \dom(\mathcal{M})}} = \varnothing
 }
 {
-  \vdash_{\mathcal{M}} q.x : {\color{blue}\submodules(q.x) \runion} \Delta
+  \vdash_{\mathcal{M}} q.x : {\color{blue}\submodules(q.x)} \mathbin{\color{blue}\runion} \Delta
 }
 \end{mathpar}
 
