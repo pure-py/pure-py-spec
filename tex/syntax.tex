@@ -227,7 +227,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \input{fig/well-formed-expr}
 \input{fig/well-formed-module}
 
-\noindent The output context $\Gamma$ of the module well-formedness judgement (\figref{well-formed-module}) comprises the classes and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own bindings are disjoint, because the module rules prohibit a module from binding a name that is also the name of a submodule (\S\ref{sec:submodule-clash}).
+The output context $\Gamma$ of the module well-formedness judgement (\figref{well-formed-module}) comprises the classes and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own bindings are disjoint, because the module rules prohibit a module from binding a name that is also the name of a submodule (\S\ref{sec:submodule-clash}).
 
 \subsection{Examples}
 
