@@ -15,7 +15,7 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 - `tex/` — macros, listings config, related work
 - `fig/` — syntax, well-formedness rules, operational semantics
 - `agda/` — Agda mechanisation (distributivity proof)
-- `src/purepy_parse.py` — reference parser (Python `ast`-based subset checker)
+- `src/` — reference checker: `parse.py` (grammar), `contexts.py` (contexts and operations), `aux.py` (auxiliary metafunctions), `patterns.py` (pattern subsumption), `well_formed.py` (well-formedness rules), `check_module.py` (module system and CLI), `check_program.py` (program discovery and CLI), `reasons.py` (diagnostics)
 - `test/` — litmus tests
 
 ## Building the spec
@@ -40,9 +40,10 @@ Tests are organised by tier (per-module $\Gamma \vdash_M m : \Delta$ and program
 
 The invariant — `prohibited` ⇒ Python runs it, `ill-formed` ⇒ Python rejects it — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails.
 
-## Reference parser (`src/purepy_parse.py`)
+## Reference checker (`src/`)
 
-Decides whether a Python program belongs to the PurePy subset, using the `ast` module.
+`parse.py` decides whether a Python program belongs to the PurePy subset, using the `ast` module;
+`check_module.py` and `check_program.py` check well-formedness at module and program level.
 
 - Exit 0: accepted
 - Exit 1: prohibited (permanently excluded)
