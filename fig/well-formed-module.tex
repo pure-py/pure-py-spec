@@ -182,7 +182,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash_{\mathcal{M}} {\color{blue}x_1.\cdots.x_n}\,{\color{deletedgray}q} : {\color{blue}\Gamma}\,{\color{deletedgray}\Delta}$}
+\flushleft \shadebox{$\vdash_{\mathcal{M}} {\color{blue}\seq{x}}\,{\color{deletedgray}q} : {\color{blue}\Gamma}\,{\color{deletedgray}\Delta}$}
 \begin{mathpar}
 \small
 {\color{blue}
@@ -195,16 +195,16 @@
 }}
 \and
 {\color{blue}
-\inferrule*[lab={\ruleName{module}}]
+\inferrule*[lab={\ruleName{module-cons}}]
 {
-  \vdash_{\mathcal{M}} x_1.\cdots.x_{n-1} : \Delta' \\
-  \mathcal{M}(x_1.\cdots.x_n) = \vec{\iota}\;\vec{s} \\
+  \vdash_{\mathcal{M}} \seq{x} : \Delta' \\
+  \mathcal{M}(\seq{x} \cons y) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} : \Gamma \\
-  \Gamma \vdash \bodyOf(x_1.\cdots.x_n) : \Delta \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submodules(x_1.\cdots.x_n)) = \varnothing
+  \Gamma \vdash \bodyOf(\seq{x} \cons y) : \Delta \\
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submodules(\seq{x} \cons y)) = \varnothing
 }
 {
-  \vdash_{\mathcal{M}} x_1.\cdots.x_n : \submodules(x_1.\cdots.x_n) \runion \Delta
+  \vdash_{\mathcal{M}} \seq{x} \cons y : \submodules(\seq{x} \cons y) \runion \Delta
 }}
 \and
 {\color{deletedgray}
