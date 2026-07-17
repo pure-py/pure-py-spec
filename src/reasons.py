@@ -1,5 +1,8 @@
+from __future__ import annotations
+
+import ast
 from dataclasses import dataclass
-from typing import Union
+from typing import Optional, Union
 
 
 @dataclass(frozen=True)
@@ -216,3 +219,24 @@ Reason = Union[
     ImportAfterStatement, SubmoduleNameClash, SubmoduleNotImported,
     UnassignedMember,
 ]
+
+
+class IllFormed(Exception):
+    exit_code: int
+    msg: str
+
+class IllFormedModule(IllFormed):
+    exit_code = 3
+    def __init__(self, node: ast.AST, reason: Reason):
+        self.line: Optional[int] = getattr(node, 'lineno', None)
+        self.col: Optional[int] = getattr(node, 'col_offset', None)
+        self.reason: Reason = reason
+        self.msg = reason.message()
+        self.module: Optional[str] = None
+        super().__init__(self.msg)
+
+class IllFormedProgram(IllFormed):
+    exit_code = 4
+    def __init__(self, msg: str):
+        self.msg = msg
+        super().__init__(msg)

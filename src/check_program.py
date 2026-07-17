@@ -4,7 +4,9 @@ import sys
 from typing import Optional
 
 import parse
-from check_module import IllFormed, IllFormedModule, IllFormedProgram, annotate_seq_kinds, check_module, has_cycle
+from aux import annotate_seq_kinds
+from check_module import check_module, has_cycle
+from reasons import IllFormed, IllFormedModule, IllFormedProgram
 
 
 PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
