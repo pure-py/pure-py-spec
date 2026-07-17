@@ -1,6 +1,4 @@
 \begin{figure}
-\begingroup
-\color{blue}
 \flushleft \shadebox{$\Gamma, \vec{x} \importsR \Gamma'$}
 \begin{mathpar}
 \small
@@ -31,30 +29,8 @@
   \Gamma, x \cons \vec{x} \importsR \set{\bind{x}{\exModF{q}{\Delta}}} \runion \Gamma'
 }
 \end{mathpar}
-\endgroup
 
-{\color{deletedgray}
-\flushleft \shadebox{$q, \vec{x} \importsR \Gamma$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{imp-nil}}]
-{
-  \strut
-}
-{
-  q, \varepsilon \importsR \varnothing
-}
-\and
-\inferrule*[lab={\ruleName{imp-member}}]
-{
-  \bind{x}{\theta} \in \members(q) \\
-  q, \vec{x} \importsR \Gamma
-}
-{
-  q, x \cons \vec{x} \importsR \set{\bind{x}{\theta}} \runion \Gamma
-}
-\end{mathpar}}
-\caption{Names $\vec{x}$ imported from \textcolor{blue}{module context $\Gamma$}\textcolor{deletedgray}{ module $q$} produce bindings $\Gamma'$}
+\caption{Names $\vec{x}$ imported from module context $\Gamma$ produce bindings $\Gamma'$}
 \label{fig:imports}
 \end{figure}
 
@@ -71,7 +47,7 @@
   \vdash \varepsilon : \varnothing
 }
 \and
-{\color{blue}
+
 \inferrule*[lab={\ruleName{import}}]
 {
   \vdash_{\mathsf{load}} q : \Delta \\
@@ -80,33 +56,21 @@
 }
 {
   \vdash \exImport{q} \cons \vec{\iota} : \Gamma' \extend \Gamma
-}}
+}
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q : \Delta \\
-  {\color{blue}q, \exModF{q}{\Delta} \wraps \Gamma''} \\
-  {\color{blue}\Delta}\,{\color{deletedgray}q'}, \vec{x} \importsR \Gamma' \\
+  q, \exModF{q}{\Delta} \wraps \Gamma'' \\
+  \Delta, \vec{x} \importsR \Gamma' \\
   \vdash \vec{\iota} : \Gamma
 }
 {
-  \vdash \exFromImport{q}{\vec{x}} \cons \vec{\iota} : \Gamma' {\color{blue}\extend}\,{\color{deletedgray}\runion} \Gamma
+  \vdash \exFromImport{q}{\vec{x}} \cons \vec{\iota} : \Gamma' \extend \Gamma
 }
-\and
-{\color{deletedgray}
-\inferrule*[lab={\ruleName{import}}]
-{
-  q' = x_1.x_2.\cdots.x_{n+1} \\
-  \vdash_{\mathcal{M}} q' : \Delta \\
-  \vdash \vec{\iota} : \Gamma
-}
-{
-  \vdash \exImport{q'} \cons \vec{\iota} : \set{\bind{x_1}{\modEntry{x_1}}} \runion \Gamma
-}}
+
 \end{mathpar}
 
-\begingroup
-\color{blue}
 \flushleft \shadebox{$q, \theta \wraps \Gamma$}
 \begin{mathpar}
 \small
@@ -127,8 +91,7 @@
   q.x, \theta \wraps \Gamma
 }
 \end{mathpar}
-\endgroup
-\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$; \textcolor{blue}{loaded reference $\theta$ for module $q$ wraps into a binding for the head of $q$}}
+\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$; loaded reference $\theta$ for module $q$ wraps into a binding for the head of $q$}
 \end{subfigure}
 
 \vspace{2mm}
@@ -183,10 +146,10 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash_{{\color{blue}\mathsf{load}}\,{\color{deletedgray}\mathcal{M}}} q : {\color{blue}\Gamma}\,{\color{deletedgray}\Delta}$}
+\flushleft \shadebox{$\vdash_{\mathsf{load}} q : \Gamma$}
 \begin{mathpar}
 \small
-{\color{blue}
+
 \inferrule*[lab={\ruleName{module}}]
 {
   \mathcal{M}(q) = \vec{\iota}\;\vec{s} \\
@@ -196,32 +159,8 @@
 }
 {
   \vdash_{\mathsf{load}} q : \submodules(q) \runion \Delta
-}}
-\and
-{\color{deletedgray}
-\inferrule*[lab={\ruleName{module-simple}}]
-{
-  \mathcal{M}(x) = \vec{\iota}\;\vec{s} \\
-  \vdash \vec{\iota} : \Gamma \\
-  \Gamma \vdash \bodyOf(x) : \Delta \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{y \mid x.y \in \dom(\mathcal{M})} = \varnothing
 }
-{
-  \vdash_{\mathcal{M}} x : \Delta
-}}
-\and
-{\color{deletedgray}
-\inferrule*[lab={\ruleName{module-qualified}}]
-{
-  \vdash_{\mathcal{M}} q : \Gamma'' \\
-  \mathcal{M}(q.x) = \vec{\iota}\;\vec{s} \\
-  \vdash \vec{\iota} : \Gamma \\
-  \Gamma \vdash \bodyOf(q.x) : \Delta \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{y \mid q.x.y \in \dom(\mathcal{M})} = \varnothing
-}
-{
-  \vdash_{\mathcal{M}} q.x : \Delta
-}}
+
 \end{mathpar}
 
 \flushleft \shadebox{$\vdash \mathcal{M}$}

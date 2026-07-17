@@ -19,16 +19,13 @@ with $\assigns{\varnothing}$ as left and right unit.
 \input{fig/well-formed-env}
 
 Module and program evaluation are given in \figref{eval-modules}; importing names from a loaded module in
-\figref{eval-imports}. \Added{Extend (Definition~\ref{def:extend}) extends to module values by reading its equations with a loaded reference $\exModF{q}{\rho}$ carrying an environment in place of a context.} The loading judgement $q \Rightarrow_{\mathsf{load}} \rho$ evaluates the import prefix
-of $q$ and then its statements, mirroring the well-formedness judgement $\vdash_{{\color{blue}\mathsf{load}}\,{\color{deletedgray}\mathcal{M}}} q : {\color{blue}\Gamma}\,{\color{deletedgray}\Delta}$
+\figref{eval-imports}. Extend (Definition~\ref{def:extend}) extends to module values by reading its equations with a loaded reference $\exModF{q}{\rho}$ carrying an environment in place of a context. The loading judgement $q \Rightarrow_{\mathsf{load}} \rho$ evaluates the import prefix
+of $q$ and then its statements, mirroring the well-formedness judgement $\vdash_{\mathsf{load}} q : \Gamma$
 (\figref{well-formed-module}); as with the static rules, the mutual
 recursion between loading and evaluation is grounded by the acyclicity of $G_{\mathcal{M}}$.
-\Added{Loading takes a single module; the ancestors of an imported module are loaded, once each, by the wraps judgement.}
-\Deleted{Loading is deterministic, so the metafunction $\cacheEnv(q)$, the unique $\rho$ such that $q \Rightarrow_{\mathsf{load}} \rho$, is well-defined (\figref{eval-expr}).}
-\Replaced{The correspondence is exact: if $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \rho$ then $\vdash \rho : \Gamma$ (\figref{well-formed-env}).}{Loading
-mirrors the static structure: for a well-formed module $q$, $\vdash \cacheEnv(q) : \members(q)$
-(\figref{well-formed-env}), and the bindings produced by the import prefix conform to the context produced by
-its well-formedness judgement.} Since
+Loading takes a single module; the ancestors of an imported module are loaded, once each, by the wraps judgement.
+
+The correspondence is exact: if $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \rho$ then $\vdash \rho : \Gamma$ (\figref{well-formed-env}). Since
 imports precede statements, every module a statement can reference is loaded before the statement runs, and
 since loading has no observable effects, reloading a module is unobservable; the semantics therefore needs no
 cache of loaded modules. These rules use the environment $\rho_{\pymath{builtins}}$ binding the names of

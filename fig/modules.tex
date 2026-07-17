@@ -4,15 +4,14 @@
 \small
 \begin{align*}
 \imports(\exImport{q}) &= \set{q} \\
-\imports(\exFromImport{q}{x_1, \ldots, x_{n+1}}) &= \set{q} \cup {\color{blue}\set{q.x_i \mid x_i \in \dom(\submodules(q))}}\,{\color{deletedgray}\set{q.x_i \mid q.x_i \in \dom(\mathcal{M})}} \\
+\imports(\exFromImport{q}{x_1, \ldots, x_{n+1}}) &= \set{q} \cup \set{q.x_i \mid x_i \in \dom(\submodules(q))} \\
 \\
 \parents(x) &= \varnothing \\
 \parents(q.x) &= \parents(q) \cup \set{q} \\
 \\
-{\color{deletedgray}\deps(q)} &= {\color{deletedgray}\textstyle\bigcup\,\set{\set{q'} \cup \parents(q') \mid q' \in \imports(\mathcal{M}(q))}} \\
-{\color{blue}\submodules(q)} &= {\color{blue}\set{\bind{x}{\exMod{q.x}} \mid q.x \in \dom(\mathcal{M})}}
+\submodules(q) &= \set{\bind{x}{\exMod{q.x}} \mid q.x \in \dom(\mathcal{M})}
 \end{align*}
-\subcaption{$\imports$, $\parents$\textcolor{deletedgray}{, $\deps$}, and \textcolor{blue}{$\submodules$} metafunctions}
+\subcaption{$\imports$, $\parents$, and $\submodules$ metafunctions}
 \end{subfigure}
 
 \vspace{2mm}

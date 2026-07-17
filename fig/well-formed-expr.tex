@@ -3,43 +3,34 @@
 \flushleft \shadebox{$\Gamma \vdash q \names \theta$}
 \begin{mathpar}
 \small
-{\color{blue}
+
 \inferrule*[lab={\ruleName{simple-var}}]
 {
   \bind{x}{\statusDefAssigned} \in \Gamma
 }
 {
   \Gamma \vdash x \names \statusDefAssigned
-}}
+}
 \and
-{\color{blue}
+
 \inferrule*[lab={\ruleName{simple-module}}]
 {
   \bind{x}{\exModF{q}{\Gamma'}} \in \Gamma
 }
 {
   \Gamma \vdash x \names \exModF{q}{\Gamma'}
-}}
+}
 \and
-{\color{blue}
+
 \inferrule*[lab={\ruleName{simple-class}}]
 {
   \bind{x}{C} \in \Gamma
 }
 {
   \Gamma \vdash x \names C
-}}
-\and
-{\color{deletedgray}
-\inferrule*[lab={\ruleName{simple}}]
-{
-  \bind{x}{\theta} \in \Gamma
 }
-{
-  \Gamma \vdash x \names \theta
-}}
 \and
-{\color{blue}
+
 \inferrule*[lab={\ruleName{qualified}}]
 {
   \Gamma \vdash q \names \exModF{q'}{\Gamma'} \\
@@ -47,31 +38,10 @@
 }
 {
   \Gamma \vdash q.x \names \theta
-}}
-\and
-{\color{deletedgray}
-\inferrule*[lab={\ruleName{qualified}}]
-{
-  \Gamma \vdash q \names \modEntry{q'} \\
-  \vdash_{\mathcal{M}} q' : \Delta \\
-  \bind{x}{\theta} \in \Delta
 }
-{
-  \Gamma \vdash q.x \names \theta
-}}
-\and
-{\color{deletedgray}
-\inferrule*[lab={\ruleName{qualified-submodule}}]
-{
-  \Gamma \vdash q \names \modEntry{q'} \\
-  q'.x \in \dom(\mathcal{M}) \\
-  q'.x \in \deps(q_0)
-}
-{
-  \Gamma \vdash q.x \names \modEntry{q'.x}
-}}
+
 \end{mathpar}
-\subcaption{Name $q$ resolves to context entry $\theta$ under $\Gamma$\textcolor{deletedgray}{, in the body of module $q_0$}}
+\subcaption{Name $q$ resolves to context entry $\theta$ under $\Gamma$}
 \end{subfigure}
 
 \vspace{2mm}
@@ -116,14 +86,14 @@
   \Gamma \vdash \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}}
 }
 \and
-{\color{blue}
+
 \inferrule*[lab={\ruleName{attr-module}}]
 {
   \Gamma \vdash \exProject{e}{y} \names \statusDefAssigned
 }
 {
   \Gamma \vdash \exProject{e}{y}
-}}
+}
 \and
 \inferrule*[lab={\ruleName{attr-object}}]
 {

@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{${\color{blue}\rho}\,{\color{deletedgray}q}, \vec{x} \importsR \rho'$}
+\flushleft \shadebox{$\rho, \vec{x} \importsR \rho'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{imp-nil}}]
@@ -7,10 +7,10 @@
   \strut
 }
 {
-  {\color{blue}\rho}\,{\color{deletedgray}q}, \varepsilon \importsR \varnothing
+  \rho, \varepsilon \importsR \varnothing
 }
 \and
-{\color{blue}
+
 \inferrule*[lab={\ruleName{imp-member}}]
 {
   \bind{x}{v} \in \rho \\
@@ -19,9 +19,9 @@
 }
 {
   \rho, x \cons \vec{x} \importsR \set{\bind{x}{v}} \runion \rho'
-}}
+}
 \and
-{\color{blue}
+
 \inferrule*[lab={\ruleName{imp-submodule}}]
 {
   \bind{x}{\exMod{q'}} \in \rho \\
@@ -30,32 +30,11 @@
 }
 {
   \rho, x \cons \vec{x} \importsR \set{\bind{x}{\exModF{q'}{\rho''}}} \runion \rho'
-}}
-\and
-{\color{deletedgray}
-\inferrule*[lab={\ruleName{imp-member}}]
-{
-  \bind{x}{v} \in \cacheEnv(q) \\
-  v \neq \exMod{q'} \\
-  q, \vec{x} \importsR \rho
 }
-{
-  q, x \cons \vec{x} \importsR \set{\bind{x}{v}} \runion \rho
-}}
-\and
-{\color{deletedgray}
-\inferrule*[lab={\ruleName{imp-module}}]
-{
-  \bind{x}{\exMod{q'}} \in \cacheEnv(q) \\
-  q' \Rightarrow_{\mathsf{load}} \rho' \\
-  q, \vec{x} \importsR \rho
-}
-{
-  q, x \cons \vec{x} \importsR \set{\bind{x}{\exMod{q'}}} \runion \rho
-}}
+
 \end{mathpar}
 
-\caption{Names $\vec{x}$ imported from \textcolor{blue}{module environment $\rho$}\textcolor{deletedgray}{ module $q$} produce bindings $\rho'$}
+\caption{Names $\vec{x}$ imported from module environment $\rho$ produce bindings $\rho'$}
 \label{fig:eval-imports}
 \end{figure}
 
@@ -72,7 +51,7 @@
   \vdash \varepsilon \Rightarrow \varnothing
 }
 \and
-{\color{blue}
+
 \inferrule*[lab={\ruleName{eval-import}}]
 {
   q \Rightarrow_{\mathsf{load}} \rho \\
@@ -81,32 +60,20 @@
 }
 {
   \vdash \exImport{q} \cons \vec{\iota} \Rightarrow \rho' \extend \rho''
-}}
+}
 \and
 \inferrule*[lab={\ruleName{eval-from-import}}]
 {
   q \Rightarrow_{\mathsf{load}} \rho \\
-  {\color{blue}\rho}\,{\color{deletedgray}q'}, \vec{x} \importsR \rho' \\
+  \rho, \vec{x} \importsR \rho' \\
   \vdash \vec{\iota} \Rightarrow \rho''
 }
 {
-  \vdash \exFromImport{q}{\vec{x}} \cons \vec{\iota} \Rightarrow \rho' {\color{blue}\extend}\,{\color{deletedgray}\runion} \rho''
+  \vdash \exFromImport{q}{\vec{x}} \cons \vec{\iota} \Rightarrow \rho' \extend \rho''
 }
-\and
-{\color{deletedgray}
-\inferrule*[lab={\ruleName{eval-import}}]
-{
-  q' = x_1.x_2.\cdots.x_{n+1} \\
-  q' \Rightarrow_{\mathsf{load}} \rho' \\
-  \vdash \vec{\iota} \Rightarrow \rho
-}
-{
-  \vdash \exImport{q'} \cons \vec{\iota} \Rightarrow \set{\bind{x_1}{\exMod{x_1}}} \runion \rho
-}}
+
 \end{mathpar}
 
-\begingroup
-\color{blue}
 \flushleft \shadebox{$q, v \wraps \rho$}
 \begin{mathpar}
 \small
@@ -127,8 +94,7 @@
   q.x, v \wraps \rho
 }
 \end{mathpar}
-\endgroup
-\subcaption{Import prefix $\vec{\iota}$ produces bindings $\rho$; \textcolor{blue}{loaded reference $v$ for module $q$ wraps into a binding for the head of $q$}}
+\subcaption{Import prefix $\vec{\iota}$ produces bindings $\rho$; loaded reference $v$ for module $q$ wraps into a binding for the head of $q$}
 \end{subfigure}
 
 \vspace{2mm}
@@ -181,7 +147,7 @@
 \flushleft \shadebox{$q \Rightarrow_{\mathsf{load}} \rho$}
 \begin{mathpar}
 \small
-{\color{blue}
+
 \inferrule*[lab={\ruleName{load}}]
 {
   \mathcal{M}(q) = \vec{\iota}\;\vec{s} \\
@@ -190,30 +156,8 @@
 }
 {
   q \Rightarrow_{\mathsf{load}} \submodules(q) \runion \rho'
-}}
-\and
-{\color{deletedgray}
-\inferrule*[lab={\ruleName{load-simple}}]
-{
-  \mathcal{M}(x) = \vec{\iota}\;\vec{s} \\
-  \vdash \vec{\iota} \Rightarrow \rho' \\
-  \rho', \bodyOf(x) \Rightarrow \rho
 }
-{
-  x \Rightarrow_{\mathsf{load}} \submodules(x) \runion \rho
-}}
-\and
-{\color{deletedgray}
-\inferrule*[lab={\ruleName{load-qualified}}]
-{
-  q \Rightarrow_{\mathsf{load}} \rho'' \\
-  \mathcal{M}(q.x) = \vec{\iota}\;\vec{s} \\
-  \vdash \vec{\iota} \Rightarrow \rho' \\
-  \rho', \bodyOf(q.x) \Rightarrow \rho
-}
-{
-  q.x \Rightarrow_{\mathsf{load}} \submodules(q.x) \runion \rho
-}}
+
 \end{mathpar}
 
 \flushleft \shadebox{$\mathcal{M} \Rightarrow n$}
