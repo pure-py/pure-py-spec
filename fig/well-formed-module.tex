@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma, \vec{x} \importsR \Gamma'$}
+\flushleft \shadebox{$\Gamma, \seq{x} \importsR \Gamma'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{imp-nil}}]
@@ -13,30 +13,30 @@
 \inferrule*[lab={\ruleName{imp-member}}]
 {
   \Gamma \vdash x \names \theta \\
-  \Gamma, \vec{x} \importsR \Gamma'
+  \Gamma, \seq{x} \importsR \Gamma'
 }
 {
-  \Gamma, x \cons \vec{x} \importsR \set{\bind{x}{\theta}} \override \Gamma'
+  \Gamma, x \cons \seq{x} \importsR \set{\bind{x}{\theta}} \override \Gamma'
 }
 \and
 \inferrule*[lab={\ruleName{imp-submodule}}]
 {
   \bind{x}{\modStub{q}} \in \Gamma \\
   \vdash_{\mathsf{load}} q : \Delta \\
-  \Gamma, \vec{x} \importsR \Gamma'
+  \Gamma, \seq{x} \importsR \Gamma'
 }
 {
-  \Gamma, x \cons \vec{x} \importsR \set{\bind{x}{\modLoaded{q}{\Delta}}} \override \Gamma'
+  \Gamma, x \cons \seq{x} \importsR \set{\bind{x}{\modLoaded{q}{\Delta}}} \override \Gamma'
 }
 \end{mathpar}
 
-\caption{Names $\vec{x}$ imported from module context $\Gamma$ produce bindings $\Gamma'$}
+\caption{Names $\seq{x}$ imported from module context $\Gamma$ produce bindings $\Gamma'$}
 \label{fig:imports}
 \end{figure}
 
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash \vec{\iota} : \Gamma$}
+\flushleft \shadebox{$\vdash \seq{\iota} : \Gamma$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{imports-nil}}]
@@ -53,21 +53,21 @@
   q = x \cons \seq{x} \\
   \vdash_{\mathsf{load}} q : \Delta \\
   q, \modLoaded{q}{\Delta} \loadsTo \theta \\
-  \vdash \vec{\iota} : \Gamma
+  \vdash \seq{\iota} : \Gamma
 }
 {
-  \vdash \exImport{q} \cons \vec{\iota} : \set{\bind{x}{\theta}} \extend \Gamma
+  \vdash \exImport{q} \cons \seq{\iota} : \set{\bind{x}{\theta}} \extend \Gamma
 }
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q : \Delta \\
   q, \modLoaded{q}{\Delta} \loadsTo \theta \\
-  \Delta, \vec{x} \importsR \Gamma' \\
-  \vdash \vec{\iota} : \Gamma
+  \Delta, \seq{x} \importsR \Gamma' \\
+  \vdash \seq{\iota} : \Gamma
 }
 {
-  \vdash \exFromImport{q}{\vec{x}} \cons \vec{\iota} : \Gamma' \extend \Gamma
+  \vdash \exFromImport{q}{\seq{x}} \cons \seq{\iota} : \Gamma' \extend \Gamma
 }
 
 \end{mathpar}
@@ -92,13 +92,13 @@
   q.x, \theta \loadsTo \theta'
 }
 \end{mathpar}
-\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$; loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}
+\subcaption{Import prefix $\seq{\iota}$ produces bindings $\Gamma$; loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}
 \end{subfigure}
 
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash \vec{s} : \Delta$}
+\flushleft \shadebox{$\Gamma \vdash \seq{s} : \Delta$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{nil}}]
@@ -112,36 +112,36 @@
 \inferrule*[lab={\ruleName{statement}}]
 {
   \Gamma \vdash s : \Assigns{\Delta} \\
-  \Gamma \override \Delta \vdash \vec{s} : \Delta' \\
-  \capturesS(s) \cap \assignsS(\vec{s}) = \varnothing
+  \Gamma \override \Delta \vdash \seq{s} : \Delta' \\
+  \capturesS(s) \cap \assignsS(\seq{s}) = \varnothing
 }
 {
-  \Gamma \vdash s \cons \vec{s} : \Delta \override \Delta'
+  \Gamma \vdash s \cons \seq{s} : \Delta \override \Delta'
 }
 \and
 \inferrule*[lab={\ruleName{class}}]
 {
-  \ownFields(\phi) = \vec{x} \text{ distinct} \\
-  C = \clsEntry{\Gamma}{q}{\vec{x}}{\bot} \\
-  \Gamma, \bind{c}{C} \vdash \vec{s} : \Delta
+  \ownFields(\phi) = \seq{x} \text{ distinct} \\
+  C = \clsEntry{\Gamma}{q}{\seq{x}}{\bot} \\
+  \Gamma, \bind{c}{C} \vdash \seq{s} : \Delta
 }
 {
-  \Gamma \vdash \exDataclass{c}{\phi} \cons \vec{s} : \set{\bind{c}{C}} \override \Delta
+  \Gamma \vdash \exDataclass{c}{\phi} \cons \seq{s} : \set{\bind{c}{C}} \override \Delta
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \bind{c'}{\clsEntry{\Delta}{q}{\vec{y}}{c''}} \in \Gamma \\
-  \ownFields(\phi) = \vec{x} \text{ distinct} \\
-  \vec{x} \cap \fields(\Gamma(c')) = \varnothing \\
-  C = \clsEntry{\Gamma}{q}{\vec{x}}{c'} \\
-  \Gamma, \bind{c}{C} \vdash \vec{s} : \Delta
+  \bind{c'}{\clsEntry{\Delta}{q}{\seq{y}}{c''}} \in \Gamma \\
+  \ownFields(\phi) = \seq{x} \text{ distinct} \\
+  \seq{x} \cap \fields(\Gamma(c')) = \varnothing \\
+  C = \clsEntry{\Gamma}{q}{\seq{x}}{c'} \\
+  \Gamma, \bind{c}{C} \vdash \seq{s} : \Delta
 }
 {
-  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons \vec{s} : \set{\bind{c}{C}} \override \Delta
+  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons \seq{s} : \set{\bind{c}{C}} \override \Delta
 }
 \end{mathpar}
-\subcaption{Statements $\vec{s}$ of module $q$ are well-formed in $\Gamma$}
+\subcaption{Statements $\seq{s}$ of module $q$ are well-formed in $\Gamma$}
 \end{subfigure}
 
 \vspace{2mm}
@@ -153,9 +153,9 @@
 
 \inferrule*[lab={\ruleName{module}}]
 {
-  \mathcal{M}(q) = \vec{\iota}\;\vec{s} \\
-  \vdash \vec{\iota} : \Gamma \\
-  \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \vec{s} : \Delta \\
+  \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
+  \vdash \seq{\iota} : \Gamma \\
+  \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} : \Delta \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submodules(q)) = \varnothing
 }
 {

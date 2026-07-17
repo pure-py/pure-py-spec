@@ -61,7 +61,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-def}}]
 {
-  d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
+  d_i = \exDef{f_i}{\seq{x}_i}{b_i} \quad (\forall i) \\
   v_i = \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} \quad (\forall i)
 }
 {
@@ -149,13 +149,13 @@
   \strut
 }
 {
-  \rho, \exLambda{x_1, \ldots, x_n}{e} \Rightarrow \exLamClosure[\Gamma]{\rho}{\vec{x}}{e}
+  \rho, \exLambda{x_1, \ldots, x_n}{e} \Rightarrow \exLamClosure[\Gamma]{\rho}{\seq{x}}{e}
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-lambda}}]
 {
-  \rho, e \Rightarrow \exLamClosure[\Delta]{\rho'}{\vec{x}}{e'} \\
-  \rho, \vec{e} \Rightarrow \vec{u} \\
+  \rho, e \Rightarrow \exLamClosure[\Delta]{\rho'}{\seq{x}}{e'} \\
+  \rho, \seq{e} \Rightarrow \seq{u} \\
   \rho' \override \set{\bind{\seq{x}}{\seq{u}}}, e' \Rightarrow v
 }
 {
@@ -165,9 +165,9 @@
 \inferrule*[lab={\ruleName{eval-call-def}}]
 {
   \rho, e \Rightarrow \exDefClosure[\Delta]{\rho'}{\seq{d}}{j} \\
-  d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
+  d_i = \exDef{f_i}{\seq{x}_i}{b_i} \quad (\forall i) \\
   v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
-  \rho, \vec{e} \Rightarrow \vec{u} \\
+  \rho, \seq{e} \Rightarrow \seq{u} \\
   \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, b_j \Rightarrow r
 }
 {
@@ -195,7 +195,7 @@
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i) \\
   \resolveClass(\rho, q) = (c, C) \\
-  C = \clsEntry{\Delta}{q'}{\vec{z}}{c'} \\
+  C = \clsEntry{\Delta}{q'}{\seq{z}}{c'} \\
   \fields(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}
 }
 {

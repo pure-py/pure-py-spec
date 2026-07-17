@@ -61,7 +61,7 @@
 \inferrule*[lab={\ruleName{pat-constr}}]
 {
   \resolveClass(\rho, q) = (c, C) \\
-  C = \clsEntry{\Delta}{q'}{\vec{z}}{c'} \\
+  C = \clsEntry{\Delta}{q'}{\seq{z}}{c'} \\
   \fields(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m} \\
   \rho, p_i, \rho''(x_i) \matches \rho_i \quad (\forall i.\, 1 \le i \le n) \\
   \rho, p_{n+j}, \rho''(y_j) \matches \rho_{n+j} \quad (\forall j.\, 1 \le j \le m)

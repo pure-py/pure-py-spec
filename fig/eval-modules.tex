@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\rho, \vec{x} \importsR \rho'$}
+\flushleft \shadebox{$\rho, \seq{x} \importsR \rho'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{imp-nil}}]
@@ -15,10 +15,10 @@
 {
   \bind{x}{v} \in \rho \\
   v \neq \modStub{q'} \quad (\forall q') \\
-  \rho, \vec{x} \importsR \rho'
+  \rho, \seq{x} \importsR \rho'
 }
 {
-  \rho, x \cons \vec{x} \importsR \set{\bind{x}{v}} \override \rho'
+  \rho, x \cons \seq{x} \importsR \set{\bind{x}{v}} \override \rho'
 }
 \and
 
@@ -26,21 +26,21 @@
 {
   \bind{x}{\modStub{q'}} \in \rho \\
   q' \Rightarrow_{\mathsf{load}} \rho'' \\
-  \rho, \vec{x} \importsR \rho'
+  \rho, \seq{x} \importsR \rho'
 }
 {
-  \rho, x \cons \vec{x} \importsR \set{\bind{x}{\modLoaded{q'}{\rho''}}} \override \rho'
+  \rho, x \cons \seq{x} \importsR \set{\bind{x}{\modLoaded{q'}{\rho''}}} \override \rho'
 }
 
 \end{mathpar}
 
-\caption{Names $\vec{x}$ imported from module environment $\rho$ produce bindings $\rho'$}
+\caption{Names $\seq{x}$ imported from module environment $\rho$ produce bindings $\rho'$}
 \label{fig:eval-imports}
 \end{figure}
 
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash \vec{\iota} \Rightarrow \rho$}
+\flushleft \shadebox{$\vdash \seq{\iota} \Rightarrow \rho$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-imports-nil}}]
@@ -57,20 +57,20 @@
   q = x \cons \seq{x} \\
   q \Rightarrow_{\mathsf{load}} \rho \\
   q, \modLoaded{q}{\rho} \loadsTo v \\
-  \vdash \vec{\iota} \Rightarrow \rho'
+  \vdash \seq{\iota} \Rightarrow \rho'
 }
 {
-  \vdash \exImport{q} \cons \vec{\iota} \Rightarrow \set{\bind{x}{v}} \extend \rho'
+  \vdash \exImport{q} \cons \seq{\iota} \Rightarrow \set{\bind{x}{v}} \extend \rho'
 }
 \and
 \inferrule*[lab={\ruleName{eval-from-import}}]
 {
   q \Rightarrow_{\mathsf{load}} \rho \\
-  \rho, \vec{x} \importsR \rho' \\
-  \vdash \vec{\iota} \Rightarrow \rho''
+  \rho, \seq{x} \importsR \rho' \\
+  \vdash \seq{\iota} \Rightarrow \rho''
 }
 {
-  \vdash \exFromImport{q}{\vec{x}} \cons \vec{\iota} \Rightarrow \rho' \extend \rho''
+  \vdash \exFromImport{q}{\seq{x}} \cons \seq{\iota} \Rightarrow \rho' \extend \rho''
 }
 
 \end{mathpar}
@@ -95,13 +95,13 @@
   q.x, v \loadsTo v'
 }
 \end{mathpar}
-\subcaption{Import prefix $\vec{\iota}$ produces bindings $\rho$; loaded reference $v$ for module $q$ loads to the reference for the head of $q$}
+\subcaption{Import prefix $\seq{\iota}$ produces bindings $\rho$; loaded reference $v$ for module $q$ loads to the reference for the head of $q$}
 \end{subfigure}
 
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\rho, \vec{s} \Rightarrow \rho'$}
+\flushleft \shadebox{$\rho, \seq{s} \Rightarrow \rho'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-nil}}]
@@ -115,31 +115,31 @@
 \inferrule*[lab={\ruleName{eval-statement}}]
 {
   \rho, s \Rightarrow \assigns{\rho'} \\
-  \rho \override \rho', \vec{s} \Rightarrow \rho''
+  \rho \override \rho', \seq{s} \Rightarrow \rho''
 }
 {
-  \rho, s \cons \vec{s} \Rightarrow \rho' \override \rho''
+  \rho, s \cons \seq{s} \Rightarrow \rho' \override \rho''
 }
 \and
 \inferrule*[lab={\ruleName{eval-class}}]
 {
   C = \clsEntry{\Gamma}{q}{\ownFields(\phi)}{\bot} \\
-  \rho \override \set{\bind{c}{C}}, \vec{s} \Rightarrow \rho'
+  \rho \override \set{\bind{c}{C}}, \seq{s} \Rightarrow \rho'
 }
 {
-  \rho, \exDataclass{c}{\phi} \cons \vec{s} \Rightarrow \set{\bind{c}{C}} \override \rho'
+  \rho, \exDataclass{c}{\phi} \cons \seq{s} \Rightarrow \set{\bind{c}{C}} \override \rho'
 }
 \and
 \inferrule*[lab={\ruleName{eval-class-extend}}]
 {
   C = \clsEntry{\Gamma}{q}{\ownFields(\phi)}{c'} \\
-  \rho \override \set{\bind{c}{C}}, \vec{s} \Rightarrow \rho'
+  \rho \override \set{\bind{c}{C}}, \seq{s} \Rightarrow \rho'
 }
 {
-  \rho, \exDataclassExtend{c}{c'}{\phi} \cons \vec{s} \Rightarrow \set{\bind{c}{C}} \override \rho'
+  \rho, \exDataclassExtend{c}{c'}{\phi} \cons \seq{s} \Rightarrow \set{\bind{c}{C}} \override \rho'
 }
 \end{mathpar}
-\subcaption{Statements $\vec{s}$ of module $q$ evaluate under environment $\rho : \Gamma$, producing bindings $\rho'$}
+\subcaption{Statements $\seq{s}$ of module $q$ evaluate under environment $\rho : \Gamma$, producing bindings $\rho'$}
 \end{subfigure}
 
 \vspace{2mm}
@@ -151,9 +151,9 @@
 
 \inferrule*[lab={\ruleName{load}}]
 {
-  \mathcal{M}(q) = \vec{\iota}\;\vec{s} \\
-  \vdash \vec{\iota} \Rightarrow \rho \\
-  \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \vec{s} \Rightarrow \rho'
+  \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
+  \vdash \seq{\iota} \Rightarrow \rho \\
+  \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} \Rightarrow \rho'
 }
 {
   q \Rightarrow_{\mathsf{load}} \submodules(q) \override \rho'

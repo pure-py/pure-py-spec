@@ -18,7 +18,7 @@ A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the fo
 \begin{itemize}
 \item the variable's \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
 \item a \emph{module reference}, for a fully-qualified module name $q$: either a \emph{stub} $\modStub{q}$, or \emph{loaded} reference $\modLoaded{q}{\Gamma}$, which also carries the member context $\Gamma$ of $q$;
-\item a \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q}{\vec{x}}{c}$, recording the declaring context $\Gamma$, defining module $q$, sequence of distinct field names $\vec{x}$, and base class $c$ (or $\bot$ for no base).
+\item a \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q}{\seq{x}}{c}$, recording the declaring context $\Gamma$, defining module $q$, sequence of distinct field names $\seq{x}$, and base class $c$ (or $\bot$ for no base).
 \end{itemize}
 \end{definition}
 
@@ -123,7 +123,7 @@ A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualifie
 (\figref{syntax-stmt}) to \emph{module bodies} $t$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
 $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
-$\vec{\iota}$ followed by a sequence of statements $\vec{s}$; since imports are not statements, they can
+$\seq{\iota}$ followed by a sequence of statements $\seq{s}$; since imports are not statements, they can
 appear neither in blocks (and hence not in function bodies) nor after the first non-import statement. The
 well-formedness and evaluation rules check and evaluate the statements of each body $\mathcal{M}(q)$ with the
 assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
@@ -157,7 +157,7 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \label{fig:predefined}
 \end{figure}
 
-The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ from individual imports to import sequences; on a module body $\vec{\iota}\;\vec{s}$, they act on $\vec{s}$ and $\vec{\iota}$ respectively. The metafunction $\parents$ collects the proper prefixes of a
+The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ from individual imports to import sequences; on a module body $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively. The metafunction $\parents$ collects the proper prefixes of a
 fully-qualified name.
 
 \input{fig/modules}

@@ -42,7 +42,7 @@
   \seq{f} \text{ distinct}
 }
 {
-  \vdash \exDefClosure[\Gamma]{\rho}{\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}}{i}
+  \vdash \exDefClosure[\Gamma]{\rho}{\exDef{f_1}{\seq{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}}{b_{n+1}}}{i}
 }
 \and
 \inferrule*[lab={\ruleName{val-obj}}]
@@ -76,7 +76,7 @@
   \strut
 }
 {
-  \vdash \clsEntry{\Gamma}{q}{\vec{x}}{\bot}
+  \vdash \clsEntry{\Gamma}{q}{\seq{x}}{\bot}
 }
 \and
 \inferrule*[lab={\ruleName{val-class-extend}}]
@@ -84,7 +84,7 @@
   \bind{c}{C} \in \Gamma
 }
 {
-  \vdash \clsEntry{\Gamma}{q}{\vec{x}}{c}
+  \vdash \clsEntry{\Gamma}{q}{\seq{x}}{c}
 }
 \end{mathpar}
 
