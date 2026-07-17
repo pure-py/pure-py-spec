@@ -47,17 +47,17 @@ class ClassEntry:
 
 
 @dataclass(frozen=True)
-class ModuleRef:
+class ModuleStub:
     q: str
 
 
 @dataclass(frozen=True)
-class ModuleFull:
+class ModuleLoaded:
     q: str
     members: 'Context'
 
 
-ContextEntry = Union[Status, ModuleRef, ModuleFull, ClassEntry]
+ContextEntry = Union[Status, ModuleStub, ModuleLoaded, ClassEntry]
 Context = dict[str, ContextEntry]
 VarContext = dict[str, Status]
 
@@ -87,9 +87,9 @@ def class_of(ctx: 'ModuleContext', c: str) -> Optional[ClassEntry]:
     v = ctx.gamma.get(c)
     return v if isinstance(v, ClassEntry) else None
 
-def module_of(ctx: 'ModuleContext', x: str) -> Optional[Union[ModuleRef, ModuleFull]]:
+def module_of(ctx: 'ModuleContext', x: str) -> Optional[Union[ModuleStub, ModuleLoaded]]:
     v = ctx.gamma.get(x)
-    return v if isinstance(v, (ModuleRef, ModuleFull)) else None
+    return v if isinstance(v, (ModuleStub, ModuleLoaded)) else None
 
 
 @dataclass(frozen=True)
@@ -292,9 +292,9 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
     check_distinct_names(defs[1:], seen | {head.name})
 
 def extend_entry(a: ContextEntry, b: ContextEntry) -> ContextEntry:
-    if isinstance(a, ModuleFull) and isinstance(b, ModuleFull) and a.q == b.q:
-        return ModuleFull(a.q, extend_context(a.members, b.members))
-    if isinstance(a, ModuleFull) and isinstance(b, ModuleRef) and a.q == b.q:
+    if isinstance(a, ModuleLoaded) and isinstance(b, ModuleLoaded) and a.q == b.q:
+        return ModuleLoaded(a.q, extend_context(a.members, b.members))
+    if isinstance(a, ModuleLoaded) and isinstance(b, ModuleStub) and a.q == b.q:
         return a
     return b
 
@@ -306,11 +306,11 @@ def extend_context(g1: Context, g2: Context) -> Context:
 
 def import_entry(q: str, ctx: ModuleContext) -> tuple[str, ContextEntry]:
     parts = q.split('.')
-    entry: ContextEntry = ModuleFull(q, check_module(ctx.M[q], ctx.M, q))
+    entry: ContextEntry = ModuleLoaded(q, check_module(ctx.M[q], ctx.M, q))
     for i in range(len(parts) - 1, 0, -1):
         parent = '.'.join(parts[:i])
         parent_ctx = check_module(ctx.M[parent], ctx.M, parent)
-        entry = ModuleFull(parent, extend_context(parent_ctx, {parts[i]: entry}))
+        entry = ModuleLoaded(parent, extend_context(parent_ctx, {parts[i]: entry}))
     return parts[0], entry
 
 def check_imports_prefix(prefix: list[ast.stmt], ctx: ModuleContext) -> Context:
@@ -330,20 +330,30 @@ def check_imports_prefix(prefix: list[ast.stmt], ctx: ModuleContext) -> Context:
             if s.module not in ctx.M:
                 raise IllFormedModule(s, reasons.UnknownModule(s.module))
             gamma_src = check_module(ctx.M[s.module], ctx.M, s.module)
+            check_ancestors(s.module, ctx)
             bindings = {a.name: imported_entry(s, a.name, s.module, gamma_src, ctx) for a in s.names}
             gamma = extend_context(gamma, bindings)
     return gamma
 
-def submodule_names(M: dict[str, ast.Module], q: str) -> set[str]:
-    return {name[len(q) + 1:].split('.')[0] for name in M if name.startswith(f'{q}.')}
+def check_ancestors(q: str, ctx: ModuleContext) -> None:
+    parts = q.split('.')
+    for i in range(len(parts) - 1, 0, -1):
+        parent = '.'.join(parts[:i])
+        check_module(ctx.M[parent], ctx.M, parent)
+
+def submodules(M: dict[str, ast.Module], q: str) -> Context:
+    return {x: ModuleStub(f'{q}.{x}')
+            for x in {name[len(q) + 1:].split('.')[0] for name in M if name.startswith(f'{q}.')}}
 
 def imported_entry(s: ast.stmt, x: str, q: str, gamma_src: Context,
                    ctx: ModuleContext) -> ContextEntry:
     entry = gamma_src.get(x)
     if entry is None:
         raise IllFormedModule(s, reasons.UnknownMember(x, q))
-    if isinstance(entry, ModuleRef):
-        return ModuleFull(entry.q, check_module(ctx.M[entry.q], ctx.M, entry.q))
+    if isinstance(entry, ModuleStub):
+        return ModuleLoaded(entry.q, check_module(ctx.M[entry.q], ctx.M, entry.q))
+    if entry == Status.FF:
+        raise IllFormedModule(s, reasons.UnassignedMember(x, q))
     return entry
 
 def own_members(body: list[ast.stmt], q: str) -> set[str]:
@@ -356,7 +366,7 @@ def resolve_entry(e: ast.expr, ctx: ModuleContext) -> Optional[ContextEntry]:
         return ctx.gamma.get(e.id)
     if isinstance(e, ast.Attribute):
         parent = resolve_entry(e.value, ctx)
-        if isinstance(parent, ModuleFull):
+        if isinstance(parent, ModuleLoaded):
             return parent.members.get(e.attr)
         return None
     return None
@@ -409,6 +419,8 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
                 return
             if module_of(ctx, e.id) is not None:
                 raise IllFormedModule(e, reasons.ModuleAsValue(e.id))
+            if class_of(ctx, e.id) is not None:
+                raise IllFormedModule(e, reasons.ClassAsValue(e.id))
             raise IllFormedModule(e, reasons.UnassignedVariable(e.id))
         return
     if isinstance(e, ast.Constant):
@@ -453,16 +465,20 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
         return
     if isinstance(e, ast.Attribute):
         parent = resolve_entry(e.value, ctx)
-        if isinstance(parent, ModuleFull):
+        if isinstance(parent, ModuleLoaded):
             entry = parent.members.get(e.attr)
             if entry is None:
                 raise IllFormedModule(e, reasons.UnknownMember(e.attr, parent.q))
-            if isinstance(entry, ModuleRef):
+            if isinstance(entry, ModuleStub):
                 raise IllFormedModule(e, reasons.SubmoduleNotImported(entry.q))
-            if entry == Status.FF or isinstance(entry, ClassEntry):
+            if isinstance(entry, ModuleLoaded):
+                raise IllFormedModule(e, reasons.ModuleAsValue(qualified_name(e)))
+            if isinstance(entry, ClassEntry):
+                raise IllFormedModule(e, reasons.ClassAsValue(qualified_name(e)))
+            if entry == Status.FF:
                 raise IllFormedModule(e, reasons.UnassignedMember(e.attr, parent.q))
             return
-        if isinstance(parent, ModuleRef):
+        if isinstance(parent, ModuleStub):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(parent.q))
         check_expr(e.value, ctx)
         return
@@ -561,7 +577,7 @@ def names_class(head: ast.expr, ctx: ModuleContext) -> Optional[tuple[str, tuple
         return (head.id, fields_of(entry)) if entry is not None else None
     if isinstance(head, ast.Attribute):
         parent = resolve_entry(head.value, ctx)
-        if not isinstance(parent, ModuleFull):
+        if not isinstance(parent, ModuleLoaded):
             return None
         member = parent.members.get(head.attr)
         if not isinstance(member, ClassEntry):
@@ -900,18 +916,23 @@ def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
     if len(clash) > 0:
         raise IllFormedModule(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
 
+_exports_cache: dict[tuple[int, str], Context] = {}
+
 def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
+    key = (id(M), q)
+    cached = _exports_cache.get(key)
+    if cached is not None:
+        return cached
     try:
-        return check_module_(m, M, q)
+        result = check_module_(m, M, q)
     except IllFormedModule as e:
         if e.module is None:
             e.module = q
         raise
+    _exports_cache[key] = result
+    return result
 
 def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
-    if '.' in q:
-        parent = q.rsplit('.', 1)[0]
-        check_module(M[parent], M, parent)
     nested = find_nested_import(m.body)
     if nested is not None:
         raise IllFormedModule(nested, reasons.NonTopLevelImport())
@@ -929,7 +950,7 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
 
 def check_submodule_clash(m: ast.Module, gamma0: Context, body: list[ast.stmt],
                           M: dict[str, ast.Module], q: str) -> None:
-    clash = sorted((set(gamma0) | own_members(body, q)) & submodule_names(M, q))
+    clash = sorted((set(gamma0) | own_members(body, q)) & set(submodules(M, q)))
     if clash:
         x = clash[0]
         node = find_binder(m.body, x)
@@ -952,7 +973,7 @@ def find_binder(stmts: list[ast.stmt], x: str) -> Optional[ast.stmt]:
     return None
 
 def module_exports(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context:
-    stubs: Context = {x: ModuleRef(f'{q}.{x}') for x in submodule_names(final_ctx.M, q)}
+    stubs: Context = submodules(final_ctx.M, q)
     if q in PREDEFINED_MEMBERS:
         own: Context = {name: Status.TT for name in PREDEFINED_MEMBERS[q] | {'__name__'}}
     else:

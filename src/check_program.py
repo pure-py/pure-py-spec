@@ -87,8 +87,7 @@ def walk_program(entry_path: pathlib.Path) -> None:
         for imp in imports_by_module[name]:
             queue.extend({imp} | parents(imp))
 
-    graph = {name: imps | parents(name) | set().union(*(parents(i) for i in imps))
-             for name, imps in imports_by_module.items()}
+    graph = {name: imps | parents(name) for name, imps in imports_by_module.items()}
     cycle = has_cycle(graph)
     if len(cycle) > 0:
         raise IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")

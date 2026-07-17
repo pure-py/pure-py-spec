@@ -197,12 +197,19 @@ class ModuleAsValue:
         return f"'{self.name}' refers to a module; modules are not first-class values"
 
 
+@dataclass(frozen=True)
+class ClassAsValue:
+    name: str
+    def message(self) -> str:
+        return f"'{self.name}' refers to a class; classes are not first-class values"
+
+
 Reason = Union[
     DuplicateFieldName, UnknownBaseClass, InheritedFieldClash,
     UnassignedVariable, CapturedReassignment, SelfCaptureAssignment,
     UnreachableStatement, ConstructorArityMismatch, PatternArityMismatch,
     UnknownClassInPattern, UnknownFieldInPattern, DuplicatePatternKeyword,
-    UnknownModule, UnknownMember, ModuleAsValue,
+    UnknownModule, UnknownMember, ModuleAsValue, ClassAsValue,
     UnknownConstructorKeyword,
     NonlinearPattern, UnreachableCase, DuplicateMutualName,
     NonTopLevelImport, NonTopLevelClass, TopLevelReturn, EmptyFromImport,
