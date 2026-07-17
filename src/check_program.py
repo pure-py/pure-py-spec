@@ -11,18 +11,12 @@ PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
 
 
 def imports(tree: ast.Module, base_dir: pathlib.Path) -> set[str]:
-    result: set[str] = set()
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Import):
-            result.update(alias.name for alias in node.names)
-        elif isinstance(node, ast.ImportFrom):
-            if node.module is not None:
-                result.add(node.module)
-                for alias in node.names:
-                    candidate = f"{node.module}.{alias.name}"
-                    if resolve(candidate, base_dir) is not None:
-                        result.add(candidate)
-    return result
+    froms = [(n.module, n.names) for n in ast.walk(tree)
+             if isinstance(n, ast.ImportFrom) and n.module is not None]
+    return ({a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
+            | {m for m, _ in froms}
+            | {f'{m}.{a.name}' for m, names in froms for a in names
+               if resolve(f'{m}.{a.name}', base_dir) is not None})
 
 
 def parents(name: str) -> set[str]:
@@ -61,42 +55,43 @@ def check_program(entry_path: pathlib.Path) -> Optional[IllFormed]:
     except IllFormed as e:
         return e
 
+def module_name(base_dir: pathlib.Path, path: pathlib.Path) -> tuple[str, ...]:
+    rel = path.relative_to(base_dir)
+    return rel.parent.parts if rel.name == '__init__.py' else rel.with_suffix('').parts
+
 def source_tree(base_dir: pathlib.Path, entry_path: pathlib.Path) -> set[str]:
-    names: set[str] = set()
-    for path in base_dir.rglob('*.py'):
-        if path == entry_path:
-            continue
-        rel = path.relative_to(base_dir)
-        parts = rel.parent.parts if rel.name == '__init__.py' else rel.with_suffix('').parts
-        if parts:
-            names.add('.'.join(parts))
-    return names
+    parts = (module_name(base_dir, p) for p in base_dir.rglob('*.py') if p != entry_path)
+    return {'.'.join(p) for p in parts if p}
+
+Discovery = tuple[dict[str, tuple[pathlib.Path, ast.Module]], dict[str, set[str]]]
+
+def with_parents(imps: set[str]) -> list[str]:
+    return sorted({q for imp in imps for q in {imp} | parents(imp)})
+
+def discover(queue: list[str], found: Discovery, base_dir: pathlib.Path) -> Discovery:
+    if len(queue) == 0:
+        return found
+    name, rest = queue[0], queue[1:]
+    modules, imports_by = found
+    if name in modules:
+        return discover(rest, found, base_dir)
+    path = resolve(name, base_dir)
+    if path is None and name in PREDEFINED_MODULES:
+        return discover(rest, (modules | {name: (pathlib.Path(f"<{name}>"), ast.Module(body=[], type_ignores=[]))},
+                               imports_by | {name: set()}), base_dir)
+    tree = load(name, base_dir)
+    assert path is not None
+    imps = imports(tree, base_dir)
+    return discover(rest + with_parents(imps),
+                    (modules | {name: (path, tree)}, imports_by | {name: imps}), base_dir)
 
 def walk_program(entry_path: pathlib.Path) -> None:
     base_dir = entry_path.parent
-    modules: dict[str, tuple[pathlib.Path, ast.Module]] = {}
-    imports_by_module: dict[str, set[str]] = {}
     entry_tree = load(entry_path.stem, base_dir)
-    modules['__main__'] = (entry_path, entry_tree)
-    imports_by_module['__main__'] = imports(entry_tree, base_dir)
-    queue: list[str] = [*PREDEFINED_MODULES, *source_tree(base_dir, entry_path)]
-    for imp in imports_by_module['__main__']:
-        queue.extend({imp} | parents(imp))
-    while queue:
-        name = queue.pop()
-        if name in modules:
-            continue
-        path = resolve(name, base_dir)
-        if path is None and name in PREDEFINED_MODULES:
-            modules[name] = (pathlib.Path(f"<{name}>"), ast.Module(body=[], type_ignores=[]))
-            imports_by_module[name] = set()
-            continue
-        tree = load(name, base_dir)
-        assert path is not None
-        modules[name] = (path, tree)
-        imports_by_module[name] = imports(tree, base_dir)
-        for imp in imports_by_module[name]:
-            queue.extend({imp} | parents(imp))
+    entry_imports = imports(entry_tree, base_dir)
+    queue = [*sorted(PREDEFINED_MODULES), *sorted(source_tree(base_dir, entry_path)), *with_parents(entry_imports)]
+    modules, imports_by_module = discover(queue, ({'__main__': (entry_path, entry_tree)},
+                                                  {'__main__': entry_imports}), base_dir)
 
     graph = {name: imps | parents(name) for name, imps in imports_by_module.items()}
     cycle = has_cycle(graph)

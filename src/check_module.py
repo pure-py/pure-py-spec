@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 import sys
+from itertools import dropwhile, takewhile
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Optional, Union
@@ -119,11 +120,11 @@ PREDEFINED_MODULES = set(PREDEFINED_MEMBERS)
 def name_assign(q: str) -> ast.stmt:
     return ast.parse(f'__name__ = {q!r}').body[0]
 
+def is_import(s: ast.stmt) -> bool:
+    return isinstance(s, (ast.Import, ast.ImportFrom))
+
 def split_imports(body: list[ast.stmt]) -> tuple[list[ast.stmt], list[ast.stmt]]:
-    i = 0
-    while i < len(body) and isinstance(body[i], (ast.Import, ast.ImportFrom)):
-        i += 1
-    return body[:i], body[i:]
+    return list(takewhile(is_import, body)), list(dropwhile(is_import, body))
 
 def find_import(stmts: list[ast.stmt]) -> Optional[ast.stmt]:
     return next((s for s in stmts if isinstance(s, (ast.Import, ast.ImportFrom))), None)
@@ -173,12 +174,8 @@ def result_type(node: ast.stmt) -> ResultTy:
     if isinstance(node, ast.FunctionDef):
         return TyAssigns({node.name: Status.TT})
     if isinstance(node, ast.If):
-        branches = [result_type_of_block(node.body)]
-        if node.orelse:
-            branches.append(result_type_of_block(node.orelse))
-        else:
-            branches.append(TY_ASSIGNS)
-        return merge_results(branches)
+        return merge_results([result_type_of_block(node.body),
+                              result_type_of_block(node.orelse) if node.orelse else TY_ASSIGNS])
     if isinstance(node, ast.Match):
         branches = [override_results(TyAssigns({x: Status.TT for x in binds(case.pattern)}), result_type_of_block(case.body)) for case in node.cases]
         if not is_catch_all(node.cases[-1].pattern):
@@ -289,44 +286,40 @@ def extend_entry(a: ContextEntry, b: ContextEntry) -> ContextEntry:
     return b
 
 def extend_context(g1: Context, g2: Context) -> Context:
-    out = dict(g1)
-    for x, e in g2.items():
-        out[x] = extend_entry(out[x], e) if x in out else e
-    return out
+    return {**g1, **{x: extend_entry(g1[x], e) if x in g1 else e for x, e in g2.items()}}
 
 def loads_to(q: str, theta: ContextEntry, ctx: ModuleContext) -> ContextEntry:
-    parts = q.split('.')
-    for i in range(len(parts) - 1, 0, -1):
-        parent = '.'.join(parts[:i])
-        parent_ctx = check_module(ctx.M[parent], ctx.M, parent)
-        theta = ModuleLoaded(parent, extend_context(parent_ctx, {parts[i]: theta}))
-    return theta
+    if '.' not in q:
+        return theta
+    parent, x = q.rsplit('.', 1)
+    parent_ctx = check_module(ctx.M[parent], ctx.M, parent)
+    return loads_to(parent, ModuleLoaded(parent, extend_context(parent_ctx, {x: theta})), ctx)
 
 def imports(s: ast.ImportFrom, gamma_src: Context, ctx: ModuleContext) -> Context:
     assert s.module is not None
     return {a.name: imported_entry(s, a.name, s.module, gamma_src, ctx) for a in s.names}
 
 def check_imports_prefix(prefix: list[ast.stmt], ctx: ModuleContext) -> Context:
-    gamma: Context = {}
-    for s in prefix:
-        if isinstance(s, ast.Import):
-            q_imp = s.names[0].name
-            if q_imp not in ctx.M:
-                raise IllFormedModule(s, reasons.UnknownModule(q_imp))
-            delta = check_module(ctx.M[q_imp], ctx.M, q_imp)
-            theta = loads_to(q_imp, ModuleLoaded(q_imp, delta), ctx)
-            gamma = extend_context(gamma, {q_imp.split('.')[0]: theta})
-        else:
-            assert isinstance(s, ast.ImportFrom)
-            if len(s.names) == 0:
-                raise IllFormedModule(s, reasons.EmptyFromImport())
-            assert s.module is not None
-            if s.module not in ctx.M:
-                raise IllFormedModule(s, reasons.UnknownModule(s.module))
-            delta = check_module(ctx.M[s.module], ctx.M, s.module)
-            loads_to(s.module, ModuleLoaded(s.module, delta), ctx)
-            gamma = extend_context(gamma, imports(s, delta, ctx))
-    return gamma
+    if len(prefix) == 0:
+        return {}
+    return extend_context(import_bindings(prefix[0], ctx), check_imports_prefix(prefix[1:], ctx))
+
+def import_bindings(s: ast.stmt, ctx: ModuleContext) -> Context:
+    if isinstance(s, ast.Import):
+        q = s.names[0].name
+        if q not in ctx.M:
+            raise IllFormedModule(s, reasons.UnknownModule(q))
+        delta = check_module(ctx.M[q], ctx.M, q)
+        return {q.split('.')[0]: loads_to(q, ModuleLoaded(q, delta), ctx)}
+    assert isinstance(s, ast.ImportFrom)
+    if len(s.names) == 0:
+        raise IllFormedModule(s, reasons.EmptyFromImport())
+    assert s.module is not None
+    if s.module not in ctx.M:
+        raise IllFormedModule(s, reasons.UnknownModule(s.module))
+    delta = check_module(ctx.M[s.module], ctx.M, s.module)
+    loads_to(s.module, ModuleLoaded(s.module, delta), ctx)
+    return imports(s, delta, ctx)
 
 def submodules(M: dict[str, ast.Module], q: str) -> Context:
     return {x: ModuleStub(f'{q}.{x}')
@@ -944,20 +937,17 @@ def check_submodule_clash(m: ast.Module, gamma0: Context, body: list[ast.stmt],
         assert node is not None
         raise IllFormedModule(node, reasons.SubmoduleNameClash(x, f'{q}.{x}'))
 
+def binds_name(s: ast.stmt, x: str) -> bool:
+    if isinstance(s, ast.Import):
+        return s.names[0].name.split('.')[0] == x
+    if isinstance(s, ast.ImportFrom):
+        return any(a.name == x for a in s.names)
+    if isinstance(s, ast.ClassDef):
+        return s.name == x
+    return x in assigns_stmt(s)
+
 def find_binder(stmts: list[ast.stmt], x: str) -> Optional[ast.stmt]:
-    for s in stmts:
-        if isinstance(s, ast.Import):
-            if s.names[0].name.split('.')[0] == x:
-                return s
-        elif isinstance(s, ast.ImportFrom):
-            if any(a.name == x for a in s.names):
-                return s
-        elif isinstance(s, ast.ClassDef):
-            if s.name == x:
-                return s
-        elif x in assigns_stmt(s):
-            return s
-    return None
+    return next((s for s in stmts if binds_name(s, x)), None)
 
 def module_context(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context:
     stubs: Context = submodules(final_ctx.M, q)
@@ -975,13 +965,9 @@ def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> Optional[I
         return e
 
 def imported_modules(tree: ast.Module) -> set[str]:
-    result: set[str] = set()
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Import):
-            result.update(a.name for a in node.names)
-        elif isinstance(node, ast.ImportFrom) and node.module is not None:
-            result.add(node.module)
-    return result
+    return ({a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
+            | {n.module for n in ast.walk(tree)
+               if isinstance(n, ast.ImportFrom) and n.module is not None})
 
 def check_file(filename: str) -> Optional[IllFormed]:
     source = open(filename).read()
