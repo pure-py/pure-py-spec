@@ -9,6 +9,8 @@ import contextlib
 import pathlib
 import subprocess
 import sys
+from collections.abc import Iterator
+from typing import Optional
 
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -41,31 +43,31 @@ NOT_YET = 2        # parse.py: planned, not yet supported
 REJECT_CHECK = 3   # check_module.py: ill-formed
 
 
-def script_cmd(script, path):
+def script_cmd(script: str, path: pathlib.Path) -> list[str]:
     return ["python3", str(ROOT / "src" / script), str(path)]
 
 
-def substr(path):
+def substr(path: pathlib.Path) -> Optional[str]:
     return path.read_text().strip() if path.exists() else None
 
 
 class Runner:
-    def __init__(self, interpreter):
+    def __init__(self, interpreter: str) -> None:
         self.interpreter = interpreter
         self.passed = 0
         self.failed = 0
-        self._failures = []
+        self._failures: list[str] = []
 
-    def ok(self, label):
+    def ok(self, label: object) -> None:
         self.passed += 1
         print(f"  {GREEN}✓{RESET} {label}")
 
-    def bad(self, label, msg):
+    def bad(self, label: object, msg: str) -> None:
         self.failed += 1
         print(f"  {RED}✗{RESET} {label} ({msg})")
 
     @contextlib.contextmanager
-    def test(self, label):
+    def test(self, label: object) -> Iterator[None]:
         """Group a test's phases into one result: a single pass line if every
         phase passes, else a single fail line listing the phases that failed."""
         self._failures = []
@@ -77,10 +79,10 @@ class Runner:
             else:
                 self.ok(label)
 
-    def _fail(self, phase, msg):
+    def _fail(self, phase: str, msg: str) -> None:
         self._failures.append(f"{phase}: {msg}")
 
-    def expect_exit(self, cmd, expected, error_substr=None):
+    def expect_exit(self, cmd: list[str], expected: int, error_substr: Optional[str] = None) -> None:
         phase = {PARSE: "parse", CHECK: "check", CHECK_PROGRAM: "check"}.get(
             pathlib.Path(cmd[1]).name, "python")
         proc = subprocess.run(cmd, capture_output=True, text=True)
@@ -92,20 +94,20 @@ class Runner:
             if error_substr not in output:
                 self._fail(phase, f"expected output containing {error_substr!r}, got: {output.strip()}")
 
-    def parse(self, path, expected, err=None):
+    def parse(self, path: pathlib.Path, expected: int, err: Optional[str] = None) -> None:
         self.expect_exit(script_cmd(PARSE, path), expected, error_substr=err)
 
-    def check(self, path, expected, err=None):
+    def check(self, path: pathlib.Path, expected: int, err: Optional[str] = None) -> None:
         self.expect_exit(script_cmd(CHECK, path), expected, error_substr=err)
 
-    def python(self, path, expected=0):
+    def python(self, path: pathlib.Path, expected: int = 0) -> None:
         self.expect_exit([self.interpreter, str(path)], expected)
 
-    def _run(self, path, cwd):
+    def _run(self, path: pathlib.Path, cwd: Optional[pathlib.Path]) -> 'subprocess.CompletedProcess[str]':
         cmd_path = path.name if cwd is not None else str(path)
         return subprocess.run([self.interpreter, cmd_path], cwd=cwd, capture_output=True, text=True)
 
-    def run_expecting_output(self, path, expected_path, cwd=None):
+    def run_expecting_output(self, path: pathlib.Path, expected_path: pathlib.Path, cwd: Optional[pathlib.Path] = None) -> None:
         phase = "run"
         proc = self._run(path, cwd)
         if proc.returncode != 0:
@@ -113,7 +115,7 @@ class Runner:
         elif proc.stdout != expected_path.read_text():
             self._fail(phase, "output mismatch")
 
-    def run_expecting_exception(self, path, exception_path, cwd=None):
+    def run_expecting_exception(self, path: pathlib.Path, exception_path: pathlib.Path, cwd: Optional[pathlib.Path] = None) -> None:
         phase = "run"
         expected = exception_path.read_text().strip()
         proc = self._run(path, cwd)
@@ -122,7 +124,7 @@ class Runner:
         elif expected not in proc.stderr:
             self._fail(phase, f"expected {expected}, got: {proc.stderr.strip()}")
 
-    def python_evidence(self, path, python_accepts, expected_path, cwd=None):
+    def python_evidence(self, path: pathlib.Path, python_accepts: bool, expected_path: pathlib.Path, cwd: Optional[pathlib.Path] = None) -> None:
         """Python must corroborate the verdict: run with the expected output
         (python_accepts) or raise the exception named in the sibling file. A
         test must carry the one piece of evidence and not the other."""
@@ -142,7 +144,7 @@ class Runner:
             else:
                 self.run_expecting_exception(path, exception_path, cwd=cwd)
 
-    def run_multi_file_tests(self, category_root):
+    def run_multi_file_tests(self, category_root: pathlib.Path) -> None:
         """Each subdir is a test: main.py, expected_exit, plus fixtures and the
         Python-side evidence fixed by the verdict (the category directory name)."""
         python_accepts = category_root.name != ILL_FORMED
@@ -155,7 +157,7 @@ class Runner:
                 self.python_evidence(main_py, python_accepts,
                                      expected_path=d / EXPECTED_FILE, cwd=d)
 
-    def module_test(self, p, module):
+    def module_test(self, p: pathlib.Path, module: pathlib.Path) -> None:
         """Assert a module-level test from its path: <verdict>[/<stage>].
 
         verdict in {well-formed, prohibited, ill-formed} fixes how PurePy and
@@ -202,7 +204,7 @@ class Runner:
                 self.python_evidence(p, verdict != ILL_FORMED,
                                      expected_path=p.with_suffix(EXPECTED))
 
-    def summary(self):
+    def summary(self) -> None:
         total = self.passed + self.failed
         print()
         if self.failed:
@@ -211,7 +213,7 @@ class Runner:
         print(f"{GREEN}✓ {total}/{total} passed{RESET}")
 
 
-def main():
+def main() -> None:
     skip_mypy = "--no-mypy" in sys.argv
     if skip_mypy:
         sys.argv.remove("--no-mypy")
@@ -222,7 +224,7 @@ def main():
 
     if not skip_mypy:
         print("mypy --strict src/")
-        sources = [str(ROOT / "src" / s) for s in (PARSE, CHECK, CHECK_PROGRAM)]
+        sources = [str(ROOT / "src" / s) for s in (PARSE, CHECK, CHECK_PROGRAM)] + [str(ROOT / "test" / "run-all.py")]
         proc = subprocess.run(["mypy", "--strict", *sources], capture_output=True, text=True)
         if proc.returncode == 0:
             r.ok("src/")
