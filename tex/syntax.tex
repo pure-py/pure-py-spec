@@ -520,8 +520,8 @@ also \S\ref{sec:local-assignment}).
 \subsubsection{Uninitialised module members}
 \label{sec:uninitialised-members}
 
-In Python, a module attribute reference raises \pyinline{AttributeError} in two situations; \PurePy
-rejects both statically. First, the run may never assign the member:
+In Python, an attribute of a module can be missing at runtime in two ways, a reference then raising
+\pyinline{AttributeError}; \PurePy rejects both statically. First, the run may never assign the member:
 \vspace{-\medskipamount}
 
 \begin{minipage}[t]{0.48\textwidth}
