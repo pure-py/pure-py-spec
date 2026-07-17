@@ -224,7 +224,7 @@ def main() -> None:
 
     if not skip_mypy:
         print("mypy --strict src/")
-        sources = [str(ROOT / "src" / s) for s in (PARSE, CHECK, CHECK_PROGRAM)] + [str(ROOT / "test" / "run-all.py")]
+        sources = sorted(str(p) for p in (ROOT / "src").glob("*.py")) + [str(ROOT / "test" / "run-all.py")]
         proc = subprocess.run(["mypy", "--strict", *sources], capture_output=True, text=True)
         if proc.returncode == 0:
             r.ok("src/")
