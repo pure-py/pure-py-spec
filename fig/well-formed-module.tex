@@ -52,7 +52,7 @@
 {
   q = x \cons \seq{x} \\
   \vdash_{\mathsf{load}} q : \Delta \\
-  q, \exModF{q}{\Delta} \wraps \theta \\
+  q, \exModF{q}{\Delta} \loadsTo \theta \\
   \vdash \vec{\iota} : \Gamma
 }
 {
@@ -62,7 +62,7 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q : \Delta \\
-  q, \exModF{q}{\Delta} \wraps \theta \\
+  q, \exModF{q}{\Delta} \loadsTo \theta \\
   \Delta, \vec{x} \importsR \Gamma' \\
   \vdash \vec{\iota} : \Gamma
 }
@@ -72,27 +72,27 @@
 
 \end{mathpar}
 
-\flushleft \shadebox{$q, \theta \wraps \theta'$}
+\flushleft \shadebox{$q, \theta \loadsTo \theta'$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{wrap-simple}}]
+\inferrule*[lab={\ruleName{loads-to-simple}}]
 {
   \strut
 }
 {
-  x, \theta \wraps \theta
+  x, \theta \loadsTo \theta
 }
 \and
-\inferrule*[lab={\ruleName{wrap-qualified}}]
+\inferrule*[lab={\ruleName{loads-to-qualified}}]
 {
   \vdash_{\mathsf{load}} q : \Gamma' \\
-  q, \exModF{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \wraps \theta'
+  q, \exModF{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo \theta'
 }
 {
-  q.x, \theta \wraps \theta'
+  q.x, \theta \loadsTo \theta'
 }
 \end{mathpar}
-\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$; loaded reference $\theta$ for module $q$ wraps into the reference for the head of $q$}
+\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$; loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}
 \end{subfigure}
 
 \vspace{2mm}

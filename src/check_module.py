@@ -294,13 +294,13 @@ def extend_context(g1: Context, g2: Context) -> Context:
         out[x] = extend_entry(out[x], e) if x in out else e
     return out
 
-def wraps(q: str, theta: ContextEntry, ctx: ModuleContext) -> Context:
+def loads_to(q: str, theta: ContextEntry, ctx: ModuleContext) -> ContextEntry:
     parts = q.split('.')
     for i in range(len(parts) - 1, 0, -1):
         parent = '.'.join(parts[:i])
         parent_ctx = check_module(ctx.M[parent], ctx.M, parent)
         theta = ModuleLoaded(parent, extend_context(parent_ctx, {parts[i]: theta}))
-    return {parts[0]: theta}
+    return theta
 
 def imports(s: ast.ImportFrom, gamma_src: Context, ctx: ModuleContext) -> Context:
     assert s.module is not None
@@ -314,7 +314,8 @@ def check_imports_prefix(prefix: list[ast.stmt], ctx: ModuleContext) -> Context:
             if q_imp not in ctx.M:
                 raise IllFormedModule(s, reasons.UnknownModule(q_imp))
             delta = check_module(ctx.M[q_imp], ctx.M, q_imp)
-            gamma = extend_context(gamma, wraps(q_imp, ModuleLoaded(q_imp, delta), ctx))
+            theta = loads_to(q_imp, ModuleLoaded(q_imp, delta), ctx)
+            gamma = extend_context(gamma, {q_imp.split('.')[0]: theta})
         else:
             assert isinstance(s, ast.ImportFrom)
             if len(s.names) == 0:
@@ -323,7 +324,7 @@ def check_imports_prefix(prefix: list[ast.stmt], ctx: ModuleContext) -> Context:
             if s.module not in ctx.M:
                 raise IllFormedModule(s, reasons.UnknownModule(s.module))
             delta = check_module(ctx.M[s.module], ctx.M, s.module)
-            wraps(s.module, ModuleLoaded(s.module, delta), ctx)
+            loads_to(s.module, ModuleLoaded(s.module, delta), ctx)
             gamma = extend_context(gamma, imports(s, delta, ctx))
     return gamma
 

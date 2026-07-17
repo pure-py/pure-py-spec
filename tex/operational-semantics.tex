@@ -23,7 +23,7 @@ Module and program evaluation are given in \figref{eval-modules}; importing name
 of $q$ and then its statements, mirroring the well-formedness judgement $\vdash_{\mathsf{load}} q : \Gamma$
 (\figref{well-formed-module}); as with the static rules, the mutual
 recursion between loading and evaluation is grounded by the acyclicity of $G_{\mathcal{M}}$.
-Loading takes a single module; the ancestors of an imported module are loaded, once each, by the wraps judgement.
+Loading takes a single module; the ancestors of an imported module are loaded, once each, by the loads-to judgement.
 
 The correspondence is exact: if $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \rho$ then $\vdash \rho : \Gamma$ (\figref{well-formed-env}). Since
 imports precede statements, every module a statement can reference is loaded before the statement runs, and

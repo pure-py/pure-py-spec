@@ -54,12 +54,13 @@
 
 \inferrule*[lab={\ruleName{eval-import}}]
 {
+  q = x \cons \seq{x} \\
   q \Rightarrow_{\mathsf{load}} \rho \\
-  q, \exModF{q}{\rho} \wraps \rho' \\
-  \vdash \vec{\iota} \Rightarrow \rho''
+  q, \exModF{q}{\rho} \loadsTo v \\
+  \vdash \vec{\iota} \Rightarrow \rho'
 }
 {
-  \vdash \exImport{q} \cons \vec{\iota} \Rightarrow \rho' \extend \rho''
+  \vdash \exImport{q} \cons \vec{\iota} \Rightarrow \set{\bind{x}{v}} \extend \rho'
 }
 \and
 \inferrule*[lab={\ruleName{eval-from-import}}]
@@ -74,27 +75,27 @@
 
 \end{mathpar}
 
-\flushleft \shadebox{$q, v \wraps \rho$}
+\flushleft \shadebox{$q, v \loadsTo v'$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{wrap-simple}}]
+\inferrule*[lab={\ruleName{loads-to-simple}}]
 {
   \strut
 }
 {
-  x, v \wraps \set{\bind{x}{v}}
+  x, v \loadsTo v
 }
 \and
-\inferrule*[lab={\ruleName{wrap-qualified}}]
+\inferrule*[lab={\ruleName{loads-to-qualified}}]
 {
-  q \Rightarrow_{\mathsf{load}} \rho' \\
-  q, \exModF{q}{\rho' \extend \set{\bind{x}{v}}} \wraps \rho
+  q \Rightarrow_{\mathsf{load}} \rho \\
+  q, \exModF{q}{\rho \extend \set{\bind{x}{v}}} \loadsTo v'
 }
 {
-  q.x, v \wraps \rho
+  q.x, v \loadsTo v'
 }
 \end{mathpar}
-\subcaption{Import prefix $\vec{\iota}$ produces bindings $\rho$; loaded reference $v$ for module $q$ wraps into a binding for the head of $q$}
+\subcaption{Import prefix $\vec{\iota}$ produces bindings $\rho$; loaded reference $v$ for module $q$ loads to the reference for the head of $q$}
 \end{subfigure}
 
 \vspace{2mm}
