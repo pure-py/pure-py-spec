@@ -228,7 +228,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \end{lemma}
 
 \begin{AddedBlock}
-\noindent A module attribute reference is well-formed only when it resolves to a definitely assigned member (rule \ruleName{attr-module-member}) or to a full module reference (rule \ruleName{attr-submodule}): any other resolved entry is one whose attribute may be missing at runtime, raising \pyinline{AttributeError} (\S\ref{sec:uninitialised-members}, \figref{prevented-errors}).
+\noindent A module attribute reference is well-formed only when it resolves to a definitely assigned member (rule \ruleName{attr-module-member}) or to an imported submodule (rule \ruleName{attr-submodule}); \S\ref{sec:uninitialised-members} shows the two references this excludes.
 \end{AddedBlock}
 
 \input{fig/well-formed}
