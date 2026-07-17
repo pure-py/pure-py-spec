@@ -232,7 +232,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 An entry $\theta$ is \emph{usable}, written $\usable(\theta)$, unless it is $\statusNotDefAssigned$ or a stub.
 \end{definition}
 
-\noindent Rule \ruleName{attr-module} requires the resolved entry to be usable: Python raises \pyinline{AttributeError} both for a member that is not definitely assigned and for a submodule that has not been imported (\figref{prevented-errors}).
+\noindent Rule \ruleName{attr-module} requires the resolved entry to be usable: an unusable entry is exactly one whose attribute may be missing at runtime, raising \pyinline{AttributeError} (\S\ref{sec:uninitialised-members}, \figref{prevented-errors}).
 \end{AddedBlock}
 
 \input{fig/well-formed}
@@ -516,6 +516,45 @@ the enclosing scope. Definite assignment after the match follows the same merge 
 every case binds the variable (or returns), it is definitely assigned afterwards; otherwise it is not (see
 also \S\ref{sec:local-assignment}).
 
+\begin{AddedBlock}
+\subsubsection{Uninitialised module members}
+\label{sec:uninitialised-members}
+
+An attribute of a module can be missing at runtime in two ways. First, a member bound on only some paths
+through the module body is not definitely assigned (its entry has status $\statusNotDefAssigned$), and the
+attribute is missing when no binding path ran:
+\vspace{-\medskipamount}
+
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+# lib.py
+b = False
+if b:
+    x = 1
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+# main.py
+import lib
+print(lib.x)  # AttributeError
+\end{python}
+\end{minipage}
+
+Second, a submodule is not an attribute of its package until it is loaded (\S\ref{sec:submodule-clash}), so
+the attribute is missing unless some import loaded it:
+\vspace{-\medskipamount}
+
+\begin{python}
+import a
+a.b.f()  # AttributeError, unless a.b was loaded by an earlier import
+\end{python}
+
+Rule \ruleName{attr-module} rejects both references: the first resolves to an entry that is not definitely
+assigned, the second to a stub, and neither is usable.
+\end{AddedBlock}
+
 \subsubsection{Unreachable code}
 \label{sec:unreachable}
 A non-empty sequence of statements returns only if the last statement returns, and all preceding statements
@@ -570,7 +609,7 @@ functional programming:
 \item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.
 \item First-class modules: in Python, modules are values. In \PurePy a module name may be projected (member access) but not used as a value.
 \item A module binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).
-\item Referring to a submodule the referring module does not itself import: \pyinline{import a} followed by \pyinline{a.b.f()} is rejected \Replaced{unless the module also imports \pyinline{a.b}}{unless \pyinline{a.b} is among the module's own dependencies}. Python permits the reference whenever some earlier import, anywhere in the program, loaded \pyinline{a.b}.
+\item Referring to a submodule the referring module does not itself import: \pyinline{import a} followed by \pyinline{a.b.f()} is rejected \Replaced{unless the module also imports \pyinline{a.b}}{unless \pyinline{a.b} is among the module's own dependencies}. Python permits the reference whenever some earlier import, anywhere in the program, loaded \pyinline{a.b} (\S\ref{sec:uninitialised-members}).
 \end{itemize}
 
 Complementing the list above (programs Python runs that \PurePy rejects), a well-formed \PurePy
