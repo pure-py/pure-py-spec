@@ -85,6 +85,7 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q : \Delta \\
+  {\color{blue}q, \exModF{q}{\Delta} \wraps \Gamma''} \\
   {\color{blue}\Delta}\,{\color{deletedgray}q'}, \vec{x} \importsR \Gamma' \\
   \vdash \vec{\iota} : \Gamma
 }
@@ -182,29 +183,19 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash_{{\color{blue}\mathsf{load}}\,{\color{deletedgray}\mathcal{M}}} {\color{blue}\seq{x}}\,{\color{deletedgray}q} : {\color{blue}\Gamma}\,{\color{deletedgray}\Delta}$}
+\flushleft \shadebox{$\vdash_{{\color{blue}\mathsf{load}}\,{\color{deletedgray}\mathcal{M}}} q : {\color{blue}\Gamma}\,{\color{deletedgray}\Delta}$}
 \begin{mathpar}
 \small
 {\color{blue}
-\inferrule*[lab={\ruleName{module-nil}}]
+\inferrule*[lab={\ruleName{module}}]
 {
-  \strut
-}
-{
-  \vdash_{\mathsf{load}} \varepsilon : \varnothing
-}}
-\and
-{\color{blue}
-\inferrule*[lab={\ruleName{module-cons}}]
-{
-  \vdash_{\mathsf{load}} \seq{x} : \Delta' \\
-  \mathcal{M}(\seq{x} \cons y) = \vec{\iota}\;\vec{s} \\
+  \mathcal{M}(q) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} : \Gamma \\
-  \Gamma \vdash \bodyOf(\seq{x} \cons y) : \Delta \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submodules(\seq{x} \cons y)) = \varnothing
+  \Gamma \vdash \bodyOf(q) : \Delta \\
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submodules(q)) = \varnothing
 }
 {
-  \vdash_{\mathsf{load}} \seq{x} \cons y : \submodules(\seq{x} \cons y) \runion \Delta
+  \vdash_{\mathsf{load}} q : \submodules(q) \runion \Delta
 }}
 \and
 {\color{deletedgray}
