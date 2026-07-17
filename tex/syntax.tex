@@ -65,7 +65,7 @@ a \merge a' &= a \meet a'
 \end{align*}}
 \end{definition}
 
-\noindent Join combines module references for the same module recursively, preferring full references to stubs, and is otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted at the same package must combine rather than shadow; it applies identically to module values (\S\ref{sec:opsem}).
+\noindent Join combines module references for the same module recursively, preferring full references to stubs, and is otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted at the same package must combine rather than shadow. The same equations, read with a loaded reference $\exModF{q}{\rho}$ in place of a full reference and environments in place of contexts, define join on values, used by the loading rules of \S\ref{sec:opsem}.
 \end{AddedBlock}
 
 \begin{lemma}[Right distributivity]
