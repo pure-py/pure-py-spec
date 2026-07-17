@@ -36,7 +36,7 @@ distributivity does not hold. Both operations are defined pointwise.
 {\small
 \begin{align*}
 \bot \runion \theta &= \theta \runion \bot = \theta \\
-\theta \runion \theta' &= \theta' \quad (\text{when } \Replaced{\theta, \theta' \neq \bot}{\theta' \neq \bot})
+\theta \runion \theta' &= \theta' \quad (\Replaced{\text{otherwise}}{\text{when } \theta' \neq \bot})
 \end{align*}}
 \end{definition}
 
@@ -60,8 +60,8 @@ a \merge a' &= a \meet a'
 \begin{align*}
 \exModF{q}{\Gamma} \join \exModF{q}{\Gamma'} &= \exModF{q}{\Gamma \join \Gamma'} \\
 \exMod{q} \join \exModF{q}{\Gamma} = \exModF{q}{\Gamma} \join \exMod{q} &= \exModF{q}{\Gamma} \\
-\theta \join \theta' &= \theta' \quad (\text{otherwise, when } \theta, \theta' \neq \bot) \\
-\bot \join \theta = \theta \join \bot &= \theta
+\bot \join \theta = \theta \join \bot &= \theta \\
+\theta \join \theta' &= \theta' \quad (\text{otherwise})
 \end{align*}}
 \end{definition}
 

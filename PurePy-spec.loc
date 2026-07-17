@@ -1,5 +1,5 @@
 \contentsline {replaced}{Replaced: \truncate {\Changestruncatewidth }{either a \emph {stub} $\mathsf {Mod}(q)$, or a \emph {full} reference $\mathsf {Mod}(q, \Gamma )$, which also carries the member context $\Gamma $ of $q$\ }}{2}{section*.1}%
-\contentsline {replaced}{Replaced: \truncate {\Changestruncatewidth }{\theta , \theta ' \neq \bot \ }}{2}{section*.5}%
+\contentsline {replaced}{Replaced: \truncate {\Changestruncatewidth }{\text {otherwise}\ }}{2}{section*.5}%
 \contentsline {deleted}{Deleted: \truncate {\Changestruncatewidth }{The \emph {dependencies} $\mathrm {deps}(q)$ of a module $q$ (Figure\nobreakspace {}\ref {fig:modules}) are the modules its import prefix imports, together with their parents. Since imports precede statements, when a PurePy\xspace program runs under Python, every module in $\mathrm {deps}(q)$ is loaded before any statement of $q$ runs.}}{6}{section*.13}%
 \contentsline {replaced}{Replaced: \truncate {\Changestruncatewidth }{The output context $\Gamma $ of the module judgement comprises\ }}{10}{section*.21}%
 \contentsline {added}{Added: \truncate {\Changestruncatewidth }{and a stub for each submodule}}{10}{section*.22}%
