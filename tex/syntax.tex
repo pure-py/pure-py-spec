@@ -32,7 +32,7 @@ an idempotent commutative semigroup of parallel composition $\merge$ (``merge'')
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\runion$ right-distributes over $\merge$ (Lemma~1), but left
 distributivity does not hold. Both operations are defined pointwise.
 %
-\begin{definition}[Override]
+\begin{definition}[Context override]
 {\small
 \begin{align*}
 \bot \runion \theta &= \theta \runion \bot = \theta \\
@@ -42,7 +42,7 @@ distributivity does not hold. Both operations are defined pointwise.
 
 \noindent Override is thus right-biased and has $\bot$ as both left and right unit.
 
-\begin{definition}[Merge]
+\begin{definition}[Context merge]
 For definite-assignment statuses $a, a' \in \B$:
 {\small
 \begin{align*}
@@ -55,7 +55,7 @@ a \merge a' &= a \meet a'
 \noindent Merge is otherwise undefined. Restricted to $\B$, it returns $\statusNotDefAssigned$ when exactly one argument is defined and the conjunction otherwise; so $\bot$ is not a unit.
 
 \begin{AddedBlock}
-\begin{definition}[Extend]
+\begin{definition}[Context extend]
 \label{def:extend}
 {\small
 \begin{align*}
