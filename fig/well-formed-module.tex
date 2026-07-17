@@ -50,18 +50,19 @@
 
 \inferrule*[lab={\ruleName{import}}]
 {
+  {\color{blue}q = x \cons \seq{x}} \\
   \vdash_{\mathsf{load}} q : \Delta \\
-  q, \exModF{q}{\Delta} \wraps \Gamma' \\
+  q, \exModF{q}{\Delta} \wraps {\color{blue}\theta}\,{\color{deletedgray}\Gamma'} \\
   \vdash \vec{\iota} : \Gamma
 }
 {
-  \vdash \exImport{q} \cons \vec{\iota} : \Gamma' \extend \Gamma
+  \vdash \exImport{q} \cons \vec{\iota} : {\color{blue}\set{\bind{x}{\theta}}}\,{\color{deletedgray}\Gamma'} \extend \Gamma
 }
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q : \Delta \\
-  q, \exModF{q}{\Delta} \wraps \Gamma'' \\
+  q, \exModF{q}{\Delta} \wraps {\color{blue}\theta}\,{\color{deletedgray}\Gamma''} \\
   \Delta, \vec{x} \importsR \Gamma' \\
   \vdash \vec{\iota} : \Gamma
 }
@@ -71,7 +72,7 @@
 
 \end{mathpar}
 
-\flushleft \shadebox{$q, \theta \wraps \Gamma$}
+\flushleft \shadebox{$q, \theta \wraps {\color{blue}\theta'}\,{\color{deletedgray}\Gamma}$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{wrap-simple}}]
@@ -79,19 +80,19 @@
   \strut
 }
 {
-  x, \theta \wraps \set{\bind{x}{\theta}}
+  x, \theta \wraps {\color{blue}\theta}\,{\color{deletedgray}\set{\bind{x}{\theta}}}
 }
 \and
 \inferrule*[lab={\ruleName{wrap-qualified}}]
 {
   \vdash_{\mathsf{load}} q : \Gamma' \\
-  q, \exModF{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \wraps \Gamma
+  q, \exModF{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \wraps {\color{blue}\theta'}\,{\color{deletedgray}\Gamma}
 }
 {
-  q.x, \theta \wraps \Gamma
+  q.x, \theta \wraps {\color{blue}\theta'}\,{\color{deletedgray}\Gamma}
 }
 \end{mathpar}
-\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$; loaded reference $\theta$ for module $q$ wraps into a binding for the head of $q$}
+\subcaption{Import prefix $\vec{\iota}$ produces bindings $\Gamma$; loaded reference $\theta$ for module $q$ wraps into {\color{blue}the reference}\,{\color{deletedgray}a binding} for the head of $q$}
 \end{subfigure}
 
 \vspace{2mm}
