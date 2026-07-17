@@ -55,18 +55,18 @@ a \merge a' &= a \meet a'
 \noindent Merge is otherwise undefined. Restricted to $\B$, it returns $\statusNotDefAssigned$ when exactly one argument is defined and the conjunction otherwise; so $\bot$ is not a unit.
 
 \begin{AddedBlock}
-\begin{definition}[Join]
-\label{def:join}
+\begin{definition}[Extend]
+\label{def:extend}
 {\small
 \begin{align*}
-\exModF{q}{\Gamma} \join \exModF{q}{\Gamma'} &= \exModF{q}{\Gamma \join \Gamma'} \\
-\exMod{q} \join \exModF{q}{\Gamma} = \exModF{q}{\Gamma} \join \exMod{q} &= \exModF{q}{\Gamma} \\
-\bot \join \theta = \theta \join \bot &= \theta \\
-\theta \join \theta' &= \theta' \quad (\text{otherwise})
+\exModF{q}{\Gamma} \extend \exModF{q}{\Gamma'} &= \exModF{q}{\Gamma \extend \Gamma'} \\
+\exMod{q} \extend \exModF{q}{\Gamma} = \exModF{q}{\Gamma} \extend \exMod{q} &= \exModF{q}{\Gamma} \\
+\bot \extend \theta = \theta \extend \bot &= \theta \\
+\theta \extend \theta' &= \theta' \quad (\text{otherwise})
 \end{align*}}
 \end{definition}
 
-\noindent Join combines module references for the same module recursively, preferring full references to stubs, and is otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted at the same package must combine rather than shadow.
+\noindent Extend combines module references for the same module recursively, preferring full references to stubs, and is otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted at the same package must combine rather than shadow.
 \end{AddedBlock}
 
 \begin{lemma}[Right distributivity]

@@ -80,7 +80,7 @@
   \vdash \vec{\iota} \Rightarrow \rho
 }
 {
-  \vdash \exImport{q'} \cons \vec{\iota} \Rightarrow \rho' \join \rho
+  \vdash \exImport{q'} \cons \vec{\iota} \Rightarrow \rho' \extend \rho
 }}
 \and
 \inferrule*[lab={\ruleName{eval-from-import}}]
@@ -90,7 +90,7 @@
   \vdash \vec{\iota} \Rightarrow \rho
 }
 {
-  \vdash \exFromImport{q'}{\vec{x}} \cons \vec{\iota} \Rightarrow \rho' {\color{blue}\join}\,{\color{deletedgray}\runion} \rho
+  \vdash \exFromImport{q'}{\vec{x}} \cons \vec{\iota} \Rightarrow \rho' {\color{blue}\extend}\,{\color{deletedgray}\runion} \rho
 }
 \and
 {\color{deletedgray}
@@ -121,7 +121,7 @@
 \inferrule*[lab={\ruleName{wrap-qualified}}]
 {
   q \Rightarrow_{\mathsf{load}} \rho' \\
-  q, \exModF{q}{\rho' \join \set{\bind{x}{v}}} \wraps \rho
+  q, \exModF{q}{\rho' \extend \set{\bind{x}{v}}} \wraps \rho
 }
 {
   q.x, v \wraps \rho

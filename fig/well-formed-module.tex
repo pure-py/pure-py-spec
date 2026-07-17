@@ -80,7 +80,7 @@
   \vdash \vec{\iota} : \Gamma
 }
 {
-  \vdash \exImport{q'} \cons \vec{\iota} : \Gamma' \join \Gamma
+  \vdash \exImport{q'} \cons \vec{\iota} : \Gamma' \extend \Gamma
 }}
 \and
 \inferrule*[lab={\ruleName{from-import}}]
@@ -90,7 +90,7 @@
   \vdash \vec{\iota} : \Gamma
 }
 {
-  \vdash \exFromImport{q'}{\vec{x}} \cons \vec{\iota} : \Gamma' {\color{blue}\join}\,{\color{deletedgray}\runion} \Gamma
+  \vdash \exFromImport{q'}{\vec{x}} \cons \vec{\iota} : \Gamma' {\color{blue}\extend}\,{\color{deletedgray}\runion} \Gamma
 }
 \and
 {\color{deletedgray}
@@ -121,7 +121,7 @@
 \inferrule*[lab={\ruleName{wrap-qualified}}]
 {
   \vdash_{\mathcal{M}} q : \Gamma' \\
-  q, \exModF{q}{\Gamma' \join \set{\bind{x}{\theta}}} \wraps \Gamma
+  q, \exModF{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \wraps \Gamma
 }
 {
   q.x, \theta \wraps \Gamma

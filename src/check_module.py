@@ -291,17 +291,17 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
         raise IllFormedModule(head, reasons.DuplicateMutualName(head.name))
     check_distinct_names(defs[1:], seen | {head.name})
 
-def join_entry(a: ContextEntry, b: ContextEntry) -> ContextEntry:
+def extend_entry(a: ContextEntry, b: ContextEntry) -> ContextEntry:
     if isinstance(a, ModuleFull) and isinstance(b, ModuleFull) and a.q == b.q:
-        return ModuleFull(a.q, join_context(a.members, b.members))
+        return ModuleFull(a.q, extend_context(a.members, b.members))
     if isinstance(a, ModuleFull) and isinstance(b, ModuleRef) and a.q == b.q:
         return a
     return b
 
-def join_context(g1: Context, g2: Context) -> Context:
+def extend_context(g1: Context, g2: Context) -> Context:
     out = dict(g1)
     for x, e in g2.items():
-        out[x] = join_entry(out[x], e) if x in out else e
+        out[x] = extend_entry(out[x], e) if x in out else e
     return out
 
 def import_entry(q: str, ctx: ModuleContext) -> tuple[str, ContextEntry]:
@@ -310,7 +310,7 @@ def import_entry(q: str, ctx: ModuleContext) -> tuple[str, ContextEntry]:
     for i in range(len(parts) - 1, 0, -1):
         parent = '.'.join(parts[:i])
         parent_ctx = check_module(ctx.M[parent], ctx.M, parent)
-        entry = ModuleFull(parent, join_context(parent_ctx, {parts[i]: entry}))
+        entry = ModuleFull(parent, extend_context(parent_ctx, {parts[i]: entry}))
     return parts[0], entry
 
 def check_imports_prefix(prefix: list[ast.stmt], ctx: ModuleContext) -> Context:
@@ -321,7 +321,7 @@ def check_imports_prefix(prefix: list[ast.stmt], ctx: ModuleContext) -> Context:
             if q_imp not in ctx.M:
                 raise IllFormedModule(s, reasons.UnknownModule(q_imp))
             head_seg, entry = import_entry(q_imp, ctx)
-            gamma = join_context(gamma, {head_seg: entry})
+            gamma = extend_context(gamma, {head_seg: entry})
         else:
             assert isinstance(s, ast.ImportFrom)
             if len(s.names) == 0:
@@ -331,7 +331,7 @@ def check_imports_prefix(prefix: list[ast.stmt], ctx: ModuleContext) -> Context:
                 raise IllFormedModule(s, reasons.UnknownModule(s.module))
             gamma_src = check_module(ctx.M[s.module], ctx.M, s.module)
             bindings = {a.name: imported_entry(s, a.name, s.module, gamma_src, ctx) for a in s.names}
-            gamma = join_context(gamma, bindings)
+            gamma = extend_context(gamma, bindings)
     return gamma
 
 def submodule_names(M: dict[str, ast.Module], q: str) -> set[str]:
