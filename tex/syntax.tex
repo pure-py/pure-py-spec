@@ -228,7 +228,7 @@ R \runion \Returns = \Returns \runion R & = \Returns
 \end{lemma}
 
 \begin{AddedBlock}
-\noindent A module attribute reference is well-formed only when it resolves to a definitely assigned member (rule \ruleName{attr-module-member}) or to an imported submodule (rule \ruleName{attr-submodule}); see \S\ref{sec:uninitialised-members}.
+\noindent A module attribute reference is well-formed only when it resolves to a definitely assigned member (rule \ruleName{attr-module}); see \S\ref{sec:uninitialised-members}.
 \end{AddedBlock}
 
 \input{fig/well-formed}
@@ -544,8 +544,8 @@ import a
 a.b.f()  # AttributeError, unless a.b was loaded by an earlier import
 \end{python}
 
-Rules \ruleName{attr-module-member} and \ruleName{attr-submodule} reject these references: the first
-resolves to an entry that is not definitely assigned, the second to a stub.
+Rule \ruleName{attr-module} rejects these references: \pyinline{x} is not definitely assigned in
+\pyinline{lib}, and \pyinline{a.b} is a stub, so neither resolves.
 \end{AddedBlock}
 
 \subsubsection{Unreachable code}

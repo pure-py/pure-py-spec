@@ -3,19 +3,47 @@
 \flushleft \shadebox{$\Gamma \vdash q \names \theta$}
 \begin{mathpar}
 \small
+{\color{blue}
+\inferrule*[lab={\ruleName{simple-var}}]
+{
+  \bind{x}{\statusDefAssigned} \in \Gamma
+}
+{
+  \Gamma \vdash x \names \statusDefAssigned
+}}
+\and
+{\color{blue}
+\inferrule*[lab={\ruleName{simple-module}}]
+{
+  \bind{x}{\exModF{q}{\Gamma'}} \in \Gamma
+}
+{
+  \Gamma \vdash x \names \exModF{q}{\Gamma'}
+}}
+\and
+{\color{blue}
+\inferrule*[lab={\ruleName{simple-class}}]
+{
+  \bind{x}{C} \in \Gamma
+}
+{
+  \Gamma \vdash x \names C
+}}
+\and
+{\color{deletedgray}
 \inferrule*[lab={\ruleName{simple}}]
 {
   \bind{x}{\theta} \in \Gamma
 }
 {
   \Gamma \vdash x \names \theta
-}
+}}
 \and
 {\color{blue}
 \inferrule*[lab={\ruleName{qualified}}]
 {
   \Gamma \vdash q \names \exModF{q'}{\Gamma'} \\
-  \bind{x}{\theta} \in \Gamma'
+  \Gamma' \vdash x \names \theta
 }
 {
   \Gamma \vdash q.x \names \theta
@@ -89,18 +117,9 @@
 }
 \and
 {\color{blue}
-\inferrule*[lab={\ruleName{attr-module-member}}]
+\inferrule*[lab={\ruleName{attr-module}}]
 {
   \Gamma \vdash \exProject{e}{y} \names \statusDefAssigned
-}
-{
-  \Gamma \vdash \exProject{e}{y}
-}}
-\and
-{\color{blue}
-\inferrule*[lab={\ruleName{attr-submodule}}]
-{
-  \Gamma \vdash \exProject{e}{y} \names \exModF{q}{\Gamma'}
 }
 {
   \Gamma \vdash \exProject{e}{y}

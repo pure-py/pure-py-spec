@@ -14,8 +14,7 @@
 \and
 \inferrule*[lab={\ruleName{imp-member}}]
 {
-  \bind{x}{\theta} \in \Gamma \\
-  \theta \neq \exMod{q} \\
+  \Gamma \vdash x \names \theta \\
   \Gamma, \vec{x} \importsR \Gamma'
 }
 {
@@ -25,11 +24,11 @@
 \inferrule*[lab={\ruleName{imp-submodule}}]
 {
   \bind{x}{\exMod{q}} \in \Gamma \\
-  \vdash_{\mathcal{M}} q : \Gamma'' \\
+  \vdash_{\mathcal{M}} q : \Delta \\
   \Gamma, \vec{x} \importsR \Gamma'
 }
 {
-  \Gamma, x \cons \vec{x} \importsR \set{\bind{x}{\exModF{q}{\Gamma''}}} \runion \Gamma'
+  \Gamma, x \cons \vec{x} \importsR \set{\bind{x}{\exModF{q}{\Delta}}} \runion \Gamma'
 }
 \end{mathpar}
 \endgroup
@@ -55,7 +54,7 @@
   q, x \cons \vec{x} \importsR \set{\bind{x}{\theta}} \runion \Gamma
 }
 \end{mathpar}}
-\caption{Names $\vec{x}$ imported from \textcolor{blue}{a source context $\Gamma$}\textcolor{deletedgray}{ module $q$} produce bindings $\Gamma'$}
+\caption{Names $\vec{x}$ imported from \textcolor{blue}{a module context $\Gamma$}\textcolor{deletedgray}{ module $q$} produce bindings $\Gamma'$}
 \label{fig:imports}
 \end{figure}
 
@@ -75,22 +74,22 @@
 {\color{blue}
 \inferrule*[lab={\ruleName{import}}]
 {
-  \vdash_{\mathcal{M}} q' : \Gamma'' \\
-  q', \exModF{q'}{\Gamma''} \wraps \Gamma' \\
+  \vdash_{\mathcal{M}} q : \Delta \\
+  q, \exModF{q}{\Delta} \wraps \Gamma' \\
   \vdash \vec{\iota} : \Gamma
 }
 {
-  \vdash \exImport{q'} \cons \vec{\iota} : \Gamma' \extend \Gamma
+  \vdash \exImport{q} \cons \vec{\iota} : \Gamma' \extend \Gamma
 }}
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
-  \vdash_{\mathcal{M}} q' : {\color{blue}\Gamma''}\,{\color{deletedgray}\Delta} \\
-  {\color{blue}\Gamma''}\,{\color{deletedgray}q'}, \vec{x} \importsR \Gamma' \\
+  \vdash_{\mathcal{M}} q : \Delta \\
+  {\color{blue}\Delta}\,{\color{deletedgray}q'}, \vec{x} \importsR \Gamma' \\
   \vdash \vec{\iota} : \Gamma
 }
 {
-  \vdash \exFromImport{q'}{\vec{x}} \cons \vec{\iota} : \Gamma' {\color{blue}\extend}\,{\color{deletedgray}\runion} \Gamma
+  \vdash \exFromImport{q}{\vec{x}} \cons \vec{\iota} : \Gamma' {\color{blue}\extend}\,{\color{deletedgray}\runion} \Gamma
 }
 \and
 {\color{deletedgray}
