@@ -178,9 +178,31 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$q \Rightarrow_{\mathsf{load}} \rho$}
+\flushleft \shadebox{${\color{blue}\seq{x}}\,{\color{deletedgray}q} \Rightarrow_{\mathsf{load}} \rho$}
 \begin{mathpar}
 \small
+{\color{blue}
+\inferrule*[lab={\ruleName{load-nil}}]
+{
+  \strut
+}
+{
+  \varepsilon \Rightarrow_{\mathsf{load}} \varnothing
+}}
+\and
+{\color{blue}
+\inferrule*[lab={\ruleName{load-cons}}]
+{
+  \seq{x} \Rightarrow_{\mathsf{load}} \rho \\
+  \mathcal{M}(\seq{x} \cons y) = \vec{\iota}\;\vec{s} \\
+  \vdash \vec{\iota} \Rightarrow \rho' \\
+  \rho', \bodyOf(\seq{x} \cons y) \Rightarrow \rho''
+}
+{
+  \seq{x} \cons y \Rightarrow_{\mathsf{load}} \submodules(\seq{x} \cons y) \runion \rho''
+}}
+\and
+{\color{deletedgray}
 \inferrule*[lab={\ruleName{load-simple}}]
 {
   \mathcal{M}(x) = \vec{\iota}\;\vec{s} \\
@@ -189,8 +211,9 @@
 }
 {
   x \Rightarrow_{\mathsf{load}} \submodules(x) \runion \rho
-}
+}}
 \and
+{\color{deletedgray}
 \inferrule*[lab={\ruleName{load-qualified}}]
 {
   q \Rightarrow_{\mathsf{load}} \rho'' \\
@@ -200,7 +223,7 @@
 }
 {
   q.x \Rightarrow_{\mathsf{load}} \submodules(q.x) \runion \rho
-}
+}}
 \end{mathpar}
 
 \flushleft \shadebox{$\mathcal{M} \Rightarrow n$}
