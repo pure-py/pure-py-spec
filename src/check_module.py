@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import ast
 import sys
 from dataclasses import dataclass, field
@@ -40,7 +42,7 @@ BlockElement = Union[ast.stmt, list[ast.FunctionDef]]
 
 @dataclass(frozen=True)
 class ClassEntry:
-    context: 'Context'
+    context: Context
     module: str
     fields: tuple[str, ...]
     base: Optional[str]
@@ -54,7 +56,7 @@ class ModuleStub:
 @dataclass(frozen=True)
 class ModuleLoaded:
     q: str
-    members: 'Context'
+    members: Context
 
 
 ContextEntry = Union[Status, ModuleStub, ModuleLoaded, ClassEntry]
@@ -69,25 +71,25 @@ class ModuleContext:
     q: str = ''
 
 
-def override_gamma(ctx: 'ModuleContext', delta: Context) -> 'ModuleContext':
+def override_gamma(ctx: ModuleContext, delta: Context) -> ModuleContext:
     return ModuleContext(gamma={**ctx.gamma, **delta}, M=ctx.M, q=ctx.q)
 
-def override_var(ctx: 'ModuleContext', delta: VarContext) -> 'ModuleContext':
+def override_var(ctx: ModuleContext, delta: VarContext) -> ModuleContext:
     return override_gamma(ctx, dict(delta))
 
-def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> 'ClassEntry':
+def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
     base = node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
     return ClassEntry(context=context, module=q, fields=tuple(own_fields_of(node)), base=base)
 
-def var_status(ctx: 'ModuleContext', x: str) -> Optional[Status]:
+def var_status(ctx: ModuleContext, x: str) -> Optional[Status]:
     v = ctx.gamma.get(x)
     return v if isinstance(v, Status) else None
 
-def class_of(ctx: 'ModuleContext', c: str) -> Optional[ClassEntry]:
+def class_of(ctx: ModuleContext, c: str) -> Optional[ClassEntry]:
     v = ctx.gamma.get(c)
     return v if isinstance(v, ClassEntry) else None
 
-def module_of(ctx: 'ModuleContext', x: str) -> Optional[Union[ModuleStub, ModuleLoaded]]:
+def module_of(ctx: ModuleContext, x: str) -> Optional[Union[ModuleStub, ModuleLoaded]]:
     v = ctx.gamma.get(x)
     return v if isinstance(v, (ModuleStub, ModuleLoaded)) else None
 
