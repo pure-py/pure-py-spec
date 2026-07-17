@@ -35,6 +35,19 @@ directions.
 Spec first, then tests, then implementation. When the spec changes, write or
 adjust the failing test before touching the checker.
 
+## Test coverage
+
+Rule-level coverage (each rule accepts once, each reason rejects once) does not
+cover operators and metafunctions: also exercise every defining equation. The
+distinguishing equations often need interacting inputs (two statements with
+overlapping names) that no single-rule test produces.
+
+- When a change swaps one operator for another, write the test that separates
+  them; the suite must fail if the old operator is restored.
+- The spec's rationale sentence for a definition typically names the separating
+  scenario ("imports rooted at the same package must combine rather than
+  shadow"); make that scenario a test.
+
 ## Why behavioral auditing misses this
 
 Walking the spec's rules and asking "does the implementation compute the right
