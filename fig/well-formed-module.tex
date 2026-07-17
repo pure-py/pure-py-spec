@@ -95,7 +95,7 @@
 {\color{deletedgray}
 \inferrule*[lab={\ruleName{import}}]
 {
-  q' = x_1.x_2.\ldots.x_{n+1} \\
+  q' = x_1.x_2.\cdots.x_{n+1} \\
   \vdash_{\mathcal{M}} q' : \Delta \\
   \vdash \vec{\iota} : \Gamma
 }
@@ -182,31 +182,55 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash_{\mathcal{M}} q : {\color{blue}\Gamma}\,{\color{deletedgray}\Delta}$}
+\flushleft \shadebox{$\vdash_{\mathcal{M}} {\color{blue}x_1.\cdots.x_n}\,{\color{deletedgray}q} : {\color{blue}\Gamma}\,{\color{deletedgray}\Delta}$}
 \begin{mathpar}
 \small
+{\color{blue}
+\inferrule*[lab={\ruleName{module-nil}}]
+{
+  \strut
+}
+{
+  \vdash_{\mathcal{M}} \varepsilon : \varnothing
+}}
+\and
+{\color{blue}
+\inferrule*[lab={\ruleName{module}}]
+{
+  \vdash_{\mathcal{M}} x_1.\cdots.x_{n-1} : \Delta' \\
+  \mathcal{M}(x_1.\cdots.x_n) = \vec{\iota}\;\vec{s} \\
+  \vdash \vec{\iota} : \Gamma \\
+  \Gamma \vdash \bodyOf(x_1.\cdots.x_n) : \Delta \\
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submodules(x_1.\cdots.x_n)) = \varnothing
+}
+{
+  \vdash_{\mathcal{M}} x_1.\cdots.x_n : \submodules(x_1.\cdots.x_n) \runion \Delta
+}}
+\and
+{\color{deletedgray}
 \inferrule*[lab={\ruleName{module-simple}}]
 {
   \mathcal{M}(x) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} : \Gamma \\
   \Gamma \vdash \bodyOf(x) : \Delta \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap {\color{blue}\dom(\submodules(x))}\,{\color{deletedgray}\set{y \mid x.y \in \dom(\mathcal{M})}} = \varnothing
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{y \mid x.y \in \dom(\mathcal{M})} = \varnothing
 }
 {
-  \vdash_{\mathcal{M}} x : {\color{blue}\submodules(x)} \mathbin{\color{blue}\runion} \Delta
-}
+  \vdash_{\mathcal{M}} x : \Delta
+}}
 \and
+{\color{deletedgray}
 \inferrule*[lab={\ruleName{module-qualified}}]
 {
   \vdash_{\mathcal{M}} q : \Gamma'' \\
   \mathcal{M}(q.x) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} : \Gamma \\
   \Gamma \vdash \bodyOf(q.x) : \Delta \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap {\color{blue}\dom(\submodules(q.x))}\,{\color{deletedgray}\set{y \mid q.x.y \in \dom(\mathcal{M})}} = \varnothing
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap \set{y \mid q.x.y \in \dom(\mathcal{M})} = \varnothing
 }
 {
-  \vdash_{\mathcal{M}} q.x : {\color{blue}\submodules(q.x)} \mathbin{\color{blue}\runion} \Delta
-}
+  \vdash_{\mathcal{M}} q.x : \Delta
+}}
 \end{mathpar}
 
 \flushleft \shadebox{$\vdash \mathcal{M}$}
