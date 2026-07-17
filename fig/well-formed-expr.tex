@@ -88,14 +88,23 @@
   \Gamma \vdash \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}}
 }
 \and
-\inferrule*[lab={\ruleName{attr-module}}]
+{\color{blue}
+\inferrule*[lab={\ruleName{attr-module-member}}]
 {
-  \Gamma \vdash \exProject{e}{y} \names \theta \\
-  {\color{blue}\usable(\theta)}
+  \Gamma \vdash \exProject{e}{y} \names \statusDefAssigned
 }
 {
   \Gamma \vdash \exProject{e}{y}
+}}
+\and
+{\color{blue}
+\inferrule*[lab={\ruleName{attr-submodule}}]
+{
+  \Gamma \vdash \exProject{e}{y} \names \exModF{q}{\Gamma'}
 }
+{
+  \Gamma \vdash \exProject{e}{y}
+}}
 \and
 \inferrule*[lab={\ruleName{attr-object}}]
 {

@@ -459,7 +459,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
                 raise IllFormedModule(e, reasons.UnknownMember(e.attr, parent.q))
             if isinstance(entry, ModuleRef):
                 raise IllFormedModule(e, reasons.SubmoduleNotImported(entry.q))
-            if entry == Status.FF:
+            if entry == Status.FF or isinstance(entry, ClassEntry):
                 raise IllFormedModule(e, reasons.UnassignedMember(e.attr, parent.q))
             return
         if isinstance(parent, ModuleRef):
