@@ -191,7 +191,7 @@
 {
   \mathcal{M}(q) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} : \Gamma \\
-  \Gamma \vdash \bodyOf(q) : \Delta \\
+  \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \vec{s} : \Delta \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submodules(q)) = \varnothing
 }
 {

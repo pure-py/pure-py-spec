@@ -186,7 +186,7 @@
 {
   \mathcal{M}(q) = \vec{\iota}\;\vec{s} \\
   \vdash \vec{\iota} \Rightarrow \rho \\
-  \rho, \bodyOf(q) \Rightarrow \rho'
+  \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \vec{s} \Rightarrow \rho'
 }
 {
   q \Rightarrow_{\mathsf{load}} \submodules(q) \runion \rho'

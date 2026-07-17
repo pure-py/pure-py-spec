@@ -128,9 +128,8 @@ $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module
 $\vec{\iota}$ followed by a sequence of statements $\vec{s}$; since imports are not statements, they can
 appear neither in blocks (and hence not in function bodies) nor after the first non-import statement. The
 well-formedness and evaluation rules check and evaluate the statements of each body $\mathcal{M}(q)$ with the
-assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended (metafunction $\bodyOf$,
-\figref{eval-expr}), modelling the $\pymath{\_\_name\_\_}$ binding the runtime supplies
-automatically. $\mathcal{M}$ additionally always includes the predefined modules of
+assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
+$\pymath{\_\_name\_\_}$ binding the runtime supplies automatically. $\mathcal{M}$ additionally always includes the predefined modules of
 \figref{predefined} and is prefix-closed: the parent of any module in $\dom(\mathcal{M})$ is itself in
 $\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$ by mapping each leaf module to a
 \texttt{.py} file and each package to an \texttt{\_\_init\_\_.py}; prefix-closure then requires an
