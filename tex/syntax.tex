@@ -520,8 +520,8 @@ also \S\ref{sec:local-assignment}).
 \subsubsection{Uninitialised module members}
 \label{sec:uninitialised-members}
 
-In Python, an attribute of a module can be missing at runtime in two ways; \PurePy rejects both
-statically. First, a member that is not definitely assigned:
+In Python, a module attribute reference raises \pyinline{AttributeError} in two situations; \PurePy
+rejects both statically. First, the run may never assign the member:
 \vspace{-\medskipamount}
 
 \begin{minipage}[t]{0.48\textwidth}
@@ -541,8 +541,7 @@ print(lib.x)  # AttributeError
 \end{python}
 \end{minipage}
 
-Second, a submodule is not an attribute of its package until it is loaded (\S\ref{sec:submodule-clash}), so
-the attribute is missing unless some import loaded it:
+Second, a submodule is not an attribute of its package until it is loaded (\S\ref{sec:submodule-clash}):
 \vspace{-\medskipamount}
 
 \begin{python}
