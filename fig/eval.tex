@@ -91,7 +91,7 @@
 {
   \rho, e \Rightarrow v \\
   \dispatch(\rho, v, \exCase{p_1}{b_1} \cons \ldots \cons \exCase{p_{n+1}}{b_{n+1}}) = (\rho', b) \\
-  \rho \runion \rho', b \Rightarrow r
+  \rho \override \rho', b \Rightarrow r
 }
 {
   \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow r
@@ -100,10 +100,10 @@
 \inferrule*[lab={\ruleName{eval-cons}}]
 {
   \rho, s \Rightarrow \assigns{\rho'} \\
-  \rho \runion \rho', b \Rightarrow r
+  \rho \override \rho', b \Rightarrow r
 }
 {
-  \rho, s \cons b \Rightarrow \assigns{\rho'} \runion r
+  \rho, s \cons b \Rightarrow \assigns{\rho'} \override r
 }
 \end{mathpar}
 \caption{Block $b$ evaluates to result $r$ under environment $\rho : \Gamma$}
@@ -117,11 +117,11 @@
 \unwrap(\assigns{\rho}) &= \pyinline{None} \\
 \\
 \\
-\cacheEnv(\rho, x) &= \rho' && \text{where } \rho(x) = \exModF{q'}{\rho'} \\
-\cacheEnv(\rho, q.x) &= \rho' && \text{where } \cacheEnv(\rho, q)(x) = \exModF{q'}{\rho'} \\
+\env(\rho, x) &= \rho' && \text{where } \rho(x) = \loaded{q'}{\rho'} \\
+\env(\rho, q.x) &= \rho' && \text{where } \env(\rho, q)(x) = \loaded{q'}{\rho'} \\
 \\
 \resolveClass(\rho, c) &= (c, \rho(c)) \\
-\resolveClass(\rho, q.c) &= (c, \cacheEnv(\rho, q)(c))
+\resolveClass(\rho, q.c) &= (c, \env(\rho, q)(c))
 \end{align*}
 
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
@@ -149,17 +149,17 @@
   \strut
 }
 {
-  \rho, \exLambda{x_1, \ldots, x_n}{e} \Rightarrow \exClosure[\Gamma]{\rho}{\vec{x}}{e}
+  \rho, \exLambda{x_1, \ldots, x_n}{e} \Rightarrow \exLamClosure[\Gamma]{\rho}{\vec{x}}{e}
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-lambda}}]
 {
-  \rho, e \Rightarrow \exClosure[\Delta]{\rho'}{\vec{x}}{e'} \\
+  \rho, e \Rightarrow \exLamClosure[\Delta]{\rho'}{\vec{x}}{e'} \\
   \rho, \vec{e} \Rightarrow \vec{u} \\
-  \rho' \runion \set{\bind{\seq{x}}{\seq{u}}}, e' \Rightarrow v
+  \rho' \override \set{\bind{\seq{x}}{\seq{u}}}, e' \Rightarrow v
 }
 {
-  \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow v
+  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow v
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-def}}]
@@ -168,19 +168,19 @@
   d_i = \exDef{f_i}{\vec{x}_i}{b_i} \quad (\forall i) \\
   v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \vec{e} \Rightarrow \vec{u} \\
-  \rho' \runion \set{\bind{\seq{f}}{\seq{v}}} \runion \set{\bind{\seq{x}_j}{\seq{u}}}, b_j \Rightarrow r
+  \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, b_j \Rightarrow r
 }
 {
-  \rho, \exApp{e}{e_1, \ldots, e_n} \Rightarrow \unwrap(r)
+  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \unwrap(r)
 }
 \and
 \inferrule*[lab={\ruleName{eval-attr-module}}]
 {
-  \rho, e \Rightarrow \exModF{q'}{\rho'} \\
+  \rho, e \Rightarrow \loaded{q'}{\rho'} \\
   \bind{x}{v} \in \rho'
 }
 {
-  \rho, \exProject{e}{x} \Rightarrow v
+  \rho, \exAttr{e}{x} \Rightarrow v
 }
 \and
 \inferrule*[lab={\ruleName{eval-attr-object}}]
@@ -188,7 +188,7 @@
   \rho, e \Rightarrow \exObj{\Delta}{q'.c}{\rho'}
 }
 {
-  \rho, \exProject{e}{x} \Rightarrow \rho'(x)
+  \rho, \exAttr{e}{x} \Rightarrow \rho'(x)
 }
 \and
 \inferrule*[lab={\ruleName{eval-constr}}]

@@ -16,17 +16,17 @@
   \Gamma, \vec{x} \importsR \Gamma'
 }
 {
-  \Gamma, x \cons \vec{x} \importsR \set{\bind{x}{\theta}} \runion \Gamma'
+  \Gamma, x \cons \vec{x} \importsR \set{\bind{x}{\theta}} \override \Gamma'
 }
 \and
 \inferrule*[lab={\ruleName{imp-submodule}}]
 {
-  \bind{x}{\exMod{q}} \in \Gamma \\
+  \bind{x}{\stub{q}} \in \Gamma \\
   \vdash_{\mathsf{load}} q : \Delta \\
   \Gamma, \vec{x} \importsR \Gamma'
 }
 {
-  \Gamma, x \cons \vec{x} \importsR \set{\bind{x}{\exModF{q}{\Delta}}} \runion \Gamma'
+  \Gamma, x \cons \vec{x} \importsR \set{\bind{x}{\loaded{q}{\Delta}}} \override \Gamma'
 }
 \end{mathpar}
 
@@ -52,7 +52,7 @@
 {
   q = x \cons \seq{x} \\
   \vdash_{\mathsf{load}} q : \Delta \\
-  q, \exModF{q}{\Delta} \loadsTo \theta \\
+  q, \loaded{q}{\Delta} \loadsTo \theta \\
   \vdash \vec{\iota} : \Gamma
 }
 {
@@ -62,7 +62,7 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q : \Delta \\
-  q, \exModF{q}{\Delta} \loadsTo \theta \\
+  q, \loaded{q}{\Delta} \loadsTo \theta \\
   \Delta, \vec{x} \importsR \Gamma' \\
   \vdash \vec{\iota} : \Gamma
 }
@@ -86,7 +86,7 @@
 \inferrule*[lab={\ruleName{loads-to-qualified}}]
 {
   \vdash_{\mathsf{load}} q : \Gamma' \\
-  q, \exModF{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo \theta'
+  q, \loaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo \theta'
 }
 {
   q.x, \theta \loadsTo \theta'
@@ -112,11 +112,11 @@
 \inferrule*[lab={\ruleName{statement}}]
 {
   \Gamma \vdash s : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash \vec{s} : \Delta' \\
+  \Gamma \override \Delta \vdash \vec{s} : \Delta' \\
   \capturesS(s) \cap \assignsS(\vec{s}) = \varnothing
 }
 {
-  \Gamma \vdash s \cons \vec{s} : \Delta \runion \Delta'
+  \Gamma \vdash s \cons \vec{s} : \Delta \override \Delta'
 }
 \and
 \inferrule*[lab={\ruleName{class}}]
@@ -126,7 +126,7 @@
   \Gamma, \bind{c}{C} \vdash \vec{s} : \Delta
 }
 {
-  \Gamma \vdash \exDataclass{c}{\phi} \cons \vec{s} : \set{\bind{c}{C}} \runion \Delta
+  \Gamma \vdash \exDataclass{c}{\phi} \cons \vec{s} : \set{\bind{c}{C}} \override \Delta
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
@@ -138,7 +138,7 @@
   \Gamma, \bind{c}{C} \vdash \vec{s} : \Delta
 }
 {
-  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons \vec{s} : \set{\bind{c}{C}} \runion \Delta
+  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons \vec{s} : \set{\bind{c}{C}} \override \Delta
 }
 \end{mathpar}
 \subcaption{Statements $\vec{s}$ of module $q$ are well-formed in $\Gamma$}
@@ -159,7 +159,7 @@
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submodules(q)) = \varnothing
 }
 {
-  \vdash_{\mathsf{load}} q : \submodules(q) \runion \Delta
+  \vdash_{\mathsf{load}} q : \submodules(q) \override \Delta
 }
 
 \end{mathpar}

@@ -7,7 +7,6 @@
 }
 
 \newcommand*{\figref}[1]{Figure~\ref{fig:#1}}
-\newcommand*{\figrefTwo}[2]{Figures \ref{fig:#1} and \ref{fig:#2}}
 
 \definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
 \newcommand*{\shadebox}[1]{\fcolorbox{lightgray}{shadecolor}{\raisebox{0pt}[0.60\baselineskip][0.05\baselineskip]{#1}}}
@@ -18,22 +17,19 @@
 \newcommand*{\disjunion}{\uplus}
 \newcommand*{\set}[1]{\{#1\}}
 
-\newcommand*{\assignsF}{\mathrm{assigns}}
 \newcommand*{\assignsS}{\mathrm{assigns}}
-\newcommand*{\wf}[2]{#1 \vdash #2}
 \newcommand*{\Assigns}[1]{\mathsf{Assigns}\;#1}
 \newcommand*{\Returns}{\mathsf{Returns}}
 
 % expressions
-\newcommand*{\exApp}[2]{#1(#2)}
+\newcommand*{\exCall}[2]{#1(#2)}
 \newcommand*{\exConstr}[2]{#1(#2)}
 \newcommand*{\patConstr}[2]{#1(#2)}
-\newcommand*{\patConstrKeyword}[2]{#1(#2)}
-\newcommand*{\exBinaryApp}[3]{#1 \mathbin{#2} #3}
-\newcommand*{\exUnaryApp}[2]{#1\,#2}
+\newcommand*{\exBinOp}[3]{#1 \mathbin{#2} #3}
+\newcommand*{\exUnaryOp}[2]{#1\,#2}
 \newcommand*{\exDict}[1]{\{#1\}}
-\newcommand*{\exProject}[2]{#1\mathord{.}#2}
-\newcommand*{\exDProject}[2]{#1[#2]}
+\newcommand*{\exAttr}[2]{#1\mathord{.}#2}
+\newcommand*{\exSubscript}[2]{#1[#2]}
 \newcommand*{\exCondExpr}[3]{#1\;\pyinline{if}\;#2\;\pyinline{else}\;#3}
 \newcommand*{\exList}[1]{[#1]}
 \newcommand*{\exTuple}[1]{(#1)}
@@ -51,18 +47,17 @@
 \newcommand*{\exImport}[1]{\pyinline{import}\;#1}
 \newcommand*{\exFromImport}[2]{\pyinline{from}\;#1\;\pyinline{import}\;#2}
 \newcommand*{\exAssertMsg}[2]{\pyinline{assert}\;#1, #2}
-\newcommand*{\exClosure}[4][]{\mathsf{Lam}_{#1}(#2, #3, #4)}
+\newcommand*{\exLamClosure}[4][]{\mathsf{Lam}_{#1}(#2, #3, #4)}
 \newcommand*{\exDefClosure}[4][]{\mathsf{Def}_{#1}(#2, #3, #4)}
 \newcommand*{\exObj}[3]{\mathsf{Obj}_{#1}(#2, #3)}
-\newcommand*{\exMod}[1]{\mathsf{Mod}(#1)}
-\newcommand*{\exModF}[2]{\mathsf{Mod}(#1, #2)}
+\newcommand*{\stub}[1]{\mathsf{Mod}(#1)}
+\newcommand*{\loaded}[2]{\mathsf{Mod}(#1, #2)}
 \newcommand*{\extend}{\lhd}
 \newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
 \newcommand*{\exDataclass}[2]{@\pyinline{dataclass}\;\pyinline{class}\;#1:\;#2}
 \newcommand*{\exDataclassExtend}[3]{@\pyinline{dataclass}\;\pyinline{class}\;#1(#2):\;#3}
 \newcommand*{\exField}[1]{#1:\;\pyinline{Any}}
 \newcommand*{\exElif}[2]{\pyinline{elif}\;#1:\;#2}
-\newcommand*{\exFunCall}[2]{#1(#2)}
 \newcommand*{\exIf}[3]{\pyinline{if}\;#1:\;#2\;#3}
 \newcommand*{\exIfElse}[4]{\pyinline{if}\;#1:\;#2\;#3\;\pyinline{else}:\;#4}
 \newcommand*{\exMatch}[2]{\pyinline{match}\;#1\mathord{:}\;#2}
@@ -78,7 +73,7 @@
 \newcommand*{\statusDefAssigned}{\mathsf{tt}}
 \newcommand*{\statusNotDefAssigned}{\mathsf{ff}}
 \newcommand*{\clsEntry}[4]{\mathsf{Cls}_{#1}(#2, #3, #4)}
-\newcommand*{\runion}{\cdot}
+\newcommand*{\override}{\cdot}
 \newcommand*{\meet}{\wedge}
 \newcommand*{\merge}{\oplus}
 \newcommand*{\B}{\mathbb{B}}
@@ -91,12 +86,10 @@
 \newcommand*{\imports}{\mathrm{imports}}
 \newcommand*{\parents}{\mathrm{parents}}
 \newcommand*{\nameOf}{\mathrm{name}}
-\newcommand*{\classes}{\mathrm{classes}}
 \newcommand*{\fields}{\mathrm{fields}}
 \newcommand*{\resolveClass}{\mathrm{resolve\text{-}class}}
-\newcommand*{\cacheEnv}{\mathrm{env}}
+\newcommand*{\env}{\mathrm{env}}
 \newcommand*{\submodules}{\mathrm{submodules}}
-\newcommand*{\loadSubmodule}{\mathrm{load\text{-}submod}}
 \newcommand*{\names}{\mathrel{\mathsf{names}}}
 \newcommand*{\importsR}{\mathrel{\mathsf{imports}}}
 \newcommand*{\loadsTo}{\mathrel{\mathsf{loads\mbox{-}to}}}

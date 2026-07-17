@@ -29,16 +29,16 @@
 \inferrule*[lab={\ruleName{val-lambda}}]
 {
   \vdash \rho : \Gamma \\
-  \Gamma \runion \statusDefAssigned(\seq{x}) \vdash e
+  \Gamma \override \statusDefAssigned(\seq{x}) \vdash e
 }
 {
-  \vdash \exClosure[\Gamma]{\rho}{\seq{x}}{e}
+  \vdash \exLamClosure[\Gamma]{\rho}{\seq{x}}{e}
 }
 \and
 \inferrule*[lab={\ruleName{val-def}}]
 {
   \vdash \rho : \Gamma \\
-  \Gamma \runion \statusDefAssigned(\seq{f} \cons \seq{x}_j) \runion \statusNotDefAssigned(\assignsS(b_j) \setminus \seq{x}_j) \vdash b_j : R_j \quad (\forall j) \\
+  \Gamma \override \statusDefAssigned(\seq{f} \cons \seq{x}_j) \override \statusNotDefAssigned(\assignsS(b_j) \setminus \seq{x}_j) \vdash b_j : R_j \quad (\forall j) \\
   \seq{f} \text{ distinct}
 }
 {
@@ -58,7 +58,7 @@
   q \in \dom(\mathcal{M})
 }
 {
-  \vdash \exMod{q}
+  \vdash \stub{q}
 }
 \and
 
@@ -68,7 +68,7 @@
   \vdash \rho : \Gamma
 }
 {
-  \vdash \exModF{q}{\rho}
+  \vdash \loaded{q}{\rho}
 }
 \and
 \inferrule*[lab={\ruleName{val-class}}]
@@ -107,7 +107,7 @@
   \vdash \rho : \Gamma
 }
 {
-  \vdash \set{\bind{x}{v}} \runion \rho : \set{\bind{x}{\theta}} \runion \Gamma
+  \vdash \set{\bind{x}{v}} \override \rho : \set{\bind{x}{\theta}} \override \Gamma
 }
 \end{mathpar}
 \caption{Well-formed values and environments}

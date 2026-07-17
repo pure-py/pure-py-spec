@@ -14,22 +14,22 @@
 \inferrule*[lab={\ruleName{imp-member}}]
 {
   \bind{x}{v} \in \rho \\
-  v \neq \exMod{q'} \quad (\forall q') \\
+  v \neq \stub{q'} \quad (\forall q') \\
   \rho, \vec{x} \importsR \rho'
 }
 {
-  \rho, x \cons \vec{x} \importsR \set{\bind{x}{v}} \runion \rho'
+  \rho, x \cons \vec{x} \importsR \set{\bind{x}{v}} \override \rho'
 }
 \and
 
 \inferrule*[lab={\ruleName{imp-submodule}}]
 {
-  \bind{x}{\exMod{q'}} \in \rho \\
+  \bind{x}{\stub{q'}} \in \rho \\
   q' \Rightarrow_{\mathsf{load}} \rho'' \\
   \rho, \vec{x} \importsR \rho'
 }
 {
-  \rho, x \cons \vec{x} \importsR \set{\bind{x}{\exModF{q'}{\rho''}}} \runion \rho'
+  \rho, x \cons \vec{x} \importsR \set{\bind{x}{\loaded{q'}{\rho''}}} \override \rho'
 }
 
 \end{mathpar}
@@ -56,7 +56,7 @@
 {
   q = x \cons \seq{x} \\
   q \Rightarrow_{\mathsf{load}} \rho \\
-  q, \exModF{q}{\rho} \loadsTo v \\
+  q, \loaded{q}{\rho} \loadsTo v \\
   \vdash \vec{\iota} \Rightarrow \rho'
 }
 {
@@ -89,7 +89,7 @@
 \inferrule*[lab={\ruleName{loads-to-qualified}}]
 {
   q \Rightarrow_{\mathsf{load}} \rho \\
-  q, \exModF{q}{\rho \extend \set{\bind{x}{v}}} \loadsTo v'
+  q, \loaded{q}{\rho \extend \set{\bind{x}{v}}} \loadsTo v'
 }
 {
   q.x, v \loadsTo v'
@@ -115,28 +115,28 @@
 \inferrule*[lab={\ruleName{eval-statement}}]
 {
   \rho, s \Rightarrow \assigns{\rho'} \\
-  \rho \runion \rho', \vec{s} \Rightarrow \rho''
+  \rho \override \rho', \vec{s} \Rightarrow \rho''
 }
 {
-  \rho, s \cons \vec{s} \Rightarrow \rho' \runion \rho''
+  \rho, s \cons \vec{s} \Rightarrow \rho' \override \rho''
 }
 \and
 \inferrule*[lab={\ruleName{eval-class}}]
 {
   C = \clsEntry{\Gamma}{q}{\ownFields(\phi)}{\bot} \\
-  \rho \runion \set{\bind{c}{C}}, \vec{s} \Rightarrow \rho'
+  \rho \override \set{\bind{c}{C}}, \vec{s} \Rightarrow \rho'
 }
 {
-  \rho, \exDataclass{c}{\phi} \cons \vec{s} \Rightarrow \set{\bind{c}{C}} \runion \rho'
+  \rho, \exDataclass{c}{\phi} \cons \vec{s} \Rightarrow \set{\bind{c}{C}} \override \rho'
 }
 \and
 \inferrule*[lab={\ruleName{eval-class-extend}}]
 {
   C = \clsEntry{\Gamma}{q}{\ownFields(\phi)}{c'} \\
-  \rho \runion \set{\bind{c}{C}}, \vec{s} \Rightarrow \rho'
+  \rho \override \set{\bind{c}{C}}, \vec{s} \Rightarrow \rho'
 }
 {
-  \rho, \exDataclassExtend{c}{c'}{\phi} \cons \vec{s} \Rightarrow \set{\bind{c}{C}} \runion \rho'
+  \rho, \exDataclassExtend{c}{c'}{\phi} \cons \vec{s} \Rightarrow \set{\bind{c}{C}} \override \rho'
 }
 \end{mathpar}
 \subcaption{Statements $\vec{s}$ of module $q$ evaluate under environment $\rho : \Gamma$, producing bindings $\rho'$}
@@ -156,7 +156,7 @@
   \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \vec{s} \Rightarrow \rho'
 }
 {
-  q \Rightarrow_{\mathsf{load}} \submodules(q) \runion \rho'
+  q \Rightarrow_{\mathsf{load}} \submodules(q) \override \rho'
 }
 
 \end{mathpar}

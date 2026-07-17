@@ -4,13 +4,13 @@
 \begin{tabular}{rcll}
 $e$ & $::=$ & $x$ & (Var) \\
     & $\mid$ & $\ell$ & (Literal) \\
-    & $\mid$ & $\exApp{e}{e_1, \ldots, e_n}$ & (Call) \\
+    & $\mid$ & $\exCall{e}{e_1, \ldots, e_n}$ & (Call) \\
     & $\mid$ & $\exConstr{q}{e_1, \ldots, e_n, x_{n+1} \mathord{=} e_{n+1}, \ldots, x_{n+m} \mathord{=} e_{n+m}}$ & (Constr) \\
     & $\mid$ & $\exDict{x_1 \mathord{:} e_1, \ldots, x_n \mathord{:} e_n}$ & (Dict) \\
-    & $\mid$ & $\exProject{e}{x}$ & (Attribute) \\
-    & $\mid$ & $\exDProject{e}{e'}$ & (Subscript) \\
-    & $\mid$ & $\exBinaryApp{e}{\odot}{e'}$ & (BinOp) \\
-    & $\mid$ & $\exUnaryApp{\ominus}{e}$ & (UnaryOp) \\
+    & $\mid$ & $\exAttr{e}{x}$ & (Attribute) \\
+    & $\mid$ & $\exSubscript{e}{e'}$ & (Subscript) \\
+    & $\mid$ & $\exBinOp{e}{\odot}{e'}$ & (BinOp) \\
+    & $\mid$ & $\exUnaryOp{\ominus}{e}$ & (UnaryOp) \\
     & $\mid$ & $\exCondExpr{e_1}{e}{e_2}$ & (CondExpr) \\
     & $\mid$ & $\exList{e_1, \ldots, e_n}$ & (List) \\
     & $\mid$ & $\exTuple{e_1, \ldots, e_n}$ & (Tuple) \\

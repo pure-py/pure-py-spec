@@ -17,7 +17,7 @@ Metavariables $x$, $f$, $c$ range over \emph{variables}; idiomatically $f$ is us
 A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the following \emph{context entries} $\theta$:
 \begin{itemize}
 \item the variable's \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
-\item a \emph{module reference}, for a fully-qualified module name $q$: either a \emph{stub} $\exMod{q}$, or \emph{loaded} reference $\exModF{q}{\Gamma}$, which also carries the member context $\Gamma$ of $q$;
+\item a \emph{module reference}, for a fully-qualified module name $q$: either a \emph{stub} $\stub{q}$, or \emph{loaded} reference $\loaded{q}{\Gamma}$, which also carries the member context $\Gamma$ of $q$;
 \item a \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q}{\vec{x}}{c}$, recording the declaring context $\Gamma$, defining module $q$, sequence of distinct field names $\vec{x}$, and base class $c$ (or $\bot$ for no base).
 \end{itemize}
 \end{definition}
@@ -27,16 +27,16 @@ It is useful to represent contexts as total functions on the set of all variable
 
 \paragraph{Context operations.}
 
-Contexts admit a non-commutative monoid of sequential composition $\Gamma \runion \Delta$ (``override'') and
+Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
 an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
-\emph{right near-semiring}~\cite{vanhoorn1967}: $\runion$ right-distributes over $\merge$ (Lemma~1), but left
+\emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$ (Lemma~1), but left
 distributivity does not hold. Both operations are defined pointwise.
 %
 \begin{definition}[Context override]
 {\small
 \begin{align*}
-\bot \runion \theta &= \theta \runion \bot = \theta \\
-\theta \runion \theta' &= \theta' \quad (\text{otherwise})
+\bot \override \theta &= \theta \override \bot = \theta \\
+\theta \override \theta' &= \theta' \quad (\text{otherwise})
 \end{align*}}
 \end{definition}
 
@@ -58,8 +58,8 @@ a \merge a' &= a \meet a'
 \label{def:extend}
 {\small
 \begin{align*}
-\exModF{q}{\Gamma} \extend \exModF{q}{\Gamma'} &= \exModF{q}{\Gamma \extend \Gamma'} \\
-\exMod{q} \extend \exModF{q}{\Gamma} = \exModF{q}{\Gamma} \extend \exMod{q} &= \exModF{q}{\Gamma} \\
+\loaded{q}{\Gamma} \extend \loaded{q}{\Gamma'} &= \loaded{q}{\Gamma \extend \Gamma'} \\
+\stub{q} \extend \loaded{q}{\Gamma} = \loaded{q}{\Gamma} \extend \stub{q} &= \loaded{q}{\Gamma} \\
 \bot \extend \theta = \theta \extend \bot &= \theta \\
 \theta \extend \theta' &= \theta' \quad (\text{otherwise})
 \end{align*}}
@@ -69,12 +69,12 @@ a \merge a' &= a \meet a'
 
 \begin{lemma}[Right distributivity]
 \[
-(\Delta \merge \Delta') \runion \Gamma = (\Delta \runion \Gamma) \merge (\Delta' \runion \Gamma).
+(\Delta \merge \Delta') \override \Gamma = (\Delta \override \Gamma) \merge (\Delta' \override \Gamma).
 \]
 \end{lemma}
 
-\noindent Left distributivity ($\Gamma \runion (\Delta \merge \Delta') = (\Gamma \runion \Delta) \merge
-(\Gamma \runion \Delta')$) does not hold. If it did, the following two programs would be equivalent, since
+\noindent Left distributivity ($\Gamma \override (\Delta \merge \Delta') = (\Gamma \override \Delta) \merge
+(\Gamma \override \Delta')$) does not hold. If it did, the following two programs would be equivalent, since
 sequential composition with a preceding assignment could be distributed into the branches of a conditional.
 But they are not: the left program is ill-formed, because a variable assigned before a conditional does not
 remain definitely assigned if only some branches assign it (see also \S\ref{sec:local-assignment}).
@@ -200,7 +200,7 @@ $\Delta$, which may be empty. The base cases are that \pyinline{return e} defini
 = e} definitely assigns $\set{\bind{\pyinline{x}}{\statusDefAssigned}}$. \emph{Result types} $R$ classify these outcomes: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$). Block well-formedness is given in
 \figref{well-formed}; expression well-formedness in \figref{well-formed-expr}.
 
-Context operations $\runion$ and $\merge$ lift to a right semiring over result types $R$, with $\Assigns{\varnothing}$ as left and right unit for $\runion$ and $\Returns$ as unit for $\merge$ and zero for $\runion$.
+Context operations $\override$ and $\merge$ lift to a right semiring over result types $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge$ and zero for $\override$.
 
 \begin{definition}[Override and merge on result types]
 {\small
@@ -208,16 +208,16 @@ Context operations $\runion$ and $\merge$ lift to a right semiring over result t
 \Assigns{\Delta} \merge \Assigns{\Delta'} & = \Assigns{(\Delta \merge \Delta')} \\
 R \merge \Returns = \Returns \merge R & = R \\
 \\
-\Assigns{\Delta} \runion \Assigns{\Delta'} & = \Assigns{(\Delta \runion \Delta')} \\
-R \runion \Returns = \Returns \runion R & = \Returns
+\Assigns{\Delta} \override \Assigns{\Delta'} & = \Assigns{(\Delta \override \Delta')} \\
+R \override \Returns = \Returns \override R & = \Returns
 \end{align*}}
 \end{definition}
 
-\noindent The $\Returns \runion R$ case never arises because the well-formedness judgement prohibits unreachable statements (\S\ref{sec:unreachable}).
+\noindent The $\Returns \override R$ case never arises because the well-formedness judgement prohibits unreachable statements (\S\ref{sec:unreachable}).
 
 \begin{lemma}[Right distributivity (result types)]
 \[
-(R \merge R') \runion S = (R \runion S) \merge (R' \runion S)
+(R \merge R') \override S = (R \override S) \merge (R' \override S)
 \]
 \end{lemma}
 

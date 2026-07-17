@@ -80,7 +80,7 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \Gamma \runion \statusDefAssigned(\seq{f} \cons \seq{x}_i) \runion \statusNotDefAssigned(\assignsS(b_i) \setminus \seq{x}_i) \vdash b_i : R_i \quad (\forall i)
+  \Gamma \override \statusDefAssigned(\seq{f} \cons \seq{x}_i) \override \statusNotDefAssigned(\assignsS(b_i) \setminus \seq{x}_i) \vdash b_i : R_i \quad (\forall i)
   \\
   \seq{f} \text{ distinct}
 }
@@ -91,8 +91,8 @@
 \inferrule*[lab={\ruleName{match}}]
 {
   \Gamma \vdash e \\
-  \Gamma \runion \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
-  S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \runion R_i \quad (\forall i) \\
+  \Gamma \override \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
+  S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \override R_i \quad (\forall i) \\
   \Gamma \vdash \seq{p} \\
   p_{n+1} \in \set{x, \patWild}
 }
@@ -103,8 +103,8 @@
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Gamma \vdash e \\
-  \Gamma \runion \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
-  S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \runion R_i \quad (\forall i) \\
+  \Gamma \override \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
+  S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \override R_i \quad (\forall i) \\
   \Gamma \vdash \seq{p} \\
   p_{n+1} \notin \set{x, \patWild}
 }
@@ -115,11 +115,11 @@
 \inferrule*[lab={\ruleName{cons}}]
 {
   \Gamma \vdash s : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash b : R \\
+  \Gamma \override \Delta \vdash b : R \\
   \capturesS(s) \cap \assignsS(b) = \varnothing
 }
 {
-  \Gamma \vdash s \cons b : \Assigns{\Delta} \runion R
+  \Gamma \vdash s \cons b : \Assigns{\Delta} \override R
 }
 \end{mathpar}
 \caption{Block $b$ is well-formed in $\Gamma$}
