@@ -75,22 +75,22 @@
 {\color{blue}
 \inferrule*[lab={\ruleName{eval-import}}]
 {
-  q' \Rightarrow_{\mathsf{load}} \rho'' \\
-  q', \exModF{q'}{\rho''} \wraps \rho' \\
-  \vdash \vec{\iota} \Rightarrow \rho
+  q \Rightarrow_{\mathsf{load}} \rho \\
+  q, \exModF{q}{\rho} \wraps \rho' \\
+  \vdash \vec{\iota} \Rightarrow \rho''
 }
 {
-  \vdash \exImport{q'} \cons \vec{\iota} \Rightarrow \rho' \extend \rho
+  \vdash \exImport{q} \cons \vec{\iota} \Rightarrow \rho' \extend \rho''
 }}
 \and
 \inferrule*[lab={\ruleName{eval-from-import}}]
 {
-  q' \Rightarrow_{\mathsf{load}} \rho'' \\
-  {\color{blue}\rho''}\,{\color{deletedgray}q'}, \vec{x} \importsR \rho' \\
-  \vdash \vec{\iota} \Rightarrow \rho
+  q \Rightarrow_{\mathsf{load}} \rho \\
+  {\color{blue}\rho}\,{\color{deletedgray}q'}, \vec{x} \importsR \rho' \\
+  \vdash \vec{\iota} \Rightarrow \rho''
 }
 {
-  \vdash \exFromImport{q'}{\vec{x}} \cons \vec{\iota} \Rightarrow \rho' {\color{blue}\extend}\,{\color{deletedgray}\runion} \rho
+  \vdash \exFromImport{q}{\vec{x}} \cons \vec{\iota} \Rightarrow \rho' {\color{blue}\extend}\,{\color{deletedgray}\runion} \rho''
 }
 \and
 {\color{deletedgray}
