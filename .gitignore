@@ -12,3 +12,7 @@ agda/_build/
 __pycache__/
 
 .claude/settings.local.json
+*.cb
+*.cb2
+*.loc
+*.soc
