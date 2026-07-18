@@ -73,6 +73,12 @@
 
 \end{mathpar}
 
+\subcaption{Import prefix $\seq{\iota}$ {\color{blue}of module $q_0$} produces bindings $\Gamma$}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$q, \theta \loadsTo \theta'$}
 \begin{mathpar}
 \small
@@ -93,11 +99,13 @@
   q.x, \theta \loadsTo \theta'
 }
 \end{mathpar}
-\subcaption{Import prefix $\seq{\iota}$ {\color{blue}of module $q_0$} produces bindings $\Gamma$; loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}
+\subcaption{Loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}
 \end{subfigure}
+\caption{Import well-formedness}
+\label{fig:well-formed-imports}
+\end{figure}
 
-\vspace{2mm}
-
+\begin{figure}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Gamma \vdash \seq{s} : \Delta$}
 \begin{mathpar}
