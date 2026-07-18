@@ -51,6 +51,7 @@
 \inferrule*[lab={\ruleName{import}}]
 {
   q = x \cons \seq{x} \\
+  {\color{blue}q_0 \notin \parents(q)} \\
   \vdash_{\mathsf{load}} q : \Delta \\
   q, \modLoaded{q}{\Delta} \loadsTo \theta \\
   \vdash \seq{\iota} : \Gamma
@@ -62,7 +63,7 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q : \Delta \\
-  q, \modLoaded{q}{\Delta} \loadsTo \theta \\
+  {\color{blue}\vdash_{\mathsf{load}} p : \Delta' \quad (\forall p \in \parents(q) \setminus \prefixes(q_0))}\,{\color{deletedgray}q, \modLoaded{q}{\Delta} \loadsTo \theta} \\
   \Delta, \seq{x} \importsR \Gamma' \\
   \vdash \seq{\iota} : \Gamma
 }
@@ -92,7 +93,7 @@
   q.x, \theta \loadsTo \theta'
 }
 \end{mathpar}
-\subcaption{Import prefix $\seq{\iota}$ produces bindings $\Gamma$; loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}
+\subcaption{Import prefix $\seq{\iota}$ {\color{blue}of module $q_0$} produces bindings $\Gamma$; loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}
 \end{subfigure}
 
 \vspace{2mm}

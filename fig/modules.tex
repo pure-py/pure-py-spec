@@ -8,10 +8,14 @@
 \\
 \parents(x) &= \varnothing \\
 \parents(q.x) &= \parents(q) \cup \set{q} \\
+{\color{blue}\prefixes(q)} &= {\color{blue}\parents(q) \cup \set{q}} \\
+\\
+{\color{blue}\deps_{q_0}(\exImport{q})} &= {\color{blue}\imports(\exImport{q}) \cup \parents(q)} \\
+{\color{blue}\deps_{q_0}(\exFromImport{q}{\seq{x}})} &= {\color{blue}\imports(\exFromImport{q}{\seq{x}}) \cup (\parents(q) \setminus \prefixes(q_0))} \\
 \\
 \submodules(q) &= \set{\bind{x}{\modStub{q.x}} \mid q.x \in \dom(\mathcal{M})}
 \end{align*}
-\subcaption{$\imports$, $\parents$, and $\submodules$ metafunctions}
+\subcaption{$\imports$, $\parents$, {\color{blue}$\prefixes$, $\deps$,} and $\submodules$ metafunctions}
 \end{subfigure}
 
 \vspace{2mm}
