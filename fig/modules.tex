@@ -9,7 +9,7 @@
 {\color{deletedgray}\parents(x)} &= {\color{deletedgray}\varnothing} \\
 {\color{deletedgray}\parents(q.x)} &= {\color{deletedgray}\parents(q) \cup \set{q}} \\
 \\
-{\color{blue}\deps_{q}(\exImport{q'})} &= {\color{blue}\imports(\exImport{q'}) \cup \set{p \mid p \properPrefixOf q'}} \\
+{\color{blue}\deps_{q}(\exImport{q'})} &= {\color{blue}\imports(\exImport{q'}) \cup \set{p \mid p \properPrefixOf q', p \neq q}} \\
 {\color{blue}\deps_{q}(\exFromImport{q'}{\seq{x}})} &= {\color{blue}\imports(\exFromImport{q'}{\seq{x}}) \cup \set{p \mid p \properPrefixOf q', p \not\prefixOf q}} \\
 \\
 \submodules(q) &= \set{\bind{x}{\modStub{q.x}} \mid q.x \in \dom(\mathcal{M})}

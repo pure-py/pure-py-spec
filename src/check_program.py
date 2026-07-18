@@ -4,9 +4,8 @@ import sys
 from typing import Optional
 
 import parse
-import reasons
 from aux import annotate_seq_kinds
-from check_module import check_module, has_cycle, proper_prefix_of
+from check_module import check_module, has_cycle
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
 
 
@@ -18,7 +17,7 @@ def deps(tree: ast.Module, q: str, base_dir: pathlib.Path) -> set[str]:
     plains = [a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names]
     exempt = proper_prefixes(q) | {q}
     return (imports(tree, base_dir)
-            | {p for t in plains for p in proper_prefixes(t)}
+            | {p for t in plains for p in proper_prefixes(t) if p != q}
             | {p for t in froms for p in proper_prefixes(t) if p not in exempt})
 
 
@@ -108,13 +107,6 @@ def walk_program(entry_path: pathlib.Path) -> None:
     queue = [*sorted(PREDEFINED_MODULES), *sorted(source_tree(base_dir, entry_path)), *with_proper_prefixes(entry_imports)]
     modules, _ = discover(queue, ({'__main__': (entry_path, entry_tree)},
                           {'__main__': entry_imports}), base_dir)
-
-    for name, (path, tree) in modules.items():
-        for stmt in tree.body:
-            if isinstance(stmt, ast.Import) and proper_prefix_of(name, stmt.names[0].name):
-                e = IllFormedModule(stmt, reasons.OwnDescendantImport(stmt.names[0].name, name))
-                e.msg = f"{path}: {e.msg}"
-                raise e
 
     graph = {name: deps(tree, name, base_dir) for name, (_, tree) in modules.items()}
     cycle = has_cycle(graph)
