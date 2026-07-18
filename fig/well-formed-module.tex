@@ -53,7 +53,7 @@
   q = x \cons \seq{x} \\
   {\color{blue}q_0 \notin \parents(q)} \\
   \vdash_{\mathsf{load}} q : \Delta \\
-  q, \modLoaded{q}{\Delta} \loadsTo \theta \\
+  q, \modLoaded{q}{\Delta} \loadsTo_{{\color{blue}\varepsilon}} \theta \\
   \vdash \seq{\iota} : \Gamma
 }
 {
@@ -63,7 +63,7 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q : \Delta \\
-  {\color{blue}\vdash_{\mathsf{load}} p : \Delta' \quad (\forall p \in \parents(q) \setminus \prefixes(q_0))}\,{\color{deletedgray}q, \modLoaded{q}{\Delta} \loadsTo \theta} \\
+  q, \modLoaded{q}{\Delta} \loadsTo_{{\color{blue}q_0}} \theta \\
   \Delta, \seq{x} \importsR \Gamma' \\
   \vdash \seq{\iota} : \Gamma
 }
@@ -79,7 +79,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$q, \theta \loadsTo \theta'$}
+\flushleft \shadebox{$q, \theta \loadsTo_{{\color{blue}r}} \theta'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{loads-to-simple}}]
@@ -87,19 +87,29 @@
   \strut
 }
 {
-  x, \theta \loadsTo \theta
+  x, \theta \loadsTo_{{\color{blue}r}} \theta
 }
 \and
 \inferrule*[lab={\ruleName{loads-to-qualified}}]
 {
+  {\color{blue}q \notin \prefixes(r)} \\
   \vdash_{\mathsf{load}} q : \Gamma' \\
-  q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo \theta'
+  q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo_{{\color{blue}r}} \theta'
 }
 {
-  q.x, \theta \loadsTo \theta'
+  q.x, \theta \loadsTo_{{\color{blue}r}} \theta'
 }
+\and
+{\color{blue}
+\inferrule*[lab={\ruleName{loads-to-bound}}]
+{
+  q \in \prefixes(r)
+}
+{
+  q.x, \theta \loadsTo_{r} \theta
+}}
 \end{mathpar}
-\subcaption{Loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}
+\subcaption{Loaded reference $\theta$ for module $q$ loads to the reference for the head of $q${\color{blue}; the walk stops at prefixes of the bound $r$}}
 \end{subfigure}
 \caption{Import well-formedness}
 \label{fig:well-formed-imports}
