@@ -171,9 +171,8 @@ The \emph{dependency graph} $G_{\mathcal{M}}$ of a program has an edge $(q, q')$
 module itself, which are necessarily still in progress when it runs and so cannot be required to load
 first. The exception appears only in the from-import clause because an import naming a proper descendant
 of the importing module is prohibited outright (\S\ref{sec:prohibited}). In the rules
-(\figref{well-formed-imports}), the exemption is the bound $m$ on the loads-to judgement, a possibly-empty
-module name whose prefixes the walk skips: $\varepsilon$ for an import, the importing module for a
-from-import.} Program well-formedness (\figref{well-formed-module}) requires the
+(\figref{well-formed-imports}), the exemption is the bound on the loads-to judgement, whose prefixes the
+walk skips: $\varepsilon$ for an import, the importing module for a from-import.} Program well-formedness (\figref{well-formed-module}) requires the
 main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
 to be acyclic. 
 

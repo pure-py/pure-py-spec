@@ -79,7 +79,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$q, \theta \loadsTo_{{\color{blue}m}} \theta'$}
+\flushleft \shadebox{$q, \theta \loadsTo_{{\color{blue}\seq{x}}} \theta'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{loads-to-simple}}]
@@ -87,26 +87,26 @@
   \strut
 }
 {
-  x, \theta \loadsTo_{{\color{blue}m}} \theta
+  x, \theta \loadsTo_{{\color{blue}\seq{x}}} \theta
 }
 \and
 \inferrule*[lab={\ruleName{loads-to-qualified}}]
 {
-  {\color{blue}q \notin \prefixes(m)} \\
+  {\color{blue}q \notin \prefixes(\seq{x})} \\
   \vdash_{\mathsf{load}} q : \Gamma' \\
-  q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo_{{\color{blue}m}} \theta'
+  q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo_{{\color{blue}\seq{x}}} \theta'
 }
 {
-  q.x, \theta \loadsTo_{{\color{blue}m}} \theta'
+  q.x, \theta \loadsTo_{{\color{blue}\seq{x}}} \theta'
 }
 \and
 {\color{blue}
 \inferrule*[lab={\ruleName{loads-to-bound}}]
 {
-  q \in \prefixes(m)
+  q \in \prefixes(\seq{x})
 }
 {
-  q.x, \theta \loadsTo_{m} \theta
+  q.x, \theta \loadsTo_{\seq{x}} \theta
 }}
 \end{mathpar}
 \subcaption{Loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}
