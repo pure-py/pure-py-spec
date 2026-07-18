@@ -167,7 +167,7 @@ fully-qualified name.
 
 The \emph{dependency graph} $G_{\mathcal{M}}$ of a program has an edge $(q, q')$ iff $q' \in
 {\color{blue}\deps_{q}(\mathcal{M}(q))}\,{\color{deletedgray}\imports(\mathcal{M}(q)) \cup \parents(q)}$.
-\Added{A bare import depends on its target's ancestors, which it loads; a from-import only on ancestors
+\Added{An import depends on its target's ancestors, which it loads; a from-import only on ancestors
 outside the importing module's own package, since the enclosing packages are necessarily in progress when
 the module runs.} Program well-formedness (\figref{well-formed-module}) requires the
 main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
@@ -587,7 +587,7 @@ functional programming:
 \item Local or interleaved imports: an \pyinline{import} or \pyinline{from} statement inside a function or other block, or after a non-import statement. \PurePy permits imports only at the start of a module; Python allows them anywhere.
 \item Wildcard imports (\pyinline{from q import *}); PEP 8 recommends avoiding these\footnote{\url{https://peps.python.org/pep-0008/}}.
 \item A submodule importing itself through its parent (\pyinline{from a import b} inside module \pyinline{a.b}). \PurePy treats the from-imported submodule as a dependency, so this is an import cycle and is rejected; Python permits it, binding the partially-loaded module.
-\item \Added{A bare import naming a proper descendant of the importing module (\pyinline{import x.y} inside module \pyinline{x}): the binding for the head would denote the still-loading module. Python permits it, binding the partially-initialised module. A from-import of the module's own submodule is permitted.}
+\item \Added{An import (not a from-import) naming a proper descendant of the importing module (\pyinline{import x.y} inside module \pyinline{x}): the binding for the head would denote the still-loading module. Python permits it, binding the partially-initialised module. A from-import of the module's own submodule is permitted.}
 \item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.
 \item First-class modules: in Python, modules are values. In \PurePy a module name may be projected (member access) but not used as a value.
 \item A module binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).
