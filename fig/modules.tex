@@ -6,15 +6,13 @@
 \imports(\exImport{q}) &= \set{q} \\
 \imports(\exFromImport{q}{x_1, \ldots, x_{n+1}}) &= \set{q} \cup \set{q.x_i \mid x_i \in \dom(\submodules(q))} \\
 \\
-{\color{deletedgray}\parents(x)} &= {\color{deletedgray}\varnothing} \\
-{\color{deletedgray}\parents(q.x)} &= {\color{deletedgray}\parents(q) \cup \set{q}} \\
 \\
-{\color{blue}\deps_{q}(\exImport{q'})} &= {\color{blue}\imports(\exImport{q'}) \cup \set{p \mid p \properPrefixOf q', p \neq q}} \\
-{\color{blue}\deps_{q}(\exFromImport{q'}{\seq{x}})} &= {\color{blue}\imports(\exFromImport{q'}{\seq{x}}) \cup \set{p \mid p \properPrefixOf q', p \not\prefixOf q}} \\
+\deps_{q}(\exImport{q'}) &= \imports(\exImport{q'}) \cup \set{p \mid p \properPrefixOf q', p \neq q} \\
+\deps_{q}(\exFromImport{q'}{\seq{x}}) &= \imports(\exFromImport{q'}{\seq{x}}) \cup \set{p \mid p \properPrefixOf q', p \not\prefixOf q} \\
 \\
 \submodules(q) &= \set{\bind{x}{\modStub{q.x}} \mid q.x \in \dom(\mathcal{M})}
 \end{align*}
-\subcaption{$\imports$, {\color{deletedgray}$\parents$,} {\color{blue}$\deps$,} and $\submodules$ metafunctions}
+\subcaption{$\imports$,  $\deps$, and $\submodules$ metafunctions}
 \end{subfigure}
 
 \vspace{2mm}

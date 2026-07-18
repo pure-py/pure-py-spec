@@ -129,12 +129,10 @@ well-formedness and evaluation rules check and evaluate the statements of each b
 assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
 $\pymath{\_\_name\_\_}$ binding the runtime supplies automatically. $\mathcal{M}$ additionally always includes the predefined modules of
 \figref{predefined} and is prefix-closed: the parent of any module in $\dom(\mathcal{M})$ is itself in
-$\dom(\mathcal{M})$.\footnote{{\color{blue}A source tree encodes such an $\mathcal{M}$: each module's body is its \texttt{.py}
+$\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is its \texttt{.py}
 file, each package's body is its \texttt{\_\_init\_\_.py}, and a package directory without an
 \texttt{\_\_init\_\_.py} encodes the empty body (a namespace package, PEP 420, \url{https://peps.python.org/pep-0420/}). Prefix-closure thus holds by
-construction.}\,{\color{deletedgray}A source tree encodes such an $\mathcal{M}$ by mapping each leaf module to a
-\texttt{.py} file and each package to an \texttt{\_\_init\_\_.py}; prefix-closure then requires an
-\texttt{\_\_init\_\_.py} for every enclosing package.}} The map $\mathcal{M}$ is fixed and ambient in all
+construction.} The map $\mathcal{M}$ is fixed and ambient in all
 definitions that follow.
 
 \begin{definition}[Builtins context]
@@ -160,19 +158,18 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \label{fig:predefined}
 \end{figure}
 
-The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ {\color{blue}and $\deps$} from individual imports to import sequences; on a module body $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively. {\color{deletedgray}The metafunction $\parents$ collects the proper prefixes of a
-fully-qualified name.} \Added{Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q = p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order.}
+The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ and $\deps$ from individual imports to import sequences; on a module body $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively.  Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q = p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order.
 
 \input{fig/modules}
 
 The \emph{dependency graph} $G_{\mathcal{M}}$ of a program has an edge $(q, q')$ iff $q' \in
-{\color{blue}\deps_{q}(\mathcal{M}(q))}\,{\color{deletedgray}\imports(\mathcal{M}(q)) \cup \parents(q)}$.
-\Added{Every import depends on its target's ancestors; excepted are ancestors enclosing the importing
+\deps_{q}(\mathcal{M}(q))$.
+Every import depends on its target's ancestors; excepted are ancestors enclosing the importing
 module itself, which are necessarily still in progress when it runs and so cannot be required to load
 first. The exception appears only in the from-import clause because an import naming a proper descendant
 of the importing module is prohibited outright (\S\ref{sec:prohibited}). In the rules
 (\figref{well-formed-imports}), the exemption is the bound on the loads-to judgement, whose prefixes the walk skips:
-$\varepsilon$ for an import, the importing module for a from-import.} Program well-formedness (\figref{well-formed-module}) requires the
+$\varepsilon$ for an import, the importing module for a from-import. Program well-formedness (\figref{well-formed-module}) requires the
 main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
 to be acyclic. 
 
@@ -590,7 +587,7 @@ functional programming:
 \item Local or interleaved imports: an \pyinline{import} or \pyinline{from} statement inside a function or other block, or after a non-import statement. \PurePy permits imports only at the start of a module; Python allows them anywhere.
 \item Wildcard imports (\pyinline{from q import *}); PEP 8 recommends avoiding these\footnote{\url{https://peps.python.org/pep-0008/}}.
 \item A submodule importing itself through its parent (\pyinline{from a import b} inside module \pyinline{a.b}). \PurePy treats the from-imported submodule as a dependency, so this is an import cycle and is rejected; Python permits it, binding the partially-loaded module.
-\item \Added{An import (not a from-import) naming a proper descendant of the importing module (\pyinline{import x.y} inside module \pyinline{x}): the binding for the head would denote the still-loading module. Python permits it, binding the partially-initialised module. A from-import of the module's own submodule is permitted.}
+\item An import (not a from-import) naming a proper descendant of the importing module (\pyinline{import x.y} inside module \pyinline{x}): the binding for the head would denote the still-loading module. Python permits it, binding the partially-initialised module. A from-import of the module's own submodule is permitted.
 \item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.
 \item First-class modules: in Python, modules are values. In \PurePy a module name may be projected (member access) but not used as a value.
 \item A module binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).

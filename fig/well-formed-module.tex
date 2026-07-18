@@ -51,9 +51,9 @@
 \inferrule*[lab={\ruleName{import}}]
 {
   q' = x \cons \seq{x} \\
-  {\color{blue}q \not\properPrefixOf q'} \\
+  q \not\properPrefixOf q' \\
   \vdash_{\mathsf{load}} q' : \Delta \\
-  {\color{blue}\varepsilon,} q', \modLoaded{q'}{\Delta} \loadsTo \theta \\
+  \varepsilon, q', \modLoaded{q'}{\Delta} \loadsTo \theta \\
   \vdash \seq{\iota} : \Gamma
 }
 {
@@ -63,7 +63,7 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q' : \Delta \\
-  {\color{blue}q,} q', \modLoaded{q'}{\Delta} \loadsTo \theta \\
+  q, q', \modLoaded{q'}{\Delta} \loadsTo \theta \\
   \Delta, \seq{x} \importsR \Gamma' \\
   \vdash \seq{\iota} : \Gamma
 }
@@ -73,13 +73,13 @@
 
 \end{mathpar}
 
-\subcaption{Import prefix $\seq{\iota}$ {\color{blue}of module $q$} produces bindings $\Gamma$}
+\subcaption{Import prefix $\seq{\iota}$ of module $q$ produces bindings $\Gamma$}
 \end{subfigure}
 
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{${\color{blue}\seq{x},} q, \theta \loadsTo \theta'$}
+\flushleft \shadebox{$\seq{x}, q, \theta \loadsTo \theta'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{loads-to-simple}}]
@@ -87,27 +87,27 @@
   \strut
 }
 {
-  {\color{blue}\seq{x},} x, \theta \loadsTo \theta
+  \seq{x}, x, \theta \loadsTo \theta
 }
 \and
 \inferrule*[lab={\ruleName{loads-to-qualified}}]
 {
-  {\color{blue}q \not\prefixOf \seq{x}} \\
+  q \not\prefixOf \seq{x} \\
   \vdash_{\mathsf{load}} q : \Gamma' \\
-  {\color{blue}\seq{x},} q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo \theta'
+  \seq{x}, q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo \theta'
 }
 {
-  {\color{blue}\seq{x},} q.x, \theta \loadsTo \theta'
+  \seq{x}, q.x, \theta \loadsTo \theta'
 }
 \and
-{\color{blue}
+
 \inferrule*[lab={\ruleName{loads-to-enclosing}}]
 {
   q \prefixOf \seq{x}
 }
 {
   \seq{x}, q.x, \theta \loadsTo \theta
-}}
+}
 \end{mathpar}
 \subcaption{Loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}
 \end{subfigure}
