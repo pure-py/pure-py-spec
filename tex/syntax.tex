@@ -160,8 +160,8 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \label{fig:predefined}
 \end{figure}
 
-The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ {\color{blue}and $\deps$} from individual imports to import sequences; on a module body $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively. The metafunction $\parents$ collects the proper prefixes of a
-fully-qualified name.
+The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ {\color{blue}and $\deps$} from individual imports to import sequences; on a module body $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively. {\color{deletedgray}The metafunction $\parents$ collects the proper prefixes of a
+fully-qualified name.} \Added{Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q = p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order.}
 
 \input{fig/modules}
 
@@ -171,8 +171,8 @@ The \emph{dependency graph} $G_{\mathcal{M}}$ of a program has an edge $(q, q')$
 module itself, which are necessarily still in progress when it runs and so cannot be required to load
 first. The exception appears only in the from-import clause because an import naming a proper descendant
 of the importing module is prohibited outright (\S\ref{sec:prohibited}). In the rules
-(\figref{well-formed-imports}), the exemption is the bound on the loads-to judgement, whose prefixes the
-walk skips: $\varepsilon$ for an import, the importing module for a from-import.} Program well-formedness (\figref{well-formed-module}) requires the
+(\figref{well-formed-imports}), the exemption is the bound on the loads-to judgement, whose prefixes the walk skips:
+$\varepsilon$ for an import, the importing module for a from-import.} Program well-formedness (\figref{well-formed-module}) requires the
 main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
 to be acyclic. 
 

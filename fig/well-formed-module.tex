@@ -51,7 +51,7 @@
 \inferrule*[lab={\ruleName{import}}]
 {
   q = x \cons \seq{x} \\
-  {\color{blue}q_0 \notin \parents(q)} \\
+  {\color{blue}q_0 \not\properPrefixOf q} \\
   \vdash_{\mathsf{load}} q : \Delta \\
   {\color{blue}\varepsilon,} q, \modLoaded{q}{\Delta} \loadsTo \theta \\
   \vdash \seq{\iota} : \Gamma
@@ -92,7 +92,7 @@
 \and
 \inferrule*[lab={\ruleName{loads-to-qualified}}]
 {
-  {\color{blue}q \notin \prefixes(\seq{x})} \\
+  {\color{blue}q \not\prefixOf \seq{x}} \\
   \vdash_{\mathsf{load}} q : \Gamma' \\
   {\color{blue}\seq{x},} q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo \theta'
 }
@@ -103,7 +103,7 @@
 {\color{blue}
 \inferrule*[lab={\ruleName{loads-to-bound}}]
 {
-  q \in \prefixes(\seq{x})
+  q \prefixOf \seq{x}
 }
 {
   \seq{x}, q.x, \theta \loadsTo \theta
