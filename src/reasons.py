@@ -201,6 +201,14 @@ class ModuleAsValue:
 
 
 @dataclass(frozen=True)
+class OwnDescendantImport:
+    q: str
+    q0: str
+    def message(self) -> str:
+        return f"'{self.q}' is a descendant of the importing module '{self.q0}'; import it with a from-import"
+
+
+@dataclass(frozen=True)
 class ClassAsValue:
     name: str
     def message(self) -> str:
@@ -216,7 +224,7 @@ Reason = Union[
     UnknownConstructorKeyword,
     NonlinearPattern, UnreachableCase, DuplicateMutualName,
     NonTopLevelImport, NonTopLevelClass, TopLevelReturn, EmptyFromImport,
-    ImportAfterStatement, SubmoduleNameClash, SubmoduleNotImported,
+    ImportAfterStatement, SubmoduleNameClash, SubmoduleNotImported, OwnDescendantImport,
     UnassignedMember,
 ]
 

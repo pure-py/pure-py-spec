@@ -4,12 +4,22 @@ import sys
 from typing import Optional
 
 import parse
+import reasons
 from aux import annotate_seq_kinds
-from check_module import check_module, has_cycle
+from check_module import check_module, has_cycle, proper_prefix_of
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
 
 
 PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
+
+
+def deps(tree: ast.Module, q: str, base_dir: pathlib.Path) -> set[str]:
+    froms = [n.module for n in ast.walk(tree) if isinstance(n, ast.ImportFrom) and n.module is not None]
+    plains = [a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names]
+    exempt = proper_prefixes(q) | {q}
+    return (imports(tree, base_dir)
+            | {p for t in plains for p in proper_prefixes(t)}
+            | {p for t in froms for p in proper_prefixes(t) if p not in exempt})
 
 
 def imports(tree: ast.Module, base_dir: pathlib.Path) -> set[str]:
@@ -21,7 +31,7 @@ def imports(tree: ast.Module, base_dir: pathlib.Path) -> set[str]:
                if resolve(f'{m}.{a.name}', base_dir) is not None})
 
 
-def parents(name: str) -> set[str]:
+def proper_prefixes(name: str) -> set[str]:
     parts = name.split(".")
     return {".".join(parts[:i]) for i in range(1, len(parts))}
 
@@ -67,12 +77,12 @@ def source_tree(base_dir: pathlib.Path, entry_path: pathlib.Path) -> set[str]:
     parts = (module_name(base_dir, p) for p in base_dir.rglob('*.py')
              if p != entry_path and '__pycache__' not in p.parts)
     names = {'.'.join(p) for p in parts if p}
-    return {n for name in names for n in {name} | parents(name)}
+    return {n for name in names for n in {name} | proper_prefixes(name)}
 
 Discovery = tuple[dict[str, tuple[pathlib.Path, ast.Module]], dict[str, set[str]]]
 
-def with_parents(imps: set[str]) -> list[str]:
-    return sorted({q for imp in imps for q in {imp} | parents(imp)})
+def with_proper_prefixes(imps: set[str]) -> list[str]:
+    return sorted({q for imp in imps for q in {imp} | proper_prefixes(imp)})
 
 def discover(queue: list[str], found: Discovery, base_dir: pathlib.Path) -> Discovery:
     if len(queue) == 0:
@@ -88,18 +98,25 @@ def discover(queue: list[str], found: Discovery, base_dir: pathlib.Path) -> Disc
     tree = load(name, base_dir)
     assert path is not None
     imps = imports(tree, base_dir)
-    return discover(rest + with_parents(imps),
+    return discover(rest + with_proper_prefixes(imps),
                     (modules | {name: (path, tree)}, imports_by | {name: imps}), base_dir)
 
 def walk_program(entry_path: pathlib.Path) -> None:
     base_dir = entry_path.parent
     entry_tree = load(entry_path.stem, base_dir)
     entry_imports = imports(entry_tree, base_dir)
-    queue = [*sorted(PREDEFINED_MODULES), *sorted(source_tree(base_dir, entry_path)), *with_parents(entry_imports)]
-    modules, imports_by_module = discover(queue, ({'__main__': (entry_path, entry_tree)},
-                                                  {'__main__': entry_imports}), base_dir)
+    queue = [*sorted(PREDEFINED_MODULES), *sorted(source_tree(base_dir, entry_path)), *with_proper_prefixes(entry_imports)]
+    modules, _ = discover(queue, ({'__main__': (entry_path, entry_tree)},
+                          {'__main__': entry_imports}), base_dir)
 
-    graph = {name: imps | parents(name) for name, imps in imports_by_module.items()}
+    for name, (path, tree) in modules.items():
+        for stmt in tree.body:
+            if isinstance(stmt, ast.Import) and proper_prefix_of(name, stmt.names[0].name):
+                e = IllFormedModule(stmt, reasons.OwnDescendantImport(stmt.names[0].name, name))
+                e.msg = f"{path}: {e.msg}"
+                raise e
+
+    graph = {name: deps(tree, name, base_dir) for name, (_, tree) in modules.items()}
     cycle = has_cycle(graph)
     if len(cycle) > 0:
         raise IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")

@@ -15,12 +15,20 @@ from well_formed import check_block, result_type_of_block
 def name_assign(q: str) -> ast.stmt:
     return ast.parse(f'__name__ = {q!r}').body[0]
 
-def loads_to(q: str, theta: ContextEntry, ctx: ModuleContext) -> ContextEntry:
+def prefix_of(p: str, q: str) -> bool:
+    return p == q or q.startswith(p + '.')
+
+def proper_prefix_of(p: str, q: str) -> bool:
+    return p != q and prefix_of(p, q)
+
+def loads_to(bound: str, q: str, theta: ContextEntry, ctx: ModuleContext) -> ContextEntry:
     if '.' not in q:
         return theta
     parent, x = q.rsplit('.', 1)
+    if prefix_of(parent, bound):
+        return theta
     parent_ctx = check_module(ctx.M[parent], ctx.M, parent)
-    return loads_to(parent, ModuleLoaded(parent, extend_context(parent_ctx, {x: theta})), ctx)
+    return loads_to(bound, parent, ModuleLoaded(parent, extend_context(parent_ctx, {x: theta})), ctx)
 
 def imports(s: ast.ImportFrom, gamma_src: Context, ctx: ModuleContext) -> Context:
     assert s.module is not None
@@ -36,8 +44,10 @@ def import_bindings(s: ast.stmt, ctx: ModuleContext) -> Context:
         q = s.names[0].name
         if q not in ctx.M:
             raise IllFormedModule(s, reasons.UnknownModule(q))
+        if proper_prefix_of(ctx.q, q):
+            raise IllFormedModule(s, reasons.OwnDescendantImport(q, ctx.q))
         delta = check_module(ctx.M[q], ctx.M, q)
-        return {q.split('.')[0]: loads_to(q, ModuleLoaded(q, delta), ctx)}
+        return {q.split('.')[0]: loads_to('', q, ModuleLoaded(q, delta), ctx)}
     assert isinstance(s, ast.ImportFrom)
     if len(s.names) == 0:
         raise IllFormedModule(s, reasons.EmptyFromImport())
@@ -45,7 +55,7 @@ def import_bindings(s: ast.stmt, ctx: ModuleContext) -> Context:
     if s.module not in ctx.M:
         raise IllFormedModule(s, reasons.UnknownModule(s.module))
     delta = check_module(ctx.M[s.module], ctx.M, s.module)
-    loads_to(s.module, ModuleLoaded(s.module, delta), ctx)
+    loads_to(ctx.q, s.module, ModuleLoaded(s.module, delta), ctx)
     return imports(s, delta, ctx)
 
 def submodules(M: dict[str, ast.Module], q: str) -> Context:
