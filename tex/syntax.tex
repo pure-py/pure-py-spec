@@ -167,9 +167,10 @@ fully-qualified name.
 
 The \emph{dependency graph} $G_{\mathcal{M}}$ of a program has an edge $(q, q')$ iff $q' \in
 {\color{blue}\deps_{q}(\mathcal{M}(q))}\,{\color{deletedgray}\imports(\mathcal{M}(q)) \cup \parents(q)}$.
-\Added{An import depends on its target's ancestors, which it loads; a from-import only on ancestors
-outside the importing module's own package, since the enclosing packages are necessarily in progress when
-the module runs.} Program well-formedness (\figref{well-formed-module}) requires the
+\Added{Every import depends on its target's ancestors; excepted are ancestors enclosing the importing
+module itself, which are necessarily still in progress when it runs and so cannot be required to load
+first. The exception appears only in the from-import clause because an import naming a proper descendant
+of the importing module is prohibited outright (\S\ref{sec:prohibited}).} Program well-formedness (\figref{well-formed-module}) requires the
 main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
 to be acyclic. 
 
