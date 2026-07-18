@@ -166,7 +166,7 @@ class Runner:
         """Each subdir is a test: main.py, expected_exit, plus fixtures and the
         Python-side evidence fixed by the verdict (the category directory name)."""
         python_accepts = category_root.name != Verdict.ILL_FORMED
-        for d in sorted(p for p in category_root.iterdir() if p.is_dir()):
+        for d in sorted(p for p in category_root.rglob("*") if p.is_dir() and (p / MAIN).exists()):
             with self.test(d.relative_to(ROOT)):
                 main_py = d / MAIN
                 self.expect_exit(script_cmd(CHECK_PROGRAM, main_py),
