@@ -50,30 +50,30 @@
 
 \inferrule*[lab={\ruleName{import}}]
 {
-  q = x \cons \seq{x} \\
-  {\color{blue}q_0 \not\properPrefixOf q} \\
-  \vdash_{\mathsf{load}} q : \Delta \\
-  {\color{blue}\varepsilon,} q, \modLoaded{q}{\Delta} \loadsTo \theta \\
+  q' = x \cons \seq{x} \\
+  {\color{blue}q \not\properPrefixOf q'} \\
+  \vdash_{\mathsf{load}} q' : \Delta \\
+  {\color{blue}\varepsilon,} q', \modLoaded{q'}{\Delta} \loadsTo \theta \\
   \vdash \seq{\iota} : \Gamma
 }
 {
-  \vdash \exImport{q} \cons \seq{\iota} : \set{\bind{x}{\theta}} \extend \Gamma
+  \vdash \exImport{q'} \cons \seq{\iota} : \set{\bind{x}{\theta}} \extend \Gamma
 }
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
-  \vdash_{\mathsf{load}} q : \Delta \\
-  {\color{blue}q_0,} q, \modLoaded{q}{\Delta} \loadsTo \theta \\
+  \vdash_{\mathsf{load}} q' : \Delta \\
+  {\color{blue}q,} q', \modLoaded{q'}{\Delta} \loadsTo \theta \\
   \Delta, \seq{x} \importsR \Gamma' \\
   \vdash \seq{\iota} : \Gamma
 }
 {
-  \vdash \exFromImport{q}{\seq{x}} \cons \seq{\iota} : \Gamma' \extend \Gamma
+  \vdash \exFromImport{q'}{\seq{x}} \cons \seq{\iota} : \Gamma' \extend \Gamma
 }
 
 \end{mathpar}
 
-\subcaption{Import prefix $\seq{\iota}$ {\color{blue}of module $q_0$} produces bindings $\Gamma$}
+\subcaption{Import prefix $\seq{\iota}$ {\color{blue}of module $q$} produces bindings $\Gamma$}
 \end{subfigure}
 
 \vspace{2mm}
