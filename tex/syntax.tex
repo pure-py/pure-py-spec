@@ -129,9 +129,12 @@ well-formedness and evaluation rules check and evaluate the statements of each b
 assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
 $\pymath{\_\_name\_\_}$ binding the runtime supplies automatically. $\mathcal{M}$ additionally always includes the predefined modules of
 \figref{predefined} and is prefix-closed: the parent of any module in $\dom(\mathcal{M})$ is itself in
-$\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$ by mapping each leaf module to a
+$\dom(\mathcal{M})$.\footnote{{\color{blue}A source tree encodes such an $\mathcal{M}$: each module's body is its \texttt{.py}
+file, each package's body is its \texttt{\_\_init\_\_.py}, and a package directory without an
+\texttt{\_\_init\_\_.py} encodes the empty body (a namespace package, PEP 420, \url{https://peps.python.org/pep-0420/}). Prefix-closure thus holds by
+construction.}\,{\color{deletedgray}A source tree encodes such an $\mathcal{M}$ by mapping each leaf module to a
 \texttt{.py} file and each package to an \texttt{\_\_init\_\_.py}; prefix-closure then requires an
-\texttt{\_\_init\_\_.py} for every enclosing package.} The map $\mathcal{M}$ is fixed and ambient in all
+\texttt{\_\_init\_\_.py} for every enclosing package.}} The map $\mathcal{M}$ is fixed and ambient in all
 definitions that follow.
 
 \begin{definition}[Builtins context]

@@ -31,13 +31,15 @@ def resolve(name: str, base_dir: pathlib.Path) -> Optional[pathlib.Path]:
     for candidate in (base_dir / f"{stem}.py", base_dir / stem / "__init__.py"):
         if candidate.exists():
             return candidate
-    return None
+    return base_dir / stem if (base_dir / stem).is_dir() else None
 
 
 def load(name: str, base_dir: pathlib.Path) -> ast.Module:
     path = resolve(name, base_dir)
     if path is None:
         raise IllFormedProgram(f"module {name!r} not found under {base_dir}")
+    if path.is_dir():
+        return ast.Module(body=[], type_ignores=[])
     source = path.read_text()
     try:
         tree = ast.parse(source, filename=str(path))
@@ -62,8 +64,10 @@ def module_name(base_dir: pathlib.Path, path: pathlib.Path) -> tuple[str, ...]:
     return rel.parent.parts if rel.name == '__init__.py' else rel.with_suffix('').parts
 
 def source_tree(base_dir: pathlib.Path, entry_path: pathlib.Path) -> set[str]:
-    parts = (module_name(base_dir, p) for p in base_dir.rglob('*.py') if p != entry_path)
-    return {'.'.join(p) for p in parts if p}
+    parts = (module_name(base_dir, p) for p in base_dir.rglob('*.py')
+             if p != entry_path and '__pycache__' not in p.parts)
+    names = {'.'.join(p) for p in parts if p}
+    return {n for name in names for n in {name} | parents(name)}
 
 Discovery = tuple[dict[str, tuple[pathlib.Path, ast.Module]], dict[str, set[str]]]
 
