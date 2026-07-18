@@ -79,7 +79,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$q, \theta \loadsTo_{{\color{blue}r}} \theta'$}
+\flushleft \shadebox{$q, \theta \loadsTo_{{\color{blue}m}} \theta'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{loads-to-simple}}]
@@ -87,29 +87,29 @@
   \strut
 }
 {
-  x, \theta \loadsTo_{{\color{blue}r}} \theta
+  x, \theta \loadsTo_{{\color{blue}m}} \theta
 }
 \and
 \inferrule*[lab={\ruleName{loads-to-qualified}}]
 {
-  {\color{blue}q \notin \prefixes(r)} \\
+  {\color{blue}q \notin \prefixes(m)} \\
   \vdash_{\mathsf{load}} q : \Gamma' \\
-  q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo_{{\color{blue}r}} \theta'
+  q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo_{{\color{blue}m}} \theta'
 }
 {
-  q.x, \theta \loadsTo_{{\color{blue}r}} \theta'
+  q.x, \theta \loadsTo_{{\color{blue}m}} \theta'
 }
 \and
 {\color{blue}
 \inferrule*[lab={\ruleName{loads-to-bound}}]
 {
-  q \in \prefixes(r)
+  q \in \prefixes(m)
 }
 {
-  q.x, \theta \loadsTo_{r} \theta
+  q.x, \theta \loadsTo_{m} \theta
 }}
 \end{mathpar}
-\subcaption{Loaded reference $\theta$ for module $q$ loads to the reference for the head of $q${\color{blue}; the walk stops at prefixes of the bound $r$}}
+\subcaption{Loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}
 \end{subfigure}
 \caption{Import well-formedness}
 \label{fig:well-formed-imports}
