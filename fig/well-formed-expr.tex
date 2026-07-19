@@ -89,10 +89,10 @@
 
 \inferrule*[lab={\ruleName{attr-module}}]
 {
-  \Gamma \vdash \exAttr{e}{y} \names \statusDefAssigned
+  \Gamma \vdash \exAttr{e}{x} \names \statusDefAssigned
 }
 {
-  \Gamma \vdash \exAttr{e}{y}
+  \Gamma \vdash \exAttr{e}{x}
 }
 \and
 \inferrule*[lab={\ruleName{attr-object}}]
@@ -100,7 +100,7 @@
   \Gamma \vdash e
 }
 {
-  \Gamma \vdash e.y
+  \Gamma \vdash \exAttr{e}{x}
 }
 \end{mathpar}
 \subcaption{Expression $e$ is well-formed under $\Gamma$}
