@@ -47,10 +47,11 @@
 \and
 \inferrule*[lab={\ruleName{val-obj}}]
 {
+  \added{\vdash C} \\
   \vdash \rho : \Gamma
 }
 {
-  \vdash \exObj{\Gamma}{q.c}{\rho}
+  \vdash \exObj{\Gamma}{\added{C}\deleted{q.c}}{\rho}
 }
 \and
 \inferrule*[lab={\ruleName{val-mod}}]

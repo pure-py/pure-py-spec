@@ -7,7 +7,7 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exTuple{v_1, \ldots, v_n}$ & (Tuple) \\
     & $\mid$ & $\exLamClosure[\Gamma]{\rho}{\seq{x}}{e}$ & (LambdaClosure) \\
     & $\mid$ & $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$ & (DefClosure) \\
-    & $\mid$ & $\exObj{\Gamma}{q.c}{\rho}$ & (Object) \\
+    & $\mid$ & $\exObj{\Gamma}{\added{C}\deleted{q.c}}{\rho}$ & (Object) \\
     & $\mid$ & $\modStub{q}$ & (Module stub) \\
     & $\mid$ & $\modLoaded{q}{\rho}$ & (Loaded module) \\
     & $\mid$ & $\clsEntry{\Gamma}{q}{\seq{x}}{c'}$ & (Class)

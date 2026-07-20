@@ -120,8 +120,8 @@
 \env(\rho, x) &= \rho' && \text{where } \rho(x) = \modLoaded{q'}{\rho'} \\
 \env(\rho, q.x) &= \rho' && \text{where } \env(\rho, q)(x) = \modLoaded{q'}{\rho'} \\
 \\
-\resolveClass(\rho, c) &= (c, \rho(c)) \\
-\resolveClass(\rho, q.c) &= (c, \env(\rho, q)(c))
+\resolveClass(\rho, c) &= \added{\rho(c)}\deleted{(c, \rho(c))} \\
+\resolveClass(\rho, q.c) &= \added{\env(\rho, q)(c)}\deleted{(c, \env(\rho, q)(c))}
 \end{align*}
 
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
@@ -185,7 +185,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-attr-object}}]
 {
-  \rho, e \Rightarrow \exObj{\Delta}{q'.c}{\rho'}
+  \rho, e \Rightarrow \exObj{\Delta}{\added{C}\deleted{q'.c}}{\rho'}
 }
 {
   \rho, \exAttr{e}{x} \Rightarrow \rho'(x)
@@ -194,12 +194,12 @@
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i) \\
-  \resolveClass(\rho, q) = (c, C) \\
-  C = \clsEntry{\Delta}{q'}{\seq{z}}{c'} \\
+  \resolveClass(\rho, q) = \added{C}\deleted{(c, C)} \\
+  \deleted{C = \clsEntry{\Delta}{q'}{\seq{z}}{c'}} \\
   \fields(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}
 }
 {
-  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \exObj{\Gamma}{q'.c}{\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}, \bind{y_1}{v_{n+1}}, \ldots, \bind{y_m}{v_{n+m}}}}
+  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \exObj{\Gamma}{\added{C}\deleted{q'.c}}{\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}, \bind{y_1}{v_{n+1}}, \ldots, \bind{y_m}{v_{n+m}}}}
 }
 \end{mathpar}
 \caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$}

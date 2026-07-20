@@ -25,9 +25,12 @@
 \ownFields(\pyinline{pass}) &= \varepsilon \\
 \\
 \fields(\clsEntry{\Gamma}{q}{\seq{x}}{\bot}) &= \seq{x} \\
-\fields(\clsEntry{\Gamma}{q}{\seq{x}}{c}) &= \fields(\Gamma(c)) \mathbin{\cdot} \seq{x}
+\fields(\clsEntry{\Gamma}{q}{\seq{x}}{c}) &= \fields(\Gamma(c)) \mathbin{\cdot} \seq{x} \\
+\\
+\added{\ancestors(C)} &\;\added{= \set{C}} && \added{\text{where } C = \clsEntry{\Gamma}{q}{\seq{x}}{\bot}} \\
+\added{\ancestors(C)} &\;\added{= \set{C} \cup \ancestors(\Gamma(c))} && \added{\text{where } C = \clsEntry{\Gamma}{q}{\seq{x}}{c}}
 \end{align*}
-\subcaption{$\ownFields$ and $\fields$ metafunctions}
+\subcaption{$\ownFields$, $\fields$\added{, and $\ancestors$} metafunctions}
 \end{subfigure}
 
 \caption{Module-related metafunctions}
