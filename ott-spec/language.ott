@@ -123,9 +123,14 @@ d :: 'Function' ::= {{ com Function }}
 %   | G , x :: :: Extend {{ com extend }}
 %   | intersection G1 .. Gn :: :: Intersection {{ com intersection }}
 
-% formula :: formula_ ::=
-%   | judgement                       ::   :: judgement
-%   | formula1 .. formulan            ::   :: dots
+formula :: formula_ ::=
+  | judgement                       ::   :: judgement
+  | formula1 .. formulan            ::   :: dots
+
+Set, sv {{ tex \sigma }} :: Set_ ::=
+  | { M }        :: :: SingletonM {{ tex \{ [[ M ]] \} }}
+  | Set1 U Set2  :: :: Union {{ tex [[ Set1 ]] \cup [[ Set2 ]] }}
+  | 0            :: :: Empty {{ tex \emptyset }}
 
 % v :: 'Val' ::=
 
@@ -133,8 +138,22 @@ d :: 'Function' ::= {{ com Function }}
 %   | bot :: :: Undefined {{ tex \bot }}
 %   | v    :: :: Val
 
-% defns
-%   Judgements :: '' ::=
+defns
+  Judgements :: '' ::=
+
+defn
+parents( M ) = Set :: :: ParentsDef :: 'ParentsDef_'
+   {{ tex \mathrm{parents}([[ M ]]) = [[ Set ]] }}
+by
+
+----------------------------- :: none
+parents( x ) = 0
+
+
+parents( M ) = sv
+-------------------------------- :: induct
+parents( M . x ) = sv U { M }
+
 
 % defn
 %   DefinitelyRet s :: :: DefinitelyRet :: 'DefinitelyRet_'
