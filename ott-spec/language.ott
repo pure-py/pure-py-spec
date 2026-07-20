@@ -142,8 +142,8 @@ defns
   Judgements :: '' ::=
 
 defn
-parents( M ) = Set :: :: ParentsDef :: 'ParentsDef_'
-   {{ tex \mathrm{parents}([[ M ]]) = [[ Set ]] }}
+parents( M ) = sv :: :: ParentsDef :: 'ParentsDef_'
+   {{ tex \mathrm{parents}([[ M ]]) = [[ sv ]] }}
 by
 
 ----------------------------- :: none
