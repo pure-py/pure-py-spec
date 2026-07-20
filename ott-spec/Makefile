@@ -21,7 +21,7 @@ $(PDF): $(TEX)
 	$(PDFLATEX) -interaction=nonstopmode -halt-on-error $(TEX)
 
 $(TEX): $(SRC)
-	$(OTT) $(OTT_TEX_FLAGS) -i $(SRC) -o $(TEX)
+	$(OTT) -i $(SRC) -o $(TEX)
 
 $(COQ): $(SRC)
 	$(OTT) -i $(SRC) -o $(COQ)

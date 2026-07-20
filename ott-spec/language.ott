@@ -1,4 +1,7 @@
 embed {{ tex-preamble
+\usepackage{xcolor}
+\definecolor{base0E}{HTML}{8959a8} % Purple
+
   \newcommand{\[[TEX_NAME_PREFIX]]grammarfigure}[1]{%
 \begin{tabular}{llcllllll}#1\end{tabular}%
 }
