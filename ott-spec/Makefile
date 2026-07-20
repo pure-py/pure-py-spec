@@ -26,5 +26,9 @@ $(TEX): $(SRC)
 $(COQ): $(SRC)
 	$(OTT) -i $(SRC) -o $(COQ)
 
+ott-preview:
+	ott $(SRC) -o $(TEX) -tex_show_meta false
+	$(PDFLATEX) -interaction=nonstopmode $(TEX) 
+
 clean:
 	rm -f $(TEX) $(PDF) $(COQ) *.aux *.log *.out *.toc
