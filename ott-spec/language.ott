@@ -112,7 +112,8 @@ m :: 'Module' ::= {{ com Module }}
   | t1 .. tn s1 .. sk :: :: Module {{ com top level definitions }}
 
 M :: 'QualifiedName' ::= {{ com Qualified Name }}
-  | x1 . ... . xn :: :: FullyQualifiedName {{ com fully qualified name }}
+  | x     :: :: SingletonName
+  | M . x :: :: InductiveQualifiedName
 
 d :: 'Function' ::= {{ com Function }}
   | def f ( x1 , .. , xn ) : b :: :: Def {{ com function definition }}
