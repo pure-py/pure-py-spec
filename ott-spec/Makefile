@@ -1,12 +1,16 @@
 OTT ?= ott
 PDFLATEX ?= pdflatex
 
+OTT_TEX_FLAGS ?= -tex_wrap false
+
 SRC := language.ott
 TEX := language.tex
 PDF := language.pdf
 COQ := language.v
 
 .PHONY: all coq clean
+
+default: $(TEX)
 
 all: $(PDF)
 
@@ -17,7 +21,7 @@ $(PDF): $(TEX)
 	$(PDFLATEX) -interaction=nonstopmode -halt-on-error $(TEX)
 
 $(TEX): $(SRC)
-	$(OTT) -i $(SRC) -o $(TEX)
+	$(OTT) $(OTT_TEX_FLAGS) -i $(SRC) -o $(TEX)
 
 $(COQ): $(SRC)
 	$(OTT) -i $(SRC) -o $(COQ)
