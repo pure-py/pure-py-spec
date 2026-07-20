@@ -1,13 +1,81 @@
+embed {{ tex-preamble
+\usepackage{xcolor}
+\definecolor{base0E}{HTML}{8959a8} % Purple
+
+  \newcommand{\[[TEX_NAME_PREFIX]]grammarfigure}[1]{%
+\begin{tabular}{llcllllll}#1\end{tabular}%
+}
+  \renewcommand{\[[TEX_NAME_PREFIX]]interrule}{\\[3.0mm]}
+  \renewcommand{\[[TEX_NAME_PREFIX]]kw}[1]{\texttt{\textcolor{base0E}{#1}%
+}%
+}
+}}
+
 metavar x ::= {{ repr-locally-nameless }} {{ com variable }}
 metavar f ::= {{ repr-locally-nameless }} {{ com function name }}
-indexvar n ::=  {{ coq nat }} {{ com index }}
+indexvar n, k ::=  {{ coq nat }} {{ com index }}
 
 grammar
 
 e :: 'Expression' ::= {{ com Expression }}
   | x :: :: Var {{ com variable }}
-  | n :: :: Literal {{ com literal }}
-  | e ( e1 .. en ) :: :: Call {{ com call }}  
+  | l :: :: Lit {{ com literal }}
+  | e ( e1 , .. , en ) :: :: Call {{ com call }}
+  | C ( e1 , .. , en ) :: :: Const {{ com constructor application }} {{ tex C ( e_1,\, ..\,,\, e_n ) }}
+  | e . x :: :: Attr {{ com attribute }}
+  | e [ e' ] :: :: Sub {{ com subscript }}
+  | e bop e' :: :: BinOP {{ com binary operation }} {{ tex [[e]] \odot [[e']]}}
+  | uop e :: :: UnOp {{ com unary operation }} {{ tex \ominus [[e]] }}
+  | e1 if e else e2 :: :: Cond {{ com conditional expression }}
+  | [ e1 , .. , en ] :: :: List {{ com list construction }}
+  | ( e1 , .. , en ) :: :: Tuple {{ com tuple construction }}
+  | [ e g1 .. gn ] :: :: ListComp {{ com list comprehension }}
+  | lambda x1 , .. , xn : e :: :: Lambda {{ com lambda abstraction }}
+
+g :: 'Guard' ::= {{ com Guard }}
+  | if e :: :: Guard {{ com guard }}
+  | for x in e :: :: Generator {{ com generator }}
+
+l :: 'Literal' ::= {{ com Literal }}
+  | n :: :: Num {{ com number }}
+  | True :: :: True {{ com true }}
+  | False :: :: False {{ com false }}
+  | None :: :: None {{ com none }}
+
+p, q :: 'Pattern' ::= {{ com Pattern }}
+  | l :: :: PatLiteral {{ com literal pattern }}
+  | - n :: :: PatNegLit {{ com negative literal pattern }}
+  | x :: :: PatVar {{ com variable pattern }}
+  | _ :: :: PatWilcard {{ com wildcard pattern }}
+  | [ p1 , .. , pn ] :: :: PatList {{ com list pattern }}
+  | ( p1 , .. , pn ) :: :: PatTuple {{ com tuple pattern }}
+  | C ( p1 , .. , pn , x1 = q1 , .., xk = qk ) :: :: PatClass 
+    {{ com class constructor pattern }}
+    % {{ tex C ( [[p1]] , \ldots , [[pn]] , [[x]] )}}
+  | p as x :: :: PatAs {{ com pattern alias }}
+
+bop :: 'BinOp' ::= {{ com Binary Operator }} {{ tex \odot }}
+  | or :: :: BinOpOr {{ com or }}
+  | and :: :: BinOpAnd {{ com and }}
+  | == :: :: BinOpEq {{ com equality }} {{ tex $==$ }}
+  | != :: :: BinOpNeq {{ com inequality }} {{ tex \neq }}
+  | < :: :: BinOpLt {{ com lower-than }}
+  | <= :: :: BinOpLeq {{ com lower-than or equal }} {{ tex \leq }}
+  | > :: :: BinOpGt {{ com greater-than }}
+  | >= :: :: BinOpGeq {{ com greater-than or equal }} {{ tex \geq }}
+  | + :: :: BinOpAdd {{ com addition }}
+  | - :: :: BinOpSub {{ com subtraction }}
+  | * :: :: BinOpMul {{ com multiplication }}
+  | / :: :: BinOpDiv {{ com division }}
+  | floordiv :: :: BinOpFloorDiv {{ com floor division }} {{ tex // }}
+  | % :: :: BinOpMod {{ com modulo }}
+  | ** :: :: BinOpPow {{ com power }}
+
+uop :: 'UnOp' ::= {{ com Unary Operator }} {{ tex \ominus }}
+  | not :: :: UnOpNot {{ com not }}
+  | + :: :: UnOpPlus {{ com unary plus }} {{ tex \mathsf{+} }}
+  | - :: :: UnOpNeg {{ com negate }}
+
 
 xs {{ tex \overline{x} }} , ys {{ tex \overline{y} }} :: 'Binders' ::= {{ com Variadic binders }}
   | x , xs :: :: Ext {{ com Ext }}
@@ -16,76 +84,124 @@ xs {{ tex \overline{x} }} , ys {{ tex \overline{y} }} :: 'Binders' ::= {{ com Va
 s :: 'Statement' ::= {{ com Statement }}
   | pass   :: :: Pass {{ com pass }}
   | x = e  :: :: Assign {{ com assign }}
-  | s1 s2 :: :: Seq {{ com sequence }}
-  | return :: :: NakedReturn {{ com Naked return }}
+  | e :: :: ExprStmt {{ com expression }}
+  | assert e :: :: Assert {{ com assert }}
+  | assert e, e' :: :: AssertMsg {{ com assert with message }}
+  | return :: :: ReturnNone {{ com empty return }}
   | return e :: :: Return {{ com return }}
-  | if e : s elif e1 : s1 .. elif en : sn :: :: IfNew {{ com if }}
-  | if e : s elif e1 : s1 .. elif en : sn else e' : s' :: :: IfElseNew {{ com if/else }}
-  | def f( xs ): s :: :: Function {{ com function definition }}
+  | if e : b elif e1 : b1 .. elif en : bn :: :: If {{ com if }}
+  | if e : b elif e1 : b1 .. elif en : bn else b' :: :: IfElse {{ com if/else }}
+  | match e : case p1 : b1 ... case pn : bn :: :: Match {{ com pattern match }}
+  | d1 .. dn :: :: MutualRegion {{ com mutually recursive definitions }}
+  | @dataclass class C : phi :: :: Dataclass 
+    {{ com data class }}
+    {{ tex \textcolor{teal}{@dataclass}\, [[class]]\, C : [[phi]] }}
+  | @dataclass class C (B) : phi :: :: DataclassExtend 
+    {{ com data class extension }}
+    {{ tex \textcolor{teal}{@dataclass}\, [[class]]\, C (B) : [[phi]] }}
 
+phi :: 'Fields' ::= {{ com Fields }} {{ tex \Phi }}
+  | x1 : Any ... xn : Any :: :: FieldList {{ com field list }}
+  | pass :: :: EmptyFieldList {{ com empty field list }}
 
-G {{ tex \Gamma }} :: 'Env' ::= {{ com Environment }}
-  | empty :: :: Empty {{ tex \varepsilon }} {{ com empty }}
-  | G , x :: :: Extend {{ com extend }}
-  | intersection G1 .. Gn :: :: Intersection {{ com intersection }}
+b :: 'Block' ::= {{ com Block }}
+  | s1 ... sn :: :: StmtBlock {{ com block of statements }}
+
+t :: 'Import' ::= {{ com Import }}
+  | import M :: :: Import {{ com module import }}
+  | from M import x1 , ... , xn :: :: FromImport {{ com import from module }}
+
+m :: 'Module' ::= {{ com Module }}
+  | t1 .. tn s1 .. sk :: :: Module {{ com top level definitions }}
+
+M :: 'QualifiedName' ::= {{ com Qualified Name }}
+  | x     :: :: SingletonName
+  | M . x :: :: InductiveQualifiedName
+
+d :: 'Function' ::= {{ com Function }}
+  | def f ( x1 , .. , xn ) : b :: :: Def {{ com function definition }}
+
+% G {{ tex \Gamma }} :: 'Env' ::= {{ com Environment }}
+%   | empty :: :: Empty {{ tex \varepsilon }} {{ com empty }}
+%   | G , x :: :: Extend {{ com extend }}
+%   | intersection G1 .. Gn :: :: Intersection {{ com intersection }}
 
 formula :: formula_ ::=
   | judgement                       ::   :: judgement
   | formula1 .. formulan            ::   :: dots
 
-v :: 'Val' ::=
+Set, sv {{ tex \sigma }} :: Set_ ::=
+  | { M }        :: :: SingletonM {{ tex \{ [[ M ]] \} }}
+  | Set1 U Set2  :: :: Union {{ tex [[ Set1 ]] \cup [[ Set2 ]] }}
+  | 0            :: :: Empty {{ tex \emptyset }}
 
-b :: 'BVal' ::=
-  | bot :: :: Undefined {{ tex \bot }}
-  | v    :: :: Val
+% v :: 'Val' ::=
+
+% b :: 'BVal' ::=
+%   | bot :: :: Undefined {{ tex \bot }}
+%   | v    :: :: Val
 
 defns
   Judgements :: '' ::=
 
 defn
-  DefinitelyRet s :: :: DefinitelyRet :: 'DefinitelyRet_'
-  {{ tex \mathsf{DefinitelyRet}([[ s ]]) }}
+parents( M ) = sv :: :: ParentsDef :: 'ParentsDef_'
+   {{ tex \mathrm{parents}([[ M ]]) = [[ sv ]] }}
 by
 
-------------------- :: return
- DefinitelyRet return e
+----------------------------- :: none
+parents( x ) = 0
 
-DefinitelyRet s1
-------------------- :: seq_1
-DefinitelyRet s2 s2
 
-DefinitelyRet s2
-------------------- :: seq_2
-DefinitelyRet s2 s2
+parents( M ) = sv
+-------------------------------- :: induct
+parents( M . x ) = sv U { M }
 
-DefinitelyRet s
-DefinitelyRet s1 .. DefinitelyRet sn
-DefinitelyRet s'
-------------------- :: if_else
-DefinitelyRet if e : s elif e1 : s1 .. elif en : sn else e' : s'
 
-defn
-  DefinitelyAssigns G s :: :: DefinitelyAssigns :: 'DefinitelyAssigns_'
-  {{ tex [[ G ]] \vdash [[ s ]] }}
-by
+% defn
+%   DefinitelyRet s :: :: DefinitelyRet :: 'DefinitelyRet_'
+%   {{ tex \mathsf{DefinitelyRet}([[ s ]]) }}
+% by
 
-------------------- :: assign
-DefinitelyAssigns empty , x x = e
+% ------------------- :: return
+%  DefinitelyRet return e
 
-DefinitelyAssigns G s
-DefinitelyAssigns G1 s1 .. DefinitelyAssigns Gn sn
-DefinitelyAssigns G' s'
-------------------- :: if_else
-DefinitelyAssigns intersection G G1 .. Gn G' if e : s elif e1 : s1 .. elif en : sn else e' : s'
+% DefinitelyRet s1
+% ------------------- :: seq_1
+% DefinitelyRet s2 s2
 
-defn
-  Dot b1 b2 = b3 :: :: Dot :: 'Dot_'
-  {{ tex [[ b1 ]] \cdot [[ b2 ]] = [[ b3 ]] }}
-  {{ com Override }}
-by
+% DefinitelyRet s2
+% ------------------- :: seq_2
+% DefinitelyRet s2 s2
 
-------------------- :: override_r
-Dot b bot = b
+% DefinitelyRet s
+% DefinitelyRet s1 .. DefinitelyRet sn
+% DefinitelyRet s'
+% ------------------- :: if_else
+% DefinitelyRet if e : s elif e1 : s1 .. elif en : sn else e' : s'
 
-------------------- :: override_l
-Dot b v = v
+% defn
+%   DefinitelyAssigns G s :: :: DefinitelyAssigns :: 'DefinitelyAssigns_'
+%   {{ tex [[ G ]] \vdash [[ s ]] }}
+% by
+
+% ------------------- :: assign
+% DefinitelyAssigns empty , x x = e
+
+% DefinitelyAssigns G s
+% DefinitelyAssigns G1 s1 .. DefinitelyAssigns Gn sn
+% DefinitelyAssigns G' s'
+% ------------------- :: if_else
+% DefinitelyAssigns intersection G G1 .. Gn G' if e : s elif e1 : s1 .. elif en : sn else e' : s'
+
+% defn
+%   Dot b1 b2 = b3 :: :: Dot :: 'Dot_'
+%   {{ tex [[ b1 ]] \cdot [[ b2 ]] = [[ b3 ]] }}
+%   {{ com Override }}
+% by
+
+% ------------------- :: override_r
+% Dot b bot = b
+
+% ------------------- :: override_l
+% Dot b v = v
