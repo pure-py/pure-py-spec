@@ -8,7 +8,7 @@ class C:
 a = C(1)
 
 @dataclass
-class C:  # shadows the first C; a remains an instance of the old class
+class C:  # PurePy: error (name already bound); Python: a remains an instance of the old class
     x: Any
 
 match a:

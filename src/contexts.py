@@ -11,10 +11,9 @@ class Status(Enum):
 
 @dataclass(frozen=True)
 class ClassEntry:
-    context: Context
-    module: str
+    name: str
     fields: tuple[str, ...]
-    base: Optional[str]
+    base: Optional['ClassEntry']
 
 @dataclass(frozen=True)
 class ModuleStub:
@@ -123,6 +122,4 @@ def extend_context(g1: Context, g2: Context) -> Context:
 def fields_of(entry: ClassEntry) -> tuple[str, ...]:
     if entry.base is None:
         return entry.fields
-    base_entry = entry.context[entry.base]
-    assert isinstance(base_entry, ClassEntry)
-    return fields_of(base_entry) + entry.fields
+    return fields_of(entry.base) + entry.fields

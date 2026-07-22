@@ -29,6 +29,13 @@ class InheritedFieldClash:
 
 
 @dataclass(frozen=True)
+class ClassNameBound:
+    name: str
+    def message(self) -> str:
+        return f"class name '{self.name}' already bound"
+
+
+@dataclass(frozen=True)
 class UnassignedVariable:
     name: str
     def message(self) -> str:
@@ -216,7 +223,7 @@ class ClassAsValue:
 
 
 Reason = Union[
-    DuplicateFieldName, UnknownBaseClass, InheritedFieldClash,
+    DuplicateFieldName, UnknownBaseClass, InheritedFieldClash, ClassNameBound,
     UnassignedVariable, CapturedReassignment, SelfCaptureAssignment,
     UnreachableStatement, ConstructorArityMismatch, PatternArityMismatch,
     UnknownClassInPattern, UnknownFieldInPattern, DuplicatePatternKeyword,

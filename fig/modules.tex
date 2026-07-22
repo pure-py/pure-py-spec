@@ -24,11 +24,11 @@
 \ownFields(\exField{x_1} \;\ldots\; \exField{x_{n+1}}) &= x_1, \ldots, x_{n+1} \\
 \ownFields(\pyinline{pass}) &= \varepsilon \\
 \\
-\fields(\clsEntry{\Gamma}{q}{\seq{x}}{\bot}) &= \seq{x} \\
-\fields(\clsEntry{\Gamma}{q}{\seq{x}}{c}) &= \fields(\Gamma(c)) \mathbin{\cdot} \seq{x} \\
+\fields(\added{\clsEntry{q.c}{\seq{x}}{\bot}}\deleted{\clsEntryOld{\Gamma}{q}{\seq{x}}{\bot}}) &= \seq{x} \\
+\fields(\added{\clsEntry{q.c}{\seq{x}}{C}}\deleted{\clsEntryOld{\Gamma}{q}{\seq{x}}{c}}) &= \fields(\added{C}\deleted{\Gamma(c)}) \mathbin{\cdot} \seq{x} \\
 \\
-\added{\ancestors(C)} &\;\added{= \set{C}} && \added{\text{where } C = \clsEntry{\Gamma}{q}{\seq{x}}{\bot}} \\
-\added{\ancestors(C)} &\;\added{= \set{C} \cup \ancestors(\Gamma(c))} && \added{\text{where } C = \clsEntry{\Gamma}{q}{\seq{x}}{c}}
+\added{\ancestors(\clsEntry{q.c}{\seq{x}}{\bot})} &\;\added{= \set{\clsEntry{q.c}{\seq{x}}{\bot}}} \\
+\added{\ancestors(\clsEntry{q.c}{\seq{x}}{C})} &\;\added{= \set{\clsEntry{q.c}{\seq{x}}{C}} \cup \ancestors(C)}
 \end{align*}
 \subcaption{$\ownFields$, $\fields$\added{, and $\ancestors$} metafunctions}
 \end{subfigure}

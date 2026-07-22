@@ -142,7 +142,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-class}}]
 {
-  C = \clsEntry{\Gamma}{q}{\ownFields(\phi)}{\bot} \\
+  C = \added{\clsEntry{q.c}{\ownFields(\phi)}{\bot}}\deleted{\clsEntryOld{\Gamma}{q}{\ownFields(\phi)}{\bot}} \\
   \rho \override \set{\bind{c}{C}}, \seq{s} \Rightarrow \rho'
 }
 {
@@ -151,7 +151,8 @@
 \and
 \inferrule*[lab={\ruleName{eval-class-extend}}]
 {
-  C = \clsEntry{\Gamma}{q}{\ownFields(\phi)}{c'} \\
+  \added{\bind{c'}{C'} \in \rho} \\
+  C = \added{\clsEntry{q.c}{\ownFields(\phi)}{C'}}\deleted{\clsEntryOld{\Gamma}{q}{\ownFields(\phi)}{c'}} \\
   \rho \override \set{\bind{c}{C}}, \seq{s} \Rightarrow \rho'
 }
 {

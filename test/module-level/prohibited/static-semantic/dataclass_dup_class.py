@@ -5,7 +5,7 @@ class C:
     pass
 
 @dataclass
-class C:  # second declaration shadows the first (matches Python)
+class C:  # PurePy: error (name already bound); Python: shadows the first
     pass
 
 print("ok")

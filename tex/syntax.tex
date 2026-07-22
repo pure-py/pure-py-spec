@@ -18,7 +18,7 @@ A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the fo
 \begin{itemize}
 \item the variable's \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
 \item a \emph{module reference}, for a fully-qualified module name $q$: either a \emph{stub} $\modStub{q}$, or \emph{loaded} reference $\modLoaded{q}{\Gamma}$, which also carries the member context $\Gamma$ of $q$;
-\item a \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q}{\seq{x}}{c}$, recording the declaring context $\Gamma$, defining module $q$, sequence of distinct field names $\seq{x}$, and base class $c$ (or $\bot$ for no base).
+\item a \emph{class entry} $C$, of the form \added{$\clsEntry{q.c}{\seq{x}}{C'}$}\deleted{$\clsEntryOld{\Gamma}{q}{\seq{x}}{c}$}, recording \added{the qualified name $q.c$ of the class, its}\deleted{the declaring context $\Gamma$, defining module $q$,} sequence of distinct field names $\seq{x}$, and \added{its base class entry $C'$}\deleted{base class $c$} (or $\bot$ for no base). \Added{A module declares each class name at most once, so a class entry is determined by its qualified name; the qualified name is the identity of the class.}
 \end{itemize}
 \end{definition}
 
@@ -378,9 +378,8 @@ the definition of \pyinline{g} and reassigned by \pyinline{x = 6}, so the progra
 analogous to Java's requirement that local variables captured by a lambda must be \emph{effectively
 final}~\cite[\S15.27.2]{gosling2025}: local variables are allocated on the stack, and so only the value
 of a local variable can be captured by a closure.
-\Added{A dataclass declaration counts as an assignment of the class name here: if a function captures a
-class name that a later declaration re-declares, the function called in Python would see the newer class,
-so such programs are rejected on the same grounds.}
+\Added{A dataclass declaration counts as an assignment of its class name for these definitions, though a
+class declaration re-using a name in scope is prohibited outright (\S\ref{sec:prohibited}).}
 
 The same issue arises when a variable is captured and reassigned in the \emph{same} statement:
 
@@ -592,6 +591,7 @@ functional programming:
 \item A submodule importing itself through its parent (\pyinline{from a import b} inside module \pyinline{a.b}). \PurePy treats the from-imported submodule as a dependency, so this is an import cycle and is rejected; Python permits it, binding the partially-loaded module.
 \item An import (not a from-import) naming a proper descendant of the importing module (\pyinline{import x.y} inside module \pyinline{x}): the binding for the head would denote the still-loading module. Python permits it, binding the partially-initialised module. A from-import of the module's own submodule is permitted.
 \item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.
+\item \Added{A class declaration re-using a name already in scope, including re-declaring a class name. Python permits the re-declaration, leaving the earlier class reachable only through its existing instances; \PurePy requires class names to be fresh, so that a qualified name identifies a class.}
 \item First-class modules: in Python, modules are values. In \PurePy a module name may be projected (member access) but not used as a value.
 \item A module binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).
 \item Referring to a submodule the referring module does not itself import: \pyinline{import a} followed by \pyinline{a.b.f()} is rejected unless the module also imports \pyinline{a.b}. Python permits the reference whenever some earlier import, anywhere in the program, loaded \pyinline{a.b} (\S\ref{sec:uninitialised-members}).
