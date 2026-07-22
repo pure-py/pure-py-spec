@@ -189,7 +189,7 @@ def assigns_stmt(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.FunctionDef):
         return {s.name}
     if isinstance(s, ast.ClassDef):
-        return set()
+        return {s.name}
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def assigns_block(block: list[ast.stmt]) -> set[str]:

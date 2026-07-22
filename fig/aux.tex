@@ -11,6 +11,8 @@
 \assignsS(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \assignsS(\seq{b}) \\
 \assignsS(\exDef{f_1}{\seq{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}}{b_{n+1}}) &= \set{f_1, \ldots, f_{n+1}} \\
 \assignsS(\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}) &= \textstyle\bigcup_i \big(\binds(p_i) \cup \assignsS(b_i)\big) \\
+{\color{blue}\assignsS(\exDataclass{c}{\phi})} &\;\added{= \set{c}} \\
+{\color{blue}\assignsS(\exDataclassExtend{c}{c'}{\phi})} &\;\added{= \set{c}} \\
 \\
 \binds(\ell) &= \varnothing \\
 \binds(-n) &= \varnothing \\

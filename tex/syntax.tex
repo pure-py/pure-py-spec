@@ -378,6 +378,9 @@ the definition of \pyinline{g} and reassigned by \pyinline{x = 6}, so the progra
 analogous to Java's requirement that local variables captured by a lambda must be \emph{effectively
 final}~\cite[\S15.27.2]{gosling2025}: local variables are allocated on the stack, and so only the value
 of a local variable can be captured by a closure.
+\Added{A dataclass declaration counts as an assignment of the class name here: if a function captures a
+class name that a later declaration re-declares, the function called in Python would see the newer class,
+so such programs are rejected on the same grounds.}
 
 The same issue arises when a variable is captured and reassigned in the \emph{same} statement:
 
