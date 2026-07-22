@@ -140,7 +140,7 @@
 \and
 \inferrule*[lab={\ruleName{class}}]
 {
-  \added{c \notin \dom(\Gamma)} \\
+  \added{\nexists C_0.\ \bind{c}{C_0} \in \Gamma} \\
   \ownFields(\phi) = \seq{x} \text{ distinct} \\
   C = \added{\clsEntry{q.c}{\seq{x}}{\bot}}\deleted{\clsEntryOld{\Gamma}{q}{\seq{x}}{\bot}} \\
   \Gamma, \bind{c}{C} \vdash \seq{s} : \Delta
@@ -151,7 +151,7 @@
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \added{c \notin \dom(\Gamma)} \\
+  \added{\nexists C_0.\ \bind{c}{C_0} \in \Gamma} \\
   \bind{c'}{\added{C'}\deleted{\clsEntryOld{\Delta}{q}{\seq{y}}{c''}}} \in \Gamma \\
   \added{C' = \clsEntry{q.c'}{\seq{y}}{C''}} \\
   \ownFields(\phi) = \seq{x} \text{ distinct} \\

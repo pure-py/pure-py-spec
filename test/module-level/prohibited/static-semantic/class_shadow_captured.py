@@ -9,12 +9,6 @@ class C:
 def mk():
     return C(1)
 
-@dataclass
-class C:  # PurePy: error (C captured by mk, re-declared here); Python: mk sees this class
-    x: Any
+C = 5  # PurePy: error (C captured by mk, reassigned here); Python: rebinds C
 
-match mk():
-    case C(x):
-        print(x)
-    case _:
-        print("other")
+print("ok")

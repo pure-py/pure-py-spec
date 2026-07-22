@@ -1,1 +1,1 @@
-class name 'C' already bound
+duplicate class name 'C' in module '__main__'

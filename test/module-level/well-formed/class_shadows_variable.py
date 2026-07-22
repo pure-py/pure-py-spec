@@ -4,7 +4,8 @@ from typing import Any
 value = 1
 
 @dataclass
-class value:  # PurePy: error (name already bound); Python: rebinds the name
+class value:  # allowed: the name held a variable, not a class
     x: Any
 
-print("ok")
+v = value(2)
+print(v.x)

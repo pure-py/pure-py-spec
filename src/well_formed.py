@@ -330,8 +330,8 @@ def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: ModuleCo
                 raise IllFormedModule(node, reasons.UnreachableCase(i + 1, j + 1))
 
 def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
-    if node.name in gamma:
-        raise IllFormedModule(node, reasons.ClassNameBound(node.name))
+    if isinstance(gamma.get(node.name), ClassEntry):
+        raise IllFormedModule(node, reasons.DuplicateClassName(node.name, q))
     names = own_fields_of(node)
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
