@@ -77,15 +77,15 @@
   \strut
 }
 {
-  \vdash \added{\clsEntry{q.c}{\seq{x}}{\bot}}\deleted{\clsEntryOld{\Gamma}{q}{\seq{x}}{\bot}}
+  \vdash \clsEntry{\Gamma}{q\added{.c}}{\seq{x}}{\bot}
 }
 \and
 \inferrule*[lab={\ruleName{val-class-extend}}]
 {
-  \added{\vdash C}\deleted{\bind{c}{C} \in \Gamma}
+  \bind{c'}{C'} \in \Gamma
 }
 {
-  \vdash \added{\clsEntry{q.c}{\seq{x}}{C}}\deleted{\clsEntryOld{\Gamma}{q}{\seq{x}}{c}}
+  \vdash \clsEntry{\Gamma}{q\added{.c}}{\seq{x}}{c'}
 }
 \end{mathpar}
 

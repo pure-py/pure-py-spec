@@ -10,7 +10,7 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exObj{\Gamma}{\added{C}\deleted{q.c}}{\rho}$ & (Object) \\
     & $\mid$ & $\modStub{q}$ & (Module stub) \\
     & $\mid$ & $\modLoaded{q}{\rho}$ & (Loaded module) \\
-    & $\mid$ & $\added{\clsEntry{q.c}{\seq{x}}{C}}\deleted{\clsEntryOld{\Gamma}{q}{\seq{x}}{c'}}$ & (Class)
+    & $\mid$ & $\clsEntry{\Gamma}{q\added{.c}}{\seq{x}}{c'}$ & (Class)
    \\[3mm]
 $\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & (Environment)
    \\[3mm]

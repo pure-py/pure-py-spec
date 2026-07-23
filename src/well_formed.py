@@ -15,9 +15,7 @@ from patterns import is_catch_all, pattern_vars, subsumes
 
 def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
     base = node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
-    base_entry = context.get(base) if base is not None else None
-    assert base_entry is None or isinstance(base_entry, ClassEntry)
-    return ClassEntry(name=f'{q}.{node.name}', fields=tuple(own_fields_of(node)), base=base_entry)
+    return ClassEntry(context=context, module=q, fields=tuple(own_fields_of(node)), base=base)
 
 def result_type(node: ast.stmt) -> ResultTy:
     if isinstance(node, ast.Pass):
@@ -341,7 +339,7 @@ def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
     base = node.bases[0]
     assert isinstance(base, ast.Name)
     entry = gamma.get(base.id)
-    if not isinstance(entry, ClassEntry) or entry.name.rsplit('.', 1)[0] != q:
+    if not isinstance(entry, ClassEntry) or entry.module != q:
         raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
     clash = set(names) & set(fields_of(entry))
     if len(clash) > 0:
