@@ -12,7 +12,7 @@ class Status(Enum):
 @dataclass(frozen=True)
 class ClassEntry:
     context: Context
-    module: str
+    name: str
     fields: tuple[str, ...]
     base: Optional[str]
 
