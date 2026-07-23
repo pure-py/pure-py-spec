@@ -41,8 +41,8 @@ sequential-composition effects, so as black boxes functions are always pure.
 Expression evaluation $\rho, e \Rightarrow v$ is given in \figref{eval-expr}. The pattern-matching judgement
 $\rho, p, v \matches \rho'$ (\figref{match}) is a deterministic partial function; we write $\rho, p, v \notmatches$
 (with no right-hand side) for $\nexists \rho'.\, \rho, p, v \matches \rho'$, i.e.\ matching is undefined.
-\Added{A constructor pattern matches any object whose class has the pattern's class among its ancestors,
-mirroring Python's \pyinline{isinstance} check; sub-patterns bind the fields of the pattern's class. An object
+\Added{A constructor pattern matches any object whose class has the pattern's class among its ancestors;
+sub-patterns bind the fields of the pattern's class. An object
 records its class entry, whose qualified name is the identity of the class: since a module declares each class
 name at most once, the entry comparison in \ruleName{pat-constr} amounts to a comparison of qualified names.}
 
