@@ -18,11 +18,11 @@ A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the fo
 \begin{itemize}
 \item the variable's \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
 \item a \emph{module reference}, for a fully-qualified module name $q$: either a \emph{stub} $\modStub{q}$, or \emph{loaded} reference $\modLoaded{q}{\Gamma}$, which also carries the member context $\Gamma$ of $q$;
-\item a \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q\added{.c}}{\seq{x}}{c'}$, recording the declaring context $\Gamma$, \added{the qualified name $q.c$ of the class}\deleted{defining module $q$}, sequence of distinct field names $\seq{x}$, and \deleted{base class $c$}\added{base class name $c'$} (or $\bot$ for no base). \Added{A module declares each class name at most once, so the qualified name is the identity of the class: two entries denote the same class exactly when their qualified names agree.}
+\item a \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q\added{.c}}{\seq{x}}{c'}$, recording the declaring context $\Gamma$, \added{the qualified name $q.c$ of the class}\deleted{defining module $q$}, sequence of distinct field names $\seq{x}$, and \deleted{base class $c$}\added{base class name $c'$} (or $\bot$ for no base).
 \end{itemize}
 \end{definition}
 
-\noindent Module references arise from import statements. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}; $\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ \emph{not definitely assigned} (or, equivalently, degenerate types ``any'' and ``none'').
+\noindent Module references arise from import statements. \Added{A module declares each class name at most once, so the qualified name of a class entry is the identity of the class: two entries denote the same class exactly when their qualified names agree.} The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}; $\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ \emph{not definitely assigned} (or, equivalently, degenerate types ``any'' and ``none'').
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusDefAssigned(X)$ for the context $\set{\bind{x}{\statusDefAssigned} \mid x \in X}$; similarly $\statusNotDefAssigned(X)$.
 
 \paragraph{Context operations.}
