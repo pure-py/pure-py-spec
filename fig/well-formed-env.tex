@@ -47,11 +47,11 @@
 \and
 \inferrule*[lab={\ruleName{val-obj}}]
 {
-  \added{\vdash C} \\
+  \vdash C \\
   \vdash \rho : \Gamma
 }
 {
-  \vdash \exObj{\Gamma}{\added{C}\deleted{q.c}}{\rho}
+  \vdash \exObj{\Gamma}{C}{\rho}
 }
 \and
 \inferrule*[lab={\ruleName{val-mod}}]
@@ -77,7 +77,7 @@
   \strut
 }
 {
-  \vdash \clsEntry{\Gamma}{q\added{.c}}{\seq{x}}{\bot}
+  \vdash \clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}
 }
 \and
 \inferrule*[lab={\ruleName{val-class-extend}}]
@@ -85,7 +85,7 @@
   \bind{c'}{C'} \in \Gamma
 }
 {
-  \vdash \clsEntry{\Gamma}{q\added{.c}}{\seq{x}}{c'}
+  \vdash \clsEntry{\Gamma}{q.c}{\seq{x}}{c'}
 }
 \end{mathpar}
 

@@ -24,13 +24,13 @@
 \ownFields(\exField{x_1} \;\ldots\; \exField{x_{n+1}}) &= x_1, \ldots, x_{n+1} \\
 \ownFields(\pyinline{pass}) &= \varepsilon \\
 \\
-\fields(\clsEntry{\Gamma}{q\added{.c}}{\seq{x}}{\bot}) &= \seq{x} \\
-\fields(\clsEntry{\Gamma}{q\added{.c}}{\seq{x}}{c'}) &= \fields(\Gamma(c')) \mathbin{\cdot} \seq{x} \\
+\fields(\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}) &= \seq{x} \\
+\fields(\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}) &= \fields(\Gamma(c')) \mathbin{\cdot} \seq{x} \\
 \\
-\added{\ancestors(\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot})} &\;\added{= \set{\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}}} \\
-\added{\ancestors(\clsEntry{\Gamma}{q.c}{\seq{x}}{c'})} &\;\added{= \set{\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}} \cup \ancestors(\Gamma(c'))}
+\ancestors(\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}) &\;= \set{\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}} \\
+\ancestors(\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}) &\;= \set{\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}} \cup \ancestors(\Gamma(c'))
 \end{align*}
-\subcaption{$\ownFields$, $\fields$\added{, and $\ancestors$} metafunctions}
+\subcaption{$\ownFields$, $\fields$, and $\ancestors$ metafunctions}
 \end{subfigure}
 
 \caption{Module-related metafunctions}

@@ -140,9 +140,9 @@
 \and
 \inferrule*[lab={\ruleName{class}}]
 {
-  \added{\nexists C'.\ \bind{c}{C'} \in \Gamma} \\
+  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
   \ownFields(\phi) = \seq{x} \text{ distinct} \\
-  C = \clsEntry{\Gamma}{q\added{.c}}{\seq{x}}{\bot} \\
+  C = \clsEntry{\Gamma}{q.c}{\seq{x}}{\bot} \\
   \Gamma, \bind{c}{C} \vdash \seq{s} : \Delta
 }
 {
@@ -151,11 +151,11 @@
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \added{\nexists C'.\ \bind{c}{C'} \in \Gamma} \\
-  \bind{c'}{\clsEntry{\Delta}{q\added{.c'}}{\seq{y}}{c''}} \in \Gamma \\
+  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
+  \bind{c'}{\clsEntry{\Delta}{q.c'}{\seq{y}}{c''}} \in \Gamma \\
   \ownFields(\phi) = \seq{x} \text{ distinct} \\
   \seq{x} \cap \fields(\Gamma(c')) = \varnothing \\
-  C = \clsEntry{\Gamma}{q\added{.c}}{\seq{x}}{c'} \\
+  C = \clsEntry{\Gamma}{q.c}{\seq{x}}{c'} \\
   \Gamma, \bind{c}{C} \vdash \seq{s} : \Delta
 }
 {
