@@ -3,18 +3,16 @@
 \centering
 \small
 \begin{align*}
-\imports(\exImport{M}) &= \set{M} \\
-\imports(\exFromImport{M}{x_1, \ldots, x_{n+1}}) &= \set{M} \\
-\imports(\exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}) &= \textstyle\bigcup_i \imports(b_i) \\
-\imports(\exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}}) &= \textstyle\bigcup_i \imports(b_i) \\
-\imports(\exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}}) &= \textstyle\bigcup_i \imports(b_i) \\
-\imports(\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}) &= \textstyle\bigcup_i \imports(b_i) \\
-\imports(s) &= \varnothing \quad \text{otherwise} \\
+\imports(\exImport{q}) &= \set{q} \\
+\imports(\exFromImport{q}{x_1, \ldots, x_{n+1}}) &= \set{q} \cup \set{q.x_i \mid x_i \in \dom(\submodules(q))} \\
 \\
-\parents(x) &= \varnothing \\
-\parents(M.x) &= \parents(M) \cup \set{M}
+\\
+\deps_{q}(\exImport{q'}) &= \imports(\exImport{q'}) \cup \set{p \mid p \properPrefixOf q', p \neq q} \\
+\deps_{q}(\exFromImport{q'}{\seq{x}}) &= \imports(\exFromImport{q'}{\seq{x}}) \cup \set{p \mid p \properPrefixOf q', p \not\prefixOf q} \\
+\\
+\submodules(q) &= \set{\bind{x}{\modStub{q.x}} \mid q.x \in \dom(\mathcal{M})}
 \end{align*}
-\subcaption{$\imports$ and $\parents$ metafunctions}
+\subcaption{$\imports$,  $\deps$, and $\submodules$ metafunctions}
 \end{subfigure}
 
 \vspace{2mm}
@@ -23,52 +21,18 @@
 \centering
 \small
 \begin{align*}
-\classes(\exDataclass{C}{\phi}) &= \set{C \mapsto (\decls(\phi), \bot)} \\
-\classes(\exDataclassExtend{C}{B}{\phi}) &= \set{C \mapsto (\decls(\phi), B)} \\
-\classes(s) &= \varnothing \quad \text{otherwise} \\
+\ownFields(\exField{x_1} \;\ldots\; \exField{x_{n+1}}) &= x_1, \ldots, x_{n+1} \\
+\ownFields(\pyinline{pass}) &= \varepsilon \\
 \\
-\decls(\exField{x_1} \;\ldots\; \exField{x_{n+1}}) &= x_1 \ldots x_{n+1} \\
-\decls(\pyinline{pass}) &= \varepsilon \\
+\fields(\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}) &= \seq{x} \\
+\fields(\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}) &= \fields(\Gamma(c')) \mathbin{\cdot} \seq{x} \\
 \\
-\fields(M.C) &= \begin{cases}
-  \vec{x} & \text{if } \Lambda_M(C) = (\vec{x}, \bot) \\
-  \fields(M.B) \mathbin{\cdot} \vec{x} & \text{if } \Lambda_M(C) = (\vec{x}, B)
-\end{cases}
+\ancestors(\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}) &\;= \set{\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}} \\
+\ancestors(\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}) &\;= \set{\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}} \cup \ancestors(\Gamma(c'))
 \end{align*}
-\subcaption{$\classes$ and $\fields$ metafunctions}
+\subcaption{$\ownFields$, $\fields$, and $\ancestors$ metafunctions}
 \end{subfigure}
 
-\vspace{2mm}
-
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash_{\mathcal{M}} M$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{module}}]
-{
-  \Gamma_M \vdash_M \mathcal{M}(M) : \Delta \\
-  \imports(\mathcal{M}(M)) \subseteq \dom(\mathcal{M}) \\
-  G_{\Lambda_M} \text{ acyclic}
-}
-{
-  \vdash_{\mathcal{M}} M
-}
-\end{mathpar}
-
-\flushleft \shadebox{$\vdash \langle E, \mathcal{M} \rangle$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{program}}]
-{
-  \vdash_{\mathcal{M}} M_i \quad (\forall M_i \in \dom(\mathcal{M})) \\
-  G_{\mathcal{M}} \text{ acyclic}
-}
-{
-  \vdash \langle E, \mathcal{M} \rangle
-}
-\end{mathpar}
-\subcaption{Module and program well-formedness}
-\end{subfigure}
-\caption{Module structure}
+\caption{Module-related metafunctions}
 \label{fig:modules}
 \end{figure}

@@ -1,32 +1,110 @@
 \begin{figure}
-\flushleft \shadebox{$\wf{\Gamma}{e}$}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Gamma \vdash q \names \theta$}
+\begin{mathpar}
+\small
+
+\inferrule*[lab={\ruleName{simple-var}}]
+{
+  \bind{x}{\statusDefAssigned} \in \Gamma
+}
+{
+  \Gamma \vdash x \names \statusDefAssigned
+}
+\and
+
+\inferrule*[lab={\ruleName{simple-module}}]
+{
+  \bind{x}{\modLoaded{q}{\Gamma'}} \in \Gamma
+}
+{
+  \Gamma \vdash x \names \modLoaded{q}{\Gamma'}
+}
+\and
+
+\inferrule*[lab={\ruleName{simple-class}}]
+{
+  \bind{c}{C} \in \Gamma
+}
+{
+  \Gamma \vdash c \names C
+}
+\and
+
+\inferrule*[lab={\ruleName{qualified}}]
+{
+  \Gamma \vdash q \names \modLoaded{q'}{\Gamma'} \\
+  \Gamma' \vdash x \names \theta
+}
+{
+  \Gamma \vdash q.x \names \theta
+}
+
+\end{mathpar}
+\subcaption{Name $q$ resolves to context entry $\theta$ under $\Gamma$}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Gamma \vdash e$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{var}}]
 {
-  \Gamma(x) = \statusDefAssigned
+  \bind{x}{\statusDefAssigned} \in \Gamma
 }
 {
-  \wf{\Gamma}{x}
+  \Gamma \vdash x
+}
+\and
+\inferrule*[lab={\ruleName{var-builtin}}]
+{
+  x \notin \dom(\Gamma) \\
+  \bind{x}{\statusDefAssigned} \in \Gamma_{\pymath{builtins}}
+}
+{
+  \Gamma \vdash x
 }
 \and
 \inferrule*[lab={\ruleName{lambda}}]
 {
-  \Gamma, x_1 : \statusDefAssigned, \ldots, x_n : \statusDefAssigned \vdash e
+  \Gamma \override \statusDefAssigned(\seq{x}) \vdash e
 }
 {
-  \wf{\Gamma}{\exLambda{x_1, \ldots, x_n}{e}}
+  \Gamma \vdash \exLambda{\seq{x}}{e}
 }
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
-  \fields(M.C) = x_1, \ldots, x_n \\
-  \wf{\Gamma}{e_i} \quad (\forall i)
+  \Gamma \vdash q \names C \\
+  \fields(C) = x_1, \ldots, x_n \mathbin{\cdot} \seq{x}\,' \\
+  \set{\seq{y}} = \set{\seq{x}\,'} \\
+  \Gamma \vdash e_i \quad (\forall i)
 }
 {
-  \wf{\Gamma}{\exConstruct{C}{e_1, \ldots, e_n}}
+  \Gamma \vdash \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}}
+}
+\and
+
+\inferrule*[lab={\ruleName{attr-module}}]
+{
+  \Gamma \vdash \exAttr{e}{x} \names \statusDefAssigned
+}
+{
+  \Gamma \vdash \exAttr{e}{x}
+}
+\and
+\inferrule*[lab={\ruleName{attr-object}}]
+{
+  \Gamma \vdash e
+}
+{
+  \Gamma \vdash \exAttr{e}{x}
 }
 \end{mathpar}
-\caption{Expression $e$ of module $M$ is well-formed in $\Gamma$}
+\subcaption{Expression $e$ is well-formed under $\Gamma$}
+\end{subfigure}
+\caption{Expression well-formedness}
 \label{fig:well-formed-expr}
 \end{figure}

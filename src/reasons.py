@@ -1,12 +1,8 @@
+from __future__ import annotations
+
+import ast
 from dataclasses import dataclass
-from typing import Union
-
-
-@dataclass(frozen=True)
-class DuplicateClassName:
-    name: str
-    def message(self) -> str:
-        return f"duplicate class name '{self.name}' in module"
+from typing import Optional, Union
 
 
 @dataclass(frozen=True)
@@ -25,18 +21,19 @@ class UnknownBaseClass:
 
 
 @dataclass(frozen=True)
-class CyclicInheritance:
-    cycle: tuple[str, ...]
-    def message(self) -> str:
-        return f"cyclic inheritance: {' -> '.join(self.cycle)}"
-
-
-@dataclass(frozen=True)
 class InheritedFieldClash:
     field: str
     base: str
     def message(self) -> str:
         return f"field '{self.field}' clashes with inherited field from '{self.base}'"
+
+
+@dataclass(frozen=True)
+class DuplicateClassName:
+    name: str
+    module: str
+    def message(self) -> str:
+        return f"duplicate class name '{self.name}' in module '{self.module}'"
 
 
 @dataclass(frozen=True)
@@ -73,6 +70,14 @@ class ConstructorArityMismatch:
     got: int
     def message(self) -> str:
         return f"constructor for '{self.cls}' expects {self.expected} arguments, got {self.got}"
+
+
+@dataclass(frozen=True)
+class UnknownConstructorKeyword:
+    cls: str
+    expected_fields: tuple[str, ...]
+    def message(self) -> str:
+        return f"constructor keywords for '{self.cls}' must be {', '.join(self.expected_fields)}"
 
 
 @dataclass(frozen=True)
@@ -129,9 +134,44 @@ class DuplicateMutualName:
 
 
 @dataclass(frozen=True)
-class NestedImport:
+class NonTopLevelImport:
     def message(self) -> str:
         return "import only allowed at module top level"
+
+
+@dataclass(frozen=True)
+class ImportAfterStatement:
+    def message(self) -> str:
+        return "imports must precede all other statements"
+
+
+@dataclass(frozen=True)
+class SubmoduleNameClash:
+    name: str
+    submodule: str
+    def message(self) -> str:
+        return f"binding '{self.name}' clashes with submodule '{self.submodule}'"
+
+
+@dataclass(frozen=True)
+class SubmoduleNotImported:
+    q: str
+    def message(self) -> str:
+        return f"submodule '{self.q}' is not imported"
+
+
+@dataclass(frozen=True)
+class UnassignedMember:
+    x: str
+    q: str
+    def message(self) -> str:
+        return f"member '{self.x}' of module '{self.q}' is not definitely assigned"
+
+
+@dataclass(frozen=True)
+class NonTopLevelClass:
+    def message(self) -> str:
+        return "class definition only allowed at module top level"
 
 
 @dataclass(frozen=True)
@@ -146,12 +186,73 @@ class EmptyFromImport:
         return "empty name list"
 
 
+@dataclass(frozen=True)
+class UnknownModule:
+    q: str
+    def message(self) -> str:
+        return f"unknown module {self.q!r}"
+
+
+@dataclass(frozen=True)
+class UnknownMember:
+    x: str
+    q: str
+    def message(self) -> str:
+        return f"module {self.q!r} has no member {self.x!r}"
+
+
+@dataclass(frozen=True)
+class ModuleAsValue:
+    name: str
+    def message(self) -> str:
+        return f"'{self.name}' refers to a module; modules are not first-class values"
+
+
+@dataclass(frozen=True)
+class OwnDescendantImport:
+    q: str
+    q0: str
+    def message(self) -> str:
+        return f"'{self.q}' is a descendant of the importing module '{self.q0}'; import it with a from-import"
+
+
+@dataclass(frozen=True)
+class ClassAsValue:
+    name: str
+    def message(self) -> str:
+        return f"'{self.name}' refers to a class; classes are not first-class values"
+
+
 Reason = Union[
-    DuplicateClassName, DuplicateFieldName, UnknownBaseClass, InheritedFieldClash,
-    CyclicInheritance,
+    DuplicateFieldName, UnknownBaseClass, InheritedFieldClash, DuplicateClassName,
     UnassignedVariable, CapturedReassignment, SelfCaptureAssignment,
     UnreachableStatement, ConstructorArityMismatch, PatternArityMismatch,
     UnknownClassInPattern, UnknownFieldInPattern, DuplicatePatternKeyword,
+    UnknownModule, UnknownMember, ModuleAsValue, ClassAsValue,
+    UnknownConstructorKeyword,
     NonlinearPattern, UnreachableCase, DuplicateMutualName,
-    NestedImport, TopLevelReturn, EmptyFromImport,
+    NonTopLevelImport, NonTopLevelClass, TopLevelReturn, EmptyFromImport,
+    ImportAfterStatement, SubmoduleNameClash, SubmoduleNotImported, OwnDescendantImport,
+    UnassignedMember,
 ]
+
+
+class IllFormed(Exception):
+    exit_code: int
+    msg: str
+
+class IllFormedModule(IllFormed):
+    exit_code = 3
+    def __init__(self, node: ast.AST, reason: Reason):
+        self.line: Optional[int] = getattr(node, 'lineno', None)
+        self.col: Optional[int] = getattr(node, 'col_offset', None)
+        self.reason: Reason = reason
+        self.msg = reason.message()
+        self.module: Optional[str] = None
+        super().__init__(self.msg)
+
+class IllFormedProgram(IllFormed):
+    exit_code = 4
+    def __init__(self, msg: str):
+        self.msg = msg
+        super().__init__(msg)

@@ -1,4 +1,2 @@
 import sys
-import math
-print(sys.platform != "")
-print(math.sqrt(4))
+print(len(sys.argv) >= 0)

@@ -15,7 +15,7 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 - `tex/` — macros, listings config, related work
 - `fig/` — syntax, well-formedness rules, operational semantics
 - `agda/` — Agda mechanisation (distributivity proof)
-- `src/purepy_parse.py` — reference parser (Python `ast`-based subset checker)
+- `src/` — reference checker (Python `ast`-based), organised to mirror the spec's sections
 - `test/` — litmus tests
 
 ## Building the spec
@@ -32,21 +32,21 @@ test/run-all.sh
 
 Sets up a `.venv` automatically. Targets Python 3.12+ ([#39](https://github.com/pure-py/pure-py-spec/issues/39)).
 
-Test categories mirror the two judgement tiers in the spec (per-module $\Gamma \vdash_M m : \Delta$ and program-level $\vdash \langle E, \mathcal{M} \rangle$):
-- `test/module-level/well-formed/` — accepted by the checker, runs correctly in Python
-- `test/module-level/ill-formed/semantic/` — parser accepts but well-formedness rejects
-- `test/module-level/ill-formed/unsupported/` — parser rejects (permanently excluded Python features)
-- `test/module-level/ill-formed/syntactic-only/` — rejected by well-formedness but cannot be expressed as `.py` source; tested via direct AST construction
-- `test/module-level/pending/` — will be accepted once features are implemented
-- `test/program-level/well-formed/` — multi-module programs accepted end-to-end
-- `test/program-level/ill-formed/` — programs rejected by whole-program checks (missing modules, cycles, etc.)
+Tests are organised by tier (per-module $\Gamma \vdash_M m : \Delta$ and program-level $\vdash \langle E, \mathcal{M} \rangle$) and then by verdict. The verdict directory *is* the test's specification: the runner derives every assertion from the path.
+- `well-formed/` — PurePy accepts; Python runs it
+- `prohibited/` — PurePy rejects but Python accepts (valid Python excluded by design); `syntactic/` is rejected at parse, `semantic/` at check
+- `ill-formed/` — PurePy rejects *and* Python rejects (a genuine error); `semantic/` carries the Python exception, `syntactic-only/` is tested via AST construction (not expressible as `.py`)
+- `pending/` — not yet implemented; will become well-formed
 
-## Reference parser (`src/purepy_parse.py`)
+The invariant — `prohibited` ⇒ Python runs it, `ill-formed` ⇒ Python rejects it — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails.
 
-Decides whether a Python program belongs to the PurePy subset, using the `ast` module.
+## Reference checker (`src/`)
+
+`parse.py` decides whether a Python program belongs to the PurePy subset, using the `ast` module;
+`check_module.py` and `check_program.py` check well-formedness at module and program level.
 
 - Exit 0: accepted
-- Exit 1: unsupported (permanently excluded)
+- Exit 1: prohibited (permanently excluded)
 - Exit 2: not yet supported (planned, linked to a GitHub issue)
 
 ## Release workflow
@@ -70,7 +70,7 @@ Implementations are allowed to have additional behaviours and syntax beyond the 
 
 Languages/language implementations we would like to be PurePy compliant:
 
-- CPython
+- Python
 - JAX
 - [Fluid](https://github.com/explorable-viz/fluid)
 - fortl

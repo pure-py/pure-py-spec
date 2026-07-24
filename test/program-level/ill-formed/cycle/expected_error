@@ -1,1 +1,1 @@
-import cycle: main -> helper -> main
+import cycle: helper -> main -> helper

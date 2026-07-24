@@ -1,60 +1,61 @@
 \begin{figure}
-\flushleft \shadebox{$\vdash p_1 \cons \ldots \cons p_n$}
+\flushleft \shadebox{$\Gamma \vdash p_1 \cons \ldots \cons p_n$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{pat-lit}}]
 { \strut }
-{ \vdash \ell }
+{ \Gamma \vdash \ell }
 \and
 \inferrule*[lab={\ruleName{pat-neg-lit}}]
 { \strut }
-{ \vdash -n }
+{ \Gamma \vdash -n }
 \and
 \inferrule*[lab={\ruleName{pat-var}}]
 { \strut }
-{ \vdash x }
+{ \Gamma \vdash x }
 \and
 \inferrule*[lab={\ruleName{pat-wild}}]
 { \strut }
-{ \vdash \patWild }
+{ \Gamma \vdash \patWild }
 \and
 \inferrule*[lab={\ruleName{pat-list}}]
-{ \vdash p_i \quad (\forall i) }
-{ \vdash \patList{p_1, \ldots, p_n} }
+{ \Gamma \vdash p \quad (\forall p \in \seq{p}) }
+{ \Gamma \vdash \patList{\seq{p}} }
 \and
 \inferrule*[lab={\ruleName{pat-tuple}}]
-{ \vdash p_i \quad (\forall i) }
-{ \vdash \patTuple{p_1, \ldots, p_n} }
+{ \Gamma \vdash p \quad (\forall p \in \seq{p}) }
+{ \Gamma \vdash \patTuple{\seq{p}} }
 \and
 \inferrule*[lab={\ruleName{pat-as}}]
-{ \vdash p }
-{ \vdash p\;\pyinline{as}\;x }
+{ \Gamma \vdash p }
+{ \Gamma \vdash p\;\pyinline{as}\;x }
 \and
-\inferrule*[lab={\ruleName{pat-class}}]
+\inferrule*[lab={\ruleName{pat-constr}}]
 {
-  \fields(M.C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m} \\
-  \set{y_1, \ldots, y_m} = \set{x_{n+1}, \ldots, x_{n+m}} \\
-  \vdash p_i \quad (\forall i)
+  \Gamma \vdash q \names C \\
+  \fields(C) = x_1, \ldots, x_n \mathbin{\cdot} \seq{x}\,' \\
+  \set{\seq{y}} = \set{\seq{x}\,'} \\
+  \Gamma \vdash p_i \quad (\forall i)
 }
 {
-  \vdash \patClass{C}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}}
+  \Gamma \vdash \patConstr{q}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}}
 }
 \and
 \inferrule*[lab={\ruleName{cases-nil}}]
 { \strut }
-{ \vdash \varepsilon }
+{ \Gamma \vdash \varepsilon }
 \and
 \inferrule*[lab={\ruleName{cases-cons}}]
 {
-  \vdash p_1 \\
-  \vdash p_2 \cons \ldots \cons p_n \\
-  \text{variables in } p_1 \text{ distinct} \\
-  p_i \not\subsumed p_1 \quad (\forall i.\, 2 \le i \le n)
+  \Gamma \vdash p \\
+  \Gamma \vdash \seq{p}\,' \\
+  \text{variables in } p \text{ distinct} \\
+  p' \not\subsumed p \quad (\forall p' \in \seq{p}\,')
 }
 {
-  \vdash p_1 \cons p_2 \cons \ldots \cons p_n
+  \Gamma \vdash p \cons \seq{p}\,'
 }
 \end{mathpar}
-\caption{Case patterns of module $M$ are well-formed}
+\caption{Case patterns are well-formed under $\Gamma$}
 \label{fig:well-formed-pat}
 \end{figure}

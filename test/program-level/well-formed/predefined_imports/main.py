@@ -9,4 +9,3 @@ class C:
     x: Any
 
 print(builtins.len([1, 2, 3]))
-print(math.pi)

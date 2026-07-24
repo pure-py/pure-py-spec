@@ -1,0 +1,647 @@
+\section{Syntax}
+
+The syntax of the language is given in \figref{syntax-stmt} and \figref{syntax-expr}. A \emph{block} is a non-empty sequence of
+statements; either a top-level statement, a \pyinline{def} body, or a branch of a conditional. A
+\emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal contiguous non-empty sequence of \pyinline{def}
+statements in a block: any non-\pyinline{def} statement in that block, by definition, separates mutual
+regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
+grouping consecutive \pyinline{def}s into a single region. The well-formedness rules treat each region as
+one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
+
+\subsection{Contexts}
+\label{sec:contexts}
+
+Metavariables $x$, $f$, $c$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function and $c$ when it is expected to denote a class.
+
+\begin{definition}[Context]
+A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the following \emph{context entries} $\theta$:
+\begin{itemize}
+\item the variable's \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
+\item a \emph{module reference}, for a fully-qualified module name $q$: either a \emph{stub} $\modStub{q}$, or \emph{loaded} reference $\modLoaded{q}{\Gamma}$, which also carries the member context $\Gamma$ of $q$;
+\item a \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}$, recording the declaring context $\Gamma$, the qualified name $q.c$ of the class, sequence of distinct field names $\seq{x}$, and base class name $c'$ (or $\bot$ for no base).
+\end{itemize}
+\end{definition}
+
+\noindent Module references arise from import statements. A module declares each class name at most once, so the qualified name of a class entry is the identity of the class. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}; $\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ \emph{not definitely assigned} (or, equivalently, degenerate types ``any'' and ``none'').
+It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusDefAssigned(X)$ for the context $\set{\bind{x}{\statusDefAssigned} \mid x \in X}$; similarly $\statusNotDefAssigned(X)$.
+
+\paragraph{Context operations.}
+
+Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
+an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
+\emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$ (Lemma~1), but left
+distributivity does not hold. Both operations are defined pointwise.
+%
+\begin{definition}[Context override]
+{\small
+\begin{align*}
+\bot \override \theta &= \theta \override \bot = \theta \\
+\theta \override \theta' &= \theta' \quad (\text{otherwise})
+\end{align*}}
+\end{definition}
+
+\noindent Override is thus right-biased and has $\bot$ as both left and right unit.
+
+\begin{definition}[Context merge]
+For definite-assignment statuses $a, a' \in \B$:
+{\small
+\begin{align*}
+\bot \merge \bot &= \bot \\
+a \merge \bot = \bot \merge a &= \statusNotDefAssigned \\
+a \merge a' &= a \meet a'
+\end{align*}}
+\end{definition}
+
+\noindent Merge is otherwise undefined. Restricted to $\B$, it returns $\statusNotDefAssigned$ when exactly one argument is defined and the conjunction otherwise; so $\bot$ is not a unit.
+
+\begin{definition}[Context extend]
+\label{def:extend}
+{\small
+\begin{align*}
+\modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} &= \modLoaded{q}{\Gamma \extend \Gamma'} \\
+\modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} &= \modLoaded{q}{\Gamma} \\
+\bot \extend \theta = \theta \extend \bot &= \theta \\
+\theta \extend \theta' &= \theta' \quad (\text{otherwise})
+\end{align*}}
+\end{definition}
+
+\noindent Extend combines module references for the same module recursively, preferring loaded references to stubs, and is otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted at the same package must combine rather than shadow.
+
+\begin{lemma}[Right distributivity]
+\[
+(\Delta \merge \Delta') \override \Gamma = (\Delta \override \Gamma) \merge (\Delta' \override \Gamma).
+\]
+\end{lemma}
+
+\noindent Left distributivity ($\Gamma \override (\Delta \merge \Delta') = (\Gamma \override \Delta) \merge
+(\Gamma \override \Delta')$) does not hold. If it did, the following two programs would be equivalent, since
+sequential composition with a preceding assignment could be distributed into the branches of a conditional.
+But they are not: the left program is ill-formed, because a variable assigned before a conditional does not
+remain definitely assigned if only some branches assign it (see also \S\ref{sec:local-assignment}).
+\vspace{-\medskipamount}
+
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+def f(b):
+    x = 1
+    if b:
+        x = 2
+    else:
+        pass
+    return x  # error
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+def f(b):
+    if b:
+        x = 1
+        x = 2
+    else:
+        x = 1
+        pass
+    return x  # ok
+\end{python}
+\end{minipage}
+
+\input{fig/syntax-stmt}
+\input{fig/syntax-expr}
+
+\paragraph{Operators.}
+
+The metavariable $\odot$ ranges over the supported binary operators and $\ominus$ over the supported unary
+operators, both enumerated in \figref{precedence}. The grammar of \figref{syntax-expr} is intentionally ambiguous
+on operator forms; disambiguation is by the precedence and associativity given in \figref{precedence},
+which follow Python.
+
+\input{fig/precedence}
+
+\subsection{Modules and programs}
+
+A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
+(\figref{syntax-stmt}) to \emph{module bodies} $t$, of which one is a distinguished \emph{main module} named
+$\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
+$\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
+$\seq{\iota}$ followed by a sequence of statements $\seq{s}$; since imports are not statements, they can
+appear neither in blocks (and hence not in function bodies) nor after the first non-import statement. The
+well-formedness and evaluation rules check and evaluate the statements of each body $\mathcal{M}(q)$ with the
+assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
+$\pymath{\_\_name\_\_}$ binding the runtime supplies automatically. $\mathcal{M}$ additionally always includes the predefined modules of
+\figref{predefined}, each defining exactly its listed members, and is prefix-closed: the parent of any module in $\dom(\mathcal{M})$ is itself in
+$\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is its \texttt{.py}
+file, each package's body is its \texttt{\_\_init\_\_.py}, and a package directory without an
+\texttt{\_\_init\_\_.py} encodes the empty body (a namespace package, PEP 420, \url{https://peps.python.org/pep-0420/}). Prefix-closure thus holds by
+construction.} The map $\mathcal{M}$ is fixed and ambient in all
+definitions that follow.
+
+\begin{definition}[Builtins context]
+$\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\pyinline{builtins}}
+(\figref{predefined}).
+\end{definition}
+
+\begin{figure}[H]
+\small
+\centering
+\begin{tabular}{lp{0.6\textwidth}}
+\hline
+\textbf{Module} & \textbf{Members} \\
+\hline
+\textup{\pyinline{builtins}} & \pyinline{print}, \pyinline{len}, \pyinline{range} \\
+\pyinline{math} & \\
+\pyinline{sys} & \pyinline{argv}, \pyinline{exit} \\
+\pyinline{typing} & \pyinline{Any} \\
+\pyinline{dataclasses} & \pyinline{dataclass} \\
+\hline
+\end{tabular}
+\caption{Predefined modules and their members}
+\label{fig:predefined}
+\end{figure}
+
+The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ and $\deps$ from individual imports to import sequences; on a module body $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively.  Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q = p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order.
+
+\input{fig/modules}
+
+The \emph{dependency graph} $G_{\mathcal{M}}$ of a program has an edge $(q, q')$ iff $q' \in
+\deps_{q}(\mathcal{M}(q))$.
+Every import depends on its target's ancestors; excepted are ancestors enclosing the importing
+module itself, which are necessarily still in progress when it runs and so cannot be required to load
+first. The exception appears only in the from-import clause because an import naming a proper descendant
+of the importing module is prohibited outright (\S\ref{sec:prohibited}). In the rules
+(\figref{well-formed-imports}), the exemption is the bound on the loads-to judgement, whose prefixes the walk skips:
+$\varepsilon$ for an import, the importing module for a from-import. Program well-formedness (\figref{well-formed-module}) requires the
+main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
+to be acyclic. 
+
+\subsection{Well-formedness}
+
+\subsubsection{Auxiliary definitions}
+
+Three syntactic analyses support the well-formedness rules: $\assignsS(s)$, the set of variables assigned
+anywhere in $s$ (without descending into nested function definitions, which have their own scope, so that
+$\assignsS(s) = \dom(\Delta)$ when $s : \Assigns{\Delta}$); $\binds(p)$, the set of variables introduced by a
+pattern $p$; and $\capturesS(s)$, the set of variables from the enclosing scope that are captured by closures
+(lambdas or nested function definitions) within $s$, with companion $\capturesE(e)$ on expressions. All are
+defined in \figref{aux}. $\capturesS$ extends to blocks and module bodies by union (like $\assignsS$),
+with the singleton block identified with its statement.
+
+\input{fig/aux}
+
+\begin{definition}[Pattern subsumption]
+The preorder $p \subsumed p'$ (\figref{subsumption}) holds when every value matched by $p$ is also matched by $p'$.
+\end{definition}
+
+\noindent Subsumption is used by the well-formedness rule for $\pyinline{match}$ to rule out unreachable cases and to check exhaustiveness; with the current pattern set, the latter reduces to requiring a catch-all (var or wildcard) case.
+
+\input{fig/subsumption}
+
+\subsubsection{Well-formedness rules}
+
+A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is linear (no repeated variable names) and no earlier pattern subsumes a later one. The \pyinline{match} well-formedness rules use this judgement to enforce reachability and linearity of case patterns.
+
+\input{fig/well-formed-pat}
+
+Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
+$\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
+= e} definitely assigns $\set{\bind{\pyinline{x}}{\statusDefAssigned}}$. \emph{Result types} $R$ classify these outcomes: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$). Block well-formedness is given in
+\figref{well-formed}; expression well-formedness in \figref{well-formed-expr}.
+
+Context operations $\override$ and $\merge$ lift to a right semiring over result types $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge$ and zero for $\override$.
+
+\begin{definition}[Override and merge on result types]
+{\small
+\begin{align*}
+\Assigns{\Delta} \merge \Assigns{\Delta'} & = \Assigns{(\Delta \merge \Delta')} \\
+R \merge \Returns = \Returns \merge R & = R \\
+\\
+\Assigns{\Delta} \override \Assigns{\Delta'} & = \Assigns{(\Delta \override \Delta')} \\
+R \override \Returns = \Returns \override R & = \Returns
+\end{align*}}
+\end{definition}
+
+\noindent The $\Returns \override R$ case never arises because the well-formedness judgement prohibits unreachable statements (\S\ref{sec:unreachable}).
+
+\begin{lemma}[Right distributivity (result types)]
+\[
+(R \merge R') \override S = (R \override S) \merge (R' \override S)
+\]
+\end{lemma}
+
+\noindent A module attribute reference is well-formed only when it resolves to a definitely assigned member (rule \ruleName{attr-module}); see \S\ref{sec:uninitialised-members}.
+
+\input{fig/well-formed}
+\input{fig/well-formed-expr}
+\input{fig/well-formed-module}
+
+The output context $\Gamma$ of the module well-formedness judgement (\figref{well-formed-module}) comprises the classes and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own bindings are disjoint, because the module rules prohibit a module from binding a name that is also the name of a submodule (\S\ref{sec:submodule-clash}).
+
+\subsection{Examples}
+
+\subsubsection{Assignment as definition}
+\label{sec:assignment-as-definition}
+
+Although \PurePy is pure and all variable usage is well-scoped, local variables are introduced using an
+\emph{assignment statement}, for compatibility with Python. If a variable is definitely assigned in any branch
+of a conditional, then for that variable to be usable after the conditional, every other branch of the
+conditional must either definitely return, or definitely assign that variable too. Thus the following are both
+well-formed:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.48\textwidth}
+\centering
+\begin{python}
+if a < b:
+   comp = "smaller"
+else:
+   comp = "bigger"
+return comp
+\end{python}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+\centering
+\begin{python}
+if a < b:
+   return "smaller"
+else:
+   comp = "bigger"
+return comp
+\end{python}
+\end{subfigure}
+\end{figure}
+
+\noindent The definite assignment set for a conditional that has at least one branch which definitely assigns
+is calculated by merging the definite assignment sets for all branches which definitely assign, using the
+$\merge$ operator on environments.
+
+Definite assignment thus gives each reference a unique lexical referent: a variable is introduced by
+an assignment, possibly jointly by the branches of a conditional, and a name may be referenced only where one
+such introduction covers every path. This is stricter than avoiding Python's \pyinline{NameError}: the
+left-hand program of \S\ref{sec:contexts} assigns \pyinline{x} on every run, but is rejected because the
+reference would denote the branch-local variable on one path and the variable it hides on the other.
+
+\subsubsection{Local assignment in conditional clauses}
+\label{sec:local-assignment}
+
+For flexibility, we permit \emph{branch-local} variables. The assignment of \pyinline{x} below (left) is
+permitted, and can be used locally in that branch of the conditional:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.48\textwidth}
+\centering
+\begin{python}
+def foo():
+  z = 6
+  if b:
+    x = 3
+    y = x + 1
+  else:
+    y = 0
+  return z
+\end{python}
+\caption{Branch-local definition of \pyinline{x}}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+\centering
+\begin{python}
+def foo():
+  x = 6
+  if b:
+    x = 3
+    y = x + 1
+  else:
+    y = 0
+  return x # error: partially defined
+\end{python}
+\caption{Now with use of \pyinline{x} after the conditional}
+\end{subfigure}
+\end{figure}
+
+\noindent However such variables only appear to be branch-local. The definition of $\merge$ actually ensures
+that a variable assigned in any branch is considered assigned by the conditional; however unless it is
+assigned in \emph{every} branch that does not definitely return, it will be bound to $\statusNotDefAssigned$ in the
+corresponding environment. Any attempt to refer to such a variable is illegal, as it refers to a variable
+which may not be assigned. (Thus the right-hand program is ill-formed, despite the enclosing \pyinline{x = 6},
+because in the \pyinline{return x} statement, the inner assignment shadows the the outer one, and the inner
+assignment is only partial.) If we were to allow the program on the right, there would be no straightforward
+way to assign it a semantics which is both pure, and in agreement with Python, since in Python the function
+returns \pyinline{3} in the case where \pyinline{b} is \pyinline{True}.
+
+\subsubsection{Function-level scoping of local variables}
+
+In Python, all local variables are scoped to the entire function body, not just from the point of
+assignment onwards. The $\assignsS$ function in the \ruleName{mutual} rule reflects this: all variables
+assigned anywhere in the function body are introduced at $\statusNotDefAssigned$ before the body is checked. This means
+the following program is statically rejected by \PurePy, whereas Python rejects it at runtime with an
+\pyinline{UnboundLocalError}:
+
+\begin{python}
+y = 7
+
+def f():
+    x = y  # error: y is local (due to assignment below)
+    y = 8
+
+f()
+\end{python}
+
+\noindent Because \pyinline{y} appears on the left-hand side of an assignment in \pyinline{f}, it is in
+$\assignsS(b)$ for the body of \pyinline{f}, and is therefore introduced at $\statusNotDefAssigned$ at the top of the
+function. The reference to \pyinline{y} in \pyinline{x = y} then fails the well-formedness check, since
+$\Gamma(\pyinline{y}) = \statusNotDefAssigned$ rather than $\Gamma(\pyinline{y}) = \statusDefAssigned$.
+
+\subsubsection{Reassignment of captured variables}
+\label{sec:captured-vars}
+
+Once a variable has been captured by a closure, it cannot be reassigned in the enclosing scope, because
+its Python semantics would depend on mutation. Consider the following program:
+
+\begin{python}
+def f():
+    x = 5
+    def g():
+        return x
+    x = 6
+    return x + g()
+\end{python}
+
+\noindent In Python, \pyinline{g} closes over the \emph{mutable binding} of \pyinline{x}, so
+\pyinline{g()} returns \pyinline{6} and the result is \pyinline{12}. In a pure semantics where
+\pyinline{x = 6} shadows the earlier binding, \pyinline{g()} would return \pyinline{5} and the result
+would be \pyinline{11}. To preserve agreement with a subset of Python, we exclude this program from
+\PurePy: the side condition in the \ruleName{seq} rule requires that no variable captured by
+$s$ is reassigned in the rest of the block $b$. Here \pyinline{x} is captured by
+the definition of \pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected. This is
+analogous to Java's requirement that local variables captured by a lambda must be \emph{effectively
+final}~\cite[\S15.27.2]{gosling2025}: local variables are allocated on the stack, and so only the value
+of a local variable can be captured by a closure.
+A dataclass declaration counts as an assignment of its class name for these definitions, though
+re-declaring a class name is prohibited outright (\S\ref{sec:prohibited}).
+
+The same issue arises when a variable is captured and reassigned in the \emph{same} statement:
+
+\begin{python}
+x = 5
+def x():
+    return x
+x()  # Python: returns the function (late binding); pure: returns 5
+\end{python}
+
+\noindent The side condition on the \ruleName{assign} rule rejects programs like this, requiring that the
+variable being bound is not captured by the expression. The \ruleName{mutual} rule, by contrast, binds
+each $f_i$ in the typing context for every body $b_i$, so the function names may legitimately appear in
+$\capturesS$ of those bodies. This is what permits self-recursion (the singleton-region case) and
+mutual recursion within a region.
+
+\subsubsection{Mutual recursion}
+\label{sec:mutual-recursion}
+
+The \ruleName{mutual} rule binds the names $f_1, \ldots, f_{n+1}$ of a mutual region $d_1 \ldots d_{n+1}$
+simultaneously. Each body $b_i$ is checked in a context that includes all the $f_j$ as definitely
+assigned, so any $f_j$ may reference any other $f_k$ within the region (the singleton case $n = 0$
+permits self-recursion). The names in a region must be distinct.
+
+Inserting any non-\pyinline{def} statement between two \pyinline{def}s splits them into separate regions,
+breaking the mutual reference:
+
+\begin{python}
+def even(n):
+    if n == 0:
+        return True
+    return odd(n - 1)
+
+x = even(0)  # intervening statement separates the regions
+
+def odd(n):
+    if n == 0:
+        return False
+    return even(n - 1)
+\end{python}
+
+\noindent This program is rejected statically: \pyinline{even} forms a singleton region in which
+\pyinline{odd} is not yet bound, so the reference to \pyinline{odd} in its body fails the
+\ruleName{var} rule. Python accepts it: the call \pyinline{even(0)} does not actually reach
+\pyinline{odd}, and Python's late binding means \pyinline{odd} is only looked up when needed.
+
+Each branch of a conditional may contain its own mutual regions, subject to the usual definite assignment
+rules. The following is well-formed because both branches define both names:
+
+\begin{python}
+b = True
+
+if b:
+    def f():
+        return g()
+    def g():
+        return "via mutual region"
+else:
+    def f():
+        return "f independent"
+    def g():
+        return "g independent"
+
+print(f())
+print(g())
+\end{python}
+
+A region containing two definitions of the same name is rejected directly by the \ruleName{mutual}
+rule's distinct-names side condition:
+
+\begin{python}
+def g():
+    return 0
+
+def f():
+    return g()
+def g():     # error: g defined twice in the same region
+    return 1
+\end{python}
+
+\noindent (Python accepts this; late binding makes \pyinline{f}'s call to \pyinline{g} resolve to the
+second \pyinline{def g}.)
+
+Wrapping the second \pyinline{def f; def g} pair in a conditional sidesteps the duplicate-name issue:
+the outer \pyinline{def g} and the inner \pyinline{def g} are now in different blocks, so they no longer
+fall in the same region. One might still expect a captured-variable problem, since the inner
+\pyinline{def g} could be seen as rebinding the outer \pyinline{g} that \pyinline{f} captures. No such
+problem arises:
+
+\begin{python}
+def g():
+    return 0
+
+if b:
+    def f():
+        return g()
+    def g():
+        return 1
+\end{python}
+
+\noindent The inner \pyinline{def f; def g} form a branch-local mutual region, so \pyinline{f}'s body
+resolves \pyinline{g} to its sibling rather than to the outer \pyinline{g}. The two are bound
+simultaneously, so \pyinline{f} cannot be called before the inner \pyinline{g} exists, and the value
+\pyinline{f} sees is the same as the value Python's late binding finds at call time.
+
+\subsubsection{Pattern variables escape the match}
+
+A variable bound by a \pyinline{case} pattern is in scope after the \pyinline{match} statement, just as
+a variable assigned inside a conditional branch is in scope after the conditional. Python treats matching
+this way; \PurePy follows.
+
+\begin{python}
+v = 5
+match v:
+    case x:
+        pass
+print(x)    # prints 5
+\end{python}
+
+Here the catch-all \pyinline{case x:} binds \pyinline{x} in the body's scope, and the binding survives into
+the enclosing scope. Definite assignment after the match follows the same merge logic as a conditional: if
+every case binds the variable (or returns), it is definitely assigned afterwards; otherwise it is not (see
+also \S\ref{sec:local-assignment}).
+
+\subsubsection{Uninitialised module members}
+\label{sec:uninitialised-members}
+
+In Python, an attribute of a module can be missing at runtime in two ways, both resulting in
+\pyinline{AttributeError}; \PurePy rejects both statically. First, the module body may never assign the member:
+\vspace{-\medskipamount}
+
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+# lib.py
+b = False
+if b:
+    x = 1
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+# main.py
+import lib
+print(lib.x)  # AttributeError
+\end{python}
+\end{minipage}
+
+Second, a submodule is not an attribute of its package until it is loaded (\S\ref{sec:submodule-clash}):
+
+\begin{python}
+import a
+a.b.f()  # AttributeError, unless a.b was loaded by an earlier import
+\end{python}
+
+Rule \ruleName{attr-module} rejects these references: \pyinline{x} is not definitely assigned in
+\pyinline{lib}, and \pyinline{a.b} is a stub, so neither resolves.
+
+\subsubsection{Unreachable code}
+\label{sec:unreachable}
+A non-empty sequence of statements returns only if the last statement returns, and all preceding statements
+assign. Thus the following is illegal:
+
+\begin{python}
+def foo(x):
+  return x + 1
+  return x    # error: unreachable
+\end{python}
+
+\subsubsection{Conditionals without \pyinline{else} clauses}
+
+An \pyinline{if} statement without an \pyinline{else} clause is equivalent to an \pyinline{if} statement with
+an \pyinline{else} clause whose body is a $\exPass$ statement; such a statement never returns.
+
+\subsubsection{Implicit \pyinline{None}}
+
+A \pyinline{return} statement without an expression is equivalent to \pyinline{return None}.
+
+\subsubsection{Implicit \pyinline{return}}
+
+A function whose body $s$ assigns rather than returns is equivalent to a function whose body is $s$ followed
+by \pyinline{return None}. This ensures every function returns, even if it is not explicitly specified.
+
+\subsubsection{\pyinline{assert} without a message}
+
+An \pyinline{assert e} statement without a message is equivalent to \pyinline{assert e, ""}.
+
+\subsection{Prohibited Python features}
+\label{sec:prohibited}
+
+The following Python features are excluded from \PurePy as they are incompatible with purity or
+functional programming:
+\begin{itemize}
+\item \pyinline{while} loops, \pyinline{for} loops, \pyinline{break}, \pyinline{continue}
+\item \pyinline{async}/\pyinline{await}
+\item \pyinline{global}, \pyinline{nonlocal}
+\item \pyinline{del}
+\item \pyinline{try}/\pyinline{except}/\pyinline{raise}
+\item Augmented assignment (\pyinline{+=}, \pyinline{-=}, etc.)
+\item Walrus operator (\pyinline{:=})
+\item \pyinline{yield}/\pyinline{yield from}
+\item \pyinline{class} definitions other than dataclasses
+\item \pyinline{with} statements
+\item Truthiness: a non-boolean value used as a condition (the test of an \pyinline{if} or conditional expression, or an \pyinline{assert}). Python coerces any value to \pyinline{bool}; \PurePy requires the condition to be boolean.
+\item List patterns matching tuple values, or tuple patterns matching list values. In \PurePy a list pattern matches only a list, and a tuple pattern matches only a tuple. Python permits either pattern against either kind of sequence.
+\item Positional class patterns matching fewer sub-patterns than the class's field arity. \PurePy requires exact arity; Python permits any number from $0$ up to the class's arity.
+\item Local or interleaved imports: an \pyinline{import} or \pyinline{from} statement inside a function or other block, or after a non-import statement. \PurePy permits imports only at the start of a module; Python allows them anywhere.
+\item Wildcard imports (\pyinline{from q import *}); PEP 8 recommends avoiding these\footnote{\url{https://peps.python.org/pep-0008/}}.
+\item A submodule importing itself through its parent (\pyinline{from a import b} inside module \pyinline{a.b}). \PurePy treats the from-imported submodule as a dependency, so this is an import cycle and is rejected; Python permits it, binding the partially-loaded module.
+\item An import (not a from-import) naming a proper descendant of the importing module (\pyinline{import x.y} inside module \pyinline{x}): the binding for the head would denote the still-loading module. Python permits it, binding the partially-initialised module. A from-import of the module's own submodule is permitted.
+\item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.
+\item Re-declaring a class name: a dataclass declaration whose name already denotes a class in the module. Python permits the re-declaration, leaving the earlier class reachable only through its existing instances; \PurePy requires a class name to be unique within its module, so that a qualified name identifies a class.
+\item First-class modules: in Python, modules are values. In \PurePy a module name may be projected (member access) but not used as a value.
+\item A module binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).
+\item Referring to a submodule the referring module does not itself import: \pyinline{import a} followed by \pyinline{a.b.f()} is rejected unless the module also imports \pyinline{a.b}. Python permits the reference whenever some earlier import, anywhere in the program, loaded \pyinline{a.b} (\S\ref{sec:uninitialised-members}).
+\end{itemize}
+
+Complementing the list above (programs Python runs that \PurePy rejects), a well-formed \PurePy
+program avoids the Python runtime errors listed in \figref{prevented-errors}, under the conditions noted
+there. Errors from ill-typed operations, such as wrong operand types, calling a non-function, or attribute
+access on an object lacking the attribute, are outside the scope of well-formedness.
+
+\subsubsection{Variable and submodule with the same name}
+\label{sec:submodule-clash}
+
+In Python, an attribute of a package can be bound by an assignment in the package's own body, and by a load
+of the same-named submodule, which assigns the new module to the attribute. Suppose the body of \pyinline{pkg}
+is the single assignment \pyinline{sub = 1}, and \pyinline{pkg} also has a submodule \pyinline{pkg.sub}:
+\vspace{-\medskipamount}
+
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+import pkg
+print(pkg.sub)  # 1
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+import pkg.sub
+print(pkg.sub)  # <module 'pkg.sub'>
+\end{python}
+\end{minipage}
+
+On the left, \pyinline{pkg.sub} is never loaded, so the assignment is visible; on the right, the load
+overwrites the assignment. The name \pyinline{pkg.sub} has no load-order-independent meaning, so the
+module rules prohibit a module from binding a name that is also the name of one of its submodules.
+
+\begin{figure}
+\centering
+\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.52\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}}
+\hline
+\textbf{Python error} & \textbf{Ruled out when} & \textbf{See} \\
+\hline
+\pyinline{NameError}, \pyinline{UnboundLocalError} & Always: a variable may be referenced only where it is definitely assigned. & \figref{well-formed}, \figref{well-formed-expr} \\[1mm]
+\pyinline{ModuleNotFoundError} & Always: an import requires its target to be a module of the program. & \figref{well-formed-imports} \\[1mm]
+\pyinline{ImportError} & Always: a from-import requires each imported name to be a member of the source module, and import cycles are rejected. (A Python cycle may run or fail, depending on where the cycle is entered.) & \figref{imports}, \figref{well-formed-module} \\[1mm]
+\pyinline{AttributeError} & Always: a module attribute reference must resolve to a definitely assigned member.  & \figref{well-formed-expr} \\[1mm]
+\pyinline{TypeError} & The operation is a constructor call or class pattern, which must match the class's arity exactly. (Only excess sub-patterns are a Python error; a pattern with fewer is prohibited even though Python permits it.) & \figref{well-formed-expr}, \figref{well-formed-pat} \\
+\hline
+\end{tabular}
+\caption{Python errors prevented by well-formedness}
+\label{fig:prevented-errors}
+\end{figure}

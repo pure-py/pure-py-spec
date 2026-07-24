@@ -78,24 +78,22 @@
   \Gamma \vdash \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
 }
 \and
-\inferrule*[lab={\ruleName{mutual}}]
+\inferrule*[lab={\ruleName{def}}]
 {
-  \Gamma \runion \statusDefAssigned(\seq{f}) \runion \statusDefAssigned(\seq{x}_{i}) \runion
-  \statusNotDefAssigned(\assignsS(b_i) \setminus \seq{x}_i) \vdash b_i : R_i
-  \quad (\forall i)
+  \Gamma \override \statusDefAssigned(\seq{f} \cons \seq{x}_i) \override \statusNotDefAssigned(\assignsS(b_i) \setminus \seq{x}_i) \vdash b_i : R_i \quad (\forall i)
   \\
-  f_1, \ldots, f_{n+1} \text{ distinct}
+  \seq{f} \text{ distinct}
 }
 {
-  \Gamma \vdash \exDef{f_1}{\vec{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\vec{x}_{n+1}}{b_{n+1}} : \Assigns{\statusDefAssigned(\seq{f})}
+  \Gamma \vdash \exDef{f_1}{\seq{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}}{b_{n+1}} : \Assigns{\statusDefAssigned(\seq{f})}
 }
 \and
 \inferrule*[lab={\ruleName{match}}]
 {
   \Gamma \vdash e \\
-  \Gamma \runion \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
-  S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \runion R_i \quad (\forall i) \\
-  \vdash p_1 \cons \ldots \cons p_{n+1} \\
+  \Gamma \override \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
+  S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \override R_i \quad (\forall i) \\
+  \Gamma \vdash \seq{p} \\
   p_{n+1} \in \set{x, \patWild}
 }
 {
@@ -105,9 +103,9 @@
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Gamma \vdash e \\
-  \Gamma \runion \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
-  S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \runion R_i \quad (\forall i) \\
-  \vdash p_1 \cons \ldots \cons p_{n+1} \\
+  \Gamma \override \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
+  S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \override R_i \quad (\forall i) \\
+  \Gamma \vdash \seq{p} \\
   p_{n+1} \notin \set{x, \patWild}
 }
 {
@@ -117,13 +115,13 @@
 \inferrule*[lab={\ruleName{cons}}]
 {
   \Gamma \vdash s : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash b : R \\
+  \Gamma \override \Delta \vdash b : R \\
   \capturesS(s) \cap \assignsS(b) = \varnothing
 }
 {
-  \Gamma \vdash s \cons b : \Assigns{\Delta} \runion R
+  \Gamma \vdash s \cons b : \Assigns{\Delta} \override R
 }
 \end{mathpar}
-\caption{Block $b$ of module $M$ is well-formed in $\Gamma$}
+\caption{Block $b$ is well-formed in $\Gamma$}
 \label{fig:well-formed}
 \end{figure}

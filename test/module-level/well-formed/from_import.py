@@ -1,3 +1,2 @@
-from sys import argv, platform
-print(platform != "")
+from sys import argv
 print(len(argv) >= 0)

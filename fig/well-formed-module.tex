@@ -1,8 +1,126 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma \vdash m : \Delta$}
+\flushleft \shadebox{$\Gamma, \seq{x} \importsR \Gamma'$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{empty}}]
+\inferrule*[lab={\ruleName{imp-nil}}]
+{
+  \strut
+}
+{
+  \Gamma, \varepsilon \importsR \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{imp-member}}]
+{
+  \Gamma \vdash x \names \theta \\
+  \Gamma, \seq{x} \importsR \Gamma'
+}
+{
+  \Gamma, x \cons \seq{x} \importsR \set{\bind{x}{\theta}} \override \Gamma'
+}
+\and
+\inferrule*[lab={\ruleName{imp-submodule}}]
+{
+  \bind{x}{\modStub{q}} \in \Gamma \\
+  \vdash_{\mathsf{load}} q : \Delta \\
+  \Gamma, \seq{x} \importsR \Gamma'
+}
+{
+  \Gamma, x \cons \seq{x} \importsR \set{\bind{x}{\modLoaded{q}{\Delta}}} \override \Gamma'
+}
+\end{mathpar}
+
+\caption{Names $\seq{x}$ imported from module context $\Gamma$ produce bindings $\Gamma'$}
+\label{fig:imports}
+\end{figure}
+
+\begin{figure}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\vdash \seq{\iota} : \Gamma$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{imports-nil}}]
+{
+  \strut
+}
+{
+  \vdash \varepsilon : \varnothing
+}
+\and
+
+\inferrule*[lab={\ruleName{import}}]
+{
+  q' = x \cons \seq{x} \\
+  q \not\properPrefixOf q' \\
+  \vdash_{\mathsf{load}} q' : \Delta \\
+  \varepsilon, q', \modLoaded{q'}{\Delta} \loadsTo \theta \\
+  \vdash \seq{\iota} : \Gamma
+}
+{
+  \vdash \exImport{q'} \cons \seq{\iota} : \set{\bind{x}{\theta}} \extend \Gamma
+}
+\and
+\inferrule*[lab={\ruleName{from-import}}]
+{
+  \vdash_{\mathsf{load}} q' : \Delta \\
+  q, q', \modLoaded{q'}{\Delta} \loadsTo \theta \\
+  \Delta, \seq{x} \importsR \Gamma' \\
+  \vdash \seq{\iota} : \Gamma
+}
+{
+  \vdash \exFromImport{q'}{\seq{x}} \cons \seq{\iota} : \Gamma' \extend \Gamma
+}
+
+\end{mathpar}
+
+\subcaption{Import prefix $\seq{\iota}$ of module $q$ produces bindings $\Gamma$}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\seq{x}, q, \theta \loadsTo \theta'$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{loads-to-simple}}]
+{
+  \strut
+}
+{
+  \seq{x}, x, \theta \loadsTo \theta
+}
+\and
+\inferrule*[lab={\ruleName{loads-to-qualified}}]
+{
+  q \not\prefixOf \seq{x} \\
+  \vdash_{\mathsf{load}} q : \Gamma' \\
+  \seq{x}, q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo \theta'
+}
+{
+  \seq{x}, q.x, \theta \loadsTo \theta'
+}
+\and
+
+\inferrule*[lab={\ruleName{loads-to-enclosing}}]
+{
+  q \prefixOf \seq{x}
+}
+{
+  \seq{x}, q.x, \theta \loadsTo \theta
+}
+\end{mathpar}
+\subcaption{Loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}
+\end{subfigure}
+\caption{Import well-formedness}
+\label{fig:well-formed-imports}
+\end{figure}
+
+\begin{figure}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Gamma \vdash \seq{s} : \Delta$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{nil}}]
 {
   \strut
 }
@@ -10,54 +128,77 @@
   \Gamma \vdash \varepsilon : \varnothing
 }
 \and
-\inferrule*[lab={\ruleName{import}}]
-{
-  M' = x_1.x_2.\ldots.x_{n+1} \\
-  \Gamma \runion \statusDefAssigned(\set{x_1}) \vdash m : \Delta'
-}
-{
-  \Gamma \vdash \exImport{M'} \cons m : \statusDefAssigned(\set{x_1}) \runion \Delta'
-}
-\and
-\inferrule*[lab={\ruleName{from-import}}]
-{
-  \Gamma \runion \statusDefAssigned(\set{x_1, \ldots, x_{n+1}}) \vdash m : \Delta'
-}
-{
-  \Gamma \vdash \exFromImport{M'}{x_1, \ldots, x_{n+1}} \cons m : \statusDefAssigned(\set{x_1, \ldots, x_{n+1}}) \runion \Delta'
-}
-\and
 \inferrule*[lab={\ruleName{statement}}]
 {
   \Gamma \vdash s : \Assigns{\Delta} \\
-  \Gamma \runion \Delta \vdash m : \Delta' \\
-  \capturesS(s) \cap \assignsS(m) = \varnothing
+  \Gamma \override \Delta \vdash \seq{s} : \Delta' \\
+  \capturesS(s) \cap \assignsS(\seq{s}) = \varnothing
 }
 {
-  \Gamma \vdash s \cons m : \Delta \runion \Delta'
+  \Gamma \vdash s \cons \seq{s} : \Delta \override \Delta'
 }
 \and
 \inferrule*[lab={\ruleName{class}}]
 {
-  \decls(\phi) = x_1, \ldots, x_n \\
-  x_1, \ldots, x_n \text{ distinct} \\
-  \Gamma \vdash m : \Delta
+  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
+  \ownFields(\phi) = \seq{x} \text{ distinct} \\
+  C = \clsEntry{\Gamma}{q.c}{\seq{x}}{\bot} \\
+  \Gamma, \bind{c}{C} \vdash \seq{s} : \Delta
 }
 {
-  \Gamma \vdash \exDataclass{C}{\phi} \cons m : \Delta
+  \Gamma \vdash \exDataclass{c}{\phi} \cons \seq{s} : \set{\bind{c}{C}} \override \Delta
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  B \in \dom(\Lambda_M) \\
-  \decls(\phi) = x_1, \ldots, x_n \\
-  x_1, \ldots, x_n \text{ distinct and disjoint from } \fields(M.B) \\
-  \Gamma \vdash m : \Delta
+  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
+  \bind{c'}{\clsEntry{\Delta}{q.c'}{\seq{y}}{c''}} \in \Gamma \\
+  \ownFields(\phi) = \seq{x} \text{ distinct} \\
+  \seq{x} \cap \fields(\Gamma(c')) = \varnothing \\
+  C = \clsEntry{\Gamma}{q.c}{\seq{x}}{c'} \\
+  \Gamma, \bind{c}{C} \vdash \seq{s} : \Delta
 }
 {
-  \Gamma \vdash \exDataclassExtend{C}{B}{\phi} \cons m : \Delta
+  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons \seq{s} : \set{\bind{c}{C}} \override \Delta
 }
 \end{mathpar}
-\caption{Body $m$ of module $M$ is well-formed in $\Gamma$}
+\subcaption{Statements $\seq{s}$ of module $q$ are well-formed in $\Gamma$}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\vdash_{\mathsf{load}} q : \Gamma$}
+\begin{mathpar}
+\small
+
+\inferrule*[lab={\ruleName{module}}]
+{
+  \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
+  \vdash \seq{\iota} : \Gamma \\
+  \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} : \Delta \\
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submodules(q)) = \varnothing
+}
+{
+  \vdash_{\mathsf{load}} q : \submodules(q) \override \Delta
+}
+
+\end{mathpar}
+
+\flushleft \shadebox{$\vdash \mathcal{M}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{program}}]
+{
+  \vdash_{\mathsf{load}} \pymath{\_\_main\_\_} : \Delta \\
+  G_{\mathcal{M}} \text{ acyclic}
+}
+{
+  \vdash \mathcal{M}
+}
+\end{mathpar}
+\subcaption{Module and program well-formedness}
+\end{subfigure}
+\caption{Module well-formedness}
 \label{fig:well-formed-module}
 \end{figure}
