@@ -79,12 +79,6 @@ PREDEFINED_MEMBERS: dict[str, set[str]] = {
 
 PREDEFINED_MODULES = set(PREDEFINED_MEMBERS)
 
-def member(parent: ModuleLoaded, x: str) -> Optional[ContextEntry]:
-    entry = parent.members.get(x)
-    if entry is None and parent.q in PREDEFINED_MODULES:
-        return Status.TT
-    return entry
-
 def meet(a: Status, b: Status) -> Status:
     if a == Status.TT and b == Status.TT:
         return Status.TT

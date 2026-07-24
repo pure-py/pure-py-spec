@@ -66,8 +66,6 @@ def imported_entry(s: ast.stmt, x: str, q: str, gamma_src: Context,
                    ctx: ModuleContext) -> ContextEntry:
     entry = gamma_src.get(x)
     if entry is None:
-        if q in PREDEFINED_MODULES:
-            return Status.TT
         raise IllFormedModule(s, reasons.UnknownMember(x, q))
     if isinstance(entry, ModuleStub):
         return ModuleLoaded(entry.q, check_module(ctx.M[entry.q], ctx.M, entry.q))
