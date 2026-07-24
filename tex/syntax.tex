@@ -145,7 +145,7 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \centering
 \begin{tabular}{lp{0.6\textwidth}}
 \hline
-\textbf{Module} & \textbf{Defined names} \\
+\textbf{Module} & \textbf{Guaranteed members} \\
 \hline
 \textup{\pyinline{builtins}} & \pyinline{print}, \pyinline{len}, \pyinline{range} \\
 \pyinline{math} & \\
@@ -157,6 +157,13 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \caption{Predefined modules and their guaranteed members}
 \label{fig:predefined}
 \end{figure}
+
+{\color{blue}The members listed for each predefined module are a lower bound: the module defines at least these, and may
+define others. An empty entry lists none as guaranteed, but the module may still define some; later versions of
+this specification will list more. A member access $q.x$ on a predefined module $q$ is therefore well-formed for
+any member name $x$, since $q$ may define it. If $x$ is in fact absent at run time, evaluation is stuck, matching
+the \pyinline{AttributeError} Python raises. Bare names resolve only to the guaranteed members of
+\pyinline{builtins} ($\Gamma_{\pymath{builtins}}$), so any extra members are reachable only by qualified access.}
 
 The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ and $\deps$ from individual imports to import sequences; on a module body $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively.  Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q = p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order.
 
@@ -638,7 +645,7 @@ module rules prohibit a module from binding a name that is also the name of one 
 \pyinline{NameError}, \pyinline{UnboundLocalError} & Always: a variable may be referenced only where it is definitely assigned. & \figref{well-formed}, \figref{well-formed-expr} \\[1mm]
 \pyinline{ModuleNotFoundError} & Always: an import requires its target to be a module of the program. & \figref{well-formed-imports} \\[1mm]
 \pyinline{ImportError} & Always: a from-import requires each imported name to be a member of the source module, and import cycles are rejected. (A Python cycle may run or fail, depending on where the cycle is entered.) & \figref{imports}, \figref{well-formed-module} \\[1mm]
-\pyinline{AttributeError} & Always: a module attribute reference must resolve to a definitely assigned member.  & \figref{well-formed-expr} \\[1mm]
+\pyinline{AttributeError} & A module attribute reference must resolve to a definitely assigned member\deleted{.}\Added{, except on a predefined module, whose members are only lower-bounded (\figref{predefined}): there a reference to an absent member is well-formed but stuck at run time, as in Python.}  & \figref{well-formed-expr} \\[1mm]
 \pyinline{TypeError} & The operation is a constructor call or class pattern, which must match the class's arity exactly. (Only excess sub-patterns are a Python error; a pattern with fewer is prohibited even though Python permits it.) & \figref{well-formed-expr}, \figref{well-formed-pat} \\
 \hline
 \end{tabular}

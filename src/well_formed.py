@@ -7,7 +7,7 @@ import reasons
 from reasons import IllFormedModule
 from contexts import (ClassEntry, Context, ContextEntry, ModuleContext, ModuleLoaded, ModuleStub,
                       PREDEFINED_MEMBERS, ResultTy, Status, TY_ASSIGNS, TY_RETURNS, TyAssigns,
-                      TyReturns, VarContext, class_of, extend_context, fields_of, merge_results,
+                      TyReturns, VarContext, class_of, extend_context, fields_of, member, merge_results,
                       module_of, override_gamma, override_results, override_var, var_status)
 from aux import (BlockElement, assigns_block, assigns_elements, binds, captures, captures_element,
                  elements_of_block, find_first_reassigning, names_in_target, own_fields_of)
@@ -124,7 +124,7 @@ def names(e: ast.expr, ctx: ModuleContext) -> Optional[ContextEntry]:
     if isinstance(e, ast.Attribute):
         parent = names(e.value, ctx)
         if isinstance(parent, ModuleLoaded):
-            return parent.members.get(e.attr)
+            return member(parent, e.attr)
         return None
     return None
 
@@ -223,7 +223,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
     if isinstance(e, ast.Attribute):
         parent = names(e.value, ctx)
         if isinstance(parent, ModuleLoaded):
-            entry = parent.members.get(e.attr)
+            entry = member(parent, e.attr)
             if entry is None:
                 raise IllFormedModule(e, reasons.UnknownMember(e.attr, parent.q))
             if isinstance(entry, ModuleStub):
