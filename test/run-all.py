@@ -10,8 +10,15 @@ import pathlib
 import subprocess
 import sys
 from collections.abc import Iterator
-from enum import IntEnum, StrEnum
+from enum import IntEnum
 from typing import Optional
+
+if sys.version_info >= (3, 11):
+    from enum import StrEnum
+else:  # PyPy, GraalPy
+    from enum import Enum
+    class StrEnum(str, Enum):
+        __str__ = str.__str__
 
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -201,7 +208,7 @@ class Runner:
                 return
 
             verdict = Verdict(dirs[0])
-            stage = Stage(dirs[1]) if len(dirs) > 1 and dirs[1] in Stage else None
+            stage = Stage(dirs[1]) if len(dirs) > 1 and dirs[1] in {s.value for s in Stage} else None
 
             if verdict == Verdict.WELL_FORMED:
                 self.parse(p, Exit.OK)
