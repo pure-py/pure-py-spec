@@ -27,7 +27,7 @@ def imports(tree: ast.Module, base_dir: pathlib.Path) -> set[str]:
     return ({a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
             | {m for m, _ in froms}
             | {f'{m}.{a.name}' for m, names in froms for a in names
-               if resolve(f'{m}.{a.name}', base_dir) is not None})
+               if is_module(f'{m}.{a.name}', base_dir) is not None})
 
 
 def proper_prefixes(name: str) -> set[str]:
@@ -35,7 +35,7 @@ def proper_prefixes(name: str) -> set[str]:
     return {".".join(parts[:i]) for i in range(1, len(parts))}
 
 
-def resolve(name: str, base_dir: pathlib.Path) -> Optional[pathlib.Path]:
+def is_module(name: str, base_dir: pathlib.Path) -> Optional[pathlib.Path]:
     stem = name.replace('.', '/')
     for candidate in (base_dir / f"{stem}.py", base_dir / stem / "__init__.py"):
         if candidate.exists():
@@ -44,7 +44,7 @@ def resolve(name: str, base_dir: pathlib.Path) -> Optional[pathlib.Path]:
 
 
 def load(name: str, base_dir: pathlib.Path) -> ast.Module:
-    path = resolve(name, base_dir)
+    path = is_module(name, base_dir)
     if path is None:
         raise IllFormedProgram(f"module {name!r} not found under {base_dir}")
     if path.is_dir():
@@ -90,7 +90,7 @@ def discover(queue: list[str], found: Discovery, base_dir: pathlib.Path) -> Disc
     modules, imports_by = found
     if name in modules:
         return discover(rest, found, base_dir)
-    path = resolve(name, base_dir)
+    path = is_module(name, base_dir)
     if path is None and name in PREDEFINED_MODULES:
         return discover(rest, (modules | {name: (pathlib.Path(f"<{name}>"), ast.Module(body=[], type_ignores=[]))},
                                imports_by | {name: set()}), base_dir)
