@@ -128,7 +128,7 @@ appear neither in blocks (and hence not in function bodies) nor after the first 
 well-formedness and evaluation rules check and evaluate the statements of each body $\mathcal{M}(q)$ with the
 assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
 $\pymath{\_\_name\_\_}$ binding the runtime supplies automatically. $\mathcal{M}$ additionally always includes the predefined modules of
-\figref{predefined} and is prefix-closed: the parent of any module in $\dom(\mathcal{M})$ is itself in
+\figref{predefined}\added{, each defining exactly its listed members,} and is prefix-closed: the parent of any module in $\dom(\mathcal{M})$ is itself in
 $\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is its \texttt{.py}
 file, each package's body is its \texttt{\_\_init\_\_.py}, and a package directory without an
 \texttt{\_\_init\_\_.py} encodes the empty body (a namespace package, PEP 420, \url{https://peps.python.org/pep-0420/}). Prefix-closure thus holds by
@@ -157,8 +157,6 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \caption{Predefined modules and their members}
 \label{fig:predefined}
 \end{figure}
-
-\Added{A predefined module defines exactly the members listed.}
 
 The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ and $\deps$ from individual imports to import sequences; on a module body $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively.  Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q = p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order.
 
