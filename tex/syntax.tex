@@ -158,12 +158,7 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \label{fig:predefined}
 \end{figure}
 
-{\color{blue}The members listed for each predefined module are a lower bound: the module defines at least these, and may
-define others. An empty entry lists none as guaranteed, but the module may still define some; later versions of
-this specification will list more. A member access $q.x$ on a predefined module $q$ is therefore well-formed for
-any member name $x$, since $q$ may define it. If $x$ is in fact absent at run time, evaluation is stuck, matching
-the \pyinline{AttributeError} Python raises. Bare names resolve only to the guaranteed members of
-\pyinline{builtins} ($\Gamma_{\pymath{builtins}}$), so any extra members are reachable only by qualified access.}
+\Added{The members listed for each predefined module are a lower bound: it may define more.}
 
 The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ and $\deps$ from individual imports to import sequences; on a module body $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively.  Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q = p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order.
 
