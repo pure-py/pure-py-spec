@@ -1,5 +1,40 @@
 \section{Extensions}
 \label{sec:extensions}
 
-\PurePy admits conservative extensions that add expressiveness without compromising purity. This section
-presents partial application and piecewise function definitions.
+Beyond the core, \PurePy is designed to grow through extensions that add expressiveness while preserving
+purity. This section sketches two, each drawn from \Fluid: partial application and piecewise function
+definitions. We give an example of each and leave a full treatment to future work.
+
+\subsection{Partial application}
+\label{sec:ext-partial}
+
+A function applied to fewer arguments than it declares returns a function of the remaining arguments:
+
+\begin{python}
+def f(x, y):
+    return x + y
+
+f(5)(6)  # 11
+\end{python}
+
+\noindent Here \pyinline{f(5)} denotes the function that adds \pyinline{5} to its argument, so
+\pyinline{f(5)(6)} evaluates to \pyinline{11}. Python rejects this, since \pyinline{f(5)} supplies too few
+arguments. Partial application is a semantic extension rather than a change of behaviour: it gives meaning to
+calls that the core rejects, so the core must first reject unsaturated calls.
+
+\subsection{Piecewise function definitions}
+\label{sec:ext-piecewise}
+
+A function may be defined by several clauses that pattern-match on its arguments, in place of a single
+definition with an explicit \pyinline{match}:
+
+\begin{python}
+def length(Nil):
+    return 0
+def length(Cons(x, xs)):
+    return 1 + length(xs)
+\end{python}
+
+\noindent The two clauses together define \pyinline{length}. Python instead treats each \pyinline{def} as an
+assignment, so the second would rebind \pyinline{length} rather than extend it; a faithful extension would
+therefore need distinct notation.
