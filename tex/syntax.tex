@@ -7,7 +7,7 @@ statements; either a top-level statement, a \pyinline{def} body, or a branch of 
 statements in a block: any non-\pyinline{def} statement in that block, by definition, separates mutual
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single region. The well-formedness rules treat each region as
-one mutually-recursive binding (see \S\ref{sec:mutual-recursion}).
+one mutually-recursive binding (see \secref{mutual-recursion}).
 
 \subsection{Contexts}
 \label{sec:contexts}
@@ -78,7 +78,7 @@ a \merge a' &= a \meet a'
 (\Gamma \override \Delta')$) does not hold. If it did, the following two programs would be equivalent, since
 sequential composition with a preceding assignment could be distributed into the branches of a conditional.
 But they are not: the left program is ill-formed, because a variable assigned before a conditional does not
-remain definitely assigned if only some branches assign it (see also \S\ref{sec:local-assignment}).
+remain definitely assigned if only some branches assign it (see also \secref{local-assignment}).
 \vspace{-\medskipamount}
 
 \begin{minipage}[t]{0.48\textwidth}
@@ -168,7 +168,7 @@ The \emph{dependency graph} $G_{\mathcal{M}}$ of a program has an edge $(q, q')$
 Every import depends on its target's ancestors; excepted are ancestors enclosing the importing
 module itself, which are necessarily still in progress when it runs and so cannot be required to load
 first. The exception appears only in the from-import clause because an import naming a proper descendant
-of the importing module is prohibited outright (\S\ref{sec:no-load-dependent}). In the rules
+of the importing module is prohibited outright (\secref{no-load-dependent}). In the rules
 (\figref{well-formed-imports}), the exemption is the bound on the loads-to judgement, whose prefixes the walk skips:
 $\varepsilon$ for an import, the importing module for a from-import. Program well-formedness (\figref{well-formed-module}) requires the
 main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
@@ -220,7 +220,7 @@ R \override \Returns = \Returns \override R & = \Returns
 \end{align*}}
 \end{definition}
 
-\noindent The $\Returns \override R$ case never arises because the well-formedness judgement prohibits unreachable statements (\S\ref{sec:unreachable}).
+\noindent The $\Returns \override R$ case never arises because the well-formedness judgement prohibits unreachable statements (\secref{unreachable}).
 
 \begin{lemma}[Right distributivity (result types)]
 \[
@@ -228,13 +228,13 @@ R \override \Returns = \Returns \override R & = \Returns
 \]
 \end{lemma}
 
-\noindent A module attribute reference is well-formed only when it resolves to a definitely assigned member (rule \ruleName{attr-module}); see \S\ref{sec:uninitialised-members}.
+\noindent A module attribute reference is well-formed only when it resolves to a definitely assigned member (rule \ruleName{attr-module}); see \secref{uninitialised-members}.
 
 \input{fig/well-formed}
 \input{fig/well-formed-expr}
 \input{fig/well-formed-module}
 
-The output context $\Gamma$ of the module well-formedness judgement (\figref{well-formed-module}) comprises the classes and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own bindings are disjoint, because the module rules prohibit a module from binding a name that is also the name of a submodule (\S\ref{sec:no-load-dependent}).
+The output context $\Gamma$ of the module well-formedness judgement (\figref{well-formed-module}) comprises the classes and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own bindings are disjoint, because the module rules prohibit a module from binding a name that is also the name of a submodule (\secref{no-load-dependent}).
 
 \subsection{Examples}
 
@@ -279,7 +279,7 @@ $\merge$ operator on environments.
 Definite assignment thus gives each reference a unique lexical referent: a variable is introduced by
 an assignment, possibly jointly by the branches of a conditional, and a name may be referenced only where one
 such introduction covers every path. This is stricter than avoiding Python's \pyinline{NameError}: the
-left-hand program of \S\ref{sec:contexts} assigns \pyinline{x} on every run, but is rejected because the
+left-hand program of \secref{contexts} assigns \pyinline{x} on every run, but is rejected because the
 reference would denote the branch-local variable on one path and the variable it hides on the other.
 
 \subsubsection{Local assignment in conditional clauses}
@@ -357,12 +357,12 @@ $\Gamma(\pyinline{y}) = \statusNotDefAssigned$ rather than $\Gamma(\pyinline{y})
 \subsubsection{Reassignment of captured variables}
 \label{sec:captured-vars}
 
-The exclusion of captured-variable reassignment (\S\ref{sec:no-mutable-state}) is enforced by a side condition
+The exclusion of captured-variable reassignment (\secref{no-mutable-state}) is enforced by a side condition
 on the \ruleName{seq} rule: no variable captured by a statement $s$ may be reassigned in the rest of the block
-$b$. In the example of \S\ref{sec:no-mutable-state}, \pyinline{x} is captured by the definition of
+$b$. In the example of \secref{no-mutable-state}, \pyinline{x} is captured by the definition of
 \pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected. A dataclass declaration counts as
 an assignment of its class name for these definitions, though re-declaring a class name is prohibited outright
-(\S\ref{sec:no-first-class}).
+(\secref{no-first-class}).
 
 The same issue arises when a variable is captured and reassigned in the \emph{same} statement:
 
@@ -485,7 +485,7 @@ print(x)    # prints 5
 Here the catch-all \pyinline{case x:} binds \pyinline{x} in the body's scope, and the binding survives into
 the enclosing scope. Definite assignment after the match follows the same merge logic as a conditional: if
 every case binds the variable (or returns), it is definitely assigned afterwards; otherwise it is not (see
-also \S\ref{sec:local-assignment}).
+also \secref{local-assignment}).
 
 \subsubsection{Unreachable code}
 \label{sec:unreachable}

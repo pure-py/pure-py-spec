@@ -24,7 +24,7 @@ well-formed \PurePy program is valid Python whose \PurePy meaning is its Python 
 The design is deliberately conservative. Rather than reconstruct Python's full behaviour, \PurePy chooses a
 simple, well-behaved core and excludes the idioms that would break it, among them mutable state, effectful
 control, implicit coercions, and constructs whose meaning depends on module load order
-(Section~\ref{sec:overview}). The standard is versioned, so the subset can grow as features earn their place
+(\secref{overview}). The standard is versioned, so the subset can grow as features earn their place
 without disturbing programs written against an earlier version.
 
 \PurePy is aimed first at researchers in programming languages and in pedagogy, and is intended to grow into a
@@ -69,19 +69,19 @@ Well-formedness correctness properties & \issue{130} \\
 
 \subsection{Contributions}
 
-After setting out the problem \PurePy addresses in Section~\ref{sec:overview}, we make the following
+After setting out the problem \PurePy addresses in \secref{overview}, we make the following
 contributions:
 \begin{itemize}
 \item a definition of \PurePy as a versioned standard, with a formal grammar and well-formedness rules based on
-a definite-assignment analysis (Section~\ref{sec:syntax}) and an operational semantics that preserves the
-meaning of well-formed programs in Python (Section~\ref{sec:opsem});
+a definite-assignment analysis (\secref{syntax}) and an operational semantics that preserves the
+meaning of well-formed programs in Python (\secref{opsem});
 \item a reference checker that decides membership of the subset, validated by a conformance test suite
-exercised on CPython, PyPy, GraalPy, and Pyodide (Section~\ref{sec:reference-impl});
+exercised on CPython, PyPy, GraalPy, and Pyodide (\secref{reference-impl});
 \item conservative extensions to the core language, including partial application and piecewise function
-definitions (Section~\ref{sec:extensions});
-\item case studies that use \PurePy as a common functional language (Section~\ref{sec:case-studies});
+definitions (\secref{extensions});
+\item case studies that use \PurePy as a common functional language (\secref{case-studies});
 \item an experimental evaluation of how readily large language models target the \PurePy subset, and of how
-readily existing Python converts to it (Section~\ref{sec:evaluation}).
+readily existing Python converts to it (\secref{evaluation}).
 \end{itemize}
-Section~\ref{sec:related} summarises related efforts, and Section~\ref{sec:conclusion} presents our conclusions
+\secref{related} summarises related efforts, and \secref{conclusion} presents our conclusions
 and discusses future work.
