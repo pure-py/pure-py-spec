@@ -6,8 +6,7 @@ unchanged under a standard Python interpreter and compute the same result. Purit
 functional core has no observable side effects, and a name's meaning does not depend on evaluation order or on
 mutation. A variable, once definitely assigned, denotes a fixed value; a function is fixed by its definition;
 and a module's members are fixed once it has loaded. Python permits much that breaks this discipline, so
-\PurePy tightens or excludes the idioms responsible. A precise characterisation of purity is left to future
-work.
+\PurePy tightens or excludes the idioms responsible.
 
 The exclusions fall into a few groups. Some features are imperative or effectful and have no place in a
 functional core, such as loops, reassignment of captured variables, exceptions, and context managers. Others
