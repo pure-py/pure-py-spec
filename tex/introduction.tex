@@ -32,15 +32,6 @@ common language for scientific computing, supporting portable applications in mo
 analysis, and visualisation. Because every \PurePy program is also a Python program, adopting it costs nothing
 at the surface, and a research language that targets \PurePy inherits a large and familiar runtime.
 
-This paper contributes:
-\begin{itemize}
-\item \PurePy, a pure functional subset of Python, presented as a versioned standard with a formal grammar and
-well-formedness rules based on a definite-assignment analysis;
-\item an operational semantics that preserves the meaning of well-formed \PurePy programs in Python;
-\item a reference checker that decides membership of the subset, validated by a conformance test suite
-exercised on CPython, PyPy, GraalPy, and Pyodide.
-\end{itemize}
-
 {\small
 \begin{center}
 \begin{minipage}[t]{0.4\textwidth}
@@ -75,3 +66,14 @@ Well-formedness correctness properties & \issue{130} \\
 \end{tabular}
 \end{minipage}
 \end{center}}
+
+\subsection{Contributions}
+
+This paper contributes:
+\begin{itemize}
+\item \PurePy, a pure functional subset of Python, presented as a versioned standard with a formal grammar and
+well-formedness rules based on a definite-assignment analysis;
+\item an operational semantics that preserves the meaning of well-formed \PurePy programs in Python;
+\item a reference checker that decides membership of the subset, validated by a conformance test suite
+exercised on CPython, PyPy, GraalPy, and Pyodide.
+\end{itemize}
