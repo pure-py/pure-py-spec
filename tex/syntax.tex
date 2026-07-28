@@ -167,7 +167,7 @@ The \emph{dependency graph} $G_{\mathcal{M}}$ of a program has an edge $(q, q')$
 Every import depends on its target's ancestors; excepted are ancestors enclosing the importing
 module itself, which are necessarily still in progress when it runs and so cannot be required to load
 first. The exception appears only in the from-import clause because an import naming a proper descendant
-of the importing module is prohibited outright (\S\ref{sec:prohibited}). In the rules
+of the importing module is prohibited outright (\S\ref{sec:no-load-dependent}). In the rules
 (\figref{well-formed-imports}), the exemption is the bound on the loads-to judgement, whose prefixes the walk skips:
 $\varepsilon$ for an import, the importing module for a from-import. Program well-formedness (\figref{well-formed-module}) requires the
 main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
@@ -233,7 +233,7 @@ R \override \Returns = \Returns \override R & = \Returns
 \input{fig/well-formed-expr}
 \input{fig/well-formed-module}
 
-The output context $\Gamma$ of the module well-formedness judgement (\figref{well-formed-module}) comprises the classes and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own bindings are disjoint, because the module rules prohibit a module from binding a name that is also the name of a submodule (\S\ref{sec:submodule-clash}).
+The output context $\Gamma$ of the module well-formedness judgement (\figref{well-formed-module}) comprises the classes and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own bindings are disjoint, because the module rules prohibit a module from binding a name that is also the name of a submodule (\S\ref{sec:no-load-dependent}).
 
 \subsection{Examples}
 
@@ -356,30 +356,12 @@ $\Gamma(\pyinline{y}) = \statusNotDefAssigned$ rather than $\Gamma(\pyinline{y})
 \subsubsection{Reassignment of captured variables}
 \label{sec:captured-vars}
 
-Once a variable has been captured by a closure, it cannot be reassigned in the enclosing scope, because
-its Python semantics would depend on mutation. Consider the following program:
-
-\begin{python}
-def f():
-    x = 5
-    def g():
-        return x
-    x = 6
-    return x + g()
-\end{python}
-
-\noindent In Python, \pyinline{g} closes over the \emph{mutable binding} of \pyinline{x}, so
-\pyinline{g()} returns \pyinline{6} and the result is \pyinline{12}. In a pure semantics where
-\pyinline{x = 6} shadows the earlier binding, \pyinline{g()} would return \pyinline{5} and the result
-would be \pyinline{11}. To preserve agreement with a subset of Python, we exclude this program from
-\PurePy: the side condition in the \ruleName{seq} rule requires that no variable captured by
-$s$ is reassigned in the rest of the block $b$. Here \pyinline{x} is captured by
-the definition of \pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected. This is
-analogous to Java's requirement that local variables captured by a lambda must be \emph{effectively
-final}~\cite[\S15.27.2]{gosling2025}: local variables are allocated on the stack, and so only the value
-of a local variable can be captured by a closure.
-A dataclass declaration counts as an assignment of its class name for these definitions, though
-re-declaring a class name is prohibited outright (\S\ref{sec:prohibited}).
+The exclusion of captured-variable reassignment (\S\ref{sec:no-mutable-state}) is enforced by a side condition
+on the \ruleName{seq} rule: no variable captured by a statement $s$ may be reassigned in the rest of the block
+$b$. In the example of \S\ref{sec:no-mutable-state}, \pyinline{x} is captured by the definition of
+\pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected. A dataclass declaration counts as
+an assignment of its class name for these definitions, though re-declaring a class name is prohibited outright
+(\S\ref{sec:no-first-class}).
 
 The same issue arises when a variable is captured and reassigned in the \emph{same} statement:
 
@@ -503,40 +485,6 @@ Here the catch-all \pyinline{case x:} binds \pyinline{x} in the body's scope, an
 the enclosing scope. Definite assignment after the match follows the same merge logic as a conditional: if
 every case binds the variable (or returns), it is definitely assigned afterwards; otherwise it is not (see
 also \S\ref{sec:local-assignment}).
-
-\subsubsection{Uninitialised module members}
-\label{sec:uninitialised-members}
-
-In Python, an attribute of a module can be missing at runtime in two ways, both resulting in
-\pyinline{AttributeError}; \PurePy rejects both statically. First, the module body may never assign the member:
-\vspace{-\medskipamount}
-
-\begin{minipage}[t]{0.48\textwidth}
-\begin{python}
-# lib.py
-b = False
-if b:
-    x = 1
-\end{python}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.48\textwidth}
-\begin{python}
-# main.py
-import lib
-print(lib.x)  # AttributeError
-\end{python}
-\end{minipage}
-
-Second, a submodule is not an attribute of its package until it is loaded (\S\ref{sec:submodule-clash}):
-
-\begin{python}
-import a
-a.b.f()  # AttributeError, unless a.b was loaded by an earlier import
-\end{python}
-
-Rule \ruleName{attr-module} rejects these references: \pyinline{x} is not definitely assigned in
-\pyinline{lib}, and \pyinline{a.b} is a stub, so neither resolves.
 
 \subsubsection{Unreachable code}
 \label{sec:unreachable}
