@@ -17,10 +17,11 @@ def f(x, y):
 f(5)(6)  # 11
 \end{python}
 
-\noindent Here \pyinline{f(5)} denotes the function that adds \pyinline{5} to its argument, so
-\pyinline{f(5)(6)} evaluates to \pyinline{11}. Python rejects this, since \pyinline{f(5)} supplies too few
-arguments. Partial application is a semantic extension rather than a change of behaviour: it gives meaning to
-calls that the core rejects, so the core must first reject unsaturated calls.
+\noindent The syntax is valid Python, but Python raises a \pyinline{TypeError} at run time, because
+\pyinline{f(5)} is missing an argument. For partial application to add meaning rather than change it, core
+\PurePy must reject such unsaturated calls, requiring every call to supply the declared arity. On that base,
+\pyinline{f(5)} denotes the function that adds \pyinline{5} to its argument, so \pyinline{f(5)(6)} evaluates to
+\pyinline{11}. This is a semantic extension: existing syntax, given a meaning the core withholds.
 
 \subsection{Piecewise function definitions}
 \label{sec:ext-piecewise}
@@ -35,6 +36,8 @@ def length(Cons(x, xs)):
     return 1 + length(xs)
 \end{python}
 
-\noindent The two clauses together define \pyinline{length}. Python instead treats each \pyinline{def} as an
-assignment, so the second would rebind \pyinline{length} rather than extend it; a faithful extension would
-therefore need distinct notation.
+\noindent Python has no way to define a function by pattern-matching on its arguments: \pyinline{def
+length(Cons(x, xs))} is a syntax error, since a parameter cannot be a pattern. Core \PurePy, a subset of
+Python, has none either. The extension adds this: the clauses together define \pyinline{length}, dispatching on
+the constructor of the argument. Because Python gives the pattern-clause form no meaning of its own, it is a
+syntactic extension that needs no special notation to distinguish it from an ordinary \pyinline{def}.
