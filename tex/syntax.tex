@@ -159,9 +159,7 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \label{fig:predefined}
 \end{figure}
 
-The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ and $\deps$ from individual imports to import sequences; on a module body $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively.  Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q = p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order.
-
-\input{fig/modules}
+The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ and $\deps$ from individual imports to import sequences; on a module body $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively.  Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q = p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order. The module-related metafunctions are collected in Appendix~\ref{sec:aux-modules}.
 
 The \emph{dependency graph} $G_{\mathcal{M}}$ of a program has an edge $(q, q')$ iff $q' \in
 \deps_{q}(\mathcal{M}(q))$.
@@ -183,18 +181,14 @@ anywhere in $s$ (without descending into nested function definitions, which have
 $\assignsS(s) = \dom(\Delta)$ when $s : \Assigns{\Delta}$); $\binds(p)$, the set of variables introduced by a
 pattern $p$; and $\capturesS(s)$, the set of variables from the enclosing scope that are captured by closures
 (lambdas or nested function definitions) within $s$, with companion $\capturesE(e)$ on expressions. All are
-defined in \figref{aux}. $\capturesS$ extends to blocks and module bodies by union (like $\assignsS$),
-with the singleton block identified with its statement.
-
-\input{fig/aux}
+defined, by their principal cases, in Appendix~\ref{sec:aux-syntactic}. $\capturesS$ extends to blocks and
+module bodies by union (like $\assignsS$), with the singleton block identified with its statement.
 
 \begin{definition}[Pattern subsumption]
-The preorder $p \subsumed p'$ (\figref{subsumption}) holds when every value matched by $p$ is also matched by $p'$.
+The preorder $p \subsumed p'$ (Appendix~\ref{sec:aux-subsumption}) holds when every value matched by $p$ is also matched by $p'$.
 \end{definition}
 
 \noindent Subsumption is used by the well-formedness rule for $\pyinline{match}$ to rule out unreachable cases and to check exhaustiveness; with the current pattern set, the latter reduces to requiring a catch-all (var or wildcard) case.
-
-\input{fig/subsumption}
 
 \subsubsection{Well-formedness rules}
 
