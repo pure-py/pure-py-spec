@@ -1,17 +1,45 @@
 \section{Introduction}
 
-\begin{itemize}
-\item Define subset of Python called \PurePy, defined as a syntactic subset further restricted by a
-well-formedness predicate
-\item Define a semantics for \PurePy such that the semantics of a \PurePy program is identical to its
-semantics in Python
-\item Some well-formedness and evaluation rules could be given by a desugaring, but for now we avoid having
-two separate syntaxes
-\end{itemize}
+Python is among the most widely used languages in scientific computing, data analysis, and teaching, valued for
+an accessible surface syntax and a large ecosystem. That reach comes with a large and permissive language.
+Programs mutate state freely, depend on side effects and dynamic binding, and admit many implicit coercions, so
+they can be hard to reason about, hard to reproduce, and hard to target with formal tools or with
+implementations other than the reference interpreter. A researcher in programming languages or in pedagogy who
+wants a well-behaved functional language faces a trade-off: such a language is easy to reason about but
+unfamiliar, whereas Python is familiar but unruly.
 
-Python interoperability is a key goal, but \PurePy is also motivated by the desire to carve out a well-behaved
-discipline for scientific programming \emph{within} Python: a sublanguage in which permissive Python idioms
-that invite confusion are tightened or excluded.
+\PurePy carves out a pure, side-effect-free subset of Python that is well-behaved and easy to reason about, yet
+remains ordinary Python. Every well-formed \PurePy program is valid Python and runs under a standard
+interpreter with the same result, so one artifact serves two roles: a program a scientist can run today, and a
+common target that a research language or tool can produce and consume. Purity makes programs referentially
+transparent, deterministic, and reproducible, the properties that scientific computing and formal reasoning
+both want.
+
+This paper defines \PurePy as a versioned formal standard: a formal grammar, well-formedness rules based on a
+definite-assignment analysis, and an operational semantics that preserves the meaning of well-formed programs
+in Python. A reference checker decides membership of the subset, and a conformance test suite exercises the
+standard against CPython, PyPy, GraalPy, and Pyodide. The guarantee is precise: membership is decidable, and a
+well-formed \PurePy program is valid Python whose \PurePy meaning is its Python meaning.
+
+The design is deliberately conservative. Rather than reconstruct Python's full behaviour, \PurePy chooses a
+simple, well-behaved core and excludes the idioms that would break it, among them mutable state, effectful
+control, implicit coercions, and constructs whose meaning depends on module load order
+(Section~\ref{sec:overview}). The standard is versioned, so the subset can grow as features earn their place
+without disturbing programs written against an earlier version.
+
+\PurePy is aimed first at researchers in programming languages and in pedagogy, and is intended to grow into a
+common language for scientific computing, supporting portable applications in modelling, data processing,
+analysis, and visualisation. Because every \PurePy program is also a Python program, adopting it costs nothing
+at the surface, and a research language that targets \PurePy inherits a large and familiar runtime.
+
+This paper contributes:
+\begin{itemize}
+\item \PurePy, a pure functional subset of Python, presented as a versioned standard with a formal grammar and
+well-formedness rules based on a definite-assignment analysis;
+\item an operational semantics that preserves the meaning of well-formed \PurePy programs in Python;
+\item a reference checker that decides membership of the subset, validated by a conformance test suite
+exercised on CPython, PyPy, GraalPy, and Pyodide.
+\end{itemize}
 
 {\small
 \begin{center}
