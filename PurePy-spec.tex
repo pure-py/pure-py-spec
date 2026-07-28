@@ -1,22 +1,19 @@
-\documentclass{scrartcl}
+% \anonmode adds the acmart anonymous option and an anonymised title.
+\ifdefined\anonmode
+  \documentclass[acmsmall,anonymous]{acmart}
+\else
+  \documentclass[acmsmall]{acmart}
+\fi
 
-\usepackage{amsmath}
+% acmart loads amsmath, amssymb, amsthm, microtype, xcolor, hyperref, natbib, enumitem.
 \usepackage{array}
-\usepackage{amssymb}
-\usepackage{amsthm}
-\usepackage{beramono}
-\usepackage{enumitem}
-\usepackage{etoolbox}
-\usepackage{float}
-\usepackage{ebgaramond}
-\usepackage{listings}
 \usepackage{mathpartir}
-\usepackage{microtype}
-\usepackage{natbib}
-\usepackage{titling}
+\usepackage{listings}
 \usepackage{subcaption}
-\usepackage{xcolor}
+\usepackage{float}
 \usepackage{xspace}
+\usepackage{enumitem}
+
 % \finalmode renders the clean version, without change markup.
 \ifdefined\finalmode
   \usepackage[final,commandnameprefix=ifneeded,commentmarkup=footnote]{changes}
@@ -25,91 +22,69 @@
 \fi
 \usepackage{changebar}
 \ifdefined\finalmode\nochangebars\fi
-\usepackage{hyperref}
 
 \input{tex/macros}
 \input{tex/listings}
 
-\deffootnote{0em}{0em}{\textsuperscript{\thefootnotemark}}
-
 \newtheorem{lemma}{Lemma}
 \newtheorem{definition}{Definition}
 
-\raggedbottom
-\setlength{\droptitle}{-8ex}
 \setlist[itemize]{leftmargin=*, nosep, topsep=2mm}
 \setlist[enumerate]{nosep}
 
-% \anonmode drops the name and version from the title for double-blind review.
-\ifdefined\anonmode
-  \title{\textbf{A Pure, Functional Subset of Python for Scientific Computing}}
-\else
-  \title{\textbf{\PurePy: A Functional Subset of Python}}
-\fi
-\version{0}{12}{0}
-
-\ifdefined\anonmode
-  \author{Anonymous Author(s)}
-\else
-  \author{
-     Nikolaus Huber\textsuperscript{1} \and
-     Dominic Orchard\textsuperscript{2,1} \and
-     Jacob Pake\textsuperscript{2} \and
-     Roly Perera\textsuperscript{1,3}
-  }
-\fi
-\date{}
-
-\ifdefined\anonmode
-  \newcommand{\affiliations}{\textit{Affiliations omitted for double-blind review}}
-\else
-  \newcommand{\affiliations}{%
-      \textsuperscript{1}\textit{Department of Computer Science and Technology, University of Cambridge, UK} \\
-      \textsuperscript{2}\textit{School of Computing, University of Kent, UK} \\
-      \textsuperscript{3}\textit{School of Computer Science, University of Bristol, UK}
-  }
-\fi
-
-% Override maketitle to avoid internal tabular conflicts
-\makeatletter
-\renewcommand{\maketitle}{%
-    \vspace*{\droptitle}
-    \begin{flushleft}
-        {\LARGE\bfseries\thetitle\par}
-        \ifdefined\anonmode
-        \else
-            \ifx\versionstring\@empty
-            \else
-                \vspace{0.5ex}
-                {\Large\normalfont version \versionstring\par}
-            \fi
-        \fi
-        \vspace{1ex}
-        {\Large\theauthor\par}
-        \vspace{1ex}
-        {\affiliations\par}
-    \end{flushleft}
-    \vspace{2ex}
-}
-\makeatother
+% PACMPL (PLDI) metadata; placeholders for a draft.
+\acmJournal{PACMPL}
+\acmVolume{10}
+\acmNumber{PLDI}
+\acmArticle{1}
+\acmYear{2026}
+\acmMonth{6}
+\setcopyright{none}
+\settopmatter{printacmref=false}
 
 \begin{document}
 
-\pagestyle{plain}
+\ifdefined\anonmode
+  \title{A Pure, Functional Subset of Python for Scientific Computing}
+\else
+  \title{\PurePy: A Functional Subset of Python}
+\fi
+\version{0}{12}{0}
 
-% Otherwise custom \maketitle allows floats to appear above title
-\makeatletter
-\let\orig@maketitle\maketitle
-\renewcommand{\maketitle}{%
-  \orig@maketitle
-  \global\@topnum=0
-}
-\makeatother
+\author{Nikolaus Huber}
+\affiliation{%
+  \department{Department of Computer Science and Technology}
+  \institution{University of Cambridge}
+  \country{UK}}
 
-\maketitle
+\author{Dominic Orchard}
+\affiliation{%
+  \department{School of Computing}
+  \institution{University of Kent}
+  \country{UK}}
+\affiliation{%
+  \department{Department of Computer Science and Technology}
+  \institution{University of Cambridge}
+  \country{UK}}
+
+\author{Jacob Pake}
+\affiliation{%
+  \department{School of Computing}
+  \institution{University of Kent}
+  \country{UK}}
+
+\author{Roly Perera}
+\affiliation{%
+  \department{Department of Computer Science and Technology}
+  \institution{University of Cambridge}
+  \country{UK}}
+\affiliation{%
+  \department{School of Computer Science}
+  \institution{University of Bristol}
+  \country{UK}}
 
 \begin{abstract}
-\noindent \PurePy is a pure functional subset of Python, providing a common functional language for use by
+\PurePy is a pure functional subset of Python, providing a common functional language for use by
 researchers in programming languages and pedagogy, while providing a front-end familiar and accessible to the
 Python community. This specification defines a versioned standard with formal syntax, well-formedness rules
 based on a definite assignment analysis, and an operational semantics intended to preserve the meaning of
@@ -117,6 +92,8 @@ well-formed \PurePy programs in Python. By combining functional programming with
 syntax, \PurePy aims to support portable implementations and lower-friction adoption of new language ideas for
 modelling, data processing, analysis, and visualisation.
 \end{abstract}
+
+\maketitle
 
 \input{tex/introduction}
 
@@ -128,7 +105,7 @@ modelling, data processing, analysis, and visualisation.
 
 \input{tex/related-work}
 
-\bibliographystyle{plain}
+\bibliographystyle{ACM-Reference-Format}
 \bibliography{tex/refs,tex/additional-refs}
 
 \ifdefined\openterms
