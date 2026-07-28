@@ -1,5 +1,9 @@
 % Document and references
-\newcommand*{\PurePy}{PurePy\xspace}
+\ifdefined\anonmode
+  \newcommand*{\PurePy}{[Our lang]\xspace}
+\else
+  \newcommand*{\PurePy}{PurePy\xspace}
+\fi
 \ifdefined\anonmode
   \newcommand*{\issue}[1]{\##1}
 \else
