@@ -1,6 +1,10 @@
 % Document and references
 \newcommand*{\PurePy}{PurePy\xspace}
-\newcommand*{\issue}[1]{\href{https://github.com/pure-py/pure-py-spec/issues/#1}{\##1}}
+\ifdefined\anonmode
+  \newcommand*{\issue}[1]{\##1}
+\else
+  \newcommand*{\issue}[1]{\href{https://github.com/pure-py/pure-py-spec/issues/#1}{\##1}}
+\fi
 \newcommand*{\versionstring}{}
 \newcommand*{\version}[3]{%
   \gdef\versionstring{#1.#2.#3}%

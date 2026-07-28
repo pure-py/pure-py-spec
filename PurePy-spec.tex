@@ -48,19 +48,27 @@
 \fi
 \version{0}{12}{0}
 
-\author{
-   Nikolaus Huber\textsuperscript{1} \and
-   Dominic Orchard\textsuperscript{2,1} \and
-   Jacob Pake\textsuperscript{2} \and
-   Roly Perera\textsuperscript{1,3}
-}
+\ifdefined\anonmode
+  \author{Anonymous Author(s)}
+\else
+  \author{
+     Nikolaus Huber\textsuperscript{1} \and
+     Dominic Orchard\textsuperscript{2,1} \and
+     Jacob Pake\textsuperscript{2} \and
+     Roly Perera\textsuperscript{1,3}
+  }
+\fi
 \date{}
 
-\newcommand{\affiliations}{%
-    \textsuperscript{1}\textit{Department of Computer Science and Technology, University of Cambridge, UK} \\
-    \textsuperscript{2}\textit{School of Computing, University of Kent, UK} \\
-    \textsuperscript{3}\textit{School of Computer Science, University of Bristol, UK}
-}
+\ifdefined\anonmode
+  \newcommand{\affiliations}{\textit{Affiliations omitted for double-blind review}}
+\else
+  \newcommand{\affiliations}{%
+      \textsuperscript{1}\textit{Department of Computer Science and Technology, University of Cambridge, UK} \\
+      \textsuperscript{2}\textit{School of Computing, University of Kent, UK} \\
+      \textsuperscript{3}\textit{School of Computer Science, University of Bristol, UK}
+  }
+\fi
 
 % Override maketitle to avoid internal tabular conflicts
 \makeatletter
