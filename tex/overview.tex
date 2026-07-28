@@ -1,0 +1,97 @@
+\section{Overview}
+\label{sec:overview}
+
+\PurePy is a subset of Python chosen so that its programs are well-behaved and broadly \emph{pure}, yet run
+unchanged under a standard Python interpreter and compute the same result. Purity here is informal: the
+functional core has no observable side effects, and a name's meaning does not depend on evaluation order or on
+mutation. A variable, once definitely assigned, denotes a fixed value; a function is fixed by its definition;
+and a module's members are fixed once it has loaded. Python permits much that breaks this discipline, so
+\PurePy tightens or excludes the idioms responsible. A precise characterisation of purity is left to future
+work.
+
+The exclusions fall into a few groups. Some features are imperative or effectful and have no place in a
+functional core, such as loops, reassignment of captured variables, exceptions, and context managers. Others
+are accepted by Python but give a program a meaning that depends on load order or runtime state, such as a name
+that is at once an assignment and a submodule; \PurePy rejects these so that meaning is static. A third group is
+excluded to keep the static account tractable, among them truthiness of non-boolean conditions and first-class
+modules and classes. The rest of this section lists the excluded features and the Python runtime errors that
+well-formedness rules out (\figref{prevented-errors}).
+
+\subsection{Prohibited Python features}
+\label{sec:prohibited}
+
+The following Python features are excluded from \PurePy as they are incompatible with purity or
+functional programming:
+\begin{itemize}
+\item \pyinline{while} loops, \pyinline{for} loops, \pyinline{break}, \pyinline{continue}
+\item \pyinline{async}/\pyinline{await}
+\item \pyinline{global}, \pyinline{nonlocal}
+\item \pyinline{del}
+\item \pyinline{try}/\pyinline{except}/\pyinline{raise}
+\item Augmented assignment (\pyinline{+=}, \pyinline{-=}, etc.)
+\item Walrus operator (\pyinline{:=})
+\item \pyinline{yield}/\pyinline{yield from}
+\item \pyinline{class} definitions other than dataclasses
+\item \pyinline{with} statements
+\item Truthiness: a non-boolean value used as a condition (the test of an \pyinline{if} or conditional expression, or an \pyinline{assert}). Python coerces any value to \pyinline{bool}; \PurePy requires the condition to be boolean.
+\item List patterns matching tuple values, or tuple patterns matching list values. In \PurePy a list pattern matches only a list, and a tuple pattern matches only a tuple. Python permits either pattern against either kind of sequence.
+\item Positional class patterns matching fewer sub-patterns than the class's field arity. \PurePy requires exact arity; Python permits any number from $0$ up to the class's arity.
+\item Local or interleaved imports: an \pyinline{import} or \pyinline{from} statement inside a function or other block, or after a non-import statement. \PurePy permits imports only at the start of a module; Python allows them anywhere.
+\item Wildcard imports (\pyinline{from q import *}); PEP 8 recommends avoiding these\footnote{\url{https://peps.python.org/pep-0008/}}.
+\item A submodule importing itself through its parent (\pyinline{from a import b} inside module \pyinline{a.b}). \PurePy treats the from-imported submodule as a dependency, so this is an import cycle and is rejected; Python permits it, binding the partially-loaded module.
+\item An import (not a from-import) naming a proper descendant of the importing module (\pyinline{import x.y} inside module \pyinline{x}): the binding for the head would denote the still-loading module. Python permits it, binding the partially-initialised module. A from-import of the module's own submodule is permitted.
+\item First-class classes: in Python, class declarations are assignments, so classes flow as values. In \PurePy class names appear only at constructor and pattern positions, and declarations are module-level only.
+\item Re-declaring a class name: a dataclass declaration whose name already denotes a class in the module. Python permits the re-declaration, leaving the earlier class reachable only through its existing instances; \PurePy requires a class name to be unique within its module, so that a qualified name identifies a class.
+\item First-class modules: in Python, modules are values. In \PurePy a module name may be projected (member access) but not used as a value.
+\item A module binding a name that is also the name of one of its submodules (\S\ref{sec:submodule-clash}).
+\item Referring to a submodule the referring module does not itself import: \pyinline{import a} followed by \pyinline{a.b.f()} is rejected unless the module also imports \pyinline{a.b}. Python permits the reference whenever some earlier import, anywhere in the program, loaded \pyinline{a.b} (\S\ref{sec:uninitialised-members}).
+\end{itemize}
+
+Complementing the list above (programs Python runs that \PurePy rejects), a well-formed \PurePy
+program avoids the Python runtime errors listed in \figref{prevented-errors}, under the conditions noted
+there. Errors from ill-typed operations, such as wrong operand types, calling a non-function, or attribute
+access on an object lacking the attribute, are outside the scope of well-formedness.
+
+\subsubsection{Variable and submodule with the same name}
+\label{sec:submodule-clash}
+
+In Python, an attribute of a package can be bound by an assignment in the package's own body, and by a load
+of the same-named submodule, which assigns the new module to the attribute. Suppose the body of \pyinline{pkg}
+is the single assignment \pyinline{sub = 1}, and \pyinline{pkg} also has a submodule \pyinline{pkg.sub}:
+\vspace{-\medskipamount}
+
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+import pkg
+print(pkg.sub)  # 1
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+import pkg.sub
+print(pkg.sub)  # <module 'pkg.sub'>
+\end{python}
+\end{minipage}
+
+On the left, \pyinline{pkg.sub} is never loaded, so the assignment is visible; on the right, the load
+overwrites the assignment. The name \pyinline{pkg.sub} has no load-order-independent meaning, so the
+module rules prohibit a module from binding a name that is also the name of one of its submodules.
+
+\begin{figure}
+\centering
+\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.52\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}}
+\hline
+\textbf{Python error} & \textbf{Ruled out when} & \textbf{See} \\
+\hline
+\pyinline{NameError}, \pyinline{UnboundLocalError} & Always: a variable may be referenced only where it is definitely assigned. & \figref{well-formed}, \figref{well-formed-expr} \\[1mm]
+\pyinline{ModuleNotFoundError} & Always: an import requires its target to be a module of the program. & \figref{well-formed-imports} \\[1mm]
+\pyinline{ImportError} & Always: a from-import requires each imported name to be a member of the source module, and import cycles are rejected. (A Python cycle may run or fail, depending on where the cycle is entered.) & \figref{imports}, \figref{well-formed-module} \\[1mm]
+\pyinline{AttributeError} & Always: a module attribute reference must resolve to a definitely assigned member.  & \figref{well-formed-expr} \\[1mm]
+\pyinline{TypeError} & The operation is a constructor call or class pattern, which must match the class's arity exactly. (Only excess sub-patterns are a Python error; a pattern with fewer is prohibited even though Python permits it.) & \figref{well-formed-expr}, \figref{well-formed-pat} \\
+\hline
+\end{tabular}
+\caption{Python errors prevented by well-formedness}
+\label{fig:prevented-errors}
+\end{figure}
