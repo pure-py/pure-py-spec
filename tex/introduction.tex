@@ -69,11 +69,19 @@ Well-formedness correctness properties & \issue{130} \\
 
 \subsection{Contributions}
 
-This paper contributes:
+After setting out the problem \PurePy addresses in Section~\ref{sec:overview}, we make the following
+contributions:
 \begin{itemize}
-\item \PurePy, a pure functional subset of Python, presented as a versioned standard with a formal grammar and
-well-formedness rules based on a definite-assignment analysis;
-\item an operational semantics that preserves the meaning of well-formed \PurePy programs in Python;
+\item a definition of \PurePy as a versioned standard, with a formal grammar and well-formedness rules based on
+a definite-assignment analysis (Section~\ref{sec:syntax}) and an operational semantics that preserves the
+meaning of well-formed programs in Python (Section~\ref{sec:opsem});
 \item a reference checker that decides membership of the subset, validated by a conformance test suite
-exercised on CPython, PyPy, GraalPy, and Pyodide.
+exercised on CPython, PyPy, GraalPy, and Pyodide (Section~\ref{sec:reference-impl});
+\item conservative extensions to the core language, including partial application and piecewise function
+definitions (Section~\ref{sec:extensions});
+\item case studies that use \PurePy as a common functional language (Section~\ref{sec:case-studies});
+\item an experimental evaluation of how readily large language models target the \PurePy subset, and of how
+readily existing Python converts to it (Section~\ref{sec:evaluation}).
 \end{itemize}
+Section~\ref{sec:related} summarises related efforts, and Section~\ref{sec:conclusion} presents our conclusions
+and discusses future work.
