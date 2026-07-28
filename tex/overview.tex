@@ -52,12 +52,14 @@ effect-free.
 \subsection{Implicit coercions}
 \label{sec:no-coercions}
 
-Python performs several implicit coercions that are convenient but a recognised source of error, since the
-coerced value rarely coincides with what the author meant.% TODO: citation on implicit-coercion errors
-\ \PurePy excludes two. The first is truthiness: the test of an \pyinline{if} or conditional expression, or an
+Python accepts several implicit coercions and lax matches that are convenient but a recognised source of error,
+since what Python accepts rarely coincides with what the author meant.% TODO: citation on implicit-coercion errors
+\ \PurePy excludes three. The first is truthiness: the test of an \pyinline{if} or conditional expression, or an
 \pyinline{assert}, is coerced to \pyinline{bool}, whereas \PurePy requires it to be boolean already. The second
 is between sequence kinds in pattern matching: Python lets a list pattern match a tuple value, and a tuple
 pattern match a list, whereas in \PurePy a list pattern matches only a list and a tuple pattern only a tuple.
+The third is in constructor patterns: Python lets a positional class pattern supply fewer sub-patterns than the
+class's field arity, matching only those given, whereas \PurePy requires the exact arity.
 
 \subsection{Load-dependent meaning}
 \label{sec:no-load-dependent}
@@ -121,8 +123,7 @@ through its existing instances.
 \label{sec:other-restrictions}
 
 A few remaining restrictions do not fit the groups above. Only dataclasses are supported, so \pyinline{class}
-definitions of other kinds are excluded. A positional class pattern must supply exactly the class's field
-arity, where Python permits fewer.
+definitions of other kinds are excluded.
 
 Complementing the exclusions above, a well-formed \PurePy program avoids the Python runtime errors listed in
 \figref{prevented-errors}, under the conditions noted there. Errors from ill-typed operations, such as wrong
