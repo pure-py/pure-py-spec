@@ -9,12 +9,9 @@
 {\color{deletedgray}\deps_{q}(\exImport{q'})} &\; {\color{deletedgray}= \imports(\exImport{q'}) \cup \set{p \mid p \properPrefixOf q', p \neq q}} \\
 {\color{deletedgray}\deps_{q}(\exFromImport{q'}{\seq{x}})} &\; {\color{deletedgray}= \imports(\exFromImport{q'}{\seq{x}}) \cup \set{p \mid p \properPrefixOf q', p \not\prefixOf q}} \\
 \\
-{\color{blue}\rootOf(x)} &\; {\color{blue}= x} \\
-{\color{blue}\rootOf(q.x)} &\; {\color{blue}= \rootOf(q)} \\
-\\
 \submodules(q) &= \set{\bind{x}{\modStub{q.x}} \mid q.x \in \dom(\mathcal{M})}
 \end{align*}
-\subcaption{\added{$\rootOf$ and $\submodules$ metafunctions}\deleted{$\imports$, $\deps$, and $\submodules$ metafunctions}}
+\subcaption{\added{$\submodules$ metafunction}\deleted{$\imports$, $\deps$, and $\submodules$ metafunctions}}
 \end{subfigure}
 
 \vspace{2mm}

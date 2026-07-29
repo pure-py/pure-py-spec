@@ -75,13 +75,13 @@
 
 \inferrule*[lab={\ruleName{eval-import}}]
 {
-  \deleted{q' = x \cons \seq{x}} \\
+  q' = x \cons \seq{x} \\
   q' \Rightarrow_{\mathsf{load}} \rho \\
   \added{q', \modLoaded{q'}{\rho} \linksTo v}\deleted{\varepsilon, q', \modLoaded{q'}{\rho} \loadsTo v} \\
   \deleted{\vdash} \seq{\iota} \Rightarrow \rho'
 }
 {
-  \deleted{\vdash} \exImport{q'} \cons \seq{\iota} \Rightarrow \set{\bind{\added{\rootOf(q')}\deleted{x}}{v}} \extend \rho'
+  \deleted{\vdash} \exImport{q'} \cons \seq{\iota} \Rightarrow \set{\bind{x}{v}} \extend \rho'
 }
 \and
 \inferrule*[lab={\ruleName{eval-from-import}}]

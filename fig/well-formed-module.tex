@@ -72,14 +72,14 @@
 
 \inferrule*[lab={\ruleName{import}}]
 {
-  \deleted{q' = x \cons \seq{x}} \\
+  q' = x \cons \seq{x} \\
   q \not\properPrefixOf q' \\
   \vdash_{\mathsf{load}} q' : \Delta \\
   \added{q', \modLoaded{q'}{\Delta} \linksTo \theta}\deleted{\varepsilon, q', \modLoaded{q'}{\Delta} \loadsTo \theta} \\
   \vdash \seq{\iota} : \Gamma
 }
 {
-  \vdash \exImport{q'} \cons \seq{\iota} : \set{\bind{\added{\rootOf(q')}\deleted{x}}{\theta}} \extend \Gamma
+  \vdash \exImport{q'} \cons \seq{\iota} : \set{\bind{x}{\theta}} \extend \Gamma
 }
 \and
 \inferrule*[lab={\ruleName{from-import}}]

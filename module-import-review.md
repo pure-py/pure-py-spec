@@ -5,11 +5,10 @@ review. Figure, definition and section numbers refer to the marked-up PurePy-spe
 
 ## Changes made
 
-- [ ] **Dotted-name grammar (Fig. 2).** `q ::= x | q.x` (SimpleName/QualifiedName) replaces the flat
-  `x1.x2.....xn+1`, which used centred dots against the house rule and was destructured inconsistently:
-  cons at the head in rule import, dots at the tail everywhere else (names judgement, links, submodules).
-  A one-line `root` metafunction (Fig. 24) supplies the head where rule import and eval-import
-  (Figs. 10a, 17a) need it.
+- [x] **Dotted-name grammar (Fig. 2).** Resolved: reverted after review. The flat sequence form and the
+  head-cons pattern in rules import and eval-import stay; the proposed recursive grammar and root
+  metafunction are dropped. Both destructurings are legitimate over the sequence form, and patterns read
+  better than a metafunction.
 
 - [ ] **Dependency graph deleted (§3.2, Fig. 24, Fig. 11b).** The `imports` and `deps` metafunctions and
   the graph G_M restated, edge for edge, the load premises already present in the import rules, and had
