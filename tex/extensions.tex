@@ -41,3 +41,28 @@ length(Cons(x, xs))} is a syntax error, since a parameter cannot be a pattern. C
 Python, has none either. The extension adds this: the clauses together define \pyinline{length}, dispatching on
 the constructor of the argument. Because Python gives the pattern-clause form no meaning of its own, it is a
 syntactic extension that needs no special notation to distinguish it from an ordinary \pyinline{def}.
+
+\subsection{Explicit variable definitions}
+\label{sec:ext-explicit-def}
+
+In the core a variable is introduced implicitly by its first assignment, and a definite-assignment analysis
+(\secref{syntax}) tracks whether it is assigned before it is used. This extension makes the introduction
+explicit, with a \pyinline{def} declaration for variables as well as functions:
+
+\begin{python}
+def total = 0   # define and assign
+
+def n           # define, assignment deferred
+if b:
+    n = 1
+else:
+    n = 2
+return total + n
+\end{python}
+
+\noindent \pyinline{def total = 0} declares \pyinline{total} and assigns it at once, whereas \pyinline{def n}
+declares \pyinline{n} with its assignment deferred, to be supplied later under the existing definite-assignment
+rules, so \pyinline{n} is usable only once every path has assigned it. Python has no such form: \pyinline{def}
+introduces a function, so a variable \pyinline{def} is a syntax error, and core \PurePy, a subset of Python, has
+none either. The implicit definitions of the core are the case in which every variable is introduced by
+\pyinline{def x = e}, so the core desugars into the explicit form.
