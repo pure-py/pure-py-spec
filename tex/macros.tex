@@ -130,6 +130,13 @@
 \newcommand*{\loadsTo}{\mathrel{\mathsf{loads\mbox{-}to}}}
 \newcommand*{\loadsAs}{\mathrel{\mathsf{loads\mbox{-}as}}}
 
+% Appendix references: the appendix is part of the full build only.
+\ifdefined\appendixmode
+  \newcommand*{\appendixref}[1]{Appendix~\ref{#1}}
+\else
+  \newcommand*{\appendixref}[1]{the appendix of the full version}
+\fi
+
 % Open term typing arrow
 \newcommand{\carrow}[1]{\xrightarrow{\; #1\; }}
 

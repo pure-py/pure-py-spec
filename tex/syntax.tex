@@ -167,7 +167,7 @@ The metafunction $\assignsS$ extends by union from individual statements to bloc
 body $\seq{\iota}\;\seq{s}$ it acts on $\seq{s}$. Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q =
 p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order; the proper prefixes of a module name
 are its \emph{ancestors}. The $\submodules$ metafunction is
-defined, with the class-related metafunctions, in Appendix~\ref{sec:aux-modules}.
+defined, with the class-related metafunctions, in \appendixref{sec:aux-modules}.
 
 In this section, loading a module means checking its body and computing its member context
 (\figref{well-formed-module}), the static counterpart of run-time loading (\secref{opsem}). Both
@@ -194,11 +194,11 @@ anywhere in $s$ (without descending into nested function definitions, which have
 $\assignsS(s) = \dom(\Delta)$ when $s : \Assigns{\Delta}$); $\binds(p)$, the set of variables introduced by a
 pattern $p$; and $\capturesS(s)$, the set of variables from the enclosing scope that are captured by closures
 (lambdas or nested function definitions) within $s$, with companion $\capturesE(e)$ on expressions. All are
-defined, by their principal cases, in Appendix~\ref{sec:aux-syntactic}. $\capturesS$ extends to blocks and
+defined, by their principal cases, in \appendixref{sec:aux-syntactic}. $\capturesS$ extends to blocks and
 module bodies by union (like $\assignsS$), with the singleton block identified with its statement.
 
 \begin{definition}[Pattern subsumption]
-The preorder $p \subsumed p'$ (Appendix~\ref{sec:aux-subsumption}) holds when every value matched by $p$ is also matched by $p'$.
+The preorder $p \subsumed p'$ (\appendixref{sec:aux-subsumption}) holds when every value matched by $p$ is also matched by $p'$.
 \end{definition}
 
 \noindent Subsumption is used by the well-formedness rule for $\pyinline{match}$ to rule out unreachable cases and to check exhaustiveness; with the current pattern set, the latter reduces to requiring a catch-all (var or wildcard) case.
