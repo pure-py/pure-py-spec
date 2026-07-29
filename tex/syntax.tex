@@ -179,19 +179,19 @@ $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively. Wr
 (\emph{prefix}) when $q = p$ or $q = p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order. The
 module-related metafunctions are collected in Appendix~\ref{sec:aux-modules}.}
 
-\Replaced{An import cannot run until other modules have loaded, and its rules
-(\figref{well-formed-imports}) have a load premise for each. Both import forms load their target. A plain
-import also loads every proper prefix of the target, linking each module into its parent (the links
-judgement), so that the binding for the target's root supports attribute access along the whole chain. A
-from-import likewise loads every proper prefix of its target, together with any imported name that denotes
-a submodule; excepted are prefixes that enclose the importing module itself, which may still be loading
-when the import runs and so cannot be required to load first. A plain import makes no such exception; an
-import naming a proper descendant of the importing module, the one case where the exception would be
-forced, is prohibited outright (\secref{no-load-dependent}). Program well-formedness
-(\figref{well-formed-module}) requires the main module to be well-formed; the load premises then reach
-every module the program can load, so a module that is never imported is not checked. The rules are
-interpreted inductively, so import cycles are ill-formed: loading a module in a cycle would require that
-module's own load derivation as a premise, and no finite derivation exists.}{The \emph{dependency graph}
+\Replaced{Loading a module may require other modules to load first
+(\figref{well-formed-imports}). Both import forms load their target. A plain import also loads every
+proper prefix of the target and links each module into its parent (the links judgement), so that the
+binding created for the target's root supports attribute access along the whole chain. A from-import also
+loads the proper prefixes of its target, together with any imported name that denotes a submodule, but not
+a prefix that encloses the importing module itself, because such a module may still be loading when the
+import runs and so cannot be required to load first. A plain import has no corresponding exception,
+because the only prefix that could never load first is the importing module itself, and an import naming a
+proper descendant of the importing module is prohibited outright (\secref{no-load-dependent}). Program
+well-formedness (\figref{well-formed-module}) requires the main module to be well-formed and hence,
+recursively, every module the program can load; a module that is never imported is not checked. The rules
+are interpreted inductively, so a program with an import cycle is ill-formed, because a module in a cycle
+could finish loading only after itself.}{The \emph{dependency graph}
 $G_{\mathcal{M}}$ of a program has an edge $(q, q')$ iff $q' \in \deps_{q}(\mathcal{M}(q))$. Every import
 depends on its target's ancestors; excepted are ancestors enclosing the importing module itself, which are
 necessarily still in progress when it runs and so cannot be required to load first. The exception appears
