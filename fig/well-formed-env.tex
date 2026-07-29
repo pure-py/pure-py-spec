@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\vdash v$}
+\flushleft \shadebox{$\vdash v \added{: \theta}$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{val-lit}}]
@@ -7,23 +7,23 @@
   \strut
 }
 {
-  \vdash \ell
+  \vdash \ell \added{: \statusDefAssigned}
 }
 \and
 \inferrule*[lab={\ruleName{val-list}}]
 {
-  \vdash v_i \quad (\forall i)
+  \vdash v_i \added{: \statusDefAssigned} \quad (\forall i)
 }
 {
-  \vdash \exList{v_1, \ldots, v_n}
+  \vdash \exList{v_1, \ldots, v_n} \added{: \statusDefAssigned}
 }
 \and
 \inferrule*[lab={\ruleName{val-tuple}}]
 {
-  \vdash v_i \quad (\forall i)
+  \vdash v_i \added{: \statusDefAssigned} \quad (\forall i)
 }
 {
-  \vdash \exTuple{v_1, \ldots, v_n}
+  \vdash \exTuple{v_1, \ldots, v_n} \added{: \statusDefAssigned}
 }
 \and
 \inferrule*[lab={\ruleName{val-lambda}}]
@@ -32,7 +32,7 @@
   \Gamma \override \statusDefAssigned(\seq{x}) \vdash e
 }
 {
-  \vdash \exLamClosure[\Gamma]{\rho}{\seq{x}}{e}
+  \vdash \exLamClosure[\Gamma]{\rho}{\seq{x}}{e} \added{: \statusDefAssigned}
 }
 \and
 \inferrule*[lab={\ruleName{val-def}}]
@@ -42,16 +42,16 @@
   \seq{f} \text{ distinct}
 }
 {
-  \vdash \exDefClosure[\Gamma]{\rho}{\exDef{f_1}{\seq{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}}{b_{n+1}}}{i}
+  \vdash \exDefClosure[\Gamma]{\rho}{\exDef{f_1}{\seq{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}}{b_{n+1}}}{i} \added{: \statusDefAssigned}
 }
 \and
 \inferrule*[lab={\ruleName{val-obj}}]
 {
-  \vdash C \\
+  \vdash C \added{: C} \\
   \vdash \rho : \Gamma
 }
 {
-  \vdash \exObj{\Gamma}{C}{\rho}
+  \vdash \exObj{\Gamma}{C}{\rho} \added{: \statusDefAssigned}
 }
 \and
 \inferrule*[lab={\ruleName{val-mod}}]
@@ -59,17 +59,17 @@
   q \in \dom(\mathcal{M})
 }
 {
-  \vdash \modStub{q}
+  \vdash \modStub{q} \added{: \modStub{q}}
 }
 \and
 
 \inferrule*[lab={\ruleName{val-mod-loaded}}]
 {
-  \vdash_{\mathsf{load}} q : \Gamma \\
+  \deleted{\vdash_{\mathsf{load}} q : \Gamma} \\
   \vdash \rho : \Gamma
 }
 {
-  \vdash \modLoaded{q}{\rho}
+  \vdash \modLoaded{q}{\rho} \added{: \modLoaded{q}{\Gamma}}
 }
 \and
 \inferrule*[lab={\ruleName{val-class}}]
@@ -77,7 +77,7 @@
   \strut
 }
 {
-  \vdash \clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}
+  \vdash \clsEntry{\Gamma}{q.c}{\seq{x}}{\bot} \added{: \clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}}
 }
 \and
 \inferrule*[lab={\ruleName{val-class-extend}}]
@@ -85,7 +85,7 @@
   \bind{c'}{C'} \in \Gamma
 }
 {
-  \vdash \clsEntry{\Gamma}{q.c}{\seq{x}}{c'}
+  \vdash \clsEntry{\Gamma}{q.c}{\seq{x}}{c'} \added{: \clsEntry{\Gamma}{q.c}{\seq{x}}{c'}}
 }
 \end{mathpar}
 
@@ -104,7 +104,7 @@
 \and
 \inferrule*[lab={\ruleName{env-cons}}]
 {
-  \vdash v \\
+  \vdash v \added{: \theta} \\
   \vdash \rho : \Gamma
 }
 {
