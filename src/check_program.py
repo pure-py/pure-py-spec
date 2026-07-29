@@ -100,13 +100,12 @@ def walk_program(entry_path: pathlib.Path) -> None:
                           {'__main__': entry_imports}), base_dir)
 
     M = {name: tree for name, (_, tree) in modules.items()}
-    for name in ['__main__', *sorted(set(modules) - {'__main__'})]:
-        try:
-            check_module(modules[name][1], M, name)
-        except IllFormedModule as e:
-            path = modules[e.module or name][0]
-            e.msg = f"{path}: {e.msg}"
-            raise
+    try:
+        check_module(modules['__main__'][1], M, '__main__')
+    except IllFormedModule as e:
+        path = modules[e.module or '__main__'][0]
+        e.msg = f"{path}: {e.msg}"
+        raise
 
 
 def main() -> None:

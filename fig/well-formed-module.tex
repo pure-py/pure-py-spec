@@ -242,7 +242,7 @@
 \small
 \inferrule*[lab={\ruleName{program}}]
 {
-  {\color{blue}\vdash_{\mathsf{load}} q : \Delta_q \quad (\forall q \in \dom(\mathcal{M}))}\;\;{\color{deletedgray}\vdash_{\mathsf{load}} \pymath{\_\_main\_\_} : \Delta} \\
+  \vdash_{\mathsf{load}} \pymath{\_\_main\_\_} : \added{\Gamma}\deleted{\Delta} \\
   {\color{deletedgray}G_{\mathcal{M}} \text{ acyclic}}
 }
 {

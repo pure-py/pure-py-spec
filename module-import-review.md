@@ -18,11 +18,11 @@ review. Figure, definition and section numbers refer to the marked-up PurePy-spe
   in a never-imported module `u`, `import u.sub` slipped through while `from u import z` was rejected.
   All three are deleted along with the acyclicity premise of rule program (Fig. 11b).
 
-- [ ] **Program well-formedness checks every module (Fig. 11b).** Rule program now requires a load
-  derivation for each module in dom(M) rather than for `__main__` only. Import cycles are ill-formed
-  because the inductively-read load judgement admits no finite derivation for them (§3.2 prose).
-  Semantic change: modules that are never imported are now fully checked. This matches what a checker
-  over a source tree does in practice, but changes the status of some programs.
+- [x] **Program well-formedness (Fig. 11b).** Resolved: kept the `__main__` entry point after review;
+  the recursive load premises reach every module the program can load, and a module that is never
+  imported is not checked (§3.2 prose states this). The output context metavariable is now Gamma. The
+  for-all-modules variant was tried and reverted. Import cycles remain ill-formed because the
+  inductively-read load judgement admits no finite derivation for them.
 
 - [ ] **loads-to replaced by links (Figs. 10b, 17b).** Three defects in loads-to: its result was bound
   but discarded in both from-import rules; its skip bound was the empty name for plain imports, which
@@ -78,9 +78,11 @@ review. Figure, definition and section numbers refer to the marked-up PurePy-spe
 
 - [x] **Checker out of sync (src/check_program.py).** Resolved: deps and has_cycle deleted; cycles now
   fail during recursive loading via an in-progress stack in check_module, mirroring the inductive
-  reading; check_program checks every discovered module; loads_to renamed links with the from-import
-  ancestor loop made explicit; the discovery helper formerly called imports renamed import_targets.
-  New tests: prohibited/unused_module, prohibited/unused_descendant_import. Suite 240/240, mypy clean.
+  reading; check_program checks `__main__`, whose load premises reach the import closure; loads_to
+  renamed links with the from-import ancestor loop made explicit; the discovery helper formerly called
+  imports renamed import_targets. Tests well-formed/unused_module and
+  well-formed/unused_descendant_import pin that unreached modules are not checked. Suite 240/240,
+  mypy clean.
 
 - [ ] **math has no members (Fig. 5).** Either give it members (pi, sqrt) or drop it from the table.
 

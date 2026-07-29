@@ -188,7 +188,8 @@ a submodule; excepted are prefixes that enclose the importing module itself, whi
 when the import runs and so cannot be required to load first. A plain import makes no such exception; an
 import naming a proper descendant of the importing module, the one case where the exception would be
 forced, is prohibited outright (\secref{no-load-dependent}). Program well-formedness
-(\figref{well-formed-module}) requires every module of the program to be well-formed. The rules are
+(\figref{well-formed-module}) requires the main module to be well-formed; the load premises then reach
+every module the program can load, so a module that is never imported is not checked. The rules are
 interpreted inductively, so import cycles are ill-formed: loading a module in a cycle would require that
 module's own load derivation as a premise, and no finite derivation exists.}{The \emph{dependency graph}
 $G_{\mathcal{M}}$ of a program has an edge $(q, q')$ iff $q' \in \deps_{q}(\mathcal{M}(q))$. Every import
