@@ -119,6 +119,7 @@ which follow Python.
 \input{fig/precedence}
 
 \subsection{Modules and programs}
+\label{sec:modules-programs}
 
 A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
 (\figref{syntax-stmt}) to \emph{module bodies} $t$, of which one is a distinguished \emph{main module} named
@@ -129,17 +130,27 @@ appear neither in blocks (and hence not in function bodies) nor after the first 
 well-formedness and evaluation rules check and evaluate the statements of each body $\mathcal{M}(q)$ with the
 assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
 $\pymath{\_\_name\_\_}$ binding the runtime supplies automatically. $\mathcal{M}$ additionally always includes the predefined modules of
-\figref{predefined}, each defining exactly its listed members, and is prefix-closed: the parent of any module in $\dom(\mathcal{M})$ is itself in
+\figref{predefined}, \Replaced{whose bodies are implementation-defined and whose contexts and environments are given directly (rules \ruleName{predefined} and \ruleName{eval-predefined})}{each defining exactly its listed members}, and is prefix-closed: the parent of any module in $\dom(\mathcal{M})$ is itself in
 $\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is its \texttt{.py}
 file, each package's body is its \texttt{\_\_init\_\_.py}, and a package directory without an
 \texttt{\_\_init\_\_.py} encodes the empty body (a namespace package, PEP 420, \url{https://peps.python.org/pep-0420/}). Prefix-closure thus holds by
 construction.} The map $\mathcal{M}$ is fixed and ambient in all
-definitions that follow.
+definitions that follow\Added{, as is the name $q$ of the enclosing module in the rules that check or evaluate a single module's body}.
 
+\begin{DeletedBlock}
 \begin{definition}[Builtins context]
 $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\pyinline{builtins}}
 (\figref{predefined}).
 \end{definition}
+\end{DeletedBlock}
+
+\begin{AddedBlock}
+\begin{definition}[Predefined contexts and environments]
+For each predefined module $m$ of \figref{predefined}, the context $\Gamma_m$ binds the members listed for
+$m$, together with \pyinline{__name__}, all definitely assigned; the environment $\rho_m$ binds the same
+names to their implementation-defined values.
+\end{definition}
+\end{AddedBlock}
 
 \begin{figure}[H]
 \small
@@ -159,18 +170,37 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \label{fig:predefined}
 \end{figure}
 
-The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ and $\deps$ from individual imports to import sequences; on a module body $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively.  Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q = p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order. The module-related metafunctions are collected in Appendix~\ref{sec:aux-modules}.
+\Replaced{The metafunction $\assignsS$ extends by union from individual statements to blocks; on a module
+body $\seq{\iota}\;\seq{s}$ it acts on $\seq{s}$. Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q =
+p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order. The metafunctions $\rootOf$ and
+$\submodules$ are collected, with the class-related metafunctions, in
+Appendix~\ref{sec:aux-modules}.}{The metafunction $\assignsS$ extends by union from individual statements to
+blocks, and $\imports$ and $\deps$ from individual imports to import sequences; on a module body
+$\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively. Write $p \prefixOf q$
+(\emph{prefix}) when $q = p$ or $q = p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order. The
+module-related metafunctions are collected in Appendix~\ref{sec:aux-modules}.}
 
-The \emph{dependency graph} $G_{\mathcal{M}}$ of a program has an edge $(q, q')$ iff $q' \in
-\deps_{q}(\mathcal{M}(q))$.
-Every import depends on its target's ancestors; excepted are ancestors enclosing the importing
-module itself, which are necessarily still in progress when it runs and so cannot be required to load
-first. The exception appears only in the from-import clause because an import naming a proper descendant
-of the importing module is prohibited outright (\secref{no-load-dependent}). In the rules
-(\figref{well-formed-imports}), the exemption is the bound on the loads-to judgement, whose prefixes the walk skips:
-$\varepsilon$ for an import, the importing module for a from-import. Program well-formedness (\figref{well-formed-module}) requires the
-main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
-to be acyclic. 
+\Replaced{An import cannot run until other modules have loaded, and its rules
+(\figref{well-formed-imports}) have a load premise for each. Both import forms load their target. A plain
+import also loads every proper prefix of the target, linking each module into its parent (the links
+judgement), so that the binding for the target's root supports attribute access along the whole chain. A
+from-import likewise loads every proper prefix of its target, together with any imported name that denotes
+a submodule; excepted are prefixes that enclose the importing module itself, which may still be loading
+when the import runs and so cannot be required to load first. A plain import makes no such exception; an
+import naming a proper descendant of the importing module, the one case where the exception would be
+forced, is prohibited outright (\secref{no-load-dependent}). Program well-formedness
+(\figref{well-formed-module}) requires every module of the program to be well-formed. The rules are
+interpreted inductively, so import cycles are ill-formed: loading a module in a cycle would require that
+module's own load derivation as a premise, and no finite derivation exists.}{The \emph{dependency graph}
+$G_{\mathcal{M}}$ of a program has an edge $(q, q')$ iff $q' \in \deps_{q}(\mathcal{M}(q))$. Every import
+depends on its target's ancestors; excepted are ancestors enclosing the importing module itself, which are
+necessarily still in progress when it runs and so cannot be required to load first. The exception appears
+only in the from-import clause because an import naming a proper descendant of the importing module is
+prohibited outright (\secref{no-load-dependent}). In the rules (\figref{well-formed-imports}), the
+exemption is the bound on the loads-to judgement, whose prefixes the walk skips: $\varepsilon$ for an
+import, the importing module for a from-import. Program well-formedness (\figref{well-formed-module})
+requires the main module to be well-formed (which recursively requires its imports to be well-formed) and
+$G_{\mathcal{M}}$ to be acyclic.}
 
 \subsection{Well-formedness}
 
