@@ -134,7 +134,7 @@ $\pymath{\_\_name\_\_}$ binding the runtime supplies automatically. $\mathcal{M}
 $\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is its \texttt{.py}
 file, each package's body is its \texttt{\_\_init\_\_.py}, and a package directory without an
 \texttt{\_\_init\_\_.py} encodes the empty body (a namespace package, PEP 420, \url{https://peps.python.org/pep-0420/}). Prefix-closure thus holds by
-construction.} The map $\mathcal{M}$ is fixed and ambient in all
+construction.} \Added{A module with submodules is a \emph{package}.} The map $\mathcal{M}$ is fixed and ambient in all
 definitions that follow\Added{, as is the name $q$ of the enclosing module in the rules that check or evaluate a single module's body}.
 
 \begin{DeletedBlock}
