@@ -14,10 +14,10 @@ $e$ & $::=$ & $x$ & (Var) \\
     & $\mid$ & $\exCondExpr{e_1}{e}{e_2}$ & (CondExpr) \\
     & $\mid$ & $\exList{e_1, \ldots, e_n}$ & (List) \\
     & $\mid$ & $\exTuple{e_1, \ldots, e_n}$ & (Tuple) \\
-    & $\mid$ & $\exListComp{e}{\added{g_1\;\ldots\;g_n}\deleted{q_1\;\ldots\;q_n}}$ & (ListComp) \\
+    & $\mid$ & $\exListComp{e}{g_1\;\ldots\;g_n}$ & (ListComp) \\
     & $\mid$ & $\exLambda{x_1, \ldots, x_n}{e}$ & (Lambda)
    \\[3mm]
-$\added{g}\deleted{q}$ & $::=$ & $\qualGuard{e}$ & (Guard) \\
+$g$ & $::=$ & $\qualGuard{e}$ & (Guard) \\
     & $\mid$ & $\qualGenerator{x}{e}$ & (Generator)
    \\[3mm]
 $\ell$ & $::=$ & $n$ & (Number) \\

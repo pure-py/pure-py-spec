@@ -3,15 +3,9 @@
 \centering
 \small
 \begin{align*}
-{\color{deletedgray}\imports(\exImport{q})} &\; {\color{deletedgray}= \set{q}} \\
-{\color{deletedgray}\imports(\exFromImport{q}{x_1, \ldots, x_{n+1}})} &\; {\color{deletedgray}= \set{q} \cup \set{q.x_i \mid x_i \in \dom(\submodules(q))}} \\
-\\
-{\color{deletedgray}\deps_{q}(\exImport{q'})} &\; {\color{deletedgray}= \imports(\exImport{q'}) \cup \set{p \mid p \properPrefixOf q', p \neq q}} \\
-{\color{deletedgray}\deps_{q}(\exFromImport{q'}{\seq{x}})} &\; {\color{deletedgray}= \imports(\exFromImport{q'}{\seq{x}}) \cup \set{p \mid p \properPrefixOf q', p \not\prefixOf q}} \\
-\\
 \submodules(q) &= \set{\bind{x}{\modStub{q.x}} \mid q.x \in \dom(\mathcal{M})}
 \end{align*}
-\subcaption{\added{$\submodules$ metafunction}\deleted{$\imports$, $\deps$, and $\submodules$ metafunctions}}
+\subcaption{$\submodules$ metafunction}
 \end{subfigure}
 
 \vspace{2mm}
@@ -32,6 +26,6 @@
 \subcaption{$\ownFields$, $\fields$, and $\ancestors$ metafunctions}
 \end{subfigure}
 
-\caption{\added{Module and class metafunctions}\deleted{Module-related metafunctions}}
+\caption{Module and class metafunctions}
 \label{fig:modules}
 \end{figure}
