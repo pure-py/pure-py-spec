@@ -146,10 +146,10 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 
 \begin{AddedBlock}
 \begin{definition}[Predefined contexts and environments]
-The semantics is parameterised by a context $\Gamma_m$ and an environment $\rho_m$ for each predefined
-module $m$ of \figref{predefined}: $\Gamma_m$ binds the members listed for $m$, together with
-\pyinline{__name__}, all definitely assigned, and $\rho_m$ binds the same names to implementation-defined
-values. The rules \ruleName{predefined} and \ruleName{eval-predefined} read off these parameters.
+For each predefined module $q$ of \figref{predefined}, the context $\Gamma_q$ binds the members listed for
+$q$, together with \pyinline{__name__}, all definitely assigned. The dynamic semantics is parameterised by
+an environment $\rho_q$ for each such $q$, binding the same names to implementation-defined values. The
+rules \ruleName{predefined} and \ruleName{eval-predefined} read off $\Gamma_q$ and $\rho_q$.
 \end{definition}
 \end{AddedBlock}
 
