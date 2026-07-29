@@ -21,12 +21,12 @@ def prefix_of(p: str, q: str) -> bool:
 def proper_prefix_of(p: str, q: str) -> bool:
     return p != q and prefix_of(p, q)
 
-def links(q: str, theta: ContextEntry, ctx: ModuleContext) -> ContextEntry:
+def loads_as(q: str, theta: ContextEntry, ctx: ModuleContext) -> ContextEntry:
     if '.' not in q:
         return theta
     parent, x = q.rsplit('.', 1)
     parent_ctx = check_module(ctx.M[parent], ctx.M, parent)
-    return links(parent, ModuleLoaded(parent, extend_context(parent_ctx, {x: theta})), ctx)
+    return loads_as(parent, ModuleLoaded(parent, extend_context(parent_ctx, {x: theta})), ctx)
 
 def proper_prefixes(q: str) -> list[str]:
     parts = q.split('.')
@@ -49,7 +49,7 @@ def import_bindings(s: ast.stmt, ctx: ModuleContext) -> Context:
         if proper_prefix_of(ctx.q, q):
             raise IllFormedModule(s, reasons.OwnDescendantImport(q, ctx.q))
         delta = check_module(ctx.M[q], ctx.M, q)
-        return {q.split('.')[0]: links(q, ModuleLoaded(q, delta), ctx)}
+        return {q.split('.')[0]: loads_as(q, ModuleLoaded(q, delta), ctx)}
     assert isinstance(s, ast.ImportFrom)
     if len(s.names) == 0:
         raise IllFormedModule(s, reasons.EmptyFromImport())

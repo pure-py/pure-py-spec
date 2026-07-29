@@ -75,7 +75,7 @@
   q' = x \cons \seq{x} \\
   q \not\properPrefixOf q' \\
   \vdash_{\mathsf{load}} q' : \Delta \\
-  \added{q', \modLoaded{q'}{\Delta} \linksTo \theta}\deleted{\varepsilon, q', \modLoaded{q'}{\Delta} \loadsTo \theta} \\
+  \added{q', \modLoaded{q'}{\Delta} \loadsAs \theta}\deleted{\varepsilon, q', \modLoaded{q'}{\Delta} \loadsTo \theta} \\
   \vdash \seq{\iota} : \Gamma
 }
 {
@@ -101,7 +101,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$q, \theta \linksTo \theta'$} \quad {\color{deletedgray}\shadebox{$\seq{x}, q, \theta \loadsTo \theta'$}}
+\flushleft \shadebox{$q, \theta \loadsAs \theta'$} \quad {\color{deletedgray}\shadebox{$\seq{x}, q, \theta \loadsTo \theta'$}}
 \begin{mathpar}
 \small
 {\color{deletedgray}
@@ -134,25 +134,25 @@
 }}
 \and
 {\color{blue}
-\inferrule*[lab={\ruleName{links-simple}}]
+\inferrule*[lab={\ruleName{loads-as-simple}}]
 {
   \strut
 }
 {
-  x, \theta \linksTo \theta
+  x, \theta \loadsAs \theta
 }}
 \and
 {\color{blue}
-\inferrule*[lab={\ruleName{links-qualified}}]
+\inferrule*[lab={\ruleName{loads-as-qualified}}]
 {
   \vdash_{\mathsf{load}} q : \Gamma' \\
-  q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \linksTo \theta'
+  q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsAs \theta'
 }
 {
-  q.x, \theta \linksTo \theta'
+  q.x, \theta \loadsAs \theta'
 }}
 \end{mathpar}
-\subcaption{\added{Reference $\theta$ for module $q$ links to the reference $\theta'$ for the root of $q$, loading the proper prefixes of $q$}\deleted{Loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}}
+\subcaption{\added{Reference $\theta$ for module $q$ loads as the reference $\theta'$ for the root of $q$, loading the proper prefixes of $q$}\deleted{Loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}}
 \end{subfigure}
 \caption{Import well-formedness}
 \label{fig:well-formed-imports}

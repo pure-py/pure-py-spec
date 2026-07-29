@@ -27,12 +27,12 @@ review. Figure, definition and section numbers refer to the marked-up PurePy-spe
   for-all-modules variant was tried and reverted. Import cycles remain ill-formed because the
   inductively-read load judgement admits no finite derivation for them.
 
-- [ ] **loads-to replaced by links (Figs. 10b, 17b).** Three defects in loads-to: its result was bound
+- [ ] **loads-to replaced by loads-as (Figs. 10b, 17b).** Three defects in loads-to: its result was bound
   but discarded in both from-import rules; its skip bound was the empty name for plain imports, which
   the grammar of q does not include, so `q <= epsilon` was ill-typed; and the enclosing rule never
-  produced a value that was used. The new links judgement has two rules, no bound, and is used only by
-  plain import to build the binding for the target's root, loading each proper prefix and linking each
-  module into its parent.
+  produced a value that was used. The new loads-as judgement has two rules, no bound, and is used only by
+  plain import to build the binding for the target's root, loading each proper prefix and recording each
+  module as a member of its parent.
 
 - [ ] **from-import loads ancestors directly (Figs. 10a, 17a).** The rule now has an explicit premise
   loading each proper prefix of the target not enclosing the importing module. The premise is kept in
@@ -47,7 +47,7 @@ review. Figure, definition and section numbers refer to the marked-up PurePy-spe
 
 - [ ] **Rule-name deduplication (Figs. 16, 17).** The dynamic figures reused the static rule names
   verbatim (imp-nil, imp-member, imp-submodule, loads-to-*). Dynamic rules now carry eval- prefixes
-  (eval-imp-member, eval-imp-submodule, eval-links-simple, eval-links-qualified), consistent with the
+  (eval-imp-member, eval-imp-submodule, eval-loads-as-simple, eval-loads-as-qualified), consistent with the
   other evaluation figures.
 
 - [ ] **Stray turnstile dropped (Fig. 17a).** The import-prefix evaluation judgement was written
@@ -65,7 +65,7 @@ review. Figure, definition and section numbers refer to the marked-up PurePy-spe
   correspondence stated in §4 was vacuous on entry shapes. The value judgement is now `v : theta`:
   ordinary values at tt, module references and class entries at the corresponding entry.
   val-mod-loaded also drops its load premise, which was wrong for entries extended with submodule
-  bindings by links or by repeated imports. A short prose introduction precedes Fig. 15.
+  bindings by loads-as or by repeated imports. A short prose introduction precedes Fig. 15.
 
 - [ ] **Program result documented (§4, Fig. 18b).** `M => n` had an unexplained n that is always 0. A
   prose sentence now documents the result as the program's exit status; sys.exit remains unmodelled.
@@ -82,7 +82,7 @@ review. Figure, definition and section numbers refer to the marked-up PurePy-spe
 - [x] **Checker out of sync (src/check_program.py).** Resolved: deps and has_cycle deleted; cycles now
   fail during recursive loading via an in-progress stack in check_module, mirroring the inductive
   reading; check_program checks `__main__`, whose load premises reach the import closure; loads_to
-  renamed links with the from-import ancestor loop made explicit; the discovery helper formerly called
+  renamed loads_as with the from-import ancestor loop made explicit; the discovery helper formerly called
   imports renamed import_targets. Tests well-formed/unused_module and
   well-formed/unused_descendant_import pin that unreached modules are not checked. Suite 240/240,
   mypy clean.
