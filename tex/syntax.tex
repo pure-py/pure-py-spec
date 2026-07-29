@@ -180,14 +180,14 @@ $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively. Wr
 module-related metafunctions are collected in Appendix~\ref{sec:aux-modules}.}
 
 \Replaced{Loading a module may require other modules to load first
-(\figref{well-formed-imports}); both import forms load their target. A plain import also loads every
-proper prefix of the target and records each module as a member of its parent (the loads-as judgement), so that the
-binding created for the target's root supports attribute access along the whole chain. A from-import also
-loads the proper prefixes of its target, together with any imported name that denotes a submodule, but not
-one that is also an ancestor of the importing module, because an ancestor may still be loading when the
-import runs and so cannot be required to load first. A plain import has no corresponding exception,
-because the only prefix that could never load first is the importing module itself, and an import naming a
-proper descendant of the importing module is prohibited outright (\secref{no-load-dependent}). Program
+(\figref{well-formed-imports}). Both import forms load their target, together with its proper prefixes,
+the packages that enclose it. A plain import also records each of these packages as a member of its parent
+(the loads-as judgement), so that the binding created for the root of the target gives attribute access
+along the whole chain. A from-import also loads any imported name that denotes a submodule. A prefix that
+is an ancestor of the importing module is exempt from loading first, because such an ancestor may still be
+loading when the import runs. The exemption applies only to from-imports, because for a plain import the
+only prefix that could never load first is the importing module itself, and an import naming a proper
+descendant of the importing module is prohibited outright (\secref{no-load-dependent}). Program
 well-formedness (\figref{well-formed-module}) requires the main module to be well-formed and hence,
 recursively, every module the program can load; a module that is never imported is not checked. The rules
 are interpreted inductively, so a program with an import cycle is ill-formed, because a module in a cycle
