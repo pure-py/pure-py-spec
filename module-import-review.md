@@ -16,7 +16,10 @@ review. Figure, definition and section numbers refer to the marked-up PurePy-spe
   enclosing-ancestor exception "appears only in the from-import clause". The clause was vacuous for
   well-formed programs and mattered only for modules nobody imports, where treatment was inconsistent:
   in a never-imported module `u`, `import u.sub` slipped through while `from u import z` was rejected.
-  All three are deleted along with the acyclicity premise of rule program (Fig. 11b).
+  All three are deleted along with the acyclicity premise of rule program (Fig. 11b). Residual
+  behaviour change now that the `__main__` entry point is kept: the old graph ranged over all of dom(M),
+  so a cycle among never-imported modules was rejected; such modules are now not examined at all
+  (tests well-formed/unused_module, well-formed/unused_descendant_import).
 
 - [x] **Program well-formedness (Fig. 11b).** Resolved: kept the `__main__` entry point after review;
   the recursive load premises reach every module the program can load, and a module that is never
