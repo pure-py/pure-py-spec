@@ -71,7 +71,7 @@ TY_ASSIGNS = TyAssigns()
 
 PREDEFINED_MEMBERS: dict[str, set[str]] = {
     'builtins': {'print', 'len', 'range'},
-    'math': set(),
+    'math': {'pi', 'e', 'sqrt', 'exp', 'log', 'sin', 'cos', 'tan', 'floor', 'ceil'},
     'sys': {'argv', 'exit'},
     'typing': {'Any'},
     'dataclasses': {'dataclass'},

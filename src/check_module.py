@@ -21,14 +21,16 @@ def prefix_of(p: str, q: str) -> bool:
 def proper_prefix_of(p: str, q: str) -> bool:
     return p != q and prefix_of(p, q)
 
-def loads_to(bound: str, q: str, theta: ContextEntry, ctx: ModuleContext) -> ContextEntry:
+def loads_as(q: str, theta: ContextEntry, ctx: ModuleContext) -> ContextEntry:
     if '.' not in q:
         return theta
     parent, x = q.rsplit('.', 1)
-    if prefix_of(parent, bound):
-        return theta
     parent_ctx = check_module(ctx.M[parent], ctx.M, parent)
-    return loads_to(bound, parent, ModuleLoaded(parent, extend_context(parent_ctx, {x: theta})), ctx)
+    return loads_as(parent, ModuleLoaded(parent, extend_context(parent_ctx, {x: theta})), ctx)
+
+def proper_prefixes(q: str) -> list[str]:
+    parts = q.split('.')
+    return ['.'.join(parts[:i]) for i in range(1, len(parts))]
 
 def imports(s: ast.ImportFrom, gamma_src: Context, ctx: ModuleContext) -> Context:
     assert s.module is not None
@@ -47,7 +49,7 @@ def import_bindings(s: ast.stmt, ctx: ModuleContext) -> Context:
         if proper_prefix_of(ctx.q, q):
             raise IllFormedModule(s, reasons.OwnDescendantImport(q, ctx.q))
         delta = check_module(ctx.M[q], ctx.M, q)
-        return {q.split('.')[0]: loads_to('', q, ModuleLoaded(q, delta), ctx)}
+        return {q.split('.')[0]: loads_as(q, ModuleLoaded(q, delta), ctx)}
     assert isinstance(s, ast.ImportFrom)
     if len(s.names) == 0:
         raise IllFormedModule(s, reasons.EmptyFromImport())
@@ -55,7 +57,9 @@ def import_bindings(s: ast.stmt, ctx: ModuleContext) -> Context:
     if s.module not in ctx.M:
         raise IllFormedModule(s, reasons.UnknownModule(s.module))
     delta = check_module(ctx.M[s.module], ctx.M, s.module)
-    loads_to(ctx.q, s.module, ModuleLoaded(s.module, delta), ctx)
+    for p in proper_prefixes(s.module):
+        if not prefix_of(p, ctx.q):
+            check_module(ctx.M[p], ctx.M, p)
     return imports(s, delta, ctx)
 
 def submodules(M: dict[str, ast.Module], q: str) -> Context:
@@ -78,46 +82,26 @@ def own_members(body: list[ast.stmt], q: str) -> set[str]:
         return PREDEFINED_MEMBERS[q]
     return assigns_block(body) | {s.name for s in body if isinstance(s, ast.ClassDef)}
 
-def has_cycle(graph: dict[str, set[str]]) -> list[str]:
-    WHITE, GRAY, BLACK = 0, 1, 2
-    color: dict[str, int] = {n: WHITE for n in graph}
-    stack: list[str] = []
-
-    def visit(node: str) -> list[str]:
-        color[node] = GRAY
-        stack.append(node)
-        for neighbour in graph.get(node, set()):
-            if color.get(neighbour, WHITE) == GRAY:
-                idx = stack.index(neighbour)
-                return stack[idx:] + [neighbour]
-            if color.get(neighbour, WHITE) == WHITE:
-                cycle = visit(neighbour)
-                if len(cycle) > 0:
-                    return cycle
-        stack.pop()
-        color[node] = BLACK
-        return []
-
-    for node in graph:
-        if color[node] == WHITE:
-            cycle = visit(node)
-            if len(cycle) > 0:
-                return cycle
-    return []
-
 _module_contexts: dict[tuple[int, str], Context] = {}
+_loading: list[tuple[int, str]] = []
 
 def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     key = (id(M), q)
     cached = _module_contexts.get(key)
     if cached is not None:
         return cached
+    if key in _loading:
+        cycle = [name for _, name in _loading[_loading.index(key):]] + [q]
+        raise IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
+    _loading.append(key)
     try:
         result = check_module_(m, M, q)
     except IllFormedModule as e:
         if e.module is None:
             e.module = q
         raise
+    finally:
+        _loading.pop()
     _module_contexts[key] = result
     return result
 
@@ -173,20 +157,12 @@ def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> Optional[I
     except IllFormed as e:
         return e
 
-def imported_modules(tree: ast.Module) -> set[str]:
-    return ({a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
-            | {n.module for n in ast.walk(tree)
-               if isinstance(n, ast.ImportFrom) and n.module is not None})
-
 def check_file(filename: str) -> Optional[IllFormed]:
     source = open(filename).read()
     tree = ast.parse(source, filename=filename)
     annotate_seq_kinds(tree, source)
     M: dict[str, ast.Module] = {p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES}
     M['__main__'] = tree
-    cycle = has_cycle({'__main__': imported_modules(tree)})
-    if len(cycle) > 0:
-        return IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
     return module_result(tree, M, '__main__')
 
 def format_result(result: Optional[IllFormed], filename: str) -> str:

@@ -1,36 +1,28 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma, \seq{x} \importsR \Gamma'$}
+\flushleft \shadebox{$\Gamma, x \importsR \theta$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{imp-nil}}]
-{
-  \strut
-}
-{
-  \Gamma, \varepsilon \importsR \varnothing
-}
-\and
+
 \inferrule*[lab={\ruleName{imp-member}}]
 {
-  \Gamma \vdash x \names \theta \\
-  \Gamma, \seq{x} \importsR \Gamma'
+  \Gamma \vdash x \names \theta
 }
 {
-  \Gamma, x \cons \seq{x} \importsR \set{\bind{x}{\theta}} \override \Gamma'
+  \Gamma, x \importsR \theta
 }
 \and
+
 \inferrule*[lab={\ruleName{imp-submodule}}]
 {
   \bind{x}{\modStub{q}} \in \Gamma \\
-  \vdash_{\mathsf{load}} q : \Delta \\
-  \Gamma, \seq{x} \importsR \Gamma'
+  \vdash_{\mathsf{load}} q : \Delta
 }
 {
-  \Gamma, x \cons \seq{x} \importsR \set{\bind{x}{\modLoaded{q}{\Delta}}} \override \Gamma'
+  \Gamma, x \importsR \modLoaded{q}{\Delta}
 }
 \end{mathpar}
 
-\caption{Names $\seq{x}$ imported from module context $\Gamma$ produce bindings $\Gamma'$}
+\caption{Name $x$ imported from module context $\Gamma$ has entry $\theta$}
 \label{fig:imports}
 \end{figure}
 
@@ -53,7 +45,7 @@
   q' = x \cons \seq{x} \\
   q \not\properPrefixOf q' \\
   \vdash_{\mathsf{load}} q' : \Delta \\
-  \varepsilon, q', \modLoaded{q'}{\Delta} \loadsTo \theta \\
+  q', \modLoaded{q'}{\Delta} \loadsAs \theta \\
   \vdash \seq{\iota} : \Gamma
 }
 {
@@ -63,12 +55,12 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q' : \Delta \\
-  q, q', \modLoaded{q'}{\Delta} \loadsTo \theta \\
-  \Delta, \seq{x} \importsR \Gamma' \\
+  \vdash_{\mathsf{load}} p : \Delta_p \quad (\forall p \properPrefixOf q',\; p \not\prefixOf q) \\
+  \Delta, x_i \importsR \theta_i \quad (\forall i) \\
   \vdash \seq{\iota} : \Gamma
 }
 {
-  \vdash \exFromImport{q'}{\seq{x}} \cons \seq{\iota} : \Gamma' \extend \Gamma
+  \vdash \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} : \set{\bind{x_1}{\theta_1}, \ldots, \bind{x_{n+1}}{\theta_{n+1}}} \extend \Gamma
 }
 
 \end{mathpar}
@@ -79,37 +71,29 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\seq{x}, q, \theta \loadsTo \theta'$}
+\flushleft \shadebox{$q, \theta \loadsAs \theta'$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{loads-to-simple}}]
+
+\inferrule*[lab={\ruleName{loads-as-simple}}]
 {
   \strut
 }
 {
-  \seq{x}, x, \theta \loadsTo \theta
-}
-\and
-\inferrule*[lab={\ruleName{loads-to-qualified}}]
-{
-  q \not\prefixOf \seq{x} \\
-  \vdash_{\mathsf{load}} q : \Gamma' \\
-  \seq{x}, q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsTo \theta'
-}
-{
-  \seq{x}, q.x, \theta \loadsTo \theta'
+  x, \theta \loadsAs \theta
 }
 \and
 
-\inferrule*[lab={\ruleName{loads-to-enclosing}}]
+\inferrule*[lab={\ruleName{loads-as-qualified}}]
 {
-  q \prefixOf \seq{x}
+  \vdash_{\mathsf{load}} q : \Gamma' \\
+  q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsAs \theta'
 }
 {
-  \seq{x}, q.x, \theta \loadsTo \theta
+  q.x, \theta \loadsAs \theta'
 }
 \end{mathpar}
-\subcaption{Loaded reference $\theta$ for module $q$ loads to the reference for the head of $q$}
+\subcaption{Reference $\theta$ for module $q$ loads as the reference $\theta'$ for the root of $q$, loading the ancestors of $q$}
 \end{subfigure}
 \caption{Import well-formedness}
 \label{fig:well-formed-imports}
@@ -172,6 +156,15 @@
 \begin{mathpar}
 \small
 
+
+\inferrule*[lab={\ruleName{predefined}}]
+{
+  q \text{ predefined}
+}
+{
+  \vdash_{\mathsf{load}} q : \Gamma_q
+}
+\and
 \inferrule*[lab={\ruleName{module}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
@@ -190,8 +183,7 @@
 \small
 \inferrule*[lab={\ruleName{program}}]
 {
-  \vdash_{\mathsf{load}} \pymath{\_\_main\_\_} : \Delta \\
-  G_{\mathcal{M}} \text{ acyclic}
+  \vdash_{\mathsf{load}} \pymath{\_\_main\_\_} : \Gamma
 }
 {
   \vdash \mathcal{M}

@@ -119,6 +119,7 @@ which follow Python.
 \input{fig/precedence}
 
 \subsection{Modules and programs}
+\label{sec:modules-programs}
 
 A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
 (\figref{syntax-stmt}) to \emph{module bodies} $t$, of which one is a distinguished \emph{main module} named
@@ -129,19 +130,22 @@ appear neither in blocks (and hence not in function bodies) nor after the first 
 well-formedness and evaluation rules check and evaluate the statements of each body $\mathcal{M}(q)$ with the
 assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
 $\pymath{\_\_name\_\_}$ binding the runtime supplies automatically. $\mathcal{M}$ additionally always includes the predefined modules of
-\figref{predefined}, each defining exactly its listed members, and is prefix-closed: the parent of any module in $\dom(\mathcal{M})$ is itself in
+\figref{predefined}, which have no body and whose contexts and environments are given directly (Definition~\ref{def:predefined}), and is prefix-closed: the parent of any module in $\dom(\mathcal{M})$ is itself in
 $\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is its \texttt{.py}
 file, each package's body is its \texttt{\_\_init\_\_.py}, and a package directory without an
 \texttt{\_\_init\_\_.py} encodes the empty body (a namespace package, PEP 420, \url{https://peps.python.org/pep-0420/}). Prefix-closure thus holds by
 construction.} The map $\mathcal{M}$ is fixed and ambient in all
-definitions that follow.
+definitions that follow, as is the name $q$ of the enclosing module in the rules that check or evaluate a single module's body.
 
-\begin{definition}[Builtins context]
-$\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\pyinline{builtins}}
-(\figref{predefined}).
+
+\begin{definition}[Predefined contexts and environments]
+\label{def:predefined}
+For each predefined module $q$ of \figref{predefined}, the context $\Gamma_q$ binds the members listed for
+$q$, together with \pyinline{__name__}, all definitely assigned. The dynamic semantics is parameterised by
+an environment $\rho_q$ for each such $q$, binding the same names to implementation-defined values.
 \end{definition}
 
-\begin{figure}[H]
+\begin{figure}
 \small
 \centering
 \begin{tabular}{lp{0.6\textwidth}}
@@ -149,7 +153,7 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \textbf{Module} & \textbf{Members} \\
 \hline
 \textup{\pyinline{builtins}} & \pyinline{print}, \pyinline{len}, \pyinline{range} \\
-\pyinline{math} & \\
+\pyinline{math} & \pyinline{pi}, \pyinline{e}, \pyinline{sqrt}, \pyinline{exp}, \pyinline{log}, \pyinline{sin}, \pyinline{cos}, \pyinline{tan}, \pyinline{floor}, \pyinline{ceil} \\
 \pyinline{sys} & \pyinline{argv}, \pyinline{exit} \\
 \pyinline{typing} & \pyinline{Any} \\
 \pyinline{dataclasses} & \pyinline{dataclass} \\
@@ -159,18 +163,27 @@ $\Gamma_{\pymath{builtins}}$ binds the names of the predefined module \textup{\p
 \label{fig:predefined}
 \end{figure}
 
-The metafunction $\assignsS$ extends by union from individual statements to blocks, and $\imports$ and $\deps$ from individual imports to import sequences; on a module body $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively.  Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q = p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order. The module-related metafunctions are collected in Appendix~\ref{sec:aux-modules}.
+The metafunction $\assignsS$ extends by union from individual statements to blocks; on a module
+body $\seq{\iota}\;\seq{s}$ it acts on $\seq{s}$. Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q =
+p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order; the proper prefixes of a module name
+are its \emph{ancestors}. The $\submodules$ metafunction is
+defined, with the class-related metafunctions, in Appendix~\ref{sec:aux-modules}.
 
-The \emph{dependency graph} $G_{\mathcal{M}}$ of a program has an edge $(q, q')$ iff $q' \in
-\deps_{q}(\mathcal{M}(q))$.
-Every import depends on its target's ancestors; excepted are ancestors enclosing the importing
-module itself, which are necessarily still in progress when it runs and so cannot be required to load
-first. The exception appears only in the from-import clause because an import naming a proper descendant
-of the importing module is prohibited outright (\secref{no-load-dependent}). In the rules
-(\figref{well-formed-imports}), the exemption is the bound on the loads-to judgement, whose prefixes the walk skips:
-$\varepsilon$ for an import, the importing module for a from-import. Program well-formedness (\figref{well-formed-module}) requires the
-main module to be well-formed (which recursively requires its imports to be well-formed) and $G_{\mathcal{M}}$
-to be acyclic. 
+In this section, loading a module means checking its body and computing its member context
+(\figref{well-formed-module}), the static counterpart of run-time loading (\secref{opsem}). Both
+import forms load their target, together with its ancestors
+(\figref{well-formed-imports}). A plain import also records each of these modules as a member of its
+parent (the loads-as judgement), so that the binding created for the root of the target gives attribute
+access along the whole chain. A from-import also loads any imported name that denotes a submodule. An
+ancestor of the target is exempt from loading first if it is the importing module or one of its
+ancestors, since at run time it may still be loading. The exemption applies only to from-imports, because
+for a plain import
+the only ancestor that could never load first is the importing module itself, and an import naming a proper
+descendant of the importing module is prohibited outright (\secref{no-load-dependent}). Loading a module
+may thus require other modules to load first; the rules are interpreted inductively, so a program with an
+import cycle is ill-formed, because a module in a cycle could finish loading only after itself. Program
+well-formedness (\figref{well-formed-module}) requires the main module to be well-formed and hence,
+recursively, every module the program can load; a module that is never imported is not checked.
 
 \subsection{Well-formedness}
 
