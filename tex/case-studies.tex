@@ -1,0 +1,27 @@
+\section{Case studies}
+\label{sec:case-studies}
+
+This section reports two research languages for scientific computing that share \PurePy's Python-like surface:
+\Fortl and \Fluid. \todo{Is there a way to do this without deanonymising the paper?}
+
+\subsection{\Fortl}
+\label{sec:cs-fortl}
+
+\Fortl is a statically-typed research language for scientific and numerical computing, with a Python-like
+syntax. Its distinctive feature is a system of graded numerical types: types are indexed and carry structure,
+so domain concepts such as units of measure and physical quantities are expressed in the types and enforced by
+the type checker. A length divided by a time is typed as a speed, and a program that mixes incompatible units
+is rejected. \Fortl aims to let code state the meaning, intent, and limitations of a scientific model, and to
+make its predictions reproducible and connected to their abstract description. \todo{Confirm and describe the
+relationship to \PurePy}
+
+\subsection{\Fluid}
+\label{sec:cs-fluid}
+
+\Fluid is a pure, Pythonic, provenance-aware functional language for transparent research outputs. It is built
+on \PurePy, adding a runtime that records fine-grained dependencies between a computation's inputs and its
+outputs, so that a figure or value can be linked back to the data it was computed from. \Fluid supports pattern
+matching, destructuring, and partial application, and is aimed at researchers who need both computation and
+verifiable transparency. As a case study it exercises \PurePy as the functional core beneath a substantial
+additional runtime, and its surface motivates the partial-application and piecewise extensions of
+\secref{extensions}.

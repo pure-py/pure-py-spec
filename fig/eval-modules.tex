@@ -1,46 +1,36 @@
 \begin{figure}
-\flushleft \shadebox{$\rho, \seq{x} \importsR \rho'$}
+\flushleft \shadebox{$\rho, x \importsR v$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{imp-nil}}]
-{
-  \strut
-}
-{
-  \rho, \varepsilon \importsR \varnothing
-}
-\and
 
-\inferrule*[lab={\ruleName{imp-member}}]
+\inferrule*[lab={\ruleName{eval-imp-member}}]
 {
   \bind{x}{v} \in \rho \\
-  v \neq \modStub{q'} \quad (\forall q') \\
-  \rho, \seq{x} \importsR \rho'
+  v \neq \modStub{q'} \quad (\forall q')
 }
 {
-  \rho, x \cons \seq{x} \importsR \set{\bind{x}{v}} \override \rho'
+  \rho, x \importsR v
 }
 \and
 
-\inferrule*[lab={\ruleName{imp-submodule}}]
+\inferrule*[lab={\ruleName{eval-imp-submodule}}]
 {
   \bind{x}{\modStub{q'}} \in \rho \\
-  q' \Rightarrow_{\mathsf{load}} \rho'' \\
-  \rho, \seq{x} \importsR \rho'
+  q' \Rightarrow_{\mathsf{load}} \rho'
 }
 {
-  \rho, x \cons \seq{x} \importsR \set{\bind{x}{\modLoaded{q'}{\rho''}}} \override \rho'
+  \rho, x \importsR \modLoaded{q'}{\rho'}
 }
 
 \end{mathpar}
 
-\caption{Names $\seq{x}$ imported from module environment $\rho$ produce bindings $\rho'$}
+\caption{Name $x$ imported from module environment $\rho$ has value $v$}
 \label{fig:eval-imports}
 \end{figure}
 
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash \seq{\iota} \Rightarrow \rho$}
+\flushleft \shadebox{$\seq{\iota} \Rightarrow \rho$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-imports-nil}}]
@@ -48,7 +38,7 @@
   \strut
 }
 {
-  \vdash \varepsilon \Rightarrow \varnothing
+   \varepsilon \Rightarrow \varnothing
 }
 \and
 
@@ -56,22 +46,22 @@
 {
   q' = x \cons \seq{x} \\
   q' \Rightarrow_{\mathsf{load}} \rho \\
-  \varepsilon, q', \modLoaded{q'}{\rho} \loadsTo v \\
-  \vdash \seq{\iota} \Rightarrow \rho'
+  q', \modLoaded{q'}{\rho} \loadsAs v \\
+   \seq{\iota} \Rightarrow \rho'
 }
 {
-  \vdash \exImport{q'} \cons \seq{\iota} \Rightarrow \set{\bind{x}{v}} \extend \rho'
+   \exImport{q'} \cons \seq{\iota} \Rightarrow \set{\bind{x}{v}} \extend \rho'
 }
 \and
 \inferrule*[lab={\ruleName{eval-from-import}}]
 {
   q' \Rightarrow_{\mathsf{load}} \rho \\
-  q, q', \modLoaded{q'}{\rho} \loadsTo v \\
-  \rho, \seq{x} \importsR \rho' \\
-  \vdash \seq{\iota} \Rightarrow \rho''
+  p \Rightarrow_{\mathsf{load}} \rho_p \quad (\forall p \properPrefixOf q',\; p \not\prefixOf q) \\
+  \rho, x_i \importsR v_i \quad (\forall i) \\
+   \seq{\iota} \Rightarrow \rho''
 }
 {
-  \vdash \exFromImport{q'}{\seq{x}} \cons \seq{\iota} \Rightarrow \rho' \extend \rho''
+   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \set{\bind{x_1}{v_1}, \ldots, \bind{x_{n+1}}{v_{n+1}}} \extend \rho''
 }
 
 \end{mathpar}
@@ -82,37 +72,29 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\seq{x}, q, v \loadsTo v'$}
+\flushleft \shadebox{$q, v \loadsAs v'$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{loads-to-simple}}]
+
+\inferrule*[lab={\ruleName{eval-loads-as-simple}}]
 {
   \strut
 }
 {
-  \seq{x}, x, v \loadsTo v
-}
-\and
-\inferrule*[lab={\ruleName{loads-to-qualified}}]
-{
-  q \not\prefixOf \seq{x} \\
-  q \Rightarrow_{\mathsf{load}} \rho \\
-  \seq{x}, q, \modLoaded{q}{\rho \extend \set{\bind{x}{v}}} \loadsTo v'
-}
-{
-  \seq{x}, q.x, v \loadsTo v'
+  x, v \loadsAs v
 }
 \and
 
-\inferrule*[lab={\ruleName{loads-to-enclosing}}]
+\inferrule*[lab={\ruleName{eval-loads-as-qualified}}]
 {
-  q \prefixOf \seq{x}
+  q \Rightarrow_{\mathsf{load}} \rho \\
+  q, \modLoaded{q}{\rho \extend \set{\bind{x}{v}}} \loadsAs v'
 }
 {
-  \seq{x}, q.x, v \loadsTo v
+  q.x, v \loadsAs v'
 }
 \end{mathpar}
-\subcaption{Loaded reference $v$ for module $q$ loads to the reference for the head of $q$}
+\subcaption{Reference $v$ for module $q$ loads as the reference $v'$ for the root of $q$, loading the ancestors of $q$}
 \end{subfigure}
 \caption{Import evaluation}
 \label{fig:eval-import-prefix}
@@ -168,10 +150,19 @@
 \begin{mathpar}
 \small
 
+
+\inferrule*[lab={\ruleName{eval-predefined}}]
+{
+  q \text{ predefined}
+}
+{
+  q \Rightarrow_{\mathsf{load}} \rho_q
+}
+\and
 \inferrule*[lab={\ruleName{load}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
-  \vdash \seq{\iota} \Rightarrow \rho \\
+   \seq{\iota} \Rightarrow \rho \\
   \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} \Rightarrow \rho'
 }
 {

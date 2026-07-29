@@ -1,22 +1,19 @@
-\documentclass{scrartcl}
+% \anonmode adds the acmart anonymous option and an anonymised title.
+\ifdefined\anonmode
+  \documentclass[acmsmall,anonymous]{acmart}
+\else
+  \documentclass[acmsmall]{acmart}
+\fi
 
-\usepackage{amsmath}
+% acmart loads amsmath, amssymb, amsthm, microtype, xcolor, hyperref, natbib, enumitem.
 \usepackage{array}
-\usepackage{amssymb}
-\usepackage{amsthm}
-\usepackage{beramono}
-\usepackage{enumitem}
-\usepackage{etoolbox}
-\usepackage{float}
-\usepackage{ebgaramond}
-\usepackage{listings}
 \usepackage{mathpartir}
-\usepackage{microtype}
-\usepackage{natbib}
-\usepackage{titling}
+\usepackage{listings}
 \usepackage{subcaption}
-\usepackage{xcolor}
+\usepackage{float}
 \usepackage{xspace}
+\usepackage{enumitem}
+
 % \finalmode renders the clean version, without change markup.
 \ifdefined\finalmode
   \usepackage[final,commandnameprefix=ifneeded,commentmarkup=footnote]{changes}
@@ -25,93 +22,108 @@
 \fi
 \usepackage{changebar}
 \ifdefined\finalmode\nochangebars\fi
-\usepackage{hyperref}
 
 \input{tex/macros}
 \input{tex/listings}
 
-\deffootnote{0em}{0em}{\textsuperscript{\thefootnotemark}}
-
 \newtheorem{lemma}{Lemma}
 \newtheorem{definition}{Definition}
 
-\raggedbottom
-\setlength{\droptitle}{-8ex}
 \setlist[itemize]{leftmargin=*, nosep, topsep=2mm}
 \setlist[enumerate]{nosep}
 
-\title{\textbf{\PurePy: A Functional Subset of Python}}
-\version{0}{12}{0}
-
-\author{
-   Nikolaus Huber\textsuperscript{1} \and
-   Dominic Orchard\textsuperscript{2,1} \and
-   Jacob Pake\textsuperscript{2} \and
-   Roly Perera\textsuperscript{1,3}
-}
-\date{}
-
-\newcommand{\affiliations}{%
-    \textsuperscript{1}\textit{Department of Computer Science and Technology, University of Cambridge, UK} \\
-    \textsuperscript{2}\textit{School of Computing, University of Kent, UK} \\
-    \textsuperscript{3}\textit{School of Computer Science, University of Bristol, UK}
-}
-
-% Override maketitle to avoid internal tabular conflicts
-\makeatletter
-\renewcommand{\maketitle}{%
-    \vspace*{\droptitle}
-    \begin{flushleft}
-        {\LARGE\bfseries\thetitle\par}
-        \ifx\versionstring\@empty
-        \else
-            \vspace{0.5ex}
-            {\Large\normalfont version \versionstring\par}
-        \fi
-        \vspace{1ex}
-        {\Large\theauthor\par}
-        \vspace{1ex}
-        {\affiliations\par}
-    \end{flushleft}
-    \vspace{2ex}
-}
-\makeatother
+% PACMPL (PLDI) metadata; placeholders for a draft.
+\acmJournal{PACMPL}
+\acmVolume{10}
+\acmNumber{PLDI}
+\acmArticle{1}
+\acmArticleSeq{0}
+\acmYear{2026}
+\acmMonth{6}
+\setcopyright{none}
+\settopmatter{printacmref=false}
+\citestyle{acmauthoryear}
 
 \begin{document}
 
-\pagestyle{plain}
+\newcommand{\basetitle}{A Pure Functional Subset of Python for Scientific Computing}
+\ifdefined\anonmode
+  \title{\basetitle}
+\else
+  \title{\PurePy: \basetitle}
+\fi
+\version{0}{12}{0}
 
-% Otherwise custom \maketitle allows floats to appear above title
-\makeatletter
-\let\orig@maketitle\maketitle
-\renewcommand{\maketitle}{%
-  \orig@maketitle
-  \global\@topnum=0
-}
-\makeatother
+\author{Tobias Antensteiner}
+\affiliation{%
+  \department{Institute of Theoretical Informatics}
+  \institution{Karlsruhe Institute of Technology}
+  \country{Germany}}
 
-\maketitle
+\author{Nikolaus Huber}
+\affiliation{%
+  \department{Department of Computer Science and Technology}
+  \institution{University of Cambridge}
+  \country{UK}}
+
+\author{Dominic Orchard}
+\affiliation{%
+  \department{School of Computing}
+  \institution{University of Kent}
+  \country{UK}}
+\affiliation{%
+  \department{Department of Computer Science and Technology}
+  \institution{University of Cambridge}
+  \country{UK}}
+
+\author{Jacob Pake}
+\affiliation{%
+  \department{School of Computing}
+  \institution{University of Kent}
+  \country{UK}}
+
+\author{Roly Perera}
+\affiliation{%
+  \department{Department of Computer Science and Technology}
+  \institution{University of Cambridge}
+  \country{UK}}
+\affiliation{%
+  \department{School of Computer Science}
+  \institution{University of Bristol}
+  \country{UK}}
+
+\renewcommand{\shortauthors}{Antensteiner et al.}
 
 \begin{abstract}
-\noindent \PurePy is a pure functional subset of Python, providing a common functional language for use by
-researchers in programming languages and pedagogy, while providing a front-end familiar and accessible to the
-Python community. This specification defines a versioned standard with formal syntax, well-formedness rules
-based on a definite assignment analysis, and an operational semantics intended to preserve the meaning of
-well-formed \PurePy programs in Python. By combining functional programming with Python-compatible surface
-syntax, \PurePy aims to support portable implementations and lower-friction adoption of new language ideas for
+\PurePy is a pure, side-effect-free subset of Python: a functional language whose programs are referentially
+transparent, reproducible, and easy to reason about, yet remain ordinary Python. Every well-formed \PurePy
+program is valid Python and runs with the same behaviour, so one source serves both a standard Python
+interpreter and any conforming implementation. This paper specifies \PurePy as a versioned standard, with a
+formal grammar, well-formedness rules based on a definite-assignment analysis, and an operational semantics
+that preserves the meaning of well-formed programs in Python. A reference checker decides membership of the
+subset, and a conformance test suite is exercised on CPython, PyPy, GraalPy, and Pyodide. Aimed first at researchers in programming languages and pedagogy, \PurePy
+is intended to grow into a common language for scientific computing, supporting portable applications in
 modelling, data processing, analysis, and visualisation.
 \end{abstract}
 
+\maketitle
+
 \input{tex/introduction}
-
+\input{tex/overview}
 \input{tex/syntax}
-
 \input{tex/operational-semantics}
-
+\input{tex/reference-implementation}
+\input{tex/extensions}
+\input{tex/case-studies}
+\input{tex/evaluation}
 \input{tex/related-work}
+\input{tex/conclusion}
 
-\bibliographystyle{plain}
+\bibliographystyle{ACM-Reference-Format}
 \bibliography{tex/refs,tex/additional-refs}
+
+\appendix
+\input{tex/appendix-aux}
 
 \ifdefined\openterms
 \input{tex/appendix-open-terms}

@@ -1,0 +1,68 @@
+\section{Extensions}
+\label{sec:extensions}
+
+Beyond the core, \PurePy is designed to grow through extensions that add expressiveness while preserving
+purity. This section sketches two, each drawn from \Fluid: partial application and piecewise function
+definitions. We give an example of each. \todo{Formally define or defer to future work}
+
+\subsection{Partial application}
+\label{sec:ext-partial}
+
+A function applied to fewer arguments than it declares returns a function of the remaining arguments:
+
+\begin{python}
+def f(x, y):
+    return x + y
+
+f(5)(6)  # 11
+\end{python}
+
+\noindent The syntax is valid Python, but Python raises a \pyinline{TypeError} at run time, because
+\pyinline{f(5)} is missing an argument. For partial application to add meaning rather than change it, core
+\PurePy must reject such unsaturated calls, requiring every call to supply the declared arity. On that base,
+\pyinline{f(5)} denotes the function that adds \pyinline{5} to its argument, so \pyinline{f(5)(6)} evaluates to
+\pyinline{11}. This is a semantic extension: existing syntax, given a meaning the core withholds.
+
+\subsection{Piecewise function definitions}
+\label{sec:ext-piecewise}
+
+A function may be defined by several clauses that pattern-match on its arguments, in place of a single
+definition with an explicit \pyinline{match}:
+
+\begin{python}
+def length(Nil):
+    return 0
+def length(Cons(x, xs)):
+    return 1 + length(xs)
+\end{python}
+
+\noindent Python has no way to define a function by pattern-matching on its arguments: \pyinline{def
+length(Cons(x, xs))} is a syntax error, since a parameter cannot be a pattern. Core \PurePy, a subset of
+Python, has none either. The extension adds this: the clauses together define \pyinline{length}, dispatching on
+the constructor of the argument. Because Python gives the pattern-clause form no meaning of its own, it is a
+syntactic extension that needs no special notation to distinguish it from an ordinary \pyinline{def}.
+
+\subsection{Explicit variable definitions}
+\label{sec:ext-explicit-def}
+
+In the core a variable is introduced implicitly by its first assignment, and a definite-assignment analysis
+(\secref{syntax}) tracks whether it is assigned before it is used. This extension makes the introduction
+explicit, with a \pyinline{def} declaration for variables as well as functions:
+
+\begin{python}
+def total = 0   # define and assign
+
+def n           # define, assignment deferred
+if b:
+    n = 1
+else:
+    n = 2
+return total + n
+\end{python}
+
+\noindent \pyinline{def total = 0} declares \pyinline{total} and assigns it at once, whereas \pyinline{def n}
+declares \pyinline{n} with its assignment deferred, to be supplied later under the existing definite-assignment
+rules, so \pyinline{n} is usable only once every path has assigned it. Python has no such form: \pyinline{def}
+introduces a function, so a variable \pyinline{def} is a syntax error, and core \PurePy, a subset of Python, has
+none either. The implicit definitions of the core are the case in which every variable is introduced by
+\pyinline{def x = e}, so the core desugars into the explicit form.

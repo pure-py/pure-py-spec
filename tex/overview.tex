@@ -1,0 +1,149 @@
+\section{Overview}
+\label{sec:overview}
+
+\PurePy is a subset of Python chosen so that its programs are well-behaved and broadly \emph{pure}, yet run
+unchanged under a standard Python interpreter and compute the same result. Purity here is informal: the
+functional core has no observable side effects, and a name's meaning does not depend on evaluation order or on
+mutation. A variable, once definitely assigned, denotes a fixed value; a function is fixed by its definition;
+and a module's members are fixed once it has loaded. Python permits much that breaks this discipline, so
+\PurePy tightens or excludes the idioms responsible.
+
+The remainder of this section sets out the excluded features, grouped by the discipline each one protects,
+with the rationale for its exclusion. \figref{prevented-errors} then summarises the Python runtime errors that
+well-formedness rules out.
+
+\subsection{Mutable state}
+\label{sec:no-mutable-state}
+
+A variable in \PurePy denotes a fixed value once definitely assigned, so features that mutate or rebind state
+are excluded: \pyinline{global} and \pyinline{nonlocal}, which reassign bindings in an outer scope;
+\pyinline{del}, which removes a binding; augmented assignment (\pyinline{+=}, \pyinline{-=}, and so on); and
+the walrus operator (\pyinline{:=}), which assigns within an expression. Reassignment of a variable already
+captured by a closure is excluded for the same reason. In Python a closure captures a mutable binding, so a
+later reassignment is visible through the closure:
+
+\begin{python}
+def f():
+    x = 5
+    def g():
+        return x
+    x = 6
+    return x + g()
+\end{python}
+
+\noindent Here \pyinline{g()} returns \pyinline{6} in Python and the result is \pyinline{12}; under a pure
+reading in which \pyinline{x = 6} shadows the earlier binding, \pyinline{g()} would return \pyinline{5} and the
+result \pyinline{11}. \PurePy rejects the program, keeping closures over values rather than mutable cells, as
+with Java's requirement that captured locals be effectively final~\cite[\S15.27.2]{gosling2025}. The rules that
+enforce this are given in \secref{captured-vars}.
+
+\subsection{Control flow and effects}
+\label{sec:no-effects}
+
+\PurePy excludes loops with \pyinline{break} and \pyinline{continue}, exceptions
+(\pyinline{try}/\pyinline{except}/\pyinline{raise}), context managers (\pyinline{with}), generators
+(\pyinline{yield}/\pyinline{yield from}), and coroutines (\pyinline{async}/\pyinline{await}). Functional
+programming has rich accounts of effects, from monads to algebraic effect handlers, so these features are not
+inherently at odds with a functional language. In idiomatic Python, though, they are used mainly in
+conjunction with mutable state, which \PurePy already excludes, and iteration is expressed by comprehensions
+and recursion rather than by loops. A future release may add structured effects; for now the core stays
+effect-free.
+
+\subsection{Implicit coercions}
+\label{sec:no-coercions}
+
+Python accepts several implicit coercions and lax matches that are convenient but a recognised source of error,
+since what Python accepts rarely coincides with what the author meant.% TODO: citation on implicit-coercion errors
+\ \PurePy excludes three. The first is truthiness: the test of an \pyinline{if} or conditional expression, or an
+\pyinline{assert}, is coerced to \pyinline{bool}, whereas \PurePy requires it to be boolean already. The second
+is between sequence kinds in pattern matching: Python lets a list pattern match a tuple value, and a tuple
+pattern match a list, whereas in \PurePy a list pattern matches only a list and a tuple pattern only a tuple.
+The third is in constructor patterns: Python lets a positional class pattern supply fewer sub-patterns than the
+class's field arity, matching only those given, whereas \PurePy requires the exact arity.
+
+\subsection{Load-dependent meaning}
+\label{sec:no-load-dependent}
+
+A name's meaning in \PurePy must not depend on the order in which modules load or on runtime state, so several
+of Python's import and module behaviours are excluded. Imports must appear at the start of a module, never
+inside a function or other block, nor after a non-import statement. Wildcard imports (\pyinline{from q import
+*}) are excluded, since the names they introduce are not explicit; PEP 8 recommends against
+them.\footnote{\url{https://peps.python.org/pep-0008/}} A submodule may not import itself through its parent
+(\pyinline{from a import b} inside module \pyinline{a.b}): \PurePy treats the from-imported submodule as a
+dependency, so this is an import cycle. An \pyinline{import} (as opposed to a from-import) may not name a proper
+descendant of the importing module (\pyinline{import x.y} inside module \pyinline{x}), since the binding for
+the head would denote the still-loading module.
+
+A module may not bind a name that is also the name of one of its submodules. In Python an attribute of a
+package can be set both by an assignment in the package body and by loading the same-named submodule, and which
+wins depends on load order. Suppose the body of \pyinline{pkg} is the single assignment \pyinline{sub = 1}, and
+\pyinline{pkg} also has a submodule \pyinline{pkg.sub}:
+\vspace{-\medskipamount}
+
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+import pkg
+print(pkg.sub)  # 1
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{python}
+import pkg.sub
+print(pkg.sub)  # <module 'pkg.sub'>
+\end{python}
+\end{minipage}
+
+On the left, \pyinline{pkg.sub} is never loaded, so the assignment is visible; on the right, the load
+overwrites the assignment. The name \pyinline{pkg.sub} has no load-order-independent meaning, so \PurePy
+prohibits the clash outright.
+
+\label{sec:uninitialised-members}
+For the same reason, a module may not refer to a submodule it does not itself import. A submodule is not an
+attribute of its package until it is loaded, so \pyinline{import a} followed by \pyinline{a.b.f()} is rejected
+unless the module also imports \pyinline{a.b}; Python permits the reference whenever some earlier import,
+anywhere in the program, happens to have loaded \pyinline{a.b}. \PurePy likewise rejects a reference to a
+module member the module body never assigns, such as \pyinline{lib.x} where \pyinline{lib} assigns
+\pyinline{x} only on a branch that is not taken. In Python both cases raise \pyinline{AttributeError}; \PurePy
+rejects them statically.
+
+\subsection{Modules and classes are not first-class}
+\label{sec:no-first-class}
+
+For now, modules and classes are not values in \PurePy. In Python a module is a value and a class declaration
+is an assignment, so both flow through programs as data. Treating them as first-class would complicate the
+static account, so the present subset keeps them second-class rather than ruling the feature out; a later
+release may revisit it. A module name may be projected by member access but not used as a value, and a class
+name appears only at constructor and pattern positions, with declarations confined to module level. Because a
+class is identified by its qualified name, a dataclass declaration may not re-declare a name that already
+denotes a class in the module; Python permits the re-declaration, leaving the earlier class reachable only
+through its existing instances.
+
+\subsection{Other restrictions}
+\label{sec:other-restrictions}
+
+A few remaining restrictions do not fit the groups above. Only dataclasses are supported, so \pyinline{class}
+definitions of other kinds are excluded.
+
+Complementing the exclusions above, a well-formed \PurePy program avoids the Python runtime errors listed in
+\figref{prevented-errors}, under the conditions noted there. Errors from ill-typed operations, such as wrong
+operand types, calling a non-function, or attribute access on an object lacking the attribute, are outside the
+scope of well-formedness.
+
+\begin{figure}
+\centering
+\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.52\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}}
+\hline
+\textbf{Python error} & \textbf{Ruled out when} & \textbf{See} \\
+\hline
+\pyinline{NameError}, \pyinline{UnboundLocalError} & Always: a variable may be referenced only where it is definitely assigned. & \figref{well-formed}, \figref{well-formed-expr} \\[1mm]
+\pyinline{ModuleNotFoundError} & Always: an import requires its target to be a module of the program. & \figref{well-formed-imports} \\[1mm]
+\pyinline{ImportError} & Always: a from-import requires each imported name to be a member of the source module, and import cycles are rejected. (A Python cycle may run or fail, depending on where the cycle is entered.) & \figref{imports}, \figref{well-formed-module} \\[1mm]
+\pyinline{AttributeError} & Always: a module attribute reference must resolve to a definitely assigned member.  & \figref{well-formed-expr} \\[1mm]
+\pyinline{TypeError} & The operation is a constructor call or class pattern, which must match the class's arity exactly. (Only excess sub-patterns are a Python error; a pattern with fewer is prohibited even though Python permits it.) & \figref{well-formed-expr}, \figref{well-formed-pat} \\
+\hline
+\end{tabular}
+\caption{Python errors prevented by well-formedness}
+\label{fig:prevented-errors}
+\end{figure}

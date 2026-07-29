@@ -17,6 +17,14 @@ default: PurePy-spec.pdf
 
 full: PurePy-spec-full.pdf
 
+anon: PurePy-spec-anon.pdf
+
+PurePy-spec-anon.pdf: $(TEXFILES)
+	pdflatex -jobname=PurePy-spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
+	bibtex PurePy-spec-anon
+	pdflatex -jobname=PurePy-spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
+	pdflatex -jobname=PurePy-spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
+
 clean:
 	rm -f *.pdf *.aux *.log *.out *.bbl *.blg $(ARXIV_ZIP)
 
@@ -26,4 +34,4 @@ $(ARXIV_ZIP): $(ARXIV_FILES)
 	rm -f $@
 	zip -9 $@ $^
 
-.PHONY: default full clean arXiv
+.PHONY: default full anon clean arXiv
