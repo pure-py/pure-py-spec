@@ -76,10 +76,11 @@ review. Figure, definition and section numbers refer to the marked-up PurePy-spe
 
 ## Flagged, not changed
 
-- [ ] **Checker out of sync (src/check_program.py).** It carries the deps/imports/has_cycle machinery
-  and checks only `__main__` recursively. Sync after review: cycle detection becomes an in-progress
-  set, all discovered modules get checked, and any conformance tests relying on unused modules being
-  unchecked need adjusting.
+- [x] **Checker out of sync (src/check_program.py).** Resolved: deps and has_cycle deleted; cycles now
+  fail during recursive loading via an in-progress stack in check_module, mirroring the inductive
+  reading; check_program checks every discovered module; loads_to renamed links with the from-import
+  ancestor loop made explicit; the discovery helper formerly called imports renamed import_targets.
+  New tests: prohibited/unused_module, prohibited/unused_descendant_import. Suite 240/240, mypy clean.
 
 - [ ] **math has no members (Fig. 5).** Either give it members (pi, sqrt) or drop it from the table.
 
