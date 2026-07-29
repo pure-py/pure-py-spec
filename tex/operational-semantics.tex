@@ -18,11 +18,7 @@ with $\assigns{\varnothing}$ as left and right unit.
 
 \Added{A value is well-formed at a context entry (\figref{well-formed-env}): ordinary values at
 $\statusDefAssigned$, module references and class entries at the corresponding entry. An environment is
-well-formed at a context that binds its variables at corresponding entries. The context inside a loaded
-reference is not always one the load judgement produces; after \pyinline{import a.b}, for example, the
-binding for \pyinline{a} carries the context of \pyinline{a} with its stub for \pyinline{b} replaced by a
-loaded reference. The rule \ruleName{val-mod-loaded} therefore relates the environment and context of a
-loaded reference directly, rather than through the load judgement.}
+well-formed at a context that binds its variables at corresponding entries.}
 
 \input{fig/well-formed-env}
 
