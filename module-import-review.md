@@ -10,7 +10,7 @@ review. Figure, definition and section numbers refer to the marked-up PurePy-spe
   metafunction are dropped. Both destructurings are legitimate over the sequence form, and patterns read
   better than a metafunction.
 
-- [ ] **Dependency graph deleted (§3.2, Fig. 24, Fig. 11b).** The `imports` and `deps` metafunctions and
+- [x] **Dependency graph deleted (§3.2, Fig. 24, Fig. 11b).** The `imports` and `deps` metafunctions and
   the graph G_M restated, edge for edge, the load premises already present in the import rules, and had
   drifted: the `p != q` clause in the plain-import case of `deps` contradicted the §3.2 claim that the
   enclosing-ancestor exception "appears only in the from-import clause". The clause was vacuous for
@@ -27,30 +27,30 @@ review. Figure, definition and section numbers refer to the marked-up PurePy-spe
   for-all-modules variant was tried and reverted. Import cycles remain ill-formed because the
   inductively-read load judgement admits no finite derivation for them.
 
-- [ ] **loads-to replaced by loads-as (Figs. 10b, 17b).** Three defects in loads-to: its result was bound
+- [x] **loads-to replaced by loads-as (Figs. 10b, 17b).** Three defects in loads-to: its result was bound
   but discarded in both from-import rules; its skip bound was the empty name for plain imports, which
   the grammar of q does not include, so `q <= epsilon` was ill-typed; and the enclosing rule never
   produced a value that was used. The new loads-as judgement has two rules, no bound, and is used only by
   plain import to build the binding for the target's root, loading each proper prefix and recording each
   module as a member of its parent.
 
-- [ ] **from-import loads ancestors directly (Figs. 10a, 17a).** The rule now has an explicit premise
+- [x] **from-import loads ancestors directly (Figs. 10a, 17a).** The rule now has an explicit premise
   loading each proper prefix of the target not enclosing the importing module. The premise is kept in
   the dynamic rule as well because ancestor loading can fail observably (a failing top-level assert),
   matching Python. The §3.2 prose "necessarily still in progress" was wrong (the ancestor may or may not
   be mid-load) and now reads "may still be loading".
 
-- [ ] **Member import elementwise (Figs. 9, 16).** The judgement now imports one name at a time (two
+- [x] **Member import elementwise (Figs. 9, 16).** The judgement now imports one name at a time (two
   rules: member, submodule) and the from-import rules quantify over the imported names, matching the
   house forall-i idiom. The nil/cons plumbing and the override accumulation are gone. With the
   `imports` metafunction deleted, the judgement name no longer clashes with it.
 
-- [ ] **Rule-name deduplication (Figs. 16, 17).** The dynamic figures reused the static rule names
+- [x] **Rule-name deduplication (Figs. 16, 17).** The dynamic figures reused the static rule names
   verbatim (imp-nil, imp-member, imp-submodule, loads-to-*). Dynamic rules now carry eval- prefixes
   (eval-imp-member, eval-imp-submodule, eval-loads-as-simple, eval-loads-as-qualified), consistent with the
   other evaluation figures.
 
-- [ ] **Stray turnstile dropped (Fig. 17a).** The import-prefix evaluation judgement was written
+- [x] **Stray turnstile dropped (Fig. 17a).** The import-prefix evaluation judgement was written
   `|- iota-bar => rho` with a turnstile no other evaluation judgement has; now `iota-bar => rho`.
 
 - [ ] **Predefined modules get load axioms (Figs. 11b, 18b; Definition 6; Fig. 5).** Rule module
