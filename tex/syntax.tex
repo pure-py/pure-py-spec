@@ -173,7 +173,8 @@ an environment $\rho_q$ for each such $q$, binding the same names to implementat
 
 \Replaced{The metafunction $\assignsS$ extends by union from individual statements to blocks; on a module
 body $\seq{\iota}\;\seq{s}$ it acts on $\seq{s}$. Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q =
-p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order. The $\submodules$ metafunction is
+p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order; the proper prefixes of a module name
+are its \emph{ancestors}. The $\submodules$ metafunction is
 defined, with the class-related metafunctions, in Appendix~\ref{sec:aux-modules}.}{The metafunction $\assignsS$ extends by union from individual statements to
 blocks, and $\imports$ and $\deps$ from individual imports to import sequences; on a module body
 $\seq{\iota}\;\seq{s}$, they act on $\seq{s}$ and $\seq{\iota}$ respectively. Write $p \prefixOf q$
@@ -182,13 +183,14 @@ module-related metafunctions are collected in Appendix~\ref{sec:aux-modules}.}
 
 \Replaced{In this section, loading a module means checking its body and computing its member context
 (\figref{well-formed-module}), the static counterpart of run-time loading (\secref{opsem}). Both
-import forms load their target, together with its proper prefixes
+import forms load their target, together with its ancestors
 (\figref{well-formed-imports}). A plain import also records each of these modules as a member of its
 parent (the loads-as judgement), so that the binding created for the root of the target gives attribute
-access along the whole chain. A from-import also loads any imported name that denotes a submodule. A
-prefix that is an ancestor of the importing module is exempt from loading first, because at run time such
-an ancestor may still be loading. The exemption applies only to from-imports, because for a plain import
-the only prefix that could never load first is the importing module itself, and an import naming a proper
+access along the whole chain. A from-import also loads any imported name that denotes a submodule. An
+ancestor of the target is exempt from loading first if it is the importing module or one of its
+ancestors, since at run time it may still be loading. The exemption applies only to from-imports, because
+for a plain import
+the only ancestor that could never load first is the importing module itself, and an import naming a proper
 descendant of the importing module is prohibited outright (\secref{no-load-dependent}). Loading a module
 may thus require other modules to load first; the rules are interpreted inductively, so a program with an
 import cycle is ill-formed, because a module in a cycle could finish loading only after itself. Program

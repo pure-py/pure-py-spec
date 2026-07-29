@@ -28,7 +28,7 @@ of $q$ and then its statements, mirroring the well-formedness judgement $\vdash_
 (\figref{well-formed-module}); as with the static rules, the mutual
 recursion between loading and evaluation is \Replaced{grounded by program well-formedness, which rules out
 import cycles (\secref{modules-programs}).}{grounded by the acyclicity of $G_{\mathcal{M}}$.}
-\Replaced{Loading takes a single module; the proper prefixes of an imported module are loaded by the
+\Replaced{Loading takes a single module; the ancestors of an imported module are loaded by the
 loads-as judgement for an import, and directly as premises of \ruleName{eval-from-import} for a
 from-import.}{Loading takes a single module; the ancestors of an imported module are loaded, once each, by
 the loads-to judgement.}
