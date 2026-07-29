@@ -53,28 +53,28 @@ review. Figure, definition and section numbers refer to the marked-up PurePy-spe
 - [x] **Stray turnstile dropped (Fig. 17a).** The import-prefix evaluation judgement was written
   `|- iota-bar => rho` with a turnstile no other evaluation judgement has; now `iota-bar => rho`.
 
-- [ ] **Predefined modules get load axioms (Figs. 11b, 18b; Definition 6; Fig. 5).** Rule module
+- [x] **Predefined modules get load axioms (Figs. 11b, 18b; Definition 6; Fig. 5).** Rule module
   requires a body in M, and predefined modules such as builtins have none that PurePy can express, so
   `import math` had no derivation. New axiom rules predefined and eval-predefined give each predefined
   module its context and environment directly. Definition 6 (Predefined contexts and environments)
   generalises the old Definition 5 (Builtins context) and includes `__name__`; numbering shifts down by
   one once markup is stripped. §3.2 prose updated ("bodies are implementation-defined").
 
-- [ ] **Values typed by context entries (Fig. 15).** env-cons placed no constraint on the entry paired
+- [x] **Values typed by context entries (Fig. 15).** env-cons placed no constraint on the entry paired
   with a value, so a well-formed environment could bind a module entry to a plain value and the load
   correspondence stated in §4 was vacuous on entry shapes. The value judgement is now `v : theta`:
   ordinary values at tt, module references and class entries at the corresponding entry.
   val-mod-loaded also drops its load premise, which was wrong for entries extended with submodule
   bindings by loads-as or by repeated imports. A short prose introduction precedes Fig. 15.
 
-- [ ] **Program result documented (§4, Fig. 18b).** `M => n` had an unexplained n that is always 0. A
+- [x] **Program result documented (§4, Fig. 18b).** `M => n` had an unexplained n that is always 0. A
   prose sentence now documents the result as the program's exit status; sys.exit remains unmodelled.
 
-- [ ] **Ambient conventions stated (§3.2).** The prose now notes that the enclosing module name q is
+- [x] **Ambient conventions stated (§3.2).** The prose now notes that the enclosing module name q is
   ambient in the rules that check or evaluate a single module's body, alongside the existing statement
   for M.
 
-- [ ] **Caption and appendix fixes (Fig. 24, §A.3).** The figure mixing module and class metafunctions
+- [x] **Caption and appendix fixes (Fig. 24, §A.3).** The figure mixing module and class metafunctions
   is recaptioned "Module and class metafunctions"; the §A.3 heading and blurb match.
 
 ## Flagged, not changed
@@ -87,14 +87,14 @@ review. Figure, definition and section numbers refer to the marked-up PurePy-spe
   well-formed/unused_descendant_import pin that unreached modules are not checked. Suite 240/240,
   mypy clean.
 
-- [ ] **math has no members (Fig. 5).** Either give it members (pi, sqrt) or drop it from the table.
+- [x] **math has no members (Fig. 5).** Either give it members (pi, sqrt) or drop it from the table.
 
-- [ ] **Reload claim relies on unmodelled output (§4).** "Loading has no observable effects" holds only
+- [x] **Reload claim relies on unmodelled output (§4).** "Loading has no observable effects" holds only
   because print is unmodelled: a top-level print would run once under Python's module cache but
   repeatedly under the cache-free reload semantics. Worth a footnote or an explicit scope remark.
 
-- [ ] **Aliased imports unmentioned (§2.4).** `import a as b` is absent from the grammar but, unlike
+- [x] **Aliased imports unmentioned (§2.4).** `import a as b` is absent from the grammar but, unlike
   wildcard imports, not listed among the exclusions. Relative imports are already tracked as #126.
 
-- [ ] **Module-reference arity overloading (Definition 1, Fig. 14).** Mod(q) stub versus Mod(q, Gamma)
+- [x] **Module-reference arity overloading (Definition 1, Fig. 14).** Mod(q) stub versus Mod(q, Gamma)
   loaded are distinguished by arity alone. Kept; split the constructors if too subtle.
