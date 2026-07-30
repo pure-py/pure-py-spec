@@ -1,6 +1,6 @@
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash q \names \theta$}
+\flushleft \shadebox{$\Gamma \vdash q : \theta$}
 \begin{mathpar}
 \small
 
@@ -9,7 +9,7 @@
   \bind{x}{\statusDefAssigned} \in \Gamma
 }
 {
-  \Gamma \vdash x \names \statusDefAssigned
+  \Gamma \vdash x : \statusDefAssigned
 }
 \and
 
@@ -18,7 +18,7 @@
   \bind{x}{\modLoaded{q}{\Gamma'}} \in \Gamma
 }
 {
-  \Gamma \vdash x \names \modLoaded{q}{\Gamma'}
+  \Gamma \vdash x : \modLoaded{q}{\Gamma'}
 }
 \and
 
@@ -27,17 +27,17 @@
   \bind{c}{C} \in \Gamma
 }
 {
-  \Gamma \vdash c \names C
+  \Gamma \vdash c : C
 }
 \and
 
 \inferrule*[lab={\ruleName{qualified}}]
 {
-  \Gamma \vdash q \names \modLoaded{q'}{\Gamma'} \\
-  \Gamma' \vdash x \names \theta
+  \Gamma \vdash q : \modLoaded{q'}{\Gamma'} \\
+  \Gamma' \vdash x : \theta
 }
 {
-  \Gamma \vdash q.x \names \theta
+  \Gamma \vdash q.x : \theta
 }
 
 \end{mathpar}
@@ -77,7 +77,7 @@
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
-  \Gamma \vdash q \names C \\
+  \Gamma \vdash q : C \\
   \fields(C) = x_1, \ldots, x_n \mathbin{\cdot} \seq{x}\,' \\
   \set{\seq{y}} = \set{\seq{x}\,'} \\
   \Gamma \vdash e_i \quad (\forall i)
@@ -89,7 +89,7 @@
 
 \inferrule*[lab={\ruleName{attr-module}}]
 {
-  \Gamma \vdash \exAttr{e}{x} \names \statusDefAssigned
+  \Gamma \vdash \exAttr{e}{x} : \statusDefAssigned
 }
 {
   \Gamma \vdash \exAttr{e}{x}

@@ -118,11 +118,11 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
         raise IllFormedModule(head, reasons.DuplicateMutualName(head.name))
     check_distinct_names(defs[1:], seen | {head.name})
 
-def names(e: ast.expr, ctx: ModuleContext) -> Optional[ContextEntry]:
+def entry_of(e: ast.expr, ctx: ModuleContext) -> Optional[ContextEntry]:
     if isinstance(e, ast.Name):
         return ctx.gamma.get(e.id)
     if isinstance(e, ast.Attribute):
-        parent = names(e.value, ctx)
+        parent = entry_of(e.value, ctx)
         if isinstance(parent, ModuleLoaded):
             return parent.members.get(e.attr)
         return None
@@ -221,7 +221,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
         check_expr(e.orelse, ctx)
         return
     if isinstance(e, ast.Attribute):
-        parent = names(e.value, ctx)
+        parent = entry_of(e.value, ctx)
         if isinstance(parent, ModuleLoaded):
             entry = parent.members.get(e.attr)
             if entry is None:
@@ -282,7 +282,7 @@ def names_class(head: ast.expr, ctx: ModuleContext) -> Optional[tuple[str, tuple
         entry = class_of(ctx, head.id)
         return (head.id, fields_of(entry)) if entry is not None else None
     if isinstance(head, ast.Attribute):
-        parent = names(head.value, ctx)
+        parent = entry_of(head.value, ctx)
         if not isinstance(parent, ModuleLoaded):
             return None
         member = parent.members.get(head.attr)
