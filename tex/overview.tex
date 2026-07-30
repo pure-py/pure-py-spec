@@ -4,7 +4,8 @@
 \PurePy is a subset of Python chosen so that its programs are well-behaved and broadly \emph{pure}, yet run
 unchanged under a standard Python interpreter and compute the same result. \secref{purity} makes the purity
 claim precise and sets out the excluded features, grouped by the discipline each one protects;
-\figref{prevented-errors} summarises the Python runtime errors that well-formedness rules out.
+\figref{prevented-errors} summarises the Python runtime errors that well-formedness rules out, and
+\figref{roadmap} lists planned additions and features under consideration.
 
 \subsection{Purity}
 \label{sec:purity}
@@ -197,7 +198,8 @@ scope of well-formedness.
 \label{fig:prevented-errors}
 \end{figure}
 
-{\small
+\begin{figure}
+\small
 \begin{center}
 \begin{minipage}[t]{0.4\textwidth}
 \vspace{0pt}
@@ -233,5 +235,8 @@ Postponed annotation evaluation & \issue{128} \\
 Primitive operations & \issue{132} \\
 \end{tabular}
 \end{minipage}
-\end{center}}
+\end{center}
+\caption{Planned additions and features under consideration}
+\label{fig:roadmap}
+\end{figure}
 
