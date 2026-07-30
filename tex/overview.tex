@@ -77,7 +77,8 @@ the head would denote the still-loading module.
 A module may not bind a name that is also the name of one of its submodules. In Python an attribute of a
 package can be set both by an assignment in the package body and by loading the same-named submodule, and which
 wins depends on load order. Suppose the body of \pyinline{pkg} is the single assignment \pyinline{sub = 1}, and
-\pyinline{pkg} also has a submodule \pyinline{pkg.sub}:
+\pyinline{pkg} also has a submodule \pyinline{pkg.sub}. The listings below are two alternative main modules
+for this program:
 \vspace{-\medskipamount}
 
 \begin{minipage}[t]{0.48\textwidth}
