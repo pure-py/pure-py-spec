@@ -23,10 +23,12 @@ reports on a computation without influencing its result.
 
 A more strict, but less useful, design would drop printing altogether. Without printing there is little
 reason to specify evaluation order, including the order in which modules load, and errors could be left to
-occur at unspecified points. We specify the order instead, for two reasons. A program that divides by zero
-should do so at the same point of execution on every run and under every implementation. And implementers
-will sooner or later add printing or something like it; a specification that ignores the possibility gives
-them no guidance when they do.
+occur at unspecified points. Leaving effects out might seem to spare implementers as well as us, but the
+saving would be ours alone, because basic effects are essential to a practical language, and sequential
+execution comes with them; implementations must provide both whether or not the specification describes
+them. So we describe them. A program that divides by zero should abort at the same point of execution on
+every run and under every implementation, and an implementer who adds printing or something like it should
+find the order of events already fixed.
 
 \subsection{Mutable state}
 \label{sec:no-mutable-state}
