@@ -1,4 +1,9 @@
 \section{Conclusions and future work}
 \label{sec:conclusion}
 
-This section summarises the contributions and discusses future work.
+\subsection{\PurePy-compatible standard libraries}
+
+Scientific computing in Python rests on libraries such as NumPy and Pandas, whose interfaces lean on
+mutation and indexing. \PurePy therefore needs compatible counterparts: libraries, or subsets of existing
+ones, whose operations are pure. Polars,\footnote{\url{https://docs.pola.rs/}} whose operations return new frames rather than
+updating in place, suggests the shape such interfaces can take.

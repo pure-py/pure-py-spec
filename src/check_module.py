@@ -82,12 +82,12 @@ def own_members(body: list[ast.stmt], q: str) -> set[str]:
         return PREDEFINED_MEMBERS[q]
     return assigns_block(body) | {s.name for s in body if isinstance(s, ast.ClassDef)}
 
-_module_contexts: dict[tuple[int, str], Context] = {}
+_signatures: dict[tuple[int, str], Context] = {}
 _loading: list[tuple[int, str]] = []
 
 def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     key = (id(M), q)
-    cached = _module_contexts.get(key)
+    cached = _signatures.get(key)
     if cached is not None:
         return cached
     if key in _loading:
@@ -102,7 +102,7 @@ def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
         raise
     finally:
         _loading.pop()
-    _module_contexts[key] = result
+    _signatures[key] = result
     return result
 
 def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
@@ -119,7 +119,7 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     if rest and isinstance(result_type_of_block(rest), TyReturns):
         raise IllFormedModule(rest[0], reasons.TopLevelReturn())
     check_submodule_clash(m, gamma0, body, M, q)
-    return module_context(body, final_ctx, q)
+    return signature(body, final_ctx, q)
 
 def check_submodule_clash(m: ast.Module, gamma0: Context, body: list[ast.stmt],
                           M: dict[str, ast.Module], q: str) -> None:
@@ -142,7 +142,7 @@ def binds_name(s: ast.stmt, x: str) -> bool:
 def find_binder(stmts: list[ast.stmt], x: str) -> Optional[ast.stmt]:
     return next((s for s in stmts if binds_name(s, x)), None)
 
-def module_context(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context:
+def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context:
     stubs: Context = submodules(final_ctx.M, q)
     if q in PREDEFINED_MEMBERS:
         own: Context = {name: Status.TT for name in PREDEFINED_MEMBERS[q] | {'__name__'}}

@@ -17,7 +17,7 @@ both want.
 
 This paper defines \PurePy as a versioned formal standard: a formal grammar, well-formedness rules based on a
 definite-assignment analysis, and an operational semantics that preserves the meaning of well-formed programs
-in Python. A reference checker decides membership of the subset, and a conformance test suite exercises the
+in Python. A reference well-formedness checker decides membership of the subset, and a conformance test suite exercises the
 standard against CPython, PyPy, GraalPy, and Pyodide. The guarantee is precise: membership is decidable, and a
 well-formed \PurePy program is valid Python whose \PurePy meaning is its Python meaning.
 
@@ -32,44 +32,6 @@ common language for scientific computing, supporting portable applications in mo
 analysis, and visualisation. Because every \PurePy program is also a Python program, adopting it costs nothing
 at the surface, and a research language that targets \PurePy inherits a large and familiar runtime.
 
-{\small
-\begin{center}
-\begin{minipage}[t]{0.4\textwidth}
-\vspace{0pt}
-\begin{tabular}{ll}
-\textbf{To do} & \\
-Reserved words & \issue{9} \\
-Set and dict comprehensions & \issue{52} \\
-Set and dict literals & \issue{87} \\
-Membership operator (\pyinline{in}) & \issue{80} \\
-Identity operator (\pyinline{is}) & \issue{81} \\
-Chained comparison & \issue{82} \\
-Enums & \issue{86} \\
-Remaining expression rules & \issue{133} \\
-Aliased imports & \issue{135} \\
-\end{tabular}
-\end{minipage}\hspace{2em}
-\begin{minipage}[t]{0.4\textwidth}
-\vspace{0pt}
-\begin{tabular}{ll}
-\textbf{Under consideration} & \\
-Destructuring assignment & \issue{54} \\
-f-strings & \issue{55} \\
-Default arguments & \issue{56} \\
-\pyinline{*args} and \pyinline{**kwargs} & \issue{57} \\
-Decorators & \issue{58} \\
-Slicing & \issue{59} \\
-Star patterns & \issue{84} \\
-Or patterns & \issue{85} \\
-Relative imports & \issue{126} \\
-Function keyword arguments & \issue{127} \\
-Postponed annotation evaluation & \issue{128} \\
-Well-formedness correctness properties & \issue{130} \\
-Primitive operations & \issue{132} \\
-\end{tabular}
-\end{minipage}
-\end{center}}
-
 \subsection{Contributions}
 
 After setting out the problem \PurePy addresses in \secref{overview}, we make the following
@@ -78,7 +40,7 @@ contributions:
 \item a definition of \PurePy as a versioned standard, with a formal grammar and well-formedness rules based on
 a definite-assignment analysis (\secref{syntax}) and an operational semantics that preserves the
 meaning of well-formed programs in Python (\secref{opsem});
-\item a reference checker that decides membership of the subset, validated by a conformance test suite
+\item a reference well-formedness checker that decides membership of the subset, validated by a conformance test suite
 exercised on CPython, PyPy, GraalPy, and Pyodide (\secref{reference-impl});
 \item conservative extensions to the core language, including partial application and piecewise function
 definitions (\secref{extensions});

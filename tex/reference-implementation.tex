@@ -1,13 +1,17 @@
 \section{Reference implementation}
 \label{sec:reference-impl}
 
-A reference checker, written in Python over the \pyinline{ast} module, decides membership of \PurePy and
+A reference well-formedness checker, written in Python over the \pyinline{ast} module, decides membership of \PurePy and
 reports why a program is rejected. This section describes the checker and its correspondence with the
 well-formedness rules of \secref{syntax}.
 
-\subsection{Testing strategy}
+\subsection{Conformance suite}
 \label{sec:testing}
 
 A conformance test suite pairs each test with the verdict Python itself gives, and runs on CPython, PyPy,
-GraalPy, and Pyodide. This section sets out the test taxonomy and the differential and metamorphic strategies
-used to build it.
+GraalPy, and Pyodide. \todo{Diagram showing the various kinds of test.}
+
+\subsection{Mechanisation in Isabelle}
+\label{sec:mechanisation}
+
+\todo{Mechanisation of the well-formedness rules and operational semantics in Isabelle (\issue{64}).}
