@@ -2,15 +2,29 @@
 \label{sec:overview}
 
 \PurePy is a subset of Python chosen so that its programs are well-behaved and broadly \emph{pure}, yet run
-unchanged under a standard Python interpreter and compute the same result. Purity here is informal: the
-functional core has no observable side effects, and a name's meaning does not depend on evaluation order or on
-mutation. A variable, once definitely assigned, denotes a fixed value; a function is fixed by its definition;
-and a module's members are fixed once it has loaded. Python permits much that breaks this discipline, so
-\PurePy tightens or excludes the idioms responsible.
+unchanged under a standard Python interpreter and compute the same result. \secref{purity} makes the purity
+claim precise; the rest of the section sets out the excluded features, grouped by the discipline each one
+protects, and \figref{prevented-errors} summarises the Python runtime errors that well-formedness rules
+out.
 
-The remainder of this section sets out the excluded features, grouped by the discipline each one protects,
-with the rationale for its exclusion. \figref{prevented-errors} then summarises the Python runtime errors that
-well-formedness rules out.
+\subsection{Purity}
+\label{sec:purity}
+
+\PurePy does not claim purity in a mathematical sense, because no practical language has it: even
+ostensibly pure languages admit non-termination, and their programs abort on runtime errors such as
+division by zero or an index out of bounds. \PurePy also supports printing, which is more plainly an
+effect, though a benign one, because printing observes a computation without influencing its result. The
+purity \PurePy claims is purity in the senses that matter for reasoning about programs: a name's meaning
+does not depend on evaluation order or on mutation; a variable, once definitely assigned, denotes a fixed
+value; a function is fixed by its definition; and a module's members are fixed once it has loaded. Python
+permits much that breaks this discipline, so \PurePy tightens or excludes the idioms responsible.
+
+A stricter design would drop printing and decline to say when failures occur. Evaluation order would then
+be unobservable, and the semantics could leave unspecified, for example, the order in which modules load.
+We reject this alternative for two reasons. First, errors should occur at determinate points; a program
+that divides by zero should do so at the same point of execution on every run and under every
+implementation. Second, implementers will sooner or later add observations such as printing, and a
+specification that ignores this possibility no longer suggests an implementation strategy once they do.
 
 \subsection{Mutable state}
 \label{sec:no-mutable-state}
