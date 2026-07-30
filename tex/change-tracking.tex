@@ -1,0 +1,50 @@
+% Copy of agent-workflows src/paper_authoring/change-tracking.tex; keep in sync manually.
+% Change-tracking macros for paper_authoring workflow.
+% Requires: xcolor, changebar, marginnote packages.
+% Note: does NOT require soul/\sout — deleted text is greyed out, not struck through.
+% This allows \deleted and \replaced to work across paragraph boundaries.
+
+% Inline change markup. Define \acceptchanges before loading to accept all changes
+% (render added text plainly, drop deleted text).
+\ifdefined\acceptchanges
+  \newcommand{\added}[1]{#1}
+  \newcommand{\deleted}[1]{}
+  \newcommand{\replaced}[2]{#1}
+\else
+  \definecolor{addedcolor}{RGB}{0,160,0}
+  \definecolor{deletedcolor}{RGB}{180,180,180}
+  \newcommand{\added}[1]{\textcolor{addedcolor}{#1}}
+  \newcommand{\deleted}[1]{\textcolor{deletedcolor}{#1}}
+  \newcommand{\replaced}[2]{\textcolor{deletedcolor}{#2}\textcolor{addedcolor}{#1}}
+\fi
+
+% Changebar-marked variants and display blocks (require the changebar package; xspace for the
+% wrappers). Capitalised variants add a margin changebar; use the lowercase forms inside figures
+% or math, where changebar spans misbehave. \leavevmode commits a run-in heading in the default
+% colour before the markup colour starts. The block environments carry deleted or added display
+% material (figures, tables) that cannot live inside a command argument.
+\ifdefined\acceptchanges
+  \newcommand{\Added}[1]{#1}
+  \newcommand{\Deleted}[1]{}
+  \newcommand{\Replaced}[2]{#1}
+  \newenvironment{DeletedBlock}{\setbox0\vbox\bgroup}{\egroup}
+  \newenvironment{AddedBlock}{\par}{\par}
+\else
+  \newcommand{\Added}[1]{\leavevmode\protect\cbstart\added{#1}\protect\cbend\xspace}
+  \newcommand{\Deleted}[1]{\leavevmode\protect\cbstart\deleted{#1}\protect\cbend\xspace}
+  \newcommand{\Replaced}[2]{\leavevmode\protect\cbstart\replaced{#1}{#2\ }\protect\cbend\xspace}
+  \newenvironment{DeletedBlock}{\par\cbstart\color{deletedcolor}}{\cbend\par}
+  \newenvironment{AddedBlock}{\par\cbstart\color{addedcolor}}{\cbend\par}
+\fi
+
+% Change bars for human review — red: proposed edit; blue: task selection.
+% Workaround: changebar's \end@dblfloat redefinition breaks labels in table* floats.
+% Wrap table* environments with \cboff/\cbon to temporarily restore originals.
+\makeatletter
+\newcommand{\cboff}{\let\end@dblfloat\ltx@end@dblfloat}
+\newcommand{\cbon}{\let\end@dblfloat\cb@end@dblfloat}
+\makeatother
+\newcommand{\reviewstart}{\cbcolor{red}\cbstart\marginnote{\parbox{1.2cm}{\scriptsize\itshape\textcolor{red}{Approval\\needed}}}}
+\newcommand{\reviewend}{\cbend}
+\newcommand{\editstart}{\cbcolor{blue}\cbstart\marginnote{\parbox{1.2cm}{\scriptsize\itshape\textcolor{blue}{In\\progress}}}}
+\newcommand{\editend}{\cbend}
