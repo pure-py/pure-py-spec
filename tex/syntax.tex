@@ -18,7 +18,7 @@ Metavariables $x$, $f$, $c$ range over \emph{variables}; idiomatically $f$ is us
 A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the following \emph{context entries} $\theta$:
 \begin{itemize}
 \item the variable's \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
-\item a \emph{module reference}, for a fully-qualified module name $q$: either a \emph{stub} $\modStub{q}$, or \emph{loaded} reference $\modLoaded{q}{\Gamma}$, which also carries a context $\Gamma$ specifying the members of $q$; a context in this role is called the \emph{signature} of $q$;
+\item a \emph{module reference}, for a fully-qualified module name $q$: either a \emph{stub} $\modStub{q}$, or \emph{loaded} reference $\modLoaded{q}{\Gamma}$ carrying the \emph{signature} $\Gamma$ of $q$, the context specifying its members;
 \item a \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}$, recording the declaring context $\Gamma$, the qualified name $q.c$ of the class, sequence of distinct field names $\seq{x}$, and base class name $c'$ (or $\bot$ for no base).
 \end{itemize}
 \end{definition}
