@@ -76,28 +76,58 @@ the head would denote the still-loading module.
 
 A module may not bind a name that is also the name of one of its submodules. In Python an attribute of a
 package can be set both by an assignment in the package body and by loading the same-named submodule, and which
-wins depends on load order. Suppose the body of \pyinline{pkg} is the single assignment \pyinline{sub = 1}, and
-\pyinline{pkg} also has a submodule \pyinline{pkg.sub}. The listings below are two alternative main modules
-for this program:
+wins depends on load order. Consider a program with four modules:
 \vspace{-\medskipamount}
 
-\begin{minipage}[t]{0.48\textwidth}
+\begin{minipage}[t]{0.2\textwidth}
 \begin{python}
+# pkg
+sub = 1
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\begin{python}
+# pkg.sub
+# (empty)
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.25\textwidth}
+\begin{python}
+# helper
+import pkg.sub
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.28\textwidth}
+\begin{python}
+# __main__
 import pkg
 print(pkg.sub)  # 1
 \end{python}
 \end{minipage}
-\hfill
-\begin{minipage}[t]{0.48\textwidth}
+
+Here \pyinline{helper} is never imported, so \pyinline{pkg.sub} never loads, and \pyinline{pkg.sub} in the
+main module denotes the assignment. Now let the main module also import \pyinline{helper}, which it does not
+otherwise use:
+\vspace{-\medskipamount}
+
+\begin{center}
+\begin{minipage}[t]{0.55\textwidth}
 \begin{python}
-import pkg.sub
+# __main__
+import helper
+import pkg
 print(pkg.sub)  # <module 'pkg.sub'>
 \end{python}
 \end{minipage}
+\end{center}
 
-On the left, \pyinline{pkg.sub} is never loaded, so the assignment is visible; on the right, the load
-overwrites the assignment. The name \pyinline{pkg.sub} has no load-order-independent meaning, so \PurePy
-prohibits the clash outright.
+Loading \pyinline{pkg.sub}, wherever in the program it happens, sets it as an attribute of the shared
+\pyinline{pkg} object, so the extra import changes what \pyinline{pkg.sub} means in a module that never
+mentions \pyinline{pkg.sub}. The name has no load-order-independent meaning, so \PurePy prohibits the clash
+outright.
 
 \label{sec:uninitialised-members}
 For the same reason, a module may not refer to a submodule it does not itself import. A submodule is not an
