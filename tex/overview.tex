@@ -61,7 +61,7 @@ enforce this are given in \secref{captured-vars}.
 
 \PurePy excludes loops with \pyinline{break} and \pyinline{continue}, exceptions
 (\pyinline{try}/\allowbreak\pyinline{except}/\allowbreak\pyinline{raise}), context managers (\pyinline{with}), generators
-(\pyinline{yield}/\allowbreak\pyinline{yield from}), and coroutines (\pyinline{async}/\pyinline{await}). Functional
+(\pyinline{yield}/\allowbreak\pyinline{yield from}), and coroutines (\pyinline{async}/\allowbreak\pyinline{await}). Functional
 programming has rich accounts of effects, from monads to algebraic effect handlers, so these features are not
 inherently at odds with a functional language. In idiomatic Python, though, they are used mainly in
 conjunction with mutable state, which \PurePy already excludes, and iteration is expressed by comprehensions
