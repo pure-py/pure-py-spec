@@ -17,7 +17,7 @@ both want.
 
 This paper defines \PurePy as a versioned formal standard: a formal grammar, well-formedness rules based on a
 definite-assignment analysis, and an operational semantics that preserves the meaning of well-formed programs
-in Python. A reference checker decides membership of the subset, and a conformance test suite exercises the
+in Python. A reference well-formedness checker decides membership of the subset, and a conformance test suite exercises the
 standard against CPython, PyPy, GraalPy, and Pyodide. The guarantee is precise: membership is decidable, and a
 well-formed \PurePy program is valid Python whose \PurePy meaning is its Python meaning.
 
@@ -40,7 +40,7 @@ contributions:
 \item a definition of \PurePy as a versioned standard, with a formal grammar and well-formedness rules based on
 a definite-assignment analysis (\secref{syntax}) and an operational semantics that preserves the
 meaning of well-formed programs in Python (\secref{opsem});
-\item a reference checker that decides membership of the subset, validated by a conformance test suite
+\item a reference well-formedness checker that decides membership of the subset, validated by a conformance test suite
 exercised on CPython, PyPy, GraalPy, and Pyodide (\secref{reference-impl});
 \item conservative extensions to the core language, including partial application and piecewise function
 definitions (\secref{extensions});
