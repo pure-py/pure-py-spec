@@ -19,9 +19,8 @@ does not depend on evaluation order or on mutation; a variable, once definitely 
 value; a function is fixed by its definition; and a module's members are fixed once it has loaded. Python
 permits much that breaks this discipline, so \PurePy tightens or excludes the idioms responsible.
 
-A stricter design would drop printing and decline to say when failures occur. Evaluation order would then
-be unobservable, and the semantics could leave unspecified, for example, the order in which modules load.
-We reject this alternative for two reasons. First, errors should occur at determinate points; a program
+A more strict, but less useful, design would drop printing and decline to specify evaluation order, for
+example the order in which modules load. We reject this alternative for two reasons. First, errors should occur at determinate points; a program
 that divides by zero should do so at the same point of execution on every run and under every
 implementation. Second, implementers will sooner or later add observations such as printing, and a
 specification that ignores this possibility no longer suggests an implementation strategy once they do.
