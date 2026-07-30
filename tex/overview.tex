@@ -3,15 +3,14 @@
 
 \PurePy is a subset of Python chosen so that its programs are well-behaved and broadly \emph{pure}, yet run
 unchanged under a standard Python interpreter and compute the same result. \secref{purity} makes the purity
-claim precise; the rest of the section sets out the excluded features, grouped by the discipline each one
-protects, and \figref{prevented-errors} summarises the Python runtime errors that well-formedness rules
-out.
+claim precise and sets out the excluded features, grouped by the discipline each one protects;
+\figref{prevented-errors} summarises the Python runtime errors that well-formedness rules out.
 
 \subsection{Purity}
 \label{sec:purity}
 
-\PurePy's purity is practical rather than mathematical. In a \PurePy program a name means one thing
-wherever it is read: a variable, once definitely assigned, denotes a fixed value; a function is fixed by
+The name \PurePy makes a claim that printing and runtime failure might seem to contradict. The claim is
+purity in the senses that matter. In a \PurePy program a name means one thing wherever it is read: a variable, once definitely assigned, denotes a fixed value; a function is fixed by
 its definition; and a module's members are fixed once the module has loaded. Neither mutation nor
 evaluation order can change what a name denotes. Python permits much that breaks this discipline, so
 \PurePy tightens or excludes the idioms responsible.
@@ -30,7 +29,7 @@ them. So we describe them. A program that divides by zero should abort at the sa
 every run and under every implementation, and an implementer who adds printing or something like it should
 find the order of events already fixed.
 
-\subsection{Mutable state}
+\subsubsection{Mutable state}
 \label{sec:no-mutable-state}
 
 A variable in \PurePy denotes a fixed value once definitely assigned, so features that mutate or rebind state
@@ -55,7 +54,7 @@ result \pyinline{11}. \PurePy rejects the program, keeping closures over values 
 with Java's requirement that captured locals be effectively final~\cite[\S15.27.2]{gosling2025}. The rules that
 enforce this are given in \secref{captured-vars}.
 
-\subsection{Control flow and effects}
+\subsubsection{Control flow and effects}
 \label{sec:no-effects}
 
 \PurePy excludes loops with \pyinline{break} and \pyinline{continue}, exceptions
@@ -67,7 +66,7 @@ conjunction with mutable state, which \PurePy already excludes, and iteration is
 and recursion rather than by loops. A future release may add structured effects; for now the core stays
 effect-free.
 
-\subsection{Implicit coercions}
+\subsubsection{Implicit coercions}
 \label{sec:no-coercions}
 
 Python accepts several implicit coercions and lax matches that are convenient but a recognised source of error,
@@ -79,7 +78,7 @@ pattern match a list, whereas in \PurePy a list pattern matches only a list and 
 The third is in constructor patterns: Python lets a positional class pattern supply fewer sub-patterns than the
 class's field arity, matching only those given, whereas \PurePy requires the exact arity.
 
-\subsection{Load-dependent meaning}
+\subsubsection{Load-dependent meaning}
 \label{sec:no-load-dependent}
 
 A name's meaning in \PurePy must not depend on the order in which modules load or on runtime state, so several
@@ -156,7 +155,7 @@ module member the module body never assigns, such as \pyinline{lib.x} where \pyi
 \pyinline{x} only on a branch that is not taken. In Python both cases raise \pyinline{AttributeError}; \PurePy
 rejects them statically.
 
-\subsection{Modules and classes are not first-class}
+\subsubsection{Modules and classes are not first-class}
 \label{sec:no-first-class}
 
 For now, modules and classes are not values in \PurePy. In Python a module is a value and a class declaration
@@ -168,7 +167,7 @@ class is identified by its qualified name, a dataclass declaration may not re-de
 denotes a class in the module; Python permits the re-declaration, leaving the earlier class reachable only
 through its existing instances.
 
-\subsection{Other restrictions}
+\subsubsection{Other restrictions}
 \label{sec:other-restrictions}
 
 A few remaining restrictions do not fit the groups above. Only dataclasses are supported, so \pyinline{class}
