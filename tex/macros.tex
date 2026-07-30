@@ -140,33 +140,27 @@
 % Open term typing arrow
 \newcommand{\carrow}[1]{\xrightarrow{\; #1\; }}
 
-% Change markup (changes + changebar packages).
+% Change markup (own copy of the shared change-tracking definitions, plus changebar).
 % No strikethrough: ulem's \sout is neither line-breakable nor metric-neutral.
+\input{tex/change-tracking}
 \colorlet{deletedgray}{gray!70}
-\setdeletedmarkup{\textcolor{deletedgray}{#1}}
 % Capitalised variants add a margin changebar; use the lowercase forms inside
 % figures or math, where changebar spans misbehave. \leavevmode commits a run-in
 % heading in the default colour before the markup colour starts.
 \newcommand{\Added}[1]{\leavevmode\protect\cbstart\added{#1}\protect\cbend\xspace}
 \newcommand{\Deleted}[1]{\leavevmode\protect\cbstart\deleted{#1}\protect\cbend\xspace}
-% The control space after #1 separates the new text from the deleted text shown
-% after it (a plain space at the start of #2 is eaten by the changes package).
-\newcommand{\Replaced}[2]{\leavevmode\protect\cbstart\replaced{#1\ }{#2}\protect\cbend\xspace}
+\newcommand{\Replaced}[2]{\leavevmode\protect\cbstart\replaced{#1}{#2\ }\protect\cbend\xspace}
 % Deleted display material (diagrams, figures) that cannot live inside \Deleted:
 % greyed out with a changebar in draft mode, discarded in final mode.
 \newenvironment{DeletedBlock}{\par\cbstart\color{deletedgray}}{\cbend\par}
 % Added display material (tables, figures) that cannot live inside \Added: alignment
 % and rule material is fragile inside the changes package's argument.
 \newenvironment{AddedBlock}{\par\cbstart\color{blue}}{\cbend\par}
-% Final mode bypasses the changes package: its \IfIsEmpty test expands the
-% replacement text, and any macro with #1 in its body then causes a runaway \iffalse.
+% Final mode also drops the changebar wrappers and block environments.
 \ifdefined\finalmode
   \renewcommand{\Added}[1]{#1}%
   \renewcommand{\Deleted}[1]{}%
   \renewcommand{\Replaced}[2]{#1}%
-  \renewcommand{\added}[2][]{#2}%
-  \renewcommand{\deleted}[2][]{}%
-  \renewcommand{\replaced}[3][]{#2}%
   \renewenvironment{DeletedBlock}{\setbox0\vbox\bgroup}{\egroup}%
   \renewenvironment{AddedBlock}{\par}{\par}%
 \fi
