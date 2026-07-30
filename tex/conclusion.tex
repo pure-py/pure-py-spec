@@ -10,12 +10,15 @@ updating in place, suggests the shape such interfaces can take.
 
 \subsection{Typed effects}
 
-A future version of \PurePy may add a typed effect discipline, in the style of monadic effects or effect
-handlers. Such disciplines commonly coexist with native effects: Haskell tracks input and output in its
-\pyinline{IO} monad yet ships an untracked \pyinline{trace} for pure
-code,\footnote{\url{https://hackage.haskell.org/package/base/docs/Debug-Trace.html}} Lean likewise has
-\pyinline{dbg_trace}, and the monadic effect libraries of Scala operate alongside the language's native
-effects. We do not expect \PurePy's existing effects, printing included, to be an obstacle: printing can
-be reinterpreted as a typed output effect (a writer, in monadic terms), or kept native as it is now, with
-essentially equivalent semantics, because printed output never influences a program's result
-(\secref{purity}).
+A future version of \PurePy may add a typed effect discipline. In a mypy-compatible type system the
+question is notational, because effect information must fit within annotations that Python and mypy
+already accept. A return type such as \pyinline{IO[int]} tracks effects as an ordinary generic type, in
+the Haskell style, though chaining is awkward in a language of statements without dedicated syntax.
+\pyinline{Annotated[int, Console]} (PEP 593) attaches effect metadata that mypy ignores and the \PurePy
+checker can read. Lightest is a decorator: with effects the default, \pyinline{@pure} marks functions in
+which printing and other effects are rejected, and unannotated code keeps its current meaning. Under any
+of these, existing support for printing is not an obstacle, since printing can be reinterpreted as a typed
+output effect or kept native with essentially equivalent semantics, printed output never influencing a
+result (\secref{purity}). Typed disciplines coexisting with native effects have precedent, from Haskell's
+untracked \pyinline{trace} in pure code\footnote{\url{https://hackage.haskell.org/package/base/docs/Debug-Trace.html}}
+to Scala's monadic effect libraries alongside the language's native effects.
