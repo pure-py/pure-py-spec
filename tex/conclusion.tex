@@ -7,3 +7,15 @@ Scientific computing in Python rests on libraries such as NumPy and Pandas, whos
 mutation and indexing. \PurePy therefore needs compatible counterparts: libraries, or subsets of existing
 ones, whose operations are pure. Polars,\footnote{\url{https://docs.pola.rs/}} whose operations return new frames rather than
 updating in place, suggests the shape such interfaces can take.
+
+\subsection{Typed effects}
+
+A future version of \PurePy may add a typed effect discipline, in the style of monadic effects or effect
+handlers. Such disciplines commonly coexist with native effects: Haskell tracks input and output in its
+\pyinline{IO} monad yet ships an untracked \pyinline{trace} for pure
+code,\footnote{\url{https://hackage.haskell.org/package/base/docs/Debug-Trace.html}} Lean likewise has
+\pyinline{dbg_trace}, and the monadic effect libraries of Scala operate alongside the language's native
+effects. We do not expect \PurePy's existing effects, printing included, to be an obstacle: printing can
+be reinterpreted as a typed output effect (a writer, in monadic terms), or kept native as it is now, with
+essentially equivalent semantics, because printed output never influences a program's result
+(\secref{purity}).
