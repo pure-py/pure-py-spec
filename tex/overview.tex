@@ -10,20 +10,23 @@ out.
 \subsection{Purity}
 \label{sec:purity}
 
-\PurePy does not claim purity in a mathematical sense, because no practical language has it: even
-ostensibly pure languages admit non-termination, and their programs abort on runtime errors such as
-division by zero or an index out of bounds. \PurePy also supports printing, which is more plainly an
-effect, though a benign one, because printing observes a computation without influencing its result. The
-purity \PurePy claims is purity in the senses that matter for reasoning about programs: a name's meaning
-does not depend on evaluation order or on mutation; a variable, once definitely assigned, denotes a fixed
-value; a function is fixed by its definition; and a module's members are fixed once it has loaded. Python
-permits much that breaks this discipline, so \PurePy tightens or excludes the idioms responsible.
+\PurePy's purity is practical rather than mathematical. In a \PurePy program a name means one thing
+wherever it is read: a variable, once definitely assigned, denotes a fixed value; a function is fixed by
+its definition; and a module's members are fixed once the module has loaded. Neither mutation nor
+evaluation order can change what a name denotes. Python permits much that breaks this discipline, so
+\PurePy tightens or excludes the idioms responsible.
 
-A more strict, but less useful, design would drop printing and decline to specify evaluation order, for
-example the order in which modules load. We reject this alternative for two reasons. First, errors should occur at determinate points; a program
-that divides by zero should do so at the same point of execution on every run and under every
-implementation. Second, implementers will sooner or later add observations such as printing, and a
-specification that ignores this possibility no longer suggests an implementation strategy once they do.
+Mathematical purity is out of reach for any practical language, and we do not claim it. \PurePy programs
+may fail to terminate, and they abort at runtime on errors such as division by zero or an index out of
+bounds, as programs do in ostensibly pure languages too. \PurePy also supports printing, a genuine
+effect, but a benign one, since printed output observes a computation without influencing its result.
+
+A more strict, but less useful, design would claim more by supporting less. Without printing there is
+little reason to specify evaluation order, including the order in which modules load, and errors could be
+left to occur at unspecified points. We specify the order instead, for two reasons. A program that divides
+by zero should do so at the same point of execution on every run and under every implementation. And
+implementers will sooner or later add observations such as printing, so a specification that ignores this
+possibility stops suggesting an implementation strategy at exactly the point one is needed.
 
 \subsection{Mutable state}
 \label{sec:no-mutable-state}
