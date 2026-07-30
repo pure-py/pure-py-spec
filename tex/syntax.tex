@@ -18,7 +18,7 @@ Metavariables $x$, $f$, $c$ range over \emph{variables}; idiomatically $f$ is us
 A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the following \emph{context entries} $\theta$:
 \begin{itemize}
 \item the variable's \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
-\item a \emph{module reference}, for a fully-qualified module name $q$: either a \emph{stub} $\modStub{q}$, or \emph{loaded} reference $\modLoaded{q}{\Gamma}$, which also carries the member context $\Gamma$ of $q$;
+\item a \emph{module reference}, for a fully-qualified module name $q$: either a \emph{stub} $\modStub{q}$, or \emph{loaded} reference $\modLoaded{q}{\Gamma}$, which also carries a context $\Gamma$ specifying the members of $q$; a context in this role is called the \emph{signature} of $q$;
 \item a \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}$, recording the declaring context $\Gamma$, the qualified name $q.c$ of the class, sequence of distinct field names $\seq{x}$, and base class name $c'$ (or $\bot$ for no base).
 \end{itemize}
 \end{definition}
@@ -169,7 +169,7 @@ p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order; the proper pref
 are its \emph{ancestors}. The $\submodules$ metafunction is
 defined, with the class-related metafunctions, in \appendixref{sec:aux-modules}.
 
-In this section, loading a module means checking its body and computing its member context
+In this section, loading a module means checking its body and computing its signature
 (\figref{well-formed-module}), the static counterpart of run-time loading (\secref{opsem}). Both
 import forms load their target, together with its ancestors
 (\figref{well-formed-imports}). A plain import also records each of these modules as a member of its
@@ -241,7 +241,7 @@ R \override \Returns = \Returns \override R & = \Returns
 \input{fig/well-formed-expr}
 \input{fig/well-formed-module}
 
-The output context $\Gamma$ of the module well-formedness judgement (\figref{well-formed-module}) comprises the classes and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own bindings are disjoint, because the module rules prohibit a module from binding a name that is also the name of a submodule (\secref{no-load-dependent}).
+The signature $\Gamma$ a module's load judgement produces (\figref{well-formed-module}) comprises the classes and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own bindings are disjoint, because the module rules prohibit a module from binding a name that is also the name of a submodule (\secref{no-load-dependent}).
 
 \subsection{Examples}
 
