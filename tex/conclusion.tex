@@ -7,3 +7,18 @@ Scientific computing in Python rests on libraries such as NumPy and Pandas, whos
 mutation and indexing. \PurePy therefore needs compatible counterparts: libraries, or subsets of existing
 ones, whose operations are pure. Polars,\footnote{\url{https://docs.pola.rs/}} whose operations return new frames rather than
 updating in place, suggests the shape such interfaces can take.
+
+\subsection{Typed effects}
+
+A future version of \PurePy may add a typed effect discipline. In a mypy-compatible type system the
+question is notational, because effect information must fit within annotations that Python and mypy
+already accept. A return type such as \pyinline{IO[int]} tracks effects as an ordinary generic type, in
+the Haskell style, though chaining is awkward in a language of statements without dedicated syntax.
+\pyinline{Annotated[int, Console]} (PEP 593) attaches effect metadata that mypy ignores and the \PurePy
+checker can read. Lightest is a decorator: with effects the default, \pyinline{@pure} marks functions in
+which printing and other effects are rejected, and unannotated code keeps its current meaning. Under any
+of these, existing support for printing is not an obstacle, since printing can be reinterpreted as a typed
+output effect or kept native with essentially equivalent semantics, printed output never influencing a
+result (\secref{purity}). Typed disciplines coexisting with native effects have precedent, from Haskell's
+untracked \pyinline{trace} in pure code\footnote{\url{https://hackage.haskell.org/package/base/docs/Debug-Trace.html}}
+to Scala's monadic effect libraries alongside the language's native effects.

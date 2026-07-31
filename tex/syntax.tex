@@ -235,13 +235,19 @@ R \override \Returns = \Returns \override R & = \Returns
 \]
 \end{lemma}
 
-\noindent A module attribute reference is well-formed only when it resolves to a definitely assigned member (rule \ruleName{attr-module}); see \secref{uninitialised-members}.
+\noindent A module attribute reference is well-formed only when it resolves to a definitely assigned member
+(rule \ruleName{attr-module}); see \secref{no-load-dependent}.
 
 \input{fig/well-formed}
 \input{fig/well-formed-expr}
 \input{fig/well-formed-module}
 
-The signature $\Gamma$ a module's load judgement produces (\figref{well-formed-module}) comprises the classes and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule, never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own bindings are disjoint, because the module rules prohibit a module from binding a name that is also the name of a submodule (\secref{no-load-dependent}).
+The signature $\Gamma$ a module's load judgement produces (\figref{well-formed-module}) comprises the classes
+and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule,
+never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
+name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own
+bindings are disjoint, because the module rules prohibit a module from binding a name that is also the name of
+a submodule (\secref{no-load-dependent}).
 
 \subsection{Examples}
 

@@ -3,29 +3,44 @@
 
 \PurePy is a subset of Python chosen so that its programs are well-behaved and broadly \emph{pure}, yet run
 unchanged under a standard Python interpreter and compute the same result. \secref{purity} makes the purity
-claim precise; the rest of the section sets out the excluded features, grouped by the discipline each one
-protects, and \figref{prevented-errors} summarises the Python runtime errors that well-formedness rules
-out.
+claim precise and sets out the excluded features, grouped by the discipline each one protects;
+\figref{prevented-errors} summarises the Python runtime errors that well-formedness rules out, and
+\figref{roadmap} lists planned additions and features under consideration.
 
 \subsection{Purity}
 \label{sec:purity}
 
-\PurePy does not claim purity in a mathematical sense, because no practical language has it: even
-ostensibly pure languages admit non-termination, and their programs abort on runtime errors such as
-division by zero or an index out of bounds. \PurePy also supports printing, which is more plainly an
-effect, though a benign one, because printing observes a computation without influencing its result. The
-purity \PurePy claims is purity in the senses that matter for reasoning about programs: a name's meaning
-does not depend on evaluation order or on mutation; a variable, once definitely assigned, denotes a fixed
-value; a function is fixed by its definition; and a module's members are fixed once it has loaded. Python
-permits much that breaks this discipline, so \PurePy tightens or excludes the idioms responsible.
+\PurePy is not semantically ``pure'' in the sense of providing a guarantee that every program terminates with
+a unique value. No practical programming language is pure in this sense. Real programs may fail to terminate,
+or abort with errors such as division-by-zero or index-out-of-bounds, even in languages regarded as (mostly)
+pure, like Haskell.
 
-A more strict, but less useful, design would drop printing and decline to specify evaluation order, for
-example the order in which modules load. We reject this alternative for two reasons. First, errors should occur at determinate points; a program
-that divides by zero should do so at the same point of execution on every run and under every
-implementation. Second, implementers will sooner or later add observations such as printing, and a
-specification that ignores this possibility no longer suggests an implementation strategy once they do.
+We do, however, claim that \PurePy is pure in the senses that matter. Every name has a unique lexical scope; a
+variable, once definitely assigned, denotes a fixed value; a module's members are fixed once the module has
+loaded. There is no mutation, nor can evaluation order change the meaning of a name. Python operates largely
+outside this discipline, and the goal of \PurePy is to characterise a suitably large subset of Python that
+stays within it.
 
-\subsection{Mutable state}
+A non-trivial component of the PurePy specification concerns module loading, in the form of well-formedness
+rules which rule out programs which depend on Python's load-order-sensitive behaviours
+(\secref{no-load-dependent}). One might wonder why a language which is mutation-free even needs to concern
+itself with loading order. If the result of a program is all that can be observed, the order in which
+subexpressions are evaluated cannot affect that result, and so cannot meaningfully be part of the
+specification. However runtime errors, at least if they can be distinguished, remove that freedom: if
+division-by-zero reports differently from index-out-of-bounds, a program with two possible failures reveals
+which was reached first, and implementations which choose different orders might disagree about what such a
+program does. \PurePy aims to serve as a template for practical implementation, not as an idealised calculus,
+and practical implementations need to be able to report on different kinds of error, since those reports are
+important to users. The sequential semantics of module loading therefore remains an important part of the
+specification so that programs which fail do so deterministically under every implementation.
+
+Real-world languages, including the ``pure'' ones, also support logging to a terminal. Haskell has
+\pyinline{trace}; \PurePy has \pyinline{print}, following Python. This too is a computational effect, but one
+that is not only indispensable but benign; printing can only report on a computation and cannot influence its
+result. Moreover with loading order already part of the specification, printing is a low-cost, high-utility
+feature that leaves the core purity benefits of \PurePy untouched.
+
+\subsubsection{Mutable state}
 \label{sec:no-mutable-state}
 
 A variable in \PurePy denotes a fixed value once definitely assigned, so features that mutate or rebind state
@@ -50,19 +65,19 @@ result \pyinline{11}. \PurePy rejects the program, keeping closures over values 
 with Java's requirement that captured locals be effectively final~\cite[\S15.27.2]{gosling2025}. The rules that
 enforce this are given in \secref{captured-vars}.
 
-\subsection{Control flow and effects}
+\subsubsection{Control flow and effects}
 \label{sec:no-effects}
 
 \PurePy excludes loops with \pyinline{break} and \pyinline{continue}, exceptions
-(\pyinline{try}/\pyinline{except}/\pyinline{raise}), context managers (\pyinline{with}), generators
-(\pyinline{yield}/\pyinline{yield from}), and coroutines (\pyinline{async}/\pyinline{await}). Functional
+(\pyinline{try}/\allowbreak\pyinline{except}/\allowbreak\pyinline{raise}), context managers (\pyinline{with}), generators
+(\pyinline{yield}/\allowbreak\pyinline{yield from}), and coroutines (\pyinline{async}/\allowbreak\pyinline{await}). Functional
 programming has rich accounts of effects, from monads to algebraic effect handlers, so these features are not
 inherently at odds with a functional language. In idiomatic Python, though, they are used mainly in
 conjunction with mutable state, which \PurePy already excludes, and iteration is expressed by comprehensions
 and recursion rather than by loops. A future release may add structured effects; for now the core stays
 effect-free.
 
-\subsection{Implicit coercions}
+\subsubsection{Implicit coercions}
 \label{sec:no-coercions}
 
 Python accepts several implicit coercions and lax matches that are convenient but a recognised source of error,
@@ -74,7 +89,7 @@ pattern match a list, whereas in \PurePy a list pattern matches only a list and 
 The third is in constructor patterns: Python lets a positional class pattern supply fewer sub-patterns than the
 class's field arity, matching only those given, whereas \PurePy requires the exact arity.
 
-\subsection{Load-dependent meaning}
+\subsubsection{Load-dependent meaning}
 \label{sec:no-load-dependent}
 
 A name's meaning in \PurePy must not depend on the order in which modules load or on runtime state, so several
@@ -142,7 +157,6 @@ Loading \pyinline{pkg.sub}, wherever in the program it happens, sets it as an at
 mentions \pyinline{pkg.sub}. The name has no load-order-independent meaning, so \PurePy prohibits the clash
 outright.
 
-\label{sec:uninitialised-members}
 For the same reason, a module may not refer to a submodule it does not itself import. A submodule is not an
 attribute of its package until it is loaded, so \pyinline{import a} followed by \pyinline{a.b.f()} is rejected
 unless the module also imports \pyinline{a.b}; Python permits the reference whenever some earlier import,
@@ -151,7 +165,7 @@ module member the module body never assigns, such as \pyinline{lib.x} where \pyi
 \pyinline{x} only on a branch that is not taken. In Python both cases raise \pyinline{AttributeError}; \PurePy
 rejects them statically.
 
-\subsection{Modules and classes are not first-class}
+\subsubsection{Modules and classes are not first-class}
 \label{sec:no-first-class}
 
 For now, modules and classes are not values in \PurePy. In Python a module is a value and a class declaration
@@ -163,7 +177,7 @@ class is identified by its qualified name, a dataclass declaration may not re-de
 denotes a class in the module; Python permits the re-declaration, leaving the earlier class reachable only
 through its existing instances.
 
-\subsection{Other restrictions}
+\subsubsection{Other restrictions}
 \label{sec:other-restrictions}
 
 A few remaining restrictions do not fit the groups above. Only dataclasses are supported, so \pyinline{class}
@@ -192,7 +206,8 @@ scope of well-formedness.
 \label{fig:prevented-errors}
 \end{figure}
 
-{\small
+\begin{figure}
+\small
 \begin{center}
 \begin{minipage}[t]{0.4\textwidth}
 \vspace{0pt}
@@ -228,5 +243,8 @@ Postponed annotation evaluation & \issue{128} \\
 Primitive operations & \issue{132} \\
 \end{tabular}
 \end{minipage}
-\end{center}}
+\end{center}
+\caption{\todo{Planned additions and features under consideration}}
+\label{fig:roadmap}
+\end{figure}
 

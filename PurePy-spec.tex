@@ -42,7 +42,7 @@
 
 \begin{document}
 
-\newcommand{\basetitle}{A Pure Functional Subset of Python for Scientific Computing}
+\newcommand{\basetitle}{A Functional Subset of Python for Scientific Computing}
 \ifdefined\anonmode
   \title{\basetitle}
 \else
@@ -93,8 +93,8 @@
 \begin{abstract}
 \PurePy is a pure, side-effect-free subset of Python: a functional language whose programs are referentially
 transparent, reproducible, and easy to reason about, yet remain ordinary Python. Every well-formed \PurePy
-program is valid Python and runs with the same behaviour, so one source serves both a standard Python
-interpreter and any conforming implementation. This paper specifies \PurePy as a versioned standard, with a
+program is valid Python and runs with the same behaviour, so the same source runs under a standard Python
+interpreter and under any conforming implementation. This paper specifies \PurePy as a versioned standard, with a
 formal grammar, well-formedness rules based on a definite-assignment analysis, and an operational semantics
 that preserves the meaning of well-formed programs in Python. A reference checker decides membership of the
 subset, and a conformance test suite is exercised on CPython, PyPy, GraalPy, and Pyodide. Aimed first at researchers in programming languages and pedagogy, \PurePy
