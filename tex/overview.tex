@@ -18,21 +18,33 @@ has a unique lexical scope; a variable, once definitely assigned, denotes a fixe
 are fixed once the module has loaded. Neither mutation nor evaluation order can change the meaning of a name.
 Python permits much that breaks this discipline, so \PurePy tightens or excludes the idioms responsible.
 
+\Added{Failure alone is enough to make evaluation order observable. Division by zero reports differently from
+an index out of bounds, so a program with two possible failures reveals which was reached first. Evaluation
+order could be left unspecified only if failures were indistinguishable, which is not a practical assumption,
+since which error a program reports is part of what its users see. \PurePy therefore specifies evaluation
+order, including the order in which modules load, so that a program which divides by zero aborts at the same
+point of execution on every run and under every implementation.}
+
 Real-world languages, including the ``pure'' ones, also support logging output to a terminal. \PurePy does
 too. This too is a computational effect, but one that is not only indispensable but benign, since printing can
-only report on a computation and cannot influence its result. A more strict, but less useful, design would
+only report on a computation and cannot influence its result. \Replaced{With evaluation order already
+settled, printing is a minor extension. A case can be made for leaving it out of the core, and little would
+be lost by doing so, since the substantial part of the specification for implementers is the evaluation
+order, which stands either way. Idealising further, to a language with no effects at all or with
+indistinguishable failures, would leave that part out, and an implementer who then added printing would have
+to fix the order of events without guidance.}{A more strict, but less useful, design would
 drop printing altogether. With failure the only effect left, the point at which a program fails cannot be
 observed, and evaluation order, including the order in which modules load, could go unspecified. But this
 works only while failures are indistinguishable. If division by zero reports differently from an index out of
 bounds, then a program with two possible failures shows which was reached first, and evaluation order is
-observable after all.
+observable after all.}
 
-Leaving effects out might seem to spare implementers as well as us, but the saving would be ours alone.
+\Deleted{Leaving effects out might seem to spare implementers as well as us, but the saving would be ours alone.
 Basic effects are essential to a practical language, and sequential execution comes with them, so
 implementations must provide both whether or not the specification describes them. So we describe them. A
 program that divides by zero aborts at the same point of execution on every run and under every
 implementation, and an implementer who adds printing or something like it finds the order of events
-already fixed.
+already fixed.}
 
 \subsubsection{Mutable state}
 \label{sec:no-mutable-state}
