@@ -10,23 +10,22 @@ claim precise and sets out the excluded features, grouped by the discipline each
 \subsection{Purity}
 \label{sec:purity}
 
-The name \PurePy makes a claim that some features of the language might seem to contradict. The claim is
-not that every \PurePy program terminates with exit status zero; a language that guaranteed only that
-would be singularly useless. The claim is purity in the senses that matter. In a \PurePy program a name means one thing wherever it is read: a variable, once definitely assigned, denotes a fixed value; a function is fixed by
-its definition; and a module's members are fixed once the module has loaded. Neither mutation nor
-evaluation order can change what a name denotes. Python permits much that breaks this discipline, so
-\PurePy tightens or excludes the idioms responsible.
+\PurePy is not semantically ``pure'' in the sense of providing a guarantee that every program terminates with
+a unique value. No practical programming language is pure in this sense. Real programs may fail to terminate,
+or abort at runtime with errors such as division-by-zero or index-out-of-bounds, even in languages regarded as
+(mostly) pure, like Haskell. What we do claim is that \PurePy is pure in the senses that matter. Every name
+has a unique lexical scope; a variable, once definitely assigned, denotes a fixed value; a module's members
+are fixed once the module has loaded. Neither mutation nor evaluation order can change the meaning of a name.
+Python permits much that breaks this discipline, so \PurePy tightens or excludes the idioms responsible.
 
-No practical language is mathematically pure. \PurePy programs may fail to terminate, and they abort at
-runtime on errors such as division by zero or an index out of bounds, as programs do even in languages
-regarded as pure. \PurePy also supports printing, a genuine effect, but a benign one, since printing
-reports on a computation without influencing its result.
-
-A more strict, but less useful, design would drop printing altogether. With failure the only effect left,
-the point at which a program fails cannot be observed, and evaluation order, including the order in which
-modules load, could go unspecified. But this works only while failures are indistinguishable. If division
-by zero reports differently from an index out of bounds, then a program with two possible failures shows
-which was reached first, and evaluation order is observable after all.
+Real-world languages, including the ``pure'' ones, also support logging output to a terminal. \PurePy does
+too. This too is a computational effect, but one that is not only indispensable but benign, since printing can
+only report on a computation and cannot influence its result. A more strict, but less useful, design would
+drop printing altogether. With failure the only effect left, the point at which a program fails cannot be
+observed, and evaluation order, including the order in which modules load, could go unspecified. But this
+works only while failures are indistinguishable. If division by zero reports differently from an index out of
+bounds, then a program with two possible failures shows which was reached first, and evaluation order is
+observable after all.
 
 Leaving effects out might seem to spare implementers as well as us, but the saving would be ours alone.
 Basic effects are essential to a practical language, and sequential execution comes with them, so
