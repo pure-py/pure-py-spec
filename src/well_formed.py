@@ -314,12 +314,10 @@ def check_pattern(p: ast.pattern, ctx: ModuleContext) -> None:
             check_pattern(sub, ctx)
         return
     if isinstance(p, ast.MatchMapping):
-        seen: set[str] = set()
-        for key in p.keys:
-            k = dict_key(key)
-            if k in seen:
-                raise IllFormedModule(p, reasons.DuplicateDictKey(k))
-            seen.add(k)
+        keys = [dict_key(key) for key in p.keys]
+        duplicate = next((k for i, k in enumerate(keys) if k in keys[:i]), None)
+        if duplicate is not None:
+            raise IllFormedModule(p, reasons.DuplicateDictKey(duplicate))
         for sub in p.patterns:
             check_pattern(sub, ctx)
         return
