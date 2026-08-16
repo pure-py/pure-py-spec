@@ -290,13 +290,13 @@ def check_expr(node: ast.expr) -> None:
     if isinstance(node, ast.ListComp):
         check_expr(node.elt)
         for g in node.generators:
-            check_comprehension(g)
+            check_generator(g)
         return
     if isinstance(node, ast.DictComp):
         check_expr(node.key)
         check_expr(node.value)
         for g in node.generators:
-            check_comprehension(g)
+            check_generator(g)
         return
     if isinstance(node, ast.SetComp):
         raise NotYetSupported(node, 'set comprehensions', 147)
@@ -327,7 +327,7 @@ def check_body(stmts: list[ast.stmt]) -> None:
 def check_keyword(node: ast.keyword) -> None:
     check_expr(node.value)
 
-def check_comprehension(node: ast.comprehension) -> None:
+def check_generator(node: ast.comprehension) -> None:
     if node.is_async:
         raise Prohibited(node, 'async comprehensions prohibited')
     if not isinstance(node.target, ast.Name):
