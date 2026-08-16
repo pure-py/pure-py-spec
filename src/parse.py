@@ -272,7 +272,7 @@ def check_expr(node: ast.expr) -> None:
             check_expr(v)
         return
     if isinstance(node, ast.Set):
-        raise NotYetSupported(node, 'set literals', 52)
+        raise NotYetSupported(node, 'set literals', 147)
     if isinstance(node, ast.Attribute):
         check_expr(node.value)
         return
