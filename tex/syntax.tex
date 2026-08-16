@@ -166,8 +166,9 @@ an environment $\rho_q$ for each such $q$, binding the same names to implementat
 \end{figure}
 
 The metafunction $\assignsS$ extends by union from individual statements to blocks; on a module
-body $\seq{\iota}\;\seq{s}$ it acts on $\seq{s}$. Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q =
-p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order; the proper prefixes of a module name
+body $\seq{\iota}\;\seq{s}$ it acts on $\seq{s}$. Write \Replaced{$q \prefixOf q'$}{$p \prefixOf q$} (\emph{prefix}) when \Replaced{$q' = q$ or $q' =
+q.q''$ for some $q''$}{$q = p$ or $q =
+p.q'$ for some $q'$}, and $\properPrefixOf$ for the strict order; the proper prefixes of a module name
 are its \emph{ancestors}. The $\submodules$ metafunction is
 defined, with the class-related metafunctions, in \appendixref{sec:aux-modules}.
 
