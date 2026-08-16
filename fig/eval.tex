@@ -218,11 +218,6 @@
 \begin{figure}
 \color{addedcolor}
 \small
-\begin{align*}
-\elems(\exList{v_1, \ldots, v_n}) &{}= v_1 \ldots v_n \\
-\elems(\exTuple{v_1, \ldots, v_n}) &{}= v_1 \ldots v_n
-\end{align*}
-
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
 \begin{mathpar}
 \small
@@ -337,10 +332,10 @@
 {
 \inferrule*[lab={\ruleName{eval-list-comp}}]
 {
-  \rho, \seq{g}, e \Rightarrow v_1 \ldots v_k
+  \rho, \seq{g}, e \Rightarrow v_1 \ldots v_m
 }
 {
-  \rho, \exListComp{e}{g_1\;\ldots\;g_n} \Rightarrow \exList{v_1, \ldots, v_k}
+  \rho, \exListComp{e}{g_1\;\ldots\;g_n} \Rightarrow \exList{v_1, \ldots, v_m}
 }}
 \end{mathpar}
 
@@ -374,12 +369,11 @@
 \and
 \inferrule*[lab={\ruleName{eval-qual-generator}}]
 {
-  \rho, e' \Rightarrow v \\
-  \elems(v) = u_1 \ldots u_k \\
+  \rho, e' \Rightarrow \exList{u_1, \ldots, u_n} \\
   \rho \override \set{\bind{x}{u_i}}, \seq{g}, e \Rightarrow \seq{v}_i \quad (\forall i)
 }
 {
-  \rho, \qualGenerator{x}{e'} \cons \seq{g}, e \Rightarrow \seq{v}_1 \cons \ldots \cons \seq{v}_k
+  \rho, \qualGenerator{x}{e'} \cons \seq{g}, e \Rightarrow \seq{v}_1 \cons \ldots \cons \seq{v}_n
 }
 \end{mathpar}
 \caption{Evaluation of the compound expression forms}
