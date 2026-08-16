@@ -41,6 +41,8 @@
 \newcommand*{\exUnaryOp}[2]{#1\,#2}
 \newcommand*{\exAttr}[2]{#1\mathord{.}#2}
 \newcommand*{\exSubscript}[2]{#1[#2]}
+\newcommand*{\exAnd}[2]{#1\;\pyinline{and}\;#2}
+\newcommand*{\exOr}[2]{#1\;\pyinline{or}\;#2}
 \newcommand*{\exCondExpr}[3]{#1\;\pyinline{if}\;#2\;\pyinline{else}\;#3}
 \newcommand*{\exList}[1]{[#1]}
 \newcommand*{\exTuple}[1]{(#1)}
@@ -118,6 +120,9 @@
 \newcommand*{\dispatch}{\mathrm{dispatch}}
 \newcommand*{\env}{\mathrm{env}}
 \newcommand*{\resolveClass}{\mathrm{resolve\text{-}class}}
+\newcommand*{\elems}{\mathrm{elems}}
+\newcommand*{\getitem}{\mathrm{subscript}}
+\newcommand*{\sem}[1]{[\![#1]\!]}
 
 % Orders, relations, and judgement symbols
 \newcommand*{\prefixOf}{\preceq}

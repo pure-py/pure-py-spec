@@ -111,8 +111,10 @@ def f(b):
 
 \paragraph{Operators.}
 
-The metavariable $\odot$ ranges over the supported binary operators and $\ominus$ over the supported unary
-operators, both enumerated in \figref{precedence}. The grammar of \figref{syntax-expr} is intentionally ambiguous
+The metavariable $\odot$ ranges over the supported binary operators \Added{other than \pyinline{and} and
+\pyinline{or},} and $\ominus$ over the supported unary
+operators, both enumerated in \figref{precedence}. \Added{The operators \pyinline{and} and \pyinline{or} have their own
+expression forms; they do not evaluate both operands.} The grammar of \figref{syntax-expr} is intentionally ambiguous
 on operator forms; disambiguation is by the precedence and associativity given in \figref{precedence},
 which follow Python.
 
@@ -212,7 +214,8 @@ A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is li
 Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
 = e} definitely assigns $\set{\bind{\pyinline{x}}{\statusDefAssigned}}$. \emph{Result types} $R$ classify these outcomes: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$). Block well-formedness is given in
-\figref{well-formed}; expression well-formedness in \figref{well-formed-expr}.
+\figref{well-formed}; expression well-formedness in \figref{well-formed-expr}\Added{, with the compound forms
+in \figref{well-formed-expr-compound}}.
 
 Context operations $\override$ and $\merge$ lift to a right semiring over result types $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge$ and zero for $\override$.
 

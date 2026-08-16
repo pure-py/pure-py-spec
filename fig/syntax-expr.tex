@@ -11,6 +11,8 @@ $e$ & $::=$ & $x$ & (Var) \\
     & $\mid$ & $\exSubscript{e}{e'}$ & (Subscript) \\
     & $\mid$ & $\exBinOp{e}{\odot}{e'}$ & (BinOp) \\
     & $\mid$ & $\exUnaryOp{\ominus}{e}$ & (UnaryOp) \\
+    & $\mid$ & $\added{\exAnd{e}{e'}}$ & \added{(And)} \\
+    & $\mid$ & $\added{\exOr{e}{e'}}$ & \added{(Or)} \\
     & $\mid$ & $\exCondExpr{e_1}{e}{e_2}$ & (CondExpr) \\
     & $\mid$ & $\exList{e_1, \ldots, e_n}$ & (List) \\
     & $\mid$ & $\exTuple{e_1, \ldots, e_n}$ & (Tuple) \\
@@ -21,6 +23,7 @@ $g$ & $::=$ & $\qualGuard{e}$ & (Guard) \\
     & $\mid$ & $\qualGenerator{x}{e}$ & (Generator)
    \\[3mm]
 $\ell$ & $::=$ & $n$ & (Number) \\
+    & $\mid$ & $\added{w}$ & \added{(String)} \\
     & $\mid$ & $\pyinline{True}$ & (True) \\
     & $\mid$ & $\pyinline{False}$ & (False) \\
     & $\mid$ & $\pyinline{None}$ & (None)
