@@ -11,7 +11,7 @@ from contexts import (ClassEntry, Context, ContextEntry, ModuleContext, ModuleLo
                       module_of, override_gamma, override_results, override_var, var_status)
 from aux import (BlockElement, assigns_block, assigns_elements, binds, captures, captures_element,
                  elements_of_block, find_first_reassigning, names_in_target, own_fields_of)
-from patterns import mapping_key, is_catch_all, pattern_vars, subsumes
+from patterns import dict_key, is_catch_all, pattern_vars, subsumes
 
 def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
     base = node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
@@ -316,7 +316,7 @@ def check_pattern(p: ast.pattern, ctx: ModuleContext) -> None:
     if isinstance(p, ast.MatchMapping):
         seen: set[str] = set()
         for key in p.keys:
-            k = mapping_key(key)
+            k = dict_key(key)
             if k in seen:
                 raise IllFormedModule(p, reasons.DuplicateDictKey(k))
             seen.add(k)

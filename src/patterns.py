@@ -15,7 +15,7 @@ def literal_value(pat: ast.MatchValue) -> object:
         return -operand_value if isinstance(v.op, ast.USub) else operand_value
     raise AssertionError(f'unexpected MatchValue payload: {type(v).__name__}')
 
-def mapping_key(k: ast.expr) -> str:
+def dict_key(k: ast.expr) -> str:
     assert isinstance(k, ast.Constant) and isinstance(k.value, str)
     return k.value
 
@@ -31,8 +31,8 @@ def subsumes(p: ast.pattern, q: ast.pattern) -> bool:
     if isinstance(p, ast.MatchSingleton) and isinstance(q, ast.MatchSingleton):
         return p.value is q.value
     if isinstance(p, ast.MatchMapping) and isinstance(q, ast.MatchMapping):
-        p_keys = {mapping_key(k): sub for k, sub in zip(p.keys, p.patterns)}
-        q_keys = {mapping_key(k): sub for k, sub in zip(q.keys, q.patterns)}
+        p_keys = {dict_key(k): sub for k, sub in zip(p.keys, p.patterns)}
+        q_keys = {dict_key(k): sub for k, sub in zip(q.keys, q.patterns)}
         if not set(q_keys) <= set(p_keys):
             return False
         return all(subsumes(p_keys[k], sub) for k, sub in q_keys.items())
