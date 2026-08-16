@@ -218,13 +218,6 @@
 \begin{figure}
 \color{addedcolor}
 \small
-\begin{align*}
-\getitem(\exList{v_1, \ldots, v_m}, n) &{}= v_{n+1} && \text{if } 0 \leq n < m \\
-\getitem(\exList{v_1, \ldots, v_m}, n) &{}= v_{m+n+1} && \text{if } {-m} \leq n < 0 \\
-\getitem(\exTuple{v_1, \ldots, v_m}, n) &{}= v_{n+1} && \text{if } 0 \leq n < m \\
-\getitem(\exTuple{v_1, \ldots, v_m}, n) &{}= v_{m+n+1} && \text{if } {-m} \leq n < 0
-\end{align*}
-
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
 \begin{mathpar}
 \small
@@ -249,12 +242,23 @@
 {
 \inferrule*[lab={\ruleName{eval-subscript}}]
 {
-  \rho, e \Rightarrow v \\
-  \rho, e' \Rightarrow v' \\
-  \getitem(v, v') = u
+  \rho, e \Rightarrow \exList{v_1, \ldots, v_m} \\
+  \rho, e' \Rightarrow n \\
+  0 \leq n < m
 }
 {
-  \rho, \exSubscript{e}{e'} \Rightarrow u
+  \rho, \exSubscript{e}{e'} \Rightarrow v_{n+1}
+}}
+\and
+{
+\inferrule*[lab={\ruleName{eval-subscript-neg}}]
+{
+  \rho, e \Rightarrow \exList{v_1, \ldots, v_m} \\
+  \rho, e' \Rightarrow n \\
+  {-m} \leq n < 0
+}
+{
+  \rho, \exSubscript{e}{e'} \Rightarrow v_{m+n+1}
 }}
 \and
 {
