@@ -260,7 +260,7 @@
 {
   \rho, e \Rightarrow v \\
   \rho, e' \Rightarrow v' \\
-  \sem{\odot}(v, v') = u
+  \hat{\odot}(v, v') = u
 }
 {
   \rho, \exBinOp{e}{\odot}{e'} \Rightarrow u
@@ -270,7 +270,7 @@
 \inferrule*[lab={\ruleName{eval-unary-op}}]
 {
   \rho, e \Rightarrow v \\
-  \sem{\ominus}(v) = u
+  \hat{\ominus}(v) = u
 }
 {
   \rho, \exUnaryOp{\ominus}{e} \Rightarrow u

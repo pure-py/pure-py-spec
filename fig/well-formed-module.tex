@@ -170,10 +170,10 @@
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
   \vdash \seq{\iota} : \Gamma \\
   \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} : \Delta \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submodules(q)) = \varnothing
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\added{\submods}\deleted{\submodules}(q)) = \varnothing
 }
 {
-  \vdash_{\mathsf{load}} q : \submodules(q) \override \Delta
+  \vdash_{\mathsf{load}} q : \added{\submods}\deleted{\submodules}(q) \override \Delta
 }
 
 \end{mathpar}

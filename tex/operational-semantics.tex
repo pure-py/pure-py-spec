@@ -48,7 +48,7 @@ sequential-composition effects, so as black boxes functions are always pure.
 
 Expression evaluation $\rho, e \Rightarrow v$ is given in \figref{eval-expr}\Added{, with the compound forms in
 \figref{eval-expr-compound}. The strict operators and subscripting are given by partial metafunctions
-$\sem{\odot}$, $\sem{\ominus}$ and $\getitem$, fixed by the implementation over the primitive values. Where
+$\hat{\odot}$, $\hat{\ominus}$ and $\getitem$, fixed by the implementation over the primitive values; the hat distinguishes the function from the operator symbol. Where
 one of them is undefined, as for division by zero or a subscript out of range, the expression has no
 derivation. The operators \pyinline{and} and \pyinline{or} evaluate their second operand only when the first
 leaves the result open, and a conditional expression requires its condition to be \pyinline{True} or
