@@ -335,7 +335,6 @@
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow v
 }
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-list-comp}}]
 {
   \rho, \seq{g} \Rightarrow \rho_1 \ldots \rho_m \\
@@ -343,9 +342,8 @@
 }
 {
   \rho, \exListComp{e}{g_1\;\ldots\;g_n} \Rightarrow \exList{v_1, \ldots, v_m}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-dict-comp}}]
 {
   \rho, \seq{g} \Rightarrow \rho_1 \ldots \rho_m \\
@@ -354,14 +352,13 @@
 }
 {
   \rho, \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \Rightarrow \exDict{\entries(\varepsilon, \bind{w_1}{v_1} \cons \ldots \cons \bind{w_m}{v_m})}
-}}
+}
 \end{mathpar}
 \caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$}
 \label{fig:eval-expr}
 \end{figure}
 
 \begin{figure}
-\color{addedcolor}
 \flushleft \shadebox{$\rho, \seq{g} \Rightarrow \seq{\rho}$}
 \begin{mathpar}
 \small
