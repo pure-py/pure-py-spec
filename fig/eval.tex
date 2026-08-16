@@ -226,7 +226,7 @@
   \rho, e_i' \Rightarrow v_i \quad (\forall i)
 }
 {
-  \rho, \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \Rightarrow \entries(\varepsilon, \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n})
+  \rho, \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \Rightarrow \exDict{\entries(\varepsilon, \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n})}
 }}
 \and
 \inferrule*[lab={\ruleName{eval-list}}]
