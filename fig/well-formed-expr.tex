@@ -202,6 +202,16 @@
 {
   \Gamma \vdash \exListComp{e}{g_1\;\ldots\;g_n}
 }
+\and
+\inferrule*[lab={\ruleName{dict-comp}}]
+{
+  \Gamma \vdash \seq{g} : \Delta \\
+  \Gamma \override \Delta \vdash e \\
+  \Gamma \override \Delta \vdash e'
+}
+{
+  \Gamma \vdash \exDictComp{e}{e'}{g_1\;\ldots\;g_n}
+}
 \end{mathpar}
 \subcaption{Expression $e$ is well-formed under $\Gamma$}
 \end{subfigure}

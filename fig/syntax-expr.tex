@@ -17,6 +17,7 @@ $e$ & $::=$ & $x$ & (Var) \\
     & $\mid$ & $\exList{e_1, \ldots, e_n}$ & (List) \\
     & $\mid$ & $\exTuple{e_1, \ldots, e_n}$ & (Tuple) \\
     & $\mid$ & $\exListComp{e}{g_1\;\ldots\;g_n}$ & (ListComp) \\
+    & $\mid$ & $\exDictComp{e}{e'}{g_1\;\ldots\;g_n}$ & (DictComp) \\
     & $\mid$ & $\exLambda{x_1, \ldots, x_n}{e}$ & (Lambda)
    \\[3mm]
 $g$ & $::=$ & $\qualGuard{e}$ & (Guard) \\
