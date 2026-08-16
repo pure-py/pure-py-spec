@@ -51,13 +51,13 @@
 }
 \and
 {\color{addedcolor}
-\inferrule*[lab={\ruleName{pat-mapping}}]
+\inferrule*[lab={\ruleName{pat-dict}}]
 {
-  w_i \mathord{:} u_i \in d \quad (\forall i) \\
+  \bind{w_i}{u_i} \in d \quad (\forall i) \\
   \rho, p_i, u_i \matches \rho_i \quad (\forall i)
 }
 {
-  \rho, \patMapping{w_1 \mathord{:} p_1, \ldots, w_n \mathord{:} p_n}, d \matches \rho_1 \disjunion \ldots \disjunion \rho_n
+  \rho, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}}, d \matches \rho_1 \disjunion \ldots \disjunion \rho_n
 }}
 \and
 \inferrule*[lab={\ruleName{pat-as}}]

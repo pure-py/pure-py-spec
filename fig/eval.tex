@@ -121,11 +121,11 @@
 \dispatch(\rho, v, (\exCase{p}{b}) \cons \seq{c}) &= \dispatch(\rho, v, \seq{c}) && \text{if } \rho, p, v \notmatches \\
 \\
 {\color{addedcolor}\entries(d, \varepsilon)} &{\color{addedcolor}{}= d} \\
-{\color{addedcolor}\entries(d, w \mathord{:} v \cons s)} &{\color{addedcolor}{}= \entries(\update(d, w, v), s)} \\
+{\color{addedcolor}\entries(d, \bind{w}{v} \cons s)} &{\color{addedcolor}{}= \entries(\update(d, w, v), s)} \\
 \\
-{\color{addedcolor}\update(\varepsilon, w, v)} &{\color{addedcolor}{}= w \mathord{:} v} \\
-{\color{addedcolor}\update(w \mathord{:} u \cons d, w, v)} &{\color{addedcolor}{}= w \mathord{:} v \cons d} \\
-{\color{addedcolor}\update(w' \mathord{:} u \cons d, w, v)} &{\color{addedcolor}{}= w' \mathord{:} u \cons \update(d, w, v)} && {\color{addedcolor}\text{if } w \neq w'}
+{\color{addedcolor}\update(\varepsilon, w, v)} &{\color{addedcolor}{}= \bind{w}{v}} \\
+{\color{addedcolor}\update(\bind{w}{u} \cons d, w, v)} &{\color{addedcolor}{}= \bind{w}{v} \cons d} \\
+{\color{addedcolor}\update(\bind{w'}{u} \cons d, w, v)} &{\color{addedcolor}{}= \bind{w'}{u} \cons \update(d, w, v)} && {\color{addedcolor}\text{if } w \neq w'}
 \end{align*}
 \caption{Metafunctions used by block and expression evaluation}
 \label{fig:eval-aux}
@@ -226,7 +226,7 @@
   \rho, e_i' \Rightarrow v_i \quad (\forall i)
 }
 {
-  \rho, \exDict{e_1 \mathord{:} e_1', \ldots, e_n \mathord{:} e_n'} \Rightarrow \entries(\varepsilon, w_1 \mathord{:} v_1 \cons \ldots \cons w_n \mathord{:} v_n)
+  \rho, \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \Rightarrow \entries(\varepsilon, \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n})
 }}
 \and
 \inferrule*[lab={\ruleName{eval-list}}]

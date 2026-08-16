@@ -122,7 +122,7 @@
   \Gamma \vdash e_i' \quad (\forall i)
 }
 {
-  \Gamma \vdash \exDict{e_1 \mathord{:} e_1', \ldots, e_n \mathord{:} e_n'}
+  \Gamma \vdash \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}}
 }}
 \and
 \inferrule*[lab={\ruleName{list}}]
