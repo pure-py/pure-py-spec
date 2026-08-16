@@ -335,57 +335,71 @@
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow v
 }
 \and
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-list-comp}}]
 {
-  \rho, \seq{g}, e \Rightarrow v_1 \ldots v_m
+  \rho, \seq{g} \Rightarrow \rho_1 \ldots \rho_m \\
+  \rho_i, e \Rightarrow v_i \quad (\forall i)
 }
 {
   \rho, \exListComp{e}{g_1\;\ldots\;g_n} \Rightarrow \exList{v_1, \ldots, v_m}
+}}
+\and
+{\color{addedcolor}
+\inferrule*[lab={\ruleName{eval-dict-comp}}]
+{
+  \rho, \seq{g} \Rightarrow \rho_1 \ldots \rho_m \\
+  \rho_i, e \Rightarrow w_i \quad (\forall i) \\
+  \rho_i, e' \Rightarrow v_i \quad (\forall i)
 }
+{
+  \rho, \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \Rightarrow \exDict{\entries(\varepsilon, \bind{w_1}{v_1} \cons \ldots \cons \bind{w_m}{v_m})}
+}}
 \end{mathpar}
 \caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$}
 \label{fig:eval-expr}
 \end{figure}
 
 \begin{figure}
-\flushleft \shadebox{$\rho, \seq{g}, e \Rightarrow \seq{v}$}
+\color{addedcolor}
+\flushleft \shadebox{$\rho, \seq{g} \Rightarrow \seq{\rho}$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-quals-nil}}]
 {
-  \rho, e \Rightarrow v
+  \strut
 }
 {
-  \rho, \varepsilon, e \Rightarrow v
+  \rho, \varepsilon \Rightarrow \rho
 }
 \and
 \inferrule*[lab={\ruleName{eval-qual-guard-true}}]
 {
-  \rho, e' \Rightarrow \pyinline{True} \\
-  \rho, \seq{g}, e \Rightarrow \seq{v}
+  \rho, e \Rightarrow \pyinline{True} \\
+  \rho, \seq{g} \Rightarrow \seq{\rho}
 }
 {
-  \rho, \qualGuard{e'} \cons \seq{g}, e \Rightarrow \seq{v}
+  \rho, \qualGuard{e} \cons \seq{g} \Rightarrow \seq{\rho}
 }
 \and
 \inferrule*[lab={\ruleName{eval-qual-guard-false}}]
 {
-  \rho, e' \Rightarrow \pyinline{False}
+  \rho, e \Rightarrow \pyinline{False}
 }
 {
-  \rho, \qualGuard{e'} \cons \seq{g}, e \Rightarrow \varepsilon
+  \rho, \qualGuard{e} \cons \seq{g} \Rightarrow \varepsilon
 }
 \and
 \inferrule*[lab={\ruleName{eval-qual-generator}}]
 {
-  \rho, e' \Rightarrow \exList{u_1, \ldots, u_n} \\
-  \rho \override \set{\bind{x}{u_i}}, \seq{g}, e \Rightarrow \seq{v}_i \quad (\forall i)
+  \rho, e \Rightarrow \exList{u_1, \ldots, u_n} \\
+  \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \seq{\rho}_i \quad (\forall i)
 }
 {
-  \rho, \qualGenerator{x}{e'} \cons \seq{g}, e \Rightarrow \seq{v}_1 \cons \ldots \cons \seq{v}_n
+  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \seq{\rho}_1 \cons \ldots \cons \seq{\rho}_n
 }
 \end{mathpar}
-\caption{Comprehension qualifiers $\seq{g}$ with body $e$ produce values $\seq{v}$}
+\caption{Comprehension qualifiers $\seq{g}$ produce environments $\seq{\rho}$}
 \label{fig:eval-quals}
 \end{figure}
 

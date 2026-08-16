@@ -251,19 +251,22 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
         check_exprs(e.values, ctx)
         return
     if isinstance(e, ast.ListComp):
-        check_comprehension(e.elt, e.generators, ctx)
+        check_comprehension([e.elt], e.generators, ctx)
+        return
+    if isinstance(e, ast.DictComp):
+        check_comprehension([e.key, e.value], e.generators, ctx)
         return
     raise AssertionError(f'unexpected expression: {type(e).__name__}')
 
-def check_comprehension(elt: ast.expr, generators: list[ast.comprehension], ctx: ModuleContext) -> None:
+def check_comprehension(elts: list[ast.expr], generators: list[ast.comprehension], ctx: ModuleContext) -> None:
     if len(generators) == 0:
-        check_expr(elt, ctx)
+        check_exprs(elts, ctx)
         return
     g = generators[0]
     check_expr(g.iter, ctx)
     ctx_ = override_var(ctx, {n: Status.TT for n in names_in_target(g.target)})
     check_exprs(g.ifs, ctx_)
-    check_comprehension(elt, generators[1:], ctx_)
+    check_comprehension(elts, generators[1:], ctx_)
 
 def check_exprs(es: list[ast.expr], ctx: ModuleContext) -> None:
     if len(es) == 0:

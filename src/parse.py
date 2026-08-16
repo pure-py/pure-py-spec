@@ -293,7 +293,11 @@ def check_expr(node: ast.expr) -> None:
             check_comprehension(g)
         return
     if isinstance(node, ast.DictComp):
-        raise NotYetSupported(node, 'dict comprehensions', 52)
+        check_expr(node.key)
+        check_expr(node.value)
+        for g in node.generators:
+            check_comprehension(g)
+        return
     if isinstance(node, ast.SetComp):
         raise NotYetSupported(node, 'set comprehensions', 147)
     if isinstance(node, ast.Slice):

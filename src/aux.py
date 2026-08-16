@@ -81,7 +81,9 @@ def fv(e: ast.expr) -> set[str]:
     if isinstance(e, ast.Dict):
         return fv_list([k for k in e.keys if k is not None]) | fv_list(e.values)
     if isinstance(e, ast.ListComp):
-        return fv_comprehension(e.elt, e.generators)
+        return fv_comprehension([e.elt], e.generators)
+    if isinstance(e, ast.DictComp):
+        return fv_comprehension([e.key, e.value], e.generators)
     raise AssertionError(f'unexpected expression: {type(e).__name__}')
 
 def fv_list(es: list[ast.expr]) -> set[str]:
@@ -89,12 +91,12 @@ def fv_list(es: list[ast.expr]) -> set[str]:
         return set()
     return fv(es[0]) | fv_list(es[1:])
 
-def fv_comprehension(elt: ast.expr, generators: list[ast.comprehension]) -> set[str]:
+def fv_comprehension(elts: list[ast.expr], generators: list[ast.comprehension]) -> set[str]:
     if len(generators) == 0:
-        return fv(elt)
+        return fv_list(elts)
     g = generators[0]
     target_names = names_in_target(g.target)
-    rest = fv_list(g.ifs) | fv_comprehension(elt, generators[1:])
+    rest = fv_list(g.ifs) | fv_comprehension(elts, generators[1:])
     return fv(g.iter) | rest - target_names
 
 def names_in_target(target: ast.expr) -> set[str]:
@@ -133,7 +135,9 @@ def captures(e: ast.expr) -> set[str]:
     if isinstance(e, ast.Dict):
         return captures_list([k for k in e.keys if k is not None]) | captures_list(e.values)
     if isinstance(e, ast.ListComp):
-        return captures_comprehension(e.elt, e.generators)
+        return captures_comprehension([e.elt], e.generators)
+    if isinstance(e, ast.DictComp):
+        return captures_comprehension([e.key, e.value], e.generators)
     raise AssertionError(f'unexpected expression: {type(e).__name__}')
 
 def captures_list(es: list[ast.expr]) -> set[str]:
@@ -141,12 +145,12 @@ def captures_list(es: list[ast.expr]) -> set[str]:
         return set()
     return captures(es[0]) | captures_list(es[1:])
 
-def captures_comprehension(elt: ast.expr, generators: list[ast.comprehension]) -> set[str]:
+def captures_comprehension(elts: list[ast.expr], generators: list[ast.comprehension]) -> set[str]:
     if len(generators) == 0:
-        return captures(elt)
+        return captures_list(elts)
     g = generators[0]
     target_names = names_in_target(g.target)
-    rest = captures_list(g.ifs) | captures_comprehension(elt, generators[1:])
+    rest = captures_list(g.ifs) | captures_comprehension(elts, generators[1:])
     return captures(g.iter) | rest - target_names
 
 def fv_stmt(s: ast.stmt) -> set[str]:
