@@ -251,10 +251,10 @@
 \inferrule*[lab={\ruleName{qual-generator}}]
 {
   \Gamma \vdash e \\
-  \Gamma \override \statusDefAssigned(\set{x}) \vdash \seq{g} : \Delta
+  \Gamma \override \set{\bind{x}{\statusDefAssigned}} \vdash \seq{g} : \Delta
 }
 {
-  \Gamma \vdash \qualGenerator{x}{e} \cons \seq{g} : \statusDefAssigned(\set{x}) \override \Delta
+  \Gamma \vdash \qualGenerator{x}{e} \cons \seq{g} : \set{\bind{x}{\statusDefAssigned}} \override \Delta
 }
 \end{mathpar}
 \subcaption{Comprehension qualifiers $\seq{g}$ bind $\Delta$ under $\Gamma$}
