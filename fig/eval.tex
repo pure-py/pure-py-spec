@@ -1,11 +1,5 @@
 \begin{figure}
 \small
-\begin{align*}
-\dispatch(\rho, v, \varepsilon) &= (\varnothing, \exPass) \\
-\dispatch(\rho, v, (\exCase{p}{b}) \cons \seq{c}) &= (\rho', b) && \text{if } \rho, p, v \matches \rho' \\
-\dispatch(\rho, v, (\exCase{p}{b}) \cons \seq{c}) &= \dispatch(\rho, v, \seq{c}) && \text{if } \rho, p, v \notmatches
-\end{align*}
-
 \flushleft \shadebox{$\rho, b \Rightarrow r$}
 \begin{mathpar}
 \small
@@ -116,14 +110,22 @@
 \unwrap(\returns{v}) &= v \\
 \unwrap(\assigns{\rho}) &= \pyinline{None} \\
 \\
-\\
 \env(\rho, x) &= \rho' && \text{where } \rho(x) = \modLoaded{q'}{\rho'} \\
 \env(\rho, q.x) &= \rho' && \text{where } \env(\rho, q)(x) = \modLoaded{q'}{\rho'} \\
 \\
 \resolveClass(\rho, c) &= \rho(c) \\
-\resolveClass(\rho, q.c) &= \env(\rho, q)(c)
+\resolveClass(\rho, q.c) &= \env(\rho, q)(c) \\
+\\
+\dispatch(\rho, v, \varepsilon) &= (\varnothing, \exPass) \\
+\dispatch(\rho, v, (\exCase{p}{b}) \cons \seq{c}) &= (\rho', b) && \text{if } \rho, p, v \matches \rho' \\
+\dispatch(\rho, v, (\exCase{p}{b}) \cons \seq{c}) &= \dispatch(\rho, v, \seq{c}) && \text{if } \rho, p, v \notmatches
 \end{align*}
+\caption{Metafunctions used by block and expression evaluation}
+\label{fig:eval-aux}
+\end{figure}
 
+\begin{figure}
+\small
 \flushleft \shadebox{$\rho, e \Rightarrow v$}
 \begin{mathpar}
 \small
@@ -210,18 +212,8 @@
 {
   \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \exObj{\Gamma}{C}{\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}, \bind{y_1}{v_{n+1}}, \ldots, \bind{y_m}{v_{n+m}}}}
 }
-\end{mathpar}
-\caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$}
-\label{fig:eval-expr}
-\end{figure}
-
-\begin{figure}
-\color{addedcolor}
-\small
-\flushleft \shadebox{$\rho, e \Rightarrow v$}
-\begin{mathpar}
-\small
-{
+\and
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-list}}]
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i)
@@ -230,7 +222,7 @@
   \rho, \exList{e_1, \ldots, e_n} \Rightarrow \exList{v_1, \ldots, v_n}
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-tuple}}]
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i)
@@ -239,7 +231,7 @@
   \rho, \exTuple{e_1, \ldots, e_n} \Rightarrow \exTuple{v_1, \ldots, v_n}
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-subscript}}]
 {
   \rho, e \Rightarrow \exList{v_1, \ldots, v_m} \\
@@ -250,7 +242,7 @@
   \rho, \exSubscript{e}{e'} \Rightarrow v_{n+1}
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-subscript-neg}}]
 {
   \rho, e \Rightarrow \exList{v_1, \ldots, v_m} \\
@@ -261,7 +253,7 @@
   \rho, \exSubscript{e}{e'} \Rightarrow v_{m+n+1}
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-binop}}]
 {
   \rho, e \Rightarrow v \\
@@ -272,7 +264,7 @@
   \rho, \exBinOp{e}{\odot}{e'} \Rightarrow u
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-unary-op}}]
 {
   \rho, e \Rightarrow v \\
@@ -282,7 +274,7 @@
   \rho, \exUnaryOp{\ominus}{e} \Rightarrow u
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-and-false}}]
 {
   \rho, e \Rightarrow \pyinline{False}
@@ -291,7 +283,7 @@
   \rho, \exAnd{e}{e'} \Rightarrow \pyinline{False}
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-and-true}}]
 {
   \rho, e \Rightarrow \pyinline{True} \\
@@ -301,7 +293,7 @@
   \rho, \exAnd{e}{e'} \Rightarrow v
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-or-true}}]
 {
   \rho, e \Rightarrow \pyinline{True}
@@ -310,7 +302,7 @@
   \rho, \exOr{e}{e'} \Rightarrow \pyinline{True}
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-or-false}}]
 {
   \rho, e \Rightarrow \pyinline{False} \\
@@ -320,7 +312,7 @@
   \rho, \exOr{e}{e'} \Rightarrow v
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-cond-true}}]
 {
   \rho, e \Rightarrow \pyinline{True} \\
@@ -330,7 +322,7 @@
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow v
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-cond-false}}]
 {
   \rho, e \Rightarrow \pyinline{False} \\
@@ -340,7 +332,7 @@
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow v
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-list-comp}}]
 {
   \rho, \seq{g}, e \Rightarrow v_1 \ldots v_m
@@ -349,7 +341,12 @@
   \rho, \exListComp{e}{g_1\;\ldots\;g_n} \Rightarrow \exList{v_1, \ldots, v_m}
 }}
 \end{mathpar}
+\caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$}
+\label{fig:eval-expr}
+\end{figure}
 
+\begin{figure}
+\color{addedcolor}
 \flushleft \shadebox{$\rho, \seq{g}, e \Rightarrow \seq{v}$}
 \begin{mathpar}
 \small
@@ -387,7 +384,7 @@
   \rho, \qualGenerator{x}{e'} \cons \seq{g}, e \Rightarrow \seq{v}_1 \cons \ldots \cons \seq{v}_n
 }
 \end{mathpar}
-\caption{Evaluation of the compound expression forms}
-\label{fig:eval-expr-compound}
+\caption{Comprehension qualifiers $\seq{g}$ with body $e$ produce values $\seq{v}$}
+\label{fig:eval-quals}
 \end{figure}
 

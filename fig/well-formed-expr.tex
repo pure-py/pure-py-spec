@@ -121,20 +121,8 @@
 {
   \Gamma \vdash \exAttr{e}{x}
 }
-\end{mathpar}
-\subcaption{Expression $e$ is well-formed under $\Gamma$}
-\end{subfigure}
-\caption{Expression well-formedness}
-\label{fig:well-formed-expr}
-\end{figure}
-
-\begin{figure}
-\color{addedcolor}
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash e$}
-\begin{mathpar}
-\small
-{
+\and
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{list}}]
 {
   \Gamma \vdash e_i \quad (\forall i)
@@ -143,7 +131,7 @@
   \Gamma \vdash \exList{e_1, \ldots, e_n}
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{tuple}}]
 {
   \Gamma \vdash e_i \quad (\forall i)
@@ -152,7 +140,7 @@
   \Gamma \vdash \exTuple{e_1, \ldots, e_n}
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{subscript}}]
 {
   \Gamma \vdash e \\
@@ -162,7 +150,7 @@
   \Gamma \vdash \exSubscript{e}{e'}
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{binop}}]
 {
   \Gamma \vdash e \\
@@ -172,7 +160,7 @@
   \Gamma \vdash \exBinOp{e}{\odot}{e'}
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{unary-op}}]
 {
   \Gamma \vdash e
@@ -181,7 +169,7 @@
   \Gamma \vdash \exUnaryOp{\ominus}{e}
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{and}}]
 {
   \Gamma \vdash e \\
@@ -191,7 +179,7 @@
   \Gamma \vdash \exAnd{e}{e'}
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{or}}]
 {
   \Gamma \vdash e \\
@@ -201,7 +189,7 @@
   \Gamma \vdash \exOr{e}{e'}
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{cond}}]
 {
   \Gamma \vdash e \\
@@ -212,7 +200,7 @@
   \Gamma \vdash \exCondExpr{e_1}{e}{e_2}
 }}
 \and
-{
+{\color{addedcolor}
 \inferrule*[lab={\ruleName{list-comp}}]
 {
   \Gamma \vdash \seq{g} : \Delta \\
@@ -228,6 +216,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
+\color{addedcolor}
 \flushleft \shadebox{$\Gamma \vdash \seq{g} : \Delta$}
 \begin{mathpar}
 \small
@@ -259,6 +248,6 @@
 \end{mathpar}
 \subcaption{Comprehension qualifiers $\seq{g}$ bind $\Delta$ under $\Gamma$}
 \end{subfigure}
-\caption{Well-formedness of the compound expression forms}
-\label{fig:well-formed-expr-compound}
+\caption{Expression well-formedness}
+\label{fig:well-formed-expr}
 \end{figure}
