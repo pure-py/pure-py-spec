@@ -50,6 +50,15 @@
   \patTuple{p_1, \ldots, p_n} \subsumed \patTuple{q_1, \ldots, q_n}
 }
 \and
+\inferrule*[lab={\ruleName{sub-dict-dict}}]
+{
+  \set{u_1, \ldots, u_m} \subseteq \set{w_1, \ldots, w_n} \\
+  p_i \subsumed q_j \quad (\forall i, j.\ w_i = u_j)
+}
+{
+  \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \subsumed \patDict{\bind{u_1}{q_1}, \ldots, \bind{u_m}{q_m}}
+}
+\and
 \inferrule*[lab={\ruleName{sub-as-l}}]
 {
   p \subsumed q
