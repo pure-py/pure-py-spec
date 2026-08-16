@@ -318,7 +318,7 @@ def check_pattern(p: ast.pattern, ctx: ModuleContext) -> None:
         for key in p.keys:
             k = mapping_key(key)
             if k in seen:
-                raise IllFormedModule(p, reasons.DuplicateMappingKey(k))
+                raise IllFormedModule(p, reasons.DuplicateDictKey(k))
             seen.add(k)
         for sub in p.patterns:
             check_pattern(sub, ctx)

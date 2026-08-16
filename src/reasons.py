@@ -112,10 +112,10 @@ class DuplicatePatternKeyword:
 
 
 @dataclass(frozen=True)
-class DuplicateMappingKey:
+class DuplicateDictKey:
     key: str
     def message(self) -> str:
-        return f"duplicate key '{self.key}' in mapping pattern"
+        return f"duplicate key '{self.key}' in dict pattern"
 
 
 @dataclass(frozen=True)
@@ -236,7 +236,7 @@ Reason = Union[
     UnreachableStatement, ConstructorArityMismatch, PatternArityMismatch,
     UnknownClassInPattern, UnknownFieldInPattern, DuplicatePatternKeyword,
     UnknownModule, UnknownMember, ModuleAsValue, ClassAsValue,
-    UnknownConstructorKeyword, DuplicateMappingKey,
+    UnknownConstructorKeyword, DuplicateDictKey,
     NonlinearPattern, UnreachableCase, DuplicateMutualName,
     NonTopLevelImport, NonTopLevelClass, TopLevelReturn, EmptyFromImport,
     ImportAfterStatement, SubmoduleNameClash, SubmoduleNotImported, OwnDescendantImport,

@@ -33,9 +33,9 @@ def subsumes(p: ast.pattern, q: ast.pattern) -> bool:
     if isinstance(p, ast.MatchMapping) and isinstance(q, ast.MatchMapping):
         p_keys = {mapping_key(k): sub for k, sub in zip(p.keys, p.patterns)}
         q_keys = {mapping_key(k): sub for k, sub in zip(q.keys, q.patterns)}
-        if not set(p_keys) <= set(q_keys):
+        if not set(q_keys) <= set(p_keys):
             return False
-        return all(subsumes(sub, q_keys[k]) for k, sub in p_keys.items())
+        return all(subsumes(p_keys[k], sub) for k, sub in q_keys.items())
     if isinstance(p, ast.MatchSequence) and isinstance(q, ast.MatchSequence):
         if bool(getattr(p, 'is_list_pattern', False)) != bool(getattr(q, 'is_list_pattern', False)):
             return False

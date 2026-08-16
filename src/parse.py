@@ -190,10 +190,10 @@ def check_pattern(node: ast.pattern) -> None:
         return
     if isinstance(node, ast.MatchMapping):
         if node.rest is not None:
-            raise NotYetSupported(node, 'rest capture in mapping patterns', 84)
+            raise NotYetSupported(node, 'rest capture in dict patterns', 84)
         for key in node.keys:
             if not (isinstance(key, ast.Constant) and isinstance(key.value, str)):
-                raise Prohibited(key, 'mapping pattern keys must be string literals')
+                raise Prohibited(key, 'dict pattern keys must be string literals')
         for sub in node.patterns:
             check_pattern(sub)
         return
