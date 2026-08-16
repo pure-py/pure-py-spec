@@ -315,7 +315,7 @@
 }}
 \and
 {
-\inferrule*[lab={\ruleName{eval-cond-expr-true}}]
+\inferrule*[lab={\ruleName{eval-cond-true}}]
 {
   \rho, e \Rightarrow \pyinline{True} \\
   \rho, e_1 \Rightarrow v
@@ -325,7 +325,7 @@
 }}
 \and
 {
-\inferrule*[lab={\ruleName{eval-cond-expr-false}}]
+\inferrule*[lab={\ruleName{eval-cond-false}}]
 {
   \rho, e \Rightarrow \pyinline{False} \\
   \rho, e_2 \Rightarrow v
