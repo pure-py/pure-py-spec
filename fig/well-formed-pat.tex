@@ -26,10 +26,9 @@
 { \Gamma \vdash p \quad (\forall p \in \seq{p}) }
 { \Gamma \vdash \patTuple{\seq{p}} }
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{pat-dict}}]
 { \Gamma \vdash p_i \quad (\forall i) \\ w_1, \ldots, w_n \text{ distinct} }
-{ \Gamma \vdash \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} }}
+{ \Gamma \vdash \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} }
 \and
 \inferrule*[lab={\ruleName{pat-as}}]
 { \Gamma \vdash p }

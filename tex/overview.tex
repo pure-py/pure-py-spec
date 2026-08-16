@@ -82,16 +82,16 @@ effect-free.
 
 Python accepts several implicit coercions and lax matches that are convenient but a recognised source of error,
 since what Python accepts rarely coincides with what the author meant.% TODO: citation on implicit-coercion errors
-\ \PurePy excludes \Replaced{four}{three}. The first is truthiness: the test of an \pyinline{if} or conditional expression, or an
+\ \PurePy excludes four. The first is truthiness: the test of an \pyinline{if} or conditional expression, or an
 \pyinline{assert}, is coerced to \pyinline{bool}, whereas \PurePy requires it to be boolean already. The second
 is between sequence kinds: Python lets a list pattern match a tuple value, and a tuple
 pattern match a list, whereas in \PurePy a list pattern matches only a list and a tuple pattern only a tuple.
 Subscripting draws the same line, applying to lists alone, a tuple being taken apart by pattern
 matching. The third is in constructor patterns: Python lets a positional class pattern supply fewer sub-patterns than the
 class's field arity, matching only those given, whereas \PurePy requires the exact arity.
-\Added{The fourth is in dictionary keys: Python admits any hashable key and treats \pyinline{1},
-\pyinline{1.0} and \pyinline{True} as one key, whereas \PurePy admits only strings.}
-Only the third is decidable without types, so the \Replaced{others are}{first two are} stated here rather than enforced by
+The fourth is in dictionary keys: Python admits any hashable key and treats \pyinline{1},
+\pyinline{1.0} and \pyinline{True} as one key, whereas \PurePy admits only strings.
+Only the third is decidable without types, so the others are stated here rather than enforced by
 the well-formedness rules.
 
 \subsubsection{Load-dependent meaning}
