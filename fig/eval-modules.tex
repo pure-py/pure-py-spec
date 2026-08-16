@@ -56,7 +56,7 @@
 \inferrule*[lab={\ruleName{eval-from-import}}]
 {
   q' \Rightarrow_{\mathsf{load}} \rho \\
-  \added{q''}\,\deleted{p} \Rightarrow_{\mathsf{load}} \rho_{\added{q''}\,\deleted{p}} \quad (\forall \added{q''}\,\deleted{p} \properPrefixOf q',\; \added{q''}\,\deleted{p} \not\prefixOf q) \\
+  q''\, \Rightarrow_{\mathsf{load}} \rho_{q''\,} \quad (\forall q''\, \properPrefixOf q',\; q''\, \not\prefixOf q) \\
   \rho, x_i \importsR v_i \quad (\forall i) \\
    \seq{\iota} \Rightarrow \rho''
 }
@@ -166,7 +166,7 @@
   \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} \Rightarrow \rho'
 }
 {
-  q \Rightarrow_{\mathsf{load}} \added{\submods}\deleted{\submodules}(q) \override \rho'
+  q \Rightarrow_{\mathsf{load}} \submods(q) \override \rho'
 }
 
 \end{mathpar}

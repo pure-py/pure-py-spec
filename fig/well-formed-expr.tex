@@ -3,7 +3,6 @@
 \flushleft \shadebox{$\Gamma \vdash q : \theta$}
 \begin{mathpar}
 \small
-
 \inferrule*[lab={\ruleName{simple-var}}]
 {
   \bind{x}{\statusDefAssigned} \in \Gamma
@@ -12,7 +11,6 @@
   \Gamma \vdash x : \statusDefAssigned
 }
 \and
-
 \inferrule*[lab={\ruleName{simple-module}}]
 {
   \bind{x}{\modLoaded{q}{\Gamma'}} \in \Gamma
@@ -21,7 +19,6 @@
   \Gamma \vdash x : \modLoaded{q}{\Gamma'}
 }
 \and
-
 \inferrule*[lab={\ruleName{simple-class}}]
 {
   \bind{c}{C} \in \Gamma
@@ -30,7 +27,6 @@
   \Gamma \vdash c : C
 }
 \and
-
 \inferrule*[lab={\ruleName{qualified}}]
 {
   \Gamma \vdash q : \modLoaded{q'}{\Gamma'} \\
@@ -67,14 +63,13 @@
   \Gamma \vdash x
 }
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{literal}}]
 {
   \strut
 }
 {
   \Gamma \vdash \ell
-}}
+}
 \and
 \inferrule*[lab={\ruleName{lambda}}]
 {
@@ -84,7 +79,6 @@
   \Gamma \vdash \exLambda{\seq{x}}{e}
 }
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{call}}]
 {
   \Gamma \vdash e \\
@@ -92,7 +86,7 @@
 }
 {
   \Gamma \vdash \exCall{e}{e_1, \ldots, e_n}
-}}
+}
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
@@ -105,7 +99,6 @@
   \Gamma \vdash \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}}
 }
 \and
-
 \inferrule*[lab={\ruleName{attr-module}}]
 {
   \Gamma \vdash \exAttr{e}{x} : \statusDefAssigned
@@ -122,25 +115,22 @@
   \Gamma \vdash \exAttr{e}{x}
 }
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{list}}]
 {
   \Gamma \vdash e_i \quad (\forall i)
 }
 {
   \Gamma \vdash \exList{e_1, \ldots, e_n}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{tuple}}]
 {
   \Gamma \vdash e_i \quad (\forall i)
 }
 {
   \Gamma \vdash \exTuple{e_1, \ldots, e_n}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{subscript}}]
 {
   \Gamma \vdash e \\
@@ -148,9 +138,8 @@
 }
 {
   \Gamma \vdash \exSubscript{e}{e'}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{binop}}]
 {
   \Gamma \vdash e \\
@@ -158,18 +147,16 @@
 }
 {
   \Gamma \vdash \exBinOp{e}{\odot}{e'}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{unary-op}}]
 {
   \Gamma \vdash e
 }
 {
   \Gamma \vdash \exUnaryOp{\ominus}{e}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{and}}]
 {
   \Gamma \vdash e \\
@@ -177,9 +164,8 @@
 }
 {
   \Gamma \vdash \exAnd{e}{e'}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{or}}]
 {
   \Gamma \vdash e \\
@@ -187,9 +173,8 @@
 }
 {
   \Gamma \vdash \exOr{e}{e'}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{cond}}]
 {
   \Gamma \vdash e \\
@@ -198,9 +183,8 @@
 }
 {
   \Gamma \vdash \exCondExpr{e_1}{e}{e_2}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{list-comp}}]
 {
   \Gamma \vdash \seq{g} : \Delta \\
@@ -208,7 +192,7 @@
 }
 {
   \Gamma \vdash \exListComp{e}{g_1\;\ldots\;g_n}
-}}
+}
 \end{mathpar}
 \subcaption{Expression $e$ is well-formed under $\Gamma$}
 \end{subfigure}
@@ -216,7 +200,6 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\color{addedcolor}
 \flushleft \shadebox{$\Gamma \vdash \seq{g} : \Delta$}
 \begin{mathpar}
 \small

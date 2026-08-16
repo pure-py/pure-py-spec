@@ -55,7 +55,7 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q' : \Delta \\
-  \vdash_{\mathsf{load}} \added{q''}\,\deleted{p} : \Delta_{\added{q''}\,\deleted{p}} \quad (\forall \added{q''}\,\deleted{p} \properPrefixOf q',\; \added{q''}\,\deleted{p} \not\prefixOf q) \\
+  \vdash_{\mathsf{load}} q''\, : \Delta_{q''\,} \quad (\forall q''\, \properPrefixOf q',\; q''\, \not\prefixOf q) \\
   \Delta, x_i \importsR \theta_i \quad (\forall i) \\
   \vdash \seq{\iota} : \Gamma
 }
@@ -170,10 +170,10 @@
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
   \vdash \seq{\iota} : \Gamma \\
   \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} : \Delta \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\added{\submods}\deleted{\submodules}(q)) = \varnothing
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {
-  \vdash_{\mathsf{load}} q : \added{\submods}\deleted{\submodules}(q) \override \Delta
+  \vdash_{\mathsf{load}} q : \submods(q) \override \Delta
 }
 
 \end{mathpar}

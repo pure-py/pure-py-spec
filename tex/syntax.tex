@@ -111,10 +111,10 @@ def f(b):
 
 \paragraph{Operators.}
 
-The metavariable $\odot$ ranges over the supported binary operators \Added{other than \pyinline{and} and
-\pyinline{or},} and $\ominus$ over the supported unary
-operators, both enumerated in \figref{precedence}. \Added{The operators \pyinline{and} and \pyinline{or} have their own
-expression forms; they do not evaluate both operands.} The grammar of \figref{syntax-expr} is intentionally ambiguous
+The metavariable $\odot$ ranges over the supported binary operators other than \pyinline{and} and
+\pyinline{or}, and $\ominus$ over the supported unary
+operators, both enumerated in \figref{precedence}. The operators \pyinline{and} and \pyinline{or} have their own
+expression forms; they do not evaluate both operands. The grammar of \figref{syntax-expr} is intentionally ambiguous
 on operator forms; disambiguation is by the precedence and associativity given in \figref{precedence},
 which follow Python.
 
@@ -166,10 +166,9 @@ an environment $\rho_q$ for each such $q$, binding the same names to implementat
 \end{figure}
 
 The metafunction $\assignsS$ extends by union from individual statements to blocks; on a module
-body $\seq{\iota}\;\seq{s}$ it acts on $\seq{s}$. Write \Replaced{$q \prefixOf q'$}{$p \prefixOf q$} (\emph{prefix}) when \Replaced{$q' = q$ or $q' =
-q.q''$ for some $q''$}{$q = p$ or $q =
-p.q'$ for some $q'$}, and $\properPrefixOf$ for the strict order; the proper prefixes of a module name
-are its \emph{ancestors}. The $\Added{\submods}\Deleted{\submodules}$ metafunction is
+body $\seq{\iota}\;\seq{s}$ it acts on $\seq{s}$. Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' =
+q.q''$ for some $q''$, and $\properPrefixOf$ for the strict order; the proper prefixes of a module name
+are its \emph{ancestors}. The $\submods$ metafunction is
 defined, with the class-related metafunctions, in \appendixref{sec:aux-modules}.
 
 In this section, loading a module means checking its body and computing its signature

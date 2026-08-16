@@ -146,14 +146,13 @@
   \rho, x \Rightarrow v
 }
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-literal}}]
 {
   \strut
 }
 {
   \rho, \ell \Rightarrow \ell
-}}
+}
 \and
 \inferrule*[lab={\ruleName{eval-lambda}}]
 {
@@ -213,25 +212,22 @@
   \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \exObj{\Gamma}{C}{\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}, \bind{y_1}{v_{n+1}}, \ldots, \bind{y_m}{v_{n+m}}}}
 }
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-list}}]
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i)
 }
 {
   \rho, \exList{e_1, \ldots, e_n} \Rightarrow \exList{v_1, \ldots, v_n}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-tuple}}]
 {
   \rho, e_i \Rightarrow v_i \quad (\forall i)
 }
 {
   \rho, \exTuple{e_1, \ldots, e_n} \Rightarrow \exTuple{v_1, \ldots, v_n}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-subscript}}]
 {
   \rho, e \Rightarrow \exList{v_1, \ldots, v_m} \\
@@ -240,9 +236,8 @@
 }
 {
   \rho, \exSubscript{e}{e'} \Rightarrow v_{n+1}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-subscript-neg}}]
 {
   \rho, e \Rightarrow \exList{v_1, \ldots, v_m} \\
@@ -251,9 +246,8 @@
 }
 {
   \rho, \exSubscript{e}{e'} \Rightarrow v_{m+n+1}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-binop}}]
 {
   \rho, e \Rightarrow v \\
@@ -262,9 +256,8 @@
 }
 {
   \rho, \exBinOp{e}{\odot}{e'} \Rightarrow u
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-unary-op}}]
 {
   \rho, e \Rightarrow v \\
@@ -272,18 +265,16 @@
 }
 {
   \rho, \exUnaryOp{\ominus}{e} \Rightarrow u
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-and-false}}]
 {
   \rho, e \Rightarrow \pyinline{False}
 }
 {
   \rho, \exAnd{e}{e'} \Rightarrow \pyinline{False}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-and-true}}]
 {
   \rho, e \Rightarrow \pyinline{True} \\
@@ -291,18 +282,16 @@
 }
 {
   \rho, \exAnd{e}{e'} \Rightarrow v
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-or-true}}]
 {
   \rho, e \Rightarrow \pyinline{True}
 }
 {
   \rho, \exOr{e}{e'} \Rightarrow \pyinline{True}
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-or-false}}]
 {
   \rho, e \Rightarrow \pyinline{False} \\
@@ -310,9 +299,8 @@
 }
 {
   \rho, \exOr{e}{e'} \Rightarrow v
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-cond-true}}]
 {
   \rho, e \Rightarrow \pyinline{True} \\
@@ -320,9 +308,8 @@
 }
 {
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow v
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-cond-false}}]
 {
   \rho, e \Rightarrow \pyinline{False} \\
@@ -330,23 +317,21 @@
 }
 {
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow v
-}}
+}
 \and
-{\color{addedcolor}
 \inferrule*[lab={\ruleName{eval-list-comp}}]
 {
   \rho, \seq{g}, e \Rightarrow v_1 \ldots v_m
 }
 {
   \rho, \exListComp{e}{g_1\;\ldots\;g_n} \Rightarrow \exList{v_1, \ldots, v_m}
-}}
+}
 \end{mathpar}
 \caption{Expression $e$ evaluates to value $v$ under environment $\rho : \Gamma$}
 \label{fig:eval-expr}
 \end{figure}
 
 \begin{figure}
-\color{addedcolor}
 \flushleft \shadebox{$\rho, \seq{g}, e \Rightarrow \seq{v}$}
 \begin{mathpar}
 \small
