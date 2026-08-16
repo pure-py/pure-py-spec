@@ -15,7 +15,8 @@ common target that a research language or tool can produce and consume. Purity m
 transparent, deterministic, and reproducible, the properties that scientific computing and formal reasoning
 both want.
 
-This paper defines \PurePy as a versioned formal standard: a formal grammar, well-formedness rules based on a
+This paper defines \PurePy as a versioned formal standard\footnote{This paper describes version
+\versionstring{} of the standard.}: a formal grammar, well-formedness rules based on a
 definite-assignment analysis, and an operational semantics that preserves the meaning of well-formed programs
 in Python. A reference well-formedness checker decides membership of the subset, and a conformance test suite exercises the
 standard against CPython, PyPy, GraalPy, and Pyodide. The guarantee is precise: membership is decidable, and a

@@ -115,6 +115,16 @@
   \Gamma \vdash \exAttr{e}{x}
 }
 \and
+{\color{addedcolor}
+\inferrule*[lab={\ruleName{dict}}]
+{
+  \Gamma \vdash e_i \quad (\forall i) \\
+  \Gamma \vdash e_i' \quad (\forall i)
+}
+{
+  \Gamma \vdash \exDict{e_1 \mathord{:} e_1', \ldots, e_n \mathord{:} e_n'}
+}}
+\and
 \inferrule*[lab={\ruleName{list}}]
 {
   \Gamma \vdash e_i \quad (\forall i)

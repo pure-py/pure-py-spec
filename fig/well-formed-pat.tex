@@ -26,6 +26,11 @@
 { \Gamma \vdash p \quad (\forall p \in \seq{p}) }
 { \Gamma \vdash \patTuple{\seq{p}} }
 \and
+{\color{addedcolor}
+\inferrule*[lab={\ruleName{pat-mapping}}]
+{ \Gamma \vdash p_i \quad (\forall i) \\ w_1, \ldots, w_n \text{ distinct} }
+{ \Gamma \vdash \patMapping{w_1 \mathord{:} p_1, \ldots, w_n \mathord{:} p_n} }}
+\and
 \inferrule*[lab={\ruleName{pat-as}}]
 { \Gamma \vdash p }
 { \Gamma \vdash p\;\pyinline{as}\;x }

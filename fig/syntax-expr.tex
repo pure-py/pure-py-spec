@@ -6,7 +6,7 @@ $e$ & $::=$ & $x$ & (Var) \\
     & $\mid$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exCall{e}{e_1, \ldots, e_n}$ & (Call) \\
     & $\mid$ & $\exConstr{q}{e_1, \ldots, e_n, x_{n+1} \mathord{=} e_{n+1}, \ldots, x_{n+m} \mathord{=} e_{n+m}}$ & (Constr) \\
-    & $\mid$ & $\exDict{x_1 \mathord{:} e_1, \ldots, x_n \mathord{:} e_n}$ & (Dict) \\
+    & $\mid$ & $\added{\exDict{e_1 \mathord{:} e_1', \ldots, e_n \mathord{:} e_n'}}\deleted{\exDict{x_1 \mathord{:} e_1, \ldots, x_n \mathord{:} e_n}}$ & (Dict) \\
     & $\mid$ & $\exAttr{e}{x}$ & (Attribute) \\
     & $\mid$ & $\exSubscript{e}{e'}$ & (Subscript) \\
     & $\mid$ & $\exBinOp{e}{\odot}{e'}$ & (BinOp) \\
@@ -35,6 +35,7 @@ $p$ & $::=$ & $\ell$ & (PatLiteral) \\
     & $\mid$ & $\patList{p_1, \ldots, p_n}$ & (PatList) \\
     & $\mid$ & $\patTuple{p_1, \ldots, p_n}$ & (PatTuple) \\
     & $\mid$ & $\patConstr{q}{p_1, \ldots, p_n, x_{n+1} \mathord{=} p_{n+1}, \ldots, x_{n+m} \mathord{=} p_{n+m}}$ & (PatConstr) \\
+    & $\mid$ & $\added{\patMapping{w_1 \mathord{:} p_1, \ldots, w_n \mathord{:} p_n}}$ & \added{(PatMapping)} \\
     & $\mid$ & $p\;\pyinline{as}\;x$ & (PatAs)
 \end{tabular}
 \end{center}
