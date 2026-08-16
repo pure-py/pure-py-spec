@@ -111,8 +111,10 @@ def f(b):
 
 \paragraph{Operators.}
 
-The metavariable $\odot$ ranges over the supported binary operators and $\ominus$ over the supported unary
-operators, both enumerated in \figref{precedence}. The grammar of \figref{syntax-expr} is intentionally ambiguous
+The metavariable $\odot$ ranges over the supported binary operators other than \pyinline{and} and
+\pyinline{or}, and $\ominus$ over the supported unary
+operators, both enumerated in \figref{precedence}. The operators \pyinline{and} and \pyinline{or} have their own
+expression forms; they do not evaluate both operands. The grammar of \figref{syntax-expr} is intentionally ambiguous
 on operator forms; disambiguation is by the precedence and associativity given in \figref{precedence},
 which follow Python.
 
@@ -164,9 +166,9 @@ an environment $\rho_q$ for each such $q$, binding the same names to implementat
 \end{figure}
 
 The metafunction $\assignsS$ extends by union from individual statements to blocks; on a module
-body $\seq{\iota}\;\seq{s}$ it acts on $\seq{s}$. Write $p \prefixOf q$ (\emph{prefix}) when $q = p$ or $q =
-p.q'$ for some $q'$, and $\properPrefixOf$ for the strict order; the proper prefixes of a module name
-are its \emph{ancestors}. The $\submodules$ metafunction is
+body $\seq{\iota}\;\seq{s}$ it acts on $\seq{s}$. Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' =
+q.q''$ for some $q''$, and $\properPrefixOf$ for the strict order; the proper prefixes of a module name
+are its \emph{ancestors}. The $\submods$ metafunction is
 defined, with the class-related metafunctions, in \appendixref{sec:aux-modules}.
 
 In this section, loading a module means checking its body and computing its signature
@@ -260,7 +262,7 @@ of a conditional, then for that variable to be usable after the conditional, eve
 conditional must either definitely return, or definitely assign that variable too. Thus the following are both
 well-formed:
 
-\begin{figure}[H]
+\begin{figure}[!ht]
 \centering
 \begin{subfigure}{0.48\textwidth}
 \centering
@@ -301,7 +303,7 @@ reference would denote the branch-local variable on one path and the variable it
 For flexibility, we permit \emph{branch-local} variables. The assignment of \pyinline{x} below (left) is
 permitted, and can be used locally in that branch of the conditional:
 
-\begin{figure}[H]
+\begin{figure}[!ht]
 \centering
 \begin{subfigure}{0.48\textwidth}
 \centering

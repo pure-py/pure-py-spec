@@ -62,7 +62,7 @@ def import_bindings(s: ast.stmt, ctx: ModuleContext) -> Context:
             check_module(ctx.M[p], ctx.M, p)
     return imports(s, delta, ctx)
 
-def submodules(M: dict[str, ast.Module], q: str) -> Context:
+def submods(M: dict[str, ast.Module], q: str) -> Context:
     return {x: ModuleStub(f'{q}.{x}')
             for x in {name[len(q) + 1:].split('.')[0] for name in M if name.startswith(f'{q}.')}}
 
@@ -123,7 +123,7 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
 
 def check_submodule_clash(m: ast.Module, gamma0: Context, body: list[ast.stmt],
                           M: dict[str, ast.Module], q: str) -> None:
-    clash = sorted((set(gamma0) | own_members(body, q)) & set(submodules(M, q)))
+    clash = sorted((set(gamma0) | own_members(body, q)) & set(submods(M, q)))
     if clash:
         x = clash[0]
         node = find_binder(m.body, x)
@@ -143,7 +143,7 @@ def find_binder(stmts: list[ast.stmt], x: str) -> Optional[ast.stmt]:
     return next((s for s in stmts if binds_name(s, x)), None)
 
 def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context:
-    stubs: Context = submodules(final_ctx.M, q)
+    stubs: Context = submods(final_ctx.M, q)
     if q in PREDEFINED_MEMBERS:
         own: Context = {name: Status.TT for name in PREDEFINED_MEMBERS[q] | {'__name__'}}
     else:

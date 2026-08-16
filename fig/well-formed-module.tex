@@ -55,7 +55,7 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q' : \Delta \\
-  \vdash_{\mathsf{load}} p : \Delta_p \quad (\forall p \properPrefixOf q',\; p \not\prefixOf q) \\
+  \vdash_{\mathsf{load}} q''\, : \Delta_{q''\,} \quad (\forall q''\, \properPrefixOf q',\; q''\, \not\prefixOf q) \\
   \Delta, x_i \importsR \theta_i \quad (\forall i) \\
   \vdash \seq{\iota} : \Gamma
 }
@@ -170,10 +170,10 @@
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
   \vdash \seq{\iota} : \Gamma \\
   \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} : \Delta \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submodules(q)) = \varnothing
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {
-  \vdash_{\mathsf{load}} q : \submodules(q) \override \Delta
+  \vdash_{\mathsf{load}} q : \submods(q) \override \Delta
 }
 
 \end{mathpar}

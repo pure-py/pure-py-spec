@@ -41,6 +41,8 @@
 \newcommand*{\exUnaryOp}[2]{#1\,#2}
 \newcommand*{\exAttr}[2]{#1\mathord{.}#2}
 \newcommand*{\exSubscript}[2]{#1[#2]}
+\newcommand*{\exAnd}[2]{#1\;\pyinline{and}\;#2}
+\newcommand*{\exOr}[2]{#1\;\pyinline{or}\;#2}
 \newcommand*{\exCondExpr}[3]{#1\;\pyinline{if}\;#2\;\pyinline{else}\;#3}
 \newcommand*{\exList}[1]{[#1]}
 \newcommand*{\exTuple}[1]{(#1)}
@@ -112,7 +114,7 @@
 \newcommand*{\ancestors}{\mathrm{ancestors}}
 \newcommand*{\imports}{\mathrm{imports}}
 \newcommand*{\deps}{\mathrm{deps}}
-\newcommand*{\submodules}{\mathrm{submodules}}
+\newcommand*{\submods}{\mathrm{submods}}
 \newcommand*{\nameOf}{\mathrm{name}}
 \newcommand*{\unwrap}{\mathrm{unwrap}}
 \newcommand*{\dispatch}{\mathrm{dispatch}}
