@@ -189,7 +189,14 @@ def check_pattern(node: ast.pattern) -> None:
             check_pattern(p)
         return
     if isinstance(node, ast.MatchMapping):
-        raise NotYetSupported(node, 'mapping patterns', 87)
+        if node.rest is not None:
+            raise NotYetSupported(node, 'rest capture in dict patterns', 84)
+        for key in node.keys:
+            if not (isinstance(key, ast.Constant) and isinstance(key.value, str)):
+                raise Prohibited(key, 'dict pattern keys must be string literals')
+        for sub in node.patterns:
+            check_pattern(sub)
+        return
     if isinstance(node, ast.MatchOr):
         raise NotYetSupported(node, 'or-patterns', 85)
     if isinstance(node, ast.MatchStar):
@@ -272,7 +279,7 @@ def check_expr(node: ast.expr) -> None:
             check_expr(v)
         return
     if isinstance(node, ast.Set):
-        raise NotYetSupported(node, 'set literals', 52)
+        raise NotYetSupported(node, 'set literals', 147)
     if isinstance(node, ast.Attribute):
         check_expr(node.value)
         return
@@ -288,7 +295,7 @@ def check_expr(node: ast.expr) -> None:
     if isinstance(node, ast.DictComp):
         raise NotYetSupported(node, 'dict comprehensions', 52)
     if isinstance(node, ast.SetComp):
-        raise NotYetSupported(node, 'set comprehensions', 52)
+        raise NotYetSupported(node, 'set comprehensions', 147)
     if isinstance(node, ast.Slice):
         raise NotYetSupported(node, 'slicing', 59)
     if isinstance(node, ast.GeneratorExp):

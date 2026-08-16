@@ -5,6 +5,7 @@
 $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exList{v_1, \ldots, v_n}$ & (List) \\
     & $\mid$ & $\exTuple{v_1, \ldots, v_n}$ & (Tuple) \\
+    & $\mid$ & $\exDict{\bind{w_1}{v_1}, \ldots, \bind{w_n}{v_n}}$ & (Dict) \\
     & $\mid$ & $\exLamClosure[\Gamma]{\rho}{\seq{x}}{e}$ & (LambdaClosure) \\
     & $\mid$ & $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$ & (DefClosure) \\
     & $\mid$ & $\exObj{\Gamma}{C}{\rho}$ & (Object) \\

@@ -50,6 +50,15 @@
   \rho, \patTuple{p_1, \ldots, p_n}, \exTuple{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
 }
 \and
+\inferrule*[lab={\ruleName{pat-dict}}]
+{
+  \bind{w_i}{u_i} \in d \quad (\forall i) \\
+  \rho, p_i, u_i \matches \rho_i \quad (\forall i)
+}
+{
+  \rho, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}}, d \matches \rho_1 \disjunion \ldots \disjunion \rho_n
+}
+\and
 \inferrule*[lab={\ruleName{pat-as}}]
 {
   \rho, p, v \matches \rho'

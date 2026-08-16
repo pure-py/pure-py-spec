@@ -48,6 +48,8 @@ def binds(pattern: ast.pattern) -> set[str]:
         return set().union(*(binds(p) for p in pattern.patterns))
     if isinstance(pattern, ast.MatchClass):
         return set().union(*(binds(p) for p in list(pattern.patterns) + list(pattern.kwd_patterns)))
+    if isinstance(pattern, ast.MatchMapping):
+        return set().union(set(), *(binds(p) for p in pattern.patterns))
     raise AssertionError(f'unexpected pattern: {type(pattern).__name__}')
 
 def fv(e: ast.expr) -> set[str]:

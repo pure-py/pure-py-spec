@@ -15,6 +15,10 @@ def literal_value(pat: ast.MatchValue) -> object:
         return -operand_value if isinstance(v.op, ast.USub) else operand_value
     raise AssertionError(f'unexpected MatchValue payload: {type(v).__name__}')
 
+def dict_key(k: ast.expr) -> str:
+    assert isinstance(k, ast.Constant) and isinstance(k.value, str)
+    return k.value
+
 def subsumes(p: ast.pattern, q: ast.pattern) -> bool:
     if isinstance(q, ast.MatchAs) and q.pattern is not None:
         return subsumes(p, q.pattern)
@@ -26,6 +30,12 @@ def subsumes(p: ast.pattern, q: ast.pattern) -> bool:
         return literal_value(p) == literal_value(q)
     if isinstance(p, ast.MatchSingleton) and isinstance(q, ast.MatchSingleton):
         return p.value is q.value
+    if isinstance(p, ast.MatchMapping) and isinstance(q, ast.MatchMapping):
+        p_keys = {dict_key(k): sub for k, sub in zip(p.keys, p.patterns)}
+        q_keys = {dict_key(k): sub for k, sub in zip(q.keys, q.patterns)}
+        if not set(q_keys) <= set(p_keys):
+            return False
+        return all(subsumes(p_keys[k], sub) for k, sub in q_keys.items())
     if isinstance(p, ast.MatchSequence) and isinstance(q, ast.MatchSequence):
         if bool(getattr(p, 'is_list_pattern', False)) != bool(getattr(q, 'is_list_pattern', False)):
             return False
@@ -45,4 +55,6 @@ def pattern_vars(p: ast.pattern) -> list[str]:
     if isinstance(p, ast.MatchClass):
         return [v for sub in p.patterns for v in pattern_vars(sub)] + \
                [v for sub in p.kwd_patterns for v in pattern_vars(sub)]
+    if isinstance(p, ast.MatchMapping):
+        return [v for sub in p.patterns for v in pattern_vars(sub)]
     raise AssertionError(f'unexpected pattern: {type(p).__name__}')
