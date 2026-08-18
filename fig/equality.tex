@@ -12,8 +12,8 @@
 \eqOp(\pyinline{True}, \pyinline{False}) = \eqOp(\pyinline{False}, \pyinline{True}) &{}= \pyinline{False} \\
 \\
 \eqOp(\exList{v_1, \ldots, v_n}, \exList{v_1', \ldots, v_n'}) &{}= \textstyle\bigwedge_{1 \leq i \leq n} \eqOp(v_i, v_i') \\
-\eqOp(\exTuple{v_1, \ldots, v_n}, \exTuple{v_1', \ldots, v_n'}) &{}= \textstyle\bigwedge_{1 \leq i \leq n} \eqOp(v_i, v_i') \\
 \eqOp(\exList{v_1, \ldots, v_n}, \exList{v_1', \ldots, v_m'}) &{}= \pyinline{False} && (\text{otherwise}) \\
+\eqOp(\exTuple{v_1, \ldots, v_n}, \exTuple{v_1', \ldots, v_n'}) &{}= \textstyle\bigwedge_{1 \leq i \leq n} \eqOp(v_i, v_i') \\
 \eqOp(\exTuple{v_1, \ldots, v_n}, \exTuple{v_1', \ldots, v_m'}) &{}= \pyinline{False} && (\text{otherwise}) \\
 \\
 \eqOp(d, d') &{}= \textstyle\bigwedge_{w \in \dom(d)} \eqOp(d(w), d'(w)) && \text{if } \dom(d) = \dom(d') \\
