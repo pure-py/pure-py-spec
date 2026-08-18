@@ -3,7 +3,7 @@
 \small
 \begin{align*}
 \eqOp(n, n) &{}= \pyinline{True} && \text{if } n \text{ is not } \pyinline{nan} \\
-\eqOp(n, n') &{}= \pyinline{False} && \text{if } n \neq n' \text{ and neither is } \pyinline{nan} \\
+\eqOp(n, n') &{}= \pyinline{False} && (\text{otherwise}) \\
 \eqOp(w, w) &{}= \pyinline{True} \\
 \eqOp(w, w') &{}= \pyinline{False} && \text{if } w \neq w' \\
 \eqOp(\pyinline{None}, \pyinline{None}) &{}= \pyinline{True} \\
@@ -29,6 +29,6 @@
 \memOp(w', w) &{}= \pyinline{True} && \text{if } w' = u \cons w \cons u' \text{ for some } u, u' \\
 \memOp(w', w) &{}= \pyinline{False} && (\text{otherwise})
 \end{align*}
-\caption{Structural equality and membership, undefined where no case applies}
+\caption{Structural equality and membership, undefined where no case applies and where \pyinline{nan} occurs as a component of a compound value}
 \label{fig:equality}
 \end{figure}
