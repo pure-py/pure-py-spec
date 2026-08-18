@@ -1,8 +1,13 @@
 \begin{figure}
 \small
 \begin{align*}
-\eqOp(\ell, \ell') &{}= \pyinline{True} && \text{if } \ell = \ell' \\
-\eqOp(\ell, \ell') &{}= \pyinline{False} && \text{if } \ell \neq \ell' \text{ and } \ell, \ell' \text{ have the same kind} \\
+\eqOp(n, n') &{}= \pyinline{True} && \text{if } n = n' \\
+\eqOp(n, n') &{}= \pyinline{False} && \text{if } n \neq n' \\
+\eqOp(w, w') &{}= \pyinline{True} && \text{if } w = w' \\
+\eqOp(w, w') &{}= \pyinline{False} && \text{if } w \neq w' \\
+\eqOp(\pyinline{None}, \pyinline{None}) &{}= \pyinline{True} \\
+\eqOp(\pyinline{True}, \pyinline{True}) = \eqOp(\pyinline{False}, \pyinline{False}) &{}= \pyinline{True} \\
+\eqOp(\pyinline{True}, \pyinline{False}) = \eqOp(\pyinline{False}, \pyinline{True}) &{}= \pyinline{False} \\
 \\
 \eqOp(\exList{v_1, \ldots, v_n}, \exList{v_1', \ldots, v_n'}) &{}= \textstyle\bigwedge_{1 \leq i \leq n} \eqOp(v_i, v_i') \\
 \eqOp(\exTuple{v_1, \ldots, v_n}, \exTuple{v_1', \ldots, v_n'}) &{}= \textstyle\bigwedge_{1 \leq i \leq n} \eqOp(v_i, v_i') \\

@@ -61,8 +61,7 @@ its class entry, whose qualified name is the identity of the class: since a modu
 most once, the entry comparison in \ruleName{pat-constr} amounts to a comparison of qualified names.
 
 \figref{equality} defines structural equality $\eqOp$, which gives $\hat{\odot}$ its meaning at
-\pyinline{==}, and its negation at \pyinline{!=}. A literal's \emph{kind} is number, string, Boolean or
-\pyinline{None}. Lists, tuples, dicts and objects are compared componentwise, a dict by its keys rather than
+\pyinline{==}, and its negation at \pyinline{!=}. Lists, tuples, dicts and objects are compared componentwise, a dict by its keys rather than
 by the order its entries were inserted, and an object by the fields of its class. Two objects of different
 classes are unequal, even where one class extends the other, which is what Python's generated equality does
 and differs from constructor patterns, which match by ancestry. Equality is undefined on operands of
