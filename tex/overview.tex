@@ -88,7 +88,7 @@ effect-free.
 \label{sec:no-coercions}
 
 \Replaced{Python accepts several implicit coercions and lax matches that are convenient but a recognised source of
-error, since what Python accepts rarely coincides with what the author meant.% TODO: citation on implicit-coercion errors
+error, since what Python accepts is not always what the author meant.% TODO: citation on implicit-coercion errors
 \ \figref{coercions} lists those \PurePy excludes. Only the arity of a constructor pattern is decidable
 without types, so the rest are stated here rather than enforced by the well-formedness rules.}{Python accepts several implicit coercions and lax matches that are convenient but a recognised source of error,
 since what Python accepts rarely coincides with what the author meant.
@@ -107,20 +107,20 @@ the well-formedness rules.}
 \begin{figure}
 \centering
 \small
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.38\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.25\textwidth}>{\raggedright\arraybackslash}p{0.35\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}}
 \hline
 \textbf{Construct} & \textbf{Python} & \textbf{\PurePy} \\
 \hline
-Test of \pyinline{if}, conditional expression or \pyinline{assert} & Coerced to \pyinline{bool}. & Must already be Boolean. \\[1mm]
-Sequence patterns & A list pattern matches a tuple, and a tuple pattern a list. & A list pattern matches only a list, a tuple pattern only a tuple. \\[1mm]
-Subscripting & Applies to lists and tuples alike. & Applies to lists alone; a tuple is taken apart by pattern matching. \\[1mm]
-Constructor patterns & A positional class pattern may supply fewer sub-patterns than the class has fields, matching only those given. & Requires the exact arity. \\[1mm]
-Dictionary keys & Any hashable key, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} one key. & Strings only. \\[1mm]
-\pyinline{==} and \pyinline{!=} & Compare operands of any two kinds, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equal. & Compare operands of the same kind only. \\[1mm]
-Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal. & Outside equality. \\
+Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & Must already be Boolean \\[1mm]
+Sequence patterns & List patterns match tuples, and tuple patterns lists & List patterns match only lists, tuple patterns only tuples \\[1mm]
+Subscripts & Apply to lists and tuples alike & Apply to lists alone; tuples are taken apart by pattern matching \\[1mm]
+Constructor patterns & Positional class patterns may supply fewer sub-patterns than the class has fields, matching only those given & Require the exact arity \\[1mm]
+Dictionary keys & Any hashable values, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Strings only \\[1mm]
+\pyinline{==} and \pyinline{!=} & Compare operands of any two kinds & Compare operands of the same kind only \\[1mm]
+Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & Equality undefined \\
 \hline
 \end{tabular}
-\caption{Python coercions and lax matches that \PurePy excludes}
+\caption{Python coercions and lax matches excluded by \PurePy}
 \label{fig:coercions}
 \end{figure}
 
