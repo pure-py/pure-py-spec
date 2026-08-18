@@ -104,7 +104,6 @@ getting stuck, so a later case runs and the program means something different in
 \hline
 Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & Must already be Boolean \\[1mm]
 Sequence patterns & List patterns match tuples, and tuple patterns lists & List patterns match only lists, tuple patterns only tuples \\[1mm]
-Subscripts & Apply to lists and tuples alike & Apply to lists alone; tuples are taken apart by pattern matching \\[1mm]
 Constructor patterns & Positional class patterns may supply fewer sub-patterns than the class has fields, matching only those given & Require the exact arity \\[1mm]
 Dictionary keys & Any hashable values, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Strings only \\[1mm]
 \pyinline{==} and \pyinline{!=} & Compare operands of any two kinds & Compare operands of the same kind only \\[1mm]
