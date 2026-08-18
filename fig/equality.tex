@@ -24,8 +24,11 @@
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \textstyle\bigwedge_{x \in \fields(C)} \eqOp(\rho(x), \rho'(x)) \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C' \\
 \\
-\memOp(\exList{v_1, \ldots, v_n}, v) &{}= \textstyle\bigvee_{1 \leq i \leq n} \eqOp(v, v_i) \\
-\memOp(\exTuple{v_1, \ldots, v_n}, v) &{}= \textstyle\bigvee_{1 \leq i \leq n} \eqOp(v, v_i) \\
+\memOp(\exList{\varepsilon}, v) = \memOp(\exTuple{\varepsilon}, v) &{}= \pyinline{False} \\
+\memOp(\exList{v' \cons \seq{v}}, v) &{}= \pyinline{True} && \text{if } \eqOp(v, v') = \pyinline{True} \\
+\memOp(\exList{v' \cons \seq{v}}, v) &{}= \memOp(\exList{\seq{v}}, v) && \text{if } \eqOp(v, v') = \pyinline{False} \\
+\memOp(\exTuple{v' \cons \seq{v}}, v) &{}= \pyinline{True} && \text{if } \eqOp(v, v') = \pyinline{True} \\
+\memOp(\exTuple{v' \cons \seq{v}}, v) &{}= \memOp(\exTuple{\seq{v}}, v) && \text{if } \eqOp(v, v') = \pyinline{False} \\
 \memOp(d, w) &{}= \pyinline{True} && \text{if } w \in \dom(d) \\
 \memOp(d, w) &{}= \pyinline{False} && \text{if } w \notin \dom(d) \\
 \memOp(w', w) &{}= \pyinline{True} && \text{if } w' = u \cons w \cons u' \text{ for some } u, u' \\
