@@ -6,16 +6,21 @@
 \eqOp(w, w) &{}= \pyinline{True} \\
 \eqOp(w, w') &{}= \pyinline{False} && \text{if } w \neq w' \\
 \eqOp(\pyinline{None}, \pyinline{None}) &{}= \pyinline{True} \\
-\eqOp(\pyinline{None}, v) = \eqOp(v, \pyinline{None}) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\
-\eqOp(\pyinline{True}, \pyinline{True}) = \eqOp(\pyinline{False}, \pyinline{False}) &{}= \pyinline{True} \\
-\eqOp(\pyinline{True}, \pyinline{False}) = \eqOp(\pyinline{False}, \pyinline{True}) &{}= \pyinline{False} \\
+\eqOp(\pyinline{None}, v) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\
+\eqOp(v, \pyinline{None}) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\
+\eqOp(\pyinline{True}, \pyinline{True}) &{}= \pyinline{True} \\
+\eqOp(\pyinline{False}, \pyinline{False}) &{}= \pyinline{True} \\
+\eqOp(\pyinline{True}, \pyinline{False}) &{}= \pyinline{False} \\
+\eqOp(\pyinline{False}, \pyinline{True}) &{}= \pyinline{False} \\
 \\
-\eqOp(\exList{\varepsilon}, \exList{\varepsilon}) = \eqOp(\exTuple{\varepsilon}, \exTuple{\varepsilon}) &{}= \pyinline{True} \\
+\eqOp(\exList{\varepsilon}, \exList{\varepsilon}) &{}= \pyinline{True} \\
+\eqOp(\exTuple{\varepsilon}, \exTuple{\varepsilon}) &{}= \pyinline{True} \\
 \eqOp(\exList{v \cons \seq{v}}, \exList{v' \cons \seq{v}\,'}) &{}= \pyinline{False} && \text{if } \eqOp(v, v') = \pyinline{False} \\
 \eqOp(\exList{v \cons \seq{v}}, \exList{v' \cons \seq{v}\,'}) &{}= \eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) && \text{if } \eqOp(v, v') = \pyinline{True} \\
 \eqOp(\exTuple{v \cons \seq{v}}, \exTuple{v' \cons \seq{v}\,'}) &{}= \pyinline{False} && \text{if } \eqOp(v, v') = \pyinline{False} \\
 \eqOp(\exTuple{v \cons \seq{v}}, \exTuple{v' \cons \seq{v}\,'}) &{}= \eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) && \text{if } \eqOp(v, v') = \pyinline{True} \\
-\eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) = \eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \pyinline{False} && \text{if } \seq{v}, \seq{v}\,' \text{ differ in length} \\
+\eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) &{}= \pyinline{False} && \text{if } \seq{v}, \seq{v}\,' \text{ differ in length} \\
+\eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \pyinline{False} && \text{if } \seq{v}, \seq{v}\,' \text{ differ in length} \\
 \\
 \eqOp(d, d') &{}= \eqEntries(d, d') && \text{if } \dom(d) = \dom(d') \\
 \eqOp(d, d') &{}= \pyinline{False} && \text{if } \dom(d) \neq \dom(d') \\
@@ -26,17 +31,7 @@
 \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \eqOp(\exTuple{\rho(x_1), \ldots, \rho(x_n)}, \exTuple{\rho'(x_1), \ldots, \rho'(x_n)}) && \text{if } \fields(C) = x_1, \ldots, x_n \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C' \\
-\\
-\memOp(\exList{\varepsilon}, v) = \memOp(\exTuple{\varepsilon}, v) &{}= \pyinline{False} \\
-\memOp(\exList{v' \cons \seq{v}}, v) &{}= \pyinline{True} && \text{if } \eqOp(v, v') = \pyinline{True} \\
-\memOp(\exList{v' \cons \seq{v}}, v) &{}= \memOp(\exList{\seq{v}}, v) && \text{if } \eqOp(v, v') = \pyinline{False} \\
-\memOp(\exTuple{v' \cons \seq{v}}, v) &{}= \pyinline{True} && \text{if } \eqOp(v, v') = \pyinline{True} \\
-\memOp(\exTuple{v' \cons \seq{v}}, v) &{}= \memOp(\exTuple{\seq{v}}, v) && \text{if } \eqOp(v, v') = \pyinline{False} \\
-\memOp(d, w) &{}= \pyinline{True} && \text{if } w \in \dom(d) \\
-\memOp(d, w) &{}= \pyinline{False} && \text{if } w \notin \dom(d) \\
-\memOp(w', w) &{}= \pyinline{True} && \text{if } w' = u \cons w \cons u' \text{ for some } u, u' \\
-\memOp(w', w) &{}= \pyinline{False} && (\text{otherwise})
 \end{align*}
-\caption{Structural equality and membership, undefined where no case applies}
+\caption{Structural equality, undefined where no case applies}
 \label{fig:equality}
 \end{figure}
