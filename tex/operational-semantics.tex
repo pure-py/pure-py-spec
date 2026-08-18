@@ -47,7 +47,7 @@ sequential-composition effects, so as black boxes functions are always pure.
 \input{fig/eval}
 
 Expression evaluation $\rho, e \Rightarrow v$ is given in \figref{eval-expr}. The strict operators are given by partial metafunctions $\hat{\odot}$ and
-$\hat{\ominus}$, fixed by the implementation over the primitive values. Where one of these is undefined, as
+$\hat{\ominus}$, which have the meanings they have in Python. Where one of these is undefined, as
 for division by zero or a subscript out of range, the expression has no derivation. The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
@@ -61,9 +61,9 @@ its class entry, whose qualified name is the identity of the class: since a modu
 most once, the entry comparison in \ruleName{pat-constr} amounts to a comparison of qualified names.
 
 \Added{\figref{equality} gives $\hat{\odot}$ its meaning at \pyinline{==} and \pyinline{!=}, in terms of
-structural equality $\eqOp$. The remaining operators stay implementation-defined. Where no case of $\eqOp$
-applies, as in comparing a number with a string or one closure with another, the comparison has no
-derivation, whereas Python returns \pyinline{False} (\secref{no-coercions}).}
+structural equality $\eqOp$. The remaining operators have the meanings they have in Python. Where no case of
+$\eqOp$ applies, as in comparing a number with a string or one closure with another, the comparison is
+undefined, whereas Python returns \pyinline{False} (\secref{no-coercions}).}
 
 \input{fig/equality}
 
