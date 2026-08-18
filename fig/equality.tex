@@ -2,11 +2,11 @@
 \small
 \begin{align*}
 \eqOp(n, n) &{}= \pyinline{True} \\
-\eqOp(n, n') &{}= \pyinline{False} && (\text{otherwise}) \\
+\eqOp(n, n') &{}= \pyinline{False} && \text{if } n \neq n' \\
 \eqOp(w, w) &{}= \pyinline{True} \\
-\eqOp(w, w') &{}= \pyinline{False} && (\text{otherwise}) \\
+\eqOp(w, w') &{}= \pyinline{False} && \text{if } w \neq w' \\
 \eqOp(\pyinline{None}, \pyinline{None}) &{}= \pyinline{True} \\
-\eqOp(\pyinline{None}, v) = \eqOp(v, \pyinline{None}) &{}= \pyinline{False} && (\text{otherwise}) \\
+\eqOp(\pyinline{None}, v) = \eqOp(v, \pyinline{None}) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\
 \eqOp(\pyinline{True}, \pyinline{True}) = \eqOp(\pyinline{False}, \pyinline{False}) &{}= \pyinline{True} \\
 \eqOp(\pyinline{True}, \pyinline{False}) = \eqOp(\pyinline{False}, \pyinline{True}) &{}= \pyinline{False} \\
 \\
@@ -15,10 +15,10 @@
 \eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) = \eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \pyinline{False} && (\text{otherwise}) \\
 \\
 \eqOp(d, d') &{}= \textstyle\bigwedge_{w \in \dom(d)} \eqOp(d(w), d'(w)) && \text{if } \dom(d) = \dom(d') \\
-\eqOp(d, d') &{}= \pyinline{False} && (\text{otherwise}) \\
+\eqOp(d, d') &{}= \pyinline{False} && \text{if } \dom(d) \neq \dom(d') \\
 \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \textstyle\bigwedge_{x \in \fields(C)} \eqOp(\rho(x), \rho'(x)) \\
-\eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && (\text{otherwise})
+\eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C'
 \end{align*}
 \caption{Structural equality; undefined on operands of differing kinds, other than \pyinline{None}, and on closures}
 \label{fig:equality}
