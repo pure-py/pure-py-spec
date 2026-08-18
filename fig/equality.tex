@@ -25,7 +25,7 @@
 \eqEntries(\bind{w}{v} \cons d, d') &{}= \pyinline{False} && \text{if } \eqOp(v, d'(w)) = \pyinline{False} \\
 \eqEntries(\bind{w}{v} \cons d, d') &{}= \eqEntries(d, d') && \text{if } \eqOp(v, d'(w)) = \pyinline{True} \\
 \\
-\eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \textstyle\bigwedge_{x \in \fields(C)} \eqOp(\rho(x), \rho'(x)) \\
+\eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \eqOp(\exTuple{\rho(x_1), \ldots, \rho(x_n)}, \exTuple{\rho'(x_1), \ldots, \rho'(x_n)}) && \text{if } \fields(C) = x_1, \ldots, x_n \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C' \\
 \\
 \memOp(\exList{\varepsilon}, v) = \memOp(\exTuple{\varepsilon}, v) &{}= \pyinline{False} \\
