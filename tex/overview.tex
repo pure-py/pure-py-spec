@@ -7,6 +7,13 @@ claim precise and sets out the excluded features, grouped by the discipline each
 \figref{prevented-errors} summarises the Python runtime errors that well-formedness rules out, and
 \figref{roadmap} lists planned additions and features under consideration.
 
+\subsection{Python compatibility}
+\label{sec:python-compatibility}
+
+\todo{\PurePy is required to be a genuine subset of Python, so that every well-formed \PurePy program is
+valid Python with the same meaning. Python has no variable declarations, so a name's binding structure is
+not evident from the syntax, which is the main obstacle to carving out the subset.}
+
 \subsection{Purity}
 \label{sec:purity}
 
@@ -82,7 +89,7 @@ effect-free.
 
 Python accepts several implicit coercions and lax matches that are convenient but a recognised source of error,
 since what Python accepts rarely coincides with what the author meant.% TODO: citation on implicit-coercion errors
-\ \PurePy excludes four. The first is truthiness: the test of an \pyinline{if} or conditional expression, or an
+\ \PurePy excludes \Replaced{five}{four}. The first is truthiness: the test of an \pyinline{if} or conditional expression, or an
 \pyinline{assert}, is coerced to \pyinline{bool}, whereas \PurePy requires it to be boolean already. The second
 is between sequence kinds: Python lets a list pattern match a tuple value, and a tuple
 pattern match a list, whereas in \PurePy a list pattern matches only a list and a tuple pattern only a tuple.
@@ -91,6 +98,11 @@ matching. The third is in constructor patterns: Python lets a positional class p
 class's field arity, matching only those given, whereas \PurePy requires the exact arity.
 The fourth is in dictionary keys: Python admits any hashable key and treats \pyinline{1},
 \pyinline{1.0} and \pyinline{True} as one key, whereas \PurePy admits only strings.
+\Added{The fifth is in comparison: Python compares operands of any two kinds with \pyinline{==} and
+\pyinline{!=}, giving \pyinline{False} where they cannot be equal and treating \pyinline{1},
+\pyinline{1.0} and \pyinline{True} as equal, whereas \PurePy compares only operands of the same kind.
+Python also compares functions by identity, so two textually identical lambdas are unequal, and \PurePy
+leaves functions outside equality altogether.}
 Only the third is decidable without types, so the others are stated here rather than enforced by
 the well-formedness rules.
 

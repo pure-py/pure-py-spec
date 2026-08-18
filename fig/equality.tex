@@ -1,0 +1,19 @@
+\begin{figure}
+\small
+\begin{align*}
+\eqOp(\ell, \ell') &{}= \pyinline{True} && \text{if } \ell = \ell' \\
+\eqOp(\ell, \ell') &{}= \pyinline{False} && \text{if } \ell \neq \ell' \text{ and } \ell, \ell' \text{ have the same kind} \\
+\\
+\eqOp(\exList{v_1, \ldots, v_n}, \exList{v_1', \ldots, v_n'}) &{}= \textstyle\bigwedge_{1 \leq i \leq n} \eqOp(v_i, v_i') \\
+\eqOp(\exTuple{v_1, \ldots, v_n}, \exTuple{v_1', \ldots, v_n'}) &{}= \textstyle\bigwedge_{1 \leq i \leq n} \eqOp(v_i, v_i') \\
+\eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) = \eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \pyinline{False} && \text{if } \seq{v}, \seq{v}\,' \text{ differ in length} \\
+\\
+\eqOp(d, d') &{}= \textstyle\bigwedge_{w \in \dom(d)} \eqOp(d(w), d'(w)) && \text{if } \dom(d) = \dom(d') \\
+\eqOp(d, d') &{}= \pyinline{False} && \text{if } \dom(d) \neq \dom(d') \\
+\\
+\eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \textstyle\bigwedge_{x \in \fields(C)} \eqOp(\rho(x), \rho'(x)) \\
+\eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C'
+\end{align*}
+\caption{Structural equality; undefined on operands of differing kinds and on closures}
+\label{fig:equality}
+\end{figure}
