@@ -8,6 +8,8 @@ $\odot$ & $\hat{\odot}(v, v')$ \\
 \hline
 \pyinline{==} & $\eqOp(v, v')$ \\
 \pyinline{!=} & \pyinline{True} if $\eqOp(v, v') = \pyinline{False}$, and \pyinline{False} otherwise \\
+\pyinline{in} & $\memOp(v, v')$ \\
+\pyinline{not in} & \pyinline{True} if $\memOp(v, v') = \pyinline{False}$, and \pyinline{False} otherwise \\
 \hline
 \end{tabular}
 \end{center}
@@ -30,8 +32,14 @@ $\odot$ & $\hat{\odot}(v, v')$ \\
 \eqOp(d, d') &{}= \pyinline{False} && \text{if } \dom(d) \neq \dom(d') \\
 \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \textstyle\bigwedge_{x \in \fields(C)} \eqOp(\rho(x), \rho'(x)) \\
-\eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C'
+\eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C' \\
+\\
+\memOp(v, \exList{v_1, \ldots, v_n}) = \memOp(v, \exTuple{v_1, \ldots, v_n}) &{}= \textstyle\bigvee_{1 \leq i \leq n} \eqOp(v, v_i) \\
+\memOp(w, d) &{}= \pyinline{True} && \text{if } w \in \dom(d) \\
+\memOp(w, d) &{}= \pyinline{False} && \text{if } w \notin \dom(d) \\
+\memOp(w, w') &{}= \pyinline{True} && \text{if } w' = u \cons w \cons u' \text{ for some } u, u' \\
+\memOp(w, w') &{}= \pyinline{False} && (\text{otherwise})
 \end{align*}
-\caption{Comparison operators and structural equality; $\eqOp$ is undefined where no case applies}
+\caption{Comparison and membership operators; $\eqOp$ and $\memOp$ are undefined where no case applies}
 \label{fig:equality}
 \end{figure}

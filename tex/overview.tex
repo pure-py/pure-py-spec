@@ -90,9 +90,10 @@ effect-free.
 \Replaced{Python accepts several implicit coercions and lax matches. \figref{coercions} lists those \PurePy
 excludes. Only the arity of a constructor pattern is decidable
 without types. A program that breaks one of the others is well-formed but has no derivation, so it runs
-under Python and not under \PurePy. Sequence patterns are the exception: a list pattern applied to a tuple
-fails to match rather than getting stuck, so a later case runs and the program means something different
-in the two languages.}{Python accepts several implicit coercions and lax matches that are convenient but a recognised source of error,
+under Python and not under \PurePy.
+\todo{Sequence patterns are the exception: a list pattern applied to a tuple fails to match rather than
+getting stuck, so a later case runs and the program means something different in the two languages
+(\issue{151}).}}{Python accepts several implicit coercions and lax matches that are convenient but a recognised source of error,
 since what Python accepts rarely coincides with what the author meant.
 \ \PurePy excludes four. The first is truthiness: the test of an \pyinline{if} or conditional expression, or an
 \pyinline{assert}, is coerced to \pyinline{bool}, whereas \PurePy requires it to be boolean already. The second
