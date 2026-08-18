@@ -111,7 +111,7 @@ the well-formedness rules.}
 \hline
 \textbf{Construct} & \textbf{Python} & \textbf{\PurePy} \\
 \hline
-Test of \pyinline{if}, conditional expression or \pyinline{assert} & Coerced to \pyinline{bool}. & Must already be boolean. \\[1mm]
+Test of \pyinline{if}, conditional expression or \pyinline{assert} & Coerced to \pyinline{bool}. & Must already be Boolean. \\[1mm]
 Sequence patterns & A list pattern matches a tuple, and a tuple pattern a list. & A list pattern matches only a list, a tuple pattern only a tuple. \\[1mm]
 Subscripting & Applies to lists and tuples alike. & Applies to lists alone; a tuple is taken apart by pattern matching. \\[1mm]
 Constructor patterns & A positional class pattern may supply fewer sub-patterns than the class has fields, matching only those given. & Requires the exact arity. \\[1mm]
