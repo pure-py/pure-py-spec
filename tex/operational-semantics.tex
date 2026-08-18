@@ -64,8 +64,8 @@ most once, the entry comparison in \ruleName{pat-constr} amounts to a comparison
 membership $\memOp$ (\figref{equality}). Where no case of $\eqOp$ applies, as in comparing a number with a
 string or one closure with another, the comparison is undefined, whereas Python returns \pyinline{False}
 (\secref{no-coercions}). $\eqOp$ is also undefined on \pyinline{nan}, since Python compares the elements of
-a container by identity before equality, and a NaN is not equal to itself, so two containers holding the
-same NaN compare equal while two holding different ones do not. \pyinline{==} answers \pyinline{False} on
+a container by identity before equality, and a NaN is not equal to itself, so two containers holding
+identical NaNs compare equal while two holding distinct ones do not. \pyinline{==} answers \pyinline{False} on
 \pyinline{nan} directly, keeping \pyinline{x != x} as a test for one.}
 
 \input{fig/operators}
