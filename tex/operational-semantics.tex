@@ -64,9 +64,9 @@ most once, the entry comparison in \ruleName{pat-constr} amounts to a comparison
 \pyinline{==}, and its negation at \pyinline{!=}. Lists, tuples, dicts and objects are compared componentwise, a dict by its keys rather than
 by the order its entries were inserted, and an object by the fields of its class. Two objects of different
 classes are unequal, even where one class extends the other, which is what Python's generated equality does
-and differs from constructor patterns, which match by ancestry. Equality is undefined on operands of
-differing kinds and on closures, except that \pyinline{None} compares with any value, since it belongs to
-every type, which Python compares by identity (\secref{no-coercions}). The remaining
+and differs from constructor patterns, which match by ancestry. Equality is undefined where no case
+applies, so comparing a number with a string, or one closure with another, has no derivation, whereas
+\pyinline{None} compares with any value, since it belongs to every type, which Python compares by identity (\secref{no-coercions}). The remaining
 operators stay implementation-defined.
 
 \input{fig/equality}
