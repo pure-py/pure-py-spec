@@ -20,6 +20,7 @@
 \\
 \eqOp(d, d') &{}= \eqEntries(d, d') && \text{if } \dom(d) = \dom(d') \\
 \eqOp(d, d') &{}= \pyinline{False} && \text{if } \dom(d) \neq \dom(d') \\
+\\
 \eqEntries(\varepsilon, d') &{}= \pyinline{True} \\
 \eqEntries(\bind{w}{v} \cons d, d') &{}= \pyinline{False} && \text{if } \eqOp(v, d'(w)) = \pyinline{False} \\
 \eqEntries(\bind{w}{v} \cons d, d') &{}= \eqEntries(d, d') && \text{if } \eqOp(v, d'(w)) = \pyinline{True} \\
