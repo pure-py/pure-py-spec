@@ -11,24 +11,24 @@
 \eqOp(\pyinline{True}, \pyinline{True}) = \eqOp(\pyinline{False}, \pyinline{False}) &{}= \pyinline{True} \\
 \eqOp(\pyinline{True}, \pyinline{False}) = \eqOp(\pyinline{False}, \pyinline{True}) &{}= \pyinline{False} \\
 \\
-\eqOp(\exList{v_1, \ldots, v_n}, \exList{v_1', \ldots, v_n'}) &{}= \textstyle\bigwedge_{1 \leq i \leq n} \eqOp(v_i, v_i') \\
-\eqOp(\exList{v_1, \ldots, v_n}, \exList{v_1', \ldots, v_m'}) &{}= \pyinline{False} && (\text{otherwise}) \\
-\eqOp(\exTuple{v_1, \ldots, v_n}, \exTuple{v_1', \ldots, v_n'}) &{}= \textstyle\bigwedge_{1 \leq i \leq n} \eqOp(v_i, v_i') \\
-\eqOp(\exTuple{v_1, \ldots, v_n}, \exTuple{v_1', \ldots, v_m'}) &{}= \pyinline{False} && (\text{otherwise}) \\
+\eqOp(\exList{v_1, \ldots, v_n}, \exList{v_1', \ldots, v_n'}) &{}= \textstyle\bigwedge_{1 \leq i \leq n} \eqOp(v_i, v_i') && \text{if no } v_i, v_i' \text{ is } \pyinline{nan} \\
+\eqOp(\exList{v_1, \ldots, v_n}, \exList{v_1', \ldots, v_m'}) &{}= \pyinline{False} && \text{if } n \neq m \\
+\eqOp(\exTuple{v_1, \ldots, v_n}, \exTuple{v_1', \ldots, v_n'}) &{}= \textstyle\bigwedge_{1 \leq i \leq n} \eqOp(v_i, v_i') && \text{if no } v_i, v_i' \text{ is } \pyinline{nan} \\
+\eqOp(\exTuple{v_1, \ldots, v_n}, \exTuple{v_1', \ldots, v_m'}) &{}= \pyinline{False} && \text{if } n \neq m \\
 \\
-\eqOp(d, d') &{}= \textstyle\bigwedge_{w \in \dom(d)} \eqOp(d(w), d'(w)) && \text{if } \dom(d) = \dom(d') \\
+\eqOp(d, d') &{}= \textstyle\bigwedge_{w \in \dom(d)} \eqOp(d(w), d'(w)) && \text{if } \dom(d) = \dom(d') \text{ and no value is } \pyinline{nan} \\
 \eqOp(d, d') &{}= \pyinline{False} && \text{if } \dom(d) \neq \dom(d') \\
 \\
-\eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \textstyle\bigwedge_{x \in \fields(C)} \eqOp(\rho(x), \rho'(x)) \\
+\eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \textstyle\bigwedge_{x \in \fields(C)} \eqOp(\rho(x), \rho'(x)) && \text{if no field is } \pyinline{nan} \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C' \\
 \\
-\memOp(\exList{v_1, \ldots, v_n}, v) &{}= \textstyle\bigvee_{1 \leq i \leq n} \eqOp(v, v_i) \\
-\memOp(\exTuple{v_1, \ldots, v_n}, v) &{}= \textstyle\bigvee_{1 \leq i \leq n} \eqOp(v, v_i) \\
+\memOp(\exList{v_1, \ldots, v_n}, v) &{}= \textstyle\bigvee_{1 \leq i \leq n} \eqOp(v, v_i) && \text{if no } v, v_i \text{ is } \pyinline{nan} \\
+\memOp(\exTuple{v_1, \ldots, v_n}, v) &{}= \textstyle\bigvee_{1 \leq i \leq n} \eqOp(v, v_i) && \text{if no } v, v_i \text{ is } \pyinline{nan} \\
 \memOp(d, w) &{}= \pyinline{True} && \text{if } w \in \dom(d) \\
 \memOp(d, w) &{}= \pyinline{False} && \text{if } w \notin \dom(d) \\
 \memOp(w', w) &{}= \pyinline{True} && \text{if } w' = u \cons w \cons u' \text{ for some } u, u' \\
 \memOp(w', w) &{}= \pyinline{False} && (\text{otherwise})
 \end{align*}
-\caption{Structural equality and membership, undefined where no case applies and where \pyinline{nan} occurs as a component of a compound value}
+\caption{Structural equality and membership, undefined where no case applies}
 \label{fig:equality}
 \end{figure}
