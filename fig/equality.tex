@@ -6,6 +6,7 @@
 \eqOp(w, w) &{}= \pyinline{True} \\
 \eqOp(w, w') &{}= \pyinline{False} && \text{if } w \neq w' \\
 \eqOp(\pyinline{None}, \pyinline{None}) &{}= \pyinline{True} \\
+\eqOp(\pyinline{None}, v) = \eqOp(v, \pyinline{None}) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\
 \eqOp(\pyinline{True}, \pyinline{True}) = \eqOp(\pyinline{False}, \pyinline{False}) &{}= \pyinline{True} \\
 \eqOp(\pyinline{True}, \pyinline{False}) = \eqOp(\pyinline{False}, \pyinline{True}) &{}= \pyinline{False} \\
 \\
@@ -19,6 +20,6 @@
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \textstyle\bigwedge_{x \in \fields(C)} \eqOp(\rho(x), \rho'(x)) \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C'
 \end{align*}
-\caption{Structural equality; undefined on operands of differing kinds and on closures}
+\caption{Structural equality; undefined on operands of differing kinds, other than \pyinline{None}, and on closures}
 \label{fig:equality}
 \end{figure}
