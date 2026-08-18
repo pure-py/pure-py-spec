@@ -34,7 +34,8 @@ $\odot$ & $\hat{\odot}(v, v')$ \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \textstyle\bigwedge_{x \in \fields(C)} \eqOp(\rho(x), \rho'(x)) \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C' \\
 \\
-\memOp(\exList{v_1, \ldots, v_n}, v) = \memOp(\exTuple{v_1, \ldots, v_n}, v) &{}= \textstyle\bigvee_{1 \leq i \leq n} \eqOp(v, v_i) \\
+\memOp(\exList{v_1, \ldots, v_n}, v) &{}= \textstyle\bigvee_{1 \leq i \leq n} \eqOp(v, v_i) \\
+\memOp(\exTuple{v_1, \ldots, v_n}, v) &{}= \textstyle\bigvee_{1 \leq i \leq n} \eqOp(v, v_i) \\
 \memOp(d, w) &{}= \pyinline{True} && \text{if } w \in \dom(d) \\
 \memOp(d, w) &{}= \pyinline{False} && \text{if } w \notin \dom(d) \\
 \memOp(w', w) &{}= \pyinline{True} && \text{if } w' = u \cons w \cons u' \text{ for some } u, u' \\
