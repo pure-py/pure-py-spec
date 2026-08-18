@@ -87,9 +87,12 @@ effect-free.
 \subsubsection{Implicit coercions}
 \label{sec:no-coercions}
 
-Python accepts several implicit coercions and lax matches that are convenient but a recognised source of error,
-since what Python accepts rarely coincides with what the author meant.% TODO: citation on implicit-coercion errors
-\ \PurePy excludes \Replaced{five}{four}. The first is truthiness: the test of an \pyinline{if} or conditional expression, or an
+\Replaced{Python accepts several implicit coercions and lax matches that are convenient but a recognised source of
+error, since what Python accepts rarely coincides with what the author meant.% TODO: citation on implicit-coercion errors
+\ \figref{coercions} lists those \PurePy excludes. Only the arity of a constructor pattern is decidable
+without types, so the rest are stated here rather than enforced by the well-formedness rules.}{Python accepts several implicit coercions and lax matches that are convenient but a recognised source of error,
+since what Python accepts rarely coincides with what the author meant.
+\ \PurePy excludes four. The first is truthiness: the test of an \pyinline{if} or conditional expression, or an
 \pyinline{assert}, is coerced to \pyinline{bool}, whereas \PurePy requires it to be boolean already. The second
 is between sequence kinds: Python lets a list pattern match a tuple value, and a tuple
 pattern match a list, whereas in \PurePy a list pattern matches only a list and a tuple pattern only a tuple.
@@ -98,13 +101,28 @@ matching. The third is in constructor patterns: Python lets a positional class p
 class's field arity, matching only those given, whereas \PurePy requires the exact arity.
 The fourth is in dictionary keys: Python admits any hashable key and treats \pyinline{1},
 \pyinline{1.0} and \pyinline{True} as one key, whereas \PurePy admits only strings.
-\Added{The fifth is in comparison: Python compares operands of any two kinds with \pyinline{==} and
-\pyinline{!=}, giving \pyinline{False} where they cannot be equal and treating \pyinline{1},
-\pyinline{1.0} and \pyinline{True} as equal, whereas \PurePy compares only operands of the same kind.
-Python also compares functions by identity, so two textually identical lambdas are unequal, and \PurePy
-leaves functions outside equality altogether.}
 Only the third is decidable without types, so the others are stated here rather than enforced by
-the well-formedness rules.
+the well-formedness rules.}
+
+\begin{figure}
+\centering
+\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.38\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}}
+\hline
+\textbf{Construct} & \textbf{Python} & \textbf{\PurePy} \\
+\hline
+Test of \pyinline{if}, conditional expression or \pyinline{assert} & Coerced to \pyinline{bool}. & Must already be boolean. \\[1mm]
+Sequence patterns & A list pattern matches a tuple, and a tuple pattern a list. & A list pattern matches only a list, a tuple pattern only a tuple. \\[1mm]
+Subscripting & Applies to lists and tuples alike. & Applies to lists alone; a tuple is taken apart by pattern matching. \\[1mm]
+Constructor patterns & A positional class pattern may supply fewer sub-patterns than the class has fields, matching only those given. & Requires the exact arity. \\[1mm]
+Dictionary keys & Any hashable key, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} one key. & Strings only. \\[1mm]
+\pyinline{==} and \pyinline{!=} & Compare operands of any two kinds, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equal. & Compare operands of the same kind only. \\[1mm]
+Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal. & Outside equality. \\
+\hline
+\end{tabular}
+\caption{Python coercions and lax matches that \PurePy excludes}
+\label{fig:coercions}
+\end{figure}
 
 \subsubsection{Load-dependent meaning}
 \label{sec:no-load-dependent}
