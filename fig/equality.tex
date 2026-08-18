@@ -18,8 +18,11 @@
 \eqOp(\exTuple{v \cons \seq{v}}, \exTuple{v' \cons \seq{v}\,'}) &{}= \eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) && \text{if } \eqOp(v, v') = \pyinline{True} \\
 \eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) = \eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \pyinline{False} && \text{if } \seq{v}, \seq{v}\,' \text{ differ in length} \\
 \\
-\eqOp(d, d') &{}= \textstyle\bigwedge_{w \in \dom(d)} \eqOp(d(w), d'(w)) && \text{if } \dom(d) = \dom(d') \\
+\eqOp(d, d') &{}= \eqEntries(d, d') && \text{if } \dom(d) = \dom(d') \\
 \eqOp(d, d') &{}= \pyinline{False} && \text{if } \dom(d) \neq \dom(d') \\
+\eqEntries(\varepsilon, d') &{}= \pyinline{True} \\
+\eqEntries(\bind{w}{v} \cons d, d') &{}= \pyinline{False} && \text{if } \eqOp(v, d'(w)) = \pyinline{False} \\
+\eqEntries(\bind{w}{v} \cons d, d') &{}= \eqEntries(d, d') && \text{if } \eqOp(v, d'(w)) = \pyinline{True} \\
 \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \textstyle\bigwedge_{x \in \fields(C)} \eqOp(\rho(x), \rho'(x)) \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C' \\
