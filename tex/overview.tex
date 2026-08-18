@@ -142,7 +142,6 @@ the head would denote the still-loading module.
 A module may not bind a name that is also the name of one of its submodules. In Python an attribute of a
 package can be set both by an assignment in the package body and by loading the same-named submodule, and which
 wins depends on load order. Consider a program with four modules:
-\vspace{-\medskipamount}
 
 \begin{minipage}[t]{0.2\textwidth}
 \begin{python}
@@ -176,7 +175,6 @@ print(pkg.sub)  # 1
 Here \pyinline{helper} is never imported, so \pyinline{pkg.sub} never loads, and \pyinline{pkg.sub} in the
 main module denotes the assignment. Now let the main module also import \pyinline{helper}, which it does not
 otherwise use:
-\vspace{-\medskipamount}
 
 \begin{center}
 \begin{minipage}[t]{0.55\textwidth}
