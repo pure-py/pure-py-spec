@@ -4,10 +4,10 @@
 \begin{center}
 \begin{tabular}{ll}
 \hline
-\textbf{Operator} & \textbf{Meaning} \\
+$\odot$ & $\hat{\odot}(v, v')$ \\
 \hline
-\pyinline{==} & $\eqOp$ \\
-\pyinline{!=} & $\neg\,\eqOp$ \\
+\pyinline{==} & $\eqOp(v, v')$ \\
+\pyinline{!=} & \pyinline{True} if $\eqOp(v, v') = \pyinline{False}$, and \pyinline{False} otherwise \\
 \hline
 \end{tabular}
 \end{center}
@@ -32,6 +32,6 @@
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \textstyle\bigwedge_{x \in \fields(C)} \eqOp(\rho(x), \rho'(x)) \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C'
 \end{align*}
-\caption{Structural equality, undefined where no case applies}
+\caption{Comparison operators and structural equality; $\eqOp$ is undefined where no case applies}
 \label{fig:equality}
 \end{figure}
