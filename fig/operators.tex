@@ -1,0 +1,31 @@
+\begin{figure}
+\color{addedcolor}
+\small
+\begin{center}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.62\textwidth}}
+\hline
+$\odot$ & $\hat{\odot}(v, v')$ \\
+\hline
+\pyinline{==} & $\eqOp(v, v')$ \\
+\pyinline{!=} & \pyinline{True} if $\eqOp(v, v') = \pyinline{False}$, and \pyinline{False} otherwise \\
+\pyinline{in} & $\memOp(v', v)$ \\
+\pyinline{not in} & \pyinline{True} if $\memOp(v', v) = \pyinline{False}$, and \pyinline{False} otherwise \\
+\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & \todo{Ordering, as in Python} \\
+\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}\quad\pyinline{**} & \todo{Arithmetic, as in Python, whose reference leaves float precision to the implementation} \\
+\hline
+\end{tabular}
+
+\vspace{2mm}
+
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.62\textwidth}}
+\hline
+$\ominus$ & $\hat{\ominus}(v)$ \\
+\hline
+\pyinline{not} & \todo{Negation, as in Python} \\
+\pyinline{+}\quad\pyinline{-} & \todo{Sign, as in Python} \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Operator meanings}
+\label{fig:operators}
+\end{figure}
