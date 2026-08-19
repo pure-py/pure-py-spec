@@ -47,17 +47,26 @@ sequential-composition effects, so as black boxes functions are always pure.
 \input{fig/eval}
 
 Expression evaluation $\rho, e \Rightarrow v$ is given in \figref{eval-expr}. The strict operators are given by partial metafunctions $\hat{\odot}$ and
-$\hat{\ominus}$, fixed by the implementation over the primitive values. Where one of these is undefined, as
+$\hat{\ominus}$, which have the meanings they have in Python. Where one of these is undefined, as
 for division by zero or a subscript out of range, the expression has no derivation. The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
 \ruleName{eval-if} does. A comprehension evaluates its body once for each binding its qualifiers produce, and
-concatenates the results; a generator draws from a list, because \PurePy has no general iteration protocol.
+concatenates the results; a generator draws from a list or a tuple, since \PurePy has no wider
+notion of iteration.
 The pattern-matching judgement $\rho, p, v \matches \rho'$ (\figref{match}) is a deterministic partial
 function; we write $\rho, p, v \notmatches$ (with no right-hand side) for $\nexists \rho'.\, \rho, p, v
 \matches \rho'$, i.e.\ matching is undefined. A constructor pattern matches any object whose class has the
 pattern's class among its ancestors; sub-patterns bind the fields of the pattern's class. An object records
 its class entry, whose qualified name is the identity of the class: since a module declares each class name at
 most once, the entry comparison in \ruleName{pat-constr} amounts to a comparison of qualified names.
+
+\figref{operators} gives the operator meanings, in terms of structural equality $\eqOp$ and
+membership $\memOp$ (\figrefTwo{equality}{membership}). Both are undefined where no case applies, which is where
+\PurePy declines to give a comparison the meaning Python gives it (\secref{no-coercions}).
+
+\input{fig/operators}
+\input{fig/equality}
+\input{fig/membership}
 
 \input{fig/match}

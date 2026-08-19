@@ -239,8 +239,6 @@ def check_expr(node: ast.expr) -> None:
         if len(node.ops) > 1:
             raise NotYetSupported(node, 'chained comparison', 82)
         for op in node.ops:
-            if isinstance(op, (ast.In, ast.NotIn)):
-                raise NotYetSupported(node, 'membership operator (in/not in)', 80)
             if isinstance(op, (ast.Is, ast.IsNot)):
                 raise NotYetSupported(node, 'identity operator (is/is not)', 81)
         check_expr(node.left)

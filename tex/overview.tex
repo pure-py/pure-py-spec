@@ -7,6 +7,13 @@ claim precise and sets out the excluded features, grouped by the discipline each
 \figref{prevented-errors} summarises the Python runtime errors that well-formedness rules out, and
 \figref{roadmap} lists planned additions and features under consideration.
 
+\subsection{Python compatibility}
+\label{sec:python-compatibility}
+
+\todo{\PurePy is required to be a genuine subset of Python, so that every well-formed \PurePy program is
+valid Python with the same meaning. Python has no variable declarations, so a name's binding structure is
+not evident from the syntax, which is the main obstacle to carving out the subset.}
+
 \subsection{Purity}
 \label{sec:purity}
 
@@ -80,19 +87,33 @@ effect-free.
 \subsubsection{Implicit coercions}
 \label{sec:no-coercions}
 
-Python accepts several implicit coercions and lax matches that are convenient but a recognised source of error,
-since what Python accepts rarely coincides with what the author meant.% TODO: citation on implicit-coercion errors
-\ \PurePy excludes four. The first is truthiness: the test of an \pyinline{if} or conditional expression, or an
-\pyinline{assert}, is coerced to \pyinline{bool}, whereas \PurePy requires it to be boolean already. The second
-is between sequence kinds: Python lets a list pattern match a tuple value, and a tuple
-pattern match a list, whereas in \PurePy a list pattern matches only a list and a tuple pattern only a tuple.
-Subscripting draws the same line, applying to lists alone, a tuple being taken apart by pattern
-matching. The third is in constructor patterns: Python lets a positional class pattern supply fewer sub-patterns than the
-class's field arity, matching only those given, whereas \PurePy requires the exact arity.
-The fourth is in dictionary keys: Python admits any hashable key and treats \pyinline{1},
-\pyinline{1.0} and \pyinline{True} as one key, whereas \PurePy admits only strings.
-Only the third is decidable without types, so the others are stated here rather than enforced by
-the well-formedness rules.
+Python accepts several implicit coercions and lax matches. \figref{coercions} lists those \PurePy
+excludes. Only the arity of a constructor pattern is decidable
+without types. A program that breaks one of the others is well-formed but has no derivation, so it runs
+under Python and not under \PurePy.
+\todo{Sequence patterns are the exception: a list pattern applied to a tuple fails to match rather than
+getting stuck, so a later case runs and the program means something different in the two languages
+(\issue{151}).}
+
+\begin{figure}
+\centering
+\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.25\textwidth}>{\raggedright\arraybackslash}p{0.35\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}}
+\hline
+\textbf{Construct} & \textbf{Python} & \textbf{\PurePy} \\
+\hline
+Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & Must already be Boolean \\[1mm]
+Sequence patterns & List patterns match tuples, and tuple patterns lists & List patterns match only lists, tuple patterns only tuples \\[1mm]
+Constructor patterns & Positional class patterns may supply fewer sub-patterns than the class has fields, matching only those given & Require the exact arity \\[1mm]
+Dictionary keys & Any hashable values, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Strings only \\[1mm]
+\pyinline{==} and \pyinline{!=} & Compare operands of any two kinds & Compare operands of the same kind only \\[1mm]
+Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & Equality undefined \\[1mm]
+\pyinline{nan} inside a list, tuple, dict or object & Elements compared by identity before equality, and a NaN is not equal to itself, so a NaN element matches an identical NaN but not a distinct one & Equality undefined \\
+\hline
+\end{tabular}
+\caption{Python coercions and lax matches excluded by \PurePy}
+\label{fig:coercions}
+\end{figure}
 
 \subsubsection{Load-dependent meaning}
 \label{sec:no-load-dependent}
@@ -110,7 +131,6 @@ the head would denote the still-loading module.
 A module may not bind a name that is also the name of one of its submodules. In Python an attribute of a
 package can be set both by an assignment in the package body and by loading the same-named submodule, and which
 wins depends on load order. Consider a program with four modules:
-\vspace{-\medskipamount}
 
 \begin{minipage}[t]{0.2\textwidth}
 \begin{python}
@@ -144,7 +164,6 @@ print(pkg.sub)  # 1
 Here \pyinline{helper} is never imported, so \pyinline{pkg.sub} never loads, and \pyinline{pkg.sub} in the
 main module denotes the assignment. Now let the main module also import \pyinline{helper}, which it does not
 otherwise use:
-\vspace{-\medskipamount}
 
 \begin{center}
 \begin{minipage}[t]{0.55\textwidth}
@@ -220,7 +239,6 @@ scope of well-formedness.
 \textbf{To do} & \\
 Reserved words & \issue{9} \\
 Set expressions & \issue{147} \\
-Membership operator (\pyinline{in}) & \issue{80} \\
 Identity operator (\pyinline{is}) & \issue{81} \\
 Chained comparison & \issue{82} \\
 Enums & \issue{86} \\

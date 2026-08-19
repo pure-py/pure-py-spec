@@ -1,0 +1,31 @@
+\begin{figure}
+\small
+\begin{center}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.62\textwidth}}
+\hline
+$\odot$ & $\hat{\odot}(v, v')$ \\
+\hline
+\pyinline{==} & \pyinline{False} if either operand is \pyinline{nan}, and $\eqOp(v, v')$ otherwise \\
+\pyinline{!=} & \pyinline{True} if either operand is \pyinline{nan} or $\eqOp(v, v') = \pyinline{False}$, and \pyinline{False} otherwise \\
+\pyinline{in} & $\memOp(v', v)$ \\
+\pyinline{not in} & \pyinline{True} if $\memOp(v', v) = \pyinline{False}$, and \pyinline{False} otherwise \\
+\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & \todo{Ordering, as in Python} \\
+\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}\quad\pyinline{**} & \todo{Arithmetic, as in Python, whose reference leaves float precision to the implementation} \\
+\hline
+\end{tabular}
+
+\vspace{2mm}
+
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.62\textwidth}}
+\hline
+$\ominus$ & $\hat{\ominus}(v)$ \\
+\hline
+\pyinline{not} & \pyinline{True} if $v = \pyinline{False}$, and \pyinline{False} if $v = \pyinline{True}$ \\
+\pyinline{+} & $v$, if $v$ is a number \\
+\pyinline{-} & $-v$, if $v$ is a number \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Operator meanings}
+\label{fig:operators}
+\end{figure}
