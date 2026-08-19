@@ -52,8 +52,8 @@ for division by zero or a subscript out of range, the expression has no derivati
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
 \ruleName{eval-if} does. A comprehension evaluates its body once for each binding its qualifiers produce, and
-concatenates the results; \Replaced{a generator draws from a list or a tuple, since \PurePy has no wider
-notion of iteration}{a generator draws from a list, because \PurePy has no general iteration protocol}.
+concatenates the results; a generator draws from a list or a tuple, since \PurePy has no wider
+notion of iteration.
 The pattern-matching judgement $\rho, p, v \matches \rho'$ (\figref{match}) is a deterministic partial
 function; we write $\rho, p, v \notmatches$ (with no right-hand side) for $\nexists \rho'.\, \rho, p, v
 \matches \rho'$, i.e.\ matching is undefined. A constructor pattern matches any object whose class has the

@@ -107,8 +107,8 @@
 \begin{figure}
 \small
 \begin{align*}
-\added{\elems(\exList{v_1, \ldots, v_n})} &\added{{}= v_1 \ldots v_n} \\
-\added{\elems(\exTuple{v_1, \ldots, v_n})} &\added{{}= v_1 \ldots v_n} \\
+\elems(\exList{v_1, \ldots, v_n}) &{}= v_1 \ldots v_n \\
+\elems(\exTuple{v_1, \ldots, v_n}) &{}= v_1 \ldots v_n \\
 \\
 \unwrap(\returns{v}) &= v \\
 \unwrap(\assigns{\rho}) &= \pyinline{None} \\
@@ -249,7 +249,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-subscript}}]
 {
-  \rho, e \Rightarrow \added{v} \quad \added{\elems(v) = v_1 \ldots v_m}\deleted{\exList{v_1, \ldots, v_m}} \\
+  \rho, e \Rightarrow v \quad \elems(v) = v_1 \ldots v_m \\
   \rho, e' \Rightarrow n \\
   0 \leq n < m
 }
@@ -259,7 +259,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-subscript-neg}}]
 {
-  \rho, e \Rightarrow \added{v} \quad \added{\elems(v) = v_1 \ldots v_m}\deleted{\exList{v_1, \ldots, v_m}} \\
+  \rho, e \Rightarrow v \quad \elems(v) = v_1 \ldots v_m \\
   \rho, e' \Rightarrow n \\
   {-m} \leq n < 0
 }
@@ -374,8 +374,8 @@
 \and
 \inferrule*[lab={\ruleName{eval-qual-generator}}]
 {
-  \rho, e \Rightarrow \added{v} \\
-  \added{\elems(v) = u_1 \ldots u_n}\deleted{\exList{u_1, \ldots, u_n}} \\
+  \rho, e \Rightarrow v \\
+  \elems(v) = u_1 \ldots u_n \\
   \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \seq{\rho}_i \quad (\forall i)
 }
 {
