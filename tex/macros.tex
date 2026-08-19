@@ -1,4 +1,4 @@
-% Document and references
+% Document metadata
 \ifdefined\anonmode
   \newcommand*{\PurePy}{OurLang\xspace}
   \newcommand*{\Fluid}{a related functional language\xspace}
@@ -8,146 +8,161 @@
   \newcommand*{\Fluid}{Fluid\xspace}
   \newcommand*{\Fortl}{Fortl\xspace}
 \fi
+\newcommand*{\versionstring}{}
+\newcommand*{\version}[3]{%
+  \gdef\versionstring{#1.#2.#3}%
+}
+
+% Cross-references and annotations
 \ifdefined\anonmode
   \newcommand*{\issue}[1]{\##1}
 \else
   \newcommand*{\issue}[1]{\href{https://github.com/pure-py/pure-py-spec/issues/#1}{\##1}}
 \fi
-\newcommand*{\versionstring}{}
-\newcommand*{\version}[3]{%
-  \gdef\versionstring{#1.#2.#3}%
-}
-\newcommand*{\figref}[1]{Figure~\ref{fig:#1}}
-\newcommand*{\secref}[1]{\S\ref{sec:#1}}
-\newcommand*{\todo}[1]{\textcolor{red}{[\textbf{TODO:} #1]}}
-\newcommand*{\figrefTwo}[2]{Figures \ref{fig:#1} and \ref{fig:#2}}
-
-% Figure and rule presentation
-\definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
-\newcommand*{\shadebox}[1]{\fcolorbox{lightgray}{shadecolor}{\raisebox{0pt}[0.60\baselineskip][0.05\baselineskip]{#1}}}
-\newcommand*{\ruleName}[1]{\textcolor{gray}{\textnormal{\textsf{#1}}}}
-
-% General notation
-\newcommand*{\set}[1]{\{#1\}}
-\newcommand*{\dom}{\mathrm{dom}}
-\newcommand*{\seq}[1]{\vec{#1}}
-\newcommand*{\cons}{\cdot}
-\newcommand*{\B}{\mathbb{B}}
-
-% Terms: expressions and comprehension qualifiers
-\newcommand*{\exCall}[2]{#1(#2)}
-\newcommand*{\exConstr}[2]{#1(#2)}
-\newcommand*{\exBinOp}[3]{#1 \mathbin{#2} #3}
-\newcommand*{\exUnaryOp}[2]{#1\,#2}
-\newcommand*{\exAttr}[2]{#1\mathord{.}#2}
-\newcommand*{\exSubscript}[2]{#1[#2]}
-\newcommand*{\exAnd}[2]{#1\;\pyinline{and}\;#2}
-\newcommand*{\exOr}[2]{#1\;\pyinline{or}\;#2}
-\newcommand*{\exCondExpr}[3]{#1\;\pyinline{if}\;#2\;\pyinline{else}\;#3}
-\newcommand*{\exList}[1]{[#1]}
-\newcommand*{\exTuple}[1]{(#1)}
-\newcommand*{\exDict}[1]{\{#1\}}
-\newcommand*{\exListComp}[2]{[\,#1\;#2]}
-\newcommand*{\exDictComp}[3]{\{\bind{#1}{#2}\;#3\}}
-\newcommand*{\exLambda}[2]{\pyinline{lambda}\;#1\mathord{:}\;#2}
-\newcommand*{\qualGuard}[1]{\pyinline{if}\;#1}
-\newcommand*{\qualGenerator}[2]{\pyinline{for}\;#1\;\pyinline{in}\;#2}
-
-% Terms: statements, blocks, and module bodies
-\newcommand*{\exPass}{\pyinline{pass}}
-\newcommand*{\exAssign}[2]{#1 = #2}
-\newcommand*{\exAssert}[1]{\pyinline{assert}\;#1}
-\newcommand*{\exAssertMsg}[2]{\pyinline{assert}\;#1, #2}
-\newcommand*{\exReturn}[1]{\pyinline{return}\;#1}
-\newcommand*{\exReturnNone}{\pyinline{return}}
-\newcommand*{\exIf}[3]{\pyinline{if}\;#1:\;#2\;#3}
-\newcommand*{\exIfElse}[4]{\pyinline{if}\;#1:\;#2\;#3\;\pyinline{else}:\;#4}
-\newcommand*{\exElif}[2]{\pyinline{elif}\;#1:\;#2}
-\newcommand*{\exMatch}[2]{\pyinline{match}\;#1\mathord{:}\;#2}
-\newcommand*{\exCase}[2]{\pyinline{case}\;#1\mathord{:}\;#2}
-\newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
-\newcommand*{\exDataclass}[2]{@\pyinline{dataclass}\;\pyinline{class}\;#1:\;#2}
-\newcommand*{\exDataclassExtend}[3]{@\pyinline{dataclass}\;\pyinline{class}\;#1(#2):\;#3}
-\newcommand*{\exField}[1]{#1:\;\pyinline{Any}}
-\newcommand*{\exImport}[1]{\pyinline{import}\;#1}
-\newcommand*{\exFromImport}[2]{\pyinline{from}\;#1\;\pyinline{import}\;#2}
-\newcommand*{\exSeq}[2]{#1\;#2}
-
-% Terms: patterns
-\newcommand*{\patConstr}[2]{#1(#2)}
-\newcommand*{\patWild}{\text{\pytext{\textunderscore}}}
-\newcommand*{\patList}[1]{[#1]}
-\newcommand*{\patTuple}[1]{(#1)}
-\newcommand*{\patDict}[1]{\{#1\}}
-
-% Values and context entries
-\newcommand*{\bind}[2]{#1\mathord{:}\,#2}
-\newcommand*{\statusDefAssigned}{\mathsf{tt}}
-\newcommand*{\statusNotDefAssigned}{\mathsf{ff}}
-\newcommand*{\modStub}[1]{\mathsf{Mod}(#1)}
-\newcommand*{\modLoaded}[2]{\mathsf{Mod}(#1, #2)}
-\newcommand*{\clsEntry}[4]{\mathsf{Cls}_{#1}(#2, #3, #4)}
-\newcommand*{\exLamClosure}[4][]{\mathsf{Lam}_{#1}(#2, #3, #4)}
-\newcommand*{\exDefClosure}[4][]{\mathsf{Def}_{#1}(#2, #3, #4)}
-\newcommand*{\exObj}[3]{\mathsf{Obj}_{#1}(#2, #3)}
-
-% Context and environment operations
-\newcommand*{\override}{\cdot}
-\newcommand*{\merge}{\oplus}
-\newcommand*{\meet}{\wedge}
-\newcommand*{\extend}{\lhd}
-\newcommand*{\disjunion}{\uplus}
-
-% Result types and results
-\newcommand*{\Assigns}[1]{\mathsf{Assigns}\;#1}
-\newcommand*{\Returns}{\mathsf{Returns}}
-\newcommand{\assigns}[1]{\mathsf{assigns}\;#1}
-\newcommand{\returns}[1]{\mathsf{returns}\;#1}
-
-% Metafunctions
-\newcommand*{\assignsS}{\mathrm{assigns}}
-\newcommand*{\capturesS}{\mathrm{captures}}
-\newcommand*{\capturesE}{\mathrm{captures}_{\mathsf{e}}}
-\newcommand*{\fvS}{\mathrm{fv}}
-\newcommand*{\fvE}{\mathrm{fv}_{\mathsf{e}}}
-\newcommand*{\binds}{\mathrm{binds}}
-\newcommand*{\ownFields}{\mathrm{own\text{-}fields}}
-\newcommand*{\fields}{\mathrm{fields}}
-\newcommand*{\ancestors}{\mathrm{ancestors}}
-\newcommand*{\imports}{\mathrm{imports}}
-\newcommand*{\deps}{\mathrm{deps}}
-\newcommand*{\submods}{\mathrm{submods}}
-\newcommand*{\nameOf}{\mathrm{name}}
-\newcommand*{\unwrap}{\mathrm{unwrap}}
-\newcommand*{\dispatch}{\mathrm{dispatch}}
-\newcommand*{\env}{\mathrm{env}}
-\newcommand*{\resolveClass}{\mathrm{resolve\text{-}class}}
-\newcommand*{\elems}{\mathrm{elems}}
-\newcommand*{\entries}{\mathrm{entries}}
-\newcommand*{\eqOp}{\mathrm{eq}}
-\newcommand*{\eqEntries}{\mathrm{eq\text{-}entries}}
-\newcommand*{\memOp}{\mathrm{contains}}
-\newcommand*{\update}{\mathrm{update}}
-
-% Orders, relations, and judgement symbols
-\newcommand*{\prefixOf}{\preceq}
-\newcommand*{\properPrefixOf}{\prec}
-\newcommand*{\subsumed}{\sqsubseteq}
-\newcommand*{\matches}{\rightsquigarrow}
-\newcommand*{\notmatches}{\not\rightsquigarrow}
-\newcommand*{\importsR}{\mathrel{\mathsf{imports}}}
-\newcommand*{\loadsTo}{\mathrel{\mathsf{loads\mbox{-}to}}}
-\newcommand*{\loadsAs}{\mathrel{\mathsf{loads\mbox{-}as}}}
-
-% Appendix references: the appendix is part of the full build only.
+% The appendix is part of the full build only.
 \ifdefined\appendixmode
   \newcommand*{\appendixref}[1]{Appendix~\ref{#1}}
 \else
   \newcommand*{\appendixref}[1]{the appendix of the full version}
 \fi
+\newcommand*{\figref}[1]{Figure~\ref{fig:#1}}
+\newcommand*{\figrefTwo}[2]{Figures \ref{fig:#1} and \ref{fig:#2}}
+\newcommand*{\secref}[1]{\S\ref{sec:#1}}
+\newcommand*{\todo}[1]{\textcolor{red}{[\textbf{TODO:} #1]}}
 
-% Open term typing arrow
+% Figure and rule presentation
+\definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
+\newcommand*{\ruleName}[1]{\textcolor{gray}{\textnormal{\textsf{#1}}}}
+\newcommand*{\shadebox}[1]{\fcolorbox{lightgray}{shadecolor}{\raisebox{0pt}[0.60\baselineskip][0.05\baselineskip]{#1}}}
+
+% General notation
+\newcommand*{\B}{\mathbb{B}}
+\newcommand*{\bind}[2]{#1\mathord{:}\,#2}
+\newcommand*{\cons}{\cdot}
+\newcommand*{\dom}{\mathrm{dom}}
+\newcommand*{\seq}[1]{\vec{#1}}
+\newcommand*{\set}[1]{\{#1\}}
+
+% Terms: expressions
+\newcommand*{\exAnd}[2]{#1\;\pyinline{and}\;#2}
+\newcommand*{\exAttr}[2]{#1\mathord{.}#2}
+\newcommand*{\exBinOp}[3]{#1 \mathbin{#2} #3}
+\newcommand*{\exCall}[2]{#1(#2)}
+\newcommand*{\exCondExpr}[3]{#1\;\pyinline{if}\;#2\;\pyinline{else}\;#3}
+\newcommand*{\exConstr}[2]{#1(#2)}
+\newcommand*{\exDict}[1]{\{#1\}}
+\newcommand*{\exDictComp}[3]{\{\bind{#1}{#2}\;#3\}}
+\newcommand*{\exLambda}[2]{\pyinline{lambda}\;#1\mathord{:}\;#2}
+\newcommand*{\exList}[1]{[#1]}
+\newcommand*{\exListComp}[2]{[\,#1\;#2]}
+\newcommand*{\exOr}[2]{#1\;\pyinline{or}\;#2}
+\newcommand*{\exSubscript}[2]{#1[#2]}
+\newcommand*{\exTuple}[1]{(#1)}
+\newcommand*{\exUnaryOp}[2]{#1\,#2}
+
+% Terms: comprehension qualifiers
+\newcommand*{\qualGenerator}[2]{\pyinline{for}\;#1\;\pyinline{in}\;#2}
+\newcommand*{\qualGuard}[1]{\pyinline{if}\;#1}
+
+% Terms: statements and blocks
+\newcommand*{\exAssert}[1]{\pyinline{assert}\;#1}
+\newcommand*{\exAssertMsg}[2]{\pyinline{assert}\;#1, #2}
+\newcommand*{\exAssign}[2]{#1 = #2}
+\newcommand*{\exCase}[2]{\pyinline{case}\;#1\mathord{:}\;#2}
+\newcommand*{\exElif}[2]{\pyinline{elif}\;#1:\;#2}
+\newcommand*{\exIf}[3]{\pyinline{if}\;#1:\;#2\;#3}
+\newcommand*{\exIfElse}[4]{\pyinline{if}\;#1:\;#2\;#3\;\pyinline{else}:\;#4}
+\newcommand*{\exMatch}[2]{\pyinline{match}\;#1\mathord{:}\;#2}
+\newcommand*{\exPass}{\pyinline{pass}}
+\newcommand*{\exReturn}[1]{\pyinline{return}\;#1}
+\newcommand*{\exReturnNone}{\pyinline{return}}
+\newcommand*{\exSeq}[2]{#1\;#2}
+
+% Terms: definitions and imports
+\newcommand*{\exDataclass}[2]{@\pyinline{dataclass}\;\pyinline{class}\;#1:\;#2}
+\newcommand*{\exDataclassExtend}[3]{@\pyinline{dataclass}\;\pyinline{class}\;#1(#2):\;#3}
+\newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
+\newcommand*{\exField}[1]{#1:\;\pyinline{Any}}
+\newcommand*{\exFromImport}[2]{\pyinline{from}\;#1\;\pyinline{import}\;#2}
+\newcommand*{\exImport}[1]{\pyinline{import}\;#1}
+
+% Terms: patterns
+\newcommand*{\patConstr}[2]{#1(#2)}
+\newcommand*{\patDict}[1]{\{#1\}}
+\newcommand*{\patList}[1]{[#1]}
+\newcommand*{\patTuple}[1]{(#1)}
+\newcommand*{\patWild}{\text{\pytext{\textunderscore}}}
+
+% Values: closures and objects
+\newcommand*{\exDefClosure}[4][]{\mathsf{Def}_{#1}(#2, #3, #4)}
+\newcommand*{\exLamClosure}[4][]{\mathsf{Lam}_{#1}(#2, #3, #4)}
+\newcommand*{\exObj}[3]{\mathsf{Obj}_{#1}(#2, #3)}
+
+% Context entries
+\newcommand*{\clsEntry}[4]{\mathsf{Cls}_{#1}(#2, #3, #4)}
+\newcommand*{\modLoaded}[2]{\mathsf{Mod}(#1, #2)}
+\newcommand*{\modStub}[1]{\mathsf{Mod}(#1)}
+\newcommand*{\statusDefAssigned}{\mathsf{tt}}
+\newcommand*{\statusNotDefAssigned}{\mathsf{ff}}
+
+% Context and environment operations
+\newcommand*{\disjunion}{\uplus}
+\newcommand*{\extend}{\lhd}
+\newcommand*{\meet}{\wedge}
+\newcommand*{\merge}{\oplus}
+\newcommand*{\override}{\cdot}
+
+% Result types and results
+\newcommand*{\Assigns}[1]{\mathsf{Assigns}\;#1}
+\newcommand{\assigns}[1]{\mathsf{assigns}\;#1}
+\newcommand*{\Returns}{\mathsf{Returns}}
+\newcommand{\returns}[1]{\mathsf{returns}\;#1}
+
+% Metafunctions: definite assignment and free variables
+\newcommand*{\assignsS}{\mathrm{assigns}}
+\newcommand*{\binds}{\mathrm{binds}}
+\newcommand*{\capturesE}{\mathrm{captures}_{\mathsf{e}}}
+\newcommand*{\capturesS}{\mathrm{captures}}
+\newcommand*{\fvE}{\mathrm{fv}_{\mathsf{e}}}
+\newcommand*{\fvS}{\mathrm{fv}}
+
+% Metafunctions: classes
+\newcommand*{\ancestors}{\mathrm{ancestors}}
+\newcommand*{\fields}{\mathrm{fields}}
+\newcommand*{\ownFields}{\mathrm{own\text{-}fields}}
+\newcommand*{\resolveClass}{\mathrm{resolve\text{-}class}}
+
+% Metafunctions: modules
+\newcommand*{\deps}{\mathrm{deps}}
+\newcommand*{\imports}{\mathrm{imports}}
+\newcommand*{\nameOf}{\mathrm{name}}
+\newcommand*{\submods}{\mathrm{submods}}
+
+% Metafunctions: lists, tuples, and dictionaries
+\newcommand*{\elems}{\mathrm{elems}}
+\newcommand*{\entries}{\mathrm{entries}}
+\newcommand*{\update}{\mathrm{update}}
+
+% Metafunctions: equality and membership
+\newcommand*{\eqEntries}{\mathrm{eq\text{-}entries}}
+\newcommand*{\eqOp}{\mathrm{eq}}
+\newcommand*{\memOp}{\mathrm{contains}}
+
+% Metafunctions: evaluation
+\newcommand*{\dispatch}{\mathrm{dispatch}}
+\newcommand*{\env}{\mathrm{env}}
+\newcommand*{\unwrap}{\mathrm{unwrap}}
+
+% Orders, relations, and judgement symbols
 \newcommand{\carrow}[1]{\xrightarrow{\; #1\; }}
+\newcommand*{\importsR}{\mathrel{\mathsf{imports}}}
+\newcommand*{\loadsAs}{\mathrel{\mathsf{loads\mbox{-}as}}}
+\newcommand*{\loadsTo}{\mathrel{\mathsf{loads\mbox{-}to}}}
+\newcommand*{\matches}{\rightsquigarrow}
+\newcommand*{\notmatches}{\not\rightsquigarrow}
+\newcommand*{\prefixOf}{\preceq}
+\newcommand*{\properPrefixOf}{\prec}
+\newcommand*{\subsumed}{\sqsubseteq}
 
 % Change markup (own copy of the shared change-tracking definitions; changebar loaded in the
 % preamble).
