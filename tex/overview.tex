@@ -12,11 +12,12 @@ claim precise and sets out the excluded features, grouped by the discipline each
 
 \Added{\PurePy is required to be a genuine subset of Python: a well-formed program is valid Python, and where
 \PurePy gives it a meaning, that meaning is the one Python gives it. Two judgements decide this, and they
-apply at different levels. Well-formedness is a property of the program, decided statically. Conformance is a
-property of a single execution: an execution is conformant when the rules of \secref{opsem} give it a result.
-The distinction matters because a program can have more than one execution, and because whether an execution
-stays inside \PurePy can depend on the values it computes. Comparing two lists is inside the subset for most
-values and outside it when a NaN reaches the comparison (\secref{no-coercions}).}
+apply at different levels. A program is well-formed when it passes \PurePy's static checks, which look only
+at the program text and always terminate. Conformance is a property of a single execution: an execution is
+conformant when the rules of \secref{opsem} give it a result. The distinction matters because a program can
+have more than one execution, and because whether an execution stays inside \PurePy can depend on the values
+it computes. Comparing two lists is inside the subset for most values and outside it when a NaN reaches the
+comparison (\secref{no-coercions}).}
 
 \Added{\figref{taxonomy} sets out the cases. The blank cells carry as much as the filled ones. \PurePy accepts
 nothing Python rejects, so the left column has a single entry, and a conformant execution never meets a Python
