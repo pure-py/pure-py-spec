@@ -15,8 +15,7 @@ claim precise and sets out the excluded features, grouped by the discipline each
 together. Both halves of that guarantee are visible as nesting: \PurePy accepts nothing that Python rejects,
 and a valid \PurePy run never fails with a Python error.}
 
-\Added{A program is well-formed when it passes \PurePy's static checks. The checks look only at the program text
-and always terminate. Semantic validity is about a single run rather than about the program, because a run
+\Added{A program is well-formed when it passes \PurePy's static checks. Semantic validity is about a single run rather than about the program, because a run
 can leave the subset depending on the values it computes. Comparing two lists stays inside the subset for
 most values, but not when the comparison reaches a NaN (\secref{no-coercions}).}
 
