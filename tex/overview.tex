@@ -19,11 +19,12 @@ have more than one execution, and because whether an execution stays inside \Pur
 it computes. Comparing two lists is inside the subset for most values and outside it when a NaN reaches the
 comparison (\secref{no-coercions}).}
 
-\Added{\figref{taxonomy} sets out the cases. The blank cells carry as much as the filled ones. \PurePy accepts
-nothing Python rejects, so the left column has a single entry, and a conformant execution never meets a Python
-error, which is the guarantee stated above.}
+\Added{\figref{taxonomy} sets out the cases. Two of them the picture states by containment rather than by a
+label. \PurePy accepts nothing Python rejects, so the well-formed region lies inside the outer one; and a
+conformant execution never meets a Python error, so the conformant region lies inside the region Python runs
+without error.}
 
-\Added{The cell where \PurePy declines a program Python runs is the boundary of the subset. An implementation
+\Added{The region where \PurePy declines a program Python runs is the boundary of the subset. An implementation
 may report reaching it, by raising \pyinline{UnsupportedOperationError}. It is not required to, since the
 guarantee says nothing about such an execution, and a stock Python interpreter will simply compute Python's
 answer.}
@@ -33,19 +34,22 @@ classified as \PurePy grows.}
 
 \begin{figure}
 \centering
-\small
 \color{addedcolor}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.27\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}>{\raggedright\arraybackslash}p{0.23\textwidth}>{\raggedright\arraybackslash}p{0.23\textwidth}}
-\hline
- & \multicolumn{3}{c}{\textbf{Python}} \\
-\textbf{\PurePy} & \textbf{rejects} & \textbf{raises} & \textbf{succeeds} \\
-\hline
-Not well-formed & Rejected by both & Error prevented (\figref{prevented-errors}) & Excluded by design (\figref{coercions}) \\[1mm]
-Well-formed, execution not conformant & & Both fail & Outside the subset (\figref{coercions}) \\[1mm]
-Well-formed, execution conformant & & & Same result \\
-\hline
-\end{tabular}
-\caption{How a \PurePy program relates to Python. Blank cells cannot occur}
+\begin{tikzpicture}[font=\footnotesize, rounded corners=4pt]
+  \draw (0,0) rectangle (13.4,7.6);
+  \draw (0.9,0.9) rectangle (9.0,6.7);
+  \draw[dashed] (4.8,0.45) rectangle (12.95,7.15);
+  \draw (5.4,2.2) rectangle (8.4,5.4);
+  \node[anchor=north west] at (0.15,7.45) {\textbf{Syntactically valid Python}};
+  \node[anchor=north west] at (1.05,6.55) {\textbf{Well-formed}};
+  \node[anchor=north east, align=right] at (12.8,7.05) {\textbf{Python runs}\\\textbf{without error}};
+  \node[align=center] at (6.9,4.4) {\textbf{Conformant}\\[1mm]Same result as Python};
+  \node[align=center] at (2.4,0.45) {Error prevented (\figref{prevented-errors})};
+  \node[align=center] at (11.0,3.8) {Excluded by design\\(\figref{coercions})};
+  \node[align=center] at (2.85,3.8) {Both fail};
+  \node[align=center] at (6.9,6.0) {Outside the subset (\figref{coercions})};
+\end{tikzpicture}
+\caption{How a \PurePy program relates to Python}
 \label{fig:taxonomy}
 \end{figure}
 
