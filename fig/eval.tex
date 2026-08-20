@@ -30,7 +30,7 @@
 \inferrule*[lab={\ruleName{eval-assert}}]
 {
   \rho, e \Rightarrow v \\
-  v \neq \pyinline{False}
+  \replaced{v = \pyinline{True}}{v \neq \pyinline{False}}
 }
 {
   \rho, \exAssert{e} \Rightarrow \assigns{\varnothing}
@@ -39,7 +39,7 @@
 \inferrule*[lab={\ruleName{eval-assert-msg}}]
 {
   \rho, e \Rightarrow v \\
-  v \neq \pyinline{False}
+  \replaced{v = \pyinline{True}}{v \neq \pyinline{False}}
 }
 {
   \rho, \exAssertMsg{e}{e'} \Rightarrow \assigns{\varnothing}
