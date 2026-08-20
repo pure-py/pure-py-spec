@@ -10,10 +10,9 @@ claim precise and sets out the excluded features, grouped by the discipline each
 \subsection{Python compatibility}
 \label{sec:python-compatibility}
 
-\Added{\PurePy is a subset of Python. Every well-formed program is also a valid Python program. Where \PurePy
+\Added{\PurePy is a subset of Python. Every well-formed program is also a valid Python program, and where \PurePy
 gives a run a result, running it under Python gives the same result. \figref{taxonomy} shows how the two
-languages fit together. Both halves of that guarantee are visible as nesting: \PurePy accepts nothing that
-Python rejects, and a valid \PurePy run never fails with a Python error.}
+languages fit together, with each half of that guarantee appearing as one box inside another.}
 
 \Added{A program is well-formed when it passes \PurePy's static checks. Semantic validity is about a single
 run rather than about the program, because a run can leave the subset depending on the values it computes.
