@@ -10,18 +10,18 @@ claim precise and sets out the excluded features, grouped by the discipline each
 \subsection{Python compatibility}
 \label{sec:python-compatibility}
 
-\Added{\PurePy is a subset of Python. Every well-formed program is also a valid Python program, and when
-\PurePy gives a run a result, Python gives the same one. \figref{taxonomy} shows how the two languages fit
-together. Both halves of that promise are visible as nesting: \PurePy accepts nothing that Python rejects,
+\Added{\PurePy is a subset of Python. Every well-formed program is also a valid Python program. Where
+\PurePy gives a run a result, running it under Python gives the same result. \figref{taxonomy} shows how the two languages fit
+together. Both halves of that guarantee are visible as nesting: \PurePy accepts nothing that Python rejects,
 and a valid \PurePy run never hits a Python error.}
 
-\Added{A program is well-formed when it passes \PurePy's static checks. These look only at the program text
+\Added{A program is well-formed when it passes \PurePy's static checks. The checks look only at the program text
 and always terminate. Semantic validity is about a single run rather than about the program, because a run
 can leave the subset depending on the values it computes. Comparing two lists stays inside the subset for
 most values, but not when the comparison reaches a NaN (\secref{no-coercions}).}
 
 \Added{When a run reaches a dynamically excluded operation, an implementation is free to raise
-\pyinline{UnsupportedOperationError}, but nothing requires it to. The promise covers only the runs that stay
+\pyinline{UnsupportedOperationError}, but nothing requires it to. The guarantee covers only runs that stay
 inside the subset, and a stock Python interpreter will carry on and give the Python answer.}
 
 \Added{The same classification organises the conformance suite (\secref{reference-impl}), and it decides
