@@ -35,6 +35,11 @@ classified as \PurePy grows.}
 \begin{figure}
 \centering
 \begin{tikzpicture}[font=\footnotesize, rounded corners=4pt]
+  \begin{scope}[even odd rule]
+    \clip (0,0) rectangle (13.4,7.8);
+    \clip (-1,-1) rectangle (15,9) (4.8,0.5) rectangle (12.95,7.3);
+    \fill[red!7] (-1,-1) rectangle (15,9);
+  \end{scope}
   \draw (0,0) rectangle (13.4,7.8);
   \draw (1.5,1.5) rectangle (9.0,6.3);
   \draw[dashed] (4.8,0.5) rectangle (12.95,7.3);
