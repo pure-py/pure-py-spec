@@ -10,9 +10,46 @@ claim precise and sets out the excluded features, grouped by the discipline each
 \subsection{Python compatibility}
 \label{sec:python-compatibility}
 
-\todo{\PurePy is required to be a genuine subset of Python, so that every well-formed \PurePy program is
-valid Python with the same meaning. Python has no variable declarations, so a name's binding structure is
-not evident from the syntax, which is the main obstacle to carving out the subset.}
+\Added{\PurePy is required to be a genuine subset of Python: a well-formed program is valid Python, and where
+\PurePy gives it a meaning, that meaning is the one Python gives it. Two judgements decide this, and they
+apply at different levels. Well-formedness is a property of the program, decided statically. Conformance is a
+property of a single execution: an execution is conformant when the rules of \secref{opsem} give it a result.
+The distinction matters because a program can have more than one execution, and because whether an execution
+stays inside \PurePy can depend on the values it computes. Comparing two lists is inside the subset for most
+values and outside it when a NaN reaches the comparison (\secref{no-coercions}).}
+
+\Added{\figref{taxonomy} sets out the cases. The blank cells carry as much as the filled ones. \PurePy accepts
+nothing Python rejects, so the left column has a single entry, and a conformant execution never meets a Python
+error, which is the guarantee stated above.}
+
+\Added{The cell where \PurePy declines a program Python runs is the boundary of the subset. An implementation
+may report reaching it, by raising \pyinline{UnsupportedOperationError}. It is not required to, since the
+guarantee says nothing about such an execution, and a stock Python interpreter will simply compute Python's
+answer.}
+
+\Added{This taxonomy organises the conformance suite (\secref{reference-impl}), and is how each new feature is
+classified as \PurePy grows.}
+
+\begin{figure}
+\centering
+\small
+\color{addedcolor}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.27\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}>{\raggedright\arraybackslash}p{0.23\textwidth}>{\raggedright\arraybackslash}p{0.23\textwidth}}
+\hline
+ & \multicolumn{3}{c}{\textbf{Python}} \\
+\textbf{\PurePy} & \textbf{rejects} & \textbf{raises} & \textbf{succeeds} \\
+\hline
+Not well-formed & Rejected by both & Error prevented (\figref{prevented-errors}) & Excluded by design (\figref{coercions}) \\[1mm]
+Well-formed, execution not conformant & & Both fail & Outside the subset (\figref{coercions}) \\[1mm]
+Well-formed, execution conformant & & & Same result \\
+\hline
+\end{tabular}
+\caption{How a \PurePy program relates to Python. Blank cells cannot occur}
+\label{fig:taxonomy}
+\end{figure}
+
+\todo{Python has no variable declarations, so a name's binding structure is not evident from the syntax, which
+is the main obstacle to carving out the subset.}
 
 \subsection{Purity}
 \label{sec:purity}
