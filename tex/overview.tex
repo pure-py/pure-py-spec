@@ -15,7 +15,7 @@ gives a run a result, that run produces the same result under Python. \figref{ta
 relationship between the two languages, with the guarantee appearing as containment.}
 
 \Added{Well-formedness is a property of the program, decided by \PurePy's static checks. Semantic validity is
-a property of a single run, because some of the Python behaviours \PurePy excludes cannot be rejected
+a property of a run rather than a program, because some of the Python behaviours \PurePy excludes cannot be rejected
 statically (\secref{no-coercions}). An implementation may report a dynamically excluded operation by raising
 \pyinline{UnsupportedOperationError}, but is not obliged to. The guarantee covers only valid runs, and a
 stock Python interpreter will simply produce the Python result. The conformance suite is organised the same
