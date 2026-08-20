@@ -10,16 +10,16 @@ claim precise and sets out the excluded features, grouped by the discipline each
 \subsection{Python compatibility}
 \label{sec:python-compatibility}
 
-\Added{\PurePy is a subset of Python: every well-formed program is a valid Python program, and if \PurePy
+\PurePy is a subset of Python: every well-formed program is a valid Python program, and if \PurePy
 gives a run a result, that run produces the same result under Python. \figref{taxonomy} shows the
-relationship between the two languages, with the guarantee appearing as containment.}
+relationship between the two languages, with the guarantee appearing as containment.
 
-\Added{Well-formedness is a property of the program, decided by \PurePy's static checks. Semantic validity is
+Well-formedness is a property of the program, decided by \PurePy's static checks. Semantic validity is
 a property of a run rather than a program, because some of the Python behaviours \PurePy excludes cannot be rejected
 statically (\secref{no-coercions}). An implementation may report a dynamically excluded operation by raising
 \pyinline{UnsupportedOperationError}, but is not obliged to. The guarantee covers only valid runs, and a
 stock Python interpreter will simply produce the Python result. The conformance suite is organised the same
-way (\secref{reference-impl}).}
+way (\secref{reference-impl}).
 
 \begin{figure}
 \centering
@@ -143,7 +143,7 @@ Constructor patterns & Positional class patterns may supply fewer sub-patterns t
 Dictionary keys & Any hashable values, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Strings only \\[1mm]
 \pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & Undefined between, say, number and string, or list and tuple; only \pyinline{None} compares with anything \\[1mm]
 Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & Equality undefined \\[1mm]
-\replaced{\pyinline{nan} comparison via container equality}{\pyinline{nan} inside a list, tuple, dict or object} & \replaced{Elements compared by identity before equality, so identical NaNs match but distinct ones do not}{Elements compared by identity before equality, and a NaN is not equal to itself, so a NaN element matches an identical NaN but not a distinct one} & Equality undefined \\
+\pyinline{nan} comparison via container equality & Elements compared by identity before equality, so identical NaNs match but distinct ones do not & Equality undefined \\
 \hline
 \end{tabular}
 \caption{Python coercions and lax matches excluded by \PurePy}
