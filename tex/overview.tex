@@ -15,12 +15,11 @@ gives a run a result, running it under Python gives the same result. \figref{tax
 languages fit together, with each half of that guarantee appearing as one box inside another.}
 
 \Added{A program is well-formed when it passes \PurePy's static checks. Semantic validity is about a single
-run rather than about the program, because a run can leave the subset depending on the values it computes.
-Comparing two lists stays inside the subset for most values, but not when the comparison reaches a NaN
+run rather than about the program, because whether a run is valid can depend on the values it computes.
+Comparing two lists is valid for most values, but not when the comparison reaches a NaN
 (\secref{no-coercions}). When a run reaches a dynamically excluded operation, an implementation is free to
-raise \pyinline{UnsupportedOperationError}, but nothing requires it to. The guarantee covers only runs that
-stay inside the subset, and a stock Python interpreter will carry on and give the Python answer. The same
-classification organises the conformance suite (\secref{reference-impl}), and it decides where a new feature
+raise \pyinline{UnsupportedOperationError}, but nothing requires it to. The guarantee covers only valid runs, and a stock
+Python interpreter will carry on and give the Python answer. The same classification organises the conformance suite (\secref{reference-impl}), and it decides where a new feature
 belongs as \PurePy grows.}
 
 \begin{figure}
