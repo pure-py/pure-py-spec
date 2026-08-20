@@ -138,7 +138,7 @@ getting stuck, so a later case runs and the program means something different in
 \textbf{Construct} & \textbf{Python} & \textbf{\PurePy} & \textbf{Excluded} \\
 \hline
 Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & Must already be Boolean & Dynamically \\[1mm]
-Sequence patterns & List patterns match tuples, and tuple patterns lists & \todo{List patterns match only lists, tuple patterns only tuples} & Neither; results differ (\issue{151}) \\[1mm]
+Sequence patterns & List patterns match tuples, and tuple patterns lists & List patterns match only lists, tuple patterns only tuples & \todo{Neither; results differ (\issue{151})} \\[1mm]
 Constructor patterns & Positional class patterns may supply fewer sub-patterns than the class has fields, matching only those given & Require exact arity & Statically \\[1mm]
 Dictionary keys & Any hashable values, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Strings only & Statically in patterns, dynamically in expressions \\[1mm]
 \pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & Undefined between, say, number and string, or list and tuple; only \pyinline{None} compares with anything & Dynamically \\[1mm]
