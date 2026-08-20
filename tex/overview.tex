@@ -104,11 +104,11 @@ getting stuck, so a later case runs and the program means something different in
 \hline
 Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & Must already be Boolean \\[1mm]
 Sequence patterns & List patterns match tuples, and tuple patterns lists & List patterns match only lists, tuple patterns only tuples \\[1mm]
-Constructor patterns & Positional class patterns may supply fewer sub-patterns than the class has fields, matching only those given & Require the exact arity \\[1mm]
+Constructor patterns & Positional class patterns may supply fewer sub-patterns than the class has fields, matching only those given & Require exact arity \\[1mm]
 Dictionary keys & Any hashable values, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Strings only \\[1mm]
-\pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & Undefined between, say, a number and a string, or a list and a tuple; only \pyinline{None} compares with anything \\[1mm]
+\pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & Undefined between, say, number and string, or list and tuple; only \pyinline{None} compares with anything \\[1mm]
 Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & Equality undefined \\[1mm]
-\pyinline{nan} inside a list, tuple, dict or object & Elements compared by identity before equality, and a NaN is not equal to itself, so a NaN element matches an identical NaN but not a distinct one & Equality undefined \\
+\replaced{\pyinline{nan} comparison via container equality}{\pyinline{nan} inside a list, tuple, dict or object} & \replaced{Elements compared by identity before equality, so identical NaNs match but distinct ones do not}{Elements compared by identity before equality, and a NaN is not equal to itself, so a NaN element matches an identical NaN but not a distinct one} & Equality undefined \\
 \hline
 \end{tabular}
 \caption{Python coercions and lax matches excluded by \PurePy}
