@@ -207,7 +207,7 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 \begin{figure}
 \small
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\rho, e \evalsTo v$} \shadebox{$\rho, b \evalsTo v$}
+\flushleft \shadebox{$\rho, e \evalsTo v$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-value}}]
@@ -217,7 +217,16 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 {
   \rho, e \evalsTo v
 }
-\and
+\end{mathpar}
+\subcaption{Expression $e$ yields value $v$}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\rho, b \evalsTo v$}
+\begin{mathpar}
+\small
 \inferrule*[lab={\ruleName{eval-value-return}}]
 {
   \rho, b \Rightarrow \returns{v}
@@ -234,7 +243,7 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
   \rho, b \evalsTo \pyinline{None}
 }
 \end{mathpar}
-\subcaption{Expression $e$ or block $b$ yields value $v$}
+\subcaption{Block $b$ yields value $v$}
 \end{subfigure}
 \caption{\todo{Value-binding premises (\issue{63})}}
 \label{fig:eval-value}
