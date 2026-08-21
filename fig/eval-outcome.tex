@@ -206,6 +206,53 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 
 \begin{figure}
 \small
+\flushleft \shadebox{$\rho, e \Rightarrow o$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-subscript-range}}]
+{
+  \rho, e \evalsTo v \quad \elems(v) = v_1 \ldots v_m \\
+  \rho, e' \evalsTo n \\
+  n < -m \text{ or } n \geq m
+}
+{
+  \rho, \exSubscript{e}{e'} \Rightarrow \fails{\errIndex}
+}
+\and
+\inferrule*[lab={\ruleName{eval-subscript-nonseq}}]
+{
+  \rho, e \evalsTo v \quad \elems(v) \text{ undefined} \\
+  \rho, e' \evalsTo v'
+}
+{
+  \rho, \exSubscript{e}{e'} \Rightarrow \fails{\errType}
+}
+\and
+\inferrule*[lab={\ruleName{eval-attr-nonobj}}]
+{
+  \rho, e \evalsTo v \\
+  v \text{ is neither a module nor an object}
+}
+{
+  \rho, \exAttr{e}{x} \Rightarrow \fails{\errType}
+}
+\and
+\inferrule*[lab={\ruleName{eval-call-nonfun}}]
+{
+  \rho, e \evalsTo v \\
+  \rho, \seq{e} \evalsTo \seq{u} \\
+  v \text{ is not a closure}
+}
+{
+  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \fails{\errType}
+}
+\end{mathpar}
+\caption{Expression $e$ fails with error kind $\kappa$ under environment $\rho : \Gamma$}
+\label{fig:eval-fails}
+\end{figure}
+
+\begin{figure}
+\small
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\rho, e \evalsTo v$}
 \begin{mathpar}
