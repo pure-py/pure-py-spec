@@ -73,9 +73,9 @@ membership $\memOp$ (\figrefTwo{equality}{membership}). Both are undefined where
 
 \todo{Errors are not yet in the semantics (\issue{63}). \figrefTwo{eval-outcome}{eval-fails} draft the
 intended form: evaluation yields an outcome $o$, either $\val{v}$ or $\fails{\kappa}$, where the error kind
-$\kappa$ records which Python error the failure corresponds to. A premise $\rho, e \evalsTo v$ abbreviates
-$\rho, e \Rightarrow \val{v}$, and each construct has propagation rules recording which subexpressions
-succeeded before the failing one was reached. Operations \PurePy excludes rather than shares with Python,
+$\kappa$ records which Python error the failure corresponds to. Each construct has propagation rules recording which
+subexpressions succeeded before the failing one was reached, and $\rho, b \evalsTo v$ is the value a block
+yields, \pyinline{None} where it falls off the end. Operations \PurePy excludes rather than shares with Python,
 such as a non-Boolean test, get no rule and leave the run stuck (\secref{no-coercions}, \issue{162}).}
 
 \input{fig/eval-outcome}

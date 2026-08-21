@@ -1,6 +1,5 @@
 \begin{figure}
 \small
-\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\rho, e \Rightarrow o$}
 \begin{mathpar}
 \small
@@ -47,7 +46,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-binop}}]
 {
-  \rho, e \evalsTo v \\
+  \rho, e \Rightarrow \val{v} \\
   \rho, e' \Rightarrow o
 }
 {
@@ -56,7 +55,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-list}}]
 {
-  \rho, e_1 \cons \ldots \cons e_n \evalsTo v_1 \cons \ldots \cons v_n
+  \rho, e_1 \cons \ldots \cons e_n \Rightarrow \val{v_1 \cons \ldots \cons v_n}
 }
 {
   \rho, \exList{e_1, \ldots, e_n} \Rightarrow \val{\exList{v_1, \ldots, v_n}}
@@ -64,7 +63,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-tuple}}]
 {
-  \rho, e_1 \cons \ldots \cons e_n \evalsTo v_1 \cons \ldots \cons v_n
+  \rho, e_1 \cons \ldots \cons e_n \Rightarrow \val{v_1 \cons \ldots \cons v_n}
 }
 {
   \rho, \exTuple{e_1, \ldots, e_n} \Rightarrow \val{\exTuple{v_1, \ldots, v_n}}
@@ -72,7 +71,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-dict}}]
 {
-  \rho, e_1 \cons e_1' \cons \ldots \cons e_n \cons e_n' \evalsTo w_1 \cons v_1 \cons \ldots \cons w_n \cons v_n
+  \rho, e_1 \cons e_1' \cons \ldots \cons e_n \cons e_n' \Rightarrow \val{w_1 \cons v_1 \cons \ldots \cons w_n \cons v_n}
 }
 {
   \rho, \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \Rightarrow \val{\exDict{\entries(\varepsilon, \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n})}}
@@ -80,7 +79,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-attr-module}}]
 {
-  \rho, e \evalsTo \modLoaded{q'}{\rho'} \\
+  \rho, e \Rightarrow \val{\modLoaded{q'}{\rho'}} \\
   \bind{x}{v} \in \rho'
 }
 {
@@ -89,7 +88,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
-  \rho, e_1 \cons \ldots \cons e_{n+m} \evalsTo v_1 \cons \ldots \cons v_{n+m} \\
+  \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \val{v_1 \cons \ldots \cons v_{n+m}} \\
   \resolveClass(\rho, q) = C \\
   \fields(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}
 }
@@ -99,8 +98,8 @@
 \and
 \inferrule*[lab={\ruleName{eval-subscript}}]
 {
-  \rho, e \evalsTo v \quad \elems(v) = v_1 \ldots v_m \\
-  \rho, e' \evalsTo n \\
+  \rho, e \Rightarrow \val{v} \quad \elems(v) = v_1 \ldots v_m \\
+  \rho, e' \Rightarrow \val{n} \\
   0 \leq n < m
 }
 {
@@ -109,8 +108,8 @@
 \and
 \inferrule*[lab={\ruleName{eval-subscript-neg}}]
 {
-  \rho, e \evalsTo v \quad \elems(v) = v_1 \ldots v_m \\
-  \rho, e' \evalsTo n \\
+  \rho, e \Rightarrow \val{v} \quad \elems(v) = v_1 \ldots v_m \\
+  \rho, e' \Rightarrow \val{n} \\
   {-m} \leq n < 0
 }
 {
@@ -119,8 +118,8 @@
 \and
 \inferrule*[lab={\ruleName{eval-call-lambda}}]
 {
-  \rho, e \evalsTo \exLamClosure[\Delta]{\rho'}{\seq{x}}{e'} \\
-  \rho, \seq{e} \evalsTo \seq{u} \\
+  \rho, e \Rightarrow \val{\exLamClosure[\Delta]{\rho'}{\seq{x}}{e'}} \\
+  \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
   \rho' \override \set{\bind{\seq{x}}{\seq{u}}}, e' \Rightarrow o
 }
 {
@@ -129,10 +128,10 @@
 \and
 \inferrule*[lab={\ruleName{eval-call-def}}]
 {
-  \rho, e \evalsTo \exDefClosure[\Delta]{\rho'}{\seq{d}}{j} \\
+  \rho, e \Rightarrow \val{\exDefClosure[\Delta]{\rho'}{\seq{d}}{j}} \\
   d_i = \exDef{f_i}{\seq{x}_i}{b_i} \quad (\forall i) \\
   v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
-  \rho, \seq{e} \evalsTo \seq{u} \\
+  \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
   \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, b_j \evalsTo v
 }
 {
@@ -141,7 +140,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-and-false}}]
 {
-  \rho, e \evalsTo \pyinline{False}
+  \rho, e \Rightarrow \val{\pyinline{False}}
 }
 {
   \rho, \exAnd{e}{e'} \Rightarrow \val{\pyinline{False}}
@@ -149,7 +148,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-and-true}}]
 {
-  \rho, e \evalsTo \pyinline{True} \\
+  \rho, e \Rightarrow \val{\pyinline{True}} \\
   \rho, e' \Rightarrow o
 }
 {
@@ -158,7 +157,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-or-true}}]
 {
-  \rho, e \evalsTo \pyinline{True}
+  \rho, e \Rightarrow \val{\pyinline{True}}
 }
 {
   \rho, \exOr{e}{e'} \Rightarrow \val{\pyinline{True}}
@@ -166,7 +165,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-or-false}}]
 {
-  \rho, e \evalsTo \pyinline{False} \\
+  \rho, e \Rightarrow \val{\pyinline{False}} \\
   \rho, e' \Rightarrow o
 }
 {
@@ -175,7 +174,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-cond-true}}]
 {
-  \rho, e \evalsTo \pyinline{True} \\
+  \rho, e \Rightarrow \val{\pyinline{True}} \\
   \rho, e_1 \Rightarrow o
 }
 {
@@ -184,16 +183,14 @@
 \and
 \inferrule*[lab={\ruleName{eval-cond-false}}]
 {
-  \rho, e \evalsTo \pyinline{False} \\
+  \rho, e \Rightarrow \val{\pyinline{False}} \\
   \rho, e_2 \Rightarrow o
 }
 {
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow o
 }
 \end{mathpar}
-\subcaption{Expression $e$ evaluates to outcome $o$, either $\val{v}$ or $\fails{\kappa}$}
-\end{subfigure}
-\caption{\todo{Evaluation with errors (\issue{63})}}
+\caption{\todo{Expression $e$ evaluates to outcome $o$ under environment $\rho : \Gamma$}}
 \label{fig:eval-outcome}
 \end{figure}
 
@@ -212,7 +209,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-seq-cons}}]
 {
-  \rho, e \evalsTo v \\
+  \rho, e \Rightarrow \val{v} \\
   \rho, \seq{e} \Rightarrow o
 }
 {
@@ -293,7 +290,7 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 \and
 \inferrule*[lab={\ruleName{eval-subscript-fail-index}}]
 {
-  \rho, e \evalsTo v \\
+  \rho, e \Rightarrow \val{v} \\
   \rho, e' \Rightarrow \fails{\kappa}
 }
 {
@@ -310,7 +307,7 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 \and
 \inferrule*[lab={\ruleName{eval-call-fail-args}}]
 {
-  \rho, e \evalsTo v \\
+  \rho, e \Rightarrow \val{v} \\
   \rho, \seq{e} \Rightarrow \fails{\kappa}
 }
 {
@@ -351,8 +348,8 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 \and
 \inferrule*[lab={\ruleName{eval-subscript-range}}]
 {
-  \rho, e \evalsTo v \quad \elems(v) = v_1 \ldots v_m \\
-  \rho, e' \evalsTo n \\
+  \rho, e \Rightarrow \val{v} \quad \elems(v) = v_1 \ldots v_m \\
+  \rho, e' \Rightarrow \val{n} \\
   n < -m \text{ or } n \geq m
 }
 {
@@ -361,8 +358,8 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 \and
 \inferrule*[lab={\ruleName{eval-subscript-nonseq}}]
 {
-  \rho, e \evalsTo v \quad \elems(v) \text{ undefined} \\
-  \rho, e' \evalsTo v'
+  \rho, e \Rightarrow \val{v} \quad \elems(v) \text{ undefined} \\
+  \rho, e' \Rightarrow \val{v'}
 }
 {
   \rho, \exSubscript{e}{e'} \Rightarrow \fails{\errType}
@@ -370,7 +367,7 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 \and
 \inferrule*[lab={\ruleName{eval-attr-nonobj}}]
 {
-  \rho, e \evalsTo v \\
+  \rho, e \Rightarrow \val{v} \\
   v \text{ neither module nor object}
 }
 {
@@ -379,8 +376,8 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 \and
 \inferrule*[lab={\ruleName{eval-call-nonfun}}]
 {
-  \rho, e \evalsTo v \\
-  \rho, \seq{e} \evalsTo \seq{u} \\
+  \rho, e \Rightarrow \val{v} \\
+  \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
   v \text{ not a closure}
 }
 {
@@ -393,24 +390,6 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 
 \begin{figure}
 \small
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\rho, e \evalsTo v$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{eval-value}}]
-{
-  \rho, e \Rightarrow \val{v}
-}
-{
-  \rho, e \evalsTo v
-}
-\end{mathpar}
-\subcaption{Expression $e$ yields value $v$}
-\end{subfigure}
-
-\vspace{2mm}
-
-\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\rho, b \evalsTo v$}
 \begin{mathpar}
 \small
@@ -430,8 +409,6 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
   \rho, b \evalsTo \pyinline{None}
 }
 \end{mathpar}
-\subcaption{Block $b$ yields value $v$}
-\end{subfigure}
-\caption{Expression $e$ or block $b$ yields value $v$ under environment $\rho : \Gamma$}
+\caption{Block $b$ yields value $v$ under environment $\rho : \Gamma$}
 \label{fig:eval-value}
 \end{figure}
