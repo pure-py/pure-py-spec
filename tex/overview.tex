@@ -10,9 +10,44 @@ claim precise and sets out the excluded features, grouped by the discipline each
 \subsection{Python compatibility}
 \label{sec:python-compatibility}
 
-\todo{\PurePy is required to be a genuine subset of Python, so that every well-formed \PurePy program is
-valid Python with the same meaning. Python has no variable declarations, so a name's binding structure is
-not evident from the syntax, which is the main obstacle to carving out the subset.}
+\PurePy is a subset of Python: every well-formed program is a syntactically valid Python program, and if \PurePy
+gives a run a result, that run produces the same result under Python. \figref{taxonomy} shows the
+relationship between the two languages, with the guarantee appearing as containment.
+
+Well-formedness is a property of the program, decided by \PurePy's static checks. Semantic validity is
+a property of a run rather than a program, because some of the Python behaviours \PurePy excludes cannot be rejected
+statically (\secref{no-coercions}). An implementation may report a dynamically excluded operation by raising
+\pyinline{UnsupportedOperationError}, but is not obliged to. The guarantee covers only valid runs, and a
+stock Python interpreter will simply produce the Python result. The conformance suite is organised the same
+way (\secref{reference-impl}).
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[font=\footnotesize, rounded corners=4pt]
+  \begin{scope}[even odd rule]
+    \clip (0,0) rectangle (13.4,7.8);
+    \clip (-1,-1) rectangle (15,9) (4.8,0.5) rectangle (12.95,7.3);
+    \fill[green!8] (-1,-1) rectangle (15,9);
+  \end{scope}
+  \draw (0,0) rectangle (13.4,7.8);
+  \draw (1.5,1.5) rectangle (9.0,6.3);
+  \draw[dashed] (4.8,0.5) rectangle (12.95,7.3);
+  \draw (5.2,2.5) rectangle (8.8,5.2);
+  \node[anchor=north west] at (0.15,7.65) {\textbf{Syntactically valid Python}};
+  \node[anchor=north east, align=right] at (12.8,7.2) {\textbf{Semantically valid Python}\\no runtime error};
+  \node[anchor=north west] at (1.65,6.15) {\textbf{Well-formed \PurePy}};
+  \node[align=center] at (2.4,0.85) {Python runtime error (\figref{prevented-errors})};
+  \node[align=center] at (11.0,3.9) {Statically excluded\\(\figref{coercions})};
+  \node[align=center] at (3.2,3.9) {\PurePy runtime error};
+  \node[align=center] at (6.9,5.75) {Dynamically excluded\\(\figref{coercions})};
+  \node[align=center] at (7.0,3.85) {\textbf{Semantically valid}\\\textbf{\PurePy}\\[1mm]Same result as Python};
+\end{tikzpicture}
+\caption{Python programs and runs, classified by \PurePy}
+\label{fig:taxonomy}
+\end{figure}
+
+\todo{Python has no variable declarations, so a name's binding structure is not evident from the syntax.
+This motivates the definite-assignment analysis (\secref{syntax}).}
 
 \subsection{Purity}
 \label{sec:purity}
@@ -88,27 +123,26 @@ effect-free.
 \label{sec:no-coercions}
 
 Python accepts several implicit coercions and lax matches. \figref{coercions} lists those \PurePy
-excludes. Only the arity of a constructor pattern is decidable
-without types. A program that breaks one of the others is well-formed but has no derivation, so it runs
-under Python and not under \PurePy.
-\todo{Sequence patterns are the exception: a list pattern applied to a tuple fails to match rather than
-getting stuck, so a later case runs and the program means something different in the two languages
-(\issue{151}).}
+excludes, and records at which stage each exclusion takes effect. A dynamically excluded operation leaves
+the run without a result, so the program runs under Python but not under \PurePy.
+\todo{Under \PurePy a list pattern applied to a tuple fails to match rather than getting stuck, so a
+later case runs and \PurePy gives a different result from Python (\issue{151}).}
 
 \begin{figure}
 \centering
 \small
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.25\textwidth}>{\raggedright\arraybackslash}p{0.35\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.315\textwidth}>{\raggedright\arraybackslash}p{0.25\textwidth}>{\raggedright\arraybackslash}p{0.142\textwidth}}
 \hline
-\textbf{Construct} & \textbf{Python} & \textbf{\PurePy} \\
+\textbf{Construct} & \textbf{Python} & \textbf{\PurePy} & \textbf{Excluded} \\
 \hline
-Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & Must already be Boolean \\[1mm]
-Sequence patterns & List patterns match tuples, and tuple patterns lists & List patterns match only lists, tuple patterns only tuples \\[1mm]
-Constructor patterns & Positional class patterns may supply fewer sub-patterns than the class has fields, matching only those given & Require the exact arity \\[1mm]
-Dictionary keys & Any hashable values, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Strings only \\[1mm]
-\pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & Undefined between, say, a number and a string, or a list and a tuple; only \pyinline{None} compares with anything \\[1mm]
-Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & Equality undefined \\[1mm]
-\pyinline{nan} inside a list, tuple, dict or object & Elements compared by identity before equality, and a NaN is not equal to itself, so a NaN element matches an identical NaN but not a distinct one & Equality undefined \\
+Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & Must already be Boolean & Dynamically \\[1mm]
+Sequence patterns & List patterns match tuples, and tuple patterns lists & List patterns match only lists, tuple patterns only tuples & \todo{\issue{151}} \\[1mm]
+Constructor patterns & Positional class patterns may supply fewer sub-patterns than the class has fields & Require exact arity & Statically \\[1mm]
+Dictionary keys & Any hashable values, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Strings only & Statically in patterns, dynamically in expressions \\[1mm]
+\pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & Undefined between, say, number and string, or list and tuple; only \pyinline{None} compares with anything & Dynamically \\[1mm]
+Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & Equality undefined & Dynamically \\[1mm]
+\pyinline{nan} comparison via container equality & Elements compared by identity before equality, so identical NaNs match but distinct ones do not & Undefined when both elements are \pyinline{nan} & Dynamically \\
 \hline
 \end{tabular}
 \caption{Python coercions and lax matches excluded by \PurePy}
@@ -178,7 +212,7 @@ print(pkg.sub)  # <module 'pkg.sub'>
 
 Loading \pyinline{pkg.sub}, wherever in the program it happens, sets it as an attribute of the shared
 \pyinline{pkg} object, so the extra import changes what \pyinline{pkg.sub} means in a module that never
-mentions \pyinline{pkg.sub}. The name has no load-order-independent meaning, so \PurePy prohibits the clash
+mentions \pyinline{pkg.sub}. The name has no load-order-independent meaning, so \PurePy excludes the clash
 outright.
 
 For the same reason, a module may not refer to a submodule it does not itself import. A submodule is not an
@@ -223,7 +257,7 @@ scope of well-formedness.
 \pyinline{ModuleNotFoundError} & Always: an import requires its target to be a module of the program. & \figref{well-formed-imports} \\[1mm]
 \pyinline{ImportError} & Always: a from-import requires each imported name to be a member of the source module, and import cycles are rejected. (A Python cycle may run or fail, depending on where the cycle is entered.) & \figref{imports}, \figref{well-formed-module} \\[1mm]
 \pyinline{AttributeError} & Always: a module attribute reference must resolve to a definitely assigned member.  & \figref{well-formed-expr} \\[1mm]
-\pyinline{TypeError} & The operation is a constructor call or class pattern, which must match the class's arity exactly. (Only excess sub-patterns are a Python error; a pattern with fewer is prohibited even though Python permits it.) & \figref{well-formed-expr}, \figref{well-formed-pat} \\
+\pyinline{TypeError} & The operation is a constructor call or class pattern, which must match the class's arity exactly. (Only excess sub-patterns are a Python error; a pattern with fewer is excluded even though Python permits it.) & \figref{well-formed-expr}, \figref{well-formed-pat} \\
 \hline
 \end{tabular}
 \caption{Python errors prevented by well-formedness}

@@ -13,6 +13,7 @@
 \usepackage{float}
 \usepackage{xspace}
 \usepackage{enumitem}
+\usepackage{tikz}
 
 % \finalmode renders the clean version, without change markup.
 \ifdefined\finalmode\newcommand{\acceptchanges}{}\fi
@@ -93,11 +94,10 @@
 \begin{abstract}
 \PurePy is a pure, side-effect-free subset of Python: a functional language whose programs are referentially
 transparent, reproducible, and easy to reason about, yet remain ordinary Python. Every well-formed \PurePy
-program is valid Python and runs with the same behaviour, so the same source runs under a standard Python
-interpreter and under any conforming implementation. This paper specifies \PurePy as a versioned standard, with a
+program is valid Python, and where \PurePy gives a run a result, Python gives the same one, so the same source
+runs under a standard Python interpreter and under any conforming implementation. This paper specifies \PurePy as a versioned standard, with a
 formal grammar, well-formedness rules based on a definite-assignment analysis, and an operational semantics
-that preserves the meaning of well-formed programs in Python. A reference checker decides membership of the
-subset, and a conformance test suite is exercised on CPython, PyPy, GraalPy, and Pyodide. Aimed first at researchers in programming languages and pedagogy, \PurePy
+that agrees with Python on every run it defines. A reference checker decides well-formedness, and a conformance test suite is exercised on CPython, PyPy, GraalPy, and Pyodide. Aimed first at researchers in programming languages and pedagogy, \PurePy
 is intended to grow into a common language for scientific computing, supporting portable applications in
 modelling, data processing, analysis, and visualisation.
 \end{abstract}
