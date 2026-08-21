@@ -35,7 +35,7 @@ MODULE_LEVEL, PROGRAM_LEVEL = "module-level", "program-level"
 # Verdict / stage directory names: a test's path is its specification
 class Verdict(StrEnum):
     WELL_FORMED = "well-formed"
-    PROHIBITED = "prohibited"
+    EXCLUDED = "excluded"
     PYTHON_ERROR = "python-error"
 
 class Stage(StrEnum):
@@ -185,7 +185,7 @@ class Runner:
     def module_test(self, p: pathlib.Path, module: pathlib.Path) -> None:
         """Assert a module-level test from its path: <verdict>[/<stage>].
 
-        verdict in {well-formed, prohibited, python-error} fixes how PurePy and
+        verdict in {well-formed, excluded, python-error} fixes how PurePy and
         Python must each respond; stage in {syntactic, static-semantic,
         dynamic-semantic} fixes where PurePy stops (dynamic-semantic = checker
         accepts, but evaluation is stuck)."""
