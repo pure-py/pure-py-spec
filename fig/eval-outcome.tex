@@ -231,7 +231,7 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 \inferrule*[lab={\ruleName{eval-attr-nonobj}}]
 {
   \rho, e \evalsTo v \\
-  v \text{ is neither a module nor an object}
+  v \text{ neither module nor object}
 }
 {
   \rho, \exAttr{e}{x} \Rightarrow \fails{\errType}
@@ -241,7 +241,7 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 {
   \rho, e \evalsTo v \\
   \rho, \seq{e} \evalsTo \seq{u} \\
-  v \text{ is not a closure}
+  v \text{ not a closure}
 }
 {
   \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \fails{\errType}
