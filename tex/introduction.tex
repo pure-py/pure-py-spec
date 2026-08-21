@@ -9,18 +9,17 @@ wants a well-behaved functional language faces a trade-off: such a language is e
 unfamiliar, whereas Python is familiar but unruly.
 
 \PurePy carves out a pure, side-effect-free subset of Python that is well-behaved and easy to reason about, yet
-remains ordinary Python. Every well-formed \PurePy program is valid Python and runs under a standard
-interpreter with the same result, so one artifact serves two roles: a program a scientist can run today, and a
+remains ordinary Python. Every well-formed \PurePy program is valid Python, and where \PurePy gives a run a
+result, a standard interpreter gives the same one, so one artifact serves two roles: a program a scientist can run today, and a
 common target that a research language or tool can produce and consume. Purity makes programs referentially
 transparent, deterministic, and reproducible, the properties that scientific computing and formal reasoning
 both want.
 
 This paper defines \PurePy as a versioned formal standard\footnote{This paper describes version
 \versionstring{} of the standard.}: a formal grammar, well-formedness rules based on a
-definite-assignment analysis, and an operational semantics that preserves the meaning of well-formed programs
-in Python. A reference well-formedness checker decides membership of the subset, and a conformance test suite exercises the
-standard against CPython, PyPy, GraalPy, and Pyodide. The guarantee is precise: membership is decidable, and a
-well-formed \PurePy program is valid Python whose \PurePy meaning is its Python meaning.
+definite-assignment analysis, and an operational semantics that agrees with Python on every run it defines. A reference well-formedness checker decides membership of the subset, and a conformance test suite exercises the
+standard against CPython, PyPy, GraalPy, and Pyodide. The guarantee is precise: membership is decidable, and
+every run a well-formed \PurePy program has under \PurePy is its Python run.
 
 The design is deliberately conservative. Rather than reconstruct Python's full behaviour, \PurePy chooses a
 simple, well-behaved core and excludes the idioms that would break it, among them mutable state, effectful
@@ -39,8 +38,8 @@ After setting out the problem \PurePy addresses in \secref{overview}, we make th
 contributions:
 \begin{itemize}
 \item a definition of \PurePy as a versioned standard, with a formal grammar and well-formedness rules based on
-a definite-assignment analysis (\secref{syntax}) and an operational semantics that preserves the
-meaning of well-formed programs in Python (\secref{opsem});
+a definite-assignment analysis (\secref{syntax}) and an operational semantics that agrees with Python on
+every run it defines (\secref{opsem});
 \item a reference well-formedness checker that decides membership of the subset, validated by a conformance test suite
 exercised on CPython, PyPy, GraalPy, and Pyodide (\secref{reference-impl});
 \item conservative extensions to the core language, including partial application and piecewise function
