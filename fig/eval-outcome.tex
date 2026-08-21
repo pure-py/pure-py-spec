@@ -134,6 +134,18 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
   \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow o
 }
 \and
+\inferrule*[lab={\ruleName{eval-call-def}}]
+{
+  \rho, e \evalsTo \exDefClosure[\Delta]{\rho'}{\seq{d}}{j} \\
+  d_i = \exDef{f_i}{\seq{x}_i}{b_i} \quad (\forall i) \\
+  v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
+  \rho, \seq{e} \evalsTo \seq{u} \\
+  \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, b_j \evalsTo v
+}
+{
+  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \val{v}
+}
+\and
 \inferrule*[lab={\ruleName{eval-and-false}}]
 {
   \rho, e \evalsTo \pyinline{False}
@@ -195,7 +207,7 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 \begin{figure}
 \small
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\rho, e \evalsTo v$}
+\flushleft \shadebox{$\rho, e \evalsTo v$} \shadebox{$\rho, b \evalsTo v$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-value}}]
@@ -205,8 +217,24 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 {
   \rho, e \evalsTo v
 }
+\and
+\inferrule*[lab={\ruleName{eval-value-return}}]
+{
+  \rho, b \Rightarrow \returns{v}
+}
+{
+  \rho, b \evalsTo v
+}
+\and
+\inferrule*[lab={\ruleName{eval-value-none}}]
+{
+  \rho, b \Rightarrow \assigns{\rho'}
+}
+{
+  \rho, b \evalsTo \pyinline{None}
+}
 \end{mathpar}
-\subcaption{Expression $e$ yields value $v$}
+\subcaption{Expression $e$ or block $b$ yields value $v$}
 \end{subfigure}
 \caption{\todo{Value-binding premises (\issue{63})}}
 \label{fig:eval-value}
