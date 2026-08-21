@@ -187,7 +187,7 @@ class Runner:
 
         verdict in {well-formed, prohibited, python-error} fixes how PurePy and
         Python must each respond; stage in {syntactic, static-semantic,
-        dynamic-semantic} fixes where PurePy declines (dynamic-semantic = checker
+        dynamic-semantic} fixes where PurePy stops (dynamic-semantic = checker
         accepts, but evaluation is stuck)."""
         rel = p.relative_to(ROOT)
         with self.test(rel):
