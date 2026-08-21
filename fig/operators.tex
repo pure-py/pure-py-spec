@@ -5,8 +5,8 @@
 \hline
 $\odot$ & $\hat{\odot}(v, v')$ \\
 \hline
-\pyinline{==} & \pyinline{False} if both operands are \pyinline{nan}, and $\eqOp(v, v')$ otherwise \\
-\pyinline{!=} & \pyinline{True} if both operands are \pyinline{nan} or $\eqOp(v, v') = \pyinline{False}$, and \pyinline{False} otherwise \\
+\pyinline{==} & \pyinline{False} if \replaced{both operands are}{either operand is} \pyinline{nan}, and $\eqOp(v, v')$ otherwise \\
+\pyinline{!=} & \pyinline{True} if \replaced{both operands are}{either operand is} \pyinline{nan} or $\eqOp(v, v') = \pyinline{False}$, and \pyinline{False} otherwise \\
 \pyinline{in} & $\memOp(v', v)$ \\
 \pyinline{not in} & \pyinline{True} if $\memOp(v', v) = \pyinline{False}$, and \pyinline{False} otherwise \\
 \pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & \todo{Ordering, as in Python} \\

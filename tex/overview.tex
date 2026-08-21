@@ -143,7 +143,7 @@ Constructor patterns & Positional class patterns may supply fewer sub-patterns t
 Dictionary keys & Any hashable values, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Strings only & Statically in patterns, dynamically in expressions \\[1mm]
 \pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & Undefined between, say, number and string, or list and tuple; only \pyinline{None} compares with anything & Dynamically \\[1mm]
 Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & Equality undefined & Dynamically \\[1mm]
-\pyinline{nan} comparison via container equality & Elements compared by identity before equality, so identical NaNs match but distinct ones do not & Undefined when both elements are \pyinline{nan} & Dynamically \\
+\pyinline{nan} comparison via container equality & Elements compared by identity before equality, so identical NaNs match but distinct ones do not & \replaced{Undefined when both elements are \pyinline{nan}}{Equality undefined} & Dynamically \\
 \hline
 \end{tabular}
 \caption{Python coercions and lax matches excluded by \PurePy}
