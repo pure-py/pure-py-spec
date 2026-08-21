@@ -86,6 +86,14 @@
   \rho, \exAttr{e}{x} \Rightarrow \val{v}
 }
 \and
+\inferrule*[lab={\ruleName{eval-attr-object}}]
+{
+  \rho, e \Rightarrow \val{\exObj{\Delta}{C}{\rho'}}
+}
+{
+  \rho, \exAttr{e}{x} \Rightarrow \val{\rho'(x)}
+}
+\and
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \val{v_1 \cons \ldots \cons v_{n+m}} \\
