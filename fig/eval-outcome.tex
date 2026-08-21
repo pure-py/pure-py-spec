@@ -1,0 +1,16 @@
+\begin{figure}
+\small
+\begin{mathpar}
+\inferrule*[lab={\ruleName{eval-cond-true}}]
+{
+  \rho, e \Rightarrow \val{\pyinline{True}} \\
+  \rho, e_1 \Rightarrow o
+}
+{
+  \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow o
+}
+\end{mathpar}
+\caption{\todo{Expression $e$ evaluates to outcome $o$ under environment $\rho : \Gamma$, where $o$ is
+$\val{v}$ or $\fails$ (\issue{63})}}
+\label{fig:eval-outcome}
+\end{figure}
