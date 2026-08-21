@@ -113,9 +113,14 @@
 \newcommand*{\override}{\cdot}
 
 % Outcomes (draft, \secref{errors})
-\newcommand*{\fails}{\mathsf{fails}}
+\newcommand*{\fails}[1]{\mathsf{fails}\;#1}
 \newcommand*{\evalsTo}{\Downarrow}
 \newcommand*{\val}[1]{\mathsf{val}\;#1}
+\newcommand*{\errAssert}{\mathsf{assert}}
+\newcommand*{\errIndex}{\mathsf{index}}
+\newcommand*{\errType}{\mathsf{type}}
+\newcommand*{\errUnsupported}{\mathsf{unsupported}}
+\newcommand*{\errZeroDiv}{\mathsf{zero\text{-}div}}
 
 % Result types and results
 \newcommand*{\Assigns}[1]{\mathsf{Assigns}\;#1}

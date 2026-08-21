@@ -1,6 +1,12 @@
 \begin{figure}
 \small
 \begin{subfigure}{\textwidth}
+\begin{center}
+\begin{tabular}{rcll}
+$o$ & ::= & $\val{v} \mid \fails{\kappa}$ & (Outcome) \\
+$\kappa$ & ::= & $\errUnsupported \mid \errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (Error kind) \\
+\end{tabular}
+\end{center}
 \flushleft \shadebox{$\rho, e \Rightarrow o$}
 \begin{mathpar}
 \small
@@ -136,6 +142,33 @@
   \rho, \exAnd{e}{e'} \Rightarrow \val{\pyinline{False}}
 }
 \and
+\inferrule*[lab={\ruleName{eval-and-nonbool}}]
+{
+  \rho, e \evalsTo v \\
+  v \neq \pyinline{True}, \pyinline{False}
+}
+{
+  \rho, \exAnd{e}{e'} \Rightarrow \fails{\errUnsupported}
+}
+\and
+\inferrule*[lab={\ruleName{eval-or-nonbool}}]
+{
+  \rho, e \evalsTo v \\
+  v \neq \pyinline{True}, \pyinline{False}
+}
+{
+  \rho, \exOr{e}{e'} \Rightarrow \fails{\errUnsupported}
+}
+\and
+\inferrule*[lab={\ruleName{eval-cond-nonbool}}]
+{
+  \rho, e \evalsTo v \\
+  v \neq \pyinline{True}, \pyinline{False}
+}
+{
+  \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow \fails{\errUnsupported}
+}
+\and
 \inferrule*[lab={\ruleName{eval-and-true}}]
 {
   \rho, e \evalsTo \pyinline{True} \\
@@ -180,11 +213,14 @@
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow o
 }
 \end{mathpar}
-\subcaption{Expression $e$ evaluates to outcome $o$, either $\val{v}$ or $\fails$}
+\subcaption{Expression $e$ evaluates to outcome $o$, either $\val{v}$ or $\fails{\kappa}$}
 \end{subfigure}
+\caption{\todo{Evaluation with errors (\issue{63})}}
+\label{fig:eval-outcome}
+\end{figure}
 
-\vspace{2mm}
-
+\begin{figure}
+\small
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\rho, e \evalsTo v$}
 \begin{mathpar}
@@ -199,6 +235,6 @@
 \end{mathpar}
 \subcaption{Expression $e$ yields value $v$}
 \end{subfigure}
-\caption{\todo{Evaluation with errors (\issue{63})}}
-\label{fig:eval-outcome}
+\caption{\todo{Value-binding premises (\issue{63})}}
+\label{fig:eval-value}
 \end{figure}
