@@ -1,6 +1,6 @@
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, e \Rightarrow o$}
+\flushleft \shadebox{$\rho, e \Rightarrow o$} \shadebox{$\rho, e \evalsTo v$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-var}}]
@@ -36,9 +36,42 @@
   \rho, \exLambda{x_1, \ldots, x_n}{e} \Rightarrow \val{\exLamClosure[\Gamma]{\rho}{\seq{x}}{e}}
 }
 \and
+\inferrule*[lab={\ruleName{eval-unary-op}}]
+{
+  \rho, e \evalsTo v
+}
+{
+  \rho, \exUnaryOp{\ominus}{e} \Rightarrow \hat{\ominus}(v)
+}
+\and
+\inferrule*[lab={\ruleName{eval-binop}}]
+{
+  \rho, e \evalsTo v \\
+  \rho, e' \evalsTo v'
+}
+{
+  \rho, \exBinOp{e}{\odot}{e'} \Rightarrow \hat{\odot}(v, v')
+}
+\and
+\inferrule*[lab={\ruleName{eval-list}}]
+{
+  \rho, e_i \evalsTo v_i \quad (\forall i)
+}
+{
+  \rho, \exList{e_1, \ldots, e_n} \Rightarrow \val{\exList{v_1, \ldots, v_n}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-tuple}}]
+{
+  \rho, e_i \evalsTo v_i \quad (\forall i)
+}
+{
+  \rho, \exTuple{e_1, \ldots, e_n} \Rightarrow \val{\exTuple{v_1, \ldots, v_n}}
+}
+\and
 \inferrule*[lab={\ruleName{eval-and-false}}]
 {
-  \rho, e \Rightarrow \val{\pyinline{False}}
+  \rho, e \evalsTo \pyinline{False}
 }
 {
   \rho, \exAnd{e}{e'} \Rightarrow \val{\pyinline{False}}
@@ -46,7 +79,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-and-true}}]
 {
-  \rho, e \Rightarrow \val{\pyinline{True}} \\
+  \rho, e \evalsTo \pyinline{True} \\
   \rho, e' \Rightarrow o
 }
 {
@@ -55,7 +88,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-or-true}}]
 {
-  \rho, e \Rightarrow \val{\pyinline{True}}
+  \rho, e \evalsTo \pyinline{True}
 }
 {
   \rho, \exOr{e}{e'} \Rightarrow \val{\pyinline{True}}
@@ -63,7 +96,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-or-false}}]
 {
-  \rho, e \Rightarrow \val{\pyinline{False}} \\
+  \rho, e \evalsTo \pyinline{False} \\
   \rho, e' \Rightarrow o
 }
 {
@@ -72,7 +105,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-cond-true}}]
 {
-  \rho, e \Rightarrow \val{\pyinline{True}} \\
+  \rho, e \evalsTo \pyinline{True} \\
   \rho, e_1 \Rightarrow o
 }
 {
@@ -81,23 +114,15 @@
 \and
 \inferrule*[lab={\ruleName{eval-cond-false}}]
 {
-  \rho, e \Rightarrow \val{\pyinline{False}} \\
+  \rho, e \evalsTo \pyinline{False} \\
   \rho, e_2 \Rightarrow o
 }
 {
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow o
 }
-\and
-\inferrule*[lab={\ruleName{eval-unary-op}}]
-{
-  \rho, e \Rightarrow o
-}
-{
-  \rho, \exUnaryOp{\ominus}{e} \Rightarrow \mlet{v}{o}{\hat{\ominus}(v)}
-}
 \end{mathpar}
 \caption{\todo{Expression $e$ evaluates to outcome $o$ under environment $\rho : \Gamma$, where $o$ is
-$\val{v}$ or $\fails$ (\issue{63}). Operators return an outcome, so \figref{operators} says where each
-one fails}}
+$\val{v}$ or $\fails$ (\issue{63}). A premise $\rho, e \evalsTo v$ binds $v$ and propagates $\fails$ to the
+conclusion; operators return an outcome, so \figref{operators} says where each one fails}}
 \label{fig:eval-outcome}
 \end{figure}
