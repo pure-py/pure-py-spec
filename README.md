@@ -35,8 +35,8 @@ Sets up a `.venv` automatically. Targets Python 3.12+ ([#39](https://github.com/
 Tests are organised by tier (per-module $\Gamma \vdash_M m : \Delta$ and program-level $\vdash \langle E, \mathcal{M} \rangle$) and then by verdict. The verdict directory *is* the test's specification: the runner derives every assertion from the path.
 - `well-formed/` — PurePy accepts; Python runs it
 - `prohibited/` — PurePy rejects but Python accepts (valid Python excluded by design); `syntactic/` is rejected at parse, `static-semantic/` at check, `dynamic-semantic/` at run time
-- `ill-formed/` — PurePy rejects *and* Python rejects (a genuine error); `semantic/` carries the Python exception, `syntactic-only/` is tested via AST construction (not expressible as `.py`)
-- `pending/` — not yet implemented; will become well-formed
+- `ill-formed/` — PurePy rejects *and* Python rejects (a genuine error); stages as above, plus `syntactic-only/`, tested via AST construction (not expressible as `.py`)
+- `pending/` — not yet decided by the checker; `well-formed/pending/` will become well-formed, `<verdict>/static-semantic/pending/` will be rejected at check
 
 The invariant — `prohibited` ⇒ Python runs it, `ill-formed` ⇒ Python rejects it — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails.
 

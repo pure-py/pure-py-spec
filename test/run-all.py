@@ -197,10 +197,10 @@ class Runner:
             if dirs == (Verdict.WELL_FORMED, Stage.PENDING):
                 self.parse(p, Exit.NOT_YET)
                 return
-            if dirs == (Verdict.ILL_FORMED, Stage.STATIC_SEMANTIC, Stage.PENDING):
+            if dirs[1:] == (Stage.STATIC_SEMANTIC, Stage.PENDING):
                 self.parse(p, Exit.OK)
                 self.check(p, Exit.OK)
-                self.python_evidence(p, not p.with_suffix(EXCEPTION_EXPECTED).exists(),
+                self.python_evidence(p, Verdict(dirs[0]) != Verdict.ILL_FORMED,
                                      expected_path=p.with_suffix(EXPECTED))
                 return
             if dirs == (Verdict.ILL_FORMED, Stage.SYNTACTIC_ONLY):
