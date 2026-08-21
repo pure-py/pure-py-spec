@@ -16,7 +16,8 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
 $\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & (Environment)
    \\[3mm]
 $r$ & $::=$ & $\assigns{\rho}$ \\
-  & $\mid$ & $\returns{v}$
+  & $\mid$ & $\returns{v}$ \\
+  & $\mid$ & $\fails{\kappa}$
    \\[3mm]
 $o$ & $::=$ & $\val{v}$ & (Outcome) \\
   & $\mid$ & $\fails{\kappa}$ \\

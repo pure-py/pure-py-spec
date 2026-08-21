@@ -1,5 +1,166 @@
 \begin{figure}
 \small
+\flushleft \shadebox{$\rho, b \Rightarrow r$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-pass}}]
+{
+  \strut
+}
+{
+  \rho, \exPass \Rightarrow \assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{eval-assign}}]
+{
+  \rho, e \Rightarrow o
+}
+{
+  \rho, \exAssign{x}{e} \Rightarrow \mlet{v}{o}{\assigns{\set{\bind{x}{v}}}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-expr-stmt}}]
+{
+  \rho, e \Rightarrow o
+}
+{
+  \rho, e \Rightarrow \mlet{v}{o}{\assigns{\varnothing}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-return}}]
+{
+  \rho, e \Rightarrow o
+}
+{
+  \rho, \exReturn{e} \Rightarrow \mlet{v}{o}{\returns{v}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-def}}]
+{
+  d_i = \exDef{f_i}{\seq{x}_i}{b_i} \quad (\forall i) \\
+  v_i = \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} \quad (\forall i)
+}
+{
+  \rho, \seq{d} \Rightarrow \assigns{\set{\bind{\seq{f}}{\seq{v}}}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-assert}}]
+{
+  \rho, e \Rightarrow \val{\pyinline{True}}
+}
+{
+  \rho, \exAssert{e} \Rightarrow \assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{eval-assert-msg}}]
+{
+  \rho, e \Rightarrow \val{\pyinline{True}}
+}
+{
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{eval-assert-false}}]
+{
+  \rho, e \Rightarrow \val{\pyinline{False}}
+}
+{
+  \rho, \exAssert{e} \Rightarrow \fails{\errAssert}
+}
+\and
+\inferrule*[lab={\ruleName{eval-assert-msg-false}}]
+{
+  \rho, e \Rightarrow \val{\pyinline{False}}
+}
+{
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \fails{\errAssert}
+}
+\and
+\inferrule*[lab={\ruleName{eval-assert-fail}}]
+{
+  \rho, e \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exAssert{e} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-assert-msg-fail}}]
+{
+  \rho, e \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-if}}]
+{
+  \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
+  \rho, e_i \Rightarrow \val{\pyinline{True}} \\
+  \rho, b_i \Rightarrow r
+}
+{
+  \rho, \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} \Rightarrow r
+}
+\and
+\inferrule*[lab={\ruleName{eval-else}}]
+{
+  \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j \in \set{1, \ldots, n+1}) \\
+  \rho, b_{n+2} \Rightarrow r
+}
+{
+  \rho, \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} \Rightarrow r
+}
+\and
+\inferrule*[lab={\ruleName{eval-if-fail}}]
+{
+  \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
+  \rho, e_i \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-match}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  \dispatch(\rho, v, \exCase{p_1}{b_1} \cons \ldots \cons \exCase{p_{n+1}}{b_{n+1}}) = (\rho', b) \\
+  \rho \override \rho', b \Rightarrow r
+}
+{
+  \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow r
+}
+\and
+\inferrule*[lab={\ruleName{eval-match-fail}}]
+{
+  \rho, e \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-cons}}]
+{
+  \rho, s \Rightarrow \assigns{\rho'} \\
+  \rho \override \rho', b \Rightarrow r
+}
+{
+  \rho, s \cons b \Rightarrow \assigns{\rho'} \override r
+}
+\and
+\inferrule*[lab={\ruleName{eval-cons-fail}}]
+{
+  \rho, s \Rightarrow \fails{\kappa}
+}
+{
+  \rho, s \cons b \Rightarrow \fails{\kappa}
+}
+\end{mathpar}
+\caption{Block $b$ evaluates to result $r$ under environment $\rho : \Gamma$}
+\label{fig:eval-block-outcome}
+\end{figure}
+
+\begin{figure}
+\small
 \flushleft \shadebox{$\rho, e \Rightarrow o$}
 \begin{mathpar}
 \small
