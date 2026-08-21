@@ -87,8 +87,17 @@
 {
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow o
 }
+\and
+\inferrule*[lab={\ruleName{eval-unary-op}}]
+{
+  \rho, e \Rightarrow o
+}
+{
+  \rho, \exUnaryOp{\ominus}{e} \Rightarrow \mlet{v}{o}{\hat{\ominus}(v)}
+}
 \end{mathpar}
 \caption{\todo{Expression $e$ evaluates to outcome $o$ under environment $\rho : \Gamma$, where $o$ is
-$\val{v}$ or $\fails$ (\issue{63}). Rules whose result does not depend on a computed value}}
+$\val{v}$ or $\fails$ (\issue{63}). Operators return an outcome, so \figref{operators} says where each
+one fails}}
 \label{fig:eval-outcome}
 \end{figure}

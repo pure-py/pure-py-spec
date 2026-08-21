@@ -72,7 +72,8 @@ membership $\memOp$ (\figrefTwo{equality}{membership}). Both are undefined where
 \input{fig/match}
 
 \todo{Errors are not yet in the semantics (\issue{63}). \figref{eval-outcome} drafts the intended form:
-evaluation yields an outcome $o$, either $\val{v}$ or $\fails$, and a rule matches $\val{v}$ in every
-consumed premise but the last, leaving the last to propagate through the bind $\mbind$.}
+evaluation yields an outcome $o$, either $\val{v}$ or $\fails$. A rule matches $\val{v}$ in every consumed
+premise but the last, and binds the last with $\mlet{v}{o}{\ldots}$, so failure propagates without a rule
+of its own.}
 
 \input{fig/eval-outcome}
