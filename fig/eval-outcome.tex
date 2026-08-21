@@ -70,6 +70,64 @@
   \rho, \exTuple{e_1, \ldots, e_n} \Rightarrow \val{\exTuple{v_1, \ldots, v_n}}
 }
 \and
+\inferrule*[lab={\ruleName{eval-dict}}]
+{
+  \rho, e_i \evalsTo w_i \quad (\forall i) \\
+  \rho, e_i' \evalsTo v_i \quad (\forall i)
+}
+{
+  \rho, \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \Rightarrow \val{\exDict{\entries(\varepsilon, \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n})}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-attr-module}}]
+{
+  \rho, e \evalsTo \modLoaded{q'}{\rho'} \\
+  \bind{x}{v} \in \rho'
+}
+{
+  \rho, \exAttr{e}{x} \Rightarrow \val{v}
+}
+\and
+\inferrule*[lab={\ruleName{eval-constr}}]
+{
+  \rho, e_i \evalsTo v_i \quad (\forall i) \\
+  \resolveClass(\rho, q) = C \\
+  \fields(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}
+}
+{
+  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{\Gamma}{C}{\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}, \bind{y_1}{v_{n+1}}, \ldots, \bind{y_m}{v_{n+m}}}}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-subscript}}]
+{
+  \rho, e \evalsTo v \quad \elems(v) = v_1 \ldots v_m \\
+  \rho, e' \evalsTo n \\
+  0 \leq n < m
+}
+{
+  \rho, \exSubscript{e}{e'} \Rightarrow \val{v_{n+1}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-subscript-neg}}]
+{
+  \rho, e \evalsTo v \quad \elems(v) = v_1 \ldots v_m \\
+  \rho, e' \evalsTo n \\
+  {-m} \leq n < 0
+}
+{
+  \rho, \exSubscript{e}{e'} \Rightarrow \val{v_{m+n+1}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-call-lambda}}]
+{
+  \rho, e \evalsTo \exLamClosure[\Delta]{\rho'}{\seq{x}}{e'} \\
+  \rho, \seq{e} \evalsTo \seq{u} \\
+  \rho' \override \set{\bind{\seq{x}}{\seq{u}}}, e' \Rightarrow o
+}
+{
+  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow o
+}
+\and
 \inferrule*[lab={\ruleName{eval-and-false}}]
 {
   \rho, e \evalsTo \pyinline{False}
