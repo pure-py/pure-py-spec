@@ -392,6 +392,161 @@
 
 \begin{figure}
 \small
+\flushleft \shadebox{$\rho, e \Rightarrow o$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-list-comp}}]
+{
+  \rho, \seq{g} \Rightarrow \val{\rho_1 \ldots \rho_m} \\
+  \rho_i, e \Rightarrow \val{v_i} \quad (\forall i)
+}
+{
+  \rho, \exListComp{e}{g_1\;\ldots\;g_n} \Rightarrow \val{\exList{v_1, \ldots, v_m}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-list-comp-fail-quals}}]
+{
+  \rho, \seq{g} \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exListComp{e}{g_1\;\ldots\;g_n} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-list-comp-fail}}]
+{
+  \rho, \seq{g} \Rightarrow \val{\rho_1 \ldots \rho_m} \\
+  \rho_i, e \Rightarrow \val{v_i} \quad (\forall i < j) \\
+  \rho_j, e \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exListComp{e}{g_1\;\ldots\;g_n} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-dict-comp}}]
+{
+  \rho, \seq{g} \Rightarrow \val{\rho_1 \ldots \rho_m} \\
+  \rho_i, e \Rightarrow \val{w_i} \quad (\forall i) \\
+  \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i)
+}
+{
+  \rho, \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \Rightarrow \val{\exDict{\entries(\varepsilon, \bind{w_1}{v_1} \cons \ldots \cons \bind{w_m}{v_m})}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-dict-comp-fail-quals}}]
+{
+  \rho, \seq{g} \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-dict-comp-fail-key}}]
+{
+  \rho, \seq{g} \Rightarrow \val{\rho_1 \ldots \rho_m} \\
+  \rho_i, e \Rightarrow \val{w_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
+  \rho_j, e \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-dict-comp-fail-value}}]
+{
+  \rho, \seq{g} \Rightarrow \val{\rho_1 \ldots \rho_m} \\
+  \rho_i, e \Rightarrow \val{w_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
+  \rho_j, e \Rightarrow \val{w_j} \\
+  \rho_j, e' \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \Rightarrow \fails{\kappa}
+}
+\end{mathpar}
+\caption{Comprehension evaluation}
+\label{fig:eval-comp-outcome}
+\end{figure}
+
+\begin{figure}
+\small
+\flushleft \shadebox{$\rho, \seq{g} \Rightarrow o$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-quals-nil}}]
+{
+  \strut
+}
+{
+  \rho, \varepsilon \Rightarrow \val{\rho}
+}
+\and
+\inferrule*[lab={\ruleName{eval-qual-guard-true}}]
+{
+  \rho, e \Rightarrow \val{\pyinline{True}} \\
+  \rho, \seq{g} \Rightarrow o
+}
+{
+  \rho, \qualGuard{e} \cons \seq{g} \Rightarrow o
+}
+\and
+\inferrule*[lab={\ruleName{eval-qual-guard-false}}]
+{
+  \rho, e \Rightarrow \val{\pyinline{False}}
+}
+{
+  \rho, \qualGuard{e} \cons \seq{g} \Rightarrow \val{\varepsilon}
+}
+\and
+\inferrule*[lab={\ruleName{eval-qual-guard-fail}}]
+{
+  \rho, e \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \qualGuard{e} \cons \seq{g} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-qual-generator}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  \elems(v) = u_1 \ldots u_n \\
+  \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i)
+}
+{
+  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \val{\seq{\rho}_1 \cons \ldots \cons \seq{\rho}_n}
+}
+\and
+\inferrule*[lab={\ruleName{eval-qual-generator-fail}}]
+{
+  \rho, e \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-qual-generator-nonseq}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  \elems(v) \text{ undefined}
+}
+{
+  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \fails{\errType}
+}
+\and
+\inferrule*[lab={\ruleName{eval-qual-generator-fail-body}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  \elems(v) = u_1 \ldots u_n \\
+  \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i < j) \\
+  \rho \override \set{\bind{x}{u_j}}, \seq{g} \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \fails{\kappa}
+}
+\end{mathpar}
+\caption{Comprehension qualifiers $\seq{g}$ evaluate to outcome $o$ under environment $\rho : \Gamma$}
+\label{fig:eval-quals-outcome}
+\end{figure}
+
+\begin{figure}
+\small
 \flushleft \shadebox{$\rho, b \evalsTo v$}
 \begin{mathpar}
 \small
