@@ -1,6 +1,7 @@
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, e \Rightarrow o$} \shadebox{$\rho, e \evalsTo v$}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\rho, e \Rightarrow o$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-var}}]
@@ -121,8 +122,27 @@
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow o
 }
 \end{mathpar}
-\caption{\todo{Expression $e$ evaluates to outcome $o$ under environment $\rho : \Gamma$, where $o$ is
-$\val{v}$ or $\fails$ (\issue{63}). A premise $\rho, e \evalsTo v$ binds $v$ and propagates $\fails$ to the
-conclusion; operators return an outcome, so \figref{operators} says where each one fails}}
+\subcaption{Expression $e$ evaluates to outcome $o$, either $\val{v}$ or $\fails$. Operators return an
+outcome, so \figref{operators} says where each one fails}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\rho, e \evalsTo v$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-value}}]
+{
+  \rho, e \Rightarrow \val{v}
+}
+{
+  \rho, e \evalsTo v
+}
+\end{mathpar}
+\subcaption{Expression $e$ yields value $v$. A rule with premises $\rho, e_i \evalsTo v_i$ also stands for
+the rules concluding $\fails$ when one of those premises does, so propagation needs no rules of its own}
+\end{subfigure}
+\caption{\todo{Evaluation with errors (\issue{63})}}
 \label{fig:eval-outcome}
 \end{figure}
