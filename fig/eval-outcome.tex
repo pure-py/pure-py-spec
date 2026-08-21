@@ -4,7 +4,7 @@
 \begin{center}
 \begin{tabular}{rcll}
 $o$ & ::= & $\val{v} \mid \fails{\kappa}$ & (Outcome) \\
-$\kappa$ & ::= & $\errUnsupported \mid \errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (Error kind) \\
+$\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (Error kind) \\
 \end{tabular}
 \end{center}
 \flushleft \shadebox{$\rho, e \Rightarrow o$}
@@ -140,33 +140,6 @@ $\kappa$ & ::= & $\errUnsupported \mid \errType \mid \errIndex \mid \errZeroDiv 
 }
 {
   \rho, \exAnd{e}{e'} \Rightarrow \val{\pyinline{False}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-and-nonbool}}]
-{
-  \rho, e \evalsTo v \\
-  v \neq \pyinline{True}, \pyinline{False}
-}
-{
-  \rho, \exAnd{e}{e'} \Rightarrow \fails{\errUnsupported}
-}
-\and
-\inferrule*[lab={\ruleName{eval-or-nonbool}}]
-{
-  \rho, e \evalsTo v \\
-  v \neq \pyinline{True}, \pyinline{False}
-}
-{
-  \rho, \exOr{e}{e'} \Rightarrow \fails{\errUnsupported}
-}
-\and
-\inferrule*[lab={\ruleName{eval-cond-nonbool}}]
-{
-  \rho, e \evalsTo v \\
-  v \neq \pyinline{True}, \pyinline{False}
-}
-{
-  \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow \fails{\errUnsupported}
 }
 \and
 \inferrule*[lab={\ruleName{eval-and-true}}]

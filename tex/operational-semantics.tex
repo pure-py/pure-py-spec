@@ -74,7 +74,8 @@ membership $\memOp$ (\figrefTwo{equality}{membership}). Both are undefined where
 \todo{Errors are not yet in the semantics (\issue{63}). \figref{eval-outcome} drafts the intended form:
 evaluation yields an outcome $o$, either $\val{v}$ or $\fails$. A premise $\rho, e \evalsTo v$ abbreviates
 $\rho, e \Rightarrow \val{v}$ together with the companion rule concluding $\fails$ when that premise does,
-so propagation needs no rules of its own. Only genuine errors, such as a non-Boolean test, remain to be
-written.}
+so propagation needs no rules of its own. An error kind $\kappa$ records which Python error the failure
+corresponds to. Operations \PurePy excludes rather than shares with Python, such as a non-Boolean test, get
+no rule and leave the run stuck (\secref{no-coercions}, \issue{162}).}
 
 \input{fig/eval-outcome}
