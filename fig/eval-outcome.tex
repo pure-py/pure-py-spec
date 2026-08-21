@@ -122,7 +122,16 @@
 {
   \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{\Gamma}{C}{\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}, \bind{y_1}{v_{n+1}}, \ldots, \bind{y_m}{v_{n+m}}}}}
 }
-\and
+\end{mathpar}
+\caption{Expression $e$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
+\label{fig:eval-outcome}
+\end{figure}
+
+\begin{figure}
+\small
+\flushleft \shadebox{$\rho, e \Rightarrow o$}
+\begin{mathpar}
+\small
 \inferrule*[lab={\ruleName{eval-subscript}}]
 {
   \rho, e \Rightarrow \val{v} \quad \elems(v) = v_1 \ldots v_m \\
@@ -217,8 +226,8 @@
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow o
 }
 \end{mathpar}
-\caption{Expression $e$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
-\label{fig:eval-outcome}
+\caption{Expression evaluation, continued}
+\label{fig:eval-outcome-ctd}
 \end{figure}
 
 \begin{figure}
