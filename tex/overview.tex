@@ -125,9 +125,8 @@ effect-free.
 Python accepts several implicit coercions and lax matches. \figref{coercions} lists those \PurePy
 excludes, and records at which stage each exclusion takes effect. A dynamically excluded operation leaves
 the run without a result, so the program runs under Python but not under \PurePy.
-\todo{Sequence patterns break this: a list pattern applied to a tuple fails to match rather than getting
-stuck, so a later case runs and the program means something different in the two languages. This is a
-defect rather than a designed exclusion (\issue{151}).}
+\todo{Sequence patterns are a defect, not an exclusion: a list pattern applied to a tuple fails to match
+rather than getting stuck, so a later case runs and the two languages disagree (\issue{151}).}
 
 \begin{figure}
 \centering
