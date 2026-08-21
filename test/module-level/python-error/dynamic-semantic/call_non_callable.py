@@ -1,4 +1,4 @@
-# dynamic-semantic: PurePy is stuck (5 is not a closure), Python raises.
-# Both agree it fails; without types PurePy has no explicit failure mode.
+# dynamic-semantic: calling a non-closure. Python raises TypeError; PurePy's
+# eval-call-nonfun gives fails TypeError.
 x = 5
 y = x(3)

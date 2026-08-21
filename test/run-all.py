@@ -28,6 +28,7 @@ GREEN, RED, RESET = "\033[32m", "\033[31m", "\033[0m"
 EXPECTED = ".expected"
 EXCEPTION_EXPECTED = f".exception{EXPECTED}"
 ERROR_EXPECTED = f".error{EXPECTED}"
+OUTPUT_EXPECTED = f".output{EXPECTED}"
 
 # Tier directory names
 MODULE_LEVEL, PROGRAM_LEVEL = "module-level", "program-level"
@@ -148,6 +149,9 @@ class Runner:
             self._fail(phase, f"expected {expected} but script succeeded")
         elif expected not in proc.stderr:
             self._fail(phase, f"expected {expected}, got: {proc.stderr.strip()}")
+        output_path = path.with_suffix(OUTPUT_EXPECTED)
+        if output_path.exists() and proc.stdout != output_path.read_text():
+            self._fail(phase, f"output before {expected} mismatch")
 
     def python_evidence(self, path: pathlib.Path, python_accepts: bool, expected_path: pathlib.Path, cwd: Optional[pathlib.Path] = None) -> None:
         """Python must corroborate the verdict: run with the expected output
