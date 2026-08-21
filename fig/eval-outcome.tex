@@ -1,12 +1,6 @@
 \begin{figure}
 \small
 \begin{subfigure}{\textwidth}
-\begin{center}
-\begin{tabular}{rcll}
-$o$ & ::= & $\val{v} \mid \fails{\kappa}$ & (Outcome) \\
-$\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (Error kind) \\
-\end{tabular}
-\end{center}
 \flushleft \shadebox{$\rho, e \Rightarrow o$}
 \begin{mathpar}
 \small
@@ -206,6 +200,12 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 
 \begin{figure}
 \small
+\begin{center}
+\begin{tabular}{rcll}
+$o$ & ::= & $\val{v} \mid \fails{\kappa}$ & (Outcome) \\
+$\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (Error kind) \\
+\end{tabular}
+\end{center}
 \flushleft \shadebox{$\rho, e \Rightarrow o$}
 \begin{mathpar}
 \small
