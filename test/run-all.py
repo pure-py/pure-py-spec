@@ -36,7 +36,7 @@ MODULE_LEVEL, PROGRAM_LEVEL = "module-level", "program-level"
 class Verdict(StrEnum):
     WELL_FORMED = "well-formed"
     PROHIBITED = "prohibited"
-    ILL_FORMED = "ill-formed"
+    PYTHON_ERROR = "python-error"
 
 class Stage(StrEnum):
     SYNTACTIC = "syntactic"
@@ -163,7 +163,7 @@ class Runner:
                 self.run_expecting_output(path, expected_path, cwd=cwd)
         else:
             if expected_path.exists():
-                self._fail(Phase.RUN, f"ill-formed must not have {expected_path.name}")
+                self._fail(Phase.RUN, f"python-error must not have {expected_path.name}")
             elif not exception_path.exists():
                 self._fail(Phase.RUN, f"missing {EXCEPTION_EXPECTED}")
             else:
@@ -172,7 +172,7 @@ class Runner:
     def run_multi_file_tests(self, category_root: pathlib.Path) -> None:
         """Each subdir is a test: main.py, expected_exit, plus fixtures and the
         Python-side evidence fixed by the verdict (the category directory name)."""
-        python_accepts = category_root.name != Verdict.ILL_FORMED
+        python_accepts = category_root.name != Verdict.PYTHON_ERROR
         for d in sorted(p for p in category_root.rglob("*") if p.is_dir() and (p / MAIN).exists()):
             with self.test(d.relative_to(ROOT)):
                 main_py = d / MAIN
@@ -185,10 +185,10 @@ class Runner:
     def module_test(self, p: pathlib.Path, module: pathlib.Path) -> None:
         """Assert a module-level test from its path: <verdict>[/<stage>].
 
-        verdict in {well-formed, prohibited, ill-formed} fixes how PurePy and
+        verdict in {well-formed, prohibited, python-error} fixes how PurePy and
         Python must each respond; stage in {syntactic, static-semantic,
-        dynamic-semantic} fixes where PurePy rejects (dynamic-semantic = checker
-        accepts, but evaluation is stuck and Python raises)."""
+        dynamic-semantic} fixes where PurePy declines (dynamic-semantic = checker
+        accepts, but evaluation is stuck)."""
         rel = p.relative_to(ROOT)
         with self.test(rel):
             dirs = p.parent.relative_to(module).parts
@@ -200,10 +200,10 @@ class Runner:
             if dirs[1:] == (Stage.STATIC_SEMANTIC, Stage.PENDING):
                 self.parse(p, Exit.OK)
                 self.check(p, Exit.OK)
-                self.python_evidence(p, Verdict(dirs[0]) != Verdict.ILL_FORMED,
+                self.python_evidence(p, Verdict(dirs[0]) != Verdict.PYTHON_ERROR,
                                      expected_path=p.with_suffix(EXPECTED))
                 return
-            if dirs == (Verdict.ILL_FORMED, Stage.SYNTACTIC_ONLY):
+            if dirs == (Verdict.PYTHON_ERROR, Stage.SYNTACTIC_ONLY):
                 self.python(p)
                 return
 
@@ -220,13 +220,13 @@ class Runner:
                 self.check(p, Exit.ILL_FORMED if stage == Stage.STATIC_SEMANTIC else Exit.OK,
                            err if stage == Stage.STATIC_SEMANTIC else None)
 
-            if verdict != Verdict.ILL_FORMED and stage == Stage.SYNTACTIC:
+            if verdict != Verdict.PYTHON_ERROR and stage == Stage.SYNTACTIC:
                 if p.with_suffix(EXCEPTION_EXPECTED).exists():
                     self._fail(Phase.RUN, f"must not have {EXCEPTION_EXPECTED}")
                 else:
                     self.python(p)
             else:
-                self.python_evidence(p, verdict != Verdict.ILL_FORMED,
+                self.python_evidence(p, verdict != Verdict.PYTHON_ERROR,
                                      expected_path=p.with_suffix(EXPECTED))
 
     def summary(self) -> None:

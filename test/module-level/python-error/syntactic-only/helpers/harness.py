@@ -1,7 +1,7 @@
 """Harness for syntactic-only tests: cases ast.parse genuinely cannot produce (e.g. an
 empty from-import name list), so we hand-build the AST and check PurePy rejects it.
 Constructs that ast.parse accepts but Python rejects at compile belong in
-ill-formed/semantic as real source, not here."""
+python-error/static-semantic as real source, not here."""
 import ast
 import pathlib
 import sys
