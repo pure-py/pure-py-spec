@@ -39,19 +39,19 @@
 \and
 \inferrule*[lab={\ruleName{eval-unary-op}}]
 {
-  \rho, e \evalsTo v
+  \rho, e \Rightarrow o
 }
 {
-  \rho, \exUnaryOp{\ominus}{e} \Rightarrow \hat{\ominus}(v)
+  \rho, \exUnaryOp{\ominus}{e} \Rightarrow \mlet{v}{o}{\hat{\ominus}(v)}
 }
 \and
 \inferrule*[lab={\ruleName{eval-binop}}]
 {
   \rho, e \evalsTo v \\
-  \rho, e' \evalsTo v'
+  \rho, e' \Rightarrow o
 }
 {
-  \rho, \exBinOp{e}{\odot}{e'} \Rightarrow \hat{\odot}(v, v')
+  \rho, \exBinOp{e}{\odot}{e'} \Rightarrow \mlet{v'}{o}{\hat{\odot}(v, v')}
 }
 \and
 \inferrule*[lab={\ruleName{eval-list}}]
@@ -209,6 +209,116 @@ $\kappa$ & ::= & $\errType \mid \errIndex \mid \errZeroDiv \mid \errAssert$ & (E
 \flushleft \shadebox{$\rho, e \Rightarrow o$}
 \begin{mathpar}
 \small
+\inferrule*[lab={\ruleName{eval-binop-fail}}]
+{
+  \rho, e \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exBinOp{e}{\odot}{e'} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-and-fail}}]
+{
+  \rho, e \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exAnd{e}{e'} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-or-fail}}]
+{
+  \rho, e \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exOr{e}{e'} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-cond-fail}}]
+{
+  \rho, e \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-attr-fail}}]
+{
+  \rho, e \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exAttr{e}{x} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-list-fail}}]
+{
+  \rho, e_i \evalsTo v_i \quad (\forall i < j) \\
+  \rho, e_j \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exList{e_1, \ldots, e_n} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-tuple-fail}}]
+{
+  \rho, e_i \evalsTo v_i \quad (\forall i < j) \\
+  \rho, e_j \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exTuple{e_1, \ldots, e_n} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-constr-fail}}]
+{
+  \rho, e_i \evalsTo v_i \quad (\forall i < j) \\
+  \rho, e_j \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-dict-fail}}]
+{
+  \todo{Keys and values interleave, so the order needs stating}
+}
+{
+  \rho, \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-subscript-fail}}]
+{
+  \rho, e \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exSubscript{e}{e'} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-subscript-fail-index}}]
+{
+  \rho, e \evalsTo v \\
+  \rho, e' \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exSubscript{e}{e'} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-call-fail}}]
+{
+  \rho, e \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-call-fail-args}}]
+{
+  \rho, e \evalsTo v \\
+  \rho, e_i \evalsTo u_i \quad (\forall i < j) \\
+  \rho, e_j \Rightarrow \fails{\kappa}
+}
+{
+  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \fails{\kappa}
+}
+\and
 \inferrule*[lab={\ruleName{eval-subscript-range}}]
 {
   \rho, e \evalsTo v \quad \elems(v) = v_1 \ldots v_m \\
