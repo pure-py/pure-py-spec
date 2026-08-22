@@ -523,6 +523,7 @@ def foo(x):
   return x    # error: unreachable
 \end{python}
 
+\begin{DeletedBlock}
 \subsubsection{Conditionals without \pyinline{else} clauses}
 
 An \pyinline{if} statement without an \pyinline{else} clause is equivalent to an \pyinline{if} statement with
@@ -537,7 +538,6 @@ A \pyinline{return} statement without an expression is equivalent to \pyinline{r
 A function whose body $s$ assigns rather than returns is equivalent to a function whose body is $s$ followed
 by \pyinline{return None}. This ensures every function returns, even if it is not explicitly specified.
 
-\begin{DeletedBlock}
 \subsubsection{\pyinline{assert} without a message}
 
 An \pyinline{assert e} statement without a message is equivalent to \pyinline{assert e, ""}.
