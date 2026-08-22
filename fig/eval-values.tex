@@ -24,7 +24,8 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 $o$ & $::=$ & $\val{v}$ & (Outcome) \\
   & $\mid$ & $\aborts{\kappa}$
    \\[3mm]
-$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \added{\errKey} \mid \errZeroDiv \mid \errAssert{\added{v}} \mid \errAttr \added{{} \mid \errExit{n}}$ & \replaced{(Termination kind)}{(Error kind)\ }
+$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \added{\errKey} \mid \errZeroDiv$ & \replaced{(Termination kind)}{(Error kind)\ } \\
+    & $\mid$ & $\errAssert{\added{v}} \mid \errAttr \added{{} \mid \errExit{n}}$ &
 \end{tabular}
 \end{center}
 \caption{Values, environments and evaluation results}
