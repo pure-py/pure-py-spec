@@ -74,14 +74,10 @@ membership $\memOp$ (\figrefTwo{equality}{membership}). Both are undefined where
 
 Evaluation yields an outcome $o$, either $\val{a}$ or $\fails{\kappa}$, where $a$ is what the judgement
 produces and the error kind $\kappa$ records which Python error the failure corresponds to
-(\figref{values}). A rule whose result is built from the payload of an outcome binds it:
-\[
-\mlet{v}{\val{a}}{E} = E[v := a]
-\qquad
-\mlet{v}{\fails{\kappa}}{E} = \fails{\kappa}
-\]
-The body $E$ may be an outcome or a result, since $\fails{\kappa}$ is both. The second equation is why no
-rule needs a propagation case for its final premise. Each construct has propagation rules
+(\figref{values}). A rule whose result is built from the payload of an outcome binds it with
+$\mlet{v}{o}{\ldots}$: where $o$ is $\val{a}$ the body is taken with $v$ denoting $a$, and where $o$ is
+$\fails{\kappa}$ the rule concludes $\fails{\kappa}$. The body is an outcome or a result, since
+$\fails{\kappa}$ is both, which is why no rule needs a propagation case for its final premise. Each construct has propagation rules
 recording which subexpressions succeeded before the failing one was reached, and $\rho, b \evalsTo v$ is the
 value a block yields, \pyinline{None} where it falls off the end. Operations \PurePy excludes rather than
 shares with Python, such as a non-Boolean test, get no rule and leave the run stuck (\secref{no-coercions},
