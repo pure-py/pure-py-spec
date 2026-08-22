@@ -72,12 +72,13 @@ membership $\memOp$ (\figrefTwo{equality}{membership}). Both are undefined where
 
 \input{fig/match}
 
-Evaluation yields an outcome $o$, either $\val{v}$ or $\fails{\kappa}$, where the error kind $\kappa$
-records which Python error the failure corresponds to (\figref{values}). A rule whose result is built from
-the value of an outcome binds it. The conclusion of \ruleName{eval-binop} is
-$\mlet{v'}{o}{\hat{\odot}(v, v')}$, which is $\hat{\odot}(v, v')$ where $o$ is $\val{v'}$, and
-$\fails{\kappa}$ where $o$ is $\fails{\kappa}$. A final premise needs no propagation rule. The statement, sequence and module judgements use outcomes of the same form, carrying a result, a
-sequence of values or an environment in place of a value. Each construct has propagation rules
+Expression evaluation $\rho, e \Rightarrow o$ yields an outcome, either $\val{v}$ or $\fails{\kappa}$,
+where the error kind $\kappa$ records which Python error the failure corresponds to (\figref{values}). A
+rule whose result is built from the value of an outcome binds it, as \ruleName{eval-binop} does with the
+conclusion $\mlet{v'}{o}{\hat{\odot}(v, v')}$: this is $\hat{\odot}(v, v')$ where $o$ is $\val{v'}$, and
+$\fails{\kappa}$ where $o$ is $\fails{\kappa}$. A final premise needs no propagation rule. The statement,
+sequence and module judgements use outcomes of the same form, carrying a result, a sequence of values or an
+environment in place of a value. Each construct has propagation rules
 recording which subexpressions succeeded before the failing one was reached, and $\rho, b \evalsTo v$ is the
 value a block yields, \pyinline{None} where it falls off the end. Operations \PurePy excludes rather than
 shares with Python, such as a non-Boolean test, get no rule and leave the run stuck (\secref{no-coercions},
