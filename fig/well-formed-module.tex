@@ -159,11 +159,10 @@
 
 \inferrule*[lab={\ruleName{predefined}}]
 {
-  \mathcal{P}(q) = \set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}} \\
-  \vdash v_i : \theta_i \quad (\forall i)
+  \vdash \mathcal{P}(q) : \Gamma
 }
 {
-  \vdash_{\mathsf{load}} q : \set{\bind{x_1}{\theta_1}, \ldots, \bind{x_n}{\theta_n}}
+  \vdash_{\mathsf{load}} q : \Gamma
 }
 \and
 \inferrule*[lab={\ruleName{module}}]
