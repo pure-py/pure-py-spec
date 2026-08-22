@@ -139,20 +139,22 @@ $\seq{\iota}$ followed by a sequence of statements $\seq{s}$; since imports are 
 appear neither in blocks (and hence not in function bodies) nor after the first non-import statement. The
 well-formedness and evaluation rules check and evaluate the statements of each body $\mathcal{M}(q)$ with the
 assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
-$\pymath{\_\_name\_\_}$ binding the runtime supplies automatically. $\mathcal{M}$ additionally always includes the predefined modules of
-\figref{predefined}, which have no body and whose contexts and environments are given directly (Definition~\ref{def:predefined}), and is prefix-closed: the parent of any module in $\dom(\mathcal{M})$ is itself in
-$\dom(\mathcal{M})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is its \texttt{.py}
+$\pymath{\_\_name\_\_}$ binding the runtime supplies automatically. A second map $\mathcal{P}$ gives the
+predefined modules of \figref{predefined}, which have no body: $\mathcal{P}$ takes each such name to its
+environment (Definition~\ref{def:predefined}). The two domains are disjoint, and their union is
+prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$ is itself in
+$\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is its \texttt{.py}
 file, each package's body is its \texttt{\_\_init\_\_.py}, and a package directory without an
 \texttt{\_\_init\_\_.py} encodes the empty body (a namespace package, PEP 420, \url{https://peps.python.org/pep-0420/}). Prefix-closure thus holds by
-construction.} The map $\mathcal{M}$ is fixed and ambient in all
+construction.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
 definitions that follow, as is the name $q$ of the enclosing module in the rules that check or evaluate a single module's body.
 
 
 \begin{definition}[Predefined contexts and environments]
 \label{def:predefined}
-For each predefined module $q$ of \figref{predefined}, the context $\Gamma_q$ binds the members listed for
-$q$, together with \pyinline{__name__}, all definitely assigned. The dynamic semantics is parameterised by
-an environment $\rho_q$ for each such $q$, binding the same names to implementation-defined values.
+$\mathcal{P}$ takes each module $q$ of \figref{predefined} to an environment binding the members listed for
+$q$, together with \pyinline{__name__}, to implementation-defined values. Its context is whatever types that
+environment (\ruleName{predefined}, \figref{well-formed-module}).
 \end{definition}
 
 \begin{figure}

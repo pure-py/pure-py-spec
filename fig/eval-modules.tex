@@ -153,10 +153,10 @@
 
 \inferrule*[lab={\ruleName{eval-predefined}}]
 {
-  q \text{ predefined}
+  q \in \dom(\mathcal{P})
 }
 {
-  q \Rightarrow_{\mathsf{load}} \rho_q
+  q \Rightarrow_{\mathsf{load}} \mathcal{P}(q)
 }
 \and
 \inferrule*[lab={\ruleName{load}}]
