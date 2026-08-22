@@ -55,7 +55,7 @@
    \seq{\iota} \Rightarrow o
 }
 {
-   \exImport{q'} \cons \seq{\iota} \Rightarrow \mlet{\rho'}{o}{\val{\set{\bind{x}{v}} \extend \rho'}}
+   \exImport{q'} \cons \seq{\iota} \Rightarrow \mlet{\rho'}{o}{\val{(\set{\bind{x}{v}} \extend \rho')}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-import-fail}}]
@@ -75,7 +75,7 @@
    \seq{\iota} \Rightarrow o
 }
 {
-   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \mlet{\rho''}{o}{\val{\set{\bind{x_1}{v_1}, \ldots, \bind{x_{n+1}}{v_{n+1}}} \extend \rho''}}
+   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \mlet{\rho^\dagger}{o}{\val{(\set{\bind{x_1}{v_1}, \ldots, \bind{x_{n+1}}{v_{n+1}}} \extend \rho^\dagger)}}
 }
 \end{mathpar}
 
@@ -130,7 +130,7 @@
   \rho \override \rho', \seq{s} \Rightarrow o
 }
 {
-  \rho, s \cons \seq{s} \Rightarrow \mlet{\rho''}{o}{\val{\rho' \override \rho''}}
+  \rho, s \cons \seq{s} \Rightarrow \mlet{\rho^\dagger}{o}{\val{(\rho' \override \rho^\dagger)}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-statement-fail}}]
@@ -147,7 +147,7 @@
   \rho \override \set{\bind{c}{C}}, \seq{s} \Rightarrow o
 }
 {
-  \rho, \exDataclass{c}{\phi} \cons \seq{s} \Rightarrow \mlet{\rho'}{o}{\val{\set{\bind{c}{C}} \override \rho'}}
+  \rho, \exDataclass{c}{\phi} \cons \seq{s} \Rightarrow \mlet{\rho'}{o}{\val{(\set{\bind{c}{C}} \override \rho')}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-class-extend}}]
@@ -156,7 +156,7 @@
   \rho \override \set{\bind{c}{C}}, \seq{s} \Rightarrow o
 }
 {
-  \rho, \exDataclassExtend{c}{c'}{\phi} \cons \seq{s} \Rightarrow \mlet{\rho'}{o}{\val{\set{\bind{c}{C}} \override \rho'}}
+  \rho, \exDataclassExtend{c}{c'}{\phi} \cons \seq{s} \Rightarrow \mlet{\rho'}{o}{\val{(\set{\bind{c}{C}} \override \rho')}}
 }
 \end{mathpar}
 \subcaption{Statements $\seq{s}$ of module $q$ evaluate under environment $\rho : \Gamma$ to outcome $o$}
@@ -183,7 +183,7 @@
   \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} \Rightarrow o
 }
 {
-  q \Rightarrow_{\mathsf{load}} \mlet{\rho'}{o}{\val{\submods(q) \override \rho'}}
+  q \Rightarrow_{\mathsf{load}} \mlet{\rho'}{o}{\val{(\submods(q) \override \rho')}}
 }
 \and
 \inferrule*[lab={\ruleName{load-fail}}]

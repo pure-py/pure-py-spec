@@ -216,7 +216,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-list}}]
 {
-  \rho, e_1 \cons \ldots \cons e_n \Rightarrow \val{v_1 \cons \ldots \cons v_n}
+  \rho, e_1 \cons \ldots \cons e_n \Rightarrow \val{(v_1 \cons \ldots \cons v_n)}
 }
 {
   \rho, \exList{e_1, \ldots, e_n} \Rightarrow \val{\exList{v_1, \ldots, v_n}}
@@ -224,7 +224,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-tuple}}]
 {
-  \rho, e_1 \cons \ldots \cons e_n \Rightarrow \val{v_1 \cons \ldots \cons v_n}
+  \rho, e_1 \cons \ldots \cons e_n \Rightarrow \val{(v_1 \cons \ldots \cons v_n)}
 }
 {
   \rho, \exTuple{e_1, \ldots, e_n} \Rightarrow \val{\exTuple{v_1, \ldots, v_n}}
@@ -232,7 +232,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-dict}}]
 {
-  \rho, e_1 \cons e_1' \cons \ldots \cons e_n \cons e_n' \Rightarrow \val{w_1 \cons v_1 \cons \ldots \cons w_n \cons v_n}
+  \rho, e_1 \cons e_1' \cons \ldots \cons e_n \cons e_n' \Rightarrow \val{(w_1 \cons v_1 \cons \ldots \cons w_n \cons v_n)}
 }
 {
   \rho, \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \Rightarrow \val{\exDict{\entries(\varepsilon, \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n})}}
@@ -276,7 +276,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
-  \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \val{v_1 \cons \ldots \cons v_{n+m}} \\
+  \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \val{(v_1 \cons \ldots \cons v_{n+m})} \\
   \resolveClass(\rho, q) = C \\
   \fields(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}
 }
@@ -410,7 +410,7 @@
   \rho, \seq{e} \Rightarrow o
 }
 {
-  \rho, e \cons \seq{e} \Rightarrow \mlet{\seq{v}}{o}{\val{v \cons \seq{v}}}
+  \rho, e \cons \seq{e} \Rightarrow \mlet{\seq{v}}{o}{\val{(v \cons \seq{v})}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-seq-fail}}]
@@ -671,7 +671,7 @@
   \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i)
 }
 {
-  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \val{\seq{\rho}_1 \cons \ldots \cons \seq{\rho}_n}
+  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \val{(\seq{\rho}_1 \cons \ldots \cons \seq{\rho}_n)}
 }
 \and
 \inferrule*[lab={\ruleName{eval-qual-generator-fail}}]
