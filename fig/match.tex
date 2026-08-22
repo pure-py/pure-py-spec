@@ -52,8 +52,8 @@
 \and
 \inferrule*[lab={\ruleName{eval-pat-dict}}]
 {
-  \bind{w_i}{u_i} \in \delta \quad (\forall i) \\
-  \rho, p_i, u_i \matches \rho_i \quad (\forall i)
+  \bind{w_i}{\replaced{v_i}{u_i}} \in \delta \quad (\forall i) \\
+  \rho, p_i, \replaced{v_i}{u_i} \matches \rho_i \quad (\forall i)
 }
 {
   \rho, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}}, \delta \matches \rho_1 \disjunion \ldots \disjunion \rho_n

@@ -9,7 +9,7 @@
 \memOp(\exTuple{v' \cons \seq{v}}, v) &{}= \memOp(\exTuple{\seq{v}}, v) && \text{if } \eqOp(v, v') = \pyinline{False} \\
 \memOp(\delta, w) &{}= \pyinline{True} && \text{if } w \in \dom(\delta) \\
 \memOp(\delta, w) &{}= \pyinline{False} && \text{if } w \notin \dom(\delta) \\
-\memOp(w', w) &{}= \pyinline{True} && \text{if } w' = u \cons w \cons u' \text{ for some } u, u' \\
+\memOp(w', w) &{}= \pyinline{True} && \text{if } w' = \replaced{w_1 \cons w \cons w_2 \text{ for some } w_1, w_2}{u \cons w \cons u' \text{ for some } u, u'\ } \\
 \memOp(w', w) &{}= \pyinline{False} && (\text{otherwise})
 \end{align*}
 \caption{Membership, undefined where no case applies}
