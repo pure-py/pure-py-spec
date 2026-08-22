@@ -161,6 +161,39 @@
 
 \begin{figure}
 \small
+\flushleft \shadebox{$\rho, b \evalsTo o$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-value-return}}]
+{
+  \rho, b \Rightarrow \returns{v}
+}
+{
+  \rho, b \evalsTo \val{v}
+}
+\and
+\inferrule*[lab={\ruleName{eval-value-none}}]
+{
+  \rho, b \Rightarrow \assigns{\rho'}
+}
+{
+  \rho, b \evalsTo \val{\pyinline{None}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-value-fail}}]
+{
+  \rho, b \Rightarrow \fails{\kappa}
+}
+{
+  \rho, b \evalsTo \fails{\kappa}
+}
+\end{mathpar}
+\caption{Block $b$ yields outcome $o$ under environment $\rho : \Gamma$}
+\label{fig:eval-value}
+\end{figure}
+
+\begin{figure}
+\small
 \flushleft \shadebox{$\rho, e \Rightarrow o$}
 \begin{mathpar}
 \small
@@ -706,35 +739,3 @@
 \label{fig:eval-quals-outcome}
 \end{figure}
 
-\begin{figure}
-\small
-\flushleft \shadebox{$\rho, b \evalsTo o$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{eval-value-return}}]
-{
-  \rho, b \Rightarrow \returns{v}
-}
-{
-  \rho, b \evalsTo \val{v}
-}
-\and
-\inferrule*[lab={\ruleName{eval-value-none}}]
-{
-  \rho, b \Rightarrow \assigns{\rho'}
-}
-{
-  \rho, b \evalsTo \val{\pyinline{None}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-value-fail}}]
-{
-  \rho, b \Rightarrow \fails{\kappa}
-}
-{
-  \rho, b \evalsTo \fails{\kappa}
-}
-\end{mathpar}
-\caption{Block $b$ yields outcome $o$ under environment $\rho : \Gamma$}
-\label{fig:eval-value}
-\end{figure}
