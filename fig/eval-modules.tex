@@ -2,7 +2,6 @@
 \flushleft \shadebox{$\rho, x \importsR v$}
 \begin{mathpar}
 \small
-
 \inferrule*[lab={\ruleName{eval-imp-member}}]
 {
   \bind{x}{v} \in \rho \\
@@ -12,7 +11,6 @@
   \rho, x \importsR v
 }
 \and
-
 \inferrule*[lab={\ruleName{eval-imp-submodule}}]
 {
   \bind{x}{\modStub{q'}} \in \rho \\
@@ -21,7 +19,6 @@
 {
   \rho, x \importsR \modLoaded{q'}{\rho'}
 }
-
 \end{mathpar}
 
 \caption{Name $x$ imported from module environment $\rho$ has value $v$}
@@ -41,7 +38,6 @@
    \varepsilon \Rightarrow \varnothing
 }
 \and
-
 \inferrule*[lab={\ruleName{eval-import}}]
 {
   q' = x \cons \seq{x} \\
@@ -63,7 +59,6 @@
 {
    \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \set{\bind{x_1}{v_1}, \ldots, \bind{x_{n+1}}{v_{n+1}}} \extend \rho''
 }
-
 \end{mathpar}
 
 \subcaption{Import prefix $\seq{\iota}$ of module $q$ produces bindings $\rho$}
@@ -75,7 +70,6 @@
 \flushleft \shadebox{$q, v \loadsAs v'$}
 \begin{mathpar}
 \small
-
 \inferrule*[lab={\ruleName{eval-loads-as-simple}}]
 {
   \strut
@@ -84,7 +78,6 @@
   x, v \loadsAs v
 }
 \and
-
 \inferrule*[lab={\ruleName{eval-loads-as-qualified}}]
 {
   q \Rightarrow_{\mathsf{load}} \rho \\
@@ -149,8 +142,6 @@
 \flushleft \shadebox{$q \Rightarrow_{\mathsf{load}} \rho$}
 \begin{mathpar}
 \small
-
-
 \inferrule*[lab={\ruleName{eval-predefined}}]
 {
   q \in \dom(\mathcal{P})
@@ -168,7 +159,6 @@
 {
   q \Rightarrow_{\mathsf{load}} \submods(q) \override \rho'
 }
-
 \end{mathpar}
 
 \flushleft \shadebox{$\mathcal{M} \Rightarrow n$}

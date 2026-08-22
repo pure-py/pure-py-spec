@@ -2,7 +2,6 @@
 \flushleft \shadebox{$\Gamma, x \importsR \theta$}
 \begin{mathpar}
 \small
-
 \inferrule*[lab={\ruleName{imp-member}}]
 {
   \Gamma \vdash x : \theta
@@ -11,7 +10,6 @@
   \Gamma, x \importsR \theta
 }
 \and
-
 \inferrule*[lab={\ruleName{imp-submodule}}]
 {
   \bind{x}{\modStub{q}} \in \Gamma \\
@@ -39,7 +37,6 @@
   \vdash \varepsilon : \varnothing
 }
 \and
-
 \inferrule*[lab={\ruleName{import}}]
 {
   q' = x \cons \seq{x} \\
@@ -62,7 +59,6 @@
 {
   \vdash \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} : \set{\bind{x_1}{\theta_1}, \ldots, \bind{x_{n+1}}{\theta_{n+1}}} \extend \Gamma
 }
-
 \end{mathpar}
 
 \subcaption{Import prefix $\seq{\iota}$ of module $q$ produces bindings $\Gamma$}
@@ -74,7 +70,6 @@
 \flushleft \shadebox{$q, \theta \loadsAs \theta'$}
 \begin{mathpar}
 \small
-
 \inferrule*[lab={\ruleName{loads-as-simple}}]
 {
   \strut
@@ -83,7 +78,6 @@
   x, \theta \loadsAs \theta
 }
 \and
-
 \inferrule*[lab={\ruleName{loads-as-qualified}}]
 {
   \vdash_{\mathsf{load}} q : \Gamma' \\
@@ -155,8 +149,6 @@
 \flushleft \shadebox{$\vdash_{\mathsf{load}} q : \Gamma$}
 \begin{mathpar}
 \small
-
-
 \inferrule*[lab={\ruleName{predefined}}]
 {
   \vdash \mathcal{P}(q) : \Gamma
@@ -175,7 +167,6 @@
 {
   \vdash_{\mathsf{load}} q : \submods(q) \override \Delta
 }
-
 \end{mathpar}
 
 \flushleft \shadebox{$\vdash \mathcal{M}$}
