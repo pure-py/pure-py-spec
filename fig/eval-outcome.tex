@@ -123,7 +123,7 @@
 \inferrule*[lab={\ruleName{eval-match}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \dispatch(\rho, v, \exCase{p_1}{b_1} \cons \ldots \cons \exCase{p_{n+1}}{b_{n+1}}) = (\rho', b) \\
+  \dispatch(\rho, v, \seq{p}, \seq{b}) = (\rho', b) \\
   \rho \override \rho', b \Rightarrow r
 }
 {
