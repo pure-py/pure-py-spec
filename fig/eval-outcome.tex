@@ -74,7 +74,7 @@
   \added{\rho, e' \Rightarrow o}
 }
 {
-  \rho, \exAssertMsg{e}{e'} \Rightarrow \replaced{\mlet{v}{o}{\aborts{\errAssert{v}}}}{\aborts{\errAssert}\ }
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \replaced{\mlet{w}{o}{\aborts{\errAssert{w}}}}{\aborts{\errAssert}\ }
 }
 \and
 \inferrule*[lab={\ruleName{eval-assert-fail}}]
