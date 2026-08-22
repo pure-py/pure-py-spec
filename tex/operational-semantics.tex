@@ -38,9 +38,12 @@ The correspondence is exact: if $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Righ
 imports precede statements, every module a statement can reference is loaded before the statement runs, and
 since loading has no observable effects, reloading a module is unobservable; the semantics therefore needs no
 cache of loaded modules. These rules use the environment $\mathcal{P}(\pyinline{builtins})$ binding the names of
-\figref{predefined}. A program evaluates to its exit status: a run whose main module loads
-successfully yields $0$, and one whose main module fails yields $1$, as Python does for an uncaught
-exception.
+\figref{predefined}. \Replaced{A run whose main module loads successfully yields the exit status $0$, and one whose main module
+fails yields the error kind rather than a status. A conforming implementation reports such a run by raising an
+exception of the corresponding Python type and terminating with a non-zero status, as Python does for an
+uncaught exception; the message and traceback are not prescribed.}{A program evaluates to its exit status: a
+run whose main module loads successfully yields $0$, and one whose main module fails yields $1$, as Python
+does for an uncaught exception.}
 
 \input{fig/eval-modules}
 
