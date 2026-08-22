@@ -18,7 +18,7 @@
 \ownFields(\pyinline{pass}) &= \varepsilon \\
 \\
 \fields(\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}) &= \seq{x} \\
-\fields(\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}) &= \fields(\Gamma(c')) \mathbin{\cdot} \seq{x} \\
+\fields(\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}) &= \fields(\Gamma(c')) \cons \seq{x} \\
 \\
 \ancestors(\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}) &\;= \set{\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}} \\
 \ancestors(\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}) &\;= \set{\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}} \cup \ancestors(\Gamma(c'))

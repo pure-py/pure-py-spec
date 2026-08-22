@@ -37,7 +37,7 @@
 \inferrule*[lab={\ruleName{pat-constr}}]
 {
   \Gamma \vdash q : C \\
-  \fields(C) = x_1, \ldots, x_n \mathbin{\cdot} \seq{x}\,' \\
+  \fields(C) = x_1, \ldots, x_n \cons \seq{x}\,' \\
   \set{\seq{y}} = \set{\seq{x}\,'} \\
   \Gamma \vdash p_i \quad (\forall i)
 }
