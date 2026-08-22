@@ -45,9 +45,8 @@ exception.
 \input{fig/eval-modules}
 
 Block evaluation $\rho, b \Rightarrow r$ is given in \figref{eval-block-outcome}. Function definitions delimit
-the scope of sequential-composition effects, so as black boxes functions are always pure. We write
-$\rho, b \evalsTo o$ for the outcome a block yields as a value, $\val{\pyinline{None}}$ where it falls off
-the end (\figref{eval-value}).
+the scope of sequential-composition effects, so as black boxes functions are always pure. The metafunction $\unwrap$ (\figref{eval-aux}) turns a block's
+result into the outcome of a call, $\val{\pyinline{None}}$ where the block falls off the end.
 
 Expression evaluation $\rho, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd}) yields an
 outcome, either $\val{v}$ or $\fails{\kappa}$ (\figref{values}). The error kinds are designed to
@@ -85,4 +84,5 @@ membership $\memOp$ (\figrefTwo{equality}{membership}). Both are undefined where
 
 \input{fig/match}
 
+\input{fig/eval-aux}
 \input{fig/eval-outcome}
