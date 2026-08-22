@@ -252,7 +252,7 @@ give those meanings are named after the hooks they stand in for.}{Only dataclass
 A well-formed \PurePy program avoids the Python runtime errors listed in
 \figref{prevented-errors}, under the conditions noted there. Well-formedness does not prevent errors from
 ill-typed operations, such as wrong operand types, calling a non-function\Added{, calling a function with the
-wrong number of arguments}, or attribute access on an object lacking the attribute. Each of these has an error kind and a rule in the semantics (\figref{eval-fails}).
+wrong number of arguments}, or attribute access on an object lacking the attribute. Each of these has a \Replaced{termination}{error} kind and a rule in the semantics (\figref{eval-fails}).
 
 \begin{figure}
 \centering

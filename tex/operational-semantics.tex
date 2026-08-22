@@ -52,8 +52,9 @@ the scope of sequential-composition effects, so as black boxes functions are alw
 the outcome of calling it, $\val{\pyinline{None}}$ where the block falls off the end.
 
 Expression evaluation $\rho, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd}) yields an
-outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). The error kinds are designed to
-correspond to the error the same program would raise under Python in the same circumstances. The rules are given in a monadic metalanguage over outcomes, in which
+outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). \Replaced{The termination kinds other than $\errExit{n}$ are named after the
+exceptions the same program raises under Python in the same circumstances.}{The error kinds are designed to
+correspond to the error the same program would raise under Python in the same circumstances.} The rules are given in a monadic metalanguage over outcomes, in which
 $\mlet{v}{o}{\ldots}$ binds the value of an outcome; for example, \ruleName{eval-binop} concludes
 $\mlet{v'}{o}{\hat{\odot}(v, v')}$, which is $\hat{\odot}(v, v')$ where $o$ is $\val{v'}$, and
 $\aborts{\kappa}$ where $o$ is $\aborts{\kappa}$. A final
@@ -70,9 +71,8 @@ a conditional expression requires its condition to be \pyinline{True} or \pyinli
 \ruleName{eval-if} does. A comprehension evaluates its body once for each binding its qualifiers produce, and
 concatenates the results; a generator draws from $\iterOp$ (\figref{eval-aux}), which is
 \Replaced{defined on lists, tuples, strings and dictionaries, a dictionary yielding its keys as in Python.
-There is no user-extensible iteration protocol, since a class cannot define \pyinline{__iter__}
-(\secref{other-restrictions}).}{defined on lists and tuples only, since \PurePy has no wider notion of
-iteration.}
+These are the only values a generator can draw from.}{defined on lists and tuples only, since \PurePy has no
+wider notion of iteration.}
 The pattern-matching judgement $\rho, p, v \matches \rho'$ (\figref{match}) is a deterministic partial
 function; we write $\rho, p, v \notmatches$ (with no right-hand side) for $\nexists \rho'.\, \rho, p, v
 \matches \rho'$, i.e.\ matching is undefined. A constructor pattern matches any object whose class has the

@@ -65,15 +65,16 @@
   \rho, e \Rightarrow \val{\pyinline{False}}
 }
 {
-  \rho, \exAssert{e} \Rightarrow \aborts{\errAssert}
+  \rho, \exAssert{e} \Rightarrow \aborts{\errAssert{\added{\pyinline{""}}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-assert-msg-false}}]
 {
-  \rho, e \Rightarrow \val{\pyinline{False}}
+  \rho, e \Rightarrow \val{\pyinline{False}} \\
+  \added{\rho, e' \Rightarrow o}
 }
 {
-  \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\errAssert}
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \replaced{\mlet{v}{o}{\aborts{\errAssert{v}}}}{\aborts{\errAssert}\ }
 }
 \and
 \inferrule*[lab={\ruleName{eval-assert-fail}}]
@@ -564,8 +565,16 @@
 {
   \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \aborts{\kappa}
 }
+\end{mathpar}
+\caption{An abort in a subexpression propagates, under environment $\rho : \Gamma$}
+\label{fig:eval-propagation}
+\end{figure}
 
-\and
+\begin{figure}
+\small
+\flushleft \shadebox{$\rho, e \Rightarrow o$}
+\begin{mathpar}
+\small
 \inferrule*[lab={\ruleName{eval-attr-missing}}]
 {
   \rho, e \Rightarrow \val{\exObj{\Delta}{C}{\rho'}} \\
@@ -615,7 +624,7 @@
   \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \aborts{\errType}
 }
 \end{mathpar}
-\caption{Expression $e$ fails with error kind $\kappa$ under environment $\rho : \Gamma$}
+\caption{Expression $e$ aborts with kind $\kappa$ under environment $\rho : \Gamma$}
 \label{fig:eval-fails}
 \end{figure}
 

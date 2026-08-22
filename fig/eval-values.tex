@@ -21,13 +21,10 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
   & $\mid$ & $\returns{v}$ \\
   & $\mid$ & $\aborts{\kappa}$
    \\[3mm]
-\added{$\pi$} & \added{$::=$} & \added{$n$} & \added{(ProgramResult)} \\
-    & \added{$\mid$} & \added{$\aborts{\kappa}$} &
-   \\[3mm]
 $o$ & $::=$ & $\val{v}$ & (Outcome) \\
   & $\mid$ & $\aborts{\kappa}$
    \\[3mm]
-$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \added{\errKey \mid} \errZeroDiv \mid \errAssert \mid \errAttr$ & (Error kind)
+$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \added{\errKey} \mid \errZeroDiv \mid \errAssert{\added{v}} \mid \errAttr \added{{} \mid \errExit{n}}$ & \replaced{(Termination kind)}{(Error kind)\ }
 \end{tabular}
 \end{center}
 \caption{Values, environments and evaluation results}

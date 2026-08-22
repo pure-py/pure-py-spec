@@ -224,7 +224,7 @@
 }
 \end{mathpar}
 
-\flushleft \shadebox{$\mathcal{M} \Rightarrow \replaced{\pi}{n\ }$}
+\flushleft \shadebox{$\mathcal{M} \Rightarrow \replaced{\kappa}{n\ }$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-program}}]
@@ -232,15 +232,15 @@
   \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{load}} \val{\rho}
 }
 {
-  \mathcal{M} \Rightarrow 0
+  \mathcal{M} \Rightarrow \replaced{\errExit{0}}{0\ }
 }
 \and
-\inferrule*[lab={\ruleName{eval-program-fail}}]
+\inferrule*[lab={\ruleName{eval-program-abort}}]
 {
   \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{load}} \aborts{\kappa}
 }
 {
-  \mathcal{M} \Rightarrow \replaced{\aborts{\kappa}}{1\ }
+  \mathcal{M} \Rightarrow \replaced{\kappa}{1\ }
 }
 \end{mathpar}
 \subcaption{Module loading and program evaluation}
