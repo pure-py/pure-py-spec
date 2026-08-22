@@ -3,13 +3,17 @@
 \begin{align*}
 \elems(\exList{v_1, \ldots, v_n}) &{}= v_1 \ldots v_n \\
 \elems(\exTuple{v_1, \ldots, v_n}) &{}= v_1 \ldots v_n \\
+\added{\elems(w)} &{}\added{{}= w_1 \ldots w_m} && \added{\text{where } w = w_1 \ldots w_m,\ \text{each } w_i \text{ one character}} \\
 \\
-\added{\iterOp(v)} &{}\added{{}= \elems(v)} \\
+\added{\iterOp(\delta)} &{}\added{{}= w_1 \ldots w_n} && \added{\text{where } \delta = \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}} \\
+\added{\iterOp(v)} &{}\added{{}= \elems(v)} && \added{(\text{otherwise})} \\
 \\
+\added{\getitem(\delta, w)} &{}\added{{}= \val{\delta(w)}} && \added{\text{if } w \in \dom(\delta)} \\
+\added{\getitem(\delta, w)} &{}\added{{}= \fails{\errKey}} && \added{\text{if } w \notin \dom(\delta)} \\
 \added{\getitem(v, n)} &{}\added{{}= \val{v_{n+1}}} && \added{\text{if } \elems(v) = v_1 \ldots v_m \text{ and } 0 \leq n < m} \\
 \added{\getitem(v, n)} &{}\added{{}= \val{v_{m+n+1}}} && \added{\text{if } \elems(v) = v_1 \ldots v_m \text{ and } {-m} \leq n < 0} \\
 \added{\getitem(v, n)} &{}\added{{}= \fails{\errIndex}} && \added{\text{if } \elems(v) = v_1 \ldots v_m \text{ and } (n < -m \text{ or } n \geq m)} \\
-\added{\getitem(v, v')} &{}\added{{}= \fails{\errType}} && \added{(\text{otherwise})} \\
+\added{\getitem(v, v')} &{}\added{{}= \fails{\errType}} && \added{(\text{otherwise}; \; v \text{ not a dictionary})} \\
 \\
 \outcome(\returns{v}) &= \val{v} \\
 \outcome(\assigns{\rho}) &= \val{\pyinline{None}} \\
