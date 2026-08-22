@@ -76,8 +76,7 @@ Evaluation yields an outcome $o$, either $\val{v}$ or $\fails{\kappa}$, where th
 records which Python error the failure corresponds to (\figref{values}). A rule whose result is built from
 the value of an outcome binds it. The conclusion of \ruleName{eval-binop} is
 $\mlet{v'}{o}{\hat{\odot}(v, v')}$, which is $\hat{\odot}(v, v')$ where $o$ is $\val{v'}$, and
-$\fails{\kappa}$ where $o$ is $\fails{\kappa}$. That is why no rule needs a propagation case for its final
-premise. The statement, sequence and module judgements use outcomes of the same form, carrying a result, a
+$\fails{\kappa}$ where $o$ is $\fails{\kappa}$. A final premise needs no propagation rule. The statement, sequence and module judgements use outcomes of the same form, carrying a result, a
 sequence of values or an environment in place of a value. Each construct has propagation rules
 recording which subexpressions succeeded before the failing one was reached, and $\rho, b \evalsTo v$ is the
 value a block yields, \pyinline{None} where it falls off the end. Operations \PurePy excludes rather than
