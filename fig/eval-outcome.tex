@@ -603,6 +603,15 @@
   \rho, \exSubscript{e}{e'} \Rightarrow \fails{\errType}
 }
 \and
+\inferrule*[lab={\ruleName{eval-attr-missing}}]
+{
+  \rho, e \Rightarrow \val{\exObj{\Delta}{C}{\rho'}} \\
+  x \notin \dom(\rho')
+}
+{
+  \rho, \exAttr{e}{x} \Rightarrow \fails{\errAttr}
+}
+\and
 \inferrule*[lab={\ruleName{eval-attr-nonobj}}]
 {
   \rho, e \Rightarrow \val{v} \\

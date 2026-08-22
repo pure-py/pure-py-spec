@@ -244,7 +244,7 @@ definitions of other kinds are excluded.
 Complementing the exclusions above, a well-formed \PurePy program avoids the Python runtime errors listed in
 \figref{prevented-errors}, under the conditions noted there. Errors from ill-typed operations, such as wrong
 operand types, calling a non-function, or attribute access on an object lacking the attribute, are outside the
-scope of well-formedness.
+scope of well-formedness; each has an error kind and a rule in the semantics (\figref{eval-fails}).
 
 \begin{figure}
 \centering
