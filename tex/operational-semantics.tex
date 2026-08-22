@@ -72,7 +72,7 @@ function; we write $\rho, p, v \notmatches$ (with no right-hand side) for $\nexi
 \matches \rho'$, i.e.\ matching is undefined. A constructor pattern matches any object whose class has the
 pattern's class among its ancestors; sub-patterns bind the fields of the pattern's class. An object records
 its class entry, whose qualified name is the identity of the class: since a module declares each class name at
-most once, the entry comparison in \ruleName{pat-constr} amounts to a comparison of qualified names.
+most once, the entry comparison in \ruleName{eval-pat-constr} amounts to a comparison of qualified names.
 
 \figref{operators} gives the operator meanings, in terms of structural equality $\eqOp$ and
 membership $\memOp$ (\figrefTwo{equality}{membership}). Both are undefined where no case applies, which is where

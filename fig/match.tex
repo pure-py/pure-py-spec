@@ -2,7 +2,7 @@
 \flushleft \shadebox{$\rho, p, v \matches \rho'$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{pat-lit}}]
+\inferrule*[lab={\ruleName{eval-pat-lit}}]
 {
   \strut
 }
@@ -10,7 +10,7 @@
   \rho, \ell, \ell \matches \varnothing
 }
 \and
-\inferrule*[lab={\ruleName{pat-neg-lit}}]
+\inferrule*[lab={\ruleName{eval-pat-neg-lit}}]
 {
   \strut
 }
@@ -18,7 +18,7 @@
   \rho, -n, -n \matches \varnothing
 }
 \and
-\inferrule*[lab={\ruleName{pat-var}}]
+\inferrule*[lab={\ruleName{eval-pat-var}}]
 {
   \strut
 }
@@ -26,7 +26,7 @@
   \rho, x, v \matches \set{\bind{x}{v}}
 }
 \and
-\inferrule*[lab={\ruleName{pat-wild}}]
+\inferrule*[lab={\ruleName{eval-pat-wild}}]
 {
   \strut
 }
@@ -34,7 +34,7 @@
   \rho, \patWild, v \matches \varnothing
 }
 \and
-\inferrule*[lab={\ruleName{pat-list}}]
+\inferrule*[lab={\ruleName{eval-pat-list}}]
 {
   \rho, p_i, v_i \matches \rho_i \quad (\forall i)
 }
@@ -42,7 +42,7 @@
   \rho, \patList{p_1, \ldots, p_n}, \exList{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
 }
 \and
-\inferrule*[lab={\ruleName{pat-tuple}}]
+\inferrule*[lab={\ruleName{eval-pat-tuple}}]
 {
   \rho, p_i, v_i \matches \rho_i \quad (\forall i)
 }
@@ -50,7 +50,7 @@
   \rho, \patTuple{p_1, \ldots, p_n}, \exTuple{v_1, \ldots, v_n} \matches \rho_1 \disjunion \ldots \disjunion \rho_n
 }
 \and
-\inferrule*[lab={\ruleName{pat-dict}}]
+\inferrule*[lab={\ruleName{eval-pat-dict}}]
 {
   \bind{w_i}{u_i} \in d \quad (\forall i) \\
   \rho, p_i, u_i \matches \rho_i \quad (\forall i)
@@ -59,7 +59,7 @@
   \rho, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}}, d \matches \rho_1 \disjunion \ldots \disjunion \rho_n
 }
 \and
-\inferrule*[lab={\ruleName{pat-as}}]
+\inferrule*[lab={\ruleName{eval-pat-as}}]
 {
   \rho, p, v \matches \rho'
 }
@@ -67,7 +67,7 @@
   \rho, p\;\pyinline{as}\;x, v \matches \rho' \disjunion \set{\bind{x}{v}}
 }
 \and
-\inferrule*[lab={\ruleName{pat-constr}}]
+\inferrule*[lab={\ruleName{eval-pat-constr}}]
 {
   \resolveClass(\rho, q) = C \\
    \\
