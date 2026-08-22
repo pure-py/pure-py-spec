@@ -91,7 +91,7 @@
 \inferrule*[lab={\ruleName{constr}}]
 {
   \Gamma \vdash q : C \\
-  \fields(C) = x_1, \ldots, x_n \cons \seq{x}\,' \\
+  \fields(C) = \replaced{x_1 \cons \ldots \cons x_n}{x_1, \ldots, x_n\ } \cons \seq{x}\,' \\
   \set{\seq{y}} = \set{\seq{x}\,'} \\
   \Gamma \vdash e_i \quad (\forall i)
 }
