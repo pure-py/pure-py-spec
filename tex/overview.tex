@@ -239,16 +239,17 @@ through its existing instances.
 \label{sec:other-restrictions}
 
 A few remaining restrictions do not fit the groups above. \Replaced{A \pyinline{class} definition must be a
-dataclass.}{Only dataclasses are supported, so \pyinline{class} definitions of other kinds are excluded.}
+dataclass, and a dataclass body declares fields and nothing else, so Python's extension hooks are
+unavailable: a class cannot define \pyinline{__getitem__} for subscripting, \pyinline{__iter__} for
+iteration, or \pyinline{__eq__} for equality. Subscripting, iteration, equality and membership therefore have
+the fixed meanings given in \secref{opsem} rather than dispatching to user code, and the metafunctions that
+give those meanings are named after the hooks they stand in for.}{Only dataclasses are supported, so
+\pyinline{class} definitions of other kinds are excluded.}
 
-\Added{Python's extension hooks are also excluded. A class may not define the special methods by which
-Python programs override built-in operations, such as \pyinline{__getitem__} for subscripting,
-\pyinline{__iter__} for iteration, or \pyinline{__eq__} for equality, since a dataclass body declares fields
-and nothing else. Subscripting, iteration, equality and membership therefore have the fixed meanings given in
-\secref{opsem} rather than dispatching to user code, and the metafunctions that give those meanings are named
-after the hooks they stand in for.}
+\subsubsection{Runtime errors}
+\label{sec:runtime-errors}
 
-Complementing the exclusions above, a well-formed \PurePy program avoids the Python runtime errors listed in
+A well-formed \PurePy program avoids the Python runtime errors listed in
 \figref{prevented-errors}, under the conditions noted there. Well-formedness does not prevent errors from
 ill-typed operations, such as wrong operand types, calling a non-function\Added{, calling a function with the
 wrong number of arguments}, or attribute access on an object lacking the attribute. Each of these has an error kind and a rule in the semantics (\figref{eval-fails}).
