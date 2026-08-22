@@ -240,7 +240,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-list-comp}}]
 {
-  \rho, \seq{g} \Rightarrow \val{\rho_1 \ldots \rho_m} \\
+  \rho, \seq{g} \Rightarrow \val{(\rho_1 \cons \ldots \cons \rho_m)} \\
   \rho_i, e \Rightarrow \val{v_i} \quad (\forall i)
 }
 {
@@ -249,7 +249,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-dict-comp}}]
 {
-  \rho, \seq{g} \Rightarrow \val{\rho_1 \ldots \rho_m} \\
+  \rho, \seq{g} \Rightarrow \val{(\rho_1 \cons \ldots \cons \rho_m)} \\
   \rho_i, e \Rightarrow \val{w_i} \quad (\forall i) \\
   \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i)
 }
@@ -520,7 +520,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-list-comp-fail}}]
 {
-  \rho, \seq{g} \Rightarrow \val{\rho_1 \ldots \rho_m} \\
+  \rho, \seq{g} \Rightarrow \val{(\rho_1 \cons \ldots \cons \rho_m)} \\
   \rho_i, e \Rightarrow \val{v_i} \quad (\forall i < j) \\
   \rho_j, e \Rightarrow \fails{\kappa}
 }
@@ -538,7 +538,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-dict-comp-fail-key}}]
 {
-  \rho, \seq{g} \Rightarrow \val{\rho_1 \ldots \rho_m} \\
+  \rho, \seq{g} \Rightarrow \val{(\rho_1 \cons \ldots \cons \rho_m)} \\
   \rho_i, e \Rightarrow \val{w_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
   \rho_j, e \Rightarrow \fails{\kappa}
 }
@@ -548,7 +548,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-dict-comp-fail-value}}]
 {
-  \rho, \seq{g} \Rightarrow \val{\rho_1 \ldots \rho_m} \\
+  \rho, \seq{g} \Rightarrow \val{(\rho_1 \cons \ldots \cons \rho_m)} \\
   \rho_i, e \Rightarrow \val{w_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
   \rho_j, e \Rightarrow \val{w_j} \\
   \rho_j, e' \Rightarrow \fails{\kappa}
@@ -639,7 +639,7 @@
 \inferrule*[lab={\ruleName{eval-qual-generator}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \iterOp(v) = u_1 \ldots u_n \\
+  \iterOp(v) = u_1 \cons \ldots \cons u_n \\
   \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i)
 }
 {
@@ -666,7 +666,7 @@
 \inferrule*[lab={\ruleName{eval-qual-generator-fail-body}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \iterOp(v) = u_1 \ldots u_n \\
+  \iterOp(v) = u_1 \cons \ldots \cons u_n \\
   \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i < j) \\
   \rho \override \set{\bind{x}{u_j}}, \seq{g} \Rightarrow \fails{\kappa}
 }
