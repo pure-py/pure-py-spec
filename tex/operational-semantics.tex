@@ -3,15 +3,15 @@
 
 Values, environments, and evaluation results are given in \figref{values}. For a statement $s$, the result
 $\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the result
-$\returns{v}$ represents \emph{abrupt completion} of $s$ with return value $v$, and $\fails{\kappa}$
-abrupt completion with an error.
+$\returns{v}$ represents \emph{abrupt completion} of $s$ with return value $v$, and $\aborts{\kappa}$
+abrupt completion \Replaced{that abandons the whole run, carrying the kind $\kappa$}{with an error}.
 Composing statements sequentially composes their results according to the following partial monoid, analogous
 to sequential composition of result types:
 {\small
 \begin{align*}
 \assigns{\rho} \override \assigns{\rho'} & = \assigns{(\rho \override \rho')} \\
 \assigns{\rho} \override \returns{v} & = \returns{v} \\
-\assigns{\rho} \override \fails{\kappa} & = \fails{\kappa}
+\assigns{\rho} \override \aborts{\kappa} & = \aborts{\kappa}
 \end{align*}}
 
 with $\assigns{\varnothing}$ as left and right unit.
@@ -39,7 +39,7 @@ imports precede statements, every module a statement can reference is loaded bef
 since loading has no observable effects, reloading a module is unobservable; the semantics therefore needs no
 cache of loaded modules. These rules use the environment $\mathcal{P}(\pyinline{builtins})$ binding the names of
 \figref{predefined}. \Replaced{A run whose main module loads successfully yields the exit status $0$, and one whose main module
-fails yields the error kind rather than a status. An implementation must agree on the kind and terminate the
+aborts yields the kind rather than a status. An implementation must agree on the kind and terminate the
 run with a non-zero status; how it reports the kind is not prescribed, \PurePy having no exceptions of its
 own. The kinds are named after the exceptions the same program raises under Python.}{A program evaluates to
 its exit status: a run whose main module loads successfully yields $0$, and one whose main module fails yields
@@ -52,17 +52,17 @@ the scope of sequential-composition effects, so as black boxes functions are alw
 the outcome of calling it, $\val{\pyinline{None}}$ where the block falls off the end.
 
 Expression evaluation $\rho, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd}) yields an
-outcome, either $\val{v}$ or $\fails{\kappa}$ (\figref{values}). The error kinds are designed to
+outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). The error kinds are designed to
 correspond to the error the same program would raise under Python in the same circumstances. The rules are given in a monadic metalanguage over outcomes, in which
 $\mlet{v}{o}{\ldots}$ binds the value of an outcome; for example, \ruleName{eval-binop} concludes
 $\mlet{v'}{o}{\hat{\odot}(v, v')}$, which is $\hat{\odot}(v, v')$ where $o$ is $\val{v'}$, and
-$\fails{\kappa}$ where $o$ is $\fails{\kappa}$. A final
+$\aborts{\kappa}$ where $o$ is $\aborts{\kappa}$. A final
 premise needs no propagation rule; earlier premises have one each, recording which subexpressions succeeded
 before the failing one was reached (\figref{eval-fails}). The statement, sequence and module judgements use
 outcomes of the same form, carrying a result, a sequence of values or an environment in place of a value.
 
 The strict operators are given by metafunctions $\hat{\odot}$ and $\hat{\ominus}$ (\figref{operators}), which
-have the meanings they have in Python and yield $\fails{\kappa}$ where Python raises. Where one of these is
+have the meanings they have in Python and yield $\aborts{\kappa}$ where Python raises. Where one of these is
 undefined the expression has no derivation, which is where \PurePy declines to give the operation the meaning
 Python gives it; a non-Boolean test is the same case (\secref{no-coercions}, \issue{162}). The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and

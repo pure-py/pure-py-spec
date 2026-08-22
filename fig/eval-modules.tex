@@ -23,10 +23,10 @@
 \inferrule*[lab={\ruleName{eval-imp-submodule-fail}}]
 {
   \bind{x}{\modStub{q'}} \in \rho \\
-  q' \Rightarrow_{\mathsf{load}} \fails{\kappa}
+  q' \Rightarrow_{\mathsf{load}} \aborts{\kappa}
 }
 {
-  \rho, x \importsR \fails{\kappa}
+  \rho, x \importsR \aborts{\kappa}
 }
 \end{mathpar}
 
@@ -61,10 +61,10 @@
 \inferrule*[lab={\ruleName{eval-import-fail}}]
 {
   q' = x \cons \seq{x} \\
-  q' \Rightarrow_{\mathsf{load}} \fails{\kappa}
+  q' \Rightarrow_{\mathsf{load}} \aborts{\kappa}
 }
 {
-   \exImport{q'} \cons \seq{\iota} \Rightarrow \fails{\kappa}
+   \exImport{q'} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-from-import}}]
@@ -80,19 +80,19 @@
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail}}]
 {
-  q' \Rightarrow_{\mathsf{load}} \fails{\kappa}
+  q' \Rightarrow_{\mathsf{load}} \aborts{\kappa}
 }
 {
-   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \fails{\kappa}
+   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail-ancestor}}]
 {
   q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
-  q''\, \Rightarrow_{\mathsf{load}} \fails{\kappa} \quad (\text{some } q''\, \properPrefixOf q',\; q''\, \not\prefixOf q)
+  q''\, \Rightarrow_{\mathsf{load}} \aborts{\kappa} \quad (\text{some } q''\, \properPrefixOf q',\; q''\, \not\prefixOf q)
 }
 {
-   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \fails{\kappa}
+   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail-member}}]
@@ -100,10 +100,10 @@
   q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
   q''\, \Rightarrow_{\mathsf{load}} \val{\rho_{q''\,}} \quad (\forall q''\, \properPrefixOf q',\; q''\, \not\prefixOf q) \\
   \rho, x_i \importsR \val{v_i} \quad (\forall i < j) \\
-  \rho, x_j \importsR \fails{\kappa}
+  \rho, x_j \importsR \aborts{\kappa}
 }
 {
-   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \fails{\kappa}
+   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
 
@@ -163,10 +163,10 @@
 \and
 \inferrule*[lab={\ruleName{eval-statement-fail}}]
 {
-  \rho, s \Rightarrow \fails{\kappa}
+  \rho, s \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, s \cons \seq{s} \Rightarrow \fails{\kappa}
+  \rho, s \cons \seq{s} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-class}}]
@@ -217,10 +217,10 @@
 \inferrule*[lab={\ruleName{load-fail}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
-   \seq{\iota} \Rightarrow \fails{\kappa}
+   \seq{\iota} \Rightarrow \aborts{\kappa}
 }
 {
-  q \Rightarrow_{\mathsf{load}} \fails{\kappa}
+  q \Rightarrow_{\mathsf{load}} \aborts{\kappa}
 }
 \end{mathpar}
 
@@ -237,10 +237,10 @@
 \and
 \inferrule*[lab={\ruleName{eval-program-fail}}]
 {
-  \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{load}} \fails{\kappa}
+  \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{load}} \aborts{\kappa}
 }
 {
-  \mathcal{M} \Rightarrow \replaced{\fails{\kappa}}{1\ }
+  \mathcal{M} \Rightarrow \replaced{\aborts{\kappa}}{1\ }
 }
 \end{mathpar}
 \subcaption{Module loading and program evaluation}

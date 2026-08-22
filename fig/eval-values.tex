@@ -19,13 +19,13 @@ $\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & (Environment
    \\[3mm]
 $r$ & $::=$ & $\assigns{\rho}$ \\
   & $\mid$ & $\returns{v}$ \\
-  & $\mid$ & $\fails{\kappa}$
+  & $\mid$ & $\aborts{\kappa}$
    \\[3mm]
 \added{$\pi$} & \added{$::=$} & \added{$n$} & \added{(ProgramResult)} \\
-    & \added{$\mid$} & \added{$\fails{\kappa}$} &
+    & \added{$\mid$} & \added{$\aborts{\kappa}$} &
    \\[3mm]
 $o$ & $::=$ & $\val{v}$ & (Outcome) \\
-  & $\mid$ & $\fails{\kappa}$
+  & $\mid$ & $\aborts{\kappa}$
    \\[3mm]
 $\kappa$ & $::=$ & $\errType \mid \errIndex \mid \added{\errKey \mid} \errZeroDiv \mid \errAssert \mid \errAttr$ & (Error kind)
 \end{tabular}

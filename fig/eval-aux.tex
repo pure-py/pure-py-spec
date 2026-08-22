@@ -9,15 +9,15 @@
 \added{\iterOp(v)} &{}\added{{}= \elems(v)} && \added{(\text{otherwise})} \\
 \\
 \added{\getitem(\delta, w)} &{}\added{{}= \val{\delta(w)}} && \added{\text{if } w \in \dom(\delta)} \\
-\added{\getitem(\delta, w)} &{}\added{{}= \fails{\errKey}} && \added{\text{if } w \notin \dom(\delta)} \\
+\added{\getitem(\delta, w)} &{}\added{{}= \aborts{\errKey}} && \added{\text{if } w \notin \dom(\delta)} \\
 \added{\getitem(v, n)} &{}\added{{}= \val{v_{n+1}}} && \added{\text{if } \elems(v) = v_1 \cons \ldots \cons v_m \text{ and } 0 \leq n < m} \\
 \added{\getitem(v, n)} &{}\added{{}= \val{v_{m+n+1}}} && \added{\text{if } \elems(v) = v_1 \cons \ldots \cons v_m \text{ and } {-m} \leq n < 0} \\
-\added{\getitem(v, n)} &{}\added{{}= \fails{\errIndex}} && \added{\text{if } \elems(v) = v_1 \cons \ldots \cons v_m \text{ and } (n < -m \text{ or } n \geq m)} \\
-\added{\getitem(v, v')} &{}\added{{}= \fails{\errType}} && \added{(\text{otherwise}; \; v \text{ not a dictionary})} \\
+\added{\getitem(v, n)} &{}\added{{}= \aborts{\errIndex}} && \added{\text{if } \elems(v) = v_1 \cons \ldots \cons v_m \text{ and } (n < -m \text{ or } n \geq m)} \\
+\added{\getitem(v, v')} &{}\added{{}= \aborts{\errType}} && \added{(\text{otherwise}; \; v \text{ not a dictionary})} \\
 \\
 \outcome(\returns{v}) &= \val{v} \\
 \outcome(\assigns{\rho}) &= \val{\pyinline{None}} \\
-\outcome(\fails{\kappa}) &= \fails{\kappa} \\
+\outcome(\aborts{\kappa}) &= \aborts{\kappa} \\
 \\
 \env(\rho, x) &= \rho' && \text{where } \rho(x) = \modLoaded{q'}{\rho'} \\
 \env(\rho, q.x) &= \rho' && \text{where } \env(\rho, q)(x) = \modLoaded{q'}{\rho'} \\
