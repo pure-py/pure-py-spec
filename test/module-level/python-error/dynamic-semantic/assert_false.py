@@ -1,3 +1,4 @@
 # dynamic-semantic: a Boolean assertion that fails. Python raises AssertionError;
-# PurePy should too, unlike assert_falsy, which is a truthiness case.
+# PurePy's eval-assert-false gives fails AssertionError, unlike assert_falsy,
+# which is a truthiness case.
 assert False
