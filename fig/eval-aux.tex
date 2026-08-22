@@ -3,7 +3,7 @@
 \begin{align*}
 \elems(\exList{v_1, \ldots, v_n}) &{}= v_1 \cons \ldots \cons v_n \\
 \elems(\exTuple{v_1, \ldots, v_n}) &{}= v_1 \cons \ldots \cons v_n \\
-\added{\elems(w)} &{}\added{{}= w_1 \cons \ldots \cons w_m} && \added{\text{where } w = w_1 \cons \ldots \cons w_m,\ \text{each } w_i \text{ one character}} \\
+\added{\elems(w)} &{}\added{{}= w_1 \cons \ldots \cons w_m} && \added{\text{where } m \text{ is the length of } w \text{ and } w_i \text{ its } i\text{th character}} \\
 \\
 \added{\iterOp(\delta)} &{}\added{{}= w_1 \cons \ldots \cons w_n} && \added{\text{where } \delta = \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}} \\
 \added{\iterOp(v)} &{}\added{{}= \elems(v)} && \added{(\text{otherwise})} \\
