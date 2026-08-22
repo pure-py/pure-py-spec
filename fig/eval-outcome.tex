@@ -293,25 +293,14 @@
 \flushleft \shadebox{$\rho, e \Rightarrow o$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{eval-subscript}}]
+\added{\inferrule*[lab={\ruleName{eval-subscript}}]
 {
-  \rho, e \Rightarrow \val{v} \quad \elems(v) = v_1 \ldots v_m \\
-  \rho, e' \Rightarrow \val{n} \\
-  0 \leq n < m
+  \rho, e \Rightarrow \val{v} \\
+  \rho, e' \Rightarrow o
 }
 {
-  \rho, \exSubscript{e}{e'} \Rightarrow \val{v_{n+1}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-subscript-neg}}]
-{
-  \rho, e \Rightarrow \val{v} \quad \elems(v) = v_1 \ldots v_m \\
-  \rho, e' \Rightarrow \val{n} \\
-  {-m} \leq n < 0
-}
-{
-  \rho, \exSubscript{e}{e'} \Rightarrow \val{v_{m+n+1}}
-}
+  \rho, \exSubscript{e}{e'} \Rightarrow \mlet{v'}{o}{\getitem(v, v')}
+}}
 \and
 \inferrule*[lab={\ruleName{eval-call-lambda}}]
 {
@@ -478,15 +467,7 @@
 {
   \rho, \exSubscript{e}{e'} \Rightarrow \fails{\kappa}
 }
-\and
-\inferrule*[lab={\ruleName{eval-subscript-fail-index}}]
-{
-  \rho, e \Rightarrow \val{v} \\
-  \rho, e' \Rightarrow \fails{\kappa}
-}
-{
-  \rho, \exSubscript{e}{e'} \Rightarrow \fails{\kappa}
-}
+
 \and
 \inferrule*[lab={\ruleName{eval-call-fail}}]
 {
@@ -583,25 +564,7 @@
 {
   \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \fails{\kappa}
 }
-\and
-\inferrule*[lab={\ruleName{eval-subscript-range}}]
-{
-  \rho, e \Rightarrow \val{v} \quad \elems(v) = v_1 \ldots v_m \\
-  \rho, e' \Rightarrow \val{n} \\
-  n < -m \text{ or } n \geq m
-}
-{
-  \rho, \exSubscript{e}{e'} \Rightarrow \fails{\errIndex}
-}
-\and
-\inferrule*[lab={\ruleName{eval-subscript-nonseq}}]
-{
-  \rho, e \Rightarrow \val{v} \quad \elems(v) \text{ undefined} \\
-  \rho, e' \Rightarrow \val{v'}
-}
-{
-  \rho, \exSubscript{e}{e'} \Rightarrow \fails{\errType}
-}
+
 \and
 \inferrule*[lab={\ruleName{eval-attr-missing}}]
 {
@@ -676,7 +639,7 @@
 \inferrule*[lab={\ruleName{eval-qual-generator}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \elems(v) = u_1 \ldots u_n \\
+  \iterOp(v) = u_1 \ldots u_n \\
   \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i)
 }
 {
@@ -694,7 +657,7 @@
 \inferrule*[lab={\ruleName{eval-qual-generator-nonseq}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \elems(v) \text{ undefined}
+  \iterOp(v) \text{ undefined}
 }
 {
   \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \fails{\errType}
@@ -703,7 +666,7 @@
 \inferrule*[lab={\ruleName{eval-qual-generator-fail-body}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \elems(v) = u_1 \ldots u_n \\
+  \iterOp(v) = u_1 \ldots u_n \\
   \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i < j) \\
   \rho \override \set{\bind{x}{u_j}}, \seq{g} \Rightarrow \fails{\kappa}
 }

@@ -4,6 +4,13 @@
 \elems(\exList{v_1, \ldots, v_n}) &{}= v_1 \ldots v_n \\
 \elems(\exTuple{v_1, \ldots, v_n}) &{}= v_1 \ldots v_n \\
 \\
+\added{\iterOp(v)} &{}\added{{}= \elems(v)} \\
+\\
+\added{\getitem(v, n)} &{}\added{{}= \val{v_{n+1}}} && \added{\text{if } \elems(v) = v_1 \ldots v_m \text{ and } 0 \leq n < m} \\
+\added{\getitem(v, n)} &{}\added{{}= \val{v_{m+n+1}}} && \added{\text{if } \elems(v) = v_1 \ldots v_m \text{ and } {-m} \leq n < 0} \\
+\added{\getitem(v, n)} &{}\added{{}= \fails{\errIndex}} && \added{\text{if } \elems(v) = v_1 \ldots v_m \text{ and } (n < -m \text{ or } n \geq m)} \\
+\added{\getitem(v, v')} &{}\added{{}= \fails{\errType}} && \added{(\text{otherwise})} \\
+\\
 \outcome(\returns{v}) &= \val{v} \\
 \outcome(\assigns{\rho}) &= \val{\pyinline{None}} \\
 \outcome(\fails{\kappa}) &= \fails{\kappa} \\
