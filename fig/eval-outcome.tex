@@ -643,7 +643,7 @@
   \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i)
 }
 {
-  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \val{(\seq{\rho}_1 \cons \ldots \cons \seq{\rho}_n)}
+  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \val{(\seq{\rho}_1 \mathbin{\replaced{\concat}{\cons}} \ldots \mathbin{\replaced{\concat}{\cons}} \seq{\rho}_n)}
 }
 \and
 \inferrule*[lab={\ruleName{eval-qual-generator-fail}}]

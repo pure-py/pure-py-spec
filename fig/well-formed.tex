@@ -80,7 +80,7 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \Gamma \override \statusDefAssigned(\seq{f} \cons \seq{x}_i) \override \statusNotDefAssigned(\assignsS(b_i) \setminus \seq{x}_i) \vdash b_i : R_i \quad (\forall i)
+  \Gamma \override \statusDefAssigned(\seq{f} \mathbin{\replaced{\concat}{\cons}} \seq{x}_i) \override \statusNotDefAssigned(\assignsS(b_i) \setminus \seq{x}_i) \vdash b_i : R_i \quad (\forall i)
   \\
   \seq{f} \text{ distinct}
 }
