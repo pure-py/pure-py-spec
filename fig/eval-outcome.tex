@@ -329,10 +329,10 @@
   d_i = \exDef{f_i}{\seq{x}_i}{b_i} \quad (\forall i) \\
   v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
-  \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, b_j \evalsTo v
+  \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, b_j \evalsTo o
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \val{v}
+  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow o
 }
 \and
 \inferrule*[lab={\ruleName{eval-and-false}}]
@@ -708,7 +708,7 @@
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, b \evalsTo v$}
+\flushleft \shadebox{$\rho, b \evalsTo o$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-value-return}}]
@@ -716,7 +716,7 @@
   \rho, b \Rightarrow \returns{v}
 }
 {
-  \rho, b \evalsTo v
+  \rho, b \evalsTo \val{v}
 }
 \and
 \inferrule*[lab={\ruleName{eval-value-none}}]
@@ -724,9 +724,17 @@
   \rho, b \Rightarrow \assigns{\rho'}
 }
 {
-  \rho, b \evalsTo \pyinline{None}
+  \rho, b \evalsTo \val{\pyinline{None}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-value-fail}}]
+{
+  \rho, b \Rightarrow \fails{\kappa}
+}
+{
+  \rho, b \evalsTo \fails{\kappa}
 }
 \end{mathpar}
-\caption{Block $b$ yields value $v$ under environment $\rho : \Gamma$}
+\caption{Block $b$ yields outcome $o$ under environment $\rho : \Gamma$}
 \label{fig:eval-value}
 \end{figure}

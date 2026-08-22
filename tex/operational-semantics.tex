@@ -46,8 +46,8 @@ exception.
 
 Block evaluation $\rho, b \Rightarrow r$ is given in \figref{eval-block-outcome}. Function definitions delimit
 the scope of sequential-composition effects, so as black boxes functions are always pure. We write
-$\rho, b \evalsTo v$ for the value a block yields, \pyinline{None} where it falls off the end
-(\figref{eval-value}).
+$\rho, b \evalsTo o$ for the outcome a block yields as a value, $\val{\pyinline{None}}$ where it falls off
+the end (\figref{eval-value}).
 
 Expression evaluation $\rho, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd}) yields an
 outcome, either $\val{v}$ or $\fails{\kappa}$ (\figref{values}). The error kinds are designed to
