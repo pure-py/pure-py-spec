@@ -65,7 +65,7 @@
   \rho, e \Rightarrow \val{\pyinline{False}}
 }
 {
-  \rho, \exAssert{e} \Rightarrow \aborts{\errAssert{\added{\pyinline{""}}}}
+  \rho, \exAssert{e} \Rightarrow \aborts{\errAssertNoMsg}
 }
 \and
 \inferrule*[lab={\ruleName{eval-assert-msg-false}}]
@@ -74,7 +74,7 @@
   \added{\rho, e' \Rightarrow o}
 }
 {
-  \rho, \exAssertMsg{e}{e'} \Rightarrow \replaced{\mlet{w}{o}{\aborts{\errAssert{w}}}}{\aborts{\errAssert}\ }
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \replaced{\mlet{w}{o}{\aborts{\errAssert{w}}}}{\aborts{\errAssertNoMsg}\ }
 }
 \and
 \inferrule*[lab={\ruleName{eval-assert-fail}}]
