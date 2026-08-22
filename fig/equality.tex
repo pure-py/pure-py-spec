@@ -1,15 +1,16 @@
 \begin{figure}
 \small
 \begin{align*}
-\eqOp(n, n) &{}= \pyinline{True} && \text{if } n \text{ is not } \pyinline{nan} \\
+\added{\eqOp(\ell, \ell)} &{}\added{{}= \pyinline{True}} && \added{\text{if } \ell \text{ is not } \pyinline{nan}} \\
+\deleted{\eqOp(n, n)} &{}\deleted{{}= \pyinline{True}} && \deleted{\text{if } n \text{ is not } \pyinline{nan}} \\
 \eqOp(n, n') &{}= \pyinline{False} && \text{if } n \neq n' \\
-\eqOp(w, w) &{}= \pyinline{True} \\
+\deleted{\eqOp(w, w)} &{}\deleted{{}= \pyinline{True}} \\
 \eqOp(w, w') &{}= \pyinline{False} && \text{if } w \neq w' \\
-\eqOp(\pyinline{None}, \pyinline{None}) &{}= \pyinline{True} \\
+\deleted{\eqOp(\pyinline{None}, \pyinline{None})} &{}\deleted{{}= \pyinline{True}} \\
 \eqOp(\pyinline{None}, v) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\
 \eqOp(v, \pyinline{None}) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\
-\eqOp(\pyinline{True}, \pyinline{True}) &{}= \pyinline{True} \\
-\eqOp(\pyinline{False}, \pyinline{False}) &{}= \pyinline{True} \\
+\deleted{\eqOp(\pyinline{True}, \pyinline{True})} &{}\deleted{{}= \pyinline{True}} \\
+\deleted{\eqOp(\pyinline{False}, \pyinline{False})} &{}\deleted{{}= \pyinline{True}} \\
 \eqOp(\pyinline{True}, \pyinline{False}) &{}= \pyinline{False} \\
 \eqOp(\pyinline{False}, \pyinline{True}) &{}= \pyinline{False} \\
 \\
