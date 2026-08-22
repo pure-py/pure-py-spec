@@ -584,6 +584,27 @@
   \rho, \exAttr{e}{x} \Rightarrow \fails{\errAttr}
 }
 \and
+\added{\inferrule*[lab={\ruleName{eval-call-lambda-arity}}]
+{
+  \rho, e \Rightarrow \val{\exLamClosure[\Delta]{\rho'}{\seq{x}}{e'}} \\
+  \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
+  \seq{x}, \seq{u} \text{ differ in length}
+}
+{
+  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \fails{\errType}
+}}
+\and
+\added{\inferrule*[lab={\ruleName{eval-call-def-arity}}]
+{
+  \rho, e \Rightarrow \val{\exDefClosure[\Delta]{\rho'}{\seq{d}}{j}} \\
+  d_j = \exDef{f_j}{\seq{x}_j}{b_j} \\
+  \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
+  \seq{x}_j, \seq{u} \text{ differ in length}
+}
+{
+  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \fails{\errType}
+}}
+\and
 \inferrule*[lab={\ruleName{eval-call-nonfun}}]
 {
   \rho, e \Rightarrow \val{v} \\
