@@ -77,6 +77,34 @@
 {
    \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \mlet{\rho^\dagger}{o}{\val{(\set{\bind{x_1}{v_1}, \ldots, \bind{x_{n+1}}{v_{n+1}}} \extend \rho^\dagger)}}
 }
+\and
+\inferrule*[lab={\ruleName{eval-from-import-fail}}]
+{
+  q' \Rightarrow_{\mathsf{load}} \fails{\kappa}
+}
+{
+   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-from-import-fail-ancestor}}]
+{
+  q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
+  q''\, \Rightarrow_{\mathsf{load}} \fails{\kappa} \quad (\text{some } q''\, \properPrefixOf q',\; q''\, \not\prefixOf q)
+}
+{
+   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \fails{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-from-import-fail-member}}]
+{
+  q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
+  q''\, \Rightarrow_{\mathsf{load}} \val{\rho_{q''\,}} \quad (\forall q''\, \properPrefixOf q',\; q''\, \not\prefixOf q) \\
+  \rho, x_i \importsR \val{v_i} \quad (\forall i < j) \\
+  \rho, x_j \importsR \fails{\kappa}
+}
+{
+   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \fails{\kappa}
+}
 \end{mathpar}
 
 \subcaption{Import prefix $\seq{\iota}$ of module $q$ evaluates to outcome $o$}
