@@ -4,10 +4,6 @@
 \elems(\exList{v_1, \ldots, v_n}) &{}= v_1 \ldots v_n \\
 \elems(\exTuple{v_1, \ldots, v_n}) &{}= v_1 \ldots v_n \\
 \\
-\unwrap(\returns{v}) &= \val{v} \\
-\unwrap(\assigns{\rho}) &= \val{\pyinline{None}} \\
-\unwrap(\fails{\kappa}) &= \fails{\kappa} \\
-\\
 \env(\rho, x) &= \rho' && \text{where } \rho(x) = \modLoaded{q'}{\rho'} \\
 \env(\rho, q.x) &= \rho' && \text{where } \env(\rho, q)(x) = \modLoaded{q'}{\rho'} \\
 \\
