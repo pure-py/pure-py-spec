@@ -51,9 +51,10 @@ $\rho, b \evalsTo v$ for the value a block yields, \pyinline{None} where it fall
 
 Expression evaluation $\rho, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd}) yields an
 outcome, either $\val{v}$ or $\fails{\kappa}$ (\figref{values}). The error kinds are designed to
-correspond to the error the same program would raise under Python in the same circumstances. A rule whose result is built from the value of an outcome binds it,
-as \ruleName{eval-binop} does with the conclusion $\mlet{v'}{o}{\hat{\odot}(v, v')}$: this is
-$\hat{\odot}(v, v')$ where $o$ is $\val{v'}$, and $\fails{\kappa}$ where $o$ is $\fails{\kappa}$. A final
+correspond to the error the same program would raise under Python in the same circumstances. Conclusions are written in a monadic metalanguage, with
+$\mlet{v}{o}{\ldots}$ binding the value of an outcome; for example, \ruleName{eval-binop} concludes
+$\mlet{v'}{o}{\hat{\odot}(v, v')}$, which is $\hat{\odot}(v, v')$ where $o$ is $\val{v'}$, and
+$\fails{\kappa}$ where $o$ is $\fails{\kappa}$. A final
 premise needs no propagation rule; earlier premises have one each, recording which subexpressions succeeded
 before the failing one was reached (\figref{eval-fails}). The statement, sequence and module judgements use
 outcomes of the same form, carrying a result, a sequence of values or an environment in place of a value.
