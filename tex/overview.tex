@@ -241,7 +241,7 @@ through its existing instances.
 A few remaining restrictions do not fit the groups above. Only dataclasses are supported, so \pyinline{class}
 definitions of other kinds are excluded.
 
-\Added{Python's extension hooks are excluded with them. A class may not define the special methods by which
+\Added{Python's extension hooks are also excluded. A class may not define the special methods by which
 Python programs override built-in operations, such as \pyinline{__getitem__} for subscripting,
 \pyinline{__iter__} for iteration, or \pyinline{__eq__} for equality, since a dataclass body declares fields
 and nothing else. Subscripting, iteration, equality and membership therefore have the fixed meanings given in
