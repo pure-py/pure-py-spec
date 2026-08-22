@@ -22,12 +22,12 @@
 \eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) &{}= \pyinline{False} && \text{if } \seq{v}, \seq{v}\,' \text{ differ in length} \\
 \eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \pyinline{False} && \text{if } \seq{v}, \seq{v}\,' \text{ differ in length} \\
 \\
-\eqOp(d, d') &{}= \eqEntries(d, d') && \text{if } \dom(d) = \dom(d') \\
-\eqOp(d, d') &{}= \pyinline{False} && \text{if } \dom(d) \neq \dom(d') \\
+\eqOp(\delta, \delta') &{}= \eqEntries(\delta, \delta') && \text{if } \dom(\delta) = \dom(\delta') \\
+\eqOp(\delta, \delta') &{}= \pyinline{False} && \text{if } \dom(\delta) \neq \dom(\delta') \\
 \\
-\eqEntries(\varepsilon, d') &{}= \pyinline{True} \\
-\eqEntries(\bind{w}{v} \cons d, d') &{}= \pyinline{False} && \text{if } \eqOp(v, d'(w)) = \pyinline{False} \\
-\eqEntries(\bind{w}{v} \cons d, d') &{}= \eqEntries(d, d') && \text{if } \eqOp(v, d'(w)) = \pyinline{True} \\
+\eqEntries(\varepsilon, \delta') &{}= \pyinline{True} \\
+\eqEntries(\bind{w}{v} \cons \delta, \delta') &{}= \pyinline{False} && \text{if } \eqOp(v, \delta'(w)) = \pyinline{False} \\
+\eqEntries(\bind{w}{v} \cons \delta, \delta') &{}= \eqEntries(\delta, \delta') && \text{if } \eqOp(v, \delta'(w)) = \pyinline{True} \\
 \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \eqOp(\exTuple{\rho(x_1), \ldots, \rho(x_n)}, \exTuple{\rho'(x_1), \ldots, \rho'(x_n)}) && \text{if } \fields(C) = x_1, \ldots, x_n \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C' \\
