@@ -175,7 +175,7 @@
 \inferrule*[lab={\ruleName{eval-var-builtin}}]
 {
   x \notin \dom(\rho) \\
-  \bind{x}{v} \in \rho_{\pymath{builtins}}
+  \bind{x}{v} \in \mathcal{P}(\pyinline{builtins})
 }
 {
   \rho, x \Rightarrow \val{v}
