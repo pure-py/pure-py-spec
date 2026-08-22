@@ -127,7 +127,7 @@
   \rho \override \rho', b \Rightarrow r
 }
 {
-  \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow r
+  \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow \added{\assigns{\rho'}} \mathbin{\added{\override}} r
 }
 \and
 \inferrule*[lab={\ruleName{eval-match-fail}}]
