@@ -41,17 +41,17 @@ successfully yields $0$ (rule \ruleName{eval-program}).
 
 \input{fig/eval-modules}
 
-Block evaluation $\rho, b \Rightarrow r$ is given in \figref{eval}. Function definitions delimit the scope of
-sequential-composition effects, so as black boxes functions are always pure.
+Block evaluation $\rho, b \Rightarrow r$ is given in \figref{eval-block-outcome}. Function definitions delimit
+the scope of sequential-composition effects, so as black boxes functions are always pure.
 
-\input{fig/eval}
-
-Expression evaluation $\rho, e \Rightarrow v$ is given in \figref{eval-expr}. The strict operators are given by partial metafunctions $\hat{\odot}$ and
-$\hat{\ominus}$, which have the meanings they have in Python. Where one of these is undefined, as
-for division by zero or a subscript out of range, the expression has no derivation. The operators
+Expression evaluation $\rho, e \Rightarrow o$ is given in \figrefTwo{eval-outcome}{eval-outcome-ctd}. The
+strict operators are given by metafunctions $\hat{\odot}$ and $\hat{\ominus}$ (\figref{operators}), which
+have the meanings they have in Python and yield $\fails{\kappa}$ where Python raises. Where one of these is
+undefined the expression has no derivation, which is where \PurePy declines to give the operation the
+meaning Python gives it. The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
-\ruleName{eval-if} does. A comprehension evaluates its body once for each binding its qualifiers produce, and
+\ruleName{eval-if} does. Failures propagate through \figref{eval-fails}. A comprehension evaluates its body once for each binding its qualifiers produce, and
 concatenates the results; a generator draws from a list or a tuple, since \PurePy has no wider
 notion of iteration.
 The pattern-matching judgement $\rho, p, v \matches \rho'$ (\figref{match}) is a deterministic partial
@@ -71,13 +71,12 @@ membership $\memOp$ (\figrefTwo{equality}{membership}). Both are undefined where
 
 \input{fig/match}
 
-Evaluation yields an outcome $o$, either $\val{v}$ or $\fails{\kappa}$, where the error kind $\kappa$ records
-which Python error the failure corresponds to (\figref{values}). Each construct has propagation rules
+Evaluation yields an outcome $o$, either $\val{a}$ or $\fails{\kappa}$, where $a$ is what the judgement
+produces and the error kind $\kappa$ records which Python error the failure corresponds to
+(\figref{values}). Each construct has propagation rules
 recording which subexpressions succeeded before the failing one was reached, and $\rho, b \evalsTo v$ is the
 value a block yields, \pyinline{None} where it falls off the end. Operations \PurePy excludes rather than
 shares with Python, such as a non-Boolean test, get no rule and leave the run stuck (\secref{no-coercions},
 \issue{162}).
-\todo{\figrefTwo{eval-expr}{eval-outcome} now give two accounts of expression evaluation; the former goes
-once the latter is complete (\issue{63}).}
 
 \input{fig/eval-outcome}
