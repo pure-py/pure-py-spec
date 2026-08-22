@@ -359,7 +359,7 @@ returns \pyinline{3} in the case where \pyinline{b} is \pyinline{True}.
 \subsubsection{Function-level scoping of local variables}
 
 In Python, all local variables are scoped to the entire function body, not just from the point of
-assignment onwards. The $\assignsS$ function in the \ruleName{mutual} rule reflects this: all variables
+assignment onwards. The $\assignsS$ function in the \ruleName{def} rule reflects this: all variables
 assigned anywhere in the function body are introduced at $\statusNotDefAssigned$ before the body is checked. This means
 the following program is statically rejected by \PurePy, whereas Python rejects it at runtime with an
 \pyinline{UnboundLocalError}:
@@ -383,7 +383,7 @@ $\Gamma(\pyinline{y}) = \statusNotDefAssigned$ rather than $\Gamma(\pyinline{y})
 \label{sec:captured-vars}
 
 The exclusion of captured-variable reassignment (\secref{no-mutable-state}) is enforced by a side condition
-on the \ruleName{seq} rule: no variable captured by a statement $s$ may be reassigned in the rest of the block
+on the \ruleName{cons} rule: no variable captured by a statement $s$ may be reassigned in the rest of the block
 $b$. In the example of \secref{no-mutable-state}, \pyinline{x} is captured by the definition of
 \pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected. A dataclass declaration counts as
 an assignment of its class name for these definitions, though re-declaring a class name is excluded outright
@@ -399,7 +399,7 @@ x()  # Python: returns the function (late binding); pure: returns 5
 \end{python}
 
 \noindent The side condition on the \ruleName{assign} rule rejects programs like this, requiring that the
-variable being bound is not captured by the expression. The \ruleName{mutual} rule, by contrast, binds
+variable being bound is not captured by the expression. The \ruleName{def} rule, by contrast, binds
 each $f_i$ in the typing context for every body $b_i$, so the function names may legitimately appear in
 $\capturesS$ of those bodies. This is what permits self-recursion (the singleton-region case) and
 mutual recursion within a region.
@@ -407,7 +407,7 @@ mutual recursion within a region.
 \subsubsection{Mutual recursion}
 \label{sec:mutual-recursion}
 
-The \ruleName{mutual} rule binds the names $f_1, \ldots, f_{n+1}$ of a mutual region $d_1 \ldots d_{n+1}$
+The \ruleName{def} rule binds the names $f_1, \ldots, f_{n+1}$ of a mutual region $d_1 \ldots d_{n+1}$
 simultaneously. Each body $b_i$ is checked in a context that includes all the $f_j$ as definitely
 assigned, so any $f_j$ may reference any other $f_k$ within the region (the singleton case $n = 0$
 permits self-recursion). The names in a region must be distinct.
@@ -455,7 +455,7 @@ print(f())
 print(g())
 \end{python}
 
-A region containing two definitions of the same name is rejected directly by the \ruleName{mutual}
+A region containing two definitions of the same name is rejected directly by the \ruleName{def}
 rule's distinct-names side condition:
 
 \begin{python}
