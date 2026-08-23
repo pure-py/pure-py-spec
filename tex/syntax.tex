@@ -157,8 +157,8 @@ definitions that follow, as is the name $q$ of the enclosing module in the rules
 \begin{definition}[Predefined contexts and environments]
 \label{def:predefined}
 $\mathcal{P}$ takes each module $q$ of \figref{predefined} to an environment binding the members listed for
-$q$, together with \pyinline{__name__}, to implementation-defined values. Its context is whatever types that
-environment (\figref{well-formed-env}).
+$q$, together with \pyinline{__name__}, to implementation-defined values. \Replaced{Its context is the $\Gamma$ for
+which $\vdash \mathcal{P}(q) : \Gamma$}{Its context is whatever types that environment} (\figref{well-formed-env}).
 \end{definition}
 
 \begin{figure}
