@@ -6,40 +6,40 @@ from typing import Optional
 import reasons
 from reasons import IllFormedModule
 from contexts import (ClassEntry, Context, ContextEntry, ModuleContext, ModuleLoaded, ModuleStub,
-                      PREDEFINED_MEMBERS, ResultTy, Status, TY_ASSIGNS, TY_RETURNS, TyAssigns,
-                      TyReturns, VarContext, class_of, extend_context, fields_of, merge_results,
+                      PREDEFINED_MEMBERS, ResultTy, Status, ASSIGNS_EMPTY, RETURNS, Assigns,
+                      Returns, VarContext, class_of, extend_context, fields, merge_results,
                       module_of, override_gamma, override_results, override_var, var_status)
 from aux import (BlockElement, assigns_block, assigns_elements, binds, captures, captures_element,
-                 elements_of_block, find_first_reassigning, names_in_target, own_fields_of)
+                 elements_of_block, find_first_reassigning, names_in_target, own_fields)
 from patterns import dict_key, is_catch_all, pattern_vars, subsumes
 
 def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
     base = node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
-    return ClassEntry(context=context, name=f'{q}.{node.name}', fields=tuple(own_fields_of(node)), base=base)
+    return ClassEntry(context=context, name=f'{q}.{node.name}', own_fields=tuple(own_fields(node)), base=base)
 
 def result_type(node: ast.stmt) -> ResultTy:
     if isinstance(node, ast.Pass):
-        return TY_ASSIGNS
+        return ASSIGNS_EMPTY
     if isinstance(node, ast.Assign):
-        return TyAssigns({t.id: Status.TT for t in node.targets if isinstance(t, ast.Name)})
+        return Assigns({t.id: Status.TT for t in node.targets if isinstance(t, ast.Name)})
     if isinstance(node, ast.Expr):
-        return TY_ASSIGNS
+        return ASSIGNS_EMPTY
     if isinstance(node, ast.Assert):
-        return TY_ASSIGNS
+        return ASSIGNS_EMPTY
     if isinstance(node, ast.Return):
-        return TY_RETURNS
+        return RETURNS
     if isinstance(node, ast.FunctionDef):
-        return TyAssigns({node.name: Status.TT})
+        return Assigns({node.name: Status.TT})
     if isinstance(node, ast.If):
         return merge_results([result_type_of_block(node.body),
-                              result_type_of_block(node.orelse) if node.orelse else TY_ASSIGNS])
+                              result_type_of_block(node.orelse) if node.orelse else ASSIGNS_EMPTY])
     if isinstance(node, ast.Match):
-        branches = [override_results(TyAssigns({x: Status.TT for x in binds(case.pattern)}), result_type_of_block(case.body)) for case in node.cases]
+        branches = [override_results(Assigns({x: Status.TT for x in binds(case.pattern)}), result_type_of_block(case.body)) for case in node.cases]
         if not is_catch_all(node.cases[-1].pattern):
-            branches.append(TY_ASSIGNS)
+            branches.append(ASSIGNS_EMPTY)
         return merge_results(branches)
     if isinstance(node, ast.ClassDef):
-        return TY_ASSIGNS
+        return ASSIGNS_EMPTY
     raise AssertionError(f'unexpected statement: {type(node).__name__}')
 
 def result_type_of_block(block: list[ast.stmt]) -> ResultTy:
@@ -58,7 +58,7 @@ def check_elements(items: list[BlockElement], ctx: ModuleContext, module_body: b
     if len(items) == 1:
         return next_ctx_after(head, ctx)
     tail = items[1:]
-    if isinstance(block_element_result_type(head), TyReturns):
+    if isinstance(block_element_result_type(head), Returns):
         first_unreachable = tail[0]
         node: ast.AST = first_unreachable[0] if isinstance(first_unreachable, list) else first_unreachable
         raise IllFormedModule(node, reasons.UnreachableStatement())
@@ -72,7 +72,7 @@ def check_elements(items: list[BlockElement], ctx: ModuleContext, module_body: b
 
 def next_ctx_after(head: BlockElement, ctx: ModuleContext) -> ModuleContext:
     head_result = block_element_result_type(head)
-    delta = head_result.delta if isinstance(head_result, TyAssigns) else {}
+    delta = head_result.delta if isinstance(head_result, Assigns) else {}
     next_ctx = override_var(ctx, delta)
     if isinstance(head, ast.ClassDef):
         next_ctx = override_gamma(next_ctx, {head.name: class_entry_for(head, ctx.q, ctx.gamma)})
@@ -80,7 +80,7 @@ def next_ctx_after(head: BlockElement, ctx: ModuleContext) -> ModuleContext:
 
 def block_element_result_type(item: BlockElement) -> ResultTy:
     if isinstance(item, list):
-        return TyAssigns({d.name: Status.TT for d in item})
+        return Assigns({d.name: Status.TT for d in item})
     return result_type(item)
 
 def check_element(item: BlockElement, ctx: ModuleContext, module_body: bool = False) -> None:
@@ -283,7 +283,7 @@ def qualified_name(e: ast.expr) -> str:
 def names_class(head: ast.expr, ctx: ModuleContext) -> Optional[tuple[str, tuple[str, ...]]]:
     if isinstance(head, ast.Name):
         entry = class_of(ctx, head.id)
-        return (head.id, fields_of(entry)) if entry is not None else None
+        return (head.id, fields(entry)) if entry is not None else None
     if isinstance(head, ast.Attribute):
         parent = entry_of(head.value, ctx)
         if not isinstance(parent, ModuleLoaded):
@@ -291,7 +291,7 @@ def names_class(head: ast.expr, ctx: ModuleContext) -> Optional[tuple[str, tuple
         member = parent.members.get(head.attr)
         if not isinstance(member, ClassEntry):
             return None
-        return head.attr, fields_of(member)
+        return head.attr, fields(member)
     return None
 
 def check_pattern(p: ast.pattern, ctx: ModuleContext) -> None:
@@ -341,7 +341,7 @@ def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: ModuleCo
 def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
     if isinstance(gamma.get(node.name), ClassEntry):
         raise IllFormedModule(node, reasons.DuplicateClassName(node.name, q))
-    names = own_fields_of(node)
+    names = own_fields(node)
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
         raise IllFormedModule(node, reasons.DuplicateFieldName(dup, node.name))
@@ -352,6 +352,6 @@ def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
     entry = gamma.get(base.id)
     if not isinstance(entry, ClassEntry) or entry.name.rsplit('.', 1)[0] != q:
         raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
-    clash = set(names) & set(fields_of(entry))
+    clash = set(names) & set(fields(entry))
     if len(clash) > 0:
         raise IllFormedModule(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))

@@ -7,7 +7,7 @@ from typing import Optional
 import reasons
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
 from contexts import (Context, ContextEntry, ModuleContext, ModuleLoaded, ModuleStub,
-                      PREDEFINED_MEMBERS, PREDEFINED_MODULES, Status, TyReturns, extend_context)
+                      PREDEFINED_MEMBERS, PREDEFINED_MODULES, Status, Returns, extend_context)
 from aux import (annotate_seq_kinds, assigns_block, assigns_stmt, find_import,
                  find_nested_import, split_imports)
 from well_formed import check_block, result_type_of_block
@@ -116,7 +116,7 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     gamma0 = check_imports_prefix(prefix, ModuleContext(gamma={}, M=M, q=q))
     body = [name_assign(q)] + rest
     final_ctx = check_block(body, ModuleContext(gamma=gamma0, M=M, q=q), module_body=True)
-    if rest and isinstance(result_type_of_block(rest), TyReturns):
+    if rest and isinstance(result_type_of_block(rest), Returns):
         raise IllFormedModule(rest[0], reasons.TopLevelReturn())
     check_submodule_clash(m, gamma0, body, M, q)
     return signature(body, final_ctx, q)

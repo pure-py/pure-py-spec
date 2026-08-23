@@ -13,7 +13,7 @@ class Status(Enum):
 class ClassEntry:
     context: Context
     name: str
-    fields: tuple[str, ...]
+    own_fields: tuple[str, ...]
     base: Optional[str]
 
 @dataclass(frozen=True)
@@ -56,18 +56,18 @@ def module_of(ctx: ModuleContext, x: str) -> Optional[Union[ModuleStub, ModuleLo
     return v if isinstance(v, (ModuleStub, ModuleLoaded)) else None
 
 @dataclass(frozen=True)
-class TyReturns:
+class Returns:
     pass
 
 @dataclass(frozen=True)
-class TyAssigns:
+class Assigns:
     delta: VarContext = field(default_factory=dict)
 
-ResultTy = Union[TyReturns, TyAssigns]
+ResultTy = Union[Returns, Assigns]
 
-TY_RETURNS = TyReturns()
+RETURNS = Returns()
 
-TY_ASSIGNS = TyAssigns()
+ASSIGNS_EMPTY = Assigns()
 
 PREDEFINED_MEMBERS: dict[str, set[str]] = {
     'builtins': {'print', 'len', 'range'},
@@ -79,23 +79,23 @@ PREDEFINED_MEMBERS: dict[str, set[str]] = {
 
 PREDEFINED_MODULES = set(PREDEFINED_MEMBERS)
 
-def meet(a: Status, b: Status) -> Status:
+def merge_status(a: Status, b: Status) -> Status:
     if a == Status.TT and b == Status.TT:
         return Status.TT
     return Status.FF
 
 def merge_delta(d1: VarContext, d2: VarContext) -> VarContext:
-    return {k: meet(d1[k], d2[k]) if k in d1 and k in d2 else Status.FF
+    return {k: merge_status(d1[k], d2[k]) if k in d1 and k in d2 else Status.FF
             for k in set(d1.keys()) | set(d2.keys())}
 
 def merge_results(rs: list[ResultTy]) -> ResultTy:
-    assigns_branches = [r for r in rs if isinstance(r, TyAssigns)]
+    assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
-        return TY_RETURNS
+        return RETURNS
     delta = assigns_branches[0].delta
-    return TyAssigns(fold_merge(delta, assigns_branches[1:]))
+    return Assigns(fold_merge(delta, assigns_branches[1:]))
 
-def fold_merge(acc: VarContext, branches: list[TyAssigns]) -> VarContext:
+def fold_merge(acc: VarContext, branches: list[Assigns]) -> VarContext:
     if len(branches) == 0:
         return acc
     return fold_merge(merge_delta(acc, branches[0].delta), branches[1:])
@@ -104,11 +104,11 @@ def override_delta(d1: VarContext, d2: VarContext) -> VarContext:
     return {**d1, **d2}
 
 def override_results(r1: ResultTy, r2: ResultTy) -> ResultTy:
-    if isinstance(r1, TyReturns):
+    if isinstance(r1, Returns):
         return r1
-    if isinstance(r2, TyReturns):
+    if isinstance(r2, Returns):
         return r2
-    return TyAssigns(override_delta(r1.delta, r2.delta))
+    return Assigns(override_delta(r1.delta, r2.delta))
 
 def extend_entry(a: ContextEntry, b: ContextEntry) -> ContextEntry:
     if isinstance(a, ModuleLoaded) and isinstance(b, ModuleLoaded) and a.q == b.q:
@@ -120,9 +120,9 @@ def extend_entry(a: ContextEntry, b: ContextEntry) -> ContextEntry:
 def extend_context(g1: Context, g2: Context) -> Context:
     return {**g1, **{x: extend_entry(g1[x], e) if x in g1 else e for x, e in g2.items()}}
 
-def fields_of(entry: ClassEntry) -> tuple[str, ...]:
+def fields(entry: ClassEntry) -> tuple[str, ...]:
     if entry.base is None:
-        return entry.fields
+        return entry.own_fields
     base_entry = entry.context[entry.base]
     assert isinstance(base_entry, ClassEntry)
-    return fields_of(base_entry) + entry.fields
+    return fields(base_entry) + entry.own_fields

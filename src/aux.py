@@ -285,6 +285,6 @@ def find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST |
                 return r
     return None
 
-def own_fields_of(node: ast.ClassDef) -> list[str]:
+def own_fields(node: ast.ClassDef) -> list[str]:
     return [t.target.id for t in node.body
             if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)]
