@@ -25,8 +25,8 @@ A value is well-formed at a context entry (\figref{well-formed-env}): ordinary v
 $\statusDefAssigned$, module references and class entries at the corresponding entry. An environment is
 well-formed at a context that binds its variables at corresponding entries. \Added{A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a partial map from
-arguments to outcomes (\figref{predefined}). A call to one has outcome $\primFn(\seq{u})$ for arguments $\seq{u}$, and no
-derivation where $\primFn(\seq{u})$ is undefined.}
+arguments to outcomes (\figref{predefined}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has outcome
+$\primFn(\seq{u})$, and no derivation where $\primFn(\seq{u})$ is undefined.}
 
 \input{fig/well-formed-env}
 
