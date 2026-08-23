@@ -27,6 +27,66 @@ well-formed at a context that binds its variables at corresponding entries.
 
 \input{fig/well-formed-env}
 
+The rules are given in a monadic metalanguage over outcomes (\figref{values}), in which
+$\mlet{v}{o}{\ldots}$ binds the value of an outcome; for example, \ruleName{eval-binop} concludes
+$\mlet{v'}{o}{\hat{\odot}(v, v')}$, which is $\hat{\odot}(v, v')$ where $o$ is $\val{v'}$, and
+$\aborts{\kappa}$ where $o$ is $\aborts{\kappa}$. A final
+premise needs no propagation rule; earlier premises have one each, recording which subexpressions succeeded
+before the failing one was reached (\figref{eval-fails}). The statement, sequence and module judgements use
+outcomes of the same form, carrying a result, a sequence of values or an environment in place of a value.
+
+\subsection{Auxiliary definitions}
+
+The strict operators are given by metafunctions $\hat{\odot}$ and $\hat{\ominus}$ (\figref{operators}), in
+terms of structural equality $\eqOp$ and membership $\memOp$ (\figrefTwo{equality}{membership}). They have
+the meanings they have in Python and yield $\aborts{\kappa}$ where Python raises. All three are undefined
+where no case applies, and where one of them is undefined the expression has no derivation, which is where
+\PurePy declines to give the operation the meaning Python gives it; a non-Boolean test is the same case
+(\secref{no-coercions}, \issue{162}).
+
+\input{fig/operators}
+\input{fig/equality}
+\input{fig/membership}
+
+\Added{The remaining metafunctions the rules use are collected in \figref{eval-aux}: $\outcome$ reads a
+block's result as the outcome of calling it, $\iterOp$ gives the sequence a generator draws from, $\getitem$
+interprets subscripting, $\dispatch$ selects the case a $\pyinline{match}$ takes, and $\entries$ and
+$\update$ build a dictionary from its entries.}
+
+\input{fig/eval-aux}
+
+\subsection{Pattern matching}
+
+The pattern-matching judgement $\rho, p, v \matches \rho'$ (\figref{match}) is a deterministic partial
+function; we write $\rho, p, v \notmatches$ (with no right-hand side) for $\nexists \rho'.\, \rho, p, v
+\matches \rho'$, i.e.\ matching is undefined. A constructor pattern matches any object whose class has the
+pattern's class among its ancestors; sub-patterns bind the fields of the pattern's class. An object records
+its class entry, whose qualified name is the identity of the class: since a module declares each class name at
+most once, the entry comparison in \ruleName{eval-pat-constr} amounts to a comparison of qualified names.
+
+\input{fig/match}
+
+\subsection{Blocks and expressions}
+
+Block evaluation $\rho, b \Rightarrow r$\Added{, for any $\rho : \Gamma$ and any $b$ well-formed in $\Gamma$,}
+is given in \figref{eval-block-outcome}. Function definitions delimit
+the scope of sequential-composition effects, so as black boxes functions are always pure. The metafunction $\outcome$ (\figref{eval-aux}) reads a block's result as
+the outcome of calling it, $\val{\pyinline{None}}$ where the block falls off the end.
+
+Expression evaluation $\rho, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd})\Added{, for any $\rho : \Gamma$ and any $e$ well-formed in $\Gamma$,} yields an
+outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). \Replaced{The termination kinds other than $\errExit{n}$ are named after the
+exceptions the same program raises under Python in the same circumstances.}{The error kinds are designed to
+correspond to the error the same program would raise under Python in the same circumstances.} The operators
+\pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
+a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
+\ruleName{eval-if} does. A comprehension evaluates its body once for each binding its qualifiers produce, and
+concatenates the results; a generator draws from $\iterOp$ (\figref{eval-aux}), which is
+\Replaced{defined on lists, tuples, strings and dictionaries, a dictionary yielding its keys as in Python.
+These are the only values a generator can draw from.}{defined on lists and tuples only, since \PurePy has no
+wider notion of iteration.}
+
+\input{fig/eval-outcome}
+
 \subsection{Modules and programs}
 
 Module and program evaluation are given in \figref{eval-modules}; import evaluation in \figref{eval-import-prefix}; importing names from a loaded module in
@@ -51,56 +111,3 @@ its exit status: a run whose main module loads successfully yields $0$, and one 
 $1$, as Python does for an uncaught exception.}
 
 \input{fig/eval-modules}
-
-\subsection{Blocks and expressions}
-
-Block evaluation $\rho, b \Rightarrow r$\Added{, for any $\rho : \Gamma$ and any $b$ well-formed in $\Gamma$,}
-is given in \figref{eval-block-outcome}. Function definitions delimit
-the scope of sequential-composition effects, so as black boxes functions are always pure. The metafunction $\outcome$ (\figref{eval-aux}) reads a block's result as
-the outcome of calling it, $\val{\pyinline{None}}$ where the block falls off the end.
-
-Expression evaluation $\rho, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd})\Added{, for any $\rho : \Gamma$ and any $e$ well-formed in $\Gamma$,} yields an
-outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). \Replaced{The termination kinds other than $\errExit{n}$ are named after the
-exceptions the same program raises under Python in the same circumstances.}{The error kinds are designed to
-correspond to the error the same program would raise under Python in the same circumstances.} The rules are given in a monadic metalanguage over outcomes, in which
-$\mlet{v}{o}{\ldots}$ binds the value of an outcome; for example, \ruleName{eval-binop} concludes
-$\mlet{v'}{o}{\hat{\odot}(v, v')}$, which is $\hat{\odot}(v, v')$ where $o$ is $\val{v'}$, and
-$\aborts{\kappa}$ where $o$ is $\aborts{\kappa}$. A final
-premise needs no propagation rule; earlier premises have one each, recording which subexpressions succeeded
-before the failing one was reached (\figref{eval-fails}). The statement, sequence and module judgements use
-outcomes of the same form, carrying a result, a sequence of values or an environment in place of a value.
-
-\input{fig/eval-aux}
-\input{fig/eval-outcome}
-
-\subsection{Operators and equality}
-
-The strict operators are given by metafunctions $\hat{\odot}$ and $\hat{\ominus}$ (\figref{operators}), which
-have the meanings they have in Python and yield $\aborts{\kappa}$ where Python raises. Where one of these is
-undefined the expression has no derivation, which is where \PurePy declines to give the operation the meaning
-Python gives it; a non-Boolean test is the same case (\secref{no-coercions}, \issue{162}). The operators
-\pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
-a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
-\ruleName{eval-if} does. A comprehension evaluates its body once for each binding its qualifiers produce, and
-concatenates the results; a generator draws from $\iterOp$ (\figref{eval-aux}), which is
-\Replaced{defined on lists, tuples, strings and dictionaries, a dictionary yielding its keys as in Python.
-These are the only values a generator can draw from.}{defined on lists and tuples only, since \PurePy has no
-wider notion of iteration.}
-\input{fig/operators}
-\input{fig/equality}
-\input{fig/membership}
-
-\subsection{Pattern matching}
-
-The pattern-matching judgement $\rho, p, v \matches \rho'$ (\figref{match}) is a deterministic partial
-function; we write $\rho, p, v \notmatches$ (with no right-hand side) for $\nexists \rho'.\, \rho, p, v
-\matches \rho'$, i.e.\ matching is undefined. A constructor pattern matches any object whose class has the
-pattern's class among its ancestors; sub-patterns bind the fields of the pattern's class. An object records
-its class entry, whose qualified name is the identity of the class: since a module declares each class name at
-most once, the entry comparison in \ruleName{eval-pat-constr} amounts to a comparison of qualified names.
-
-\figref{operators} gives the operator meanings, in terms of structural equality $\eqOp$ and
-membership $\memOp$ (\figrefTwo{equality}{membership}). Both are undefined where no case applies, which is where
-\PurePy declines to give a comparison the meaning Python gives it (\secref{no-coercions}).
-
-\input{fig/match}
