@@ -2,6 +2,7 @@
 \small
 \begin{center}
 \begin{tabular}{rcll}
+\grammarGroup{\added{Expressions}} \\
 $e$ & $::=$ & $x$ & (Var) \\
     & $\mid$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exCall{e}{e_1, \ldots, e_n}$ & (Call) \\
@@ -20,15 +21,18 @@ $e$ & $::=$ & $x$ & (Var) \\
     & $\mid$ & $\exDictComp{e}{e'}{g_1\;\ldots\;g_n}$ & (DictComp) \\
     & $\mid$ & $\exLambda{x_1, \ldots, x_n}{e}$ & (Lambda)
    \\[3mm]
+\grammarGroup{\added{Comprehension qualifiers}} \\
 $g$ & $::=$ & $\qualGuard{e}$ & (Guard) \\
     & $\mid$ & $\qualGenerator{x}{e}$ & (Generator)
    \\[3mm]
+\grammarGroup{\added{Literals}} \\
 $\ell$ & $::=$ & $n$ & (Number) \\
     & $\mid$ & $w$ & (String) \\
     & $\mid$ & $\pyinline{True}$ & (True) \\
     & $\mid$ & $\pyinline{False}$ & (False) \\
     & $\mid$ & $\pyinline{None}$ & (None)
    \\[3mm]
+\grammarGroup{\added{Patterns}} \\
 $p$ & $::=$ & $\ell$ & (PatLiteral) \\
     & $\mid$ & $-n$ & (PatNegLit) \\
     & $\mid$ & $x$ & (PatVar) \\

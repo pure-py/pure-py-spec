@@ -2,6 +2,7 @@
 \small
 \begin{center}
 \begin{tabular}{rcll}
+\grammarGroup{\added{Statements}} \\
 $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exAssign{x}{e}$ & (Assign) \\
     & $\mid$ & $e$ & (ExprStmt) \\
@@ -16,18 +17,24 @@ $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exDataclass{c}{\phi}$ & (Dataclass) \\
     & $\mid$ & $\exDataclassExtend{c}{c'}{\phi}$ & (DataclassExtend)
    \\[3mm]
+\grammarGroup{\added{Imports}} \\
 $\iota$ & $::=$ & $\exImport{q}$ & (Import) \\
     & $\mid$ & $\exFromImport{q}{x_1, \ldots, x_{n+1}}$ & (FromImport)
    \\[3mm]
+\grammarGroup{\added{Field lists}} \\
 $\phi$ & $::=$ & $\exField{x_1} \;\ldots\; \exField{x_{n+1}}$ & (FieldList) \\
     & $\mid$ & $\pyinline{pass}$ & (EmptyFieldList)
    \\[3mm]
+\grammarGroup{\added{Blocks}} \\
 $b$ & $::=$ & $s_1 \;\ldots\; s_{n+1}$ & (Block)
    \\[3mm]
+\grammarGroup{\added{Module bodies}} \\
 $t$ & $::=$ & $\iota_1 \;\ldots\; \iota_m \;\; s_1 \;\ldots\; s_n$ & (ModuleBody)
    \\[3mm]
+\grammarGroup{\added{Qualified names}} \\
 $q$ & $::=$ & $x_1.x_2.\cdots.x_{n+1}$ & (Name)
    \\[3mm]
+\grammarGroup{\added{Function definitions}} \\
 $d$ & $::=$ & $\exDef{f}{x_1, \ldots, x_n}{b}$ & (Def)
 \end{tabular}
 \end{center}

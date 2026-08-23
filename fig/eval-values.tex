@@ -2,6 +2,7 @@
 \small
 \begin{center}
 \begin{tabular}{rcll}
+\grammarGroup{\added{Values}} \\
 $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exList{v_1, \ldots, v_n}$ & (List) \\
     & $\mid$ & $\exTuple{v_1, \ldots, v_n}$ & (Tuple) \\
@@ -9,25 +10,31 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exLamClosure[\Gamma]{\rho}{\seq{x}}{e}$ & (LambdaClosure) \\
     & $\mid$ & $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$ & (DefClosure) \\
     & $\mid$ & $\exObj{\Gamma}{C}{\rho}$ & (Object) \\
-    & $\mid$ & $\modStub{q}$ & (Module stub) \\
-    & $\mid$ & $\modLoaded{q}{\rho}$ & (Loaded module) \\
+    & $\mid$ & $\modStub{q}$ & \replaced{(ModuleStub)}{(Module stub)\ } \\
+    & $\mid$ & $\modLoaded{q}{\rho}$ & \replaced{(LoadedModule)}{(Loaded module)\ } \\
     & $\mid$ & $\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}$ & (Class)
    \\[3mm]
-$\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & (Environment)
+\grammarGroup{\added{Environments}} \\
+$\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & \deleted{(Environment)}
    \\[3mm]
-\added{$\delta$} & \added{$::=$} & \added{$\bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}$} & \added{(DictEntries)}
+\grammarGroup{\added{Dictionary entries}} \\
+\added{$\delta$} & \added{$::=$} & \added{$\bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}$} &
    \\[3mm]
-$r$ & $::=$ & $\assigns{\rho}$ \\
-  & $\mid$ & $\returns{v}$ \\
-  & $\mid$ & $\aborts{\kappa}$
+\grammarGroup{\added{Results}} \\
+$r$ & $::=$ & $\assigns{\rho}$ & \added{(Assigns)} \\
+  & $\mid$ & $\returns{v}$ & \added{(Returns)} \\
+  & $\mid$ & $\aborts{\kappa}$ & \added{(Aborts)}
    \\[3mm]
-$o$ & $::=$ & $\val{v}$ & (Outcome) \\
-  & $\mid$ & $\aborts{\kappa}$
+\grammarGroup{\added{Outcomes}} \\
+$o$ & $::=$ & $\val{v}$ & \replaced{(Val)}{(Outcome)\ } \\
+  & $\mid$ & $\aborts{\kappa}$ & \added{(Aborts)}
    \\[3mm]
-\added{$m$} & \added{$::=$} & \added{$\matchOk{\rho}$} & \added{(Match result)} \\
-  & \added{$\mid$} & \added{$\noMatch$} &
+\grammarGroup{\added{Match results}} \\
+\added{$m$} & \added{$::=$} & \added{$\matchOk{\rho}$} & \added{(Match)} \\
+  & \added{$\mid$} & \added{$\noMatch$} & \added{(NoMatch)}
    \\[3mm]
-$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \added{\errKey} \mid \errZeroDiv$ & \replaced{(Termination kind)}{(Error kind)\ } \\
+\grammarGroup{\added{Termination kinds}} \\
+$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \added{\errKey} \mid \errZeroDiv$ & \deleted{(Error kind)} \\
     & $\mid$ & $\added{\errAssertNoMsg} \mid \errAssert{\added{w}} \mid \errAttr \added{{} \mid \errExit{n}}$ &
 \end{tabular}
 \end{center}
