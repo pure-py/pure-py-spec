@@ -2,7 +2,6 @@
 \flushleft \shadebox{$\Gamma, x \importsR \theta$}
 \begin{mathpar}
 \small
-
 \inferrule*[lab={\ruleName{imp-member}}]
 {
   \Gamma \vdash x : \theta
@@ -11,7 +10,6 @@
   \Gamma, x \importsR \theta
 }
 \and
-
 \inferrule*[lab={\ruleName{imp-submodule}}]
 {
   \bind{x}{\modStub{q}} \in \Gamma \\
@@ -39,7 +37,6 @@
   \vdash \varepsilon : \varnothing
 }
 \and
-
 \inferrule*[lab={\ruleName{import}}]
 {
   q' = x \cons \seq{x} \\
@@ -55,14 +52,13 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q' : \Delta \\
-  \vdash_{\mathsf{load}} q''\, : \Delta_{q''\,} \quad (\forall q''\, \properPrefixOf q',\; q''\, \not\prefixOf q) \\
+  \vdash_{\mathsf{load}} q^\dagger : \Delta_{q^\dagger} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q) \\
   \Delta, x_i \importsR \theta_i \quad (\forall i) \\
   \vdash \seq{\iota} : \Gamma
 }
 {
   \vdash \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} : \set{\bind{x_1}{\theta_1}, \ldots, \bind{x_{n+1}}{\theta_{n+1}}} \extend \Gamma
 }
-
 \end{mathpar}
 
 \subcaption{Import prefix $\seq{\iota}$ of module $q$ produces bindings $\Gamma$}
@@ -74,7 +70,6 @@
 \flushleft \shadebox{$q, \theta \loadsAs \theta'$}
 \begin{mathpar}
 \small
-
 \inferrule*[lab={\ruleName{loads-as-simple}}]
 {
   \strut
@@ -83,7 +78,6 @@
   x, \theta \loadsAs \theta
 }
 \and
-
 \inferrule*[lab={\ruleName{loads-as-qualified}}]
 {
   \vdash_{\mathsf{load}} q : \Gamma' \\
@@ -136,7 +130,7 @@
 \inferrule*[lab={\ruleName{class-extend}}]
 {
   \nexists C'.\ \bind{c}{C'} \in \Gamma \\
-  \bind{c'}{\clsEntry{\Delta}{q.c'}{\seq{y}}{c''}} \in \Gamma \\
+  \bind{c'}{\clsEntry{\Gamma'}{q.c'}{\seq{y}}{c^\dagger}} \in \Gamma \\
   \ownFields(\phi) = \seq{x} \text{ distinct} \\
   \seq{x} \cap \fields(\Gamma(c')) = \varnothing \\
   C = \clsEntry{\Gamma}{q.c}{\seq{x}}{c'} \\
@@ -155,27 +149,25 @@
 \flushleft \shadebox{$\vdash_{\mathsf{load}} q : \Gamma$}
 \begin{mathpar}
 \small
-
-
 \inferrule*[lab={\ruleName{predefined}}]
 {
-  q \text{ predefined}
+  \mathcal{P}(q) = (\rho, \Gamma)
 }
 {
-  \vdash_{\mathsf{load}} q : \Gamma_q
+  \vdash_{\mathsf{load}} q : \Gamma
 }
 \and
 \inferrule*[lab={\ruleName{module}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
   \vdash \seq{\iota} : \Gamma \\
-  \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} : \Delta \\
+  \mathcal{P}(\pyinline{builtins}) = (\rho, \Gamma') \\
+  \Gamma' \mathbin{\override} \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} : \Delta \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {
   \vdash_{\mathsf{load}} q : \submods(q) \override \Delta
 }
-
 \end{mathpar}
 
 \flushleft \shadebox{$\vdash \mathcal{M}$}

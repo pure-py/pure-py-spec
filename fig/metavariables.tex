@@ -1,0 +1,49 @@
+\begin{figure}
+\small
+\begin{center}
+\begin{tabular}{rll}
+\metaGroup{Names and literals} \\
+$x$, $f$, $c$ & variable; idiomatically $f$ a function and $c$ a class & \secref{contexts} \\
+$q$ & qualified name of a module or class & \figref{syntax-stmt} \\
+$n$ & number; also a sequence length and an exit status & \figref{syntax-expr} \\
+$w$ & string & \figref{syntax-expr} \\
+$\ell$ & literal & \figref{syntax-expr} \\
+$\odot$, $\ominus$ & binary and unary operator & \figref{precedence}
+   \\[2mm]
+\metaGroup{Syntax} \\
+$e$ & expression & \figref{syntax-expr} \\
+$p$ & pattern & \figref{syntax-expr} \\
+$g$ & comprehension qualifier & \figref{syntax-expr} \\
+$s$ & statement & \figref{syntax-stmt} \\
+$b$ & block & \figref{syntax-stmt} \\
+$d$ & function definition & \figref{syntax-stmt} \\
+$\iota$ & import & \figref{syntax-stmt} \\
+$\phi$ & field list of a dataclass & \figref{syntax-stmt} \\
+$t$ & module body & \figref{syntax-stmt} \\
+$u$ & argument: an expression, a pattern or a value & \secref{syntax}
+   \\[2mm]
+\metaGroup{Programs} \\
+$\mathcal{M}$ & program, a finite map from module names to bodies & \secref{modules-programs} \\
+$\mathcal{P}$ & predefined modules, each with its environment and context & \secref{modules-programs}
+   \\[2mm]
+\metaGroup{Contexts} \\
+$\Gamma$, $\Delta$ & context, a finite map from variables to entries & Definition~\ref{def:context} \\
+$\theta$ & context entry & Definition~\ref{def:context} \\
+$a$ & definite-assignment status, $\statusDefAssigned$ or $\statusNotDefAssigned$ & Definition~\ref{def:context} \\
+$C$ & class entry & Definition~\ref{def:context} \\
+$R$ & result type & \secref{wf-blocks}
+   \\[2mm]
+\metaGroup{Values and results} \\
+$v$ & value & \figref{values} \\
+$\rho$ & environment, a finite map from variables to values & \figref{values} \\
+$\delta$ & dictionary entries & \figref{values} \\
+$r$ & result of statement or block evaluation & \figref{values} \\
+$o$ & outcome of expression evaluation & \figref{values} \\
+$m$ & match result & \figref{values} \\
+$\kappa$ & termination kind & \figref{values} \\
+$\primFn$ & meaning of a primitive, a partial map from a sequence of values to an outcome & \figref{values}
+\end{tabular}
+\end{center}
+\caption{Metavariables used throughout the paper}
+\label{fig:metavariables}
+\end{figure}

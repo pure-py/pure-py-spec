@@ -3,12 +3,12 @@
 
 A reference checker, written in Python over the \pyinline{ast} module, decides well-formedness and
 reports why a program is rejected. This section describes the checker and its correspondence with the
-well-formedness rules of \secref{syntax}.
+well-formedness rules of \secref{well-formedness}.
 
 \subsection{Conformance suite}
 \label{sec:testing}
 
-A conformance test suite pairs each test with the verdict Python itself gives, and runs on CPython, PyPy,
+A conformance test suite pairs each test with the verdict Python itself gives, and runs on CPython, 
 GraalPy, and Pyodide. \todo{Diagram showing the various kinds of test.}
 
 \subsection{Mechanisation in Isabelle}

@@ -7,6 +7,7 @@ Walks the test directories, runs each test through the appropriate steps
 
 import contextlib
 import pathlib
+import re
 import subprocess
 import sys
 from collections.abc import Iterator
@@ -28,27 +29,31 @@ GREEN, RED, RESET = "\033[32m", "\033[31m", "\033[0m"
 EXPECTED = ".expected"
 EXCEPTION_EXPECTED = f".exception{EXPECTED}"
 ERROR_EXPECTED = f".error{EXPECTED}"
+OUTPUT_EXPECTED = f".output{EXPECTED}"
 
 # Tier directory names
 MODULE_LEVEL, PROGRAM_LEVEL = "module-level", "program-level"
 
 # Verdict / stage directory names: a test's path is its specification
 class Verdict(StrEnum):
-    WELL_FORMED = "well-formed"
+    SEMANTICALLY_VALID = "semantically-valid"
     EXCLUDED = "excluded"
     PYTHON_ERROR = "python-error"
 
 class Stage(StrEnum):
     SYNTACTIC = "syntactic"
-    STATIC_SEMANTIC = "static-semantic"
-    DYNAMIC_SEMANTIC = "dynamic-semantic"
+    STATIC = "static"
+    DYNAMIC = "dynamic"
     SYNTACTIC_ONLY = "syntactic-only"
     PENDING = "pending"
 
 HELPERS = "helpers"
 
+RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
+CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
+
 # Checker entry points under src/
-PARSE, CHECK, CHECK_PROGRAM = "parse.py", "check_module.py", "check_program.py"
+PARSE, CHECK, CHECK_PROGRAM = "syntax.py", "check_module.py", "check_program.py"
 
 # Program-level test files (a test is a directory)
 MAIN = "main.py"
@@ -57,8 +62,8 @@ EXPECTED_FILE, EXPECTED_EXIT, EXPECTED_ERROR = "expected", "expected_exit", "exp
 # PurePy exit codes (OK = accepted / ran clean)
 class Exit(IntEnum):
     OK = 0
-    PROHIBITED = 1   # parse.py: prohibited syntactic form
-    NOT_YET = 2      # parse.py: planned, not yet supported
+    PROHIBITED = 1   # syntax.py: prohibited syntactic form
+    NOT_YET = 2      # syntax.py: planned, not yet supported
     ILL_FORMED = 3   # check_module.py: ill-formed
 
 class Phase(StrEnum):
@@ -148,6 +153,9 @@ class Runner:
             self._fail(phase, f"expected {expected} but script succeeded")
         elif expected not in proc.stderr:
             self._fail(phase, f"expected {expected}, got: {proc.stderr.strip()}")
+        output_path = path.with_suffix(OUTPUT_EXPECTED)
+        if output_path.exists() and proc.stdout != output_path.read_text():
+            self._fail(phase, f"output before {expected} mismatch")
 
     def python_evidence(self, path: pathlib.Path, python_accepts: bool, expected_path: pathlib.Path, cwd: Optional[pathlib.Path] = None) -> None:
         """Python must corroborate the verdict: run with the expected output
@@ -185,19 +193,19 @@ class Runner:
     def module_test(self, p: pathlib.Path, module: pathlib.Path) -> None:
         """Assert a module-level test from its path: <verdict>[/<stage>].
 
-        verdict in {well-formed, excluded, python-error} fixes how PurePy and
-        Python must each respond; stage in {syntactic, static-semantic,
-        dynamic-semantic} fixes where PurePy stops (dynamic-semantic = checker
+        verdict in {semantically-valid, excluded, python-error} fixes how PurePy and
+        Python must each respond; stage in {syntactic, static,
+        dynamic} fixes where PurePy stops (dynamic = checker
         accepts, but evaluation is stuck)."""
         rel = p.relative_to(ROOT)
         with self.test(rel):
             dirs = p.parent.relative_to(module).parts
             err = substr(p.with_suffix(ERROR_EXPECTED))
 
-            if dirs == (Verdict.WELL_FORMED, Stage.PENDING):
+            if dirs == (Verdict.SEMANTICALLY_VALID, Stage.PENDING):
                 self.parse(p, Exit.NOT_YET)
                 return
-            if dirs[1:] == (Stage.STATIC_SEMANTIC, Stage.PENDING):
+            if dirs[1:] == (Stage.STATIC, Stage.PENDING):
                 self.parse(p, Exit.OK)
                 self.check(p, Exit.OK)
                 self.python_evidence(p, Verdict(dirs[0]) != Verdict.PYTHON_ERROR,
@@ -210,15 +218,15 @@ class Runner:
             verdict = Verdict(dirs[0])
             stage = Stage(dirs[1]) if len(dirs) > 1 and dirs[1] in {s.value for s in Stage} else None
 
-            if verdict == Verdict.WELL_FORMED:
+            if verdict == Verdict.SEMANTICALLY_VALID:
                 self.parse(p, Exit.OK)
                 self.check(p, Exit.OK)
             elif stage == Stage.SYNTACTIC:
                 self.parse(p, Exit.PROHIBITED, err)
             else:
                 self.parse(p, Exit.OK)
-                self.check(p, Exit.ILL_FORMED if stage == Stage.STATIC_SEMANTIC else Exit.OK,
-                           err if stage == Stage.STATIC_SEMANTIC else None)
+                self.check(p, Exit.ILL_FORMED if stage == Stage.STATIC else Exit.OK,
+                           err if stage == Stage.STATIC else None)
 
             if verdict != Verdict.PYTHON_ERROR and stage == Stage.SYNTACTIC:
                 if p.with_suffix(EXCEPTION_EXPECTED).exists():
@@ -238,6 +246,24 @@ class Runner:
         print(f"{GREEN}✓ {total}/{total} passed{RESET}")
 
 
+def check_rule_citations(r: Runner, base: pathlib.Path) -> None:
+    """Every `# rule: X` in a test must name a rule the spec defines, so a
+    citation cannot outlive the rule it points at."""
+    spec = {m for f in sorted((ROOT / "fig").glob("*.tex"))
+            for m in RULE_NAME.findall(f.read_text(encoding="utf-8"))}
+    stale = []
+    for path in sorted(base.rglob("*.py")):
+        if "__pycache__" in path.parts:
+            continue
+        first = path.read_text(encoding="utf-8").split("\n", 1)[0]
+        cited = CITATION.match(first)
+        if cited is not None and cited.group(1) not in spec:
+            stale.append(f"{path.relative_to(base)} cites {cited.group(1)}")
+    if stale:
+        r.bad("rule citations", "; ".join(stale))
+    else:
+        r.ok("rule citations")
+
 def main() -> None:
     skip_mypy = "--no-mypy" in sys.argv
     if skip_mypy:
@@ -246,6 +272,9 @@ def main() -> None:
     base = ROOT / "test"
     module = base / MODULE_LEVEL
     r = Runner(interpreter)
+
+    print("cross-references")
+    check_rule_citations(r, base)
 
     if not skip_mypy:
         print("mypy --strict src/")

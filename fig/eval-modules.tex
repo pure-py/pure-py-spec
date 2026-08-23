@@ -1,36 +1,42 @@
 \begin{figure}
-\flushleft \shadebox{$\rho, x \importsR v$}
+\flushleft \shadebox{$\rho, x \importsR o$}
 \begin{mathpar}
 \small
-
 \inferrule*[lab={\ruleName{eval-imp-member}}]
 {
   \bind{x}{v} \in \rho \\
   v \neq \modStub{q'} \quad (\forall q')
 }
 {
-  \rho, x \importsR v
+  \rho, x \importsR \val{v}
 }
 \and
-
 \inferrule*[lab={\ruleName{eval-imp-submodule}}]
 {
   \bind{x}{\modStub{q'}} \in \rho \\
-  q' \Rightarrow_{\mathsf{load}} \rho'
+  q' \Rightarrow_{\mathsf{load}} \val{\rho'}
 }
 {
-  \rho, x \importsR \modLoaded{q'}{\rho'}
+  \rho, x \importsR \val{\modLoaded{q'}{\rho'}}
 }
-
+\and
+\inferrule*[lab={\ruleName{eval-imp-submodule-fail}}]
+{
+  \bind{x}{\modStub{q'}} \in \rho \\
+  q' \Rightarrow_{\mathsf{load}} \aborts{\kappa}
+}
+{
+  \rho, x \importsR \aborts{\kappa}
+}
 \end{mathpar}
 
-\caption{Name $x$ imported from module environment $\rho$ has value $v$}
+\caption{Name $x$ imported from module environment $\rho$ has outcome $o$}
 \label{fig:eval-imports}
 \end{figure}
 
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\seq{\iota} \Rightarrow \rho$}
+\flushleft \shadebox{$\seq{\iota} \Rightarrow o$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-imports-nil}}]
@@ -38,35 +44,70 @@
   \strut
 }
 {
-   \varepsilon \Rightarrow \varnothing
+   \varepsilon \Rightarrow \val{\varnothing}
 }
 \and
-
 \inferrule*[lab={\ruleName{eval-import}}]
 {
   q' = x \cons \seq{x} \\
-  q' \Rightarrow_{\mathsf{load}} \rho \\
+  q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
   q', \modLoaded{q'}{\rho} \loadsAs v \\
-   \seq{\iota} \Rightarrow \rho'
+   \seq{\iota} \Rightarrow o
 }
 {
-   \exImport{q'} \cons \seq{\iota} \Rightarrow \set{\bind{x}{v}} \extend \rho'
+   \exImport{q'} \cons \seq{\iota} \Rightarrow \mlet{\rho'}{o}{\val{(\set{\bind{x}{v}} \extend \rho')}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-import-fail}}]
+{
+  q' = x \cons \seq{x} \\
+  q' \Rightarrow_{\mathsf{load}} \aborts{\kappa}
+}
+{
+   \exImport{q'} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-from-import}}]
 {
-  q' \Rightarrow_{\mathsf{load}} \rho \\
-  q''\, \Rightarrow_{\mathsf{load}} \rho_{q''\,} \quad (\forall q''\, \properPrefixOf q',\; q''\, \not\prefixOf q) \\
-  \rho, x_i \importsR v_i \quad (\forall i) \\
-   \seq{\iota} \Rightarrow \rho''
+  q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
+  q^\dagger \Rightarrow_{\mathsf{load}} \val{\rho_{q^\dagger}} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q) \\
+  \rho, x_i \importsR \val{v_i} \quad (\forall i) \\
+   \seq{\iota} \Rightarrow o
 }
 {
-   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \set{\bind{x_1}{v_1}, \ldots, \bind{x_{n+1}}{v_{n+1}}} \extend \rho''
+   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \mlet{\rho^\dagger}{o}{\val{(\set{\bind{x_1}{v_1}, \ldots, \bind{x_{n+1}}{v_{n+1}}} \extend \rho^\dagger)}}
 }
-
+\and
+\inferrule*[lab={\ruleName{eval-from-import-fail}}]
+{
+  q' \Rightarrow_{\mathsf{load}} \aborts{\kappa}
+}
+{
+   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-from-import-fail-ancestor}}]
+{
+  q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
+  q^\dagger \Rightarrow_{\mathsf{load}} \aborts{\kappa} \quad (\text{some } q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q)
+}
+{
+   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-from-import-fail-member}}]
+{
+  q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
+  q^\dagger \Rightarrow_{\mathsf{load}} \val{\rho_{q^\dagger}} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q) \\
+  \rho, x_i \importsR \val{v_i} \quad (\forall i < j) \\
+  \rho, x_j \importsR \aborts{\kappa}
+}
+{
+   \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
+}
 \end{mathpar}
 
-\subcaption{Import prefix $\seq{\iota}$ of module $q$ produces bindings $\rho$}
+\subcaption{Import prefix $\seq{\iota}$ of module $q$ evaluates to outcome $o$}
 \end{subfigure}
 
 \vspace{2mm}
@@ -75,7 +116,6 @@
 \flushleft \shadebox{$q, v \loadsAs v'$}
 \begin{mathpar}
 \small
-
 \inferrule*[lab={\ruleName{eval-loads-as-simple}}]
 {
   \strut
@@ -84,10 +124,9 @@
   x, v \loadsAs v
 }
 \and
-
 \inferrule*[lab={\ruleName{eval-loads-as-qualified}}]
 {
-  q \Rightarrow_{\mathsf{load}} \rho \\
+  q \Rightarrow_{\mathsf{load}} \val{\rho} \\
   q, \modLoaded{q}{\rho \extend \set{\bind{x}{v}}} \loadsAs v'
 }
 {
@@ -102,7 +141,7 @@
 
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\rho, \seq{s} \Rightarrow \rho'$}
+\flushleft \shadebox{$\rho, \seq{s} \Rightarrow o$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-nil}}]
@@ -110,76 +149,99 @@
   \strut
 }
 {
-  \rho, \varepsilon \Rightarrow \varnothing
+  \rho, \varepsilon \Rightarrow \val{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{eval-statement}}]
 {
   \rho, s \Rightarrow \assigns{\rho'} \\
-  \rho \override \rho', \seq{s} \Rightarrow \rho''
+  \rho \override \rho', \seq{s} \Rightarrow o
 }
 {
-  \rho, s \cons \seq{s} \Rightarrow \rho' \override \rho''
+  \rho, s \cons \seq{s} \Rightarrow \mlet{\rho^\dagger}{o}{\val{(\rho' \override \rho^\dagger)}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-statement-fail}}]
+{
+  \rho, s \Rightarrow \aborts{\kappa}
+}
+{
+  \rho, s \cons \seq{s} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-class}}]
 {
   C = \clsEntry{\Gamma}{q.c}{\ownFields(\phi)}{\bot} \\
-  \rho \override \set{\bind{c}{C}}, \seq{s} \Rightarrow \rho'
+  \rho \override \set{\bind{c}{C}}, \seq{s} \Rightarrow o
 }
 {
-  \rho, \exDataclass{c}{\phi} \cons \seq{s} \Rightarrow \set{\bind{c}{C}} \override \rho'
+  \rho, \exDataclass{c}{\phi} \cons \seq{s} \Rightarrow \mlet{\rho'}{o}{\val{(\set{\bind{c}{C}} \override \rho')}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-class-extend}}]
 {
   C = \clsEntry{\Gamma}{q.c}{\ownFields(\phi)}{c'} \\
-  \rho \override \set{\bind{c}{C}}, \seq{s} \Rightarrow \rho'
+  \rho \override \set{\bind{c}{C}}, \seq{s} \Rightarrow o
 }
 {
-  \rho, \exDataclassExtend{c}{c'}{\phi} \cons \seq{s} \Rightarrow \set{\bind{c}{C}} \override \rho'
+  \rho, \exDataclassExtend{c}{c'}{\phi} \cons \seq{s} \Rightarrow \mlet{\rho'}{o}{\val{(\set{\bind{c}{C}} \override \rho')}}
 }
 \end{mathpar}
-\subcaption{Statements $\seq{s}$ of module $q$ evaluate under environment $\rho : \Gamma$, producing bindings $\rho'$}
+\subcaption{Statements $\seq{s}$ of module $q$ evaluate under environment $\rho : \Gamma$ to outcome $o$}
 \end{subfigure}
 
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$q \Rightarrow_{\mathsf{load}} \rho$}
+\flushleft \shadebox{$q \Rightarrow_{\mathsf{load}} o$}
 \begin{mathpar}
 \small
-
-
 \inferrule*[lab={\ruleName{eval-predefined}}]
 {
-  q \text{ predefined}
+  \mathcal{P}(q) = (\rho, \Gamma)
 }
 {
-  q \Rightarrow_{\mathsf{load}} \rho_q
+  q \Rightarrow_{\mathsf{load}} \val{\rho}
 }
 \and
-\inferrule*[lab={\ruleName{load}}]
+\inferrule*[lab={\ruleName{eval-module}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
-   \seq{\iota} \Rightarrow \rho \\
-  \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} \Rightarrow \rho'
+   \seq{\iota} \Rightarrow \val{\rho} \\
+  \mathcal{P}(\pyinline{builtins}) = (\rho', \Gamma') \\
+  \rho' \mathbin{\override} \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} \Rightarrow o
 }
 {
-  q \Rightarrow_{\mathsf{load}} \submods(q) \override \rho'
+  q \Rightarrow_{\mathsf{load}} \mlet{\rho^\dagger}{o}{\val{(\submods(q) \override \rho^\dagger)}}
 }
-
+\and
+\inferrule*[lab={\ruleName{eval-module-fail}}]
+{
+  \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
+   \seq{\iota} \Rightarrow \aborts{\kappa}
+}
+{
+  q \Rightarrow_{\mathsf{load}} \aborts{\kappa}
+}
 \end{mathpar}
 
-\flushleft \shadebox{$\mathcal{M} \Rightarrow n$}
+\flushleft \shadebox{$\mathcal{M} \Rightarrow \kappa$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-program}}]
 {
-  \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{load}} \rho
+  \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{load}} \val{\rho}
 }
 {
-  \mathcal{M} \Rightarrow 0
+  \mathcal{M} \Rightarrow \errExit{0}
+}
+\and
+\inferrule*[lab={\ruleName{eval-program-abort}}]
+{
+  \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{load}} \aborts{\kappa}
+}
+{
+  \mathcal{M} \Rightarrow \kappa
 }
 \end{mathpar}
 \subcaption{Module loading and program evaluation}

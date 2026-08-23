@@ -26,6 +26,15 @@
   \vdash \exTuple{v_1, \ldots, v_n} : \statusDefAssigned
 }
 \and
+\inferrule*[lab={\ruleName{val-dict}}]
+{
+  \vdash v_i : \statusDefAssigned \quad (\forall i) \\
+  w_1, \ldots, w_n \text{ distinct}
+}
+{
+  \vdash \exDict{\bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}} : \statusDefAssigned
+}
+\and
 \inferrule*[lab={\ruleName{val-lambda}}]
 {
   \vdash \rho : \Gamma \\
@@ -38,7 +47,7 @@
 \inferrule*[lab={\ruleName{val-def}}]
 {
   \vdash \rho : \Gamma \\
-  \Gamma \override \statusDefAssigned(\seq{f} \cons \seq{x}_j) \override \statusNotDefAssigned(\assignsS(b_j) \setminus \seq{x}_j) \vdash b_j : R_j \quad (\forall j) \\
+  \Gamma \override \statusDefAssigned(\seq{f} \mathbin{\concat} \seq{x}_j) \override \statusNotDefAssigned(\assignsS(b_j) \setminus \seq{x}_j) \vdash b_j : R_j \quad (\forall j) \\
   \seq{f} \text{ distinct}
 }
 {
@@ -54,9 +63,17 @@
   \vdash \exObj{\Gamma}{C}{\rho} : \statusDefAssigned
 }
 \and
+\inferrule*[lab={\ruleName{val-prim}}]
+{
+  \strut
+}
+{
+  \vdash \primVal{\primFn} : \statusDefAssigned
+}
+\and
 \inferrule*[lab={\ruleName{val-mod}}]
 {
-  q \in \dom(\mathcal{M})
+  q \in \dom(\mathcal{M}) \cup \dom(\mathcal{P})
 }
 {
   \vdash \modStub{q} : \modStub{q}

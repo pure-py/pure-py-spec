@@ -7,6 +7,8 @@
 
 % acmart loads amsmath, amssymb, amsthm, microtype, xcolor, hyperref, natbib, enumitem.
 \usepackage{array}
+\usepackage{colortbl}
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
 \usepackage{mathpartir}
 \usepackage{listings}
 \usepackage{subcaption}
@@ -23,6 +25,7 @@
 \input{tex/macros}
 \input{tex/listings}
 
+\newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 \newtheorem{definition}{Definition}
 
@@ -97,7 +100,7 @@ transparent, reproducible, and easy to reason about, yet remain ordinary Python.
 program is valid Python, and where \PurePy gives a run a result, Python gives the same one, so the same source
 runs under a standard Python interpreter and under any conforming implementation. This paper specifies \PurePy as a versioned standard, with a
 formal grammar, well-formedness rules based on a definite-assignment analysis, and an operational semantics
-that agrees with Python on every run it defines. A reference checker decides well-formedness, and a conformance test suite is exercised on CPython, PyPy, GraalPy, and Pyodide. Aimed first at researchers in programming languages and pedagogy, \PurePy
+that agrees with Python on every run it defines. A reference checker decides well-formedness, and a conformance test suite is exercised on CPython, GraalPy, and Pyodide. Aimed first at researchers in programming languages and pedagogy, \PurePy
 is intended to grow into a common language for scientific computing, supporting portable applications in
 modelling, data processing, analysis, and visualisation.
 \end{abstract}
@@ -107,6 +110,7 @@ modelling, data processing, analysis, and visualisation.
 \input{tex/introduction}
 \input{tex/overview}
 \input{tex/syntax}
+\input{tex/well-formedness}
 \input{tex/operational-semantics}
 \input{tex/reference-implementation}
 \input{tex/extensions}
@@ -117,11 +121,5 @@ modelling, data processing, analysis, and visualisation.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{tex/refs,tex/additional-refs}
-
-\ifdefined\appendixmode
-\appendix
-\input{tex/appendix-aux}
-\input{tex/appendix-open-terms}
-\fi
 
 \end{document}

@@ -54,14 +54,7 @@
   \Gamma \vdash x
 }
 \and
-\inferrule*[lab={\ruleName{var-builtin}}]
-{
-  x \notin \dom(\Gamma) \\
-  \bind{x}{\statusDefAssigned} \in \Gamma_{\pymath{builtins}}
-}
-{
-  \Gamma \vdash x
-}
+
 \and
 \inferrule*[lab={\ruleName{literal}}]
 {
@@ -91,12 +84,12 @@
 \inferrule*[lab={\ruleName{constr}}]
 {
   \Gamma \vdash q : C \\
-  \fields(C) = x_1, \ldots, x_n \mathbin{\cdot} \seq{x}\,' \\
-  \set{\seq{y}} = \set{\seq{x}\,'} \\
-  \Gamma \vdash e_i \quad (\forall i)
+   \\
+   \\
+  \Gamma \vdash \fieldMap(C, \seq{e})(x) \quad (\forall x \in \fields(C))
 }
 {
-  \Gamma \vdash \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}}
+  \Gamma \vdash \exConstr{q}{\seq{e}}
 }
 \and
 \inferrule*[lab={\ruleName{attr-module}}]

@@ -18,7 +18,7 @@ both want.
 This paper defines \PurePy as a versioned formal standard\footnote{This paper describes version
 \versionstring{} of the standard.}: a formal grammar, well-formedness rules based on a
 definite-assignment analysis, and an operational semantics that agrees with Python on every run it defines. A reference checker decides well-formedness, and a conformance test suite exercises the
-standard against CPython, PyPy, GraalPy, and Pyodide. The guarantee is precise: well-formedness is decidable, and
+standard against CPython,  GraalPy, and Pyodide. The guarantee is precise: well-formedness is decidable, and
 \PurePy either gives a run Python's result or gives it no result at all.
 
 The design is deliberately conservative. Rather than reconstruct Python's full behaviour, \PurePy chooses a
@@ -38,10 +38,10 @@ After setting out the problem \PurePy addresses in \secref{overview}, we make th
 contributions:
 \begin{itemize}
 \item a definition of \PurePy as a versioned standard, with a formal grammar and well-formedness rules based on
-a definite-assignment analysis (\secref{syntax}) and an operational semantics that agrees with Python on
+a definite-assignment analysis (\secref{well-formedness}) and an operational semantics that agrees with Python on
 every run it defines (\secref{opsem});
 \item a reference checker that decides well-formedness, validated by a conformance test suite
-exercised on CPython, PyPy, GraalPy, and Pyodide (\secref{reference-impl});
+exercised on CPython,  GraalPy, and Pyodide (\secref{reference-impl});
 \item conservative extensions to the core language, including partial application and piecewise function
 definitions (\secref{extensions});
 \item case studies that use \PurePy as a common functional language (\secref{case-studies});

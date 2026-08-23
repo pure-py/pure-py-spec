@@ -19,12 +19,6 @@
 \else
   \newcommand*{\issue}[1]{\href{https://github.com/pure-py/pure-py-spec/issues/#1}{\##1}}
 \fi
-% The appendix is part of the full build only.
-\ifdefined\appendixmode
-  \newcommand*{\appendixref}[1]{Appendix~\ref{#1}}
-\else
-  \newcommand*{\appendixref}[1]{the appendix of the full version}
-\fi
 \newcommand*{\figref}[1]{Figure~\ref{fig:#1}}
 \newcommand*{\figrefTwo}[2]{Figures \ref{fig:#1} and \ref{fig:#2}}
 \newcommand*{\secref}[1]{\S\ref{sec:#1}}
@@ -38,6 +32,7 @@
 % General notation
 \newcommand*{\B}{\mathbb{B}}
 \newcommand*{\bind}[2]{#1\mathord{:}\,#2}
+\newcommand*{\concat}{\mathbin{{+}\mkern-3mu{+}}}
 \newcommand*{\cons}{\cdot}
 \newcommand*{\dom}{\mathrm{dom}}
 \newcommand*{\seq}[1]{\vec{#1}}
@@ -101,6 +96,8 @@
 % Context entries
 \newcommand*{\clsEntry}[4]{\mathsf{Cls}_{#1}(#2, #3, #4)}
 \newcommand*{\modLoaded}[2]{\mathsf{Mod}(#1, #2)}
+\newcommand*{\primFn}{\mathpzc{f}}
+\newcommand*{\primVal}[1]{\mathsf{Prim}(#1)}
 \newcommand*{\modStub}[1]{\mathsf{Mod}(#1)}
 \newcommand*{\statusDefAssigned}{\mathsf{tt}}
 \newcommand*{\statusNotDefAssigned}{\mathsf{ff}}
@@ -110,7 +107,20 @@
 \newcommand*{\extend}{\lhd}
 \newcommand*{\meet}{\wedge}
 \newcommand*{\merge}{\oplus}
-\newcommand*{\override}{\cdot}
+\newcommand*{\override}{\otimes}
+
+% Outcomes (draft, \secref{errors})
+\newcommand*{\aborts}[1]{\mathsf{aborts}\;#1}
+\newcommand*{\mlet}[3]{\mathsf{let}\;#1 \leftarrow #2\;\mathsf{in}\;#3}
+\newcommand*{\val}[1]{\mathsf{val}\;#1}
+\newcommand*{\errAssertNoMsg}{\mathsf{AssertionError}}
+\newcommand*{\errAssert}[1]{\errAssertNoMsg(#1)}
+\newcommand*{\errAttr}{\mathsf{AttributeError}}
+\newcommand*{\errExit}[1]{\mathsf{SystemExit}(#1)}
+\newcommand*{\errIndex}{\mathsf{IndexError}}
+\newcommand*{\errKey}{\mathsf{KeyError}}
+\newcommand*{\errType}{\mathsf{TypeError}}
+\newcommand*{\errZeroDiv}{\mathsf{ZeroDivisionError}}
 
 % Result types and results
 \newcommand*{\Assigns}[1]{\mathsf{Assigns}\;#1}
@@ -129,6 +139,7 @@
 % Metafunctions: classes
 \newcommand*{\ancestors}{\mathrm{ancestors}}
 \newcommand*{\fields}{\mathrm{fields}}
+\newcommand*{\fieldMap}{\mathrm{field\text{-}map}}
 \newcommand*{\ownFields}{\mathrm{own\text{-}fields}}
 \newcommand*{\resolveClass}{\mathrm{resolve\text{-}class}}
 
@@ -138,6 +149,8 @@
 
 % Metafunctions: lists, tuples, and dictionaries
 \newcommand*{\elems}{\mathrm{elems}}
+\newcommand*{\iterOp}{\mathrm{iter}}
+\newcommand*{\getitem}{\mathrm{getitem}}
 \newcommand*{\entries}{\mathrm{entries}}
 \newcommand*{\update}{\mathrm{update}}
 
@@ -148,14 +161,16 @@
 
 % Metafunctions: evaluation
 \newcommand*{\dispatch}{\mathrm{dispatch}}
+\newcommand*{\outcome}{\mathrm{outcome}}
 \newcommand*{\env}{\mathrm{env}}
-\newcommand*{\unwrap}{\mathrm{unwrap}}
 
 % Orders, relations, and judgement symbols
 \newcommand{\carrow}[1]{\xrightarrow{\; #1\; }}
 \newcommand*{\importsR}{\mathrel{\mathsf{imports}}}
 \newcommand*{\loadsAs}{\mathrel{\mathsf{loads\mbox{-}as}}}
 \newcommand*{\matches}{\rightsquigarrow}
+\newcommand*{\matchOk}[1]{\mathsf{match}\;#1}
+\newcommand*{\noMatch}{\mathsf{no}\text{-}\mathsf{match}}
 \newcommand*{\notmatches}{\not\rightsquigarrow}
 \newcommand*{\prefixOf}{\preceq}
 \newcommand*{\properPrefixOf}{\prec}
@@ -164,3 +179,8 @@
 % Change markup (own copy of the shared change-tracking definitions; changebar loaded in the
 % preamble).
 \input{tex/change-tracking}
+
+% Grammar figures: shaded heading row naming the syntactic category
+\definecolor{grammarheadcolor}{gray}{0.93}
+\newcommand*{\grammarGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{4}{l}{#1}}
+\newcommand*{\metaGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{#1}}

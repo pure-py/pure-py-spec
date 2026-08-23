@@ -1,6 +1,13 @@
 from __future__ import annotations
 
 import ast
+from typing import Optional
+
+import reasons
+from reasons import IllFormedModule
+from contexts import (ModuleContext, ancestors, class_entry, field_map, fields,
+                      short_name)
+from aux import binds_seq, qualified_name
 
 def is_catch_all(p: ast.pattern) -> bool:
     return isinstance(p, ast.MatchAs) and p.pattern is None
@@ -19,11 +26,11 @@ def dict_key(k: ast.expr) -> str:
     assert isinstance(k, ast.Constant) and isinstance(k.value, str)
     return k.value
 
-def subsumes(p: ast.pattern, q: ast.pattern) -> bool:
+def subsumes(p: ast.pattern, q: ast.pattern, ctx: ModuleContext) -> bool:
     if isinstance(q, ast.MatchAs) and q.pattern is not None:
-        return subsumes(p, q.pattern)
+        return subsumes(p, q.pattern, ctx)
     if isinstance(p, ast.MatchAs) and p.pattern is not None:
-        return subsumes(p.pattern, q)
+        return subsumes(p.pattern, q, ctx)
     if isinstance(q, ast.MatchAs) and q.pattern is None:
         return True
     if isinstance(p, ast.MatchValue) and isinstance(q, ast.MatchValue):
@@ -35,26 +42,64 @@ def subsumes(p: ast.pattern, q: ast.pattern) -> bool:
         q_keys = {dict_key(k): sub for k, sub in zip(q.keys, q.patterns)}
         if not set(q_keys) <= set(p_keys):
             return False
-        return all(subsumes(p_keys[k], sub) for k, sub in q_keys.items())
+        return all(subsumes(p_keys[k], sub, ctx) for k, sub in q_keys.items())
     if isinstance(p, ast.MatchSequence) and isinstance(q, ast.MatchSequence):
         if bool(getattr(p, 'is_list_pattern', False)) != bool(getattr(q, 'is_list_pattern', False)):
             return False
         if len(p.patterns) != len(q.patterns):
             return False
-        return all((subsumes(pi, qi) for pi, qi in zip(p.patterns, q.patterns)))
+        return all(subsumes(pi, qi, ctx) for pi, qi in zip(p.patterns, q.patterns))
+    if isinstance(p, ast.MatchClass) and isinstance(q, ast.MatchClass):
+        c_p, c_q = class_entry(p.cls, ctx), class_entry(q.cls, ctx)
+        if c_p is None or c_q is None:
+            return False
+        if not any(a.name == c_q.name for a in ancestors(c_p)):
+            return False
+        map_p = field_map(c_p, p.patterns, p.kwd_attrs, p.kwd_patterns)
+        map_q = field_map(c_q, q.patterns, q.kwd_attrs, q.kwd_patterns)
+        if map_p is None or map_q is None:
+            return False
+        return all(subsumes(map_p[x], map_q[x], ctx) for x in fields(c_q))
     return False
 
-def pattern_vars(p: ast.pattern) -> list[str]:
-    if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
-        return []
-    if isinstance(p, ast.MatchAs):
-        sub = pattern_vars(p.pattern) if p.pattern is not None else []
-        return sub + ([p.name] if p.name else [])
-    if isinstance(p, ast.MatchSequence):
-        return [v for sub in p.patterns for v in pattern_vars(sub)]
+def check_pattern(p: ast.pattern, ctx: ModuleContext) -> None:
     if isinstance(p, ast.MatchClass):
-        return [v for sub in p.patterns for v in pattern_vars(sub)] + \
-               [v for sub in p.kwd_patterns for v in pattern_vars(sub)]
+        entry = class_entry(p.cls, ctx)
+        if entry is None:
+            raise IllFormedModule(p, reasons.UnknownClassInPattern(qualified_name(p.cls) if isinstance(p.cls, (ast.Name, ast.Attribute)) else ast.unparse(p.cls)))
+        c_name, xs = short_name(entry), fields(entry)
+        if field_map(entry, p.patterns, p.kwd_attrs, p.kwd_patterns) is None:
+            n = len(p.patterns)
+            if n + len(p.kwd_attrs) != len(xs):
+                raise IllFormedModule(p, reasons.PatternArityMismatch(c_name, len(xs), n + len(p.kwd_attrs)))
+            if len(p.kwd_attrs) != len(set(p.kwd_attrs)):
+                raise IllFormedModule(p, reasons.DuplicatePatternKeyword(c_name))
+            raise IllFormedModule(p, reasons.UnknownFieldInPattern(c_name, tuple(sorted(set(xs[n:])))))
+        for sub in list(p.patterns) + list(p.kwd_patterns):
+            check_pattern(sub, ctx)
+        return
+    if isinstance(p, ast.MatchSequence):
+        for sub in p.patterns:
+            check_pattern(sub, ctx)
+        return
     if isinstance(p, ast.MatchMapping):
-        return [v for sub in p.patterns for v in pattern_vars(sub)]
-    raise AssertionError(f'unexpected pattern: {type(p).__name__}')
+        keys = [dict_key(key) for key in p.keys]
+        duplicate = next((k for i, k in enumerate(keys) if k in keys[:i]), None)
+        if duplicate is not None:
+            raise IllFormedModule(p, reasons.DuplicateDictKey(duplicate))
+        for sub in p.patterns:
+            check_pattern(sub, ctx)
+        return
+    if isinstance(p, ast.MatchAs) and p.pattern is not None:
+        check_pattern(p.pattern, ctx)
+        return
+
+def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: ModuleContext) -> None:
+    for i, p in enumerate(patterns):
+        check_pattern(p, ctx)
+        vars_ = binds_seq(p)
+        if len(vars_) != len(set(vars_)):
+            raise IllFormedModule(node, reasons.NonlinearPattern(i + 1))
+        for j in range(i):
+            if subsumes(p, patterns[j], ctx):
+                raise IllFormedModule(node, reasons.UnreachableCase(i + 1, j + 1))

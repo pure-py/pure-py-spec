@@ -1,0 +1,375 @@
+\section{Well-formedness}
+\label{sec:well-formedness}
+
+Well-formedness decides which programs \PurePy accepts. The block and expression rules rest on a
+definite-assignment analysis; the pattern rules enforce linearity and reachability; and the module rules
+govern imports and class declarations. The section follows the syntax of \secref{syntax}, taking patterns,
+then blocks and expressions, then modules and programs, and \secref{opsem} gives each of these a dynamic
+counterpart.
+
+\subsection{Auxiliary definitions}
+
+Three syntactic analyses support the well-formedness rules: $\assignsS(s)$, the set of variables assigned
+anywhere in $s$ (without descending into nested function definitions, which have their own scope, so that
+$\assignsS(s) = \dom(\Delta)$ when $s : \Assigns{\Delta}$); $\binds(p)$, the set of variables introduced by a
+pattern $p$; and $\capturesS(s)$, the set of variables from the enclosing scope that are captured by closures
+(lambdas or nested function definitions) within $s$, with companion $\capturesE(e)$ on expressions. All are
+defined, by their principal cases, in \figref{aux}. The metafunction $\capturesS$ extends to blocks and
+module bodies by union (like $\assignsS$), with the singleton block identified with its statement.
+There $\fvE(e)$ and $\fvS(b)$ are the free variables of an expression and of a block, defined in the
+usual way. On the cases not shown, $\binds$ and $\capturesE$ recurse structurally, taking the union over
+immediate subterms, and $\capturesS$ takes the union of $\capturesE$ over a statement's subexpressions and
+$\capturesS$ over the blocks it contains. The metafunction $\assignsS$ is empty on the statements not shown, is the union over the branch blocks of
+a conditional, and does not descend into nested function definitions, which have their own scope.
+
+\input{fig/aux}
+
+\begin{definition}[Pattern subsumption]
+The preorder $\Gamma \vdash p \subsumed p'$ (\figref{subsumption}) holds when every value matched by $p$ is also matched by $p'$.
+\end{definition}
+
+\noindent Subsumption is used by the well-formedness rule for $\pyinline{match}$ to rule out unreachable cases and to check exhaustiveness; with the current pattern set, the latter reduces to requiring a catch-all (var or wildcard) case.
+
+\input{fig/subsumption}
+
+\subsection{Patterns}
+
+A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is linear (no repeated variable names) and no earlier pattern subsumes a later one. The \pyinline{match} well-formedness rules use this judgement to enforce reachability and linearity of case patterns.
+
+\input{fig/well-formed-pat}
+
+\subsection{Blocks and expressions}
+\label{sec:wf-blocks}
+
+Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
+$\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
+= e} definitely assigns $\set{\bind{\pyinline{x}}{\statusDefAssigned}}$. \emph{Result types} $R$ classify these outcomes: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$). Block well-formedness is given in
+\figref{well-formed}; expression well-formedness in \figref{well-formed-expr}.
+
+Context operations $\override$ and $\merge$ lift to a right semiring over result types $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge$ and zero for $\override$.
+
+\begin{definition}[Override and merge on result types]
+{\small
+\begin{align*}
+\Assigns{\Delta} \merge \Assigns{\Delta'} & = \Assigns{(\Delta \merge \Delta')} \\
+R \merge \Returns = \Returns \merge R & = R \\
+\\
+\Assigns{\Delta} \override \Assigns{\Delta'} & = \Assigns{(\Delta \override \Delta')} \\
+R \override \Returns = \Returns \override R & = \Returns
+\end{align*}}
+\end{definition}
+
+\noindent The $\Returns \override R$ case never arises because the well-formedness judgement excludes unreachable statements (\secref{unreachable}).
+
+\begin{lemma}[Right distributivity (result types)]
+\[
+(R \merge R') \override S = (R \override S) \merge (R' \override S)
+\]
+\end{lemma}
+
+\noindent A module attribute reference is well-formed only when it resolves to a definitely assigned member
+(rule \ruleName{attr-module}); see \secref{no-load-dependent}.
+
+\input{fig/well-formed}
+\input{fig/well-formed-expr}
+
+\subsection{Modules and programs}
+\label{sec:wf-modules}
+
+In this section, loading a module means checking its body and computing its signature
+(\figref{well-formed-module}), the static counterpart of run-time loading (\secref{opsem}). Both
+import forms load their target, together with its ancestors
+(\figref{well-formed-imports}). A plain import also records each of these modules as a member of its
+parent (the loads-as judgement), so that the binding created for the root of the target gives attribute
+access along the whole chain. A from-import also loads any imported name that denotes a submodule. An
+ancestor of the target is exempt from loading first if it is the importing module or one of its
+ancestors, since at run time it may still be loading. The exemption applies only to from-imports, because
+for a plain import
+the only ancestor that could never load first is the importing module itself, and an import naming a proper
+descendant of the importing module is excluded outright (\secref{no-load-dependent}). Loading a module
+may thus require other modules to load first; the rules are interpreted inductively, so a program with an
+import cycle is ill-formed, because a module in a cycle could finish loading only after itself. Program
+well-formedness (\figref{well-formed-module}) requires the main module to be well-formed and hence,
+recursively, every module the program can load; a module that is never imported is not checked.
+The rule \ruleName{module} checks a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
+overridden by the imported context, so the members of \pyinline{builtins} are in scope
+unqualified.
+
+\input{fig/well-formed-module}
+
+The signature $\Gamma$ a module's load judgement produces (\figref{well-formed-module}) comprises the classes
+and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule,
+never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
+name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own
+bindings are disjoint, because the module rules exclude a module that binds a name that is also the name of
+a submodule (\secref{no-load-dependent}).
+
+\subsection{Examples}
+
+\subsubsection{Assignment as definition}
+\label{sec:assignment-as-definition}
+
+Although \PurePy is pure and all variable usage is well-scoped, local variables are introduced using an
+\emph{assignment statement}, for compatibility with Python. If a variable is definitely assigned in any branch
+of a conditional, then for that variable to be usable after the conditional, every other branch of the
+conditional must either definitely return, or definitely assign that variable too. Thus the following are both
+well-formed:
+
+\begin{center}
+\begin{minipage}{0.48\textwidth}
+\centering
+\begin{python}
+if a < b:
+   comp = "smaller"
+else:
+   comp = "bigger"
+return comp
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\begin{python}
+if a < b:
+   return "smaller"
+else:
+   comp = "bigger"
+return comp
+\end{python}
+\end{minipage}
+\end{center}
+\medskip
+
+\noindent The definite assignment set for a conditional that has at least one branch which definitely assigns
+is calculated by merging the definite assignment sets for all branches which definitely assign, using the
+$\merge$ operator on environments.
+
+Definite assignment thus gives each reference a unique lexical referent: a variable is introduced by
+an assignment, possibly jointly by the branches of a conditional, and a name may be referenced only where one
+such introduction covers every path. This is stricter than avoiding Python's \pyinline{NameError}: the
+left-hand program of \secref{contexts} assigns \pyinline{x} on every run, but is rejected because the
+reference would denote the branch-local variable on one path and the variable it hides on the other.
+
+\subsubsection{Local assignment in conditional clauses}
+\label{sec:local-assignment}
+
+For flexibility, we permit \emph{branch-local} variables. The assignment of \pyinline{x} below (left) is
+permitted, and can be used locally in that branch of the conditional:
+
+\begin{center}
+\begin{minipage}{0.48\textwidth}
+\centering
+\begin{python}
+def foo():
+  z = 6
+  if b:
+    x = 3
+    y = x + 1
+  else:
+    y = 0
+  return z
+\end{python}
+
+\smallskip
+
+{\small Branch-local definition of \pyinline{x}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\begin{python}
+def foo():
+  x = 6
+  if b:
+    x = 3
+    y = x + 1
+  else:
+    y = 0
+  return x # error: partially defined
+\end{python}
+
+\smallskip
+
+{\small Now with use of \pyinline{x} after the conditional}
+\end{minipage}
+\end{center}
+\medskip
+
+\noindent However such variables only appear to be branch-local. The definition of $\merge$ actually ensures
+that a variable assigned in any branch is considered assigned by the conditional; however unless it is
+assigned in \emph{every} branch that does not definitely return, it will be bound to $\statusNotDefAssigned$ in the
+corresponding environment. Any attempt to refer to such a variable is illegal, as it refers to a variable
+which may not be assigned. (Thus the right-hand program is ill-formed, despite the enclosing \pyinline{x = 6},
+because in the \pyinline{return x} statement, the inner assignment shadows the the outer one, and the inner
+assignment is only partial.) If we were to allow the program on the right, there would be no straightforward
+way to assign it a semantics which is both pure, and in agreement with Python, since in Python the function
+returns \pyinline{3} in the case where \pyinline{b} is \pyinline{True}.
+
+\subsubsection{Function-level scoping of local variables}
+
+In Python, all local variables are scoped to the entire function body, not just from the point of
+assignment onwards. The $\assignsS$ function in the \ruleName{def} rule reflects this: all variables
+assigned anywhere in the function body are introduced at $\statusNotDefAssigned$ before the body is checked. This means
+the following program is statically rejected by \PurePy, whereas Python rejects it at runtime with an
+\pyinline{UnboundLocalError}:
+
+\begin{python}
+y = 7
+
+def f():
+    x = y  # error: y is local (due to assignment below)
+    y = 8
+
+f()
+\end{python}
+
+\noindent Because \pyinline{y} appears on the left-hand side of an assignment in \pyinline{f}, it is in
+$\assignsS(b)$ for the body of \pyinline{f}, and is therefore introduced at $\statusNotDefAssigned$ at the top of the
+function. The reference to \pyinline{y} in \pyinline{x = y} then fails the well-formedness check, since
+$\Gamma(\pyinline{y}) = \statusNotDefAssigned$ rather than $\Gamma(\pyinline{y}) = \statusDefAssigned$.
+
+\subsubsection{Reassignment of captured variables}
+\label{sec:captured-vars}
+
+The exclusion of captured-variable reassignment (\secref{no-mutable-state}) is enforced by a side condition
+on the \ruleName{cons} rule: no variable captured by a statement $s$ may be reassigned in the rest of the block
+$b$. In the example of \secref{no-mutable-state}, \pyinline{x} is captured by the definition of
+\pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected. A dataclass declaration counts as
+an assignment of its class name for these definitions, though re-declaring a class name is excluded outright
+(\secref{no-first-class}).
+
+The same issue arises when a variable is captured and reassigned in the \emph{same} statement:
+
+\begin{python}
+x = 5
+def x():
+    return x
+x()  # Python: returns the function (late binding); pure: returns 5
+\end{python}
+
+\noindent The side condition on the \ruleName{assign} rule rejects programs like this, requiring that the
+variable being bound is not captured by the expression. The \ruleName{def} rule, by contrast, binds
+each $f_i$ in the typing context for every body $b_i$, so the function names may legitimately appear in
+$\capturesS$ of those bodies. This is what permits self-recursion (the singleton-region case) and
+mutual recursion within a region.
+
+\subsubsection{Mutual recursion}
+\label{sec:mutual-recursion}
+
+The \ruleName{def} rule binds the names $f_1, \ldots, f_{n+1}$ of a mutual region $d_1 \ldots d_{n+1}$
+simultaneously. Each body $b_i$ is checked in a context that includes all the $f_j$ as definitely
+assigned, so any $f_j$ may reference any other $f_k$ within the region (the singleton case $n = 0$
+permits self-recursion). The names in a region must be distinct.
+
+Inserting any non-\pyinline{def} statement between two \pyinline{def}s splits them into separate regions,
+breaking the mutual reference:
+
+\begin{python}
+def even(n):
+    if n == 0:
+        return True
+    return odd(n - 1)
+
+x = even(0)  # intervening statement separates the regions
+
+def odd(n):
+    if n == 0:
+        return False
+    return even(n - 1)
+\end{python}
+
+\noindent This program is rejected statically: \pyinline{even} forms a singleton region in which
+\pyinline{odd} is not yet bound, so the reference to \pyinline{odd} in its body fails the
+\ruleName{var} rule. Python accepts it: the call \pyinline{even(0)} does not actually reach
+\pyinline{odd}, and Python's late binding means \pyinline{odd} is only looked up when needed.
+
+Each branch of a conditional may contain its own mutual regions, subject to the usual definite assignment
+rules. The following is well-formed because both branches define both names:
+
+\begin{python}
+b = True
+
+if b:
+    def f():
+        return g()
+    def g():
+        return "via mutual region"
+else:
+    def f():
+        return "f independent"
+    def g():
+        return "g independent"
+
+print(f())
+print(g())
+\end{python}
+
+A region containing two definitions of the same name is rejected directly by the \ruleName{def}
+rule's distinct-names side condition:
+
+\begin{python}
+def g():
+    return 0
+
+def f():
+    return g()
+def g():     # error: g defined twice in the same region
+    return 1
+\end{python}
+
+\noindent (Python accepts this; late binding makes \pyinline{f}'s call to \pyinline{g} resolve to the
+second \pyinline{def g}.)
+
+Wrapping the second \pyinline{def f; def g} pair in a conditional sidesteps the duplicate-name issue:
+the outer \pyinline{def g} and the inner \pyinline{def g} are now in different blocks, so they no longer
+fall in the same region. One might still expect a captured-variable problem, since the inner
+\pyinline{def g} could be seen as rebinding the outer \pyinline{g} that \pyinline{f} captures. No such
+problem arises:
+
+\begin{python}
+def g():
+    return 0
+
+if b:
+    def f():
+        return g()
+    def g():
+        return 1
+\end{python}
+
+\noindent The inner \pyinline{def f; def g} form a branch-local mutual region, so \pyinline{f}'s body
+resolves \pyinline{g} to its sibling rather than to the outer \pyinline{g}. The two are bound
+simultaneously, so \pyinline{f} cannot be called before the inner \pyinline{g} exists, and the value
+\pyinline{f} sees is the same as the value Python's late binding finds at call time.
+
+\subsubsection{Pattern variables escape the match}
+
+A variable bound by a \pyinline{case} pattern is in scope after the \pyinline{match} statement, just as
+a variable assigned inside a conditional branch is in scope after the conditional. Python treats matching
+this way; \PurePy follows.
+
+\begin{python}
+v = 5
+match v:
+    case x:
+        pass
+print(x)    # prints 5
+\end{python}
+
+Here the catch-all \pyinline{case x:} binds \pyinline{x} in the body's scope, and the binding survives into
+the enclosing scope. Definite assignment after the match follows the same merge logic as a conditional: if
+every case binds the variable (or returns), it is definitely assigned afterwards; otherwise it is not (see
+also \secref{local-assignment}).
+
+\subsubsection{Unreachable code}
+\label{sec:unreachable}
+A non-empty sequence of statements returns only if the last statement returns, and all preceding statements
+assign. Thus the following is illegal:
+
+\begin{python}
+def foo(x):
+  return x + 1
+  return x    # error: unreachable
+\end{python}
+
+
