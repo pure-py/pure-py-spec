@@ -7,6 +7,7 @@ Walks the test directories, runs each test through the appropriate steps
 
 import contextlib
 import pathlib
+import re
 import subprocess
 import sys
 from collections.abc import Iterator
@@ -47,6 +48,9 @@ class Stage(StrEnum):
     PENDING = "pending"
 
 HELPERS = "helpers"
+
+RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
+CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
 
 # Checker entry points under src/
 PARSE, CHECK, CHECK_PROGRAM = "syntax.py", "check_module.py", "check_program.py"
@@ -242,6 +246,24 @@ class Runner:
         print(f"{GREEN}✓ {total}/{total} passed{RESET}")
 
 
+def check_rule_citations(r: Runner, base: pathlib.Path) -> None:
+    """Every `# rule: X` in a test must name a rule the spec defines, so a
+    citation cannot outlive the rule it points at."""
+    spec = {m for f in sorted((ROOT / "fig").glob("*.tex"))
+            for m in RULE_NAME.findall(f.read_text(encoding="utf-8"))}
+    stale = []
+    for path in sorted(base.rglob("*.py")):
+        if "__pycache__" in path.parts:
+            continue
+        first = path.read_text(encoding="utf-8").split("\n", 1)[0]
+        cited = CITATION.match(first)
+        if cited is not None and cited.group(1) not in spec:
+            stale.append(f"{path.relative_to(base)} cites {cited.group(1)}")
+    if stale:
+        r.bad("rule citations", "; ".join(stale))
+    else:
+        r.ok("rule citations")
+
 def main() -> None:
     skip_mypy = "--no-mypy" in sys.argv
     if skip_mypy:
@@ -250,6 +272,9 @@ def main() -> None:
     base = ROOT / "test"
     module = base / MODULE_LEVEL
     r = Runner(interpreter)
+
+    print("cross-references")
+    check_rule_citations(r, base)
 
     if not skip_mypy:
         print("mypy --strict src/")
