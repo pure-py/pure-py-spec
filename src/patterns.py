@@ -43,18 +43,3 @@ def subsumes(p: ast.pattern, q: ast.pattern) -> bool:
             return False
         return all((subsumes(pi, qi) for pi, qi in zip(p.patterns, q.patterns)))
     return False
-
-def pattern_vars(p: ast.pattern) -> list[str]:
-    if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
-        return []
-    if isinstance(p, ast.MatchAs):
-        sub = pattern_vars(p.pattern) if p.pattern is not None else []
-        return sub + ([p.name] if p.name else [])
-    if isinstance(p, ast.MatchSequence):
-        return [v for sub in p.patterns for v in pattern_vars(sub)]
-    if isinstance(p, ast.MatchClass):
-        return [v for sub in p.patterns for v in pattern_vars(sub)] + \
-               [v for sub in p.kwd_patterns for v in pattern_vars(sub)]
-    if isinstance(p, ast.MatchMapping):
-        return [v for sub in p.patterns for v in pattern_vars(sub)]
-    raise AssertionError(f'unexpected pattern: {type(p).__name__}')

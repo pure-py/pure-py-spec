@@ -38,19 +38,22 @@ def annotate_seq_kinds(tree: ast.AST, source: str) -> None:
             segment = ast.get_source_segment(source, node)
             setattr(node, 'is_list_pattern', segment is not None and segment.lstrip().startswith('['))
 
-def binds(pattern: ast.pattern) -> set[str]:
+def binds_seq(pattern: ast.pattern) -> list[str]:
     if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
-        return set()
+        return []
     if isinstance(pattern, ast.MatchAs):
-        sub = binds(pattern.pattern) if pattern.pattern is not None else set()
-        return sub | ({pattern.name} if pattern.name else set())
+        sub = binds_seq(pattern.pattern) if pattern.pattern is not None else []
+        return sub + ([pattern.name] if pattern.name else [])
     if isinstance(pattern, ast.MatchSequence):
-        return set().union(*(binds(p) for p in pattern.patterns))
+        return [x for p in pattern.patterns for x in binds_seq(p)]
     if isinstance(pattern, ast.MatchClass):
-        return set().union(*(binds(p) for p in list(pattern.patterns) + list(pattern.kwd_patterns)))
+        return [x for p in list(pattern.patterns) + list(pattern.kwd_patterns) for x in binds_seq(p)]
     if isinstance(pattern, ast.MatchMapping):
-        return set().union(set(), *(binds(p) for p in pattern.patterns))
+        return [x for p in pattern.patterns for x in binds_seq(p)]
     raise AssertionError(f'unexpected pattern: {type(pattern).__name__}')
+
+def binds(pattern: ast.pattern) -> set[str]:
+    return set(binds_seq(pattern))
 
 def fv_e(e: ast.expr) -> set[str]:
     if isinstance(e, ast.Name):

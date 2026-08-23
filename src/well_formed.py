@@ -10,8 +10,8 @@ from contexts import (ClassEntry, Context, ContextEntry, ModuleContext, ModuleLo
                       Returns, VarContext, class_of, extend_context, fields, merge_results,
                       module_of, override_gamma, override_results, override_var, var_status)
 from aux import (BlockElement, assigns_block, assigns_elements, binds, captures_e, captures_element,
-                 elements_of_block, find_first_reassigning, names_in_target, own_fields)
-from patterns import dict_key, is_catch_all, pattern_vars, subsumes
+                 binds_seq, elements_of_block, find_first_reassigning, names_in_target, own_fields)
+from patterns import dict_key, is_catch_all, subsumes
 
 def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
     base = node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
@@ -331,7 +331,7 @@ def check_pattern(p: ast.pattern, ctx: ModuleContext) -> None:
 def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: ModuleContext) -> None:
     for i, p in enumerate(patterns):
         check_pattern(p, ctx)
-        vars_ = pattern_vars(p)
+        vars_ = binds_seq(p)
         if len(vars_) != len(set(vars_)):
             raise IllFormedModule(node, reasons.NonlinearPattern(i + 1))
         for j in range(i):
