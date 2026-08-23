@@ -24,6 +24,9 @@ $r$ & $::=$ & $\assigns{\rho}$ \\
 $o$ & $::=$ & $\val{v}$ & (Outcome) \\
   & $\mid$ & $\aborts{\kappa}$
    \\[3mm]
+\added{$m$} & \added{$::=$} & \added{$\matchOk{\rho}$} & \added{(Match result)} \\
+  & \added{$\mid$} & \added{$\noMatch$} &
+   \\[3mm]
 $\kappa$ & $::=$ & $\errType \mid \errIndex \mid \added{\errKey} \mid \errZeroDiv$ & \replaced{(Termination kind)}{(Error kind)\ } \\
     & $\mid$ & $\added{\errAssertNoMsg} \mid \errAssert{\added{w}} \mid \errAttr \added{{} \mid \errExit{n}}$ &
 \end{tabular}
