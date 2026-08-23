@@ -130,7 +130,7 @@
 \inferrule*[lab={\ruleName{class-extend}}]
 {
   \nexists C'.\ \bind{c}{C'} \in \Gamma \\
-  \bind{c'}{\clsEntry{\replaced{\Gamma'}{\Delta}}{q.c'}{\seq{y}}{\replaced{c^\dagger}{c''}}} \in \Gamma \\
+  \bind{c'}{\clsEntry{\Gamma'}{q.c'}{\seq{y}}{c^\dagger}} \in \Gamma \\
   \ownFields(\phi) = \seq{x} \text{ distinct} \\
   \seq{x} \cap \fields(\Gamma(c')) = \varnothing \\
   C = \clsEntry{\Gamma}{q.c}{\seq{x}}{c'} \\
@@ -151,7 +151,7 @@
 \small
 \inferrule*[lab={\ruleName{predefined}}]
 {
-  \replaced{\mathcal{P}(q) = (\rho, \Gamma)}{\vdash \mathcal{P}(q) : \Gamma\ }
+  \mathcal{P}(q) = (\rho, \Gamma)
 }
 {
   \vdash_{\mathsf{load}} q : \Gamma
@@ -161,8 +161,8 @@
 {
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
   \vdash \seq{\iota} : \Gamma \\
-  \added{\mathcal{P}(\pyinline{builtins}) = (\rho, \Gamma')} \\
-  \added{\Gamma' \mathbin{\added{\override}}} \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} : \Delta \\
+  \mathcal{P}(\pyinline{builtins}) = (\rho, \Gamma') \\
+  \Gamma' \mathbin{\override} \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} : \Delta \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {

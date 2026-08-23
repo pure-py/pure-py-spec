@@ -2,41 +2,41 @@
 \small
 \begin{center}
 \begin{tabular}{rcll}
-\grammarGroup{\added{Values}} \\
+\grammarGroup{Values} \\
 $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exList{v_1, \ldots, v_n}$ & (List) \\
     & $\mid$ & $\exTuple{v_1, \ldots, v_n}$ & (Tuple) \\
-    & $\mid$ & $\exDict{\replaced{\delta}{\bind{w_1}{v_1}, \ldots, \bind{w_n}{v_n}\ }}$ & (Dict) \\
+    & $\mid$ & $\exDict{\delta}$ & (Dict) \\
     & $\mid$ & $\exLamClosure[\Gamma]{\rho}{\seq{x}}{e}$ & (LambdaClosure) \\
     & $\mid$ & $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$ & (DefClosure) \\
     & $\mid$ & $\exObj{\Gamma}{C}{\rho}$ & (Object) \\
-    & $\mid$ & $\modStub{q}$ & \replaced{(ModuleStub)}{(Module stub)\ } \\
-    & $\mid$ & $\modLoaded{q}{\rho}$ & \replaced{(LoadedModule)}{(Loaded module)\ } \\
+    & $\mid$ & $\modStub{q}$ & (ModuleStub) \\
+    & $\mid$ & $\modLoaded{q}{\rho}$ & (LoadedModule) \\
     & $\mid$ & $\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}$ & (Class) \\
-    & \added{$\mid$} & \added{$\primVal{\primFn}$} & \added{(Primitive)}
+    & $\mid$ & $\primVal{\primFn}$ & (Primitive)
    \\[3mm]
-\grammarGroup{\added{Environments}} \\
-$\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & \deleted{(Environment)}
+\grammarGroup{Environments} \\
+$\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & 
    \\[3mm]
-\grammarGroup{\added{Dictionary entries}} \\
-\added{$\delta$} & \added{$::=$} & \added{$\bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}$} &
+\grammarGroup{Dictionary entries} \\
+$\delta$ & $::=$ & $\bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}$ &
    \\[3mm]
-\grammarGroup{\added{Results}} \\
-$r$ & $::=$ & $\assigns{\rho}$ & \added{(Assigns)} \\
-  & $\mid$ & $\returns{v}$ & \added{(Returns)} \\
-  & $\mid$ & $\aborts{\kappa}$ & \added{(Aborts)}
+\grammarGroup{Results} \\
+$r$ & $::=$ & $\assigns{\rho}$ & (Assigns) \\
+  & $\mid$ & $\returns{v}$ & (Returns) \\
+  & $\mid$ & $\aborts{\kappa}$ & (Aborts)
    \\[3mm]
-\grammarGroup{\added{Outcomes}} \\
-$o$ & $::=$ & $\val{v}$ & \replaced{(Val)}{(Outcome)\ } \\
-  & $\mid$ & $\aborts{\kappa}$ & \added{(Aborts)}
+\grammarGroup{Outcomes} \\
+$o$ & $::=$ & $\val{v}$ & (Val) \\
+  & $\mid$ & $\aborts{\kappa}$ & (Aborts)
    \\[3mm]
-\grammarGroup{\added{Match results}} \\
-\added{$m$} & \added{$::=$} & \added{$\matchOk{\rho}$} & \added{(Match)} \\
-  & \added{$\mid$} & \added{$\noMatch$} & \added{(NoMatch)}
+\grammarGroup{Match results} \\
+$m$ & $::=$ & $\matchOk{\rho}$ & (Match) \\
+  & $\mid$ & $\noMatch$ & (NoMatch)
    \\[3mm]
-\grammarGroup{\added{Termination kinds}} \\
-$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \added{\errKey} \mid \errZeroDiv$ & \deleted{(Error kind)} \\
-    & $\mid$ & $\added{\errAssertNoMsg} \mid \errAssert{\added{w}} \mid \errAttr \added{{} \mid \errExit{n}}$ &
+\grammarGroup{Termination kinds} \\
+$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \errKey \mid \errZeroDiv$ &  \\
+    & $\mid$ & $\errAssertNoMsg \mid \errAssert{w} \mid \errAttr \mid \errExit{n}$ &
 \end{tabular}
 \end{center}
 \caption{Values, environments and evaluation results}

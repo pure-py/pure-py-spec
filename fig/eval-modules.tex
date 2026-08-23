@@ -198,24 +198,24 @@
 \small
 \inferrule*[lab={\ruleName{eval-predefined}}]
 {
-  \replaced{\mathcal{P}(q) = (\rho, \Gamma)}{q \in \dom(\mathcal{P})\ }
+  \mathcal{P}(q) = (\rho, \Gamma)
 }
 {
-  q \Rightarrow_{\mathsf{load}} \val{\replaced{\rho}{\mathcal{P}(q)\ }}
+  q \Rightarrow_{\mathsf{load}} \val{\rho}
 }
 \and
-\inferrule*[lab={\ruleName{\replaced{eval-module}{load}}}]
+\inferrule*[lab={\ruleName{eval-module}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
    \seq{\iota} \Rightarrow \val{\rho} \\
-  \added{\mathcal{P}(\pyinline{builtins}) = (\rho', \Gamma')} \\
-  \added{\rho' \mathbin{\added{\override}}} \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} \Rightarrow o
+  \mathcal{P}(\pyinline{builtins}) = (\rho', \Gamma') \\
+  \rho' \mathbin{\override} \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} \Rightarrow o
 }
 {
-  q \Rightarrow_{\mathsf{load}} \mlet{\rho\replaced{^\dagger}{'\ }}{o}{\val{(\submods(q) \override \rho\replaced{^\dagger}{'\ })}}
+  q \Rightarrow_{\mathsf{load}} \mlet{\rho^\dagger}{o}{\val{(\submods(q) \override \rho^\dagger)}}
 }
 \and
-\inferrule*[lab={\ruleName{\replaced{eval-module-fail}{load-fail}}}]
+\inferrule*[lab={\ruleName{eval-module-fail}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
    \seq{\iota} \Rightarrow \aborts{\kappa}
@@ -225,7 +225,7 @@
 }
 \end{mathpar}
 
-\flushleft \shadebox{$\mathcal{M} \Rightarrow \replaced{\kappa}{n\ }$}
+\flushleft \shadebox{$\mathcal{M} \Rightarrow \kappa$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-program}}]
@@ -233,7 +233,7 @@
   \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{load}} \val{\rho}
 }
 {
-  \mathcal{M} \Rightarrow \replaced{\errExit{0}}{0\ }
+  \mathcal{M} \Rightarrow \errExit{0}
 }
 \and
 \inferrule*[lab={\ruleName{eval-program-abort}}]
@@ -241,7 +241,7 @@
   \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{load}} \aborts{\kappa}
 }
 {
-  \mathcal{M} \Rightarrow \replaced{\kappa}{1\ }
+  \mathcal{M} \Rightarrow \kappa
 }
 \end{mathpar}
 \subcaption{Module loading and program evaluation}

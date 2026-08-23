@@ -5,9 +5,8 @@
 
 Values, environments, and evaluation results are given in \figref{values}. For a statement $s$, the result
 $\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the result
-$\returns{v}$ represents \emph{abrupt completion} of $s$, with return value $v$; \Replaced{and the result
-$\aborts{\kappa}$ represents abrupt completion of the whole run, with termination kind $\kappa$}{and
-$\aborts{\kappa}$ abrupt completion with an error}.
+$\returns{v}$ represents \emph{abrupt completion} of $s$, with return value $v$; and the result
+$\aborts{\kappa}$ represents abrupt completion of the whole run, with termination kind $\kappa$.
 Composing statements sequentially composes their results according to the following partial monoid, analogous
 to sequential composition of result types:
 {\small
@@ -23,12 +22,12 @@ with $\assigns{\varnothing}$ as left and right unit.
 
 A value is well-formed at a context entry (\figref{well-formed-env}): ordinary values at
 $\statusDefAssigned$, module references and class entries at the corresponding entry. An environment is
-well-formed at a context that binds its variables at corresponding entries. \Added{A \emph{termination
+well-formed at a context that binds its variables at corresponding entries. A \emph{termination
 kind} $\kappa$ records how a run ends; all but $\errExit{n}$ are named after the exceptions the same program
 raises under Python in the same circumstances. A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a partial map from
 arguments to outcomes (\figref{predefined}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has outcome
-$\primFn(\seq{u})$, and no derivation where $\primFn(\seq{u})$ is undefined.}
+$\primFn(\seq{u})$, and no derivation where $\primFn(\seq{u})$ is undefined.
 
 \input{fig/well-formed-env}
 
@@ -53,29 +52,29 @@ where no case applies, and where one of them is undefined the expression has no 
 \input{fig/equality}
 \input{fig/membership}
 
-\Added{The remaining metafunctions the rules use are collected in \figref{eval-aux}: $\outcome$ reads a
+The remaining metafunctions the rules use are collected in \figref{eval-aux}: $\outcome$ reads a
 block's result as the outcome of calling it, $\iterOp$ gives the sequence a generator draws from, $\getitem$
 interprets subscripting, $\dispatch$ selects the case a $\pyinline{match}$ takes, and $\entries$ and
-$\update$ build a dictionary from its entries.}
+$\update$ build a dictionary from its entries.
 
 \input{fig/eval-aux}
 
 \subsection{Pattern matching}
 
 The pattern-matching judgement $\rho, p, v \matches m$ (\figref{match}) is a deterministic partial
-function. \Added{A \emph{match result} $m$ is either $\matchOk{\rho'}$, a match binding $\rho'$, or
+function. A \emph{match result} $m$ is either $\matchOk{\rho'}$, a match binding $\rho'$, or
 $\noMatch$, a failure to match, on which $\dispatch$ moves to the next case. Having no derivation is a third
 outcome, distinct from both: the match has no meaning, and \PurePy gives the run no result. A pattern and a
 value that are not comparable have no derivation, since \PurePy can say neither that they match nor that
 they do not; a list pattern against a tuple is such a case. Sub-results compose with $\override$, matching
-sequentially:}
+sequentially:
 {\small
 \begin{align*}
-\added{\matchOk{\rho} \override \matchOk{\rho'}} & \added{{}= \matchOk{(\rho \disjunion \rho')}} \\
-\added{m \override \noMatch = \noMatch \override m} & \added{{}= \noMatch}
+\matchOk{\rho} \override \matchOk{\rho'} & {}= \matchOk{(\rho \disjunion \rho')} \\
+m \override \noMatch = \noMatch \override m & {}= \noMatch
 \end{align*}}
 
-\Added{with $\matchOk{\varnothing}$ as left and right unit.}
+with $\matchOk{\varnothing}$ as left and right unit.
 A constructor pattern matches any object whose class has the
 pattern's class among its ancestors; sub-patterns bind the fields of the pattern's class. An object records
 its class entry, whose qualified name is the identity of the class: since a module declares each class name at
@@ -85,21 +84,19 @@ most once, the entry comparison in \ruleName{eval-pat-constr} amounts to a compa
 
 \subsection{Blocks and expressions}
 
-Block evaluation $\rho, b \Rightarrow r$\Added{, for any $\rho : \Gamma$ and any $b$ well-formed in $\Gamma$,}
-is given in \Replaced{\figrefTwo{eval-block-outcome}{eval-block-fails}}{\figref{eval-block-outcome}}. Function definitions delimit
+Block evaluation $\rho, b \Rightarrow r$, for any $\rho : \Gamma$ and any $b$ well-formed in $\Gamma$,
+is given in \figrefTwo{eval-block-outcome}{eval-block-fails}. Function definitions delimit
 the scope of sequential-composition effects, so as black boxes functions are always pure. The metafunction $\outcome$ (\figref{eval-aux}) reads a block's result as
 the outcome of calling it, $\val{\pyinline{None}}$ where the block falls off the end.
 
-Expression evaluation $\rho, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd})\Added{, for any $\rho : \Gamma$ and any $e$ well-formed in $\Gamma$,} yields an
-outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). \Deleted{The error kinds are designed to
-correspond to the error the same program would raise under Python in the same circumstances.}The operators
+Expression evaluation $\rho, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd}), for any $\rho : \Gamma$ and any $e$ well-formed in $\Gamma$, yields an
+outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
 \ruleName{eval-if} does. A comprehension evaluates its body once for each binding its qualifiers produce, and
 concatenates the results; a generator draws from $\iterOp$ (\figref{eval-aux}), which is
-\Replaced{defined on lists, tuples, strings and dictionaries, a dictionary yielding its keys as in Python.
-These are the only values a generator can draw from.}{defined on lists and tuples only, since \PurePy has no
-wider notion of iteration.}
+defined on lists, tuples, strings and dictionaries, a dictionary yielding its keys as in Python.
+These are the only values a generator can draw from.
 
 \input{fig/eval-outcome}
 
@@ -115,21 +112,17 @@ Loading takes a single module; the ancestors of an imported module are loaded by
 loads-as judgement for an import, and directly as premises of \ruleName{eval-from-import} for a
 from-import.
 
-\Deleted{The correspondence is exact: if $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \val{\rho}$ then $\vdash \rho : \Gamma$ (\figref{well-formed-env}).} \begin{theorem}[\Added{Load preservation}]
-\Added{If $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \val{\rho}$ then $\vdash \rho : \Gamma$.}
+ \begin{theorem}[Load preservation]
+If $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \val{\rho}$ then $\vdash \rho : \Gamma$.
 \end{theorem}
 
 \noindent Since
 imports precede statements, every module a statement can reference is loaded before the statement runs, and
-\Replaced{loading is deterministic, so}{since loading has no observable effects, reloading a module is
-unobservable; the semantics therefore needs no cache of loaded modules.} \Added{the semantics needs no cache
+loading is deterministic, so the semantics needs no cache
 of loaded modules. The rule \ruleName{eval-module} puts $\mathcal{P}(\pyinline{builtins})$ under a module
-body's environment, mirroring \ruleName{module} (\secref{wf-modules}).}\Deleted{These rules use the environment $\mathcal{P}(\pyinline{builtins})$ binding the names of
-\figref{predefined}.}
-\Replaced{A program evaluates to a termination kind (\figref{values}): $\errExit{0}$ if the main module
+body's environment, mirroring \ruleName{module} (\secref{wf-modules}).
+A program evaluates to a termination kind (\figref{values}): $\errExit{0}$ if the main module
 loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exited with status $n$. An implementation must agree on which kind a run yields, though how it
-reports one is not prescribed.}{A program evaluates to
-its exit status: a run whose main module loads successfully yields $0$, and one whose main module fails yields
-$1$, as Python does for an uncaught exception.}
+reports one is not prescribed.
 
 \input{fig/eval-modules}

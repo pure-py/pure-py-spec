@@ -6,9 +6,9 @@
 $\odot$ & $\hat{\odot}(v, v')$ \\
 \hline
 \pyinline{==} & $\val{\pyinline{False}}$ if both operands are \pyinline{nan}, and $\val{\eqOp(v, v')}$ otherwise \\
-\pyinline{!=} & $\val{\pyinline{True}}$ if both operands are \pyinline{nan} or $\eqOp(v, v') = \pyinline{False}$, and $\val{\pyinline{False}}$ \replaced{if $\eqOp(v, v') = \pyinline{True}$}{otherwise\ } \\
+\pyinline{!=} & $\val{\pyinline{True}}$ if both operands are \pyinline{nan} or $\eqOp(v, v') = \pyinline{False}$, and $\val{\pyinline{False}}$ if $\eqOp(v, v') = \pyinline{True}$ \\
 \pyinline{in} & $\val{\memOp(v', v)}$ \\
-\pyinline{not in} & $\val{\pyinline{True}}$ if $\memOp(v', v) = \pyinline{False}$, and $\val{\pyinline{False}}$ \replaced{if $\memOp(v', v) = \pyinline{True}$}{otherwise\ } \\
+\pyinline{not in} & $\val{\pyinline{True}}$ if $\memOp(v', v) = \pyinline{False}$, and $\val{\pyinline{False}}$ if $\memOp(v', v) = \pyinline{True}$ \\
 \pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & \todo{Ordering, as in Python} \\
 \pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}\quad\pyinline{**} & \todo{Arithmetic, as in Python. Float precision is left to the implementation. $\aborts{\errZeroDiv}$ where the divisor is zero, and $\aborts{\errType}$ where an operand is not a number} \\
 \hline

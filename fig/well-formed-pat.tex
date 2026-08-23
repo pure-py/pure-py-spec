@@ -19,41 +19,41 @@
 { \Gamma \vdash \patWild }
 \and
 \inferrule*[lab={\ruleName{pat-list}}]
-{ \Gamma \vdash \replaced{p_i \quad (\forall i)}{p \quad (\forall p \in \seq{p})\ } \\ \added{\text{variables in } \seq{p} \text{ distinct}} }
+{ \Gamma \vdash p_i \quad (\forall i) \\ \text{variables in } \seq{p} \text{ distinct} }
 { \Gamma \vdash \patList{\seq{p}} }
 \and
 \inferrule*[lab={\ruleName{pat-tuple}}]
-{ \Gamma \vdash \replaced{p_i \quad (\forall i)}{p \quad (\forall p \in \seq{p})\ } \\ \added{\text{variables in } \seq{p} \text{ distinct}} }
+{ \Gamma \vdash p_i \quad (\forall i) \\ \text{variables in } \seq{p} \text{ distinct} }
 { \Gamma \vdash \patTuple{\seq{p}} }
 \and
 \inferrule*[lab={\ruleName{pat-as}}]
-{ \Gamma \vdash p \\ \added{x \notin \binds(p)} }
+{ \Gamma \vdash p \\ x \notin \binds(p) }
 { \Gamma \vdash p\;\pyinline{as}\;x }
 \and
 \inferrule*[lab={\ruleName{pat-dict}}]
-{ \Gamma \vdash p_i \quad (\forall i) \\ w_1, \ldots, w_n \text{ distinct} \\ \added{\text{variables in } \seq{p} \text{ distinct}} }
+{ \Gamma \vdash p_i \quad (\forall i) \\ w_1, \ldots, w_n \text{ distinct} \\ \text{variables in } \seq{p} \text{ distinct} }
 { \Gamma \vdash \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} }
 \and
 \inferrule*[lab={\ruleName{pat-constr}}]
 {
   \Gamma \vdash q : C \\
-  \deleted{\fields(C) = x_1, \ldots, x_n \cons \seq{x}\,'} \\
-  \deleted{\set{\seq{y}} = \set{\seq{x}\,'}} \\
-  \replaced{\Gamma \vdash \fieldMap(C, \seq{p})(x) \quad (\forall x \in \fields(C))}{\Gamma \vdash p_i \quad (\forall i)\ } \\
-  \added{\text{variables in } \seq{p} \text{ distinct}}
+   \\
+   \\
+  \Gamma \vdash \fieldMap(C, \seq{p})(x) \quad (\forall x \in \fields(C)) \\
+  \text{variables in } \seq{p} \text{ distinct}
 }
 {
-  \Gamma \vdash \patConstr{q}{\replaced{\seq{p}}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}\ }}
+  \Gamma \vdash \patConstr{q}{\seq{p}}
 }
 \and
 \inferrule*[lab={\ruleName{cases-cons}}]
 {
   \Gamma \vdash p \\
-  \Gamma \vdash \replaced{p' \cons \seq{p}\,'}{\seq{p}\,'\ } \\
-  \replaced{\Gamma \vdash p_i \not\subsumed p \quad (\forall i)}{p' \not\subsumed p \quad (\forall p' \in \seq{p}\,')\ }
+  \Gamma \vdash p' \cons \seq{p}\,' \\
+  \Gamma \vdash p_i \not\subsumed p \quad (\forall i)
 }
 {
-  \Gamma \vdash p \cons \added{p'} \mathbin{\added{\cons}} \seq{p}\,'
+  \Gamma \vdash p \cons p' \mathbin{\cons} \seq{p}\,'
 }
 \end{mathpar}
 \caption{Case patterns are well-formed under $\Gamma$}

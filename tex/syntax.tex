@@ -8,7 +8,7 @@ statements in a block: any non-\pyinline{def} statement in that block, by defini
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single region. The well-formedness rules treat each region as
 one mutually-recursive binding (see \secref{mutual-recursion}).
-\Added{\figref{metavariables} summarises the metavariables used throughout.}
+\figref{metavariables} summarises the metavariables used throughout.
 
 \input{fig/metavariables}
 
@@ -17,8 +17,7 @@ one mutually-recursive binding (see \secref{mutual-recursion}).
 
 The grammar of \PurePy is an abstract syntax, and its metavariables range over values rather than
 over source text: $n$ is a number and $w$ is a string, not the lexemes that denote them. How source text
-becomes abstract syntax follows Python, including the indentation that delimits blocks\Deleted{; say where \PurePy
-narrows those rules}.
+becomes abstract syntax follows Python, including the indentation that delimits blocks.
 
 \subsection{Contexts}
 \label{sec:contexts}
@@ -145,7 +144,7 @@ well-formedness and evaluation rules check and evaluate the statements of each b
 assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
 $\pymath{\_\_name\_\_}$ binding the runtime supplies automatically. A second map $\mathcal{P}$ gives the
 predefined modules of \figref{predefined}, which have no body: $\mathcal{P}$ takes each such name to its
-\Replaced{environment and context}{environment} (Definition~\ref{def:predefined}). The two domains are disjoint, and their union is
+environment and context (Definition~\ref{def:predefined}). The two domains are disjoint, and their union is
 prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$ is itself in
 $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is its \texttt{.py}
 file, each package's body is its \texttt{\_\_init\_\_.py}, and a package directory without an
@@ -156,11 +155,9 @@ definitions that follow, as is the name $q$ of the enclosing module in the rules
 
 \begin{definition}[Predefined contexts and environments]
 \label{def:predefined}
-$\mathcal{P}$ takes each module $q$ of \figref{predefined} to \Replaced{a pair $(\rho, \Gamma)$ with $\vdash \rho :
+$\mathcal{P}$ takes each module $q$ of \figref{predefined} to a pair $(\rho, \Gamma)$ with $\vdash \rho :
 \Gamma$ (\figref{well-formed-env}), where $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each
-member listed for $q$ in \figref{predefined} to its value.}{an environment binding each member listed for $q$, together with
-\pyinline{__name__}, to implementation-defined values. Its context is whatever types that environment
-(\figref{well-formed-env}).}
+member listed for $q$ in \figref{predefined} to its value.
 \end{definition}
 
 \begin{figure}
@@ -168,15 +165,15 @@ member listed for $q$ in \figref{predefined} to its value.}{an environment bindi
 \centering
 \begin{tabular}{llll}
 \hline
-\textbf{Module} & \textbf{Member} & \multicolumn{2}{l}{\added{\textbf{Value}}} \\
+\textbf{Module} & \textbf{Member} & \multicolumn{2}{l}{\textbf{Value}} \\
 \hline
 \textup{\pyinline{builtins}} & \pyinline{print} & & \\
- & \pyinline{len} & \multicolumn{2}{l}{\added{$\primVal{\primFn}$ where}} \\
- & & \added{$\quad \primFn(v) = \val{n}$} & \added{if $\iterOp(v) = u_1 \cons \ldots \cons u_n$} \\
- & & \added{$\quad \primFn(\seq{u}) = \aborts{\errType}$} & \added{(otherwise)} \\
- & \pyinline{range} & \multicolumn{2}{l}{\added{$\primVal{\primFn}$ where}} \\
- & & \added{$\quad \primFn(n) = \val{\exList{0, \ldots, n-1}}$} & \added{if $n$ whole number, $n > 0$} \\
- & & \added{$\quad \primFn(n) = \val{\exList{}}$} & \added{if $n$ whole number, $n \leq 0$} \\
+ & \pyinline{len} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
+ & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
+ & & $\quad \primFn(\seq{u}) = \aborts{\errType}$ & (otherwise) \\
+ & \pyinline{range} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
+ & & $\quad \primFn(n) = \val{\exList{0, \ldots, n-1}}$ & if $n$ whole number, $n > 0$ \\
+ & & $\quad \primFn(n) = \val{\exList{}}$ & if $n$ whole number, $n \leq 0$ \\
 \pyinline{math} & \pyinline{pi} & & \\
  & \pyinline{e} & & \\
  & \pyinline{sqrt} & & \\
@@ -188,9 +185,9 @@ member listed for $q$ in \figref{predefined} to its value.}{an environment bindi
  & \pyinline{floor} & & \\
  & \pyinline{ceil} & & \\
 \pyinline{sys} & \pyinline{argv} & & \\
- & \pyinline{exit} & \multicolumn{2}{l}{\added{$\primVal{\primFn}$ where}} \\
- & & \added{$\quad \primFn(\varepsilon) = \aborts{\errExit{0}}$} & \\
- & & \added{$\quad \primFn(n) = \aborts{\errExit{n}}$} & \\
+ & \pyinline{exit} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
+ & & $\quad \primFn(\varepsilon) = \aborts{\errExit{0}}$ & \\
+ & & $\quad \primFn(n) = \aborts{\errExit{n}}$ & \\
 \pyinline{typing} & \pyinline{Any} & & \\
 \pyinline{dataclasses} & \pyinline{dataclass} & & \\
 \hline
@@ -204,11 +201,11 @@ The metafunction $\assignsS$ extends by union from individual statements to bloc
 body $\seq{\iota}\;\seq{s}$ it acts on $\seq{s}$. Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' =
 q.q''$ for some $q''$, and $\properPrefixOf$ for the strict order; the proper prefixes of a module name
 are its \emph{ancestors}. The $\submods$ metafunction is
-defined, with the class-related metafunctions, in \Replaced{\figref{modules}}{\appendixref{sec:aux-modules}}.
-\Added{A dataclass names its fields in a fixed order, and a constructor supplies each field exactly once,
+defined, with the class-related metafunctions, in \figref{modules}.
+A dataclass names its fields in a fixed order, and a constructor supplies each field exactly once,
 positionally or by keyword. The metafunction $\fieldMap(C, \seq{u})$ maps each field of $C$ to the argument supplied for it,
 and is undefined if the arguments do not cover the fields exactly. Constructor patterns and expressions
 use it to check and evaluate field-by-field, so the rules do not depend on how a constructor splits its
-arguments.}
+arguments.
 
 \input{fig/modules}

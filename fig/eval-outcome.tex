@@ -35,13 +35,13 @@
   \rho, \exReturn{e} \Rightarrow \mlet{v}{o}{\returns{v}}
 }
 \and
-\added{\inferrule*[lab={\ruleName{eval-return-none}}]
+\inferrule*[lab={\ruleName{eval-return-none}}]
 {
   \strut
 }
 {
   \rho, \exReturnNone \Rightarrow \returns{\pyinline{None}}
-}}
+}
 \and
 \inferrule*[lab={\ruleName{eval-def}}]
 {
@@ -79,13 +79,13 @@
 \inferrule*[lab={\ruleName{eval-assert-msg-false}}]
 {
   \rho, e \Rightarrow \val{\pyinline{False}} \\
-  \added{\rho, e' \Rightarrow o}
+  \rho, e' \Rightarrow o
 }
 {
-  \rho, \exAssertMsg{e}{e'} \Rightarrow \replaced{\mlet{w}{o}{\aborts{\errAssert{w}}}}{\aborts{\errAssertNoMsg}\ }
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \mlet{w}{o}{\aborts{\errAssert{w}}}
 }
 \and
-\added{\inferrule*[lab={\ruleName{eval-if}}]
+\inferrule*[lab={\ruleName{eval-if}}]
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
   \rho, e_i \Rightarrow \val{\pyinline{True}} \\
@@ -93,17 +93,17 @@
 }
 {
   \rho, \exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}} \Rightarrow r
-}}
+}
 \and
-\added{\inferrule*[lab={\ruleName{eval-if-none}}]
+\inferrule*[lab={\ruleName{eval-if-none}}]
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j \in \set{1, \ldots, n+1})
 }
 {
   \rho, \exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}} \Rightarrow \assigns{\varnothing}
-}}
+}
 \and
-\inferrule*[lab={\ruleName{\replaced{eval-if-else}{eval-if}}}]
+\inferrule*[lab={\ruleName{eval-if-else}}]
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
   \rho, e_i \Rightarrow \val{\pyinline{True}} \\
@@ -129,7 +129,7 @@
   \rho \override \rho', b \Rightarrow r
 }
 {
-  \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow \added{\assigns{\rho'}} \mathbin{\added{\override}} r
+  \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow \assigns{\rho'} \mathbin{\override} r
 }
 \and
 \inferrule*[lab={\ruleName{eval-cons}}]
@@ -147,7 +147,7 @@
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, b \Rightarrow r$ \added{(continued)}}
+\flushleft \shadebox{$\rho, b \Rightarrow r$ (continued)}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-assert-fail}}]
@@ -166,16 +166,16 @@
   \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\kappa}
 }
 \and
-\added{\inferrule*[lab={\ruleName{eval-if-fail}}]
+\inferrule*[lab={\ruleName{eval-if-fail}}]
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
   \rho, e_i \Rightarrow \aborts{\kappa}
 }
 {
   \rho, \exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}} \Rightarrow \aborts{\kappa}
-}}
+}
 \and
-\inferrule*[lab={\ruleName{\replaced{eval-if-else-fail}{eval-if-fail}}}]
+\inferrule*[lab={\ruleName{eval-if-else-fail}}]
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
   \rho, e_i \Rightarrow \aborts{\kappa}
@@ -217,14 +217,7 @@
   \rho, x \Rightarrow \val{v}
 }
 \and
-\deleted{\inferrule*[lab={\ruleName{eval-var-builtin}}]
-{
-  x \notin \dom(\rho) \\
-  \bind{x}{v} \in \mathcal{P}(\pyinline{builtins})
-}
-{
-  \rho, x \Rightarrow \val{v}
-}}
+
 \and
 \inferrule*[lab={\ruleName{eval-literal}}]
 {
@@ -322,11 +315,10 @@
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \val{(v_1 \cons \ldots \cons v_{n+m})} \\
-  \resolveClass(\rho, q) = C \deleted{{} \\
-  \fields(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}}
+  \resolveClass(\rho, q) = C 
 }
 {
-  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{\Gamma}{C}{\replaced{\fieldMap(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m}))}{\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}, \bind{y_1}{v_{n+1}}, \ldots, \bind{y_m}{v_{n+m}}}\ }}}
+  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{\Gamma}{C}{\fieldMap(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m}))}}
 }
 \end{mathpar}
 \caption{Expression $e$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
@@ -335,17 +327,17 @@
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, e \Rightarrow o$ \added{(continued)}}
+\flushleft \shadebox{$\rho, e \Rightarrow o$ (continued)}
 \begin{mathpar}
 \small
-\added{\inferrule*[lab={\ruleName{eval-subscript}}]
+\inferrule*[lab={\ruleName{eval-subscript}}]
 {
   \rho, e \Rightarrow \val{v} \\
   \rho, e' \Rightarrow o
 }
 {
   \rho, \exSubscript{e}{e'} \Rightarrow \mlet{v'}{o}{\getitem(v, v')}
-}}
+}
 \and
 \inferrule*[lab={\ruleName{eval-call-lambda}}]
 {
@@ -369,14 +361,14 @@
   \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \outcome(r)
 }
 \and
-\added{\inferrule*[lab={\ruleName{eval-call-prim}}]
+\inferrule*[lab={\ruleName{eval-call-prim}}]
 {
   \rho, e \Rightarrow \val{\primVal{\primFn}} \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}}
 }
 {
   \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \primFn(\seq{u})
-}}
+}
 \and
 \inferrule*[lab={\ruleName{eval-and-false}}]
 {
@@ -471,7 +463,7 @@
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, e \Rightarrow o$ \added{(continued)}}
+\flushleft \shadebox{$\rho, e \Rightarrow o$ (continued)}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-binop-fail}}]
@@ -625,7 +617,7 @@
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, e \Rightarrow o$ \added{(continued)}}
+\flushleft \shadebox{$\rho, e \Rightarrow o$ (continued)}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-attr-missing}}]
@@ -646,7 +638,7 @@
   \rho, \exAttr{e}{x} \Rightarrow \aborts{\errAttr}
 }
 \and
-\added{\inferrule*[lab={\ruleName{eval-call-lambda-arity}}]
+\inferrule*[lab={\ruleName{eval-call-lambda-arity}}]
 {
   \rho, e \Rightarrow \val{\exLamClosure[\Delta]{\rho'}{\seq{x}}{e'}} \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
@@ -654,9 +646,9 @@
 }
 {
   \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \aborts{\errType}
-}}
+}
 \and
-\added{\inferrule*[lab={\ruleName{eval-call-def-arity}}]
+\inferrule*[lab={\ruleName{eval-call-def-arity}}]
 {
   \rho, e \Rightarrow \val{\exDefClosure[\Delta]{\rho'}{\seq{d}}{j}} \\
   d_j = \exDef{f_j}{\seq{x}_j}{b_j} \\
@@ -665,13 +657,13 @@
 }
 {
   \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \aborts{\errType}
-}}
+}
 \and
 \inferrule*[lab={\ruleName{eval-call-nonfun}}]
 {
   \rho, e \Rightarrow \val{v} \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
-  v \text{ \replaced{neither closure nor primitive}{not a closure}}
+  v \text{ neither closure nor primitive}
 }
 {
   \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \aborts{\errType}
@@ -726,7 +718,7 @@
   \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i)
 }
 {
-  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \val{(\seq{\rho}_1 \mathbin{\replaced{\concat}{\cons}} \ldots \mathbin{\replaced{\concat}{\cons}} \seq{\rho}_n)}
+  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \val{(\seq{\rho}_1 \mathbin{\concat} \ldots \mathbin{\concat} \seq{\rho}_n)}
 }
 \and
 \inferrule*[lab={\ruleName{eval-qual-generator-fail}}]

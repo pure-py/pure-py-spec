@@ -123,8 +123,7 @@ effect-free.
 Python accepts several implicit coercions and lax matches. \figref{coercions} lists those \PurePy
 excludes, and records at which stage each exclusion takes effect. A dynamically excluded operation leaves
 the run without a result, so the program runs under Python but not under \PurePy.
-\Deleted{Under \PurePy a list pattern applied to a tuple fails to match rather than getting stuck, so a
-later case runs and \PurePy gives a different result from Python (\issue{151}).}
+
 
 \begin{figure}
 \centering
@@ -135,10 +134,10 @@ later case runs and \PurePy gives a different result from Python (\issue{151}).}
 \textbf{Construct} & \textbf{Python} & \textbf{\PurePy} & \textbf{Excluded} \\
 \hline
 Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & Must already be Boolean & Dynamically \\[1mm]
-Sequence patterns & List patterns match tuples, and tuple patterns lists & List patterns match only lists, tuple patterns only tuples & \replaced{Dynamically}{\issue{151}} \\[1mm]
+Sequence patterns & List patterns match tuples, and tuple patterns lists & List patterns match only lists, tuple patterns only tuples & Dynamically \\[1mm]
 Constructor patterns & Positional class patterns may supply fewer sub-patterns than the class has fields & Require exact arity & Statically \\[1mm]
-Dictionary keys & \Replaced{Any hashable value}{Any hashable values}, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Strings only & Statically in patterns, dynamically in expressions \\[1mm]
-\added{\pyinline{assert} message} & \added{Any object, shown in the traceback} & \added{Strings only} & \added{Dynamically} \\[1mm]
+Dictionary keys & Any hashable value, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Strings only & Statically in patterns, dynamically in expressions \\[1mm]
+\pyinline{assert} message & Any object, shown in the traceback & Strings only & Dynamically \\[1mm]
 \pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & Undefined between, say, number and string, or list and tuple; only \pyinline{None} compares with anything & Dynamically \\[1mm]
 Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & Equality undefined & Dynamically \\[1mm]
 \pyinline{nan} comparison via container equality & Elements compared by identity before equality, so identical NaNs match but distinct ones do not & Undefined when both elements are \pyinline{nan} & Dynamically \\
@@ -237,20 +236,19 @@ through its existing instances.
 \subsubsection{Other restrictions}
 \label{sec:other-restrictions}
 
-A few remaining restrictions do not fit the groups above. \Replaced{A \pyinline{class} definition must be a
+A few remaining restrictions do not fit the groups above. A \pyinline{class} definition must be a
 dataclass, and a dataclass body declares fields and nothing else. \PurePy therefore supports none of Python's
 class-based extension mechanisms, such as \pyinline{__getitem__} for subscripting, \pyinline{__iter__} for
 iteration or \pyinline{__eq__} for equality. Subscripting, iteration, equality and membership have the fixed
-meanings given in \secref{opsem}.}{Only dataclasses are supported, so
-\pyinline{class} definitions of other kinds are excluded.}
+meanings given in \secref{opsem}.
 
 \subsubsection{Runtime errors}
 \label{sec:runtime-errors}
 
 A well-formed \PurePy program avoids the Python runtime errors listed in
 \figref{prevented-errors}, under the conditions noted there. Well-formedness does not prevent errors from
-ill-typed operations, such as wrong operand types, calling a non-function\Added{, calling a function with the
-wrong number of arguments}, or attribute access on an object lacking the attribute. Each of these has a \Replaced{termination}{error} kind and a rule in the semantics (\figref{eval-fails}).
+ill-typed operations, such as wrong operand types, calling a non-function, calling a function with the
+wrong number of arguments, or attribute access on an object lacking the attribute. Each of these has a termination kind and a rule in the semantics (\figref{eval-fails}).
 
 \begin{figure}
 \centering
@@ -262,7 +260,7 @@ wrong number of arguments}, or attribute access on an object lacking the attribu
 \pyinline{NameError}, \pyinline{UnboundLocalError} & Always: a variable may be referenced only where it is definitely assigned. & \figref{well-formed}, \figref{well-formed-expr} \\[1mm]
 \pyinline{ModuleNotFoundError} & Always: an import requires its target to be a module of the program. & \figref{well-formed-imports} \\[1mm]
 \pyinline{ImportError} & Always: a from-import requires each imported name to be a member of the source module, and import cycles are rejected. (A Python cycle may run or fail, depending on where the cycle is entered.) & \figref{imports}, \figref{well-formed-module} \\[1mm]
-\pyinline{AttributeError} & \replaced{The reference is a module attribute, which}{Always: a module attribute reference\ } must resolve to a definitely assigned member.  & \figref{well-formed-expr} \\[1mm]
+\pyinline{AttributeError} & The reference is a module attribute, which must resolve to a definitely assigned member.  & \figref{well-formed-expr} \\[1mm]
 \pyinline{TypeError} & The operation is a constructor call or class pattern, which must match the class's arity exactly. (Only excess sub-patterns are a Python error; a pattern with fewer is excluded even though Python permits it.) & \figref{well-formed-expr}, \figref{well-formed-pat} \\
 \hline
 \end{tabular}

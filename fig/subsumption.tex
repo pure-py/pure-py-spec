@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\added{\Gamma} \mathrel{\added{\vdash}} p \subsumed p'$}
+\flushleft \shadebox{$\Gamma \mathrel{\vdash} p \subsumed p'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{sub-lit}}]
@@ -7,7 +7,7 @@
   \strut
 }
 {
-  \added{\Gamma} \mathrel{\added{\vdash}} \ell \subsumed \ell
+  \Gamma \mathrel{\vdash} \ell \subsumed \ell
 }
 \and
 \inferrule*[lab={\ruleName{sub-neg-lit}}]
@@ -15,7 +15,7 @@
   \strut
 }
 {
-  \added{\Gamma} \mathrel{\added{\vdash}} -n \subsumed -n
+  \Gamma \mathrel{\vdash} -n \subsumed -n
 }
 \and
 \inferrule*[lab={\ruleName{sub-var}}]
@@ -23,7 +23,7 @@
   \strut
 }
 {
-  \added{\Gamma} \mathrel{\added{\vdash}} p \subsumed x
+  \Gamma \mathrel{\vdash} p \subsumed x
 }
 \and
 \inferrule*[lab={\ruleName{sub-wild}}]
@@ -31,35 +31,35 @@
   \strut
 }
 {
-  \added{\Gamma} \mathrel{\added{\vdash}} p \subsumed \patWild
+  \Gamma \mathrel{\vdash} p \subsumed \patWild
 }
 \and
 \inferrule*[lab={\ruleName{sub-list-list}}]
 {
-  \added{\Gamma} \mathrel{\added{\vdash}} p_i \subsumed q_i \quad (\forall i)
+  \Gamma \mathrel{\vdash} p_i \subsumed q_i \quad (\forall i)
 }
 {
-  \added{\Gamma} \mathrel{\added{\vdash}} \patList{p_1, \ldots, p_n} \subsumed \patList{q_1, \ldots, q_n}
+  \Gamma \mathrel{\vdash} \patList{p_1, \ldots, p_n} \subsumed \patList{q_1, \ldots, q_n}
 }
 \and
 \inferrule*[lab={\ruleName{sub-tuple-tuple}}]
 {
-  \added{\Gamma} \mathrel{\added{\vdash}} p_i \subsumed q_i \quad (\forall i)
+  \Gamma \mathrel{\vdash} p_i \subsumed q_i \quad (\forall i)
 }
 {
-  \added{\Gamma} \mathrel{\added{\vdash}} \patTuple{p_1, \ldots, p_n} \subsumed \patTuple{q_1, \ldots, q_n}
+  \Gamma \mathrel{\vdash} \patTuple{p_1, \ldots, p_n} \subsumed \patTuple{q_1, \ldots, q_n}
 }
 \and
 \inferrule*[lab={\ruleName{sub-dict-dict}}]
 {
   \set{u_1, \ldots, u_m} \subseteq \set{w_1, \ldots, w_n} \\
-  \added{\Gamma} \mathrel{\added{\vdash}} p_i \subsumed q_j \quad (\forall i, j.\ w_i = u_j)
+  \Gamma \mathrel{\vdash} p_i \subsumed q_j \quad (\forall i, j.\ w_i = u_j)
 }
 {
-  \added{\Gamma} \mathrel{\added{\vdash}} \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \subsumed \patDict{\bind{u_1}{q_1}, \ldots, \bind{u_m}{q_m}}
+  \Gamma \mathrel{\vdash} \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \subsumed \patDict{\bind{u_1}{q_1}, \ldots, \bind{u_m}{q_m}}
 }
 \and
-\added{\inferrule*[lab={\ruleName{sub-constr}}]
+\inferrule*[lab={\ruleName{sub-constr}}]
 {
   \Gamma \vdash q : C \\
   \Gamma \vdash q' : C' \\
@@ -68,22 +68,22 @@
 }
 {
   \Gamma \vdash \patConstr{q}{\seq{p}} \subsumed \patConstr{q'}{\seq{p}\,'}
-}}
+}
 \and
 \inferrule*[lab={\ruleName{sub-as-l}}]
 {
-  \added{\Gamma} \mathrel{\added{\vdash}} p \subsumed q
+  \Gamma \mathrel{\vdash} p \subsumed q
 }
 {
-  \added{\Gamma} \mathrel{\added{\vdash}} p\;\pyinline{as}\;x \subsumed q
+  \Gamma \mathrel{\vdash} p\;\pyinline{as}\;x \subsumed q
 }
 \and
 \inferrule*[lab={\ruleName{sub-as-r}}]
 {
-  \added{\Gamma} \mathrel{\added{\vdash}} p \subsumed q
+  \Gamma \mathrel{\vdash} p \subsumed q
 }
 {
-  \added{\Gamma} \mathrel{\added{\vdash}} p \subsumed q\;\pyinline{as}\;y
+  \Gamma \mathrel{\vdash} p \subsumed q\;\pyinline{as}\;y
 }
 \end{mathpar}
 \caption{Pattern $p$ is subsumed by pattern $p'$ under $\Gamma$}

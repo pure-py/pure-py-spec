@@ -1,45 +1,45 @@
 \begin{figure}
-\flushleft \shadebox{$\rho, p, v \matches \replaced{m}{\rho'}$}
+\flushleft \shadebox{$\rho, p, v \matches m$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-pat-lit}}]
 {
-  \added{\eqOp(\ell, v) = \pyinline{True}}
+  \eqOp(\ell, v) = \pyinline{True}
 }
 {
-  \rho, \ell, \replaced{v}{\ell} \matches \replaced{\matchOk{\varnothing}}{\varnothing}
+  \rho, \ell, v \matches \matchOk{\varnothing}
 }
 \and
-\added{\inferrule*[lab={\ruleName{eval-pat-lit-no}}]
+\inferrule*[lab={\ruleName{eval-pat-lit-no}}]
 {
   \eqOp(\ell, v) = \pyinline{False}
 }
 {
   \rho, \ell, v \matches \noMatch
-}}
+}
 \and
 \inferrule*[lab={\ruleName{eval-pat-neg-lit}}]
 {
-  \added{\eqOp(-n, v) = \pyinline{True}}
+  \eqOp(-n, v) = \pyinline{True}
 }
 {
-  \rho, -n, \replaced{v}{-n} \matches \replaced{\matchOk{\varnothing}}{\varnothing}
+  \rho, -n, v \matches \matchOk{\varnothing}
 }
 \and
-\added{\inferrule*[lab={\ruleName{eval-pat-neg-lit-no}}]
+\inferrule*[lab={\ruleName{eval-pat-neg-lit-no}}]
 {
   \eqOp(-n, v) = \pyinline{False}
 }
 {
   \rho, -n, v \matches \noMatch
-}}
+}
 \and
 \inferrule*[lab={\ruleName{eval-pat-var}}]
 {
   \strut
 }
 {
-  \rho, x, v \matches \replaced{\matchOk{\set{\bind{x}{v}}}}{\set{\bind{x}{v}}}
+  \rho, x, v \matches \matchOk{\set{\bind{x}{v}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-pat-wild}}]
@@ -47,85 +47,85 @@
   \strut
 }
 {
-  \rho, \patWild, v \matches \replaced{\matchOk{\varnothing}}{\varnothing}
+  \rho, \patWild, v \matches \matchOk{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{eval-pat-list}}]
 {
-  \rho, p_i, v_i \matches \replaced{m_i}{\rho_i} \quad (\forall i)
+  \rho, p_i, v_i \matches m_i \quad (\forall i)
 }
 {
-  \rho, \patList{p_1, \ldots, p_n}, \exList{v_1, \ldots, v_n} \matches \replaced{m_1 \override \ldots \override m_n}{\rho_1 \disjunion \ldots \disjunion \rho_n}
+  \rho, \patList{p_1, \ldots, p_n}, \exList{v_1, \ldots, v_n} \matches m_1 \override \ldots \override m_n
 }
 \and
-\added{\inferrule*[lab={\ruleName{eval-pat-list-no}}]
+\inferrule*[lab={\ruleName{eval-pat-list-no}}]
 {
   v \text{ neither list nor tuple, or list of length} \neq n
 }
 {
   \rho, \patList{p_1, \ldots, p_n}, v \matches \noMatch
-}}
+}
 \and
 \inferrule*[lab={\ruleName{eval-pat-tuple}}]
 {
-  \rho, p_i, v_i \matches \replaced{m_i}{\rho_i} \quad (\forall i)
+  \rho, p_i, v_i \matches m_i \quad (\forall i)
 }
 {
-  \rho, \patTuple{p_1, \ldots, p_n}, \exTuple{v_1, \ldots, v_n} \matches \replaced{m_1 \override \ldots \override m_n}{\rho_1 \disjunion \ldots \disjunion \rho_n}
+  \rho, \patTuple{p_1, \ldots, p_n}, \exTuple{v_1, \ldots, v_n} \matches m_1 \override \ldots \override m_n
 }
 \and
-\added{\inferrule*[lab={\ruleName{eval-pat-tuple-no}}]
+\inferrule*[lab={\ruleName{eval-pat-tuple-no}}]
 {
   v \text{ neither list nor tuple, or tuple of length} \neq n
 }
 {
   \rho, \patTuple{p_1, \ldots, p_n}, v \matches \noMatch
-}}
+}
 \and
 \inferrule*[lab={\ruleName{eval-pat-dict}}]
 {
-  \bind{w_i}{\replaced{v_i}{u_i}} \in \delta \quad (\forall i) \\
-  \rho, p_i, \replaced{v_i}{u_i} \matches \replaced{m_i}{\rho_i} \quad (\forall i)
+  \bind{w_i}{v_i} \in \delta \quad (\forall i) \\
+  \rho, p_i, v_i \matches m_i \quad (\forall i)
 }
 {
-  \rho, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}}, \delta \matches \replaced{m_1 \override \ldots \override m_n}{\rho_1 \disjunion \ldots \disjunion \rho_n}
+  \rho, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}}, \delta \matches m_1 \override \ldots \override m_n
 }
 \and
-\added{\inferrule*[lab={\ruleName{eval-pat-dict-no}}]
+\inferrule*[lab={\ruleName{eval-pat-dict-no}}]
 {
   v \text{ not dictionary, or } \delta \text{ with } w_i \notin \dom(\delta) \text{ for some } i
 }
 {
   \rho, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}}, v \matches \noMatch
-}}
+}
 \and
 \inferrule*[lab={\ruleName{eval-pat-as}}]
 {
-  \rho, p, v \matches \replaced{m}{\rho'}
+  \rho, p, v \matches m
 }
 {
-  \rho, p\;\pyinline{as}\;x, v \matches \replaced{m \override \matchOk{\set{\bind{x}{v}}}}{\rho' \disjunion \set{\bind{x}{v}}}
+  \rho, p\;\pyinline{as}\;x, v \matches m \override \matchOk{\set{\bind{x}{v}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-pat-constr}}]
 {
   \resolveClass(\rho, q) = C \\
   C \in \ancestors(C') \\
-  \rho, \fieldMap(C, \seq{p})(x), \rho^\dagger(x) \matches \replaced{m_x}{\rho_x} \quad (\forall x \in \fields(C))
+  \rho, \fieldMap(C, \seq{p})(x), \rho^\dagger(x) \matches m_x \quad (\forall x \in \fields(C))
 }
 {
-  \rho, \patConstr{q}{\seq{p}}, \exObj{\Gamma'}{C'}{\rho^\dagger} \matches \replaced{{\textstyle\bigotimes_{x \in \fields(C)}}\, m_x}{{\textstyle\biguplus_{x \in \fields(C)}}\, \rho_x}
+  \rho, \patConstr{q}{\seq{p}}, \exObj{\Gamma'}{C'}{\rho^\dagger} \matches {\textstyle\bigotimes_{x \in \fields(C)}}\, m_x
 }
 \and
-\added{\inferrule*[lab={\ruleName{eval-pat-constr-no}}]
+\inferrule*[lab={\ruleName{eval-pat-constr-no}}]
 {
   \resolveClass(\rho, q) = C \\
   v \text{ not object, or } \exObj{\Gamma'}{C'}{\rho^\dagger} \text{ with } C \notin \ancestors(C')
 }
 {
   \rho, \patConstr{q}{\seq{p}}, v \matches \noMatch
-}}
+}
 \end{mathpar}
-\caption{Pattern $p$ matches value $v$ under environment $\rho$, \replaced{with result $m$}{producing bindings $\rho'$}}
+\caption{Pattern $p$ matches value $v$ under environment $\rho$, with result $m$}
 \label{fig:match}
 \end{figure}
