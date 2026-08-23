@@ -59,6 +59,15 @@
   \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \subsumed \patDict{\bind{u_1}{q_1}, \ldots, \bind{u_m}{q_m}}
 }
 \and
+\added{\inferrule*[lab={\ruleName{sub-constr}}]
+{
+  p_i \subsumed p_i' \quad (\forall i)
+}
+{
+  \patConstr{q}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}} \subsumed
+  \patConstr{q}{p_1', \ldots, p_n', y_1 \mathord{=} p_{n+1}', \ldots, y_m \mathord{=} p_{n+m}'}
+}}
+\and
 \inferrule*[lab={\ruleName{sub-as-l}}]
 {
   p \subsumed q
