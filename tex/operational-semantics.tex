@@ -47,13 +47,12 @@ $1$, as Python does for an uncaught exception.}
 
 \input{fig/eval-modules}
 
-\Added{The evaluation rules are read for any context $\Gamma$, any environment $\rho$ well-formed at
-$\Gamma$, and any block or expression closed by $\Gamma$.}
-Block evaluation $\rho, b \Rightarrow r$ is given in \figref{eval-block-outcome}. Function definitions delimit
+Block evaluation $\rho, b \Rightarrow r$\Added{, for any $\rho : \Gamma$ and any $b$ well-formed in $\Gamma$,}
+is given in \figref{eval-block-outcome}. Function definitions delimit
 the scope of sequential-composition effects, so as black boxes functions are always pure. The metafunction $\outcome$ (\figref{eval-aux}) reads a block's result as
 the outcome of calling it, $\val{\pyinline{None}}$ where the block falls off the end.
 
-Expression evaluation $\rho, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd}) yields an
+Expression evaluation $\rho, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd})\Added{, for any $\rho : \Gamma$ and any $e$ well-formed in $\Gamma$,} yields an
 outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). \Replaced{The termination kinds other than $\errExit{n}$ are named after the
 exceptions the same program raises under Python in the same circumstances.}{The error kinds are designed to
 correspond to the error the same program would raise under Python in the same circumstances.} The rules are given in a monadic metalanguage over outcomes, in which
