@@ -6,7 +6,7 @@ from typing import Optional
 import reasons
 from reasons import IllFormedModule
 from contexts import (ClassEntry, Context, ContextEntry, ModuleContext, ModuleLoaded, ModuleStub,
-                      PREDEFINED_MEMBERS, ResultTy, Status, ASSIGNS_EMPTY, RETURNS, Assigns,
+                      ResultTy, Status, ASSIGNS_EMPTY, RETURNS, Assigns,
                       Returns, VarContext, class_of, extend_context, fields, merge_results,
                       module_of, override_gamma, override_results, override_var, var_status)
 from aux import (BlockElement, assigns_block, assigns_elements, binds, captures_e, captures_element,
@@ -172,8 +172,6 @@ def check_match_cases(cases: list[ast.match_case], ctx: ModuleContext) -> None:
 def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
     if isinstance(e, ast.Name):
         if var_status(ctx, e.id) != Status.TT:
-            if e.id not in ctx.gamma and e.id in PREDEFINED_MEMBERS['builtins']:
-                return
             if module_of(ctx, e.id) is not None:
                 raise IllFormedModule(e, reasons.ModuleAsValue(e.id))
             if class_of(ctx, e.id) is not None:

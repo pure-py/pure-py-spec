@@ -79,6 +79,9 @@ PREDEFINED_MEMBERS: dict[str, set[str]] = {
 
 PREDEFINED_MODULES = set(PREDEFINED_MEMBERS)
 
+def predefined_context(q: str) -> Context:
+    return {x: Status.TT for x in PREDEFINED_MEMBERS[q] | {'__name__'}}
+
 def merge_status(a: Status, b: Status) -> Status:
     if a == Status.TT and b == Status.TT:
         return Status.TT

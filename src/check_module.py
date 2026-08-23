@@ -7,7 +7,8 @@ from typing import Optional
 import reasons
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
 from contexts import (Context, ContextEntry, ModuleContext, ModuleLoaded, ModuleStub,
-                      PREDEFINED_MEMBERS, PREDEFINED_MODULES, Status, Returns, extend_context)
+                      PREDEFINED_MEMBERS, PREDEFINED_MODULES, Status, Returns, extend_context,
+                      predefined_context)
 from aux import (annotate_seq_kinds, assigns_block, assigns_stmt, find_import,
                  find_nested_import, split_imports)
 from well_formed import check_block, result_type_of_block
@@ -115,7 +116,8 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
         raise IllFormedModule(stray, reasons.ImportAfterStatement())
     gamma0 = check_imports_prefix(prefix, ModuleContext(gamma={}, M=M, q=q))
     body = [name_assign(q)] + rest
-    final_ctx = check_block(body, ModuleContext(gamma=gamma0, M=M, q=q), module_body=True)
+    gamma1 = {**predefined_context('builtins'), **gamma0}
+    final_ctx = check_block(body, ModuleContext(gamma=gamma1, M=M, q=q), module_body=True)
     if rest and isinstance(result_type_of_block(rest), Returns):
         raise IllFormedModule(rest[0], reasons.TopLevelReturn())
     check_submodule_clash(m, gamma0, body, M, q)
@@ -145,7 +147,7 @@ def find_binder(stmts: list[ast.stmt], x: str) -> Optional[ast.stmt]:
 def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context:
     stubs: Context = submods(final_ctx.M, q)
     if q in PREDEFINED_MEMBERS:
-        own: Context = {name: Status.TT for name in PREDEFINED_MEMBERS[q] | {'__name__'}}
+        own: Context = predefined_context(q)
     else:
         own = {name: final_ctx.gamma[name] for name in own_members(body, q)}
     return {**stubs, **own}
