@@ -6,7 +6,8 @@ from typing import Optional
 import reasons
 from reasons import IllFormedModule
 from contexts import (ClassEntry, Context, ContextEntry, ModuleContext, ModuleLoaded, ModuleStub,
-                      ResultTy, Status, ASSIGNS_EMPTY, RETURNS, Assigns,
+                      class_entry, entry_of,
+                      field_map, ResultTy, Status, ASSIGNS_EMPTY, RETURNS, Assigns,
                       Returns, VarContext, class_of, extend_context, fields, merge_results,
                       module_of, override_gamma, override_results, override_var, var_status)
 from aux import (BlockElement, assigns_block, assigns_elements, binds, captures_e, captures_element,
@@ -118,16 +119,6 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
         raise IllFormedModule(head, reasons.DuplicateMutualName(head.name))
     check_distinct_names(defs[1:], seen | {head.name})
 
-def entry_of(e: ast.expr, ctx: ModuleContext) -> Optional[ContextEntry]:
-    if isinstance(e, ast.Name):
-        return ctx.gamma.get(e.id)
-    if isinstance(e, ast.Attribute):
-        parent = entry_of(e.value, ctx)
-        if isinstance(parent, ModuleLoaded):
-            return parent.members.get(e.attr)
-        return None
-    return None
-
 def check_stmt(s: ast.stmt, ctx: ModuleContext, module_body: bool = False) -> None:
     if isinstance(s, ast.Pass):
         return
@@ -185,14 +176,15 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
         check_expr(e.body, override_var(ctx, {p: Status.TT for p in params}))
         return
     if isinstance(e, ast.Call):
-        sig = names_class(e.func, ctx)
-        if sig is not None:
-            c_name, fields = sig
-            n, m = len(e.args), len(e.keywords)
-            if n + m != len(fields):
-                raise IllFormedModule(e, reasons.ConstructorArityMismatch(c_name, len(fields), n + m))
-            if {k.arg for k in e.keywords} != set(fields[n:]):
-                raise IllFormedModule(e, reasons.UnknownConstructorKeyword(c_name, tuple(sorted(set(fields[n:])))))
+        constructed = class_entry(e.func, ctx)
+        if constructed is not None:
+            c_name, xs = short_name(constructed), fields(constructed)
+            kwd_names = [k.arg for k in e.keywords if k.arg is not None]
+            if field_map(constructed, e.args, kwd_names, [k.value for k in e.keywords]) is None:
+                n = len(e.args)
+                if n + len(kwd_names) != len(xs):
+                    raise IllFormedModule(e, reasons.ConstructorArityMismatch(c_name, len(xs), n + len(kwd_names)))
+                raise IllFormedModule(e, reasons.UnknownConstructorKeyword(c_name, tuple(sorted(set(xs[n:])))))
             check_exprs(e.args, ctx)
             check_exprs([k.value for k in e.keywords], ctx)
             return
@@ -272,41 +264,28 @@ def check_exprs(es: list[ast.expr], ctx: ModuleContext) -> None:
     check_expr(es[0], ctx)
     check_exprs(es[1:], ctx)
 
+def short_name(entry: ClassEntry) -> str:
+    return entry.name.rsplit('.', 1)[-1]
+
 def qualified_name(e: ast.expr) -> str:
     if isinstance(e, ast.Name):
         return e.id
     assert isinstance(e, ast.Attribute)
     return qualified_name(e.value) + '.' + e.attr
 
-def names_class(head: ast.expr, ctx: ModuleContext) -> Optional[tuple[str, tuple[str, ...]]]:
-    if isinstance(head, ast.Name):
-        entry = class_of(ctx, head.id)
-        return (head.id, fields(entry)) if entry is not None else None
-    if isinstance(head, ast.Attribute):
-        parent = entry_of(head.value, ctx)
-        if not isinstance(parent, ModuleLoaded):
-            return None
-        member = parent.members.get(head.attr)
-        if not isinstance(member, ClassEntry):
-            return None
-        return head.attr, fields(member)
-    return None
-
 def check_pattern(p: ast.pattern, ctx: ModuleContext) -> None:
     if isinstance(p, ast.MatchClass):
-        sig = names_class(p.cls, ctx)
-        if sig is None:
+        entry = class_entry(p.cls, ctx)
+        if entry is None:
             raise IllFormedModule(p, reasons.UnknownClassInPattern(qualified_name(p.cls) if isinstance(p.cls, (ast.Name, ast.Attribute)) else ast.unparse(p.cls)))
-        c_name, fields = sig
-        n, m = len(p.patterns), len(p.kwd_patterns)
-        if n + m != len(fields):
-            raise IllFormedModule(p, reasons.PatternArityMismatch(c_name, len(fields), n + m))
-        remaining = set(fields[n:])
-        kwds = list(p.kwd_attrs)
-        if len(kwds) != len(set(kwds)):
-            raise IllFormedModule(p, reasons.DuplicatePatternKeyword(c_name))
-        if set(kwds) != remaining:
-            raise IllFormedModule(p, reasons.UnknownFieldInPattern(c_name, tuple(sorted(remaining))))
+        c_name, xs = short_name(entry), fields(entry)
+        if field_map(entry, p.patterns, p.kwd_attrs, p.kwd_patterns) is None:
+            n = len(p.patterns)
+            if n + len(p.kwd_attrs) != len(xs):
+                raise IllFormedModule(p, reasons.PatternArityMismatch(c_name, len(xs), n + len(p.kwd_attrs)))
+            if len(p.kwd_attrs) != len(set(p.kwd_attrs)):
+                raise IllFormedModule(p, reasons.DuplicatePatternKeyword(c_name))
+            raise IllFormedModule(p, reasons.UnknownFieldInPattern(c_name, tuple(sorted(set(xs[n:])))))
         for sub in list(p.patterns) + list(p.kwd_patterns):
             check_pattern(sub, ctx)
         return
@@ -333,7 +312,7 @@ def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: ModuleCo
         if len(vars_) != len(set(vars_)):
             raise IllFormedModule(node, reasons.NonlinearPattern(i + 1))
         for j in range(i):
-            if subsumes(p, patterns[j]):
+            if subsumes(p, patterns[j], ctx):
                 raise IllFormedModule(node, reasons.UnreachableCase(i + 1, j + 1))
 
 def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:

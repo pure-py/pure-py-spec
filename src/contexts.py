@@ -3,7 +3,9 @@ from __future__ import annotations
 import ast
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Optional, Union
+from typing import Optional, Sequence, TypeVar, Union
+
+T = TypeVar('T')
 
 class Status(Enum):
     TT = auto()
@@ -123,9 +125,40 @@ def extend_entry(a: ContextEntry, b: ContextEntry) -> ContextEntry:
 def extend_context(g1: Context, g2: Context) -> Context:
     return {**g1, **{x: extend_entry(g1[x], e) if x in g1 else e for x, e in g2.items()}}
 
+def entry_of(e: ast.expr, ctx: ModuleContext) -> Optional[ContextEntry]:
+    if isinstance(e, ast.Name):
+        return ctx.gamma.get(e.id)
+    if isinstance(e, ast.Attribute):
+        parent = entry_of(e.value, ctx)
+        if isinstance(parent, ModuleLoaded):
+            return parent.members.get(e.attr)
+        return None
+    return None
+
+def class_entry(e: ast.expr, ctx: ModuleContext) -> Optional[ClassEntry]:
+    entry = entry_of(e, ctx)
+    return entry if isinstance(entry, ClassEntry) else None
+
+def ancestors(entry: ClassEntry) -> list[ClassEntry]:
+    if entry.base is None:
+        return [entry]
+    base_entry = entry.context[entry.base]
+    assert isinstance(base_entry, ClassEntry)
+    return [entry] + ancestors(base_entry)
+
 def fields(entry: ClassEntry) -> tuple[str, ...]:
     if entry.base is None:
         return entry.own_fields
     base_entry = entry.context[entry.base]
     assert isinstance(base_entry, ClassEntry)
     return fields(base_entry) + entry.own_fields
+
+def field_map(entry: ClassEntry, positional: Sequence[T],
+              kwd_names: Sequence[str], kwd_values: Sequence[T]) -> Optional[dict[str, T]]:
+    xs = fields(entry)
+    n = len(positional)
+    if n + len(kwd_names) != len(xs) or len(set(kwd_names)) != len(kwd_names):
+        return None
+    if set(kwd_names) != set(xs[n:]):
+        return None
+    return {**dict(zip(xs[:n], positional)), **dict(zip(kwd_names, kwd_values))}

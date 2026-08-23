@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import ast
+from typing import Optional
+
+from contexts import ModuleContext, ancestors, class_entry, field_map, fields
 
 def is_catch_all(p: ast.pattern) -> bool:
     return isinstance(p, ast.MatchAs) and p.pattern is None
@@ -19,11 +22,11 @@ def dict_key(k: ast.expr) -> str:
     assert isinstance(k, ast.Constant) and isinstance(k.value, str)
     return k.value
 
-def subsumes(p: ast.pattern, q: ast.pattern) -> bool:
+def subsumes(p: ast.pattern, q: ast.pattern, ctx: ModuleContext) -> bool:
     if isinstance(q, ast.MatchAs) and q.pattern is not None:
-        return subsumes(p, q.pattern)
+        return subsumes(p, q.pattern, ctx)
     if isinstance(p, ast.MatchAs) and p.pattern is not None:
-        return subsumes(p.pattern, q)
+        return subsumes(p.pattern, q, ctx)
     if isinstance(q, ast.MatchAs) and q.pattern is None:
         return True
     if isinstance(p, ast.MatchValue) and isinstance(q, ast.MatchValue):
@@ -35,11 +38,22 @@ def subsumes(p: ast.pattern, q: ast.pattern) -> bool:
         q_keys = {dict_key(k): sub for k, sub in zip(q.keys, q.patterns)}
         if not set(q_keys) <= set(p_keys):
             return False
-        return all(subsumes(p_keys[k], sub) for k, sub in q_keys.items())
+        return all(subsumes(p_keys[k], sub, ctx) for k, sub in q_keys.items())
     if isinstance(p, ast.MatchSequence) and isinstance(q, ast.MatchSequence):
         if bool(getattr(p, 'is_list_pattern', False)) != bool(getattr(q, 'is_list_pattern', False)):
             return False
         if len(p.patterns) != len(q.patterns):
             return False
-        return all((subsumes(pi, qi) for pi, qi in zip(p.patterns, q.patterns)))
+        return all(subsumes(pi, qi, ctx) for pi, qi in zip(p.patterns, q.patterns))
+    if isinstance(p, ast.MatchClass) and isinstance(q, ast.MatchClass):
+        c_p, c_q = class_entry(p.cls, ctx), class_entry(q.cls, ctx)
+        if c_p is None or c_q is None:
+            return False
+        if not any(a.name == c_q.name for a in ancestors(c_p)):
+            return False
+        map_p = field_map(c_p, p.patterns, p.kwd_attrs, p.kwd_patterns)
+        map_q = field_map(c_q, q.patterns, q.kwd_attrs, q.kwd_patterns)
+        if map_p is None or map_q is None:
+            return False
+        return all(subsumes(map_p[x], map_q[x], ctx) for x in fields(c_q))
     return False
