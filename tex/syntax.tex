@@ -8,6 +8,9 @@ statements in a block: any non-\pyinline{def} statement in that block, by defini
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single region. The well-formedness rules treat each region as
 one mutually-recursive binding (see \secref{mutual-recursion}).
+\Added{\figref{metavariables} summarises the metavariables used throughout.}
+
+\input{fig/metavariables}
 
 \subsection{Lexical syntax}
 \label{sec:lexical}
@@ -23,6 +26,7 @@ narrows those rules.}
 Metavariables $x$, $f$, $c$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function and $c$ when it is expected to denote a class.
 
 \begin{definition}[Context]
+\label{def:context}
 A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the following \emph{context entries} $\theta$:
 \begin{itemize}
 \item the variable's \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;

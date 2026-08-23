@@ -38,6 +38,7 @@ A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is li
 \input{fig/well-formed-pat}
 
 \subsection{Blocks and expressions}
+\label{sec:wf-blocks}
 
 Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
