@@ -120,9 +120,9 @@
 \newcommand*{\mlet}[3]{\mathsf{let}\;#1 \leftarrow #2\;\mathsf{in}\;#3}
 \newcommand*{\val}[1]{\mathsf{val}\;#1}
 \newcommand*{\errAssertNoMsg}{\mathsf{AssertionError}}
-\newcommand*{\errAssert}[1]{\errAssertNoMsg\;#1}
+\newcommand*{\errAssert}[1]{\errAssertNoMsg(#1)}
 \newcommand*{\errAttr}{\mathsf{AttributeError}}
-\newcommand*{\errExit}[1]{\mathsf{SystemExit}\;#1}
+\newcommand*{\errExit}[1]{\mathsf{SystemExit}(#1)}
 \newcommand*{\errIndex}{\mathsf{IndexError}}
 \newcommand*{\errKey}{\mathsf{KeyError}}
 \newcommand*{\errType}{\mathsf{TypeError}}

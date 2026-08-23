@@ -165,7 +165,6 @@ environment (\figref{well-formed-env}).}
 
 \begin{figure}
 \small
-\begin{subfigure}{\textwidth}
 \centering
 \begin{tabular}{lp{0.6\textwidth}}
 \hline
@@ -178,34 +177,23 @@ environment (\figref{well-formed-env}).}
 \pyinline{dataclasses} & \pyinline{dataclass} \\
 \hline
 \end{tabular}
-\subcaption{Modules and their members}
-\end{subfigure}
 
-\vspace{2mm}
+\vspace{3mm}
 
-\begin{subfigure}{\textwidth}
-\centering
-\added{\begin{tabular}{ll}
+\added{\begin{tabular}{lll}
 \hline
-\textbf{Member} & \textbf{Meaning} \\
+\textbf{Member} & \multicolumn{2}{l}{\textbf{Meaning}} \\
 \hline
-\pyinline{len} & $\begin{aligned}[t]
-  \primFn(v) &= \val{n} && \text{if } \iterOp(v) = u_1 \cons \ldots \cons u_n \\
-  \primFn(\seq{u}) &= \aborts{\errType} && (\text{otherwise})
-\end{aligned}$ \\[3mm]
-\pyinline{range} & $\begin{aligned}[t]
-  \primFn(n) &= \val{\exList{0, \ldots, n-1}} && \text{if } n \text{ whole number}, n > 0 \\
-  \primFn(n) &= \val{\exList{}} && \text{if } n \text{ whole number}, n \leq 0
-\end{aligned}$ \\[3mm]
-\pyinline{exit} & $\begin{aligned}[t]
-  \primFn(\varepsilon) &= \aborts{\errExit{0}} \\
-  \primFn(n) &= \aborts{\errExit{n}}
-\end{aligned}$ \\
+\pyinline{len} & $\primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
+ & $\primFn(\seq{u}) = \aborts{\errType}$ & (otherwise) \\
+\pyinline{range} & $\primFn(n) = \val{\exList{0, \ldots, n-1}}$ & if $n$ whole number, $n > 0$ \\
+ & $\primFn(n) = \val{\exList{}}$ & if $n$ whole number, $n \leq 0$ \\
+\pyinline{exit} & $\primFn(\varepsilon) = \aborts{\errExit{0}}$ & \\
+ & $\primFn(n) = \aborts{\errExit{n}}$ & \\
 \hline
 \end{tabular}}
-\subcaption{\added{Meanings of predefined functions}}
-\end{subfigure}
-\caption{Predefined modules}
+
+\caption{Predefined modules and their members}
 \label{fig:predefined}
 \end{figure}
 
