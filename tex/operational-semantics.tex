@@ -1,6 +1,8 @@
 \section{Operational semantics}
 \label{sec:opsem}
 
+\subsection{Values and environments}
+
 Values, environments, and evaluation results are given in \figref{values}. For a statement $s$, the result
 $\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the result
 $\returns{v}$ represents \emph{abrupt completion} of $s$ with return value $v$, and $\aborts{\kappa}$
@@ -23,6 +25,8 @@ $\statusDefAssigned$, module references and class entries at the corresponding e
 well-formed at a context that binds its variables at corresponding entries.
 
 \input{fig/well-formed-env}
+
+\subsection{Modules and programs}
 
 Module and program evaluation are given in \figref{eval-modules}; import evaluation in \figref{eval-import-prefix}; importing names from a loaded module in
 \figref{eval-imports}. Extend (Definition~\ref{def:extend}) extends to module values by reading its equations with a loaded reference $\modLoaded{q}{\rho}$ carrying an environment in place of a context. The loading judgement $q \Rightarrow_{\mathsf{load}} o$ evaluates the import prefix
@@ -47,6 +51,8 @@ $1$, as Python does for an uncaught exception.}
 
 \input{fig/eval-modules}
 
+\subsection{Blocks and expressions}
+
 Block evaluation $\rho, b \Rightarrow r$\Added{, for any $\rho : \Gamma$ and any $b$ well-formed in $\Gamma$,}
 is given in \figref{eval-block-outcome}. Function definitions delimit
 the scope of sequential-composition effects, so as black boxes functions are always pure. The metafunction $\outcome$ (\figref{eval-aux}) reads a block's result as
@@ -63,6 +69,11 @@ premise needs no propagation rule; earlier premises have one each, recording whi
 before the failing one was reached (\figref{eval-fails}). The statement, sequence and module judgements use
 outcomes of the same form, carrying a result, a sequence of values or an environment in place of a value.
 
+\input{fig/eval-aux}
+\input{fig/eval-outcome}
+
+\subsection{Operators and equality}
+
 The strict operators are given by metafunctions $\hat{\odot}$ and $\hat{\ominus}$ (\figref{operators}), which
 have the meanings they have in Python and yield $\aborts{\kappa}$ where Python raises. Where one of these is
 undefined the expression has no derivation, which is where \PurePy declines to give the operation the meaning
@@ -74,6 +85,12 @@ concatenates the results; a generator draws from $\iterOp$ (\figref{eval-aux}), 
 \Replaced{defined on lists, tuples, strings and dictionaries, a dictionary yielding its keys as in Python.
 These are the only values a generator can draw from.}{defined on lists and tuples only, since \PurePy has no
 wider notion of iteration.}
+\input{fig/operators}
+\input{fig/equality}
+\input{fig/membership}
+
+\subsection{Pattern matching}
+
 The pattern-matching judgement $\rho, p, v \matches \rho'$ (\figref{match}) is a deterministic partial
 function; we write $\rho, p, v \notmatches$ (with no right-hand side) for $\nexists \rho'.\, \rho, p, v
 \matches \rho'$, i.e.\ matching is undefined. A constructor pattern matches any object whose class has the
@@ -85,11 +102,4 @@ most once, the entry comparison in \ruleName{eval-pat-constr} amounts to a compa
 membership $\memOp$ (\figrefTwo{equality}{membership}). Both are undefined where no case applies, which is where
 \PurePy declines to give a comparison the meaning Python gives it (\secref{no-coercions}).
 
-\input{fig/operators}
-\input{fig/equality}
-\input{fig/membership}
-
 \input{fig/match}
-
-\input{fig/eval-aux}
-\input{fig/eval-outcome}
