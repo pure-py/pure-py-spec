@@ -12,7 +12,8 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exObj{\Gamma}{C}{\rho}$ & (Object) \\
     & $\mid$ & $\modStub{q}$ & \replaced{(ModuleStub)}{(Module stub)\ } \\
     & $\mid$ & $\modLoaded{q}{\rho}$ & \replaced{(LoadedModule)}{(Loaded module)\ } \\
-    & $\mid$ & $\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}$ & (Class)
+    & $\mid$ & $\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}$ & (Class) \\
+    & \added{$\mid$} & \added{$\primVal{q.x}$} & \added{(Primitive)}
    \\[3mm]
 \grammarGroup{\added{Environments}} \\
 $\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & \deleted{(Environment)}

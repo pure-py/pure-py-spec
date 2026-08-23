@@ -63,6 +63,14 @@
   \vdash \exObj{\Gamma}{C}{\rho} : \statusDefAssigned
 }
 \and
+\added{\inferrule*[lab={\ruleName{val-prim}}]
+{
+  q \in \dom(\mathcal{P})
+}
+{
+  \vdash \primVal{q.x} : \statusDefAssigned
+}}
+\and
 \inferrule*[lab={\ruleName{val-mod}}]
 {
   q \in \dom(\mathcal{M}) \cup \dom(\mathcal{P})
