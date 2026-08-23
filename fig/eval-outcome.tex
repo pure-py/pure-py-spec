@@ -35,6 +35,14 @@
   \rho, \exReturn{e} \Rightarrow \mlet{v}{o}{\returns{v}}
 }
 \and
+\added{\inferrule*[lab={\ruleName{eval-return-none}}]
+{
+  \strut
+}
+{
+  \rho, \exReturnNone \Rightarrow \returns{\pyinline{None}}
+}}
+\and
 \inferrule*[lab={\ruleName{eval-def}}]
 {
   d_i = \exDef{f_i}{\seq{x}_i}{b_i} \quad (\forall i) \\
@@ -77,23 +85,25 @@
   \rho, \exAssertMsg{e}{e'} \Rightarrow \replaced{\mlet{w}{o}{\aborts{\errAssert{w}}}}{\aborts{\errAssertNoMsg}\ }
 }
 \and
-\inferrule*[lab={\ruleName{eval-assert-fail}}]
+\added{\inferrule*[lab={\ruleName{eval-if}}]
 {
-  \rho, e \Rightarrow \aborts{\kappa}
+  \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
+  \rho, e_i \Rightarrow \val{\pyinline{True}} \\
+  \rho, b_i \Rightarrow r
 }
 {
-  \rho, \exAssert{e} \Rightarrow \aborts{\kappa}
-}
+  \rho, \exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}} \Rightarrow r
+}}
 \and
-\inferrule*[lab={\ruleName{eval-assert-msg-fail}}]
+\added{\inferrule*[lab={\ruleName{eval-if-none}}]
 {
-  \rho, e \Rightarrow \aborts{\kappa}
+  \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j \in \set{1, \ldots, n+1})
 }
 {
-  \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\kappa}
-}
+  \rho, \exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}} \Rightarrow \assigns{\varnothing}
+}}
 \and
-\inferrule*[lab={\ruleName{eval-if}}]
+\inferrule*[lab={\ruleName{\replaced{eval-if-else}{eval-if}}}]
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
   \rho, e_i \Rightarrow \val{\pyinline{True}} \\
@@ -112,15 +122,6 @@
   \rho, \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} \Rightarrow r
 }
 \and
-\inferrule*[lab={\ruleName{eval-if-fail}}]
-{
-  \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
-  \rho, e_i \Rightarrow \aborts{\kappa}
-}
-{
-  \rho, \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} \Rightarrow \aborts{\kappa}
-}
-\and
 \inferrule*[lab={\ruleName{eval-match}}]
 {
   \rho, e \Rightarrow \val{v} \\
@@ -131,14 +132,6 @@
   \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow \added{\assigns{\rho'}} \mathbin{\added{\override}} r
 }
 \and
-\inferrule*[lab={\ruleName{eval-match-fail}}]
-{
-  \rho, e \Rightarrow \aborts{\kappa}
-}
-{
-  \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow \aborts{\kappa}
-}
-\and
 \inferrule*[lab={\ruleName{eval-cons}}]
 {
   \rho, s \Rightarrow \assigns{\rho'} \\
@@ -146,6 +139,57 @@
 }
 {
   \rho, s \cons b \Rightarrow \assigns{\rho'} \override r
+}
+\end{mathpar}
+\caption{Block $b$ evaluates to result $r$ under environment $\rho : \Gamma$}
+\label{fig:eval-block-outcome}
+\end{figure}
+
+\begin{figure}
+\small
+\flushleft \shadebox{$\rho, b \Rightarrow r$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-assert-fail}}]
+{
+  \rho, e \Rightarrow \aborts{\kappa}
+}
+{
+  \rho, \exAssert{e} \Rightarrow \aborts{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-assert-msg-fail}}]
+{
+  \rho, e \Rightarrow \aborts{\kappa}
+}
+{
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\kappa}
+}
+\and
+\added{\inferrule*[lab={\ruleName{eval-if-fail}}]
+{
+  \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
+  \rho, e_i \Rightarrow \aborts{\kappa}
+}
+{
+  \rho, \exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}} \Rightarrow \aborts{\kappa}
+}}
+\and
+\inferrule*[lab={\ruleName{\replaced{eval-if-else-fail}{eval-if-fail}}}]
+{
+  \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
+  \rho, e_i \Rightarrow \aborts{\kappa}
+}
+{
+  \rho, \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} \Rightarrow \aborts{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-match-fail}}]
+{
+  \rho, e \Rightarrow \aborts{\kappa}
+}
+{
+  \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-cons-fail}}]
@@ -156,8 +200,8 @@
   \rho, s \cons b \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
-\caption{Block $b$ evaluates to result $r$ under environment $\rho : \Gamma$}
-\label{fig:eval-block-outcome}
+\caption{Block $b$ aborts with kind $\kappa$ under environment $\rho : \Gamma$}
+\label{fig:eval-block-fails}
 \end{figure}
 
 \begin{figure}

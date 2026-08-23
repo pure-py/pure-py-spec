@@ -84,7 +84,7 @@ most once, the entry comparison in \ruleName{eval-pat-constr} amounts to a compa
 \subsection{Blocks and expressions}
 
 Block evaluation $\rho, b \Rightarrow r$\Added{, for any $\rho : \Gamma$ and any $b$ well-formed in $\Gamma$,}
-is given in \figref{eval-block-outcome}. Function definitions delimit
+is given in \Replaced{\figrefTwo{eval-block-outcome}{eval-block-fails}}{\figref{eval-block-outcome}}. Function definitions delimit
 the scope of sequential-composition effects, so as black boxes functions are always pure. The metafunction $\outcome$ (\figref{eval-aux}) reads a block's result as
 the outcome of calling it, $\val{\pyinline{None}}$ where the block falls off the end.
 
