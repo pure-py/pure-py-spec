@@ -121,7 +121,7 @@ imports precede statements, every module a statement can reference is loaded bef
 \Replaced{loading is deterministic, so}{since loading has no observable effects, reloading a module is
 unobservable; the semantics therefore needs no cache of loaded modules.} \Added{the semantics needs no cache
 of loaded modules. The rule \ruleName{eval-module} evaluates a module body under the environment of
-$\mathcal{P}(\pyinline{builtins})$, overridden by the one its imports produce, so the members of
+$\mathcal{P}(\pyinline{builtins})$, overridden by the imported environment, so the members of
 \pyinline{builtins} are in scope unqualified.}\Deleted{These rules use the environment $\mathcal{P}(\pyinline{builtins})$ binding the names of
 \figref{predefined}.}
 \Replaced{A program evaluates to a \emph{termination kind} (\figref{values}): $\errExit{0}$ if the main module
