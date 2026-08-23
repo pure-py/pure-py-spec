@@ -181,7 +181,7 @@ q.q''$ for some $q''$, and $\properPrefixOf$ for the strict order; the proper pr
 are its \emph{ancestors}. The $\submods$ metafunction is
 defined, with the class-related metafunctions, in \Replaced{\figref{modules}}{\appendixref{sec:aux-modules}}.
 \Added{A dataclass names its fields in a fixed order, and a constructor supplies each field exactly once,
-positionally or by keyword. $\fieldMap(C, \seq{u})$ maps each field of $C$ to the argument supplied for it,
+positionally or by keyword. The metafunction $\fieldMap(C, \seq{u})$ maps each field of $C$ to the argument supplied for it,
 and is undefined if the arguments do not cover the fields exactly. Constructor patterns and expressions are
 checked and evaluated field-by-field using it, so the rules do not depend on how a constructor splits its
 arguments.}
