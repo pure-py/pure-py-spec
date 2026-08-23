@@ -60,7 +60,7 @@
 \and
 \added{\inferrule*[lab={\ruleName{eval-pat-list-no}}]
 {
-  v \text{ is neither a list nor a tuple, or is one of length} \neq n
+  v \text{ neither list nor tuple, or of length} \neq n
 }
 {
   \rho, \patList{p_1, \ldots, p_n}, v \matches \noMatch
@@ -76,7 +76,7 @@
 \and
 \added{\inferrule*[lab={\ruleName{eval-pat-tuple-no}}]
 {
-  v \text{ is neither a list nor a tuple, or is one of length} \neq n
+  v \text{ neither list nor tuple, or of length} \neq n
 }
 {
   \rho, \patTuple{p_1, \ldots, p_n}, v \matches \noMatch
@@ -93,7 +93,7 @@
 \and
 \added{\inferrule*[lab={\ruleName{eval-pat-dict-no}}]
 {
-  v \text{ is not a dictionary, or is } \delta \text{ with } w_i \notin \dom(\delta) \text{ for some } i
+  v \text{ not dictionary, or } \delta \text{ with } w_i \notin \dom(\delta) \text{ for some } i
 }
 {
   \rho, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}}, v \matches \noMatch
@@ -120,7 +120,7 @@
 \added{\inferrule*[lab={\ruleName{eval-pat-constr-no}}]
 {
   \resolveClass(\rho, q) = C \\
-  v \text{ is not an object, or is } \exObj{\Gamma'}{C'}{\rho^\dagger} \text{ with } C \notin \ancestors(C')
+  v \text{ not object, or } \exObj{\Gamma'}{C'}{\rho^\dagger} \text{ with } C \notin \ancestors(C')
 }
 {
   \rho, \patConstr{q}{\seq{p}}, v \matches \noMatch
