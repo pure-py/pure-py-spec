@@ -158,8 +158,7 @@ definitions that follow, as is the name $q$ of the enclosing module in the rules
 \label{def:predefined}
 $\mathcal{P}$ takes each module $q$ of \figref{predefined} to \Replaced{a pair $(\rho, \Gamma)$ with $\vdash \rho :
 \Gamma$ (\figref{well-formed-env}), where $\rho$ binds}{an environment binding} each member listed for
-$q$, together with \pyinline{__name__}, to \Replaced{an implementation-defined value}{implementation-defined values}.\Added{ A member given a meaning
-$\primFn$ in \figref{predefined} is bound to $\primVal{\primFn}$.}\Deleted{Its context is whatever types that
+$q$, together with \pyinline{__name__}, to \Replaced{an implementation-defined value}{implementation-defined values}.\Added{ A member given a value in \figref{predefined} is bound to that value.}\Deleted{Its context is whatever types that
 environment (\figref{well-formed-env}).}
 \end{definition}
 
@@ -168,13 +167,15 @@ environment (\figref{well-formed-env}).}
 \centering
 \begin{tabular}{llll}
 \hline
-\textbf{Module} & \textbf{Member} & \multicolumn{2}{l}{\added{\textbf{Meaning}}} \\
+\textbf{Module} & \textbf{Member} & \multicolumn{2}{l}{\added{\textbf{Value}}} \\
 \hline
 \textup{\pyinline{builtins}} & \pyinline{print} & & \\
- & \pyinline{len} & \added{$\primFn(v) = \val{n}$} & \added{if $\iterOp(v) = u_1 \cons \ldots \cons u_n$} \\
- & & \added{$\primFn(\seq{u}) = \aborts{\errType}$} & \added{(otherwise)} \\
- & \pyinline{range} & \added{$\primFn(n) = \val{\exList{0, \ldots, n-1}}$} & \added{if $n$ whole number, $n > 0$} \\
- & & \added{$\primFn(n) = \val{\exList{}}$} & \added{if $n$ whole number, $n \leq 0$} \\
+ & \pyinline{len} & \multicolumn{2}{l}{\added{$\primVal{\primFn}$ where}} \\
+ & & \added{$\quad \primFn(v) = \val{n}$} & \added{if $\iterOp(v) = u_1 \cons \ldots \cons u_n$} \\
+ & & \added{$\quad \primFn(\seq{u}) = \aborts{\errType}$} & \added{(otherwise)} \\
+ & \pyinline{range} & \multicolumn{2}{l}{\added{$\primVal{\primFn}$ where}} \\
+ & & \added{$\quad \primFn(n) = \val{\exList{0, \ldots, n-1}}$} & \added{if $n$ whole number, $n > 0$} \\
+ & & \added{$\quad \primFn(n) = \val{\exList{}}$} & \added{if $n$ whole number, $n \leq 0$} \\
 \pyinline{math} & \pyinline{pi} & & \\
  & \pyinline{e} & & \\
  & \pyinline{sqrt} & & \\
@@ -186,8 +187,9 @@ environment (\figref{well-formed-env}).}
  & \pyinline{floor} & & \\
  & \pyinline{ceil} & & \\
 \pyinline{sys} & \pyinline{argv} & & \\
- & \pyinline{exit} & \added{$\primFn(\varepsilon) = \aborts{\errExit{0}}$} & \\
- & & \added{$\primFn(n) = \aborts{\errExit{n}}$} & \\
+ & \pyinline{exit} & \multicolumn{2}{l}{\added{$\primVal{\primFn}$ where}} \\
+ & & \added{$\quad \primFn(\varepsilon) = \aborts{\errExit{0}}$} & \\
+ & & \added{$\quad \primFn(n) = \aborts{\errExit{n}}$} & \\
 \pyinline{typing} & \pyinline{Any} & & \\
 \pyinline{dataclasses} & \pyinline{dataclass} & & \\
 \hline
