@@ -60,7 +60,7 @@
 \and
 \added{\inferrule*[lab={\ruleName{eval-pat-list-no}}]
 {
-  v \text{ neither list nor tuple, or of length} \neq n
+  v \text{ neither list nor tuple, or list of length} \neq n
 }
 {
   \rho, \patList{p_1, \ldots, p_n}, v \matches \noMatch
@@ -76,7 +76,7 @@
 \and
 \added{\inferrule*[lab={\ruleName{eval-pat-tuple-no}}]
 {
-  v \text{ neither list nor tuple, or of length} \neq n
+  v \text{ neither list nor tuple, or tuple of length} \neq n
 }
 {
   \rho, \patTuple{p_1, \ldots, p_n}, v \matches \noMatch
