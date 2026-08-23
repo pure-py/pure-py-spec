@@ -41,8 +41,8 @@ class Verdict(StrEnum):
 
 class Stage(StrEnum):
     SYNTACTIC = "syntactic"
-    STATIC_SEMANTIC = "static-semantic"
-    DYNAMIC_SEMANTIC = "dynamic-semantic"
+    STATIC = "static"
+    DYNAMIC = "dynamic"
     SYNTACTIC_ONLY = "syntactic-only"
     PENDING = "pending"
 
@@ -190,8 +190,8 @@ class Runner:
         """Assert a module-level test from its path: <verdict>[/<stage>].
 
         verdict in {semantically-valid, excluded, python-error} fixes how PurePy and
-        Python must each respond; stage in {syntactic, static-semantic,
-        dynamic-semantic} fixes where PurePy stops (dynamic-semantic = checker
+        Python must each respond; stage in {syntactic, static,
+        dynamic} fixes where PurePy stops (dynamic = checker
         accepts, but evaluation is stuck)."""
         rel = p.relative_to(ROOT)
         with self.test(rel):
@@ -201,7 +201,7 @@ class Runner:
             if dirs == (Verdict.SEMANTICALLY_VALID, Stage.PENDING):
                 self.parse(p, Exit.NOT_YET)
                 return
-            if dirs[1:] == (Stage.STATIC_SEMANTIC, Stage.PENDING):
+            if dirs[1:] == (Stage.STATIC, Stage.PENDING):
                 self.parse(p, Exit.OK)
                 self.check(p, Exit.OK)
                 self.python_evidence(p, Verdict(dirs[0]) != Verdict.PYTHON_ERROR,
@@ -221,8 +221,8 @@ class Runner:
                 self.parse(p, Exit.PROHIBITED, err)
             else:
                 self.parse(p, Exit.OK)
-                self.check(p, Exit.ILL_FORMED if stage == Stage.STATIC_SEMANTIC else Exit.OK,
-                           err if stage == Stage.STATIC_SEMANTIC else None)
+                self.check(p, Exit.ILL_FORMED if stage == Stage.STATIC else Exit.OK,
+                           err if stage == Stage.STATIC else None)
 
             if verdict != Verdict.PYTHON_ERROR and stage == Stage.SYNTACTIC:
                 if p.with_suffix(EXCEPTION_EXPECTED).exists():
