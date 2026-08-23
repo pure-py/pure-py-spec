@@ -114,8 +114,11 @@ from-import.
 The correspondence is exact: if $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \val{\rho}$ then $\vdash \rho : \Gamma$ (\figref{well-formed-env}). Since
 imports precede statements, every module a statement can reference is loaded before the statement runs, and
 since loading has no observable effects, reloading a module is unobservable; the semantics therefore needs no
-cache of loaded modules. These rules use the environment \Added{component of} $\mathcal{P}(\pyinline{builtins})$, binding the names of
-\figref{predefined}. \Replaced{A program evaluates to a \emph{termination kind} (\figref{values}): $\errExit{0}$ if the main module
+cache of loaded modules. \Replaced{A module body is checked and evaluated under the context and environment of
+$\mathcal{P}(\pyinline{builtins})$, overridden by those its imports produce, so the names of
+\figref{predefined} are in scope in every module and an import or an assignment of the same name takes
+precedence.}{These rules use the environment $\mathcal{P}(\pyinline{builtins})$ binding the names of
+\figref{predefined}.} \Replaced{A program evaluates to a \emph{termination kind} (\figref{values}): $\errExit{0}$ if the main module
 loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exited with status $n$; the remaining kinds are named after the exceptions the
 same program raises under Python. An implementation must agree on which kind a run yields, though how it
 reports one is not prescribed.}{A program evaluates to

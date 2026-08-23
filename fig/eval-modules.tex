@@ -208,10 +208,11 @@
 {
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
    \seq{\iota} \Rightarrow \val{\rho} \\
-  \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} \Rightarrow o
+  \added{\mathcal{P}(\pyinline{builtins}) = (\rho', \Gamma')} \\
+  \added{\rho' \mathbin{\added{\override}}} \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} \Rightarrow o
 }
 {
-  q \Rightarrow_{\mathsf{load}} \mlet{\rho'}{o}{\val{(\submods(q) \override \rho')}}
+  q \Rightarrow_{\mathsf{load}} \mlet{\rho\replaced{''}{'\ }}{o}{\val{(\submods(q) \override \rho\replaced{''}{'\ })}}
 }
 \and
 \inferrule*[lab={\ruleName{load-fail}}]

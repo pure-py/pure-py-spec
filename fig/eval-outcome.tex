@@ -173,15 +173,14 @@
   \rho, x \Rightarrow \val{v}
 }
 \and
-\inferrule*[lab={\ruleName{eval-var-builtin}}]
+\deleted{\inferrule*[lab={\ruleName{eval-var-builtin}}]
 {
   x \notin \dom(\rho) \\
-  \added{\mathcal{P}(\pyinline{builtins}) = (\rho', \Gamma')} \\
-  \bind{x}{v} \in \replaced{\rho'}{\mathcal{P}(\pyinline{builtins})\ }
+  \bind{x}{v} \in \mathcal{P}(\pyinline{builtins})
 }
 {
   \rho, x \Rightarrow \val{v}
-}
+}}
 \and
 \inferrule*[lab={\ruleName{eval-literal}}]
 {

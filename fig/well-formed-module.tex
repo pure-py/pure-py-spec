@@ -161,7 +161,8 @@
 {
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
   \vdash \seq{\iota} : \Gamma \\
-  \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} : \Delta \\
+  \added{\mathcal{P}(\pyinline{builtins}) = (\rho, \Gamma')} \\
+  \added{\Gamma' \mathbin{\added{\override}}} \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} : \Delta \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {
