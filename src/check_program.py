@@ -3,7 +3,7 @@ import pathlib
 import sys
 from typing import Optional
 
-import parse
+import syntax
 from aux import annotate_seq_kinds
 from check_module import check_module, proper_prefixes
 from contexts import PREDEFINED_MODULES
@@ -38,7 +38,7 @@ def load(name: str, base_dir: pathlib.Path) -> ast.Module:
         tree = ast.parse(source, filename=str(path))
     except SyntaxError as e:
         raise IllFormedProgram(f"{path}: parse error: {e}") from e
-    parse_err = parse.check_module(tree)
+    parse_err = syntax.check_module(tree)
     if parse_err is not None:
         raise IllFormedProgram(f"{path}: {parse_err.msg}")
     annotate_seq_kinds(tree, source)

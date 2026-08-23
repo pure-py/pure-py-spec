@@ -49,7 +49,7 @@ class Stage(StrEnum):
 HELPERS = "helpers"
 
 # Checker entry points under src/
-PARSE, CHECK, CHECK_PROGRAM = "parse.py", "check_module.py", "check_program.py"
+PARSE, CHECK, CHECK_PROGRAM = "syntax.py", "check_module.py", "check_program.py"
 
 # Program-level test files (a test is a directory)
 MAIN = "main.py"
@@ -58,8 +58,8 @@ EXPECTED_FILE, EXPECTED_EXIT, EXPECTED_ERROR = "expected", "expected_exit", "exp
 # PurePy exit codes (OK = accepted / ran clean)
 class Exit(IntEnum):
     OK = 0
-    PROHIBITED = 1   # parse.py: prohibited syntactic form
-    NOT_YET = 2      # parse.py: planned, not yet supported
+    PROHIBITED = 1   # syntax.py: prohibited syntactic form
+    NOT_YET = 2      # syntax.py: planned, not yet supported
     ILL_FORMED = 3   # check_module.py: ill-formed
 
 class Phase(StrEnum):

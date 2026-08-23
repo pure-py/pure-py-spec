@@ -42,7 +42,7 @@ The invariant — `excluded` ⇒ Python runs it, `python-error` ⇒ Python raise
 
 ## Reference checker (`src/`)
 
-`parse.py` decides whether a Python program belongs to the PurePy subset, using the `ast` module;
+`syntax.py` decides whether a Python program belongs to the PurePy subset, using the `ast` module;
 `check_module.py` and `check_program.py` check well-formedness at module and program level.
 
 - Exit 0: accepted
