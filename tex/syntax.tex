@@ -288,9 +288,8 @@ of a conditional, then for that variable to be usable after the conditional, eve
 conditional must either definitely return, or definitely assign that variable too. Thus the following are both
 well-formed:
 
-\begin{figure}[!ht]
-\centering
-\begin{subfigure}{0.48\textwidth}
+\begin{center}
+\begin{minipage}{0.48\textwidth}
 \centering
 \begin{python}
 if a < b:
@@ -299,9 +298,9 @@ else:
    comp = "bigger"
 return comp
 \end{python}
-\end{subfigure}
+\end{minipage}
 \hfill
-\begin{subfigure}{0.48\textwidth}
+\begin{minipage}{0.48\textwidth}
 \centering
 \begin{python}
 if a < b:
@@ -310,8 +309,9 @@ else:
    comp = "bigger"
 return comp
 \end{python}
-\end{subfigure}
-\end{figure}
+\end{minipage}
+\end{center}
+\medskip
 
 \noindent The definite assignment set for a conditional that has at least one branch which definitely assigns
 is calculated by merging the definite assignment sets for all branches which definitely assign, using the
@@ -329,9 +329,8 @@ reference would denote the branch-local variable on one path and the variable it
 For flexibility, we permit \emph{branch-local} variables. The assignment of \pyinline{x} below (left) is
 permitted, and can be used locally in that branch of the conditional:
 
-\begin{figure}[!ht]
-\centering
-\begin{subfigure}{0.48\textwidth}
+\begin{center}
+\begin{minipage}{0.48\textwidth}
 \centering
 \begin{python}
 def foo():
@@ -343,10 +342,13 @@ def foo():
     y = 0
   return z
 \end{python}
-\caption{Branch-local definition of \pyinline{x}}
-\end{subfigure}
+
+\smallskip
+
+{\small Branch-local definition of \pyinline{x}}
+\end{minipage}
 \hfill
-\begin{subfigure}{0.48\textwidth}
+\begin{minipage}{0.48\textwidth}
 \centering
 \begin{python}
 def foo():
@@ -358,9 +360,13 @@ def foo():
     y = 0
   return x # error: partially defined
 \end{python}
-\caption{Now with use of \pyinline{x} after the conditional}
-\end{subfigure}
-\end{figure}
+
+\smallskip
+
+{\small Now with use of \pyinline{x} after the conditional}
+\end{minipage}
+\end{center}
+\medskip
 
 \noindent However such variables only appear to be branch-local. The definition of $\merge$ actually ensures
 that a variable assigned in any branch is considered assigned by the conditional; however unless it is
