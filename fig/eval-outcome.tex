@@ -325,6 +325,15 @@
   \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \outcome(r)
 }
 \and
+\added{\inferrule*[lab={\ruleName{eval-call-prim}}]
+{
+  \rho, e \Rightarrow \val{\primVal{\primFn}} \\
+  \rho, \seq{e} \Rightarrow \val{\seq{u}}
+}
+{
+  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \primFn(\seq{u})
+}}
+\and
 \inferrule*[lab={\ruleName{eval-and-false}}]
 {
   \rho, e \Rightarrow \val{\pyinline{False}}
