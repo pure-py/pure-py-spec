@@ -21,13 +21,12 @@ with $\assigns{\varnothing}$ as left and right unit.
 
 \input{fig/eval-values}
 
-\Added{A primitive $\primVal{\primFn}$ is a value that can be applied, with $\primFn$ its meaning.
-$\mathcal{P}$ binds a member to one where there is no body to evaluate. No rule applies a primitive, so
-calling one has no derivation (\issue{132}, \issue{47}).}
-
 A value is well-formed at a context entry (\figref{well-formed-env}): ordinary values at
 $\statusDefAssigned$, module references and class entries at the corresponding entry. An environment is
-well-formed at a context that binds its variables at corresponding entries.
+well-formed at a context that binds its variables at corresponding entries. \Added{A primitive
+$\primVal{\primFn}$ is a value that can be applied, with $\primFn$ its meaning; $\mathcal{P}$ binds a member
+to one where there is no body to evaluate. No rule applies a primitive, so calling one has no derivation
+(\issue{132}, \issue{47}).}
 
 \input{fig/well-formed-env}
 
