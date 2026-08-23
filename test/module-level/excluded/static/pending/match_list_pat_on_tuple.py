@@ -1,6 +1,6 @@
-# list pattern against a tuple value. Python matches;
-# PurePy's sub-list-list admits only lists, so a later case runs and the two
-# languages differ. Statically rejectable once unions are restricted (#151).
+# list pattern against a tuple value. Python matches; PurePy's eval-pat-list-no does not
+# fire on a sequence of the other kind, so the match has no derivation and the run has
+# no result. Statically rejectable once the type system arrives (#92).
 v = (1, 2)
 match v:
     case [a, b]:
