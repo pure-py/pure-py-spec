@@ -1,10 +1,11 @@
 \section{Well-formedness}
 \label{sec:well-formedness}
 
-\Added{Well-formedness is a definite-assignment analysis over the syntax of \secref{syntax}: it decides which
-programs \PurePy gives a meaning to. The judgements are stated over contexts, and the section follows the
-syntax, taking patterns, then blocks and expressions, then modules and programs. \secref{opsem} gives each
-of these a dynamic counterpart.}
+\Added{Well-formedness decides which programs \PurePy accepts. The block and expression rules rest on a
+definite-assignment analysis; the pattern rules enforce linearity and reachability; and the module rules
+govern imports and class declarations. The section follows the syntax of \secref{syntax}, taking patterns,
+then blocks and expressions, then modules and programs, and \secref{opsem} gives each of these a dynamic
+counterpart.}
 
 \subsection{Auxiliary definitions}
 
