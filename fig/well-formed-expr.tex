@@ -57,7 +57,8 @@
 \inferrule*[lab={\ruleName{var-builtin}}]
 {
   x \notin \dom(\Gamma) \\
-  \bind{x}{\statusDefAssigned} \in \Gamma_{\pymath{builtins}}
+  \added{\mathcal{P}(\pyinline{builtins}) = (\rho, \Gamma')} \\
+  \bind{x}{\statusDefAssigned} \in \replaced{\Gamma'}{\Gamma_{\pymath{builtins}}\ }
 }
 {
   \Gamma \vdash x

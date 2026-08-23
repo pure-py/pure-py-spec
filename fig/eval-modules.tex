@@ -198,10 +198,10 @@
 \small
 \inferrule*[lab={\ruleName{eval-predefined}}]
 {
-  q \in \dom(\mathcal{P})
+  \replaced{\mathcal{P}(q) = (\rho, \Gamma)}{q \in \dom(\mathcal{P})\ }
 }
 {
-  q \Rightarrow_{\mathsf{load}} \val{\mathcal{P}(q)}
+  q \Rightarrow_{\mathsf{load}} \val{\replaced{\rho}{\mathcal{P}(q)\ }}
 }
 \and
 \inferrule*[lab={\ruleName{load}}]

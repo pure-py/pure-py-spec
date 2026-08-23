@@ -145,7 +145,7 @@ well-formedness and evaluation rules check and evaluate the statements of each b
 assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
 $\pymath{\_\_name\_\_}$ binding the runtime supplies automatically. A second map $\mathcal{P}$ gives the
 predefined modules of \figref{predefined}, which have no body: $\mathcal{P}$ takes each such name to its
-environment (Definition~\ref{def:predefined}). The two domains are disjoint, and their union is
+\Replaced{environment and context}{environment} (Definition~\ref{def:predefined}). The two domains are disjoint, and their union is
 prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$ is itself in
 $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is its \texttt{.py}
 file, each package's body is its \texttt{\_\_init\_\_.py}, and a package directory without an
@@ -156,9 +156,10 @@ definitions that follow, as is the name $q$ of the enclosing module in the rules
 
 \begin{definition}[Predefined contexts and environments]
 \label{def:predefined}
-$\mathcal{P}$ takes each module $q$ of \figref{predefined} to an environment binding the members listed for
-$q$, together with \pyinline{__name__}, to implementation-defined values. \Replaced{Its context is the $\Gamma$ for
-which $\vdash \mathcal{P}(q) : \Gamma$}{Its context is whatever types that environment} (\figref{well-formed-env}).
+$\mathcal{P}$ takes each module $q$ of \figref{predefined} to \Replaced{a pair $(\rho, \Gamma)$ with $\vdash \rho :
+\Gamma$ (\figref{well-formed-env}), where $\rho$ binds}{an environment binding} the members listed for
+$q$, together with \pyinline{__name__}, to implementation-defined values.\Deleted{Its context is whatever types that
+environment (\figref{well-formed-env}).}
 \end{definition}
 
 \begin{figure}
