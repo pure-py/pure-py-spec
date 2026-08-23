@@ -21,10 +21,9 @@ with $\assigns{\varnothing}$ as left and right unit.
 
 \input{fig/eval-values}
 
-\Added{The primitive $\primVal{\primFn}$ is how $\mathcal{P}$ supplies a member that can be called, since a
-supplied member has no body to evaluate and $\primFn$ gives its meaning directly. No rule applies a
-primitive, and \ruleName{eval-call-nonfun} does not cover one, so calling a primitive has no derivation
-(\issue{132}, \issue{47}).}
+\Added{A primitive $\primVal{\primFn}$ is a value that can be applied, with $\primFn$ its meaning.
+$\mathcal{P}$ binds a member to one where there is no body to evaluate. No rule applies a primitive, so
+calling one has no derivation (\issue{132}, \issue{47}).}
 
 A value is well-formed at a context entry (\figref{well-formed-env}): ordinary values at
 $\statusDefAssigned$, module references and class entries at the corresponding entry. An environment is
