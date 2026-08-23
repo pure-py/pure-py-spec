@@ -27,7 +27,7 @@
 \\
 \dispatch(\rho, v, \varepsilon, \varepsilon) &= (\varnothing, \exPass) \\
 \dispatch(\rho, v, p \cons \seq{p}, b \cons \seq{b}) &= (\rho', b) && \text{if } \rho, p, v \matches \added{\matchOk{}}\rho' \\
-\dispatch(\rho, v, p \cons \seq{p}, b \cons \seq{b}) &= \dispatch(\rho, v, \seq{p}, \seq{b}) && \text{if } \rho, p, v \matches \replaced{\noMatch}{{}\ } \\
+\dispatch(\rho, v, p \cons \seq{p}, b \cons \seq{b}) &= \dispatch(\rho, v, \seq{p}, \seq{b}) && \replaced{\text{if } \rho, p, v \matches \noMatch}{\text{if } \rho, p, v \notmatches\ } \\
 \\
 \entries(\delta, \varepsilon) &{}= \delta \\
 \entries(\delta, \bind{w}{v} \cons \delta') &{}= \entries(\update(\delta, w, v), \delta') \\
