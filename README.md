@@ -42,13 +42,12 @@ The invariant — `excluded` ⇒ Python runs it, `python-error` ⇒ Python raise
 
 ## Reference checker (`src/`)
 
-`syntax.py` decides whether a Python program belongs to the PurePy subset, using the `ast` module.
-`contexts.py`, `aux.py`, `patterns.py`, `blocks.py` and `check_module.py` follow the spec's
-subsections; `check_program.py` checks a whole program.
+Check a single module, or a whole program from its entry module:
 
-- Exit 0: accepted
-- Exit 1: prohibited (permanently excluded)
-- Exit 2: not yet supported (planned, linked to a GitHub issue)
+```
+python3 src/check_module.py path/to/module.py
+python3 src/check_program.py path/to/main.py
+```
 
 ## Release workflow
 
