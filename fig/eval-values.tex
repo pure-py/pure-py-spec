@@ -6,9 +6,9 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exList{v_1, \ldots, v_n}$ & (List) \\
     & $\mid$ & $\exTuple{v_1, \ldots, v_n}$ & (Tuple) \\
     & $\mid$ & $\exDict{\replaced{\delta}{\bind{w_1}{v_1}, \ldots, \bind{w_n}{v_n}\ }}$ & (Dict) \\
-    & $\mid$ & $\exLamClosure[\Gamma]{\rho}{\seq{x}}{e}$ & (LambdaClosure) \\
-    & $\mid$ & $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$ & (DefClosure) \\
-    & $\mid$ & $\exObj{\Gamma}{C}{\rho}$ & (Object) \\
+    & $\mid$ & $\exLamClosure[\deleted{\Gamma}]{\rho}{\seq{x}}{e}$ & (LambdaClosure) \\
+    & $\mid$ & $\exDefClosure[\deleted{\Gamma}]{\rho}{\seq{d}}{i}$ & (DefClosure) \\
+    & $\mid$ & $\exObj{\deleted{\Gamma}}{C}{\rho}$ & (Object) \\
     & $\mid$ & $\modStub{q}$ & (Module stub) \\
     & $\mid$ & $\modLoaded{q}{\rho}$ & (Loaded module) \\
     & $\mid$ & $\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}$ & (Class)

@@ -30,8 +30,8 @@
 \eqEntries(\bind{w}{v} \cons \delta, \delta') &{}= \pyinline{False} && \text{if } \eqOp(v, \delta'(w)) = \pyinline{False} \\
 \eqEntries(\bind{w}{v} \cons \delta, \delta') &{}= \eqEntries(\delta, \delta') && \text{if } \eqOp(v, \delta'(w)) = \pyinline{True} \\
 \\
-\eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \eqOp(\exTuple{\rho(x_1), \ldots, \rho(x_n)}, \exTuple{\rho'(x_1), \ldots, \rho'(x_n)}) && \text{if } \fields(C) = x_1, \ldots, x_n \\
-\eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C' \\
+\eqOp(\exObj{\deleted{\Gamma}}{C}{\rho}, \exObj{\deleted{\Gamma'}}{C}{\rho'}) &{}= \eqOp(\exTuple{\rho(x_1), \ldots, \rho(x_n)}, \exTuple{\rho'(x_1), \ldots, \rho'(x_n)}) && \text{if } \fields(C) = x_1, \ldots, x_n \\
+\eqOp(\exObj{\deleted{\Gamma}}{C}{\rho}, \exObj{\deleted{\Gamma'}}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C' \\
 \end{align*}
 \caption{Structural equality, undefined where no case applies}
 \label{fig:equality}

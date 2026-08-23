@@ -38,7 +38,7 @@
 \inferrule*[lab={\ruleName{eval-def}}]
 {
   d_i = \exDef{f_i}{\seq{x}_i}{b_i} \quad (\forall i) \\
-  v_i = \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} \quad (\forall i)
+  v_i = \exDefClosure[\deleted{\Gamma}]{\rho}{\seq{d}}{i} \quad (\forall i)
 }
 {
   \rho, \seq{d} \Rightarrow \assigns{\set{\bind{\seq{f}}{\seq{v}}}}
@@ -156,7 +156,7 @@
   \rho, s \cons b \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
-\caption{Block $b$ evaluates to result $r$ under environment $\rho : \Gamma$}
+\caption{Block $b$ evaluates to result $r$ under environment $\rho\deleted{{} : \Gamma}$}
 \label{fig:eval-block-outcome}
 \end{figure}
 
@@ -195,7 +195,7 @@
   \strut
 }
 {
-  \rho, \exLambda{x_1, \ldots, x_n}{e} \Rightarrow \val{\exLamClosure[\Gamma]{\rho}{\seq{x}}{e}}
+  \rho, \exLambda{x_1, \ldots, x_n}{e} \Rightarrow \val{\exLamClosure[\deleted{\Gamma}]{\rho}{\seq{x}}{e}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-unary-op}}]
@@ -269,7 +269,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-attr-object}}]
 {
-  \rho, e \Rightarrow \val{\exObj{\Delta}{C}{\rho'}}
+  \rho, e \Rightarrow \val{\exObj{\deleted{\Delta}}{C}{\rho'}}
 }
 {
   \rho, \exAttr{e}{x} \Rightarrow \val{\rho'(x)}
@@ -282,10 +282,10 @@
   \fields(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}}
 }
 {
-  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{\Gamma}{C}{\replaced{\fieldMap(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m}))}{\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}, \bind{y_1}{v_{n+1}}, \ldots, \bind{y_m}{v_{n+m}}}\ }}}
+  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{\deleted{\Gamma}}{C}{\replaced{\fieldMap(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m}))}{\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}, \bind{y_1}{v_{n+1}}, \ldots, \bind{y_m}{v_{n+m}}}\ }}}
 }
 \end{mathpar}
-\caption{Expression $e$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
+\caption{Expression $e$ evaluates to outcome $o$ under environment $\rho\deleted{{} : \Gamma}$}
 \label{fig:eval-outcome}
 \end{figure}
 
@@ -305,7 +305,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-call-lambda}}]
 {
-  \rho, e \Rightarrow \val{\exLamClosure[\Delta]{\rho'}{\seq{x}}{e'}} \\
+  \rho, e \Rightarrow \val{\exLamClosure[\deleted{\Delta}]{\rho'}{\seq{x}}{e'}} \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
   \rho' \override \set{\bind{\seq{x}}{\seq{u}}}, e' \Rightarrow o
 }
@@ -315,9 +315,9 @@
 \and
 \inferrule*[lab={\ruleName{eval-call-def}}]
 {
-  \rho, e \Rightarrow \val{\exDefClosure[\Delta]{\rho'}{\seq{d}}{j}} \\
+  \rho, e \Rightarrow \val{\exDefClosure[\deleted{\Delta}]{\rho'}{\seq{d}}{j}} \\
   d_i = \exDef{f_i}{\seq{x}_i}{b_i} \quad (\forall i) \\
-  v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
+  v_i = \exDefClosure[\deleted{\Delta}]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
   \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, b_j \Rightarrow r
 }
@@ -411,8 +411,8 @@
   \rho, e \cons \seq{e} \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
-\caption{Expression sequence $\seq{e}$ evaluates left to right to outcome $o$ under environment $\rho :
-\Gamma$}
+\caption{Expression sequence $\seq{e}$ evaluates left to right to outcome $o$ under environment $\rho\deleted{{} :
+\Gamma}$}
 \label{fig:eval-seq}
 \end{figure}
 
@@ -566,7 +566,7 @@
   \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
-\caption{An abort in a subexpression propagates, under environment $\rho : \Gamma$}
+\caption{An abort in a subexpression propagates, under environment $\rho\deleted{{} : \Gamma}$}
 \label{fig:eval-propagation}
 \end{figure}
 
@@ -577,7 +577,7 @@
 \small
 \inferrule*[lab={\ruleName{eval-attr-missing}}]
 {
-  \rho, e \Rightarrow \val{\exObj{\Delta}{C}{\rho'}} \\
+  \rho, e \Rightarrow \val{\exObj{\deleted{\Delta}}{C}{\rho'}} \\
   x \notin \dom(\rho')
 }
 {
@@ -595,7 +595,7 @@
 \and
 \added{\inferrule*[lab={\ruleName{eval-call-lambda-arity}}]
 {
-  \rho, e \Rightarrow \val{\exLamClosure[\Delta]{\rho'}{\seq{x}}{e'}} \\
+  \rho, e \Rightarrow \val{\exLamClosure[\deleted{\Delta}]{\rho'}{\seq{x}}{e'}} \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
   |\seq{x}| \neq |\seq{u}|
 }
@@ -605,7 +605,7 @@
 \and
 \added{\inferrule*[lab={\ruleName{eval-call-def-arity}}]
 {
-  \rho, e \Rightarrow \val{\exDefClosure[\Delta]{\rho'}{\seq{d}}{j}} \\
+  \rho, e \Rightarrow \val{\exDefClosure[\deleted{\Delta}]{\rho'}{\seq{d}}{j}} \\
   d_j = \exDef{f_j}{\seq{x}_j}{b_j} \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
   |\seq{x}_j| \neq |\seq{u}|
@@ -624,7 +624,7 @@
   \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \aborts{\errType}
 }
 \end{mathpar}
-\caption{Expression $e$ aborts with kind $\kappa$ under environment $\rho : \Gamma$}
+\caption{Expression $e$ aborts with kind $\kappa$ under environment $\rho\deleted{{} : \Gamma}$}
 \label{fig:eval-fails}
 \end{figure}
 
@@ -704,7 +704,7 @@
   \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
-\caption{Comprehension qualifiers $\seq{g}$ evaluate to outcome $o$ under environment $\rho : \Gamma$}
+\caption{Comprehension qualifiers $\seq{g}$ evaluate to outcome $o$ under environment $\rho\deleted{{} : \Gamma}$}
 \label{fig:eval-quals-outcome}
 \end{figure}
 

@@ -41,7 +41,7 @@
   \Gamma \override \statusDefAssigned(\seq{x}) \vdash e
 }
 {
-  \vdash \exLamClosure[\Gamma]{\rho}{\seq{x}}{e} : \statusDefAssigned
+  \vdash \exLamClosure[\deleted{\Gamma}]{\rho}{\seq{x}}{e} : \statusDefAssigned
 }
 \and
 \inferrule*[lab={\ruleName{val-def}}]
@@ -51,7 +51,7 @@
   \seq{f} \text{ distinct}
 }
 {
-  \vdash \exDefClosure[\Gamma]{\rho}{\exDef{f_1}{\seq{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}}{b_{n+1}}}{i} : \statusDefAssigned
+  \vdash \exDefClosure[\deleted{\Gamma}]{\rho}{\exDef{f_1}{\seq{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}}{b_{n+1}}}{i} : \statusDefAssigned
 }
 \and
 \inferrule*[lab={\ruleName{val-obj}}]
@@ -60,7 +60,7 @@
   \vdash \rho : \Gamma
 }
 {
-  \vdash \exObj{\Gamma}{C}{\rho} : \statusDefAssigned
+  \vdash \exObj{\deleted{\Gamma}}{C}{\rho} : \statusDefAssigned
 }
 \and
 \inferrule*[lab={\ruleName{val-mod}}]
