@@ -238,8 +238,10 @@ through its existing instances.
 \label{sec:other-restrictions}
 
 A few remaining restrictions do not fit the groups above. \Replaced{A \pyinline{class} definition must be a
-dataclass, and a dataclass body declares fields and nothing else. A class cannot supply its own meaning for
-subscripting, iteration, equality or membership, which have the fixed meanings given in \secref{opsem}.}{Only dataclasses are supported, so
+dataclass, and a dataclass body declares fields and nothing else. \PurePy therefore supports none of Python's
+class-based extension mechanisms, such as \pyinline{__getitem__} for subscripting, \pyinline{__iter__} for
+iteration or \pyinline{__eq__} for equality. Subscripting, iteration, equality and membership have the fixed
+meanings given in \secref{opsem}.}{Only dataclasses are supported, so
 \pyinline{class} definitions of other kinds are excluded.}
 
 \subsubsection{Runtime errors}
