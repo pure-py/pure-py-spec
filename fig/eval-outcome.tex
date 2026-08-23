@@ -147,7 +147,7 @@
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, b \Rightarrow r$}
+\flushleft \shadebox{$\rho, b \Rightarrow r$ \added{(continued)}}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-assert-fail}}]
@@ -200,7 +200,7 @@
   \rho, s \cons b \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
-\caption{Block $b$ aborts with kind $\kappa$ under environment $\rho : \Gamma$}
+\caption{Block evaluation, continued (aborting cases)}
 \label{fig:eval-block-fails}
 \end{figure}
 
@@ -335,7 +335,7 @@
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, e \Rightarrow o$}
+\flushleft \shadebox{$\rho, e \Rightarrow o$ \added{(continued)}}
 \begin{mathpar}
 \small
 \added{\inferrule*[lab={\ruleName{eval-subscript}}]
@@ -471,7 +471,7 @@
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, e \Rightarrow o$}
+\flushleft \shadebox{$\rho, e \Rightarrow o$ \added{(continued)}}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-binop-fail}}]
@@ -619,13 +619,13 @@
   \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
-\caption{An abort in a subexpression propagates, under environment $\rho : \Gamma$}
+\caption{Expression evaluation, continued (propagation from subexpressions)}
 \label{fig:eval-propagation}
 \end{figure}
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, e \Rightarrow o$}
+\flushleft \shadebox{$\rho, e \Rightarrow o$ \added{(continued)}}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-attr-missing}}]
@@ -677,7 +677,7 @@
   \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \aborts{\errType}
 }
 \end{mathpar}
-\caption{Expression $e$ aborts with kind $\kappa$ under environment $\rho : \Gamma$}
+\caption{Expression evaluation, continued (aborting cases)}
 \label{fig:eval-fails}
 \end{figure}
 
