@@ -70,7 +70,7 @@
 \inferrule*[lab={\ruleName{eval-from-import}}]
 {
   q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
-  q''\, \Rightarrow_{\mathsf{load}} \val{\rho_{q''\,}} \quad (\forall q''\, \properPrefixOf q',\; q''\, \not\prefixOf q) \\
+  q^\dagger \Rightarrow_{\mathsf{load}} \val{\rho_{q^\dagger}} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q) \\
   \rho, x_i \importsR \val{v_i} \quad (\forall i) \\
    \seq{\iota} \Rightarrow o
 }
@@ -89,7 +89,7 @@
 \inferrule*[lab={\ruleName{eval-from-import-fail-ancestor}}]
 {
   q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
-  q''\, \Rightarrow_{\mathsf{load}} \aborts{\kappa} \quad (\text{some } q''\, \properPrefixOf q',\; q''\, \not\prefixOf q)
+  q^\dagger \Rightarrow_{\mathsf{load}} \aborts{\kappa} \quad (\text{some } q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q)
 }
 {
    \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
@@ -98,7 +98,7 @@
 \inferrule*[lab={\ruleName{eval-from-import-fail-member}}]
 {
   q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
-  q''\, \Rightarrow_{\mathsf{load}} \val{\rho_{q''\,}} \quad (\forall q''\, \properPrefixOf q',\; q''\, \not\prefixOf q) \\
+  q^\dagger \Rightarrow_{\mathsf{load}} \val{\rho_{q^\dagger}} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q) \\
   \rho, x_i \importsR \val{v_i} \quad (\forall i < j) \\
   \rho, x_j \importsR \aborts{\kappa}
 }

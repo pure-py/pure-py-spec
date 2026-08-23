@@ -52,7 +52,7 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q' : \Delta \\
-  \vdash_{\mathsf{load}} q''\, : \Delta_{q''\,} \quad (\forall q''\, \properPrefixOf q',\; q''\, \not\prefixOf q) \\
+  \vdash_{\mathsf{load}} q^\dagger : \Delta_{q^\dagger} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q) \\
   \Delta, x_i \importsR \theta_i \quad (\forall i) \\
   \vdash \seq{\iota} : \Gamma
 }
