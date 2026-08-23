@@ -9,7 +9,7 @@ from contexts import (ClassEntry, Context, ContextEntry, ModuleContext, ModuleLo
                       PREDEFINED_MEMBERS, ResultTy, Status, ASSIGNS_EMPTY, RETURNS, Assigns,
                       Returns, VarContext, class_of, extend_context, fields, merge_results,
                       module_of, override_gamma, override_results, override_var, var_status)
-from aux import (BlockElement, assigns_block, assigns_elements, binds, captures, captures_element,
+from aux import (BlockElement, assigns_block, assigns_elements, binds, captures_e, captures_element,
                  elements_of_block, find_first_reassigning, names_in_target, own_fields)
 from patterns import dict_key, is_catch_all, pattern_vars, subsumes
 
@@ -133,7 +133,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, module_body: bool = False) -> No
         return
     if isinstance(s, ast.Assign):
         check_expr(s.value, ctx)
-        check_assign_targets(s.targets, captures(s.value))
+        check_assign_targets(s.targets, captures_e(s.value))
         return
     if isinstance(s, ast.Expr):
         check_expr(s.value, ctx)
