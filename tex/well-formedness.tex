@@ -90,6 +90,9 @@ may thus require other modules to load first; the rules are interpreted inductiv
 import cycle is ill-formed, because a module in a cycle could finish loading only after itself. Program
 well-formedness (\figref{well-formed-module}) requires the main module to be well-formed and hence,
 recursively, every module the program can load; a module that is never imported is not checked.
+\Added{The rule \ruleName{module} checks a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
+overridden by the one its imports produce, so the members of \pyinline{builtins} are in scope
+unqualified.}
 
 \input{fig/well-formed-module}
 
