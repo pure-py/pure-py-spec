@@ -5,11 +5,9 @@ from typing import Optional
 
 import parse
 from aux import annotate_seq_kinds
-from check_module import check_module
+from check_module import check_module, proper_prefixes
+from contexts import PREDEFINED_MODULES
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
-
-
-PREDEFINED_MODULES = {'builtins', 'math', 'sys', 'typing', 'dataclasses'}
 
 
 def import_targets(tree: ast.Module, base_dir: pathlib.Path) -> set[str]:
@@ -19,11 +17,6 @@ def import_targets(tree: ast.Module, base_dir: pathlib.Path) -> set[str]:
             | {m for m, _ in froms}
             | {f'{m}.{a.name}' for m, names in froms for a in names
                if is_module(f'{m}.{a.name}', base_dir) is not None})
-
-
-def proper_prefixes(name: str) -> set[str]:
-    parts = name.split(".")
-    return {".".join(parts[:i]) for i in range(1, len(parts))}
 
 
 def is_module(name: str, base_dir: pathlib.Path) -> Optional[pathlib.Path]:
@@ -67,12 +60,12 @@ def source_tree(base_dir: pathlib.Path, entry_path: pathlib.Path) -> set[str]:
     parts = (module_name(base_dir, p) for p in base_dir.rglob('*.py')
              if p != entry_path and '__pycache__' not in p.parts)
     names = {'.'.join(p) for p in parts if p}
-    return {n for name in names for n in {name} | proper_prefixes(name)}
+    return {n for name in names for n in {name, *proper_prefixes(name)}}
 
 Discovery = tuple[dict[str, tuple[pathlib.Path, ast.Module]], dict[str, set[str]]]
 
 def with_proper_prefixes(imps: set[str]) -> list[str]:
-    return sorted({q for imp in imps for q in {imp} | proper_prefixes(imp)})
+    return sorted({q for imp in imps for q in {imp, *proper_prefixes(imp)}})
 
 def discover(queue: list[str], found: Discovery, base_dir: pathlib.Path) -> Discovery:
     if len(queue) == 0:
