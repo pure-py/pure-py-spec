@@ -13,7 +13,7 @@ from contexts import (Context, ContextEntry, ModuleContext, ModuleLoaded, Module
 from aux import (BlockElement, annotate_seq_kinds, assigns_block, assigns_elements, assigns_stmt,
                  captures_element, elements_of_block, find_first_reassigning, find_import,
                  find_nested_import, own_fields, split_imports)
-from well_formed import block_element_result_type, check_element, next_ctx_after
+from blocks import block_element_result_type, check_element, next_ctx_after
 
 def name_assign(q: str) -> ast.stmt:
     return ast.parse(f'__name__ = {q!r}').body[0]
