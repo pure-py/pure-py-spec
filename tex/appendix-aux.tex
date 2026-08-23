@@ -1,32 +1,4 @@
 \section{Auxiliary definitions}
 \label{sec:aux-defs}
 
-\subsection{Syntactic analyses}
-\label{sec:aux-syntactic}
-
-\figref{aux} gives the principal cases of the analyses that support the well-formedness rules. Here
-$\fvE(e)$ and $\fvS(b)$ are the free variables of an expression and of a block, defined in the usual way. On
-the cases not shown, $\binds$ and $\capturesE$ recurse structurally, taking the union over immediate subterms,
-and $\capturesS$ takes the union of $\capturesE$ over its subexpressions and $\capturesS$ over its subblocks.
-$\assignsS$ is empty on the statements not shown, is the union over the branch blocks of a conditional, and
-does not descend into nested function definitions, which have their own scope.
-
-\input{fig/aux}
-
-\subsection{Pattern subsumption}
-\label{sec:aux-subsumption}
-
-\figref{subsumption} gives the rules for the subsumption preorder $\Replaced{\Gamma \vdash p \subsumed
-p'}{p \subsumed p'}$ used by the pattern well-formedness judgement. \Added{In \ruleName{sub-constr} a constructor pattern's sub-patterns are
-written $\seq{p}$, and $\seq{p}[x]$ is the one supplied for field $x$, whether positionally or by keyword;
-\ruleName{pat-constr} establishes that correspondence when it checks the pattern's arity against
-$\fields(C)$.}
-
-\input{fig/subsumption}
-
-\subsection{Module and class metafunctions}
-\label{sec:aux-modules}
-
-\figref{modules} collects the metafunctions used by the module and class rules.
-
-\input{fig/modules}
+\todo{Empty for now; the auxiliary figures have moved into \secref{syntax}.}
