@@ -33,10 +33,10 @@ test/run-all.sh
 Sets up a `.venv` automatically. Targets Python 3.12+ ([#39](https://github.com/pure-py/pure-py-spec/issues/39)).
 
 Tests are organised by tier (module-level and program-level) and then by verdict. The verdict directory *is* the test's specification: the runner derives every assertion from the path.
-- `well-formed/` — PurePy accepts; Python runs it
+- `semantically-valid/` — PurePy accepts; Python runs it and gives the same result
 - `excluded/` — Python accepts but PurePy excludes by design; `syntactic/` is rejected at parse, `static-semantic/` at check, `dynamic-semantic/` at run time
 - `python-error/` — neither language gives a result (a genuine error); stages as above, plus `syntactic-only/`, tested via AST construction (not expressible as `.py`)
-- `pending/` — not yet decided by the checker; `well-formed/pending/` will become well-formed, `<verdict>/static-semantic/pending/` will be rejected at check
+- `pending/` — not yet decided by the checker; `semantically-valid/pending/` will become semantically valid, `<verdict>/static-semantic/pending/` will be rejected at check
 
 The invariant — `excluded` ⇒ Python runs it, `python-error` ⇒ Python raises — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails.
 

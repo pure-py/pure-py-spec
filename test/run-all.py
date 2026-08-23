@@ -35,7 +35,7 @@ MODULE_LEVEL, PROGRAM_LEVEL = "module-level", "program-level"
 
 # Verdict / stage directory names: a test's path is its specification
 class Verdict(StrEnum):
-    WELL_FORMED = "well-formed"
+    SEMANTICALLY_VALID = "semantically-valid"
     EXCLUDED = "excluded"
     PYTHON_ERROR = "python-error"
 
@@ -189,7 +189,7 @@ class Runner:
     def module_test(self, p: pathlib.Path, module: pathlib.Path) -> None:
         """Assert a module-level test from its path: <verdict>[/<stage>].
 
-        verdict in {well-formed, excluded, python-error} fixes how PurePy and
+        verdict in {semantically-valid, excluded, python-error} fixes how PurePy and
         Python must each respond; stage in {syntactic, static-semantic,
         dynamic-semantic} fixes where PurePy stops (dynamic-semantic = checker
         accepts, but evaluation is stuck)."""
@@ -198,7 +198,7 @@ class Runner:
             dirs = p.parent.relative_to(module).parts
             err = substr(p.with_suffix(ERROR_EXPECTED))
 
-            if dirs == (Verdict.WELL_FORMED, Stage.PENDING):
+            if dirs == (Verdict.SEMANTICALLY_VALID, Stage.PENDING):
                 self.parse(p, Exit.NOT_YET)
                 return
             if dirs[1:] == (Stage.STATIC_SEMANTIC, Stage.PENDING):
@@ -214,7 +214,7 @@ class Runner:
             verdict = Verdict(dirs[0])
             stage = Stage(dirs[1]) if len(dirs) > 1 and dirs[1] in {s.value for s in Stage} else None
 
-            if verdict == Verdict.WELL_FORMED:
+            if verdict == Verdict.SEMANTICALLY_VALID:
                 self.parse(p, Exit.OK)
                 self.check(p, Exit.OK)
             elif stage == Stage.SYNTACTIC:
