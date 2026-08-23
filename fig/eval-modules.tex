@@ -204,7 +204,7 @@
   q \Rightarrow_{\mathsf{load}} \val{\replaced{\rho}{\mathcal{P}(q)\ }}
 }
 \and
-\inferrule*[lab={\ruleName{load}}]
+\inferrule*[lab={\ruleName{\replaced{eval-module}{load}}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
    \seq{\iota} \Rightarrow \val{\rho} \\
@@ -215,7 +215,7 @@
   q \Rightarrow_{\mathsf{load}} \mlet{\rho\replaced{^\dagger}{'\ }}{o}{\val{(\submods(q) \override \rho\replaced{^\dagger}{'\ })}}
 }
 \and
-\inferrule*[lab={\ruleName{load-fail}}]
+\inferrule*[lab={\ruleName{\replaced{eval-module-fail}{load-fail}}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
    \seq{\iota} \Rightarrow \aborts{\kappa}
