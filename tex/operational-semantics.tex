@@ -22,6 +22,11 @@ A value is well-formed at a context entry (\figref{well-formed-env}): ordinary v
 $\statusDefAssigned$, module references and class entries at the corresponding entry. An environment is
 well-formed at a context that binds its variables at corresponding entries.
 
+\Added{Every evaluation judgement is implicitly parameterised by a context $\Gamma$ with $\vdash \rho : \Gamma$,
+as the figure captions record. A rule passes $\Gamma$ to its premises unchanged, and only the rules that build
+a closure, an object or a class entry mention it, storing it in the value so that the value can later be
+checked against the context it was created in.}
+
 \input{fig/well-formed-env}
 
 Module and program evaluation are given in \figref{eval-modules}; import evaluation in \figref{eval-import-prefix}; importing names from a loaded module in
