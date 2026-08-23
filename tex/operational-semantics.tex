@@ -24,9 +24,8 @@ with $\assigns{\varnothing}$ as left and right unit.
 A value is well-formed at a context entry (\figref{well-formed-env}): ordinary values at
 $\statusDefAssigned$, module references and class entries at the corresponding entry. An environment is
 well-formed at a context that binds its variables at corresponding entries. \Added{A primitive
-$\primVal{\primFn}$ is a value that can be applied, with $\primFn$ its meaning; $\mathcal{P}$ binds a member
-to one where there is no body to evaluate. No rule applies a primitive, so calling one has no derivation
-(\issue{132}, \issue{47}).}
+$\primVal{\primFn}$ is a value that can be applied, with $\primFn$ its meaning. No rule applies a primitive,
+so calling one has no derivation.}
 
 \input{fig/well-formed-env}
 
@@ -45,7 +44,7 @@ terms of structural equality $\eqOp$ and membership $\memOp$ (\figrefTwo{equalit
 the meanings they have in Python and yield $\aborts{\kappa}$ where Python raises. All three are undefined
 where no case applies, and where one of them is undefined the expression has no derivation, which is where
 \PurePy declines to give the operation the meaning Python gives it; a non-Boolean test is the same case
-(\secref{no-coercions}, \issue{162}).
+(\secref{no-coercions}).
 
 \input{fig/operators}
 \input{fig/equality}
@@ -65,7 +64,7 @@ function. \Added{A \emph{match result} $m$ is either $\matchOk{\rho'}$, a match 
 $\noMatch$, a failure to match, on which $\dispatch$ moves to the next case. Having no derivation is a third
 outcome, distinct from both: the match has no meaning, and \PurePy gives the run no result. That is where a
 pattern and a value are not comparable, so \PurePy can say neither that they match nor that they do not; a
-list pattern against a tuple is such a case (\issue{151}). Sub-results compose with $\override$, matching
+list pattern against a tuple is such a case. Sub-results compose with $\override$, matching
 sequentially:}
 {\small
 \begin{align*}
