@@ -158,8 +158,9 @@ definitions that follow, as is the name $q$ of the enclosing module in the rules
 \label{def:predefined}
 $\mathcal{P}$ takes each module $q$ of \figref{predefined} to \Replaced{a pair $(\rho, \Gamma)$ with $\vdash \rho :
 \Gamma$ (\figref{well-formed-env}), where $\rho$ binds}{an environment binding} the members listed for
-$q$, together with \pyinline{__name__}, to \Replaced{an implementation-defined value, or to a primitive $\primVal{\primFn}$ where $\primFn$ maps a
-sequence of values to an outcome}{implementation-defined values}.\Deleted{Its context is whatever types that
+$q$, together with \pyinline{__name__}, to implementation-defined values.\Added{ A member that denotes a function is
+bound to a primitive $\primVal{\primFn}$, the implementation supplying the total map $\primFn$ from a
+sequence of values to an outcome.}\Deleted{Its context is whatever types that
 environment (\figref{well-formed-env}).}
 \end{definition}
 
