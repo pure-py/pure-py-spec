@@ -126,7 +126,7 @@ unobservable; the semantics therefore needs no cache of loaded modules.} \Added{
 of loaded modules. The rule \ruleName{eval-module} puts $\mathcal{P}(\pyinline{builtins})$ under a module
 body's environment, mirroring \ruleName{module} (\secref{wf-modules}).}\Deleted{These rules use the environment $\mathcal{P}(\pyinline{builtins})$ binding the names of
 \figref{predefined}.}
-\Replaced{A program evaluates to a \emph{termination kind} (\figref{values}): $\errExit{0}$ if the main module
+\Replaced{A program evaluates to a termination kind (\figref{values}): $\errExit{0}$ if the main module
 loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exited with status $n$. An implementation must agree on which kind a run yields, though how it
 reports one is not prescribed.}{A program evaluates to
 its exit status: a run whose main module loads successfully yields $0$, and one whose main module fails yields
