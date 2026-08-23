@@ -37,13 +37,13 @@
 \inferrule*[lab={\ruleName{pat-constr}}]
 {
   \Gamma \vdash q : C \\
-  \fields(C) = \replaced{x_1 \cons \ldots \cons x_n}{x_1, \ldots, x_n\ } \cons \seq{x}\,' \\
-  \set{\seq{y}} = \set{\seq{x}\,'} \\
-  \Gamma \vdash p_i \quad (\forall i) \\
+  \deleted{\fields(C) = x_1, \ldots, x_n \cons \seq{x}\,'} \\
+  \deleted{\set{\seq{y}} = \set{\seq{x}\,'}} \\
+  \replaced{\Gamma \vdash \fieldMap(C, \seq{p})(x) \quad (\forall x \in \fields(C))}{\Gamma \vdash p_i \quad (\forall i)\ } \\
   \added{\text{variables in } \seq{p} \text{ distinct}}
 }
 {
-  \Gamma \vdash \patConstr{q}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}}
+  \Gamma \vdash \patConstr{q}{\replaced{\seq{p}}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}\ }}
 }
 \and
 \inferrule*[lab={\ruleName{cases-cons}}]

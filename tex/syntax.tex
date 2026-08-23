@@ -180,6 +180,11 @@ body $\seq{\iota}\;\seq{s}$ it acts on $\seq{s}$. Write $q \prefixOf q'$ (\emph{
 q.q''$ for some $q''$, and $\properPrefixOf$ for the strict order; the proper prefixes of a module name
 are its \emph{ancestors}. The $\submods$ metafunction is
 defined, with the class-related metafunctions, in \Replaced{\figref{modules}}{\appendixref{sec:aux-modules}}.
+\Added{A dataclass names its fields in a fixed order, and a constructor supplies each field exactly once,
+positionally or by keyword. $\fieldMap(C, \seq{u})$ maps each field of $C$ to the argument supplied for it,
+and is undefined if the arguments do not cover the fields exactly. Constructor patterns and expressions are
+checked and evaluated field by field using it, so the rules do not depend on how a constructor splits its
+arguments.}
 
 \input{fig/modules}
 
@@ -222,10 +227,7 @@ a conditional, and does not descend into nested function definitions, which have
 The preorder $\Replaced{\Gamma \vdash p \subsumed p'}{p \subsumed p'}$ (\Replaced{\figref{subsumption}}{\appendixref{sec:aux-subsumption}}) holds when every value matched by $p$ is also matched by $p'$.
 \end{definition}
 
-\noindent Subsumption is used by the well-formedness rule for $\pyinline{match}$ to rule out unreachable cases and to check exhaustiveness; with the current pattern set, the latter reduces to requiring a catch-all (var or wildcard) case. \Added{In \ruleName{sub-constr} a constructor pattern's sub-patterns are written
-$\seq{p}$, and $\seq{p}[x]$ is the one supplied for field $x$, whether positionally or by keyword;
-\ruleName{pat-constr} establishes that correspondence when it checks the pattern's arity against
-$\fields(C)$.}
+\noindent Subsumption is used by the well-formedness rule for $\pyinline{match}$ to rule out unreachable cases and to check exhaustiveness; with the current pattern set, the latter reduces to requiring a catch-all (var or wildcard) case.
 
 \input{fig/subsumption}
 
