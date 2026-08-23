@@ -1,4 +1,4 @@
-# rule: seq
+# rule: cons -- captures(s) and assigns of the rest of the block must be disjoint
 def f():
     x = 5
     def g():

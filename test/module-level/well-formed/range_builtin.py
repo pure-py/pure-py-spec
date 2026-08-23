@@ -1,2 +1,2 @@
-# rule: var-builtin -- range is a predefined builtin
+# rule: module -- builtins enter the module context by override
 print(len(range(5)))

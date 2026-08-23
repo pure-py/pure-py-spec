@@ -1,3 +1,3 @@
-# rule: var beats var-builtin -- a local binding shadows a builtin
+# rule: var -- a module-level assignment overrides the builtins entry
 len = 3
 print(len)

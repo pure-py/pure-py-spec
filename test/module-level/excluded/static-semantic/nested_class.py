@@ -1,4 +1,4 @@
-# rule: block (block-wf has no class rule; dataclasses only at module top level)
+# rule: class -- classes are declared by the module-statement judgement, not within a block
 from dataclasses import dataclass
 from typing import Any
 

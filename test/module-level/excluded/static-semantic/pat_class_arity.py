@@ -1,4 +1,4 @@
-# rule: pat-class
+# rule: pat-constr
 from dataclasses import dataclass
 from typing import Any
 
