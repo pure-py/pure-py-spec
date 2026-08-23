@@ -291,3 +291,9 @@ def find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST |
 def own_fields(node: ast.ClassDef) -> list[str]:
     return [t.target.id for t in node.body
             if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)]
+
+def qualified_name(e: ast.expr) -> str:
+    if isinstance(e, ast.Name):
+        return e.id
+    assert isinstance(e, ast.Attribute)
+    return qualified_name(e.value) + '.' + e.attr

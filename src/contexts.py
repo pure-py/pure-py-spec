@@ -139,6 +139,9 @@ def class_entry(e: ast.expr, ctx: ModuleContext) -> Optional[ClassEntry]:
     entry = entry_of(e, ctx)
     return entry if isinstance(entry, ClassEntry) else None
 
+def short_name(entry: ClassEntry) -> str:
+    return entry.name.rsplit('.', 1)[-1]
+
 def ancestors(entry: ClassEntry) -> list[ClassEntry]:
     if entry.base is None:
         return [entry]
