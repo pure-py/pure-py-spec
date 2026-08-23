@@ -278,11 +278,11 @@
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \val{(v_1 \cons \ldots \cons v_{n+m})} \\
-  \resolveClass(\rho, q) = C \\
-  \fields(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}
+  \resolveClass(\rho, q) = C \deleted{{} \\
+  \fields(C) = x_1, \ldots, x_n, x_{n+1}, \ldots, x_{n+m}}
 }
 {
-  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{\Gamma}{C}{\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}, \bind{y_1}{v_{n+1}}, \ldots, \bind{y_m}{v_{n+m}}}}}
+  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{\Gamma}{C}{\replaced{\fieldMap(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m}))}{\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}, \bind{y_1}{v_{n+1}}, \ldots, \bind{y_m}{v_{n+m}}}\ }}}
 }
 \end{mathpar}
 \caption{Expression $e$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
