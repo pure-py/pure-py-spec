@@ -159,7 +159,7 @@ definitions that follow, as is the name $q$ of the enclosing module in the rules
 $\mathcal{P}$ takes each module $q$ of \figref{predefined} to \Replaced{a pair $(\rho, \Gamma)$ with $\vdash \rho :
 \Gamma$ (\figref{well-formed-env}), where $\rho$ binds}{an environment binding} each member listed for
 $q$, together with \pyinline{__name__}, to \Replaced{an implementation-defined value}{implementation-defined values}.\Added{ A member that denotes a function is
-bound to a primitive $\primVal{\primFn}$, the implementation supplying the partial map $\primFn$ from a
+bound to a primitive $\primVal{\primFn}$, where $\primFn$ is a partial map from a
 sequence of values to an outcome.}\Deleted{Its context is whatever types that
 environment (\figref{well-formed-env}).}
 \end{definition}
