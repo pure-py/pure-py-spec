@@ -64,7 +64,7 @@
   \Gamma \vdash q : C \\
   \Gamma \vdash q' : C' \\
   C' \in \ancestors(C) \\
-  \Gamma \vdash \seq{p}[x] \subsumed \seq{p}\,'[x] \quad (\forall x \in \fields(C'))
+  \Gamma \vdash \fieldMap(C, \seq{p})(x) \subsumed \fieldMap(C', \seq{p}\,')(x) \quad (\forall x \in \fields(C'))
 }
 {
   \Gamma \vdash \patConstr{q}{\seq{p}} \subsumed \patConstr{q'}{\seq{p}\,'}
