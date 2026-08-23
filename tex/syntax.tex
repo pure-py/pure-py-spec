@@ -166,32 +166,32 @@ environment (\figref{well-formed-env}).}
 \begin{figure}
 \small
 \centering
-\begin{tabular}{lp{0.6\textwidth}}
+\begin{tabular}{llll}
 \hline
-\textbf{Module} & \textbf{Members} \\
+\textbf{Module} & \textbf{Member} & \multicolumn{2}{l}{\added{\textbf{Meaning}}} \\
 \hline
-\textup{\pyinline{builtins}} & \pyinline{print}, \pyinline{len}, \pyinline{range} \\
-\pyinline{math} & \pyinline{pi}, \pyinline{e}, \pyinline{sqrt}, \pyinline{exp}, \pyinline{log}, \pyinline{sin}, \pyinline{cos}, \pyinline{tan}, \pyinline{floor}, \pyinline{ceil} \\
-\pyinline{sys} & \pyinline{argv}, \pyinline{exit} \\
-\pyinline{typing} & \pyinline{Any} \\
-\pyinline{dataclasses} & \pyinline{dataclass} \\
+\textup{\pyinline{builtins}} & \pyinline{print} & & \\
+ & \pyinline{len} & \added{$\primFn(v) = \val{n}$} & \added{if $\iterOp(v) = u_1 \cons \ldots \cons u_n$} \\
+ & & \added{$\primFn(\seq{u}) = \aborts{\errType}$} & \added{(otherwise)} \\
+ & \pyinline{range} & \added{$\primFn(n) = \val{\exList{0, \ldots, n-1}}$} & \added{if $n$ whole number, $n > 0$} \\
+ & & \added{$\primFn(n) = \val{\exList{}}$} & \added{if $n$ whole number, $n \leq 0$} \\
+\pyinline{math} & \pyinline{pi} & & \\
+ & \pyinline{e} & & \\
+ & \pyinline{sqrt} & & \\
+ & \pyinline{exp} & & \\
+ & \pyinline{log} & & \\
+ & \pyinline{sin} & & \\
+ & \pyinline{cos} & & \\
+ & \pyinline{tan} & & \\
+ & \pyinline{floor} & & \\
+ & \pyinline{ceil} & & \\
+\pyinline{sys} & \pyinline{argv} & & \\
+ & \pyinline{exit} & \added{$\primFn(\varepsilon) = \aborts{\errExit{0}}$} & \\
+ & & \added{$\primFn(n) = \aborts{\errExit{n}}$} & \\
+\pyinline{typing} & \pyinline{Any} & & \\
+\pyinline{dataclasses} & \pyinline{dataclass} & & \\
 \hline
 \end{tabular}
-
-\vspace{3mm}
-
-\added{\begin{tabular}{lll}
-\hline
-\textbf{Member} & \multicolumn{2}{l}{\textbf{Meaning}} \\
-\hline
-\pyinline{len} & $\primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
- & $\primFn(\seq{u}) = \aborts{\errType}$ & (otherwise) \\
-\pyinline{range} & $\primFn(n) = \val{\exList{0, \ldots, n-1}}$ & if $n$ whole number, $n > 0$ \\
- & $\primFn(n) = \val{\exList{}}$ & if $n$ whole number, $n \leq 0$ \\
-\pyinline{exit} & $\primFn(\varepsilon) = \aborts{\errExit{0}}$ & \\
- & $\primFn(n) = \aborts{\errExit{n}}$ & \\
-\hline
-\end{tabular}}
 
 \caption{Predefined modules and their members}
 \label{fig:predefined}
