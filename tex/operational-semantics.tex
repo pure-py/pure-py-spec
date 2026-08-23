@@ -22,11 +22,6 @@ A value is well-formed at a context entry (\figref{well-formed-env}): ordinary v
 $\statusDefAssigned$, module references and class entries at the corresponding entry. An environment is
 well-formed at a context that binds its variables at corresponding entries.
 
-\Added{Every evaluation judgement is implicitly parameterised by a context $\Gamma$ with $\vdash \rho : \Gamma$,
-as the figure captions record. A rule passes $\Gamma$ to its premises unchanged, and only the rules that build
-a closure, an object or a class entry mention it, storing it in the value so that the value can later be
-checked against the context it was created in.}
-
 \input{fig/well-formed-env}
 
 Module and program evaluation are given in \figref{eval-modules}; import evaluation in \figref{eval-import-prefix}; importing names from a loaded module in
@@ -52,11 +47,11 @@ $1$, as Python does for an uncaught exception.}
 
 \input{fig/eval-modules}
 
-Block evaluation $\rho, b \Rightarrow r$ is given in \figref{eval-block-outcome}. Function definitions delimit
+Block evaluation $\rho\Added{{} : \Gamma}, b \Rightarrow r$ is given in \figref{eval-block-outcome}. Function definitions delimit
 the scope of sequential-composition effects, so as black boxes functions are always pure. The metafunction $\outcome$ (\figref{eval-aux}) reads a block's result as
 the outcome of calling it, $\val{\pyinline{None}}$ where the block falls off the end.
 
-Expression evaluation $\rho, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd}) yields an
+Expression evaluation $\rho\Added{{} : \Gamma}, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd}) yields an
 outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). \Replaced{The termination kinds other than $\errExit{n}$ are named after the
 exceptions the same program raises under Python in the same circumstances.}{The error kinds are designed to
 correspond to the error the same program would raise under Python in the same circumstances.} The rules are given in a monadic metalanguage over outcomes, in which
