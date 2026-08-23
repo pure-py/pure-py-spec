@@ -23,7 +23,9 @@ with $\assigns{\varnothing}$ as left and right unit.
 
 A value is well-formed at a context entry (\figref{well-formed-env}): ordinary values at
 $\statusDefAssigned$, module references and class entries at the corresponding entry. An environment is
-well-formed at a context that binds its variables at corresponding entries. \Added{A primitive
+well-formed at a context that binds its variables at corresponding entries. \Added{A \emph{termination
+kind} $\kappa$ records how a run ends; all but $\errExit{n}$ are named after the exceptions the same program
+raises under Python in the same circumstances. A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a partial map from
 arguments to outcomes (\figref{predefined}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has outcome
 $\primFn(\seq{u})$, and no derivation where $\primFn(\seq{u})$ is undefined.}
@@ -89,9 +91,8 @@ the scope of sequential-composition effects, so as black boxes functions are alw
 the outcome of calling it, $\val{\pyinline{None}}$ where the block falls off the end.
 
 Expression evaluation $\rho, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd})\Added{, for any $\rho : \Gamma$ and any $e$ well-formed in $\Gamma$,} yields an
-outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). \Replaced{The termination kinds other than $\errExit{n}$ are named after the
-exceptions the same program raises under Python in the same circumstances.}{The error kinds are designed to
-correspond to the error the same program would raise under Python in the same circumstances.} The operators
+outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). \Deleted{The error kinds are designed to
+correspond to the error the same program would raise under Python in the same circumstances.}The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
 \ruleName{eval-if} does. A comprehension evaluates its body once for each binding its qualifiers produce, and
@@ -126,8 +127,7 @@ of loaded modules. The rule \ruleName{eval-module} puts $\mathcal{P}(\pyinline{b
 body's environment, mirroring \ruleName{module} (\secref{wf-modules}).}\Deleted{These rules use the environment $\mathcal{P}(\pyinline{builtins})$ binding the names of
 \figref{predefined}.}
 \Replaced{A program evaluates to a \emph{termination kind} (\figref{values}): $\errExit{0}$ if the main module
-loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exited with status $n$; the remaining kinds are named after the exceptions the
-same program raises under Python. An implementation must agree on which kind a run yields, though how it
+loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exited with status $n$. An implementation must agree on which kind a run yields, though how it
 reports one is not prescribed.}{A program evaluates to
 its exit status: a run whose main module loads successfully yields $0$, and one whose main module fails yields
 $1$, as Python does for an uncaught exception.}
