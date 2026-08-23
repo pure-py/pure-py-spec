@@ -5,8 +5,9 @@
 
 Values, environments, and evaluation results are given in \figref{values}. For a statement $s$, the result
 $\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the result
-$\returns{v}$ represents \emph{abrupt completion} of $s$ with return value $v$, and $\aborts{\kappa}$
-abrupt completion \Replaced{that abandons the whole run, carrying the kind $\kappa$}{with an error}.
+$\returns{v}$ represents \emph{abrupt completion} of $s$, with return value $v$; \Replaced{and the result
+$\aborts{\kappa}$ represents abrupt completion of the whole run, with termination kind $\kappa$}{and
+$\aborts{\kappa}$ abrupt completion with an error}.
 Composing statements sequentially composes their results according to the following partial monoid, analogous
 to sequential composition of result types:
 {\small
