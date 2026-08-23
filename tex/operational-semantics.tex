@@ -116,7 +116,11 @@ Loading takes a single module; the ancestors of an imported module are loaded by
 loads-as judgement for an import, and directly as premises of \ruleName{eval-from-import} for a
 from-import.
 
-\Deleted{The correspondence is exact:} \Added{If} $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \val{\rho}$ then $\vdash \rho : \Gamma$ (\figref{well-formed-env}). Since
+\Deleted{The correspondence is exact: if $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \val{\rho}$ then $\vdash \rho : \Gamma$ (\figref{well-formed-env}).} \begin{theorem}[\Added{Load preservation}]
+\Added{If $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \val{\rho}$ then $\vdash \rho : \Gamma$.}
+\end{theorem}
+
+\noindent Since
 imports precede statements, every module a statement can reference is loaded before the statement runs, and
 \Replaced{loading is deterministic, so}{since loading has no observable effects, reloading a module is
 unobservable; the semantics therefore needs no cache of loaded modules.} \Added{the semantics needs no cache
