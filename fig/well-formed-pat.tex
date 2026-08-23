@@ -50,7 +50,7 @@
 {
   \Gamma \vdash p \\
   \Gamma \vdash \replaced{p' \cons \seq{p}\,'}{\seq{p}\,'\ } \\
-  \replaced{p_i \not\subsumed p \quad (\forall i)}{p' \not\subsumed p \quad (\forall p' \in \seq{p}\,')\ }
+  \replaced{\Gamma \vdash p_i \not\subsumed p \quad (\forall i)}{p' \not\subsumed p \quad (\forall p' \in \seq{p}\,')\ }
 }
 {
   \Gamma \vdash p \cons \added{p'} \mathbin{\added{\cons}} \seq{p}\,'

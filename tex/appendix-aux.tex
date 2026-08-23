@@ -16,8 +16,11 @@ does not descend into nested function definitions, which have their own scope.
 \subsection{Pattern subsumption}
 \label{sec:aux-subsumption}
 
-\figref{subsumption} gives the rules for the subsumption preorder $p \subsumed p'$ used by the pattern
-well-formedness judgement.
+\figref{subsumption} gives the rules for the subsumption preorder $\Replaced{\Gamma \vdash p \subsumed
+p'}{p \subsumed p'}$ used by the pattern well-formedness judgement. \Added{In \ruleName{sub-constr} a constructor pattern's sub-patterns are
+written $\seq{p}$, and $\seq{p}[x]$ is the one supplied for field $x$, whether positionally or by keyword;
+\ruleName{pat-constr} establishes that correspondence when it checks the pattern's arity against
+$\fields(C)$.}
 
 \input{fig/subsumption}
 

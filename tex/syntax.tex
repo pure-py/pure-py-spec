@@ -210,7 +210,7 @@ defined, by their principal cases, in \appendixref{sec:aux-syntactic}. $\capture
 module bodies by union (like $\assignsS$), with the singleton block identified with its statement.
 
 \begin{definition}[Pattern subsumption]
-The preorder $p \subsumed p'$ (\appendixref{sec:aux-subsumption}) holds when every value matched by $p$ is also matched by $p'$.
+The preorder $\Replaced{\Gamma \vdash p \subsumed p'}{p \subsumed p'}$ (\appendixref{sec:aux-subsumption}) holds when every value matched by $p$ is also matched by $p'$.
 \end{definition}
 
 \noindent Subsumption is used by the well-formedness rule for $\pyinline{match}$ to rule out unreachable cases and to check exhaustiveness; with the current pattern set, the latter reduces to requiring a catch-all (var or wildcard) case.
