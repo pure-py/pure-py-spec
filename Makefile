@@ -15,8 +15,6 @@ default: PurePy-spec.pdf
 	pdflatex $<
 	pdflatex $<
 
-full: PurePy-spec-full.pdf
-
 anon: PurePy-spec-anon.pdf
 
 PurePy-spec-anon.pdf: $(TEXFILES)
@@ -34,4 +32,4 @@ $(ARXIV_ZIP): $(ARXIV_FILES)
 	rm -f $@
 	zip -9 $@ $^
 
-.PHONY: default full anon clean arXiv
+.PHONY: default anon clean arXiv
