@@ -238,8 +238,7 @@ through its existing instances.
 \label{sec:other-restrictions}
 
 A few remaining restrictions do not fit the groups above. \Replaced{A \pyinline{class} definition must be a
-dataclass, and a dataclass body declares fields and nothing else, so Python's extension hooks are
-unavailable: a class cannot define \pyinline{__getitem__} for subscripting, \pyinline{__iter__} for
+dataclass, and a dataclass body declares fields and nothing else: a class cannot define \pyinline{__getitem__} for subscripting, \pyinline{__iter__} for
 iteration, or \pyinline{__eq__} for equality. Subscripting, iteration, equality and membership therefore have
 the fixed meanings given in \secref{opsem} rather than dispatching to user code, and the metafunctions that
 give those meanings are named after the hooks they stand in for.}{Only dataclasses are supported, so
