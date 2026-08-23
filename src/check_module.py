@@ -7,11 +7,13 @@ from typing import Optional
 import reasons
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
 from contexts import (Context, ContextEntry, ModuleContext, ModuleLoaded, ModuleStub,
-                      PREDEFINED_MEMBERS, PREDEFINED_MODULES, Status, Returns, extend_context,
+                      ClassEntry, PREDEFINED_MEMBERS, PREDEFINED_MODULES, Status, Returns,
+                      extend_context, fields, override_gamma,
                       predefined_context)
-from aux import (annotate_seq_kinds, assigns_block, assigns_stmt, find_import,
-                 find_nested_import, split_imports)
-from well_formed import check_block, result_type_of_block
+from aux import (BlockElement, annotate_seq_kinds, assigns_block, assigns_elements, assigns_stmt,
+                 captures_element, elements_of_block, find_first_reassigning, find_import,
+                 find_nested_import, own_fields, split_imports)
+from well_formed import block_element_result_type, check_element, next_ctx_after
 
 def name_assign(q: str) -> ast.stmt:
     return ast.parse(f'__name__ = {q!r}').body[0]
@@ -86,6 +88,54 @@ def own_members(body: list[ast.stmt], q: str) -> set[str]:
 _signatures: dict[tuple[int, str], Context] = {}
 _loading: list[tuple[int, str]] = []
 
+def check_statements(items: list[BlockElement], ctx: ModuleContext) -> ModuleContext:
+    if len(items) == 0:
+        return ctx
+    head, tail = items[0], items[1:]
+    if isinstance(head, ast.ClassDef):
+        check_class_decl(head, ctx.gamma, ctx.q)
+    else:
+        check_element(head, ctx)
+    if isinstance(block_element_result_type(head), Returns):
+        node: ast.AST = head[0] if isinstance(head, list) else head
+        raise IllFormedModule(node, reasons.TopLevelReturn())
+    reassigned = captures_element(head) & assigns_elements(tail)
+    if reassigned:
+        name = sorted(reassigned)[0]
+        ra_node = find_first_reassigning(tail, reassigned)
+        assert ra_node is not None
+        raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
+    return check_statements(tail, next_statement_ctx(head, ctx))
+
+def next_statement_ctx(head: BlockElement, ctx: ModuleContext) -> ModuleContext:
+    next_ctx = next_ctx_after(head, ctx)
+    if isinstance(head, ast.ClassDef):
+        return override_gamma(next_ctx, {head.name: class_entry_for(head, ctx.q, ctx.gamma)})
+    return next_ctx
+
+def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
+    base = node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
+    return ClassEntry(context=context, name=f'{q}.{node.name}', own_fields=tuple(own_fields(node)), base=base)
+
+
+def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
+    if isinstance(gamma.get(node.name), ClassEntry):
+        raise IllFormedModule(node, reasons.DuplicateClassName(node.name, q))
+    names = own_fields(node)
+    dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
+    if dup is not None:
+        raise IllFormedModule(node, reasons.DuplicateFieldName(dup, node.name))
+    if len(node.bases) == 0:
+        return
+    base = node.bases[0]
+    assert isinstance(base, ast.Name)
+    entry = gamma.get(base.id)
+    if not isinstance(entry, ClassEntry) or entry.name.rsplit('.', 1)[0] != q:
+        raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
+    clash = set(names) & set(fields(entry))
+    if len(clash) > 0:
+        raise IllFormedModule(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
+
 def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     key = (id(M), q)
     cached = _signatures.get(key)
@@ -117,9 +167,7 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     gamma0 = check_imports_prefix(prefix, ModuleContext(gamma={}, M=M, q=q))
     body = [name_assign(q)] + rest
     gamma1 = {**predefined_context('builtins'), **gamma0}
-    final_ctx = check_block(body, ModuleContext(gamma=gamma1, M=M, q=q), module_body=True)
-    if rest and isinstance(result_type_of_block(rest), Returns):
-        raise IllFormedModule(rest[0], reasons.TopLevelReturn())
+    final_ctx = check_statements(elements_of_block(body), ModuleContext(gamma=gamma1, M=M, q=q))
     check_submodule_clash(m, gamma0, body, M, q)
     return signature(body, final_ctx, q)
 

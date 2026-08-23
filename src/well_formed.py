@@ -15,10 +15,6 @@ from aux import (BlockElement, assigns_block, assigns_elements, binds, captures_
                  qualified_name)
 from patterns import check_pattern_list, dict_key, is_catch_all
 
-def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
-    base = node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
-    return ClassEntry(context=context, name=f'{q}.{node.name}', own_fields=tuple(own_fields(node)), base=base)
-
 def result_type(node: ast.stmt) -> ResultTy:
     if isinstance(node, ast.Pass):
         return ASSIGNS_EMPTY
@@ -49,14 +45,14 @@ def result_type_of_block(block: list[ast.stmt]) -> ResultTy:
         return result_type(block[0])
     return override_results(result_type(block[0]), result_type_of_block(block[1:]))
 
-def check_block(block: list[ast.stmt], ctx: ModuleContext, module_body: bool = False) -> ModuleContext:
-    return check_elements(elements_of_block(block), ctx, module_body)
+def check_block(block: list[ast.stmt], ctx: ModuleContext) -> ModuleContext:
+    return check_elements(elements_of_block(block), ctx)
 
-def check_elements(items: list[BlockElement], ctx: ModuleContext, module_body: bool = False) -> ModuleContext:
+def check_elements(items: list[BlockElement], ctx: ModuleContext) -> ModuleContext:
     if len(items) == 0:
         return ctx
     head = items[0]
-    check_element(head, ctx, module_body)
+    check_element(head, ctx)
     if len(items) == 1:
         return next_ctx_after(head, ctx)
     tail = items[1:]
@@ -70,26 +66,23 @@ def check_elements(items: list[BlockElement], ctx: ModuleContext, module_body: b
         ra_node = find_first_reassigning(tail, reassigned)
         assert ra_node is not None
         raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
-    return check_elements(tail, next_ctx_after(head, ctx), module_body)
+    return check_elements(tail, next_ctx_after(head, ctx))
 
 def next_ctx_after(head: BlockElement, ctx: ModuleContext) -> ModuleContext:
     head_result = block_element_result_type(head)
     delta = head_result.delta if isinstance(head_result, Assigns) else {}
-    next_ctx = override_var(ctx, delta)
-    if isinstance(head, ast.ClassDef):
-        next_ctx = override_gamma(next_ctx, {head.name: class_entry_for(head, ctx.q, ctx.gamma)})
-    return next_ctx
+    return override_var(ctx, delta)
 
 def block_element_result_type(item: BlockElement) -> ResultTy:
     if isinstance(item, list):
         return Assigns({d.name: Status.TT for d in item})
     return result_type(item)
 
-def check_element(item: BlockElement, ctx: ModuleContext, module_body: bool = False) -> None:
+def check_element(item: BlockElement, ctx: ModuleContext) -> None:
     if isinstance(item, list):
         check_mutual_region(item, ctx)
     else:
-        check_stmt(item, ctx, module_body)
+        check_stmt(item, ctx)
 
 def check_mutual_region(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
     check_distinct_names(defs, set())
@@ -120,7 +113,7 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
         raise IllFormedModule(head, reasons.DuplicateMutualName(head.name))
     check_distinct_names(defs[1:], seen | {head.name})
 
-def check_stmt(s: ast.stmt, ctx: ModuleContext, module_body: bool = False) -> None:
+def check_stmt(s: ast.stmt, ctx: ModuleContext) -> None:
     if isinstance(s, ast.Pass):
         return
     if isinstance(s, ast.Assign):
@@ -151,10 +144,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, module_body: bool = False) -> No
         check_match_cases(s.cases, ctx)
         return
     if isinstance(s, ast.ClassDef):
-        if not module_body:
-            raise IllFormedModule(s, reasons.NonTopLevelClass())
-        check_class_decl(s, ctx.gamma, ctx.q)
-        return
+        raise IllFormedModule(s, reasons.NonTopLevelClass())
     raise AssertionError(f'unexpected statement: {type(s).__name__}')
 
 def check_match_cases(cases: list[ast.match_case], ctx: ModuleContext) -> None:
@@ -264,21 +254,3 @@ def check_exprs(es: list[ast.expr], ctx: ModuleContext) -> None:
         return
     check_expr(es[0], ctx)
     check_exprs(es[1:], ctx)
-
-def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
-    if isinstance(gamma.get(node.name), ClassEntry):
-        raise IllFormedModule(node, reasons.DuplicateClassName(node.name, q))
-    names = own_fields(node)
-    dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
-    if dup is not None:
-        raise IllFormedModule(node, reasons.DuplicateFieldName(dup, node.name))
-    if len(node.bases) == 0:
-        return
-    base = node.bases[0]
-    assert isinstance(base, ast.Name)
-    entry = gamma.get(base.id)
-    if not isinstance(entry, ClassEntry) or entry.name.rsplit('.', 1)[0] != q:
-        raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
-    clash = set(names) & set(fields(entry))
-    if len(clash) > 0:
-        raise IllFormedModule(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
