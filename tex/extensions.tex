@@ -17,7 +17,7 @@ def f(x, y):
 f(5)(6)  # 11
 \end{python}
 
-\noindent The syntax is valid Python, but Python raises a \pyinline{TypeError} at run time, because
+\noindent The syntax is valid Python, but Python raises a \pyinline{TypeError} at runtime, because
 \pyinline{f(5)} is missing an argument. For partial application to add meaning rather than change it, core
 \PurePy must reject such unsaturated calls, requiring every call to supply the declared arity. On that base,
 \pyinline{f(5)} denotes the function that adds \pyinline{5} to its argument, so \pyinline{f(5)(6)} evaluates to

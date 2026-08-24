@@ -77,13 +77,13 @@ R \override \Returns = \Returns \override R & = \Returns
 \label{sec:wf-modules}
 
 In this section, loading a module means checking its body and computing its signature
-(\figref{well-formed-module}), the static counterpart of run-time loading (\secref{opsem}). Both
+(\figref{well-formed-module}), the static counterpart of runtime loading (\secref{opsem}). Both
 import forms load their target, together with its ancestors
 (\figref{well-formed-imports}). A plain import also records each of these modules as a member of its
 parent (the loads-as judgement), so that the binding created for the root of the target gives attribute
 access along the whole chain. A from-import also loads any imported name that denotes a submodule. An
 ancestor of the target is exempt from loading first if it is the importing module or one of its
-ancestors, since at run time it may still be loading. The exemption applies only to from-imports, because
+ancestors, since at runtime it may still be loading. The exemption applies only to from-imports, because
 for a plain import
 the only ancestor that could never load first is the importing module itself, and an import naming a proper
 descendant of the importing module is excluded outright (\secref{no-load-dependent}). Loading a module
