@@ -1,10 +1,74 @@
 % The PurePy language specification, built separately from the paper (paper.tex).
-\documentclass{article}
+\documentclass[a4paper,11pt,DIV=12,twoside=false,numbers=noenddot]{scrreprt}
 
-\title{PurePy Language Specification}
-\author{}
-\date{}
+% Fonts and layout
+\usepackage[T1]{fontenc}
+\usepackage{libertinus-type1}
+\usepackage{libertinust1math}
+\usepackage{microtype}
+\setkomafont{disposition}{\normalfont\bfseries}
+
+% Packages the shared macros and figures rely on (the paper gets most of these from acmart).
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{colortbl}
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+\usepackage{mathpartir}
+\usepackage{listings}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{xspace}
+\usepackage{enumitem}
+\usepackage{changebar}
+\usepackage[colorlinks,allcolors=blue!50!black]{hyperref}
+
+% The specification carries no change markup.
+\newcommand{\acceptchanges}{}
+\input{tex/macros}
+\input{tex/listings}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+
+\version{0}{14}{1}
 
 \begin{document}
-\maketitle
+
+\begin{titlepage}
+\raggedright
+\vspace*{50mm}
+{\Huge\bfseries PurePy\par}
+\vspace{5mm}
+{\LARGE Language Specification\par}
+\vspace{10mm}
+{\large Version \versionstring\par}
+\end{titlepage}
+
+{\hypersetup{linkcolor=black}\tableofcontents}
+
+\chapter{Syntax}
+\label{ch:syntax}
+
+\section{Modules and blocks}
+
+Statements, imports, field lists, blocks, module bodies, qualified names and function definitions are
+given in \figref{syntax-stmt}.
+
+\input{fig/syntax-stmt}
+
+\section{Expressions and patterns}
+
+Expressions, comprehension qualifiers, literals and patterns are given in \figref{syntax-expr}.
+
+\input{fig/syntax-expr}
+
+\section{Types and annotations}
+
+Types, and the optional annotations on parameters and return values, are given in \figref{syntax-types}.
+
+\input{fig/syntax-types}
+
 \end{document}
