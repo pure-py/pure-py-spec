@@ -15,6 +15,12 @@ default: PurePy-spec.pdf
 	pdflatex $<
 	pdflatex $<
 
+standard: PurePy-standard.pdf
+
+PurePy-standard.pdf: PurePy-standard.tex $(TEXFILES)
+	pdflatex PurePy-standard.tex
+	pdflatex PurePy-standard.tex
+
 anon: PurePy-spec-anon.pdf
 
 PurePy-spec-anon.pdf: $(TEXFILES)
@@ -32,4 +38,4 @@ $(ARXIV_ZIP): $(ARXIV_FILES)
 	rm -f $@
 	zip -9 $@ $^
 
-.PHONY: default anon clean arXiv
+.PHONY: default standard anon clean arXiv

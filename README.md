@@ -12,6 +12,7 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 ## Project structure
 
 - `PurePy-spec.tex` — main spec document
+- `PurePy-standard.tex` — the language specification as a standalone document, separate from the paper (#134)
 - `tex/` — macros, listings config, related work
 - `fig/` — syntax, well-formedness rules, operational semantics
 - `agda/` — Agda mechanisation (distributivity proof)
@@ -23,6 +24,8 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 ```
 latexmk -pdf PurePy-spec.tex
 ```
+
+The standalone specification is built with `make standard`.
 
 ## Running tests
 
