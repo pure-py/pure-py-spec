@@ -1,6 +1,7 @@
 % The PurePy language specification, built separately from the paper (paper.tex).
 % \anonmode anonymises the language name and drops the copyright notice, as for the paper.
-\documentclass[a4paper,11pt,DIV=12,twoside=false,numbers=noenddot]{scrreprt}
+\documentclass[a4paper,11pt,DIV=12,twoside=false,numbers=noenddot,appendixprefix=true]{scrreprt}
+\AtBeginDocument{\renewcommand*{\appendixname}{Annex}}
 
 % Fonts and layout
 \usepackage[T1]{fontenc}
@@ -66,7 +67,11 @@
 
 {\hypersetup{linkcolor=black}\tableofcontents}
 
-% The shared sources use \section for what is a chapter here; shift the heading levels, innermost first.
+% The shared sources use \section for what is a chapter here; shift the heading levels, innermost first,
+% and restore them afterwards.
+\let\specsection\section
+\let\specsubsection\subsection
+\let\specsubsubsection\subsubsection
 \let\subsubsection\subsection
 \let\subsection\section
 \let\section\chapter
@@ -74,6 +79,21 @@
 \input{tex/syntax}
 \input{tex/well-formedness}
 \input{tex/operational-semantics}
+
+\let\section\specsection
+\let\subsection\specsubsection
+\let\subsubsection\specsubsubsection
+
+\appendix
+\chapter{Metafunctions}
+\label{ch:metafunctions}
+
+\section{Syntactic analyses}
+\label{sec:mf-syntactic}
+
+The analyses $\assignsS$, $\binds$, $\capturesS$ and $\capturesE$ introduced in \secref{wf-aux} are
+defined by the principal cases in \figref{aux} together with the general behaviour stated here.
+\input{tex/metafunctions-syntactic}
 
 \bibliographystyle{plainnat}
 \bibliography{tex/refs,tex/additional-refs}
