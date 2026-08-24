@@ -137,12 +137,12 @@ which follow Python.
 \begin{AddedBlock}
 \paragraph{Annotations.}
 
-A parameter $x\pi$ carries an optional annotation $\pi$ and a function definition an optional return
-annotation $\omega$, while a dataclass field and an annotated assignment carry a type $\tau$; types and
-annotations are given in \figref{syntax-types}. In rules, $\seq{x}\,\seq{\pi}$ abbreviates the parameter list
-$x_1\pi_1, \ldots, x_n\pi_n$. The well-formedness rules and the operational semantics do not consult
-annotations, so an annotated assignment is checked and evaluated as an assignment
-(\ruleName{ann-assign}, \ruleName{eval-ann-assign}). Annotations are given meaning by the type system.
+Parameters carry optional annotations $\pi$ and function definitions optional return annotations
+$\omega$, while dataclass fields and annotated assignments carry types $\tau$; types and annotations are
+given in \figref{syntax-types}. We write $\seq{x}\,\seq{\pi}$ for the parameter list $x_1\pi_1, \ldots,
+x_n\pi_n$. The well-formedness rules and the operational semantics do not consult annotations, so an
+annotated assignment is checked and evaluated as an assignment (\ruleName{ann-assign},
+\ruleName{eval-ann-assign}). Annotations are given meaning by the type system.
 \todo{Type system (\issue{92}).}
 \end{AddedBlock}
 
