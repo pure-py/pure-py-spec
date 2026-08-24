@@ -1,7 +1,7 @@
 \section{Syntax}
 \label{sec:syntax}
 
-The syntax of \PurePy is given in \figref{syntax-stmt}, \figref{syntax-expr} and \figref{syntax-types}. A \emph{block} is a non-empty sequence of
+The syntax of \PurePy is given in \Replaced{\figref{syntax-stmt}, \figref{syntax-expr} and \figref{syntax-types}}{\figref{syntax-stmt} and \figref{syntax-expr}}. A \emph{block} is a non-empty sequence of
 statements; either a top-level statement, a \pyinline{def} body, or a branch of a conditional. A
 \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal contiguous non-empty sequence of \pyinline{def}
 statements in a block: any non-\pyinline{def} statement in that block, by definition, separates mutual
@@ -119,7 +119,9 @@ def f(b):
 
 \input{fig/syntax-stmt}
 \input{fig/syntax-expr}
+\begin{AddedBlock}
 \input{fig/syntax-types}
+\end{AddedBlock}
 
 \paragraph{Operators.}
 
@@ -132,6 +134,7 @@ which follow Python.
 
 \input{fig/precedence}
 
+\begin{AddedBlock}
 \paragraph{Annotations.}
 
 A parameter $x\pi$ carries an optional annotation $\pi$ and a function definition an optional return
@@ -141,6 +144,7 @@ $x_1\pi_1, \ldots, x_n\pi_n$. The well-formedness rules and the operational sema
 annotations, so an annotated assignment is checked and evaluated as an assignment
 (\ruleName{ann-assign}, \ruleName{eval-ann-assign}). Annotations are given meaning by the type system.
 \todo{Type system (\issue{92}).}
+\end{AddedBlock}
 
 \subsection{Modules and programs}
 \label{sec:modules-programs}
@@ -200,7 +204,7 @@ member listed for $q$ in \figref{predefined} to its value.
  & & $\quad \primFn(\varepsilon) = \aborts{\errExit{0}}$ & \\
  & & $\quad \primFn(n) = \aborts{\errExit{n}}$ & \\
 \pyinline{typing} & \pyinline{Any} & & \\
- & \pyinline{Callable} & & \\
+ & \added{\pyinline{Callable}} & & \\
 \pyinline{dataclasses} & \pyinline{dataclass} & & \\
 \hline
 \end{tabular}

@@ -2,8 +2,9 @@
 \small
 \begin{align*}
 \assignsS(\exAssign{x}{e}) &= \set{x} \\
-\assignsS(\exAnnAssign{x}{\tau}{e}) &= \set{x} \\
-\assignsS(\seq{d}) &= \set{\seq{f}} \qquad \text{where } d_i = \exDef{f_i}{\seq{x}_i\,\seq{\pi}_i}{\omega_i}{b_i} \; (\forall i) \\
+\added{\assignsS(\exAnnAssign{x}{\tau}{e})} &\added{{}= \set{x}} \\
+\deleted{\assignsS(\exDef{f_1}{\seq{x}_1}{}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}}{}{b_{n+1}})} &\deleted{{}= \set{f_1, \ldots, f_{n+1}}} \\
+\added{\assignsS(\seq{d})} &\added{{}= \set{\seq{f}} \qquad \text{where } d_i = \exDef{f_i}{\seq{x}_i\,\seq{\pi}_i}{\omega_i}{b_i} \; (\forall i)} \\
 \assignsS(\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}) &= \textstyle\bigcup_i \big(\binds(p_i) \cup \assignsS(b_i)\big) \\
 \assignsS(\exDataclass{c}{\phi}) &= \set{c} \\
 \assignsS(\exDataclassExtend{c}{c'}{\phi}) &= \set{c} \\
@@ -11,7 +12,8 @@
 \binds(x) &= \set{x} \\
 \binds(p\;\pyinline{as}\;x) &= \binds(p) \cup \set{x} \\
 \\
-\capturesS(\seq{d}) &= \textstyle\bigcup_i \big(\fvS(b_i) \setminus (\set{\seq{x}_i} \cup \assignsS(b_i))\big) \setminus \set{\seq{f}} \\
+\deleted{\capturesS(\exDef{f_1}{\seq{x}_1}{}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}}{}{b_{n+1}})} &\deleted{{}= \textstyle\bigcup_i \big(\fvS(b_i) \setminus (\set{\seq{x}_i} \cup \assignsS(b_i))\big) \setminus \set{f_1, \ldots, f_{n+1}}} \\
+\added{\capturesS(\seq{d})} &\added{{}= \textstyle\bigcup_i \big(\fvS(b_i) \setminus (\set{\seq{x}_i} \cup \assignsS(b_i))\big) \setminus \set{\seq{f}}} \\
 \capturesS(\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}) &= \capturesE(e) \cup \textstyle\bigcup_i \big(\capturesS(b_i) \setminus \binds(p_i)\big) \\
 \\
 \capturesE(\exLambda{\seq{x}}{e}) &= \fvE(e) \setminus \set{\seq{x}}
