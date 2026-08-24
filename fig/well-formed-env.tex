@@ -51,7 +51,7 @@
   \seq{f} \text{ distinct}
 }
 {
-  \vdash \exDefClosure[\Gamma]{\rho}{\exDef{f_1}{\seq{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}}{b_{n+1}}}{i} : \statusDefAssigned
+  \vdash \exDefClosure[\Gamma]{\rho}{\exDef{f_1}{\seq{x}_1\,\seq{\pi}_1}{\omega_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}\,\seq{\pi}_{n+1}}{\omega_{n+1}}{b_{n+1}}}{i} : \statusDefAssigned
 }
 \and
 \inferrule*[lab={\ruleName{val-obj}}]

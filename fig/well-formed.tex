@@ -19,6 +19,15 @@
   \Gamma \vdash \exAssign{x}{e} : \Assigns{\set{x : \statusDefAssigned}}
 }
 \and
+\inferrule*[lab={\ruleName{ann-assign}}]
+{
+  \Gamma \vdash e \\
+  x \notin \capturesE(e)
+}
+{
+  \Gamma \vdash \exAnnAssign{x}{\tau}{e} : \Assigns{\set{x : \statusDefAssigned}}
+}
+\and
 \inferrule*[lab={\ruleName{expr-stmt}}]
 {
   \Gamma \vdash e
@@ -85,7 +94,7 @@
   \seq{f} \text{ distinct}
 }
 {
-  \Gamma \vdash \exDef{f_1}{\seq{x}_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}}{b_{n+1}} : \Assigns{\statusDefAssigned(\seq{f})}
+  \Gamma \vdash \exDef{f_1}{\seq{x}_1\,\seq{\pi}_1}{\omega_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}\,\seq{\pi}_{n+1}}{\omega_{n+1}}{b_{n+1}} : \Assigns{\statusDefAssigned(\seq{f})}
 }
 \and
 \inferrule*[lab={\ruleName{match}}]

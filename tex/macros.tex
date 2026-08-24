@@ -62,6 +62,7 @@
 % Terms: statements and blocks
 \newcommand*{\exAssert}[1]{\pyinline{assert}\;#1}
 \newcommand*{\exAssertMsg}[2]{\pyinline{assert}\;#1, #2}
+\newcommand*{\exAnnAssign}[3]{#1\exAnnot{#2} = #3}
 \newcommand*{\exAssign}[2]{#1 = #2}
 \newcommand*{\exCase}[2]{\pyinline{case}\;#1\mathord{:}\;#2}
 \newcommand*{\exElif}[2]{\pyinline{elif}\;#1:\;#2}
@@ -76,10 +77,25 @@
 % Terms: definitions and imports
 \newcommand*{\exDataclass}[2]{@\pyinline{dataclass}\;\pyinline{class}\;#1:\;#2}
 \newcommand*{\exDataclassExtend}[3]{@\pyinline{dataclass}\;\pyinline{class}\;#1(#2):\;#3}
-\newcommand*{\exDef}[3]{\pyinline{def}\;#1(#2):\;#3}
-\newcommand*{\exField}[1]{#1:\;\pyinline{Any}}
+\newcommand*{\exDef}[4]{\pyinline{def}\;#1(#2)\,#3\mathord{:}\;#4}
+\newcommand*{\exField}[2]{#1\exAnnot{#2}}
 \newcommand*{\exFromImport}[2]{\pyinline{from}\;#1\;\pyinline{import}\;#2}
 \newcommand*{\exImport}[1]{\pyinline{import}\;#1}
+
+% Types and annotations
+\newcommand*{\tyAny}{\pyinline{Any}}
+\newcommand*{\tyNone}{\pyinline{None}}
+\newcommand*{\tyBool}{\pyinline{bool}}
+\newcommand*{\tyInt}{\pyinline{int}}
+\newcommand*{\tyFloat}{\pyinline{float}}
+\newcommand*{\tyStr}{\pyinline{str}}
+\newcommand*{\tyList}[1]{\pyinline{list}[#1]}
+\newcommand*{\tyTuple}[1]{\pyinline{tuple}[#1]}
+\newcommand*{\tyDict}[1]{\pyinline{dict}[\tyStr, #1]}
+\newcommand*{\tyCallable}[2]{\pyinline{Callable}[[#1], #2]}
+\newcommand*{\tyUnion}[2]{#1 \mathbin{|} #2}
+\newcommand*{\exAnnot}[1]{\mathord{:}\;#1}
+\newcommand*{\exRetAnnot}[1]{\;\pymath{->}\;#1}
 
 % Terms: patterns
 \newcommand*{\patConstr}[2]{#1(#2)}
