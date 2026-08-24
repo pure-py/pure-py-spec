@@ -156,7 +156,9 @@ $\seq{\iota}$ followed by a sequence of statements $\seq{s}$; since imports are 
 appear neither in blocks (and hence not in function bodies) nor after the first non-import statement. The
 well-formedness and evaluation rules check and evaluate the statements of each body $\mathcal{M}(q)$ with the
 assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
-$\pymath{\_\_name\_\_}$ binding the runtime supplies automatically. A second map $\mathcal{P}$ gives the
+$\pymath{\_\_name\_\_}$ binding the runtime supplies automatically.
+
+A second map $\mathcal{P}$ gives the
 predefined modules of \figref{predefined}, which have no body: $\mathcal{P}$ takes each such name to its
 environment and context (Definition~\ref{def:predefined}). The two domains are disjoint, and their union is
 prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$ is itself in
