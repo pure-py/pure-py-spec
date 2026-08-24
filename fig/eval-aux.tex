@@ -19,12 +19,6 @@
 \outcome(\assigns{\rho}) &= \val{\pyinline{None}} \\
 \outcome(\aborts{\kappa}) &= \aborts{\kappa} \\
 \\
-\env(\rho, x) &= \rho' && \text{where } \rho(x) = \modLoaded{q'}{\rho'} \\
-\env(\rho, q.x) &= \rho' && \text{where } \env(\rho, q)(x) = \modLoaded{q'}{\rho'} \\
-\\
-\resolveClass(\rho, c) &= \rho(c) \\
-\resolveClass(\rho, q.c) &= \env(\rho, q)(c) \\
-\\
 \dispatch(\rho, v, \varepsilon, \varepsilon) &= (\varnothing, \exPass) \\
 \dispatch(\rho, v, p \cons \seq{p}, b \cons \seq{b}) &= (\rho', b) && \text{if } \rho, p, v \matches \matchOk{}\rho' \\
 \dispatch(\rho, v, p \cons \seq{p}, b \cons \seq{b}) &= \dispatch(\rho, v, \seq{p}, \seq{b}) && \text{if } \rho, p, v \matches \noMatch \\

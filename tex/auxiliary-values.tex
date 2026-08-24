@@ -1,0 +1,16 @@
+The strict operators are given by metafunctions $\hat{\odot}$ and $\hat{\ominus}$ (\figref{operators}), in
+terms of structural equality $\eqOp$ and membership $\memOp$ (\figrefTwo{equality}{membership}). They have
+the meanings they have in Python and yield $\aborts{\kappa}$ where Python raises. All three are undefined
+where no case applies, and where one of them is undefined the expression has no derivation, which is where
+\PurePy declines to give the operation the meaning Python gives it; a non-Boolean test is the same case\paperonly{ (\secref{no-coercions})}.
+
+\input{fig/operators}
+\input{fig/equality}
+\input{fig/membership}
+
+The remaining metafunctions the rules use are collected in \figref{eval-aux}: $\outcome$ reads a
+block's result as the outcome of calling it, $\iterOp$ gives the sequence a generator draws from, $\getitem$
+interprets subscripting, $\dispatch$ selects the case a $\pyinline{match}$ takes, and $\entries$ and
+$\update$ build a dictionary from its entries.
+
+\input{fig/eval-aux}

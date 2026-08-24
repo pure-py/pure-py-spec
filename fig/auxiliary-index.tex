@@ -14,8 +14,8 @@ $\ownFields(\phi)$ & sequence of variables & field names declared by field list 
 $\fields(C)$ & sequence of variables & all fields of class $C$, inherited fields first & \figref{modules} \\
 $\ancestors(C)$ & set of class entries & $C$ and its base classes & \figref{modules} \\
 $\fieldMap(C, \seq{u})$ & map from variables & the argument supplied for each field of $C$; undefined unless the arguments cover the fields exactly & \figref{modules} \\
-$\resolveClass(\rho, q)$ & class entry & the class that qualified name $q$ denotes in $\rho$ & \figref{eval-aux} \\
-$\env(\rho, q)$ & environment & the environment of module $q$ as loaded in $\rho$ & \figref{eval-aux} \\
+$\resolveClass(\rho, q)$ & class entry & the class that qualified name $q$ denotes in $\rho$ & \figref{resolution} \\
+$\env(\rho, q)$ & environment & the environment of module $q$ as loaded in $\rho$ & \figref{resolution} \\
 $\nameOf(q)$ & string & the string literal naming module $q$ & \secref{modules-programs}
    \\[2mm]
 \grammarGroup{Values} \\

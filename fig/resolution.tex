@@ -1,0 +1,12 @@
+\begin{figure}
+\small
+\begin{align*}
+\env(\rho, x) &= \rho' && \text{where } \rho(x) = \modLoaded{q'}{\rho'} \\
+\env(\rho, q.x) &= \rho' && \text{where } \env(\rho, q)(x) = \modLoaded{q'}{\rho'} \\
+\\
+\resolveClass(\rho, c) &= \rho(c) \\
+\resolveClass(\rho, q.c) &= \env(\rho, q)(c)
+\end{align*}
+\caption{Module and class resolution}
+\label{fig:resolution}
+\end{figure}

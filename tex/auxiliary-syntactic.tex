@@ -1,5 +1,5 @@
-The metafunction $\capturesS$ extends to blocks and
-module bodies by union (like $\assignsS$), with the singleton block identified with its statement.
+The metafunctions $\assignsS$ and $\capturesS$ extend by union from statements to blocks, with the singleton
+block identified with its statement, and on a module body $\seq{\iota}\;\seq{s}$ act on $\seq{s}$.
 There $\fvE(e)$ and $\fvS(b)$ are the free variables of an expression and of a block, defined in the
 usual way. On the cases not shown, $\binds$ and $\capturesE$ recurse structurally, taking the union over
 immediate subterms, and $\capturesS$ takes the union of $\capturesE$ over a statement's subexpressions and
