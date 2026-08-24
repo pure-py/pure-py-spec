@@ -18,7 +18,7 @@ jobs:
 
           - runtime: GraalPy
             cli: python --no-mypy
-            version: 'graalpy-24.0'
+            version: 'graalpy-25.2'
 
           - runtime: Pyodide
             cli: $PYODIDE_PYTHON --no-mypy

@@ -11,14 +11,7 @@ import re
 import subprocess
 import sys
 from collections.abc import Iterator
-from enum import IntEnum
-
-if sys.version_info >= (3, 11):
-    from enum import StrEnum
-else:  # GraalPy
-    from enum import Enum
-    class StrEnum(str, Enum):
-        __str__ = str.__str__
+from enum import IntEnum, StrEnum
 
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
