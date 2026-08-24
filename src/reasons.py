@@ -1,8 +1,5 @@
-from __future__ import annotations
-
 import ast
 from dataclasses import dataclass
-from typing import Optional, Union
 
 
 @dataclass(frozen=True)
@@ -230,18 +227,16 @@ class ClassAsValue:
         return f"'{self.name}' refers to a class; classes are not first-class values"
 
 
-Reason = Union[
-    DuplicateFieldName, UnknownBaseClass, InheritedFieldClash, DuplicateClassName,
-    UnassignedVariable, CapturedReassignment, SelfCaptureAssignment,
-    UnreachableStatement, ConstructorArityMismatch, PatternArityMismatch,
-    UnknownClassInPattern, UnknownFieldInPattern, DuplicatePatternKeyword,
-    UnknownModule, UnknownMember, ModuleAsValue, ClassAsValue,
-    UnknownConstructorKeyword, DuplicateDictKey,
-    NonlinearPattern, UnreachableCase, DuplicateMutualName,
-    NonTopLevelImport, NonTopLevelClass, TopLevelReturn, EmptyFromImport,
-    ImportAfterStatement, SubmoduleNameClash, SubmoduleNotImported, OwnDescendantImport,
-    UnassignedMember,
-]
+Reason = (
+    DuplicateFieldName | UnknownBaseClass | InheritedFieldClash | DuplicateClassName |
+    UnassignedVariable | CapturedReassignment | SelfCaptureAssignment | UnreachableStatement |
+    ConstructorArityMismatch | PatternArityMismatch | UnknownClassInPattern |
+    UnknownFieldInPattern | DuplicatePatternKeyword | UnknownModule | UnknownMember |
+    ModuleAsValue | ClassAsValue | UnknownConstructorKeyword | DuplicateDictKey |
+    NonlinearPattern | UnreachableCase | DuplicateMutualName | NonTopLevelImport |
+    NonTopLevelClass | TopLevelReturn | EmptyFromImport | ImportAfterStatement |
+    SubmoduleNameClash | SubmoduleNotImported | OwnDescendantImport | UnassignedMember
+)
 
 
 class IllFormed(Exception):
@@ -251,11 +246,11 @@ class IllFormed(Exception):
 class IllFormedModule(IllFormed):
     exit_code = 3
     def __init__(self, node: ast.AST, reason: Reason):
-        self.line: Optional[int] = getattr(node, 'lineno', None)
-        self.col: Optional[int] = getattr(node, 'col_offset', None)
+        self.line: int | None = getattr(node, 'lineno', None)
+        self.col: int | None = getattr(node, 'col_offset', None)
         self.reason: Reason = reason
         self.msg = reason.message()
-        self.module: Optional[str] = None
+        self.module: str | None = None
         super().__init__(self.msg)
 
 class IllFormedProgram(IllFormed):

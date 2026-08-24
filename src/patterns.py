@@ -1,7 +1,4 @@
-from __future__ import annotations
-
 import ast
-from typing import Optional
 
 import reasons
 from reasons import IllFormedModule

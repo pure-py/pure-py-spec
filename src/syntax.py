@@ -1,6 +1,5 @@
 import ast
 import sys
-from typing import Optional
 
 
 OP_SYMBOLS: dict[type, str] = {
@@ -15,8 +14,8 @@ class ParseError(Exception):
     msg: str
 
     def __init__(self, node: ast.AST, msg: str):
-        self.line: Optional[int] = getattr(node, 'lineno', None)
-        self.col: Optional[int] = getattr(node, 'col_offset', None)
+        self.line: int | None = getattr(node, 'lineno', None)
+        self.col: int | None = getattr(node, 'col_offset', None)
         self.msg = msg
         super().__init__(msg)
 
@@ -348,19 +347,19 @@ def check_arguments(node: ast.arguments) -> None:
     if len(node.posonlyargs) > 0:
         raise Prohibited(node, 'positional-only arguments prohibited')
 
-def check_module(node: ast.Module) -> Optional[ParseError]:
+def check_module(node: ast.Module) -> ParseError | None:
     try:
         check_body(node.body)
         return None
     except ParseError as e:
         return e
 
-def check_file(filename: str) -> Optional[ParseError]:
+def check_file(filename: str) -> ParseError | None:
     source = open(filename).read()
     tree = ast.parse(source, filename=filename)
     return check_module(tree)
 
-def format_result(result: Optional[ParseError], filename: str) -> str:
+def format_result(result: ParseError | None, filename: str) -> str:
     if result is None:
         return f'{filename}: ok'
     if result.line is not None:

@@ -1,10 +1,7 @@
-from __future__ import annotations
-
 import ast
 from itertools import dropwhile, takewhile
-from typing import Optional, Union
 
-BlockElement = Union[ast.stmt, list[ast.FunctionDef]]
+BlockElement = ast.stmt | list[ast.FunctionDef]
 
 def is_import(s: ast.stmt) -> bool:
     return isinstance(s, (ast.Import, ast.ImportFrom))
@@ -12,7 +9,7 @@ def is_import(s: ast.stmt) -> bool:
 def split_imports(body: list[ast.stmt]) -> tuple[list[ast.stmt], list[ast.stmt]]:
     return list(takewhile(is_import, body)), list(dropwhile(is_import, body))
 
-def find_import(stmts: list[ast.stmt]) -> Optional[ast.stmt]:
+def find_import(stmts: list[ast.stmt]) -> ast.stmt | None:
     return next((s for s in stmts if isinstance(s, (ast.Import, ast.ImportFrom))), None)
 
 def elements_of_block(block: list[ast.stmt]) -> list[BlockElement]:
@@ -262,7 +259,7 @@ def assigns_elements(items: list[BlockElement]) -> set[str]:
         return set()
     return assigns_element(items[0]) | assigns_elements(items[1:])
 
-def find_first_reassigning(items: list[BlockElement], names: set[str]) -> Optional[ast.AST]:
+def find_first_reassigning(items: list[BlockElement], names: set[str]) -> ast.AST | None:
     if len(items) == 0:
         return None
     if assigns_element(items[0]) & names:

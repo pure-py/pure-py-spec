@@ -12,11 +12,10 @@ import subprocess
 import sys
 from collections.abc import Iterator
 from enum import IntEnum
-from typing import Optional
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
-else:  # PyPy, GraalPy
+else:  # GraalPy
     from enum import Enum
     class StrEnum(str, Enum):
         __str__ = str.__str__
@@ -77,7 +76,7 @@ def script_cmd(script: str, path: pathlib.Path) -> list[str]:
     return ["python3", str(ROOT / "src" / script), str(path)]
 
 
-def substr(path: pathlib.Path) -> Optional[str]:
+def substr(path: pathlib.Path) -> str | None:
     return path.read_text().strip() if path.exists() else None
 
 
@@ -112,7 +111,7 @@ class Runner:
     def _fail(self, phase: Phase, msg: str) -> None:
         self._failures.append(f"{phase}: {msg}")
 
-    def expect_exit(self, cmd: list[str], expected: int, error_substr: Optional[str] = None) -> None:
+    def expect_exit(self, cmd: list[str], expected: int, error_substr: str | None = None) -> None:
         phase = {PARSE: Phase.PARSE, CHECK: Phase.CHECK, CHECK_PROGRAM: Phase.CHECK}.get(
             pathlib.Path(cmd[1]).name, Phase.PYTHON)
         proc = subprocess.run(cmd, capture_output=True, text=True)
@@ -124,20 +123,20 @@ class Runner:
             if error_substr not in output:
                 self._fail(phase, f"expected output containing {error_substr!r}, got: {output.strip()}")
 
-    def parse(self, path: pathlib.Path, expected: int, err: Optional[str] = None) -> None:
+    def parse(self, path: pathlib.Path, expected: int, err: str | None = None) -> None:
         self.expect_exit(script_cmd(PARSE, path), expected, error_substr=err)
 
-    def check(self, path: pathlib.Path, expected: int, err: Optional[str] = None) -> None:
+    def check(self, path: pathlib.Path, expected: int, err: str | None = None) -> None:
         self.expect_exit(script_cmd(CHECK, path), expected, error_substr=err)
 
     def python(self, path: pathlib.Path, expected: int = Exit.OK) -> None:
         self.expect_exit([self.interpreter, str(path)], expected)
 
-    def _run(self, path: pathlib.Path, cwd: Optional[pathlib.Path]) -> 'subprocess.CompletedProcess[str]':
+    def _run(self, path: pathlib.Path, cwd: pathlib.Path | None) -> 'subprocess.CompletedProcess[str]':
         cmd_path = path.name if cwd is not None else str(path)
         return subprocess.run([self.interpreter, cmd_path], cwd=cwd, capture_output=True, text=True)
 
-    def run_expecting_output(self, path: pathlib.Path, expected_path: pathlib.Path, cwd: Optional[pathlib.Path] = None) -> None:
+    def run_expecting_output(self, path: pathlib.Path, expected_path: pathlib.Path, cwd: pathlib.Path | None = None) -> None:
         phase = Phase.RUN
         proc = self._run(path, cwd)
         if proc.returncode != 0:
@@ -145,7 +144,7 @@ class Runner:
         elif proc.stdout != expected_path.read_text():
             self._fail(phase, "output mismatch")
 
-    def run_expecting_exception(self, path: pathlib.Path, exception_path: pathlib.Path, cwd: Optional[pathlib.Path] = None) -> None:
+    def run_expecting_exception(self, path: pathlib.Path, exception_path: pathlib.Path, cwd: pathlib.Path | None = None) -> None:
         phase = Phase.RUN
         expected = exception_path.read_text().strip()
         proc = self._run(path, cwd)
@@ -157,7 +156,7 @@ class Runner:
         if output_path.exists() and proc.stdout != output_path.read_text():
             self._fail(phase, f"output before {expected} mismatch")
 
-    def python_evidence(self, path: pathlib.Path, python_accepts: bool, expected_path: pathlib.Path, cwd: Optional[pathlib.Path] = None) -> None:
+    def python_evidence(self, path: pathlib.Path, python_accepts: bool, expected_path: pathlib.Path, cwd: pathlib.Path | None = None) -> None:
         """Python must corroborate the verdict: run with the expected output
         (python_accepts) or raise the exception named in the sibling file. A
         test must carry the one piece of evidence and not the other."""

@@ -1,9 +1,11 @@
+# Context, ContextEntry and ClassEntry are mutually recursive, so the annotations in
+# ClassEntry are forward references.
 from __future__ import annotations
 
 import ast
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Optional, Sequence, TypeVar, Union
+from typing import Sequence, TypeVar
 
 T = TypeVar('T')
 
@@ -16,7 +18,7 @@ class ClassEntry:
     context: Context
     name: str
     own_fields: tuple[str, ...]
-    base: Optional[str]
+    base: str | None
 
 @dataclass(frozen=True)
 class ModuleStub:
@@ -27,7 +29,7 @@ class ModuleLoaded:
     q: str
     members: Context
 
-ContextEntry = Union[Status, ModuleStub, ModuleLoaded, ClassEntry]
+ContextEntry = Status | ModuleStub | ModuleLoaded | ClassEntry
 
 Context = dict[str, ContextEntry]
 
@@ -45,15 +47,15 @@ def override_gamma(ctx: ModuleContext, delta: Context) -> ModuleContext:
 def override_var(ctx: ModuleContext, delta: VarContext) -> ModuleContext:
     return override_gamma(ctx, dict(delta))
 
-def var_status(ctx: ModuleContext, x: str) -> Optional[Status]:
+def var_status(ctx: ModuleContext, x: str) -> Status | None:
     v = ctx.gamma.get(x)
     return v if isinstance(v, Status) else None
 
-def class_of(ctx: ModuleContext, c: str) -> Optional[ClassEntry]:
+def class_of(ctx: ModuleContext, c: str) -> ClassEntry | None:
     v = ctx.gamma.get(c)
     return v if isinstance(v, ClassEntry) else None
 
-def module_of(ctx: ModuleContext, x: str) -> Optional[Union[ModuleStub, ModuleLoaded]]:
+def module_of(ctx: ModuleContext, x: str) -> ModuleStub | ModuleLoaded | None:
     v = ctx.gamma.get(x)
     return v if isinstance(v, (ModuleStub, ModuleLoaded)) else None
 
@@ -65,7 +67,7 @@ class Returns:
 class Assigns:
     delta: VarContext = field(default_factory=dict)
 
-ResultTy = Union[Returns, Assigns]
+ResultTy = Returns | Assigns
 
 RETURNS = Returns()
 
@@ -125,7 +127,7 @@ def extend_entry(a: ContextEntry, b: ContextEntry) -> ContextEntry:
 def extend_context(g1: Context, g2: Context) -> Context:
     return {**g1, **{x: extend_entry(g1[x], e) if x in g1 else e for x, e in g2.items()}}
 
-def entry_of(e: ast.expr, ctx: ModuleContext) -> Optional[ContextEntry]:
+def entry_of(e: ast.expr, ctx: ModuleContext) -> ContextEntry | None:
     if isinstance(e, ast.Name):
         return ctx.gamma.get(e.id)
     if isinstance(e, ast.Attribute):
@@ -135,7 +137,7 @@ def entry_of(e: ast.expr, ctx: ModuleContext) -> Optional[ContextEntry]:
         return None
     return None
 
-def class_entry(e: ast.expr, ctx: ModuleContext) -> Optional[ClassEntry]:
+def class_entry(e: ast.expr, ctx: ModuleContext) -> ClassEntry | None:
     entry = entry_of(e, ctx)
     return entry if isinstance(entry, ClassEntry) else None
 
@@ -157,7 +159,7 @@ def fields(entry: ClassEntry) -> tuple[str, ...]:
     return fields(base_entry) + entry.own_fields
 
 def field_map(entry: ClassEntry, positional: Sequence[T],
-              kwd_names: Sequence[str], kwd_values: Sequence[T]) -> Optional[dict[str, T]]:
+              kwd_names: Sequence[str], kwd_values: Sequence[T]) -> dict[str, T] | None:
     xs = fields(entry)
     n = len(positional)
     if n + len(kwd_names) != len(xs) or len(set(kwd_names)) != len(kwd_names):

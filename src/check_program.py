@@ -1,7 +1,6 @@
 import ast
 import pathlib
 import sys
-from typing import Optional
 
 import syntax
 from aux import annotate_seq_kinds
@@ -19,7 +18,7 @@ def import_targets(tree: ast.Module, base_dir: pathlib.Path) -> set[str]:
                if is_module(f'{m}.{a.name}', base_dir) is not None})
 
 
-def is_module(name: str, base_dir: pathlib.Path) -> Optional[pathlib.Path]:
+def is_module(name: str, base_dir: pathlib.Path) -> pathlib.Path | None:
     stem = name.replace('.', '/')
     for candidate in (base_dir / f"{stem}.py", base_dir / stem / "__init__.py"):
         if candidate.exists():
@@ -45,7 +44,7 @@ def load(name: str, base_dir: pathlib.Path) -> ast.Module:
     return tree
 
 
-def check_program(entry_path: pathlib.Path) -> Optional[IllFormed]:
+def check_program(entry_path: pathlib.Path) -> IllFormed | None:
     try:
         walk_program(entry_path)
         return None

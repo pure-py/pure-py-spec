@@ -1,8 +1,5 @@
-from __future__ import annotations
-
 import ast
 import sys
-from typing import Optional
 
 import reasons
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
@@ -189,7 +186,7 @@ def binds_name(s: ast.stmt, x: str) -> bool:
         return s.name == x
     return x in assigns_stmt(s)
 
-def find_binder(stmts: list[ast.stmt], x: str) -> Optional[ast.stmt]:
+def find_binder(stmts: list[ast.stmt], x: str) -> ast.stmt | None:
     return next((s for s in stmts if binds_name(s, x)), None)
 
 def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context:
@@ -200,14 +197,14 @@ def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context
         own = {name: final_ctx.gamma[name] for name in own_members(body, q)}
     return {**stubs, **own}
 
-def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> Optional[IllFormed]:
+def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> IllFormed | None:
     try:
         check_module(m, M, q)
         return None
     except IllFormed as e:
         return e
 
-def check_file(filename: str) -> Optional[IllFormed]:
+def check_file(filename: str) -> IllFormed | None:
     source = open(filename).read()
     tree = ast.parse(source, filename=filename)
     annotate_seq_kinds(tree, source)
@@ -215,7 +212,7 @@ def check_file(filename: str) -> Optional[IllFormed]:
     M['__main__'] = tree
     return module_result(tree, M, '__main__')
 
-def format_result(result: Optional[IllFormed], filename: str) -> str:
+def format_result(result: IllFormed | None, filename: str) -> str:
     if result is None:
         return f'{filename}: ok'
     if isinstance(result, IllFormedModule):
