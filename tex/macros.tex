@@ -9,6 +9,17 @@
   \newcommand*{\Fortl}{Fortl\xspace}
 \fi
 \newcommand*{\versionstring}{}
+
+% Audience. \specmode selects the specification; otherwise the paper. The PaperOnly environment and the
+% \paperonly command carry material that appears in the paper only.
+\usepackage{comment}
+\ifdefined\specmode
+  \excludecomment{PaperOnly}
+  \newcommand*{\paperonly}[1]{}
+\else
+  \includecomment{PaperOnly}
+  \newcommand*{\paperonly}[1]{#1}
+\fi
 \newcommand*{\version}[3]{%
   \gdef\versionstring{#1.#2.#3}%
 }

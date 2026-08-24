@@ -6,6 +6,9 @@
 \usepackage{libertinus-type1}
 \usepackage{libertinust1math}
 \usepackage{microtype}
+% libertinust1math replaces amssymb; declare the one AMS symbol the rules use that it lacks.
+\DeclareSymbolFont{AMSa}{U}{msa}{m}{n}
+\DeclareMathSymbol{\rightsquigarrow}{\mathrel}{AMSa}{"0B}
 \setkomafont{disposition}{\normalfont\bfseries}
 
 % Packages the shared macros and figures rely on (the paper gets most of these from acmart).
@@ -27,6 +30,7 @@
 
 % The specification carries no change markup.
 \newcommand{\acceptchanges}{}
+\newcommand{\specmode}{}
 % The paper's top-level sections are chapters here.
 \newcommand*{\seckind}{chapter}
 \input{tex/macros}
@@ -67,6 +71,8 @@
 \let\section\chapter
 
 \input{tex/syntax}
+\input{tex/well-formedness}
+\input{tex/operational-semantics}
 
 \bibliographystyle{plainnat}
 \bibliography{tex/refs,tex/additional-refs}

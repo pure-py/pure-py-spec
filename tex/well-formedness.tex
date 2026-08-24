@@ -61,7 +61,7 @@ R \override \Returns = \Returns \override R & = \Returns
 \end{align*}}
 \end{definition}
 
-\noindent The $\Returns \override R$ case never arises because the well-formedness judgement excludes unreachable statements (\secref{unreachable}).
+\noindent The $\Returns \override R$ case never arises because the well-formedness judgement excludes unreachable statements\paperonly{ (\secref{unreachable})}.
 
 \begin{lemma}[Right distributivity (result types)]
 \[
@@ -70,7 +70,7 @@ R \override \Returns = \Returns \override R & = \Returns
 \end{lemma}
 
 \noindent A module attribute reference is well-formed only when it resolves to a definitely assigned member
-(rule \ruleName{attr-module}); see \secref{no-load-dependent}.
+(rule \ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}.
 
 \input{fig/well-formed}
 \input{fig/well-formed-expr}
@@ -88,7 +88,7 @@ ancestor of the target is exempt from loading first if it is the importing modul
 ancestors, since at runtime it may still be loading. The exemption applies only to from-imports, because
 for a plain import
 the only ancestor that could never load first is the importing module itself, and an import naming a proper
-descendant of the importing module is excluded outright (\secref{no-load-dependent}). Loading a module
+descendant of the importing module is excluded outright\paperonly{ (\secref{no-load-dependent})}. Loading a module
 may thus require other modules to load first; the rules are interpreted inductively, so a program with an
 import cycle is ill-formed, because a module in a cycle could finish loading only after itself. Program
 well-formedness (\figref{well-formed-module}) requires the main module to be well-formed and hence,
@@ -104,8 +104,9 @@ and variables a module defines, together with its intrinsic \pyinline{__name__} 
 never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
 name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own
 bindings are disjoint, because the module rules exclude a module that binds a name that is also the name of
-a submodule (\secref{no-load-dependent}).
+a submodule\paperonly{ (\secref{no-load-dependent})}.
 
+\begin{PaperOnly}
 \subsection{Examples}
 
 \subsubsection{Assignment as definition}
@@ -373,5 +374,4 @@ def foo(x):
   return x + 1
   return x    # error: unreachable
 \end{python}
-
-
+\end{PaperOnly}

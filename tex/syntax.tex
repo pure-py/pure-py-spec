@@ -7,7 +7,7 @@ statements; either a top-level statement, a \pyinline{def} body, or a branch of 
 statements in a block: any non-\pyinline{def} statement in that block, by definition, separates mutual
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single region. The well-formedness rules treat each region as
-one mutually-recursive binding (see \secref{mutual-recursion}).
+one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
 \figref{metavariables} summarises the metavariables used throughout.
 
 \input{fig/metavariables}
@@ -90,7 +90,7 @@ a \merge a' &= a \meet a'
 (\Gamma \override \Delta')$) does not hold. If it did, the following two programs would be equivalent, since
 sequential composition with a preceding assignment could be distributed into the branches of a conditional.
 But they are not: the left program is ill-formed, because a variable assigned before a conditional does not
-remain definitely assigned if only some branches assign it (see also \secref{local-assignment}).
+remain definitely assigned if only some branches assign it\paperonly{ (see also \secref{local-assignment})}.
 \vspace{-\medskipamount}
 
 \begin{minipage}[t]{0.48\textwidth}
