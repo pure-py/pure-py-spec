@@ -55,7 +55,7 @@ python3 src/check_program.py path/to/main.py
 ## Release workflow
 
 Run the `Bump version` GitHub Action manually with a version in the form `x.y.z` (for example, `0.1.4`).
-This updates version numbers on `main`, commits them, creates and pushes tag `v0.1.4`, then builds `paper.pdf` and uploads it to the GitHub Release for that tag.
+This updates version numbers on `main`, commits them, creates and pushes tag `v0.1.4`, then builds `PurePy-spec.pdf` and uploads it to the GitHub Release for that tag.
 
 ### Zotero export settings
 
