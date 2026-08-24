@@ -13,7 +13,6 @@ import sys
 from collections.abc import Iterator
 from enum import IntEnum, StrEnum
 
-
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 GREEN, RED, RESET = "\033[32m", "\033[31m", "\033[0m"
 
@@ -107,7 +106,7 @@ class Runner:
     def expect_exit(self, cmd: list[str], expected: int, error_substr: str | None = None) -> None:
         phase = {PARSE: Phase.PARSE, CHECK: Phase.CHECK, CHECK_PROGRAM: Phase.CHECK}.get(
             pathlib.Path(cmd[1]).name, Phase.PYTHON)
-        proc = subprocess.run(cmd, capture_output=True, text=True)
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
         if proc.returncode != expected:
             self._fail(phase, f"expected exit {expected}, got {proc.returncode}")
             return
@@ -127,7 +126,7 @@ class Runner:
 
     def _run(self, path: pathlib.Path, cwd: pathlib.Path | None) -> 'subprocess.CompletedProcess[str]':
         cmd_path = path.name if cwd is not None else str(path)
-        return subprocess.run([self.interpreter, cmd_path], cwd=cwd, capture_output=True, text=True)
+        return subprocess.run([self.interpreter, cmd_path], cwd=cwd, capture_output=True, text=True, check=False)
 
     def run_expecting_output(self, path: pathlib.Path, expected_path: pathlib.Path, cwd: pathlib.Path | None = None) -> None:
         phase = Phase.RUN
@@ -271,7 +270,7 @@ def main() -> None:
     if not skip_mypy:
         print("mypy --strict src/")
         sources = sorted(str(p) for p in (ROOT / "src").glob("*.py")) + [str(ROOT / "test" / "run-all.py")]
-        proc = subprocess.run(["mypy", "--strict", *sources], capture_output=True, text=True)
+        proc = subprocess.run(["mypy", "--strict", *sources], capture_output=True, text=True, check=False)
         if proc.returncode == 0:
             r.ok("src/")
         else:

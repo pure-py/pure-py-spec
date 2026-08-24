@@ -1,7 +1,6 @@
 import ast
 import sys
 
-
 OP_SYMBOLS: dict[type, str] = {
     ast.BitOr: '|', ast.BitAnd: '&', ast.BitXor: '^',
     ast.LShift: '<<', ast.RShift: '>>', ast.MatMult: '@',
@@ -355,7 +354,8 @@ def check_module(node: ast.Module) -> ParseError | None:
         return e
 
 def check_file(filename: str) -> ParseError | None:
-    source = open(filename).read()
+    with open(filename) as f:
+        source = f.read()
     tree = ast.parse(source, filename=filename)
     return check_module(tree)
 

@@ -1,16 +1,44 @@
 import ast
 
 import reasons
+from aux import (
+    BlockElement,
+    assigns_block,
+    assigns_elements,
+    binds,
+    captures_e,
+    captures_element,
+    elements_of_block,
+    find_first_reassigning,
+    names_in_target,
+    qualified_name,
+)
+from contexts import (
+    ASSIGNS_EMPTY,
+    RETURNS,
+    Assigns,
+    ClassEntry,
+    ModuleContext,
+    ModuleLoaded,
+    ModuleStub,
+    ResultTy,
+    Returns,
+    Status,
+    class_entry,
+    class_of,
+    entry_of,
+    field_map,
+    fields,
+    merge_results,
+    module_of,
+    override_results,
+    override_var,
+    short_name,
+    var_status,
+)
+from patterns import check_pattern_list, is_catch_all
 from reasons import IllFormedModule
-from contexts import (ClassEntry, Context, ContextEntry, ModuleContext, ModuleLoaded, ModuleStub,
-                      class_entry, entry_of,
-                      field_map, short_name, ResultTy, Status, ASSIGNS_EMPTY, RETURNS, Assigns,
-                      Returns, VarContext, class_of, extend_context, fields, merge_results,
-                      module_of, override_gamma, override_results, override_var, var_status)
-from aux import (BlockElement, assigns_block, assigns_elements, binds, captures_e, captures_element,
-                 elements_of_block, find_first_reassigning, names_in_target, own_fields,
-                 qualified_name)
-from patterns import check_pattern_list, dict_key, is_catch_all
+
 
 def result_type(node: ast.stmt) -> ResultTy:
     if isinstance(node, ast.Pass):
@@ -59,7 +87,7 @@ def check_elements(items: list[BlockElement], ctx: ModuleContext) -> ModuleConte
         raise IllFormedModule(node, reasons.UnreachableStatement())
     reassigned = captures_element(head) & assigns_elements(tail)
     if reassigned:
-        name = sorted(reassigned)[0]
+        name = min(reassigned)
         ra_node = find_first_reassigning(tail, reassigned)
         assert ra_node is not None
         raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))

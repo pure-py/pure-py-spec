@@ -2,15 +2,39 @@ import ast
 import sys
 
 import reasons
-from reasons import IllFormed, IllFormedModule, IllFormedProgram
-from contexts import (Context, ContextEntry, ModuleContext, ModuleLoaded, ModuleStub,
-                      ClassEntry, PREDEFINED_MEMBERS, PREDEFINED_MODULES, Status, Returns,
-                      extend_context, fields, override_gamma,
-                      predefined_context)
-from aux import (BlockElement, annotate_seq_kinds, assigns_block, assigns_elements, assigns_stmt,
-                 captures_element, elements_of_block, find_first_reassigning, find_import,
-                 find_nested_import, own_fields, split_imports)
+from aux import (
+    BlockElement,
+    annotate_seq_kinds,
+    assigns_block,
+    assigns_elements,
+    assigns_stmt,
+    captures_element,
+    elements_of_block,
+    find_first_reassigning,
+    find_import,
+    find_nested_import,
+    own_fields,
+    split_imports,
+)
 from blocks import block_element_result_type, check_element, next_ctx_after
+from contexts import (
+    PREDEFINED_MEMBERS,
+    PREDEFINED_MODULES,
+    ClassEntry,
+    Context,
+    ContextEntry,
+    ModuleContext,
+    ModuleLoaded,
+    ModuleStub,
+    Returns,
+    Status,
+    extend_context,
+    fields,
+    override_gamma,
+    predefined_context,
+)
+from reasons import IllFormed, IllFormedModule, IllFormedProgram
+
 
 def name_assign(q: str) -> ast.stmt:
     return ast.parse(f'__name__ = {q!r}').body[0]
@@ -98,7 +122,7 @@ def check_statements(items: list[BlockElement], ctx: ModuleContext) -> ModuleCon
         raise IllFormedModule(node, reasons.TopLevelReturn())
     reassigned = captures_element(head) & assigns_elements(tail)
     if reassigned:
-        name = sorted(reassigned)[0]
+        name = min(reassigned)
         ra_node = find_first_reassigning(tail, reassigned)
         assert ra_node is not None
         raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
@@ -131,7 +155,7 @@ def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
         raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
     clash = set(names) & set(fields(entry))
     if len(clash) > 0:
-        raise IllFormedModule(node, reasons.InheritedFieldClash(sorted(clash)[0], base.id))
+        raise IllFormedModule(node, reasons.InheritedFieldClash(min(clash), base.id))
 
 def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     key = (id(M), q)
@@ -205,7 +229,8 @@ def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> IllFormed 
         return e
 
 def check_file(filename: str) -> IllFormed | None:
-    source = open(filename).read()
+    with open(filename) as f:
+        source = f.read()
     tree = ast.parse(source, filename=filename)
     annotate_seq_kinds(tree, source)
     M: dict[str, ast.Module] = {p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES}

@@ -1,10 +1,17 @@
 import ast
 
 import reasons
-from reasons import IllFormedModule
-from contexts import (ModuleContext, ancestors, class_entry, field_map, fields,
-                      short_name)
 from aux import binds_seq, qualified_name
+from contexts import (
+    ModuleContext,
+    ancestors,
+    class_entry,
+    field_map,
+    fields,
+    short_name,
+)
+from reasons import IllFormedModule
+
 
 def is_catch_all(p: ast.pattern) -> bool:
     return isinstance(p, ast.MatchAs) and p.pattern is None
