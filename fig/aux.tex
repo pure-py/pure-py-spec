@@ -14,6 +14,7 @@
 \\
 \deleted{\capturesS(\exDef{f_1}{\seq{x}_1}{}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}}{}{b_{n+1}})} &\deleted{{}= \textstyle\bigcup_i \big(\fvS(b_i) \setminus (\set{\seq{x}_i} \cup \assignsS(b_i))\big) \setminus \set{f_1, \ldots, f_{n+1}}} \\
 \added{\capturesS(\seq{d})} &\added{{}= \textstyle\bigcup_i \big(\fvS(b_i) \setminus (\set{\seq{x}_i} \cup \assignsS(b_i))\big) \setminus \set{\seq{f}}} \\
+&\added{\qquad \text{where } d_i = \exDef{f_i}{\seq{x}_i\,\seq{\pi}_i}{\omega_i}{b_i} \; (\forall i)} \\
 \capturesS(\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}) &= \capturesE(e) \cup \textstyle\bigcup_i \big(\capturesS(b_i) \setminus \binds(p_i)\big) \\
 \\
 \capturesE(\exLambda{\seq{x}}{e}) &= \fvE(e) \setminus \set{\seq{x}}
