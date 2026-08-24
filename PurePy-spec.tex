@@ -27,8 +27,15 @@
 
 % The specification carries no change markup.
 \newcommand{\acceptchanges}{}
+% The paper's top-level sections are chapters here.
+\newcommand*{\secword}{chapter}
 \input{tex/macros}
 \input{tex/listings}
+
+% \secref renders a top-level label as a chapter reference; hyperref records each label's anchor.
+\usepackage{refcount}
+\usepackage{xstring}
+\renewcommand*{\secref}[1]{\IfBeginWith{\getrefbykeydefault{sec:#1}{anchor}{}}{chapter.}{Chapter~\ref{sec:#1}}{\S\ref{sec:#1}}}
 
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}[chapter]
