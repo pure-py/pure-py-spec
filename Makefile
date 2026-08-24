@@ -18,10 +18,6 @@ default: paper.pdf
 
 spec: PurePy-spec.pdf
 
-PurePy-spec.pdf: PurePy-spec.tex $(TEXFILES)
-	$(PDFLATEX) PurePy-spec.tex
-	$(PDFLATEX) PurePy-spec.tex
-
 anon: paper-anon.pdf
 
 paper-anon.pdf: $(TEXFILES)

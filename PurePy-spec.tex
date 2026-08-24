@@ -22,6 +22,7 @@
 \usepackage{xspace}
 \usepackage{enumitem}
 \usepackage{changebar}
+\usepackage[numbers,sort&compress]{natbib}
 \usepackage[colorlinks,allcolors=blue!50!black]{hyperref}
 
 % The specification carries no change markup.
@@ -29,9 +30,11 @@
 \input{tex/macros}
 \input{tex/listings}
 
-\newtheorem{theorem}{Theorem}
-\newtheorem{lemma}{Lemma}
-\newtheorem{definition}{Definition}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}{Lemma}[chapter]
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[chapter]
 
 \version{0}{14}{1}
 
@@ -51,26 +54,14 @@
 
 {\hypersetup{linkcolor=black}\tableofcontents}
 
-\chapter{Syntax}
-\label{ch:syntax}
+% The shared sources use \section for what is a chapter here; shift the heading levels, innermost first.
+\let\subsubsection\subsection
+\let\subsection\section
+\let\section\chapter
 
-\section{Modules and blocks}
+\input{tex/syntax}
 
-Statements, imports, field lists, blocks, module bodies, qualified names and function definitions are
-given in \figref{syntax-stmt}.
-
-\input{fig/syntax-stmt}
-
-\section{Expressions and patterns}
-
-Expressions, comprehension qualifiers, literals and patterns are given in \figref{syntax-expr}.
-
-\input{fig/syntax-expr}
-
-\section{Types and annotations}
-
-Types, and the optional annotations on parameters and return values, are given in \figref{syntax-types}.
-
-\input{fig/syntax-types}
+\bibliographystyle{plainnat}
+\bibliography{tex/refs,tex/additional-refs}
 
 \end{document}

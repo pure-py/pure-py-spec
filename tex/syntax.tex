@@ -41,7 +41,7 @@ It is useful to represent contexts as total functions on the set of all variable
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
 an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
-\emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$ (Lemma~1), but left
+\emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$ (Lemma~\ref{lem:right-distributivity}), but left
 distributivity does not hold. Both operations are defined pointwise.
 %
 \begin{definition}[Context override]
@@ -80,6 +80,7 @@ a \merge a' &= a \meet a'
 \noindent Extend combines module references for the same module recursively, preferring loaded references to stubs, and is otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted at the same package must combine rather than shadow.
 
 \begin{lemma}[Right distributivity]
+\label{lem:right-distributivity}
 \[
 (\Delta \merge \Delta') \override \Gamma = (\Delta \override \Gamma) \merge (\Delta' \override \Gamma).
 \]
