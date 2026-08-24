@@ -1,17 +1,16 @@
-# Context, ContextEntry and ClassEntry are mutually recursive, so the annotations in
-# ClassEntry are forward references.
-from __future__ import annotations
-
 import ast
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Sequence, TypeVar
-
-T = TypeVar('T')
 
 class Status(Enum):
     TT = auto()
     FF = auto()
+
+# Lazily evaluated, so these may name ClassEntry before it is defined.
+type ContextEntry = Status | ModuleStub | ModuleLoaded | ClassEntry
+type Context = dict[str, ContextEntry]
+type VarContext = dict[str, Status]
 
 @dataclass(frozen=True)
 class ClassEntry:
@@ -28,12 +27,6 @@ class ModuleStub:
 class ModuleLoaded:
     q: str
     members: Context
-
-ContextEntry = Status | ModuleStub | ModuleLoaded | ClassEntry
-
-Context = dict[str, ContextEntry]
-
-VarContext = dict[str, Status]
 
 @dataclass(frozen=True)
 class ModuleContext:
@@ -67,7 +60,7 @@ class Returns:
 class Assigns:
     delta: VarContext = field(default_factory=dict)
 
-ResultTy = Returns | Assigns
+type ResultTy = Returns | Assigns
 
 RETURNS = Returns()
 
@@ -158,8 +151,8 @@ def fields(entry: ClassEntry) -> tuple[str, ...]:
     assert isinstance(base_entry, ClassEntry)
     return fields(base_entry) + entry.own_fields
 
-def field_map(entry: ClassEntry, positional: Sequence[T],
-              kwd_names: Sequence[str], kwd_values: Sequence[T]) -> dict[str, T] | None:
+def field_map[T](entry: ClassEntry, positional: Sequence[T],
+                 kwd_names: Sequence[str], kwd_values: Sequence[T]) -> dict[str, T] | None:
     xs = fields(entry)
     n = len(positional)
     if n + len(kwd_names) != len(xs) or len(set(kwd_names)) != len(kwd_names):
