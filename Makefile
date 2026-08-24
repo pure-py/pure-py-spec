@@ -18,6 +18,14 @@ default: paper.pdf
 
 spec: PurePy-spec.pdf
 
+spec-anon: PurePy-spec-anon.pdf
+
+PurePy-spec-anon.pdf: $(TEXFILES)
+	$(PDFLATEX) -jobname=PurePy-spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
+	bibtex PurePy-spec-anon
+	$(PDFLATEX) -jobname=PurePy-spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
+	$(PDFLATEX) -jobname=PurePy-spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
+
 anon: paper-anon.pdf
 
 paper-anon.pdf: $(TEXFILES)
@@ -35,4 +43,4 @@ $(ARXIV_ZIP): $(ARXIV_FILES)
 	rm -f $@
 	zip -9 $@ $^
 
-.PHONY: default spec anon clean arXiv
+.PHONY: default spec spec-anon anon clean arXiv
