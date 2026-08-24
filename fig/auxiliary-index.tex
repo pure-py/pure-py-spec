@@ -1,0 +1,33 @@
+% Index of auxiliary functions (specification only).
+\begin{center}
+\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.21\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}}
+\grammarGroup{Syntactic analyses} \\
+$\assignsS(s)$ & set of variables & variables assigned in $s$, not descending into nested definitions & \figref{aux} \\
+$\binds(p)$ & set of variables & variables bound by pattern $p$ & \figref{aux} \\
+$\capturesS(s)$, $\capturesE(e)$ & set of variables & variables of the enclosing scope captured by closures in $s$ or $e$ & \figref{aux} \\
+$\fvS(b)$, $\fvE(e)$ & set of variables & free variables of $b$ or $e$ & \secref{mf-syntactic}
+   \\[2mm]
+\grammarGroup{Classes and modules} \\
+$\submods(q)$ & context & a stub for each submodule of $q$ & \figref{modules} \\
+$\ownFields(\phi)$ & sequence of variables & field names declared by field list $\phi$ & \figref{modules} \\
+$\fields(C)$ & sequence of variables & all fields of class $C$, inherited fields first & \figref{modules} \\
+$\ancestors(C)$ & set of class entries & $C$ and its base classes & \figref{modules} \\
+$\fieldMap(C, \seq{u})$ & map from variables & the argument supplied for each field of $C$; undefined unless the arguments cover the fields exactly & \figref{modules} \\
+$\resolveClass(\rho, q)$ & class entry & the class that qualified name $q$ denotes in $\rho$ & \figref{eval-aux} \\
+$\env(\rho, q)$ & environment & the environment of module $q$ as loaded in $\rho$ & \figref{eval-aux} \\
+$\nameOf(q)$ & string & the string literal naming module $q$ & \secref{modules-programs}
+   \\[2mm]
+\grammarGroup{Values} \\
+$\hat{\odot}(v, v')$, $\hat{\ominus}(v)$ & outcome & meaning of a binary or unary operator & \figref{operators} \\
+$\eqOp(v, v')$ & Boolean & structural equality; undefined between unrelated values & \figref{equality} \\
+$\eqEntries(\delta, \delta')$ & Boolean & equality of dictionary entries & \figref{equality} \\
+$\memOp(v, v')$ & Boolean & whether $v'$ is an element of $v$ & \figref{membership} \\
+$\elems(v)$ & sequence of values & the elements of a list, tuple or string & \figref{eval-aux} \\
+$\iterOp(v)$ & sequence of values & the sequence a generator draws from $v$; the keys of a dictionary & \figref{eval-aux} \\
+$\getitem(v, v')$ & outcome & subscripting & \figref{eval-aux} \\
+$\outcome(r)$ & outcome & the result of a block read as the outcome of calling it & \figref{eval-aux} \\
+$\dispatch(\rho, v, \seq{p}, \seq{b})$ & bindings and block & the case a \pyinline{match} takes & \figref{eval-aux} \\
+$\entries(\delta, \delta')$, $\update(\delta, w, v)$ & dictionary entries & a dictionary built from its entries, later entries overriding earlier & \figref{eval-aux}
+\end{tabular}
+\end{center}
