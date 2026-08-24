@@ -11,8 +11,8 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 
 ## Project structure
 
-- `PurePy-spec.tex` — main spec document
-- `PurePy-standard.tex` — the language specification as a standalone document, separate from the paper (#134)
+- `paper.tex` — the paper
+- `PurePy-spec.tex` — the language specification as a standalone document, separate from the paper (#134)
 - `tex/` — macros, listings config, related work
 - `fig/` — syntax, well-formedness rules, operational semantics
 - `agda/` — Agda mechanisation (distributivity proof)
@@ -22,10 +22,10 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 ## Building the spec
 
 ```
-latexmk -pdf PurePy-spec.tex
+latexmk -pdf paper.tex
 ```
 
-The standalone specification is built with `make standard`.
+The standalone specification is built with `make spec`.
 
 ## Running tests
 
@@ -55,7 +55,7 @@ python3 src/check_program.py path/to/main.py
 ## Release workflow
 
 Run the `Bump version` GitHub Action manually with a version in the form `x.y.z` (for example, `0.1.4`).
-This updates version numbers on `main`, commits them, creates and pushes tag `v0.1.4`, then builds `PurePy-spec.pdf` and uploads it to the GitHub Release for that tag.
+This updates version numbers on `main`, commits them, creates and pushes tag `v0.1.4`, then builds `paper.pdf` and uploads it to the GitHub Release for that tag.
 
 ### Zotero export settings
 

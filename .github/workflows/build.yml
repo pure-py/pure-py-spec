@@ -22,4 +22,6 @@ jobs:
       - name: Build LaTeX document
         uses: xu-cheng/latex-action@v4
         with:
-          root_file: PurePy-spec.tex
+          root_file: |
+            paper.tex
+            PurePy-spec.tex
