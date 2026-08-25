@@ -73,7 +73,7 @@ Python's late binding semantics (\secref{mutual-recursion}).
 \subsubsection{Mutual regions}
 \label{sec:mutual-recursion}
 
-Python resolves the free names of a function when it is called, so two functions may refer to each other
+Python resolves the free variables of a function when it is called, so two functions may refer to each other
 whatever order they are defined in, provided both exist by the time either runs. \PurePy makes the
 dependency static: a \emph{mutual region}, a maximal run of consecutive \pyinline{def} statements in a
 block (\secref{syntax}), is a single simultaneous binding. The \ruleName{def} rule checks each body in a
