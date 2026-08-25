@@ -14,7 +14,7 @@ only where an assignment covers every path to the reference. The \ruleName{var} 
 to be definitely assigned, $\Gamma(x) = \statusDefAssigned$; the \ruleName{assign} rule makes it so, with
 $x = e$ assigning $\set{\bind{x}{\statusDefAssigned}}$; and the \ruleName{if} rules combine the branches with
 $\merge$, so that a conditional definitely assigns a variable only if every branch that does not definitely
-return assigns it, and otherwise leaves it at $\statusNotDefAssigned$ (\secref{wf-blocks}). Branch-local
+return assigns it, otherwise leaving it at $\statusNotDefAssigned$ (\secref{wf-blocks}). Branch-local
 variables are therefore permitted, but using one after the conditional is not:
 
 \begin{python}
