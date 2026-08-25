@@ -1,9 +1,9 @@
-\subsection{Principles}
+\subsection{Design principles}
 \label{sec:principles}
 
-Well-formedness enforces a small number of principles. This section states each with the programs it
-accepts and rejects and the auxiliary functions its rules use; the rules themselves follow. Two analyses
-appear throughout: $\assignsS(s)$, the set of variables assigned anywhere in $s$, not descending into nested
+Well-formedness enforces a few constraints, summarised here with the programs each accepts and rejects;
+the rules follow in \secref{wf-patterns} to \secref{wf-modules}. Two auxiliary functions appear
+throughout: $\assignsS(s)$, the set of variables assigned anywhere in $s$, not descending into nested
 function definitions, which have their own scope, so that $\assignsS(s) = \dom(\Delta)$ when
 $s : \Assigns{\Delta}$; and $\binds(p)$, the set of variables a pattern $p$ introduces.
 

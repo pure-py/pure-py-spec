@@ -20,6 +20,7 @@ The preorder $\Gamma \vdash p \subsumed p'$ (\figref{subsumption}) holds when ev
 \input{spec/fig/subsumption}
 
 \subsection{Patterns}
+\label{sec:wf-patterns}
 
 A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is linear (no repeated variable names) and no earlier pattern subsumes a later one. The \pyinline{match} well-formedness rules use this judgement to enforce reachability and linearity of case patterns.
 
