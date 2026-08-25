@@ -119,8 +119,8 @@ functions after the conditional subject to the usual definite assignment rules (
 \label{sec:pattern-binding}
 
 A \pyinline{case} pattern binds variables, and Python scopes them as it does assignments: they remain in
-scope after the \pyinline{match} statement. \PurePy follows: each case is treated as a branch, and the variables
-bound by its pattern as assigned. The set of variables a pattern $p$ introduces is $\binds(p)$; the
+scope after the \pyinline{match} statement. \PurePy follows: each case is treated as a branch, and its pattern as an
+assignment of the variables it binds. The set of variables a pattern $p$ introduces is $\binds(p)$; the
 \ruleName{match} rule checks each body in a context in which they are definitely assigned, and combines
 the cases with $\merge$ as the \ruleName{if} rules do, so a variable is definitely assigned after the match
 only if every case binds it or returns. A match whose last case is not a catch-all (a variable or
