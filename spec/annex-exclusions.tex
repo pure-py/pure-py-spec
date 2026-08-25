@@ -1,0 +1,18 @@
+% Informative annex collecting the Python behaviours PurePy excludes. The sections are shared with the
+% paper, which presents them under its discussion of purity.
+\chapter{Excluded Python behaviours}
+\label{sec:exclusions}
+
+This annex is informative. It collects the Python behaviours \PurePy excludes and the stage at which each
+exclusion takes effect; the normative basis is the well-formedness rules (\secref{well-formedness}) and the operational
+semantics (\secref{opsem}).
+
+\section{Implicit coercions}
+\label{sec:no-coercions}
+
+\input{spec/exclusions/coercions}
+
+\section{Runtime errors}
+\label{sec:runtime-errors}
+
+\input{spec/exclusions/prevented-errors}

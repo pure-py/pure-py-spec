@@ -45,6 +45,7 @@
 % \secref renders a top-level label as a chapter reference; hyperref records each label's anchor.
 \usepackage{refcount}
 \usepackage{xstring}
+\newcommand*{\annexref}[1]{Annex~\ref{sec:#1}}
 \renewcommand*{\secref}[1]{\IfBeginWith{\getrefbykeydefault{sec:#1}{anchor}{}}{chapter.}{Chapter~\ref{sec:#1}}{\S\ref{sec:#1}}}
 
 \theoremstyle{plain}
@@ -114,6 +115,7 @@ The auxiliary functions used by the rules, with the section defining each.
 
 \appendix
 \input{spec/annex-auxiliary}
+\input{spec/annex-exclusions}
 
 \bibliographystyle{plainnat}
 \bibliography{tex/refs,tex/additional-refs}
