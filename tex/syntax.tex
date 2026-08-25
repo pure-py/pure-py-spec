@@ -218,4 +218,13 @@ member listed for $q$ in \figref{predefined} to its value.
 Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' = q.q''$ for some $q''$, and $\properPrefixOf$ for
 the strict order; the proper prefixes of a module name are its \emph{ancestors}.\speconly{ The metafunctions
 on modules and classes are defined in \secref{mf-classes}.}
-\inplace{tex/auxiliary-classes}
+\begin{PaperOnly}
+The $\submods$ metafunction is defined, with the class-related metafunctions, in \figref{modules}.
+A dataclass names its fields in a fixed order, and a constructor supplies each field exactly once,
+positionally or by keyword. The metafunction $\fieldMap(C, \seq{u})$ maps each field of $C$ to the argument supplied for it,
+and is undefined if the arguments do not cover the fields exactly. Constructor patterns and expressions
+use it to check and evaluate field-by-field, so the rules do not depend on how a constructor splits its
+arguments.
+
+\input{fig/modules}
+\end{PaperOnly}

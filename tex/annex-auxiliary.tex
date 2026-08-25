@@ -51,8 +51,67 @@ The free variables of a block and of an expression, defined in the usual way.
 \section{Classes and modules}
 \label{sec:mf-classes}
 
-\input{tex/auxiliary-classes}
-\input{tex/auxiliary-resolution}
+The functions on module names, field lists and class entries introduced in \secref{modules-programs}, and
+the resolution of qualified names in an environment.
+
+\begin{auxfunction}{\submods(q)}{context}{aux:submods}
+The context that binds each submodule of $q$ to a stub: an entry $\bind{x}{\modStub{q.x}}$ for each module
+$q.x$ of the program or of the predefined modules.
+\begin{align*}
+\input{functions/submods}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\ownFields(\phi)}{sequence of variables}{aux:own-fields}
+The field names a field list declares, in order.
+\begin{align*}
+\input{functions/own-fields}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\fields(C)}{sequence of variables}{aux:fields}
+All fields of class $C$: the fields of its base class, looked up in the declaring context, followed by
+its own.
+\begin{align*}
+\input{functions/fields}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\ancestors(C)}{set of class entries}{aux:ancestors}
+Class $C$ together with its base class and that class's ancestors, looked up in the declaring context.
+\begin{align*}
+\input{functions/ancestors}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\fieldMap(C, \seq{u})}{map from variables}{aux:field-map}
+The argument supplied for each field of $C$: positional arguments fill the fields in order and keyword
+arguments name theirs. It is undefined unless the arguments cover the fields exactly, so constructor
+patterns and expressions check and evaluate field by field without regard to how a constructor splits its
+arguments.
+\begin{align*}
+\input{functions/field-map}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\env(\rho, q)}{environment}{aux:env}
+The environment of module $q$ as loaded in $\rho$, reached by following the module references along $q$.
+\begin{align*}
+\input{functions/env}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\resolveClass(\rho, q)}{class entry}{aux:resolve-class}
+The class entry that qualified name $q$ denotes in $\rho$: a bare class name is looked up directly, a
+qualified one in the environment of its module.
+\begin{align*}
+\input{functions/resolve-class}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\nameOf(q)}{string}{aux:name}
+The string literal naming module $q$, so that $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$.
+\end{auxfunction}
 
 \section{Values}
 \label{sec:mf-values}

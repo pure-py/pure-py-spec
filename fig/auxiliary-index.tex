@@ -9,14 +9,14 @@ $\capturesS(s)$, $\capturesE(e)$ & set of variables & variables of the enclosing
 $\fvS(b)$, $\fvE(e)$ & set of variables & free variables of $b$ or $e$ & \S\ref{aux:fv}
    \\[2mm]
 \grammarGroup{Classes and modules} \\
-$\submods(q)$ & context & a stub for each submodule of $q$ & \figref{modules} \\
-$\ownFields(\phi)$ & sequence of variables & field names declared by field list $\phi$ & \figref{modules} \\
-$\fields(C)$ & sequence of variables & all fields of class $C$, inherited fields first & \figref{modules} \\
-$\ancestors(C)$ & set of class entries & $C$ and its base classes & \figref{modules} \\
-$\fieldMap(C, \seq{u})$ & map from variables & the argument supplied for each field of $C$; undefined unless the arguments cover the fields exactly & \figref{modules} \\
-$\resolveClass(\rho, q)$ & class entry & the class that qualified name $q$ denotes in $\rho$ & \figref{resolution} \\
-$\env(\rho, q)$ & environment & the environment of module $q$ as loaded in $\rho$ & \figref{resolution} \\
-$\nameOf(q)$ & string & the string literal naming module $q$ & \secref{modules-programs}
+$\submods(q)$ & context & a stub for each submodule of $q$ & \S\ref{aux:submods} \\
+$\ownFields(\phi)$ & sequence of variables & field names declared by field list $\phi$ & \S\ref{aux:own-fields} \\
+$\fields(C)$ & sequence of variables & all fields of class $C$, inherited fields first & \S\ref{aux:fields} \\
+$\ancestors(C)$ & set of class entries & $C$ and its base classes & \S\ref{aux:ancestors} \\
+$\fieldMap(C, \seq{u})$ & map from variables & the argument supplied for each field of $C$; undefined unless the arguments cover the fields exactly & \S\ref{aux:field-map} \\
+$\resolveClass(\rho, q)$ & class entry & the class that qualified name $q$ denotes in $\rho$ & \S\ref{aux:resolve-class} \\
+$\env(\rho, q)$ & environment & the environment of module $q$ as loaded in $\rho$ & \S\ref{aux:env} \\
+$\nameOf(q)$ & string & the string literal naming module $q$ & \S\ref{aux:name}
    \\[2mm]
 \grammarGroup{Values} \\
 $\hat{\odot}(v, v')$, $\hat{\ominus}(v)$ & outcome & meaning of a binary or unary operator & \figref{operators} \\

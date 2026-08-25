@@ -3,7 +3,7 @@
 \centering
 \small
 \begin{align*}
-\submods(q) &= \set{\bind{x}{\modStub{q.x}} \mid q.x \in \dom(\mathcal{M}) \cup \dom(\mathcal{P})}
+\input{functions/submods}
 \end{align*}
 \subcaption{$\submods$ metafunction}
 \end{subfigure}
@@ -14,18 +14,13 @@
 \centering
 \small
 \begin{align*}
-\ownFields(\exField{x_1}{\replaced{\tau_1}{\pyinline{Any}}} \;\ldots\; \exField{x_{n+1}}{\replaced{\tau_{n+1}}{\pyinline{Any}}}) &= x_1, \ldots, x_{n+1} \\
-\ownFields(\pyinline{pass}) &= \varepsilon \\
+\input{functions/own-fields} \\
 \\
-\fields(\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}) &= \seq{x} \\
-\fields(\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}) &= \fields(\Gamma(c')) \mathbin{\concat} \seq{x} \\
+\input{functions/fields} \\
 \\
-\ancestors(\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}) &\;= \set{\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}} \\
-\ancestors(\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}) &\;= \set{\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}} \cup \ancestors(\Gamma(c')) \\
+\input{functions/ancestors} \\
 \\
-\fieldMap(C, (u_1, \ldots, u_n, y_1 \mathord{=} u_{n+1}, \ldots, y_m \mathord{=} u_{n+m}))
-   &{}= \set{\bind{x_1}{u_1}, \ldots, \bind{x_n}{u_n}, \bind{y_1}{u_{n+1}}, \ldots, \bind{y_m}{u_{n+m}}} \\
-   &\qquad \text{if } \fields(C) = x_1 \cons \ldots \cons x_n \cons \seq{y}\,' \text{ and } \set{\seq{y}} = \set{\seq{y}\,'}
+\input{functions/field-map}
 \end{align*}
 \subcaption{$\ownFields$, $\fields$, $\fieldMap$, and $\ancestors$ metafunctions}
 \end{subfigure}

@@ -44,7 +44,13 @@ outcomes of the same form, carrying a result, a sequence of values or an environ
 \speconly{The operators and the other auxiliary functions the evaluation rules use are defined in
 \secref{mf-values}, and module and class resolution in \secref{mf-classes}.}
 \inplace{tex/auxiliary-values}
-\inplace{tex/auxiliary-resolution}
+\begin{PaperOnly}
+A qualified name is resolved through the environments of loaded modules: $\env(\rho, q)$ is the
+environment of module $q$ as loaded in $\rho$, and $\resolveClass(\rho, q)$ the class entry that $q$
+denotes (\figref{resolution}).
+
+\input{fig/resolution}
+\end{PaperOnly}
 
 \subsection{Pattern matching}
 
