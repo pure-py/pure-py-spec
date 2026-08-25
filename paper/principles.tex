@@ -167,8 +167,8 @@ def foo(x):
 \subsubsection{Load-order independence}
 \label{sec:load-order}
 
-In Python a module's namespace is filled as loading proceeds, by the assignments in its body and, for a
-package, by the import system binding each submodule as it loads, so what a qualified name denotes can
+In Python a module's namespace is populated as loading proceeds, by the assignments in its body and, for
+a package, by the import system binding each submodule as it loads, so what a qualified name denotes can
 depend on which modules have loaded so far, anywhere in the program (\secref{no-load-dependent}). \PurePy gives each name a meaning fixed by the
 module's own text and imports. Imports come first in a module, so its dependencies are known before any
 statement runs. Loading is static: the \ruleName{module} rule checks a body and computes its signature,
