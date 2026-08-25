@@ -20,16 +20,12 @@ with $\assigns{\varnothing}$ as left and right unit.
 
 \input{spec/fig/eval-values}
 
-A value is well-formed at a context entry (\figref{well-formed-env}): ordinary values at
-$\statusDefAssigned$, module references and class entries at the corresponding entry. An environment is
-well-formed at a context that binds its variables at corresponding entries. A \emph{termination
+A \emph{termination
 kind} $\kappa$ records how a run ends; all but $\errExit{n}$ are named after the exceptions the same program
 raises under Python in the same circumstances. A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a partial map from
 arguments to outcomes (\figref{predefined}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has outcome
 $\primFn(\seq{u})$, and no derivation where $\primFn(\seq{u})$ is undefined.
-
-\input{spec/fig/well-formed-env}
 
 The rules are given in a monadic metalanguage over outcomes (\figref{values}), in which
 $\mlet{v}{o}{\ldots}$ binds the value of an outcome; for example, \ruleName{eval-binop} concludes
@@ -71,12 +67,11 @@ most once, the entry comparison in \ruleName{eval-pat-constr} amounts to a compa
 
 \subsection{Blocks and expressions}
 
-Block evaluation $\rho, b \Rightarrow r$, for any $\rho : \Gamma$ and any $b$ well-formed in $\Gamma$,
-is given in \speconly{\figrefTwo{eval-block-outcome}{eval-block-fails}}\paperonly{full in \specification}. Function definitions delimit
+Block evaluation $\rho, b \Rightarrow r$ is given in \speconly{\figrefTwo{eval-block-outcome}{eval-block-fails}}\paperonly{full in \specification}. Function definitions delimit
 the scope of sequential-composition effects, so as black boxes functions are always pure. The metafunction $\outcome$ (\paperonly{\figref{eval-aux}}\speconly{\S\ref{aux:outcome}}) reads a block's result as
 the outcome of calling it, $\val{\pyinline{None}}$ where the block falls off the end.
 
-Expression evaluation $\rho, e \Rightarrow o$\speconly{ (\figrefTwo{eval-outcome}{eval-outcome-ctd})}, for any $\rho : \Gamma$ and any $e$ well-formed in $\Gamma$, yields an
+Expression evaluation $\rho, e \Rightarrow o$\speconly{ (\figrefTwo{eval-outcome}{eval-outcome-ctd})} yields an
 outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
@@ -99,11 +94,7 @@ Loading takes a single module; the ancestors of an imported module are loaded by
 loads-as judgement for an import, and directly as premises of \ruleName{eval-from-import} for a
 from-import.
 
- \begin{theorem}[Load preservation]
-If $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \val{\rho}$ then $\vdash \rho : \Gamma$.
-\end{theorem}
-
-\noindent Since
+Since
 imports precede statements, every module a statement can reference is loaded before the statement runs, and
 loading is deterministic, so the semantics needs no cache
 of loaded modules. The rule \ruleName{eval-module} puts $\mathcal{P}(\pyinline{builtins})$ under a module
@@ -113,3 +104,5 @@ loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exite
 reports one is not prescribed.
 
 \input{spec/fig/eval-modules}
+
+\paperinput{paper/properties}

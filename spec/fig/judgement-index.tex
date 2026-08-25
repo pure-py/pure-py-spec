@@ -15,9 +15,7 @@ $\vdash \seq{\iota} : \Gamma$ & imports $\seq{\iota}$ are well-formed and yield 
 $q, \theta \loadsAs \theta'$ & importing module $q$ into entry $\theta$ gives entry $\theta'$ & \figref{well-formed-imports} \\
 $\Gamma \vdash \seq{s} : \Delta$ & module statements $\seq{s}$ are well-formed and define $\Delta$ & \figref{well-formed-module} \\
 $\vdash_{\mathsf{load}} q : \Gamma$ & module $q$ loads with signature $\Gamma$ & \figref{well-formed-module} \\
-$\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{well-formed-module} \\
-$\vdash v : \theta$ & value $v$ has context entry $\theta$ & \figref{well-formed-env} \\
-$\vdash \rho : \Gamma$ & environment $\rho$ conforms to context $\Gamma$ & \figref{well-formed-env}
+$\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{well-formed-module}
    \\[2mm]
 \metaGroup{Evaluation} \\
 $\rho, p, v \matches m$ & pattern $p$ matches value $v$ with result $m$ & \figref{match} \\
