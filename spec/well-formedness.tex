@@ -3,31 +3,17 @@
 
 \PurePy excludes some Python behaviours statically and others only at runtime.
 Well-formedness is the static part, a judgement on programs defined in this \seckind{}; the operational
-semantics (\secref{opsem}) is defined for well-formed programs. The block and expression rules rest on a definite-assignment analysis; the pattern rules
+semantics (\secref{opsem}) is defined for well-formed programs. The statement and expression rules rest on a definite-assignment analysis; the pattern rules
 enforce linearity and reachability; and the module rules govern imports and class declarations. The
-\seckind{} follows the syntax of \secref{syntax}, taking patterns, then blocks and expressions, then modules
+\seckind{} follows the syntax of \secref{syntax}, taking statements, expressions and patterns, then modules
 and programs, and \secref{opsem} gives each of these a dynamic counterpart.
 
 \specinput{spec/well-formedness/auxiliary}
 \paperinput{paper/principles}
 
-\subsection{Patterns}
-\label{sec:wf-patterns}
-
-Pattern subsumption $\Gamma \vdash p \subsumed p'$\speconly{ (\figref{subsumption})}\paperonly{ (defined in \specification)} is a
-preorder on patterns under which every value matched by $p$ is also matched by $p'$. It is used by the
-well-formedness rule for $\pyinline{match}$ (\figref{well-formed}) to rule out unreachable cases. Exhaustiveness is a
-separate test; without a type system to bound the values a match may receive, it degenerates to
-whether the last case is a catch-all, a variable or wildcard.
-
-\specinput{spec/fig/subsumption}
-
-A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is linear (no pattern variable occurs more than once) and no earlier pattern subsumes a later one. The \pyinline{match} well-formedness rules use this judgement to enforce reachability and linearity of case patterns.
-
-\input{spec/fig/well-formed-pat}
-
-\subsection{Blocks and expressions}
+\subsection{Statements, expressions and patterns}
 \label{sec:wf-blocks}
+\label{sec:wf-patterns}
 
 Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
@@ -56,6 +42,18 @@ R \override \Returns = \Returns \override R & = \Returns
 
 \input{spec/fig/well-formed}
 \input{spec/fig/well-formed-expr}
+
+Pattern subsumption $\Gamma \vdash p \subsumed p'$\speconly{ (\figref{subsumption})}\paperonly{ (defined in \specification)} is a
+preorder on patterns under which every value matched by $p$ is also matched by $p'$. It is used by the
+well-formedness rule for $\pyinline{match}$ (\figref{well-formed}) to rule out unreachable cases. Exhaustiveness is a
+separate test; without a type system to bound the values a match may receive, it degenerates to
+whether the last case is a catch-all, a variable or wildcard.
+
+\specinput{spec/fig/subsumption}
+
+A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is linear (no pattern variable occurs more than once) and no earlier pattern subsumes a later one. The \pyinline{match} well-formedness rules use this judgement to enforce reachability and linearity of case patterns.
+
+\input{spec/fig/well-formed-pat}
 
 \subsection{Modules and programs}
 \label{sec:wf-modules}
