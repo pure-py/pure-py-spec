@@ -1,9 +1,9 @@
-TEXFILES := $(wildcard *.tex) $(wildcard tex/*.tex spec/*.tex spec/fig/*.tex spec/functions/*.tex paper/*.tex paper/fig/*.tex)
+TEXFILES := $(wildcard *.tex) $(wildcard tex/*.tex spec/*.tex spec/*/*.tex paper/*.tex paper/*/*.tex)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
 ARXIV_ZIP := paper-arXiv.zip
 ARXIV_FILES := \
 	paper.tex \
-	$(wildcard tex/*.tex spec/*.tex spec/fig/*.tex spec/functions/*.tex paper/*.tex paper/fig/*.tex) \
+	$(wildcard tex/*.tex spec/*.tex spec/*/*.tex paper/*.tex paper/*/*.tex) \
 	$(wildcard *.bbl *.bst tex/*.bib)
 
 default: paper.pdf
