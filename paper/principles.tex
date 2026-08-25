@@ -79,8 +79,8 @@ both exist by the time the reference is evaluated. \PurePy makes the
 dependency static: a \emph{mutual region}, a maximal run of consecutive \pyinline{def} statements in a
 block (\figref{syntax-stmt}), is a single simultaneous binding. The \ruleName{def} rule checks each body in a
 context in which every name of the region is definitely assigned, so any function in the region may refer
-to any other (a region of one permits self-recursion), and requires the names to be distinct. Any other
-statement between two definitions separates them into different regions:
+to any other, and requires the names to be distinct. Self-recursion is the special case of a singleton
+region. Any other statement between two definitions separates them into different regions:
 
 \begin{python}
 def even(n):
