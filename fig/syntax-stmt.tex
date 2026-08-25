@@ -4,8 +4,7 @@
 \begin{tabular}{rcll}
 \grammarGroup{Statements} \\
 $s$ & $::=$ & $\exPass$ & (Pass) \\
-    & $\mid$ & $\exAssign{x}{e}$ & (Assign) \\
-    & $\mid$ & $\added{\exAnnAssign{x}{\tau}{e}}$ & \added{(AnnAssign)} \\
+    & $\mid$ & $\exAssign{x\added{\pi}}{e}$ & (Assign) \\
     & $\mid$ & $e$ & (ExprStmt) \\
     & $\mid$ & $\exAssert{e}$ & (Assert) \\
     & $\mid$ & $\exAssertMsg{e}{e'}$ & (AssertMsg) \\

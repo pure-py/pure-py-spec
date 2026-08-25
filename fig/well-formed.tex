@@ -16,17 +16,8 @@
   x \notin \capturesE(e)
 }
 {
-  \Gamma \vdash \exAssign{x}{e} : \Assigns{\set{x : \statusDefAssigned}}
+  \Gamma \vdash \exAssign{x\added{\pi}}{e} : \Assigns{\set{x : \statusDefAssigned}}
 }
-\and
-\added{\inferrule*[lab={\ruleName{ann-assign}}]
-{
-  \Gamma \vdash e \\
-  x \notin \capturesE(e)
-}
-{
-  \Gamma \vdash \exAnnAssign{x}{\tau}{e} : \Assigns{\set{x : \statusDefAssigned}}
-}}
 \and
 \inferrule*[lab={\ruleName{expr-stmt}}]
 {

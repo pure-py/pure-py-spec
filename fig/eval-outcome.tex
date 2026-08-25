@@ -16,16 +16,8 @@
   \rho, e \Rightarrow o
 }
 {
-  \rho, \exAssign{x}{e} \Rightarrow \mlet{v}{o}{\assigns{\set{\bind{x}{v}}}}
+  \rho, \exAssign{x\added{\pi}}{e} \Rightarrow \mlet{v}{o}{\assigns{\set{\bind{x}{v}}}}
 }
-\and
-\added{\inferrule*[lab={\ruleName{eval-ann-assign}}]
-{
-  \rho, e \Rightarrow o
-}
-{
-  \rho, \exAnnAssign{x}{\tau}{e} \Rightarrow \mlet{v}{o}{\assigns{\set{\bind{x}{v}}}}
-}}
 \and
 \inferrule*[lab={\ruleName{eval-expr-stmt}}]
 {
