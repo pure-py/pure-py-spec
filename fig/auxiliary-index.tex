@@ -1,15 +1,15 @@
 % Index of auxiliary functions (specification only).
 \begin{center}
 \small
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.21\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.21\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}>{\raggedright\arraybackslash}p{0.10\textwidth}}
 \textbf{Function} & \textbf{Result} & \textbf{Meaning} & \textbf{Defined in} \\[1mm]
-\grammarGroup{Syntactic analyses} \\
+\grammarGroup{\itshape Syntactic analyses} \\
 $\assignsS(s)$ & set of variables & variables assigned in $s$, not descending into nested definitions & \S\ref{aux:assigns} \\
 $\binds(p)$ & set of variables & variables bound by pattern $p$ & \S\ref{aux:binds} \\
 $\capturesS(s)$, $\capturesE(e)$ & set of variables & variables of the enclosing scope captured by closures in $s$ or $e$ & \S\ref{aux:captures} \\
 $\fvS(b)$, $\fvE(e)$ & set of variables & free variables of $b$ or $e$ & \S\ref{aux:fv}
    \\[2mm]
-\grammarGroup{Classes and modules} \\
+\grammarGroup{\itshape Classes and modules} \\
 $\submods(q)$ & context & a stub for each submodule of $q$ & \S\ref{aux:submods} \\
 $\ownFields(\phi)$ & sequence of variables & field names declared by field list $\phi$ & \S\ref{aux:own-fields} \\
 $\fields(C)$ & sequence of variables & all fields of class $C$, inherited fields first & \S\ref{aux:fields} \\
@@ -19,7 +19,7 @@ $\resolveClass(\rho, q)$ & class entry & the class that qualified name $q$ denot
 $\env(\rho, q)$ & environment & the environment of module $q$ as loaded in $\rho$ & \S\ref{aux:env} \\
 $\nameOf(q)$ & string & the string literal naming module $q$ & \S\ref{aux:name}
    \\[2mm]
-\grammarGroup{Values} \\
+\grammarGroup{\itshape Values} \\
 $\hat{\odot}(v, v')$ & outcome & meaning of a binary operator & \S\ref{aux:binop} \\
 $\hat{\ominus}(v)$ & outcome & meaning of a unary operator & \S\ref{aux:unop} \\
 $\eqOp(v, v')$ & Boolean & structural equality; undefined between unrelated values & \S\ref{aux:eq} \\
