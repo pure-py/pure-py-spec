@@ -26,16 +26,16 @@
 \auxrow{$\nameOf(q)$}{string}{string literal naming module $q$}{aux:name}
 \noalign{\vskip 2mm}
 \auxgroup{Values}
-\auxrow{$\hat{\odot}(v, v')$}{outcome}{meaning of binary operator}{aux:binop}
-\auxrow{$\hat{\ominus}(v)$}{outcome}{meaning of unary operator}{aux:unop}
+\auxrow{$\hat{\odot}(v, v')$}{value or abort}{meaning of binary operator}{aux:binop}
+\auxrow{$\hat{\ominus}(v)$}{value or abort}{meaning of unary operator}{aux:unop}
 \auxrow{$\eqOp(v, v')$}{Boolean}{structural equality; undefined between unrelated values}{aux:eq}
 \specauxrow{$\eqElems(\seq{v}, \seq{v}\,')$}{Boolean}{elementwise equality of value sequences}{aux:eq-elems}
 \auxrow{$\memOp(v, v')$}{Boolean}{whether $v'$ is an element of $v$}{aux:contains}
 \specauxrow{$\memElems(\seq{v}, v)$}{Boolean}{whether $\seq{v}$ has an element equal to $v$}{aux:contains-elems}
 \specauxrow{$\elems(v)$}{sequence of values}{elements of list, tuple or string}{aux:elems}
 \auxrow{$\iterOp(v)$}{sequence of values}{sequence a generator draws from $v$; keys if $v$ is a dictionary}{aux:iter}
-\auxrow{$\getitem(v, v')$}{outcome}{subscripting}{aux:getitem}
-\auxrow{$\outcome(r)$}{outcome}{block result read as outcome of calling it}{aux:outcome}
+\auxrow{$\getitem(v, v')$}{value or abort}{subscripting}{aux:getitem}
+\auxrow{$\outcome(r)$}{value or abort}{block result read as outcome of calling it}{aux:outcome}
 \auxrow{$\dispatch(\rho, v, \seq{p}, \seq{b})$}{bindings and block}{case taken by a \pyinline{match}}{aux:dispatch}
 \auxrow{$\entries(\delta, \delta')$}{dictionary entries}{$\delta$ extended by the entries of $\delta'$ in order, later overriding earlier}{aux:entries}
 \auxrow{$\update(\delta, w, v)$}{dictionary entries}{$\delta$ with $w$ bound to $v$, replacing any earlier binding}{aux:update}
