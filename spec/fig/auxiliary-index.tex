@@ -32,7 +32,7 @@
 \specauxrow{$\memElems(\seq{v}, v)$}{Boolean}{whether $\seq{v}$ has an element equal to $v$}{aux:contains-elems}
 \specauxrow{$\elems(v)$}{sequence of values}{elements of list, tuple or string}{aux:elems}
 \auxrow{$\iterOp(v)$}{sequence of values}{sequence a generator draws from $v$; keys if $v$ is a dictionary}{aux:iter}
-\auxrow{$\getitem(v, v')$}{value or abort}{subscripting; aborts with \pyinline{IndexError} for an index out of range, \pyinline{KeyError} for a missing key and \pyinline{TypeError} otherwise}{aux:getitem}
+\auxrow{$\getitem(v, v')$}{value or abort}{subscripting; aborts with $\errIndex$ for an index out of range, $\errKey$ for a missing key and $\errType$ otherwise}{aux:getitem}
 \auxrow{$\outcome(r)$}{value or abort}{block result read as outcome of calling it: the returned value, \pyinline{None} if the block falls off the end, an abort unchanged}{aux:outcome}
 \auxrow{$\dispatch(\rho, v, \seq{p}, \seq{b})$}{bindings and block}{case taken by a \pyinline{match}}{aux:dispatch}
 \auxrow{$\entries(\delta, \delta')$}{dictionary entries}{$\delta$ extended by the entries of $\delta'$ in order, later overriding earlier}{aux:entries}
