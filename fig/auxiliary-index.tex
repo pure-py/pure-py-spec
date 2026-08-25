@@ -22,8 +22,9 @@ $\nameOf(q)$ & string & the string literal naming module $q$ & \S\ref{aux:name}
 $\hat{\odot}(v, v')$ & outcome & meaning of a binary operator & \S\ref{aux:binop} \\
 $\hat{\ominus}(v)$ & outcome & meaning of a unary operator & \S\ref{aux:unop} \\
 $\eqOp(v, v')$ & Boolean & structural equality; undefined between unrelated values & \S\ref{aux:eq} \\
-$\eqEntries(\delta, \delta')$ & Boolean & equality of dictionary entries & \S\ref{aux:eq-entries} \\
+$\eqElems(\seq{v}, \seq{v}\,')$ & Boolean & equality of two sequences of values, elementwise & \S\ref{aux:eq-elems} \\
 $\memOp(v, v')$ & Boolean & whether $v'$ is an element of $v$ & \S\ref{aux:contains} \\
+$\memElems(\seq{v}, v)$ & Boolean & whether a sequence of values has an element equal to $v$ & \S\ref{aux:contains-elems} \\
 $\elems(v)$ & sequence of values & the elements of a list, tuple or string & \S\ref{aux:elems} \\
 $\iterOp(v)$ & sequence of values & the sequence a generator draws from $v$; the keys of a dictionary & \S\ref{aux:iter} \\
 $\getitem(v, v')$ & outcome & subscripting & \S\ref{aux:getitem} \\
