@@ -44,7 +44,7 @@ outcomes of the same form, carrying a result, a sequence of values or an environ
 A \pyinline{match} statement takes the first case whose pattern matches the value, running its body under
 the bindings the pattern produces, and does nothing if no case matches; the auxiliary function
 $\dispatch$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:dispatch}}) selects that case.
-\paperinput{paper/operational-semantics/match}
+\paperinput{paper/operational-semantics/match}%
 Whether a pattern matches is the pattern-matching judgement $\rho, p, v \matches m$ (\figref{match}), a
 deterministic partial function. A \emph{match result} $m$ is either $\matchOk{\rho'}$, a match binding
 $\rho'$, or $\noMatch$, a failure to match. Having no derivation is a third possibility, distinct from
