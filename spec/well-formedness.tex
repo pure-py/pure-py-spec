@@ -50,7 +50,9 @@ variables are at $\statusNotDefAssigned$; the function names must be distinct. A
 checks each case body in a context in which the variables bound by its pattern are definitely
 assigned, and merges the cases as a
 conditional merges its branches, merging in $\Assigns{\varnothing}$ unless the last case is a catch-all, i.e.~a
-variable or wildcard. Function bodies, branches and case bodies may not declare classes. A class
+variable or wildcard.
+\paperinput{paper/well-formedness/match}
+Function bodies, branches and case bodies may not declare classes. A class
 declaration (\ruleName{class}, \ruleName{class-extend}) assigns a class entry $C$ to its name, which must
 not already denote a class; its fields must be distinct and, for an extension, disjoint from those of the
 base class.
