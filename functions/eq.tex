@@ -7,12 +7,13 @@
 \eqOp(\pyinline{False}, \pyinline{True}) &{}= \pyinline{False} \\*
 \\
 \eqOp(\exList{\varepsilon}, \exList{\varepsilon}) &{}= \pyinline{True} \\*
-\eqOp(\exTuple{\varepsilon}, \exTuple{\varepsilon}) &{}= \pyinline{True} \\*
 \eqOp(\exList{v \cons \seq{v}}, \exList{v' \cons \seq{v}\,'}) &{}= \pyinline{False} && \text{if } \eqOp(v, v') = \pyinline{False} \\*
 \eqOp(\exList{v \cons \seq{v}}, \exList{v' \cons \seq{v}\,'}) &{}= \eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) && \text{if } \eqOp(v, v') = \pyinline{True} \\*
+\eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) &{}= \pyinline{False} && \text{if } |\seq{v}| \neq |\seq{v}\,'| \\*
+\\
+\eqOp(\exTuple{\varepsilon}, \exTuple{\varepsilon}) &{}= \pyinline{True} \\*
 \eqOp(\exTuple{v \cons \seq{v}}, \exTuple{v' \cons \seq{v}\,'}) &{}= \pyinline{False} && \text{if } \eqOp(v, v') = \pyinline{False} \\*
 \eqOp(\exTuple{v \cons \seq{v}}, \exTuple{v' \cons \seq{v}\,'}) &{}= \eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) && \text{if } \eqOp(v, v') = \pyinline{True} \\*
-\eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) &{}= \pyinline{False} && \text{if } |\seq{v}| \neq |\seq{v}\,'| \\*
 \eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \pyinline{False} && \text{if } |\seq{v}| \neq |\seq{v}\,'| \\*
 \\
 \eqOp(\delta, \delta') &{}= \eqEntries(\delta, \delta') && \text{if } \dom(\delta) = \dom(\delta') \\*
