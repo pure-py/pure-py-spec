@@ -43,11 +43,12 @@ R \override \Returns = \Returns \override R & = \Returns
 \paperonly{\noindent}A sequence $s\;s'$ is well-formed (\ruleName{seq}) when $s$ definitely assigns some $\Delta$, $s'$ is
 well-formed under $\Gamma \override \Delta$, and no variable captured by $s$ is assigned in $s'$. A
 conditional combines its branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no
-\pyinline{else} branch. A mutual region (\ruleName{def}) checks each body with the region's function
-names and the body's parameters definitely assigned and the body's other assigned variables at
-$\statusNotDefAssigned$; the function names must be distinct. A \pyinline{match}
+\pyinline{else} branch. A mutual region (\ruleName{def}) checks each body in a context in which the region's
+function names and the body's parameters are definitely assigned and the body's other assigned
+variables are at $\statusNotDefAssigned$; the function names must be distinct. A \pyinline{match}
 (\ruleName{match}, \ruleName{match-partial}) requires its case patterns to be well-formed as a list,
-checks each case body with the variables its pattern binds definitely assigned, and merges the cases as a
+checks each case body in a context in which the variables bound by its pattern are definitely
+assigned, and merges the cases as a
 conditional merges its branches, merging in $\Assigns{\varnothing}$ unless the last case is a catch-all, a
 variable or wildcard. Function bodies, branches and case bodies may not declare classes. A class
 declaration (\ruleName{class}, \ruleName{class-extend}) assigns a class entry $C$ to its name, which must
