@@ -111,7 +111,7 @@ def g():     # error: g defined twice in the same region
     return 1
 \end{python}
 
-\noindent Python accepts this too, its late binding resolving the call in \pyinline{f} to the second
-\pyinline{g}. A branch of a conditional may contain regions of its own, subject to definite assignment as
+\noindent Python accepts this too, treating the second \pyinline{def g} as a reassignment of \pyinline{g},
+which late binding then makes the target of the call in \pyinline{f}. A branch of a conditional may contain regions of its own, subject to definite assignment as
 for any other assignment (\secref{local-assignment}).
 
