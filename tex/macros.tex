@@ -23,6 +23,17 @@
   \newcommand*{\paperinput}[1]{\input{#1}}
   \newcommand*{\specinput}[1]{}
 \fi
+% Rows of the auxiliary-functions table: the section column exists only in the specification, and
+% \specauxrow rows appear only there.
+\ifdefined\specmode
+  \newcommand*{\auxrow}[4]{#1 & #2 & #3 & \S\ref{#4} \\}
+  \newcommand*{\specauxrow}[4]{#1 & #2 & #3 & \S\ref{#4} \\}
+  \newcommand*{\auxgroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{4}{l}{\itshape #1} \\}
+\else
+  \newcommand*{\auxrow}[4]{#1 & #2 & #3 \\}
+  \newcommand*{\specauxrow}[4]{}
+  \newcommand*{\auxgroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{\itshape #1} \\}
+\fi
 % How the paper refers to the specification document.
 \newcommand*{\specification}{the \PurePy specification (supplementary material)\xspace}
 \newcommand*{\version}[3]{%
