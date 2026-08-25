@@ -176,8 +176,10 @@ and the \ruleName{import} and \ruleName{from-import} rules load each target and 
 an import cycle has no derivation. A module may not bind a name that is also the name of one of its
 submodules, a side condition of \ruleName{module}, since Python resolves the clash by load order. A
 qualified reference must resolve through the referring module's own imports to a definitely assigned
-member (\ruleName{attr-module}); this excludes \pyinline{lib.x} where \pyinline{lib} assigns \pyinline{x}
-only on a branch, and a reference to a submodule that some other module happens to have loaded:
+member (\ruleName{attr-module}). A submodule is not an attribute of its package until it is loaded, so
+\pyinline{import pkg} followed by \pyinline{pkg.sub.y} is rejected unless the module also imports
+\pyinline{pkg.sub}, whereas Python permits the reference whenever some earlier import, anywhere in the
+program, happens to have loaded \pyinline{pkg.sub}:
 
 \begin{minipage}[t]{0.3\textwidth}
 \begin{python}
@@ -195,7 +197,9 @@ print(pkg.sub.y)  # error: pkg.sub is not imported here
 \end{python}
 \end{minipage}
 
-\noindent Python accepts this because importing \pyinline{a} loads \pyinline{pkg.sub}, which becomes an
-attribute of \pyinline{pkg}; remove the import of \pyinline{a}, which the main module does not otherwise
-use, and Python raises \pyinline{AttributeError}. \PurePy rejects both programs (\secref{wf-modules}).
+\noindent Python accepts this because importing \pyinline{a} loads \pyinline{pkg.sub}; remove that import,
+which the main module does not otherwise use, and Python raises \pyinline{AttributeError}. It raises the
+same for a reference to a module member the body never assigns, such as \pyinline{lib.x} where
+\pyinline{lib} assigns \pyinline{x} only on a branch that is not taken. \PurePy rejects all three programs
+statically (\secref{wf-modules}).
 
