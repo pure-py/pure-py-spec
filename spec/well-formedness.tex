@@ -21,7 +21,7 @@ separate, syntactic test: whether the last case is a catch-all, a variable or wi
 
 \specinput{spec/fig/subsumption}
 
-A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is linear (no repeated variable names) and no earlier pattern subsumes a later one. The \pyinline{match} well-formedness rules use this judgement to enforce reachability and linearity of case patterns.
+A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is linear (no pattern variable occurs more than once) and no earlier pattern subsumes a later one. The \pyinline{match} well-formedness rules use this judgement to enforce reachability and linearity of case patterns.
 
 \input{spec/fig/well-formed-pat}
 
