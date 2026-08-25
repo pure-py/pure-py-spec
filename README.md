@@ -22,7 +22,9 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 
 The specification is the source of truth. The paper reuses its sections and definitions; where the paper
 adds material to a shared section, the section carries a marker at that point and the material itself
-lives with the paper.
+lives with the paper. The markers are macros in `tex/macros.tex`: `\paperinput` reads a file of the paper's
+material, and `\paperonly` and `\speconly` keep a phrase for one document; the specification's build defines
+`\specmode` to select its side of each.
 
 ## Building the spec
 
