@@ -1,0 +1,3 @@
+\memElems(\varepsilon, v) &{}= \pyinline{False} \\*
+\memElems(v' \cons \seq{v}, v) &{}= \pyinline{True} && \text{if } \eqOp(v, v') = \pyinline{True} \\*
+\memElems(v' \cons \seq{v}, v) &{}= \memElems(\seq{v}, v) && \text{if } \eqOp(v, v') = \pyinline{False}

@@ -1,0 +1,31 @@
+\begin{figure}
+\small
+%
+\begin{center}
+\begin{tabular}{rcll}
+\grammarGroup{Types} \\
+$\tau$ & $::=$ & $\tyAny$ & (Any) \\
+    & $\mid$ & $\tyNone$ & (None) \\
+    & $\mid$ & $\tyBool$ & (Bool) \\
+    & $\mid$ & $\tyInt$ & (Int) \\
+    & $\mid$ & $\tyFloat$ & (Float) \\
+    & $\mid$ & $\tyStr$ & (Str) \\
+    & $\mid$ & $\tyList{\tau}$ & (List) \\
+    & $\mid$ & $\tyTuple{\tau_1, \ldots, \tau_n}$ & (Tuple) \\
+    & $\mid$ & $\tyDict{\tau}$ & (Dict) \\
+    & $\mid$ & $\tyCallable{\tau_1, \ldots, \tau_n}{\tau}$ & (Callable) \\
+    & $\mid$ & $q$ & (Class) \\
+    & $\mid$ & $\tyUnion{\sigma}{\tau}$ & (Union)
+   \\[3mm]
+\grammarGroup{Annotations} \\
+$\pi$ & $::=$ & $\exAnnot{\tau}$ & (Annot) \\
+    & $\mid$ & $\varepsilon$ & (Unannot)
+   \\[3mm]
+\grammarGroup{Return annotations} \\
+$\omega$ & $::=$ & $\exRetAnnot{\tau}$ & (ReturnAnnot) \\
+    & $\mid$ & $\varepsilon$ & (ReturnUnannot)
+\end{tabular}
+\end{center}
+\caption{Types and annotations}
+\label{fig:syntax-types}
+\end{figure}

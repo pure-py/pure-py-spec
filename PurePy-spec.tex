@@ -1,11 +1,24 @@
-% \anonmode adds the acmart anonymous option and an anonymised title.
-\ifdefined\anonmode
-  \documentclass[acmsmall,anonymous]{acmart}
-\else
-  \documentclass[acmsmall]{acmart}
-\fi
+% The PurePy language specification, built separately from the paper (paper.tex).
+% \anonmode anonymises the language name, including in the copyright notice, as for the paper.
+\documentclass[a4paper,11pt,DIV=12,twoside=false,numbers=noenddot,appendixprefix=true]{scrreprt}
+\AtBeginDocument{\renewcommand*{\appendixname}{Annex}}
 
-% acmart loads amsmath, amssymb, amsthm, microtype, xcolor, hyperref, natbib, enumitem.
+% Fonts and layout
+\usepackage[T1]{fontenc}
+\usepackage{libertinus-type1}
+\usepackage{libertinust1math}
+\usepackage{microtype}
+% libertinust1math replaces amssymb; declare the one AMS symbol the rules use that it lacks.
+\DeclareSymbolFont{AMSa}{U}{msa}{m}{n}
+\DeclareMathSymbol{\rightsquigarrow}{\mathrel}{AMSa}{"20}
+\setkomafont{disposition}{\normalfont\bfseries}
+
+% Packages the shared macros and figures rely on (the paper gets most of these from acmart).
+\usepackage{amsmath}
+% Definitions in the annex may break across pages, between blocks of rows (\\* forbids a break within one).
+\allowdisplaybreaks
+\usepackage{amsthm}
+\usepackage{xcolor}
 \usepackage{array}
 \usepackage{colortbl}
 \DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
@@ -13,113 +26,104 @@
 \usepackage{listings}
 \usepackage{subcaption}
 \usepackage{float}
+% Keep figures near their text: allow placement at the input point, and let large floats share a page with text.
+\floatplacement{figure}{htbp}
+\renewcommand*{\topfraction}{0.9}
+\renewcommand*{\bottomfraction}{0.7}
+\renewcommand*{\textfraction}{0.05}
+\renewcommand*{\floatpagefraction}{0.8}
+\usepackage{needspace}
 \usepackage{xspace}
 \usepackage{enumitem}
-\usepackage{tikz}
-
-% \finalmode renders the clean version, without change markup.
-\ifdefined\finalmode\newcommand{\acceptchanges}{}\fi
 \usepackage{changebar}
-\ifdefined\finalmode\nochangebars\fi
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks,allcolors=blue!50!black]{hyperref}
 
+% The specification carries no change markup.
+\newcommand{\acceptchanges}{}
+\newcommand{\specmode}{}
+% The paper's top-level sections are chapters here.
+\newcommand*{\seckind}{chapter}
+\newcommand*{\thisdoc}{specification}
 \input{tex/macros}
 \input{tex/listings}
 
-\newtheorem{theorem}{Theorem}
-\newtheorem{lemma}{Lemma}
-\newtheorem{definition}{Definition}
+% \secref renders a top-level label as a chapter reference; hyperref records each label's anchor.
+\usepackage{refcount}
+\usepackage{xstring}
+\newcommand*{\annexref}[1]{Annex~\ref{sec:#1}}
+\renewcommand*{\secref}[1]{\IfBeginWith{\getrefbykeydefault{sec:#1}{anchor}{}}{chapter.}{Chapter~\ref{sec:#1}}{\S\ref{sec:#1}}}
 
-\setlist[itemize]{leftmargin=*, nosep, topsep=2mm}
-\setlist[enumerate]{nosep}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}{Lemma}[chapter]
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[chapter]
 
-% PACMPL (PLDI) metadata; placeholders for a draft.
-\acmJournal{PACMPL}
-\acmVolume{10}
-\acmNumber{PLDI}
-\acmArticle{1}
-\acmArticleSeq{0}
-\acmYear{2026}
-\acmMonth{6}
-\setcopyright{none}
-\settopmatter{printacmref=false}
-\citestyle{acmauthoryear}
+% An entry of the annex of auxiliary functions: the application form, its result and its label, then
+% prose and rows.
+\newenvironment{auxfunction}[3]{%
+  \par\addvspace{\bigskipamount}\phantomsection\label{#3}%
+  \noindent{\color{gray!60}\rule{\textwidth}{0.4pt}}\par\nobreak\vskip-\parskip\nointerlineskip
+  \noindent\colorbox{grammarheadcolor}{\parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
+    {\bfseries $#1$}\hfill{\itshape #2}}}\par\nobreak\vspace{2mm}\noindent\ignorespaces}
+  {\par\addvspace{\bigskipamount}}
+
+\version{0}{14}{1}
 
 \begin{document}
 
-\newcommand{\basetitle}{A Functional Subset of Python for Scientific Computing}
-\ifdefined\anonmode
-  \title{\basetitle}
-\else
-  \title{\PurePy: \basetitle}
-\fi
-\version{0}{14}{1}
+\begin{titlepage}
+\raggedright
+\vspace*{50mm}
+{\Huge\bfseries \PurePy\par}
+\vspace{5mm}
+{\LARGE Language Specification, v\versionstring\par}
+\vfill
+{\small Copyright \textcopyright{} 2026 \PurePy contributors. Distributed under the MIT License.\par}
+\end{titlepage}
 
-\author{Tobias Antensteiner}
-\affiliation{%
-  \department{Institute of Theoretical Informatics}
-  \institution{Karlsruhe Institute of Technology}
-  \country{Germany}}
+{\hypersetup{linkcolor=black}\tableofcontents}
 
-\author{Nikolaus Huber}
-\affiliation{%
-  \department{Department of Computer Science and Technology}
-  \institution{University of Cambridge}
-  \country{UK}}
+\addchap{Summary}
+\label{ch:summary}
 
-\author{Dominic Orchard}
-\affiliation{%
-  \department{School of Computing}
-  \institution{University of Kent}
-  \country{UK}}
-\affiliation{%
-  \department{Department of Computer Science and Technology}
-  \institution{University of Cambridge}
-  \country{UK}}
+\addsec{Judgement forms}
 
-\author{Jacob Pake}
-\affiliation{%
-  \department{School of Computing}
-  \institution{University of Kent}
-  \country{UK}}
+The judgement forms of the well-formedness rules and the operational semantics, with the figure defining
+each.
 
-\author{Roly Perera}
-\affiliation{%
-  \department{Department of Computer Science and Technology}
-  \institution{University of Cambridge}
-  \country{UK}}
-\affiliation{%
-  \department{School of Computer Science}
-  \institution{University of Bristol}
-  \country{UK}}
+\input{spec/fig/judgement-index}
 
-\renewcommand{\shortauthors}{Antensteiner et al.}
+\addsec{Auxiliary functions}
 
-\begin{abstract}
-\PurePy is a pure, side-effect-free subset of Python: a functional language whose programs are referentially
-transparent, reproducible, and easy to reason about, yet remain ordinary Python. Every well-formed \PurePy
-program is valid Python, and where \PurePy gives a run a result, Python gives the same one, so the same source
-runs under a standard Python interpreter and under any conforming implementation. This paper specifies \PurePy as a versioned standard, with a
-formal grammar, well-formedness rules based on a definite-assignment analysis, and an operational semantics
-that agrees with Python on every run it defines. A reference checker decides well-formedness, and a conformance test suite is exercised on CPython, GraalPy, and Pyodide. Aimed first at researchers in programming languages and pedagogy, \PurePy
-is intended to grow into a common language for scientific computing, supporting portable applications in
-modelling, data processing, analysis, and visualisation.
-\end{abstract}
+The auxiliary functions used by the rules, with the section defining each.
 
-\maketitle
+\input{spec/fig/auxiliary-index}
 
-\input{tex/introduction}
-\input{tex/overview}
-\input{tex/syntax}
-\input{tex/well-formedness}
-\input{tex/operational-semantics}
-\input{tex/reference-implementation}
-\input{tex/extensions}
-\input{tex/case-studies}
-\input{tex/evaluation}
-\input{tex/related-work}
-\input{tex/conclusion}
+% The shared sources use \section for what is a chapter here; shift the heading levels, innermost first,
+% and restore them afterwards.
+\let\specsection\section
+\let\specsubsection\subsection
+\let\specsubsubsection\subsubsection
+\let\subsubsection\subsection
+\let\subsection\section
+\let\section\chapter
 
-\bibliographystyle{ACM-Reference-Format}
+\input{spec/conformance}
+\input{spec/syntax}
+\input{spec/well-formedness}
+\input{spec/operational-semantics}
+
+\let\section\specsection
+\let\subsection\specsubsection
+\let\subsubsection\specsubsubsection
+
+\appendix
+\input{spec/annex-auxiliary}
+\input{spec/annex-exclusions}
+
+\bibliographystyle{plainnat}
 \bibliography{tex/refs,tex/additional-refs}
 
 \end{document}

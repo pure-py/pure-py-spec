@@ -1,0 +1,209 @@
+% Annex of auxiliary functions (specification only). Each entry states the function's meaning and the
+% cases its rows do not show; the rows are shared with the paper's figures. In the rows, a side condition
+% (if or where) goes in the condition column; a row too wide for that puts its condition on a
+% continuation line indented under the right-hand side.
+\chapter{Auxiliary functions (normative)}
+\label{ch:auxiliary-functions}
+
+This annex is normative. It defines the auxiliary functions used by the well-formedness rules
+(\secref{well-formedness}) and the operational semantics (\secref{opsem}).
+
+\section{Syntactic analyses}
+\label{sec:mf-syntactic}
+
+The analyses $\assignsS$, $\binds$, $\capturesS$ and $\capturesE$ introduced in \secref{wf-aux} are
+defined by their principal cases; the remaining cases are stated with each.
+
+\begin{auxfunction}{\assignsS(s)}{set of variables}{aux:assigns}
+\input{spec/functions/assigns-text}
+\begin{align*}
+\input{spec/functions/assigns}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\binds(p)}{set of variables}{aux:binds}
+\input{spec/functions/binds-text}
+\begin{align*}
+\input{spec/functions/binds}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\capturesS(s)}{set of variables}{aux:captures}
+\input{spec/functions/captures-text}
+\begin{align*}
+\input{spec/functions/captures}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\capturesE(e)}{set of variables}{aux:captures-e}
+\input{spec/functions/captures-e-text}
+\begin{align*}
+\input{spec/functions/captures-e}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\fvS(b)}{set of variables}{aux:fv}
+\input{spec/functions/fv-text}
+\end{auxfunction}
+
+\begin{auxfunction}{\fvE(e)}{set of variables}{aux:fv-e}
+\input{spec/functions/fv-e-text}
+\end{auxfunction}
+
+\section{Classes and modules}
+\label{sec:mf-classes}
+
+The functions on module names, field lists and class entries introduced in \secref{modules-programs}, and
+the resolution of qualified names in an environment.
+
+\begin{auxfunction}{\submods(q)}{context}{aux:submods}
+\input{spec/functions/submods-text}
+\begin{align*}
+\input{spec/functions/submods}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\ownFields(\phi)}{sequence of variables}{aux:own-fields}
+\input{spec/functions/own-fields-text}
+\begin{align*}
+\input{spec/functions/own-fields}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\fields(C)}{sequence of variables}{aux:fields}
+\input{spec/functions/fields-text}
+\begin{align*}
+\input{spec/functions/fields}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\ancestors(C)}{set of class entries}{aux:ancestors}
+\input{spec/functions/ancestors-text}
+\begin{align*}
+\input{spec/functions/ancestors}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\fieldMap(C, \seq{u})}{map from variables}{aux:field-map}
+\input{spec/functions/field-map-text}
+\begin{align*}
+\input{spec/functions/field-map}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\env(\rho, q)}{environment}{aux:env}
+\input{spec/functions/env-text}
+\begin{align*}
+\input{spec/functions/env}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\resolveClass(\rho, q)}{class entry}{aux:resolve-class}
+\input{spec/functions/resolve-class-text}
+\begin{align*}
+\input{spec/functions/resolve-class}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\nameOf(q)}{string}{aux:name}
+\input{spec/functions/name-text}
+\end{auxfunction}
+
+\section{Values}
+\label{sec:mf-values}
+
+The functions on values used by the evaluation rules.
+\input{spec/functions/operators-text}
+
+\begin{auxfunction}{\hat{\odot}(v, v')}{outcome}{aux:binop}
+\input{spec/functions/binop-text}
+\begin{center}
+\small
+\input{spec/functions/binop}
+\end{center}
+\end{auxfunction}
+
+\begin{auxfunction}{\hat{\ominus}(v)}{outcome}{aux:unop}
+\input{spec/functions/unop-text}
+\begin{center}
+\small
+\input{spec/functions/unop}
+\end{center}
+\end{auxfunction}
+
+\begin{auxfunction}{\eqOp(v, v')}{Boolean}{aux:eq}
+\input{spec/functions/eq-text}
+\begin{align*}
+\input{spec/functions/eq}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\eqElems(\seq{v}, \seq{v}\,')}{Boolean}{aux:eq-elems}
+\input{spec/functions/eq-elems-text}
+\begin{align*}
+\input{spec/functions/eq-elems}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\memOp(v, v')}{Boolean}{aux:contains}
+\input{spec/functions/contains-text}
+\begin{align*}
+\input{spec/functions/contains}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\memElems(\seq{v}, v)}{Boolean}{aux:contains-elems}
+\input{spec/functions/contains-elems-text}
+\begin{align*}
+\input{spec/functions/contains-elems}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\elems(v)}{sequence of values}{aux:elems}
+\input{spec/functions/elems-text}
+\begin{align*}
+\input{spec/functions/elems}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\iterOp(v)}{sequence of values}{aux:iter}
+\input{spec/functions/iter-text}
+\begin{align*}
+\input{spec/functions/iter}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\getitem(v, v')}{outcome}{aux:getitem}
+\input{spec/functions/getitem-text}
+\begin{align*}
+\input{spec/functions/getitem}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\outcome(r)}{outcome}{aux:outcome}
+\input{spec/functions/outcome-text}
+\begin{align*}
+\input{spec/functions/outcome}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\dispatch(\rho, v, \seq{p}, \seq{b})}{bindings and block}{aux:dispatch}
+\input{spec/functions/dispatch-text}
+\begin{align*}
+\input{spec/functions/dispatch}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\entries(\delta, \delta')}{dictionary entries}{aux:entries}
+\input{spec/functions/entries-text}
+\begin{align*}
+\input{spec/functions/entries}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\update(\delta, w, v)}{dictionary entries}{aux:update}
+\input{spec/functions/update-text}
+\begin{align*}
+\input{spec/functions/update}
+\end{align*}
+\end{auxfunction}

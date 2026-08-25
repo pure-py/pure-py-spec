@@ -1,0 +1,8 @@
+The $\submods$ metafunction is defined, with the class-related metafunctions, in \figref{modules}.
+A dataclass names its fields in a fixed order, and a constructor supplies each field exactly once,
+positionally or by keyword. The metafunction $\fieldMap(C, \seq{u})$ maps each field of $C$ to the argument supplied for it,
+and is undefined if the arguments do not cover the fields exactly. Constructor patterns and expressions
+use it to check and evaluate field-by-field, so the rules do not depend on how a constructor splits its
+arguments.
+
+\input{paper/fig/modules}
