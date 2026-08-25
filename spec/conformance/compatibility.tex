@@ -1,7 +1,7 @@
 Well-formedness is a property of the program, decided by \PurePy's static checks. Semantic validity is
 a property of a run rather than a program, because some of the Python behaviours \PurePy excludes cannot be rejected
-statically\paperonly{ (\secref{no-coercions})}\speconly{ (summarised in the informative \annexref{exclusions})}. Agreement with Python is guaranteed only for valid runs, so an implementation may abort the run at a
-dynamically excluded operation, or simply produce the Python result as a stock interpreter does. \added{An implementation conforms if it accepts
-exactly the well-formed programs and, on every valid run, produces the Python result.} The conformance suite
+statically\paperonly{ (\secref{no-coercions})}\speconly{ (summarised in the informative \annexref{exclusions})}. \added{An implementation conforms if it accepts exactly the well-formed programs and, on every valid run,
+produces the Python result; on any other run it may abort at the dynamically excluded operation, or simply
+produce the Python result as a stock interpreter does.} The conformance suite
 (\paperonly{\secref{reference-impl}}\speconly{\secref{testing}}) tests both properties: whether a program is well-formed,
 and what result a valid run produces.
