@@ -129,7 +129,7 @@ descendant of the importing module (\pyinline{import x.y} inside module \pyinlin
 the head would denote the still-loading module.
 
 A module may not bind a name that is also the name of one of its submodules. In Python an attribute of a
-package can be set both by an assignment in the package body and by loading the same-named submodule, and which
+module can be set both by an assignment in the module body and by loading a same-named submodule, and which
 wins depends on load order. Consider a program with four modules:
 
 \begin{minipage}[t]{0.2\textwidth}

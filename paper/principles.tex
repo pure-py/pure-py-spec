@@ -168,7 +168,7 @@ def foo(x):
 \label{sec:load-order}
 
 In Python a module's namespace is populated as loading proceeds, by the assignments in its body and, for
-a package, by the import system binding each submodule as it loads, so what a qualified name denotes can
+a module with submodules, by the import system binding each submodule as it loads, so what a qualified name denotes can
 depend on which modules have loaded so far, anywhere in the program (\secref{no-load-dependent}). \PurePy gives each name a meaning fixed by the
 module's own text and imports. Imports come first in a module, so its dependencies are known before any
 statement runs. Loading is static: the \ruleName{module} rule checks a body and computes its signature,
@@ -176,7 +176,7 @@ and the \ruleName{import} and \ruleName{from-import} rules load each target and 
 an import cycle has no derivation. A module may not bind a name that is also the name of one of its
 submodules, a side condition of \ruleName{module}, since Python resolves the clash by load order. A
 qualified reference must resolve through the referring module's own imports to a definitely assigned
-member (\ruleName{attr-module}). A submodule is not an attribute of its package until it is loaded, so
+member (\ruleName{attr-module}). A submodule is not an attribute of its parent until it is loaded, so
 \pyinline{import pkg} followed by \pyinline{pkg.sub.y} is rejected unless the module also imports
 \pyinline{pkg.sub}, whereas Python permits the reference whenever some earlier import, anywhere in the
 program, happens to have loaded \pyinline{pkg.sub}:
