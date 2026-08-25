@@ -17,8 +17,11 @@ and programs, and \secref{opsem} gives each of these a dynamic counterpart.
 
 Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
-= e} definitely assigns $\set{\bind{\pyinline{x}}{\statusDefAssigned}}$. \emph{Result types} $R$ classify these outcomes: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$). Block well-formedness is given in
-\figref{well-formed}; expression well-formedness in \figref{well-formed-expr}.
+= e} definitely assigns $\set{\bind{\pyinline{x}}{\statusDefAssigned}}$. \emph{Result types} $R$ classify
+these outcomes: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns
+$\Delta$). Statement well-formedness $\Gamma \vdash s : R$ is given in \figref{well-formed}, expression
+well-formedness $\Gamma \vdash e$ in \figref{well-formed-expr}, and pattern well-formedness in
+\figref{well-formed-pat}.
 
 Context operations $\override$ and $\merge$ lift to a right semiring over result types $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge$ and zero for $\override$.
 
@@ -37,22 +40,42 @@ R \override \Returns = \Returns \override R & = \Returns
 
 \paperinput{paper/well-formedness/right-distributivity}
 
-\paperonly{\noindent}A module attribute reference is well-formed only when it resolves to a definitely assigned member
-(rule \ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}.
+\paperonly{\noindent}A sequence $s\;s'$ is well-formed (\ruleName{seq}) when $s$ definitely assigns some $\Delta$, $s'$ is
+well-formed under $\Gamma \override \Delta$, and no variable captured by $s$ is assigned in $s'$. A
+conditional combines its branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no
+\pyinline{else} branch. A mutual region (\ruleName{def}) checks each body with the region's function
+names and the body's parameters definitely assigned and the body's other assigned variables at
+$\statusNotDefAssigned$; the function names must be distinct. A \pyinline{match}
+(\ruleName{match}, \ruleName{match-partial}) requires its case patterns to be well-formed as a list,
+checks each case body with the variables its pattern binds definitely assigned, and merges the cases as a
+conditional merges its branches, merging in $\Assigns{\varnothing}$ unless the last case is a catch-all, a
+variable or wildcard. Function bodies, branches and case bodies may not declare classes. A class
+declaration (\ruleName{class}, \ruleName{class-extend}) assigns a class entry $C$ to its name, which must
+not already denote a class; its fields must be distinct and, for an extension, disjoint from those of the
+base class.
 
 \input{spec/fig/well-formed}
+
+An expression is well-formed when every variable it references is definitely assigned (\ruleName{var});
+a lambda checks its body with its parameters definitely assigned, and a comprehension its body under the
+variables its generators bind (\ruleName{qual-generator}). A qualified name resolves through the context
+to an entry $\theta$ (\figref{well-formed-expr}a). A module attribute reference is well-formed only when
+it resolves to a definitely assigned member (\ruleName{attr-module})\paperonly{; see
+\secref{no-load-dependent}}. A constructor call requires its name to resolve to a class and its arguments
+to cover the class's fields exactly, through $\fieldMap$ (\ruleName{constr}). A name that resolves to a
+module or class entry is not itself a well-formed expression, since \ruleName{var} requires a variable.
+
 \input{spec/fig/well-formed-expr}
 
 Pattern subsumption $\Gamma \vdash p \subsumed p'$\speconly{ (\figref{subsumption})}\paperonly{ (defined in \specification)} is a
-preorder on patterns under which every value matched by $p$ is also matched by $p'$. It is used by the
-well-formedness rule for $\pyinline{match}$ (\figref{well-formed}) to rule out unreachable cases. Exhaustiveness is a
-separate test; without a type system to bound the values a match may receive, it degenerates to
-whether the last case is a catch-all, a variable or wildcard.
+preorder on patterns under which every value matched by $p$ is also matched by $p'$. A pattern list is
+well-formed (\figref{well-formed-pat}) when each pattern is linear (no pattern variable occurs more than
+once), each constructor pattern names a class and its sub-patterns cover the class's fields exactly
+(\ruleName{pat-constr}), and no earlier pattern subsumes a later one (\ruleName{cases-cons}), so that
+every case of a \pyinline{match} is reachable. Exhaustiveness is a separate test; without a type system
+to bound the values a match may receive, it degenerates to whether the last case is a catch-all.
 
 \specinput{spec/fig/subsumption}
-
-A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is linear (no pattern variable occurs more than once) and no earlier pattern subsumes a later one. The \pyinline{match} well-formedness rules use this judgement to enforce reachability and linearity of case patterns.
-
 \input{spec/fig/well-formed-pat}
 
 \subsection{Modules and programs}
