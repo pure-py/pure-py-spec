@@ -1,7 +1,7 @@
 The comparisons \pyinline{==}, \pyinline{!=}, \pyinline{in} and \pyinline{not in} are given in terms of
 structural equality $\eqOp$ and membership $\memOp$, which recurse through their operands. Where they are
 defined, the operators, equality and membership have the meanings they have in
-Python, yielding $\aborts{\kappa}$ where Python raises. Each is undefined where no case applies, and an
+Python, yielding $\aborts{\kappa}$ where Python raises an exception. Each is undefined where no case applies, and an
 expression applying an undefined operation has no derivation; these are the cases where \PurePy declines
 to give the operation the meaning Python gives it, a non-Boolean test being
 another\paperonly{ (\secref{no-coercions})}. Because
