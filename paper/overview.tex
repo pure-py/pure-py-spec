@@ -181,14 +181,6 @@ Loading \pyinline{pkg.sub}, wherever in the program it happens, sets it as an at
 mentions \pyinline{pkg.sub}. The name has no load-order-independent meaning, so \PurePy excludes the clash
 outright.
 
-For the same reason, a module may not refer to a submodule it does not itself import. A submodule is not an
-attribute of its package until it is loaded, so \pyinline{import a} followed by \pyinline{a.b.f()} is rejected
-unless the module also imports \pyinline{a.b}; Python permits the reference whenever some earlier import,
-anywhere in the program, happens to have loaded \pyinline{a.b}. \PurePy likewise rejects a reference to a
-module member the module body never assigns, such as \pyinline{lib.x} where \pyinline{lib} assigns
-\pyinline{x} only on a branch that is not taken. In Python both cases raise \pyinline{AttributeError}; \PurePy
-rejects them statically.
-
 \subsubsection{Modules and classes are not first-class}
 \label{sec:no-first-class}
 
