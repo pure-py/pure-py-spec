@@ -40,9 +40,9 @@ It is useful to represent contexts as total functions on the set of all variable
 \paragraph{Context operations.}
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
-an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
+an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). \paperonly{Together these form a
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$ (Lemma~\ref{lem:right-distributivity}), but left
-distributivity does not hold. Both operations are defined pointwise.
+distributivity does not hold. }Both operations are defined pointwise.
 %
 \begin{definition}[Context override]
 {\small
@@ -79,44 +79,7 @@ a \merge a' &= a \meet a'
 
 \noindent Extend combines module references for the same module recursively, preferring loaded references to stubs, and is otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted at the same package must combine rather than shadow.
 
-\begin{lemma}[Right distributivity]
-\label{lem:right-distributivity}
-\[
-(\Delta \merge \Delta') \override \Gamma = (\Delta \override \Gamma) \merge (\Delta' \override \Gamma).
-\]
-\end{lemma}
-
-\noindent Left distributivity ($\Gamma \override (\Delta \merge \Delta') = (\Gamma \override \Delta) \merge
-(\Gamma \override \Delta')$) does not hold. If it did, the following two programs would be equivalent, since
-sequential composition with a preceding assignment could be distributed into the branches of a conditional.
-But they are not: the left program is ill-formed, because a variable assigned before a conditional does not
-remain definitely assigned if only some branches assign it\paperonly{ (see also \secref{local-assignment})}.
-\vspace{-\medskipamount}
-
-\begin{minipage}[t]{0.48\textwidth}
-\begin{python}
-def f(b):
-    x = 1
-    if b:
-        x = 2
-    else:
-        pass
-    return x  # error
-\end{python}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.48\textwidth}
-\begin{python}
-def f(b):
-    if b:
-        x = 1
-        x = 2
-    else:
-        x = 1
-        pass
-    return x  # ok
-\end{python}
-\end{minipage}
+\paperinput{paper/right-distributivity}
 
 \input{spec/fig/syntax-stmt}
 \input{spec/fig/syntax-expr}
