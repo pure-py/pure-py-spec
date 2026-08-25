@@ -1,9 +1,8 @@
 The comparisons \pyinline{==}, \pyinline{!=}, \pyinline{in} and \pyinline{not in} are given in terms of
-structural equality $\eqOp$ and membership $\memOp$, which recurse through their operands. Where they are
-defined, the operators, equality and membership have the meanings they have in
-Python, yielding $\aborts{\kappa}$ where Python raises an exception. Each is undefined where no case applies, and the
-evaluation of an expression that applies an undefined operation has no derivation; these are the cases where \PurePy declines
-to give the operation the meaning Python gives it\paperonly{ (\secref{no-coercions})}. Because
+structural equality $\eqOp$ and membership $\memOp$, which recurse through their operands. Where defined, the
+operators, equality and membership agree with Python, yielding $\aborts{\kappa}$ where Python raises an
+exception. Where undefined, evaluation of the expression has no derivation: the operation has a meaning in
+Python that \PurePy does not adopt\paperonly{ (\secref{no-coercions})}. Because
 equality is partial, the order in which elements are compared is observable: equality and membership stop
 at the first element that decides the result, so an undefined comparison later in a sequence does not make
 the whole undefined.
