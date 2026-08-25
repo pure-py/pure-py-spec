@@ -1,5 +1,5 @@
 % The PurePy language specification, built separately from the paper (paper.tex).
-% \anonmode anonymises the language name and drops the copyright notice, as for the paper.
+% \anonmode anonymises the language name, including in the copyright notice, as for the paper.
 \documentclass[a4paper,11pt,DIV=12,twoside=false,numbers=noenddot,appendixprefix=true]{scrreprt}
 \AtBeginDocument{\renewcommand*{\appendixname}{Annex}}
 
@@ -73,9 +73,7 @@
 \vspace{5mm}
 {\LARGE Language Specification, v\versionstring\par}
 \vfill
-\ifdefined\anonmode\else
-{\small Copyright \textcopyright{} 2026 PurePy contributors. Distributed under the MIT License.\par}
-\fi
+{\small Copyright \textcopyright{} 2026 \PurePy contributors. Distributed under the MIT License.\par}
 \end{titlepage}
 
 {\hypersetup{linkcolor=black}\tableofcontents}
