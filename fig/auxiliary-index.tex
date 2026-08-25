@@ -3,10 +3,10 @@
 \small
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.21\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}}
 \grammarGroup{Syntactic analyses} \\
-$\assignsS(s)$ & set of variables & variables assigned in $s$, not descending into nested definitions & \figref{aux} \\
-$\binds(p)$ & set of variables & variables bound by pattern $p$ & \figref{aux} \\
-$\capturesS(s)$, $\capturesE(e)$ & set of variables & variables of the enclosing scope captured by closures in $s$ or $e$ & \figref{aux} \\
-$\fvS(b)$, $\fvE(e)$ & set of variables & free variables of $b$ or $e$ & \secref{mf-syntactic}
+$\assignsS(s)$ & set of variables & variables assigned in $s$, not descending into nested definitions & \S\ref{aux:assigns} \\
+$\binds(p)$ & set of variables & variables bound by pattern $p$ & \S\ref{aux:binds} \\
+$\capturesS(s)$, $\capturesE(e)$ & set of variables & variables of the enclosing scope captured by closures in $s$ or $e$ & \S\ref{aux:captures} \\
+$\fvS(b)$, $\fvE(e)$ & set of variables & free variables of $b$ or $e$ & \S\ref{aux:fv}
    \\[2mm]
 \grammarGroup{Classes and modules} \\
 $\submods(q)$ & context & a stub for each submodule of $q$ & \figref{modules} \\

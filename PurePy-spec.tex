@@ -49,6 +49,13 @@
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[chapter]
 
+% An entry of the annex of auxiliary functions: the application form, its result and its label, then
+% prose and rows.
+\newenvironment{auxfunction}[3]{%
+  \par\addvspace{\bigskipamount}\phantomsection\label{#3}%
+  \noindent{\bfseries $#1$}\hfill{\itshape #2}\par\nobreak\smallskip\noindent\ignorespaces}
+  {\par\addvspace{\bigskipamount}}
+
 \version{0}{14}{1}
 
 \begin{document}
@@ -93,26 +100,7 @@ or section defining each.
 \let\subsubsection\specsubsubsection
 
 \appendix
-\chapter{Auxiliary functions}
-\label{ch:auxiliary-functions}
-
-\section{Syntactic analyses}
-\label{sec:mf-syntactic}
-
-The analyses $\assignsS$, $\binds$, $\capturesS$ and $\capturesE$ introduced in \secref{wf-aux} are
-defined by the principal cases in \figref{aux} together with the general behaviour stated here.
-\input{tex/auxiliary-syntactic}
-
-\section{Classes and modules}
-\label{sec:mf-classes}
-
-\input{tex/auxiliary-classes}
-\input{tex/auxiliary-resolution}
-
-\section{Values}
-\label{sec:mf-values}
-
-\input{tex/auxiliary-values}
+\input{tex/annex-auxiliary}
 
 \bibliographystyle{plainnat}
 \bibliography{tex/refs,tex/additional-refs}

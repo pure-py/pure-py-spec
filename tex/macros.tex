@@ -216,6 +216,12 @@
 % Change markup (own copy of the shared change-tracking definitions; changebar loaded in the
 % preamble).
 \input{tex/change-tracking}
+% A row of an align recording a deleted definition: grey in the paper, absent under \acceptchanges.
+\ifdefined\acceptchanges
+  \newcommand*{\deletedrow}[2]{}
+\else
+  \newcommand*{\deletedrow}[2]{\deleted{#1} &\deleted{{}#2} \\}
+\fi
 
 % Grammar figures: shaded heading row naming the syntactic category
 \definecolor{grammarheadcolor}{gray}{0.93}

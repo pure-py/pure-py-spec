@@ -1,0 +1,60 @@
+% Annex of auxiliary functions (specification only). Each entry states the function's meaning and the
+% cases its rows do not show; the rows are shared with the paper's figures.
+\chapter{Auxiliary functions}
+\label{ch:auxiliary-functions}
+
+\section{Syntactic analyses}
+\label{sec:mf-syntactic}
+
+The analyses $\assignsS$, $\binds$, $\capturesS$ and $\capturesE$ introduced in \secref{wf-aux} are
+defined by their principal cases; the remaining cases are stated with each.
+
+\begin{auxfunction}{\assignsS(s)}{set of variables}{aux:assigns}
+The variables assigned anywhere in $s$, not descending into nested function definitions, which have their
+own scope. It is empty on the statements not shown and is the union over the branch blocks of a
+conditional. It extends by union from statements to blocks, with the singleton block identified with its
+statement, and on a module body $\seq{\iota}\;\seq{s}$ acts on $\seq{s}$.
+\begin{align*}
+\input{functions/assigns}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\binds(p)}{set of variables}{aux:binds}
+The variables introduced by pattern $p$. On the cases not shown it recurses structurally, taking the union
+over the immediate subpatterns.
+\begin{align*}
+\input{functions/binds}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\capturesS(s)}{set of variables}{aux:captures}
+The variables of the enclosing scope captured by closures (lambdas or nested function definitions) within
+$s$. On the cases not shown it takes the union of $\capturesE$ over the statement's subexpressions and of
+$\capturesS$ over the blocks it contains, and it extends to blocks and module bodies as $\assignsS$ does.
+\begin{align*}
+\input{functions/captures}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\capturesE(e)}{set of variables}{aux:captures-e}
+The variables of the enclosing scope captured by closures within expression $e$. On the cases not shown it
+recurses structurally, taking the union over the immediate subexpressions.
+\begin{align*}
+\input{functions/captures-e}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\fvS(b), \fvE(e)}{set of variables}{aux:fv}
+The free variables of a block and of an expression, defined in the usual way.
+\end{auxfunction}
+
+\section{Classes and modules}
+\label{sec:mf-classes}
+
+\input{tex/auxiliary-classes}
+\input{tex/auxiliary-resolution}
+
+\section{Values}
+\label{sec:mf-values}
+
+\input{tex/auxiliary-values}
