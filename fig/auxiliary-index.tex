@@ -4,10 +4,11 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.08\textwidth}}
 \textbf{Function} & \textbf{Result} & \textbf{Meaning} & \textbf{Section} \\[1mm]
 \grammarGroup{\itshape Syntactic analyses} \\
-$\assignsS(s)$ & set of variables & variables assigned in $s$, not descending into nested definitions & \S\ref{aux:assigns} \\
+$\assignsS(s)$ & set of variables & variables assigned in $s$, not descending into nested functions & \S\ref{aux:assigns} \\
 $\binds(p)$ & set of variables & variables bound by pattern $p$ & \S\ref{aux:binds} \\
 $\capturesS(s)$, $\capturesE(e)$ & set of variables & variables of enclosing scope captured by closures in $s$ or $e$ & \S\ref{aux:captures} \\
-$\fvS(b)$, $\fvE(e)$ & set of variables & free variables of $b$ or $e$ & \S\ref{aux:fv}
+$\fvS(b)$ & set of variables & free variables of block $b$ & \S\ref{aux:fv} \\
+$\fvE(e)$ & set of variables & free variables of expression $e$ & \S\ref{aux:fv-e}
    \\[2mm]
 \grammarGroup{\itshape Classes and modules} \\
 $\submods(q)$ & context & stub for each submodule of $q$ & \S\ref{aux:submods} \\
