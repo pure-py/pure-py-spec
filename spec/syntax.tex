@@ -79,7 +79,7 @@ a \merge a' &= a \meet a'
 
 \noindent Extend combines module references for the same module recursively, preferring loaded references to stubs, and is otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted at the same module must combine rather than shadow.
 
-\paperinput{paper/right-distributivity}
+\paperinput{paper/syntax/right-distributivity}
 
 \input{spec/fig/syntax-stmt}
 \input{spec/fig/syntax-expr}
@@ -176,4 +176,4 @@ and $\Gamma$ binds the same variables at $\statusDefAssigned$.
 Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' = q.q^\dagger$ for some $q^\dagger$, and $\properPrefixOf$ for
 the strict order; the proper prefixes of a module name are its \emph{ancestors}.\speconly{ The metafunctions
 on modules and classes are defined in \secref{mf-classes}.}
-\paperinput{paper/syntax-classes}
+\paperinput{paper/syntax/classes}

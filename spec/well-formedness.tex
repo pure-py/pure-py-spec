@@ -9,7 +9,7 @@ enforce linearity and reachability; and the module rules govern imports and clas
 and programs, and \secref{opsem} gives each of these a dynamic counterpart.
 
 \specinput{spec/well-formedness/auxiliary}
-\paperinput{paper/principles}
+\paperinput{paper/well-formedness/principles}
 
 \subsection{Statements, expressions and patterns}
 \label{sec:wf-blocks}
@@ -35,7 +35,7 @@ R \override \Returns = \Returns \override R & = \Returns
 
 \noindent The $\Returns \override R$ case never arises because the well-formedness judgement excludes unreachable statements\paperonly{ (\secref{unreachable})}.
 
-\paperinput{paper/right-distributivity-results}
+\paperinput{paper/well-formedness/right-distributivity}
 
 \paperonly{\noindent}A module attribute reference is well-formed only when it resolves to a definitely assigned member
 (rule \ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}.
