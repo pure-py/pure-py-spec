@@ -46,7 +46,9 @@ function. A \emph{match result} $m$ is either $\matchOk{\rho'}$, a match binding
 $\noMatch$, a failure to match. A \pyinline{match} statement takes the first case whose pattern matches
 the value, running its body under the bindings, and does nothing if no case matches; the auxiliary
 function $\dispatch$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:dispatch}}) selects that
-case. Having no derivation is a third
+case.
+\paperinput{paper/operational-semantics/match}
+Having no derivation is a third
 outcome, distinct from both: the match has no meaning, and \PurePy gives the run no result. A pattern and a
 value that are not comparable have no derivation, since \PurePy can say neither that they match nor that
 they do not; a list pattern against a tuple is such a case. Sub-results compose with $\override$, matching
