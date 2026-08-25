@@ -20,11 +20,11 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 - `src/` — reference checker (Python `ast`-based), organised to mirror the spec's sections
 - `test/` — litmus tests
 
-The specification is the source of truth. The paper reuses its sections and definitions; where the paper
-adds material to a shared section, the section carries a marker at that point and the material itself
-lives with the paper. In a specification source, `\paperinput{file}` marks where a block of the paper's
-material (a paragraph, an example section, a figure) goes, and `\paperonly{...}` and `\speconly{...}` keep a
-phrase for one document, such as a cross-reference the other lacks.
+The specification is the source of truth, and the paper is built from its sections and definitions.
+Material that belongs only to the paper is kept under `paper/`. Where such material should appear inside
+a shared section, the specification source says so with `\paperinput{file}`; the paper expands this to
+the contents of the file and the specification ignores it. `\paperonly{...}` and `\speconly{...}` do the
+same for a phrase, such as a cross-reference that only one document can resolve.
 
 ## Building the spec
 
