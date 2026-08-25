@@ -7,8 +7,10 @@ Structural equality $\eqOp$ compares literals by value, lists and tuples element
 the same keys by their values, and objects of the same class by their fields; \pyinline{None} compares
 with any value. Otherwise equality is undefined: between values of different kinds, such as a number and a
 string, a list and a tuple, or a Boolean and a number; between functions; and between two
-\pyinline{nan}s. Python gives an answer in each case (\figref{coercions}), so each is a dynamically excluded
-comparison. Comparison stops at the first element that
+\pyinline{nan}s inside a container. Directly, \pyinline{nan == nan} is \pyinline{False} in both languages,
+but Python compares container elements by identity before equality, so two lists holding \pyinline{nan}s
+are equal or not according to whether they hold the same object, a distinction \PurePy cannot make.
+Python gives an answer in each case (\figref{coercions}), so each is a dynamically excluded comparison. Comparison stops at the first element that
 decides the result, so its order is observable:
 
 \begin{python}
