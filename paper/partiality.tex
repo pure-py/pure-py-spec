@@ -19,12 +19,12 @@ print([1, "a"] == [1, 3])  # undefined: "a" against 3
 \end{python}
 
 \noindent Dictionaries are compared in the entry order of the left operand for the same reason. The membership
-function $\memOp$ is defined through equality and short-circuits in the same way. The strict operators are given by
+function $\memOp$ tests an element of a list or tuple by structural equality, short-circuiting in the same
+way, a key of a dictionary, or a substring of a string. The strict operators are given by
 $\hat{\odot}$ and $\hat{\ominus}$ (\figref{operators}); the definitions of all of these are given in
 \specification.
 
 \input{paper/fig/operators}
-\input{paper/fig/membership}
 
 The remaining metafunctions the rules use are collected in \figref{eval-aux}: $\outcome$ reads a
 block's result as the outcome of calling it, $\iterOp$ gives the sequence a generator draws from, $\getitem$
