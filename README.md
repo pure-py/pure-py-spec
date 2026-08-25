@@ -20,7 +20,7 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 - `src/` — reference checker (Python `ast`-based), organised to mirror the spec's sections
 - `test/` — litmus tests
 
-The specification is the source of truth, and the paper is built from its sections and definitions.
+The specification is the source of truth; the paper is built from its sections and definitions.
 Material that belongs only to the paper is kept under `paper/`. To insert such material into a shared
 section, write `\paperinput{file}` in the specification source where the material should go: when the
 paper is built the contents of the file are inserted there, and when the specification is built nothing
