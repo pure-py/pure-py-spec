@@ -1,16 +1,7 @@
 \begin{figure}
 \small
 \begin{align*}
-\memOp(\exList{\varepsilon}, v) &{}= \pyinline{False} \\
-\memOp(\exTuple{\varepsilon}, v) &{}= \pyinline{False} \\
-\memOp(\exList{v' \cons \seq{v}}, v) &{}= \pyinline{True} && \text{if } \eqOp(v, v') = \pyinline{True} \\
-\memOp(\exList{v' \cons \seq{v}}, v) &{}= \memOp(\exList{\seq{v}}, v) && \text{if } \eqOp(v, v') = \pyinline{False} \\
-\memOp(\exTuple{v' \cons \seq{v}}, v) &{}= \pyinline{True} && \text{if } \eqOp(v, v') = \pyinline{True} \\
-\memOp(\exTuple{v' \cons \seq{v}}, v) &{}= \memOp(\exTuple{\seq{v}}, v) && \text{if } \eqOp(v, v') = \pyinline{False} \\
-\memOp(\delta, w) &{}= \pyinline{True} && \text{if } w \in \dom(\delta) \\
-\memOp(\delta, w) &{}= \pyinline{False} && \text{if } w \notin \dom(\delta) \\
-\memOp(w', w) &{}= \pyinline{True} && \text{if } w' = w_1 \concat w \concat w_2 \text{ for some } w_1, w_2 \\
-\memOp(w', w) &{}= \pyinline{False} && (\text{otherwise})
+\input{functions/contains}
 \end{align*}
 \caption{Membership, undefined where no case applies}
 \label{fig:membership}

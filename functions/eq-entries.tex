@@ -1,0 +1,3 @@
+\eqEntries(\varepsilon, \delta') &{}= \pyinline{True} \\
+\eqEntries(\bind{w}{v} \cons \delta, \delta') &{}= \pyinline{False} && \text{if } \eqOp(v, \delta'(w)) = \pyinline{False} \\
+\eqEntries(\bind{w}{v} \cons \delta, \delta') &{}= \eqEntries(\delta, \delta') && \text{if } \eqOp(v, \delta'(w)) = \pyinline{True}

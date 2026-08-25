@@ -115,4 +115,95 @@ The string literal naming module $q$, so that $\nameOf(\pymath{\_\_main\_\_}) = 
 \section{Values}
 \label{sec:mf-values}
 
-\input{tex/auxiliary-values}
+The functions on values used by the evaluation rules. The operators, structural equality and membership
+have the meanings they have in Python and yield $\aborts{\kappa}$ where Python raises. All three are
+undefined where no case applies, and where one of them is undefined the expression has no derivation,
+which is where \PurePy declines to give the operation the meaning Python gives it; a non-Boolean test is
+the same case.
+
+\begin{auxfunction}{\hat{\odot}(v, v'), \hat{\ominus}(v)}{outcome}{aux:operators}
+The meaning of a strict binary or unary operator applied to its operands.
+\begin{center}
+\small
+\input{functions/operators}
+\end{center}
+\end{auxfunction}
+
+\begin{auxfunction}{\eqOp(v, v')}{Boolean}{aux:eq}
+Structural equality: literals by value, lists and tuples elementwise, dictionaries by their keys and
+entries, and objects by their class and then their fields. \pyinline{None} compares with any value;
+otherwise equality is undefined between values of different kinds.
+\begin{align*}
+\input{functions/eq}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\eqEntries(\delta, \delta')}{Boolean}{aux:eq-entries}
+Whether each entry of $\delta$ has an equal value under its key in $\delta'$; used by $\eqOp$ on
+dictionaries with the same keys.
+\begin{align*}
+\input{functions/eq-entries}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\memOp(v, v')}{Boolean}{aux:contains}
+Whether $v'$ is an element of $v$: of a list or tuple by structural equality, of a dictionary as a key,
+and of a string as a substring.
+\begin{align*}
+\input{functions/contains}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\elems(v)}{sequence of values}{aux:elems}
+The elements of a list or tuple, or the characters of a string, in order.
+\begin{align*}
+\input{functions/elems}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\iterOp(v)}{sequence of values}{aux:iter}
+The sequence a generator draws from $v$: the keys of a dictionary, and otherwise its elements.
+\begin{align*}
+\input{functions/iter}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\getitem(v, v')}{outcome}{aux:getitem}
+Subscripting: the value under key $v'$ of a dictionary, or the element at index $v'$ of a sequence,
+counting from the end when the index is negative. It aborts with \pyinline{KeyError},
+\pyinline{IndexError} or \pyinline{TypeError} where Python does.
+\begin{align*}
+\input{functions/getitem}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\outcome(r)}{outcome}{aux:outcome}
+The result of a block read as the outcome of calling it: a returned value, \pyinline{None} for a block
+that completes without returning, and an abort unchanged.
+\begin{align*}
+\input{functions/outcome}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\dispatch(\rho, v, \seq{p}, \seq{b})}{bindings and block}{aux:dispatch}
+The case a \pyinline{match} statement takes for value $v$: the bindings and block of the first pattern that
+matches, or no bindings and \pyinline{pass} if none does.
+\begin{align*}
+\input{functions/dispatch}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\entries(\delta, \delta')}{dictionary entries}{aux:entries}
+The entries $\delta$ extended by those of $\delta'$ in order, each replacing any earlier entry under
+its key.
+\begin{align*}
+\input{functions/entries}
+\end{align*}
+\end{auxfunction}
+
+\begin{auxfunction}{\update(\delta, w, v)}{dictionary entries}{aux:update}
+The entries $\delta$ with $w$ bound to $v$, replacing any earlier binding of $w$.
+\begin{align*}
+\input{functions/update}
+\end{align*}
+\end{auxfunction}

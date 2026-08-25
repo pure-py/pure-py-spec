@@ -22,12 +22,6 @@
   \newcommand*{\paperonly}[1]{#1}
   \newcommand*{\speconly}[1]{}
 \fi
-% \inplace inputs a unit where it stands in the paper; the specification places the same unit elsewhere.
-\ifdefined\specmode
-  \newcommand*{\inplace}[1]{}
-\else
-  \newcommand*{\inplace}[1]{\input{#1}}
-\fi
 \newcommand*{\version}[3]{%
   \gdef\versionstring{#1.#2.#3}%
 }
@@ -43,6 +37,7 @@
 \newcommand*{\figrefThree}[3]{Figures~\ref{fig:#1}, \ref{fig:#2} and \ref{fig:#3}}
 \newcommand*{\secref}[1]{\S\ref{sec:#1}}
 \providecommand*{\seckind}{section}
+\providecommand*{\thisdoc}{paper}
 \newcommand*{\todo}[1]{\textcolor{red}{[\textbf{TODO:} #1]}}
 
 % Figure and rule presentation

@@ -19,15 +19,15 @@ $\env(\rho, q)$ & environment & the environment of module $q$ as loaded in $\rho
 $\nameOf(q)$ & string & the string literal naming module $q$ & \S\ref{aux:name}
    \\[2mm]
 \grammarGroup{Values} \\
-$\hat{\odot}(v, v')$, $\hat{\ominus}(v)$ & outcome & meaning of a binary or unary operator & \figref{operators} \\
-$\eqOp(v, v')$ & Boolean & structural equality; undefined between unrelated values & \figref{equality} \\
-$\eqEntries(\delta, \delta')$ & Boolean & equality of dictionary entries & \figref{equality} \\
-$\memOp(v, v')$ & Boolean & whether $v'$ is an element of $v$ & \figref{membership} \\
-$\elems(v)$ & sequence of values & the elements of a list, tuple or string & \figref{eval-aux} \\
-$\iterOp(v)$ & sequence of values & the sequence a generator draws from $v$; the keys of a dictionary & \figref{eval-aux} \\
-$\getitem(v, v')$ & outcome & subscripting & \figref{eval-aux} \\
-$\outcome(r)$ & outcome & the result of a block read as the outcome of calling it & \figref{eval-aux} \\
-$\dispatch(\rho, v, \seq{p}, \seq{b})$ & bindings and block & the case a \pyinline{match} takes & \figref{eval-aux} \\
-$\entries(\delta, \delta')$, $\update(\delta, w, v)$ & dictionary entries & a dictionary built from its entries, later entries overriding earlier & \figref{eval-aux}
+$\hat{\odot}(v, v')$, $\hat{\ominus}(v)$ & outcome & meaning of a binary or unary operator & \S\ref{aux:operators} \\
+$\eqOp(v, v')$ & Boolean & structural equality; undefined between unrelated values & \S\ref{aux:eq} \\
+$\eqEntries(\delta, \delta')$ & Boolean & equality of dictionary entries & \S\ref{aux:eq-entries} \\
+$\memOp(v, v')$ & Boolean & whether $v'$ is an element of $v$ & \S\ref{aux:contains} \\
+$\elems(v)$ & sequence of values & the elements of a list, tuple or string & \S\ref{aux:elems} \\
+$\iterOp(v)$ & sequence of values & the sequence a generator draws from $v$; the keys of a dictionary & \S\ref{aux:iter} \\
+$\getitem(v, v')$ & outcome & subscripting & \S\ref{aux:getitem} \\
+$\outcome(r)$ & outcome & the result of a block read as the outcome of calling it & \S\ref{aux:outcome} \\
+$\dispatch(\rho, v, \seq{p}, \seq{b})$ & bindings and block & the case a \pyinline{match} takes & \S\ref{aux:dispatch} \\
+$\entries(\delta, \delta')$, $\update(\delta, w, v)$ & dictionary entries & a dictionary built from its entries, later entries overriding earlier & \S\ref{aux:entries}
 \end{tabular}
 \end{center}

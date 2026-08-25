@@ -43,7 +43,24 @@ outcomes of the same form, carrying a result, a sequence of values or an environ
 
 \speconly{The operators and the other auxiliary functions the evaluation rules use are defined in
 \secref{mf-values}, and module and class resolution in \secref{mf-classes}.}
-\inplace{tex/auxiliary-values}
+\begin{PaperOnly}
+The strict operators are given by metafunctions $\hat{\odot}$ and $\hat{\ominus}$ (\figref{operators}), in
+terms of structural equality $\eqOp$ and membership $\memOp$ (\figrefTwo{equality}{membership}). They have
+the meanings they have in Python and yield $\aborts{\kappa}$ where Python raises. All three are undefined
+where no case applies, and where one of them is undefined the expression has no derivation, which is where
+\PurePy declines to give the operation the meaning Python gives it; a non-Boolean test is the same case\paperonly{ (\secref{no-coercions})}.
+
+\input{fig/operators}
+\input{fig/equality}
+\input{fig/membership}
+
+The remaining metafunctions the rules use are collected in \figref{eval-aux}: $\outcome$ reads a
+block's result as the outcome of calling it, $\iterOp$ gives the sequence a generator draws from, $\getitem$
+interprets subscripting, $\dispatch$ selects the case a $\pyinline{match}$ takes, and $\entries$ and
+$\update$ build a dictionary from its entries.
+
+\input{fig/eval-aux}
+\end{PaperOnly}
 \begin{PaperOnly}
 A qualified name is resolved through the environments of loaded modules: $\env(\rho, q)$ is the
 environment of module $q$ as loaded in $\rho$, and $\resolveClass(\rho, q)$ the class entry that $q$
@@ -79,7 +96,7 @@ most once, the entry comparison in \ruleName{eval-pat-constr} amounts to a compa
 
 Block evaluation $\rho, b \Rightarrow r$, for any $\rho : \Gamma$ and any $b$ well-formed in $\Gamma$,
 is given in \figrefTwo{eval-block-outcome}{eval-block-fails}. Function definitions delimit
-the scope of sequential-composition effects, so as black boxes functions are always pure. The metafunction $\outcome$ (\figref{eval-aux}) reads a block's result as
+the scope of sequential-composition effects, so as black boxes functions are always pure. The metafunction $\outcome$ (\paperonly{\figref{eval-aux}}\speconly{\S\ref{aux:outcome}}) reads a block's result as
 the outcome of calling it, $\val{\pyinline{None}}$ where the block falls off the end.
 
 Expression evaluation $\rho, e \Rightarrow o$ (\figrefTwo{eval-outcome}{eval-outcome-ctd}), for any $\rho : \Gamma$ and any $e$ well-formed in $\Gamma$, yields an
@@ -87,7 +104,7 @@ outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
 \ruleName{eval-if} does. A comprehension evaluates its body once for each binding its qualifiers produce, and
-concatenates the results; a generator draws from $\iterOp$ (\figref{eval-aux}), which is
+concatenates the results; a generator draws from $\iterOp$ (\paperonly{\figref{eval-aux}}\speconly{\S\ref{aux:iter}}), which is
 defined on lists, tuples, strings and dictionaries, a dictionary yielding its keys as in Python.
 These are the only values a generator can draw from.
 
