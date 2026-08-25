@@ -1,0 +1,20 @@
+\figref{eval-example} shows three rules of the expression judgement, which stand for the rest.
+\ruleName{eval-binop} evaluates both operands and binds the outcome of the second. The meaning
+$\hat{\odot}(v, v')$ of the operator is itself an outcome, $\aborts{\kappa}$ where Python raises, and is
+undefined where \PurePy gives the operation no meaning; an expression whose operator meaning is undefined
+has no derivation. \ruleName{eval-binop-fail} propagates an abort from the first operand.
+\ruleName{eval-call-nonfun} originates an abort: calling a value that is neither closure nor primitive
+is a \pyinline{TypeError}, as in Python. The remaining rules follow the same pattern and are given in
+full in \specification.
+
+\begin{figure}
+\begin{mathpar}
+\input{spec/rules/eval-binop}
+\and
+\input{spec/rules/eval-binop-fail}
+\and
+\input{spec/rules/eval-call-nonfun}
+\end{mathpar}
+\caption{Expression evaluation: representative rules}
+\label{fig:eval-example}
+\end{figure}

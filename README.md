@@ -23,8 +23,9 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 The specification is the source of truth; the paper is built from its sections and definitions.
 Material that belongs only to the paper is kept under `paper/`. To insert such material into a shared
 section, write `\paperinput{file}` in the specification source where the material should go. The paper
-includes the file at that point; the specification does not. `\paperonly{...}` and `\speconly{...}` do
-the same for a phrase.
+includes the file at that point; the specification does not. `\specinput{file}` is the reverse: the
+specification includes the file and the paper does not. `\paperonly{...}` and `\speconly{...}` do the
+same for a phrase.
 
 ## Building the spec
 

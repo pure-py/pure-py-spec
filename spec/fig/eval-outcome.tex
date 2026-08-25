@@ -243,14 +243,7 @@
   \rho, \exUnaryOp{\ominus}{e} \Rightarrow \mlet{v}{o}{\hat{\ominus}(v)}
 }
 \and
-\inferrule*[lab={\ruleName{eval-binop}}]
-{
-  \rho, e \Rightarrow \val{v} \\
-  \rho, e' \Rightarrow o
-}
-{
-  \rho, \exBinOp{e}{\odot}{e'} \Rightarrow \mlet{v'}{o}{\hat{\odot}(v, v')}
-}
+\input{spec/rules/eval-binop}
 \and
 \inferrule*[lab={\ruleName{eval-list}}]
 {
@@ -466,13 +459,7 @@
 \flushleft \shadebox{$\rho, e \Rightarrow o$ (continued)}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{eval-binop-fail}}]
-{
-  \rho, e \Rightarrow \aborts{\kappa}
-}
-{
-  \rho, \exBinOp{e}{\odot}{e'} \Rightarrow \aborts{\kappa}
-}
+\input{spec/rules/eval-binop-fail}
 \and
 \inferrule*[lab={\ruleName{eval-and-fail}}]
 {
@@ -659,15 +646,7 @@
   \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \aborts{\errType}
 }
 \and
-\inferrule*[lab={\ruleName{eval-call-nonfun}}]
-{
-  \rho, e \Rightarrow \val{v} \\
-  \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
-  v \text{ neither closure nor primitive}
-}
-{
-  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \aborts{\errType}
-}
+\input{spec/rules/eval-call-nonfun}
 \end{mathpar}
 \caption{Expression evaluation, continued (aborting cases)}
 \label{fig:eval-fails}
