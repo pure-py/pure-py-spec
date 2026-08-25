@@ -10,34 +10,22 @@ $s : \Assigns{\Delta}$; and $\binds(p)$, the set of variables a pattern $p$ intr
 \subsubsection{No reassignment of captured variables}
 \label{sec:captured-vars}
 
-A lambda or nested function definition may refer to variables of the enclosing scope, which it is said to
-\emph{capture}. The set of variables of the enclosing scope captured by the lambdas and nested function
-definitions within a statement $s$ is $\capturesS(s)$, with $\capturesE(e)$ the same for an expression $e$: the
-free variables of each such function's body, less its parameters and the variables the body assigns, which are local to it. For a
-mutual region of function definitions (\secref{syntax}) the names of the functions themselves are also
-excluded.
+In Python a closure holds a mutable binding, so a variable captured by a lambda or nested function
+definition may be reassigned afterwards, changing what the function sees (\secref{no-mutable-state}).
+\PurePy excludes this: a variable captured by a statement may not be assigned later in the same block, nor
+by that statement itself. The \ruleName{cons} rule imposes the first as a side condition on a block $s; b$,
+$\capturesS(s) \cap \assignsS(b) = \varnothing$, and the \ruleName{statement} rule does the same for the
+statements of a module; in the example of \secref{no-mutable-state}, \pyinline{x} is captured by the
+definition of \pyinline{g} and assigned by \pyinline{x = 6}, so the program is rejected. The
+\ruleName{assign} rule imposes the second, $x \notin \capturesE(e)$ for an assignment $x = e$, rejecting
+for instance \pyinline{x = lambda: x}, whose lambda under Python's late binding would return itself. A
+dataclass declaration counts as an assignment of its class name here, though re-declaring a class name is
+excluded outright (\secref{no-first-class}).
 
-In Python a closure captures a mutable binding, so reassigning a captured variable after the closure is
-created changes what the closure sees, as in the example of \secref{no-mutable-state}, where \pyinline{x}
-is captured by the definition of \pyinline{g} and then reassigned by \pyinline{x = 6}. \PurePy rejects
-that program by a side condition on the \ruleName{cons} rule: in a block $s; b$, no variable captured by
-$s$ may be assigned in $b$, that is $\capturesS(s) \cap \assignsS(b) = \varnothing$. The
-\ruleName{statement} rule imposes the same condition on the statements of a module. A dataclass
-declaration counts as an assignment of its class name here, though re-declaring a class name is excluded
-outright (\secref{no-first-class}).
-
-The same issue arises within a single statement when the expression assigned to a variable captures that
-variable:
-
-\begin{python}
-def f():
-    x = 5
-    x = lambda: x  # Python: the lambda returns itself
-    return x()
-\end{python}
-
-\noindent The \ruleName{assign} rule requires $x \notin \capturesE(e)$ for an assignment $x = e$, so the
-program is rejected. A function definition is not subject to this condition, because the \ruleName{def}
-rule binds the names of its mutual region for every body: a body's reference to its own name or a
-sibling's denotes the definition, which is also what Python's late binding finds
+Here $\capturesS(s)$ is the set of variables of the enclosing scope captured by the lambdas and nested
+function definitions within a statement $s$, with $\capturesE(e)$ the same for an expression $e$: the
+free variables of each such function's body, less its parameters and the variables the body assigns, which
+are local to it. For a mutual region of function definitions (\secref{syntax}) the names of the functions
+themselves are also excluded: the \ruleName{def} rule binds them for every body, so a body's reference to
+its own name or a sibling's denotes the definition, which is also what Python's late binding finds
 (\secref{mutual-recursion}).
