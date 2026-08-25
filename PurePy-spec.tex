@@ -53,7 +53,9 @@
 % prose and rows.
 \newenvironment{auxfunction}[3]{%
   \par\addvspace{\bigskipamount}\phantomsection\label{#3}%
-  \noindent{\bfseries $#1$}\hfill{\itshape #2}\par\nobreak\smallskip\noindent\ignorespaces}
+  \noindent{\color{gray!60}\rule{\textwidth}{0.4pt}}\par\nobreak\vskip-\parskip\nointerlineskip
+  \noindent\colorbox{grammarheadcolor}{\parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
+    {\bfseries $#1$}\hfill{\itshape #2}}}\par\nobreak\smallskip\noindent\ignorespaces}
   {\par\addvspace{\bigskipamount}}
 
 \version{0}{14}{1}
