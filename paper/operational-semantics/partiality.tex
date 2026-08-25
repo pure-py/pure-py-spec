@@ -26,13 +26,6 @@ $\hat{\odot}$ and $\hat{\ominus}$ (\figref{operators}); the definitions of all o
 
 \input{paper/fig/operators}
 
-The remaining metafunctions the rules use are collected in \figref{eval-aux}: $\outcome$ reads a
-statement's result as the outcome of calling it, $\iterOp$ gives the sequence a generator draws from, $\getitem$
-interprets subscripting, $\dispatch$ selects the case a $\pyinline{match}$ takes, and $\entries$ and
-$\update$ build a dictionary from its entries.
-
-\input{paper/fig/eval-aux}
-
 A qualified name is resolved through the environments of loaded modules: $\env(\rho, q)$ is the
 environment of module $q$ as loaded in $\rho$, and $\resolveClass(\rho, q)$ the class entry that $q$
 denotes (\figref{resolution}).
