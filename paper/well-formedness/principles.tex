@@ -122,7 +122,7 @@ scope after the \pyinline{match} statement. \PurePy follows: each case is treate
 assignment of the variables it binds. The set of variables a pattern $p$ introduces is $\binds(p)$; the
 \ruleName{match} rule checks each body in a context in which they are definitely assigned, and combines
 the cases with $\merge$ as the \ruleName{if} rules do, so a variable is definitely assigned after the match
-only if every case binds it or returns. A match whose last case is not a catch-all (a variable or
+only if every case binds it or returns. A match whose last case is not a catch-all (i.e.~a variable or
 wildcard) may fall through; in this case the \ruleName{match-partial} rule merges in the empty assignment set, as for a
 conditional without an \pyinline{else}:
 
