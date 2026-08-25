@@ -24,11 +24,7 @@
   \newcommand*{\specinput}[1]{}
 \fi
 % How the paper refers to the specification document.
-\ifdefined\anonmode
-  \newcommand*{\specification}{the language specification (supplementary material)\xspace}
-\else
-  \newcommand*{\specification}{the \PurePy specification~\citep{purepy-spec}\xspace}
-\fi
+\newcommand*{\specification}{the \PurePy specification (supplementary material)\xspace}
 \newcommand*{\version}[3]{%
   \gdef\versionstring{#1.#2.#3}%
 }
