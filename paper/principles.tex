@@ -115,3 +115,37 @@ def g():     # error: g defined twice in the same region
 which late binding then makes the target of the call in \pyinline{f}. Finally, the branches of a conditional may contain mutual regions of their own, with any use of those
 functions after the conditional subject to the usual definite assignment rules (\secref{local-assignment}).
 
+\subsubsection{Pattern binding and reachability}
+\label{sec:pattern-binding}
+
+A \pyinline{case} pattern binds variables, and Python scopes them as it does assignments: they remain in
+scope after the \pyinline{match} statement. \PurePy follows, treating each case as a branch that assigns
+the variables its pattern binds. The set of variables a pattern $p$ introduces is $\binds(p)$; the
+\ruleName{match} rule checks each body in a context in which they are definitely assigned, and combines
+the cases with $\merge$ as the \ruleName{if} rules do, so a variable is definitely assigned after the match
+only if every case binds it or returns. A match whose last case is not a catch-all (a variable or
+wildcard) may fall through, and the \ruleName{match-partial} rule merges in the empty assignment, as for a
+conditional without \pyinline{else}:
+
+\begin{python}
+v = (1, 2)
+match v:
+    case (x, y):
+        print(x, y)
+print(x)  # error: x not definitely assigned
+\end{python}
+
+\noindent Python prints \pyinline{1}, the binding having escaped the match. Within a pattern the
+variables must be distinct, as in Python. The cases must also each be reachable: the \ruleName{cases-cons}
+rule rejects a case whose pattern is subsumed by an earlier one (\secref{wf-patterns}), which Python
+leaves silently unreachable:
+
+\begin{python}
+v = (1, 2)
+match v:
+    case (a, b):
+        print("seq", a, b)
+    case (1, 2):  # error: subsumed by the previous case
+        print("lit")
+\end{python}
+
