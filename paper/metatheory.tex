@@ -1,11 +1,10 @@
-\subsection{Properties}
-\label{sec:properties}
+\subsection{Metatheory}
+\label{sec:metatheory}
 
-A value is well-formed at a context entry (\figref{well-formed-env}): ordinary values at
-$\statusDefAssigned$, module references and class entries at the corresponding entry. An environment is
-well-formed at a context that binds its variables at corresponding entries. The predefined environments
-are well-formed at their contexts, and loading preserves well-formedness; these are the base case and the
-module case of a soundness result for well-formedness, which remains to be established.
+\figref{well-formed-env} defines when a value is well-formed at a context entry: an ordinary value at
+$\statusDefAssigned$, a module or class value at the matching module or class entry. An environment is
+well-formed in a context that binds its variables at such entries. The predefined environments are
+well-formed and loading preserves well-formedness, the base case and the module case of soundness.
 
 \begin{lemma}[Predefined environments]
 \label{lem:predefined}
