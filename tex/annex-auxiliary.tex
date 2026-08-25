@@ -70,8 +70,7 @@ The field names a field list declares, in order.
 \end{auxfunction}
 
 \begin{auxfunction}{\fields(C)}{sequence of variables}{aux:fields}
-All fields of class $C$: the fields of its base class, looked up in the declaring context, followed by
-its own.
+The fields of class $C$: the fields of its base class, if any, followed by the fields $C$ declares.
 \begin{align*}
 \input{functions/fields}
 \end{align*}
@@ -102,8 +101,8 @@ The environment of module $q$ as loaded in $\rho$, reached by following the modu
 \end{auxfunction}
 
 \begin{auxfunction}{\resolveClass(\rho, q)}{class entry}{aux:resolve-class}
-The class entry that qualified name $q$ denotes in $\rho$: a bare class name is looked up directly, a
-qualified one in the environment of its module.
+The class entry that qualified name $q$ denotes in $\rho$. A simple class name is looked up in $\rho$
+directly; a qualified name is looked up in the environment of its module.
 \begin{align*}
 \input{functions/resolve-class}
 \end{align*}
