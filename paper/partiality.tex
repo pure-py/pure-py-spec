@@ -2,9 +2,6 @@
 \label{sec:partiality}
 
 \input{spec/functions/operators-text}
-For a run that reaches an undefined operation the specification prescribes nothing: a conforming
-implementation may produce Python's result, as a stock interpreter does, or abort
-(\secref{python-compatibility}).
 
 Structural equality $\eqOp$ compares literals by value, lists and tuples elementwise, dictionaries with
 the same keys by their values, and objects of the same class by their fields; \pyinline{None} compares
