@@ -16,7 +16,7 @@ to sequential composition of result types:
 \assigns{\rho} \override \aborts{\kappa} & = \aborts{\kappa}
 \end{align*}}
 
-with $\assigns{\varnothing}$ as left and right unit.
+\noindent with $\assigns{\varnothing}$ as left and right unit.
 
 \input{spec/fig/eval-values}
 
@@ -59,7 +59,7 @@ sequentially:
 m \override \noMatch = \noMatch \override m & {}= \noMatch
 \end{align*}}
 
-with $\matchOk{\varnothing}$ as left and right unit.
+\noindent with $\matchOk{\varnothing}$ as left and right unit.
 A constructor pattern matches any object whose class has the
 pattern's class among its ancestors; sub-patterns bind the fields of the pattern's class. An object records
 its class entry, whose qualified name is the identity of the class: since a module declares each class name at
