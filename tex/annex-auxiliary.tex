@@ -29,8 +29,8 @@ over the immediate subpatterns.
 
 \begin{auxfunction}{\capturesS(s)}{set of variables}{aux:captures}
 The variables of the enclosing scope captured by closures (lambdas or nested function definitions) within
-$s$. On the cases not shown it takes the union of $\capturesE$ over the statement's subexpressions and of
-$\capturesS$ over the blocks it contains, and it extends to blocks and module bodies as $\assignsS$ does.
+$s$. On the cases not shown it takes the union of $\capturesE$ over the subexpressions of $s$ and of
+$\capturesS$ over its blocks, and extends to blocks and module bodies as $\assignsS$ does.
 \begin{align*}
 \input{functions/captures}
 \end{align*}
@@ -85,7 +85,7 @@ Class $C$ together with all its base classes.
 
 \begin{auxfunction}{\fieldMap(C, \seq{u})}{map from variables}{aux:field-map}
 The argument supplied for each field of $C$: positional arguments fill the fields in order and keyword
-arguments name theirs. It is undefined unless the arguments cover the fields exactly, so constructor
+arguments match by name. It is undefined unless the arguments cover the fields exactly, so constructor
 patterns and expressions check and evaluate field by field without regard to how a constructor splits its
 arguments.
 \begin{align*}
@@ -138,8 +138,8 @@ The meaning of a unary operator.
 \end{auxfunction}
 
 \begin{auxfunction}{\eqOp(v, v')}{Boolean}{aux:eq}
-Structural equality: literals by value, lists and tuples elementwise, dictionaries by their keys and
-entries, and objects by their class and then their fields. \pyinline{None} compares with any value;
+Structural equality: literals by value, lists and tuples elementwise, dictionaries by keys and
+entries, and objects by class and then by fields. \pyinline{None} compares with any value;
 otherwise equality is undefined between values of different kinds.
 \begin{align*}
 \input{functions/eq}
@@ -203,7 +203,7 @@ matches, or no bindings and \pyinline{pass} if none does.
 
 \begin{auxfunction}{\entries(\delta, \delta')}{dictionary entries}{aux:entries}
 The entries $\delta$ extended by those of $\delta'$ in order, each replacing any earlier entry under
-its key.
+the same key.
 \begin{align*}
 \input{functions/entries}
 \end{align*}
