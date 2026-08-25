@@ -49,9 +49,9 @@ function $\dispatch$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{a
 case.
 \paperinput{paper/operational-semantics/match}
 Having no derivation is a third
-possibility, distinct from both match results: the match has no meaning, and \PurePy gives the run no result. A pattern and a
-value that are not comparable have no derivation, since \PurePy can say neither that they match nor that
-they do not; a list pattern against a tuple is such a case. Sub-results compose with $\override$, matching
+possibility, distinct from both match results: where a pattern and a value are not comparable, as a list
+pattern against a tuple, \PurePy can say neither that they match nor that they do not, and gives the run
+no result. Sub-results compose with $\override$, matching
 sequentially:
 {\small
 \begin{align*}
