@@ -27,5 +27,5 @@ function definitions within a statement $s$, with $\capturesE(e)$ computing the 
 free variables of each such function's body, less its parameters and any variables the body assigns, which
 are local to it. For a mutual region of function definitions (\secref{syntax}) the names of the functions
 themselves are also excluded: the \ruleName{def} rule binds them for every body, so a body's reference to
-its own name or a sibling's denotes the definition, which is also what Python's late binding finds
+its own name or a sibling's denotes the definition, consistent with Python's late binding semantics
 (\secref{mutual-recursion}).
