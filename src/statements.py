@@ -7,7 +7,7 @@ import reasons
 from reasons import IllFormedModule
 from contexts import (ClassEntry, Context, ContextEntry, ModuleContext, ModuleLoaded, ModuleStub,
                       class_entry, entry_of,
-                      field_map, short_name, ResultTy, Status, ASSIGNS_EMPTY, RETURNS, Assigns,
+                      field_map, short_name, ResultType, Status, ASSIGNS_EMPTY, RETURNS, Assigns,
                       Returns, VarContext, class_of, extend_context, fields, merge_results,
                       module_of, override_gamma, override_results, override_var, var_status)
 from aux import (Statement, assigns_body, assigns_seq, binds, captures_e, captures_statement,
@@ -15,7 +15,7 @@ from aux import (Statement, assigns_body, assigns_seq, binds, captures_e, captur
                  qualified_name)
 from patterns import check_pattern_list, dict_key, is_catch_all
 
-def result_type(node: ast.stmt) -> ResultTy:
+def result_type(node: ast.stmt) -> ResultType:
     if isinstance(node, ast.Pass):
         return ASSIGNS_EMPTY
     if isinstance(node, ast.Assign):
@@ -40,7 +40,7 @@ def result_type(node: ast.stmt) -> ResultTy:
         return ASSIGNS_EMPTY
     raise AssertionError(f'unexpected statement: {type(node).__name__}')
 
-def result_type_of_body(body: list[ast.stmt]) -> ResultTy:
+def result_type_of_body(body: list[ast.stmt]) -> ResultType:
     if len(body) == 1:
         return result_type(body[0])
     return override_results(result_type(body[0]), result_type_of_body(body[1:]))
@@ -69,7 +69,7 @@ def check_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
     return check_seq(tail, next_ctx_after(head, ctx))
 
 def next_ctx_after(head: Statement, ctx: ModuleContext) -> ModuleContext:
-    # Assigns {c: C} for a class statement: ResultTy carries statuses only, so the class entry is
+    # Assigns {c: C} for a class statement: ResultType carries statuses only, so the class entry is
     # added here rather than through the result type.
     if isinstance(head, ast.ClassDef):
         return override_gamma(ctx, {head.name: class_entry_for(head, ctx.q, ctx.gamma)})
@@ -77,7 +77,7 @@ def next_ctx_after(head: Statement, ctx: ModuleContext) -> ModuleContext:
     delta = head_result.delta if isinstance(head_result, Assigns) else {}
     return override_var(ctx, delta)
 
-def result_type_of_statement(item: Statement) -> ResultTy:
+def result_type_of_statement(item: Statement) -> ResultType:
     if isinstance(item, list):
         return Assigns({d.name: Status.TT for d in item})
     return result_type(item)

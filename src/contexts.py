@@ -65,7 +65,7 @@ class Returns:
 class Assigns:
     delta: VarContext = field(default_factory=dict)
 
-ResultTy = Union[Returns, Assigns]
+ResultType = Union[Returns, Assigns]
 
 RETURNS = Returns()
 
@@ -93,7 +93,7 @@ def merge_delta(d1: VarContext, d2: VarContext) -> VarContext:
     return {k: merge_status(d1[k], d2[k]) if k in d1 and k in d2 else Status.FF
             for k in set(d1.keys()) | set(d2.keys())}
 
-def merge_results(rs: list[ResultTy]) -> ResultTy:
+def merge_results(rs: list[ResultType]) -> ResultType:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return RETURNS
@@ -108,7 +108,7 @@ def fold_merge(acc: VarContext, branches: list[Assigns]) -> VarContext:
 def override_delta(d1: VarContext, d2: VarContext) -> VarContext:
     return {**d1, **d2}
 
-def override_results(r1: ResultTy, r2: ResultTy) -> ResultTy:
+def override_results(r1: ResultType, r2: ResultType) -> ResultType:
     if isinstance(r1, Returns):
         return r1
     if isinstance(r2, Returns):
