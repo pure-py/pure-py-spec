@@ -122,31 +122,6 @@ $\assignsS(b)$ for the body of \pyinline{f}, and is therefore introduced at $\st
 function. The reference to \pyinline{y} in \pyinline{x = y} then fails the well-formedness check, since
 $\Gamma(\pyinline{y}) = \statusNotDefAssigned$ rather than $\Gamma(\pyinline{y}) = \statusDefAssigned$.
 
-\subsubsection{Reassignment of captured variables}
-\label{sec:captured-vars}
-
-The exclusion of captured-variable reassignment (\secref{no-mutable-state}) is enforced by a side condition
-on the \ruleName{cons} rule: no variable captured by a statement $s$ may be reassigned in the rest of the block
-$b$. In the example of \secref{no-mutable-state}, \pyinline{x} is captured by the definition of
-\pyinline{g} and reassigned by \pyinline{x = 6}, so the program is rejected. A dataclass declaration counts as
-an assignment of its class name for these definitions, though re-declaring a class name is excluded outright
-(\secref{no-first-class}).
-
-The same issue arises when a variable is captured and reassigned in the \emph{same} statement:
-
-\begin{python}
-x = 5
-def x():
-    return x
-x()  # Python: returns the function (late binding); pure: returns 5
-\end{python}
-
-\noindent The side condition on the \ruleName{assign} rule rejects programs like this, requiring that the
-variable being bound is not captured by the expression. The \ruleName{def} rule, by contrast, binds
-each $f_i$ in the typing context for every body $b_i$, so the function names may legitimately appear in
-$\capturesS$ of those bodies. This is what permits self-recursion (the singleton-region case) and
-mutual recursion within a region.
-
 \subsubsection{Mutual recursion}
 \label{sec:mutual-recursion}
 

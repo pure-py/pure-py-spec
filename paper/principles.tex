@@ -1,0 +1,43 @@
+\subsection{Principles}
+\label{sec:principles}
+
+Well-formedness enforces a small number of principles. This section states each with the programs it
+accepts and rejects and the auxiliary functions its rules use; the rules themselves follow. Two analyses
+appear throughout: $\assignsS(s)$, the set of variables assigned anywhere in $s$, not descending into nested
+function definitions, which have their own scope, so that $\assignsS(s) = \dom(\Delta)$ when
+$s : \Assigns{\Delta}$; and $\binds(p)$, the set of variables a pattern $p$ introduces.
+
+\subsubsection{No reassignment of captured variables}
+\label{sec:captured-vars}
+
+A lambda or nested function definition may refer to variables of the enclosing scope, which it is said to
+\emph{capture}. $\capturesS(s)$ is the set of variables of the enclosing scope captured by the closures
+within statement $s$, and $\capturesE(e)$ the same for an expression $e$: the free variables of each
+closure's body, less its parameters and the variables the body assigns, which are local to it. For a
+mutual region of function definitions the names of the functions themselves are also excluded, since the
+\ruleName{def} rule binds them for every body in the region (\secref{mutual-recursion}).
+
+In Python a closure captures a mutable binding, so reassigning a captured variable after the closure is
+created changes what the closure sees, as in the example of \secref{no-mutable-state}, where \pyinline{x}
+is captured by the definition of \pyinline{g} and then reassigned by \pyinline{x = 6}. \PurePy rejects
+that program by a side condition on the \ruleName{cons} rule: in a block $s; b$, no variable captured by
+$s$ may be assigned in $b$, that is $\capturesS(s) \cap \assignsS(b) = \varnothing$. The
+\ruleName{statement} rule imposes the same condition on the statements of a module. A dataclass
+declaration counts as an assignment of its class name here, though re-declaring a class name is excluded
+outright (\secref{no-first-class}).
+
+The same issue arises within a single statement when the expression assigned to a variable captures that
+variable:
+
+\begin{python}
+def f():
+    x = 5
+    x = lambda: x  # Python: the lambda returns itself
+    return x()
+\end{python}
+
+\noindent The \ruleName{assign} rule requires $x \notin \capturesE(e)$ for an assignment $x = e$, so the
+program is rejected. A function definition is not subject to this condition, because the \ruleName{def}
+rule binds the names of its mutual region for every body: a body's reference to its own name or a
+sibling's denotes the definition, which is also what Python's late binding finds
+(\secref{mutual-recursion}).

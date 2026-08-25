@@ -8,17 +8,8 @@ enforce linearity and reachability; and the module rules govern imports and clas
 \seckind{} follows the syntax of \secref{syntax}, taking patterns, then blocks and expressions, then modules
 and programs, and \secref{opsem} gives each of these a dynamic counterpart.
 
-\subsection{Auxiliary definitions}
-\label{sec:wf-aux}
-
-Three syntactic analyses support the well-formedness rules: $\assignsS(s)$, the set of variables assigned
-anywhere in $s$ (without descending into nested function definitions, which have their own scope, so that
-$\assignsS(s) = \dom(\Delta)$ when $s : \Assigns{\Delta}$); $\binds(p)$, the set of variables introduced by a
-pattern $p$; and $\capturesS(s)$, the set of variables from the enclosing scope that are captured by closures
-(lambdas or nested function definitions) within $s$, with companion $\capturesE(e)$ on expressions.
-\paperonly{All are defined, by their principal cases, in \figref{aux}.}\speconly{All are defined in
-\secref{mf-syntactic}.}
-\paperinput{paper/well-formedness-analyses}
+\specinput{spec/well-formedness/auxiliary}
+\paperinput{paper/principles}
 
 \begin{definition}[Pattern subsumption]
 The preorder $\Gamma \vdash p \subsumed p'$ (\figref{subsumption}) holds when every value matched by $p$ is also matched by $p'$.
