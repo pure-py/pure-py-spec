@@ -15,12 +15,12 @@ and programs, and \secref{opsem} gives each of these a dynamic counterpart.
 \label{sec:wf-patterns}
 
 \begin{definition}[Pattern subsumption]
-The preorder $\Gamma \vdash p \subsumed p'$ (\figref{subsumption}) holds when every value matched by $p$ is also matched by $p'$.
+The preorder $\Gamma \vdash p \subsumed p'$\speconly{ (\figref{subsumption})} holds when every value matched by $p$ is also matched by $p'$.
 \end{definition}
 
-\noindent Subsumption is used by the well-formedness rule for $\pyinline{match}$ to rule out unreachable cases and to check exhaustiveness; with the current pattern set, the latter reduces to requiring a catch-all (var or wildcard) case.
+\noindent Subsumption is used by the well-formedness rule for $\pyinline{match}$ to rule out unreachable cases and to check exhaustiveness; with the current pattern set, the latter reduces to requiring a catch-all (var or wildcard) case.\paperonly{ The rules defining $\subsumed$ are given in \specification.}
 
-\input{spec/fig/subsumption}
+\specinput{spec/fig/subsumption}
 
 A pattern list is well-formed (\figref{well-formed-pat}) when each pattern is linear (no repeated variable names) and no earlier pattern subsumes a later one. The \pyinline{match} well-formedness rules use this judgement to enforce reachability and linearity of case patterns.
 
