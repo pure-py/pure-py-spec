@@ -124,7 +124,7 @@ assignment of the variables it binds. The set of variables a pattern $p$ introdu
 \ruleName{match} rule checks each body in a context in which they are definitely assigned, and combines
 the cases with $\merge$ as the \ruleName{if} rules do, so a variable is definitely assigned after the match
 only if every case binds it or returns. A match whose last case is not a catch-all (a variable or
-wildcard) may fall through; in this case the \ruleName{match-partial} rule merges in the empty assignment, as for a
+wildcard) may fall through; in this case the \ruleName{match-partial} rule merges in the empty assignment set, as for a
 conditional without \pyinline{else}:
 
 \begin{python}
