@@ -14,11 +14,10 @@ and programs, and \secref{opsem} gives each of these a dynamic counterpart.
 \subsection{Patterns}
 \label{sec:wf-patterns}
 
-\begin{definition}[Pattern subsumption]
-The preorder $\Gamma \vdash p \subsumed p'$\speconly{ (\figref{subsumption})} holds when every value matched by $p$ is also matched by $p'$.
-\end{definition}
-
-\noindent Subsumption is used by the well-formedness rule for $\pyinline{match}$ to rule out unreachable cases and to check exhaustiveness; with the current pattern set, the latter reduces to requiring a catch-all (var or wildcard) case.\paperonly{ The rules defining $\subsumed$ are given in \specification.}
+Pattern subsumption $\Gamma \vdash p \subsumed p'$\speconly{ (\figref{subsumption})}\paperonly{ (defined in \specification)} is a
+preorder on patterns under which every value matched by $p$ is also matched by $p'$. It is used by the
+well-formedness rule for $\pyinline{match}$ to rule out unreachable cases and to check exhaustiveness; with
+the current pattern set, the latter reduces to requiring a catch-all (var or wildcard) case.
 
 \specinput{spec/fig/subsumption}
 
