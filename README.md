@@ -25,7 +25,9 @@ Material that belongs only to the paper is kept under `paper/`. To insert such m
 section, write `\paperinput{file}` in the specification source where the material should go. The paper
 includes the file at that point; the specification does not. `\specinput{file}` is the reverse: the
 specification includes the file and the paper does not. `\paperonly{...}` and `\speconly{...}` do the
-same for a phrase.
+same for a phrase. The subfolders of `spec/` are self-explanatory, except that `spec/rules/` holds only
+the rules the paper reproduces individually, so that each has one source; all other rules live in their
+figures.
 
 ## Building the spec
 
