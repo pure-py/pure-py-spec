@@ -112,7 +112,7 @@
   \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : S_1 \merge \ldots \merge S_{n+1} \merge \Assigns{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{cons}}]
+\inferrule*[lab={\ruleName{seq}}]
 {
   \Gamma \vdash s : \Assigns{\Delta} \\
   \Gamma \override \Delta \vdash b : R \\

@@ -249,7 +249,7 @@ class Runner:
 def check_rule_citations(r: Runner, base: pathlib.Path) -> None:
     """Every `# rule: X` in a test must name a rule the spec defines, so a
     citation cannot outlive the rule it points at."""
-    spec = {m for f in sorted((ROOT / "fig").glob("*.tex"))
+    spec = {m for f in sorted((ROOT / "spec").rglob("*.tex"))
             for m in RULE_NAME.findall(f.read_text(encoding="utf-8"))}
     stale = []
     for path in sorted(base.rglob("*.py")):

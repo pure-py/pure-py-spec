@@ -132,7 +132,7 @@
   \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow \assigns{\rho'} \mathbin{\override} r
 }
 \and
-\inferrule*[lab={\ruleName{eval-cons}}]
+\inferrule*[lab={\ruleName{eval-seq}}]
 {
   \rho, s \Rightarrow \assigns{\rho'} \\
   \rho \override \rho', b \Rightarrow r
@@ -192,7 +192,7 @@
   \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow \aborts{\kappa}
 }
 \and
-\inferrule*[lab={\ruleName{eval-cons-fail}}]
+\inferrule*[lab={\ruleName{eval-seq-fail}}]
 {
   \rho, s \Rightarrow \aborts{\kappa}
 }
@@ -424,7 +424,7 @@
 \flushleft \shadebox{$\rho, \seq{e} \Rightarrow o$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{eval-seq-nil}}]
+\inferrule*[lab={\ruleName{eval-exprs-nil}}]
 {
   \strut
 }
@@ -432,7 +432,7 @@
   \rho, \varepsilon \Rightarrow \val{\varepsilon}
 }
 \and
-\inferrule*[lab={\ruleName{eval-seq-cons}}]
+\inferrule*[lab={\ruleName{eval-exprs-cons}}]
 {
   \rho, e \Rightarrow \val{v} \\
   \rho, \seq{e} \Rightarrow o
@@ -441,7 +441,7 @@
   \rho, e \cons \seq{e} \Rightarrow \mlet{\seq{v}}{o}{\val{(v \cons \seq{v})}}
 }
 \and
-\inferrule*[lab={\ruleName{eval-seq-fail}}]
+\inferrule*[lab={\ruleName{eval-exprs-fail}}]
 {
   \rho, e \Rightarrow \aborts{\kappa}
 }

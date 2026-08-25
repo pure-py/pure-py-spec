@@ -13,7 +13,7 @@ $s : \Assigns{\Delta}$; and $\binds(p)$, the set of variables a pattern $p$ intr
 In Python a closure holds a mutable binding, so a variable captured by a lambda or nested function
 definition may be reassigned afterwards, changing what the function sees (\secref{no-mutable-state}).
 \PurePy excludes this: a variable captured by a statement may not be assigned later in the same block, nor
-by that statement itself. The \ruleName{cons} rule imposes the first as a side condition on a block $s; b$,
+by that statement itself. The \ruleName{seq} rule imposes the first as a side condition on a block $s; b$,
 $\capturesS(s) \cap \assignsS(b) = \varnothing$, and the \ruleName{statement} rule does the same for the
 statements of a module; in the example of \secref{no-mutable-state}, \pyinline{x} is captured by the
 definition of \pyinline{g} and assigned by \pyinline{x = 6}, so the program is rejected. The
