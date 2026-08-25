@@ -1,10 +1,10 @@
 \section{Syntax}
 \label{sec:syntax}
 
-The syntax of \PurePy is given in \figrefThree{syntax-stmt}{syntax-expr}{syntax-types}. A \emph{block} is a non-empty sequence of
-statements; either a top-level statement, a \pyinline{def} body, or a branch of a conditional. A
-\emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal contiguous non-empty sequence of \pyinline{def}
-statements in a block: any non-\pyinline{def} statement in that block, by definition, separates mutual
+The syntax of \PurePy is given in \figrefThree{syntax-stmt}{syntax-expr}{syntax-types}. Statements are sequenced by
+juxtaposition, $s\;s'$; a function body, a branch of a conditional and the body of a case are statements,
+and a module body $b$ is a statement or empty. A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal
+run of consecutive \pyinline{def} statements in a sequence: any other statement separates mutual
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single region. The well-formedness rules treat each region as
 one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
@@ -111,9 +111,9 @@ A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualifie
 (\figref{syntax-stmt}) to \emph{module bodies} $t$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
 $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
-$\seq{\iota}$ followed by a sequence of statements $\seq{s}$; since imports are not statements, they can
-appear neither in blocks (and hence not in function bodies) nor after the first non-import statement. The
-well-formedness and evaluation rules check and evaluate the statements of each body $\mathcal{M}(q)$ with the
+$\seq{\iota}$ followed by an optional statement $b$; since imports are not statements, they can appear
+neither within a statement (and hence not in function bodies) nor after the first statement. The
+well-formedness and evaluation rules check and evaluate the body of each module $\mathcal{M}(q)$ with the
 assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
 $\pymath{\_\_name\_\_}$ binding the runtime supplies automatically.
 

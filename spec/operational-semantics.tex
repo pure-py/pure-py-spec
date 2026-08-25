@@ -62,11 +62,11 @@ most once, the entry comparison in \ruleName{eval-pat-constr} amounts to a compa
 
 \input{spec/fig/match}
 
-\subsection{Blocks and expressions}
+\subsection{Statements and expressions}
 
-Block evaluation $\rho, b \Rightarrow r$ is given in \speconly{\figrefTwo{eval-block-outcome}{eval-block-fails}}\paperonly{full in \specification}. Function definitions delimit
-the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\outcome$\speconly{ (\S\ref{aux:outcome})} reads a block's result as
-the outcome of calling it\speconly{, $\val{\pyinline{None}}$ where the block falls off the end.}\paperonly{:}
+Statement evaluation $\rho, s \Rightarrow r$ is given in \speconly{\figrefTwo{eval-block-outcome}{eval-block-fails}}\paperonly{full in \specification}. Function definitions delimit
+the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\outcome$\speconly{ (\S\ref{aux:outcome})} reads a statement's result as
+the outcome of calling it\speconly{, $\val{\pyinline{None}}$ where the statement completes without returning.}\paperonly{:}
 \paperinput{paper/operational-semantics/outcome}
 
 Expression evaluation $\rho, e \Rightarrow o$\speconly{ (\figrefTwo{eval-outcome}{eval-outcome-ctd})} yields an

@@ -12,7 +12,7 @@
 \auxrow{$\binds(p)$}{set of variables}{variables bound by pattern $p$}{aux:binds}
 \auxrow{$\capturesS(s)$}{set of variables}{variables of enclosing scope captured by lambdas and nested functions in $s$}{aux:captures}
 \auxrow{$\capturesE(e)$}{set of variables}{variables of enclosing scope captured by lambdas in $e$}{aux:captures-e}
-\specauxrow{$\fvS(b)$}{set of variables}{free variables of block $b$}{aux:fv}
+\specauxrow{$\fvS(s)$}{set of variables}{free variables of statement $s$}{aux:fv}
 \specauxrow{$\fvE(e)$}{set of variables}{free variables of expression $e$}{aux:fv-e}
 \noalign{\vskip 2mm}
 \auxgroup{Classes and modules}
@@ -33,8 +33,8 @@
 \specauxrow{$\elems(v)$}{sequence of values}{elements of list, tuple or string}{aux:elems}
 \auxrow{$\iterOp(v)$}{sequence of values}{sequence a generator draws from $v$; keys if $v$ is a dictionary}{aux:iter}
 \auxrow{$\getitem(v, v')$}{value or abort}{subscripting; aborts with $\errIndex$ for an index out of range, $\errKey$ for a missing key and $\errType$ otherwise}{aux:getitem}
-\auxrow{$\outcome(r)$}{value or abort}{block result read as an outcome: the returned value, \pyinline{None} if the block falls off the end, an abort unchanged}{aux:outcome}
-\auxrow{$\dispatch(\rho, v, \seq{p}, \seq{b})$}{bindings and block}{case taken by a \pyinline{match}}{aux:dispatch}
+\auxrow{$\outcome(r)$}{value or abort}{statement result read as an outcome: the returned value, \pyinline{None} if the block falls off the end, an abort unchanged}{aux:outcome}
+\auxrow{$\dispatch(\rho, v, \seq{p}, \seq{s})$}{bindings and statement}{case taken by a \pyinline{match}}{aux:dispatch}
 \auxrow{$\entries(\delta, \delta')$}{dictionary entries}{$\delta$ extended by entries of $\delta'$ in order, later overriding earlier}{aux:entries}
 \auxrow{$\update(\delta, w, v)$}{dictionary entries}{$\delta$ with $w$ bound to $v$, replacing any earlier binding}{aux:update}
 \end{tabular}

@@ -1,6 +1,6 @@
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, b \Rightarrow r$}
+\flushleft \shadebox{$\rho, s \Rightarrow r$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-pass}}]
@@ -45,7 +45,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-def}}]
 {
-  d_i = \exDef{f_i}{\seq{x}_i\,\seq{\pi}_i}{\omega_i}{b_i} \quad (\forall i) \\
+  d_i = \exDef{f_i}{\seq{x}_i\,\seq{\pi}_i}{\omega_i}{s_i} \quad (\forall i) \\
   v_i = \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} \quad (\forall i)
 }
 {
@@ -89,10 +89,10 @@
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
   \rho, e_i \Rightarrow \val{\pyinline{True}} \\
-  \rho, b_i \Rightarrow r
+  \rho, s_i \Rightarrow r
 }
 {
-  \rho, \exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}} \Rightarrow r
+  \rho, \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} \Rightarrow r
 }
 \and
 \inferrule*[lab={\ruleName{eval-if-none}}]
@@ -100,54 +100,70 @@
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j \in \set{1, \ldots, n+1})
 }
 {
-  \rho, \exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}} \Rightarrow \assigns{\varnothing}
+  \rho, \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} \Rightarrow \assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{eval-if-else}}]
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
   \rho, e_i \Rightarrow \val{\pyinline{True}} \\
-  \rho, b_i \Rightarrow r
+  \rho, s_i \Rightarrow r
 }
 {
-  \rho, \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} \Rightarrow r
+  \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow r
 }
 \and
 \inferrule*[lab={\ruleName{eval-else}}]
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j \in \set{1, \ldots, n+1}) \\
-  \rho, b_{n+2} \Rightarrow r
+  \rho, s_{n+2} \Rightarrow r
 }
 {
-  \rho, \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} \Rightarrow r
+  \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow r
 }
 \and
 \inferrule*[lab={\ruleName{eval-match}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \dispatch(\rho, v, \seq{p}, \seq{b}) = (\rho', b) \\
-  \rho \override \rho', b \Rightarrow r
+  \dispatch(\rho, v, \seq{p}, \seq{s}) = (\rho', s') \\
+  \rho \override \rho', s' \Rightarrow r
 }
 {
-  \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow \assigns{\rho'} \mathbin{\override} r
+  \rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \assigns{\rho'} \mathbin{\override} r
 }
 \and
 \inferrule*[lab={\ruleName{eval-seq}}]
 {
   \rho, s \Rightarrow \assigns{\rho'} \\
-  \rho \override \rho', b \Rightarrow r
+  \rho \override \rho', s' \Rightarrow r
 }
 {
-  \rho, s \cons b \Rightarrow \assigns{\rho'} \override r
+  \rho, s\;s' \Rightarrow \assigns{\rho'} \override r
+}
+\and
+\inferrule*[lab={\ruleName{eval-class}}]
+{
+  C = \clsEntry{\Gamma}{q.c}{\ownFields(\phi)}{\bot}
+}
+{
+  \rho, \exDataclass{c}{\phi} \Rightarrow \assigns{\set{\bind{c}{C}}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-class-extend}}]
+{
+  C = \clsEntry{\Gamma}{q.c}{\ownFields(\phi)}{c'}
+}
+{
+  \rho, \exDataclassExtend{c}{c'}{\phi} \Rightarrow \assigns{\set{\bind{c}{C}}}
 }
 \end{mathpar}
-\caption{Block $b$ evaluates to result $r$ under environment $\rho : \Gamma$}
+\caption{Statement $s$ evaluates to result $r$ under environment $\rho : \Gamma$}
 \label{fig:eval-block-outcome}
 \end{figure}
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, b \Rightarrow r$ (continued)}
+\flushleft \shadebox{$\rho, s \Rightarrow r$ (continued)}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-assert-fail}}]
@@ -172,7 +188,7 @@
   \rho, e_i \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}} \Rightarrow \aborts{\kappa}
+  \rho, \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-if-else-fail}}]
@@ -181,7 +197,7 @@
   \rho, e_i \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} \Rightarrow \aborts{\kappa}
+  \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-match-fail}}]
@@ -189,7 +205,7 @@
   \rho, e \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} \Rightarrow \aborts{\kappa}
+  \rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-seq-fail}}]
@@ -197,10 +213,10 @@
   \rho, s \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, s \cons b \Rightarrow \aborts{\kappa}
+  \rho, s\;s' \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
-\caption{Block evaluation, continued (aborting cases)}
+\caption{Statement evaluation, continued (aborting cases)}
 \label{fig:eval-block-fails}
 \end{figure}
 
@@ -345,10 +361,10 @@
 \inferrule*[lab={\ruleName{eval-call-def}}]
 {
   \rho, e \Rightarrow \val{\exDefClosure[\Delta]{\rho'}{\seq{d}}{j}} \\
-  d_i = \exDef{f_i}{\seq{x}_i\,\seq{\pi}_i}{\omega_i}{b_i} \quad (\forall i) \\
+  d_i = \exDef{f_i}{\seq{x}_i\,\seq{\pi}_i}{\omega_i}{s_i} \quad (\forall i) \\
   v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
-  \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, b_j \Rightarrow r
+  \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, s_j \Rightarrow r
 }
 {
   \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \outcome(r)
@@ -638,7 +654,7 @@
 \inferrule*[lab={\ruleName{eval-call-def-arity}}]
 {
   \rho, e \Rightarrow \val{\exDefClosure[\Delta]{\rho'}{\seq{d}}{j}} \\
-  d_j = \exDef{f_j}{\seq{x}_j\,\seq{\pi}_j}{\omega_j}{b_j} \\
+  d_j = \exDef{f_j}{\seq{x}_j\,\seq{\pi}_j}{\omega_j}{s_j} \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
   |\seq{x}_j| \neq |\seq{u}|
 }

@@ -120,7 +120,7 @@ effect-free.
 
 A name's meaning in \PurePy must not depend on the order in which modules load or on runtime state, so several
 of Python's import and module behaviours are excluded. Imports must appear at the start of a module, never
-inside a function or other block, nor after a non-import statement. Wildcard imports (\pyinline{from q import
+inside a function body or branch, nor after a statement. Wildcard imports (\pyinline{from q import
 *}) are excluded, since the names they introduce are not explicit; PEP 8 recommends against
 them.\footnote{\url{https://peps.python.org/pep-0008/}} A submodule may not import itself through its parent
 (\pyinline{from a import b} inside module \pyinline{a.b}): \PurePy treats the from-imported submodule as a

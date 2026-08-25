@@ -94,58 +94,6 @@
 \end{figure}
 
 \begin{figure}
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash \seq{s} : \Delta$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{stmts-nil}}]
-{
-  \strut
-}
-{
-  \Gamma \vdash \varepsilon : \varnothing
-}
-\and
-\inferrule*[lab={\ruleName{statement}}]
-{
-  \Gamma \vdash s : \Assigns{\Delta} \\
-  \Gamma \override \Delta \vdash \seq{s} : \Delta' \\
-  \capturesS(s) \cap \assignsS(\seq{s}) = \varnothing
-}
-{
-  \Gamma \vdash s \cons \seq{s} : \Delta \override \Delta'
-}
-\and
-\inferrule*[lab={\ruleName{class}}]
-{
-  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
-  \ownFields(\phi) = \seq{x} \text{ distinct} \\
-  C = \clsEntry{\Gamma}{q.c}{\seq{x}}{\bot} \\
-  \Gamma, \bind{c}{C} \vdash \seq{s} : \Delta
-}
-{
-  \Gamma \vdash \exDataclass{c}{\phi} \cons \seq{s} : \set{\bind{c}{C}} \override \Delta
-}
-\and
-\inferrule*[lab={\ruleName{class-extend}}]
-{
-  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
-  \bind{c'}{\clsEntry{\Gamma'}{q.c'}{\seq{y}}{c^\dagger}} \in \Gamma \\
-  \ownFields(\phi) = \seq{x} \text{ distinct} \\
-  \seq{x} \cap \fields(\Gamma(c')) = \varnothing \\
-  C = \clsEntry{\Gamma}{q.c}{\seq{x}}{c'} \\
-  \Gamma, \bind{c}{C} \vdash \seq{s} : \Delta
-}
-{
-  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} \cons \seq{s} : \set{\bind{c}{C}} \override \Delta
-}
-\end{mathpar}
-\subcaption{Statements $\seq{s}$ of module $q$ are well-formed in $\Gamma$}
-\end{subfigure}
-
-\vspace{2mm}
-
-\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\vdash_{\mathsf{load}} q : \Gamma$}
 \begin{mathpar}
 \small
@@ -159,10 +107,10 @@
 \and
 \inferrule*[lab={\ruleName{module}}]
 {
-  \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
+  \mathcal{M}(q) = \seq{\iota}\;b \\
   \vdash \seq{\iota} : \Gamma \\
   \mathcal{P}(\pyinline{builtins}) = (\rho, \Gamma') \\
-  \Gamma' \mathbin{\override} \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} : \Delta \\
+  \Gamma' \mathbin{\override} \Gamma \vdash (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)})\;b : \Assigns{\Delta} \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {
@@ -181,8 +129,6 @@
   \vdash \mathcal{M}
 }
 \end{mathpar}
-\subcaption{Module and program well-formedness}
-\end{subfigure}
 \caption{Module well-formedness}
 \label{fig:well-formed-module}
 \end{figure}
