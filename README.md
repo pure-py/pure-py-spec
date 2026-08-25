@@ -24,8 +24,7 @@ The specification is the source of truth; the paper is built from its sections a
 Material that belongs only to the paper is kept under `paper/`. To insert such material into a shared
 section, write `\paperinput{file}` in the specification source where the material should go. The paper
 includes the file at that point; the specification does not. `\paperonly{...}` and `\speconly{...}` do
-the same for a phrase: the paper keeps the first and the specification the second. They are for
-cross-references that only one document can resolve.
+the same for a phrase.
 
 ## Building the spec
 
