@@ -17,7 +17,7 @@ and programs, and \secref{opsem} gives each of these a dynamic counterpart.
 Pattern subsumption $\Gamma \vdash p \subsumed p'$\speconly{ (\figref{subsumption})}\paperonly{ (defined in \specification)} is a
 preorder on patterns under which every value matched by $p$ is also matched by $p'$. It is used by the
 well-formedness rule for $\pyinline{match}$ (\figref{well-formed}) to rule out unreachable cases. Exhaustiveness is a
-separate test and, without a type system to bound the values a match may receive, a degenerate one:
+separate test which, without a type system to bound the values a match may receive, degenerates to
 whether the last case is a catch-all, a variable or wildcard.
 
 \specinput{spec/fig/subsumption}
