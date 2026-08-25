@@ -10,7 +10,8 @@
 \auxgroup{Syntactic analyses}
 \auxrow{$\assignsS(s)$}{set of variables}{variables assigned in $s$, not descending into nested functions}{aux:assigns}
 \auxrow{$\binds(p)$}{set of variables}{variables bound by pattern $p$}{aux:binds}
-\auxrow{$\capturesS(s)$, $\capturesE(e)$}{set of variables}{variables of enclosing scope captured by closures in $s$ or $e$}{aux:captures}
+\auxrow{$\capturesS(s)$}{set of variables}{variables of enclosing scope captured by closures in $s$}{aux:captures}
+\auxrow{$\capturesE(e)$}{set of variables}{variables of enclosing scope captured by closures in $e$}{aux:captures-e}
 \auxrow{$\fvS(b)$}{set of variables}{free variables of block $b$}{aux:fv}
 \auxrow{$\fvE(e)$}{set of variables}{free variables of expression $e$}{aux:fv-e}
 \noalign{\vskip 2mm}
@@ -36,6 +37,7 @@
 \auxrow{$\getitem(v, v')$}{outcome}{subscripting}{aux:getitem}
 \auxrow{$\outcome(r)$}{outcome}{block result read as outcome of calling it}{aux:outcome}
 \auxrow{$\dispatch(\rho, v, \seq{p}, \seq{b})$}{bindings and block}{case taken by a \pyinline{match}}{aux:dispatch}
-\auxrow{$\entries(\delta, \delta')$, $\update(\delta, w, v)$}{dictionary entries}{dictionary built from entries, later overriding earlier}{aux:entries}
+\auxrow{$\entries(\delta, \delta')$}{dictionary entries}{$\delta$ extended by the entries of $\delta'$ in order, later overriding earlier}{aux:entries}
+\auxrow{$\update(\delta, w, v)$}{dictionary entries}{$\delta$ with $w$ bound to $v$, replacing any earlier binding}{aux:update}
 \end{tabular}
 \end{center}
