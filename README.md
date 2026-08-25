@@ -11,18 +11,28 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 
 ## Project structure
 
-- `PurePy-spec.tex` — main spec document
-- `tex/` — macros, listings config, related work
-- `fig/` — syntax, well-formedness rules, operational semantics
+- `paper.tex` — the paper
+- `PurePy-spec.tex` — the language specification as a standalone document, separate from the paper (#134)
+- `spec/` — the specification's sources; the paper is assembled from these
+- `paper/` — the paper's own material
+- `tex/` — macros and bibliography shared by both documents
 - `agda/` — Agda mechanisation (distributivity proof)
 - `src/` — reference checker (Python `ast`-based), organised to mirror the spec's sections
 - `test/` — litmus tests
 
+The specification is the source of truth; the paper is built from its sections and definitions.
+Material that belongs only to the paper is kept under `paper/`. To insert such material into a shared
+section, write `\paperinput{file}` in the specification source where the material should go. The paper
+includes the file at that point; the specification does not. `\paperonly{...}` and `\speconly{...}` do
+the same for a phrase.
+
 ## Building the spec
 
 ```
-latexmk -pdf PurePy-spec.tex
+latexmk -pdf paper.tex
 ```
+
+The standalone specification is built with `make spec`.
 
 ## Running tests
 

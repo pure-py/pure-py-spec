@@ -1,0 +1,4 @@
+\eqElems(\varepsilon, \varepsilon) &{}= \pyinline{True} \\*
+\eqElems(v \cons \seq{v}, v' \cons \seq{v}\,') &{}= \pyinline{False} && \text{if } \eqOp(v, v') = \pyinline{False} \\*
+\eqElems(v \cons \seq{v}, v' \cons \seq{v}\,') &{}= \eqElems(\seq{v}, \seq{v}\,') && \text{if } \eqOp(v, v') = \pyinline{True} \\*
+\eqElems(\seq{v}, \seq{v}\,') &{}= \pyinline{False} && \text{if } |\seq{v}| \neq |\seq{v}\,'|

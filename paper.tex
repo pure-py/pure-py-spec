@@ -1,0 +1,124 @@
+% \anonmode adds the acmart anonymous option and an anonymised title.
+\ifdefined\anonmode
+  \documentclass[acmsmall,anonymous]{acmart}
+\else
+  \documentclass[acmsmall]{acmart}
+\fi
+
+% acmart loads amsmath, amssymb, amsthm, microtype, xcolor, hyperref, natbib, enumitem.
+\usepackage{array}
+\usepackage{colortbl}
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+\usepackage{mathpartir}
+\usepackage{listings}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{xspace}
+\usepackage{enumitem}
+\usepackage{tikz}
+
+% \finalmode renders the clean version, without change markup.
+\ifdefined\finalmode\newcommand{\acceptchanges}{}\fi
+\usepackage{changebar}
+\ifdefined\finalmode\nochangebars\fi
+
+\input{tex/macros}
+\input{tex/listings}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+
+\setlist[itemize]{leftmargin=*, nosep, topsep=2mm}
+\setlist[enumerate]{nosep}
+
+% PACMPL (PLDI) metadata; placeholders for a draft.
+\acmJournal{PACMPL}
+\acmVolume{10}
+\acmNumber{PLDI}
+\acmArticle{1}
+\acmArticleSeq{0}
+\acmYear{2026}
+\acmMonth{6}
+\setcopyright{none}
+\settopmatter{printacmref=false}
+\citestyle{acmauthoryear}
+
+\begin{document}
+
+\ifdefined\anonmode
+  \title{A Pure Functional Subset of Python for Scientific Computing}
+\else
+  \title{\PurePy: A Functional Subset of Python for Scientific Computing}
+\fi
+\version{0}{14}{1}
+
+\author{Tobias Antensteiner}
+\affiliation{%
+  \department{Institute of Theoretical Informatics}
+  \institution{Karlsruhe Institute of Technology}
+  \country{Germany}}
+
+\author{Nikolaus Huber}
+\affiliation{%
+  \department{Department of Computer Science and Technology}
+  \institution{University of Cambridge}
+  \country{UK}}
+
+\author{Dominic Orchard}
+\affiliation{%
+  \department{School of Computing}
+  \institution{University of Kent}
+  \country{UK}}
+\affiliation{%
+  \department{Department of Computer Science and Technology}
+  \institution{University of Cambridge}
+  \country{UK}}
+
+\author{Jacob Pake}
+\affiliation{%
+  \department{School of Computing}
+  \institution{University of Kent}
+  \country{UK}}
+
+\author{Roly Perera}
+\affiliation{%
+  \department{Department of Computer Science and Technology}
+  \institution{University of Cambridge}
+  \country{UK}}
+\affiliation{%
+  \department{School of Computer Science}
+  \institution{University of Bristol}
+  \country{UK}}
+
+\renewcommand{\shortauthors}{Antensteiner et al.}
+
+\begin{abstract}
+\PurePy is a pure, side-effect-free subset of Python: a functional language whose programs are referentially
+transparent, reproducible, and easy to reason about, yet remain ordinary Python. Every well-formed \PurePy
+program is valid Python, and where \PurePy gives a run a result, Python gives the same one, so the same source
+runs under a standard Python interpreter and under any conforming implementation. This paper specifies \PurePy as a versioned standard, with a
+formal grammar, well-formedness rules based on a definite-assignment analysis, and an operational semantics
+that agrees with Python on every run it defines. A reference checker decides well-formedness, and a conformance test suite is exercised on CPython, GraalPy, and Pyodide. Aimed first at researchers in programming languages and pedagogy, \PurePy
+is intended to grow into a common language for scientific computing, supporting portable applications in
+modelling, data processing, analysis, and visualisation.
+\end{abstract}
+
+\maketitle
+
+\input{paper/introduction}
+\input{paper/overview}
+\input{spec/syntax}
+\input{spec/well-formedness}
+\input{spec/operational-semantics}
+\input{paper/reference-implementation}
+\input{paper/extensions}
+\input{paper/case-studies}
+\input{paper/evaluation}
+\input{paper/related-work}
+\input{paper/conclusion}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{tex/refs,tex/additional-refs}
+
+\end{document}

@@ -1,0 +1,6 @@
+A well-formed \PurePy program avoids the Python runtime errors listed in
+\figref{prevented-errors}, under the conditions noted there. Well-formedness does not prevent errors from
+ill-typed operations, such as wrong operand types, calling a non-function, calling a function with the
+wrong number of arguments, or attribute access on an object lacking the attribute. Each of these has a termination kind and a rule in the semantics (\figref{eval-fails}).
+
+\input{spec/fig/prevented-errors}

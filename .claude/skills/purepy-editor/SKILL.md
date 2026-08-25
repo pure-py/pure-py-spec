@@ -19,6 +19,8 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 
 - New issues: add to the PurePy project with Status either Planned or Proposed.
 
+- Issue titles and task-list items are noun phrases (e.g. "Syntax of types", not "Define the syntax of types").
+
 - When an issue references other issues or external resources, add a **See also** paragraph at the end with a bullet list of links. Example:
 
   ```

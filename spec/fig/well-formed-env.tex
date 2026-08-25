@@ -1,0 +1,132 @@
+\begin{figure}
+\flushleft \shadebox{$\vdash v : \theta$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{val-lit}}]
+{
+  \strut
+}
+{
+  \vdash \ell : \statusDefAssigned
+}
+\and
+\inferrule*[lab={\ruleName{val-list}}]
+{
+  \vdash v_i : \statusDefAssigned \quad (\forall i)
+}
+{
+  \vdash \exList{v_1, \ldots, v_n} : \statusDefAssigned
+}
+\and
+\inferrule*[lab={\ruleName{val-tuple}}]
+{
+  \vdash v_i : \statusDefAssigned \quad (\forall i)
+}
+{
+  \vdash \exTuple{v_1, \ldots, v_n} : \statusDefAssigned
+}
+\and
+\inferrule*[lab={\ruleName{val-dict}}]
+{
+  \vdash v_i : \statusDefAssigned \quad (\forall i) \\
+  w_1, \ldots, w_n \text{ distinct}
+}
+{
+  \vdash \exDict{\bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}} : \statusDefAssigned
+}
+\and
+\inferrule*[lab={\ruleName{val-lambda}}]
+{
+  \vdash \rho : \Gamma \\
+  \Gamma \override \statusDefAssigned(\seq{x}) \vdash e
+}
+{
+  \vdash \exLamClosure[\Gamma]{\rho}{\seq{x}}{e} : \statusDefAssigned
+}
+\and
+\inferrule*[lab={\ruleName{val-def}}]
+{
+  \vdash \rho : \Gamma \\
+  \Gamma \override \statusDefAssigned(\seq{f} \mathbin{\concat} \seq{x}_j) \override \statusNotDefAssigned(\assignsS(b_j) \setminus \seq{x}_j) \vdash b_j : R_j \quad (\forall j) \\
+  \seq{f} \text{ distinct}
+}
+{
+  \vdash \exDefClosure[\Gamma]{\rho}{\exDef{f_1}{\seq{x}_1\,\seq{\pi}_1}{\omega_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}\,\seq{\pi}_{n+1}}{\omega_{n+1}}{b_{n+1}}}{i} : \statusDefAssigned
+}
+\and
+\inferrule*[lab={\ruleName{val-obj}}]
+{
+  \vdash C : C \\
+  \vdash \rho : \Gamma
+}
+{
+  \vdash \exObj{\Gamma}{C}{\rho} : \statusDefAssigned
+}
+\and
+\inferrule*[lab={\ruleName{val-prim}}]
+{
+  \strut
+}
+{
+  \vdash \primVal{\primFn} : \statusDefAssigned
+}
+\and
+\inferrule*[lab={\ruleName{val-mod}}]
+{
+  q \in \dom(\mathcal{M}) \cup \dom(\mathcal{P})
+}
+{
+  \vdash \modStub{q} : \modStub{q}
+}
+\and
+
+\inferrule*[lab={\ruleName{val-mod-loaded}}]
+{
+  \vdash \rho : \Gamma
+}
+{
+  \vdash \modLoaded{q}{\rho} : \modLoaded{q}{\Gamma}
+}
+\and
+\inferrule*[lab={\ruleName{val-class}}]
+{
+  \strut
+}
+{
+  \vdash \clsEntry{\Gamma}{q.c}{\seq{x}}{\bot} : \clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}
+}
+\and
+\inferrule*[lab={\ruleName{val-class-extend}}]
+{
+  \bind{c'}{C'} \in \Gamma
+}
+{
+  \vdash \clsEntry{\Gamma}{q.c}{\seq{x}}{c'} : \clsEntry{\Gamma}{q.c}{\seq{x}}{c'}
+}
+\end{mathpar}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\vdash \rho : \Gamma$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{env-nil}}]
+{
+  \strut
+}
+{
+  \vdash \varnothing : \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{env-cons}}]
+{
+  \vdash v : \theta \\
+  \vdash \rho : \Gamma
+}
+{
+  \vdash \set{\bind{x}{v}} \override \rho : \set{\bind{x}{\theta}} \override \Gamma
+}
+\end{mathpar}
+\caption{Well-formed values and environments}
+\label{fig:well-formed-env}
+\end{figure}

@@ -1,0 +1,8 @@
+\memOp(\exList{v_1, \ldots, v_n}, v) &{}= \memElems(v_1 \cons \ldots \cons v_n, v) \\*
+\memOp(\exTuple{v_1, \ldots, v_n}, v) &{}= \memElems(v_1 \cons \ldots \cons v_n, v) \\*
+\\
+\memOp(\delta, w) &{}= \pyinline{True} && \text{if } w \in \dom(\delta) \\*
+\memOp(\delta, w) &{}= \pyinline{False} && \text{if } w \notin \dom(\delta) \\*
+\\
+\memOp(w', w) &{}= \pyinline{True} && \text{if } w' = w_1 \concat w \concat w_2 \text{ for some } w_1, w_2 \\*
+\memOp(w', w) &{}= \pyinline{False} && (\text{otherwise})

@@ -32,7 +32,7 @@ jobs:
           IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
           TAG="v$VERSION"
 
-          sed -i "s/\\\\version{[0-9]*}{[0-9]*}{[0-9]*}/\\\\version{$MAJOR}{$MINOR}{$PATCH}/" PurePy-spec.tex
+          sed -i "s/\\\\version{[0-9]*}{[0-9]*}{[0-9]*}/\\\\version{$MAJOR}{$MINOR}{$PATCH}/" paper.tex PurePy-spec.tex
           sed -i "s|## \[v[0-9]*\.[0-9]*\.[0-9]*\](https://github.com/pure-py/pure-py-spec/releases/download/v[0-9]*\.[0-9]*\.[0-9]*/PurePy-spec.pdf)|## [$TAG](https://github.com/pure-py/pure-py-spec/releases/download/$TAG/PurePy-spec.pdf)|" README.md
 
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
@@ -41,7 +41,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add PurePy-spec.tex README.md
+          git add paper.tex PurePy-spec.tex README.md
           git diff --cached --quiet || git commit -m "Bump version to ${{ steps.version.outputs.tag }}"
           git pull --rebase origin main
           git push origin HEAD:refs/heads/main
