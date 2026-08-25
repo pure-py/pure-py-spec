@@ -69,3 +69,48 @@ free variables of each such function's body, less its parameters and any variabl
 are local to it. For a mutual region of function definitions (\secref{syntax}) the names of the functions
 themselves are also excluded, since the \ruleName{def} rule binds them in every body, consistent with
 Python's late binding semantics (\secref{mutual-recursion}).
+
+\subsubsection{Mutual regions}
+\label{sec:mutual-recursion}
+
+Python resolves the free names of a function when it is called, so two functions may refer to each other
+whatever order they are defined in, provided both exist by the time either runs. \PurePy makes the
+dependency static: a \emph{mutual region}, a maximal run of consecutive \pyinline{def} statements in a
+block (\secref{syntax}), is a single simultaneous binding. The \ruleName{def} rule checks each body in a
+context in which every name of the region is definitely assigned, so any function in the region may refer
+to any other (a region of one permits self-recursion), and requires the names to be distinct. Any other
+statement between two definitions separates them into different regions:
+
+\begin{python}
+def even(n):
+    if n == 0:
+        return True
+    return odd(n - 1)
+
+x = even(0)  # intervening statement separates the regions
+
+def odd(n):
+    if n == 0:
+        return False
+    return even(n - 1)
+\end{python}
+
+\noindent This is rejected statically: \pyinline{even} forms a region of its own in which \pyinline{odd}
+is not yet bound, so the reference fails the \ruleName{var} rule. Python accepts the program, since the
+call \pyinline{even(0)} never reaches \pyinline{odd}. A region with two definitions of the same name is
+rejected by the distinct-names condition:
+
+\begin{python}
+def g():
+    return 0
+
+def f():
+    return g()
+def g():     # error: g defined twice in the same region
+    return 1
+\end{python}
+
+\noindent Python accepts this too, its late binding resolving the call in \pyinline{f} to the second
+\pyinline{g}. A branch of a conditional may contain regions of its own, subject to definite assignment as
+for any other assignment (\secref{local-assignment}).
+
