@@ -149,3 +149,18 @@ match v:
         print("lit")
 \end{python}
 
+\subsubsection{No unreachable code}
+\label{sec:unreachable}
+
+Python accepts statements that can never run, such as code after a \pyinline{return}. \PurePy rejects
+them, the statement-level counterpart of case reachability (\secref{pattern-binding}). A statement
+sequence returns only if its last statement returns and every earlier one assigns: the \ruleName{seq}
+rule requires the first statement of a sequence to have result type $\Assigns{\Delta}$
+(\secref{wf-blocks}), so a statement following a \pyinline{return} has no derivation:
+
+\begin{python}
+def foo(x):
+    return x + 1
+    return x  # error: unreachable
+\end{python}
+
