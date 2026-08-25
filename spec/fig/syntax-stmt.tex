@@ -29,9 +29,9 @@ $\phi$ & $::=$ & $\exField{x_1}{\tau_1} \;\ldots\; \exField{x_{n+1}}{\tau_{n+1}}
 \grammarGroup{Module bodies} \\
 $t$ & $::=$ & $\iota_1 \;\ldots\; \iota_m \;\; b$ & (ModuleBody)
    \\[3mm]
-\grammarGroup{Bodies} \\
-$b$ & $::=$ & $s$ & (Body) \\
-    & $\mid$ & $\varepsilon$ & (EmptyBody)
+\grammarGroup{Optional statements} \\
+$b$ & $::=$ & $s$ & (Stmt) \\
+    & $\mid$ & $\varepsilon$ & (NoStmt)
    \\[3mm]
 \grammarGroup{Qualified names} \\
 $q$ & $::=$ & $x_1.x_2.\cdots.x_{n+1}$ & (Name)
