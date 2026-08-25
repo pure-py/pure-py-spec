@@ -1,5 +1,6 @@
 import ast
 import sys
+from collections.abc import Callable
 
 OP_SYMBOLS: dict[type, str] = {
     ast.BitOr: '|', ast.BitAnd: '&', ast.BitXor: '^',
@@ -28,6 +29,48 @@ class NotYetSupported(ParseError):
 
     def __init__(self, node: ast.AST, feature: str, issue: int):
         super().__init__(node, f'{feature} not yet supported (#{issue})')
+
+
+class PatList(ast.MatchSequence):
+    """Sequence pattern written with brackets."""
+
+
+class PatTuple(ast.MatchSequence):
+    """Sequence pattern written with parentheses, or bare."""
+
+
+def map_tree(f: Callable[[ast.AST], ast.AST], node: ast.AST) -> ast.AST:
+    """Rebuild node bottom-up, applying f to each node. Subtrees f leaves alone are shared, not copied."""
+    fields: dict[str, object] = {}
+    for name in node._fields:
+        v = getattr(node, name)
+        if isinstance(v, ast.AST):
+            fields[name] = map_tree(f, v)
+        elif isinstance(v, list):
+            new = [map_tree(f, x) if isinstance(x, ast.AST) else x for x in v]
+            fields[name] = v if all(a is b for a, b in zip(new, v)) else new
+        else:
+            fields[name] = v
+    unchanged = all(fields[name] is getattr(node, name) for name in node._fields)
+    return f(node if unchanged else ast.copy_location(type(node)(**fields), node))
+
+
+def classify_sequence(source: str) -> Callable[[ast.AST], ast.AST]:
+    """Python's parser gives list and tuple patterns one node type; the source text tells them apart."""
+    def classify(node: ast.AST) -> ast.AST:
+        if not isinstance(node, ast.MatchSequence):
+            return node
+        segment = ast.get_source_segment(source, node)
+        assert segment is not None
+        cls = PatList if segment.startswith('[') else PatTuple
+        return ast.copy_location(cls(patterns=node.patterns), node)
+    return classify
+
+
+def parse(source: str, filename: str) -> ast.Module:
+    tree = map_tree(classify_sequence(source), ast.parse(source, filename=filename))
+    assert isinstance(tree, ast.Module)
+    return tree
 
 
 def check_stmt(node: ast.stmt) -> None:
@@ -356,8 +399,7 @@ def check_module(node: ast.Module) -> ParseError | None:
 def check_file(filename: str) -> ParseError | None:
     with open(filename) as f:
         source = f.read()
-    tree = ast.parse(source, filename=filename)
-    return check_module(tree)
+    return check_module(parse(source, filename))
 
 def format_result(result: ParseError | None, filename: str) -> str:
     if result is None:

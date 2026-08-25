@@ -2,9 +2,9 @@ import ast
 import sys
 
 import reasons
+import syntax
 from aux import (
     BlockElement,
-    annotate_seq_kinds,
     assigns_block,
     assigns_elements,
     assigns_stmt,
@@ -231,8 +231,7 @@ def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> IllFormed 
 def check_file(filename: str) -> IllFormed | None:
     with open(filename) as f:
         source = f.read()
-    tree = ast.parse(source, filename=filename)
-    annotate_seq_kinds(tree, source)
+    tree = syntax.parse(source, filename)
     M: dict[str, ast.Module] = {p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES}
     M['__main__'] = tree
     return module_result(tree, M, '__main__')

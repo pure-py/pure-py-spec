@@ -29,12 +29,6 @@ def extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[B
         return extend_region(region + [head], rest[1:])
     return [region] + elements_of_block(rest)
 
-def annotate_seq_kinds(tree: ast.AST, source: str) -> None:
-    for node in ast.walk(tree):
-        if isinstance(node, ast.MatchSequence):
-            segment = ast.get_source_segment(source, node)
-            setattr(node, 'is_list_pattern', segment is not None and segment.lstrip().startswith('['))
-
 def binds_seq(pattern: ast.pattern) -> list[str]:
     if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
         return []

@@ -11,6 +11,7 @@ from contexts import (
     short_name,
 )
 from reasons import IllFormedModule
+from syntax import PatList, PatTuple
 
 
 def is_catch_all(p: ast.pattern) -> bool:
@@ -48,7 +49,8 @@ def subsumes(p: ast.pattern, q: ast.pattern, ctx: ModuleContext) -> bool:
             return False
         return all(subsumes(p_keys[k], sub, ctx) for k, sub in q_keys.items())
     if isinstance(p, ast.MatchSequence) and isinstance(q, ast.MatchSequence):
-        if bool(getattr(p, 'is_list_pattern', False)) != bool(getattr(q, 'is_list_pattern', False)):
+        assert isinstance(p, (PatList, PatTuple)) and isinstance(q, (PatList, PatTuple))
+        if type(p) is not type(q):
             return False
         if len(p.patterns) != len(q.patterns):
             return False
