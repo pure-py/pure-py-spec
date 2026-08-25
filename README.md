@@ -22,8 +22,8 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 
 The specification is the source of truth, and the paper is built from its sections and definitions.
 Material that belongs only to the paper is kept under `paper/`. Where such material should appear inside
-a shared section, the specification source says so with `\paperinput{file}`; the paper expands this to
-the contents of the file and the specification ignores it. `\paperonly{...}` and `\speconly{...}` do the
+a shared section, the specification source contains `\paperinput{file}` at that point; the paper expands
+this to the contents of the file and the specification ignores it. `\paperonly{...}` and `\speconly{...}` do the
 same for a phrase, such as a cross-reference that only one document can resolve.
 
 ## Building the spec
