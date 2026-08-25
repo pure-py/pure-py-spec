@@ -73,9 +73,9 @@ outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
 \ruleName{eval-if} does. A comprehension evaluates its body once for each binding its qualifiers produce, and
-concatenates the results; a generator draws its bindings from the elements of a value, which $\iterOp$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:iter}}) gives for a list, tuple or string, and for a
-dictionary as its keys, as in Python. These are the only values a generator can draw from.
+concatenates the results; a generator draws its bindings from the elements of a value, which the auxiliary
+function $\iterOp$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:iter}}) gives for a list, tuple or
+string, and for a dictionary as its keys, as in Python. These are the only values a generator can draw from.
 
 \specinput{spec/fig/eval-outcome}
 
