@@ -112,6 +112,6 @@ def g():     # error: g defined twice in the same region
 \end{python}
 
 \noindent Python accepts this too, treating the second \pyinline{def g} as a reassignment of \pyinline{g},
-which late binding then makes the target of the call in \pyinline{f}. Finally, the branches of a conditional may contain regions of their own, subject to the usual
+which late binding then makes the target of the call in \pyinline{f}. Finally, the branches of a conditional may contain mutual regions of their own, subject to the usual
 definite assignment rules (\secref{local-assignment}).
 
