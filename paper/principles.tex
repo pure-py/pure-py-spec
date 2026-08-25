@@ -136,7 +136,7 @@ print(x)  # error: x not definitely assigned
 \end{python}
 
 \noindent Python prints \pyinline{1}, the binding having escaped the match. Within a pattern the
-variables must be distinct, as in Python. The cases must also each be reachable: the \ruleName{cases-cons}
+variables must be distinct, as in Python. Every case must also be reachable: the \ruleName{cases-cons}
 rule rejects a case whose pattern is subsumed by an earlier one (\secref{wf-patterns}), which Python
 leaves silently unreachable:
 
