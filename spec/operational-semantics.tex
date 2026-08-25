@@ -77,7 +77,8 @@ concatenates the results; a generator draws its bindings from the elements of a 
 function $\iterOp$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:iter}}): the elements of a
 list, tuple or string, and the keys of a dictionary, as in Python. Subscripting, given by the auxiliary
 function $\getitem$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:getitem}}), indexes a list, tuple or
-string by an integer, counting from the end when negative, and a dictionary by a string key; a
+string by an integer, counting from the end when negative, and a dictionary by a string key,
+aborting with \pyinline{IndexError}, \pyinline{KeyError} or \pyinline{TypeError} where Python raises them; a
 dictionary subscripted by a value other than a string is undefined.
 
 \specinput{spec/fig/eval-outcome}
