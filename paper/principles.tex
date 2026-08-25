@@ -14,8 +14,8 @@ A lambda or nested function definition may refer to variables of the enclosing s
 \emph{capture}. The set of variables of the enclosing scope captured by the lambdas and nested function
 definitions within a statement $s$ is $\capturesS(s)$, with $\capturesE(e)$ the same for an expression $e$: the
 free variables of each such function's body, less its parameters and the variables the body assigns, which are local to it. For a
-mutual region of function definitions the names of the functions themselves are also excluded, since the
-\ruleName{def} rule binds them for every body in the region (\secref{mutual-recursion}).
+mutual region of function definitions (\secref{syntax}) the names of the functions themselves are also
+excluded.
 
 In Python a closure captures a mutable binding, so reassigning a captured variable after the closure is
 created changes what the closure sees, as in the example of \secref{no-mutable-state}, where \pyinline{x}
