@@ -10,7 +10,7 @@ string, a list and a tuple, or a Boolean and a number; between functions; and be
 \pyinline{nan}s inside a container. Directly, \pyinline{nan == nan} is \pyinline{False} in both languages,
 but Python compares container elements by identity before equality, so two lists holding \pyinline{nan}s
 are equal or not according to whether they hold the same object, a distinction \PurePy cannot make.
-Python gives an answer in each case (\figref{coercions}), so each is a dynamically excluded comparison. Comparison stops at the first element that
+Python gives an answer in each case (\figref{coercions}), so each is a dynamically excluded comparison. Comparison short-circuits at the first element that
 decides the result, so the comparison order is observable:
 
 \begin{python}
@@ -19,7 +19,7 @@ print([1, "a"] == [1, 3])  # undefined: "a" against 3
 \end{python}
 
 \noindent Dictionaries are compared in the entry order of the left operand for the same reason. The membership
-function $\memOp$ is defined through equality and stops in the same way. The strict operators are given by
+function $\memOp$ is defined through equality and short-circuits in the same way. The strict operators are given by
 $\hat{\odot}$ and $\hat{\ominus}$ (\figref{operators}); the definitions of all of these are given in
 \specification.
 

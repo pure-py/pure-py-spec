@@ -3,6 +3,6 @@ structural equality $\eqOp$ and membership $\memOp$. Where defined, the
 operators agree with Python, yielding $\aborts{\kappa}$ where Python raises an
 exception. Where undefined\paperonly{ (\secref{no-coercions})}, evaluation of the expression has no derivation, and an
 implementation may abort or produce Python's result (\paperonly{\secref{python-compatibility}}\speconly{\secref{conformance}}). Because
-equality is partial, the order in which elements are compared is observable: equality and membership stop
+equality is partial, the order in which elements are compared is observable: equality and membership short-circuit
 at the first element that decides the result, so an undefined comparison later in a sequence does not make
 the whole comparison undefined.
