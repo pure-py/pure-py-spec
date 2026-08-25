@@ -35,7 +35,11 @@
   \newcommand*{\auxgroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{\itshape #1} \\}
 \fi
 % How the paper refers to the specification document.
-\newcommand*{\specification}{the \PurePy specification (supplementary material)\xspace}
+\ifdefined\anonmode
+  \newcommand*{\specification}{the supplementary material\xspace}
+\else
+  \newcommand*{\specification}{the \PurePy specification\xspace}
+\fi
 \newcommand*{\version}[3]{%
   \gdef\versionstring{#1.#2.#3}%
 }
