@@ -65,8 +65,9 @@ most once, the entry comparison in \ruleName{eval-pat-constr} amounts to a compa
 \subsection{Blocks and expressions}
 
 Block evaluation $\rho, b \Rightarrow r$ is given in \speconly{\figrefTwo{eval-block-outcome}{eval-block-fails}}\paperonly{full in \specification}. Function definitions delimit
-the scope of sequential-composition effects, so as black boxes functions are always pure. The metafunction $\outcome$ (\paperonly{\figref{eval-aux}}\speconly{\S\ref{aux:outcome}}) reads a block's result as
-the outcome of calling it, $\val{\pyinline{None}}$ where the block falls off the end.
+the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\outcome$\speconly{ (\S\ref{aux:outcome})} reads a block's result as
+the outcome of calling it\speconly{, $\val{\pyinline{None}}$ where the block falls off the end.}\paperonly{:}
+\paperinput{paper/operational-semantics/outcome}
 
 Expression evaluation $\rho, e \Rightarrow o$\speconly{ (\figrefTwo{eval-outcome}{eval-outcome-ctd})} yields an
 outcome, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). The operators
