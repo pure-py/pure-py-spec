@@ -2,10 +2,51 @@
 \label{sec:principles}
 
 Well-formedness enforces several constraints, summarised here with the programs each accepts and rejects;
-the rules follow in \secref{wf-patterns} to \secref{wf-modules}. Two auxiliary functions appear
-throughout: $\assignsS(s)$, the set of variables assigned anywhere in $s$, not descending into nested
-function definitions, which have their own scope, so that $\assignsS(s) = \dom(\Delta)$ when
-$s : \Assigns{\Delta}$; and $\binds(p)$, the set of variables a pattern $p$ introduces.
+the rules follow in \secref{wf-patterns} to \secref{wf-modules}.
+
+\subsubsection{Assignment is definition}
+\label{sec:local-assignment}
+
+Python has no variable declarations: a variable is introduced by assigning to it, and a local variable is
+in scope throughout the function body, wherever the assignment occurs. \PurePy keeps the syntax but gives
+each reference a unique lexical referent through \emph{definite assignment}: a variable may be referenced
+only where an assignment covers every path to the reference. The \ruleName{var} rule requires the variable
+to be definitely assigned, $\Gamma(x) = \statusDefAssigned$; the \ruleName{assign} rule makes it so, with
+$x = e$ assigning $\set{\bind{x}{\statusDefAssigned}}$; and the \ruleName{if} rules combine the branches with
+$\merge$, so that a conditional definitely assigns a variable only if every branch that does not definitely
+return assigns it, and otherwise leaves it at $\statusNotDefAssigned$ (\secref{wf-blocks}). Branch-local
+variables are therefore permitted, but using one after the conditional is not:
+
+\begin{python}
+def foo():
+    x = 6
+    if b:
+        x = 3
+        y = x + 1
+    else:
+        y = 0
+    return x  # error: partially defined
+\end{python}
+
+\noindent Python returns \pyinline{3} when \pyinline{b} is true, so no pure reading of the program agrees
+with Python. The program assigns \pyinline{x} on every run, so this is stricter than avoiding Python's
+\pyinline{NameError}: the reference would denote the branch-local variable on one path and the
+\pyinline{x = 6} it hides on the other.
+
+Python's function-level scoping is kept as well. The \ruleName{def} rule introduces every variable the
+body assigns, $\assignsS(b)$, at $\statusNotDefAssigned$ before checking the body, so a reference before the
+assignment is rejected statically, where Python fails at run time with \pyinline{UnboundLocalError}:
+
+\begin{python}
+y = 7
+def f():
+    x = y  # error: y is local, because of the assignment below
+    y = 8
+\end{python}
+
+\noindent Here $\assignsS(s)$ is the set of variables assigned anywhere in a statement $s$, not descending
+into nested function definitions, which have their own scope; it is the domain of the context $s$
+definitely assigns, $\assignsS(s) = \dom(\Delta)$ when $s : \Assigns{\Delta}$.
 
 \subsubsection{No reassignment of captured variables}
 \label{sec:captured-vars}
