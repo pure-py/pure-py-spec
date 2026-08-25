@@ -119,9 +119,7 @@ The functions on values used by the evaluation rules. The operators, structural 
 have the meanings they have in Python and yield $\aborts{\kappa}$ where Python raises. All three are
 undefined where no case applies, and where one of them is undefined the expression has no derivation,
 which is where \PurePy declines to give the operation the meaning Python gives it; a non-Boolean test is
-the same case. Because equality is partial, the order in which elements are compared is observable:
-equality and membership stop at the first element that decides the result, so an undefined comparison
-later in a sequence does not make the whole undefined.
+the same case.
 
 \begin{auxfunction}{\hat{\odot}(v, v')}{outcome}{aux:binop}
 The meaning of a strict binary operator.
@@ -143,7 +141,9 @@ The meaning of a unary operator.
 Structural equality: literals by value, lists and tuples elementwise, dictionaries by keys and
 entries, and objects by class and then by fields. \pyinline{None} compares with any value;
 otherwise equality is undefined between values of different kinds. Sequences are compared from the
-first element and comparison stops at the first unequal one.
+first element and comparison stops at the first unequal one. Because equality is partial, this order is
+observable: an undefined comparison later in a sequence does not make the whole undefined. The same
+holds of $\eqEntries$ and $\memOp$ below.
 \begin{align*}
 \input{functions/eq}
 \end{align*}
