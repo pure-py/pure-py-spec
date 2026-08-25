@@ -121,11 +121,19 @@ undefined where no case applies, and where one of them is undefined the expressi
 which is where \PurePy declines to give the operation the meaning Python gives it; a non-Boolean test is
 the same case.
 
-\begin{auxfunction}{\hat{\odot}(v, v'), \hat{\ominus}(v)}{outcome}{aux:operators}
-The meaning of a strict binary or unary operator applied to its operands.
+\begin{auxfunction}{\hat{\odot}(v, v')}{outcome}{aux:binop}
+The meaning of a strict binary operator applied to its operands.
 \begin{center}
 \small
-\input{functions/operators}
+\input{functions/binop}
+\end{center}
+\end{auxfunction}
+
+\begin{auxfunction}{\hat{\ominus}(v)}{outcome}{aux:unop}
+The meaning of a unary operator applied to its operand.
+\begin{center}
+\small
+\input{functions/unop}
 \end{center}
 \end{auxfunction}
 
