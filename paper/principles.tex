@@ -19,7 +19,7 @@ statements of a module; in the example of \secref{no-mutable-state}, \pyinline{x
 definition of \pyinline{g} and assigned by \pyinline{x = 6}, so the program is rejected. The
 \ruleName{assign} rule imposes the second, $x \notin \capturesE(e)$ for an assignment $x = e$, rejecting
 for instance \pyinline{x = lambda: x}, whose lambda under Python's late binding would return itself. A
-dataclass declaration counts as an assignment of its class name here, though re-declaring a class name is
+dataclass declaration counts as an assignment of its class name here, although re-declaring a class name is
 excluded outright (\secref{no-first-class}).
 
 Here $\capturesS(s)$ is the set of variables of the enclosing scope captured by the lambdas and nested
