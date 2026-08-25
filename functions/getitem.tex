@@ -1,6 +1,6 @@
-\getitem(\delta, w) &{}= \val{\delta(w)} && \text{if } w \in \dom(\delta) \\
-\getitem(\delta, w) &{}= \aborts{\errKey} && \text{if } w \notin \dom(\delta) \\
-\getitem(v, n) &{}= \val{v_{n+1}} && \text{if } \elems(v) = v_1 \cons \ldots \cons v_m \text{ and } 0 \leq n < m \\
-\getitem(v, n) &{}= \val{v_{m+n+1}} && \text{if } \elems(v) = v_1 \cons \ldots \cons v_m \text{ and } {-m} \leq n < 0 \\
-\getitem(v, n) &{}= \aborts{\errIndex} && \text{if } \elems(v) = v_1 \cons \ldots \cons v_m \text{ and } (n < -m \text{ or } n \geq m) \\
+\getitem(\delta, w) &{}= \val{\delta(w)} && \text{if } w \in \dom(\delta) \\*
+\getitem(\delta, w) &{}= \aborts{\errKey} && \text{if } w \notin \dom(\delta) \\*
+\getitem(v, n) &{}= \val{v_{n+1}} && \text{if } \elems(v) = v_1 \cons \ldots \cons v_m \text{ and } 0 \leq n < m \\*
+\getitem(v, n) &{}= \val{v_{m+n+1}} && \text{if } \elems(v) = v_1 \cons \ldots \cons v_m \text{ and } {-m} \leq n < 0 \\*
+\getitem(v, n) &{}= \aborts{\errIndex} && \text{if } \elems(v) = v_1 \cons \ldots \cons v_m \text{ and } (n < -m \text{ or } n \geq m) \\*
 \getitem(v, v') &{}= \aborts{\errType} && (\text{otherwise}; \; v \text{ not a dictionary})

@@ -1,22 +1,22 @@
-\eqOp(\ell, \ell) &{}= \pyinline{True} && \text{if } \ell \text{ is not } \pyinline{nan} \\
-\eqOp(n, n') &{}= \pyinline{False} && \text{if } n \neq n' \\
-\eqOp(w, w') &{}= \pyinline{False} && \text{if } w \neq w' \\
-\eqOp(\pyinline{None}, v) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\
-\eqOp(v, \pyinline{None}) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\
-\eqOp(\pyinline{True}, \pyinline{False}) &{}= \pyinline{False} \\
-\eqOp(\pyinline{False}, \pyinline{True}) &{}= \pyinline{False} \\
+\eqOp(\ell, \ell) &{}= \pyinline{True} && \text{if } \ell \text{ is not } \pyinline{nan} \\*
+\eqOp(n, n') &{}= \pyinline{False} && \text{if } n \neq n' \\*
+\eqOp(w, w') &{}= \pyinline{False} && \text{if } w \neq w' \\*
+\eqOp(\pyinline{None}, v) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\*
+\eqOp(v, \pyinline{None}) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\*
+\eqOp(\pyinline{True}, \pyinline{False}) &{}= \pyinline{False} \\*
+\eqOp(\pyinline{False}, \pyinline{True}) &{}= \pyinline{False} \\*
 \\
-\eqOp(\exList{\varepsilon}, \exList{\varepsilon}) &{}= \pyinline{True} \\
-\eqOp(\exTuple{\varepsilon}, \exTuple{\varepsilon}) &{}= \pyinline{True} \\
-\eqOp(\exList{v \cons \seq{v}}, \exList{v' \cons \seq{v}\,'}) &{}= \pyinline{False} && \text{if } \eqOp(v, v') = \pyinline{False} \\
-\eqOp(\exList{v \cons \seq{v}}, \exList{v' \cons \seq{v}\,'}) &{}= \eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) && \text{if } \eqOp(v, v') = \pyinline{True} \\
-\eqOp(\exTuple{v \cons \seq{v}}, \exTuple{v' \cons \seq{v}\,'}) &{}= \pyinline{False} && \text{if } \eqOp(v, v') = \pyinline{False} \\
-\eqOp(\exTuple{v \cons \seq{v}}, \exTuple{v' \cons \seq{v}\,'}) &{}= \eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) && \text{if } \eqOp(v, v') = \pyinline{True} \\
-\eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) &{}= \pyinline{False} && \text{if } |\seq{v}| \neq |\seq{v}\,'| \\
-\eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \pyinline{False} && \text{if } |\seq{v}| \neq |\seq{v}\,'| \\
+\eqOp(\exList{\varepsilon}, \exList{\varepsilon}) &{}= \pyinline{True} \\*
+\eqOp(\exTuple{\varepsilon}, \exTuple{\varepsilon}) &{}= \pyinline{True} \\*
+\eqOp(\exList{v \cons \seq{v}}, \exList{v' \cons \seq{v}\,'}) &{}= \pyinline{False} && \text{if } \eqOp(v, v') = \pyinline{False} \\*
+\eqOp(\exList{v \cons \seq{v}}, \exList{v' \cons \seq{v}\,'}) &{}= \eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) && \text{if } \eqOp(v, v') = \pyinline{True} \\*
+\eqOp(\exTuple{v \cons \seq{v}}, \exTuple{v' \cons \seq{v}\,'}) &{}= \pyinline{False} && \text{if } \eqOp(v, v') = \pyinline{False} \\*
+\eqOp(\exTuple{v \cons \seq{v}}, \exTuple{v' \cons \seq{v}\,'}) &{}= \eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) && \text{if } \eqOp(v, v') = \pyinline{True} \\*
+\eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) &{}= \pyinline{False} && \text{if } |\seq{v}| \neq |\seq{v}\,'| \\*
+\eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \pyinline{False} && \text{if } |\seq{v}| \neq |\seq{v}\,'| \\*
 \\
-\eqOp(\delta, \delta') &{}= \eqEntries(\delta, \delta') && \text{if } \dom(\delta) = \dom(\delta') \\
-\eqOp(\delta, \delta') &{}= \pyinline{False} && \text{if } \dom(\delta) \neq \dom(\delta') \\
+\eqOp(\delta, \delta') &{}= \eqEntries(\delta, \delta') && \text{if } \dom(\delta) = \dom(\delta') \\*
+\eqOp(\delta, \delta') &{}= \pyinline{False} && \text{if } \dom(\delta) \neq \dom(\delta') \\*
 \\
-\eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \eqOp(\exTuple{\rho(x_1), \ldots, \rho(x_n)}, \exTuple{\rho'(x_1), \ldots, \rho'(x_n)}) && \text{if } \fields(C) = x_1, \ldots, x_n \\
+\eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \eqOp(\exTuple{\rho(x_1), \ldots, \rho(x_n)}, \exTuple{\rho'(x_1), \ldots, \rho'(x_n)}) && \text{if } \fields(C) = x_1, \ldots, x_n \\*
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C'
