@@ -26,6 +26,12 @@
 \usepackage{listings}
 \usepackage{subcaption}
 \usepackage{float}
+% Keep figures near their text: allow placement at the input point, and let large floats share a page with text.
+\floatplacement{figure}{htbp}
+\renewcommand*{\topfraction}{0.9}
+\renewcommand*{\bottomfraction}{0.7}
+\renewcommand*{\textfraction}{0.05}
+\renewcommand*{\floatpagefraction}{0.8}
 \usepackage{needspace}
 \usepackage{xspace}
 \usepackage{enumitem}
