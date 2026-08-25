@@ -1,13 +1,10 @@
-TEXFILES := $(wildcard *.tex) $(wildcard tex/*.tex fig/*.tex functions/*.tex)
+TEXFILES := $(wildcard *.tex) $(wildcard tex/*.tex spec/*.tex spec/fig/*.tex spec/functions/*.tex paper/*.tex paper/fig/*.tex)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
 ARXIV_ZIP := paper-arXiv.zip
 ARXIV_FILES := \
 	paper.tex \
-	$(wildcard tex/*.tex) \
-	$(wildcard fig/*.tex) \
-	$(wildcard functions/*.tex) \
-	$(wildcard *.bbl *.bst tex/*.bib) \
-	$(wildcard fig/*.pdf fig/*.png fig/*.jpg fig/*.jpeg fig/*.eps)
+	$(wildcard tex/*.tex spec/*.tex spec/fig/*.tex spec/functions/*.tex paper/*.tex paper/fig/*.tex) \
+	$(wildcard *.bbl *.bst tex/*.bib)
 
 default: paper.pdf
 

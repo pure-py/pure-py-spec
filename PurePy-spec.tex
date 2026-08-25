@@ -88,13 +88,13 @@
 The judgement forms of the well-formedness rules and the operational semantics, with the figure defining
 each.
 
-\input{fig/judgement-index}
+\input{spec/fig/judgement-index}
 
 \addsec{Auxiliary functions}
 
 The auxiliary functions used by the rules, with the section defining each.
 
-\input{fig/auxiliary-index}
+\input{spec/fig/auxiliary-index}
 
 % The shared sources use \section for what is a chapter here; shift the heading levels, innermost first,
 % and restore them afterwards.
@@ -105,16 +105,16 @@ The auxiliary functions used by the rules, with the section defining each.
 \let\subsection\section
 \let\section\chapter
 
-\input{tex/syntax}
-\input{tex/well-formedness}
-\input{tex/operational-semantics}
+\input{spec/syntax}
+\input{spec/well-formedness}
+\input{spec/operational-semantics}
 
 \let\section\specsection
 \let\subsection\specsubsection
 \let\subsubsection\specsubsubsection
 
 \appendix
-\input{tex/annex-auxiliary}
+\input{spec/annex-auxiliary}
 
 \bibliographystyle{plainnat}
 \bibliography{tex/refs,tex/additional-refs}

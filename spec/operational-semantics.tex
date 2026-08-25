@@ -18,7 +18,7 @@ to sequential composition of result types:
 
 with $\assigns{\varnothing}$ as left and right unit.
 
-\input{fig/eval-values}
+\input{spec/fig/eval-values}
 
 A value is well-formed at a context entry (\figref{well-formed-env}): ordinary values at
 $\statusDefAssigned$, module references and class entries at the corresponding entry. An environment is
@@ -29,7 +29,7 @@ $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a partia
 arguments to outcomes (\figref{predefined}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has outcome
 $\primFn(\seq{u})$, and no derivation where $\primFn(\seq{u})$ is undefined.
 
-\input{fig/well-formed-env}
+\input{spec/fig/well-formed-env}
 
 The rules are given in a monadic metalanguage over outcomes (\figref{values}), in which
 $\mlet{v}{o}{\ldots}$ binds the value of an outcome; for example, \ruleName{eval-binop} concludes
@@ -43,29 +43,7 @@ outcomes of the same form, carrying a result, a sequence of values or an environ
 
 \speconly{The operators and the other auxiliary functions the evaluation rules use are defined in
 \secref{mf-values}, and module and class resolution in \secref{mf-classes}.}
-\begin{PaperOnly}
-The strict operators are given by metafunctions $\hat{\odot}$ and $\hat{\ominus}$ (\figref{operators}), in
-terms of structural equality $\eqOp$ and membership $\memOp$ (\figrefTwo{equality}{membership}).
-\input{functions/operators-text}
-
-\input{fig/operators}
-\input{fig/equality}
-\input{fig/membership}
-
-The remaining metafunctions the rules use are collected in \figref{eval-aux}: $\outcome$ reads a
-block's result as the outcome of calling it, $\iterOp$ gives the sequence a generator draws from, $\getitem$
-interprets subscripting, $\dispatch$ selects the case a $\pyinline{match}$ takes, and $\entries$ and
-$\update$ build a dictionary from its entries.
-
-\input{fig/eval-aux}
-\end{PaperOnly}
-\begin{PaperOnly}
-A qualified name is resolved through the environments of loaded modules: $\env(\rho, q)$ is the
-environment of module $q$ as loaded in $\rho$, and $\resolveClass(\rho, q)$ the class entry that $q$
-denotes (\figref{resolution}).
-
-\input{fig/resolution}
-\end{PaperOnly}
+\paperinput{paper/operational-values}
 
 \subsection{Pattern matching}
 
@@ -88,7 +66,7 @@ pattern's class among its ancestors; sub-patterns bind the fields of the pattern
 its class entry, whose qualified name is the identity of the class: since a module declares each class name at
 most once, the entry comparison in \ruleName{eval-pat-constr} amounts to a comparison of qualified names.
 
-\input{fig/match}
+\input{spec/fig/match}
 
 \subsection{Blocks and expressions}
 
@@ -106,7 +84,7 @@ concatenates the results; a generator draws from $\iterOp$ (\paperonly{\figref{e
 defined on lists, tuples, strings and dictionaries, a dictionary yielding its keys as in Python.
 These are the only values a generator can draw from.
 
-\input{fig/eval-outcome}
+\input{spec/fig/eval-outcome}
 
 \subsection{Modules and programs}
 
@@ -133,4 +111,4 @@ A program evaluates to a termination kind (\figref{values}): $\errExit{0}$ if th
 loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exited with status $n$. An implementation must agree on which kind a run yields, though how it
 reports one is not prescribed.
 
-\input{fig/eval-modules}
+\input{spec/fig/eval-modules}

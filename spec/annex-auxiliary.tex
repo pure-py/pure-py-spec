@@ -12,39 +12,39 @@ The analyses $\assignsS$, $\binds$, $\capturesS$ and $\capturesE$ introduced in 
 defined by their principal cases; the remaining cases are stated with each.
 
 \begin{auxfunction}{\assignsS(s)}{set of variables}{aux:assigns}
-\input{functions/assigns-text}
+\input{spec/functions/assigns-text}
 \begin{align*}
-\input{functions/assigns}
+\input{spec/functions/assigns}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\binds(p)}{set of variables}{aux:binds}
-\input{functions/binds-text}
+\input{spec/functions/binds-text}
 \begin{align*}
-\input{functions/binds}
+\input{spec/functions/binds}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\capturesS(s)}{set of variables}{aux:captures}
-\input{functions/captures-text}
+\input{spec/functions/captures-text}
 \begin{align*}
-\input{functions/captures}
+\input{spec/functions/captures}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\capturesE(e)}{set of variables}{aux:captures-e}
-\input{functions/captures-e-text}
+\input{spec/functions/captures-e-text}
 \begin{align*}
-\input{functions/captures-e}
+\input{spec/functions/captures-e}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\fvS(b)}{set of variables}{aux:fv}
-\input{functions/fv-text}
+\input{spec/functions/fv-text}
 \end{auxfunction}
 
 \begin{auxfunction}{\fvE(e)}{set of variables}{aux:fv-e}
-\input{functions/fv-e-text}
+\input{spec/functions/fv-e-text}
 \end{auxfunction}
 
 \section{Classes and modules}
@@ -54,153 +54,153 @@ The functions on module names, field lists and class entries introduced in \secr
 the resolution of qualified names in an environment.
 
 \begin{auxfunction}{\submods(q)}{context}{aux:submods}
-\input{functions/submods-text}
+\input{spec/functions/submods-text}
 \begin{align*}
-\input{functions/submods}
+\input{spec/functions/submods}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\ownFields(\phi)}{sequence of variables}{aux:own-fields}
-\input{functions/own-fields-text}
+\input{spec/functions/own-fields-text}
 \begin{align*}
-\input{functions/own-fields}
+\input{spec/functions/own-fields}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\fields(C)}{sequence of variables}{aux:fields}
-\input{functions/fields-text}
+\input{spec/functions/fields-text}
 \begin{align*}
-\input{functions/fields}
+\input{spec/functions/fields}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\ancestors(C)}{set of class entries}{aux:ancestors}
-\input{functions/ancestors-text}
+\input{spec/functions/ancestors-text}
 \begin{align*}
-\input{functions/ancestors}
+\input{spec/functions/ancestors}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\fieldMap(C, \seq{u})}{map from variables}{aux:field-map}
-\input{functions/field-map-text}
+\input{spec/functions/field-map-text}
 \begin{align*}
-\input{functions/field-map}
+\input{spec/functions/field-map}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\env(\rho, q)}{environment}{aux:env}
-\input{functions/env-text}
+\input{spec/functions/env-text}
 \begin{align*}
-\input{functions/env}
+\input{spec/functions/env}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\resolveClass(\rho, q)}{class entry}{aux:resolve-class}
-\input{functions/resolve-class-text}
+\input{spec/functions/resolve-class-text}
 \begin{align*}
-\input{functions/resolve-class}
+\input{spec/functions/resolve-class}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\nameOf(q)}{string}{aux:name}
-\input{functions/name-text}
+\input{spec/functions/name-text}
 \end{auxfunction}
 
 \section{Values}
 \label{sec:mf-values}
 
 The functions on values used by the evaluation rules.
-\input{functions/operators-text}
+\input{spec/functions/operators-text}
 
 \begin{auxfunction}{\hat{\odot}(v, v')}{outcome}{aux:binop}
-\input{functions/binop-text}
+\input{spec/functions/binop-text}
 \begin{center}
 \small
-\input{functions/binop}
+\input{spec/functions/binop}
 \end{center}
 \end{auxfunction}
 
 \begin{auxfunction}{\hat{\ominus}(v)}{outcome}{aux:unop}
-\input{functions/unop-text}
+\input{spec/functions/unop-text}
 \begin{center}
 \small
-\input{functions/unop}
+\input{spec/functions/unop}
 \end{center}
 \end{auxfunction}
 
 \begin{auxfunction}{\eqOp(v, v')}{Boolean}{aux:eq}
-\input{functions/eq-text}
+\input{spec/functions/eq-text}
 \begin{align*}
-\input{functions/eq}
+\input{spec/functions/eq}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\eqElems(\seq{v}, \seq{v}\,')}{Boolean}{aux:eq-elems}
-\input{functions/eq-elems-text}
+\input{spec/functions/eq-elems-text}
 \begin{align*}
-\input{functions/eq-elems}
+\input{spec/functions/eq-elems}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\memOp(v, v')}{Boolean}{aux:contains}
-\input{functions/contains-text}
+\input{spec/functions/contains-text}
 \begin{align*}
-\input{functions/contains}
+\input{spec/functions/contains}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\memElems(\seq{v}, v)}{Boolean}{aux:contains-elems}
-\input{functions/contains-elems-text}
+\input{spec/functions/contains-elems-text}
 \begin{align*}
-\input{functions/contains-elems}
+\input{spec/functions/contains-elems}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\elems(v)}{sequence of values}{aux:elems}
-\input{functions/elems-text}
+\input{spec/functions/elems-text}
 \begin{align*}
-\input{functions/elems}
+\input{spec/functions/elems}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\iterOp(v)}{sequence of values}{aux:iter}
-\input{functions/iter-text}
+\input{spec/functions/iter-text}
 \begin{align*}
-\input{functions/iter}
+\input{spec/functions/iter}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\getitem(v, v')}{outcome}{aux:getitem}
-\input{functions/getitem-text}
+\input{spec/functions/getitem-text}
 \begin{align*}
-\input{functions/getitem}
+\input{spec/functions/getitem}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\outcome(r)}{outcome}{aux:outcome}
-\input{functions/outcome-text}
+\input{spec/functions/outcome-text}
 \begin{align*}
-\input{functions/outcome}
+\input{spec/functions/outcome}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\dispatch(\rho, v, \seq{p}, \seq{b})}{bindings and block}{aux:dispatch}
-\input{functions/dispatch-text}
+\input{spec/functions/dispatch-text}
 \begin{align*}
-\input{functions/dispatch}
+\input{spec/functions/dispatch}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\entries(\delta, \delta')}{dictionary entries}{aux:entries}
-\input{functions/entries-text}
+\input{spec/functions/entries-text}
 \begin{align*}
-\input{functions/entries}
+\input{spec/functions/entries}
 \end{align*}
 \end{auxfunction}
 
 \begin{auxfunction}{\update(\delta, w, v)}{dictionary entries}{aux:update}
-\input{functions/update-text}
+\input{spec/functions/update-text}
 \begin{align*}
-\input{functions/update}
+\input{spec/functions/update}
 \end{align*}
 \end{auxfunction}

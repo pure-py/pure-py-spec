@@ -13,11 +13,16 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 
 - `paper.tex` — the paper
 - `PurePy-spec.tex` — the language specification as a standalone document, separate from the paper (#134)
-- `tex/` — macros, listings config, related work
-- `fig/` — syntax, well-formedness rules, operational semantics
+- `spec/` — the specification's sources; the paper is assembled from these
+- `paper/` — the paper's own material
+- `tex/` — macros and bibliography shared by both documents
 - `agda/` — Agda mechanisation (distributivity proof)
 - `src/` — reference checker (Python `ast`-based), organised to mirror the spec's sections
 - `test/` — litmus tests
+
+The specification is the source of truth. The paper reuses its sections and definitions; where the paper
+adds material to a shared section, the section carries a marker at that point and the material itself
+lives with the paper.
 
 ## Building the spec
 

@@ -10,7 +10,7 @@ grouping consecutive \pyinline{def}s into a single region. The well-formedness r
 one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
 \figref{metavariables} summarises the metavariables used throughout.
 
-\input{fig/metavariables}
+\input{spec/fig/metavariables}
 
 \subsection{Lexical syntax}
 \label{sec:lexical}
@@ -118,10 +118,10 @@ def f(b):
 \end{python}
 \end{minipage}
 
-\input{fig/syntax-stmt}
-\input{fig/syntax-expr}
+\input{spec/fig/syntax-stmt}
+\input{spec/fig/syntax-expr}
 \begin{AddedBlock}
-\input{fig/syntax-types}
+\input{spec/fig/syntax-types}
 \end{AddedBlock}
 
 \paragraph{Operators.}
@@ -133,7 +133,7 @@ expression forms; they do not evaluate both operands. The grammar of \figref{syn
 on operator forms; disambiguation is by the precedence and associativity given in \figref{precedence},
 which follow Python.
 
-\input{fig/precedence}
+\input{spec/fig/precedence}
 
 \begin{AddedBlock}
 \paragraph{Annotations.}
@@ -217,13 +217,4 @@ member listed for $q$ in \figref{predefined} to its value.
 Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' = q.q''$ for some $q''$, and $\properPrefixOf$ for
 the strict order; the proper prefixes of a module name are its \emph{ancestors}.\speconly{ The metafunctions
 on modules and classes are defined in \secref{mf-classes}.}
-\begin{PaperOnly}
-The $\submods$ metafunction is defined, with the class-related metafunctions, in \figref{modules}.
-A dataclass names its fields in a fixed order, and a constructor supplies each field exactly once,
-positionally or by keyword. The metafunction $\fieldMap(C, \seq{u})$ maps each field of $C$ to the argument supplied for it,
-and is undefined if the arguments do not cover the fields exactly. Constructor patterns and expressions
-use it to check and evaluate field-by-field, so the rules do not depend on how a constructor splits its
-arguments.
-
-\input{fig/modules}
-\end{PaperOnly}
+\paperinput{paper/syntax-classes}
