@@ -29,13 +29,9 @@ same for a phrase. The subfolders of `spec/` are self-explanatory, except that `
 rules the paper needs to include on an individual basis, so that each has one source; all other rules
 live in their figures.
 
-## Building the spec
+## Building
 
-```
-latexmk -pdf paper.tex
-```
-
-The standalone specification is built with `make spec`.
+See the Makefile.
 
 ## Running tests
 

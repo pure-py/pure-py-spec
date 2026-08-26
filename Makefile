@@ -1,6 +1,6 @@
 TEXFILES := $(wildcard *.tex) $(wildcard tex/*.tex spec/*.tex spec/*/*.tex paper/*.tex paper/*/*.tex)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
-ARXIV_ZIP := paper-arXiv.zip
+AUX := *.aux *.bbl *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
 ARXIV_FILES := \
 	paper.tex \
 	$(wildcard tex/*.tex spec/*.tex spec/*/*.tex paper/*.tex paper/*/*.tex) \
@@ -8,37 +8,41 @@ ARXIV_FILES := \
 
 default: paper.pdf
 
-%.pdf: %.tex $(TEXFILES)
+%.pdf: %.tex $(TEXFILES) | clean-aux
 	$(PDFLATEX) $<
 	bibtex "$*"
 	$(PDFLATEX) $<
 	$(PDFLATEX) $<
 
-spec: PurePy-spec.pdf
+# Anonymised build of source $(2) under job name $(1).
+define anon
+$(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
+bibtex $(1)
+$(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
+$(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
+endef
 
-spec-anon: PurePy-spec-anon.pdf
+paper-anon.pdf: $(TEXFILES) | clean-aux
+	$(call anon,paper-anon,paper.tex)
 
-PurePy-spec-anon.pdf: $(TEXFILES)
-	$(PDFLATEX) -jobname=PurePy-spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
-	bibtex PurePy-spec-anon
-	$(PDFLATEX) -jobname=PurePy-spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
-	$(PDFLATEX) -jobname=PurePy-spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
+spec-anon.pdf: $(TEXFILES) | clean-aux
+	$(call anon,spec-anon,PurePy-spec.tex)
 
-anon: paper-anon.pdf
-
-paper-anon.pdf: $(TEXFILES)
-	$(PDFLATEX) -jobname=paper-anon "\def\anonmode{}\input{paper.tex}"
-	bibtex paper-anon
-	$(PDFLATEX) -jobname=paper-anon "\def\anonmode{}\input{paper.tex}"
-	$(PDFLATEX) -jobname=paper-anon "\def\anonmode{}\input{paper.tex}"
-
-clean:
-	rm -f *.pdf *.aux *.log *.out *.bbl *.blg $(ARXIV_ZIP)
-
-arXiv: $(ARXIV_ZIP)
-
-$(ARXIV_ZIP): $(ARXIV_FILES)
+# Zip rather than a bare PDF, to make room for a mechanisation.
+supplementary.zip: spec-anon.pdf
 	rm -f $@
-	zip -9 $@ $^
+	cp $< spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
 
-.PHONY: default spec spec-anon anon clean arXiv
+submit: paper-anon.pdf supplementary.zip
+
+paper-arXiv.zip: $(ARXIV_FILES)
+	rm -f $@
+	zip -q -9 $@ $^
+
+clean-aux:
+	rm -f $(AUX)
+
+clean: clean-aux
+	rm -f *.pdf *.zip
+
+.PHONY: default submit clean-aux clean
