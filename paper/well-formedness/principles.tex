@@ -59,10 +59,11 @@ $t\;t'$: no variable in $\capturesS(t)$ may be in $\assignsS(t')$. In the exampl
 definition of \pyinline{g} and assigned by \pyinline{x = 6}, so the program is rejected. The
 \ruleName{assign} rule imposes the second, $x \notin \capturesE(e)$ for an assignment $x = e$, rejecting
 for instance \pyinline{x = lambda: x}, where under Python's late binding the lambda would return itself. A
-comprehension mutates its generator variables on each iteration, so a lambda in its body or in a later
-qualifier may not capture one, a side condition of \ruleName{list-comp}, \ruleName{dict-comp} and
-\ruleName{qual-generator}: \pyinline{[lambda x: x**i for i in range(10)]} is rejected, since under Python
-every element would compute \pyinline{x**9}. A dataclass declaration counts as an assignment of its class name here, although re-declaring a class name is
+third case arises in comprehensions: in Python a comprehension mutates its generator variables on each
+iteration, so a lambda in the body or in a later qualifier may not capture one, a side condition of
+\ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}. For instance
+\pyinline{[lambda x: x**i for i in range(10)]} is rejected, since under Python every element would compute
+\pyinline{x**9}. A dataclass declaration counts as an assignment of its class name here, although re-declaring a class name is
 excluded outright (\secref{no-first-class}).
 
 Here $\capturesS(s)$ is the set of variables of the enclosing scope captured by the lambdas and nested
