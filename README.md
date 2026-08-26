@@ -36,11 +36,57 @@ The standalone specification is built with `make spec`.
 
 ## Running tests
 
-```
-test/run-all.sh
+Install [uv](https://docs.astral.sh/uv/). The project requires Python 3.12
+or later, as specified in `pyproject.toml` and `.python-version`
+([#39](https://github.com/pure-py/pure-py-spec/issues/39)).
+
+From the repository root, run:
+
+```bash
+uv run --locked ./test/run-all.sh
 ```
 
-Sets up a `.venv` automatically. Targets Python 3.12+ ([#39](https://github.com/pure-py/pure-py-spec/issues/39)).
+This command creates the project environment, installs the locked development
+dependencies, and runs the test suite.
+
+## Development
+
+Synchronize the project environment and install the development dependencies:
+
+```bash
+uv sync --locked
+```
+
+Run Ruff’s linter:
+
+```bash
+uv run --locked ruff check ./src ./test/run-all.py
+```
+
+Check formatting:
+
+```bash
+uv run --locked ruff format --check ./src ./test/run-all.py
+```
+
+Apply Ruff formatting:
+
+```bash
+uv run --locked ruff format ./src ./test/run-all.py
+```
+
+When changing project dependencies or metadata, run:
+
+```bash
+uv lock
+```
+
+Review and commit the resulting changes to:
+
+```text
+pyproject.toml
+uv.lock
+```
 
 Tests are organised by tier (module-level and program-level) and then by verdict. The verdict directory *is* the test's specification: the runner derives every assertion from the path.
 - `semantically-valid/` — PurePy accepts; Python runs it and gives the same result
@@ -54,9 +100,9 @@ The invariant — `excluded` ⇒ Python runs it, `python-error` ⇒ Python raise
 
 Check a single module, or a whole program from its entry module:
 
-```
-python3 src/check_module.py path/to/module.py
-python3 src/check_program.py path/to/main.py
+```bash
+uv run --locked python src/check_module.py path/to/module.py
+uv run --locked python src/check_program.py path/to/main.py
 ```
 
 ## Release workflow

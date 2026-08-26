@@ -2,55 +2,92 @@ name: Litmus tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
 
 jobs:
-  test:
+  lint:
+    name: lint
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install development dependencies
+        run: uv sync --locked
+
+      - name: Run Ruff
+        run: uv run --locked ruff check ./src ./test/run-all.py
+
+      - name: Check formatting
+        run: uv run --locked ruff format --check ./src ./test/run-all.py
+
+  test:
+    name: test (${{ matrix.runtime }})
+    runs-on: ubuntu-latest
+
     strategy:
       fail-fast: false
       matrix:
         include:
           - runtime: CPython
-            cli: python
-            version: '3.12'
+            version: "3.12"
 
           - runtime: GraalPy
-            cli: python --no-mypy
-            version: 'graalpy-25.2'
+            version: "graalpy-25.2"
 
           - runtime: Pyodide
-            cli: $PYODIDE_PYTHON --no-mypy
-            version: '3.12'
+            version: "3.12"
 
-    name: test (${{ matrix.runtime }})
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up CPython or GraalPy
+        if: matrix.runtime != 'Pyodide'
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.version }}
 
-      - name: Install mypy
+      - name: Set up uv for CPython
         if: matrix.runtime == 'CPython'
-        run: pip install mypy
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
 
-      - name: Install uv
+      - name: Install CPython dependencies
+        if: matrix.runtime == 'CPython'
+        run: uv sync --locked
+
+      - name: Set up uv for Pyodide
         if: matrix.runtime == 'Pyodide'
         uses: astral-sh/setup-uv@v6
 
       - name: Install Pyodide
         if: matrix.runtime == 'Pyodide'
         run: |
-          uv python install cpython-3.14.2-emscripten-wasm32-musl
-          PYODIDE_PYTHON=$(uv python find cpython-3.14.2-emscripten-wasm32-musl)
+          uv python install pyodide@${{ matrix.version }}
+          PYODIDE_PYTHON="$(uv python find pyodide@${{ matrix.version }})"
           echo "PYODIDE_PYTHON=$PYODIDE_PYTHON" >> "$GITHUB_ENV"
-          
-      - name: Run all tests
-        run: |
-          test/run-all.sh ${{ matrix.cli }}
-          
 
+      - name: Run tests with CPython
+        if: matrix.runtime == 'CPython'
+        run: |
+          uv run --locked ./test/run-all.sh python
+
+      - name: Run tests with GraalPy
+        if: matrix.runtime == 'GraalPy'
+        run: |
+          test/run-all.sh python --no-mypy
+
+      - name: Run tests with Pyodide
+        if: matrix.runtime == 'Pyodide'
+        run: |
+          test/run-all.sh "$PYODIDE_PYTHON" --no-mypy
