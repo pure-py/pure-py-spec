@@ -45,36 +45,33 @@ an idempotent commutative semigroup of parallel composition $\merge$ (``merge'')
 distributivity does not hold. Both operations are defined pointwise.
 %
 \begin{definition}[Context override]
-{\small
 \begin{align*}
 \bot \override \theta &= \theta \override \bot = \theta \\
 \theta \override \theta' &= \theta' \quad (\text{otherwise})
-\end{align*}}
+\end{align*}
 \end{definition}
 
 \noindent Override is thus right-biased and has $\bot$ as both left and right unit.
 
 \begin{definition}[Context merge]
 For definite-assignment statuses $a, a' \in \B$:
-{\small
 \begin{align*}
 \bot \merge \bot &= \bot \\
 a \merge \bot = \bot \merge a &= \statusNotDefAssigned \\
 a \merge a' &= a \meet a'
-\end{align*}}
+\end{align*}
 \end{definition}
 
 \noindent Merge is otherwise undefined. Restricted to $\B$, it returns $\statusNotDefAssigned$ when exactly one argument is defined and the conjunction otherwise; so $\bot$ is not a unit.
 
 \begin{definition}[Context extend]
 \label{def:extend}
-{\small
 \begin{align*}
 \modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} &= \modLoaded{q}{\Gamma \extend \Gamma'} \\
 \modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} &= \modLoaded{q}{\Gamma} \\
 \bot \extend \theta = \theta \extend \bot &= \theta \\
 \theta \extend \theta' &= \theta' \quad (\text{otherwise})
-\end{align*}}
+\end{align*}
 \end{definition}
 
 \noindent Extend combines module references for the same module recursively, preferring loaded references to stubs, and is otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted at the same module must combine rather than shadow.
