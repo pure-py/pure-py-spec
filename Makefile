@@ -16,13 +16,13 @@ default: paper.pdf
 
 spec: PurePy-spec.pdf
 
-spec-anon: PurePy-spec-anon.pdf
+spec-anon: spec-anon.pdf
 
-PurePy-spec-anon.pdf: $(TEXFILES)
-	$(PDFLATEX) -jobname=PurePy-spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
-	bibtex PurePy-spec-anon
-	$(PDFLATEX) -jobname=PurePy-spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
-	$(PDFLATEX) -jobname=PurePy-spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
+spec-anon.pdf: $(TEXFILES)
+	$(PDFLATEX) -jobname=spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
+	bibtex spec-anon
+	$(PDFLATEX) -jobname=spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
+	$(PDFLATEX) -jobname=spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
 
 anon: paper-anon.pdf
 
