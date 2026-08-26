@@ -36,6 +36,11 @@
 \fi
 % Inline definitions: align* with tighter row spacing than a standalone figure.
 \newenvironment{defalign}{\setlength{\jot}{1pt}\csname align*\endcsname}{\csname endalign*\endcsname}
+% An entry of the context-operations figure: the shaded name at the left, the equations beside it.
+\newcommand*{\contextop}[2]{%
+  \noindent\begin{minipage}[t]{0.2\textwidth}\vspace{0pt}\shadebox{#1}\end{minipage}%
+  \begin{minipage}[t]{0.8\textwidth}\vspace{0pt}\setlength{\abovedisplayskip}{0pt}\setlength{\belowdisplayskip}{0pt}%
+  \begin{defalign}#2\end{defalign}\end{minipage}\par\vspace{2mm}}
 % How the paper refers to the specification document.
 \ifdefined\anonmode
   \newcommand*{\specification}{the supplementary material\xspace}

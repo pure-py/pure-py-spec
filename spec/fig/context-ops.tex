@@ -1,26 +1,20 @@
 \begin{figure}
 \small
-\flushleft \shadebox{$\Gamma \override \Delta$ (override)}
-\begin{defalign}
+\contextop{$\Gamma \override \Delta$ (override)}{
 (\Gamma \override \Delta)(x) &= \Gamma(x) \override \Delta(x) \\
 \bot \override \theta &= \theta \override \bot = \theta \\
-\theta \override \theta' &= \theta' \quad (\text{otherwise})
-\end{defalign}
-\flushleft \shadebox{$\Gamma \merge \Delta$ (merge)}
-\begin{defalign}
+\theta \override \theta' &= \theta' \quad (\text{otherwise})}
+\contextop{$\Gamma \merge \Delta$ (merge)}{
 (\Gamma \merge \Delta)(x) &= \Gamma(x) \merge \Delta(x) \\
 \bot \merge \bot &= \bot \\
 a \merge \bot = \bot \merge a &= \statusNotDefAssigned \\
-a \merge a' &= a \meet a' \quad (a, a' \in \B)
-\end{defalign}
-\flushleft \shadebox{$\Gamma \extend \Delta$ (extension)}
-\begin{defalign}
+a \merge a' &= a \meet a' \quad (a, a' \in \B)}
+\contextop{$\Gamma \extend \Delta$ (extension)}{
 (\Gamma \extend \Delta)(x) &= \Gamma(x) \extend \Delta(x) \\
 \modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} &= \modLoaded{q}{\Gamma \extend \Gamma'} \\
 \modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} &= \modLoaded{q}{\Gamma} \\
 \bot \extend \theta = \theta \extend \bot &= \theta \\
-\theta \extend \theta' &= \theta' \quad (\text{otherwise})
-\end{defalign}
+\theta \extend \theta' &= \theta' \quad (\text{otherwise})}
 \caption{Context operations, pointwise on entries}
 \label{fig:context-ops}
 \end{figure}
