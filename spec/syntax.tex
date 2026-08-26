@@ -110,8 +110,8 @@ $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
 $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
 $\seq{\iota}$ followed by a statement $s$; since imports are not statements, they can appear neither
 within a statement (and hence not in function bodies) nor after it. The statement begins with the
-assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$, establishing the binding of
-$\pymath{\_\_name\_\_}$ that loading the module provides (\secref{wf-modules}).
+assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$, establishing the binding that loading
+the module provides (\secref{wf-modules}).
 
 A second map $\mathcal{P}$ gives the
 predefined modules of \figref{predefined}, which have no body: $\mathcal{P}$ takes each such name to its
