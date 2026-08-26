@@ -2,18 +2,18 @@
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}}
 \hline
-\textbf{Construct} & \textbf{Python} & \textbf{Excluded} & \textbf{\PurePy} \\
+\textbf{Construct} & \textbf{Python} & \textbf{Exclusion} & \textbf{Mechanism} \\
 \hline
-Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & Dynamically & Must already be Boolean \\[1mm]
-Sequence patterns & List patterns match tuples, and tuple patterns lists & Dynamically & List patterns match only lists, tuple patterns only tuples \\[1mm]
-Constructor patterns & Positional class patterns may supply fewer sub-patterns than class has fields & Statically & Require exact arity \\[1mm]
-Dictionary keys & Any hashable value, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Statically in patterns, dynamically in expressions & Strings only \\[1mm]
-\pyinline{assert} message & Any object, shown in traceback & Dynamically & Strings only \\[1mm]
-\pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & Dynamically & Undefined between, say, number and string, or list and tuple; only \pyinline{None} compares with anything \\[1mm]
-Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & Dynamically & Equality undefined \\[1mm]
-\pyinline{nan} comparison via container equality & Elements compared by identity before equality, so identical NaNs match but distinct ones do not & Dynamically & Undefined when both elements are \pyinline{nan} \\
+Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & Dynamic & Must already be Boolean \\[1mm]
+Sequence patterns & List patterns match tuples, and tuple patterns lists & Dynamic & List patterns match only lists, tuple patterns only tuples \\[1mm]
+Constructor patterns & Positional class patterns may supply fewer sub-patterns than class has fields & Static & Require exact arity \\[1mm]
+Dictionary keys & Any hashable value, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Static in patterns, dynamic in expressions & Strings only \\[1mm]
+\pyinline{assert} message & Any object, shown in traceback & Dynamic & Strings only \\[1mm]
+\pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & Dynamic & Undefined between, say, number and string, or list and tuple; only \pyinline{None} compares with anything \\[1mm]
+Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & Dynamic & Equality undefined \\[1mm]
+\pyinline{nan} comparison via container equality & Elements compared by identity before equality, so identical NaNs match but distinct ones do not & Dynamic & Undefined when both elements are \pyinline{nan} \\
 \hline
 \end{tabular}
 \caption{Python coercions and lax matches excluded by \PurePy}
