@@ -1,5 +1,6 @@
 TEXFILES := $(wildcard *.tex) $(wildcard tex/*.tex spec/*.tex spec/*/*.tex paper/*.tex paper/*/*.tex)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
+AUX := *.aux *.bbl *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
 ARXIV_ZIP := paper-arXiv.zip
 ARXIV_FILES := \
 	paper.tex \
@@ -8,7 +9,7 @@ ARXIV_FILES := \
 
 default: paper.pdf
 
-%.pdf: %.tex $(TEXFILES)
+%.pdf: %.tex $(TEXFILES) | clean-aux
 	$(PDFLATEX) $<
 	bibtex "$*"
 	$(PDFLATEX) $<
@@ -18,7 +19,7 @@ spec: PurePy-spec.pdf
 
 spec-anon: spec-anon.pdf
 
-spec-anon.pdf: $(TEXFILES)
+spec-anon.pdf: $(TEXFILES) | clean-aux
 	$(PDFLATEX) -jobname=spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
 	bibtex spec-anon
 	$(PDFLATEX) -jobname=spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
@@ -26,14 +27,17 @@ spec-anon.pdf: $(TEXFILES)
 
 anon: paper-anon.pdf
 
-paper-anon.pdf: $(TEXFILES)
+paper-anon.pdf: $(TEXFILES) | clean-aux
 	$(PDFLATEX) -jobname=paper-anon "\def\anonmode{}\input{paper.tex}"
 	bibtex paper-anon
 	$(PDFLATEX) -jobname=paper-anon "\def\anonmode{}\input{paper.tex}"
 	$(PDFLATEX) -jobname=paper-anon "\def\anonmode{}\input{paper.tex}"
 
-clean:
-	rm -f *.pdf *.aux *.log *.out *.bbl *.blg $(ARXIV_ZIP)
+clean-aux:
+	rm -f $(AUX)
+
+clean: clean-aux
+	rm -f *.pdf $(ARXIV_ZIP)
 
 arXiv: $(ARXIV_ZIP)
 
@@ -41,4 +45,4 @@ $(ARXIV_ZIP): $(ARXIV_FILES)
 	rm -f $@
 	zip -9 $@ $^
 
-.PHONY: default spec spec-anon anon clean arXiv
+.PHONY: default spec spec-anon anon clean-aux clean arXiv
