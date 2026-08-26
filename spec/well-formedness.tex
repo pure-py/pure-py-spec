@@ -61,8 +61,8 @@ base class.
 A variable is a well-formed expression when it is definitely assigned (\ruleName{var});
 a lambda checks its body with its parameters definitely assigned, and a comprehension checks its body
 with the variables bound by its generators definitely assigned (\ruleName{qual-generator}). Two rules resolve a qualified name through the
-context to an entry $\theta$ (\figref{well-formed-expr}a). A module attribute reference is well-formed only
-when, read as a qualified name, it resolves to a definitely assigned member
+context to an entry $\theta$ (\figref{well-formed-expr}a). A module attribute reference $\exAttr{e}{x}$ is well-formed
+only when, read as a qualified name, it resolves to a definitely assigned member
 (\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}. A constructor call requires its name
 to resolve to a class and its arguments to cover the class's fields exactly, through $\fieldMap$
 (\ruleName{constr}). A variable bound to a module or class entry is not an expression on its own, and occurs
