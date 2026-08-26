@@ -2,18 +2,18 @@
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.315\textwidth}>{\raggedright\arraybackslash}p{0.25\textwidth}>{\raggedright\arraybackslash}p{0.142\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}}
 \hline
-\textbf{Construct} & \textbf{Python} & \textbf{\PurePy} & \textbf{Excluded} \\
+\textbf{Construct} & \textbf{Python} & \textbf{Excluded} & \textbf{\PurePy} \\
 \hline
-\pyinline{global} and \pyinline{nonlocal} & Reassign a binding of an enclosing scope & Not in the grammar & Syntactically \\[1mm]
-\pyinline{del} & Removes a binding & Not in the grammar & Syntactically \\[1mm]
-Augmented assignment (\pyinline{+=} and so on) & Rebinds a variable & Not in the grammar & Syntactically \\[1mm]
-Walrus operator (\pyinline{:=}) & Assigns within an expression & Not in the grammar & Syntactically \\[1mm]
-Item and attribute assignment (\pyinline{xs[0] = v}, \pyinline{p.x = v}) & Update a container or object in place & Not in the grammar: an assignment target is a variable & Syntactically \\[1mm]
-Mutating methods, such as \pyinline{list.append} & Update the value in place & Built-in values have no attributes, so the reference aborts with $\errAttr$ & Dynamically \\[1mm]
-Reassignment of a captured variable & The closure sees the new value & A variable captured by a statement may not be assigned later in the sequence, nor by the statement itself & Statically \\[1mm]
-Lambdas capturing a comprehension variable & Every lambda sees the variable's final value & A lambda may not capture a generator variable & Statically \\
+\pyinline{global} and \pyinline{nonlocal} & Reassign binding of enclosing scope & Syntactically & Not in grammar \\[1mm]
+\pyinline{del} & Removes binding & Syntactically & Not in grammar \\[1mm]
+Augmented assignment (\pyinline{+=} and so on) & Rebinds variable & Syntactically & Not in grammar \\[1mm]
+Walrus operator (\pyinline{:=}) & Assigns within expression & Syntactically & Not in grammar \\[1mm]
+Item and attribute assignment (\pyinline{xs[0] = v}, \pyinline{p.x = v}) & Update container or object in place & Syntactically & Not in grammar; assignment targets are variables \\[1mm]
+Mutating methods, such as \pyinline{list.append} & Update value in place & Dynamically & Built-in values have no attributes; reference aborts with $\errAttr$ \\[1mm]
+Reassignment of captured variable & Closure sees new value & Statically & Variable captured by statement may not be assigned later in sequence, nor by statement itself \\[1mm]
+Lambdas capturing comprehension variable & Every lambda sees variable's final value & Statically & Lambda may not capture generator variable \\
 \hline
 \end{tabular}
 \caption{Python mutation of state excluded by \PurePy}
