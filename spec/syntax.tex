@@ -117,11 +117,11 @@ A second map $\mathcal{P}$ gives the
 predefined modules of \figref{predefined}, which have no body: $\mathcal{P}$ takes each such name to its
 environment and context (Definition~\ref{def:predefined}). The two domains are disjoint, and their union is
 prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$ is itself in
-$\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is the statements of its
-\texttt{.py} file, or of its \texttt{\_\_init\_\_.py} for a package, preceded by the
-$\pymath{\_\_name\_\_}$ assignment; a package directory without an \texttt{\_\_init\_\_.py} (a namespace
-package, PEP 420, \url{https://peps.python.org/pep-0420/}) encodes that assignment alone. Every directory on the
-path to a module is therefore itself a module, so prefix-closure holds by construction.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
+$\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: its modules are the \texttt{.py} files and the
+directories, each named by its path, so the domain is prefix-closed by construction. A module's statement is
+the statements of its \texttt{.py} file, or of its \texttt{\_\_init\_\_.py} for a directory, preceded by the
+$\pymath{\_\_name\_\_}$ assignment; a directory without an \texttt{\_\_init\_\_.py} (a namespace package,
+PEP 420, \url{https://peps.python.org/pep-0420/}) contributes that assignment alone.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
 definitions that follow, as is the name $q$ of the enclosing module in the rules that check or evaluate a single module's body.
 
 
