@@ -58,7 +58,7 @@ by that statement itself. The \ruleName{seq} rule imposes the first as a side co
 $t\;t'$: no variable in $\capturesS(t)$ may be in $\assignsS(t')$. In the example of \secref{no-mutable-state}, \pyinline{x} is captured by the
 definition of \pyinline{g} and assigned by \pyinline{x = 6}, so the program is rejected. The
 \ruleName{assign} rule imposes the second, $x \notin \capturesE(e)$ for an assignment $x = e$, rejecting
-for instance \pyinline{x = lambda: x}, whose lambda under Python's late binding would return itself. A
+for instance \pyinline{x = lambda: x}, where under Python's late binding the lambda would return itself. A
 comprehension mutates its generator variables on each iteration, so a lambda in its body or in a later
 qualifier may not capture one, a side condition of \ruleName{list-comp}, \ruleName{dict-comp} and
 \ruleName{qual-generator}: \pyinline{[lambda x: x**i for i in range(10)]} is rejected, since under Python
