@@ -76,7 +76,7 @@ feature that leaves the core purity benefits of \PurePy untouched.
 \label{sec:no-mutable-state}
 
 A variable in \PurePy denotes a fixed value once definitely assigned, so features that update values in place or
-rebind variables are excluded: \pyinline{global} and \pyinline{nonlocal}, which reassign bindings in an outer scope;
+rebind variables are excluded: \pyinline{global} and \pyinline{nonlocal}, which make assignments rebind a variable of an enclosing scope;
 \pyinline{del}, which removes a binding; augmented assignment (\pyinline{+=}, \pyinline{-=}, and so on); and
 the walrus operator (\pyinline{:=}), which assigns within an expression. Reassignment of a variable already
 captured by a closure is excluded for the same reason. In Python a closure captures a mutable binding, so a
