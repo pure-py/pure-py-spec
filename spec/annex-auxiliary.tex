@@ -6,13 +6,13 @@
 \label{ch:auxiliary-functions}
 
 This annex is normative. It defines the auxiliary functions used by the well-formedness rules
-(\secref{well-formedness}) and the operational semantics (\secref{opsem}).
+(\secref{well-formedness}) and the operational semantics (\secref{operational-semantics}).
 
 \section{Syntactic analyses}
-\label{sec:mf-syntactic}
+\label{sec:auxiliary-syntactic}
 
-The analyses $\assignsS$, $\binds$, $\capturesS$ and $\capturesE$ introduced in \secref{wf-aux} are
-defined by their principal cases; the remaining cases are stated with each.
+The syntactic analyses introduced in \secref{well-formedness-auxiliary} are defined by their principal cases; the remaining
+cases are stated with each.
 
 \begin{auxfunction}{\assignsS(t)}{set of variables}{aux:assigns}
 \input{spec/functions/assigns-text}
@@ -51,7 +51,7 @@ defined by their principal cases; the remaining cases are stated with each.
 \end{auxfunction}
 
 \section{Classes and modules}
-\label{sec:mf-classes}
+\label{sec:auxiliary-classes}
 
 The functions on module names, field lists and class entries introduced in \secref{modules-programs}, and
 the resolution of qualified names in an environment.
@@ -110,7 +110,7 @@ the resolution of qualified names in an environment.
 \end{auxfunction}
 
 \section{Values}
-\label{sec:mf-values}
+\label{sec:auxiliary-values}
 
 The functions on values used by the evaluation rules.
 \input{spec/functions/operators-text}

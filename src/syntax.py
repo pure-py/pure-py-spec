@@ -86,6 +86,10 @@ def check_stmt(node: ast.stmt) -> None:
         if len(node.targets) != 1:
             raise Prohibited(node, "multiple assignment targets")
         target = node.targets[0]
+        if isinstance(target, ast.Subscript):
+            raise Prohibited(node, "item assignment prohibited")
+        if isinstance(target, ast.Attribute):
+            raise Prohibited(node, "attribute assignment prohibited")
         if not isinstance(target, ast.Name):
             raise NotYetSupported(node, "destructuring assignment", 54)
         check_expr(node.value)

@@ -153,9 +153,13 @@ def captures_e(e: ast.expr) -> set[str]:
             e.values
         )
     if isinstance(e, ast.ListComp):
-        return captures_e_comprehension([e.elt], e.generators)
+        return captures_quals(e.generators) | (
+            captures_e(e.elt) - binds_quals(e.generators)
+        )
     if isinstance(e, ast.DictComp):
-        return captures_e_comprehension([e.key, e.value], e.generators)
+        return captures_quals(e.generators) | (
+            (captures_e(e.key) | captures_e(e.value)) - binds_quals(e.generators)
+        )
     raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
@@ -165,15 +169,16 @@ def captures_e_list(es: list[ast.expr]) -> set[str]:
     return captures_e(es[0]) | captures_e_list(es[1:])
 
 
-def captures_e_comprehension(
-    elts: list[ast.expr], generators: list[ast.comprehension]
-) -> set[str]:
+def captures_quals(generators: list[ast.comprehension]) -> set[str]:
     if len(generators) == 0:
-        return captures_e_list(elts)
+        return set()
     g = generators[0]
-    target_names = names_in_target(g.target)
-    rest = captures_e_list(g.ifs) | captures_e_comprehension(elts, generators[1:])
-    return captures_e(g.iter) | rest - target_names
+    rest = captures_e_list(g.ifs) | captures_quals(generators[1:])
+    return captures_e(g.iter) | rest - names_in_target(g.target)
+
+
+def binds_quals(generators: list[ast.comprehension]) -> set[str]:
+    return {n for g in generators for n in names_in_target(g.target)}
 
 
 def fv_stmt(s: ast.stmt) -> set[str]:

@@ -2,7 +2,7 @@
 \label{sec:principles}
 
 Well-formedness enforces several constraints, summarised here with the programs each accepts and rejects;
-the rules follow in \secref{wf-blocks} and \secref{wf-modules}.
+the rules follow in \secref{well-formedness-statements} and \secref{well-formedness-modules}.
 
 \subsubsection{Assignment is definition}
 \label{sec:local-assignment}
@@ -14,7 +14,7 @@ only where an assignment covers every path to the reference. The \ruleName{var} 
 to be definitely assigned, $\Gamma(x) = \statusDefAssigned$; the \ruleName{assign} rule makes it so, with
 $x = e$ assigning $\set{\bind{x}{\statusDefAssigned}}$; and the \ruleName{if} rules combine the branches with
 $\merge$, so that a conditional definitely assigns a variable only if every branch that does not definitely
-return assigns it, otherwise leaving it at $\statusNotDefAssigned$ (\secref{wf-blocks}). Branch-local
+return assigns it, otherwise leaving it at $\statusNotDefAssigned$ (\secref{well-formedness-statements}). Branch-local
 variables are therefore permitted, but using one after the conditional is not:
 
 \begin{python}
@@ -49,17 +49,21 @@ into nested function definitions, which have their own scope; it is the domain o
 definitely assigns, $\assignsS(s) = \dom(\Delta)$ when $s : \Assigns{\Delta}$.
 
 \subsubsection{No reassignment of captured variables}
-\label{sec:captured-vars}
+\label{sec:captured-variables}
 
 In Python a closure holds a mutable binding, so a variable captured by a lambda or nested function
 definition may be reassigned afterwards, changing what the function sees (\secref{no-mutable-state}).
 \PurePy excludes this: a variable captured by a statement may not be assigned later in the same sequence, nor
 by that statement itself. The \ruleName{seq} rule imposes the first as a side condition on a sequence
-$t\;t'$, $\capturesS(t) \cap \assignsS(t') = \varnothing$; in the example of \secref{no-mutable-state}, \pyinline{x} is captured by the
+$t\;t'$: no variable in $\capturesS(t)$ may be in $\assignsS(t')$. In the example of \secref{no-mutable-state}, \pyinline{x} is captured by the
 definition of \pyinline{g} and assigned by \pyinline{x = 6}, so the program is rejected. The
 \ruleName{assign} rule imposes the second, $x \notin \capturesE(e)$ for an assignment $x = e$, rejecting
-for instance \pyinline{x = lambda: x}, whose lambda under Python's late binding would return itself. A
-dataclass declaration counts as an assignment of its class name here, although re-declaring a class name is
+for instance \pyinline{x = lambda: x}, where under Python's late binding the lambda would return itself. A
+third case arises in comprehensions: in Python a comprehension mutates its generator variables on each
+iteration, so a lambda in the body or in a later qualifier may not capture one, a side condition of
+\ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}. For instance
+\pyinline{[lambda x: x**i for i in range(10)]} is rejected, since under Python each lambda in the list would compute
+\pyinline{x**9}. A dataclass declaration counts as an assignment of its class name here, although re-declaring a class name is
 excluded outright (\secref{no-first-class}).
 
 Here $\capturesS(s)$ is the set of variables of the enclosing scope captured by the lambdas and nested
@@ -136,7 +140,7 @@ print(x)  # error: x not definitely assigned
 
 \noindent Python prints \pyinline{1}, the binding having escaped the match. Within a pattern the
 variables must be distinct, as in Python. Every case must also be reachable: the \ruleName{cases-cons}
-rule rejects a case whose pattern is subsumed by an earlier one (\secref{wf-patterns}), which Python
+rule rejects a case whose pattern is subsumed by an earlier one (\secref{well-formedness-patterns}), which Python
 leaves silently unreachable:
 
 \begin{python}
@@ -155,7 +159,7 @@ Python accepts statements that can never run, such as code after a \pyinline{ret
 them, the statement-level counterpart of case reachability (\secref{pattern-binding}). A statement
 sequence returns only if its last statement returns and every earlier one assigns: the \ruleName{seq}
 rule requires the first statement of a sequence to have result type $\Assigns{\Delta}$
-(\secref{wf-blocks}), so a statement following a \pyinline{return} has no derivation:
+(\secref{well-formedness-statements}), so a statement following a \pyinline{return} has no derivation:
 
 \begin{python}
 def foo(x):
@@ -200,5 +204,5 @@ print(pkg.sub.y)  # error: pkg.sub is not imported here
 which the main module does not otherwise use, and Python raises \pyinline{AttributeError}. It raises the
 same for a reference to a module member the body never assigns, such as \pyinline{lib.x} where
 \pyinline{lib} assigns \pyinline{x} only on a branch that is not taken. \PurePy rejects all three programs
-statically (\secref{wf-modules}).
+statically (\secref{well-formedness-modules}).
 

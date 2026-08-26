@@ -22,3 +22,10 @@ output effect or kept native with essentially equivalent semantics, printed outp
 result (\secref{purity}). Typed disciplines coexisting with native effects have precedent, from Haskell's
 untracked \pyinline{trace} in pure code\footnote{\url{https://hackage.haskell.org/package/base/docs/Debug-Trace.html}}
 to Scala's monadic effect libraries alongside the language's native effects.
+
+\subsection{Proof of agreement with Python}
+\label{sec:agreement}
+
+The guarantee of \secref{python-compatibility} is informal. To prove it we would need a reference semantics
+of Python to state it against; one candidate is the core calculus of Politz et al.~\cite{politz2013}, which
+covers a subset of Python and predates the current language.

@@ -17,7 +17,7 @@ y = foo()
 While \pyinline{x} is not defined before its usage inside the definition of \pyinline{foo}, it is defined by the
 time the function is called. Therefore, Python uses a limited form of \emph{dynamic scoping}. In PurePy, we would
 like to restrict this form of scoping to something that is easier to statically analyse, and less error-prone 
-(see \secref{captured-vars}). However, some forms of late binding must be allowed, as we could otherwise not
+(see \secref{captured-variables}). However, some forms of late binding must be allowed, as we could otherwise not
 define (mutually) recursive functions:
 
 \begin{python}
@@ -42,7 +42,7 @@ As with other programming languages, scoping in Python and PurePy has nesting, i
 and \pyinline{lambda} opens a new scope. Therefore, the typing rules are expressed in terms of 
 \emph{frames} $\Psi$, which correspond to the different nesting levels. A particular frame $\Psi$ consists
 of the set of \emph{closure variables} $\Sigma$, i.e., the set of variables defined in the current frame
-that are used within a closure (see \secref{captured-vars}), and an \emph{environment} $\Gamma$,
+that are used within a closure (see \secref{captured-variables}), and an \emph{environment} $\Gamma$,
 which maps variable names to open term types. Finally, a \emph{frame stack} $\Delta$ holds the nested
 scoping frames.
 
@@ -57,7 +57,7 @@ We will start by illustrating the typing rules for expressions. A constant has a
 the stack. For variables, there are three different cases. In $\ruleName{var1}$, the variable is
 already bound in the current scope $\Gamma$. Therefore, its type can be read from the environment, and the
 variable itself is added to the set of closure variables at the current scope level (to circumvent the issue explained in
-\secref{captured-vars}). If the variable is not bound in the current environment, it is typed at the
+\secref{captured-variables}). If the variable is not bound in the current environment, it is typed at the
 surrounding scope as shown in $\ruleName{var2}$. The base-case is illustrated by $\ruleName{var3}$, where a variable
 is typed at the global scope (i.e. $\carrow{0}$). If the variable is not defined at the global scope either, it receives
 itself as an open term type.

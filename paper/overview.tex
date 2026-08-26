@@ -75,8 +75,8 @@ feature that leaves the core purity benefits of \PurePy untouched.
 \subsubsection{Mutable state}
 \label{sec:no-mutable-state}
 
-A variable in \PurePy denotes a fixed value once definitely assigned, so features that mutate or rebind state
-are excluded: \pyinline{global} and \pyinline{nonlocal}, which reassign bindings in an outer scope;
+A variable in \PurePy denotes a fixed value once definitely assigned, so features associated with mutation and
+shared state are excluded: \pyinline{global} and \pyinline{nonlocal}, which direct assignments to a variable of an enclosing scope;
 \pyinline{del}, which removes a binding; augmented assignment (\pyinline{+=}, \pyinline{-=}, and so on); and
 the walrus operator (\pyinline{:=}), which assigns within an expression. Reassignment of a variable already
 captured by a closure is excluded for the same reason. In Python a closure captures a mutable binding, so a
@@ -95,7 +95,9 @@ def f():
 reading in which \pyinline{x = 6} shadows the earlier binding, \pyinline{g()} would return \pyinline{5} and the
 result \pyinline{11}. \PurePy rejects the program, keeping closures over values rather than mutable cells, as
 with Java's requirement that captured locals be effectively final~\cite[\S15.27.2]{gosling2025}. The rules that
-enforce this are given in \secref{captured-vars}.
+enforce this are given in \secref{captured-variables}.
+
+\input{spec/exclusions/mutable-state}
 
 \subsubsection{Control flow and effects}
 \label{sec:no-effects}
@@ -199,7 +201,7 @@ A few remaining restrictions do not fit the groups above. A \pyinline{class} def
 dataclass, and a dataclass body declares fields and nothing else. \PurePy therefore supports none of Python's
 class-based extension mechanisms, such as \pyinline{__getitem__} for subscripting, \pyinline{__iter__} for
 iteration or \pyinline{__eq__} for equality. Subscripting, iteration, equality and membership have the fixed
-meanings given in \secref{opsem}.
+meanings given in \secref{operational-semantics}.
 
 \subsubsection{Runtime errors}
 \label{sec:runtime-errors}
@@ -239,6 +241,7 @@ Function keyword arguments & \issue{127} \\
 Postponed annotation evaluation & \issue{128} \\
 Primitive operations & \issue{132} \\
 Annotated lambda parameters and generator targets & \issue{178} \\
+Members for built-in types & \issue{181} \\
 \end{tabular}
 \end{minipage}
 \end{center}

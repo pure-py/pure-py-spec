@@ -88,7 +88,7 @@ $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module
 $\seq{\iota}$, its \emph{import prefix}, followed by a top-level statement $t$; since imports are not statements, they can appear neither
 within a statement nor after it. The statement begins with the
 assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$, which binds the module's name when it
-loads (\secref{wf-modules}).
+loads (\secref{well-formedness-modules}).
 
 A second map $\mathcal{P}$ gives the
 predefined modules of \figref{predefined}, which have no body: $\mathcal{P}$ takes each such name to its
@@ -147,5 +147,5 @@ and $\Gamma$ binds the same variables at $\statusDefAssigned$.
 
 Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' = q.q^\dagger$ for some $q^\dagger$, and $\properPrefixOf$ for
 the strict order; the proper prefixes of a module name are its \emph{ancestors}.\speconly{ The metafunctions
-on modules and classes are defined in \secref{mf-classes}.}
+on modules and classes are defined in \secref{auxiliary-classes}.}
 \paperinput{paper/syntax/classes}

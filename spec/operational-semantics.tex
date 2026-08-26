@@ -1,5 +1,5 @@
 \section{Operational semantics}
-\label{sec:opsem}
+\label{sec:operational-semantics}
 
 \subsection{Values and environments}
 
@@ -85,7 +85,8 @@ list, tuple or string, and the keys of a dictionary, as in Python. Subscripting,
 function $\getitem$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:getitem}}), indexes a list, tuple or
 string by an integer, counting from the end when negative, and a dictionary by a string key,
 aborting with $\errIndex$, $\errKey$ or $\errType$ where Python raises the exception of that name; a
-dictionary subscripted by a value other than a string is undefined.
+dictionary subscripted by a value other than a string is undefined. Likewise an attribute reference on a
+value other than a module or object has no derivation: the attributes of built-in values are undefined.
 
 \specinput{spec/fig/eval-outcome}
 
@@ -105,7 +106,7 @@ Since
 imports precede statements, every module a statement can reference is loaded before the statement runs, and
 loading is deterministic, so the semantics needs no cache
 of loaded modules. The rule \ruleName{eval-module} puts $\mathcal{P}(\pyinline{builtins})$ under a module
-body's environment, mirroring \ruleName{module} (\secref{wf-modules})\paperonly{:}\speconly{.}
+body's environment, mirroring \ruleName{module} (\secref{well-formedness-modules})\paperonly{:}\speconly{.}
 \paperinput{paper/operational-semantics/module}%
 A program evaluates to a termination kind (\figref{values}): $\errExit{0}$ if the main module
 loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exited with status $n$\paperonly{:}\speconly{.}

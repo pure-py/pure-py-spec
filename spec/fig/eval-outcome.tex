@@ -624,15 +624,6 @@
   \rho, \exAttr{e}{x} \Rightarrow \aborts{\errAttr}
 }
 \and
-\inferrule*[lab={\ruleName{eval-attr-nonobj}}]
-{
-  \rho, e \Rightarrow \val{v} \\
-  v \text{ neither module nor object}
-}
-{
-  \rho, \exAttr{e}{x} \Rightarrow \aborts{\errAttr}
-}
-\and
 \inferrule*[lab={\ruleName{eval-call-lambda-arity}}]
 {
   \rho, e \Rightarrow \val{\exLamClosure[\Delta]{\rho'}{\seq{x}}{e'}} \\
