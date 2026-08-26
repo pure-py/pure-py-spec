@@ -120,8 +120,8 @@ prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal
 $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is the statements of its
 \texttt{.py} file, or of its \texttt{\_\_init\_\_.py} for a package, preceded by the
 $\pymath{\_\_name\_\_}$ assignment; a package directory without an \texttt{\_\_init\_\_.py} (a namespace
-package, PEP 420, \url{https://peps.python.org/pep-0420/}) encodes that assignment alone. Prefix-closure
-thus holds by construction.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
+package, PEP 420, \url{https://peps.python.org/pep-0420/}) encodes that assignment alone. Every directory on the
+path to a module is therefore itself a module, so prefix-closure holds by construction.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
 definitions that follow, as is the name $q$ of the enclosing module in the rules that check or evaluate a single module's body.
 
 
