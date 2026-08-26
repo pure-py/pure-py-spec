@@ -39,8 +39,10 @@
 % How the paper refers to the specification document.
 \ifdefined\anonmode
   \newcommand*{\specification}{the supplementary material\xspace}
+  \newcommand*{\specificationavailability}{is included as supplementary material}
 \else
   \newcommand*{\specification}{the \PurePy specification\xspace}
+  \newcommand*{\specificationavailability}{accompanies this paper}
 \fi
 \newcommand*{\version}[3]{%
   \gdef\versionstring{#1.#2.#3}%
