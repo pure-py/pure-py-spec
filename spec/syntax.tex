@@ -44,41 +44,16 @@ It is useful to represent contexts as total functions on the set of all variable
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
 an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$\paperonly{ (Lemma~\ref{lem:right-distributivity})}, but left
-distributivity does not hold. Both operations are defined pointwise.
-%
-\begin{definition}[Context override]
-$(\Gamma \override \Delta)(x) = \Gamma(x) \override \Delta(x)$, where on entries
-\begin{defalign}
-\bot \override \theta &= \theta \override \bot = \theta \\
-\theta \override \theta' &= \theta' \quad (\text{otherwise})
-\end{defalign}
-\end{definition}
+distributivity does not hold. Both operations, and context extension $\extend$ (below), are defined pointwise
+(\figref{context-ops}).
+\input{spec/fig/context-ops}
 
-\noindent Override is thus right-biased and has $\bot$ as both left and right unit.
-
-\begin{definition}[Context merge]
-$(\Gamma \merge \Delta)(x) = \Gamma(x) \merge \Delta(x)$, where on definite-assignment statuses $a, a' \in \B$
-\begin{defalign}
-\bot \merge \bot &= \bot \\
-a \merge \bot = \bot \merge a &= \statusNotDefAssigned \\
-a \merge a' &= a \meet a'
-\end{defalign}
-\end{definition}
-
-\noindent Merge is otherwise undefined. Restricted to $\B$, it returns $\statusNotDefAssigned$ when exactly one argument is defined and the conjunction otherwise; so $\bot$ is not a unit.
-
-\begin{definition}[Context extension]
-\label{def:extend}
-$(\Gamma \extend \Delta)(x) = \Gamma(x) \extend \Delta(x)$, where on entries
-\begin{defalign}
-\modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} &= \modLoaded{q}{\Gamma \extend \Gamma'} \\
-\modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} &= \modLoaded{q}{\Gamma} \\
-\bot \extend \theta = \theta \extend \bot &= \theta \\
-\theta \extend \theta' &= \theta' \quad (\text{otherwise})
-\end{defalign}
-\end{definition}
-
-\noindent Context extension combines module references for the same module recursively, preferring loaded references to stubs, and is otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted at the same module must combine rather than shadow.
+\noindent Override is right-biased and has $\bot$ as both left and right unit. Merge is defined only on
+definite-assignment statuses; restricted to $\B$, it returns $\statusNotDefAssigned$ when exactly one argument
+is defined and the conjunction otherwise, so $\bot$ is not a unit. Context extension combines module
+references for the same module recursively, preferring loaded references to stubs, and is otherwise
+right-biased like override. It is used when processing import prefixes, where two imports rooted at the
+same module must combine rather than shadow.
 
 \paperinput{paper/syntax/right-distributivity}
 
@@ -109,7 +84,7 @@ meaning by the type system.
 \label{sec:modules-programs}
 
 A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
-(\figref{syntax-stmt}) to \emph{module bodies} $t$, of which one is a distinguished \emph{main module} named
+(\figref{syntax-stmt}) to \emph{module bodies} $\mu$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
 $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
 $\seq{\iota}$ followed by a top-level statement $t$; since imports are not statements, they can appear neither
