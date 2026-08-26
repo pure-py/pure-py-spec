@@ -44,7 +44,7 @@ A \pyinline{match} statement takes the first case whose pattern matches the valu
 the bindings the pattern produces, and does nothing if no case matches; the auxiliary function
 $\dispatch$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:dispatch}}) selects the matching case.
 \paperinput{paper/operational-semantics/match}%
-Whether a pattern matches is determined by the deterministic pattern-matching judgement
+Whether a pattern matches is determined by the pattern-matching judgement
 $\rho, p, v \matches m$\speconly{ (\figref{match})}. A \emph{match result} $m$ is either $\matchOk{\rho'}$, a match binding
 $\rho'$, or $\noMatch$, a failure to match. Having no derivation is a third possibility, distinct from
 both: where a pattern and a value are not comparable, as a list pattern against a tuple, \PurePy can say
