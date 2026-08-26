@@ -3,9 +3,8 @@
 \footnotesize
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.29\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}}
-\hline
-\textbf{Construct} & \textbf{Python} & \textbf{Exclusion} & \textbf{Mechanism} \\
-\hline
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Construct & Python & Exclusion & Mechanism \\
 Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & Dynamic & Must already be Boolean \\[1mm]
 Sequence patterns & List patterns match tuples, and tuple patterns lists & Dynamic & List patterns match only lists, tuple patterns only tuples \\[1mm]
 Constructor patterns & Positional class patterns may supply fewer sub-patterns than class has fields & Static & Require exact arity \\[1mm]
@@ -13,8 +12,7 @@ Dictionary keys & Any hashable value, with \pyinline{1}, \pyinline{1.0} and \pyi
 \pyinline{assert} message & Any object, shown in traceback & Dynamic & Strings only \\[1mm]
 \pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & Dynamic & Undefined between, say, number and string, or list and tuple; only \pyinline{None} compares with anything \\[1mm]
 Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & Dynamic & Equality undefined \\[1mm]
-\pyinline{nan} comparison via container equality & Elements compared by identity before equality, so identical NaNs match but distinct ones do not & Dynamic & Undefined when both elements are \pyinline{nan} \\
-\hline
+\pyinline{nan} comparison via container equality & Elements compared by identity before equality, so identical NaNs match but distinct ones do not & Dynamic & Undefined when both elements are \pyinline{nan}
 \end{tabular}
 \caption{Python coercions and lax matches excluded by \PurePy}
 \label{fig:coercions}

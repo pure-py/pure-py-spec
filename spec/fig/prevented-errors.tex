@@ -2,15 +2,13 @@
 \centering
 \small
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.23\textwidth}>{\raggedright\arraybackslash}p{0.55\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}}
-\hline
-\textbf{Python error} & \textbf{Ruled out when} & \textbf{See} \\
-\hline
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Python error & Ruled out when & See \\
 \pyinline{NameError}, \pyinline{UnboundLocalError} & Always: a variable may be referenced only where it is definitely assigned. & \figref{well-formed}, \figref{well-formed-expr} \\[1mm]
 \pyinline{ModuleNotFoundError} & Always: an import requires its target to be a module of the program. & \figref{well-formed-imports} \\[1mm]
 \pyinline{ImportError} & Always: a from-import requires each imported name to be a member of the source module, and import cycles are rejected. (A Python cycle may run or fail, depending on where the cycle is entered.) & \figref{imports}, \figref{well-formed-module} \\[1mm]
 \pyinline{AttributeError} & The reference is a module attribute, which must resolve to a definitely assigned member.  & \figref{well-formed-expr} \\[1mm]
-\pyinline{TypeError} & The operation is a constructor call or class pattern, which must match the class's arity exactly. (Only excess sub-patterns are a Python error; a pattern with fewer is excluded even though Python permits it.) & \figref{well-formed-expr}, \figref{well-formed-pat} \\
-\hline
+\pyinline{TypeError} & The operation is a constructor call or class pattern, which must match the class's arity exactly. (Only excess sub-patterns are a Python error; a pattern with fewer is excluded even though Python permits it.) & \figref{well-formed-expr}, \figref{well-formed-pat}
 \end{tabular}
 \caption{Python errors prevented by well-formedness}
 \label{fig:prevented-errors}

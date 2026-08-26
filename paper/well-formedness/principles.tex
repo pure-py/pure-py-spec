@@ -59,7 +59,7 @@ $t\;t'$, $\capturesS(t) \cap \assignsS(t') = \varnothing$; in the example of \se
 definition of \pyinline{g} and assigned by \pyinline{x = 6}, so the program is rejected. The
 \ruleName{assign} rule imposes the second, $x \notin \capturesE(e)$ for an assignment $x = e$, rejecting
 for instance \pyinline{x = lambda: x}, whose lambda under Python's late binding would return itself. A
-comprehension rebinds its generator variables on each iteration, so a lambda in its body or in a later
+comprehension mutates its generator variables on each iteration, so a lambda in its body or in a later
 qualifier may not capture one, a side condition of \ruleName{list-comp}, \ruleName{dict-comp} and
 \ruleName{qual-generator}: \pyinline{[lambda x: x**i for i in range(10)]} is rejected, since under Python
 every element would compute \pyinline{x**9}. A dataclass declaration counts as an assignment of its class name here, although re-declaring a class name is
