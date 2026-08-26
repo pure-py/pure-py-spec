@@ -110,18 +110,18 @@ $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
 $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
 $\seq{\iota}$ followed by a statement $s$; since imports are not statements, they can appear neither
 within a statement (and hence not in function bodies) nor after it. The statement begins with the
-assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$, which the encoding of a source tree
-supplies, modelling the $\pymath{\_\_name\_\_}$ binding the runtime supplies automatically.
+assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$, modelling the binding of
+$\pymath{\_\_name\_\_}$ that Python's import system makes before running the body.
 
 A second map $\mathcal{P}$ gives the
 predefined modules of \figref{predefined}, which have no body: $\mathcal{P}$ takes each such name to its
 environment and context (Definition~\ref{def:predefined}). The two domains are disjoint, and their union is
 prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$ is itself in
 $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is the statements of its
-\texttt{.py} file, or of its \texttt{\_\_init\_\_.py} for a package, preceded by the assignment
-$\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$; a package directory without an \texttt{\_\_init\_\_.py}
-(a namespace package, PEP 420, \url{https://peps.python.org/pep-0420/}) encodes that assignment alone.
-Prefix-closure thus holds by construction.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
+\texttt{.py} file, or of its \texttt{\_\_init\_\_.py} for a package, preceded by the
+$\pymath{\_\_name\_\_}$ assignment; a package directory without an \texttt{\_\_init\_\_.py} (a namespace
+package, PEP 420, \url{https://peps.python.org/pep-0420/}) encodes that assignment alone. Prefix-closure
+thus holds by construction.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
 definitions that follow, as is the name $q$ of the enclosing module in the rules that check or evaluate a single module's body.
 
 
