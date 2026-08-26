@@ -243,12 +243,12 @@
   \rho, \exLambda{x_1, \ldots, x_n}{e} \Rightarrow \val{\exLamClosure[\Gamma]{\rho}{\seq{x}}{e}}
 }
 \and
-\inferrule*[lab={\ruleName{eval-unary-op}}]
+\inferrule*[lab={\ruleName{eval-unop}}]
 {
   \rho, e \Rightarrow o
 }
 {
-  \rho, \exUnaryOp{\ominus}{e} \Rightarrow \mlet{v}{o}{\hat{\ominus}(v)}
+  \rho, \exUnOp{\ominus}{e} \Rightarrow \mlet{v}{o}{\hat{\ominus}(v)}
 }
 \and
 \input{spec/rules/eval-binop}

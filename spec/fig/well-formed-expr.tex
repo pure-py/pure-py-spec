@@ -151,12 +151,12 @@
   \Gamma \vdash \exBinOp{e}{\odot}{e'}
 }
 \and
-\inferrule*[lab={\ruleName{unary-op}}]
+\inferrule*[lab={\ruleName{unop}}]
 {
   \Gamma \vdash e
 }
 {
-  \Gamma \vdash \exUnaryOp{\ominus}{e}
+  \Gamma \vdash \exUnOp{\ominus}{e}
 }
 \and
 \inferrule*[lab={\ruleName{and}}]
