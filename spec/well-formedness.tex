@@ -26,13 +26,13 @@ well-formedness $\Gamma \vdash e$ in \figref{well-formed-expr}, and pattern well
 Context operations $\override$ and $\merge$ lift to a right semiring over result types $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge$ and zero for $\override$.
 
 \begin{definition}[Override and merge on result types]
-\begin{align*}
+\begin{defalign}
 \Assigns{\Delta} \merge \Assigns{\Delta'} & = \Assigns{(\Delta \merge \Delta')} \\
 R \merge \Returns = \Returns \merge R & = R \\
 \\
 \Assigns{\Delta} \override \Assigns{\Delta'} & = \Assigns{(\Delta \override \Delta')} \\
 R \override \Returns = \Returns \override R & = \Returns
-\end{align*}
+\end{defalign}
 \end{definition}
 
 \noindent The $\Returns \override R$ case never arises because the well-formedness judgement excludes unreachable statements\paperonly{ (\secref{unreachable})}.
