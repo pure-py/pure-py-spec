@@ -1,8 +1,8 @@
 \begin{figure}
 \centering
-\small
+\footnotesize
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.29\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}}
 \hline
 \textbf{Construct} & \textbf{Python} & \textbf{Exclusion} & \textbf{Mechanism} \\
 \hline
@@ -11,9 +11,9 @@
 Augmented assignment (\pyinline{+=} and so on) & Rebinds variable & Syntactic & Not in grammar \\[1mm]
 Walrus operator (\pyinline{:=}) & Assigns within expression & Syntactic & Not in grammar \\[1mm]
 Item and attribute assignment (\pyinline{xs[0] = v}, \pyinline{p.x = v}) & Update container or object in place & Syntactic & Not in grammar; assignment targets are variables \\[1mm]
-Mutating methods, such as \pyinline{list.append} & Update value in place & Dynamic & Built-in values have no attributes; reference aborts with $\errAttr$ \\[1mm]
+Mutating methods, such as \pyinline{list.append} & Update value in place & Dynamic & Method reference aborts with $\errAttr$ \\[1mm]
 Reassignment of captured variable & Closure sees new value & Static & Variable captured by statement may not be assigned later in sequence, nor by statement itself \\[1mm]
-Lambdas capturing comprehension variable & Every lambda sees variable's final value & Static & Lambda may not capture generator variable \\
+Lambdas capturing comprehension variable & Lambda captures mutable variable & Static & Lambda may not capture generator variable \\
 \hline
 \end{tabular}
 \caption{Python mutation of state excluded by \PurePy}
