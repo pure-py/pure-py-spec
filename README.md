@@ -31,7 +31,7 @@ live in their figures.
 
 ## Building
 
-`make` builds the paper and `make spec` the standalone specification; see the Makefile for the other targets.
+See the Makefile.
 
 ## Running tests
 
