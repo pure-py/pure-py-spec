@@ -95,25 +95,12 @@ def check_mutual_region(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None
 def check_bodies(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
     f_names = {d.name: Status.TT for d in defs}
     for d in defs:
-        check_no_class_declaration(d.body)
         params = {a.arg for a in d.args.args}
         locals_ = assigns_body(d.body) - params
         delta = f_names | {p: Status.TT for p in params} | {x: Status.FF for x in locals_}
         body_ctx = override_var(ctx, delta)
         check_body(d.body, body_ctx)
 
-def check_no_class_declaration(body: list[ast.stmt]) -> None:
-    for s in body:
-        if isinstance(s, ast.ClassDef):
-            raise IllFormedModule(s, reasons.NonTopLevelClass())
-        if isinstance(s, ast.If):
-            check_no_class_declaration(s.body)
-            check_no_class_declaration(s.orelse)
-        if isinstance(s, ast.Match):
-            for case in s.cases:
-                check_no_class_declaration(case.body)
-        if isinstance(s, ast.FunctionDef):
-            check_no_class_declaration(s.body)
 
 def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> None:
     if len(targets) == 0:
@@ -147,8 +134,6 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext) -> None:
         return
     if isinstance(s, ast.If):
         check_expr(s.test, ctx)
-        check_no_class_declaration(s.body)
-        check_no_class_declaration(s.orelse)
         check_body(s.body, ctx)
         if s.orelse:
             check_body(s.orelse, ctx)
@@ -170,7 +155,6 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext) -> None:
 
 def check_match_cases(cases: list[ast.match_case], ctx: ModuleContext) -> None:
     for case in cases:
-        check_no_class_declaration(case.body)
         check_body(case.body, override_var(ctx, {x: Status.TT for x in binds(case.pattern)}))
 
 def check_expr(e: ast.expr, ctx: ModuleContext) -> None:

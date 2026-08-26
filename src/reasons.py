@@ -175,11 +175,6 @@ class UnassignedMember:
         return f"member '{self.x}' of module '{self.q}' is not definitely assigned"
 
 
-@dataclass(frozen=True)
-class NonTopLevelClass:
-    def message(self) -> str:
-        return "class definition only allowed at module top level"
-
 
 @dataclass(frozen=True)
 class TopLevelReturn:
@@ -238,7 +233,7 @@ Reason = Union[
     UnknownModule, UnknownMember, ModuleAsValue, ClassAsValue,
     UnknownConstructorKeyword, DuplicateDictKey,
     NonlinearPattern, UnreachableCase, DuplicateMutualName,
-    NonTopLevelImport, NonTopLevelClass, TopLevelReturn, EmptyFromImport,
+    NonTopLevelImport, TopLevelReturn, EmptyFromImport,
     ImportAfterStatement, SubmoduleNameClash, SubmoduleNotImported, OwnDescendantImport,
     UnassignedMember,
 ]
