@@ -8,11 +8,10 @@ well-formed and loading preserves well-formedness, the base case and the module 
 
 \begin{lemma}[Predefined environments]
 \label{lem:predefined}
-For each predefined module $q$ with $\mathcal{P}(q) = (\rho, \Gamma)$, $\vdash \rho : \Gamma$.
+If $\mathcal{P}(q) = (\rho, \Gamma)$ then $\vdash \rho : \Gamma$.
 \end{lemma}
 \begin{proof}
-By inspection of \figref{predefined}: each member is bound to an ordinary value, and $\Gamma$ binds it at
-$\statusDefAssigned$.
+Immediate from Definition~\ref{def:predefined}.
 \end{proof}
 
 \begin{theorem}[Load preservation]
