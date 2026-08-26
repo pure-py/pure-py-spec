@@ -3,17 +3,17 @@
 
 \PurePy excludes some Python behaviours statically and others only at runtime.
 Well-formedness is the static part, a judgement on programs defined in this \seckind{}; the operational
-semantics (\secref{opsem}) is defined for well-formed programs. The statement and expression rules rest on a definite-assignment analysis; the pattern rules
+semantics (\secref{operational-semantics}) is defined for well-formed programs. The statement and expression rules rest on a definite-assignment analysis; the pattern rules
 enforce linearity and reachability; and the module rules govern imports and class declarations. The
 \seckind{} follows the syntax of \secref{syntax}, taking statements, expressions and patterns, then modules
-and programs, and \secref{opsem} gives each of these a dynamic counterpart.
+and programs, and \secref{operational-semantics} gives each of these a dynamic counterpart.
 
 \specinput{spec/well-formedness/auxiliary}
 \paperinput{paper/well-formedness/principles}
 
 \subsection{Statements, expressions and patterns}
-\label{sec:wf-blocks}
-\label{sec:wf-patterns}
+\label{sec:well-formedness-statements}
+\label{sec:well-formedness-patterns}
 
 Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
@@ -83,10 +83,10 @@ to bound the values a match may receive, it degenerates to whether the last case
 \input{spec/fig/well-formed-pat}
 
 \subsection{Modules and programs}
-\label{sec:wf-modules}
+\label{sec:well-formedness-modules}
 
 \emph{Static loading} checks a module's body and computes its signature $\Gamma$, the judgement
-$\vdash_{\mathsf{load}} q : \Gamma$ (\figref{well-formed-module}); it mirrors loading at run time (\secref{opsem}).
+$\vdash_{\mathsf{load}} q : \Gamma$ (\figref{well-formed-module}); it mirrors loading at run time (\secref{operational-semantics}).
 Both import forms statically load their target, together with its ancestors
 (\figref{well-formed-imports}). A plain import also records each of these modules as a member of its
 parent (the static loads-as judgement), so that the binding created for the root of the target gives attribute

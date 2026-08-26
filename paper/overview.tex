@@ -95,7 +95,7 @@ def f():
 reading in which \pyinline{x = 6} shadows the earlier binding, \pyinline{g()} would return \pyinline{5} and the
 result \pyinline{11}. \PurePy rejects the program, keeping closures over values rather than mutable cells, as
 with Java's requirement that captured locals be effectively final~\cite[\S15.27.2]{gosling2025}. The rules that
-enforce this are given in \secref{captured-vars}.
+enforce this are given in \secref{captured-variables}.
 
 \input{spec/exclusions/mutable-state}
 
@@ -201,7 +201,7 @@ A few remaining restrictions do not fit the groups above. A \pyinline{class} def
 dataclass, and a dataclass body declares fields and nothing else. \PurePy therefore supports none of Python's
 class-based extension mechanisms, such as \pyinline{__getitem__} for subscripting, \pyinline{__iter__} for
 iteration or \pyinline{__eq__} for equality. Subscripting, iteration, equality and membership have the fixed
-meanings given in \secref{opsem}.
+meanings given in \secref{operational-semantics}.
 
 \subsubsection{Runtime errors}
 \label{sec:runtime-errors}

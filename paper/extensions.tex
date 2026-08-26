@@ -6,7 +6,7 @@ purity. This section sketches two, each drawn from \Fluid: partial application a
 definitions. We give an example of each. \todo{Formally define or defer to future work}
 
 \subsection{Partial application}
-\label{sec:ext-partial}
+\label{sec:extension-partial-application}
 
 A function applied to fewer arguments than it declares returns a function of the remaining arguments:
 
@@ -24,7 +24,7 @@ f(5)(6)  # 11
 \pyinline{11}. This is a semantic extension: existing syntax, given a meaning the core withholds.
 
 \subsection{Piecewise function definitions}
-\label{sec:ext-piecewise}
+\label{sec:extension-piecewise}
 
 A function may be defined by several clauses that pattern-match on its arguments, in place of a single
 definition with an explicit \pyinline{match}:
@@ -43,7 +43,7 @@ the constructor of the argument. Because Python gives the pattern-clause form no
 syntactic extension that needs no special notation to distinguish it from an ordinary \pyinline{def}.
 
 \subsection{Explicit variable definitions}
-\label{sec:ext-explicit-def}
+\label{sec:extension-explicit-definitions}
 
 In the core a variable is introduced implicitly by its first assignment, and a definite-assignment analysis
 (\secref{well-formedness}) tracks whether it is assigned before it is used. This extension makes the introduction
