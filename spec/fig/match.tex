@@ -100,7 +100,7 @@
 \inferrule*[lab={\ruleName{eval-pat-constr-no}}]
 {
   \resolveClass(\rho, q) = C \\
-  v \text{ not object, or } \exObj{\Gamma'}{C'}{\rho^\dagger} \text{ with } C \notin \ancestors(C')
+  v \text{ not object, or } \exObj{\Gamma'}{C'}{\rho'} \text{ with } C \notin \ancestors(C')
 }
 {
   \rho, \patConstr{q}{\seq{p}}, v \matches \noMatch
