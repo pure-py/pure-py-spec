@@ -17,13 +17,13 @@ default: paper.pdf
 
 spec: PurePy-spec.pdf
 
-spec-anon: specification.pdf
+spec-anon: spec.pdf
 
-specification.pdf: $(TEXFILES) | clean-aux
-	$(PDFLATEX) -jobname=specification "\def\anonmode{}\input{PurePy-spec.tex}"
-	bibtex specification
-	$(PDFLATEX) -jobname=specification "\def\anonmode{}\input{PurePy-spec.tex}"
-	$(PDFLATEX) -jobname=specification "\def\anonmode{}\input{PurePy-spec.tex}"
+spec.pdf: $(TEXFILES) | clean-aux
+	$(PDFLATEX) -jobname=spec "\def\anonmode{}\input{PurePy-spec.tex}"
+	bibtex spec
+	$(PDFLATEX) -jobname=spec "\def\anonmode{}\input{PurePy-spec.tex}"
+	$(PDFLATEX) -jobname=spec "\def\anonmode{}\input{PurePy-spec.tex}"
 
 anon: main.pdf
 
@@ -36,7 +36,7 @@ main.pdf: $(TEXFILES) | clean-aux
 # Zip rather than a bare PDF, to make room for a mechanisation.
 submit: main.pdf supplementary.zip
 
-supplementary.zip: specification.pdf
+supplementary.zip: spec.pdf
 	rm -f $@
 	zip -q -9 $@ $<
 

@@ -36,7 +36,7 @@ latexmk -pdf paper.tex
 ```
 
 The standalone specification is built with `make spec`. `make anon` and `make spec-anon` build the anonymised
-versions as `main.pdf` and `specification.pdf`, and `make submit` builds both and zips the specification as
+versions as `main.pdf` and `spec.pdf`, and `make submit` builds both and zips the specification as
 `supplementary.zip`.
 
 ## Running tests
