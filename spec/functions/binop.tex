@@ -1,7 +1,5 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.62\textwidth}}
-\hline
-$\odot$ & $\hat{\odot}(v, v')$ \\
-\hline
+\rowcolor{grammarheadcolor}$\odot$ & $\hat{\odot}(v, v')$ \\
 \pyinline{==} & $\val{\pyinline{False}}$ if both operands are \pyinline{nan}, and $\val{\eqOp(v, v')}$ otherwise \\
 \pyinline{!=} & $\val{\pyinline{True}}$ if both operands are \pyinline{nan} or $\eqOp(v, v') = \pyinline{False}$, and $\val{\pyinline{False}}$ if $\eqOp(v, v') = \pyinline{True}$ \\
 \pyinline{in} & $\val{\memOp(v', v)}$ \\
