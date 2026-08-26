@@ -1,0 +1,20 @@
+\begin{figure}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.315\textwidth}>{\raggedright\arraybackslash}p{0.25\textwidth}>{\raggedright\arraybackslash}p{0.142\textwidth}}
+\hline
+\textbf{Construct} & \textbf{Python} & \textbf{\PurePy} & \textbf{Excluded} \\
+\hline
+\pyinline{global} and \pyinline{nonlocal} & Reassign a binding of an enclosing scope & Not in the grammar & Syntactically \\[1mm]
+\pyinline{del} & Removes a binding & Not in the grammar & Syntactically \\[1mm]
+Augmented assignment (\pyinline{+=} and so on) and the walrus operator (\pyinline{:=}) & Rebind a variable, within an expression for \pyinline{:=} & Not in the grammar & Syntactically \\[1mm]
+Item and attribute assignment (\pyinline{xs[0] = v}, \pyinline{p.x = v}) & Update a container or object in place & Not in the grammar: an assignment target is a variable & Syntactically \\[1mm]
+Mutating methods, such as \pyinline{list.append} & Update the value in place & Built-in values have no attributes, so the reference aborts with $\errAttr$ & Dynamically \\[1mm]
+Reassignment of a captured variable & The closure sees the new value & A variable captured by a statement may not be assigned later in the sequence, nor by the statement itself & Statically \\[1mm]
+Lambdas capturing a comprehension variable & Every lambda sees the variable's final value & A lambda may not capture a generator variable & Statically \\
+\hline
+\end{tabular}
+\caption{Python mutation of state excluded by \PurePy}
+\label{fig:mutable-state}
+\end{figure}
