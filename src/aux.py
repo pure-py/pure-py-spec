@@ -1,19 +1,20 @@
-from __future__ import annotations
-
 import ast
 from itertools import dropwhile, takewhile
-from typing import Optional, Union
 
-BlockElement = Union[ast.stmt, list[ast.FunctionDef]]
+BlockElement = ast.stmt | list[ast.FunctionDef]
+
 
 def is_import(s: ast.stmt) -> bool:
     return isinstance(s, (ast.Import, ast.ImportFrom))
 
+
 def split_imports(body: list[ast.stmt]) -> tuple[list[ast.stmt], list[ast.stmt]]:
     return list(takewhile(is_import, body)), list(dropwhile(is_import, body))
 
-def find_import(stmts: list[ast.stmt]) -> Optional[ast.stmt]:
+
+def find_import(stmts: list[ast.stmt]) -> ast.stmt | None:
     return next((s for s in stmts if isinstance(s, (ast.Import, ast.ImportFrom))), None)
+
 
 def elements_of_block(block: list[ast.stmt]) -> list[BlockElement]:
     if len(block) == 0:
@@ -24,7 +25,10 @@ def elements_of_block(block: list[ast.stmt]) -> list[BlockElement]:
         return extend_region([head], rest)
     return [head] + elements_of_block(rest)
 
-def extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[BlockElement]:
+
+def extend_region(
+    region: list[ast.FunctionDef], rest: list[ast.stmt]
+) -> list[BlockElement]:
     if len(rest) == 0:
         return [region]
     head = rest[0]
@@ -32,11 +36,6 @@ def extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[B
         return extend_region(region + [head], rest[1:])
     return [region] + elements_of_block(rest)
 
-def annotate_seq_kinds(tree: ast.AST, source: str) -> None:
-    for node in ast.walk(tree):
-        if isinstance(node, ast.MatchSequence):
-            segment = ast.get_source_segment(source, node)
-            setattr(node, 'is_list_pattern', segment is not None and segment.lstrip().startswith('['))
 
 def binds_seq(pattern: ast.pattern) -> list[str]:
     if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
@@ -47,13 +46,19 @@ def binds_seq(pattern: ast.pattern) -> list[str]:
     if isinstance(pattern, ast.MatchSequence):
         return [x for p in pattern.patterns for x in binds_seq(p)]
     if isinstance(pattern, ast.MatchClass):
-        return [x for p in list(pattern.patterns) + list(pattern.kwd_patterns) for x in binds_seq(p)]
+        return [
+            x
+            for p in list(pattern.patterns) + list(pattern.kwd_patterns)
+            for x in binds_seq(p)
+        ]
     if isinstance(pattern, ast.MatchMapping):
         return [x for p in pattern.patterns for x in binds_seq(p)]
-    raise AssertionError(f'unexpected pattern: {type(pattern).__name__}')
+    raise AssertionError(f"unexpected pattern: {type(pattern).__name__}")
+
 
 def binds(pattern: ast.pattern) -> set[str]:
     return set(binds_seq(pattern))
+
 
 def fv_e(e: ast.expr) -> set[str]:
     if isinstance(e, ast.Name):
@@ -87,14 +92,18 @@ def fv_e(e: ast.expr) -> set[str]:
         return fv_e_comprehension([e.elt], e.generators)
     if isinstance(e, ast.DictComp):
         return fv_e_comprehension([e.key, e.value], e.generators)
-    raise AssertionError(f'unexpected expression: {type(e).__name__}')
+    raise AssertionError(f"unexpected expression: {type(e).__name__}")
+
 
 def fv_e_list(es: list[ast.expr]) -> set[str]:
     if len(es) == 0:
         return set()
     return fv_e(es[0]) | fv_e_list(es[1:])
 
-def fv_e_comprehension(elts: list[ast.expr], generators: list[ast.comprehension]) -> set[str]:
+
+def fv_e_comprehension(
+    elts: list[ast.expr], generators: list[ast.comprehension]
+) -> set[str]:
     if len(generators) == 0:
         return fv_e_list(elts)
     g = generators[0]
@@ -102,12 +111,14 @@ def fv_e_comprehension(elts: list[ast.expr], generators: list[ast.comprehension]
     rest = fv_e_list(g.ifs) | fv_e_comprehension(elts, generators[1:])
     return fv_e(g.iter) | rest - target_names
 
+
 def names_in_target(target: ast.expr) -> set[str]:
     if isinstance(target, ast.Name):
         return {target.id}
     if isinstance(target, ast.Tuple):
         return {n for t in target.elts for n in names_in_target(t)}
     return set()
+
 
 def captures_e(e: ast.expr) -> set[str]:
     if isinstance(e, ast.Lambda):
@@ -136,25 +147,32 @@ def captures_e(e: ast.expr) -> set[str]:
     if isinstance(e, (ast.List, ast.Tuple)):
         return captures_e_list(e.elts)
     if isinstance(e, ast.Dict):
-        return captures_e_list([k for k in e.keys if k is not None]) | captures_e_list(e.values)
+        return captures_e_list([k for k in e.keys if k is not None]) | captures_e_list(
+            e.values
+        )
     if isinstance(e, ast.ListComp):
         return captures_e_comprehension([e.elt], e.generators)
     if isinstance(e, ast.DictComp):
         return captures_e_comprehension([e.key, e.value], e.generators)
-    raise AssertionError(f'unexpected expression: {type(e).__name__}')
+    raise AssertionError(f"unexpected expression: {type(e).__name__}")
+
 
 def captures_e_list(es: list[ast.expr]) -> set[str]:
     if len(es) == 0:
         return set()
     return captures_e(es[0]) | captures_e_list(es[1:])
 
-def captures_e_comprehension(elts: list[ast.expr], generators: list[ast.comprehension]) -> set[str]:
+
+def captures_e_comprehension(
+    elts: list[ast.expr], generators: list[ast.comprehension]
+) -> set[str]:
     if len(generators) == 0:
         return captures_e_list(elts)
     g = generators[0]
     target_names = names_in_target(g.target)
     rest = captures_e_list(g.ifs) | captures_e_comprehension(elts, generators[1:])
     return captures_e(g.iter) | rest - target_names
+
 
 def fv_stmt(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.Pass):
@@ -173,18 +191,22 @@ def fv_stmt(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.If):
         return fv_e(s.test) | fv(s.body) | fv(s.orelse)
     if isinstance(s, ast.Match):
-        return fv_e(s.subject) | set().union(*(fv(case.body) - binds(case.pattern) for case in s.cases))
+        return fv_e(s.subject) | set().union(
+            *(fv(case.body) - binds(case.pattern) for case in s.cases)
+        )
     if isinstance(s, ast.FunctionDef):
         params = {a.arg for a in s.args.args}
         return fv(s.body) - params - {s.name}
     if isinstance(s, ast.ClassDef):
         return set()
-    raise AssertionError(f'unexpected statement: {type(s).__name__}')
+    raise AssertionError(f"unexpected statement: {type(s).__name__}")
+
 
 def fv(block: list[ast.stmt]) -> set[str]:
     if len(block) == 0:
         return set()
     return fv_stmt(block[0]) | fv(block[1:])
+
 
 def assigns_stmt(s: ast.stmt) -> set[str]:
     if isinstance(s, (ast.Pass, ast.Expr, ast.Return, ast.Assert)):
@@ -194,17 +216,21 @@ def assigns_stmt(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.If):
         return assigns_block(s.body) | assigns_block(s.orelse)
     if isinstance(s, ast.Match):
-        return set().union(*(binds(case.pattern) | assigns_block(case.body) for case in s.cases))
+        return set().union(
+            *(binds(case.pattern) | assigns_block(case.body) for case in s.cases)
+        )
     if isinstance(s, ast.FunctionDef):
         return {s.name}
     if isinstance(s, ast.ClassDef):
         return {s.name}
-    raise AssertionError(f'unexpected statement: {type(s).__name__}')
+    raise AssertionError(f"unexpected statement: {type(s).__name__}")
+
 
 def assigns_block(block: list[ast.stmt]) -> set[str]:
     if len(block) == 0:
         return set()
     return assigns_stmt(block[0]) | assigns_block(block[1:])
+
 
 def captures(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.Pass):
@@ -223,21 +249,26 @@ def captures(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.If):
         return captures_e(s.test) | captures_block(s.body) | captures_block(s.orelse)
     if isinstance(s, ast.Match):
-        return captures_e(s.subject) | set().union(*(captures_block(case.body) - binds(case.pattern) for case in s.cases))
+        return captures_e(s.subject) | set().union(
+            *(captures_block(case.body) - binds(case.pattern) for case in s.cases)
+        )
     if isinstance(s, ast.FunctionDef):
         return captures_region([s])
     if isinstance(s, ast.ClassDef):
         return set()
-    raise AssertionError(f'unexpected statement: {type(s).__name__}')
+    raise AssertionError(f"unexpected statement: {type(s).__name__}")
+
 
 def captures_block(block: list[ast.stmt]) -> set[str]:
     if len(block) == 0:
         return set()
     return captures(block[0]) | captures_block(block[1:])
 
+
 def captures_region(defs: list[ast.FunctionDef]) -> set[str]:
     f_names = {d.name for d in defs}
     return captures_region_bodies(defs) - f_names
+
 
 def captures_region_bodies(defs: list[ast.FunctionDef]) -> set[str]:
     if len(defs) == 0:
@@ -247,27 +278,34 @@ def captures_region_bodies(defs: list[ast.FunctionDef]) -> set[str]:
     own = fv(d.body) - params - assigns_block(d.body)
     return own | captures_region_bodies(defs[1:])
 
+
 def captures_element(item: BlockElement) -> set[str]:
     if isinstance(item, list):
         return captures_region(item)
     return captures(item)
+
 
 def assigns_element(item: BlockElement) -> set[str]:
     if isinstance(item, list):
         return {d.name for d in item}
     return assigns_stmt(item)
 
+
 def assigns_elements(items: list[BlockElement]) -> set[str]:
     if len(items) == 0:
         return set()
     return assigns_element(items[0]) | assigns_elements(items[1:])
 
-def find_first_reassigning(items: list[BlockElement], names: set[str]) -> Optional[ast.AST]:
+
+def find_first_reassigning(
+    items: list[BlockElement], names: set[str]
+) -> ast.AST | None:
     if len(items) == 0:
         return None
     if assigns_element(items[0]) & names:
         return items[0][0] if isinstance(items[0], list) else items[0]
     return find_first_reassigning(items[1:], names)
+
 
 def find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST | None:
     for s in stmts:
@@ -278,7 +316,9 @@ def find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST |
             if r is not None:
                 return r
         if isinstance(s, ast.If):
-            r = find_nested_import(s.body, nested=True) or find_nested_import(s.orelse, nested=True)
+            r = find_nested_import(s.body, nested=True) or find_nested_import(
+                s.orelse, nested=True
+            )
             if r is not None:
                 return r
         if isinstance(s, ast.Match):
@@ -288,12 +328,17 @@ def find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST |
                 return r
     return None
 
+
 def own_fields(node: ast.ClassDef) -> list[str]:
-    return [t.target.id for t in node.body
-            if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)]
+    return [
+        t.target.id
+        for t in node.body
+        if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)
+    ]
+
 
 def qualified_name(e: ast.expr) -> str:
     if isinstance(e, ast.Name):
         return e.id
     assert isinstance(e, ast.Attribute)
-    return qualified_name(e.value) + '.' + e.attr
+    return qualified_name(e.value) + "." + e.attr
