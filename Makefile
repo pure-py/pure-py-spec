@@ -17,37 +17,34 @@ default: paper.pdf
 
 spec: PurePy-spec.pdf
 
-spec-anon: spec-anon.pdf
+spec-anon: specification.pdf
 
-spec-anon.pdf: $(TEXFILES) | clean-aux
-	$(PDFLATEX) -jobname=spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
-	bibtex spec-anon
-	$(PDFLATEX) -jobname=spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
-	$(PDFLATEX) -jobname=spec-anon "\def\anonmode{}\input{PurePy-spec.tex}"
+specification.pdf: $(TEXFILES) | clean-aux
+	$(PDFLATEX) -jobname=specification "\def\anonmode{}\input{PurePy-spec.tex}"
+	bibtex specification
+	$(PDFLATEX) -jobname=specification "\def\anonmode{}\input{PurePy-spec.tex}"
+	$(PDFLATEX) -jobname=specification "\def\anonmode{}\input{PurePy-spec.tex}"
 
-anon: paper-anon.pdf
+anon: main.pdf
 
-paper-anon.pdf: $(TEXFILES) | clean-aux
-	$(PDFLATEX) -jobname=paper-anon "\def\anonmode{}\input{paper.tex}"
-	bibtex paper-anon
-	$(PDFLATEX) -jobname=paper-anon "\def\anonmode{}\input{paper.tex}"
-	$(PDFLATEX) -jobname=paper-anon "\def\anonmode{}\input{paper.tex}"
-
-SUBMIT_DIR := submission
+main.pdf: $(TEXFILES) | clean-aux
+	$(PDFLATEX) -jobname=main "\def\anonmode{}\input{paper.tex}"
+	bibtex main
+	$(PDFLATEX) -jobname=main "\def\anonmode{}\input{paper.tex}"
+	$(PDFLATEX) -jobname=main "\def\anonmode{}\input{paper.tex}"
 
 # Zip rather than a bare PDF, to make room for a mechanisation.
-submit: paper-anon.pdf spec-anon.pdf
-	rm -rf $(SUBMIT_DIR)
-	mkdir $(SUBMIT_DIR)
-	cp paper-anon.pdf $(SUBMIT_DIR)/main.pdf
-	cp spec-anon.pdf $(SUBMIT_DIR)/specification.pdf
-	cd $(SUBMIT_DIR) && zip -q -9 supplementary.zip specification.pdf && rm specification.pdf
+submit: main.pdf supplementary.zip
+
+supplementary.zip: specification.pdf
+	rm -f $@
+	zip -q -9 $@ $<
 
 clean-aux:
 	rm -f $(AUX)
 
 clean: clean-aux
-	rm -rf *.pdf $(ARXIV_ZIP) $(SUBMIT_DIR)
+	rm -f *.pdf *.zip
 
 arXiv: $(ARXIV_ZIP)
 
