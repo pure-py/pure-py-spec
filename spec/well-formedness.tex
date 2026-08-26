@@ -82,11 +82,11 @@ to bound the values a match may receive, it degenerates to whether the last case
 \subsection{Modules and programs}
 \label{sec:wf-modules}
 
-In this section, loading a module means checking its body and computing its signature
-(\figref{well-formed-module}), the static counterpart of runtime loading (\secref{opsem}). Both
-import forms load their target, together with its ancestors
+\emph{Static loading} checks a module's body and computes its signature $\Gamma$, the judgement
+$\vdash_{\mathsf{load}} q : \Gamma$ (\figref{well-formed-module}); it mirrors loading at run time (\secref{opsem}).
+Both import forms statically load their target, together with its ancestors
 (\figref{well-formed-imports}). A plain import also records each of these modules as a member of its
-parent (the loads-as judgement), so that the binding created for the root of the target gives attribute
+parent (the static loads-as judgement), so that the binding created for the root of the target gives attribute
 access along the whole chain. A from-import also loads any imported name that denotes a submodule. An
 ancestor of the target is exempt from loading first if it is the importing module or one of its
 ancestors, since at runtime it may still be loading. The exemption applies only to from-imports, because
@@ -103,7 +103,7 @@ unqualified.
 
 \input{spec/fig/well-formed-module}
 
-The signature $\Gamma$ a module's load judgement produces (\figref{well-formed-module}) comprises the classes
+The signature $\Gamma$ that static loading produces (\figref{well-formed-module}) comprises the classes
 and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule,
 never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
 name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own

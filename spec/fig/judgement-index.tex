@@ -13,7 +13,7 @@ $\Gamma \vdash t : R$ & statement $t$ is well-formed with result type $R$ & \fig
 $\Gamma, x \importsR \theta$ & name $x$ imported from module signature $\Gamma$ has entry $\theta$ & \figref{imports} \\
 $\vdash \seq{\iota} : \Gamma$ & imports $\seq{\iota}$ are well-formed and yield context $\Gamma$ & \figref{well-formed-imports} \\
 $q, \theta \loadsAs \theta'$ & importing module $q$ into entry $\theta$ gives entry $\theta'$ & \figref{well-formed-imports} \\
-$\vdash_{\mathsf{load}} q : \Gamma$ & module $q$ loads with signature $\Gamma$ & \figref{well-formed-module} \\
+$\vdash_{\mathsf{load}} q : \Gamma$ & module $q$ statically loads with signature $\Gamma$ & \figref{well-formed-module} \\
 $\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{well-formed-module}
    \\[2mm]
 \metaGroup{Evaluation} \\
