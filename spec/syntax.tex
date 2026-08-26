@@ -47,7 +47,7 @@ an idempotent commutative semigroup of parallel composition $\merge$ (``merge'')
 distributivity does not hold. Both operations are defined pointwise.
 %
 \begin{definition}[Context override]
-Pointwise, $(\Gamma \override \Delta)(x) = \Gamma(x) \override \Delta(x)$, where on entries
+$(\Gamma \override \Delta)(x) = \Gamma(x) \override \Delta(x)$, where on entries
 \begin{defalign}
 \bot \override \theta &= \theta \override \bot = \theta \\
 \theta \override \theta' &= \theta' \quad (\text{otherwise})
@@ -57,7 +57,7 @@ Pointwise, $(\Gamma \override \Delta)(x) = \Gamma(x) \override \Delta(x)$, where
 \noindent Override is thus right-biased and has $\bot$ as both left and right unit.
 
 \begin{definition}[Context merge]
-Pointwise, $(\Gamma \merge \Delta)(x) = \Gamma(x) \merge \Delta(x)$, where on definite-assignment statuses $a, a' \in \B$
+$(\Gamma \merge \Delta)(x) = \Gamma(x) \merge \Delta(x)$, where on definite-assignment statuses $a, a' \in \B$
 \begin{defalign}
 \bot \merge \bot &= \bot \\
 a \merge \bot = \bot \merge a &= \statusNotDefAssigned \\
@@ -69,7 +69,7 @@ a \merge a' &= a \meet a'
 
 \begin{definition}[Context extension]
 \label{def:extend}
-Pointwise, $(\Gamma \extend \Delta)(x) = \Gamma(x) \extend \Delta(x)$, where on entries
+$(\Gamma \extend \Delta)(x) = \Gamma(x) \extend \Delta(x)$, where on entries
 \begin{defalign}
 \modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} &= \modLoaded{q}{\Gamma \extend \Gamma'} \\
 \modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} &= \modLoaded{q}{\Gamma} \\
