@@ -4,8 +4,7 @@
 \figref{well-formed-env} defines when a value is well-formed at a context entry: an ordinary value at
 $\statusDefAssigned$, a module or class value at the matching module or class entry. An environment is
 well-formed in a context that binds its variables at such entries. The predefined environments are
-well-formed by construction, and a module loads to an environment that is well-formed at its signature;
-these are the base case and the module case of soundness.
+well-formed by construction, and a module loads to an environment that is well-formed at its signature.
 
 \begin{theorem}[Loaded environments are well-formed]
 \label{thm:loaded}
