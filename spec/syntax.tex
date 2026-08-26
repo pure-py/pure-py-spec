@@ -48,7 +48,7 @@ distributivity does not hold. Both operations, and context extension $\extend$ (
 (\figref{context-ops}).
 \input{spec/fig/context-ops}
 
-\noindent Override is right-biased and has $\bot$ as both left and right unit. Merge is defined only on
+Override is right-biased and has $\bot$ as both left and right unit. Merge is defined only on
 definite-assignment statuses; restricted to $\B$, it returns $\statusNotDefAssigned$ when exactly one argument
 is defined and the conjunction otherwise, so $\bot$ is not a unit. Context extension combines module
 references for the same module recursively, preferring loaded references to stubs, and is otherwise
