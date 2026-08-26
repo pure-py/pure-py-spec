@@ -58,15 +58,15 @@ base class.
 
 \input{spec/fig/well-formed}
 
-An expression is well-formed when every variable it references is definitely assigned (\ruleName{var});
+A variable is a well-formed expression when it is definitely assigned (\ruleName{var});
 a lambda checks its body with its parameters definitely assigned, and a comprehension its body under the
 variables its generators bind (\ruleName{qual-generator}). A qualified name resolves through the context
 to an entry $\theta$ (\figref{well-formed-expr}a), which two rules consult: a module attribute reference is
 well-formed only when, read as a qualified name, it resolves to a definitely assigned member
 (\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}; and a constructor call requires its
 name to resolve to a class and its arguments to cover the class's fields exactly, through $\fieldMap$
-(\ruleName{constr}). A name that resolves to a
-module or class entry is not itself a well-formed expression, since \ruleName{var} requires a variable.
+(\ruleName{constr}). A variable bound to a module or class entry is not an expression on its own, and occurs
+only as the head of a qualified name.
 
 \input{spec/fig/well-formed-expr}
 
