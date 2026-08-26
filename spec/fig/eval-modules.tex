@@ -151,16 +151,7 @@
   q \Rightarrow_{\mathsf{load}} \val{\rho}
 }
 \and
-\inferrule*[lab={\ruleName{eval-module}}]
-{
-  \mathcal{M}(q) = \seq{\iota}\;t \\
-   \seq{\iota} \Rightarrow \val{\rho} \\
-  \mathcal{P}(\pyinline{builtins}) = (\rho', \Gamma') \\
-  \rho' \mathbin{\override} \rho, t \Rightarrow \assigns{\rho^\dagger}
-}
-{
-  q \Rightarrow_{\mathsf{load}} \val{(\submods(q) \override \rho^\dagger)}
-}
+\input{spec/rules/eval-module}
 \and
 \inferrule*[lab={\ruleName{eval-module-fail}}]
 {
@@ -186,21 +177,9 @@
 \flushleft \shadebox{$\mathcal{M} \Rightarrow \kappa$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{eval-program}}]
-{
-  \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{load}} \val{\rho}
-}
-{
-  \mathcal{M} \Rightarrow \errExit{0}
-}
+\input{spec/rules/eval-program}
 \and
-\inferrule*[lab={\ruleName{eval-program-abort}}]
-{
-  \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{load}} \aborts{\kappa}
-}
-{
-  \mathcal{M} \Rightarrow \kappa
-}
+\input{spec/rules/eval-program-abort}
 \end{mathpar}
 \caption{Module and program evaluation}
 \label{fig:eval-modules}
