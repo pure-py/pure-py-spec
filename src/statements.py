@@ -2,26 +2,28 @@ import ast
 
 import reasons
 from aux import (
-    BlockElement,
-    assigns_block,
-    assigns_elements,
+    Statement,
+    assigns_body,
+    assigns_seq,
     binds,
     captures_e,
-    captures_element,
-    elements_of_block,
+    captures_statement,
     find_first_reassigning,
     names_in_target,
+    own_fields,
     qualified_name,
+    statements,
 )
 from contexts import (
     ASSIGNS_EMPTY,
     RETURNS,
     Assigns,
     ClassEntry,
+    Context,
     ModuleContext,
     ModuleLoaded,
     ModuleStub,
-    ResultTy,
+    ResultType,
     Returns,
     Status,
     class_entry,
@@ -31,6 +33,7 @@ from contexts import (
     fields,
     merge_results,
     module_of,
+    override_gamma,
     override_results,
     override_var,
     short_name,
@@ -40,7 +43,7 @@ from patterns import check_pattern_list, is_catch_all
 from reasons import IllFormedModule
 
 
-def result_type(node: ast.stmt) -> ResultTy:
+def result_type(node: ast.stmt) -> ResultType:
     if isinstance(node, ast.Pass):
         return ASSIGNS_EMPTY
     if isinstance(node, ast.Assign):
@@ -58,15 +61,15 @@ def result_type(node: ast.stmt) -> ResultTy:
     if isinstance(node, ast.If):
         return merge_results(
             [
-                result_type_of_block(node.body),
-                result_type_of_block(node.orelse) if node.orelse else ASSIGNS_EMPTY,
+                result_type_body(node.body),
+                result_type_body(node.orelse) if node.orelse else ASSIGNS_EMPTY,
             ]
         )
     if isinstance(node, ast.Match):
         branches = [
             override_results(
                 Assigns({x: Status.TT for x in binds(case.pattern)}),
-                result_type_of_block(case.body),
+                result_type_body(case.body),
             )
             for case in node.cases
         ]
@@ -78,25 +81,25 @@ def result_type(node: ast.stmt) -> ResultTy:
     raise AssertionError(f"unexpected statement: {type(node).__name__}")
 
 
-def result_type_of_block(block: list[ast.stmt]) -> ResultTy:
-    if len(block) == 1:
-        return result_type(block[0])
-    return override_results(result_type(block[0]), result_type_of_block(block[1:]))
+def result_type_body(body: list[ast.stmt]) -> ResultType:
+    if len(body) == 1:
+        return result_type(body[0])
+    return override_results(result_type(body[0]), result_type_body(body[1:]))
 
 
-def check_block(block: list[ast.stmt], ctx: ModuleContext) -> ModuleContext:
-    return check_elements(elements_of_block(block), ctx)
+def check_body(body: list[ast.stmt], ctx: ModuleContext) -> ModuleContext:
+    return check_seq(statements(body), ctx)
 
 
-def check_elements(items: list[BlockElement], ctx: ModuleContext) -> ModuleContext:
+def check_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
     if len(items) == 0:
         return ctx
     head = items[0]
-    check_element(head, ctx)
+    check_statement(head, ctx)
     if len(items) == 1:
         return next_ctx_after(head, ctx)
     tail = items[1:]
-    if isinstance(block_element_result_type(head), Returns):
+    if isinstance(result_type_statement(head), Returns):
         first_unreachable = tail[0]
         node: ast.AST = (
             first_unreachable[0]
@@ -104,28 +107,32 @@ def check_elements(items: list[BlockElement], ctx: ModuleContext) -> ModuleConte
             else first_unreachable
         )
         raise IllFormedModule(node, reasons.UnreachableStatement())
-    reassigned = captures_element(head) & assigns_elements(tail)
+    reassigned = captures_statement(head) & assigns_seq(tail)
     if reassigned:
         name = min(reassigned)
         ra_node = find_first_reassigning(tail, reassigned)
         assert ra_node is not None
         raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
-    return check_elements(tail, next_ctx_after(head, ctx))
+    return check_seq(tail, next_ctx_after(head, ctx))
 
 
-def next_ctx_after(head: BlockElement, ctx: ModuleContext) -> ModuleContext:
-    head_result = block_element_result_type(head)
+def next_ctx_after(head: Statement, ctx: ModuleContext) -> ModuleContext:
+    # Assigns {c: C} for a class statement: ResultType carries statuses only, so the class entry is
+    # added here rather than through the result type.
+    if isinstance(head, ast.ClassDef):
+        return override_gamma(ctx, {head.name: class_entry_for(head, ctx.q, ctx.gamma)})
+    head_result = result_type_statement(head)
     delta = head_result.delta if isinstance(head_result, Assigns) else {}
     return override_var(ctx, delta)
 
 
-def block_element_result_type(item: BlockElement) -> ResultTy:
+def result_type_statement(item: Statement) -> ResultType:
     if isinstance(item, list):
         return Assigns({d.name: Status.TT for d in item})
     return result_type(item)
 
 
-def check_element(item: BlockElement, ctx: ModuleContext) -> None:
+def check_statement(item: Statement, ctx: ModuleContext) -> None:
     if isinstance(item, list):
         check_mutual_region(item, ctx)
     else:
@@ -141,12 +148,12 @@ def check_bodies(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
     f_names = {d.name: Status.TT for d in defs}
     for d in defs:
         params = {a.arg for a in d.args.args}
-        locals_ = assigns_block(d.body) - params
+        locals_ = assigns_body(d.body) - params
         delta = (
             f_names | {p: Status.TT for p in params} | {x: Status.FF for x in locals_}
         )
         body_ctx = override_var(ctx, delta)
-        check_block(d.body, body_ctx)
+        check_body(d.body, body_ctx)
 
 
 def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> None:
@@ -183,9 +190,9 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext) -> None:
         return
     if isinstance(s, ast.If):
         check_expr(s.test, ctx)
-        check_block(s.body, ctx)
+        check_body(s.body, ctx)
         if s.orelse:
-            check_block(s.orelse, ctx)
+            check_body(s.orelse, ctx)
         return
     if isinstance(s, ast.Assert):
         check_expr(s.test, ctx)
@@ -198,13 +205,14 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext) -> None:
         check_match_cases(s.cases, ctx)
         return
     if isinstance(s, ast.ClassDef):
-        raise IllFormedModule(s, reasons.NonTopLevelClass())
+        check_class_decl(s, ctx.gamma, ctx.q)
+        return
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
 def check_match_cases(cases: list[ast.match_case], ctx: ModuleContext) -> None:
     for case in cases:
-        check_block(
+        check_body(
             case.body, override_var(ctx, {x: Status.TT for x in binds(case.pattern)})
         )
 
@@ -329,3 +337,34 @@ def check_exprs(es: list[ast.expr], ctx: ModuleContext) -> None:
         return
     check_expr(es[0], ctx)
     check_exprs(es[1:], ctx)
+
+
+def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
+    base = (
+        node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
+    )
+    return ClassEntry(
+        context=context,
+        name=f"{q}.{node.name}",
+        own_fields=tuple(own_fields(node)),
+        base=base,
+    )
+
+
+def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
+    if isinstance(gamma.get(node.name), ClassEntry):
+        raise IllFormedModule(node, reasons.DuplicateClassName(node.name, q))
+    names = own_fields(node)
+    dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
+    if dup is not None:
+        raise IllFormedModule(node, reasons.DuplicateFieldName(dup, node.name))
+    if len(node.bases) == 0:
+        return
+    base = node.bases[0]
+    assert isinstance(base, ast.Name)
+    entry = gamma.get(base.id)
+    if not isinstance(entry, ClassEntry) or entry.name.rsplit(".", 1)[0] != q:
+        raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
+    clash = set(names) & set(fields(entry))
+    if len(clash) > 0:
+        raise IllFormedModule(node, reasons.InheritedFieldClash(min(clash), base.id))

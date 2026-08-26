@@ -1,0 +1,9 @@
+\inferrule*[lab={\ruleName{eval-match}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  \dispatch(\rho, v, \seq{p}, \seq{s}) = (\rho', s') \\
+  \rho \override \rho', s' \Rightarrow r
+}
+{
+  \rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \assigns{\rho'} \mathbin{\override} r
+}

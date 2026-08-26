@@ -1,0 +1,7 @@
+\inferrule*[lab={\ruleName{eval-pat-list}}]
+{
+  \rho, p_i, v_i \matches m_i \quad (\forall i)
+}
+{
+  \rho, \patList{p_1, \ldots, p_n}, \exList{v_1, \ldots, v_n} \matches m_1 \override \ldots \override m_n
+}

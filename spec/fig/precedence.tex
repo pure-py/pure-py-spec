@@ -2,9 +2,8 @@
 \small
 \begin{center}
 \begin{tabular}{rlll}
-\hline
-Level & Operators & Arity & Associativity \\
-\hline
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Level & Operators & Arity & Associativity \\
 1 (lowest)  & \pyinline{or}                                                              & binary & left \\
 2           & \pyinline{and}                                                             & binary & left \\
 3           & \pyinline{not}                                                             & unary  & --- \\
@@ -12,8 +11,7 @@ Level & Operators & Arity & Associativity \\
 5           & \pyinline{+}\quad\pyinline{-}                                                & binary & left \\
 6           & \pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}                & binary & left \\
 7           & \pyinline{+}\quad\pyinline{-}                                                & unary  & --- \\
-8 (highest) & \pyinline{**}                                                              & binary & right \\
-\hline
+8 (highest) & \pyinline{**}                                                              & binary & right
 \end{tabular}
 \end{center}
 \caption{Operator precedence (lowest binds loosest)}

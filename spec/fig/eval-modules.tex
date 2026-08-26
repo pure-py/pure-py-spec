@@ -140,59 +140,6 @@
 \end{figure}
 
 \begin{figure}
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\rho, \seq{s} \Rightarrow o$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{eval-nil}}]
-{
-  \strut
-}
-{
-  \rho, \varepsilon \Rightarrow \val{\varnothing}
-}
-\and
-\inferrule*[lab={\ruleName{eval-statement}}]
-{
-  \rho, s \Rightarrow \assigns{\rho'} \\
-  \rho \override \rho', \seq{s} \Rightarrow o
-}
-{
-  \rho, s \cons \seq{s} \Rightarrow \mlet{\rho^\dagger}{o}{\val{(\rho' \override \rho^\dagger)}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-statement-fail}}]
-{
-  \rho, s \Rightarrow \aborts{\kappa}
-}
-{
-  \rho, s \cons \seq{s} \Rightarrow \aborts{\kappa}
-}
-\and
-\inferrule*[lab={\ruleName{eval-class}}]
-{
-  C = \clsEntry{\Gamma}{q.c}{\ownFields(\phi)}{\bot} \\
-  \rho \override \set{\bind{c}{C}}, \seq{s} \Rightarrow o
-}
-{
-  \rho, \exDataclass{c}{\phi} \cons \seq{s} \Rightarrow \mlet{\rho'}{o}{\val{(\set{\bind{c}{C}} \override \rho')}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-class-extend}}]
-{
-  C = \clsEntry{\Gamma}{q.c}{\ownFields(\phi)}{c'} \\
-  \rho \override \set{\bind{c}{C}}, \seq{s} \Rightarrow o
-}
-{
-  \rho, \exDataclassExtend{c}{c'}{\phi} \cons \seq{s} \Rightarrow \mlet{\rho'}{o}{\val{(\set{\bind{c}{C}} \override \rho')}}
-}
-\end{mathpar}
-\subcaption{Statements $\seq{s}$ of module $q$ evaluate under environment $\rho : \Gamma$ to outcome $o$}
-\end{subfigure}
-
-\vspace{2mm}
-
-\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$q \Rightarrow_{\mathsf{load}} o$}
 \begin{mathpar}
 \small
@@ -204,21 +151,23 @@
   q \Rightarrow_{\mathsf{load}} \val{\rho}
 }
 \and
-\inferrule*[lab={\ruleName{eval-module}}]
-{
-  \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
-   \seq{\iota} \Rightarrow \val{\rho} \\
-  \mathcal{P}(\pyinline{builtins}) = (\rho', \Gamma') \\
-  \rho' \mathbin{\override} \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}) \cons \seq{s} \Rightarrow o
-}
-{
-  q \Rightarrow_{\mathsf{load}} \mlet{\rho^\dagger}{o}{\val{(\submods(q) \override \rho^\dagger)}}
-}
+\input{spec/rules/eval-module}
 \and
 \inferrule*[lab={\ruleName{eval-module-fail}}]
 {
-  \mathcal{M}(q) = \seq{\iota}\;\seq{s} \\
+  \mathcal{M}(q) = \seq{\iota}\;t \\
    \seq{\iota} \Rightarrow \aborts{\kappa}
+}
+{
+  q \Rightarrow_{\mathsf{load}} \aborts{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-module-fail-body}}]
+{
+  \mathcal{M}(q) = \seq{\iota}\;t \\
+   \seq{\iota} \Rightarrow \val{\rho} \\
+  \mathcal{P}(\pyinline{builtins}) = (\rho', \Gamma') \\
+  \rho' \mathbin{\override} \rho, t \Rightarrow \aborts{\kappa}
 }
 {
   q \Rightarrow_{\mathsf{load}} \aborts{\kappa}
@@ -228,24 +177,10 @@
 \flushleft \shadebox{$\mathcal{M} \Rightarrow \kappa$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{eval-program}}]
-{
-  \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{load}} \val{\rho}
-}
-{
-  \mathcal{M} \Rightarrow \errExit{0}
-}
+\input{spec/rules/eval-program}
 \and
-\inferrule*[lab={\ruleName{eval-program-abort}}]
-{
-  \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{load}} \aborts{\kappa}
-}
-{
-  \mathcal{M} \Rightarrow \kappa
-}
+\input{spec/rules/eval-program-abort}
 \end{mathpar}
-\subcaption{Module loading and program evaluation}
-\end{subfigure}
 \caption{Module and program evaluation}
 \label{fig:eval-modules}
 \end{figure}

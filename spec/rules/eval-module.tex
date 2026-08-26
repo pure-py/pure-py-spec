@@ -1,0 +1,10 @@
+\inferrule*[lab={\ruleName{eval-module}}]
+{
+  \mathcal{M}(q) = \seq{\iota}\;t \\
+   \seq{\iota} \Rightarrow \val{\rho} \\
+  \mathcal{P}(\pyinline{builtins}) = (\rho', \Gamma') \\
+  \rho' \mathbin{\override} \rho, t \Rightarrow \assigns{\rho^\dagger}
+}
+{
+  q \Rightarrow_{\mathsf{load}} \val{(\submods(q) \override \rho^\dagger)}
+}

@@ -1,0 +1,9 @@
+\inferrule*[lab={\ruleName{eval-call-nonfun}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
+  v \text{ neither closure nor primitive}
+}
+{
+  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \aborts{\errType}
+}

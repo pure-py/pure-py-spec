@@ -1,0 +1,10 @@
+The rule \ruleName{eval-match} passes the bindings of the selected case both to its body and into the
+statement's result, so pattern variables remain bound after the match (\secref{pattern-binding}):
+\begin{mathpar}
+\input{spec/rules/eval-match}
+\end{mathpar}
+Here $\dispatch$ tries the cases in order under the pattern-matching judgement, and yields \pyinline{pass}
+with no bindings if none matches:
+\begin{defalign}
+\input{spec/functions/dispatch}
+\end{defalign}

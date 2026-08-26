@@ -1,0 +1,11 @@
+\inferrule*[lab={\ruleName{match}}]
+{
+  \Gamma \vdash e \\
+  \Gamma \override \statusDefAssigned(\binds(p_i)) \vdash s_i : R_i \quad (\forall i) \\
+  S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \override R_i \quad (\forall i) \\
+  \Gamma \vdash \seq{p} \\
+  p_{n+1} \in \set{x, \patWild}
+}
+{
+  \Gamma \vdash \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} : S_1 \merge \ldots \merge S_{n+1}
+}

@@ -37,7 +37,7 @@
 }
 
 \end{mathpar}
-\subcaption{Name $q$ resolves to context entry $\theta$ under $\Gamma$}
+\subcaption{Qualified name $q$ resolves to context entry $\theta$ under $\Gamma$}
 \end{subfigure}
 
 \vspace{2mm}
@@ -151,12 +151,12 @@
   \Gamma \vdash \exBinOp{e}{\odot}{e'}
 }
 \and
-\inferrule*[lab={\ruleName{unary-op}}]
+\inferrule*[lab={\ruleName{unop}}]
 {
   \Gamma \vdash e
 }
 {
-  \Gamma \vdash \exUnaryOp{\ominus}{e}
+  \Gamma \vdash \exUnOp{\ominus}{e}
 }
 \and
 \inferrule*[lab={\ruleName{and}}]

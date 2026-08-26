@@ -1,0 +1,9 @@
+For example, a list pattern matches a list of the same length elementwise, composing the sub-results,
+and fails to match a list of another length or a value that is neither a list nor a tuple:
+\begin{mathpar}
+\input{spec/rules/eval-pat-list}
+\and
+\input{spec/rules/eval-pat-list-no}
+\end{mathpar}
+Neither rule applies when the value is a tuple: a list pattern against a tuple has no derivation, and
+the run has no result.

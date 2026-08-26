@@ -14,7 +14,7 @@ This annex is normative. It defines the auxiliary functions used by the well-for
 The analyses $\assignsS$, $\binds$, $\capturesS$ and $\capturesE$ introduced in \secref{wf-aux} are
 defined by their principal cases; the remaining cases are stated with each.
 
-\begin{auxfunction}{\assignsS(s)}{set of variables}{aux:assigns}
+\begin{auxfunction}{\assignsS(t)}{set of variables}{aux:assigns}
 \input{spec/functions/assigns-text}
 \begin{align*}
 \input{spec/functions/assigns}
@@ -28,7 +28,7 @@ defined by their principal cases; the remaining cases are stated with each.
 \end{align*}
 \end{auxfunction}
 
-\begin{auxfunction}{\capturesS(s)}{set of variables}{aux:captures}
+\begin{auxfunction}{\capturesS(t)}{set of variables}{aux:captures}
 \input{spec/functions/captures-text}
 \begin{align*}
 \input{spec/functions/captures}
@@ -42,7 +42,7 @@ defined by their principal cases; the remaining cases are stated with each.
 \end{align*}
 \end{auxfunction}
 
-\begin{auxfunction}{\fvS(b)}{set of variables}{aux:fv}
+\begin{auxfunction}{\fvS(s)}{set of variables}{aux:fv}
 \input{spec/functions/fv-text}
 \end{auxfunction}
 
@@ -119,7 +119,7 @@ The functions on values used by the evaluation rules.
 \input{spec/functions/binop-text}
 \begin{center}
 \small
-\input{spec/functions/binop}
+\input{spec/functions/binop-meaning}
 \end{center}
 \end{auxfunction}
 
@@ -127,7 +127,7 @@ The functions on values used by the evaluation rules.
 \input{spec/functions/unop-text}
 \begin{center}
 \small
-\input{spec/functions/unop}
+\input{spec/functions/unop-meaning}
 \end{center}
 \end{auxfunction}
 
@@ -187,7 +187,7 @@ The functions on values used by the evaluation rules.
 \end{align*}
 \end{auxfunction}
 
-\begin{auxfunction}{\dispatch(\rho, v, \seq{p}, \seq{b})}{bindings and block}{aux:dispatch}
+\begin{auxfunction}{\dispatch(\rho, v, \seq{p}, \seq{s})}{bindings and statement}{aux:dispatch}
 \input{spec/functions/dispatch-text}
 \begin{align*}
 \input{spec/functions/dispatch}

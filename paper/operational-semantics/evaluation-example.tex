@@ -1,0 +1,16 @@
+Concretely, \ruleName{eval-binop} evaluates both operands and binds the outcome of the second:
+\begin{mathpar}
+\input{spec/rules/eval-binop}
+\end{mathpar}
+The meaning $\hat{\odot}(v, v')$ of the operator is itself an outcome, $\aborts{\kappa}$ where Python
+raises, and is undefined where \PurePy gives the operation no meaning; an expression whose operator
+meaning is undefined has no derivation. An abort from the first operand is propagated by a rule of its own:
+\begin{mathpar}
+\input{spec/rules/eval-binop-fail}
+\end{mathpar}
+Rules may also originate an abort rather than propagate one. Calling a value that is neither closure nor
+primitive aborts with $\errType$, as Python raises \pyinline{TypeError}:
+\begin{mathpar}
+\input{spec/rules/eval-call-nonfun}
+\end{mathpar}
+The remaining rules follow the same pattern and are given in full in \specification.

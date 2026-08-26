@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma \vdash b : R$}
+\flushleft \shadebox{$\Gamma \vdash t : R$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{pass}}]
@@ -63,65 +63,77 @@
 \inferrule*[lab={\ruleName{if}}]
 {
   \Gamma \vdash e_i \quad (\forall i) \\
-  \Gamma \vdash b_i : R_i \quad (\forall i)
+  \Gamma \vdash s_i : R_i \quad (\forall i)
 }
 {
-  \Gamma \vdash \exIf{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}} : R_1 \merge \ldots \mathbin{\merge} R_{n+1} \:  \merge \Assigns{\varnothing}
+  \Gamma \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \merge \ldots \mathbin{\merge} R_{n+1} \:  \merge \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{if-else}}]
 {
   \Gamma \vdash e_i \quad (\forall i) \\
-  \Gamma \vdash b_i : R_i \quad (\forall i)
+  \Gamma \vdash s_i : R_i \quad (\forall i)
 }
 {
-  \Gamma \vdash \exIfElse{e_1}{b_1}{\exElif{e_2}{b_2}\;\ldots\;\exElif{e_{n+1}}{b_{n+1}}}{b_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
+  \Gamma \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
 }
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \Gamma \override \statusDefAssigned(\seq{f} \mathbin{\concat} \seq{x}_i) \override \statusNotDefAssigned(\assignsS(b_i) \setminus \seq{x}_i) \vdash b_i : R_i \quad (\forall i)
+  \Gamma \override \statusDefAssigned(\seq{f} \mathbin{\concat} \seq{x}_i) \override \statusNotDefAssigned(\assignsS(s_i) \setminus \seq{x}_i) \vdash s_i : R_i \quad (\forall i)
   \\
   \seq{f} \text{ distinct}
 }
 {
-  \Gamma \vdash \exDef{f_1}{\seq{x}_1\,\seq{\pi}_1}{\omega_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}\,\seq{\pi}_{n+1}}{\omega_{n+1}}{b_{n+1}} : \Assigns{\statusDefAssigned(\seq{f})}
+  \Gamma \vdash \exDef{f_1}{\seq{x}_1\,\seq{\pi}_1}{\omega_1}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}\,\seq{\pi}_{n+1}}{\omega_{n+1}}{s_{n+1}} : \Assigns{\statusDefAssigned(\seq{f})}
 }
 \and
-\inferrule*[lab={\ruleName{match}}]
-{
-  \Gamma \vdash e \\
-  \Gamma \override \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
-  S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \override R_i \quad (\forall i) \\
-  \Gamma \vdash \seq{p} \\
-  p_{n+1} \in \set{x, \patWild}
-}
-{
-  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : S_1 \merge \ldots \merge S_{n+1}
-}
+\input{spec/rules/match}
 \and
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Gamma \vdash e \\
-  \Gamma \override \statusDefAssigned(\binds(p_i)) \vdash b_i : R_i \quad (\forall i) \\
+  \Gamma \override \statusDefAssigned(\binds(p_i)) \vdash s_i : R_i \quad (\forall i) \\
   S_i = \Assigns{\statusDefAssigned(\binds(p_i))} \override R_i \quad (\forall i) \\
   \Gamma \vdash \seq{p} \\
   p_{n+1} \notin \set{x, \patWild}
 }
 {
-  \Gamma \vdash \exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}} : S_1 \merge \ldots \merge S_{n+1} \merge \Assigns{\varnothing}
+  \Gamma \vdash \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} : S_1 \merge \ldots \merge S_{n+1} \merge \Assigns{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{cons}}]
+\inferrule*[lab={\ruleName{seq}}]
 {
-  \Gamma \vdash s : \Assigns{\Delta} \\
-  \Gamma \override \Delta \vdash b : R \\
-  \capturesS(s) \cap \assignsS(b) = \varnothing
+  \Gamma \vdash t : \Assigns{\Delta} \\
+  \Gamma \override \Delta \vdash t' : R \\
+  \capturesS(t) \cap \assignsS(t') = \varnothing
 }
 {
-  \Gamma \vdash s \cons b : \Assigns{\Delta} \override R
+  \Gamma \vdash t\;t' : \Assigns{\Delta} \override R
+}
+\and
+\inferrule*[lab={\ruleName{class}}]
+{
+  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
+  \ownFields(\phi) = \seq{x} \text{ distinct} \\
+  C = \clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}
+}
+{
+  \Gamma \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{C}}}
+}
+\and
+\inferrule*[lab={\ruleName{class-extend}}]
+{
+  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
+  \bind{c'}{\clsEntry{\Gamma'}{q.c'}{\seq{y}}{c^\dagger}} \in \Gamma \\
+  \ownFields(\phi) = \seq{x} \text{ distinct} \\
+  \seq{x} \cap \fields(\Gamma(c')) = \varnothing \\
+  C = \clsEntry{\Gamma}{q.c}{\seq{x}}{c'}
+}
+{
+  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{C}}}
 }
 \end{mathpar}
-\caption{Block $b$ is well-formed in $\Gamma$}
+\caption{Statement $t$ is well-formed in $\Gamma$ with result type $R$}
 \label{fig:well-formed}
 \end{figure}

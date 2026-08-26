@@ -1,0 +1,19 @@
+\begin{figure}
+\small
+\setlength{\jot}{1pt}
+\newcommand*{\opname}[1]{\makebox[0.22\textwidth][l]{\shadebox{#1}}}
+\newcommand*{\opblank}{\makebox[0.22\textwidth]{}}
+\begin{alignat*}{2}
+\opname{$\override$ (override)} && \bot \override \theta &= \theta \override \bot = \theta \\
+\opblank && \theta \override \theta' &= \theta' \quad (\text{otherwise}) \\[2mm]
+\opname{$\merge$ (merge)} && \bot \merge \bot &= \bot \\
+\opblank && a \merge \bot = \bot \merge a &= \statusNotDefAssigned \\
+\opblank && a \merge a' &= a \meet a' \quad (a, a' \in \B) \\[2mm]
+\opname{$\extend$ (extension)} && \modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} &= \modLoaded{q}{\Gamma \extend \Gamma'} \\
+\opblank && \modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} &= \modLoaded{q}{\Gamma} \\
+\opblank && \bot \extend \theta = \theta \extend \bot &= \theta \\
+\opblank && \theta \extend \theta' &= \theta' \quad (\text{otherwise})
+\end{alignat*}
+\caption{Context operations, defined on entries and lifted pointwise to contexts: $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$}
+\label{fig:context-ops}
+\end{figure}

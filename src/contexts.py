@@ -74,7 +74,7 @@ class Assigns:
     delta: VarContext = field(default_factory=dict)
 
 
-type ResultTy = Returns | Assigns
+type ResultType = Returns | Assigns
 
 RETURNS = Returns()
 
@@ -108,7 +108,7 @@ def merge_delta(d1: VarContext, d2: VarContext) -> VarContext:
     }
 
 
-def merge_results(rs: list[ResultTy]) -> ResultTy:
+def merge_results(rs: list[ResultType]) -> ResultType:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return RETURNS
@@ -126,7 +126,7 @@ def override_delta(d1: VarContext, d2: VarContext) -> VarContext:
     return {**d1, **d2}
 
 
-def override_results(r1: ResultTy, r2: ResultTy) -> ResultTy:
+def override_results(r1: ResultType, r2: ResultType) -> ResultType:
     if isinstance(r1, Returns):
         return r1
     if isinstance(r2, Returns):

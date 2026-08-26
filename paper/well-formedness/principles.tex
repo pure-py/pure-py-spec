@@ -1,0 +1,204 @@
+\subsection{Design principles}
+\label{sec:principles}
+
+Well-formedness enforces several constraints, summarised here with the programs each accepts and rejects;
+the rules follow in \secref{wf-blocks} and \secref{wf-modules}.
+
+\subsubsection{Assignment is definition}
+\label{sec:local-assignment}
+
+Python has no variable declarations: a variable is introduced by assigning to it, and a local variable is
+in scope throughout the function body, wherever the assignment occurs. \PurePy keeps the syntax but gives
+each reference a unique lexical referent through \emph{definite assignment}: a variable may be referenced
+only where an assignment covers every path to the reference. The \ruleName{var} rule requires the variable
+to be definitely assigned, $\Gamma(x) = \statusDefAssigned$; the \ruleName{assign} rule makes it so, with
+$x = e$ assigning $\set{\bind{x}{\statusDefAssigned}}$; and the \ruleName{if} rules combine the branches with
+$\merge$, so that a conditional definitely assigns a variable only if every branch that does not definitely
+return assigns it, otherwise leaving it at $\statusNotDefAssigned$ (\secref{wf-blocks}). Branch-local
+variables are therefore permitted, but using one after the conditional is not:
+
+\begin{python}
+def foo():
+    x = 6
+    if b:
+        x = 3
+        y = x + 1
+    else:
+        y = 0
+    return x  # error: partially defined
+\end{python}
+
+\noindent Python returns \pyinline{3} when \pyinline{b} is true, so no pure reading of the program agrees
+with Python. The program assigns \pyinline{x} on every run, so this is stricter than avoiding Python's
+\pyinline{NameError}: the reference would denote the branch-local variable on one path and the
+\pyinline{x = 6} it hides on the other.
+
+Python's function-level scoping is kept as well. The \ruleName{def} rule introduces every variable the
+body assigns, $\assignsS(b)$, at $\statusNotDefAssigned$ before checking the body, so a reference before the
+assignment is rejected statically, where Python fails at run time with \pyinline{UnboundLocalError}:
+
+\begin{python}
+y = 7
+def f():
+    x = y  # error: y is local, because of the assignment below
+    y = 8
+\end{python}
+
+\noindent Here $\assignsS(s)$ is the set of variables assigned anywhere in a statement $s$, not descending
+into nested function definitions, which have their own scope; it is the domain of the context $s$
+definitely assigns, $\assignsS(s) = \dom(\Delta)$ when $s : \Assigns{\Delta}$.
+
+\subsubsection{No reassignment of captured variables}
+\label{sec:captured-vars}
+
+In Python a closure holds a mutable binding, so a variable captured by a lambda or nested function
+definition may be reassigned afterwards, changing what the function sees (\secref{no-mutable-state}).
+\PurePy excludes this: a variable captured by a statement may not be assigned later in the same sequence, nor
+by that statement itself. The \ruleName{seq} rule imposes the first as a side condition on a sequence
+$t\;t'$, $\capturesS(t) \cap \assignsS(t') = \varnothing$; in the example of \secref{no-mutable-state}, \pyinline{x} is captured by the
+definition of \pyinline{g} and assigned by \pyinline{x = 6}, so the program is rejected. The
+\ruleName{assign} rule imposes the second, $x \notin \capturesE(e)$ for an assignment $x = e$, rejecting
+for instance \pyinline{x = lambda: x}, whose lambda under Python's late binding would return itself. A
+dataclass declaration counts as an assignment of its class name here, although re-declaring a class name is
+excluded outright (\secref{no-first-class}).
+
+Here $\capturesS(s)$ is the set of variables of the enclosing scope captured by the lambdas and nested
+function definitions within a statement $s$, with $\capturesE(e)$ computing the same for an expression $e$: the
+free variables of each such function's body, less its parameters and any variables the body assigns, which
+are local to it. For a mutual region of function definitions (\figref{syntax-stmt}) the names of the functions
+themselves are also excluded, since the \ruleName{def} rule binds them in every body, consistent with
+Python's late binding semantics (\secref{mutual-recursion}).
+
+\subsubsection{Mutual regions}
+\label{sec:mutual-recursion}
+
+Mutual recursion in Python relies on late binding: the free variables of a function are resolved when
+they are evaluated, so two functions may refer to each other whatever order they are defined in, provided
+both exist by the time the reference is evaluated. \PurePy makes the
+dependency static: a \emph{mutual region}, a maximal run of consecutive \pyinline{def} statements in a
+sequence (\figref{syntax-stmt}), is a single simultaneous binding. The \ruleName{def} rule checks each body in a
+context in which every name of the region is definitely assigned, so any function in the region may refer
+to any other, and requires the names to be distinct. Self-recursion is the special case of a singleton
+region. Any other statement between two definitions separates them into different regions:
+
+\begin{python}
+def even(n):
+    if n == 0:
+        return True
+    return odd(n - 1)  # error: odd is not yet bound
+
+x = even(0)  # intervening statement separates the regions
+
+def odd(n):
+    if n == 0:
+        return False
+    return even(n - 1)
+\end{python}
+
+\noindent This is rejected statically: \pyinline{even} forms a region of its own in which \pyinline{odd}
+is not yet bound, so the reference fails the \ruleName{var} rule. Python accepts the program, since the
+call \pyinline{even(0)} never reaches \pyinline{odd}. A region with two definitions of the same name is
+rejected by the distinct-names condition:
+
+\begin{python}
+def g():
+    return 0
+
+def f():
+    return g()
+def g():     # error: g defined twice in the same region
+    return 1
+\end{python}
+
+\noindent Python accepts this too, treating the second \pyinline{def g} as a reassignment of \pyinline{g},
+which late binding then makes the target of the call in \pyinline{f}. Finally, the branches of a conditional may contain mutual regions of their own, with any use of those
+functions after the conditional subject to the usual definite assignment rules (\secref{local-assignment}).
+
+\subsubsection{Pattern binding and reachability}
+\label{sec:pattern-binding}
+
+A \pyinline{case} pattern binds variables, and Python scopes them as it does assignments: they remain in
+scope after the \pyinline{match} statement. \PurePy follows: each case is treated as a branch, and its pattern as an
+assignment of the variables it binds. The set of variables a pattern $p$ introduces is $\binds(p)$; the
+\ruleName{match} rule checks each body in a context in which they are definitely assigned, and combines
+the cases with $\merge$ as the \ruleName{if} rules do, so a variable is definitely assigned after the match
+only if every case binds it or returns. A match whose last case is not a catch-all (i.e.~a variable or
+wildcard) may fall through; in this case the \ruleName{match-partial} rule merges in the empty assignment set, as for a
+conditional without an \pyinline{else}:
+
+\begin{python}
+v = (1, 2)
+match v:
+    case (x, y):
+        print(x, y)
+print(x)  # error: x not definitely assigned
+\end{python}
+
+\noindent Python prints \pyinline{1}, the binding having escaped the match. Within a pattern the
+variables must be distinct, as in Python. Every case must also be reachable: the \ruleName{cases-cons}
+rule rejects a case whose pattern is subsumed by an earlier one (\secref{wf-patterns}), which Python
+leaves silently unreachable:
+
+\begin{python}
+v = (1, 2)
+match v:
+    case (a, b):
+        print("seq", a, b)
+    case (1, 2):  # error: subsumed by the previous case
+        print("lit")
+\end{python}
+
+\subsubsection{No unreachable code}
+\label{sec:unreachable}
+
+Python accepts statements that can never run, such as code after a \pyinline{return}. \PurePy rejects
+them, the statement-level counterpart of case reachability (\secref{pattern-binding}). A statement
+sequence returns only if its last statement returns and every earlier one assigns: the \ruleName{seq}
+rule requires the first statement of a sequence to have result type $\Assigns{\Delta}$
+(\secref{wf-blocks}), so a statement following a \pyinline{return} has no derivation:
+
+\begin{python}
+def foo(x):
+    return x + 1
+    return x  # error: unreachable
+\end{python}
+
+\subsubsection{Static module loading}
+\label{sec:load-order}
+
+In Python a module's namespace is populated as loading proceeds, by the assignments in its body and, for
+a module with submodules, by the import system binding each submodule as it loads, so what a qualified name denotes can
+depend on which modules have loaded so far, anywhere in the program (\secref{no-load-dependent}). \PurePy gives each name a meaning fixed by the
+module's own text and imports. Imports come first in a module, so its dependencies are known before any
+statement runs. Loading is checked statically: the \ruleName{module} rule checks a body and computes its
+signature, and the \ruleName{import} and \ruleName{from-import} rules statically load each target and its
+ancestors first, so an import cycle has no derivation. A module may not bind a name that is also the name of one of its
+submodules, a side condition of \ruleName{module}, since Python resolves the clash by load order. A
+qualified reference must resolve through the referring module's own imports to a definitely assigned
+member (\ruleName{attr-module}). A submodule is not an attribute of its parent until it is loaded, so
+\pyinline{import pkg} followed by \pyinline{pkg.sub.y} is rejected unless the module also imports
+\pyinline{pkg.sub}, whereas Python permits the reference whenever some earlier import, anywhere in the
+program, happens to have loaded \pyinline{pkg.sub}:
+
+\begin{minipage}[t]{0.3\textwidth}
+\begin{python}
+# a
+import pkg.sub
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.6\textwidth}
+\begin{python}
+# __main__
+import pkg
+import a
+print(pkg.sub.y)  # error: pkg.sub is not imported here
+\end{python}
+\end{minipage}
+
+\noindent Python accepts this because importing \pyinline{a} loads \pyinline{pkg.sub}; remove that import,
+which the main module does not otherwise use, and Python raises \pyinline{AttributeError}. It raises the
+same for a reference to a module member the body never assigns, such as \pyinline{lib.x} where
+\pyinline{lib} assigns \pyinline{x} only on a branch that is not taken. \PurePy rejects all three programs
+statically (\secref{wf-modules}).
+

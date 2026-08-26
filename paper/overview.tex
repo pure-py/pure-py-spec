@@ -16,22 +16,21 @@ claim precise and sets out the excluded features, grouped by the discipline each
 
 \begin{figure}
 \centering
-\begin{tikzpicture}[font=\footnotesize, rounded corners=4pt]
-  \fill[cyan!60, fill opacity=0.13] (4.8,0.5) rectangle (12.95,7.3);
-  \fill[cyan!60, fill opacity=0.13] (1.5,1.5) rectangle (9.0,6.3);
-  \fill[green!14] (5.2,2.5) rectangle (8.8,5.2);
-  \draw[black!33, line width=0.7pt] (0,0) rectangle (13.4,7.8);
-  \draw[cyan!72!black, line width=0.7pt] (1.5,1.5) rectangle (9.0,6.3);
-  \draw[dashed, cyan!72!black, line width=0.7pt] (4.8,0.5) rectangle (12.95,7.3);
-  \draw[green!58!black, line width=0.7pt] (5.2,2.5) rectangle (8.8,5.2);
-  \node[anchor=north west] at (0.15,7.65) {\textbf{Syntactically valid Python}};
-  \node[anchor=north east, align=right] at (12.8,7.2) {\textbf{Semantically valid Python}\\no runtime error};
-  \node[anchor=north west] at (1.65,6.15) {\textbf{Well-formed \PurePy}};
-  \node[align=center] at (2.4,0.85) {Python runtime error (\figref{prevented-errors})};
-  \node[align=center] at (11.0,3.9) {Statically excluded\\(\figref{coercions})};
-  \node[align=center] at (3.2,3.9) {\PurePy runtime error};
-  \node[align=center] at (6.9,5.75) {Dynamically excluded\\(\figref{coercions})};
-  \node[align=center] at (7.0,3.85) {\textbf{Semantically valid}\\\textbf{\PurePy}\\[1mm]Same result as Python};
+\begin{tikzpicture}[font=\footnotesize, rounded corners=4pt, yscale=0.7]
+  \fill[cyan!60, fill opacity=0.13] (4.6,0.5) rectangle (12.0,5.8);
+  \fill[cyan!60, fill opacity=0.13] (1.5,1.0) rectangle (8.6,5.0);
+  \fill[green!14] (5.0,1.7) rectangle (8.2,3.8);
+  \draw[black!33, line width=0.7pt] (0,0) rectangle (12.4,6.5);
+  \draw[cyan!72!black, line width=0.7pt] (1.5,1.0) rectangle (8.6,5.0);
+  \draw[dashed, cyan!72!black, line width=0.7pt] (4.6,0.5) rectangle (12.0,5.8);
+  \draw[green!58!black, line width=0.7pt] (5.0,1.7) rectangle (8.2,3.8);
+  \node[anchor=north west, align=left] at (0.15,6.35) {\textbf{Syntactically valid Python}\\Python runtime error (\figref{prevented-errors})};
+  \node[anchor=north east, align=right] at (11.85,5.7) {\textbf{Semantically valid Python}\\no runtime error};
+  \node[anchor=north west] at (1.65,4.85) {\textbf{Well-formed \PurePy}};
+  \node[align=center] at (10.3,2.9) {Statically excluded\\(\figref{coercions})};
+  \node[align=center] at (3.25,3.0) {\PurePy runtime error};
+  \node[align=center] at (6.6,4.4) {Dynamically excluded\\(\figref{coercions})};
+  \node[align=center] at (6.6,2.75) {\textbf{Semantically valid}\\\textbf{\PurePy}\\[1mm]Same result as Python};
 \end{tikzpicture}
 \caption{Python programs and runs, classified by \PurePy}
 \label{fig:taxonomy}
@@ -120,7 +119,7 @@ effect-free.
 
 A name's meaning in \PurePy must not depend on the order in which modules load or on runtime state, so several
 of Python's import and module behaviours are excluded. Imports must appear at the start of a module, never
-inside a function or other block, nor after a non-import statement. Wildcard imports (\pyinline{from q import
+inside a function body or branch, nor after a statement. Wildcard imports (\pyinline{from q import
 *}) are excluded, since the names they introduce are not explicit; PEP 8 recommends against
 them.\footnote{\url{https://peps.python.org/pep-0008/}} A submodule may not import itself through its parent
 (\pyinline{from a import b} inside module \pyinline{a.b}): \PurePy treats the from-imported submodule as a
@@ -129,7 +128,7 @@ descendant of the importing module (\pyinline{import x.y} inside module \pyinlin
 the head would denote the still-loading module.
 
 A module may not bind a name that is also the name of one of its submodules. In Python an attribute of a
-package can be set both by an assignment in the package body and by loading the same-named submodule, and which
+module can be set both by an assignment in the module body and by loading a same-named submodule, and which
 wins depends on load order. Consider a program with four modules:
 
 \begin{minipage}[t]{0.2\textwidth}
@@ -181,14 +180,6 @@ Loading \pyinline{pkg.sub}, wherever in the program it happens, sets it as an at
 mentions \pyinline{pkg.sub}. The name has no load-order-independent meaning, so \PurePy excludes the clash
 outright.
 
-For the same reason, a module may not refer to a submodule it does not itself import. A submodule is not an
-attribute of its package until it is loaded, so \pyinline{import a} followed by \pyinline{a.b.f()} is rejected
-unless the module also imports \pyinline{a.b}; Python permits the reference whenever some earlier import,
-anywhere in the program, happens to have loaded \pyinline{a.b}. \PurePy likewise rejects a reference to a
-module member the module body never assigns, such as \pyinline{lib.x} where \pyinline{lib} assigns
-\pyinline{x} only on a branch that is not taken. In Python both cases raise \pyinline{AttributeError}; \PurePy
-rejects them statically.
-
 \subsubsection{Modules and classes are not first-class}
 \label{sec:no-first-class}
 
@@ -239,7 +230,6 @@ Destructuring assignment & \issue{54} \\
 f-strings & \issue{55} \\
 Default arguments & \issue{56} \\
 \pyinline{*args} and \pyinline{**kwargs} & \issue{57} \\
- &  \\
 Slicing & \issue{59} \\
 Star patterns & \issue{84} \\
 Or patterns & \issue{85} \\

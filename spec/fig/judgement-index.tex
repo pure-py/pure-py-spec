@@ -9,26 +9,22 @@ $\Gamma \vdash p \subsumed p'$ & every value matched by $p$ is matched by $p'$ &
 $\Gamma \vdash q : \theta$ & qualified name $q$ denotes entry $\theta$ & \figref{well-formed-expr} \\
 $\Gamma \vdash e$ & expression $e$ is well-formed & \figref{well-formed-expr} \\
 $\Gamma \vdash \seq{g} : \Delta$ & comprehension qualifiers $\seq{g}$ are well-formed and bind $\Delta$ & \figref{well-formed-expr} \\
-$\Gamma \vdash b : R$ & block $b$ is well-formed with result type $R$ & \figref{well-formed} \\
+$\Gamma \vdash t : R$ & statement $t$ is well-formed with result type $R$ & \figref{well-formed} \\
 $\Gamma, x \importsR \theta$ & name $x$ imported from module signature $\Gamma$ has entry $\theta$ & \figref{imports} \\
 $\vdash \seq{\iota} : \Gamma$ & imports $\seq{\iota}$ are well-formed and yield context $\Gamma$ & \figref{well-formed-imports} \\
 $q, \theta \loadsAs \theta'$ & importing module $q$ into entry $\theta$ gives entry $\theta'$ & \figref{well-formed-imports} \\
-$\Gamma \vdash \seq{s} : \Delta$ & module statements $\seq{s}$ are well-formed and define $\Delta$ & \figref{well-formed-module} \\
-$\vdash_{\mathsf{load}} q : \Gamma$ & module $q$ loads with signature $\Gamma$ & \figref{well-formed-module} \\
-$\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{well-formed-module} \\
-$\vdash v : \theta$ & value $v$ has context entry $\theta$ & \figref{well-formed-env} \\
-$\vdash \rho : \Gamma$ & environment $\rho$ conforms to context $\Gamma$ & \figref{well-formed-env}
+$\vdash_{\mathsf{load}} q : \Gamma$ & module $q$ statically loads with signature $\Gamma$ & \figref{well-formed-module} \\
+$\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{well-formed-module}
    \\[2mm]
 \metaGroup{Evaluation} \\
 $\rho, p, v \matches m$ & pattern $p$ matches value $v$ with result $m$ & \figref{match} \\
-$\rho, b \Rightarrow r$ & block $b$ evaluates to result $r$ & \figref{eval-block-outcome} \\
+$\rho, t \Rightarrow r$ & statement $t$ evaluates to result $r$ & \figref{eval-block-outcome} \\
 $\rho, e \Rightarrow o$ & expression $e$ evaluates to outcome $o$ & \figref{eval-outcome} \\
 $\rho, \seq{e} \Rightarrow o$ & expressions $\seq{e}$ evaluate, left to right, to outcome $o$ & \figref{eval-seq} \\
 $\rho, \seq{g} \Rightarrow o$ & comprehension qualifiers $\seq{g}$ evaluate to outcome $o$ & \figref{eval-quals-outcome} \\
 $\rho, x \importsR o$ & name $x$ imported from module environment $\rho$ has outcome $o$ & \figref{eval-imports} \\
 $\seq{\iota} \Rightarrow o$ & imports $\seq{\iota}$ evaluate to outcome $o$ & \figref{eval-import-prefix} \\
 $q, v \loadsAs v'$ & importing module $q$ into value $v$ gives value $v'$ & \figref{eval-import-prefix} \\
-$\rho, \seq{s} \Rightarrow o$ & module statements $\seq{s}$ evaluate to outcome $o$ & \figref{eval-modules} \\
 $q \Rightarrow_{\mathsf{load}} o$ & module $q$ loads to outcome $o$ & \figref{eval-modules} \\
 $\mathcal{M} \Rightarrow \kappa$ & program $\mathcal{M}$ evaluates to termination kind $\kappa$ & \figref{eval-modules}
 \end{tabular}

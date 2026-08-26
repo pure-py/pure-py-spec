@@ -159,8 +159,7 @@ def check_stmt(node: ast.stmt) -> None:
     if isinstance(node, ast.Nonlocal):
         raise Prohibited(node, "nonlocal prohibited")
     if isinstance(node, ast.ClassDef):
-        check_classdef(node)
-        return
+        raise Prohibited(node, "class declaration only at module top level")
     if isinstance(node, ast.Match):
         check_expr(node.subject)
         for case in node.cases:
@@ -383,6 +382,14 @@ def check_body(stmts: list[ast.stmt]) -> None:
         check_stmt(s)
 
 
+def check_top_level(stmts: list[ast.stmt]) -> None:
+    for s in stmts:
+        if isinstance(s, ast.ClassDef):
+            check_classdef(s)
+        else:
+            check_stmt(s)
+
+
 def check_keyword(node: ast.keyword) -> None:
     check_expr(node.value)
 
@@ -414,7 +421,7 @@ def check_arguments(node: ast.arguments) -> None:
 
 def check_module(node: ast.Module) -> ParseError | None:
     try:
-        check_body(node.body)
+        check_top_level(node.body)
         return None
     except ParseError as e:
         return e

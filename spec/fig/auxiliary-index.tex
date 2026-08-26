@@ -1,37 +1,41 @@
-% Index of auxiliary functions (specification only).
+% Auxiliary functions with their meanings; the specification adds the section defining each.
 \begin{center}
 \small
+\ifdefined\specmode
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.08\textwidth}}
-\textbf{Function} & \textbf{Result} & \textbf{Meaning} & \textbf{Section} \\[1mm]
-\grammarGroup{\itshape Syntactic analyses} \\
-$\assignsS(s)$ & set of variables & variables assigned in $s$, not descending into nested functions & \S\ref{aux:assigns} \\
-$\binds(p)$ & set of variables & variables bound by pattern $p$ & \S\ref{aux:binds} \\
-$\capturesS(s)$, $\capturesE(e)$ & set of variables & variables of enclosing scope captured by closures in $s$ or $e$ & \S\ref{aux:captures} \\
-$\fvS(b)$ & set of variables & free variables of block $b$ & \S\ref{aux:fv} \\
-$\fvE(e)$ & set of variables & free variables of expression $e$ & \S\ref{aux:fv-e}
-   \\[2mm]
-\grammarGroup{\itshape Classes and modules} \\
-$\submods(q)$ & context & stub for each submodule of $q$ & \S\ref{aux:submods} \\
-$\ownFields(\phi)$ & sequence of variables & field names declared by field list $\phi$ & \S\ref{aux:own-fields} \\
-$\fields(C)$ & sequence of variables & fields of class $C$, inherited first & \S\ref{aux:fields} \\
-$\ancestors(C)$ & set of class entries & $C$ and its base classes & \S\ref{aux:ancestors} \\
-$\fieldMap(C, \seq{u})$ & map from variables & argument supplied for each field of $C$; undefined unless arguments cover fields exactly & \S\ref{aux:field-map} \\
-$\resolveClass(\rho, q)$ & class entry & class denoted by qualified name $q$ in $\rho$ & \S\ref{aux:resolve-class} \\
-$\env(\rho, q)$ & environment & environment of module $q$ as loaded in $\rho$ & \S\ref{aux:env} \\
-$\nameOf(q)$ & string & string literal naming module $q$ & \S\ref{aux:name}
-   \\[2mm]
-\grammarGroup{\itshape Values} \\
-$\hat{\odot}(v, v')$ & outcome & meaning of binary operator & \S\ref{aux:binop} \\
-$\hat{\ominus}(v)$ & outcome & meaning of unary operator & \S\ref{aux:unop} \\
-$\eqOp(v, v')$ & Boolean & structural equality; undefined between unrelated values & \S\ref{aux:eq} \\
-$\eqElems(\seq{v}, \seq{v}\,')$ & Boolean & elementwise equality of value sequences & \S\ref{aux:eq-elems} \\
-$\memOp(v, v')$ & Boolean & whether $v'$ is an element of $v$ & \S\ref{aux:contains} \\
-$\memElems(\seq{v}, v)$ & Boolean & whether $\seq{v}$ has an element equal to $v$ & \S\ref{aux:contains-elems} \\
-$\elems(v)$ & sequence of values & elements of list, tuple or string & \S\ref{aux:elems} \\
-$\iterOp(v)$ & sequence of values & sequence a generator draws from $v$; keys if $v$ is a dictionary & \S\ref{aux:iter} \\
-$\getitem(v, v')$ & outcome & subscripting & \S\ref{aux:getitem} \\
-$\outcome(r)$ & outcome & block result read as outcome of calling it & \S\ref{aux:outcome} \\
-$\dispatch(\rho, v, \seq{p}, \seq{b})$ & bindings and block & case taken by a \pyinline{match} & \S\ref{aux:dispatch} \\
-$\entries(\delta, \delta')$, $\update(\delta, w, v)$ & dictionary entries & dictionary built from entries, later overriding earlier & \S\ref{aux:entries}
+\else
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.2\textwidth}>{\raggedright\arraybackslash}p{0.54\textwidth}}
+\fi
+\textbf{Function} & \textbf{Result} & \textbf{Meaning}\speconly{ & \textbf{Section}} \\[1mm]
+\auxgroup{Syntactic analyses}
+\auxrow{$\assignsS(t)$}{set of variables}{variables assigned in $t$, not descending into nested functions}{aux:assigns}
+\auxrow{$\binds(p)$}{set of variables}{variables bound by pattern $p$}{aux:binds}
+\auxrow{$\capturesS(t)$}{set of variables}{variables of enclosing scope captured by lambdas and nested functions in $t$}{aux:captures}
+\auxrow{$\capturesE(e)$}{set of variables}{variables of enclosing scope captured by lambdas in $e$}{aux:captures-e}
+\specauxrow{$\fvS(s)$}{set of variables}{free variables of statement $s$}{aux:fv}
+\specauxrow{$\fvE(e)$}{set of variables}{free variables of expression $e$}{aux:fv-e}
+\noalign{\vskip 2mm}
+\auxgroup{Classes and modules}
+\auxrow{$\submods(q)$}{context}{stub for each submodule of $q$}{aux:submods}
+\auxrow{$\ownFields(\phi)$}{sequence of variables}{field names declared by field list $\phi$}{aux:own-fields}
+\auxrow{$\fields(C)$}{sequence of variables}{fields of class $C$, inherited first}{aux:fields}
+\auxrow{$\ancestors(C)$}{set of class entries}{$C$ and its base classes}{aux:ancestors}
+\auxrow{$\fieldMap(C, \seq{u})$}{map from variables}{argument supplied for each field of $C$; undefined unless arguments cover fields exactly}{aux:field-map}
+\auxrow{$\resolveClass(\rho, q)$}{class entry}{class denoted by qualified name $q$ in $\rho$}{aux:resolve-class}
+\specauxrow{$\env(\rho, q)$}{environment}{environment of module $q$ as loaded in $\rho$}{aux:env}
+\auxrow{$\nameOf(q)$}{string}{string literal naming module $q$}{aux:name}
+\noalign{\vskip 2mm}
+\auxgroup{Values}
+\auxrow{$\eqOp(v, v')$}{Boolean}{structural equality; undefined between unrelated values}{aux:eq}
+\specauxrow{$\eqElems(\seq{v}, \seq{v}\,')$}{Boolean}{elementwise equality of value sequences}{aux:eq-elems}
+\auxrow{$\memOp(v, v')$}{Boolean}{whether $v'$ is an element of $v$}{aux:contains}
+\specauxrow{$\memElems(\seq{v}, v)$}{Boolean}{whether $\seq{v}$ has an element equal to $v$}{aux:contains-elems}
+\specauxrow{$\elems(v)$}{sequence of values}{elements of list, tuple or string}{aux:elems}
+\auxrow{$\iterOp(v)$}{sequence of values}{sequence a generator draws from $v$; keys if $v$ is a dictionary}{aux:iter}
+\auxrow{$\getitem(v, v')$}{value or abort}{subscripting; aborts with $\errIndex$ for an index out of range, $\errKey$ for a missing key and $\errType$ otherwise}{aux:getitem}
+\auxrow{$\outcome(r)$}{value or abort}{statement result read as an outcome: the returned value, \pyinline{None} if the block falls off the end, an abort unchanged}{aux:outcome}
+\auxrow{$\dispatch(\rho, v, \seq{p}, \seq{s})$}{bindings and statement}{case taken by a \pyinline{match}}{aux:dispatch}
+\specauxrow{$\entries(\delta, \delta')$}{dictionary entries}{$\delta$ extended by entries of $\delta'$ in order, later overriding earlier}{aux:entries}
+\specauxrow{$\update(\delta, w, v)$}{dictionary entries}{$\delta$ with $w$ bound to $v$, replacing any earlier binding}{aux:update}
 \end{tabular}
 \end{center}

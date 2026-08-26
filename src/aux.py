@@ -1,7 +1,9 @@
 import ast
 from itertools import dropwhile, takewhile
 
-BlockElement = ast.stmt | list[ast.FunctionDef]
+# A PurePy statement: a Python statement, or a mutual region of consecutive defs. A Python body
+# (a statement list) represents the spec's right-nested sequence s s'.
+type Statement = ast.stmt | list[ast.FunctionDef]
 
 
 def is_import(s: ast.stmt) -> bool:
@@ -16,25 +18,25 @@ def find_import(stmts: list[ast.stmt]) -> ast.stmt | None:
     return next((s for s in stmts if isinstance(s, (ast.Import, ast.ImportFrom))), None)
 
 
-def elements_of_block(block: list[ast.stmt]) -> list[BlockElement]:
-    if len(block) == 0:
+def statements(body: list[ast.stmt]) -> list[Statement]:
+    if len(body) == 0:
         return []
-    head = block[0]
-    rest = block[1:]
+    head = body[0]
+    rest = body[1:]
     if isinstance(head, ast.FunctionDef):
         return extend_region([head], rest)
-    return [head] + elements_of_block(rest)
+    return [head] + statements(rest)
 
 
 def extend_region(
     region: list[ast.FunctionDef], rest: list[ast.stmt]
-) -> list[BlockElement]:
+) -> list[Statement]:
     if len(rest) == 0:
         return [region]
     head = rest[0]
     if isinstance(head, ast.FunctionDef):
         return extend_region(region + [head], rest[1:])
-    return [region] + elements_of_block(rest)
+    return [region] + statements(rest)
 
 
 def binds_seq(pattern: ast.pattern) -> list[str]:
@@ -189,23 +191,23 @@ def fv_stmt(s: ast.stmt) -> set[str]:
             result = result | fv_e(s.msg)
         return result
     if isinstance(s, ast.If):
-        return fv_e(s.test) | fv(s.body) | fv(s.orelse)
+        return fv_e(s.test) | fv_body(s.body) | fv_body(s.orelse)
     if isinstance(s, ast.Match):
         return fv_e(s.subject) | set().union(
-            *(fv(case.body) - binds(case.pattern) for case in s.cases)
+            *(fv_body(case.body) - binds(case.pattern) for case in s.cases)
         )
     if isinstance(s, ast.FunctionDef):
         params = {a.arg for a in s.args.args}
-        return fv(s.body) - params - {s.name}
+        return fv_body(s.body) - params - {s.name}
     if isinstance(s, ast.ClassDef):
         return set()
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
-def fv(block: list[ast.stmt]) -> set[str]:
-    if len(block) == 0:
+def fv_body(body: list[ast.stmt]) -> set[str]:
+    if len(body) == 0:
         return set()
-    return fv_stmt(block[0]) | fv(block[1:])
+    return fv_stmt(body[0]) | fv_body(body[1:])
 
 
 def assigns_stmt(s: ast.stmt) -> set[str]:
@@ -214,10 +216,10 @@ def assigns_stmt(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.Assign):
         return {t.id for t in s.targets if isinstance(t, ast.Name)}
     if isinstance(s, ast.If):
-        return assigns_block(s.body) | assigns_block(s.orelse)
+        return assigns_body(s.body) | assigns_body(s.orelse)
     if isinstance(s, ast.Match):
         return set().union(
-            *(binds(case.pattern) | assigns_block(case.body) for case in s.cases)
+            *(binds(case.pattern) | assigns_body(case.body) for case in s.cases)
         )
     if isinstance(s, ast.FunctionDef):
         return {s.name}
@@ -226,10 +228,10 @@ def assigns_stmt(s: ast.stmt) -> set[str]:
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
-def assigns_block(block: list[ast.stmt]) -> set[str]:
-    if len(block) == 0:
+def assigns_body(body: list[ast.stmt]) -> set[str]:
+    if len(body) == 0:
         return set()
-    return assigns_stmt(block[0]) | assigns_block(block[1:])
+    return assigns_stmt(body[0]) | assigns_body(body[1:])
 
 
 def captures(s: ast.stmt) -> set[str]:
@@ -247,10 +249,10 @@ def captures(s: ast.stmt) -> set[str]:
             result = result | captures_e(s.msg)
         return result
     if isinstance(s, ast.If):
-        return captures_e(s.test) | captures_block(s.body) | captures_block(s.orelse)
+        return captures_e(s.test) | captures_body(s.body) | captures_body(s.orelse)
     if isinstance(s, ast.Match):
         return captures_e(s.subject) | set().union(
-            *(captures_block(case.body) - binds(case.pattern) for case in s.cases)
+            *(captures_body(case.body) - binds(case.pattern) for case in s.cases)
         )
     if isinstance(s, ast.FunctionDef):
         return captures_region([s])
@@ -259,10 +261,10 @@ def captures(s: ast.stmt) -> set[str]:
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
-def captures_block(block: list[ast.stmt]) -> set[str]:
-    if len(block) == 0:
+def captures_body(body: list[ast.stmt]) -> set[str]:
+    if len(body) == 0:
         return set()
-    return captures(block[0]) | captures_block(block[1:])
+    return captures(body[0]) | captures_body(body[1:])
 
 
 def captures_region(defs: list[ast.FunctionDef]) -> set[str]:
@@ -275,34 +277,32 @@ def captures_region_bodies(defs: list[ast.FunctionDef]) -> set[str]:
         return set()
     d = defs[0]
     params = {a.arg for a in d.args.args}
-    own = fv(d.body) - params - assigns_block(d.body)
+    own = fv_body(d.body) - params - assigns_body(d.body)
     return own | captures_region_bodies(defs[1:])
 
 
-def captures_element(item: BlockElement) -> set[str]:
+def captures_statement(item: Statement) -> set[str]:
     if isinstance(item, list):
         return captures_region(item)
     return captures(item)
 
 
-def assigns_element(item: BlockElement) -> set[str]:
+def assigns_statement(item: Statement) -> set[str]:
     if isinstance(item, list):
         return {d.name for d in item}
     return assigns_stmt(item)
 
 
-def assigns_elements(items: list[BlockElement]) -> set[str]:
+def assigns_seq(items: list[Statement]) -> set[str]:
     if len(items) == 0:
         return set()
-    return assigns_element(items[0]) | assigns_elements(items[1:])
+    return assigns_statement(items[0]) | assigns_seq(items[1:])
 
 
-def find_first_reassigning(
-    items: list[BlockElement], names: set[str]
-) -> ast.AST | None:
+def find_first_reassigning(items: list[Statement], names: set[str]) -> ast.AST | None:
     if len(items) == 0:
         return None
-    if assigns_element(items[0]) & names:
+    if assigns_statement(items[0]) & names:
         return items[0][0] if isinstance(items[0], list) else items[0]
     return find_first_reassigning(items[1:], names)
 

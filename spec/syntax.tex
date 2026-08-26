@@ -1,10 +1,12 @@
 \section{Syntax}
 \label{sec:syntax}
 
-The syntax of \PurePy is given in \figrefThree{syntax-stmt}{syntax-expr}{syntax-types}. A \emph{block} is a non-empty sequence of
-statements; either a top-level statement, a \pyinline{def} body, or a branch of a conditional. A
-\emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal contiguous non-empty sequence of \pyinline{def}
-statements in a block: any non-\pyinline{def} statement in that block, by definition, separates mutual
+The syntax of \PurePy is given in \figrefThree{syntax-stmt}{syntax-expr}{syntax-types}. Statements are sequenced by
+juxtaposition, $s\;s'$; a function body, a branch of a conditional and the body of a case are statements.
+A \emph{top-level statement} $t$ is a statement or a class declaration, sequenced likewise; the body of a
+module after its imports is a top-level statement, so class declarations occur only at the top level of a
+module. A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal
+run of consecutive \pyinline{def} statements in a sequence: any other statement separates mutual
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single region. The well-formedness rules treat each region as
 one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
@@ -22,7 +24,7 @@ becomes abstract syntax follows Python, including the indentation that delimits 
 \subsection{Contexts}
 \label{sec:contexts}
 
-Metavariables $x$, $f$, $c$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function and $c$ when it is expected to denote a class.
+Metavariables $x$, $f$, $c$ range over \emph{variables}, simple identifiers whatever they denote; idiomatically $f$ is used when the variable is expected to denote a function and $c$ when it is expected to denote a class. A \emph{qualified name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}); a variable is thus a qualified name with a single component.
 
 \begin{definition}[Context]
 \label{def:context}
@@ -41,82 +43,17 @@ It is useful to represent contexts as total functions on the set of all variable
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
 an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
-\emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$ (Lemma~\ref{lem:right-distributivity}), but left
-distributivity does not hold. Both operations are defined pointwise.
-%
-\begin{definition}[Context override]
-{\small
-\begin{align*}
-\bot \override \theta &= \theta \override \bot = \theta \\
-\theta \override \theta' &= \theta' \quad (\text{otherwise})
-\end{align*}}
-\end{definition}
+\emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
+distributivity does not hold. Both are defined pointwise (\figref{context-ops}): override is right-biased
+and has $\bot$ as both left and right unit; merge is defined only on definite-assignment statuses, returning
+$\statusNotDefAssigned$ when exactly one argument is defined and the conjunction otherwise, so $\bot$ is not
+a unit.
+\input{spec/fig/context-ops}
 
-\noindent Override is thus right-biased and has $\bot$ as both left and right unit.
-
-\begin{definition}[Context merge]
-For definite-assignment statuses $a, a' \in \B$:
-{\small
-\begin{align*}
-\bot \merge \bot &= \bot \\
-a \merge \bot = \bot \merge a &= \statusNotDefAssigned \\
-a \merge a' &= a \meet a'
-\end{align*}}
-\end{definition}
-
-\noindent Merge is otherwise undefined. Restricted to $\B$, it returns $\statusNotDefAssigned$ when exactly one argument is defined and the conjunction otherwise; so $\bot$ is not a unit.
-
-\begin{definition}[Context extend]
-\label{def:extend}
-{\small
-\begin{align*}
-\modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} &= \modLoaded{q}{\Gamma \extend \Gamma'} \\
-\modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} &= \modLoaded{q}{\Gamma} \\
-\bot \extend \theta = \theta \extend \bot &= \theta \\
-\theta \extend \theta' &= \theta' \quad (\text{otherwise})
-\end{align*}}
-\end{definition}
-
-\noindent Extend combines module references for the same module recursively, preferring loaded references to stubs, and is otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted at the same package must combine rather than shadow.
-
-\begin{lemma}[Right distributivity]
-\label{lem:right-distributivity}
-\[
-(\Delta \merge \Delta') \override \Gamma = (\Delta \override \Gamma) \merge (\Delta' \override \Gamma).
-\]
-\end{lemma}
-
-\noindent Left distributivity ($\Gamma \override (\Delta \merge \Delta') = (\Gamma \override \Delta) \merge
-(\Gamma \override \Delta')$) does not hold. If it did, the following two programs would be equivalent, since
-sequential composition with a preceding assignment could be distributed into the branches of a conditional.
-But they are not: the left program is ill-formed, because a variable assigned before a conditional does not
-remain definitely assigned if only some branches assign it\paperonly{ (see also \secref{local-assignment})}.
-\vspace{-\medskipamount}
-
-\begin{minipage}[t]{0.48\textwidth}
-\begin{python}
-def f(b):
-    x = 1
-    if b:
-        x = 2
-    else:
-        pass
-    return x  # error
-\end{python}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.48\textwidth}
-\begin{python}
-def f(b):
-    if b:
-        x = 1
-        x = 2
-    else:
-        x = 1
-        pass
-    return x  # ok
-\end{python}
-\end{minipage}
+A third operation, \emph{context extension} $\Gamma \extend \Delta$, also \figref{context-ops},
+combines module references for the same module recursively, preferring loaded references to stubs, and is
+otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted
+at the same module must combine rather than shadow.
 
 \input{spec/fig/syntax-stmt}
 \input{spec/fig/syntax-expr}
@@ -133,10 +70,10 @@ which follow Python.
 
 \input{spec/fig/precedence}
 
-\paragraph{Annotations.}
+\paragraph{Type annotations.}
 
-Parameters and assignments carry optional annotations $\pi$ and function definitions optional return
-annotations $\omega$, while dataclass fields carry types $\tau$; types and annotations are given in
+Parameters and assignments carry optional type annotations $\pi$ and function definitions optional return
+type annotations $\omega$, while dataclass fields carry types $\tau$; types and annotations are given in
 \figref{syntax-types}. We write $\seq{x}\,\seq{\pi}$ for the parameter list $x_1\pi_1, \ldots,
 x_n\pi_n$. The well-formedness rules and operational semantics do not consult annotations, which are given
 meaning by the type system.
@@ -145,40 +82,39 @@ meaning by the type system.
 \label{sec:modules-programs}
 
 A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
-(\figref{syntax-stmt}) to \emph{module bodies} $t$, of which one is a distinguished \emph{main module} named
+(\figref{syntax-stmt}) to \emph{module bodies} $\mu$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
 $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
-$\seq{\iota}$ followed by a sequence of statements $\seq{s}$; since imports are not statements, they can
-appear neither in blocks (and hence not in function bodies) nor after the first non-import statement. The
-well-formedness and evaluation rules check and evaluate the statements of each body $\mathcal{M}(q)$ with the
-assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
-$\pymath{\_\_name\_\_}$ binding the runtime supplies automatically.
+$\seq{\iota}$, its \emph{import prefix}, followed by a top-level statement $t$; since imports are not statements, they can appear neither
+within a statement nor after it. The statement begins with the
+assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$, which binds the module's name when it
+loads (\secref{wf-modules}).
 
 A second map $\mathcal{P}$ gives the
 predefined modules of \figref{predefined}, which have no body: $\mathcal{P}$ takes each such name to its
 environment and context (Definition~\ref{def:predefined}). The two domains are disjoint, and their union is
 prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$ is itself in
-$\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is its \texttt{.py}
-file, each package's body is its \texttt{\_\_init\_\_.py}, and a package directory without an
-\texttt{\_\_init\_\_.py} encodes the empty body (a namespace package, PEP 420, \url{https://peps.python.org/pep-0420/}). Prefix-closure thus holds by
-construction.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
+$\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: its modules are the \texttt{.py} files and the
+directories, each named by its path, so the domain is prefix-closed by construction. A module's statement is
+the statements of its \texttt{.py} file, or of its \texttt{\_\_init\_\_.py} for a directory, preceded by the
+$\pymath{\_\_name\_\_}$ assignment; a directory without an \texttt{\_\_init\_\_.py} (a namespace package,
+PEP 420, \url{https://peps.python.org/pep-0420/}) contributes that assignment alone.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
 definitions that follow, as is the name $q$ of the enclosing module in the rules that check or evaluate a single module's body.
 
 
 \begin{definition}[Predefined contexts and environments]
 \label{def:predefined}
-$\mathcal{P}$ takes each module $q$ of \figref{predefined} to a pair $(\rho, \Gamma)$ with $\vdash \rho :
-\Gamma$ (\figref{well-formed-env}), where $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each
-member listed for $q$ in \figref{predefined} to its value.
+$\mathcal{P}$ takes each module $q$ of \figref{predefined} to a pair $(\rho, \Gamma)$, where $\rho$ binds
+$\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member listed for $q$ in \figref{predefined} to its value,
+and $\Gamma$ binds the same variables at $\statusDefAssigned$.
 \end{definition}
 
 \begin{figure}
 \small
 \centering
 \begin{tabular}{llll}
-\hline
-\textbf{Module} & \textbf{Member} & \multicolumn{2}{l}{\textbf{Value}} \\
-\hline
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Module & Member & \multicolumn{2}{l}{Value} \\
 \textup{\pyinline{builtins}} & \pyinline{print} & & \\
  & \pyinline{len} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
  & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
@@ -202,15 +138,14 @@ member listed for $q$ in \figref{predefined} to its value.
  & & $\quad \primFn(n) = \aborts{\errExit{n}}$ & \\
 \pyinline{typing} & \pyinline{Any} & & \\
  & \pyinline{Callable} & & \\
-\pyinline{dataclasses} & \pyinline{dataclass} & & \\
-\hline
+\pyinline{dataclasses} & \pyinline{dataclass} & &
 \end{tabular}
 
 \caption{Predefined modules and their members}
 \label{fig:predefined}
 \end{figure}
 
-Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' = q.q''$ for some $q''$, and $\properPrefixOf$ for
+Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' = q.q^\dagger$ for some $q^\dagger$, and $\properPrefixOf$ for
 the strict order; the proper prefixes of a module name are its \emph{ancestors}.\speconly{ The metafunctions
 on modules and classes are defined in \secref{mf-classes}.}
-\paperinput{paper/syntax-classes}
+\paperinput{paper/syntax/classes}

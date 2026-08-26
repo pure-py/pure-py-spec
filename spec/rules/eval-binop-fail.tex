@@ -1,0 +1,7 @@
+\inferrule*[lab={\ruleName{eval-binop-fail}}]
+{
+  \rho, e \Rightarrow \aborts{\kappa}
+}
+{
+  \rho, \exBinOp{e}{\odot}{e'} \Rightarrow \aborts{\kappa}
+}

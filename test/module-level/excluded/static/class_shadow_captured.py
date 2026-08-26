@@ -1,4 +1,4 @@
-# rule: statement
+# rule: seq
 from dataclasses import dataclass
 from typing import Any
 

@@ -4,23 +4,16 @@ import sys
 import reasons
 import syntax
 from aux import (
-    BlockElement,
-    assigns_block,
-    assigns_elements,
+    assigns_body,
     assigns_stmt,
-    captures_element,
-    elements_of_block,
-    find_first_reassigning,
     find_import,
     find_nested_import,
-    own_fields,
     split_imports,
+    statements,
 )
-from blocks import block_element_result_type, check_element, next_ctx_after
 from contexts import (
     PREDEFINED_MEMBERS,
     PREDEFINED_MODULES,
-    ClassEntry,
     Context,
     ContextEntry,
     ModuleContext,
@@ -29,11 +22,10 @@ from contexts import (
     Returns,
     Status,
     extend_context,
-    fields,
-    override_gamma,
     predefined_context,
 )
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
+from statements import check_seq, result_type_statement
 
 
 def name_assign(q: str) -> ast.stmt:
@@ -125,71 +117,11 @@ def imported_entry(
 def own_members(body: list[ast.stmt], q: str) -> set[str]:
     if q in PREDEFINED_MEMBERS:
         return PREDEFINED_MEMBERS[q]
-    return assigns_block(body) | {s.name for s in body if isinstance(s, ast.ClassDef)}
+    return assigns_body(body)
 
 
 _signatures: dict[tuple[int, str], Context] = {}
 _loading: list[tuple[int, str]] = []
-
-
-def check_statements(items: list[BlockElement], ctx: ModuleContext) -> ModuleContext:
-    if len(items) == 0:
-        return ctx
-    head, tail = items[0], items[1:]
-    if isinstance(head, ast.ClassDef):
-        check_class_decl(head, ctx.gamma, ctx.q)
-    else:
-        check_element(head, ctx)
-    if isinstance(block_element_result_type(head), Returns):
-        node: ast.AST = head[0] if isinstance(head, list) else head
-        raise IllFormedModule(node, reasons.TopLevelReturn())
-    reassigned = captures_element(head) & assigns_elements(tail)
-    if reassigned:
-        name = min(reassigned)
-        ra_node = find_first_reassigning(tail, reassigned)
-        assert ra_node is not None
-        raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
-    return check_statements(tail, next_statement_ctx(head, ctx))
-
-
-def next_statement_ctx(head: BlockElement, ctx: ModuleContext) -> ModuleContext:
-    next_ctx = next_ctx_after(head, ctx)
-    if isinstance(head, ast.ClassDef):
-        return override_gamma(
-            next_ctx, {head.name: class_entry_for(head, ctx.q, ctx.gamma)}
-        )
-    return next_ctx
-
-
-def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
-    base = (
-        node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
-    )
-    return ClassEntry(
-        context=context,
-        name=f"{q}.{node.name}",
-        own_fields=tuple(own_fields(node)),
-        base=base,
-    )
-
-
-def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
-    if isinstance(gamma.get(node.name), ClassEntry):
-        raise IllFormedModule(node, reasons.DuplicateClassName(node.name, q))
-    names = own_fields(node)
-    dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
-    if dup is not None:
-        raise IllFormedModule(node, reasons.DuplicateFieldName(dup, node.name))
-    if len(node.bases) == 0:
-        return
-    base = node.bases[0]
-    assert isinstance(base, ast.Name)
-    entry = gamma.get(base.id)
-    if not isinstance(entry, ClassEntry) or entry.name.rsplit(".", 1)[0] != q:
-        raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
-    clash = set(names) & set(fields(entry))
-    if len(clash) > 0:
-        raise IllFormedModule(node, reasons.InheritedFieldClash(min(clash), base.id))
 
 
 def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
@@ -224,9 +156,14 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     gamma0 = check_imports_prefix(prefix, ModuleContext(gamma={}, M=M, q=q))
     body = [name_assign(q)] + rest
     gamma1 = {**predefined_context("builtins"), **gamma0}
-    final_ctx = check_statements(
-        elements_of_block(body), ModuleContext(gamma=gamma1, M=M, q=q)
+    items = statements(body)
+    returning = next(
+        (i for i in items if isinstance(result_type_statement(i), Returns)), None
     )
+    if returning is not None:  # the module rule requires result type Assigns
+        node: ast.AST = returning[0] if isinstance(returning, list) else returning
+        raise IllFormedModule(node, reasons.TopLevelReturn())
+    final_ctx = check_seq(items, ModuleContext(gamma=gamma1, M=M, q=q))
     check_submodule_clash(m, gamma0, body, M, q)
     return signature(body, final_ctx, q)
 

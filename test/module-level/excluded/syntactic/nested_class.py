@@ -1,4 +1,3 @@
-# rule: class -- classes are declared by the module-statement judgement, not within a block
 from dataclasses import dataclass
 from typing import Any
 

@@ -193,12 +193,6 @@ class UnassignedMember:
 
 
 @dataclass(frozen=True)
-class NonTopLevelClass:
-    def message(self) -> str:
-        return "class definition only allowed at module top level"
-
-
-@dataclass(frozen=True)
 class TopLevelReturn:
     def message(self) -> str:
         return "top-level return not allowed (module body must not return)"
@@ -276,7 +270,6 @@ Reason = (
     | UnreachableCase
     | DuplicateMutualName
     | NonTopLevelImport
-    | NonTopLevelClass
     | TopLevelReturn
     | EmptyFromImport
     | ImportAfterStatement
