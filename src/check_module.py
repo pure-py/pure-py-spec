@@ -3,20 +3,6 @@ import sys
 
 import reasons
 import syntax
-from reasons import IllFormed, IllFormedModule, IllFormedProgram
-from contexts import (
-    Context,
-    ContextEntry,
-    ModuleContext,
-    ModuleLoaded,
-    ModuleStub,
-    PREDEFINED_MEMBERS,
-    PREDEFINED_MODULES,
-    Status,
-    Returns,
-    extend_context,
-    predefined_context,
-)
 from aux import (
     assigns_body,
     assigns_stmt,
@@ -25,6 +11,20 @@ from aux import (
     split_imports,
     statements,
 )
+from contexts import (
+    PREDEFINED_MEMBERS,
+    PREDEFINED_MODULES,
+    Context,
+    ContextEntry,
+    ModuleContext,
+    ModuleLoaded,
+    ModuleStub,
+    Returns,
+    Status,
+    extend_context,
+    predefined_context,
+)
+from reasons import IllFormed, IllFormedModule, IllFormedProgram
 from statements import check_seq, result_type_statement
 
 

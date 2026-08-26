@@ -1,35 +1,6 @@
 import ast
 
 import reasons
-from reasons import IllFormedModule
-from contexts import (
-    ClassEntry,
-    Context,
-    ContextEntry,
-    ModuleContext,
-    ModuleLoaded,
-    ModuleStub,
-    class_entry,
-    entry_of,
-    field_map,
-    short_name,
-    ResultType,
-    Status,
-    ASSIGNS_EMPTY,
-    RETURNS,
-    Assigns,
-    Returns,
-    VarContext,
-    class_of,
-    extend_context,
-    fields,
-    merge_results,
-    module_of,
-    override_gamma,
-    override_results,
-    override_var,
-    var_status,
-)
 from aux import (
     Statement,
     assigns_body,
@@ -37,13 +8,39 @@ from aux import (
     binds,
     captures_e,
     captures_statement,
-    statements,
     find_first_reassigning,
     names_in_target,
     own_fields,
     qualified_name,
+    statements,
 )
-from patterns import check_pattern_list, dict_key, is_catch_all
+from contexts import (
+    ASSIGNS_EMPTY,
+    RETURNS,
+    Assigns,
+    ClassEntry,
+    Context,
+    ModuleContext,
+    ModuleLoaded,
+    ModuleStub,
+    ResultType,
+    Returns,
+    Status,
+    class_entry,
+    class_of,
+    entry_of,
+    field_map,
+    fields,
+    merge_results,
+    module_of,
+    override_gamma,
+    override_results,
+    override_var,
+    short_name,
+    var_status,
+)
+from patterns import check_pattern_list, is_catch_all
+from reasons import IllFormedModule
 
 
 def result_type(node: ast.stmt) -> ResultType:
@@ -370,6 +367,4 @@ def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
         raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
     clash = set(names) & set(fields(entry))
     if len(clash) > 0:
-        raise IllFormedModule(
-            node, reasons.InheritedFieldClash(sorted(clash)[0], base.id)
-        )
+        raise IllFormedModule(node, reasons.InheritedFieldClash(min(clash), base.id))
