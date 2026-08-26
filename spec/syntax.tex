@@ -24,7 +24,7 @@ becomes abstract syntax follows Python, including the indentation that delimits 
 \subsection{Contexts}
 \label{sec:contexts}
 
-Metavariables $x$, $f$, $c$ range over \emph{variables}, simple identifiers whatever they denote; idiomatically $f$ is used when the variable is expected to denote a function and $c$ when it is expected to denote a class. A \emph{qualified name} $q$ is a variable followed by zero or more member selections (\figref{syntax-stmt}), so a variable is a qualified name of one segment.
+Metavariables $x$, $f$, $c$ range over \emph{variables}, simple identifiers whatever they denote; idiomatically $f$ is used when the variable is expected to denote a function and $c$ when it is expected to denote a class. A \emph{qualified name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}); a variable is thus a qualified name with a single component.
 
 \begin{definition}[Context]
 \label{def:context}
