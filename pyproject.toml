@@ -1,6 +1,6 @@
 [project]
 name = "pure-py-reference-checker"
-version = "0.14.1"
+version = "0.15.0"
 requires-python = ">=3.12"
 
 [dependency-groups]
