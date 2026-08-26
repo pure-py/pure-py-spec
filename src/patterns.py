@@ -17,6 +17,7 @@ from syntax import PatList, PatTuple
 def is_catch_all(p: ast.pattern) -> bool:
     return isinstance(p, ast.MatchAs) and p.pattern is None
 
+
 def literal_value(pat: ast.MatchValue) -> object:
     v = pat.value
     if isinstance(v, ast.Constant):
@@ -25,11 +26,13 @@ def literal_value(pat: ast.MatchValue) -> object:
         operand_value = v.operand.value
         assert isinstance(operand_value, (int, float))
         return -operand_value if isinstance(v.op, ast.USub) else operand_value
-    raise AssertionError(f'unexpected MatchValue payload: {type(v).__name__}')
+    raise AssertionError(f"unexpected MatchValue payload: {type(v).__name__}")
+
 
 def dict_key(k: ast.expr) -> str:
     assert isinstance(k, ast.Constant) and isinstance(k.value, str)
     return k.value
+
 
 def subsumes(p: ast.pattern, q: ast.pattern, ctx: ModuleContext) -> bool:
     if isinstance(q, ast.MatchAs) and q.pattern is not None:
@@ -68,19 +71,32 @@ def subsumes(p: ast.pattern, q: ast.pattern, ctx: ModuleContext) -> bool:
         return all(subsumes(map_p[x], map_q[x], ctx) for x in fields(c_q))
     return False
 
+
 def check_pattern(p: ast.pattern, ctx: ModuleContext) -> None:
     if isinstance(p, ast.MatchClass):
         entry = class_entry(p.cls, ctx)
         if entry is None:
-            raise IllFormedModule(p, reasons.UnknownClassInPattern(qualified_name(p.cls) if isinstance(p.cls, (ast.Name, ast.Attribute)) else ast.unparse(p.cls)))
+            raise IllFormedModule(
+                p,
+                reasons.UnknownClassInPattern(
+                    qualified_name(p.cls)
+                    if isinstance(p.cls, (ast.Name, ast.Attribute))
+                    else ast.unparse(p.cls)
+                ),
+            )
         c_name, xs = short_name(entry), fields(entry)
         if field_map(entry, p.patterns, p.kwd_attrs, p.kwd_patterns) is None:
             n = len(p.patterns)
             if n + len(p.kwd_attrs) != len(xs):
-                raise IllFormedModule(p, reasons.PatternArityMismatch(c_name, len(xs), n + len(p.kwd_attrs)))
+                raise IllFormedModule(
+                    p,
+                    reasons.PatternArityMismatch(c_name, len(xs), n + len(p.kwd_attrs)),
+                )
             if len(p.kwd_attrs) != len(set(p.kwd_attrs)):
                 raise IllFormedModule(p, reasons.DuplicatePatternKeyword(c_name))
-            raise IllFormedModule(p, reasons.UnknownFieldInPattern(c_name, tuple(sorted(set(xs[n:])))))
+            raise IllFormedModule(
+                p, reasons.UnknownFieldInPattern(c_name, tuple(sorted(set(xs[n:]))))
+            )
         for sub in list(p.patterns) + list(p.kwd_patterns):
             check_pattern(sub, ctx)
         return
@@ -100,7 +116,10 @@ def check_pattern(p: ast.pattern, ctx: ModuleContext) -> None:
         check_pattern(p.pattern, ctx)
         return
 
-def check_pattern_list(patterns: list[ast.pattern], node: ast.AST, ctx: ModuleContext) -> None:
+
+def check_pattern_list(
+    patterns: list[ast.pattern], node: ast.AST, ctx: ModuleContext
+) -> None:
     for i, p in enumerate(patterns):
         check_pattern(p, ctx)
         vars_ = binds_seq(p)

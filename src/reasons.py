@@ -6,6 +6,7 @@ from dataclasses import dataclass
 class DuplicateFieldName:
     name: str
     cls: str
+
     def message(self) -> str:
         return f"duplicate field name '{self.name}' in class '{self.cls}'"
 
@@ -13,6 +14,7 @@ class DuplicateFieldName:
 @dataclass(frozen=True)
 class UnknownBaseClass:
     base: str
+
     def message(self) -> str:
         return f"base class '{self.base}' is not declared in this module"
 
@@ -21,6 +23,7 @@ class UnknownBaseClass:
 class InheritedFieldClash:
     field: str
     base: str
+
     def message(self) -> str:
         return f"field '{self.field}' clashes with inherited field from '{self.base}'"
 
@@ -29,6 +32,7 @@ class InheritedFieldClash:
 class DuplicateClassName:
     name: str
     module: str
+
     def message(self) -> str:
         return f"duplicate class name '{self.name}' in module '{self.module}'"
 
@@ -36,6 +40,7 @@ class DuplicateClassName:
 @dataclass(frozen=True)
 class UnassignedVariable:
     name: str
+
     def message(self) -> str:
         return f"'{self.name}' is not definitely assigned"
 
@@ -43,6 +48,7 @@ class UnassignedVariable:
 @dataclass(frozen=True)
 class CapturedReassignment:
     name: str
+
     def message(self) -> str:
         return f"'{self.name}' captured by previous statement, reassigned here"
 
@@ -50,6 +56,7 @@ class CapturedReassignment:
 @dataclass(frozen=True)
 class SelfCaptureAssignment:
     name: str
+
     def message(self) -> str:
         return f"'{self.name}' captured by right-hand side"
 
@@ -65,6 +72,7 @@ class ConstructorArityMismatch:
     cls: str
     expected: int
     got: int
+
     def message(self) -> str:
         return f"constructor for '{self.cls}' expects {self.expected} arguments, got {self.got}"
 
@@ -73,6 +81,7 @@ class ConstructorArityMismatch:
 class UnknownConstructorKeyword:
     cls: str
     expected_fields: tuple[str, ...]
+
     def message(self) -> str:
         return f"constructor keywords for '{self.cls}' must be {', '.join(self.expected_fields)}"
 
@@ -82,6 +91,7 @@ class PatternArityMismatch:
     cls: str
     expected: int
     got: int
+
     def message(self) -> str:
         return f"pattern for '{self.cls}' expects {self.expected} sub-patterns, got {self.got}"
 
@@ -89,6 +99,7 @@ class PatternArityMismatch:
 @dataclass(frozen=True)
 class UnknownClassInPattern:
     cls: str
+
     def message(self) -> str:
         return f"'{self.cls}' is not a declared class"
 
@@ -97,6 +108,7 @@ class UnknownClassInPattern:
 class UnknownFieldInPattern:
     cls: str
     expected_fields: tuple[str, ...]
+
     def message(self) -> str:
         return f"pattern keywords for '{self.cls}' must be {', '.join(self.expected_fields)}"
 
@@ -104,6 +116,7 @@ class UnknownFieldInPattern:
 @dataclass(frozen=True)
 class DuplicatePatternKeyword:
     cls: str
+
     def message(self) -> str:
         return f"duplicate keyword in pattern for '{self.cls}'"
 
@@ -111,6 +124,7 @@ class DuplicatePatternKeyword:
 @dataclass(frozen=True)
 class DuplicateDictKey:
     key: str
+
     def message(self) -> str:
         return f"duplicate key '{self.key}' in dict pattern"
 
@@ -118,6 +132,7 @@ class DuplicateDictKey:
 @dataclass(frozen=True)
 class NonlinearPattern:
     index: int
+
     def message(self) -> str:
         return f"repeated variable in pattern {self.index}"
 
@@ -126,6 +141,7 @@ class NonlinearPattern:
 class UnreachableCase:
     index: int
     subsumed_by: int
+
     def message(self) -> str:
         return f"case {self.index} unreachable: subsumed by case {self.subsumed_by}"
 
@@ -133,6 +149,7 @@ class UnreachableCase:
 @dataclass(frozen=True)
 class DuplicateMutualName:
     name: str
+
     def message(self) -> str:
         return f"duplicate name '{self.name}' in mutual region"
 
@@ -153,6 +170,7 @@ class ImportAfterStatement:
 class SubmoduleNameClash:
     name: str
     submodule: str
+
     def message(self) -> str:
         return f"binding '{self.name}' clashes with submodule '{self.submodule}'"
 
@@ -160,6 +178,7 @@ class SubmoduleNameClash:
 @dataclass(frozen=True)
 class SubmoduleNotImported:
     q: str
+
     def message(self) -> str:
         return f"submodule '{self.q}' is not imported"
 
@@ -168,6 +187,7 @@ class SubmoduleNotImported:
 class UnassignedMember:
     x: str
     q: str
+
     def message(self) -> str:
         return f"member '{self.x}' of module '{self.q}' is not definitely assigned"
 
@@ -193,6 +213,7 @@ class EmptyFromImport:
 @dataclass(frozen=True)
 class UnknownModule:
     q: str
+
     def message(self) -> str:
         return f"unknown module {self.q!r}"
 
@@ -201,6 +222,7 @@ class UnknownModule:
 class UnknownMember:
     x: str
     q: str
+
     def message(self) -> str:
         return f"module {self.q!r} has no member {self.x!r}"
 
@@ -208,6 +230,7 @@ class UnknownMember:
 @dataclass(frozen=True)
 class ModuleAsValue:
     name: str
+
     def message(self) -> str:
         return f"'{self.name}' refers to a module; modules are not first-class values"
 
@@ -216,6 +239,7 @@ class ModuleAsValue:
 class OwnDescendantImport:
     q: str
     q0: str
+
     def message(self) -> str:
         return f"'{self.q}' is a descendant of the importing module '{self.q0}'; import it with a from-import"
 
@@ -223,19 +247,43 @@ class OwnDescendantImport:
 @dataclass(frozen=True)
 class ClassAsValue:
     name: str
+
     def message(self) -> str:
         return f"'{self.name}' refers to a class; classes are not first-class values"
 
 
 Reason = (
-    DuplicateFieldName | UnknownBaseClass | InheritedFieldClash | DuplicateClassName |
-    UnassignedVariable | CapturedReassignment | SelfCaptureAssignment | UnreachableStatement |
-    ConstructorArityMismatch | PatternArityMismatch | UnknownClassInPattern |
-    UnknownFieldInPattern | DuplicatePatternKeyword | UnknownModule | UnknownMember |
-    ModuleAsValue | ClassAsValue | UnknownConstructorKeyword | DuplicateDictKey |
-    NonlinearPattern | UnreachableCase | DuplicateMutualName | NonTopLevelImport |
-    NonTopLevelClass | TopLevelReturn | EmptyFromImport | ImportAfterStatement |
-    SubmoduleNameClash | SubmoduleNotImported | OwnDescendantImport | UnassignedMember
+    DuplicateFieldName
+    | UnknownBaseClass
+    | InheritedFieldClash
+    | DuplicateClassName
+    | UnassignedVariable
+    | CapturedReassignment
+    | SelfCaptureAssignment
+    | UnreachableStatement
+    | ConstructorArityMismatch
+    | PatternArityMismatch
+    | UnknownClassInPattern
+    | UnknownFieldInPattern
+    | DuplicatePatternKeyword
+    | UnknownModule
+    | UnknownMember
+    | ModuleAsValue
+    | ClassAsValue
+    | UnknownConstructorKeyword
+    | DuplicateDictKey
+    | NonlinearPattern
+    | UnreachableCase
+    | DuplicateMutualName
+    | NonTopLevelImport
+    | NonTopLevelClass
+    | TopLevelReturn
+    | EmptyFromImport
+    | ImportAfterStatement
+    | SubmoduleNameClash
+    | SubmoduleNotImported
+    | OwnDescendantImport
+    | UnassignedMember
 )
 
 
@@ -243,18 +291,22 @@ class IllFormed(Exception):
     exit_code: int
     msg: str
 
+
 class IllFormedModule(IllFormed):
     exit_code = 3
+
     def __init__(self, node: ast.AST, reason: Reason):
-        self.line: int | None = getattr(node, 'lineno', None)
-        self.col: int | None = getattr(node, 'col_offset', None)
+        self.line: int | None = getattr(node, "lineno", None)
+        self.col: int | None = getattr(node, "col_offset", None)
         self.reason: Reason = reason
         self.msg = reason.message()
         self.module: str | None = None
         super().__init__(self.msg)
 
+
 class IllFormedProgram(IllFormed):
     exit_code = 4
+
     def __init__(self, msg: str):
         self.msg = msg
         super().__init__(msg)
