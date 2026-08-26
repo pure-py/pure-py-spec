@@ -97,8 +97,9 @@ of $q$ and then its statement, mirroring static loading $\vdash_{\mathsf{load}} 
 (\figref{well-formed-module}); as with the static rules, the mutual
 recursion between loading and evaluation is grounded by program well-formedness, which rules out
 import cycles (\secref{modules-programs}).
-Loading takes a single module; the ancestors of an imported module are loaded as in the static rules\speconly{,
-by the loads-as judgement for a plain import and as premises of the from-import rule}.
+Loading takes a single module; an import loads the ancestors of its target from the root down, each
+before its descendant, as in the static rules\speconly{, by the loads-as judgement for a plain import and
+as premises of the from-import rule}.
 
 Since
 imports precede statements, every module a statement can reference is loaded before the statement runs, and
