@@ -25,7 +25,7 @@ from aux import (
     split_imports,
     statements,
 )
-from statements import check_seq, result_type_of_statement
+from statements import check_seq, result_type_statement
 
 
 def name_assign(q: str) -> ast.stmt:
@@ -158,7 +158,7 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     gamma1 = {**predefined_context("builtins"), **gamma0}
     items = statements(body)
     returning = next(
-        (i for i in items if isinstance(result_type_of_statement(i), Returns)), None
+        (i for i in items if isinstance(result_type_statement(i), Returns)), None
     )
     if returning is not None:  # the module rule requires result type Assigns
         node: ast.AST = returning[0] if isinstance(returning, list) else returning

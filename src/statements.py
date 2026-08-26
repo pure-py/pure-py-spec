@@ -64,15 +64,15 @@ def result_type(node: ast.stmt) -> ResultType:
     if isinstance(node, ast.If):
         return merge_results(
             [
-                result_type_of_body(node.body),
-                result_type_of_body(node.orelse) if node.orelse else ASSIGNS_EMPTY,
+                result_type_body(node.body),
+                result_type_body(node.orelse) if node.orelse else ASSIGNS_EMPTY,
             ]
         )
     if isinstance(node, ast.Match):
         branches = [
             override_results(
                 Assigns({x: Status.TT for x in binds(case.pattern)}),
-                result_type_of_body(case.body),
+                result_type_body(case.body),
             )
             for case in node.cases
         ]
@@ -84,10 +84,10 @@ def result_type(node: ast.stmt) -> ResultType:
     raise AssertionError(f"unexpected statement: {type(node).__name__}")
 
 
-def result_type_of_body(body: list[ast.stmt]) -> ResultType:
+def result_type_body(body: list[ast.stmt]) -> ResultType:
     if len(body) == 1:
         return result_type(body[0])
-    return override_results(result_type(body[0]), result_type_of_body(body[1:]))
+    return override_results(result_type(body[0]), result_type_body(body[1:]))
 
 
 def check_body(body: list[ast.stmt], ctx: ModuleContext) -> ModuleContext:
@@ -102,7 +102,7 @@ def check_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
     if len(items) == 1:
         return next_ctx_after(head, ctx)
     tail = items[1:]
-    if isinstance(result_type_of_statement(head), Returns):
+    if isinstance(result_type_statement(head), Returns):
         first_unreachable = tail[0]
         node: ast.AST = (
             first_unreachable[0]
@@ -124,12 +124,12 @@ def next_ctx_after(head: Statement, ctx: ModuleContext) -> ModuleContext:
     # added here rather than through the result type.
     if isinstance(head, ast.ClassDef):
         return override_gamma(ctx, {head.name: class_entry_for(head, ctx.q, ctx.gamma)})
-    head_result = result_type_of_statement(head)
+    head_result = result_type_statement(head)
     delta = head_result.delta if isinstance(head_result, Assigns) else {}
     return override_var(ctx, delta)
 
 
-def result_type_of_statement(item: Statement) -> ResultType:
+def result_type_statement(item: Statement) -> ResultType:
     if isinstance(item, list):
         return Assigns({d.name: Status.TT for d in item})
     return result_type(item)
