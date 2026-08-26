@@ -1,9 +1,9 @@
 For example, a list pattern matches a list of the same length elementwise, composing the sub-results,
-and fails to match a list of another length or a value that is neither a list nor a tuple. A tuple falls
-under neither case, so a list pattern and a tuple are not comparable: there is no derivation, and the run
-has no result:
+and fails to match a list of another length or a value that is neither a list nor a tuple:
 \begin{mathpar}
 \input{spec/rules/eval-pat-list}
 \and
 \input{spec/rules/eval-pat-list-no}
 \end{mathpar}
+A tuple falls under neither case, so a list pattern and a tuple are not comparable: there is no
+derivation, and the run has no result.
