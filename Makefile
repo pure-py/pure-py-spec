@@ -35,6 +35,7 @@ paper-anon.pdf: $(TEXFILES) | clean-aux
 
 SUBMIT_DIR := submission
 
+# Zip rather than a bare PDF, to make room for a mechanisation.
 submit: paper-anon.pdf spec-anon.pdf
 	rm -rf $(SUBMIT_DIR)
 	mkdir $(SUBMIT_DIR)
