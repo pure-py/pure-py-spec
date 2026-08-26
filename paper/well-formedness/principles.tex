@@ -62,7 +62,7 @@ for instance \pyinline{x = lambda: x}, where under Python's late binding the lam
 third case arises in comprehensions: in Python a comprehension mutates its generator variables on each
 iteration, so a lambda in the body or in a later qualifier may not capture one, a side condition of
 \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}. For instance
-\pyinline{[lambda x: x**i for i in range(10)]} is rejected, since under Python every element would compute
+\pyinline{[lambda x: x**i for i in range(10)]} is rejected, since under Python each lambda in the list would compute
 \pyinline{x**9}. A dataclass declaration counts as an assignment of its class name here, although re-declaring a class name is
 excluded outright (\secref{no-first-class}).
 
