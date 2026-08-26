@@ -10,7 +10,8 @@
 \pyinline{del} & Removes binding & Syntactic & Not in grammar \\[1mm]
 Augmented assignment (\pyinline{+=} and so on) & Rebinds variable & Syntactic & Not in grammar \\[1mm]
 Walrus operator (\pyinline{:=}) & Assigns within expression & Syntactic & Not in grammar \\[1mm]
-Item and attribute assignment (\pyinline{xs[0] = v}, \pyinline{p.x = v}) & Update container or object in place & Syntactic & Not in grammar; assignment targets are variables \\[1mm]
+Item assignment (\pyinline{xs[0] = v}) & Updates container in place & Syntactic & Not in grammar; assignment targets are variables \\[1mm]
+Attribute assignment (\pyinline{p.x = v}) & Updates object in place & Syntactic & Not in grammar; assignment targets are variables \\[1mm]
 Mutating methods, such as \pyinline{list.append} & Update value in place & Dynamic & Method reference aborts with $\errAttr$ \\[1mm]
 Reassignment of captured variable & Closure sees new value & Static & Variable captured by statement may not be assigned later in sequence, nor by statement itself \\[1mm]
 Lambdas capturing comprehension variable & Variable rebound on each iteration; lambda sees final value & Static & Lambda may not capture generator variable \\
