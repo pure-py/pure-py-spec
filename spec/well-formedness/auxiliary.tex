@@ -1,9 +1,9 @@
 \subsection{Auxiliary definitions}
 \label{sec:wf-aux}
 
-Three syntactic analyses support the well-formedness rules: $\assignsS(s)$, the set of variables assigned
-anywhere in $s$ (without descending into nested function definitions, which have their own scope, so that
-$\assignsS(s) = \dom(\Delta)$ when $s : \Assigns{\Delta}$); $\binds(p)$, the set of variables introduced by a
-pattern $p$; and $\capturesS(s)$, the set of variables from the enclosing scope that are captured by lambdas
-and nested function definitions within $s$, with companion $\capturesE(e)$ on expressions.
+Three syntactic analyses support the well-formedness rules: $\assignsS(t)$, the set of variables assigned
+anywhere in $t$ (without descending into nested function definitions, which have their own scope, so that
+$\assignsS(t) = \dom(\Delta)$ when $t : \Assigns{\Delta}$); $\binds(p)$, the set of variables introduced by a
+pattern $p$; and $\capturesS(t)$, the set of variables from the enclosing scope that are captured by lambdas
+and nested function definitions within $t$, with companion $\capturesE(e)$ on expressions.
 All are defined in \secref{mf-syntactic}.

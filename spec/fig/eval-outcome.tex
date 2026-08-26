@@ -1,6 +1,6 @@
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, s \Rightarrow r$}
+\flushleft \shadebox{$\rho, t \Rightarrow r$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-pass}}]
@@ -126,11 +126,11 @@
 \and
 \inferrule*[lab={\ruleName{eval-seq}}]
 {
-  \rho, s \Rightarrow \assigns{\rho'} \\
-  \rho \override \rho', s' \Rightarrow r
+  \rho, t \Rightarrow \assigns{\rho'} \\
+  \rho \override \rho', t' \Rightarrow r
 }
 {
-  \rho, s\;s' \Rightarrow \assigns{\rho'} \override r
+  \rho, t\;t' \Rightarrow \assigns{\rho'} \override r
 }
 \and
 \inferrule*[lab={\ruleName{eval-class}}]
@@ -149,13 +149,13 @@
   \rho, \exDataclassExtend{c}{c'}{\phi} \Rightarrow \assigns{\set{\bind{c}{C}}}
 }
 \end{mathpar}
-\caption{Statement $s$ evaluates to result $r$ under environment $\rho : \Gamma$}
+\caption{Statement $t$ evaluates to result $r$ under environment $\rho : \Gamma$}
 \label{fig:eval-block-outcome}
 \end{figure}
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, s \Rightarrow r$ (continued)}
+\flushleft \shadebox{$\rho, t \Rightarrow r$ (continued)}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-assert-fail}}]
@@ -202,10 +202,10 @@
 \and
 \inferrule*[lab={\ruleName{eval-seq-fail}}]
 {
-  \rho, s \Rightarrow \aborts{\kappa}
+  \rho, t \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, s\;s' \Rightarrow \aborts{\kappa}
+  \rho, t\;t' \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
 \caption{Statement evaluation, continued (aborting cases)}

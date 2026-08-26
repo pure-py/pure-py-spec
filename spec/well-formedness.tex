@@ -19,7 +19,7 @@ Every well-formed statement either \emph{definitely returns}, or \emph{definitel
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
 = e} definitely assigns $\set{\bind{\pyinline{x}}{\statusDefAssigned}}$. \emph{Result types} $R$ classify
 these outcomes: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns
-$\Delta$). Statement well-formedness $\Gamma \vdash s : R$ is given in \figref{well-formed}, expression
+$\Delta$). Statement well-formedness $\Gamma \vdash t : R$ is given in \figref{well-formed}, expression
 well-formedness $\Gamma \vdash e$ in \figref{well-formed-expr}, and pattern well-formedness in
 \figref{well-formed-pat}.
 
@@ -51,7 +51,7 @@ assigned, and merges the cases as a
 conditional merges its branches, merging in $\Assigns{\varnothing}$ unless the last case is a catch-all, i.e.~a
 variable or wildcard.
 \paperinput{paper/well-formedness/match}%
-Function bodies, branches and case bodies may not declare classes. A class
+A class
 declaration (\ruleName{class}, \ruleName{class-extend}) assigns a class entry $C$ to its name, which must
 not already denote a class; its fields must be distinct and, for an extension, disjoint from those of the
 base class.

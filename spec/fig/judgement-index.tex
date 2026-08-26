@@ -9,7 +9,7 @@ $\Gamma \vdash p \subsumed p'$ & every value matched by $p$ is matched by $p'$ &
 $\Gamma \vdash q : \theta$ & qualified name $q$ denotes entry $\theta$ & \figref{well-formed-expr} \\
 $\Gamma \vdash e$ & expression $e$ is well-formed & \figref{well-formed-expr} \\
 $\Gamma \vdash \seq{g} : \Delta$ & comprehension qualifiers $\seq{g}$ are well-formed and bind $\Delta$ & \figref{well-formed-expr} \\
-$\Gamma \vdash s : R$ & statement $s$ is well-formed with result type $R$ & \figref{well-formed} \\
+$\Gamma \vdash t : R$ & statement $t$ is well-formed with result type $R$ & \figref{well-formed} \\
 $\Gamma, x \importsR \theta$ & name $x$ imported from module signature $\Gamma$ has entry $\theta$ & \figref{imports} \\
 $\vdash \seq{\iota} : \Gamma$ & imports $\seq{\iota}$ are well-formed and yield context $\Gamma$ & \figref{well-formed-imports} \\
 $q, \theta \loadsAs \theta'$ & importing module $q$ into entry $\theta$ gives entry $\theta'$ & \figref{well-formed-imports} \\
@@ -18,7 +18,7 @@ $\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{well-forme
    \\[2mm]
 \metaGroup{Evaluation} \\
 $\rho, p, v \matches m$ & pattern $p$ matches value $v$ with result $m$ & \figref{match} \\
-$\rho, s \Rightarrow r$ & statement $s$ evaluates to result $r$ & \figref{eval-block-outcome} \\
+$\rho, t \Rightarrow r$ & statement $t$ evaluates to result $r$ & \figref{eval-block-outcome} \\
 $\rho, e \Rightarrow o$ & expression $e$ evaluates to outcome $o$ & \figref{eval-outcome} \\
 $\rho, \seq{e} \Rightarrow o$ & expressions $\seq{e}$ evaluate, left to right, to outcome $o$ & \figref{eval-seq} \\
 $\rho, \seq{g} \Rightarrow o$ & comprehension qualifiers $\seq{g}$ evaluate to outcome $o$ & \figref{eval-quals-outcome} \\

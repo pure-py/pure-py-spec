@@ -107,10 +107,10 @@
 \and
 \inferrule*[lab={\ruleName{module}}]
 {
-  \mathcal{M}(q) = \seq{\iota}\;s \\
+  \mathcal{M}(q) = \seq{\iota}\;t \\
   \vdash \seq{\iota} : \Gamma \\
   \mathcal{P}(\pyinline{builtins}) = (\rho, \Gamma') \\
-  \Gamma' \mathbin{\override} \Gamma \vdash s : \Assigns{\Delta} \\
+  \Gamma' \mathbin{\override} \Gamma \vdash t : \Assigns{\Delta} \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {

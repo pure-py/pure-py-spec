@@ -65,7 +65,7 @@ amounts to a comparison of qualified names.
 
 \subsection{Statements and expressions}
 
-Statement evaluation $\rho, s \Rightarrow r$ is given in \speconly{\figrefTwo{eval-block-outcome}{eval-block-fails}}\paperonly{full in \specification}. Function definitions delimit
+Statement evaluation $\rho, t \Rightarrow r$ is given in \speconly{\figrefTwo{eval-block-outcome}{eval-block-fails}}\paperonly{full in \specification}. Function definitions delimit
 the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\outcome$\speconly{ (\S\ref{aux:outcome})} reads a statement's result as
 the outcome of calling it\speconly{, $\val{\pyinline{None}}$ where the statement completes without returning.}\paperonly{:}
 \paperinput{paper/operational-semantics/outcome}
