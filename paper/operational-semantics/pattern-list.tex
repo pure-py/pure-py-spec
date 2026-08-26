@@ -5,5 +5,5 @@ and fails to match a list of another length or a value that is neither a list no
 \and
 \input{spec/rules/eval-pat-list-no}
 \end{mathpar}
-A tuple falls under neither case, so a list pattern and a tuple are not comparable: there is no
-derivation, and the run has no result.
+Neither rule applies when the value is a tuple: a list pattern against a tuple has no derivation, and
+the run has no result.
