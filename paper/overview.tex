@@ -53,7 +53,7 @@ loaded. There is no mutation, nor can evaluation order change the meaning of a n
 outside this discipline, and the goal of \PurePy is to characterise a suitably large subset of Python that
 stays within it.
 
-A non-trivial component of the PurePy specification concerns module loading, in the form of well-formedness
+A non-trivial component of the \PurePy specification concerns module loading, in the form of well-formedness
 rules which rule out programs which depend on Python's load-order-sensitive behaviours
 (\secref{no-load-dependent}). One might wonder why a language which is mutation-free even needs to concern
 itself with loading order. If the result of a program is all that can be observed, the order in which
@@ -238,6 +238,7 @@ Wildcard imports & \issue{105} \\
 Function keyword arguments & \issue{127} \\
 Postponed annotation evaluation & \issue{128} \\
 Primitive operations & \issue{132} \\
+Annotated lambda parameters and generator targets & \issue{178} \\
 \end{tabular}
 \end{minipage}
 \end{center}
