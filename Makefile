@@ -25,13 +25,13 @@ endef
 paper-anon.pdf: $(TEXFILES) | clean-aux
 	$(call anon,paper-anon,paper.tex)
 
-spec.pdf: $(TEXFILES) | clean-aux
-	$(call anon,spec,PurePy-spec.tex)
+spec-anon.pdf: $(TEXFILES) | clean-aux
+	$(call anon,spec-anon,PurePy-spec.tex)
 
 # Zip rather than a bare PDF, to make room for a mechanisation.
-supplementary.zip: spec.pdf
+supplementary.zip: spec-anon.pdf
 	rm -f $@
-	zip -q -9 $@ $<
+	cp $< spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
 
 submit: paper-anon.pdf supplementary.zip
 
