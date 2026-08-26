@@ -92,7 +92,7 @@ dictionary subscripted by a value other than a string is undefined.
 \subsection{Modules and programs}
 
 \speconly{Module and program evaluation are given in \figref{eval-modules}; import evaluation in \figref{eval-import-prefix}; importing names from a loaded module in
-\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specification.} Context extension (Definition~\ref{def:extend}) applies to module values as well, reading its equations with a loaded reference $\modLoaded{q}{\rho}$ carrying an environment in place of a context. The loading judgement $q \Rightarrow_{\mathsf{load}} o$ evaluates the import prefix
+\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specification.} Context extension (Definition~\ref{def:extend}) applies to environments as well, pointwise on variables and with the same equations on values in place of entries: a loaded module value $\modLoaded{q}{\rho}$ carries an environment where the entry $\modLoaded{q}{\Gamma}$ carries a context, and any other value is overridden as an entry is. The loading judgement $q \Rightarrow_{\mathsf{load}} o$ evaluates the import prefix
 of $q$ and then its statements, mirroring the well-formedness judgement $\vdash_{\mathsf{load}} q : \Gamma$
 (\figref{well-formed-module}); as with the static rules, the mutual
 recursion between loading and evaluation is grounded by program well-formedness, which rules out

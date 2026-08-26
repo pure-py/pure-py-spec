@@ -47,6 +47,7 @@ an idempotent commutative semigroup of parallel composition $\merge$ (``merge'')
 distributivity does not hold. Both operations are defined pointwise.
 %
 \begin{definition}[Context override]
+Pointwise, $(\Gamma \override \Delta)(x) = \Gamma(x) \override \Delta(x)$, where on entries
 \begin{defalign}
 \bot \override \theta &= \theta \override \bot = \theta \\
 \theta \override \theta' &= \theta' \quad (\text{otherwise})
@@ -56,7 +57,7 @@ distributivity does not hold. Both operations are defined pointwise.
 \noindent Override is thus right-biased and has $\bot$ as both left and right unit.
 
 \begin{definition}[Context merge]
-For definite-assignment statuses $a, a' \in \B$:
+Pointwise, $(\Gamma \merge \Delta)(x) = \Gamma(x) \merge \Delta(x)$, where on definite-assignment statuses $a, a' \in \B$
 \begin{defalign}
 \bot \merge \bot &= \bot \\
 a \merge \bot = \bot \merge a &= \statusNotDefAssigned \\
@@ -68,6 +69,7 @@ a \merge a' &= a \meet a'
 
 \begin{definition}[Context extension]
 \label{def:extend}
+Pointwise, $(\Gamma \extend \Delta)(x) = \Gamma(x) \extend \Delta(x)$, where on entries
 \begin{defalign}
 \modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} &= \modLoaded{q}{\Gamma \extend \Gamma'} \\
 \modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} &= \modLoaded{q}{\Gamma} \\
