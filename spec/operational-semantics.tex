@@ -42,9 +42,9 @@ outcomes of the same form, carrying a result, a sequence of values or an environ
 
 A \pyinline{match} statement takes the first case whose pattern matches the value, running its body under
 the bindings the pattern produces, and does nothing if no case matches; the auxiliary function
-$\dispatch$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:dispatch}}) selects that case.
+$\dispatch$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:dispatch}}) selects the matching case.
 \paperinput{paper/operational-semantics/match}%
-Whether a pattern matches is the pattern-matching judgement $\rho, p, v \matches m$ (\figref{match}), a
+Whether a pattern matches is the pattern-matching judgement $\rho, p, v \matches m$\speconly{ (\figref{match})}, a
 deterministic partial function. A \emph{match result} $m$ is either $\matchOk{\rho'}$, a match binding
 $\rho'$, or $\noMatch$, a failure to match. Having no derivation is a third possibility, distinct from
 both: where a pattern and a value are not comparable, as a list pattern against a tuple, \PurePy can say
@@ -55,13 +55,17 @@ $\override$, matching sequentially:
 m \override \noMatch = \noMatch \override m & {}= \noMatch
 \end{defalign}
 
-\noindent with $\matchOk{\varnothing}$ as left and right unit. A constructor pattern matches any object
+\noindent with $\matchOk{\varnothing}$ as left and right unit.
+\paperinput{paper/operational-semantics/pattern-list}%
+A constructor pattern matches any object
 whose class has the pattern's class among its ancestors, and its sub-patterns bind the fields of the
-pattern's class. An object records its class entry, whose qualified name is the identity of the class:
+pattern's class\paperonly{:}\speconly{.}
+\paperinput{paper/operational-semantics/pattern-constr}%
+An object records its class entry, whose qualified name is the identity of the class:
 since a module declares each class name at most once, the entry comparison in \ruleName{eval-pat-constr}
 amounts to a comparison of qualified names.
 
-\input{spec/fig/match}
+\specinput{spec/fig/match}
 
 \subsection{Statements and expressions}
 

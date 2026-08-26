@@ -50,21 +50,9 @@
   \rho, \patWild, v \matches \matchOk{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{eval-pat-list}}]
-{
-  \rho, p_i, v_i \matches m_i \quad (\forall i)
-}
-{
-  \rho, \patList{p_1, \ldots, p_n}, \exList{v_1, \ldots, v_n} \matches m_1 \override \ldots \override m_n
-}
+\input{spec/rules/eval-pat-list}
 \and
-\inferrule*[lab={\ruleName{eval-pat-list-no}}]
-{
-  v \text{ neither list nor tuple, or list of length} \neq n
-}
-{
-  \rho, \patList{p_1, \ldots, p_n}, v \matches \noMatch
-}
+\input{spec/rules/eval-pat-list-no}
 \and
 \inferrule*[lab={\ruleName{eval-pat-tuple}}]
 {
@@ -107,15 +95,7 @@
   \rho, p\;\pyinline{as}\;x, v \matches m \override \matchOk{\set{\bind{x}{v}}}
 }
 \and
-\inferrule*[lab={\ruleName{eval-pat-constr}}]
-{
-  \resolveClass(\rho, q) = C \\
-  C \in \ancestors(C') \\
-  \rho, \fieldMap(C, \seq{p})(x), \rho^\dagger(x) \matches m_x \quad (\forall x \in \fields(C))
-}
-{
-  \rho, \patConstr{q}{\seq{p}}, \exObj{\Gamma'}{C'}{\rho^\dagger} \matches {\textstyle\bigotimes_{x \in \fields(C)}}\, m_x
-}
+\input{spec/rules/eval-pat-constr}
 \and
 \inferrule*[lab={\ruleName{eval-pat-constr-no}}]
 {

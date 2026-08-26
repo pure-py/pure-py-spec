@@ -1,0 +1,7 @@
+\inferrule*[lab={\ruleName{eval-pat-list-no}}]
+{
+  v \text{ neither list nor tuple, or list of length} \neq n
+}
+{
+  \rho, \patList{p_1, \ldots, p_n}, v \matches \noMatch
+}

@@ -1,0 +1,8 @@
+For example, a list pattern matches a list of the same length elementwise, composing the sub-results,
+and fails to match a list of another length or a value that is not a sequence; a tuple is neither, so a
+list pattern against a tuple has no derivation:
+\begin{mathpar}
+\input{spec/rules/eval-pat-list}
+\and
+\input{spec/rules/eval-pat-list-no}
+\end{mathpar}
