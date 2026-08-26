@@ -35,6 +35,11 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 
 - When linking to another GitHub issue in a bullet list, write just the bare `#N` reference — GitHub renders the issue title inline.
 
+## Pull requests
+
+- Titles are noun phrases, like issue titles.
+- The body is empty, or `Closes #N` alone. The issue carries the content; do not summarise the changes in the PR.
+
 ## Meetings
 
 - Meeting issues are titled `YYYY-MM-DD`; set Type to `Meeting`.
