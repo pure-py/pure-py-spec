@@ -43,7 +43,7 @@ It is useful to represent contexts as total functions on the set of all variable
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
 an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
-\emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$\paperonly{ (Lemma~\ref{lem:right-distributivity})}, but left
+\emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
 distributivity does not hold. Both are defined pointwise (\figref{context-ops}): override is right-biased
 and has $\bot$ as both left and right unit; merge is defined only on definite-assignment statuses, returning
 $\statusNotDefAssigned$ when exactly one argument is defined and the conjunction otherwise, so $\bot$ is not
@@ -54,8 +54,6 @@ A third operation, \emph{context extension} $\Gamma \extend \Delta$, also pointw
 combines module references for the same module recursively, preferring loaded references to stubs, and is
 otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted
 at the same module must combine rather than shadow.
-
-\paperinput{paper/syntax/right-distributivity}
 
 \input{spec/fig/syntax-stmt}
 \input{spec/fig/syntax-expr}

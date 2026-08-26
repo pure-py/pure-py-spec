@@ -37,9 +37,7 @@ R \override \Returns = \Returns \override R & = \Returns
 
 \noindent The $\Returns \override R$ case never arises because the well-formedness judgement excludes unreachable statements\paperonly{ (\secref{unreachable})}.
 
-\paperinput{paper/well-formedness/right-distributivity}
-
-\paperonly{\noindent}A sequence $s\;s'$ is well-formed (\ruleName{seq}) when $s$ definitely assigns some $\Delta$, $s'$ is
+A sequence $s\;s'$ is well-formed (\ruleName{seq}) when $s$ definitely assigns some $\Delta$, $s'$ is
 well-formed under $\Gamma \override \Delta$, and no variable captured by $s$ is assigned in $s'$. A
 conditional combines its branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no
 \pyinline{else} branch. A mutual region (\ruleName{def}) checks each body in a context in which the region's
