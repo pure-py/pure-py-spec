@@ -1,2 +1,5 @@
 \binds(x) &= \set{x} \\*
-\binds(p\;\pyinline{as}\;x) &= \binds(p) \cup \set{x}
+\binds(p\;\pyinline{as}\;x) &= \binds(p) \cup \set{x} \\*
+\binds(\varepsilon) &= \varnothing \\*
+\binds(\qualGuard{e} \cons \seq{g}) &= \binds(\seq{g}) \\*
+\binds(\qualGenerator{x}{e} \cons \seq{g}) &= \set{x} \cup \binds(\seq{g})

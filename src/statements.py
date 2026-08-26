@@ -7,6 +7,8 @@ from aux import (
     assigns_seq,
     binds,
     captures_e,
+    captures_e_comprehension,
+    captures_e_list,
     captures_statement,
     find_first_reassigning,
     names_in_target,
@@ -327,7 +329,15 @@ def check_comprehension(
         return
     g = generators[0]
     check_expr(g.iter, ctx)
-    ctx_ = override_var(ctx, {n: Status.TT for n in names_in_target(g.target)})
+    targets = names_in_target(g.target)
+    captured = targets & (
+        captures_e_list(g.ifs) | captures_e_comprehension(elts, generators[1:])
+    )
+    if captured:
+        raise IllFormedModule(
+            g.target, reasons.CapturedGeneratorVariable(min(captured))
+        )
+    ctx_ = override_var(ctx, {n: Status.TT for n in targets})
     check_exprs(g.ifs, ctx_)
     check_comprehension(elts, generators[1:], ctx_)
 

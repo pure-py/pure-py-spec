@@ -62,6 +62,14 @@ class SelfCaptureAssignment:
 
 
 @dataclass(frozen=True)
+class CapturedGeneratorVariable:
+    name: str
+
+    def message(self) -> str:
+        return f"'{self.name}' bound by a generator, captured by a lambda"
+
+
+@dataclass(frozen=True)
 class UnreachableStatement:
     def message(self) -> str:
         return "unreachable statement"
@@ -254,6 +262,7 @@ Reason = (
     | UnassignedVariable
     | CapturedReassignment
     | SelfCaptureAssignment
+    | CapturedGeneratorVariable
     | UnreachableStatement
     | ConstructorArityMismatch
     | PatternArityMismatch

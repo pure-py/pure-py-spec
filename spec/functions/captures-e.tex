@@ -1,1 +1,6 @@
-\capturesE(\exLambda{\seq{x}}{e}) &= \fvE(e) \setminus \set{\seq{x}}
+\capturesE(\exLambda{\seq{x}}{e}) &= \fvE(e) \setminus \set{\seq{x}} \\*
+\capturesE(\exListComp{e}{\seq{g}}) &= \capturesE(\seq{g}) \cup (\capturesE(e) \setminus \binds(\seq{g})) \\*
+\capturesE(\exDictComp{e}{e'}{\seq{g}}) &= \capturesE(\seq{g}) \cup ((\capturesE(e) \cup \capturesE(e')) \setminus \binds(\seq{g})) \\*
+\capturesE(\varepsilon) &= \varnothing \\*
+\capturesE(\qualGuard{e} \cons \seq{g}) &= \capturesE(e) \cup \capturesE(\seq{g}) \\*
+\capturesE(\qualGenerator{x}{e} \cons \seq{g}) &= \capturesE(e) \cup (\capturesE(\seq{g}) \setminus \set{x})
