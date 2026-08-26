@@ -2,8 +2,8 @@
 \label{sec:syntax}
 
 The syntax of \PurePy is given in \figrefThree{syntax-stmt}{syntax-expr}{syntax-types}. Statements are sequenced by
-juxtaposition, $s\;s'$; a function body, a branch of a conditional and the body of a case are statements,
-and a module's statement $b$ is optional. A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal
+juxtaposition, $s\;s'$; a function body, a branch of a conditional, the body of a case and the body of a module after its
+imports are statements. A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal
 run of consecutive \pyinline{def} statements in a sequence: any other statement separates mutual
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single region. The well-formedness rules treat each region as
@@ -108,20 +108,20 @@ A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualifie
 (\figref{syntax-stmt}) to \emph{module bodies} $t$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
 $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
-$\seq{\iota}$ followed by an optional statement $b$; since imports are not statements, they can appear
-neither within a statement (and hence not in function bodies) nor after it. The
-well-formedness and evaluation rules check and evaluate the body of each module $\mathcal{M}(q)$ with the
-assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$ prepended, modelling the
-$\pymath{\_\_name\_\_}$ binding the runtime supplies automatically.
+$\seq{\iota}$ followed by a statement $s$; since imports are not statements, they can appear neither
+within a statement (and hence not in function bodies) nor after it. The statement begins with the
+assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$, which the encoding of a source tree
+supplies, modelling the $\pymath{\_\_name\_\_}$ binding the runtime supplies automatically.
 
 A second map $\mathcal{P}$ gives the
 predefined modules of \figref{predefined}, which have no body: $\mathcal{P}$ takes each such name to its
 environment and context (Definition~\ref{def:predefined}). The two domains are disjoint, and their union is
 prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$ is itself in
-$\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is its \texttt{.py}
-file, each package's body is its \texttt{\_\_init\_\_.py}, and a package directory without an
-\texttt{\_\_init\_\_.py} encodes the empty body (a namespace package, PEP 420, \url{https://peps.python.org/pep-0420/}). Prefix-closure thus holds by
-construction.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
+$\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: each module's body is the statements of its
+\texttt{.py} file, or of its \texttt{\_\_init\_\_.py} for a package, preceded by the assignment
+$\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$; a package directory without an \texttt{\_\_init\_\_.py}
+(a namespace package, PEP 420, \url{https://peps.python.org/pep-0420/}) encodes that assignment alone.
+Prefix-closure thus holds by construction.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
 definitions that follow, as is the name $q$ of the enclosing module in the rules that check or evaluate a single module's body.
 
 

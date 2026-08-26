@@ -153,10 +153,10 @@
 \and
 \inferrule*[lab={\ruleName{eval-module}}]
 {
-  \mathcal{M}(q) = \seq{\iota}\;b \\
+  \mathcal{M}(q) = \seq{\iota}\;s \\
    \seq{\iota} \Rightarrow \val{\rho} \\
   \mathcal{P}(\pyinline{builtins}) = (\rho', \Gamma') \\
-  \rho' \mathbin{\override} \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)})\;b \Rightarrow \assigns{\rho^\dagger}
+  \rho' \mathbin{\override} \rho, s \Rightarrow \assigns{\rho^\dagger}
 }
 {
   q \Rightarrow_{\mathsf{load}} \val{(\submods(q) \override \rho^\dagger)}
@@ -164,7 +164,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-module-fail}}]
 {
-  \mathcal{M}(q) = \seq{\iota}\;b \\
+  \mathcal{M}(q) = \seq{\iota}\;s \\
    \seq{\iota} \Rightarrow \aborts{\kappa}
 }
 {
@@ -173,10 +173,10 @@
 \and
 \inferrule*[lab={\ruleName{eval-module-fail-body}}]
 {
-  \mathcal{M}(q) = \seq{\iota}\;b \\
+  \mathcal{M}(q) = \seq{\iota}\;s \\
    \seq{\iota} \Rightarrow \val{\rho} \\
   \mathcal{P}(\pyinline{builtins}) = (\rho', \Gamma') \\
-  \rho' \mathbin{\override} \rho, (\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)})\;b \Rightarrow \aborts{\kappa}
+  \rho' \mathbin{\override} \rho, s \Rightarrow \aborts{\kappa}
 }
 {
   q \Rightarrow_{\mathsf{load}} \aborts{\kappa}
