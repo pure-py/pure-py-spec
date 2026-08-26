@@ -55,7 +55,7 @@ In Python a closure holds a mutable binding, so a variable captured by a lambda 
 definition may be reassigned afterwards, changing what the function sees (\secref{no-mutable-state}).
 \PurePy excludes this: a variable captured by a statement may not be assigned later in the same sequence, nor
 by that statement itself. The \ruleName{seq} rule imposes the first as a side condition on a sequence
-$t\;t'$, $\capturesS(t) \cap \assignsS(t') = \varnothing$; in the example of \secref{no-mutable-state}, \pyinline{x} is captured by the
+$t\;t'$: no variable in $\capturesS(t)$ may be in $\assignsS(t')$. In the example of \secref{no-mutable-state}, \pyinline{x} is captured by the
 definition of \pyinline{g} and assigned by \pyinline{x = 6}, so the program is rejected. The
 \ruleName{assign} rule imposes the second, $x \notin \capturesE(e)$ for an assignment $x = e$, rejecting
 for instance \pyinline{x = lambda: x}, whose lambda under Python's late binding would return itself. A
