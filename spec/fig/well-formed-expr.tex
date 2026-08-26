@@ -238,7 +238,7 @@
 {
   \Gamma \vdash e \\
   \Gamma \override \set{\bind{x}{\statusDefAssigned}} \vdash \seq{g} : \Delta \\
-  x \notin \capturesE(\seq{g})
+  x \notin \capturesS(\seq{g})
 }
 {
   \Gamma \vdash \qualGenerator{x}{e} \cons \seq{g} : \set{\bind{x}{\statusDefAssigned}} \override \Delta

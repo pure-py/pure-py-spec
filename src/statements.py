@@ -6,9 +6,10 @@ from aux import (
     assigns_body,
     assigns_seq,
     binds,
+    binds_quals,
     captures_e,
-    captures_e_comprehension,
     captures_e_list,
+    captures_quals,
     captures_statement,
     find_first_reassigning,
     names_in_target,
@@ -324,22 +325,29 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
 def check_comprehension(
     elts: list[ast.expr], generators: list[ast.comprehension], ctx: ModuleContext
 ) -> None:
+    check_quals(generators, ctx)
+    bound = binds_quals(generators)
+    check_exprs(elts, override_var(ctx, {n: Status.TT for n in bound}))
+    captured = captures_e_list(elts) & bound
+    if captured:
+        node = generators[0].target
+        raise IllFormedModule(node, reasons.CapturedGeneratorVariable(min(captured)))
+
+
+def check_quals(generators: list[ast.comprehension], ctx: ModuleContext) -> None:
     if len(generators) == 0:
-        check_exprs(elts, ctx)
         return
     g = generators[0]
     check_expr(g.iter, ctx)
     targets = names_in_target(g.target)
-    captured = targets & (
-        captures_e_list(g.ifs) | captures_e_comprehension(elts, generators[1:])
-    )
+    captured = targets & (captures_e_list(g.ifs) | captures_quals(generators[1:]))
     if captured:
         raise IllFormedModule(
             g.target, reasons.CapturedGeneratorVariable(min(captured))
         )
     ctx_ = override_var(ctx, {n: Status.TT for n in targets})
     check_exprs(g.ifs, ctx_)
-    check_comprehension(elts, generators[1:], ctx_)
+    check_quals(generators[1:], ctx_)
 
 
 def check_exprs(es: list[ast.expr], ctx: ModuleContext) -> None:
