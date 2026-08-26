@@ -8,6 +8,7 @@
 *.zip
 *.out
 agda/_build/
+submission/
 .venv/
 __pycache__/
 

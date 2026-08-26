@@ -33,11 +33,20 @@ paper-anon.pdf: $(TEXFILES) | clean-aux
 	$(PDFLATEX) -jobname=paper-anon "\def\anonmode{}\input{paper.tex}"
 	$(PDFLATEX) -jobname=paper-anon "\def\anonmode{}\input{paper.tex}"
 
+SUBMIT_DIR := submission
+
+submit: paper-anon.pdf spec-anon.pdf
+	rm -rf $(SUBMIT_DIR)
+	mkdir $(SUBMIT_DIR)
+	cp paper-anon.pdf $(SUBMIT_DIR)/main.pdf
+	cp spec-anon.pdf $(SUBMIT_DIR)/specification.pdf
+	cd $(SUBMIT_DIR) && zip -q -9 supplementary.zip specification.pdf && rm specification.pdf
+
 clean-aux:
 	rm -f $(AUX)
 
 clean: clean-aux
-	rm -f *.pdf $(ARXIV_ZIP)
+	rm -rf *.pdf $(ARXIV_ZIP) $(SUBMIT_DIR)
 
 arXiv: $(ARXIV_ZIP)
 
@@ -45,4 +54,4 @@ $(ARXIV_ZIP): $(ARXIV_FILES)
 	rm -f $@
 	zip -9 $@ $^
 
-.PHONY: default spec spec-anon anon clean-aux clean arXiv
+.PHONY: default spec spec-anon anon submit clean-aux clean arXiv
