@@ -25,16 +25,16 @@ spec.pdf: $(TEXFILES) | clean-aux
 	$(PDFLATEX) -jobname=spec "\def\anonmode{}\input{PurePy-spec.tex}"
 	$(PDFLATEX) -jobname=spec "\def\anonmode{}\input{PurePy-spec.tex}"
 
-anon: main.pdf
+anon: paper-anon.pdf
 
-main.pdf: $(TEXFILES) | clean-aux
-	$(PDFLATEX) -jobname=main "\def\anonmode{}\input{paper.tex}"
-	bibtex main
-	$(PDFLATEX) -jobname=main "\def\anonmode{}\input{paper.tex}"
-	$(PDFLATEX) -jobname=main "\def\anonmode{}\input{paper.tex}"
+paper-anon.pdf: $(TEXFILES) | clean-aux
+	$(PDFLATEX) -jobname=paper-anon "\def\anonmode{}\input{paper.tex}"
+	bibtex paper-anon
+	$(PDFLATEX) -jobname=paper-anon "\def\anonmode{}\input{paper.tex}"
+	$(PDFLATEX) -jobname=paper-anon "\def\anonmode{}\input{paper.tex}"
 
 # Zip rather than a bare PDF, to make room for a mechanisation.
-submit: main.pdf supplementary.zip
+submit: paper-anon.pdf supplementary.zip
 
 supplementary.zip: spec.pdf
 	rm -f $@
