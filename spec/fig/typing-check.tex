@@ -58,7 +58,8 @@
 \inferrule*[lab={\ruleName{list-comp}}]
 {
   \Gamma \vdash \seq{g} : \Delta \\
-  \Gamma \override \Delta \vdash e \checks \tau
+  \Gamma \override \Delta \vdash e \checks \tau \\
+  \capturesE(e) \cap \dom(\Delta) = \varnothing
 }
 {
   \Gamma \vdash \exListComp{e}{g_1\;\ldots\;g_n} \checks \tyList{\tau}
@@ -68,7 +69,8 @@
 {
   \Gamma \vdash \seq{g} : \Delta \\
   \Gamma \override \Delta \vdash e \checks \tyStr \\
-  \Gamma \override \Delta \vdash e' \checks \tau
+  \Gamma \override \Delta \vdash e' \checks \tau \\
+  (\capturesE(e) \cup \capturesE(e')) \cap \dom(\Delta) = \varnothing
 }
 {
   \Gamma \vdash \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \checks \tyDict{\tau}
@@ -104,7 +106,8 @@
 {
   \Gamma \vdash e \synth \tau \\
   \elemTy(\tau) = \sigma \\
-  \Gamma \override \set{\bind{x}{\sigma}} \vdash \seq{g} : \Delta
+  \Gamma \override \set{\bind{x}{\sigma}} \vdash \seq{g} : \Delta \\
+  x \notin \capturesS(\seq{g})
 }
 {
   \Gamma \vdash \qualGenerator{x}{e} \cons \seq{g} : \set{\bind{x}{\sigma}} \override \Delta

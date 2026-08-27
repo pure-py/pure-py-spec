@@ -42,6 +42,19 @@ annotations for its parameters, so both take their type from the surroundings. O
 rule changes direction: an expression that synthesises $\sigma$ checks against any supertype of $\sigma$
 (\ruleName{check-synth}).
 
+The division follows the usual recipe for bidirectional systems~\cite{davies2000,dunfield2021}: introduction forms
+check, since a lambda or an empty list does not determine its own type, and elimination forms synthesise,
+since a call, a subscript or an attribute reference starts from a subterm whose type is known. A system
+that follows the recipe strictly relies on an annotation form $(e \mathbin{:} \tau)$, which synthesises by
+construction, so that a checking form can stand where synthesis is required. Python annotates binders and
+never expressions, so \PurePy gives the introduction forms synthesis rules of their own wherever their
+parts determine the type: a non-empty list, tuple or dictionary, and a comprehension
+(\ruleName{syn-list}, \ruleName{syn-tuple}, \ruleName{syn-dict}, \ruleName{syn-list-comp},
+\ruleName{syn-dict-comp}). The checking rules remain for what synthesis cannot reach, an empty list or
+dictionary, a lambda, and an expression whose expected type is wider than the one it synthesises. Swift,
+Kotlin and Scala take the element type of a collection from its elements in the same
+way~\cite{swift2025,kotlin2025,odersky2025}.
+
 Subtyping (\figref{subtyping}) is reflexivity, the widening of a literal type, the union rules and the
 ancestors of a class, with \pyinline{object} above every type and \pyinline{Never} below every type. Lists,
 dictionaries, tuples and callables are related only by reflexivity: \pyinline{list} and \pyinline{dict} are
@@ -89,7 +102,7 @@ Merging two branches merges their contexts pointwise. A variable definitely assi
 $\tau'$, is of type $\joinTy(\tau, \tau')$. Writing the \emph{members} of a type for its operands where it
 is a union and for the type itself otherwise, $\joinTy(\tau, \tau')$ is the union of the members of $\tau$
 and $\tau'$, less any member that is a subtype of another, and is that member alone where one remains.
-Joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor,
+Joining a sequence of types folds $\joinTy$ over them. Joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor,
 and joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$. A variable definitely
 assigned in one branch alone is $\statusNotDefAssigned$.
 

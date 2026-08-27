@@ -155,6 +155,52 @@
 {
   \Gamma \vdash \exSubscript{e}{e'} \synth \tau_1 \mathbin{|} \ldots \mathbin{|} \tau_m
 }
+\and
+\inferrule*[lab={\ruleName{syn-list}}]
+{
+  \Gamma \vdash e_i \synth \tau_i \quad (\forall i)
+}
+{
+  \Gamma \vdash \exList{e_1, \ldots, e_{n+1}} \synth \tyList{\joinTy(\tau_1, \ldots, \tau_{n+1})}
+}
+\and
+\inferrule*[lab={\ruleName{syn-tuple}}]
+{
+  \Gamma \vdash e_i \synth \tau_i \quad (\forall i)
+}
+{
+  \Gamma \vdash \exTuple{e_1, \ldots, e_n} \synth \tyTuple{\tau_1, \ldots, \tau_n}
+}
+\and
+\inferrule*[lab={\ruleName{syn-dict}}]
+{
+  \Gamma \vdash e_i \checks \tyStr \quad (\forall i) \\
+  \Gamma \vdash e_i' \synth \tau_i \quad (\forall i)
+}
+{
+  \Gamma \vdash \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_{n+1}}{e_{n+1}'}} \synth \tyDict{\joinTy(\tau_1, \ldots, \tau_{n+1})}
+}
+\and
+\inferrule*[lab={\ruleName{syn-list-comp}}]
+{
+  \Gamma \vdash \seq{g} : \Delta \\
+  \Gamma \override \Delta \vdash e \synth \tau \\
+  \capturesE(e) \cap \dom(\Delta) = \varnothing
+}
+{
+  \Gamma \vdash \exListComp{e}{g_1\;\ldots\;g_n} \synth \tyList{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{syn-dict-comp}}]
+{
+  \Gamma \vdash \seq{g} : \Delta \\
+  \Gamma \override \Delta \vdash e \checks \tyStr \\
+  \Gamma \override \Delta \vdash e' \synth \tau \\
+  (\capturesE(e) \cup \capturesE(e')) \cap \dom(\Delta) = \varnothing
+}
+{
+  \Gamma \vdash \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \synth \tyDict{\tau}
+}
 \end{mathpar}
 \caption{Expression $e$ synthesises type $\tau$ under $\Gamma$}
 \label{fig:typing-synth}
