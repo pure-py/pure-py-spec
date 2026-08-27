@@ -35,8 +35,8 @@ literal synthesises the negated literal type (\ruleName{unop-literal}), and \rul
 form, to keep the judgement deterministic.
 
 Lambdas check, as do lists, tuples, dictionaries and comprehensions. Their types are not determined by
-the expression alone: $\exList{}$ is a list of any element type, and Python's grammar gives a lambda no
-annotations for its parameters, so both take their type from the surroundings. One
+the expression alone: $\exList{}$ is a list of any element type, and a lambda's parameters cannot be annotated in
+Python, so both take their type from the surroundings. One
 rule changes direction: an expression that synthesises $\sigma$ checks against any supertype of $\sigma$
 (\ruleName{check-synth}).
 
