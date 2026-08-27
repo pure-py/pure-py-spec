@@ -12,8 +12,7 @@ and \emph{checking} $\Gamma \vdash e \checks \tau$ tests an expression against a
 surroundings (\figref{typing-check}).
 
 Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise. A
-literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base type} $\widen(\ell)$ is
-the type of its form:
+literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base type} is $\widen(\ell)$:
 \begin{defalign}
 \widen(n) & = \tyInt \quad \text{($n$ an integer literal)} \\
 \widen(n) & = \tyFloat \quad \text{($n$ a float literal)} \\
