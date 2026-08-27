@@ -23,7 +23,7 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base
 
 \noindent The \emph{alternatives} of a type are the sequence of a union's operands, and the type itself
 otherwise. Two types are \emph{comparable} when either is a subtype of the other; two comparable types
-\emph{join} to the larger of them and two incomparable types to their union, and a longer sequence folds:
+\emph{join} to the larger type and two incomparable types to their union, and a longer sequence folds:
 \begin{defalign}
 \membersOf(\tyUnion{\sigma}{\tau}) & = \membersOf(\sigma) \mathbin{\concat} \membersOf(\tau) \\
 \membersOf(\tau) & = \tau \quad \text{(otherwise)} \\[3mm]
