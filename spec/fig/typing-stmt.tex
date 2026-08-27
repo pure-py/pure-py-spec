@@ -90,14 +90,14 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \Delta_i = \set{\bind{x_{i1}}{\tau_{i1}}, \ldots, \bind{x_{in_i}}{\tau_{in_i}}} \quad (\forall i) \\
-  \Gamma \override \set{\bind{f_j}{\tyCallable{\seq{\tau}_j}{\tau_j}} \mid \forall j} \override \Delta_i \override \statusNotDefAssigned(\assignsS(s_i) \setminus \dom(\Delta_i)); \tau_i \vdash s_i : R_i \quad (\forall i)
+  \Delta_i = \set{\bind{\seq{x}_i}{\seq{\sigma}_i}} \quad (\forall i) \\
+  \Gamma \override \set{\bind{f_j}{\tyCallable{\seq{\sigma}_j}{\tau_j}} \mid \forall j} \override \Delta_i \override \statusNotDefAssigned(\assignsS(s_i) \setminus \dom(\Delta_i)); \tau_i \vdash s_i : R_i \quad (\forall i)
   \\
-  R_i = \Returns \text{ or } \tau_i = \tyNone \quad (\forall i) \\
+  R_i = \Returns \text{ or } \tyNone \subty \tau_i \quad (\forall i) \\
   \seq{f} \text{ distinct}
 }
 {
-  \Gamma; \tau \vdash \exDef{f_1}{\seq{x}_1\,\seq{\pi}_1}{\omega_1}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}\,\seq{\pi}_{n+1}}{\omega_{n+1}}{s_{n+1}} : \Assigns{\set{\bind{f_j}{\tyCallable{\seq{\tau}_j}{\tau_j}} \mid \forall j}}
+  \Gamma; \tau \vdash \exDef{f_1}{\bind{\seq{x}_1}{\seq{\sigma}_1}}{\exRetAnnot{\tau_1}}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\sigma}_{n+1}}}{\exRetAnnot{\tau_{n+1}}}{s_{n+1}} : \Assigns{\set{\bind{f_j}{\tyCallable{\seq{\sigma}_j}{\tau_j}} \mid \forall j}}
 }
 \and
 \inferrule*[lab={\ruleName{match}}]
