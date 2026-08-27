@@ -56,21 +56,21 @@
 \and
 \inferrule*[lab={\ruleName{syn-binop}}]
 {
-  \odot : (\tau, \tau') \to \tau'' \\
-  \Gamma \vdash e \checks \tau \\
-  \Gamma \vdash e' \checks \tau'
+  \odot : (\sigma, \sigma') \to \tau \\
+  \Gamma \vdash e \checks \sigma \\
+  \Gamma \vdash e' \checks \sigma'
 }
 {
-  \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \tau''
+  \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \tau
 }
 \and
 \inferrule*[lab={\ruleName{syn-unop}}]
 {
-  \ominus : \tau \to \tau' \\
-  \Gamma \vdash e \checks \tau
+  \ominus : \sigma \to \tau \\
+  \Gamma \vdash e \checks \sigma
 }
 {
-  \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau'
+  \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau
 }
 \and
 \inferrule*[lab={\ruleName{syn-and}}]
