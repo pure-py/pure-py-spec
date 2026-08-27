@@ -79,11 +79,12 @@ a subtype of the subject's type, so a case that cannot match is rejected rather 
 unreachable.
 
 Merging two branches merges their contexts pointwise. A variable definitely assigned in both, at $\tau$ and
-$\tau'$, is of their join under subtyping: $\tau'$ where $\tau \subty \tau'$, and $\tyUnion{\tau}{\tau'}$
-where neither is a subtype of the other. The union is a join because it is an upper bound
-(\ruleName{subty-union-left}, \ruleName{subty-union-right}) below every other upper bound
-(\ruleName{subty-union}), so types are taken up to mutual subtyping. A variable definitely assigned in one
-branch alone is $\statusNotDefAssigned$.
+$\tau'$, is of type $\joinTy(\tau, \tau')$. Writing the \emph{members} of a type for its operands where it
+is a union and for the type itself otherwise, $\joinTy(\tau, \tau')$ is the union of the members of $\tau$
+and $\tau'$, less any member that is a subtype of another, and is that member alone where one remains.
+Joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor,
+and joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$. A variable definitely
+assigned in one branch alone is $\statusNotDefAssigned$.
 
 \input{spec/fig/typing-stmt}
 
