@@ -103,11 +103,11 @@
 \inferrule*[lab={\ruleName{qual-generator}}]
 {
   \Gamma \vdash e \synth \tau \\
-  \elemTy(\tau) = \tau' \\
-  \Gamma \override \set{\bind{x}{\tau'}} \vdash \seq{g} : \Delta
+  \elemTy(\tau) = \sigma \\
+  \Gamma \override \set{\bind{x}{\sigma}} \vdash \seq{g} : \Delta
 }
 {
-  \Gamma \vdash \qualGenerator{x}{e} \cons \seq{g} : \set{\bind{x}{\tau'}} \override \Delta
+  \Gamma \vdash \qualGenerator{x}{e} \cons \seq{g} : \set{\bind{x}{\sigma}} \override \Delta
 }
 \end{mathpar}
 \subcaption{Comprehension qualifiers $\seq{g}$ bind $\Delta$ under $\Gamma$}
