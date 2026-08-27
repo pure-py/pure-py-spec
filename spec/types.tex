@@ -49,8 +49,8 @@ that follows the recipe strictly relies on an annotation form $(e \mathbin{:} \t
 construction, so a checking form written with an annotation can be used where synthesis is required. Python has no such form, since it allows an annotation only on a
 parameter, a return or an assignment, so \PurePy gives the introduction forms synthesis rules of their own
 wherever their parts determine the type: a tuple when all its components synthesise, a
-comprehension when its body does, and a non-empty list or dictionary when at least one element does, the
-others checking against the join of those that do (\ruleName{syn-list}, \ruleName{syn-tuple},
+comprehension when its body synthesises, and a non-empty list or dictionary when at least one element
+synthesises, the others checking against the join of the types of those that synthesise (\ruleName{syn-list}, \ruleName{syn-tuple},
 \ruleName{syn-dict}, \ruleName{syn-list-comp}, \ruleName{syn-dict-comp}). The checking rules remain for what synthesis cannot reach, an empty list or
 dictionary, a lambda, and an expression whose expected type is wider than the one it synthesises. Swift,
 Kotlin and Scala take the element type of a collection from its elements in the same
