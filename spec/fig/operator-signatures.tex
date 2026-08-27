@@ -1,30 +1,32 @@
 \begin{figure}
 \small
 \begin{center}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.41\textwidth}>{\raggedright\arraybackslash}p{0.26\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.37\textwidth}>{\raggedright\arraybackslash}p{0.32\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}$\odot$ & Signature & Condition \\
-\pyinline{==}\quad\pyinline{!=} & $(\sigma, \sigma') \to \tyBool$ & for all comparable $\sigma$, $\sigma'$ \\
-\pyinline{in}\quad\pyinline{not in} & $(\sigma, \tyList{\tau}) \to \tyBool$ & for all comparable $\sigma$, $\tau$ \\
- & $(\sigma, \tyTuple{\seq{\tau}}) \to \tyBool$ & for all $\sigma$, $\seq{\tau}$ with $\sigma$ and $\joinTy(\seq{\tau})$ comparable \\
+\pyinline{==}\quad\pyinline{!=} & $(\sigma, \sigma') \to \tyBool$ & $\forall \sigma, \sigma'$ comparable \\
+\pyinline{in}\quad\pyinline{not in} & $(\sigma, \tyList{\tau}) \to \tyBool$ & $\forall \sigma, \tau$ comparable \\
+ & $(\sigma, \tyTuple{\seq{\tau}}) \to \tyBool$ & $\forall \sigma, \seq{\tau}$ with $\sigma$, $\joinTy(\seq{\tau})$ comparable \\
  & $(\tyStr, \tyStr) \to \tyBool$ & \\
- & $(\tyStr, \tyDict{\tau}) \to \tyBool$ & for all $\tau$ \\
+ & $(\tyStr, \tyDict{\tau}) \to \tyBool$ & $\forall \tau$ \\
 \pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\tyFloat, \tyFloat) \to \tyBool$ & \\
  & $(\tyStr, \tyStr) \to \tyBool$ & \\
 \pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{//}\quad\pyinline{\%} & $(\tyInt, \tyInt) \to \tyInt$ & \\
  & $(\tyFloat, \tyFloat) \to \tyFloat$ & \\
 \pyinline{/} & $(\tyFloat, \tyFloat) \to \tyFloat$ & \\
 \pyinline{+} & $(\tyStr, \tyStr) \to \tyStr$ & \\
- & $(\tyList{\sigma}, \tyList{\tau}) \to \tyList{\joinTy(\sigma, \tau)}$ & for all $\sigma$, $\tau$ \\
- & $(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) \to \tyTuple{\seq{\sigma} \mathbin{\concat} \seq{\tau}}$ & for all $\seq{\sigma}$, $\seq{\tau}$ \\
-\pyinline{*} & $(\tyStr, \tyInt) \to \tyStr$, $(\tyInt, \tyStr) \to \tyStr$ & \\
- & $(\tyList{\tau}, \tyInt) \to \tyList{\tau}$, $(\tyInt, \tyList{\tau}) \to \tyList{\tau}$ & for all $\tau$ \\
+ & $(\tyList{\sigma}, \tyList{\tau}) \to \tyList{\joinTy(\sigma, \tau)}$ & $\forall \sigma, \tau$ \\
+ & $(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) \to \tyTuple{\seq{\sigma} \mathbin{\concat} \seq{\tau}}$ & $\forall \seq{\sigma}, \seq{\tau}$ \\
+\pyinline{*} & $(\tyStr, \tyInt) \to \tyStr$ & \\
+ & $(\tyInt, \tyStr) \to \tyStr$ & \\
+ & $(\tyList{\tau}, \tyInt) \to \tyList{\tau}$ & $\forall \tau$ \\
+ & $(\tyInt, \tyList{\tau}) \to \tyList{\tau}$ & $\forall \tau$ \\
 \pyinline{**} & \multicolumn{2}{l}{\todo{Depends on the sign of the exponent: \pyinline{2 ** -1} is a \pyinline{float}}}
 \end{tabular}
 
 \vspace{3mm}
 
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.41\textwidth}>{\raggedright\arraybackslash}p{0.26\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.37\textwidth}>{\raggedright\arraybackslash}p{0.32\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}$\ominus$ & Signature & Condition \\
 \pyinline{not} & $\tyBool \to \tyBool$ & \\
