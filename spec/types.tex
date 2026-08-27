@@ -38,7 +38,7 @@ rule changes direction: an expression that synthesises $\sigma$ checks against a
 (\ruleName{check-synth}).
 
 Subtyping (\figref{subtyping}) is reflexivity, the widening of a literal type, the union rules and the
-ancestors of a class. Lists,
+ancestors of a class, with \pyinline{object} above every type and \pyinline{Never} below every type. Lists,
 dictionaries, tuples and callables are related only by reflexivity: \pyinline{list} and \pyinline{dict} are
 invariant in mypy, and \PurePy admits no program mypy rejects. A \pyinline{bool} is not an \pyinline{int},
 though Python treats it as one.

@@ -18,6 +18,22 @@
   q.c \subty q.c'
 }
 \and
+\inferrule*[lab={\ruleName{subty-never}}]
+{
+  \strut
+}
+{
+  \tyNever \subty \tau
+}
+\and
+\inferrule*[lab={\ruleName{subty-object}}]
+{
+  \strut
+}
+{
+  \tau \subty \tyObject
+}
+\and
 \inferrule*[lab={\ruleName{subty-literal}}]
 {
   \widen(\ell) = \tau
