@@ -66,8 +66,8 @@ dictionaries, tuples and callables are related only by reflexivity. The type sys
 mypy's: a well-typed \PurePy program should be accepted by mypy, and \PurePy may reject programs mypy
 accepts but not the reverse. So \pyinline{list} and \pyinline{dict} are invariant, as they are in mypy, although
 covariance would be sound here, since a \PurePy list cannot be written to; code that wants the covariant
-reading writes \pyinline{Sequence}, which mypy treats as covariant. An \pyinline{int} is a \pyinline{float}, the duck-type compatibility
-PEP~484 requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int},
+reading writes \pyinline{Sequence}, which mypy treats as covariant. An \pyinline{int} is a \pyinline{float}, as PEP~484 requires, so
+\pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int},
 though Python treats it as one.
 
 \input{spec/fig/operator-signatures}
