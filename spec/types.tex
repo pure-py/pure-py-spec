@@ -48,8 +48,9 @@ parameters, returns and assignments, so \PurePy gives the introduction forms syn
 wherever their parts determine the type: a tuple when all its components synthesise, a
 comprehension when its body synthesises, and a non-empty list or dictionary when at least one element
 synthesises, the others checking against the join of the types of those that synthesise (\ruleName{syn-list}, \ruleName{syn-tuple},
-\ruleName{syn-dict}, \ruleName{syn-list-comp}, \ruleName{syn-dict-comp}). The checking rules remain for what synthesis cannot reach, an empty list or
-dictionary, a lambda, and an expression whose expected type is wider than the one it synthesises. Swift,
+\ruleName{syn-dict}, \ruleName{syn-list-comp}, \ruleName{syn-dict-comp}). The checking rules remain for the cases the synthesis rules do not cover: an
+empty list or dictionary, a lambda, and an expression whose expected type is wider than the one it
+synthesises. Swift,
 Kotlin and Scala take the element type of a collection from its elements in the same
 way~\cite{swift2025,kotlin2025,odersky2025}.
 
