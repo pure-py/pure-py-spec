@@ -27,10 +27,8 @@ $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the entry $C
 (\ruleName{attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
 signature $\ominus : \sigma \to \tau$, relating operand types to result type
 (\figref{operator-signatures}). Two types are \emph{comparable} when either is a subtype of the other.
-Where several signatures apply, the one with the more specific operand types is used, so \pyinline{1 + 2}
-is an \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}. An operator marked numeric
-gives \pyinline{int} where both operands are \pyinline{int} and \pyinline{float} where either is
-\pyinline{float}. In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
+Where several signatures apply, the first listed is used, so \pyinline{1 + 2}
+is an \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}. In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
 (\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
 dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
 that synthesises a literal type gives the component type at that position, counting from the end where the index
