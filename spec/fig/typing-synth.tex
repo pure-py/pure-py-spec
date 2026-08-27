@@ -158,10 +158,13 @@
 \and
 \inferrule*[lab={\ruleName{syn-list}}]
 {
-  \Gamma \vdash e_i \synth \tau_i \quad (\forall i)
+  \varnothing \neq I \subseteq \set{1, \ldots, n+1} \\
+  \Gamma \vdash e_i \synth \tau_i \quad (\forall i \in I) \\
+  \tau = \textstyle\joinTy_{i \in I} \tau_i \\
+  \Gamma \vdash e_j \checks \tau \quad (\forall j \notin I)
 }
 {
-  \Gamma \vdash \exList{e_1, \ldots, e_{n+1}} \synth \tyList{\joinTy(\tau_1, \ldots, \tau_{n+1})}
+  \Gamma \vdash \exList{e_1, \ldots, e_{n+1}} \synth \tyList{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{syn-tuple}}]
@@ -175,10 +178,13 @@
 \inferrule*[lab={\ruleName{syn-dict}}]
 {
   \Gamma \vdash e_i \checks \tyStr \quad (\forall i) \\
-  \Gamma \vdash e_i' \synth \tau_i \quad (\forall i)
+  \varnothing \neq I \subseteq \set{1, \ldots, n+1} \\
+  \Gamma \vdash e_i' \synth \tau_i \quad (\forall i \in I) \\
+  \tau = \textstyle\joinTy_{i \in I} \tau_i \\
+  \Gamma \vdash e_j' \checks \tau \quad (\forall j \notin I)
 }
 {
-  \Gamma \vdash \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_{n+1}}{e_{n+1}'}} \synth \tyDict{\joinTy(\tau_1, \ldots, \tau_{n+1})}
+  \Gamma \vdash \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_{n+1}}{e_{n+1}'}} \synth \tyDict{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{syn-list-comp}}]
