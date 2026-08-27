@@ -1,7 +1,7 @@
 \section{Types}
 \label{sec:types}
 
-Well-formedness gives each expression a type. A context maps a variable to its type, so $\Gamma(x)$ is a
+The typing judgement gives each expression a type. A context maps a variable to its type, so $\Gamma(x)$ is a
 type $\tau$ where $x$ is definitely assigned and of type $\tau$, is $\statusNotDefAssigned$ where $x$ is in
 scope but not definitely assigned, and is $\bot$ where $x$ is not in scope
 (Definition~\ref{def:context}). Only the first case gives a type, so \ruleName{var} applies only to a
@@ -80,7 +80,7 @@ mirroring $\iterOp$ (\secref{auxiliary-values}):
 \noindent A tuple whose component types differ has no element type, so it cannot be iterated.
 
 Statements carry the return type of the function they appear in as a second argument to the left of the
-turnstile: $\Gamma; \tau \vdash t : R$ says that $t$ is well-formed in $\Gamma$ with result type $R$, in a
+turnstile: $\Gamma; \tau \vdash t : R$ says that $t$ has result type $R$ in $\Gamma$, in a
 function declared to return $\tau$ (\figref{typing-stmt}). The type $\tau$ is an obligation on the
 \pyinline{return} statements within $t$ rather than a property of $t$, so every rule passes it down
 unchanged. A \pyinline{return} checks its expression against $\tau$, and a bare
