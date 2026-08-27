@@ -3,7 +3,7 @@
 
 Well-formedness gives each expression a type. A context maps a variable to its type, so $\Gamma(x) = \tau$
 says that $x$ is definitely assigned and is of type $\tau$. A variable in scope but not definitely assigned
-is bound to $\statusNotDefAssigned$, which is not a type, so no rule gives such a variable one; a variable
+is bound to $\statusNotDefAssigned$, which is not a type, so \ruleName{var} does not apply to it; a variable
 that is not in scope is undefined in $\Gamma$ (Definition~\ref{def:context}). Every parameter, return and assignment carries an annotation, so the type of a definition is given rather
 than inferred from its body; within an expression, types flow in the two directions of a bidirectional
 system.
