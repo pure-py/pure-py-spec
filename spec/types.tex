@@ -22,8 +22,8 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base
 \end{defalign}
 
 \noindent The \emph{alternatives} of a type are the sequence of a union's operands, and the type itself
-otherwise. Two comparable types \emph{join} to the larger of them, and two incomparable types to their
-union, and a longer sequence folds:
+otherwise. Two types are \emph{comparable} when either is a subtype of the other; two comparable types
+\emph{join} to the larger of them and two incomparable types to their union, and a longer sequence folds:
 \begin{defalign}
 \membersOf(\tyUnion{\sigma}{\tau}) & = \membersOf(\sigma) \mathbin{\concat} \membersOf(\tau) \\
 \membersOf(\tau) & = \tau \quad \text{(otherwise)} \\[3mm]
@@ -44,7 +44,7 @@ $\fieldMap$, checks it against that field's type, and synthesises $q$ as a class
 $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the entry $C$ that $q$ resolves to
 (\ruleName{attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
 signature $\ominus : \sigma \to \tau$, relating operand types to result type
-(\figref{operator-signatures}). Two types are \emph{comparable} when either is a subtype of the other. A
+(\figref{operator-signatures}). A
 signature with type variables stands for all its instances, which agree on the result type.
 Where several signatures apply, the first listed is used, so \pyinline{1 + 2}
 is an \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}. In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
