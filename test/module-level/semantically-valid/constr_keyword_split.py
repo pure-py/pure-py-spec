@@ -7,7 +7,7 @@ class P:
     x: Any
     y: Any
 
-def sum_of(p):
+def sum_of(p: P) -> Any:
     match p:
         case P(a, b):
             return a + b

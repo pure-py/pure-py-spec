@@ -1,12 +1,12 @@
 b = True
 
-def g():
+def g() -> int:
     return 0
 
 if b:
-    def f():
+    def f() -> int:
         return g()  # sibling g, bound simultaneously, not the outer g
-    def g():
+    def g() -> int:
         return 1
     print(f())
 else:

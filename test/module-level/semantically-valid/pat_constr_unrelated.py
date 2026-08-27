@@ -10,7 +10,7 @@ class Left:
 class Right:
     y: Any
 
-def describe(v):
+def describe(v: Any) -> Any:
     match v:
         case Left(a):
             return a

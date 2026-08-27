@@ -1,4 +1,5 @@
-def f(v):
+from typing import Any
+def f(v: Any) -> int:
     match v:
         case (x, y):
             return x + y

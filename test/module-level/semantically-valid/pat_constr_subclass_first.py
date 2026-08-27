@@ -10,7 +10,7 @@ class Base:
 class Derived(Base):
     y: Any
 
-def describe(v):
+def describe(v: Any) -> Any:
     match v:
         case Derived(a, b):
             return b

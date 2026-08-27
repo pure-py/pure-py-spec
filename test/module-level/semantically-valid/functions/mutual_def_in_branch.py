@@ -1,14 +1,14 @@
 b = True
 
 if b:
-    def f():
+    def f() -> str:
         return g()
-    def g():
+    def g() -> str:
         return "via mutual region"
 else:
-    def f():
+    def f() -> str:
         return "f independent"
-    def g():
+    def g() -> str:
         return "g independent"
 
 print(f())

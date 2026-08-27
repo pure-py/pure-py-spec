@@ -1,5 +1,5 @@
 # rule: if / eval-if -- elif chain (>=3 branches; selects the elif)
-def classify(n):
+def classify(n: int) -> str:
     if n == 0:
         return "zero"
     elif n == 1:

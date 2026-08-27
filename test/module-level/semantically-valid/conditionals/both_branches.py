@@ -1,4 +1,4 @@
-def foo(a, b):
+def foo(a: int, b: int) -> str:
     if a < b:
         comp = "smaller"
     else:

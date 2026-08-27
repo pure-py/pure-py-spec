@@ -1,6 +1,7 @@
-def outer(x):
-    def middle(y):
-        def inner(z):
+from typing import Callable
+def outer(x: int) -> Callable[[int], Callable[[int], int]]:
+    def middle(y: int) -> Callable[[int], int]:
+        def inner(z: int) -> int:
             return x + y + z
         return inner
     return middle

@@ -1,4 +1,4 @@
-def f(n):
+def f(n: int) -> int:
     g = lambda x: x + n
     return g(1)
 

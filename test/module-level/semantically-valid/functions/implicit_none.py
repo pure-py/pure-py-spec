@@ -1,4 +1,4 @@
-def foo():
+def foo() -> None:
     return
 
 print(foo())
