@@ -14,5 +14,5 @@
 \eqOp(\delta, \delta') &{}= \pyinline{False} && \text{if } \dom(\delta) \neq \dom(\delta') \\*
 \\
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C}{\rho'}) &{}= \eqElems(\rho(x_1) \cons \ldots \cons \rho(x_n), \rho'(x_1) \cons \ldots \cons \rho'(x_n)) \\*
-&\qquad \text{if } \fields(C) = x_1, \ldots, x_n \\*
+&\qquad \text{if } \dom(\fields(C)) = x_1, \ldots, x_n \\*
 \eqOp(\exObj{\Gamma}{C}{\rho}, \exObj{\Gamma'}{C'}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq C'

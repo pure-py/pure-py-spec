@@ -34,9 +34,9 @@
 {
   \Gamma \vdash q : C \\
   q \subty \tau \\
-  \Gamma \vdash \fieldMap(C, \seq{p})(x) \checks \fieldTy(C, x) \binding \Delta_x \quad (\forall x \in \fields(C))
+  \Gamma \vdash \fieldMap(C, \seq{p})(x) \checks \tau \binding \Delta_x \quad (\forall \bind{x}{\tau} \in \fields(C))
 }
-{ \Gamma \vdash \patConstr{q}{\seq{p}} \checks \tau \binding \textstyle\bigotimes_{x \in \fields(C)} \Delta_x }
+{ \Gamma \vdash \patConstr{q}{\seq{p}} \checks \tau \binding \textstyle\bigotimes_{x \in \dom(\fields(C))} \Delta_x }
 \and
 \inferrule*[lab={\ruleName{pat-as}}]
 { \Gamma \vdash p \checks \tau \binding \Delta }

@@ -22,10 +22,10 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base
 \end{defalign}
 
 \noindent A class entry $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ records the declared
-type of each field it introduces, and $\fieldTy(C, x)$ is the type of field $x$ of $C$, taken from the base class
-if $x$ is inherited. A constructor call $\exConstr{q}{\seq{e}}$ pairs each argument with a field using
+type of each field it introduces, and $\fields(C)$ is the bindings of all its fields, those of the base
+class first. A constructor call $\exConstr{q}{\seq{e}}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises $q$ itself (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must synthesise a class $q$, and
-$\exAttr{e}{x}$ then has type $\fieldTy(C, x)$, for the entry $C$ that $q$ resolves to
+$\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the entry $C$ that $q$ resolves to
 (\ruleName{attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
 signature $\ominus : \sigma \to \tau$, relating operand types to result type. In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list or
 string with $e'$ of type \pyinline{int}, and a dictionary with $e'$ of type \pyinline{str}. A tuple has two rules, since a component's type
