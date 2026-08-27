@@ -50,15 +50,14 @@ since a call, a subscript or an attribute reference starts from a subterm whose 
 follow the recipe strictly usually rely on an annotation form $(e \mathbin{:} \tau)$, which synthesises by
 construction, so a checking form written with an annotation can be used in any context where synthesis is required. Python has no such form, allowing annotations only on
 parameters, returns and assignments, so \PurePy gives the introduction forms synthesis rules of their own
-wherever their parts determine the type: a tuple when all its components synthesise, a
+wherever their parts determine the type, as Swift, Kotlin and Scala take the element type of a collection
+from its elements~\cite{swift2025,kotlin2025,odersky2025}: a tuple when all its components synthesise, a
 comprehension when its body synthesises, and a non-empty list or dictionary when at least one element
 synthesises, the others checking against the join of the types of those that synthesise (\ruleName{syn-list}, \ruleName{syn-tuple},
 \ruleName{syn-dict}, \ruleName{syn-list-comp}, \ruleName{syn-dict-comp}). Each of these forms keeps its checking rule as well. An empty list or dictionary and a lambda have no
 synthesis rule at all, so checking is the only way to type them. A non-empty list has both, and the
 checking rule is still needed where the expected element type is wider than the one the elements
-synthesise, since \pyinline{list} is invariant. Swift,
-Kotlin and Scala take the element type of a collection from its elements in the same
-way~\cite{swift2025,kotlin2025,odersky2025}.
+synthesise, since \pyinline{list} is invariant.
 
 Subtyping (\figref{subtyping}) is reflexivity, the widening of a literal type, the union rules and the
 ancestors of a class, with \pyinline{object} above every type and \pyinline{Never} below every type. Lists,
