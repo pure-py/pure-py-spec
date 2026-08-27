@@ -59,3 +59,29 @@ mirroring $\iterOp$ (\secref{auxiliary-values}):
 \end{defalign}
 
 \noindent A tuple whose component types differ has no element type, so it cannot be iterated.
+
+Statements carry the return type of the function they appear in: $\Gamma \vdash_\sigma t : R$ says that $t$
+is well-formed in $\Gamma$ with result type $R$, in a function declared to return $\sigma$
+(\figref{typing-stmt}). A \pyinline{return} checks its expression against $\sigma$, and a bare
+\pyinline{return} requires $\sigma$ to admit \pyinline{None}. An assignment takes its type from its
+annotation and checks the expression against it; the conditions of \pyinline{if} and \pyinline{assert}
+check against \pyinline{bool}, and an assertion message against \pyinline{str}.
+
+A function definition binds its parameters at their annotated types and its own name, and the names of the
+region it belongs to, at the corresponding $\pyinline{Callable}$ type; the variables the body assigns start
+at $\statusNotDefAssigned$, as they do without types (\ruleName{ty-def}). The body is checked with the
+declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
+so a function that declares a result definitely returns one.
+
+A \pyinline{match} subject synthesises a type, and each pattern checks against it, binding its variables at
+the types of the positions they match (\figref{typing-pat}). A constructor pattern requires its class to be
+a subtype of the subject's type, so a case that cannot match is rejected rather than being merely
+unreachable.
+
+Merging two branches merges their contexts pointwise: a variable definitely assigned in both, at $\tau$
+and $\tau'$, is of type $\tyUnion{\tau}{\tau'}$ afterwards, and a variable definitely assigned in one
+branch alone is $\statusNotDefAssigned$.
+
+\input{spec/fig/typing-stmt}
+
+\input{spec/fig/typing-pat}
