@@ -11,23 +11,25 @@ system.
 and \emph{checking} $\Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
 surroundings (\figref{typing-check}).
 
-Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise.
-Each literal form has a type, given by $\tyOf$:
+Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise. A
+literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, which $\widen$ widens to the type of its
+form:
 \begin{defalign}
-\tyOf(n) & = \tyInt \quad \text{($n$ an integer literal)} \\
-\tyOf(n) & = \tyFloat \quad \text{($n$ a float literal)} \\
-\tyOf(w) & = \tyStr \\
-\tyOf(\pyinline{True}) = \tyOf(\pyinline{False}) & = \tyBool \\
-\tyOf(\pyinline{None}) & = \tyNone
+\widen(n) & = \tyInt \quad \text{($n$ an integer literal)} \\
+\widen(n) & = \tyFloat \quad \text{($n$ a float literal)} \\
+\widen(w) & = \tyStr \\
+\widen(\pyinline{True}) = \widen(\pyinline{False}) & = \tyBool \\
+\widen(\pyinline{None}) & = \tyNone
 \end{defalign}
 
 \noindent A class entry $C$ maps each field name to its declared type. A constructor call pairs each
 argument with a field through $\fieldMap$, checks the argument against that field's type, and synthesises
 the class (\ruleName{syn-constr}). In an attribute reference the object must synthesise a class, and the reference then has the type of the
 field named (\ruleName{syn-attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
-signature $\ominus : \sigma \to \tau$, relating operand types to result type. Subscripting has a rule for each container the subscript expression can synthesise: a list or string
-subscripted by an \pyinline{int}, a dictionary by a \pyinline{str}, and a tuple by a literal index, which
-must be one of its component positions, since the components have different types.
+signature $\ominus : \sigma \to \tau$, relating operand types to result type. Subscripting has a rule for each container the subscripted expression can synthesise: a list or string
+subscripted by an \pyinline{int}, and a dictionary by a \pyinline{str}. A tuple has two rules, since its
+components have different types: an index that synthesises a literal type in range gives the component at
+that position, and any other index of type \pyinline{int} gives the union of the components.
 
 Lambdas, list, tuple and dictionary expressions and comprehensions check. Their types are not determined by
 the expression alone: $\exList{}$ is a list of any element type, and a lambda has no annotations to declare
@@ -35,7 +37,8 @@ its parameter types, since Python's grammar admits none, so both take their type
 rule changes direction: an expression that synthesises $\sigma$ checks against any supertype of $\sigma$
 (\ruleName{check-synth}).
 
-Subtyping (\figref{subtyping}) is reflexivity, the union rules and the ancestors of a class. Lists,
+Subtyping (\figref{subtyping}) is reflexivity, the widening of a literal type, the union rules and the
+ancestors of a class. Lists,
 dictionaries, tuples and callables are related only by reflexivity: \pyinline{list} and \pyinline{dict} are
 invariant in mypy, and \PurePy admits no program mypy rejects. A \pyinline{bool} is not an \pyinline{int},
 though Python treats it as one.

@@ -18,6 +18,14 @@
   q.c \subty q.c'
 }
 \and
+\inferrule*[lab={\ruleName{subty-literal}}]
+{
+  \widen(\ell) = \tau
+}
+{
+  \tyLiteral{\ell} \subty \tau
+}
+\and
 \inferrule*[lab={\ruleName{subty-union-left}}]
 {
   \strut

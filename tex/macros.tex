@@ -131,6 +131,7 @@
 \newcommand*{\tyDict}[1]{\pyinline{dict}[\tyStr, #1]}
 \newcommand*{\tyCallable}[2]{\pyinline{Callable}[[#1], #2]}
 \newcommand*{\tyUnion}[2]{#1 \mathbin{|} #2}
+\newcommand*{\tyLiteral}[1]{\pyinline{Literal}[#1]}
 \newcommand*{\exAnnot}[1]{\mathord{:}\;#1}
 \newcommand*{\exRetAnnot}[1]{\;\pymath{-\raisebox{-0.15ex}{>}}\;#1}
 
@@ -161,7 +162,7 @@
 \newcommand*{\synth}{\mathrel{\triangleright}}
 \newcommand*{\checks}{\mathrel{\triangleleft}}
 \newcommand*{\subty}{\mathrel{<:}}
-\newcommand*{\tyOf}{\mathrm{literal\text{-}type}}
+\newcommand*{\widen}{\mathrm{widen}}
 \newcommand*{\elemTy}{\mathrm{elem\text{-}type}}
 \newcommand*{\meet}{\wedge}
 \newcommand*{\merge}{\oplus}

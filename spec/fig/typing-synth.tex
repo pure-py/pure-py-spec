@@ -15,7 +15,7 @@
   \strut
 }
 {
-  \Gamma \vdash \ell \synth \tyOf(\ell)
+  \Gamma \vdash \ell \synth \tyLiteral{\ell}
 }
 \and
 \inferrule*[lab={\ruleName{syn-attr-module}}]
@@ -120,11 +120,21 @@
 \and
 \inferrule*[lab={\ruleName{syn-subscript-tuple}}]
 {
-  \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_{n+1}} \\
-  0 \leq i \leq n
+  \Gamma \vdash e \synth \tyTuple{\tau_0, \ldots, \tau_m} \\
+  \Gamma \vdash e' \synth \tyLiteral{n} \\
+  0 \leq n \leq m
 }
 {
-  \Gamma \vdash \exSubscript{e}{i} \synth \tau_{i+1}
+  \Gamma \vdash \exSubscript{e}{e'} \synth \tau_n
+}
+\and
+\inferrule*[lab={\ruleName{syn-subscript-tuple-int}}]
+{
+  \Gamma \vdash e \synth \tyTuple{\tau_0, \ldots, \tau_m} \\
+  \Gamma \vdash e' \synth \tyInt
+}
+{
+  \Gamma \vdash \exSubscript{e}{e'} \synth \tau_0 \mathbin{|} \ldots \mathbin{|} \tau_m
 }
 \end{mathpar}
 \caption{Expression $e$ synthesises type $\tau$ under $\Gamma$}
