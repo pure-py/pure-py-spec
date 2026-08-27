@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma \vdash_\sigma t : R$}
+\flushleft \shadebox{$\Gamma; \tau \vdash t : R$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{ty-pass}}]
@@ -7,24 +7,24 @@
   \strut
 }
 {
-  \Gamma \vdash_\sigma \exPass : \Assigns{\varnothing}
+  \Gamma; \tau \vdash \exPass : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{ty-assign}}]
 {
-  \Gamma \vdash e \checks \tau \\
+  \Gamma \vdash e \checks \sigma \\
   x \notin \capturesE(e)
 }
 {
-  \Gamma \vdash_\sigma \exAssign{x \exAnnot{\tau}}{e} : \Assigns{\set{\bind{x}{\tau}}}
+  \Gamma; \tau \vdash \exAssign{x \exAnnot{\sigma}}{e} : \Assigns{\set{\bind{x}{\sigma}}}
 }
 \and
 \inferrule*[lab={\ruleName{ty-expr-stmt}}]
 {
-  \Gamma \vdash e \synth \tau
+  \Gamma \vdash e \synth \sigma
 }
 {
-  \Gamma \vdash_\sigma e : \Assigns{\varnothing}
+  \Gamma; \tau \vdash e : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{ty-assert}}]
@@ -32,7 +32,7 @@
   \Gamma \vdash e \checks \tyBool
 }
 {
-  \Gamma \vdash_\sigma \exAssert{e} : \Assigns{\varnothing}
+  \Gamma; \tau \vdash \exAssert{e} : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{ty-assert-msg}}]
@@ -41,89 +41,89 @@
   \Gamma \vdash e' \checks \tyStr
 }
 {
-  \Gamma \vdash_\sigma \exAssertMsg{e}{e'} : \Assigns{\varnothing}
+  \Gamma; \tau \vdash \exAssertMsg{e}{e'} : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{ty-return-none}}]
 {
-  \tyNone \subty \sigma
+  \tyNone \subty \tau
 }
 {
-  \Gamma \vdash_\sigma \exReturnNone : \Returns
+  \Gamma; \tau \vdash \exReturnNone : \Returns
 }
 \and
 \inferrule*[lab={\ruleName{ty-return}}]
 {
-  \Gamma \vdash e \checks \sigma
+  \Gamma \vdash e \checks \tau
 }
 {
-  \Gamma \vdash_\sigma \exReturn{e} : \Returns
+  \Gamma; \tau \vdash \exReturn{e} : \Returns
 }
 \and
 \inferrule*[lab={\ruleName{ty-if}}]
 {
   \Gamma \vdash e_i \checks \tyBool \quad (\forall i) \\
-  \Gamma \vdash_\sigma s_i : R_i \quad (\forall i)
+  \Gamma; \tau \vdash s_i : R_i \quad (\forall i)
 }
 {
-  \Gamma \vdash_\sigma \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \merge \ldots \mathbin{\merge} R_{n+1} \: \merge \Assigns{\varnothing}
+  \Gamma; \tau \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \merge \ldots \mathbin{\merge} R_{n+1} \: \merge \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{ty-if-else}}]
 {
   \Gamma \vdash e_i \checks \tyBool \quad (\forall i) \\
-  \Gamma \vdash_\sigma s_i : R_i \quad (\forall i)
+  \Gamma; \tau \vdash s_i : R_i \quad (\forall i)
 }
 {
-  \Gamma \vdash_\sigma \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
+  \Gamma; \tau \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
 }
 \and
 \inferrule*[lab={\ruleName{ty-seq}}]
 {
-  \Gamma \vdash_\sigma t : \Assigns{\Delta} \\
-  \Gamma \override \Delta \vdash_\sigma t' : R \\
+  \Gamma; \tau \vdash t : \Assigns{\Delta} \\
+  \Gamma \override \Delta ; \tau \vdash t' : R \\
   \capturesS(t) \cap \assignsS(t') = \varnothing
 }
 {
-  \Gamma \vdash_\sigma t\;t' : \Assigns{\Delta} \override R
+  \Gamma; \tau \vdash t\;t' : \Assigns{\Delta} \override R
 }
 \and
 \inferrule*[lab={\ruleName{ty-def}}]
 {
   \Delta_i = \set{\bind{x_{i1}}{\tau_{i1}}, \ldots, \bind{x_{in_i}}{\tau_{in_i}}} \quad (\forall i) \\
-  \Gamma \override \set{\bind{f_j}{\tyCallable{\seq{\tau}_j}{\tau_j}} \mid \forall j} \override \Delta_i \override \statusNotDefAssigned(\assignsS(s_i) \setminus \dom(\Delta_i)) \vdash_{\tau_i} s_i : R_i \quad (\forall i)
+  \Gamma \override \set{\bind{f_j}{\tyCallable{\seq{\tau}_j}{\tau_j}} \mid \forall j} \override \Delta_i \override \statusNotDefAssigned(\assignsS(s_i) \setminus \dom(\Delta_i)); \tau_i \vdash s_i : R_i \quad (\forall i)
   \\
   R_i = \Returns \text{ or } \tau_i = \tyNone \quad (\forall i) \\
   \seq{f} \text{ distinct}
 }
 {
-  \Gamma \vdash_\sigma \exDef{f_1}{\seq{x}_1\,\seq{\pi}_1}{\omega_1}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}\,\seq{\pi}_{n+1}}{\omega_{n+1}}{s_{n+1}} : \Assigns{\set{\bind{f_j}{\tyCallable{\seq{\tau}_j}{\tau_j}} \mid \forall j}}
+  \Gamma; \tau \vdash \exDef{f_1}{\seq{x}_1\,\seq{\pi}_1}{\omega_1}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}\,\seq{\pi}_{n+1}}{\omega_{n+1}}{s_{n+1}} : \Assigns{\set{\bind{f_j}{\tyCallable{\seq{\tau}_j}{\tau_j}} \mid \forall j}}
 }
 \and
 \inferrule*[lab={\ruleName{ty-match}}]
 {
-  \Gamma \vdash e \synth \tau \\
-  \Gamma \vdash p_i \checks \tau \binding \Delta_i \quad (\forall i) \\
-  \Gamma \override \Delta_i \vdash_\sigma s_i : R_i \quad (\forall i) \\
+  \Gamma \vdash e \synth \sigma \\
+  \Gamma \vdash p_i \checks \sigma \binding \Delta_i \quad (\forall i) \\
+  \Gamma \override \Delta_i ; \tau \vdash s_i : R_i \quad (\forall i) \\
   S_i = \Assigns{\Delta_i} \override R_i \quad (\forall i) \\
   p_{n+1} \in \set{x, \patWild}
 }
 {
-  \Gamma \vdash_\sigma \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} : S_1 \merge \ldots \merge S_{n+1}
+  \Gamma; \tau \vdash \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} : S_1 \merge \ldots \merge S_{n+1}
 }
 \and
 \inferrule*[lab={\ruleName{ty-match-partial}}]
 {
-  \Gamma \vdash e \synth \tau \\
-  \Gamma \vdash p_i \checks \tau \binding \Delta_i \quad (\forall i) \\
-  \Gamma \override \Delta_i \vdash_\sigma s_i : R_i \quad (\forall i) \\
+  \Gamma \vdash e \synth \sigma \\
+  \Gamma \vdash p_i \checks \sigma \binding \Delta_i \quad (\forall i) \\
+  \Gamma \override \Delta_i ; \tau \vdash s_i : R_i \quad (\forall i) \\
   S_i = \Assigns{\Delta_i} \override R_i \quad (\forall i) \\
   p_{n+1} \notin \set{x, \patWild}
 }
 {
-  \Gamma \vdash_\sigma \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} : S_1 \merge \ldots \merge S_{n+1} \merge \Assigns{\varnothing}
+  \Gamma; \tau \vdash \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} : S_1 \merge \ldots \merge S_{n+1} \merge \Assigns{\varnothing}
 }
 \end{mathpar}
-\caption{Statement $t$ is well-formed in $\Gamma$ with result type $R$, in a function returning $\sigma$}
+\caption{Statement $t$ is well-formed in $\Gamma$ with result type $R$, in a function returning $\tau$}
 \label{fig:typing-stmt}
 \end{figure}
