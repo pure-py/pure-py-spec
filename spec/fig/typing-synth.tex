@@ -155,7 +155,15 @@
 {
   \Gamma \vdash \exSubscript{e}{e'} \synth \tau_1 \mathbin{|} \ldots \mathbin{|} \tau_m
 }
-\and
+\end{mathpar}
+\caption{Expression $e$ synthesises type $\tau$ under $\Gamma$}
+\label{fig:typing-synth}
+\end{figure}
+
+\begin{figure}
+\flushleft \shadebox{$\Gamma \vdash e \synth \tau$ (continued)}
+\begin{mathpar}
+\small
 \inferrule*[lab={\ruleName{syn-list}}]
 {
   \varnothing \neq I \subseteq \set{1, \ldots, n+1} \\
@@ -208,6 +216,6 @@
   \Gamma \vdash \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \synth \tyDict{\tau}
 }
 \end{mathpar}
-\caption{Expression $e$ synthesises type $\tau$ under $\Gamma$}
-\label{fig:typing-synth}
+\caption{Expression synthesis, continued}
+\label{fig:typing-synth-ctd}
 \end{figure}

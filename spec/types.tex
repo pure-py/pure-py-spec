@@ -5,7 +5,7 @@ The typing judgement gives each expression a type. The entry for a definitely as
 (Definition~\ref{def:context}), so \ruleName{var} applies whenever $\Gamma(x)$ is a type, and a variable
 bound to $\statusNotDefAssigned$ has no rule. Every parameter, return and assignment carries an annotation, so the type of a definition is given rather
 than inferred from its body; within an expression, typing is bidirectional.
-\emph{Synthesis} $\Gamma \vdash e \synth \tau$ reads a type out of an expression (\figref{typing-synth}),
+\emph{Synthesis} $\Gamma \vdash e \synth \tau$ reads a type out of an expression (\figrefTwo{typing-synth}{typing-synth-ctd}),
 and \emph{checking} $\Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
 surroundings (\figref{typing-check}).
 
