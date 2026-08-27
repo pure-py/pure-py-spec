@@ -29,10 +29,12 @@ $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the entry $C
 (\ruleName{attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
 signature $\ominus : \sigma \to \tau$, relating operand types to result type. In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
 (\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
-dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have two rules: an index
-that synthesises a literal type in range gives the component at that position
-(\ruleName{subscript-tuple}), and any other index of type \pyinline{int} gives the union of the components
-(\ruleName{subscript-tuple-int}).
+dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
+that synthesises a literal type gives the component at that position, counting from the end where the index
+is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and any other index of type
+\pyinline{int} gives the union of the components (\ruleName{subscript-tuple-int}). A negated numeric
+literal synthesises the negated literal type (\ruleName{unop-literal}), which is sharper than the type
+\ruleName{unop} gives it.
 
 Lambdas, list, tuple and dictionary expressions and comprehensions check. Their types are not determined by
 the expression alone: $\exList{}$ is a list of any element type, and Python's grammar gives a lambda no

@@ -73,6 +73,14 @@
   \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau
 }
 \and
+\inferrule*[lab={\ruleName{unop-literal}}]
+{
+  \strut
+}
+{
+  \Gamma \vdash \exUnOp{\pyinline{-}}{n} \synth \tyLiteral{-n}
+}
+\and
 \inferrule*[lab={\ruleName{and}}]
 {
   \Gamma \vdash e \checks \tyBool \\
@@ -120,21 +128,31 @@
 \and
 \inferrule*[lab={\ruleName{subscript-tuple}}]
 {
-  \Gamma \vdash e \synth \tyTuple{\tau_0, \ldots, \tau_m} \\
+  \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_m} \\
   \Gamma \vdash e' \synth \tyLiteral{n} \\
-  0 \leq n \leq m
+  0 \leq n < m
 }
 {
-  \Gamma \vdash \exSubscript{e}{e'} \synth \tau_n
+  \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{n+1}
+}
+\and
+\inferrule*[lab={\ruleName{subscript-tuple-neg}}]
+{
+  \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_m} \\
+  \Gamma \vdash e' \synth \tyLiteral{n} \\
+  {-m} \leq n < 0
+}
+{
+  \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{m+n+1}
 }
 \and
 \inferrule*[lab={\ruleName{subscript-tuple-int}}]
 {
-  \Gamma \vdash e \synth \tyTuple{\tau_0, \ldots, \tau_m} \\
+  \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_m} \\
   \Gamma \vdash e' \synth \tyInt
 }
 {
-  \Gamma \vdash \exSubscript{e}{e'} \synth \tau_0 \mathbin{|} \ldots \mathbin{|} \tau_m
+  \Gamma \vdash \exSubscript{e}{e'} \synth \tau_1 \mathbin{|} \ldots \mathbin{|} \tau_m
 }
 \end{mathpar}
 \caption{Expression $e$ synthesises type $\tau$ under $\Gamma$}
