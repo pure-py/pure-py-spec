@@ -67,7 +67,8 @@
 \inferrule*[lab={\ruleName{unop}}]
 {
   \ominus : \sigma \to \tau \\
-  \Gamma \vdash e \checks \sigma
+  \Gamma \vdash e \checks \sigma \\
+  \exUnOp{\ominus}{e} \neq \exUnOp{\pyinline{-}}{n} \quad (\forall n)
 }
 {
   \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau
