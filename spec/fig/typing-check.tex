@@ -6,7 +6,8 @@
 \inferrule*[lab={\ruleName{check-synth}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \sigma \subty \tau
+  \sigma \subty \tau \\
+  e \text{ not a lambda, list, tuple, dictionary or comprehension}
 }
 {
   \Gamma \vdash e \checks \tau
