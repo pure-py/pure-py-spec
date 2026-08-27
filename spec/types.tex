@@ -62,9 +62,9 @@ way~\cite{swift2025,kotlin2025,odersky2025}.
 
 Subtyping (\figref{subtyping}) is reflexivity, the widening of a literal type, the union rules and the
 ancestors of a class, with \pyinline{object} above every type and \pyinline{Never} below every type. Lists,
-dictionaries, tuples and callables are related only by reflexivity. The type system is a refinement of
-mypy's: a well-typed \PurePy program is accepted by mypy, and \PurePy may reject programs mypy accepts but
-never the reverse. So \pyinline{list} and \pyinline{dict} are invariant, as they are in mypy, although
+dictionaries, tuples and callables are related only by reflexivity. The type system is intended as a refinement of
+mypy's: a well-typed \PurePy program should be accepted by mypy, and \PurePy may reject programs mypy
+accepts but not the reverse. So \pyinline{list} and \pyinline{dict} are invariant, as they are in mypy, although
 covariance would be sound here, since a \PurePy list cannot be written to; code that wants the covariant
 reading writes \pyinline{Sequence}, which mypy treats as covariant. An \pyinline{int} is a \pyinline{float}, the duck-type compatibility
 PEP~484 requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int},
