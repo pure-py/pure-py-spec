@@ -21,7 +21,7 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base
 \widen(\pyinline{None}) & = \tyNone
 \end{defalign}
 
-\noindent A class entry $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{c'}$ records the declared
+\noindent A class entry $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ records the declared
 type of each field it introduces, and $\fieldTy(C, x)$ is the type of field $x$ of $C$, taken from the base class
 if $x$ is inherited. A constructor call $\exConstr{q}{\seq{e}}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises $q$ itself (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must synthesise a class $q$, and
