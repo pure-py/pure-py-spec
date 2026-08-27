@@ -53,6 +53,9 @@ def result_type(node: ast.stmt) -> ResultType:
         return Assigns(
             {t.id: Status.TT for t in node.targets if isinstance(t, ast.Name)}
         )
+    if isinstance(node, ast.AnnAssign):
+        target = node.target
+        return Assigns({target.id: Status.TT} if isinstance(target, ast.Name) else {})
     if isinstance(node, ast.Expr):
         return ASSIGNS_EMPTY
     if isinstance(node, ast.Assert):
@@ -183,6 +186,11 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext) -> None:
     if isinstance(s, ast.Assign):
         check_expr(s.value, ctx)
         check_assign_targets(s.targets, captures_e(s.value))
+        return
+    if isinstance(s, ast.AnnAssign):
+        assert s.value is not None
+        check_expr(s.value, ctx)
+        check_assign_targets([s.target], captures_e(s.value))
         return
     if isinstance(s, ast.Expr):
         check_expr(s.value, ctx)

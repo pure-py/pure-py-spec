@@ -2,6 +2,8 @@ import ast
 import sys
 from collections.abc import Callable
 
+from type_syntax import parse_annotation
+
 OP_SYMBOLS: dict[type, str] = {
     ast.BitOr: "|",
     ast.BitAnd: "&",
@@ -107,8 +109,7 @@ def check_stmt(node: ast.stmt) -> None:
         check_arguments(node.args)
         if len(node.decorator_list) > 0:
             raise NotYetSupported(node, "decorators", 58)
-        if node.returns is not None:
-            raise Prohibited(node, "return type annotations prohibited")
+        check_annotation(node.returns)
         check_body(node.body)
         return
     if isinstance(node, ast.Expr):
@@ -122,7 +123,13 @@ def check_stmt(node: ast.stmt) -> None:
     if isinstance(node, ast.AugAssign):
         raise Prohibited(node, "augmented assignment (+=, etc.) prohibited")
     if isinstance(node, ast.AnnAssign):
-        raise Prohibited(node, "annotated assignment prohibited")
+        if node.value is None:
+            raise Prohibited(node, "annotation without assignment prohibited")
+        if not isinstance(node.target, ast.Name):
+            raise Prohibited(node, "assignment target must be a simple name")
+        check_annotation(node.annotation)
+        check_expr(node.value)
+        return
     if isinstance(node, ast.Delete):
         raise Prohibited(node, "del prohibited")
     if isinstance(node, ast.For):
@@ -206,8 +213,7 @@ def check_field(stmt: ast.stmt) -> None:
         raise Prohibited(stmt, "field target must be a simple name")
     if stmt.value is not None:
         raise Prohibited(stmt, "field default values prohibited")
-    if not (isinstance(stmt.annotation, ast.Name) and stmt.annotation.id == "Any"):
-        raise Prohibited(stmt, "field type annotation must be Any")
+    check_annotation(stmt.annotation)
 
 
 def is_qualified_name(node: ast.expr) -> bool:
@@ -408,6 +414,11 @@ def check_generator(node: ast.comprehension) -> None:
         check_expr(i)
 
 
+def check_annotation(node: ast.expr | None) -> None:
+    if node is not None and parse_annotation(node) is None:
+        raise Prohibited(node, "unsupported type annotation")
+
+
 def check_arguments(node: ast.arguments) -> None:
     if node.vararg is not None:
         raise NotYetSupported(node, "*args", 57)
@@ -421,6 +432,8 @@ def check_arguments(node: ast.arguments) -> None:
         raise NotYetSupported(node, "default arguments", 56)
     if len(node.posonlyargs) > 0:
         raise Prohibited(node, "positional-only arguments prohibited")
+    for a in node.args:
+        check_annotation(a.annotation)
 
 
 def check_module(node: ast.Module) -> ParseError | None:

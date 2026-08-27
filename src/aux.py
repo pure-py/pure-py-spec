@@ -186,6 +186,8 @@ def fv_stmt(s: ast.stmt) -> set[str]:
         return set()
     if isinstance(s, ast.Assign):
         return fv_e(s.value)
+    if isinstance(s, ast.AnnAssign):
+        return fv_e(s.value) if s.value is not None else set()
     if isinstance(s, ast.Expr):
         return fv_e(s.value)
     if isinstance(s, ast.Return):
@@ -220,6 +222,8 @@ def assigns_stmt(s: ast.stmt) -> set[str]:
         return set()
     if isinstance(s, ast.Assign):
         return {t.id for t in s.targets if isinstance(t, ast.Name)}
+    if isinstance(s, ast.AnnAssign):
+        return {s.target.id} if isinstance(s.target, ast.Name) else set()
     if isinstance(s, ast.If):
         return assigns_body(s.body) | assigns_body(s.orelse)
     if isinstance(s, ast.Match):
@@ -244,6 +248,8 @@ def captures(s: ast.stmt) -> set[str]:
         return set()
     if isinstance(s, ast.Assign):
         return captures_e(s.value)
+    if isinstance(s, ast.AnnAssign):
+        return captures_e(s.value) if s.value is not None else set()
     if isinstance(s, ast.Expr):
         return captures_e(s.value)
     if isinstance(s, ast.Return):
