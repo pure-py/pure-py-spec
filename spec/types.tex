@@ -47,10 +47,10 @@ check, since a lambda or an empty list does not determine its own type, and elim
 since a call, a subscript or an attribute reference starts from a subterm whose type is known. A system
 that follows the recipe strictly relies on an annotation form $(e \mathbin{:} \tau)$, which synthesises by
 construction, so a checking form written with an annotation can be used where synthesis is required. Python has no such form, since it allows an annotation only on a
-parameter, a return or an assignment, so \PurePy gives the introduction forms synthesis rules of their own wherever their
-parts determine the type: a non-empty list, tuple or dictionary, and a comprehension
-(\ruleName{syn-list}, \ruleName{syn-tuple}, \ruleName{syn-dict}, \ruleName{syn-list-comp},
-\ruleName{syn-dict-comp}). The checking rules remain for what synthesis cannot reach, an empty list or
+parameter, a return or an assignment, so \PurePy gives the introduction forms synthesis rules of their own
+wherever their parts determine the type: a non-empty list or dictionary, or a tuple, whose elements all
+synthesise, and a comprehension whose body does (\ruleName{syn-list}, \ruleName{syn-tuple},
+\ruleName{syn-dict}, \ruleName{syn-list-comp}, \ruleName{syn-dict-comp}). The checking rules remain for what synthesis cannot reach, an empty list or
 dictionary, a lambda, and an expression whose expected type is wider than the one it synthesises. Swift,
 Kotlin and Scala take the element type of a collection from its elements in the same
 way~\cite{swift2025,kotlin2025,odersky2025}.
