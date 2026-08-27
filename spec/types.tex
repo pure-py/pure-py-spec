@@ -26,7 +26,7 @@ $\joinTy$ combines types by taking the alternatives of each and dropping those a
 \begin{defalign}
 \membersOf(\tyUnion{\sigma}{\tau}) & = \membersOf(\sigma) \cup \membersOf(\tau) \\
 \membersOf(\tau) & = \set{\tau} \quad \text{(otherwise)} \\[3mm]
-\joinTy(\seq{\tau}) & = \textstyle\bigcup \set{\sigma \in A \mid \nexists \sigma' \in A.\ \sigma' \neq \sigma \text{ and } \sigma \subty \sigma'} \\
+\joinTy(\seq{\tau}) & = \textstyle\bigcup\, \set{\sigma \in A \mid \nexists \sigma' \in A.\ \sigma' \neq \sigma \text{ and } \sigma \subty \sigma'} \\
 & \qquad \text{where } A = \membersOf(\tau_1) \cup \ldots \cup \membersOf(\tau_n)
 \end{defalign}
 
