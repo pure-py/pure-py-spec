@@ -21,17 +21,18 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base
 \widen(\pyinline{None}) & = \tyNone
 \end{defalign}
 
-\noindent The \emph{alternatives} of a type are the operands of a union and the type itself otherwise, and
-$\joinTy$ combines types by taking the alternatives of each and dropping those another subsumes:
+\noindent The \emph{alternatives} of a type are the sequence of a union's operands, and the type itself
+otherwise, and $\joinTy$ combines types by taking the alternatives of each and dropping those another
+subsumes:
 \begin{defalign}
-\membersOf(\tyUnion{\sigma}{\tau}) & = \membersOf(\sigma) \cup \membersOf(\tau) \\
-\membersOf(\tau) & = \set{\tau} \quad \text{(otherwise)} \\[3mm]
-\joinTy(\seq{\tau}) & = \textstyle\bigcup\, \set{\sigma \in A \mid \nexists \sigma' \in A.\ \sigma' \neq \sigma \text{ and } \sigma \subty \sigma'} \\
-& \qquad \text{where } A = \membersOf(\tau_1) \cup \ldots \cup \membersOf(\tau_n)
+\membersOf(\tyUnion{\sigma}{\tau}) & = \membersOf(\sigma) \mathbin{\concat} \membersOf(\tau) \\
+\membersOf(\tau) & = \tau \quad \text{(otherwise)} \\[3mm]
+\joinTy(\seq{\tau}) & = \sigma_1 \mathbin{|} \ldots \mathbin{|} \sigma_m \\
+& \qquad \text{where } \sigma_1 \cons \ldots \cons \sigma_m \text{ is } \membersOf(\tau_1) \mathbin{\concat} \ldots \mathbin{\concat} \membersOf(\tau_n) \\
+& \qquad \text{less each alternative that another subsumes, and each repetition but the first}
 \end{defalign}
 
-\noindent Here $\bigcup$ of a set of types is their union, and the type itself where one remains. So joining
-a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
+\noindent So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.
 
 A class entry $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ records the declared
