@@ -21,13 +21,13 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base
 \widen(\pyinline{None}) & = \tyNone
 \end{defalign}
 
-\noindent The \emph{members} of a type are the operands of a union and the type itself otherwise, and
-$\joinTy$ combines types by taking the members of each and dropping those a member subsumes:
+\noindent The \emph{alternatives} of a type are the operands of a union and the type itself otherwise, and
+$\joinTy$ combines types by taking the alternatives of each and dropping those another subsumes:
 \begin{defalign}
 \membersOf(\tyUnion{\sigma}{\tau}) & = \membersOf(\sigma) \cup \membersOf(\tau) \\
-\membersOf(\tau) & = \set{\tau} \quad \text{(otherwise)} \\
-\joinTy(\seq{\tau}) & = \textstyle\bigcup \set{\sigma \in M \mid \nexists \sigma' \in M.\ \sigma' \neq \sigma \text{ and } \sigma \subty \sigma'} \\
-& \qquad \text{where } M = \membersOf(\tau_1) \cup \ldots \cup \membersOf(\tau_n)
+\membersOf(\tau) & = \set{\tau} \quad \text{(otherwise)} \\[3mm]
+\joinTy(\seq{\tau}) & = \textstyle\bigcup \set{\sigma \in A \mid \nexists \sigma' \in A.\ \sigma' \neq \sigma \text{ and } \sigma \subty \sigma'} \\
+& \qquad \text{where } A = \membersOf(\tau_1) \cup \ldots \cup \membersOf(\tau_n)
 \end{defalign}
 
 \noindent Here $\bigcup$ of a set of types is their union, and the type itself where one remains. So joining
