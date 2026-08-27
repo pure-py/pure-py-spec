@@ -103,9 +103,9 @@ at $\statusNotDefAssigned$, as they do without types (\ruleName{def}). The body 
 declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
-A \pyinline{match} subject synthesises a type, and each pattern checks against it, binding its variables at
+A \pyinline{match} scrutinee synthesises a type, and each pattern checks against it, binding its variables at
 the types of the positions they match (\figref{typing-pat}). A constructor pattern requires its class to be
-a subtype of the subject's type, so a case that cannot match is rejected rather than being merely
+a subtype of the scrutinee's type, so a case that cannot match is rejected rather than being merely
 unreachable.
 
 Merging two branches merges their contexts pointwise. A variable definitely assigned in both, at $\tau$ and
