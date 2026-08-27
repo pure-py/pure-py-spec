@@ -28,7 +28,7 @@ $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the entry $C
 signature $\ominus : \sigma \to \tau$, relating operand types to result type. In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
 (\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
 dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
-that synthesises a literal type gives the component at that position, counting from the end where the index
+that synthesises a literal type gives the component type at that position, counting from the end where the index
 is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and any other index of type
 \pyinline{int} gives the union of the components (\ruleName{subscript-tuple-int}). A negated numeric
 literal synthesises the negated literal type (\ruleName{unop-literal}), and \ruleName{unop} excludes that
