@@ -1,10 +1,9 @@
 \section{Types}
 \label{sec:types}
 
-The typing judgement gives each expression a type. The entry for a definitely assigned variable is its type, in place of
-$\statusDefAssigned$; the other context entries are as in Definition~\ref{def:context}. So
-\ruleName{var} applies where $\Gamma(x)$ is a type, and not to a variable that is
-$\statusNotDefAssigned$. Every parameter, return and assignment carries an annotation, so the type of a definition is given rather
+The typing judgement gives each expression a type. The entry for a definitely assigned variable is its type
+(Definition~\ref{def:context}), so \ruleName{var} applies where $\Gamma(x)$ is a type, and not to a
+variable that is $\statusNotDefAssigned$. Every parameter, return and assignment carries an annotation, so the type of a definition is given rather
 than inferred from its body; within an expression, typing is bidirectional.
 \emph{Synthesis} $\Gamma \vdash e \synth \tau$ reads a type out of an expression (\figref{typing-synth}),
 and \emph{checking} $\Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
