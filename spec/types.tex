@@ -21,7 +21,20 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base
 \widen(\pyinline{None}) & = \tyNone
 \end{defalign}
 
-\noindent A class entry $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ records the declared
+\noindent The \emph{members} of a type are the operands of a union and the type itself otherwise, and
+$\joinTy$ combines types by taking the members of each and dropping those a member subsumes:
+\begin{defalign}
+\membersOf(\tyUnion{\sigma}{\tau}) & = \membersOf(\sigma) \cup \membersOf(\tau) \\
+\membersOf(\tau) & = \set{\tau} \quad \text{(otherwise)} \\
+\joinTy(\seq{\tau}) & = \textstyle\bigcup \set{\sigma \in M \mid \nexists \sigma' \in M.\ \sigma' \neq \sigma \text{ and } \sigma \subty \sigma'} \\
+& \qquad \text{where } M = \membersOf(\tau_1) \cup \ldots \cup \membersOf(\tau_n)
+\end{defalign}
+
+\noindent Here $\bigcup$ of a set of types is their union, and the type itself where one remains. So joining
+a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
+joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.
+
+A class entry $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ records the declared
 type of each field it introduces, and $\fields(C)$ is the bindings of all its fields, those of the base
 class first. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises $q$ as a class type (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must synthesise a class $q$, and
@@ -128,12 +141,8 @@ exhaustive, though no one of them subsumes what a further case would match.
 \input{spec/fig/coverage}
 
 Merging two branches merges their contexts pointwise. A variable definitely assigned in both, at $\tau$ and
-$\tau'$, is of type $\joinTy(\tau, \tau')$. Writing the \emph{members} of a type for its operands where it
-is a union and for the type itself otherwise, $\joinTy(\tau, \tau')$ is the union of the members of $\tau$
-and $\tau'$, less any member that is a subtype of another, and is that member alone where one remains.
-Joining a sequence or set of types folds $\joinTy$ over them. Joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor,
-and joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$. A variable definitely
-assigned in one branch alone is $\statusNotDefAssigned$.
+$\tau'$, is of type $\joinTy(\tau, \tau')$, and a variable definitely assigned in one branch alone is
+$\statusNotDefAssigned$.
 
 \input{spec/fig/typing-stmt}
 
