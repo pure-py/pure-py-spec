@@ -168,7 +168,7 @@
 {
   \varnothing \neq I \subseteq \set{1, \ldots, n+1} \\
   \Gamma \vdash e_i \synth \tau_i \quad (\forall i \in I) \\
-  \tau = \textstyle\joinTy_{i \in I} \tau_i \\
+  \tau = \joinTy(\tau_i \mid i \in I) \\
   \Gamma \vdash e_j \checks \tau \quad (\forall j \notin I)
 }
 {
@@ -188,7 +188,7 @@
   \Gamma \vdash e_i \checks \tyStr \quad (\forall i) \\
   \varnothing \neq I \subseteq \set{1, \ldots, n+1} \\
   \Gamma \vdash e_i' \synth \tau_i \quad (\forall i \in I) \\
-  \tau = \textstyle\joinTy_{i \in I} \tau_i \\
+  \tau = \joinTy(\tau_i \mid i \in I) \\
   \Gamma \vdash e_j' \checks \tau \quad (\forall j \notin I)
 }
 {
