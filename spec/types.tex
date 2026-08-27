@@ -24,8 +24,8 @@ form:
 
 \noindent A class entry $C$ maps each field name to its declared type. A constructor call pairs each
 argument with a field through $\fieldMap$, checks the argument against that field's type, and synthesises
-the class (\ruleName{syn-constr}). In an attribute reference the object must synthesise a class, and the reference then has the type of the
-field named (\ruleName{syn-attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
+the class (\ruleName{constr}). In an attribute reference the object must synthesise a class, and the reference then has the type of the
+field named (\ruleName{attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
 signature $\ominus : \sigma \to \tau$, relating operand types to result type. Subscripting has a rule for each container the subscripted expression can synthesise: a list or string
 subscripted by an \pyinline{int}, and a dictionary by a \pyinline{str}. A tuple has two rules, since its
 components have different types: an index that synthesises a literal type in range gives the component at
@@ -71,7 +71,7 @@ check against \pyinline{bool}, and an assertion message against \pyinline{str}.
 
 A function definition binds its parameters at their annotated types and its own name, and the names of the
 region it belongs to, at the corresponding $\pyinline{Callable}$ type; the variables the body assigns start
-at $\statusNotDefAssigned$, as they do without types (\ruleName{ty-def}). The body is checked with the
+at $\statusNotDefAssigned$, as they do without types (\ruleName{def}). The body is checked with the
 declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 

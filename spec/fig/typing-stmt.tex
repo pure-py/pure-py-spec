@@ -2,7 +2,7 @@
 \flushleft \shadebox{$\Gamma; \tau \vdash t : R$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{ty-pass}}]
+\inferrule*[lab={\ruleName{pass}}]
 {
   \strut
 }
@@ -10,7 +10,7 @@
   \Gamma; \tau \vdash \exPass : \Assigns{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{ty-assign}}]
+\inferrule*[lab={\ruleName{assign}}]
 {
   \Gamma \vdash e \checks \sigma \\
   x \notin \capturesE(e)
@@ -19,7 +19,7 @@
   \Gamma; \tau \vdash \exAssign{x \exAnnot{\sigma}}{e} : \Assigns{\set{\bind{x}{\sigma}}}
 }
 \and
-\inferrule*[lab={\ruleName{ty-expr-stmt}}]
+\inferrule*[lab={\ruleName{expr-stmt}}]
 {
   \Gamma \vdash e \synth \sigma
 }
@@ -27,7 +27,7 @@
   \Gamma; \tau \vdash e : \Assigns{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{ty-assert}}]
+\inferrule*[lab={\ruleName{assert}}]
 {
   \Gamma \vdash e \checks \tyBool
 }
@@ -35,7 +35,7 @@
   \Gamma; \tau \vdash \exAssert{e} : \Assigns{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{ty-assert-msg}}]
+\inferrule*[lab={\ruleName{assert-msg}}]
 {
   \Gamma \vdash e \checks \tyBool \\
   \Gamma \vdash e' \checks \tyStr
@@ -44,7 +44,7 @@
   \Gamma; \tau \vdash \exAssertMsg{e}{e'} : \Assigns{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{ty-return-none}}]
+\inferrule*[lab={\ruleName{return-none}}]
 {
   \tyNone \subty \tau
 }
@@ -52,7 +52,7 @@
   \Gamma; \tau \vdash \exReturnNone : \Returns
 }
 \and
-\inferrule*[lab={\ruleName{ty-return}}]
+\inferrule*[lab={\ruleName{return}}]
 {
   \Gamma \vdash e \checks \tau
 }
@@ -60,7 +60,7 @@
   \Gamma; \tau \vdash \exReturn{e} : \Returns
 }
 \and
-\inferrule*[lab={\ruleName{ty-if}}]
+\inferrule*[lab={\ruleName{if}}]
 {
   \Gamma \vdash e_i \checks \tyBool \quad (\forall i) \\
   \Gamma; \tau \vdash s_i : R_i \quad (\forall i)
@@ -69,7 +69,7 @@
   \Gamma; \tau \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \merge \ldots \mathbin{\merge} R_{n+1} \: \merge \Assigns{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{ty-if-else}}]
+\inferrule*[lab={\ruleName{if-else}}]
 {
   \Gamma \vdash e_i \checks \tyBool \quad (\forall i) \\
   \Gamma; \tau \vdash s_i : R_i \quad (\forall i)
@@ -78,7 +78,7 @@
   \Gamma; \tau \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
 }
 \and
-\inferrule*[lab={\ruleName{ty-seq}}]
+\inferrule*[lab={\ruleName{seq}}]
 {
   \Gamma; \tau \vdash t : \Assigns{\Delta} \\
   \Gamma \override \Delta ; \tau \vdash t' : R \\
@@ -88,7 +88,7 @@
   \Gamma; \tau \vdash t\;t' : \Assigns{\Delta} \override R
 }
 \and
-\inferrule*[lab={\ruleName{ty-def}}]
+\inferrule*[lab={\ruleName{def}}]
 {
   \Delta_i = \set{\bind{x_{i1}}{\tau_{i1}}, \ldots, \bind{x_{in_i}}{\tau_{in_i}}} \quad (\forall i) \\
   \Gamma \override \set{\bind{f_j}{\tyCallable{\seq{\tau}_j}{\tau_j}} \mid \forall j} \override \Delta_i \override \statusNotDefAssigned(\assignsS(s_i) \setminus \dom(\Delta_i)); \tau_i \vdash s_i : R_i \quad (\forall i)
@@ -100,7 +100,7 @@
   \Gamma; \tau \vdash \exDef{f_1}{\seq{x}_1\,\seq{\pi}_1}{\omega_1}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}\,\seq{\pi}_{n+1}}{\omega_{n+1}}{s_{n+1}} : \Assigns{\set{\bind{f_j}{\tyCallable{\seq{\tau}_j}{\tau_j}} \mid \forall j}}
 }
 \and
-\inferrule*[lab={\ruleName{ty-match}}]
+\inferrule*[lab={\ruleName{match}}]
 {
   \Gamma \vdash e \synth \sigma \\
   \Gamma \vdash p_i \checks \sigma \binding \Delta_i \quad (\forall i) \\
@@ -112,7 +112,7 @@
   \Gamma; \tau \vdash \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} : S_1 \merge \ldots \merge S_{n+1}
 }
 \and
-\inferrule*[lab={\ruleName{ty-match-partial}}]
+\inferrule*[lab={\ruleName{match-partial}}]
 {
   \Gamma \vdash e \synth \sigma \\
   \Gamma \vdash p_i \checks \sigma \binding \Delta_i \quad (\forall i) \\

@@ -2,7 +2,7 @@
 \flushleft \shadebox{$\Gamma \vdash e \synth \tau$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{syn-var}}]
+\inferrule*[lab={\ruleName{var}}]
 {
   \bind{x}{\tau} \in \Gamma
 }
@@ -10,7 +10,7 @@
   \Gamma \vdash x \synth \tau
 }
 \and
-\inferrule*[lab={\ruleName{syn-literal}}]
+\inferrule*[lab={\ruleName{literal}}]
 {
   \strut
 }
@@ -18,7 +18,7 @@
   \Gamma \vdash \ell \synth \tyLiteral{\ell}
 }
 \and
-\inferrule*[lab={\ruleName{syn-attr-module}}]
+\inferrule*[lab={\ruleName{attr-module}}]
 {
   \Gamma \vdash \exAttr{e}{x} : \tau
 }
@@ -26,7 +26,7 @@
   \Gamma \vdash \exAttr{e}{x} \synth \tau
 }
 \and
-\inferrule*[lab={\ruleName{syn-attr-object}}]
+\inferrule*[lab={\ruleName{attr-object}}]
 {
   \Gamma \vdash e \synth q \\
   \Gamma \vdash q : C \\
@@ -36,7 +36,7 @@
   \Gamma \vdash \exAttr{e}{x} \synth C(x)
 }
 \and
-\inferrule*[lab={\ruleName{syn-call}}]
+\inferrule*[lab={\ruleName{call}}]
 {
   \Gamma \vdash e \synth \tyCallable{\tau_1, \ldots, \tau_n}{\tau} \\
   \Gamma \vdash e_i \checks \tau_i \quad (\forall i)
@@ -45,7 +45,7 @@
   \Gamma \vdash \exCall{e}{e_1, \ldots, e_n} \synth \tau
 }
 \and
-\inferrule*[lab={\ruleName{syn-constr}}]
+\inferrule*[lab={\ruleName{constr}}]
 {
   \Gamma \vdash q : C \\
   \Gamma \vdash \fieldMap(C, \seq{e})(x) \checks C(x) \quad (\forall x \in \fields(C))
@@ -54,7 +54,7 @@
   \Gamma \vdash \exConstr{q}{\seq{e}} \synth q
 }
 \and
-\inferrule*[lab={\ruleName{syn-binop}}]
+\inferrule*[lab={\ruleName{binop}}]
 {
   \odot : (\sigma, \sigma') \to \tau \\
   \Gamma \vdash e \checks \sigma \\
@@ -64,7 +64,7 @@
   \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \tau
 }
 \and
-\inferrule*[lab={\ruleName{syn-unop}}]
+\inferrule*[lab={\ruleName{unop}}]
 {
   \ominus : \sigma \to \tau \\
   \Gamma \vdash e \checks \sigma
@@ -73,7 +73,7 @@
   \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau
 }
 \and
-\inferrule*[lab={\ruleName{syn-and}}]
+\inferrule*[lab={\ruleName{and}}]
 {
   \Gamma \vdash e \checks \tyBool \\
   \Gamma \vdash e' \checks \tyBool
@@ -82,7 +82,7 @@
   \Gamma \vdash \exAnd{e}{e'} \synth \tyBool
 }
 \and
-\inferrule*[lab={\ruleName{syn-or}}]
+\inferrule*[lab={\ruleName{or}}]
 {
   \Gamma \vdash e \checks \tyBool \\
   \Gamma \vdash e' \checks \tyBool
@@ -91,7 +91,7 @@
   \Gamma \vdash \exOr{e}{e'} \synth \tyBool
 }
 \and
-\inferrule*[lab={\ruleName{syn-subscript-list}}]
+\inferrule*[lab={\ruleName{subscript-list}}]
 {
   \Gamma \vdash e \synth \tyList{\tau} \\
   \Gamma \vdash e' \checks \tyInt
@@ -100,7 +100,7 @@
   \Gamma \vdash \exSubscript{e}{e'} \synth \tau
 }
 \and
-\inferrule*[lab={\ruleName{syn-subscript-str}}]
+\inferrule*[lab={\ruleName{subscript-str}}]
 {
   \Gamma \vdash e \synth \tyStr \\
   \Gamma \vdash e' \checks \tyInt
@@ -109,7 +109,7 @@
   \Gamma \vdash \exSubscript{e}{e'} \synth \tyStr
 }
 \and
-\inferrule*[lab={\ruleName{syn-subscript-dict}}]
+\inferrule*[lab={\ruleName{subscript-dict}}]
 {
   \Gamma \vdash e \synth \tyDict{\tau} \\
   \Gamma \vdash e' \checks \tyStr
@@ -118,7 +118,7 @@
   \Gamma \vdash \exSubscript{e}{e'} \synth \tau
 }
 \and
-\inferrule*[lab={\ruleName{syn-subscript-tuple}}]
+\inferrule*[lab={\ruleName{subscript-tuple}}]
 {
   \Gamma \vdash e \synth \tyTuple{\tau_0, \ldots, \tau_m} \\
   \Gamma \vdash e' \synth \tyLiteral{n} \\
@@ -128,7 +128,7 @@
   \Gamma \vdash \exSubscript{e}{e'} \synth \tau_n
 }
 \and
-\inferrule*[lab={\ruleName{syn-subscript-tuple-int}}]
+\inferrule*[lab={\ruleName{subscript-tuple-int}}]
 {
   \Gamma \vdash e \synth \tyTuple{\tau_0, \ldots, \tau_m} \\
   \Gamma \vdash e' \synth \tyInt
