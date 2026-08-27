@@ -1,0 +1,117 @@
+\begin{figure}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Gamma \vdash e \checks \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{check-synth}}]
+{
+  \Gamma \vdash e \synth \sigma \\
+  \sigma \subty \tau
+}
+{
+  \Gamma \vdash e \checks \tau
+}
+\and
+\inferrule*[lab={\ruleName{check-lambda}}]
+{
+  \Gamma \override \set{\bind{x_1}{\tau_1}, \ldots, \bind{x_n}{\tau_n}} \vdash e \checks \tau
+}
+{
+  \Gamma \vdash \exLambda{x_1, \ldots, x_n}{e} \checks \tyCallable{\tau_1, \ldots, \tau_n}{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{check-list}}]
+{
+  \Gamma \vdash e_i \checks \tau \quad (\forall i)
+}
+{
+  \Gamma \vdash \exList{e_1, \ldots, e_n} \checks \tyList{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{check-tuple}}]
+{
+  \Gamma \vdash e_i \checks \tau_i \quad (\forall i)
+}
+{
+  \Gamma \vdash \exTuple{e_1, \ldots, e_n} \checks \tyTuple{\tau_1, \ldots, \tau_n}
+}
+\and
+\inferrule*[lab={\ruleName{check-dict}}]
+{
+  \Gamma \vdash e_i \checks \tyStr \quad (\forall i) \\
+  \Gamma \vdash e_i' \checks \tau \quad (\forall i)
+}
+{
+  \Gamma \vdash \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \checks \tyDict{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{check-cond}}]
+{
+  \Gamma \vdash e_1 \checks \tyBool \\
+  \Gamma \vdash e \checks \tau \\
+  \Gamma \vdash e_2 \checks \tau
+}
+{
+  \Gamma \vdash \exCondExpr{e_1}{e}{e_2} \checks \tau
+}
+\and
+\inferrule*[lab={\ruleName{check-list-comp}}]
+{
+  \Gamma \vdash \seq{g} : \Delta \\
+  \Gamma \override \Delta \vdash e \checks \tau
+}
+{
+  \Gamma \vdash \exListComp{e}{g_1\;\ldots\;g_n} \checks \tyList{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{check-dict-comp}}]
+{
+  \Gamma \vdash \seq{g} : \Delta \\
+  \Gamma \override \Delta \vdash e \checks \tyStr \\
+  \Gamma \override \Delta \vdash e' \checks \tau
+}
+{
+  \Gamma \vdash \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \checks \tyDict{\tau}
+}
+\end{mathpar}
+\subcaption{Expression $e$ checks against type $\tau$ under $\Gamma$}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Gamma \vdash \seq{g} : \Delta$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{ty-quals-nil}}]
+{
+  \strut
+}
+{
+  \Gamma \vdash \varepsilon : \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{ty-qual-guard}}]
+{
+  \Gamma \vdash e \checks \tyBool \\
+  \Gamma \vdash \seq{g} : \Delta
+}
+{
+  \Gamma \vdash \qualGuard{e} \cons \seq{g} : \Delta
+}
+\and
+\inferrule*[lab={\ruleName{ty-qual-generator}}]
+{
+  \Gamma \vdash e \synth \tau \\
+  \elemTy(\tau) = \tau' \\
+  \Gamma \override \set{\bind{x}{\tau'}} \vdash \seq{g} : \Delta
+}
+{
+  \Gamma \vdash \qualGenerator{x}{e} \cons \seq{g} : \set{\bind{x}{\tau'}} \override \Delta
+}
+\end{mathpar}
+\subcaption{Comprehension qualifiers $\seq{g}$ bind $\Delta$ under $\Gamma$}
+\end{subfigure}
+\caption{Expression checking}
+\label{fig:typing-check}
+\end{figure}

@@ -1,0 +1,132 @@
+\begin{figure}
+\flushleft \shadebox{$\Gamma \vdash e \synth \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{syn-var}}]
+{
+  \bind{x}{\tau} \in \Gamma
+}
+{
+  \Gamma \vdash x \synth \tau
+}
+\and
+\inferrule*[lab={\ruleName{syn-literal}}]
+{
+  \strut
+}
+{
+  \Gamma \vdash \ell \synth \tyOf(\ell)
+}
+\and
+\inferrule*[lab={\ruleName{syn-attr-module}}]
+{
+  \Gamma \vdash \exAttr{e}{x} : \tau
+}
+{
+  \Gamma \vdash \exAttr{e}{x} \synth \tau
+}
+\and
+\inferrule*[lab={\ruleName{syn-attr-object}}]
+{
+  \Gamma \vdash e \synth q \\
+  \Gamma \vdash q : C \\
+  x \in \fields(C)
+}
+{
+  \Gamma \vdash \exAttr{e}{x} \synth C(x)
+}
+\and
+\inferrule*[lab={\ruleName{syn-call}}]
+{
+  \Gamma \vdash e \synth \tyCallable{\tau_1, \ldots, \tau_n}{\tau} \\
+  \Gamma \vdash e_i \checks \tau_i \quad (\forall i)
+}
+{
+  \Gamma \vdash \exCall{e}{e_1, \ldots, e_n} \synth \tau
+}
+\and
+\inferrule*[lab={\ruleName{syn-constr}}]
+{
+  \Gamma \vdash q : C \\
+  \Gamma \vdash \fieldMap(C, \seq{e})(x) \checks C(x) \quad (\forall x \in \fields(C))
+}
+{
+  \Gamma \vdash \exConstr{q}{\seq{e}} \synth q
+}
+\and
+\inferrule*[lab={\ruleName{syn-binop}}]
+{
+  \odot : (\tau, \tau') \to \tau'' \\
+  \Gamma \vdash e \checks \tau \\
+  \Gamma \vdash e' \checks \tau'
+}
+{
+  \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \tau''
+}
+\and
+\inferrule*[lab={\ruleName{syn-unop}}]
+{
+  \ominus : \tau \to \tau' \\
+  \Gamma \vdash e \checks \tau
+}
+{
+  \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau'
+}
+\and
+\inferrule*[lab={\ruleName{syn-and}}]
+{
+  \Gamma \vdash e \checks \tyBool \\
+  \Gamma \vdash e' \checks \tyBool
+}
+{
+  \Gamma \vdash \exAnd{e}{e'} \synth \tyBool
+}
+\and
+\inferrule*[lab={\ruleName{syn-or}}]
+{
+  \Gamma \vdash e \checks \tyBool \\
+  \Gamma \vdash e' \checks \tyBool
+}
+{
+  \Gamma \vdash \exOr{e}{e'} \synth \tyBool
+}
+\and
+\inferrule*[lab={\ruleName{syn-subscript-list}}]
+{
+  \Gamma \vdash e \synth \tyList{\tau} \\
+  \Gamma \vdash e' \checks \tyInt
+}
+{
+  \Gamma \vdash \exSubscript{e}{e'} \synth \tau
+}
+\and
+\inferrule*[lab={\ruleName{syn-subscript-str}}]
+{
+  \Gamma \vdash e \synth \tyStr \\
+  \Gamma \vdash e' \checks \tyInt
+}
+{
+  \Gamma \vdash \exSubscript{e}{e'} \synth \tyStr
+}
+\and
+\inferrule*[lab={\ruleName{syn-subscript-dict}}]
+{
+  \Gamma \vdash e \synth \tyDict{\tau} \\
+  \Gamma \vdash e' \checks \tyStr
+}
+{
+  \Gamma \vdash \exSubscript{e}{e'} \synth \tau
+}
+\and
+\inferrule*[lab={\ruleName{syn-subscript-tuple}}]
+{
+  \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_{n+1}} \\
+  0 \leq i \leq n
+}
+{
+  \Gamma \vdash \exSubscript{e}{i} \synth \tau_{i+1}
+}
+\end{mathpar}
+\caption{Expression $e$ synthesises type $\tau$ under $\Gamma$}
+\label{fig:typing-synth}
+\end{figure}

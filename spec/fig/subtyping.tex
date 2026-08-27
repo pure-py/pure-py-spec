@@ -2,7 +2,7 @@
 \flushleft \shadebox{$\sigma \subty \tau$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{sub-refl}}]
+\inferrule*[lab={\ruleName{subty-refl}}]
 {
   \strut
 }
@@ -10,7 +10,7 @@
   \tau \subty \tau
 }
 \and
-\inferrule*[lab={\ruleName{sub-class}}]
+\inferrule*[lab={\ruleName{subty-class}}]
 {
   \Gamma(c') \in \ancestors(\Gamma(c))
 }
@@ -18,7 +18,7 @@
   q.c \subty q.c'
 }
 \and
-\inferrule*[lab={\ruleName{sub-union-left}}]
+\inferrule*[lab={\ruleName{subty-union-left}}]
 {
   \strut
 }
@@ -26,7 +26,7 @@
   \sigma \subty \tyUnion{\sigma}{\tau}
 }
 \and
-\inferrule*[lab={\ruleName{sub-union-right}}]
+\inferrule*[lab={\ruleName{subty-union-right}}]
 {
   \strut
 }
@@ -34,7 +34,7 @@
   \tau \subty \tyUnion{\sigma}{\tau}
 }
 \and
-\inferrule*[lab={\ruleName{sub-union}}]
+\inferrule*[lab={\ruleName{subty-union}}]
 {
   \sigma \subty \rho \\
   \tau \subty \rho
