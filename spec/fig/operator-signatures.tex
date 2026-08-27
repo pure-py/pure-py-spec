@@ -21,8 +21,8 @@
  & $(\tyInt, \tyStr) \to \tyStr$ & \\
  & $(\tyList{\tau}, \tyInt) \to \tyList{\tau}$ & $\forall \tau$ \\
  & $(\tyInt, \tyList{\tau}) \to \tyList{\tau}$ & $\forall \tau$ \\
-\pyinline{**} & $(\tyInt, \tyLiteral{n}) \to \tyInt$ & $\forall$ whole $n$ \\
- & $(\tyInt, \tyLiteral{-n}) \to \tyFloat$ & $\forall$ whole $n > 0$ \\
+\pyinline{**} & $(\tyInt, \tyLiteral{n}) \to \tyInt$ & $\forall n$, $n$ an integer \\
+ & $(\tyInt, \tyLiteral{-n}) \to \tyFloat$ & $\forall n > 0$, $n$ an integer \\
  & $(\tyInt, \tyInt) \to \tyUnion{\tyInt}{\tyFloat}$ & \\
  & $(\tyFloat, \tyFloat) \to \tyFloat$ &
 \end{tabular}
