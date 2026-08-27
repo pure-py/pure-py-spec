@@ -23,8 +23,8 @@ Each literal form has a type, given by $\tyOf$:
 
 \noindent A class entry $C$ maps each field name to its declared type. A constructor call pairs each
 argument with a field through $\fieldMap$, checks the argument against that field's type, and synthesises
-the class (\ruleName{syn-constr}). An attribute reference synthesises the field's type from the class its object
-synthesises (\ruleName{syn-attr-object}), so the object must be an expression that synthesises. Each operator has a signature $\odot : (\sigma, \sigma') \to \tau$ relating its
+the class (\ruleName{syn-constr}). An attribute reference requires synthesis for its object, which must synthesise a
+class, and synthesises the type of the field named (\ruleName{syn-attr-object}). Each operator has a signature $\odot : (\sigma, \sigma') \to \tau$ relating its
 operand types to its result type. Subscripting has a rule per container, and a tuple is subscripted by a
 literal index, since its component types differ.
 
