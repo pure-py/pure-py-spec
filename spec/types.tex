@@ -1,0 +1,52 @@
+\section{Types}
+\label{sec:types}
+
+Types are a second static layer over the well-formed programs of \secref{well-formedness}. Every parameter,
+return and assignment carries an annotation, so no type is inferred across a definition; within an
+expression, types flow in the two directions of a bidirectional system. \emph{Synthesis} $\Gamma \vdash e
+\synth \tau$ reads a type out of an expression, and \emph{checking} $\Gamma \vdash e \checks \tau$ tests an
+expression against a type given by its surroundings (\figrefTwo{typing-synth}{typing-check}). A context now maps a variable to
+its type, and definite assignment is the presence of a type: $\Gamma(x) = \tau$ says that $x$ is definitely
+assigned and holds values of type $\tau$.
+
+Variables, literals, module attributes, calls, constructor calls, operators and subscripts synthesise. A
+literal has the type $\tyOf(\ell)$ of its form:
+\begin{defalign}
+\tyOf(n) & = \tyInt \quad \text{($n$ an integer literal)} \\
+\tyOf(n) & = \tyFloat \quad \text{($n$ a float literal)} \\
+\tyOf(w) & = \tyStr \\
+\tyOf(\pyinline{True}) = \tyOf(\pyinline{False}) & = \tyBool \\
+\tyOf(\pyinline{None}) & = \tyNone
+\end{defalign}
+
+\noindent The class entry $C$ is read as a map from field names to their declared types, so a constructor
+call checks each argument against the type of the field it supplies and synthesises the class (\ruleName{syn-constr}).
+Each operator has a signature $\odot : (\tau, \tau') \to \tau''$ relating its operand types to its result
+type. Subscripting has a rule per container, and a tuple is subscripted by a literal index, since the
+component types differ.
+
+Displays, comprehensions and lambdas check. Their element types are not determined by the expression itself:
+$\exList{}$ is a list of any element type, and a lambda has no annotations to declare its parameter types
+(Python's grammar admits none), so both take their type from the surroundings. A tuple display and a
+conditional expression have rules in both modes, synthesising when their parts do. One rule changes mode:
+an expression that synthesises $\sigma$ checks against any supertype of $\sigma$ (\ruleName{chk-synth}).
+
+Subtyping (\figref{subtyping}) is reflexivity, the union rules, and the ancestors of a class. Lists,
+dictionaries, tuples and callables are related only by reflexivity: \pyinline{list} and \pyinline{dict} are
+invariant in mypy, and \PurePy admits no program mypy rejects. A \pyinline{bool} is not an \pyinline{int},
+though Python treats it as one.
+
+\input{spec/fig/typing-expr}
+
+\input{spec/fig/subtyping}
+
+A generator draws its bindings from the elements of a value, and $\elemTy$ gives the type of those elements,
+mirroring $\iterOp$ (\secref{auxiliary-values}):
+\begin{defalign}
+\elemTy(\tyList{\tau}) & = \tau \\
+\elemTy(\tyStr) & = \tyStr \\
+\elemTy(\tyDict{\tau}) & = \tyStr \\
+\elemTy(\tyTuple{\tau, \ldots, \tau}) & = \tau
+\end{defalign}
+
+\noindent A tuple of mixed component types has no element type, so it cannot be iterated.

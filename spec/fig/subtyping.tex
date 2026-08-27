@@ -1,0 +1,48 @@
+\begin{figure}
+\flushleft \shadebox{$\sigma \subty \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{sub-refl}}]
+{
+  \strut
+}
+{
+  \tau \subty \tau
+}
+\and
+\inferrule*[lab={\ruleName{sub-class}}]
+{
+  \Gamma(c') \in \ancestors(\Gamma(c))
+}
+{
+  q.c \subty q.c'
+}
+\and
+\inferrule*[lab={\ruleName{sub-union-left}}]
+{
+  \strut
+}
+{
+  \sigma \subty \tyUnion{\sigma}{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{sub-union-right}}]
+{
+  \strut
+}
+{
+  \tau \subty \tyUnion{\sigma}{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{sub-union}}]
+{
+  \sigma \subty \rho \\
+  \tau \subty \rho
+}
+{
+  \tyUnion{\sigma}{\tau} \subty \rho
+}
+\end{mathpar}
+\caption{Subtyping}
+\label{fig:subtyping}
+\end{figure}
