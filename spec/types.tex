@@ -27,10 +27,12 @@ class first. A constructor call $\exConstr{q}{a}$ pairs each argument with a fie
 $\fieldMap$, checks it against that field's type, and synthesises $q$ itself (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must synthesise a class $q$, and
 $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the entry $C$ that $q$ resolves to
 (\ruleName{attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
-signature $\ominus : \sigma \to \tau$, relating operand types to result type. In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list or
-string with $e'$ of type \pyinline{int}, and a dictionary with $e'$ of type \pyinline{str}. Tuples have two rules: an index that synthesises a literal type in
-range gives the component at that position, and any other index of type \pyinline{int} gives the union of
-the components.
+signature $\ominus : \sigma \to \tau$, relating operand types to result type. In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
+(\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
+dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have two rules: an index
+that synthesises a literal type in range gives the component at that position
+(\ruleName{subscript-tuple}), and any other index of type \pyinline{int} gives the union of the components
+(\ruleName{subscript-tuple-int}).
 
 Lambdas, list, tuple and dictionary expressions and comprehensions check. Their types are not determined by
 the expression alone: $\exList{}$ is a list of any element type, and a lambda has no annotations to declare
