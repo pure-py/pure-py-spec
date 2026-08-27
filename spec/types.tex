@@ -2,8 +2,9 @@
 \label{sec:types}
 
 Well-formedness gives each expression a type. A context maps a variable to its type, so $\Gamma(x) = \tau$
-says that $x$ is definitely assigned and is of type $\tau$, and a variable that is not definitely assigned
-has no type. Every parameter, return and assignment carries an annotation, so no type is inferred across a
+says that $x$ is definitely assigned and is of type $\tau$. A variable in scope but not definitely assigned
+is bound to $\statusNotDefAssigned$, which is not a type, so no rule gives such a variable one; a variable
+that is not in scope is undefined in $\Gamma$ (Definition~\ref{def:context}). Every parameter, return and assignment carries an annotation, so no type is inferred across a
 definition; within an expression types flow in the two directions of a bidirectional system.
 \emph{Synthesis} $\Gamma \vdash e \synth \tau$ reads a type out of an expression (\figref{typing-synth}),
 and \emph{checking} $\Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
