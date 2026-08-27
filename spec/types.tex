@@ -1,7 +1,9 @@
 \section{Types}
 \label{sec:types}
 
-The typing judgement gives each expression a type. The entry for a definitely assigned variable is its type
+The typing judgement gives each expression a type. It is intended as a refinement of mypy's: a well-typed
+\PurePy program should be accepted by mypy, and \PurePy may reject programs mypy accepts but not the
+reverse. The entry for a definitely assigned variable is its type
 (Definition~\ref{def:context}), so \ruleName{var} applies whenever $\Gamma(x)$ is a type, and a variable
 bound to $\statusNotDefAssigned$ has no rule. Every parameter, return and assignment carries an annotation, so the type of a definition is given rather
 than inferred from its body; within an expression, typing is bidirectional.
@@ -59,15 +61,13 @@ synthesis rule at all, so checking is the only way to type them. A non-empty lis
 checking rule is still needed where the expected element type is wider than the one the elements
 synthesise, since \pyinline{list} is invariant.
 
-Subtyping (\figref{subtyping}) is reflexivity, the widening of a literal type, the union rules and the
-ancestors of a class, with \pyinline{object} above every type and \pyinline{Never} below every type. Lists,
-dictionaries, tuples and callables are related only by reflexivity. The type system is intended as a refinement of
-mypy's: a well-typed \PurePy program should be accepted by mypy, and \PurePy may reject programs mypy
-accepts but not the reverse. So \pyinline{list} and \pyinline{dict} are invariant, as they are in mypy, although
-covariance would be sound here, since a \PurePy list cannot be written to; code that wants the covariant
-reading writes \pyinline{Sequence}, which mypy treats as covariant. An \pyinline{int} is a \pyinline{float}, as PEP~484 requires, so
-\pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int},
-though Python treats it as one.
+Subtyping (\figref{subtyping}) is reflexivity, a literal type below its base type, and a class below its
+ancestors, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
+each of its members and below every type that is above all of them. Lists, dictionaries, tuples and
+callables are related only by reflexivity, since \pyinline{list} and \pyinline{dict} are invariant in mypy
+and covariance would accept programs mypy rejects. An \pyinline{int} is a \pyinline{float}, as PEP~484
+requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, though
+Python treats it as one.
 
 \input{spec/fig/operator-signatures}
 
