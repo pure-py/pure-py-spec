@@ -36,9 +36,8 @@ form, to keep the judgement deterministic.
 
 Lambdas check, as do lists, tuples, dictionaries and comprehensions. Their types are not determined by
 the expression alone: $\exList{}$ is a list of any element type, and a lambda's parameters cannot be annotated in
-Python, so both take their type from the surroundings. One
-rule changes direction: an expression that synthesises $\sigma$ checks against any supertype of $\sigma$
-(\ruleName{check-synth}).
+Python, so both take their type from the surroundings. An expression that synthesises $\sigma$ checks against any supertype
+of $\sigma$ (\ruleName{check-synth}).
 
 The division follows the usual recipe for bidirectional systems~\cite{davies2000,dunfield2021}: introduction forms
 check, since a lambda or an empty list does not determine its own type, and elimination forms synthesise,
