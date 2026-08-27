@@ -30,7 +30,7 @@ Metavariables $x$, $f$, $c$ range over \emph{variables}, simple identifiers what
 \label{def:context}
 A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the following \emph{context entries} $\theta$:
 \begin{itemize}
-\item the variable's \emph{definite assignment} status $a \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
+\item the variable's \emph{definite assignment} status $b \in \B = \set{\statusDefAssigned, \statusNotDefAssigned}$;
 \item a \emph{module reference}, for a fully-qualified module name $q$: either a \emph{stub} $\modStub{q}$, or \emph{loaded} reference $\modLoaded{q}{\Gamma}$ carrying the \emph{signature} $\Gamma$ of $q$, the context specifying its members;
 \item a \emph{class entry} $C$, of the form $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$, recording the declaring context $\Gamma$, the qualified name $q.c$ of the class, sequence of distinct fields $\seq{x}$ with their declared types $\seq{\tau}$, and base class name $c'$ (or $\bot$ for no base).
 \end{itemize}
@@ -38,6 +38,11 @@ A context $\Gamma$ (or $\Delta$) is a finite map from variables to one of the fo
 
 \noindent Module references arise from import statements. A module declares each class name at most once, so the qualified name of a class entry is the identity of the class. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}; $\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ \emph{not definitely assigned} (or, equivalently, degenerate types ``any'' and ``none'').
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusDefAssigned(X)$ for the context $\set{\bind{x}{\statusDefAssigned} \mid x \in X}$; similarly $\statusNotDefAssigned(X)$.
+
+An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by
+keyword arguments $x = u$, where an argument $u$ is an expression in a constructor call and a pattern in a
+constructor pattern. $\fieldMap$ (\secref{auxiliary-classes}) pairs the arguments of $a$ with the fields
+they supply.
 
 \paragraph{Context operations.}
 

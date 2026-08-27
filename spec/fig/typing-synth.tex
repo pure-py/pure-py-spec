@@ -48,10 +48,10 @@
 \inferrule*[lab={\ruleName{constr}}]
 {
   \Gamma \vdash q : C \\
-  \Gamma \vdash \fieldMap(C, \seq{e})(x) \checks \tau \quad (\forall \bind{x}{\tau} \in \fields(C))
+  \Gamma \vdash \fieldMap(C, a)(x) \checks \tau \quad (\forall \bind{x}{\tau} \in \fields(C))
 }
 {
-  \Gamma \vdash \exConstr{q}{\seq{e}} \synth q
+  \Gamma \vdash \exConstr{q}{a} \synth q
 }
 \and
 \inferrule*[lab={\ruleName{binop}}]

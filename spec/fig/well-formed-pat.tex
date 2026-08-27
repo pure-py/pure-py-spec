@@ -39,11 +39,11 @@
   \Gamma \vdash q : C \\
    \\
    \\
-  \Gamma \vdash \fieldMap(C, \seq{p})(x) \quad (\forall x \in \dom(\fields(C))) \\
+  \Gamma \vdash \fieldMap(C, a)(x) \quad (\forall x \in \dom(\fields(C))) \\
   \text{variables in } \seq{p} \text{ distinct}
 }
 {
-  \Gamma \vdash \patConstr{q}{\seq{p}}
+  \Gamma \vdash \patConstr{q}{a}
 }
 \and
 \inferrule*[lab={\ruleName{cases-cons}}]
