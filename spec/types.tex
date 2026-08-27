@@ -78,8 +78,11 @@ the types of the positions they match (\figref{typing-pat}). A constructor patte
 a subtype of the subject's type, so a case that cannot match is rejected rather than being merely
 unreachable.
 
-Merging two branches merges their contexts pointwise: a variable definitely assigned in both, at $\tau$
-and $\tau'$, is of type $\tyUnion{\tau}{\tau'}$ afterwards, and a variable definitely assigned in one
+Merging two branches merges their contexts pointwise. A variable definitely assigned in both, at $\tau$ and
+$\tau'$, is of their join under subtyping: $\tau'$ where $\tau \subty \tau'$, and $\tyUnion{\tau}{\tau'}$
+where neither is a subtype of the other. The union is a join because it is an upper bound
+(\ruleName{subty-union-left}, \ruleName{subty-union-right}) below every other upper bound
+(\ruleName{subty-union}), so types are taken up to mutual subtyping. A variable definitely assigned in one
 branch alone is $\statusNotDefAssigned$.
 
 \input{spec/fig/typing-stmt}
