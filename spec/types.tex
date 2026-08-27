@@ -22,7 +22,7 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base
 \end{defalign}
 
 \noindent A class entry $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{c'}$ records the declared
-type of each field it introduces, and $C(x)$ is the type of field $x$ of $C$, taken from the base class
+type of each field it introduces, and $\fieldTy(C, x)$ is the type of field $x$ of $C$, taken from the base class
 if $x$ is inherited. A constructor call pairs each argument with a field using $\fieldMap$, checks
 the argument against that field's type, and synthesises the class (\ruleName{constr}). In an attribute reference the object must synthesise a class, and the reference then has the type of the
 field named (\ruleName{attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a

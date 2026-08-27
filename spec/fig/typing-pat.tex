@@ -34,7 +34,7 @@
 {
   \Gamma \vdash q : C \\
   q \subty \tau \\
-  \Gamma \vdash \fieldMap(C, \seq{p})(x) \checks C(x) \binding \Delta_x \quad (\forall x \in \fields(C))
+  \Gamma \vdash \fieldMap(C, \seq{p})(x) \checks \fieldTy(C, x) \binding \Delta_x \quad (\forall x \in \fields(C))
 }
 { \Gamma \vdash \patConstr{q}{\seq{p}} \checks \tau \binding \textstyle\bigotimes_{x \in \fields(C)} \Delta_x }
 \and

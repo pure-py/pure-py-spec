@@ -48,7 +48,7 @@
 \inferrule*[lab={\ruleName{constr}}]
 {
   \Gamma \vdash q : C \\
-  \Gamma \vdash \fieldMap(C, \seq{e})(x) \checks C(x) \quad (\forall x \in \fields(C))
+  \Gamma \vdash \fieldMap(C, \seq{e})(x) \checks \fieldTy(C, x) \quad (\forall x \in \fields(C))
 }
 {
   \Gamma \vdash \exConstr{q}{\seq{e}} \synth q
