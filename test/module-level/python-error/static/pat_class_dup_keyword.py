@@ -1,10 +1,9 @@
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class P:
-    x: Any
-    y: Any
+    x: int
+    y: int
 
 def f(v):
     match v:

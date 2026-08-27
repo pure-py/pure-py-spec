@@ -1,16 +1,15 @@
 # rule: sub-constr -- a base-class pattern is not subsumed by a subclass pattern
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class Base:
-    x: Any
+    x: int
 
 @dataclass
 class Derived(Base):
-    y: Any
+    y: int
 
-def describe(v: Any) -> Any:
+def describe(v: Base) -> int:
     match v:
         case Derived(a, b):
             return b

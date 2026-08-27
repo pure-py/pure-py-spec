@@ -1,15 +1,14 @@
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class C:
-    x: Any
+    x: int
 
 a = C(1)
 
 @dataclass
 class C:  # PurePy: error (name already bound); Python: a remains an instance of the old class
-    x: Any
+    x: int
 
 match a:
     case C(x):

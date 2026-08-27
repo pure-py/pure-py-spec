@@ -1,5 +1,4 @@
-from typing import Any
-def f(v: Any) -> int:
+def f(v: tuple[int, int] | int) -> int:
     match v:
         case (x, y):
             return x + y

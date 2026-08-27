@@ -1,13 +1,12 @@
 # rule: constr -- field-map accepts any split of the arguments that covers the fields
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class P:
-    x: Any
-    y: Any
+    x: int
+    y: int
 
-def sum_of(p: P) -> Any:
+def sum_of(p: P) -> int:
     match p:
         case P(a, b):
             return a + b

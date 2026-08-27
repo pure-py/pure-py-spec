@@ -1,11 +1,10 @@
 # rule: sub-constr -- field-map compares field by field, whatever the argument split
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class P:
-    x: Any
-    y: Any
+    x: int
+    y: int
 
 v = P(1, 2)
 match v:

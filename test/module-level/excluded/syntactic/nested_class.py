@@ -1,10 +1,9 @@
 from dataclasses import dataclass
-from typing import Any
 
 def f():
     @dataclass
     class C:
-        a: Any
+        a: int
     return 0
 
 print("ok")

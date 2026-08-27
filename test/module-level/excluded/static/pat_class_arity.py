@@ -1,11 +1,10 @@
 # rule: pat-constr
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class Point:
-    x: Any
-    y: Any
+    x: int
+    y: int
 
 p = Point(1, 2)
 match p:

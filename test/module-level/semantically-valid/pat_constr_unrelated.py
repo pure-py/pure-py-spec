@@ -1,16 +1,15 @@
 # rule: sub-constr -- patterns for unrelated classes do not subsume each other
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class Left:
-    x: Any
+    x: int
 
 @dataclass
 class Right:
-    y: Any
+    y: int
 
-def describe(v: Any) -> Any:
+def describe(v: Left | Right) -> int:
     match v:
         case Left(a):
             return a

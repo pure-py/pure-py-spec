@@ -1,10 +1,9 @@
 # rule: seq
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class C:
-    x: Any
+    x: int
 
 def mk():
     return C(1)

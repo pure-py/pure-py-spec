@@ -1,7 +1,6 @@
 # rule: sub-list-list / sub-tuple-tuple -- empty list and tuple patterns are
 # distinct kinds (an empty list pattern matches only an empty list).
-from typing import Any
-def f(s: Any) -> str:
+def f(s: list[int] | tuple[()]) -> str:
     match s:
         case []:
             return "el"

@@ -1,10 +1,9 @@
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class Pair:
-    a: Any
-    b: Any
+    a: int
+    b: int
 
 p = Pair((1, [2, 3]), Pair(4, None))
 match p:

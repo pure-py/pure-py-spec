@@ -1,11 +1,10 @@
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class Triple:
-    x: Any
-    y: Any
-    z: Any
+    x: int
+    y: int
+    z: int
 
 t = Triple(1, 2, 3)
 match t:

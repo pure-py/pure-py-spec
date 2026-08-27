@@ -1,11 +1,10 @@
 # rule: pat-constr
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class Point:
-    x: Any
-    y: Any
+    x: int
+    y: int
 
 # Subject isn't a Point: Python skips the keyword lookup; GraalPy doesn't
 # propagate AttributeError. PurePy rejects the pattern statically regardless.

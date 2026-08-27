@@ -1,17 +1,16 @@
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class A:
-    x: Any
+    x: int
 
 @dataclass
 class B(A):
-    y: Any
+    y: int
 
 @dataclass
 class C(B):
-    z: Any
+    z: int
 
 v = C(1, 2, 3)
 match v:
