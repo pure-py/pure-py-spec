@@ -140,11 +140,11 @@
 \inferrule*[lab={\ruleName{subscript-tuple-neg}}]
 {
   \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_m} \\
-  \Gamma \vdash e' \synth \tyLiteral{n} \\
-  {-m} \leq n < 0
+  \Gamma \vdash e' \synth \tyLiteral{-n} \\
+  0 < n \leq m
 }
 {
-  \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{m+n+1}
+  \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{m-n+1}
 }
 \and
 \inferrule*[lab={\ruleName{subscript-tuple-int}}]
