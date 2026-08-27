@@ -1,26 +1,35 @@
 \begin{figure}
 \small
 \begin{center}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.64\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.41\textwidth}>{\raggedright\arraybackslash}p{0.26\textwidth}}
 \arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}$\odot$ & $\odot : (\sigma, \sigma') \to \tau$ \\
-\pyinline{==}\quad\pyinline{!=} & $(\sigma, \sigma') \to \tyBool$, for $\sigma$ and $\sigma'$ comparable \\
-\pyinline{in}\quad\pyinline{not in} & $(\sigma, \tyList{\tau}) \to \tyBool$ and $(\sigma, \tyTuple{\seq{\tau}}) \to \tyBool$, for $\sigma$ comparable with the element type; $(\tyStr, \tyStr) \to \tyBool$; $(\tyStr, \tyDict{\tau}) \to \tyBool$ \\
-\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\sigma, \sigma') \to \tyBool$ for numeric $\sigma$ and $\sigma'$; $(\tyStr, \tyStr) \to \tyBool$ \\
-\pyinline{+} & numeric; $(\tyStr, \tyStr) \to \tyStr$; $(\tyList{\sigma}, \tyList{\sigma'}) \to \tyList{\joinTy(\sigma, \sigma')}$; $(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\sigma}\,'}) \to \tyTuple{\seq{\sigma} \mathbin{\concat} \seq{\sigma}\,'}$ \\
-\pyinline{-}\quad\pyinline{//}\quad\pyinline{\%} & numeric \\
-\pyinline{*} & numeric; $(\tyStr, \tyInt) \to \tyStr$ and $(\tyInt, \tyStr) \to \tyStr$; $(\tyList{\tau}, \tyInt) \to \tyList{\tau}$ and $(\tyInt, \tyList{\tau}) \to \tyList{\tau}$ \\
-\pyinline{/} & $(\sigma, \sigma') \to \tyFloat$ for numeric $\sigma$ and $\sigma'$ \\
-\pyinline{**} & \todo{Depends on the sign of the exponent: \pyinline{2 ** -1} is a \pyinline{float}}
+\rowcolor{grammarheadcolor}$\odot$ & Signature & Condition \\
+\pyinline{==}\quad\pyinline{!=} & $(\sigma, \sigma') \to \tyBool$ & $\sigma$ and $\sigma'$ comparable \\
+\pyinline{in}\quad\pyinline{not in} & $(\sigma, \tyList{\tau}) \to \tyBool$ & $\sigma$ and $\tau$ comparable \\
+ & $(\sigma, \tyTuple{\seq{\tau}}) \to \tyBool$ & $\sigma$ and $\joinTy(\seq{\tau})$ comparable \\
+ & $(\tyStr, \tyStr) \to \tyBool$ & \\
+ & $(\tyStr, \tyDict{\tau}) \to \tyBool$ & \\
+\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\tyFloat, \tyFloat) \to \tyBool$ & \\
+ & $(\tyStr, \tyStr) \to \tyBool$ & \\
+\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{//}\quad\pyinline{\%} & $(\tyInt, \tyInt) \to \tyInt$ & \\
+ & $(\tyFloat, \tyFloat) \to \tyFloat$ & \\
+\pyinline{/} & $(\tyFloat, \tyFloat) \to \tyFloat$ & \\
+\pyinline{+} & $(\tyStr, \tyStr) \to \tyStr$ & \\
+ & $(\tyList{\sigma}, \tyList{\sigma'}) \to \tyList{\joinTy(\sigma, \sigma')}$ & \\
+ & $(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\sigma}\,'}) \to \tyTuple{\seq{\sigma} \mathbin{\concat} \seq{\sigma}\,'}$ & \\
+\pyinline{*} & $(\tyStr, \tyInt) \to \tyStr$, $(\tyInt, \tyStr) \to \tyStr$ & \\
+ & $(\tyList{\tau}, \tyInt) \to \tyList{\tau}$, $(\tyInt, \tyList{\tau}) \to \tyList{\tau}$ & \\
+\pyinline{**} & \multicolumn{2}{l}{\todo{Depends on the sign of the exponent: \pyinline{2 ** -1} is a \pyinline{float}}}
 \end{tabular}
 
-\vspace{2mm}
+\vspace{3mm}
 
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.64\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.41\textwidth}>{\raggedright\arraybackslash}p{0.26\textwidth}}
 \arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}$\ominus$ & $\ominus : \sigma \to \tau$ \\
-\pyinline{not} & $\tyBool \to \tyBool$ \\
-\pyinline{+}\quad\pyinline{-} & $\tyInt \to \tyInt$; $\tyFloat \to \tyFloat$
+\rowcolor{grammarheadcolor}$\ominus$ & Signature & Condition \\
+\pyinline{not} & $\tyBool \to \tyBool$ & \\
+\pyinline{+}\quad\pyinline{-} & $\tyInt \to \tyInt$ & \\
+ & $\tyFloat \to \tyFloat$ &
 \end{tabular}
 \end{center}
 \caption{Operator signatures}

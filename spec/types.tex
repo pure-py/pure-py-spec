@@ -26,8 +26,9 @@ $\fieldMap$, checks it against that field's type, and synthesises $q$ as a class
 $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the entry $C$ that $q$ resolves to
 (\ruleName{attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
 signature $\ominus : \sigma \to \tau$, relating operand types to result type
-(\figref{operator-signatures}). Two types are \emph{comparable} when either is a subtype of the other, and
-an operand is \emph{numeric} when it is \pyinline{int} or \pyinline{float}. An operator marked numeric
+(\figref{operator-signatures}). Two types are \emph{comparable} when either is a subtype of the other.
+Where several signatures apply, the one with the more specific operand types is used, so \pyinline{1 + 2}
+is an \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}. An operator marked numeric
 gives \pyinline{int} where both operands are \pyinline{int} and \pyinline{float} where either is
 \pyinline{float}. In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
 (\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
@@ -65,8 +66,9 @@ dictionaries, tuples and callables are related only by reflexivity. The type sys
 mypy's: a well-typed \PurePy program is accepted by mypy, and \PurePy may reject programs mypy accepts but
 never the reverse. So \pyinline{list} and \pyinline{dict} are invariant, as they are in mypy, although
 covariance would be sound here, since a \PurePy list cannot be written to; code that wants the covariant
-reading writes \pyinline{Sequence}, which mypy treats as covariant. A \pyinline{bool} is not an
-\pyinline{int}, though Python treats it as one.
+reading writes \pyinline{Sequence}, which mypy treats as covariant. An \pyinline{int} is a \pyinline{float}, the duck-type compatibility
+PEP~484 requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int},
+though Python treats it as one.
 
 \input{spec/fig/operator-signatures}
 

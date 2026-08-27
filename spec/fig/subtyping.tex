@@ -34,6 +34,14 @@
   \tau \subty \tyObject
 }
 \and
+\inferrule*[lab={\ruleName{subty-int-float}}]
+{
+  \strut
+}
+{
+  \tyInt \subty \tyFloat
+}
+\and
 \inferrule*[lab={\ruleName{subty-literal}}]
 {
   \widen(\ell) = \tau
