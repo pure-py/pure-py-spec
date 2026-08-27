@@ -25,8 +25,9 @@ Each literal form has a type, given by $\tyOf$:
 argument with a field through $\fieldMap$, checks the argument against that field's type, and synthesises
 the class (\ruleName{syn-constr}). In an attribute reference the object must synthesise a class, and the reference then has the type of the
 field named (\ruleName{syn-attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
-signature $\ominus : \sigma \to \tau$, relating operand types to result type. Subscripting has a rule per container, and a tuple is subscripted by a
-literal index, since its component types differ.
+signature $\ominus : \sigma \to \tau$, relating operand types to result type. Subscripting has a rule for each container the subscript expression can synthesise: a list or string
+subscripted by an \pyinline{int}, a dictionary by a \pyinline{str}, and a tuple by a literal index, which
+must be one of its component positions, since the components have different types.
 
 Lambdas, list, tuple and dictionary expressions and comprehensions check. Their types are not determined by
 the expression alone: $\exList{}$ is a list of any element type, and a lambda has no annotations to declare
