@@ -22,14 +22,16 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base
 \end{defalign}
 
 \noindent The \emph{alternatives} of a type are the sequence of a union's operands, and the type itself
-otherwise, and $\joinTy$ combines types by taking the alternatives of each and dropping those another
-subsumes:
+otherwise. Two types \emph{join} to the smaller where one is a subtype of the other, and to their union
+where neither is, and a longer sequence folds:
 \begin{defalign}
 \membersOf(\tyUnion{\sigma}{\tau}) & = \membersOf(\sigma) \mathbin{\concat} \membersOf(\tau) \\
 \membersOf(\tau) & = \tau \quad \text{(otherwise)} \\[3mm]
-\joinTy(\seq{\tau}) & = \sigma_1 \mathbin{|} \ldots \mathbin{|} \sigma_m \\
-& \qquad \text{where } \sigma_1 \cons \ldots \cons \sigma_m \text{ is } \membersOf(\tau_1) \mathbin{\concat} \ldots \mathbin{\concat} \membersOf(\tau_n) \\
-& \qquad \text{less each alternative that another subsumes, and each repetition but the first}
+\joinTy(\sigma, \tau) & = \tau \quad \text{if } \sigma \subty \tau \\
+\joinTy(\sigma, \tau) & = \sigma \quad \text{if } \tau \subty \sigma \\
+\joinTy(\sigma, \tau) & = \tyUnion{\sigma}{\tau} \quad (\text{otherwise}) \\
+\joinTy(\tau) & = \tau \\
+\joinTy(\tau_1, \seq{\tau}) & = \joinTy(\tau_1, \joinTy(\seq{\tau}))
 \end{defalign}
 
 \noindent So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
