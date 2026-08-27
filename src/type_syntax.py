@@ -190,6 +190,10 @@ def ancestor_names(q: str, ctx: ModuleContext) -> tuple[str, ...]:
     return () if entry is None else tuple(short_name(a) for a in ancestors(entry))
 
 
+def comparable(s: Type, t: Type, ctx: ModuleContext) -> bool:
+    return subtype(s, t, ctx) or subtype(t, s, ctx)
+
+
 def elem_type(t: Type) -> Type | None:
     if isinstance(t, ListType):
         return t.elem
