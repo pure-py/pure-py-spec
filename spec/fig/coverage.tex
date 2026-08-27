@@ -1,0 +1,50 @@
+\begin{figure}
+\small
+\setlength{\jot}{2pt}
+\begin{center}
+\begin{tabular}{rcll}
+\grammarGroup{Shapes} \\
+$k$ & $::=$ & $\shapeAny{\tau}{N}$ & (Any) \\
+    & $\mid$ & $\ell$ & (Literal) \\
+    & $\mid$ & $\patConstr{q}{\seq{k}}$ & (Constr) \\
+    & $\mid$ & $\patTuple{\seq{k}}$ & (Tuple) \\
+    & $\mid$ & $\patList{\seq{k}}$ & (List)
+\end{tabular}
+\end{center}
+
+\begin{align*}
+\residual(\tau) &= \set{\shapeAny{\sigma}{\varnothing} \mid \sigma \text{ a member of } \tau} \\
+\shapesOf(\tau_1, \ldots, \tau_n) &= (\shapeAny{\tau_1}{\varnothing}, \ldots, \shapeAny{\tau_n}{\varnothing}) \\
+K - p &= \textstyle\bigcup_{k \in K} (k - p)
+\end{align*}
+
+\begin{align*}
+k - x = k - \patWild &= \varnothing \\*
+k - (p\;\pyinline{as}\;x) &= k - p \\*
+\ell - \ell' &= \varnothing \quad (\ell = \ell'), \quad \set{\ell} \; \text{(otherwise)} \\*
+\shapeAny{\tau}{N} - \ell &= \varnothing && \text{if } \tyLiteral{\ell} \subty \tau \text{ and } N \cup \set{\ell} \exhausts \tau \\*
+\shapeAny{\tau}{N} - \ell &= \set{\shapeAny{\tau}{N \cup \set{\ell}}} && \text{if } \tyLiteral{\ell} \subty \tau \\*
+\shapeAny{\tau}{N} - \patConstr{q}{\seq{p}} &= \set{\patConstr{q}{\seq{k}} \mid \seq{k} \in \shapesOf(\fields(q)) - \seq{p}} && \text{if } \tau \subty q \\*
+\shapeAny{\tau}{N} - \patConstr{q}{\seq{p}} &= \set{\shapeAny{\tau}{N \cup \set{q}}} \cup \set{\patConstr{q}{\seq{k}} \mid \seq{k} \in \shapesOf(\fields(q)) - \seq{p}} && \text{if } q \subty \tau,\; q \notin N \\*
+\shapeAny{\tyTuple{\seq{\tau}}}{N} - \patTuple{\seq{p}} &= \set{\patTuple{\seq{k}} \mid \seq{k} \in \shapesOf(\seq{\tau}) - \seq{p}} && \text{if } |\seq{\tau}| = |\seq{p}| \\*
+\shapeAny{\tyList{\tau}}{N} - \patList{\seq{p}} &= \set{\shapeAny{\tyList{\tau}}{N \cup \set{n}}} \cup \set{\patList{\seq{k}} \mid \seq{k} \in \shapesOf(\tau, \ldots, \tau) - \seq{p}} && \text{if } n = |\seq{p}| \notin N \\*
+\patConstr{q}{\seq{k}} - \patConstr{q'}{\seq{p}} &= \set{\patConstr{q}{\seq{k}\,'} \mid \seq{k}\,' \in \seq{k} - \seq{p}} && \text{if } q \subty q' \\*
+\patTuple{\seq{k}} - \patTuple{\seq{p}} &= \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in \seq{k} - \seq{p}} && \text{if } |\seq{k}| = |\seq{p}| \\*
+\patList{\seq{k}} - \patList{\seq{p}} &= \set{\patList{\seq{k}\,'} \mid \seq{k}\,' \in \seq{k} - \seq{p}} && \text{if } |\seq{k}| = |\seq{p}| \\*
+k - p &= \set{k} && (\text{otherwise})
+\end{align*}
+
+\begin{align*}
+(k_1, \ldots, k_n) - (p_1, \ldots, p_n) &= \textstyle\bigcup_i \set{(m_1, \ldots, m_{i-1}, k, k_{i+1}, \ldots, k_n) \mid k \in k_i - p_i,\; m_j \in k_j \meetShape p_j}
+\end{align*}
+
+\begin{align*}
+k \meetShape x = k \meetShape \patWild &= \set{k} \\*
+\shapeAny{\tau}{N} \meetShape \ell &= \set{\ell} \quad \text{if } \tyLiteral{\ell} \subty \tau \text{ and } \ell \notin N, \quad \varnothing \; \text{(otherwise)} \\*
+\ell \meetShape \ell' &= \set{\ell} \quad (\ell = \ell'), \quad \varnothing \; \text{(otherwise)} \\*
+k \meetShape p &= \set{k} \quad (\text{otherwise})
+\end{align*}
+
+\caption{Shapes, and the residual of a shape set under a pattern}
+\label{fig:coverage}
+\end{figure}
