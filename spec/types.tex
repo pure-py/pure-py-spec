@@ -43,8 +43,8 @@ The division follows the usual recipe for bidirectional systems~\cite{davies2000
 check, since a lambda or an empty list does not determine its own type, and elimination forms synthesise,
 since a call, a subscript or an attribute reference starts from a subterm whose type is known. Type systems that
 follow the recipe strictly usually rely on an annotation form $(e \mathbin{:} \tau)$, which synthesises by
-construction, so a checking form written with an annotation can be used in any context where synthesis is required. Python has no such form, since it allows an annotation only on a
-parameter, a return or an assignment, so \PurePy gives the introduction forms synthesis rules of their own
+construction, so a checking form written with an annotation can be used in any context where synthesis is required. Python has no such form, since it allows annotations only on
+parameters, returns and assignments, so \PurePy gives the introduction forms synthesis rules of their own
 wherever their parts determine the type: a tuple when all its components synthesise, a
 comprehension when its body synthesises, and a non-empty list or dictionary when at least one element
 synthesises, the others checking against the join of the types of those that synthesise (\ruleName{syn-list}, \ruleName{syn-tuple},
