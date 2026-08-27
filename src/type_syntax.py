@@ -50,7 +50,8 @@ class ClassType:
 
 @dataclass(frozen=True)
 class UnionType:
-    members: tuple["Type", ...]
+    left: "Type"
+    right: "Type"
 
 
 type Type = (
@@ -150,23 +151,29 @@ def parse_annotations(es: Sequence[ast.expr]) -> tuple[Type, ...] | None:
 
 
 def union(s: Type | None, t: Type | None) -> Type | None:
-    return None if s is None or t is None else UnionType((s, t))
+    return None if s is None or t is None else UnionType(s, t)
 
 
-def members(t: Type) -> tuple[Type, ...]:
-    return t.members if isinstance(t, UnionType) else (t,)
+def alts(t: Type) -> tuple[Type, ...]:
+    """The alternatives of a type: a union's operands, or the type itself."""
+    if isinstance(t, UnionType):
+        return alts(t.left) + alts(t.right)
+    return (t,)
+
+
+def join_two(s: Type, t: Type, ctx: ModuleContext) -> Type:
+    if subtype(s, t, ctx):
+        return t
+    if subtype(t, s, ctx):
+        return s
+    return UnionType(s, t)
 
 
 def join(ts: Sequence[Type], ctx: ModuleContext) -> Type:
-    ms = tuple(m for t in ts for m in members(t))
-    kept = tuple(
-        m
-        for i, m in enumerate(ms)
-        if not any(
-            subtype(m, n, ctx) for j, n in enumerate(ms) if j != i and (m != n or j < i)
-        )
-    )
-    return kept[0] if len(kept) == 1 else UnionType(kept)
+    assert len(ts) > 0
+    if len(ts) == 1:
+        return ts[0]
+    return join_two(ts[0], join(ts[1:], ctx), ctx)
 
 
 def subtype(s: Type, t: Type, ctx: ModuleContext) -> bool:
@@ -177,9 +184,9 @@ def subtype(s: Type, t: Type, ctx: ModuleContext) -> bool:
     if isinstance(s, LiteralType):
         return subtype(base_type(s.value), t, ctx)
     if isinstance(s, UnionType):
-        return all(subtype(m, t, ctx) for m in s.members)
+        return all(subtype(m, t, ctx) for m in alts(s))
     if isinstance(t, UnionType):
-        return any(subtype(s, m, ctx) for m in t.members)
+        return any(subtype(s, m, ctx) for m in alts(t))
     if isinstance(s, ClassType) and isinstance(t, ClassType):
         return t.q in ancestor_names(s.q, ctx)
     return False

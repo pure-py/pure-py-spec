@@ -22,8 +22,8 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base
 \end{defalign}
 
 \noindent The \emph{alternatives} of a type are the sequence of a union's operands, and the type itself
-otherwise. Two types \emph{join} to the smaller where one is a subtype of the other, and to their union
-where neither is, and a longer sequence folds:
+otherwise. Two comparable types \emph{join} to the larger of them, and two incomparable types to their
+union, and a longer sequence folds:
 \begin{defalign}
 \membersOf(\tyUnion{\sigma}{\tau}) & = \membersOf(\sigma) \mathbin{\concat} \membersOf(\tau) \\
 \membersOf(\tau) & = \tau \quad \text{(otherwise)} \\[3mm]

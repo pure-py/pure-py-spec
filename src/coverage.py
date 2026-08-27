@@ -27,8 +27,8 @@ from type_syntax import (
     Primitive,
     TupleType,
     Type,
+    alts,
     base_type,
-    members,
     subtype,
 )
 
@@ -62,7 +62,7 @@ type Shape = Any_ | Constr | Seq | Lit
 
 
 def seed(t: Type) -> tuple[Shape, ...]:
-    return tuple(Any_(m, frozenset()) for m in members(t))
+    return tuple(Any_(m, frozenset()) for m in alts(t))
 
 
 def is_empty(shapes: tuple[Shape, ...]) -> bool:
