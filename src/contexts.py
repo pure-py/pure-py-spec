@@ -63,6 +63,12 @@ def var_entry(ctx: ModuleContext, x: str) -> VarEntry | None:
     )
 
 
+def var_type(ctx: ModuleContext, x: str) -> Type | None:
+    """The variable's type, where the context has one for it."""
+    v = var_entry(ctx, x)
+    return None if v is None or isinstance(v, Status) else v
+
+
 def is_assigned(ctx: ModuleContext, x: str) -> bool:
     v = var_entry(ctx, x)
     return v is not None and v != Status.FF
