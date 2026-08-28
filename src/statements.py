@@ -60,6 +60,7 @@ from type_syntax import (
     Primitive,
     TupleType,
     Type,
+    base_type,
     parse_annotation,
     parse_annotations,
     render,
@@ -396,8 +397,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
             return None
         return TupleType(tuple(t for t in components if t is not None))
     if isinstance(e, ast.List):
-        check_exprs(e.elts, ctx)
-        return None
+        return list_type(e.elts, ctx)
     if isinstance(e, ast.Dict):
         check_exprs([k for k in e.keys if k is not None], ctx)
         check_exprs(e.values, ctx)
@@ -453,6 +453,20 @@ def literal_index(t: Type | None) -> int | None:
     return v if isinstance(v, int) and not isinstance(v, bool) else None
 
 
+def list_type(elts: list[ast.expr], ctx: ModuleContext) -> Type | None:
+    """A non-empty list synthesises where at least one element does, at the join
+    of the types of those that do, with the others checked against it."""
+    synthesised = [check_expr(x, ctx) for x in elts]
+    known = [t for t in synthesised if t is not None]
+    if len(known) == 0:
+        return None
+    elem = join([base_type(t) for t in known], ctx)
+    for x, t in zip(elts, synthesised):
+        if t is None:
+            checks_against(x, elem, ctx)
+    return ListType(elem)
+
+
 def call(e: ast.Call, ctx: ModuleContext) -> Type | None:
     """The result type of a call, checking each argument against its parameter
     type; the callee must be a callable of the same arity."""
@@ -470,9 +484,33 @@ def call(e: ast.Call, ctx: ModuleContext) -> Type | None:
 
 
 def checks_against(e: ast.expr, expected: Type | None, ctx: ModuleContext) -> None:
-    """Check `e` against `expected`, where both types are known."""
+    """Check `e` against `expected`. A container display checks its parts against
+    the parts of the expected type; anything else synthesises and must be below
+    it."""
+    if expected is None:
+        check_expr(e, ctx)
+        return
+    if isinstance(e, ast.List) and isinstance(expected, ListType):
+        for x in e.elts:
+            checks_against(x, expected.elem, ctx)
+        return
+    if (
+        isinstance(e, ast.Tuple)
+        and isinstance(expected, TupleType)
+        and len(e.elts) == len(expected.components)
+    ):
+        for x, t in zip(e.elts, expected.components):
+            checks_against(x, t, ctx)
+        return
+    if isinstance(e, ast.Dict) and isinstance(expected, DictType):
+        for k in e.keys:
+            if k is not None:
+                checks_against(k, Primitive.STR, ctx)
+        for v in e.values:
+            checks_against(v, expected.value, ctx)
+        return
     actual = check_expr(e, ctx)
-    if expected is None or actual is None:
+    if actual is None:
         return
     if not subtype(actual, expected, ctx):
         raise IllFormedModule(e, reasons.TypeMismatch(render(expected), render(actual)))
