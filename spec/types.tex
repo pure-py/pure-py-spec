@@ -28,7 +28,15 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base
 \widen(\pyinline{None}) & = \tyNone
 \end{defalign}
 
-\noindent Two types are \emph{comparable} when either is a subtype of the other. Subtyping and the definitions
+Subtyping (\figref{subtyping}) is reflexivity, a literal type below its base type, and a class below its
+ancestors, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
+each of its members and below every type that is above all of them. Lists, dictionaries, tuples and
+callables are related only by reflexivity, since \pyinline{list} and \pyinline{dict} are invariant in mypy
+and covariance would accept programs mypy rejects. An \pyinline{int} is a \pyinline{float}, as PEP~484
+requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
+Python treats it as one.
+
+Two types are \emph{comparable} when either is a subtype of the other. Subtyping and the definitions
 below depend on the context, since a class is below its ancestors, and $\Gamma$ is left implicit where it
 plays no part. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. A sequence of types joins by
@@ -86,22 +94,15 @@ synthesis rule at all, so checking is the only way to type them. A non-empty lis
 checking rule is still needed where the expected element type is wider than the one the elements
 synthesise, since \pyinline{list} is invariant.
 
-Subtyping (\figref{subtyping}) is reflexivity, a literal type below its base type, and a class below its
-ancestors, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
-each of its members and below every type that is above all of them. Lists, dictionaries, tuples and
-callables are related only by reflexivity, since \pyinline{list} and \pyinline{dict} are invariant in mypy
-and covariance would accept programs mypy rejects. An \pyinline{int} is a \pyinline{float}, as PEP~484
-requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
-Python treats it as one.
-
 \input{spec/fig/typing-synth}
 
 \input{spec/fig/typing-check}
 
 \input{spec/fig/subtyping}
 
-A generator draws its bindings from the elements of a value, and $\elemTy$ gives the type of those elements,
-mirroring $\iterOp$ (\secref{auxiliary-values}):
+Typing a comprehension types its qualifiers, which bind the variables its body may use
+(\figref{typing-check}). A generator draws those bindings from the elements of a value, and $\elemTy$ gives
+the type of those elements, mirroring $\iterOp$ (\secref{auxiliary-values}):
 \begin{defalign}
 \elemTy(\tyList{\tau}) & = \tau \\
 \elemTy(\tyStr) & = \tyStr \\
