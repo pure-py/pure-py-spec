@@ -64,7 +64,7 @@
 \end{mathpar}
 
 \begin{defalign}
-\restOf(\tyUnion{\sigma}{\sigma'}, N) & = \restOf(\sigma, N) \cup \restOf(\sigma', N) \\
+\restOf(\tyUnion{\sigma}{\tau}, N) & = \restOf(\sigma, N) \cup \restOf(\tau, N) \\
 \restOf(\tyLiteral{\ell}, N) & = \varnothing \quad \text{if } \ell \in N \\
 \restOf(\tyBool, N) & = \varnothing \quad \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\
 \restOf(\tyNone, N) & = \varnothing \quad \text{if } \pyinline{None} \in N \\
