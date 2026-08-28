@@ -141,6 +141,10 @@ Merging two branches merges their contexts pointwise. A variable definitely assi
 $\tau'$, is of type $\joinTy(\tau, \tau')$, and a variable definitely assigned in one branch alone is
 $\statusNotDefAssigned$.
 
+\input{spec/fig/typing-stmt}
+
+\input{spec/fig/typing-pat}
+
 \subsection{Exhaustiveness checking}
 \label{sec:exhaustiveness}
 
@@ -182,9 +186,7 @@ exhaustive, although no one of them subsumes what a further case would match.
 
 \input{spec/fig/coverage}
 
-\input{spec/fig/typing-stmt}
-
-\input{spec/fig/typing-pat}
+\input{spec/fig/typing-cases}
 
 \begin{lemma}[Transitivity of subtyping]
 \label{lem:subtyping-transitive}
