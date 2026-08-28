@@ -11,6 +11,9 @@ is bidirectional. \emph{Synthesis} $\Gamma \vdash e \synth \tau$ reads a type ou
 and \emph{checking} $\Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
 surroundings (\figref{typing-check}).
 
+\subsection{Expression typing}
+\label{sec:expression-typing}
+
 Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise. A
 literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base type} is $\widen(\ell)$:
 \input{spec/fig/aux-types}
@@ -106,6 +109,9 @@ mirroring $\iterOp$ (\secref{auxiliary-values}):
 
 \noindent A tuple whose component types differ has no element type, so it cannot be iterated.
 
+\subsection{Statement typing}
+\label{sec:statement-typing}
+
 Statements carry the return type of the function they appear in as a second argument to the left of the
 turnstile: $\Gamma; \tau \vdash t : R$ says that $t$ has result type $R$ in $\Gamma$, in a
 function declared to return $\tau$ (\figref{typing-stmt}). The type $\tau$ is an obligation on the
@@ -127,6 +133,10 @@ A \pyinline{match} scrutinee synthesises a type, and each pattern checks against
 the types of the positions they match (\figref{typing-pat}). A constructor pattern requires its class to be
 a subtype of the scrutinee's type, so a case that cannot match is rejected rather than being merely
 unreachable.
+
+Merging two branches merges their contexts pointwise. A variable definitely assigned in both, at $\tau$ and
+$\tau'$, is of type $\joinTy(\tau, \tau')$, and a variable definitely assigned in one branch alone is
+$\statusNotDefAssigned$.
 
 \subsection{Exhaustiveness checking}
 \label{sec:exhaustiveness}
@@ -168,10 +178,6 @@ $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinli
 exhaustive, although no one of them subsumes what a further case would match.
 
 \input{spec/fig/coverage}
-
-Merging two branches merges their contexts pointwise. A variable definitely assigned in both, at $\tau$ and
-$\tau'$, is of type $\joinTy(\tau, \tau')$, and a variable definitely assigned in one branch alone is
-$\statusNotDefAssigned$.
 
 \input{spec/fig/typing-stmt}
 
