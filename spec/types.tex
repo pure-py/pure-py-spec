@@ -6,6 +6,12 @@ The typing rules say whether a program is well typed. They are intended as a ref
 reverse. Every parameter and return carries an annotation, so the type of a definition is given rather
 than inferred from its body.
 
+The entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
+that is not definitely assigned is bound to $\statusNotDefAssigned$. Merging two branches merges their
+contexts pointwise. A variable definitely assigned in both, at $\tau$ and $\tau'$, is of type
+$\joinTy(\tau, \tau')$, and a variable definitely assigned in one branch alone is
+$\statusNotDefAssigned$.
+
 \input{spec/fig/aux-types}
 
 \subsection{Expression typing}
@@ -24,9 +30,9 @@ allowing annotations only on parameters, returns and assignments, so \PurePy giv
 synthesis rules of their own wherever their parts determine the type, following Swift, Kotlin and
 Scala~\cite{swift2025,kotlin2025,odersky2025}.
 
-Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise. The
-entry for a definitely assigned variable is its type (Definition~\ref{def:context}), so \ruleName{var}
-applies whenever $\Gamma(x)$ is a type, and a variable bound to $\statusNotDefAssigned$ has no rule. A
+Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise.
+\ruleName{var} applies whenever $\Gamma(x)$ is a type, so a variable that is not definitely assigned has no
+rule. A
 literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base type} is $\widen(\ell)$:
 \begin{defalign}
 \widen(n) & = \tyInt &\quad& \text{if } n \text{ is an integer literal} \\
@@ -144,10 +150,6 @@ and its body is checked under those bindings. A constructor pattern requires its
 scrutinee's type, so a case that cannot match is rejected rather than being merely unreachable. \ruleName{match} and \ruleName{match-partial} also require the cases to be reachable and to
 exhaust the scrutinee's type, which the judgement $\Gamma; \tau \vdash L, \seq{h} \checks \sigma : S
 \binding L'$ decides from the shapes $\restOf(\sigma, \varnothing)$ of that type. Neither is defined here.
-
-Merging two branches merges their contexts pointwise. A variable definitely assigned in both, at $\tau$ and
-$\tau'$, is of type $\joinTy(\tau, \tau')$, and a variable definitely assigned in one branch alone is
-$\statusNotDefAssigned$.
 
 \input{spec/fig/typing-stmt}
 
