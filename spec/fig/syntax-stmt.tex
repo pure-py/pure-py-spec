@@ -13,7 +13,7 @@ $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exReturn{e}$ & (Return) \\
     & $\mid$ & $\exIf{e}{s}{\exElif{e_1}{s_1}\;\ldots\;\exElif{e_n}{s_n}}$ & (If) \\
     & $\mid$ & $\exIfElse{e}{s}{\exElif{e_1}{s_1}\;\ldots\;\exElif{e_n}{s_n}}{s'}$ & (IfElse) \\
-    & $\mid$ & $\exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}}$ & (Match) \\
+    & $\mid$ & $\exMatch{e}{h_1 \;\ldots\; h_{n+1}}$ & (Match) \\
     & $\mid$ & $d_1 \;\ldots\; d_{n+1}$ & (MutualRegion)
    \\[3mm]
 \grammarGroup{Top-level statements} \\
@@ -25,6 +25,9 @@ $t$ & $::=$ & $s$ & (Stmt) \\
 \grammarGroup{Imports} \\
 $\iota$ & $::=$ & $\exImport{q}$ & (Import) \\
     & $\mid$ & $\exFromImport{q}{x_1, \ldots, x_{n+1}}$ & (FromImport)
+   \\[3mm]
+\grammarGroup{Cases} \\
+$h$ & $::=$ & $\exCase{p}{s}$ & (Case)
    \\[3mm]
 \grammarGroup{Field lists} \\
 $\phi$ & $::=$ & $\exField{x_1}{\tau_1} \;\ldots\; \exField{x_{n+1}}{\tau_{n+1}}$ & (FieldList) \\

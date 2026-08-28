@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma; \tau \vdash L, \seq{c} \checks \sigma : S \binding L'$}
+\flushleft \shadebox{$\Gamma; \tau \vdash L, \seq{h} \checks \sigma : S \binding L'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{cases-one}}]
@@ -19,12 +19,12 @@
   \Gamma \override \Delta; \tau \vdash s : R \\
   \Gamma \vdash L, p \splitTo K, L'' \\
   K \neq \varnothing \\
-  \Gamma; \tau \vdash L'', \seq{c} \checks \sigma : S \binding L'
+  \Gamma; \tau \vdash L'', \seq{h} \checks \sigma : S \binding L'
 }
 {
-  \Gamma; \tau \vdash L, \exCase{p}{s} \cons \seq{c} \checks \sigma : (\Assigns{\Delta} \override R) \merge S \binding L'
+  \Gamma; \tau \vdash L, \exCase{p}{s} \cons \seq{h} \checks \sigma : (\Assigns{\Delta} \override R) \merge S \binding L'
 }
 \end{mathpar}
-\caption{Cases $\seq{c}$ against scrutinee type $\sigma$ have result type $S$, reducing residual $L$ to $L'$}
+\caption{Cases $\seq{h}$ against scrutinee type $\sigma$ have result type $S$, reducing residual $L$ to $L'$}
 \label{fig:typing-cases}
 \end{figure}
