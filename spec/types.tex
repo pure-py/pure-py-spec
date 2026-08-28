@@ -12,11 +12,11 @@ than inferred from its body.
 Within an expression the typing judgement gives each subexpression a type, and
 is bidirectional. \emph{Synthesis} $\Gamma \vdash e \synth \tau$ reads a type out of an expression (\figrefTwo{typing-synth}{typing-synth-ctd}),
 and \emph{checking} $\Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
-surroundings (\figref{typing-check}). The entry for a definitely assigned variable is its type
-(Definition~\ref{def:context}), so \ruleName{var} applies whenever $\Gamma(x)$ is a type, and a variable
-bound to $\statusNotDefAssigned$ has no rule.
+surroundings (\figref{typing-check}).
 
-Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise. A
+Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise. The
+entry for a definitely assigned variable is its type (Definition~\ref{def:context}), so \ruleName{var}
+applies whenever $\Gamma(x)$ is a type, and a variable bound to $\statusNotDefAssigned$ has no rule. A
 literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base type} is $\widen(\ell)$:
 \input{spec/fig/aux-types}
 
