@@ -35,7 +35,7 @@
   \newcommand*{\auxgroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{\itshape #1} \\}
 \fi
 % Inline definitions: align* with tighter row spacing than a standalone figure.
-\newenvironment{defalign}{\setlength{\jot}{1pt}\csname align*\endcsname}{\csname endalign*\endcsname}
+\newenvironment{defalign}{\setlength{\jot}{1pt}\csname alignat*\endcsname{2}}{\csname endalignat*\endcsname}
 % How the paper refers to the specification document.
 \ifdefined\anonmode
   \newcommand*{\specification}{the supplementary material\xspace}

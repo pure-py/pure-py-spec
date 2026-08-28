@@ -1,6 +1,7 @@
 \begin{figure}
 \small
 \setlength{\jot}{2pt}
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Gamma \vdash k : \tau$}
 \begin{mathpar}
 \small
@@ -62,18 +63,25 @@
   \Gamma \vdash \patList{\seq{k}} : \tyList{\tau}
 }
 \end{mathpar}
+\subcaption{Shape $k$ denotes values of type $\tau$}
+\end{subfigure}
 
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
 \begin{defalign}
 \restOf(\tyUnion{\sigma}{\tau}, N) & = \restOf(\sigma, N) \cup \restOf(\tau, N) \\
-\restOf(\tyLiteral{\ell}, N) & = \varnothing \quad \text{if } \ell \in N \\
-\restOf(\tyBool, N) & = \varnothing \quad \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\
-\restOf(\tyNone, N) & = \varnothing \quad \text{if } \pyinline{None} \in N \\
-\restOf(q, N) & = \varnothing \quad \text{if } \Gamma \vdash q \subty q' \text{ for some } q' \in N \\
+\restOf(\tyLiteral{\ell}, N) & = \varnothing &\quad& \text{if } \ell \in N \\
+\restOf(\tyBool, N) & = \varnothing &\quad& \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\
+\restOf(\tyNone, N) & = \varnothing &\quad& \text{if } \pyinline{None} \in N \\
+\restOf(q, N) & = \varnothing &\quad& \text{if } \Gamma \vdash q \subty q' \text{ for some } q' \in N \\
 \restOf(\tyNever, N) & = \varnothing \\
-\restOf(\tau, N) & = \set{\shapeAny{\tau}{N}} \quad (\text{otherwise})
+\restOf(\tau, N) & = \set{\shapeAny{\tau}{N}} &\quad& \text{otherwise}
 \end{defalign}
+\subcaption{Shapes of type $\tau$ with constructors $N$ excluded}
+\end{subfigure}
 
-\caption{Shape $k$ denotes values of type $\tau$, and $\restOf(\tau, N)$ gives shapes of $\tau$ with constructors $N$ excluded}
+\caption{Shapes}
 \label{fig:shapes}
 \end{figure}
 
