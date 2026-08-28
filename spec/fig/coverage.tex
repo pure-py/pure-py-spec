@@ -2,12 +2,53 @@
 \small
 \setlength{\jot}{2pt}
 \begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Gamma \vdash h \ctorOf \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{ctor-class}}]
+{
+  \Gamma \vdash q' \subty q
+}
+{
+  \Gamma \vdash q' \ctorOf q
+}
+\and
+\inferrule*[lab={\ruleName{ctor-list}}]
+{
+  n \geq 0
+}
+{
+  \Gamma \vdash n \ctorOf \tyList{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{ctor-dict}}]
+{
+  \strut
+}
+{
+  \Gamma \vdash \set{w_1, \ldots, w_n} \ctorOf \tyDict{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{ctor-literal}}]
+{
+  \Gamma \vdash \tyLiteral{\ell} \subty \tau
+}
+{
+  \Gamma \vdash \ell \ctorOf \tau
+}
+\end{mathpar}
+\subcaption{Constructor $h$ of type $\tau$}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Gamma \vdash k : \tau$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{shape-rest}}]
 {
-  N \subseteq \ctors(\tau) \\
+  \Gamma \vdash h \ctorOf \tau \quad (\forall h \in N) \\
   \tau \text{ not a union}
 }
 {
@@ -55,10 +96,6 @@
 
 \begin{subfigure}{\textwidth}
 \begin{defalign}
-\ctors(q) & = \set{q' \mid \Gamma \vdash q' \subty q} \\
-\ctors(\tyList{\tau}) & = \set{n \mid n \geq 0} \\
-\ctors(\tyDict{\tau}) & = \set{\set{w_1, \ldots, w_n} \mid n \geq 0} \\
-\ctors(\tau) & = \set{\ell \mid \Gamma \vdash \tyLiteral{\ell} \subty \tau} &\quad& \text{otherwise} \\[3mm]
 \restOf(\tyUnion{\sigma}{\tau}, N) & = \restOf(\sigma, N) \cup \restOf(\tau, N) \\
 \restOf(\tyLiteral{\ell}, N) & = \varnothing &\quad& \text{if } \ell \in N \\
 \restOf(\tyBool, N) & = \varnothing &\quad& \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\
@@ -68,7 +105,7 @@
 \restOf(\tyNever, N) & = \varnothing \\
 \restOf(\tau, N) & = \set{\shapeAny{\tau}{N}} &\quad& \text{otherwise}
 \end{defalign}
-\subcaption{Constructors of type $\tau$, and shapes of $\tau$ with constructors $N$ excluded}
+\subcaption{Shapes of type $\tau$ with constructors $N$ excluded}
 \end{subfigure}
 
 \caption{Shapes}
