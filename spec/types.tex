@@ -131,17 +131,18 @@ Reachability and exhaustiveness are the two halves of one computation (\figref{c
 $k$ denotes a set of values: $\shapeAny{\tau}{N}$ is a value of type $\tau$ whose head is none of $N$,
 where $N$ collects literals, class names and sequence lengths, and the remaining forms are a literal, a
 constructor, a tuple and a list, each with shapes in place of sub-patterns. The \emph{residual} of the
-scrutinee's type is one shape per member of it, and subtracting a pattern leaves the shapes it does not
-match.
+scrutinee's type is one shape per alternative of it, and $\splitShape$ divides a set of shapes into the
+part a pattern matches and the part it leaves.
 
 The cases are then walked once, from the residual of the scrutinee's type, in the same shape as
 $\dispatch$ walks them at run time (\figref{typing-cases}). Each case checks its pattern, checks its body
-under the bindings, and must reduce the residual, which is what makes it reachable. \ruleName{match}
+under the bindings, and must match some shape of the residual, which is what makes it reachable, and the
+part it leaves is passed on. \ruleName{match}
 applies where the walk ends with an empty residual, and \ruleName{match-partial} where it does not, merging
 in $\Assigns{\varnothing}$ for the values that fall through. A union is exhausted
 by covering each member, a class type by a pattern for the class itself, and \pyinline{bool} by
 \pyinline{True} and \pyinline{False}, while \pyinline{int}, \pyinline{str}, lists and dictionaries have
-unboundedly many heads and need a variable or wildcard. Subtraction is strictly sharper than comparing
+unboundedly many heads and need a variable or wildcard. Splitting is strictly sharper than comparing
 patterns pairwise: over $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ are
 exhaustive, though no one of them subsumes what a further case would match.

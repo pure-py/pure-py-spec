@@ -13,38 +13,38 @@ $k$ & $::=$ & $\shapeAny{\tau}{N}$ & (Any) \\
 \end{center}
 
 \begin{align*}
-\residual(\tau) &= \set{\shapeAny{\sigma}{\varnothing} \mid \sigma \text{ in } \membersOf(\tau)} \\
-\shapesOf(\tau_1, \ldots, \tau_n) &= (\shapeAny{\tau_1}{\varnothing}, \ldots, \shapeAny{\tau_n}{\varnothing}) \\
-K - p &= \textstyle\bigcup_{k \in K} (k - p)
+\residual(\tau) &= \set{\shapeAny{\sigma}{\varnothing} \mid \sigma \text{ in } \membersOf(\tau)} &
+\shapesOf(\tau_1, \ldots, \tau_n) &= (\shapeAny{\tau_1}{\varnothing}, \ldots, \shapeAny{\tau_n}{\varnothing})
 \end{align*}
 
 \begin{align*}
-k - x = k - \patWild &= \varnothing \\*
-k - (p\;\pyinline{as}\;x) &= k - p \\*
-\ell - \ell' &= \varnothing \quad (\ell = \ell'), \quad \set{\ell} \; \text{(otherwise)} \\*
-\shapeAny{\tau}{N} - \ell &= \varnothing && \text{if } \tyLiteral{\ell} \subty \tau \text{ and } N \cup \set{\ell} \exhausts \tau \\*
-\shapeAny{\tau}{N} - \ell &= \set{\shapeAny{\tau}{N \cup \set{\ell}}} && \text{if } \tyLiteral{\ell} \subty \tau \\*
-\shapeAny{\tau}{N} - \patConstr{q}{\seq{p}} &= \set{\patConstr{q}{\seq{k}} \mid \seq{k} \in \shapesOf(\fields(q)) - \seq{p}} && \text{if } \tau \subty q \\*
-\shapeAny{\tau}{N} - \patConstr{q}{\seq{p}} &= \set{\shapeAny{\tau}{N \cup \set{q}}} \cup \set{\patConstr{q}{\seq{k}} \mid \seq{k} \in \shapesOf(\fields(q)) - \seq{p}} && \text{if } q \subty \tau,\; q \notin N \\*
-\shapeAny{\tyTuple{\seq{\tau}}}{N} - \patTuple{\seq{p}} &= \set{\patTuple{\seq{k}} \mid \seq{k} \in \shapesOf(\seq{\tau}) - \seq{p}} && \text{if } |\seq{\tau}| = |\seq{p}| \\*
-\shapeAny{\tyList{\tau}}{N} - \patList{\seq{p}} &= \set{\shapeAny{\tyList{\tau}}{N \cup \set{n}}} \cup \set{\patList{\seq{k}} \mid \seq{k} \in \shapesOf(\tau, \ldots, \tau) - \seq{p}} && \text{if } n = |\seq{p}| \notin N \\*
-\patConstr{q}{\seq{k}} - \patConstr{q'}{\seq{p}} &= \set{\patConstr{q}{\seq{k}\,'} \mid \seq{k}\,' \in \seq{k} - \seq{p}} && \text{if } q \subty q' \\*
-\patTuple{\seq{k}} - \patTuple{\seq{p}} &= \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in \seq{k} - \seq{p}} && \text{if } |\seq{k}| = |\seq{p}| \\*
-\patList{\seq{k}} - \patList{\seq{p}} &= \set{\patList{\seq{k}\,'} \mid \seq{k}\,' \in \seq{k} - \seq{p}} && \text{if } |\seq{k}| = |\seq{p}| \\*
-k - p &= \set{k} && (\text{otherwise})
+\splitShape(k, x) = \splitShape(k, \patWild) &= (\set{k}, \varnothing) \\*
+\splitShape(k, p\;\pyinline{as}\;x) &= \splitShape(k, p) \\*
+\splitShape(\ell, \ell') &= (\set{\ell}, \varnothing) \quad (\ell = \ell'), \quad (\varnothing, \set{\ell}) \; \text{(otherwise)} \\*
+\splitShape(\shapeAny{\tau}{N}, \ell) &= (\set{\ell}, \varnothing) && \text{if } \Gamma \vdash \tyLiteral{\ell} \subty \tau \text{ and } N \cup \set{\ell} \exhausts \tau \\*
+\splitShape(\shapeAny{\tau}{N}, \ell) &= (\set{\ell}, \set{\shapeAny{\tau}{N \cup \set{\ell}}}) && \text{if } \Gamma \vdash \tyLiteral{\ell} \subty \tau \\*
+\splitShape(\shapeAny{\tau}{N}, \patConstr{q}{\seq{p}}) &= (\set{\patConstr{q}{\seq{m}} \mid \seq{m} \in M}, \set{\patConstr{q}{\seq{k}} \mid \seq{k} \in K} \cup R) && \text{if } q \notin N, \; \tau \text{ and } q \text{ comparable} \\*
+&\qquad \text{where } (M, K) = \splitShape(\shapesOf(\fields(q)), \seq{p}) \\*
+&\qquad \text{and } R = \varnothing \text{ if } \Gamma \vdash \tau \subty q, \; \set{\shapeAny{\tau}{N \cup \set{q}}} \text{ otherwise} \\*
+\splitShape(\shapeAny{\tyTuple{\seq{\tau}}}{N}, \patTuple{\seq{p}}) &= (\set{\patTuple{\seq{m}} \mid \seq{m} \in M}, \set{\patTuple{\seq{k}} \mid \seq{k} \in K}) && \text{if } |\seq{\tau}| = |\seq{p}| \\*
+&\qquad \text{where } (M, K) = \splitShape(\shapesOf(\seq{\tau}), \seq{p}) \\*
+\splitShape(\shapeAny{\tyList{\tau}}{N}, \patList{\seq{p}}) &= (\set{\patList{\seq{m}} \mid \seq{m} \in M}, \set{\patList{\seq{k}} \mid \seq{k} \in K} \cup \set{\shapeAny{\tyList{\tau}}{N \cup \set{n}}}) && \text{if } n = |\seq{p}| \notin N \\*
+&\qquad \text{where } (M, K) = \splitShape(\shapesOf(\tau, \ldots, \tau), \seq{p}) \\*
+\splitShape(\patConstr{q}{\seq{k}}, \patConstr{q'}{\seq{p}}) &= (\set{\patConstr{q}{\seq{m}} \mid \seq{m} \in M}, \set{\patConstr{q}{\seq{k}\,'} \mid \seq{k}\,' \in K}) && \text{if } \Gamma \vdash q \subty q' \\*
+&\qquad \text{where } (M, K) = \splitShape(\seq{k}, \seq{p}) \\*
+\splitShape(\patTuple{\seq{k}}, \patTuple{\seq{p}}) &= (\set{\patTuple{\seq{m}} \mid \seq{m} \in M}, \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in K}) && \text{if } |\seq{k}| = |\seq{p}| \\*
+&\qquad \text{where } (M, K) = \splitShape(\seq{k}, \seq{p}) \\*
+\splitShape(\patList{\seq{k}}, \patList{\seq{p}}) &= (\set{\patList{\seq{m}} \mid \seq{m} \in M}, \set{\patList{\seq{k}\,'} \mid \seq{k}\,' \in K}) && \text{if } |\seq{k}| = |\seq{p}| \\*
+&\qquad \text{where } (M, K) = \splitShape(\seq{k}, \seq{p}) \\*
+\splitShape(k, p) &= (\varnothing, \set{k}) && (\text{otherwise})
 \end{align*}
 
 \begin{align*}
-(k_1, \ldots, k_n) - (p_1, \ldots, p_n) &= \textstyle\bigcup_i \set{(m_1, \ldots, m_{i-1}, k, k_{i+1}, \ldots, k_n) \mid k \in k_i - p_i,\; m_j \in k_j \meetShape p_j}
+\splitShape((k_1, \ldots, k_n), (p_1, \ldots, p_n)) &= \big(\set{(m_1, \ldots, m_n) \mid m_i \in M_i}, \; \textstyle\bigcup_i \set{(m_1, \ldots, m_{i-1}, k, k_{i+1}, \ldots, k_n) \mid k \in K_i, \; m_j \in M_j}\big) \\*
+&\qquad \text{where } (M_i, K_i) = \splitShape(k_i, p_i) \\[2mm]
+\splitShape(K, p) &= \big(\textstyle\bigcup_{k \in K} M_k, \; \textstyle\bigcup_{k \in K} K_k\big) \quad \text{where } (M_k, K_k) = \splitShape(k, p)
 \end{align*}
 
-\begin{align*}
-k \meetShape x = k \meetShape \patWild &= \set{k} \\*
-\shapeAny{\tau}{N} \meetShape \ell &= \set{\ell} \quad \text{if } \tyLiteral{\ell} \subty \tau \text{ and } \ell \notin N, \quad \varnothing \; \text{(otherwise)} \\*
-\ell \meetShape \ell' &= \set{\ell} \quad (\ell = \ell'), \quad \varnothing \; \text{(otherwise)} \\*
-k \meetShape p &= \set{k} \quad (\text{otherwise})
-\end{align*}
-
-\caption{Shapes, and the residual of a shape set under a pattern}
+\caption{Shapes, and the split of a shape set by a pattern into the part it matches and the part it leaves}
 \label{fig:coverage}
 \end{figure}

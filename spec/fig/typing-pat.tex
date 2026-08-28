@@ -54,18 +54,20 @@
 {
   \Gamma \vdash p \checks \sigma \binding \Delta \\
   \Gamma \override \Delta; \tau \vdash s : R \\
-  K - p \neq K
+  \splitShape(K, p) = (M, K') \\
+  M \neq \varnothing
 }
 {
-  \Gamma; \tau \vdash K, \exCase{p}{s} \checks \sigma : \Assigns{\Delta} \override R \binding K - p
+  \Gamma; \tau \vdash K, \exCase{p}{s} \checks \sigma : \Assigns{\Delta} \override R \binding K'
 }
 \and
 \inferrule*[lab={\ruleName{cases-cons}}]
 {
   \Gamma \vdash p \checks \sigma \binding \Delta \\
   \Gamma \override \Delta; \tau \vdash s : R \\
-  K - p \neq K \\
-  \Gamma; \tau \vdash K - p, \seq{c} \checks \sigma : S \binding K'
+  \splitShape(K, p) = (M, K'') \\
+  M \neq \varnothing \\
+  \Gamma; \tau \vdash K'', \seq{c} \checks \sigma : S \binding K'
 }
 {
   \Gamma; \tau \vdash K, \exCase{p}{s} \cons \seq{c} \checks \sigma : (\Assigns{\Delta} \override R) \merge S \binding K'
