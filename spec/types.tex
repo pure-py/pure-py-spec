@@ -138,10 +138,10 @@ at $\statusNotDefAssigned$ (\ruleName{def}). The body is checked with the
 declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
-A \pyinline{match} scrutinee synthesises a type, and each pattern checks against it, binding its variables at
-the types of the positions they match (\figref{typing-pat}). A constructor pattern requires its class to be
-a subtype of the scrutinee's type, so a case that cannot match is rejected rather than being merely
-unreachable. \ruleName{match} and \ruleName{match-partial} also require the cases to be reachable and to
+A \pyinline{match} scrutinee synthesises a type, and each case checks against it: the pattern checks against
+that type, binding its variables at the types of the positions they match (\figref{typing-pat}), and the
+body is checked under those bindings. A constructor pattern requires its class to be a subtype of the
+scrutinee's type, so a case that cannot match is rejected rather than being merely unreachable. \ruleName{match} and \ruleName{match-partial} also require the cases to be reachable and to
 exhaust the scrutinee's type, which the judgement $\Gamma; \tau \vdash L, \seq{c} \checks \sigma : S
 \binding L'$ decides from the shapes $\restOf(\sigma, \varnothing)$ of that type. Neither is defined here.
 
