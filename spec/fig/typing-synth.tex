@@ -57,21 +57,19 @@
 \inferrule*[lab={\ruleName{binop}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma \vdash e' \synth \sigma' \\
-  \resolve(\odot, \sigma, \sigma') = \tau
+  \Gamma \vdash e' \synth \sigma'
 }
 {
-  \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \tau
+  \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \resolve(\odot, \sigma, \sigma')
 }
 \and
 \inferrule*[lab={\ruleName{unop}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \resolve(\ominus, \sigma) = \tau \\
   \exUnOp{\ominus}{e} \neq \exUnOp{\pyinline{-}}{n} \quad (\forall n)
 }
 {
-  \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau
+  \Gamma \vdash \exUnOp{\ominus}{e} \synth \resolve(\ominus, \sigma)
 }
 \and
 \inferrule*[lab={\ruleName{unop-literal}}]
