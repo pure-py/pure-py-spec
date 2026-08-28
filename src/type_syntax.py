@@ -63,6 +63,17 @@ type Type = (
     | UnionType
 )
 
+PRIMITIVE_SPELLINGS = {
+    Primitive.ANY: "Any",
+    Primitive.OBJECT: "object",
+    Primitive.NEVER: "Never",
+    Primitive.NONE: "None",
+    Primitive.BOOL: "bool",
+    Primitive.INT: "int",
+    Primitive.FLOAT: "float",
+    Primitive.STR: "str",
+}
+
 PRIMITIVE_NAMES = {
     "Any": Primitive.ANY,
     "object": Primitive.OBJECT,
@@ -73,6 +84,26 @@ PRIMITIVE_NAMES = {
     "float": Primitive.FLOAT,
     "str": Primitive.STR,
 }
+
+
+def render(t: Type) -> str:
+    """The type as it is written in an annotation."""
+    if isinstance(t, Primitive):
+        return PRIMITIVE_SPELLINGS[t]
+    if isinstance(t, ListType):
+        return f"list[{render(t.elem)}]"
+    if isinstance(t, TupleType):
+        return f"tuple[{', '.join(render(c) for c in t.components)}]"
+    if isinstance(t, DictType):
+        return f"dict[str, {render(t.value)}]"
+    if isinstance(t, CallableType):
+        params = ", ".join(render(p) for p in t.params)
+        return f"Callable[[{params}], {render(t.result)}]"
+    if isinstance(t, LiteralType):
+        return f"Literal[{t.value!r}]"
+    if isinstance(t, ClassType):
+        return t.q
+    return f"{render(t.left)} | {render(t.right)}"
 
 
 def base_type(v: object) -> Type:

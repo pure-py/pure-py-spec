@@ -262,6 +262,25 @@ class MissingAnnotation:
         return f"'{self.name}' must annotate every parameter and its return type"
 
 
+@dataclass(frozen=True)
+class NoBinarySignature:
+    op: str
+    left: str
+    right: str
+
+    def message(self) -> str:
+        return f"no signature for '{self.op}' with operands of type {self.left} and {self.right}"
+
+
+@dataclass(frozen=True)
+class NoUnarySignature:
+    op: str
+    operand: str
+
+    def message(self) -> str:
+        return f"no signature for '{self.op}' with operand of type {self.operand}"
+
+
 Reason = (
     DuplicateFieldName
     | UnknownBaseClass
@@ -295,6 +314,8 @@ Reason = (
     | OwnDescendantImport
     | UnassignedMember
     | MissingAnnotation
+    | NoBinarySignature
+    | NoUnarySignature
 )
 
 

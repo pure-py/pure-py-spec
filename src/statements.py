@@ -56,6 +56,7 @@ from type_syntax import (
     Type,
     parse_annotation,
     parse_annotations,
+    render,
 )
 
 
@@ -327,14 +328,19 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
         check_exprs(e.args, ctx)
         return None
     if isinstance(e, ast.BinOp):
-        return binary(BINARY_NAMES[type(e.op)], e.left, e.right, ctx)
+        return binary(BINARY_NAMES[type(e.op)], e.left, e.right, e, ctx)
     if isinstance(e, ast.UnaryOp):
         operand = check_expr(e.operand, ctx)
         negated = negated_literal(e)
         if negated is not None:
             return negated
         name = UNARY_NAMES[type(e.op)]
-        return None if operand is None else unary_type(name, operand, ctx)
+        if operand is None:
+            return None
+        result = unary_type(name, operand, ctx)
+        if result is None:
+            raise IllFormedModule(e, reasons.NoUnarySignature(name, render(operand)))
+        return result
     if isinstance(e, ast.BoolOp):
         operands = [check_expr(v, ctx) for v in e.values]
         return (
@@ -343,13 +349,11 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
             else None
         )
     if isinstance(e, ast.Compare):
-        left = check_expr(e.left, ctx)
         check_exprs(e.comparators, ctx)
-        if len(e.ops) != 1 or left is None:
+        if len(e.ops) != 1:
+            check_expr(e.left, ctx)
             return None
-        right = check_expr(e.comparators[0], ctx)
-        name = BINARY_NAMES[type(e.ops[0])]
-        return None if right is None else binary_type(name, left, right, ctx)
+        return binary(BINARY_NAMES[type(e.ops[0])], e.left, e.comparators[0], e, ctx)
     if isinstance(e, ast.IfExp):
         check_expr(e.test, ctx)
         check_expr(e.body, ctx)
@@ -404,9 +408,16 @@ def negated_literal(e: ast.UnaryOp) -> Type | None:
     return LiteralType(-v)
 
 
-def binary(op: str, left: ast.expr, right: ast.expr, ctx: ModuleContext) -> Type | None:
+def binary(
+    op: str, left: ast.expr, right: ast.expr, e: ast.expr, ctx: ModuleContext
+) -> Type | None:
     s, t = check_expr(left, ctx), check_expr(right, ctx)
-    return None if s is None or t is None else binary_type(op, s, t, ctx)
+    if s is None or t is None:
+        return None
+    result = binary_type(op, s, t, ctx)
+    if result is None:
+        raise IllFormedModule(e, reasons.NoBinarySignature(op, render(s), render(t)))
+    return result
 
 
 def check_comprehension(

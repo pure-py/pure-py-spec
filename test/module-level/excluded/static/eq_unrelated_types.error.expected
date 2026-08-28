@@ -1,0 +1,1 @@
+no signature for '==' with operands of type Literal[1] and Literal['a']
