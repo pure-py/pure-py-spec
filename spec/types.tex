@@ -148,8 +148,8 @@ judgement $\Gamma; \tau \vdash L, \seq{h} \checks \sigma : S, L'$, which checks 
 requiring each to be reachable and the whole list to exhaust the type. The judgement starts from
 $\shapesOf(\sigma, \varnothing)$, which denotes every value of type $\sigma$. Checking a case checks its pattern
 against the scrutinee's type, binding each variable at the type of the value it is matched against
-(\figref{typing-pat}), checks its body under those bindings, and then removes the values the pattern
-matches. A
+(\figref{typing-pat}), checks its body under those bindings, and then removes the values matched by the
+pattern. A
 constructor pattern requires its class to be a subtype of the type it checks against, so a case that cannot
 match is rejected rather than being merely unreachable.
 \todo{define the cases judgement and $\shapesOf$}
