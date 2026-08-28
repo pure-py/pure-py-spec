@@ -81,9 +81,9 @@ they are evaluated, so two functions may refer to each other whatever order they
 both exist by the time the reference is evaluated. \PurePy makes the
 dependency static: a \emph{mutual region}, a maximal run of consecutive \pyinline{def} statements in a
 sequence (\figref{syntax-stmt}), is a single simultaneous binding. The \ruleName{def} rule checks each body in a
-context in which every name of the region is definitely assigned, so any function in the region may refer
+context in which every name of the mutual region is definitely assigned, so any function in the region may refer
 to any other, and requires the names to be distinct. Self-recursion is the special case of a singleton
-region. Any other statement between two definitions separates them into different regions:
+mutual region. Any other statement between two definitions separates them into different mutual regions:
 
 \begin{python}
 def even(n):
@@ -91,7 +91,7 @@ def even(n):
         return True
     return odd(n - 1)  # error: odd is not yet bound
 
-x = even(0)  # intervening statement separates the regions
+x = even(0)  # intervening statement separates the mutual regions
 
 def odd(n):
     if n == 0:
@@ -99,9 +99,9 @@ def odd(n):
     return even(n - 1)
 \end{python}
 
-\noindent This is rejected statically: \pyinline{even} forms a region of its own in which \pyinline{odd}
+\noindent This is rejected statically: \pyinline{even} forms a mutual region of its own in which \pyinline{odd}
 is not yet bound, so the reference fails the \ruleName{var} rule. Python accepts the program, since the
-call \pyinline{even(0)} never reaches \pyinline{odd}. A region with two definitions of the same name is
+call \pyinline{even(0)} never reaches \pyinline{odd}. A mutual region with two definitions of the same name is
 rejected by the distinct-names condition:
 
 \begin{python}
@@ -110,7 +110,7 @@ def g():
 
 def f():
     return g()
-def g():     # error: g defined twice in the same region
+def g():     # error: g defined twice in the same mutual region
     return 1
 \end{python}
 

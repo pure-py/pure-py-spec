@@ -8,8 +8,8 @@ module after its imports is a top-level statement, so class declarations occur o
 module. A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal
 run of consecutive \pyinline{def} statements in a sequence: any other statement separates mutual
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
-grouping consecutive \pyinline{def}s into a single region. The well-formedness rules treat each region as
-one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
+grouping consecutive \pyinline{def}s into a single mutual region. The well-formedness rules treat each
+mutual region as one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
 \figref{metavariables} summarises the metavariables used throughout.
 
 \input{spec/fig/metavariables}
