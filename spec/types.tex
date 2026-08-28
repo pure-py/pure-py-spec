@@ -85,7 +85,7 @@ ancestors, with \pyinline{object} above every type and \pyinline{Never} below ev
 each of its members and below every type that is above all of them. Lists, dictionaries, tuples and
 callables are related only by reflexivity, since \pyinline{list} and \pyinline{dict} are invariant in mypy
 and covariance would accept programs mypy rejects. An \pyinline{int} is a \pyinline{float}, as PEP~484
-requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, though
+requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
 Python treats it as one.
 
 \input{spec/fig/operator-signatures}
@@ -166,7 +166,7 @@ dictionaries that lack the key. The empty pattern matches every dictionary and l
 exhausts a dictionary type (\ruleName{split-dict-nil}). Splitting is strictly sharper than comparing
 patterns pairwise: over $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ are
-exhaustive, though no one of them subsumes what a further case would match.
+exhaustive, although no one of them subsumes what a further case would match.
 
 \input{spec/fig/coverage}
 

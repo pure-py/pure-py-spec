@@ -13,7 +13,7 @@ updating in place, suggests the shape such interfaces can take.
 A future version of \PurePy may add a typed effect discipline. In a mypy-compatible type system the
 question is notational, because effect information must fit within annotations that Python and mypy
 already accept. A return type such as \pyinline{IO[int]} tracks effects as an ordinary generic type, in
-the Haskell style, though chaining is awkward in a language of statements without dedicated syntax.
+the Haskell style, although chaining is awkward in a language of statements without dedicated syntax.
 \pyinline{Annotated[int, Console]} (PEP 593) attaches effect metadata that mypy ignores and the \PurePy
 checker can read. Lightest is a decorator: with effects the default, \pyinline{@pure} marks functions in
 which printing and other effects are rejected, and unannotated code keeps its current meaning. Under any
