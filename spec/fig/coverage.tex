@@ -8,10 +8,19 @@
 \inferrule*[lab={\ruleName{shape-rest}}]
 {
   \Gamma \vdash N \ctors \tau \\
-  \tau \text{ not a union}
+  \tau \text{ neither union nor dictionary type}
 }
 {
   \Gamma \vdash \shapeAny{\tau}{N} : \tau
+}
+\and
+\inferrule*[lab={\ruleName{shape-dict}}]
+{
+  \Gamma \vdash \beta(w) : \tau \quad (\forall w \in \dom(\beta)) \\
+  \dom(\beta) \cap N = \varnothing
+}
+{
+  \Gamma \vdash \shapeDict{\tau}{\beta}{N} : \tyDict{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{shape-literal}}]
@@ -82,14 +91,7 @@
 {
   \Gamma \vdash \set{n} \cup N \ctors \tyList{\tau}
 }
-\and
-\inferrule*[lab={\ruleName{constructs-dict}}]
-{
-  \Gamma \vdash N \ctors \tyDict{\tau}
-}
-{
-  \Gamma \vdash \set{\set{w_1, \ldots, w_n}} \cup N \ctors \tyDict{\tau}
-}
+
 \and
 \inferrule*[lab={\ruleName{constructs-literal}}]
 {
@@ -112,8 +114,8 @@
 \restOf(\tyBool, N) & = \varnothing &\quad& \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\
 \restOf(\tyNone, N) & = \varnothing &\quad& \text{if } \pyinline{None} \in N \\
 \restOf(q, N) & = \varnothing &\quad& \text{if } \Gamma \vdash q \subty q' \text{ for some } q' \in N \\
-\restOf(\tyDict{\tau}, N) & = \varnothing &\quad& \text{if } \varnothing \in N \\
 \restOf(\tyNever, N) & = \varnothing \\
+\restOf(\tyDict{\tau}, N) & = \set{\shapeDict{\tau}{\varnothing}{N}} \\
 \restOf(\tau, N) & = \set{\shapeAny{\tau}{N}} &\quad& \text{otherwise}
 \end{defalign}
 \subcaption{Shapes of type $\tau$ with heads $N$ excluded}
@@ -224,23 +226,32 @@
   \Gamma \vdash \patList{k_1, \ldots, k_n}, \patList{p_1, \ldots, p_n} \splitTo \set{\patList{\seq{m}} \mid \seq{m} \in M}, \set{\patList{\seq{k}\,'} \mid \seq{k}\,' \in K}
 }
 \and
-\inferrule*[lab={\ruleName{split-rest-dict}}]
+\inferrule*[lab={\ruleName{split-dict-nil}}]
 {
-  N' \not\subseteq \set{w_1, \ldots, w_n} \quad (\forall N' \in N) \\
-  \Gamma \vdash \restOf(\tau, \varnothing), p_i \splitTo M_i, \varnothing \quad (\forall i)
+  \strut
 }
 {
-  \Gamma \vdash \shapeAny{\tyDict{\tau}}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \splitTo \set{\shapeAny{\tyDict{\tau}}{N}}, \restOf(\tyDict{\tau}, N \cup \set{\set{w_1, \ldots, w_n}})
+  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{} \splitTo \set{\shapeDict{\tau}{\beta}{N}}, \varnothing
 }
 \and
-\inferrule*[lab={\ruleName{split-rest-dict-partial}}]
+\inferrule*[lab={\ruleName{split-dict-bound}}]
 {
-  N' \not\subseteq \set{w_1, \ldots, w_n} \quad (\forall N' \in N) \\
-  \Gamma \vdash \restOf(\tau, \varnothing), p_i \splitTo M_i, K_i \quad (\forall i) \\
-  K_j \neq \varnothing \quad (\text{some } j)
+  \beta(w_1) = k \\
+  \Gamma \vdash k, p_1 \splitTo M, K \\
+  \Gamma \vdash \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{m}}}{N} \mid m \in M}, \patDict{\bind{w_2}{p_2}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo M', K'
 }
 {
-  \Gamma \vdash \shapeAny{\tyDict{\tau}}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \splitTo \set{\shapeAny{\tyDict{\tau}}{N}}, \set{\shapeAny{\tyDict{\tau}}{N}}
+  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo M', \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{k'}}}{N} \mid k' \in K} \cup K'
+}
+\and
+\inferrule*[lab={\ruleName{split-dict-unbound}}]
+{
+  w_1 \notin \dom(\beta) \cup N \\
+  \Gamma \vdash \restOf(\tau, \varnothing), p_1 \splitTo M, K \\
+  \Gamma \vdash \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{m}}}{N} \mid m \in M}, \patDict{\bind{w_2}{p_2}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo M', K'
+}
+{
+  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo M', \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{k}}}{N} \mid k \in K} \cup K' \cup \set{\shapeDict{\tau}{\beta}{N \cup \set{w_1}}}
 }
 \and
 \inferrule*[lab={\ruleName{split-none}}]

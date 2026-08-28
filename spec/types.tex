@@ -132,8 +132,8 @@ unreachable.
 Reachability and exhaustiveness are the two halves of one computation (\figrefTwo{shapes}{coverage}). A \emph{shape} $k$
 denotes a set of values of a type, written $\Gamma \vdash k : \tau$. The form $\shapeAny{\tau}{N}$ is a
 value of type $\tau$ whose outermost head is not among those in $N$, where $N$ \emph{constructs} $\tau$: its
-elements are subclasses where the type is a class, lengths where it is a list, sets of keys where it is a
-dictionary, and literals below the type otherwise (\figref{shapes}). The other forms are a literal, a constructor, a tuple and a list, each with shapes in place of
+elements are subclasses where the type is a class, lengths where it is a list, and literals below the type
+otherwise (\figref{shapes}). The other forms are a literal, a constructor, a tuple, a list and a dictionary, each with shapes in place of
 sub-patterns. The shapes of $\tau$ that remain once the heads in $N$ are excluded are
 $\restOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape
 carries a union type, since $\restOf$ is the only source of the form $\shapeAny{\tau}{N}$ and it splits a
@@ -150,12 +150,13 @@ applies where the walk ends with an empty residual, and \ruleName{match-partial}
 in $\Assigns{\varnothing}$ for the values that fall through. A union is exhausted
 by covering each member, a class type by a pattern for the class itself, and \pyinline{bool} by
 \pyinline{True} and \pyinline{False}, while \pyinline{int}, \pyinline{str} and lists have
-unboundedly many heads and need a variable or wildcard. For a dictionary type the excluded set holds sets of
-keys, each standing for the dictionaries that contain them. A dictionary pattern records its keys where
-splitting the value type by every one of its sub-patterns leaves nothing, since every dictionary with those
-keys has then matched, and leaves the shape untouched otherwise. A later pattern whose keys include a
-recorded set matches nothing, and the empty pattern records the empty set of keys, which every dictionary
-contains, so it exhausts the type. Splitting is strictly sharper than comparing
+unboundedly many heads and need a variable or wildcard. A dictionary shape has a form of its own,
+$\shapeDict{\tau}{\beta}{N}$, standing for dictionaries that hold each key of $\beta$ with a value of the
+shape $\beta$ gives it, and hold no key of $N$. A dictionary pattern is taken one key at a time
+(\ruleName{split-dict-bound}, \ruleName{split-dict-unbound}). A key already in $\beta$ splits the shape
+recorded for it, and a key in neither $\beta$ nor $N$ splits the value type, adding to the residual the
+dictionaries that lack the key. The empty pattern matches every dictionary and leaves nothing, so it alone
+exhausts a dictionary type (\ruleName{split-dict-nil}). Splitting is strictly sharper than comparing
 patterns pairwise: over $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ are
 exhaustive, though no one of them subsumes what a further case would match.
