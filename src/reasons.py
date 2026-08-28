@@ -254,6 +254,14 @@ class ClassAsValue:
         return f"'{self.name}' refers to a class; classes are not first-class values"
 
 
+@dataclass(frozen=True)
+class MissingAnnotation:
+    name: str
+
+    def message(self) -> str:
+        return f"'{self.name}' must annotate every parameter and its return type"
+
+
 Reason = (
     DuplicateFieldName
     | UnknownBaseClass
@@ -286,6 +294,7 @@ Reason = (
     | SubmoduleNotImported
     | OwnDescendantImport
     | UnassignedMember
+    | MissingAnnotation
 )
 
 

@@ -190,7 +190,16 @@ def check_statement(item: Statement, ctx: ModuleContext) -> None:
 
 def check_mutual_region(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
     check_distinct_names(defs, set())
+    check_annotated(defs)
     check_bodies(defs, ctx)
+
+
+def check_annotated(defs: list[ast.FunctionDef]) -> None:
+    """Every parameter and return carries an annotation, so the type of a
+    definition is given rather than inferred from its body."""
+    for d in defs:
+        if isinstance(signature(d), Status):
+            raise IllFormedModule(d, reasons.MissingAnnotation(d.name))
 
 
 def check_bodies(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
