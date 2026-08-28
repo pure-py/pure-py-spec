@@ -128,7 +128,7 @@ check against \pyinline{bool}, and an assertion message against \pyinline{str}.
 
 A function definition binds its parameters at their annotated types and its own name, and the names of the
 mutual region it belongs to, at the corresponding $\pyinline{Callable}$ type; variables assigned in the body start
-at $\statusNotDefAssigned$, as they do without types (\ruleName{def}). The body is checked with the
+at $\statusNotDefAssigned$ (\ruleName{def}). The body is checked with the
 declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
