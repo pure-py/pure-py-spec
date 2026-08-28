@@ -56,9 +56,9 @@
 \and
 \inferrule*[lab={\ruleName{binop}}]
 {
-  \odot : (\sigma, \sigma') \to \tau \\
-  \Gamma \vdash e \checks \sigma \\
-  \Gamma \vdash e' \checks \sigma'
+  \Gamma \vdash e \synth \sigma \\
+  \Gamma \vdash e' \synth \sigma' \\
+  \odot : (\sigma, \sigma') \to \tau
 }
 {
   \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \tau
@@ -66,8 +66,8 @@
 \and
 \inferrule*[lab={\ruleName{unop}}]
 {
+  \Gamma \vdash e \synth \sigma \\
   \ominus : \sigma \to \tau \\
-  \Gamma \vdash e \checks \sigma \\
   \exUnOp{\ominus}{e} \neq \exUnOp{\pyinline{-}}{n} \quad (\forall n)
 }
 {

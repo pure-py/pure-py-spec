@@ -62,9 +62,12 @@ $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the class en
 (\ruleName{attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
 signature $\ominus : \sigma \to \tau$, relating operand types to result type
 (\figref{operator-signatures}). A
-signature with type variables stands for all its instances, which agree on the result type.
-Where several signatures apply, the first listed is used, so \pyinline{1 + 2}
-is an \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}. In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
+signature with type variables stands for all its instances, which agree on the result type. The operands
+synthesise their types, and a signature written for a base type also applies to a literal type with that
+base type, so \pyinline{1 == 0} uses the equality signature at \pyinline{int}. A signature that applies to
+the synthesised types is preferred to one that applies only after taking base types, which is what makes
+\pyinline{2 ** 3} an \pyinline{int}. Where several signatures still apply, the first listed is used, so
+\pyinline{1 + 2} is an \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}. In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
 (\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
 dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
 that synthesises a literal type gives the component type at that position, counting from the end where the index
