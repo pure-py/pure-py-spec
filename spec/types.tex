@@ -48,7 +48,7 @@ joining the first with the join of the rest, with \pyinline{Never} as the unit:
 \joinTy(\sigma, \tau) & = \sigma &\quad& \text{if } \Gamma \vdash \tau \subty \sigma \\
 \joinTy(\sigma, \tau) & = \tyUnion{\sigma}{\tau} &\quad& \text{otherwise} \\[2mm]
 \joinTy() & = \tyNever \\
-\joinTy(\tau_1, \seq{\tau}) & = \joinTy(\tau_1, \joinTy(\seq{\tau}))
+\joinTy(\sigma \cons \seq{\tau}) & = \joinTy(\sigma, \joinTy(\seq{\tau}))
 \end{defalign}
 
 \noindent So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
