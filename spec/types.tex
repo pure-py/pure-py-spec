@@ -9,7 +9,8 @@ than inferred from its body.
 The context entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
 that is not definitely assigned is bound to $\statusNotDefAssigned$. Two contexts, one from each branch of a conditional,
 merge pointwise. A variable definitely assigned in both, at $\sigma$ and $\tau$, is of type
-$\joinTy(\sigma, \tau)$, and a variable definitely assigned in one alone is $\statusNotDefAssigned$.
+$\joinTy(\sigma, \tau)$, whereas a variable definitely assigned in one alone is
+$\statusNotDefAssigned$.
 
 \input{spec/fig/aux-types}
 
