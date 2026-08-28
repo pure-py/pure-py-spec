@@ -62,7 +62,7 @@ with the variables bound by its generators definitely assigned (\ruleName{qual-g
 a comprehension may not capture a generator variable, a side condition of \ruleName{list-comp},
 \ruleName{dict-comp} and \ruleName{qual-generator}, because Python mutates the variable on each iteration
 and the lambda would see its final value. Two rules resolve a qualified name through the
-context to an entry $\theta$ (\figref{well-formed-expr}a). A module attribute reference $\exAttr{e}{x}$ is well-formed
+context to a context entry $\theta$ (\figref{well-formed-expr}a). A module attribute reference $\exAttr{e}{x}$ is well-formed
 when, read as a qualified name, it resolves to a definitely assigned member
 (\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}. A constructor call requires its name
 to resolve to a class and its arguments to cover the class's fields exactly, through $\fieldMap$

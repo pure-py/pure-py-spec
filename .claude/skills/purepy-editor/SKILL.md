@@ -10,6 +10,7 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 - Minimal. State the thing; stop.
 - No weasel-words like "honest", "clean", "obvious", "simply".
 - Table cells and figure captions are telegraphic: no articles ("Rebinds variable", not "Rebinds a variable").
+- Never write "entry" on its own: it is a context entry or a class entry.
 - Name things with nouns, not free relative clauses: "matched shapes", not "what it matches"; "the residual", not "what is left over".
 - Prefer a participle or a named term to a postmodifying relative clause: "variables assigned in the body", not "the variables the body assigns"; "the residual", not "the part it leaves". Where a metafunction names the concept, use its name.
 - No defensive coding. If a case shouldn't arise, assert it; don't silently return a safe default.

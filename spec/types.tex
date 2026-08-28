@@ -6,7 +6,7 @@ The typing rules say whether a program is well typed. They are intended as a ref
 reverse. Every parameter and return carries an annotation, so the type of a definition is given rather
 than inferred from its body.
 
-The entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
+The context entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
 that is not definitely assigned is bound to $\statusNotDefAssigned$. Merging two branches merges their
 contexts pointwise. A variable definitely assigned in both, at $\tau$ and $\tau'$, is of type
 $\joinTy(\tau, \tau')$, and a variable definitely assigned in one branch alone is
@@ -76,7 +76,7 @@ A class entry $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ records t
 type of each field it introduces, and $\fields(C)$ is the bindings of all its fields, those of the base
 class first. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises $q$ as a class type (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must synthesise a class $q$, and
-$\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the entry $C$ that $q$ resolves to
+$\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the class entry $C$ that $q$ resolves to
 (\ruleName{attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
 signature $\ominus : \sigma \to \tau$, relating operand types to result type
 (\figref{operator-signatures}). A
