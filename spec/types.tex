@@ -88,22 +88,23 @@ $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the class en
 (\ruleName{attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
 signature $\ominus : \sigma \to \tau$, relating operand types to result type
 (\figref{operator-signatures}). A
-signature with type variables stands for all its instances, which agree on the result type, and it
-\emph{applies} to given operand types when its variables can be instantiated so that each given type is a
-subtype of the corresponding operand type and its condition holds. \emph{Resolution} takes the first
-signature listed that applies, falling back to the base types of the operands:
+signature with type variables stands for all its instances, which agree on the result type; a variable binds
+the operand's type as it is, and an operand type written out is matched by any subtype of it. Where several
+signatures give a result the first listed is used, so \pyinline{1 + 2} is an \pyinline{int} and
+\pyinline{1 + 2.0} a \pyinline{float}. \emph{Resolution} takes the operand types as they are, and their
+base types where that gives nothing:
 \begin{defalign}
-\resolve(\odot, \sigma, \sigma') & = \tau &\quad& \text{if the first signature of } \odot \text{ applying to } \sigma, \sigma' \text{ gives } \tau \\
-\resolve(\odot, \sigma, \sigma') & = \resolve(\odot, \widen(\sigma), \widen(\sigma')) &\quad& \text{if } \sigma \text{ or } \sigma' \text{ is a literal type} \\[2mm]
-\resolve(\ominus, \sigma) & = \tau &\quad& \text{if the first signature of } \ominus \text{ applying to } \sigma \text{ gives } \tau \\
-\resolve(\ominus, \sigma) & = \resolve(\ominus, \widen(\sigma)) &\quad& \text{if } \sigma \text{ is a literal type}
+\resolve(\odot, \sigma, \sigma') & = \tau &\quad& \text{if } \odot : (\sigma, \sigma') \to \tau \\
+\resolve(\odot, \sigma, \sigma') & = \tau &\quad& \text{if } \odot : (\widen(\sigma), \widen(\sigma')) \to \tau \\[2mm]
+\resolve(\ominus, \sigma) & = \tau &\quad& \text{if } \ominus : \sigma \to \tau \\
+\resolve(\ominus, \sigma) & = \tau &\quad& \text{if } \ominus : \widen(\sigma) \to \tau
 \end{defalign}
 
-\noindent So \pyinline{1 + 2} is an \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}, both by the
-first signature that applies. Taking base types second is what keeps \pyinline{2 ** 3} an \pyinline{int},
-since the signature for a literal exponent would not apply once the exponent is taken at \pyinline{int},
-and it is what lets \pyinline{1 == 0} use the equality signature at \pyinline{int}, since two distinct
-literal types are not comparable. In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
+\noindent The second clause lets \pyinline{1 == 0} use the equality signature at \pyinline{int}, since two
+distinct literal types are not comparable. Taking the operand types as they are first keeps \pyinline{2 **
+3} an \pyinline{int}, since the exponent binds a variable that its base type would not.
+
+In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
 (\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
 dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
 that synthesises a literal type gives the component type at that position, counting from the end where the index
