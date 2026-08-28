@@ -52,27 +52,27 @@
 \and
 \inferrule*[lab={\ruleName{subty-union-left}}]
 {
-  \sigma' \subty \sigma
+  \sigma \subty \tau
 }
 {
-  \sigma' \subty \tyUnion{\sigma}{\tau}
+  \sigma \subty \tyUnion{\tau}{\tau'}
 }
 \and
 \inferrule*[lab={\ruleName{subty-union-right}}]
 {
-  \sigma' \subty \tau
+  \sigma \subty \tau'
 }
 {
-  \sigma' \subty \tyUnion{\sigma}{\tau}
+  \sigma \subty \tyUnion{\tau}{\tau'}
 }
 \and
 \inferrule*[lab={\ruleName{subty-union}}]
 {
-  \sigma \subty \tau' \\
-  \tau \subty \tau'
+  \tau \subty \sigma \\
+  \tau' \subty \sigma
 }
 {
-  \tyUnion{\sigma}{\tau} \subty \tau'
+  \tyUnion{\tau}{\tau'} \subty \sigma
 }
 \end{mathpar}
 \caption{Subtyping}
