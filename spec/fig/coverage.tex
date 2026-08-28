@@ -7,7 +7,7 @@
 \small
 \inferrule*[lab={\ruleName{shape-rest}}]
 {
-  \Gamma \vdash \tau \ctors h \quad (\forall h \in N) \\
+  \Gamma \vdash h \ctors \tau \quad (\forall h \in N) \\
   \tau \text{ not a union}
 }
 {
@@ -55,10 +55,10 @@
 
 \begin{subfigure}{\textwidth}
 \begin{defalign}
-\Gamma \vdash q \ctors q' \quad & \text{iff } \Gamma \vdash q' \subty q \\
-\Gamma \vdash \tyList{\tau} \ctors n \quad & \text{iff } n \geq 0 \\
-\Gamma \vdash \tyDict{\tau} \ctors \set{w_1, \ldots, w_n} \quad & \\
-\Gamma \vdash \tau \ctors \ell \quad & \text{iff } \Gamma \vdash \tyLiteral{\ell} \subty \tau &\quad& \text{otherwise} \\[3mm]
+\Gamma \vdash q' \ctors q \quad & \text{iff } \Gamma \vdash q' \subty q \\
+\Gamma \vdash n \ctors \tyList{\tau} \quad & \text{iff } n \geq 0 \\
+\Gamma \vdash \set{w_1, \ldots, w_n} \ctors \tyDict{\tau} \quad & \\
+\Gamma \vdash \ell \ctors \tau \quad & \text{iff } \Gamma \vdash \tyLiteral{\ell} \subty \tau &\quad& \text{otherwise} \\[3mm]
 \restOf(\tyUnion{\sigma}{\tau}, N) & = \restOf(\sigma, N) \cup \restOf(\tau, N) \\
 \restOf(\tyLiteral{\ell}, N) & = \varnothing &\quad& \text{if } \ell \in N \\
 \restOf(\tyBool, N) & = \varnothing &\quad& \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\
