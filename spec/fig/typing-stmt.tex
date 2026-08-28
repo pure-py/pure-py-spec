@@ -103,27 +103,20 @@
 \inferrule*[lab={\ruleName{match}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma \vdash p_i \checks \sigma \binding \Delta_i \quad (\forall i) \\
-  \residual(\sigma) - p_1 - \ldots - p_{i-1} \neq \residual(\sigma) - p_1 - \ldots - p_i \quad (\forall i) \\
-  \Gamma \override \Delta_i ; \tau \vdash s_i : R_i \quad (\forall i) \\
-  S_i = \Assigns{\Delta_i} \override R_i \quad (\forall i) \\
-  \residual(\sigma) - p_1 - \ldots - p_{n+1} = \varnothing
+  \Gamma; \tau \vdash \residual(\sigma), \seq{c} \checks \sigma : S \binding \varnothing
 }
 {
-  \Gamma; \tau \vdash \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} : S_1 \merge \ldots \merge S_{n+1}
+  \Gamma; \tau \vdash \exMatch{e}{\seq{c}} : S
 }
 \and
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma \vdash p_i \checks \sigma \binding \Delta_i \quad (\forall i) \\
-  \residual(\sigma) - p_1 - \ldots - p_{i-1} \neq \residual(\sigma) - p_1 - \ldots - p_i \quad (\forall i) \\
-  \Gamma \override \Delta_i ; \tau \vdash s_i : R_i \quad (\forall i) \\
-  S_i = \Assigns{\Delta_i} \override R_i \quad (\forall i) \\
-  \residual(\sigma) - p_1 - \ldots - p_{n+1} \neq \varnothing
+  \Gamma; \tau \vdash \residual(\sigma), \seq{c} \checks \sigma : S \binding K \\
+  K \neq \varnothing
 }
 {
-  \Gamma; \tau \vdash \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} : S_1 \merge \ldots \merge S_{n+1} \merge \Assigns{\varnothing}
+  \Gamma; \tau \vdash \exMatch{e}{\seq{c}} : S \merge \Assigns{\varnothing}
 }
 \end{mathpar}
 \caption{Statement $t$ has result type $R$ in $\Gamma$, in a function returning $\tau$}

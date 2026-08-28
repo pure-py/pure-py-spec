@@ -45,3 +45,32 @@
 \caption{Pattern $p$ checks against type $\tau$, binding $\Delta$}
 \label{fig:typing-pat}
 \end{figure}
+
+\begin{figure}
+\flushleft \shadebox{$\Gamma; \tau \vdash K, \seq{c} \checks \sigma : S \binding K'$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{cases-one}}]
+{
+  \Gamma \vdash p \checks \sigma \binding \Delta \\
+  \Gamma \override \Delta; \tau \vdash s : R \\
+  K - p \neq K
+}
+{
+  \Gamma; \tau \vdash K, \exCase{p}{s} \checks \sigma : \Assigns{\Delta} \override R \binding K - p
+}
+\and
+\inferrule*[lab={\ruleName{cases-cons}}]
+{
+  \Gamma \vdash p \checks \sigma \binding \Delta \\
+  \Gamma \override \Delta; \tau \vdash s : R \\
+  K - p \neq K \\
+  \Gamma; \tau \vdash K - p, \seq{c} \checks \sigma : S \binding K'
+}
+{
+  \Gamma; \tau \vdash K, \exCase{p}{s} \cons \seq{c} \checks \sigma : (\Assigns{\Delta} \override R) \merge S \binding K'
+}
+\end{mathpar}
+\caption{Cases $\seq{c}$ against scrutinee type $\sigma$ have result type $S$, reducing residual $K$ to $K'$}
+\label{fig:typing-cases}
+\end{figure}

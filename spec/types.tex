@@ -134,9 +134,11 @@ constructor, a tuple and a list, each with shapes in place of sub-patterns. The 
 scrutinee's type is one shape per member of it, and subtracting a pattern leaves the shapes it does not
 match.
 
-A case is reachable when it removes at least one shape, and the cases are exhaustive when the residual is
-empty. So \ruleName{match} applies where the cases exhaust the scrutinee's type, and \ruleName{match-partial}
-where they do not, merging in $\Assigns{\varnothing}$ for the values that fall through. A union is exhausted
+The cases are then walked once, from the residual of the scrutinee's type, in the same shape as
+$\dispatch$ walks them at run time (\figref{typing-cases}). Each case checks its pattern, checks its body
+under the bindings, and must reduce the residual, which is what makes it reachable. \ruleName{match}
+applies where the walk ends with an empty residual, and \ruleName{match-partial} where it does not, merging
+in $\Assigns{\varnothing}$ for the values that fall through. A union is exhausted
 by covering each member, a class type by a pattern for the class itself, and \pyinline{bool} by
 \pyinline{True} and \pyinline{False}, while \pyinline{int}, \pyinline{str}, lists and dictionaries have
 unboundedly many heads and need a variable or wildcard. Subtraction is strictly sharper than comparing
