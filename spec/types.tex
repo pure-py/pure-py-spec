@@ -1,7 +1,8 @@
 \section{Types}
 \label{sec:types}
 
-The typing judgement gives each expression a type. It is intended as a refinement of mypy's: a well-typed
+The typing rules say whether a program is well typed. Within a program, the typing judgement gives each
+expression a type. The rules are intended as a refinement of mypy's: a well-typed
 \PurePy program should be accepted by mypy, and \PurePy may reject programs mypy accepts but not the
 reverse. The entry for a definitely assigned variable is its type
 (Definition~\ref{def:context}), so \ruleName{var} applies whenever $\Gamma(x)$ is a type, and a variable
