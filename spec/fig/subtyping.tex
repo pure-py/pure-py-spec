@@ -42,6 +42,14 @@
   \Gamma \vdash \tyInt \subty \tyFloat
 }
 \and
+\inferrule*[lab={\ruleName{subty-tuple}}]
+{
+  \Gamma \vdash \sigma_i \subty \tau_i \quad (\forall i)
+}
+{
+  \Gamma \vdash \tyTuple{\sigma_1, \ldots, \sigma_n} \subty \tyTuple{\tau_1, \ldots, \tau_n}
+}
+\and
 \inferrule*[lab={\ruleName{subty-literal}}]
 {
   \Gamma \vdash \widen(\ell) \subty \tau

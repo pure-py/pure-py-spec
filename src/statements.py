@@ -390,7 +390,12 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
         return None if entry is None else field_type(entry, e.attr)
     if isinstance(e, ast.Subscript):
         return subscript(e, ctx)
-    if isinstance(e, (ast.List, ast.Tuple)):
+    if isinstance(e, ast.Tuple):
+        components = [check_expr(x, ctx) for x in e.elts]
+        if any(t is None for t in components):
+            return None
+        return TupleType(tuple(t for t in components if t is not None))
+    if isinstance(e, ast.List):
         check_exprs(e.elts, ctx)
         return None
     if isinstance(e, ast.Dict):

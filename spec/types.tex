@@ -30,9 +30,10 @@ type replaced by the base type of its literal:
 
 Subtyping (\figref{subtyping}) is reflexivity, a literal type below its base type, and a class below its
 ancestors, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
-each of its members and below every type that is above all of them. Lists, dictionaries, tuples and
-callables are related only by reflexivity, since \pyinline{list} and \pyinline{dict} are invariant in mypy
-and covariance would accept programs mypy rejects. An \pyinline{int} is a \pyinline{float}, as PEP~484
+each of its members and below every type that is above all of them. A tuple type is below another of the same
+length whose components are above its own, since a tuple is immutable. Lists, dictionaries and callables
+are related only by reflexivity, since \pyinline{list} and \pyinline{dict} are invariant in mypy and
+covariance would accept programs mypy rejects. An \pyinline{int} is a \pyinline{float}, as PEP~484
 requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
 Python treats it as one.
 

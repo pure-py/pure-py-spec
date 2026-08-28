@@ -5,6 +5,7 @@ from type_syntax import (
     ClassType,
     LiteralType,
     Primitive,
+    TupleType,
     Type,
     UnionType,
     alts,
@@ -39,6 +40,10 @@ def subtype(s: Type, t: Type, ctx: ModuleContext) -> bool:
         return any(subtype(s, m, ctx) for m in alts(t))
     if isinstance(s, ClassType) and isinstance(t, ClassType):
         return t.q in ancestor_names(s.q, ctx)
+    if isinstance(s, TupleType) and isinstance(t, TupleType):
+        return len(s.components) == len(t.components) and all(
+            subtype(a, b, ctx) for a, b in zip(s.components, t.components)
+        )
     return False
 
 
