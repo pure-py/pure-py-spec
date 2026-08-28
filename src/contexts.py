@@ -25,6 +25,7 @@ class ClassEntry:
     context: Context
     name: str
     own_fields: tuple[str, ...]
+    own_types: tuple[tuple[str, Type], ...]
     base: str | None
 
 
@@ -205,6 +206,18 @@ def fields(entry: ClassEntry) -> tuple[str, ...]:
     base_entry = entry.context[entry.base]
     assert isinstance(base_entry, ClassEntry)
     return fields(base_entry) + entry.own_fields
+
+
+def field_type(entry: ClassEntry, x: str) -> Type | None:
+    """Declared type of field `x`, where the class entry records one."""
+    own = dict(entry.own_types)
+    if x in own:
+        return own[x]
+    if entry.base is None:
+        return None
+    base_entry = entry.context[entry.base]
+    assert isinstance(base_entry, ClassEntry)
+    return field_type(base_entry, x)
 
 
 def field_map[T](

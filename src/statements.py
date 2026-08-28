@@ -13,6 +13,7 @@ from aux import (
     captures_statement,
     find_first_reassigning,
     names_in_target,
+    own_field_types,
     own_fields,
     qualified_name,
     statements,
@@ -35,6 +36,7 @@ from contexts import (
     class_of,
     entry_of,
     field_map,
+    field_type,
     fields,
     is_assigned,
     merge_results,
@@ -51,6 +53,7 @@ from reasons import IllFormedModule
 from subtyping import subtype
 from type_syntax import (
     CallableType,
+    ClassType,
     LiteralType,
     Primitive,
     Type,
@@ -321,12 +324,14 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
                         c_name, tuple(sorted(set(xs[n:])))
                     ),
                 )
-            check_exprs(e.args, ctx)
-            check_exprs([k.value for k in e.keywords], ctx)
-            return None
-        check_expr(e.func, ctx)
-        check_exprs(e.args, ctx)
-        return None
+            args = field_map(
+                constructed, e.args, kwd_names, [k.value for k in e.keywords]
+            )
+            assert args is not None
+            for x, arg in args.items():
+                checks_against(arg, field_type(constructed, x), ctx)
+            return ClassType(c_name)
+        return call(e, ctx)
     if isinstance(e, ast.BinOp):
         return binary(BINARY_NAMES[type(e.op)], e.left, e.right, e, ctx)
     if isinstance(e, ast.UnaryOp):
@@ -398,6 +403,31 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
     raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
+def call(e: ast.Call, ctx: ModuleContext) -> Type | None:
+    """The result type of a call, checking each argument against its parameter
+    type; the callee must be a callable of the same arity."""
+    fn = check_expr(e.func, ctx)
+    if fn is None:
+        check_exprs(e.args, ctx)
+        return None
+    if not isinstance(fn, CallableType):
+        raise IllFormedModule(e, reasons.NotCallable(render(fn)))
+    if len(fn.params) != len(e.args):
+        raise IllFormedModule(e, reasons.CallArityMismatch(len(fn.params), len(e.args)))
+    for arg, param in zip(e.args, fn.params):
+        checks_against(arg, param, ctx)
+    return fn.result
+
+
+def checks_against(e: ast.expr, expected: Type | None, ctx: ModuleContext) -> None:
+    """Check `e` against `expected`, where both types are known."""
+    actual = check_expr(e, ctx)
+    if expected is None or actual is None:
+        return
+    if not subtype(actual, expected, ctx):
+        raise IllFormedModule(e, reasons.TypeMismatch(render(expected), render(actual)))
+
+
 def negated_literal(e: ast.UnaryOp) -> Type | None:
     """A negated numeric literal synthesises the negated literal type."""
     if not isinstance(e.op, ast.USub) or not isinstance(e.operand, ast.Constant):
@@ -463,6 +493,7 @@ def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
         context=context,
         name=f"{q}.{node.name}",
         own_fields=tuple(own_fields(node)),
+        own_types=own_field_types(node),
         base=base,
     )
 

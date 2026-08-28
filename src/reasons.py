@@ -281,6 +281,32 @@ class NoUnarySignature:
         return f"no signature for '{self.op}' with operand of type {self.operand}"
 
 
+@dataclass(frozen=True)
+class NotCallable:
+    ty: str
+
+    def message(self) -> str:
+        return f"call of a value of type {self.ty}, which is not callable"
+
+
+@dataclass(frozen=True)
+class CallArityMismatch:
+    expected: int
+    given: int
+
+    def message(self) -> str:
+        return f"call expects {self.expected} arguments, given {self.given}"
+
+
+@dataclass(frozen=True)
+class TypeMismatch:
+    expected: str
+    actual: str
+
+    def message(self) -> str:
+        return f"expected type {self.expected}, given {self.actual}"
+
+
 Reason = (
     DuplicateFieldName
     | UnknownBaseClass
@@ -316,6 +342,9 @@ Reason = (
     | MissingAnnotation
     | NoBinarySignature
     | NoUnarySignature
+    | NotCallable
+    | CallArityMismatch
+    | TypeMismatch
 )
 
 

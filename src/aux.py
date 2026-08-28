@@ -1,6 +1,8 @@
 import ast
 from itertools import dropwhile, takewhile
 
+from type_syntax import Type, parse_annotation
+
 # A PurePy statement: a Python statement, or a mutual region of consecutive defs. A Python body
 # (a statement list) represents the spec's right-nested sequence s s'.
 type Statement = ast.stmt | list[ast.FunctionDef]
@@ -346,6 +348,16 @@ def own_fields(node: ast.ClassDef) -> list[str]:
         for t in node.body
         if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)
     ]
+
+
+def own_field_types(node: ast.ClassDef) -> tuple[tuple[str, Type], ...]:
+    """Declared type of each field, omitting annotations we do not represent."""
+    annotated = (
+        (t.target.id, parse_annotation(t.annotation))
+        for t in node.body
+        if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)
+    )
+    return tuple((x, t) for x, t in annotated if t is not None)
 
 
 def qualified_name(e: ast.expr) -> str:
