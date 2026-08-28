@@ -64,12 +64,11 @@
 \end{mathpar}
 
 \begin{align*}
-N \covers \tyLiteral{\ell} & \text{ iff } \ell \in N &
-N \covers q & \text{ iff } \Gamma \vdash q \subty q' \text{ for some } q' \in N \\
-N \covers \tyBool & \text{ iff } \set{\pyinline{True}, \pyinline{False}} \subseteq N &
-N \covers \tyNever & \text{ always} \\
-N \covers \tyNone & \text{ iff } \pyinline{None} \in N &
-N \covers \tau & \text{ for no other } \tau
+N \covers \tyLiteral{\ell} \quad & \text{iff } \ell \in N \\
+N \covers \tyBool \quad & \text{iff } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\
+N \covers \tyNone \quad & \text{iff } \pyinline{None} \in N \\
+N \covers q \quad & \text{iff } \Gamma \vdash q \subty q' \text{ for some } q' \in N \\
+N \covers \tyNever \quad &
 \end{align*}
 
 \begin{align*}
