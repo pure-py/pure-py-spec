@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma; \tau \vdash L, \seq{h} \checks \sigma : S, L'$}
+\flushleft \shadebox{$\Gamma; \tau; L \vdash \seq{h} \checks \sigma : S, L'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{cases-one}}]
@@ -10,7 +10,7 @@
   K \neq \varnothing
 }
 {
-  \Gamma; \tau \vdash L, \exCase{p}{s} \checks \sigma : \Assigns{\Delta} \override R, L'
+  \Gamma; \tau; L \vdash \exCase{p}{s} \checks \sigma : \Assigns{\Delta} \override R, L'
 }
 \and
 \inferrule*[lab={\ruleName{cases-cons}}]
@@ -19,10 +19,10 @@
   \Gamma \override \Delta; \tau \vdash s : R \\
   \Gamma \vdash L, p \splitTo K, L'' \\
   K \neq \varnothing \\
-  \Gamma; \tau \vdash L'', \seq{h} \checks \sigma : S, L'
+  \Gamma; \tau; L'' \vdash \seq{h} \checks \sigma : S, L'
 }
 {
-  \Gamma; \tau \vdash L, \exCase{p}{s} \cons \seq{h} \checks \sigma : (\Assigns{\Delta} \override R) \merge S, L'
+  \Gamma; \tau; L \vdash \exCase{p}{s} \cons \seq{h} \checks \sigma : (\Assigns{\Delta} \override R) \merge S, L'
 }
 \end{mathpar}
 \caption{Cases $\seq{h}$ against scrutinee type $\sigma$ have result type $S$, reducing residual $L$ to $L'$}
