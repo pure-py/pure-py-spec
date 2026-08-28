@@ -128,9 +128,11 @@ a subtype of the scrutinee's type, so a case that cannot match is rejected rathe
 unreachable.
 
 Reachability and exhaustiveness are the two halves of one computation (\figref{coverage}). A \emph{shape}
-$k$ denotes a set of values: $\shapeAny{\tau}{N}$ is a value of type $\tau$ whose head is none of $N$,
-where $N$ collects literals, class names and sequence lengths, and the remaining forms are a literal, a
-constructor, a tuple and a list, each with shapes in place of sub-patterns. The \emph{residual} of the
+$k$ denotes a set of values. The form $\shapeAny{\tau}{N}$ is a value of type $\tau$ whose outermost
+constructor is not among those in $N$, which holds class names for a class type, lengths for a list type
+and literals otherwise; the other forms are a literal, a constructor, a tuple and a list, each with shapes
+in place of sub-patterns. A set $N$ \emph{covers} $\tau$ when it leaves no values, so
+$\shapeAny{\tau}{N}$ denotes the empty set and $\restOf$ discards it. The \emph{residual} of the
 scrutinee's type is one shape per alternative of it, and $\splitShape$ divides a set of shapes into the
 part a pattern matches and the part it leaves.
 

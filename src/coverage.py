@@ -33,8 +33,8 @@ from type_syntax import (
 
 
 @dataclass(frozen=True)
-class Any_:
-    """Values of type `ty` whose head is none of `excluded`."""
+class Rest:
+    """Values of type `ty` whose outermost constructor is none of `excluded`."""
 
     ty: Type
     excluded: frozenset[object]
@@ -57,11 +57,11 @@ class Lit:
     value: object
 
 
-type Shape = Any_ | Constr | Seq | Lit
+type Shape = Rest | Constr | Seq | Lit
 
 
-def seed(t: Type) -> tuple[Shape, ...]:
-    return tuple(Any_(m, frozenset()) for m in alts(t))
+def seed(t: Type, ctx: ModuleContext) -> tuple[Shape, ...]:
+    return tuple(k for m in alts(t) for k in rest(m, frozenset(), ctx))
 
 
 def is_empty(shapes: tuple[Shape, ...]) -> bool:
@@ -105,29 +105,31 @@ def split_literal(
     if isinstance(s, Lit):
         return ((s,), ()) if s.value == v else ((), (s,))
     if (
-        isinstance(s, Any_)
+        isinstance(s, Rest)
         and v not in s.excluded
         and subtype(LiteralType(v), s.ty, ctx)
     ):
-        excluded = s.excluded | {v}
-        rest = (
-            ()
-            if covers_all(s.ty, excluded, ctx)
-            else (Any_(s.ty, frozenset(excluded)),)
-        )
-        return (Lit(v),), rest
+        return (Lit(v),), rest(s.ty, s.excluded | {v}, ctx)
     return (), (s,)
 
 
-def covers_all(t: Type, excluded: frozenset[object], ctx: ModuleContext) -> bool:
-    """Whether the excluded literals exhaust the values of `t`."""
+def covers(excluded: frozenset[object], t: Type, ctx: ModuleContext) -> bool:
+    """Whether the excluded constructors leave no values of `t`."""
     if isinstance(t, LiteralType):
         return t.value in excluded
+    if isinstance(t, ClassType):
+        return any(
+            isinstance(q, str) and subtype(t, ClassType(q), ctx) for q in excluded
+        )
     if t == Primitive.BOOL:
         return {True, False} <= excluded
     if t == Primitive.NONE:
         return None in excluded
-    return False
+    return t == Primitive.NEVER
+
+
+def rest(t: Type, excluded: frozenset[object], ctx: ModuleContext) -> tuple[Shape, ...]:
+    return () if covers(excluded, t, ctx) else (Rest(t, excluded),)
 
 
 def split_class(
@@ -144,21 +146,21 @@ def split_class(
     if isinstance(s, Constr):
         if not any(a.name == entry.name for a in ancestors_of(s.cls, ctx)):
             return (), (s,)
-        matched, rest = split_row(s.args, subs, ctx)
+        matched, remaining = split_row(s.args, subs, ctx)
         return (
             tuple(Constr(s.cls, row) for row in matched),
-            tuple(Constr(s.cls, row) for row in rest),
+            tuple(Constr(s.cls, row) for row in remaining),
         )
-    if isinstance(s, Any_) and isinstance(s.ty, ClassType) and name not in s.excluded:
+    if isinstance(s, Rest) and isinstance(s.ty, ClassType) and name not in s.excluded:
         cls = ClassType(name)
         if not (subtype(s.ty, cls, ctx) or subtype(cls, s.ty, ctx)):
             return (), (s,)
-        row = tuple(Any_(Primitive.OBJECT, frozenset()) for _ in subs)
-        matched, rest = split_row(row, subs, ctx)
-        others = () if subtype(s.ty, cls, ctx) else (Any_(s.ty, s.excluded | {name}),)
+        row = tuple(Rest(Primitive.OBJECT, frozenset()) for _ in subs)
+        matched, remaining = split_row(row, subs, ctx)
         return (
             tuple(Constr(name, r) for r in matched),
-            tuple(Constr(name, r) for r in rest) + others,
+            tuple(Constr(name, r) for r in remaining)
+            + rest(s.ty, s.excluded | {name}, ctx),
         )
     return (), (s,)
 
@@ -177,29 +179,30 @@ def split_sequence(
     if isinstance(s, Seq):
         if s.kind is not kind or len(s.args) != n:
             return (), (s,)
-        matched, rest = split_row(s.args, subs, ctx)
+        matched, remaining = split_row(s.args, subs, ctx)
         return (
             tuple(Seq(kind, r) for r in matched),
-            tuple(Seq(kind, r) for r in rest),
+            tuple(Seq(kind, r) for r in remaining),
         )
-    if isinstance(s, Any_):
+    if isinstance(s, Rest):
         if (
             kind is PatTuple
             and isinstance(s.ty, TupleType)
             and len(s.ty.components) == n
         ):
-            row = tuple(Any_(t, frozenset()) for t in s.ty.components)
-            matched, rest = split_row(row, subs, ctx)
+            row = tuple(Rest(t, frozenset()) for t in s.ty.components)
+            matched, remaining = split_row(row, subs, ctx)
             return (
                 tuple(Seq(kind, r) for r in matched),
-                tuple(Seq(kind, r) for r in rest),
+                tuple(Seq(kind, r) for r in remaining),
             )
         if kind is PatList and isinstance(s.ty, ListType) and n not in s.excluded:
-            row = tuple(Any_(s.ty.elem, frozenset()) for _ in range(n))
-            matched, rest = split_row(row, subs, ctx)
+            row = tuple(Rest(s.ty.elem, frozenset()) for _ in range(n))
+            matched, remaining = split_row(row, subs, ctx)
             return (
                 tuple(Seq(kind, r) for r in matched),
-                tuple(Seq(kind, r) for r in rest) + (Any_(s.ty, s.excluded | {n}),),
+                tuple(Seq(kind, r) for r in remaining)
+                + rest(s.ty, s.excluded | {n}, ctx),
             )
     return (), (s,)
 
@@ -236,7 +239,7 @@ def uncovered(
     t: Type, patterns: list[ast.pattern], ctx: ModuleContext
 ) -> tuple[tuple[Shape, ...], tuple[int, ...]]:
     """The residual after every pattern, and the indices of the unreachable ones."""
-    residual = seed(t)
+    residual = seed(t, ctx)
     unreachable: list[int] = []
     for i, p in enumerate(patterns):
         matched, residual = split_set(residual, p, ctx)
