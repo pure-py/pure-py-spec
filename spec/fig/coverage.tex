@@ -274,7 +274,7 @@
   \Gamma \vdash k_i, p_i \splitTo K_i, L_i \quad (\forall i)
 }
 {
-  \Gamma \vdash (k_1, \ldots, k_n), (p_1, \ldots, p_n) \splitTo \set{(m_1, \ldots, m_n) \mid m_i \in K_i}, \; \textstyle\bigcup_i \set{(m_1, \ldots, m_{i-1}, k, k_{i+1}, \ldots, k_n) \mid k \in L_i, \; m_j \in K_j}
+  \Gamma \vdash (k_1, \ldots, k_n), (p_1, \ldots, p_n) \splitTo \set{(m_1, \ldots, m_n) \mid m_i \in K_i}, \; \textstyle\bigcup_i \set{(m_1, \ldots, m_{i-1}, k\,', k_{i+1}, \ldots, k_n) \mid k\,' \in L_i, \; m_j \in K_j \text{ for } j < i}
 }
 \and
 \inferrule*[lab={\ruleName{split-shapes}}]
