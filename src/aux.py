@@ -342,6 +342,25 @@ def find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST |
     return None
 
 
+def first_return(body: list[ast.stmt]) -> ast.Return | None:
+    """The first return in a statement list, not descending into definitions."""
+    for s in body:
+        if isinstance(s, ast.Return):
+            return s
+        if isinstance(s, ast.FunctionDef):
+            continue
+        nested = first_return(nested_statements(s))
+        if nested is not None:
+            return nested
+    return None
+
+
+def nested_statements(s: ast.stmt) -> list[ast.stmt]:
+    if isinstance(s, ast.Match):
+        return [t for case in s.cases for t in case.body]
+    return [c for c in ast.iter_child_nodes(s) if isinstance(c, ast.stmt)]
+
+
 def own_fields(node: ast.ClassDef) -> list[str]:
     return [
         t.target.id

@@ -10,6 +10,7 @@ from type_syntax import (
     Primitive,
     TupleType,
     Type,
+    base_type,
 )
 
 type BinarySignature = Callable[[Type, Type, ModuleContext], Type | None]
@@ -182,8 +183,22 @@ def first_result(results: Sequence[Type | None]) -> Type | None:
 
 
 def binary_type(op: str, s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    return first_result([sig(s, t, ctx) for sig in BINARY_SIGNATURES[op]])
+    """The result of applying `op`, trying the operand types as synthesised and
+    then at their base types, which is how a literal operand checks against a
+    signature written for its base type."""
+    exact = first_result([sig(s, t, ctx) for sig in BINARY_SIGNATURES[op]])
+    if exact is not None:
+        return exact
+    return first_result([sig(widen(s), widen(t), ctx) for sig in BINARY_SIGNATURES[op]])
 
 
 def unary_type(op: str, s: Type, ctx: ModuleContext) -> Type | None:
-    return first_result([sig(s, ctx) for sig in UNARY_SIGNATURES[op]])
+    exact = first_result([sig(s, ctx) for sig in UNARY_SIGNATURES[op]])
+    if exact is not None:
+        return exact
+    return first_result([sig(widen(s), ctx) for sig in UNARY_SIGNATURES[op]])
+
+
+def widen(t: Type) -> Type:
+    """A literal type at its base type, any other type unchanged."""
+    return base_type(t.value) if isinstance(t, LiteralType) else t

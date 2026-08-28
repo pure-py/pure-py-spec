@@ -8,6 +8,7 @@ from aux import (
     assigns_stmt,
     find_import,
     find_nested_import,
+    first_return,
     split_imports,
     statements,
 )
@@ -19,13 +20,12 @@ from contexts import (
     ModuleContext,
     ModuleLoaded,
     ModuleStub,
-    Returns,
     Status,
     extend_context,
     predefined_context,
 )
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
-from statements import check_seq, result_type_statement
+from statements import check_seq
 
 
 def name_assign(q: str) -> ast.stmt:
@@ -156,14 +156,11 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     gamma0 = check_imports_prefix(prefix, ModuleContext(gamma={}, M=M, q=q))
     body = [name_assign(q)] + rest
     gamma1 = {**predefined_context("builtins"), **gamma0}
-    items = statements(body)
-    returning = next(
-        (i for i in items if isinstance(result_type_statement(i), Returns)), None
-    )
+    returning = first_return(body)
     if returning is not None:  # the module rule requires result type Assigns
-        node: ast.AST = returning[0] if isinstance(returning, list) else returning
-        raise IllFormedModule(node, reasons.TopLevelReturn())
-    final_ctx = check_seq(items, ModuleContext(gamma=gamma1, M=M, q=q))
+        raise IllFormedModule(returning, reasons.TopLevelReturn())
+    items = statements(body)
+    _, final_ctx = check_seq(items, ModuleContext(gamma=gamma1, M=M, q=q))
     check_submodule_clash(m, gamma0, body, M, q)
     return signature(body, final_ctx, q)
 

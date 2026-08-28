@@ -97,74 +97,26 @@ def annotation_or_tt(e: ast.expr) -> VarEntry:
     return Status.TT if t is None else t
 
 
-def result_type(node: ast.stmt) -> ResultType:
-    if isinstance(node, ast.Pass):
-        return ASSIGNS_EMPTY
-    if isinstance(node, ast.Assign):
-        return Assigns(
-            {t.id: Status.TT for t in node.targets if isinstance(t, ast.Name)}
-        )
-    if isinstance(node, ast.AnnAssign):
-        target = node.target
-        return Assigns(
-            {target.id: annotated_type(node)} if isinstance(target, ast.Name) else {}
-        )
-    if isinstance(node, ast.Expr):
-        return ASSIGNS_EMPTY
-    if isinstance(node, ast.Assert):
-        return ASSIGNS_EMPTY
-    if isinstance(node, ast.Return):
-        return RETURNS
-    if isinstance(node, ast.FunctionDef):
-        return Assigns({node.name: signature(node)})
-    if isinstance(node, ast.If):
-        return merge_results(
-            [
-                result_type_body(node.body),
-                result_type_body(node.orelse) if node.orelse else ASSIGNS_EMPTY,
-            ]
-        )
-    if isinstance(node, ast.Match):
-        branches = [
-            override_results(
-                Assigns({x: Status.TT for x in binds(case.pattern)}),
-                result_type_body(case.body),
-            )
-            for case in node.cases
-        ]
-        if not is_catch_all(node.cases[-1].pattern):
-            branches.append(ASSIGNS_EMPTY)
-        return merge_results(branches)
-    if isinstance(node, ast.ClassDef):
-        return ASSIGNS_EMPTY
-    raise AssertionError(f"unexpected statement: {type(node).__name__}")
+def check_body(body: list[ast.stmt], ctx: ModuleContext) -> ResultType:
+    result, _ = check_seq(statements(body), ctx)
+    return result
 
 
-def result_type_body(body: list[ast.stmt]) -> ResultType:
-    if len(body) == 1:
-        return result_type(body[0])
-    return override_results(result_type(body[0]), result_type_body(body[1:]))
-
-
-def check_body(body: list[ast.stmt], ctx: ModuleContext) -> ModuleContext:
-    return check_seq(statements(body), ctx)
-
-
-def check_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
+def check_seq(
+    items: list[Statement], ctx: ModuleContext
+) -> tuple[ResultType, ModuleContext]:
+    """Check a sequence, threading the context through it, and give its result
+    type and the context after it; nothing may follow a statement that
+    definitely returns."""
     if len(items) == 0:
-        return ctx
-    head = items[0]
-    check_statement(head, ctx)
-    if len(items) == 1:
-        return next_ctx_after(head, ctx)
-    tail = items[1:]
-    if isinstance(result_type_statement(head), Returns):
-        first_unreachable = tail[0]
-        node: ast.AST = (
-            first_unreachable[0]
-            if isinstance(first_unreachable, list)
-            else first_unreachable
-        )
+        return ASSIGNS_EMPTY, ctx
+    head, tail = items[0], items[1:]
+    head_result = check_statement(head, ctx)
+    ctx_after = extend(head, head_result, ctx)
+    if len(tail) == 0:
+        return head_result, ctx_after
+    if isinstance(head_result, Returns):
+        node: ast.AST = tail[0][0] if isinstance(tail[0], list) else tail[0]
         raise IllFormedModule(node, reasons.UnreachableStatement())
     reassigned = captures_statement(head) & assigns_seq(tail)
     if reassigned:
@@ -172,30 +124,22 @@ def check_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
         ra_node = find_first_reassigning(tail, reassigned)
         assert ra_node is not None
         raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
-    return check_seq(tail, next_ctx_after(head, ctx))
+    tail_result, final_ctx = check_seq(tail, ctx_after)
+    return override_results(head_result, tail_result), final_ctx
 
 
-def next_ctx_after(head: Statement, ctx: ModuleContext) -> ModuleContext:
-    # Assigns {c: C} for a class statement: ResultType carries statuses only, so the class entry is
-    # added here rather than through the result type.
+def extend(head: Statement, result: ResultType, ctx: ModuleContext) -> ModuleContext:
+    # A class declaration assigns a class entry, which a result type cannot carry.
     if isinstance(head, ast.ClassDef):
         return override_gamma(ctx, {head.name: class_entry_for(head, ctx.q, ctx.gamma)})
-    head_result = result_type_statement(head)
-    delta = head_result.delta if isinstance(head_result, Assigns) else {}
-    return override_var(ctx, delta)
+    return override_var(ctx, result.delta if isinstance(result, Assigns) else {})
 
 
-def result_type_statement(item: Statement) -> ResultType:
-    if isinstance(item, list):
-        return Assigns({d.name: signature(d) for d in item})
-    return result_type(item)
-
-
-def check_statement(item: Statement, ctx: ModuleContext) -> None:
+def check_statement(item: Statement, ctx: ModuleContext) -> ResultType:
     if isinstance(item, list):
         check_mutual_region(item, ctx)
-    else:
-        check_stmt(item, ctx)
+        return Assigns({d.name: signature(d) for d in item})
+    return check_stmt(item, ctx)
 
 
 def check_mutual_region(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
@@ -240,52 +184,69 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
     check_distinct_names(defs[1:], seen | {head.name})
 
 
-def check_stmt(s: ast.stmt, ctx: ModuleContext) -> None:
+def check_stmt(s: ast.stmt, ctx: ModuleContext) -> ResultType:
     if isinstance(s, ast.Pass):
-        return
+        return ASSIGNS_EMPTY
     if isinstance(s, ast.Assign):
-        check_expr(s.value, ctx)
+        assigned = check_expr(s.value, ctx)
         check_assign_targets(s.targets, captures_e(s.value))
-        return
+        return Assigns(
+            {
+                t.id: Status.TT if assigned is None else assigned
+                for t in s.targets
+                if isinstance(t, ast.Name)
+            }
+        )
     if isinstance(s, ast.AnnAssign):
         assert s.value is not None
-        check_expr(s.value, ctx)
+        declared = annotated_type(s)
+        checks_against(
+            s.value, declared if not isinstance(declared, Status) else None, ctx
+        )
         check_assign_targets([s.target], captures_e(s.value))
-        return
+        target = s.target
+        return Assigns({target.id: declared} if isinstance(target, ast.Name) else {})
     if isinstance(s, ast.Expr):
         check_expr(s.value, ctx)
-        return
+        return ASSIGNS_EMPTY
     if isinstance(s, ast.Return):
         if s.value is not None:
             check_expr(s.value, ctx)
-        return
+        return RETURNS
     if isinstance(s, ast.If):
         check_expr(s.test, ctx)
-        check_body(s.body, ctx)
-        if s.orelse:
-            check_body(s.orelse, ctx)
-        return
+        branches = [check_body(s.body, ctx)]
+        branches.append(check_body(s.orelse, ctx) if s.orelse else ASSIGNS_EMPTY)
+        return merge_results(branches)
     if isinstance(s, ast.Assert):
         check_expr(s.test, ctx)
         if s.msg is not None:
             check_expr(s.msg, ctx)
-        return
+        return ASSIGNS_EMPTY
     if isinstance(s, ast.Match):
         check_expr(s.subject, ctx)
         check_pattern_list([c.pattern for c in s.cases], s, ctx)
-        check_match_cases(s.cases, ctx)
-        return
+        return check_match_cases(s.cases, ctx)
     if isinstance(s, ast.ClassDef):
         check_class_decl(s, ctx.gamma, ctx.q)
-        return
+        return ASSIGNS_EMPTY
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
-def check_match_cases(cases: list[ast.match_case], ctx: ModuleContext) -> None:
-    for case in cases:
-        check_body(
-            case.body, override_var(ctx, {x: Status.TT for x in binds(case.pattern)})
+def check_match_cases(cases: list[ast.match_case], ctx: ModuleContext) -> ResultType:
+    branches = [
+        override_results(
+            Assigns({x: Status.TT for x in binds(case.pattern)}),
+            check_body(
+                case.body,
+                override_var(ctx, {x: Status.TT for x in binds(case.pattern)}),
+            ),
         )
+        for case in cases
+    ]
+    if not is_catch_all(cases[-1].pattern):
+        branches.append(ASSIGNS_EMPTY)
+    return merge_results(branches)
 
 
 def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
