@@ -120,6 +120,23 @@ def render(t: Type) -> str:
 
 
 def base_type(v: object) -> Type:
+    """The base type of a literal, or of a type: a literal type at the base type
+    of its literal, and any other type unchanged."""
+    if isinstance(v, LiteralType):
+        return base_type(v.value)
+    if isinstance(
+        v,
+        (
+            Primitive,
+            ListType,
+            TupleType,
+            DictType,
+            CallableType,
+            ClassType,
+            UnionType,
+        ),
+    ):
+        return v
     if v is None:
         return Primitive.NONE
     if isinstance(v, bool):
