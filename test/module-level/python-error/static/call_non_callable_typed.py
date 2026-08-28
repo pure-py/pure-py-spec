@@ -1,3 +1,3 @@
-# rule: call -- the callee must be a callable
+# rule: call
 x: int = 5
 print(x(1))

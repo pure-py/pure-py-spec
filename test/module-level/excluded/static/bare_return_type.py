@@ -1,4 +1,4 @@
-# rule: return-none -- a bare return requires None to be a subtype of the result type
+# rule: return-none
 def f() -> int:
     return
 

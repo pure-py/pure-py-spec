@@ -1,4 +1,4 @@
-# rule: return -- a return is checked against the declared result type
+# rule: return
 def f() -> int:
     return "a"
 

@@ -1,4 +1,4 @@
-# rule: subty-tuple -- a tuple is immutable, so its type is covariant
+# rule: subty-tuple
 def first(t: tuple[int, str]) -> int:
     return t[0]
 

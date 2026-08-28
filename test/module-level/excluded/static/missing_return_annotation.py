@@ -1,5 +1,5 @@
-# rule: def -- every parameter and return carries an annotation
-def f(n: int):  # PurePy: error (no return annotation); Python: infers nothing
+# rule: def
+def f(n: int):
     return n + 1
 
 print(f(1))

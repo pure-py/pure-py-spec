@@ -1,4 +1,4 @@
-# rule: constr -- a constructor argument is checked against the field type
+# rule: constr
 from dataclasses import dataclass
 
 @dataclass

@@ -1,3 +1,3 @@
-# rule: binop -- bool is not an int, so arithmetic has no signature for it
+# rule: binop
 x: bool = True
 print(x + 1)

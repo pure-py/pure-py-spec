@@ -1,4 +1,4 @@
-# rule: def -- a function declaring a result must definitely return one
+# rule: def
 def f(b: bool) -> int:
     if b:
         return 1

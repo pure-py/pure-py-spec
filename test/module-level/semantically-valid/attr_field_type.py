@@ -1,4 +1,4 @@
-# rule: attr-object -- an attribute reference has the field's declared type
+# rule: attr-object
 from dataclasses import dataclass
 
 @dataclass
