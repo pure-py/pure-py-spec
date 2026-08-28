@@ -52,18 +52,18 @@
 \and
 \inferrule*[lab={\ruleName{subty-union-left}}]
 {
-  \strut
+  \sigma' \subty \sigma
 }
 {
-  \sigma \subty \tyUnion{\sigma}{\tau}
+  \sigma' \subty \tyUnion{\sigma}{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{subty-union-right}}]
 {
-  \strut
+  \sigma' \subty \tau
 }
 {
-  \tau \subty \tyUnion{\sigma}{\tau}
+  \sigma' \subty \tyUnion{\sigma}{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{subty-union}}]
