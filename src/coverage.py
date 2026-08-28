@@ -100,7 +100,7 @@ def literal_of(p: ast.pattern) -> object:
 def subtract_literal(s: Shape, v: object, ctx: ModuleContext) -> tuple[Shape, ...]:
     if isinstance(s, Lit):
         return () if s.value == v else (s,)
-    if isinstance(s, Any_) and subtype(LiteralType(v), s.ty, ctx):
+    if isinstance(s, Any_) and v not in s.excluded and subtype(LiteralType(v), s.ty, ctx):
         excluded = s.excluded | {v}
         return (
             ()
