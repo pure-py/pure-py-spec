@@ -13,6 +13,8 @@ surroundings (\figref{typing-check}).
 
 Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise. A
 literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base type} is $\widen(\ell)$:
+\input{spec/fig/aux-types}
+
 \begin{defalign}
 \widen(n) & = \tyInt &\quad& \text{if } n \text{ is an integer literal} \\
 \widen(n) & = \tyFloat &\quad& \text{if } n \text{ is a float literal} \\

@@ -1,0 +1,16 @@
+\begin{figure}
+\begin{center}
+\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.2\textwidth}>{\raggedright\arraybackslash}p{0.48\textwidth}}
+\textbf{Function} & \textbf{Result} & \textbf{Meaning} \\[1mm]
+\rowcolor{grammarheadcolor}\multicolumn{3}{l}{\itshape Types} \\
+$\widen(\ell)$ & type & base type of literal $\ell$ \\
+$\joinTy(\sigma, \tau)$, $\joinTy(\seq{\tau})$ & type & larger type where comparable, union otherwise \\
+$\elemTy(\tau)$ & type & type of elements a generator draws from $\tau$ \\
+\rowcolor{grammarheadcolor}\multicolumn{3}{l}{\itshape Shapes} \\
+$\restOf(\tau, N)$ & set of shapes & shapes of $\tau$ with heads $N$ excluded \\
+\end{tabular}
+\end{center}
+\caption{Auxiliary functions of the type system}
+\label{fig:aux-types}
+\end{figure}
