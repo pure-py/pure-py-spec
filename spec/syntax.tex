@@ -18,7 +18,9 @@ one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
 \label{sec:lexical}
 
 The grammar of \PurePy is an abstract syntax, and its metavariables range over values rather than
-over source text: $n$ is a number and $w$ is a string, not the lexemes that denote them. How source text
+over source text: $n$ is a number and $w$ is a string, not the lexemes that denote them. A number is never
+negative, since Python writes a negative number as unary minus applied to a literal, and a length or an
+exit status is a whole number. How source text
 becomes abstract syntax follows Python, including the indentation that delimits blocks.
 
 \subsection{Contexts}
@@ -125,8 +127,8 @@ and $\Gamma$ binds the same variables at $\statusDefAssigned$.
  & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
  & & $\quad \primFn(\seq{u}) = \aborts{\errType}$ & (otherwise) \\
  & \pyinline{range} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
- & & $\quad \primFn(n) = \val{\exList{0, \ldots, n-1}}$ & if $n$ whole number, $n > 0$ \\
- & & $\quad \primFn(n) = \val{\exList{}}$ & if $n$ whole number, $n \leq 0$ \\
+ & & $\quad \primFn(v) = \val{\exList{0, \ldots, v-1}}$ & if $v$ whole number, $v > 0$ \\
+ & & $\quad \primFn(v) = \val{\exList{}}$ & if $v$ whole number, $v \leq 0$ \\
 \pyinline{math} & \pyinline{pi} & & \\
  & \pyinline{e} & & \\
  & \pyinline{sqrt} & & \\
