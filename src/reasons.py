@@ -324,6 +324,17 @@ class TupleIndexOutOfRange:
         return f"index {self.index} out of range for a tuple of length {self.length}"
 
 
+@dataclass(frozen=True)
+class MissingReturn:
+    name: str
+    ty: str
+
+    def message(self) -> str:
+        return (
+            f"'{self.name}' declares result type {self.ty} but does not always return"
+        )
+
+
 Reason = (
     DuplicateFieldName
     | UnknownBaseClass
@@ -364,6 +375,7 @@ Reason = (
     | TypeMismatch
     | NotSubscriptable
     | TupleIndexOutOfRange
+    | MissingReturn
 )
 
 
