@@ -102,7 +102,9 @@ at their base types where no signature gives a result for the operand types them
 
 \noindent The second clause lets \pyinline{1 == 0} use the equality signature at \pyinline{int}, since two
 distinct literal types are not comparable. Taking the operand types as they are first keeps \pyinline{2 **
-3} an \pyinline{int}, since the exponent binds a variable that its base type would not.
+3} an \pyinline{int}, since the exponent binds a variable that its base type would not. Resolution is more
+precise than mypy for this operator, whose overloads give \pyinline{Any} as soon as the exponent is not a
+literal, where resolution gives \pyinline{float}.
 
 In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
 (\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
