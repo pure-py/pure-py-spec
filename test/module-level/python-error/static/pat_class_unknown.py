@@ -1,4 +1,4 @@
-def f(v):
+def f(v: int) -> int:
     match v:
         case NotAClass():
             return 1

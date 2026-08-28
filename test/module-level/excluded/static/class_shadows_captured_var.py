@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 x = 1
 
-def f():
+def f() -> int:
     return x  # captures x (the variable)
 
 @dataclass
