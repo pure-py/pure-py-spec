@@ -145,7 +145,7 @@ so a function that declares a result definitely returns one.
 
 A \pyinline{match} scrutinee synthesises a type. Both \pyinline{match} rules hand the cases to the
 judgement $\Gamma; \tau \vdash L, \seq{h} \checks \sigma : S, L'$, which checks the cases in turn,
-requiring each to be reachable and the whole list to exhaust the type. It starts from
+requiring each to be reachable and the whole list to exhaust the type. The judgement starts from
 $\shapesOf(\sigma, \varnothing)$, which denotes every value of type $\sigma$, and each case removes the values its
 pattern matches. Checking a case checks its pattern against the scrutinee's type, binding each variable at
 the type of the position it matches (\figref{typing-pat}), and then checks its body under those bindings. A
