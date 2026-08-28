@@ -399,9 +399,10 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
     if isinstance(e, ast.List):
         return list_type(e.elts, ctx)
     if isinstance(e, ast.Dict):
-        check_exprs([k for k in e.keys if k is not None], ctx)
-        check_exprs(e.values, ctx)
-        return None
+        for k in e.keys:
+            if k is not None:
+                checks_against(k, Primitive.STR, ctx)
+        return dict_type(e.values, ctx)
     if isinstance(e, ast.ListComp):
         check_comprehension([e.elt], e.generators, ctx)
         return None
@@ -465,6 +466,14 @@ def list_type(elts: list[ast.expr], ctx: ModuleContext) -> Type | None:
         if t is None:
             checks_against(x, elem, ctx)
     return ListType(elem)
+
+
+def dict_type(values: list[ast.expr], ctx: ModuleContext) -> Type | None:
+    """A non-empty dictionary synthesises where at least one value does, at the
+    join of the base types of those that do, with the others checked against
+    it."""
+    elem = list_type(values, ctx)
+    return None if not isinstance(elem, ListType) else DictType(elem.elem)
 
 
 def call(e: ast.Call, ctx: ModuleContext) -> Type | None:
