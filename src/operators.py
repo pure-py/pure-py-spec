@@ -182,7 +182,7 @@ def first_result(results: Sequence[Type | None]) -> Type | None:
     return next((r for r in results if r is not None), None)
 
 
-def binary_type(op: str, s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def resolve_binary(op: str, s: Type, t: Type, ctx: ModuleContext) -> Type | None:
     """The result of applying `op`, trying the operand types as synthesised and
     then at their base types, which is how a literal operand checks against a
     signature written for its base type."""
@@ -194,7 +194,7 @@ def binary_type(op: str, s: Type, t: Type, ctx: ModuleContext) -> Type | None:
     )
 
 
-def unary_type(op: str, s: Type, ctx: ModuleContext) -> Type | None:
+def resolve_unary(op: str, s: Type, ctx: ModuleContext) -> Type | None:
     exact = first_result([sig(s, ctx) for sig in UNARY_SIGNATURES[op]])
     if exact is not None:
         return exact

@@ -47,7 +47,7 @@ from contexts import (
     short_name,
     var_type,
 )
-from operators import BINARY_NAMES, UNARY_NAMES, binary_type, unary_type
+from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
 from patterns import check_pattern_list, is_catch_all
 from reasons import IllFormedModule
 from subtyping import join, subtype
@@ -306,7 +306,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
         name = UNARY_NAMES[type(e.op)]
         if operand is None:
             return None
-        result = unary_type(name, operand, ctx)
+        result = resolve_unary(name, operand, ctx)
         if result is None:
             raise IllFormedModule(e, reasons.NoUnarySignature(name, render(operand)))
         return result
@@ -451,7 +451,7 @@ def binary(
     s, t = check_expr(left, ctx), check_expr(right, ctx)
     if s is None or t is None:
         return None
-    result = binary_type(op, s, t, ctx)
+    result = resolve_binary(op, s, t, ctx)
     if result is None:
         raise IllFormedModule(e, reasons.NoBinarySignature(op, render(s), render(t)))
     return result
