@@ -45,11 +45,14 @@ from contexts import (
     short_name,
     var_type,
 )
+from operators import BINARY_NAMES, UNARY_NAMES, binary_type, unary_type
 from patterns import check_pattern_list, is_catch_all
 from reasons import IllFormedModule
+from subtyping import subtype
 from type_syntax import (
     CallableType,
     LiteralType,
+    Primitive,
     Type,
     parse_annotation,
     parse_annotations,
@@ -324,19 +327,29 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
         check_exprs(e.args, ctx)
         return None
     if isinstance(e, ast.BinOp):
-        check_expr(e.left, ctx)
-        check_expr(e.right, ctx)
-        return None
+        return binary(BINARY_NAMES[type(e.op)], e.left, e.right, ctx)
     if isinstance(e, ast.UnaryOp):
-        check_expr(e.operand, ctx)
-        return None
+        operand = check_expr(e.operand, ctx)
+        negated = negated_literal(e)
+        if negated is not None:
+            return negated
+        name = UNARY_NAMES[type(e.op)]
+        return None if operand is None else unary_type(name, operand, ctx)
     if isinstance(e, ast.BoolOp):
-        check_exprs(e.values, ctx)
-        return None
+        operands = [check_expr(v, ctx) for v in e.values]
+        return (
+            Primitive.BOOL
+            if all(t is not None and subtype(t, Primitive.BOOL, ctx) for t in operands)
+            else None
+        )
     if isinstance(e, ast.Compare):
-        check_expr(e.left, ctx)
+        left = check_expr(e.left, ctx)
         check_exprs(e.comparators, ctx)
-        return None
+        if len(e.ops) != 1 or left is None:
+            return None
+        right = check_expr(e.comparators[0], ctx)
+        name = BINARY_NAMES[type(e.ops[0])]
+        return None if right is None else binary_type(name, left, right, ctx)
     if isinstance(e, ast.IfExp):
         check_expr(e.test, ctx)
         check_expr(e.body, ctx)
@@ -379,6 +392,21 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
         check_comprehension([e.key, e.value], e.generators, ctx)
         return None
     raise AssertionError(f"unexpected expression: {type(e).__name__}")
+
+
+def negated_literal(e: ast.UnaryOp) -> Type | None:
+    """A negated numeric literal synthesises the negated literal type."""
+    if not isinstance(e.op, ast.USub) or not isinstance(e.operand, ast.Constant):
+        return None
+    v = e.operand.value
+    if isinstance(v, bool) or not isinstance(v, (int, float)):
+        return None
+    return LiteralType(-v)
+
+
+def binary(op: str, left: ast.expr, right: ast.expr, ctx: ModuleContext) -> Type | None:
+    s, t = check_expr(left, ctx), check_expr(right, ctx)
+    return None if s is None or t is None else binary_type(op, s, t, ctx)
 
 
 def check_comprehension(
