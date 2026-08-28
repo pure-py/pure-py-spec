@@ -29,37 +29,37 @@ def both(
 def equality(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
     if not comparable(s, t, ctx):
         return None
-    if not equality_type(s, ctx, frozenset()) or not equality_type(t, ctx, frozenset()):
+    if not equality_type(s, ctx) or not equality_type(t, ctx):
         return None
     return Primitive.BOOL
 
 
-def equality_type(t: Type, ctx: ModuleContext, seen: frozenset[str]) -> bool:
+def equality_type(t: Type, ctx: ModuleContext) -> bool:
     """Whether values of `t` can be compared for equality: every type but a
-    callable, and a container or class of equality types."""
+    callable, and a container or class of equality types. A class cannot refer
+    to itself through a field, since an annotation is evaluated where it
+    appears."""
     if isinstance(t, CallableType):
         return False
     if isinstance(t, ListType):
-        return equality_type(t.elem, ctx, seen)
+        return equality_type(t.elem, ctx)
     if isinstance(t, DictType):
-        return equality_type(t.value, ctx, seen)
+        return equality_type(t.value, ctx)
     if isinstance(t, TupleType):
-        return all(equality_type(c, ctx, seen) for c in t.components)
+        return all(equality_type(c, ctx) for c in t.components)
     if isinstance(t, UnionType):
-        return equality_type(t.left, ctx, seen) and equality_type(t.right, ctx, seen)
+        return equality_type(t.left, ctx) and equality_type(t.right, ctx)
     if isinstance(t, ClassType):
-        return class_equality_type(t.q, ctx, seen)
+        return class_equality_type(t.q, ctx)
     return True
 
 
-def class_equality_type(q: str, ctx: ModuleContext, seen: frozenset[str]) -> bool:
-    if q in seen:
-        return True
+def class_equality_type(q: str, ctx: ModuleContext) -> bool:
     entry = class_of(ctx, q)
     if entry is None:
         return True
     return all(
-        equality_type(field_type(entry, x) or Primitive.OBJECT, ctx, seen | {q})
+        equality_type(field_type(entry, x) or Primitive.OBJECT, ctx)
         for x in fields(entry)
     )
 
