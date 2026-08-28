@@ -134,8 +134,8 @@ admits are its subclasses where it is a class, the lengths where it is a list, a
 (\figref{shapes}). The other forms are a literal, a constructor, a tuple and a list, each with shapes in place of
 sub-patterns. A set $N$ \emph{covers} $\tau$ when it leaves no values, so $\shapeAny{\tau}{N}$ denotes the
 empty set and $\restOf$ discards it. The \emph{residual} of the
-scrutinee's type is one shape per alternative of it, and $\splitShape$ divides a set of shapes into the
-part a pattern matches and the part it leaves.
+scrutinee's type is one shape per alternative of it, and $\Gamma \vdash K \splitOp p \splitTo M, K'$ divides a set
+of shapes into the matched shapes $M$ and the residual $K'$.
 
 The cases are then walked once, from the residual of the scrutinee's type, in the same shape as
 $\dispatch$ walks them at run time (\figref{typing-cases}). Each case checks its pattern, checks its body
