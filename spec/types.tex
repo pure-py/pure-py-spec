@@ -14,7 +14,15 @@ than inferred from its body.
 Within an expression the typing judgement gives each subexpression a type, and
 is bidirectional. \emph{Synthesis} $\Gamma \vdash e \synth \tau$ reads a type out of an expression (\figrefTwo{typing-synth}{typing-synth-ctd}),
 and \emph{checking} $\Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
-surroundings (\figref{typing-check}).
+surroundings (\figref{typing-check}). The division follows the usual recipe for bidirectional
+systems~\cite{davies2000,dunfield2021}: introduction forms check, since a lambda or an empty list does not
+determine its own type, and elimination forms synthesise, since a call, a subscript or an attribute
+reference starts from a subterm whose type is known. Type systems that follow the recipe strictly usually
+rely on an annotation form $(e \mathbin{:} \tau)$, which synthesises by construction, so a checking form
+written with an annotation can be used in any context where synthesis is required. Python has no such form,
+allowing annotations only on parameters, returns and assignments, so \PurePy gives the introduction forms
+synthesis rules of their own wherever their parts determine the type, following Swift, Kotlin and
+Scala~\cite{swift2025,kotlin2025,odersky2025}.
 
 Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise. The
 entry for a definitely assigned variable is its type (Definition~\ref{def:context}), so \ruleName{var}
@@ -79,14 +87,7 @@ Python, so both take their type from the surroundings. An expression that synthe
 of $\sigma$ (\ruleName{check-synth}), which applies only where no other rule does, so both judgements are
 syntax-directed and an expression has at most one derivation in each.
 
-The division follows the usual recipe for bidirectional systems~\cite{davies2000,dunfield2021}: introduction forms
-check, since a lambda or an empty list does not determine its own type, and elimination forms synthesise,
-since a call, a subscript or an attribute reference starts from a subterm whose type is known. Type systems that
-follow the recipe strictly usually rely on an annotation form $(e \mathbin{:} \tau)$, which synthesises by
-construction, so a checking form written with an annotation can be used in any context where synthesis is required. Python has no such form, allowing annotations only on
-parameters, returns and assignments. \PurePy instead gives the introduction forms synthesis rules of their own
-wherever their parts determine the type, following Swift, Kotlin and
-Scala~\cite{swift2025,kotlin2025,odersky2025}: a tuple when all its components synthesise, a
+The forms with synthesis rules of their own are a tuple when all its components synthesise, a
 comprehension when its body synthesises, and a non-empty list or dictionary when at least one element
 synthesises, the others checking against the join of the types of those that synthesise (\ruleName{syn-list}, \ruleName{syn-tuple},
 \ruleName{syn-dict}, \ruleName{syn-list-comp}, \ruleName{syn-dict-comp}). Each of these forms keeps its checking rule as well. An empty list or dictionary and a lambda have no
