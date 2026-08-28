@@ -63,7 +63,7 @@ joining the first with the join of the rest:
 \begin{defalign}
 \joinTy(\sigma, \tau) & = \tau &\quad& \text{if } \Gamma \vdash \sigma \subty \tau \\
 \joinTy(\sigma, \tau) & = \sigma &\quad& \text{if } \Gamma \vdash \tau \subty \sigma \\
-\joinTy(\sigma, \tau) & = \tyUnion{\sigma}{\tau} &\quad& \text{otherwise} \\
+\joinTy(\sigma, \tau) & = \tyUnion{\sigma}{\tau} &\quad& \text{otherwise} \\[2mm]
 \joinTy(\tau) & = \tau \\
 \joinTy(\tau_1, \seq{\tau}) & = \joinTy(\tau_1, \joinTy(\seq{\tau}))
 \end{defalign}
