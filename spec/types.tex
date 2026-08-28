@@ -22,14 +22,16 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base
 \end{defalign}
 
 \noindent The \emph{alternatives} of a type are the sequence of a union's operands, and the type itself
-otherwise. Two types are \emph{comparable} when either is a subtype of the other; two comparable types
+otherwise. Two types are \emph{comparable} when either is a subtype of the other. Subtyping and the definitions
+below depend on the context, since a class is below its ancestors, and $\Gamma$ is left implicit where it
+plays no part. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. A sequence of types joins by
 joining the first with the join of the rest:
 \begin{defalign}
 \membersOf(\tyUnion{\sigma}{\tau}) & = \membersOf(\sigma) \mathbin{\concat} \membersOf(\tau) \\
 \membersOf(\tau) & = \tau \quad \text{(otherwise)} \\[3mm]
-\joinTy(\sigma, \tau) & = \tau \quad \text{if } \sigma \subty \tau \\
-\joinTy(\sigma, \tau) & = \sigma \quad \text{if } \tau \subty \sigma \\
+\joinTy(\sigma, \tau) & = \tau \quad \text{if } \Gamma \vdash \sigma \subty \tau \\
+\joinTy(\sigma, \tau) & = \sigma \quad \text{if } \Gamma \vdash \tau \subty \sigma \\
 \joinTy(\sigma, \tau) & = \tyUnion{\sigma}{\tau} \quad (\text{otherwise}) \\
 \joinTy(\tau) & = \tau \\
 \joinTy(\tau_1, \seq{\tau}) & = \joinTy(\tau_1, \joinTy(\seq{\tau}))
@@ -151,3 +153,9 @@ $\statusNotDefAssigned$.
 \input{spec/fig/typing-stmt}
 
 \input{spec/fig/typing-pat}
+
+\begin{lemma}[Transitivity of subtyping]
+\label{lem:subtyping-transitive}
+If $\Gamma \vdash \sigma \subty \tau$ and $\Gamma \vdash \tau \subty \upsilon$ then $\Gamma \vdash
+\sigma \subty \upsilon$.
+\end{lemma}
