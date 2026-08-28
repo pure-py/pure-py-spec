@@ -187,6 +187,22 @@
   \Gamma \vdash \patList{k_1, \ldots, k_n}, \patList{p_1, \ldots, p_n} \splitTo \set{\patList{\seq{m}} \mid \seq{m} \in M}, \set{\patList{\seq{k}\,'} \mid \seq{k}\,' \in K}
 }
 \and
+\inferrule*[lab={\ruleName{split-rest-dict}}]
+{
+  n \geq 1
+}
+{
+  \Gamma \vdash \shapeAny{\tyDict{\tau}}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \splitTo \set{\shapeAny{\tyDict{\tau}}{N}}, \set{\shapeAny{\tyDict{\tau}}{N}}
+}
+\and
+\inferrule*[lab={\ruleName{split-rest-dict-empty}}]
+{
+  \strut
+}
+{
+  \Gamma \vdash \shapeAny{\tyDict{\tau}}{N}, \patDict{} \splitTo \set{\shapeAny{\tyDict{\tau}}{N}}, \varnothing
+}
+\and
 \inferrule*[lab={\ruleName{split-none}}]
 {
   \text{no other rule applies}
@@ -195,13 +211,29 @@
   \Gamma \vdash k, p \splitTo \varnothing, \set{k}
 }
 \end{mathpar}
-
-\begin{align*}
-\Gamma \vdash (k_1, \ldots, k_n), (p_1, \ldots, p_n) &\splitTo \set{(m_1, \ldots, m_n) \mid m_i \in M_i}, \; \textstyle\bigcup_i \set{(m_1, \ldots, m_{i-1}, k, k_{i+1}, \ldots, k_n) \mid k \in K_i, \; m_j \in M_j} \\*
-&\qquad \text{where } \Gamma \vdash k_i, p_i \splitTo M_i, K_i \\[2mm]
-\Gamma \vdash K, p &\splitTo \textstyle\bigcup_{k \in K} M_k, \; \textstyle\bigcup_{k \in K} K_k \quad \text{where } \Gamma \vdash k, p \splitTo M_k, K_k
-\end{align*}
-
 \caption{Pattern $p$ splits shape $k$ into matched shapes $M$ and residual $K$}
 \label{fig:coverage}
+\end{figure}
+
+\begin{figure}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{split-row}}]
+{
+  \Gamma \vdash k_i, p_i \splitTo M_i, K_i \quad (\forall i)
+}
+{
+  \Gamma \vdash (k_1, \ldots, k_n), (p_1, \ldots, p_n) \splitTo \set{(m_1, \ldots, m_n) \mid m_i \in M_i}, \; \textstyle\bigcup_i \set{(m_1, \ldots, m_{i-1}, k, k_{i+1}, \ldots, k_n) \mid k \in K_i, \; m_j \in M_j}
+}
+\and
+\inferrule*[lab={\ruleName{split-shapes}}]
+{
+  \Gamma \vdash k, p \splitTo M_k, K_k \quad (\forall k \in K)
+}
+{
+  \Gamma \vdash K, p \splitTo \textstyle\bigcup_{k \in K} M_k, \; \textstyle\bigcup_{k \in K} K_k
+}
+\end{mathpar}
+\caption{Splitting rows and sets of shapes}
+\label{fig:coverage-rows}
 \end{figure}

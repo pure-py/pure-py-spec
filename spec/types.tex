@@ -136,7 +136,8 @@ $\restOf(\tau, N)$: one shape per member of a union, and none at all where $N$ e
 carries a union type, since $\restOf$ is the only source of the form $\shapeAny{\tau}{N}$ and it splits a
 union into its members. The
 relation $\Gamma \vdash K, p \splitTo M, K'$ divides a set of shapes into the matched shapes $M$ and the
-\emph{residual} $K'$.
+\emph{residual} $K'$, one shape at a time and one position at a time
+(\figrefTwo{coverage}{coverage-rows}).
 
 The cases are then walked once, from $\restOf(\sigma, \varnothing)$ for the scrutinee's type $\sigma$, in the same shape as
 $\dispatch$ walks them at run time (\figref{typing-cases}). Each case checks its pattern, checks its body
@@ -146,7 +147,9 @@ applies where the walk ends with an empty residual, and \ruleName{match-partial}
 in $\Assigns{\varnothing}$ for the values that fall through. A union is exhausted
 by covering each member, a class type by a pattern for the class itself, and \pyinline{bool} by
 \pyinline{True} and \pyinline{False}, while \pyinline{int}, \pyinline{str}, lists and dictionaries have
-unboundedly many heads and need a variable or wildcard. Splitting is strictly sharper than comparing
+unboundedly many heads and need a variable or wildcard. A dictionary pattern matches on the presence of
+keys, which shapes do not record, so it leaves the shape it matched, and only the empty dictionary pattern,
+which matches every dictionary, removes one. Splitting is strictly sharper than comparing
 patterns pairwise: over $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ are
 exhaustive, though no one of them subsumes what a further case would match.
