@@ -127,7 +127,7 @@ expression synthesises (\ruleName{assign}, \ruleName{assign-unannot}). The condi
 check against \pyinline{bool}, and an assertion message against \pyinline{str}.
 
 A function definition binds its parameters at their annotated types and its own name, and the names of the
-mutual region it belongs to, at the corresponding $\pyinline{Callable}$ type; the variables the body assigns start
+mutual region it belongs to, at the corresponding $\pyinline{Callable}$ type; variables assigned in the body start
 at $\statusNotDefAssigned$, as they do without types (\ruleName{def}). The body is checked with the
 declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
@@ -164,7 +164,7 @@ relation $\Gamma \vdash L, p \splitTo K, L'$ divides a set of shapes into the ma
 The cases are then walked once, from $\restOf(\sigma, \varnothing)$ for the scrutinee's type $\sigma$, in the same shape as
 $\dispatch$ walks them at run time (\figref{typing-cases}). Each case checks its pattern, checks its body
 under the bindings, and must match some shape of the residual, so a case that matches nothing is rejected
-as unreachable, and the part it leaves is passed on. \ruleName{match}
+as unreachable, and the residual it leaves is passed on. \ruleName{match}
 applies where the walk ends with an empty residual, and \ruleName{match-partial} where it does not, merging
 in $\Assigns{\varnothing}$ for the values that fall through. A union is exhausted
 by covering each member, a class type by a pattern for the class itself, and \pyinline{bool} by
