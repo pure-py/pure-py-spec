@@ -28,7 +28,6 @@ from type_syntax import (
     TupleType,
     Type,
     alts,
-    base_type,
     subtype,
 )
 
@@ -77,17 +76,20 @@ def irrefutable(p: ast.pattern) -> bool:
     return isinstance(p, ast.MatchAs) and p.pattern is None
 
 
-def subtract(s: Shape, p: ast.pattern, ctx: ModuleContext) -> tuple[Shape, ...]:
+def split(
+    s: Shape, p: ast.pattern, ctx: ModuleContext
+) -> tuple[tuple[Shape, ...], tuple[Shape, ...]]:
+    """The shapes of `s` that `p` matches, and the shapes it leaves."""
     if irrefutable(p):
-        return ()
+        return (s,), ()
     q = strip(p)
     if isinstance(q, (ast.MatchValue, ast.MatchSingleton)):
-        return subtract_literal(s, literal_of(q), ctx)
+        return split_literal(s, literal_of(q), ctx)
     if isinstance(q, ast.MatchClass):
-        return subtract_class(s, q, ctx)
+        return split_class(s, q, ctx)
     if isinstance(q, ast.MatchSequence):
-        return subtract_sequence(s, q, ctx)
-    return (s,)
+        return split_sequence(s, q, ctx)
+    return (), (s,)
 
 
 def literal_of(p: ast.pattern) -> object:
@@ -97,17 +99,24 @@ def literal_of(p: ast.pattern) -> object:
     return literal_value(p)
 
 
-def subtract_literal(s: Shape, v: object, ctx: ModuleContext) -> tuple[Shape, ...]:
+def split_literal(
+    s: Shape, v: object, ctx: ModuleContext
+) -> tuple[tuple[Shape, ...], tuple[Shape, ...]]:
     if isinstance(s, Lit):
-        return () if s.value == v else (s,)
-    if isinstance(s, Any_) and v not in s.excluded and subtype(LiteralType(v), s.ty, ctx):
+        return ((s,), ()) if s.value == v else ((), (s,))
+    if (
+        isinstance(s, Any_)
+        and v not in s.excluded
+        and subtype(LiteralType(v), s.ty, ctx)
+    ):
         excluded = s.excluded | {v}
-        return (
+        rest = (
             ()
             if covers_all(s.ty, excluded, ctx)
             else (Any_(s.ty, frozenset(excluded)),)
         )
-    return (s,)
+        return (Lit(v),), rest
+    return (), (s,)
 
 
 def covers_all(t: Type, excluded: frozenset[object], ctx: ModuleContext) -> bool:
@@ -121,32 +130,37 @@ def covers_all(t: Type, excluded: frozenset[object], ctx: ModuleContext) -> bool
     return False
 
 
-def subtract_class(
+def split_class(
     s: Shape, p: ast.MatchClass, ctx: ModuleContext
-) -> tuple[Shape, ...]:
+) -> tuple[tuple[Shape, ...], tuple[Shape, ...]]:
     entry = class_entry(p.cls, ctx)
     if entry is None:
-        return (s,)
+        return (), (s,)
     name = short_name(entry)
     args = field_map(entry, p.patterns, p.kwd_attrs, p.kwd_patterns)
     if args is None:
-        return (s,)
+        return (), (s,)
     subs = tuple(args[x] for x in fields(entry))
     if isinstance(s, Constr):
         if not any(a.name == entry.name for a in ancestors_of(s.cls, ctx)):
-            return (s,)
-        return tuple(Constr(s.cls, row) for row in subtract_row(s.args, subs, ctx))
-    if isinstance(s, Any_) and isinstance(s.ty, ClassType):
-        if name in s.excluded:
-            return (s,)
-        below = subtype(s.ty, ClassType(name), ctx)
-        shape = tuple(Any_(Primitive.OBJECT, frozenset()) for _ in subs)
-        rest = tuple(Constr(name, row) for row in subtract_row(shape, subs, ctx))
-        if below:
-            return rest
-        if subtype(ClassType(name), s.ty, ctx):
-            return (Any_(s.ty, s.excluded | {name}),) + rest
-    return (s,)
+            return (), (s,)
+        matched, rest = split_row(s.args, subs, ctx)
+        return (
+            tuple(Constr(s.cls, row) for row in matched),
+            tuple(Constr(s.cls, row) for row in rest),
+        )
+    if isinstance(s, Any_) and isinstance(s.ty, ClassType) and name not in s.excluded:
+        cls = ClassType(name)
+        if not (subtype(s.ty, cls, ctx) or subtype(cls, s.ty, ctx)):
+            return (), (s,)
+        row = tuple(Any_(Primitive.OBJECT, frozenset()) for _ in subs)
+        matched, rest = split_row(row, subs, ctx)
+        others = () if subtype(s.ty, cls, ctx) else (Any_(s.ty, s.excluded | {name}),)
+        return (
+            tuple(Constr(name, r) for r in matched),
+            tuple(Constr(name, r) for r in rest) + others,
+        )
+    return (), (s,)
 
 
 def ancestors_of(name: str, ctx: ModuleContext) -> tuple[ClassEntry, ...]:
@@ -154,16 +168,20 @@ def ancestors_of(name: str, ctx: ModuleContext) -> tuple[ClassEntry, ...]:
     return () if entry is None else tuple(ancestors(entry))
 
 
-def subtract_sequence(
+def split_sequence(
     s: Shape, p: ast.MatchSequence, ctx: ModuleContext
-) -> tuple[Shape, ...]:
+) -> tuple[tuple[Shape, ...], tuple[Shape, ...]]:
     kind = PatList if isinstance(p, PatList) else PatTuple
     n = len(p.patterns)
     subs = tuple(p.patterns)
     if isinstance(s, Seq):
         if s.kind is not kind or len(s.args) != n:
-            return (s,)
-        return tuple(Seq(kind, row) for row in subtract_row(s.args, subs, ctx))
+            return (), (s,)
+        matched, rest = split_row(s.args, subs, ctx)
+        return (
+            tuple(Seq(kind, r) for r in matched),
+            tuple(Seq(kind, r) for r in rest),
+        )
     if isinstance(s, Any_):
         if (
             kind is PatTuple
@@ -171,55 +189,57 @@ def subtract_sequence(
             and len(s.ty.components) == n
         ):
             row = tuple(Any_(t, frozenset()) for t in s.ty.components)
-            return tuple(Seq(kind, r) for r in subtract_row(row, subs, ctx))
+            matched, rest = split_row(row, subs, ctx)
+            return (
+                tuple(Seq(kind, r) for r in matched),
+                tuple(Seq(kind, r) for r in rest),
+            )
         if kind is PatList and isinstance(s.ty, ListType) and n not in s.excluded:
             row = tuple(Any_(s.ty.elem, frozenset()) for _ in range(n))
-            rest = tuple(Seq(kind, r) for r in subtract_row(row, subs, ctx))
-            return (Any_(s.ty, s.excluded | {n}),) + rest
-    return (s,)
+            matched, rest = split_row(row, subs, ctx)
+            return (
+                tuple(Seq(kind, r) for r in matched),
+                tuple(Seq(kind, r) for r in rest) + (Any_(s.ty, s.excluded | {n}),),
+            )
+    return (), (s,)
 
 
-def subtract_row(
-    row: tuple[Shape, ...], ps: tuple[ast.pattern, ...], ctx: ModuleContext
-) -> tuple[tuple[Shape, ...], ...]:
-    """Rows of shapes that fail to match the pattern row, one group per position."""
-    out: list[tuple[Shape, ...]] = []
-    for i, (s, p) in enumerate(zip(row, ps)):
-        heads = [intersect(row[j], ps[j], ctx) for j in range(i)]
-        if any(len(h) == 0 for h in heads):
-            continue
-        for prefix in product(*heads):
-            out.extend(tuple(prefix) + (r,) + row[i + 1 :] for r in subtract(s, p, ctx))
-    return tuple(out)
+type Row = tuple[Shape, ...]
 
 
-def intersect(s: Shape, p: ast.pattern, ctx: ModuleContext) -> tuple[Shape, ...]:
-    if irrefutable(p):
-        return (s,)
-    q = strip(p)
-    if isinstance(q, (ast.MatchValue, ast.MatchSingleton)):
-        v = literal_of(q)
-        if isinstance(s, Lit):
-            return (s,) if s.value == v else ()
-        if (
-            isinstance(s, Any_)
-            and subtype(base_type(v), s.ty, ctx)
-            and v not in s.excluded
-        ):
-            return (Lit(v),)
-        return ()
-    return (s,)
+def split_row(
+    row: Row, ps: tuple[ast.pattern, ...], ctx: ModuleContext
+) -> tuple[tuple[Row, ...], tuple[Row, ...]]:
+    """Rows that match the pattern row, and rows that fail at some position."""
+    splits = [split(s, p, ctx) for s, p in zip(row, ps)]
+    matched = tuple(product(*(m for m, _ in splits)))
+    rest = tuple(
+        tuple(prefix) + (r,) + row[i + 1 :]
+        for i, (_, ks) in enumerate(splits)
+        for prefix in product(*(splits[j][0] for j in range(i)))
+        for r in ks
+    )
+    return matched, rest
+
+
+def split_set(
+    shapes: tuple[Shape, ...], p: ast.pattern, ctx: ModuleContext
+) -> tuple[tuple[Shape, ...], tuple[Shape, ...]]:
+    splits = [split(s, p, ctx) for s in shapes]
+    return (
+        tuple(k for m, _ in splits for k in m),
+        tuple(k for _, ks in splits for k in ks),
+    )
 
 
 def uncovered(
     t: Type, patterns: list[ast.pattern], ctx: ModuleContext
 ) -> tuple[tuple[Shape, ...], tuple[int, ...]]:
-    """Residual after each pattern, and the indices of the unreachable ones."""
+    """The residual after every pattern, and the indices of the unreachable ones."""
     residual = seed(t)
     unreachable: list[int] = []
     for i, p in enumerate(patterns):
-        after = tuple(r for s in residual for r in subtract(s, p, ctx))
-        if after == residual:
+        matched, residual = split_set(residual, p, ctx)
+        if len(matched) == 0:
             unreachable.append(i)
-        residual = after
     return residual, tuple(unreachable)
