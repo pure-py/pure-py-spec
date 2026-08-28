@@ -1,15 +1,18 @@
 import ast
 from collections.abc import Callable, Sequence
 
-from contexts import ModuleContext
+from contexts import ModuleContext, class_of, field_type, fields
 from subtyping import comparable, join, subtype
 from type_syntax import (
+    CallableType,
+    ClassType,
     DictType,
     ListType,
     LiteralType,
     Primitive,
     TupleType,
     Type,
+    UnionType,
     base_type,
 )
 
@@ -24,7 +27,41 @@ def both(
 
 
 def equality(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    return Primitive.BOOL if comparable(s, t, ctx) else None
+    if not comparable(s, t, ctx):
+        return None
+    if not equality_type(s, ctx, frozenset()) or not equality_type(t, ctx, frozenset()):
+        return None
+    return Primitive.BOOL
+
+
+def equality_type(t: Type, ctx: ModuleContext, seen: frozenset[str]) -> bool:
+    """Whether values of `t` can be compared for equality: every type but a
+    callable, and a container or class of equality types."""
+    if isinstance(t, CallableType):
+        return False
+    if isinstance(t, ListType):
+        return equality_type(t.elem, ctx, seen)
+    if isinstance(t, DictType):
+        return equality_type(t.value, ctx, seen)
+    if isinstance(t, TupleType):
+        return all(equality_type(c, ctx, seen) for c in t.components)
+    if isinstance(t, UnionType):
+        return equality_type(t.left, ctx, seen) and equality_type(t.right, ctx, seen)
+    if isinstance(t, ClassType):
+        return class_equality_type(t.q, ctx, seen)
+    return True
+
+
+def class_equality_type(q: str, ctx: ModuleContext, seen: frozenset[str]) -> bool:
+    if q in seen:
+        return True
+    entry = class_of(ctx, q)
+    if entry is None:
+        return True
+    return all(
+        equality_type(field_type(entry, x) or Primitive.OBJECT, ctx, seen | {q})
+        for x in fields(entry)
+    )
 
 
 def membership_list(s: Type, t: Type, ctx: ModuleContext) -> Type | None:

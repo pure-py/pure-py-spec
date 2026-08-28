@@ -92,7 +92,9 @@ signature $\ominus : \sigma \to \tau$, relating operand types to result type
 signature with type variables stands for all its instances, which agree on the result type; a variable binds
 the operand's type as it is, and an operand type written out is matched by any subtype of it. Where several
 signatures give a result the first listed is used, so \pyinline{1 + 2} is an \pyinline{int} and
-\pyinline{1 + 2.0} a \pyinline{float}. \emph{Resolution} looks the operator up at the operand types, and
+\pyinline{1 + 2.0} a \pyinline{float}. Equality is available on \emph{equality types}, which are all types but a callable and any list,
+dictionary, tuple, union or class with a component that is not one, so that structural equality is defined
+wherever it can be applied. \emph{Resolution} looks the operator up at the operand types, and
 at their base types where no signature gives a result for the operand types themselves:
 \begin{defalign}
 \resolve(\odot, \sigma, \sigma') & = \tau &\quad& \text{if } \odot : (\sigma, \sigma') \to \tau \\
