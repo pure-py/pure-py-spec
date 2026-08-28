@@ -30,8 +30,8 @@ synthesis rules of their own wherever their parts determine the type, following 
 Scala~\cite{swift2025,kotlin2025,odersky2025}.
 
 Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise.
-\ruleName{var} applies whenever $\Gamma(x)$ is a type, so a variable that is not definitely assigned has no
-rule. A
+The \ruleName{var} rule applies whenever $\Gamma(x)$ is a type, so a variable that is not definitely
+assigned has no rule. A
 literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base type} is $\widen(\ell)$:
 \begin{defalign}
 \widen(n) & = \tyInt &\quad& \text{if } n \text{ is an integer literal} \\
@@ -143,7 +143,7 @@ at $\statusNotDefAssigned$ (\ruleName{def}). The body is checked with the
 declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
-A \pyinline{match} scrutinee synthesises a type. \ruleName{match} and \ruleName{match-partial} hand the
+A \pyinline{match} scrutinee synthesises a type. Both \pyinline{match} rules hand the
 cases to the judgement $\Gamma; \tau \vdash L, \seq{h} \checks \sigma : S, L'$, which checks each
 pattern against that type, checks each body under the bindings its pattern gives, and requires the cases to
 be reachable and to exhaust the type, starting from the shapes $\shapesOf(\sigma, \varnothing)$. That
