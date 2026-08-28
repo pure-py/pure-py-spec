@@ -121,7 +121,7 @@ turnstile: $\Gamma; \tau \vdash t : R$ says that $t$ has result type $R$ in $\Ga
 function declared to return $\tau$ (\figref{typing-stmt}). The type $\tau$ is an obligation on the
 \pyinline{return} statements within $t$ rather than a property of $t$, so every rule passes it down
 unchanged. A \pyinline{return} checks its expression against $\tau$, and a bare
-\pyinline{return} requires $\tau$ to admit \pyinline{None}. An annotated assignment takes its type
+\pyinline{return} requires \pyinline{None} to be a subtype of $\tau$. An annotated assignment takes its type
 from the annotation and checks the expression against it, and an unannotated assignment takes the type the
 expression synthesises (\ruleName{assign}, \ruleName{assign-unannot}). Every assignment introduces a
 binding rather than updating one, so the unannotated form needs no earlier declaration. The conditions of \pyinline{if} and \pyinline{assert}
