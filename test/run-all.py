@@ -42,6 +42,9 @@ class Stage(StrEnum):
 
 
 HELPERS = "helpers"
+# Semantically-valid tests PurePy accepts and mypy rejects
+MYPY_INCOMPATIBLE = "mypy-incompatible"
+MYPY_INI = "mypy.ini"
 
 RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
 CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
@@ -320,6 +323,46 @@ def check_rule_citations(r: Runner, base: pathlib.Path) -> None:
         r.ok("rule citations")
 
 
+def check_mypy_tests(r: Runner, module: pathlib.Path) -> None:
+    """Every semantically-valid test must type-check under mypy, except those
+    under mypy-incompatible, which record where PurePy is the more permissive
+    of the two."""
+    paths = [
+        p
+        for p in sorted((module / Verdict.SEMANTICALLY_VALID).rglob("*.py"))
+        if Stage.PENDING not in p.parts
+    ]
+    # mypy reports paths relative to its working directory
+    relative = [p.relative_to(ROOT) for p in paths]
+    proc = subprocess.run(
+        [
+            "mypy",
+            "--config-file",
+            str(pathlib.Path("test") / MYPY_INI),
+            "--no-error-summary",
+            "--no-color-output",
+            *(str(p) for p in relative),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    rejected = {
+        line.split(":", 1)[0] for line in proc.stdout.splitlines() if ": error:" in line
+    }
+    expected = {str(p) for p in relative if MYPY_INCOMPATIBLE in p.parts}
+    misfiled = [
+        f"{p} {'rejected by mypy' if str(p) in rejected else 'accepted by mypy'}"
+        for p in relative
+        if (str(p) in rejected) != (str(p) in expected)
+    ]
+    if misfiled:
+        r.bad("mypy tests", "; ".join(misfiled))
+    else:
+        r.ok("mypy tests")
+
+
 def main() -> None:
     skip_mypy = "--no-mypy" in sys.argv
     if skip_mypy:
@@ -344,6 +387,7 @@ def main() -> None:
             r.ok("src/")
         else:
             r.bad("src/", proc.stdout.strip()[:400])
+        check_mypy_tests(r, module)
 
     last = None
     for p in sorted(module.rglob("*.py"), key=lambda p: (p.parent.as_posix(), p.name)):
