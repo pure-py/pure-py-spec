@@ -1,16 +1,67 @@
 \begin{figure}
 \small
 \setlength{\jot}{2pt}
-\begin{center}
-\begin{tabular}{rcll}
-\grammarGroup{Shapes} \\
-$k$ & $::=$ & $\shapeAny{\tau}{N}$ & (Rest) \\
-    & $\mid$ & $\ell$ & (Literal) \\
-    & $\mid$ & $\patConstr{q}{\seq{k}}$ & (Constr) \\
-    & $\mid$ & $\patTuple{\seq{k}}$ & (Tuple) \\
-    & $\mid$ & $\patList{\seq{k}}$ & (List)
-\end{tabular}
-\end{center}
+\flushleft \shadebox{$\Gamma \vdash k : \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{shape-rest-class}}]
+{
+  N \subseteq \set{q' \mid \Gamma \vdash q' \subty q}
+}
+{
+  \Gamma \vdash \shapeAny{q}{N} : q
+}
+\and
+\inferrule*[lab={\ruleName{shape-rest-list}}]
+{
+  N \subseteq \set{n \mid n \geq 0}
+}
+{
+  \Gamma \vdash \shapeAny{\tyList{\tau}}{N} : \tyList{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{shape-rest}}]
+{
+  N \subseteq \set{\ell \mid \Gamma \vdash \tyLiteral{\ell} \subty \tau}
+}
+{
+  \Gamma \vdash \shapeAny{\tau}{N} : \tau
+}
+\and
+\inferrule*[lab={\ruleName{shape-literal}}]
+{
+  \Gamma \vdash \tyLiteral{\ell} \subty \tau
+}
+{
+  \Gamma \vdash \ell : \tau
+}
+\and
+\inferrule*[lab={\ruleName{shape-constr}}]
+{
+  \Gamma \vdash q : C \\
+  \Gamma \vdash q \subty \tau \\
+  \Gamma \vdash k_x : \sigma \quad (\forall \bind{x}{\sigma} \in \fields(C))
+}
+{
+  \Gamma \vdash \patConstr{q}{\seq{k}} : \tau
+}
+\and
+\inferrule*[lab={\ruleName{shape-tuple}}]
+{
+  \Gamma \vdash k_i : \tau_i \quad (\forall i)
+}
+{
+  \Gamma \vdash \patTuple{\seq{k}} : \tyTuple{\seq{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{shape-list}}]
+{
+  \Gamma \vdash k_i : \tau \quad (\forall i)
+}
+{
+  \Gamma \vdash \patList{\seq{k}} : \tyList{\tau}
+}
+\end{mathpar}
 
 \begin{align*}
 N \covers \tyLiteral{\ell} & \text{ iff } \ell \in N &
@@ -23,21 +74,27 @@ N \covers \tau & \text{ for no other } \tau
 
 \begin{align*}
 \restOf(\tau, N) &= \varnothing \; \text{ if } N \covers \tau, \quad \set{\shapeAny{\tau}{N}} \text{ otherwise} \\
-\residual(\tau) &= \textstyle\bigcup \set{\restOf(\sigma, \varnothing) \mid \sigma \text{ in } \membersOf(\tau)} \\
-\shapesOf(\tau_1, \ldots, \tau_n) &= (\shapeAny{\tau_1}{\varnothing}, \ldots, \shapeAny{\tau_n}{\varnothing})
+\residual(\tau) &= \textstyle\bigcup \set{\restOf(\sigma, \varnothing) \mid \sigma \text{ in } \membersOf(\tau)}
 \end{align*}
 
+\caption{Shape $k$ denotes values of type $\tau$}
+\label{fig:shapes}
+\end{figure}
+
+\begin{figure}
+\small
+\setlength{\jot}{2pt}
 \begin{align*}
 \splitShape(k, x) = \splitShape(k, \patWild) &= (\set{k}, \varnothing) \\*
 \splitShape(k, p\;\pyinline{as}\;x) &= \splitShape(k, p) \\*
 \splitShape(\ell, \ell') &= (\set{\ell}, \varnothing) \; \text{ if } \ell = \ell' \\*
 \splitShape(\shapeAny{\tau}{N}, \ell) &= (\set{\ell}, \restOf(\tau, N \cup \set{\ell})) && \text{if } \ell \notin N \text{ and } \Gamma \vdash \tyLiteral{\ell} \subty \tau \\*
 \splitShape(\shapeAny{\tau}{N}, \patConstr{q}{\seq{p}}) &= (\set{\patConstr{q}{\seq{m}} \mid \seq{m} \in M}, \set{\patConstr{q}{\seq{k}} \mid \seq{k} \in K} \cup \restOf(\tau, N \cup \set{q})) && \text{if } q \notin N \text{ and } \tau, q \text{ comparable} \\*
-&\qquad \text{where } (M, K) = \splitShape(\shapesOf(\fields(q)), \seq{p}) \\*
+&\qquad \text{where } (M, K) = \splitShape((\shapeAny{\sigma_1}{\varnothing}, \ldots, \shapeAny{\sigma_n}{\varnothing}), \seq{p}) \text{ for } \fields(q) = \bind{\seq{x}}{\seq{\sigma}} \\*
 \splitShape(\shapeAny{\tyTuple{\seq{\tau}}}{N}, \patTuple{\seq{p}}) &= (\set{\patTuple{\seq{m}} \mid \seq{m} \in M}, \set{\patTuple{\seq{k}} \mid \seq{k} \in K}) && \text{if } |\seq{\tau}| = |\seq{p}| \\*
-&\qquad \text{where } (M, K) = \splitShape(\shapesOf(\seq{\tau}), \seq{p}) \\*
+&\qquad \text{where } (M, K) = \splitShape((\shapeAny{\tau_1}{\varnothing}, \ldots, \shapeAny{\tau_n}{\varnothing}), \seq{p}) \\*
 \splitShape(\shapeAny{\tyList{\tau}}{N}, \patList{\seq{p}}) &= (\set{\patList{\seq{m}} \mid \seq{m} \in M}, \set{\patList{\seq{k}} \mid \seq{k} \in K} \cup \restOf(\tyList{\tau}, N \cup \set{n})) && \text{if } n = |\seq{p}| \notin N \\*
-&\qquad \text{where } (M, K) = \splitShape(\shapesOf(\tau, \ldots, \tau), \seq{p}) \\*
+&\qquad \text{where } (M, K) = \splitShape((\shapeAny{\tau}{\varnothing}, \ldots, \shapeAny{\tau}{\varnothing}), \seq{p}) \\*
 \splitShape(\patConstr{q}{\seq{k}}, \patConstr{q'}{\seq{p}}) &= (\set{\patConstr{q}{\seq{m}} \mid \seq{m} \in M}, \set{\patConstr{q}{\seq{k}\,'} \mid \seq{k}\,' \in K}) && \text{if } \Gamma \vdash q \subty q' \\*
 &\qquad \text{where } (M, K) = \splitShape(\seq{k}, \seq{p}) \\*
 \splitShape(\patTuple{\seq{k}}, \patTuple{\seq{p}}) &= (\set{\patTuple{\seq{m}} \mid \seq{m} \in M}, \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in K}) && \text{if } |\seq{k}| = |\seq{p}| \\*
