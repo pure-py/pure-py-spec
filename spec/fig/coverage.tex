@@ -23,7 +23,8 @@
 \and
 \inferrule*[lab={\ruleName{shape-rest}}]
 {
-  N \subseteq \set{\ell \mid \Gamma \vdash \tyLiteral{\ell} \subty \tau}
+  N \subseteq \set{\ell \mid \Gamma \vdash \tyLiteral{\ell} \subty \tau} \\
+  \tau \text{ not a union}
 }
 {
   \Gamma \vdash \shapeAny{\tau}{N} : \tau

@@ -132,7 +132,9 @@ value of type $\tau$ whose outermost constructor is not among those in $N$, and 
 admits are its subclasses where it is a class, the lengths where it is a list, and its literals otherwise
 (\figref{shapes}). The other forms are a literal, a constructor, a tuple and a list, each with shapes in place of
 sub-patterns. The shapes of $\tau$ that remain once the constructors in $N$ are excluded are
-$\restOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. The
+$\restOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape
+carries a union type, since $\restOf$ is the only source of the form $\shapeAny{\tau}{N}$ and it splits a
+union into its members. The
 relation $\Gamma \vdash K, p \splitTo M, K'$ divides a set of shapes into the matched shapes $M$ and the
 \emph{residual} $K'$.
 
