@@ -131,9 +131,9 @@ unreachable.
 
 Reachability and exhaustiveness are the two halves of one computation (\figrefTwo{shapes}{coverage}). A \emph{shape} $k$
 denotes a set of values of a type, written $\Gamma \vdash k : \tau$. The form $\shapeAny{\tau}{N}$ is a
-value of type $\tau$ whose outermost construct is not among those in $N$. The \emph{constructs} of a type are
-its subclasses where it is a class, the lengths where it is a list, the sets of keys where it is a
-dictionary, and the literals below it otherwise, so $N \subseteq \ctors(\tau)$ (\figref{shapes}). The other forms are a literal, a constructor, a tuple and a list, each with shapes in place of
+value of type $\tau$ whose outermost construct is not among those in $N$. A type \emph{constructs} its subclasses where it
+is a class, the lengths where it is a list, the sets of keys where it is a dictionary, and the literals
+below it otherwise, and it constructs every element of $N$ (\figref{shapes}). The other forms are a literal, a constructor, a tuple and a list, each with shapes in place of
 sub-patterns. The shapes of $\tau$ that remain once the constructs in $N$ are excluded are
 $\restOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape
 carries a union type, since $\restOf$ is the only source of the form $\shapeAny{\tau}{N}$ and it splits a

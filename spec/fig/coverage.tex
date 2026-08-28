@@ -7,7 +7,7 @@
 \small
 \inferrule*[lab={\ruleName{shape-rest}}]
 {
-  N \subseteq \ctors(\tau) \\
+  \tau \ctors h \quad (\forall h \in N) \\
   \tau \text{ not a union}
 }
 {
@@ -55,10 +55,10 @@
 
 \begin{subfigure}{\textwidth}
 \begin{defalign}
-\ctors(q) & = \set{q' \mid \Gamma \vdash q' \subty q} \\
-\ctors(\tyList{\tau}) & = \set{n \mid n \geq 0} \\
-\ctors(\tyDict{\tau}) & = \set{\set{w_1, \ldots, w_n} \mid n \geq 0} \\
-\ctors(\tau) & = \set{\ell \mid \Gamma \vdash \tyLiteral{\ell} \subty \tau} &\quad& \text{otherwise} \\[3mm]
+q \ctors q' \quad & \text{iff } \Gamma \vdash q' \subty q \\
+\tyList{\tau} \ctors n \quad & \text{iff } n \geq 0 \\
+\tyDict{\tau} \ctors \set{w_1, \ldots, w_n} \quad & \\
+\tau \ctors \ell \quad & \text{iff } \Gamma \vdash \tyLiteral{\ell} \subty \tau &\quad& \text{otherwise} \\[3mm]
 \restOf(\tyUnion{\sigma}{\tau}, N) & = \restOf(\sigma, N) \cup \restOf(\tau, N) \\
 \restOf(\tyLiteral{\ell}, N) & = \varnothing &\quad& \text{if } \ell \in N \\
 \restOf(\tyBool, N) & = \varnothing &\quad& \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\
