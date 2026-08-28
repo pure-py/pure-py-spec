@@ -2,6 +2,7 @@ import ast
 from collections.abc import Callable, Sequence
 
 from contexts import ModuleContext
+from subtyping import comparable, join, subtype
 from type_syntax import (
     DictType,
     ListType,
@@ -9,9 +10,6 @@ from type_syntax import (
     Primitive,
     TupleType,
     Type,
-    comparable,
-    join,
-    subtype,
 )
 
 type BinarySignature = Callable[[Type, Type, ModuleContext], Type | None]

@@ -19,6 +19,7 @@ from contexts import (
     short_name,
 )
 from patterns import literal_value
+from subtyping import subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
     ClassType,
@@ -28,7 +29,6 @@ from type_syntax import (
     TupleType,
     Type,
     alts,
-    subtype,
 )
 
 
