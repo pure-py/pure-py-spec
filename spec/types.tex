@@ -6,6 +6,8 @@ The typing rules say whether a program is well typed. They are intended as a ref
 reverse. Every parameter and return carries an annotation, so the type of a definition is given rather
 than inferred from its body.
 
+\input{spec/fig/aux-types}
+
 \subsection{Expression typing}
 \label{sec:expression-typing}
 
@@ -18,8 +20,6 @@ Variables, literals, attribute references, calls, constructor calls, operators a
 entry for a definitely assigned variable is its type (Definition~\ref{def:context}), so \ruleName{var}
 applies whenever $\Gamma(x)$ is a type, and a variable bound to $\statusNotDefAssigned$ has no rule. A
 literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base type} is $\widen(\ell)$:
-\input{spec/fig/aux-types}
-
 \begin{defalign}
 \widen(n) & = \tyInt &\quad& \text{if } n \text{ is an integer literal} \\
 \widen(n) & = \tyFloat &\quad& \text{if } n \text{ is a float literal} \\
@@ -63,6 +63,8 @@ is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and an
 literal synthesises the negated literal type (\ruleName{unop-literal}), and \ruleName{unop} excludes that
 form, to keep the judgement deterministic.
 
+\input{spec/fig/operator-signatures}
+
 Lambdas check, as do lists, tuples, dictionaries and comprehensions. Their types are not determined by
 the expression alone: $\exList{}$ is a list of any element type, and a lambda's parameters cannot be annotated in
 Python, so both take their type from the surroundings. An expression that synthesises $\sigma$ checks against any supertype
@@ -91,8 +93,6 @@ callables are related only by reflexivity, since \pyinline{list} and \pyinline{d
 and covariance would accept programs mypy rejects. An \pyinline{int} is a \pyinline{float}, as PEP~484
 requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
 Python treats it as one.
-
-\input{spec/fig/operator-signatures}
 
 \input{spec/fig/typing-synth}
 
