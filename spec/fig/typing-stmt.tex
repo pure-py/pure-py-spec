@@ -112,7 +112,7 @@
 \inferrule*[lab={\ruleName{match}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma; \tau \vdash \restOf(\sigma, \varnothing), \seq{h} \checks \sigma : S \binding \varnothing
+  \Gamma; \tau \vdash \shapesOf(\sigma, \varnothing), \seq{h} \checks \sigma : S, \varnothing
 }
 {
   \Gamma; \tau \vdash \exMatch{e}{\seq{h}} : S
@@ -121,7 +121,7 @@
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma; \tau \vdash \restOf(\sigma, \varnothing), \seq{h} \checks \sigma : S \binding L \\
+  \Gamma; \tau \vdash \shapesOf(\sigma, \varnothing), \seq{h} \checks \sigma : S, L \\
   L \neq \varnothing
 }
 {

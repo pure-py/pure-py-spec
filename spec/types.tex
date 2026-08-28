@@ -143,12 +143,15 @@ at $\statusNotDefAssigned$ (\ruleName{def}). The body is checked with the
 declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
-A \pyinline{match} scrutinee synthesises a type, against which each case is checked: the pattern checks
-against that type, binding its variables at the types of the positions they match (\figref{typing-pat}),
-and its body is checked under those bindings. A constructor pattern requires its class to be a subtype of the
-scrutinee's type, so a case that cannot match is rejected rather than being merely unreachable. \ruleName{match} and \ruleName{match-partial} also require the cases to be reachable and to
-exhaust the scrutinee's type, which the judgement $\Gamma; \tau \vdash L, \seq{h} \checks \sigma : S
-\binding L'$ decides from the shapes $\restOf(\sigma, \varnothing)$ of that type. Neither is defined here.
+A \pyinline{match} scrutinee synthesises a type. \ruleName{match} and \ruleName{match-partial} hand the
+cases to the judgement $\Gamma; \tau \vdash L, \seq{h} \checks \sigma : S, L'$, which checks each
+pattern against that type, checks each body under the bindings its pattern gives, and requires the cases to
+be reachable and to exhaust the type, starting from the shapes $\shapesOf(\sigma, \varnothing)$. That
+judgement is not defined here, nor is $\shapesOf$.
+
+Pattern checking is defined here (\figref{typing-pat}): a pattern checks against a type, binding each
+variable at the type of the position it matches. A constructor pattern requires its class to be a subtype of the type it
+checks against, so a case that cannot match is rejected rather than being merely unreachable.
 
 \input{spec/fig/typing-stmt}
 
@@ -169,14 +172,14 @@ value of type $\tau$ whose outermost head is not among those in $N$, where $N$ \
 elements are subclasses where the type is a class, lengths where it is a list, and literals below the type
 otherwise (\figref{shapes}). The other forms are a literal, a constructor, a tuple, a list and a dictionary, each with shapes in place of
 sub-patterns. The shapes of $\tau$ that remain once the heads in $N$ are excluded are
-$\restOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape
-carries a union type, since $\restOf$ is the only source of the form $\shapeAny{\tau}{N}$ and it splits a
+$\shapesOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape
+carries a union type, since $\shapesOf$ is the only source of the form $\shapeAny{\tau}{N}$ and it splits a
 union into its members. The
 relation $\Gamma \vdash L, p \splitTo K, L'$ divides a set of shapes into the matched shapes $K$ and the
 \emph{residual} $L'$, one shape at a time and one position at a time
 (\figrefTwo{coverage}{coverage-rows}).
 
-The cases are then walked once, from $\restOf(\sigma, \varnothing)$ for the scrutinee's type $\sigma$, in the same shape as
+The cases are then walked once, from $\shapesOf(\sigma, \varnothing)$ for the scrutinee's type $\sigma$, in the same shape as
 $\dispatch$ walks them at run time (\figref{typing-cases}). Each case checks its pattern, checks its body
 under the bindings, and must match some shape of the residual, so a case that matches nothing is rejected
 as unreachable, and the residual it leaves is passed on. \ruleName{match}
