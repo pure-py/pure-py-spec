@@ -16,13 +16,16 @@ $\statusNotDefAssigned$.
 \subsection{Subtyping}
 \label{sec:subtyping}
 
-The \emph{base type} of a literal $\ell$ is $\widen(\ell)$:
+The \emph{base type} of a literal $\ell$ is $\widen(\ell)$, and of a type is that type with a literal
+type replaced by the base type of its literal:
 \begin{defalign}
 \widen(n) & = \tyInt &\quad& \text{if } n \text{ is an integer literal} \\
 \widen(n) & = \tyFloat &\quad& \text{if } n \text{ is a float literal} \\
 \widen(w) & = \tyStr \\
 \widen(\pyinline{True}) = \widen(\pyinline{False}) & = \tyBool \\
-\widen(\pyinline{None}) & = \tyNone
+\widen(\pyinline{None}) & = \tyNone \\[2mm]
+\widen(\tyLiteral{\ell}) & = \widen(\ell) \\
+\widen(\tau) & = \tau &\quad& \text{otherwise}
 \end{defalign}
 
 Subtyping (\figref{subtyping}) is reflexivity, a literal type below its base type, and a class below its
@@ -54,28 +57,6 @@ joining the first with the join of the rest, with \pyinline{Never} as the unit:
 \noindent So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.
 
-A class entry $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ records the declared
-type of each field it introduces, and $\fields(C)$ is the bindings of all its fields, those of the base
-class first. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
-$\fieldMap$, checks it against that field's type, and synthesises $q$ as a class type (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must synthesise a class $q$, and
-$\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the class entry $C$ that $q$ resolves to
-(\ruleName{attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
-signature $\ominus : \sigma \to \tau$, relating operand types to result type
-(\figref{operator-signatures}). A
-signature with type variables stands for all its instances, which agree on the result type. The operands
-synthesise their types, and a signature written for a base type also applies to a literal type with that
-base type, so \pyinline{1 == 0} uses the equality signature at \pyinline{int}. A signature that applies to
-the synthesised types is preferred to one that applies only after taking base types, which is what makes
-\pyinline{2 ** 3} an \pyinline{int}. Where several signatures still apply, the first listed is used, so
-\pyinline{1 + 2} is an \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}. In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
-(\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
-dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
-that synthesises a literal type gives the component type at that position, counting from the end where the index
-is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and any other index of type
-\pyinline{int} gives the union of the component types (\ruleName{subscript-tuple-int}). A negated numeric
-literal synthesises the negated literal type (\ruleName{unop-literal}), and \ruleName{unop} excludes that
-form, to keep the judgement deterministic.
-
 \input{spec/fig/subtyping}
 
 \subsection{Expression typing}
@@ -98,6 +79,38 @@ Variables, literals, attribute references, calls, constructor calls, operators a
 The \ruleName{var} rule applies whenever $\Gamma(x)$ is a type, so a variable that is not definitely
 assigned has no rule. A
 literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
+
+A class entry $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ records the declared
+type of each field it introduces, and $\fields(C)$ is the bindings of all its fields, those of the base
+class first. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
+$\fieldMap$, checks it against that field's type, and synthesises $q$ as a class type (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must synthesise a class $q$, and
+$\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the class entry $C$ that $q$ resolves to
+(\ruleName{attr-object}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
+signature $\ominus : \sigma \to \tau$, relating operand types to result type
+(\figref{operator-signatures}). A
+signature with type variables stands for all its instances, which agree on the result type, and it
+\emph{applies} to given operand types when its variables can be instantiated so that each given type is a
+subtype of the corresponding operand type and its condition holds. \emph{Resolution} takes the first
+signature listed that applies, falling back to the base types of the operands:
+\begin{defalign}
+\resolve(\odot, \sigma, \sigma') & = \tau &\quad& \text{if the first signature of } \odot \text{ applying to } \sigma, \sigma' \text{ gives } \tau \\
+\resolve(\odot, \sigma, \sigma') & = \resolve(\odot, \widen(\sigma), \widen(\sigma')) &\quad& \text{if } \sigma \text{ or } \sigma' \text{ is a literal type} \\[2mm]
+\resolve(\ominus, \sigma) & = \tau &\quad& \text{if the first signature of } \ominus \text{ applying to } \sigma \text{ gives } \tau \\
+\resolve(\ominus, \sigma) & = \resolve(\ominus, \widen(\sigma)) &\quad& \text{if } \sigma \text{ is a literal type}
+\end{defalign}
+
+\noindent So \pyinline{1 + 2} is an \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}, both by the
+first signature that applies. Taking base types second is what keeps \pyinline{2 ** 3} an \pyinline{int},
+since the signature for a literal exponent would not apply once the exponent is taken at \pyinline{int},
+and it is what lets \pyinline{1 == 0} use the equality signature at \pyinline{int}, since two distinct
+literal types are not comparable. In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
+(\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
+dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
+that synthesises a literal type gives the component type at that position, counting from the end where the index
+is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and any other index of type
+\pyinline{int} gives the union of the component types (\ruleName{subscript-tuple-int}). A negated numeric
+literal synthesises the negated literal type (\ruleName{unop-literal}), and \ruleName{unop} excludes that
+form, to keep the judgement deterministic.
 
 \input{spec/fig/operator-signatures}
 

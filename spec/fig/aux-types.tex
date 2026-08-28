@@ -3,9 +3,10 @@
 \small
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.2\textwidth}>{\raggedright\arraybackslash}p{0.48\textwidth}}
 \textbf{Function} & \textbf{Result} & \textbf{Meaning} \\[1mm]
-$\widen(\ell)$ & type & base type of literal $\ell$ \\
+$\widen(\ell)$, $\widen(\tau)$ & type & base type of literal $\ell$, or of type $\tau$ \\
 $\joinTy(\sigma, \tau)$, $\joinTy(\seq{\tau})$ & type & larger type where comparable, union otherwise \\
 $\elemTy(\tau)$ & type & type of elements a generator draws from $\tau$ \\
+$\resolve(\odot, \sigma, \sigma')$, $\resolve(\ominus, \sigma)$ & type & result of resolving an operator against its operand types \\
 \end{tabular}
 \end{center}
 \caption{Auxiliary functions of the type system}
