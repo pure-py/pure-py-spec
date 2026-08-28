@@ -307,6 +307,23 @@ class TypeMismatch:
         return f"expected type {self.expected}, given {self.actual}"
 
 
+@dataclass(frozen=True)
+class NotSubscriptable:
+    ty: str
+
+    def message(self) -> str:
+        return f"subscript of a value of type {self.ty}, which has no subscript rule"
+
+
+@dataclass(frozen=True)
+class TupleIndexOutOfRange:
+    index: int
+    length: int
+
+    def message(self) -> str:
+        return f"index {self.index} out of range for a tuple of length {self.length}"
+
+
 Reason = (
     DuplicateFieldName
     | UnknownBaseClass
@@ -345,6 +362,8 @@ Reason = (
     | NotCallable
     | CallArityMismatch
     | TypeMismatch
+    | NotSubscriptable
+    | TupleIndexOutOfRange
 )
 
 

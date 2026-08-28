@@ -50,12 +50,15 @@ from contexts import (
 from operators import BINARY_NAMES, UNARY_NAMES, binary_type, unary_type
 from patterns import check_pattern_list, is_catch_all
 from reasons import IllFormedModule
-from subtyping import subtype
+from subtyping import join, subtype
 from type_syntax import (
     CallableType,
     ClassType,
+    DictType,
+    ListType,
     LiteralType,
     Primitive,
+    TupleType,
     Type,
     parse_annotation,
     parse_annotations,
@@ -381,12 +384,13 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
             return None
         if isinstance(parent, ModuleStub):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(parent.q))
-        check_expr(e.value, ctx)
-        return None
+        obj = check_expr(e.value, ctx)
+        if not isinstance(obj, ClassType):
+            return None
+        entry = class_of(ctx, obj.q)
+        return None if entry is None else field_type(entry, e.attr)
     if isinstance(e, ast.Subscript):
-        check_expr(e.value, ctx)
-        check_expr(e.slice, ctx)
-        return None
+        return subscript(e, ctx)
     if isinstance(e, (ast.List, ast.Tuple)):
         check_exprs(e.elts, ctx)
         return None
@@ -401,6 +405,48 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
         check_comprehension([e.key, e.value], e.generators, ctx)
         return None
     raise AssertionError(f"unexpected expression: {type(e).__name__}")
+
+
+def subscript(e: ast.Subscript, ctx: ModuleContext) -> Type | None:
+    """The type of a subscript, given the type of the container."""
+    container = check_expr(e.value, ctx)
+    if container is None:
+        check_expr(e.slice, ctx)
+        return None
+    if isinstance(container, ListType):
+        checks_against(e.slice, Primitive.INT, ctx)
+        return container.elem
+    if container == Primitive.STR:
+        checks_against(e.slice, Primitive.INT, ctx)
+        return Primitive.STR
+    if isinstance(container, DictType):
+        checks_against(e.slice, Primitive.STR, ctx)
+        return container.value
+    if isinstance(container, TupleType):
+        return tuple_subscript(container, e.slice, ctx)
+    raise IllFormedModule(e, reasons.NotSubscriptable(render(container)))
+
+
+def tuple_subscript(
+    container: TupleType, index: ast.expr, ctx: ModuleContext
+) -> Type | None:
+    """A literal index gives the component at that position, counting from the
+    end where it is negative; any other index of type int gives their join."""
+    m = len(container.components)
+    i = literal_index(check_expr(index, ctx))
+    if i is None:
+        checks_against(index, Primitive.INT, ctx)
+        return join(container.components, ctx)
+    if not -m <= i < m:
+        raise IllFormedModule(index, reasons.TupleIndexOutOfRange(i, m))
+    return container.components[i]
+
+
+def literal_index(t: Type | None) -> int | None:
+    if not isinstance(t, LiteralType):
+        return None
+    v = t.value
+    return v if isinstance(v, int) and not isinstance(v, bool) else None
 
 
 def call(e: ast.Call, ctx: ModuleContext) -> Type | None:
