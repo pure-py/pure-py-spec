@@ -123,8 +123,7 @@ function declared to return $\tau$ (\figref{typing-stmt}). The type $\tau$ is an
 unchanged. A \pyinline{return} checks its expression against $\tau$, and a bare
 \pyinline{return} requires \pyinline{None} to be a subtype of $\tau$. An annotated assignment takes its type
 from the annotation and checks the expression against it, and an unannotated assignment takes the type the
-expression synthesises (\ruleName{assign}, \ruleName{assign-unannot}). Every assignment introduces a
-binding rather than updating one, so the unannotated form needs no earlier declaration. The conditions of \pyinline{if} and \pyinline{assert}
+expression synthesises (\ruleName{assign}, \ruleName{assign-unannot}). The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}.
 
 A function definition binds its parameters at their annotated types and its own name, and the names of the
