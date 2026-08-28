@@ -59,12 +59,12 @@ Two types are \emph{comparable} when either is a subtype of the other. Subtyping
 below depend on the context, since a class is below its ancestors, and $\Gamma$ is left implicit where it
 plays no part. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. A sequence of types joins by
-joining the first with the join of the rest:
+joining the first with the join of the rest, with \pyinline{Never} as the unit:
 \begin{defalign}
 \joinTy(\sigma, \tau) & = \tau &\quad& \text{if } \Gamma \vdash \sigma \subty \tau \\
 \joinTy(\sigma, \tau) & = \sigma &\quad& \text{if } \Gamma \vdash \tau \subty \sigma \\
 \joinTy(\sigma, \tau) & = \tyUnion{\sigma}{\tau} &\quad& \text{otherwise} \\[2mm]
-\joinTy(\tau) & = \tau \\
+\joinTy() & = \tyNever \\
 \joinTy(\tau_1, \seq{\tau}) & = \joinTy(\tau_1, \joinTy(\seq{\tau}))
 \end{defalign}
 

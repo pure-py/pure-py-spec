@@ -21,9 +21,8 @@ def join_two(s: Type, t: Type, ctx: ModuleContext) -> Type:
 
 
 def join(ts: Sequence[Type], ctx: ModuleContext) -> Type:
-    assert len(ts) > 0
-    if len(ts) == 1:
-        return ts[0]
+    if len(ts) == 0:
+        return Primitive.NEVER
     return join_two(ts[0], join(ts[1:], ctx), ctx)
 
 
