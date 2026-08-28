@@ -44,6 +44,12 @@ and covariance would accept programs mypy rejects. An \pyinline{int} is a \pyinl
 requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
 Python treats it as one.
 
+\begin{lemma}[Transitivity of subtyping]
+\label{lem:subtyping-transitive}
+If $\Gamma \vdash \sigma \subty \tau$ and $\Gamma \vdash \tau \subty \tau'$ then $\Gamma \vdash
+\sigma \subty \tau'$.
+\end{lemma}
+
 Two types are \emph{comparable} when either is a subtype of the other. Subtyping and the definitions
 below depend on the context, since a class is below its ancestors, and $\Gamma$ is left implicit where it
 plays no part. Two comparable types
@@ -187,9 +193,3 @@ exhaustive, although no one of them subsumes what a further case would match.
 \input{spec/fig/coverage}
 
 \input{spec/fig/typing-cases}
-
-\begin{lemma}[Transitivity of subtyping]
-\label{lem:subtyping-transitive}
-If $\Gamma \vdash \sigma \subty \tau$ and $\Gamma \vdash \tau \subty \tau'$ then $\Gamma \vdash
-\sigma \subty \tau'$.
-\end{lemma}
