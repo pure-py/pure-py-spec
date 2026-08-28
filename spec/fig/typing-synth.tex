@@ -58,7 +58,7 @@
 {
   \Gamma \vdash e \synth \sigma \\
   \Gamma \vdash e' \synth \sigma' \\
-  \odot : (\sigma, \sigma') \to \tau
+  \resolve(\odot, \sigma, \sigma') = \tau
 }
 {
   \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \tau
@@ -67,7 +67,7 @@
 \inferrule*[lab={\ruleName{unop}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \ominus : \sigma \to \tau \\
+  \resolve(\ominus, \sigma) = \tau \\
   \exUnOp{\ominus}{e} \neq \exUnOp{\pyinline{-}}{n} \quad (\forall n)
 }
 {

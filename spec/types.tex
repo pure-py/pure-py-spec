@@ -91,8 +91,8 @@ signature $\ominus : \sigma \to \tau$, relating operand types to result type
 signature with type variables stands for all its instances, which agree on the result type; a variable binds
 the operand's type as it is, and an operand type written out is matched by any subtype of it. Where several
 signatures give a result the first listed is used, so \pyinline{1 + 2} is an \pyinline{int} and
-\pyinline{1 + 2.0} a \pyinline{float}. \emph{Resolution} takes the operand types as they are, and
-otherwise their base types:
+\pyinline{1 + 2.0} a \pyinline{float}. \emph{Resolution} looks the operator up at the operand types, and
+at their base types where no signature gives a result for the operand types themselves:
 \begin{defalign}
 \resolve(\odot, \sigma, \sigma') & = \tau &\quad& \text{if } \odot : (\sigma, \sigma') \to \tau \\
 \resolve(\odot, \sigma, \sigma') & = \tau &\quad& \text{if } \odot : (\widen(\sigma), \widen(\sigma')) \to \tau \\[2mm]
