@@ -7,10 +7,9 @@ reverse. Every parameter and return carries an annotation, so the type of a defi
 than inferred from its body.
 
 The context entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
-that is not definitely assigned is bound to $\statusNotDefAssigned$. Merging two branches merges their
-contexts pointwise. A variable definitely assigned in both, at $\sigma$ and $\tau$, is of type
-$\joinTy(\sigma, \tau)$, and a variable definitely assigned in one branch alone is
-$\statusNotDefAssigned$.
+that is not definitely assigned is bound to $\statusNotDefAssigned$. Contexts merge pointwise. A variable
+definitely assigned in both, at $\sigma$ and $\tau$, is of type $\joinTy(\sigma, \tau)$, and a variable
+definitely assigned in one alone is $\statusNotDefAssigned$.
 
 \input{spec/fig/aux-types}
 
