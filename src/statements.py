@@ -34,13 +34,13 @@ from contexts import (
     entry_of,
     field_map,
     fields,
+    is_assigned,
     merge_results,
     module_of,
     override_gamma,
     override_results,
     override_var,
     short_name,
-    var_status,
 )
 from patterns import check_pattern_list, is_catch_all
 from reasons import IllFormedModule
@@ -230,7 +230,7 @@ def check_match_cases(cases: list[ast.match_case], ctx: ModuleContext) -> None:
 
 def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
     if isinstance(e, ast.Name):
-        if var_status(ctx, e.id) != Status.TT:
+        if not is_assigned(ctx, e.id):
             if module_of(ctx, e.id) is not None:
                 raise IllFormedModule(e, reasons.ModuleAsValue(e.id))
             if class_of(ctx, e.id) is not None:

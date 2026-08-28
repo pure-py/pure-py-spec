@@ -1,7 +1,9 @@
 import ast
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import Enum, auto
+
+from type_syntax import Type
 
 
 class Status(Enum):
@@ -9,10 +11,13 @@ class Status(Enum):
     FF = auto()
 
 
+# The entry for a variable is its type where that is known, Status.TT where it is
+# assigned but not yet typed, and Status.FF where it is not definitely assigned.
 # Lazily evaluated, so these may name ClassEntry before it is defined.
-type ContextEntry = Status | ModuleStub | ModuleLoaded | ClassEntry
+type VarEntry = Status | Type
+type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | ClassEntry
 type Context = dict[str, ContextEntry]
-type VarContext = dict[str, Status]
+type VarContext = dict[str, VarEntry]
 
 
 @dataclass(frozen=True)
@@ -45,13 +50,22 @@ def override_gamma(ctx: ModuleContext, delta: Context) -> ModuleContext:
     return ModuleContext(gamma={**ctx.gamma, **delta}, M=ctx.M, q=ctx.q)
 
 
-def override_var(ctx: ModuleContext, delta: VarContext) -> ModuleContext:
+def override_var(ctx: ModuleContext, delta: Mapping[str, VarEntry]) -> ModuleContext:
     return override_gamma(ctx, dict(delta))
 
 
-def var_status(ctx: ModuleContext, x: str) -> Status | None:
+def var_entry(ctx: ModuleContext, x: str) -> VarEntry | None:
     v = ctx.gamma.get(x)
-    return v if isinstance(v, Status) else None
+    return (
+        None
+        if v is None or isinstance(v, (ModuleStub, ModuleLoaded, ClassEntry))
+        else v
+    )
+
+
+def is_assigned(ctx: ModuleContext, x: str) -> bool:
+    v = var_entry(ctx, x)
+    return v is not None and v != Status.FF
 
 
 def class_of(ctx: ModuleContext, c: str) -> ClassEntry | None:
@@ -95,15 +109,17 @@ def predefined_context(q: str) -> Context:
     return {x: Status.TT for x in PREDEFINED_MEMBERS[q] | {"__name__"}}
 
 
-def merge_status(a: Status, b: Status) -> Status:
-    if a == Status.TT and b == Status.TT:
-        return Status.TT
-    return Status.FF
+def merge_entry(a: VarEntry, b: VarEntry) -> VarEntry:
+    """Assigned in both branches at the same type gives that type; assigned in
+    both at different types is assigned with no type yet."""
+    if a == Status.FF or b == Status.FF:
+        return Status.FF
+    return a if a == b else Status.TT
 
 
 def merge_delta(d1: VarContext, d2: VarContext) -> VarContext:
     return {
-        k: merge_status(d1[k], d2[k]) if k in d1 and k in d2 else Status.FF
+        k: merge_entry(d1[k], d2[k]) if k in d1 and k in d2 else Status.FF
         for k in set(d1.keys()) | set(d2.keys())
     }
 
