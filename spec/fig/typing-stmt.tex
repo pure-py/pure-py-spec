@@ -19,6 +19,15 @@
   \Gamma; \tau \vdash \exAssign{x \exAnnot{\sigma}}{e} : \Assigns{\set{\bind{x}{\sigma}}}
 }
 \and
+\inferrule*[lab={\ruleName{assign-unannot}}]
+{
+  \Gamma \vdash e \synth \sigma \\
+  x \notin \capturesE(e)
+}
+{
+  \Gamma; \tau \vdash \exAssign{x}{e} : \Assigns{\set{\bind{x}{\sigma}}}
+}
+\and
 \inferrule*[lab={\ruleName{expr-stmt}}]
 {
   \Gamma \vdash e \synth \sigma

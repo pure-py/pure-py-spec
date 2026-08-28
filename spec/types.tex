@@ -5,7 +5,7 @@ The typing judgement gives each expression a type. It is intended as a refinemen
 \PurePy program should be accepted by mypy, and \PurePy may reject programs mypy accepts but not the
 reverse. The entry for a definitely assigned variable is its type
 (Definition~\ref{def:context}), so \ruleName{var} applies whenever $\Gamma(x)$ is a type, and a variable
-bound to $\statusNotDefAssigned$ has no rule. Every parameter, return and assignment carries an annotation, so the type of a definition is given rather
+bound to $\statusNotDefAssigned$ has no rule. Every parameter and return carries an annotation, so the type of a definition is given rather
 than inferred from its body; within an expression, typing is bidirectional.
 \emph{Synthesis} $\Gamma \vdash e \synth \tau$ reads a type out of an expression (\figrefTwo{typing-synth}{typing-synth-ctd}),
 and \emph{checking} $\Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
@@ -112,8 +112,10 @@ turnstile: $\Gamma; \tau \vdash t : R$ says that $t$ has result type $R$ in $\Ga
 function declared to return $\tau$ (\figref{typing-stmt}). The type $\tau$ is an obligation on the
 \pyinline{return} statements within $t$ rather than a property of $t$, so every rule passes it down
 unchanged. A \pyinline{return} checks its expression against $\tau$, and a bare
-\pyinline{return} requires $\tau$ to admit \pyinline{None}. An assignment takes its type from its
-annotation and checks the expression against it; the conditions of \pyinline{if} and \pyinline{assert}
+\pyinline{return} requires $\tau$ to admit \pyinline{None}. An annotated assignment takes its type
+from the annotation and checks the expression against it, and an unannotated assignment takes the type the
+expression synthesises (\ruleName{assign}, \ruleName{assign-unannot}). Every assignment introduces a
+binding rather than updating one, so the unannotated form needs no earlier declaration. The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}.
 
 A function definition binds its parameters at their annotated types and its own name, and the names of the
