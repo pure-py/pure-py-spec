@@ -146,9 +146,10 @@ so a function that declares a result definitely returns one.
 A \pyinline{match} scrutinee synthesises a type. Both \pyinline{match} rules hand the cases to the
 judgement $\Gamma; \tau \vdash L, \seq{h} \checks \sigma : S, L'$, which checks the cases in turn,
 requiring each to be reachable and the whole list to exhaust the type. The judgement starts from
-$\shapesOf(\sigma, \varnothing)$, which denotes every value of type $\sigma$, and as each case is checked the values its pattern
-matches are removed. Checking a case checks its pattern against the scrutinee's type, binding each variable at
-the type of the position it matches (\figref{typing-pat}), and then checks its body under those bindings. A
+$\shapesOf(\sigma, \varnothing)$, which denotes every value of type $\sigma$. Checking a case checks its pattern
+against the scrutinee's type, binding each variable at the type of the position it matches
+(\figref{typing-pat}), then checks its body under those bindings, and removes the values the pattern
+matches. A
 constructor pattern requires its class to be a subtype of the type it checks against, so a case that cannot
 match is rejected rather than being merely unreachable.
 \todo{define the cases judgement and $\shapesOf$}
