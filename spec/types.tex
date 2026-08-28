@@ -8,8 +8,8 @@ than inferred from its body.
 
 The context entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
 that is not definitely assigned is bound to $\statusNotDefAssigned$. Merging two branches merges their
-contexts pointwise. A variable definitely assigned in both, at $\tau$ and $\tau'$, is of type
-$\joinTy(\tau, \tau')$, and a variable definitely assigned in one branch alone is
+contexts pointwise. A variable definitely assigned in both, at $\sigma$ and $\tau$, is of type
+$\joinTy(\sigma, \tau)$, and a variable definitely assigned in one branch alone is
 $\statusNotDefAssigned$.
 
 \input{spec/fig/aux-types}
