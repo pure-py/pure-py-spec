@@ -63,20 +63,17 @@
 }
 \end{mathpar}
 
-\begin{align*}
-N \covers \tyLiteral{\ell} \quad & \text{iff } \ell \in N \\
-N \covers \tyBool \quad & \text{iff } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\
-N \covers \tyNone \quad & \text{iff } \pyinline{None} \in N \\
-N \covers q \quad & \text{iff } \Gamma \vdash q \subty q' \text{ for some } q' \in N \\
-N \covers \tyNever \quad &
-\end{align*}
+\begin{defalign}
+\restOf(\tyUnion{\sigma}{\sigma'}, N) & = \restOf(\sigma, N) \cup \restOf(\sigma', N) \\
+\restOf(\tyLiteral{\ell}, N) & = \varnothing \quad \text{if } \ell \in N \\
+\restOf(\tyBool, N) & = \varnothing \quad \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\
+\restOf(\tyNone, N) & = \varnothing \quad \text{if } \pyinline{None} \in N \\
+\restOf(q, N) & = \varnothing \quad \text{if } \Gamma \vdash q \subty q' \text{ for some } q' \in N \\
+\restOf(\tyNever, N) & = \varnothing \\
+\restOf(\tau, N) & = \set{\shapeAny{\tau}{N}} \quad (\text{otherwise})
+\end{defalign}
 
-\begin{align*}
-\restOf(\tau, N) &= \varnothing \; \text{ if } N \covers \tau, \quad \set{\shapeAny{\tau}{N}} \text{ otherwise} \\
-\residual(\tau) &= \textstyle\bigcup \set{\restOf(\sigma, \varnothing) \mid \sigma \text{ in } \membersOf(\tau)}
-\end{align*}
-
-\caption{Shape $k$ denotes values of type $\tau$}
+\caption{Shape $k$ denotes values of type $\tau$, and $\restOf(\tau, N)$ gives shapes of $\tau$ with constructors $N$ excluded}
 \label{fig:shapes}
 \end{figure}
 
