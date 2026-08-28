@@ -140,8 +140,8 @@ sub-patterns. The shapes of $\tau$ that remain once the heads in $N$ are exclude
 $\restOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape
 carries a union type, since $\restOf$ is the only source of the form $\shapeAny{\tau}{N}$ and it splits a
 union into its members. The
-relation $\Gamma \vdash K, p \splitTo M, K'$ divides a set of shapes into the matched shapes $M$ and the
-\emph{residual} $K'$, one shape at a time and one position at a time
+relation $\Gamma \vdash L, p \splitTo K, L'$ divides a set of shapes into the matched shapes $K$ and the
+\emph{residual} $L'$, one shape at a time and one position at a time
 (\figrefTwo{coverage}{coverage-rows}).
 
 The cases are then walked once, from $\restOf(\sigma, \varnothing)$ for the scrutinee's type $\sigma$, in the same shape as

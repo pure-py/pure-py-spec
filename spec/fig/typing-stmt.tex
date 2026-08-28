@@ -121,8 +121,8 @@
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma; \tau \vdash \restOf(\sigma, \varnothing), \seq{c} \checks \sigma : S \binding K \\
-  K \neq \varnothing
+  \Gamma; \tau \vdash \restOf(\sigma, \varnothing), \seq{c} \checks \sigma : S \binding L \\
+  L \neq \varnothing
 }
 {
   \Gamma; \tau \vdash \exMatch{e}{\seq{c}} : S \merge \Assigns{\varnothing}

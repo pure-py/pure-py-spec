@@ -47,32 +47,32 @@
 \end{figure}
 
 \begin{figure}
-\flushleft \shadebox{$\Gamma; \tau \vdash K, \seq{c} \checks \sigma : S \binding K'$}
+\flushleft \shadebox{$\Gamma; \tau \vdash L, \seq{c} \checks \sigma : S \binding L'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{cases-one}}]
 {
   \Gamma \vdash p \checks \sigma \binding \Delta \\
   \Gamma \override \Delta; \tau \vdash s : R \\
-  \Gamma \vdash K, p \splitTo M, K' \\
-  M \neq \varnothing
+  \Gamma \vdash L, p \splitTo K, L' \\
+  K \neq \varnothing
 }
 {
-  \Gamma; \tau \vdash K, \exCase{p}{s} \checks \sigma : \Assigns{\Delta} \override R \binding K'
+  \Gamma; \tau \vdash L, \exCase{p}{s} \checks \sigma : \Assigns{\Delta} \override R \binding L'
 }
 \and
 \inferrule*[lab={\ruleName{cases-cons}}]
 {
   \Gamma \vdash p \checks \sigma \binding \Delta \\
   \Gamma \override \Delta; \tau \vdash s : R \\
-  \Gamma \vdash K, p \splitTo M, K'' \\
-  M \neq \varnothing \\
-  \Gamma; \tau \vdash K'', \seq{c} \checks \sigma : S \binding K'
+  \Gamma \vdash L, p \splitTo K, L'' \\
+  K \neq \varnothing \\
+  \Gamma; \tau \vdash L'', \seq{c} \checks \sigma : S \binding L'
 }
 {
-  \Gamma; \tau \vdash K, \exCase{p}{s} \cons \seq{c} \checks \sigma : (\Assigns{\Delta} \override R) \merge S \binding K'
+  \Gamma; \tau \vdash L, \exCase{p}{s} \cons \seq{c} \checks \sigma : (\Assigns{\Delta} \override R) \merge S \binding L'
 }
 \end{mathpar}
-\caption{Cases $\seq{c}$ against scrutinee type $\sigma$ have result type $S$, reducing residual $K$ to $K'$}
+\caption{Cases $\seq{c}$ against scrutinee type $\sigma$ have result type $S$, reducing residual $L$ to $L'$}
 \label{fig:typing-cases}
 \end{figure}

@@ -128,7 +128,7 @@
 \begin{figure}
 \small
 \setlength{\jot}{2pt}
-\flushleft \shadebox{$\Gamma \vdash k, p \splitTo M, K$}
+\flushleft \shadebox{$\Gamma \vdash k, p \splitTo K, L$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{split-var}}]
@@ -149,10 +149,10 @@
 \and
 \inferrule*[lab={\ruleName{split-as}}]
 {
-  \Gamma \vdash k, p \splitTo M, K
+  \Gamma \vdash k, p \splitTo K, L
 }
 {
-  \Gamma \vdash k, p\;\pyinline{as}\;x \splitTo M, K
+  \Gamma \vdash k, p\;\pyinline{as}\;x \splitTo K, L
 }
 \and
 \inferrule*[lab={\ruleName{split-literal}}]
@@ -178,52 +178,52 @@
   \tau, q \text{ comparable} \\
   \Gamma \vdash q : C \\
   \fields(C) = \bind{\seq{x}}{\seq{\sigma}} \\
-  \Gamma \vdash (\shapeAny{\sigma_1}{\varnothing}, \ldots, \shapeAny{\sigma_n}{\varnothing}), a \splitTo M, K
+  \Gamma \vdash (\shapeAny{\sigma_1}{\varnothing}, \ldots, \shapeAny{\sigma_n}{\varnothing}), a \splitTo K, L
 }
 {
-  \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \splitTo \set{\patConstr{q}{\seq{m}} \mid \seq{m} \in M}, \set{\patConstr{q}{\seq{k}} \mid \seq{k} \in K} \cup \restOf(\tau, N \cup \set{q})
+  \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \splitTo \set{\patConstr{q}{\seq{m}} \mid \seq{m} \in K}, \set{\patConstr{q}{\seq{k}} \mid \seq{k} \in L} \cup \restOf(\tau, N \cup \set{q})
 }
 \and
 \inferrule*[lab={\ruleName{split-rest-tuple}}]
 {
-  \Gamma \vdash (\shapeAny{\tau_1}{\varnothing}, \ldots, \shapeAny{\tau_n}{\varnothing}), \seq{p} \splitTo M, K
+  \Gamma \vdash (\shapeAny{\tau_1}{\varnothing}, \ldots, \shapeAny{\tau_n}{\varnothing}), \seq{p} \splitTo K, L
 }
 {
-  \Gamma \vdash \shapeAny{\tyTuple{\tau_1, \ldots, \tau_n}}{N}, \patTuple{p_1, \ldots, p_n} \splitTo \set{\patTuple{\seq{m}} \mid \seq{m} \in M}, \set{\patTuple{\seq{k}} \mid \seq{k} \in K}
+  \Gamma \vdash \shapeAny{\tyTuple{\tau_1, \ldots, \tau_n}}{N}, \patTuple{p_1, \ldots, p_n} \splitTo \set{\patTuple{\seq{m}} \mid \seq{m} \in K}, \set{\patTuple{\seq{k}} \mid \seq{k} \in L}
 }
 \and
 \inferrule*[lab={\ruleName{split-rest-list}}]
 {
   n \notin N \\
-  \Gamma \vdash (\shapeAny{\tau}{\varnothing}, \ldots, \shapeAny{\tau}{\varnothing}), p_1 \cons \ldots \cons p_n \splitTo M, K
+  \Gamma \vdash (\shapeAny{\tau}{\varnothing}, \ldots, \shapeAny{\tau}{\varnothing}), p_1 \cons \ldots \cons p_n \splitTo K, L
 }
 {
-  \Gamma \vdash \shapeAny{\tyList{\tau}}{N}, \patList{p_1, \ldots, p_n} \splitTo \set{\patList{\seq{m}} \mid \seq{m} \in M}, \set{\patList{\seq{k}} \mid \seq{k} \in K} \cup \restOf(\tyList{\tau}, N \cup \set{n})
+  \Gamma \vdash \shapeAny{\tyList{\tau}}{N}, \patList{p_1, \ldots, p_n} \splitTo \set{\patList{\seq{m}} \mid \seq{m} \in K}, \set{\patList{\seq{k}} \mid \seq{k} \in L} \cup \restOf(\tyList{\tau}, N \cup \set{n})
 }
 \and
 \inferrule*[lab={\ruleName{split-constr}}]
 {
   \Gamma \vdash q \subty q' \\
-  \Gamma \vdash \seq{k}, a \splitTo M, K
+  \Gamma \vdash \seq{k}, a \splitTo K, L
 }
 {
-  \Gamma \vdash \patConstr{q}{\seq{k}}, \patConstr{q'}{a} \splitTo \set{\patConstr{q}{\seq{m}} \mid \seq{m} \in M}, \set{\patConstr{q}{\seq{k}\,'} \mid \seq{k}\,' \in K}
+  \Gamma \vdash \patConstr{q}{\seq{k}}, \patConstr{q'}{a} \splitTo \set{\patConstr{q}{\seq{m}} \mid \seq{m} \in K}, \set{\patConstr{q}{\seq{k}\,'} \mid \seq{k}\,' \in L}
 }
 \and
 \inferrule*[lab={\ruleName{split-tuple}}]
 {
-  \Gamma \vdash \seq{k}, \seq{p} \splitTo M, K
+  \Gamma \vdash \seq{k}, \seq{p} \splitTo K, L
 }
 {
-  \Gamma \vdash \patTuple{k_1, \ldots, k_n}, \patTuple{p_1, \ldots, p_n} \splitTo \set{\patTuple{\seq{m}} \mid \seq{m} \in M}, \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in K}
+  \Gamma \vdash \patTuple{k_1, \ldots, k_n}, \patTuple{p_1, \ldots, p_n} \splitTo \set{\patTuple{\seq{m}} \mid \seq{m} \in K}, \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in L}
 }
 \and
 \inferrule*[lab={\ruleName{split-list}}]
 {
-  \Gamma \vdash \seq{k}, \seq{p} \splitTo M, K
+  \Gamma \vdash \seq{k}, \seq{p} \splitTo K, L
 }
 {
-  \Gamma \vdash \patList{k_1, \ldots, k_n}, \patList{p_1, \ldots, p_n} \splitTo \set{\patList{\seq{m}} \mid \seq{m} \in M}, \set{\patList{\seq{k}\,'} \mid \seq{k}\,' \in K}
+  \Gamma \vdash \patList{k_1, \ldots, k_n}, \patList{p_1, \ldots, p_n} \splitTo \set{\patList{\seq{m}} \mid \seq{m} \in K}, \set{\patList{\seq{k}\,'} \mid \seq{k}\,' \in L}
 }
 \and
 \inferrule*[lab={\ruleName{split-dict-nil}}]
@@ -237,21 +237,21 @@
 \inferrule*[lab={\ruleName{split-dict-bound}}]
 {
   \beta(w_1) = k \\
-  \Gamma \vdash k, p_1 \splitTo M, K \\
-  \Gamma \vdash \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{m}}}{N} \mid m \in M}, \patDict{\bind{w_2}{p_2}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo M', K'
+  \Gamma \vdash k, p_1 \splitTo K, L \\
+  \Gamma \vdash \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{m}}}{N} \mid m \in K}, \patDict{\bind{w_2}{p_2}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', L'
 }
 {
-  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo M', \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{k'}}}{N} \mid k' \in K} \cup K'
+  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{k'}}}{N} \mid k' \in L} \cup L'
 }
 \and
 \inferrule*[lab={\ruleName{split-dict-unbound}}]
 {
   w_1 \notin \dom(\beta) \cup N \\
-  \Gamma \vdash \restOf(\tau, \varnothing), p_1 \splitTo M, K \\
-  \Gamma \vdash \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{m}}}{N} \mid m \in M}, \patDict{\bind{w_2}{p_2}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo M', K'
+  \Gamma \vdash \restOf(\tau, \varnothing), p_1 \splitTo K, L \\
+  \Gamma \vdash \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{m}}}{N} \mid m \in K}, \patDict{\bind{w_2}{p_2}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', L'
 }
 {
-  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo M', \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{k}}}{N} \mid k \in K} \cup K' \cup \set{\shapeDict{\tau}{\beta}{N \cup \set{w_1}}}
+  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{k}}}{N} \mid k \in L} \cup L' \cup \set{\shapeDict{\tau}{\beta}{N \cup \set{w_1}}}
 }
 \and
 \inferrule*[lab={\ruleName{split-none}}]
@@ -262,7 +262,7 @@
   \Gamma \vdash k, p \splitTo \varnothing, \set{k}
 }
 \end{mathpar}
-\caption{Pattern $p$ splits shape $k$ into matched shapes $M$ and residual $K$}
+\caption{Pattern $p$ splits shape $k$ into matched shapes $K$ and residual $L$}
 \label{fig:coverage}
 \end{figure}
 
@@ -271,18 +271,18 @@
 \small
 \inferrule*[lab={\ruleName{split-row}}]
 {
-  \Gamma \vdash k_i, p_i \splitTo M_i, K_i \quad (\forall i)
+  \Gamma \vdash k_i, p_i \splitTo K_i, L_i \quad (\forall i)
 }
 {
-  \Gamma \vdash (k_1, \ldots, k_n), (p_1, \ldots, p_n) \splitTo \set{(m_1, \ldots, m_n) \mid m_i \in M_i}, \; \textstyle\bigcup_i \set{(m_1, \ldots, m_{i-1}, k, k_{i+1}, \ldots, k_n) \mid k \in K_i, \; m_j \in M_j}
+  \Gamma \vdash (k_1, \ldots, k_n), (p_1, \ldots, p_n) \splitTo \set{(m_1, \ldots, m_n) \mid m_i \in K_i}, \; \textstyle\bigcup_i \set{(m_1, \ldots, m_{i-1}, k, k_{i+1}, \ldots, k_n) \mid k \in L_i, \; m_j \in K_j}
 }
 \and
 \inferrule*[lab={\ruleName{split-shapes}}]
 {
-  \Gamma \vdash k, p \splitTo M_k, K_k \quad (\forall k \in K)
+  \Gamma \vdash k, p \splitTo K_k, L_k \quad (\forall k \in L)
 }
 {
-  \Gamma \vdash K, p \splitTo \textstyle\bigcup_{k \in K} M_k, \; \textstyle\bigcup_{k \in K} K_k
+  \Gamma \vdash L, p \splitTo \textstyle\bigcup_{k \in L} K_k, \; \textstyle\bigcup_{k \in L} L_k
 }
 \end{mathpar}
 \caption{Splitting rows and sets of shapes}
