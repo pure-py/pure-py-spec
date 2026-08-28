@@ -21,15 +21,12 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, whose \emph{base
 \widen(\pyinline{None}) & = \tyNone
 \end{defalign}
 
-\noindent The \emph{alternatives} of a type are the sequence of a union's operands, and the type itself
-otherwise. Two types are \emph{comparable} when either is a subtype of the other. Subtyping and the definitions
+\noindent Two types are \emph{comparable} when either is a subtype of the other. Subtyping and the definitions
 below depend on the context, since a class is below its ancestors, and $\Gamma$ is left implicit where it
 plays no part. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. A sequence of types joins by
 joining the first with the join of the rest:
 \begin{defalign}
-\membersOf(\tyUnion{\sigma}{\tau}) & = \membersOf(\sigma) \mathbin{\concat} \membersOf(\tau) \\
-\membersOf(\tau) & = \tau &\quad& \text{otherwise} \\[3mm]
 \joinTy(\sigma, \tau) & = \tau &\quad& \text{if } \Gamma \vdash \sigma \subty \tau \\
 \joinTy(\sigma, \tau) & = \sigma &\quad& \text{if } \Gamma \vdash \tau \subty \sigma \\
 \joinTy(\sigma, \tau) & = \tyUnion{\sigma}{\tau} &\quad& \text{otherwise} \\
@@ -135,7 +132,7 @@ value of type $\tau$ whose outermost constructor is not among those in $N$, and 
 admits are its subclasses where it is a class, the lengths where it is a list, and its literals otherwise
 (\figref{shapes}). The other forms are a literal, a constructor, a tuple and a list, each with shapes in place of
 sub-patterns. The shapes of $\tau$ that remain once the constructors in $N$ are excluded are
-$\restOf(\tau, N)$: one shape per alternative of a union, and none at all where $N$ exhausts $\tau$. The
+$\restOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. The
 relation $\Gamma \vdash K, p \splitTo M, K'$ divides a set of shapes into the matched shapes $M$ and the
 \emph{residual} $K'$.
 
