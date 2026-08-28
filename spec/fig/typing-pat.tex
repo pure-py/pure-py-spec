@@ -54,7 +54,7 @@
 {
   \Gamma \vdash p \checks \sigma \binding \Delta \\
   \Gamma \override \Delta; \tau \vdash s : R \\
-  \Gamma \vdash K \splitOp p \splitTo M, K' \\
+  \Gamma \vdash K, p \splitTo M, K' \\
   M \neq \varnothing
 }
 {
@@ -65,7 +65,7 @@
 {
   \Gamma \vdash p \checks \sigma \binding \Delta \\
   \Gamma \override \Delta; \tau \vdash s : R \\
-  \Gamma \vdash K \splitOp p \splitTo M, K'' \\
+  \Gamma \vdash K, p \splitTo M, K'' \\
   M \neq \varnothing \\
   \Gamma; \tau \vdash K'', \seq{c} \checks \sigma : S \binding K'
 }

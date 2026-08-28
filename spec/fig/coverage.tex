@@ -83,7 +83,7 @@ N \covers \tyNever \quad &
 \begin{figure}
 \small
 \setlength{\jot}{2pt}
-\flushleft \shadebox{$\Gamma \vdash k \splitOp p \splitTo M, K$}
+\flushleft \shadebox{$\Gamma \vdash k, p \splitTo M, K$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{split-var}}]
@@ -91,7 +91,7 @@ N \covers \tyNever \quad &
   \strut
 }
 {
-  \Gamma \vdash k \splitOp x \splitTo \set{k}, \varnothing
+  \Gamma \vdash k, x \splitTo \set{k}, \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{split-wild}}]
@@ -99,15 +99,15 @@ N \covers \tyNever \quad &
   \strut
 }
 {
-  \Gamma \vdash k \splitOp \patWild \splitTo \set{k}, \varnothing
+  \Gamma \vdash k, \patWild \splitTo \set{k}, \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{split-as}}]
 {
-  \Gamma \vdash k \splitOp p \splitTo M, K
+  \Gamma \vdash k, p \splitTo M, K
 }
 {
-  \Gamma \vdash k \splitOp p\;\pyinline{as}\;x \splitTo M, K
+  \Gamma \vdash k, p\;\pyinline{as}\;x \splitTo M, K
 }
 \and
 \inferrule*[lab={\ruleName{split-literal}}]
@@ -115,7 +115,7 @@ N \covers \tyNever \quad &
   \strut
 }
 {
-  \Gamma \vdash \ell \splitOp \ell \splitTo \set{\ell}, \varnothing
+  \Gamma \vdash \ell, \ell \splitTo \set{\ell}, \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{split-rest-literal}}]
@@ -124,61 +124,61 @@ N \covers \tyNever \quad &
   \Gamma \vdash \tyLiteral{\ell} \subty \tau
 }
 {
-  \Gamma \vdash \shapeAny{\tau}{N} \splitOp \ell \splitTo \set{\ell}, \restOf(\tau, N \cup \set{\ell})
+  \Gamma \vdash \shapeAny{\tau}{N}, \ell \splitTo \set{\ell}, \restOf(\tau, N \cup \set{\ell})
 }
 \and
 \inferrule*[lab={\ruleName{split-rest-constr}}]
 {
   q \notin N \\
-  \tau \text{ and } q \text{ comparable} \\
+  \tau, q \text{ comparable} \\
   \Gamma \vdash q : C \\
   \fields(C) = \bind{\seq{x}}{\seq{\sigma}} \\
-  \Gamma \vdash (\shapeAny{\sigma_1}{\varnothing}, \ldots, \shapeAny{\sigma_n}{\varnothing}) \splitOp a \splitTo M, K
+  \Gamma \vdash (\shapeAny{\sigma_1}{\varnothing}, \ldots, \shapeAny{\sigma_n}{\varnothing}), a \splitTo M, K
 }
 {
-  \Gamma \vdash \shapeAny{\tau}{N} \splitOp \patConstr{q}{a} \splitTo \set{\patConstr{q}{\seq{m}} \mid \seq{m} \in M}, \set{\patConstr{q}{\seq{k}} \mid \seq{k} \in K} \cup \restOf(\tau, N \cup \set{q})
+  \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \splitTo \set{\patConstr{q}{\seq{m}} \mid \seq{m} \in M}, \set{\patConstr{q}{\seq{k}} \mid \seq{k} \in K} \cup \restOf(\tau, N \cup \set{q})
 }
 \and
 \inferrule*[lab={\ruleName{split-rest-tuple}}]
 {
-  \Gamma \vdash (\shapeAny{\tau_1}{\varnothing}, \ldots, \shapeAny{\tau_n}{\varnothing}) \splitOp \seq{p} \splitTo M, K
+  \Gamma \vdash (\shapeAny{\tau_1}{\varnothing}, \ldots, \shapeAny{\tau_n}{\varnothing}), \seq{p} \splitTo M, K
 }
 {
-  \Gamma \vdash \shapeAny{\tyTuple{\tau_1, \ldots, \tau_n}}{N} \splitOp \patTuple{p_1, \ldots, p_n} \splitTo \set{\patTuple{\seq{m}} \mid \seq{m} \in M}, \set{\patTuple{\seq{k}} \mid \seq{k} \in K}
+  \Gamma \vdash \shapeAny{\tyTuple{\tau_1, \ldots, \tau_n}}{N}, \patTuple{p_1, \ldots, p_n} \splitTo \set{\patTuple{\seq{m}} \mid \seq{m} \in M}, \set{\patTuple{\seq{k}} \mid \seq{k} \in K}
 }
 \and
 \inferrule*[lab={\ruleName{split-rest-list}}]
 {
   n \notin N \\
-  \Gamma \vdash (\shapeAny{\tau}{\varnothing}, \ldots, \shapeAny{\tau}{\varnothing}) \splitOp p_1 \cons \ldots \cons p_n \splitTo M, K
+  \Gamma \vdash (\shapeAny{\tau}{\varnothing}, \ldots, \shapeAny{\tau}{\varnothing}), p_1 \cons \ldots \cons p_n \splitTo M, K
 }
 {
-  \Gamma \vdash \shapeAny{\tyList{\tau}}{N} \splitOp \patList{p_1, \ldots, p_n} \splitTo \set{\patList{\seq{m}} \mid \seq{m} \in M}, \set{\patList{\seq{k}} \mid \seq{k} \in K} \cup \restOf(\tyList{\tau}, N \cup \set{n})
+  \Gamma \vdash \shapeAny{\tyList{\tau}}{N}, \patList{p_1, \ldots, p_n} \splitTo \set{\patList{\seq{m}} \mid \seq{m} \in M}, \set{\patList{\seq{k}} \mid \seq{k} \in K} \cup \restOf(\tyList{\tau}, N \cup \set{n})
 }
 \and
 \inferrule*[lab={\ruleName{split-constr}}]
 {
   \Gamma \vdash q \subty q' \\
-  \Gamma \vdash \seq{k} \splitOp a \splitTo M, K
+  \Gamma \vdash \seq{k}, a \splitTo M, K
 }
 {
-  \Gamma \vdash \patConstr{q}{\seq{k}} \splitOp \patConstr{q'}{a} \splitTo \set{\patConstr{q}{\seq{m}} \mid \seq{m} \in M}, \set{\patConstr{q}{\seq{k}\,'} \mid \seq{k}\,' \in K}
+  \Gamma \vdash \patConstr{q}{\seq{k}}, \patConstr{q'}{a} \splitTo \set{\patConstr{q}{\seq{m}} \mid \seq{m} \in M}, \set{\patConstr{q}{\seq{k}\,'} \mid \seq{k}\,' \in K}
 }
 \and
 \inferrule*[lab={\ruleName{split-tuple}}]
 {
-  \Gamma \vdash \seq{k} \splitOp \seq{p} \splitTo M, K
+  \Gamma \vdash \seq{k}, \seq{p} \splitTo M, K
 }
 {
-  \Gamma \vdash \patTuple{k_1, \ldots, k_n} \splitOp \patTuple{p_1, \ldots, p_n} \splitTo \set{\patTuple{\seq{m}} \mid \seq{m} \in M}, \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in K}
+  \Gamma \vdash \patTuple{k_1, \ldots, k_n}, \patTuple{p_1, \ldots, p_n} \splitTo \set{\patTuple{\seq{m}} \mid \seq{m} \in M}, \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in K}
 }
 \and
 \inferrule*[lab={\ruleName{split-list}}]
 {
-  \Gamma \vdash \seq{k} \splitOp \seq{p} \splitTo M, K
+  \Gamma \vdash \seq{k}, \seq{p} \splitTo M, K
 }
 {
-  \Gamma \vdash \patList{k_1, \ldots, k_n} \splitOp \patList{p_1, \ldots, p_n} \splitTo \set{\patList{\seq{m}} \mid \seq{m} \in M}, \set{\patList{\seq{k}\,'} \mid \seq{k}\,' \in K}
+  \Gamma \vdash \patList{k_1, \ldots, k_n}, \patList{p_1, \ldots, p_n} \splitTo \set{\patList{\seq{m}} \mid \seq{m} \in M}, \set{\patList{\seq{k}\,'} \mid \seq{k}\,' \in K}
 }
 \and
 \inferrule*[lab={\ruleName{split-none}}]
@@ -186,14 +186,14 @@ N \covers \tyNever \quad &
   \text{no other rule applies}
 }
 {
-  \Gamma \vdash k \splitOp p \splitTo \varnothing, \set{k}
+  \Gamma \vdash k, p \splitTo \varnothing, \set{k}
 }
 \end{mathpar}
 
 \begin{align*}
-\Gamma \vdash (k_1, \ldots, k_n) \splitOp (p_1, \ldots, p_n) &\splitTo \set{(m_1, \ldots, m_n) \mid m_i \in M_i}, \; \textstyle\bigcup_i \set{(m_1, \ldots, m_{i-1}, k, k_{i+1}, \ldots, k_n) \mid k \in K_i, \; m_j \in M_j} \\*
-&\qquad \text{where } \Gamma \vdash k_i \splitOp p_i \splitTo M_i, K_i \\[2mm]
-\Gamma \vdash K \splitOp p &\splitTo \textstyle\bigcup_{k \in K} M_k, \; \textstyle\bigcup_{k \in K} K_k \quad \text{where } \Gamma \vdash k \splitOp p \splitTo M_k, K_k
+\Gamma \vdash (k_1, \ldots, k_n), (p_1, \ldots, p_n) &\splitTo \set{(m_1, \ldots, m_n) \mid m_i \in M_i}, \; \textstyle\bigcup_i \set{(m_1, \ldots, m_{i-1}, k, k_{i+1}, \ldots, k_n) \mid k \in K_i, \; m_j \in M_j} \\*
+&\qquad \text{where } \Gamma \vdash k_i, p_i \splitTo M_i, K_i \\[2mm]
+\Gamma \vdash K, p &\splitTo \textstyle\bigcup_{k \in K} M_k, \; \textstyle\bigcup_{k \in K} K_k \quad \text{where } \Gamma \vdash k, p \splitTo M_k, K_k
 \end{align*}
 
 \caption{Pattern $p$ splits shape $k$ into matched shapes $M$ and residual $K$}
