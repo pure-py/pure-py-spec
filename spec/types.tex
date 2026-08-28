@@ -146,10 +146,13 @@ as unreachable, and the part it leaves is passed on. \ruleName{match}
 applies where the walk ends with an empty residual, and \ruleName{match-partial} where it does not, merging
 in $\Assigns{\varnothing}$ for the values that fall through. A union is exhausted
 by covering each member, a class type by a pattern for the class itself, and \pyinline{bool} by
-\pyinline{True} and \pyinline{False}, while \pyinline{int}, \pyinline{str}, lists and dictionaries have
-unboundedly many heads and need a variable or wildcard. A dictionary pattern matches on the presence of
-keys, which shapes do not record, so it leaves the shape it matched, and only the empty dictionary pattern,
-which matches every dictionary, removes one. Splitting is strictly sharper than comparing
+\pyinline{True} and \pyinline{False}, while \pyinline{int}, \pyinline{str} and lists have
+unboundedly many heads and need a variable or wildcard. For a dictionary type the excluded set holds sets of
+keys, each standing for the dictionaries that contain them. A dictionary pattern records its keys where
+splitting the value type by every one of its sub-patterns leaves nothing, since every dictionary with those
+keys has then matched, and leaves the shape untouched otherwise. A later pattern whose keys include a
+recorded set matches nothing, and the empty pattern records the empty set of keys, which every dictionary
+contains, so it exhausts the type. Splitting is strictly sharper than comparing
 patterns pairwise: over $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ are
 exhaustive, though no one of them subsumes what a further case would match.

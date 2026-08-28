@@ -21,6 +21,14 @@
   \Gamma \vdash \shapeAny{\tyList{\tau}}{N} : \tyList{\tau}
 }
 \and
+\inferrule*[lab={\ruleName{shape-rest-dict}}]
+{
+  N \subseteq \set{\set{w_1, \ldots, w_n} \mid n \geq 0}
+}
+{
+  \Gamma \vdash \shapeAny{\tyDict{\tau}}{N} : \tyDict{\tau}
+}
+\and
 \inferrule*[lab={\ruleName{shape-rest}}]
 {
   N \subseteq \set{\ell \mid \Gamma \vdash \tyLiteral{\ell} \subty \tau} \\
@@ -76,6 +84,7 @@
 \restOf(\tyBool, N) & = \varnothing &\quad& \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\
 \restOf(\tyNone, N) & = \varnothing &\quad& \text{if } \pyinline{None} \in N \\
 \restOf(q, N) & = \varnothing &\quad& \text{if } \Gamma \vdash q \subty q' \text{ for some } q' \in N \\
+\restOf(\tyDict{\tau}, N) & = \varnothing &\quad& \text{if } \varnothing \in N \\
 \restOf(\tyNever, N) & = \varnothing \\
 \restOf(\tau, N) & = \set{\shapeAny{\tau}{N}} &\quad& \text{otherwise}
 \end{defalign}
@@ -189,18 +198,21 @@
 \and
 \inferrule*[lab={\ruleName{split-rest-dict}}]
 {
-  n \geq 1
+  N' \not\subseteq \set{w_1, \ldots, w_n} \quad (\forall N' \in N) \\
+  \Gamma \vdash \restOf(\tau, \varnothing), p_i \splitTo M_i, \varnothing \quad (\forall i)
+}
+{
+  \Gamma \vdash \shapeAny{\tyDict{\tau}}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \splitTo \set{\shapeAny{\tyDict{\tau}}{N}}, \restOf(\tyDict{\tau}, N \cup \set{\set{w_1, \ldots, w_n}})
+}
+\and
+\inferrule*[lab={\ruleName{split-rest-dict-partial}}]
+{
+  N' \not\subseteq \set{w_1, \ldots, w_n} \quad (\forall N' \in N) \\
+  \Gamma \vdash \restOf(\tau, \varnothing), p_i \splitTo M_i, K_i \quad (\forall i) \\
+  K_j \neq \varnothing \quad (\text{some } j)
 }
 {
   \Gamma \vdash \shapeAny{\tyDict{\tau}}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \splitTo \set{\shapeAny{\tyDict{\tau}}{N}}, \set{\shapeAny{\tyDict{\tau}}{N}}
-}
-\and
-\inferrule*[lab={\ruleName{split-rest-dict-empty}}]
-{
-  \strut
-}
-{
-  \Gamma \vdash \shapeAny{\tyDict{\tau}}{N}, \patDict{} \splitTo \set{\shapeAny{\tyDict{\tau}}{N}}, \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{split-none}}]
