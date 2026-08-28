@@ -54,11 +54,20 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Gamma \vdash h \ctors \tau$}
 \begin{defalign}
 \Gamma \vdash q' \ctors q \quad & \text{if } \Gamma \vdash q' \subty q \\
 \Gamma \vdash n \ctors \tyList{\tau} \quad & \text{if } n \text{ an integer} \\
 \Gamma \vdash \set{w_1, \ldots, w_n} \ctors \tyDict{\tau} \quad & \\
-\Gamma \vdash \ell \ctors \tau \quad & \text{if } \Gamma \vdash \tyLiteral{\ell} \subty \tau \\[3mm]
+\Gamma \vdash \ell \ctors \tau \quad & \text{if } \Gamma \vdash \tyLiteral{\ell} \subty \tau
+\end{defalign}
+\subcaption{Head $h$ constructs type $\tau$}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\begin{defalign}
 \restOf(\tyUnion{\sigma}{\tau}, N) & = \restOf(\sigma, N) \cup \restOf(\tau, N) \\
 \restOf(\tyLiteral{\ell}, N) & = \varnothing &\quad& \text{if } \ell \in N \\
 \restOf(\tyBool, N) & = \varnothing &\quad& \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\
@@ -68,7 +77,7 @@
 \restOf(\tyNever, N) & = \varnothing \\
 \restOf(\tau, N) & = \set{\shapeAny{\tau}{N}} &\quad& \text{otherwise}
 \end{defalign}
-\subcaption{Constructs of type $\tau$, and shapes of $\tau$ with constructs $N$ excluded}
+\subcaption{Shapes of type $\tau$ with heads $N$ excluded}
 \end{subfigure}
 
 \caption{Shapes}

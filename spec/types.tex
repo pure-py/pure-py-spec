@@ -131,10 +131,10 @@ unreachable.
 
 Reachability and exhaustiveness are the two halves of one computation (\figrefTwo{shapes}{coverage}). A \emph{shape} $k$
 denotes a set of values of a type, written $\Gamma \vdash k : \tau$. The form $\shapeAny{\tau}{N}$ is a
-value of type $\tau$ whose outermost construct is not among those in $N$. A subclass \emph{constructs} a class type, a length
-constructs a list type, a set of keys constructs a dictionary type, and a literal below the type constructs
-it otherwise, and every element of $N$ constructs $\tau$ (\figref{shapes}). The other forms are a literal, a constructor, a tuple and a list, each with shapes in place of
-sub-patterns. The shapes of $\tau$ that remain once the constructs in $N$ are excluded are
+value of type $\tau$ whose outermost head is not among those in $N$. A \emph{head} $h$ is a subclass where the type is a class, a length where it is a list, a set of keys
+where it is a dictionary, and a literal below the type otherwise, and every element of $N$ \emph{constructs}
+$\tau$ (\figref{shapes}). The other forms are a literal, a constructor, a tuple and a list, each with shapes in place of
+sub-patterns. The shapes of $\tau$ that remain once the heads in $N$ are excluded are
 $\restOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape
 carries a union type, since $\restOf$ is the only source of the form $\shapeAny{\tau}{N}$ and it splits a
 union into its members. The
