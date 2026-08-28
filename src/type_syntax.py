@@ -36,9 +36,22 @@ class CallableType:
     result: "Type"
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class LiteralType:
+    """A literal type. Equality compares the value's Python type as well, since
+    True == 1 and 1 == 1.0 hold between values of different types."""
+
     value: object
+
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, LiteralType)
+            and type(self.value) is type(other.value)
+            and self.value == other.value
+        )
+
+    def __hash__(self) -> int:
+        return hash((type(self.value).__name__, self.value))
 
 
 @dataclass(frozen=True)
