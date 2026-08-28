@@ -5,33 +5,9 @@
 \flushleft \shadebox{$\Gamma \vdash k : \tau$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{shape-rest-class}}]
-{
-  N \subseteq \set{q' \mid \Gamma \vdash q' \subty q}
-}
-{
-  \Gamma \vdash \shapeAny{q}{N} : q
-}
-\and
-\inferrule*[lab={\ruleName{shape-rest-list}}]
-{
-  N \subseteq \set{n \mid n \geq 0}
-}
-{
-  \Gamma \vdash \shapeAny{\tyList{\tau}}{N} : \tyList{\tau}
-}
-\and
-\inferrule*[lab={\ruleName{shape-rest-dict}}]
-{
-  N \subseteq \set{\set{w_1, \ldots, w_n} \mid n \geq 0}
-}
-{
-  \Gamma \vdash \shapeAny{\tyDict{\tau}}{N} : \tyDict{\tau}
-}
-\and
 \inferrule*[lab={\ruleName{shape-rest}}]
 {
-  N \subseteq \set{\ell \mid \Gamma \vdash \tyLiteral{\ell} \subty \tau} \\
+  N \subseteq \ctors(\tau) \\
   \tau \text{ not a union}
 }
 {
@@ -79,6 +55,10 @@
 
 \begin{subfigure}{\textwidth}
 \begin{defalign}
+\ctors(q) & = \set{q' \mid \Gamma \vdash q' \subty q} \\
+\ctors(\tyList{\tau}) & = \set{n \mid n \geq 0} \\
+\ctors(\tyDict{\tau}) & = \set{\set{w_1, \ldots, w_n} \mid n \geq 0} \\
+\ctors(\tau) & = \set{\ell \mid \Gamma \vdash \tyLiteral{\ell} \subty \tau} &\quad& \text{otherwise} \\[3mm]
 \restOf(\tyUnion{\sigma}{\tau}, N) & = \restOf(\sigma, N) \cup \restOf(\tau, N) \\
 \restOf(\tyLiteral{\ell}, N) & = \varnothing &\quad& \text{if } \ell \in N \\
 \restOf(\tyBool, N) & = \varnothing &\quad& \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\
@@ -88,7 +68,7 @@
 \restOf(\tyNever, N) & = \varnothing \\
 \restOf(\tau, N) & = \set{\shapeAny{\tau}{N}} &\quad& \text{otherwise}
 \end{defalign}
-\subcaption{Shapes of type $\tau$ with constructors $N$ excluded}
+\subcaption{Constructors of type $\tau$, and shapes of $\tau$ with constructors $N$ excluded}
 \end{subfigure}
 
 \caption{Shapes}

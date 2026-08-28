@@ -126,11 +126,14 @@ the types of the positions they match (\figref{typing-pat}). A constructor patte
 a subtype of the scrutinee's type, so a case that cannot match is rejected rather than being merely
 unreachable.
 
+\subsection{Exhaustiveness checking}
+\label{sec:exhaustiveness}
+
 Reachability and exhaustiveness are the two halves of one computation (\figrefTwo{shapes}{coverage}). A \emph{shape} $k$
 denotes a set of values of a type, written $\Gamma \vdash k : \tau$. The form $\shapeAny{\tau}{N}$ is a
-value of type $\tau$ whose outermost constructor is not among those in $N$, and the constructors a type
-admits are its subclasses where it is a class, the lengths where it is a list, and its literals otherwise
-(\figref{shapes}). The other forms are a literal, a constructor, a tuple and a list, each with shapes in place of
+value of type $\tau$ whose outermost constructor is not among those in $N$. The constructors of a type are
+its subclasses where it is a class, the lengths where it is a list, the sets of keys where it is a
+dictionary, and the literals below it otherwise, so $N \subseteq \ctors(\tau)$ (\figref{shapes}). The other forms are a literal, a constructor, a tuple and a list, each with shapes in place of
 sub-patterns. The shapes of $\tau$ that remain once the constructors in $N$ are excluded are
 $\restOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape
 carries a union type, since $\restOf$ is the only source of the form $\shapeAny{\tau}{N}$ and it splits a
