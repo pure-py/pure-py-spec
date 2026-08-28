@@ -47,7 +47,7 @@ joining the first with the join of the rest, with \pyinline{Never} as the unit:
 \joinTy(\sigma, \tau) & = \tau &\quad& \text{if } \Gamma \vdash \sigma \subty \tau \\
 \joinTy(\sigma, \tau) & = \sigma &\quad& \text{if } \Gamma \vdash \tau \subty \sigma \\
 \joinTy(\sigma, \tau) & = \tyUnion{\sigma}{\tau} &\quad& \text{otherwise} \\[2mm]
-\joinTy() & = \tyNever \\
+\joinTy(\varepsilon) & = \tyNever \\
 \joinTy(\sigma \cons \seq{\tau}) & = \joinTy(\sigma, \joinTy(\seq{\tau}))
 \end{defalign}
 
