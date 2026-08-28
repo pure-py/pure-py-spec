@@ -45,8 +45,7 @@ def f():
 \end{python}
 
 \noindent Here $\assignsS(s)$ is the set of variables assigned anywhere in a statement $s$, not descending
-into nested function definitions, which have their own scope; it is the domain of the context $s$
-definitely assigns, $\assignsS(s) = \dom(\Delta)$ when $s : \Assigns{\Delta}$.
+into nested function definitions, which have their own scope.
 
 \subsubsection{No reassignment of captured variables}
 \label{sec:captured-variables}
