@@ -9,7 +9,7 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 
 - Minimal. State the thing; stop.
 - No weasel-words like "honest", "clean", "obvious", "simply".
-- Table cells are telegraphic: no articles ("Rebinds variable", not "Rebinds a variable").
+- Table cells and figure captions are telegraphic: no articles ("Rebinds variable", not "Rebinds a variable").
 - No defensive coding. If a case shouldn't arise, assert it; don't silently return a safe default.
 
 ## Git
