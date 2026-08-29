@@ -248,16 +248,16 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
             checks_against(s.value, returns, ctx)
         return RETURNS
     if isinstance(s, ast.If):
-        check_expr(s.test, ctx)
+        checks_against(s.test, Primitive.BOOL, ctx)
         branches = [check_body(s.body, ctx, returns)]
         branches.append(
             check_body(s.orelse, ctx, returns) if s.orelse else ASSIGNS_EMPTY
         )
         return merge_results(branches)
     if isinstance(s, ast.Assert):
-        check_expr(s.test, ctx)
+        checks_against(s.test, Primitive.BOOL, ctx)
         if s.msg is not None:
-            check_expr(s.msg, ctx)
+            checks_against(s.msg, Primitive.STR, ctx)
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Match):
         check_expr(s.subject, ctx)
@@ -350,12 +350,9 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
             raise IllFormedModule(e, reasons.NoUnarySignature(name, render(operand)))
         return result
     if isinstance(e, ast.BoolOp):
-        operands = [check_expr(v, ctx) for v in e.values]
-        return (
-            Primitive.BOOL
-            if all(t is not None and subtype(t, Primitive.BOOL, ctx) for t in operands)
-            else None
-        )
+        for v in e.values:
+            checks_against(v, Primitive.BOOL, ctx)
+        return Primitive.BOOL
     if isinstance(e, ast.Compare):
         check_exprs(e.comparators, ctx)
         if len(e.ops) != 1:
@@ -363,7 +360,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
             return None
         return binary(BINARY_NAMES[type(e.ops[0])], e.left, e.comparators[0], e, ctx)
     if isinstance(e, ast.IfExp):
-        check_expr(e.test, ctx)
+        checks_against(e.test, Primitive.BOOL, ctx)
         check_expr(e.body, ctx)
         check_expr(e.orelse, ctx)
         return None
@@ -519,6 +516,11 @@ def checks_against(e: ast.expr, expected: Type | None, ctx: ModuleContext) -> No
                 checks_against(k, Primitive.STR, ctx)
         for v in e.values:
             checks_against(v, expected.value, ctx)
+        return
+    if isinstance(e, ast.IfExp):
+        checks_against(e.test, Primitive.BOOL, ctx)
+        checks_against(e.body, expected, ctx)
+        checks_against(e.orelse, expected, ctx)
         return
     if isinstance(e, ast.ListComp) and isinstance(expected, ListType):
         checks_against(e.elt, expected.elem, qual_context([e.elt], e.generators, ctx))
