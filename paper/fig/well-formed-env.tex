@@ -71,6 +71,22 @@
   \vdash \primVal{\primFn} : \statusDefAssigned
 }
 \and
+\inferrule*[lab={\ruleName{val-range}}]
+{
+  \strut
+}
+{
+  \vdash \valRange{n} : \statusDefAssigned
+}
+\and
+\inferrule*[lab={\ruleName{val-opaque}}]
+{
+  \strut
+}
+{
+  \vdash \opaqueVal{q.x} : \predefName
+}
+\and
 \inferrule*[lab={\ruleName{val-mod}}]
 {
   q \in \dom(\mathcal{M}) \cup \dom(\mathcal{P})
