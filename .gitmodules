@@ -1,0 +1,3 @@
+[submodule "mechanisation"]
+	path = mechanisation
+	url = git@github.com:pure-py/isabelle-purepy.git

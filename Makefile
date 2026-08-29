@@ -32,10 +32,26 @@ paper-anon.pdf: $(TEXFILES)
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 
-# Zip rather than a bare PDF, to make room for a mechanisation.
-supplementary.zip: spec-anon.pdf
-	rm -f $@
-	cp $< spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
+# The Isabelle mechanisation, as a submodule so that it has a known location.
+MECHANISATION := mechanisation
+
+# A submission ships the mechanisation as it stands on main, so refuse to build
+# one from a working copy that has changes, unpushed commits, or a branch that
+# origin/main does not already contain.
+check-mechanisation:
+	@test -e $(MECHANISATION)/ROOT || \
+		{ echo "$(MECHANISATION) not checked out: git submodule update --init"; exit 1; }
+	@test -z "$$(git -C $(MECHANISATION) status --porcelain)" || \
+		{ echo "$(MECHANISATION) has uncommitted changes"; exit 1; }
+	@git -C $(MECHANISATION) merge-base --is-ancestor HEAD origin/main || \
+		{ echo "$(MECHANISATION) HEAD is not in origin/main: push and merge first"; exit 1; }
+
+supplementary.zip: spec-anon.pdf check-mechanisation
+	rm -f $@ && rm -rf .submission
+	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
+	mkdir .submission && git -C $(MECHANISATION) archive --format=tar --prefix=$(MECHANISATION)/ HEAD | tar -x -C .submission
+	cd .submission && zip -q -9 -r ../$@ $(MECHANISATION)
+	rm -rf .submission
 
 submit: paper-anon.pdf supplementary.zip
 
@@ -46,4 +62,4 @@ paper-arXiv.zip: $(ARXIV_FILES)
 clean:
 	rm -f $(AUX) *.pdf *.zip
 
-.PHONY: default submit clean
+.PHONY: default submit clean check-mechanisation

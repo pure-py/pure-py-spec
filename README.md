@@ -17,6 +17,7 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 - `paper/` — the paper's own material
 - `tex/` — macros and bibliography shared by both documents
 - `agda/` — Agda mechanisation (distributivity proof)
+- `mechanisation/` — Isabelle/HOL mechanisation, a submodule of the `isabelle-purepy` repository
 - `src/` — reference checker (Python `ast`-based), organised to mirror the spec's sections
 - `test/` — litmus tests
 
@@ -103,6 +104,17 @@ Check a single module, or a whole program from its entry module:
 ```bash
 uv run --locked python src/check_module.py path/to/module.py
 uv run --locked python src/check_program.py path/to/main.py
+```
+
+## Submission
+
+`make submit` builds the anonymised paper and `supplementary.zip`, which carries the anonymised
+specification and the Isabelle mechanisation. It refuses to build unless the `mechanisation` submodule is
+checked out, has no uncommitted changes, and sits at a commit `origin/main` already contains, so a
+submission never ships a working copy. Check it out with:
+
+```bash
+git submodule update --init
 ```
 
 ## Release workflow
