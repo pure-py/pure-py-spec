@@ -221,7 +221,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
     if isinstance(s, ast.Pass):
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Assign):
-        assigned = synthesises(s.value, ctx)
+        assigned = synth_expr(s.value, ctx)
         check_assign_targets(s.targets, captures_e(s.value))
         return Assigns(
             {
@@ -233,35 +233,35 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
     if isinstance(s, ast.AnnAssign):
         assert s.value is not None
         declared = annotated_type(s)
-        checks_against(
+        check_expr(
             s.value, declared if not isinstance(declared, Status) else None, ctx
         )
         check_assign_targets([s.target], captures_e(s.value))
         target = s.target
         return Assigns({target.id: declared} if isinstance(target, ast.Name) else {})
     if isinstance(s, ast.Expr):
-        synthesises(s.value, ctx)
+        synth_expr(s.value, ctx)
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Return):
         if s.value is None:
             check_returns_none(s, returns, ctx)
         else:
-            checks_against(s.value, returns, ctx)
+            check_expr(s.value, returns, ctx)
         return RETURNS
     if isinstance(s, ast.If):
-        checks_against(s.test, Primitive.BOOL, ctx)
+        check_expr(s.test, Primitive.BOOL, ctx)
         branches = [check_body(s.body, ctx, returns)]
         branches.append(
             check_body(s.orelse, ctx, returns) if s.orelse else ASSIGNS_EMPTY
         )
         return merge_results(branches)
     if isinstance(s, ast.Assert):
-        checks_against(s.test, Primitive.BOOL, ctx)
+        check_expr(s.test, Primitive.BOOL, ctx)
         if s.msg is not None:
-            checks_against(s.msg, Primitive.STR, ctx)
+            check_expr(s.msg, Primitive.STR, ctx)
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Match):
-        subject = synthesises(s.subject, ctx)
+        subject = synth_expr(s.subject, ctx)
         check_pattern_list([c.pattern for c in s.cases], s, ctx)
         return check_match_cases(s.cases, subject, ctx, returns)
     if isinstance(s, ast.ClassDef):
@@ -335,7 +335,7 @@ def check_case(
     )
 
 
-def synthesises(e: ast.expr, ctx: ModuleContext) -> Type | None:
+def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
     """Type `e` synthesises, where the rules give one; None where they do not
     yet."""
     if isinstance(e, ast.Name):
@@ -350,7 +350,7 @@ def synthesises(e: ast.expr, ctx: ModuleContext) -> Type | None:
         return LiteralType(e.value)
     if isinstance(e, ast.Lambda):
         params = {a.arg for a in e.args.args}
-        synthesises(e.body, override_var(ctx, {p: Status.TT for p in params}))
+        synth_expr(e.body, override_var(ctx, {p: Status.TT for p in params}))
         return None
     if isinstance(e, ast.Call):
         constructed = class_entry(e.func, ctx)
@@ -380,13 +380,13 @@ def synthesises(e: ast.expr, ctx: ModuleContext) -> Type | None:
             )
             assert args is not None
             for x, arg in args.items():
-                checks_against(arg, field_type(constructed, x), ctx)
+                check_expr(arg, field_type(constructed, x), ctx)
             return ClassType(c_name)
         return call(e, ctx)
     if isinstance(e, ast.BinOp):
         return binary(BINARY_NAMES[type(e.op)], e.left, e.right, e, ctx)
     if isinstance(e, ast.UnaryOp):
-        operand = synthesises(e.operand, ctx)
+        operand = synth_expr(e.operand, ctx)
         negated = negated_literal(e)
         if negated is not None:
             return negated
@@ -399,18 +399,18 @@ def synthesises(e: ast.expr, ctx: ModuleContext) -> Type | None:
         return result
     if isinstance(e, ast.BoolOp):
         for v in e.values:
-            checks_against(v, Primitive.BOOL, ctx)
+            check_expr(v, Primitive.BOOL, ctx)
         return Primitive.BOOL
     if isinstance(e, ast.Compare):
         check_exprs(e.comparators, ctx)
         if len(e.ops) != 1:
-            synthesises(e.left, ctx)
+            synth_expr(e.left, ctx)
             return None
         return binary(BINARY_NAMES[type(e.ops[0])], e.left, e.comparators[0], e, ctx)
     if isinstance(e, ast.IfExp):
-        checks_against(e.test, Primitive.BOOL, ctx)
-        synthesises(e.body, ctx)
-        synthesises(e.orelse, ctx)
+        check_expr(e.test, Primitive.BOOL, ctx)
+        synth_expr(e.body, ctx)
+        synth_expr(e.orelse, ctx)
         return None
     if isinstance(e, ast.Attribute):
         parent = entry_of(e.value, ctx)
@@ -429,7 +429,7 @@ def synthesises(e: ast.expr, ctx: ModuleContext) -> Type | None:
             return None if isinstance(entry, Status) else entry
         if isinstance(parent, ModuleStub):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(parent.q))
-        obj = synthesises(e.value, ctx)
+        obj = synth_expr(e.value, ctx)
         if not isinstance(obj, ClassType):
             return None
         entry = class_of(ctx, obj.q)
@@ -437,7 +437,7 @@ def synthesises(e: ast.expr, ctx: ModuleContext) -> Type | None:
     if isinstance(e, ast.Subscript):
         return subscript(e, ctx)
     if isinstance(e, ast.Tuple):
-        components = [synthesises(x, ctx) for x in e.elts]
+        components = [synth_expr(x, ctx) for x in e.elts]
         if any(t is None for t in components):
             return None
         return TupleType(tuple(t for t in components if t is not None))
@@ -446,33 +446,33 @@ def synthesises(e: ast.expr, ctx: ModuleContext) -> Type | None:
     if isinstance(e, ast.Dict):
         for k in e.keys:
             if k is not None:
-                checks_against(k, Primitive.STR, ctx)
+                check_expr(k, Primitive.STR, ctx)
         return dict_type(e.values, ctx)
     if isinstance(e, ast.ListComp):
-        t = synthesises(e.elt, qual_context([e.elt], e.generators, ctx))
+        t = synth_expr(e.elt, qual_context([e.elt], e.generators, ctx))
         return None if t is None else ListType(base_type(t))
     if isinstance(e, ast.DictComp):
         ctx_ = qual_context([e.key, e.value], e.generators, ctx)
-        checks_against(e.key, Primitive.STR, ctx_)
-        t = synthesises(e.value, ctx_)
+        check_expr(e.key, Primitive.STR, ctx_)
+        t = synth_expr(e.value, ctx_)
         return None if t is None else DictType(base_type(t))
     raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
 def subscript(e: ast.Subscript, ctx: ModuleContext) -> Type | None:
     """The type of a subscript, given the type of the container."""
-    container = synthesises(e.value, ctx)
+    container = synth_expr(e.value, ctx)
     if container is None:
-        synthesises(e.slice, ctx)
+        synth_expr(e.slice, ctx)
         return None
     if isinstance(container, ListType):
-        checks_against(e.slice, Primitive.INT, ctx)
+        check_expr(e.slice, Primitive.INT, ctx)
         return container.elem
     if container == Primitive.STR:
-        checks_against(e.slice, Primitive.INT, ctx)
+        check_expr(e.slice, Primitive.INT, ctx)
         return Primitive.STR
     if isinstance(container, DictType):
-        checks_against(e.slice, Primitive.STR, ctx)
+        check_expr(e.slice, Primitive.STR, ctx)
         return container.value
     if isinstance(container, TupleType):
         return tuple_subscript(container, e.slice, ctx)
@@ -485,9 +485,9 @@ def tuple_subscript(
     """A literal index gives the component at that position, counting from the
     end where it is negative; any other index of type int gives their join."""
     m = len(container.components)
-    i = literal_index(synthesises(index, ctx))
+    i = literal_index(synth_expr(index, ctx))
     if i is None:
-        checks_against(index, Primitive.INT, ctx)
+        check_expr(index, Primitive.INT, ctx)
         return join(container.components, ctx)
     if not -m <= i < m:
         raise IllFormedModule(index, reasons.TupleIndexOutOfRange(i, m))
@@ -504,14 +504,14 @@ def literal_index(t: Type | None) -> int | None:
 def list_type(elts: list[ast.expr], ctx: ModuleContext) -> Type | None:
     """A non-empty list synthesises where at least one element does, at the join
     of the types of those that do, with the others checked against it."""
-    synthesised = [synthesises(x, ctx) for x in elts]
+    synthesised = [synth_expr(x, ctx) for x in elts]
     known = [t for t in synthesised if t is not None]
     if len(known) == 0:
         return None
     elem = join([base_type(t) for t in known], ctx)
     for x, t in zip(elts, synthesised):
         if t is None:
-            checks_against(x, elem, ctx)
+            check_expr(x, elem, ctx)
     return ListType(elem)
 
 
@@ -526,7 +526,7 @@ def dict_type(values: list[ast.expr], ctx: ModuleContext) -> Type | None:
 def call(e: ast.Call, ctx: ModuleContext) -> Type | None:
     """The result type of a call, checking each argument against its parameter
     type; the callee must be a callable of the same arity."""
-    fn = synthesises(e.func, ctx)
+    fn = synth_expr(e.func, ctx)
     if fn is None:
         check_exprs(e.args, ctx)
         return None
@@ -535,20 +535,20 @@ def call(e: ast.Call, ctx: ModuleContext) -> Type | None:
     if len(fn.params) != len(e.args):
         raise IllFormedModule(e, reasons.CallArityMismatch(len(fn.params), len(e.args)))
     for arg, param in zip(e.args, fn.params):
-        checks_against(arg, param, ctx)
+        check_expr(arg, param, ctx)
     return fn.result
 
 
-def checks_against(e: ast.expr, expected: Type | None, ctx: ModuleContext) -> None:
+def check_expr(e: ast.expr, expected: Type | None, ctx: ModuleContext) -> None:
     """Check `e` against `expected`. A container display checks its parts against
     the parts of the expected type; anything else synthesises and must be below
     it."""
     if expected is None:
-        synthesises(e, ctx)
+        synth_expr(e, ctx)
         return
     if isinstance(e, ast.List) and isinstance(expected, ListType):
         for x in e.elts:
-            checks_against(x, expected.elem, ctx)
+            check_expr(x, expected.elem, ctx)
         return
     if (
         isinstance(e, ast.Tuple)
@@ -556,32 +556,32 @@ def checks_against(e: ast.expr, expected: Type | None, ctx: ModuleContext) -> No
         and len(e.elts) == len(expected.components)
     ):
         for x, t in zip(e.elts, expected.components):
-            checks_against(x, t, ctx)
+            check_expr(x, t, ctx)
         return
     if isinstance(e, ast.Dict) and isinstance(expected, DictType):
         for k in e.keys:
             if k is not None:
-                checks_against(k, Primitive.STR, ctx)
+                check_expr(k, Primitive.STR, ctx)
         for v in e.values:
-            checks_against(v, expected.value, ctx)
+            check_expr(v, expected.value, ctx)
         return
     if isinstance(e, ast.Lambda):
         check_lambda(e, expected, ctx)
         return
     if isinstance(e, ast.IfExp):
-        checks_against(e.test, Primitive.BOOL, ctx)
-        checks_against(e.body, expected, ctx)
-        checks_against(e.orelse, expected, ctx)
+        check_expr(e.test, Primitive.BOOL, ctx)
+        check_expr(e.body, expected, ctx)
+        check_expr(e.orelse, expected, ctx)
         return
     if isinstance(e, ast.ListComp) and isinstance(expected, ListType):
-        checks_against(e.elt, expected.elem, qual_context([e.elt], e.generators, ctx))
+        check_expr(e.elt, expected.elem, qual_context([e.elt], e.generators, ctx))
         return
     if isinstance(e, ast.DictComp) and isinstance(expected, DictType):
         ctx_ = qual_context([e.key, e.value], e.generators, ctx)
-        checks_against(e.key, Primitive.STR, ctx_)
-        checks_against(e.value, expected.value, ctx_)
+        check_expr(e.key, Primitive.STR, ctx_)
+        check_expr(e.value, expected.value, ctx_)
         return
-    actual = synthesises(e, ctx)
+    actual = synth_expr(e, ctx)
     if actual is None:
         return
     if not subtype(actual, expected, ctx):
@@ -599,7 +599,7 @@ def check_lambda(e: ast.Lambda, expected: Type, ctx: ModuleContext) -> None:
             e, reasons.TypeMismatch(render(expected), lambda_of(len(params)))
         )
     delta = dict(zip(params, expected.params))
-    checks_against(e.body, expected.result, override_var(ctx, delta))
+    check_expr(e.body, expected.result, override_var(ctx, delta))
 
 
 def lambda_of(n: int) -> str:
@@ -619,7 +619,7 @@ def negated_literal(e: ast.UnaryOp) -> Type | None:
 def binary(
     op: str, left: ast.expr, right: ast.expr, e: ast.expr, ctx: ModuleContext
 ) -> Type | None:
-    s, t = synthesises(left, ctx), synthesises(right, ctx)
+    s, t = synth_expr(left, ctx), synth_expr(right, ctx)
     if s is None or t is None:
         return None
     result = resolve_binary(op, s, t, ctx)
@@ -657,14 +657,14 @@ def check_quals(generators: list[ast.comprehension], ctx: ModuleContext) -> VarC
     delta = {n: entry for n in targets}
     ctx_ = override_var(ctx, delta)
     for e in g.ifs:
-        checks_against(e, Primitive.BOOL, ctx_)
+        check_expr(e, Primitive.BOOL, ctx_)
     return delta | check_quals(generators[1:], ctx_)
 
 
 def elem_entry(e: ast.expr, ctx: ModuleContext) -> VarEntry:
     """Type a generator binds its target at, where the type of what it draws
     from is known."""
-    t = synthesises(e, ctx)
+    t = synth_expr(e, ctx)
     if t is None:
         return Status.TT
     elem = elem_type(t, ctx)
@@ -676,7 +676,7 @@ def elem_entry(e: ast.expr, ctx: ModuleContext) -> VarEntry:
 def check_exprs(es: list[ast.expr], ctx: ModuleContext) -> None:
     if len(es) == 0:
         return
-    synthesises(es[0], ctx)
+    synth_expr(es[0], ctx)
     check_exprs(es[1:], ctx)
 
 
