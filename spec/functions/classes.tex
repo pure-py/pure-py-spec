@@ -1,0 +1,8 @@
+\classesOf(q) &{}= \set{q} \\*
+\classesOf(\tyList{\tau}) &{}= \classesOf(\tau) \\*
+\classesOf(\tyDict{\tau}) &{}= \classesOf(\tau) \\*
+\classesOf(\tyTuple{\seq{\tau}}) &{}= \classesOf(\seq{\tau}) \\*
+\classesOf(\tyCallable{\seq{\sigma}}{\tau}) &{}= \classesOf(\seq{\sigma}) \cup \classesOf(\tau) \\*
+\classesOf(\tyUnion{\sigma}{\tau}) &{}= \classesOf(\sigma) \cup \classesOf(\tau) \\*
+\classesOf(\tau) &{}= \varnothing && \text{otherwise} \\*[2mm]
+\classesOf(\tau_1, \ldots, \tau_n) &{}= \classesOf(\tau_1) \cup \ldots \cup \classesOf(\tau_n)
