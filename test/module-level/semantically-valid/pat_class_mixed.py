@@ -9,6 +9,7 @@ class Triple:
 t = Triple(1, 2, 3)
 match t:
     case Triple(1, z=zz, y=yy):
-        print(yy, zz)
+        print(yy)
+        print(zz)
     case _:
         print("other")

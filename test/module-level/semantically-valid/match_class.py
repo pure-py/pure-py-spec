@@ -8,4 +8,5 @@ class Point:
 p = Point(0, 1)
 match p:
     case Point(x, y):
-        print(x, y)
+        print(x)
+        print(y)

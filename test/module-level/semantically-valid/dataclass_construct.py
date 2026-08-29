@@ -11,4 +11,5 @@ class Point:
 
 Empty()
 p = Point(1, 2)
-print(p.x, p.y)
+print(p.x)
+print(p.y)

@@ -9,4 +9,5 @@ class Sub(Base):
     y: int
 
 s = Sub(1, 2)
-print(s.x, s.y)
+print(s.x)
+print(s.y)

@@ -116,7 +116,7 @@ def imported_entry(
 
 def own_members(body: list[ast.stmt], q: str) -> set[str]:
     if q in PREDEFINED_MEMBERS:
-        return PREDEFINED_MEMBERS[q]
+        return set(PREDEFINED_MEMBERS[q])
     return assigns_body(body)
 
 

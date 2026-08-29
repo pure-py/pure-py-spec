@@ -12,6 +12,9 @@ class Derived(Base):
 v = Derived(1, 2)
 match v:
     case Base(a):
-        print("base", a)
+        print("base")
+        print(a)
     case Derived(a, b):  # PurePy: error (subsumed by previous); Python: silently unreachable
-        print("derived", a, b)
+        print("derived")
+        print(a)
+        print(b)

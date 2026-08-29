@@ -3,7 +3,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
-from type_syntax import Type
+from type_syntax import CallableType, ListType, Primitive, Type
 
 
 class Status(Enum):
@@ -101,19 +101,42 @@ RETURNS = Returns()
 
 ASSIGNS_EMPTY = Assigns()
 
-PREDEFINED_MEMBERS: dict[str, set[str]] = {
-    "builtins": {"print", "len", "range"},
-    "math": {"pi", "e", "sqrt", "exp", "log", "sin", "cos", "tan", "floor", "ceil"},
-    "sys": {"argv", "exit"},
-    "typing": {"Any", "Callable", "Sized"},
-    "dataclasses": {"dataclass"},
+FLOAT_TO_FLOAT = CallableType((Primitive.FLOAT,), Primitive.FLOAT)
+FLOAT_TO_INT = CallableType((Primitive.FLOAT,), Primitive.INT)
+
+# The type of each predefined member, with Status.TT for the members that name a
+# type rather than a value.
+PREDEFINED_MEMBERS: dict[str, dict[str, VarEntry]] = {
+    "builtins": {
+        "print": CallableType((Primitive.OBJECT,), Primitive.NONE),
+        "len": CallableType((Primitive.SIZED,), Primitive.INT),
+        "range": CallableType((Primitive.INT,), ListType(Primitive.INT)),
+    },
+    "math": {
+        "pi": Primitive.FLOAT,
+        "e": Primitive.FLOAT,
+        "sqrt": FLOAT_TO_FLOAT,
+        "exp": FLOAT_TO_FLOAT,
+        "log": FLOAT_TO_FLOAT,
+        "sin": FLOAT_TO_FLOAT,
+        "cos": FLOAT_TO_FLOAT,
+        "tan": FLOAT_TO_FLOAT,
+        "floor": FLOAT_TO_INT,
+        "ceil": FLOAT_TO_INT,
+    },
+    "sys": {
+        "argv": ListType(Primitive.STR),
+        "exit": CallableType((Primitive.INT,), Primitive.NEVER),
+    },
+    "typing": {"Any": Status.TT, "Callable": Status.TT, "Sized": Status.TT},
+    "dataclasses": {"dataclass": Status.TT},
 }
 
 PREDEFINED_MODULES = set(PREDEFINED_MEMBERS)
 
 
 def predefined_context(q: str) -> Context:
-    return {x: Status.TT for x in PREDEFINED_MEMBERS[q] | {"__name__"}}
+    return {**PREDEFINED_MEMBERS[q], "__name__": Primitive.STR}
 
 
 def merge_entry(a: VarEntry, b: VarEntry) -> VarEntry:

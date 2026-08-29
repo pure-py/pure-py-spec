@@ -14,4 +14,6 @@ match 5:
 
 match (1, 2):
     case (a, b) as t:
-        print(a, b, t)
+        print(a)
+        print(b)
+        print(t)

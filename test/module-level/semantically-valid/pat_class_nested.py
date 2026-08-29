@@ -13,6 +13,9 @@ class Pair:
 p = Pair((1, [2, 3]), Inner(4, 5))
 match p:
     case Pair((1, [x, y]) as t, Inner(z, _)):
-        print(t, x, y, z)
+        print(t)
+        print(x)
+        print(y)
+        print(z)
     case _:
         print("other")
