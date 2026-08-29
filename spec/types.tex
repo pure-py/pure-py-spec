@@ -201,14 +201,11 @@ since a pattern for a base class matches a value of any class derived from it. A
 union by checking against those alternatives it matches, of which there must be at least one, and binds each
 variable at the join of the types they give it (\ruleName{pat-union}). The body is then checked
 under those bindings, and the values matched by the pattern are removed from the residual.
-\todo{define the cases judgement and $\shapesOf$}
 
 \input{spec/fig/typing-stmt}
 
 \input{spec/fig/typing-pat}
 
-% Deferred: the split judgement needs more work (\issue{92}).
-\iffalse
 \subsection{Exhaustiveness checking}
 \label{sec:exhaustiveness}
 
@@ -251,4 +248,3 @@ exhaustive, although no one of them subsumes what a further case would match.
 \input{spec/fig/coverage}
 
 \input{spec/fig/typing-cases}
-\fi
