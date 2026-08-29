@@ -121,6 +121,20 @@
 \subcaption{Shapes of type $\tau$ with heads $N$ excluded}
 \end{subfigure}
 
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\begin{defalign}
+\shapeTy(\shapeAny{\tau}{N}) & = \tau \\
+\shapeTy(\ell) & = \tyLiteral{\ell} \\
+\shapeTy(\patConstr{q}{\seq{k}}) & = q \\
+\shapeTy(\patTuple{\seq{k}}) & = \tyTuple{\shapeTy(k_1), \ldots, \shapeTy(k_n)} \\
+\shapeTy(\shapeList{\tau}{\seq{k}}) & = \tyList{\tau} \\
+\shapeTy(\shapeDict{\tau}{\beta}{N}) & = \tyDict{\tau}
+\end{defalign}
+\subcaption{Least type of shape $k$}
+\end{subfigure}
+
 \caption{Shape typing}
 \label{fig:shapes}
 \end{figure}
