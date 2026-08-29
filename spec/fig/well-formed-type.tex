@@ -3,8 +3,8 @@
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{ty-name}}]
-{ \tau \text{ a primitive type} \\ \bind{\tau}{\predefName} \in \Gamma }
-{ \Gamma \vdash \tau }
+{ \bind{\nu}{\predefName} \in \Gamma }
+{ \Gamma \vdash \nu }
 \and
 \inferrule*[lab={\ruleName{ty-class}}]
 { \Gamma \vdash q : C }

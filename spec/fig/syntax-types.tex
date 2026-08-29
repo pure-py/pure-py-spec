@@ -3,8 +3,8 @@
 %
 \begin{center}
 \begin{tabular}{rcll}
-\grammarGroup{Types} \\
-$\tau$ & $::=$ & $\tyAny$ & (Any) \\
+\grammarGroup{Primitive types} \\
+$\nu$ & $::=$ & $\tyAny$ & (Any) \\
     & $\mid$ & $\tyObject$ & (Object) \\
     & $\mid$ & $\tyNever$ & (Never) \\
     & $\mid$ & $\tyNone$ & (None) \\
@@ -13,7 +13,10 @@ $\tau$ & $::=$ & $\tyAny$ & (Any) \\
     & $\mid$ & $\tyFloat$ & (Float) \\
     & $\mid$ & $\tyStr$ & (Str) \\
     & $\mid$ & $\tySized$ & (Sized) \\
-    & $\mid$ & $\tyRange$ & (Range) \\
+    & $\mid$ & $\tyRange$ & (Range)
+   \\[3mm]
+\grammarGroup{Types} \\
+$\tau$ & $::=$ & $\nu$ & (Primitive) \\
     & $\mid$ & $\tyList{\tau}$ & (List) \\
     & $\mid$ & $\tyTuple{\tau_1, \ldots, \tau_n}$ & (Tuple) \\
     & $\mid$ & $\tyDict{\tau}$ & (Dict) \\
