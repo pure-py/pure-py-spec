@@ -155,22 +155,16 @@ declared return type, and must have result type $\Returns$ unless the function r
 so a function that declares a result definitely returns one.
 
 A \pyinline{match} scrutinee synthesises a type. Both \pyinline{match} rules hand the cases to the
-judgement $\Gamma; \tau; L \vdash \seq{h} \checks \sigma : S, L'$, which checks them in turn,
-requiring each to be reachable and the whole list to exhaust the type. The \emph{residual} $L$ holds the
+judgement $\Gamma; \tau; L \vdash \seq{h} : S, L'$, which takes them in turn,
+requiring each to match something and the whole list to exhaust the type. The \emph{residual} $L$ holds the
 values no earlier case has matched, and $L'$ those still unmatched once these cases are done. The judgement
 starts from $\shapesOf(\widen(\sigma), \varnothing)$, which denotes every value of the scrutinee's base
 type. Taking the base type keeps a literal case from exhausting the scrutinee on its own, so a
-\pyinline{match} on \pyinline{42} with a case for \pyinline{42} still admits a catch-all. Checking a case checks its pattern
-against the scrutinee's type, which binds each variable at the type of the value it is matched against
-(\figref{typing-pat}). A constructor pattern requires its class and the scrutinee's type to be comparable,
-since a pattern for a base class matches a value of any class derived from it. A pattern checks against a
-union by checking against those alternatives it matches, of which there must be at least one, and binds each
-variable at the join of the types they give it (\ruleName{pat-union}). The body is then checked
-under those bindings, and the values matched by the pattern are removed from the residual.
+\pyinline{match} on \pyinline{42} with a case for \pyinline{42} still admits a catch-all. Each case splits
+the residual with its pattern (\secref{exhaustiveness}), which yields the bindings the pattern makes as
+well as the values it leaves. The body is then checked under those bindings.
 
 \input{spec/fig/typing-stmt}
-
-\input{spec/fig/typing-pat}
 
 \subsection{Exhaustiveness checking}
 \label{sec:exhaustiveness}
@@ -189,14 +183,18 @@ sub-patterns. A list shape records its element type as well, which the element s
 $\shapesOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape
 carries a union type, since $\shapesOf$ is the only source of the form $\shapeAny{\tau}{N}$ and it splits a
 union into its members. The
-relation $\Gamma \vdash L, p \splitTo K, L'$ divides a set of shapes into the matched shapes $K$ and the
-\emph{residual} $L'$, one shape at a time and one position at a time
-(\figrefTwo{coverage}{coverage-rows}).
+relation $\Gamma \vdash L, p \splitTo K, L' \binding \Delta$ divides a set of shapes into the matched shapes
+$K$ and the \emph{residual} $L'$, binding $\Delta$, one shape at a time and one position at a time
+(\figrefTwo{coverage}{coverage-rows}). A pattern that cannot match a shape has no derivation against it, so
+\ruleName{split-shapes} takes the shapes it does match, which must not be none, and passes the others into
+the residual untouched. A variable pattern binds at $\shapeTy(k)$ for the shape $k$ it matches, and a
+pattern named by \pyinline{as} at the join over the shapes it matched, so a case for one alternative of a
+union leaves a later variable case bound at the others alone.
 
-The cases are then walked once, from $\shapesOf(\sigma, \varnothing)$ for the scrutinee's type $\sigma$, in the same shape as
-$\dispatch$ walks them at run time (\figref{typing-cases}). Each case checks its pattern, checks its body
-under the bindings, and must match some shape of the residual, so a case that matches nothing is rejected
-as unreachable, and the residual it leaves is passed on. \ruleName{match}
+The cases are then walked once, from $\shapesOf(\widen(\sigma), \varnothing)$ for the scrutinee's type $\sigma$, in the same shape as
+$\dispatch$ walks them at run time (\figref{typing-cases}). Each case splits the residual, checks its body
+under the bindings that split gives, and passes on the residual it leaves. A case that matches nothing is
+rejected, whether because the scrutinee can never take that shape or because the earlier cases already cover it. \ruleName{match}
 applies where the walk ends with an empty residual, and \ruleName{match-partial} where it does not, merging
 in $\Assigns{\varnothing}$ for the values that fall through. A union is exhausted
 by covering each member, a class type by a pattern for the class itself, and \pyinline{bool} by
