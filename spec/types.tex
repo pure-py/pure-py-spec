@@ -217,8 +217,7 @@ under those bindings, and the values matched by the pattern are removed from the
 
 Reachability and exhaustiveness are the two halves of one computation (\figrefTwo{shapes}{coverage}). A \emph{shape} $k$
 denotes a set of values of a type, written $\Gamma \vdash k : \tau$. Every shape has a least such type,
-$\shapeTy(k)$: the literal type of a literal, the class of a constructor, the recorded type of a list or
-dictionary shape, and componentwise for a tuple. The form $\shapeAny{\tau}{N}$ is a
+$\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{N}$ is a
 value of type $\tau$ whose outermost head is not among those in $N$, where $N$ \emph{constructs} $\tau$: its
 elements are subclasses where the type is a class, lengths where it is a list, and literals below the type
 otherwise (\figref{shapes}). The other forms are a literal, a constructor, a tuple, a list and a dictionary, each with shapes in place of
@@ -252,3 +251,15 @@ exhaustive, although no one of them subsumes what a further case would match.
 \input{spec/fig/coverage}
 
 \input{spec/fig/typing-cases}
+
+\subsection{Auxiliary functions}
+\label{sec:types-auxiliary}
+
+The functions used by the rules of this \seckind{}, each defined by its cases.
+
+\begin{auxfunction}{\shapeTy(k)}{type}{aux:shape-type}
+\input{spec/functions/shape-type-text}
+\begin{align*}
+\input{spec/functions/shape-type}
+\end{align*}
+\end{auxfunction}

@@ -60,15 +60,6 @@
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[chapter]
 
-% An entry of the annex of auxiliary functions: the application form, its result and its label, then
-% prose and rows.
-\newenvironment{auxfunction}[3]{%
-  \par\addvspace{\bigskipamount}\phantomsection\label{#3}%
-  \noindent{\color{gray!60}\rule{\textwidth}{0.4pt}}\par\nobreak\vskip-\parskip\nointerlineskip
-  \noindent\colorbox{grammarheadcolor}{\parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
-    {\bfseries $#1$}\hfill{\itshape #2}}}\par\nobreak\vspace{2mm}\noindent\ignorespaces}
-  {\par\addvspace{\bigskipamount}}
-
 \version{0}{15}{1}
 
 \begin{document}

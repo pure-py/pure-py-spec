@@ -262,5 +262,15 @@
 
 % Grammar figures: shaded heading row naming the syntactic category
 \definecolor{grammarheadcolor}{gray}{0.93}
+
+% An entry of the annex of auxiliary functions: the application form, its result and its label, then
+% prose and rows.
+\newenvironment{auxfunction}[3]{%
+  \par\addvspace{\bigskipamount}\phantomsection\label{#3}%
+  \noindent{\color{gray!60}\rule{\textwidth}{0.4pt}}\par\nobreak\vskip-\parskip\nointerlineskip
+  \noindent\colorbox{grammarheadcolor}{\parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
+    {\bfseries $#1$}\hfill{\itshape #2}}}\par\nobreak\vspace{2mm}\noindent\ignorespaces}
+  {\par\addvspace{\bigskipamount}}
+
 \newcommand*{\grammarGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{4}{l}{#1}}
 \newcommand*{\metaGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{#1}}
