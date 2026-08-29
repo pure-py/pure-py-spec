@@ -73,8 +73,9 @@ $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the class en
 (\ruleName{attr-object}). Typing a program refines the context of a predefined module
 (Definition~\ref{def:predefined}), binding $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type
 listed for it in \figref{predefined-types}, so \pyinline{len} takes a \pyinline{Sized} and \pyinline{print}
-one argument of any type. A member listed with no type, such as \pyinline{Callable}, stays at
-$\predefName{q.x}$: it is a name for annotations and has no use as a value. Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
+one argument of any type. A member the figure omits, such as \pyinline{Callable}, keeps the entry
+$\predefName{q.x}$ that Definition~\ref{def:predefined} gives it, so it is not a variable and no rule takes
+it for one. Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
 signature $\ominus : \sigma \to \tau$, relating operand types to result type
 (\figref{operator-signatures}). A
 signature with type variables stands for all its instances, which agree on the result type; a variable binds
