@@ -425,7 +425,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
                 raise IllFormedModule(e, reasons.ClassAsValue(qualified_name(e)))
             if entry == Status.FF:
                 raise IllFormedModule(e, reasons.UnassignedMember(e.attr, parent.q))
-            return None
+            return None if isinstance(entry, Status) else entry
         if isinstance(parent, ModuleStub):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(parent.q))
         obj = check_expr(e.value, ctx)
