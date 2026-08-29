@@ -113,7 +113,8 @@ definitions that follow, as is the name $q$ of the enclosing module in the rules
 \label{def:predefined}
 $\mathcal{P}$ takes each module $q$ of \figref{predefined} to a pair $(\rho, \Gamma)$, where $\rho$ binds
 $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member listed for $q$ in \figref{predefined} to its value,
-and $\Gamma$ binds the same variables at $\statusDefAssigned$.
+and $\Gamma$ binds the same variables at the type listed for each, and at $\statusDefAssigned$ where the
+figure lists none.
 \end{definition}
 
 \begin{figure}
@@ -121,28 +122,28 @@ and $\Gamma$ binds the same variables at $\statusDefAssigned$.
 \centering
 \begin{tabular}{llll}
 \arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}Module & Member & \multicolumn{2}{l}{Value} \\
-\textup{\pyinline{builtins}} & \pyinline{print} & & \\
- & \pyinline{len} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
- & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
- & & $\quad \primFn(\seq{u}) = \aborts{\errType}$ & (otherwise) \\
- & \pyinline{range} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
- & & $\quad \primFn(v) = \val{\exList{0, \ldots, v-1}}$ & if $v$ an integer, $v > 0$ \\
- & & $\quad \primFn(v) = \val{\exList{}}$ & if $v$ an integer, $v \leq 0$ \\
-\pyinline{math} & \pyinline{pi} & & \\
- & \pyinline{e} & & \\
- & \pyinline{sqrt} & & \\
- & \pyinline{exp} & & \\
- & \pyinline{log} & & \\
- & \pyinline{sin} & & \\
- & \pyinline{cos} & & \\
- & \pyinline{tan} & & \\
- & \pyinline{floor} & & \\
- & \pyinline{ceil} & & \\
-\pyinline{sys} & \pyinline{argv} & & \\
- & \pyinline{exit} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
- & & $\quad \primFn(\varepsilon) = \aborts{\errExit{0}}$ & \\
- & & $\quad \primFn(n) = \aborts{\errExit{n}}$ & \\
+\rowcolor{grammarheadcolor}Module & Member & Type & Value \\
+\textup{\pyinline{builtins}} & \pyinline{print} & $\tyCallable{\tyObject}{\tyNone}$ & \\
+ & \pyinline{len} & $\tyCallable{\tySized}{\tyInt}$ & $\primVal{\primFn}$ where \\
+ & & \multicolumn{2}{l}{$\quad \primFn(v) = \val{n}$ \quad if $\iterOp(v) = u_1 \cons \ldots \cons u_n$} \\
+ & & \multicolumn{2}{l}{$\quad \primFn(\seq{u}) = \aborts{\errType}$ \quad otherwise} \\
+ & \pyinline{range} & $\tyCallable{\tyInt}{\tyList{\tyInt}}$ & $\primVal{\primFn}$ where \\
+ & & \multicolumn{2}{l}{$\quad \primFn(v) = \val{\exList{0, \ldots, v-1}}$ \quad if $v$ an integer, $v > 0$} \\
+ & & \multicolumn{2}{l}{$\quad \primFn(v) = \val{\exList{}}$ \quad if $v$ an integer, $v \leq 0$} \\
+\pyinline{math} & \pyinline{pi} & $\tyFloat$ & \\
+ & \pyinline{e} & $\tyFloat$ & \\
+ & \pyinline{sqrt} & $\tyCallable{\tyFloat}{\tyFloat}$ & \\
+ & \pyinline{exp} & $\tyCallable{\tyFloat}{\tyFloat}$ & \\
+ & \pyinline{log} & $\tyCallable{\tyFloat}{\tyFloat}$ & \\
+ & \pyinline{sin} & $\tyCallable{\tyFloat}{\tyFloat}$ & \\
+ & \pyinline{cos} & $\tyCallable{\tyFloat}{\tyFloat}$ & \\
+ & \pyinline{tan} & $\tyCallable{\tyFloat}{\tyFloat}$ & \\
+ & \pyinline{floor} & $\tyCallable{\tyFloat}{\tyInt}$ & \\
+ & \pyinline{ceil} & $\tyCallable{\tyFloat}{\tyInt}$ & \\
+\pyinline{sys} & \pyinline{argv} & $\tyList{\tyStr}$ & \\
+ & \pyinline{exit} & $\tyCallable{\tyInt}{\tyNever}$ & $\primVal{\primFn}$ where \\
+ & & \multicolumn{2}{l}{$\quad \primFn(\varepsilon) = \aborts{\errExit{0}}$} \\
+ & & \multicolumn{2}{l}{$\quad \primFn(n) = \aborts{\errExit{n}}$} \\
 \pyinline{typing} & \pyinline{Any} & & \\
  & \pyinline{Callable} & & \\
  & \pyinline{Sized} & & \\
