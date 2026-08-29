@@ -2,12 +2,12 @@
 \flushleft \shadebox{$\Gamma \vdash \tau$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{ty-builtin}}]
-{ \tau \in \set{\tyObject, \tyBool, \tyInt, \tyFloat, \tyStr, \tyNone, \tyRange} }
-{ \Gamma \vdash \tau }
+\inferrule*[lab={\ruleName{ty-none}}]
+{ \strut }
+{ \Gamma \vdash \tyNone }
 \and
-\inferrule*[lab={\ruleName{ty-imported}}]
-{ \tau \in \set{\tyAny, \tyNever, \tySized} \\ \bind{\tau}{\predefName} \in \Gamma }
+\inferrule*[lab={\ruleName{ty-name}}]
+{ \tau \text{ a primitive type other than } \tyNone \\ \tau \in \dom(\Gamma) }
 { \Gamma \vdash \tau }
 \and
 \inferrule*[lab={\ruleName{ty-class}}]
@@ -15,23 +15,23 @@
 { \Gamma \vdash q }
 \and
 \inferrule*[lab={\ruleName{ty-literal}}]
-{ \bind{\pyinline{Literal}}{\predefName} \in \Gamma }
+{ \pyinline{Literal} \in \dom(\Gamma) }
 { \Gamma \vdash \tyLiteral{\ell} }
 \and
 \inferrule*[lab={\ruleName{ty-list}}]
-{ \Gamma \vdash \tau }
+{ \pyinline{list} \in \dom(\Gamma) \\ \Gamma \vdash \tau }
 { \Gamma \vdash \tyList{\tau} }
 \and
 \inferrule*[lab={\ruleName{ty-dict}}]
-{ \Gamma \vdash \tau }
+{ \pyinline{dict}, \pyinline{str} \in \dom(\Gamma) \\ \Gamma \vdash \tau }
 { \Gamma \vdash \tyDict{\tau} }
 \and
 \inferrule*[lab={\ruleName{ty-tuple}}]
-{ \Gamma \vdash \tau_i \quad (\forall i) }
+{ \pyinline{tuple} \in \dom(\Gamma) \\ \Gamma \vdash \tau_i \quad (\forall i) }
 { \Gamma \vdash \tyTuple{\seq{\tau}} }
 \and
 \inferrule*[lab={\ruleName{ty-callable}}]
-{ \bind{\pyinline{Callable}}{\predefName} \in \Gamma \\ \Gamma \vdash \sigma_i \quad (\forall i) \\ \Gamma \vdash \tau }
+{ \pyinline{Callable} \in \dom(\Gamma) \\ \Gamma \vdash \sigma_i \quad (\forall i) \\ \Gamma \vdash \tau }
 { \Gamma \vdash \tyCallable{\seq{\sigma}}{\tau} }
 \and
 \inferrule*[lab={\ruleName{ty-union}}]

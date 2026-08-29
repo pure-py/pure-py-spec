@@ -163,9 +163,8 @@ and, where it extends another class, that class to be bound and the own fields n
 one (\ruleName{class}, \ruleName{class-extend}). It also requires \pyinline{dataclass} to be in scope, since
 the declaration names it. Each rule that takes an annotation also requires it to be well-formed
 (\figref{well-formed-type}). An annotation is a type, so the rules follow its structure, and each name it
-is written with must be in scope: a class name bound to a class entry, and \pyinline{Any},
-\pyinline{Callable}, \pyinline{Literal}, \pyinline{Never} and \pyinline{Sized} bound to the entry their
-import gives them. The remaining spellings are Python builtins, in scope everywhere.
+is written with must be in scope: a class name bound to a class entry, and every other name bound as a
+member of \pyinline{builtins}, which every module has, or of \pyinline{typing}, which takes an import.
 
 A function definition binds its parameters at their annotated types and its own name, and the names of the
 mutual region it belongs to, at the corresponding $\pyinline{Callable}$ type; variables assigned in the body start
