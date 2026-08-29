@@ -119,7 +119,10 @@ synthesises, the others checking against the join of the base types of those tha
 dictionary or comprehension takes the base type of what its elements or body synthesise, since
 \pyinline{list} and \pyinline{dict} are invariant and a literal element type would keep the container from
 matching any other. Each of these forms keeps its checking rule as well. An empty list or dictionary and a lambda have no
-synthesis rule at all, so checking is the only way to type them. A non-empty list has both, and the
+synthesis rule at all, so checking is the only way to type them. A lambda applied to arguments is the
+exception, since the arguments give the parameter types and the call synthesises the type of the body
+(\ruleName{call-lambda}). A comprehension uses that form to pass a generator variable to a lambda by value,
+which it may not capture. A non-empty list has both, and the
 checking rule is still needed where the expected element type is wider than the one the elements
 synthesise, since \pyinline{list} is invariant.
 

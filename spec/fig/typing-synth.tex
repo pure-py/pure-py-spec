@@ -45,6 +45,15 @@
   \Gamma \vdash \exCall{e}{e_1, \ldots, e_n} \synth \tau
 }
 \and
+\inferrule*[lab={\ruleName{call-lambda}}]
+{
+  \Gamma \vdash e_i \synth \tau_i \quad (\forall i) \\
+  \Gamma \override \set{\bind{x_1}{\tau_1}, \ldots, \bind{x_n}{\tau_n}} \vdash e \synth \tau
+}
+{
+  \Gamma \vdash \exCall{(\exLambda{x_1, \ldots, x_n}{e})}{e_1, \ldots, e_n} \synth \tau
+}
+\and
 \inferrule*[lab={\ruleName{constr}}]
 {
   \Gamma \vdash q : C \\
