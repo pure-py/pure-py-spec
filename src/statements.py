@@ -130,9 +130,9 @@ def well_formed(t: Type, node: ast.AST, ctx: ModuleContext) -> Type:
 
 
 def in_scope(x: str, node: ast.AST, ctx: ModuleContext) -> None:
-    """A name an annotation is written with must be bound, which for a builtin
-    holds everywhere and for a member of `typing` takes an import."""
-    if x not in ctx.gamma:
+    """A name an annotation is written with must still be the predefined one,
+    which an import brings into scope and an assignment takes away."""
+    if not isinstance(ctx.gamma.get(x), PredefinedName):
         raise IllFormedModule(node, reasons.AnnotationNameNotInScope(x))
 
 

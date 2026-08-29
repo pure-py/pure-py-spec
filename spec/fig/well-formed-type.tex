@@ -3,7 +3,7 @@
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{ty-name}}]
-{ \tau \text{ a primitive type} \\ \tau \in \dom(\Gamma) }
+{ \tau \text{ a primitive type} \\ \bind{\tau}{\predefName} \in \Gamma }
 { \Gamma \vdash \tau }
 \and
 \inferrule*[lab={\ruleName{ty-class}}]
@@ -11,23 +11,23 @@
 { \Gamma \vdash q }
 \and
 \inferrule*[lab={\ruleName{ty-literal}}]
-{ \pyinline{Literal} \in \dom(\Gamma) }
+{ \bind{\pyinline{Literal}}{\predefName} \in \Gamma }
 { \Gamma \vdash \tyLiteral{\ell} }
 \and
 \inferrule*[lab={\ruleName{ty-list}}]
-{ \pyinline{list} \in \dom(\Gamma) \\ \Gamma \vdash \tau }
+{ \bind{\pyinline{list}}{\predefName} \in \Gamma \\ \Gamma \vdash \tau }
 { \Gamma \vdash \tyList{\tau} }
 \and
 \inferrule*[lab={\ruleName{ty-dict}}]
-{ \pyinline{dict}, \pyinline{str} \in \dom(\Gamma) \\ \Gamma \vdash \tau }
+{ \bind{\pyinline{dict}}{\predefName}, \bind{\pyinline{str}}{\predefName} \in \Gamma \\ \Gamma \vdash \tau }
 { \Gamma \vdash \tyDict{\tau} }
 \and
 \inferrule*[lab={\ruleName{ty-tuple}}]
-{ \pyinline{tuple} \in \dom(\Gamma) \\ \Gamma \vdash \tau_i \quad (\forall i) }
+{ \bind{\pyinline{tuple}}{\predefName} \in \Gamma \\ \Gamma \vdash \tau_i \quad (\forall i) }
 { \Gamma \vdash \tyTuple{\seq{\tau}} }
 \and
 \inferrule*[lab={\ruleName{ty-callable}}]
-{ \pyinline{Callable} \in \dom(\Gamma) \\ \Gamma \vdash \sigma_i \quad (\forall i) \\ \Gamma \vdash \tau }
+{ \bind{\pyinline{Callable}}{\predefName} \in \Gamma \\ \Gamma \vdash \sigma_i \quad (\forall i) \\ \Gamma \vdash \tau }
 { \Gamma \vdash \tyCallable{\seq{\sigma}}{\tau} }
 \and
 \inferrule*[lab={\ruleName{ty-union}}]
