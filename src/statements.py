@@ -402,10 +402,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
             check_expr(v, Primitive.BOOL, ctx)
         return Primitive.BOOL
     if isinstance(e, ast.Compare):
-        check_exprs(e.comparators, ctx)
-        if len(e.ops) != 1:
-            synth_expr(e.left, ctx)
-            return None
+        assert len(e.ops) == 1
         return binary(BINARY_NAMES[type(e.ops[0])], e.left, e.comparators[0], e, ctx)
     if isinstance(e, ast.IfExp):
         check_expr(e.test, Primitive.BOOL, ctx)
