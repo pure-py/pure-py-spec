@@ -113,8 +113,7 @@ definitions that follow, as is the name $q$ of the enclosing module in the rules
 \label{def:predefined}
 $\mathcal{P}$ takes each module $q$ of \figref{predefined} to a pair $(\rho, \Gamma)$, where $\rho$ binds
 $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member listed for $q$ in \figref{predefined} to its value,
-and $\Gamma$ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type listed for it\speconly{ in
-\figref{predefined-types}}, or at $\statusDefAssigned$ where no type is listed.
+and $\Gamma$ binds the same variables at $\statusDefAssigned$.
 \end{definition}
 
 \begin{figure}
