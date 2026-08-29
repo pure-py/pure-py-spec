@@ -42,6 +42,14 @@
   \Gamma \vdash \tyInt \subty \tyFloat
 }
 \and
+\inferrule*[lab={\ruleName{subty-sized}}]
+{
+  \tau \text{ a list, dictionary, string or tuple type}
+}
+{
+  \Gamma \vdash \tau \subty \tySized
+}
+\and
 \inferrule*[lab={\ruleName{subty-tuple}}]
 {
   \Gamma \vdash \sigma_i \subty \tau_i \quad (\forall i)
