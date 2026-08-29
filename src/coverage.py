@@ -233,6 +233,7 @@ def split_mapping(
     if len(ws) == 0:
         return frozenset({k}), NOTHING, NO_BINDINGS
     (w, p), rest = ws[0], ws[1:]
+    assert w not in [key for key, _ in rest]
     bound = dict(k.bound)
     if w in bound:
         first = split(bound[w], p, ctx)

@@ -202,7 +202,7 @@ by covering each member, a class type by a pattern for the class itself, and \py
 \pyinline{True} and \pyinline{False}, while \pyinline{int}, \pyinline{str} and lists have
 unboundedly many heads and need a variable or wildcard. A dictionary shape has a form of its own,
 $\shapeDict{\tau}{\beta}{N}$, standing for dictionaries that hold each key of $\beta$ with a value of the
-shape $\beta$ gives it, and hold no key of $N$. A dictionary pattern is taken one key at a time
+shape $\beta$ gives it, and hold no key of $N$. A dictionary pattern is taken one key at a time, no key twice
 (\ruleName{split-dict-bound}, \ruleName{split-dict-unbound}). A key already in $\beta$ splits the shape
 recorded for it, and a key in neither $\beta$ nor $N$ splits the value type, adding to the residual the
 dictionaries that lack the key. The empty pattern matches every dictionary and leaves nothing, so it alone
