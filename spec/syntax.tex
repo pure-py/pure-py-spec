@@ -36,7 +36,7 @@ take the following forms:
 {\normalfont
 \begin{center}
 \small
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.52\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.155\textwidth}>{\raggedright\arraybackslash}p{0.555\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Entry & Form & Records \\
 variable & $\tau$ or $\statusNotDefAssigned$ & type of definitely assigned variable, and
@@ -45,7 +45,7 @@ module stub & $\modStub{q}$ & module $q$, named but not loaded \\
 module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$ \\
 class entry & $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ & declaring context, qualified name,
 fields with types, base class \\
-predefined name & $\predefName{q.x}$ & member of predefined module, never an expression \\
+predefined name & $\predefName{q.x}$ & member of predefined module, used in annotation or as decorator \\
 \end{tabular}
 \end{center}
 }
