@@ -277,8 +277,8 @@
 % also puts a full \baselineskip before the first row, which the display skip takes back.
 \newcommand*{\funcrows}[1]{%
   \begingroup\lineskiplimit=-\baselineskip
-  \setlength{\abovedisplayskip}{\dimexpr -\baselineskip\relax}%
-  \setlength{\abovedisplayshortskip}{\dimexpr -\baselineskip\relax}%
+  \setlength{\abovedisplayskip}{\dimexpr\abovedisplayskip - \baselineskip\relax}%
+  \setlength{\abovedisplayshortskip}{\dimexpr\abovedisplayshortskip - \baselineskip\relax}%
   \begin{align*}\input{spec/functions/#1}\end{align*}\endgroup}
 
 \newcommand*{\grammarGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{4}{l}{#1}}
