@@ -221,7 +221,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
     if isinstance(s, ast.Pass):
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Assign):
-        assigned = check_expr(s.value, ctx)
+        assigned = synthesises(s.value, ctx)
         check_assign_targets(s.targets, captures_e(s.value))
         return Assigns(
             {
@@ -240,7 +240,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
         target = s.target
         return Assigns({target.id: declared} if isinstance(target, ast.Name) else {})
     if isinstance(s, ast.Expr):
-        check_expr(s.value, ctx)
+        synthesises(s.value, ctx)
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Return):
         if s.value is None:
@@ -261,7 +261,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
             checks_against(s.msg, Primitive.STR, ctx)
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Match):
-        subject = check_expr(s.subject, ctx)
+        subject = synthesises(s.subject, ctx)
         check_pattern_list([c.pattern for c in s.cases], s, ctx)
         return check_match_cases(s.cases, subject, ctx, returns)
     if isinstance(s, ast.ClassDef):
@@ -335,8 +335,9 @@ def check_case(
     )
 
 
-def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
-    """The type of `e`, where the rules give one; None where they do not yet."""
+def synthesises(e: ast.expr, ctx: ModuleContext) -> Type | None:
+    """Type `e` synthesises, where the rules give one; None where they do not
+    yet."""
     if isinstance(e, ast.Name):
         if not is_assigned(ctx, e.id):
             if module_of(ctx, e.id) is not None:
@@ -349,7 +350,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
         return LiteralType(e.value)
     if isinstance(e, ast.Lambda):
         params = {a.arg for a in e.args.args}
-        check_expr(e.body, override_var(ctx, {p: Status.TT for p in params}))
+        synthesises(e.body, override_var(ctx, {p: Status.TT for p in params}))
         return None
     if isinstance(e, ast.Call):
         constructed = class_entry(e.func, ctx)
@@ -385,7 +386,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
     if isinstance(e, ast.BinOp):
         return binary(BINARY_NAMES[type(e.op)], e.left, e.right, e, ctx)
     if isinstance(e, ast.UnaryOp):
-        operand = check_expr(e.operand, ctx)
+        operand = synthesises(e.operand, ctx)
         negated = negated_literal(e)
         if negated is not None:
             return negated
@@ -403,13 +404,13 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
     if isinstance(e, ast.Compare):
         check_exprs(e.comparators, ctx)
         if len(e.ops) != 1:
-            check_expr(e.left, ctx)
+            synthesises(e.left, ctx)
             return None
         return binary(BINARY_NAMES[type(e.ops[0])], e.left, e.comparators[0], e, ctx)
     if isinstance(e, ast.IfExp):
         checks_against(e.test, Primitive.BOOL, ctx)
-        check_expr(e.body, ctx)
-        check_expr(e.orelse, ctx)
+        synthesises(e.body, ctx)
+        synthesises(e.orelse, ctx)
         return None
     if isinstance(e, ast.Attribute):
         parent = entry_of(e.value, ctx)
@@ -428,7 +429,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
             return None if isinstance(entry, Status) else entry
         if isinstance(parent, ModuleStub):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(parent.q))
-        obj = check_expr(e.value, ctx)
+        obj = synthesises(e.value, ctx)
         if not isinstance(obj, ClassType):
             return None
         entry = class_of(ctx, obj.q)
@@ -436,7 +437,7 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
     if isinstance(e, ast.Subscript):
         return subscript(e, ctx)
     if isinstance(e, ast.Tuple):
-        components = [check_expr(x, ctx) for x in e.elts]
+        components = [synthesises(x, ctx) for x in e.elts]
         if any(t is None for t in components):
             return None
         return TupleType(tuple(t for t in components if t is not None))
@@ -448,21 +449,21 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
                 checks_against(k, Primitive.STR, ctx)
         return dict_type(e.values, ctx)
     if isinstance(e, ast.ListComp):
-        t = check_expr(e.elt, qual_context([e.elt], e.generators, ctx))
+        t = synthesises(e.elt, qual_context([e.elt], e.generators, ctx))
         return None if t is None else ListType(base_type(t))
     if isinstance(e, ast.DictComp):
         ctx_ = qual_context([e.key, e.value], e.generators, ctx)
         checks_against(e.key, Primitive.STR, ctx_)
-        t = check_expr(e.value, ctx_)
+        t = synthesises(e.value, ctx_)
         return None if t is None else DictType(base_type(t))
     raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
 def subscript(e: ast.Subscript, ctx: ModuleContext) -> Type | None:
     """The type of a subscript, given the type of the container."""
-    container = check_expr(e.value, ctx)
+    container = synthesises(e.value, ctx)
     if container is None:
-        check_expr(e.slice, ctx)
+        synthesises(e.slice, ctx)
         return None
     if isinstance(container, ListType):
         checks_against(e.slice, Primitive.INT, ctx)
@@ -484,7 +485,7 @@ def tuple_subscript(
     """A literal index gives the component at that position, counting from the
     end where it is negative; any other index of type int gives their join."""
     m = len(container.components)
-    i = literal_index(check_expr(index, ctx))
+    i = literal_index(synthesises(index, ctx))
     if i is None:
         checks_against(index, Primitive.INT, ctx)
         return join(container.components, ctx)
@@ -503,7 +504,7 @@ def literal_index(t: Type | None) -> int | None:
 def list_type(elts: list[ast.expr], ctx: ModuleContext) -> Type | None:
     """A non-empty list synthesises where at least one element does, at the join
     of the types of those that do, with the others checked against it."""
-    synthesised = [check_expr(x, ctx) for x in elts]
+    synthesised = [synthesises(x, ctx) for x in elts]
     known = [t for t in synthesised if t is not None]
     if len(known) == 0:
         return None
@@ -525,7 +526,7 @@ def dict_type(values: list[ast.expr], ctx: ModuleContext) -> Type | None:
 def call(e: ast.Call, ctx: ModuleContext) -> Type | None:
     """The result type of a call, checking each argument against its parameter
     type; the callee must be a callable of the same arity."""
-    fn = check_expr(e.func, ctx)
+    fn = synthesises(e.func, ctx)
     if fn is None:
         check_exprs(e.args, ctx)
         return None
@@ -543,7 +544,7 @@ def checks_against(e: ast.expr, expected: Type | None, ctx: ModuleContext) -> No
     the parts of the expected type; anything else synthesises and must be below
     it."""
     if expected is None:
-        check_expr(e, ctx)
+        synthesises(e, ctx)
         return
     if isinstance(e, ast.List) and isinstance(expected, ListType):
         for x in e.elts:
@@ -580,7 +581,7 @@ def checks_against(e: ast.expr, expected: Type | None, ctx: ModuleContext) -> No
         checks_against(e.key, Primitive.STR, ctx_)
         checks_against(e.value, expected.value, ctx_)
         return
-    actual = check_expr(e, ctx)
+    actual = synthesises(e, ctx)
     if actual is None:
         return
     if not subtype(actual, expected, ctx):
@@ -618,7 +619,7 @@ def negated_literal(e: ast.UnaryOp) -> Type | None:
 def binary(
     op: str, left: ast.expr, right: ast.expr, e: ast.expr, ctx: ModuleContext
 ) -> Type | None:
-    s, t = check_expr(left, ctx), check_expr(right, ctx)
+    s, t = synthesises(left, ctx), synthesises(right, ctx)
     if s is None or t is None:
         return None
     result = resolve_binary(op, s, t, ctx)
@@ -663,7 +664,7 @@ def check_quals(generators: list[ast.comprehension], ctx: ModuleContext) -> VarC
 def elem_entry(e: ast.expr, ctx: ModuleContext) -> VarEntry:
     """Type a generator binds its target at, where the type of what it draws
     from is known."""
-    t = check_expr(e, ctx)
+    t = synthesises(e, ctx)
     if t is None:
         return Status.TT
     elem = elem_type(t, ctx)
@@ -675,7 +676,7 @@ def elem_entry(e: ast.expr, ctx: ModuleContext) -> VarEntry:
 def check_exprs(es: list[ast.expr], ctx: ModuleContext) -> None:
     if len(es) == 0:
         return
-    check_expr(es[0], ctx)
+    synthesises(es[0], ctx)
     check_exprs(es[1:], ctx)
 
 
