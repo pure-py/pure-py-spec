@@ -13,6 +13,7 @@ class Primitive(Enum):
     INT = auto()
     FLOAT = auto()
     STR = auto()
+    SIZED = auto()
 
 
 @dataclass(frozen=True)
@@ -85,6 +86,7 @@ PRIMITIVE_SPELLINGS = {
     Primitive.INT: "int",
     Primitive.FLOAT: "float",
     Primitive.STR: "str",
+    Primitive.SIZED: "Sized",
 }
 
 PRIMITIVE_NAMES = {
@@ -96,6 +98,7 @@ PRIMITIVE_NAMES = {
     "int": Primitive.INT,
     "float": Primitive.FLOAT,
     "str": Primitive.STR,
+    "Sized": Primitive.SIZED,
 }
 
 

@@ -39,6 +39,8 @@ def subtype(s: Type, t: Type, ctx: ModuleContext) -> bool:
         return subtype(s.left, t, ctx) and subtype(s.right, t, ctx)
     if isinstance(t, UnionType):
         return subtype(s, t.left, ctx) or subtype(s, t.right, ctx)
+    if t == Primitive.SIZED:
+        return isinstance(s, (ListType, DictType, TupleType)) or s == Primitive.STR
     if isinstance(s, ClassType) and isinstance(t, ClassType):
         return t.q in ancestor_names(s.q, ctx)
     if isinstance(s, TupleType) and isinstance(t, TupleType):
