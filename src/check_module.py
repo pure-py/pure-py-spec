@@ -211,10 +211,13 @@ def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> IllFormed 
         return e
 
 
-def check_file(filename: str) -> IllFormed | None:
+def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:
     with open(filename) as f:
         source = f.read()
     tree = syntax.parse(source, filename)
+    unsupported = syntax.supported_module(tree)
+    if unsupported is not None:
+        return unsupported
     M: dict[str, ast.Module] = {
         p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES
     }
@@ -222,7 +225,11 @@ def check_file(filename: str) -> IllFormed | None:
     return module_result(tree, M, "__main__")
 
 
-def format_result(result: IllFormed | None, filename: str) -> str:
+def format_result(
+    result: IllFormed | syntax.Unsupported | None, filename: str
+) -> str:
+    if isinstance(result, syntax.Unsupported):
+        return syntax.format_result(result, filename)
     if result is None:
         return f"{filename}: ok"
     if isinstance(result, IllFormedModule):

@@ -15,7 +15,7 @@ OP_SYMBOLS: dict[type, str] = {
 }
 
 
-class ParseError(Exception):
+class Unsupported(Exception):
     exit_code: int  # overridden by subclass
     msg: str
 
@@ -26,11 +26,11 @@ class ParseError(Exception):
         super().__init__(msg)
 
 
-class Prohibited(ParseError):
+class Prohibited(Unsupported):
     exit_code = 1
 
 
-class NotYetSupported(ParseError):
+class NotYetSupported(Unsupported):
     exit_code = 2
 
     def __init__(self, node: ast.AST, feature: str, issue: int):
@@ -436,21 +436,21 @@ def supported_arguments(node: ast.arguments) -> None:
         supported_annotation(a.annotation)
 
 
-def supported_module(node: ast.Module) -> ParseError | None:
+def supported_module(node: ast.Module) -> Unsupported | None:
     try:
         supported_top_level(node.body)
         return None
-    except ParseError as e:
+    except Unsupported as e:
         return e
 
 
-def check_file(filename: str) -> ParseError | None:
+def check_file(filename: str) -> Unsupported | None:
     with open(filename) as f:
         source = f.read()
     return supported_module(parse(source, filename))
 
 
-def format_result(result: ParseError | None, filename: str) -> str:
+def format_result(result: Unsupported | None, filename: str) -> str:
     if result is None:
         return f"{filename}: ok"
     if result.line is not None:

@@ -45,17 +45,18 @@ def load(name: str, base_dir: pathlib.Path) -> ast.Module:
         tree = syntax.parse(source, str(path))
     except SyntaxError as e:
         raise IllFormedProgram(f"{path}: parse error: {e}") from e
-    parse_err = syntax.supported_module(tree)
-    if parse_err is not None:
-        raise IllFormedProgram(f"{path}: {parse_err.msg}")
+    unsupported = syntax.supported_module(tree)
+    if unsupported is not None:
+        unsupported.msg = f"{path}: {unsupported.msg}"
+        raise unsupported
     return tree
 
 
-def check_program(entry_path: pathlib.Path) -> IllFormed | None:
+def check_program(entry_path: pathlib.Path) -> IllFormed | syntax.Unsupported | None:
     try:
         walk_program(entry_path)
         return None
-    except IllFormed as e:
+    except (IllFormed, syntax.Unsupported) as e:
         return e
 
 
