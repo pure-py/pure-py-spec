@@ -136,7 +136,7 @@
   \Gamma \vdash k, p \splitTo K, L \binding \Delta
 }
 {
-  \Gamma \vdash k, p\;\pyinline{as}\;x \splitTo K, L \binding \Delta \override \set{\bind{x}{\joinTy(\shapeTy(m) \mid m \in K)}}
+  \Gamma \vdash k, p\;\pyinline{as}\;x \splitTo K, L \binding \Delta \disjunion \set{\bind{x}{\joinTy(\shapeTy(m) \mid m \in K)}}
 }
 \and
 \inferrule*[lab={\ruleName{split-literal}}]
@@ -231,7 +231,7 @@
   L^\dagger = \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{k'}}}{N} \mid k' \in L} \cup L'
 }
 {
-  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', L^\dagger \binding \Delta \override \Delta'
+  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', L^\dagger \binding \Delta \disjunion \Delta'
 }
 \and
 \inferrule*[lab={\ruleName{split-dict-unbound}}]
@@ -242,7 +242,7 @@
   L^\dagger = \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{k}}}{N} \mid k \in L} \cup L' \cup \set{\shapeDict{\tau}{\beta}{N \cup \set{w_1}}}
 }
 {
-  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', L^\dagger \binding \Delta \override \Delta'
+  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', L^\dagger \binding \Delta \disjunion \Delta'
 }
 \end{mathpar}
 \caption{Pattern $p$ splits shape $k$ into matched shapes $K$ and residual $L$, binding $\Delta$}
@@ -259,7 +259,7 @@
   L = \textstyle\bigcup_i \set{(m_1, \ldots, m_{i-1}, k\,', k_{i+1}, \ldots, k_n) \mid k\,' \in L_i, \; m_j \in K_j \text{ for } j < i}
 }
 {
-  \Gamma \vdash (k_1, \ldots, k_n), (p_1, \ldots, p_n) \splitTo K, L \binding \Delta_1 \override \ldots \override \Delta_n
+  \Gamma \vdash (k_1, \ldots, k_n), (p_1, \ldots, p_n) \splitTo K, L \binding \Delta_1 \disjunion \ldots \disjunion \Delta_n
 }
 \and
 \inferrule*[lab={\ruleName{split-shapes}}]

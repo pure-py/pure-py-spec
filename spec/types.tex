@@ -188,7 +188,9 @@ $K$ and the \emph{residual} $L'$, binding $\Delta$, one shape at a time and one 
 \ruleName{split-shapes} takes the shapes it does match, which must not be none, and passes the others into
 the residual untouched. A variable pattern binds at $\shapeTy(k)$ for the shape $k$ it matches, and a
 pattern named by \pyinline{as} at the join over the shapes it matched, so a case for one alternative of a
-union leaves a later variable case bound at the others alone.
+union leaves a later variable case bound at the others alone. Bindings from the positions of a row, or from
+the keys of a dictionary pattern, compose by disjoint union, so a pattern that binds a name twice has no
+derivation.
 
 The cases are then walked once, from $\shapesOf(\widen(\sigma), \varnothing)$ for the scrutinee's type $\sigma$, in the same shape as
 $\dispatch$ walks them at run time (\figref{typing-cases}). Each case splits the residual, checks its body

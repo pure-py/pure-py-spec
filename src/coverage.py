@@ -157,7 +157,7 @@ def split_as(k: Shape, p: ast.MatchAs, ctx: ModuleContext) -> Split | None:
     if p.name is None:
         return matched, left, delta
     named = join([shape_type(m) for m in matched], ctx)
-    return matched, left, delta | {p.name: named}
+    return matched, left, disjoint_union([delta, {p.name: named}])
 
 
 def split_literal(k: Shape, ell: LiteralType, ctx: ModuleContext) -> Split | None:
@@ -253,7 +253,7 @@ def split_mapping(
         NOTHING if w in bound else frozenset({Dict(k.value, k.bound, k.heads | {w})})
     )
     left__ = frozenset(with_key(k, w, r) for r in left) | left_ | absent
-    return matched_, left__, delta | delta_
+    return matched_, left__, disjoint_union([delta, delta_])
 
 
 def split_mappings(
@@ -282,10 +282,7 @@ def split_row(
         for prefix in product(*(parts[j][0] for j in range(i)))
         for k in ks
     )
-    delta: VarContext = {}
-    for _, _, d in parts:
-        delta = delta | d
-    return matched, left, delta
+    return matched, left, disjoint_union([d for _, _, d in parts])
 
 
 def split_shapes(
@@ -299,6 +296,16 @@ def split_shapes(
     matched = union(m for m, _, _ in splits.values())
     left = union(left for _, left, _ in splits.values()) | (ks - splits.keys())
     return matched, left, join_deltas([d for _, _, d in splits.values()], ctx)
+
+
+def disjoint_union(deltas: list[VarContext]) -> VarContext:
+    """Bindings of sub-patterns taken together. Their variables are distinct,
+    since a pattern is linear."""
+    merged: VarContext = {}
+    for delta in deltas:
+        assert merged.keys().isdisjoint(delta.keys())
+        merged = merged | delta
+    return merged
 
 
 def join_deltas(deltas: list[VarContext], ctx: ModuleContext) -> VarContext:
