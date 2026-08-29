@@ -8,4 +8,5 @@ def f(s: list[int] | tuple[()]) -> str:
             return "et"
         case _:
             return "other"
-print(f([]))
+xs: list[int] = []
+print(f(xs))

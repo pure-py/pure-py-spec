@@ -59,7 +59,7 @@ def class_equality_type(q: str, ctx: ModuleContext) -> bool:
     if entry is None:
         return True
     return all(
-        equality_type(field_type(entry, x) or Primitive.OBJECT, ctx)
+        equality_type(field_type(entry, x) or Primitive.NEVER, ctx)
         for x in fields(entry)
     )
 

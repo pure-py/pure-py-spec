@@ -361,22 +361,15 @@ def nested_statements(s: ast.stmt) -> list[ast.stmt]:
     return [c for c in ast.iter_child_nodes(s) if isinstance(c, ast.stmt)]
 
 
-def own_fields(node: ast.ClassDef) -> list[str]:
-    return [
-        t.target.id
-        for t in node.body
-        if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)
-    ]
-
-
-def own_field_types(node: ast.ClassDef) -> tuple[tuple[str, Type], ...]:
-    """Declared type of each field, omitting annotations we do not represent."""
-    annotated = (
+def own_fields(node: ast.ClassDef) -> tuple[tuple[str, Type], ...]:
+    """Fields a class declares, with their types."""
+    declared = [
         (t.target.id, parse_annotation(t.annotation))
         for t in node.body
         if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)
-    )
-    return tuple((x, t) for x, t in annotated if t is not None)
+    ]
+    assert all(t is not None for _, t in declared)
+    return tuple((x, t) for x, t in declared if t is not None)
 
 
 def qualified_name(e: ast.expr) -> str:

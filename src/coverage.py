@@ -316,8 +316,11 @@ def join_deltas(deltas: list[VarContext], ctx: ModuleContext) -> VarContext:
 
 
 def join_entries(entries: list[VarEntry], ctx: ModuleContext) -> VarEntry:
+    """Bindings a pattern gives across the shapes it matches are all types, so
+    they join."""
     types = [e for e in entries if not isinstance(e, Status)]
-    return Status.TT if len(types) != len(entries) else join(types, ctx)
+    assert len(types) == len(entries)
+    return join(types, ctx)
 
 
 def ordered(ks: frozenset[Shape]) -> list[Shape]:
@@ -348,9 +351,10 @@ def padded(ps: tuple[ast.pattern, ...], n: int) -> tuple[ast.pattern, ...]:
 
 
 def field_shape(entry: ClassEntry, x: str) -> Shape:
-    """Shape of a field, with an unknown field type standing for any value."""
+    """Shape of a field of the class, at its declared type."""
     t = field_type(entry, x)
-    return Rest(Primitive.OBJECT if t is None else t, frozenset())
+    assert t is not None
+    return Rest(t, frozenset())
 
 
 def with_key(k: Dict, w: str, m: Shape) -> Dict:

@@ -1,5 +1,5 @@
 import ast
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
@@ -24,8 +24,7 @@ type VarContext = dict[str, VarEntry]
 class ClassEntry:
     context: Context
     name: str
-    own_fields: tuple[str, ...]
-    own_types: tuple[tuple[str, Type], ...]
+    own_fields: tuple[tuple[str, Type], ...]
     base: str | None
 
 
@@ -76,8 +75,17 @@ def is_assigned(ctx: ModuleContext, x: str) -> bool:
 
 
 def class_of(ctx: ModuleContext, c: str) -> ClassEntry | None:
+    """Class entry for a class name, which a class type carries by its short
+    name, so a class imported with its module is found through that module."""
     v = ctx.gamma.get(c)
-    return v if isinstance(v, ClassEntry) else None
+    if isinstance(v, ClassEntry):
+        return v
+    for entry in ctx.gamma.values():
+        if isinstance(entry, ModuleLoaded):
+            member = entry.members.get(c)
+            if isinstance(member, ClassEntry):
+                return member
+    return None
 
 
 def module_of(ctx: ModuleContext, x: str) -> ModuleStub | ModuleLoaded | None:
@@ -96,6 +104,9 @@ class Assigns:
 
 
 type ResultType = Returns | Assigns
+
+# Join of two types, supplied by the caller since it depends on the context.
+type Join = Callable[[Type, Type], Type]
 
 RETURNS = Returns()
 
@@ -139,33 +150,35 @@ def predefined_context(q: str) -> Context:
     return {**PREDEFINED_MEMBERS[q], "__name__": Primitive.STR}
 
 
-def merge_entry(a: VarEntry, b: VarEntry) -> VarEntry:
-    """Assigned in both branches at the same type gives that type; assigned in
-    both at different types is assigned with no type yet."""
+def merge_entry(a: VarEntry, b: VarEntry, join_types: Join) -> VarEntry:
+    """Assigned in both branches gives the join of the two types; assigned in
+    one alone is not definitely assigned."""
     if a == Status.FF or b == Status.FF:
         return Status.FF
-    return a if a == b else Status.TT
+    if isinstance(a, Status) or isinstance(b, Status):
+        return a if a == b else Status.TT
+    return join_types(a, b)
 
 
-def merge_delta(d1: VarContext, d2: VarContext) -> VarContext:
+def merge_delta(d1: VarContext, d2: VarContext, join_types: Join) -> VarContext:
     return {
-        k: merge_entry(d1[k], d2[k]) if k in d1 and k in d2 else Status.FF
+        k: merge_entry(d1[k], d2[k], join_types) if k in d1 and k in d2 else Status.FF
         for k in set(d1.keys()) | set(d2.keys())
     }
 
 
-def merge_results(rs: list[ResultType]) -> ResultType:
+def merge_results(rs: list[ResultType], join_types: Join) -> ResultType:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return RETURNS
     delta = assigns_branches[0].delta
-    return Assigns(fold_merge(delta, assigns_branches[1:]))
+    return Assigns(fold_merge(delta, assigns_branches[1:], join_types))
 
 
-def fold_merge(acc: VarContext, branches: list[Assigns]) -> VarContext:
+def fold_merge(acc: VarContext, branches: list[Assigns], join_types: Join) -> VarContext:
     if len(branches) == 0:
         return acc
-    return fold_merge(merge_delta(acc, branches[0].delta), branches[1:])
+    return fold_merge(merge_delta(acc, branches[0].delta, join_types), branches[1:], join_types)
 
 
 def override_delta(d1: VarContext, d2: VarContext) -> VarContext:
@@ -225,15 +238,15 @@ def ancestors(entry: ClassEntry) -> list[ClassEntry]:
 
 def fields(entry: ClassEntry) -> tuple[str, ...]:
     if entry.base is None:
-        return entry.own_fields
+        return tuple(x for x, _ in entry.own_fields)
     base_entry = entry.context[entry.base]
     assert isinstance(base_entry, ClassEntry)
-    return fields(base_entry) + entry.own_fields
+    return fields(base_entry) + tuple(x for x, _ in entry.own_fields)
 
 
 def field_type(entry: ClassEntry, x: str) -> Type | None:
     """Declared type of field `x`, where the class entry records one."""
-    own = dict(entry.own_types)
+    own = dict(entry.own_fields)
     if x in own:
         return own[x]
     if entry.base is None:

@@ -350,6 +350,15 @@ class NotIterable:
 
 
 @dataclass(frozen=True)
+class UnknownField:
+    cls: str
+    field: str
+
+    def message(self) -> str:
+        return f"class '{self.cls}' has no field '{self.field}'"
+
+
+@dataclass(frozen=True)
 class NotSynthesised:
     """No synthesis rule gives this expression a type, so it cannot stand where
     a rule demands one."""
@@ -414,6 +423,7 @@ Reason = (
     | PatternTypeMismatch
     | CaseMatchesNothing
     | NotSynthesised
+    | UnknownField
 )
 
 
