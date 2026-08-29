@@ -1,4 +1,4 @@
-# rule: cases-cons -- a case must match some shape the earlier cases leave
+# rule: split-shapes -- a case must match some shape the earlier cases leave
 x = None
 match x:
     case None:

@@ -6,6 +6,7 @@ from aux import (
     assigns_body,
     assigns_seq,
     binds_quals,
+    binds_seq,
     captures_e,
     captures_e_list,
     captures_quals,
@@ -48,7 +49,7 @@ from contexts import (
 )
 from coverage import Shape, shapes, split_shapes
 from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
-from patterns import check_pattern_against, check_pattern_list, is_catch_all
+from patterns import check_pattern_list, describe, is_catch_all
 from reasons import IllFormedModule
 from subtyping import elem_type, join, subtype
 from type_syntax import (
@@ -275,38 +276,50 @@ def check_match_cases(
     ctx: ModuleContext,
     returns: Type | None,
 ) -> ResultType:
-    deltas = [check_pattern_against(case.pattern, subject, ctx) for case in cases]
-    partial = falls_through(cases, subject, ctx)
+    if subject is None:
+        deltas: list[VarContext] = [
+            {x: Status.TT for x in binds_seq(case.pattern)} for case in cases
+        ]
+        partial = not is_catch_all(cases[-1].pattern)
+    else:
+        deltas, partial = split_cases(cases, subject, ctx)
     branches = [
         check_case(case, delta, ctx, returns) for case, delta in zip(cases, deltas)
     ]
     return merge_results(branches + ([ASSIGNS_EMPTY] if partial else []))
 
 
-def falls_through(
-    cases: list[ast.match_case], subject: Type | None, ctx: ModuleContext
-) -> bool:
-    """Whether some value of the scrutinee type matches no case. Where the
-    scrutinee type is unknown, only a catch-all leaves nothing."""
-    if subject is None:
-        return not is_catch_all(cases[-1].pattern)
+def split_cases(
+    cases: list[ast.match_case], subject: Type, ctx: ModuleContext
+) -> tuple[list[VarContext], bool]:
+    """Bindings of each case, taken by splitting the residual, and whether some
+    value of the scrutinee type falls through."""
     seed = shapes(base_type(subject), frozenset(), ctx)
-    return len(residual(cases, 1, seed, ctx)) > 0
+    left = seed
+    deltas: list[VarContext] = []
+    for index, case in enumerate(cases, 1):
+        result = split_shapes(left, case.pattern, ctx)
+        if result is None:
+            raise unmatched(case.pattern, index, subject, seed, ctx)
+        _, left, delta = result
+        deltas.append(delta)
+    return deltas, len(left) > 0
 
 
-def residual(
-    cases: list[ast.match_case],
+def unmatched(
+    p: ast.pattern,
     index: int,
-    left: frozenset[Shape],
+    subject: Type,
+    seed: frozenset[Shape],
     ctx: ModuleContext,
-) -> frozenset[Shape]:
-    """Shapes the cases leave unmatched, rejecting a case that matches none."""
-    if len(cases) == 0:
-        return left
-    matched, rest = split_shapes(left, cases[0].pattern, ctx)
-    if len(matched) == 0:
-        raise IllFormedModule(cases[0].pattern, reasons.CaseMatchesNothing(index))
-    return residual(cases[1:], index + 1, rest, ctx)
+) -> IllFormedModule:
+    """A case matches nothing either because no value of the scrutinee type has
+    its shape, or because the earlier cases have taken every shape it has."""
+    if split_shapes(seed, p, ctx) is None:
+        return IllFormedModule(
+            p, reasons.PatternTypeMismatch(describe(p, ctx), render(subject))
+        )
+    return IllFormedModule(p, reasons.CaseMatchesNothing(index))
 
 
 def check_case(
