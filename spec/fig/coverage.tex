@@ -227,20 +227,22 @@
 {
   \beta(w_1) = k \\
   \Gamma \vdash k, p_1 \splitTo K, L \binding \Delta \\
-  \Gamma \vdash \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{m}}}{N} \mid m \in K}, \patDict{\bind{w_2}{p_2}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', L' \binding \Delta'
+  \Gamma \vdash \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{m}}}{N} \mid m \in K}, \patDict{\bind{w_2}{p_2}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', L' \binding \Delta' \\
+  L^\dagger = \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{k'}}}{N} \mid k' \in L} \cup L'
 }
 {
-  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{k'}}}{N} \mid k' \in L} \cup L' \binding \Delta \override \Delta'
+  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', L^\dagger \binding \Delta \override \Delta'
 }
 \and
 \inferrule*[lab={\ruleName{split-dict-unbound}}]
 {
   w_1 \notin \dom(\beta) \cup N \\
   \Gamma \vdash \shapesOf(\tau, \varnothing), p_1 \splitTo K, L \binding \Delta \\
-  \Gamma \vdash \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{m}}}{N} \mid m \in K}, \patDict{\bind{w_2}{p_2}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', L' \binding \Delta'
+  \Gamma \vdash \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{m}}}{N} \mid m \in K}, \patDict{\bind{w_2}{p_2}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', L' \binding \Delta' \\
+  L^\dagger = \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{k}}}{N} \mid k \in L} \cup L' \cup \set{\shapeDict{\tau}{\beta}{N \cup \set{w_1}}}
 }
 {
-  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', \set{\shapeDict{\tau}{\beta \override \set{\bind{w_1}{k}}}{N} \mid k \in L} \cup L' \cup \set{\shapeDict{\tau}{\beta}{N \cup \set{w_1}}} \binding \Delta \override \Delta'
+  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_{n+1}}{p_{n+1}}} \splitTo K', L^\dagger \binding \Delta \override \Delta'
 }
 \end{mathpar}
 \caption{Pattern $p$ splits shape $k$ into matched shapes $K$ and residual $L$, binding $\Delta$}

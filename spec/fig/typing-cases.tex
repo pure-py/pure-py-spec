@@ -13,9 +13,9 @@
 \and
 \inferrule*[lab={\ruleName{cases-cons}}]
 {
-  \Gamma \vdash L, p \splitTo K, L'' \binding \Delta \\
+  \Gamma \vdash L, p \splitTo K, L^\dagger \binding \Delta \\
   \Gamma \override \Delta; \tau \vdash s : R \\
-  \Gamma; \tau; L'' \vdash \seq{h} : S, L'
+  \Gamma; \tau; L^\dagger \vdash \seq{h} : S, L'
 }
 {
   \Gamma; \tau; L \vdash \exCase{p}{s} \cons \seq{h} : (\Assigns{\Delta} \override R) \merge S, L'
