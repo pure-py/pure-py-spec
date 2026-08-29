@@ -19,7 +19,7 @@
 { \Gamma \vdash \tyList{\tau} }
 \and
 \inferrule*[lab={\ruleName{ty-dict}}]
-{ \bind{\pyinline{dict}}{\predefName}, \bind{\pyinline{str}}{\predefName} \in \Gamma \\ \Gamma \vdash \tau }
+{ \bind{\pyinline{dict}}{\predefName} \in \Gamma \\ \bind{\pyinline{str}}{\predefName} \in \Gamma \\ \Gamma \vdash \tau }
 { \Gamma \vdash \tyDict{\tau} }
 \and
 \inferrule*[lab={\ruleName{ty-tuple}}]
