@@ -31,7 +31,7 @@ Metavariables $x$, $f$, $c$ range over \emph{variables}, simple identifiers what
 \begin{definition}[Context]
 \label{def:context}
 A context $\Gamma$ (or $\Delta$) is a finite map from variables to \emph{context entries} $\theta$, of
-which there are six:
+which there are five:
 
 {\normalfont
 \begin{center}
@@ -39,8 +39,8 @@ which there are six:
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.24\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.45\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Entry & Form & Records \\
-variable & $b \in \B$ & whether variable is definitely assigned \\
-type & $\tau$ & type of definitely assigned variable \\
+variable & $b \in \B$ & whether variable is definitely assigned; typing rules bind its type in place of
+$\statusDefAssigned$ \\
 module stub & $\modStub{q}$ & module $q$, named but not loaded \\
 module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$ \\
 class entry & $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ & declaring context, qualified name,
@@ -51,8 +51,9 @@ predefined name & $\predefName{q.x}$ & member of predefined module, mentioned by
 }
 \end{definition}
 
-\noindent A variable is bound to its definite-assignment status under the well-formedness rules and to its
-type under the typing rules\speconly{ (\secref{types})}, which take the place of $\statusDefAssigned$. Module
+\noindent A variable is bound to its definite-assignment status under the well-formedness rules, and under
+the typing rules\speconly{ (\secref{types})} to its type, which takes the place of
+$\statusDefAssigned$, or to $\statusNotDefAssigned$ where it is not definitely assigned. Module
 references arise from import statements. A class entry records the context the class was declared in, the
 qualified name $q.c$ that identifies it, its distinct fields $\seq{x}$ with their declared types
 $\seq{\tau}$, and its base class $c'$, or $\bot$ where it has none. A module declares each class name at
