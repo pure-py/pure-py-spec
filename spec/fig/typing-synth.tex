@@ -200,7 +200,7 @@
   \capturesE(e) \cap \dom(\Delta) = \varnothing
 }
 {
-  \Gamma \vdash \exListComp{e}{g_1\;\ldots\;g_n} \synth \tyList{\tau}
+  \Gamma \vdash \exListComp{e}{g_1\;\ldots\;g_n} \synth \tyList{\widen(\tau)}
 }
 \and
 \inferrule*[lab={\ruleName{syn-dict-comp}}]
@@ -211,7 +211,7 @@
   (\capturesE(e) \cup \capturesE(e')) \cap \dom(\Delta) = \varnothing
 }
 {
-  \Gamma \vdash \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \synth \tyDict{\tau}
+  \Gamma \vdash \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \synth \tyDict{\widen(\tau)}
 }
 \end{mathpar}
 \caption{Expression synthesis, continued}

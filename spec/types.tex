@@ -138,10 +138,11 @@ syntax-directed and an expression has at most one derivation in each.
 
 The forms with synthesis rules of their own are a tuple when all its components synthesise, a
 comprehension when its body synthesises, and a non-empty list or dictionary when at least one element
-synthesises, the others checking against the join of the base types of those that synthesise, since
+synthesises, the others checking against the join of the base types of those that synthesise (\ruleName{syn-list},
+\ruleName{syn-tuple}, \ruleName{syn-dict}, \ruleName{syn-list-comp}, \ruleName{syn-dict-comp}). A list,
+dictionary or comprehension takes the base type of what its elements or body synthesise, since
 \pyinline{list} and \pyinline{dict} are invariant and a literal element type would keep the container from
-matching any other (\ruleName{syn-list}, \ruleName{syn-tuple},
-\ruleName{syn-dict}, \ruleName{syn-list-comp}, \ruleName{syn-dict-comp}). Each of these forms keeps its checking rule as well. An empty list or dictionary and a lambda have no
+matching any other. Each of these forms keeps its checking rule as well. An empty list or dictionary and a lambda have no
 synthesis rule at all, so checking is the only way to type them. A non-empty list has both, and the
 checking rule is still needed where the expected element type is wider than the one the elements
 synthesise, since \pyinline{list} is invariant.
