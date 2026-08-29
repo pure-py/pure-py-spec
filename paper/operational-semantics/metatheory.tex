@@ -8,10 +8,11 @@ well-formed by construction, and a module loads to an environment that is well-f
 
 \begin{theorem}[Loaded environments are well-formed]
 \label{thm:loaded}
-If $\mathcal{P}(q) = (\rho, \Gamma)$ then $\vdash \rho : \Gamma$. Moreover, if $\vdash_{\mathsf{load}} q : \Gamma$ and
-$q \Rightarrow_{\mathsf{load}} \val{\rho}$ then $\vdash \rho : \Gamma$. In either case
-$\Gamma_{\mathcal{P}} \override \Gamma \vdash \tau$ for every type $\tau$ in an entry of $\Gamma$, where
-$\Gamma_{\mathcal{P}}$ binds every predefined member.
+Write $\Gamma_{\mathcal{P}}$ for the context binding every predefined member.
+If $\vdash_{\mathsf{load}} q : \Gamma$ then $\Gamma_{\mathcal{P}} \override \Gamma \vdash \tau$ for every
+type $\tau$ in an entry of $\Gamma$.
+If $\mathcal{P}(q) = (\rho, \Gamma)$ then $\vdash \rho : \Gamma$.
+If $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \val{\rho}$ then $\vdash \rho : \Gamma$.
 \end{theorem}
 
 \input{paper/fig/well-formed-env}
