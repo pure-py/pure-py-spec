@@ -54,7 +54,7 @@
   \Gamma \vdash k_i : \tau \quad (\forall i)
 }
 {
-  \Gamma \vdash \patList{\seq{k}} : \tyList{\tau}
+  \Gamma \vdash \shapeList{\tau}{\seq{k}} : \tyList{\tau}
 }
 \end{mathpar}
 \subcaption{Shape $k$ denotes values of type $\tau$}
@@ -199,7 +199,7 @@
   \Gamma \vdash (\shapeAny{\tau}{\varnothing}, \ldots, \shapeAny{\tau}{\varnothing}), p_1 \cons \ldots \cons p_n \splitTo K, L
 }
 {
-  \Gamma \vdash \shapeAny{\tyList{\tau}}{N}, \patList{p_1, \ldots, p_n} \splitTo \set{\patList{\seq{m}} \mid \seq{m} \in K}, \set{\patList{\seq{k}} \mid \seq{k} \in L} \cup \shapesOf(\tyList{\tau}, N \cup \set{n})
+  \Gamma \vdash \shapeAny{\tyList{\tau}}{N}, \patList{p_1, \ldots, p_n} \splitTo \set{\shapeList{\tau}{\seq{m}} \mid \seq{m} \in K}, \set{\shapeList{\tau}{\seq{k}} \mid \seq{k} \in L} \cup \shapesOf(\tyList{\tau}, N \cup \set{n})
 }
 \and
 \inferrule*[lab={\ruleName{split-constr}}]
@@ -228,7 +228,7 @@
   \Gamma \vdash \seq{k}, \seq{p} \splitTo K, L
 }
 {
-  \Gamma \vdash \patList{k_1, \ldots, k_n}, \patList{p_1, \ldots, p_n} \splitTo \set{\patList{\seq{m}} \mid \seq{m} \in K}, \set{\patList{\seq{k}\,'} \mid \seq{k}\,' \in L}
+  \Gamma \vdash \shapeList{\tau}{k_1, \ldots, k_n}, \patList{p_1, \ldots, p_n} \splitTo \set{\shapeList{\tau}{\seq{m}} \mid \seq{m} \in K}, \set{\shapeList{\tau}{\seq{k}\,'} \mid \seq{k}\,' \in L}
 }
 \and
 \inferrule*[lab={\ruleName{split-dict-nil}}]

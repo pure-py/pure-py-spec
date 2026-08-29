@@ -220,7 +220,7 @@ denotes a set of values of a type, written $\Gamma \vdash k : \tau$. The form $\
 value of type $\tau$ whose outermost head is not among those in $N$, where $N$ \emph{constructs} $\tau$: its
 elements are subclasses where the type is a class, lengths where it is a list, and literals below the type
 otherwise (\figref{shapes}). The other forms are a literal, a constructor, a tuple, a list and a dictionary, each with shapes in place of
-sub-patterns. The shapes of $\tau$ that remain once the heads in $N$ are excluded are
+sub-patterns. A list shape records its element type as well, which the element shapes do not determine. The shapes of $\tau$ that remain once the heads in $N$ are excluded are
 $\shapesOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape
 carries a union type, since $\shapesOf$ is the only source of the form $\shapeAny{\tau}{N}$ and it splits a
 union into its members. The

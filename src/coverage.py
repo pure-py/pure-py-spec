@@ -61,6 +61,9 @@ class Tuple:
 
 @dataclass(frozen=True)
 class List:
+    """Lists of element type `elem` whose entries have the given shapes."""
+
+    elem: Type
     elems: tuple["Shape", ...]
 
 
@@ -150,10 +153,11 @@ def split_tuple(k: Shape, ps: tuple[ast.pattern, ...], ctx: ModuleContext) -> Sp
 def split_list(k: Shape, ps: tuple[ast.pattern, ...], ctx: ModuleContext) -> Split:
     n = len(ps)
     if isinstance(k, List) and len(k.elems) == n:
-        return wrap(List, split_row(k.elems, ps, ctx))
+        return wrap(lambda r: List(k.elem, r), split_row(k.elems, ps, ctx))
     if isinstance(k, Rest) and isinstance(k.ty, ListType) and n not in k.heads:
-        row = tuple(Rest(k.ty.elem, frozenset()) for _ in ps)
-        matched, left = wrap(List, split_row(row, ps, ctx))
+        elem = k.ty.elem
+        row = tuple(Rest(elem, frozenset()) for _ in ps)
+        matched, left = wrap(lambda r: List(elem, r), split_row(row, ps, ctx))
         return matched, left | shapes(k.ty, k.heads | {n}, ctx)
     return NOTHING, frozenset({k})
 
