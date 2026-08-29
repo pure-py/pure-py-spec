@@ -53,6 +53,7 @@ from patterns import check_pattern_list, describe
 from reasons import IllFormedModule
 from subtyping import elem_type, join, subtype
 from type_syntax import (
+    PRIMITIVE_SPELLINGS,
     CallableType,
     ClassType,
     DictType,
@@ -95,29 +96,27 @@ def parameters(d: ast.FunctionDef) -> VarContext:
     }
 
 
-IMPORTED_SPELLINGS: dict[Primitive, str] = {
-    Primitive.ANY: "Any",
-    Primitive.NEVER: "Never",
-    Primitive.SIZED: "Sized",
-}
-
-
 def well_formed(t: Type, node: ast.AST, ctx: ModuleContext) -> Type:
     """Check that annotation `t` is well-formed: each name it is written with is
-    in scope, a class name bound to a class entry and an imported spelling to the
-    entry its import gives it."""
-    if isinstance(t, Primitive) and t in IMPORTED_SPELLINGS:
-        in_scope(IMPORTED_SPELLINGS[t], node, ctx)
+    in scope, a class name bound to a class entry and every other spelling to the
+    entry its module gives it."""
+    if isinstance(t, Primitive):
+        if t != Primitive.NONE:
+            in_scope(PRIMITIVE_SPELLINGS[t], node, ctx)
     elif isinstance(t, LiteralType):
         in_scope("Literal", node, ctx)
     elif isinstance(t, ClassType):
         if class_of(ctx, t.q) is None:
             raise IllFormedModule(node, reasons.UnknownClassInAnnotation(t.q))
     elif isinstance(t, ListType):
+        in_scope("list", node, ctx)
         well_formed(t.elem, node, ctx)
     elif isinstance(t, DictType):
+        in_scope("dict", node, ctx)
+        in_scope("str", node, ctx)
         well_formed(t.value, node, ctx)
     elif isinstance(t, TupleType):
+        in_scope("tuple", node, ctx)
         for c in t.components:
             well_formed(c, node, ctx)
     elif isinstance(t, CallableType):
@@ -132,9 +131,9 @@ def well_formed(t: Type, node: ast.AST, ctx: ModuleContext) -> Type:
 
 
 def in_scope(x: str, node: ast.AST, ctx: ModuleContext) -> None:
-    """A name an annotation is written with must be bound to its predefined
-    entry, which its import gives it."""
-    if not isinstance(ctx.gamma.get(x), PredefinedName):
+    """A name an annotation is written with must be bound, which for a builtin
+    holds everywhere and for a member of `typing` takes an import."""
+    if x not in ctx.gamma:
         raise IllFormedModule(node, reasons.AnnotationNameNotInScope(x))
 
 
