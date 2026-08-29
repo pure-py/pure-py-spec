@@ -105,6 +105,22 @@ class PatternArityMismatch:
 
 
 @dataclass(frozen=True)
+class UnknownClassInAnnotation:
+    cls: str
+
+    def message(self) -> str:
+        return f"annotation names '{self.cls}', which is not a declared class"
+
+
+@dataclass(frozen=True)
+class DecoratorNotInScope:
+    name: str
+
+    def message(self) -> str:
+        return f"class declaration names '{self.name}', which is not in scope"
+
+
+@dataclass(frozen=True)
 class UnknownClassInPattern:
     cls: str
 
@@ -399,6 +415,8 @@ Reason = (
     | ConstructorArityMismatch
     | PatternArityMismatch
     | UnknownClassInPattern
+    | UnknownClassInAnnotation
+    | DecoratorNotInScope
     | UnknownFieldInPattern
     | DuplicatePatternKeyword
     | UnknownModule

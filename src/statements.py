@@ -61,6 +61,7 @@ from type_syntax import (
     Primitive,
     TupleType,
     Type,
+    UnionType,
     base_type,
     parse_annotation,
     parse_annotations,
@@ -92,6 +93,29 @@ def parameters(d: ast.FunctionDef) -> VarContext:
         a.arg: (Status.TT if a.annotation is None else annotated(a.annotation))
         for a in d.args.args
     }
+
+
+def well_formed(t: Type, node: ast.AST, ctx: ModuleContext) -> Type:
+    """Check that `t` is well-formed: every class name it mentions is bound to a
+    class entry."""
+    if isinstance(t, ClassType):
+        if class_of(ctx, t.q) is None:
+            raise IllFormedModule(node, reasons.UnknownClassInAnnotation(t.q))
+    elif isinstance(t, ListType):
+        well_formed(t.elem, node, ctx)
+    elif isinstance(t, DictType):
+        well_formed(t.value, node, ctx)
+    elif isinstance(t, TupleType):
+        for c in t.components:
+            well_formed(c, node, ctx)
+    elif isinstance(t, CallableType):
+        for param in t.params:
+            well_formed(param, node, ctx)
+        well_formed(t.result, node, ctx)
+    elif isinstance(t, UnionType):
+        well_formed(t.left, node, ctx)
+        well_formed(t.right, node, ctx)
+    return t
 
 
 def annotated(e: ast.expr) -> Type:
@@ -170,6 +194,11 @@ def check_bodies(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
     f_names: VarContext = {d.name: signature(d) for d in defs}
     for d in defs:
         params = parameters(d)
+        for a in d.args.args:
+            assert a.annotation is not None
+            well_formed(annotated(a.annotation), a, ctx)
+        assert d.returns is not None
+        well_formed(annotated(d.returns), d, ctx)
         locals_ = assigns_body(d.body) - set(params)
         delta = f_names | params | {x: Status.FF for x in locals_}
         body_ctx = override_var(ctx, delta)
@@ -228,7 +257,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
         return Assigns({t.id: assigned for t in s.targets if isinstance(t, ast.Name)})
     if isinstance(s, ast.AnnAssign):
         assert s.value is not None
-        declared = annotated_type(s)
+        declared = well_formed(annotated_type(s), s, ctx)
         check_expr(s.value, declared, ctx)
         check_assign_targets([s.target], captures_e(s.value))
         target = s.target
@@ -693,6 +722,10 @@ def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
 def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
     if isinstance(gamma.get(node.name), ClassEntry):
         raise IllFormedModule(node, reasons.DuplicateClassName(node.name, q))
+    if not isinstance(gamma.get("dataclass"), PredefinedName):
+        raise IllFormedModule(node, reasons.DecoratorNotInScope("dataclass"))
+    for _, t in own_fields(node):
+        well_formed(t, node, ModuleContext(gamma=gamma, q=q))
     names = [x for x, _ in own_fields(node)]
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
