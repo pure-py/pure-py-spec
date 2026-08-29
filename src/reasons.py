@@ -325,6 +325,14 @@ class TupleIndexOutOfRange:
 
 
 @dataclass(frozen=True)
+class CaseMatchesNothing:
+    index: int
+
+    def message(self) -> str:
+        return f"case {self.index} matches no value the earlier cases leave"
+
+
+@dataclass(frozen=True)
 class PatternTypeMismatch:
     pattern: str
     ty: str
@@ -395,6 +403,7 @@ Reason = (
     | MissingReturn
     | NotIterable
     | PatternTypeMismatch
+    | CaseMatchesNothing
 )
 
 

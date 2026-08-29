@@ -12,5 +12,3 @@ b = Base(1)
 match b:
     case Base(x):
         print(x)
-    case _:
-        print("other")

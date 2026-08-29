@@ -194,7 +194,9 @@ A \pyinline{match} scrutinee synthesises a type. Both \pyinline{match} rules han
 judgement $\Gamma; \tau; L \vdash \seq{h} \checks \sigma : S, L'$, which checks them in turn,
 requiring each to be reachable and the whole list to exhaust the type. The \emph{residual} $L$ holds the
 values no earlier case has matched, and $L'$ those still unmatched once these cases are done. The judgement
-starts from $\shapesOf(\sigma, \varnothing)$, which denotes every value of type $\sigma$. Checking a case checks its pattern
+starts from $\shapesOf(\widen(\sigma), \varnothing)$, which denotes every value of the scrutinee's base
+type. Taking the base type keeps a literal case from exhausting the scrutinee on its own, so a
+\pyinline{match} on \pyinline{42} with a case for \pyinline{42} still admits a catch-all. Checking a case checks its pattern
 against the scrutinee's type, which binds each variable at the type of the value it is matched against
 (\figref{typing-pat}). A constructor pattern requires its class and the scrutinee's type to be comparable,
 since a pattern for a base class matches a value of any class derived from it. A pattern checks against a

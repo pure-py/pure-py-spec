@@ -15,8 +15,6 @@ def describe(v: Left | Right) -> int:
             return a
         case Right(b):
             return b
-        case _:
-            return 0
 
 print(describe(Left(1)))
 print(describe(Right(2)))

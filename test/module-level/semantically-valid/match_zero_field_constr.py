@@ -7,5 +7,3 @@ e = Empty()
 match e:
     case Empty():
         print("empty")
-    case _:
-        print("other")

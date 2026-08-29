@@ -15,8 +15,6 @@ def describe(v: Base) -> int:
             return b
         case Base(a):
             return a
-        case _:
-            return 0
 
 print(describe(Derived(1, 2)))
 print(describe(Base(3)))

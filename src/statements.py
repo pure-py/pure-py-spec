@@ -46,6 +46,7 @@ from contexts import (
     short_name,
     var_type,
 )
+from coverage import Shape, shapes, split_shapes
 from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
 from patterns import check_pattern_against, check_pattern_list, is_catch_all
 from reasons import IllFormedModule
@@ -274,21 +275,48 @@ def check_match_cases(
     ctx: ModuleContext,
     returns: Type | None,
 ) -> ResultType:
-    branches = [check_case(case, subject, ctx, returns) for case in cases]
-    if not is_catch_all(cases[-1].pattern):
-        branches.append(ASSIGNS_EMPTY)
-    return merge_results(branches)
+    deltas = [check_pattern_against(case.pattern, subject, ctx) for case in cases]
+    partial = falls_through(cases, subject, ctx)
+    branches = [
+        check_case(case, delta, ctx, returns) for case, delta in zip(cases, deltas)
+    ]
+    return merge_results(branches + ([ASSIGNS_EMPTY] if partial else []))
+
+
+def falls_through(
+    cases: list[ast.match_case], subject: Type | None, ctx: ModuleContext
+) -> bool:
+    """Whether some value of the scrutinee type matches no case. Where the
+    scrutinee type is unknown, only a catch-all leaves nothing."""
+    if subject is None:
+        return not is_catch_all(cases[-1].pattern)
+    seed = shapes(base_type(subject), frozenset(), ctx)
+    return len(residual(cases, 1, seed, ctx)) > 0
+
+
+def residual(
+    cases: list[ast.match_case],
+    index: int,
+    left: frozenset[Shape],
+    ctx: ModuleContext,
+) -> frozenset[Shape]:
+    """Shapes the cases leave unmatched, rejecting a case that matches none."""
+    if len(cases) == 0:
+        return left
+    matched, rest = split_shapes(left, cases[0].pattern, ctx)
+    if len(matched) == 0:
+        raise IllFormedModule(cases[0].pattern, reasons.CaseMatchesNothing(index))
+    return residual(cases[1:], index + 1, rest, ctx)
 
 
 def check_case(
     case: ast.match_case,
-    subject: Type | None,
+    delta: VarContext,
     ctx: ModuleContext,
     returns: Type | None,
 ) -> ResultType:
-    """Result of one case: its pattern checks against the scrutinee type, and
-    its body is checked under the bindings that gives."""
-    delta = check_pattern_against(case.pattern, subject, ctx)
+    """Result of one case, whose body is checked under the bindings its pattern
+    gives."""
     return override_results(
         Assigns(delta), check_body(case.body, override_var(ctx, delta), returns)
     )

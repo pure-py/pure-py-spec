@@ -16,5 +16,3 @@ v = C(1, 2, 3)
 match v:
     case A(x):  # matches: C derives from A via B
         print(x)
-    case _:
-        print("other")

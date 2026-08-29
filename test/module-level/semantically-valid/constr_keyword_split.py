@@ -10,8 +10,6 @@ def sum_of(p: P) -> int:
     match p:
         case P(a, b):
             return a + b
-        case _:
-            return 0
 
 print(sum_of(P(1, 2)))
 print(sum_of(P(1, y=2)))
