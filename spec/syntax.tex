@@ -112,62 +112,46 @@ definitions that follow, as is the name $q$ of the enclosing module in the rules
 \begin{definition}[Predefined contexts and environments]
 \label{def:predefined}
 $\mathcal{P}$ takes each module $q$ of \figref{predefined} to a pair $(\rho, \Gamma)$, where $\rho$ binds
-$\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member listed for $q$ in \figref{predefined} to its value
-(\figref{predefined-values}),
-and $\Gamma$ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type listed for it, or at
-$\statusDefAssigned$ where the figure lists none.
+$\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member listed for $q$ in \figref{predefined} to its value,
+and $\Gamma$ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type
+\figref{predefined-types} lists for it, or at $\statusDefAssigned$ where that figure lists none.
 \end{definition}
 
 \begin{figure}
 \small
 \centering
-\begin{tabular}{lll}
+\begin{tabular}{llll}
 \arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}Module & Member & Type \\
-\textup{\pyinline{builtins}} & \pyinline{print} & $\tyCallable{\tyObject}{\tyNone}$ \\
- & \pyinline{len} & $\tyCallable{\tySized}{\tyInt}$ \\
- & \pyinline{range} & $\tyCallable{\tyInt}{\tyList{\tyInt}}$ \\
-\pyinline{math} & \pyinline{pi} & $\tyFloat$ \\
- & \pyinline{e} & $\tyFloat$ \\
- & \pyinline{sqrt} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
- & \pyinline{exp} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
- & \pyinline{log} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
- & \pyinline{sin} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
- & \pyinline{cos} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
- & \pyinline{tan} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
- & \pyinline{floor} & $\tyCallable{\tyFloat}{\tyInt}$ \\
- & \pyinline{ceil} & $\tyCallable{\tyFloat}{\tyInt}$ \\
-\pyinline{sys} & \pyinline{argv} & $\tyList{\tyStr}$ \\
- & \pyinline{exit} & $\tyCallable{\tyInt}{\tyNever}$ \\
-\pyinline{typing} & \pyinline{Any} & \\
- & \pyinline{Callable} & \\
- & \pyinline{Sized} & \\
-\pyinline{dataclasses} & \pyinline{dataclass} &
+\rowcolor{grammarheadcolor}Module & Member & \multicolumn{2}{l}{Value} \\
+\textup{\pyinline{builtins}} & \pyinline{print} & & \\
+ & \pyinline{len} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
+ & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
+ & & $\quad \primFn(\seq{u}) = \aborts{\errType}$ & (otherwise) \\
+ & \pyinline{range} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
+ & & $\quad \primFn(v) = \val{\exList{0, \ldots, v-1}}$ & if $v$ an integer, $v > 0$ \\
+ & & $\quad \primFn(v) = \val{\exList{}}$ & if $v$ an integer, $v \leq 0$ \\
+\pyinline{math} & \pyinline{pi} & & \\
+ & \pyinline{e} & & \\
+ & \pyinline{sqrt} & & \\
+ & \pyinline{exp} & & \\
+ & \pyinline{log} & & \\
+ & \pyinline{sin} & & \\
+ & \pyinline{cos} & & \\
+ & \pyinline{tan} & & \\
+ & \pyinline{floor} & & \\
+ & \pyinline{ceil} & & \\
+\pyinline{sys} & \pyinline{argv} & & \\
+ & \pyinline{exit} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
+ & & $\quad \primFn(\varepsilon) = \aborts{\errExit{0}}$ & \\
+ & & $\quad \primFn(n) = \aborts{\errExit{n}}$ & \\
+\pyinline{typing} & \pyinline{Any} & & \\
+ & \pyinline{Callable} & & \\
+ & \pyinline{Sized} & & \\
+\pyinline{dataclasses} & \pyinline{dataclass} & &
 \end{tabular}
 
 \caption{Predefined modules and their members}
 \label{fig:predefined}
-\end{figure}
-
-\begin{figure}
-\small
-\centering
-\begin{tabular}{lll}
-\arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}Member & \multicolumn{2}{l}{Value} \\
-\pyinline{len} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
- & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
- & $\quad \primFn(\seq{u}) = \aborts{\errType}$ & otherwise \\
-\pyinline{range} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
- & $\quad \primFn(v) = \val{\exList{0, \ldots, v-1}}$ & if $v$ an integer, $v > 0$ \\
- & $\quad \primFn(v) = \val{\exList{}}$ & if $v$ an integer, $v \leq 0$ \\
-\pyinline{exit} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
- & $\quad \primFn(\varepsilon) = \aborts{\errExit{0}}$ & \\
- & $\quad \primFn(n) = \aborts{\errExit{n}}$ &
-\end{tabular}
-
-\caption{Values of the predefined functions}
-\label{fig:predefined-values}
 \end{figure}
 
 Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' = q.q^\dagger$ for some $q^\dagger$, and $\properPrefixOf$ for

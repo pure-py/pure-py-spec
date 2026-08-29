@@ -70,7 +70,7 @@ type of each field it introduces, and $\fields(C)$ is the bindings of all its fi
 class first. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises $q$ as a class type (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must synthesise a class $q$, and
 $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the class entry $C$ that $q$ resolves to
-(\ruleName{attr-object}). A member of a predefined module has the type \figref{predefined} lists for it, so
+(\ruleName{attr-object}). A member of a predefined module has the type \figref{predefined-types} lists for it, so
 \pyinline{len} takes a \pyinline{Sized} and \pyinline{print} one argument of any type; a member listed with
 no type, such as \pyinline{Callable}, is a name for annotations and has no use as a value. Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
 signature $\ominus : \sigma \to \tau$, relating operand types to result type
@@ -106,6 +106,8 @@ is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and an
 \pyinline{int} gives the union of the component types (\ruleName{subscript-tuple-int}). A negated numeric
 literal synthesises the negated literal type (\ruleName{unop-literal}), and \ruleName{unop} excludes that
 form, to keep the judgement deterministic.
+
+\input{spec/fig/predefined-types}
 
 \input{spec/fig/operator-signatures}
 

@@ -1,0 +1,30 @@
+\begin{figure}
+\small
+\centering
+\begin{tabular}{lll}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Module & Member & Type \\
+\textup{\pyinline{builtins}} & \pyinline{print} & $\tyCallable{\tyObject}{\tyNone}$ \\
+ & \pyinline{len} & $\tyCallable{\tySized}{\tyInt}$ \\
+ & \pyinline{range} & $\tyCallable{\tyInt}{\tyList{\tyInt}}$ \\
+\pyinline{math} & \pyinline{pi} & $\tyFloat$ \\
+ & \pyinline{e} & $\tyFloat$ \\
+ & \pyinline{sqrt} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
+ & \pyinline{exp} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
+ & \pyinline{log} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
+ & \pyinline{sin} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
+ & \pyinline{cos} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
+ & \pyinline{tan} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
+ & \pyinline{floor} & $\tyCallable{\tyFloat}{\tyInt}$ \\
+ & \pyinline{ceil} & $\tyCallable{\tyFloat}{\tyInt}$ \\
+\pyinline{sys} & \pyinline{argv} & $\tyList{\tyStr}$ \\
+ & \pyinline{exit} & $\tyCallable{\tyInt}{\tyNever}$ \\
+\pyinline{typing} & \pyinline{Any} & \\
+ & \pyinline{Callable} & \\
+ & \pyinline{Sized} & \\
+\pyinline{dataclasses} & \pyinline{dataclass} &
+\end{tabular}
+
+\caption{Types of the predefined members}
+\label{fig:predefined-types}
+\end{figure}
