@@ -110,7 +110,7 @@ PREDEFINED_MEMBERS: dict[str, dict[str, VarEntry]] = {
     "builtins": {
         "print": CallableType((Primitive.OBJECT,), Primitive.NONE),
         "len": CallableType((Primitive.SIZED,), Primitive.INT),
-        "range": CallableType((Primitive.INT,), ListType(Primitive.INT)),
+        "range": CallableType((Primitive.INT,), Primitive.RANGE),
     },
     "math": {
         "pi": Primitive.FLOAT,

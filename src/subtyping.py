@@ -40,7 +40,10 @@ def subtype(s: Type, t: Type, ctx: ModuleContext) -> bool:
     if isinstance(t, UnionType):
         return subtype(s, t.left, ctx) or subtype(s, t.right, ctx)
     if t == Primitive.SIZED:
-        return isinstance(s, (ListType, DictType, TupleType)) or s == Primitive.STR
+        return isinstance(s, (ListType, DictType, TupleType)) or s in (
+            Primitive.STR,
+            Primitive.RANGE,
+        )
     if isinstance(s, ClassType) and isinstance(t, ClassType):
         return t.q in ancestor_names(s.q, ctx)
     if isinstance(s, TupleType) and isinstance(t, TupleType):
@@ -65,6 +68,8 @@ def elem_type(t: Type, ctx: ModuleContext) -> Type | None:
         return t.elem
     if t == Primitive.STR:
         return Primitive.STR
+    if t == Primitive.RANGE:
+        return Primitive.INT
     if isinstance(t, DictType):
         return Primitive.STR
     if isinstance(t, TupleType):
