@@ -70,12 +70,11 @@ type of each field it introduces, and $\fields(C)$ is the bindings of all its fi
 class first. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises $q$ as a class type (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must synthesise a class $q$, and
 $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the class entry $C$ that $q$ resolves to
-(\ruleName{attr-object}). Typing a program refines the context of a predefined module
-(Definition~\ref{def:predefined}), binding $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type
+(\ruleName{attr-object}). Typing a program refines the signature of a predefined module
+(Definition~\ref{def:predefined}), binding $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the entry
 listed for it in \figref{predefined-types}, so \pyinline{len} takes a \pyinline{Sized} and \pyinline{print}
-one argument of any type. A member the figure omits, such as \pyinline{Callable}, keeps the entry
-$\predefName{q.x}$ that Definition~\ref{def:predefined} gives it, so it is not a variable and no rule takes
-it for one. Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
+one argument of any type, while \pyinline{Callable} and the other three names that no expression may
+mention keep the entry $\predefName{q.x}$. Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
 signature $\ominus : \sigma \to \tau$, relating operand types to result type
 (\figref{operator-signatures}). A
 signature with type variables stands for all its instances, which agree on the result type; a variable binds

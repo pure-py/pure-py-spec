@@ -3,7 +3,7 @@
 \centering
 \begin{tabular}{lll}
 \arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}Module & Member & Type \\
+\rowcolor{grammarheadcolor}Module & Member & Entry \\
 \textup{\pyinline{builtins}} & \pyinline{print} & $\tyCallable{\tyObject}{\tyNone}$ \\
  & \pyinline{len} & $\tyCallable{\tySized}{\tyInt}$ \\
  & \pyinline{range} & $\tyCallable{\tyInt}{\tyRange}$ \\
@@ -18,9 +18,13 @@
  & \pyinline{floor} & $\tyCallable{\tyFloat}{\tyInt}$ \\
  & \pyinline{ceil} & $\tyCallable{\tyFloat}{\tyInt}$ \\
 \pyinline{sys} & \pyinline{argv} & $\tyList{\tyStr}$ \\
- & \pyinline{exit} & $\tyCallable{\tyInt}{\tyNever}$
+ & \pyinline{exit} & $\tyCallable{\tyInt}{\tyNever}$ \\
+\pyinline{typing} & \pyinline{Any} & $\predefName{\pyinline{typing}.\pyinline{Any}}$ \\
+ & \pyinline{Callable} & $\predefName{\pyinline{typing}.\pyinline{Callable}}$ \\
+ & \pyinline{Sized} & $\predefName{\pyinline{typing}.\pyinline{Sized}}$ \\
+\pyinline{dataclasses} & \pyinline{dataclass} & $\predefName{\pyinline{dataclasses}.\pyinline{dataclass}}$
 \end{tabular}
 
-\caption{Types of the predefined members}
+\caption{Signature of each predefined module}
 \label{fig:predefined-types}
 \end{figure}
