@@ -39,8 +39,7 @@ when either is a subtype of the other. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. A sequence of types joins by
 joining the first with the join of the rest, with \pyinline{Never} as the unit (\secref{types-auxiliary}).
 So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
-joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$. The \emph{alternatives} of a
-type are the alternatives of a union's operands, and the type itself otherwise.
+joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.
 
 \input{spec/fig/subtyping}
 
@@ -227,11 +226,6 @@ The functions used by the rules of this \seckind{}, each defined by its cases.
 \begin{auxfunction}{\joinTy(\sigma, \tau), \joinTy(\seq{\tau})}{type}{aux:join}
 \input{spec/functions/join-text}
 \funcrows{join}
-\end{auxfunction}
-
-\begin{auxfunction}{\altsOf(\tau)}{set of types}{aux:alts}
-\input{spec/functions/alts-text}
-\funcrows{alts}
 \end{auxfunction}
 
 \begin{auxfunction}{\elemTy(\tau)}{type}{aux:elem-type}
