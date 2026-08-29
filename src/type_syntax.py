@@ -212,9 +212,3 @@ def parse_annotations(es: Sequence[ast.expr]) -> tuple[Type, ...] | None:
 def union(s: Type | None, t: Type | None) -> Type | None:
     return None if s is None or t is None else UnionType(s, t)
 
-
-def alts(t: Type) -> tuple[Type, ...]:
-    """The alternatives of a type: a union's operands, or the type itself."""
-    if isinstance(t, UnionType):
-        return alts(t.left) + alts(t.right)
-    return (t,)

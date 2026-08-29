@@ -10,7 +10,6 @@ from type_syntax import (
     TupleType,
     Type,
     UnionType,
-    alts,
     base_type,
 )
 
@@ -37,9 +36,9 @@ def subtype(s: Type, t: Type, ctx: ModuleContext) -> bool:
     if isinstance(s, LiteralType):
         return subtype(base_type(s.value), t, ctx)
     if isinstance(s, UnionType):
-        return all(subtype(m, t, ctx) for m in alts(s))
+        return subtype(s.left, t, ctx) and subtype(s.right, t, ctx)
     if isinstance(t, UnionType):
-        return any(subtype(s, m, ctx) for m in alts(t))
+        return subtype(s, t.left, ctx) or subtype(s, t.right, ctx)
     if isinstance(s, ClassType) and isinstance(t, ClassType):
         return t.q in ancestor_names(s.q, ctx)
     if isinstance(s, TupleType) and isinstance(t, TupleType):
