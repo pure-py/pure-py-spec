@@ -14,7 +14,8 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\modStub{q}$ & (ModuleStub) \\
     & $\mid$ & $\modLoaded{q}{\rho}$ & (LoadedModule) \\
     & $\mid$ & $\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}$ & (Class) \\
-    & $\mid$ & $\primVal{\primFn}$ & (Primitive)
+    & $\mid$ & $\primVal{\primFn}$ & (Primitive) \\
+    & $\mid$ & $\opaqueVal{q.x}$ & (Opaque)
    \\[3mm]
 \grammarGroup{Environments} \\
 $\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & 

@@ -134,7 +134,8 @@ definitions that follow, as is the name $q$ of the enclosing module in the rules
 \label{def:predefined}
 $\mathcal{P}$ takes each module $q$ of \figref{predefined} to a pair $(\rho, \Gamma)$, where $\rho$ binds
 $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member listed for $q$ in \figref{predefined} to its value,
-and $\Gamma$ binds the same variables at $\statusDefAssigned$.
+and $\Gamma$ binds the same variables at $\statusDefAssigned$, except those whose value is opaque, which
+it binds at $\predefName{q.x}$.
 \end{definition}
 
 \begin{figure}
@@ -146,7 +147,7 @@ and $\Gamma$ binds the same variables at $\statusDefAssigned$.
 \textup{\pyinline{builtins}} & \pyinline{print} & & \\
  & \pyinline{len} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
  & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
- & & $\quad \primFn(\seq{u}) = \aborts{\errType}$ & (otherwise) \\
+ & & $\quad \primFn(\seq{u}) = \aborts{\errType}$ & otherwise \\
  & \pyinline{range} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
  & & $\quad \primFn(n) = \val{\valRange{n}}$ & \\
 \pyinline{math} & \pyinline{pi} & & \\
@@ -163,10 +164,10 @@ and $\Gamma$ binds the same variables at $\statusDefAssigned$.
  & \pyinline{exit} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
  & & $\quad \primFn(\varepsilon) = \aborts{\errExit{0}}$ & \\
  & & $\quad \primFn(n) = \aborts{\errExit{n}}$ & \\
-\pyinline{typing} & \pyinline{Any} & & \\
- & \pyinline{Callable} & & \\
- & \pyinline{Sized} & & \\
-\pyinline{dataclasses} & \pyinline{dataclass} & &
+\pyinline{typing} & \pyinline{Any} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Any}}$} \\
+ & \pyinline{Callable} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Callable}}$} \\
+ & \pyinline{Sized} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Sized}}$} \\
+\pyinline{dataclasses} & \pyinline{dataclass} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{dataclasses}.\pyinline{dataclass}}$}
 \end{tabular}
 
 \caption{Predefined modules and their members}
