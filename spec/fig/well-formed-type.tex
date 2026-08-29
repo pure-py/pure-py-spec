@@ -7,7 +7,7 @@
 { \Gamma \vdash \tau }
 \and
 \inferrule*[lab={\ruleName{ty-class}}]
-{ \Gamma(q) \text{ a class entry} }
+{ \Gamma \vdash q : C }
 { \Gamma \vdash q }
 \and
 \inferrule*[lab={\ruleName{ty-literal}}]
