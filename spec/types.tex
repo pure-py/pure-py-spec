@@ -204,10 +204,10 @@ shape $\beta$ gives it, and hold no key of $N$. A dictionary pattern is taken on
 (\ruleName{split-dict-bound}, \ruleName{split-dict-unbound}). A key already in $\beta$ splits the shape
 recorded for it, and a key in neither $\beta$ nor $N$ splits the value type, adding to the residual the
 dictionaries that lack the key. The empty pattern matches every dictionary and leaves nothing, so it alone
-exhausts a dictionary type (\ruleName{split-dict-nil}). Splitting is strictly sharper than comparing
-patterns pairwise: over $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
-$\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ are
-exhaustive, although no one of them subsumes what a further case would match.
+exhausts a dictionary type (\ruleName{split-dict-nil}). Exhaustiveness need not come from a catch-all: over
+$\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
+$\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave nothing,
+although each covers only part of the type.
 
 \input{spec/fig/coverage}
 
