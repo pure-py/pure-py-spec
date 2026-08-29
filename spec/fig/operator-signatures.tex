@@ -4,7 +4,7 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.37\textwidth}>{\raggedright\arraybackslash}p{0.32\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}$\odot$ & Signature & Condition \\
-\pyinline{==}\quad\pyinline{!=} & $(\sigma, \sigma') \to \tyBool$ & $\forall \sigma, \sigma'$ comparable, both equality types \\
+\pyinline{==}\quad\pyinline{!=} & $(\sigma, \sigma') \to \tyBool$ & $\forall \sigma, \sigma'$ comparable equality types \\
 \pyinline{in}\quad\pyinline{not in} & $(\sigma, \tyList{\tau}) \to \tyBool$ & $\forall \sigma, \tau$ comparable \\
  & $(\sigma, \tyTuple{\seq{\tau}}) \to \tyBool$ & $\forall \sigma, \seq{\tau}$ with $\sigma$, $\joinTy(\seq{\tau})$ comparable \\
  & $(\tyStr, \tyStr) \to \tyBool$ & \\
