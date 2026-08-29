@@ -178,7 +178,8 @@
   \tau, q \text{ comparable} \\
   \Gamma \vdash q : C \\
   \fields(C) = \bind{\seq{x}}{\seq{\sigma}} \\
-  \Gamma \vdash (\shapeAny{\sigma_1}{\varnothing}, \ldots, \shapeAny{\sigma_n}{\varnothing}), (\fieldMap(C, a)(x_1), \ldots, \fieldMap(C, a)(x_n)) \splitTo K, L
+  p_i = \fieldMap(C, a)(x_i) \quad (\forall i) \\
+  \Gamma \vdash (\shapeAny{\sigma_1}{\varnothing}, \ldots, \shapeAny{\sigma_n}{\varnothing}), \seq{p} \splitTo K, L
 }
 {
   \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \splitTo \set{\patConstr{q}{\seq{m}} \mid \seq{m} \in K}, \set{\patConstr{q}{\seq{k}} \mid \seq{k} \in L} \cup \shapesOf(\tau, N \cup \set{q})
@@ -206,7 +207,8 @@
   \Gamma \vdash q \subty q' \\
   \Gamma \vdash q' : C \\
   \fields(C) = \bind{\seq{x}}{\seq{\sigma}} \\
-  \seq{p} = (\fieldMap(C, a)(x_1), \ldots, \fieldMap(C, a)(x_n)) \text{ padded with } \patWild \text{ to the length of } \seq{k} \\
+  p_i = \fieldMap(C, a)(x_i) \quad (\forall i \leq n) \\
+  p_i = \patWild \quad (\forall i > n) \\
   \Gamma \vdash \seq{k}, \seq{p} \splitTo K, L
 }
 {
