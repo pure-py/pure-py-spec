@@ -145,7 +145,10 @@ unchanged. A \pyinline{return} checks its expression against $\tau$, and a bare
 \pyinline{return} requires \pyinline{None} to be a subtype of $\tau$. An annotated assignment takes its type
 from the annotation and checks the expression against it, and an unannotated assignment takes the type the
 expression synthesises (\ruleName{assign}, \ruleName{assign-unannot}). The conditions of \pyinline{if} and \pyinline{assert}
-check against \pyinline{bool}, and an assertion message against \pyinline{str}.
+check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
+the class name to its entry, requiring that name to be unbound and the class's own fields to be distinct,
+and, where it extends another class, that class to be bound and the own fields not to repeat an inherited
+one (\ruleName{class}, \ruleName{class-extend}).
 
 A function definition binds its parameters at their annotated types and its own name, and the names of the
 mutual region it belongs to, at the corresponding $\pyinline{Callable}$ type; variables assigned in the body start

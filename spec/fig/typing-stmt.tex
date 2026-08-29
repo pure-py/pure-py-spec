@@ -127,6 +127,28 @@
 {
   \Gamma; \tau \vdash \exMatch{e}{\seq{h}} : S \merge \Assigns{\varnothing}
 }
+\and
+\inferrule*[lab={\ruleName{class}}]
+{
+  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
+  \ownFields(\phi) = \bind{\seq{x}}{\seq{\sigma}}, \; \seq{x} \text{ distinct} \\
+  C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}
+}
+{
+  \Gamma; \tau \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{C}}}
+}
+\and
+\inferrule*[lab={\ruleName{class-extend}}]
+{
+  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
+  \bind{c'}{\clsEntry{\Gamma'}{q.c'}{\seq{y}}{c^\dagger}} \in \Gamma \\
+  \ownFields(\phi) = \bind{\seq{x}}{\seq{\sigma}}, \; \seq{x} \text{ distinct} \\
+  \seq{x} \cap \dom(\fields(\Gamma(c'))) = \varnothing \\
+  C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{c'}
+}
+{
+  \Gamma; \tau \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{C}}}
+}
 \end{mathpar}
 \caption{Statement $t$ has result type $R$ in $\Gamma$, within function returning $\tau$}
 \label{fig:typing-stmt}
