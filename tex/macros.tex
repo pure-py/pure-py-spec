@@ -272,5 +272,11 @@
     {\bfseries $#1$}\hfill{\itshape #2}}}\par\nobreak\vspace{2mm}\noindent\ignorespaces}
   {\par\addvspace{\bigskipamount}}
 
+% Rows defining an auxiliary function, from spec/functions. Uniform row height: a negative
+% \lineskiplimit stops TeX adding interline glue for a taller row, such as one carrying an accent.
+\newcommand*{\funcrows}[1]{%
+  \begingroup\lineskiplimit=-\baselineskip
+  \begin{align*}\input{spec/functions/#1}\end{align*}\endgroup}
+
 \newcommand*{\grammarGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{4}{l}{#1}}
 \newcommand*{\metaGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{#1}}
