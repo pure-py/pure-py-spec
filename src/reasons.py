@@ -113,6 +113,14 @@ class UnknownClassInAnnotation:
 
 
 @dataclass(frozen=True)
+class AnnotationNameNotInScope:
+    name: str
+
+    def message(self) -> str:
+        return f"annotation names '{self.name}', which is not in scope"
+
+
+@dataclass(frozen=True)
 class DecoratorNotInScope:
     name: str
 
@@ -416,6 +424,7 @@ Reason = (
     | PatternArityMismatch
     | UnknownClassInPattern
     | UnknownClassInAnnotation
+    | AnnotationNameNotInScope
     | DecoratorNotInScope
     | UnknownFieldInPattern
     | DuplicatePatternKeyword

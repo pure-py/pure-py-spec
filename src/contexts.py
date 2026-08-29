@@ -148,6 +148,8 @@ PREDEFINED_MEMBERS: dict[str, dict[str, ContextEntry]] = {
     "typing": {
         "Any": PredefinedName(),
         "Callable": PredefinedName(),
+        "Literal": PredefinedName(),
+        "Never": PredefinedName(),
         "Sized": PredefinedName(),
     },
     "dataclasses": {"dataclass": PredefinedName()},

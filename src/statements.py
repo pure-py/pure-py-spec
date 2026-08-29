@@ -95,10 +95,22 @@ def parameters(d: ast.FunctionDef) -> VarContext:
     }
 
 
+IMPORTED_SPELLINGS: dict[Primitive, str] = {
+    Primitive.ANY: "Any",
+    Primitive.NEVER: "Never",
+    Primitive.SIZED: "Sized",
+}
+
+
 def well_formed(t: Type, node: ast.AST, ctx: ModuleContext) -> Type:
-    """Check that `t` is well-formed: every class name it mentions is bound to a
-    class entry."""
-    if isinstance(t, ClassType):
+    """Check that annotation `t` is well-formed: each name it is written with is
+    in scope, a class name bound to a class entry and an imported spelling to the
+    entry its import gives it."""
+    if isinstance(t, Primitive) and t in IMPORTED_SPELLINGS:
+        in_scope(IMPORTED_SPELLINGS[t], node, ctx)
+    elif isinstance(t, LiteralType):
+        in_scope("Literal", node, ctx)
+    elif isinstance(t, ClassType):
         if class_of(ctx, t.q) is None:
             raise IllFormedModule(node, reasons.UnknownClassInAnnotation(t.q))
     elif isinstance(t, ListType):
@@ -109,6 +121,7 @@ def well_formed(t: Type, node: ast.AST, ctx: ModuleContext) -> Type:
         for c in t.components:
             well_formed(c, node, ctx)
     elif isinstance(t, CallableType):
+        in_scope("Callable", node, ctx)
         for param in t.params:
             well_formed(param, node, ctx)
         well_formed(t.result, node, ctx)
@@ -116,6 +129,13 @@ def well_formed(t: Type, node: ast.AST, ctx: ModuleContext) -> Type:
         well_formed(t.left, node, ctx)
         well_formed(t.right, node, ctx)
     return t
+
+
+def in_scope(x: str, node: ast.AST, ctx: ModuleContext) -> None:
+    """A name an annotation is written with must be bound to its predefined
+    entry, which its import gives it."""
+    if not isinstance(ctx.gamma.get(x), PredefinedName):
+        raise IllFormedModule(node, reasons.AnnotationNameNotInScope(x))
 
 
 def annotated(e: ast.expr) -> Type:

@@ -2,13 +2,21 @@
 \flushleft \shadebox{$\Gamma \vdash \tau$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{ty-prim}}]
-{ \tau \text{ primitive or literal type} }
+\inferrule*[lab={\ruleName{ty-builtin}}]
+{ \tau \in \set{\tyObject, \tyBool, \tyInt, \tyFloat, \tyStr, \tyNone, \tyRange} }
+{ \Gamma \vdash \tau }
+\and
+\inferrule*[lab={\ruleName{ty-imported}}]
+{ \tau \in \set{\tyAny, \tyNever, \tySized} \\ \bind{\tau}{\predefName} \in \Gamma }
 { \Gamma \vdash \tau }
 \and
 \inferrule*[lab={\ruleName{ty-class}}]
 { \Gamma(q) \text{ a class entry} }
 { \Gamma \vdash q }
+\and
+\inferrule*[lab={\ruleName{ty-literal}}]
+{ \bind{\pyinline{Literal}}{\predefName} \in \Gamma }
+{ \Gamma \vdash \tyLiteral{\ell} }
 \and
 \inferrule*[lab={\ruleName{ty-list}}]
 { \Gamma \vdash \tau }
@@ -23,13 +31,13 @@
 { \Gamma \vdash \tyTuple{\seq{\tau}} }
 \and
 \inferrule*[lab={\ruleName{ty-callable}}]
-{ \Gamma \vdash \sigma_i \quad (\forall i) \\ \Gamma \vdash \tau }
+{ \bind{\pyinline{Callable}}{\predefName} \in \Gamma \\ \Gamma \vdash \sigma_i \quad (\forall i) \\ \Gamma \vdash \tau }
 { \Gamma \vdash \tyCallable{\seq{\sigma}}{\tau} }
 \and
 \inferrule*[lab={\ruleName{ty-union}}]
 { \Gamma \vdash \sigma \\ \Gamma \vdash \tau }
 { \Gamma \vdash \tyUnion{\sigma}{\tau} }
 \end{mathpar}
-\caption{Type $\tau$ is well-formed in $\Gamma$}
+\caption{Annotation $\tau$ is well-formed in $\Gamma$}
 \label{fig:well-formed-type}
 \end{figure}
