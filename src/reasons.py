@@ -247,6 +247,15 @@ class OwnDescendantImport:
 
 
 @dataclass(frozen=True)
+class PredefinedNameAsValue:
+    name: str
+    q: str
+
+    def message(self) -> str:
+        return f"'{self.name}' is a name of module '{self.q}'; it is not a value"
+
+
+@dataclass(frozen=True)
 class ClassAsValue:
     name: str
 
@@ -397,6 +406,7 @@ Reason = (
     | UnknownMember
     | ModuleAsValue
     | ClassAsValue
+    | PredefinedNameAsValue
     | UnknownConstructorKeyword
     | DuplicateDictKey
     | NonlinearPattern

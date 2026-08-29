@@ -15,7 +15,7 @@ class Status(Enum):
 # assigned but not yet typed, and Status.FF where it is not definitely assigned.
 # Lazily evaluated, so these may name ClassEntry before it is defined.
 type VarEntry = Status | Type
-type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | ClassEntry
+type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | ClassEntry | PredefinedName
 type Context = dict[str, ContextEntry]
 type VarContext = dict[str, VarEntry]
 
@@ -26,6 +26,15 @@ class ClassEntry:
     name: str
     own_fields: tuple[tuple[str, Type], ...]
     base: str | None
+
+
+@dataclass(frozen=True)
+class PredefinedName:
+    """Member of a predefined module that is not a value: it names a type, heads
+    a type form, or decorates a class declaration."""
+
+    q: str
+    x: str
 
 
 @dataclass(frozen=True)
@@ -58,7 +67,7 @@ def var_entry(ctx: ModuleContext, x: str) -> VarEntry | None:
     v = ctx.gamma.get(x)
     return (
         None
-        if v is None or isinstance(v, (ModuleStub, ModuleLoaded, ClassEntry))
+        if v is None or isinstance(v, (ModuleStub, ModuleLoaded, ClassEntry, PredefinedName))
         else v
     )
 
@@ -117,7 +126,7 @@ FLOAT_TO_INT = CallableType((Primitive.FLOAT,), Primitive.INT)
 
 # The type of each predefined member, with Status.TT for the members that name a
 # type rather than a value.
-PREDEFINED_MEMBERS: dict[str, dict[str, VarEntry]] = {
+PREDEFINED_MEMBERS: dict[str, dict[str, ContextEntry]] = {
     "builtins": {
         "print": CallableType((Primitive.OBJECT,), Primitive.NONE),
         "len": CallableType((Primitive.SIZED,), Primitive.INT),
@@ -139,8 +148,12 @@ PREDEFINED_MEMBERS: dict[str, dict[str, VarEntry]] = {
         "argv": ListType(Primitive.STR),
         "exit": CallableType((Primitive.INT,), Primitive.NEVER),
     },
-    "typing": {"Any": Status.TT, "Callable": Status.TT, "Sized": Status.TT},
-    "dataclasses": {"dataclass": Status.TT},
+    "typing": {
+        "Any": PredefinedName("typing", "Any"),
+        "Callable": PredefinedName("typing", "Callable"),
+        "Sized": PredefinedName("typing", "Sized"),
+    },
+    "dataclasses": {"dataclass": PredefinedName("dataclasses", "dataclass")},
 }
 
 PREDEFINED_MODULES = set(PREDEFINED_MEMBERS)
