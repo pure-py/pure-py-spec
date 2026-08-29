@@ -5,7 +5,6 @@ from aux import (
     Statement,
     assigns_body,
     assigns_seq,
-    binds,
     binds_quals,
     captures_e,
     captures_e_list,
@@ -48,7 +47,7 @@ from contexts import (
     var_type,
 )
 from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
-from patterns import check_pattern_list, is_catch_all
+from patterns import check_pattern_against, check_pattern_list, is_catch_all
 from reasons import IllFormedModule
 from subtyping import elem_type, join, subtype
 from type_syntax import (
@@ -260,9 +259,9 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
             checks_against(s.msg, Primitive.STR, ctx)
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Match):
-        check_expr(s.subject, ctx)
+        subject = check_expr(s.subject, ctx)
         check_pattern_list([c.pattern for c in s.cases], s, ctx)
-        return check_match_cases(s.cases, ctx, returns)
+        return check_match_cases(s.cases, subject, ctx, returns)
     if isinstance(s, ast.ClassDef):
         check_class_decl(s, ctx.gamma, ctx.q)
         return ASSIGNS_EMPTY
@@ -270,22 +269,29 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
 
 
 def check_match_cases(
-    cases: list[ast.match_case], ctx: ModuleContext, returns: Type | None
+    cases: list[ast.match_case],
+    subject: Type | None,
+    ctx: ModuleContext,
+    returns: Type | None,
 ) -> ResultType:
-    branches = [
-        override_results(
-            Assigns({x: Status.TT for x in binds(case.pattern)}),
-            check_body(
-                case.body,
-                override_var(ctx, {x: Status.TT for x in binds(case.pattern)}),
-                returns,
-            ),
-        )
-        for case in cases
-    ]
+    branches = [check_case(case, subject, ctx, returns) for case in cases]
     if not is_catch_all(cases[-1].pattern):
         branches.append(ASSIGNS_EMPTY)
     return merge_results(branches)
+
+
+def check_case(
+    case: ast.match_case,
+    subject: Type | None,
+    ctx: ModuleContext,
+    returns: Type | None,
+) -> ResultType:
+    """Result of one case: its pattern checks against the scrutinee type, and
+    its body is checked under the bindings that gives."""
+    delta = check_pattern_against(case.pattern, subject, ctx)
+    return override_results(
+        Assigns(delta), check_body(case.body, override_var(ctx, delta), returns)
+    )
 
 
 def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:

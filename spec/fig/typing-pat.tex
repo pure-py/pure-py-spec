@@ -15,7 +15,7 @@
 { \Gamma \vdash \ell \checks \tau \binding \varnothing }
 \and
 \inferrule*[lab={\ruleName{pat-neg-lit}}]
-{ \Gamma \vdash \widen(n) \subty \tau }
+{ \Gamma \vdash \tyLiteral{-n} \subty \tau }
 { \Gamma \vdash -n \checks \tau \binding \varnothing }
 \and
 \inferrule*[lab={\ruleName{pat-list}}]
@@ -33,7 +33,7 @@
 \inferrule*[lab={\ruleName{pat-constr}}]
 {
   \Gamma \vdash q : C \\
-  \Gamma \vdash q \subty \tau \\
+  q, \tau \text{ comparable} \\
   \Gamma \vdash \fieldMap(C, a)(x) \checks \sigma \binding \Delta_x \quad (\forall \bind{x}{\sigma} \in \fields(C))
 }
 { \Gamma \vdash \patConstr{q}{a} \checks \tau \binding \textstyle\bigotimes_{\bind{x}{\sigma} \in \fields(C)} \Delta_x }

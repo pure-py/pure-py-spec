@@ -325,6 +325,15 @@ class TupleIndexOutOfRange:
 
 
 @dataclass(frozen=True)
+class PatternTypeMismatch:
+    pattern: str
+    ty: str
+
+    def message(self) -> str:
+        return f"{self.pattern} cannot match a value of type {self.ty}"
+
+
+@dataclass(frozen=True)
 class NotIterable:
     ty: str
 
@@ -385,6 +394,7 @@ Reason = (
     | TupleIndexOutOfRange
     | MissingReturn
     | NotIterable
+    | PatternTypeMismatch
 )
 
 

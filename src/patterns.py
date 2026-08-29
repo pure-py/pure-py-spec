@@ -4,14 +4,29 @@ import reasons
 from aux import binds_seq, qualified_name
 from contexts import (
     ModuleContext,
+    Status,
+    VarContext,
+    VarEntry,
     ancestors,
     class_entry,
     field_map,
+    field_type,
     fields,
     short_name,
 )
 from reasons import IllFormedModule
+from subtyping import comparable, join, subtype
 from syntax import PatList, PatTuple
+from type_syntax import (
+    ClassType,
+    DictType,
+    ListType,
+    LiteralType,
+    TupleType,
+    Type,
+    alts,
+    render,
+)
 
 
 def is_catch_all(p: ast.pattern) -> bool:
@@ -128,3 +143,104 @@ def check_pattern_list(
         for j in range(i):
             if subsumes(p, patterns[j], ctx):
                 raise IllFormedModule(node, reasons.UnreachableCase(i + 1, j + 1))
+
+
+def check_pattern_against(
+    p: ast.pattern, t: Type | None, ctx: ModuleContext
+) -> VarContext:
+    """Bindings `p` introduces when checked against the scrutinee type `t`, with
+    every variable bound at no type where that type is unknown."""
+    if t is None:
+        return {x: Status.TT for x in binds_seq(p)}
+    if isinstance(p, ast.MatchAs):
+        delta = {} if p.pattern is None else check_pattern_against(p.pattern, t, ctx)
+        return delta if p.name is None else delta | {p.name: t}
+    candidates = [a for a in alts(t) if fits(p, a, ctx)]
+    if len(candidates) == 0:
+        raise IllFormedModule(
+            p, reasons.PatternTypeMismatch(describe(p, ctx), render(t))
+        )
+    return join_deltas([bindings(p, a, ctx) for a in candidates], ctx)
+
+
+def fits(p: ast.pattern, t: Type, ctx: ModuleContext) -> bool:
+    """Whether values of type `t` are of the shape `p` matches."""
+    if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
+        return subtype(LiteralType(literal_of(p)), t, ctx)
+    if isinstance(p, PatList):
+        return isinstance(t, ListType)
+    if isinstance(p, PatTuple):
+        return isinstance(t, TupleType) and len(t.components) == len(p.patterns)
+    if isinstance(p, ast.MatchMapping):
+        return isinstance(t, DictType)
+    assert isinstance(p, ast.MatchClass)
+    return comparable(ClassType(pattern_class(p, ctx)), t, ctx)
+
+
+def bindings(p: ast.pattern, t: Type, ctx: ModuleContext) -> VarContext:
+    """Bindings of a pattern whose shape `t` fits."""
+    if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
+        return {}
+    if isinstance(p, PatList):
+        assert isinstance(t, ListType)
+        return merge([check_pattern_against(q, t.elem, ctx) for q in p.patterns])
+    if isinstance(p, PatTuple):
+        assert isinstance(t, TupleType)
+        return merge(
+            [check_pattern_against(q, c, ctx) for q, c in zip(p.patterns, t.components)]
+        )
+    if isinstance(p, ast.MatchMapping):
+        assert isinstance(t, DictType)
+        return merge([check_pattern_against(q, t.value, ctx) for q in p.patterns])
+    assert isinstance(p, ast.MatchClass)
+    entry = class_entry(p.cls, ctx)
+    assert entry is not None
+    args = field_map(entry, p.patterns, p.kwd_attrs, p.kwd_patterns)
+    assert args is not None
+    return merge(
+        [
+            check_pattern_against(args[x], field_type(entry, x), ctx)
+            for x in fields(entry)
+        ]
+    )
+
+
+def literal_of(p: ast.pattern) -> object:
+    if isinstance(p, ast.MatchSingleton):
+        return p.value
+    assert isinstance(p, ast.MatchValue)
+    return literal_value(p)
+
+
+def pattern_class(p: ast.MatchClass, ctx: ModuleContext) -> str:
+    entry = class_entry(p.cls, ctx)
+    assert entry is not None
+    return short_name(entry)
+
+
+def describe(p: ast.pattern, ctx: ModuleContext) -> str:
+    if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
+        return f"a pattern of type {render(LiteralType(literal_of(p)))}"
+    if isinstance(p, PatList):
+        return "a list pattern"
+    if isinstance(p, PatTuple):
+        return "a tuple pattern"
+    if isinstance(p, ast.MatchMapping):
+        return "a dictionary pattern"
+    assert isinstance(p, ast.MatchClass)
+    return f"a pattern for class {pattern_class(p, ctx)}"
+
+
+def merge(deltas: list[VarContext]) -> VarContext:
+    return {x: t for delta in deltas for x, t in delta.items()}
+
+
+def join_deltas(deltas: list[VarContext], ctx: ModuleContext) -> VarContext:
+    """Bindings of a pattern that fits more than one alternative of a union, at
+    the join of the types each gives."""
+    return {x: join_entries([d[x] for d in deltas], ctx) for x in deltas[0]}
+
+
+def join_entries(entries: list[VarEntry], ctx: ModuleContext) -> VarEntry:
+    types = [e for e in entries if not isinstance(e, Status)]
+    return Status.TT if len(types) != len(entries) else join(types, ctx)
