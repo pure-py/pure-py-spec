@@ -1,0 +1,8 @@
+\shapesOf(\tyUnion{\sigma}{\tau}, N) &{}= \shapesOf(\sigma, N) \cup \shapesOf(\tau, N) \\*
+\shapesOf(\tyLiteral{\ell}, N) &{}= \varnothing && \text{if } \ell \in N \\*
+\shapesOf(\tyBool, N) &{}= \varnothing && \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\*
+\shapesOf(\tyNone, N) &{}= \varnothing && \text{if } \pyinline{None} \in N \\*
+\shapesOf(q, N) &{}= \varnothing && \text{if } \Gamma \vdash q \subty q' \text{ for some } q' \in N \\*
+\shapesOf(\tyNever, N) &{}= \varnothing \\*
+\shapesOf(\tyDict{\tau}, N) &{}= \set{\shapeDict{\tau}{\varnothing}{N}} \\*
+\shapesOf(\tau, N) &{}= \set{\shapeAny{\tau}{N}} && (\text{otherwise})
