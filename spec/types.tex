@@ -42,6 +42,8 @@ joining the first with the join of the rest, with \pyinline{Never} as the unit (
 So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.
 
+\input{spec/fig/well-formed-type}
+
 \input{spec/fig/subtyping}
 
 \subsection{Expression typing}
@@ -159,9 +161,8 @@ check against \pyinline{bool}, and an assertion message against \pyinline{str}. 
 the class name to its entry, requiring that name to be unbound and the class's own fields to be distinct,
 and, where it extends another class, that class to be bound and the own fields not to repeat an inherited
 one (\ruleName{class}, \ruleName{class-extend}). It also requires \pyinline{dataclass} to be in scope, since
-the declaration names it. Every class name an annotation mentions must be bound to a class entry, a premise
-each rule that takes an annotation carries, written with $\classesOf$
-(\ruleName{assign}, \ruleName{def}, \ruleName{class}, \ruleName{class-extend}).
+the declaration names it. Each rule that takes an annotation also requires its type to be well-formed
+(\figref{well-formed-type}), which holds when every class name the type mentions is bound to a class entry.
 
 A function definition binds its parameters at their annotated types and its own name, and the names of the
 mutual region it belongs to, at the corresponding $\pyinline{Callable}$ type; variables assigned in the body start
@@ -257,11 +258,6 @@ The functions used by the rules of this \seckind{}, each defined by its cases.
 \begin{auxfunction}{\resolve(\odot, \sigma, \sigma'), \resolve(\ominus, \sigma)}{type}{aux:resolve}
 \input{spec/functions/resolve-text}
 \funcrows{resolve}
-\end{auxfunction}
-
-\begin{auxfunction}{\classesOf(\tau), \classesOf(\seq{\tau})}{set of class names}{aux:classes}
-\input{spec/functions/classes-text}
-\funcrows{classes}
 \end{auxfunction}
 
 \begin{auxfunction}{\shapesOf(\tau, N)}{set of shapes}{aux:shapes}
