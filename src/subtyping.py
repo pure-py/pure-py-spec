@@ -3,6 +3,8 @@ from collections.abc import Sequence
 from contexts import ModuleContext, ancestors, class_of, short_name
 from type_syntax import (
     ClassType,
+    DictType,
+    ListType,
     LiteralType,
     Primitive,
     TupleType,
@@ -54,3 +56,16 @@ def ancestor_names(q: str, ctx: ModuleContext) -> tuple[str, ...]:
 
 def comparable(s: Type, t: Type, ctx: ModuleContext) -> bool:
     return subtype(s, t, ctx) or subtype(t, s, ctx)
+
+
+def elem_type(t: Type, ctx: ModuleContext) -> Type | None:
+    """Type of the elements a generator draws from a value of type `t`."""
+    if isinstance(t, ListType):
+        return t.elem
+    if t == Primitive.STR:
+        return Primitive.STR
+    if isinstance(t, DictType):
+        return Primitive.STR
+    if isinstance(t, TupleType):
+        return join([base_type(c) for c in t.components], ctx)
+    return None

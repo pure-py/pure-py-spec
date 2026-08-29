@@ -218,15 +218,3 @@ def alts(t: Type) -> tuple[Type, ...]:
     if isinstance(t, UnionType):
         return alts(t.left) + alts(t.right)
     return (t,)
-
-
-def elem_type(t: Type) -> Type | None:
-    if isinstance(t, ListType):
-        return t.elem
-    if t == Primitive.STR:
-        return Primitive.STR
-    if isinstance(t, DictType):
-        return Primitive.STR
-    if isinstance(t, TupleType) and len(set(t.components)) == 1:
-        return t.components[0]
-    return None

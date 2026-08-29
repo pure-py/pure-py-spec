@@ -158,10 +158,12 @@ the type of those elements, mirroring $\iterOp$ (\secref{auxiliary-values}):
 \elemTy(\tyList{\tau}) & = \tau \\
 \elemTy(\tyStr) & = \tyStr \\
 \elemTy(\tyDict{\tau}) & = \tyStr \\
-\elemTy(\tyTuple{\tau, \ldots, \tau}) & = \tau
+\elemTy(\tyTuple{\seq{\tau}}) & = \joinTy(\widen(\tau_1), \ldots, \widen(\tau_n))
 \end{defalign}
 
-\noindent A tuple whose component types differ has no element type, so it cannot be iterated.
+\noindent A tuple is iterated at the join of the base types of its components, whether or not they agree.
+A type with no clause, such as a class or a callable, cannot be iterated, and a generator over a value of
+that type has no rule.
 
 \subsection{Statement typing}
 \label{sec:statement-typing}

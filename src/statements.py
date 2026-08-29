@@ -50,7 +50,7 @@ from contexts import (
 from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
 from patterns import check_pattern_list, is_catch_all
 from reasons import IllFormedModule
-from subtyping import join, subtype
+from subtyping import elem_type, join, subtype
 from type_syntax import (
     CallableType,
     ClassType,
@@ -404,11 +404,13 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
                 checks_against(k, Primitive.STR, ctx)
         return dict_type(e.values, ctx)
     if isinstance(e, ast.ListComp):
-        check_comprehension([e.elt], e.generators, ctx)
-        return None
+        t = check_expr(e.elt, qual_context([e.elt], e.generators, ctx))
+        return None if t is None else ListType(base_type(t))
     if isinstance(e, ast.DictComp):
-        check_comprehension([e.key, e.value], e.generators, ctx)
-        return None
+        ctx_ = qual_context([e.key, e.value], e.generators, ctx)
+        checks_against(e.key, Primitive.STR, ctx_)
+        t = check_expr(e.value, ctx_)
+        return None if t is None else DictType(base_type(t))
     raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
@@ -518,6 +520,14 @@ def checks_against(e: ast.expr, expected: Type | None, ctx: ModuleContext) -> No
         for v in e.values:
             checks_against(v, expected.value, ctx)
         return
+    if isinstance(e, ast.ListComp) and isinstance(expected, ListType):
+        checks_against(e.elt, expected.elem, qual_context([e.elt], e.generators, ctx))
+        return
+    if isinstance(e, ast.DictComp) and isinstance(expected, DictType):
+        ctx_ = qual_context([e.key, e.value], e.generators, ctx)
+        checks_against(e.key, Primitive.STR, ctx_)
+        checks_against(e.value, expected.value, ctx_)
+        return
     actual = check_expr(e, ctx)
     if actual is None:
         return
@@ -547,32 +557,49 @@ def binary(
     return result
 
 
-def check_comprehension(
+def qual_context(
     elts: list[ast.expr], generators: list[ast.comprehension], ctx: ModuleContext
-) -> None:
-    check_quals(generators, ctx)
-    bound = binds_quals(generators)
-    check_exprs(elts, override_var(ctx, {n: Status.TT for n in bound}))
-    captured = captures_e_list(elts) & bound
+) -> ModuleContext:
+    """Context a comprehension body is typed in, extended by the bindings of its
+    qualifiers."""
+    delta = check_quals(generators, ctx)
+    captured = captures_e_list(elts) & binds_quals(generators)
     if captured:
         node = generators[0].target
         raise IllFormedModule(node, reasons.CapturedGeneratorVariable(min(captured)))
+    return override_var(ctx, delta)
 
 
-def check_quals(generators: list[ast.comprehension], ctx: ModuleContext) -> None:
+def check_quals(generators: list[ast.comprehension], ctx: ModuleContext) -> VarContext:
+    """Bindings the qualifiers introduce, each generator binding its target at
+    the element type of the value it draws from."""
     if len(generators) == 0:
-        return
+        return {}
     g = generators[0]
-    check_expr(g.iter, ctx)
+    entry = elem_entry(g.iter, ctx)
     targets = names_in_target(g.target)
     captured = targets & (captures_e_list(g.ifs) | captures_quals(generators[1:]))
     if captured:
         raise IllFormedModule(
             g.target, reasons.CapturedGeneratorVariable(min(captured))
         )
-    ctx_ = override_var(ctx, {n: Status.TT for n in targets})
-    check_exprs(g.ifs, ctx_)
-    check_quals(generators[1:], ctx_)
+    delta = {n: entry for n in targets}
+    ctx_ = override_var(ctx, delta)
+    for e in g.ifs:
+        checks_against(e, Primitive.BOOL, ctx_)
+    return delta | check_quals(generators[1:], ctx_)
+
+
+def elem_entry(e: ast.expr, ctx: ModuleContext) -> VarEntry:
+    """Type a generator binds its target at, where the type of what it draws
+    from is known."""
+    t = check_expr(e, ctx)
+    if t is None:
+        return Status.TT
+    elem = elem_type(t, ctx)
+    if elem is None:
+        raise IllFormedModule(e, reasons.NotIterable(render(t)))
+    return elem
 
 
 def check_exprs(es: list[ast.expr], ctx: ModuleContext) -> None:

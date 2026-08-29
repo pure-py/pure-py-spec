@@ -325,6 +325,14 @@ class TupleIndexOutOfRange:
 
 
 @dataclass(frozen=True)
+class NotIterable:
+    ty: str
+
+    def message(self) -> str:
+        return f"iteration over a value of type {self.ty}, which has no element type"
+
+
+@dataclass(frozen=True)
 class MissingReturn:
     name: str
     ty: str
@@ -376,6 +384,7 @@ Reason = (
     | NotSubscriptable
     | TupleIndexOutOfRange
     | MissingReturn
+    | NotIterable
 )
 
 
