@@ -38,6 +38,14 @@
 }
 { \Gamma \vdash \patConstr{q}{a} \checks \tau \binding \textstyle\bigotimes_{\bind{x}{\sigma} \in \fields(C)} \Delta_x }
 \and
+\inferrule*[lab={\ruleName{pat-union}}]
+{
+  \tau \text{ a union} \\
+  \varnothing \neq K = \set{\sigma \in \altsOf(\tau) \mid \Gamma \vdash p \checks \sigma \binding \Delta_\sigma} \\
+  \Delta = \set{\bind{x}{\joinTy(\Delta_\sigma(x) \mid \sigma \in K)} \mid x \in \binds(p)}
+}
+{ \Gamma \vdash p \checks \tau \binding \Delta }
+\and
 \inferrule*[lab={\ruleName{pat-as}}]
 { \Gamma \vdash p \checks \tau \binding \Delta }
 { \Gamma \vdash p\;\pyinline{as}\;x \checks \tau \binding \Delta \override \set{\bind{x}{\tau}} }

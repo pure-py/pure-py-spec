@@ -58,6 +58,12 @@ joining the first with the join of the rest, with \pyinline{Never} as the unit:
 \noindent So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.
 
+The \emph{alternatives} of a type are the alternatives of a union's operands, and the type itself otherwise:
+\begin{defalign}
+\altsOf(\tyUnion{\sigma}{\tau}) & = \altsOf(\sigma) \cup \altsOf(\tau) \\
+\altsOf(\tau) & = \set{\tau} &\quad& \text{otherwise}
+\end{defalign}
+
 \input{spec/fig/subtyping}
 
 \subsection{Expression typing}
@@ -191,7 +197,9 @@ values no earlier case has matched, and $L'$ those still unmatched once these ca
 starts from $\shapesOf(\sigma, \varnothing)$, which denotes every value of type $\sigma$. Checking a case checks its pattern
 against the scrutinee's type, which binds each variable at the type of the value it is matched against
 (\figref{typing-pat}). A constructor pattern requires its class and the scrutinee's type to be comparable,
-since a pattern for a base class matches a value of any class derived from it. The body is then checked
+since a pattern for a base class matches a value of any class derived from it. A pattern checks against a
+union by checking against those alternatives it matches, of which there must be at least one, and binds each
+variable at the join of the types they give it (\ruleName{pat-union}). The body is then checked
 under those bindings, and the values matched by the pattern are removed from the residual.
 \todo{define the cases judgement and $\shapesOf$}
 
