@@ -6,7 +6,6 @@ from aux import (
     assigns_body,
     assigns_seq,
     binds_quals,
-    binds_seq,
     captures_e,
     captures_e_list,
     captures_quals,
@@ -49,7 +48,7 @@ from contexts import (
 )
 from coverage import Shape, shapes, split_shapes
 from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
-from patterns import check_pattern_list, describe, is_catch_all
+from patterns import check_pattern_list, describe
 from reasons import IllFormedModule
 from subtyping import elem_type, join, subtype
 from type_syntax import (
@@ -221,15 +220,9 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
     if isinstance(s, ast.Pass):
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Assign):
-        assigned = synth_expr(s.value, ctx)
         check_assign_targets(s.targets, captures_e(s.value))
-        return Assigns(
-            {
-                t.id: Status.TT if assigned is None else assigned
-                for t in s.targets
-                if isinstance(t, ast.Name)
-            }
-        )
+        assigned = synthesised(s.value, ctx)
+        return Assigns({t.id: assigned for t in s.targets if isinstance(t, ast.Name)})
     if isinstance(s, ast.AnnAssign):
         assert s.value is not None
         declared = annotated_type(s)
@@ -240,7 +233,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
         target = s.target
         return Assigns({target.id: declared} if isinstance(target, ast.Name) else {})
     if isinstance(s, ast.Expr):
-        synth_expr(s.value, ctx)
+        synthesised(s.value, ctx)
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Return):
         if s.value is None:
@@ -261,7 +254,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
             check_expr(s.msg, Primitive.STR, ctx)
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Match):
-        subject = synth_expr(s.subject, ctx)
+        subject = synthesised(s.subject, ctx)
         check_pattern_list([c.pattern for c in s.cases], s, ctx)
         return check_match_cases(s.cases, subject, ctx, returns)
     if isinstance(s, ast.ClassDef):
@@ -272,17 +265,11 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
 
 def check_match_cases(
     cases: list[ast.match_case],
-    subject: Type | None,
+    subject: Type,
     ctx: ModuleContext,
     returns: Type | None,
 ) -> ResultType:
-    if subject is None:
-        deltas: list[VarContext] = [
-            {x: Status.TT for x in binds_seq(case.pattern)} for case in cases
-        ]
-        partial = not is_catch_all(cases[-1].pattern)
-    else:
-        deltas, partial = split_cases(cases, subject, ctx)
+    deltas, partial = split_cases(cases, subject, ctx)
     branches = [
         check_case(case, delta, ctx, returns) for case, delta in zip(cases, deltas)
     ]
@@ -333,6 +320,14 @@ def check_case(
     return override_results(
         Assigns(delta), check_body(case.body, override_var(ctx, delta), returns)
     )
+
+
+def synthesised(e: ast.expr, ctx: ModuleContext) -> Type:
+    """Type `e` synthesises, where a rule demands one."""
+    t = synth_expr(e, ctx)
+    if t is None:
+        raise IllFormedModule(e, reasons.NotSynthesised())
+    return t
 
 
 def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type | None:
@@ -541,14 +536,16 @@ def call(e: ast.Call, ctx: ModuleContext) -> Type | None:
 def applied_lambda(f: ast.Lambda, e: ast.Call, ctx: ModuleContext) -> Type | None:
     """A lambda applied to arguments takes its parameter types from the types
     the arguments synthesise, and gives the type of its body."""
+    return synth_expr(f.body, override_var(ctx, lambda_arguments(f, e, ctx)))
+
+
+def lambda_arguments(f: ast.Lambda, e: ast.Call, ctx: ModuleContext) -> VarContext:
+    """Parameters of an applied lambda, at the types its arguments synthesise."""
     params = [a.arg for a in f.args.args]
     if len(params) != len(e.args):
         raise IllFormedModule(e, reasons.CallArityMismatch(len(params), len(e.args)))
     given = [synth_expr(arg, ctx) for arg in e.args]
-    delta: VarContext = {
-        x: Status.TT if t is None else t for x, t in zip(params, given)
-    }
-    return synth_expr(f.body, override_var(ctx, delta))
+    return {x: Status.TT if t is None else t for x, t in zip(params, given)}
 
 
 def check_expr(e: ast.expr, expected: Type | None, ctx: ModuleContext) -> None:
@@ -557,6 +554,9 @@ def check_expr(e: ast.expr, expected: Type | None, ctx: ModuleContext) -> None:
     it."""
     if expected is None:
         synth_expr(e, ctx)
+        return
+    if isinstance(e, ast.Call) and isinstance(e.func, ast.Lambda):
+        check_expr(e.func.body, expected, override_var(ctx, lambda_arguments(e.func, e, ctx)))
         return
     if isinstance(e, ast.List) and isinstance(expected, ListType):
         for x in e.elts:

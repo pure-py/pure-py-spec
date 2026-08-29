@@ -21,6 +21,15 @@
   \Gamma \vdash \exLambda{x_1, \ldots, x_n}{e} \checks \tyCallable{\tau_1, \ldots, \tau_n}{\tau}
 }
 \and
+\inferrule*[lab={\ruleName{call-lambda}}]
+{
+  \Gamma \vdash e_i \synth \tau_i \quad (\forall i) \\
+  \Gamma \override \set{\bind{x_1}{\tau_1}, \ldots, \bind{x_n}{\tau_n}} \vdash e \checks \tau
+}
+{
+  \Gamma \vdash \exCall{(\exLambda{x_1, \ldots, x_n}{e})}{e_1, \ldots, e_n} \checks \tau
+}
+\and
 \inferrule*[lab={\ruleName{list}}]
 {
   \Gamma \vdash e_i \checks \tau \quad (\forall i)

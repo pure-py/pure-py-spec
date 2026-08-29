@@ -18,10 +18,6 @@ from type_syntax import (
 )
 
 
-def is_catch_all(p: ast.pattern) -> bool:
-    return isinstance(p, ast.MatchAs) and p.pattern is None
-
-
 def literal_value(pat: ast.MatchValue) -> object:
     v = pat.value
     if isinstance(v, ast.Constant):
