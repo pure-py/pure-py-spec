@@ -168,7 +168,8 @@ def split_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Split:
     if isinstance(k, Constr):
         if not subtype(ClassType(k.q), ClassType(q), ctx):
             return NOTHING, frozenset({k})
-        return wrap(lambda row: Constr(k.q, row), split_row(k.args, ps, ctx))
+        rows = split_row(k.args, padded(ps, len(k.args)), ctx)
+        return wrap(lambda r: Constr(k.q, r), rows)
     if isinstance(k, Rest) and q not in k.heads and comparable(ClassType(q), k.ty, ctx):
         row = tuple(field_shape(entry, x) for x in fields(entry))
         matched, left = wrap(lambda r: Constr(q, r), split_row(row, ps, ctx))
@@ -236,6 +237,12 @@ def wrap(
 ) -> Split:
     matched, left = rows
     return frozenset(form(row) for row in matched), frozenset(form(row) for row in left)
+
+
+def padded(ps: tuple[ast.pattern, ...], n: int) -> tuple[ast.pattern, ...]:
+    """Pattern row padded with wildcards, for a shape of a subclass whose extra
+    fields the pattern does not name."""
+    return ps + tuple(ast.MatchAs() for _ in range(n - len(ps)))
 
 
 def field_shape(entry: ClassEntry, x: str) -> Shape:
