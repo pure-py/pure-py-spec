@@ -517,6 +517,9 @@ def checks_against(e: ast.expr, expected: Type | None, ctx: ModuleContext) -> No
         for v in e.values:
             checks_against(v, expected.value, ctx)
         return
+    if isinstance(e, ast.Lambda):
+        check_lambda(e, expected, ctx)
+        return
     if isinstance(e, ast.IfExp):
         checks_against(e.test, Primitive.BOOL, ctx)
         checks_against(e.body, expected, ctx)
@@ -535,6 +538,24 @@ def checks_against(e: ast.expr, expected: Type | None, ctx: ModuleContext) -> No
         return
     if not subtype(actual, expected, ctx):
         raise IllFormedModule(e, reasons.TypeMismatch(render(expected), render(actual)))
+
+
+def check_lambda(e: ast.Lambda, expected: Type, ctx: ModuleContext) -> None:
+    """Check a lambda against a callable type, binding each parameter at the
+    type the callable gives it."""
+    params = [a.arg for a in e.args.args]
+    if not isinstance(expected, CallableType):
+        raise IllFormedModule(e, reasons.TypeMismatch(render(expected), "a lambda"))
+    if len(params) != len(expected.params):
+        raise IllFormedModule(
+            e, reasons.TypeMismatch(render(expected), lambda_of(len(params)))
+        )
+    delta = dict(zip(params, expected.params))
+    checks_against(e.body, expected.result, override_var(ctx, delta))
+
+
+def lambda_of(n: int) -> str:
+    return f"a lambda of {n} parameter{'' if n == 1 else 's'}"
 
 
 def negated_literal(e: ast.UnaryOp) -> Type | None:
