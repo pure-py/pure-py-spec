@@ -89,15 +89,8 @@ whose values structural equality relates:
 
 \noindent A callable type is not an equality type, and neither is any type with a callable component, so
 comparing two functions is rejected rather than left undefined. \emph{Resolution} looks the operator up at the operand types, and
-at their base types where no signature gives a result for the operand types themselves:
-\begin{defalign}
-\resolve(\odot, \sigma, \sigma') & = \tau &\quad& \text{if } \odot : (\sigma, \sigma') \to \tau \\
-\resolve(\odot, \sigma, \sigma') & = \tau &\quad& \text{if } \odot : (\widen(\sigma), \widen(\sigma')) \to \tau \\[2mm]
-\resolve(\ominus, \sigma) & = \tau &\quad& \text{if } \ominus : \sigma \to \tau \\
-\resolve(\ominus, \sigma) & = \tau &\quad& \text{if } \ominus : \widen(\sigma) \to \tau
-\end{defalign}
-
-\noindent The second clause lets \pyinline{1 == 0} use the equality signature at \pyinline{int}, since two
+at their base types where no signature gives a result for the operand types themselves
+(\secref{types-auxiliary}). The second clause lets \pyinline{1 == 0} use the equality signature at \pyinline{int}, since two
 distinct literal types are not comparable. Taking the operand types as they are first keeps \pyinline{2 **
 3} an \pyinline{int}, since the exponent binds a variable that its base type would not. Resolution is more
 precise than mypy for this operator, whose overloads give \pyinline{Any} as soon as the exponent is not a
@@ -137,15 +130,8 @@ synthesise, since \pyinline{list} is invariant.
 
 Typing a comprehension types its qualifiers, which bind the variables its body may use
 (\figref{typing-check}). A generator draws those bindings from the elements of a value, and $\elemTy$ gives
-the type of those elements, mirroring $\iterOp$ (\secref{auxiliary-values}):
-\begin{defalign}
-\elemTy(\tyList{\tau}) & = \tau \\
-\elemTy(\tyStr) & = \tyStr \\
-\elemTy(\tyDict{\tau}) & = \tyStr \\
-\elemTy(\tyTuple{\seq{\tau}}) & = \joinTy(\widen(\tau_1), \ldots, \widen(\tau_n))
-\end{defalign}
-
-\noindent A tuple is iterated at the join of the base types of its components, whether or not they agree.
+the type of those elements (\secref{types-auxiliary}), mirroring $\iterOp$ (\secref{auxiliary-values}). A
+tuple is iterated at the join of the base types of its components, whether or not they agree.
 A type with no clause, such as a class or a callable, cannot be iterated, and a generator over a value of
 that type has no rule.
 
@@ -248,6 +234,16 @@ The functions used by the rules of this \seckind{}, each defined by its cases.
 \begin{auxfunction}{\altsOf(\tau)}{set of types}{aux:alts}
 \input{spec/functions/alts-text}
 \funcrows{alts}
+\end{auxfunction}
+
+\begin{auxfunction}{\elemTy(\tau)}{type}{aux:elem-type}
+\input{spec/functions/elem-type-text}
+\funcrows{elem-type}
+\end{auxfunction}
+
+\begin{auxfunction}{\resolve(\odot, \sigma, \sigma'), \resolve(\ominus, \sigma)}{type}{aux:resolve}
+\input{spec/functions/resolve-text}
+\funcrows{resolve}
 \end{auxfunction}
 
 \begin{auxfunction}{\shapesOf(\tau, N)}{set of shapes}{aux:shapes}

@@ -273,9 +273,12 @@
   {\par\addvspace{\bigskipamount}}
 
 % Rows defining an auxiliary function, from spec/functions. Uniform row height: a negative
-% \lineskiplimit stops TeX adding interline glue for a taller row, such as one carrying an accent.
+% \lineskiplimit stops TeX adding interline glue for a taller row, such as one carrying an accent. That
+% also puts a full \baselineskip before the first row, which the display skip takes back.
 \newcommand*{\funcrows}[1]{%
   \begingroup\lineskiplimit=-\baselineskip
+  \setlength{\abovedisplayskip}{\dimexpr -\baselineskip\relax}%
+  \setlength{\abovedisplayshortskip}{\dimexpr -\baselineskip\relax}%
   \begin{align*}\input{spec/functions/#1}\end{align*}\endgroup}
 
 \newcommand*{\grammarGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{4}{l}{#1}}
