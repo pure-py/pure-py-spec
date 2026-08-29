@@ -523,6 +523,8 @@ def dict_type(values: list[ast.expr], ctx: ModuleContext) -> Type | None:
 def call(e: ast.Call, ctx: ModuleContext) -> Type | None:
     """The result type of a call, checking each argument against its parameter
     type; the callee must be a callable of the same arity."""
+    if isinstance(e.func, ast.Lambda):
+        return applied_lambda(e.func, e, ctx)
     fn = synth_expr(e.func, ctx)
     if fn is None:
         check_exprs(e.args, ctx)
@@ -534,6 +536,19 @@ def call(e: ast.Call, ctx: ModuleContext) -> Type | None:
     for arg, param in zip(e.args, fn.params):
         check_expr(arg, param, ctx)
     return fn.result
+
+
+def applied_lambda(f: ast.Lambda, e: ast.Call, ctx: ModuleContext) -> Type | None:
+    """A lambda applied to arguments takes its parameter types from the types
+    the arguments synthesise, and gives the type of its body."""
+    params = [a.arg for a in f.args.args]
+    if len(params) != len(e.args):
+        raise IllFormedModule(e, reasons.CallArityMismatch(len(params), len(e.args)))
+    given = [synth_expr(arg, ctx) for arg in e.args]
+    delta: VarContext = {
+        x: Status.TT if t is None else t for x, t in zip(params, given)
+    }
+    return synth_expr(f.body, override_var(ctx, delta))
 
 
 def check_expr(e: ast.expr, expected: Type | None, ctx: ModuleContext) -> None:
