@@ -50,7 +50,7 @@ RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
 CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
 
 # Checker entry points under src/
-PARSE, CHECK, CHECK_PROGRAM = "syntax.py", "check_module.py", "check_program.py"
+CHECK, CHECK_PROGRAM = "check_module.py", "check_program.py"
 
 # Program-level test files (a test is a directory)
 MAIN = "main.py"
@@ -64,13 +64,12 @@ EXPECTED_FILE, EXPECTED_EXIT, EXPECTED_ERROR = (
 # PurePy exit codes (OK = accepted / ran clean)
 class Exit(IntEnum):
     OK = 0
-    PROHIBITED = 1  # syntax.py: prohibited syntactic form
-    NOT_YET = 2  # syntax.py: planned, not yet supported
-    ILL_FORMED = 3  # check_module.py: ill-formed
+    PROHIBITED = 1  # prohibited syntactic form
+    NOT_YET = 2  # planned, not yet supported
+    ILL_FORMED = 3  # ill-formed
 
 
 class Phase(StrEnum):
-    PARSE = "parse"
     CHECK = "check"
     PYTHON = "python"
     RUN = "run"
@@ -119,7 +118,6 @@ class Runner:
         self, cmd: list[str], expected: int, error_substr: str | None = None
     ) -> None:
         phase = {
-            PARSE: Phase.PARSE,
             CHECK: Phase.CHECK,
             CHECK_PROGRAM: Phase.CHECK,
         }.get(pathlib.Path(cmd[1]).name, Phase.PYTHON)
@@ -134,9 +132,6 @@ class Runner:
                     phase,
                     f"expected output containing {error_substr!r}, got: {output.strip()}",
                 )
-
-    def parse(self, path: pathlib.Path, expected: int, err: str | None = None) -> None:
-        self.expect_exit(script_cmd(PARSE, path), expected, error_substr=err)
 
     def check(self, path: pathlib.Path, expected: int, err: str | None = None) -> None:
         self.expect_exit(script_cmd(CHECK, path), expected, error_substr=err)
@@ -245,10 +240,9 @@ class Runner:
             err = substr(p.with_suffix(ERROR_EXPECTED))
 
             if dirs == (Verdict.SEMANTICALLY_VALID, Stage.PENDING):
-                self.parse(p, Exit.NOT_YET)
+                self.check(p, Exit.NOT_YET)
                 return
             if dirs[1:] == (Stage.STATIC, Stage.PENDING):
-                self.parse(p, Exit.OK)
                 self.check(p, Exit.OK)
                 self.python_evidence(
                     p,
@@ -268,12 +262,10 @@ class Runner:
             )
 
             if verdict == Verdict.SEMANTICALLY_VALID:
-                self.parse(p, Exit.OK)
                 self.check(p, Exit.OK)
             elif stage == Stage.SYNTACTIC:
-                self.parse(p, Exit.PROHIBITED, err)
+                self.check(p, Exit.PROHIBITED, err)
             else:
-                self.parse(p, Exit.OK)
                 self.check(
                     p,
                     Exit.ILL_FORMED if stage == Stage.STATIC else Exit.OK,
