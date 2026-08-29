@@ -1,1 +1,1 @@
-'Callable' is a name of module 'typing'; it is not a value
+'Callable' is usable only in an annotation or as a decorator

@@ -30,11 +30,8 @@ class ClassEntry:
 
 @dataclass(frozen=True)
 class PredefinedName:
-    """Member of a predefined module that is not a value: it names a type, heads
-    a type form, or decorates a class declaration."""
-
-    q: str
-    x: str
+    """Name usable only in an annotation or as a decorator: it names a type,
+    heads a type form, or decorates a class declaration."""
 
 
 @dataclass(frozen=True)
@@ -149,11 +146,11 @@ PREDEFINED_MEMBERS: dict[str, dict[str, ContextEntry]] = {
         "exit": CallableType((Primitive.INT,), Primitive.NEVER),
     },
     "typing": {
-        "Any": PredefinedName("typing", "Any"),
-        "Callable": PredefinedName("typing", "Callable"),
-        "Sized": PredefinedName("typing", "Sized"),
+        "Any": PredefinedName(),
+        "Callable": PredefinedName(),
+        "Sized": PredefinedName(),
     },
-    "dataclasses": {"dataclass": PredefinedName("dataclasses", "dataclass")},
+    "dataclasses": {"dataclass": PredefinedName()},
 }
 
 PREDEFINED_MODULES = set(PREDEFINED_MEMBERS)

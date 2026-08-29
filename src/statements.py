@@ -338,11 +338,8 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
                 raise IllFormedModule(e, reasons.ModuleAsValue(e.id))
             if class_of(ctx, e.id) is not None:
                 raise IllFormedModule(e, reasons.ClassAsValue(e.id))
-            predefined = ctx.gamma.get(e.id)
-            if isinstance(predefined, PredefinedName):
-                raise IllFormedModule(
-                    e, reasons.PredefinedNameAsValue(predefined.x, predefined.q)
-                )
+            if isinstance(ctx.gamma.get(e.id), PredefinedName):
+                raise IllFormedModule(e, reasons.PredefinedNameAsValue(e.id))
             raise IllFormedModule(e, reasons.UnassignedVariable(e.id))
         t = var_type(ctx, e.id)
         if t is None:
@@ -421,7 +418,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
                 raise IllFormedModule(e, reasons.ClassAsValue(qualified_name(e)))
             if isinstance(entry, PredefinedName):
                 raise IllFormedModule(
-                    e, reasons.PredefinedNameAsValue(entry.x, entry.q)
+                    e, reasons.PredefinedNameAsValue(qualified_name(e))
                 )
             if entry == Status.FF:
                 raise IllFormedModule(e, reasons.UnassignedMember(e.attr, parent.q))

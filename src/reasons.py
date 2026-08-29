@@ -249,10 +249,9 @@ class OwnDescendantImport:
 @dataclass(frozen=True)
 class PredefinedNameAsValue:
     name: str
-    q: str
 
     def message(self) -> str:
-        return f"'{self.name}' is a name of module '{self.q}'; it is not a value"
+        return f"'{self.name}' is usable only in an annotation or as a decorator"
 
 
 @dataclass(frozen=True)
