@@ -45,7 +45,7 @@ def load(name: str, base_dir: pathlib.Path) -> ast.Module:
         tree = syntax.parse(source, str(path))
     except SyntaxError as e:
         raise IllFormedProgram(f"{path}: parse error: {e}") from e
-    parse_err = syntax.check_module(tree)
+    parse_err = syntax.supported_module(tree)
     if parse_err is not None:
         raise IllFormedProgram(f"{path}: {parse_err.msg}")
     return tree
