@@ -2,12 +2,8 @@
 \flushleft \shadebox{$\Gamma \vdash \tau$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{ty-none}}]
-{ \strut }
-{ \Gamma \vdash \tyNone }
-\and
 \inferrule*[lab={\ruleName{ty-name}}]
-{ \tau \text{ a primitive type other than } \tyNone \\ \tau \in \dom(\Gamma) }
+{ \tau \text{ a primitive type} \\ \tau \in \dom(\Gamma) }
 { \Gamma \vdash \tau }
 \and
 \inferrule*[lab={\ruleName{ty-class}}]

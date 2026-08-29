@@ -128,6 +128,7 @@ PREDEFINED_MEMBERS: dict[str, dict[str, ContextEntry]] = {
         "print": CallableType((Primitive.OBJECT,), Primitive.NONE),
         "len": CallableType((Primitive.SIZED,), Primitive.INT),
         "range": CallableType((Primitive.INT,), Primitive.RANGE),
+        "None": PredefinedName(),
         "object": PredefinedName(),
         "bool": PredefinedName(),
         "int": PredefinedName(),

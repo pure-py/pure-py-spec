@@ -101,8 +101,7 @@ def well_formed(t: Type, node: ast.AST, ctx: ModuleContext) -> Type:
     in scope, a class name bound to a class entry and every other spelling to the
     entry its module gives it."""
     if isinstance(t, Primitive):
-        if t != Primitive.NONE:
-            in_scope(PRIMITIVE_SPELLINGS[t], node, ctx)
+        in_scope(PRIMITIVE_SPELLINGS[t], node, ctx)
     elif isinstance(t, LiteralType):
         in_scope("Literal", node, ctx)
     elif isinstance(t, ClassType):
