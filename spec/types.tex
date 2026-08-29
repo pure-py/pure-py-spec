@@ -92,9 +92,19 @@ signature $\ominus : \sigma \to \tau$, relating operand types to result type
 signature with type variables stands for all its instances, which agree on the result type; a variable binds
 the operand's type as it is, and an operand type written out is matched by any subtype of it. Where several
 signatures give a result the first listed is used, so \pyinline{1 + 2} is an \pyinline{int} and
-\pyinline{1 + 2.0} a \pyinline{float}. Equality is available on \emph{equality types}, which are all types but a callable and any list,
-dictionary, tuple, union or class with a component that is not one, so that structural equality is defined
-wherever it can be applied. \emph{Resolution} looks the operator up at the operand types, and
+\pyinline{1 + 2.0} a \pyinline{float}. Equality is available on \emph{equality types}, which are the types
+whose values structural equality relates:
+\begin{defalign}
+\Gamma \vdash \tau \eqType \quad & \text{if } \tau \text{ primitive or literal type} \\
+\Gamma \vdash \tyList{\tau} \eqType \quad & \text{if } \Gamma \vdash \tau \eqType \\
+\Gamma \vdash \tyDict{\tau} \eqType \quad & \text{if } \Gamma \vdash \tau \eqType \\
+\Gamma \vdash \tyTuple{\seq{\tau}} \eqType \quad & \text{if } \Gamma \vdash \tau_i \eqType \quad (\forall i) \\
+\Gamma \vdash \tyUnion{\sigma}{\tau} \eqType \quad & \text{if } \Gamma \vdash \sigma \eqType \text{ and } \Gamma \vdash \tau \eqType \\
+\Gamma \vdash q \eqType \quad & \text{if } \Gamma \vdash q : C \text{ and } \Gamma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \fields(C)
+\end{defalign}
+
+\noindent A callable type is not an equality type, and neither is any type with a callable component, so
+comparing two functions is rejected rather than left undefined. \emph{Resolution} looks the operator up at the operand types, and
 at their base types where no signature gives a result for the operand types themselves:
 \begin{defalign}
 \resolve(\odot, \sigma, \sigma') & = \tau &\quad& \text{if } \odot : (\sigma, \sigma') \to \tau \\
