@@ -127,8 +127,7 @@ and $\Gamma$ binds the same variables at $\statusDefAssigned$.
  & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
  & & $\quad \primFn(\seq{u}) = \aborts{\errType}$ & (otherwise) \\
  & \pyinline{range} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
- & & $\quad \primFn(v) = \val{\exList{0, \ldots, v-1}}$ & if $v$ an integer, $v > 0$ \\
- & & $\quad \primFn(v) = \val{\exList{}}$ & if $v$ an integer, $v \leq 0$ \\
+ & & $\quad \primFn(n) = \val{\valRange{n}}$ & \\
 \pyinline{math} & \pyinline{pi} & & \\
  & \pyinline{e} & & \\
  & \pyinline{sqrt} & & \\
