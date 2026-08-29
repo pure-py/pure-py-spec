@@ -17,16 +17,7 @@ $\statusNotDefAssigned$.
 \label{sec:subtyping}
 
 The \emph{base type} of a literal $\ell$ is $\widen(\ell)$, and of a type is that type with a literal
-type replaced by the base type of its literal:
-\begin{defalign}
-\widen(n) & = \tyInt &\quad& \text{if } n \text{ is an integer literal} \\
-\widen(n) & = \tyFloat &\quad& \text{if } n \text{ is a float literal} \\
-\widen(w) & = \tyStr \\
-\widen(\pyinline{True}) = \widen(\pyinline{False}) & = \tyBool \\
-\widen(\pyinline{None}) & = \tyNone \\[2mm]
-\widen(\tyLiteral{\ell}) & = \widen(\ell) \\
-\widen(\tau) & = \tau &\quad& \text{otherwise}
-\end{defalign}
+type replaced by the base type of its literal (\secref{types-auxiliary}).
 
 Subtyping (\figref{subtyping}) is reflexivity, a literal type below its base type, and a class below its
 ancestors, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
@@ -46,23 +37,10 @@ If $\Gamma \vdash \sigma \subty \tau$ and $\Gamma \vdash \tau \subty \tau'$ then
 Subtyping depends on the context, since a class is below its ancestors. Two types are \emph{comparable}
 when either is a subtype of the other. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. A sequence of types joins by
-joining the first with the join of the rest, with \pyinline{Never} as the unit:
-\begin{defalign}
-\joinTy(\sigma, \tau) & = \tau &\quad& \text{if } \Gamma \vdash \sigma \subty \tau \\
-\joinTy(\sigma, \tau) & = \sigma &\quad& \text{if } \Gamma \vdash \tau \subty \sigma \\
-\joinTy(\sigma, \tau) & = \tyUnion{\sigma}{\tau} &\quad& \text{otherwise} \\[2mm]
-\joinTy(\varepsilon) & = \tyNever \\
-\joinTy(\sigma \cons \seq{\tau}) & = \joinTy(\sigma, \joinTy(\seq{\tau}))
-\end{defalign}
-
-\noindent So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
-joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.
-
-The \emph{alternatives} of a type are the alternatives of a union's operands, and the type itself otherwise:
-\begin{defalign}
-\altsOf(\tyUnion{\sigma}{\tau}) & = \altsOf(\sigma) \cup \altsOf(\tau) \\
-\altsOf(\tau) & = \set{\tau} &\quad& \text{otherwise}
-\end{defalign}
+joining the first with the join of the rest, with \pyinline{Never} as the unit (\secref{types-auxiliary}).
+So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
+joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$. The \emph{alternatives} of a
+type are the alternatives of a union's operands, and the type itself otherwise.
 
 \input{spec/fig/subtyping}
 
@@ -256,6 +234,21 @@ exhaustive, although no one of them subsumes what a further case would match.
 \label{sec:types-auxiliary}
 
 The functions used by the rules of this \seckind{}, each defined by its cases.
+
+\begin{auxfunction}{\widen(\ell), \widen(\tau)}{type}{aux:base-type}
+\input{spec/functions/base-type-text}
+\funcrows{base-type}
+\end{auxfunction}
+
+\begin{auxfunction}{\joinTy(\sigma, \tau), \joinTy(\seq{\tau})}{type}{aux:join}
+\input{spec/functions/join-text}
+\funcrows{join}
+\end{auxfunction}
+
+\begin{auxfunction}{\altsOf(\tau)}{set of types}{aux:alts}
+\input{spec/functions/alts-text}
+\funcrows{alts}
+\end{auxfunction}
 
 \begin{auxfunction}{\shapesOf(\tau, N)}{set of shapes}{aux:shapes}
 \input{spec/functions/shapes-text}
