@@ -183,7 +183,10 @@ well as the values it leaves. The body is then checked under those bindings.
 
 \input{spec/fig/syntax-shapes}
 
-Reachability and exhaustiveness are the two halves of one computation (\figrefTwo{shapes}{coverage}). A \emph{shape} $k$
+Reachability and exhaustiveness are the two halves of one computation
+(\figrefTwo{shapes}{coverage}), as in the usefulness algorithm for
+ML~\cite{maranget2007} and in the term descriptions a match compiler carries~\cite{sestoft1996}. Splitting
+takes the scrutinee's type into account, as the uncovered sets of \citet{karachalias2015} do. A \emph{shape} $k$
 denotes a set of values of a type, written $\Gamma \vdash k : \tau$. Every shape has a least such type,
 $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{N}$ is a
 value of type $\tau$ whose outermost head is not among those in $N$, where $N$ \emph{constructs} $\tau$: its

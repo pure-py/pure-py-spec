@@ -40,3 +40,13 @@ functional pipelines have been proposed for scientific computation in Python~\ci
 more functional, the community has moved in that direction, from lambda expressions in Python~1.0 to a recent
 proposal for deeply immutable objects~\cite{johnson2025}. Typed treatments of effects in functional languages,
 such as Prism,\footnote{\url{https://www.stephendiehl.com/posts/prism/}} are relevant to the structured effects \PurePy may add in a later release.
+
+\subsection{Pattern matching}
+
+Checking that the cases of a match are reachable and exhaustive goes back to the usefulness algorithm for
+ML~\cite{maranget2007}, which asks of each case whether some value reaches it, and to the term descriptions a
+match compiler carries as it decides a pattern one position at a time~\cite{sestoft1996}. \PurePy computes
+both from a residual, the set of values no earlier case has matched, and seeds that residual from the type of
+the scrutinee, so the types of the bindings a pattern makes come from the same computation. Accounting for
+the type in this way follows the uncovered sets of \citet{karachalias2015}, which track what a GADT match
+leaves and rule out cases the indices make impossible.
