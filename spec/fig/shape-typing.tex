@@ -45,20 +45,19 @@
 \and
 \inferrule*[lab={\ruleName{shape-literal}}]
 {
-  \Gamma \vdash \tyLiteral{\ell} \subty \tau
+  \strut
 }
 {
-  \Gamma \vdash \ell : \tau
+  \Gamma \vdash \ell : \tyLiteral{\ell}
 }
 \and
 \inferrule*[lab={\ruleName{shape-constr}}]
 {
-  \Gamma \vdash C \subty \tau \\
   \Gamma \vdash h : C \quad (\forall h \in N) \\
   \Gamma \vdash k_x : \sigma \quad (\forall \bind{x}{\sigma} \in \fields(C))
 }
 {
-  \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{N} : \tau
+  \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{N} : C
 }
 \and
 \inferrule*[lab={\ruleName{shape-tuple}}]
@@ -75,6 +74,15 @@
 }
 {
   \Gamma \vdash \shapeList{\tau}{\seq{k}} : \tyList{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{shape-sub}}]
+{
+  \Gamma \vdash k : \sigma \\
+  \Gamma \vdash \sigma \subty \tau
+}
+{
+  \Gamma \vdash k : \tau
 }
 \and
 \inferrule*[lab={\ruleName{shape-dict}}]

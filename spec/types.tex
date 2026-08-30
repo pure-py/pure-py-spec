@@ -228,11 +228,9 @@ derivation.
 
 \begin{lemma}[Preservation of shape type]
 \label{lem:shape-typing}
-If $\Gamma \vdash h : \tau$ for every $h \in N$, then each $k \in \shapesOf(\tau, N)$ has $\Gamma
-\vdash k : \sigma$ for some $\sigma$ with $\Gamma \vdash \sigma \subty \tau$. Moreover, if each $k \in
-L$ has $\Gamma \vdash k : \sigma$ for some $\sigma$ with $\Gamma \vdash \sigma \subty \tau$, and
-$\Gamma \vdash L, p \matches K, L' \binding \Delta$, then each $k \in K \cup L'$ has
-$\Gamma \vdash k : \sigma$ for some $\sigma$ with $\Gamma \vdash \sigma \subty \tau$.
+If $\Gamma \vdash h : \tau$ for every $h \in N$ then $\Gamma \vdash k : \tau$ for each $k \in
+\shapesOf(\tau, N)$. Moreover, if $\Gamma \vdash k : \tau$ for each $k \in L$ and $\Gamma \vdash L, p
+\matches K, L' \binding \Delta$ then $\Gamma \vdash k : \tau$ for each $k \in K \cup L'$.
 \end{lemma}
 
 The cases are then walked once, from $\shapesOf(\widen(\sigma), \varnothing)$ for the scrutinee's type $\sigma$, in the same shape as
