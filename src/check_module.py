@@ -1,5 +1,6 @@
 import ast
 import sys
+from collections.abc import Mapping
 
 import reasons
 import syntax
@@ -92,7 +93,7 @@ def import_bindings(s: ast.stmt, ctx: ModuleContext) -> Context:
     return imports(s, delta, ctx)
 
 
-def submods(M: dict[str, ast.Module], q: str) -> Context:
+def submods(M: Mapping[str, ast.Module], q: str) -> Context:
     return {
         x: ModuleStub(f"{q}.{x}")
         for x in {
@@ -124,7 +125,7 @@ _signatures: dict[tuple[int, str], Context] = {}
 _loading: list[tuple[int, str]] = []
 
 
-def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
+def check_module(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context:
     key = (id(M), q)
     cached = _signatures.get(key)
     if cached is not None:
@@ -145,7 +146,7 @@ def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     return result
 
 
-def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
+def check_module_(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context:
     nested = find_nested_import(m.body)
     if nested is not None:
         raise IllFormedModule(nested, reasons.NonTopLevelImport())
@@ -169,7 +170,7 @@ def check_submodule_clash(
     m: ast.Module,
     gamma0: Context,
     body: list[ast.stmt],
-    M: dict[str, ast.Module],
+    M: Mapping[str, ast.Module],
     q: str,
 ) -> None:
     clash = sorted((set(gamma0) | own_members(body, q)) & set(submods(M, q)))
@@ -203,7 +204,9 @@ def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context
     return {**stubs, **own}
 
 
-def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> IllFormed | None:
+def module_result(
+    m: ast.Module, M: Mapping[str, ast.Module], q: str
+) -> IllFormed | None:
     try:
         check_module(m, M, q)
         return None

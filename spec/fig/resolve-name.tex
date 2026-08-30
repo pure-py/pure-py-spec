@@ -1,0 +1,40 @@
+\begin{figure}
+\flushleft \shadebox{$\Gamma \vdash q : \theta$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{simple-var}}]
+{
+  \bind{x}{\tau} \in \Gamma
+}
+{
+  \Gamma \vdash x : \tau
+}
+\and
+\inferrule*[lab={\ruleName{simple-module}}]
+{
+  \bind{x}{\modLoaded{q}{\Gamma'}} \in \Gamma
+}
+{
+  \Gamma \vdash x : \modLoaded{q}{\Gamma'}
+}
+\and
+\inferrule*[lab={\ruleName{simple-class}}]
+{
+  \bind{c}{C} \in \Gamma
+}
+{
+  \Gamma \vdash c : C
+}
+\and
+\inferrule*[lab={\ruleName{qualified}}]
+{
+  \Gamma \vdash q : \modLoaded{q'}{\Gamma'} \\
+  \Gamma' \vdash x : \theta
+}
+{
+  \Gamma \vdash q.x : \theta
+}
+\end{mathpar}
+\caption{Qualified name $q$ resolves to context entry $\theta$ under $\Gamma$}
+\label{fig:resolve-name}
+\end{figure}

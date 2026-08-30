@@ -58,7 +58,7 @@ class ModuleLoaded:
 @dataclass(frozen=True)
 class ModuleContext:
     gamma: Context
-    M: dict[str, ast.Module] = field(default_factory=dict)
+    M: Mapping[str, ast.Module] = field(default_factory=dict)
     q: str = ""
 
 

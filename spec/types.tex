@@ -6,7 +6,7 @@ The typing rules say whether a program is well typed. They are intended as a ref
 reverse. Function signatures, assignments and dataclass fields are annotated with type expressions, and a
 type expression denotes a type under a context (\figref{resolve-type}). Every parameter and return carries
 one, so the type of a definition is given rather than inferred from its body. A class name resolves to a
-class entry and every other name must resolve to a predefined entry (\figref{predefined-types}).
+class entry (\figref{resolve-name}) and every other name must resolve to a predefined entry (\figref{predefined-types}).
 
 The context entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
 that is not definitely assigned is bound to $\statusNotDefAssigned$. Two contexts from different branches of a conditional merge pointwise. A variable definitely assigned in both, at $\sigma$ and $\tau$, is of type
@@ -14,6 +14,8 @@ $\joinTy(\sigma, \tau)$, whereas a variable definitely assigned in one branch al
 $\statusNotDefAssigned$.
 
 \input{spec/fig/aux-types}
+
+\input{spec/fig/resolve-name}
 
 \input{spec/fig/resolve-type}
 

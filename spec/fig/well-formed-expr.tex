@@ -3,7 +3,7 @@
 \flushleft \shadebox{$\Gamma \vdash q : \theta$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{simple-var}}]
+\inferrule*[lab={\ruleName{wf-simple-var}}]
 {
   \bind{x}{\statusDefAssigned} \in \Gamma
 }
@@ -11,7 +11,7 @@
   \Gamma \vdash x : \statusDefAssigned
 }
 \and
-\inferrule*[lab={\ruleName{simple-module}}]
+\inferrule*[lab={\ruleName{wf-simple-module}}]
 {
   \bind{x}{\modLoaded{q}{\Gamma'}} \in \Gamma
 }
@@ -19,7 +19,7 @@
   \Gamma \vdash x : \modLoaded{q}{\Gamma'}
 }
 \and
-\inferrule*[lab={\ruleName{simple-class}}]
+\inferrule*[lab={\ruleName{wf-simple-class}}]
 {
   \bind{c}{C} \in \Gamma
 }
@@ -27,7 +27,7 @@
   \Gamma \vdash c : C
 }
 \and
-\inferrule*[lab={\ruleName{qualified}}]
+\inferrule*[lab={\ruleName{wf-qualified}}]
 {
   \Gamma \vdash q : \modLoaded{q'}{\Gamma'} \\
   \Gamma' \vdash x : \theta
