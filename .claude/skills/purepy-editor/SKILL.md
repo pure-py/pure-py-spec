@@ -25,15 +25,22 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 
 - Commit after every coherent change; don't sit on uncommitted work.
 
+## References in conversation
+
+- When referring to an issue, give its number, its title and its URL, so it can be opened
+  without a search. For example: #181, Classes for built-in types,
+  https://github.com/pure-py/pure-py-spec/issues/181.
+
+- When referring to a figure, lemma, definition or section of the specification or paper, give its name
+  and its number in the current PDF, so it can be found without a search. For example: the shape-typing
+  figure, Figure 4.8 in the specification. Look the number up (a draft-mode `pdflatex` run's `.aux` has
+  every label's number); don't guess it.
+
 ## GitHub issues
 
 - New issues: add to the PurePy project with Status either Planned or Proposed.
 
 - Add content to an issue, whether a body, a comment or a closing comment, only when asked to. Otherwise create, edit or close it and nothing more.
-
-- When referring to an issue in conversation, give its number, its title and its URL, so it can be opened
-  without a search. For example: #181, Classes for built-in types,
-  https://github.com/pure-py/pure-py-spec/issues/181.
 
 - Issue titles and task-list items are noun phrases (e.g. "Syntax of types", not "Define the syntax of types").
 
