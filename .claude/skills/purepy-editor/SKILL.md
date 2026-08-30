@@ -33,7 +33,7 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 
 - When referring to a figure, lemma, definition or section of the specification or paper, give its name
   and its number in the current PDF, so it can be found without a search. For example: the shape-typing
-  figure, Figure 4.8 in the specification. Look the number up (a draft-mode `pdflatex` run's `.aux` has
+  figure, Figure 4.13 in the specification. Look the number up (a draft-mode `pdflatex` run's `.aux` has
   every label's number); don't guess it.
 
 ## GitHub issues
