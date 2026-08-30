@@ -50,7 +50,7 @@ from match import literal_of, match_shapes
 from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
 from reasons import IllFormedModule
 from shapes import Shape, shapes
-from subtyping import elem_type, join, subtype
+from subtyping import join, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
     PRIMITIVE_SPELLINGS,
@@ -718,6 +718,19 @@ def check_quals(generators: list[ast.comprehension], ctx: ModuleContext) -> VarC
     for e in g.ifs:
         check_expr(e, Primitive.BOOL, ctx_)
     return delta | check_quals(generators[1:], ctx_)
+
+
+def elem_type(t: Type, ctx: ModuleContext) -> Type | None:
+    """Type of the elements a generator draws from a value of type `t`."""
+    if isinstance(t, ListType):
+        return t.elem
+    if t == Primitive.STR:
+        return Primitive.STR
+    if isinstance(t, DictType):
+        return Primitive.STR
+    if isinstance(t, TupleType):
+        return join([base_type(c) for c in t.components], ctx)
+    return None
 
 
 def elem_entry(e: ast.expr, ctx: ModuleContext) -> Type:
