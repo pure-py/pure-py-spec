@@ -279,8 +279,6 @@ def supported_expr(node: ast.expr) -> None:
             raise Prohibited(node, f"{type(node.value).__name__} literals prohibited")
         raise Prohibited(node, f"prohibited literal type: {type(node.value).__name__}")
     if isinstance(node, ast.Name):
-        if node.id == "range":
-            raise NotYetSupported(node, "range", 181)
         return
     if isinstance(node, ast.BinOp):
         allowed = (ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv, ast.Mod, ast.Pow)
