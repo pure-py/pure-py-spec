@@ -135,8 +135,10 @@ definitions that follow, as is the name $q$ of the enclosing module in the rules
 $\mathcal{P}$ takes each module $q$ of \figref{predefined} to a pair $(\rho, \Gamma)$, where $\rho$ binds
 $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member listed for $q$ in \figref{predefined} to its value,
 and $\Gamma$ binds the same variables at $\statusDefAssigned$, except those whose value is opaque, which
-it binds at $\predefName$. These signatures name types that are themselves members, sometimes of
-another predefined module, so each is well-formed in the union of the predefined signatures.
+it binds at $\predefName$. The class entry for \pyinline{range} is declared in the signature of
+\pyinline{builtins} itself, and its field type is a member of that signature. These signatures name types
+that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
+the predefined signatures.
 \end{definition}
 
 \begin{figure}
@@ -149,8 +151,7 @@ another predefined module, so each is well-formed in the union of the predefined
  & \pyinline{len} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
  & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
  & & $\quad \primFn(\seq{u}) = \aborts{\errType}$ & otherwise \\
- & \pyinline{range} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
- & & $\quad \primFn(n) = \val{\valRange{n}}$ & \\
+ & \pyinline{range} & \multicolumn{2}{l}{$\rangeClass$} \\
  & \pyinline{None} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{None}}$} \\
  & \pyinline{object} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{object}}$} \\
  & \pyinline{bool} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{bool}}$} \\
