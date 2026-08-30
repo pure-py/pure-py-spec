@@ -1,7 +1,7 @@
 import ast
 from itertools import dropwhile, takewhile
 
-from type_syntax import Type, parse_annotation
+from type_syntax import TypeExpr, dotted_name, parse_annotation
 
 # A PurePy statement: a Python statement, or a mutual region of consecutive defs. A Python body
 # (a statement list) represents the spec's right-nested sequence s s'.
@@ -361,8 +361,8 @@ def nested_statements(s: ast.stmt) -> list[ast.stmt]:
     return [c for c in ast.iter_child_nodes(s) if isinstance(c, ast.stmt)]
 
 
-def own_fields(node: ast.ClassDef) -> tuple[tuple[str, Type], ...]:
-    """Fields a class declares, with their types."""
+def own_fields(node: ast.ClassDef) -> tuple[tuple[str, TypeExpr], ...]:
+    """Fields a class declares, with their type expressions."""
     declared = [
         (t.target.id, parse_annotation(t.annotation))
         for t in node.body
@@ -373,7 +373,6 @@ def own_fields(node: ast.ClassDef) -> tuple[tuple[str, Type], ...]:
 
 
 def qualified_name(e: ast.expr) -> str:
-    if isinstance(e, ast.Name):
-        return e.id
-    assert isinstance(e, ast.Attribute)
-    return qualified_name(e.value) + "." + e.attr
+    q = dotted_name(e)
+    assert q is not None
+    return q

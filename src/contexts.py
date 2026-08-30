@@ -3,7 +3,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
-from type_syntax import CallableType, ListType, Primitive, Type
+from type_syntax import CallableType, ListType, Primitive, Type, dotted_name
 
 
 class Status(Enum):
@@ -18,12 +18,24 @@ type Context = dict[str, ContextEntry]
 type VarContext = dict[str, VarEntry]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class ClassEntry:
+    """A class, identified by its qualified name: two entries with the same name
+    are the same class, and the entry is also the class type."""
+
     context: Context
     name: str
     own_fields: tuple[tuple[str, Type], ...]
     base: str | None
+
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, ClassEntry) and self.name == other.name
+
+    def __hash__(self) -> int:
+        return hash(self.name)
+
+    def __repr__(self) -> str:
+        return f"ClassEntry({self.name})"
 
 
 @dataclass(frozen=True)
@@ -79,18 +91,16 @@ def is_assigned(ctx: ModuleContext, x: str) -> bool:
     return v is not None and v != Status.FF
 
 
-def class_of(ctx: ModuleContext, c: str) -> ClassEntry | None:
-    """Class entry for a class name, which a class type carries by its short
-    name, so a class imported with its module is found through that module."""
-    v = ctx.gamma.get(c)
-    if isinstance(v, ClassEntry):
-        return v
-    for entry in ctx.gamma.values():
-        if isinstance(entry, ModuleLoaded):
-            member = entry.members.get(c)
-            if isinstance(member, ClassEntry):
-                return member
-    return None
+def resolve_name(q: str, ctx: ModuleContext) -> ContextEntry | None:
+    """Entry a qualified name denotes: its first component in the context, and
+    each later one a member of the module the components before it denote."""
+    x, *rest = q.split(".")
+    entry = ctx.gamma.get(x)
+    for y in rest:
+        if not isinstance(entry, ModuleLoaded):
+            return None
+        entry = entry.members.get(y)
+    return entry
 
 
 def module_of(ctx: ModuleContext, x: str) -> ModuleStub | ModuleLoaded | None:
@@ -230,14 +240,8 @@ def extend_context(g1: Context, g2: Context) -> Context:
 
 
 def entry_of(e: ast.expr, ctx: ModuleContext) -> ContextEntry | None:
-    if isinstance(e, ast.Name):
-        return ctx.gamma.get(e.id)
-    if isinstance(e, ast.Attribute):
-        parent = entry_of(e.value, ctx)
-        if isinstance(parent, ModuleLoaded):
-            return parent.members.get(e.attr)
-        return None
-    return None
+    q = dotted_name(e)
+    return None if q is None else resolve_name(q, ctx)
 
 
 def class_entry(e: ast.expr, ctx: ModuleContext) -> ClassEntry | None:

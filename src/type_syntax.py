@@ -2,6 +2,10 @@ import ast
 from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import Enum, auto
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from contexts import ClassEntry
 
 
 class Primitive(Enum):
@@ -14,6 +18,74 @@ class Primitive(Enum):
     FLOAT = auto()
     STR = auto()
     SIZED = auto()
+
+
+@dataclass(frozen=True, eq=False)
+class LiteralType:
+    """A literal type. Equality compares the value's Python type as well, since
+    True == 1 and 1 == 1.0 hold between values of different types."""
+
+    value: object
+
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, LiteralType)
+            and type(self.value) is type(other.value)
+            and self.value == other.value
+        )
+
+    def __hash__(self) -> int:
+        return hash((type(self.value).__name__, self.value))
+
+
+# Type expressions: types as written, naming a class by a qualified name.
+
+
+@dataclass(frozen=True)
+class ListExpr:
+    elem: "TypeExpr"
+
+
+@dataclass(frozen=True)
+class TupleExpr:
+    components: tuple["TypeExpr", ...]
+
+
+@dataclass(frozen=True)
+class DictExpr:
+    value: "TypeExpr"
+
+
+@dataclass(frozen=True)
+class CallableExpr:
+    params: tuple["TypeExpr", ...]
+    result: "TypeExpr"
+
+
+@dataclass(frozen=True)
+class ClassName:
+    q: str
+
+
+@dataclass(frozen=True)
+class UnionExpr:
+    left: "TypeExpr"
+    right: "TypeExpr"
+
+
+type TypeExpr = (
+    Primitive
+    | ListExpr
+    | TupleExpr
+    | DictExpr
+    | CallableExpr
+    | LiteralType
+    | ClassName
+    | UnionExpr
+)
+
+
+# Types: a class type is the class entry itself.
 
 
 @dataclass(frozen=True)
@@ -37,27 +109,9 @@ class CallableType:
     result: "Type"
 
 
-@dataclass(frozen=True, eq=False)
-class LiteralType:
-    """A literal type. Equality compares the value's Python type as well, since
-    True == 1 and 1 == 1.0 hold between values of different types."""
-
-    value: object
-
-    def __eq__(self, other: object) -> bool:
-        return (
-            isinstance(other, LiteralType)
-            and type(self.value) is type(other.value)
-            and self.value == other.value
-        )
-
-    def __hash__(self) -> int:
-        return hash((type(self.value).__name__, self.value))
-
-
 @dataclass(frozen=True)
 class ClassType:
-    q: str
+    entry: "ClassEntry"
 
 
 @dataclass(frozen=True)
@@ -103,7 +157,8 @@ PRIMITIVE_NAMES = {
 
 
 def render(t: Type) -> str:
-    """The type as it is written in an annotation."""
+    """The type as it is written in an annotation, a class by its qualified
+    name."""
     if isinstance(t, Primitive):
         return PRIMITIVE_SPELLINGS[t]
     if isinstance(t, ListType):
@@ -118,7 +173,7 @@ def render(t: Type) -> str:
     if isinstance(t, LiteralType):
         return f"Literal[{t.value!r}]"
     if isinstance(t, ClassType):
-        return t.q
+        return t.entry.name
     return f"{render(t.left)} | {render(t.right)}"
 
 
@@ -152,11 +207,14 @@ def base_type(v: object) -> Type:
     return Primitive.STR
 
 
-def parse_annotation(e: ast.expr) -> Type | None:
+def parse_annotation(e: ast.expr) -> TypeExpr | None:
     if isinstance(e, ast.Constant) and e.value is None:
         return Primitive.NONE
     if isinstance(e, ast.Name):
-        return PRIMITIVE_NAMES.get(e.id, ClassType(e.id))
+        return PRIMITIVE_NAMES.get(e.id, ClassName(e.id))
+    if isinstance(e, ast.Attribute):
+        q = dotted_name(e)
+        return None if q is None else ClassName(q)
     if isinstance(e, ast.BinOp) and isinstance(e.op, ast.BitOr):
         return union(parse_annotation(e.left), parse_annotation(e.right))
     if isinstance(e, ast.Subscript):
@@ -164,7 +222,18 @@ def parse_annotation(e: ast.expr) -> Type | None:
     return None
 
 
-def parse_subscript(e: ast.Subscript) -> Type | None:
+def dotted_name(e: ast.expr) -> str | None:
+    """The qualified name a chain of attribute references spells, or nothing
+    where the chain does not start at a name."""
+    if isinstance(e, ast.Name):
+        return e.id
+    if isinstance(e, ast.Attribute):
+        q = dotted_name(e.value)
+        return None if q is None else f"{q}.{e.attr}"
+    return None
+
+
+def parse_subscript(e: ast.Subscript) -> TypeExpr | None:
     if not isinstance(e.value, ast.Name):
         return None
     if e.value.id == "Literal":
@@ -175,15 +244,15 @@ def parse_subscript(e: ast.Subscript) -> Type | None:
     if args is None:
         return None
     if e.value.id == "list" and len(args) == 1:
-        return ListType(args[0])
+        return ListExpr(args[0])
     if e.value.id == "tuple":
-        return TupleType(args)
+        return TupleExpr(args)
     if e.value.id == "dict" and len(args) == 2 and args[0] == Primitive.STR:
-        return DictType(args[1])
+        return DictExpr(args[1])
     return None
 
 
-def parse_literal(s: ast.expr) -> Type | None:
+def parse_literal(s: ast.expr) -> TypeExpr | None:
     if isinstance(s, ast.Constant):
         return LiteralType(s.value)
     if isinstance(s, ast.UnaryOp) and isinstance(s.op, ast.USub):
@@ -195,22 +264,22 @@ def parse_literal(s: ast.expr) -> Type | None:
     return None
 
 
-def parse_callable(args: tuple[ast.expr, ...]) -> Type | None:
+def parse_callable(args: tuple[ast.expr, ...]) -> TypeExpr | None:
     if len(args) != 2 or not isinstance(args[0], ast.List):
         return None
     params = parse_annotations(args[0].elts)
     result = parse_annotation(args[1])
-    return None if params is None or result is None else CallableType(params, result)
+    return None if params is None or result is None else CallableExpr(params, result)
 
 
 def subscript_args(s: ast.expr) -> tuple[ast.expr, ...]:
     return tuple(s.elts) if isinstance(s, ast.Tuple) else (s,)
 
 
-def parse_annotations(es: Sequence[ast.expr]) -> tuple[Type, ...] | None:
+def parse_annotations(es: Sequence[ast.expr]) -> tuple[TypeExpr, ...] | None:
     ts = tuple(parse_annotation(e) for e in es)
     return None if any(t is None for t in ts) else tuple(t for t in ts if t is not None)
 
 
-def union(s: Type | None, t: Type | None) -> Type | None:
-    return None if s is None or t is None else UnionType(s, t)
+def union(s: TypeExpr | None, t: TypeExpr | None) -> TypeExpr | None:
+    return None if s is None or t is None else UnionExpr(s, t)

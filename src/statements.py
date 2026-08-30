@@ -32,7 +32,6 @@ from contexts import (
     Status,
     VarContext,
     class_entry,
-    class_of,
     entry_of,
     field_map,
     field_type,
@@ -43,6 +42,7 @@ from contexts import (
     override_gamma,
     override_results,
     override_var,
+    resolve_name,
     short_name,
     var_type,
 )
@@ -54,14 +54,21 @@ from subtyping import elem_type, join, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
     PRIMITIVE_SPELLINGS,
+    CallableExpr,
     CallableType,
+    ClassName,
     ClassType,
+    DictExpr,
     DictType,
+    ListExpr,
     ListType,
     LiteralType,
     Primitive,
+    TupleExpr,
     TupleType,
     Type,
+    TypeExpr,
+    UnionExpr,
     UnionType,
     base_type,
     parse_annotation,
@@ -69,57 +76,62 @@ from type_syntax import (
 )
 
 
-def annotated_type(node: ast.AnnAssign) -> Type:
-    """Type an annotated assignment declares. Every annotation the subset
-    admits denotes a type."""
+def annotated_type(node: ast.AnnAssign) -> TypeExpr:
+    """Type expression an annotated assignment carries; the subset admits no
+    other annotation."""
     t = parse_annotation(node.annotation)
     assert t is not None
     return t
 
 
-def signature(d: ast.FunctionDef) -> CallableType:
+def signature(d: ast.FunctionDef, ctx: ModuleContext) -> CallableType:
     """Callable type of a definition, from its parameter and return
     annotations."""
     return CallableType(
-        tuple(annotated(a.annotation) for a in d.args.args), annotated(d.returns)
+        tuple(resolve_type(annotated(a.annotation), a, ctx) for a in d.args.args),
+        resolve_type(annotated(d.returns), d, ctx),
     )
 
 
-def parameters(d: ast.FunctionDef) -> VarContext:
-    return {a.arg: annotated(a.annotation) for a in d.args.args}
+def parameters(d: ast.FunctionDef, ctx: ModuleContext) -> VarContext:
+    return {a.arg: resolve_type(annotated(a.annotation), a, ctx) for a in d.args.args}
 
 
-def well_formed(t: Type, node: ast.AST, ctx: ModuleContext) -> Type:
-    """Check that annotation `t` is well-formed: each name it is written with is
-    in scope, a class name bound to a class entry and every other spelling to the
-    entry its module gives it."""
-    if isinstance(t, Primitive):
-        in_scope(PRIMITIVE_SPELLINGS[t], node, ctx)
-    elif isinstance(t, LiteralType):
+def resolve_type(psi: TypeExpr, node: ast.AST, ctx: ModuleContext) -> Type:
+    """Type that type expression `psi` denotes: each name it is written with
+    must be in scope, a class name resolving to the class entry that is its type
+    and every other spelling to the predefined entry its module gives it."""
+    if isinstance(psi, Primitive):
+        in_scope(PRIMITIVE_SPELLINGS[psi], node, ctx)
+        return psi
+    if isinstance(psi, LiteralType):
         in_scope("Literal", node, ctx)
-    elif isinstance(t, ClassType):
-        if class_of(ctx, t.q) is None:
-            raise IllFormedModule(node, reasons.UnknownClassInAnnotation(t.q))
-    elif isinstance(t, ListType):
+        return psi
+    if isinstance(psi, ClassName):
+        entry = resolve_name(psi.q, ctx)
+        if not isinstance(entry, ClassEntry):
+            raise IllFormedModule(node, reasons.UnknownClassInAnnotation(psi.q))
+        return ClassType(entry)
+    if isinstance(psi, ListExpr):
         in_scope("list", node, ctx)
-        well_formed(t.elem, node, ctx)
-    elif isinstance(t, DictType):
+        return ListType(resolve_type(psi.elem, node, ctx))
+    if isinstance(psi, DictExpr):
         in_scope("dict", node, ctx)
         in_scope("str", node, ctx)
-        well_formed(t.value, node, ctx)
-    elif isinstance(t, TupleType):
+        return DictType(resolve_type(psi.value, node, ctx))
+    if isinstance(psi, TupleExpr):
         in_scope("tuple", node, ctx)
-        for c in t.components:
-            well_formed(c, node, ctx)
-    elif isinstance(t, CallableType):
+        return TupleType(tuple(resolve_type(c, node, ctx) for c in psi.components))
+    if isinstance(psi, CallableExpr):
         in_scope("Callable", node, ctx)
-        for param in t.params:
-            well_formed(param, node, ctx)
-        well_formed(t.result, node, ctx)
-    elif isinstance(t, UnionType):
-        well_formed(t.left, node, ctx)
-        well_formed(t.right, node, ctx)
-    return t
+        return CallableType(
+            tuple(resolve_type(p, node, ctx) for p in psi.params),
+            resolve_type(psi.result, node, ctx),
+        )
+    assert isinstance(psi, UnionExpr)
+    return UnionType(
+        resolve_type(psi.left, node, ctx), resolve_type(psi.right, node, ctx)
+    )
 
 
 def in_scope(x: str, node: ast.AST, ctx: ModuleContext) -> None:
@@ -129,9 +141,9 @@ def in_scope(x: str, node: ast.AST, ctx: ModuleContext) -> None:
         raise IllFormedModule(node, reasons.AnnotationNameNotInScope(x))
 
 
-def annotated(e: ast.expr | None) -> Type:
-    """Type an annotation denotes; every parameter and return carries one, and
-    the subset admits no other annotation."""
+def annotated(e: ast.expr | None) -> TypeExpr:
+    """Type expression an annotation carries; every parameter and return has
+    one, and the subset admits no other annotation."""
     assert e is not None
     t = parse_annotation(e)
     assert t is not None
@@ -185,7 +197,7 @@ def check_statement(
 ) -> ResultType:
     if isinstance(item, list):
         check_mutual_region(item, ctx)
-        return Assigns({d.name: signature(d) for d in item})
+        return Assigns({d.name: signature(d, ctx) for d in item})
     return check_stmt(item, ctx, returns)
 
 
@@ -204,23 +216,16 @@ def check_annotated(defs: list[ast.FunctionDef]) -> None:
 
 
 def check_bodies(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
-    f_names: VarContext = {d.name: signature(d) for d in defs}
+    f_names: VarContext = {d.name: signature(d, ctx) for d in defs}
     for d in defs:
-        params = parameters(d)
-        for a in d.args.args:
-            well_formed(annotated(a.annotation), a, ctx)
-        well_formed(annotated(d.returns), d, ctx)
+        params = parameters(d, ctx)
         locals_ = assigns_body(d.body) - set(params)
         delta = f_names | params | {x: Status.FF for x in locals_}
         body_ctx = override_var(ctx, delta)
-        declared = declared_return(d)
+        declared = resolve_type(annotated(d.returns), d, ctx)
         result = check_body(d.body, body_ctx, declared)
         if not isinstance(result, Returns):
             check_falls_off_end(d, declared, ctx)
-
-
-def declared_return(d: ast.FunctionDef) -> Type | None:
-    return None if d.returns is None else parse_annotation(d.returns)
 
 
 def check_falls_off_end(
@@ -268,7 +273,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
         return Assigns({t.id: assigned for t in s.targets if isinstance(t, ast.Name)})
     if isinstance(s, ast.AnnAssign):
         assert s.value is not None
-        declared = well_formed(annotated_type(s), s, ctx)
+        declared = resolve_type(annotated_type(s), s, ctx)
         check_expr(s.value, declared, ctx)
         check_assign_targets([s.target], captures_e(s.value))
         target = s.target
@@ -375,7 +380,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
         if not is_assigned(ctx, e.id):
             if module_of(ctx, e.id) is not None:
                 raise IllFormedModule(e, reasons.ModuleAsValue(e.id))
-            if class_of(ctx, e.id) is not None:
+            if isinstance(ctx.gamma.get(e.id), ClassEntry):
                 raise IllFormedModule(e, reasons.ClassAsValue(e.id))
             if isinstance(ctx.gamma.get(e.id), PredefinedName):
                 raise IllFormedModule(e, reasons.PredefinedNameAsValue(e.id))
@@ -421,7 +426,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
                 declared = field_type(constructed, x)
                 assert declared is not None
                 check_expr(arg, declared, ctx)
-            return ClassType(c_name)
+            return ClassType(constructed)
         return call(e, ctx)
     if isinstance(e, ast.BinOp):
         return binary(BINARY_NAMES[type(e.op)], e.left, e.right, e, ctx)
@@ -468,7 +473,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
         if isinstance(parent, ModuleStub):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(parent.q))
         obj = synth_expr(e.value, ctx)
-        entry = class_of(ctx, obj.q) if isinstance(obj, ClassType) else None
+        entry = obj.entry if isinstance(obj, ClassType) else None
         if entry is None:
             raise IllFormedModule(e, reasons.NotSynthesised())
         member = field_type(entry, e.attr)
@@ -722,10 +727,13 @@ def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
     base = (
         node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
     )
+    ctx = ModuleContext(gamma=context, q=q)
     return ClassEntry(
         context=context,
         name=f"{q}.{node.name}",
-        own_fields=own_fields(node),
+        own_fields=tuple(
+            (x, resolve_type(psi, node, ctx)) for x, psi in own_fields(node)
+        ),
         base=base,
     )
 
@@ -736,7 +744,7 @@ def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
     if not isinstance(gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.DecoratorNotInScope("dataclass"))
     for _, t in own_fields(node):
-        well_formed(t, node, ModuleContext(gamma=gamma, q=q))
+        resolve_type(t, node, ModuleContext(gamma=gamma, q=q))
     names = [x for x, _ in own_fields(node)]
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:

@@ -1,7 +1,7 @@
 import ast
 from collections.abc import Callable, Sequence
 
-from contexts import ModuleContext, class_of, field_type, fields
+from contexts import ClassEntry, ModuleContext, field_type, fields
 from subtyping import comparable, join, subtype
 from type_syntax import (
     CallableType,
@@ -50,14 +50,11 @@ def equality_type(t: Type, ctx: ModuleContext) -> bool:
     if isinstance(t, UnionType):
         return equality_type(t.left, ctx) and equality_type(t.right, ctx)
     if isinstance(t, ClassType):
-        return class_equality_type(t.q, ctx)
+        return class_equality_type(t.entry, ctx)
     return True
 
 
-def class_equality_type(q: str, ctx: ModuleContext) -> bool:
-    entry = class_of(ctx, q)
-    if entry is None:
-        return True
+def class_equality_type(entry: ClassEntry, ctx: ModuleContext) -> bool:
     return all(
         equality_type(field_type(entry, x) or Primitive.NEVER, ctx)
         for x in fields(entry)

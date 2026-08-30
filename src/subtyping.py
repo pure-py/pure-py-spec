@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from contexts import ModuleContext, ancestors, class_of, short_name
+from contexts import ModuleContext, ancestors
 from type_syntax import (
     ClassType,
     DictType,
@@ -42,17 +42,12 @@ def subtype(s: Type, t: Type, ctx: ModuleContext) -> bool:
     if t == Primitive.SIZED:
         return isinstance(s, (ListType, DictType, TupleType)) or s == Primitive.STR
     if isinstance(s, ClassType) and isinstance(t, ClassType):
-        return t.q in ancestor_names(s.q, ctx)
+        return t.entry in ancestors(s.entry)
     if isinstance(s, TupleType) and isinstance(t, TupleType):
         return len(s.components) == len(t.components) and all(
             subtype(a, b, ctx) for a, b in zip(s.components, t.components)
         )
     return False
-
-
-def ancestor_names(q: str, ctx: ModuleContext) -> tuple[str, ...]:
-    entry = class_of(ctx, q.rsplit(".", 1)[-1])
-    return () if entry is None else tuple(short_name(a) for a in ancestors(entry))
 
 
 def comparable(s: Type, t: Type, ctx: ModuleContext) -> bool:

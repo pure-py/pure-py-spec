@@ -8,7 +8,7 @@ sub-patterns.
 
 from dataclasses import dataclass
 
-from contexts import ModuleContext
+from contexts import ClassEntry, ModuleContext
 from subtyping import subtype
 from type_syntax import (
     ClassType,
@@ -37,7 +37,7 @@ class Literal:
 
 @dataclass(frozen=True)
 class Constr:
-    q: str
+    entry: ClassEntry
     args: tuple["Shape", ...]
 
 
@@ -77,7 +77,7 @@ def shape_type(k: Shape) -> Type:
     if isinstance(k, Literal):
         return LiteralType(k.value)
     if isinstance(k, Constr):
-        return ClassType(k.q)
+        return ClassType(k.entry)
     if isinstance(k, Tuple):
         return TupleType(tuple(shape_type(c) for c in k.components))
     if isinstance(k, List):
@@ -96,7 +96,7 @@ def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> frozenset[S
     if t == Primitive.NONE and LiteralType(None) in heads:
         return NOTHING
     if isinstance(t, ClassType) and any(
-        isinstance(h, str) and subtype(t, ClassType(h), ctx) for h in heads
+        isinstance(h, ClassEntry) and subtype(t, ClassType(h), ctx) for h in heads
     ):
         return NOTHING
     if t == Primitive.NEVER:

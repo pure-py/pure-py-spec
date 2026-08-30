@@ -125,23 +125,26 @@ def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | Non
     entry = class_entry(p.cls, ctx)
     if entry is None:
         raise IllFormedModule(p, reasons.UnknownClassInPattern(class_name(p.cls)))
-    q = short_name(entry)
     args = field_map(entry, p.patterns, p.kwd_attrs, p.kwd_patterns)
     if args is None:
         raise no_field_map(entry, p)
     ps = tuple(args[x] for x in fields(entry))
     if isinstance(k, Constr):
-        if not subtype(ClassType(k.q), ClassType(q), ctx):
+        if not subtype(ClassType(k.entry), ClassType(entry), ctx):
             return None
         rows = match_row(k.args, padded(ps, len(k.args)), p, ctx)
-        return wrap(lambda r: Constr(k.q, r), rows)
-    if isinstance(k, Rest) and q not in k.heads and comparable(ClassType(q), k.ty, ctx):
+        return wrap(lambda r: Constr(k.entry, r), rows)
+    if (
+        isinstance(k, Rest)
+        and entry not in k.heads
+        and comparable(ClassType(entry), k.ty, ctx)
+    ):
         row = tuple(field_shape(entry, x) for x in fields(entry))
-        result = wrap(lambda r: Constr(q, r), match_row(row, ps, p, ctx))
+        result = wrap(lambda r: Constr(entry, r), match_row(row, ps, p, ctx))
         if result is None:
             return None
         matched, left, delta = result
-        return matched, left | shapes(k.ty, k.heads | {q}, ctx), delta
+        return matched, left | shapes(k.ty, k.heads | {entry}, ctx), delta
     return None
 
 
