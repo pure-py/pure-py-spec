@@ -14,15 +14,11 @@ directions.
 1. Build two inventories: spec constructs (judgements, rules, metafunctions,
    operators, technical terms, section headings) and implementation identifiers
    (functions, classes, constants, test taxonomy, docs).
-2. Match by name. Every unmatched item, in either direction, gets exactly one
-   of:
+2. Match by name. Every unmatched item, in either direction, gets one of:
    - **rename** to the spec's name (the spec is the reference; `wraps` in the
      spec means a function called `wraps` in the checker);
    - **delete** as dead code or a displaced term (unused macros, stale labels,
-     helpers with no callers);
-   - **excuse** as a true implementation detail with no spec-level counterpart
-     (e.g. memoizing module contexts, which is caching for idempotent
-     checking). Record the excuse.
+     helpers with no callers).
 3. Watch for the same name meaning different things on the two sides (the spec
    distinguishes override from extend; the implementation must not use one
    name for both).
