@@ -17,7 +17,7 @@ $\vdash_{\mathsf{load}} q : \Gamma$ & module $q$ statically loads with signature
 $\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{well-formed-module}
    \\[2mm]
 \metaGroup{Evaluation} \\
-$\rho, p, v \matches m$ & pattern $p$ matches value $v$ with result $m$ & \figref{match} \\
+$\rho, p, v \matches m$ & pattern $p$ matches value $v$ with result $m$ & \figref{eval-pat} \\
 $\rho, t \Rightarrow r$ & statement $t$ evaluates to result $r$ & \figref{eval-block-outcome} \\
 $\rho, e \Rightarrow o$ & expression $e$ evaluates to outcome $o$ & \figref{eval-outcome} \\
 $\rho, \seq{e} \Rightarrow o$ & expressions $\seq{e}$ evaluate, left to right, to outcome $o$ & \figref{eval-seq} \\

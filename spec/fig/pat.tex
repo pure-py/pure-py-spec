@@ -1,117 +1,6 @@
 \begin{figure}
 \small
 \setlength{\jot}{2pt}
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash k : \tau$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{shape-rest}}]
-{
-  \Gamma \vdash N \ctors \tau \\
-  \tau \text{ neither union nor dictionary type}
-}
-{
-  \Gamma \vdash \shapeAny{\tau}{N} : \tau
-}
-\and
-\inferrule*[lab={\ruleName{shape-dict}}]
-{
-  \Gamma \vdash \beta(w) : \tau \quad (\forall w \in \dom(\beta)) \\
-  \dom(\beta) \cap N = \varnothing
-}
-{
-  \Gamma \vdash \shapeDict{\tau}{\beta}{N} : \tyDict{\tau}
-}
-\and
-\inferrule*[lab={\ruleName{shape-literal}}]
-{
-  \Gamma \vdash \tyLiteral{\ell} \subty \tau
-}
-{
-  \Gamma \vdash \ell : \tau
-}
-\and
-\inferrule*[lab={\ruleName{shape-constr}}]
-{
-  \Gamma \vdash q : C \\
-  \Gamma \vdash q \subty \tau \\
-  \Gamma \vdash k_x : \sigma \quad (\forall \bind{x}{\sigma} \in \fields(C))
-}
-{
-  \Gamma \vdash \patConstr{q}{\seq{k}} : \tau
-}
-\and
-\inferrule*[lab={\ruleName{shape-tuple}}]
-{
-  \Gamma \vdash k_i : \tau_i \quad (\forall i)
-}
-{
-  \Gamma \vdash \patTuple{\seq{k}} : \tyTuple{\seq{\tau}}
-}
-\and
-\inferrule*[lab={\ruleName{shape-list}}]
-{
-  \Gamma \vdash k_i : \tau \quad (\forall i)
-}
-{
-  \Gamma \vdash \shapeList{\tau}{\seq{k}} : \tyList{\tau}
-}
-\end{mathpar}
-\subcaption{Shape $k$ denotes values of type $\tau$}
-\end{subfigure}
-
-\vspace{2mm}
-
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash N \ctors \tau$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{constructs-empty}}]
-{
-  \strut
-}
-{
-  \Gamma \vdash \varnothing \ctors \tau
-}
-\and
-\inferrule*[lab={\ruleName{constructs-class}}]
-{
-  \Gamma \vdash q' \subty q \\
-  \Gamma \vdash N \ctors q
-}
-{
-  \Gamma \vdash \set{q'} \cup N \ctors q
-}
-\and
-\inferrule*[lab={\ruleName{constructs-list}}]
-{
-  n \text{ an integer} \\
-  \Gamma \vdash N \ctors \tyList{\tau}
-}
-{
-  \Gamma \vdash \set{n} \cup N \ctors \tyList{\tau}
-}
-
-\and
-\inferrule*[lab={\ruleName{constructs-literal}}]
-{
-  \Gamma \vdash \tyLiteral{\ell} \subty \tau \\
-  \Gamma \vdash N \ctors \tau
-}
-{
-  \Gamma \vdash \set{\ell} \cup N \ctors \tau
-}
-\end{mathpar}
-\subcaption{Set of heads $N$ constructs type $\tau$}
-\end{subfigure}
-
-\caption{Shape typing}
-\label{fig:shapes}
-\end{figure}
-
-\begin{figure}
-\small
-\setlength{\jot}{2pt}
 \flushleft \shadebox{$\Gamma \vdash k, p \matches K, L \binding \Delta$}
 \begin{mathpar}
 \small
@@ -247,7 +136,7 @@
 }
 \end{mathpar}
 \caption{Pattern $p$ matches shape $k$, giving matched shapes $K$, residual $L$ and binding $\Delta$}
-\label{fig:split}
+\label{fig:pat}
 \end{figure}
 
 \begin{figure}
@@ -273,5 +162,5 @@
 }
 \end{mathpar}
 \caption{Matching rows and sets of shapes}
-\label{fig:split-rows}
+\label{fig:pat-rows}
 \end{figure}
