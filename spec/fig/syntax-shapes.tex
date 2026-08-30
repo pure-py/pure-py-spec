@@ -5,7 +5,7 @@
 \grammarGroup{Shapes} \\
 $k$ & $::=$ & $\shapeAny{\tau}{N}$ & (Rest) \\
     & $\mid$ & $\ell$ & (Literal) \\
-    & $\mid$ & $\patConstr{C}{k_1, \ldots, k_n}$ & (Constr) \\
+    & $\mid$ & $\shapeAny{\patConstr{C}{k_1, \ldots, k_n}}{N}$ & (Constr) \\
     & $\mid$ & $\patTuple{k_1, \ldots, k_n}$ & (Tuple) \\
     & $\mid$ & $\shapeList{\tau}{k_1, \ldots, k_n}$ & (List) \\
     & $\mid$ & $\shapeDict{\tau}{\beta}{N}$ & (Dict)

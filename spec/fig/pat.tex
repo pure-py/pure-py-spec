@@ -48,10 +48,11 @@
 \inferrule*[lab={\ruleName{pat-rest-constr}}]
 {
   \Gamma \vdash q : C \\
-  C \notin N \\
+  \nexists C' \in N.\ \Gamma \vdash C \subty C' \\
   \tau, C \text{ comparable} \\
-  \fields(C) = \bind{\seq{x}}{\seq{\sigma}} \\
-  \Gamma \vdash \set{\patConstr{C}{\seq{k}} \mid \seq{k} \in \shapesOf(\seq{\sigma})}, \patConstr{q}{a} \matches K, L \binding \Delta
+  E \text{ the lower of } \tau \text{ and } C \\
+  \fields(E) = \bind{\seq{x}}{\seq{\sigma}} \\
+  \Gamma \vdash \set{\shapeAny{\patConstr{E}{\seq{k}}}{N} \mid \seq{k} \in \shapesOf(\seq{\sigma})}, \patConstr{q}{a} \matches K, L \binding \Delta
 }
 {
   \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \matches K, L \cup \shapesOf(\tau, N \cup \set{C}) \binding \Delta
@@ -84,7 +85,20 @@
   \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
 }
 {
-  \Gamma \vdash \patConstr{C}{\seq{k}}, \patConstr{q'}{a} \matches \set{\patConstr{C}{\seq{m}} \mid \seq{m} \in K}, \set{\patConstr{C}{\seq{k}\,'} \mid \seq{k}\,' \in L} \binding \Delta
+  \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{N}, \patConstr{q'}{a} \matches \set{\shapeAny{\patConstr{C}{\seq{m}}}{N} \mid \seq{m} \in K}, \set{\shapeAny{\patConstr{C}{\seq{k}\,'}}{N} \mid \seq{k}\,' \in L} \binding \Delta
+}
+\and
+\inferrule*[lab={\ruleName{pat-constr-sub}}]
+{
+  \Gamma \vdash q' : C' \\
+  \Gamma \vdash C' \subty C \\
+  C' \neq C \\
+  \nexists C'' \in N.\ \Gamma \vdash C' \subty C'' \\
+  \fields(C') = \fields(C) \mathbin{\concat} \bind{\seq{y}}{\seq{\sigma}} \\
+  \Gamma \vdash \set{\shapeAny{\patConstr{C'}{\seq{k} \mathbin{\concat} \seq{k}\,'}}{N} \mid \seq{k}\,' \in \shapesOf(\seq{\sigma})}, \patConstr{q'}{a} \matches K, L \binding \Delta
+}
+{
+  \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{N}, \patConstr{q'}{a} \matches K, L \cup \set{\shapeAny{\patConstr{C}{\seq{k}}}{N \cup \set{C'}}} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-tuple}}]

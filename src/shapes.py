@@ -39,8 +39,12 @@ class Literal:
 
 @dataclass(frozen=True)
 class Constr:
+    """Instances of `entry` or of a subclass not below `heads`, whose fields
+    (those of `entry`) have the given shapes."""
+
     entry: ClassEntry
     args: tuple["Shape", ...]
+    heads: frozenset[object]
 
 
 @dataclass(frozen=True)
@@ -97,9 +101,7 @@ def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> frozenset[S
         return NOTHING
     if t == Primitive.NONE and LiteralType(None) in heads:
         return NOTHING
-    if isinstance(t, ClassType) and any(
-        isinstance(h, ClassEntry) and subtype(t, ClassType(h), ctx) for h in heads
-    ):
+    if isinstance(t, ClassType) and below_excluded(t.entry, heads, ctx):
         return NOTHING
     if t == Primitive.NEVER:
         return NOTHING
@@ -108,6 +110,16 @@ def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> frozenset[S
             {Dict(t.value, (), frozenset(k for k in heads if isinstance(k, str)))}
         )
     return frozenset({Rest(t, heads)})
+
+
+def below_excluded(
+    entry: ClassEntry, heads: frozenset[object], ctx: ModuleContext
+) -> bool:
+    """Whether the class lies below a class of the excluded heads."""
+    return any(
+        isinstance(h, ClassEntry) and subtype(ClassType(entry), ClassType(h), ctx)
+        for h in heads
+    )
 
 
 def shapes_row(ts: Sequence[Type], ctx: ModuleContext) -> frozenset[Row]:

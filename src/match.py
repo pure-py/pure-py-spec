@@ -34,6 +34,7 @@ from shapes import (
     Row,
     Shape,
     Tuple,
+    below_excluded,
     shape_type,
     shapes,
     shapes_row,
@@ -139,23 +140,44 @@ def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | Non
         raise no_field_map(entry, p)
     ps = tuple(args[x] for x in fields(entry))
     if isinstance(k, Constr):
-        if not subtype(ClassType(k.entry), ClassType(entry), ctx):
-            return None
-        rows = match_row(k.args, padded(ps, len(k.args)), p, ctx)
-        return wrap(lambda r: Constr(k.entry, r), rows)
+        if subtype(ClassType(k.entry), ClassType(entry), ctx):
+            rows = match_row(k.args, padded(ps, len(k.args)), p, ctx)
+            return wrap(lambda r: Constr(k.entry, r, k.heads), rows)
+        if subtype(ClassType(entry), ClassType(k.entry), ctx) and not below_excluded(
+            entry, k.heads, ctx
+        ):
+            own = tuple(declared_field(entry, x) for x in fields(entry)[len(k.args) :])
+            expanded = frozenset(
+                Constr(entry, k.args + row, k.heads) for row in shapes_row(own, ctx)
+            )
+            result = match_shapes(expanded, p, ctx)
+            if result is None:
+                return None
+            matched, left, delta = result
+            taken = Constr(k.entry, k.args, k.heads | {entry})
+            return matched, left | {taken}, delta
+        return None
     if (
         isinstance(k, Rest)
-        and entry not in k.heads
         and comparable(ClassType(entry), k.ty, ctx)
+        and not below_excluded(entry, k.heads, ctx)
     ):
-        types = tuple(declared_field(entry, x) for x in fields(entry))
-        expanded = frozenset(Constr(entry, row) for row in shapes_row(types, ctx))
+        low = entry if subtype(ClassType(entry), k.ty, ctx) else class_of(k.ty)
+        types = tuple(declared_field(low, x) for x in fields(low))
+        expanded = frozenset(
+            Constr(low, row, k.heads) for row in shapes_row(types, ctx)
+        )
         result = match_shapes(expanded, p, ctx)
         if result is None:
             return None
         matched, left, delta = result
         return matched, left | shapes(k.ty, k.heads | {entry}, ctx), delta
     return None
+
+
+def class_of(t: Type) -> ClassEntry:
+    assert isinstance(t, ClassType)
+    return t.entry
 
 
 def match_mapping(
