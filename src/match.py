@@ -1,8 +1,8 @@
-"""Shapes, and how a pattern splits them.
+"""Shapes, and how a pattern matches them.
 
-A shape denotes a set of values of a type. Splitting a shape by a pattern gives
-the shapes the pattern matches, the residual it leaves and the bindings it
-makes, so a case that matches nothing has no split and a match is exhaustive
+A shape denotes a set of values of a type. Matching a pattern against a shape
+gives the shapes it matches, the residual it leaves and the bindings it makes,
+so a case that matches nothing has no derivation and a match is exhaustive
 where the residual is empty.
 """
 
@@ -82,8 +82,8 @@ class Dict:
 
 type Shape = Rest | Literal | Constr | Tuple | List | Dict
 type Row = tuple[Shape, ...]
-type Split = tuple[frozenset[Shape], frozenset[Shape], VarContext]
-type RowSplit = tuple[frozenset[Row], frozenset[Row], VarContext]
+type Match = tuple[frozenset[Shape], frozenset[Shape], VarContext]
+type RowMatch = tuple[frozenset[Row], frozenset[Row], VarContext]
 
 NOTHING: frozenset[Shape] = frozenset()
 NO_BINDINGS: VarContext = {}
@@ -127,30 +127,30 @@ def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> frozenset[S
     return frozenset({Rest(t, heads)})
 
 
-def split(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Split | None:
+def match(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Match | None:
     """Shapes of `k` that `p` matches, the shapes it leaves and the bindings it
     makes, or nothing where `p` cannot match `k`."""
     if isinstance(p, ast.MatchAs):
-        return split_as(k, p, ctx)
+        return match_as(k, p, ctx)
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
-        return split_literal(k, LiteralType(literal_of(p)), ctx)
+        return match_literal(k, LiteralType(literal_of(p)), ctx)
     if isinstance(p, PatTuple):
-        return split_tuple(k, tuple(p.patterns), ctx)
+        return match_tuple(k, tuple(p.patterns), ctx)
     if isinstance(p, PatList):
-        return split_list(k, tuple(p.patterns), ctx)
+        return match_list(k, tuple(p.patterns), ctx)
     if isinstance(p, ast.MatchMapping):
-        return split_mapping(k, items(p), ctx)
+        return match_mapping(k, items(p), ctx)
     assert isinstance(p, ast.MatchClass)
-    return split_constr(k, p, ctx)
+    return match_constr(k, p, ctx)
 
 
-def split_as(k: Shape, p: ast.MatchAs, ctx: ModuleContext) -> Split | None:
+def match_as(k: Shape, p: ast.MatchAs, ctx: ModuleContext) -> Match | None:
     """A variable or wildcard matches the whole shape; a named sub-pattern binds
     at the join over the shapes it matched."""
     if p.pattern is None:
         bare: VarContext = {} if p.name is None else {p.name: shape_type(k)}
         return frozenset({k}), NOTHING, bare
-    result = split(k, p.pattern, ctx)
+    result = match(k, p.pattern, ctx)
     if result is None:
         return None
     matched, left, delta = result
@@ -160,7 +160,7 @@ def split_as(k: Shape, p: ast.MatchAs, ctx: ModuleContext) -> Split | None:
     return matched, left, disjoint_union([delta, {p.name: named}])
 
 
-def split_literal(k: Shape, ell: LiteralType, ctx: ModuleContext) -> Split | None:
+def match_literal(k: Shape, ell: LiteralType, ctx: ModuleContext) -> Match | None:
     if isinstance(k, Literal):
         if LiteralType(k.value) != ell:
             return None
@@ -171,31 +171,31 @@ def split_literal(k: Shape, ell: LiteralType, ctx: ModuleContext) -> Split | Non
     return None
 
 
-def split_tuple(
+def match_tuple(
     k: Shape, ps: tuple[ast.pattern, ...], ctx: ModuleContext
-) -> Split | None:
+) -> Match | None:
     if isinstance(k, Tuple) and len(k.components) == len(ps):
-        return wrap(Tuple, split_row(k.components, ps, ctx))
+        return wrap(Tuple, match_row(k.components, ps, ctx))
     if (
         isinstance(k, Rest)
         and isinstance(k.ty, TupleType)
         and len(k.ty.components) == len(ps)
     ):
         row = tuple(Rest(c, frozenset()) for c in k.ty.components)
-        return wrap(Tuple, split_row(row, ps, ctx))
+        return wrap(Tuple, match_row(row, ps, ctx))
     return None
 
 
-def split_list(
+def match_list(
     k: Shape, ps: tuple[ast.pattern, ...], ctx: ModuleContext
-) -> Split | None:
+) -> Match | None:
     n = len(ps)
     if isinstance(k, List) and len(k.elems) == n:
-        return wrap(lambda r: List(k.elem, r), split_row(k.elems, ps, ctx))
+        return wrap(lambda r: List(k.elem, r), match_row(k.elems, ps, ctx))
     if isinstance(k, Rest) and isinstance(k.ty, ListType) and n not in k.heads:
         elem = k.ty.elem
         row = tuple(Rest(elem, frozenset()) for _ in ps)
-        result = wrap(lambda r: List(elem, r), split_row(row, ps, ctx))
+        result = wrap(lambda r: List(elem, r), match_row(row, ps, ctx))
         if result is None:
             return None
         matched, left, delta = result
@@ -203,7 +203,7 @@ def split_list(
     return None
 
 
-def split_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Split | None:
+def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | None:
     entry = class_entry(p.cls, ctx)
     assert entry is not None
     q = short_name(entry)
@@ -213,11 +213,11 @@ def split_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Split | Non
     if isinstance(k, Constr):
         if not subtype(ClassType(k.q), ClassType(q), ctx):
             return None
-        rows = split_row(k.args, padded(ps, len(k.args)), ctx)
+        rows = match_row(k.args, padded(ps, len(k.args)), ctx)
         return wrap(lambda r: Constr(k.q, r), rows)
     if isinstance(k, Rest) and q not in k.heads and comparable(ClassType(q), k.ty, ctx):
         row = tuple(field_shape(entry, x) for x in fields(entry))
-        result = wrap(lambda r: Constr(q, r), split_row(row, ps, ctx))
+        result = wrap(lambda r: Constr(q, r), match_row(row, ps, ctx))
         if result is None:
             return None
         matched, left, delta = result
@@ -225,9 +225,9 @@ def split_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Split | Non
     return None
 
 
-def split_mapping(
+def match_mapping(
     k: Shape, ws: tuple[tuple[str, ast.pattern], ...], ctx: ModuleContext
-) -> Split | None:
+) -> Match | None:
     if not isinstance(k, Dict):
         return None
     if len(ws) == 0:
@@ -236,20 +236,18 @@ def split_mapping(
     assert w not in [key for key, _ in rest]
     bound = dict(k.bound)
     if w in bound:
-        first = split(bound[w], p, ctx)
+        first = match(bound[w], p, ctx)
     elif w not in k.heads:
-        first = split_shapes(shapes(k.value, frozenset(), ctx), p, ctx)
+        first = match_shapes(shapes(k.value, frozenset(), ctx), p, ctx)
     else:
         return None
     if first is None:
         return None
     matched, left, delta = first
-    rest_split = split_mappings(
-        frozenset(with_key(k, w, m) for m in matched), rest, ctx
-    )
-    if rest_split is None:
+    later = match_mappings(frozenset(with_key(k, w, m) for m in matched), rest, ctx)
+    if later is None:
         return None
-    matched_, left_, delta_ = rest_split
+    matched_, left_, delta_ = later
     absent = (
         NOTHING if w in bound else frozenset({Dict(k.value, k.bound, k.heads | {w})})
     )
@@ -257,25 +255,25 @@ def split_mapping(
     return matched_, left__, disjoint_union([delta, delta_])
 
 
-def split_mappings(
+def match_mappings(
     ks: frozenset[Shape], ws: tuple[tuple[str, ast.pattern], ...], ctx: ModuleContext
-) -> Split | None:
-    splits = {k: s for k in ordered(ks) if (s := split_mapping(k, ws, ctx)) is not None}
-    if len(splits) == 0:
+) -> Match | None:
+    matches = {k: s for k in ordered(ks) if (s := match_mapping(k, ws, ctx)) is not None}
+    if len(matches) == 0:
         return None
-    matched = union(m for m, _, _ in splits.values())
-    left = union(left for _, left, _ in splits.values()) | (ks - splits.keys())
-    return matched, left, join_deltas([d for _, _, d in splits.values()], ctx)
+    matched = union(m for m, _, _ in matches.values())
+    left = union(left for _, left, _ in matches.values()) | (ks - matches.keys())
+    return matched, left, join_deltas([d for _, _, d in matches.values()], ctx)
 
 
-def split_row(
+def match_row(
     row: Row, ps: tuple[ast.pattern, ...], ctx: ModuleContext
-) -> RowSplit | None:
+) -> RowMatch | None:
     """Rows that match the row of patterns, and rows that fail at one position."""
-    splits = [split(k, p, ctx) for k, p in zip(row, ps)]
-    if any(s is None for s in splits):
+    matches = [match(k, p, ctx) for k, p in zip(row, ps)]
+    if any(s is None for s in matches):
         return None
-    parts = [s for s in splits if s is not None]
+    parts = [s for s in matches if s is not None]
     matched = frozenset(product(*(m for m, _, _ in parts)))
     left = frozenset(
         tuple(prefix) + (k,) + row[i + 1 :]
@@ -286,17 +284,17 @@ def split_row(
     return matched, left, disjoint_union([d for _, _, d in parts])
 
 
-def split_shapes(
+def match_shapes(
     ks: frozenset[Shape], p: ast.pattern, ctx: ModuleContext
-) -> Split | None:
+) -> Match | None:
     """Shapes of `ks` that `p` matches, with the shapes it does not match passed
     into the residual, or nothing where it matches none of them."""
-    splits = {k: s for k in ordered(ks) if (s := split(k, p, ctx)) is not None}
-    if len(splits) == 0:
+    matches = {k: s for k in ordered(ks) if (s := match(k, p, ctx)) is not None}
+    if len(matches) == 0:
         return None
-    matched = union(m for m, _, _ in splits.values())
-    left = union(left for _, left, _ in splits.values()) | (ks - splits.keys())
-    return matched, left, join_deltas([d for _, _, d in splits.values()], ctx)
+    matched = union(m for m, _, _ in matches.values())
+    left = union(left for _, left, _ in matches.values()) | (ks - matches.keys())
+    return matched, left, join_deltas([d for _, _, d in matches.values()], ctx)
 
 
 def disjoint_union(deltas: list[VarContext]) -> VarContext:
@@ -333,7 +331,7 @@ def union(sets: Iterable[frozenset[Shape]]) -> frozenset[Shape]:
     return frozenset(k for s in sets for k in s)
 
 
-def wrap(form: Callable[[Row], Shape], rows: RowSplit | None) -> Split | None:
+def wrap(form: Callable[[Row], Shape], rows: RowMatch | None) -> Match | None:
     if rows is None:
         return None
     matched, left, delta = rows

@@ -1,4 +1,4 @@
-# rule: split-constr -- a base-class pattern splits a subclass shape at its own fields
+# rule: pat-constr -- a base-class pattern splits a subclass shape at its own fields
 from dataclasses import dataclass
 
 @dataclass

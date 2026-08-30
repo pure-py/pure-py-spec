@@ -1,4 +1,4 @@
-# rule: split-row -- splitting position by position exhausts what no single case covers
+# rule: pat-row -- splitting position by position exhausts what no single case covers
 def f(p: tuple[bool, bool]) -> int:
     match p:
         case (True, _):

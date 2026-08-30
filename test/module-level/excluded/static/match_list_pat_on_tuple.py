@@ -1,4 +1,4 @@
-# rule: split-shapes -- a list pattern matches only a list shape
+# rule: pat-shapes -- a list pattern matches only a list shape
 v = (1, 2)
 match v:
     case [a, b]:

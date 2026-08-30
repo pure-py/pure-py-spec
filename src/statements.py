@@ -47,7 +47,7 @@ from contexts import (
     short_name,
     var_type,
 )
-from split import Shape, shapes, split_shapes
+from match import Shape, match_shapes, shapes
 from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
 from patterns import check_pattern_list, describe
 from reasons import IllFormedModule
@@ -323,23 +323,23 @@ def check_match_cases(
     ctx: ModuleContext,
     returns: Type | None,
 ) -> ResultType:
-    deltas, partial = split_cases(cases, subject, ctx)
+    deltas, partial = match_cases(cases, subject, ctx)
     branches = [
         check_case(case, delta, ctx, returns) for case, delta in zip(cases, deltas)
     ]
     return merge_results(branches + ([ASSIGNS_EMPTY] if partial else []), joiner(ctx))
 
 
-def split_cases(
+def match_cases(
     cases: list[ast.match_case], subject: Type, ctx: ModuleContext
 ) -> tuple[list[VarContext], bool]:
-    """Bindings of each case, taken by splitting the residual, and whether some
-    value of the scrutinee type falls through."""
+    """Bindings of each case, taken by matching against the residual, and
+    whether some value of the scrutinee type falls through."""
     seed = shapes(base_type(subject), frozenset(), ctx)
     left = seed
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):
-        result = split_shapes(left, case.pattern, ctx)
+        result = match_shapes(left, case.pattern, ctx)
         if result is None:
             raise unmatched(case.pattern, index, subject, seed, ctx)
         _, left, delta = result
@@ -356,7 +356,7 @@ def unmatched(
 ) -> IllFormedModule:
     """A case matches nothing either because no value of the scrutinee type has
     its shape, or because the earlier cases have taken every shape it has."""
-    if split_shapes(seed, p, ctx) is None:
+    if match_shapes(seed, p, ctx) is None:
         return IllFormedModule(
             p, reasons.PatternTypeMismatch(describe(p, ctx), render(subject))
         )

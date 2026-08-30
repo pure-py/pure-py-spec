@@ -47,7 +47,52 @@ MYPY_INCOMPATIBLE = "mypy-incompatible"
 MYPY_INI = "mypy.ini"
 
 RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
+RULE_DEF = re.compile(r"lab=\{\\ruleName\{([a-z0-9-]+)\}\}")
 CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
+
+# Constructs with a rule at more than one level: well-formed in the chapter on
+# well-formedness, typed in the chapter on the type system, and open-term typed
+# in the appendix. A typing rule refines the well-formedness rule of the same
+# construct, so the two share a name.
+REFINED_RULES = frozenset(
+    {
+        "and",
+        "assert",
+        "assert-msg",
+        "assign",
+        "attr-module",
+        "attr-object",
+        "binop",
+        "call",
+        "class",
+        "class-extend",
+        "cond",
+        "constr",
+        "def",
+        "dict",
+        "dict-comp",
+        "expr-stmt",
+        "if",
+        "if-else",
+        "lambda",
+        "list",
+        "list-comp",
+        "literal",
+        "match",
+        "match-partial",
+        "or",
+        "pass",
+        "qual-generator",
+        "qual-guard",
+        "quals-nil",
+        "return",
+        "return-none",
+        "seq",
+        "tuple",
+        "unop",
+        "var",
+    }
+)
 
 # Checker entry points under src/
 CHECK, CHECK_PROGRAM = "check_module.py", "check_program.py"
@@ -293,6 +338,26 @@ class Runner:
         print(f"{GREEN}✓ {total}/{total} passed{RESET}")
 
 
+def check_rule_names(r: Runner) -> None:
+    """A citation names one rule, so no two rules may carry the same name,
+    unless one refines the other."""
+    where: dict[str, list[str]] = {}
+    for source in ("spec", "paper"):
+        for f in sorted((ROOT / source).rglob("*.tex")):
+            for name in RULE_DEF.findall(f.read_text(encoding="utf-8")):
+                where.setdefault(name, []).append(str(f.relative_to(ROOT)))
+    clashes = [
+        f"{name} in {', '.join(files)}"
+        for name, files in sorted(where.items())
+        if len(files) != len(set(files))
+        or (len(files) > 1 and name not in REFINED_RULES)
+    ]
+    if clashes:
+        r.bad("rule names", "; ".join(clashes))
+    else:
+        r.ok("rule names")
+
+
 def check_rule_citations(r: Runner, base: pathlib.Path) -> None:
     """Every `# rule: X` in a test must name a rule the spec defines, so a
     citation cannot outlive the rule it points at."""
@@ -365,6 +430,7 @@ def main() -> None:
     r = Runner(interpreter)
 
     print("cross-references")
+    check_rule_names(r)
     check_rule_citations(r, base)
 
     if not skip_mypy:

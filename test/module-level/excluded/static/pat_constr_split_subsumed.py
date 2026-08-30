@@ -1,4 +1,4 @@
-# rule: split-constr -- field-map pairs fields, whatever the argument split
+# rule: pat-constr -- field-map pairs fields, whatever the argument split
 from dataclasses import dataclass
 
 @dataclass

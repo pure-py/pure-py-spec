@@ -1,4 +1,4 @@
-# rule: split-shapes -- a pattern must match at least one shape
+# rule: pat-shapes -- a pattern must match at least one shape
 def f(v: list[int] | tuple[int, int]) -> int:
     match v:
         case {"k": x}:

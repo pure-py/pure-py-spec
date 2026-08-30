@@ -75,7 +75,7 @@ Pattern subsumption $\Gamma \vdash p \subsumed p'$\speconly{ (\figref{subsumptio
 preorder on patterns under which every value matched by $p$ is also matched by $p'$. A pattern list is
 well-formed (\figref{well-formed-pat}) when each pattern is linear (no pattern variable occurs more than
 once), each constructor pattern names a class and its sub-patterns cover the class's fields exactly
-(\ruleName{pat-constr}), and no earlier pattern subsumes a later one (\ruleName{cases-cons}), so that
+(\ruleName{wf-pat-constr}), and no earlier pattern subsumes a later one (\ruleName{wf-cases-cons}), so that
 every case of a \pyinline{match} is reachable. Exhaustiveness is a separate test; without a type system
 to bound the values a match may receive, it degenerates to whether the last case is a catch-all.
 
