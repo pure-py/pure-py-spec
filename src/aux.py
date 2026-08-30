@@ -91,7 +91,7 @@ def fv_e(e: ast.expr) -> set[str]:
     if isinstance(e, (ast.List, ast.Tuple)):
         return fv_e_list(e.elts)
     if isinstance(e, ast.Dict):
-        return fv_e_list([k for k in e.keys if k is not None]) | fv_e_list(e.values)
+        return fv_e_list(dict_keys(e)) | fv_e_list(e.values)
     if isinstance(e, ast.ListComp):
         return fv_e_comprehension([e.elt], e.generators)
     if isinstance(e, ast.DictComp):
@@ -114,6 +114,14 @@ def fv_e_comprehension(
     target_names = names_in_target(g.target)
     rest = fv_e_list(g.ifs) | fv_e_comprehension(elts, generators[1:])
     return fv_e(g.iter) | rest - target_names
+
+
+def dict_keys(e: ast.Dict) -> list[ast.expr]:
+    """Keys of a dictionary display; a missing key would mean unpacking, which
+    the syntax stage rejects."""
+    keys = [k for k in e.keys if k is not None]
+    assert len(keys) == len(e.keys)
+    return keys
 
 
 def names_in_target(target: ast.expr) -> set[str]:
@@ -151,9 +159,7 @@ def captures_e(e: ast.expr) -> set[str]:
     if isinstance(e, (ast.List, ast.Tuple)):
         return captures_e_list(e.elts)
     if isinstance(e, ast.Dict):
-        return captures_e_list([k for k in e.keys if k is not None]) | captures_e_list(
-            e.values
-        )
+        return captures_e_list(dict_keys(e)) | captures_e_list(e.values)
     if isinstance(e, ast.ListComp):
         return captures_quals(e.generators) | (
             captures_e(e.elt) - binds_quals(e.generators)

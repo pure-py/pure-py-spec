@@ -152,18 +152,17 @@ def supported_stmt(node: ast.stmt) -> None:
         if len(node.names) != 1:
             raise NotYetSupported(node, "multi-target import (import a, b)", 53)
         if node.names[0].asname is not None:
-            raise NotYetSupported(node, "import-as", 53)
+            raise NotYetSupported(node, "import-as", 135)
         return
     if isinstance(node, ast.ImportFrom):
         if node.level > 0:
-            raise NotYetSupported(node, "relative imports", 53)
-        if node.module is None:
-            raise NotYetSupported(node, "from-import with no module", 53)
+            raise NotYetSupported(node, "relative imports", 126)
+        assert node.module is not None  # absent only in a relative import
         for alias in node.names:
             if alias.name == "*":
-                raise NotYetSupported(node, "from M import *", 53)
+                raise NotYetSupported(node, "from M import *", 105)
             if alias.asname is not None:
-                raise NotYetSupported(node, "from-import-as", 53)
+                raise NotYetSupported(node, "from-import-as", 135)
         return
     if isinstance(node, ast.Global):
         raise Prohibited(node, "global prohibited")
@@ -216,12 +215,6 @@ def supported_field(stmt: ast.stmt) -> None:
     supported_annotation(stmt.annotation)
 
 
-def is_qualified_name(node: ast.expr) -> bool:
-    return isinstance(node, ast.Name) or (
-        isinstance(node, ast.Attribute) and is_qualified_name(node.value)
-    )
-
-
 def supported_pattern(node: ast.pattern) -> None:
     if isinstance(node, ast.MatchValue):
         v = node.value
@@ -229,7 +222,7 @@ def supported_pattern(node: ast.pattern) -> None:
             return
         if (
             isinstance(v, ast.UnaryOp)
-            and isinstance(v.op, (ast.UAdd, ast.USub))
+            and isinstance(v.op, ast.USub)
             and isinstance(v.operand, ast.Constant)
             and isinstance(v.operand.value, (int, float))
         ):
@@ -250,8 +243,6 @@ def supported_pattern(node: ast.pattern) -> None:
             supported_pattern(p)
         return
     if isinstance(node, ast.MatchClass):
-        if not is_qualified_name(node.cls):
-            raise Prohibited(node, "class pattern head must be a qualified name")
         for p in list(node.patterns) + list(node.kwd_patterns):
             supported_pattern(p)
         return
@@ -339,8 +330,9 @@ def supported_expr(node: ast.expr) -> None:
         return
     if isinstance(node, ast.Dict):
         for key in node.keys:
-            if key is not None:
-                supported_expr(key)
+            if key is None:
+                raise Prohibited(node, "dict unpacking prohibited")
+            supported_expr(key)
         for v in node.values:
             supported_expr(v)
         return

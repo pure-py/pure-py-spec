@@ -10,6 +10,7 @@ from aux import (
     captures_e_list,
     captures_quals,
     captures_statement,
+    dict_keys,
     find_first_reassigning,
     names_in_target,
     own_fields,
@@ -476,9 +477,8 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
     if isinstance(e, ast.List):
         return list_type(e, e.elts, ctx)
     if isinstance(e, ast.Dict):
-        for k in e.keys:
-            if k is not None:
-                check_expr(k, Primitive.STR, ctx)
+        for k in dict_keys(e):
+            check_expr(k, Primitive.STR, ctx)
         return dict_type(e, e.values, ctx)
     if isinstance(e, ast.ListComp):
         return ListType(
@@ -622,9 +622,8 @@ def check_expr(e: ast.expr, expected: Type, ctx: ModuleContext) -> None:
             check_expr(x, t, ctx)
         return
     if isinstance(e, ast.Dict) and isinstance(expected, DictType):
-        for k in e.keys:
-            if k is not None:
-                check_expr(k, Primitive.STR, ctx)
+        for k in dict_keys(e):
+            check_expr(k, Primitive.STR, ctx)
         for v in e.values:
             check_expr(v, expected.value, ctx)
         return
