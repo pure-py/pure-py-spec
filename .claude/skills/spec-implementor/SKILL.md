@@ -30,6 +30,17 @@ directions.
    that is a sanctioned refinement. Name each reason after the prohibition or
    premise it enforces.
 
+## Sequential check against the spec
+
+When the implementation and the spec have drifted, or when one chapter of the spec replaces another,
+walk the implementation in order rather than jumping to the parts you suspect. Take each module, and
+within it each definition, and name the spec construct it implements. A definition that implements
+something the spec no longer contains is deleted when the walk reaches it, not before, so that the
+consequences are seen one at a time and each test message that changes is accounted for.
+
+Decide first which chapters the checker is meant to implement. Implementing a blend of two chapters
+that define the same thing is incoherent, and is what the walk is there to expose.
+
 ## Order of work
 
 Spec first, then tests, then implementation. When the spec changes, write or
