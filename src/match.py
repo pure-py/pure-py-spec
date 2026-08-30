@@ -23,7 +23,6 @@ from contexts import (
     fields,
     short_name,
 )
-from patterns import dict_key, literal_of
 from reasons import IllFormedModule
 from shapes import (
     NOTHING,
@@ -318,3 +317,26 @@ def with_key(k: Dict, w: str, m: Shape) -> Dict:
 
 def items(p: ast.MatchMapping) -> tuple[tuple[str, ast.pattern], ...]:
     return tuple(zip([dict_key(key) for key in p.keys], p.patterns))
+
+
+def literal_value(pat: ast.MatchValue) -> object:
+    v = pat.value
+    if isinstance(v, ast.Constant):
+        return v.value
+    if isinstance(v, ast.UnaryOp) and isinstance(v.operand, ast.Constant):
+        operand_value = v.operand.value
+        assert isinstance(operand_value, (int, float))
+        return -operand_value if isinstance(v.op, ast.USub) else operand_value
+    raise AssertionError(f"unexpected MatchValue payload: {type(v).__name__}")
+
+
+def dict_key(k: ast.expr) -> str:
+    assert isinstance(k, ast.Constant) and isinstance(k.value, str)
+    return k.value
+
+
+def literal_of(p: ast.pattern) -> object:
+    if isinstance(p, ast.MatchSingleton):
+        return p.value
+    assert isinstance(p, ast.MatchValue)
+    return literal_value(p)

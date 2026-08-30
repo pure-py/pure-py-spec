@@ -47,12 +47,12 @@ from contexts import (
     short_name,
     var_type,
 )
-from match import match_shapes
+from match import literal_of, match_shapes
 from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
-from patterns import describe
 from reasons import IllFormedModule
 from shapes import Shape, shapes
 from subtyping import elem_type, join, subtype
+from syntax import PatList, PatTuple
 from type_syntax import (
     PRIMITIVE_SPELLINGS,
     CallableType,
@@ -760,3 +760,18 @@ def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
     clash = set(names) & set(fields(entry))
     if len(clash) > 0:
         raise IllFormedModule(node, reasons.InheritedFieldClash(min(clash), base.id))
+
+
+def describe(p: ast.pattern, ctx: ModuleContext) -> str:
+    if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
+        return f"a pattern of type {render(LiteralType(literal_of(p)))}"
+    if isinstance(p, PatList):
+        return "a list pattern"
+    if isinstance(p, PatTuple):
+        return "a tuple pattern"
+    if isinstance(p, ast.MatchMapping):
+        return "a dictionary pattern"
+    assert isinstance(p, ast.MatchClass)
+    entry = class_entry(p.cls, ctx)
+    assert entry is not None
+    return f"a pattern for class {short_name(entry)}"
