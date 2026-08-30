@@ -32,14 +32,13 @@ directions.
 
 ## Sequential check against the spec
 
-When the implementation and the spec have drifted, or when one chapter of the spec replaces another,
-walk the implementation in order rather than jumping to the parts you suspect. Take each module, and
-within it each definition, and name the spec construct it implements. A definition that implements
-something the spec no longer contains is deleted when the walk reaches it, not before, so that the
-consequences are seen one at a time and each test message that changes is accounted for.
+Check the implementation against the spec definition by definition, in order, rather than jumping to
+the parts you suspect. Take each module, and within it each definition, and name the feature of the
+spec it implements. Every piece of code earns its keep that way, and what cannot be matched to a
+feature is renamed, deleted or excused as the inventory step prescribes.
 
-Decide first which chapters the checker is meant to implement. Implementing a blend of two chapters
-that define the same thing is incoherent, and is what the walk is there to expose.
+Act at the point the walk reaches, not before: a definition to be deleted goes when you arrive at it,
+so its consequences are seen one at a time and each test that changes is accounted for.
 
 ## Order of work
 
