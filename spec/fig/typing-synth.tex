@@ -28,8 +28,7 @@
 \and
 \inferrule*[lab={\ruleName{attr-object}}]
 {
-  \Gamma \vdash e \synth q \\
-  \Gamma \vdash q : C \\
+  \Gamma \vdash e \synth C \\
   \bind{x}{\tau} \in \fields(C)
 }
 {
@@ -60,7 +59,7 @@
   \Gamma \vdash \fieldMap(C, a)(x) \checks \tau \quad (\forall \bind{x}{\tau} \in \fields(C))
 }
 {
-  \Gamma \vdash \exConstr{q}{a} \synth q
+  \Gamma \vdash \exConstr{q}{a} \synth C
 }
 \and
 \inferrule*[lab={\ruleName{binop}}]

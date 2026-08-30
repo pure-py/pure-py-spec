@@ -1,0 +1,39 @@
+\begin{figure}
+\flushleft \shadebox{$\Gamma \vdash \psi \synth \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{ty-name}}]
+{ \bind{\nu}{\predefName} \in \Gamma }
+{ \Gamma \vdash \nu \synth \nu }
+\and
+\inferrule*[lab={\ruleName{ty-class}}]
+{ \Gamma \vdash q : C }
+{ \Gamma \vdash q \synth C }
+\and
+\inferrule*[lab={\ruleName{ty-literal}}]
+{ \bind{\pyinline{Literal}}{\predefName} \in \Gamma }
+{ \Gamma \vdash \tyLiteral{\ell} \synth \tyLiteral{\ell} }
+\and
+\inferrule*[lab={\ruleName{ty-list}}]
+{ \bind{\pyinline{list}}{\predefName} \in \Gamma \\ \Gamma \vdash \psi \synth \tau }
+{ \Gamma \vdash \tyList{\psi} \synth \tyList{\tau} }
+\and
+\inferrule*[lab={\ruleName{ty-dict}}]
+{ \bind{\pyinline{dict}}{\predefName} \in \Gamma \\ \bind{\pyinline{str}}{\predefName} \in \Gamma \\ \Gamma \vdash \psi \synth \tau }
+{ \Gamma \vdash \tyDict{\psi} \synth \tyDict{\tau} }
+\and
+\inferrule*[lab={\ruleName{ty-tuple}}]
+{ \bind{\pyinline{tuple}}{\predefName} \in \Gamma \\ \Gamma \vdash \psi_i \synth \tau_i \quad (\forall i) }
+{ \Gamma \vdash \tyTuple{\seq{\psi}} \synth \tyTuple{\seq{\tau}} }
+\and
+\inferrule*[lab={\ruleName{ty-callable}}]
+{ \bind{\pyinline{Callable}}{\predefName} \in \Gamma \\ \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\ \Gamma \vdash \psi \synth \tau }
+{ \Gamma \vdash \tyCallable{\seq{\psi}}{\psi} \synth \tyCallable{\seq{\sigma}}{\tau} }
+\and
+\inferrule*[lab={\ruleName{ty-union}}]
+{ \Gamma \vdash \psi \synth \sigma \\ \Gamma \vdash \psi' \synth \tau }
+{ \Gamma \vdash \tyUnion{\psi}{\psi'} \synth \tyUnion{\sigma}{\tau} }
+\end{mathpar}
+\caption{Type expression $\psi$ denotes type $\tau$ in $\Gamma$}
+\label{fig:resolve-type}
+\end{figure}

@@ -33,12 +33,11 @@
 \and
 \inferrule*[lab={\ruleName{shape-constr}}]
 {
-  \Gamma \vdash q : C \\
-  \Gamma \vdash q \subty \tau \\
+  \Gamma \vdash C \subty \tau \\
   \Gamma \vdash k_x : \sigma \quad (\forall \bind{x}{\sigma} \in \fields(C))
 }
 {
-  \Gamma \vdash \patConstr{q}{\seq{k}} : \tau
+  \Gamma \vdash \patConstr{C}{\seq{k}} : \tau
 }
 \and
 \inferrule*[lab={\ruleName{shape-tuple}}]
@@ -76,11 +75,11 @@
 \and
 \inferrule*[lab={\ruleName{constructs-class}}]
 {
-  \Gamma \vdash q' \subty q \\
-  \Gamma \vdash N \ctors q
+  \Gamma \vdash C' \subty C \\
+  \Gamma \vdash N \ctors C
 }
 {
-  \Gamma \vdash \set{q'} \cup N \ctors q
+  \Gamma \vdash \set{C'} \cup N \ctors C
 }
 \and
 \inferrule*[lab={\ruleName{constructs-list}}]

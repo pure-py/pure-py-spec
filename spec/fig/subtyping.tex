@@ -12,10 +12,10 @@
 \and
 \inferrule*[lab={\ruleName{subty-class}}]
 {
-  \Gamma(c') \in \ancestors(\Gamma(c))
+  C' \in \ancestors(C)
 }
 {
-  \Gamma \vdash q.c \subty q.c'
+  \Gamma \vdash C \subty C'
 }
 \and
 \inferrule*[lab={\ruleName{subty-never}}]

@@ -14,6 +14,16 @@ $\nu$ & $::=$ & $\tyAny$ & (Any) \\
     & $\mid$ & $\tyStr$ & (Str) \\
     & $\mid$ & $\tySized$ & (Sized)
    \\[3mm]
+\grammarGroup{Type expressions} \\
+$\psi$ & $::=$ & $\nu$ & (Primitive) \\
+    & $\mid$ & $\tyList{\psi}$ & (List) \\
+    & $\mid$ & $\tyTuple{\psi_1, \ldots, \psi_n}$ & (Tuple) \\
+    & $\mid$ & $\tyDict{\psi}$ & (Dict) \\
+    & $\mid$ & $\tyCallable{\psi_1, \ldots, \psi_n}{\psi}$ & (Callable) \\
+    & $\mid$ & $\tyLiteral{\ell}$ & (Literal) \\
+    & $\mid$ & $q$ & (ClassName) \\
+    & $\mid$ & $\tyUnion{\psi}{\psi'}$ & (Union)
+   \\[3mm]
 \grammarGroup{Types} \\
 $\tau$ & $::=$ & $\nu$ & (Primitive) \\
     & $\mid$ & $\tyList{\tau}$ & (List) \\
@@ -21,18 +31,18 @@ $\tau$ & $::=$ & $\nu$ & (Primitive) \\
     & $\mid$ & $\tyDict{\tau}$ & (Dict) \\
     & $\mid$ & $\tyCallable{\tau_1, \ldots, \tau_n}{\tau}$ & (Callable) \\
     & $\mid$ & $\tyLiteral{\ell}$ & (Literal) \\
-    & $\mid$ & $q$ & (Class) \\
+    & $\mid$ & $C$ & (Class) \\
     & $\mid$ & $\tyUnion{\sigma}{\tau}$ & (Union)
    \\[3mm]
-\grammarGroup{Annotations} \\
-$\pi$ & $::=$ & $\exAnnot{\tau}$ & (Annot) \\
+\grammarGroup{Optional annotations} \\
+$\pi$ & $::=$ & $\exAnnot{\psi}$ & (Annot) \\
     & $\mid$ & $\varepsilon$ & (Unannot)
    \\[3mm]
-\grammarGroup{Return annotations} \\
-$\omega$ & $::=$ & $\exRetAnnot{\tau}$ & (ReturnAnnot) \\
+\grammarGroup{Optional return annotations} \\
+$\omega$ & $::=$ & $\exRetAnnot{\psi}$ & (ReturnAnnot) \\
     & $\mid$ & $\varepsilon$ & (ReturnUnannot)
 \end{tabular}
 \end{center}
-\caption{Types and annotations}
+\caption{Type expressions, types and annotations}
 \label{fig:syntax-types}
 \end{figure}

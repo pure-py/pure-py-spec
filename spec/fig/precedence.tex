@@ -4,16 +4,16 @@
 \begin{tabular}{rlll}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Level & Operators & Arity & Associativity \\
-(lowest) 1  & \pyinline{or}                                                              & binary & left \\
+(loosest) 1  & \pyinline{or}                                                              & binary & left \\
 2           & \pyinline{and}                                                             & binary & left \\
 3           & \pyinline{not}                                                             & unary  & --- \\
 4           & \pyinline{==}\quad\pyinline{!=}\quad\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=}\quad\pyinline{in}\quad\pyinline{not in} & binary & left \\
 5           & \pyinline{+}\quad\pyinline{-}                                                & binary & left \\
 6           & \pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}                & binary & left \\
 7           & \pyinline{+}\quad\pyinline{-}                                                & unary  & --- \\
-(highest) 8 & \pyinline{**}                                                              & binary & right
+(tightest) 8 & \pyinline{**}                                                              & binary & right
 \end{tabular}
 \end{center}
-\caption{Operator precedence (lowest binds loosest)}
+\caption{Operator precedence}
 \label{fig:precedence}
 \end{figure}

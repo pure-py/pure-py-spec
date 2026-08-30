@@ -115,7 +115,7 @@
 \inferrule*[lab={\ruleName{class}}]
 {
   \nexists C'.\ \bind{c}{C'} \in \Gamma \\
-  \ownFields(\phi) = \bind{\seq{x}}{\seq{\tau}}, \; \seq{x} \text{ distinct} \\
+  \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
   C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{\bot}
 }
 {
@@ -126,7 +126,7 @@
 {
   \nexists C'.\ \bind{c}{C'} \in \Gamma \\
   \bind{c'}{\clsEntry{\Gamma'}{q.c'}{\seq{y}}{c^\dagger}} \in \Gamma \\
-  \ownFields(\phi) = \bind{\seq{x}}{\seq{\tau}}, \; \seq{x} \text{ distinct} \\
+  \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
   \seq{x} \cap \dom(\fields(\Gamma(c'))) = \varnothing \\
   C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}
 }

@@ -12,12 +12,12 @@
 \and
 \inferrule*[lab={\ruleName{assign}}]
 {
+  \Gamma \vdash \psi \synth \sigma \\
   \Gamma \vdash e \checks \sigma \\
-  x \notin \capturesE(e) \\
-  \Gamma \vdash \sigma
+  x \notin \capturesE(e)
 }
 {
-  \Gamma; \tau \vdash \exAssign{x \exAnnot{\sigma}}{e} : \Assigns{\set{\bind{x}{\sigma}}}
+  \Gamma; \tau \vdash \exAssign{x \exAnnot{\psi}}{e} : \Assigns{\set{\bind{x}{\sigma}}}
 }
 \and
 \inferrule*[lab={\ruleName{assign-unannot}}]
@@ -105,11 +105,11 @@
   \\
   R_i = \Returns \text{ or } \Gamma \vdash \tyNone \subty \tau_i \quad (\forall i) \\
   \seq{f} \text{ distinct} \\
-  \Gamma \vdash \sigma \quad (\forall \sigma \in \seq{\sigma}_i, \forall i) \\
-  \Gamma \vdash \tau_i \quad (\forall i)
+  \Gamma \vdash \seq{\psi}_i \synth \seq{\sigma}_i \quad (\forall i) \\
+  \Gamma \vdash \psi_i \synth \tau_i \quad (\forall i)
 }
 {
-  \Gamma; \tau \vdash \exDef{f_1}{\bind{\seq{x}_1}{\seq{\sigma}_1}}{\exRetAnnot{\tau_1}}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\sigma}_{n+1}}}{\exRetAnnot{\tau_{n+1}}}{s_{n+1}} : \Assigns{\set{\bind{f_j}{\tyCallable{\seq{\sigma}_j}{\tau_j}} \mid \forall j}}
+  \Gamma; \tau \vdash \exDef{f_1}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{s_{n+1}} : \Assigns{\set{\bind{f_j}{\tyCallable{\seq{\sigma}_j}{\tau_j}} \mid \forall j}}
 }
 \and
 \inferrule*[lab={\ruleName{match}}]
@@ -135,8 +135,8 @@
 {
   \nexists C'.\ \bind{c}{C'} \in \Gamma \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
-  \ownFields(\phi) = \bind{\seq{x}}{\seq{\sigma}}, \; \seq{x} \text{ distinct} \\
-  \Gamma \vdash \sigma_i \quad (\forall i) \\
+  \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
+  \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
   C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}
 }
 {
@@ -148,8 +148,8 @@
   \nexists C'.\ \bind{c}{C'} \in \Gamma \\
   \bind{c'}{\clsEntry{\Gamma'}{q.c'}{\seq{y}}{c^\dagger}} \in \Gamma \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
-  \ownFields(\phi) = \bind{\seq{x}}{\seq{\sigma}}, \; \seq{x} \text{ distinct} \\
-  \Gamma \vdash \sigma_i \quad (\forall i) \\
+  \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
+  \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
   \seq{x} \cap \dom(\fields(\Gamma(c'))) = \varnothing \\
   C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{c'}
 }

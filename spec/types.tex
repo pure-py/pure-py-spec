@@ -35,14 +35,23 @@ If $\Gamma \vdash \sigma \subty \tau$ and $\Gamma \vdash \tau \subty \tau'$ then
 \sigma \subty \tau'$.
 \end{lemma}
 
-Subtyping depends on the context, since a class is below its ancestors. Two types are \emph{comparable}
+Subtyping does not consult the context, since a class entry carries the context it was declared in, where
+its ancestors are found. Two types are \emph{comparable}
 when either is a subtype of the other. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. A sequence of types joins by
 joining the first with the join of the rest, with \pyinline{Never} as the unit (\secref{types-auxiliary}).
 So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.
 
-\input{spec/fig/well-formed-type}
+An annotation is a type expression, a type as written, and denotes a type in $\Gamma$
+(\figref{resolve-type}). The rules follow the structure of the expression, and each name it is written
+with must be in scope: a class name resolves to a class entry, which is the type it denotes, and every
+other name must be bound as a member of \pyinline{builtins}, which every module has, or of
+\pyinline{typing}, which takes an import. A class type is a class entry, so the names a class goes by in
+the module that declares it and in a module that imports it denote one type, and the types in the
+signature of a module mention the entries its annotations resolved to, wherever that signature is read.
+
+\input{spec/fig/resolve-type}
 
 \input{spec/fig/subtyping}
 
@@ -70,8 +79,9 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 A class entry $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ records the declared
 type of each field it introduces, and $\fields(C)$ is the bindings of all its fields, those of the base
 class first. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
-$\fieldMap$, checks it against that field's type, and synthesises $q$ as a class type (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must synthesise a class $q$, and
-$\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$, for the class entry $C$ that $q$ resolves to
+$\fieldMap$, checks it against that field's type, and synthesises the class entry $C$ that $q$ resolves to,
+which is the class type (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must
+synthesise a class entry $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$
 (\ruleName{attr-object}). Typing a program refines the signature of a predefined module
 (Definition~\ref{def:predefined}), binding $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the entry
 listed for it in \figref{predefined-types}, so \pyinline{len} takes a \pyinline{Sized} and \pyinline{print}
@@ -162,10 +172,8 @@ check against \pyinline{bool}, and an assertion message against \pyinline{str}. 
 the class name to its entry, requiring that name to be unbound and the class's own fields to be distinct,
 and, where it extends another class, that class to be bound and the own fields not to repeat an inherited
 one (\ruleName{class}, \ruleName{class-extend}). It also requires \pyinline{dataclass} to be in scope, since
-the declaration names it. Each rule that takes an annotation also requires its type to be well-formed
-(\figref{well-formed-type}). The rules follow the structure of the type, and each name it is written with
-must be in scope: a class name bound to a class entry, and every other name bound as a
-member of \pyinline{builtins}, which every module has, or of \pyinline{typing}, which takes an import.
+the declaration names it. Each rule that takes an annotation resolves it to a type
+(\figref{resolve-type}).
 
 A function definition binds its parameters at their annotated types and its own name, and the names of the
 mutual region it belongs to, at the corresponding $\pyinline{Callable}$ type; variables assigned in the body start

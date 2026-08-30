@@ -47,15 +47,15 @@
 \and
 \inferrule*[lab={\ruleName{pat-rest-constr}}]
 {
-  q \notin N \\
-  \tau, q \text{ comparable} \\
   \Gamma \vdash q : C \\
+  C \notin N \\
+  \tau, C \text{ comparable} \\
   \fields(C) = \bind{\seq{x}}{\seq{\sigma}} \\
   p_i = \fieldMap(C, a)(x_i) \quad (\forall i) \\
   \Gamma \vdash (\shapeAny{\sigma_1}{\varnothing}, \ldots, \shapeAny{\sigma_n}{\varnothing}), \seq{p} \matches K, L \binding \Delta
 }
 {
-  \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \matches \set{\patConstr{q}{\seq{m}} \mid \seq{m} \in K}, \set{\patConstr{q}{\seq{k}} \mid \seq{k} \in L} \cup \shapesOf(\tau, N \cup \set{q}) \binding \Delta
+  \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \matches \set{\patConstr{C}{\seq{m}} \mid \seq{m} \in K}, \set{\patConstr{C}{\seq{k}} \mid \seq{k} \in L} \cup \shapesOf(\tau, N \cup \set{C}) \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-rest-tuple}}]
@@ -77,15 +77,15 @@
 \and
 \inferrule*[lab={\ruleName{pat-constr}}]
 {
-  \Gamma \vdash q \subty q' \\
-  \Gamma \vdash q' : C \\
-  \fields(C) = \bind{\seq{x}}{\seq{\sigma}} \\
-  p_i = \fieldMap(C, a)(x_i) \quad (\forall i \leq n) \\
+  \Gamma \vdash q' : C' \\
+  \Gamma \vdash C \subty C' \\
+  \fields(C') = \bind{\seq{x}}{\seq{\sigma}} \\
+  p_i = \fieldMap(C', a)(x_i) \quad (\forall i \leq n) \\
   p_i = \patWild \quad (\forall i > n) \\
   \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
 }
 {
-  \Gamma \vdash \patConstr{q}{\seq{k}}, \patConstr{q'}{a} \matches \set{\patConstr{q}{\seq{m}} \mid \seq{m} \in K}, \set{\patConstr{q}{\seq{k}\,'} \mid \seq{k}\,' \in L} \binding \Delta
+  \Gamma \vdash \patConstr{C}{\seq{k}}, \patConstr{q'}{a} \matches \set{\patConstr{C}{\seq{m}} \mid \seq{m} \in K}, \set{\patConstr{C}{\seq{k}\,'} \mid \seq{k}\,' \in L} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-tuple}}]
