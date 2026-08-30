@@ -24,6 +24,10 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 
 - New issues: add to the PurePy project with Status either Planned or Proposed.
 
+- When referring to an issue in conversation, give its number, its title and its URL, so it can be opened
+  without a search. For example: #181, Classes for built-in types,
+  https://github.com/pure-py/pure-py-spec/issues/181.
+
 - Issue titles and task-list items are noun phrases (e.g. "Syntax of types", not "Define the syntax of types").
 
 - When an issue references other issues or external resources, add a **See also** paragraph at the end with a bullet list of links. Example:
