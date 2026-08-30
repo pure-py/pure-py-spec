@@ -387,6 +387,8 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
                 raise IllFormedModule(e, reasons.ClassAsValue(e.id))
             if isinstance(ctx.gamma.get(e.id), PredefinedName):
                 raise IllFormedModule(e, reasons.PredefinedNameAsValue(e.id))
+            if e.id not in ctx.gamma:
+                raise IllFormedModule(e, reasons.UndefinedVariable(e.id))
             raise IllFormedModule(e, reasons.UnassignedVariable(e.id))
         t = var_type(ctx, e.id)
         if t is None:

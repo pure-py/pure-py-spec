@@ -38,6 +38,14 @@ class DuplicateClassName:
 
 
 @dataclass(frozen=True)
+class UndefinedVariable:
+    name: str
+
+    def message(self) -> str:
+        return f"'{self.name}' is not defined"
+
+
+@dataclass(frozen=True)
 class UnassignedVariable:
     name: str
 
@@ -416,6 +424,7 @@ Reason = (
     | InheritedFieldClash
     | DuplicateClassName
     | UnassignedVariable
+    | UndefinedVariable
     | CapturedReassignment
     | SelfCaptureAssignment
     | CapturedGeneratorVariable
