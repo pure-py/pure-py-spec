@@ -6,8 +6,8 @@ The typing rules say whether a program is well typed. They are intended as a ref
 reverse. Function signatures, assignments and dataclass fields are annotated with type expressions, and a
 type expression denotes a type under a context (\figref{resolve-type}). Every parameter and return carries
 one, so the type of a definition is given rather than inferred from its body. A class name resolves to a
-class entry, which is the type it denotes, and every other name must be bound to its predefined entry. A
-class type is a class entry, so a class has one type whatever name it goes by.
+class entry and every other name must be bound to its predefined entry. A class type is a class entry, so
+a class has one type whatever name it goes by.
 
 The context entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
 that is not definitely assigned is bound to $\statusNotDefAssigned$. Two contexts from different branches of a conditional merge pointwise. A variable definitely assigned in both, at $\sigma$ and $\tau$, is of type
