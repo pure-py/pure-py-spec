@@ -35,6 +35,7 @@ from shapes import (
     Shape,
     Tuple,
     below_excluded,
+    head_typed,
     shape_type,
     shapes,
     shapes_row,
