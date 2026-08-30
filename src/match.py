@@ -36,6 +36,7 @@ from shapes import (
     Tuple,
     shape_type,
     shapes,
+    shapes_row,
 )
 from subtyping import comparable, join, subtype
 from syntax import PatList, PatTuple
@@ -103,13 +104,6 @@ def match_tuple(k: Shape, p: PatTuple, ctx: ModuleContext) -> Match | None:
     ps = tuple(p.patterns)
     if isinstance(k, Tuple) and len(k.components) == len(ps):
         return wrap(Tuple, match_row(k.components, ps, p, ctx))
-    if (
-        isinstance(k, Rest)
-        and isinstance(k.ty, TupleType)
-        and len(k.ty.components) == len(ps)
-    ):
-        row = tuple(Rest(c, frozenset()) for c in k.ty.components)
-        return wrap(Tuple, match_row(row, ps, p, ctx))
     return None
 
 
@@ -120,8 +114,8 @@ def match_list(k: Shape, p: PatList, ctx: ModuleContext) -> Match | None:
         return wrap(lambda r: List(k.elem, r), match_row(k.elems, ps, p, ctx))
     if isinstance(k, Rest) and isinstance(k.ty, ListType) and n not in k.heads:
         elem = k.ty.elem
-        row = tuple(Rest(elem, frozenset()) for _ in ps)
-        result = wrap(lambda r: List(elem, r), match_row(row, ps, p, ctx))
+        expanded = frozenset(List(elem, row) for row in shapes_row((elem,) * n, ctx))
+        result = match_shapes(expanded, p, ctx)
         if result is None:
             return None
         matched, left, delta = result
@@ -147,8 +141,9 @@ def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | Non
         and entry not in k.heads
         and comparable(ClassType(entry), k.ty, ctx)
     ):
-        row = tuple(field_shape(entry, x) for x in fields(entry))
-        result = wrap(lambda r: Constr(entry, r), match_row(row, ps, p, ctx))
+        types = tuple(declared_field(entry, x) for x in fields(entry))
+        expanded = frozenset(Constr(entry, row) for row in shapes_row(types, ctx))
+        result = match_shapes(expanded, p, ctx)
         if result is None:
             return None
         matched, left, delta = result
@@ -354,13 +349,6 @@ def no_field_map(entry: ClassEntry, p: ast.MatchClass) -> IllFormedModule:
     return IllFormedModule(
         p, reasons.UnknownFieldInPattern(c, tuple(sorted(set(xs[n:]))))
     )
-
-
-def field_shape(entry: ClassEntry, x: str) -> Shape:
-    """Shape of a field of the class, at its declared type."""
-    t = field_type(entry, x)
-    assert t is not None
-    return Rest(t, frozenset())
 
 
 def with_key(k: Dict, w: str, m: Shape) -> Dict:

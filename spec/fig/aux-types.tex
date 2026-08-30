@@ -7,7 +7,7 @@ $\widen(\ell)$, $\widen(\tau)$ & type & base type of literal $\ell$, or of type 
 $\joinTy(\sigma, \tau)$, $\joinTy(\seq{\tau})$ & type & larger type where comparable, union otherwise \\
 $\elemTy(\tau)$ & type & type of elements drawn from $\tau$ by generator \\
 $\resolve(\odot, \sigma, \sigma')$, $\resolve(\ominus, \sigma)$ & type & result of resolving operator against operand types \\
-$\shapesOf(\tau, N)$ & set of shapes & shapes of $\tau$ remaining once heads in $N$ are excluded \\
+$\shapesOf(\tau, N)$, $\shapesOf(\seq{\tau})$ & set of shapes, or of rows & shapes of $\tau$ remaining once heads in $N$ are excluded; rows of shapes of $\seq{\tau}$ \\
 $\shapeTy(k)$ & type & least type of shape $k$ \\
 $\agrees(p, \tau)$ & Boolean & sequence patterns in $p$ meet only their own kind at $\tau$ \\
 \end{tabular}

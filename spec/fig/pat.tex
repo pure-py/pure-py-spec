@@ -51,28 +51,19 @@
   C \notin N \\
   \tau, C \text{ comparable} \\
   \fields(C) = \bind{\seq{x}}{\seq{\sigma}} \\
-  p_i = \fieldMap(C, a)(x_i) \quad (\forall i) \\
-  \Gamma \vdash (\shapeAny{\sigma_1}{\varnothing}, \ldots, \shapeAny{\sigma_n}{\varnothing}), \seq{p} \matches K, L \binding \Delta
+  \Gamma \vdash \set{\patConstr{C}{\seq{k}} \mid \seq{k} \in \shapesOf(\seq{\sigma})}, \patConstr{q}{a} \matches K, L \binding \Delta
 }
 {
-  \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \matches \set{\patConstr{C}{\seq{m}} \mid \seq{m} \in K}, \set{\patConstr{C}{\seq{k}} \mid \seq{k} \in L} \cup \shapesOf(\tau, N \cup \set{C}) \binding \Delta
-}
-\and
-\inferrule*[lab={\ruleName{pat-rest-tuple}}]
-{
-  \Gamma \vdash (\shapeAny{\tau_1}{\varnothing}, \ldots, \shapeAny{\tau_n}{\varnothing}), \seq{p} \matches K, L \binding \Delta
-}
-{
-  \Gamma \vdash \shapeAny{\tyTuple{\tau_1, \ldots, \tau_n}}{N}, \patTuple{p_1, \ldots, p_n} \matches \set{\patTuple{\seq{m}} \mid \seq{m} \in K}, \set{\patTuple{\seq{k}} \mid \seq{k} \in L} \binding \Delta
+  \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \matches K, L \cup \shapesOf(\tau, N \cup \set{C}) \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-rest-list}}]
 {
   n \notin N \\
-  \Gamma \vdash (\shapeAny{\tau}{\varnothing}, \ldots, \shapeAny{\tau}{\varnothing}), p_1 \cons \ldots \cons p_n \matches K, L \binding \Delta
+  \Gamma \vdash \set{\shapeList{\tau}{\seq{k}} \mid \seq{k} \in \shapesOf(\tau, \varnothing)^n}, \patList{p_1, \ldots, p_n} \matches K, L \binding \Delta
 }
 {
-  \Gamma \vdash \shapeAny{\tyList{\tau}}{N}, \patList{p_1, \ldots, p_n} \matches \set{\shapeList{\tau}{\seq{m}} \mid \seq{m} \in K}, \set{\shapeList{\tau}{\seq{k}} \mid \seq{k} \in L} \cup \shapesOf(\tyList{\tau}, N \cup \set{n}) \binding \Delta
+  \Gamma \vdash \shapeAny{\tyList{\tau}}{N}, \patList{p_1, \ldots, p_n} \matches K, L \cup \shapesOf(\tyList{\tau}, N \cup \set{n}) \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-constr}}]

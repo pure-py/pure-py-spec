@@ -5,4 +5,6 @@
 \shapesOf(C, N) &{}= \varnothing && \text{if } \Gamma \vdash C \subty C' \text{ for some } C' \in N \\*
 \shapesOf(\tyNever, N) &{}= \varnothing \\*
 \shapesOf(\tyDict{\tau}, N) &{}= \set{\shapeDict{\tau}{\varnothing}{N}} \\*
-\shapesOf(\tau, N) &{}= \set{\shapeAny{\tau}{N}} && \text{otherwise}
+\shapesOf(\tyTuple{\seq{\tau}}, N) &{}= \set{\patTuple{\seq{k}} \mid \seq{k} \in \shapesOf(\seq{\tau})} \\*
+\shapesOf(\tau, N) &{}= \set{\shapeAny{\tau}{N}} && \text{otherwise} \\*[2mm]
+\shapesOf(\seq{\tau}) &{}= \shapesOf(\tau_1, \varnothing) \times \cdots \times \shapesOf(\tau_n, \varnothing)

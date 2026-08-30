@@ -6,7 +6,9 @@ constructor, a tuple, a list and a dictionary, each with shapes in place of
 sub-patterns.
 """
 
+from collections.abc import Sequence
 from dataclasses import dataclass
+from itertools import product
 
 from contexts import ClassEntry, ModuleContext
 from subtyping import subtype
@@ -105,4 +107,11 @@ def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> frozenset[S
         return frozenset(
             {Dict(t.value, (), frozenset(k for k in heads if isinstance(k, str)))}
         )
+    if isinstance(t, TupleType):
+        return frozenset(Tuple(row) for row in shapes_row(t.components, ctx))
     return frozenset({Rest(t, heads)})
+
+
+def shapes_row(ts: Sequence[Type], ctx: ModuleContext) -> frozenset[Row]:
+    """Rows of shapes of the types of a row: the second form of `shapes`."""
+    return frozenset(product(*(shapes(t, frozenset(), ctx) for t in ts)))

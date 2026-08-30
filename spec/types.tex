@@ -207,9 +207,11 @@ value of type $\tau$ whose outermost head is not among those in $N$, where $N$ \
 elements are subclasses where the type is a class, lengths where it is a list, and literals below the type
 otherwise (\figref{shapes}). The other forms are a literal, a constructor, a tuple, a list and a dictionary, each with shapes in place of
 sub-patterns. A list shape records its element type as well, which the element shapes do not determine. The shapes of $\tau$ that remain once the heads in $N$ are excluded are
-$\shapesOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape
-carries a union type, since $\shapesOf$ is the only source of the form $\shapeAny{\tau}{N}$ and it splits a
-union into its members. The
+$\shapesOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape carries a
+union, tuple or dictionary type in the form $\shapeAny{\tau}{N}$, since $\shapesOf$ is the only source of
+that form: it splits a union into its members and gives a tuple or dictionary type its structured shape.
+The rules that match sub-patterns against the form $\shapeAny{\tau}{N}$ draw the shapes of the component
+types from $\shapesOf$ as well. The
 matching judgement $\Gamma \vdash L, p \matches K, L' \binding \Delta$ divides a set of shapes into the
 matched shapes $K$ and the \emph{residual} $L'$, binding $\Delta$, one shape at a time and one position at a time
 (\figrefTwo{pat}{pat-rows}). A pattern that cannot match a shape has no derivation against it, so
@@ -286,7 +288,7 @@ The functions used by the rules of this \seckind{}, each defined by its cases.
 \funcrows{resolve}
 \end{auxfunction}
 
-\begin{auxfunction}{\shapesOf(\tau, N)}{set of shapes}{aux:shapes}
+\begin{auxfunction}{\shapesOf(\tau, N), \shapesOf(\seq{\tau})}{set of shapes, or of rows}{aux:shapes}
 \input{spec/functions/shapes-text}
 \funcrows{shapes}
 \end{auxfunction}
