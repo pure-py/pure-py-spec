@@ -202,9 +202,11 @@ ML~\cite{maranget2007} and in the term descriptions a match compiler carries~\ci
 pattern against a shape takes the scrutinee's type into account, as the uncovered sets of
 \citet{karachalias2015} do. A \emph{shape} $k$
 denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{N}$ is a
-value of type $\tau$ whose outermost head is not among those in $N$. Each head in $N$ itself denotes
-values of $\tau$: a class below $\tau$ its instances, an integer literal $n$ the lists of length $n$
-where $\tau$ is a list type, and a literal below $\tau$ the literal itself otherwise. The other forms are a literal, a constructor, a tuple, a list and a dictionary, each with shapes in place of
+value of type $\tau$ whose outermost head is not among those in $N$. A head itself denotes values: a
+class its instances, an integer at a list type the lists of that length, and a literal its value. Head
+typing $\Gamma \vdash h : \tau$ admits the heads whose values lie within $\tau$, and shape typing
+$\Gamma \vdash k : \tau$ types each excluded head and each component of a shape
+(\figref{shape-typing}). The other forms are a literal, a constructor, a tuple, a list and a dictionary, each with shapes in place of
 sub-patterns. A list shape records its element type as well, which the element shapes do not determine. A
 constructor shape carries an excluded set as well: $\shapeAny{\patConstr{C}{\seq{k}}}{N}$ denotes the
 instances of $C$, or of a subclass not below a class of $N$, whose fields, those of $C$, have the shapes
@@ -223,6 +225,13 @@ pattern named by \pyinline{as} at the join over the shapes it matched, so a case
 union leaves a later variable case bound at the others alone. Bindings from the positions of a row, or from
 the keys of a dictionary pattern, compose by disjoint union, so a pattern that binds a name twice has no
 derivation.
+
+\begin{lemma}[Shape typing preserved]
+\label{lem:shape-typing}
+Provided each head of $N$ is typed at $\tau$, each shape of $\shapesOf(\tau, N)$ is typed at a type below
+$\tau$. If each shape of $L$ is typed at a type below $\sigma$ and $\Gamma \vdash L, p \matches K, L'
+\binding \Delta$ then each shape of $K$ and of $L'$ is typed at a type below $\sigma$.
+\end{lemma}
 
 The cases are then walked once, from $\shapesOf(\widen(\sigma), \varnothing)$ for the scrutinee's type $\sigma$, in the same shape as
 $\dispatch$ walks them at run time (\figref{typing-cases}). Each case matches its pattern against the residual, checks its
@@ -249,6 +258,8 @@ exhausts a dictionary type (\ruleName{pat-dict-nil}). Exhaustiveness need not co
 $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave nothing,
 although each covers only part of the type.
+
+\input{spec/fig/shape-typing}
 
 \input{spec/fig/pat}
 

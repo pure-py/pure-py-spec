@@ -1,0 +1,91 @@
+\begin{figure}
+\small
+\setlength{\jot}{2pt}
+\flushleft \shadebox{$\Gamma \vdash h : \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{head-literal}}]
+{
+  \Gamma \vdash \tyLiteral{\ell} \subty \tau
+}
+{
+  \Gamma \vdash \ell : \tau
+}
+\and
+\inferrule*[lab={\ruleName{head-class}}]
+{
+  \Gamma \vdash C \subty \tau
+}
+{
+  \Gamma \vdash C : \tau
+}
+\and
+\inferrule*[lab={\ruleName{head-length}}]
+{
+  n \text{ an integer}
+}
+{
+  \Gamma \vdash n : \tyList{\tau}
+}
+\end{mathpar}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\Gamma \vdash k : \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{shape-rest}}]
+{
+  \Gamma \vdash h : \tau \quad (\forall h \in N) \\
+  \tau \text{ neither union nor dictionary type}
+}
+{
+  \Gamma \vdash \shapeAny{\tau}{N} : \tau
+}
+\and
+\inferrule*[lab={\ruleName{shape-literal}}]
+{
+  \Gamma \vdash \tyLiteral{\ell} \subty \tau
+}
+{
+  \Gamma \vdash \ell : \tau
+}
+\and
+\inferrule*[lab={\ruleName{shape-constr}}]
+{
+  \Gamma \vdash C \subty \tau \\
+  \Gamma \vdash h : C \quad (\forall h \in N) \\
+  \Gamma \vdash k_x : \sigma \quad (\forall \bind{x}{\sigma} \in \fields(C))
+}
+{
+  \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{N} : \tau
+}
+\and
+\inferrule*[lab={\ruleName{shape-tuple}}]
+{
+  \Gamma \vdash k_i : \tau_i \quad (\forall i)
+}
+{
+  \Gamma \vdash \patTuple{\seq{k}} : \tyTuple{\seq{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{shape-list}}]
+{
+  \Gamma \vdash k_i : \tau \quad (\forall i)
+}
+{
+  \Gamma \vdash \shapeList{\tau}{\seq{k}} : \tyList{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{shape-dict}}]
+{
+  \Gamma \vdash \beta(w) : \tau \quad (\forall w \in \dom(\beta)) \\
+  \dom(\beta) \cap N = \varnothing
+}
+{
+  \Gamma \vdash \shapeDict{\tau}{\beta}{N} : \tyDict{\tau}
+}
+\end{mathpar}
+\caption{Head and shape typing}
+\label{fig:shape-typing}
+\end{figure}

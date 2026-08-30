@@ -147,8 +147,9 @@ def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | Non
             entry, k.heads, ctx
         ):
             own = tuple(declared_field(entry, x) for x in fields(entry)[len(k.args) :])
+            kept = typed_heads(k.heads, ClassType(entry), ctx)
             expanded = frozenset(
-                Constr(entry, k.args + row, k.heads) for row in shapes_row(own, ctx)
+                Constr(entry, k.args + row, kept) for row in shapes_row(own, ctx)
             )
             result = match_shapes(expanded, p, ctx)
             if result is None:
@@ -164,15 +165,22 @@ def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | Non
     ):
         low = entry if subtype(ClassType(entry), k.ty, ctx) else class_of(k.ty)
         types = tuple(declared_field(low, x) for x in fields(low))
-        expanded = frozenset(
-            Constr(low, row, k.heads) for row in shapes_row(types, ctx)
-        )
+        kept = typed_heads(k.heads, ClassType(low), ctx)
+        expanded = frozenset(Constr(low, row, kept) for row in shapes_row(types, ctx))
         result = match_shapes(expanded, p, ctx)
         if result is None:
             return None
         matched, left, delta = result
         return matched, left | shapes(k.ty, k.heads | {entry}, ctx), delta
     return None
+
+
+def typed_heads(
+    heads: frozenset[object], t: Type, ctx: ModuleContext
+) -> frozenset[object]:
+    """The heads typed at `t`, kept when an excluded set passes to a shape of a
+    narrower type."""
+    return frozenset(h for h in heads if head_typed(h, t, ctx))
 
 
 def class_of(t: Type) -> ClassEntry:

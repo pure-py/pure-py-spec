@@ -112,6 +112,17 @@ def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> frozenset[S
     return frozenset({Rest(t, heads)})
 
 
+def head_typed(h: object, t: Type, ctx: ModuleContext) -> bool:
+    """Head typing: a literal below `t`, a class below `t`, or an integer read
+    as a length where `t` is a list type."""
+    if isinstance(h, ClassEntry):
+        return subtype(ClassType(h), t, ctx)
+    if isinstance(h, LiteralType):
+        return subtype(h, t, ctx)
+    assert isinstance(h, int)
+    return isinstance(t, ListType)
+
+
 def below_excluded(
     entry: ClassEntry, heads: frozenset[object], ctx: ModuleContext
 ) -> bool:
