@@ -47,10 +47,11 @@ from contexts import (
     short_name,
     var_type,
 )
-from match import Shape, match_shapes, shapes
+from match import match_shapes
 from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
 from patterns import describe
 from reasons import IllFormedModule
+from shapes import Shape, shapes
 from subtyping import elem_type, join, subtype
 from type_syntax import (
     PRIMITIVE_SPELLINGS,

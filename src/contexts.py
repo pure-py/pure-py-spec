@@ -64,7 +64,8 @@ def var_entry(ctx: ModuleContext, x: str) -> VarEntry | None:
     v = ctx.gamma.get(x)
     return (
         None
-        if v is None or isinstance(v, (ModuleStub, ModuleLoaded, ClassEntry, PredefinedName))
+        if v is None
+        or isinstance(v, (ModuleStub, ModuleLoaded, ClassEntry, PredefinedName))
         else v
     )
 
@@ -195,10 +196,14 @@ def merge_results(rs: list[ResultType], join_types: Join) -> ResultType:
     return Assigns(fold_merge(delta, assigns_branches[1:], join_types))
 
 
-def fold_merge(acc: VarContext, branches: list[Assigns], join_types: Join) -> VarContext:
+def fold_merge(
+    acc: VarContext, branches: list[Assigns], join_types: Join
+) -> VarContext:
     if len(branches) == 0:
         return acc
-    return fold_merge(merge_delta(acc, branches[0].delta, join_types), branches[1:], join_types)
+    return fold_merge(
+        merge_delta(acc, branches[0].delta, join_types), branches[1:], join_types
+    )
 
 
 def override_delta(d1: VarContext, d2: VarContext) -> VarContext:

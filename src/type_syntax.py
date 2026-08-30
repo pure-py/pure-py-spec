@@ -214,4 +214,3 @@ def parse_annotations(es: Sequence[ast.expr]) -> tuple[Type, ...] | None:
 
 def union(s: Type | None, t: Type | None) -> Type | None:
     return None if s is None or t is None else UnionType(s, t)
-

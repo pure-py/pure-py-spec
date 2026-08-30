@@ -225,9 +225,7 @@ def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:
     return module_result(tree, M, "__main__")
 
 
-def format_result(
-    result: IllFormed | syntax.Unsupported | None, filename: str
-) -> str:
+def format_result(result: IllFormed | syntax.Unsupported | None, filename: str) -> str:
     if isinstance(result, syntax.Unsupported):
         return syntax.format_result(result, filename)
     if result is None:
