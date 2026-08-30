@@ -228,9 +228,9 @@ derivation.
 
 \begin{lemma}[Shape typing preserved]
 \label{lem:shape-typing}
-Provided each head of $N$ is typed at $\tau$, each shape of $\shapesOf(\tau, N)$ is typed at a type below
-$\tau$. If each shape of $L$ is typed at a type below $\sigma$ and $\Gamma \vdash L, p \matches K, L'
-\binding \Delta$ then each shape of $K$ and of $L'$ is typed at a type below $\sigma$.
+If each head of $N$ is typed at $\tau$ then each shape of $\shapesOf(\tau, N)$ is typed at a type below
+$\tau$. Moreover, if each shape of $L$ is typed at a type below $\sigma$ and $\Gamma \vdash L, p \matches
+K, L' \binding \Delta$ then each shape of $K$ and of $L'$ is typed at a type below $\sigma$.
 \end{lemma}
 
 The cases are then walked once, from $\shapesOf(\widen(\sigma), \varnothing)$ for the scrutinee's type $\sigma$, in the same shape as
