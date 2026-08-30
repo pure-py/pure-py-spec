@@ -264,8 +264,9 @@ def captures(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.If):
         return captures_e(s.test) | captures_body(s.body) | captures_body(s.orelse)
     if isinstance(s, ast.Match):
+        # A pattern variable is in the function's scope, so a capture of it counts.
         return captures_e(s.subject) | set().union(
-            *(captures_body(case.body) - binds(case.pattern) for case in s.cases)
+            *(captures_body(case.body) for case in s.cases)
         )
     if isinstance(s, ast.FunctionDef):
         return captures_region([s])
