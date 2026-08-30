@@ -1,1 +1,1 @@
-a tuple pattern does not agree with type tuple[tuple[int, int], int], where a list or tuple pattern may meet a value of the other kind
+a tuple pattern against a value of type tuple[tuple[int, int], int]; Python matches sequence patterns against lists and tuples alike, so PurePy treats the two kinds as incompatible

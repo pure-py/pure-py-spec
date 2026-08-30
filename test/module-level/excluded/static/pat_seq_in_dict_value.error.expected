@@ -1,1 +1,1 @@
-a dictionary pattern does not agree with type dict[str, list[int] | tuple[int, int]], where a list or tuple pattern may meet a value of the other kind
+a dictionary pattern against a value of type dict[str, list[int] | tuple[int, int]]; Python matches sequence patterns against lists and tuples alike, so PurePy treats the two kinds as incompatible

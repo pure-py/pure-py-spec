@@ -332,7 +332,7 @@ def match_cases(
             if not agrees(case.pattern, shape_type(k), ctx):
                 raise IllFormedModule(
                     case.pattern,
-                    reasons.PatternDisagrees(
+                    reasons.SequenceKindClash(
                         describe(case.pattern, ctx), render(shape_type(k))
                     ),
                 )

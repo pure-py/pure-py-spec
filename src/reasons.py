@@ -355,14 +355,15 @@ class PatternTypeMismatch:
 
 
 @dataclass(frozen=True)
-class PatternDisagrees:
+class SequenceKindClash:
     pattern: str
     ty: str
 
     def message(self) -> str:
         return (
-            f"{self.pattern} does not agree with type {self.ty}, "
-            "where a list or tuple pattern may meet a value of the other kind"
+            f"{self.pattern} against a value of type {self.ty}; Python matches "
+            "sequence patterns against lists and tuples alike, so PurePy "
+            "treats the two kinds as incompatible"
         )
 
 
@@ -447,7 +448,7 @@ Reason = (
     | MissingReturn
     | NotIterable
     | PatternTypeMismatch
-    | PatternDisagrees
+    | SequenceKindClash
     | CaseMatchesNothing
     | NotSynthesised
     | UnknownField
