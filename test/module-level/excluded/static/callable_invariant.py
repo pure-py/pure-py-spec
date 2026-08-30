@@ -1,4 +1,4 @@
-# rule: subty-refl -- callables are related only by reflexivity
+# rule: subty-callable -- callables are related only where their components are equivalent
 from typing import Callable
 
 def f(n: int) -> int:

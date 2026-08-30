@@ -50,6 +50,31 @@
   \Gamma \vdash \tau \subty \tySized
 }
 \and
+\inferrule*[lab={\ruleName{subty-list}}]
+{
+  \Gamma \vdash \sigma \tyEquiv \tau
+}
+{
+  \Gamma \vdash \tyList{\sigma} \subty \tyList{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{subty-dict}}]
+{
+  \Gamma \vdash \sigma \tyEquiv \tau
+}
+{
+  \Gamma \vdash \tyDict{\sigma} \subty \tyDict{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{subty-callable}}]
+{
+  \Gamma \vdash \sigma_i \tyEquiv \tau_i \quad (\forall i) \\
+  \Gamma \vdash \sigma \tyEquiv \tau
+}
+{
+  \Gamma \vdash \tyCallable{\sigma_1, \ldots, \sigma_n}{\sigma} \subty \tyCallable{\tau_1, \ldots, \tau_n}{\tau}
+}
+\and
 \inferrule*[lab={\ruleName{subty-tuple}}]
 {
   \Gamma \vdash \sigma_i \subty \tau_i \quad (\forall i)
