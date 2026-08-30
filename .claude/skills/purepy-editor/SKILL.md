@@ -29,6 +29,8 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 
 - New issues: add to the PurePy project with Status either Planned or Proposed.
 
+- Add content to an issue, whether a body, a comment or a closing comment, only when asked to. Otherwise create, edit or close it and nothing more.
+
 - When referring to an issue in conversation, give its number, its title and its URL, so it can be opened
   without a search. For example: #181, Classes for built-in types,
   https://github.com/pure-py/pure-py-spec/issues/181.
