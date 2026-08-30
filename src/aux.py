@@ -37,27 +37,19 @@ def extend_region(
     return [region] + statements(rest)
 
 
-def binds_seq(pattern: ast.pattern) -> list[str]:
-    if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
-        return []
-    if isinstance(pattern, ast.MatchAs):
-        sub = binds_seq(pattern.pattern) if pattern.pattern is not None else []
-        return sub + ([pattern.name] if pattern.name else [])
-    if isinstance(pattern, ast.MatchSequence):
-        return [x for p in pattern.patterns for x in binds_seq(p)]
-    if isinstance(pattern, ast.MatchClass):
-        return [
-            x
-            for p in list(pattern.patterns) + list(pattern.kwd_patterns)
-            for x in binds_seq(p)
-        ]
-    if isinstance(pattern, ast.MatchMapping):
-        return [x for p in pattern.patterns for x in binds_seq(p)]
-    raise AssertionError(f"unexpected pattern: {type(pattern).__name__}")
-
-
 def binds(pattern: ast.pattern) -> set[str]:
-    return set(binds_seq(pattern))
+    """Variables the pattern introduces."""
+    if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
+        return set()
+    if isinstance(pattern, ast.MatchAs):
+        sub = binds(pattern.pattern) if pattern.pattern is not None else set()
+        return sub | ({pattern.name} if pattern.name else set())
+    if isinstance(pattern, (ast.MatchSequence, ast.MatchMapping)):
+        return set().union(*(binds(p) for p in pattern.patterns))
+    assert isinstance(pattern, ast.MatchClass)
+    return set().union(
+        *(binds(p) for p in list(pattern.patterns) + list(pattern.kwd_patterns))
+    )
 
 
 def fv_e(e: ast.expr) -> set[str]:
@@ -69,7 +61,9 @@ def fv_e(e: ast.expr) -> set[str]:
         params = {a.arg for a in e.args.args}
         return fv_e(e.body) - params
     if isinstance(e, ast.Call):
-        return fv_e(e.func) | fv_e_list(e.args)
+        return (
+            fv_e(e.func) | fv_e_list(e.args) | fv_e_list([k.value for k in e.keywords])
+        )
     if isinstance(e, ast.BinOp):
         return fv_e(e.left) | fv_e(e.right)
     if isinstance(e, ast.UnaryOp):
@@ -137,7 +131,11 @@ def captures_e(e: ast.expr) -> set[str]:
     if isinstance(e, ast.Constant):
         return set()
     if isinstance(e, ast.Call):
-        return captures_e(e.func) | captures_e_list(e.args)
+        return (
+            captures_e(e.func)
+            | captures_e_list(e.args)
+            | captures_e_list([k.value for k in e.keywords])
+        )
     if isinstance(e, ast.BinOp):
         return captures_e(e.left) | captures_e(e.right)
     if isinstance(e, ast.UnaryOp):
@@ -208,8 +206,9 @@ def fv_stmt(s: ast.stmt) -> set[str]:
             *(fv_body(case.body) - binds(case.pattern) for case in s.cases)
         )
     if isinstance(s, ast.FunctionDef):
+        # Parameters and variables assigned in the body are local to the function.
         params = {a.arg for a in s.args.args}
-        return fv_body(s.body) - params - {s.name}
+        return fv_body(s.body) - params - assigns_body(s.body) - {s.name}
     if isinstance(s, ast.ClassDef):
         return set()
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
