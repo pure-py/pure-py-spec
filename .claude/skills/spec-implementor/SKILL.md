@@ -28,9 +28,14 @@ directions.
 
 ## Sequential check against the spec
 
-Read the implementation in order, module by module and definition by definition, checking each one
-off against the spec as you go, rather than jumping to the parts you suspect. Every definition has to
-earn its keep, and one that cannot be checked off is renamed or deleted.
+Check in both directions, in order, rather than jumping to the parts you suspect.
+
+Start with the specification and read it top down. For each judgement, rule and metafunction, find the
+definition in the implementation that carries the same name and serves the same purpose.
+
+Then read the implementation the same way. For each definition, find the construct in the
+specification of the same or a similar name that it implements. A definition that implements no single
+construct is renamed, moved to the construct it belongs to, or deleted.
 
 Act at the point the walk reaches, not before, so that whatever breaks is traceable to the one
 definition you changed.
