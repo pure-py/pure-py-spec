@@ -10,6 +10,7 @@ class Sub(Base):
     y: int
 
 def f(b: bool) -> Base:
+    v: Base = Base(0)
     if b:
         v = Sub(1, 2)
     else:

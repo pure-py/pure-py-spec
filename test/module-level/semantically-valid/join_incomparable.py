@@ -1,5 +1,6 @@
 # rule: if-else -- branches assigning incomparable types merge at their union
 def f(b: bool) -> int | str:
+    x: int | str = 0
     if b:
         x = 1
     else:
