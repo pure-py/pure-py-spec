@@ -179,8 +179,8 @@ requiring each to match something and the whole list to exhaust the type. The \e
 values no earlier case has matched, and $L'$ those still unmatched once these cases are done. The judgement
 starts from $\shapesOf(\widen(\sigma), \varnothing)$, which denotes every value of the scrutinee's base
 type. Taking the base type keeps a literal case from exhausting the scrutinee on its own, so a
-\pyinline{match} on \pyinline{42} with a case for \pyinline{42} still admits a catch-all. Each case splits
-the residual with its pattern (\secref{exhaustiveness}), which yields the bindings the pattern makes as
+\pyinline{match} on \pyinline{42} with a case for \pyinline{42} still admits a catch-all. Each case matches its
+pattern against the residual (\secref{exhaustiveness}), which yields the bindings the pattern makes as
 well as the values it leaves. The body is then checked under those bindings.
 
 \input{spec/fig/typing-stmt}
@@ -193,9 +193,10 @@ well as the values it leaves. The body is then checked under those bindings.
 \input{spec/fig/syntax-shapes}
 
 Reachability and exhaustiveness are the two halves of one computation
-(\figrefTwo{shapes}{splitting}), as in the usefulness algorithm for
-ML~\cite{maranget2007} and in the term descriptions a match compiler carries~\cite{sestoft1996}. Splitting
-takes the scrutinee's type into account, as the uncovered sets of \citet{karachalias2015} do. A \emph{shape} $k$
+(\figrefTwo{shapes}{split}), as in the usefulness algorithm for
+ML~\cite{maranget2007} and in the term descriptions a match compiler carries~\cite{sestoft1996}. Matching a
+pattern against a shape takes the scrutinee's type into account, as the uncovered sets of
+\citet{karachalias2015} do. A \emph{shape} $k$
 denotes a set of values of a type, written $\Gamma \vdash k : \tau$. Every shape has a least such type,
 $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{N}$ is a
 value of type $\tau$ whose outermost head is not among those in $N$, where $N$ \emph{constructs} $\tau$: its
@@ -205,10 +206,10 @@ sub-patterns. A list shape records its element type as well, which the element s
 $\shapesOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape
 carries a union type, since $\shapesOf$ is the only source of the form $\shapeAny{\tau}{N}$ and it splits a
 union into its members. The
-relation $\Gamma \vdash L, p \splitTo K, L' \binding \Delta$ divides a set of shapes into the matched shapes
-$K$ and the \emph{residual} $L'$, binding $\Delta$, one shape at a time and one position at a time
-(\figrefTwo{splitting}{splitting-rows}). A pattern that cannot match a shape has no derivation against it, so
-\ruleName{split-shapes} takes the shapes it does match, which must not be none, and passes the others into
+matching judgement $\Gamma \vdash L, p \matches K, L' \binding \Delta$ divides a set of shapes into the
+matched shapes $K$ and the \emph{residual} $L'$, binding $\Delta$, one shape at a time and one position at a time
+(\figrefTwo{split}{split-rows}). A pattern that cannot match a shape has no derivation against it, so
+\ruleName{pat-shapes} takes the shapes it does match, which must not be none, and passes the others into
 the residual untouched. A variable pattern binds at $\shapeTy(k)$ for the shape $k$ it matches, and a
 pattern named by \pyinline{as} at the join over the shapes it matched, so a case for one alternative of a
 union leaves a later variable case bound at the others alone. Bindings from the positions of a row, or from
@@ -216,8 +217,8 @@ the keys of a dictionary pattern, compose by disjoint union, so a pattern that b
 derivation.
 
 The cases are then walked once, from $\shapesOf(\widen(\sigma), \varnothing)$ for the scrutinee's type $\sigma$, in the same shape as
-$\dispatch$ walks them at run time (\figref{typing-cases}). Each case splits the residual, checks its body
-under the bindings that split gives, and passes on the residual it leaves. A case that matches nothing is
+$\dispatch$ walks them at run time (\figref{typing-cases}). Each case matches its pattern against the residual, checks its
+body under the bindings that matching gives, and passes on the residual it leaves. A case that matches nothing is
 rejected, whether because the scrutinee can never take that shape or because the earlier cases already cover it. \ruleName{match}
 applies where the walk ends with an empty residual, and \ruleName{match-partial} where it does not, merging
 in $\Assigns{\varnothing}$ for the values that fall through. A union is exhausted
@@ -226,15 +227,15 @@ by covering each member, a class type by a pattern for the class itself, and \py
 unboundedly many heads and need a variable or wildcard. A dictionary shape has a form of its own,
 $\shapeDict{\tau}{\beta}{N}$, standing for dictionaries that hold each key of $\beta$ with a value of the
 shape $\beta$ gives it, and hold no key of $N$. A dictionary pattern is taken one key at a time, no key twice
-(\ruleName{split-dict-bound}, \ruleName{split-dict-unbound}). A key already in $\beta$ splits the shape
-recorded for it, and a key in neither $\beta$ nor $N$ splits the value type, adding to the residual the
+(\ruleName{pat-dict-bound}, \ruleName{pat-dict-unbound}). A key already in $\beta$ is matched against the
+shape recorded for it, and a key in neither $\beta$ nor $N$ against the value type, adding to the residual the
 dictionaries that lack the key. The empty pattern matches every dictionary and leaves nothing, so it alone
-exhausts a dictionary type (\ruleName{split-dict-nil}). Exhaustiveness need not come from a catch-all: over
+exhausts a dictionary type (\ruleName{pat-dict-nil}). Exhaustiveness need not come from a catch-all: over
 $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave nothing,
 although each covers only part of the type.
 
-\input{spec/fig/splitting}
+\input{spec/fig/split}
 
 \input{spec/fig/typing-cases}
 

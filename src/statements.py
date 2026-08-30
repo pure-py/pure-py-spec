@@ -47,7 +47,7 @@ from contexts import (
     short_name,
     var_type,
 )
-from coverage import Shape, shapes, split_shapes
+from split import Shape, shapes, split_shapes
 from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
 from patterns import check_pattern_list, describe
 from reasons import IllFormedModule

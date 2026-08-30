@@ -4,7 +4,7 @@
 \small
 \inferrule*[lab={\ruleName{cases-one}}]
 {
-  \Gamma \vdash L, p \splitTo K, L' \binding \Delta \\
+  \Gamma \vdash L, p \matches K, L' \binding \Delta \\
   \Gamma \override \Delta; \tau \vdash s : R
 }
 {
@@ -13,7 +13,7 @@
 \and
 \inferrule*[lab={\ruleName{cases-cons}}]
 {
-  \Gamma \vdash L, p \splitTo K, L^\dagger \binding \Delta \\
+  \Gamma \vdash L, p \matches K, L^\dagger \binding \Delta \\
   \Gamma \override \Delta; \tau \vdash s : R \\
   \Gamma; \tau; L^\dagger \vdash \seq{h} : S, L'
 }
