@@ -197,15 +197,14 @@ well as the values it leaves. The body is then checked under those bindings.
 \input{spec/fig/syntax-shapes}
 
 Reachability and exhaustiveness are the two halves of one computation
-(\figrefTwo{shapes}{pat}), as in the usefulness algorithm for
+(\figrefTwo{pat}{pat-rows}), as in the usefulness algorithm for
 ML~\cite{maranget2007} and in the term descriptions a match compiler carries~\cite{sestoft1996}. Matching a
 pattern against a shape takes the scrutinee's type into account, as the uncovered sets of
 \citet{karachalias2015} do. A \emph{shape} $k$
-denotes a set of values of a type, written $\Gamma \vdash k : \tau$. Every shape has a least such type,
-$\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{N}$ is a
-value of type $\tau$ whose outermost head is not among those in $N$, where $N$ \emph{constructs} $\tau$: its
-elements are subclasses where the type is a class, lengths where it is a list, and literals below the type
-otherwise (\figref{shapes}). The other forms are a literal, a constructor, a tuple, a list and a dictionary, each with shapes in place of
+denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{N}$ is a
+value of type $\tau$ whose outermost head is not among those in $N$. Each head in $N$ itself denotes
+values of $\tau$: a class below $\tau$ its instances, a length $n$ the lists of that length where $\tau$
+is a list type, and a literal below $\tau$ the literal itself otherwise. The other forms are a literal, a constructor, a tuple, a list and a dictionary, each with shapes in place of
 sub-patterns. A list shape records its element type as well, which the element shapes do not determine. A
 constructor shape carries an excluded set as well: $\shapeAny{\patConstr{C}{\seq{k}}}{N}$ denotes the
 instances of $C$, or of a subclass not below a class of $N$, whose fields, those of $C$, have the shapes
@@ -250,8 +249,6 @@ exhausts a dictionary type (\ruleName{pat-dict-nil}). Exhaustiveness need not co
 $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave nothing,
 although each covers only part of the type.
-
-\input{spec/fig/shapes}
 
 \input{spec/fig/pat}
 
