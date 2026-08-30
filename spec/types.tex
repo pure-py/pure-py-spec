@@ -155,9 +155,8 @@ Statements carry an optional return type as a second argument to the left of the
 $\Gamma; \zeta \vdash t : R$ says that $t$ has result type $R$ in $\Gamma$, in a function declared to
 return $\zeta$, or at the top level of a module, where $\zeta$ is empty (\figref{typing-stmt}). The
 return type is an obligation on the \pyinline{return} statements within $t$ rather than a property of
-$t$, so every rule passes it down unchanged, and a \pyinline{return} has no rule where it is empty. A
-\pyinline{return} checks its expression against $\tau$, and a bare
-\pyinline{return} requires \pyinline{None} to be a subtype of $\tau$. An annotated assignment takes its type
+$t$, so every rule passes it down unchanged. A \pyinline{return} checks its expression against the
+return type, and a bare \pyinline{return} requires \pyinline{None} to be a subtype of it. An annotated assignment takes its type
 from the annotation and checks the expression against it, and an unannotated assignment takes the type the
 expression synthesises (\ruleName{assign}, \ruleName{assign-unannot}). The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
