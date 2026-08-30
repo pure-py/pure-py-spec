@@ -1,4 +1,4 @@
-# rule: pat-shapes -- a tuple pattern matches only a tuple shape of the same length
+# rule: cases-cons -- a tuple pattern agrees with no list type
 v = [1, 2]
 match v:
     case (a, b):

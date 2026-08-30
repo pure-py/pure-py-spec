@@ -47,10 +47,10 @@ from contexts import (
     short_name,
     var_type,
 )
-from match import literal_of, match_shapes
+from match import agrees, literal_of, match_shapes, ordered
 from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
 from reasons import IllFormedModule
-from shapes import Shape, shapes
+from shapes import Shape, shape_type, shapes
 from subtyping import join, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
@@ -328,6 +328,14 @@ def match_cases(
     left = seed
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):
+        for k in ordered(left):
+            if not agrees(case.pattern, shape_type(k), ctx):
+                raise IllFormedModule(
+                    case.pattern,
+                    reasons.PatternDisagrees(
+                        describe(case.pattern, ctx), render(shape_type(k))
+                    ),
+                )
         result = match_shapes(left, case.pattern, ctx)
         if result is None:
             raise unmatched(case.pattern, index, subject, seed, ctx)
@@ -815,6 +823,9 @@ def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
 
 
 def describe(p: ast.pattern, ctx: ModuleContext) -> str:
+    if isinstance(p, ast.MatchAs):
+        assert p.pattern is not None  # a bare variable or wildcard agrees and matches
+        return describe(p.pattern, ctx)
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
         return f"a pattern of type {render(LiteralType(literal_of(p)))}"
     if isinstance(p, PatList):

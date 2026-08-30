@@ -39,7 +39,15 @@ from shapes import (
 )
 from subtyping import comparable, join, subtype
 from syntax import PatList, PatTuple
-from type_syntax import ClassType, ListType, LiteralType, TupleType
+from type_syntax import (
+    ClassType,
+    DictType,
+    ListType,
+    LiteralType,
+    TupleType,
+    Type,
+    UnionType,
+)
 
 type Match = tuple[frozenset[Shape], frozenset[Shape], VarContext]
 type RowMatch = tuple[frozenset[Row], frozenset[Row], VarContext]
@@ -229,6 +237,48 @@ def match_shapes(
     matched = union(m for m, _, _ in matches.values())
     left = union(left for _, left, _ in matches.values()) | (ks - matches.keys())
     return matched, left, join_deltas([d for _, _, d in matches.values()], ctx)
+
+
+def agrees(p: ast.pattern, t: Type, ctx: ModuleContext) -> bool:
+    """True unless a sequence pattern within `p` would be matched against a
+    value of the other kind at type `t`."""
+    if isinstance(t, UnionType):
+        return agrees(p, t.left, ctx) and agrees(p, t.right, ctx)
+    if isinstance(p, PatTuple):
+        if isinstance(t, ListType):
+            return False
+        if isinstance(t, TupleType) and len(t.components) == len(p.patterns):
+            return all(agrees(q, c, ctx) for q, c in zip(p.patterns, t.components))
+        return True
+    if isinstance(p, PatList):
+        if isinstance(t, TupleType):
+            return False
+        if isinstance(t, ListType):
+            return all(agrees(q, t.elem, ctx) for q in p.patterns)
+        return True
+    if isinstance(p, ast.MatchMapping):
+        if isinstance(t, DictType):
+            return all(agrees(q, t.value, ctx) for q in p.patterns)
+        return True
+    if isinstance(p, ast.MatchClass):
+        entry = class_entry(p.cls, ctx)
+        if entry is None:
+            return True
+        args = field_map(entry, p.patterns, p.kwd_attrs, p.kwd_patterns)
+        if args is None:
+            return True
+        return all(
+            agrees(args[x], declared_field(entry, x), ctx) for x in fields(entry)
+        )
+    if isinstance(p, ast.MatchAs):
+        return p.pattern is None or agrees(p.pattern, t, ctx)
+    return True
+
+
+def declared_field(entry: ClassEntry, x: str) -> Type:
+    t = field_type(entry, x)
+    assert t is not None
+    return t
 
 
 def disjoint_union(deltas: list[VarContext], node: ast.AST) -> VarContext:

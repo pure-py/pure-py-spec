@@ -222,7 +222,12 @@ derivation.
 
 The cases are then walked once, from $\shapesOf(\widen(\sigma), \varnothing)$ for the scrutinee's type $\sigma$, in the same shape as
 $\dispatch$ walks them at run time (\figref{typing-cases}). Each case matches its pattern against the residual, checks its
-body under the bindings that matching gives, and passes on the residual it leaves. A case that matches nothing is
+body under the bindings that matching gives, and passes on the residual it leaves. The evaluation rules
+apply a sequence pattern only to a value of its own kind, although Python would match either
+(\figref{eval-pat}), so each case's pattern must agree with the type of every shape of the residual
+($\agrees$, \secref{types-auxiliary}): a tuple pattern agrees with no list type and a list pattern with no
+tuple type, at every position. A match on $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ thus
+admits no sequence pattern. A case that matches nothing is
 rejected, whether because the scrutinee can never take that shape or because the earlier cases already cover it. \ruleName{match}
 applies where the walk ends with an empty residual, and \ruleName{match-partial} where it does not, merging
 in $\Assigns{\varnothing}$ for the values that fall through. A union is exhausted
@@ -289,4 +294,9 @@ The functions used by the rules of this \seckind{}, each defined by its cases.
 \begin{auxfunction}{\shapeTy(k)}{type}{aux:shape-type}
 \input{spec/functions/shape-type-text}
 \funcrows{shape-type}
+\end{auxfunction}
+
+\begin{auxfunction}{\agrees(p, \tau)}{Boolean}{aux:agrees}
+\input{spec/functions/agrees-text}
+\funcrows{agrees}
 \end{auxfunction}

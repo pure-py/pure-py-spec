@@ -355,6 +355,18 @@ class PatternTypeMismatch:
 
 
 @dataclass(frozen=True)
+class PatternDisagrees:
+    pattern: str
+    ty: str
+
+    def message(self) -> str:
+        return (
+            f"{self.pattern} does not agree with type {self.ty}, "
+            "where a list or tuple pattern may meet a value of the other kind"
+        )
+
+
+@dataclass(frozen=True)
 class NotIterable:
     ty: str
 
@@ -435,6 +447,7 @@ Reason = (
     | MissingReturn
     | NotIterable
     | PatternTypeMismatch
+    | PatternDisagrees
     | CaseMatchesNothing
     | NotSynthesised
     | UnknownField

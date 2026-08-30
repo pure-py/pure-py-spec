@@ -4,6 +4,7 @@
 \small
 \inferrule*[lab={\ruleName{cases-one}}]
 {
+  \agrees(p, \shapeTy(k)) \quad (\forall k \in L) \\
   \Gamma \vdash L, p \matches K, L' \binding \Delta \\
   \Gamma \override \Delta; \zeta \vdash s : R
 }
@@ -13,6 +14,7 @@
 \and
 \inferrule*[lab={\ruleName{cases-cons}}]
 {
+  \agrees(p, \shapeTy(k)) \quad (\forall k \in L) \\
   \Gamma \vdash L, p \matches K, L^\dagger \binding \Delta \\
   \Gamma \override \Delta; \zeta \vdash s : R \\
   \Gamma; \zeta; L^\dagger \vdash \seq{h} : S, L'

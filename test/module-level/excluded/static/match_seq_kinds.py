@@ -1,5 +1,4 @@
-# rule: sub-list-list / sub-tuple-tuple -- list and tuple patterns are distinct
-# kinds, so neither subsumes the other (a list pattern matches only a list).
+# rule: cases-cons -- a match on a union of list and tuple admits no sequence pattern
 def f(s: list[int] | tuple[int, int]) -> str:
     match s:
         case [a, b]:

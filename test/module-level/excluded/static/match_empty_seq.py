@@ -1,5 +1,5 @@
-# rule: sub-list-list / sub-tuple-tuple -- empty list and tuple patterns are
-# distinct kinds (an empty list pattern matches only an empty list).
+# rule: cases-cons -- empty list and tuple patterns are sequence patterns too,
+# so a union of the kinds admits neither
 def f(s: list[int] | tuple[()]) -> str:
     match s:
         case []:

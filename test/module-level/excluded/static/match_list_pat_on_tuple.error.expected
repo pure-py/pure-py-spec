@@ -1,1 +1,1 @@
-a list pattern cannot match a value of type tuple[Literal[1], Literal[2]]
+a list pattern does not agree with type tuple[Literal[1], Literal[2]], where a list or tuple pattern may meet a value of the other kind
