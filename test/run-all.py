@@ -50,10 +50,10 @@ RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
 RULE_DEF = re.compile(r"lab=\{\\ruleName\{([a-z0-9-]+)\}\}")
 CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
 
-# Constructs with a rule at more than one level: well-formed in the chapter on
-# well-formedness, typed in the chapter on the type system, and open-term typed
-# in the appendix. A typing rule refines the well-formedness rule of the same
-# construct, so the two share a name.
+# Names carried by one construct at more than one level: well-formed in the
+# chapter on well-formedness, typed in the chapter on the type system, and
+# open-term typed in the appendix. The list records the overlap as it stands,
+# so a name given to two different rules fails.
 REFINED_RULES = frozenset(
     {
         "and",

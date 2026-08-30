@@ -33,7 +33,7 @@ spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 
 # The Isabelle mechanisation, as a submodule so that it has a known location.
-MECHANISATION := mechanisation
+MECHANISATION := isabelle-purepy
 
 # A submission ships the mechanisation as it stands on main, so refuse to build
 # one from a working copy that has changes, unpushed commits, or a branch that
