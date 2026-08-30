@@ -37,36 +37,36 @@ R \override \Returns = \Returns \override R & = \Returns
 
 \noindent The $\Returns \override R$ case never arises because the well-formedness judgement excludes unreachable statements\paperonly{ (\secref{unreachable})}.
 
-A sequence $s\;s'$ is well-formed (\ruleName{seq}) when $s$ definitely assigns some $\Delta$, $s'$ is
+A sequence $s\;s'$ is well-formed (\ruleName{wf-seq}) when $s$ definitely assigns some $\Delta$, $s'$ is
 well-formed under $\Gamma \override \Delta$, and no variable captured by $s$ is assigned in $s'$. A
 conditional combines its branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no
-\pyinline{else} branch. A mutual region (\ruleName{def}) checks each body in a context in which the region's
+\pyinline{else} branch. A mutual region (\ruleName{wf-def}) checks each body in a context in which the region's
 function names and the body's parameters are definitely assigned and the body's other assigned
 variables are at $\statusNotDefAssigned$; the function names must be distinct. A \pyinline{match}
-(\ruleName{match}, \ruleName{match-partial}) requires its case patterns to be well-formed as a list,
+(\ruleName{wf-match}, \ruleName{wf-match-partial}) requires its case patterns to be well-formed as a list,
 checks each case body in a context in which the variables bound by its pattern are definitely
 assigned, and merges the cases as a
 conditional merges its branches, merging in $\Assigns{\varnothing}$ unless the last case is a catch-all, i.e.~a
 variable or wildcard.
 \paperinput{paper/well-formedness/match}%
 A class
-declaration (\ruleName{class}, \ruleName{class-extend}) assigns a class entry $C$ to its name, which must
+declaration (\ruleName{wf-class}, \ruleName{wf-class-extend}) assigns a class entry $C$ to its name, which must
 not already denote a class; its fields must be distinct and, for an extension, disjoint from those of the
 base class.
 
 \input{spec/fig/well-formed}
 
-A variable is a well-formed expression when it is definitely assigned (\ruleName{var});
+A variable is a well-formed expression when it is definitely assigned (\ruleName{wf-var});
 a lambda checks its body with its parameters definitely assigned, and a comprehension checks its body
-with the variables bound by its generators definitely assigned (\ruleName{qual-generator}). A lambda within
-a comprehension may not capture a generator variable, a side condition of \ruleName{list-comp},
-\ruleName{dict-comp} and \ruleName{qual-generator}, because Python mutates the variable on each iteration
+with the variables bound by its generators definitely assigned (\ruleName{wf-qual-generator}). A lambda within
+a comprehension may not capture a generator variable, a side condition of \ruleName{wf-list-comp},
+\ruleName{wf-dict-comp} and \ruleName{wf-qual-generator}, because Python mutates the variable on each iteration
 and the lambda would see its final value. Two rules resolve a qualified name through the
 context to a context entry $\theta$ (\figref{well-formed-expr}a). A module attribute reference $\exAttr{e}{x}$ is well-formed
 when, read as a qualified name, it resolves to a definitely assigned member
-(\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}. A constructor call requires its name
+(\ruleName{wf-attr-module})\paperonly{; see \secref{no-load-dependent}}. A constructor call requires its name
 to resolve to a class and its arguments to cover the class's fields exactly, through $\fieldMap$
-(\ruleName{constr}). A variable bound to a module or class entry is not an expression on its own, and occurs
+(\ruleName{wf-constr}). A variable bound to a module or class entry is not an expression on its own, and occurs
 only as the head of a qualified name\paperonly{ (\secref{no-first-class})}.
 
 \input{spec/fig/well-formed-expr}

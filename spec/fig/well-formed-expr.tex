@@ -46,7 +46,7 @@
 \flushleft \shadebox{$\Gamma \vdash e$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{var}}]
+\inferrule*[lab={\ruleName{wf-var}}]
 {
   \bind{x}{\statusDefAssigned} \in \Gamma
 }
@@ -54,7 +54,7 @@
   \Gamma \vdash x
 }
 \and
-\inferrule*[lab={\ruleName{literal}}]
+\inferrule*[lab={\ruleName{wf-literal}}]
 {
   \strut
 }
@@ -62,7 +62,7 @@
   \Gamma \vdash \ell
 }
 \and
-\inferrule*[lab={\ruleName{lambda}}]
+\inferrule*[lab={\ruleName{wf-lambda}}]
 {
   \Gamma \override \statusDefAssigned(\seq{x}) \vdash e
 }
@@ -70,7 +70,7 @@
   \Gamma \vdash \exLambda{\seq{x}}{e}
 }
 \and
-\inferrule*[lab={\ruleName{call}}]
+\inferrule*[lab={\ruleName{wf-call}}]
 {
   \Gamma \vdash e \\
   \Gamma \vdash e_i \quad (\forall i)
@@ -79,7 +79,7 @@
   \Gamma \vdash \exCall{e}{e_1, \ldots, e_n}
 }
 \and
-\inferrule*[lab={\ruleName{constr}}]
+\inferrule*[lab={\ruleName{wf-constr}}]
 {
   \Gamma \vdash q : C \\
    \\
@@ -90,7 +90,7 @@
   \Gamma \vdash \exConstr{q}{a}
 }
 \and
-\inferrule*[lab={\ruleName{attr-module}}]
+\inferrule*[lab={\ruleName{wf-attr-module}}]
 {
   \Gamma \vdash \exAttr{e}{x} : \statusDefAssigned
 }
@@ -98,7 +98,7 @@
   \Gamma \vdash \exAttr{e}{x}
 }
 \and
-\inferrule*[lab={\ruleName{attr-object}}]
+\inferrule*[lab={\ruleName{wf-attr-object}}]
 {
   \Gamma \vdash e
 }
@@ -106,7 +106,7 @@
   \Gamma \vdash \exAttr{e}{x}
 }
 \and
-\inferrule*[lab={\ruleName{dict}}]
+\inferrule*[lab={\ruleName{wf-dict}}]
 {
   \Gamma \vdash e_i \quad (\forall i) \\
   \Gamma \vdash e_i' \quad (\forall i)
@@ -115,7 +115,7 @@
   \Gamma \vdash \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}}
 }
 \and
-\inferrule*[lab={\ruleName{list}}]
+\inferrule*[lab={\ruleName{wf-list}}]
 {
   \Gamma \vdash e_i \quad (\forall i)
 }
@@ -123,7 +123,7 @@
   \Gamma \vdash \exList{e_1, \ldots, e_n}
 }
 \and
-\inferrule*[lab={\ruleName{tuple}}]
+\inferrule*[lab={\ruleName{wf-tuple}}]
 {
   \Gamma \vdash e_i \quad (\forall i)
 }
@@ -131,7 +131,7 @@
   \Gamma \vdash \exTuple{e_1, \ldots, e_n}
 }
 \and
-\inferrule*[lab={\ruleName{subscript}}]
+\inferrule*[lab={\ruleName{wf-subscript}}]
 {
   \Gamma \vdash e \\
   \Gamma \vdash e'
@@ -140,7 +140,7 @@
   \Gamma \vdash \exSubscript{e}{e'}
 }
 \and
-\inferrule*[lab={\ruleName{binop}}]
+\inferrule*[lab={\ruleName{wf-binop}}]
 {
   \Gamma \vdash e \\
   \Gamma \vdash e'
@@ -149,7 +149,7 @@
   \Gamma \vdash \exBinOp{e}{\odot}{e'}
 }
 \and
-\inferrule*[lab={\ruleName{unop}}]
+\inferrule*[lab={\ruleName{wf-unop}}]
 {
   \Gamma \vdash e
 }
@@ -157,7 +157,7 @@
   \Gamma \vdash \exUnOp{\ominus}{e}
 }
 \and
-\inferrule*[lab={\ruleName{and}}]
+\inferrule*[lab={\ruleName{wf-and}}]
 {
   \Gamma \vdash e \\
   \Gamma \vdash e'
@@ -166,7 +166,7 @@
   \Gamma \vdash \exAnd{e}{e'}
 }
 \and
-\inferrule*[lab={\ruleName{or}}]
+\inferrule*[lab={\ruleName{wf-or}}]
 {
   \Gamma \vdash e \\
   \Gamma \vdash e'
@@ -175,7 +175,7 @@
   \Gamma \vdash \exOr{e}{e'}
 }
 \and
-\inferrule*[lab={\ruleName{cond}}]
+\inferrule*[lab={\ruleName{wf-cond}}]
 {
   \Gamma \vdash e \\
   \Gamma \vdash e_1 \\
@@ -185,7 +185,7 @@
   \Gamma \vdash \exCondExpr{e_1}{e}{e_2}
 }
 \and
-\inferrule*[lab={\ruleName{list-comp}}]
+\inferrule*[lab={\ruleName{wf-list-comp}}]
 {
   \Gamma \vdash \seq{g} : \Delta \\
   \Gamma \override \Delta \vdash e \\
@@ -195,7 +195,7 @@
   \Gamma \vdash \exListComp{e}{g_1\;\ldots\;g_n}
 }
 \and
-\inferrule*[lab={\ruleName{dict-comp}}]
+\inferrule*[lab={\ruleName{wf-dict-comp}}]
 {
   \Gamma \vdash \seq{g} : \Delta \\
   \Gamma \override \Delta \vdash e \\
@@ -215,7 +215,7 @@
 \flushleft \shadebox{$\Gamma \vdash \seq{g} : \Delta$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{quals-nil}}]
+\inferrule*[lab={\ruleName{wf-quals-nil}}]
 {
   \strut
 }
@@ -223,7 +223,7 @@
   \Gamma \vdash \varepsilon : \varnothing
 }
 \and
-\inferrule*[lab={\ruleName{qual-guard}}]
+\inferrule*[lab={\ruleName{wf-qual-guard}}]
 {
   \Gamma \vdash e \\
   \Gamma \vdash \seq{g} : \Delta
@@ -232,7 +232,7 @@
   \Gamma \vdash \qualGuard{e} \cons \seq{g} : \Delta
 }
 \and
-\inferrule*[lab={\ruleName{qual-generator}}]
+\inferrule*[lab={\ruleName{wf-qual-generator}}]
 {
   \Gamma \vdash e \\
   \Gamma \override \set{\bind{x}{\statusDefAssigned}} \vdash \seq{g} : \Delta \\

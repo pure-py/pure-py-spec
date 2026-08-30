@@ -10,9 +10,9 @@ the rules follow in \secref{well-formedness-statements} and \secref{well-formedn
 Python has no variable declarations: a variable is introduced by assigning to it, and a local variable is
 in scope throughout the function body, wherever the assignment occurs. \PurePy keeps the syntax but gives
 each reference a unique lexical referent through \emph{definite assignment}: a variable may be referenced
-only where an assignment covers every path to the reference. The \ruleName{var} rule requires the variable
-to be definitely assigned, $\Gamma(x) = \statusDefAssigned$; the \ruleName{assign} rule makes it so, with
-$x = e$ assigning $\set{\bind{x}{\statusDefAssigned}}$; and the \ruleName{if} rules combine the branches with
+only where an assignment covers every path to the reference. The \ruleName{wf-var} rule requires the variable
+to be definitely assigned, $\Gamma(x) = \statusDefAssigned$; the \ruleName{wf-assign} rule makes it so, with
+$x = e$ assigning $\set{\bind{x}{\statusDefAssigned}}$; and the \ruleName{wf-if} rules combine the branches with
 $\merge$, so that a conditional definitely assigns a variable only if every branch that does not definitely
 return assigns it, otherwise leaving it at $\statusNotDefAssigned$ (\secref{well-formedness-statements}). Branch-local
 variables are therefore permitted, but using one after the conditional is not:
@@ -33,7 +33,7 @@ with Python. The program assigns \pyinline{x} on every run, so this is stricter 
 \pyinline{NameError}: the reference would denote the branch-local variable on one path and the
 \pyinline{x = 6} it hides on the other.
 
-Python's function-level scoping is kept as well. The \ruleName{def} rule introduces every variable the
+Python's function-level scoping is kept as well. The \ruleName{wf-def} rule introduces every variable the
 body assigns, $\assignsS(b)$, at $\statusNotDefAssigned$ before checking the body, so a reference before the
 assignment is rejected statically, where Python fails at run time with \pyinline{UnboundLocalError}:
 
@@ -53,14 +53,14 @@ into nested function definitions, which have their own scope.
 In Python a closure holds a mutable binding, so a variable captured by a lambda or nested function
 definition may be reassigned afterwards, changing what the function sees (\secref{no-mutable-state}).
 \PurePy excludes this: a variable captured by a statement may not be assigned later in the same sequence, nor
-by that statement itself. The \ruleName{seq} rule imposes the first as a side condition on a sequence
+by that statement itself. The \ruleName{wf-seq} rule imposes the first as a side condition on a sequence
 $t\;t'$: no variable in $\capturesS(t)$ may be in $\assignsS(t')$. In the example of \secref{no-mutable-state}, \pyinline{x} is captured by the
 definition of \pyinline{g} and assigned by \pyinline{x = 6}, so the program is rejected. The
-\ruleName{assign} rule imposes the second, $x \notin \capturesE(e)$ for an assignment $x = e$, rejecting
+\ruleName{wf-assign} rule imposes the second, $x \notin \capturesE(e)$ for an assignment $x = e$, rejecting
 for instance \pyinline{x = lambda: x}, where under Python's late binding the lambda would return itself. A
 third case arises in comprehensions: in Python a comprehension mutates its generator variables on each
 iteration, so a lambda in the body or in a later qualifier may not capture one, a side condition of
-\ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}. For instance
+\ruleName{wf-list-comp}, \ruleName{wf-dict-comp} and \ruleName{wf-qual-generator}. For instance
 \pyinline{[lambda x: x**i for i in [1, 2, 3]]} is rejected, since under Python each lambda in the list would compute
 \pyinline{x**3}. A dataclass declaration counts as an assignment of its class name here, although re-declaring a class name is
 excluded outright (\secref{no-first-class}).
@@ -69,7 +69,7 @@ Here $\capturesS(s)$ is the set of variables of the enclosing scope captured by 
 function definitions within a statement $s$, with $\capturesE(e)$ computing the same for an expression $e$: the
 free variables of each such function's body, less its parameters and any variables the body assigns, which
 are local to it. For a mutual region of function definitions (\figref{syntax-stmt}) the names of the functions
-themselves are also excluded, since the \ruleName{def} rule binds them in every body, consistent with
+themselves are also excluded, since the \ruleName{wf-def} rule binds them in every body, consistent with
 Python's late binding semantics (\secref{mutual-recursion}).
 
 \subsubsection{Mutual regions}
@@ -79,7 +79,7 @@ Mutual recursion in Python relies on late binding: the free variables of a funct
 they are evaluated, so two functions may refer to each other whatever order they are defined in, provided
 both exist by the time the reference is evaluated. \PurePy makes the
 dependency static: a \emph{mutual region}, a maximal run of consecutive \pyinline{def} statements in a
-sequence (\figref{syntax-stmt}), is a single simultaneous binding. The \ruleName{def} rule checks each body in a
+sequence (\figref{syntax-stmt}), is a single simultaneous binding. The \ruleName{wf-def} rule checks each body in a
 context in which every name of the mutual region is definitely assigned, so any function in the region may refer
 to any other, and requires the names to be distinct. Self-recursion is the special case of a singleton
 mutual region. Any other statement between two definitions separates them into different mutual regions:
@@ -99,7 +99,7 @@ def odd(n):
 \end{python}
 
 \noindent This is rejected statically: \pyinline{even} forms a mutual region of its own in which \pyinline{odd}
-is not yet bound, so the reference fails the \ruleName{var} rule. Python accepts the program, since the
+is not yet bound, so the reference fails the \ruleName{wf-var} rule. Python accepts the program, since the
 call \pyinline{even(0)} never reaches \pyinline{odd}. A mutual region with two definitions of the same name is
 rejected by the distinct-names condition:
 
@@ -123,10 +123,10 @@ functions after the conditional subject to the usual definite assignment rules (
 A \pyinline{case} pattern binds variables, and Python scopes them as it does assignments: they remain in
 scope after the \pyinline{match} statement. \PurePy follows: each case is treated as a branch, and its pattern as an
 assignment of the variables it binds. The set of variables a pattern $p$ introduces is $\binds(p)$; the
-\ruleName{match} rule checks each body in a context in which they are definitely assigned, and combines
-the cases with $\merge$ as the \ruleName{if} rules do, so a variable is definitely assigned after the match
+\ruleName{wf-match} rule checks each body in a context in which they are definitely assigned, and combines
+the cases with $\merge$ as the \ruleName{wf-if} rules do, so a variable is definitely assigned after the match
 only if every case binds it or returns. A match whose last case is not a catch-all (i.e.~a variable or
-wildcard) may fall through; in this case the \ruleName{match-partial} rule merges in the empty assignment set, as for a
+wildcard) may fall through; in this case the \ruleName{wf-match-partial} rule merges in the empty assignment set, as for a
 conditional without an \pyinline{else}:
 
 \begin{python}
@@ -156,7 +156,7 @@ match v:
 
 Python accepts statements that can never run, such as code after a \pyinline{return}. \PurePy rejects
 them, the statement-level counterpart of case reachability (\secref{pattern-binding}). A statement
-sequence returns only if its last statement returns and every earlier one assigns: the \ruleName{seq}
+sequence returns only if its last statement returns and every earlier one assigns: the \ruleName{wf-seq}
 rule requires the first statement of a sequence to have result type $\Assigns{\Delta}$
 (\secref{well-formedness-statements}), so a statement following a \pyinline{return} has no derivation:
 
@@ -178,7 +178,7 @@ signature, and the \ruleName{wf-import} and \ruleName{wf-from-import} rules stat
 ancestors first, so an import cycle has no derivation. A module may not bind a name that is also the name of one of its
 submodules, a side condition of \ruleName{wf-module}, since Python resolves the clash by load order. A
 qualified reference must resolve through the referring module's own imports to a definitely assigned
-member (\ruleName{attr-module}). A submodule is not an attribute of its parent until it is loaded, so
+member (\ruleName{wf-attr-module}). A submodule is not an attribute of its parent until it is loaded, so
 \pyinline{import pkg} followed by \pyinline{pkg.sub.y} is rejected unless the module also imports
 \pyinline{pkg.sub}, whereas Python permits the reference whenever some earlier import, anywhere in the
 program, happens to have loaded \pyinline{pkg.sub}:

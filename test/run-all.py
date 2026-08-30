@@ -50,50 +50,6 @@ RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
 RULE_DEF = re.compile(r"lab=\{\\ruleName\{([a-z0-9-]+)\}\}")
 CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
 
-# Names carried by one construct at more than one level: well-formed in the
-# chapter on well-formedness, typed in the chapter on the type system, and
-# open-term typed in the appendix. The list records the overlap as it stands,
-# so a name given to two different rules fails.
-REFINED_RULES = frozenset(
-    {
-        "and",
-        "assert",
-        "assert-msg",
-        "assign",
-        "attr-module",
-        "attr-object",
-        "binop",
-        "call",
-        "class",
-        "class-extend",
-        "cond",
-        "constr",
-        "def",
-        "dict",
-        "dict-comp",
-        "expr-stmt",
-        "if",
-        "if-else",
-        "lambda",
-        "list",
-        "list-comp",
-        "literal",
-        "match",
-        "match-partial",
-        "or",
-        "pass",
-        "qual-generator",
-        "qual-guard",
-        "quals-nil",
-        "return",
-        "return-none",
-        "seq",
-        "tuple",
-        "unop",
-        "var",
-    }
-)
-
 # Checker entry points under src/
 CHECK, CHECK_PROGRAM = "check_module.py", "check_program.py"
 
@@ -339,8 +295,7 @@ class Runner:
 
 
 def check_rule_names(r: Runner) -> None:
-    """A citation names one rule, so no two rules may carry the same name,
-    unless one refines the other."""
+    """A citation names one rule, so no two rules may carry the same name."""
     where: dict[str, list[str]] = {}
     for source in ("spec", "paper"):
         for f in sorted((ROOT / source).rglob("*.tex")):
@@ -349,8 +304,7 @@ def check_rule_names(r: Runner) -> None:
     clashes = [
         f"{name} in {', '.join(files)}"
         for name, files in sorted(where.items())
-        if len(files) != len(set(files))
-        or (len(files) > 1 and name not in REFINED_RULES)
+        if len(files) > 1
     ]
     if clashes:
         r.bad("rule names", "; ".join(clashes))
