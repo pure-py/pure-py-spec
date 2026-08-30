@@ -36,8 +36,8 @@ Read the implementation in order, module by module and definition by definition,
 off against the spec as you go, rather than jumping to the parts you suspect. Every definition has to
 earn its keep, and one that cannot be checked off is renamed or deleted.
 
-Act at the point the walk reaches, not before: a definition to be deleted goes when you arrive at it,
-so its consequences are seen one at a time and each test that changes is accounted for.
+Act at the point the walk reaches, not before, so that whatever breaks is traceable to the one
+definition you changed.
 
 ## Order of work
 
