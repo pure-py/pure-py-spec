@@ -161,6 +161,38 @@
 {
   \Gamma \vdash \exSubscript{e}{e'} \synth \tau_1 \mathbin{|} \ldots \mathbin{|} \tau_m
 }
+\and
+\inferrule*[lab={\ruleName{subscript-union}}]
+{
+  \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
+  \Gamma \override \set{\bind{y}{\sigma}} \vdash \exSubscript{y}{e'} \synth \tau \\
+  \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exSubscript{y}{e'} \synth \tau' \\
+  y \notin \fvE(e')
+}
+{
+  \Gamma \vdash \exSubscript{e}{e'} \synth \joinTy(\tau, \tau')
+}
+\and
+\inferrule*[lab={\ruleName{attr-union}}]
+{
+  \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
+  \Gamma \override \set{\bind{y}{\sigma}} \vdash \exAttr{y}{x} \synth \tau \\
+  \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exAttr{y}{x} \synth \tau'
+}
+{
+  \Gamma \vdash \exAttr{e}{x} \synth \joinTy(\tau, \tau')
+}
+\and
+\inferrule*[lab={\ruleName{call-union}}]
+{
+  \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
+  \Gamma \override \set{\bind{y}{\sigma}} \vdash \exCall{y}{\seq{e}} \synth \tau \\
+  \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exCall{y}{\seq{e}} \synth \tau' \\
+  y \notin \fvE(e_i) \quad (\forall i)
+}
+{
+  \Gamma \vdash \exCall{e}{\seq{e}} \synth \joinTy(\tau, \tau')
+}
 \end{mathpar}
 \caption{Expression $e$ synthesises type $\tau$ under $\Gamma$}
 \label{fig:typing-synth}

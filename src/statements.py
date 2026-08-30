@@ -462,14 +462,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
             return entry
         if isinstance(parent, ModuleStub):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(parent.q))
-        obj = synth_expr(e.value, ctx)
-        entry = obj.entry if isinstance(obj, ClassType) else None
-        if entry is None:
-            raise IllFormedModule(e, reasons.NotSynthesised())
-        member = field_type(entry, e.attr)
-        if member is None:
-            raise IllFormedModule(e, reasons.UnknownField(short_name(entry), e.attr))
-        return member
+        return field_of(synth_expr(e.value, ctx), e, ctx)
     if isinstance(e, ast.Subscript):
         return subscript(e, ctx)
     if isinstance(e, ast.Tuple):
@@ -491,9 +484,34 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
     raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
+def field_of(obj: Type, e: ast.Attribute, ctx: ModuleContext) -> Type:
+    """The type of a field of an object of type `obj`; at a union, the join
+    over the members."""
+    if isinstance(obj, UnionType):
+        return join([field_of(obj.left, e, ctx), field_of(obj.right, e, ctx)], ctx)
+    if not isinstance(obj, ClassType):
+        raise IllFormedModule(e, reasons.NotSynthesised())
+    member = field_type(obj.entry, e.attr)
+    if member is None:
+        raise IllFormedModule(e, reasons.UnknownField(short_name(obj.entry), e.attr))
+    return member
+
+
 def subscript(e: ast.Subscript, ctx: ModuleContext) -> Type:
-    """The type of a subscript, given the type of the container."""
-    container = synth_expr(e.value, ctx)
+    return subscript_type(synth_expr(e.value, ctx), e, ctx)
+
+
+def subscript_type(container: Type, e: ast.Subscript, ctx: ModuleContext) -> Type:
+    """The type of a subscript, given the type of the container; at a union,
+    the join over the members."""
+    if isinstance(container, UnionType):
+        return join(
+            [
+                subscript_type(container.left, e, ctx),
+                subscript_type(container.right, e, ctx),
+            ],
+            ctx,
+        )
     if isinstance(container, ListType):
         check_expr(e.slice, Primitive.INT, ctx)
         return container.elem
@@ -576,7 +594,14 @@ def call(e: ast.Call, ctx: ModuleContext) -> Type:
     type; the callee must be a callable of the same arity."""
     if isinstance(e.func, ast.Lambda):
         return applied_lambda(e.func, e, ctx)
-    fn = synth_expr(e.func, ctx)
+    return result_type(synth_expr(e.func, ctx), e, ctx)
+
+
+def result_type(fn: Type, e: ast.Call, ctx: ModuleContext) -> Type:
+    """The result of a call at callee type `fn`; at a union, the join over the
+    members."""
+    if isinstance(fn, UnionType):
+        return join([result_type(fn.left, e, ctx), result_type(fn.right, e, ctx)], ctx)
     if not isinstance(fn, CallableType):
         raise IllFormedModule(e, reasons.NotCallable(render(fn)))
     if len(fn.params) != len(e.args):
@@ -729,6 +754,9 @@ def elem_type(t: Type, ctx: ModuleContext) -> Type | None:
         return Primitive.STR
     if isinstance(t, TupleType):
         return join([base_type(c) for c in t.components], ctx)
+    if isinstance(t, UnionType):
+        left, right = elem_type(t.left, ctx), elem_type(t.right, ctx)
+        return None if left is None or right is None else join([left, right], ctx)
     return None
 
 

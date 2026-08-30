@@ -1,4 +1,5 @@
 \elemTy(\tyList{\tau}) &{}= \tau \\*
 \elemTy(\tyStr) &{}= \tyStr \\*
 \elemTy(\tyDict{\tau}) &{}= \tyStr \\*
-\elemTy(\tyTuple{\seq{\tau}}) &{}= \joinTy(\widen(\tau_1), \ldots, \widen(\tau_n))
+\elemTy(\tyTuple{\seq{\tau}}) &{}= \joinTy(\widen(\tau_1), \ldots, \widen(\tau_n)) \\*
+\elemTy(\tyUnion{\sigma}{\tau}) &{}= \joinTy(\elemTy(\sigma), \elemTy(\tau))
