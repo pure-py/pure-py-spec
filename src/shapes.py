@@ -107,8 +107,6 @@ def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> frozenset[S
         return frozenset(
             {Dict(t.value, (), frozenset(k for k in heads if isinstance(k, str)))}
         )
-    if isinstance(t, TupleType):
-        return frozenset(Tuple(row) for row in shapes_row(t.components, ctx))
     return frozenset({Rest(t, heads)})
 
 

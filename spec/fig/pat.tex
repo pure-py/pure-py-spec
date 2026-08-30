@@ -57,6 +57,14 @@
   \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \matches K, L \cup \shapesOf(\tau, N \cup \set{C}) \binding \Delta
 }
 \and
+\inferrule*[lab={\ruleName{pat-rest-tuple}}]
+{
+  \Gamma \vdash \set{\patTuple{\seq{k}} \mid \seq{k} \in \shapesOf(\seq{\tau})}, \patTuple{p_1, \ldots, p_n} \matches K, L \binding \Delta
+}
+{
+  \Gamma \vdash \shapeAny{\tyTuple{\tau_1, \ldots, \tau_n}}{N}, \patTuple{p_1, \ldots, p_n} \matches K, L \binding \Delta
+}
+\and
 \inferrule*[lab={\ruleName{pat-rest-list}}]
 {
   n \notin N \\

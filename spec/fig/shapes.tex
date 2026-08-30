@@ -8,7 +8,7 @@
 \inferrule*[lab={\ruleName{shape-rest}}]
 {
   \Gamma \vdash N \ctors \tau \\
-  \tau \text{ neither union, tuple nor dictionary type}
+  \tau \text{ neither union nor dictionary type}
 }
 {
   \Gamma \vdash \shapeAny{\tau}{N} : \tau

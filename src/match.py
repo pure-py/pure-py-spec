@@ -104,6 +104,13 @@ def match_tuple(k: Shape, p: PatTuple, ctx: ModuleContext) -> Match | None:
     ps = tuple(p.patterns)
     if isinstance(k, Tuple) and len(k.components) == len(ps):
         return wrap(Tuple, match_row(k.components, ps, p, ctx))
+    if (
+        isinstance(k, Rest)
+        and isinstance(k.ty, TupleType)
+        and len(k.ty.components) == len(ps)
+    ):
+        expanded = frozenset(Tuple(row) for row in shapes_row(k.ty.components, ctx))
+        return match_shapes(expanded, p, ctx)
     return None
 
 
