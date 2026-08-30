@@ -389,7 +389,6 @@ def supported_import(node: ast.stmt) -> None:
             raise NotYetSupported(node, "from M import *", 105)
         if alias.asname is not None:
             raise NotYetSupported(node, "from-import-as", 135)
-    return
 
 
 def supported_top_level(stmts: list[ast.stmt]) -> None:
