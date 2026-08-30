@@ -226,7 +226,7 @@ union leaves a later variable case bound at the others alone. Bindings from the 
 the keys of a dictionary pattern, compose by disjoint union, so a pattern that binds a name twice has no
 derivation.
 
-\begin{lemma}[Shape typing preserved]
+\begin{lemma}[Preservation of shape type]
 \label{lem:shape-typing}
 If $\Gamma \vdash h : \tau$ for every $h \in N$, then each $k \in \shapesOf(\tau, N)$ has $\Gamma
 \vdash k : \sigma$ for some $\sigma$ with $\Gamma \vdash \sigma \subty \tau$. Moreover, if each $k \in
