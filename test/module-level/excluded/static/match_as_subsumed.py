@@ -1,4 +1,4 @@
-# rule: sub-as-l -- an as-pattern is unreachable when its inner pattern is subsumed
+# rule: split-as -- a case matching nothing the earlier cases leave is rejected
 v = 1
 match v:
     case 1:

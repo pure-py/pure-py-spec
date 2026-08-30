@@ -1,4 +1,4 @@
-# rule: sub-list-list -- a repeated list pattern is unreachable
+# rule: split-rest-list -- a list case leaves nothing for the same list pattern
 v = [1, 2]
 match v:
     case [a, b]:

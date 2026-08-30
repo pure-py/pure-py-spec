@@ -1,4 +1,4 @@
-# rule: sub-wild -- a wildcard case makes a later case unreachable
+# rule: split-wild -- a wildcard case leaves nothing for a later case
 v = 1
 match v:
     case _:

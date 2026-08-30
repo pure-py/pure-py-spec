@@ -1,4 +1,4 @@
-# rule: sub-constr -- a subclass pattern is unreachable under a base-class pattern
+# rule: split-rest-constr -- a base-class case leaves nothing for a subclass case
 from dataclasses import dataclass
 
 @dataclass

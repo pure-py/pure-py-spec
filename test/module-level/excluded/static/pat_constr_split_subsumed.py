@@ -1,4 +1,4 @@
-# rule: sub-constr -- field-map compares field by field, whatever the argument split
+# rule: split-constr -- field-map pairs fields, whatever the argument split
 from dataclasses import dataclass
 
 @dataclass

@@ -178,15 +178,6 @@ class NonlinearPattern:
 
 
 @dataclass(frozen=True)
-class UnreachableCase:
-    index: int
-    subsumed_by: int
-
-    def message(self) -> str:
-        return f"case {self.index} unreachable: subsumed by case {self.subsumed_by}"
-
-
-@dataclass(frozen=True)
 class DuplicateMutualName:
     name: str
 
@@ -445,7 +436,6 @@ Reason = (
     | UnknownConstructorKeyword
     | DuplicateDictKey
     | NonlinearPattern
-    | UnreachableCase
     | DuplicateMutualName
     | NonTopLevelImport
     | TopLevelReturn

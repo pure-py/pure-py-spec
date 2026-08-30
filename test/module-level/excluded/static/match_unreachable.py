@@ -1,4 +1,4 @@
-# rule: cases-cons -- a case must not be subsumed by an earlier one
+# rule: split-shapes -- a case must match some shape the earlier cases leave
 v = (1, 2)
 match v:
     case (a, b):
