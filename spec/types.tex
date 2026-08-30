@@ -151,11 +151,12 @@ that type has no rule.
 \subsection{Statement typing}
 \label{sec:statement-typing}
 
-Statements carry the return type of the function they appear in as a second argument to the left of the
-turnstile: $\Gamma; \tau \vdash t : R$ says that $t$ has result type $R$ in $\Gamma$, in a
-function declared to return $\tau$ (\figref{typing-stmt}). The type $\tau$ is an obligation on the
-\pyinline{return} statements within $t$ rather than a property of $t$, so every rule passes it down
-unchanged. A \pyinline{return} checks its expression against $\tau$, and a bare
+Statements carry an optional return type as a second argument to the left of the turnstile:
+$\Gamma; \zeta \vdash t : R$ says that $t$ has result type $R$ in $\Gamma$, in a function declared to
+return $\zeta$, or at the top level of a module, where $\zeta$ is empty (\figref{typing-stmt}). The
+return type is an obligation on the \pyinline{return} statements within $t$ rather than a property of
+$t$, so every rule passes it down unchanged, and a \pyinline{return} has no rule where it is empty. A
+\pyinline{return} checks its expression against $\tau$, and a bare
 \pyinline{return} requires \pyinline{None} to be a subtype of $\tau$. An annotated assignment takes its type
 from the annotation and checks the expression against it, and an unannotated assignment takes the type the
 expression synthesises (\ruleName{assign}, \ruleName{assign-unannot}). The conditions of \pyinline{if} and \pyinline{assert}
@@ -173,7 +174,7 @@ declared return type, and must have result type $\Returns$ unless the function r
 so a function that declares a result definitely returns one.
 
 A \pyinline{match} scrutinee synthesises a type. Both \pyinline{match} rules hand the cases to the
-judgement $\Gamma; \tau; L \vdash \seq{h} : S, L'$, which takes them in turn,
+judgement $\Gamma; \zeta; L \vdash \seq{h} : S, L'$, which takes them in turn,
 requiring each to match something and the whole list to exhaust the type. The \emph{residual} $L$ holds the
 values no earlier case has matched, and $L'$ those still unmatched once these cases are done. The judgement
 starts from $\shapesOf(\widen(\sigma), \varnothing)$, which denotes every value of the scrutinee's base
@@ -239,6 +240,17 @@ although each covers only part of the type.
 \input{spec/fig/pat}
 
 \input{spec/fig/typing-cases}
+
+\subsection{Modules and programs}
+\label{sec:typing-modules}
+
+Static loading types a module's body and computes its signature
+(\figrefThree{typing-imports}{typing-import-prefix}{typing-module}). The rules are those of
+\secref{well-formedness-modules}, with two changes: \ruleName{module} types the body with no return type,
+so a \pyinline{return} has no derivation at the top level, and \ruleName{predefined} refines the
+signature of a predefined module by \figref{predefined-types}.
+
+\input{spec/fig/typing-module}
 
 \subsection{Auxiliary functions}
 \label{sec:types-auxiliary}

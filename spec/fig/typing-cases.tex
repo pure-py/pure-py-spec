@@ -1,24 +1,24 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma; \tau; L \vdash \seq{h} : S, L'$}
+\flushleft \shadebox{$\Gamma; \zeta; L \vdash \seq{h} : S, L'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{cases-one}}]
 {
   \Gamma \vdash L, p \matches K, L' \binding \Delta \\
-  \Gamma \override \Delta; \tau \vdash s : R
+  \Gamma \override \Delta; \zeta \vdash s : R
 }
 {
-  \Gamma; \tau; L \vdash \exCase{p}{s} : \Assigns{\Delta} \override R, L'
+  \Gamma; \zeta; L \vdash \exCase{p}{s} : \Assigns{\Delta} \override R, L'
 }
 \and
 \inferrule*[lab={\ruleName{cases-cons}}]
 {
   \Gamma \vdash L, p \matches K, L^\dagger \binding \Delta \\
-  \Gamma \override \Delta; \tau \vdash s : R \\
-  \Gamma; \tau; L^\dagger \vdash \seq{h} : S, L'
+  \Gamma \override \Delta; \zeta \vdash s : R \\
+  \Gamma; \zeta; L^\dagger \vdash \seq{h} : S, L'
 }
 {
-  \Gamma; \tau; L \vdash \exCase{p}{s} \cons \seq{h} : (\Assigns{\Delta} \override R) \merge S, L'
+  \Gamma; \zeta; L \vdash \exCase{p}{s} \cons \seq{h} : (\Assigns{\Delta} \override R) \merge S, L'
 }
 \end{mathpar}
 \caption{Cases $\seq{h}$ have result type $S$, reducing residual $L$ to $L'$}

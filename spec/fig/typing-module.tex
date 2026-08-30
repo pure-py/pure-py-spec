@@ -2,7 +2,7 @@
 \flushleft \shadebox{$\Gamma, x \importsR \theta$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{wf-imp-member}}]
+\inferrule*[lab={\ruleName{imp-member}}]
 {
   \Gamma \vdash x : \theta
 }
@@ -10,7 +10,7 @@
   \Gamma, x \importsR \theta
 }
 \and
-\inferrule*[lab={\ruleName{wf-imp-submodule}}]
+\inferrule*[lab={\ruleName{imp-submodule}}]
 {
   \bind{x}{\modStub{q}} \in \Gamma \\
   \vdash_{\mathsf{load}} q : \Delta
@@ -21,7 +21,7 @@
 \end{mathpar}
 
 \caption{Name $x$ imported from module signature $\Gamma$ has entry $\theta$}
-\label{fig:imports}
+\label{fig:typing-imports}
 \end{figure}
 
 \begin{figure}
@@ -29,7 +29,7 @@
 \flushleft \shadebox{$\vdash \seq{\iota} : \Gamma$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{wf-imports-nil}}]
+\inferrule*[lab={\ruleName{imports-nil}}]
 {
   \strut
 }
@@ -37,7 +37,7 @@
   \vdash \varepsilon : \varnothing
 }
 \and
-\inferrule*[lab={\ruleName{wf-import}}]
+\inferrule*[lab={\ruleName{import}}]
 {
   q' = x \cons \seq{x} \\
   q \not\properPrefixOf q' \\
@@ -49,7 +49,7 @@
   \vdash \exImport{q'} \cons \seq{\iota} : \set{\bind{x}{\theta}} \extend \Gamma
 }
 \and
-\inferrule*[lab={\ruleName{wf-from-import}}]
+\inferrule*[lab={\ruleName{from-import}}]
 {
   \vdash_{\mathsf{load}} q' : \Delta \\
   \vdash_{\mathsf{load}} q^\dagger : \Delta_{q^\dagger} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q) \\
@@ -70,7 +70,7 @@
 \flushleft \shadebox{$q, \theta \loadsAs \theta'$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{wf-loads-as-simple}}]
+\inferrule*[lab={\ruleName{loads-as-simple}}]
 {
   \strut
 }
@@ -78,7 +78,7 @@
   x, \theta \loadsAs \theta
 }
 \and
-\inferrule*[lab={\ruleName{wf-loads-as-qualified}}]
+\inferrule*[lab={\ruleName{loads-as-qualified}}]
 {
   \vdash_{\mathsf{load}} q : \Gamma' \\
   q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsAs \theta'
@@ -89,28 +89,29 @@
 \end{mathpar}
 \subcaption{Reference $\theta$ for module $q$ loads as reference $\theta'$ for root of $q$, statically loading ancestors of $q$}
 \end{subfigure}
-\caption{Import well-formedness}
-\label{fig:well-formed-imports}
+\caption{Import typing}
+\label{fig:typing-import-prefix}
 \end{figure}
 
 \begin{figure}
 \flushleft \shadebox{$\vdash_{\mathsf{load}} q : \Gamma$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{wf-predefined}}]
+\inferrule*[lab={\ruleName{predefined}}]
 {
-  \mathcal{P}(q) = (\rho, \Gamma)
+  \mathcal{P}(q) = (\rho, \Gamma') \\
+  \Delta \text{ the entries listed for } q \text{ in \figref{predefined-types}}
 }
 {
-  \vdash_{\mathsf{load}} q : \Gamma
+  \vdash_{\mathsf{load}} q : \Gamma' \override \set{\bind{\pymath{\_\_name\_\_}}{\tyStr}} \override \Delta
 }
 \and
-\inferrule*[lab={\ruleName{wf-module}}]
+\inferrule*[lab={\ruleName{module}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;t \\
   \vdash \seq{\iota} : \Gamma \\
   \mathcal{P}(\pyinline{builtins}) = (\rho, \Gamma') \\
-  \Gamma' \mathbin{\override} \Gamma \vdash t : \Assigns{\Delta} \\
+  \Gamma' \mathbin{\override} \Gamma; \varepsilon \vdash t : \Assigns{\Delta} \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {
@@ -121,7 +122,7 @@
 \flushleft \shadebox{$\vdash \mathcal{M}$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{wf-program}}]
+\inferrule*[lab={\ruleName{program}}]
 {
   \vdash_{\mathsf{load}} \pymath{\_\_main\_\_} : \Gamma
 }
@@ -129,6 +130,6 @@
   \vdash \mathcal{M}
 }
 \end{mathpar}
-\caption{Module well-formedness}
-\label{fig:well-formed-module}
+\caption{Module typing}
+\label{fig:typing-module}
 \end{figure}

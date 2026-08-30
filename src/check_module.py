@@ -157,7 +157,7 @@ def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     body = [name_assign(q)] + rest
     gamma1 = {**predefined_context("builtins"), **gamma0}
     returning = first_return(body)
-    if returning is not None:  # the module rule requires result type Assigns
+    if returning is not None:  # no return rule applies with an empty return type
         raise IllFormedModule(returning, reasons.TopLevelReturn())
     items = statements(body)
     _, final_ctx = check_seq(items, ModuleContext(gamma=gamma1, M=M, q=q))

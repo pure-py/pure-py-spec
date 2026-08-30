@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma; \tau \vdash t : R$}
+\flushleft \shadebox{$\Gamma; \zeta \vdash t : R$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{pass}}]
@@ -7,7 +7,7 @@
   \strut
 }
 {
-  \Gamma; \tau \vdash \exPass : \Assigns{\varnothing}
+  \Gamma; \zeta \vdash \exPass : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assign}}]
@@ -17,7 +17,7 @@
   x \notin \capturesE(e)
 }
 {
-  \Gamma; \tau \vdash \exAssign{x \exAnnot{\psi}}{e} : \Assigns{\set{\bind{x}{\sigma}}}
+  \Gamma; \zeta \vdash \exAssign{x \exAnnot{\psi}}{e} : \Assigns{\set{\bind{x}{\sigma}}}
 }
 \and
 \inferrule*[lab={\ruleName{assign-unannot}}]
@@ -26,7 +26,7 @@
   x \notin \capturesE(e)
 }
 {
-  \Gamma; \tau \vdash \exAssign{x}{e} : \Assigns{\set{\bind{x}{\sigma}}}
+  \Gamma; \zeta \vdash \exAssign{x}{e} : \Assigns{\set{\bind{x}{\sigma}}}
 }
 \and
 \inferrule*[lab={\ruleName{expr-stmt}}]
@@ -34,7 +34,7 @@
   \Gamma \vdash e \synth \sigma
 }
 {
-  \Gamma; \tau \vdash e : \Assigns{\varnothing}
+  \Gamma; \zeta \vdash e : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assert}}]
@@ -42,7 +42,7 @@
   \Gamma \vdash e \checks \tyBool
 }
 {
-  \Gamma; \tau \vdash \exAssert{e} : \Assigns{\varnothing}
+  \Gamma; \zeta \vdash \exAssert{e} : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assert-msg}}]
@@ -51,7 +51,7 @@
   \Gamma \vdash e' \checks \tyStr
 }
 {
-  \Gamma; \tau \vdash \exAssertMsg{e}{e'} : \Assigns{\varnothing}
+  \Gamma; \zeta \vdash \exAssertMsg{e}{e'} : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{return-none}}]
@@ -73,29 +73,29 @@
 \inferrule*[lab={\ruleName{if}}]
 {
   \Gamma \vdash e_i \checks \tyBool \quad (\forall i) \\
-  \Gamma; \tau \vdash s_i : R_i \quad (\forall i)
+  \Gamma; \zeta \vdash s_i : R_i \quad (\forall i)
 }
 {
-  \Gamma; \tau \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \merge \ldots \mathbin{\merge} R_{n+1} \: \merge \Assigns{\varnothing}
+  \Gamma; \zeta \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \merge \ldots \mathbin{\merge} R_{n+1} \: \merge \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{if-else}}]
 {
   \Gamma \vdash e_i \checks \tyBool \quad (\forall i) \\
-  \Gamma; \tau \vdash s_i : R_i \quad (\forall i)
+  \Gamma; \zeta \vdash s_i : R_i \quad (\forall i)
 }
 {
-  \Gamma; \tau \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
+  \Gamma; \zeta \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
 }
 \and
 \inferrule*[lab={\ruleName{seq}}]
 {
-  \Gamma; \tau \vdash t : \Assigns{\Delta} \\
+  \Gamma; \zeta \vdash t : \Assigns{\Delta} \\
   \Gamma \override \Delta ; \tau \vdash t' : R \\
   \capturesS(t) \cap \assignsS(t') = \varnothing
 }
 {
-  \Gamma; \tau \vdash t\;t' : \Assigns{\Delta} \override R
+  \Gamma; \zeta \vdash t\;t' : \Assigns{\Delta} \override R
 }
 \and
 \inferrule*[lab={\ruleName{def}}]
@@ -109,26 +109,26 @@
   \Gamma \vdash \psi_i \synth \tau_i \quad (\forall i)
 }
 {
-  \Gamma; \tau \vdash \exDef{f_1}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{s_{n+1}} : \Assigns{\set{\bind{f_j}{\tyCallable{\seq{\sigma}_j}{\tau_j}} \mid \forall j}}
+  \Gamma; \zeta \vdash \exDef{f_1}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{s_{n+1}} : \Assigns{\set{\bind{f_j}{\tyCallable{\seq{\sigma}_j}{\tau_j}} \mid \forall j}}
 }
 \and
 \inferrule*[lab={\ruleName{match}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma; \tau; \shapesOf(\widen(\sigma), \varnothing) \vdash \seq{h} : S, \varnothing
+  \Gamma; \zeta; \shapesOf(\widen(\sigma), \varnothing) \vdash \seq{h} : S, \varnothing
 }
 {
-  \Gamma; \tau \vdash \exMatch{e}{\seq{h}} : S
+  \Gamma; \zeta \vdash \exMatch{e}{\seq{h}} : S
 }
 \and
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma; \tau; \shapesOf(\widen(\sigma), \varnothing) \vdash \seq{h} : S, L \\
+  \Gamma; \zeta; \shapesOf(\widen(\sigma), \varnothing) \vdash \seq{h} : S, L \\
   L \neq \varnothing
 }
 {
-  \Gamma; \tau \vdash \exMatch{e}{\seq{h}} : S \merge \Assigns{\varnothing}
+  \Gamma; \zeta \vdash \exMatch{e}{\seq{h}} : S \merge \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{class}}]
@@ -140,7 +140,7 @@
   C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}
 }
 {
-  \Gamma; \tau \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{C}}}
+  \Gamma; \zeta \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{C}}}
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
@@ -154,9 +154,9 @@
   C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{c'}
 }
 {
-  \Gamma; \tau \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{C}}}
+  \Gamma; \zeta \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{C}}}
 }
 \end{mathpar}
-\caption{Statement $t$ has result type $R$ in $\Gamma$, within function returning $\tau$}
+\caption{Statement $t$ has result type $R$ in $\Gamma$, with optional return type $\zeta$}
 \label{fig:typing-stmt}
 \end{figure}
