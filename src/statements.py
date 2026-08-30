@@ -49,7 +49,7 @@ from contexts import (
 )
 from match import Shape, match_shapes, shapes
 from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
-from patterns import check_pattern_list, describe
+from patterns import describe
 from reasons import IllFormedModule
 from subtyping import elem_type, join, subtype
 from type_syntax import (
@@ -304,7 +304,6 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Match):
         subject = synth_expr(s.subject, ctx)
-        check_pattern_list([c.pattern for c in s.cases], s, ctx)
         return check_match_cases(s.cases, subject, ctx, returns)
     if isinstance(s, ast.ClassDef):
         check_class_decl(s, ctx.gamma, ctx.q)
@@ -482,9 +481,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
             raise IllFormedModule(e, reasons.NotSynthesised())
         member = field_type(entry, e.attr)
         if member is None:
-            raise IllFormedModule(
-                e, reasons.UnknownField(short_name(entry), e.attr)
-            )
+            raise IllFormedModule(e, reasons.UnknownField(short_name(entry), e.attr))
         return member
     if isinstance(e, ast.Subscript):
         return subscript(e, ctx)
@@ -498,7 +495,9 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
                 check_expr(k, Primitive.STR, ctx)
         return dict_type(e, e.values, ctx)
     if isinstance(e, ast.ListComp):
-        return ListType(base_type(synth_expr(e.elt, qual_context([e.elt], e.generators, ctx))))
+        return ListType(
+            base_type(synth_expr(e.elt, qual_context([e.elt], e.generators, ctx)))
+        )
     if isinstance(e, ast.DictComp):
         ctx_ = qual_context([e.key, e.value], e.generators, ctx)
         check_expr(e.key, Primitive.STR, ctx_)
@@ -523,9 +522,7 @@ def subscript(e: ast.Subscript, ctx: ModuleContext) -> Type:
     raise IllFormedModule(e, reasons.NotSubscriptable(render(container)))
 
 
-def tuple_subscript(
-    container: TupleType, index: ast.expr, ctx: ModuleContext
-) -> Type:
+def tuple_subscript(container: TupleType, index: ast.expr, ctx: ModuleContext) -> Type:
     """A literal index gives the component at that position, counting from the
     end where it is negative; any other index of type int gives their join."""
     m = len(container.components)
@@ -596,7 +593,9 @@ def check_expr(e: ast.expr, expected: Type, ctx: ModuleContext) -> None:
         synth_expr(e, ctx)
         return
     if isinstance(e, ast.Call) and isinstance(e.func, ast.Lambda):
-        check_expr(e.func.body, expected, override_var(ctx, lambda_arguments(e.func, e, ctx)))
+        check_expr(
+            e.func.body, expected, override_var(ctx, lambda_arguments(e.func, e, ctx))
+        )
         return
     if isinstance(e, ast.List) and isinstance(expected, ListType):
         for x in e.elts:

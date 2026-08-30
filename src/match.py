@@ -11,6 +11,8 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from itertools import product
 
+import reasons
+from aux import qualified_name
 from contexts import (
     ClassEntry,
     ModuleContext,
@@ -24,6 +26,7 @@ from contexts import (
     short_name,
 )
 from patterns import dict_key, literal_of
+from reasons import IllFormedModule
 from subtyping import comparable, join, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
@@ -135,11 +138,11 @@ def match(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Match | None:
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
         return match_literal(k, LiteralType(literal_of(p)), ctx)
     if isinstance(p, PatTuple):
-        return match_tuple(k, tuple(p.patterns), ctx)
+        return match_tuple(k, p, ctx)
     if isinstance(p, PatList):
-        return match_list(k, tuple(p.patterns), ctx)
+        return match_list(k, p, ctx)
     if isinstance(p, ast.MatchMapping):
-        return match_mapping(k, items(p), ctx)
+        return match_mapping(k, items(p), p, ctx)
     assert isinstance(p, ast.MatchClass)
     return match_constr(k, p, ctx)
 
@@ -157,7 +160,7 @@ def match_as(k: Shape, p: ast.MatchAs, ctx: ModuleContext) -> Match | None:
     if p.name is None:
         return matched, left, delta
     named = join([shape_type(m) for m in matched], ctx)
-    return matched, left, disjoint_union([delta, {p.name: named}])
+    return matched, left, disjoint_union([delta, {p.name: named}], p)
 
 
 def match_literal(k: Shape, ell: LiteralType, ctx: ModuleContext) -> Match | None:
@@ -171,31 +174,29 @@ def match_literal(k: Shape, ell: LiteralType, ctx: ModuleContext) -> Match | Non
     return None
 
 
-def match_tuple(
-    k: Shape, ps: tuple[ast.pattern, ...], ctx: ModuleContext
-) -> Match | None:
+def match_tuple(k: Shape, p: PatTuple, ctx: ModuleContext) -> Match | None:
+    ps = tuple(p.patterns)
     if isinstance(k, Tuple) and len(k.components) == len(ps):
-        return wrap(Tuple, match_row(k.components, ps, ctx))
+        return wrap(Tuple, match_row(k.components, ps, p, ctx))
     if (
         isinstance(k, Rest)
         and isinstance(k.ty, TupleType)
         and len(k.ty.components) == len(ps)
     ):
         row = tuple(Rest(c, frozenset()) for c in k.ty.components)
-        return wrap(Tuple, match_row(row, ps, ctx))
+        return wrap(Tuple, match_row(row, ps, p, ctx))
     return None
 
 
-def match_list(
-    k: Shape, ps: tuple[ast.pattern, ...], ctx: ModuleContext
-) -> Match | None:
+def match_list(k: Shape, p: PatList, ctx: ModuleContext) -> Match | None:
+    ps = tuple(p.patterns)
     n = len(ps)
     if isinstance(k, List) and len(k.elems) == n:
-        return wrap(lambda r: List(k.elem, r), match_row(k.elems, ps, ctx))
+        return wrap(lambda r: List(k.elem, r), match_row(k.elems, ps, p, ctx))
     if isinstance(k, Rest) and isinstance(k.ty, ListType) and n not in k.heads:
         elem = k.ty.elem
         row = tuple(Rest(elem, frozenset()) for _ in ps)
-        result = wrap(lambda r: List(elem, r), match_row(row, ps, ctx))
+        result = wrap(lambda r: List(elem, r), match_row(row, ps, p, ctx))
         if result is None:
             return None
         matched, left, delta = result
@@ -205,19 +206,21 @@ def match_list(
 
 def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | None:
     entry = class_entry(p.cls, ctx)
-    assert entry is not None
+    if entry is None:
+        raise IllFormedModule(p, reasons.UnknownClassInPattern(class_name(p.cls)))
     q = short_name(entry)
     args = field_map(entry, p.patterns, p.kwd_attrs, p.kwd_patterns)
-    assert args is not None
+    if args is None:
+        raise no_field_map(entry, p)
     ps = tuple(args[x] for x in fields(entry))
     if isinstance(k, Constr):
         if not subtype(ClassType(k.q), ClassType(q), ctx):
             return None
-        rows = match_row(k.args, padded(ps, len(k.args)), ctx)
+        rows = match_row(k.args, padded(ps, len(k.args)), p, ctx)
         return wrap(lambda r: Constr(k.q, r), rows)
     if isinstance(k, Rest) and q not in k.heads and comparable(ClassType(q), k.ty, ctx):
         row = tuple(field_shape(entry, x) for x in fields(entry))
-        result = wrap(lambda r: Constr(q, r), match_row(row, ps, ctx))
+        result = wrap(lambda r: Constr(q, r), match_row(row, ps, p, ctx))
         if result is None:
             return None
         matched, left, delta = result
@@ -226,14 +229,18 @@ def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | Non
 
 
 def match_mapping(
-    k: Shape, ws: tuple[tuple[str, ast.pattern], ...], ctx: ModuleContext
+    k: Shape,
+    ws: tuple[tuple[str, ast.pattern], ...],
+    node: ast.MatchMapping,
+    ctx: ModuleContext,
 ) -> Match | None:
     if not isinstance(k, Dict):
         return None
     if len(ws) == 0:
         return frozenset({k}), NOTHING, NO_BINDINGS
     (w, p), rest = ws[0], ws[1:]
-    assert w not in [key for key, _ in rest]
+    if w in [key for key, _ in rest]:
+        raise IllFormedModule(node, reasons.DuplicateDictKey(w))
     bound = dict(k.bound)
     if w in bound:
         first = match(bound[w], p, ctx)
@@ -244,7 +251,9 @@ def match_mapping(
     if first is None:
         return None
     matched, left, delta = first
-    later = match_mappings(frozenset(with_key(k, w, m) for m in matched), rest, ctx)
+    later = match_mappings(
+        frozenset(with_key(k, w, m) for m in matched), rest, node, ctx
+    )
     if later is None:
         return None
     matched_, left_, delta_ = later
@@ -252,13 +261,18 @@ def match_mapping(
         NOTHING if w in bound else frozenset({Dict(k.value, k.bound, k.heads | {w})})
     )
     left__ = frozenset(with_key(k, w, r) for r in left) | left_ | absent
-    return matched_, left__, disjoint_union([delta, delta_])
+    return matched_, left__, disjoint_union([delta, delta_], node)
 
 
 def match_mappings(
-    ks: frozenset[Shape], ws: tuple[tuple[str, ast.pattern], ...], ctx: ModuleContext
+    ks: frozenset[Shape],
+    ws: tuple[tuple[str, ast.pattern], ...],
+    node: ast.MatchMapping,
+    ctx: ModuleContext,
 ) -> Match | None:
-    matches = {k: s for k in ordered(ks) if (s := match_mapping(k, ws, ctx)) is not None}
+    matches = {
+        k: s for k in ordered(ks) if (s := match_mapping(k, ws, node, ctx)) is not None
+    }
     if len(matches) == 0:
         return None
     matched = union(m for m, _, _ in matches.values())
@@ -267,7 +281,7 @@ def match_mappings(
 
 
 def match_row(
-    row: Row, ps: tuple[ast.pattern, ...], ctx: ModuleContext
+    row: Row, ps: tuple[ast.pattern, ...], node: ast.pattern, ctx: ModuleContext
 ) -> RowMatch | None:
     """Rows that match the row of patterns, and rows that fail at one position."""
     matches = [match(k, p, ctx) for k, p in zip(row, ps)]
@@ -281,7 +295,7 @@ def match_row(
         for prefix in product(*(parts[j][0] for j in range(i)))
         for k in ks
     )
-    return matched, left, disjoint_union([d for _, _, d in parts])
+    return matched, left, disjoint_union([d for _, _, d in parts], node)
 
 
 def match_shapes(
@@ -297,12 +311,15 @@ def match_shapes(
     return matched, left, join_deltas([d for _, _, d in matches.values()], ctx)
 
 
-def disjoint_union(deltas: list[VarContext]) -> VarContext:
-    """Bindings of sub-patterns taken together. Their variables are distinct,
-    since a pattern is linear."""
+def disjoint_union(deltas: list[VarContext], node: ast.AST) -> VarContext:
+    """Bindings of sub-patterns taken together, which compose only where the
+    variables are distinct, so a pattern binding a name twice has no
+    derivation."""
     merged: VarContext = {}
     for delta in deltas:
-        assert merged.keys().isdisjoint(delta.keys())
+        repeated = sorted(merged.keys() & delta.keys())
+        if repeated:
+            raise IllFormedModule(node, reasons.NonlinearPattern(repeated[0]))
         merged = merged | delta
     return merged
 
@@ -348,6 +365,27 @@ def padded(ps: tuple[ast.pattern, ...], n: int) -> tuple[ast.pattern, ...]:
     return ps + tuple(ast.MatchAs() for _ in range(n - len(ps)))
 
 
+def class_name(cls: ast.expr) -> str:
+    if isinstance(cls, (ast.Name, ast.Attribute)):
+        return qualified_name(cls)
+    return ast.unparse(cls)
+
+
+def no_field_map(entry: ClassEntry, p: ast.MatchClass) -> IllFormedModule:
+    """Why field-map is undefined for the pattern's arguments."""
+    c, xs = short_name(entry), fields(entry)
+    n = len(p.patterns)
+    if n + len(p.kwd_attrs) != len(xs):
+        return IllFormedModule(
+            p, reasons.PatternArityMismatch(c, len(xs), n + len(p.kwd_attrs))
+        )
+    if len(p.kwd_attrs) != len(set(p.kwd_attrs)):
+        return IllFormedModule(p, reasons.DuplicatePatternKeyword(c))
+    return IllFormedModule(
+        p, reasons.UnknownFieldInPattern(c, tuple(sorted(set(xs[n:]))))
+    )
+
+
 def field_shape(entry: ClassEntry, x: str) -> Shape:
     """Shape of a field of the class, at its declared type."""
     t = field_type(entry, x)
@@ -362,4 +400,3 @@ def with_key(k: Dict, w: str, m: Shape) -> Dict:
 
 def items(p: ast.MatchMapping) -> tuple[tuple[str, ast.pattern], ...]:
     return tuple(zip([dict_key(key) for key in p.keys], p.patterns))
-

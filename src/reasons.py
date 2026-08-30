@@ -171,10 +171,10 @@ class DuplicateDictKey:
 
 @dataclass(frozen=True)
 class NonlinearPattern:
-    index: int
+    variable: str
 
     def message(self) -> str:
-        return f"repeated variable in pattern {self.index}"
+        return f"repeated variable '{self.variable}' in pattern"
 
 
 @dataclass(frozen=True)
