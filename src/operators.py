@@ -55,10 +55,13 @@ def equality_type(t: Type, ctx: ModuleContext) -> bool:
 
 
 def class_equality_type(entry: ClassEntry, ctx: ModuleContext) -> bool:
-    return all(
-        equality_type(field_type(entry, x) or Primitive.NEVER, ctx)
-        for x in fields(entry)
-    )
+    return all(equality_type(declared(entry, x), ctx) for x in fields(entry))
+
+
+def declared(entry: ClassEntry, x: str) -> Type:
+    t = field_type(entry, x)
+    assert t is not None
+    return t
 
 
 def membership_list(s: Type, t: Type, ctx: ModuleContext) -> Type | None:

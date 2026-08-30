@@ -76,10 +76,8 @@ $\fieldMap$, checks it against that field's type, and synthesises the class entr
 which is the class type (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must
 synthesise a class entry $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$
 (\ruleName{attr-object}). Typing a program refines the signature of a predefined module
-(Definition~\ref{def:predefined}), binding $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the entry
-listed for it in \figref{predefined-types}, so \pyinline{len} takes a \pyinline{Sized} and \pyinline{print}
-one argument of any type, while \pyinline{Callable} and the other three names that no expression may
-mention keep the entry $\predefName$. Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
+(Definition~\ref{def:predefined}), binding $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member listed in
+\figref{predefined-types} at its entry there. Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
 signature $\ominus : \sigma \to \tau$, relating operand types to result type
 (\figref{operator-signatures}). A
 signature with type variables stands for all its instances, which agree on the result type; a variable binds
@@ -94,7 +92,7 @@ whose values structural equality relates:
 \Gamma \vdash \tyDict{\tau} \eqType \quad & \text{if } \Gamma \vdash \tau \eqType \\
 \Gamma \vdash \tyTuple{\seq{\tau}} \eqType \quad & \text{if } \Gamma \vdash \tau_i \eqType \quad (\forall i) \\
 \Gamma \vdash \tyUnion{\sigma}{\tau} \eqType \quad & \text{if } \Gamma \vdash \sigma \eqType \text{ and } \Gamma \vdash \tau \eqType \\
-\Gamma \vdash q \eqType \quad & \text{if } \Gamma \vdash q : C \text{ and } \Gamma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \fields(C)
+\Gamma \vdash C \eqType \quad & \text{if } \Gamma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \fields(C)
 \end{defalign}
 
 \noindent A callable type is not an equality type, and neither is any type with a callable component, so

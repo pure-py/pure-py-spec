@@ -388,8 +388,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
                 raise IllFormedModule(e, reasons.UndefinedVariable(e.id))
             raise IllFormedModule(e, reasons.UnassignedVariable(e.id))
         t = var_type(ctx, e.id)
-        if t is None:
-            raise IllFormedModule(e, reasons.NotSynthesised())
+        assert t is not None
         return t
     if isinstance(e, ast.Constant):
         return LiteralType(e.value)
@@ -448,7 +447,6 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
         assert len(e.ops) == 1
         return binary(BINARY_NAMES[type(e.ops[0])], e.left, e.comparators[0], e, ctx)
     if isinstance(e, ast.IfExp):
-        check_expr(e.test, Primitive.BOOL, ctx)
         raise IllFormedModule(e, reasons.NotSynthesised())
     if isinstance(e, ast.Attribute):
         parent = entry_of(e.value, ctx)
@@ -523,9 +521,13 @@ def tuple_subscript(container: TupleType, index: ast.expr, ctx: ModuleContext) -
     """A literal index gives the component at that position, counting from the
     end where it is negative; any other index of type int gives their join."""
     m = len(container.components)
-    i = literal_index(synth_expr(index, ctx))
+    actual = synth_expr(index, ctx)
+    i = literal_index(actual)
     if i is None:
-        check_expr(index, Primitive.INT, ctx)
+        if actual != Primitive.INT:
+            raise IllFormedModule(
+                index, reasons.TypeMismatch(render(Primitive.INT), render(actual))
+            )
         return join(container.components, ctx)
     if not -m <= i < m:
         raise IllFormedModule(index, reasons.TupleIndexOutOfRange(i, m))
@@ -540,16 +542,41 @@ def literal_index(t: Type) -> int | None:
 
 
 def list_type(e: ast.expr, elts: list[ast.expr], ctx: ModuleContext) -> ListType:
-    """A non-empty list synthesises at the join of the base types of its
-    elements; an empty one has no synthesis rule."""
-    if len(elts) == 0:
+    """A list synthesises at the join of the base types of the elements that
+    synthesise, which must not be none, the others checking against it."""
+    synthesising = [x for x in elts if synthesises(x)]
+    if len(synthesising) == 0:
         raise IllFormedModule(e, reasons.NotSynthesised())
-    return ListType(join([base_type(synth_expr(x, ctx)) for x in elts], ctx))
+    t = join([base_type(synth_expr(x, ctx)) for x in synthesising], ctx)
+    for x in elts:
+        if not synthesises(x):
+            check_expr(x, t, ctx)
+    return ListType(t)
+
+
+def synthesises(e: ast.expr) -> bool:
+    """Whether some synthesis rule has the form of `e`: a lambda, an empty list
+    or dictionary and a conditional expression have none, and a container has
+    one where its parts do."""
+    if isinstance(e, (ast.Lambda, ast.IfExp)):
+        return False
+    if isinstance(e, ast.List):
+        return any(synthesises(x) for x in e.elts)
+    if isinstance(e, ast.Dict):
+        return any(synthesises(v) for v in e.values)
+    if isinstance(e, ast.Tuple):
+        return all(synthesises(x) for x in e.elts)
+    if isinstance(e, ast.ListComp):
+        return synthesises(e.elt)
+    if isinstance(e, ast.DictComp):
+        return synthesises(e.value)
+    if isinstance(e, ast.Call) and isinstance(e.func, ast.Lambda):
+        return synthesises(e.func.body) and all(synthesises(a) for a in e.args)
+    return True
 
 
 def dict_type(e: ast.expr, values: list[ast.expr], ctx: ModuleContext) -> DictType:
-    """A non-empty dictionary synthesises at the join of the base types of its
-    values; an empty one has no synthesis rule."""
+    """A dictionary synthesises as a list of its values does."""
     return DictType(list_type(e, values, ctx).elem)
 
 
@@ -586,9 +613,6 @@ def check_expr(e: ast.expr, expected: Type, ctx: ModuleContext) -> None:
     """Check `e` against `expected`. A container display checks its parts against
     the parts of the expected type; anything else synthesises and must be below
     it."""
-    if expected is None:
-        synth_expr(e, ctx)
-        return
     if isinstance(e, ast.Call) and isinstance(e.func, ast.Lambda):
         check_expr(
             e.func.body, expected, override_var(ctx, lambda_arguments(e.func, e, ctx))
@@ -630,8 +654,6 @@ def check_expr(e: ast.expr, expected: Type, ctx: ModuleContext) -> None:
         check_expr(e.value, expected.value, ctx_)
         return
     actual = synth_expr(e, ctx)
-    if actual is None:
-        return
     if not subtype(actual, expected, ctx):
         raise IllFormedModule(e, reasons.TypeMismatch(render(expected), render(actual)))
 

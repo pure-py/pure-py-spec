@@ -1,2 +1,2 @@
-# rule: var -- the builtins context holds only print, len and range; abs is not one
+# rule: var -- abs is not a member of builtins
 y = abs(-1)
