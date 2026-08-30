@@ -186,18 +186,6 @@ class DuplicateMutualName:
 
 
 @dataclass(frozen=True)
-class NonTopLevelImport:
-    def message(self) -> str:
-        return "import only allowed at module top level"
-
-
-@dataclass(frozen=True)
-class ImportAfterStatement:
-    def message(self) -> str:
-        return "imports must precede all other statements"
-
-
-@dataclass(frozen=True)
 class SubmoduleNameClash:
     name: str
     submodule: str
@@ -227,12 +215,6 @@ class UnassignedMember:
 class TopLevelReturn:
     def message(self) -> str:
         return "top-level return not allowed (module body must not return)"
-
-
-@dataclass(frozen=True)
-class EmptyFromImport:
-    def message(self) -> str:
-        return "empty name list"
 
 
 @dataclass(frozen=True)
@@ -437,10 +419,7 @@ Reason = (
     | DuplicateDictKey
     | NonlinearPattern
     | DuplicateMutualName
-    | NonTopLevelImport
     | TopLevelReturn
-    | EmptyFromImport
-    | ImportAfterStatement
     | SubmoduleNameClash
     | SubmoduleNotImported
     | OwnDescendantImport
@@ -473,7 +452,6 @@ class IllFormedModule(IllFormed):
     def __init__(self, node: ast.AST, reason: Reason):
         self.line: int | None = getattr(node, "lineno", None)
         self.col: int | None = getattr(node, "col_offset", None)
-        self.reason: Reason = reason
         self.msg = reason.message()
         self.module: str | None = None
         super().__init__(self.msg)

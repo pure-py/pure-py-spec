@@ -7,8 +7,6 @@ import syntax
 from aux import (
     assigns_body,
     assigns_stmt,
-    find_import,
-    find_nested_import,
     first_return,
     split_imports,
     statements,
@@ -80,10 +78,7 @@ def import_bindings(s: ast.stmt, ctx: ModuleContext) -> Context:
             raise IllFormedModule(s, reasons.OwnDescendantImport(q, ctx.q))
         delta = check_module(ctx.M[q], ctx.M, q)
         return {q.split(".")[0]: loads_as(q, ModuleLoaded(q, delta), ctx)}
-    assert isinstance(s, ast.ImportFrom)
-    if len(s.names) == 0:
-        raise IllFormedModule(s, reasons.EmptyFromImport())
-    assert s.module is not None
+    assert isinstance(s, ast.ImportFrom) and s.module is not None
     if s.module not in ctx.M:
         raise IllFormedModule(s, reasons.UnknownModule(s.module))
     delta = check_module(ctx.M[s.module], ctx.M, s.module)
@@ -147,13 +142,7 @@ def check_module(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context:
 
 
 def check_module_(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context:
-    nested = find_nested_import(m.body)
-    if nested is not None:
-        raise IllFormedModule(nested, reasons.NonTopLevelImport())
     prefix, rest = split_imports(m.body)
-    stray = find_import(rest)
-    if stray is not None:
-        raise IllFormedModule(stray, reasons.ImportAfterStatement())
     gamma0 = check_imports_prefix(prefix, ModuleContext(gamma={}, M=M, q=q))
     body = [name_assign(q)] + rest
     gamma1 = {**predefined_context("builtins"), **gamma0}

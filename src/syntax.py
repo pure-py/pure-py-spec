@@ -2,6 +2,7 @@ import ast
 import sys
 from collections.abc import Callable
 
+from aux import is_import, split_imports
 from type_syntax import parse_annotation
 
 OP_SYMBOLS: dict[type, str] = {
@@ -148,22 +149,8 @@ def supported_stmt(node: ast.stmt) -> None:
         raise Prohibited(node, "raise prohibited")
     if isinstance(node, ast.Try):
         raise Prohibited(node, "try/except prohibited")
-    if isinstance(node, ast.Import):
-        if len(node.names) != 1:
-            raise NotYetSupported(node, "multi-target import (import a, b)", 135)
-        if node.names[0].asname is not None:
-            raise NotYetSupported(node, "import-as", 135)
-        return
-    if isinstance(node, ast.ImportFrom):
-        if node.level > 0:
-            raise NotYetSupported(node, "relative imports", 126)
-        assert node.module is not None  # absent only in a relative import
-        for alias in node.names:
-            if alias.name == "*":
-                raise NotYetSupported(node, "from M import *", 105)
-            if alias.asname is not None:
-                raise NotYetSupported(node, "from-import-as", 135)
-        return
+    if isinstance(node, (ast.Import, ast.ImportFrom)):
+        raise Prohibited(node, "import only allowed at module top level")
     if isinstance(node, ast.Global):
         raise Prohibited(node, "global prohibited")
     if isinstance(node, ast.Nonlocal):
@@ -384,8 +371,35 @@ def supported_body(stmts: list[ast.stmt]) -> None:
         supported_stmt(s)
 
 
+def supported_import(node: ast.stmt) -> None:
+    if isinstance(node, ast.Import):
+        if len(node.names) != 1:
+            raise NotYetSupported(node, "multi-target import (import a, b)", 135)
+        if node.names[0].asname is not None:
+            raise NotYetSupported(node, "import-as", 135)
+        return
+    assert isinstance(node, ast.ImportFrom)
+    if len(node.names) == 0:
+        raise Prohibited(node, "empty name list")
+    if node.level > 0:
+        raise NotYetSupported(node, "relative imports", 126)
+    assert node.module is not None  # absent only in a relative import
+    for alias in node.names:
+        if alias.name == "*":
+            raise NotYetSupported(node, "from M import *", 105)
+        if alias.asname is not None:
+            raise NotYetSupported(node, "from-import-as", 135)
+    return
+
+
 def supported_top_level(stmts: list[ast.stmt]) -> None:
-    for s in stmts:
+    """A module body is its import prefix followed by a top-level statement."""
+    prefix, rest = split_imports(stmts)
+    for s in prefix:
+        supported_import(s)
+    for s in rest:
+        if is_import(s):
+            raise Prohibited(s, "imports must precede all other statements")
         if isinstance(s, ast.ClassDef):
             supported_classdef(s)
         else:

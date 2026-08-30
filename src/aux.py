@@ -16,10 +16,6 @@ def split_imports(body: list[ast.stmt]) -> tuple[list[ast.stmt], list[ast.stmt]]
     return list(takewhile(is_import, body)), list(dropwhile(is_import, body))
 
 
-def find_import(stmts: list[ast.stmt]) -> ast.stmt | None:
-    return next((s for s in stmts if isinstance(s, (ast.Import, ast.ImportFrom))), None)
-
-
 def statements(body: list[ast.stmt]) -> list[Statement]:
     if len(body) == 0:
         return []
@@ -325,28 +321,6 @@ def find_first_reassigning(items: list[Statement], names: set[str]) -> ast.AST |
     if assigns_statement(items[0]) & names:
         return items[0][0] if isinstance(items[0], list) else items[0]
     return find_first_reassigning(items[1:], names)
-
-
-def find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST | None:
-    for s in stmts:
-        if nested and isinstance(s, (ast.Import, ast.ImportFrom)):
-            return s
-        if isinstance(s, ast.FunctionDef):
-            r = find_nested_import(s.body, nested=True)
-            if r is not None:
-                return r
-        if isinstance(s, ast.If):
-            r = find_nested_import(s.body, nested=True) or find_nested_import(
-                s.orelse, nested=True
-            )
-            if r is not None:
-                return r
-        if isinstance(s, ast.Match):
-            results = (find_nested_import(case.body, nested=True) for case in s.cases)
-            r = next((x for x in results if x is not None), None)
-            if r is not None:
-                return r
-    return None
 
 
 def first_return(body: list[ast.stmt]) -> ast.Return | None:
