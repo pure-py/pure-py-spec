@@ -32,10 +32,10 @@ directions.
 
 ## Sequential check against the spec
 
-Check the implementation against the spec definition by definition, in order, rather than jumping to
-the parts you suspect. Take each module, and within it each definition, and name the feature of the
-spec it implements. Every piece of code earns its keep that way, and what cannot be matched to a
-feature is renamed, deleted or excused as the inventory step prescribes.
+Read the implementation in order, module by module and definition by definition, checking each one
+off against the spec as you go, rather than jumping to the parts you suspect. Every definition has to
+earn its keep, and one that cannot be checked off is renamed, deleted or excused as the inventory step
+prescribes.
 
 Act at the point the walk reaches, not before: a definition to be deleted goes when you arrive at it,
 so its consequences are seen one at a time and each test that changes is accounted for.
