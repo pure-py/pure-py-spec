@@ -193,7 +193,7 @@ well as the values it leaves. The body is then checked under those bindings.
 \input{spec/fig/syntax-shapes}
 
 Reachability and exhaustiveness are the two halves of one computation
-(\figrefTwo{shapes}{coverage}), as in the usefulness algorithm for
+(\figrefTwo{shapes}{splitting}), as in the usefulness algorithm for
 ML~\cite{maranget2007} and in the term descriptions a match compiler carries~\cite{sestoft1996}. Splitting
 takes the scrutinee's type into account, as the uncovered sets of \citet{karachalias2015} do. A \emph{shape} $k$
 denotes a set of values of a type, written $\Gamma \vdash k : \tau$. Every shape has a least such type,
@@ -207,7 +207,7 @@ carries a union type, since $\shapesOf$ is the only source of the form $\shapeAn
 union into its members. The
 relation $\Gamma \vdash L, p \splitTo K, L' \binding \Delta$ divides a set of shapes into the matched shapes
 $K$ and the \emph{residual} $L'$, binding $\Delta$, one shape at a time and one position at a time
-(\figrefTwo{coverage}{coverage-rows}). A pattern that cannot match a shape has no derivation against it, so
+(\figrefTwo{splitting}{splitting-rows}). A pattern that cannot match a shape has no derivation against it, so
 \ruleName{split-shapes} takes the shapes it does match, which must not be none, and passes the others into
 the residual untouched. A variable pattern binds at $\shapeTy(k)$ for the shape $k$ it matches, and a
 pattern named by \pyinline{as} at the join over the shapes it matched, so a case for one alternative of a
@@ -234,7 +234,7 @@ $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave nothing,
 although each covers only part of the type.
 
-\input{spec/fig/coverage}
+\input{spec/fig/splitting}
 
 \input{spec/fig/typing-cases}
 
