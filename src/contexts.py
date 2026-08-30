@@ -7,13 +7,11 @@ from type_syntax import CallableType, ListType, Primitive, Type
 
 
 class Status(Enum):
-    TT = auto()
     FF = auto()
 
 
-# The entry for a variable is its type where that is known, Status.TT where it is
-# assigned but not yet typed, and Status.FF where it is not definitely assigned.
-# Lazily evaluated, so these may name ClassEntry before it is defined.
+# The entry for a variable is its type, or Status.FF where it is not definitely
+# assigned. Lazily evaluated, so these may name ClassEntry before it is defined.
 type VarEntry = Status | Type
 type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | ClassEntry | PredefinedName
 type Context = dict[str, ContextEntry]
@@ -176,8 +174,6 @@ def merge_entry(a: VarEntry, b: VarEntry, join_types: Join) -> VarEntry:
     one alone is not definitely assigned."""
     if a == Status.FF or b == Status.FF:
         return Status.FF
-    if isinstance(a, Status) or isinstance(b, Status):
-        return a if a == b else Status.TT
     return join_types(a, b)
 
 

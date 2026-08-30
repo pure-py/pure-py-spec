@@ -31,7 +31,6 @@ from contexts import (
     Returns,
     Status,
     VarContext,
-    VarEntry,
     class_entry,
     class_of,
     entry_of,
@@ -66,7 +65,6 @@ from type_syntax import (
     UnionType,
     base_type,
     parse_annotation,
-    parse_annotations,
     render,
 )
 
@@ -79,22 +77,16 @@ def annotated_type(node: ast.AnnAssign) -> Type:
     return t
 
 
-def signature(d: ast.FunctionDef) -> VarEntry:
+def signature(d: ast.FunctionDef) -> CallableType:
     """Callable type of a definition, from its parameter and return
-    annotations; assigned with no type yet where either is missing."""
-    if d.returns is None or any(a.annotation is None for a in d.args.args):
-        return Status.TT
-    params = parse_annotations([a.annotation for a in d.args.args if a.annotation])
-    result = parse_annotation(d.returns)
-    assert params is not None and result is not None
-    return CallableType(params, result)
+    annotations."""
+    return CallableType(
+        tuple(annotated(a.annotation) for a in d.args.args), annotated(d.returns)
+    )
 
 
 def parameters(d: ast.FunctionDef) -> VarContext:
-    return {
-        a.arg: (Status.TT if a.annotation is None else annotated(a.annotation))
-        for a in d.args.args
-    }
+    return {a.arg: annotated(a.annotation) for a in d.args.args}
 
 
 def well_formed(t: Type, node: ast.AST, ctx: ModuleContext) -> Type:
@@ -137,8 +129,10 @@ def in_scope(x: str, node: ast.AST, ctx: ModuleContext) -> None:
         raise IllFormedModule(node, reasons.AnnotationNameNotInScope(x))
 
 
-def annotated(e: ast.expr) -> Type:
-    """Type an annotation denotes; the subset admits no other annotation."""
+def annotated(e: ast.expr | None) -> Type:
+    """Type an annotation denotes; every parameter and return carries one, and
+    the subset admits no other annotation."""
+    assert e is not None
     t = parse_annotation(e)
     assert t is not None
     return t
@@ -205,7 +199,7 @@ def check_annotated(defs: list[ast.FunctionDef]) -> None:
     """Every parameter and return carries an annotation, so the type of a
     definition is given rather than inferred from its body."""
     for d in defs:
-        if isinstance(signature(d), Status):
+        if d.returns is None or any(a.annotation is None for a in d.args.args):
             raise IllFormedModule(d, reasons.MissingAnnotation(d.name))
 
 
@@ -214,9 +208,7 @@ def check_bodies(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
     for d in defs:
         params = parameters(d)
         for a in d.args.args:
-            assert a.annotation is not None
             well_formed(annotated(a.annotation), a, ctx)
-        assert d.returns is not None
         well_formed(annotated(d.returns), d, ctx)
         locals_ = assigns_body(d.body) - set(params)
         delta = f_names | params | {x: Status.FF for x in locals_}
@@ -471,8 +463,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
                 )
             if entry == Status.FF:
                 raise IllFormedModule(e, reasons.UnassignedMember(e.attr, parent.q))
-            if isinstance(entry, (Status, PredefinedName)):
-                raise IllFormedModule(e, reasons.NotSynthesised())
+            assert not isinstance(entry, Status)
             return entry
         if isinstance(parent, ModuleStub):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(parent.q))
