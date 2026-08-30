@@ -41,9 +41,6 @@ def literal_of(p: ast.pattern) -> object:
 
 
 def check_pattern(p: ast.pattern, ctx: ModuleContext) -> None:
-    """Premises of the split rules that do not depend on the shape being split:
-    a constructor pattern names a class and its arguments cover the fields, and
-    a dictionary pattern names each key once."""
     if isinstance(p, ast.MatchClass):
         entry = class_entry(p.cls, ctx)
         if entry is None:
@@ -91,8 +88,6 @@ def check_pattern(p: ast.pattern, ctx: ModuleContext) -> None:
 def check_pattern_list(
     patterns: list[ast.pattern], node: ast.AST, ctx: ModuleContext
 ) -> None:
-    """The same for each case of a match, with the variables of a pattern
-    distinct, which splitting requires when it composes bindings."""
     for i, p in enumerate(patterns):
         check_pattern(p, ctx)
         vars_ = binds_seq(p)
