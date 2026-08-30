@@ -229,7 +229,7 @@ def supported_pattern(node: ast.pattern) -> None:
             return
         if isinstance(v, ast.Attribute):
             raise NotYetSupported(node, "attribute value patterns", 86)
-        raise NotYetSupported(node, "complex and bytes literal patterns", 191)
+        raise Prohibited(node, "complex and bytes literal patterns prohibited")
     if isinstance(node, ast.MatchSingleton):
         return
     if isinstance(node, ast.MatchAs):
@@ -267,7 +267,7 @@ def supported_expr(node: ast.expr) -> None:
         if isinstance(node.value, (int, float, str, bool, type(None))):
             return
         if isinstance(node.value, (bytes, complex)):
-            raise NotYetSupported(node, "complex and bytes literals", 191)
+            raise Prohibited(node, f"{type(node.value).__name__} literals prohibited")
         raise Prohibited(node, f"prohibited literal type: {type(node.value).__name__}")
     if isinstance(node, ast.Name):
         return
