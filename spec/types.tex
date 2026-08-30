@@ -151,14 +151,12 @@ that type has no rule.
 \subsection{Statement typing}
 \label{sec:statement-typing}
 
-Statements carry an optional return type as a second argument to the left of the turnstile:
-$\Gamma; \zeta \vdash t : R$ says that $t$ has result type $R$ in $\Gamma$, in a function declared to
-return $\zeta$, or at the top level of a module, where $\zeta$ is empty (\figref{typing-stmt}). Every
-rule passes the return type down unchanged, since it is an obligation on the \pyinline{return} statements
-within $t$ rather than a property of $t$. A \pyinline{return} checks its expression against the return
-type, and a bare \pyinline{return} requires the return type to admit \pyinline{None}. An annotated assignment takes its type
-from the annotation and checks the expression against it, and an unannotated assignment takes the type the
-expression synthesises (\ruleName{assign}, \ruleName{assign-unannot}). The conditions of \pyinline{if} and \pyinline{assert}
+$\Gamma; \zeta \vdash t : R$ says that $t$ has result type $R$ in $\Gamma$, with return type $\zeta$,
+empty at the top level of a module (\figref{typing-stmt}). Every rule passes $\zeta$ down unchanged. A
+\pyinline{return} checks its expression against $\zeta$, and a bare \pyinline{return} requires $\zeta$ to
+admit \pyinline{None}. An annotated assignment checks the expression against the type of the annotation,
+and an unannotated assignment takes the type the expression synthesises (\ruleName{assign},
+\ruleName{assign-unannot}). The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
 the class name to its entry, requiring that name to be unbound and the class's own fields to be distinct,
 and, where it extends another class, that class to be bound and the own fields not to repeat an inherited
