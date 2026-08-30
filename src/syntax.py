@@ -150,7 +150,7 @@ def supported_stmt(node: ast.stmt) -> None:
         raise Prohibited(node, "try/except prohibited")
     if isinstance(node, ast.Import):
         if len(node.names) != 1:
-            raise NotYetSupported(node, "multi-target import (import a, b)", 53)
+            raise NotYetSupported(node, "multi-target import (import a, b)", 135)
         if node.names[0].asname is not None:
             raise NotYetSupported(node, "import-as", 135)
         return
@@ -174,7 +174,7 @@ def supported_stmt(node: ast.stmt) -> None:
         supported_expr(node.subject)
         for case in node.cases:
             if case.guard is not None:
-                raise NotYetSupported(case, "case guards", 83)
+                raise NotYetSupported(case, "case guards", 190)
             supported_pattern(case.pattern)
             supported_body(case.body)
         return
@@ -229,7 +229,7 @@ def supported_pattern(node: ast.pattern) -> None:
             return
         if isinstance(v, ast.Attribute):
             raise NotYetSupported(node, "attribute value patterns", 86)
-        raise NotYetSupported(node, "complex value patterns", 83)
+        raise NotYetSupported(node, "complex and bytes literal patterns", 191)
     if isinstance(node, ast.MatchSingleton):
         return
     if isinstance(node, ast.MatchAs):
@@ -267,7 +267,7 @@ def supported_expr(node: ast.expr) -> None:
         if isinstance(node.value, (int, float, str, bool, type(None))):
             return
         if isinstance(node.value, (bytes, complex)):
-            raise Prohibited(node, f"{type(node.value).__name__} literals prohibited")
+            raise NotYetSupported(node, "complex and bytes literals", 191)
         raise Prohibited(node, f"prohibited literal type: {type(node.value).__name__}")
     if isinstance(node, ast.Name):
         return
