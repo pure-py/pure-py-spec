@@ -115,7 +115,7 @@ class Returns:
 
 @dataclass(frozen=True)
 class Assigns:
-    delta: VarContext = field(default_factory=dict)
+    delta: Mapping[str, ContextEntry] = field(default_factory=dict)
 
 
 type ResultType = Returns | Assigns
@@ -179,15 +179,20 @@ def predefined_context(q: str) -> Context:
     return {**PREDEFINED_MEMBERS[q], "__name__": Primitive.STR}
 
 
-def merge_entry(a: VarEntry, b: VarEntry, join_types: Join) -> VarEntry:
+def merge_entry(a: ContextEntry, b: ContextEntry, join_types: Join) -> VarEntry:
     """Assigned in both branches gives the join of the two types; assigned in
-    one alone is not definitely assigned."""
+    one alone is not definitely assigned. Only variables are assigned within a
+    branch, since a class is declared at the top level alone."""
+    assert not isinstance(a, (ModuleStub, ModuleLoaded, ClassEntry, PredefinedName))
+    assert not isinstance(b, (ModuleStub, ModuleLoaded, ClassEntry, PredefinedName))
     if a == Status.FF or b == Status.FF:
         return Status.FF
     return join_types(a, b)
 
 
-def merge_delta(d1: VarContext, d2: VarContext, join_types: Join) -> VarContext:
+def merge_delta(
+    d1: Mapping[str, ContextEntry], d2: Mapping[str, ContextEntry], join_types: Join
+) -> VarContext:
     return {
         k: merge_entry(d1[k], d2[k], join_types) if k in d1 and k in d2 else Status.FF
         for k in set(d1.keys()) | set(d2.keys())
@@ -203,8 +208,8 @@ def merge_results(rs: list[ResultType], join_types: Join) -> ResultType:
 
 
 def fold_merge(
-    acc: VarContext, branches: list[Assigns], join_types: Join
-) -> VarContext:
+    acc: Mapping[str, ContextEntry], branches: list[Assigns], join_types: Join
+) -> Mapping[str, ContextEntry]:
     if len(branches) == 0:
         return acc
     return fold_merge(
@@ -212,7 +217,9 @@ def fold_merge(
     )
 
 
-def override_delta(d1: VarContext, d2: VarContext) -> VarContext:
+def override_delta(
+    d1: Mapping[str, ContextEntry], d2: Mapping[str, ContextEntry]
+) -> Context:
     return {**d1, **d2}
 
 

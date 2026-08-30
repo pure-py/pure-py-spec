@@ -169,7 +169,7 @@ def check_seq(
         return ASSIGNS_EMPTY, ctx
     head, tail = items[0], items[1:]
     head_result = check_statement(head, ctx, returns)
-    ctx_after = extend(head, head_result, ctx)
+    ctx_after = extend(head_result, ctx)
     if len(tail) == 0:
         return head_result, ctx_after
     if isinstance(head_result, Returns):
@@ -185,11 +185,10 @@ def check_seq(
     return override_results(head_result, tail_result), final_ctx
 
 
-def extend(head: Statement, result: ResultType, ctx: ModuleContext) -> ModuleContext:
-    # A class declaration assigns a class entry, which a result type cannot carry.
-    if isinstance(head, ast.ClassDef):
-        return override_gamma(ctx, {head.name: class_entry_for(head, ctx.q, ctx.gamma)})
-    return override_var(ctx, result.delta if isinstance(result, Assigns) else {})
+def extend(result: ResultType, ctx: ModuleContext) -> ModuleContext:
+    return (
+        override_gamma(ctx, dict(result.delta)) if isinstance(result, Assigns) else ctx
+    )
 
 
 def check_statement(
@@ -228,31 +227,23 @@ def check_bodies(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
             check_falls_off_end(d, declared, ctx)
 
 
-def check_falls_off_end(
-    d: ast.FunctionDef, declared: Type | None, ctx: ModuleContext
-) -> None:
+def check_falls_off_end(d: ast.FunctionDef, declared: Type, ctx: ModuleContext) -> None:
     """A body that does not definitely return falls off the end, giving None,
     so the declared type must admit it."""
-    if declared is not None and not subtype(Primitive.NONE, declared, ctx):
+    if not subtype(Primitive.NONE, declared, ctx):
         raise IllFormedModule(d, reasons.MissingReturn(d.name, render(declared)))
 
 
-def check_returns_none(
-    s: ast.Return, declared: Type | None, ctx: ModuleContext
-) -> None:
-    if declared is not None and not subtype(Primitive.NONE, declared, ctx):
+def check_returns_none(s: ast.Return, declared: Type, ctx: ModuleContext) -> None:
+    if not subtype(Primitive.NONE, declared, ctx):
         raise IllFormedModule(
             s, reasons.TypeMismatch(render(declared), render(Primitive.NONE))
         )
 
 
-def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> None:
-    if len(targets) == 0:
-        return
-    t = targets[0]
-    if isinstance(t, ast.Name) and t.id in captured:
-        raise IllFormedModule(t, reasons.SelfCaptureAssignment(t.id))
-    check_assign_targets(targets[1:], captured)
+def check_assign_target(target: ast.Name, captured: set[str]) -> None:
+    if target.id in captured:
+        raise IllFormedModule(target, reasons.SelfCaptureAssignment(target.id))
 
 
 def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
@@ -268,24 +259,24 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
     if isinstance(s, ast.Pass):
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Assign):
-        check_assign_targets(s.targets, captures_e(s.value))
-        assigned = synth_expr(s.value, ctx)
-        return Assigns({t.id: assigned for t in s.targets if isinstance(t, ast.Name)})
+        (target,) = s.targets
+        assert isinstance(target, ast.Name)
+        check_assign_target(target, captures_e(s.value))
+        return Assigns({target.id: synth_expr(s.value, ctx)})
     if isinstance(s, ast.AnnAssign):
-        assert s.value is not None
+        assert s.value is not None and isinstance(s.target, ast.Name)
         declared = resolve_type(annotated_type(s), s, ctx)
         check_expr(s.value, declared, ctx)
-        check_assign_targets([s.target], captures_e(s.value))
-        target = s.target
-        return Assigns({target.id: declared} if isinstance(target, ast.Name) else {})
+        check_assign_target(s.target, captures_e(s.value))
+        return Assigns({s.target.id: declared})
     if isinstance(s, ast.Expr):
         synth_expr(s.value, ctx)
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Return):
+        assert returns is not None  # a return at the top level is rejected earlier
         if s.value is None:
             check_returns_none(s, returns, ctx)
         else:
-            assert returns is not None
             check_expr(s.value, returns, ctx)
         return RETURNS
     if isinstance(s, ast.If):
@@ -305,7 +296,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
         return check_match_cases(s.cases, subject, ctx, returns)
     if isinstance(s, ast.ClassDef):
         check_class_decl(s, ctx.gamma, ctx.q)
-        return ASSIGNS_EMPTY
+        return Assigns({s.name: class_entry_for(s, ctx.q, ctx.gamma)})
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
