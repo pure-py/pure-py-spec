@@ -16,6 +16,11 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 - Prefer a participle or a named term to a postmodifying relative clause: "variables assigned in the body", not "the variables the body assigns"; "the residual", not "the part it leaves". Where a metafunction names the concept, use its name.
 - No defensive coding. If a case shouldn't arise, assert it; don't silently return a safe default.
 
+## LaTeX
+
+- Name a source file after the definitions it contains, and rename it when they change. A figure label
+  follows the file name.
+
 ## Git
 
 - Commit after every coherent change; don't sit on uncommitted work.
