@@ -112,16 +112,7 @@
   \Gamma; \zeta \vdash \exDef{f_1}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{s_{n+1}} : \Assigns{\set{\bind{f_j}{\tyCallable{\seq{\sigma}_j}{\tau_j}} \mid \forall j}}
 }
 \and
-\inferrule*[lab={\ruleName{match}}]
-{
-  \Gamma \vdash e \synth \sigma \\
-  \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, \varnothing \\
-  \Gamma \override \Delta_i; \zeta \vdash s_i : R_i \quad (\forall i) \\
-  S_i = \Assigns{\Delta_i} \override R_i \quad (\forall i)
-}
-{
-  \Gamma; \zeta \vdash \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} : S_1 \merge \ldots \merge S_{n+1}
-}
+\input{spec/rules/match}
 \and
 \inferrule*[lab={\ruleName{match-partial}}]
 {

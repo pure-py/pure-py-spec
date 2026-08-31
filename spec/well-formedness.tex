@@ -64,17 +64,14 @@ joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.
 \input{spec/fig/subtyping}
 
 
-\subsection{Statements, expressions and patterns}
+\subsection{Statements}
 \label{sec:well-formedness-statements}
-\label{sec:well-formedness-patterns}
 
-Every well-formed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
-$\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x
-= e} definitely assigns $\set{\bind{\pyinline{x}}{\statusDefAssigned}}$. \emph{Result types} $R$ classify
-these outcomes: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns
-$\Delta$). Statement well-formedness $\Gamma \vdash t : R$ is given in \figref{well-formed}, expression
-well-formedness $\Gamma \vdash e$ in \figref{well-formed-expr}, and pattern well-formedness in
-\figref{well-formed-pat}.
+Every well-typed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
+$\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and
+\pyinline{x = e} definitely assigns $\set{\bind{\pyinline{x}}{\sigma}}$ for the type $\sigma$ of
+\pyinline{e}. \emph{Result types} $R$ classify these outcomes: $R$ is either $\Returns$ (definitely
+returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$).
 
 Context operations $\override$ and $\merge$ lift to a right semiring over result types $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge$ and zero for $\override$.
 
@@ -88,26 +85,52 @@ R \override \Returns = \Returns \override R & = \Returns
 \end{defalign}
 \end{definition}
 
-\noindent The $\Returns \override R$ case never arises because the well-formedness judgement excludes unreachable statements\paperonly{ (\secref{unreachable})}.
+\noindent The $\Returns \override R$ case never arises because the statement judgement excludes unreachable statements\paperonly{ (\secref{unreachable})}.
 
-A sequence $s\;s'$ is well-formed (\ruleName{wf-seq}) when $s$ definitely assigns some $\Delta$, $s'$ is
-well-formed under $\Gamma \override \Delta$, and no variable captured by $s$ is assigned in $s'$. A
-conditional combines its branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no
-\pyinline{else} branch. A mutual region (\ruleName{wf-def}) checks each body in a context in which the region's
-function names and the body's parameters are definitely assigned and the body's other assigned
-variables are at $\statusNotDefAssigned$; the function names must be distinct. A \pyinline{match}
-(\ruleName{wf-match}, \ruleName{wf-match-partial}) requires its case patterns to be well-formed as a list,
-checks each case body in a context in which the variables bound by its pattern are definitely
-assigned, and merges the cases as a
-conditional merges its branches, merging in $\Assigns{\varnothing}$ unless the last case is a catch-all, i.e.~a
-variable or wildcard.
+A sequence $s\;s'$ (\ruleName{seq}) types $s$, types $s'$ under $\Gamma$ overridden by what $s$
+assigns, and requires that no variable captured by $s$ is assigned in $s'$. A conditional combines its
+branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
 \paperinput{paper/well-formedness/match}%
-A class
-declaration (\ruleName{wf-class}, \ruleName{wf-class-extend}) binds its name to $\Type{C}$ for the declared class $C$, which must
-not already denote a class; its fields must be distinct and, for an extension, disjoint from those of the
-base class.
 
-\input{spec/fig/well-formed}
+$\Gamma; \zeta \vdash s : R$ says that $s$ has result type $R$ in $\Gamma$, with return type $\zeta$
+(\figref{typing-stmt}); every rule passes $\zeta$ down unchanged. Top-level statements have a judgement of
+their own, $\Gamma \vdash t : R$ (\figref{typing-top}): a sequence composes as a statement sequence does, a
+class declaration is a top-level form, and a plain statement is checked with no return type
+(\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A top-level
+statement may not assign a name that an earlier top-level statement bound to a class
+(\ruleName{top-seq}), so a class binding is permanent in its module and no later declaration or
+assignment can take a declared class's name. A
+\pyinline{return} checks its expression against $\zeta$, and a bare \pyinline{return} requires $\zeta$ to
+admit \pyinline{None}. An annotated assignment checks the expression against the type of the annotation,
+and an unannotated assignment takes the type the expression synthesises (\ruleName{assign},
+\ruleName{assign-unannot}). The conditions of \pyinline{if} and \pyinline{assert}
+check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
+the class name to $\Type{C}$, requiring the class's own fields to be distinct and, where it extends
+another class, the base name to be bound to a class and the own fields not to repeat an inherited one
+(\ruleName{class}, \ruleName{class-extend}). It also requires \pyinline{dataclass} to be in scope, since
+the declaration names it. Each rule that takes an annotation resolves it to a type
+(\figref{resolve-type}).
+
+A function definition binds its parameters at their annotated types and its own name, and the names of the
+mutual region it belongs to, each at its $\pyinline{Callable}$ type; variables assigned in the body start
+at $\statusNotDefAssigned$ (\ruleName{def}). The body is checked with the
+declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
+so a function that declares a result definitely returns one.
+
+A \pyinline{match} scrutinee synthesises a type $\sigma$, and the cases are taken in turn from
+$\shapesOf(\sigma, \varnothing)$, which denotes every value of $\sigma$. The \emph{residual} $L_i$ holds
+the values which have not been matched by any case up to the $i$th. Each case matches its pattern against
+the residual by the \ruleName{cases} rule (\figref{pat-rows}), yielding the pattern's bindings and the
+shapes left unmatched; the body is checked under the bindings, and the pattern must agree with $\sigma$
+(\figref{agrees}). The \ruleName{match} rule applies where the final residual is empty;
+\ruleName{match-partial} applies otherwise, merging in $\Assigns{\varnothing}$ for the values that fall
+through. A literal-typed scrutinee is exhausted by covering its literals, so \pyinline{x = 42} admits a
+match with a case for \pyinline{42} alone; \pyinline{x: int = 42} keeps the type open.
+
+\input{spec/fig/typing-stmt}
+
+\input{spec/fig/typing-top}
+
 
 Name resolution takes a qualified name to a context entry (\figref{resolve-name}).
 A variable is a well-formed expression when it is definitely assigned (\ruleName{wf-var});

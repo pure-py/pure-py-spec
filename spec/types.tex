@@ -107,48 +107,6 @@ tuple is iterated at the join of the base types of its components, whether or no
 A type with no clause, such as a class or a callable, cannot be iterated, and a generator over a value of
 that type has no rule.
 
-\subsection{Statement typing}
-\label{sec:statement-typing}
-
-$\Gamma; \zeta \vdash s : R$ says that $s$ has result type $R$ in $\Gamma$, with return type $\zeta$
-(\figref{typing-stmt}); every rule passes $\zeta$ down unchanged. Top-level statements have a judgement of
-their own, $\Gamma \vdash t : R$ (\figref{typing-top}): a sequence composes as a statement sequence does, a
-class declaration is a top-level form, and a plain statement is checked with no return type
-(\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A top-level
-statement may not assign a name that an earlier top-level statement bound to a class
-(\ruleName{top-seq}), so a class binding is permanent in its module and no later declaration or
-assignment can take a declared class's name. A
-\pyinline{return} checks its expression against $\zeta$, and a bare \pyinline{return} requires $\zeta$ to
-admit \pyinline{None}. An annotated assignment checks the expression against the type of the annotation,
-and an unannotated assignment takes the type the expression synthesises (\ruleName{assign},
-\ruleName{assign-unannot}). The conditions of \pyinline{if} and \pyinline{assert}
-check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
-the class name to $\Type{C}$, requiring the class's own fields to be distinct and, where it extends
-another class, the base name to be bound to a class and the own fields not to repeat an inherited one
-(\ruleName{class}, \ruleName{class-extend}). It also requires \pyinline{dataclass} to be in scope, since
-the declaration names it. Each rule that takes an annotation resolves it to a type
-(\figref{resolve-type}).
-
-A function definition binds its parameters at their annotated types and its own name, and the names of the
-mutual region it belongs to, each at its $\pyinline{Callable}$ type; variables assigned in the body start
-at $\statusNotDefAssigned$ (\ruleName{def}). The body is checked with the
-declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
-so a function that declares a result definitely returns one.
-
-A \pyinline{match} scrutinee synthesises a type $\sigma$, and the cases are taken in turn from
-$\shapesOf(\sigma, \varnothing)$, which denotes every value of $\sigma$. The \emph{residual} $L_i$ holds
-the values which have not been matched by any case up to the $i$th. Each case matches its pattern against
-the residual by the \ruleName{cases} rule (\figref{pat-rows}), yielding the pattern's bindings and the
-shapes left unmatched; the body is checked under the bindings, and the pattern must agree with $\sigma$
-(\figref{agrees}). The \ruleName{match} rule applies where the final residual is empty;
-\ruleName{match-partial} applies otherwise, merging in $\Assigns{\varnothing}$ for the values that fall
-through. A literal-typed scrutinee is exhausted by covering its literals, so \pyinline{x = 42} admits a
-match with a case for \pyinline{42} alone; \pyinline{x: int = 42} keeps the type open.
-
-\input{spec/fig/typing-stmt}
-
-\input{spec/fig/typing-top}
-
 \subsection{Exhaustiveness checking}
 \label{sec:exhaustiveness}
 
