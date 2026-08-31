@@ -189,39 +189,3 @@ of Definition~\ref{def:predefined}.
 \input{spec/fig/typing-module}
 
 \FloatBarrier
-
-\subsection{Auxiliary functions}
-\label{sec:types-auxiliary}
-
-The functions used by the rules of this \seckind{}, each defined by its cases.
-
-\begin{auxfunction}{\baseType(\ell), \baseType(\tau)}{type}{aux:base-type}
-\input{spec/functions/base-type-text}
-\funcrows{base-type}
-\end{auxfunction}
-
-\begin{auxfunction}{\joinTy(\sigma, \tau), \joinTy(\seq{\tau})}{type}{aux:join}
-\input{spec/functions/join-text}
-\funcrows{join}
-\end{auxfunction}
-
-\begin{auxfunction}{\elemTy(\tau)}{type}{aux:elem-type}
-\input{spec/functions/elem-type-text}
-\funcrows{elem-type}
-\end{auxfunction}
-
-\begin{auxfunction}{\resolve(\odot, \sigma, \sigma'), \resolve(\ominus, \sigma)}{type}{aux:resolve}
-\input{spec/functions/resolve-text}
-\funcrows{resolve}
-\end{auxfunction}
-
-\begin{auxfunction}{\shapesOf(\tau, N), \shapesOf(\seq{\tau})}{set of shapes or rows of shapes}{aux:shapes}
-\input{spec/functions/shapes-text}
-\funcrows{shapes}
-\end{auxfunction}
-
-\begin{auxfunction}{\shapeTy(k)}{type}{aux:shape-type}
-\input{spec/functions/shape-type-text}
-\funcrows{shape-type}
-\end{auxfunction}
-
