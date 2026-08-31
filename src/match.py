@@ -212,9 +212,15 @@ def match_mapping(
     if first is None:
         return None
     matched, left, delta = first
-    later = match_mappings(
-        frozenset(with_key(k, w, m) for m in matched), rest, node, ctx
+    rest_node = ast.copy_location(
+        ast.MatchMapping(
+            keys=[ast.copy_location(ast.Constant(value=w2), node) for w2, _ in rest],
+            patterns=[p2 for _, p2 in rest],
+            rest=None,
+        ),
+        node,
     )
+    later = match_shapes(frozenset(with_key(k, w, m) for m in matched), rest_node, ctx)
     if later is None:
         return None
     matched_, left_, delta_ = later
@@ -223,22 +229,6 @@ def match_mapping(
     )
     left__ = frozenset(with_key(k, w, r) for r in left) | left_ | absent
     return matched_, left__, disjoint_union([delta, delta_], node)
-
-
-def match_mappings(
-    ks: frozenset[Shape],
-    ws: tuple[tuple[str, ast.pattern], ...],
-    node: ast.MatchMapping,
-    ctx: ModuleContext,
-) -> Match | None:
-    matches = {
-        k: s for k in ordered(ks) if (s := match_mapping(k, ws, node, ctx)) is not None
-    }
-    if len(matches) == 0:
-        return None
-    matched = union(m for m, _, _ in matches.values())
-    left = union(left for _, left, _ in matches.values()) | (ks - matches.keys())
-    return matched, left, join_deltas([d for _, _, d in matches.values()], ctx)
 
 
 def match_row(
