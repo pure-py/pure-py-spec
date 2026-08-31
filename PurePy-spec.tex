@@ -40,8 +40,9 @@
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage[colorlinks,allcolors=blue!50!black]{hyperref}
 
-% The specification carries no change markup.
-\newcommand{\acceptchanges}{}
+% The specification accepts change markup, unless built with \markupmode (make spec-markup.pdf) to
+% show it for review.
+\ifdefined\markupmode\else\newcommand{\acceptchanges}{}\fi
 \newcommand{\specmode}{}
 % The paper's top-level sections are chapters here.
 \newcommand*{\seckind}{chapter}

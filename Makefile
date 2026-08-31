@@ -32,6 +32,14 @@ paper-anon.pdf: $(TEXFILES)
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 
+# The specification with change markup shown, for review.
+spec-markup.pdf: $(TEXFILES)
+	$(PDFLATEX) -jobname=spec-markup "\def\markupmode{}\input{PurePy-spec.tex}"
+	bibtex spec-markup
+	$(PDFLATEX) -jobname=spec-markup "\def\markupmode{}\input{PurePy-spec.tex}"
+	$(PDFLATEX) -jobname=spec-markup "\def\markupmode{}\input{PurePy-spec.tex}"
+	rm -f $(BUILD_AUX)
+
 # The Isabelle mechanisation, as a submodule so that it has a known location.
 MECHANISATION := isabelle-purepy
 
