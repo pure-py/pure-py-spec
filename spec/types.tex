@@ -168,7 +168,7 @@ their own, $\Gamma \vdash t : R$ (\figref{typing-top}): a sequence composes as a
 class declaration is a top-level form, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A top-level
 statement may not assign a name bound to a class (\ruleName{top-seq}), so a class binding is permanent in
-its module and the class rule's freshness premise makes each declared class name unique. A
+its module and no later declaration or assignment can take an existing class's name. A
 \pyinline{return} checks its expression against $\zeta$, and a bare \pyinline{return} requires $\zeta$ to
 admit \pyinline{None}. An annotated assignment checks the expression against the type of the annotation,
 and an unannotated assignment takes the type the expression synthesises (\ruleName{assign},

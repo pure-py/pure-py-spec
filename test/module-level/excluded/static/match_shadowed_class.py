@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+# rule: top-seq -- a top-level pattern cannot take a class's name
 
 @dataclass
 class C:

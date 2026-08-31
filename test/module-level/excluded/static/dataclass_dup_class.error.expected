@@ -1,1 +1,1 @@
-duplicate class name 'C' in module '__main__'
+class declaration names 'dataclass', which is not in scope
