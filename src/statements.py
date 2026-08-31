@@ -47,7 +47,7 @@ from contexts import (
     short_name,
     var_type,
 )
-from match import agrees, literal_of, match_shapes, ordered
+from match import conflicts, literal_of, match_shapes, ordered
 from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
 from reasons import IllFormedModule
 from shapes import Shape, shape_type, shapes
@@ -329,7 +329,7 @@ def match_cases(
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):
         for k in ordered(left):
-            if not agrees(case.pattern, shape_type(k), ctx):
+            if conflicts(case.pattern, shape_type(k), ctx):
                 raise IllFormedModule(
                     case.pattern,
                     reasons.SequenceKindClash(

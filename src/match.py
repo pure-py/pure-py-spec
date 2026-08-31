@@ -272,40 +272,40 @@ def match_shapes(
     return matched, left, join_deltas([d for _, _, d in matches.values()], ctx)
 
 
-def agrees(p: ast.pattern, t: Type, ctx: ModuleContext) -> bool:
-    """True unless a sequence pattern within `p` would be matched against a
-    value of the other kind at type `t`."""
+def conflicts(p: ast.pattern, t: Type, ctx: ModuleContext) -> bool:
+    """Whether a sequence pattern within `p` could be matched against a value
+    of the other kind at type `t`."""
     if isinstance(t, UnionType):
-        return agrees(p, t.left, ctx) and agrees(p, t.right, ctx)
+        return conflicts(p, t.left, ctx) or conflicts(p, t.right, ctx)
     if isinstance(p, PatTuple):
         if isinstance(t, ListType):
-            return False
+            return True
         if isinstance(t, TupleType) and len(t.components) == len(p.patterns):
-            return all(agrees(q, c, ctx) for q, c in zip(p.patterns, t.components))
-        return True
+            return any(conflicts(q, c, ctx) for q, c in zip(p.patterns, t.components))
+        return False
     if isinstance(p, PatList):
         if isinstance(t, TupleType):
-            return False
+            return True
         if isinstance(t, ListType):
-            return all(agrees(q, t.elem, ctx) for q in p.patterns)
-        return True
+            return any(conflicts(q, t.elem, ctx) for q in p.patterns)
+        return False
     if isinstance(p, ast.MatchMapping):
         if isinstance(t, DictType):
-            return all(agrees(q, t.value, ctx) for q in p.patterns)
-        return True
+            return any(conflicts(q, t.value, ctx) for q in p.patterns)
+        return False
     if isinstance(p, ast.MatchClass):
         entry = class_entry(p.cls, ctx)
         if entry is None:
-            return True
+            return False
         args = field_map(entry, p.patterns, p.kwd_attrs, p.kwd_patterns)
         if args is None:
-            return True
-        return all(
-            agrees(args[x], declared_field(entry, x), ctx) for x in fields(entry)
+            return False
+        return any(
+            conflicts(args[x], declared_field(entry, x), ctx) for x in fields(entry)
         )
     if isinstance(p, ast.MatchAs):
-        return p.pattern is None or agrees(p.pattern, t, ctx)
-    return True
+        return p.pattern is not None and conflicts(p.pattern, t, ctx)
+    return False
 
 
 def declared_field(entry: ClassEntry, x: str) -> Type:

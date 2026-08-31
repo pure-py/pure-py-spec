@@ -243,10 +243,20 @@ the scrutinee's type $\sigma$, the order in which $\dispatch$ tries the cases at
 (\figref{typing-cases}). Each case matches its pattern against the residual, checks its
 body under the bindings that matching gives, and passes on the residual of the match. The evaluation rules
 apply a sequence pattern only to a value of its own kind, although Python would match either
-(\figref{eval-pat}), so each case's pattern must agree with the type of every shape of the residual
-($\agrees$, \secref{types-auxiliary}): a tuple pattern agrees with no list type and a list pattern with no
-tuple type, at every position. A match on $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ thus
-admits no sequence pattern. A case that matches nothing is
+(\figref{eval-pat}), so a case is rejected where a sequence pattern within it could be matched against a
+value of the other kind. Pattern $p$ \emph{conflicts} with type $\tau$ in exactly that circumstance:
+\begin{defalign}
+\Gamma \vdash \patTuple{\seq{p}} \conflicts \tyList{\tau} \\
+\Gamma \vdash \patList{\seq{p}} \conflicts \tyTuple{\seq{\tau}} \\
+\Gamma \vdash p \conflicts \tyUnion{\sigma}{\tau} \quad & \text{if } \Gamma \vdash p \conflicts \sigma \text{ or } \Gamma \vdash p \conflicts \tau \\
+\Gamma \vdash \patTuple{p_1, \ldots, p_n} \conflicts \tyTuple{\tau_1, \ldots, \tau_n} \quad & \text{if } \Gamma \vdash p_i \conflicts \tau_i \text{ for some } i \\
+\Gamma \vdash \patList{p_1, \ldots, p_n} \conflicts \tyList{\tau} \quad & \text{if } \Gamma \vdash p_i \conflicts \tau \text{ for some } i \\
+\Gamma \vdash \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \conflicts \tyDict{\tau} \quad & \text{if } \Gamma \vdash p_i \conflicts \tau \text{ for some } i \\
+\Gamma \vdash \patConstr{q}{a} \conflicts \tau \quad & \text{if } \Gamma \vdash q : C \text{ and } \Gamma \vdash \fieldMap(C, a)(x) \conflicts \sigma \text{ for some } \bind{x}{\sigma} \in \fields(C) \\
+\Gamma \vdash p\;\pyinline{as}\;x \conflicts \tau \quad & \text{if } \Gamma \vdash p \conflicts \tau
+\end{defalign}
+\noindent Each case's pattern must conflict with the type of no shape of the residual, so a match on
+$\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no sequence pattern. A case that matches nothing is
 rejected, whether because the scrutinee can never take that shape or because the earlier cases already cover it. \ruleName{match}
 applies where the walk ends with an empty residual, and \ruleName{match-partial} where it does not, merging
 in $\Assigns{\varnothing}$ for the values that fall through. A union is exhausted
@@ -318,7 +328,3 @@ The functions used by the rules of this \seckind{}, each defined by its cases.
 \funcrows{shape-type}
 \end{auxfunction}
 
-\begin{auxfunction}{\agrees(p, \tau)}{Boolean}{aux:agrees}
-\input{spec/functions/agrees-text}
-\funcrows{agrees}
-\end{auxfunction}
