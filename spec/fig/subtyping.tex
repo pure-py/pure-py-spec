@@ -12,7 +12,8 @@
 \and
 \inferrule*[lab={\ruleName{subty-class}}]
 {
-  C' \in \ancestors(C)
+  \added{C' = \clsEntry{q'}{\bind{\seq{x}}{\seq{\tau}}}{A}} \\
+  \replaced{q' \in \ancestors(C)}{C' \in \ancestors(C)}
 }
 {
   \Gamma \vdash C \subty C'

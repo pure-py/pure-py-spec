@@ -43,7 +43,7 @@ def subtype(s: Type, t: Type, ctx: ModuleContext) -> bool:
     if t == Primitive.SIZED:
         return isinstance(s, (ListType, DictType, TupleType)) or s == Primitive.STR
     if isinstance(s, ClassType) and isinstance(t, ClassType):
-        return t.entry in ancestors(s.entry)
+        return t.entry.name in ancestors(s.entry)
     if isinstance(s, TupleType) and isinstance(t, TupleType):
         return len(s.components) == len(t.components) and all(
             subtype(a, b, ctx) for a, b in zip(s.components, t.components)

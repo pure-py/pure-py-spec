@@ -63,7 +63,8 @@
 {
   \Gamma \vdash q : C \\
   \Gamma \vdash q' : C' \\
-  C' \in \ancestors(C) \\
+  \added{C' = \clsEntry{q^\dagger}{\bind{\seq{y}}{\seq{\tau}}}{A}} \\
+  \replaced{q^\dagger \in \ancestors(C)}{C' \in \ancestors(C)} \\
   \Gamma \vdash \fieldMap(C, a)(x) \subsumed \fieldMap(C', a')(x) \quad (\forall x \in \dom(\fields(C')))
 }
 {

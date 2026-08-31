@@ -21,12 +21,13 @@ type VarContext = dict[str, VarEntry]
 @dataclass(frozen=True, eq=False)
 class ClassEntry:
     """A class, identified by its qualified name: two entries with the same name
-    are the same class, and the entry is also the class type."""
+    are the same class, and the entry is also the class type. Self-contained:
+    all fields with their declared types, inherited first, and the qualified
+    names of the ancestors, the entry's own name first."""
 
-    context: Context
     name: str
-    own_fields: tuple[tuple[str, Type], ...]
-    base: str | None
+    fields: tuple[tuple[str, Type], ...]
+    ancestors: tuple[str, ...]
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, ClassEntry) and self.name == other.name
@@ -260,32 +261,17 @@ def short_name(entry: ClassEntry) -> str:
     return entry.name.rsplit(".", 1)[-1]
 
 
-def ancestors(entry: ClassEntry) -> list[ClassEntry]:
-    if entry.base is None:
-        return [entry]
-    base_entry = entry.context[entry.base]
-    assert isinstance(base_entry, ClassEntry)
-    return [entry] + ancestors(base_entry)
+def ancestors(entry: ClassEntry) -> tuple[str, ...]:
+    return entry.ancestors
 
 
 def fields(entry: ClassEntry) -> tuple[str, ...]:
-    if entry.base is None:
-        return tuple(x for x, _ in entry.own_fields)
-    base_entry = entry.context[entry.base]
-    assert isinstance(base_entry, ClassEntry)
-    return fields(base_entry) + tuple(x for x, _ in entry.own_fields)
+    return tuple(x for x, _ in entry.fields)
 
 
 def field_type(entry: ClassEntry, x: str) -> Type | None:
     """Declared type of field `x`, where the class entry records one."""
-    own = dict(entry.own_fields)
-    if x in own:
-        return own[x]
-    if entry.base is None:
-        return None
-    base_entry = entry.context[entry.base]
-    assert isinstance(base_entry, ClassEntry)
-    return field_type(base_entry, x)
+    return dict(entry.fields).get(x)
 
 
 def field_map[T](

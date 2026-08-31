@@ -135,7 +135,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-class}}]
 {
-  C = \clsEntry{\Gamma}{q.c}{\ownFields(\phi)}{\bot}
+  C = \replaced{\clsEntry{q.c}{\dom(\ownFields(\phi))}{q.c}}{\mathsf{Cls}_{\Gamma}(q.c, \ownFields(\phi), \bot)}
 }
 {
   \rho, \exDataclass{c}{\phi} \Rightarrow \assigns{\set{\bind{c}{C}}}
@@ -143,7 +143,8 @@
 \and
 \inferrule*[lab={\ruleName{eval-class-extend}}]
 {
-  C = \clsEntry{\Gamma}{q.c}{\ownFields(\phi)}{c'}
+  \added{\rho(c') = \clsEntry{q.c'}{\seq{y}}{A}} \\
+  C = \replaced{\clsEntry{q.c}{\seq{y} \mathbin{\concat} \dom(\ownFields(\phi))}{q.c \cons A}}{\mathsf{Cls}_{\Gamma}(q.c, \ownFields(\phi), c')}
 }
 {
   \rho, \exDataclassExtend{c}{c'}{\phi} \Rightarrow \assigns{\set{\bind{c}{C}}}
