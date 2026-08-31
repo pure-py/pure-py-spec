@@ -256,7 +256,7 @@
   \Gamma \vdash \seq{g} : \Delta \\
   \Gamma \override \Delta \vdash e \checks \tyStr \\
   \Gamma \override \Delta \vdash e' \synth \tau \\
-  (\capturesE(e) \cup \capturesE(e')) \cap \dom(\Delta) = \varnothing
+  \capturesE(e, e') \cap \dom(\Delta) = \varnothing
 }
 {
   \Gamma \vdash \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \synth \tyDict{\baseType(\tau)}
