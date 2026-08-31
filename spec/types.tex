@@ -259,7 +259,8 @@ value of the other kind. Pattern $p$ \emph{conflicts} with type $\tau$ in exactl
 \Gamma \vdash \patTuple{p_1, \ldots, p_n} \conflicts \tyTuple{\tau_1, \ldots, \tau_n} \quad & \text{if } \Gamma \vdash p_i \conflicts \tau_i \text{ for some } i \\
 \Gamma \vdash \patList{p_1, \ldots, p_n} \conflicts \tyList{\tau} \quad & \text{if } \Gamma \vdash p_i \conflicts \tau \text{ for some } i \\
 \Gamma \vdash \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \conflicts \tyDict{\tau} \quad & \text{if } \Gamma \vdash p_i \conflicts \tau \text{ for some } i \\
-\Gamma \vdash \patConstr{q}{a} \conflicts \tau \quad & \text{if } \Gamma \vdash q : C \text{ and } \Gamma \vdash \fieldMap(C, a)(x) \conflicts \sigma \text{ for some } \bind{x}{\sigma} \in \fields(C) \\
+\Gamma \vdash \patConstr{q}{a} \conflicts \tau \quad & \text{if } \Gamma \vdash q : C \text{ and } \Gamma \vdash \fieldMap(C, a)(x) \conflicts \sigma \\
+& \qquad \text{for some } \bind{x}{\sigma} \in \fields(C) \\
 \Gamma \vdash p\;\pyinline{as}\;x \conflicts \tau \quad & \text{if } \Gamma \vdash p \conflicts \tau
 \end{defalign}
 \noindent Each case's pattern must conflict with the type of no shape of the residual, so a match on
