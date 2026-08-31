@@ -116,8 +116,8 @@ is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and an
 literal synthesises the negated literal type (\ruleName{unop-literal}), and \ruleName{unop} excludes that
 form, to keep the judgement deterministic. A subscript, attribute reference or call whose subject
 synthesises a union is typed at each member, with a variable in place of the subject, and synthesises the
-join of the results (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union}); $\elemTy$
-has the corresponding clause. \citet{dunfield2004} state union elimination once, for every evaluation
+join of the results (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union}); a union
+is iterated at the join of its members' element types ($\elemTy$). \citet{dunfield2004} state union elimination once, for every evaluation
 context; with four elimination forms a rule each is shorter.
 
 \input{spec/fig/predefined-types}
@@ -127,16 +127,18 @@ context; with four elimination forms a rule each is shorter.
 Lambdas check, as do lists, tuples, dictionaries and comprehensions. Their types are not determined by
 the expression alone: $\exList{}$ is a list of any element type, and a lambda's parameters cannot be annotated in
 Python, so both take their type from the surroundings. An expression that synthesises $\sigma$ checks against any supertype
-of $\sigma$ (\ruleName{check-synth}), which applies only where no other rule does, so both judgements are
+of $\sigma$ (\ruleName{check-synth}), which applies only where no other rule concludes $\Gamma \vdash e \checks
+\tau$, so both judgements are
 syntax-directed and an expression has at most one derivation in each.
 
 The forms with synthesis rules of their own are a tuple when all its components synthesise, a
 comprehension when its body synthesises, and a non-empty list or dictionary when at least one element
-synthesises, the others checking against the join of the base types of those that synthesise (\ruleName{syn-list},
+synthesises, the remaining elements checking against the join of the base types of the synthesising
+elements (\ruleName{syn-list},
 \ruleName{syn-tuple}, \ruleName{syn-dict}, \ruleName{syn-list-comp}, \ruleName{syn-dict-comp}). A list,
 dictionary or comprehension takes the base type of what its elements or body synthesise, since
 \pyinline{list} and \pyinline{dict} are invariant and a literal element type would keep the container from
-matching any other. Each of these forms keeps its checking rule as well. An empty list or dictionary and a lambda have no
+matching any other. Each of these forms also keeps its checking rule. An empty list or dictionary and a lambda have no
 synthesis rule at all, so checking is the only way to type them. A lambda applied to arguments is the
 exception, since the arguments give the parameter types, and the call then synthesises the type of the body
 or checks the body against an expected type (\ruleName{syn-call-lambda}, \ruleName{call-lambda}). A
@@ -150,7 +152,8 @@ synthesise, since \pyinline{list} is invariant.
 
 Typing a comprehension types its qualifiers, which bind the variables its body may use
 (\figref{typing-check}). A generator draws those bindings from the elements of a value, and $\elemTy$ gives
-the type of those elements (\secref{types-auxiliary}), mirroring $\iterOp$ (\secref{auxiliary-values}). A
+the type of those elements (\secref{types-auxiliary}), the static counterpart of $\iterOp$
+(\secref{auxiliary-values}). A
 tuple is iterated at the join of the base types of its components, whether or not they agree.
 A type with no clause, such as a class or a callable, cannot be iterated, and a generator over a value of
 that type has no rule.
@@ -172,7 +175,7 @@ the declaration names it. Each rule that takes an annotation resolves it to a ty
 (\figref{resolve-type}).
 
 A function definition binds its parameters at their annotated types and its own name, and the names of the
-mutual region it belongs to, at the corresponding $\pyinline{Callable}$ type; variables assigned in the body start
+mutual region it belongs to, each at its $\pyinline{Callable}$ type; variables assigned in the body start
 at $\statusNotDefAssigned$ (\ruleName{def}). The body is checked with the
 declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
@@ -184,8 +187,8 @@ values no earlier case has matched, and $L'$ those still unmatched once these ca
 starts from $\shapesOf(\widen(\sigma), \varnothing)$, which denotes every value of the scrutinee's base
 type. Taking the base type keeps a literal case from exhausting the scrutinee on its own, so a
 \pyinline{match} on \pyinline{42} with a case for \pyinline{42} still admits a catch-all. Each case matches its
-pattern against the residual (\secref{exhaustiveness}), which yields the bindings the pattern makes as
-well as the values it leaves. The body is then checked under those bindings.
+pattern against the residual (\secref{exhaustiveness}), which yields the bindings the pattern makes and
+the shapes the pattern leaves. The body is then checked under the bindings.
 
 \input{spec/fig/typing-stmt}
 
@@ -208,22 +211,22 @@ class its instances, an integer at a list type the lists of that length, and a l
 typing $\Gamma \vdash h : \tau$ admits the heads whose values lie within $\tau$, and shape typing
 $\Gamma \vdash k : \tau$ types each excluded head and each component of a shape
 (\figref{shape-typing}). The other forms are a literal, a constructor, a tuple, a list and a dictionary, each with shapes in place of
-sub-patterns. A list shape records its element type as well, which the element shapes do not determine. A
-constructor shape carries an excluded set as well: $\shapeAny{\patConstr{C}{\seq{k}}}{N}$ denotes the
+sub-patterns. A list shape also records its element type, which the element shapes do not determine. A
+constructor shape carries an excluded set of its own: $\shapeAny{\patConstr{C}{\seq{k}}}{N}$ denotes the
 instances of $C$, or of a subclass not below a class of $N$, whose fields, those of $C$, have the shapes
 $\seq{k}$. The shapes of $\tau$ that remain once the heads in $N$ are excluded are
 $\shapesOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape carries a
 union or dictionary type in the form $\shapeAny{\tau}{N}$, since $\shapesOf$ is the only source of
 that form: it splits a union into its members and gives a dictionary type its dictionary shape.
-The rules that match sub-patterns against the form $\shapeAny{\tau}{N}$ draw the shapes of the component
-types from $\shapesOf$ as well. The
+The rules that match sub-patterns against the form $\shapeAny{\tau}{N}$ also draw the shapes of the
+component types from $\shapesOf$. The
 matching judgement $\Gamma \vdash L, p \matches K, L' \binding \Delta$ divides a set of shapes into the
 matched shapes $K$ and the \emph{residual} $L'$, binding $\Delta$, one shape at a time and one position at a time
 (\figrefTwo{pat}{pat-rows}). A pattern that cannot match a shape has no derivation against it, so
-\ruleName{pat-shapes} takes the shapes it does match, which must not be none, and passes the others into
-the residual untouched. A variable pattern binds at $\shapeTy(k)$ for the shape $k$ it matches, and a
+\ruleName{pat-shapes} takes the shapes the pattern does match, which must not be none, and passes the
+unmatched shapes into the residual untouched. A variable pattern binds at $\shapeTy(k)$ for the shape $k$ it matches, and a
 pattern named by \pyinline{as} at the join over the shapes it matched, so a case for one alternative of a
-union leaves a later variable case bound at the others alone. Bindings from the positions of a row, or from
+union leaves a later variable case bound at the remaining members alone. Bindings from the positions of a row, or from
 the keys of a dictionary pattern, compose by disjoint union, so a pattern that binds a name twice has no
 derivation.
 
@@ -234,9 +237,10 @@ If $\Gamma \vdash h : \tau$ for every $h \in N$ then $\Gamma \vdash k : \tau$ fo
 \matches K, L' \binding \Delta$ then $\Gamma \vdash k : \tau$ for each $k \in K \cup L'$.
 \end{lemma}
 
-The cases are then walked once, from $\shapesOf(\widen(\sigma), \varnothing)$ for the scrutinee's type $\sigma$, in the same shape as
-$\dispatch$ walks them at run time (\figref{typing-cases}). Each case matches its pattern against the residual, checks its
-body under the bindings that matching gives, and passes on the residual it leaves. The evaluation rules
+The cases are then taken in turn, first to last, from $\shapesOf(\widen(\sigma), \varnothing)$ for
+the scrutinee's type $\sigma$, the order in which $\dispatch$ tries the cases at run time
+(\figref{typing-cases}). Each case matches its pattern against the residual, checks its
+body under the bindings that matching gives, and passes on the residual of the match. The evaluation rules
 apply a sequence pattern only to a value of its own kind, although Python would match either
 (\figref{eval-pat}), so each case's pattern must agree with the type of every shape of the residual
 ($\agrees$, \secref{types-auxiliary}): a tuple pattern agrees with no list type and a list pattern with no
