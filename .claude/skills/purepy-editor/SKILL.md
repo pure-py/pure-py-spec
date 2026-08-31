@@ -22,6 +22,8 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 
 - Name a source file after the definitions it contains, and rename it when they change. A figure label
   follows the file name.
+- A macro is named after what it renders (\baseType for base-type, not \widen), and is renamed when the
+  rendered name changes.
 
 ## Git
 

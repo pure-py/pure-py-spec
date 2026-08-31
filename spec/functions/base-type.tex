@@ -1,7 +1,7 @@
-\widen(n) &{}= \tyInt && \text{if } n \text{ is an integer literal} \\*
-\widen(n) &{}= \tyFloat && \text{if } n \text{ is a float literal} \\*
-\widen(w) &{}= \tyStr \\*
-\widen(\pyinline{True}) = \widen(\pyinline{False}) &{}= \tyBool \\*
-\widen(\pyinline{None}) &{}= \tyNone \\*[2mm]
-\widen(\tyLiteral{\ell}) &{}= \widen(\ell) \\*
-\widen(\tau) &{}= \tau && \text{otherwise}
+\baseType(n) &{}= \tyInt && \text{if } n \text{ is an integer literal} \\*
+\baseType(n) &{}= \tyFloat && \text{if } n \text{ is a float literal} \\*
+\baseType(w) &{}= \tyStr \\*
+\baseType(\pyinline{True}) = \baseType(\pyinline{False}) &{}= \tyBool \\*
+\baseType(\pyinline{None}) &{}= \tyNone \\*[2mm]
+\baseType(\tyLiteral{\ell}) &{}= \baseType(\ell) \\*
+\baseType(\tau) &{}= \tau && \text{otherwise}

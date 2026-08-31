@@ -206,7 +206,7 @@
 {
   \varnothing \neq I \subseteq \set{1, \ldots, n+1} \\
   \Gamma \vdash e_i \synth \tau_i \quad (\forall i \in I) \\
-  \tau = \joinTy(\widen(\tau_i) \mid i \in I) \\
+  \tau = \joinTy(\baseType(\tau_i) \mid i \in I) \\
   \Gamma \vdash e_j \checks \tau \quad (\forall j \notin I)
 }
 {
@@ -226,7 +226,7 @@
   \Gamma \vdash e_i \checks \tyStr \quad (\forall i) \\
   \varnothing \neq I \subseteq \set{1, \ldots, n+1} \\
   \Gamma \vdash e_i' \synth \tau_i \quad (\forall i \in I) \\
-  \tau = \joinTy(\widen(\tau_i) \mid i \in I) \\
+  \tau = \joinTy(\baseType(\tau_i) \mid i \in I) \\
   \Gamma \vdash e_j' \checks \tau \quad (\forall j \notin I)
 }
 {
@@ -240,7 +240,7 @@
   \capturesE(e) \cap \dom(\Delta) = \varnothing
 }
 {
-  \Gamma \vdash \exListComp{e}{g_1\;\ldots\;g_n} \synth \tyList{\widen(\tau)}
+  \Gamma \vdash \exListComp{e}{g_1\;\ldots\;g_n} \synth \tyList{\baseType(\tau)}
 }
 \and
 \inferrule*[lab={\ruleName{syn-dict-comp}}]
@@ -251,7 +251,7 @@
   (\capturesE(e) \cup \capturesE(e')) \cap \dom(\Delta) = \varnothing
 }
 {
-  \Gamma \vdash \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \synth \tyDict{\widen(\tau)}
+  \Gamma \vdash \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \synth \tyDict{\baseType(\tau)}
 }
 \end{mathpar}
 \caption{Expression synthesis, continued}

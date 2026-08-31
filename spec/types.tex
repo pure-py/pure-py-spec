@@ -23,7 +23,7 @@ $\statusNotDefAssigned$.
 \subsection{Subtyping}
 \label{sec:subtyping}
 
-The \emph{base type} of a literal $\ell$ is $\widen(\ell)$, and of a type is that type with a literal
+The \emph{base type} of a literal $\ell$ is $\baseType(\ell)$, and of a type is that type with a literal
 type replaced by the base type of its literal (\secref{types-auxiliary}).
 
 Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and a class below its
@@ -189,7 +189,7 @@ so a function that declares a result definitely returns one.
 
 A \pyinline{match} scrutinee synthesises a type. Both \pyinline{match} rules take the cases in turn,
 requiring each to match something and the whole list to exhaust the type. The \emph{residual} $L_i$ holds
-the values no case up to the $i$th has matched, starting from $\shapesOf(\widen(\sigma), \varnothing)$,
+the values no case up to the $i$th has matched, starting from $\shapesOf(\baseType(\sigma), \varnothing)$,
 which denotes every value of the scrutinee's base type. Taking the base type keeps a literal case from
 exhausting the scrutinee on its own, so a \pyinline{match} on \pyinline{42} with a case for \pyinline{42}
 still admits a catch-all. Each case matches its pattern against the residual
@@ -245,7 +245,7 @@ If $\Gamma \vdash h : \tau$ for every $h \in N$ then $\Gamma \vdash k : \tau$ fo
 \matches K, L' \binding \Delta$ then $\Gamma \vdash k : \tau$ for each $k \in K \cup L'$.
 \end{lemma}
 
-The cases are then taken in turn, from $\shapesOf(\widen(\sigma), \varnothing)$ for
+The cases are then taken in turn, from $\shapesOf(\baseType(\sigma), \varnothing)$ for
 the scrutinee's type $\sigma$, the order in which $\dispatch$ tries the cases at run time
 (\figref{typing-stmt}). Each case matches its pattern against the residual, checks its
 body under the bindings that matching gives, and passes on the residual of the match. The evaluation rules
@@ -296,7 +296,7 @@ body as a top-level statement, and the
 
 The functions used by the rules of this \seckind{}, each defined by its cases.
 
-\begin{auxfunction}{\widen(\ell), \widen(\tau)}{type}{aux:base-type}
+\begin{auxfunction}{\baseType(\ell), \baseType(\tau)}{type}{aux:base-type}
 \input{spec/functions/base-type-text}
 \funcrows{base-type}
 \end{auxfunction}

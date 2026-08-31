@@ -85,7 +85,7 @@
 \and
 \inferrule*[lab={\ruleName{subty-literal}}]
 {
-  \Gamma \vdash \widen(\ell) \subty \tau
+  \Gamma \vdash \baseType(\ell) \subty \tau
 }
 {
   \Gamma \vdash \tyLiteral{\ell} \subty \tau

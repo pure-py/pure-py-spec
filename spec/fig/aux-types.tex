@@ -3,7 +3,7 @@
 \small
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.3\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}>{\raggedright\arraybackslash}p{0.47\textwidth}}
 \textbf{Function} & \textbf{Result} & \textbf{Meaning} \\[1mm]
-$\widen(\ell)$, $\widen(\tau)$ & type & base type of literal $\ell$, or of type $\tau$ \\
+$\baseType(\ell)$, $\baseType(\tau)$ & type & base type of literal $\ell$, or of type $\tau$ \\
 $\joinTy(\sigma, \tau)$, $\joinTy(\seq{\tau})$ & type & larger type where comparable, union otherwise \\
 $\elemTy(\tau)$ & type & type of elements drawn from $\tau$ by generator \\
 $\resolve(\odot, \sigma, \sigma')$, $\resolve(\ominus, \sigma)$ & type & result of resolving operator against operand types \\
