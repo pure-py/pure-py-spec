@@ -141,9 +141,9 @@ definitions that follow, as is the name $q$ of the current module in the rules t
 \label{def:predefined}
 $\mathcal{P}$ takes each module $q$ of \figref{predefined} to a pair $(\rho, \Gamma)$, where $\rho$ binds
 $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member listed for $q$ in \figref{predefined} to its value,
-and $\Gamma$ binds $\pymath{\_\_name\_\_}$ at $\tyStr$, each member whose value is opaque at
-$\predefName$, and each other member at the type listed for it in \figref{predefined-types}. The
-well-formedness rules read a type as $\statusDefAssigned$, since they compute no types. These signatures name types
+and $\Gamma$ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the entry listed for it in
+\figref{predefined-types}. The well-formedness rules read a type as $\statusDefAssigned$, since they
+compute no types. These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
 the predefined signatures.
 \end{definition}
