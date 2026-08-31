@@ -6,6 +6,7 @@ import reasons
 import syntax
 from aux import (
     assigns_body,
+    classes,
     assigns_stmt,
     first_return,
     split_imports,
@@ -143,6 +144,7 @@ def check_module(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context:
 
 def check_module_(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context:
     prefix, rest = split_imports(m.body)
+    check_distinct_classes(rest, q)
     gamma0 = check_imports_prefix(prefix, ModuleContext(gamma={}, M=M, q=q))
     body = [name_assign(q)] + rest
     gamma1 = {**predefined_context("builtins"), **gamma0}
@@ -153,6 +155,16 @@ def check_module_(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context
     _, final_ctx = check_seq(items, ModuleContext(gamma=gamma1, M=M, q=q))
     check_submodule_clash(m, gamma0, body, M, q)
     return signature(body, final_ctx, q)
+
+
+def check_distinct_classes(body: list[ast.stmt], q: str) -> None:
+    """A module declares each class name at most once, so the qualified name
+    identifies the class."""
+    names = classes(body)
+    dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
+    if dup is not None:
+        decls = [s for s in body if isinstance(s, ast.ClassDef) and s.name == dup]
+        raise IllFormedModule(decls[1], reasons.DuplicateClassName(dup, q))
 
 
 def check_submodule_clash(

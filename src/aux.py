@@ -341,6 +341,11 @@ def nested_statements(s: ast.stmt) -> list[ast.stmt]:
     return [c for c in ast.iter_child_nodes(s) if isinstance(c, ast.stmt)]
 
 
+def classes(body: list[ast.stmt]) -> list[str]:
+    """Names of the class declarations of a module body, in order."""
+    return [s.name for s in body if isinstance(s, ast.ClassDef)]
+
+
 def own_fields(node: ast.ClassDef) -> tuple[tuple[str, TypeExpr], ...]:
     """Fields a class declares, with their type expressions."""
     declared = [
