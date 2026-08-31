@@ -169,7 +169,7 @@
   \Gamma \vdash e' \synth \tyInt
 }
 {
-  \Gamma \vdash \exSubscript{e}{e'} \synth \tau_1 \mathbin{|} \ldots \mathbin{|} \tau_m
+  \Gamma \vdash \exSubscript{e}{e'} \synth \joinTy(\tau_1, \ldots, \tau_m)
 }
 \and
 \inferrule*[lab={\ruleName{subscript-union}}]
