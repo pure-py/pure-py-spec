@@ -143,8 +143,8 @@ def in_scope(x: str, node: ast.AST, ctx: ModuleContext) -> None:
 
 
 def annotated(e: ast.expr | None) -> TypeExpr:
-    """Type expression an annotation carries; every parameter and return has
-    one, and the subset admits no other annotation."""
+    """Type expression an annotation carries; a definition annotates every
+    parameter and its return type, and the subset admits no other annotation."""
     assert e is not None
     t = parse_annotation(e)
     assert t is not None
@@ -208,8 +208,8 @@ def check_mutual_region(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None
 
 
 def check_annotated(defs: list[ast.FunctionDef]) -> None:
-    """Every parameter and return carries an annotation, so the type of a
-    definition is given rather than inferred from its body."""
+    """A definition annotates every parameter and its return type, so the type
+    of a definition is given rather than inferred from its body."""
     for d in defs:
         if d.returns is None or any(a.annotation is None for a in d.args.args):
             raise IllFormedModule(d, reasons.MissingAnnotation(d.name))
