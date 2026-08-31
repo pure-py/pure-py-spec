@@ -131,19 +131,119 @@ match with a case for \pyinline{42} alone; \pyinline{x: int = 42} keeps the type
 
 
 Name resolution takes a qualified name to a context entry (\figref{resolve-name}).
-A variable is a well-formed expression when it is definitely assigned (\ruleName{wf-var});
-a lambda checks its body with its parameters definitely assigned, and a comprehension checks its body
-with the variables bound by its generators definitely assigned (\ruleName{wf-qual-generator}). A lambda within
-a comprehension may not capture a generator variable, a side condition of \ruleName{wf-list-comp},
-\ruleName{wf-dict-comp} and \ruleName{wf-qual-generator}, because Python mutates the variable on each iteration
-and the lambda would see its final value. A module attribute reference $\exAttr{e}{x}$ is well-formed
-when, read as a qualified name, it resolves to a definitely assigned member
-(\ruleName{wf-attr-module})\paperonly{; see \secref{no-load-dependent}}. A constructor call requires its name
-to resolve to a class and its arguments to cover the class's fields exactly, through $\fieldMap$
-(\ruleName{wf-constr}). A variable bound to a module or class is not an expression on its own, and occurs
-only as the head of a qualified name\paperonly{ (\secref{no-first-class})}.
+\subsection{Expressions}
+\label{sec:expression-typing}
 
-\input{spec/fig/well-formed-expr}
+Within an expression the typing judgement gives each subexpression a type, and
+is bidirectional. \emph{Synthesis} $\Gamma \vdash e \synth \tau$ reads a type out of an expression (\figrefThree{typing-synth}{typing-synth-elim}{typing-synth-ctd}),
+and \emph{checking} $\Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
+surroundings (\figref{typing-check}). The division follows the usual recipe for bidirectional
+systems~\cite{davies2000,dunfield2021}: introduction forms check, since a lambda or an empty list does not
+determine its own type, and elimination forms synthesise, since a call, a subscript or an attribute
+reference starts from a subterm whose type is known. Type systems that follow the recipe strictly usually
+rely on an annotation form $(e \mathbin{:} \tau)$, which synthesises by construction, so a checking form
+written with an annotation can be used in any context where synthesis is required. Python has no such form,
+allowing annotations only on parameters, returns and assignments, so \PurePy gives the introduction forms
+synthesis rules of their own wherever their parts determine the type, following Swift, Kotlin and
+Scala~\cite{swift2025,kotlin2025,odersky2025}.
+
+Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise.
+The \ruleName{var} rule applies whenever $\Gamma(x)$ is a type, so a variable that is not definitely
+assigned has no rule. A
+literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
+
+A class $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ records the declared
+type of each field it introduces, and $\fields(C)$ is the bindings of all its fields, those of the base
+class first. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
+$\fieldMap$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to,
+which is the type of its instances (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must
+synthesise a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$
+(\ruleName{attr-object}). The signature of a predefined module binds
+$\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type listed for it
+(\figref{predefined-types}, Definition~\ref{def:predefined}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
+signature $\ominus : \sigma \to \tau$, relating operand types to result type
+(\figref{operator-signatures}). A
+signature with type variables stands for all its instances, which agree on the result type; a variable binds
+the operand's type as it is, and an operand type written out is matched by any subtype of it. Where several
+signatures give a result the first listed is used, so \pyinline{1 + 2} is an \pyinline{int} and
+\pyinline{1 + 2.0} a \pyinline{float}. Equality is available on \emph{equality types}, which are the types
+whose values structural equality relates:
+\begin{defalign}
+\Gamma \vdash \nu \eqType \\
+\Gamma \vdash \tyLiteral{\ell} \eqType \\
+\Gamma \vdash \tyList{\tau} \eqType \quad & \text{if } \Gamma \vdash \tau \eqType \\
+\Gamma \vdash \tyDict{\tau} \eqType \quad & \text{if } \Gamma \vdash \tau \eqType \\
+\Gamma \vdash \tyTuple{\seq{\tau}} \eqType \quad & \text{if } \Gamma \vdash \tau_i \eqType \quad (\forall i) \\
+\Gamma \vdash \tyUnion{\sigma}{\tau} \eqType \quad & \text{if } \Gamma \vdash \sigma \eqType \text{ and } \Gamma \vdash \tau \eqType \\
+\Gamma \vdash C \eqType \quad & \text{if } \Gamma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \fields(C)
+\end{defalign}
+
+\noindent A callable type is not an equality type, and neither is any type with a callable component, so
+comparing two functions is rejected rather than left undefined. \emph{Resolution} looks the operator up at the operand types, and
+at their base types where no signature gives a result for the operand types themselves
+(\secref{types-auxiliary}). The second clause lets \pyinline{1 == 0} use the equality signature at \pyinline{int}, since two
+distinct literal types are not comparable. Taking the operand types as they are first keeps \pyinline{2 **
+3} an \pyinline{int}, since the exponent binds a variable that its base type would not. Resolution is more
+precise than mypy for this operator, whose overloads give \pyinline{Any} as soon as the exponent is not a
+literal, where resolution gives \pyinline{float}.
+
+In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
+(\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
+dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
+that synthesises a literal type gives the component type at that position, counting from the end where the index
+is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and any other index of type
+\pyinline{int} gives the join of the component types (\ruleName{subscript-tuple-int}). A negated numeric
+literal synthesises the negated literal type (\ruleName{unop-literal}), and \ruleName{unop} excludes that
+form, to keep the judgement deterministic. A subscript, attribute reference or call whose subject
+synthesises a union is typed at each member, with a variable in place of the subject, and synthesises the
+join of the results (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union}); a union
+is iterated at the join of its members' element types ($\elemTy$). \citet{dunfield2004} state union elimination once, for every evaluation
+context; with four elimination forms a rule each is shorter.
+
+\input{spec/fig/operator-signatures}
+
+Lambdas check, as do lists, tuples, dictionaries and comprehensions. Their types are not determined by
+the expression alone: $\exList{}$ is a list of any element type, and a lambda's parameters cannot be annotated in
+Python, so both take their type from the surroundings. An expression that synthesises $\sigma$ checks against any supertype
+of $\sigma$ (\ruleName{check-synth}), which applies only where no other rule concludes $\Gamma \vdash e \checks
+\tau$, so both judgements are
+syntax-directed and an expression has at most one derivation in each.
+
+The forms with synthesis rules of their own are a conditional expression when a branch
+synthesises, at the join of the types the synthesising branches give, the other branch checking against
+that join (\ruleName{syn-cond}), a tuple when all its components synthesise, a
+comprehension when its body synthesises, and a non-empty list or dictionary when at least one element
+synthesises, the remaining elements checking against the join of the base types of the synthesising elements (\ruleName{syn-list},
+\ruleName{syn-tuple}, \ruleName{syn-dict}, \ruleName{syn-list-comp}, \ruleName{syn-dict-comp}). A list,
+dictionary or comprehension takes the base type of what its elements or body synthesise, since
+\pyinline{list} and \pyinline{dict} are invariant and a literal element type would keep the container from
+matching any other. Each of these forms also keeps its checking rule. An empty list or dictionary and a lambda have no
+synthesis rule at all, so checking is the only way to type them. A lambda applied to arguments is the
+exception, since the arguments give the parameter types, and the call then synthesises the type of the body
+or checks the body against an expected type (\ruleName{syn-call-lambda}, \ruleName{call-lambda}). A
+comprehension uses that form to pass a generator variable to a lambda by value, which it may not capture. A non-empty list has both, and the
+checking rule is still needed where the expected element type is wider than the one the elements
+synthesise, since \pyinline{list} is invariant.
+
+\input{spec/fig/typing-synth}
+
+\input{spec/fig/typing-check}
+
+Typing a comprehension types its qualifiers, which bind the variables its body may use
+(\figref{typing-check}). A generator draws those bindings from the elements of a value, and $\elemTy$ gives
+the type of those elements (\secref{types-auxiliary}), the static counterpart of $\iterOp$
+(\secref{auxiliary-values}). A
+tuple is iterated at the join of the base types of its components, whether or not they agree.
+A type with no clause, such as a class or a callable, cannot be iterated, and a generator over a value of
+that type has no rule.
+
+A lambda within a comprehension may not capture a generator variable, a side condition of
+\ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}, because Python mutates the
+variable on each iteration and the lambda would see its final value. A module attribute reference
+$\exAttr{e}{x}$ resolves as a qualified name to a definitely assigned member
+(\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}. A variable bound to a module or
+class is not an expression on its own, and occurs only as the head of a qualified
+name\paperonly{ (\secref{no-first-class})}.
 
 Pattern subsumption $\Gamma \vdash p \subsumed p'$\speconly{ (\figref{subsumption})}\paperonly{ (defined in \specification)} is a
 preorder on patterns under which every value matched by $p$ is also matched by $p'$. A pattern list is
