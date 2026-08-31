@@ -88,6 +88,16 @@
   \Gamma \vdash \exUnOp{\pyinline{-}}{n} \synth \tyLiteral{-n}
 }
 \and
+\inferrule*[lab={\ruleName{syn-cond}}]
+{
+  \Gamma \vdash e \checks \tyBool \\
+  \Gamma \vdash e_1 \synth \sigma \\
+  \Gamma \vdash e_2 \synth \tau
+}
+{
+  \Gamma \vdash \exCondExpr{e_1}{e}{e_2} \synth \joinTy(\sigma, \tau)
+}
+\and
 \inferrule*[lab={\ruleName{and}}]
 {
   \Gamma \vdash e \checks \tyBool \\

@@ -474,7 +474,8 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
         assert len(e.ops) == 1
         return binary(BINARY_NAMES[type(e.ops[0])], e.left, e.comparators[0], e, ctx)
     if isinstance(e, ast.IfExp):
-        raise IllFormedModule(e, reasons.NotSynthesised())
+        check_expr(e.test, Primitive.BOOL, ctx)
+        return join([synth_expr(e.body, ctx), synth_expr(e.orelse, ctx)], ctx)
     if isinstance(e, ast.Attribute):
         parent = entry_of(e.value, ctx)
         if isinstance(parent, ModuleLoaded):
@@ -599,11 +600,13 @@ def list_type(e: ast.expr, elts: list[ast.expr], ctx: ModuleContext) -> ListType
 
 
 def synthesises(e: ast.expr) -> bool:
-    """Whether some synthesis rule has the form of `e`: a lambda, an empty list
-    or dictionary and a conditional expression have none, and a container has
+    """Whether some synthesis rule has the form of `e`: a lambda and an empty
+    list or dictionary have none, and a container or conditional expression has
     one where its parts do."""
-    if isinstance(e, (ast.Lambda, ast.IfExp)):
+    if isinstance(e, ast.Lambda):
         return False
+    if isinstance(e, ast.IfExp):
+        return synthesises(e.body) and synthesises(e.orelse)
     if isinstance(e, ast.List):
         return any(synthesises(x) for x in e.elts)
     if isinstance(e, ast.Dict):
