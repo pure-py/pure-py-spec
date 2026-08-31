@@ -204,9 +204,8 @@
 \small
 \inferrule*[lab={\ruleName{syn-list}}]
 {
-  I = \set{i \mid \Gamma \vdash e_i \synth \sigma \text{ for some } \sigma} \neq \varnothing \\
-  \Gamma \vdash e_i \synth \tau_i \quad (\forall i \in I) \\
-  \tau = \joinTy(\baseType(\tau_i) \mid i \in I) \\
+  I = \set{i \mid \Gamma \vdash e_i \synth \sigma_i} \neq \varnothing \\
+  \tau = \joinTy(\baseType(\sigma_i) \mid i \in I) \\
   \Gamma \vdash e_j \checks \tau \quad (\forall j \notin I)
 }
 {
@@ -224,9 +223,8 @@
 \inferrule*[lab={\ruleName{syn-dict}}]
 {
   \Gamma \vdash e_i \checks \tyStr \quad (\forall i) \\
-  I = \set{i \mid \Gamma \vdash e_i' \synth \sigma \text{ for some } \sigma} \neq \varnothing \\
-  \Gamma \vdash e_i' \synth \tau_i \quad (\forall i \in I) \\
-  \tau = \joinTy(\baseType(\tau_i) \mid i \in I) \\
+  I = \set{i \mid \Gamma \vdash e_i' \synth \sigma_i} \neq \varnothing \\
+  \tau = \joinTy(\baseType(\sigma_i) \mid i \in I) \\
   \Gamma \vdash e_j' \checks \tau \quad (\forall j \notin I)
 }
 {
