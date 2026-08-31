@@ -20,7 +20,9 @@ reverse. Function signatures, assignments and dataclass fields are annotated wit
 type expression denotes a type under a context (\figref{resolve-type}). Every definition carries an
 annotation for each parameter and for its return type, so the type of a definition is given rather than
 inferred from its body. A class name resolves to a
-class (\figref{resolve-name}) and every other name must resolve to a predefined entry (\figref{predefined-types}).
+class (\figref{resolve-name}) and every other name must resolve to a predefined entry
+(\figref{predefined-types}). The \emph{base type} of a literal $\ell$ is $\baseType(\ell)$, and of a type
+is that type with a literal type replaced by the base type of its literal (\secref{types-auxiliary}).
 
 The context entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
 that is not definitely assigned is bound to $\statusNotDefAssigned$. Two contexts from different branches of a conditional merge pointwise. A variable definitely assigned in both, at $\sigma$ and $\tau$, is of type
@@ -35,9 +37,6 @@ $\statusNotDefAssigned$.
 
 \subsection{Subtyping}
 \label{sec:subtyping}
-
-The \emph{base type} of a literal $\ell$ is $\baseType(\ell)$, and of a type is that type with a literal
-type replaced by the base type of its literal (\secref{types-auxiliary}).
 
 Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and a class below its
 ancestors, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
