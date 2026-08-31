@@ -11,17 +11,13 @@ from itertools import product
 
 import reasons
 from aux import qualified_name
+from classes import Class, field_map, field_type, fields, short_name
 from contexts import (
-    Class,
     ModuleContext,
     Status,
     VarContext,
     VarEntry,
     class_of_name,
-    field_map,
-    field_type,
-    fields,
-    short_name,
 )
 from reasons import IllFormedModule
 from shapes import (
@@ -87,7 +83,7 @@ def match_as(k: Shape, p: ast.MatchAs, ctx: ModuleContext) -> Match | None:
     matched, left, delta = result
     if p.name is None:
         return matched, left, delta
-    named = join([shape_type(m) for m in matched], ctx)
+    named = join([shape_type(m) for m in matched])
     return matched, left, disjoint_union([delta, {p.name: named}], p)
 
 
@@ -96,7 +92,7 @@ def match_literal(k: Shape, ell: LiteralType, ctx: ModuleContext) -> Match | Non
         if LiteralType(k.value) != ell:
             return None
         return frozenset({k}), NOTHING, NO_BINDINGS
-    if isinstance(k, Rest) and ell not in k.heads and subtype(ell, k.ty, ctx):
+    if isinstance(k, Rest) and ell not in k.heads and subtype(ell, k.ty):
         matched = frozenset({Literal(ell.value)})
         return matched, shapes(k.ty, k.heads | {ell}, ctx), NO_BINDINGS
     return None
@@ -141,10 +137,10 @@ def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | Non
         raise no_field_map(cls, p)
     ps = tuple(args[x] for x in fields(cls))
     if isinstance(k, Constr):
-        if subtype(ClassType(k.c), ClassType(cls), ctx):
+        if subtype(ClassType(k.c), ClassType(cls)):
             rows = match_row(k.args, padded(ps, len(k.args)), p, ctx)
             return wrap(lambda r: Constr(k.c, r, k.heads), rows)
-        if subtype(ClassType(cls), ClassType(k.c), ctx) and not below_excluded(
+        if subtype(ClassType(cls), ClassType(k.c)) and not below_excluded(
             cls, k.heads, ctx
         ):
             own = tuple(declared_field(cls, x) for x in fields(cls)[len(k.args) :])
@@ -161,10 +157,10 @@ def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | Non
         return None
     if (
         isinstance(k, Rest)
-        and comparable(ClassType(cls), k.ty, ctx)
+        and comparable(ClassType(cls), k.ty)
         and not below_excluded(cls, k.heads, ctx)
     ):
-        low = cls if subtype(ClassType(cls), k.ty, ctx) else class_of(k.ty)
+        low = cls if subtype(ClassType(cls), k.ty) else class_of(k.ty)
         types = tuple(declared_field(low, x) for x in fields(low))
         kept = typed_heads(k.heads, ClassType(low), ctx)
         expanded = frozenset(Constr(low, row, kept) for row in shapes_row(types, ctx))
@@ -326,7 +322,7 @@ def join_entries(entries: list[VarEntry], ctx: ModuleContext) -> VarEntry:
     they join."""
     types = [e for e in entries if not isinstance(e, Status)]
     assert len(types) == len(entries)
-    return join(types, ctx)
+    return join(types)
 
 
 def ordered(ks: frozenset[Shape]) -> list[Shape]:

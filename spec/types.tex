@@ -29,8 +29,7 @@ type replaced by the base type of its literal (\secref{types-auxiliary}).
 Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and a class below its
 ancestors, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
 each of its members and below every type that is above all of them. A tuple type is covariant, below another of the
-same length whose components are above its own. Two types are \emph{equivalent}, $\Gamma \vdash \sigma
-\tyEquiv \tau$, when each is a subtype of the other; both notations follow \citet{pierce2002}. Lists,
+same length whose components are above its own. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; both notations follow \citet{pierce2002}. Lists,
 dictionaries and callables are related only where their components are equivalent, since \pyinline{list}
 and \pyinline{dict} are invariant in mypy and covariance would accept programs mypy rejects. The types with a length, namely lists, dictionaries,
 strings and tuples, are below \pyinline{Sized}. An \pyinline{int} is a \pyinline{float}, as PEP~484
@@ -39,8 +38,7 @@ Python treats it as one.
 
 \begin{lemma}[Transitivity of subtyping]
 \label{lem:subtyping-transitive}
-If $\Gamma \vdash \sigma \subty \tau$ and $\Gamma \vdash \tau \subty \tau'$ then $\Gamma \vdash
-\sigma \subty \tau'$.
+If $\sigma \subty \tau$ and $\tau \subty \tau'$ then $\sigma \subty \tau'$.
 \end{lemma}
 
 Two types are \emph{comparable}

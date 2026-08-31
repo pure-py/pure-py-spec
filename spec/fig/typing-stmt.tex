@@ -56,7 +56,7 @@
 \and
 \inferrule*[lab={\ruleName{return-none}}]
 {
-  \Gamma \vdash \tyNone \subty \tau
+  \tyNone \subty \tau
 }
 {
   \Gamma; \tau \vdash \exReturnNone : \Returns
@@ -103,7 +103,7 @@
   \Delta_i = \set{\bind{\seq{x}_i}{\seq{\sigma}_i}} \quad (\forall i) \\
   \Gamma \override \set{\bind{f_j}{\tyCallable{\seq{\sigma}_j}{\tau_j}} \mid \forall j} \override \Delta_i \override \statusNotDefAssigned(\assignsS(s_i) \setminus \dom(\Delta_i)); \tau_i \vdash s_i : R_i \quad (\forall i)
   \\
-  R_i = \Returns \text{ or } \Gamma \vdash \tyNone \subty \tau_i \quad (\forall i) \\
+  R_i = \Returns \text{ or } \tyNone \subty \tau_i \quad (\forall i) \\
   \seq{f} \text{ distinct} \\
   \Gamma \vdash \seq{\psi}_i \synth \seq{\sigma}_i \quad (\forall i) \\
   \Gamma \vdash \psi_i \synth \tau_i \quad (\forall i)

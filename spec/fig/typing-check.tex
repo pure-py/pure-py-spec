@@ -6,7 +6,7 @@
 \inferrule*[lab={\ruleName{check-synth}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma \vdash \sigma \subty \tau \\
+  \sigma \subty \tau \\
   \text{no other rule concludes } \Gamma \vdash e \checks \tau
 }
 {

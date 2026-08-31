@@ -10,7 +10,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product
 
-from contexts import Class, ModuleContext
+from classes import Class
+from contexts import ModuleContext
 from subtyping import subtype
 from type_syntax import (
     ClassType,
@@ -116,9 +117,9 @@ def head_typed(h: object, t: Type, ctx: ModuleContext) -> bool:
     """Head typing: a literal below `t`, a class below `t`, or an integer read
     as a length where `t` is a list type."""
     if isinstance(h, Class):
-        return subtype(ClassType(h), t, ctx)
+        return subtype(ClassType(h), t)
     if isinstance(h, LiteralType):
-        return subtype(h, t, ctx)
+        return subtype(h, t)
     assert isinstance(h, int)
     return isinstance(t, ListType)
 
@@ -126,7 +127,7 @@ def head_typed(h: object, t: Type, ctx: ModuleContext) -> bool:
 def below_excluded(c: Class, heads: frozenset[object], ctx: ModuleContext) -> bool:
     """Whether the class lies below a class of the excluded heads."""
     return any(
-        isinstance(h, Class) and subtype(ClassType(c), ClassType(h), ctx) for h in heads
+        isinstance(h, Class) and subtype(ClassType(c), ClassType(h)) for h in heads
     )
 
 

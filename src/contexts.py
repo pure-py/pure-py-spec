@@ -1,8 +1,10 @@
 import ast
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
+from classes import Class
+from subtyping import join
 from type_syntax import CallableType, ListType, Primitive, Type, dotted_name
 
 
@@ -16,26 +18,6 @@ type VarEntry = Status | Type
 type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName
 type Context = dict[str, ContextEntry]
 type VarContext = dict[str, VarEntry]
-
-
-@dataclass(frozen=True, eq=False)
-class Class:
-    """A class, identified by its qualified name: two classes with the same
-    name are the same class, and a class is also the type of its instances."""
-
-    context: Context
-    name: str
-    own_fields: tuple[tuple[str, Type], ...]
-    base: str | None
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, Class) and self.name == other.name
-
-    def __hash__(self) -> int:
-        return hash(self.name)
-
-    def __repr__(self) -> str:
-        return f"Class({self.name})"
 
 
 @dataclass(frozen=True)
@@ -119,9 +101,6 @@ class Assigns:
 
 type ResultType = Returns | Assigns
 
-# Join of two types, supplied by the caller since it depends on the context.
-type Join = Callable[[Type, Type], Type]
-
 RETURNS = Returns()
 
 ASSIGNS_EMPTY = Assigns()
@@ -178,7 +157,7 @@ def predefined_context(q: str) -> Context:
     return {**PREDEFINED_MEMBERS[q], "__name__": Primitive.STR}
 
 
-def merge_entry(a: ContextEntry, b: ContextEntry, join_types: Join) -> VarEntry:
+def merge_entry(a: ContextEntry, b: ContextEntry) -> VarEntry:
     """Assigned in both branches gives the join of the two types; assigned in
     one alone is not definitely assigned. Only variables are assigned within a
     branch, since a class is declared at the top level alone."""
@@ -186,34 +165,32 @@ def merge_entry(a: ContextEntry, b: ContextEntry, join_types: Join) -> VarEntry:
     assert not isinstance(b, (ModuleStub, ModuleLoaded, Class, PredefinedName))
     if a == Status.FF or b == Status.FF:
         return Status.FF
-    return join_types(a, b)
+    return join([a, b])
 
 
 def merge_delta(
-    d1: Mapping[str, ContextEntry], d2: Mapping[str, ContextEntry], join_types: Join
+    d1: Mapping[str, ContextEntry], d2: Mapping[str, ContextEntry]
 ) -> VarContext:
     return {
-        k: merge_entry(d1[k], d2[k], join_types) if k in d1 and k in d2 else Status.FF
+        k: merge_entry(d1[k], d2[k]) if k in d1 and k in d2 else Status.FF
         for k in set(d1.keys()) | set(d2.keys())
     }
 
 
-def merge_results(rs: list[ResultType], join_types: Join) -> ResultType:
+def merge_results(rs: list[ResultType]) -> ResultType:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return RETURNS
     delta = assigns_branches[0].delta
-    return Assigns(fold_merge(delta, assigns_branches[1:], join_types))
+    return Assigns(fold_merge(delta, assigns_branches[1:]))
 
 
 def fold_merge(
-    acc: Mapping[str, ContextEntry], branches: list[Assigns], join_types: Join
+    acc: Mapping[str, ContextEntry], branches: list[Assigns]
 ) -> Mapping[str, ContextEntry]:
     if len(branches) == 0:
         return acc
-    return fold_merge(
-        merge_delta(acc, branches[0].delta, join_types), branches[1:], join_types
-    )
+    return fold_merge(merge_delta(acc, branches[0].delta), branches[1:])
 
 
 def override_delta(
@@ -253,50 +230,3 @@ def entry_of(e: ast.expr, ctx: ModuleContext) -> ContextEntry | None:
 def class_of_name(e: ast.expr, ctx: ModuleContext) -> Class | None:
     entry = entry_of(e, ctx)
     return entry if isinstance(entry, Class) else None
-
-
-def short_name(c: Class) -> str:
-    return c.name.rsplit(".", 1)[-1]
-
-
-def ancestors(c: Class) -> list[Class]:
-    if c.base is None:
-        return [c]
-    base = c.context[c.base]
-    assert isinstance(base, Class)
-    return [c] + ancestors(base)
-
-
-def fields(c: Class) -> tuple[str, ...]:
-    if c.base is None:
-        return tuple(x for x, _ in c.own_fields)
-    base = c.context[c.base]
-    assert isinstance(base, Class)
-    return fields(base) + tuple(x for x, _ in c.own_fields)
-
-
-def field_type(c: Class, x: str) -> Type | None:
-    """Declared type of field `x`, if the class records one."""
-    own = dict(c.own_fields)
-    if x in own:
-        return own[x]
-    if c.base is None:
-        return None
-    base = c.context[c.base]
-    assert isinstance(base, Class)
-    return field_type(base, x)
-
-
-def field_map[T](
-    c: Class,
-    positional: Sequence[T],
-    kwd_names: Sequence[str],
-    kwd_values: Sequence[T],
-) -> dict[str, T] | None:
-    xs = fields(c)
-    n = len(positional)
-    if n + len(kwd_names) != len(xs) or len(set(kwd_names)) != len(kwd_names):
-        return None
-    if set(kwd_names) != set(xs[n:]):
-        return None
-    return {**dict(zip(xs[:n], positional)), **dict(zip(kwd_names, kwd_values))}

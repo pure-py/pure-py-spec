@@ -39,7 +39,7 @@
 \inferrule*[lab={\ruleName{pat-rest-literal}}]
 {
   \ell \notin N \\
-  \Gamma \vdash \tyLiteral{\ell} \subty \tau
+  \tyLiteral{\ell} \subty \tau
 }
 {
   \Gamma \vdash \shapeAny{\tau}{N}, \ell \matches \set{\ell}, \shapesOf(\tau, N \cup \set{\ell}) \binding \varnothing
@@ -48,7 +48,7 @@
 \inferrule*[lab={\ruleName{pat-rest-constr}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \nexists C' \in N.\ \Gamma \vdash C \subty C' \\
+  \nexists C' \in N.\ C \subty C' \\
   \tau, C \text{ comparable} \\
   E \text{ the lower of } \tau \text{ and } C \\
   \fields(E) = \bind{\seq{x}}{\seq{\sigma}} \\
@@ -79,7 +79,7 @@
 \inferrule*[lab={\ruleName{pat-constr}}]
 {
   \Gamma \vdash q' : \Type{C'} \\
-  \Gamma \vdash C \subty C' \\
+  C \subty C' \\
   \fields(C') = \bind{\seq{x}}{\seq{\sigma}} \\
   p_i = \fieldMap(C', a)(x_i) \quad (\forall i \leq n) \\
   p_i = \patWild \quad (\forall i > n) \\
@@ -92,9 +92,9 @@
 \inferrule*[lab={\ruleName{pat-constr-sub}}]
 {
   \Gamma \vdash q' : \Type{C'} \\
-  \Gamma \vdash C' \subty C \\
+  C' \subty C \\
   C' \neq C \\
-  \nexists C'' \in N.\ \Gamma \vdash C' \subty C'' \\
+  \nexists C'' \in N.\ C' \subty C'' \\
   \fields(C') = \fields(C) \mathbin{\concat} \bind{\seq{y}}{\seq{\sigma}} \\
   N' = \set{h \in N \mid \Gamma \vdash h : C'} \\
   \Gamma \vdash \set{\shapeAny{\patConstr{C'}{\seq{k} \mathbin{\concat} \seq{k}\,'}}{N'} \mid \seq{k}\,' \in \shapesOf(\seq{\sigma})}, \patConstr{q'}{a} \matches K, L \binding \Delta

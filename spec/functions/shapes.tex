@@ -2,7 +2,7 @@
 \shapesOf(\tyLiteral{\ell}, N) &{}= \varnothing && \text{if } \ell \in N \\*
 \shapesOf(\tyBool, N) &{}= \varnothing && \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq N \\*
 \shapesOf(\tyNone, N) &{}= \varnothing && \text{if } \pyinline{None} \in N \\*
-\shapesOf(C, N) &{}= \varnothing && \text{if } \Gamma \vdash C \subty C' \text{ for some } C' \in N \\*
+\shapesOf(C, N) &{}= \varnothing && \text{if } C \subty C' \text{ for some } C' \in N \\*
 \shapesOf(\tyNever, N) &{}= \varnothing \\*
 \shapesOf(\tyDict{\tau}, N) &{}= \set{\shapeDict{\tau}{\varnothing}{N}} \\*
 \shapesOf(\tau, N) &{}= \set{\shapeAny{\tau}{N}} && \text{otherwise} \\*[2mm]

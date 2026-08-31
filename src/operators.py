@@ -1,7 +1,8 @@
 import ast
 from collections.abc import Callable, Sequence
 
-from contexts import Class, ModuleContext, field_type, fields
+from classes import Class, field_type, fields
+from contexts import ModuleContext
 from subtyping import comparable, join, subtype
 from type_syntax import (
     CallableType,
@@ -23,11 +24,11 @@ type UnarySignature = Callable[[Type, ModuleContext], Type | None]
 def both(
     s: Type, t: Type, param: Type, result: Type, ctx: ModuleContext
 ) -> Type | None:
-    return result if subtype(s, param, ctx) and subtype(t, param, ctx) else None
+    return result if subtype(s, param) and subtype(t, param) else None
 
 
 def equality(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    if not comparable(s, t, ctx):
+    if not comparable(s, t):
         return None
     if not equality_type(s, ctx) or not equality_type(t, ctx):
         return None
@@ -65,13 +66,13 @@ def declared(c: Class, x: str) -> Type:
 
 
 def membership_list(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    if isinstance(t, ListType) and comparable(s, t.elem, ctx):
+    if isinstance(t, ListType) and comparable(s, t.elem):
         return Primitive.BOOL
     return None
 
 
 def membership_tuple(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    if isinstance(t, TupleType) and comparable(s, join(t.components, ctx), ctx):
+    if isinstance(t, TupleType) and comparable(s, join(t.components)):
         return Primitive.BOOL
     return None
 
@@ -81,7 +82,7 @@ def membership_str(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
 
 
 def membership_dict(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    if isinstance(t, DictType) and subtype(s, Primitive.STR, ctx):
+    if isinstance(t, DictType) and subtype(s, Primitive.STR):
         return Primitive.BOOL
     return None
 
@@ -108,7 +109,7 @@ def concat_str(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
 
 def concat_list(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
     if isinstance(s, ListType) and isinstance(t, ListType):
-        return ListType(join((s.elem, t.elem), ctx))
+        return ListType(join((s.elem, t.elem)))
     return None
 
 
@@ -119,7 +120,7 @@ def concat_tuple(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
 
 
 def repeat_str(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    if subtype(s, Primitive.STR, ctx) and subtype(t, Primitive.INT, ctx):
+    if subtype(s, Primitive.STR) and subtype(t, Primitive.INT):
         return Primitive.STR
     return None
 
@@ -129,7 +130,7 @@ def repeat_str_left(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
 
 
 def repeat_list(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    if isinstance(s, ListType) and subtype(t, Primitive.INT, ctx):
+    if isinstance(s, ListType) and subtype(t, Primitive.INT):
         return s
     return None
 
@@ -139,7 +140,7 @@ def repeat_list_left(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
 
 
 def power_int(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    if subtype(s, Primitive.INT, ctx) and isinstance(t, LiteralType):
+    if subtype(s, Primitive.INT) and isinstance(t, LiteralType):
         exponent = t.value
         if isinstance(exponent, int) and not isinstance(exponent, bool):
             return Primitive.FLOAT if exponent < 0 else Primitive.INT
@@ -173,15 +174,15 @@ BINARY_SIGNATURES: dict[str, tuple[BinarySignature, ...]] = {
 
 
 def negate_bool(s: Type, ctx: ModuleContext) -> Type | None:
-    return Primitive.BOOL if subtype(s, Primitive.BOOL, ctx) else None
+    return Primitive.BOOL if subtype(s, Primitive.BOOL) else None
 
 
 def sign_int(s: Type, ctx: ModuleContext) -> Type | None:
-    return Primitive.INT if subtype(s, Primitive.INT, ctx) else None
+    return Primitive.INT if subtype(s, Primitive.INT) else None
 
 
 def sign_float(s: Type, ctx: ModuleContext) -> Type | None:
-    return Primitive.FLOAT if subtype(s, Primitive.FLOAT, ctx) else None
+    return Primitive.FLOAT if subtype(s, Primitive.FLOAT) else None
 
 
 UNARY_SIGNATURES: dict[str, tuple[UnarySignature, ...]] = {

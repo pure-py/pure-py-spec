@@ -17,13 +17,12 @@ from aux import (
     qualified_name,
     statements,
 )
+from classes import Class, field_map, field_type, fields, short_name
 from contexts import (
     ASSIGNS_EMPTY,
     RETURNS,
     Assigns,
-    Class,
     Context,
-    Join,
     ModuleContext,
     ModuleLoaded,
     ModuleStub,
@@ -34,9 +33,6 @@ from contexts import (
     VarContext,
     class_of_name,
     entry_of,
-    field_map,
-    field_type,
-    fields,
     is_assigned,
     merge_results,
     module_of,
@@ -44,7 +40,6 @@ from contexts import (
     override_results,
     override_var,
     resolve_name,
-    short_name,
     var_type,
 )
 from match import agrees, literal_of, match_shapes
@@ -264,12 +259,12 @@ def check_bodies(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
 def check_falls_off_end(d: ast.FunctionDef, declared: Type, ctx: ModuleContext) -> None:
     """A body that does not definitely return falls off the end, giving None,
     so the declared type must admit it."""
-    if not subtype(Primitive.NONE, declared, ctx):
+    if not subtype(Primitive.NONE, declared):
         raise IllFormedModule(d, reasons.MissingReturn(d.name, render(declared)))
 
 
 def check_returns_none(s: ast.Return, declared: Type, ctx: ModuleContext) -> None:
-    if not subtype(Primitive.NONE, declared, ctx):
+    if not subtype(Primitive.NONE, declared):
         raise IllFormedModule(
             s, reasons.TypeMismatch(render(declared), render(Primitive.NONE))
         )
@@ -319,7 +314,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
         branches.append(
             check_body(s.orelse, ctx, returns) if s.orelse else ASSIGNS_EMPTY
         )
-        return merge_results(branches, joiner(ctx))
+        return merge_results(branches)
     if isinstance(s, ast.Assert):
         check_expr(s.test, Primitive.BOOL, ctx)
         if s.msg is not None:
@@ -329,11 +324,6 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
         subject = synth_expr(s.subject, ctx)
         return check_match_cases(s.cases, subject, ctx, returns)
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
-
-
-def joiner(ctx: ModuleContext) -> Join:
-    """Join at this context, for merging the branches of a conditional."""
-    return lambda s, t: join([s, t], ctx)
 
 
 def check_match_cases(
@@ -346,7 +336,7 @@ def check_match_cases(
     branches = [
         check_case(case, delta, ctx, returns) for case, delta in zip(cases, deltas)
     ]
-    return merge_results(branches + ([ASSIGNS_EMPTY] if partial else []), joiner(ctx))
+    return merge_results(branches + ([ASSIGNS_EMPTY] if partial else []))
 
 
 def match_cases(
@@ -524,7 +514,7 @@ def field_of(obj: Type, e: ast.Attribute, ctx: ModuleContext) -> Type:
     """The type of a field of an object of type `obj`; at a union, the join
     over the members."""
     if isinstance(obj, UnionType):
-        return join([field_of(obj.left, e, ctx), field_of(obj.right, e, ctx)], ctx)
+        return join([field_of(obj.left, e, ctx), field_of(obj.right, e, ctx)])
     if not isinstance(obj, ClassType):
         raise IllFormedModule(e, reasons.NotSynthesised())
     member = field_type(obj.c, e.attr)
@@ -545,8 +535,7 @@ def subscript_type(container: Type, e: ast.Subscript, ctx: ModuleContext) -> Typ
             [
                 subscript_type(container.left, e, ctx),
                 subscript_type(container.right, e, ctx),
-            ],
-            ctx,
+            ]
         )
     if isinstance(container, ListType):
         check_expr(e.slice, Primitive.INT, ctx)
@@ -573,7 +562,7 @@ def tuple_subscript(container: TupleType, index: ast.expr, ctx: ModuleContext) -
             raise IllFormedModule(
                 index, reasons.TypeMismatch(render(Primitive.INT), render(actual))
             )
-        return join(container.components, ctx)
+        return join(container.components)
     if not -m <= i < m:
         raise IllFormedModule(index, reasons.TupleIndexOutOfRange(i, m))
     return container.components[i]
@@ -594,7 +583,7 @@ def branch_type(e: ast.IfExp, ctx: ModuleContext) -> Type:
     synthesising = [x for x in branches if synthesises(x)]
     if len(synthesising) == 0:
         raise IllFormedModule(e, reasons.NotSynthesised())
-    t = join([synth_expr(x, ctx) for x in synthesising], ctx)
+    t = join([synth_expr(x, ctx) for x in synthesising])
     for x in branches:
         if not synthesises(x):
             check_expr(x, t, ctx)
@@ -607,7 +596,7 @@ def list_type(e: ast.expr, elts: list[ast.expr], ctx: ModuleContext) -> ListType
     synthesising = [x for x in elts if synthesises(x)]
     if len(synthesising) == 0:
         raise IllFormedModule(e, reasons.NotSynthesised())
-    t = join([base_type(synth_expr(x, ctx)) for x in synthesising], ctx)
+    t = join([base_type(synth_expr(x, ctx)) for x in synthesising])
     for x in elts:
         if not synthesises(x):
             check_expr(x, t, ctx)
@@ -654,7 +643,7 @@ def result_type(fn: Type, e: ast.Call, ctx: ModuleContext) -> Type:
     """The result of a call at callee type `fn`; at a union, the join over the
     members."""
     if isinstance(fn, UnionType):
-        return join([result_type(fn.left, e, ctx), result_type(fn.right, e, ctx)], ctx)
+        return join([result_type(fn.left, e, ctx), result_type(fn.right, e, ctx)])
     if not isinstance(fn, CallableType):
         raise IllFormedModule(e, reasons.NotCallable(render(fn)))
     if len(fn.params) != len(e.args):
@@ -722,7 +711,7 @@ def check_expr(e: ast.expr, expected: Type, ctx: ModuleContext) -> None:
         check_expr(e.value, expected.value, ctx_)
         return
     actual = synth_expr(e, ctx)
-    if not subtype(actual, expected, ctx):
+    if not subtype(actual, expected):
         raise IllFormedModule(e, reasons.TypeMismatch(render(expected), render(actual)))
 
 
@@ -806,10 +795,10 @@ def elem_type(t: Type, ctx: ModuleContext) -> Type | None:
     if isinstance(t, DictType):
         return Primitive.STR
     if isinstance(t, TupleType):
-        return join([base_type(c) for c in t.components], ctx)
+        return join([base_type(c) for c in t.components])
     if isinstance(t, UnionType):
         left, right = elem_type(t.left, ctx), elem_type(t.right, ctx)
-        return None if left is None or right is None else join([left, right], ctx)
+        return None if left is None or right is None else join([left, right])
     return None
 
 
