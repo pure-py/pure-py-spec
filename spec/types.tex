@@ -196,11 +196,12 @@ well as the values it leaves. The body is then checked under those bindings.
 
 \input{spec/fig/syntax-shapes}
 
-Reachability and exhaustiveness are the two halves of one computation
-(\figrefTwo{pat}{pat-rows}), as in the usefulness algorithm for
-ML~\cite{maranget2007} and in the term descriptions a match compiler carries~\cite{sestoft1996}. Matching a
-pattern against a shape takes the scrutinee's type into account, as the uncovered sets of
-\citet{karachalias2015} do. A \emph{shape} $k$
+The matching judgement decides reachability and exhaustiveness together
+(\figrefTwo{pat}{pat-rows}), reachability by the shapes a case matches and exhaustiveness by the residual
+left by the last case. The usefulness algorithm for ML also decides both with one
+relation~\cite{maranget2007}, and the residual corresponds to the term descriptions that the match
+compiler of \citet{sestoft1996} threads through the cases. Matching a pattern against a shape takes the
+scrutinee's type into account, following the uncovered sets of \citet{karachalias2015}. A \emph{shape} $k$
 denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{N}$ is a
 value of type $\tau$ whose outermost head is not among those in $N$. A head itself denotes values: a
 class its instances, an integer at a list type the lists of that length, and a literal its value. Head
