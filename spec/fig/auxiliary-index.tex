@@ -9,7 +9,7 @@
 \textbf{Function} & \textbf{Result} & \textbf{Meaning}\speconly{ & \textbf{Section}} \\[1mm]
 \auxgroup{Syntactic analyses}
 \auxrow{$\assignsS(t)$}{set of variables}{variables assigned in $t$, not descending into nested functions}{aux:assigns}
-\auxrow{$\binds(p)$, $\binds(\seq{g})$}{set of variables}{variables bound by pattern $p$, or by the generators of qualifiers $\seq{g}$}{aux:binds}
+\auxrow{$\binds(p)$, $\binds(\seq{g})$}{set of variables}{variables bound by pattern $p$, or by generators of qualifiers $\seq{g}$}{aux:binds}
 \auxrow{$\capturesS(t)$, $\capturesS(\seq{g})$}{set of variables}{variables of enclosing scope captured by lambdas and nested functions in $t$, or in $\seq{g}$}{aux:captures}
 \auxrow{$\capturesE(e)$}{set of variables}{variables of enclosing scope captured by lambdas in $e$}{aux:captures-e}
 \specauxrow{$\fvS(s)$}{set of variables}{free variables of statement $s$}{aux:fv}
@@ -28,7 +28,7 @@
 \auxrow{$\ownFields(\phi)$}{sequence of bindings}{fields declared by field list $\phi$, with their type expressions}{aux:own-fields}
 \auxrow{$\fields(C)$}{sequence of bindings}{fields of class $C$ with their types, inherited first}{aux:fields}
 \auxrow{$\ancestors(C)$}{set of classes}{$C$ and its base classes}{aux:ancestors}
-\auxrow{$\fieldMap(C, \seq{u})$}{map from variables}{argument supplied for each field of $C$; undefined unless the arguments cover them exactly}{aux:field-map}
+\auxrow{$\fieldMap(C, \seq{u})$}{map from variables}{argument supplied for each field of $C$; undefined unless arguments cover them exactly}{aux:field-map}
 \auxrow{$\resolveClass(\rho, q)$}{class}{class denoted by qualified name $q$ in $\rho$}{aux:resolve-class}
 \specauxrow{$\env(\rho, q)$}{environment}{environment of module $q$ as loaded in $\rho$}{aux:env}
 \auxrow{$\nameOf(q)$}{string}{string literal naming module $q$}{aux:name}
@@ -36,14 +36,14 @@
 \auxgroup{Values}
 \auxrow{$\eqOp(v, v')$}{Boolean}{structural equality; undefined between unrelated values}{aux:eq}
 \specauxrow{$\eqElems(\seq{v}, \seq{v}\,')$}{Boolean}{elementwise equality of value sequences}{aux:eq-elems}
-\auxrow{$\memOp(v, v')$}{Boolean}{whether $v'$ is an element of $v$}{aux:contains}
-\specauxrow{$\memElems(\seq{v}, v)$}{Boolean}{whether $\seq{v}$ has an element equal to $v$}{aux:contains-elems}
+\auxrow{$\memOp(v, v')$}{Boolean}{whether $v'$ is element of $v$}{aux:contains}
+\specauxrow{$\memElems(\seq{v}, v)$}{Boolean}{whether $\seq{v}$ has element equal to $v$}{aux:contains-elems}
 \specauxrow{$\elems(v)$}{sequence of values}{elements of list, tuple or string}{aux:elems}
-\auxrow{$\iterOp(v)$}{sequence of values}{sequence a generator draws from $v$; keys if $v$ is a dictionary}{aux:iter}
-\auxrow{$\getitem(v, v')$}{value or abort}{subscripting; $\errIndex$ for an index out of range, $\errKey$ for a missing key, $\errType$ otherwise}{aux:getitem}
-\auxrow{$\outcome(r)$}{value or abort}{statement result as an outcome: the returned value, \pyinline{None} if it falls off the end, an abort unchanged}{aux:outcome}
-\auxrow{$\dispatch(\rho, v, \seq{p}, \seq{s})$}{bindings and statement}{case taken by a \pyinline{match}}{aux:dispatch}
+\auxrow{$\iterOp(v)$}{sequence of values}{sequence generator draws from $v$; keys if $v$ is dictionary}{aux:iter}
+\auxrow{$\getitem(v, v')$}{value or abort}{subscripting; $\errIndex$ for index out of range, $\errKey$ for missing key, $\errType$ otherwise}{aux:getitem}
+\auxrow{$\outcome(r)$}{value or abort}{statement result as outcome: returned value, \pyinline{None} if block falls off end, abort unchanged}{aux:outcome}
+\auxrow{$\dispatch(\rho, v, \seq{p}, \seq{s})$}{bindings and statement}{case taken by \pyinline{match}}{aux:dispatch}
 \specauxrow{$\entries(\delta, \delta')$}{dictionary entries}{$\delta$ extended by $\delta'$ in order, later overriding earlier}{aux:entries}
-\specauxrow{$\update(\delta, w, v)$}{dictionary entries}{$\delta$ with $w$ bound to $v$, replacing any earlier binding}{aux:update}
+\specauxrow{$\update(\delta, w, v)$}{dictionary entries}{$\delta$ with $w$ bound to $v$, replacing earlier binding}{aux:update}
 \end{tabular}
 \end{center}
