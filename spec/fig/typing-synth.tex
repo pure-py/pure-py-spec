@@ -145,9 +145,9 @@
 \and
 \inferrule*[lab={\ruleName{subscript-tuple}}]
 {
-  \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_m} \\
+  \Gamma \vdash e \synth \tyTuple{\seq{\tau}} \\
   \Gamma \vdash e' \synth \tyLiteral{n} \\
-  0 \leq n < m
+  0 \leq n < |\seq{\tau}|
 }
 {
   \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{n+1}
@@ -155,21 +155,21 @@
 \and
 \inferrule*[lab={\ruleName{subscript-tuple-neg}}]
 {
-  \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_m} \\
+  \Gamma \vdash e \synth \tyTuple{\seq{\tau}} \\
   \Gamma \vdash e' \synth \tyLiteral{-n} \\
-  0 < n \leq m
+  0 < n \leq |\seq{\tau}|
 }
 {
-  \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{(m-n)+1}
+  \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{(|\seq{\tau}|-n)+1}
 }
 \and
 \inferrule*[lab={\ruleName{subscript-tuple-int}}]
 {
-  \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_m} \\
+  \Gamma \vdash e \synth \tyTuple{\seq{\tau}} \\
   \Gamma \vdash e' \synth \tyInt
 }
 {
-  \Gamma \vdash \exSubscript{e}{e'} \synth \joinTy(\tau_1, \ldots, \tau_m)
+  \Gamma \vdash \exSubscript{e}{e'} \synth \joinTy(\seq{\tau})
 }
 \and
 \inferrule*[lab={\ruleName{subscript-union}}]
