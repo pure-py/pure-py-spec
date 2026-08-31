@@ -189,9 +189,9 @@ so a function that declares a result definitely returns one.
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and the cases are taken in turn from
 $\shapesOf(\sigma, \varnothing)$, which denotes every value of $\sigma$. The \emph{residual} $L_i$ holds
-the values no case up to the $i$th has matched. Each case matches its pattern against the residual by the
-matching judgement (\secref{exhaustiveness}), yielding the bindings the pattern makes and the shapes the
-pattern leaves; the body is checked under the bindings, and the pattern must agree with $\sigma$
+the values which have not been matched by any case up to the $i$th. Each case matches its pattern against
+the residual by the matching judgement (\secref{exhaustiveness}), yielding the pattern's bindings and the
+shapes left unmatched; the body is checked under the bindings, and the pattern must agree with $\sigma$
 (\figref{agrees}). The \ruleName{match} rule applies where the final residual $L_{n+1}$ is empty;
 \ruleName{match-partial} applies otherwise, merging in $\Assigns{\varnothing}$ for the values that fall
 through. A literal-typed scrutinee is exhausted by covering its literals, so \pyinline{x = 42} admits a
