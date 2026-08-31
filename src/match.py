@@ -12,12 +12,12 @@ from itertools import product
 import reasons
 from aux import qualified_name
 from contexts import (
-    ClassEntry,
+    Class,
     ModuleContext,
     Status,
     VarContext,
     VarEntry,
-    class_entry,
+    class_of_name,
     field_map,
     field_type,
     fields,
@@ -133,38 +133,38 @@ def match_list(k: Shape, p: PatList, ctx: ModuleContext) -> Match | None:
 
 
 def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | None:
-    entry = class_entry(p.cls, ctx)
-    if entry is None:
+    cls = class_of_name(p.cls, ctx)
+    if cls is None:
         raise IllFormedModule(p, reasons.UnknownClassInPattern(class_name(p.cls)))
-    args = field_map(entry, p.patterns, p.kwd_attrs, p.kwd_patterns)
+    args = field_map(cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
     if args is None:
-        raise no_field_map(entry, p)
-    ps = tuple(args[x] for x in fields(entry))
+        raise no_field_map(cls, p)
+    ps = tuple(args[x] for x in fields(cls))
     if isinstance(k, Constr):
-        if subtype(ClassType(k.entry), ClassType(entry), ctx):
+        if subtype(ClassType(k.c), ClassType(cls), ctx):
             rows = match_row(k.args, padded(ps, len(k.args)), p, ctx)
-            return wrap(lambda r: Constr(k.entry, r, k.heads), rows)
-        if subtype(ClassType(entry), ClassType(k.entry), ctx) and not below_excluded(
-            entry, k.heads, ctx
+            return wrap(lambda r: Constr(k.c, r, k.heads), rows)
+        if subtype(ClassType(cls), ClassType(k.c), ctx) and not below_excluded(
+            cls, k.heads, ctx
         ):
-            own = tuple(declared_field(entry, x) for x in fields(entry)[len(k.args) :])
-            kept = typed_heads(k.heads, ClassType(entry), ctx)
+            own = tuple(declared_field(cls, x) for x in fields(cls)[len(k.args) :])
+            kept = typed_heads(k.heads, ClassType(cls), ctx)
             expanded = frozenset(
-                Constr(entry, k.args + row, kept) for row in shapes_row(own, ctx)
+                Constr(cls, k.args + row, kept) for row in shapes_row(own, ctx)
             )
             result = match_shapes(expanded, p, ctx)
             if result is None:
                 return None
             matched, left, delta = result
-            taken = Constr(k.entry, k.args, k.heads | {entry})
+            taken = Constr(k.c, k.args, k.heads | {cls})
             return matched, left | {taken}, delta
         return None
     if (
         isinstance(k, Rest)
-        and comparable(ClassType(entry), k.ty, ctx)
-        and not below_excluded(entry, k.heads, ctx)
+        and comparable(ClassType(cls), k.ty, ctx)
+        and not below_excluded(cls, k.heads, ctx)
     ):
-        low = entry if subtype(ClassType(entry), k.ty, ctx) else class_of(k.ty)
+        low = cls if subtype(ClassType(cls), k.ty, ctx) else class_of(k.ty)
         types = tuple(declared_field(low, x) for x in fields(low))
         kept = typed_heads(k.heads, ClassType(low), ctx)
         expanded = frozenset(Constr(low, row, kept) for row in shapes_row(types, ctx))
@@ -172,7 +172,7 @@ def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | Non
         if result is None:
             return None
         matched, left, delta = result
-        return matched, left | shapes(k.ty, k.heads | {entry}, ctx), delta
+        return matched, left | shapes(k.ty, k.heads | {cls}, ctx), delta
     return None
 
 
@@ -184,9 +184,9 @@ def typed_heads(
     return frozenset(h for h in heads if head_typed(h, t, ctx))
 
 
-def class_of(t: Type) -> ClassEntry:
+def class_of(t: Type) -> Class:
     assert isinstance(t, ClassType)
-    return t.entry
+    return t.c
 
 
 def match_mapping(
@@ -284,22 +284,20 @@ def agrees(p: ast.pattern, t: Type, ctx: ModuleContext) -> bool:
             return all(agrees(q, t.value, ctx) for q in p.patterns)
         return True
     if isinstance(p, ast.MatchClass):
-        entry = class_entry(p.cls, ctx)
-        if entry is None:
+        cls = class_of_name(p.cls, ctx)
+        if cls is None:
             return True  # the match rules reject with a sharper reason
-        args = field_map(entry, p.patterns, p.kwd_attrs, p.kwd_patterns)
+        args = field_map(cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
         if args is None:
             return True  # likewise
-        return all(
-            agrees(args[x], declared_field(entry, x), ctx) for x in fields(entry)
-        )
+        return all(agrees(args[x], declared_field(cls, x), ctx) for x in fields(cls))
     if isinstance(p, ast.MatchAs):
         return p.pattern is None or agrees(p.pattern, t, ctx)
     return True
 
 
-def declared_field(entry: ClassEntry, x: str) -> Type:
-    t = field_type(entry, x)
+def declared_field(c: Class, x: str) -> Type:
+    t = field_type(c, x)
     assert t is not None
     return t
 
@@ -364,9 +362,9 @@ def class_name(cls: ast.expr) -> str:
     return ast.unparse(cls)
 
 
-def no_field_map(entry: ClassEntry, p: ast.MatchClass) -> IllFormedModule:
+def no_field_map(cls: Class, p: ast.MatchClass) -> IllFormedModule:
     """Why field-map is undefined for the pattern's arguments."""
-    c, xs = short_name(entry), fields(entry)
+    c, xs = short_name(cls), fields(cls)
     n = len(p.patterns)
     if n + len(p.kwd_attrs) != len(xs):
         return IllFormedModule(

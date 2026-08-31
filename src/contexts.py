@@ -11,17 +11,17 @@ class Status(Enum):
 
 
 # The entry for a variable is its type, or Status.FF where it is not definitely
-# assigned. Lazily evaluated, so these may name ClassEntry before it is defined.
+# assigned. Lazily evaluated, so these may name Class before it is defined.
 type VarEntry = Status | Type
-type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | ClassEntry | PredefinedName
+type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName
 type Context = dict[str, ContextEntry]
 type VarContext = dict[str, VarEntry]
 
 
 @dataclass(frozen=True, eq=False)
-class ClassEntry:
-    """A class, identified by its qualified name: two entries with the same name
-    are the same class, and the entry is also the class type."""
+class Class:
+    """A class, identified by its qualified name: two classes with the same
+    name are the same class, and a class is also the type of its instances."""
 
     context: Context
     name: str
@@ -29,13 +29,13 @@ class ClassEntry:
     base: str | None
 
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, ClassEntry) and self.name == other.name
+        return isinstance(other, Class) and self.name == other.name
 
     def __hash__(self) -> int:
         return hash(self.name)
 
     def __repr__(self) -> str:
-        return f"ClassEntry({self.name})"
+        return f"Class({self.name})"
 
 
 @dataclass(frozen=True)
@@ -74,8 +74,7 @@ def var_entry(ctx: ModuleContext, x: str) -> VarEntry | None:
     v = ctx.gamma.get(x)
     return (
         None
-        if v is None
-        or isinstance(v, (ModuleStub, ModuleLoaded, ClassEntry, PredefinedName))
+        if v is None or isinstance(v, (ModuleStub, ModuleLoaded, Class, PredefinedName))
         else v
     )
 
@@ -183,8 +182,8 @@ def merge_entry(a: ContextEntry, b: ContextEntry, join_types: Join) -> VarEntry:
     """Assigned in both branches gives the join of the two types; assigned in
     one alone is not definitely assigned. Only variables are assigned within a
     branch, since a class is declared at the top level alone."""
-    assert not isinstance(a, (ModuleStub, ModuleLoaded, ClassEntry, PredefinedName))
-    assert not isinstance(b, (ModuleStub, ModuleLoaded, ClassEntry, PredefinedName))
+    assert not isinstance(a, (ModuleStub, ModuleLoaded, Class, PredefinedName))
+    assert not isinstance(b, (ModuleStub, ModuleLoaded, Class, PredefinedName))
     if a == Status.FF or b == Status.FF:
         return Status.FF
     return join_types(a, b)
@@ -251,50 +250,50 @@ def entry_of(e: ast.expr, ctx: ModuleContext) -> ContextEntry | None:
     return None if q is None else resolve_name(q, ctx)
 
 
-def class_entry(e: ast.expr, ctx: ModuleContext) -> ClassEntry | None:
+def class_of_name(e: ast.expr, ctx: ModuleContext) -> Class | None:
     entry = entry_of(e, ctx)
-    return entry if isinstance(entry, ClassEntry) else None
+    return entry if isinstance(entry, Class) else None
 
 
-def short_name(entry: ClassEntry) -> str:
-    return entry.name.rsplit(".", 1)[-1]
+def short_name(c: Class) -> str:
+    return c.name.rsplit(".", 1)[-1]
 
 
-def ancestors(entry: ClassEntry) -> list[ClassEntry]:
-    if entry.base is None:
-        return [entry]
-    base_entry = entry.context[entry.base]
-    assert isinstance(base_entry, ClassEntry)
-    return [entry] + ancestors(base_entry)
+def ancestors(c: Class) -> list[Class]:
+    if c.base is None:
+        return [c]
+    base = c.context[c.base]
+    assert isinstance(base, Class)
+    return [c] + ancestors(base)
 
 
-def fields(entry: ClassEntry) -> tuple[str, ...]:
-    if entry.base is None:
-        return tuple(x for x, _ in entry.own_fields)
-    base_entry = entry.context[entry.base]
-    assert isinstance(base_entry, ClassEntry)
-    return fields(base_entry) + tuple(x for x, _ in entry.own_fields)
+def fields(c: Class) -> tuple[str, ...]:
+    if c.base is None:
+        return tuple(x for x, _ in c.own_fields)
+    base = c.context[c.base]
+    assert isinstance(base, Class)
+    return fields(base) + tuple(x for x, _ in c.own_fields)
 
 
-def field_type(entry: ClassEntry, x: str) -> Type | None:
-    """Declared type of field `x`, where the class entry records one."""
-    own = dict(entry.own_fields)
+def field_type(c: Class, x: str) -> Type | None:
+    """Declared type of field `x`, if the class records one."""
+    own = dict(c.own_fields)
     if x in own:
         return own[x]
-    if entry.base is None:
+    if c.base is None:
         return None
-    base_entry = entry.context[entry.base]
-    assert isinstance(base_entry, ClassEntry)
-    return field_type(base_entry, x)
+    base = c.context[c.base]
+    assert isinstance(base, Class)
+    return field_type(base, x)
 
 
 def field_map[T](
-    entry: ClassEntry,
+    c: Class,
     positional: Sequence[T],
     kwd_names: Sequence[str],
     kwd_values: Sequence[T],
 ) -> dict[str, T] | None:
-    xs = fields(entry)
+    xs = fields(c)
     n = len(positional)
     if n + len(kwd_names) != len(xs) or len(set(kwd_names)) != len(kwd_names):
         return None

@@ -10,7 +10,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product
 
-from contexts import ClassEntry, ModuleContext
+from contexts import Class, ModuleContext
 from subtyping import subtype
 from type_syntax import (
     ClassType,
@@ -39,10 +39,10 @@ class Literal:
 
 @dataclass(frozen=True)
 class Constr:
-    """Instances of `entry` or of a subclass not below `heads`, whose fields
-    (those of `entry`) have the given shapes."""
+    """Instances of `c` or of a subclass not below `heads`, whose fields (those
+    of `c`) have the given shapes."""
 
-    entry: ClassEntry
+    c: Class
     args: tuple["Shape", ...]
     heads: frozenset[object]
 
@@ -83,7 +83,7 @@ def shape_type(k: Shape) -> Type:
     if isinstance(k, Literal):
         return LiteralType(k.value)
     if isinstance(k, Constr):
-        return ClassType(k.entry)
+        return ClassType(k.c)
     if isinstance(k, Tuple):
         return TupleType(tuple(shape_type(c) for c in k.components))
     if isinstance(k, List):
@@ -101,7 +101,7 @@ def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> frozenset[S
         return NOTHING
     if t == Primitive.NONE and LiteralType(None) in heads:
         return NOTHING
-    if isinstance(t, ClassType) and below_excluded(t.entry, heads, ctx):
+    if isinstance(t, ClassType) and below_excluded(t.c, heads, ctx):
         return NOTHING
     if t == Primitive.NEVER:
         return NOTHING
@@ -115,7 +115,7 @@ def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> frozenset[S
 def head_typed(h: object, t: Type, ctx: ModuleContext) -> bool:
     """Head typing: a literal below `t`, a class below `t`, or an integer read
     as a length where `t` is a list type."""
-    if isinstance(h, ClassEntry):
+    if isinstance(h, Class):
         return subtype(ClassType(h), t, ctx)
     if isinstance(h, LiteralType):
         return subtype(h, t, ctx)
@@ -123,13 +123,10 @@ def head_typed(h: object, t: Type, ctx: ModuleContext) -> bool:
     return isinstance(t, ListType)
 
 
-def below_excluded(
-    entry: ClassEntry, heads: frozenset[object], ctx: ModuleContext
-) -> bool:
+def below_excluded(c: Class, heads: frozenset[object], ctx: ModuleContext) -> bool:
     """Whether the class lies below a class of the excluded heads."""
     return any(
-        isinstance(h, ClassEntry) and subtype(ClassType(entry), ClassType(h), ctx)
-        for h in heads
+        isinstance(h, Class) and subtype(ClassType(c), ClassType(h), ctx) for h in heads
     )
 
 

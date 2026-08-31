@@ -21,7 +21,7 @@ from contexts import (
     ASSIGNS_EMPTY,
     RETURNS,
     Assigns,
-    ClassEntry,
+    Class,
     Context,
     Join,
     ModuleContext,
@@ -32,7 +32,7 @@ from contexts import (
     Returns,
     Status,
     VarContext,
-    class_entry,
+    class_of_name,
     entry_of,
     field_map,
     field_type,
@@ -100,8 +100,8 @@ def parameters(d: ast.FunctionDef, ctx: ModuleContext) -> VarContext:
 
 def resolve_type(psi: TypeExpr, node: ast.AST, ctx: ModuleContext) -> Type:
     """Type that type expression `psi` denotes: each name it is written with
-    must be in scope, a class name resolving to the class entry that is its type
-    and every other spelling to the predefined entry its module gives it."""
+    must be in scope, a class name resolving to the class that is its type and
+    every other spelling to the predefined entry its module gives it."""
     if isinstance(psi, Primitive):
         in_scope(PRIMITIVE_SPELLINGS[psi], node, ctx)
         return psi
@@ -109,10 +109,10 @@ def resolve_type(psi: TypeExpr, node: ast.AST, ctx: ModuleContext) -> Type:
         in_scope("Literal", node, ctx)
         return psi
     if isinstance(psi, ClassName):
-        entry = resolve_name(psi.q, ctx)
-        if not isinstance(entry, ClassEntry):
+        c = resolve_name(psi.q, ctx)
+        if not isinstance(c, Class):
             raise IllFormedModule(node, reasons.UnknownClassInAnnotation(psi.q))
-        return ClassType(entry)
+        return ClassType(c)
     if isinstance(psi, ListExpr):
         in_scope("list", node, ctx)
         return ListType(resolve_type(psi.elem, node, ctx))
@@ -176,7 +176,7 @@ def check_top_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
         assert ra_node is not None
         raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
     delta = head_result.delta if isinstance(head_result, Assigns) else {}
-    rebound = {c for c in assigns_seq(tail) if isinstance(delta.get(c), ClassEntry)}
+    rebound = {c for c in assigns_seq(tail) if isinstance(delta.get(c), Class)}
     if rebound:
         node = find_first_reassigning(tail, rebound)
         assert node is not None
@@ -189,7 +189,7 @@ def check_top_statement(item: Statement, ctx: ModuleContext) -> ResultType:
     plain statement, checked with no return type (top-stmt)."""
     if isinstance(item, ast.ClassDef):
         check_class_decl(item, ctx.gamma, ctx.q)
-        return Assigns({item.name: class_entry_for(item, ctx.q, ctx.gamma)})
+        return Assigns({item.name: class_declared(item, ctx.q, ctx.gamma)})
     return check_statement(item, ctx, None)
 
 
@@ -407,7 +407,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
         if not is_assigned(ctx, e.id):
             if module_of(ctx, e.id) is not None:
                 raise IllFormedModule(e, reasons.ModuleAsValue(e.id))
-            if isinstance(ctx.gamma.get(e.id), ClassEntry):
+            if isinstance(ctx.gamma.get(e.id), Class):
                 raise IllFormedModule(e, reasons.ClassAsValue(e.id))
             if isinstance(ctx.gamma.get(e.id), PredefinedName):
                 raise IllFormedModule(e, reasons.PredefinedNameAsValue(e.id))
@@ -422,7 +422,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
     if isinstance(e, ast.Lambda):
         raise IllFormedModule(e, reasons.NotSynthesised())
     if isinstance(e, ast.Call):
-        constructed = class_entry(e.func, ctx)
+        constructed = class_of_name(e.func, ctx)
         if constructed is not None:
             c_name, xs = short_name(constructed), fields(constructed)
             kwd_names = [k.arg for k in e.keywords if k.arg is not None]
@@ -485,7 +485,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
                 raise IllFormedModule(e, reasons.SubmoduleNotImported(entry.q))
             if isinstance(entry, ModuleLoaded):
                 raise IllFormedModule(e, reasons.ModuleAsValue(qualified_name(e)))
-            if isinstance(entry, ClassEntry):
+            if isinstance(entry, Class):
                 raise IllFormedModule(e, reasons.ClassAsValue(qualified_name(e)))
             if isinstance(entry, PredefinedName):
                 raise IllFormedModule(
@@ -526,9 +526,9 @@ def field_of(obj: Type, e: ast.Attribute, ctx: ModuleContext) -> Type:
         return join([field_of(obj.left, e, ctx), field_of(obj.right, e, ctx)], ctx)
     if not isinstance(obj, ClassType):
         raise IllFormedModule(e, reasons.NotSynthesised())
-    member = field_type(obj.entry, e.attr)
+    member = field_type(obj.c, e.attr)
     if member is None:
-        raise IllFormedModule(e, reasons.UnknownField(short_name(obj.entry), e.attr))
+        raise IllFormedModule(e, reasons.UnknownField(short_name(obj.c), e.attr))
     return member
 
 
@@ -804,12 +804,12 @@ def elem_entry(e: ast.expr, ctx: ModuleContext) -> Type:
     return elem
 
 
-def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
+def class_declared(node: ast.ClassDef, q: str, context: Context) -> Class:
     base = (
         node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
     )
     ctx = ModuleContext(gamma=context, q=q)
-    return ClassEntry(
+    return Class(
         context=context,
         name=f"{q}.{node.name}",
         own_fields=tuple(
@@ -832,10 +832,10 @@ def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
         return
     base = node.bases[0]
     assert isinstance(base, ast.Name)
-    entry = gamma.get(base.id)
-    if not isinstance(entry, ClassEntry) or entry.name.rsplit(".", 1)[0] != q:
+    base_class = gamma.get(base.id)
+    if not isinstance(base_class, Class) or base_class.name.rsplit(".", 1)[0] != q:
         raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
-    clash = set(names) & set(fields(entry))
+    clash = set(names) & set(fields(base_class))
     if len(clash) > 0:
         raise IllFormedModule(node, reasons.InheritedFieldClash(min(clash), base.id))
 
@@ -855,6 +855,6 @@ def describe(p: ast.pattern, ctx: ModuleContext) -> str:
     if isinstance(p, ast.MatchMapping):
         return "a dictionary pattern"
     assert isinstance(p, ast.MatchClass)
-    entry = class_entry(p.cls, ctx)
-    assert entry is not None
-    return f"a pattern for class {short_name(entry)}"
+    cls = class_of_name(p.cls, ctx)
+    assert cls is not None
+    return f"a pattern for class {short_name(cls)}"

@@ -5,7 +5,7 @@ from enum import Enum, auto
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from contexts import ClassEntry
+    from contexts import Class
 
 
 class Primitive(Enum):
@@ -111,7 +111,7 @@ class CallableType:
 
 @dataclass(frozen=True)
 class ClassType:
-    entry: "ClassEntry"
+    c: "Class"
 
 
 @dataclass(frozen=True)
@@ -173,7 +173,7 @@ def render(t: Type) -> str:
     if isinstance(t, LiteralType):
         return f"Literal[{t.value!r}]"
     if isinstance(t, ClassType):
-        return t.entry.name
+        return t.c.name
     return f"{render(t.left)} | {render(t.right)}"
 
 
