@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma; \zeta \vdash t : R$}
+\flushleft \shadebox{$\Gamma; \zeta \vdash s : R$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{pass}}]
@@ -90,12 +90,12 @@
 \and
 \inferrule*[lab={\ruleName{seq}}]
 {
-  \Gamma; \zeta \vdash t : \Assigns{\Delta} \\
-  \Gamma \override \Delta ; \tau \vdash t' : R \\
-  \capturesS(t) \cap \assignsS(t') = \varnothing
+  \Gamma; \zeta \vdash s : \Assigns{\Delta} \\
+  \Gamma \override \Delta ; \zeta \vdash s' : R \\
+  \capturesS(s) \cap \assignsS(s') = \varnothing
 }
 {
-  \Gamma; \zeta \vdash t\;t' : \Assigns{\Delta} \override R
+  \Gamma; \zeta \vdash s\;s' : \Assigns{\Delta} \override R
 }
 \and
 \inferrule*[lab={\ruleName{def}}]
@@ -130,33 +130,7 @@
 {
   \Gamma; \zeta \vdash \exMatch{e}{\seq{h}} : S \merge \Assigns{\varnothing}
 }
-\and
-\inferrule*[lab={\ruleName{class}}]
-{
-  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
-  \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
-  \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
-  C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}
-}
-{
-  \Gamma; \zeta \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{C}}}
-}
-\and
-\inferrule*[lab={\ruleName{class-extend}}]
-{
-  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
-  \bind{c'}{\clsEntry{\Gamma'}{q.c'}{\seq{y}}{c^\dagger}} \in \Gamma \\
-  \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
-  \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
-  \seq{x} \cap \dom(\fields(\Gamma(c'))) = \varnothing \\
-  C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{c'}
-}
-{
-  \Gamma; \zeta \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{C}}}
-}
 \end{mathpar}
-\caption{Statement $t$ has result type $R$ in $\Gamma$, with optional return type $\zeta$}
+\caption{Statement $s$ has result type $R$ in $\Gamma$, with optional return type $\zeta$}
 \label{fig:typing-stmt}
 \end{figure}

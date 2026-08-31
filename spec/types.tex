@@ -162,8 +162,11 @@ that type has no rule.
 \subsection{Statement typing}
 \label{sec:statement-typing}
 
-$\Gamma; \zeta \vdash t : R$ says that $t$ has result type $R$ in $\Gamma$, with return type $\zeta$,
-empty at the top level of a module (\figref{typing-stmt}). Every rule passes $\zeta$ down unchanged. A
+$\Gamma; \zeta \vdash s : R$ says that $s$ has result type $R$ in $\Gamma$, with return type $\zeta$
+(\figref{typing-stmt}); every rule passes $\zeta$ down unchanged. Top-level statements have a judgement of
+their own, $\Gamma \vdash t : R$ (\figref{typing-top}): a sequence composes as a statement sequence does, a
+class declaration is a top-level form, and a plain statement is checked with no return type
+(\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A
 \pyinline{return} checks its expression against $\zeta$, and a bare \pyinline{return} requires $\zeta$ to
 admit \pyinline{None}. An annotated assignment checks the expression against the type of the annotation,
 and an unannotated assignment takes the type the expression synthesises (\ruleName{assign},
@@ -192,6 +195,8 @@ pattern against the residual (\secref{exhaustiveness}), which yields the binding
 the shapes the pattern leaves. The body is then checked under the bindings.
 
 \input{spec/fig/typing-stmt}
+
+\input{spec/fig/typing-top}
 
 \subsection{Exhaustiveness checking}
 \label{sec:exhaustiveness}
@@ -286,7 +291,7 @@ although each covers only part of the type.
 
 Static loading types a module's body and computes its signature
 (\figrefThree{typing-imports}{typing-import-prefix}{typing-module}). The \ruleName{module} rule types the
-body with no return type, so a \pyinline{return} has no derivation at the top level, and the
+body as a top-level statement, and the
 \ruleName{predefined} rule refines the signature of a predefined module by \figref{predefined-types}.
 
 \input{spec/fig/typing-module}

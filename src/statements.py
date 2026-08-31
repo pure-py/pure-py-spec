@@ -154,10 +154,37 @@ def annotated(e: ast.expr | None) -> TypeExpr:
 def check_body(
     body: list[ast.stmt], ctx: ModuleContext, returns: Type | None = None
 ) -> ResultType:
-    """Check a body in a function declared to return `returns`, or at the top
-    level of a module, where a return is not allowed at all."""
+    """Check a block in a function declared to return `returns`."""
     result, _ = check_seq(statements(body), ctx, returns)
     return result
+
+
+def check_top_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
+    """Check a module body's top-level statements, threading the context, and
+    give the context after them; class declarations are top-level forms."""
+    if len(items) == 0:
+        return ctx
+    head, tail = items[0], items[1:]
+    head_result = check_top_statement(head, ctx)
+    ctx_after = extend(head_result, ctx)
+    if len(tail) == 0:
+        return ctx_after
+    reassigned = captures_statement(head) & assigns_seq(tail)
+    if reassigned:
+        name = min(reassigned)
+        ra_node = find_first_reassigning(tail, reassigned)
+        assert ra_node is not None
+        raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
+    return check_top_seq(tail, ctx_after)
+
+
+def check_top_statement(item: Statement, ctx: ModuleContext) -> ResultType:
+    """A class declaration is checked here; any other top-level statement is a
+    plain statement, checked with no return type (top-stmt)."""
+    if isinstance(item, ast.ClassDef):
+        check_class_decl(item, ctx.gamma, ctx.q)
+        return Assigns({item.name: class_entry_for(item, ctx.q, ctx.gamma)})
+    return check_statement(item, ctx, None)
 
 
 def check_seq(
@@ -295,9 +322,6 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
     if isinstance(s, ast.Match):
         subject = synth_expr(s.subject, ctx)
         return check_match_cases(s.cases, subject, ctx, returns)
-    if isinstance(s, ast.ClassDef):
-        check_class_decl(s, ctx.gamma, ctx.q)
-        return Assigns({s.name: class_entry_for(s, ctx.q, ctx.gamma)})
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 

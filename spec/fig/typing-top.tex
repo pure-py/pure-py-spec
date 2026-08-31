@@ -1,0 +1,51 @@
+\begin{figure}
+\flushleft \shadebox{$\Gamma \vdash t : R$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{top-stmt}}]
+{
+  \Gamma; \varepsilon \vdash s : R
+}
+{
+  \Gamma \vdash s : R
+}
+\and
+\inferrule*[lab={\ruleName{top-seq}}]
+{
+  \Gamma \vdash t : \Assigns{\Delta} \\
+  \Gamma \override \Delta \vdash t' : R \\
+  \capturesS(t) \cap \assignsS(t') = \varnothing
+}
+{
+  \Gamma \vdash t\;t' : \Assigns{\Delta} \override R
+}
+\and
+\inferrule*[lab={\ruleName{class}}]
+{
+  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
+  \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
+  \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
+  \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
+  C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}
+}
+{
+  \Gamma \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{C}}}
+}
+\and
+\inferrule*[lab={\ruleName{class-extend}}]
+{
+  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
+  \bind{c'}{\clsEntry{\Gamma'}{q.c'}{\seq{y}}{c^\dagger}} \in \Gamma \\
+  \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
+  \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
+  \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
+  \seq{x} \cap \dom(\fields(\Gamma(c'))) = \varnothing \\
+  C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{c'}
+}
+{
+  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{C}}}
+}
+\end{mathpar}
+\caption{Top-level statement $t$ has result type $R$ in $\Gamma$}
+\label{fig:typing-top}
+\end{figure}

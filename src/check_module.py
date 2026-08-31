@@ -6,8 +6,8 @@ import reasons
 import syntax
 from aux import (
     assigns_body,
-    classes,
     assigns_stmt,
+    classes,
     first_return,
     split_imports,
     statements,
@@ -25,7 +25,7 @@ from contexts import (
     predefined_context,
 )
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
-from statements import check_seq
+from statements import check_top_seq
 
 
 def name_assign(q: str) -> ast.stmt:
@@ -152,7 +152,7 @@ def check_module_(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context
     if returning is not None:  # no return rule applies with an empty return type
         raise IllFormedModule(returning, reasons.TopLevelReturn())
     items = statements(body)
-    _, final_ctx = check_seq(items, ModuleContext(gamma=gamma1, M=M, q=q))
+    final_ctx = check_top_seq(items, ModuleContext(gamma=gamma1, M=M, q=q))
     check_submodule_clash(m, gamma0, body, M, q)
     return signature(body, final_ctx, q)
 
