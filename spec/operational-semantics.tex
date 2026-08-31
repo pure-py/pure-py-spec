@@ -76,8 +76,8 @@ the scope of sequential-composition effects, so as black boxes functions are alw
 the outcome of calling it\speconly{, $\val{\pyinline{None}}$ where the statement completes without returning.}\paperonly{:}
 \paperinput{paper/operational-semantics/outcome}
 
-For $\Gamma$ and $\rho$ as above and any expression $e$ with $\Gamma \vdash e \synth \tau$, the
-expression evaluation judgement $\rho, e \Rightarrow o$\speconly{ (\figrefTwo{eval-outcome}{eval-outcome-ctd})} says that $e$ evaluates to
+For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with $\Gamma \vdash e \synth
+\tau$, the expression evaluation judgement $\rho, e \Rightarrow o$\speconly{ (\figrefTwo{eval-outcome}{eval-outcome-ctd})} says that $e$ evaluates to
 outcome $o$ in $\rho$, either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
