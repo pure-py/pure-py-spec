@@ -145,7 +145,7 @@
 \small
 \inferrule*[lab={\ruleName{eval-predefined}}]
 {
-  \mathcal{P}(q) = (\rho, \Gamma)
+  \mathcal{P}(q) = (\Gamma, \rho)
 }
 {
   q \Rightarrow_{\mathsf{load}} \val{\rho}
@@ -166,7 +166,7 @@
 {
   \mathcal{M}(q) = \seq{\iota}\;t \\
    \seq{\iota} \Rightarrow \val{\rho} \\
-  \mathcal{P}(\pyinline{builtins}) = (\rho', \Gamma') \\
+  \mathcal{P}(\pyinline{builtins}) = (\Gamma', \rho') \\
   \rho' \mathbin{\override} \rho, t \Rightarrow \aborts{\kappa}
 }
 {
