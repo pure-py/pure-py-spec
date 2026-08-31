@@ -190,9 +190,9 @@ so a function that declares a result definitely returns one.
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and the cases are taken in turn from
 $\shapesOf(\sigma, \varnothing)$, which denotes every value of $\sigma$. The \emph{residual} $L_i$ holds
 the values which have not been matched by any case up to the $i$th. Each case matches its pattern against
-the residual by the matching judgement (\secref{exhaustiveness}), yielding the pattern's bindings and the
+the residual by the \ruleName{cases} rule (\figref{pat-rows}), yielding the pattern's bindings and the
 shapes left unmatched; the body is checked under the bindings, and the pattern must agree with $\sigma$
-(\figref{agrees}). The \ruleName{match} rule applies where the final residual $L_{n+1}$ is empty;
+(\figref{agrees}). The \ruleName{match} rule applies where the final residual is empty;
 \ruleName{match-partial} applies otherwise, merging in $\Assigns{\varnothing}$ for the values that fall
 through. A literal-typed scrutinee is exhausted by covering its literals, so \pyinline{x = 42} admits a
 match with a case for \pyinline{42} alone; \pyinline{x: int = 42} keeps the type open.

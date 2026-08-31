@@ -175,7 +175,17 @@
 {
   \Gamma \vdash L, p \matches \textstyle\bigcup_{k \in M} K_k, \; \textstyle\bigcup_{k \in M} L_k \cup (L \setminus M) \binding \Delta
 }
+\and
+\inferrule*[lab={\ruleName{cases}}]
+{
+  L_0 = \shapesOf(\sigma, \varnothing) \\
+  \Gamma \vdash p_i \agrees \sigma \quad (\forall i) \\
+  \Gamma \vdash L_{i-1}, p_i \matches K_i, L_i \binding \Delta_i \quad (\forall i)
+}
+{
+  \Gamma; \sigma \vdash p_1 \cons \ldots \cons p_{n+1} \matches \Delta_1 \cons \ldots \cons \Delta_{n+1}, L_{n+1}
+}
 \end{mathpar}
-\caption{Matching rows and sets of shapes}
+\caption{Matching rows, sets of shapes, and case patterns}
 \label{fig:pat-rows}
 \end{figure}

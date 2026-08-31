@@ -115,12 +115,9 @@
 \inferrule*[lab={\ruleName{match}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma \vdash p_i \agrees \sigma \quad (\forall i) \\
-  L_0 = \shapesOf(\sigma, \varnothing) \\
-  \Gamma \vdash L_{i-1}, p_i \matches K_i, L_i \binding \Delta_i \quad (\forall i) \\
+  \Gamma; \sigma \vdash p_1 \cons \ldots \cons p_{n+1} \matches \Delta_1 \cons \ldots \cons \Delta_{n+1}, \varnothing \\
   \Gamma \override \Delta_i; \zeta \vdash s_i : R_i \quad (\forall i) \\
-  S_i = \Assigns{\Delta_i} \override R_i \quad (\forall i) \\
-  L_{n+1} = \varnothing
+  S_i = \Assigns{\Delta_i} \override R_i \quad (\forall i)
 }
 {
   \Gamma; \zeta \vdash \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} : S_1 \merge \ldots \merge S_{n+1}
@@ -129,12 +126,10 @@
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma \vdash p_i \agrees \sigma \quad (\forall i) \\
-  L_0 = \shapesOf(\sigma, \varnothing) \\
-  \Gamma \vdash L_{i-1}, p_i \matches K_i, L_i \binding \Delta_i \quad (\forall i) \\
+  \Gamma; \sigma \vdash p_1 \cons \ldots \cons p_{n+1} \matches \Delta_1 \cons \ldots \cons \Delta_{n+1}, L \\
+  L \neq \varnothing \\
   \Gamma \override \Delta_i; \zeta \vdash s_i : R_i \quad (\forall i) \\
-  S_i = \Assigns{\Delta_i} \override R_i \quad (\forall i) \\
-  L_{n+1} \neq \varnothing
+  S_i = \Assigns{\Delta_i} \override R_i \quad (\forall i)
 }
 {
   \Gamma; \zeta \vdash \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} : S_1 \merge \ldots \merge S_{n+1} \merge \Assigns{\varnothing}
