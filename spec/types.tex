@@ -134,8 +134,7 @@ syntax-directed and an expression has at most one derivation in each.
 
 The forms with synthesis rules of their own are a tuple when all its components synthesise, a
 comprehension when its body synthesises, and a non-empty list or dictionary when at least one element
-synthesises, the remaining elements checking against the join of the base types of the synthesising
-elements (\ruleName{syn-list},
+synthesises, the remaining elements checking against the join of the base types of the synthesising elements (\ruleName{syn-list},
 \ruleName{syn-tuple}, \ruleName{syn-dict}, \ruleName{syn-list-comp}, \ruleName{syn-dict-comp}). A list,
 dictionary or comprehension takes the base type of what its elements or body synthesise, since
 \pyinline{list} and \pyinline{dict} are invariant and a literal element type would keep the container from
