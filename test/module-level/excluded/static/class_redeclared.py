@@ -1,4 +1,4 @@
-# rule: module -- a module declares each class name at most once
+# rule: top-seq -- a class binding is permanent, so a name cannot be freed for redeclaration
 from dataclasses import dataclass
 
 

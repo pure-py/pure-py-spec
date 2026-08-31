@@ -1,4 +1,4 @@
-# rule: assign -- a class name may be rebound; the class itself is unaffected
+# rule: top-seq -- a class binding is permanent at the top level
 from dataclasses import dataclass
 
 

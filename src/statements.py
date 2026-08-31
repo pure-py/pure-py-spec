@@ -175,6 +175,13 @@ def check_top_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
         ra_node = find_first_reassigning(tail, reassigned)
         assert ra_node is not None
         raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
+    rebound = {
+        c for c in assigns_seq(tail) if isinstance(ctx_after.gamma.get(c), ClassEntry)
+    }
+    if rebound:
+        node = find_first_reassigning(tail, rebound)
+        assert node is not None
+        raise IllFormedModule(node, reasons.ClassRebound(min(rebound)))
     return check_top_seq(tail, ctx_after)
 
 

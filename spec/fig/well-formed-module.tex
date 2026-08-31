@@ -108,7 +108,7 @@
 \inferrule*[lab={\ruleName{wf-module}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;t \\
-  \classesOf(t) \text{ defined} \\
+  \text{no two class declarations of } t \text{ bind the same name} \\
   \vdash \seq{\iota} : \Gamma \\
   \mathcal{P}(\pyinline{builtins}) = (\rho, \Gamma') \\
   \Gamma' \mathbin{\override} \Gamma \vdash t : \Assigns{\Delta} \\

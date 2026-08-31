@@ -29,6 +29,16 @@ class InheritedFieldClash:
 
 
 @dataclass(frozen=True)
+class ClassRebound:
+    name: str
+
+    def message(self) -> str:
+        return (
+            f"'{self.name}' is bound to a class and cannot be rebound at the top level"
+        )
+
+
+@dataclass(frozen=True)
 class DuplicateClassName:
     name: str
     module: str
@@ -409,6 +419,7 @@ Reason = (
     | UnknownBaseClass
     | InheritedFieldClash
     | DuplicateClassName
+    | ClassRebound
     | UnassignedVariable
     | UndefinedVariable
     | CapturedReassignment

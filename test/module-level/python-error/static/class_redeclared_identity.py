@@ -1,4 +1,4 @@
-# rule: module -- two classes sharing a qualified name would be conflated
+# rule: top-seq -- a class binding is permanent, so no second class can take its name
 from dataclasses import dataclass
 
 

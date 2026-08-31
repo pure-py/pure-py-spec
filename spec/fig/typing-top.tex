@@ -14,7 +14,8 @@
 {
   \Gamma \vdash t : \Assigns{\Delta} \\
   \Gamma \override \Delta \vdash t' : R \\
-  \capturesS(t) \cap \assignsS(t') = \varnothing
+  \capturesS(t) \cap \assignsS(t') = \varnothing \\
+  \nexists c, C.\ \bind{c}{C} \in \Gamma \override \Delta \text{ and } c \in \assignsS(t')
 }
 {
   \Gamma \vdash t\;t' : \Assigns{\Delta} \override R

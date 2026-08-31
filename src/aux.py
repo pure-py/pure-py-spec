@@ -341,18 +341,6 @@ def nested_statements(s: ast.stmt) -> list[ast.stmt]:
     return [c for c in ast.iter_child_nodes(s) if isinstance(c, ast.stmt)]
 
 
-def classes(body: list[ast.stmt]) -> dict[str, ast.ClassDef] | None:
-    """Class declarations of a module body by name, or None where two share a
-    name."""
-    decls: dict[str, ast.ClassDef] = {}
-    for s in body:
-        if isinstance(s, ast.ClassDef):
-            if s.name in decls:
-                return None
-            decls[s.name] = s
-    return decls
-
-
 def own_fields(node: ast.ClassDef) -> tuple[tuple[str, TypeExpr], ...]:
     """Fields a class declares, with their type expressions."""
     declared = [

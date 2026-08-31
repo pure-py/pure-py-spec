@@ -1,1 +1,1 @@
-'C' captured by previous statement, reassigned here
+'C' is bound to a class and cannot be rebound at the top level
