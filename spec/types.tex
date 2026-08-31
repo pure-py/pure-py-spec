@@ -7,7 +7,7 @@ reverse. Function signatures, assignments and dataclass fields are annotated wit
 type expression denotes a type under a context (\figref{resolve-type}). Every definition carries an
 annotation for each parameter and for its return type, so the type of a definition is given rather than
 inferred from its body. A class name resolves to a
-class entry (\figref{resolve-name}) and every other name must resolve to a predefined entry (\figref{predefined-types}).
+class (\figref{resolve-name}) and every other name must resolve to a predefined entry (\figref{predefined-types}).
 
 The context entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
 that is not definitely assigned is bound to $\statusNotDefAssigned$. Two contexts from different branches of a conditional merge pointwise. A variable definitely assigned in both, at $\sigma$ and $\tau$, is of type
@@ -73,12 +73,12 @@ The \ruleName{var} rule applies whenever $\Gamma(x)$ is a type, so a variable th
 assigned has no rule. A
 literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 
-A class entry $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ records the declared
+A class $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ records the declared
 type of each field it introduces, and $\fields(C)$ is the bindings of all its fields, those of the base
 class first. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
-$\fieldMap$, checks it against that field's type, and synthesises the class entry $C$ that $q$ resolves to,
-which is the class type (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must
-synthesise a class entry $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$
+$\fieldMap$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to,
+which is the type of its instances (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must
+synthesise a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$
 (\ruleName{attr-object}). Typing a program refines the signature of a predefined module
 (Definition~\ref{def:predefined}), binding $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member listed in
 \figref{predefined-types} at its entry there. Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
@@ -175,7 +175,7 @@ admit \pyinline{None}. An annotated assignment checks the expression against the
 and an unannotated assignment takes the type the expression synthesises (\ruleName{assign},
 \ruleName{assign-unannot}). The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
-the class name to its entry, requiring the class's own fields to be distinct and, where it extends
+the class name to $\Type{C}$, requiring the class's own fields to be distinct and, where it extends
 another class, the base name to be bound to a class and the own fields not to repeat an inherited one
 (\ruleName{class}, \ruleName{class-extend}). It also requires \pyinline{dataclass} to be in scope, since
 the declaration names it. Each rule that takes an annotation resolves it to a type

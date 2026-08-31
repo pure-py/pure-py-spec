@@ -50,7 +50,7 @@ conditional merges its branches, merging in $\Assigns{\varnothing}$ unless the l
 variable or wildcard.
 \paperinput{paper/well-formedness/match}%
 A class
-declaration (\ruleName{wf-class}, \ruleName{wf-class-extend}) assigns a class entry $C$ to its name, which must
+declaration (\ruleName{wf-class}, \ruleName{wf-class-extend}) binds its name to $\Type{C}$ for the declared class $C$, which must
 not already denote a class; its fields must be distinct and, for an extension, disjoint from those of the
 base class.
 
@@ -66,7 +66,7 @@ context to a context entry $\theta$ (\figref{well-formed-expr}a). A module attri
 when, read as a qualified name, it resolves to a definitely assigned member
 (\ruleName{wf-attr-module})\paperonly{; see \secref{no-load-dependent}}. A constructor call requires its name
 to resolve to a class and its arguments to cover the class's fields exactly, through $\fieldMap$
-(\ruleName{wf-constr}). A variable bound to a module or class entry is not an expression on its own, and occurs
+(\ruleName{wf-constr}). A variable bound to a module or class is not an expression on its own, and occurs
 only as the head of a qualified name\paperonly{ (\secref{no-first-class})}.
 
 \input{spec/fig/well-formed-expr}

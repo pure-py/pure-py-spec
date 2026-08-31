@@ -40,24 +40,29 @@ take the following forms:
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Entry & Form & Records \\
 variable & $\tau$ or $\statusNotDefAssigned$ & type of definitely assigned variable, and
-$\statusNotDefAssigned$ where not definitely assigned \\
+$\statusNotDefAssigned$ if not definitely assigned \\
 module stub & $\modStub{q}$ & module $q$, named but not loaded \\
 module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$ \\
-class entry & $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ & declaring context, qualified name,
-fields with types, base class \\
+class entry & $\Type{C}$ & name denotes class $C$ \\
 predefined name & $\predefName$ & name usable only in annotation or as decorator \\
 \end{tabular}
 \end{center}
 }
 \end{definition}
 
+\begin{definition}[Class]
+\label{def:class}
+A class $C$ takes the form $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$: the context
+$\Gamma$ it was declared in, the qualified name $q.c$ that identifies it, its distinct fields $\seq{x}$ with their
+declared types $\seq{\tau}$, and its base class $c'$, or $\bot$ if it has none. A module declares each
+class name at most once, so the qualified name of a class is the identity of the class. A class is also
+the type of its instances.
+\end{definition}
+
 \noindent The well-formedness rules compute no types, so they bind a definitely assigned variable to
 $\statusDefAssigned$ in place of its type, and the two statuses together are written $\B =
 \set{\statusDefAssigned, \statusNotDefAssigned}$. Module
-references arise from import statements. A class entry records the context the class was declared in, the
-qualified name $q.c$ that identifies it, its distinct fields $\seq{x}$ with their declared types
-$\seq{\tau}$, and its base class $c'$, or $\bot$ where it has none. A module declares each class name at
-most once, so the qualified name of a class entry is the identity of the class. A predefined name is a
+references arise from import statements. A predefined name is a
 member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expression may mention: it names a
 type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}; $\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ \emph{not definitely assigned} (or, equivalently, degenerate types ``any'' and ``none'').
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusDefAssigned(X)$ for the context $\set{\bind{x}{\statusDefAssigned} \mid x \in X}$; similarly $\statusNotDefAssigned(X)$.
@@ -103,7 +108,7 @@ which follow Python.
 Parameters and assignments carry optional type annotations $\pi$ and function definitions optional return
 type annotations $\omega$, while dataclass fields carry type expressions $\psi$
 (\figref{syntax-types}). A type expression is a type as written: it names a class by a qualified name,
-where a type holds the class entry itself, and the type system resolves the one into the
+where a type holds the class itself, and the type system resolves the one into the
 other\speconly{ (\secref{types})}. We write $\seq{x}\,\seq{\pi}$ for the parameter list $x_1\pi_1, \ldots,
 x_n\pi_n$. The well-formedness rules and operational semantics do not consult annotations, which are given
 meaning by the type system.

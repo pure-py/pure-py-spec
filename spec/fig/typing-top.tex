@@ -15,7 +15,7 @@
   \Gamma \vdash t : \Assigns{\Delta} \\
   \Gamma \override \Delta \vdash t' : R \\
   \capturesS(t) \cap \assignsS(t') = \varnothing \\
-  \nexists c, C.\ \bind{c}{C} \in \Delta \text{ and } c \in \assignsS(t')
+  \nexists c, C.\ \bind{c}{\Type{C}} \in \Delta \text{ and } c \in \assignsS(t')
 }
 {
   \Gamma \vdash t\;t' : \Assigns{\Delta} \override R
@@ -29,20 +29,20 @@
   C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}
 }
 {
-  \Gamma \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{C}}}
+  \Gamma \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{\Type{C}}}}
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \bind{c'}{\clsEntry{\Gamma'}{q.c'}{\seq{y}}{c^\dagger}} \in \Gamma \\
+  \bind{c'}{\Type{C'}} \in \Gamma \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
   \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
-  \seq{x} \cap \dom(\fields(\Gamma(c'))) = \varnothing \\
+  \seq{x} \cap \dom(\fields(C')) = \varnothing \\
   C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{c'}
 }
 {
-  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{C}}}
+  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{\Type{C}}}}
 }
 \end{mathpar}
 \caption{Top-level statement $t$ has result type $R$ in $\Gamma$}

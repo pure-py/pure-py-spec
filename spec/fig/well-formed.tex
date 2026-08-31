@@ -119,19 +119,19 @@
   C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{\bot}
 }
 {
-  \Gamma \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{C}}}
+  \Gamma \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{\Type{C}}}}
 }
 \and
 \inferrule*[lab={\ruleName{wf-class-extend}}]
 {
   \nexists C'.\ \bind{c}{C'} \in \Gamma \\
-  \bind{c'}{\clsEntry{\Gamma'}{q.c'}{\seq{y}}{c^\dagger}} \in \Gamma \\
+  \bind{c'}{\Type{C'}} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \seq{x} \cap \dom(\fields(\Gamma(c'))) = \varnothing \\
+  \seq{x} \cap \dom(\fields(C')) = \varnothing \\
   C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}
 }
 {
-  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{C}}}
+  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{\Type{C}}}}
 }
 \end{mathpar}
 \caption{Statement $t$ is well-formed in $\Gamma$ with result type $R$}

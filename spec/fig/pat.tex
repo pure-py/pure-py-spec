@@ -47,7 +47,7 @@
 \and
 \inferrule*[lab={\ruleName{pat-rest-constr}}]
 {
-  \Gamma \vdash q : C \\
+  \Gamma \vdash q : \Type{C} \\
   \nexists C' \in N.\ \Gamma \vdash C \subty C' \\
   \tau, C \text{ comparable} \\
   E \text{ the lower of } \tau \text{ and } C \\
@@ -78,7 +78,7 @@
 \and
 \inferrule*[lab={\ruleName{pat-constr}}]
 {
-  \Gamma \vdash q' : C' \\
+  \Gamma \vdash q' : \Type{C'} \\
   \Gamma \vdash C \subty C' \\
   \fields(C') = \bind{\seq{x}}{\seq{\sigma}} \\
   p_i = \fieldMap(C', a)(x_i) \quad (\forall i \leq n) \\
@@ -91,7 +91,7 @@
 \and
 \inferrule*[lab={\ruleName{pat-constr-sub}}]
 {
-  \Gamma \vdash q' : C' \\
+  \Gamma \vdash q' : \Type{C'} \\
   \Gamma \vdash C' \subty C \\
   C' \neq C \\
   \nexists C'' \in N.\ \Gamma \vdash C' \subty C'' \\

@@ -53,7 +53,7 @@
 { \Gamma \vdash \patDict{\bind{\seq{w}}{\seq{p}}} \agrees \tau }
 \and
 \inferrule*[lab={\ruleName{agrees-constr}}]
-{ \Gamma \vdash q : C \\ \Gamma \vdash \fieldMap(C, a)(x) \agrees \sigma \quad (\forall \bind{x}{\sigma} \in \fields(C)) }
+{ \Gamma \vdash q : \Type{C} \\ \Gamma \vdash \fieldMap(C, a)(x) \agrees \sigma \quad (\forall \bind{x}{\sigma} \in \fields(C)) }
 { \Gamma \vdash \patConstr{q}{a} \agrees \tau }
 \end{mathpar}
 \caption{Pattern $p$ agrees with type $\tau$ under $\Gamma$}
