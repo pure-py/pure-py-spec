@@ -807,13 +807,6 @@ def elem_entry(e: ast.expr, ctx: ModuleContext) -> Type:
     return elem
 
 
-def check_exprs(es: list[ast.expr], ctx: ModuleContext) -> None:
-    if len(es) == 0:
-        return
-    synth_expr(es[0], ctx)
-    check_exprs(es[1:], ctx)
-
-
 def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
     base = (
         node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
@@ -852,7 +845,9 @@ def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
 
 def describe(p: ast.pattern, ctx: ModuleContext) -> str:
     if isinstance(p, ast.MatchAs):
-        assert p.pattern is not None  # a bare variable or wildcard agrees and matches
+        assert (
+            p.pattern is not None
+        )  # a bare variable or wildcard never conflicts and always matches
         return describe(p.pattern, ctx)
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
         return f"a pattern of type {render(LiteralType(literal_of(p)))}"

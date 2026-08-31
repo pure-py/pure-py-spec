@@ -34,12 +34,12 @@ def subtype(s: Type, t: Type, ctx: ModuleContext) -> bool:
         return True
     if s == Primitive.INT and t == Primitive.FLOAT:
         return True
-    if isinstance(s, LiteralType):
-        return subtype(base_type(s.value), t, ctx)
     if isinstance(s, UnionType):
         return subtype(s.left, t, ctx) and subtype(s.right, t, ctx)
     if isinstance(t, UnionType):
         return subtype(s, t.left, ctx) or subtype(s, t.right, ctx)
+    if isinstance(s, LiteralType):
+        return subtype(base_type(s.value), t, ctx)
     if t == Primitive.SIZED:
         return isinstance(s, (ListType, DictType, TupleType)) or s == Primitive.STR
     if isinstance(s, ClassType) and isinstance(t, ClassType):

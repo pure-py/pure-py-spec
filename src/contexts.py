@@ -130,8 +130,8 @@ ASSIGNS_EMPTY = Assigns()
 FLOAT_TO_FLOAT = CallableType((Primitive.FLOAT,), Primitive.FLOAT)
 FLOAT_TO_INT = CallableType((Primitive.FLOAT,), Primitive.INT)
 
-# The type of each predefined member, with Status.TT for the members that name a
-# type rather than a value.
+# The type of each predefined member, with PredefinedName for the members
+# usable only in an annotation or as a decorator.
 PREDEFINED_MEMBERS: dict[str, dict[str, ContextEntry]] = {
     "builtins": {
         "print": CallableType((Primitive.OBJECT,), Primitive.NONE),
