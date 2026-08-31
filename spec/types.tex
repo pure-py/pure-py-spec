@@ -250,22 +250,10 @@ the scrutinee's type $\sigma$, the order in which $\dispatch$ tries the cases at
 (\figref{typing-stmt}). Each case matches its pattern against the residual, checks its
 body under the bindings that matching gives, and passes on the residual of the match. The evaluation rules
 apply a sequence pattern only to a value of its own kind, although Python would match either
-(\figref{eval-pat}); each case's pattern must therefore \emph{agree} with the scrutinee's base type.
-\begin{defalign}
-\Gamma \vdash p \agrees \tau \quad & \text{if } p \text{ a variable, wildcard, literal or negated literal} \\
-\Gamma \vdash p\;\pyinline{as}\;x \agrees \tau \quad & \text{if } \Gamma \vdash p \agrees \tau \\
-\Gamma \vdash p \agrees \tyUnion{\sigma}{\tau} \quad & \text{if } \Gamma \vdash p \agrees \sigma \text{ and } \Gamma \vdash p \agrees \tau \\
-\Gamma \vdash \patTuple{p_1, \ldots, p_n} \agrees \tyTuple{\tau_1, \ldots, \tau_n} \quad & \text{if } \Gamma \vdash p_i \agrees \tau_i \text{ for each } i \\
-\Gamma \vdash \patTuple{\seq{p}} \agrees \tau \quad & \text{if } \tau \text{ neither a list type, a union, nor a tuple type of the same arity} \\
-\Gamma \vdash \patList{p_1, \ldots, p_n} \agrees \tyList{\tau} \quad & \text{if } \Gamma \vdash p_i \agrees \tau \text{ for each } i \\
-\Gamma \vdash \patList{\seq{p}} \agrees \tau \quad & \text{if } \tau \text{ neither a tuple type, a union, nor a list type} \\
-\Gamma \vdash \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \agrees \tyDict{\tau} \quad & \text{if } \Gamma \vdash p_i \agrees \tau \text{ for each } i \\
-\Gamma \vdash \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \agrees \tau \quad & \text{if } \tau \text{ neither a dictionary type nor a union} \\
-\Gamma \vdash \patConstr{q}{a} \agrees \tau \quad & \text{if } \Gamma \vdash q : C \text{ and } \Gamma \vdash \fieldMap(C, a)(x) \agrees \sigma \\
-& \qquad \text{for each } \bind{x}{\sigma} \in \fields(C)
-\end{defalign}
-\noindent A match on $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ thus admits no
-sequence pattern. A case that matches nothing is
+(\figref{eval-pat}); each case's pattern must therefore \emph{agree} with the scrutinee's base type
+(\figref{agrees}).
+A match on $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ thus admits no sequence
+pattern. A case that matches nothing is
 rejected, whether because the scrutinee can never take that shape or because the earlier cases already cover it. \ruleName{match}
 applies where the walk ends with an empty residual, and \ruleName{match-partial} where it does not, merging
 in $\Assigns{\varnothing}$ for the values that fall through. A union is exhausted
@@ -283,6 +271,8 @@ exhausts a dictionary type (\ruleName{pat-dict-nil}). Exhaustiveness need not co
 $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave nothing,
 although each covers only part of the type.
+
+\input{spec/fig/agrees}
 
 \input{spec/fig/shape-typing}
 
