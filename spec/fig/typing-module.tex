@@ -99,11 +99,10 @@
 \small
 \inferrule*[lab={\ruleName{predefined}}]
 {
-  \mathcal{P}(q) = (\rho, \Gamma') \\
-  \Delta \text{ the entries listed for } q \text{ in \figref{predefined-types}}
+  \mathcal{P}(q) = (\rho, \Gamma')
 }
 {
-  \vdash_{\mathsf{load}} q : \Gamma' \override \set{\bind{\pymath{\_\_name\_\_}}{\tyStr}} \override \Delta
+  \vdash_{\mathsf{load}} q : \Gamma'
 }
 \and
 \inferrule*[lab={\ruleName{module}}]
