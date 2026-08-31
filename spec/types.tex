@@ -245,7 +245,7 @@ If $\Gamma \vdash h : \tau$ for every $h \in N$ then $\Gamma \vdash k : \tau$ fo
 \matches K, L' \binding \Delta$ then $\Gamma \vdash k : \tau$ for each $k \in K \cup L'$.
 \end{lemma}
 
-The cases are then taken in turn, first to last, from $\shapesOf(\widen(\sigma), \varnothing)$ for
+The cases are then taken in turn, from $\shapesOf(\widen(\sigma), \varnothing)$ for
 the scrutinee's type $\sigma$, the order in which $\dispatch$ tries the cases at run time
 (\figref{typing-stmt}). Each case matches its pattern against the residual, checks its
 body under the bindings that matching gives, and passes on the residual of the match. The evaluation rules
