@@ -475,7 +475,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
         return binary(BINARY_NAMES[type(e.ops[0])], e.left, e.comparators[0], e, ctx)
     if isinstance(e, ast.IfExp):
         check_expr(e.test, Primitive.BOOL, ctx)
-        return join([synth_expr(e.body, ctx), synth_expr(e.orelse, ctx)], ctx)
+        return branch_type(e, ctx)
     if isinstance(e, ast.Attribute):
         parent = entry_of(e.value, ctx)
         if isinstance(parent, ModuleLoaded):
@@ -586,6 +586,21 @@ def literal_index(t: Type) -> int | None:
     return v if isinstance(v, int) and not isinstance(v, bool) else None
 
 
+def branch_type(e: ast.IfExp, ctx: ModuleContext) -> Type:
+    """A conditional expression synthesises at the join of the types its
+    synthesising branches give, which must not be none, the other branch
+    checking against that join."""
+    branches = [e.body, e.orelse]
+    synthesising = [x for x in branches if synthesises(x)]
+    if len(synthesising) == 0:
+        raise IllFormedModule(e, reasons.NotSynthesised())
+    t = join([synth_expr(x, ctx) for x in synthesising], ctx)
+    for x in branches:
+        if not synthesises(x):
+            check_expr(x, t, ctx)
+    return t
+
+
 def list_type(e: ast.expr, elts: list[ast.expr], ctx: ModuleContext) -> ListType:
     """A list synthesises at the join of the base types of the elements that
     synthesise, which must not be none, the others checking against it."""
@@ -606,7 +621,7 @@ def synthesises(e: ast.expr) -> bool:
     if isinstance(e, ast.Lambda):
         return False
     if isinstance(e, ast.IfExp):
-        return synthesises(e.body) and synthesises(e.orelse)
+        return synthesises(e.body) or synthesises(e.orelse)
     if isinstance(e, ast.List):
         return any(synthesises(x) for x in e.elts)
     if isinstance(e, ast.Dict):

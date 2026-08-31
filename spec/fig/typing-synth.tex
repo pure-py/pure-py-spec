@@ -91,11 +91,11 @@
 \inferrule*[lab={\ruleName{syn-cond}}]
 {
   \Gamma \vdash e \checks \tyBool \\
-  \Gamma \vdash e_1 \synth \sigma \\
-  \Gamma \vdash e_2 \synth \tau
+  I = \set{i \mid \Gamma \vdash e_i \synth \sigma_i} \neq \varnothing \\
+  \Gamma \vdash e_j \checks \joinTy(\sigma_i \mid i \in I) \quad (\forall j \notin I)
 }
 {
-  \Gamma \vdash \exCondExpr{e_1}{e}{e_2} \synth \joinTy(\sigma, \tau)
+  \Gamma \vdash \exCondExpr{e_1}{e}{e_2} \synth \joinTy(\sigma_i \mid i \in I)
 }
 \and
 \inferrule*[lab={\ruleName{and}}]
