@@ -69,8 +69,8 @@ amounts to a comparison of qualified names.
 
 \subsection{Statements and expressions}
 
-For any context $\Gamma$, any environment $\rho$ with $\bind{\rho}{\Gamma}$ and any top-level statement
-$t$ with $\Gamma \vdash t : R$, the statement evaluation judgement $\rho, t \Rightarrow r$ says that $t$ evaluates
+For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any top-level statement $t$ with
+$\Gamma \vdash t : R$, the statement evaluation judgement $\rho, t \Rightarrow r$ says that $t$ evaluates
 to result $r$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Function definitions delimit
 the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\outcome$\speconly{ (\S\ref{aux:outcome})} reads a statement's result as
 the outcome of calling it\speconly{, $\val{\pyinline{None}}$ where the statement completes without returning.}\paperonly{:}
