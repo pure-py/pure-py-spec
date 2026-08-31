@@ -187,14 +187,17 @@ at $\statusNotDefAssigned$ (\ruleName{def}). The body is checked with the
 declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
-A \pyinline{match} scrutinee synthesises a type. Both \pyinline{match} rules take the cases in turn,
-requiring each to match something and the whole list to exhaust the type. The \emph{residual} $L_i$ holds
-the values no case up to the $i$th has matched, starting from $\shapesOf(\sigma, \varnothing)$, which
-denotes every value of the scrutinee's type. A literal-typed scrutinee is exhausted by covering its
-literals, so \pyinline{x = 42} admits a match with a case for \pyinline{42} alone; the annotation
-\pyinline{x: int = 42} keeps the type open. Each case matches its pattern against the residual
-(\secref{exhaustiveness}), which yields the bindings the pattern makes and the shapes the pattern leaves.
-The body is then checked under the bindings.
+A \pyinline{match} scrutinee synthesises a type $\sigma$, and the cases are taken in turn from
+$\shapesOf(\sigma, \varnothing)$, which denotes every value of $\sigma$. The \emph{residual} $L_i$ holds
+the values no case up to the $i$th has matched. Each case must match some of them; \ruleName{match}
+applies where the last case leaves none, and \ruleName{match-partial} otherwise, merging in
+$\Assigns{\varnothing}$ for the values that fall through. A literal-typed scrutinee is exhausted by
+covering its literals, so \pyinline{x = 42} admits a match with a case for \pyinline{42} alone;
+\pyinline{x: int = 42} keeps the type open.
+
+Each case matches its pattern against the residual by the matching judgement
+(\secref{exhaustiveness}), yielding the bindings the pattern makes and the shapes the pattern leaves. The
+body is checked under the bindings, and the pattern must agree with $\sigma$ (\figref{agrees}).
 
 \input{spec/fig/typing-stmt}
 
@@ -245,18 +248,12 @@ If $\Gamma \vdash h : \tau$ for every $h \in N$ then $\Gamma \vdash k : \tau$ fo
 \matches K, L' \binding \Delta$ then $\Gamma \vdash k : \tau$ for each $k \in K \cup L'$.
 \end{lemma}
 
-The cases are then taken in turn, from $\shapesOf(\sigma, \varnothing)$ for
-the scrutinee's type $\sigma$, the order in which $\dispatch$ tries the cases at run time
-(\figref{typing-stmt}). Each case matches its pattern against the residual, checks its
-body under the bindings that matching gives, and passes on the residual of the match. The evaluation rules
-apply a sequence pattern only to a value of its own kind, although Python would match either
-(\figref{eval-pat}); each case's pattern must therefore \emph{agree} with the scrutinee's base type
-(\figref{agrees}).
-A match on $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ thus admits no sequence
-pattern. A case that matches nothing is
-rejected, whether because the scrutinee can never take that shape or because the earlier cases already cover it. \ruleName{match}
-applies where the walk ends with an empty residual, and \ruleName{match-partial} where it does not, merging
-in $\Assigns{\varnothing}$ for the values that fall through. A union is exhausted
+The match rules (\figref{typing-stmt}) take the cases in the order $\dispatch$ tries them at run
+time. A case that matches nothing is rejected, whether because the scrutinee can never take that shape or
+because the earlier cases already cover it. The evaluation rules apply a sequence pattern only to a value
+of its own kind, although Python would match either (\figref{eval-pat}); each case's pattern must
+therefore agree with the scrutinee's type (\figref{agrees}), so a match on
+$\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no sequence pattern. A union is exhausted
 by covering each member, a class type by a pattern for the class itself, and \pyinline{bool} by
 \pyinline{True} and \pyinline{False}, while \pyinline{int}, \pyinline{str} and lists have
 unboundedly many heads and need a variable or wildcard. A constructor pattern whose class lies below a
