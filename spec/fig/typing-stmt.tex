@@ -115,7 +115,7 @@
 \inferrule*[lab={\ruleName{match}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma; \sigma \vdash p_1 \cons \ldots \cons p_{n+1} \matches \Delta_1 \cons \ldots \cons \Delta_{n+1}, \varnothing \\
+  \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, \varnothing \\
   \Gamma \override \Delta_i; \zeta \vdash s_i : R_i \quad (\forall i) \\
   S_i = \Assigns{\Delta_i} \override R_i \quad (\forall i)
 }
@@ -126,7 +126,7 @@
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma; \sigma \vdash p_1 \cons \ldots \cons p_{n+1} \matches \Delta_1 \cons \ldots \cons \Delta_{n+1}, L \\
+  \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L \\
   L \neq \varnothing \\
   \Gamma \override \Delta_i; \zeta \vdash s_i : R_i \quad (\forall i) \\
   S_i = \Assigns{\Delta_i} \override R_i \quad (\forall i)
