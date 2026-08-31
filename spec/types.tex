@@ -270,10 +270,9 @@ although each covers only part of the type.
 \label{sec:typing-modules}
 
 Static loading types a module's body and computes its signature
-(\figrefThree{typing-imports}{typing-import-prefix}{typing-module}). The rules are those of
-\secref{well-formedness-modules}, with two changes: \ruleName{module} types the body with no return type,
-so a \pyinline{return} has no derivation at the top level, and \ruleName{predefined} refines the
-signature of a predefined module by \figref{predefined-types}.
+(\figrefThree{typing-imports}{typing-import-prefix}{typing-module}). The \ruleName{module} rule types the
+body with no return type, so a \pyinline{return} has no derivation at the top level, and the
+\ruleName{predefined} rule refines the signature of a predefined module by \figref{predefined-types}.
 
 \input{spec/fig/typing-module}
 
