@@ -166,8 +166,8 @@ signature $\ominus : \sigma \to \tau$, relating operand types to result type
 signature with type variables stands for all its instances, which agree on the result type; a variable binds
 the operand's type as it is, and an operand type written out is matched by any subtype of it. Where several
 signatures give a result the first listed is used, so \pyinline{1 + 2} is an \pyinline{int} and
-\pyinline{1 + 2.0} a \pyinline{float}. Equality is available on \emph{equality types}, which are the types
-whose values structural equality relates:
+\pyinline{1 + 2.0} a \pyinline{float}. Equality is available on \emph{equality types}, the types for which
+structural equality is defined:
 \begin{defalign}
 \Gamma \vdash \nu \eqType \\
 \Gamma \vdash \tyLiteral{\ell} \eqType \\
