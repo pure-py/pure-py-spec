@@ -85,24 +85,19 @@
 \renewcommand*{\thefigure}{S\arabic{figure}}
 \setcounter{figure}{0}
 
-\addsec{Metavariables}
-
-The metavariables used throughout.
-
 \input{spec/fig/metavariables}
 
-\addsec{Judgement forms}
-
-The judgement forms of the well-formedness rules and the operational semantics, with the figure defining
-each.
-
+\begin{figure}
 \input{spec/fig/judgement-index}
+\caption{Judgement forms}
+\label{fig:judgement-index}
+\end{figure}
 
-\addsec{Auxiliary functions}
-
-The auxiliary functions used by the rules, with the section defining each.
-
+\begin{figure}
 \input{spec/fig/auxiliary-index}
+\caption{Auxiliary functions}
+\label{fig:auxiliary-index}
+\end{figure}
 
 \FloatBarrier
 \renewcommand*{\thefigure}{\thechapter.\arabic{figure}}
