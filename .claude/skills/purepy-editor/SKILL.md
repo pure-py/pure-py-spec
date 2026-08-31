@@ -15,6 +15,7 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 - Name things with nouns, not free relative clauses: "matched shapes", not "what it matches"; "the residual", not "what is left over".
 - Prefer a participle or a named term to a postmodifying relative clause: "variables assigned in the body", not "the variables the body assigns"; "the residual", not "the part it leaves". Where a metafunction names the concept, use its name.
 - A condition takes "if" or "when", not "where": "undefined if two declarations share a name". "Where" reads as a place, so reserve it for quantifying over positions ("the rows differ where the pattern is a literal") and for binding a symbol ("where n is the arity").
+- Do not coin terminology, in the spec or in conversation ("foreign module", "fresh position"). Use the spec's own terms or plain description ("a module other than the enclosing one").
 - No defensive coding. If a case shouldn't arise, assert it; don't silently return a safe default.
 
 ## LaTeX
