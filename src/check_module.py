@@ -6,8 +6,8 @@ import reasons
 import syntax
 from aux import (
     assigns_body,
-    assigns_stmt,
     classes,
+    assigns_stmt,
     first_return,
     split_imports,
     statements,

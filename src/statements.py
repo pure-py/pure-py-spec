@@ -785,17 +785,17 @@ def check_exprs(es: list[ast.expr], ctx: ModuleContext) -> None:
 
 
 def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
+    base = (
+        node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
+    )
     ctx = ModuleContext(gamma=context, q=q)
-    name = f"{q}.{node.name}"
-    own = tuple((x, resolve_type(psi, node, ctx)) for x, psi in own_fields(node))
-    if len(node.bases) == 0:
-        return ClassEntry(name=name, fields=own, ancestors=(name,))
-    base = node.bases[0]
-    assert isinstance(base, ast.Name)
-    entry = context[base.id]  # a class entry, by check_class_decl
-    assert isinstance(entry, ClassEntry)
     return ClassEntry(
-        name=name, fields=entry.fields + own, ancestors=(name,) + entry.ancestors
+        context=context,
+        name=f"{q}.{node.name}",
+        own_fields=tuple(
+            (x, resolve_type(psi, node, ctx)) for x, psi in own_fields(node)
+        ),
+        base=base,
     )
 
 

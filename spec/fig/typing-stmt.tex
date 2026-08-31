@@ -137,7 +137,7 @@
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
   \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
-  C = \replaced{\clsEntry{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{q.c}}{\mathsf{Cls}_{\Gamma}(q.c, \bind{\seq{x}}{\seq{\sigma}}, \bot)}
+  C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}
 }
 {
   \Gamma; \zeta \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{C}}}
@@ -146,12 +146,12 @@
 \inferrule*[lab={\ruleName{class-extend}}]
 {
   \nexists C'.\ \bind{c}{C'} \in \Gamma \\
-  \bind{c'}{\replaced{\clsEntry{q.c'}{\bind{\seq{y}}{\seq{\tau}}}{A}}{\mathsf{Cls}_{\Gamma'}(q.c', \seq{y}, c^\dagger)}} \in \Gamma \\
+  \bind{c'}{\clsEntry{\Gamma'}{q.c'}{\seq{y}}{c^\dagger}} \in \Gamma \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
   \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
-  \seq{x} \cap \replaced{\set{\seq{y}}}{\dom(\fields(\Gamma(c')))} = \varnothing \\
-  C = \replaced{\clsEntry{q.c}{\bind{\seq{y}}{\seq{\tau}} \mathbin{\concat} \bind{\seq{x}}{\seq{\sigma}}}{q.c \cons A}}{\mathsf{Cls}_{\Gamma}(q.c, \bind{\seq{x}}{\seq{\sigma}}, c')}
+  \seq{x} \cap \dom(\fields(\Gamma(c'))) = \varnothing \\
+  C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{c'}
 }
 {
   \Gamma; \zeta \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{C}}}

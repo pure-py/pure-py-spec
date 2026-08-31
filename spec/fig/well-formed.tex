@@ -116,7 +116,7 @@
 {
   \nexists C'.\ \bind{c}{C'} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  C = \replaced{\clsEntry{q.c}{\bind{\seq{x}}{\seq{\tau}}}{q.c}}{\mathsf{Cls}_{\Gamma}(q.c, \bind{\seq{x}}{\seq{\tau}}, \bot)}
+  C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{\bot}
 }
 {
   \Gamma \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{C}}}
@@ -125,10 +125,10 @@
 \inferrule*[lab={\ruleName{wf-class-extend}}]
 {
   \nexists C'.\ \bind{c}{C'} \in \Gamma \\
-  \bind{c'}{\replaced{\clsEntry{q.c'}{\bind{\seq{y}}{\seq{\tau}\,'}}{A}}{\mathsf{Cls}_{\Gamma'}(q.c', \seq{y}, c^\dagger)}} \in \Gamma \\
+  \bind{c'}{\clsEntry{\Gamma'}{q.c'}{\seq{y}}{c^\dagger}} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \seq{x} \cap \replaced{\set{\seq{y}}}{\dom(\fields(\Gamma(c')))} = \varnothing \\
-  C = \replaced{\clsEntry{q.c}{\bind{\seq{y}}{\seq{\tau}\,'} \mathbin{\concat} \bind{\seq{x}}{\seq{\tau}}}{q.c \cons A}}{\mathsf{Cls}_{\Gamma}(q.c, \bind{\seq{x}}{\seq{\tau}}, c')}
+  \seq{x} \cap \dom(\fields(\Gamma(c'))) = \varnothing \\
+  C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}
 }
 {
   \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{C}}}

@@ -73,10 +73,9 @@ The \ruleName{var} rule applies whenever $\Gamma(x)$ is a type, so a variable th
 assigned has no rule. A
 literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 
-\Replaced{A class entry $\clsEntry{q.c}{\bind{\seq{x}}{\seq{\tau}}}{A}$ records its fields with
-their declared types, those of the base class first, and $\fields(C)$ is that sequence.}{A class entry
-$\mathsf{Cls}_{\Gamma}(q.c, \bind{\seq{x}}{\seq{\tau}}, c')$ records the declared type of each field it
-introduces, and $\fields(C)$ is the bindings of all its fields, those of the base class first.} A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
+A class entry $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ records the declared
+type of each field it introduces, and $\fields(C)$ is the bindings of all its fields, those of the base
+class first. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises the class entry $C$ that $q$ resolves to,
 which is the class type (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must
 synthesise a class entry $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$

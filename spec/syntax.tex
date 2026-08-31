@@ -43,7 +43,8 @@ variable & $\tau$ or $\statusNotDefAssigned$ & type of definitely assigned varia
 $\statusNotDefAssigned$ where not definitely assigned \\
 module stub & $\modStub{q}$ & module $q$, named but not loaded \\
 module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$ \\
-class entry & $\replaced{\clsEntry{q.c}{\bind{\seq{x}}{\seq{\tau}}}{A}}{\mathsf{Cls}_{\Gamma}(q.c, \bind{\seq{x}}{\seq{\tau}}, c')}$ & \replaced{qualified name, fields with types (inherited first), ancestor names}{declaring context, qualified name, fields with types, base class} \\
+class entry & $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ & declaring context, qualified name,
+fields with types, base class \\
 predefined name & $\predefName$ & name usable only in annotation or as decorator \\
 \end{tabular}
 \end{center}
@@ -53,11 +54,9 @@ predefined name & $\predefName$ & name usable only in annotation or as decorator
 \noindent The well-formedness rules compute no types, so they bind a definitely assigned variable to
 $\statusDefAssigned$ in place of its type, and the two statuses together are written $\B =
 \set{\statusDefAssigned, \statusNotDefAssigned}$. Module
-references arise from import statements. \Replaced{A class entry records the qualified name $q.c$ that identifies it, its distinct fields
-$\seq{x}$ with their declared types $\seq{\tau}$, those of its base classes first, and the qualified names
-$A$ of its ancestors, its own name first.}{A class entry records the context the class was declared in, the
+references arise from import statements. A class entry records the context the class was declared in, the
 qualified name $q.c$ that identifies it, its distinct fields $\seq{x}$ with their declared types
-$\seq{\tau}$, and its base class $c'$, or $\bot$ where it has none.} A module declares each class name at
+$\seq{\tau}$, and its base class $c'$, or $\bot$ where it has none. A module declares each class name at
 most once, so the qualified name of a class entry is the identity of the class. A predefined name is a
 member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expression may mention: it names a
 type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}; $\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ \emph{not definitely assigned} (or, equivalently, degenerate types ``any'' and ``none'').

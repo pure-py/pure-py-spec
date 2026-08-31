@@ -12,7 +12,7 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exObj{\Gamma}{C}{\rho}$ & (Object) \\
     & $\mid$ & $\modStub{q}$ & (ModuleStub) \\
     & $\mid$ & $\modLoaded{q}{\rho}$ & (LoadedModule) \\
-    & $\mid$ & $\replaced{\clsEntry{q.c}{\seq{x}}{A}}{\mathsf{Cls}_{\Gamma}(q.c, \seq{x}, c')}$ & (Class) \\
+    & $\mid$ & $\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}$ & (Class) \\
     & $\mid$ & $\primVal{\primFn}$ & (Primitive) \\
     & $\mid$ & $\opaqueVal{q.x}$ & (Opaque)
    \\[3mm]

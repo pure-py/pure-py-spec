@@ -1,8 +1,7 @@
 \inferrule*[lab={\ruleName{eval-pat-constr}}]
 {
   \resolveClass(\rho, q) = C \\
-  \added{C = \clsEntry{q'}{\seq{x}}{A}} \\
-  \replaced{q' \in \ancestors(C')}{C \in \ancestors(C')} \\
+  C \in \ancestors(C') \\
   \rho, \fieldMap(C, \seq{p})(x), \rho'(x) \matches m_x \quad (\forall x \in \fields(C))
 }
 {
