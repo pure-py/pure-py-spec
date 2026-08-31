@@ -14,6 +14,7 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 - Use every metavariable of a sort before reaching for a prime: two types are sigma and tau, not tau and tau prime. A prime is for the third of a sort, or where the two are the same thing at different stages.
 - Name things with nouns, not free relative clauses: "matched shapes", not "what it matches"; "the residual", not "what is left over".
 - Prefer a participle or a named term to a postmodifying relative clause: "variables assigned in the body", not "the variables the body assigns"; "the residual", not "the part it leaves". Where a metafunction names the concept, use its name.
+- A condition takes "if" or "when", not "where": "undefined if two declarations share a name". "Where" reads as a place, so reserve it for quantifying over positions ("the rows differ where the pattern is a literal") and for binding a symbol ("where n is the arity").
 - No defensive coding. If a case shouldn't arise, assert it; don't silently return a safe default.
 
 ## LaTeX
