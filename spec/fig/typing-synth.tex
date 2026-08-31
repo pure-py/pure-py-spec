@@ -157,10 +157,11 @@
 {
   \Gamma \vdash e \synth \tyTuple{\seq{\tau}} \\
   \Gamma \vdash e' \synth \tyLiteral{-n} \\
-  0 < n \leq |\seq{\tau}|
+  m = |\seq{\tau}| \\
+  0 < n \leq m
 }
 {
-  \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{(|\seq{\tau}|-n)+1}
+  \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{(m-n)+1}
 }
 \and
 \inferrule*[lab={\ruleName{subscript-tuple-int}}]
