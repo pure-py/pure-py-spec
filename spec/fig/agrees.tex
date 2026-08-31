@@ -33,7 +33,7 @@
 { \Gamma \vdash \patTuple{p_1, \ldots, p_n} \agrees \tyTuple{\tau_1, \ldots, \tau_n} }
 \and
 \inferrule*[lab={\ruleName{agrees-tuple-other}}]
-{ \tau \text{ neither a list type, a union, nor a tuple type of arity } n }
+{ \tau \text{ neither list type, union, nor tuple type of arity } n }
 { \Gamma \vdash \patTuple{p_1, \ldots, p_n} \agrees \tau }
 \and
 \inferrule*[lab={\ruleName{agrees-list}}]
@@ -41,7 +41,7 @@
 { \Gamma \vdash \patList{p_1, \ldots, p_n} \agrees \tyList{\tau} }
 \and
 \inferrule*[lab={\ruleName{agrees-list-other}}]
-{ \tau \text{ neither a tuple type, a union, nor a list type} }
+{ \tau \text{ neither tuple type, union, nor list type} }
 { \Gamma \vdash \patList{\seq{p}} \agrees \tau }
 \and
 \inferrule*[lab={\ruleName{agrees-dict}}]
@@ -49,7 +49,7 @@
 { \Gamma \vdash \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \agrees \tyDict{\tau} }
 \and
 \inferrule*[lab={\ruleName{agrees-dict-other}}]
-{ \tau \text{ neither a dictionary type nor a union} }
+{ \tau \text{ neither dictionary type nor union} }
 { \Gamma \vdash \patDict{\bind{\seq{w}}{\seq{p}}} \agrees \tau }
 \and
 \inferrule*[lab={\ruleName{agrees-constr}}]

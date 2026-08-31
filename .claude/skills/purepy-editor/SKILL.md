@@ -9,7 +9,7 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 
 - Minimal. State the thing; stop.
 - No weasel-words like "honest", "clean", "obvious", "simply".
-- Table cells and figure captions are telegraphic: no articles ("Rebinds variable", not "Rebinds a variable").
+- Table cells, figure captions and rule side conditions are telegraphic: no articles ("Rebinds variable", not "Rebinds a variable"; "neither list type nor union").
 - Never write "entry" on its own: it is a context entry or a class entry.
 - Use every metavariable of a sort before reaching for a prime: two types are sigma and tau, not tau and tau prime. A prime is for the third of a sort, or where the two are the same thing at different stages.
 - Name things with nouns, not free relative clauses: "matched shapes", not "what it matches"; "the residual", not "what is left over".
