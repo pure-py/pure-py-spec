@@ -21,10 +21,9 @@ type expression denotes a type under a context (\figref{resolve-type}). Every de
 annotation for each parameter and for its return type, so the type of a definition is given rather than
 inferred from its body. A class name resolves to a
 class (\figref{resolve-name}) and every other name must resolve to a predefined entry
-(\figref{predefined-types}). The \emph{base type} $\baseType(\ell)$ of a literal is the type of its
-values, an integer literal giving \pyinline{int} and a string literal \pyinline{str};
-$\baseType(\tyLiteral{\ell})$ is $\baseType(\ell)$, and $\baseType(\tau)$ is $\tau$ for every other
-type (\secref{types-auxiliary}).
+(\figref{predefined-types}). The \emph{base type} $\baseType(\tau)$ discards the precision of a
+literal type, taking $\tyLiteral{42}$ to \pyinline{int} and leaving every other type alone
+(\secref{types-auxiliary}).
 
 The context entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
 that is not definitely assigned is bound to $\statusNotDefAssigned$. Two contexts from different branches of a conditional merge pointwise. A variable definitely assigned in both, at $\sigma$ and $\tau$, is of type
