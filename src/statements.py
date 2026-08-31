@@ -354,15 +354,14 @@ def match_cases(
 ) -> tuple[list[VarContext], bool]:
     """Bindings of each case, taken by matching against the residual, and
     whether some value of the scrutinee type falls through."""
-    base = base_type(subject)
-    seed = shapes(base, frozenset(), ctx)
+    seed = shapes(subject, frozenset(), ctx)
     left = seed
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):
-        if not agrees(case.pattern, base, ctx):
+        if not agrees(case.pattern, subject, ctx):
             raise IllFormedModule(
                 case.pattern,
-                reasons.SequenceKindClash(describe(case.pattern, ctx), render(base)),
+                reasons.SequenceKindClash(describe(case.pattern, ctx), render(subject)),
             )
         result = match_shapes(left, case.pattern, ctx)
         if result is None:

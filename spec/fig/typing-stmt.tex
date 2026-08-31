@@ -115,8 +115,8 @@
 \inferrule*[lab={\ruleName{match}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma \vdash p_i \agrees \baseType(\sigma) \quad (\forall i) \\
-  L_0 = \shapesOf(\baseType(\sigma), \varnothing) \\
+  \Gamma \vdash p_i \agrees \sigma \quad (\forall i) \\
+  L_0 = \shapesOf(\sigma, \varnothing) \\
   \Gamma \vdash L_{i-1}, p_i \matches K_i, L_i \binding \Delta_i \quad (\forall i) \\
   \Gamma \override \Delta_i; \zeta \vdash s_i : R_i \quad (\forall i) \\
   S_i = \Assigns{\Delta_i} \override R_i \quad (\forall i) \\
@@ -129,8 +129,8 @@
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma \vdash p_i \agrees \baseType(\sigma) \quad (\forall i) \\
-  L_0 = \shapesOf(\baseType(\sigma), \varnothing) \\
+  \Gamma \vdash p_i \agrees \sigma \quad (\forall i) \\
+  L_0 = \shapesOf(\sigma, \varnothing) \\
   \Gamma \vdash L_{i-1}, p_i \matches K_i, L_i \binding \Delta_i \quad (\forall i) \\
   \Gamma \override \Delta_i; \zeta \vdash s_i : R_i \quad (\forall i) \\
   S_i = \Assigns{\Delta_i} \override R_i \quad (\forall i) \\

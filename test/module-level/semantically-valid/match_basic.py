@@ -1,4 +1,5 @@
-match 42:
+n: int = 42
+match n:
     case 42:
         print("forty-two")
     case _:
