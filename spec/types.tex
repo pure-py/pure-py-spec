@@ -1,54 +1,5 @@
 \section{Types}
-\label{sec:types}
-
-The typing rules say whether a program is well typed. They are intended as a refinement of mypy's: a well-typed
-\PurePy program should be accepted by mypy, and \PurePy may reject programs mypy accepts but not the
-reverse. Function signatures, assignments and dataclass fields are annotated with type expressions, and a
-type expression denotes a type under a context (\figref{resolve-type}). Every definition carries an
-annotation for each parameter and for its return type, so the type of a definition is given rather than
-inferred from its body. A class name resolves to a
-class (\figref{resolve-name}) and every other name must resolve to a predefined entry (\figref{predefined-types}).
-
-The context entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
-that is not definitely assigned is bound to $\statusNotDefAssigned$. Two contexts from different branches of a conditional merge pointwise. A variable definitely assigned in both, at $\sigma$ and $\tau$, is of type
-$\joinTy(\sigma, \tau)$, whereas a variable definitely assigned in one branch alone is
-$\statusNotDefAssigned$.
-
-\input{spec/fig/aux-types}
-
-\input{spec/fig/resolve-name}
-
-\input{spec/fig/resolve-type}
-
-\subsection{Subtyping}
-\label{sec:subtyping}
-
-The \emph{base type} of a literal $\ell$ is $\baseType(\ell)$, and of a type is that type with a literal
-type replaced by the base type of its literal (\secref{types-auxiliary}).
-
-Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and a class below its
-ancestors, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
-each of its members and below every type that is above all of them. A tuple type is covariant, below another of the
-same length whose components are above its own. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; both notations follow \citet{pierce2002}. Lists,
-dictionaries and callables are related only where their components are equivalent, since \pyinline{list}
-and \pyinline{dict} are invariant in mypy and covariance would accept programs mypy rejects. The types with a length, namely lists, dictionaries,
-strings and tuples, are below \pyinline{Sized}. An \pyinline{int} is a \pyinline{float}, as PEP~484
-requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
-Python treats it as one.
-
-\begin{lemma}[Transitivity of subtyping]
-\label{lem:subtyping-transitive}
-If $\sigma \subty \tau$ and $\tau \subty \tau'$ then $\sigma \subty \tau'$.
-\end{lemma}
-
-Two types are \emph{comparable}
-when either is a subtype of the other. Two comparable types
-\emph{join} to the larger type and two incomparable types to their union. A sequence of types joins by
-joining the first with the join of the rest, with \pyinline{Never} as the unit (\secref{types-auxiliary}).
-So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
-joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.
-
-\input{spec/fig/subtyping}
+\label{sec:types-remaining}
 
 \subsection{Expression typing}
 \label{sec:expression-typing}

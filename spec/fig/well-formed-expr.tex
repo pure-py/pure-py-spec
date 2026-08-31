@@ -1,48 +1,5 @@
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash q : \theta$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{wf-simple-var}}]
-{
-  \bind{x}{\statusDefAssigned} \in \Gamma
-}
-{
-  \Gamma \vdash x : \statusDefAssigned
-}
-\and
-\inferrule*[lab={\ruleName{wf-simple-module}}]
-{
-  \bind{x}{\modLoaded{q}{\Gamma'}} \in \Gamma
-}
-{
-  \Gamma \vdash x : \modLoaded{q}{\Gamma'}
-}
-\and
-\inferrule*[lab={\ruleName{wf-simple-class}}]
-{
-  \bind{c}{\Type{C}} \in \Gamma
-}
-{
-  \Gamma \vdash c : \Type{C}
-}
-\and
-\inferrule*[lab={\ruleName{wf-qualified}}]
-{
-  \Gamma \vdash q : \modLoaded{q'}{\Gamma'} \\
-  \Gamma' \vdash x : \theta
-}
-{
-  \Gamma \vdash q.x : \theta
-}
-
-\end{mathpar}
-\subcaption{Qualified name $q$ resolves to context entry $\theta$ under $\Gamma$}
-\end{subfigure}
-
-\vspace{2mm}
-
-\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Gamma \vdash e$}
 \begin{mathpar}
 \small
