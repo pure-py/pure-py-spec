@@ -1,4 +1,4 @@
 \capturesE(\exLambda{\seq{x}}{e}) &= \fvE(e) \setminus \set{\seq{x}} \\*
 \capturesE(\exListComp{e}{\seq{g}}) &= \capturesS(\seq{g}) \cup (\capturesE(e) \setminus \binds(\seq{g})) \\*
-\capturesE(\exDictComp{e}{e'}{\seq{g}}) &= \capturesS(\seq{g}) \cup (\capturesE(e, e') \setminus \binds(\seq{g})) \\*[2mm]
+\capturesE(\exDictComp{e}{e'}{\seq{g}}) &= \capturesS(\seq{g}) \cup (\capturesE((e, e')) \setminus \binds(\seq{g})) \\*[2mm]
 \capturesE(\seq{e}) &= \capturesE(e_1) \cup \ldots \cup \capturesE(e_n)
