@@ -116,7 +116,7 @@
   \Gamma \vdash \exOr{e}{e'} \synth \tyBool
 }
 \end{mathpar}
-\caption{Expression $e$ synthesises type $\tau$ under $\Gamma$}
+\caption{Expression synthesis: names, literals, attributes, calls and operators}
 \label{fig:typing-synth}
 \end{figure}
 
@@ -213,7 +213,7 @@
   \Gamma \vdash \exCall{e}{\seq{e}} \synth \joinTy(\tau, \tau')
 }
 \end{mathpar}
-\caption{Expression synthesis, elimination forms}
+\caption{Expression synthesis: subscripts, and elimination at a union}
 \label{fig:typing-synth-elim}
 \end{figure}
 
@@ -271,6 +271,6 @@
   \Gamma \vdash \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \synth \tyDict{\baseType(\tau)}
 }
 \end{mathpar}
-\caption{Expression synthesis, container forms}
+\caption{Expression synthesis: tuples, lists, dictionaries and comprehensions}
 \label{fig:typing-synth-ctd}
 \end{figure}
