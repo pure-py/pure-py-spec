@@ -23,7 +23,6 @@
 \and
 \inferrule*[lab={\ruleName{class}}]
 {
-  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
   \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
@@ -35,7 +34,6 @@
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \nexists C'.\ \bind{c}{C'} \in \Gamma \\
   \bind{c'}{\clsEntry{\Gamma'}{q.c'}{\seq{y}}{c^\dagger}} \in \Gamma \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\

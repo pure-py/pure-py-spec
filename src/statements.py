@@ -830,8 +830,6 @@ def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
 
 
 def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
-    if isinstance(gamma.get(node.name), ClassEntry):
-        raise IllFormedModule(node, reasons.DuplicateClassName(node.name, q))
     if not isinstance(gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.DecoratorNotInScope("dataclass"))
     for _, t in own_fields(node):

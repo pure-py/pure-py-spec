@@ -175,9 +175,9 @@ admit \pyinline{None}. An annotated assignment checks the expression against the
 and an unannotated assignment takes the type the expression synthesises (\ruleName{assign},
 \ruleName{assign-unannot}). The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
-the class name to its entry, requiring that name to be unbound and the class's own fields to be distinct,
-and, where it extends another class, that class to be bound and the own fields not to repeat an inherited
-one (\ruleName{class}, \ruleName{class-extend}). It also requires \pyinline{dataclass} to be in scope, since
+the class name to its entry, requiring the class's own fields to be distinct and, where it extends
+another class, the base name to be bound to a class and the own fields not to repeat an inherited one
+(\ruleName{class}, \ruleName{class-extend}). It also requires \pyinline{dataclass} to be in scope, since
 the declaration names it. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
 

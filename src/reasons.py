@@ -39,15 +39,6 @@ class ClassRebound:
 
 
 @dataclass(frozen=True)
-class DuplicateClassName:
-    name: str
-    module: str
-
-    def message(self) -> str:
-        return f"duplicate class name '{self.name}' in module '{self.module}'"
-
-
-@dataclass(frozen=True)
 class UndefinedVariable:
     name: str
 
@@ -418,7 +409,6 @@ Reason = (
     DuplicateFieldName
     | UnknownBaseClass
     | InheritedFieldClash
-    | DuplicateClassName
     | ClassRebound
     | UnassignedVariable
     | UndefinedVariable
