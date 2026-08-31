@@ -1,4 +1,5 @@
 # rule: top-seq -- a second declaration cannot take an existing class's name
+from dataclasses import dataclass
 
 @dataclass
 class C:

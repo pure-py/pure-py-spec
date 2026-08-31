@@ -1,4 +1,5 @@
 # rule: top-seq -- a top-level pattern cannot take a class's name
+from dataclasses import dataclass
 
 @dataclass
 class C:

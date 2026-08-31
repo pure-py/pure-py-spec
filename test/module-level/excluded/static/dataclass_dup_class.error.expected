@@ -1,1 +1,1 @@
-class declaration names 'dataclass', which is not in scope
+'C' is bound to a class and cannot be rebound at the top level
