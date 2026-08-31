@@ -81,6 +81,16 @@
 \addchap{Summary}
 \label{ch:summary}
 
+% Figures of the summary carry their own numbering, since the summary is not a numbered chapter.
+\renewcommand*{\thefigure}{S\arabic{figure}}
+\setcounter{figure}{0}
+
+\addsec{Metavariables}
+
+The metavariables used throughout.
+
+\input{spec/fig/metavariables}
+
 \addsec{Judgement forms}
 
 The judgement forms of the well-formedness rules and the operational semantics, with the figure defining
@@ -93,6 +103,9 @@ each.
 The auxiliary functions used by the rules, with the section defining each.
 
 \input{spec/fig/auxiliary-index}
+
+\FloatBarrier
+\renewcommand*{\thefigure}{\thechapter.\arabic{figure}}
 
 % The shared sources use \section for what is a chapter here; shift the heading levels, innermost first,
 % and restore them afterwards.
