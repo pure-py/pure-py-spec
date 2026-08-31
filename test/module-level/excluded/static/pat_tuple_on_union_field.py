@@ -1,4 +1,4 @@
-# rule: cases-cons -- a sub-pattern agrees at the declared type of its field
+# rule: match -- a sub-pattern agrees at the declared type of its field
 from dataclasses import dataclass
 
 

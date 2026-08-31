@@ -1,1 +1,1 @@
-a list pattern against a value of type tuple[]; Python matches sequence patterns against lists and tuples alike, so PurePy treats the two kinds as incompatible
+a list pattern against a value of type list[int] | tuple[]; Python matches sequence patterns against lists and tuples alike, so PurePy treats the two kinds as incompatible

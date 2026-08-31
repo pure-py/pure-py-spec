@@ -187,15 +187,14 @@ at $\statusNotDefAssigned$ (\ruleName{def}). The body is checked with the
 declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
-A \pyinline{match} scrutinee synthesises a type. Both \pyinline{match} rules hand the cases to the
-judgement $\Gamma; \zeta; L \vdash \seq{h} : S, L'$, which takes them in turn,
-requiring each to match something and the whole list to exhaust the type. The \emph{residual} $L$ holds the
-values no earlier case has matched, and $L'$ those still unmatched once these cases are done. The judgement
-starts from $\shapesOf(\widen(\sigma), \varnothing)$, which denotes every value of the scrutinee's base
-type. Taking the base type keeps a literal case from exhausting the scrutinee on its own, so a
-\pyinline{match} on \pyinline{42} with a case for \pyinline{42} still admits a catch-all. Each case matches its
-pattern against the residual (\secref{exhaustiveness}), which yields the bindings the pattern makes and
-the shapes the pattern leaves. The body is then checked under the bindings.
+A \pyinline{match} scrutinee synthesises a type. Both \pyinline{match} rules take the cases in turn,
+requiring each to match something and the whole list to exhaust the type. The \emph{residual} $L_i$ holds
+the values no case up to the $i$th has matched, starting from $\shapesOf(\widen(\sigma), \varnothing)$,
+which denotes every value of the scrutinee's base type. Taking the base type keeps a literal case from
+exhausting the scrutinee on its own, so a \pyinline{match} on \pyinline{42} with a case for \pyinline{42}
+still admits a catch-all. Each case matches its pattern against the residual
+(\secref{exhaustiveness}), which yields the bindings the pattern makes and the shapes the pattern leaves.
+The body is then checked under the bindings.
 
 \input{spec/fig/typing-stmt}
 
@@ -248,24 +247,25 @@ If $\Gamma \vdash h : \tau$ for every $h \in N$ then $\Gamma \vdash k : \tau$ fo
 
 The cases are then taken in turn, first to last, from $\shapesOf(\widen(\sigma), \varnothing)$ for
 the scrutinee's type $\sigma$, the order in which $\dispatch$ tries the cases at run time
-(\figref{typing-cases}). Each case matches its pattern against the residual, checks its
+(\figref{typing-stmt}). Each case matches its pattern against the residual, checks its
 body under the bindings that matching gives, and passes on the residual of the match. The evaluation rules
 apply a sequence pattern only to a value of its own kind, although Python would match either
-(\figref{eval-pat}), so a case is rejected where a sequence pattern within it could be matched against a
-value of the other kind. Pattern $p$ \emph{conflicts} with type $\tau$ in exactly that circumstance:
+(\figref{eval-pat}); each case's pattern must therefore \emph{agree} with the scrutinee's base type.
 \begin{defalign}
-\Gamma \vdash \patTuple{\seq{p}} \conflicts \tyList{\tau} \\
-\Gamma \vdash \patList{\seq{p}} \conflicts \tyTuple{\seq{\tau}} \\
-\Gamma \vdash p \conflicts \tyUnion{\sigma}{\tau} \quad & \text{if } \Gamma \vdash p \conflicts \sigma \text{ or } \Gamma \vdash p \conflicts \tau \\
-\Gamma \vdash \patTuple{p_1, \ldots, p_n} \conflicts \tyTuple{\tau_1, \ldots, \tau_n} \quad & \text{if } \Gamma \vdash p_i \conflicts \tau_i \text{ for some } i \\
-\Gamma \vdash \patList{p_1, \ldots, p_n} \conflicts \tyList{\tau} \quad & \text{if } \Gamma \vdash p_i \conflicts \tau \text{ for some } i \\
-\Gamma \vdash \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \conflicts \tyDict{\tau} \quad & \text{if } \Gamma \vdash p_i \conflicts \tau \text{ for some } i \\
-\Gamma \vdash \patConstr{q}{a} \conflicts \tau \quad & \text{if } \Gamma \vdash q : C \text{ and } \Gamma \vdash \fieldMap(C, a)(x) \conflicts \sigma \\
-& \qquad \text{for some } \bind{x}{\sigma} \in \fields(C) \\
-\Gamma \vdash p\;\pyinline{as}\;x \conflicts \tau \quad & \text{if } \Gamma \vdash p \conflicts \tau
+\Gamma \vdash p \agrees \tau \quad & \text{if } p \text{ a variable, wildcard, literal or negated literal} \\
+\Gamma \vdash p\;\pyinline{as}\;x \agrees \tau \quad & \text{if } \Gamma \vdash p \agrees \tau \\
+\Gamma \vdash p \agrees \tyUnion{\sigma}{\tau} \quad & \text{if } \Gamma \vdash p \agrees \sigma \text{ and } \Gamma \vdash p \agrees \tau \\
+\Gamma \vdash \patTuple{p_1, \ldots, p_n} \agrees \tyTuple{\tau_1, \ldots, \tau_n} \quad & \text{if } \Gamma \vdash p_i \agrees \tau_i \text{ for each } i \\
+\Gamma \vdash \patTuple{\seq{p}} \agrees \tau \quad & \text{if } \tau \text{ neither a list type, a union, nor a tuple type of the same arity} \\
+\Gamma \vdash \patList{p_1, \ldots, p_n} \agrees \tyList{\tau} \quad & \text{if } \Gamma \vdash p_i \agrees \tau \text{ for each } i \\
+\Gamma \vdash \patList{\seq{p}} \agrees \tau \quad & \text{if } \tau \text{ neither a tuple type, a union, nor a list type} \\
+\Gamma \vdash \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \agrees \tyDict{\tau} \quad & \text{if } \Gamma \vdash p_i \agrees \tau \text{ for each } i \\
+\Gamma \vdash \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \agrees \tau \quad & \text{if } \tau \text{ neither a dictionary type nor a union} \\
+\Gamma \vdash \patConstr{q}{a} \agrees \tau \quad & \text{if } \Gamma \vdash q : C \text{ and } \Gamma \vdash \fieldMap(C, a)(x) \agrees \sigma \\
+& \qquad \text{for each } \bind{x}{\sigma} \in \fields(C)
 \end{defalign}
-\noindent Each case's pattern must conflict with the type of no shape of the residual, so a match on
-$\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no sequence pattern. A case that matches nothing is
+\noindent A match on $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ thus admits no
+sequence pattern. A case that matches nothing is
 rejected, whether because the scrutinee can never take that shape or because the earlier cases already cover it. \ruleName{match}
 applies where the walk ends with an empty residual, and \ruleName{match-partial} where it does not, merging
 in $\Assigns{\varnothing}$ for the values that fall through. A union is exhausted
@@ -288,7 +288,6 @@ although each covers only part of the type.
 
 \input{spec/fig/pat}
 
-\input{spec/fig/typing-cases}
 
 \subsection{Modules and programs}
 \label{sec:typing-modules}

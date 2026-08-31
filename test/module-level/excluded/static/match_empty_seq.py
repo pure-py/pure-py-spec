@@ -1,4 +1,4 @@
-# rule: cases-cons -- empty list and tuple patterns are sequence patterns too,
+# rule: match -- empty list and tuple patterns are sequence patterns too,
 # so a union of the kinds admits neither
 def f(s: list[int] | tuple[()]) -> str:
     match s:

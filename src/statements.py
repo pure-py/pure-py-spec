@@ -47,10 +47,10 @@ from contexts import (
     short_name,
     var_type,
 )
-from match import conflicts, literal_of, match_shapes, ordered
+from match import agrees, literal_of, match_shapes
 from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
 from reasons import IllFormedModule
-from shapes import Shape, shape_type, shapes
+from shapes import Shape, shapes
 from subtyping import join, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
@@ -354,18 +354,16 @@ def match_cases(
 ) -> tuple[list[VarContext], bool]:
     """Bindings of each case, taken by matching against the residual, and
     whether some value of the scrutinee type falls through."""
-    seed = shapes(base_type(subject), frozenset(), ctx)
+    base = base_type(subject)
+    seed = shapes(base, frozenset(), ctx)
     left = seed
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):
-        for k in ordered(left):
-            if conflicts(case.pattern, shape_type(k), ctx):
-                raise IllFormedModule(
-                    case.pattern,
-                    reasons.SequenceKindClash(
-                        describe(case.pattern, ctx), render(shape_type(k))
-                    ),
-                )
+        if not agrees(case.pattern, base, ctx):
+            raise IllFormedModule(
+                case.pattern,
+                reasons.SequenceKindClash(describe(case.pattern, ctx), render(base)),
+            )
         result = match_shapes(left, case.pattern, ctx)
         if result is None:
             raise unmatched(case.pattern, index, subject, seed, ctx)
