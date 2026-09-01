@@ -34,11 +34,11 @@
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \bind{c'}{\Type{C'}} \in \Gamma \\
+  \bind{c'}{\Type{D}} \in \Gamma \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
   \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
-  \seq{x} \cap \dom(\fields(C')) = \varnothing \\
+  \seq{x} \cap \dom(\fields(D)) = \varnothing \\
   C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{c'}
 }
 {
