@@ -1,4 +1,4 @@
-# rule: pat-rest-constr -- a union field has one shape per member
+# rule: split-class -- a union field has one shape per member
 from dataclasses import dataclass
 
 

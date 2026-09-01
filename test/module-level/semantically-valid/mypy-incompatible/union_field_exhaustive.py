@@ -1,4 +1,4 @@
-# rule: pat-rest-constr -- one shape per member of a union field, so the cases
+# rule: split-class -- one shape per member of a union field, so the cases
 # exhaust it; mypy wants a catch-all
 from dataclasses import dataclass
 

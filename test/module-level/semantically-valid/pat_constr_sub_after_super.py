@@ -1,4 +1,4 @@
-# rule: pat-constr-sub -- a subclass case after a superclass case matches the
+# rule: split-subclass -- a subclass case after a superclass case matches the
 # instances the superclass case left
 from dataclasses import dataclass
 

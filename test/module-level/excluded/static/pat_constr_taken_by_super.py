@@ -1,4 +1,4 @@
-# rule: pat-rest-constr -- a case for a class takes its subclasses, so a later
+# rule: split-class -- a case for a class takes its subclasses, so a later
 # case for a subclass matches nothing
 from dataclasses import dataclass
 

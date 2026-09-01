@@ -1,4 +1,4 @@
-# rule: pat-rest-constr -- expansion takes the lower of the shape's type and
+# rule: split-class -- expansion takes the lower of the shape's type and
 # the pattern's class, so a later case for the type itself can match
 from dataclasses import dataclass
 

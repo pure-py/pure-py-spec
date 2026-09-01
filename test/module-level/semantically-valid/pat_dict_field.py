@@ -1,4 +1,4 @@
-# rule: pat-rest-constr -- a dictionary field takes its dictionary shape
+# rule: split-class -- a dictionary field takes its dictionary shape
 from dataclasses import dataclass
 
 

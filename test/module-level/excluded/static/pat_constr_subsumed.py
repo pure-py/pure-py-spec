@@ -1,4 +1,4 @@
-# rule: pat-rest-constr -- a base-class case leaves nothing for a subclass case
+# rule: split-class -- a base-class case leaves nothing for a subclass case
 from dataclasses import dataclass
 
 @dataclass

@@ -1,4 +1,4 @@
-# rule: pat-rest-tuple -- a variable case binds at the tuple type itself
+# rule: split-tuple -- a variable case binds at the tuple type itself
 def f(t: tuple[int | str, int]) -> int:
     match t:
         case s:

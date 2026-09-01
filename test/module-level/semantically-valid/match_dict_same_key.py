@@ -1,4 +1,4 @@
-# rule: pat-dict-bound -- a key an earlier case bound is matched against the shape recorded for it
+# rule: pat-dict -- a key an earlier case bound is matched against the shape recorded for it
 def f(d: dict[str, int]) -> int:
     match d:
         case {"a": 1}:

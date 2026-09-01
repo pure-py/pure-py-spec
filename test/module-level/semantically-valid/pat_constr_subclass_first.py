@@ -1,4 +1,4 @@
-# rule: pat-constr-sub -- a subclass case leaves the base class's other instances
+# rule: split-subclass -- a subclass case leaves the base class's other instances
 from dataclasses import dataclass
 
 @dataclass

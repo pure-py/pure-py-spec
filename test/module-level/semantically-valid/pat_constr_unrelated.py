@@ -1,4 +1,4 @@
-# rule: pat-rest-constr -- a case for an unrelated class leaves the others
+# rule: split-class -- a case for an unrelated class leaves the others
 from dataclasses import dataclass
 
 @dataclass

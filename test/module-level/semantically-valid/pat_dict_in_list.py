@@ -1,4 +1,4 @@
-# rule: pat-rest-list -- a list's element shapes come from shapes, a dictionary
+# rule: split-list -- a list's element shapes come from shapes, a dictionary
 # element taking its dictionary form
 def f(xs: list[dict[str, int]]) -> int:
     match xs:
