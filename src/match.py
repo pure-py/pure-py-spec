@@ -1,8 +1,10 @@
-"""How a pattern matches a shape.
+"""How a pattern matches a shape, and how a shape splits for a pattern.
 
 Matching a pattern against a shape gives the shapes it matches, the residual it
 leaves and the bindings it makes, so a case that matches nothing has no
-derivation and a match is exhaustive where the residual is empty.
+derivation and a match is exhaustive where the residual is empty. A shape which
+stands for many heads splits first, into the shapes carrying the head the
+pattern tests for and the shapes it leaves.
 """
 
 import ast
@@ -50,6 +52,7 @@ from type_syntax import (
 
 type Match = tuple[frozenset[Shape], frozenset[Shape], VarContext]
 type RowMatch = tuple[frozenset[Row], frozenset[Row], VarContext]
+type Split = tuple[frozenset[Shape], frozenset[Shape]]
 
 NO_BINDINGS: VarContext = {}
 
@@ -60,15 +63,17 @@ def match(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Match | None:
     if isinstance(p, ast.MatchAs):
         return match_as(k, p, ctx)
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
-        return match_literal(k, LiteralType(literal_of(p)), ctx)
-    if isinstance(p, PatTuple):
-        return match_tuple(k, p, ctx)
-    if isinstance(p, PatList):
-        return match_list(k, p, ctx)
-    if isinstance(p, ast.MatchMapping):
-        return match_mapping(k, items(p), p, ctx)
-    assert isinstance(p, ast.MatchClass)
-    return match_constr(k, p, ctx)
+        same = match_literal(k, LiteralType(literal_of(p)))
+    elif isinstance(p, PatTuple):
+        same = match_tuple(k, p, ctx)
+    elif isinstance(p, PatList):
+        same = match_list(k, p, ctx)
+    elif isinstance(p, ast.MatchMapping):
+        same = match_dict(k, p, ctx)
+    else:
+        assert isinstance(p, ast.MatchClass)
+        same = match_constr(k, p, ctx)
+    return same if same is not None else match_split(k, p, ctx)
 
 
 def match_as(k: Shape, p: ast.MatchAs, ctx: ModuleContext) -> Match | None:
@@ -87,14 +92,23 @@ def match_as(k: Shape, p: ast.MatchAs, ctx: ModuleContext) -> Match | None:
     return matched, left, disjoint_union([delta, {p.name: named}], p)
 
 
-def match_literal(k: Shape, ell: LiteralType, ctx: ModuleContext) -> Match | None:
-    if isinstance(k, Literal):
-        if LiteralType(k.value) != ell:
-            return None
+def match_split(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Match | None:
+    """The shapes the split gives, matched against the pattern, with the shapes
+    the split leaves passed into the residual."""
+    parts = split(k, p, ctx)
+    if parts is None:
+        return None
+    ks, without = parts
+    result = match_shapes(ks, p, ctx)
+    if result is None:
+        return None
+    matched, left, delta = result
+    return matched, left | without, delta
+
+
+def match_literal(k: Shape, ell: LiteralType) -> Match | None:
+    if isinstance(k, Literal) and LiteralType(k.value) == ell:
         return frozenset({k}), NOTHING, NO_BINDINGS
-    if isinstance(k, Rest) and ell not in k.heads and subtype(ell, k.ty):
-        matched = frozenset({Literal(ell.value)})
-        return matched, shapes(k.ty, k.heads | {ell}, ctx), NO_BINDINGS
     return None
 
 
@@ -102,74 +116,149 @@ def match_tuple(k: Shape, p: PatTuple, ctx: ModuleContext) -> Match | None:
     ps = tuple(p.patterns)
     if isinstance(k, Tuple) and len(k.components) == len(ps):
         return wrap(Tuple, match_row(k.components, ps, p, ctx))
-    if (
-        isinstance(k, Rest)
-        and isinstance(k.ty, TupleType)
-        and len(k.ty.components) == len(ps)
-    ):
-        expanded = frozenset(Tuple(row) for row in shapes_row(k.ty.components, ctx))
-        return match_shapes(expanded, p, ctx)
     return None
 
 
 def match_list(k: Shape, p: PatList, ctx: ModuleContext) -> Match | None:
     ps = tuple(p.patterns)
-    n = len(ps)
-    if isinstance(k, List) and len(k.elems) == n:
+    if isinstance(k, List) and len(k.elems) == len(ps):
         return wrap(lambda r: List(k.elem, r), match_row(k.elems, ps, p, ctx))
-    if isinstance(k, Rest) and isinstance(k.ty, ListType) and n not in k.heads:
-        elem = k.ty.elem
-        expanded = frozenset(List(elem, row) for row in shapes_row((elem,) * n, ctx))
-        result = match_shapes(expanded, p, ctx)
-        if result is None:
-            return None
-        matched, left, delta = result
-        return matched, left | shapes(k.ty, k.heads | {n}, ctx), delta
     return None
+
+
+def match_dict(k: Shape, p: ast.MatchMapping, ctx: ModuleContext) -> Match | None:
+    """Every key of the pattern is bound by the shape, so the keys match as a
+    row."""
+    if not isinstance(k, Dict):
+        return None
+    ws = items(p)
+    keys = tuple(w for w, _ in ws)
+    repeated = [w for i, w in enumerate(keys) if w in keys[:i]]
+    if repeated:
+        raise IllFormedModule(p, reasons.DuplicateDictKey(repeated[0]))
+    bound = dict(k.bound)
+    if any(w not in bound for w in keys):
+        return None
+    row = tuple(bound[w] for w in keys)
+    rows = match_row(row, tuple(q for _, q in ws), p, ctx)
+    return wrap(lambda r: with_keys(k, keys, r), rows)
 
 
 def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | None:
+    cls = class_of_pattern(p, ctx)
+    ps = pattern_row(cls, p)
+    if isinstance(k, Constr) and subtype(ClassType(k.c), ClassType(cls)):
+        rows = match_row(k.args, padded(ps, len(k.args)), p, ctx)
+        return wrap(lambda r: Constr(k.c, r, k.heads), rows)
+    return None
+
+
+def split(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Split | None:
+    """Shapes of `k` carrying the head that `p` tests for, and the shapes `k`
+    leaves without that head, or nothing where `k` does not split for `p`."""
+    if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
+        return split_literal(k, LiteralType(literal_of(p)), ctx)
+    if isinstance(p, PatTuple):
+        return split_tuple(k, len(p.patterns), ctx)
+    if isinstance(p, PatList):
+        return split_list(k, len(p.patterns), ctx)
+    if isinstance(p, ast.MatchMapping):
+        return split_key(k, items(p), ctx)
+    assert isinstance(p, ast.MatchClass)
+    cls = class_of_pattern(p, ctx)
+    if isinstance(k, Rest):
+        return split_class(k, cls, ctx)
+    if isinstance(k, Constr):
+        return split_subclass(k, cls, ctx)
+    return None
+
+
+def split_literal(k: Shape, ell: LiteralType, ctx: ModuleContext) -> Split | None:
+    if isinstance(k, Rest) and ell not in k.heads and subtype(ell, k.ty):
+        return frozenset({Literal(ell.value)}), shapes(k.ty, k.heads | {ell}, ctx)
+    return None
+
+
+def split_tuple(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
+    """No head types at a tuple type, so the shape excludes nothing and the
+    split leaves nothing."""
+    if not (isinstance(k, Rest) and isinstance(k.ty, TupleType)):
+        return None
+    if len(k.ty.components) != n:
+        return None
+    assert not k.heads
+    return frozenset(Tuple(row) for row in shapes_row(k.ty.components, ctx)), NOTHING
+
+
+def split_list(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
+    if not (isinstance(k, Rest) and isinstance(k.ty, ListType) and n not in k.heads):
+        return None
+    elem = k.ty.elem
+    return (
+        frozenset(List(elem, row) for row in shapes_row((elem,) * n, ctx)),
+        shapes(k.ty, k.heads | {n}, ctx),
+    )
+
+
+def split_key(
+    k: Shape, ws: tuple[tuple[str, ast.pattern], ...], ctx: ModuleContext
+) -> Split | None:
+    """The first key of the pattern which the shape does not bind."""
+    if not isinstance(k, Dict):
+        return None
+    bound = dict(k.bound)
+    w = next((w for w, _ in ws if w not in bound), None)
+    if w is None or w in k.heads:
+        return None
+    return (
+        frozenset(with_keys(k, (w,), (m,)) for m in shapes(k.value, frozenset(), ctx)),
+        frozenset({Dict(k.value, k.bound, k.heads | {w})}),
+    )
+
+
+def split_class(k: Rest, cls: Class, ctx: ModuleContext) -> Split | None:
+    """Instances of the lower of the shape's type and the pattern's class, with
+    the heads which type at that class kept."""
+    if not comparable(ClassType(cls), k.ty) or below_excluded(cls, k.heads, ctx):
+        return None
+    low = cls if subtype(ClassType(cls), k.ty) else class_of(k.ty)
+    types = tuple(declared_field(low, x) for x in fields(low))
+    kept = typed_heads(k.heads, ClassType(low), ctx)
+    return (
+        frozenset(Constr(low, row, kept) for row in shapes_row(types, ctx)),
+        shapes(k.ty, k.heads | {cls}, ctx),
+    )
+
+
+def split_subclass(k: Constr, cls: Class, ctx: ModuleContext) -> Split | None:
+    """Instances of a proper subclass of the shape's class, whose fields are
+    those of the shape followed by the ones the subclass declares."""
+    if cls == k.c or not subtype(ClassType(cls), ClassType(k.c)):
+        return None
+    if below_excluded(cls, k.heads, ctx):
+        return None
+    own = tuple(declared_field(cls, x) for x in fields(cls)[len(k.args) :])
+    kept = typed_heads(k.heads, ClassType(cls), ctx)
+    return (
+        frozenset(Constr(cls, k.args + row, kept) for row in shapes_row(own, ctx)),
+        frozenset({Constr(k.c, k.args, k.heads | {cls})}),
+    )
+
+
+def class_of_pattern(p: ast.MatchClass, ctx: ModuleContext) -> Class:
+    """Class the pattern names."""
     cls = class_of_name(p.cls, ctx)
     if cls is None:
         raise IllFormedModule(p, reasons.UnknownClassInPattern(class_name(p.cls)))
+    return cls
+
+
+def pattern_row(cls: Class, p: ast.MatchClass) -> tuple[ast.pattern, ...]:
+    """Pattern the arguments supply for each field of `cls`, by field-map."""
     args = field_map(cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
     if args is None:
         raise no_field_map(cls, p)
-    ps = tuple(args[x] for x in fields(cls))
-    if isinstance(k, Constr):
-        if subtype(ClassType(k.c), ClassType(cls)):
-            rows = match_row(k.args, padded(ps, len(k.args)), p, ctx)
-            return wrap(lambda r: Constr(k.c, r, k.heads), rows)
-        if subtype(ClassType(cls), ClassType(k.c)) and not below_excluded(
-            cls, k.heads, ctx
-        ):
-            own = tuple(declared_field(cls, x) for x in fields(cls)[len(k.args) :])
-            kept = typed_heads(k.heads, ClassType(cls), ctx)
-            expanded = frozenset(
-                Constr(cls, k.args + row, kept) for row in shapes_row(own, ctx)
-            )
-            result = match_shapes(expanded, p, ctx)
-            if result is None:
-                return None
-            matched, left, delta = result
-            taken = Constr(k.c, k.args, k.heads | {cls})
-            return matched, left | {taken}, delta
-        return None
-    if (
-        isinstance(k, Rest)
-        and comparable(ClassType(cls), k.ty)
-        and not below_excluded(cls, k.heads, ctx)
-    ):
-        low = cls if subtype(ClassType(cls), k.ty) else class_of(k.ty)
-        types = tuple(declared_field(low, x) for x in fields(low))
-        kept = typed_heads(k.heads, ClassType(low), ctx)
-        expanded = frozenset(Constr(low, row, kept) for row in shapes_row(types, ctx))
-        result = match_shapes(expanded, p, ctx)
-        if result is None:
-            return None
-        matched, left, delta = result
-        return matched, left | shapes(k.ty, k.heads | {cls}, ctx), delta
-    return None
+    return tuple(args[x] for x in fields(cls))
 
 
 def typed_heads(
@@ -183,48 +272,6 @@ def typed_heads(
 def class_of(t: Type) -> Class:
     assert isinstance(t, ClassType)
     return t.c
-
-
-def match_mapping(
-    k: Shape,
-    ws: tuple[tuple[str, ast.pattern], ...],
-    node: ast.MatchMapping,
-    ctx: ModuleContext,
-) -> Match | None:
-    if not isinstance(k, Dict):
-        return None
-    if len(ws) == 0:
-        return frozenset({k}), NOTHING, NO_BINDINGS
-    (w, p), rest = ws[0], ws[1:]
-    if w in [key for key, _ in rest]:
-        raise IllFormedModule(node, reasons.DuplicateDictKey(w))
-    bound = dict(k.bound)
-    if w in bound:
-        first = match(bound[w], p, ctx)
-    elif w not in k.heads:
-        first = match_shapes(shapes(k.value, frozenset(), ctx), p, ctx)
-    else:
-        return None
-    if first is None:
-        return None
-    matched, left, delta = first
-    rest_node = ast.copy_location(
-        ast.MatchMapping(
-            keys=[ast.copy_location(ast.Constant(value=w2), node) for w2, _ in rest],
-            patterns=[p2 for _, p2 in rest],
-            rest=None,
-        ),
-        node,
-    )
-    later = match_shapes(frozenset(with_key(k, w, m) for m in matched), rest_node, ctx)
-    if later is None:
-        return None
-    matched_, left_, delta_ = later
-    absent = (
-        NOTHING if w in bound else frozenset({Dict(k.value, k.bound, k.heads | {w})})
-    )
-    left__ = frozenset(with_key(k, w, r) for r in left) | left_ | absent
-    return matched_, left__, disjoint_union([delta, delta_], node)
 
 
 def match_row(
@@ -373,8 +420,9 @@ def no_field_map(cls: Class, p: ast.MatchClass) -> IllFormedModule:
     )
 
 
-def with_key(k: Dict, w: str, m: Shape) -> Dict:
-    bound = dict(k.bound) | {w: m}
+def with_keys(k: Dict, ws: tuple[str, ...], row: Row) -> Dict:
+    """Dictionary shape with each key of `ws` at the shape the row gives it."""
+    bound = dict(k.bound) | dict(zip(ws, row))
     return Dict(k.value, tuple(sorted(bound.items())), k.heads)
 
 
