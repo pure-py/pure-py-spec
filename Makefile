@@ -53,6 +53,9 @@ check-mechanisation:
 		{ echo "$(MECHANISATION) has uncommitted changes"; exit 1; }
 	@git -C $(MECHANISATION) merge-base --is-ancestor HEAD origin/main || \
 		{ echo "$(MECHANISATION) HEAD is not in origin/main: push and merge first"; exit 1; }
+	@command -v isabelle >/dev/null || \
+		{ echo "isabelle not on PATH: needed to check $(MECHANISATION)"; exit 1; }
+	$(MAKE) -C $(MECHANISATION) build
 
 supplementary.zip: spec-anon.pdf check-mechanisation
 	rm -f $@ && rm -rf .submission
