@@ -1,4 +1,4 @@
-# rule: sub-constr -- patterns for unrelated classes do not subsume each other
+# rule: pat-rest-constr -- a case for an unrelated class leaves the others
 from dataclasses import dataclass
 
 @dataclass

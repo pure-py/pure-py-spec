@@ -1,4 +1,4 @@
-# rule: sub-constr -- a base-class pattern is not subsumed by a subclass pattern
+# rule: pat-constr-sub -- a subclass case leaves the base class's other instances
 from dataclasses import dataclass
 
 @dataclass

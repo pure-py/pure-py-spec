@@ -138,16 +138,16 @@ print(x)  # error: x not definitely assigned
 \end{python}
 
 \noindent Python prints \pyinline{1}, the binding having escaped the match. Within a pattern the
-variables must be distinct, as in Python. Every case must also be reachable: the \ruleName{wf-cases-cons}
-rule rejects a case whose pattern is subsumed by an earlier one (\secref{well-formedness-patterns}), which Python
-leaves silently unreachable:
+variables must be distinct, as in Python. Every case must also be reachable: the matching judgement rejects a case
+that matches nothing the earlier cases leave (\secref{well-formedness-patterns}), which Python leaves
+silently unreachable:
 
 \begin{python}
 v = (1, 2)
 match v:
     case (a, b):
         print("seq", a, b)
-    case (1, 2):  # error: subsumed by the previous case
+    case (1, 2):  # error: the previous case matches every pair
         print("lit")
 \end{python}
 
