@@ -141,7 +141,6 @@ PREDEFINED_MEMBERS: dict[str, dict[str, ContextEntry]] = {
         "exit": CallableType((Primitive.INT,), Primitive.NEVER),
     },
     "typing": {
-        "Any": PredefinedName(),
         "Callable": PredefinedName(),
         "Literal": PredefinedName(),
         "Never": PredefinedName(),

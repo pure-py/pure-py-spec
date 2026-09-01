@@ -9,7 +9,6 @@ if TYPE_CHECKING:
 
 
 class Primitive(Enum):
-    ANY = auto()
     OBJECT = auto()
     NEVER = auto()
     NONE = auto()
@@ -132,7 +131,6 @@ type Type = (
 )
 
 PRIMITIVE_SPELLINGS = {
-    Primitive.ANY: "Any",
     Primitive.OBJECT: "object",
     Primitive.NEVER: "Never",
     Primitive.NONE: "None",
@@ -144,7 +142,6 @@ PRIMITIVE_SPELLINGS = {
 }
 
 PRIMITIVE_NAMES = {
-    "Any": Primitive.ANY,
     "object": Primitive.OBJECT,
     "Never": Primitive.NEVER,
     "None": Primitive.NONE,
