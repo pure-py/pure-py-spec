@@ -172,32 +172,7 @@ which is the type of its instances (\ruleName{constr}). In an attribute referenc
 synthesise a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$
 (\ruleName{attr-object}). The signature of a predefined module binds
 $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type listed for it
-(\figref{predefined-types}, Definition~\ref{def:predefined}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
-signature $\ominus : \sigma \to \tau$, relating operand types to result type
-(\figref{operator-signatures}). A signature
-applies at the operand types that instantiate it with its condition holding. Where several signatures
-apply the first listed is used, so \pyinline{1 + 2} is an \pyinline{int} and
-\pyinline{1 + 2.0} a \pyinline{float}. An \emph{equality type} is one for which structural equality is
-defined:
-\begin{defalign}
-& \Gamma \vdash \nu \eqType \\
-& \Gamma \vdash \tyLiteral{\ell} \eqType \\
-& \Gamma \vdash \tyList{\tau} \eqType && \qquad\quad \text{if } \Gamma \vdash \tau \eqType \\
-& \Gamma \vdash \tyDict{\tau} \eqType && \qquad\quad \text{if } \Gamma \vdash \tau \eqType \\
-& \Gamma \vdash \tyTuple{\seq{\tau}} \eqType && \qquad\quad \text{if } \Gamma \vdash \tau_i \eqType \quad (\forall i) \\
-& \Gamma \vdash \tyUnion{\sigma}{\tau} \eqType && \qquad\quad \text{if } \Gamma \vdash \sigma \eqType \text{ and } \Gamma \vdash \tau \eqType \\
-& \Gamma \vdash C \eqType && \qquad\quad \text{if } \Gamma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \fields(C)
-\end{defalign}
-
-\noindent A callable type is not an equality type, and neither is any type with a callable component, so
-comparing two functions is rejected rather than left undefined. \emph{Resolution} looks the operator up at the operand types, and
-at their base types where no signature gives a result for the operand types themselves
-(\secref{types-auxiliary}). The second clause lets \pyinline{1 == 0} use the equality signature at \pyinline{int}, since two
-distinct literal types are not comparable. Taking the operand types as they are first keeps \pyinline{2 **
-3} an \pyinline{int}, since the exponent binds a variable that its base type would not. Resolution is more
-precise than mypy for this operator, whose overloads give \pyinline{Any} as soon as the exponent is not a
-literal, where resolution gives \pyinline{float}.
-
+(\figref{predefined-types}, Definition~\ref{def:predefined}).
 In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
 (\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
 dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
@@ -210,8 +185,6 @@ synthesises a union is typed at each member, with a variable in place of the sub
 join of the results (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union}); a union
 is iterated at the join of its members' element types ($\elemTy$). \citet{dunfield2004} state union elimination once, for every evaluation
 context; with four elimination forms a rule each is shorter.
-
-\input{spec/fig/operator-signatures}
 
 Lambdas check, as do lists, tuples, dictionaries and comprehensions. Their types are not determined by
 the expression alone: $\exList{}$ is a list of any element type, and a lambda's parameters cannot be annotated in
@@ -255,6 +228,38 @@ $\exAttr{e}{x}$ resolves as a qualified name to a definitely assigned member
 (\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}. A variable bound to a module or
 class is not an expression on its own, and occurs only as the head of a qualified
 name\paperonly{ (\secref{no-first-class})}.
+
+
+\speconly{\subsubsection{Operators}\label{sec:well-formedness-operators}}%
+\paperonly{\paragraph{Operators.}}
+
+Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
+signature $\ominus : \sigma \to \tau$, relating operand types to result type
+(\figref{operator-signatures}). A signature
+applies at the operand types that instantiate it with its condition holding. Where several signatures
+apply the first listed is used, so \pyinline{1 + 2} is an \pyinline{int} and
+\pyinline{1 + 2.0} a \pyinline{float}. An \emph{equality type} is one for which structural equality is
+defined:
+\begin{defalign}
+& \Gamma \vdash \nu \eqType \\
+& \Gamma \vdash \tyLiteral{\ell} \eqType \\
+& \Gamma \vdash \tyList{\tau} \eqType && \qquad\quad \text{if } \Gamma \vdash \tau \eqType \\
+& \Gamma \vdash \tyDict{\tau} \eqType && \qquad\quad \text{if } \Gamma \vdash \tau \eqType \\
+& \Gamma \vdash \tyTuple{\seq{\tau}} \eqType && \qquad\quad \text{if } \Gamma \vdash \tau_i \eqType \quad (\forall i) \\
+& \Gamma \vdash \tyUnion{\sigma}{\tau} \eqType && \qquad\quad \text{if } \Gamma \vdash \sigma \eqType \text{ and } \Gamma \vdash \tau \eqType \\
+& \Gamma \vdash C \eqType && \qquad\quad \text{if } \Gamma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \fields(C)
+\end{defalign}
+
+\noindent A callable type is not an equality type, and neither is any type with a callable component, so
+comparing two functions is rejected rather than left undefined. \emph{Resolution} looks the operator up at the operand types, and
+at their base types where no signature gives a result for the operand types themselves
+(\secref{types-auxiliary}). The second clause lets \pyinline{1 == 0} use the equality signature at \pyinline{int}, since two
+distinct literal types are not comparable. Taking the operand types as they are first keeps \pyinline{2 **
+3} an \pyinline{int}, since the exponent binds a variable that its base type would not. Resolution is more
+precise than mypy for this operator, whose overloads give \pyinline{Any} as soon as the exponent is not a
+literal, where resolution gives \pyinline{float}.
+
+\input{spec/fig/operator-signatures}
 
 \subsection{Patterns}
 \label{sec:exhaustiveness}
