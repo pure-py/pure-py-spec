@@ -89,6 +89,9 @@
 \end{figure}
 
 \begin{figure}
+\small
+\setlength{\jot}{2pt}
+\flushleft \shadebox{$\Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{pat-row}}]
@@ -100,7 +103,13 @@
 {
   \Gamma \vdash (k_1, \ldots, k_n), (p_1, \ldots, p_n) \matches K, L \binding \Delta_1 \disjunion \ldots \disjunion \Delta_n
 }
-\and
+\end{mathpar}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\Gamma \vdash L, p \matches K, L' \binding \Delta$}
+\begin{mathpar}
+\small
 \inferrule*[lab={\ruleName{pat-shapes}}]
 {
   \varnothing \neq M = \set{k \in L \mid \Gamma \vdash k, p \matches K_k, L_k \binding \Delta_k} \\
@@ -109,7 +118,13 @@
 {
   \Gamma \vdash L, p \matches \textstyle\bigcup_{k \in M} K_k, \; \textstyle\bigcup_{k \in M} L_k \cup (L \setminus M) \binding \Delta
 }
-\and
+\end{mathpar}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L$}
+\begin{mathpar}
+\small
 \inferrule*[lab={\ruleName{cases}}]
 {
   L_0 = \shapesOf(\sigma, \varnothing) \\
