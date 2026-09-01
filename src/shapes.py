@@ -72,7 +72,7 @@ class Dict:
 
 
 type Shape = Rest | Literal | Constr | Tuple | List | Dict
-type Row = tuple[Shape, ...]
+type Seq = tuple[Shape, ...]
 
 NOTHING: frozenset[Shape] = frozenset()
 
@@ -131,6 +131,6 @@ def below_excluded(c: Class, heads: frozenset[object], ctx: ModuleContext) -> bo
     )
 
 
-def shapes_row(ts: Sequence[Type], ctx: ModuleContext) -> frozenset[Row]:
-    """Rows of shapes of the types of a row: the second form of `shapes`."""
+def shapes_seq(ts: Sequence[Type], ctx: ModuleContext) -> frozenset[Seq]:
+    """Sequences of shapes of a sequence of types: the second form of `shapes`."""
     return frozenset(product(*(shapes(t, frozenset(), ctx) for t in ts)))

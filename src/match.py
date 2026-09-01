@@ -29,14 +29,14 @@ from shapes import (
     List,
     Literal,
     Rest,
-    Row,
+    Seq,
     Shape,
     Tuple,
     below_excluded,
     head_typed,
     shape_type,
     shapes,
-    shapes_row,
+    shapes_seq,
 )
 from subtyping import comparable, join, subtype
 from syntax import PatList, PatTuple
@@ -51,7 +51,7 @@ from type_syntax import (
 )
 
 type Match = tuple[frozenset[Shape], frozenset[Shape], VarContext]
-type RowMatch = tuple[frozenset[Row], frozenset[Row], VarContext]
+type SeqMatch = tuple[frozenset[Seq], frozenset[Seq], VarContext]
 type Split = tuple[frozenset[Shape], frozenset[Shape]]
 
 NO_BINDINGS: VarContext = {}
@@ -115,20 +115,20 @@ def match_literal(k: Shape, ell: LiteralType) -> Match | None:
 def match_tuple(k: Shape, p: PatTuple, ctx: ModuleContext) -> Match | None:
     ps = tuple(p.patterns)
     if isinstance(k, Tuple) and len(k.components) == len(ps):
-        return wrap(Tuple, match_row(k.components, ps, p, ctx))
+        return wrap(Tuple, match_seq(k.components, ps, p, ctx))
     return None
 
 
 def match_list(k: Shape, p: PatList, ctx: ModuleContext) -> Match | None:
     ps = tuple(p.patterns)
     if isinstance(k, List) and len(k.elems) == len(ps):
-        return wrap(lambda r: List(k.elem, r), match_row(k.elems, ps, p, ctx))
+        return wrap(lambda r: List(k.elem, r), match_seq(k.elems, ps, p, ctx))
     return None
 
 
 def match_dict(k: Shape, p: ast.MatchMapping, ctx: ModuleContext) -> Match | None:
     """Every key of the pattern is bound by the shape, so the keys match as a
-    row."""
+    sequence."""
     if not isinstance(k, Dict):
         return None
     ws = items(p)
@@ -139,17 +139,17 @@ def match_dict(k: Shape, p: ast.MatchMapping, ctx: ModuleContext) -> Match | Non
     bound = dict(k.bound)
     if any(w not in bound for w in keys):
         return None
-    row = tuple(bound[w] for w in keys)
-    rows = match_row(row, tuple(q for _, q in ws), p, ctx)
-    return wrap(lambda r: with_keys(k, keys, r), rows)
+    ks = tuple(bound[w] for w in keys)
+    seqs = match_seq(ks, tuple(q for _, q in ws), p, ctx)
+    return wrap(lambda r: with_keys(k, keys, r), seqs)
 
 
 def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | None:
     cls = class_of_pattern(p, ctx)
-    ps = pattern_row(cls, p)
+    ps = pattern_seq(cls, p)
     if isinstance(k, Constr) and subtype(ClassType(k.c), ClassType(cls)):
-        rows = match_row(k.args, padded(ps, len(k.args)), p, ctx)
-        return wrap(lambda r: Constr(k.c, r, k.heads), rows)
+        seqs = match_seq(k.args, padded(ps, len(k.args)), p, ctx)
+        return wrap(lambda r: Constr(k.c, r, k.heads), seqs)
     return None
 
 
@@ -187,7 +187,7 @@ def split_tuple(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
     if len(k.ty.components) != n:
         return None
     assert not k.heads
-    return frozenset(Tuple(row) for row in shapes_row(k.ty.components, ctx)), NOTHING
+    return frozenset(Tuple(ks) for ks in shapes_seq(k.ty.components, ctx)), NOTHING
 
 
 def split_list(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
@@ -195,7 +195,7 @@ def split_list(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
         return None
     elem = k.ty.elem
     return (
-        frozenset(List(elem, row) for row in shapes_row((elem,) * n, ctx)),
+        frozenset(List(elem, ks) for ks in shapes_seq((elem,) * n, ctx)),
         shapes(k.ty, k.heads | {n}, ctx),
     )
 
@@ -225,7 +225,7 @@ def split_class(k: Rest, cls: Class, ctx: ModuleContext) -> Split | None:
     types = tuple(declared_field(low, x) for x in fields(low))
     kept = typed_heads(k.heads, ClassType(low), ctx)
     return (
-        frozenset(Constr(low, row, kept) for row in shapes_row(types, ctx)),
+        frozenset(Constr(low, ks, kept) for ks in shapes_seq(types, ctx)),
         shapes(k.ty, k.heads | {cls}, ctx),
     )
 
@@ -240,7 +240,7 @@ def split_subclass(k: Constr, cls: Class, ctx: ModuleContext) -> Split | None:
     own = tuple(declared_field(cls, x) for x in fields(cls)[len(k.args) :])
     kept = typed_heads(k.heads, ClassType(cls), ctx)
     return (
-        frozenset(Constr(cls, k.args + row, kept) for row in shapes_row(own, ctx)),
+        frozenset(Constr(cls, k.args + ks, kept) for ks in shapes_seq(own, ctx)),
         frozenset({Constr(k.c, k.args, k.heads | {cls})}),
     )
 
@@ -253,7 +253,7 @@ def class_of_pattern(p: ast.MatchClass, ctx: ModuleContext) -> Class:
     return cls
 
 
-def pattern_row(cls: Class, p: ast.MatchClass) -> tuple[ast.pattern, ...]:
+def pattern_seq(cls: Class, p: ast.MatchClass) -> tuple[ast.pattern, ...]:
     """Pattern the arguments supply for each field of `cls`, by field-map."""
     args = field_map(cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
     if args is None:
@@ -274,20 +274,21 @@ def class_of(t: Type) -> Class:
     return t.c
 
 
-def match_row(
-    row: Row, ps: tuple[ast.pattern, ...], node: ast.pattern, ctx: ModuleContext
-) -> RowMatch | None:
-    """Rows that match the row of patterns, and rows that fail at one position."""
-    matches = [match(k, p, ctx) for k, p in zip(row, ps)]
+def match_seq(
+    ks: Seq, ps: tuple[ast.pattern, ...], node: ast.pattern, ctx: ModuleContext
+) -> SeqMatch | None:
+    """Sequences that match the sequence of patterns, and sequences that fail at
+    one position."""
+    matches = [match(k, p, ctx) for k, p in zip(ks, ps)]
     if any(s is None for s in matches):
         return None
     parts = [s for s in matches if s is not None]
     matched = frozenset(product(*(m for m, _, _ in parts)))
     left = frozenset(
-        tuple(prefix) + (k,) + row[i + 1 :]
-        for i, (_, ks, _) in enumerate(parts)
+        tuple(prefix) + (k,) + ks[i + 1 :]
+        for i, (_, ls, _) in enumerate(parts)
         for prefix in product(*(parts[j][0] for j in range(i)))
-        for k in ks
+        for k in ls
     )
     return matched, left, disjoint_union([d for _, _, d in parts], node)
 
@@ -382,20 +383,20 @@ def union(sets: Iterable[frozenset[Shape]]) -> frozenset[Shape]:
     return frozenset(k for s in sets for k in s)
 
 
-def wrap(form: Callable[[Row], Shape], rows: RowMatch | None) -> Match | None:
-    if rows is None:
+def wrap(form: Callable[[Seq], Shape], seqs: SeqMatch | None) -> Match | None:
+    if seqs is None:
         return None
-    matched, left, delta = rows
+    matched, left, delta = seqs
     return (
-        frozenset(form(row) for row in matched),
-        frozenset(form(row) for row in left),
+        frozenset(form(ks) for ks in matched),
+        frozenset(form(ks) for ks in left),
         delta,
     )
 
 
 def padded(ps: tuple[ast.pattern, ...], n: int) -> tuple[ast.pattern, ...]:
-    """Pattern row padded with wildcards, for a shape of a subclass whose extra
-    fields the pattern does not name."""
+    """Pattern sequence padded with wildcards, for a shape of a subclass whose
+    extra fields the pattern does not name."""
     return ps + tuple(ast.MatchAs() for _ in range(n - len(ps)))
 
 
@@ -420,9 +421,9 @@ def no_field_map(cls: Class, p: ast.MatchClass) -> IllFormedModule:
     )
 
 
-def with_keys(k: Dict, ws: tuple[str, ...], row: Row) -> Dict:
-    """Dictionary shape with each key of `ws` at the shape the row gives it."""
-    bound = dict(k.bound) | dict(zip(ws, row))
+def with_keys(k: Dict, ws: tuple[str, ...], ks: Seq) -> Dict:
+    """Dictionary shape with each key of `ws` at the shape the sequence gives it."""
+    bound = dict(k.bound) | dict(zip(ws, ks))
     return Dict(k.value, tuple(sorted(bound.items())), k.heads)
 
 
