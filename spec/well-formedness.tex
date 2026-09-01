@@ -42,9 +42,10 @@ $\statusNotDefAssigned$.
 Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and a class below its
 ancestors, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
 each of its members and below every type that is above all of them. A tuple type is covariant, below another of the
-same length whose components are above its own. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; both notations follow \citet{pierce2002}. Lists,
-dictionaries and callables are related only where their components are equivalent, since \pyinline{list}
-and \pyinline{dict} are invariant in mypy and covariance would accept programs mypy rejects. The types with a length, namely lists, dictionaries,
+same length whose components are above its own. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; both notations follow \citet{pierce2002}. Lists and
+dictionaries are related only where their components are equivalent, since both are invariant in mypy
+and covariance would accept programs mypy rejects. A callable type is contravariant in its parameters
+and covariant in its result, following mypy. The types with a length, namely lists, dictionaries,
 strings and tuples, are below \pyinline{Sized}. An \pyinline{int} is a \pyinline{float}, as PEP~484
 requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
 Python treats it as one.
@@ -57,8 +58,8 @@ If $\sigma \subty \tau$ and $\tau \subty \tau'$ then $\sigma \subty \tau'$.
 Two types are \emph{comparable}
 when either is a subtype of the other. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. Two comparable types \emph{meet} to the smaller type; a
-meet of incomparable types distributes over a union and takes tuples componentwise, and is
-\pyinline{Never} where no type lies below both. A sequence of types joins by
+meet of incomparable types distributes over a union, takes tuples componentwise and callables with
+parameters joined and results met, and is \pyinline{Never} where no type lies below both. A sequence of types joins by
 joining the first with the join of the rest, with \pyinline{Never} as the unit (\secref{types-auxiliary}).
 So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.

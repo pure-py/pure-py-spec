@@ -41,6 +41,15 @@ def meet(s: Type, t: Type) -> Type:
         and len(s.components) == len(t.components)
     ):
         return TupleType(tuple(meet(a, b) for a, b in zip(s.components, t.components)))
+    if (
+        isinstance(s, CallableType)
+        and isinstance(t, CallableType)
+        and len(s.params) == len(t.params)
+    ):
+        return CallableType(
+            tuple(join_two(a, b) for a, b in zip(s.params, t.params)),
+            meet(s.result, t.result),
+        )
     return Primitive.NEVER
 
 
@@ -76,8 +85,8 @@ def subtype(s: Type, t: Type) -> bool:
     if isinstance(s, CallableType) and isinstance(t, CallableType):
         return (
             len(s.params) == len(t.params)
-            and all(equivalent(a, b) for a, b in zip(s.params, t.params))
-            and equivalent(s.result, t.result)
+            and all(subtype(b, a) for a, b in zip(s.params, t.params))
+            and subtype(s.result, t.result)
         )
     return False
 

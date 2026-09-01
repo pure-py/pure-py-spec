@@ -2,5 +2,6 @@
 \meetTy(\sigma, \tau) &{}= \tau && \text{if } \tau \subty \sigma \text{ and } \sigma \not\tyEquiv \tau \\*
 \meetTy(\tyUnion{\sigma}{\sigma'}, \tau) &{}= \joinTy(\meetTy(\sigma, \tau), \meetTy(\sigma', \tau)) \\*
 \meetTy(\sigma, \tyUnion{\tau}{\tau'}) &{}= \joinTy(\meetTy(\sigma, \tau), \meetTy(\sigma, \tau')) && \text{if } \sigma \text{ not union} \\*
+\meetTy(\tyCallable{\sigma_1, \ldots, \sigma_n}{\sigma}, \tyCallable{\tau_1, \ldots, \tau_n}{\tau}) &{}= \tyCallable{\joinTy(\sigma_1, \tau_1), \ldots, \joinTy(\sigma_n, \tau_n)}{\meetTy(\sigma, \tau)} \\*
 \meetTy(\tyTuple{\sigma_1, \ldots, \sigma_n}, \tyTuple{\tau_1, \ldots, \tau_n}) &{}= \tyTuple{\meetTy(\sigma_1, \tau_1), \ldots, \meetTy(\sigma_n, \tau_n)} \\*
 \meetTy(\sigma, \tau) &{}= \tyNever && \text{otherwise}

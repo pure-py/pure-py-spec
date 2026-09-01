@@ -68,8 +68,8 @@
 \and
 \inferrule*[lab={\ruleName{subty-callable}}]
 {
-  \sigma_i \tyEquiv \tau_i \quad (\forall i) \\
-  \sigma \tyEquiv \tau
+  \tau_i \subty \sigma_i \quad (\forall i) \\
+  \sigma \subty \tau
 }
 {
   \tyCallable{\sigma_1, \ldots, \sigma_n}{\sigma} \subty \tyCallable{\tau_1, \ldots, \tau_n}{\tau}
