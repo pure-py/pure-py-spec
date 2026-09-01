@@ -319,10 +319,13 @@ although each covers only part of the type.
 \subsection{Modules and programs}
 \label{sec:well-formedness-modules}
 
-\emph{Static loading} checks a module's body and computes its signature $\Gamma$, the judgement
-$\vdash_{\mathsf{load}} q : \Gamma$ (\figref{well-formed-module}); it mirrors loading at run time (\secref{operational-semantics}).
+\emph{Static loading} types a module's body and computes its signature $\Gamma$, the judgement
+$\vdash_{\mathsf{load}} q : \Gamma$ (\figref{typing-module}); it mirrors loading at run time
+(\secref{operational-semantics}). The \ruleName{module} rule types the body as a top-level statement, and
+the \ruleName{predefined} rule gives a predefined module the signature of
+Definition~\ref{def:predefined}.
 Both import forms statically load their target, together with its ancestors
-(\figref{well-formed-imports}). A plain import also records each of these modules as a member of its
+(\figref{typing-import-prefix}). A plain import also records each of these modules as a member of its
 parent (the static loads-as judgement), so that the binding created for the root of the target gives attribute
 access along the whole chain. A from-import also loads any imported name that denotes a submodule. An
 ancestor of the target is exempt from loading first if it is the importing module or one of its
@@ -332,15 +335,15 @@ the only ancestor that could never load first is the importing module itself, an
 descendant of the importing module is excluded outright\paperonly{ (\secref{no-load-dependent})}. Loading a module
 may thus require other modules to load first; the rules are interpreted inductively, so a program with an
 import cycle is ill-formed, because a module in a cycle could finish loading only after itself. Program
-well-formedness (\figref{well-formed-module}) requires the main module to be well-formed and hence,
+well-formedness (\figref{typing-module}) requires the main module to be well typed and hence,
 recursively, every module the program can load; a module that is never imported is not checked.
-The rule \ruleName{wf-module} checks a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
+The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
 overridden by the imported context, so the members of \pyinline{builtins} are in scope
 unqualified.
 
-\input{spec/fig/well-formed-module}
+\input{spec/fig/typing-module}
 
-The signature $\Gamma$ that static loading produces (\figref{well-formed-module}) comprises the classes
+The signature $\Gamma$ that static loading produces (\figref{typing-module}) comprises the classes
 and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule,
 never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
 name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own
