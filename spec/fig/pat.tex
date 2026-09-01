@@ -75,10 +75,10 @@
 {
   \Gamma \vdash q : \Type{D} \\
   C \subty D \\
-  \fields(D) = \bind{\seq{x}}{\seq{\sigma}} \\
-  p_i = \fieldMap(D, a)(x_i) \quad (\forall i \leq n) \\
-  p_i = \patWild \quad (\forall i > n) \\
-  \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
+  \dom(\fields(D)) = \seq{x} \\
+  \fieldMap(D, a) = \set{\bind{\seq{x}}{\seq{p}}} \\
+  p'_j = \patWild \quad (\forall j) \\
+  \Gamma \vdash \seq{k}, \seq{p} \mathbin{\concat} \seq{p}\,' \matches K, L \binding \Delta
 }
 {
   \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{N}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{C}{\seq{m}}}{N} \mid \seq{m} \in K}, \set{\shapeAny{\patConstr{C}{\seq{k}\,'}}{N} \mid \seq{k}\,' \in L} \binding \Delta
