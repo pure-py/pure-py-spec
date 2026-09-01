@@ -17,22 +17,24 @@ from type_syntax import (
     base_type,
 )
 
-type BinarySignature = Callable[[Type, Type, ModuleContext], Type | None]
-type UnarySignature = Callable[[Type, ModuleContext], Type | None]
+type Applied = tuple[tuple[Type, ...], Type]
+type BinaryOverload = Callable[[Type, Type, ModuleContext], Applied | None]
+type UnaryOverload = Callable[[Type, ModuleContext], Applied | None]
 
 
 def both(
-    s: Type, t: Type, param: Type, result: Type, ctx: ModuleContext
-) -> Type | None:
-    return result if subtype(s, param) and subtype(t, param) else None
+    s: Type, t: Type, bound: Type, result: Type, ctx: ModuleContext
+) -> Applied | None:
+    """An overload bounding both positions by `bound`."""
+    return ((bound, bound), result) if subtype(s, bound) and subtype(t, bound) else None
 
 
-def equality(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def equality(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     if not comparable(s, t):
         return None
     if not equality_type(s, ctx) or not equality_type(t, ctx):
         return None
-    return Primitive.BOOL
+    return (s, t), Primitive.BOOL
 
 
 def equality_type(t: Type, ctx: ModuleContext) -> bool:
@@ -65,89 +67,95 @@ def declared(c: Class, x: str) -> Type:
     return t
 
 
-def membership_list(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def membership_list(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     if isinstance(t, ListType) and comparable(s, t.elem):
-        return Primitive.BOOL
+        return (s, t), Primitive.BOOL
     return None
 
 
-def membership_tuple(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def membership_tuple(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     if isinstance(t, TupleType) and comparable(s, join(t.components)):
-        return Primitive.BOOL
+        return (s, t), Primitive.BOOL
     return None
 
 
-def membership_str(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def membership_str(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     return both(s, t, Primitive.STR, Primitive.BOOL, ctx)
 
 
-def membership_dict(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def membership_dict(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     if isinstance(t, DictType) and subtype(s, Primitive.STR):
-        return Primitive.BOOL
+        return (Primitive.STR, t), Primitive.BOOL
     return None
 
 
-def ordering_number(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def ordering_number(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     return both(s, t, Primitive.FLOAT, Primitive.BOOL, ctx)
 
 
-def ordering_str(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def ordering_str(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     return both(s, t, Primitive.STR, Primitive.BOOL, ctx)
 
 
-def arithmetic_int(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def arithmetic_int(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     return both(s, t, Primitive.INT, Primitive.INT, ctx)
 
 
-def arithmetic_float(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def arithmetic_float(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     return both(s, t, Primitive.FLOAT, Primitive.FLOAT, ctx)
 
 
-def concat_str(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def concat_str(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     return both(s, t, Primitive.STR, Primitive.STR, ctx)
 
 
-def concat_list(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def concat_list(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     if isinstance(s, ListType) and isinstance(t, ListType):
-        return ListType(join((s.elem, t.elem)))
+        return (s, t), ListType(join((s.elem, t.elem)))
     return None
 
 
-def concat_tuple(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def concat_tuple(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     if isinstance(s, TupleType) and isinstance(t, TupleType):
-        return TupleType(s.components + t.components)
+        return (s, t), TupleType(s.components + t.components)
     return None
 
 
-def repeat_str(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def repeat_str(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     if subtype(s, Primitive.STR) and subtype(t, Primitive.INT):
-        return Primitive.STR
+        return (Primitive.STR, Primitive.INT), Primitive.STR
     return None
 
 
-def repeat_str_left(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    return repeat_str(t, s, ctx)
+def repeat_str_left(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+    if subtype(s, Primitive.INT) and subtype(t, Primitive.STR):
+        return (Primitive.INT, Primitive.STR), Primitive.STR
+    return None
 
 
-def repeat_list(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def repeat_list(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     if isinstance(s, ListType) and subtype(t, Primitive.INT):
-        return s
+        return (s, Primitive.INT), s
     return None
 
 
-def repeat_list_left(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    return repeat_list(t, s, ctx)
+def repeat_list_left(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+    if subtype(s, Primitive.INT) and isinstance(t, ListType):
+        return (Primitive.INT, t), t
+    return None
 
 
-def power_int(s: Type, t: Type, ctx: ModuleContext) -> Type | None:
+def power_int(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
     if subtype(s, Primitive.INT) and isinstance(t, LiteralType):
         exponent = t.value
         if isinstance(exponent, int) and not isinstance(exponent, bool):
-            return Primitive.FLOAT if exponent < 0 else Primitive.INT
+            return (Primitive.INT, t), (
+                Primitive.FLOAT if exponent < 0 else Primitive.INT
+            )
     return None
 
 
-BINARY_SIGNATURES: dict[str, tuple[BinarySignature, ...]] = {
+BINARY_OVERLOADS: dict[str, tuple[BinaryOverload, ...]] = {
     "==": (equality,),
     "!=": (equality,),
     "in": (membership_list, membership_tuple, membership_str, membership_dict),
@@ -173,19 +181,21 @@ BINARY_SIGNATURES: dict[str, tuple[BinarySignature, ...]] = {
 }
 
 
-def negate_bool(s: Type, ctx: ModuleContext) -> Type | None:
-    return Primitive.BOOL if subtype(s, Primitive.BOOL) else None
+def negate_bool(s: Type, ctx: ModuleContext) -> Applied | None:
+    return ((Primitive.BOOL,), Primitive.BOOL) if subtype(s, Primitive.BOOL) else None
 
 
-def sign_int(s: Type, ctx: ModuleContext) -> Type | None:
-    return Primitive.INT if subtype(s, Primitive.INT) else None
+def sign_int(s: Type, ctx: ModuleContext) -> Applied | None:
+    return ((Primitive.INT,), Primitive.INT) if subtype(s, Primitive.INT) else None
 
 
-def sign_float(s: Type, ctx: ModuleContext) -> Type | None:
-    return Primitive.FLOAT if subtype(s, Primitive.FLOAT) else None
+def sign_float(s: Type, ctx: ModuleContext) -> Applied | None:
+    return (
+        ((Primitive.FLOAT,), Primitive.FLOAT) if subtype(s, Primitive.FLOAT) else None
+    )
 
 
-UNARY_SIGNATURES: dict[str, tuple[UnarySignature, ...]] = {
+UNARY_OVERLOADS: dict[str, tuple[UnaryOverload, ...]] = {
     "not": (negate_bool,),
     "+": (sign_int, sign_float),
     "-": (sign_int, sign_float),
@@ -216,24 +226,41 @@ UNARY_NAMES: dict[type[ast.AST], str] = {
 }
 
 
-def first_result(results: Sequence[Type | None]) -> Type | None:
-    return next((r for r in results if r is not None), None)
+def least(applied: Sequence[Applied]) -> Applied | None:
+    """The overload whose bounds lie pointwise below every applicable
+    overload's, or nothing if no applicable overload is least."""
+    for cand in applied:
+        if all(
+            all(subtype(a, b) for a, b in zip(cand[0], other[0])) for other in applied
+        ):
+            return cand
+    return None
+
+
+def result_of_least(applied: Sequence[Applied]) -> Type | None:
+    chosen = least(applied)
+    return chosen[1] if chosen is not None else None
 
 
 def resolve_binary(op: str, s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    """The result of applying `op`, trying the operand types as synthesised and
-    then at their base types, which is how a literal operand checks against a
-    signature written for its base type."""
-    exact = first_result([sig(s, t, ctx) for sig in BINARY_SIGNATURES[op]])
-    if exact is not None:
-        return exact
-    return first_result(
-        [sig(base_type(s), base_type(t), ctx) for sig in BINARY_SIGNATURES[op]]
-    )
+    """Result of the least overload of `op` at the operand types, or at their
+    base types if no overload applies at the operand types themselves."""
+    applied = [r for ov in BINARY_OVERLOADS[op] if (r := ov(s, t, ctx)) is not None]
+    if applied:
+        return result_of_least(applied)
+    applied = [
+        r
+        for ov in BINARY_OVERLOADS[op]
+        if (r := ov(base_type(s), base_type(t), ctx)) is not None
+    ]
+    return result_of_least(applied) if applied else None
 
 
 def resolve_unary(op: str, s: Type, ctx: ModuleContext) -> Type | None:
-    exact = first_result([sig(s, ctx) for sig in UNARY_SIGNATURES[op]])
-    if exact is not None:
-        return exact
-    return first_result([sig(base_type(s), ctx) for sig in UNARY_SIGNATURES[op]])
+    applied = [r for ov in UNARY_OVERLOADS[op] if (r := ov(s, ctx)) is not None]
+    if applied:
+        return result_of_least(applied)
+    applied = [
+        r for ov in UNARY_OVERLOADS[op] if (r := ov(base_type(s), ctx)) is not None
+    ]
+    return result_of_least(applied) if applied else None

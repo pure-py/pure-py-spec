@@ -233,12 +233,18 @@ name\paperonly{ (\secref{no-first-class})}.
 \speconly{\subsubsection{Operators}\label{sec:well-formedness-operators}}%
 \paperonly{\paragraph{Operators.}}
 
-Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
-signature $\ominus : \sigma \to \tau$, relating operand types to result type
-(\figref{operator-signatures}). A signature
-applies at the operand types that instantiate it with its condition holding. Where several signatures
-apply the first listed is used, so \pyinline{1 + 2} is an \pyinline{int} and
-\pyinline{1 + 2.0} a \pyinline{float}. An \emph{equality type} is one for which structural equality is
+Each operator is overloaded: an \emph{overload} $\omega$, a row of \figref{operator-overloads}, is a
+tuple of operand forms, bounds, condition and result. The overload \emph{applies at} operand types
+$(\sigma, \sigma')$ if they are of $\omega$'s operand forms under an instantiation of its variables, the
+type instantiating each bounded variable lies below its bound, and the condition holds. The
+\emph{bounds} of $\omega$ at $(\sigma, \sigma')$ are the declared bound at each position and the operand's
+type at a position without one, and $\resultOf(\omega, \sigma, \sigma')$ is the result under the
+instantiation. Write $\omega \subty \omega'$ at $(\sigma, \sigma')$ when the bounds of $\omega$ lie
+componentwise below the bounds of $\omega'$; the overload is \emph{least} at $(\sigma, \sigma')$ if it applies at
+$(\sigma, \sigma')$ and $\omega \subty \omega'$ for every overload $\omega'$ of the same operator that
+applies at $(\sigma, \sigma')$. A unary
+overload is read likewise at a single operand type. Resolution takes the least applicable overload, so
+\pyinline{1 + 2} is an \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}. An \emph{equality type} is one for which structural equality is
 defined:
 \begin{defalign}
 & \Gamma \vdash \nu \eqType \\
@@ -252,14 +258,21 @@ defined:
 
 \noindent A callable type is not an equality type, and neither is any type with a callable component, so
 comparing two functions is rejected rather than left undefined. \emph{Resolution} looks the operator up at the operand types, and
-at their base types where no signature gives a result for the operand types themselves
-(\secref{types-auxiliary}). The second clause lets \pyinline{1 == 0} use the equality signature at \pyinline{int}, since two
+at their base types where no overload applies at the operand types themselves
+(\secref{types-auxiliary}). The second clause lets \pyinline{1 == 0} use the equality overload at \pyinline{int}, since two
 distinct literal types are not comparable. Taking the operand types as they are first keeps \pyinline{2 **
 3} an \pyinline{int}, since the exponent binds a variable that its base type would not. Resolution is more
 precise than mypy for this operator, whose overloads give \pyinline{Any} as soon as the exponent is not a
 literal, where resolution gives \pyinline{float}.
 
-\input{spec/fig/operator-signatures}
+\input{spec/fig/operator-overloads}
+
+\begin{lemma}[Least overload]
+\label{lem:least-overload}
+If neither $\sigma$ nor $\sigma'$ is a subtype of \pyinline{Never} and some overload of $\odot$ applies at
+$(\sigma, \sigma')$, then a least overload of $\odot$ at $(\sigma, \sigma')$ exists; likewise for $\ominus$
+at $\sigma$.
+\end{lemma}
 
 \subsection{Patterns}
 \label{sec:exhaustiveness}
