@@ -7,8 +7,9 @@
 \opname{$\override$ (override)} && \bot \override \theta &= \theta \override \bot = \theta \\
 \opblank && \theta \override \theta' &= \theta' \quad \text{otherwise} \\[2mm]
 \opname{$\merge$ (merge)} && \bot \merge \bot &= \bot \\
-\opblank && b \merge \bot = \bot \merge b &= \statusNotDefAssigned \\
-\opblank && b \merge b' &= b \meet b' \quad (b, b' \in \B) \\[2mm]
+\opblank && \tau \merge \bot = \bot \merge \tau &= \statusNotDefAssigned \\
+\opblank && \statusNotDefAssigned \merge \theta = \theta \merge \statusNotDefAssigned &= \statusNotDefAssigned \\
+\opblank && \sigma \merge \tau &= \joinTy(\sigma, \tau) \\[2mm]
 \opname{$\extend$ (extension)} && \modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} &= \modLoaded{q}{\Gamma \extend \Gamma'} \\
 \opblank && \modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} &= \modLoaded{q}{\Gamma} \\
 \opblank && \bot \extend \theta = \theta \extend \bot &= \theta \\

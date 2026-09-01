@@ -59,13 +59,10 @@ class name at most once, so the qualified name of a class is the identity of the
 the type of its instances.
 \end{definition}
 
-\noindent The well-formedness rules compute no types, so they bind a definitely assigned variable to
-$\statusDefAssigned$ in place of its type, and the two statuses together are written $\B =
-\set{\statusDefAssigned, \statusNotDefAssigned}$. Module
-references arise from import statements. A predefined name is a
+\noindent Module references arise from import statements. A predefined name is a
 member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expression may mention: it names a
-type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}; $\statusDefAssigned$ indicates \emph{definitely assigned} and $\statusNotDefAssigned$ \emph{not definitely assigned} (or, equivalently, degenerate types ``any'' and ``none'').
-It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusDefAssigned(X)$ for the context $\set{\bind{x}{\statusDefAssigned} \mid x \in X}$; similarly $\statusNotDefAssigned(X)$.
+type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}, and $\statusNotDefAssigned$ indicates \emph{not definitely assigned}.
+It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusNotDefAssigned(X)$ for the context $\set{\bind{x}{\statusNotDefAssigned} \mid x \in X}$.
 
 An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by
 keyword arguments $x = u$, where an argument $u$ is an expression in a constructor call and a pattern in a
@@ -78,9 +75,9 @@ Contexts admit a non-commutative monoid of sequential composition $\Gamma \overr
 an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
 distributivity does not hold. Both are defined pointwise (\figref{context-ops}): override is right-biased
-and has $\bot$ as both left and right unit; merge is defined only on definite-assignment statuses, returning
-$\statusNotDefAssigned$ when exactly one argument is defined and the conjunction otherwise, so $\bot$ is not
-a unit.
+and has $\bot$ as both left and right unit; merge is defined only on variable entries, returning
+$\statusNotDefAssigned$ where either argument is undefined or not definitely assigned, and the join of two
+types otherwise, so $\bot$ is not a unit.
 \input{spec/fig/context-ops}
 
 A third operation, \emph{context extension} $\Gamma \extend \Delta$, also \figref{context-ops},
@@ -142,8 +139,7 @@ definitions that follow, as is the name $q$ of the current module in the rules t
 $\mathcal{P}$ takes each module $q$ of \figref{predefined} to a pair $(\Gamma, \rho)$, where $\Gamma$
 binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member listed for $q$ in \figref{predefined-types} at
 its entry there, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value
-(\figref{predefined}). The well-formedness rules read a type as $\statusDefAssigned$, since they
-compute no types. These signatures name types
+(\figref{predefined}). These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
 the predefined signatures.
 \end{definition}
