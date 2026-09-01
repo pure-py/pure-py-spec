@@ -63,6 +63,13 @@ joining the first with the join of the rest, with \pyinline{Never} as the unit (
 So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.
 
+\begin{lemma}[Types form a lattice]
+\label{lem:lattice}
+Types ordered by subtyping, up to equivalence, form a bounded distributive lattice: $\joinTy(\sigma, \tau)$
+is the least upper bound of $\sigma$ and $\tau$, $\meetTy(\sigma, \tau)$ is their greatest lower bound,
+\pyinline{object} is the greatest type and \pyinline{Never} the least.
+\end{lemma}
+
 \input{spec/fig/subtyping}
 
 
