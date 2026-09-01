@@ -75,9 +75,9 @@
 {
   \Gamma \vdash q : \Type{D} \\
   C \subty D \\
-  \dom(\fields(D)) = \seq{x} \\
+  \fields(D) = \bind{\seq{x}}{\seq{\sigma}} \\
   \fieldMap(D, a) = \set{\bind{\seq{x}}{\seq{p}}} \\
-  p'_j = \patWild \quad (\forall j) \\
+  p'_i = \patWild \quad (\forall i) \\
   \Gamma \vdash \seq{k}, \seq{p} \mathbin{\concat} \seq{p}\,' \matches K, L \binding \Delta
 }
 {
