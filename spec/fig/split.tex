@@ -53,7 +53,7 @@
 \and
 \inferrule*[lab={\ruleName{split-subclass}}]
 {
-  \Gamma \vdash q' : \Type{C'} \\
+  \Gamma \vdash q : \Type{C'} \\
   C' \subty C \\
   C' \neq C \\
   \nexists C'' \in N.\ C' \subty C'' \\
@@ -61,7 +61,7 @@
   N' = \set{h \in N \mid \Gamma \vdash h : C'}
 }
 {
-  \Gamma \vdashSplit \shapeAny{\patConstr{C}{\seq{k}}}{N}, \patConstr{q'}{a} \matches \set{\shapeAny{\patConstr{C'}{\seq{k} \mathbin{\concat} \seq{k}\,'}}{N'} \mid \seq{k}\,' \in \shapesOf(\seq{\sigma})}, \set{\shapeAny{\patConstr{C}{\seq{k}}}{(N \cup \set{C'})}}
+  \Gamma \vdashSplit \shapeAny{\patConstr{C}{\seq{k}}}{N}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{C'}{\seq{k} \mathbin{\concat} \seq{k}\,'}}{N'} \mid \seq{k}\,' \in \shapesOf(\seq{\sigma})}, \set{\shapeAny{\patConstr{C}{\seq{k}}}{(N \cup \set{C'})}}
 }
 \end{mathpar}
 \caption{Shape $k$ splits for pattern $p$ into shapes $K$, leaving residual $L$}
