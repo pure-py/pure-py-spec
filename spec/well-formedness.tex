@@ -56,7 +56,9 @@ If $\sigma \subty \tau$ and $\tau \subty \tau'$ then $\sigma \subty \tau'$.
 
 Two types are \emph{comparable}
 when either is a subtype of the other. Two comparable types
-\emph{join} to the larger type and two incomparable types to their union. A sequence of types joins by
+\emph{join} to the larger type and two incomparable types to their union. Two comparable types \emph{meet} to the smaller type; a
+meet of incomparable types distributes over a union and takes tuples componentwise, and is
+\pyinline{Never} where no type lies below both. A sequence of types joins by
 joining the first with the join of the rest, with \pyinline{Never} as the unit (\secref{types-auxiliary}).
 So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.

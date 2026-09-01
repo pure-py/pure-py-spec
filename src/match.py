@@ -38,7 +38,7 @@ from shapes import (
     shapes,
     shapes_seq,
 )
-from subtyping import comparable, join, subtype
+from subtyping import join, meet, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
     ClassType,
@@ -217,15 +217,17 @@ def split_key(
 
 
 def split_class(k: Rest, cls: Class, ctx: ModuleContext) -> Split | None:
-    """Instances of the lower of the shape's type and the pattern's class, with
+    """Instances of the meet of the shape's type and the pattern's class, with
     the heads which type at that class kept."""
-    if not comparable(ClassType(cls), k.ty) or below_excluded(cls, k.heads, ctx):
+    if below_excluded(cls, k.heads, ctx):
         return None
-    low = cls if subtype(ClassType(cls), k.ty) else class_of(k.ty)
-    types = tuple(declared_field(low, x) for x in fields(low))
-    kept = typed_heads(k.heads, ClassType(low), ctx)
+    low = meet(k.ty, ClassType(cls))
+    if not isinstance(low, ClassType):
+        return None
+    types = tuple(declared_field(low.c, x) for x in fields(low.c))
+    kept = typed_heads(k.heads, low, ctx)
     return (
-        frozenset(Constr(low, ks, kept) for ks in shapes_seq(types, ctx)),
+        frozenset(Constr(low.c, ks, kept) for ks in shapes_seq(types, ctx)),
         shapes(k.ty, k.heads | {cls}, ctx),
     )
 
@@ -267,11 +269,6 @@ def typed_heads(
     """The heads typed at `t`, kept when an excluded set passes to a shape of a
     narrower type."""
     return frozenset(h for h in heads if head_typed(h, t, ctx))
-
-
-def class_of(t: Type) -> Class:
-    assert isinstance(t, ClassType)
-    return t.c
 
 
 def match_seq(

@@ -42,8 +42,7 @@
 {
   \Gamma \vdash q : \Type{C} \\
   \ancestors(C) \cap N = \varnothing \\
-  \tau, C \text{ comparable} \\
-  D \text{ the lower of } \tau \text{ and } C \\
+  D = \meetTy(\tau, C) \\
   \fields(D) = \bind{\seq{x}}{\seq{\sigma}} \\
   N' = \set{h \in N \mid \Gamma \vdash h : D}
 }

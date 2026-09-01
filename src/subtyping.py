@@ -23,6 +23,27 @@ def join_two(s: Type, t: Type) -> Type:
     return UnionType(s, t)
 
 
+def meet(s: Type, t: Type) -> Type:
+    """Greatest type below both: the smaller where they are comparable, and
+    otherwise distributing over a union, componentwise on tuples of the same
+    length, and `Never` on any other pair."""
+    if subtype(s, t):
+        return s
+    if subtype(t, s):
+        return t
+    if isinstance(s, UnionType):
+        return join_two(meet(s.left, t), meet(s.right, t))
+    if isinstance(t, UnionType):
+        return join_two(meet(s, t.left), meet(s, t.right))
+    if (
+        isinstance(s, TupleType)
+        and isinstance(t, TupleType)
+        and len(s.components) == len(t.components)
+    ):
+        return TupleType(tuple(meet(a, b) for a, b in zip(s.components, t.components)))
+    return Primitive.NEVER
+
+
 def join(ts: Sequence[Type]) -> Type:
     if len(ts) == 0:
         return Primitive.NEVER
