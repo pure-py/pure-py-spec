@@ -41,7 +41,7 @@
 \inferrule*[lab={\ruleName{split-class}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  C \text{ below no class of } N \\
+  \ancestors(C) \cap N = \varnothing \\
   \tau, C \text{ comparable} \\
   D \text{ the lower of } \tau \text{ and } C \\
   \fields(D) = \bind{\seq{x}}{\seq{\sigma}} \\
@@ -56,7 +56,7 @@
   \Gamma \vdash q : \Type{D} \\
   D \subty C \\
   D \neq C \\
-  D \text{ below no class of } N \\
+  \ancestors(D) \cap N = \varnothing \\
   \fields(D) = \fields(C) \mathbin{\concat} \bind{\seq{y}}{\seq{\sigma}} \\
   N' = \set{h \in N \mid \Gamma \vdash h : D}
 }
