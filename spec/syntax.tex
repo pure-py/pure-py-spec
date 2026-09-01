@@ -64,11 +64,6 @@ member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expressio
 type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}, and $\statusNotDefAssigned$ indicates \emph{not definitely assigned}.
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusNotDefAssigned(X)$ for the context $\set{\bind{x}{\statusNotDefAssigned} \mid x \in X}$.
 
-An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by
-keyword arguments $x = u$, where an argument $u$ is an expression in a constructor call and a pattern in a
-constructor pattern. $\fieldMap$ (\secref{auxiliary-classes}) pairs the arguments of $a$ with the fields
-they supply.
-
 \paragraph{Context operations.}
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
@@ -87,6 +82,11 @@ at the same module must combine rather than shadow.
 
 \subsection{Expressions and statements}
 \label{sec:expressions-statements}
+
+An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by
+keyword arguments $x = u$, where an argument $u$ is an expression in a constructor call and a pattern in a
+constructor pattern. $\fieldMap$ (\secref{auxiliary-classes}) pairs the arguments of $a$ with the fields
+they supply.
 
 \input{spec/fig/syntax-stmt}
 \input{spec/fig/syntax-expr}
