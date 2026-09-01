@@ -35,7 +35,7 @@
   w_j \in \dom(\beta) \quad (\forall j < i)
 }
 {
-  \Gamma \vdashSplit \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \matches \set{\shapeDict{\tau}{\beta \override \set{\bind{w_i}{k}}}{N} \mid k \in \shapesOf(\tau, \varnothing)}, \set{\shapeDict{\tau}{\beta}{N \cup \set{w_i}}}
+  \Gamma \vdashSplit \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \matches \set{\shapeDict{\tau}{\beta \override \set{\bind{w_i}{k}}}{N} \mid k \in \shapesOf(\tau, \varnothing)}, \set{\shapeDict{\tau}{\beta}{(N \cup \set{w_i})}}
 }
 \and
 \inferrule*[lab={\ruleName{split-class}}]
@@ -61,7 +61,7 @@
   N' = \set{h \in N \mid \Gamma \vdash h : C'}
 }
 {
-  \Gamma \vdashSplit \shapeAny{\patConstr{C}{\seq{k}}}{N}, \patConstr{q'}{a} \matches \set{\shapeAny{\patConstr{C'}{\seq{k} \mathbin{\concat} \seq{k}\,'}}{N'} \mid \seq{k}\,' \in \shapesOf(\seq{\sigma})}, \set{\shapeAny{\patConstr{C}{\seq{k}}}{N \cup \set{C'}}}
+  \Gamma \vdashSplit \shapeAny{\patConstr{C}{\seq{k}}}{N}, \patConstr{q'}{a} \matches \set{\shapeAny{\patConstr{C'}{\seq{k} \mathbin{\concat} \seq{k}\,'}}{N'} \mid \seq{k}\,' \in \shapesOf(\seq{\sigma})}, \set{\shapeAny{\patConstr{C}{\seq{k}}}{(N \cup \set{C'})}}
 }
 \end{mathpar}
 \caption{Shape $k$ splits for pattern $p$ into shapes $K$, leaving residual $L$}
