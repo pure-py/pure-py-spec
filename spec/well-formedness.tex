@@ -3,10 +3,12 @@
 
 \PurePy excludes some Python behaviours statically and others only at runtime.
 Well-formedness is the static part, a judgement on programs defined in this \seckind{}; the operational
-semantics (\secref{operational-semantics}) is defined for well-formed programs. The statement and expression rules rest on a definite-assignment analysis; the pattern rules
-enforce linearity and reachability; and the module rules govern imports and class declarations. The
-\seckind{} follows the syntax of \secref{syntax}, taking statements, expressions and patterns, then modules
-and programs, and \secref{operational-semantics} gives each of these a dynamic counterpart.
+semantics (\secref{operational-semantics}) is defined for well-formed programs. A program is well-formed
+when it is well typed, so the rules of this \seckind{} give each expression a type, each statement a
+result type recording what it assigns or returns, and each module a signature. The \seckind{} introduces
+types and subtyping, then follows the syntax of \secref{syntax}, taking statements, expressions and
+patterns, then modules and programs, and \secref{operational-semantics} gives each of these a dynamic
+counterpart.
 
 \specinput{spec/well-formedness/auxiliary}
 \paperinput{paper/well-formedness/principles}
@@ -14,7 +16,7 @@ and programs, and \secref{operational-semantics} gives each of these a dynamic c
 \subsection{Types}
 \label{sec:types}
 
-The typing rules say whether a program is well typed. They are intended as a refinement of mypy's: a well-typed
+The rules are intended as a refinement of mypy's: a well-typed
 \PurePy program should be accepted by mypy, and \PurePy may reject programs mypy accepts but not the
 reverse. Function signatures, assignments and dataclass fields are annotated with type expressions, and a
 type expression denotes a type under a context (\figref{resolve-type}). Every definition carries an
