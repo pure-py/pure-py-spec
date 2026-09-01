@@ -73,10 +73,10 @@
 \and
 \inferrule*[lab={\ruleName{pat-constr}}]
 {
-  \Gamma \vdash q : \Type{C'} \\
-  C \subty C' \\
-  \fields(C') = \bind{\seq{x}}{\seq{\sigma}} \\
-  p_i = \fieldMap(C', a)(x_i) \quad (\forall i \leq n) \\
+  \Gamma \vdash q : \Type{D} \\
+  C \subty D \\
+  \fields(D) = \bind{\seq{x}}{\seq{\sigma}} \\
+  p_i = \fieldMap(D, a)(x_i) \quad (\forall i \leq n) \\
   p_i = \patWild \quad (\forall i > n) \\
   \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
 }

@@ -41,7 +41,7 @@
 \inferrule*[lab={\ruleName{split-class}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \nexists C' \in N.\ C \subty C' \\
+  \nexists D \in N.\ C \subty D \\
   \tau, C \text{ comparable} \\
   E \text{ the lower of } \tau \text{ and } C \\
   \fields(E) = \bind{\seq{x}}{\seq{\sigma}} \\
@@ -53,15 +53,15 @@
 \and
 \inferrule*[lab={\ruleName{split-subclass}}]
 {
-  \Gamma \vdash q : \Type{C'} \\
-  C' \subty C \\
-  C' \neq C \\
-  \nexists C'' \in N.\ C' \subty C'' \\
-  \fields(C') = \fields(C) \mathbin{\concat} \bind{\seq{y}}{\seq{\sigma}} \\
-  N' = \set{h \in N \mid \Gamma \vdash h : C'}
+  \Gamma \vdash q : \Type{D} \\
+  D \subty C \\
+  D \neq C \\
+  \nexists E \in N.\ D \subty E \\
+  \fields(D) = \fields(C) \mathbin{\concat} \bind{\seq{y}}{\seq{\sigma}} \\
+  N' = \set{h \in N \mid \Gamma \vdash h : D}
 }
 {
-  \Gamma \vdashSplit \shapeAny{\patConstr{C}{\seq{k}}}{N}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{C'}{\seq{k} \mathbin{\concat} \seq{k}\,'}}{N'} \mid \seq{k}\,' \in \shapesOf(\seq{\sigma})}, \set{\shapeAny{\patConstr{C}{\seq{k}}}{(N \cup \set{C'})}}
+  \Gamma \vdashSplit \shapeAny{\patConstr{C}{\seq{k}}}{N}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{D}{\seq{k} \mathbin{\concat} \seq{k}\,'}}{N'} \mid \seq{k}\,' \in \shapesOf(\seq{\sigma})}, \set{\shapeAny{\patConstr{C}{\seq{k}}}{(N \cup \set{D})}}
 }
 \end{mathpar}
 \caption{Shape $k$ splits for pattern $p$ into shapes $K$, leaving residual $L$}
