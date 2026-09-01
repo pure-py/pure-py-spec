@@ -4,8 +4,8 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.55\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}}
 \textbf{Judgement} & \textbf{Reading} & \textbf{Defined in} \\[1mm]
 \metaGroup{Well-formedness} \\
-$\Gamma \vdash h : \tau$ & head $h$ has type $\tau$ & \figref{shape-typing} \\
-$\Gamma \vdash k : \tau$ & shape $k$ has type $\tau$ & \figref{shape-typing} \\
+$\Gamma \vdash h : \tau$ & head $h$ has type $\tau$ & \figref{shapes} \\
+$\Gamma \vdash k : \tau$ & shape $k$ has type $\tau$ & \figref{shapes} \\
 $\Gamma \vdash p \agrees \tau$ & tuple and list patterns in $p$ meet only their own kind at $\tau$ & \figref{agrees} \\
 $\Gamma \vdash k, p \splits K, L$ & shape $k$ splits at the head that $p$ tests for, giving $K$ and $L$ & \figref{split} \\
 $\Gamma \vdash k, p \matches K, L \binding \Delta$ & pattern $p$ matches shapes $K$ of $k$, leaving $L$ and binding $\Delta$ & \figref{pat} \\

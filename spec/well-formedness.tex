@@ -251,7 +251,7 @@ name\paperonly{ (\secref{no-first-class})}.
 \label{sec:exhaustiveness}
 \label{sec:well-formedness-patterns}
 
-\input{spec/fig/syntax-shapes}
+\input{spec/fig/shapes}
 
 The matching judgement decides reachability and exhaustiveness together
 (\figrefTwo{pat}{pat-seq}), reachability by the shapes a case matches and exhaustiveness by the residual
@@ -264,7 +264,7 @@ value of type $\tau$ whose outermost head is not among those in $N$. A head itse
 class its instances, an integer at a list type the lists of that length, and a literal its value. Head
 typing $\Gamma \vdash h : \tau$ admits the heads whose values lie within $\tau$, and shape typing
 $\Gamma \vdash k : \tau$ types each excluded head and each component of a shape
-(\figref{shape-typing}). The other forms are a literal, a constructor, a tuple, a list and a dictionary, each with shapes in place of
+(\figref{shapes}). The other forms are a literal, a constructor, a tuple, a list and a dictionary, each with shapes in place of
 sub-patterns. A list shape also records its element type, which the element shapes do not determine. A
 constructor shape carries an excluded set of its own: $\shapeAny{\patConstr{C}{\seq{k}}}{N}$ denotes the
 instances of $C$, or of a subclass not below a class of $N$, whose fields, those of $C$, have the shapes
@@ -317,8 +317,6 @@ $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinli
 although each covers only part of the type.
 
 \input{spec/fig/agrees}
-
-\input{spec/fig/shape-typing}
 
 \input{spec/fig/split}
 

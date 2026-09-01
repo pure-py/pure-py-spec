@@ -1,6 +1,24 @@
 \begin{figure}
 \small
 \setlength{\jot}{2pt}
+\begin{center}
+\begin{tabular}{rcll}
+\grammarGroup{Heads} \\
+$h$ & $::=$ & $\ell$ & (Literal) \\
+    & $\mid$ & $C$ & (Class)
+   \\[3mm]
+\grammarGroup{Shapes} \\
+$k$ & $::=$ & $\shapeAny{\tau}{N}$ & (Rest) \\
+    & $\mid$ & $\ell$ & (Literal) \\
+    & $\mid$ & $\shapeAny{\patConstr{C}{k_1, \ldots, k_n}}{N}$ & (Constr) \\
+    & $\mid$ & $\patTuple{k_1, \ldots, k_n}$ & (Tuple) \\
+    & $\mid$ & $\shapeList{\tau}{k_1, \ldots, k_n}$ & (List) \\
+    & $\mid$ & $\shapeDict{\tau}{\beta}{N}$ & (Dict)
+\end{tabular}
+\end{center}
+
+\vspace{2mm}
+
 \flushleft \shadebox{$\Gamma \vdash h : \tau$}
 \begin{mathpar}
 \small
@@ -94,6 +112,6 @@
   \Gamma \vdash \shapeDict{\tau}{\beta}{N} : \tyDict{\tau}
 }
 \end{mathpar}
-\caption{Head and shape typing}
-\label{fig:shape-typing}
+\caption{Shapes and their typing}
+\label{fig:shapes}
 \end{figure}
