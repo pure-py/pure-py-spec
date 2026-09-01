@@ -1,39 +1,39 @@
 \begin{figure}
 \small
 \begin{center}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.37\textwidth}>{\raggedright\arraybackslash}p{0.32\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.37\textwidth}>{\raggedright\arraybackslash}p{0.16\textwidth}>{\raggedright\arraybackslash}p{0.16\textwidth}}
 \arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}$\odot$ & Signature & Condition \\
-\pyinline{==}\quad\pyinline{!=} & $(\sigma, \sigma') \to \tyBool$ & $\forall \sigma, \sigma'$ comparable equality types \\
-\pyinline{in}\quad\pyinline{not in} & $(\sigma, \tyList{\tau}) \to \tyBool$ & $\forall \sigma, \tau$ comparable \\
- & $(\sigma, \tyTuple{\seq{\tau}}) \to \tyBool$ & $\forall \sigma, \seq{\tau}$ with $\sigma$, $\joinTy(\seq{\tau})$ comparable \\
- & $(\sigma, \sigma') \to \tyBool$ & $\forall \sigma, \sigma' \subty \tyStr$ \\
- & $(\sigma, \tyDict{\tau}) \to \tyBool$ & $\forall \tau,\ \sigma \subty \tyStr$ \\
-\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\sigma, \sigma') \to \tyBool$ & $\forall \sigma, \sigma' \subty \tyFloat$ \\
- & $(\sigma, \sigma') \to \tyBool$ & $\forall \sigma, \sigma' \subty \tyStr$ \\
-\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{//}\quad\pyinline{\%} & $(\sigma, \sigma') \to \tyInt$ & $\forall \sigma, \sigma' \subty \tyInt$ \\
- & $(\sigma, \sigma') \to \tyFloat$ & $\forall \sigma, \sigma' \subty \tyFloat$ \\
-\pyinline{/} & $(\sigma, \sigma') \to \tyFloat$ & $\forall \sigma, \sigma' \subty \tyFloat$ \\
-\pyinline{+} & $(\sigma, \sigma') \to \tyStr$ & $\forall \sigma, \sigma' \subty \tyStr$ \\
- & $(\tyList{\sigma}, \tyList{\tau}) \to \tyList{\joinTy(\sigma, \tau)}$ & $\forall \sigma, \tau$ \\
- & $(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) \to \tyTuple{\seq{\sigma} \mathbin{\concat} \seq{\tau}}$ & $\forall \seq{\sigma}, \seq{\tau}$ \\
-\pyinline{*} & $(\sigma, \sigma') \to \tyStr$ & $\forall \sigma \subty \tyStr,\ \sigma' \subty \tyInt$ \\
- & $(\sigma, \sigma') \to \tyStr$ & $\forall \sigma \subty \tyInt,\ \sigma' \subty \tyStr$ \\
- & $(\tyList{\tau}, \sigma) \to \tyList{\tau}$ & $\forall \tau,\ \sigma \subty \tyInt$ \\
- & $(\sigma, \tyList{\tau}) \to \tyList{\tau}$ & $\forall \tau,\ \sigma \subty \tyInt$ \\
-\pyinline{**} & $(\sigma, \tyLiteral{n}) \to \tyInt$ & $\forall \sigma \subty \tyInt$, $n$ an integer \\
- & $(\sigma, \tyLiteral{-n}) \to \tyFloat$ & $\forall \sigma \subty \tyInt$, $n$ a positive integer \\
- & $(\sigma, \sigma') \to \tyFloat$ & $\forall \sigma, \sigma' \subty \tyFloat$
+\rowcolor{grammarheadcolor}$\odot$ & Signature & Bounds & Condition \\
+\pyinline{==}\quad\pyinline{!=} & $(\sigma, \sigma') \to \tyBool$ & & $\sigma, \sigma'$ comparable equality types \\
+\pyinline{in}\quad\pyinline{not in} & $(\sigma, \tyList{\tau}) \to \tyBool$ & & $\sigma, \tau$ comparable \\
+ & $(\sigma, \tyTuple{\seq{\tau}}) \to \tyBool$ & & $\sigma$, $\joinTy(\seq{\tau})$ comparable \\
+ & $(\sigma, \sigma') \to \tyBool$ & $\sigma, \sigma' \subty \tyStr$ & \\
+ & $(\sigma, \tyDict{\tau}) \to \tyBool$ & $\sigma \subty \tyStr$ & \\
+\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\sigma, \sigma') \to \tyBool$ & $\sigma, \sigma' \subty \tyFloat$ & \\
+ & $(\sigma, \sigma') \to \tyBool$ & $\sigma, \sigma' \subty \tyStr$ & \\
+\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{//}\quad\pyinline{\%} & $(\sigma, \sigma') \to \tyInt$ & $\sigma, \sigma' \subty \tyInt$ & \\
+ & $(\sigma, \sigma') \to \tyFloat$ & $\sigma, \sigma' \subty \tyFloat$ & \\
+\pyinline{/} & $(\sigma, \sigma') \to \tyFloat$ & $\sigma, \sigma' \subty \tyFloat$ & \\
+\pyinline{+} & $(\sigma, \sigma') \to \tyStr$ & $\sigma, \sigma' \subty \tyStr$ & \\
+ & $(\tyList{\sigma}, \tyList{\tau}) \to \tyList{\joinTy(\sigma, \tau)}$ & & \\
+ & $(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) \to \tyTuple{\seq{\sigma} \mathbin{\concat} \seq{\tau}}$ & & \\
+\pyinline{*} & $(\sigma, \sigma') \to \tyStr$ & $\sigma \subty \tyStr$, $\sigma' \subty \tyInt$ & \\
+ & $(\sigma, \sigma') \to \tyStr$ & $\sigma \subty \tyInt$, $\sigma' \subty \tyStr$ & \\
+ & $(\tyList{\tau}, \sigma) \to \tyList{\tau}$ & $\sigma \subty \tyInt$ & \\
+ & $(\sigma, \tyList{\tau}) \to \tyList{\tau}$ & $\sigma \subty \tyInt$ & \\
+\pyinline{**} & $(\sigma, \tyLiteral{n}) \to \tyInt$ & $\sigma \subty \tyInt$ & $n$ an integer \\
+ & $(\sigma, \tyLiteral{-n}) \to \tyFloat$ & $\sigma \subty \tyInt$ & $n$ a positive integer \\
+ & $(\sigma, \sigma') \to \tyFloat$ & $\sigma, \sigma' \subty \tyFloat$ &
 \end{tabular}
 
 \vspace{3mm}
 
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.37\textwidth}>{\raggedright\arraybackslash}p{0.32\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.37\textwidth}>{\raggedright\arraybackslash}p{0.16\textwidth}>{\raggedright\arraybackslash}p{0.16\textwidth}}
 \arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}$\ominus$ & Signature & Condition \\
-\pyinline{not} & $\sigma \to \tyBool$ & $\forall \sigma \subty \tyBool$ \\
-\pyinline{+}\quad\pyinline{-} & $\sigma \to \tyInt$ & $\forall \sigma \subty \tyInt$ \\
- & $\sigma \to \tyFloat$ & $\forall \sigma \subty \tyFloat$
+\rowcolor{grammarheadcolor}$\ominus$ & Signature & Bounds & Condition \\
+\pyinline{not} & $\sigma \to \tyBool$ & $\sigma \subty \tyBool$ & \\
+\pyinline{+}\quad\pyinline{-} & $\sigma \to \tyInt$ & $\sigma \subty \tyInt$ & \\
+ & $\sigma \to \tyFloat$ & $\sigma \subty \tyFloat$ &
 \end{tabular}
 \end{center}
 \caption{Operator signatures, arithmetic listed in priority order}
