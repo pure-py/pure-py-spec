@@ -16,7 +16,15 @@
   \rho, e \Rightarrow o
 }
 {
-  \rho, \exAssign{x\pi}{e} \Rightarrow \mlet{v}{o}{\assigns{\set{\bind{x}{v}}}}
+  \rho, \exAssign{x}{e} \Rightarrow \mlet{v}{o}{\assigns{\set{\bind{x}{v}}}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-assign-annot}}]
+{
+  \rho, e \Rightarrow o
+}
+{
+  \rho, \exAssign{x\exAnnot{\psi}}{e} \Rightarrow \mlet{v}{o}{\assigns{\set{\bind{x}{v}}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-expr-stmt}}]
@@ -45,7 +53,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-def}}]
 {
-  d_i = \exDef{f_i}{\seq{x}_i\,\seq{\pi}_i}{\omega_i}{s_i} \quad (\forall i) \\
+  d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \quad (\forall i) \\
   v_i = \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} \quad (\forall i)
 }
 {
@@ -351,7 +359,7 @@
 \inferrule*[lab={\ruleName{eval-call-def}}]
 {
   \rho, e \Rightarrow \val{\exDefClosure[\Delta]{\rho'}{\seq{d}}{j}} \\
-  d_i = \exDef{f_i}{\seq{x}_i\,\seq{\pi}_i}{\omega_i}{s_i} \quad (\forall i) \\
+  d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \quad (\forall i) \\
   v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
   \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, s_j \Rightarrow r
@@ -635,7 +643,7 @@
 \inferrule*[lab={\ruleName{eval-call-def-arity}}]
 {
   \rho, e \Rightarrow \val{\exDefClosure[\Delta]{\rho'}{\seq{d}}{j}} \\
-  d_j = \exDef{f_j}{\seq{x}_j\,\seq{\pi}_j}{\omega_j}{s_j} \\
+  d_j = \exDef{f_j}{\bind{\seq{x}_j}{\seq{\psi}_j}}{\exRetAnnot{\psi_j}}{s_j} \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
   |\seq{x}_j| \neq |\seq{u}|
 }

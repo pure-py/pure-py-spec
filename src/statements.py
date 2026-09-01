@@ -231,16 +231,7 @@ def check_statement(
 
 def check_mutual_region(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
     check_distinct_names(defs, set())
-    check_annotated(defs)
     check_bodies(defs, ctx)
-
-
-def check_annotated(defs: list[ast.FunctionDef]) -> None:
-    """A definition annotates every parameter and its return type, so the type
-    of a definition is given rather than inferred from its body."""
-    for d in defs:
-        if d.returns is None or any(a.annotation is None for a in d.args.args):
-            raise IllFormedModule(d, reasons.MissingAnnotation(d.name))
 
 
 def check_bodies(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:

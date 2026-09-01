@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-def f():
+def f() -> int:
     @dataclass
     class C:
         a: int

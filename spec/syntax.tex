@@ -96,12 +96,11 @@ they supply.
 
 \paragraph{Type annotations.}
 
-Parameters and assignments carry optional type annotations $\pi$ and function definitions optional return
-type annotations $\omega$, while dataclass fields carry type expressions $\psi$
-(\figref{syntax-types}). A type expression is a type as written: it names a class by a qualified name,
+Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
+may be (\figref{syntax-types}). A type expression is a type as written: it names a class by a qualified name,
 where a type holds the class itself, and the type system resolves the one into the
-other\speconly{ (\secref{types})}. We write $\seq{x}\,\seq{\pi}$ for the parameter list $x_1\pi_1, \ldots,
-x_n\pi_n$. The well-formedness rules and operational semantics do not consult annotations, which are given
+other\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
+\bind{x_n}{\psi_n}$. The well-formedness rules and operational semantics do not consult annotations, which are given
 meaning by the type system.
 
 \subsubsection{Operators}

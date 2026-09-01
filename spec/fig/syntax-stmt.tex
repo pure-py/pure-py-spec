@@ -5,7 +5,8 @@
 \grammarGroup{Statements} \\
 $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $s\;s'$ & (Seq) \\
-    & $\mid$ & $\exAssign{x\pi}{e}$ & (Assign) \\
+    & $\mid$ & $\exAssign{x}{e}$ & (Assign) \\
+    & $\mid$ & $\exAssign{x\exAnnot{\psi}}{e}$ & (AnnAssign) \\
     & $\mid$ & $e$ & (ExprStmt) \\
     & $\mid$ & $\exAssert{e}$ & (Assert) \\
     & $\mid$ & $\exAssertMsg{e}{e'}$ & (AssertMsg) \\
@@ -40,7 +41,7 @@ $\mu$ & $::=$ & $\iota_1 \;\ldots\; \iota_n \;\; t$ & (ModuleBody)
 $q$ & $::=$ & $x_1.x_2.\cdots.x_{n+1}$ & (Name)
    \\[3mm]
 \grammarGroup{Function definitions} \\
-$d$ & $::=$ & $\exDef{f}{x_1\pi_1, \ldots, x_n\pi_n}{\omega}{s}$ & (Def)
+$d$ & $::=$ & $\exDef{f}{\bind{x_1}{\psi_1}, \ldots, \bind{x_n}{\psi_n}}{\exRetAnnot{\psi}}{s}$ & (Def)
 \end{tabular}
 \end{center}
 \caption{Modules and statements}

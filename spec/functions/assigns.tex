@@ -1,6 +1,6 @@
-\assignsS(\exAssign{x\pi}{e}) &= \set{x} \\*
+\assignsS(\exAssign{x}{e}) = \assignsS(\exAssign{x\exAnnot{\psi}}{e}) &= \set{x} \\*
 \assignsS(t\;t') &= \assignsS(t) \cup \assignsS(t') \\*
-\assignsS(\seq{d}) &{}= \set{\seq{f}} \quad \text{where } d_i = \exDef{f_i}{\seq{x}_i\,\seq{\pi}_i}{\omega_i}{s_i} \\*
+\assignsS(\seq{d}) &{}= \set{\seq{f}} \quad \text{where } d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \\*
 \assignsS(\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}}) &= \textstyle\bigcup_i \big(\binds(p_i) \cup \assignsS(b_i)\big) \\*
 \assignsS(\exDataclass{c}{\phi}) &= \set{c} \\*
 \assignsS(\exDataclassExtend{c}{c'}{\phi}) &= \set{c}

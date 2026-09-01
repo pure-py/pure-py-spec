@@ -110,6 +110,10 @@ def supported_stmt(node: ast.stmt) -> None:
         supported_arguments(node.args)
         if len(node.decorator_list) > 0:
             raise NotYetSupported(node, "decorators", 58)
+        if any(a.annotation is None for a in node.args.args):
+            raise Prohibited(node, "parameters must be annotated")
+        if node.returns is None:
+            raise Prohibited(node, "return type must be annotated")
         supported_annotation(node.returns)
         supported_body(node.body)
         return

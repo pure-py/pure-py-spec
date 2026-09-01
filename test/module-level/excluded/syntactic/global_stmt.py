@@ -1,6 +1,6 @@
 x = 5
 
-def f():
+def f() -> int:
     global x
     return x
 

@@ -269,14 +269,6 @@ class ClassAsValue:
 
 
 @dataclass(frozen=True)
-class MissingAnnotation:
-    name: str
-
-    def message(self) -> str:
-        return f"'{self.name}' must annotate every parameter and its return type"
-
-
-@dataclass(frozen=True)
 class NoBinarySignature:
     op: str
     left: str
@@ -438,7 +430,6 @@ Reason = (
     | SubmoduleNotImported
     | OwnDescendantImport
     | UnassignedMember
-    | MissingAnnotation
     | NoBinarySignature
     | NoUnarySignature
     | NotCallable
