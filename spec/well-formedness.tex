@@ -181,13 +181,13 @@ signatures give a result the first listed is used, so \pyinline{1 + 2} is an \py
 \pyinline{1 + 2.0} a \pyinline{float}. An \emph{equality type} is one for which structural equality is
 defined:
 \begin{defalign}
-\Gamma \vdash \nu \eqType \\
-\Gamma \vdash \tyLiteral{\ell} \eqType \\
-\Gamma \vdash \tyList{\tau} \eqType \hspace{8em} & \text{if } \Gamma \vdash \tau \eqType \\
-\Gamma \vdash \tyDict{\tau} \eqType \hspace{8em} & \text{if } \Gamma \vdash \tau \eqType \\
-\Gamma \vdash \tyTuple{\seq{\tau}} \eqType \hspace{8em} & \text{if } \Gamma \vdash \tau_i \eqType \quad (\forall i) \\
-\Gamma \vdash \tyUnion{\sigma}{\tau} \eqType \hspace{8em} & \text{if } \Gamma \vdash \sigma \eqType \text{ and } \Gamma \vdash \tau \eqType \\
-\Gamma \vdash C \eqType \hspace{8em} & \text{if } \Gamma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \fields(C)
+& \Gamma \vdash \nu \eqType \\
+& \Gamma \vdash \tyLiteral{\ell} \eqType \\
+& \Gamma \vdash \tyList{\tau} \eqType && \qquad\quad \text{if } \Gamma \vdash \tau \eqType \\
+& \Gamma \vdash \tyDict{\tau} \eqType && \qquad\quad \text{if } \Gamma \vdash \tau \eqType \\
+& \Gamma \vdash \tyTuple{\seq{\tau}} \eqType && \qquad\quad \text{if } \Gamma \vdash \tau_i \eqType \quad (\forall i) \\
+& \Gamma \vdash \tyUnion{\sigma}{\tau} \eqType && \qquad\quad \text{if } \Gamma \vdash \sigma \eqType \text{ and } \Gamma \vdash \tau \eqType \\
+& \Gamma \vdash C \eqType && \qquad\quad \text{if } \Gamma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \fields(C)
 \end{defalign}
 
 \noindent A callable type is not an equality type, and neither is any type with a callable component, so
