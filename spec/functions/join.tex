@@ -1,5 +1,5 @@
 \joinTy(\sigma, \tau) &{}= \tau && \text{if } \sigma \subty \tau \\*
-\joinTy(\sigma, \tau) &{}= \sigma && \text{if } \tau \subty \sigma \\*
+\joinTy(\sigma, \tau) &{}= \sigma && \text{if } \tau \subty \sigma \text{ and } \sigma \not\tyEquiv \tau \\*
 \joinTy(\sigma, \tau) &{}= \tyUnion{\sigma}{\tau} && \text{otherwise} \\*[2mm]
 \joinTy(\varepsilon) &{}= \tyNever \\*
 \joinTy(\sigma \cons \seq{\tau}) &{}= \joinTy(\sigma, \joinTy(\seq{\tau}))
