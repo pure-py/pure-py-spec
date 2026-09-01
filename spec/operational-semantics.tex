@@ -10,7 +10,7 @@ $\aborts{\kappa}$ represents abrupt completion of the whole run, with terminatio
 Composing statements sequentially composes their results according to the following partial monoid, analogous
 to sequential composition of result types:
 \begin{defalign}
-\assigns{\rho} \override \assigns{\rho'} & = \assigns{(\rho \override \rho')} \\
+\assigns{\rho} \override \assigns{\rho'} & = \assigns{\rho \override \rho'} \\
 \assigns{\rho} \override \returns{v} & = \returns{v} \\
 \assigns{\rho} \override \aborts{\kappa} & = \aborts{\kappa}
 \end{defalign}
