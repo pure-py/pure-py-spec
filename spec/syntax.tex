@@ -64,7 +64,8 @@ member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expressio
 type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}, and $\statusNotDefAssigned$ indicates \emph{not definitely assigned}.
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusNotDefAssigned(X)$ for the context $\set{\bind{x}{\statusNotDefAssigned} \mid x \in X}$.
 
-\paragraph{Context operations.}
+\subsection{Context operations}
+\label{sec:context-operations}
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
 an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
@@ -92,17 +93,6 @@ they supply.
 \input{spec/fig/syntax-expr}
 \input{spec/fig/syntax-types}
 
-\paragraph{Operators.}
-
-The metavariable $\odot$ ranges over the supported binary operators other than \pyinline{and} and
-\pyinline{or}, and $\ominus$ over the supported unary
-operators, both enumerated in \figref{precedence}. The operators \pyinline{and} and \pyinline{or} have their own
-expression forms; they do not evaluate both operands. The grammar of \figref{syntax-expr} is intentionally ambiguous
-on operator forms; disambiguation is by the precedence and associativity given in \figref{precedence},
-which follow Python.
-
-\input{spec/fig/precedence}
-
 \paragraph{Type annotations.}
 
 Parameters and assignments carry optional type annotations $\pi$ and function definitions optional return
@@ -112,6 +102,18 @@ where a type holds the class itself, and the type system resolves the one into t
 other\speconly{ (\secref{types})}. We write $\seq{x}\,\seq{\pi}$ for the parameter list $x_1\pi_1, \ldots,
 x_n\pi_n$. The well-formedness rules and operational semantics do not consult annotations, which are given
 meaning by the type system.
+
+\subsection{Operators}
+\label{sec:operators}
+
+The metavariable $\odot$ ranges over the supported binary operators other than \pyinline{and} and
+\pyinline{or}, and $\ominus$ over the supported unary
+operators, both enumerated in \figref{precedence}. The operators \pyinline{and} and \pyinline{or} have their own
+expression forms; they do not evaluate both operands. The grammar of \figref{syntax-expr} is intentionally ambiguous
+on operator forms; disambiguation is by the precedence and associativity given in \figref{precedence},
+which follow Python.
+
+\input{spec/fig/precedence}
 
 \subsection{Modules and programs}
 \label{sec:modules-programs}
