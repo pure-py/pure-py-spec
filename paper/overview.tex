@@ -4,7 +4,7 @@
 \PurePy is a subset of Python chosen so that its programs are well-behaved and broadly \emph{pure}, yet run
 unchanged under a standard Python interpreter and compute the same result. \secref{purity} makes the purity
 claim precise and sets out the excluded features, grouped by the discipline each one protects;
-\figref{prevented-errors} summarises the Python runtime errors that well-formedness rules out, and
+\figref{prevented-errors} summarises the Python runtime errors that the type system rules out, and
 \figref{roadmap} lists planned additions and features under consideration.
 
 \subsection{Python compatibility}
@@ -197,8 +197,10 @@ through its existing instances.
 \subsubsection{Other restrictions}
 \label{sec:other-restrictions}
 
-A few remaining restrictions do not fit the groups above. A \pyinline{class} definition must be a
-dataclass, and a dataclass body declares fields and nothing else. \PurePy therefore supports none of Python's
+A few remaining restrictions do not fit the groups above. Every function definition annotates each
+parameter and its return type, and every dataclass field carries a type expression, so the type of a
+definition is given rather than inferred (\secref{well-formedness}); Python requires neither. A
+\pyinline{class} definition must be a dataclass, and a dataclass body declares fields and nothing else. \PurePy therefore supports none of Python's
 class-based extension mechanisms, such as \pyinline{__getitem__} for subscripting, \pyinline{__iter__} for
 iteration or \pyinline{__eq__} for equality. Subscripting, iteration, equality and membership have the fixed
 meanings given in \secref{operational-semantics}.
