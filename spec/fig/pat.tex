@@ -63,12 +63,12 @@
 \and
 \inferrule*[lab={\ruleName{pat-dict}}]
 {
-  w_1, \ldots, w_n \text{ distinct} \\
+  \seq{w} \text{ distinct} \\
   k_i = \beta(w_i) \quad (\forall i) \\
   \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
 }
 {
-  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \matches \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{m}}}}{N} \mid \seq{m} \in K}, \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{k}\,'}}}{N} \mid \seq{k}\,' \in L} \binding \Delta
+  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{\seq{w}}{\seq{p}}} \matches \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{m}}}}{N} \mid \seq{m} \in K}, \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{k}\,'}}}{N} \mid \seq{k}\,' \in L} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-constr}}]
