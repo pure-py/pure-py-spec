@@ -120,7 +120,7 @@ so a function that declares a result definitely returns one.
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and the cases are taken in turn from
 $\shapesOf(\sigma, \varnothing)$, which denotes every value of $\sigma$. The \emph{residual} $L_i$ holds
 the values which have not been matched by any case up to the $i$th. Each case matches its pattern against
-the residual by the \ruleName{cases} rule (\figref{pat-rows}), yielding the pattern's bindings and the
+the residual by the \ruleName{cases} rule (\figref{pat-seq}), yielding the pattern's bindings and the
 shapes left unmatched; the body is checked under the bindings, and the pattern must agree with $\sigma$
 (\figref{agrees}). The \ruleName{match} rule applies where the final residual is empty;
 \ruleName{match-partial} applies otherwise, merging in $\Assigns{\varnothing}$ for the values that fall
@@ -254,7 +254,7 @@ name\paperonly{ (\secref{no-first-class})}.
 \input{spec/fig/syntax-shapes}
 
 The matching judgement decides reachability and exhaustiveness together
-(\figrefTwo{pat}{pat-rows}), reachability by the shapes a case matches and exhaustiveness by the residual
+(\figrefTwo{pat}{pat-seq}), reachability by the shapes a case matches and exhaustiveness by the residual
 left by the last case. The usefulness algorithm for ML also decides both with one
 relation~\cite{maranget2007}, and the residual corresponds to the term descriptions that the match
 compiler of \citet{sestoft1996} threads through the cases. Matching a pattern against a shape takes the
@@ -280,11 +280,11 @@ with an excluded set split, and no head types at a tuple type, so $N$ is empty t
 \ruleName{split-tuple} leaves nothing. The
 matching judgement $\Gamma \vdash L, p \matches K, L' \binding \Delta$ divides a set of shapes into the
 matched shapes $K$ and the \emph{residual} $L'$, binding $\Delta$, one shape at a time and one position at a time
-(\figrefTwo{pat}{pat-rows}). A pattern that cannot match a shape has no derivation against it, so
+(\figrefTwo{pat}{pat-seq}). A pattern that cannot match a shape has no derivation against it, so
 \ruleName{pat-shapes} takes the shapes the pattern does match, which must not be none, and passes the
 unmatched shapes into the residual untouched. A variable pattern binds at $\shapeTy(k)$ for the shape $k$ it matches, and a
 pattern named by \pyinline{as} at the join over the shapes it matched, so a case for one alternative of a
-union leaves a later variable case bound at the remaining members alone. Bindings from the positions of a row, or from
+union leaves a later variable case bound at the remaining members alone. Bindings from the positions of a sequence, or from
 the keys of a dictionary pattern, compose by disjoint union, so a pattern that binds a name twice has no
 derivation.
 
@@ -297,10 +297,10 @@ If $\Gamma \vdash h : \tau$ for every $h \in N$ then $\Gamma \vdash k : \tau$ fo
 
 The match rules (\figref{typing-stmt}) take the cases in the order $\dispatch$ tries them at run
 time. A case that matches nothing is rejected, whether because the scrutinee can never take that shape or
-because the earlier cases already cover it. The evaluation rules apply a sequence pattern only to a value
+because the earlier cases already cover it. The evaluation rules apply a tuple or list pattern only to a value
 of its own kind, although Python would match either (\figref{eval-pat}); each case's pattern must
 therefore agree with the scrutinee's type (\figref{agrees}), so a match on
-$\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no sequence pattern. A union is exhausted
+$\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple or list pattern. A union is exhausted
 by covering each member, a class type by a pattern for the class itself, and \pyinline{bool} by
 \pyinline{True} and \pyinline{False}, while \pyinline{int}, \pyinline{str} and lists have
 unboundedly many heads and need a variable or wildcard. A constructor pattern whose class lies below a
@@ -309,7 +309,7 @@ instance. A dictionary shape has a form of its own,
 $\shapeDict{\tau}{\beta}{N}$, standing for dictionaries that hold each key of $\beta$ with a value of the
 shape $\beta$ gives it, and hold no key of $N$. A dictionary pattern takes its keys in order, no key twice. A key in
 neither $\beta$ nor $N$ splits the shape at that key (\ruleName{split-key}), adding to the residual the
-dictionaries that lack the key; once every key of the pattern is in $\beta$ the keys match as a row
+dictionaries that lack the key; once every key of the pattern is in $\beta$ the keys match as a sequence
 (\ruleName{pat-dict}), each against the shape $\beta$ records for it. The empty pattern matches every
 dictionary and leaves nothing, the case $n = 0$, so it alone exhausts a dictionary type. Exhaustiveness need not come from a catch-all: over
 $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,

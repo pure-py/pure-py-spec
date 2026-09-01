@@ -94,14 +94,14 @@
 \flushleft \shadebox{$\Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{pat-row}}]
+\inferrule*[lab={\ruleName{pat-seq}}]
 {
   \Gamma \vdash k_i, p_i \matches K_i, L_i \binding \Delta_i \quad (\forall i) \\
-  K = \set{(m_1, \ldots, m_n) \mid m_i \in K_i} \\
-  L = \textstyle\bigcup_i \set{(m_1, \ldots, m_{i-1}, k\,', k_{i+1}, \ldots, k_n) \mid k\,' \in L_i, \; m_j \in K_j \text{ for } j < i}
+  K = \set{m_1 \cons \ldots \cons m_n \mid m_i \in K_i} \\
+  L = \textstyle\bigcup_i \set{m_1 \cons \ldots \cons m_{i-1} \cons k\,' \cons k_{i+1} \cons \ldots \cons k_n \mid k\,' \in L_i, \; m_j \in K_j \text{ for } j < i}
 }
 {
-  \Gamma \vdash (k_1, \ldots, k_n), (p_1, \ldots, p_n) \matches K, L \binding \Delta_1 \disjunion \ldots \disjunion \Delta_n
+  \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta_1 \disjunion \ldots \disjunion \Delta_n
 }
 \end{mathpar}
 
@@ -135,6 +135,6 @@
   \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L_{n+1}
 }
 \end{mathpar}
-\caption{Matching rows, sets of shapes, and case patterns}
-\label{fig:pat-rows}
+\caption{Matching sequences, sets of shapes, and case patterns}
+\label{fig:pat-seq}
 \end{figure}

@@ -6,10 +6,10 @@
 \metaGroup{Well-formedness} \\
 $\Gamma \vdash h : \tau$ & head $h$ has type $\tau$ & \figref{shape-typing} \\
 $\Gamma \vdash k : \tau$ & shape $k$ has type $\tau$ & \figref{shape-typing} \\
-$\Gamma \vdash p \agrees \tau$ & sequence patterns in $p$ meet only their own kind at $\tau$ & \figref{agrees} \\
+$\Gamma \vdash p \agrees \tau$ & tuple and list patterns in $p$ meet only their own kind at $\tau$ & \figref{agrees} \\
 $\Gamma \vdash k, p \splits K, L$ & shape $k$ splits at the head that $p$ tests for, giving $K$ and $L$ & \figref{split} \\
 $\Gamma \vdash k, p \matches K, L \binding \Delta$ & pattern $p$ matches shapes $K$ of $k$, leaving $L$ and binding $\Delta$ & \figref{pat} \\
-$\Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L$ & case patterns $\seq{p}$ over $\sigma$ bind $\seq{\Delta}$, leaving $L$ & \figref{pat-rows} \\
+$\Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L$ & case patterns $\seq{p}$ over $\sigma$ bind $\seq{\Delta}$, leaving $L$ & \figref{pat-seq} \\
 $\Gamma \vdash q : \theta$ & qualified name $q$ denotes entry $\theta$ & \figref{resolve-name} \\
 $\Gamma \vdash e \synth \tau$ & expression $e$ synthesises type $\tau$ & \figref{typing-synth} \\
 $\Gamma \vdash e \checks \tau$ & expression $e$ checks against type $\tau$ & \figref{typing-check} \\

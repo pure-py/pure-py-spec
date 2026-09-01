@@ -41,14 +41,14 @@
 \inferrule*[lab={\ruleName{split-class}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \nexists D \in N.\ C \subty D \\
+  C \text{ below no class of } N \\
   \tau, C \text{ comparable} \\
-  E \text{ the lower of } \tau \text{ and } C \\
-  \fields(E) = \bind{\seq{x}}{\seq{\sigma}} \\
-  N' = \set{h \in N \mid \Gamma \vdash h : E}
+  D \text{ the lower of } \tau \text{ and } C \\
+  \fields(D) = \bind{\seq{x}}{\seq{\sigma}} \\
+  N' = \set{h \in N \mid \Gamma \vdash h : D}
 }
 {
-  \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{E}{\seq{k}}}{N'} \mid \seq{k} \in \shapesOf(\seq{\sigma})}, \shapesOf(\tau, N \cup \set{C})
+  \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{D}{\seq{k}}}{N'} \mid \seq{k} \in \shapesOf(\seq{\sigma})}, \shapesOf(\tau, N \cup \set{C})
 }
 \and
 \inferrule*[lab={\ruleName{split-subclass}}]
@@ -56,7 +56,7 @@
   \Gamma \vdash q : \Type{D} \\
   D \subty C \\
   D \neq C \\
-  \nexists E \in N.\ D \subty E \\
+  D \text{ below no class of } N \\
   \fields(D) = \fields(C) \mathbin{\concat} \bind{\seq{y}}{\seq{\sigma}} \\
   N' = \set{h \in N \mid \Gamma \vdash h : D}
 }
