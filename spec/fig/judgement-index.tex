@@ -15,11 +15,11 @@ $\Gamma \vdash e \checks \tau$ & expression $e$ checks against type $\tau$ & \fi
 $\Gamma \vdash \seq{g} : \Delta$ & comprehension qualifiers $\seq{g}$ bind $\Delta$ & \figref{typing-check} \\
 $\Gamma; \zeta \vdash s : R$ & statement $s$ has result type $R$, with return type $\zeta$ & \figref{typing-stmt} \\
 $\Gamma \vdash t : R$ & top-level statement $t$ has result type $R$ & \figref{typing-top} \\
-$\Gamma, x \importsR \theta$ & name $x$ imported from module signature $\Gamma$ has entry $\theta$ & \figref{imports} \\
-$\vdash \seq{\iota} : \Gamma$ & imports $\seq{\iota}$ are well-formed and yield context $\Gamma$ & \figref{well-formed-imports} \\
-$q, \theta \loadsAs \theta'$ & importing module $q$ into entry $\theta$ gives entry $\theta'$ & \figref{well-formed-imports} \\
-$\vdash_{\mathsf{load}} q : \Gamma$ & module $q$ statically loads with signature $\Gamma$ & \figref{well-formed-module} \\
-$\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{well-formed-module}
+$\Gamma, x \importsR \theta$ & name $x$ imported from module signature $\Gamma$ has entry $\theta$ & \figref{typing-imports} \\
+$\vdash \seq{\iota} : \Gamma$ & imports $\seq{\iota}$ yield context $\Gamma$ & \figref{typing-import-prefix} \\
+$q, \theta \loadsAs \theta'$ & importing module $q$ into entry $\theta$ gives entry $\theta'$ & \figref{typing-import-prefix} \\
+$\vdash_{\mathsf{load}} q : \Gamma$ & module $q$ statically loads with signature $\Gamma$ & \figref{typing-module} \\
+$\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{typing-module}
    \\[2mm]
 \metaGroup{Evaluation} \\
 $\rho, p, v \matches m$ & pattern $p$ matches value $v$ with result $m$ & \figref{eval-pat} \\
