@@ -69,6 +69,7 @@ amounts to a comparison of qualified names.
 
 \subsection{Statements and expressions}
 
+A value has a context entry, and an environment a context, by \figref{value-typing}.
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any top-level statement $t$ with
 $\Gamma \vdash t : R$, the statement evaluation judgement $\rho, t \Rightarrow r$ says that $t$ evaluates
 to result $r$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Function definitions delimit
@@ -90,6 +91,8 @@ string by an integer, counting from the end when negative, and a dictionary by a
 aborting with $\errIndex$, $\errKey$ or $\errType$ where Python raises the exception of that name; a
 dictionary subscripted by a value other than a string is undefined. Likewise an attribute reference on a
 value other than a module or object has no derivation: the attributes of built-in values are undefined.
+
+\input{spec/fig/value-typing}
 
 \specinput{spec/fig/eval-outcome}
 

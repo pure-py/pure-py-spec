@@ -1,10 +1,10 @@
 \subsection{Metatheory}
 \label{sec:metatheory}
 
-\figref{well-formed-env} defines when a value is well-formed at a context entry: an ordinary value at
-$\statusDefAssigned$, a module or class value at the matching module or class entry. An environment is
-well-formed in a context that binds its variables at such context entries. The predefined environments are
-well-formed by construction, and a module loads to an environment that is well-formed at its signature.
+Value typing (\figref{value-typing}) gives an ordinary value its type, and a module or
+class value the matching entry; an environment has the context binding its variables at those entries. The
+predefined environments are well-formed by construction, and a module loads to an environment typed at its
+signature.
 
 \begin{theorem}[Loaded environments are well-formed]
 \label{thm:loaded}
@@ -14,4 +14,3 @@ If $\mathcal{P}(q) = (\rho, \Gamma)$ then $\vdash \rho : \Gamma$.
 If $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \val{\rho}$ then $\vdash \rho : \Gamma$.
 \end{theorem}
 
-\input{paper/fig/well-formed-env}

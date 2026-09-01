@@ -7,70 +7,70 @@
   \strut
 }
 {
-  \vdash \ell : \statusDefAssigned
+  \vdash \ell : \tyLiteral{\ell}
 }
 \and
 \inferrule*[lab={\ruleName{val-list}}]
 {
-  \vdash v_i : \statusDefAssigned \quad (\forall i)
+  \vdash v_i : \tau \quad (\forall i)
 }
 {
-  \vdash \exList{v_1, \ldots, v_n} : \statusDefAssigned
+  \vdash \exList{v_1, \ldots, v_n} : \tyList{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{val-tuple}}]
 {
-  \vdash v_i : \statusDefAssigned \quad (\forall i)
+  \vdash v_i : \tau_i \quad (\forall i)
 }
 {
-  \vdash \exTuple{v_1, \ldots, v_n} : \statusDefAssigned
+  \vdash \exTuple{v_1, \ldots, v_n} : \tyTuple{\seq{\tau}}
 }
 \and
 \inferrule*[lab={\ruleName{val-dict}}]
 {
-  \vdash v_i : \statusDefAssigned \quad (\forall i) \\
+  \vdash v_i : \tau \quad (\forall i) \\
   w_1, \ldots, w_n \text{ distinct}
 }
 {
-  \vdash \exDict{\bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}} : \statusDefAssigned
+  \vdash \exDict{\bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}} : \tyDict{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{val-lambda}}]
 {
   \vdash \rho : \Gamma \\
-  \Gamma \override \statusDefAssigned(\seq{x}) \vdash e
+  \Gamma \override \set{\bind{\seq{x}}{\seq{\sigma}}} \vdash e \checks \tau
 }
 {
-  \vdash \exLamClosure[\Gamma]{\rho}{\seq{x}}{e} : \statusDefAssigned
+  \vdash \exLamClosure[\Gamma]{\rho}{\seq{x}}{e} : \tyCallable{\seq{\sigma}}{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{val-def}}]
 {
   \vdash \rho : \Gamma \\
-  \Gamma \override \statusDefAssigned(\seq{f} \mathbin{\concat} \seq{x}_j) \override \statusNotDefAssigned(\assignsS(b_j) \setminus \seq{x}_j) \vdash b_j : R_j \quad (\forall j) \\
-  \seq{f} \text{ distinct}
+  \Gamma \vdash \exDef{f_1}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{b_{n+1}} : \Assigns{\Delta}
 }
 {
-  \vdash \exDefClosure[\Gamma]{\rho}{\exDef{f_1}{\seq{x}_1\,\seq{\pi}_1}{\omega_1}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\seq{x}_{n+1}\,\seq{\pi}_{n+1}}{\omega_{n+1}}{b_{n+1}}}{i} : \statusDefAssigned
+  \vdash \exDefClosure[\Gamma]{\rho}{\exDef{f_1}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{b_{n+1}}}{i} : \Delta(f_i)
 }
 \and
 \inferrule*[lab={\ruleName{val-obj}}]
 {
-  \vdash C : C \\
+  \vdash \rho(x) : \tau \quad (\forall \bind{x}{\tau} \in \fields(C)) \\
   \vdash \rho : \Gamma
 }
 {
-  \vdash \exObj{\Gamma}{C}{\rho} : \statusDefAssigned
+  \vdash \exObj{\Gamma}{C}{\rho} : C
 }
 \and
 \inferrule*[lab={\ruleName{val-prim}}]
 {
-  \strut
+  \mathcal{P}(q) = (\Gamma, \rho) \\
+  \rho(x) = \primVal{\primFn} \\
+  \Gamma(x) = \theta
 }
 {
-  \vdash \primVal{\primFn} : \statusDefAssigned
+  \vdash \primVal{\primFn} : \theta
 }
-
 \and
 \inferrule*[lab={\ruleName{val-opaque}}]
 {
@@ -88,7 +88,6 @@
   \vdash \modStub{q} : \modStub{q}
 }
 \and
-
 \inferrule*[lab={\ruleName{val-mod-loaded}}]
 {
   \vdash \rho : \Gamma
@@ -102,15 +101,15 @@
   \strut
 }
 {
-  \vdash \clsEntry{\Gamma}{q.c}{\seq{x}}{\bot} : \clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}
+  \vdash \clsEntry{\Gamma}{q.c}{\seq{x}}{\bot} : \Type{\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}}
 }
 \and
 \inferrule*[lab={\ruleName{val-class-extend}}]
 {
-  \bind{c'}{C'} \in \Gamma
+  \bind{c'}{\Type{C'}} \in \Gamma
 }
 {
-  \vdash \clsEntry{\Gamma}{q.c}{\seq{x}}{c'} : \clsEntry{\Gamma}{q.c}{\seq{x}}{c'}
+  \vdash \clsEntry{\Gamma}{q.c}{\seq{x}}{c'} : \Type{\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}}
 }
 \end{mathpar}
 
@@ -136,6 +135,6 @@
   \vdash \set{\bind{x}{v}} \override \rho : \set{\bind{x}{\theta}} \override \Gamma
 }
 \end{mathpar}
-\caption{Well-formed values and environments}
-\label{fig:well-formed-env}
+\caption{Value and environment typing}
+\label{fig:value-typing}
 \end{figure}
