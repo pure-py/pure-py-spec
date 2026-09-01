@@ -272,8 +272,12 @@ $\seq{k}$. The shapes of $\tau$ that remain once the heads in $N$ are excluded a
 $\shapesOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape carries a
 union or dictionary type in the form $\shapeAny{\tau}{N}$, since $\shapesOf$ is the only source of
 that form: it splits a union into its members and gives a dictionary type its dictionary shape.
-The rules that match sub-patterns against the form $\shapeAny{\tau}{N}$ also draw the shapes of the
-component types from $\shapesOf$. The
+A pattern meets a shape of its own form, or splits it first (\figref{split}): splitting takes the head
+the pattern tests for, gives the shapes with that head, drawing the shapes of the component types from
+$\shapesOf$, and leaves the shape with that head excluded as well. \ruleName{pat-split} matches the
+pattern against the shapes the split gives and adds the shapes it leaves to the residual. Only the forms
+with an excluded set split, and no head types at a tuple type, so $N$ is empty there and
+\ruleName{split-tuple} leaves nothing. The
 matching judgement $\Gamma \vdash L, p \matches K, L' \binding \Delta$ divides a set of shapes into the
 matched shapes $K$ and the \emph{residual} $L'$, binding $\Delta$, one shape at a time and one position at a time
 (\figrefTwo{pat}{pat-rows}). A pattern that cannot match a shape has no derivation against it, so
@@ -303,11 +307,11 @@ unboundedly many heads and need a variable or wildcard. A constructor pattern wh
 class of the excluded set matches nothing, because an earlier case for the superclass took every
 instance. A dictionary shape has a form of its own,
 $\shapeDict{\tau}{\beta}{N}$, standing for dictionaries that hold each key of $\beta$ with a value of the
-shape $\beta$ gives it, and hold no key of $N$. A dictionary pattern is taken one key at a time, no key twice
-(\ruleName{pat-dict-bound}, \ruleName{pat-dict-unbound}). A key already in $\beta$ is matched against the
-shape recorded for it, and a key in neither $\beta$ nor $N$ against the value type, adding to the residual the
-dictionaries that lack the key. The empty pattern matches every dictionary and leaves nothing, so it alone
-exhausts a dictionary type (\ruleName{pat-dict-nil}). Exhaustiveness need not come from a catch-all: over
+shape $\beta$ gives it, and hold no key of $N$. A dictionary pattern takes its keys in order, no key twice. A key in
+neither $\beta$ nor $N$ splits the shape at that key (\ruleName{split-key}), adding to the residual the
+dictionaries that lack the key; once every key of the pattern is in $\beta$ the keys match as a row
+(\ruleName{pat-dict}), each against the shape $\beta$ records for it. The empty pattern matches every
+dictionary and leaves nothing, the case $n = 0$, so it alone exhausts a dictionary type. Exhaustiveness need not come from a catch-all: over
 $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave nothing,
 although each covers only part of the type.
@@ -315,6 +319,8 @@ although each covers only part of the type.
 \input{spec/fig/agrees}
 
 \input{spec/fig/shape-typing}
+
+\input{spec/fig/split}
 
 \input{spec/fig/pat}
 
