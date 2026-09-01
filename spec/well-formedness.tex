@@ -174,10 +174,9 @@ synthesise a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\
 $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type listed for it
 (\figref{predefined-types}, Definition~\ref{def:predefined}). Each binary operator has a signature $\odot : (\sigma, \sigma') \to \tau$ and each unary operator a
 signature $\ominus : \sigma \to \tau$, relating operand types to result type
-(\figref{operator-signatures}). A variable in a
-signature binds the operand's type as it is, and an operand type written out is matched by any subtype
-of it. Where several
-signatures give a result the first listed is used, so \pyinline{1 + 2} is an \pyinline{int} and
+(\figref{operator-signatures}). A signature
+applies at the operand types that instantiate it with its condition holding. Where several signatures
+apply the first listed is used, so \pyinline{1 + 2} is an \pyinline{int} and
 \pyinline{1 + 2.0} a \pyinline{float}. An \emph{equality type} is one for which structural equality is
 defined:
 \begin{defalign}
