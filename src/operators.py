@@ -17,19 +17,19 @@ from type_syntax import (
     base_type,
 )
 
-type Applied = tuple[tuple[Type, ...], Type]
-type BinaryOverload = Callable[[Type, Type, ModuleContext], Applied | None]
-type UnaryOverload = Callable[[Type, ModuleContext], Applied | None]
+type InstantiatedRow = tuple[tuple[Type, ...], Type]
+type BinaryOverload = Callable[[Type, Type, ModuleContext], InstantiatedRow | None]
+type UnaryOverload = Callable[[Type, ModuleContext], InstantiatedRow | None]
 
 
 def both(
     s: Type, t: Type, bound: Type, result: Type, ctx: ModuleContext
-) -> Applied | None:
+) -> InstantiatedRow | None:
     """An overload bounding both positions by `bound`."""
     return ((bound, bound), result) if subtype(s, bound) and subtype(t, bound) else None
 
 
-def equality(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def equality(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     if not comparable(s, t):
         return None
     if not equality_type(s, ctx) or not equality_type(t, ctx):
@@ -67,85 +67,85 @@ def declared(c: Class, x: str) -> Type:
     return t
 
 
-def membership_list(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def membership_list(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     if isinstance(t, ListType) and comparable(s, t.elem):
         return (s, t), Primitive.BOOL
     return None
 
 
-def membership_tuple(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def membership_tuple(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     if isinstance(t, TupleType) and comparable(s, join(t.components)):
         return (s, t), Primitive.BOOL
     return None
 
 
-def membership_str(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def membership_str(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     return both(s, t, Primitive.STR, Primitive.BOOL, ctx)
 
 
-def membership_dict(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def membership_dict(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     if isinstance(t, DictType) and subtype(s, Primitive.STR):
         return (Primitive.STR, t), Primitive.BOOL
     return None
 
 
-def ordering_number(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def ordering_number(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     return both(s, t, Primitive.FLOAT, Primitive.BOOL, ctx)
 
 
-def ordering_str(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def ordering_str(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     return both(s, t, Primitive.STR, Primitive.BOOL, ctx)
 
 
-def arithmetic_int(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def arithmetic_int(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     return both(s, t, Primitive.INT, Primitive.INT, ctx)
 
 
-def arithmetic_float(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def arithmetic_float(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     return both(s, t, Primitive.FLOAT, Primitive.FLOAT, ctx)
 
 
-def concat_str(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def concat_str(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     return both(s, t, Primitive.STR, Primitive.STR, ctx)
 
 
-def concat_list(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def concat_list(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     if isinstance(s, ListType) and isinstance(t, ListType):
         return (s, t), ListType(join((s.elem, t.elem)))
     return None
 
 
-def concat_tuple(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def concat_tuple(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     if isinstance(s, TupleType) and isinstance(t, TupleType):
         return (s, t), TupleType(s.components + t.components)
     return None
 
 
-def repeat_str(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def repeat_str(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     if subtype(s, Primitive.STR) and subtype(t, Primitive.INT):
         return (Primitive.STR, Primitive.INT), Primitive.STR
     return None
 
 
-def repeat_str_left(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def repeat_str_left(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     if subtype(s, Primitive.INT) and subtype(t, Primitive.STR):
         return (Primitive.INT, Primitive.STR), Primitive.STR
     return None
 
 
-def repeat_list(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def repeat_list(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     if isinstance(s, ListType) and subtype(t, Primitive.INT):
         return (s, Primitive.INT), s
     return None
 
 
-def repeat_list_left(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def repeat_list_left(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     if subtype(s, Primitive.INT) and isinstance(t, ListType):
         return (Primitive.INT, t), t
     return None
 
 
-def power_int(s: Type, t: Type, ctx: ModuleContext) -> Applied | None:
+def power_int(s: Type, t: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     if subtype(s, Primitive.INT) and isinstance(t, LiteralType):
         exponent = t.value
         if isinstance(exponent, int) and not isinstance(exponent, bool):
@@ -181,15 +181,15 @@ BINARY_OVERLOADS: dict[str, tuple[BinaryOverload, ...]] = {
 }
 
 
-def negate_bool(s: Type, ctx: ModuleContext) -> Applied | None:
+def negate_bool(s: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     return ((Primitive.BOOL,), Primitive.BOOL) if subtype(s, Primitive.BOOL) else None
 
 
-def sign_int(s: Type, ctx: ModuleContext) -> Applied | None:
+def sign_int(s: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     return ((Primitive.INT,), Primitive.INT) if subtype(s, Primitive.INT) else None
 
 
-def sign_float(s: Type, ctx: ModuleContext) -> Applied | None:
+def sign_float(s: Type, ctx: ModuleContext) -> InstantiatedRow | None:
     return (
         ((Primitive.FLOAT,), Primitive.FLOAT) if subtype(s, Primitive.FLOAT) else None
     )
@@ -226,41 +226,46 @@ UNARY_NAMES: dict[type[ast.AST], str] = {
 }
 
 
-def least(applied: Sequence[Applied]) -> Applied | None:
-    """The overload whose bounds lie pointwise below every applicable
-    overload's, or nothing if no applicable overload is least."""
-    for cand in applied:
+def overloads_binary(
+    op: str, s: Type, t: Type, ctx: ModuleContext
+) -> list[InstantiatedRow]:
+    """Instantiated rows of `op` at the operand types."""
+    return [r for ov in BINARY_OVERLOADS[op] if (r := ov(s, t, ctx)) is not None]
+
+
+def overloads_unary(op: str, s: Type, ctx: ModuleContext) -> list[InstantiatedRow]:
+    return [r for ov in UNARY_OVERLOADS[op] if (r := ov(s, ctx)) is not None]
+
+
+def least(rows: Sequence[InstantiatedRow]) -> InstantiatedRow | None:
+    """The instantiated row whose bounds lie componentwise below every other's,
+    or nothing if no row is least."""
+    for cand in rows:
         if all(
-            all(subtype(a, b) for a, b in zip(cand[0], other[0])) for other in applied
+            all(subtype(a, b) for a, b in zip(cand[0], other[0])) for other in rows
         ):
             return cand
     return None
 
 
-def result_of_least(applied: Sequence[Applied]) -> Type | None:
-    chosen = least(applied)
+def result_of_least(rows: Sequence[InstantiatedRow]) -> Type | None:
+    chosen = least(rows)
     return chosen[1] if chosen is not None else None
 
 
 def resolve_binary(op: str, s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    """Result of the least overload of `op` at the operand types, or at their
-    base types if no overload applies at the operand types themselves."""
-    applied = [r for ov in BINARY_OVERLOADS[op] if (r := ov(s, t, ctx)) is not None]
-    if applied:
-        return result_of_least(applied)
-    applied = [
-        r
-        for ov in BINARY_OVERLOADS[op]
-        if (r := ov(base_type(s), base_type(t), ctx)) is not None
-    ]
-    return result_of_least(applied) if applied else None
+    """Result component of the least instantiated row at the operand types, or
+    at their base types if no row applies at the operand types themselves."""
+    rows = overloads_binary(op, s, t, ctx)
+    if rows:
+        return result_of_least(rows)
+    rows = overloads_binary(op, base_type(s), base_type(t), ctx)
+    return result_of_least(rows) if rows else None
 
 
 def resolve_unary(op: str, s: Type, ctx: ModuleContext) -> Type | None:
-    applied = [r for ov in UNARY_OVERLOADS[op] if (r := ov(s, ctx)) is not None]
-    if applied:
-        return result_of_least(applied)
-    applied = [
-        r for ov in UNARY_OVERLOADS[op] if (r := ov(base_type(s), ctx)) is not None
-    ]
-    return result_of_least(applied) if applied else None
+    rows = overloads_unary(op, s, ctx)
+    if rows:
+        return result_of_least(rows)
+    rows = overloads_unary(op, base_type(s), ctx)
+    return result_of_least(rows) if rows else None

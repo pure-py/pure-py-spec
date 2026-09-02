@@ -233,15 +233,26 @@ name\paperonly{ (\secref{no-first-class})}.
 \speconly{\subsubsection{Operators}\label{sec:well-formedness-operators}}%
 \paperonly{\paragraph{Operators.}}
 
-Each operator is overloaded: an \emph{overload} $\omega$, a row of \figref{operator-overloads}, is a
-tuple of operand forms, bounds, condition and result. The overload \emph{applies at} operand types
-$(\sigma, \sigma')$ if they instantiate its operand forms, each bounded variable's type lies below its
-bound, and the condition holds; the result under the instantiation is $\resultOf(\omega, \sigma, \sigma')$. A
-position without a declared bound takes the operand's type as its bound. Write $\omega \subty \omega'$ when the bounds of $\omega$ lie
-componentwise below the bounds of $\omega'$; an applicable overload is \emph{least} if
-$\omega \subty \omega'$ for every overload $\omega'$ of the same operator that applies at the same
-operand types. A unary overload is read likewise at a single operand type. Resolution takes the least
-applicable overload, so \pyinline{1 + 2} is an \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
+Each operator is overloaded as specified in \figref{operator-overloads}. Each row is read as a rule
+which applies when operand types $(\sigma, \sigma')$ instantiate its operand forms, the type at each
+position lies below any declared bound, and the condition holds.
+
+\begin{definition}[Overloads at operand types]
+\label{def:overloads}
+The set $\overloadsOf(\odot, \sigma, \sigma')$ consists of the instantiated rows $((\tau_1, \tau_2), \tau)$
+given by the rows of $\odot$ that apply at $(\sigma, \sigma')$: $\tau$ is the instance's result, and
+$\tau_i$ is the declared bound at position $i$, or $\sigma$ and $\sigma'$ respectively if no bounds are
+given. Instantiated rows are ordered by componentwise subtyping on their bounds;
+$\overloadsOf(\ominus, \sigma)$ is read likewise at one operand type, with instantiated rows
+$(\tau_1, \tau)$.
+\end{definition}
+
+Resolution takes the least element of $\overloadsOf(\odot, \sigma, \sigma')$:
+$\overloadsOf(\pyinline{+}, \tyLiteral{1}, \tyLiteral{2})$ is
+$\set{((\tyInt, \tyInt), \tyInt), ((\tyFloat, \tyFloat), \tyFloat)}$, whose least element gives
+\pyinline{1 + 2} the type \pyinline{int}, while
+$\overloadsOf(\pyinline{+}, \tyLiteral{1}, \tyLiteral{2.0})$ is
+$\set{((\tyFloat, \tyFloat), \tyFloat)}$ alone, so \pyinline{1 + 2.0} is a \pyinline{float}.
 
 An \emph{equality type} is one for which structural equality is
 defined:
@@ -268,9 +279,8 @@ literal, where resolution gives \pyinline{float}.
 
 \begin{lemma}[Least overload]
 \label{lem:least-overload}
-If neither $\sigma$ nor $\sigma'$ is a subtype of \pyinline{Never} and some overload of $\odot$ applies at
-$(\sigma, \sigma')$, then a least overload of $\odot$ at $(\sigma, \sigma')$ exists; likewise for $\ominus$
-at $\sigma$.
+If neither $\sigma$ nor $\sigma'$ is a subtype of \pyinline{Never} and $\overloadsOf(\odot, \sigma, \sigma')$
+is not empty, then the set has a least element; likewise $\overloadsOf(\ominus, \sigma)$.
 \end{lemma}
 
 \subsection{Patterns}
