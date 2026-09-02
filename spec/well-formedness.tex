@@ -233,21 +233,25 @@ name\paperonly{ (\secref{no-first-class})}.
 \speconly{\subsubsection{Operators}\label{sec:well-formedness-operators}}%
 \paperonly{\paragraph{Operators.}}
 
-Each operator is overloaded as specified in \figref{operator-overloads}. Each row is read as a rule
-which applies when operand types $(\sigma, \sigma')$ instantiate its operand forms, the type at each
-position lies below any declared bound, and the condition holds.
+Each operator is overloaded as specified in \figref{operator-overloads}. Each row is read as a rule: the
+premises are the row's bounds and condition, and the conclusion pairs the bounds with the result, with
+the operand's type as the bound at each position where none is given. The third row of \pyinline{*}
+reads
+\begin{mathpar}
+\inferrule*
+{\sigma \subty \tyInt}
+{\pyinline{*}(\tyList{\tau}, \sigma) : ((\tyList{\tau}, \tyInt), \tyList{\tau})}
+\end{mathpar}
 
 \begin{definition}[Overloads at operand types]
 \label{def:overloads}
-The set $\overloadsOf(\odot, \sigma, \sigma')$ consists of the instantiated rows $((\tau_1, \tau_2), \tau)$
-given by the rows of $\odot$ that apply at $(\sigma, \sigma')$: $\tau$ is the instance's result, and
-$\tau_i$ is the declared bound at position $i$, or $\sigma$ and $\sigma'$ respectively if no bounds are
-given. Instantiated rows are ordered by componentwise subtyping on their bounds;
-$\overloadsOf(\ominus, \sigma)$ is read likewise at one operand type, with instantiated rows
-$(\tau_1, \tau)$.
+The set $\overloadsOf(\odot, \sigma_1, \sigma_2)$ consists of the instantiated rows
+$((\tau_1, \tau_2), \tau)$ such that $\odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$, ordered by
+componentwise subtyping on their bounds $(\tau_1, \tau_2)$. The unary set $\overloadsOf(\ominus, \sigma)$
+is defined in the same way from conclusions $\ominus(\sigma) : (\tau_1, \tau)$.
 \end{definition}
 
-Resolution takes the least element of $\overloadsOf(\odot, \sigma, \sigma')$:
+Resolution takes the least element of $\overloadsOf(\odot, \sigma_1, \sigma_2)$:
 $\overloadsOf(\pyinline{+}, \tyLiteral{1}, \tyLiteral{2})$ is
 $\set{((\tyInt, \tyInt), \tyInt), ((\tyFloat, \tyFloat), \tyFloat)}$, whose least element gives
 \pyinline{1 + 2} the type \pyinline{int}, while
@@ -279,8 +283,9 @@ literal, where resolution gives \pyinline{float}.
 
 \begin{lemma}[Least overload]
 \label{lem:least-overload}
-If neither $\sigma$ nor $\sigma'$ is a subtype of \pyinline{Never} and $\overloadsOf(\odot, \sigma, \sigma')$
-is not empty, then the set has a least element; likewise $\overloadsOf(\ominus, \sigma)$.
+If neither $\sigma_1$ nor $\sigma_2$ is a subtype of \pyinline{Never} and
+$\overloadsOf(\odot, \sigma_1, \sigma_2)$ is not empty, then the set has a least element; likewise
+$\overloadsOf(\ominus, \sigma)$.
 \end{lemma}
 
 \subsection{Patterns}
