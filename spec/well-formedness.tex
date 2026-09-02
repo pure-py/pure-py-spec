@@ -233,9 +233,9 @@ name\paperonly{ (\secref{no-first-class})}.
 \speconly{\subsubsection{Operators}\label{sec:well-formedness-operators}}%
 \paperonly{\paragraph{Operators.}}
 
-Each operator is overloaded as specified in \figref{operator-overloads}, whose rows define the
-judgements $\odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$ and $\ominus(\sigma) : (\tau_1, \tau)$,
-relating operand types to a \emph{resolved overload} $((\tau_1, \tau_2), \tau)$.
+Each operator is overloaded as specified in \figref{operator-overloads}. A \emph{resolved overload}
+$((\tau_1, \tau_2), \tau)$ pairs \emph{bounds} with a result; the judgements of the figure relate operand
+types to the resolved overloads of an operator.
 
 \begin{definition}[Overloads at operand types]
 \label{def:overloads}

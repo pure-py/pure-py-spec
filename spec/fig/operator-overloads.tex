@@ -1,72 +1,36 @@
 \begin{figure}
 \small
-\begin{center}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.23\textwidth}>{\raggedright\arraybackslash}p{0.15\textwidth}>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.14\textwidth}}
-\arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}$\odot$ & Operand types & Bounds & Condition & Result \\
-\pyinline{==}\;\;\pyinline{!=} & $(\sigma, \sigma')$ & & $\sigma, \sigma'$ comparable equality types & $\tyBool$ \\
-\pyinline{in}\;\;\pyinline{not in} & $(\sigma, \tyList{\tau})$ & & $\sigma, \tau$ comparable & $\tyBool$ \\
- & $(\sigma, \tyTuple{\seq{\tau}})$ & & $\sigma$, $\joinTy(\seq{\tau})$ comparable & $\tyBool$ \\
- & $(\sigma, \sigma')$ & $\sigma, \sigma' \subty \tyStr$ & & $\tyBool$ \\
- & $(\sigma, \tyDict{\tau})$ & $\sigma \subty \tyStr$ & & $\tyBool$ \\
-\pyinline{<}\;\;\pyinline{<=}\;\;\pyinline{>}\;\;\pyinline{>=} & $(\sigma, \sigma')$ & $\sigma, \sigma' \subty \tyFloat$ & & $\tyBool$ \\
- & $(\sigma, \sigma')$ & $\sigma, \sigma' \subty \tyStr$ & & $\tyBool$ \\
-\pyinline{+}\;\;\pyinline{-}\;\;\pyinline{*}\;\;\pyinline{//}\;\;\pyinline{\%} & $(\sigma, \sigma')$ & $\sigma, \sigma' \subty \tyInt$ & & $\tyInt$ \\
- & $(\sigma, \sigma')$ & $\sigma, \sigma' \subty \tyFloat$ & & $\tyFloat$ \\
-\pyinline{/} & $(\sigma, \sigma')$ & $\sigma, \sigma' \subty \tyFloat$ & & $\tyFloat$ \\
-\pyinline{+} & $(\sigma, \sigma')$ & $\sigma, \sigma' \subty \tyStr$ & & $\tyStr$ \\
- & $(\tyList{\sigma}, \tyList{\tau})$ & & & $\tyList{\joinTy(\sigma, \tau)}$ \\
- & $(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}})$ & & & $\tyTuple{\seq{\sigma} \mathbin{\concat} \seq{\tau}}$ \\
-\pyinline{*} & $(\sigma, \sigma')$ & $\sigma \subty \tyStr$, $\sigma' \subty \tyInt$ & & $\tyStr$ \\
- & $(\sigma, \sigma')$ & $\sigma \subty \tyInt$, $\sigma' \subty \tyStr$ & & $\tyStr$ \\
- & $(\tyList{\tau}, \sigma)$ & $\sigma \subty \tyInt$ & & $\tyList{\tau}$ \\
- & $(\sigma, \tyList{\tau})$ & $\sigma \subty \tyInt$ & & $\tyList{\tau}$ \\
-\pyinline{**} & $(\sigma, \tyLiteral{n})$ & $\sigma \subty \tyInt$ & $n$ an integer & $\tyInt$ \\
- & $(\sigma, \tyLiteral{-n})$ & $\sigma \subty \tyInt$ & $n$ a positive integer & $\tyFloat$ \\
- & $(\sigma, \sigma')$ & $\sigma, \sigma' \subty \tyFloat$ & & $\tyFloat$
-\end{tabular}
-
-\end{center}
+\setlength{\jot}{2pt}
+\flushleft \shadebox{$\odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$}
+\begin{defalign}
+& \odot(\sigma, \sigma') : ((\sigma, \sigma'), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{==}, \pyinline{!=}} \text{ and } \sigma, \sigma' \text{ comparable equality types} \\
+& \odot(\sigma, \tyList{\tau}) : ((\sigma, \tyList{\tau}), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{in}, \pyinline{not in}} \text{ and } \sigma, \tau \text{ comparable} \\
+& \odot(\sigma, \tyTuple{\seq{\tau}}) : ((\sigma, \tyTuple{\seq{\tau}}), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{in}, \pyinline{not in}} \text{ and } \sigma, \joinTy(\seq{\tau}) \text{ comparable} \\
+& \odot(\sigma, \sigma') : ((\tyStr, \tyStr), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{in}, \pyinline{not in}} \text{ and } \sigma, \sigma' \subty \tyStr \\
+& \odot(\sigma, \tyDict{\tau}) : ((\tyStr, \tyDict{\tau}), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{in}, \pyinline{not in}} \text{ and } \sigma \subty \tyStr \\
+& \odot(\sigma, \sigma') : ((\tyFloat, \tyFloat), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{<}, \pyinline{<=}, \pyinline{>}, \pyinline{>=}} \text{ and } \sigma, \sigma' \subty \tyFloat \\
+& \odot(\sigma, \sigma') : ((\tyStr, \tyStr), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{<}, \pyinline{<=}, \pyinline{>}, \pyinline{>=}} \text{ and } \sigma, \sigma' \subty \tyStr \\
+& \odot(\sigma, \sigma') : ((\tyInt, \tyInt), \tyInt) && \quad \text{if } \odot \in \set{\pyinline{+}, \pyinline{-}, \pyinline{*}, \pyinline{//}, \pyinline{\%}} \text{ and } \sigma, \sigma' \subty \tyInt \\
+& \odot(\sigma, \sigma') : ((\tyFloat, \tyFloat), \tyFloat) && \quad \text{if } \odot \in \set{\pyinline{+}, \pyinline{-}, \pyinline{*}, \pyinline{//}, \pyinline{\%}, \pyinline{/}, \pyinline{**}} \text{ and } \sigma, \sigma' \subty \tyFloat \\
+& \pyinline{+}(\sigma, \sigma') : ((\tyStr, \tyStr), \tyStr) && \quad \text{if } \sigma, \sigma' \subty \tyStr \\
+& \pyinline{+}(\tyList{\sigma}, \tyList{\tau}) : ((\tyList{\sigma}, \tyList{\tau}), \tyList{\joinTy(\sigma, \tau)}) \\
+& \pyinline{+}(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) : ((\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}), \tyTuple{\seq{\sigma} \mathbin{\concat} \seq{\tau}}) \\
+& \pyinline{*}(\sigma, \sigma') : ((\tyStr, \tyInt), \tyStr) && \quad \text{if } \sigma \subty \tyStr \text{ and } \sigma' \subty \tyInt \\
+& \pyinline{*}(\sigma, \sigma') : ((\tyInt, \tyStr), \tyStr) && \quad \text{if } \sigma \subty \tyInt \text{ and } \sigma' \subty \tyStr \\
+& \pyinline{*}(\tyList{\tau}, \sigma) : ((\tyList{\tau}, \tyInt), \tyList{\tau}) && \quad \text{if } \sigma \subty \tyInt \\
+& \pyinline{*}(\sigma, \tyList{\tau}) : ((\tyInt, \tyList{\tau}), \tyList{\tau}) && \quad \text{if } \sigma \subty \tyInt \\
+& \pyinline{**}(\sigma, \tyLiteral{n}) : ((\tyInt, \tyLiteral{n}), \tyInt) && \quad \text{if } \sigma \subty \tyInt \text{ and } n \text{ an integer} \\
+& \pyinline{**}(\sigma, \tyLiteral{-n}) : ((\tyInt, \tyLiteral{-n}), \tyFloat) && \quad \text{if } \sigma \subty \tyInt \text{ and } n \text{ a positive integer}
+\end{defalign}
 
 \vspace{2mm}
 
-\begin{center}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.23\textwidth}>{\raggedright\arraybackslash}p{0.15\textwidth}>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.14\textwidth}}
-\arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}$\ominus$ & Operand type & Bounds & Condition & Result \\
-\pyinline{not} & $\sigma$ & $\sigma \subty \tyBool$ & & $\tyBool$ \\
-\pyinline{+}\;\;\pyinline{-} & $\sigma$ & $\sigma \subty \tyInt$ & & $\tyInt$ \\
- & $\sigma$ & $\sigma \subty \tyFloat$ & & $\tyFloat$
-\end{tabular}
-\end{center}
-
-\vspace{2mm}
-
-\setlength{\parindent}{0pt}
-Each row is read as a rule: the premises are the row's bounds and condition, and the conclusion pairs
-the bounds with the result, with the operand's type as the bound at each position where none is given.
-
-\vspace{1mm}
-
-\flushleft \shadebox{$\odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$}\par
-\vspace{1mm}
-For example, the third row of \pyinline{*} is read as the rule:
-\begin{mathpar}
-\inferrule*
-{\sigma \subty \tyInt}
-{\pyinline{*}(\tyList{\tau}, \sigma) : ((\tyList{\tau}, \tyInt), \tyList{\tau})}
-\end{mathpar}
-
-\vspace{1mm}
-
-\flushleft \shadebox{$\ominus(\sigma) : (\tau_1, \tau)$}\par
-\vspace{1mm}
-For example, the second row of the unary table is read as the rule:
-\begin{mathpar}
-\inferrule*
-{\sigma \subty \tyInt}
-{\pyinline{-}(\sigma) : (\tyInt, \tyInt)}
-\end{mathpar}
+\flushleft \shadebox{$\ominus(\sigma) : (\tau_1, \tau)$}
+\begin{defalign}
+& \pyinline{not}(\sigma) : (\tyBool, \tyBool) && \quad \text{if } \sigma \subty \tyBool \\
+& \ominus(\sigma) : (\tyInt, \tyInt) && \quad \text{if } \ominus \in \set{\pyinline{+}, \pyinline{-}} \text{ and } \sigma \subty \tyInt \\
+& \ominus(\sigma) : (\tyFloat, \tyFloat) && \quad \text{if } \ominus \in \set{\pyinline{+}, \pyinline{-}} \text{ and } \sigma \subty \tyFloat
+\end{defalign}
 \caption{Operator overloads}
 \label{fig:operator-overloads}
 \end{figure}
