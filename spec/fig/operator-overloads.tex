@@ -13,8 +13,8 @@
 & \odot(\sigma, \sigma') : ((\tyInt, \tyInt), \tyInt) && \quad \text{if } \odot \in \set{\pyinline{+}, \pyinline{-}, \pyinline{*}, \pyinline{//}, \pyinline{\%}} \text{ and } \sigma, \sigma' \subty \tyInt \\
 & \odot(\sigma, \sigma') : ((\tyFloat, \tyFloat), \tyFloat) && \quad \text{if } \odot \in \set{\pyinline{+}, \pyinline{-}, \pyinline{*}, \pyinline{//}, \pyinline{\%}, \pyinline{/}, \pyinline{**}} \text{ and } \sigma, \sigma' \subty \tyFloat \\
 & \pyinline{+}(\sigma, \sigma') : ((\tyStr, \tyStr), \tyStr) && \quad \text{if } \sigma, \sigma' \subty \tyStr \\
-& \pyinline{+}(\tyList{\sigma}, \tyList{\tau}) : ((\tyList{\sigma}, \tyList{\tau}), \tyList{\joinTy(\sigma, \tau)}) \\
-& \pyinline{+}(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) : ((\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}), \tyTuple{\seq{\sigma} \mathbin{\concat} \seq{\tau}}) \\
+& \rlap{$\pyinline{+}(\tyList{\sigma}, \tyList{\tau}) : ((\tyList{\sigma}, \tyList{\tau}), \tyList{\joinTy(\sigma, \tau)})$} \\
+& \rlap{$\pyinline{+}(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) : ((\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}), \tyTuple{\seq{\sigma} \mathbin{\concat} \seq{\tau}})$} \\
 & \pyinline{*}(\sigma, \sigma') : ((\tyStr, \tyInt), \tyStr) && \quad \text{if } \sigma \subty \tyStr \text{ and } \sigma' \subty \tyInt \\
 & \pyinline{*}(\sigma, \sigma') : ((\tyInt, \tyStr), \tyStr) && \quad \text{if } \sigma \subty \tyInt \text{ and } \sigma' \subty \tyStr \\
 & \pyinline{*}(\tyList{\tau}, \sigma) : ((\tyList{\tau}, \tyInt), \tyList{\tau}) && \quad \text{if } \sigma \subty \tyInt \\
