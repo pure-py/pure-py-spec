@@ -243,11 +243,12 @@ types to the resolved overloads of an operator.
 The set $\overloadsOf(\odot, \sigma, \sigma')$ consists of the tuples $((\tau, \tau'), \tau^\dagger)$ such
 that $\odot(\sigma, \sigma') : ((\tau, \tau'), \tau^\dagger)$, ordered by componentwise subtyping on their
 bounds $(\tau, \tau')$. The unary set $\overloadsOf(\ominus, \sigma)$ is defined in the same way from
-conclusions $\ominus(\sigma) : (\tau, \tau^\dagger)$.
+conclusions $\ominus(\sigma) : (\tau, \tau^\dagger)$. In both cases $\min$ denotes the least element
+under this order, where one exists.
 \end{definition}
 
-\noindent The function $\resolve$ takes the result type of the least element of
-$\overloadsOf(\odot, \sigma, \sigma')$ (\secref{types-auxiliary}), so \pyinline{1 + 2} is an
+\noindent The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the result type
+of $\min(\overloadsOf(\odot, \sigma, \sigma'))$, so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
 An \emph{equality type} is one for which structural equality is

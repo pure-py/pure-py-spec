@@ -43,7 +43,13 @@ from contexts import (
     var_type,
 )
 from match import agrees, literal_of, match_shapes
-from operators import BINARY_NAMES, UNARY_NAMES, resolve_binary, resolve_unary
+from operators import (
+    BINARY_NAMES,
+    UNARY_NAMES,
+    overloads_binary,
+    overloads_unary,
+    result_of_min,
+)
 from reasons import IllFormedModule
 from shapes import Shape, shapes
 from subtyping import join, subtype
@@ -443,7 +449,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
         if negated is not None:
             return negated
         name = UNARY_NAMES[type(e.op)]
-        result = resolve_unary(name, operand, ctx)
+        result = result_of_min(overloads_unary(name, operand, ctx))
         if result is None:
             raise IllFormedModule(e, reasons.NoUnarySignature(name, render(operand)))
         return result
@@ -738,7 +744,7 @@ def binary(
     op: str, left: ast.expr, right: ast.expr, e: ast.expr, ctx: ModuleContext
 ) -> Type:
     s, t = synth_expr(left, ctx), synth_expr(right, ctx)
-    result = resolve_binary(op, s, t, ctx)
+    result = result_of_min(overloads_binary(op, s, t, ctx))
     if result is None:
         raise IllFormedModule(e, reasons.NoBinarySignature(op, render(s), render(t)))
     return result

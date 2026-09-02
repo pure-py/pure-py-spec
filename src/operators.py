@@ -246,9 +246,9 @@ def overloads_unary(op: str, s: Type, ctx: ModuleContext) -> list[ResolvedOverlo
     return list(dict.fromkeys(rows))
 
 
-def least(rows: Sequence[ResolvedOverload]) -> ResolvedOverload | None:
-    """The resolved overload whose bounds lie componentwise below every other's,
-    or nothing if none is least."""
+def minimum(rows: Sequence[ResolvedOverload]) -> ResolvedOverload | None:
+    """The least element under the bounds order, or nothing where none
+    exists."""
     for cand in rows:
         if all(
             all(subtype(a, b) for a, b in zip(cand[0], other[0])) for other in rows
@@ -257,15 +257,7 @@ def least(rows: Sequence[ResolvedOverload]) -> ResolvedOverload | None:
     return None
 
 
-def result_of_least(rows: Sequence[ResolvedOverload]) -> Type | None:
-    chosen = least(rows)
+def result_of_min(rows: Sequence[ResolvedOverload]) -> Type | None:
+    chosen = minimum(rows)
     return chosen[1] if chosen is not None else None
 
-
-def resolve_binary(op: str, s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    """Result component of the least resolved overload at the operand types."""
-    return result_of_least(overloads_binary(op, s, t, ctx))
-
-
-def resolve_unary(op: str, s: Type, ctx: ModuleContext) -> Type | None:
-    return result_of_least(overloads_unary(op, s, ctx))

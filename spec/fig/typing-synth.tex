@@ -65,19 +65,21 @@
 \inferrule*[lab={\ruleName{binop}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \Gamma \vdash e' \synth \sigma'
+  \Gamma \vdash e' \synth \sigma' \\
+  \min(\overloadsOf(\odot, \sigma, \sigma')) = ((\tau, \tau'), \tau^\dagger)
 }
 {
-  \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \resolve(\odot, \sigma, \sigma')
+  \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \tau^\dagger
 }
 \and
 \inferrule*[lab={\ruleName{unop}}]
 {
   \Gamma \vdash e \synth \sigma \\
-  \exUnOp{\ominus}{e} \neq \exUnOp{\pyinline{-}}{n} \quad (\forall n)
+  \exUnOp{\ominus}{e} \neq \exUnOp{\pyinline{-}}{n} \quad (\forall n) \\
+  \min(\overloadsOf(\ominus, \sigma)) = (\tau, \tau^\dagger)
 }
 {
-  \Gamma \vdash \exUnOp{\ominus}{e} \synth \resolve(\ominus, \sigma)
+  \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau^\dagger
 }
 \and
 \inferrule*[lab={\ruleName{unop-literal}}]
