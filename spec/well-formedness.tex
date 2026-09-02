@@ -234,18 +234,18 @@ name\paperonly{ (\secref{no-first-class})}.
 \paperonly{\paragraph{Operators.}}
 
 Each operator is overloaded as specified in \figref{operator-overloads}. A \emph{resolved overload}
-$((\tau_1, \tau_2), \tau)$ pairs \emph{bounds} with a result; the judgements of the figure relate operand
+$((\tau, \tau'), \tau^\dagger)$ pairs \emph{bounds} with a result; the judgements of the figure relate operand
 types to the resolved overloads of an operator.
 
 \begin{definition}[Overloads at operand types]
 \label{def:overloads}
-The set $\overloadsOf(\odot, \sigma_1, \sigma_2)$ consists of the tuples $((\tau_1, \tau_2), \tau)$ such
-that $\odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$, ordered by componentwise subtyping on their
-bounds $(\tau_1, \tau_2)$. The unary set $\overloadsOf(\ominus, \sigma)$ is defined in the same way from
-conclusions $\ominus(\sigma) : (\tau_1, \tau)$.
+The set $\overloadsOf(\odot, \sigma, \sigma')$ consists of the tuples $((\tau, \tau'), \tau^\dagger)$ such
+that $\odot(\sigma, \sigma') : ((\tau, \tau'), \tau^\dagger)$, ordered by componentwise subtyping on their
+bounds $(\tau, \tau')$. The unary set $\overloadsOf(\ominus, \sigma)$ is defined in the same way from
+conclusions $\ominus(\sigma) : (\tau, \tau^\dagger)$.
 \end{definition}
 
-Resolution takes the least element of $\overloadsOf(\odot, \sigma_1, \sigma_2)$:
+Resolution takes the least element of $\overloadsOf(\odot, \sigma, \sigma')$:
 $\overloadsOf(\pyinline{+}, \tyLiteral{1}, \tyLiteral{2})$ is
 $\set{((\tyInt, \tyInt), \tyInt), ((\tyFloat, \tyFloat), \tyFloat)}$, whose least element gives
 \pyinline{1 + 2} the type \pyinline{int}, while
@@ -277,8 +277,8 @@ literal, where resolution gives \pyinline{float}.
 
 \begin{lemma}[Least overload]
 \label{lem:least-overload}
-If neither $\sigma_1$ nor $\sigma_2$ is a subtype of \pyinline{Never} and
-$\overloadsOf(\odot, \sigma_1, \sigma_2)$ is not empty, then the set has a least element; likewise
+If neither $\sigma$ nor $\sigma'$ is a subtype of \pyinline{Never} and
+$\overloadsOf(\odot, \sigma, \sigma')$ is not empty, then the set has a least element; likewise
 $\overloadsOf(\ominus, \sigma)$.
 \end{lemma}
 

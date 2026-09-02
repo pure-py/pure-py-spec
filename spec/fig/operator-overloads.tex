@@ -1,7 +1,7 @@
 \begin{figure}
 \small
 \setlength{\jot}{2pt}
-\flushleft \shadebox{$\odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$}
+\flushleft \shadebox{$\odot(\sigma, \sigma') : ((\tau, \tau'), \tau^\dagger)$}
 \begin{defalign}
 & \odot(\sigma, \sigma') : ((\sigma, \sigma'), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{==}, \pyinline{!=}} \text{ and } \sigma, \sigma' \text{ comparable equality types} \\
 & \odot(\sigma, \tyList{\tau}) : ((\sigma, \tyList{\tau}), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{in}, \pyinline{not in}} \text{ and } \sigma, \tau \text{ comparable} \\
@@ -25,7 +25,7 @@
 
 \vspace{2mm}
 
-\flushleft \shadebox{$\ominus(\sigma) : (\tau_1, \tau)$}
+\flushleft \shadebox{$\ominus(\sigma) : (\tau, \tau^\dagger)$}
 \begin{defalign}
 & \pyinline{not}(\sigma) : (\tyBool, \tyBool) && \quad \text{if } \sigma \subty \tyBool \\
 & \ominus(\sigma) : (\tyInt, \tyInt) && \quad \text{if } \ominus \in \set{\pyinline{+}, \pyinline{-}} \text{ and } \sigma \subty \tyInt \\

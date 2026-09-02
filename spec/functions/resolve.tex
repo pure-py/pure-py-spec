@@ -1,5 +1,5 @@
-\resolve(\odot, \sigma, \sigma') &{}= \tau && \text{if } ((\tau_1, \tau_2), \tau) \text{ least in } \overloadsOf(\odot, \sigma, \sigma') \\*
-\resolve(\odot, \sigma, \sigma') &{}= \tau \\*
-&\qquad \text{if } \overloadsOf(\odot, \sigma, \sigma') = \varnothing \text{ and } ((\tau_1, \tau_2), \tau) \text{ least in } \overloadsOf(\odot, \baseType(\sigma), \baseType(\sigma')) \\*[2mm]
-\resolve(\ominus, \sigma) &{}= \tau && \text{if } (\tau_1, \tau) \text{ least in } \overloadsOf(\ominus, \sigma) \\*
-\resolve(\ominus, \sigma) &{}= \tau && \text{if } \overloadsOf(\ominus, \sigma) = \varnothing \text{ and } (\tau_1, \tau) \text{ least in } \overloadsOf(\ominus, \baseType(\sigma))
+\resolve(\odot, \sigma, \sigma') &{}= \tau^\dagger && \text{if } ((\tau, \tau'), \tau^\dagger) \text{ least in } \overloadsOf(\odot, \sigma, \sigma') \\*
+\resolve(\odot, \sigma, \sigma') &{}= \tau^\dagger \\*
+&\qquad \text{if } \overloadsOf(\odot, \sigma, \sigma') = \varnothing \text{ and } ((\tau, \tau'), \tau^\dagger) \text{ least in } \overloadsOf(\odot, \baseType(\sigma), \baseType(\sigma')) \\*[2mm]
+\resolve(\ominus, \sigma) &{}= \tau^\dagger && \text{if } (\tau, \tau^\dagger) \text{ least in } \overloadsOf(\ominus, \sigma) \\*
+\resolve(\ominus, \sigma) &{}= \tau^\dagger && \text{if } \overloadsOf(\ominus, \sigma) = \varnothing \text{ and } (\tau, \tau^\dagger) \text{ least in } \overloadsOf(\ominus, \baseType(\sigma))
