@@ -235,16 +235,15 @@ name\paperonly{ (\secref{no-first-class})}.
 
 Each operator is overloaded: an \emph{overload} $\omega$, a row of \figref{operator-overloads}, is a
 tuple of operand forms, bounds, condition and result. The overload \emph{applies at} operand types
-$(\sigma, \sigma')$ if they are of $\omega$'s operand forms under an instantiation of its variables, the
-type instantiating each bounded variable lies below its bound, and the condition holds. The
-\emph{bounds} of $\omega$ at $(\sigma, \sigma')$ are the declared bound at each position and the operand's
-type at a position without one, and $\resultOf(\omega, \sigma, \sigma')$ is the result under the
-instantiation. Write $\omega \subty \omega'$ at $(\sigma, \sigma')$ when the bounds of $\omega$ lie
-componentwise below the bounds of $\omega'$; the overload is \emph{least} at $(\sigma, \sigma')$ if it applies at
-$(\sigma, \sigma')$ and $\omega \subty \omega'$ for every overload $\omega'$ of the same operator that
-applies at $(\sigma, \sigma')$. A unary
-overload is read likewise at a single operand type. Resolution takes the least applicable overload, so
-\pyinline{1 + 2} is an \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}. An \emph{equality type} is one for which structural equality is
+$(\sigma, \sigma')$ that instantiate its operand forms, with each bounded variable's type below its bound
+and the condition holding; the result under the instantiation is $\resultOf(\omega, \sigma, \sigma')$. A
+position without a declared bound takes the operand's type as its bound. Write $\omega \subty \omega'$ when the bounds of $\omega$ lie
+componentwise below the bounds of $\omega'$; an applicable overload is \emph{least} if
+$\omega \subty \omega'$ for every overload $\omega'$ of the same operator that applies at the same
+operand types. A unary overload is read likewise at a single operand type. Resolution takes the least
+applicable overload, so \pyinline{1 + 2} is an \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
+
+An \emph{equality type} is one for which structural equality is
 defined:
 \begin{defalign}
 & \Gamma \vdash \nu \eqType \\
