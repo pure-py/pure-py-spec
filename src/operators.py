@@ -229,12 +229,21 @@ UNARY_NAMES: dict[type[ast.AST], str] = {
 def overloads_binary(
     op: str, s: Type, t: Type, ctx: ModuleContext
 ) -> list[ResolvedOverload]:
-    """Resolved overloads of `op` at the operand types."""
-    return [r for ov in BINARY_OVERLOADS[op] if (r := ov(s, t, ctx)) is not None]
+    """Resolved overloads of `op` at the operand types, closed under
+    base-typing."""
+    rows = [r for ov in BINARY_OVERLOADS[op] if (r := ov(s, t, ctx)) is not None] + [
+        r
+        for ov in BINARY_OVERLOADS[op]
+        if (r := ov(base_type(s), base_type(t), ctx)) is not None
+    ]
+    return list(dict.fromkeys(rows))
 
 
 def overloads_unary(op: str, s: Type, ctx: ModuleContext) -> list[ResolvedOverload]:
-    return [r for ov in UNARY_OVERLOADS[op] if (r := ov(s, ctx)) is not None]
+    rows = [r for ov in UNARY_OVERLOADS[op] if (r := ov(s, ctx)) is not None] + [
+        r for ov in UNARY_OVERLOADS[op] if (r := ov(base_type(s), ctx)) is not None
+    ]
+    return list(dict.fromkeys(rows))
 
 
 def least(rows: Sequence[ResolvedOverload]) -> ResolvedOverload | None:
@@ -254,18 +263,9 @@ def result_of_least(rows: Sequence[ResolvedOverload]) -> Type | None:
 
 
 def resolve_binary(op: str, s: Type, t: Type, ctx: ModuleContext) -> Type | None:
-    """Result component of the least resolved overload at the operand types, or
-    at their base types if no overload applies at the operand types themselves."""
-    rows = overloads_binary(op, s, t, ctx)
-    if rows:
-        return result_of_least(rows)
-    rows = overloads_binary(op, base_type(s), base_type(t), ctx)
-    return result_of_least(rows) if rows else None
+    """Result component of the least resolved overload at the operand types."""
+    return result_of_least(overloads_binary(op, s, t, ctx))
 
 
 def resolve_unary(op: str, s: Type, ctx: ModuleContext) -> Type | None:
-    rows = overloads_unary(op, s, ctx)
-    if rows:
-        return result_of_least(rows)
-    rows = overloads_unary(op, base_type(s), ctx)
-    return result_of_least(rows) if rows else None
+    return result_of_least(overloads_unary(op, s, ctx))

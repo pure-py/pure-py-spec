@@ -20,16 +20,18 @@
 & \pyinline{*}(\tyList{\tau}, \sigma) : ((\tyList{\tau}, \tyInt), \tyList{\tau}) && \quad \text{if } \sigma \subty \tyInt \\
 & \pyinline{*}(\sigma, \tyList{\tau}) : ((\tyInt, \tyList{\tau}), \tyList{\tau}) && \quad \text{if } \sigma \subty \tyInt \\
 & \pyinline{**}(\sigma, \tyLiteral{n}) : ((\tyInt, \tyLiteral{n}), \tyInt) && \quad \text{if } \sigma \subty \tyInt \text{ and } n \text{ an integer} \\
-& \pyinline{**}(\sigma, \tyLiteral{-n}) : ((\tyInt, \tyLiteral{-n}), \tyFloat) && \quad \text{if } \sigma \subty \tyInt \text{ and } n \text{ a positive integer}
+& \pyinline{**}(\sigma, \tyLiteral{-n}) : ((\tyInt, \tyLiteral{-n}), \tyFloat) && \quad \text{if } \sigma \subty \tyInt \text{ and } n \text{ a positive integer} \\
+& \odot(\sigma, \sigma') : ((\tau, \tau'), \tau^\dagger) && \quad \text{if } {\odot}(\baseType(\sigma), \baseType(\sigma')) : ((\tau, \tau'), \tau^\dagger)
 \end{defalign}
 
-\vspace{2mm}
+\vspace{-2mm}
 
 \flushleft \shadebox{$\ominus(\sigma) : (\tau, \tau^\dagger)$}
 \begin{defalign}
 & \pyinline{not}(\sigma) : (\tyBool, \tyBool) && \quad \text{if } \sigma \subty \tyBool \\
 & \ominus(\sigma) : (\tyInt, \tyInt) && \quad \text{if } \ominus \in \set{\pyinline{+}, \pyinline{-}} \text{ and } \sigma \subty \tyInt \\
-& \ominus(\sigma) : (\tyFloat, \tyFloat) && \quad \text{if } \ominus \in \set{\pyinline{+}, \pyinline{-}} \text{ and } \sigma \subty \tyFloat
+& \ominus(\sigma) : (\tyFloat, \tyFloat) && \quad \text{if } \ominus \in \set{\pyinline{+}, \pyinline{-}} \text{ and } \sigma \subty \tyFloat \\
+& \ominus(\sigma) : (\tau, \tau^\dagger) && \quad \text{if } {\ominus}(\baseType(\sigma)) : (\tau, \tau^\dagger)
 \end{defalign}
 \caption{Operator overloads}
 \label{fig:operator-overloads}
