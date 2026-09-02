@@ -235,8 +235,8 @@ name\paperonly{ (\secref{no-first-class})}.
 
 Each operator is overloaded: an \emph{overload} $\omega$, a row of \figref{operator-overloads}, is a
 tuple of operand forms, bounds, condition and result. The overload \emph{applies at} operand types
-$(\sigma, \sigma')$ that instantiate its operand forms, with each bounded variable's type below its bound
-and the condition holding; the result under the instantiation is $\resultOf(\omega, \sigma, \sigma')$. A
+$(\sigma, \sigma')$ if they instantiate its operand forms, each bounded variable's type lies below its
+bound, and the condition holds; the result under the instantiation is $\resultOf(\omega, \sigma, \sigma')$. A
 position without a declared bound takes the operand's type as its bound. Write $\omega \subty \omega'$ when the bounds of $\omega$ lie
 componentwise below the bounds of $\omega'$; an applicable overload is \emph{least} if
 $\omega \subty \omega'$ for every overload $\omega'$ of the same operator that applies at the same
