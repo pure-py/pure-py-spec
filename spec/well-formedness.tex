@@ -235,14 +235,14 @@ name\paperonly{ (\secref{no-first-class})}.
 
 Each operator is overloaded as specified in \figref{operator-overloads}, whose rows define the
 judgements $\odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$ and $\ominus(\sigma) : (\tau_1, \tau)$,
-relating operand types to an instantiated row.
+relating operand types to a \emph{resolved overload} $((\tau_1, \tau_2), \tau)$.
 
 \begin{definition}[Overloads at operand types]
 \label{def:overloads}
-The set $\overloadsOf(\odot, \sigma_1, \sigma_2)$ consists of the instantiated rows
-$((\tau_1, \tau_2), \tau)$ such that $\odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$, ordered by
-componentwise subtyping on their bounds $(\tau_1, \tau_2)$. The unary set $\overloadsOf(\ominus, \sigma)$
-is defined in the same way from conclusions $\ominus(\sigma) : (\tau_1, \tau)$.
+The set $\overloadsOf(\odot, \sigma_1, \sigma_2)$ consists of the tuples $((\tau_1, \tau_2), \tau)$ such
+that $\odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$, ordered by componentwise subtyping on their
+bounds $(\tau_1, \tau_2)$. The unary set $\overloadsOf(\ominus, \sigma)$ is defined in the same way from
+conclusions $\ominus(\sigma) : (\tau_1, \tau)$.
 \end{definition}
 
 Resolution takes the least element of $\overloadsOf(\odot, \sigma_1, \sigma_2)$:
