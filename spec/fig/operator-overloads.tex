@@ -1,5 +1,6 @@
 \begin{figure}
 \small
+\flushleft \shadebox{$\odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$}
 \begin{center}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.23\textwidth}>{\raggedright\arraybackslash}p{0.15\textwidth}>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.14\textwidth}}
 \arrayrulecolor{gray!60}\hline
@@ -26,8 +27,12 @@
  & $(\sigma, \sigma')$ & $\sigma, \sigma' \subty \tyFloat$ & & $\tyFloat$
 \end{tabular}
 
-\vspace{3mm}
+\end{center}
 
+\vspace{2mm}
+
+\flushleft \shadebox{$\ominus(\sigma) : (\tau_1, \tau)$}
+\begin{center}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.23\textwidth}>{\raggedright\arraybackslash}p{0.15\textwidth}>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.14\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}$\ominus$ & Operand type & Bounds & Condition & Result \\
@@ -36,6 +41,18 @@
  & $\sigma$ & $\sigma \subty \tyFloat$ & & $\tyFloat$
 \end{tabular}
 \end{center}
+
+\vspace{2mm}
+
+\setlength{\parindent}{0pt}
+Each row is read as a rule: the premises are the row's bounds and condition, and the conclusion pairs
+the bounds with the result, with the operand's type as the bound at each position where none is given.
+For example, the third row of \pyinline{*} is read as the rule:
+\begin{mathpar}
+\inferrule*
+{\sigma \subty \tyInt}
+{\pyinline{*}(\tyList{\tau}, \sigma) : ((\tyList{\tau}, \tyInt), \tyList{\tau})}
+\end{mathpar}
 \caption{Operator overloads}
 \label{fig:operator-overloads}
 \end{figure}
