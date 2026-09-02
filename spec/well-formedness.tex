@@ -246,12 +246,8 @@ bounds $(\tau, \tau')$. The unary set $\overloadsOf(\ominus, \sigma)$ is defined
 conclusions $\ominus(\sigma) : (\tau, \tau^\dagger)$.
 \end{definition}
 
-Resolution takes the least element of $\overloadsOf(\odot, \sigma, \sigma')$:
-$\overloadsOf(\pyinline{+}, \tyLiteral{1}, \tyLiteral{2})$ is
-$\set{((\tyInt, \tyInt), \tyInt), ((\tyFloat, \tyFloat), \tyFloat)}$, whose least element gives
-\pyinline{1 + 2} the type \pyinline{int}, while
-$\overloadsOf(\pyinline{+}, \tyLiteral{1}, \tyLiteral{2.0})$ is
-$\set{((\tyFloat, \tyFloat), \tyFloat)}$ alone, so \pyinline{1 + 2.0} is a \pyinline{float}.
+Resolution takes the least element of $\overloadsOf(\odot, \sigma, \sigma')$, so \pyinline{1 + 2} is an
+\pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
 An \emph{equality type} is one for which structural equality is
 defined:
