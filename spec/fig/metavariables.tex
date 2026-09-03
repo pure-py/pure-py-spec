@@ -17,7 +17,7 @@ $g$ & comprehension qualifier & \figref{syntax-expr} \\
 $h$ & case of a \pyinline{match} & \figref{syntax-stmt} \\
 $s$ & statement & \figref{syntax-stmt} \\
 $d$ & function definition & \figref{syntax-stmt} \\
-$\tau$, $\sigma$ & type & \figref{syntax-types} \\
+$\tau$, $\sigma$ & type, a type expression whose class names are all marked & \figref{syntax-types} \\
 $\psi$ & type expression, a type as written & \figref{syntax-types} \\
 $\nu$ & primitive type & \figref{syntax-types} \\
 $\iota$ & import & \figref{syntax-stmt} \\
@@ -34,7 +34,8 @@ $\mathcal{P}$ & predefined modules, each with its environment and context & \sec
 \metaGroup{Contexts} \\
 $\Gamma$, $\Delta$ & context, a finite map from variables to entries & Definition~\ref{def:context} \\
 $\theta$ & context entry & Definition~\ref{def:context} \\
-$C$, $D$ & class, also the type of its instances & Definition~\ref{def:class} \\
+$C$, $D$ & class, a fully qualified class name; also the type of its instances & Definition~\ref{def:class} \\
+$\Sigma$ & class table, a finite map from classes to their entries & Definition~\ref{def:class-table} \\
 $R$ & result type & \secref{well-formedness-statements} \\
 $\zeta$ & optional return type, $\tau$ or $\varepsilon$ & \speconly{\figref{typing-stmt}} \\
 \metaGroup{Shapes} \\

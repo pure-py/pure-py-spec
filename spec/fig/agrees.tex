@@ -1,61 +1,61 @@
 \begin{figure}
 \small
 \setlength{\jot}{2pt}
-\flushleft \shadebox{$\Gamma \vdash p \agrees \tau$}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash p \agrees \tau$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{agrees-var}}]
 { \strut }
-{ \Gamma \vdash x \agrees \tau }
+{ \Sigma; \Gamma \vdash x \agrees \tau }
 \and
 \inferrule*[lab={\ruleName{agrees-wild}}]
 { \strut }
-{ \Gamma \vdash \patWild \agrees \tau }
+{ \Sigma; \Gamma \vdash \patWild \agrees \tau }
 \and
 \inferrule*[lab={\ruleName{agrees-lit}}]
 { \strut }
-{ \Gamma \vdash \ell \agrees \tau }
+{ \Sigma; \Gamma \vdash \ell \agrees \tau }
 \and
 \inferrule*[lab={\ruleName{agrees-neg-lit}}]
 { \strut }
-{ \Gamma \vdash -n \agrees \tau }
+{ \Sigma; \Gamma \vdash -n \agrees \tau }
 \and
 \inferrule*[lab={\ruleName{agrees-as}}]
-{ \Gamma \vdash p \agrees \tau }
-{ \Gamma \vdash p\;\pyinline{as}\;x \agrees \tau }
+{ \Sigma; \Gamma \vdash p \agrees \tau }
+{ \Sigma; \Gamma \vdash p\;\pyinline{as}\;x \agrees \tau }
 \and
 \inferrule*[lab={\ruleName{agrees-union}}]
-{ \Gamma \vdash p \agrees \sigma \\ \Gamma \vdash p \agrees \tau }
-{ \Gamma \vdash p \agrees \tyUnion{\sigma}{\tau} }
+{ \Sigma; \Gamma \vdash p \agrees \sigma \\ \Sigma; \Gamma \vdash p \agrees \tau }
+{ \Sigma; \Gamma \vdash p \agrees \tyUnion{\sigma}{\tau} }
 \and
 \inferrule*[lab={\ruleName{agrees-tuple}}]
-{ \Gamma \vdash p_i \agrees \tau_i \quad (\forall i) }
-{ \Gamma \vdash \patTuple{p_1, \ldots, p_n} \agrees \tyTuple{\tau_1, \ldots, \tau_n} }
+{ \Sigma; \Gamma \vdash p_i \agrees \tau_i \quad (\forall i) }
+{ \Sigma; \Gamma \vdash \patTuple{p_1, \ldots, p_n} \agrees \tyTuple{\tau_1, \ldots, \tau_n} }
 \and
 \inferrule*[lab={\ruleName{agrees-tuple-other}}]
 { \tau \text{ neither list type, union, nor tuple type of arity } n }
-{ \Gamma \vdash \patTuple{p_1, \ldots, p_n} \agrees \tau }
+{ \Sigma; \Gamma \vdash \patTuple{p_1, \ldots, p_n} \agrees \tau }
 \and
 \inferrule*[lab={\ruleName{agrees-list}}]
-{ \Gamma \vdash p_i \agrees \tau \quad (\forall i) }
-{ \Gamma \vdash \patList{p_1, \ldots, p_n} \agrees \tyList{\tau} }
+{ \Sigma; \Gamma \vdash p_i \agrees \tau \quad (\forall i) }
+{ \Sigma; \Gamma \vdash \patList{p_1, \ldots, p_n} \agrees \tyList{\tau} }
 \and
 \inferrule*[lab={\ruleName{agrees-list-other}}]
 { \tau \text{ neither tuple type, union, nor list type} }
-{ \Gamma \vdash \patList{\seq{p}} \agrees \tau }
+{ \Sigma; \Gamma \vdash \patList{\seq{p}} \agrees \tau }
 \and
 \inferrule*[lab={\ruleName{agrees-dict}}]
-{ \Gamma \vdash p_i \agrees \tau \quad (\forall i) }
-{ \Gamma \vdash \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \agrees \tyDict{\tau} }
+{ \Sigma; \Gamma \vdash p_i \agrees \tau \quad (\forall i) }
+{ \Sigma; \Gamma \vdash \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \agrees \tyDict{\tau} }
 \and
 \inferrule*[lab={\ruleName{agrees-dict-other}}]
 { \tau \text{ neither dictionary type nor union} }
-{ \Gamma \vdash \patDict{\bind{\seq{w}}{\seq{p}}} \agrees \tau }
+{ \Sigma; \Gamma \vdash \patDict{\bind{\seq{w}}{\seq{p}}} \agrees \tau }
 \and
 \inferrule*[lab={\ruleName{agrees-constr}}]
-{ \Gamma \vdash q : \Type{C} \\ \Gamma \vdash \fieldMap(C, a)(x) \agrees \sigma \quad (\forall \bind{x}{\sigma} \in \fields(C)) }
-{ \Gamma \vdash \patConstr{q}{a} \agrees \tau }
+{ \Gamma \vdash q : \Type{C} \\ \Sigma; \Gamma \vdash \fieldMap(\Sigma, C, a)(x) \agrees \sigma \quad (\forall \bind{x}{\sigma} \in \fields(\Sigma, C)) }
+{ \Sigma; \Gamma \vdash \patConstr{q}{a} \agrees \tau }
 \end{mathpar}
-\caption{Pattern $p$ agrees with type $\tau$ under $\Gamma$}
+\caption{Pattern $p$ agrees with type $\tau$}
 \label{fig:agrees}
 \end{figure}

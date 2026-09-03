@@ -1,5 +1,5 @@
-\joinTy(\sigma, \tau) &{}= \tau && \text{if } \sigma \subty \tau \\*
-\joinTy(\sigma, \tau) &{}= \sigma && \text{if } \tau \subty \sigma \text{ and } \sigma \not\tyEquiv \tau \\*
-\joinTy(\sigma, \tau) &{}= \tyUnion{\sigma}{\tau} && \text{otherwise} \\*[2mm]
-\joinTy(\varepsilon) &{}= \tyNever \\*
-\joinTy(\sigma \cons \seq{\tau}) &{}= \joinTy(\sigma, \joinTy(\seq{\tau}))
+\joinTy(\Sigma, \sigma, \tau) &{}= \tau && \text{if } \Sigma \vdash \sigma \subty \tau \\*
+\joinTy(\Sigma, \sigma, \tau) &{}= \sigma && \text{if } \Sigma \vdash \tau \subty \sigma \text{ and } \Sigma \nvdash \sigma \tyEquiv \tau \\*
+\joinTy(\Sigma, \sigma, \tau) &{}= \tyUnion{\sigma}{\tau} && \text{otherwise} \\*[2mm]
+\joinTy(\Sigma, \varepsilon) &{}= \tyNever \\*
+\joinTy(\Sigma, \sigma \cons \seq{\tau}) &{}= \joinTy(\Sigma, \sigma, \joinTy(\Sigma, \seq{\tau}))

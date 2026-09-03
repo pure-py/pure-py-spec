@@ -54,22 +54,22 @@ The functions on types and shapes introduced in \secref{types}, each defined by 
 \funcrows{base-type}
 \end{auxfunction}
 
-\begin{auxfunction}{\joinTy(\sigma, \tau), \joinTy(\seq{\tau})}{type}{aux:join}
+\begin{auxfunction}{\joinTy(\Sigma, \sigma, \tau), \joinTy(\Sigma, \seq{\tau})}{type}{aux:join}
 \input{spec/functions/join-text}
 \funcrows{join}
 \end{auxfunction}
 
-\begin{auxfunction}{\meetTy(\sigma, \tau)}{type}{aux:meet}
+\begin{auxfunction}{\meetTy(\Sigma, \sigma, \tau)}{type}{aux:meet}
 \input{spec/functions/meet-text}
 \funcrows{meet}
 \end{auxfunction}
 
-\begin{auxfunction}{\elemTy(\tau)}{type}{aux:elem-type}
+\begin{auxfunction}{\elemTy(\Sigma, \tau)}{type}{aux:elem-type}
 \input{spec/functions/elem-type-text}
 \funcrows{elem-type}
 \end{auxfunction}
 
-\begin{auxfunction}{\shapesOf(\tau, N), \shapesOf(\seq{\tau})}{set of shapes or sequences of shapes}{aux:shapes}
+\begin{auxfunction}{\shapesOf(\Sigma, \tau, N), \shapesOf(\Sigma, \seq{\tau})}{set of shapes or sequences of shapes}{aux:shapes}
 \input{spec/functions/shapes-text}
 \funcrows{shapes}
 \end{auxfunction}
@@ -95,17 +95,17 @@ the resolution of qualified names in an environment.
 \funcrows{own-fields}
 \end{auxfunction}
 
-\begin{auxfunction}{\fields(C)}{sequence of bindings}{aux:fields}
+\begin{auxfunction}{\fields(\Sigma, C)}{sequence of bindings}{aux:fields}
 \input{spec/functions/fields-text}
 \funcrows{fields}
 \end{auxfunction}
 
-\begin{auxfunction}{\ancestors(C)}{set of classes}{aux:ancestors}
+\begin{auxfunction}{\ancestors(\Sigma, C)}{set of classes}{aux:ancestors}
 \input{spec/functions/ancestors-text}
 \funcrows{ancestors}
 \end{auxfunction}
 
-\begin{auxfunction}{\fieldMap(C, \seq{u})}{map from variables}{aux:field-map}
+\begin{auxfunction}{\fieldMap(\Sigma, C, \seq{u})}{map from variables}{aux:field-map}
 \input{spec/functions/field-map-text}
 \funcrows{field-map}
 \end{auxfunction}

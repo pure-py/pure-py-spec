@@ -1,16 +1,16 @@
 \begin{figure}
 \small
 \setlength{\jot}{2pt}
-\flushleft \shadebox{$\Gamma \vdash k, p \splits K, L$}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash k, p \splits K, L$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{split-literal}}]
 {
   \ell \notin N \\
-  \tyLiteral{\ell} \subty \tau
+  \Sigma \vdash \tyLiteral{\ell} \subty \tau
 }
 {
-  \Gamma \vdash \shapeAny{\tau}{N}, \ell \splits \set{\ell}, \shapesOf(\tau, N \cup \set{\ell})
+  \Sigma; \Gamma \vdash \shapeAny{\tau}{N}, \ell \splits \set{\ell}, \shapesOf(\Sigma, \tau, N \cup \set{\ell})
 }
 \and
 \inferrule*[lab={\ruleName{split-tuple}}]
@@ -18,7 +18,7 @@
   \strut
 }
 {
-  \Gamma \vdash \shapeAny{\tyTuple{\tau_1, \ldots, \tau_n}}{\varnothing}, \patTuple{p_1, \ldots, p_n} \splits \set{\patTuple{\seq{k}} \mid \seq{k} \in \shapesOf(\seq{\tau})}, \varnothing
+  \Sigma; \Gamma \vdash \shapeAny{\tyTuple{\tau_1, \ldots, \tau_n}}{\varnothing}, \patTuple{p_1, \ldots, p_n} \splits \set{\patTuple{\seq{k}} \mid \seq{k} \in \shapesOf(\Sigma, \seq{\tau})}, \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{split-list}}]
@@ -26,7 +26,7 @@
   n \notin N
 }
 {
-  \Gamma \vdash \shapeAny{\tyList{\tau}}{N}, \patList{p_1, \ldots, p_n} \splits \set{\shapeList{\tau}{\seq{k}} \mid \seq{k} \in \shapesOf(\tau, \varnothing)^n}, \shapesOf(\tyList{\tau}, N \cup \set{n})
+  \Sigma; \Gamma \vdash \shapeAny{\tyList{\tau}}{N}, \patList{p_1, \ldots, p_n} \splits \set{\shapeList{\tau}{\seq{k}} \mid \seq{k} \in \shapesOf(\Sigma, \tau, \varnothing)^n}, \shapesOf(\Sigma, \tyList{\tau}, N \cup \set{n})
 }
 \and
 \inferrule*[lab={\ruleName{split-key}}]
@@ -35,32 +35,32 @@
   w_j \in \dom(\beta) \quad (\forall j < i)
 }
 {
-  \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \splits \set{\shapeDict{\tau}{\beta \override \set{\bind{w_i}{k}}}{N} \mid k \in \shapesOf(\tau, \varnothing)}, \set{\shapeDict{\tau}{\beta}{(N \cup \set{w_i})}}
+  \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \splits \set{\shapeDict{\tau}{\beta \override \set{\bind{w_i}{k}}}{N} \mid k \in \shapesOf(\Sigma, \tau, \varnothing)}, \set{\shapeDict{\tau}{\beta}{(N \cup \set{w_i})}}
 }
 \and
 \inferrule*[lab={\ruleName{split-class}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \ancestors(C) \cap N = \varnothing \\
-  D = \meetTy(\tau, C) \\
-  \fields(D) = \bind{\seq{x}}{\seq{\sigma}} \\
-  N' = \set{h \in N \mid \Gamma \vdash h : D}
+  \ancestors(\Sigma, C) \cap N = \varnothing \\
+  D = \meetTy(\Sigma, \tau, C) \\
+  \fields(\Sigma, D) = \bind{\seq{x}}{\seq{\sigma}} \\
+  N' = \set{h \in N \mid \Sigma \vdash h : D}
 }
 {
-  \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{D}{\seq{k}}}{N'} \mid \seq{k} \in \shapesOf(\seq{\sigma})}, \shapesOf(\tau, N \cup \set{C})
+  \Sigma; \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{D}{\seq{k}}}{N'} \mid \seq{k} \in \shapesOf(\Sigma, \seq{\sigma})}, \shapesOf(\Sigma, \tau, N \cup \set{C})
 }
 \and
 \inferrule*[lab={\ruleName{split-subclass}}]
 {
   \Gamma \vdash q : \Type{D} \\
-  D \subty C \\
+  \Sigma \vdash D \subty C \\
   D \neq C \\
-  \ancestors(D) \cap N = \varnothing \\
-  \fields(D) = \fields(C) \mathbin{\concat} \bind{\seq{y}}{\seq{\sigma}} \\
-  N' = \set{h \in N \mid \Gamma \vdash h : D}
+  \ancestors(\Sigma, D) \cap N = \varnothing \\
+  \fields(\Sigma, D) = \fields(\Sigma, C) \mathbin{\concat} \bind{\seq{y}}{\seq{\sigma}} \\
+  N' = \set{h \in N \mid \Sigma \vdash h : D}
 }
 {
-  \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{N}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{D}{\seq{k} \mathbin{\concat} \seq{k}\,'}}{N'} \mid \seq{k}\,' \in \shapesOf(\seq{\sigma})}, \set{\shapeAny{\patConstr{C}{\seq{k}}}{(N \cup \set{D})}}
+  \Sigma; \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{N}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{D}{\seq{k} \mathbin{\concat} \seq{k}\,'}}{N'} \mid \seq{k}\,' \in \shapesOf(\Sigma, \seq{\sigma})}, \set{\shapeAny{\patConstr{C}{\seq{k}}}{(N \cup \set{D})}}
 }
 \end{mathpar}
 \caption{Shape $k$ splits at the head that $p$ tests for, giving shapes $K$ and residual $L$}

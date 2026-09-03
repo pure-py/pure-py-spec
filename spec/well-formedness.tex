@@ -29,7 +29,7 @@ literal type, taking $\tyLiteral{42}$ to \pyinline{int} and leaving every other 
 
 The context entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
 that is not definitely assigned is bound to $\statusNotDefAssigned$. Two contexts from different branches of a conditional merge pointwise. A variable definitely assigned in both, at $\sigma$ and $\tau$, is of type
-$\joinTy(\sigma, \tau)$, whereas a variable definitely assigned in one branch alone is
+$\joinTy(\Sigma, \sigma, \tau)$, whereas a variable definitely assigned in one branch alone is
 $\statusNotDefAssigned$.
 
 \input{spec/fig/resolve-name}
@@ -52,7 +52,7 @@ Python treats it as one.
 
 \begin{lemma}[Transitivity of subtyping]
 \label{lem:subtyping-transitive}
-If $\sigma \subty \tau$ and $\tau \subty \tau'$ then $\sigma \subty \tau'$.
+If $\Sigma \vdash \sigma \subty \tau$ and $\Sigma \vdash \tau \subty \tau'$ then $\Sigma \vdash \sigma \subty \tau'$.
 \end{lemma}
 
 Two types are \emph{comparable}
@@ -66,8 +66,8 @@ joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.
 
 \begin{lemma}[Types form a lattice]
 \label{lem:lattice}
-Types ordered by subtyping, up to equivalence, form a bounded distributive lattice: $\joinTy(\sigma, \tau)$
-is the least upper bound of $\sigma$ and $\tau$, $\meetTy(\sigma, \tau)$ is their greatest lower bound,
+Types ordered by subtyping in $\Sigma$, up to equivalence, form a bounded distributive lattice: $\joinTy(\Sigma, \sigma, \tau)$
+is the least upper bound of $\sigma$ and $\tau$, $\meetTy(\Sigma, \sigma, \tau)$ is their greatest lower bound,
 \pyinline{object} is the greatest type and \pyinline{Never} the least.
 \end{lemma}
 
@@ -83,12 +83,12 @@ $\Delta$, which may be empty. The base cases are that \pyinline{return e} defini
 \pyinline{e}. \emph{Result types} $R$ classify these outcomes: $R$ is either $\Returns$ (definitely
 returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$).
 
-Context operations $\override$ and $\merge$ lift to a right semiring over result types $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge$ and zero for $\override$.
+Context operations $\override$ and $\mergeS$ lift to a right semiring over result types $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\mergeS$ and zero for $\override$.
 
 \begin{definition}[Override and merge on result types]
 \begin{defalign}
-\Assigns{\Delta} \merge \Assigns{\Delta'} & = \Assigns{\Delta \merge \Delta'} \\
-R \merge \Returns = \Returns \merge R & = R \\
+\Assigns{\Delta} \mergeS \Assigns{\Delta'} & = \Assigns{\Delta \mergeS \Delta'} \\
+R \mergeS \Returns = \Returns \mergeS R & = R \\
 \\
 \Assigns{\Delta} \override \Assigns{\Delta'} & = \Assigns{\Delta \override \Delta'} \\
 R \override \Returns = \Returns \override R & = \Returns
@@ -99,12 +99,12 @@ R \override \Returns = \Returns \override R & = \Returns
 
 A sequence $s\;s'$ (\ruleName{seq}) types $s$, types $s'$ under $\Gamma$ overridden by what $s$
 assigns, and requires that no variable captured by $s$ is assigned in $s'$. A conditional combines its
-branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
+branches with $\mergeS$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
 \paperinput{paper/well-formedness/match}%
 
-$\Gamma; \zeta \vdash s : R$ says that $s$ has result type $R$ in $\Gamma$, with return type $\zeta$
+$\Sigma; \Gamma; \zeta \vdash s : R$ says that $s$ has result type $R$ in $\Gamma$, with return type $\zeta$
 (\figref{typing-stmt}); every rule passes $\zeta$ down unchanged. Top-level statements have a judgement of
-their own, $\Gamma \vdash t : R$ (\figref{typing-top}): a sequence composes as a statement sequence does, a
+their own, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top}): a sequence composes as a statement sequence does, a
 class declaration is a top-level form, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A top-level
 statement may not assign a name that an earlier top-level statement bound to a class
@@ -128,9 +128,9 @@ declared return type, and must have result type $\Returns$ unless the function r
 so a function that declares a result definitely returns one.
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and the cases are taken in turn from
-$\shapesOf(\sigma, \varnothing)$, which denotes every value of $\sigma$. The \emph{residual} $L_i$ holds
+$\shapesOf(\Sigma, \sigma, \varnothing)$, which denotes every value of $\sigma$. The \emph{residual} $L_i$ holds
 the values which have not been matched by any case up to the $i$th. Each case matches its pattern against
-the residual by the \ruleName{cases} rule (\figref{pat-seq}), yielding the pattern's bindings and the
+the residual by the \ruleName{pat-cases} rule (\figref{pat-seq}), yielding the pattern's bindings and the
 shapes left unmatched; the body is checked under the bindings, and the pattern must agree with $\sigma$
 (\figref{agrees}). The \ruleName{match} rule applies where the final residual is empty;
 \ruleName{match-partial} applies otherwise, merging in $\Assigns{\varnothing}$ for the values that fall
@@ -147,8 +147,8 @@ Name resolution takes a qualified name to a context entry (\figref{resolve-name}
 \label{sec:expression-typing}
 
 Within an expression the typing judgement gives each subexpression a type, and
-is bidirectional. \emph{Synthesis} $\Gamma \vdash e \synth \tau$ reads a type out of an expression (\figrefThree{typing-synth}{typing-synth-elim}{typing-synth-ctd}),
-and \emph{checking} $\Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
+is bidirectional. \emph{Synthesis} $\Sigma; \Gamma \vdash e \synth \tau$ reads a type out of an expression (\figrefThree{typing-synth}{typing-synth-elim}{typing-synth-ctd}),
+and \emph{checking} $\Sigma; \Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
 surroundings (\figref{typing-check}). The division follows the usual recipe for bidirectional
 systems~\cite{davies2000,dunfield2021}: introduction forms check, since a lambda or an empty list does not
 determine its own type, and elimination forms synthesise, since a call, a subscript or an attribute
@@ -164,12 +164,11 @@ The \ruleName{var} rule applies whenever $\Gamma(x)$ is a type, so a variable th
 assigned has no rule. A
 literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 
-A class $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$ records the declared
-type of each field it introduces, and $\fields(C)$ is the bindings of all its fields, those of the base
-class first. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
+The fields of a class $C$ are $\fields(\Sigma, C)$: those of its base class, then its own, each with its
+declared type. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to,
 which is the type of its instances (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must
-synthesise a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(C)$
+synthesise a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(\Sigma, C)$
 (\ruleName{attr-object}). The signature of a predefined module binds
 $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type listed for it
 (\figref{predefined-types}, Definition~\ref{def:predefined}).
@@ -189,7 +188,7 @@ context; with four elimination forms a rule each is shorter.
 Lambdas check, as do lists, tuples, dictionaries and comprehensions. Their types are not determined by
 the expression alone: $\exList{}$ is a list of any element type, and a lambda's parameters cannot be annotated in
 Python, so both take their type from the surroundings. An expression that synthesises $\sigma$ checks against any supertype
-of $\sigma$ (\ruleName{check-synth}), which applies only where no other rule concludes $\Gamma \vdash e \checks
+of $\sigma$ (\ruleName{check-synth}), which applies only where no other rule concludes $\Sigma; \Gamma \vdash e \checks
 \tau$, so both judgements are
 syntax-directed and an expression has at most one derivation in each.
 
@@ -240,27 +239,27 @@ types to the resolved overloads of an operator.
 
 \begin{definition}[Overloads at operand types]
 \label{def:overloads}
-The set $\overloadsOf(\odot, \sigma, \sigma')$ consists of the tuples $((\tau, \tau'), \tau^\dagger)$ such
-that $\odot(\sigma, \sigma') : ((\tau, \tau'), \tau^\dagger)$, ordered by componentwise subtyping on their
-bounds $(\tau, \tau')$. The unary set $\overloadsOf(\ominus, \sigma)$ is defined in the same way from
-conclusions $\ominus(\sigma) : (\tau, \tau^\dagger)$. In both cases $\min$ denotes the least element
+The set $\overloadsOf(\Sigma, \odot, \sigma, \sigma')$ consists of the tuples $((\tau, \tau'), \tau^\dagger)$ such
+that $\Sigma \vdash \odot(\sigma, \sigma') : ((\tau, \tau'), \tau^\dagger)$, ordered by componentwise subtyping in $\Sigma$ on their
+bounds $(\tau, \tau')$. The unary set $\overloadsOf(\Sigma, \ominus, \sigma)$ is defined in the same way from
+conclusions $\Sigma \vdash \ominus(\sigma) : (\tau, \tau^\dagger)$. In both cases $\min$ denotes the least element
 under this order, where one exists.
 \end{definition}
 
 \noindent The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the result type
-of $\min(\overloadsOf(\odot, \sigma, \sigma'))$, so \pyinline{1 + 2} is an
+of $\min(\overloadsOf(\Sigma, \odot, \sigma, \sigma'))$, so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
 An \emph{equality type} is one for which structural equality is
 defined:
 \begin{defalign}
-& \Gamma \vdash \nu \eqType \\
-& \Gamma \vdash \tyLiteral{\ell} \eqType \\
-& \Gamma \vdash \tyList{\tau} \eqType && \qquad\quad \text{if } \Gamma \vdash \tau \eqType \\
-& \Gamma \vdash \tyDict{\tau} \eqType && \qquad\quad \text{if } \Gamma \vdash \tau \eqType \\
-& \Gamma \vdash \tyTuple{\seq{\tau}} \eqType && \qquad\quad \text{if } \Gamma \vdash \tau_i \eqType \quad (\forall i) \\
-& \Gamma \vdash \tyUnion{\sigma}{\tau} \eqType && \qquad\quad \text{if } \Gamma \vdash \sigma \eqType \text{ and } \Gamma \vdash \tau \eqType \\
-& \Gamma \vdash C \eqType && \qquad\quad \text{if } \Gamma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \fields(C)
+& \Sigma \vdash \nu \eqType \\
+& \Sigma \vdash \tyLiteral{\ell} \eqType \\
+& \Sigma \vdash \tyList{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \\
+& \Sigma \vdash \tyDict{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \\
+& \Sigma \vdash \tyTuple{\seq{\tau}} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau_i \eqType \quad (\forall i) \\
+& \Sigma \vdash \tyUnion{\sigma}{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \sigma \eqType \text{ and } \Sigma \vdash \tau \eqType \\
+& \Sigma \vdash C \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \fields(\Sigma, C)
 \end{defalign}
 
 \noindent A callable type is not an equality type, and neither is any type with a callable component, so
@@ -276,8 +275,8 @@ $(\tyFloat, \tyFloat)$. Resolution is more precise than mypy for this operator, 
 \begin{lemma}[Least overload]
 \label{lem:least-overload}
 If neither $\sigma$ nor $\sigma'$ is a subtype of \pyinline{Never} and
-$\overloadsOf(\odot, \sigma, \sigma')$ is not empty, then the set has a least element; likewise
-$\overloadsOf(\ominus, \sigma)$.
+$\overloadsOf(\Sigma, \odot, \sigma, \sigma')$ is not empty, then the set has a least element; likewise
+$\overloadsOf(\Sigma, \ominus, \sigma)$.
 \end{lemma}
 
 \subsection{Patterns}
@@ -291,27 +290,32 @@ The matching judgement decides reachability and exhaustiveness together
 left by the last case. The usefulness algorithm for ML also decides both with one
 relation~\cite{maranget2007}, and the residual corresponds to the term descriptions that the match
 compiler of \citet{sestoft1996} threads through the cases. Matching a pattern against a shape takes the
-scrutinee's type into account, following the uncovered sets of \citet{karachalias2015}. A \emph{shape} $k$
+scrutinee's type into account, following the uncovered sets of \citet{karachalias2015}.
+
+A \emph{shape} $k$
 denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{N}$ is a
 value of type $\tau$ whose outermost head is not among those in $N$. A head itself denotes values: a
 class its instances, an integer at a list type the lists of that length, and a literal its value. Head
-typing $\Gamma \vdash h : \tau$ admits the heads whose values lie within $\tau$, and shape typing
-$\Gamma \vdash k : \tau$ types each excluded head and each component of a shape
-(\figref{shapes}). The other forms are a literal, a constructor, a tuple, a list and a dictionary, each with shapes in place of
+typing $\Sigma \vdash h : \tau$ admits the heads whose values lie within $\tau$, and shape typing
+$\Sigma \vdash k : \tau$ types each excluded head and each component of a shape
+(\figref{shapes}). The other forms are literals, constructors, tuples, lists and dictionaries, each with shapes in place of
 sub-patterns. A list shape also records its element type, which the element shapes do not determine. A
 constructor shape carries an excluded set of its own: $\shapeAny{\patConstr{C}{\seq{k}}}{N}$ denotes the
 instances of $C$, or of a subclass not below a class of $N$, whose fields, those of $C$, have the shapes
 $\seq{k}$. The shapes of $\tau$ that remain once the heads in $N$ are excluded are
-$\shapesOf(\tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape carries a
+$\shapesOf(\Sigma, \tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape carries a
 union or dictionary type in the form $\shapeAny{\tau}{N}$, since $\shapesOf$ is the only source of
 that form: it splits a union into its members and gives a dictionary type its dictionary shape.
+
 A pattern meets a shape of its own form, or splits it first (\figref{split}): splitting takes the head
 the pattern tests for, gives the shapes with that head, drawing the shapes of the component types from
 $\shapesOf$, and leaves the shape with that head excluded as well. \ruleName{pat-split} matches the
 pattern against the shapes the split gives and adds the shapes it leaves to the residual. Only the forms
 with an excluded set split, and no head types at a tuple type, so $N$ is empty there and
-\ruleName{split-tuple} leaves nothing. The
-matching judgement $\Gamma \vdash L, p \matches K, L' \binding \Delta$ divides a set of shapes into the
+\ruleName{split-tuple} leaves nothing.
+
+The
+matching judgement $\Sigma; \Gamma \vdash L, p \matches K, L' \binding \Delta$ divides a set of shapes into the
 matched shapes $K$ and the \emph{residual} $L'$, binding $\Delta$, one shape at a time and one position at a time
 (\figrefTwo{pat}{pat-seq}). A pattern that cannot match a shape has no derivation against it, so
 \ruleName{pat-shapes} takes the shapes the pattern does match, which must not be none, and passes the
@@ -323,28 +327,32 @@ derivation.
 
 \begin{lemma}[Preservation of shape type]
 \label{lem:shape-typing}
-If $\Gamma \vdash h : \tau$ for every $h \in N$ then $\Gamma \vdash k : \tau$ for each $k \in
-\shapesOf(\tau, N)$. Moreover, if $\Gamma \vdash k : \tau$ for each $k \in L$ and $\Gamma \vdash L, p
-\matches K, L' \binding \Delta$ then $\Gamma \vdash k : \tau$ for each $k \in K \cup L'$.
+If $\Sigma \vdash h : \tau$ for every $h \in N$ then $\Sigma \vdash k : \tau$ for each $k \in
+\shapesOf(\Sigma, \tau, N)$. Moreover, if $\Sigma \vdash k : \tau$ for each $k \in L$ and $\Sigma; \Gamma \vdash L, p
+\matches K, L' \binding \Delta$ then $\Sigma \vdash k : \tau$ for each $k \in K \cup L'$.
 \end{lemma}
 
 The match rules (\figref{typing-stmt}) take the cases in the order $\dispatch$ tries them at run
 time. A case that matches nothing is rejected, whether because the scrutinee can never take that shape or
-because the earlier cases already cover it. The evaluation rules apply a tuple or list pattern only to a value
+because the earlier cases already cover it. A constructor pattern whose class lies below a
+class of the excluded set matches nothing, because an earlier case for the superclass took every
+instance. The evaluation rules apply a tuple or list pattern only to a value
 of its own kind, although Python would match either (\figref{eval-pat}); each case's pattern must
 therefore agree with the scrutinee's type (\figref{agrees}), so a match on
-$\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple or list pattern. A union is exhausted
-by covering each member, a class type by a pattern for the class itself, and \pyinline{bool} by
-\pyinline{True} and \pyinline{False}, while \pyinline{int}, \pyinline{str} and lists have
-unboundedly many heads and need a variable or wildcard. A constructor pattern whose class lies below a
-class of the excluded set matches nothing, because an earlier case for the superclass took every
-instance. A dictionary shape has a form of its own,
+$\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple or list pattern.
+
+A dictionary shape has a form of its own,
 $\shapeDict{\tau}{\beta}{N}$, standing for dictionaries that hold each key of $\beta$ with a value of the
 shape $\beta$ gives it, and hold no key of $N$. A dictionary pattern takes its keys in order, no key twice. A key in
 neither $\beta$ nor $N$ splits the shape at that key (\ruleName{split-key}), adding to the residual the
 dictionaries that lack the key; once every key of the pattern is in $\beta$ the keys match as a sequence
 (\ruleName{pat-dict}), each against the shape $\beta$ records for it. The empty pattern matches every
-dictionary and leaves nothing, the case $n = 0$, so it alone exhausts a dictionary type. Exhaustiveness need not come from a catch-all: over
+dictionary and leaves nothing, the case $n = 0$, so it alone exhausts a dictionary type.
+
+A union is exhausted
+by covering each member, a class type by a pattern for the class itself, and \pyinline{bool} by
+\pyinline{True} and \pyinline{False}, while \pyinline{int}, \pyinline{str} and lists have
+unboundedly many heads and need a variable or wildcard. Exhaustiveness need not come from a catch-all: over
 $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave nothing,
 although each covers only part of the type.
@@ -359,7 +367,7 @@ although each covers only part of the type.
 \label{sec:well-formedness-modules}
 
 \emph{Static loading} types a module's body and computes its signature $\Gamma$, the judgement
-$\vdash_{\mathsf{load}} q : \Gamma$ (\figref{typing-module}); it mirrors loading at run time
+$\Sigma \vdash_{\mathsf{load}} q : \Gamma \binding \Sigma'$ (\figref{typing-module}); it mirrors loading at run time
 (\secref{operational-semantics}). The \ruleName{module} rule types the body as a top-level statement, and
 the \ruleName{predefined} rule gives a predefined module the signature of
 Definition~\ref{def:predefined}.

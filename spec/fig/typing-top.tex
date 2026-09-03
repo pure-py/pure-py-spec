@@ -1,35 +1,34 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma \vdash t : R$}
+\flushleft \shadebox{$\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{top-stmt}}]
 {
-  \Gamma; \varepsilon \vdash s : R
+  \Sigma; \Gamma; \varepsilon \vdash s : R
 }
 {
-  \Gamma \vdash s : R
+  \Sigma; q; \Gamma \vdash s : R \binding \Sigma
 }
 \and
 \inferrule*[lab={\ruleName{top-seq}}]
 {
-  \Gamma \vdash t : \Assigns{\Delta} \\
-  \Gamma \override \Delta \vdash t' : R \\
+  \Sigma; q; \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
+  \Sigma'; q; \Gamma \override \Delta \vdash t' : R \binding \Sigma^\dagger \\
   \capturesS(t) \cap \assignsS(t') = \varnothing \\
   \nexists c, C.\ \bind{c}{\Type{C}} \in \Delta \text{ and } c \in \assignsS(t')
 }
 {
-  \Gamma \vdash t\;t' : \Assigns{\Delta} \override R
+  \Sigma; q; \Gamma \vdash t\;t' : \Assigns{\Delta} \override R \binding \Sigma^\dagger
 }
 \and
 \inferrule*[lab={\ruleName{class}}]
 {
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
-  C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}
+  \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i)
 }
 {
-  \Gamma \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{\Type{C}}}}
+  \Sigma; q; \Gamma \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
@@ -38,13 +37,12 @@
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
   \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
-  \seq{x} \cap \dom(\fields(D)) = \varnothing \\
-  C = \clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\sigma}}}{c'}
+  \seq{x} \cap \dom(\fields(\Sigma, D)) = \varnothing
 }
 {
-  \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{\Type{C}}}}
+  \Sigma; q; \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\bind{\seq{x}}{\seq{\sigma}}}{D}}
 }
 \end{mathpar}
-\caption{Top-level statement $t$ has result type $R$ in $\Gamma$}
+\caption{Top-level statement $t$ has result type $R$, extending $\Sigma$ to $\Sigma'$}
 \label{fig:typing-top}
 \end{figure}

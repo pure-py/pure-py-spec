@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma, x \importsR \theta$}
+\flushleft \shadebox{$\Sigma \vdash \Gamma, x \importsR \theta \binding \Sigma'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{imp-member}}]
@@ -7,16 +7,16 @@
   \Gamma \vdash x : \theta
 }
 {
-  \Gamma, x \importsR \theta
+  \Sigma \vdash \Gamma, x \importsR \theta \binding \Sigma
 }
 \and
 \inferrule*[lab={\ruleName{imp-submodule}}]
 {
   \bind{x}{\modStub{q}} \in \Gamma \\
-  \vdash_{\mathsf{load}} q : \Delta
+  \Sigma \vdash_{\mathsf{load}} q : \Delta \binding \Sigma'
 }
 {
-  \Gamma, x \importsR \modLoaded{q}{\Delta}
+  \Sigma \vdash \Gamma, x \importsR \modLoaded{q}{\Delta} \binding \Sigma'
 }
 \end{mathpar}
 
@@ -26,7 +26,7 @@
 
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\vdash \seq{\iota} : \Gamma$}
+\flushleft \shadebox{$\Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{imports-nil}}]
@@ -34,30 +34,31 @@
   \strut
 }
 {
-  \vdash \varepsilon : \varnothing
+  \Sigma; q \vdash \varepsilon : \varnothing \binding \Sigma
 }
 \and
 \inferrule*[lab={\ruleName{import}}]
 {
   q' = x \cons \seq{x} \\
   q \not\properPrefixOf q' \\
-  \vdash_{\mathsf{load}} q' : \Delta \\
-  q', \modLoaded{q'}{\Delta} \loadsAs \theta \\
-  \vdash \seq{\iota} : \Gamma
+  \Sigma \vdash_{\mathsf{load}} q' : \Delta \binding \Sigma_1 \\
+  \Sigma_1 \vdash q', \modLoaded{q'}{\Delta} \loadsAs \theta \binding \Sigma_2 \\
+  \Sigma_2; q \vdash \seq{\iota} : \Gamma \binding \Sigma'
 }
 {
-  \vdash \exImport{q'} \cons \seq{\iota} : \set{\bind{x}{\theta}} \extend \Gamma
+  \Sigma; q \vdash \exImport{q'} \cons \seq{\iota} : \set{\bind{x}{\theta}} \extend \Gamma \binding \Sigma'
 }
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
-  \vdash_{\mathsf{load}} q' : \Delta \\
-  \vdash_{\mathsf{load}} q^\dagger : \Delta_{q^\dagger} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q) \\
-  \Delta, x_i \importsR \theta_i \quad (\forall i) \\
-  \vdash \seq{\iota} : \Gamma
+  \Sigma \vdash_{\mathsf{load}} q' : \Delta \binding \Sigma_0 \\
+  q^\dagger_1 \properPrefixOf \cdots \properPrefixOf q^\dagger_m \text{ the } q^\dagger \properPrefixOf q' \text{ with } q^\dagger \not\prefixOf q \\
+  \Sigma_{j-1} \vdash_{\mathsf{load}} q^\dagger_j : \Delta_j \binding \Sigma_j \quad (\forall j) \\
+  \Sigma_{m+i-1} \vdash \Delta, x_i \importsR \theta_i \binding \Sigma_{m+i} \quad (\forall i) \\
+  \Sigma_{m+n+1}; q \vdash \seq{\iota} : \Gamma \binding \Sigma'
 }
 {
-  \vdash \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} : \set{\bind{x_1}{\theta_1}, \ldots, \bind{x_{n+1}}{\theta_{n+1}}} \extend \Gamma
+  \Sigma; q \vdash \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} : \set{\bind{x_1}{\theta_1}, \ldots, \bind{x_{n+1}}{\theta_{n+1}}} \extend \Gamma \binding \Sigma'
 }
 \end{mathpar}
 
@@ -67,7 +68,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$q, \theta \loadsAs \theta'$}
+\flushleft \shadebox{$\Sigma \vdash q, \theta \loadsAs \theta' \binding \Sigma'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{loads-as-simple}}]
@@ -75,16 +76,16 @@
   \strut
 }
 {
-  x, \theta \loadsAs \theta
+  \Sigma \vdash x, \theta \loadsAs \theta \binding \Sigma
 }
 \and
 \inferrule*[lab={\ruleName{loads-as-qualified}}]
 {
-  \vdash_{\mathsf{load}} q : \Gamma' \\
-  q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsAs \theta'
+  \Sigma \vdash_{\mathsf{load}} q : \Gamma' \binding \Sigma_1 \\
+  \Sigma_1 \vdash q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsAs \theta' \binding \Sigma'
 }
 {
-  q.x, \theta \loadsAs \theta'
+  \Sigma \vdash q.x, \theta \loadsAs \theta' \binding \Sigma'
 }
 \end{mathpar}
 \subcaption{Reference $\theta$ for module $q$ loads as reference $\theta'$ for root of $q$, statically loading ancestors of $q$}
@@ -94,7 +95,7 @@
 \end{figure}
 
 \begin{figure}
-\flushleft \shadebox{$\vdash_{\mathsf{load}} q : \Gamma$}
+\flushleft \shadebox{$\Sigma \vdash_{\mathsf{load}} q : \Gamma \binding \Sigma'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{predefined}}]
@@ -102,19 +103,19 @@
   \mathcal{P}(q) = (\Gamma', \rho)
 }
 {
-  \vdash_{\mathsf{load}} q : \Gamma'
+  \Sigma \vdash_{\mathsf{load}} q : \Gamma' \binding \Sigma
 }
 \and
 \inferrule*[lab={\ruleName{module}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;t \\
-  \vdash \seq{\iota} : \Gamma \\
+  \Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma_1 \\
   \mathcal{P}(\pyinline{builtins}) = (\Gamma', \rho) \\
-  \Gamma' \mathbin{\override} \Gamma \vdash t : \Assigns{\Delta} \\
+  \Sigma_1; q; \Gamma' \mathbin{\override} \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {
-  \vdash_{\mathsf{load}} q : \submods(q) \override \Delta
+  \Sigma \vdash_{\mathsf{load}} q : \submods(q) \override \Delta \binding \Sigma'
 }
 \end{mathpar}
 
@@ -123,7 +124,7 @@
 \small
 \inferrule*[lab={\ruleName{program}}]
 {
-  \vdash_{\mathsf{load}} \pymath{\_\_main\_\_} : \Gamma
+  \varnothing \vdash_{\mathsf{load}} \pymath{\_\_main\_\_} : \Gamma \binding \Sigma
 }
 {
   \vdash \mathcal{M}

@@ -10,6 +10,7 @@ Sequence patterns & List patterns match tuples, and tuple patterns lists & Dynam
 Constructor patterns & Positional class patterns may supply fewer sub-patterns than class has fields & Static & Require exact arity \\[1mm]
 Dictionary keys & Any hashable value, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Static in patterns, dynamic in expressions & Strings only \\[1mm]
 \pyinline{assert} message & Any object, shown in traceback & Dynamic & Strings only \\[1mm]
+Duplicate name in \pyinline{from} import & Repeated name rebinds harmlessly & Static & Imported names distinct \\[1mm]
 \pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & Dynamic & Undefined between, say, number and string, or list and tuple; only \pyinline{None} compares with anything \\[1mm]
 Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & Dynamic & Equality undefined \\[1mm]
 \pyinline{nan} comparison via container equality & Elements compared by identity before equality, so identical NaNs match but distinct ones do not & Dynamic & Undefined when both elements are \pyinline{nan}

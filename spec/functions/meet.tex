@@ -1,7 +1,7 @@
-\meetTy(\sigma, \tau) &{}= \sigma && \text{if } \sigma \subty \tau \\*
-\meetTy(\sigma, \tau) &{}= \tau && \text{if } \tau \subty \sigma \text{ and } \sigma \not\tyEquiv \tau \\*
-\meetTy(\tyUnion{\sigma}{\sigma'}, \tau) &{}= \joinTy(\meetTy(\sigma, \tau), \meetTy(\sigma', \tau)) \\*
-\meetTy(\sigma, \tyUnion{\tau}{\tau'}) &{}= \joinTy(\meetTy(\sigma, \tau), \meetTy(\sigma, \tau')) && \text{if } \sigma \text{ not union} \\*
-\meetTy(\tyCallable{\seq{\sigma}}{\sigma}, \tyCallable{\seq{\tau}}{\tau}) &\rlap{${}= \tyCallable{\joinTy(\sigma_1, \tau_1), \ldots, \joinTy(\sigma_n, \tau_n)}{\meetTy(\sigma, \tau)}$} \\*
-\meetTy(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) &\rlap{${}= \tyTuple{\meetTy(\sigma_1, \tau_1), \ldots, \meetTy(\sigma_n, \tau_n)}$} \\*
-\meetTy(\sigma, \tau) &{}= \tyNever && \text{otherwise}
+\meetTy(\Sigma, \sigma, \tau) &{}= \sigma && \text{if } \Sigma \vdash \sigma \subty \tau \\*
+\meetTy(\Sigma, \sigma, \tau) &{}= \tau && \text{if } \Sigma \vdash \tau \subty \sigma \text{ and } \Sigma \nvdash \sigma \tyEquiv \tau \\*
+\meetTy(\Sigma, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \joinTy(\Sigma, \meetTy(\Sigma, \sigma, \tau), \meetTy(\Sigma, \sigma', \tau)) \\*
+\meetTy(\Sigma, \sigma, \tyUnion{\tau}{\tau'}) &{}= \joinTy(\Sigma, \meetTy(\Sigma, \sigma, \tau), \meetTy(\Sigma, \sigma, \tau')) && \text{if } \sigma \text{ not union} \\*
+\meetTy(\Sigma, \tyCallable{\seq{\sigma}}{\sigma}, \tyCallable{\seq{\tau}}{\tau}) &\rlap{${}= \tyCallable{\joinTy(\Sigma, \sigma_1, \tau_1), \ldots, \joinTy(\Sigma, \sigma_n, \tau_n)}{\meetTy(\Sigma, \sigma, \tau)}$} \\*
+\meetTy(\Sigma, \tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) &\rlap{${}= \tyTuple{\meetTy(\Sigma, \sigma_1, \tau_1), \ldots, \meetTy(\Sigma, \sigma_n, \tau_n)}$} \\*
+\meetTy(\Sigma, \sigma, \tau) &{}= \tyNever && \text{otherwise}

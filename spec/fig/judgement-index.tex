@@ -4,22 +4,22 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.55\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}}
 \textbf{Judgement} & \textbf{Reading} & \textbf{Defined in} \\[1mm]
 \metaGroup{Well-formedness} \\
-$\Gamma \vdash h : \tau$ & head $h$ has type $\tau$ & \figref{shapes} \\
-$\Gamma \vdash k : \tau$ & shape $k$ has type $\tau$ & \figref{shapes} \\
-$\Gamma \vdash p \agrees \tau$ & tuple and list patterns in $p$ meet only their own kind at $\tau$ & \figref{agrees} \\
-$\Gamma \vdash k, p \splits K, L$ & shape $k$ splits at the head that $p$ tests for, giving $K$ and $L$ & \figref{split} \\
-$\Gamma \vdash k, p \matches K, L \binding \Delta$ & pattern $p$ matches shapes $K$ of $k$, leaving $L$ and binding $\Delta$ & \figref{pat} \\
-$\Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L$ & case patterns $\seq{p}$ over $\sigma$ bind $\seq{\Delta}$, leaving $L$ & \figref{pat-seq} \\
+$\Sigma \vdash h : \tau$ & head $h$ has type $\tau$ & \figref{shapes} \\
+$\Sigma \vdash k : \tau$ & shape $k$ has type $\tau$ & \figref{shapes} \\
+$\Sigma; \Gamma \vdash p \agrees \tau$ & tuple and list patterns in $p$ meet only their own kind at $\tau$ & \figref{agrees} \\
+$\Sigma; \Gamma \vdash k, p \splits K, L$ & shape $k$ splits at the head that $p$ tests for, giving $K$ and $L$ & \figref{split} \\
+$\Sigma; \Gamma \vdash k, p \matches K, L \binding \Delta$ & pattern $p$ matches shapes $K$ of $k$, leaving $L$ and binding $\Delta$ & \figref{pat} \\
+$\Sigma; \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L$ & case patterns $\seq{p}$ over $\sigma$ bind $\seq{\Delta}$, leaving $L$ & \figref{pat-seq} \\
 $\Gamma \vdash q : \theta$ & qualified name $q$ denotes entry $\theta$ & \figref{resolve-name} \\
-$\Gamma \vdash e \synth \tau$ & expression $e$ synthesises type $\tau$ & \figref{typing-synth} \\
-$\Gamma \vdash e \checks \tau$ & expression $e$ checks against type $\tau$ & \figref{typing-check} \\
-$\Gamma \vdash \seq{g} : \Delta$ & comprehension qualifiers $\seq{g}$ bind $\Delta$ & \figref{typing-check} \\
-$\Gamma; \zeta \vdash s : R$ & statement $s$ has result type $R$, with return type $\zeta$ & \figref{typing-stmt} \\
-$\Gamma \vdash t : R$ & top-level statement $t$ has result type $R$ & \figref{typing-top} \\
-$\Gamma, x \importsR \theta$ & name $x$ imported from module signature $\Gamma$ has entry $\theta$ & \figref{typing-imports} \\
-$\vdash \seq{\iota} : \Gamma$ & imports $\seq{\iota}$ yield context $\Gamma$ & \figref{typing-import-prefix} \\
-$q, \theta \loadsAs \theta'$ & importing module $q$ into entry $\theta$ gives entry $\theta'$ & \figref{typing-import-prefix} \\
-$\vdash_{\mathsf{load}} q : \Gamma$ & module $q$ statically loads with signature $\Gamma$ & \figref{typing-module} \\
+$\Sigma; \Gamma \vdash e \synth \tau$ & expression $e$ synthesises type $\tau$ & \figref{typing-synth} \\
+$\Sigma; \Gamma \vdash e \checks \tau$ & expression $e$ checks against type $\tau$ & \figref{typing-check} \\
+$\Sigma; \Gamma \vdash \seq{g} : \Delta$ & comprehension qualifiers $\seq{g}$ bind $\Delta$ & \figref{typing-check} \\
+$\Sigma; \Gamma; \zeta \vdash s : R$ & statement $s$ has result type $R$, with return type $\zeta$ & \figref{typing-stmt} \\
+$\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ & top-level statement $t$ has result type $R$, extending $\Sigma$ to $\Sigma'$ & \figref{typing-top} \\
+$\Sigma \vdash \Gamma, x \importsR \theta \binding \Sigma'$ & name $x$ imported from module signature $\Gamma$ has entry $\theta$ & \figref{typing-imports} \\
+$\Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma'$ & imports $\seq{\iota}$ of module $q$ yield context $\Gamma$ & \figref{typing-import-prefix} \\
+$\Sigma \vdash q, \theta \loadsAs \theta' \binding \Sigma'$ & importing module $q$ into entry $\theta$ gives entry $\theta'$ & \figref{typing-import-prefix} \\
+$\Sigma \vdash_{\mathsf{load}} q : \Gamma \binding \Sigma'$ & module $q$ statically loads with signature $\Gamma$ & \figref{typing-module} \\
 $\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{typing-module}
    \\[2mm]
 \metaGroup{Evaluation} \\

@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\sigma \subty \tau$}
+\flushleft \shadebox{$\Sigma \vdash \sigma \subty \tau$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{subty-refl}}]
@@ -7,15 +7,15 @@
   \strut
 }
 {
-  \tau \subty \tau
+  \Sigma \vdash \tau \subty \tau
 }
 \and
 \inferrule*[lab={\ruleName{subty-class}}]
 {
-  D \in \ancestors(C)
+  D \in \ancestors(\Sigma, C)
 }
 {
-  C \subty D
+  \Sigma \vdash C \subty D
 }
 \and
 \inferrule*[lab={\ruleName{subty-never}}]
@@ -23,7 +23,7 @@
   \strut
 }
 {
-  \tyNever \subty \tau
+  \Sigma \vdash \tyNever \subty \tau
 }
 \and
 \inferrule*[lab={\ruleName{subty-object}}]
@@ -31,7 +31,7 @@
   \strut
 }
 {
-  \tau \subty \tyObject
+  \Sigma \vdash \tau \subty \tyObject
 }
 \and
 \inferrule*[lab={\ruleName{subty-int-float}}]
@@ -39,7 +39,7 @@
   \strut
 }
 {
-  \tyInt \subty \tyFloat
+  \Sigma \vdash \tyInt \subty \tyFloat
 }
 \and
 \inferrule*[lab={\ruleName{subty-sized}}]
@@ -47,73 +47,73 @@
   \tau \text{ a list, dictionary, string or tuple type}
 }
 {
-  \tau \subty \tySized
+  \Sigma \vdash \tau \subty \tySized
 }
 \and
 \inferrule*[lab={\ruleName{subty-list}}]
 {
-  \sigma \tyEquiv \tau
+  \Sigma \vdash \sigma \tyEquiv \tau
 }
 {
-  \tyList{\sigma} \subty \tyList{\tau}
+  \Sigma \vdash \tyList{\sigma} \subty \tyList{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{subty-dict}}]
 {
-  \sigma \tyEquiv \tau
+  \Sigma \vdash \sigma \tyEquiv \tau
 }
 {
-  \tyDict{\sigma} \subty \tyDict{\tau}
+  \Sigma \vdash \tyDict{\sigma} \subty \tyDict{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{subty-callable}}]
 {
-  \tau_i \subty \sigma_i \quad (\forall i) \\
-  \sigma \subty \tau
+  \Sigma \vdash \tau_i \subty \sigma_i \quad (\forall i) \\
+  \Sigma \vdash \sigma \subty \tau
 }
 {
-  \tyCallable{\sigma_1, \ldots, \sigma_n}{\sigma} \subty \tyCallable{\tau_1, \ldots, \tau_n}{\tau}
+  \Sigma \vdash \tyCallable{\sigma_1, \ldots, \sigma_n}{\sigma} \subty \tyCallable{\tau_1, \ldots, \tau_n}{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{subty-tuple}}]
 {
-  \sigma_i \subty \tau_i \quad (\forall i)
+  \Sigma \vdash \sigma_i \subty \tau_i \quad (\forall i)
 }
 {
-  \tyTuple{\sigma_1, \ldots, \sigma_n} \subty \tyTuple{\tau_1, \ldots, \tau_n}
+  \Sigma \vdash \tyTuple{\sigma_1, \ldots, \sigma_n} \subty \tyTuple{\tau_1, \ldots, \tau_n}
 }
 \and
 \inferrule*[lab={\ruleName{subty-literal}}]
 {
-  \baseType(\ell) \subty \tau
+  \Sigma \vdash \baseType(\ell) \subty \tau
 }
 {
-  \tyLiteral{\ell} \subty \tau
+  \Sigma \vdash \tyLiteral{\ell} \subty \tau
 }
 \and
 \inferrule*[lab={\ruleName{subty-union-left}}]
 {
-  \sigma \subty \tau
+  \Sigma \vdash \sigma \subty \tau
 }
 {
-  \sigma \subty \tyUnion{\tau}{\tau'}
+  \Sigma \vdash \sigma \subty \tyUnion{\tau}{\tau'}
 }
 \and
 \inferrule*[lab={\ruleName{subty-union-right}}]
 {
-  \sigma \subty \tau'
+  \Sigma \vdash \sigma \subty \tau'
 }
 {
-  \sigma \subty \tyUnion{\tau}{\tau'}
+  \Sigma \vdash \sigma \subty \tyUnion{\tau}{\tau'}
 }
 \and
 \inferrule*[lab={\ruleName{subty-union}}]
 {
-  \tau \subty \sigma \\
-  \tau' \subty \sigma
+  \Sigma \vdash \tau \subty \sigma \\
+  \Sigma \vdash \tau' \subty \sigma
 }
 {
-  \tyUnion{\tau}{\tau'} \subty \sigma
+  \Sigma \vdash \tyUnion{\tau}{\tau'} \subty \sigma
 }
 \end{mathpar}
 \caption{Subtyping}

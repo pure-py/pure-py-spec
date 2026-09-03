@@ -133,6 +133,7 @@
 \newcommand*{\tyCallable}[2]{\pyinline{Callable}[[#1], #2]}
 \newcommand*{\tyUnion}[2]{#1 \mathbin{|} #2}
 \newcommand*{\tyLiteral}[1]{\pyinline{Literal}[#1]}
+\newcommand*{\fq}[1]{\widetilde{#1}}
 \newcommand*{\tyAny}{\pyinline{Any}}
 \newcommand*{\gty}[1]{\bar{#1}}
 \newcommand*{\precTy}{\mathrel{\sqsubseteq}}
@@ -141,6 +142,7 @@
 \newcommand*{\gtyEquiv}{\mathrel{\sim}}
 \newcommand*{\TypeSet}{\mathrm{Type}}
 \newcommand*{\GTypeSet}{\mathrm{GType}}
+\newcommand*{\powerset}[1]{\wp(#1)}
 \newcommand*{\powersetplus}[1]{\wp^{+}(#1)}
 \newcommand*{\exAnnot}[1]{\mathord{:}\;#1}
 \newcommand*{\exRetAnnot}[1]{\;\pymath{-\raisebox{-0.15ex}{>}}\;#1}
@@ -159,6 +161,7 @@
 
 % Context entries
 \newcommand*{\clsEntry}[4]{\mathsf{Cls}_{#1}(#2, #3, #4)}
+\newcommand*{\clsRec}[2]{(#1;\, #2)}
 \newcommand*{\modLoaded}[2]{\mathsf{Mod}(#1, #2)}
 \newcommand*{\primFn}{\mathpzc{f}}
 \newcommand*{\primVal}[1]{\mathsf{Prim}(#1)}
@@ -191,6 +194,7 @@
 \newcommand*{\agrees}{\mathrel{\mathrm{agrees}}}
 \newcommand*{\elemTy}{\mathrm{elem\text{-}type}}
 \newcommand*{\merge}{\oplus}
+\newcommand*{\mergeS}{\mathbin{\merge_\Sigma}}
 \newcommand*{\override}{\otimes}
 
 % Outcomes (draft, \secref{errors})

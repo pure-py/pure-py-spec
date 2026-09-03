@@ -2,6 +2,8 @@
 \label{sec:syntax}
 
 The syntax of \PurePy is given in \figrefThree{syntax-stmt}{syntax-expr}{syntax-types}. \figref{metavariables} summarises the metavariables used throughout.
+Comma-separated elements inside set braces are pairwise distinct, so $\set{x_1, \ldots, x_n}$ has $n$
+elements; the set of the elements of a sequence, $\set{\seq{x}}$, assumes no distinctness.
 
 \paperinput{spec/fig/metavariables}
 
@@ -43,14 +45,21 @@ predefined name & $\predefName$ & name usable only in annotation or as decorator
 
 \begin{definition}[Class]
 \label{def:class}
-A class $C$ takes the form $\clsEntry{\Gamma}{q.c}{\bind{\seq{x}}{\seq{\tau}}}{c'}$: the context
-$\Gamma$ it was declared in, the qualified name $q.c$ that identifies it, its distinct fields $\seq{x}$ with their
-declared types $\seq{\tau}$, and its base class $c'$, or $\bot$ if it has none. A module declares each
-class name at most once, so the qualified name of a class is the identity of the class. A class is also
-the type of its instances.
+A class $C$ is a marked name $\fq{q.c}$: a module $q$ and a class name $c$ declared in $q$. A module
+declares each class name at most once, so the fully qualified name of a class is the identity of the
+class. A class is also the type of its instances.
 \end{definition}
 
-\noindent Module references arise from import statements. A predefined name is a
+\begin{definition}[Class table]
+\label{def:class-table}
+A class table $\Sigma$ is a finite map from classes to entries; an entry $\Sigma(C)$ takes the form
+$\clsRec{\bind{\seq{x}}{\seq{\tau}}}{D}$: the distinct fields $\seq{x}$ of $C$ with their declared types
+$\seq{\tau}$, and its base class $D$, or $\bot$ if it has none. Every class occurring in an entry of
+$\Sigma$ is in $\dom(\Sigma)$, and the relation taking each class of $\Sigma$ to its base class is
+acyclic.
+\end{definition}
+
+\noindent The class table is borrowed from Featherweight Java~\cite{igarashi2001}. Module references arise from import statements. A predefined name is a
 member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expression may mention: it names a
 type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}, and $\statusNotDefAssigned$ indicates \emph{not definitely assigned}.
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusNotDefAssigned(X)$ for the context $\set{\bind{x}{\statusNotDefAssigned} \mid x \in X}$.
@@ -59,8 +68,8 @@ It is useful to represent contexts as total functions on the set of all variable
 \label{sec:context-operations}
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
-an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
-\emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
+an idempotent commutative semigroup of parallel composition $\mergeS$ (``merge''), indexed by a class table $\Sigma$. Together these form a
+\emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\mergeS$, but left
 distributivity does not hold. Both are defined pointwise (\figref{context-ops}): override is right-biased
 and has $\bot$ as both left and right unit; merge is defined only on variable entries, returning
 $\statusNotDefAssigned$ where either argument is undefined or not definitely assigned, and the join of two
@@ -97,9 +106,9 @@ they supply.
 \paragraph{Type annotations.}
 
 Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
-may be (\figref{syntax-types}). A type expression is a type as written: it names a class by a qualified name,
-where a type holds the class itself, and the type system resolves the one into the
-other\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
+may be (\figref{syntax-types}). A type expression names a class by a qualified name; a marked name
+$\fq{q}$ is fully qualified, and does not occur in source. A \emph{type} $\tau$ is a type expression whose
+class names are all marked; the type system resolves the one into the other\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
 \bind{x_n}{\psi_n}$. The well-formedness rules and operational semantics do not consult annotations, which are given
 meaning by the type system.
 
@@ -136,7 +145,7 @@ directories, each named by its path, so the domain is prefix-closed by construct
 the statements of its \texttt{.py} file, or of its \texttt{\_\_init\_\_.py} for a directory, preceded by the
 $\pymath{\_\_name\_\_}$ assignment; a directory without an \texttt{\_\_init\_\_.py} (a namespace package,
 PEP 420, \url{https://peps.python.org/pep-0420/}) contributes that assignment alone.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
-definitions that follow, as is the name $q$ of the current module in the rules that check or evaluate a single module's body.
+definitions that follow.
 
 
 \begin{definition}[Predefined contexts and environments]

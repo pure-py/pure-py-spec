@@ -5,7 +5,8 @@
 \begin{tabular}{rcll}
 \grammarGroup{Heads} \\
 $h$ & $::=$ & $\ell$ & (Literal) \\
-    & $\mid$ & $C$ & (Class)
+    & $\mid$ & $C$ & (Class) \\
+$N$ & $::=$ & $\set{h_1, \ldots, h_n}$ & (Exclusion set)
    \\[3mm]
 \grammarGroup{Shapes} \\
 $k$ & $::=$ & $\shapeAny{\tau}{N}$ & (Rest) \\
@@ -13,29 +14,30 @@ $k$ & $::=$ & $\shapeAny{\tau}{N}$ & (Rest) \\
     & $\mid$ & $\shapeAny{\patConstr{C}{k_1, \ldots, k_n}}{N}$ & (Constr) \\
     & $\mid$ & $\patTuple{k_1, \ldots, k_n}$ & (Tuple) \\
     & $\mid$ & $\shapeList{\tau}{k_1, \ldots, k_n}$ & (List) \\
-    & $\mid$ & $\shapeDict{\tau}{\beta}{N}$ & (Dict)
+    & $\mid$ & $\shapeDict{\tau}{\beta}{N}$ & (Dict) \\
+$K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
 \end{tabular}
 \end{center}
 
 \vspace{2mm}
 
-\flushleft \shadebox{$\Gamma \vdash h : \tau$}
+\flushleft \shadebox{$\Sigma \vdash h : \tau$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{head-literal}}]
 {
-  \tyLiteral{\ell} \subty \tau
+  \Sigma \vdash \tyLiteral{\ell} \subty \tau
 }
 {
-  \Gamma \vdash \ell : \tau
+  \Sigma \vdash \ell : \tau
 }
 \and
 \inferrule*[lab={\ruleName{head-class}}]
 {
-  C \subty \tau
+  \Sigma \vdash C \subty \tau
 }
 {
-  \Gamma \vdash C : \tau
+  \Sigma \vdash C : \tau
 }
 \and
 \inferrule*[lab={\ruleName{head-length}}]
@@ -43,22 +45,22 @@ $k$ & $::=$ & $\shapeAny{\tau}{N}$ & (Rest) \\
   n \text{ an integer}
 }
 {
-  \Gamma \vdash n : \tyList{\tau}
+  \Sigma \vdash n : \tyList{\tau}
 }
 \end{mathpar}
 
 \vspace{2mm}
 
-\flushleft \shadebox{$\Gamma \vdash k : \tau$}
+\flushleft \shadebox{$\Sigma \vdash k : \tau$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{shape-rest}}]
 {
-  \Gamma \vdash h : \tau \quad (\forall h \in N) \\
+  \Sigma \vdash h : \tau \quad (\forall h \in N) \\
   \tau \text{ neither union nor dictionary type}
 }
 {
-  \Gamma \vdash \shapeAny{\tau}{N} : \tau
+  \Sigma \vdash \shapeAny{\tau}{N} : \tau
 }
 \and
 \inferrule*[lab={\ruleName{shape-literal}}]
@@ -66,50 +68,50 @@ $k$ & $::=$ & $\shapeAny{\tau}{N}$ & (Rest) \\
   \strut
 }
 {
-  \Gamma \vdash \ell : \tyLiteral{\ell}
+  \Sigma \vdash \ell : \tyLiteral{\ell}
 }
 \and
 \inferrule*[lab={\ruleName{shape-constr}}]
 {
-  \Gamma \vdash h : C \quad (\forall h \in N) \\
-  \Gamma \vdash k_x : \sigma \quad (\forall \bind{x}{\sigma} \in \fields(C))
+  \Sigma \vdash h : C \quad (\forall h \in N) \\
+  \Sigma \vdash k_x : \sigma \quad (\forall \bind{x}{\sigma} \in \fields(\Sigma, C))
 }
 {
-  \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{N} : C
+  \Sigma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{N} : C
 }
 \and
 \inferrule*[lab={\ruleName{shape-tuple}}]
 {
-  \Gamma \vdash k_i : \tau_i \quad (\forall i)
+  \Sigma \vdash k_i : \tau_i \quad (\forall i)
 }
 {
-  \Gamma \vdash \patTuple{\seq{k}} : \tyTuple{\seq{\tau}}
+  \Sigma \vdash \patTuple{\seq{k}} : \tyTuple{\seq{\tau}}
 }
 \and
 \inferrule*[lab={\ruleName{shape-list}}]
 {
-  \Gamma \vdash k_i : \tau \quad (\forall i)
+  \Sigma \vdash k_i : \tau \quad (\forall i)
 }
 {
-  \Gamma \vdash \shapeList{\tau}{\seq{k}} : \tyList{\tau}
+  \Sigma \vdash \shapeList{\tau}{\seq{k}} : \tyList{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{shape-sub}}]
 {
-  \Gamma \vdash k : \sigma \\
-  \sigma \subty \tau
+  \Sigma \vdash k : \sigma \\
+  \Sigma \vdash \sigma \subty \tau
 }
 {
-  \Gamma \vdash k : \tau
+  \Sigma \vdash k : \tau
 }
 \and
 \inferrule*[lab={\ruleName{shape-dict}}]
 {
-  \Gamma \vdash \beta(w) : \tau \quad (\forall w \in \dom(\beta)) \\
+  \Sigma \vdash \beta(w) : \tau \quad (\forall w \in \dom(\beta)) \\
   \dom(\beta) \cap N = \varnothing
 }
 {
-  \Gamma \vdash \shapeDict{\tau}{\beta}{N} : \tyDict{\tau}
+  \Sigma \vdash \shapeDict{\tau}{\beta}{N} : \tyDict{\tau}
 }
 \end{mathpar}
 \caption{Shapes and shape typing}

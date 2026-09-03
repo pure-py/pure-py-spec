@@ -1,5 +1,5 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma; \zeta \vdash s : R$}
+\flushleft \shadebox{$\Sigma; \Gamma; \zeta \vdash s : R$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{pass}}]
@@ -7,125 +7,125 @@
   \strut
 }
 {
-  \Gamma; \zeta \vdash \exPass : \Assigns{\varnothing}
+  \Sigma; \Gamma; \zeta \vdash \exPass : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assign}}]
 {
   \Gamma \vdash \psi \synth \sigma \\
-  \Gamma \vdash e \checks \sigma \\
+  \Sigma; \Gamma \vdash e \checks \sigma \\
   x \notin \capturesE(e)
 }
 {
-  \Gamma; \zeta \vdash \exAssign{x \exAnnot{\psi}}{e} : \Assigns{\set{\bind{x}{\sigma}}}
+  \Sigma; \Gamma; \zeta \vdash \exAssign{x \exAnnot{\psi}}{e} : \Assigns{\set{\bind{x}{\sigma}}}
 }
 \and
 \inferrule*[lab={\ruleName{assign-unannot}}]
 {
-  \Gamma \vdash e \synth \sigma \\
+  \Sigma; \Gamma \vdash e \synth \sigma \\
   x \notin \capturesE(e)
 }
 {
-  \Gamma; \zeta \vdash \exAssign{x}{e} : \Assigns{\set{\bind{x}{\sigma}}}
+  \Sigma; \Gamma; \zeta \vdash \exAssign{x}{e} : \Assigns{\set{\bind{x}{\sigma}}}
 }
 \and
 \inferrule*[lab={\ruleName{expr-stmt}}]
 {
-  \Gamma \vdash e \synth \sigma
+  \Sigma; \Gamma \vdash e \synth \sigma
 }
 {
-  \Gamma; \zeta \vdash e : \Assigns{\varnothing}
+  \Sigma; \Gamma; \zeta \vdash e : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assert}}]
 {
-  \Gamma \vdash e \checks \tyBool
+  \Sigma; \Gamma \vdash e \checks \tyBool
 }
 {
-  \Gamma; \zeta \vdash \exAssert{e} : \Assigns{\varnothing}
+  \Sigma; \Gamma; \zeta \vdash \exAssert{e} : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assert-msg}}]
 {
-  \Gamma \vdash e \checks \tyBool \\
-  \Gamma \vdash e' \checks \tyStr
+  \Sigma; \Gamma \vdash e \checks \tyBool \\
+  \Sigma; \Gamma \vdash e' \checks \tyStr
 }
 {
-  \Gamma; \zeta \vdash \exAssertMsg{e}{e'} : \Assigns{\varnothing}
+  \Sigma; \Gamma; \zeta \vdash \exAssertMsg{e}{e'} : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{return-none}}]
 {
-  \tyNone \subty \tau
+  \Sigma \vdash \tyNone \subty \tau
 }
 {
-  \Gamma; \tau \vdash \exReturnNone : \Returns
+  \Sigma; \Gamma; \tau \vdash \exReturnNone : \Returns
 }
 \and
 \inferrule*[lab={\ruleName{return}}]
 {
-  \Gamma \vdash e \checks \tau
+  \Sigma; \Gamma \vdash e \checks \tau
 }
 {
-  \Gamma; \tau \vdash \exReturn{e} : \Returns
+  \Sigma; \Gamma; \tau \vdash \exReturn{e} : \Returns
 }
 \and
 \inferrule*[lab={\ruleName{if}}]
 {
-  \Gamma \vdash e_i \checks \tyBool \quad (\forall i) \\
-  \Gamma; \zeta \vdash s_i : R_i \quad (\forall i)
+  \Sigma; \Gamma \vdash e_i \checks \tyBool \quad (\forall i) \\
+  \Sigma; \Gamma; \zeta \vdash s_i : R_i \quad (\forall i)
 }
 {
-  \Gamma; \zeta \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \merge \ldots \mathbin{\merge} R_{n+1} \: \merge \Assigns{\varnothing}
+  \Sigma; \Gamma; \zeta \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \mergeS \ldots \mergeS R_{n+1} \: \mergeS \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{if-else}}]
 {
-  \Gamma \vdash e_i \checks \tyBool \quad (\forall i) \\
-  \Gamma; \zeta \vdash s_i : R_i \quad (\forall i)
+  \Sigma; \Gamma \vdash e_i \checks \tyBool \quad (\forall i) \\
+  \Sigma; \Gamma; \zeta \vdash s_i : R_i \quad (\forall i)
 }
 {
-  \Gamma; \zeta \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
+  \Sigma; \Gamma; \zeta \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \mergeS \ldots \mergeS R_{n+2}
 }
 \and
 \inferrule*[lab={\ruleName{seq}}]
 {
-  \Gamma; \zeta \vdash s : \Assigns{\Delta} \\
-  \Gamma \override \Delta ; \zeta \vdash s' : R \\
+  \Sigma; \Gamma; \zeta \vdash s : \Assigns{\Delta} \\
+  \Sigma; \Gamma \override \Delta ; \zeta \vdash s' : R \\
   \capturesS(s) \cap \assignsS(s') = \varnothing
 }
 {
-  \Gamma; \zeta \vdash s\;s' : \Assigns{\Delta} \override R
+  \Sigma; \Gamma; \zeta \vdash s\;s' : \Assigns{\Delta} \override R
 }
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
   \Delta_i = \set{\bind{\seq{x}_i}{\seq{\sigma}_i}} \quad (\forall i) \\
-  \Gamma \override \set{\bind{f_j}{\tyCallable{\seq{\sigma}_j}{\tau_j}} \mid \forall j} \override \Delta_i \override \statusNotDefAssigned(\assignsS(s_i) \setminus \dom(\Delta_i)); \tau_i \vdash s_i : R_i \quad (\forall i)
+  \Delta' = \set{\bind{f_1}{\tyCallable{\seq{\sigma}_1}{\tau_1}}, \ldots, \bind{f_{n+1}}{\tyCallable{\seq{\sigma}_{n+1}}{\tau_{n+1}}}} \\
+  \Sigma; \Gamma \override \Delta' \override \Delta_i \override \statusNotDefAssigned(\assignsS(s_i) \setminus \dom(\Delta_i)); \tau_i \vdash s_i : R_i \quad (\forall i)
   \\
-  R_i = \Returns \text{ or } \tyNone \subty \tau_i \quad (\forall i) \\
-  \seq{f} \text{ distinct} \\
+  R_i = \Returns \text{ or } \Sigma \vdash \tyNone \subty \tau_i \quad (\forall i) \\
   \Gamma \vdash \seq{\psi}_i \synth \seq{\sigma}_i \quad (\forall i) \\
   \Gamma \vdash \psi_i \synth \tau_i \quad (\forall i)
 }
 {
-  \Gamma; \zeta \vdash \exDef{f_1}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{s_{n+1}} : \Assigns{\set{\bind{f_j}{\tyCallable{\seq{\sigma}_j}{\tau_j}} \mid \forall j}}
+  \Sigma; \Gamma; \zeta \vdash \exDef{f_1}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{s_{n+1}} : \Assigns{\Delta'}
 }
 \and
 \input{spec/rules/match}
 \and
 \inferrule*[lab={\ruleName{match-partial}}]
 {
-  \Gamma \vdash e \synth \sigma \\
-  \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L \\
+  \Sigma; \Gamma \vdash e \synth \sigma \\
+  \Sigma; \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L \\
   L \neq \varnothing \\
-  \Gamma \override \Delta_i; \zeta \vdash s_i : R_i \quad (\forall i) \\
+  \Sigma; \Gamma \override \Delta_i; \zeta \vdash s_i : R_i \quad (\forall i) \\
   S_i = \Assigns{\Delta_i} \override R_i \quad (\forall i)
 }
 {
-  \Gamma; \zeta \vdash \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} : S_1 \merge \ldots \merge S_{n+1} \merge \Assigns{\varnothing}
+  \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} : S_1 \mergeS \ldots \mergeS S_{n+1} \mergeS \Assigns{\varnothing}
 }
 \end{mathpar}
-\caption{Statement $s$ has result type $R$ in $\Gamma$, with optional return type $\zeta$}
+\caption{Statement $s$ has result type $R$, with optional return type $\zeta$}
 \label{fig:typing-stmt}
 \end{figure}
