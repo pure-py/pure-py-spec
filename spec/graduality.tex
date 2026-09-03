@@ -36,8 +36,8 @@ $\gty{\sigma} \precTy \gty{\tau}$ if and only if $\gamma(\gty{\sigma}) \subseteq
 A gradual type $\gty{\tau}$ \emph{approximates} a set $S$ of types when $S \subseteq \gamma(\gty{\tau})$;
 $\tyAny$ approximates every set of types. A least approximant is a best abstraction in the sense
 of \citet{cousot1977}. Preservation is monotonicity of concretisation. Reflection forces every
-approximant of $S$ to lie above the join of $S$, so a least approximant exists; without reflection
-the join would approximate $S$ but need not be least.
+approximant of $S$ to lie above the join of $S$, so the join is the least approximant; without
+reflection it would approximate $S$ but need not be least.
 
 \begin{lemma}[Least approximant]
 \label{lem:least-approximant}
