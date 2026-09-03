@@ -1,0 +1,100 @@
+\begin{figure}
+\small
+%
+\begin{center}
+\begin{tabular}{rcll}
+\grammarGroup{Gradual types} \\
+$\gty{\tau}$ & $::=$ & $\tyAny$ & (Any) \\
+    & $\mid$ & $\nu$ & (Primitive) \\
+    & $\mid$ & $\tyList{\gty{\tau}}$ & (List) \\
+    & $\mid$ & $\tyTuple{\gty{\tau}_1, \ldots, \gty{\tau}_n}$ & (Tuple) \\
+    & $\mid$ & $\tyDict{\gty{\tau}}$ & (Dict) \\
+    & $\mid$ & $\tyCallable{\gty{\tau}_1, \ldots, \gty{\tau}_n}{\gty{\tau}}$ & (Callable) \\
+    & $\mid$ & $\tyLiteral{\ell}$ & (Literal) \\
+    & $\mid$ & $C$ & (Class) \\
+    & $\mid$ & $\tyUnion{\gty{\sigma}}{\gty{\tau}}$ & (Union)
+\end{tabular}
+\end{center}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\gty{\sigma} \precTy \gty{\tau}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{ref-any}}]
+{
+  \strut
+}
+{
+  \gty{\tau} \precTy \tyAny
+}
+\and
+\inferrule*[lab={\ruleName{ref-prim}}]
+{
+  \strut
+}
+{
+  \nu \precTy \nu
+}
+\and
+\inferrule*[lab={\ruleName{ref-literal}}]
+{
+  \strut
+}
+{
+  \tyLiteral{\ell} \precTy \tyLiteral{\ell}
+}
+\and
+\inferrule*[lab={\ruleName{ref-class}}]
+{
+  \strut
+}
+{
+  C \precTy C
+}
+\and
+\inferrule*[lab={\ruleName{ref-list}}]
+{
+  \gty{\sigma} \precTy \gty{\tau}
+}
+{
+  \tyList{\gty{\sigma}} \precTy \tyList{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{ref-dict}}]
+{
+  \gty{\sigma} \precTy \gty{\tau}
+}
+{
+  \tyDict{\gty{\sigma}} \precTy \tyDict{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{ref-tuple}}]
+{
+  \gty{\sigma}_i \precTy \gty{\tau}_i \quad (\forall i)
+}
+{
+  \tyTuple{\gty{\sigma}_1, \ldots, \gty{\sigma}_n} \precTy \tyTuple{\gty{\tau}_1, \ldots, \gty{\tau}_n}
+}
+\and
+\inferrule*[lab={\ruleName{ref-callable}}]
+{
+  \gty{\sigma}_i \precTy \gty{\tau}_i \quad (\forall i) \\
+  \gty{\sigma} \precTy \gty{\tau}
+}
+{
+  \tyCallable{\gty{\sigma}_1, \ldots, \gty{\sigma}_n}{\gty{\sigma}} \precTy \tyCallable{\gty{\tau}_1, \ldots, \gty{\tau}_n}{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{ref-union}}]
+{
+  \gty{\sigma} \precTy \gty{\tau} \\
+  \gty{\sigma}' \precTy \gty{\tau}'
+}
+{
+  \tyUnion{\gty{\sigma}}{\gty{\sigma}'} \precTy \tyUnion{\gty{\tau}}{\gty{\tau}'}
+}
+\end{mathpar}
+\caption{Gradual types and refinement}
+\label{fig:graduality-precision}
+\end{figure}

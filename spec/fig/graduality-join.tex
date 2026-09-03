@@ -1,0 +1,18 @@
+\begin{figure}
+\small
+\begin{defalign}
+\tyAny \gjoin \gty{\tau} &= \tyAny \\*
+\gty{\tau} \gjoin \tyAny &= \tyAny \\*
+\nu \gjoin \nu &= \nu \\*
+\tyList{\gty{\sigma}} \gjoin \tyList{\gty{\tau}} &= \tyList{\gty{\sigma} \gjoin \gty{\tau}} \\*
+\tyTuple{\seq{\gty{\sigma}}} \gjoin \tyTuple{\seq{\gty{\tau}}} &= \tyTuple{\gty{\sigma}_1 \gjoin \gty{\tau}_1, \ldots, \gty{\sigma}_n \gjoin \gty{\tau}_n} \\*
+\tyDict{\gty{\sigma}} \gjoin \tyDict{\gty{\tau}} &= \tyDict{\gty{\sigma} \gjoin \gty{\tau}} \\*
+\tyCallable{\seq{\gty{\sigma}}}{\gty{\sigma}} \gjoin \tyCallable{\seq{\gty{\tau}}}{\gty{\tau}} &= \tyCallable{\gty{\sigma}_1 \gjoin \gty{\tau}_1, \ldots, \gty{\sigma}_n \gjoin \gty{\tau}_n}{\gty{\sigma} \gjoin \gty{\tau}} \\*
+\tyLiteral{\ell} \gjoin \tyLiteral{\ell} &= \tyLiteral{\ell} \\*
+C \gjoin C &= C \\*
+(\tyUnion{\gty{\sigma}}{\gty{\sigma}'}) \gjoin (\tyUnion{\gty{\tau}}{\gty{\tau}'}) &= \tyUnion{(\gty{\sigma} \gjoin \gty{\tau})}{(\gty{\sigma}' \gjoin \gty{\tau}')} \\*
+\gty{\sigma} \gjoin \gty{\tau} &= \tyAny && \quad \text{otherwise}
+\end{defalign}
+\caption{Join}
+\label{fig:graduality-join}
+\end{figure}

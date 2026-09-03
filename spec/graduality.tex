@@ -1,0 +1,63 @@
+% Draft notes for gradual typing, built as their own document (graduality.tex) rather than as
+% a chapter of the specification.
+\section{Graduality}
+\label{sec:graduality}
+
+\figref{graduality-precision} gives the gradual types and \emph{refinement} $\precTy$, a partial
+order on gradual types; the literature calls it \emph{precision}. Define $\TypeSet$ to be the set of
+types, as given in \specification, and $\GTypeSet$ to be the set
+of gradual types; $\sigma$ and $\tau$ range over $\TypeSet$, and $\gty{\sigma}$ and $\gty{\tau}$ over
+$\GTypeSet$. Concretisation and abstraction, which form a Galois connection, are from
+\citet{garcia2016}; precision is from \citet{siek2015}.
+
+\input{spec/fig/graduality-precision}
+
+\begin{lemma}[Discreteness of static types]
+\label{lem:static-discrete}
+If $\sigma \precTy \tau$ then $\sigma = \tau$.
+\end{lemma}
+
+\begin{definition}[Concretisation]
+\label{def:concretisation}
+Concretisation $\gamma : \GTypeSet \to \powersetplus{\TypeSet}$ is defined in \figref{graduality-concretisation}.
+\end{definition}
+
+\input{spec/fig/graduality-concretisation}
+
+\begin{lemma}[Monotonicity of concretisation]
+\label{lem:precision-concretisation}
+$\gty{\sigma} \precTy \gty{\tau}$ if and only if $\gamma(\gty{\sigma}) \subseteq \gamma(\gty{\tau})$.
+\end{lemma}
+
+A gradual type $\gty{\tau}$ \emph{approximates} a set $S$ of types when $S \subseteq \gamma(\gty{\tau})$;
+$\tyAny$ approximates every set of types. A least approximant with respect to $\precTy$ is a best
+abstraction in the sense of \citet{cousot1977}.
+
+\begin{lemma}[Least approximant]
+\label{lem:least-approximant}
+For every nonempty set $S$ of types, the least upper bound $\bigsqcup S$ under $\precTy$ exists and
+is the least $\gty{\tau}$ that approximates $S$.
+\end{lemma}
+
+\begin{proof}
+Since $\gamma(\sigma) = \set{\sigma}$ for every type $\sigma$, approximating $S$ is the same as
+bounding $S$ above under $\precTy$ (Lemma~\ref{lem:precision-concretisation}). The join of two
+gradual types (\figref{graduality-join}) is their least upper bound, by induction on the pair, so
+every finite nonempty set of gradual types has a least upper bound, by induction on its size. Fix
+$\sigma \in S$. The gradual types above $\sigma$ are obtained by replacing subterms of $\sigma$ with
+$\tyAny$, so there are finitely many; the joins $\bigsqcup F$ for finite $F \subseteq S$ containing
+$\sigma$ lie among them and increase with $F$, so some $\bigsqcup F$ is maximal. Then
+$\tau \precTy \bigsqcup (F \cup \set{\tau}) = \bigsqcup F$ for every $\tau \in S$ by maximality, so
+$\bigsqcup F$ bounds $S$; and every bound of $S$ bounds $F$, so $\bigsqcup F$ is least.
+\end{proof}
+
+\input{spec/fig/graduality-join}
+
+\begin{definition}[Abstraction]
+\label{def:abstraction}
+Abstraction $\alpha : \powersetplus{\TypeSet} \to \GTypeSet$ is defined by
+$\alpha(S) = \bigsqcup S$ (Lemma~\ref{lem:least-approximant}).
+\end{definition}
+
+\noindent Every gradual type approximates the empty set, and $\GTypeSet$ has no least element under
+$\precTy$, so the empty set is excluded from the domain of $\alpha$.

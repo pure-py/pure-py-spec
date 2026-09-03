@@ -1,0 +1,17 @@
+\begin{figure}
+\small
+\begin{defalign}
+\gamma(\tyAny) &= \TypeSet \\*
+\gamma(\nu) &= \set{\nu} \\*
+\gamma(\tyList{\gty{\tau}}) &= \set{\tyList{\tau} \mid \tau \in \gamma(\gty{\tau})} \\*
+\gamma(\tyTuple{\seq{\gty{\tau}}}) &= \set{\tyTuple{\seq{\tau}} \mid \seq{\tau} \in \gamma(\seq{\gty{\tau}})} \\*
+\gamma(\tyDict{\gty{\tau}}) &= \set{\tyDict{\tau} \mid \tau \in \gamma(\gty{\tau})} \\*
+\gamma(\tyCallable{\seq{\gty{\tau}}}{\gty{\tau}}) &= \set{\tyCallable{\seq{\tau}}{\tau} \mid \seq{\tau} \in \gamma(\seq{\gty{\tau}}), \; \tau \in \gamma(\gty{\tau})} \\*
+\gamma(\tyLiteral{\ell}) &= \set{\tyLiteral{\ell}} \\*
+\gamma(C) &= \set{C} \\*
+\gamma(\tyUnion{\gty{\sigma}}{\gty{\tau}}) &= \set{(\tyUnion{\sigma}{\tau}) \mid \sigma \in \gamma(\gty{\sigma}), \; \tau \in \gamma(\gty{\tau})} \\*[2mm]
+\gamma(\seq{\gty{\tau}}) &= \gamma(\gty{\tau}_1) \times \cdots \times \gamma(\gty{\tau}_n)
+\end{defalign}
+\caption{Concretisation}
+\label{fig:graduality-concretisation}
+\end{figure}

@@ -1,0 +1,52 @@
+% Draft notes on gradual typing for PurePy, built separately from the specification
+% (PurePy-spec.tex).
+\documentclass[a4paper,11pt]{scrartcl}
+
+% Fonts and layout
+\usepackage[T1]{fontenc}
+\usepackage{libertinus-type1}
+\usepackage{libertinust1math}
+\usepackage{microtype}
+% libertinust1math replaces amssymb; declare the one AMS symbol the rules use that it lacks.
+\DeclareSymbolFont{AMSa}{U}{msa}{m}{n}
+\DeclareMathSymbol{\rightsquigarrow}{\mathrel}{AMSa}{"20}
+\setkomafont{disposition}{\normalfont\bfseries}
+
+% Packages the shared macros and figures rely on.
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{colortbl}
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+\usepackage{mathpartir}
+\usepackage{listings}
+\usepackage{float}
+\floatplacement{figure}{htbp}
+\usepackage{xspace}
+\usepackage{changebar}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks,allcolors=blue!50!black]{hyperref}
+
+% These notes carry no change markup, so accept changes unconditionally.
+\newcommand{\acceptchanges}{}
+\input{tex/macros}
+\input{tex/listings}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+\begin{document}
+
+\title{\PurePy: Graduality notes}
+\maketitle
+
+\input{spec/graduality}
+
+\bibliographystyle{plainnat}
+\bibliography{tex/refs,tex/additional-refs}
+
+\end{document}
