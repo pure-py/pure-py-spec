@@ -41,6 +41,12 @@ more functional, the community has moved in that direction, from lambda expressi
 proposal for deeply immutable objects~\cite{johnson2025}. Typed treatments of effects in functional languages,
 such as Prism,\footnote{\url{https://www.stephendiehl.com/posts/prism/}} are relevant to the structured effects \PurePy may add in a later release.
 
+\subsection{Typed Python}
+
+Static Python~\cite{lu2023} is a gradually typed dialect of Python used in production at Instagram,
+combining concrete and transient enforcement so that typed code is sound. \PurePy adopts a static
+type system whose well-typed programs mypy accepts, leaving gradual typing to a later release.
+
 \subsection{Pattern matching}
 
 Checking that the cases of a match are reachable and exhaustive goes back to the usefulness algorithm for
