@@ -68,7 +68,8 @@ $\alpha(S) = \bigsqcup S$ (Lemma~\ref{lem:least-approximant}).
 \noindent Every gradual type approximates the empty set, and $\GTypeSet$ has no least element under
 $\precTy$, so the empty set is excluded from the domain of $\alpha$. Concretisation and abstraction
 form a \emph{Galois insertion}: $\alpha(S) \precTy \gty{\tau}$ if and only if
-$S \subseteq \gamma(\gty{\tau})$, and $\alpha(\gamma(\gty{\tau})) = \gty{\tau}$ by reflection
+$S \subseteq \gamma(\gty{\tau})$ (Lemma~\ref{lem:least-approximant}), and
+$\alpha(\gamma(\gty{\tau})) = \gty{\tau}$ by reflection
 (Lemma~\ref{lem:precision-concretisation}).
 
 A relation on types lifts to gradual types through concretisation \citep{garcia2016}: the lifted
