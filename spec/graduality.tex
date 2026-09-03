@@ -67,15 +67,9 @@ form a \emph{Galois insertion}: $\alpha(S) \precTy \gty{\tau}$ if and only if
 $S \subseteq \gamma(\gty{\tau})$, and $\alpha(\gamma(\gty{\tau})) = \gty{\tau}$ by reflection
 (Lemma~\ref{lem:precision-concretisation}).
 
-A relation on types lifts to gradual types through concretisation \citep{garcia2016}: subtyping
-lifts to \emph{consistent subtyping}, and equivalence to \emph{consistency}. Both static relations
-are as defined in \specification.
-
-\begin{definition}[Consistent subtyping]
-\label{def:consistent-subtyping}
-$\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$ if and only if $\Sigma \vdash \sigma \subty \tau$ for some
-$\sigma \in \gamma(\gty{\sigma})$ and $\tau \in \gamma(\gty{\tau})$.
-\end{definition}
+A relation on types lifts to gradual types through concretisation \citep{garcia2016}: the lifted
+relation holds when the concretisations contain a related pair. Subtyping and equivalence on types
+are as defined in \specification; equivalence lifts to \emph{consistency}.
 
 \begin{definition}[Consistency]
 \label{def:consistency}
@@ -83,21 +77,23 @@ $\Sigma \vdash \gty{\sigma} \gtyEquiv \gty{\tau}$ if and only if $\Sigma \vdash 
 $\sigma \in \gamma(\gty{\sigma})$ and $\tau \in \gamma(\gty{\tau})$.
 \end{definition}
 
-\figref{graduality-subtyping} lifts the subtyping rules of \specification rule by rule: types
-become gradual types, subtyping premises become consistent subtyping, equivalence premises become
-consistency, and two axioms place $\tyAny$ below and above every gradual type.
+\figref{graduality-subtyping} defines \emph{consistent subtyping} by lifting the subtyping rules
+of \specification rule by rule: types become gradual types, subtyping premises become consistent
+subtyping, equivalence premises become consistency, and two axioms place $\tyAny$ below and above
+every gradual type. The intended characterisation is the lifting of subtyping itself; the rules
+satisfy one direction.
 
 \input{spec/fig/graduality-subtyping}
 
 \begin{lemma}[Completeness of the lifted rules]
 \label{lem:consistent-subtyping-complete}
-If $\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$ (Definition~\ref{def:consistent-subtyping}) then
-the rules of \figref{graduality-subtyping} derive $\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$.
+If $\Sigma \vdash \sigma \subty \tau$ for some $\sigma \in \gamma(\gty{\sigma})$ and
+$\tau \in \gamma(\gty{\tau})$ then $\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$.
 \end{lemma}
 
 The converse fails at \ruleName{gsubty-union} alone. The premises of \ruleName{gsubty-union} share
-their right-hand type, for which Definition~\ref{def:consistent-subtyping} chooses one witness,
-whereas the lifted premises choose witnesses independently. The rules derive
+their right-hand type, for which the lifting of subtyping takes one witness,
+whereas the lifted premises take witnesses independently. The rules derive
 $\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \gsubty \tyList{\tyAny}$, since
 $\tyInt \gtyEquiv \tyAny$ and $\tyStr \gtyEquiv \tyAny$; but
 $\gamma(\tyList{\tyAny}) = \set{\tyList{\tau} \mid \tau \in \TypeSet}$, and
