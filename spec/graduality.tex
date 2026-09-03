@@ -3,12 +3,12 @@
 \section{Graduality}
 \label{sec:graduality}
 
-\figref{graduality-precision} gives the gradual types and \emph{refinement} $\precTy$, a partial
-order on gradual types; the literature calls it \emph{precision}. Define $\TypeSet$ to be the set of
+\figref{graduality-precision} gives the gradual types and \emph{precision} $\precTy$, a partial
+order on gradual types. Define $\TypeSet$ to be the set of
 types, as given in \specification, and $\GTypeSet$ to be the set
 of gradual types; $\sigma$ and $\tau$ range over $\TypeSet$, and $\gty{\sigma}$ and $\gty{\tau}$ over
-$\GTypeSet$. Concretisation and abstraction, which form a Galois connection, are from
-\citet{garcia2016}; precision is from \citet{siek2015}.
+$\GTypeSet$. Concretisation and abstraction are from \citet{garcia2016}; precision is from
+\citet{siek2015}.
 
 \input{spec/fig/graduality-precision}
 
@@ -24,14 +24,16 @@ Concretisation $\gamma : \GTypeSet \to \powersetplus{\TypeSet}$ is defined in \f
 
 \input{spec/fig/graduality-concretisation}
 
-\begin{lemma}[Monotonicity of concretisation]
+\begin{lemma}[Preservation and reflection of precision]
 \label{lem:precision-concretisation}
 $\gty{\sigma} \precTy \gty{\tau}$ if and only if $\gamma(\gty{\sigma}) \subseteq \gamma(\gty{\tau})$.
 \end{lemma}
 
 A gradual type $\gty{\tau}$ \emph{approximates} a set $S$ of types when $S \subseteq \gamma(\gty{\tau})$;
 $\tyAny$ approximates every set of types. A least approximant with respect to $\precTy$ is a best
-abstraction in the sense of \citet{cousot1977}.
+abstraction in the sense of \citet{cousot1977}. Preservation is monotonicity of concretisation.
+Reflection forces every approximant of $S$ to lie above the join of $S$; without reflection the
+join would still approximate $S$ but need not be least.
 
 \begin{lemma}[Least approximant]
 \label{lem:least-approximant}
@@ -61,3 +63,45 @@ $\alpha(S) = \bigsqcup S$ (Lemma~\ref{lem:least-approximant}).
 
 \noindent Every gradual type approximates the empty set, and $\GTypeSet$ has no least element under
 $\precTy$, so the empty set is excluded from the domain of $\alpha$.
+
+Concretisation and abstraction form a \emph{Galois insertion}: $\alpha(S) \precTy \gty{\tau}$ if and
+only if $S \subseteq \gamma(\gty{\tau})$, and $\alpha(\gamma(\gty{\tau})) = \gty{\tau}$, because by
+reflection $\gty{\tau}$ lies below every gradual type whose concretisation contains
+$\gamma(\gty{\tau})$.
+
+A relation on types lifts to gradual types through concretisation \citep{garcia2016}: subtyping
+lifts to \emph{consistent subtyping}, and equivalence to \emph{consistency}. Both static relations
+are as defined in \specification.
+
+\begin{definition}[Consistent subtyping]
+\label{def:consistent-subtyping}
+$\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$ if and only if $\Sigma \vdash \sigma \subty \tau$ for some
+$\sigma \in \gamma(\gty{\sigma})$ and $\tau \in \gamma(\gty{\tau})$.
+\end{definition}
+
+\begin{definition}[Consistency]
+\label{def:consistency}
+$\Sigma \vdash \gty{\sigma} \gtyEquiv \gty{\tau}$ if and only if $\Sigma \vdash \sigma \tyEquiv \tau$ for some
+$\sigma \in \gamma(\gty{\sigma})$ and $\tau \in \gamma(\gty{\tau})$.
+\end{definition}
+
+\figref{graduality-subtyping} lifts the subtyping rules of \specification rule by rule: types
+become gradual types, subtyping premises become consistent subtyping, equivalence premises become
+consistency, and two axioms place $\tyAny$ below and above every gradual type.
+
+\input{spec/fig/graduality-subtyping}
+
+\begin{lemma}[Completeness of the lifted rules]
+\label{lem:consistent-subtyping-complete}
+If $\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$ (Definition~\ref{def:consistent-subtyping}) then
+the rules of \figref{graduality-subtyping} derive $\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$.
+\end{lemma}
+
+The converse fails at \ruleName{gsubty-union} alone. The premises of \ruleName{gsubty-union} share
+their right-hand type, for which Definition~\ref{def:consistent-subtyping} chooses one witness,
+whereas the lifted premises choose witnesses independently. The rules derive
+$\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \gsubty \tyList{\tyAny}$, since
+$\tyInt \gtyEquiv \tyAny$ and $\tyStr \gtyEquiv \tyAny$; but
+$\gamma(\tyList{\tyAny}) = \set{\tyList{\tau} \mid \tau \in \TypeSet}$, and
+$\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \subty \tyList{\tau}$ requires
+$\tyInt \tyEquiv \tau$ and $\tyStr \tyEquiv \tau$.

@@ -1,0 +1,137 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{gsubty-any-left}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \tyAny \gsubty \gty{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-any-right}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \gty{\sigma} \gsubty \tyAny
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-refl}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \gty{\tau} \gsubty \gty{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-class}}]
+{
+  D \in \ancestors(\Sigma, C)
+}
+{
+  \Sigma \vdash C \gsubty D
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-never}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \tyNever \gsubty \gty{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-object}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \gty{\tau} \gsubty \tyObject
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-int-float}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \tyInt \gsubty \tyFloat
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-sized}}]
+{
+  \gty{\tau} \text{ a list, dictionary, string or tuple type}
+}
+{
+  \Sigma \vdash \gty{\tau} \gsubty \tySized
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-list}}]
+{
+  \Sigma \vdash \gty{\sigma} \gtyEquiv \gty{\tau}
+}
+{
+  \Sigma \vdash \tyList{\gty{\sigma}} \gsubty \tyList{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-dict}}]
+{
+  \Sigma \vdash \gty{\sigma} \gtyEquiv \gty{\tau}
+}
+{
+  \Sigma \vdash \tyDict{\gty{\sigma}} \gsubty \tyDict{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-callable}}]
+{
+  \Sigma \vdash \gty{\tau}_i \gsubty \gty{\sigma}_i \quad (\forall i) \\
+  \Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}
+}
+{
+  \Sigma \vdash \tyCallable{\gty{\sigma}_1, \ldots, \gty{\sigma}_n}{\gty{\sigma}} \gsubty \tyCallable{\gty{\tau}_1, \ldots, \gty{\tau}_n}{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-tuple}}]
+{
+  \Sigma \vdash \gty{\sigma}_i \gsubty \gty{\tau}_i \quad (\forall i)
+}
+{
+  \Sigma \vdash \tyTuple{\gty{\sigma}_1, \ldots, \gty{\sigma}_n} \gsubty \tyTuple{\gty{\tau}_1, \ldots, \gty{\tau}_n}
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-literal}}]
+{
+  \Sigma \vdash \baseType(\ell) \gsubty \gty{\tau}
+}
+{
+  \Sigma \vdash \tyLiteral{\ell} \gsubty \gty{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-union-left}}]
+{
+  \Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}
+}
+{
+  \Sigma \vdash \gty{\sigma} \gsubty \tyUnion{\gty{\tau}}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-union-right}}]
+{
+  \Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}'
+}
+{
+  \Sigma \vdash \gty{\sigma} \gsubty \tyUnion{\gty{\tau}}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{gsubty-union}}]
+{
+  \Sigma \vdash \gty{\tau} \gsubty \gty{\sigma} \\
+  \Sigma \vdash \gty{\tau}' \gsubty \gty{\sigma}
+}
+{
+  \Sigma \vdash \tyUnion{\gty{\tau}}{\gty{\tau}'} \gsubty \gty{\sigma}
+}
+\end{mathpar}
+\caption{Consistent subtyping: lifted rules}
+\label{fig:graduality-subtyping}
+\end{figure}
