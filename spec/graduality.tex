@@ -3,14 +3,18 @@
 \section{Graduality}
 \label{sec:graduality}
 
-\figref{graduality-precision} gives the gradual types and \emph{precision} $\precTy$, a partial
-order on gradual types. Define $\TypeSet$ to be the set of
+\figref{graduality-precision} gives the gradual types. Define $\TypeSet$ to be the set of
 types, as given in \specification, and $\GTypeSet$ to be the set
 of gradual types; $\sigma$ and $\tau$ range over $\TypeSet$, and $\gty{\sigma}$ and $\gty{\tau}$ over
 $\GTypeSet$. Concretisation and abstraction are from \citet{garcia2016}; precision is from
 \citet{siek2015}.
 
 \input{spec/fig/graduality-precision}
+
+\begin{definition}[Precision]
+\label{def:precision}
+Precision $\precTy$, a partial order on gradual types, is defined in \figref{graduality-precision}.
+\end{definition}
 
 \begin{lemma}[Discreteness of static types]
 \label{lem:static-discrete}
