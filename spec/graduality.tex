@@ -79,10 +79,11 @@ metavariable the existentials factor, and the lifting is the conjunction of the 
 A shared metavariable makes the conjunction a relational composition, with the middle witness
 drawn from a concretisation rather than from all types; that the lifting of a composition is
 stronger than the composition of the liftings is standard \citep{garcia2016}. Subtyping and
-equivalence on types are as defined in \specification; equivalence lifts to \emph{consistency}.
+equivalence on types are as defined in \specification; equivalence lifts to \emph{consistent
+equivalence} \citep{sekiyama2019}.
 
-\begin{definition}[Consistency]
-\label{def:consistency}
+\begin{definition}[Consistent equivalence]
+\label{def:consistent-equivalence}
 $\Sigma \vdash \gty{\sigma} \gtyEquiv \gty{\tau}$ if and only if $\Sigma \vdash \sigma \tyEquiv \tau$ for some
 $\sigma \in \gamma(\gty{\sigma})$ and $\tau \in \gamma(\gty{\tau})$.
 \end{definition}
@@ -99,8 +100,8 @@ $\Sigma \vdash \threeEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, over equival
 \figref{graduality-subtyping} defines \emph{consistent subtyping}, mutually with the consistent
 three-way subtype relation of \figref{graduality-three-sub}, by lifting the subtyping rules of
 \specification: types become gradual types, subtyping premises become consistent subtyping,
-equivalence premises become consistency, and two axioms place $\tyAny$ below and above every
-gradual type. The premises of \ruleName{gsubty-union} share $\gty{\sigma}$ and are replaced by
+equivalence premises become consistent equivalence, and two axioms place $\tyAny$ below and above every
+gradual type. The two premises share $\gty{\sigma}$ and are replaced by
 the three-way premise; lifted separately they would derive
 $\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \gsubty \tyList{\tyAny}$, since
 $\tyInt \gtyEquiv \tyAny$ and $\tyStr \gtyEquiv \tyAny$, although
