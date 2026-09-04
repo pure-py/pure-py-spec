@@ -175,4 +175,45 @@ $\Sigma \vdash \sigma \subty \tau$ and $\Sigma \vdash \sigma \subty \tau'$ for s
 $\tau'$ and $\sigma$.
 \end{definition}
 
-\noindent Both admit characterisations by the same method, which are deferred.
+\noindent The characterisation of $\UEquiv$ by the same method is deferred.
+
+\subsection{Rules for $\USup$}
+
+The rules of \figref{graduality-usub} appeal to $\USup$ at callable arguments, so the method must
+be repeated for $\USup$. The case analysis closes every case but one; the positive cases give
+\figref{graduality-usup}.
+
+The induction is on the total size of the triple; cases as before. On the right, $\tyAny$ admits
+the witness $\tyNever$, below every type (\ruleName{usup-any-right}); a static right-hand type is
+its own sole concretisation, so sharing is trivial and two consistent subtyping checks remain
+(\ruleName{usup-static}); a right-hand union that is not static is the residual case, taken up
+below. In the remaining cases the shared witness is constructor-headed. A left type $\tyAny$ or
+$\tyObject$ takes the witness $\tyObject$, above every type, leaving a consistent subtyping check
+on the other left type (\ruleName{usup-any-left}, \ruleName{usup-object-left}). For a union on the
+left, inversion sends the shared witness below one component, and the witness for the other
+component is unconstrained (\ruleName{usup-union-left}, \ruleName{usup-union-right}). A
+constructor on the right must head both left types, or the case refutes. Tuples proceed
+componentwise (\ruleName{usup-tuple}); lists and dictionaries need one element witness equivalent
+to both element types (\ruleName{usup-list}, \ruleName{usup-dict}); callable arguments need one
+argument witness above both argument types, instances of $\USub$ (\ruleName{usup-callable}), so
+the two predicates are mutually recursive.
+
+\input{spec/fig/graduality-usup}
+
+The residual case is a right-hand union $\tyUnion{\gty{\sigma}}{\gty{\sigma}'}$ that is not
+static. Its witness is a union, below a type exactly when both components are, so the two
+constraints become four, relating each component witness to each left witness; every witness now
+appears in two constraints. The case amounts to $\USub(\gty{\sigma}, \gty{\sigma}'; \gty{\tau})$
+and $\USub(\gty{\sigma}, \gty{\sigma}'; \gty{\tau}')$ with the component witnesses shared between
+the two instances, which no predicate over three gradual types expresses. Splitting the union
+instead, with one $\USup$ premise per component, is unsound:
+$\USup(\tyList{\tyAny}, \tyList{\tyAny}; \tyList{\tyInt})$ and
+$\USup(\tyList{\tyAny}, \tyList{\tyAny}; \tyList{\tyStr})$ hold, but
+$\USup(\tyList{\tyAny}, \tyList{\tyAny}; \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}})$ needs an
+element witness equivalent to both $\tyInt$ and $\tyStr$.
+
+Sharing the pair of component witnesses suggests a predicate over four gradual types, but the
+widening does not stop there: a union on the left then sends each component witness below a
+component of the left union independently, so the constraints no longer relate every pair. The
+general form is a finite set of subtyping and equivalence constraints over shared witnesses, a
+constraint system in the sense of \citet{garcia2015}; its treatment is deferred.

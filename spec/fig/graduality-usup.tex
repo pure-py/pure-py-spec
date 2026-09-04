@@ -1,0 +1,89 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma \vdash \USup(\gty{\tau}, \gty{\tau}'; \gty{\sigma})$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{usup-any-right}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \USup(\gty{\tau}, \gty{\tau}'; \tyAny)
+}
+\and
+\inferrule*[lab={\ruleName{usup-any-left}}]
+{
+  \Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}
+}
+{
+  \Sigma \vdash \USup(\tyAny, \gty{\tau}; \gty{\sigma})
+}
+\and
+\inferrule*[lab={\ruleName{usup-object-left}}]
+{
+  \Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}
+}
+{
+  \Sigma \vdash \USup(\tyObject, \gty{\tau}; \gty{\sigma})
+}
+\and
+\inferrule*[lab={\ruleName{usup-static}}]
+{
+  \Sigma \vdash \sigma \gsubty \gty{\tau} \\
+  \Sigma \vdash \sigma \gsubty \gty{\tau}'
+}
+{
+  \Sigma \vdash \USup(\gty{\tau}, \gty{\tau}'; \sigma)
+}
+\and
+\inferrule*[lab={\ruleName{usup-union-left}}]
+{
+  \Sigma \vdash \USup(\gty{\tau}, \gty{\tau}''; \gty{\sigma})
+}
+{
+  \Sigma \vdash \USup(\tyUnion{\gty{\tau}}{\gty{\tau}'}, \gty{\tau}''; \gty{\sigma})
+}
+\and
+\inferrule*[lab={\ruleName{usup-union-right}}]
+{
+  \Sigma \vdash \USup(\gty{\tau}', \gty{\tau}''; \gty{\sigma})
+}
+{
+  \Sigma \vdash \USup(\tyUnion{\gty{\tau}}{\gty{\tau}'}, \gty{\tau}''; \gty{\sigma})
+}
+\and
+\inferrule*[lab={\ruleName{usup-list}}]
+{
+  \Sigma \vdash \UEquiv(\gty{\tau}, \gty{\tau}'; \gty{\sigma})
+}
+{
+  \Sigma \vdash \USup(\tyList{\gty{\tau}}, \tyList{\gty{\tau}'}; \tyList{\gty{\sigma}})
+}
+\and
+\inferrule*[lab={\ruleName{usup-dict}}]
+{
+  \Sigma \vdash \UEquiv(\gty{\tau}, \gty{\tau}'; \gty{\sigma})
+}
+{
+  \Sigma \vdash \USup(\tyDict{\gty{\tau}}, \tyDict{\gty{\tau}'}; \tyDict{\gty{\sigma}})
+}
+\and
+\inferrule*[lab={\ruleName{usup-tuple}}]
+{
+  \Sigma \vdash \USup(\gty{\tau}_i, \gty{\tau}'_i; \gty{\sigma}_i) \quad (\forall i)
+}
+{
+  \Sigma \vdash \USup(\tyTuple{\gty{\tau}_1, \ldots, \gty{\tau}_n}, \tyTuple{\gty{\tau}'_1, \ldots, \gty{\tau}'_n}; \tyTuple{\gty{\sigma}_1, \ldots, \gty{\sigma}_n})
+}
+\and
+\inferrule*[lab={\ruleName{usup-callable}}]
+{
+  \Sigma \vdash \USub(\gty{\tau}_i, \gty{\tau}'_i; \gty{\sigma}_i) \quad (\forall i) \\
+  \Sigma \vdash \USup(\gty{\tau}, \gty{\tau}'; \gty{\sigma})
+}
+{
+  \Sigma \vdash \USup(\tyCallable{\gty{\tau}_1, \ldots, \gty{\tau}_n}{\gty{\tau}}, \tyCallable{\gty{\tau}'_1, \ldots, \gty{\tau}'_n}{\gty{\tau}'}; \tyCallable{\gty{\sigma}_1, \ldots, \gty{\sigma}_n}{\gty{\sigma}})
+}
+\end{mathpar}
+\caption{$\USup$: rules extracted from the case analysis, up to symmetry in the left-hand types; a right-hand union that is not static has no rule}
+\label{fig:graduality-usup}
+\end{figure}
