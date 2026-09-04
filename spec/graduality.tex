@@ -134,8 +134,8 @@ then by the size of the first; cases on the triple, where each case matches one 
 type $\tyAny$ or $\tyNever$ takes the witness $\tyNever$, leaving a consistent subtyping check on
 the other outer type (\ruleName{three-sub-any-left}, \ruleName{three-sub-never-left}). A union in
 an outer position reassociates, because its witness is a union, below a type exactly when both
-components are (\ruleName{three-sub-assoc}). Otherwise each outer witness has
-the head of its own type, and neither is a union. In the middle, $\tyAny$ admits the witness $\tyObject$
+components are (\ruleName{three-sub-assoc}). Otherwise each outer witness shares its
+head with the gradual type it witnesses, and neither is a union. In the middle, $\tyAny$ admits the witness $\tyObject$
 (\ruleName{three-sub-any}). A static middle type is its own sole concretisation, so sharing is
 trivial and two consistent subtyping checks remain (\ruleName{three-sub-static}). For a union in
 the middle, inversion sends each outer witness into one component: the same component
