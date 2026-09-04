@@ -104,3 +104,75 @@ $\tyInt \gtyEquiv \tyAny$ and $\tyStr \gtyEquiv \tyAny$; but
 $\gamma(\tyList{\tyAny}) = \set{\tyList{\tau} \mid \tau \in \TypeSet}$, and
 $\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \subty \tyList{\tau}$ requires
 $\tyInt \tyEquiv \tau$ and $\tyStr \tyEquiv \tau$.
+
+\subsection{Joint lifting of the union premises}
+
+The premises of \ruleName{gsubty-union} share their right-hand type, so they must be lifted
+jointly, as one predicate over three gradual types.
+
+\begin{definition}[$\USub$]
+\label{def:usub}
+$\Sigma \vdash \USub(\gty{\tau}, \gty{\tau}'; \gty{\sigma})$ if and only if
+$\Sigma \vdash \tau \subty \sigma$ and $\Sigma \vdash \tau' \subty \sigma$ for some
+$\tau \in \gamma(\gty{\tau})$, $\tau' \in \gamma(\gty{\tau}')$ and $\sigma \in \gamma(\gty{\sigma})$.
+\end{definition}
+
+\noindent The predicate is symmetric in its first two arguments. Replacing the premises of
+\ruleName{gsubty-union} with $\USub$ alone,
+%
+\begin{mathpar}
+\inferrule*[lab={\ruleName{gsubty-union}}]
+{
+  \Sigma \vdash \USub(\gty{\tau}, \gty{\tau}'; \gty{\sigma})
+}
+{
+  \Sigma \vdash \tyUnion{\gty{\tau}}{\gty{\tau}'} \gsubty \gty{\sigma}
+}
+\end{mathpar}
+%
+makes the rule match the lifting of subtyping by construction, because a concrete union lies below
+$\sigma$ exactly when both components do; the counterexample above is no longer derivable.
+
+An inductive characterisation of $\USub$ can be extracted from a decidability proof: each case of
+the induction either exhibits witnesses or refutes their existence, and the positive cases, read
+as inference rules, give \figref{graduality-usub}. The proof is a device for finding the rules;
+the surviving obligation, that the rules derive the predicate exactly, follows from the same case
+analysis, because every positive case is an equivalence.
+
+\begin{theorem}[Decidability of $\USub$]
+\label{thm:usub-decidable}
+The predicate of Definition~\ref{def:usub} is decidable.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+By induction on the triple, ordered by the total size of the three types and then by the size of
+the first; cases on the triple. A left type $\tyAny$ or $\tyNever$ takes the witness $\tyNever$,
+leaving a consistent subtyping check on the other left type (\ruleName{usub-any-left},
+\ruleName{usub-never-left}). A left union rebrackets, because its witness is a union, below
+$\sigma$ exactly when both components are (\ruleName{usub-union}). Otherwise both left witnesses
+are constructor-headed. On the right, $\tyAny$ admits the witness $\tyObject$
+(\ruleName{usub-any-right}). A static right-hand type is its own sole concretisation, so sharing
+is trivial and two consistent subtyping checks remain (\ruleName{usub-static}). For a union on
+the right, inversion sends each left witness into one branch: the same branch
+(\ruleName{usub-union-left}, \ruleName{usub-union-right}), or different branches, in which case
+the witnesses no longer interact (\ruleName{usub-union-split}). A constructor on the right must
+head both left types, or the case refutes. Tuples proceed componentwise (\ruleName{usub-tuple});
+lists and dictionaries need one element witness equivalent to both element types
+(\ruleName{usub-list}, \ruleName{usub-dict}), and callable arguments one witness below both
+argument types (\ruleName{usub-callable}), the liftings $\UEquiv$ and $\USup$ of
+Definition~\ref{def:uequiv-usup}. Each appeal to the hypothesis decreases the order.
+\end{proof}
+
+\input{spec/fig/graduality-usub}
+
+\begin{definition}[$\UEquiv$ and $\USup$]
+\label{def:uequiv-usup}
+$\Sigma \vdash \UEquiv(\gty{\tau}, \gty{\tau}'; \gty{\sigma})$ if and only if
+$\Sigma \vdash \tau \tyEquiv \sigma$ and $\Sigma \vdash \tau' \tyEquiv \sigma$ for some
+$\tau \in \gamma(\gty{\tau})$, $\tau' \in \gamma(\gty{\tau}')$ and $\sigma \in \gamma(\gty{\sigma})$.
+$\Sigma \vdash \USup(\gty{\tau}, \gty{\tau}'; \gty{\sigma})$ if and only if
+$\Sigma \vdash \sigma \subty \tau$ and $\Sigma \vdash \sigma \subty \tau'$ for some such $\tau$,
+$\tau'$ and $\sigma$.
+\end{definition}
+
+\noindent Both admit characterisations by the same method, which are deferred.

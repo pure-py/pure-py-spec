@@ -1,0 +1,106 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma \vdash \USub(\gty{\tau}, \gty{\tau}'; \gty{\sigma})$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{usub-any-right}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \USub(\gty{\tau}, \gty{\tau}'; \tyAny)
+}
+\and
+\inferrule*[lab={\ruleName{usub-any-left}}]
+{
+  \Sigma \vdash \gty{\tau} \gsubty \gty{\sigma}
+}
+{
+  \Sigma \vdash \USub(\tyAny, \gty{\tau}; \gty{\sigma})
+}
+\and
+\inferrule*[lab={\ruleName{usub-never-left}}]
+{
+  \Sigma \vdash \gty{\tau} \gsubty \gty{\sigma}
+}
+{
+  \Sigma \vdash \USub(\tyNever, \gty{\tau}; \gty{\sigma})
+}
+\and
+\inferrule*[lab={\ruleName{usub-union}}]
+{
+  \Sigma \vdash \USub(\gty{\tau}, \tyUnion{\gty{\tau}'}{\gty{\tau}''}; \gty{\sigma})
+}
+{
+  \Sigma \vdash \USub(\tyUnion{\gty{\tau}}{\gty{\tau}'}, \gty{\tau}''; \gty{\sigma})
+}
+\and
+\inferrule*[lab={\ruleName{usub-static}}]
+{
+  \Sigma \vdash \gty{\tau} \gsubty \sigma \\
+  \Sigma \vdash \gty{\tau}' \gsubty \sigma
+}
+{
+  \Sigma \vdash \USub(\gty{\tau}, \gty{\tau}'; \sigma)
+}
+\and
+\inferrule*[lab={\ruleName{usub-union-left}}]
+{
+  \Sigma \vdash \USub(\gty{\tau}, \gty{\tau}'; \gty{\sigma})
+}
+{
+  \Sigma \vdash \USub(\gty{\tau}, \gty{\tau}'; \tyUnion{\gty{\sigma}}{\gty{\sigma}'})
+}
+\and
+\inferrule*[lab={\ruleName{usub-union-right}}]
+{
+  \Sigma \vdash \USub(\gty{\tau}, \gty{\tau}'; \gty{\sigma}')
+}
+{
+  \Sigma \vdash \USub(\gty{\tau}, \gty{\tau}'; \tyUnion{\gty{\sigma}}{\gty{\sigma}'})
+}
+\and
+\inferrule*[lab={\ruleName{usub-union-split}}]
+{
+  \Sigma \vdash \gty{\tau} \gsubty \gty{\sigma} \\
+  \Sigma \vdash \gty{\tau}' \gsubty \gty{\sigma}'
+}
+{
+  \Sigma \vdash \USub(\gty{\tau}, \gty{\tau}'; \tyUnion{\gty{\sigma}}{\gty{\sigma}'})
+}
+\and
+\inferrule*[lab={\ruleName{usub-list}}]
+{
+  \Sigma \vdash \UEquiv(\gty{\tau}, \gty{\tau}'; \gty{\sigma})
+}
+{
+  \Sigma \vdash \USub(\tyList{\gty{\tau}}, \tyList{\gty{\tau}'}; \tyList{\gty{\sigma}})
+}
+\and
+\inferrule*[lab={\ruleName{usub-dict}}]
+{
+  \Sigma \vdash \UEquiv(\gty{\tau}, \gty{\tau}'; \gty{\sigma})
+}
+{
+  \Sigma \vdash \USub(\tyDict{\gty{\tau}}, \tyDict{\gty{\tau}'}; \tyDict{\gty{\sigma}})
+}
+\and
+\inferrule*[lab={\ruleName{usub-tuple}}]
+{
+  \Sigma \vdash \USub(\gty{\tau}_i, \gty{\tau}'_i; \gty{\sigma}_i) \quad (\forall i)
+}
+{
+  \Sigma \vdash \USub(\tyTuple{\gty{\tau}_1, \ldots, \gty{\tau}_n}, \tyTuple{\gty{\tau}'_1, \ldots, \gty{\tau}'_n}; \tyTuple{\gty{\sigma}_1, \ldots, \gty{\sigma}_n})
+}
+\and
+\inferrule*[lab={\ruleName{usub-callable}}]
+{
+  \Sigma \vdash \USup(\gty{\tau}_i, \gty{\tau}'_i; \gty{\sigma}_i) \quad (\forall i) \\
+  \Sigma \vdash \USub(\gty{\tau}, \gty{\tau}'; \gty{\sigma})
+}
+{
+  \Sigma \vdash \USub(\tyCallable{\gty{\tau}_1, \ldots, \gty{\tau}_n}{\gty{\tau}}, \tyCallable{\gty{\tau}'_1, \ldots, \gty{\tau}'_n}{\gty{\tau}'}; \tyCallable{\gty{\sigma}_1, \ldots, \gty{\sigma}_n}{\gty{\sigma}})
+}
+\end{mathpar}
+\caption{$\USub$: rules extracted from the decidability proof, up to symmetry in the left-hand types}
+\label{fig:graduality-usub}
+\end{figure}
