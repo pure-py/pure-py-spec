@@ -55,6 +55,10 @@ Python treats it as one.
 If $\Sigma \vdash \sigma \subty \tau$ and $\Sigma \vdash \tau \subty \tau'$ then $\Sigma \vdash \sigma \subty \tau'$.
 \end{lemma}
 
+\noindent Subtyping is therefore a preorder: reflexive and transitive but not antisymmetric,
+because distinct types such as $\tyUnion{\sigma}{\tau}$ and $\tyUnion{\tau}{\sigma}$ are
+equivalent.
+
 Two types are \emph{comparable}
 when either is a subtype of the other. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. Two comparable types \emph{meet} to the smaller type; a
