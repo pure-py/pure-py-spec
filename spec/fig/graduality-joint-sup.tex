@@ -1,0 +1,89 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma \vdash \jointSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{joint-sup-any}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \jointSup{\gty{\tau}}{\tyAny}{\gty{\sigma}}
+}
+\and
+\inferrule*[lab={\ruleName{joint-sup-any-left}}]
+{
+  \Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}
+}
+{
+  \Sigma \vdash \jointSup{\tyAny}{\gty{\sigma}}{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{joint-sup-object-left}}]
+{
+  \Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}
+}
+{
+  \Sigma \vdash \jointSup{\tyObject}{\gty{\sigma}}{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{joint-sup-static}}]
+{
+  \Sigma \vdash \sigma \gsubty \gty{\tau} \\
+  \Sigma \vdash \sigma \gsubty \gty{\tau}'
+}
+{
+  \Sigma \vdash \jointSup{\gty{\tau}}{\sigma}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{joint-sup-union-left}}]
+{
+  \Sigma \vdash \jointSup{\gty{\tau}}{\gty{\sigma}}{\gty{\sigma}'}
+}
+{
+  \Sigma \vdash \jointSup{\tyUnion{\gty{\tau}}{\gty{\tau}'}}{\gty{\sigma}}{\gty{\sigma}'}
+}
+\and
+\inferrule*[lab={\ruleName{joint-sup-union-right}}]
+{
+  \Sigma \vdash \jointSup{\gty{\tau}'}{\gty{\sigma}}{\gty{\sigma}'}
+}
+{
+  \Sigma \vdash \jointSup{\tyUnion{\gty{\tau}}{\gty{\tau}'}}{\gty{\sigma}}{\gty{\sigma}'}
+}
+\and
+\inferrule*[lab={\ruleName{joint-sup-list}}]
+{
+  \Sigma \vdash \jointEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \jointSup{\tyList{\gty{\tau}}}{\tyList{\gty{\sigma}}}{\tyList{\gty{\tau}'}}
+}
+\and
+\inferrule*[lab={\ruleName{joint-sup-dict}}]
+{
+  \Sigma \vdash \jointEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \jointSup{\tyDict{\gty{\tau}}}{\tyDict{\gty{\sigma}}}{\tyDict{\gty{\tau}'}}
+}
+\and
+\inferrule*[lab={\ruleName{joint-sup-tuple}}]
+{
+  \Sigma \vdash \jointSup{\gty{\tau}_i}{\gty{\sigma}_i}{\gty{\tau}'_i} \quad (\forall i)
+}
+{
+  \Sigma \vdash \jointSup{\tyTuple{\gty{\tau}_1, \ldots, \gty{\tau}_n}}{\tyTuple{\gty{\sigma}_1, \ldots, \gty{\sigma}_n}}{\tyTuple{\gty{\tau}'_1, \ldots, \gty{\tau}'_n}}
+}
+\and
+\inferrule*[lab={\ruleName{joint-sup-callable}}]
+{
+  \Sigma \vdash \jointSub{\gty{\tau}_i}{\gty{\sigma}_i}{\gty{\tau}'_i} \quad (\forall i) \\
+  \Sigma \vdash \jointSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \jointSup{\tyCallable{\gty{\tau}_1, \ldots, \gty{\tau}_n}{\gty{\tau}}}{\tyCallable{\gty{\sigma}_1, \ldots, \gty{\sigma}_n}{\gty{\sigma}}}{\tyCallable{\gty{\tau}'_1, \ldots, \gty{\tau}'_n}{\gty{\tau}'}}
+}
+\end{mathpar}
+\caption{$\jointSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$; symmetric variants omitted}
+\label{fig:graduality-joint-sup}
+\end{figure}
