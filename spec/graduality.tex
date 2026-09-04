@@ -74,8 +74,8 @@ $\alpha(\gamma(\gty{\tau})) = \gty{\tau}$ by reflection
 
 A relation on types lifts to gradual types through concretisation \citep{garcia2016}: the lifted
 relation holds when the concretisations contain a related pair. A conjunction of such statements
-lifts in the same way, with one witness for each type it mentions; when no type is shared between
-conjuncts the existentials factor, and the lifting is the conjunction of the lifted conjuncts.
+lifts in the same way, with one witness for each metavariable; when the conjuncts share no
+metavariable the existentials factor, and the lifting is the conjunction of the lifted conjuncts.
 Subtyping and equivalence on types are as defined in \specification; equivalence lifts to
 \emph{consistency}.
 
@@ -97,9 +97,9 @@ $\jointSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, over the converse of subtypi
 
 \noindent A judgement of this form holds exactly when its reversal holds, and implies each
 conjunct; the converse fails, because separately lifted conjuncts take their witnesses
-independently. The shared middle type makes the conjunction a relational composition, with the
-middle drawn from $\gamma(\gty{\sigma})$ rather than quantified away; that the lifting of a
-composition is stronger than the composition of the liftings is standard \citep{garcia2016}.
+independently. The shared middle metavariable makes the conjunction a relational composition, with the
+middle witness drawn from $\gamma(\gty{\sigma})$ rather than from all types; that the lifting
+of a composition is stronger than the composition of the liftings is standard \citep{garcia2016}.
 
 \figref{graduality-subtyping} defines \emph{consistent subtyping} by lifting the subtyping rules
 of \specification: types become gradual types, subtyping premises become consistent subtyping,
