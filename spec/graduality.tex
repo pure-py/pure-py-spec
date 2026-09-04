@@ -85,8 +85,8 @@ $\Sigma \vdash \gty{\sigma} \gtyEquiv \gty{\tau}$ if and only if $\Sigma \vdash 
 $\sigma \in \gamma(\gty{\sigma})$ and $\tau \in \gamma(\gty{\tau})$.
 \end{definition}
 
-\begin{definition}[Lifted conjunctions]
-\label{def:lifted-conjunctions}
+\begin{definition}[$\jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, $\jointEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ and $\jointSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$]
+\label{def:joint-judgements}
 $\Sigma \vdash \jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ if and only if
 $\Sigma \vdash \tau \subty \sigma$ and $\Sigma \vdash \tau' \subty \sigma$ for some
 $\tau \in \gamma(\gty{\tau})$, $\tau' \in \gamma(\gty{\tau}')$ and
@@ -132,7 +132,7 @@ the same case analysis, because every positive case is an equivalence.
 \begin{lemma}[Decidability]
 \label{lem:joint-sub-decidable}
 The judgement $\Sigma \vdash \jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ of
-Definition~\ref{def:lifted-conjunctions} is decidable.
+Definition~\ref{def:joint-judgements} is decidable.
 \end{lemma}
 
 \begin{proof}[Proof sketch]
@@ -151,7 +151,7 @@ middle must head both outer types, or the case refutes. Tuples proceed component
 (\ruleName{joint-sub-tuple}); lists and dictionaries need one element witness equivalent to both
 element types (\ruleName{joint-sub-list}, \ruleName{joint-sub-dict}), and callable arguments one
 witness below both argument types (\ruleName{joint-sub-callable}), the other two judgements of
-Definition~\ref{def:lifted-conjunctions}. Each appeal to the hypothesis decreases the order.
+Definition~\ref{def:joint-judgements}. Each appeal to the hypothesis decreases the order.
 \end{proof}
 
 \input{spec/fig/graduality-joint-sub}
