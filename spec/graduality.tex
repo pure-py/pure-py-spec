@@ -108,22 +108,27 @@ $\tyInt \tyEquiv \tau$ and $\tyStr \tyEquiv \tau$.
 \subsection{Joint lifting of the union premises}
 
 The premises of \ruleName{gsubty-union} share their right-hand type, so they must be lifted
-jointly, as one predicate over three gradual types.
+jointly, as one judgement in which the shared type is written once.
 
-\begin{definition}[$\USub$]
-\label{def:usub}
-$\Sigma \vdash \USub(\gty{\tau}, \gty{\tau}'; \gty{\sigma})$ if and only if
-$\Sigma \vdash \tau \subty \sigma$ and $\Sigma \vdash \tau' \subty \sigma$ for some
-$\tau \in \gamma(\gty{\tau})$, $\tau' \in \gamma(\gty{\tau}')$ and $\sigma \in \gamma(\gty{\sigma})$.
+\begin{definition}[Chains]
+\label{def:chains}
+A chain of relations on types lifts through concretisation jointly, with one witness for each
+type written in the chain: $\Sigma \vdash \chainSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ if
+and only if $\Sigma \vdash \tau \subty \sigma$ and $\Sigma \vdash \tau' \subty \sigma$ for some
+$\tau \in \gamma(\gty{\tau})$, $\tau' \in \gamma(\gty{\tau}')$ and
+$\sigma \in \gamma(\gty{\sigma})$, and likewise for
+$\chainEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ and
+$\chainSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$.
 \end{definition}
 
-\noindent The predicate is symmetric in its first two arguments. Replacing the premises of
-\ruleName{gsubty-union} with $\USub$ alone,
+\noindent A chain holds exactly when its reversal holds. When a chain holds, each link holds; the
+converse fails, because separate links take their witnesses independently. Replacing the premises
+of \ruleName{gsubty-union} with the chain that shares $\gty{\sigma}$,
 %
 \begin{mathpar}
 \inferrule*[lab={\ruleName{gsubty-union}}]
 {
-  \Sigma \vdash \USub(\gty{\tau}, \gty{\tau}'; \gty{\sigma})
+  \Sigma \vdash \chainSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
 }
 {
   \Sigma \vdash \tyUnion{\gty{\tau}}{\gty{\tau}'} \gsubty \gty{\sigma}
@@ -133,87 +138,80 @@ $\tau \in \gamma(\gty{\tau})$, $\tau' \in \gamma(\gty{\tau}')$ and $\sigma \in \
 makes the rule match the lifting of subtyping by construction, because a concrete union lies below
 $\sigma$ exactly when both components do; the counterexample above is no longer derivable.
 
-An inductive characterisation of $\USub$ can be extracted from a decidability proof: each case of
-the induction either exhibits witnesses or refutes their existence, and the positive cases, read
-as inference rules, give \figref{graduality-usub}. The proof is a device for finding the rules;
-the surviving obligation, that the rules derive the predicate exactly, follows from the same case
-analysis, because every positive case is an equivalence.
+An inductive characterisation of the chain can be extracted from a decidability proof: each case
+of the induction either exhibits witnesses or refutes their existence, and the positive cases,
+read as inference rules, give \figref{graduality-chain-sub}. The proof is a device for finding
+the rules; the surviving obligation, that the rules derive the judgement exactly, follows from
+the same case analysis, because every positive case is an equivalence.
 
-\begin{theorem}[Decidability of $\USub$]
-\label{thm:usub-decidable}
-The predicate of Definition~\ref{def:usub} is decidable.
+\begin{theorem}[Decidability]
+\label{thm:chain-sub-decidable}
+The judgement $\Sigma \vdash \chainSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ of
+Definition~\ref{def:chains} is decidable.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
 By induction on the triple, ordered by the total size of the three types and then by the size of
-the first; cases on the triple. A left type $\tyAny$ or $\tyNever$ takes the witness $\tyNever$,
-leaving a consistent subtyping check on the other left type (\ruleName{usub-any-left},
-\ruleName{usub-never-left}). A left union rebrackets, because its witness is a union, below
-$\sigma$ exactly when both components are (\ruleName{usub-union}). Otherwise both left witnesses
-are constructor-headed. On the right, $\tyAny$ admits the witness $\tyObject$
-(\ruleName{usub-any-right}). A static right-hand type is its own sole concretisation, so sharing
-is trivial and two consistent subtyping checks remain (\ruleName{usub-static}). For a union on
-the right, inversion sends each left witness into one branch: the same branch
-(\ruleName{usub-union-left}, \ruleName{usub-union-right}), or different branches, in which case
-the witnesses no longer interact (\ruleName{usub-union-split}). A constructor on the right must
-head both left types, or the case refutes. Tuples proceed componentwise (\ruleName{usub-tuple});
-lists and dictionaries need one element witness equivalent to both element types
-(\ruleName{usub-list}, \ruleName{usub-dict}), and callable arguments one witness below both
-argument types (\ruleName{usub-callable}), the liftings $\UEquiv$ and $\USup$ of
-Definition~\ref{def:uequiv-usup}. Each appeal to the hypothesis decreases the order.
+the first; cases on the triple. An end type $\tyAny$ or $\tyNever$ takes the witness $\tyNever$,
+leaving a consistent subtyping check on the other end (\ruleName{chain-sub-any-left},
+\ruleName{chain-sub-never-left}). A union at an end reassociates, because its witness is a union,
+below $\sigma$ exactly when both components are (\ruleName{chain-sub-assoc}). Otherwise both end
+witnesses are constructor-headed. In the middle, $\tyAny$ admits the witness $\tyObject$
+(\ruleName{chain-sub-any}). A static middle type is its own sole concretisation, so sharing is
+trivial and two consistent subtyping checks remain (\ruleName{chain-sub-static}). For a union in
+the middle, inversion sends each end witness into one component: the same component
+(\ruleName{chain-sub-union-left}, \ruleName{chain-sub-union-right}), or different components, in
+which case the witnesses no longer interact (\ruleName{chain-sub-split}). A constructor in the
+middle must head both end types, or the case refutes. Tuples proceed componentwise
+(\ruleName{chain-sub-tuple}); lists and dictionaries need one element witness equivalent to both
+element types (\ruleName{chain-sub-list}, \ruleName{chain-sub-dict}), and callable arguments one
+witness below both argument types (\ruleName{chain-sub-callable}), the other two chains of
+Definition~\ref{def:chains}. Each appeal to the hypothesis decreases the order.
 \end{proof}
 
-\input{spec/fig/graduality-usub}
+\input{spec/fig/graduality-chain-sub}
 
-\begin{definition}[$\UEquiv$ and $\USup$]
-\label{def:uequiv-usup}
-$\Sigma \vdash \UEquiv(\gty{\tau}, \gty{\tau}'; \gty{\sigma})$ if and only if
-$\Sigma \vdash \tau \tyEquiv \sigma$ and $\Sigma \vdash \tau' \tyEquiv \sigma$ for some
-$\tau \in \gamma(\gty{\tau})$, $\tau' \in \gamma(\gty{\tau}')$ and $\sigma \in \gamma(\gty{\sigma})$.
-$\Sigma \vdash \USup(\gty{\tau}, \gty{\tau}'; \gty{\sigma})$ if and only if
-$\Sigma \vdash \sigma \subty \tau$ and $\Sigma \vdash \sigma \subty \tau'$ for some such $\tau$,
-$\tau'$ and $\sigma$.
-\end{definition}
+\subsection{Chains with a shared lower bound}
 
-\noindent The characterisation of $\UEquiv$ by the same method is deferred.
+The rules of \figref{graduality-chain-sub} appeal at callable arguments to chains of the form
+$\chainSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, in which the shared witness lies below the
+two end witnesses, so the method must be repeated for them. The case analysis closes every case
+but one; the positive cases give \figref{graduality-chain-sup}.
 
-\subsection{Rules for $\USup$}
+The induction is on the total size of the triple; cases as before. In the middle, $\tyAny$
+admits the witness $\tyNever$, below every type (\ruleName{chain-sup-any}); a static middle type
+is its own sole concretisation, so sharing is trivial and two consistent subtyping checks remain
+(\ruleName{chain-sup-static}); a middle union that is not static is the residual case, taken up
+below. In the remaining cases the shared witness is constructor-headed. An end type $\tyAny$ or
+$\tyObject$ takes the witness $\tyObject$, above every type, leaving a consistent subtyping
+check on the other end (\ruleName{chain-sup-any-left}, \ruleName{chain-sup-object-left}). For a
+union at an end, inversion sends the shared witness below one component, and the witness for the
+other component is unconstrained (\ruleName{chain-sup-union-left},
+\ruleName{chain-sup-union-right}). A constructor in the middle must head both end types, or the
+case refutes. Tuples proceed componentwise (\ruleName{chain-sup-tuple}); lists and dictionaries
+need one element witness equivalent to both element types (\ruleName{chain-sup-list},
+\ruleName{chain-sup-dict}); callable arguments need one argument witness above both argument
+types, chains with a shared upper bound (\ruleName{chain-sup-callable}), so the two judgements
+are mutually recursive.
 
-The rules of \figref{graduality-usub} appeal to $\USup$ at callable arguments, so the method must
-be repeated for $\USup$. The case analysis closes every case but one; the positive cases give
-\figref{graduality-usup}.
+\input{spec/fig/graduality-chain-sup}
 
-The induction is on the total size of the triple; cases as before. On the right, $\tyAny$ admits
-the witness $\tyNever$, below every type (\ruleName{usup-any-right}); a static right-hand type is
-its own sole concretisation, so sharing is trivial and two consistent subtyping checks remain
-(\ruleName{usup-static}); a right-hand union that is not static is the residual case, taken up
-below. In the remaining cases the shared witness is constructor-headed. A left type $\tyAny$ or
-$\tyObject$ takes the witness $\tyObject$, above every type, leaving a consistent subtyping check
-on the other left type (\ruleName{usup-any-left}, \ruleName{usup-object-left}). For a union on the
-left, inversion sends the shared witness below one component, and the witness for the other
-component is unconstrained (\ruleName{usup-union-left}, \ruleName{usup-union-right}). A
-constructor on the right must head both left types, or the case refutes. Tuples proceed
-componentwise (\ruleName{usup-tuple}); lists and dictionaries need one element witness equivalent
-to both element types (\ruleName{usup-list}, \ruleName{usup-dict}); callable arguments need one
-argument witness above both argument types, instances of $\USub$ (\ruleName{usup-callable}), so
-the two predicates are mutually recursive.
+The residual case is a middle union $\tyUnion{\gty{\sigma}}{\gty{\sigma}'}$ that is not static.
+Its witness is a union, below a type exactly when both components are, so the two links become
+four constraints, relating each component witness to each end witness; every witness now appears
+in two constraints. The case amounts to the two chains
+$\chainSub{\gty{\sigma}}{\gty{\tau}}{\gty{\sigma}'}$ and
+$\chainSub{\gty{\sigma}}{\gty{\tau}'}{\gty{\sigma}'}$ with the witnesses for $\gty{\sigma}$ and
+$\gty{\sigma}'$ shared between them, a cycle of four constraints, which no single chain
+expresses. Splitting the union instead, with one chain per component, is unsound:
+$\chainSup{\tyList{\tyAny}}{\tyList{\tyInt}}{\tyList{\tyAny}}$ and
+$\chainSup{\tyList{\tyAny}}{\tyList{\tyStr}}{\tyList{\tyAny}}$ hold, but
+$\chainSup{\tyList{\tyAny}}{\tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}}}{\tyList{\tyAny}}$ needs
+an element witness equivalent to both $\tyInt$ and $\tyStr$.
 
-\input{spec/fig/graduality-usup}
-
-The residual case is a right-hand union $\tyUnion{\gty{\sigma}}{\gty{\sigma}'}$ that is not
-static. Its witness is a union, below a type exactly when both components are, so the two
-constraints become four, relating each component witness to each left witness; every witness now
-appears in two constraints. The case amounts to $\USub(\gty{\sigma}, \gty{\sigma}'; \gty{\tau})$
-and $\USub(\gty{\sigma}, \gty{\sigma}'; \gty{\tau}')$ with the component witnesses shared between
-the two instances, which no predicate over three gradual types expresses. Splitting the union
-instead, with one $\USup$ premise per component, is unsound:
-$\USup(\tyList{\tyAny}, \tyList{\tyAny}; \tyList{\tyInt})$ and
-$\USup(\tyList{\tyAny}, \tyList{\tyAny}; \tyList{\tyStr})$ hold, but
-$\USup(\tyList{\tyAny}, \tyList{\tyAny}; \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}})$ needs an
-element witness equivalent to both $\tyInt$ and $\tyStr$.
-
-Sharing the pair of component witnesses suggests a predicate over four gradual types, but the
-widening does not stop there: a union on the left then sends each component witness below a
-component of the left union independently, so the constraints no longer relate every pair. The
+Sharing the pair of component witnesses suggests a judgement over four gradual types, but the
+widening does not stop there: a union at an end then sends each component witness below a
+component of the end union independently, so the constraints no longer relate every pair. The
 general form is a finite set of subtyping and equivalence constraints over shared witnesses, a
-constraint system in the sense of \citet{garcia2015}; its treatment is deferred.
+constraint system in the sense of \citet{garcia2015}; its treatment, with the characterisation
+of the equivalence chain, is deferred.

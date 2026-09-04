@@ -1,0 +1,106 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma \vdash \chainSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{chain-sub-any}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \chainSub{\gty{\tau}}{\tyAny}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sub-any-left}}]
+{
+  \Sigma \vdash \gty{\tau} \gsubty \gty{\sigma}
+}
+{
+  \Sigma \vdash \chainSub{\tyAny}{\gty{\sigma}}{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sub-never-left}}]
+{
+  \Sigma \vdash \gty{\tau} \gsubty \gty{\sigma}
+}
+{
+  \Sigma \vdash \chainSub{\tyNever}{\gty{\sigma}}{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sub-assoc}}]
+{
+  \Sigma \vdash \chainSub{\gty{\tau}}{\gty{\sigma}}{\tyUnion{\gty{\tau}'}{\gty{\tau}''}}
+}
+{
+  \Sigma \vdash \chainSub{\tyUnion{\gty{\tau}}{\gty{\tau}'}}{\gty{\sigma}}{\gty{\tau}''}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sub-static}}]
+{
+  \Sigma \vdash \gty{\tau} \gsubty \sigma \\
+  \Sigma \vdash \gty{\tau}' \gsubty \sigma
+}
+{
+  \Sigma \vdash \chainSub{\gty{\tau}}{\sigma}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sub-union-left}}]
+{
+  \Sigma \vdash \chainSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \chainSub{\gty{\tau}}{\tyUnion{\gty{\sigma}}{\gty{\sigma}'}}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sub-union-right}}]
+{
+  \Sigma \vdash \chainSub{\gty{\tau}}{\gty{\sigma}'}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \chainSub{\gty{\tau}}{\tyUnion{\gty{\sigma}}{\gty{\sigma}'}}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sub-split}}]
+{
+  \Sigma \vdash \gty{\tau} \gsubty \gty{\sigma} \\
+  \Sigma \vdash \gty{\tau}' \gsubty \gty{\sigma}'
+}
+{
+  \Sigma \vdash \chainSub{\gty{\tau}}{\tyUnion{\gty{\sigma}}{\gty{\sigma}'}}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sub-list}}]
+{
+  \Sigma \vdash \chainEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \chainSub{\tyList{\gty{\tau}}}{\tyList{\gty{\sigma}}}{\tyList{\gty{\tau}'}}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sub-dict}}]
+{
+  \Sigma \vdash \chainEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \chainSub{\tyDict{\gty{\tau}}}{\tyDict{\gty{\sigma}}}{\tyDict{\gty{\tau}'}}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sub-tuple}}]
+{
+  \Sigma \vdash \chainSub{\gty{\tau}_i}{\gty{\sigma}_i}{\gty{\tau}'_i} \quad (\forall i)
+}
+{
+  \Sigma \vdash \chainSub{\tyTuple{\gty{\tau}_1, \ldots, \gty{\tau}_n}}{\tyTuple{\gty{\sigma}_1, \ldots, \gty{\sigma}_n}}{\tyTuple{\gty{\tau}'_1, \ldots, \gty{\tau}'_n}}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sub-callable}}]
+{
+  \Sigma \vdash \chainSup{\gty{\tau}_i}{\gty{\sigma}_i}{\gty{\tau}'_i} \quad (\forall i) \\
+  \Sigma \vdash \chainSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \chainSub{\tyCallable{\gty{\tau}_1, \ldots, \gty{\tau}_n}{\gty{\tau}}}{\tyCallable{\gty{\sigma}_1, \ldots, \gty{\sigma}_n}{\gty{\sigma}}}{\tyCallable{\gty{\tau}'_1, \ldots, \gty{\tau}'_n}{\gty{\tau}'}}
+}
+\end{mathpar}
+\caption{Chains with a shared upper bound: rules extracted from the decidability proof, up to reversal}
+\label{fig:graduality-chain-sub}
+\end{figure}

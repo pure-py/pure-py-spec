@@ -1,0 +1,89 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma \vdash \chainSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{chain-sup-any}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \chainSup{\gty{\tau}}{\tyAny}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sup-any-left}}]
+{
+  \Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}
+}
+{
+  \Sigma \vdash \chainSup{\tyAny}{\gty{\sigma}}{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sup-object-left}}]
+{
+  \Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}
+}
+{
+  \Sigma \vdash \chainSup{\tyObject}{\gty{\sigma}}{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sup-static}}]
+{
+  \Sigma \vdash \sigma \gsubty \gty{\tau} \\
+  \Sigma \vdash \sigma \gsubty \gty{\tau}'
+}
+{
+  \Sigma \vdash \chainSup{\gty{\tau}}{\sigma}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sup-union-left}}]
+{
+  \Sigma \vdash \chainSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}''}
+}
+{
+  \Sigma \vdash \chainSup{\tyUnion{\gty{\tau}}{\gty{\tau}'}}{\gty{\sigma}}{\gty{\tau}''}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sup-union-right}}]
+{
+  \Sigma \vdash \chainSup{\gty{\tau}'}{\gty{\sigma}}{\gty{\tau}''}
+}
+{
+  \Sigma \vdash \chainSup{\tyUnion{\gty{\tau}}{\gty{\tau}'}}{\gty{\sigma}}{\gty{\tau}''}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sup-list}}]
+{
+  \Sigma \vdash \chainEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \chainSup{\tyList{\gty{\tau}}}{\tyList{\gty{\sigma}}}{\tyList{\gty{\tau}'}}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sup-dict}}]
+{
+  \Sigma \vdash \chainEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \chainSup{\tyDict{\gty{\tau}}}{\tyDict{\gty{\sigma}}}{\tyDict{\gty{\tau}'}}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sup-tuple}}]
+{
+  \Sigma \vdash \chainSup{\gty{\tau}_i}{\gty{\sigma}_i}{\gty{\tau}'_i} \quad (\forall i)
+}
+{
+  \Sigma \vdash \chainSup{\tyTuple{\gty{\tau}_1, \ldots, \gty{\tau}_n}}{\tyTuple{\gty{\sigma}_1, \ldots, \gty{\sigma}_n}}{\tyTuple{\gty{\tau}'_1, \ldots, \gty{\tau}'_n}}
+}
+\and
+\inferrule*[lab={\ruleName{chain-sup-callable}}]
+{
+  \Sigma \vdash \chainSub{\gty{\tau}_i}{\gty{\sigma}_i}{\gty{\tau}'_i} \quad (\forall i) \\
+  \Sigma \vdash \chainSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \chainSup{\tyCallable{\gty{\tau}_1, \ldots, \gty{\tau}_n}{\gty{\tau}}}{\tyCallable{\gty{\sigma}_1, \ldots, \gty{\sigma}_n}{\gty{\sigma}}}{\tyCallable{\gty{\tau}'_1, \ldots, \gty{\tau}'_n}{\gty{\tau}'}}
+}
+\end{mathpar}
+\caption{Chains with a shared lower bound: rules extracted from the case analysis, up to reversal; a middle union that is not static has no rule}
+\label{fig:graduality-chain-sup}
+\end{figure}
