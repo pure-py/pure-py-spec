@@ -1,0 +1,106 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma \vdash \threeSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{three-sub-any}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \threeSub{\gty{\tau}}{\tyAny}{\gty{\sigma}}
+}
+\and
+\inferrule*[lab={\ruleName{three-sub-any-left}}]
+{
+  \Sigma \vdash \gty{\tau} \gsubty \gty{\sigma}
+}
+{
+  \Sigma \vdash \threeSub{\tyAny}{\gty{\sigma}}{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{three-sub-never-left}}]
+{
+  \Sigma \vdash \gty{\tau} \gsubty \gty{\sigma}
+}
+{
+  \Sigma \vdash \threeSub{\tyNever}{\gty{\sigma}}{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{three-sub-assoc}}]
+{
+  \Sigma \vdash \threeSub{\gty{\tau}}{\gty{\sigma}}{\tyUnion{\gty{\tau}'}{\gty{\sigma}'}}
+}
+{
+  \Sigma \vdash \threeSub{\tyUnion{\gty{\tau}}{\gty{\tau}'}}{\gty{\sigma}}{\gty{\sigma}'}
+}
+\and
+\inferrule*[lab={\ruleName{three-sub-static}}]
+{
+  \Sigma \vdash \gty{\tau} \gsubty \sigma \\
+  \Sigma \vdash \gty{\tau}' \gsubty \sigma
+}
+{
+  \Sigma \vdash \threeSub{\gty{\tau}}{\sigma}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{three-sub-union-left}}]
+{
+  \Sigma \vdash \threeSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \threeSub{\gty{\tau}}{\tyUnion{\gty{\sigma}}{\gty{\sigma}'}}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{three-sub-union-right}}]
+{
+  \Sigma \vdash \threeSub{\gty{\tau}}{\gty{\sigma}'}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \threeSub{\gty{\tau}}{\tyUnion{\gty{\sigma}}{\gty{\sigma}'}}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{three-sub-split}}]
+{
+  \Sigma \vdash \gty{\tau} \gsubty \gty{\sigma} \\
+  \Sigma \vdash \gty{\tau}' \gsubty \gty{\sigma}'
+}
+{
+  \Sigma \vdash \threeSub{\gty{\tau}}{\tyUnion{\gty{\sigma}}{\gty{\sigma}'}}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{three-sub-list}}]
+{
+  \Sigma \vdash \threeEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \threeSub{\tyList{\gty{\tau}}}{\tyList{\gty{\sigma}}}{\tyList{\gty{\tau}'}}
+}
+\and
+\inferrule*[lab={\ruleName{three-sub-dict}}]
+{
+  \Sigma \vdash \threeEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \threeSub{\tyDict{\gty{\tau}}}{\tyDict{\gty{\sigma}}}{\tyDict{\gty{\tau}'}}
+}
+\and
+\inferrule*[lab={\ruleName{three-sub-tuple}}]
+{
+  \Sigma \vdash \threeSub{\gty{\tau}_i}{\gty{\sigma}_i}{\gty{\tau}'_i} \quad (\forall i)
+}
+{
+  \Sigma \vdash \threeSub{\tyTuple{\gty{\tau}_1, \ldots, \gty{\tau}_n}}{\tyTuple{\gty{\sigma}_1, \ldots, \gty{\sigma}_n}}{\tyTuple{\gty{\tau}'_1, \ldots, \gty{\tau}'_n}}
+}
+\and
+\inferrule*[lab={\ruleName{three-sub-callable}}]
+{
+  \Sigma \vdash \threeSup{\gty{\tau}_i}{\gty{\sigma}_i}{\gty{\tau}'_i} \quad (\forall i) \\
+  \Sigma \vdash \threeSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \threeSub{\tyCallable{\gty{\tau}_1, \ldots, \gty{\tau}_n}{\gty{\tau}}}{\tyCallable{\gty{\sigma}_1, \ldots, \gty{\sigma}_n}{\gty{\sigma}}}{\tyCallable{\gty{\tau}'_1, \ldots, \gty{\tau}'_n}{\gty{\tau}'}}
+}
+\end{mathpar}
+\caption{$\threeSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$; symmetric variants omitted}
+\label{fig:graduality-three-sub}
+\end{figure}

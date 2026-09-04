@@ -1,0 +1,89 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma \vdash \threeSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{three-sup-any}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \threeSup{\gty{\tau}}{\tyAny}{\gty{\sigma}}
+}
+\and
+\inferrule*[lab={\ruleName{three-sup-any-left}}]
+{
+  \Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}
+}
+{
+  \Sigma \vdash \threeSup{\tyAny}{\gty{\sigma}}{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{three-sup-object-left}}]
+{
+  \Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}
+}
+{
+  \Sigma \vdash \threeSup{\tyObject}{\gty{\sigma}}{\gty{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{three-sup-static}}]
+{
+  \Sigma \vdash \sigma \gsubty \gty{\tau} \\
+  \Sigma \vdash \sigma \gsubty \gty{\tau}'
+}
+{
+  \Sigma \vdash \threeSup{\gty{\tau}}{\sigma}{\gty{\tau}'}
+}
+\and
+\inferrule*[lab={\ruleName{three-sup-union-left}}]
+{
+  \Sigma \vdash \threeSup{\gty{\tau}}{\gty{\sigma}}{\gty{\sigma}'}
+}
+{
+  \Sigma \vdash \threeSup{\tyUnion{\gty{\tau}}{\gty{\tau}'}}{\gty{\sigma}}{\gty{\sigma}'}
+}
+\and
+\inferrule*[lab={\ruleName{three-sup-union-right}}]
+{
+  \Sigma \vdash \threeSup{\gty{\tau}'}{\gty{\sigma}}{\gty{\sigma}'}
+}
+{
+  \Sigma \vdash \threeSup{\tyUnion{\gty{\tau}}{\gty{\tau}'}}{\gty{\sigma}}{\gty{\sigma}'}
+}
+\and
+\inferrule*[lab={\ruleName{three-sup-list}}]
+{
+  \Sigma \vdash \threeEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \threeSup{\tyList{\gty{\tau}}}{\tyList{\gty{\sigma}}}{\tyList{\gty{\tau}'}}
+}
+\and
+\inferrule*[lab={\ruleName{three-sup-dict}}]
+{
+  \Sigma \vdash \threeEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \threeSup{\tyDict{\gty{\tau}}}{\tyDict{\gty{\sigma}}}{\tyDict{\gty{\tau}'}}
+}
+\and
+\inferrule*[lab={\ruleName{three-sup-tuple}}]
+{
+  \Sigma \vdash \threeSup{\gty{\tau}_i}{\gty{\sigma}_i}{\gty{\tau}'_i} \quad (\forall i)
+}
+{
+  \Sigma \vdash \threeSup{\tyTuple{\gty{\tau}_1, \ldots, \gty{\tau}_n}}{\tyTuple{\gty{\sigma}_1, \ldots, \gty{\sigma}_n}}{\tyTuple{\gty{\tau}'_1, \ldots, \gty{\tau}'_n}}
+}
+\and
+\inferrule*[lab={\ruleName{three-sup-callable}}]
+{
+  \Sigma \vdash \threeSub{\gty{\tau}_i}{\gty{\sigma}_i}{\gty{\tau}'_i} \quad (\forall i) \\
+  \Sigma \vdash \threeSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
+}
+{
+  \Sigma \vdash \threeSup{\tyCallable{\gty{\tau}_1, \ldots, \gty{\tau}_n}{\gty{\tau}}}{\tyCallable{\gty{\sigma}_1, \ldots, \gty{\sigma}_n}{\gty{\sigma}}}{\tyCallable{\gty{\tau}'_1, \ldots, \gty{\tau}'_n}{\gty{\tau}'}}
+}
+\end{mathpar}
+\caption{$\threeSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$; symmetric variants omitted}
+\label{fig:graduality-three-sup}
+\end{figure}

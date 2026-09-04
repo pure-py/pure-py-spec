@@ -85,14 +85,14 @@ $\Sigma \vdash \gty{\sigma} \gtyEquiv \gty{\tau}$ if and only if $\Sigma \vdash 
 $\sigma \in \gamma(\gty{\sigma})$ and $\tau \in \gamma(\gty{\tau})$.
 \end{definition}
 
-\begin{definition}[$\jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, $\jointEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ and $\jointSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$]
-\label{def:joint-judgements}
-$\Sigma \vdash \jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ if and only if
+\begin{definition}[Consistent three-way subtype, supertype and equivalence relations]
+\label{def:three-way-relations}
+$\Sigma \vdash \threeSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ if and only if
 $\Sigma \vdash \tau \subty \sigma$ and $\Sigma \vdash \tau' \subty \sigma$ for some
 $\tau \in \gamma(\gty{\tau})$, $\tau' \in \gamma(\gty{\tau}')$ and
 $\sigma \in \gamma(\gty{\sigma})$; likewise
-$\jointEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, over equivalence, and
-$\jointSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, over the converse of subtyping.
+$\threeSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, over the converse of subtyping, and
+$\threeEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, over equivalence.
 \end{definition}
 
 \noindent A judgement of this form holds exactly when its reversal holds, and implies each
@@ -105,7 +105,7 @@ of a composition is stronger than the composition of the liftings is standard \c
 of \specification: types become gradual types, subtyping premises become consistent subtyping,
 equivalence premises become consistency, and two axioms place $\tyAny$ below and above every
 gradual type. The premises of \ruleName{gsubty-union} share their right-hand type, so they lift
-jointly, to $\jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$; a union type lies below a
+jointly, to $\threeSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$; a union type lies below a
 type exactly when both its components do, so the rule matches the lifting of subtyping. Lifting
 the premises separately would derive
 $\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \gsubty \tyList{\tyAny}$, since
@@ -123,75 +123,76 @@ If $\Sigma \vdash \sigma \subty \tau$ for some $\sigma \in \gamma(\gty{\sigma})$
 $\tau \in \gamma(\gty{\tau})$ then $\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$.
 \end{lemma}
 
-An inductive characterisation of $\jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ can be extracted from a decidability proof: each case
+An inductive characterisation of the consistent three-way subtype relation can be extracted
+from a decidability proof: each case
 of the induction either exhibits witnesses or refutes their existence, and the positive cases,
-read as inference rules, give \figref{graduality-joint-sub}. The proof is a device for finding
+read as inference rules, give \figref{graduality-three-sub}. The proof is a device for finding
 the rules; the surviving obligation, that the rules derive the judgement exactly, follows from
 the same case analysis, because every positive case is an equivalence.
 
 \begin{lemma}[Decidability]
-\label{lem:joint-sub-decidable}
-The judgement $\Sigma \vdash \jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ of
-Definition~\ref{def:joint-judgements} is decidable.
+\label{lem:three-sub-decidable}
+The judgement $\Sigma \vdash \threeSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ of
+Definition~\ref{def:three-way-relations} is decidable.
 \end{lemma}
 
 \begin{proof}[Proof sketch]
 By induction on the triple, ordered by the total size of the three types and then by the size of
 the first; cases on the triple. An outer type $\tyAny$ or $\tyNever$ takes the witness $\tyNever$,
-leaving a consistent subtyping check on the other outer type (\ruleName{joint-sub-any-left},
-\ruleName{joint-sub-never-left}). A union in an outer position reassociates, because its witness is a union,
-below $\sigma$ exactly when both components are (\ruleName{joint-sub-assoc}). Otherwise both outer
+leaving a consistent subtyping check on the other outer type (\ruleName{three-sub-any-left},
+\ruleName{three-sub-never-left}). A union in an outer position reassociates, because its witness is a union,
+below $\sigma$ exactly when both components are (\ruleName{three-sub-assoc}). Otherwise both outer
 witnesses are constructor-headed. In the middle, $\tyAny$ admits the witness $\tyObject$
-(\ruleName{joint-sub-any}). A static middle type is its own sole concretisation, so sharing is
-trivial and two consistent subtyping checks remain (\ruleName{joint-sub-static}). For a union in
+(\ruleName{three-sub-any}). A static middle type is its own sole concretisation, so sharing is
+trivial and two consistent subtyping checks remain (\ruleName{three-sub-static}). For a union in
 the middle, inversion sends each outer witness into one component: the same component
-(\ruleName{joint-sub-union-left}, \ruleName{joint-sub-union-right}), or different components, in
-which case the witnesses no longer interact (\ruleName{joint-sub-split}). A constructor in the
+(\ruleName{three-sub-union-left}, \ruleName{three-sub-union-right}), or different components, in
+which case the witnesses no longer interact (\ruleName{three-sub-split}). A constructor in the
 middle must head both outer types, or the case refutes. Tuples proceed componentwise
-(\ruleName{joint-sub-tuple}); lists and dictionaries need one element witness equivalent to both
-element types (\ruleName{joint-sub-list}, \ruleName{joint-sub-dict}), and callable arguments one
-witness below both argument types (\ruleName{joint-sub-callable}), the other two judgements of
-Definition~\ref{def:joint-judgements}. Each appeal to the hypothesis decreases the order.
+(\ruleName{three-sub-tuple}); lists and dictionaries need one element witness equivalent to both
+element types (\ruleName{three-sub-list}, \ruleName{three-sub-dict}), and callable arguments one
+witness below both argument types (\ruleName{three-sub-callable}), the other two judgements of
+Definition~\ref{def:three-way-relations}. Each appeal to the hypothesis decreases the order.
 \end{proof}
 
-\input{spec/fig/graduality-joint-sub}
+\input{spec/fig/graduality-three-sub}
 
-\subsection{Rules for $\jointSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$}
+\subsection{Rules for $\threeSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$}
 
-The rules of \figref{graduality-joint-sub} appeal at callable arguments to judgements of the form
-$\jointSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, in which the middle witness lies below the
-outer witnesses, so the method must be repeated for them. The case analysis closes every case
-but one; the positive cases give \figref{graduality-joint-sup}.
+The rules of \figref{graduality-three-sub} appeal at callable arguments to the consistent
+three-way supertype relation, in which the middle witness lies below the outer witnesses, so the
+method must be repeated for it. The case analysis closes every case
+but one; the positive cases give \figref{graduality-three-sup}.
 
 The induction is on the total size of the triple; cases as before. In the middle, $\tyAny$
-admits the witness $\tyNever$, below every type (\ruleName{joint-sup-any}); a static middle type
+admits the witness $\tyNever$, below every type (\ruleName{three-sup-any}); a static middle type
 is its own sole concretisation, so sharing is trivial and two consistent subtyping checks remain
-(\ruleName{joint-sup-static}); a middle union that is not static is the residual case, taken up
+(\ruleName{three-sup-static}); a middle union that is not static is the residual case, taken up
 below. In the remaining cases the middle witness is constructor-headed. An outer type $\tyAny$ or
 $\tyObject$ takes the witness $\tyObject$, above every type, leaving a consistent subtyping
-check on the other outer type (\ruleName{joint-sup-any-left}, \ruleName{joint-sup-object-left}). For a
+check on the other outer type (\ruleName{three-sup-any-left}, \ruleName{three-sup-object-left}). For a
 union in an outer position, inversion sends the middle witness below one component, and the witness for the
-other component is unconstrained (\ruleName{joint-sup-union-left},
-\ruleName{joint-sup-union-right}). A constructor in the middle must head both outer types, or the
-case refutes. Tuples proceed componentwise (\ruleName{joint-sup-tuple}); lists and dictionaries
-need one element witness equivalent to both element types (\ruleName{joint-sup-list},
-\ruleName{joint-sup-dict}); callable arguments need one argument witness above both argument
-types, the judgements of \figref{graduality-joint-sub} (\ruleName{joint-sup-callable}), so the two judgements
+other component is unconstrained (\ruleName{three-sup-union-left},
+\ruleName{three-sup-union-right}). A constructor in the middle must head both outer types, or the
+case refutes. Tuples proceed componentwise (\ruleName{three-sup-tuple}); lists and dictionaries
+need one element witness equivalent to both element types (\ruleName{three-sup-list},
+\ruleName{three-sup-dict}); callable arguments need one argument witness above both argument
+types, the judgements of \figref{graduality-three-sub} (\ruleName{three-sup-callable}), so the two judgements
 are mutually recursive.
 
-\input{spec/fig/graduality-joint-sup}
+\input{spec/fig/graduality-three-sup}
 
 The residual case is a middle union $\tyUnion{\gty{\sigma}}{\gty{\sigma}'}$ that is not static.
 Its witness is a union, below a type exactly when both components are, so the two conjuncts become
 four constraints, relating each component witness to each outer witness; every witness now appears
 in two constraints. The case amounts to the two judgements
-$\jointSub{\gty{\sigma}}{\gty{\tau}}{\gty{\sigma}'}$ and
-$\jointSub{\gty{\sigma}}{\gty{\tau}'}{\gty{\sigma}'}$ with the witnesses for $\gty{\sigma}$ and
+$\threeSub{\gty{\sigma}}{\gty{\tau}}{\gty{\sigma}'}$ and
+$\threeSub{\gty{\sigma}}{\gty{\tau}'}{\gty{\sigma}'}$ with the witnesses for $\gty{\sigma}$ and
 $\gty{\sigma}'$ shared between them, a cycle of four constraints, which no one judgement
 expresses. Splitting the union instead, with one judgement per component, is unsound:
-$\jointSup{\tyList{\tyAny}}{\tyList{\tyInt}}{\tyList{\tyAny}}$ and
-$\jointSup{\tyList{\tyAny}}{\tyList{\tyStr}}{\tyList{\tyAny}}$ hold, but
-$\jointSup{\tyList{\tyAny}}{\tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}}}{\tyList{\tyAny}}$ needs
+$\threeSup{\tyList{\tyAny}}{\tyList{\tyInt}}{\tyList{\tyAny}}$ and
+$\threeSup{\tyList{\tyAny}}{\tyList{\tyStr}}{\tyList{\tyAny}}$ hold, but
+$\threeSup{\tyList{\tyAny}}{\tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}}}{\tyList{\tyAny}}$ needs
 an element witness equivalent to both $\tyInt$ and $\tyStr$.
 
 Sharing the pair of component witnesses suggests a judgement over four gradual types, but the
@@ -199,4 +200,4 @@ widening does not stop there: a union in an outer position then sends each compo
 independently, so the constraints no longer relate every pair. The
 general form is a finite set of subtyping and equivalence constraints over shared witnesses, a
 constraint system in the sense of \citet{garcia2015}; its treatment, with the characterisation
-of $\jointEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, is deferred.
+of $\threeEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, is deferred.
