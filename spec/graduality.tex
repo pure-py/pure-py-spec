@@ -74,8 +74,10 @@ $\alpha(\gamma(\gty{\tau})) = \gty{\tau}$ by reflection
 
 A relation on types lifts to gradual types through concretisation \citep{garcia2016}: the lifted
 relation holds when the concretisations contain a related pair. A conjunction of such statements
-lifts in the same way, with one witness for each type it mentions. Subtyping and equivalence on
-types are as defined in \specification; equivalence lifts to \emph{consistency}.
+lifts in the same way, with one witness for each type it mentions; when no type is shared between
+conjuncts the existentials factor, and the lifting is the conjunction of the lifted conjuncts.
+Subtyping and equivalence on types are as defined in \specification; equivalence lifts to
+\emph{consistency}.
 
 \begin{definition}[Consistency]
 \label{def:consistency}
