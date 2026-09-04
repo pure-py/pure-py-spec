@@ -171,27 +171,27 @@ Definition~\ref{def:chains}. Each appeal to the hypothesis decreases the order.
 
 \input{spec/fig/graduality-chain-sub}
 
-\subsection{Chains with a shared lower bound}
+\subsection{Chains $\chainSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$}
 
 The rules of \figref{graduality-chain-sub} appeal at callable arguments to chains of the form
-$\chainSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, in which the shared witness lies below the
-two end witnesses, so the method must be repeated for them. The case analysis closes every case
+$\chainSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, in which the middle witness lies below the
+end witnesses, so the method must be repeated for them. The case analysis closes every case
 but one; the positive cases give \figref{graduality-chain-sup}.
 
 The induction is on the total size of the triple; cases as before. In the middle, $\tyAny$
 admits the witness $\tyNever$, below every type (\ruleName{chain-sup-any}); a static middle type
 is its own sole concretisation, so sharing is trivial and two consistent subtyping checks remain
 (\ruleName{chain-sup-static}); a middle union that is not static is the residual case, taken up
-below. In the remaining cases the shared witness is constructor-headed. An end type $\tyAny$ or
+below. In the remaining cases the middle witness is constructor-headed. An end type $\tyAny$ or
 $\tyObject$ takes the witness $\tyObject$, above every type, leaving a consistent subtyping
 check on the other end (\ruleName{chain-sup-any-left}, \ruleName{chain-sup-object-left}). For a
-union at an end, inversion sends the shared witness below one component, and the witness for the
+union at an end, inversion sends the middle witness below one component, and the witness for the
 other component is unconstrained (\ruleName{chain-sup-union-left},
 \ruleName{chain-sup-union-right}). A constructor in the middle must head both end types, or the
 case refutes. Tuples proceed componentwise (\ruleName{chain-sup-tuple}); lists and dictionaries
 need one element witness equivalent to both element types (\ruleName{chain-sup-list},
 \ruleName{chain-sup-dict}); callable arguments need one argument witness above both argument
-types, chains with a shared upper bound (\ruleName{chain-sup-callable}), so the two judgements
+types, the chains of \figref{graduality-chain-sub} (\ruleName{chain-sup-callable}), so the two judgements
 are mutually recursive.
 
 \input{spec/fig/graduality-chain-sup}
