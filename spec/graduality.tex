@@ -129,8 +129,8 @@ $\sigma \in \gamma(\gty{\sigma})$.
 \end{lemma}
 
 \begin{proof}[Proof sketch]
-By induction on the triple, ordered by the total size of the three types and then by the size of
-the first; cases on the triple, where each case matches one rule and is an equivalence. An outer
+By induction on the triple, ordered lexicographically by the total size of the three types and
+then by the size of the first; cases on the triple, where each case matches one rule and is an equivalence. An outer
 type $\tyAny$ or $\tyNever$ takes the witness $\tyNever$, leaving a consistent subtyping check on
 the other outer type (\ruleName{three-sub-any-left}, \ruleName{three-sub-never-left}). A union in
 an outer position reassociates, because its witness is a union, below a type exactly when both
