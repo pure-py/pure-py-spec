@@ -107,15 +107,15 @@ $\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \gsubty \tyList{\tyAny
 $\tyInt \gtyEquiv \tyAny$ and $\tyStr \gtyEquiv \tyAny$, although
 $\gamma(\tyList{\tyAny}) = \set{\tyList{\tau} \mid \tau \in \TypeSet}$, and
 $\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \subty \tyList{\tau}$ requires
-$\tyInt \tyEquiv \tau$ and $\tyStr \tyEquiv \tau$. The intended characterisation is the lifting
-of subtyping itself; the rules satisfy one direction.
+$\tyInt \tyEquiv \tau$ and $\tyStr \tyEquiv \tau$.
 
 \input{spec/fig/graduality-subtyping}
 
-\begin{lemma}[Completeness of the consistent subtyping rules]
-\label{lem:consistent-subtyping-complete}
-If $\Sigma \vdash \sigma \subty \tau$ for some $\sigma \in \gamma(\gty{\sigma})$ and
-$\tau \in \gamma(\gty{\tau})$ then $\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$.
+\begin{lemma}[Characterisation of consistent subtyping]
+\label{lem:consistent-subtyping-characterisation}
+$\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$ if and only if
+$\Sigma \vdash \sigma \subty \tau$ for some $\sigma \in \gamma(\gty{\sigma})$ and
+$\tau \in \gamma(\gty{\tau})$.
 \end{lemma}
 
 \input{spec/fig/graduality-three-sub}
