@@ -111,8 +111,8 @@ $\tyInt \tyEquiv \tau$ and $\tyStr \tyEquiv \tau$.
 
 \input{spec/fig/graduality-subtyping}
 
-\begin{lemma}[Characterisation of consistent subtyping]
-\label{lem:consistent-subtyping-characterisation}
+\begin{lemma}[Correctness of consistent subtyping]
+\label{lem:consistent-subtyping-correct}
 $\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$ if and only if
 $\Sigma \vdash \sigma \subty \tau$ for some $\sigma \in \gamma(\gty{\sigma})$ and
 $\tau \in \gamma(\gty{\tau})$.
@@ -120,8 +120,8 @@ $\tau \in \gamma(\gty{\tau})$.
 
 \input{spec/fig/graduality-three-sub}
 
-\begin{lemma}[Characterisation of the three-way subtype relation]
-\label{lem:three-sub-characterisation}
+\begin{lemma}[Correctness of the three-way subtype relation]
+\label{lem:three-sub-correct}
 $\Sigma \vdash \threeSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ if and only if
 $\Sigma \vdash \tau \subty \sigma$ and $\Sigma \vdash \tau' \subty \sigma$ for some
 $\tau \in \gamma(\gty{\tau})$, $\tau' \in \gamma(\gty{\tau}')$ and
@@ -152,7 +152,7 @@ Definition~\ref{def:three-sup-equiv}. Each appeal to the hypothesis decreases th
 
 The rules of \figref{graduality-three-sub} take the supertype relation as premises at callable
 arguments. \figref{graduality-three-sup} gives rules for it by the case analysis of
-Lemma~\ref{lem:three-sub-characterisation}, with the subtyping constraints reversed; every case
+Lemma~\ref{lem:three-sub-correct}, with the subtyping constraints reversed; every case
 closes except one.
 
 \begin{lemma}[Soundness of the supertype rules]
