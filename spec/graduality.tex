@@ -101,8 +101,8 @@ $\Sigma \vdash \threeEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, over equival
 three-way subtype relation of \figref{graduality-three-sub}, by lifting the subtyping rules of
 \specification: types become gradual types, subtyping premises become consistent subtyping,
 equivalence premises become consistent equivalence, and two axioms place $\tyAny$ below and above every
-gradual type. The two premises share $\gty{\sigma}$ and are replaced by
-the three-way premise; lifted separately they would derive
+gradual type. The two premises of \ruleName{gsubty-union} share $\gty{\sigma}$ and are
+replaced by the three-way premise; lifted separately they would derive
 $\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \gsubty \tyList{\tyAny}$, since
 $\tyInt \gtyEquiv \tyAny$ and $\tyStr \gtyEquiv \tyAny$, although
 $\gamma(\tyList{\tyAny}) = \set{\tyList{\tau} \mid \tau \in \TypeSet}$, and
