@@ -125,8 +125,7 @@
 \and
 \inferrule*[lab={\ruleName{gsubty-union}}]
 {
-  \Sigma \vdash \gty{\tau} \gsubty \gty{\sigma} \\
-  \Sigma \vdash \gty{\tau}' \gsubty \gty{\sigma}
+  \Sigma \vdash \jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
 }
 {
   \Sigma \vdash \tyUnion{\gty{\tau}}{\gty{\tau}'} \gsubty \gty{\sigma}

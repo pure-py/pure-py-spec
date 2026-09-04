@@ -73,8 +73,9 @@ $\alpha(\gamma(\gty{\tau})) = \gty{\tau}$ by reflection
 (Lemma~\ref{lem:precision-concretisation}).
 
 A relation on types lifts to gradual types through concretisation \citep{garcia2016}: the lifted
-relation holds when the concretisations contain a related pair. Subtyping and equivalence on types
-are as defined in \specification; equivalence lifts to \emph{consistency}.
+relation holds when the concretisations contain a related pair. A conjunction of such statements
+lifts in the same way, with one witness for each type it mentions. Subtyping and equivalence on
+types are as defined in \specification; equivalence lifts to \emph{consistency}.
 
 \begin{definition}[Consistency]
 \label{def:consistency}
@@ -82,11 +83,33 @@ $\Sigma \vdash \gty{\sigma} \gtyEquiv \gty{\tau}$ if and only if $\Sigma \vdash 
 $\sigma \in \gamma(\gty{\sigma})$ and $\tau \in \gamma(\gty{\tau})$.
 \end{definition}
 
+\begin{definition}[Lifted conjunctions]
+\label{def:lifted-conjunctions}
+$\Sigma \vdash \jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ if and only if
+$\Sigma \vdash \tau \subty \sigma$ and $\Sigma \vdash \tau' \subty \sigma$ for some
+$\tau \in \gamma(\gty{\tau})$, $\tau' \in \gamma(\gty{\tau}')$ and
+$\sigma \in \gamma(\gty{\sigma})$; likewise
+$\jointEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, over equivalence, and
+$\jointSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, over the converse of subtyping.
+\end{definition}
+
+\noindent A judgement of this form holds exactly when its reversal holds, and implies each
+conjunct; the converse fails, because separately lifted conjuncts take their witnesses
+independently.
+
 \figref{graduality-subtyping} defines \emph{consistent subtyping} by lifting the subtyping rules
-of \specification rule by rule: types become gradual types, subtyping premises become consistent
-subtyping, equivalence premises become consistency, and two axioms place $\tyAny$ below and above
-every gradual type. The intended characterisation is the lifting of subtyping itself; the rules
-satisfy one direction.
+of \specification: types become gradual types, subtyping premises become consistent subtyping,
+equivalence premises become consistency, and two axioms place $\tyAny$ below and above every
+gradual type. The premises of \ruleName{gsubty-union} share their right-hand type, so they lift
+jointly to $\jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, which matches the lifting of
+their conjunction by construction, because a concrete union lies below $\sigma$ exactly when both
+components do. Lifting them separately would derive
+$\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \gsubty \tyList{\tyAny}$, since
+$\tyInt \gtyEquiv \tyAny$ and $\tyStr \gtyEquiv \tyAny$; but
+$\gamma(\tyList{\tyAny}) = \set{\tyList{\tau} \mid \tau \in \TypeSet}$, and
+$\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \subty \tyList{\tau}$ requires
+$\tyInt \tyEquiv \tau$ and $\tyStr \tyEquiv \tau$. The intended characterisation is the
+lifting of subtyping itself; the rules satisfy one direction.
 
 \input{spec/fig/graduality-subtyping}
 
@@ -96,59 +119,17 @@ If $\Sigma \vdash \sigma \subty \tau$ for some $\sigma \in \gamma(\gty{\sigma})$
 $\tau \in \gamma(\gty{\tau})$ then $\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$.
 \end{lemma}
 
-The converse fails at \ruleName{gsubty-union} alone. The premises of \ruleName{gsubty-union} share
-their right-hand type, for which the lifting of subtyping takes one witness,
-whereas the lifted premises take witnesses independently. The rules derive
-$\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \gsubty \tyList{\tyAny}$, since
-$\tyInt \gtyEquiv \tyAny$ and $\tyStr \gtyEquiv \tyAny$; but
-$\gamma(\tyList{\tyAny}) = \set{\tyList{\tau} \mid \tau \in \TypeSet}$, and
-$\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \subty \tyList{\tau}$ requires
-$\tyInt \tyEquiv \tau$ and $\tyStr \tyEquiv \tau$.
-
-\subsection{Joint lifting of the union premises}
-
-The premises of \ruleName{gsubty-union} share their right-hand type, so they must be lifted
-jointly, as one judgement in which the shared type is written once.
-
-\begin{definition}[Joint lifting]
-\label{def:joint-lifting}
-A conjunction of relations on types lifts through concretisation jointly, with one witness for
-each type written in the judgement: $\Sigma \vdash \jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ if
-and only if $\Sigma \vdash \tau \subty \sigma$ and $\Sigma \vdash \tau' \subty \sigma$ for some
-$\tau \in \gamma(\gty{\tau})$, $\tau' \in \gamma(\gty{\tau}')$ and
-$\sigma \in \gamma(\gty{\sigma})$, and likewise for
-$\jointEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ and
-$\jointSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$.
-\end{definition}
-
-\noindent A judgement holds exactly when its reversal holds. When a judgement holds, each conjunct
-holds; the converse fails, because separately lifted conjuncts take their witnesses independently.
-Replacing the premises of \ruleName{gsubty-union} with the joint lifting,
-%
-\begin{mathpar}
-\inferrule*[lab={\ruleName{gsubty-union}}]
-{
-  \Sigma \vdash \jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}
-}
-{
-  \Sigma \vdash \tyUnion{\gty{\tau}}{\gty{\tau}'} \gsubty \gty{\sigma}
-}
-\end{mathpar}
-%
-makes the rule match the lifting of subtyping by construction, because a concrete union lies below
-$\sigma$ exactly when both components do; the counterexample above is no longer derivable.
-
 An inductive characterisation of $\jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ can be extracted from a decidability proof: each case
 of the induction either exhibits witnesses or refutes their existence, and the positive cases,
 read as inference rules, give \figref{graduality-joint-sub}. The proof is a device for finding
 the rules; the surviving obligation, that the rules derive the judgement exactly, follows from
 the same case analysis, because every positive case is an equivalence.
 
-\begin{theorem}[Decidability]
-\label{thm:joint-sub-decidable}
+\begin{lemma}[Decidability]
+\label{lem:joint-sub-decidable}
 The judgement $\Sigma \vdash \jointSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ of
-Definition~\ref{def:joint-lifting} is decidable.
-\end{theorem}
+Definition~\ref{def:lifted-conjunctions} is decidable.
+\end{lemma}
 
 \begin{proof}[Proof sketch]
 By induction on the triple, ordered by the total size of the three types and then by the size of
@@ -166,7 +147,7 @@ middle must head both outer types, or the case refutes. Tuples proceed component
 (\ruleName{joint-sub-tuple}); lists and dictionaries need one element witness equivalent to both
 element types (\ruleName{joint-sub-list}, \ruleName{joint-sub-dict}), and callable arguments one
 witness below both argument types (\ruleName{joint-sub-callable}), the other two judgements of
-Definition~\ref{def:joint-lifting}. Each appeal to the hypothesis decreases the order.
+Definition~\ref{def:lifted-conjunctions}. Each appeal to the hypothesis decreases the order.
 \end{proof}
 
 \input{spec/fig/graduality-joint-sub}
@@ -210,8 +191,8 @@ $\jointSup{\tyList{\tyAny}}{\tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}}}{\tyList{
 an element witness equivalent to both $\tyInt$ and $\tyStr$.
 
 Sharing the pair of component witnesses suggests a judgement over four gradual types, but the
-widening does not stop there: a union at an end then sends each component witness below a
-component of the end union independently, so the constraints no longer relate every pair. The
+widening does not stop there: a union in an outer position then sends each component witness below one of its components
+independently, so the constraints no longer relate every pair. The
 general form is a finite set of subtyping and equivalence constraints over shared witnesses, a
 constraint system in the sense of \citet{garcia2015}; its treatment, with the characterisation
 of $\jointEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, is deferred.
