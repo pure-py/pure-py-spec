@@ -7,7 +7,7 @@
   \strut
 }
 {
-  \Sigma \vdash \chainSub{\gty{\tau}}{\tyAny}{\gty{\tau}'}
+  \Sigma \vdash \chainSub{\gty{\tau}}{\tyAny}{\gty{\sigma}}
 }
 \and
 \inferrule*[lab={\ruleName{chain-sub-any-left}}]
@@ -28,10 +28,10 @@
 \and
 \inferrule*[lab={\ruleName{chain-sub-assoc}}]
 {
-  \Sigma \vdash \chainSub{\gty{\tau}}{\gty{\sigma}}{\tyUnion{\gty{\tau}'}{\gty{\tau}''}}
+  \Sigma \vdash \chainSub{\gty{\tau}}{\gty{\sigma}}{\tyUnion{\gty{\tau}'}{\gty{\sigma}'}}
 }
 {
-  \Sigma \vdash \chainSub{\tyUnion{\gty{\tau}}{\gty{\tau}'}}{\gty{\sigma}}{\gty{\tau}''}
+  \Sigma \vdash \chainSub{\tyUnion{\gty{\tau}}{\gty{\tau}'}}{\gty{\sigma}}{\gty{\sigma}'}
 }
 \and
 \inferrule*[lab={\ruleName{chain-sub-static}}]

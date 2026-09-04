@@ -7,7 +7,7 @@
   \strut
 }
 {
-  \Sigma \vdash \chainSup{\gty{\tau}}{\tyAny}{\gty{\tau}'}
+  \Sigma \vdash \chainSup{\gty{\tau}}{\tyAny}{\gty{\sigma}}
 }
 \and
 \inferrule*[lab={\ruleName{chain-sup-any-left}}]
@@ -37,18 +37,18 @@
 \and
 \inferrule*[lab={\ruleName{chain-sup-union-left}}]
 {
-  \Sigma \vdash \chainSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}''}
+  \Sigma \vdash \chainSup{\gty{\tau}}{\gty{\sigma}}{\gty{\sigma}'}
 }
 {
-  \Sigma \vdash \chainSup{\tyUnion{\gty{\tau}}{\gty{\tau}'}}{\gty{\sigma}}{\gty{\tau}''}
+  \Sigma \vdash \chainSup{\tyUnion{\gty{\tau}}{\gty{\tau}'}}{\gty{\sigma}}{\gty{\sigma}'}
 }
 \and
 \inferrule*[lab={\ruleName{chain-sup-union-right}}]
 {
-  \Sigma \vdash \chainSup{\gty{\tau}'}{\gty{\sigma}}{\gty{\tau}''}
+  \Sigma \vdash \chainSup{\gty{\tau}'}{\gty{\sigma}}{\gty{\sigma}'}
 }
 {
-  \Sigma \vdash \chainSup{\tyUnion{\gty{\tau}}{\gty{\tau}'}}{\gty{\sigma}}{\gty{\tau}''}
+  \Sigma \vdash \chainSup{\tyUnion{\gty{\tau}}{\gty{\tau}'}}{\gty{\sigma}}{\gty{\sigma}'}
 }
 \and
 \inferrule*[lab={\ruleName{chain-sup-list}}]
