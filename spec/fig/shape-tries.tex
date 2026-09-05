@@ -102,7 +102,7 @@ $d$ & $::=$ & $\top$ & (All) \\
 \inferrule*[lab={\ruleName{entries-class}}]
 {
   \Sigma \vdash C \subty \tau \\
-  \fields(\Sigma, C) = \seq{\bind{x}{\sigma}} \\
+  \fields(\Sigma, C) = \bind{\seq{x}}{\seq{\sigma}} \\
   \Sigma \vdash T : \seq{\sigma} \concat \seq{\tau} \\
   \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau}
 }
