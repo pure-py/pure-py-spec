@@ -11,8 +11,8 @@ $h$ & $::=$ & $\ell$ & (Literal) \\
 $t$ & $::=$ & $\top$ & (All) \\
     & $\mid$ & $\bot$ & (None) \\
     & $\mid$ & $\tyUnion{t}{t'}$ & (Union) \\
-    & $\mid$ & $\trieSwitch{\bind{h_1}{t_1}, \ldots, \bind{h_n}{t_n}}{d}$ & (Switch) \\
-    & $\mid$ & $\trieDict{\bind{w_1}{t_1}, \ldots, \bind{w_n}{t_n}}{d}$ & (Dict)
+    & $\mid$ & $\trieSwitch{\bind{\seq{h}}{\seq{t}}}{d}$ & (Switch) \\
+    & $\mid$ & $\trieDict{\bind{\seq{w}}{\seq{t}}}{d}$ & (Dict)
    \\[3mm]
 \grammarGroup{Defaults} \\
 $d$ & $::=$ & $\top$ & (All) \\
@@ -60,12 +60,12 @@ $d$ & $::=$ & $\top$ & (All) \\
 \and
 \inferrule*[lab={\ruleName{trie-switch}}]
 {
-  \Sigma \vdash \bind{h_1}{t_1}, \ldots, \bind{h_n}{t_n} : \tau \cons \seq{\tau} \\
+  \Sigma \vdash \bind{\seq{h}}{\seq{t}} : \tau \cons \seq{\tau} \\
   \seq{h} \text{ distinct} \\
   \tau \text{ neither union, tuple nor dictionary type}
 }
 {
-  \Sigma \vdash \trieSwitch{\bind{h_1}{t_1}, \ldots, \bind{h_n}{t_n}}{d} : \tau \cons \seq{\tau}
+  \Sigma \vdash \trieSwitch{\bind{\seq{h}}{\seq{t}}}{d} : \tau \cons \seq{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{trie-dict}}]
@@ -74,13 +74,13 @@ $d$ & $::=$ & $\top$ & (All) \\
   \seq{w} \text{ distinct}
 }
 {
-  \Sigma \vdash \trieDict{\bind{w_1}{t_1}, \ldots, \bind{w_n}{t_n}}{d} : \tyDict{\tau} \cons \seq{\tau}
+  \Sigma \vdash \trieDict{\bind{\seq{w}}{\seq{t}}}{d} : \tyDict{\tau} \cons \seq{\tau}
 }
 \end{mathpar}
 
 \vspace{2mm}
 
-\flushleft \shadebox{$\Sigma \vdash \seq{\bind{h}{t}} : \seq{\tau}$}
+\flushleft \shadebox{$\Sigma \vdash \bind{\seq{h}}{\seq{t}} : \seq{\tau}$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{entries-empty}}]
@@ -95,10 +95,10 @@ $d$ & $::=$ & $\top$ & (All) \\
 {
   \Sigma \vdash \tyLiteral{\ell} \subty \tau \\
   \Sigma \vdash t : \seq{\tau} \\
-  \Sigma \vdash \seq{\bind{h}{t}} : \tau \cons \seq{\tau}
+  \Sigma \vdash \bind{\seq{h}}{\seq{t}} : \tau \cons \seq{\tau}
 }
 {
-  \Sigma \vdash \bind{\ell}{t}, \seq{\bind{h}{t}} : \tau \cons \seq{\tau}
+  \Sigma \vdash \bind{\ell}{t}, \bind{\seq{h}}{\seq{t}} : \tau \cons \seq{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{entries-class}}]
@@ -106,20 +106,20 @@ $d$ & $::=$ & $\top$ & (All) \\
   \Sigma \vdash C \subty \tau \\
   \fields(\Sigma, C) = \seq{\bind{x}{\sigma}} \\
   \Sigma \vdash t : \seq{\sigma} \concat \seq{\tau} \\
-  \Sigma \vdash \seq{\bind{h}{t}} : \tau \cons \seq{\tau}
+  \Sigma \vdash \bind{\seq{h}}{\seq{t}} : \tau \cons \seq{\tau}
 }
 {
-  \Sigma \vdash \bind{C}{t}, \seq{\bind{h}{t}} : \tau \cons \seq{\tau}
+  \Sigma \vdash \bind{C}{t}, \bind{\seq{h}}{\seq{t}} : \tau \cons \seq{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{entries-length}}]
 {
   \sigma_i = \tau \quad (\forall i \leq n) \\
   \Sigma \vdash t : \sigma_1, \ldots, \sigma_n \concat \seq{\tau} \\
-  \Sigma \vdash \seq{\bind{h}{t}} : \tyList{\tau} \cons \seq{\tau}
+  \Sigma \vdash \bind{\seq{h}}{\seq{t}} : \tyList{\tau} \cons \seq{\tau}
 }
 {
-  \Sigma \vdash \bind{n}{t}, \seq{\bind{h}{t}} : \tyList{\tau} \cons \seq{\tau}
+  \Sigma \vdash \bind{n}{t}, \bind{\seq{h}}{\seq{t}} : \tyList{\tau} \cons \seq{\tau}
 }
 \end{mathpar}
 
