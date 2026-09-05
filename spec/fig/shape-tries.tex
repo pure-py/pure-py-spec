@@ -11,8 +11,8 @@ $h$ & $::=$ & $\ell$ & (Literal) \\
 $t$ & $::=$ & $\top$ & (All) \\
     & $\mid$ & $\bot$ & (None) \\
     & $\mid$ & $\tyUnion{t}{t'}$ & (Union) \\
-    & $\mid$ & $\trieSwitch{h_1 \mapsto t_1, \ldots, h_n \mapsto t_n}{d}$ & (Switch) \\
-    & $\mid$ & $\trieDict{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d}$ & (Dict)
+    & $\mid$ & $\trieSwitch{\bind{h_1}{t_1}, \ldots, \bind{h_n}{t_n}}{d}$ & (Switch) \\
+    & $\mid$ & $\trieDict{\bind{w_1}{t_1}, \ldots, \bind{w_n}{t_n}}{d}$ & (Dict)
    \\[3mm]
 \grammarGroup{Defaults} \\
 $d$ & $::=$ & $\top$ & (All) \\
@@ -95,7 +95,7 @@ $d$ & $::=$ & $\top$ & (All) \\
   \tau \text{ neither union, tuple nor dictionary type}
 }
 {
-  \Sigma \vdash \trieSwitch{h_1 \mapsto t_1, \ldots, h_n \mapsto t_n}{d} : \tau \cons \seq{\tau}
+  \Sigma \vdash \trieSwitch{\bind{h_1}{t_1}, \ldots, \bind{h_n}{t_n}}{d} : \tau \cons \seq{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{trie-dict}}]
@@ -103,7 +103,7 @@ $d$ & $::=$ & $\top$ & (All) \\
   \Sigma \vdash t_i : \tau \cons \seq{\tau} \quad (\forall i)
 }
 {
-  \Sigma \vdash \trieDict{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d} : \tyDict{\tau} \cons \seq{\tau}
+  \Sigma \vdash \trieDict{\bind{w_1}{t_1}, \ldots, \bind{w_n}{t_n}}{d} : \tyDict{\tau} \cons \seq{\tau}
 }
 \end{mathpar}
 
