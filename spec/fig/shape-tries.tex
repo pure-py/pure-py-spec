@@ -110,9 +110,9 @@ $d$ & $::=$ & $\top$ & (All) \\
 \vspace{2mm}
 
 \begin{defalign}
-& \compsOf(\Sigma, \tau, \ell) && = \varepsilon \\
-& \compsOf(\Sigma, \tau, C) && = \seq{\sigma} \quad \text{if } \fields(\Sigma, C) = \seq{\bind{x}{\sigma}} \\
-& \compsOf(\Sigma, \tyList{\tau}, n) && = \sigma_1, \ldots, \sigma_n \quad \text{if } \sigma_i = \tau \; (\forall i)
+\compsOf(\Sigma, \tau, \ell) &{}= \varepsilon \\*
+\compsOf(\Sigma, \tau, C) &{}= \seq{\sigma} && \text{if } \fields(\Sigma, C) = \seq{\bind{x}{\sigma}} \\*
+\compsOf(\Sigma, \tyList{\tau}, n) &{}= \sigma_1, \ldots, \sigma_n && \text{if } \sigma_i = \tau \; (\forall i)
 \end{defalign}
 \caption{Shape tries}
 \label{fig:shape-tries}
