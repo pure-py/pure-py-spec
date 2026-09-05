@@ -11,7 +11,7 @@ $h$ & $::=$ & $\ell$ & (Literal) \\
 $T$ & $::=$ & $\top$ & (All) \\
     & $\mid$ & $\bot$ & (None) \\
     & $\mid$ & $\tyUnion{T}{T'}$ & (Union) \\
-    & $\mid$ & $\trieSwitch{\set{\bind{\seq{h}}{\seq{T}}}}{d}$ & (Switch) \\
+    & $\mid$ & $\trieMatch{\set{\bind{\seq{h}}{\seq{T}}}}{d}$ & (Match) \\
     & $\mid$ & $\trieDict{\set{\bind{\seq{w}}{\seq{T}}}}{d}$ & (Dict)
    \\[3mm]
 \grammarGroup{Defaults} \\
@@ -58,13 +58,13 @@ $d$ & $::=$ & $\top$ & (All) \\
   \Sigma \vdash T : \tyTuple{\seq{\sigma}} \cons \seq{\tau}
 }
 \and
-\inferrule*[lab={\ruleName{trie-switch}}]
+\inferrule*[lab={\ruleName{trie-match}}]
 {
   \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \\
   \tau \text{ neither union, tuple nor dictionary type}
 }
 {
-  \Sigma \vdash \trieSwitch{\set{\bind{\seq{h}}{\seq{T}}}}{d} : \tau \cons \seq{\tau}
+  \Sigma \vdash \trieMatch{\set{\bind{\seq{h}}{\seq{T}}}}{d} : \tau \cons \seq{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{trie-dict}}]
