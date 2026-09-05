@@ -290,8 +290,8 @@ Name resolution takes a qualified name to a context entry (\figref{resolve-name}
 \input{spec/fig/shapes}
 
 The matching judgement decides both reachability and exhaustiveness
-(\figrefTwo{pat}{pat-seq}), reachability by the shapes a case matches and exhaustiveness by the residual
-left by the last case. The usefulness algorithm for ML also decides both with one
+(\figrefTwo{pat}{pat-seq}). Reachability is decided by the shapes a case matches and exhaustiveness
+by the residual left by the last case. The (``usefulness'') algorithm for ML also decides both with one
 relation~\cite{maranget2007}, and the residual corresponds to the term descriptions that the match
 compiler of \citet{sestoft1996} threads through the cases. Matching a pattern against a shape takes the
 scrutinee's type into account, following the uncovered sets of \citet{karachalias2015}.
