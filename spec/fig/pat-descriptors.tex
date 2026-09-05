@@ -8,7 +8,9 @@
 {
   T_0 = \top \\
   \Sigma; \Gamma \vdash p_i \agrees \sigma \quad (\forall i) \\
-  \Sigma; \Gamma \vdash T_{i-1} : \sigma, p_i \matches S_i, T_i \binding \Delta_i \quad (\forall i)
+  \Sigma; \Gamma \vdash T_{i-1} : \sigma, p_i \matches S_i, T_i \binding \Delta_i \quad (\forall i) \\
+  \Sigma \vdash S_i : \sigma \synth \tau_i \\
+  \tau_i \neq \tyNever \quad (\forall i)
 }
 {
   \Sigma; \Gamma \vdash \seq{p} : \sigma \matches \seq{\Delta}, T_{n+1}
@@ -30,10 +32,10 @@
 \and
 \inferrule*[lab={\ruleName{desc-var}}]
 {
-  \strut
+  \Sigma \vdash T : \seq{\tau} \synth \sigma
 }
 {
-  \Sigma; \Gamma \vdash T : \seq{\tau}, x \matches T, \bot \binding \set{\bind{x}{\descTy(\Sigma, \seq{\tau}, T)}}
+  \Sigma; \Gamma \vdash T : \seq{\tau}, x \matches T, \bot \binding \set{\bind{x}{\sigma}}
 }
 \and
 \inferrule*[lab={\ruleName{desc-lit}}]
