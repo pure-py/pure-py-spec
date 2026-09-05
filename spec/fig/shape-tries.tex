@@ -5,7 +5,8 @@
 \begin{tabular}{rcll}
 \grammarGroup{Heads} \\
 $h$ & $::=$ & $\ell$ & (Literal) \\
-    & $\mid$ & $C$ & (Class)
+    & $\mid$ & $C$ & (Class) \\
+    & $\mid$ & $\headList{n}$ & (Length)
    \\[3mm]
 \grammarGroup{Tries} \\
 $T$ & $::=$ & $\top$ & (All) \\
@@ -117,7 +118,7 @@ $U$ & $::=$ & $\top$ & (All) \\
   \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tyList{\tau} \cons \seq{\tau}
 }
 {
-  \Sigma \vdash \set{\bind{n}{T}, \bind{\seq{h}}{\seq{T}}} : \tyList{\tau} \cons \seq{\tau}
+  \Sigma \vdash \set{\bind{\headList{n}}{T}, \bind{\seq{h}}{\seq{T}}} : \tyList{\tau} \cons \seq{\tau}
 }
 \end{mathpar}
 
