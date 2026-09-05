@@ -289,15 +289,17 @@ Name resolution takes a qualified name to a context entry (\figref{resolve-name}
 
 \input{spec/fig/shapes}
 
-The matching judgement decides both reachability and exhaustiveness
-(\figrefTwo{pat}{pat-seq}): a case is reachable when it matches some shape of the residual, and a
-match is exhaustive when its last case leaves the residual empty. Because the residual is seeded
-from the scrutinee's type, a case whose values the type already excludes is unreachable, as with
-the uncovered sets of \citet{karachalias2015}. A single relation deciding both properties goes
-back to the (``usefulness'') algorithm for ML~\cite{maranget2007}, and the residual threaded from
-case to case corresponds to the term descriptions of the match compiler of \citet{sestoft1996}.
+To check a \pyinline{match}, each case is matched in turn against the residual: the values of the
+scrutinee's type which have not been matched by any earlier case. A case that matches none of the
+residual is unreachable, and a match whose last case leaves an empty residual is exhaustive, so a
+single judgement decides both properties (\figrefTwo{pat}{pat-seq}). Because the residual starts
+from the type, a case whose values the type excludes is unreachable. The (``usefulness'') algorithm
+for ML also decides both properties with a single relation~\cite{maranget2007}; the residual
+corresponds to the term descriptions a match compiler threads through the
+cases~\cite{sestoft1996}; and starting from the type follows the uncovered sets of
+\citet{karachalias2015}.
 
-A \emph{shape} $k$
+The residual is represented as a finite set of shapes. A \emph{shape} $k$
 denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{N}$ is a
 value of type $\tau$ whose outermost head is not among those in $N$. A head itself denotes values: a
 class its instances, an integer at a list type the lists of that length, and a literal its value. Head
