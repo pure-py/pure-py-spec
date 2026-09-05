@@ -10,7 +10,7 @@ $h$ & $::=$ & $\ell$ & (Literal) \\
 \grammarGroup{Tries} \\
 $t$ & $::=$ & $\top$ & (All) \\
     & $\mid$ & $\bot$ & (None) \\
-    & $\mid$ & $\langle t, t' \rangle$ & (Union) \\
+    & $\mid$ & $\tyUnion{t}{t'}$ & (Union) \\
     & $\mid$ & $\trieSwitch{h_1 \mapsto t_1, \ldots, h_n \mapsto t_n}{d}$ & (Switch) \\
     & $\mid$ & $\trieSwitch{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d}$ & (Key switch)
    \\[3mm]
@@ -77,7 +77,7 @@ $d$ & $::=$ & $\top$ & (All) \\
   \Sigma \vdash t' : \sigma \cons \seq{\tau}
 }
 {
-  \Sigma \vdash \langle t, t' \rangle : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}
+  \Sigma \vdash \tyUnion{t}{t'} : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{trie-tuple}}]
