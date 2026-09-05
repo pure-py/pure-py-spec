@@ -186,69 +186,53 @@ equivalence relation and decidability of the three relations.
 \section{Constraints}
 \label{sec:constraints}
 
-The rules of \figref{graduality-three-sub} are incomplete. The judgement
+The rules of \figref{graduality-three-sub} are incomplete:
 $\threeSub{\tyUnion{\tyList{\tyInt}}{\tyList{\tyInt}}}{\tyList{\tyAny}}{\tyList{\tyInt}}$
-satisfies the lifting of its two conjuncts, every element witness being $\tyInt$, but no rule
-derives it: only reassociation applies, and reassociation cannot reduce three list-headed
-components to two, so the completeness direction of Lemma~\ref{lem:three-sub-correct} fails.
-Together with the residual case of the supertype relation, this motivates one generalisation,
-constraints over shared witnesses in place of judgements of fixed arity.
+satisfies the lifting of its two conjuncts but has no derivation, because reassociation cannot
+reduce three list-headed components to two, so the completeness direction of
+Lemma~\ref{lem:three-sub-correct} fails. With the residual case of the supertype relation, this
+motivates constraints over shared witnesses in place of judgements of fixed arity.
 
 \begin{definition}[Constraint system]
 \label{def:constraint-system}
 Let $x$, $y$ and $z$ range over constraint variables. A constraint system $\consys$ declares
-finitely many variables, each with a gradual type as its \emph{range}, and imposes finitely many
+finitely many variables, each with a gradual type as its range, and imposes finitely many
 constraints $x \subty y$ and $x \tyEquiv y$ whose operands are declared variables or types.
 \end{definition}
 
 \begin{definition}[Satisfaction]
 \label{def:satisfaction}
-An assignment for $\consys$ maps each declared variable to a member of the concretisation of its
-range. $\Sigma \vDash \consys$ if and only if some assignment $\theta$ validates every constraint,
-reading $x \subty y$ as $\Sigma \vdash \theta(x) \subty \theta(y)$ and $x \tyEquiv y$ as
-$\Sigma \vdash \theta(x) \tyEquiv \theta(y)$, with $\theta$ the identity on types.
+$\Sigma \vDash \consys$ if and only if some map $\theta$, sending each variable to a member of
+the concretisation of its range and each type to itself, validates every constraint as the
+corresponding static judgement.
 \end{definition}
 
-\noindent Every lifted judgement is a satisfiability instance:
-$\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$ if and only if
-$\Sigma \vDash \langle x : \gty{\sigma}, y : \gty{\tau} \mathrel{;} x \subty y \rangle$, and
+\noindent The lifted relations are the small instances:
 $\Sigma \vdash \threeSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ if and only if
 $\Sigma \vDash \langle x : \gty{\tau}, y : \gty{\tau}', z : \gty{\sigma} \mathrel{;}
-x \subty z, y \subty z \rangle$; likewise the other lifted relations.
+x \subty z, y \subty z \rangle$, and consistent subtyping is the one-constraint case.
 
-The solver rewrites a system to decide satisfiability: each step preserves and reflects it, and a
-choice point is a disjunction, so $\consys$ is satisfiable exactly when some run succeeds. The
-steps, so far:
+The solver rewrites a system; every step preserves and reflects satisfiability, and a choice is a
+disjunction, so $\consys$ is satisfiable exactly when some run succeeds.
 %
 \begin{itemize}
-\item A variable whose range is static is replaced by its range in every constraint and
-  discarded.
-\item A constraint between two types is checked by the static judgement and deleted, the run
-  failing if the check does; a constraint whose upper operand is $\tyObject$ is deleted.
-\item A variable whose range is $\tyUnion{\gty{\tau}}{\gty{\tau}'}$ is replaced by fresh
-  variables $x_1$ and $x_2$ ranging over the components. A constraint with the variable as lower
-  operand becomes two constraints, one per component; a constraint $t \subty x$ becomes
-  $t \subty x_i$ for a chosen $i$, provided the root of $t$, or of its range, is neither
-  $\tyAny$ nor a union. A union type as lower operand splits likewise. Equivalence constraints on
-  the variable are deferred.
+\item A variable with static range is replaced by its range and discarded.
+\item A constraint between types is checked by the static judgement, the run failing if the check
+  does; a constraint with upper operand $\tyObject$ is deleted.
+\item A variable with union range splits into fresh variables over the components: as lower
+  operand, one constraint per component; as upper operand, one chosen component, provided the
+  root of the other operand, or of its range, is neither $\tyAny$ nor a union. A union type as
+  lower operand splits likewise.
 \item Variables whose ranges share a root constructor unfold once, the argument positions
-  receiving fresh variables shared by every constraint on the variable; a constraint between
-  unfolded operands decomposes componentwise, into equivalence of element variables for lists and
-  dictionaries, subtyping for tuple components and callable results, and reversed subtyping for
-  callable arguments. A constraint between operands with distinct root constructors fails.
-\item A variable whose range is $\tyAny$ is an \emph{unknown}. A system whose remaining
-  constraints relate each unknown to types alone is discharged by the lattice of \specification:
-  the unknown is assignable exactly when the join of its lower bounds lies below the meet of its
-  upper bounds, and an equivalence constraint pins it up to equivalence.
+  receiving fresh variables shared by every constraint on the variable; constraints between
+  unfolded operands decompose componentwise, into equivalence for list and dictionary elements,
+  subtyping for tuple components and callable results, and reversed subtyping for callable
+  arguments. Distinct root constructors fail.
+\item A variable with range $\tyAny$ is an \emph{unknown}; when every remaining constraint
+  relates unknowns to types alone, an unknown is assignable exactly when the join of its lower
+  bounds lies below the meet of its upper bounds, by the lattice of \specification.
 \end{itemize}
 %
-On the counterexample above, splitting the union yields three subtyping constraints on one shared
-variable, whose unfolding leaves the element unknown bounded by $\tyInt$ alone; the system is
-satisfiable and the solver accepts.
-
-Deferred: constraints between two unknowns; an unknown against a constructor operand, where the
-shape of its witness must be chosen; equivalence constraints on union-ranged variables; and the
-correctness and termination arguments. Each step reduces the total size of the declared ranges,
-the intended termination measure. The obligation is the analogue of
-Lemma~\ref{lem:three-sub-correct}: the solver succeeds on $\consys$ exactly when
-$\Sigma \vDash \consys$.
+Deferred: constraints between two unknowns, unknowns against constructor operands, equivalence
+constraints on split unions, and the proof that the solver succeeds exactly on satisfiable
+systems.
