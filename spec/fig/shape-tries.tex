@@ -42,7 +42,7 @@ $d$ & $::=$ & $\top \mid \bot$ & (Default)
   \Sigma \vdash t' : \sigma' \concat \seq{\tau}
 }
 {
-  \Sigma \vdash \langle t, t' \rangle : \tyUnion{\sigma}{\sigma'} \concat \seq{\tau}
+  \Sigma \vdash \langle t, t' \rangle : (\tyUnion{\sigma}{\sigma'}) \concat \seq{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{trie-tuple}}]
