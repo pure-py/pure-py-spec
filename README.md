@@ -1,5 +1,7 @@
 # PurePy - A Pure Functional Subset of Python
 
+[![submit](https://github.com/pure-py/pure-py-spec/actions/workflows/submit.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/submit.yml)
+
 ## [v0.15.1](https://github.com/pure-py/pure-py-spec/releases/download/v0.15.1/PurePy-spec.pdf)
 
 PurePy defines a pure (side-effect free) subset of Python, intended initially for use by researchers in
