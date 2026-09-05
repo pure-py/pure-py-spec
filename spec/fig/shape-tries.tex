@@ -11,11 +11,11 @@ $h$ & $::=$ & $\ell$ & (Literal) \\
 $T$ & $::=$ & $\top$ & (All) \\
     & $\mid$ & $\bot$ & (None) \\
     & $\mid$ & $\tyUnion{T}{T'}$ & (Union) \\
-    & $\mid$ & $\trieMatch{\set{\bind{\seq{h}}{\seq{T}}}}{d}$ & (Match) \\
-    & $\mid$ & $\trieDict{\set{\bind{\seq{w}}{\seq{T}}}}{d}$ & (Dict)
+    & $\mid$ & $\trieMatch{\set{\bind{\seq{h}}{\seq{T}}}}{U}$ & (Match) \\
+    & $\mid$ & $\trieDict{\set{\bind{\seq{w}}{\seq{T}}}}{U}$ & (Dict)
    \\[3mm]
 \grammarGroup{Defaults} \\
-$d$ & $::=$ & $\top$ & (All) \\
+$U$ & $::=$ & $\top$ & (All) \\
     & $\mid$ & $\bot$ & (None)
 \end{tabular}
 \end{center}
@@ -64,7 +64,7 @@ $d$ & $::=$ & $\top$ & (All) \\
   \tau \text{ neither union, tuple nor dictionary type}
 }
 {
-  \Sigma \vdash \trieMatch{\set{\bind{\seq{h}}{\seq{T}}}}{d} : \tau \cons \seq{\tau}
+  \Sigma \vdash \trieMatch{\set{\bind{\seq{h}}{\seq{T}}}}{U} : \tau \cons \seq{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{trie-dict}}]
@@ -72,7 +72,7 @@ $d$ & $::=$ & $\top$ & (All) \\
   \Sigma \vdash T_i : \tau \cons \seq{\tau} \quad (\forall i)
 }
 {
-  \Sigma \vdash \trieDict{\set{\bind{\seq{w}}{\seq{T}}}}{d} : \tyDict{\tau} \cons \seq{\tau}
+  \Sigma \vdash \trieDict{\set{\bind{\seq{w}}{\seq{T}}}}{U} : \tyDict{\tau} \cons \seq{\tau}
 }
 \end{mathpar}
 
