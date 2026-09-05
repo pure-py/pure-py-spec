@@ -8,7 +8,7 @@
 {
   T_0 = \top \\
   \Sigma; \Gamma \vdash p_i \agrees \sigma \quad (\forall i) \\
-  \Sigma; \Gamma; \sigma \vdash T_{i-1}, p_i \matches T'_i, T_i \binding \Delta_i \quad (\forall i)
+  \Sigma; \Gamma; \sigma \vdash T_{i-1}, p_i \matches S_i, T_i \binding \Delta_i \quad (\forall i)
 }
 {
   \Sigma; \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, T_{n+1}
@@ -17,7 +17,7 @@
 
 \vspace{2mm}
 
-\flushleft \shadebox{$\Sigma; \Gamma; \seq{\tau} \vdash T, p \matches T', T'' \binding \Delta$}
+\flushleft \shadebox{$\Sigma; \Gamma; \seq{\tau} \vdash T, p \matches S, T' \binding \Delta$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{trie-wild}}]
