@@ -60,10 +60,8 @@ check-mechanisation:
 supplementary.zip: spec-anon.pdf check-mechanisation
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
-	mkdir .submission && git -C $(MECHANISATION) archive --format=tar --prefix=$(MECHANISATION)/ HEAD | tar -x -C .submission
-	grep -v 'badge.svg' .submission/$(MECHANISATION)/README.md > .submission/README.tmp && \
-		mv .submission/README.tmp .submission/$(MECHANISATION)/README.md
-	cd .submission && zip -q -9 -r ../$@ $(MECHANISATION)
+	./anonymise-mechanisation.sh .submission
+	cd .submission && zip -q -9 -r ../$@ ourlang-mechanisation
 	rm -rf .submission
 
 # Tests are included in the paper as examples, so a submission requires a passing suite.
