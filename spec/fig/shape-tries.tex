@@ -58,7 +58,7 @@ $U$ & $::=$ & $\top$ & (All) \\
   \Sigma \vdash T : \tyTuple{\seq{\sigma}} \cons \seq{\tau}
 }
 \and
-\inferrule*[lab={\ruleName{trie-match}}]
+\inferrule*[lab={\ruleName{trie-heads}}]
 {
   \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \\
   \tau \text{ neither union, tuple nor dictionary type}
