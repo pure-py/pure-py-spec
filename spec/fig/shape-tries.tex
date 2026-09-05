@@ -12,7 +12,7 @@ $t$ & $::=$ & $\top$ & (All) \\
     & $\mid$ & $\bot$ & (None) \\
     & $\mid$ & $\tyUnion{t}{t'}$ & (Union) \\
     & $\mid$ & $\trieSwitch{h_1 \mapsto t_1, \ldots, h_n \mapsto t_n}{d}$ & (Switch) \\
-    & $\mid$ & $\trieSwitch{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d}$ & (Key switch)
+    & $\mid$ & $\trieDict{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d}$ & (Dict)
    \\[3mm]
 \grammarGroup{Defaults} \\
 $d$ & $::=$ & $\top$ & (All) \\
@@ -103,7 +103,7 @@ $d$ & $::=$ & $\top$ & (All) \\
   \Sigma \vdash t_i : \tau \cons \seq{\tau} \quad (\forall i)
 }
 {
-  \Sigma \vdash \trieSwitch{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d} : \tyDict{\tau} \cons \seq{\tau}
+  \Sigma \vdash \trieDict{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d} : \tyDict{\tau} \cons \seq{\tau}
 }
 \end{mathpar}
 
