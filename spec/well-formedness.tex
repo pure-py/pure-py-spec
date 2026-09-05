@@ -293,7 +293,7 @@ To check a \pyinline{match}, each case is matched in turn against the \emph{resi
 scrutinee's type which no earlier case has matched. A case that matches none of the
 residual is unreachable, and a match whose last case leaves an empty residual is exhaustive, so a
 single judgement decides both properties (\figrefTwo{pat}{pat-seq}). Because the residual starts
-from the type, a case whose values the type excludes is unreachable. The (``usefulness'') algorithm
+from the type, a case whose values the type excludes is unreachable. The ``usefulness'' algorithm
 for ML also decides both properties with a single relation~\cite{maranget2007}; the residual
 corresponds to the term descriptions a match compiler threads through the
 cases~\cite{sestoft1996}; and starting from the type follows the uncovered sets of
