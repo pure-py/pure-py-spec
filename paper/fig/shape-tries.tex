@@ -1,0 +1,81 @@
+\begin{figure}
+\small
+\setlength{\jot}{2pt}
+\begin{center}
+\begin{tabular}{rcll}
+\grammarGroup{Tries} \\
+$t$ & $::=$ & $\top \mid \bot$ & (All, none) \\
+    & $\mid$ & $\langle t, t' \rangle$ & (Union) \\
+    & $\mid$ & $\trieSwitch{h_1 \mapsto t_1, \ldots, h_n \mapsto t_n}{d}$ & (Switch) \\
+    & $\mid$ & $\trieSwitch{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d}$ & (Key switch) \\
+$d$ & $::=$ & $\top \mid \bot$ & (Default)
+\end{tabular}
+\end{center}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\Sigma \vdash t : \seq{\tau}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{trie-top}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \top : \seq{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{trie-bot}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \bot : \seq{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{trie-union}}]
+{
+  \Sigma \vdash t : \sigma \, \seq{\tau} \\
+  \Sigma \vdash t' : \sigma' \, \seq{\tau}
+}
+{
+  \Sigma \vdash \langle t, t' \rangle : \tyUnion{\sigma}{\sigma'} \, \seq{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{trie-tuple}}]
+{
+  \Sigma \vdash t : \seq{\sigma} \, \seq{\tau}
+}
+{
+  \Sigma \vdash t : \tyTuple{\seq{\sigma}} \, \seq{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{trie-switch}}]
+{
+  \Sigma \vdash h_i : \sigma \quad
+  \Sigma \vdash t_i : \compsOf(\Sigma, \sigma, h_i) \, \seq{\tau} \quad (\forall i) \\
+  \sigma \text{ neither union, tuple nor dictionary type}
+}
+{
+  \Sigma \vdash \trieSwitch{h_1 \mapsto t_1, \ldots, h_n \mapsto t_n}{d} : \sigma \, \seq{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{trie-dict}}]
+{
+  \Sigma \vdash t_i : \sigma \, \seq{\tau} \quad (\forall i)
+}
+{
+  \Sigma \vdash \trieSwitch{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d} : \tyDict{\sigma} \, \seq{\tau}
+}
+\end{mathpar}
+
+\vspace{2mm}
+
+\begin{defalign}
+& \compsOf(\Sigma, \sigma, \ell) && = \varepsilon \\
+& \compsOf(\Sigma, \sigma, C) && = \seq{\sigma}' \quad (\fields(\Sigma, C) = \seq{\bind{x}{\sigma'}}) \\
+& \compsOf(\Sigma, \tyList{\sigma}, n) && = \sigma^n
+\end{defalign}
+\caption{Shape tries: $\seq{\tau}$ a sequence of types, $\varepsilon$ the empty sequence, $\sigma^n$ the $n$-fold sequence}
+\label{fig:shape-tries}
+\end{figure}
