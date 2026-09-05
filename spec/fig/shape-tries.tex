@@ -22,36 +22,6 @@ $d$ & $::=$ & $\top$ & (All) \\
 
 \vspace{2mm}
 
-\flushleft \shadebox{$\Sigma \vdash h : \tau$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{head-literal}}]
-{
-  \Sigma \vdash \tyLiteral{\ell} \subty \tau
-}
-{
-  \Sigma \vdash \ell : \tau
-}
-\and
-\inferrule*[lab={\ruleName{head-class}}]
-{
-  \Sigma \vdash C \subty \tau
-}
-{
-  \Sigma \vdash C : \tau
-}
-\and
-\inferrule*[lab={\ruleName{head-length}}]
-{
-  n \text{ an integer}
-}
-{
-  \Sigma \vdash n : \tyList{\tau}
-}
-\end{mathpar}
-
-\vspace{2mm}
-
 \flushleft \shadebox{$\Sigma \vdash t : \seq{\tau}$}
 \begin{mathpar}
 \small
@@ -90,8 +60,8 @@ $d$ & $::=$ & $\top$ & (All) \\
 \and
 \inferrule*[lab={\ruleName{trie-switch}}]
 {
-  \Sigma \vdash h_i : \tau \quad
-  \Sigma \vdash t_i : \compsOf(\Sigma, \tau, h_i) \concat \seq{\tau} \quad (\forall i) \\
+  \Sigma \vdash \bind{h_1}{t_1}, \ldots, \bind{h_n}{t_n} : \tau \cons \seq{\tau} \\
+  h_1, \ldots, h_n \text{ distinct} \\
   \tau \text{ neither union, tuple nor dictionary type}
 }
 {
@@ -100,7 +70,8 @@ $d$ & $::=$ & $\top$ & (All) \\
 \and
 \inferrule*[lab={\ruleName{trie-dict}}]
 {
-  \Sigma \vdash t_i : \tau \cons \seq{\tau} \quad (\forall i)
+  \Sigma \vdash t_i : \tau \cons \seq{\tau} \quad (\forall i) \\
+  w_1, \ldots, w_n \text{ distinct}
 }
 {
   \Sigma \vdash \trieDict{\bind{w_1}{t_1}, \ldots, \bind{w_n}{t_n}}{d} : \tyDict{\tau} \cons \seq{\tau}
@@ -109,11 +80,49 @@ $d$ & $::=$ & $\top$ & (All) \\
 
 \vspace{2mm}
 
-\begin{defalign}
-\compsOf(\Sigma, \tau, \ell) &{}= \varepsilon \\*
-\compsOf(\Sigma, \tau, C) &{}= \seq{\sigma} && \text{if } \fields(\Sigma, C) = \seq{\bind{x}{\sigma}} \\*
-\compsOf(\Sigma, \tyList{\tau}, n) &{}= \sigma_1, \ldots, \sigma_n && \text{if } \sigma_i = \tau \; (\forall i)
-\end{defalign}
+\flushleft \shadebox{$\Sigma \vdash \seq{\bind{h}{t}} : \seq{\tau}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{entries-empty}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \varepsilon : \tau \cons \seq{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{entries-literal}}]
+{
+  \Sigma \vdash \tyLiteral{\ell} \subty \tau \\
+  \Sigma \vdash t : \seq{\tau} \\
+  \Sigma \vdash \seq{\bind{h}{t}} : \tau \cons \seq{\tau}
+}
+{
+  \Sigma \vdash \bind{\ell}{t}, \seq{\bind{h}{t}} : \tau \cons \seq{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{entries-class}}]
+{
+  \Sigma \vdash C \subty \tau \\
+  \fields(\Sigma, C) = \seq{\bind{x}{\sigma}} \\
+  \Sigma \vdash t : \seq{\sigma} \concat \seq{\tau} \\
+  \Sigma \vdash \seq{\bind{h}{t}} : \tau \cons \seq{\tau}
+}
+{
+  \Sigma \vdash \bind{C}{t}, \seq{\bind{h}{t}} : \tau \cons \seq{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{entries-length}}]
+{
+  \sigma_i = \tau \quad (\forall i \leq n) \\
+  \Sigma \vdash t : \sigma_1, \ldots, \sigma_n \concat \seq{\tau} \\
+  \Sigma \vdash \seq{\bind{h}{t}} : \tyList{\tau} \cons \seq{\tau}
+}
+{
+  \Sigma \vdash \bind{n}{t}, \seq{\bind{h}{t}} : \tyList{\tau} \cons \seq{\tau}
+}
+\end{mathpar}
+
 \caption{Shape tries}
 \label{fig:shape-tries}
 \end{figure}
