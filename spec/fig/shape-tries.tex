@@ -4,10 +4,13 @@
 \begin{center}
 \begin{tabular}{rcll}
 \grammarGroup{Tries} \\
-$t$ & $::=$ & $\top \mid \bot$ & (All, none) \\
+$t$ & $::=$ & $\top$ & (All) \\
+    & $\mid$ & $\bot$ & (None) \\
     & $\mid$ & $\langle t, t' \rangle$ & (Union) \\
     & $\mid$ & $\trieSwitch{h_1 \mapsto t_1, \ldots, h_n \mapsto t_n}{d}$ & (Switch) \\
-    & $\mid$ & $\trieSwitch{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d}$ & (Key switch) \\
+    & $\mid$ & $\trieSwitch{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d}$ & (Key switch)
+   \\[3mm]
+\grammarGroup{Defaults} \\
 $d$ & $::=$ & $\top \mid \bot$ & (Default)
 \end{tabular}
 \end{center}
