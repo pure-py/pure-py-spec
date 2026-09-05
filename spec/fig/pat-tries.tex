@@ -1,0 +1,62 @@
+\begin{figure}
+\small
+\setlength{\jot}{2pt}
+\flushleft \shadebox{$\Sigma; \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, T$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{trie-cases}}]
+{
+  T_0 = \top \\
+  \Sigma; \Gamma \vdash p_i \agrees \sigma \quad (\forall i) \\
+  \Sigma; \Gamma; \sigma \vdash T_{i-1}, p_i \matches T'_i, T_i \binding \Delta_i \quad (\forall i)
+}
+{
+  \Sigma; \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, T_{n+1}
+}
+\end{mathpar}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\Sigma; \Gamma; \seq{\tau} \vdash T, p \matches T', T'' \binding \Delta$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{trie-wild}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma; \seq{\tau} \vdash T, \patWild \matches T, \bot \binding \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{trie-var}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma; \seq{\tau} \vdash T, x \matches T, \bot \binding \set{\bind{x}{\trieTy(\Sigma, \seq{\tau}, T)}}
+}
+\and
+\inferrule*[lab={\ruleName{trie-lit}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma; \seq{\tau} \vdash \trieHeads{\set{\bind{\ell}{T}, \bind{\seq{h}}{\seq{T}}}}{U}, \ell
+    \matches \trieHeads{\set{\bind{\ell}{T}}}{\bot},
+    \trieHeads{\set{\bind{\ell}{\bot}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{trie-lit-default}}]
+{
+  \ell \notin \seq{h} \\
+  \Sigma \vdash \tyLiteral{\ell} \subty \tau
+}
+{
+  \Sigma; \Gamma; \tau \cons \seq{\tau} \vdash \trieHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U}, \ell
+    \matches \trieHeads{\set{\bind{\ell}{U}}}{\bot},
+    \trieHeads{\set{\bind{\ell}{\bot}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \varnothing
+}
+\end{mathpar}
+\caption{Pattern matching over tries}
+\label{fig:pat-tries}
+\end{figure}
