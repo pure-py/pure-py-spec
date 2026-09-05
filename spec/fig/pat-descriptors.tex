@@ -1,23 +1,23 @@
 \begin{figure}
 \small
 \setlength{\jot}{2pt}
-\flushleft \shadebox{$\Sigma; \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, T$}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash \seq{p} : \sigma \matches \seq{\Delta}, T$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{desc-cases}}]
 {
   T_0 = \top \\
   \Sigma; \Gamma \vdash p_i \agrees \sigma \quad (\forall i) \\
-  \Sigma; \Gamma; \sigma \vdash T_{i-1}, p_i \matches S_i, T_i \binding \Delta_i \quad (\forall i)
+  \Sigma; \Gamma \vdash T_{i-1}, p_i : \sigma \matches S_i, T_i \binding \Delta_i \quad (\forall i)
 }
 {
-  \Sigma; \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, T_{n+1}
+  \Sigma; \Gamma \vdash \seq{p} : \sigma \matches \seq{\Delta}, T_{n+1}
 }
 \end{mathpar}
 
 \vspace{2mm}
 
-\flushleft \shadebox{$\Sigma; \Gamma; \seq{\tau} \vdash T, p \matches S, T' \binding \Delta$}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash T, p : \seq{\tau} \matches S, T' \binding \Delta$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{desc-wild}}]
@@ -25,7 +25,7 @@
   \strut
 }
 {
-  \Sigma; \Gamma; \seq{\tau} \vdash T, \patWild \matches T, \bot \binding \varnothing
+  \Sigma; \Gamma \vdash T, \patWild : \seq{\tau} \matches T, \bot \binding \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{desc-var}}]
@@ -33,7 +33,7 @@
   \strut
 }
 {
-  \Sigma; \Gamma; \seq{\tau} \vdash T, x \matches T, \bot \binding \set{\bind{x}{\descTy(\Sigma, \seq{\tau}, T)}}
+  \Sigma; \Gamma \vdash T, x : \seq{\tau} \matches T, \bot \binding \set{\bind{x}{\descTy(\Sigma, \seq{\tau}, T)}}
 }
 \and
 \inferrule*[lab={\ruleName{desc-lit}}]
@@ -41,7 +41,7 @@
   \strut
 }
 {
-  \Sigma; \Gamma; \seq{\tau} \vdash \descHeads{\set{\bind{\ell}{T}, \bind{\seq{h}}{\seq{T}}}}{U}, \ell
+  \Sigma; \Gamma \vdash \descHeads{\set{\bind{\ell}{T}, \bind{\seq{h}}{\seq{T}}}}{U}, \ell : \seq{\tau}
     \matches \descHeads{\set{\bind{\ell}{T}}}{\bot},
     \descHeads{\set{\bind{\ell}{\bot}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \varnothing
 }
@@ -52,7 +52,7 @@
   \Sigma \vdash \tyLiteral{\ell} \subty \tau
 }
 {
-  \Sigma; \Gamma; \tau \cons \seq{\tau} \vdash \descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U}, \ell
+  \Sigma; \Gamma \vdash \descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U}, \ell : \tau \cons \seq{\tau}
     \matches \descHeads{\set{\bind{\ell}{U}}}{\bot},
     \descHeads{\set{\bind{\ell}{\bot}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \varnothing
 }
