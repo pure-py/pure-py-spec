@@ -1,0 +1,26 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma \vdash \consys \longrightarrow \consys'$}
+\[
+\small
+\begin{array}{l@{\qquad}r@{\;\longrightarrow\;}l@{\qquad}l}
+\ruleName{solve-ground} & \sigma \subty \tau & \emptyset & \text{if } \Sigma \vdash \sigma \subty \tau \\
+\ruleName{solve-ground-equiv} & \sigma \tyEquiv \tau & \emptyset & \text{if } \Sigma \vdash \sigma \tyEquiv \tau \\
+\ruleName{solve-object} & t \subty \tyObject & \emptyset & \\
+\ruleName{solve-never} & \tyNever \subty t & \emptyset & \\
+\ruleName{solve-sized} & t \subty \tySized & \emptyset & \text{root of } t \text{ a constructor} \\
+\ruleName{solve-list} & \tyList{t} \subty \tyList{u} & t \tyEquiv u & \\
+\ruleName{solve-dict} & \tyDict{t} \subty \tyDict{u} & t \tyEquiv u & \\
+\ruleName{solve-tuple} & \tyTuple{t_1, \ldots, t_n} \subty \tyTuple{u_1, \ldots, u_n} & t_i \subty u_i \quad (\forall i) & \\
+\ruleName{solve-callable} & \tyCallable{t_1, \ldots, t_n}{t} \subty \tyCallable{u_1, \ldots, u_n}{u} & u_i \subty t_i \quad (\forall i), \; t \subty u & \\
+\ruleName{solve-union-lower} & \tyUnion{t}{t'} \subty u & t \subty u, \; t' \subty u & \\
+\ruleName{solve-union-left} & t \subty \tyUnion{u}{u'} & t \subty u & \text{root of } t \text{ neither union nor variable} \\
+\ruleName{solve-union-right} & t \subty \tyUnion{u}{u'} & t \subty u' & \text{likewise} \\
+\ruleName{solve-list-equiv} & \tyList{t} \tyEquiv \tyList{u} & t \tyEquiv u & \\
+\ruleName{solve-dict-equiv} & \tyDict{t} \tyEquiv \tyDict{u} & t \tyEquiv u & \\
+\ruleName{solve-tuple-equiv} & \tyTuple{t_1, \ldots, t_n} \tyEquiv \tyTuple{u_1, \ldots, u_n} & t_i \tyEquiv u_i \quad (\forall i) & \\
+\ruleName{solve-callable-equiv} & \tyCallable{t_1, \ldots, t_n}{t} \tyEquiv \tyCallable{u_1, \ldots, u_n}{u} & t_i \tyEquiv u_i \quad (\forall i), \; t \tyEquiv u & \\
+\end{array}
+\]
+\caption{Solver steps, each rewriting one constraint of the system}
+\label{fig:graduality-solver}
+\end{figure}

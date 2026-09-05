@@ -193,46 +193,40 @@ reduce three list-headed components to two, so the completeness direction of
 Lemma~\ref{lem:three-sub-correct} fails. With the residual case of the supertype relation, this
 motivates constraints over shared witnesses in place of judgements of fixed arity.
 
-\begin{definition}[Constraint system]
-\label{def:constraint-system}
-Let $x$, $y$ and $z$ range over constraint variables. A constraint system $\consys$ declares
-finitely many variables, each with a gradual type as its range, and imposes finitely many
-constraints $x \subty y$ and $x \tyEquiv y$ whose operands are declared variables or types.
+\begin{definition}[Constraints]
+\label{def:constraints}
+Let $x$, $y$ and $z$ range over variables, and $t$ and $u$ over terms:
+\[
+t, u \mathrel{::=} x \mid \sigma \mid \tyList{t} \mid \tyDict{t} \mid \tyTuple{t_1, \ldots, t_n}
+  \mid \tyCallable{t_1, \ldots, t_n}{t} \mid \tyUnion{t}{u}
+\]
+where $\sigma$ is atomic, with neither a constructor nor a union at the root. A constraint is
+$t \subty u$ or $t \tyEquiv u$; a system $\consys$ is a finite set of constraints. Write
+$\toTerm{\gty{\tau}}$ for $\gty{\tau}$ read as a term with each occurrence of $\tyAny$ replaced
+by a fresh variable.
 \end{definition}
 
 \begin{definition}[Satisfaction]
 \label{def:satisfaction}
-$\Sigma \vDash \consys$ if and only if some map $\theta$, sending each variable to a member of
-the concretisation of its range and each type to itself, validates every constraint as the
-corresponding static judgement.
+$\Sigma \vDash \consys$ if and only if some map $\theta$ from variables to types validates every
+constraint of $\consys$ as the corresponding static judgement.
 \end{definition}
 
-\noindent The lifted relations are the small instances:
+\noindent The instances $\theta\toTerm{\gty{\tau}}$ are exactly the concretisation of
+$\gty{\tau}$, so the lifted relations are small systems:
 $\Sigma \vdash \threeSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ if and only if
-$\Sigma \vDash \langle x : \gty{\tau}, y : \gty{\tau}', z : \gty{\sigma} \mathrel{;}
-x \subty z, y \subty z \rangle$, and consistent subtyping is the one-constraint case.
+$\Sigma \vDash \set{\toTerm{\gty{\tau}} \subty t, \toTerm{\gty{\tau}'} \subty t}$ where
+$t = \toTerm{\gty{\sigma}}$, the shared type contributing one term; consistent subtyping is the
+one-constraint case.
 
-The solver rewrites a system; every step preserves and reflects satisfiability, and a choice is a
-disjunction, so $\consys$ is satisfiable exactly when some run succeeds.
-%
-\begin{itemize}
-\item A variable with static range is replaced by its range and discarded.
-\item A constraint between types is checked by the static judgement, the run failing if the check
-  does; a constraint with upper operand $\tyObject$ is deleted.
-\item A variable with union range splits into fresh variables over the components: as lower
-  operand, one constraint per component; as upper operand, one chosen component, provided the
-  root of the other operand, or of its range, is neither $\tyAny$ nor a union. A union type as
-  lower operand splits likewise.
-\item Variables whose ranges share a root constructor unfold once, the argument positions
-  receiving fresh variables shared by every constraint on the variable; constraints between
-  unfolded operands decompose componentwise, into equivalence for list and dictionary elements,
-  subtyping for tuple components and callable results, and reversed subtyping for callable
-  arguments. Distinct root constructors fail.
-\item A variable with range $\tyAny$ is an \emph{unknown}; when every remaining constraint
-  relates unknowns to types alone, an unknown is assignable exactly when the join of its lower
-  bounds lies below the meet of its upper bounds, by the lattice of \specification.
-\end{itemize}
-%
-Deferred: constraints between two unknowns, unknowns against constructor operands, equivalence
-constraints on split unions, and the proof that the solver succeeds exactly on satisfiable
-systems.
+\figref{graduality-solver} gives the solver steps. A step rewrites any one constraint, and a
+choice is a disjunction, so $\consys$ is satisfiable exactly when some run succeeds. A ground
+constraint whose static check fails, or a constraint between operands with distinct constructor
+roots, fails the run. A run stops when every constraint relates a variable to a ground term; a
+variable is then assignable exactly when the join of its lower bounds lies below the meet of its
+upper bounds, up to the equivalences that pin it, by the lattice of \specification.
+
+\input{spec/fig/graduality-solver}
+
+Deferred: constraints in which both operands contain variables, equivalences involving union
+terms, and the correctness and termination arguments.
