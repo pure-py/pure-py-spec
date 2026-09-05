@@ -47,10 +47,11 @@
 \inferrule*[lab={\ruleName{val-def}}]
 {
   \vdash \rho : \Gamma \\
-  \Gamma \vdash \exDef{f_1}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{b_{n+1}} : \Assigns{\Delta}
+  d_i = \exDef{f_i}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{b} \\
+  \Gamma \vdash \seq{d} : \Assigns{\Delta}
 }
 {
-  \vdash \exDefClosure[\Gamma]{\rho}{\exDef{f_1}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{b_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{b_{n+1}}}{i} : \Delta(f_i)
+  \vdash \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} : \Delta(f_i)
 }
 \and
 \inferrule*[lab={\ruleName{val-obj}}]
