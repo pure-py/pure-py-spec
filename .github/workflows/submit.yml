@@ -12,14 +12,23 @@ on:
 permissions:
   contents: read
 
-env:
-  ISABELLE_VERSION: Isabelle2025-2
-
 jobs:
   submit:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    container:
+      # Official image, with HOL prebuilt. Runs as root so that checkout and apt can write.
+      image: makarius/isabelle:Isabelle2025-2
+      options: --user root
     steps:
+      - name: Install packages
+        run: |
+          apt-get update -q
+          apt-get install -y -q --no-install-recommends \
+            git zip make ca-certificates \
+            texlive-latex-extra texlive-fonts-extra texlive-science \
+            texlive-publishers texlive-bibtex-extra
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -35,29 +44,8 @@ jobs:
           python-version: "3.12"
           enable-cache: true
 
-      - name: Install TeX Live
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y -q --no-install-recommends \
-            texlive-latex-extra texlive-fonts-extra texlive-science \
-            texlive-publishers texlive-bibtex-extra
-
-      - name: Cache Isabelle
-        id: cache-isabelle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/${{ env.ISABELLE_VERSION }}
-            ~/.isabelle
-          key: ${{ env.ISABELLE_VERSION }}-linux
-
-      - name: Install Isabelle
-        if: steps.cache-isabelle.outputs.cache-hit != 'true'
-        run: |
-          curl -fsSL "https://isabelle.in.tum.de/dist/${ISABELLE_VERSION}_linux.tar.gz" | tar -xz -C "$HOME"
-
       - name: Add Isabelle to PATH
-        run: echo "$HOME/$ISABELLE_VERSION/bin" >> "$GITHUB_PATH"
+        run: echo "/home/isabelle/Isabelle/bin" >> "$GITHUB_PATH"
 
       - name: Build documents and submission
         run: make PurePy-spec.pdf paper.pdf submit
