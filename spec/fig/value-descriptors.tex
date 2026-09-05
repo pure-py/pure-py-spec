@@ -8,12 +8,12 @@ $h$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $C$ & (Class) \\
     & $\mid$ & $\headList{n}$ & (Length)
    \\[3mm]
-\grammarGroup{Tries} \\
+\grammarGroup{Value descriptors} \\
 $T$, $S$ & $::=$ & $\top$ & (All) \\
     & $\mid$ & $\bot$ & (None) \\
     & $\mid$ & $\tyUnion{T}{T'}$ & (Union) \\
-    & $\mid$ & $\trieHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U}$ & (Heads) \\
-    & $\mid$ & $\trieDict{\set{\bind{\seq{w}}{\seq{T}}}}{U}$ & (Dict)
+    & $\mid$ & $\descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U}$ & (Heads) \\
+    & $\mid$ & $\descDict{\set{\bind{\seq{w}}{\seq{T}}}}{U}$ & (Dict)
    \\[3mm]
 \grammarGroup{Defaults} \\
 $U$ & $::=$ & $\top$ & (All) \\
@@ -26,7 +26,7 @@ $U$ & $::=$ & $\top$ & (All) \\
 \flushleft \shadebox{$\Sigma \vdash T : \seq{\tau}$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{trie-top}}]
+\inferrule*[lab={\ruleName{desc-top}}]
 {
   \strut
 }
@@ -34,7 +34,7 @@ $U$ & $::=$ & $\top$ & (All) \\
   \Sigma \vdash \top : \seq{\tau}
 }
 \and
-\inferrule*[lab={\ruleName{trie-bot}}]
+\inferrule*[lab={\ruleName{desc-bot}}]
 {
   \strut
 }
@@ -42,7 +42,7 @@ $U$ & $::=$ & $\top$ & (All) \\
   \Sigma \vdash \bot : \seq{\tau}
 }
 \and
-\inferrule*[lab={\ruleName{trie-union}}]
+\inferrule*[lab={\ruleName{desc-union}}]
 {
   \Sigma \vdash T : \tau \cons \seq{\tau} \\
   \Sigma \vdash T' : \sigma \cons \seq{\tau}
@@ -51,7 +51,7 @@ $U$ & $::=$ & $\top$ & (All) \\
   \Sigma \vdash \tyUnion{T}{T'} : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}
 }
 \and
-\inferrule*[lab={\ruleName{trie-tuple}}]
+\inferrule*[lab={\ruleName{desc-tuple}}]
 {
   \Sigma \vdash T : \seq{\sigma} \concat \seq{\tau}
 }
@@ -59,21 +59,21 @@ $U$ & $::=$ & $\top$ & (All) \\
   \Sigma \vdash T : \tyTuple{\seq{\sigma}} \cons \seq{\tau}
 }
 \and
-\inferrule*[lab={\ruleName{trie-heads}}]
+\inferrule*[lab={\ruleName{desc-heads}}]
 {
   \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \\
   \tau \text{ neither union, tuple nor dictionary type}
 }
 {
-  \Sigma \vdash \trieHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U} : \tau \cons \seq{\tau}
+  \Sigma \vdash \descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U} : \tau \cons \seq{\tau}
 }
 \and
-\inferrule*[lab={\ruleName{trie-dict}}]
+\inferrule*[lab={\ruleName{desc-dict}}]
 {
   \Sigma \vdash T_i : \tau \cons \seq{\tau} \quad (\forall i)
 }
 {
-  \Sigma \vdash \trieDict{\set{\bind{\seq{w}}{\seq{T}}}}{U} : \tyDict{\tau} \cons \seq{\tau}
+  \Sigma \vdash \descDict{\set{\bind{\seq{w}}{\seq{T}}}}{U} : \tyDict{\tau} \cons \seq{\tau}
 }
 \end{mathpar}
 
@@ -122,6 +122,6 @@ $U$ & $::=$ & $\top$ & (All) \\
 }
 \end{mathpar}
 
-\caption{Shape tries}
-\label{fig:shape-tries}
+\caption{Value descriptors}
+\label{fig:value-descriptors}
 \end{figure}
