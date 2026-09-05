@@ -268,7 +268,7 @@ declared return type, and must have result type $\Returns$ unless the function r
 so a function that declares a result definitely returns one.
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and the cases are taken in turn from
-$\shapesOf(\Sigma, \sigma, \varnothing)$, which denotes every value of $\sigma$. The \emph{residual} $L_i$ holds
+$\shapesOf(\Sigma, \sigma, \varnothing)$, which denotes every value of $\sigma$. The residual $L_i$ holds
 the values which have not been matched by any case up to the $i$th. Each case matches its pattern against
 the residual by the \ruleName{pat-cases} rule (\figref{pat-seq}), yielding the pattern's bindings and the
 shapes left unmatched; the body is checked under the bindings, and the pattern must agree with $\sigma$
@@ -289,7 +289,7 @@ Name resolution takes a qualified name to a context entry (\figref{resolve-name}
 
 \input{spec/fig/shapes}
 
-To check a \pyinline{match}, each case is matched in turn against the residual: the values of the
+To check a \pyinline{match}, each case is matched in turn against the \emph{residual}: the values of the
 scrutinee's type which have not been matched by any earlier case. A case that matches none of the
 residual is unreachable, and a match whose last case leaves an empty residual is exhaustive, so a
 single judgement decides both properties (\figrefTwo{pat}{pat-seq}). Because the residual starts
