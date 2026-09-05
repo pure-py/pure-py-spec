@@ -3,6 +3,10 @@
 \setlength{\jot}{2pt}
 \begin{center}
 \begin{tabular}{rcll}
+\grammarGroup{Heads} \\
+$h$ & $::=$ & $\ell$ & (Literal) \\
+    & $\mid$ & $C$ & (Class)
+   \\[3mm]
 \grammarGroup{Tries} \\
 $t$ & $::=$ & $\top$ & (All) \\
     & $\mid$ & $\bot$ & (None) \\
@@ -11,9 +15,40 @@ $t$ & $::=$ & $\top$ & (All) \\
     & $\mid$ & $\trieSwitch{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d}$ & (Key switch)
    \\[3mm]
 \grammarGroup{Defaults} \\
-$d$ & $::=$ & $\top \mid \bot$ & (Default)
+$d$ & $::=$ & $\top$ & (All) \\
+    & $\mid$ & $\bot$ & (None)
 \end{tabular}
 \end{center}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\Sigma \vdash h : \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{head-literal}}]
+{
+  \Sigma \vdash \tyLiteral{\ell} \subty \tau
+}
+{
+  \Sigma \vdash \ell : \tau
+}
+\and
+\inferrule*[lab={\ruleName{head-class}}]
+{
+  \Sigma \vdash C \subty \tau
+}
+{
+  \Sigma \vdash C : \tau
+}
+\and
+\inferrule*[lab={\ruleName{head-length}}]
+{
+  n \text{ an integer}
+}
+{
+  \Sigma \vdash n : \tyList{\tau}
+}
+\end{mathpar}
 
 \vspace{2mm}
 
