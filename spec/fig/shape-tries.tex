@@ -12,7 +12,7 @@ $h$ & $::=$ & $\ell$ & (Literal) \\
 $T$ & $::=$ & $\top$ & (All) \\
     & $\mid$ & $\bot$ & (None) \\
     & $\mid$ & $\tyUnion{T}{T'}$ & (Union) \\
-    & $\mid$ & $\trieMatch{\set{\bind{\seq{h}}{\seq{T}}}}{U}$ & (Match) \\
+    & $\mid$ & $\trieHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U}$ & (Heads) \\
     & $\mid$ & $\trieDict{\set{\bind{\seq{w}}{\seq{T}}}}{U}$ & (Dict)
    \\[3mm]
 \grammarGroup{Defaults} \\
@@ -65,7 +65,7 @@ $U$ & $::=$ & $\top$ & (All) \\
   \tau \text{ neither union, tuple nor dictionary type}
 }
 {
-  \Sigma \vdash \trieMatch{\set{\bind{\seq{h}}{\seq{T}}}}{U} : \tau \cons \seq{\tau}
+  \Sigma \vdash \trieHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U} : \tau \cons \seq{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{trie-dict}}]
