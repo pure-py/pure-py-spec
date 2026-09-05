@@ -64,7 +64,11 @@ supplementary.zip: spec-anon.pdf check-mechanisation
 	cd .submission && zip -q -9 -r ../$@ $(MECHANISATION)
 	rm -rf .submission
 
-submit: paper-anon.pdf supplementary.zip
+# Tests are included in the paper as examples, so a submission requires a passing suite.
+check-tests:
+	uv run --locked ./test/run-all.sh
+
+submit: check-tests paper-anon.pdf supplementary.zip
 
 paper-arXiv.zip: $(ARXIV_FILES)
 	rm -f $@
@@ -73,4 +77,4 @@ paper-arXiv.zip: $(ARXIV_FILES)
 clean:
 	rm -f $(AUX) *.pdf *.zip
 
-.PHONY: default submit clean check-mechanisation
+.PHONY: default submit clean check-mechanisation check-tests
