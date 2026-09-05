@@ -73,11 +73,11 @@ $d$ & $::=$ & $\top$ & (All) \\
 \and
 \inferrule*[lab={\ruleName{trie-union}}]
 {
-  \Sigma \vdash t : \tau \concat \seq{\tau} \\
-  \Sigma \vdash t' : \sigma \concat \seq{\tau}
+  \Sigma \vdash t : \tau \cons \seq{\tau} \\
+  \Sigma \vdash t' : \sigma \cons \seq{\tau}
 }
 {
-  \Sigma \vdash \langle t, t' \rangle : (\tyUnion{\tau}{\sigma}) \concat \seq{\tau}
+  \Sigma \vdash \langle t, t' \rangle : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{trie-tuple}}]
@@ -85,7 +85,7 @@ $d$ & $::=$ & $\top$ & (All) \\
   \Sigma \vdash t : \seq{\sigma} \concat \seq{\tau}
 }
 {
-  \Sigma \vdash t : \tyTuple{\seq{\sigma}} \concat \seq{\tau}
+  \Sigma \vdash t : \tyTuple{\seq{\sigma}} \cons \seq{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{trie-switch}}]
@@ -95,15 +95,15 @@ $d$ & $::=$ & $\top$ & (All) \\
   \tau \text{ neither union, tuple nor dictionary type}
 }
 {
-  \Sigma \vdash \trieSwitch{h_1 \mapsto t_1, \ldots, h_n \mapsto t_n}{d} : \tau \concat \seq{\tau}
+  \Sigma \vdash \trieSwitch{h_1 \mapsto t_1, \ldots, h_n \mapsto t_n}{d} : \tau \cons \seq{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{trie-dict}}]
 {
-  \Sigma \vdash t_i : \tau \concat \seq{\tau} \quad (\forall i)
+  \Sigma \vdash t_i : \tau \cons \seq{\tau} \quad (\forall i)
 }
 {
-  \Sigma \vdash \trieSwitch{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d} : \tyDict{\tau} \concat \seq{\tau}
+  \Sigma \vdash \trieSwitch{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d} : \tyDict{\tau} \cons \seq{\tau}
 }
 \end{mathpar}
 
