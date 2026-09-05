@@ -1,0 +1,70 @@
+name: Submit
+
+on:
+  workflow_dispatch:
+  push:
+    paths-ignore:
+      - README.md
+  pull_request:
+    paths-ignore:
+      - README.md
+
+permissions:
+  contents: read
+
+env:
+  ISABELLE_VERSION: Isabelle2025-2
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Fetch mechanisation main for the ancestor check
+        run: git -C isabelle-purepy fetch -q origin main
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install TeX Live
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends \
+            texlive-latex-extra texlive-fonts-extra texlive-science \
+            texlive-publishers texlive-bibtex-extra
+
+      - name: Cache Isabelle
+        id: cache-isabelle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/${{ env.ISABELLE_VERSION }}
+            ~/.isabelle
+          key: ${{ env.ISABELLE_VERSION }}-linux
+
+      - name: Install Isabelle
+        if: steps.cache-isabelle.outputs.cache-hit != 'true'
+        run: |
+          curl -fsSL "https://isabelle.in.tum.de/dist/${ISABELLE_VERSION}_linux.tar.gz" | tar -xz -C "$HOME"
+
+      - name: Add Isabelle to PATH
+        run: echo "$HOME/$ISABELLE_VERSION/bin" >> "$GITHUB_PATH"
+
+      - name: Build documents and submission
+        run: make PurePy-spec.pdf paper.pdf submit
+
+      - name: Upload submission artefacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: submission
+          path: |
+            paper-anon.pdf
+            supplementary.zip
