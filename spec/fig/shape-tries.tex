@@ -61,7 +61,7 @@ $d$ & $::=$ & $\top$ & (All) \\
 \inferrule*[lab={\ruleName{trie-switch}}]
 {
   \Sigma \vdash \bind{h_1}{t_1}, \ldots, \bind{h_n}{t_n} : \tau \cons \seq{\tau} \\
-  h_1, \ldots, h_n \text{ distinct} \\
+  \seq{h} \text{ distinct} \\
   \tau \text{ neither union, tuple nor dictionary type}
 }
 {
@@ -71,7 +71,7 @@ $d$ & $::=$ & $\top$ & (All) \\
 \inferrule*[lab={\ruleName{trie-dict}}]
 {
   \Sigma \vdash t_i : \tau \cons \seq{\tau} \quad (\forall i) \\
-  w_1, \ldots, w_n \text{ distinct}
+  \seq{w} \text{ distinct}
 }
 {
   \Sigma \vdash \trieDict{\bind{w_1}{t_1}, \ldots, \bind{w_n}{t_n}}{d} : \tyDict{\tau} \cons \seq{\tau}
