@@ -38,6 +38,35 @@ outcomes of the same form, carrying a result, a sequence of values or an environ
 \specinput{spec/operational-semantics/auxiliary}
 \paperinput{paper/operational-semantics/operators}
 
+\subsection{Expressions and statements}
+
+A value has a context entry, and an environment a context, by \figref{value-typing}.
+For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any top-level statement $t$ with
+$\Gamma \vdash t : R$, the statement evaluation judgement $\rho, t \Rightarrow r$ says that $t$ evaluates
+to result $r$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Function definitions delimit
+the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\outcome$\speconly{ (\S\ref{aux:outcome})} reads a statement's result as
+the outcome of calling it\speconly{, $\val{\pyinline{None}}$ where the statement completes without returning.}\paperonly{:}
+\paperinput{paper/operational-semantics/outcome}
+
+For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with $\Gamma \vdash e \synth
+\tau$, the expression evaluation judgement $\rho, e \Rightarrow o$\speconly{ (\figrefTwo{eval-outcome}{eval-outcome-ctd})} says that $e$ evaluates to
+outcome $o$ in $\rho$, where $o$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). The operators
+\pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
+a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
+\ruleName{eval-if} does. A comprehension evaluates its body once for each binding its qualifiers produce, and
+concatenates the results; a generator draws its bindings from the elements of a value, given by the auxiliary
+function $\iterOp$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:iter}}): the elements of a
+list, tuple or string, and the keys of a dictionary, as in Python. Subscripting, given by the auxiliary
+function $\getitem$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:getitem}}), indexes a list, tuple or
+string by an integer, counting from the end when negative, and a dictionary by a string key,
+aborting with $\errIndex$, $\errKey$ or $\errType$ where Python raises the exception of that name; a
+dictionary subscripted by a value other than a string is undefined. Likewise an attribute reference on a
+value other than a module or object has no derivation: the attributes of built-in values are undefined.
+
+\input{spec/fig/value-typing}
+
+\specinput{spec/fig/eval-outcome}
+
 \subsection{Pattern matching}
 
 A \pyinline{match} statement takes the first case whose pattern matches the value, running its body under
@@ -66,35 +95,6 @@ since a module declares each class name at most once, the class comparison in \r
 amounts to a comparison of qualified names.
 
 \specinput{spec/fig/eval-pat}
-
-\subsection{Statements and expressions}
-
-A value has a context entry, and an environment a context, by \figref{value-typing}.
-For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any top-level statement $t$ with
-$\Gamma \vdash t : R$, the statement evaluation judgement $\rho, t \Rightarrow r$ says that $t$ evaluates
-to result $r$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Function definitions delimit
-the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\outcome$\speconly{ (\S\ref{aux:outcome})} reads a statement's result as
-the outcome of calling it\speconly{, $\val{\pyinline{None}}$ where the statement completes without returning.}\paperonly{:}
-\paperinput{paper/operational-semantics/outcome}
-
-For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with $\Gamma \vdash e \synth
-\tau$, the expression evaluation judgement $\rho, e \Rightarrow o$\speconly{ (\figrefTwo{eval-outcome}{eval-outcome-ctd})} says that $e$ evaluates to
-outcome $o$ in $\rho$, where $o$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). The operators
-\pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
-a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
-\ruleName{eval-if} does. A comprehension evaluates its body once for each binding its qualifiers produce, and
-concatenates the results; a generator draws its bindings from the elements of a value, given by the auxiliary
-function $\iterOp$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:iter}}): the elements of a
-list, tuple or string, and the keys of a dictionary, as in Python. Subscripting, given by the auxiliary
-function $\getitem$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:getitem}}), indexes a list, tuple or
-string by an integer, counting from the end when negative, and a dictionary by a string key,
-aborting with $\errIndex$, $\errKey$ or $\errType$ where Python raises the exception of that name; a
-dictionary subscripted by a value other than a string is undefined. Likewise an attribute reference on a
-value other than a module or object has no derivation: the attributes of built-in values are undefined.
-
-\input{spec/fig/value-typing}
-
-\specinput{spec/fig/eval-outcome}
 
 \subsection{Modules and programs}
 
