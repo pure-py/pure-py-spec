@@ -290,12 +290,12 @@ Name resolution takes a qualified name to a context entry (\figref{resolve-name}
 \input{spec/fig/shapes}
 
 The matching judgement decides both reachability and exhaustiveness
-(\figrefTwo{pat}{pat-seq}). Reachability is decided by the shapes a case matches and exhaustiveness
-by the residual left by the last case. Each element of this design has a precedent. Deciding both properties with a single
-relation goes back to the (``usefulness'') algorithm for ML~\cite{maranget2007}. The residual plays
-the role of the term descriptions that the match compiler of \citet{sestoft1996} threads through the
-cases. Seeding the match with the scrutinee's type follows the uncovered sets of
-\citet{karachalias2015}.
+(\figrefTwo{pat}{pat-seq}): a case is reachable when it matches some shape of the residual, and a
+match is exhaustive when its last case leaves the residual empty. Because the residual is seeded
+from the scrutinee's type, a case whose values the type already excludes is unreachable, as with
+the uncovered sets of \citet{karachalias2015}. A single relation deciding both properties goes
+back to the (``usefulness'') algorithm for ML~\cite{maranget2007}, and the residual threaded from
+case to case corresponds to the term descriptions of the match compiler of \citet{sestoft1996}.
 
 A \emph{shape} $k$
 denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{N}$ is a
