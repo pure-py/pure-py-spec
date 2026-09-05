@@ -73,11 +73,11 @@ $d$ & $::=$ & $\top$ & (All) \\
 \and
 \inferrule*[lab={\ruleName{trie-union}}]
 {
-  \Sigma \vdash t : \sigma \concat \seq{\tau} \\
-  \Sigma \vdash t' : \sigma' \concat \seq{\tau}
+  \Sigma \vdash t : \tau \concat \seq{\tau} \\
+  \Sigma \vdash t' : \sigma \concat \seq{\tau}
 }
 {
-  \Sigma \vdash \langle t, t' \rangle : (\tyUnion{\sigma}{\sigma'}) \concat \seq{\tau}
+  \Sigma \vdash \langle t, t' \rangle : (\tyUnion{\tau}{\sigma}) \concat \seq{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{trie-tuple}}]
@@ -90,30 +90,30 @@ $d$ & $::=$ & $\top$ & (All) \\
 \and
 \inferrule*[lab={\ruleName{trie-switch}}]
 {
-  \Sigma \vdash h_i : \sigma \quad
-  \Sigma \vdash t_i : \compsOf(\Sigma, \sigma, h_i) \concat \seq{\tau} \quad (\forall i) \\
-  \sigma \text{ neither union, tuple nor dictionary type}
+  \Sigma \vdash h_i : \tau \quad
+  \Sigma \vdash t_i : \compsOf(\Sigma, \tau, h_i) \concat \seq{\tau} \quad (\forall i) \\
+  \tau \text{ neither union, tuple nor dictionary type}
 }
 {
-  \Sigma \vdash \trieSwitch{h_1 \mapsto t_1, \ldots, h_n \mapsto t_n}{d} : \sigma \concat \seq{\tau}
+  \Sigma \vdash \trieSwitch{h_1 \mapsto t_1, \ldots, h_n \mapsto t_n}{d} : \tau \concat \seq{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{trie-dict}}]
 {
-  \Sigma \vdash t_i : \sigma \concat \seq{\tau} \quad (\forall i)
+  \Sigma \vdash t_i : \tau \concat \seq{\tau} \quad (\forall i)
 }
 {
-  \Sigma \vdash \trieSwitch{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d} : \tyDict{\sigma} \concat \seq{\tau}
+  \Sigma \vdash \trieSwitch{w_1 \mapsto t_1, \ldots, w_n \mapsto t_n}{d} : \tyDict{\tau} \concat \seq{\tau}
 }
 \end{mathpar}
 
 \vspace{2mm}
 
 \begin{defalign}
-& \compsOf(\Sigma, \sigma, \ell) && = \varepsilon \\
-& \compsOf(\Sigma, \sigma, C) && = \seq{\sigma}' \quad (\fields(\Sigma, C) = \seq{\bind{x}{\sigma'}}) \\
-& \compsOf(\Sigma, \tyList{\sigma}, n) && = \sigma^n
+& \compsOf(\Sigma, \tau, \ell) && = \varepsilon \\
+& \compsOf(\Sigma, \tau, C) && = \seq{\sigma} \quad (\fields(\Sigma, C) = \seq{\bind{x}{\sigma}}) \\
+& \compsOf(\Sigma, \tyList{\tau}, n) && = \tau^n
 \end{defalign}
-\caption{Shape tries: $\seq{\tau}$ a sequence of types, $\varepsilon$ the empty sequence, $\sigma^n$ the $n$-fold sequence}
+\caption{Shape tries: $\seq{\tau}$ a sequence of types, $\varepsilon$ the empty sequence, $\tau^n$ the $n$-fold sequence}
 \label{fig:shape-tries}
 \end{figure}
