@@ -61,7 +61,7 @@ supplementary.zip: spec-anon.pdf check-mechanisation
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
 	./anonymise-mechanisation.sh .submission
-	cd .submission && zip -q -9 -r ../$@ ourlang-mechanisation
+	cd .submission && zip -q -9 -r ../$@ mechanisation
 	rm -rf .submission
 
 # Tests are included in the paper as examples, so a submission requires a passing suite.

@@ -4,7 +4,7 @@ set -euo pipefail
 
 SRC=isabelle-purepy
 DEST="${1:?usage: anonymise-mechanisation.sh <dest-dir>}"
-NAME=ourlang-mechanisation
+NAME=mechanisation
 
 rm -rf "$DEST/$NAME"
 mkdir -p "$DEST/$NAME"
