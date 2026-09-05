@@ -66,10 +66,3 @@ rules, so \pyinline{n} is usable only once every path has assigned it. Python ha
 introduces a function, so a variable \pyinline{def} is a syntax error, and core \PurePy, a subset of Python, has
 none either. The implicit definitions of the core are the case in which every variable is introduced by
 \pyinline{def x = e}, so the core desugars into the explicit form.
-
-\subsection{Shape tries}
-
-\figref{shape-tries} sketches a type-indexed trie to replace the shape sets of
-\secref{well-formedness-patterns}, with a default branch in place of excluded heads.
-
-\input{paper/fig/shape-tries}
