@@ -27,7 +27,7 @@ jobs:
           apt-get install -y -q --no-install-recommends \
             git zip make ca-certificates \
             texlive-latex-extra texlive-fonts-extra texlive-science \
-            texlive-publishers texlive-bibtex-extra
+            texlive-publishers texlive-bibtex-extra texlive-plain-generic
 
       - name: Checkout repository
         uses: actions/checkout@v4
