@@ -39,19 +39,10 @@
 \and
 \inferrule*[lab={\ruleName{desc-tuple}}]
 {
-  \Sigma \vdash T : \seq{\sigma} \concat \seq{\tau} \synth \zeta \\
-  \zeta \neq \tyNever
+  \Sigma \vdash T : \seq{\sigma} \concat \seq{\tau} \synth \zeta
 }
 {
-  \Sigma \vdash T : \tyTuple{\seq{\sigma}} \cons \seq{\tau} \synth \tyTuple{\seq{\sigma}}
-}
-\and
-\inferrule*[lab={\ruleName{desc-tuple-empty}}]
-{
-  \Sigma \vdash T : \seq{\sigma} \concat \seq{\tau} \synth \tyNever
-}
-{
-  \Sigma \vdash T : \tyTuple{\seq{\sigma}} \cons \seq{\tau} \synth \tyNever
+  \Sigma \vdash T : \tyTuple{\seq{\sigma}} \cons \seq{\tau} \synth \liveTy(\zeta, \tyTuple{\seq{\sigma}})
 }
 \and
 \inferrule*[lab={\ruleName{desc-heads-open}}]
@@ -89,6 +80,12 @@
   \Sigma \vdash \descDict{\set{\bind{\seq{w}}{\seq{T}}}}{U} : \tyDict{\tau} \cons \seq{\tau} \synth \tyNever
 }
 \end{mathpar}
+\vspace{2mm}
+
+\begin{defalign}
+\liveTy(\tyNever, \sigma) &{}= \tyNever \\*
+\liveTy(\zeta, \sigma) &{}= \sigma && \text{if } \zeta \neq \tyNever
+\end{defalign}
 \caption{Value descriptor typing}
 \label{fig:value-descriptor-typing}
 \end{figure}
