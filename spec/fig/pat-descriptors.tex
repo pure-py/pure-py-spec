@@ -87,7 +87,7 @@
 \inferrule*[lab={\ruleName{desc-top-heads}}]
 {
   \Sigma; \Gamma \vdash \descHeads{\varnothing}{\top} : \tau \cons \seq{\tau}, \seq{p} \matches S, T' \binding \Delta \\
-  \tau \text{ neither union, tuple nor dictionary type}
+  \headed(\tau)
 }
 {
   \Sigma; \Gamma \vdash \top : \tau \cons \seq{\tau}, \seq{p} \matches S, T' \binding \Delta
@@ -96,7 +96,7 @@
 \inferrule*[lab={\ruleName{desc-bot-heads}}]
 {
   \Sigma; \Gamma \vdash \descHeads{\varnothing}{\bot} : \tau \cons \seq{\tau}, \seq{p} \matches S, T' \binding \Delta \\
-  \tau \text{ neither union, tuple nor dictionary type}
+  \headed(\tau)
 }
 {
   \Sigma; \Gamma \vdash \bot : \tau \cons \seq{\tau}, \seq{p} \matches S, T' \binding \Delta

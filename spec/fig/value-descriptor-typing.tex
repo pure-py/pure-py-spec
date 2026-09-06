@@ -49,7 +49,7 @@
 {
   \Sigma \vdash E : \tau \cons \seq{\tau} \synth \sigma \\
   \Sigma \vdash U : \seq{\tau} \synth \zeta \\
-  \tau \text{ neither union, tuple nor dictionary type}
+  \headed(\tau)
 }
 {
   \Sigma \vdash \descHeads{E}{U} : \tau \cons \seq{\tau} \synth \liveTy(\Sigma, \zeta, \tau, \sigma)
@@ -75,6 +75,7 @@
 \vspace{2mm}
 
 \begin{defalign}
+\headed(\tau) &{}\iff \tau \text{ neither union, tuple nor dictionary type} \\*
 \liveTy(\Sigma, \tyNever, \sigma, \tau) &{}= \tau \\*
 \liveTy(\Sigma, \zeta, \sigma, \tau) &{}= \joinTy(\Sigma, \sigma, \tau) && \quad \text{otherwise}
 \end{defalign}
