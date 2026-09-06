@@ -19,7 +19,7 @@
   \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \sigma
 }
 {
-  \Sigma \vdash \set{\bind{\ell}{T}, \bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \joinTy(\Sigma, \liveTy(\zeta, \tyLiteral{\ell}), \sigma)
+  \Sigma \vdash \set{\bind{\ell}{T}, \bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \liveTy(\Sigma, \zeta, \tyLiteral{\ell}, \sigma)
 }
 \and
 \inferrule*[lab={\ruleName{entries-class}}]
@@ -30,7 +30,7 @@
   \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \sigma
 }
 {
-  \Sigma \vdash \set{\bind{C}{T}, \bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \joinTy(\Sigma, \liveTy(\zeta, C), \sigma)
+  \Sigma \vdash \set{\bind{C}{T}, \bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \liveTy(\Sigma, \zeta, C, \sigma)
 }
 \and
 \inferrule*[lab={\ruleName{entries-list}}]
@@ -40,7 +40,7 @@
   \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tyList{\tau} \cons \seq{\tau} \synth \sigma
 }
 {
-  \Sigma \vdash \set{\bind{\headList{n}}{T}, \bind{\seq{h}}{\seq{T}}} : \tyList{\tau} \cons \seq{\tau} \synth \joinTy(\Sigma, \liveTy(\zeta, \tyList{\tau}), \sigma)
+  \Sigma \vdash \set{\bind{\headList{n}}{T}, \bind{\seq{h}}{\seq{T}}} : \tyList{\tau} \cons \seq{\tau} \synth \liveTy(\Sigma, \zeta, \tyList{\tau}, \sigma)
 }
 \end{mathpar}
 \caption{Descriptor entry typing}

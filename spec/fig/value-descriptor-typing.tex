@@ -42,7 +42,7 @@
   \Sigma \vdash T : \seq{\sigma} \concat \seq{\tau} \synth \zeta
 }
 {
-  \Sigma \vdash T : \tyTuple{\seq{\sigma}} \cons \seq{\tau} \synth \liveTy(\zeta, \tyTuple{\seq{\sigma}})
+  \Sigma \vdash T : \tyTuple{\seq{\sigma}} \cons \seq{\tau} \synth \liveTy(\Sigma, \zeta, \tyTuple{\seq{\sigma}}, \tyNever)
 }
 \and
 \inferrule*[lab={\ruleName{desc-heads-open}}]
@@ -83,8 +83,8 @@
 \vspace{2mm}
 
 \begin{defalign}
-\liveTy(\tyNever, \sigma) &{}= \tyNever \\*
-\liveTy(\zeta, \sigma) &{}= \sigma && \quad \text{otherwise}
+\liveTy(\Sigma, \tyNever, \sigma, \sigma') &{}= \sigma' \\*
+\liveTy(\Sigma, \zeta, \sigma, \sigma') &{}= \joinTy(\Sigma, \sigma, \sigma') && \quad \text{otherwise}
 \end{defalign}
 \caption{Value descriptor typing}
 \label{fig:value-descriptor-typing}
