@@ -19,119 +19,158 @@
 
 \vspace{2mm}
 
-\flushleft \shadebox{$\Sigma; \Gamma \vdash T : \seq{\tau}, p \matches S, T' \binding \Delta$}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash T : \seq{\tau}, \seq{p} \matches S, T' \binding \Delta$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{desc-wild}}]
+\inferrule*[lab={\ruleName{desc-empty}}]
 {
   \strut
 }
 {
-  \Sigma; \Gamma \vdash T : \seq{\tau}, \patWild \matches T, \bot \binding \varnothing
+  \Sigma; \Gamma \vdash T : \varepsilon, \varepsilon \matches T, \bot \binding \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{desc-wild}}]
+{
+  p_i = \patWild \quad (\forall i)
+}
+{
+  \Sigma; \Gamma \vdash T : \seq{\tau}, \seq{p} \matches T, \bot \binding \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{desc-wild-default}}]
+{
+  \Sigma; \Gamma \vdash U : \seq{\tau}, \seq{p} \matches S, T' \binding \Delta
+}
+{
+  \Sigma; \Gamma \vdash \descHeads{\varnothing}{U} : \tau \cons \seq{\tau}, \patWild \cons \seq{p}
+    \matches \descHeads{\varnothing}{S}, \descHeads{\varnothing}{T'} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{desc-var}}]
 {
-  \Sigma \vdash T : \seq{\tau} \synth \sigma
+  \Sigma; \Gamma \vdash T : \seq{\tau}, \patWild \cons \seq{p} \matches S, T' \binding \Delta \\
+  \Sigma \vdash S : \seq{\tau} \synth \sigma
 }
 {
-  \Sigma; \Gamma \vdash T : \seq{\tau}, x \matches T, \bot \binding \set{\bind{x}{\sigma}}
+  \Sigma; \Gamma \vdash T : \seq{\tau}, x \cons \seq{p} \matches S, T' \binding \Delta \disjunion \set{\bind{x}{\sigma}}
+}
+\and
+\inferrule*[lab={\ruleName{desc-as}}]
+{
+  \Sigma; \Gamma \vdash T : \seq{\tau}, p \cons \seq{p} \matches S, T' \binding \Delta \\
+  \Sigma \vdash S : \seq{\tau} \synth \sigma
+}
+{
+  \Sigma; \Gamma \vdash T : \seq{\tau}, (p\;\pyinline{as}\;x) \cons \seq{p} \matches S, T' \binding \Delta \disjunion \set{\bind{x}{\sigma}}
 }
 \and
 \inferrule*[lab={\ruleName{desc-lit}}]
 {
-  \strut
+  \Sigma; \Gamma \vdash T : \seq{\tau}, \seq{p} \matches S, T' \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \descHeads{\set{\bind{\ell}{T}, \bind{\seq{h}}{\seq{T}}}}{U} : \seq{\tau}, \ell
-    \matches \descHeads{\set{\bind{\ell}{T}}}{\bot},
-    \descHeads{\set{\bind{\ell}{\bot}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \varnothing
+  \Sigma; \Gamma \vdash \descHeads{\set{\bind{\ell}{T}, \bind{\seq{h}}{\seq{T}}}}{U} : \tau \cons \seq{\tau}, \ell \cons \seq{p}
+    \matches \descHeads{\set{\bind{\ell}{S}}}{\bot},
+    \descHeads{\set{\bind{\ell}{T'}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{desc-lit-default}}]
 {
   \ell \notin \seq{h} \\
-  \Sigma \vdash \tyLiteral{\ell} \subty \tau
+  \Sigma \vdash \tyLiteral{\ell} \subty \tau \\
+  \Sigma; \Gamma \vdash U : \seq{\tau}, \seq{p} \matches S, T' \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U} : \tau \cons \seq{\tau}, \ell
-    \matches \descHeads{\set{\bind{\ell}{U}}}{\bot},
-    \descHeads{\set{\bind{\ell}{\bot}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \varnothing
+  \Sigma; \Gamma \vdash \descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U} : \tau \cons \seq{\tau}, \ell \cons \seq{p}
+    \matches \descHeads{\set{\bind{\ell}{S}}}{\bot},
+    \descHeads{\set{\bind{\ell}{T'}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{desc-neg-lit}}]
 {
-  \strut
+  \Sigma; \Gamma \vdash T : \seq{\tau}, \seq{p} \matches S, T' \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \descHeads{\set{\bind{-n}{T}, \bind{\seq{h}}{\seq{T}}}}{U} : \seq{\tau}, -n
-    \matches \descHeads{\set{\bind{-n}{T}}}{\bot},
-    \descHeads{\set{\bind{-n}{\bot}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \varnothing
+  \Sigma; \Gamma \vdash \descHeads{\set{\bind{-n}{T}, \bind{\seq{h}}{\seq{T}}}}{U} : \tau \cons \seq{\tau}, -n \cons \seq{p}
+    \matches \descHeads{\set{\bind{-n}{S}}}{\bot},
+    \descHeads{\set{\bind{-n}{T'}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{desc-neg-lit-default}}]
 {
   -n \notin \seq{h} \\
-  \Sigma \vdash \tyLiteral{-n} \subty \tau
+  \Sigma \vdash \tyLiteral{-n} \subty \tau \\
+  \Sigma; \Gamma \vdash U : \seq{\tau}, \seq{p} \matches S, T' \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U} : \tau \cons \seq{\tau}, -n
-    \matches \descHeads{\set{\bind{-n}{U}}}{\bot},
-    \descHeads{\set{\bind{-n}{\bot}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \varnothing
+  \Sigma; \Gamma \vdash \descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U} : \tau \cons \seq{\tau}, -n \cons \seq{p}
+    \matches \descHeads{\set{\bind{-n}{S}}}{\bot},
+    \descHeads{\set{\bind{-n}{T'}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \Delta
 }
 \and
-\inferrule*[lab={\ruleName{desc-as}}]
+\inferrule*[lab={\ruleName{desc-tuple}}]
 {
-  \Sigma; \Gamma \vdash T : \seq{\tau}, p \matches S, T' \binding \Delta \\
-  \Sigma \vdash S : \seq{\tau} \synth \sigma
+  \Sigma; \Gamma \vdash T : \seq{\sigma} \concat \seq{\tau}, \seq{p}\,' \concat \seq{p} \matches S, T' \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash T : \seq{\tau}, p\;\pyinline{as}\;x \matches S, T' \binding \Delta \disjunion \set{\bind{x}{\sigma}}
+  \Sigma; \Gamma \vdash T : \tyTuple{\seq{\sigma}} \cons \seq{\tau}, \patTuple{\seq{p}\,'} \cons \seq{p} \matches S, T' \binding \Delta
+}
+\and
+\inferrule*[lab={\ruleName{desc-list}}]
+{
+  \sigma_i = \tau \quad (\forall i \leq n) \\
+  \Sigma; \Gamma \vdash T : \sigma_1, \ldots, \sigma_n \concat \seq{\tau}, \seq{p}\,' \concat \seq{p} \matches S, T' \binding \Delta
+}
+{
+  \Sigma; \Gamma \vdash \descHeads{\set{\bind{\headList{n}}{T}, \bind{\seq{h}}{\seq{T}}}}{U} : \tyList{\tau} \cons \seq{\tau}, \patList{\seq{p}\,'} \cons \seq{p}
+    \matches \descHeads{\set{\bind{\headList{n}}{S}}}{\bot},
+    \descHeads{\set{\bind{\headList{n}}{T'}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{desc-union}}]
 {
-  \Sigma; \Gamma \vdash T : \tau \cons \seq{\tau}, p \matches S_1, T_1 \binding \Delta_1 \\
-  \Sigma; \Gamma \vdash T' : \sigma \cons \seq{\tau}, p \matches S_2, T_2 \binding \Delta_2 \\
-  \Delta = \set{\bind{x}{\joinTy(\Sigma, \Delta_1(x), \Delta_2(x))} \mid x \in \binds(p)}
+  \Sigma; \Gamma \vdash T : \tau \cons \seq{\tau}, \seq{p} \matches S_1, T_1 \binding \Delta_1 \\
+  \Sigma; \Gamma \vdash T' : \sigma \cons \seq{\tau}, \seq{p} \matches S_2, T_2 \binding \Delta_2 \\
+  \Delta = \set{\bind{x}{\joinTy(\Sigma, \Delta_1(x), \Delta_2(x))} \mid x \in \binds(\seq{p})}
 }
 {
-  \Sigma; \Gamma \vdash \tyUnion{T}{T'} : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, p
+  \Sigma; \Gamma \vdash \tyUnion{T}{T'} : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, \seq{p}
     \matches \tyUnion{S_1}{S_2}, \tyUnion{T_1}{T_2} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{desc-top-heads}}]
 {
-  \Sigma; \Gamma \vdash \descHeads{\varnothing}{\top} : \tau \cons \seq{\tau}, p \matches S, T' \binding \Delta \\
+  \Sigma; \Gamma \vdash \descHeads{\varnothing}{\top} : \tau \cons \seq{\tau}, \seq{p} \matches S, T' \binding \Delta \\
   \tau \text{ neither union, tuple nor dictionary type}
 }
 {
-  \Sigma; \Gamma \vdash \top : \tau \cons \seq{\tau}, p \matches S, T' \binding \Delta
+  \Sigma; \Gamma \vdash \top : \tau \cons \seq{\tau}, \seq{p} \matches S, T' \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{desc-bot-heads}}]
 {
-  \Sigma; \Gamma \vdash \descHeads{\varnothing}{\bot} : \tau \cons \seq{\tau}, p \matches S, T' \binding \Delta \\
+  \Sigma; \Gamma \vdash \descHeads{\varnothing}{\bot} : \tau \cons \seq{\tau}, \seq{p} \matches S, T' \binding \Delta \\
   \tau \text{ neither union, tuple nor dictionary type}
 }
 {
-  \Sigma; \Gamma \vdash \bot : \tau \cons \seq{\tau}, p \matches S, T' \binding \Delta
+  \Sigma; \Gamma \vdash \bot : \tau \cons \seq{\tau}, \seq{p} \matches S, T' \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{desc-top-union}}]
 {
-  \Sigma; \Gamma \vdash \tyUnion{\top}{\top} : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, p \matches S, T' \binding \Delta
+  \Sigma; \Gamma \vdash \tyUnion{\top}{\top} : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, \seq{p} \matches S, T' \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \top : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, p \matches S, T' \binding \Delta
+  \Sigma; \Gamma \vdash \top : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, \seq{p} \matches S, T' \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{desc-bot-union}}]
 {
-  \Sigma; \Gamma \vdash \tyUnion{\bot}{\bot} : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, p \matches S, T' \binding \Delta
+  \Sigma; \Gamma \vdash \tyUnion{\bot}{\bot} : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, \seq{p} \matches S, T' \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \bot : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, p \matches S, T' \binding \Delta
+  \Sigma; \Gamma \vdash \bot : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, \seq{p} \matches S, T' \binding \Delta
 }
 \end{mathpar}
 \caption{Pattern matching over value descriptors}
