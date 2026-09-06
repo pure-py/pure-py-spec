@@ -58,6 +58,60 @@
     \matches \descHeads{\set{\bind{\ell}{U}}}{\bot},
     \descHeads{\set{\bind{\ell}{\bot}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \varnothing
 }
+\and
+\inferrule*[lab={\ruleName{desc-as}}]
+{
+  \Sigma; \Gamma \vdash T : \seq{\tau}, p \matches S, T' \binding \Delta \\
+  \Sigma \vdash S : \seq{\tau} \synth \sigma
+}
+{
+  \Sigma; \Gamma \vdash T : \seq{\tau}, p\;\pyinline{as}\;x \matches S, T' \binding \Delta \disjunion \set{\bind{x}{\sigma}}
+}
+\and
+\inferrule*[lab={\ruleName{desc-union}}]
+{
+  \Sigma; \Gamma \vdash T : \tau \cons \seq{\tau}, p \matches S_1, T_1 \binding \Delta_1 \\
+  \Sigma; \Gamma \vdash T' : \sigma \cons \seq{\tau}, p \matches S_2, T_2 \binding \Delta_2 \\
+  \Delta = \set{\bind{x}{\joinTy(\Sigma, \Delta_1(x), \Delta_2(x))} \mid x \in \binds(p)}
+}
+{
+  \Sigma; \Gamma \vdash \tyUnion{T}{T'} : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, p
+    \matches \tyUnion{S_1}{S_2}, \tyUnion{T_1}{T_2} \binding \Delta
+}
+\and
+\inferrule*[lab={\ruleName{desc-top-heads}}]
+{
+  \Sigma; \Gamma \vdash \descHeads{\varnothing}{\top} : \tau \cons \seq{\tau}, p \matches S, T' \binding \Delta \\
+  \tau \text{ neither union, tuple nor dictionary type}
+}
+{
+  \Sigma; \Gamma \vdash \top : \tau \cons \seq{\tau}, p \matches S, T' \binding \Delta
+}
+\and
+\inferrule*[lab={\ruleName{desc-bot-heads}}]
+{
+  \Sigma; \Gamma \vdash \descHeads{\varnothing}{\bot} : \tau \cons \seq{\tau}, p \matches S, T' \binding \Delta \\
+  \tau \text{ neither union, tuple nor dictionary type}
+}
+{
+  \Sigma; \Gamma \vdash \bot : \tau \cons \seq{\tau}, p \matches S, T' \binding \Delta
+}
+\and
+\inferrule*[lab={\ruleName{desc-top-union}}]
+{
+  \Sigma; \Gamma \vdash \tyUnion{\top}{\top} : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, p \matches S, T' \binding \Delta
+}
+{
+  \Sigma; \Gamma \vdash \top : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, p \matches S, T' \binding \Delta
+}
+\and
+\inferrule*[lab={\ruleName{desc-bot-union}}]
+{
+  \Sigma; \Gamma \vdash \tyUnion{\bot}{\bot} : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, p \matches S, T' \binding \Delta
+}
+{
+  \Sigma; \Gamma \vdash \bot : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau}, p \matches S, T' \binding \Delta
+}
 \end{mathpar}
 \caption{Pattern matching over value descriptors}
 \label{fig:pat-descriptors}
