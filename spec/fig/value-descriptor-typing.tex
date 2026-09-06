@@ -47,12 +47,12 @@
 \and
 \inferrule*[lab={\ruleName{desc-heads}}]
 {
-  \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \sigma \\
+  \Sigma \vdash E : \tau \cons \seq{\tau} \synth \sigma \\
   \Sigma \vdash U : \seq{\tau} \synth \zeta \\
   \tau \text{ neither union, tuple nor dictionary type}
 }
 {
-  \Sigma \vdash \descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U} : \tau \cons \seq{\tau} \synth \liveTy(\Sigma, \zeta, \tau, \sigma)
+  \Sigma \vdash \descHeads{E}{U} : \tau \cons \seq{\tau} \synth \liveTy(\Sigma, \zeta, \tau, \sigma)
 }
 \and
 \inferrule*[lab={\ruleName{desc-dict}}]

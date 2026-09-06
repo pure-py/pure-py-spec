@@ -9,11 +9,14 @@ $h$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $C$ & (Class) \\
     & $\mid$ & $\headList{n}$ & (List)
    \\[3mm]
+\grammarGroup{Head entries} \\
+$E$ & $::=$ & $\set{\bind{\seq{h}}{\seq{T}}}$ & (Entries)
+   \\[3mm]
 \grammarGroup{Value descriptors} \\
 $T$, $S$, $U$ & $::=$ & $\top$ & (All) \\
     & $\mid$ & $\bot$ & (None) \\
     & $\mid$ & $\tyUnion{T}{T'}$ & (Union) \\
-    & $\mid$ & $\descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U}$ & (Heads) \\
+    & $\mid$ & $\descHeads{E}{U}$ & (Heads) \\
     & $\mid$ & $\descDict{\set{\bind{\seq{w}}{\seq{T}}}}{U}$ & (Dict)
 \end{tabular}
 \end{center}
