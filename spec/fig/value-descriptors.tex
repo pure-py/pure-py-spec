@@ -10,15 +10,11 @@ $h$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\headList{n}$ & (List)
    \\[3mm]
 \grammarGroup{Value descriptors} \\
-$T$, $S$ & $::=$ & $\top$ & (All) \\
+$T$, $S$, $U$ & $::=$ & $\top$ & (All) \\
     & $\mid$ & $\bot$ & (None) \\
     & $\mid$ & $\tyUnion{T}{T'}$ & (Union) \\
     & $\mid$ & $\descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U}$ & (Heads) \\
     & $\mid$ & $\descDict{\set{\bind{\seq{w}}{\seq{T}}}}{U}$ & (Dict)
-   \\[3mm]
-\grammarGroup{Defaults} \\
-$U$ & $::=$ & $\top$ & (All) \\
-    & $\mid$ & $\bot$ & (None)
 \end{tabular}
 \end{center}
 

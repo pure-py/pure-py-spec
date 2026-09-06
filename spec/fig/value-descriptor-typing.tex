@@ -45,22 +45,14 @@
   \Sigma \vdash T : \tyTuple{\seq{\sigma}} \cons \seq{\tau} \synth \liveTy(\Sigma, \zeta, \tyTuple{\seq{\sigma}}, \tyNever)
 }
 \and
-\inferrule*[lab={\ruleName{desc-heads-open}}]
+\inferrule*[lab={\ruleName{desc-heads}}]
 {
   \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \sigma \\
+  \Sigma \vdash U : \seq{\tau} \synth \zeta \\
   \tau \text{ neither union, tuple nor dictionary type}
 }
 {
-  \Sigma \vdash \descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{\top} : \tau \cons \seq{\tau} \synth \tau
-}
-\and
-\inferrule*[lab={\ruleName{desc-heads-closed}}]
-{
-  \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \sigma \\
-  \tau \text{ neither union, tuple nor dictionary type}
-}
-{
-  \Sigma \vdash \descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{\bot} : \tau \cons \seq{\tau} \synth \sigma
+  \Sigma \vdash \descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U} : \tau \cons \seq{\tau} \synth \liveTy(\Sigma, \zeta, \tau, \sigma)
 }
 \and
 \inferrule*[lab={\ruleName{desc-dict}}]
