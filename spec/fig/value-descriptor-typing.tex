@@ -83,8 +83,8 @@
 \vspace{2mm}
 
 \begin{defalign}
-\liveTy(\Sigma, \tyNever, \sigma, \sigma') &{}= \sigma' \\*
-\liveTy(\Sigma, \zeta, \sigma, \sigma') &{}= \joinTy(\Sigma, \sigma, \sigma') && \quad \text{otherwise}
+\liveTy(\Sigma, \tyNever, \sigma, \tau) &{}= \tau \\*
+\liveTy(\Sigma, \zeta, \sigma, \tau) &{}= \joinTy(\Sigma, \sigma, \tau) && \quad \text{otherwise}
 \end{defalign}
 \caption{Value descriptor typing}
 \label{fig:value-descriptor-typing}
