@@ -1,0 +1,173 @@
+\begin{figure}
+\small
+\setlength{\jot}{2pt}
+\flushleft \shadebox{$\Sigma \vdash T : \seq{\tau} \synth \zeta$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{desc-top}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \top : \tau \cons \seq{\tau} \synth \tau
+}
+\and
+\inferrule*[lab={\ruleName{desc-top-empty}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \top : \varepsilon \synth \varepsilon
+}
+\and
+\inferrule*[lab={\ruleName{desc-bot}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \bot : \seq{\tau} \synth \tyNever
+}
+\and
+\inferrule*[lab={\ruleName{desc-union}}]
+{
+  \Sigma \vdash T : \tau \cons \seq{\tau} \synth \tau' \\
+  \Sigma \vdash T' : \sigma \cons \seq{\tau} \synth \sigma'
+}
+{
+  \Sigma \vdash \tyUnion{T}{T'} : (\tyUnion{\tau}{\sigma}) \cons \seq{\tau} \synth \joinTy(\Sigma, \tau', \sigma')
+}
+\and
+\inferrule*[lab={\ruleName{desc-tuple}}]
+{
+  \Sigma \vdash T : \seq{\sigma} \concat \seq{\tau} \synth \zeta \\
+  \zeta \neq \tyNever
+}
+{
+  \Sigma \vdash T : \tyTuple{\seq{\sigma}} \cons \seq{\tau} \synth \tyTuple{\seq{\sigma}}
+}
+\and
+\inferrule*[lab={\ruleName{desc-tuple-empty}}]
+{
+  \Sigma \vdash T : \seq{\sigma} \concat \seq{\tau} \synth \tyNever
+}
+{
+  \Sigma \vdash T : \tyTuple{\seq{\sigma}} \cons \seq{\tau} \synth \tyNever
+}
+\and
+\inferrule*[lab={\ruleName{desc-heads-open}}]
+{
+  \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \sigma \\
+  \tau \text{ neither union, tuple nor dictionary type}
+}
+{
+  \Sigma \vdash \descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{\top} : \tau \cons \seq{\tau} \synth \tau
+}
+\and
+\inferrule*[lab={\ruleName{desc-heads-closed}}]
+{
+  \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \sigma \\
+  \tau \text{ neither union, tuple nor dictionary type}
+}
+{
+  \Sigma \vdash \descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{\bot} : \tau \cons \seq{\tau} \synth \sigma
+}
+\and
+\inferrule*[lab={\ruleName{desc-dict}}]
+{
+  \Sigma \vdash T_i : \tau \cons \seq{\tau} \synth \sigma_i \\
+  \sigma_i \neq \tyNever \quad (\forall i)
+}
+{
+  \Sigma \vdash \descDict{\set{\bind{\seq{w}}{\seq{T}}}}{U} : \tyDict{\tau} \cons \seq{\tau} \synth \tyDict{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{desc-dict-empty}}]
+{
+  \Sigma \vdash T_i : \tau \cons \seq{\tau} \synth \tyNever
+}
+{
+  \Sigma \vdash \descDict{\set{\bind{\seq{w}}{\seq{T}}}}{U} : \tyDict{\tau} \cons \seq{\tau} \synth \tyNever
+}
+\end{mathpar}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \seq{\tau} \synth \sigma$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{entries-empty}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \varnothing : \tau \cons \seq{\tau} \synth \tyNever
+}
+\and
+\inferrule*[lab={\ruleName{entries-literal}}]
+{
+  \Sigma \vdash \tyLiteral{\ell} \subty \tau \\
+  \Sigma \vdash T : \seq{\tau} \synth \zeta \\
+  \zeta \neq \tyNever \\
+  \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \sigma
+}
+{
+  \Sigma \vdash \set{\bind{\ell}{T}, \bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \joinTy(\Sigma, \tyLiteral{\ell}, \sigma)
+}
+\and
+\inferrule*[lab={\ruleName{entries-literal-empty}}]
+{
+  \Sigma \vdash \tyLiteral{\ell} \subty \tau \\
+  \Sigma \vdash T : \seq{\tau} \synth \tyNever \\
+  \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \sigma
+}
+{
+  \Sigma \vdash \set{\bind{\ell}{T}, \bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \sigma
+}
+\and
+\inferrule*[lab={\ruleName{entries-class}}]
+{
+  \Sigma \vdash C \subty \tau \\
+  \fields(\Sigma, C) = \bind{\seq{x}}{\seq{\sigma}} \\
+  \Sigma \vdash T : \seq{\sigma} \concat \seq{\tau} \synth \zeta \\
+  \zeta \neq \tyNever \\
+  \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \sigma
+}
+{
+  \Sigma \vdash \set{\bind{C}{T}, \bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \joinTy(\Sigma, C, \sigma)
+}
+\and
+\inferrule*[lab={\ruleName{entries-class-empty}}]
+{
+  \Sigma \vdash C \subty \tau \\
+  \fields(\Sigma, C) = \bind{\seq{x}}{\seq{\sigma}} \\
+  \Sigma \vdash T : \seq{\sigma} \concat \seq{\tau} \synth \tyNever \\
+  \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \sigma
+}
+{
+  \Sigma \vdash \set{\bind{C}{T}, \bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \sigma
+}
+\and
+\inferrule*[lab={\ruleName{entries-list}}]
+{
+  \sigma_i = \tau \quad (\forall i \leq n) \\
+  \Sigma \vdash T : \sigma_1, \ldots, \sigma_n \concat \seq{\tau} \synth \zeta \\
+  \zeta \neq \tyNever \\
+  \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tyList{\tau} \cons \seq{\tau} \synth \sigma
+}
+{
+  \Sigma \vdash \set{\bind{\headList{n}}{T}, \bind{\seq{h}}{\seq{T}}} : \tyList{\tau} \cons \seq{\tau} \synth \joinTy(\Sigma, \tyList{\tau}, \sigma)
+}
+\and
+\inferrule*[lab={\ruleName{entries-list-empty}}]
+{
+  \sigma_i = \tau \quad (\forall i \leq n) \\
+  \Sigma \vdash T : \sigma_1, \ldots, \sigma_n \concat \seq{\tau} \synth \tyNever \\
+  \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tyList{\tau} \cons \seq{\tau} \synth \sigma
+}
+{
+  \Sigma \vdash \set{\bind{\headList{n}}{T}, \bind{\seq{h}}{\seq{T}}} : \tyList{\tau} \cons \seq{\tau} \synth \sigma
+}
+\end{mathpar}
+\caption{Value descriptor typing}
+\label{fig:value-descriptor-typing}
+\end{figure}
