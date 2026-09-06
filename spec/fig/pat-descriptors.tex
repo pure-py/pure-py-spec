@@ -59,6 +59,27 @@
     \descHeads{\set{\bind{\ell}{\bot}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \varnothing
 }
 \and
+\inferrule*[lab={\ruleName{desc-neg-lit}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma \vdash \descHeads{\set{\bind{-n}{T}, \bind{\seq{h}}{\seq{T}}}}{U} : \seq{\tau}, -n
+    \matches \descHeads{\set{\bind{-n}{T}}}{\bot},
+    \descHeads{\set{\bind{-n}{\bot}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{desc-neg-lit-default}}]
+{
+  -n \notin \seq{h} \\
+  \Sigma \vdash \tyLiteral{-n} \subty \tau
+}
+{
+  \Sigma; \Gamma \vdash \descHeads{\set{\bind{\seq{h}}{\seq{T}}}}{U} : \tau \cons \seq{\tau}, -n
+    \matches \descHeads{\set{\bind{-n}{U}}}{\bot},
+    \descHeads{\set{\bind{-n}{\bot}, \bind{\seq{h}}{\seq{T}}}}{U} \binding \varnothing
+}
+\and
 \inferrule*[lab={\ruleName{desc-as}}]
 {
   \Sigma; \Gamma \vdash T : \seq{\tau}, p \matches S, T' \binding \Delta \\

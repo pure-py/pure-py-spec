@@ -22,6 +22,16 @@
   \Sigma \vdash \set{\bind{\ell}{T}, \bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \liveTy(\Sigma, \zeta, \tyLiteral{\ell}, \sigma)
 }
 \and
+\inferrule*[lab={\ruleName{entries-neg-lit}}]
+{
+  \Sigma \vdash \tyLiteral{-n} \subty \tau \\
+  \Sigma \vdash T : \seq{\tau} \synth \zeta \\
+  \Sigma \vdash \set{\bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \sigma
+}
+{
+  \Sigma \vdash \set{\bind{-n}{T}, \bind{\seq{h}}{\seq{T}}} : \tau \cons \seq{\tau} \synth \liveTy(\Sigma, \zeta, \tyLiteral{-n}, \sigma)
+}
+\and
 \inferrule*[lab={\ruleName{entries-class}}]
 {
   \Sigma \vdash C \subty \tau \\
