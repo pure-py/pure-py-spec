@@ -129,8 +129,8 @@ of $\sigma$ (\ruleName{check-synth}), which applies only where no other rule con
 syntax-directed and an expression has at most one derivation in each.
 
 The forms with synthesis rules of their own are conditional expressions when a branch
-synthesises, at the join of the types the synthesising branches give, the other branch checking against
-that join (\ruleName{syn-cond}), tuples when every component synthesises, comprehensions
+synthesises, at the join of the two types when both branches synthesise and otherwise at the
+synthesising branch's type, the other branch checking against it (\ruleName{syn-cond}), tuples when every component synthesises, comprehensions
 when the body synthesises, and non-empty lists and dictionaries when at least one element
 synthesises, the remaining elements checking against the join of the base types of the synthesising elements (\ruleName{syn-list},
 \ruleName{syn-tuple}, \ruleName{syn-dict}, \ruleName{syn-list-comp}, \ruleName{syn-dict-comp}). A list,
