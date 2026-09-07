@@ -4,8 +4,12 @@
 The syntax of \PurePy is given in \figrefThree{syntax-stmt}{syntax-expr}{syntax-types}. \figref{metavariables} summarises the metavariables used throughout.
 Comma-separated elements inside set braces are pairwise distinct, so $\set{x_1, \ldots, x_n}$ has $n$
 elements; the set of the elements of a sequence, $\set{\seq{x}}$, assumes no distinctness. A family
-$(x_i)_{i \in I}$, where $I$ is a finite totally ordered set of indices, denotes the sequence of the
-$x_i$ in ascending index order.
+$(x_i)_{i \in I}$, where the finite index set $I$ carries a total order, denotes the sequence of the
+$x_i$ in that order. Where the order of its elements matters, a set $\set{x_1, \ldots, x_n}$ is
+\emph{ordered} by position. A comprehension over an ordered set preserves the order of its source;
+$X \setminus Y$ keeps the surviving elements of $X$ in their order; $X \disjunion Y$, defined when $X$
+and $Y$ are disjoint, appends the elements of $Y$ to those of $X$; $X \cup Y$ appends the elements of
+$Y$ not in $X$; and a product of ordered sets is ordered lexicographically.
 
 \paperinput{spec/fig/metavariables}
 

@@ -33,7 +33,7 @@
   \Sigma; \Gamma \vdash k, p \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash k, p\;\pyinline{as}\;x \matches K, L \binding \Delta \disjunion \set{\bind{x}{\bigJoinTy{\Sigma}{\shapeTy(m) \mid m \in K}}}
+  \Sigma; \Gamma \vdash k, p\;\pyinline{as}\;x \matches K, L \binding \Delta \disjunion \set{\bind{x}{\bigJoinTy{\Sigma}{(\shapeTy(m))_{m \in K}}}}
 }
 \and
 \inferrule*[lab={\ruleName{pat-split}}]
@@ -42,7 +42,7 @@
   \Sigma; \Gamma \vdash K', p \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash k, p \matches K, L \cup L' \binding \Delta
+  \Sigma; \Gamma \vdash k, p \matches K, L \disjunion L' \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-tuple}}]
@@ -97,7 +97,7 @@
 \inferrule*[lab={\ruleName{pat-seq}}]
 {
   \Sigma; \Gamma \vdash k_i, p_i \matches K_i, L_i \binding \Delta_i \quad (\forall i) \\
-  L = \textstyle\bigcup_i K_1 \times \cdots \times K_{i-1} \times L_i \times \set{k_{i+1}} \times \cdots \times \set{k_n}
+  L = \textstyle\bigdisjunion_i K_1 \times \cdots \times K_{i-1} \times L_i \times \set{k_{i+1}} \times \cdots \times \set{k_n}
 }
 {
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K_1 \times \cdots \times K_n, L \binding \Delta_1 \disjunion \ldots \disjunion \Delta_n
@@ -112,10 +112,10 @@
 \inferrule*[lab={\ruleName{pat-shapes}}]
 {
   \varnothing \neq L' = \set{k \in L \mid \Sigma; \Gamma \vdash k, p \matches K_k, L_k \binding \Delta_k} \\
-  \Delta = \set{\bind{x}{\bigJoinTy{\Sigma}{\Delta_k(x) \mid k \in L'}} \mid x \in \binds(p)}
+  \Delta = \set{\bind{x}{\bigJoinTy{\Sigma}{(\Delta_k(x))_{k \in L'}}} \mid x \in \binds(p)}
 }
 {
-  \Sigma; \Gamma \vdash L, p \matches \textstyle\bigcup_{k \in L'} K_k, \; \textstyle\bigcup_{k \in L'} L_k \cup (L \setminus L') \binding \Delta
+  \Sigma; \Gamma \vdash L, p \matches \textstyle\bigdisjunion_{k \in L'} K_k, \; \textstyle\bigdisjunion_{k \in L'} L_k \disjunion (L \setminus L') \binding \Delta
 }
 \end{mathpar}
 
@@ -134,6 +134,6 @@
   \Sigma; \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L_{n+1}
 }
 \end{mathpar}
-\caption{Matching sequences, sets of shapes, and case patterns}
+\caption{Matching sequences, ordered sets of shapes, and case patterns}
 \label{fig:pat-seq}
 \end{figure}

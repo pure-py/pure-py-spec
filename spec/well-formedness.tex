@@ -297,7 +297,7 @@ properties goes back to the ``usefulness'' algorithm for ML~\cite{maranget2007}.
 plays the role of the term descriptions of \citet{sestoft1996}, and the uncovered sets of
 \citet{karachalias2015} likewise let the type exclude cases.
 
-The residual is represented as a finite set of shapes. A \emph{shape} $k$
+The residual is represented as a finite ordered set of shapes. A \emph{shape} $k$
 denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{N}$ is a
 value of type $\tau$ whose outermost head is not among those in $N$. A head itself denotes values: a
 class its instances, an integer at a list type the lists of that length, and a literal its value. Head
@@ -320,7 +320,7 @@ with an excluded set split, and no head types at a tuple type, so $N$ is empty t
 \ruleName{split-tuple} leaves nothing.
 
 The
-matching judgement $\Sigma; \Gamma \vdash L, p \matches K, L' \binding \Delta$ divides a set of shapes into the
+matching judgement $\Sigma; \Gamma \vdash L, p \matches K, L' \binding \Delta$ divides an ordered set of shapes into the
 matched shapes $K$ and the \emph{residual} $L'$, binding $\Delta$, one shape at a time and one position at a time
 (\figrefTwo{pat}{pat-seq}). A pattern that cannot match a shape has no derivation against it, so
 \ruleName{pat-shapes} takes the shapes the pattern does match, which must not be none, and passes the
