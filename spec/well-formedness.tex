@@ -171,6 +171,8 @@ $((\tau_1, \tau_2), \tau)$ pairs operand \emph{bounds}
 with a result type; the judgements of the figure relate operand
 types to the resolved overloads of an operator.
 
+\input{spec/fig/operator-overloads}
+
 \begin{definition}[Overloads at operand types]
 \label{def:overloads}
 The set $\overloadsOf(\Sigma, \odot, \sigma_1, \sigma_2)$ consists of the tuples $((\tau_1, \tau_2), \tau)$ such
@@ -204,8 +206,6 @@ direct instance's bounds $(\tyInt, \tyLiteral{3})$ lie below the base instance's
 $(\tyFloat, \tyFloat)$. Resolution is more precise than mypy for this operator, whose overloads give
 \pyinline{Any} as soon as the exponent is not a literal, where resolution gives \pyinline{float}.
 
-\input{spec/fig/operator-overloads}
-
 \begin{lemma}[Least overload]
 \label{lem:least-overload}
 If neither $\sigma$ nor $\sigma'$ is a subtype of \pyinline{Never} and
@@ -221,6 +221,10 @@ $\Delta$, which may be empty. The base cases are that \pyinline{return e} defini
 \pyinline{x = e} definitely assigns $\set{\bind{\pyinline{x}}{\sigma}}$ for the type $\sigma$ of
 \pyinline{e}. \emph{Result types} $R$ classify these outcomes: $R$ is either $\Returns$ (definitely
 returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$).
+
+\input{spec/fig/typing-stmt}
+
+\input{spec/fig/typing-top}
 
 Context operations $\override$ and $\mergeS$ lift to a right semiring over result types $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\mergeS$ and zero for $\override$.
 
@@ -275,10 +279,6 @@ shapes left unmatched; the body is checked under the bindings, and the pattern m
 \ruleName{match-partial} applies otherwise, merging in $\Assigns{\varnothing}$ for the values that fall
 through. A literal-typed scrutinee is exhausted by covering its literals, so \pyinline{x = 42} admits a
 match with a case for \pyinline{42} alone; \pyinline{x: int = 42} keeps the type open.
-
-\input{spec/fig/typing-stmt}
-
-\input{spec/fig/typing-top}
 
 
 Name resolution takes a qualified name to a context entry (\figref{resolve-name}).
