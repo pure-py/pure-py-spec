@@ -99,8 +99,10 @@ The \ruleName{var} rule applies whenever $\Gamma(x)$ is a type, so a variable th
 assigned has no rule. A
 literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 
-The fields of a class $C$ are $\fields(\Sigma, C)$: those of its base class, then its own, each with its
-declared type. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
+The fields of a class $C$ form a sequence $\fields(\Sigma, C)$ of bindings $\bind{x}{\tau}$, one per
+field: the fields of its base class first, recursively, then the fields $C$ declares itself, each at its
+declared type. The order matters, because a constructor call pairs positional arguments with fields by
+position. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to,
 which is the type of its instances (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must
 synthesise a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(\Sigma, C)$
