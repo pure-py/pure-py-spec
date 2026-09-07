@@ -237,7 +237,7 @@ R \override \Returns = \Returns \override R & = \Returns
 
 \paperinput{paper/well-formedness/match}%
 
-$\Sigma; \Gamma; \zeta \vdash s : R$ says that $s$ has static outcome $R$ in $\Gamma$, with return type $\zeta$
+The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that $s$ has static outcome $R$ in $\Gamma$, with return type $\zeta$
 (\figref{typing-stmt}); every rule passes $\zeta$ down unchanged.
 A sequence $s\;s'$ (\ruleName{seq}) types $s$, types $s'$ under $\Gamma$ overridden by what $s$
 assigns, and requires that no variable captured by $s$ is assigned in $s'$. A conditional combines its
