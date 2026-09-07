@@ -237,8 +237,8 @@ R \override \Returns = \Returns \override R & = \Returns
 
 \paperinput{paper/well-formedness/match}%
 
-The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that $s$ has static outcome $R$ under $\Gamma$
-and optional return type $\zeta$ (\figref{typing-stmt}); every rule passes $\zeta$ down unchanged.
+The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\Gamma$ and
+optional return type $\zeta$, $s$ has static outcome $R$ (\figref{typing-stmt}); every rule passes $\zeta$ down unchanged.
 A sequence $s\;s'$ (\ruleName{seq}) types $s$, types $s'$ under $\Gamma$ overridden by the context that $s$
 assigns, and requires that no variable captured by $s$ is assigned in $s'$. A conditional combines its
 branches with $\mergeS$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
