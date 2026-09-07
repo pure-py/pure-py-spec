@@ -1,6 +1,6 @@
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, t \Rightarrow r$}
+\flushleft \shadebox{$\rho, t \Rightarrow o$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-pass}}]
@@ -13,34 +13,34 @@
 \and
 \inferrule*[lab={\ruleName{eval-assign}}]
 {
-  \rho, e \Rightarrow o
+  \rho, e \Rightarrow r
 }
 {
-  \rho, \exAssign{x}{e} \Rightarrow \mlet{v}{o}{\assigns{\set{\bind{x}{v}}}}
+  \rho, \exAssign{x}{e} \Rightarrow \mlet{v}{r}{\assigns{\set{\bind{x}{v}}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-assign-annot}}]
 {
-  \rho, e \Rightarrow o
+  \rho, e \Rightarrow r
 }
 {
-  \rho, \exAssign{x\exAnnot{\psi}}{e} \Rightarrow \mlet{v}{o}{\assigns{\set{\bind{x}{v}}}}
+  \rho, \exAssign{x\exAnnot{\psi}}{e} \Rightarrow \mlet{v}{r}{\assigns{\set{\bind{x}{v}}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-expr-stmt}}]
 {
-  \rho, e \Rightarrow o
+  \rho, e \Rightarrow r
 }
 {
-  \rho, e \Rightarrow \mlet{v}{o}{\assigns{\varnothing}}
+  \rho, e \Rightarrow \mlet{v}{r}{\assigns{\varnothing}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-return}}]
 {
-  \rho, e \Rightarrow o
+  \rho, e \Rightarrow r
 }
 {
-  \rho, \exReturn{e} \Rightarrow \mlet{v}{o}{\returns{v}}
+  \rho, \exReturn{e} \Rightarrow \mlet{v}{r}{\returns{v}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-return-none}}]
@@ -87,20 +87,20 @@
 \inferrule*[lab={\ruleName{eval-assert-msg-false}}]
 {
   \rho, e \Rightarrow \val{\pyinline{False}} \\
-  \rho, e' \Rightarrow o
+  \rho, e' \Rightarrow r
 }
 {
-  \rho, \exAssertMsg{e}{e'} \Rightarrow \mlet{w}{o}{\aborts{\errAssert{w}}}
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \mlet{w}{r}{\aborts{\errAssert{w}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-if}}]
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
   \rho, e_i \Rightarrow \val{\pyinline{True}} \\
-  \rho, s_i \Rightarrow r
+  \rho, s_i \Rightarrow o
 }
 {
-  \rho, \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} \Rightarrow r
+  \rho, \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} \Rightarrow o
 }
 \and
 \inferrule*[lab={\ruleName{eval-if-none}}]
@@ -115,19 +115,19 @@
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
   \rho, e_i \Rightarrow \val{\pyinline{True}} \\
-  \rho, s_i \Rightarrow r
+  \rho, s_i \Rightarrow o
 }
 {
-  \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow r
+  \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow o
 }
 \and
 \inferrule*[lab={\ruleName{eval-else}}]
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j \in \set{1, \ldots, n+1}) \\
-  \rho, s_{n+2} \Rightarrow r
+  \rho, s_{n+2} \Rightarrow o
 }
 {
-  \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow r
+  \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow o
 }
 \and
 \input{spec/rules/eval-match}
@@ -135,10 +135,10 @@
 \inferrule*[lab={\ruleName{eval-seq}}]
 {
   \rho, t \Rightarrow \assigns{\rho'} \\
-  \rho \override \rho', t' \Rightarrow r
+  \rho \override \rho', t' \Rightarrow o
 }
 {
-  \rho, t\;t' \Rightarrow \assigns{\rho'} \override r
+  \rho, t\;t' \Rightarrow \assigns{\rho'} \override o
 }
 \and
 \inferrule*[lab={\ruleName{eval-class}}]
@@ -157,13 +157,13 @@
   \rho, \exDataclassExtend{c}{c'}{\phi} \Rightarrow \assigns{\set{\bind{c}{C}}}
 }
 \end{mathpar}
-\caption{Statement $t$ evaluates to result $r$ under environment $\rho : \Gamma$}
+\caption{Statement $t$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
 \label{fig:eval-block-outcome}
 \end{figure}
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, t \Rightarrow r$ (continued)}
+\flushleft \shadebox{$\rho, t \Rightarrow o$ (continued)}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-assert-fail}}]
@@ -222,7 +222,7 @@
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, e \Rightarrow o$}
+\flushleft \shadebox{$\rho, e \Rightarrow r$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-var}}]
@@ -251,10 +251,10 @@
 \and
 \inferrule*[lab={\ruleName{eval-unop}}]
 {
-  \rho, e \Rightarrow o
+  \rho, e \Rightarrow r
 }
 {
-  \rho, \exUnOp{\ominus}{e} \Rightarrow \mlet{v}{o}{\hat{\ominus}(v)}
+  \rho, \exUnOp{\ominus}{e} \Rightarrow \mlet{v}{r}{\hat{\ominus}(v)}
 }
 \and
 \input{spec/rules/eval-binop}
@@ -328,32 +328,32 @@
   \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{\Gamma}{C}{\fieldMap(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m}))}}
 }
 \end{mathpar}
-\caption{Expression $e$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
-\label{fig:eval-outcome}
+\caption{Expression $e$ evaluates to result $r$ under environment $\rho : \Gamma$}
+\label{fig:eval-result}
 \end{figure}
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, e \Rightarrow o$ (continued)}
+\flushleft \shadebox{$\rho, e \Rightarrow r$ (continued)}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-subscript}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \rho, e' \Rightarrow o
+  \rho, e' \Rightarrow r
 }
 {
-  \rho, \exSubscript{e}{e'} \Rightarrow \mlet{v'}{o}{\getitem(v, v')}
+  \rho, \exSubscript{e}{e'} \Rightarrow \mlet{v'}{r}{\getitem(v, v')}
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-lambda}}]
 {
   \rho, e \Rightarrow \val{\exLamClosure[\Delta]{\rho'}{\seq{x}}{e'}} \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
-  \rho' \override \set{\bind{\seq{x}}{\seq{u}}}, e' \Rightarrow o
+  \rho' \override \set{\bind{\seq{x}}{\seq{u}}}, e' \Rightarrow r
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow o
+  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow r
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-def}}]
@@ -362,10 +362,10 @@
   d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \quad (\forall i) \\
   v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
-  \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, s_j \Rightarrow r
+  \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, s_j \Rightarrow o
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \outcome(r)
+  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \result(o)
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-prim}}]
@@ -388,10 +388,10 @@
 \inferrule*[lab={\ruleName{eval-and-true}}]
 {
   \rho, e \Rightarrow \val{\pyinline{True}} \\
-  \rho, e' \Rightarrow o
+  \rho, e' \Rightarrow r
 }
 {
-  \rho, \exAnd{e}{e'} \Rightarrow o
+  \rho, \exAnd{e}{e'} \Rightarrow r
 }
 \and
 \inferrule*[lab={\ruleName{eval-or-true}}]
@@ -405,37 +405,37 @@
 \inferrule*[lab={\ruleName{eval-or-false}}]
 {
   \rho, e \Rightarrow \val{\pyinline{False}} \\
-  \rho, e' \Rightarrow o
+  \rho, e' \Rightarrow r
 }
 {
-  \rho, \exOr{e}{e'} \Rightarrow o
+  \rho, \exOr{e}{e'} \Rightarrow r
 }
 \and
 \inferrule*[lab={\ruleName{eval-cond-true}}]
 {
   \rho, e \Rightarrow \val{\pyinline{True}} \\
-  \rho, e_1 \Rightarrow o
+  \rho, e_1 \Rightarrow r
 }
 {
-  \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow o
+  \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow r
 }
 \and
 \inferrule*[lab={\ruleName{eval-cond-false}}]
 {
   \rho, e \Rightarrow \val{\pyinline{False}} \\
-  \rho, e_2 \Rightarrow o
+  \rho, e_2 \Rightarrow r
 }
 {
-  \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow o
+  \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow r
 }
 \end{mathpar}
 \caption{Expression evaluation, continued}
-\label{fig:eval-outcome-ctd}
+\label{fig:eval-result-ctd}
 \end{figure}
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, \seq{e} \Rightarrow o$}
+\flushleft \shadebox{$\rho, \seq{e} \Rightarrow r$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-exprs-nil}}]
@@ -449,10 +449,10 @@
 \inferrule*[lab={\ruleName{eval-exprs-cons}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \rho, \seq{e} \Rightarrow o
+  \rho, \seq{e} \Rightarrow r
 }
 {
-  \rho, e \cons \seq{e} \Rightarrow \mlet{\seq{v}}{o}{\val{(v \cons \seq{v})}}
+  \rho, e \cons \seq{e} \Rightarrow \mlet{\seq{v}}{r}{\val{(v \cons \seq{v})}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-exprs-fail}}]
@@ -463,14 +463,14 @@
   \rho, e \cons \seq{e} \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
-\caption{Expression sequence $\seq{e}$ evaluates left to right to outcome $o$ under environment $\rho :
+\caption{Expression sequence $\seq{e}$ evaluates left to right to result $r$ under environment $\rho :
 \Gamma$}
 \label{fig:eval-seq}
 \end{figure}
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, e \Rightarrow o$ (continued)}
+\flushleft \shadebox{$\rho, e \Rightarrow r$ (continued)}
 \begin{mathpar}
 \small
 \input{spec/rules/eval-binop-fail}
@@ -618,7 +618,7 @@
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, e \Rightarrow o$ (continued)}
+\flushleft \shadebox{$\rho, e \Rightarrow r$ (continued)}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-attr-missing}}]
@@ -659,7 +659,7 @@
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, \seq{g} \Rightarrow o$}
+\flushleft \shadebox{$\rho, \seq{g} \Rightarrow r$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-quals-nil}}]
@@ -673,10 +673,10 @@
 \inferrule*[lab={\ruleName{eval-qual-guard-true}}]
 {
   \rho, e \Rightarrow \val{\pyinline{True}} \\
-  \rho, \seq{g} \Rightarrow o
+  \rho, \seq{g} \Rightarrow r
 }
 {
-  \rho, \qualGuard{e} \cons \seq{g} \Rightarrow o
+  \rho, \qualGuard{e} \cons \seq{g} \Rightarrow r
 }
 \and
 \inferrule*[lab={\ruleName{eval-qual-guard-false}}]
@@ -733,7 +733,7 @@
   \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
-\caption{Comprehension qualifiers $\seq{g}$ evaluate to outcome $o$ under environment $\rho : \Gamma$}
-\label{fig:eval-quals-outcome}
+\caption{Comprehension qualifiers $\seq{g}$ evaluate to result $r$ under environment $\rho : \Gamma$}
+\label{fig:eval-quals-result}
 \end{figure}
 

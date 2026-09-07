@@ -130,7 +130,7 @@ the resolution of qualified names in an environment.
 The functions on values used by the evaluation rules.
 \input{spec/functions/operators-text}
 
-\begin{auxfunction}{\hat{\odot}(v, v')}{outcome}{aux:binop}
+\begin{auxfunction}{\hat{\odot}(v, v')}{result}{aux:binop}
 \input{spec/functions/binop-text}
 \begin{center}
 \small
@@ -138,7 +138,7 @@ The functions on values used by the evaluation rules.
 \end{center}
 \end{auxfunction}
 
-\begin{auxfunction}{\hat{\ominus}(v)}{outcome}{aux:unop}
+\begin{auxfunction}{\hat{\ominus}(v)}{result}{aux:unop}
 \input{spec/functions/unop-text}
 \begin{center}
 \small
@@ -176,14 +176,14 @@ The functions on values used by the evaluation rules.
 \funcrows{iter}
 \end{auxfunction}
 
-\begin{auxfunction}{\getitem(v, v')}{outcome}{aux:getitem}
+\begin{auxfunction}{\getitem(v, v')}{result}{aux:getitem}
 \input{spec/functions/getitem-text}
 \funcrows{getitem}
 \end{auxfunction}
 
-\begin{auxfunction}{\outcome(r)}{outcome}{aux:outcome}
-\input{spec/functions/outcome-text}
-\funcrows{outcome}
+\begin{auxfunction}{\result(o)}{result}{aux:result}
+\input{spec/functions/result-text}
+\funcrows{result}
 \end{auxfunction}
 
 \begin{auxfunction}{\dispatch(\rho, v, \seq{p}, \seq{s})}{bindings and statement}{aux:dispatch}

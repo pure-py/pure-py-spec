@@ -3,12 +3,12 @@
 
 \subsection{Values and environments}
 
-Values, environments, and evaluation results are given in \figref{values}. For a statement $s$, the result
-$\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the result
-$\returns{v}$ represents \emph{abrupt completion} of $s$, with return value $v$; and the result
+Values, environments, outcomes and results are given in \figref{values}. For a statement $s$, the outcome
+$\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the outcome
+$\returns{v}$ represents \emph{abrupt completion} of $s$, with return value $v$; and the outcome
 $\aborts{\kappa}$ represents abrupt completion of the whole run, with termination kind $\kappa$.
-Composing statements sequentially composes their results according to the following partial monoid, analogous
-to sequential composition of result types:
+Composing statements sequentially composes their outcomes according to the following partial monoid, analogous
+to sequential composition of static outcomes:
 \begin{defalign}
 \assigns{\rho} \override \assigns{\rho'} & = \assigns{\rho \override \rho'} \\
 \assigns{\rho} \override \returns{v} & = \returns{v} \\
@@ -23,16 +23,16 @@ A \emph{termination
 kind} $\kappa$ records how a run ends; all but $\errExit{n}$ are named after the exceptions the same program
 raises under Python in the same circumstances. A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a partial map from
-arguments to outcomes (\figref{predefined}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has outcome
+arguments to results (\figref{predefined}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
 $\primFn(\seq{u})$, and no derivation where $\primFn(\seq{u})$ is undefined.
 
-The rules are given in a monadic metalanguage over outcomes (\figref{values}), in which
-$\mlet{v}{o}{\ldots}$ binds the value of an outcome; for example, \ruleName{eval-binop} concludes
-$\mlet{v'}{o}{\hat{\odot}(v, v')}$, which is $\hat{\odot}(v, v')$ where $o$ is $\val{v'}$, and
-$\aborts{\kappa}$ where $o$ is $\aborts{\kappa}$. A final
+The rules are given in a monadic metalanguage over results (\figref{values}), in which
+$\mlet{v}{r}{\ldots}$ binds the value of a result; for example, \ruleName{eval-binop} concludes
+$\mlet{v'}{r}{\hat{\odot}(v, v')}$, which is $\hat{\odot}(v, v')$ where $r$ is $\val{v'}$, and
+$\aborts{\kappa}$ where $r$ is $\aborts{\kappa}$. A final
 premise needs no propagation rule; earlier premises have one each, recording which subexpressions succeeded
 before the failing one was reached\speconly{ (\figref{eval-fails})}. The statement, sequence and module judgements use
-outcomes of the same form, carrying a result, a sequence of values or an environment in place of a value.
+results of the same form, carrying an outcome, a sequence of values or an environment in place of a value.
 \paperinput{paper/operational-semantics/evaluation-example}
 
 \specinput{spec/operational-semantics/auxiliary}
@@ -42,15 +42,15 @@ outcomes of the same form, carrying a result, a sequence of values or an environ
 
 A value has a context entry, and an environment a context, by \figref{value-typing}.
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any top-level statement $t$ with
-$\Gamma \vdash t : R$, the statement evaluation judgement $\rho, t \Rightarrow r$ says that $t$ evaluates
-to result $r$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Function definitions delimit
-the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\outcome$\speconly{ (\S\ref{aux:outcome})} reads a statement's result as
-the outcome of calling it\speconly{, $\val{\pyinline{None}}$ where the statement completes without returning.}\paperonly{:}
-\paperinput{paper/operational-semantics/outcome}
+$\Gamma \vdash t : R$, the statement evaluation judgement $\rho, t \Rightarrow o$ says that $t$ evaluates
+to outcome $o$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Function definitions delimit
+the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\result$\speconly{ (\S\ref{aux:result})} reads a statement's outcome as
+the result of calling it\speconly{, $\val{\pyinline{None}}$ where the statement completes without returning.}\paperonly{:}
+\paperinput{paper/operational-semantics/result}
 
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with $\Gamma \vdash e \synth
-\tau$, the expression evaluation judgement $\rho, e \Rightarrow o$\speconly{ (\figrefTwo{eval-outcome}{eval-outcome-ctd})} says that $e$ evaluates to
-outcome $o$ in $\rho$, where $o$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). The operators
+\tau$, the expression evaluation judgement $\rho, e \Rightarrow r$\speconly{ (\figrefTwo{eval-result}{eval-result-ctd})} says that $e$ evaluates to
+result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, as
 \ruleName{eval-if} does. A comprehension evaluates its body once for each binding its qualifiers produce, and
@@ -99,7 +99,7 @@ amounts to a comparison of qualified names.
 \subsection{Modules and programs}
 
 \speconly{Module and program evaluation are given in \figref{eval-modules}; import evaluation in \figref{eval-import-prefix}; importing names from a loaded module in
-\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specification.}\speconly{ Context extension (\figref{context-ops}) applies to environments as well, with the same equations on values in place of context entries, except that a loaded module value $\modLoaded{q}{\rho}$ carries an environment where the context entry $\modLoaded{q}{\Gamma}$ carries a context.} \emph{Loading}, the judgement $q \Rightarrow_{\mathsf{load}} o$, evaluates the import prefix
+\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specification.}\speconly{ Context extension (\figref{context-ops}) applies to environments as well, with the same equations on values in place of context entries, except that a loaded module value $\modLoaded{q}{\rho}$ carries an environment where the context entry $\modLoaded{q}{\Gamma}$ carries a context.} \emph{Loading}, the judgement $q \Rightarrow_{\mathsf{load}} r$, evaluates the import prefix
 of $q$ and then its statement, mirroring static loading $\vdash_{\mathsf{load}} q : \Gamma$
 (\figref{typing-module}); as with the static rules, the mutual
 recursion between loading and evaluation is grounded by program well-formedness, which rules out

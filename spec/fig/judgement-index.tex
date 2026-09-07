@@ -25,15 +25,15 @@ $\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{typing-mod
 \metaGroup{Evaluation} \\
 $\vdash v : \theta$ & value $v$ has entry $\theta$ & \figref{value-typing} \\
 $\vdash \rho : \Gamma$ & environment $\rho$ has context $\Gamma$ & \figref{value-typing} \\
-$\rho, p, v \matches m$ & pattern $p$ matches value $v$ with result $m$ & \figref{eval-pat} \\
-$\rho, t \Rightarrow r$ & statement $t$ evaluates to result $r$ & \figref{eval-block-outcome} \\
-$\rho, e \Rightarrow o$ & expression $e$ evaluates to outcome $o$ & \figref{eval-outcome} \\
-$\rho, \seq{e} \Rightarrow o$ & expressions $\seq{e}$ evaluate, left to right, to outcome $o$ & \figref{eval-seq} \\
-$\rho, \seq{g} \Rightarrow o$ & comprehension qualifiers $\seq{g}$ evaluate to outcome $o$ & \figref{eval-quals-outcome} \\
-$\rho, x \importsR o$ & name $x$ imported from module environment $\rho$ has outcome $o$ & \figref{eval-imports} \\
-$\seq{\iota} \Rightarrow o$ & imports $\seq{\iota}$ evaluate to outcome $o$ & \figref{eval-import-prefix} \\
+$\rho, p, v \matches m$ & pattern $p$ matches value $v$ with match result $m$ & \figref{eval-pat} \\
+$\rho, t \Rightarrow o$ & statement $t$ evaluates to outcome $o$ & \figref{eval-block-outcome} \\
+$\rho, e \Rightarrow r$ & expression $e$ evaluates to result $r$ & \figref{eval-result} \\
+$\rho, \seq{e} \Rightarrow r$ & expressions $\seq{e}$ evaluate, left to right, to result $r$ & \figref{eval-seq} \\
+$\rho, \seq{g} \Rightarrow r$ & comprehension qualifiers $\seq{g}$ evaluate to result $r$ & \figref{eval-quals-result} \\
+$\rho, x \importsR r$ & name $x$ imported from module environment $\rho$ has result $r$ & \figref{eval-imports} \\
+$\seq{\iota} \Rightarrow r$ & imports $\seq{\iota}$ evaluate to result $r$ & \figref{eval-import-prefix} \\
 $q, v \loadsAs v'$ & importing module $q$ into value $v$ gives value $v'$ & \figref{eval-import-prefix} \\
-$q \Rightarrow_{\mathsf{load}} o$ & module $q$ loads to outcome $o$ & \figref{eval-modules} \\
+$q \Rightarrow_{\mathsf{load}} r$ & module $q$ loads to result $r$ & \figref{eval-modules} \\
 $\mathcal{M} \Rightarrow \kappa$ & program $\mathcal{M}$ evaluates to termination kind $\kappa$ & \figref{eval-modules}
 \end{tabular}
 \end{center}

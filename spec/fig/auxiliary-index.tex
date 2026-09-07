@@ -40,7 +40,7 @@
 \specauxrow{$\elems(v)$}{sequence of values}{elements of list, tuple or string}{aux:elems}
 \auxrow{$\iterOp(v)$}{sequence of values}{sequence generator draws from $v$; keys if $v$ is dictionary}{aux:iter}
 \auxrow{$\getitem(v, v')$}{value or abort}{subscripting; $\errIndex$ for index out of range, $\errKey$ for missing key, $\errType$ otherwise}{aux:getitem}
-\auxrow{$\outcome(r)$}{value or abort}{statement result as outcome: returned value, \pyinline{None} if block falls off end, abort unchanged}{aux:outcome}
+\auxrow{$\result(o)$}{value or abort}{statement outcome as result: returned value, \pyinline{None} if block falls off end, abort unchanged}{aux:result}
 \auxrow{$\dispatch(\rho, v, \seq{p}, \seq{s})$}{bindings and statement}{case taken by \pyinline{match}}{aux:dispatch}
 \specauxrow{$\entries(\delta, \delta')$}{dictionary entries}{$\delta$ extended by $\delta'$ in order, later overriding earlier}{aux:entries}
 \specauxrow{$\update(\delta, w, v)$}{dictionary entries}{$\delta$ with $w$ bound to $v$, replacing earlier binding}{aux:update}

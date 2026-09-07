@@ -22,13 +22,13 @@ $\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ &
 \grammarGroup{Dictionary entries} \\
 $\delta$ & $::=$ & $\bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}$ &
    \\[3mm]
-\grammarGroup{Results} \\
-$r$ & $::=$ & $\assigns{\rho}$ & (Assigns) \\
+\grammarGroup{Outcomes} \\
+$o$ & $::=$ & $\assigns{\rho}$ & (Assigns) \\
   & $\mid$ & $\returns{v}$ & (Returns) \\
   & $\mid$ & $\aborts{\kappa}$ & (Aborts)
    \\[3mm]
-\grammarGroup{Outcomes} \\
-$o$ & $::=$ & $\val{v}$ & (Val) \\
+\grammarGroup{Results} \\
+$r$ & $::=$ & $\val{v}$ & (Val) \\
   & $\mid$ & $\aborts{\kappa}$ & (Aborts)
    \\[3mm]
 \grammarGroup{Match results} \\
@@ -40,6 +40,6 @@ $\kappa$ & $::=$ & $\errType \mid \errIndex \mid \errKey \mid \errZeroDiv$ &  \\
     & $\mid$ & $\errAssertNoMsg \mid \errAssert{w} \mid \errAttr \mid \errExit{n}$ &
 \end{tabular}
 \end{center}
-\caption{Values, environments and evaluation results}
+\caption{Values, environments, outcomes and results}
 \label{fig:values}
 \end{figure}

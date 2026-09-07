@@ -1,8 +1,8 @@
 \inferrule*[lab={\ruleName{eval-binop}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \rho, e' \Rightarrow o
+  \rho, e' \Rightarrow r
 }
 {
-  \rho, \exBinOp{e}{\odot}{e'} \Rightarrow \mlet{v'}{o}{\hat{\odot}(v, v')}
+  \rho, \exBinOp{e}{\odot}{e'} \Rightarrow \mlet{v'}{r}{\hat{\odot}(v, v')}
 }
