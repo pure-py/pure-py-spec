@@ -111,11 +111,11 @@
 \small
 \inferrule*[lab={\ruleName{pat-shapes}}]
 {
-  \varnothing \neq M = \set{k \in L \mid \Sigma; \Gamma \vdash k, p \matches K_k, L_k \binding \Delta_k} \\
-  \Delta = \set{\bind{x}{\bigJoinTy{\Sigma}{\Delta_k(x) \mid k \in M}} \mid x \in \binds(p)}
+  \varnothing \neq L' = \set{k \in L \mid \Sigma; \Gamma \vdash k, p \matches K_k, L_k \binding \Delta_k} \\
+  \Delta = \set{\bind{x}{\bigJoinTy{\Sigma}{\Delta_k(x) \mid k \in L'}} \mid x \in \binds(p)}
 }
 {
-  \Sigma; \Gamma \vdash L, p \matches \textstyle\bigcup_{k \in M} K_k, \; \textstyle\bigcup_{k \in M} L_k \cup (L \setminus M) \binding \Delta
+  \Sigma; \Gamma \vdash L, p \matches \textstyle\bigcup_{k \in L'} K_k, \; \textstyle\bigcup_{k \in L'} L_k \cup (L \setminus L') \binding \Delta
 }
 \end{mathpar}
 
