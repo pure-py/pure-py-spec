@@ -267,14 +267,13 @@ prefers a locally assigned name to one visible in an enclosing scope. The body i
 declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
-A \pyinline{match} scrutinee synthesises a type $\sigma$, and the cases are taken in turn from
-$\shapesOf(\Sigma, \sigma, \varnothing)$, which denotes every value of $\sigma$. The residual $L_i$ holds
-the values which have not been matched by any case up to the $i$th. Each case matches its pattern against
-the residual by the \ruleName{pat-cases} rule (\figref{pat-seq}), yielding the pattern's bindings and the
-shapes left unmatched; the body is checked under the bindings, and the pattern must agree with $\sigma$
-(\figref{agrees}). The \ruleName{match} rule applies where the final residual is empty;
-\ruleName{match-partial} applies otherwise, merging in $\Assigns{\varnothing}$ for the values that fall
-through. A literal-typed scrutinee is exhausted by covering its literals, so \pyinline{x = 42} admits a
+A \pyinline{match} scrutinee synthesises a type $\sigma$, and the judgement
+$\Sigma; \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L$ matches each case's pattern in turn
+against the values of $\sigma$ that the earlier cases have not matched, yielding each pattern's bindings
+$\Delta_i$ and the unmatched values $L$ (\secref{well-formedness-patterns}). The body of each case is
+checked under its pattern's bindings, and each pattern must agree with $\sigma$ (\figref{agrees}). The
+\ruleName{match} rule applies where $L$ is empty; \ruleName{match-partial} applies otherwise, merging in
+$\Assigns{\varnothing}$ for the values that fall through. A literal-typed scrutinee is exhausted by covering its literals, so \pyinline{x = 42} admits a
 match with a case for \pyinline{42} alone; \pyinline{x: int = 42} keeps the type open.
 
 \subsection{Pattern matching}
