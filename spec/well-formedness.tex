@@ -31,11 +31,6 @@ class (\figref{resolve-name}) and every other name must resolve to a predefined 
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and leaving every other type alone
 (\secref{types-auxiliary}).
 
-The context entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
-that is not definitely assigned is bound to $\statusNotDefAssigned$. Two contexts from different branches of a conditional merge pointwise. A variable definitely assigned in both, at $\sigma$ and $\tau$, is of type
-$\joinTy{\Sigma}{\sigma}{\tau}$, whereas a variable definitely assigned in one branch alone is
-$\statusNotDefAssigned$.
-
 \speconly{\subsubsection{Subtyping}\label{sec:subtyping}}%
 \paperonly{\paragraph{Subtyping.}}
 
