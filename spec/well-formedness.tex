@@ -147,7 +147,7 @@ or checks the body against an expected type (\ruleName{syn-call-lambda}, \ruleNa
 checking rule is still needed where the expected element type is wider than the one the elements
 synthesise, since \pyinline{list} is invariant.
 
-Typing a comprehension types its qualifiers, which bind the variables the body may use
+Typing a comprehension types its qualifiers, which bind the variables that can be used in the body
 (\figref{typing-check}). A generator's variable is bound at $\elemTy$ of the type synthesised by the
 iterated expression (\secref{types-auxiliary}). A
 tuple is iterated at the join of the base types of its components.
