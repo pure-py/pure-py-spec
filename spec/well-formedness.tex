@@ -85,8 +85,8 @@ Within an expression the typing judgement gives each subexpression a type, and
 is bidirectional. \emph{Synthesis} $\Sigma; \Gamma \vdash e \synth \tau$ reads a type out of an expression (\figrefThree{typing-synth}{typing-synth-elim}{typing-synth-ctd}),
 and \emph{checking} $\Sigma; \Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
 surroundings (\figref{typing-check}). The division follows the usual recipe for bidirectional
-systems~\cite{davies2000,dunfield2021}: introduction forms check, since a lambda or empty list does not
-determine its own type, and elimination forms synthesise, since a call, a subscript or an attribute
+systems~\cite{davies2000,dunfield2021}: introduction forms check, since a lambda's parameters cannot be
+annotated and an empty list does not determine its element type, and elimination forms synthesise, since a call, a subscript or an attribute
 reference starts from a subterm whose type is known. Type systems that follow the recipe strictly usually
 rely on an annotation form $(e \mathbin{:} \tau)$, which synthesises by construction, so a checking form
 written with an annotation can be used in any context where synthesis is required. Python has no such form,
@@ -123,9 +123,7 @@ such rule, because $\elemTy$ takes a union to the join of its members' element t
 \citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here each
 elimination form has its own rule.
 
-Lambdas check, as do lists, tuples, dictionaries and comprehensions. Their types are not determined by
-the expression alone: $\exList{}$ is a list of any element type, and a lambda's parameters cannot be annotated in
-Python, so both take their type from the surroundings. An expression that synthesises $\sigma$ checks against any supertype
+Lambdas check, as do lists, tuples, dictionaries and comprehensions. An expression that synthesises $\sigma$ checks against any supertype
 of $\sigma$ (\ruleName{check-synth}), which applies only where no other rule concludes $\Sigma; \Gamma \vdash e \checks
 \tau$, so both judgements are
 syntax-directed and an expression has at most one derivation in each.
