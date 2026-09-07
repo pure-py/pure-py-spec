@@ -137,7 +137,7 @@ dictionaries when at least one element synthesises, the remaining elements check
 of the base types of the synthesising elements (\ruleName{syn-list}, \ruleName{syn-dict}). A list,
 dictionary or comprehension takes the base type of the type its elements or body synthesise, since
 \pyinline{list} and \pyinline{dict} are invariant and a literal element type would keep the container from
-matching a container of any other element type. Each of these forms also has a checking rule. An empty list or dictionary and a lambda have no
+matching any other element type. Each of these forms also has a checking rule. An empty list or dictionary and a lambda have no
 synthesis rule at all, so checking is the only way to type them. A lambda applied to arguments is the
 exception, since the arguments give the parameter types, and the call then synthesises the type of the body
 or checks the body against an expected type (\ruleName{syn-call-lambda}, \ruleName{call-lambda}). A
