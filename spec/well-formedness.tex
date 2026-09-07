@@ -243,7 +243,7 @@ A sequence $s\;s'$ (\ruleName{seq}) types $s$, types $s'$ under $\Gamma$ overrid
 by $s$, and requires that no variable captured by $s$ is assigned in $s'$. A conditional combines its
 branches with $\mergeS$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
 Top-level statements have a judgement of
-their own, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top}): a sequence composes as a statement sequence does, a
+their own, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top}): a sequence composes in the same way as a statement sequence, a
 class declaration is a top-level form, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A top-level
 statement may not assign a name that an earlier top-level statement bound to a class
