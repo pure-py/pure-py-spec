@@ -99,6 +99,8 @@ The \ruleName{var} rule applies whenever $\Gamma(x)$ is a type, so a variable th
 assigned has no rule. A
 literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 
+\input{spec/fig/typing-synth}
+
 The fields of a class $C$ form a sequence $\fields(\Sigma, C)$ of bindings $\bind{x}{\tau}$, one per
 field: the fields of its base class first, recursively, then the fields $C$ declares itself, each at its
 declared type. The order matters, because a constructor call pairs positional arguments with fields by
@@ -132,6 +134,8 @@ of $\sigma$ (\ruleName{check-synth}), which applies only where no other rule con
 \tau$, so both judgements are
 syntax-directed and an expression has at most one derivation in each.
 
+\input{spec/fig/typing-check}
+
 The forms with synthesis rules of their own are conditional expressions when a branch
 synthesises, at the join of the two types when both branches synthesise and otherwise at the
 synthesising branch's type, the other branch checking against it (\ruleName{syn-cond});
@@ -147,10 +151,6 @@ exception, since the arguments give the parameter types, and the call then synth
 or checks the body against an expected type (\ruleName{syn-call-lambda}, \ruleName{call-lambda}). A non-empty list has both, and the
 checking rule is still needed where the expected element type is wider than the one the elements
 synthesise, since \pyinline{list} is invariant.
-
-\input{spec/fig/typing-synth}
-
-\input{spec/fig/typing-check}
 
 Typing a comprehension types its qualifiers, which bind the variables the body may use
 (\figref{typing-check}). A generator's variable is bound at $\elemTy$ of the type synthesised by the
