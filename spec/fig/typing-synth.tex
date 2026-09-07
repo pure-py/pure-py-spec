@@ -94,10 +94,10 @@
 {
   \Sigma; \Gamma \vdash e \checks \tyBool \\
   I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \sigma_i} \neq \varnothing \\
-  \Sigma; \Gamma \vdash e_j \checks \joinTy(\sigma_i \mid i \in I) \quad (\forall j \notin I)
+  \Sigma; \Gamma \vdash e_j \checks \bigJoinTy{\Sigma}{\set{\sigma_i \mid i \in I}} \quad (\forall j \notin I)
 }
 {
-  \Sigma; \Gamma \vdash \exCondExpr{e_1}{e}{e_2} \synth \joinTy(\sigma_i \mid i \in I)
+  \Sigma; \Gamma \vdash \exCondExpr{e_1}{e}{e_2} \synth \bigJoinTy{\Sigma}{\sigma_i \mid i \in I}
 }
 \and
 \inferrule*[lab={\ruleName{and}}]
@@ -180,7 +180,7 @@
   \Sigma; \Gamma \vdash e' \synth \tyInt
 }
 {
-  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \joinTy(\seq{\tau})
+  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \bigJoinTy{\Sigma}{\seq{\tau}}
 }
 \and
 \inferrule*[lab={\ruleName{subscript-union}}]
@@ -191,7 +191,7 @@
   y \notin \fvE(e')
 }
 {
-  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \joinTy(\tau, \tau')
+  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \joinTy{\Sigma}{\tau}{\tau'}
 }
 \and
 \inferrule*[lab={\ruleName{attr-union}}]
@@ -201,7 +201,7 @@
   \Sigma; \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exAttr{y}{x} \synth \tau'
 }
 {
-  \Sigma; \Gamma \vdash \exAttr{e}{x} \synth \joinTy(\tau, \tau')
+  \Sigma; \Gamma \vdash \exAttr{e}{x} \synth \joinTy{\Sigma}{\tau}{\tau'}
 }
 \and
 \inferrule*[lab={\ruleName{call-union}}]
@@ -212,7 +212,7 @@
   y \notin \fvE(e_i) \quad (\forall i)
 }
 {
-  \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \joinTy(\tau, \tau')
+  \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \joinTy{\Sigma}{\tau}{\tau'}
 }
 \end{mathpar}
 \caption{Expression synthesis: subscripts, and elimination at a union}
@@ -226,7 +226,7 @@
 \inferrule*[lab={\ruleName{syn-list}}]
 {
   I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \sigma_i} \neq \varnothing \\
-  \tau = \joinTy(\baseType(\sigma_i) \mid i \in I) \\
+  \tau = \bigJoinTy{\Sigma}{\set{\baseType(\sigma_i) \mid i \in I}} \\
   \Sigma; \Gamma \vdash e_j \checks \tau \quad (\forall j \notin I)
 }
 {
@@ -245,7 +245,7 @@
 {
   \Sigma; \Gamma \vdash e_i \checks \tyStr \quad (\forall i) \\
   I = \set{i \mid \Sigma; \Gamma \vdash e_i' \synth \sigma_i} \neq \varnothing \\
-  \tau = \joinTy(\baseType(\sigma_i) \mid i \in I) \\
+  \tau = \bigJoinTy{\Sigma}{\set{\baseType(\sigma_i) \mid i \in I}} \\
   \Sigma; \Gamma \vdash e_j' \checks \tau \quad (\forall j \notin I)
 }
 {

@@ -29,7 +29,7 @@ literal type, taking $\tyLiteral{42}$ to \pyinline{int} and leaving every other 
 
 The context entry for a definitely assigned variable is its type (Definition~\ref{def:context}), and a variable
 that is not definitely assigned is bound to $\statusNotDefAssigned$. Two contexts from different branches of a conditional merge pointwise. A variable definitely assigned in both, at $\sigma$ and $\tau$, is of type
-$\joinTy(\Sigma, \sigma, \tau)$, whereas a variable definitely assigned in one branch alone is
+$\joinTy{\Sigma}{\sigma}{\tau}$, whereas a variable definitely assigned in one branch alone is
 $\statusNotDefAssigned$.
 
 \input{spec/fig/resolve-name}
@@ -70,8 +70,8 @@ joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.
 
 \begin{lemma}[Types form a lattice]
 \label{lem:lattice}
-Types ordered by subtyping in $\Sigma$, up to equivalence, form a bounded distributive lattice: $\joinTy(\Sigma, \sigma, \tau)$
-is the least upper bound of $\sigma$ and $\tau$, $\meetTy(\Sigma, \sigma, \tau)$ is their greatest lower bound,
+Types ordered by subtyping in $\Sigma$, up to equivalence, form a bounded distributive lattice: $\joinTy{\Sigma}{\sigma}{\tau}$
+is the least upper bound of $\sigma$ and $\tau$, $\meetTy{\Sigma}{\sigma}{\tau}$ is their greatest lower bound,
 \pyinline{object} is the greatest type and \pyinline{Never} the least.
 \end{lemma}
 

@@ -190,8 +190,10 @@
 \newcommand*{\baseType}{\mathrm{base\text{-}type}}
 \newcommand*{\overloadsOf}{\mathrm{overloads}}
 \newcommand*{\eqType}{\mathrel{\mathrm{eq\text{-}type}}}
-\newcommand*{\joinTy}{\mathrm{join}}
-\newcommand*{\meetTy}{\mathrm{meet}}
+\newcommand*{\joinTy}[3]{#2 \vee_{#1} #3}
+\newcommand*{\meetTy}[3]{#2 \wedge_{#1} #3}
+\newcommand*{\bigJoinTy}[2]{\textstyle\bigvee_{#1} #2}
+\newcommand*{\bigMeetTy}[2]{\textstyle\bigwedge_{#1} #2}
 \newcommand*{\shapeAny}[2]{#1 \setminus #2}
 \newcommand*{\shapeDict}[3]{#2 \setminus_{#1} #3}
 \newcommand*{\shapeList}[2]{[#2]_{#1}}

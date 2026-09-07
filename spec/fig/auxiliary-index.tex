@@ -17,8 +17,8 @@
 \noalign{\vskip 2mm}
 \auxgroup{Types}
 \auxrow{$\baseType(\ell)$, $\baseType(\tau)$}{type}{base type of literal $\ell$, or of type $\tau$}{aux:base-type}
-\auxrow{$\joinTy(\Sigma, \sigma, \tau)$, $\joinTy(\Sigma, \seq{\tau})$}{type}{larger type where comparable, union otherwise}{aux:join}
-\auxrow{$\meetTy(\Sigma, \sigma, \tau)$}{type}{greatest type below both}{aux:meet}
+\auxrow{$\joinTy{\Sigma}{\sigma}{\tau}$, $\bigJoinTy{\Sigma}{\seq{\tau}}$}{type}{larger type where comparable, union otherwise}{aux:join}
+\auxrow{$\meetTy{\Sigma}{\sigma}{\tau}$}{type}{greatest type below both}{aux:meet}
 \auxrow{$\elemTy(\Sigma, \tau)$}{type}{type of elements drawn from $\tau$ by generator}{aux:elem-type}
 \auxrow{$\shapesOf(\Sigma, \tau, N)$, $\shapesOf(\Sigma, \seq{\tau})$}{set of shapes or sequences of shapes}{shapes of $\tau$ once heads in $N$ are excluded; sequences of shapes of $\seq{\tau}$}{aux:shapes}
 \auxrow{$\shapeTy(k)$}{type}{least type of shape $k$}{aux:shape-type}

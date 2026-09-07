@@ -9,7 +9,7 @@
 \opname{$\mergeS$ (merge)} && \bot \mergeS \bot &= \bot \\
 \opblank && \tau \mergeS \bot = \bot \mergeS \tau &= \statusNotDefAssigned \\
 \opblank && \statusNotDefAssigned \mergeS \theta = \theta \mergeS \statusNotDefAssigned &= \statusNotDefAssigned \\
-\opblank && \sigma \mergeS \tau &= \joinTy(\Sigma, \sigma, \tau) \\[2mm]
+\opblank && \sigma \mergeS \tau &= \joinTy{\Sigma}{\sigma}{\tau} \\[2mm]
 \opname{$\extend$ (extension)} && \modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} &= \modLoaded{q}{\Gamma \extend \Gamma'} \\
 \opblank && \modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} &= \modLoaded{q}{\Gamma} \\
 \opblank && \bot \extend \theta = \theta \extend \bot &= \theta \\

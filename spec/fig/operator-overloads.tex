@@ -5,7 +5,7 @@
 \begin{defalign}
 & \Sigma \vdash \odot(\sigma, \sigma') : ((\sigma, \sigma'), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{==}, \pyinline{!=}} \text{ and } \sigma, \sigma' \text{ comparable equality types} \\
 & \Sigma \vdash \odot(\sigma, \tyList{\tau}) : ((\sigma, \tyList{\tau}), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{in}, \pyinline{not in}} \text{ and } \sigma, \tau \text{ comparable} \\
-& \Sigma \vdash \odot(\sigma, \tyTuple{\seq{\tau}}) : ((\sigma, \tyTuple{\seq{\tau}}), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{in}, \pyinline{not in}} \text{ and } \sigma, \joinTy(\Sigma, \seq{\tau}) \text{ comparable} \\
+& \Sigma \vdash \odot(\sigma, \tyTuple{\seq{\tau}}) : ((\sigma, \tyTuple{\seq{\tau}}), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{in}, \pyinline{not in}} \text{ and } \sigma, \bigJoinTy{\Sigma}{\seq{\tau}} \text{ comparable} \\
 & \Sigma \vdash \odot(\sigma, \sigma') : ((\tyStr, \tyStr), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{in}, \pyinline{not in}} \text{ and } \Sigma \vdash \sigma, \sigma' \subty \tyStr \\
 & \Sigma \vdash \odot(\sigma, \tyDict{\tau}) : ((\tyStr, \tyDict{\tau}), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{in}, \pyinline{not in}} \text{ and } \Sigma \vdash \sigma \subty \tyStr \\
 & \Sigma \vdash \odot(\sigma, \sigma') : ((\tyFloat, \tyFloat), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{<}, \pyinline{<=}, \pyinline{>}, \pyinline{>=}} \text{ and } \Sigma \vdash \sigma, \sigma' \subty \tyFloat \\
@@ -13,7 +13,7 @@
 & \Sigma \vdash \odot(\sigma, \sigma') : ((\tyInt, \tyInt), \tyInt) && \quad \text{if } \odot \in \set{\pyinline{+}, \pyinline{-}, \pyinline{*}, \pyinline{//}, \pyinline{\%}} \text{ and } \Sigma \vdash \sigma, \Sigma \vdash \sigma' \subty \tyInt \\
 & \Sigma \vdash \odot(\sigma, \sigma') : ((\tyFloat, \tyFloat), \tyFloat) && \quad \text{if } \odot \in \set{\pyinline{+}, \pyinline{-}, \pyinline{*}, \pyinline{//}, \pyinline{\%}, \pyinline{/}, \pyinline{**}} \text{ and } \Sigma \vdash \sigma, \sigma' \subty \tyFloat \\
 & \Sigma \vdash \pyinline{+}(\sigma, \sigma') : ((\tyStr, \tyStr), \tyStr) && \quad \text{if } \Sigma \vdash \sigma, \sigma' \subty \tyStr \\
-& \rlap{$\Sigma \vdash \pyinline{+}(\tyList{\sigma}, \tyList{\tau}) : ((\tyList{\sigma}, \tyList{\tau}), \tyList{\joinTy(\Sigma, \sigma, \tau)})$} \\
+& \rlap{$\Sigma \vdash \pyinline{+}(\tyList{\sigma}, \tyList{\tau}) : ((\tyList{\sigma}, \tyList{\tau}), \tyList{\joinTy{\Sigma}{\sigma}{\tau}})$} \\
 & \rlap{$\Sigma \vdash \pyinline{+}(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) : ((\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}), \tyTuple{\seq{\sigma} \mathbin{\concat} \seq{\tau}})$} \\
 & \Sigma \vdash \pyinline{*}(\sigma, \sigma') : ((\tyStr, \tyInt), \tyStr) && \quad \text{if } \Sigma \vdash \sigma \subty \tyStr \text{ and } \Sigma \vdash \sigma' \subty \tyInt \\
 & \Sigma \vdash \pyinline{*}(\sigma, \sigma') : ((\tyInt, \tyStr), \tyStr) && \quad \text{if } \Sigma \vdash \sigma \subty \tyInt \text{ and } \sigma' \subty \tyStr \\

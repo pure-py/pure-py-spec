@@ -42,7 +42,7 @@
 {
   \Gamma \vdash q : \Type{C} \\
   \ancestors(\Sigma, C) \cap N = \varnothing \\
-  D = \meetTy(\Sigma, \tau, C) \\
+  D = \meetTy{\Sigma}{\tau}{C} \\
   \fields(\Sigma, D) = \bind{\seq{x}}{\seq{\sigma}} \\
   N' = \set{h \in N \mid \Sigma \vdash h : D}
 }
