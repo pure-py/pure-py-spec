@@ -24,7 +24,7 @@ The rules are intended as a refinement of mypy's: a well-typed
 \PurePy program should be accepted by mypy, and \PurePy may reject programs mypy accepts but not the
 reverse. Function signatures, assignments and dataclass fields are annotated with type expressions, and a
 type expression denotes a type under a context (\figref{resolve-type}). Every definition carries an
-annotation for each parameter and for its return type, so the type of a definition is given rather than
+annotation for its parameters and return type, so the type of a definition is given rather than
 inferred from its body. A class name resolves to a
 class (\figref{resolve-name}) and every other name must resolve to a predefined entry
 (\figref{predefined-types}). The \emph{base type} $\baseType(\tau)$ discards the precision of a
