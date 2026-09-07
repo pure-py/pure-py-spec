@@ -33,7 +33,7 @@
   \Sigma; \Gamma \vdash k, p \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash k, p\;\pyinline{as}\;x \matches K, L \binding \Delta \disjunion \set{\bind{x}{\bigJoinTy{\Sigma}{(\shapeTy(m))_{m \in K}}}}
+  \Sigma; \Gamma \vdash k, p\;\pyinline{as}\;x \matches K, L \binding \Delta \disjunion \set{\bind{x}{\bigJoinTy{\Sigma}{(\shapeTy(m) \mid m \in K)}}}
 }
 \and
 \inferrule*[lab={\ruleName{pat-split}}]
