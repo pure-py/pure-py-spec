@@ -5,7 +5,7 @@
 Well-formedness is the static part, a judgement on programs defined in this \seckind{}; the operational
 semantics (\secref{operational-semantics}) is defined for well-formed programs. A program is well-formed
 when it is well typed, so the rules of this \seckind{} give each expression a type, each statement a
-result type recording what it assigns or returns, and each module a signature. The \seckind{} introduces
+static outcome recording what it assigns or returns, and each module a signature. The \seckind{} introduces
 types and subtyping, then follows the syntax of \secref{syntax}, taking statements, expressions and
 patterns, then modules and programs, and \secref{operational-semantics} gives each of these a dynamic
 counterpart.
@@ -214,16 +214,16 @@ $\overloadsOf(\Sigma, \ominus, \sigma)$.
 Every well-typed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and
 \pyinline{x = e} definitely assigns $\set{\bind{\pyinline{x}}{\sigma}}$ for the type $\sigma$ of
-\pyinline{e}. \emph{Result types} $R$ classify these outcomes: $R$ is either $\Returns$ (definitely
+\pyinline{e}. \emph{Static outcomes} $R$ classify the two completions: $R$ is either $\Returns$ (definitely
 returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$).
 
 \input{spec/fig/typing-stmt}
 
 \input{spec/fig/typing-top}
 
-Context operations $\override$ and $\mergeS$ lift to a right semiring over result types $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\mergeS$ and zero for $\override$.
+Context operations $\override$ and $\mergeS$ lift to a right semiring over static outcomes $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\mergeS$ and zero for $\override$.
 
-\begin{definition}[Override and merge on result types]
+\begin{definition}[Override and merge on static outcomes]
 \begin{defalign}
 \Assigns{\Delta} \mergeS \Assigns{\Delta'} & = \Assigns{\Delta \mergeS \Delta'} \\
 R \mergeS \Returns = \Returns \mergeS R & = R \\
@@ -240,7 +240,7 @@ assigns, and requires that no variable captured by $s$ is assigned in $s'$. A co
 branches with $\mergeS$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
 \paperinput{paper/well-formedness/match}%
 
-$\Sigma; \Gamma; \zeta \vdash s : R$ says that $s$ has result type $R$ in $\Gamma$, with return type $\zeta$
+$\Sigma; \Gamma; \zeta \vdash s : R$ says that $s$ has static outcome $R$ in $\Gamma$, with return type $\zeta$
 (\figref{typing-stmt}); every rule passes $\zeta$ down unchanged. Top-level statements have a judgement of
 their own, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top}): a sequence composes as a statement sequence does, a
 class declaration is a top-level form, and a plain statement is checked with no return type
@@ -263,7 +263,7 @@ A function definition binds its parameters at their annotated types and its own 
 mutual region it belongs to, each at its $\pyinline{Callable}$ type; variables assigned in the body start
 at $\statusNotDefAssigned$ (\ruleName{def}), emulating Python's scoping of function bodies, which
 prefers a locally assigned name to one visible in an enclosing scope. The body is checked with the
-declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
+declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and the cases are taken in turn from

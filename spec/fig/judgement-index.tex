@@ -14,8 +14,8 @@ $\Gamma \vdash q : \theta$ & qualified name $q$ denotes entry $\theta$ & \figref
 $\Sigma; \Gamma \vdash e \synth \tau$ & expression $e$ synthesises type $\tau$ & \figref{typing-synth} \\
 $\Sigma; \Gamma \vdash e \checks \tau$ & expression $e$ checks against type $\tau$ & \figref{typing-check} \\
 $\Sigma; \Gamma \vdash \seq{g} : \Delta$ & comprehension qualifiers $\seq{g}$ bind $\Delta$ & \figref{typing-check} \\
-$\Sigma; \Gamma; \zeta \vdash s : R$ & statement $s$ has result type $R$, with return type $\zeta$ & \figref{typing-stmt} \\
-$\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ & top-level statement $t$ has result type $R$, extending $\Sigma$ to $\Sigma'$ & \figref{typing-top} \\
+$\Sigma; \Gamma; \zeta \vdash s : R$ & statement $s$ has static outcome $R$, with return type $\zeta$ & \figref{typing-stmt} \\
+$\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ & top-level statement $t$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$ & \figref{typing-top} \\
 $\Sigma \vdash \Gamma, x \importsR \theta \binding \Sigma'$ & name $x$ imported from module signature $\Gamma$ has entry $\theta$ & \figref{typing-imports} \\
 $\Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma'$ & imports $\seq{\iota}$ of module $q$ yield context $\Gamma$ & \figref{typing-import-prefix} \\
 $\Sigma \vdash q, \theta \loadsAs \theta' \binding \Sigma'$ & importing module $q$ into entry $\theta$ gives entry $\theta'$ & \figref{typing-import-prefix} \\
