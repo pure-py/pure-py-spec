@@ -16,6 +16,10 @@ counterpart.
 \subsection{Types}
 \label{sec:types}
 
+\input{spec/fig/resolve-name}
+
+\input{spec/fig/resolve-type}
+
 The rules are intended as a refinement of mypy's: a well-typed
 \PurePy program should be accepted by mypy, and \PurePy may reject programs mypy accepts but not the
 reverse. Function signatures, assignments and dataclass fields are annotated with type expressions, and a
@@ -32,12 +36,8 @@ that is not definitely assigned is bound to $\statusNotDefAssigned$. Two context
 $\joinTy{\Sigma}{\sigma}{\tau}$, whereas a variable definitely assigned in one branch alone is
 $\statusNotDefAssigned$.
 
-\input{spec/fig/resolve-name}
-
-\input{spec/fig/resolve-type}
-
-\subsection{Subtyping}
-\label{sec:subtyping}
+\speconly{\subsubsection{Subtyping}\label{sec:subtyping}}%
+\paperonly{\paragraph{Subtyping.}}
 
 Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and a class below its
 ancestors, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
