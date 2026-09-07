@@ -259,7 +259,7 @@ another class, the base name to be bound to a class and the additional fields no
 scope; every \PurePy class must declare itself a dataclass. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
 
-A function definition binds its parameters at their annotated types and its own name, and the names of the
+A function definition binds its parameters at their annotated types and its own name, as well as the names of the
 mutual region it belongs to, each at its $\pyinline{Callable}$ type; variables assigned in the body start
 at $\statusNotDefAssigned$ (\ruleName{def}). The body is checked with the
 declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
