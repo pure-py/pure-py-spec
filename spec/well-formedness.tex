@@ -172,13 +172,13 @@ types to the resolved overloads of an operator.
 \label{def:overloads}
 The set $\overloadsOf(\Sigma, \odot, \sigma_1, \sigma_2)$ consists of the tuples $((\tau_1, \tau_2), \tau)$ such
 that $\Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$, ordered by componentwise subtyping in $\Sigma$ on their
-bounds $(\tau_1, \tau_2)$. The unary set $\overloadsOf(\Sigma, \ominus, \sigma_1)$ is defined in the same way from
-conclusions $\Sigma \vdash \ominus(\sigma_1) : (\tau_1, \tau)$. In both cases $\min$ denotes the least element
+bounds $(\tau_1, \tau_2)$. The unary set $\overloadsOf(\Sigma, \ominus, \sigma)$ is defined in the same way from
+conclusions $\Sigma \vdash \ominus(\sigma) : (\tau, \tau')$. In both cases $\min$ denotes the least element
 under this order, where one exists.
 \end{definition}
 
 \noindent The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the result type
-of $\min(\overloadsOf(\Sigma, \odot, \sigma, \sigma'))$, so \pyinline{1 + 2} is an
+of $\min(\overloadsOf(\Sigma, \odot, \sigma_1, \sigma_2))$, so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
 An \emph{equality type} is one for which structural equality is
@@ -203,8 +203,8 @@ $(\tyFloat, \tyFloat)$. Resolution is more precise than mypy for this operator, 
 
 \begin{lemma}[Least overload]
 \label{lem:least-overload}
-If neither $\sigma$ nor $\sigma'$ is a subtype of \pyinline{Never} and
-$\overloadsOf(\Sigma, \odot, \sigma, \sigma')$ is not empty, then the set has a least element; likewise
+If neither $\sigma_1$ nor $\sigma_2$ is a subtype of \pyinline{Never} and
+$\overloadsOf(\Sigma, \odot, \sigma_1, \sigma_2)$ is not empty, then the set has a least element; likewise
 $\overloadsOf(\Sigma, \ominus, \sigma)$.
 \end{lemma}
 
