@@ -175,8 +175,8 @@ types to the resolved overloads of an operator.
 \label{def:overloads}
 The set $\overloadsOf(\Sigma, \odot, \sigma_1, \sigma_2)$ consists of the tuples $((\tau_1, \tau_2), \tau)$ such
 that $\Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$, ordered by componentwise subtyping in $\Sigma$ on their
-bounds $(\tau_1, \tau_2)$. The unary set $\overloadsOf(\Sigma, \ominus, \sigma)$ is defined in the same way from
-conclusions $\Sigma \vdash \ominus(\sigma) : (\tau_1, \tau)$. In both cases $\min$ denotes the least element
+bounds $(\tau_1, \tau_2)$. The unary set $\overloadsOf(\Sigma, \ominus, \sigma_1)$ is defined in the same way from
+conclusions $\Sigma \vdash \ominus(\sigma_1) : (\tau_1, \tau)$. In both cases $\min$ denotes the least element
 under this order, where one exists.
 \end{definition}
 
