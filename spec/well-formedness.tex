@@ -66,7 +66,7 @@ meet of incomparable types distributes over a union, takes tuples componentwise 
 parameters joined and results combined using meet, and is \pyinline{Never} otherwise, since no value belongs to both types.
 So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$. A sequence of types is joined by
-folding binary join over it, with \pyinline{Never} as the unit (\secref{types-auxiliary}).
+folding binary join over the sequence, with \pyinline{Never} as the unit (\secref{types-auxiliary}).
 
 \begin{lemma}[Types form a lattice]
 \label{lem:lattice}
