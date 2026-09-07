@@ -85,7 +85,7 @@ Within an expression the typing judgement gives each subexpression a type, and
 is bidirectional. \emph{Synthesis} $\Sigma; \Gamma \vdash e \synth \tau$ reads a type out of an expression (\figrefThree{typing-synth}{typing-synth-elim}{typing-synth-ctd}),
 and \emph{checking} $\Sigma; \Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
 surroundings (\figref{typing-check}). The division follows the usual recipe for bidirectional
-systems~\cite{davies2000,dunfield2021}: introduction forms check, since a lambda or an empty list does not
+systems~\cite{davies2000,dunfield2021}: introduction forms check, since a lambda or empty list does not
 determine its own type, and elimination forms synthesise, since a call, a subscript or an attribute
 reference starts from a subterm whose type is known. Type systems that follow the recipe strictly usually
 rely on an annotation form $(e \mathbin{:} \tau)$, which synthesises by construction, so a checking form
