@@ -119,7 +119,7 @@ literal synthesises the negated literal type (\ruleName{unop-literal}), and \rul
 form, to keep the judgement deterministic. A subscript, attribute reference or call whose subject
 synthesises a union is typed at each member, with a variable in place of the subject, and synthesises the
 join of the results (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union}); a union
-is iterated at the join of its members' element types ($\elemTy$). \citet{dunfield2004} state union elimination once, for every evaluation
+is iterated at the join of its members' element types, computed by $\elemTy$. \citet{dunfield2004} state union elimination once, for every evaluation
 context; with four elimination forms a rule each is shorter.
 
 Lambdas check, as do lists, tuples, dictionaries and comprehensions. Their types are not determined by
