@@ -314,6 +314,8 @@ pattern against the shapes the split gives and adds the shapes it leaves to the 
 with an excluded set split, and no head types at a tuple type, so $N$ is empty there and
 \ruleName{split-tuple} leaves nothing.
 
+\input{spec/fig/split}
+
 The
 matching judgement $\Sigma; \Gamma \vdash L, p \matches K, L' \binding \Delta$ divides an ordered set of shapes into the
 matched shapes $K$ and the \emph{residual} $L'$, binding $\Delta$, one shape at a time and one position at a time
@@ -324,6 +326,8 @@ pattern named by \pyinline{as} at the join over the shapes it matched, so a case
 union leaves a later variable case bound at the remaining members alone. Bindings from the positions of a sequence, or from
 the keys of a dictionary pattern, compose by disjoint union, so a pattern that binds a name twice has no
 derivation.
+
+\input{spec/fig/pat}
 
 \begin{lemma}[Preservation of shape type]
 \label{lem:shape-typing}
@@ -341,6 +345,8 @@ of its own kind, although Python would match either (\figref{eval-pat}); each ca
 therefore agree with the scrutinee's type (\figref{agrees}), so a match on
 $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple or list pattern.
 
+\input{spec/fig/agrees}
+
 A dictionary shape has a form of its own,
 $\shapeDict{\tau}{\beta}{N}$, standing for dictionaries that hold each key of $\beta$ with a value of the
 shape $\beta$ gives it, and hold no key of $N$. A dictionary pattern takes its keys in order, no key twice. A key in
@@ -356,12 +362,6 @@ unboundedly many heads and need a variable or wildcard. Exhaustiveness need not 
 $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave nothing,
 although each covers only part of the type.
-
-\input{spec/fig/agrees}
-
-\input{spec/fig/split}
-
-\input{spec/fig/pat}
 
 \subsection{Modules and programs}
 \label{sec:well-formedness-modules}
