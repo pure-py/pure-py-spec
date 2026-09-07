@@ -63,7 +63,7 @@ Two types are \emph{comparable}
 when either is a subtype of the other. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. Two comparable types \emph{meet} to the smaller type; a
 meet of incomparable types distributes over a union, takes tuples componentwise and callables with
-parameters joined and results met, and is \pyinline{Never} where no type lies below both. A sequence of types joins by
+parameters joined and results combined using meet, and is \pyinline{Never} where no type lies below both. A sequence of types joins by
 joining the first with the join of the rest, with \pyinline{Never} as the unit (\secref{types-auxiliary}).
 So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$.
@@ -198,7 +198,7 @@ defined:
 \end{defalign}
 
 \noindent A callable type is not an equality type, and neither is any type with a callable component, so
-comparing two functions is rejected rather than left undefined. The final rule of each table closes the
+comparing two functions is rejected statically. The final rule of each table closes the
 judgement under base-typing, letting \pyinline{1 == 0} use the equality overload at \pyinline{int}, since
 two distinct literal types are not comparable; \pyinline{2 ** 3} is still an \pyinline{int}, since the
 direct instance's bounds $(\tyInt, \tyLiteral{3})$ lie below the base instance's
