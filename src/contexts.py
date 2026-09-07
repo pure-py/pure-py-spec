@@ -99,7 +99,7 @@ class Assigns:
     delta: Mapping[str, ContextEntry] = field(default_factory=dict)
 
 
-type ResultType = Returns | Assigns
+type StaticOutcome = Returns | Assigns
 
 RETURNS = Returns()
 
@@ -176,7 +176,7 @@ def merge_delta(
     }
 
 
-def merge_results(rs: list[ResultType]) -> ResultType:
+def merge_outcomes(rs: list[StaticOutcome]) -> StaticOutcome:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return RETURNS
@@ -198,7 +198,7 @@ def override_delta(
     return {**d1, **d2}
 
 
-def override_results(r1: ResultType, r2: ResultType) -> ResultType:
+def override_outcomes(r1: StaticOutcome, r2: StaticOutcome) -> StaticOutcome:
     if isinstance(r1, Returns):
         return r1
     if isinstance(r2, Returns):

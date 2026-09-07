@@ -27,17 +27,17 @@ from contexts import (
     ModuleLoaded,
     ModuleStub,
     PredefinedName,
-    ResultType,
+    StaticOutcome,
     Returns,
     Status,
     VarContext,
     class_of_name,
     entry_of,
     is_assigned,
-    merge_results,
+    merge_outcomes,
     module_of,
     override_gamma,
-    override_results,
+    override_outcomes,
     override_var,
     resolve_name,
     var_type,
@@ -154,10 +154,10 @@ def annotated(e: ast.expr | None) -> TypeExpr:
 
 def check_body(
     body: list[ast.stmt], ctx: ModuleContext, returns: Type | None = None
-) -> ResultType:
+) -> StaticOutcome:
     """Check a block in a function declared to return `returns`."""
-    result, _ = check_seq(statements(body), ctx, returns)
-    return result
+    outcome, _ = check_seq(statements(body), ctx, returns)
+    return outcome
 
 
 def check_top_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
@@ -166,8 +166,8 @@ def check_top_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
     if len(items) == 0:
         return ctx
     head, tail = items[0], items[1:]
-    head_result = check_top_statement(head, ctx)
-    ctx_after = extend(head_result, ctx)
+    head_outcome = check_top_statement(head, ctx)
+    ctx_after = extend(head_outcome, ctx)
     if len(tail) == 0:
         return ctx_after
     reassigned = captures_statement(head) & assigns_seq(tail)
@@ -176,7 +176,7 @@ def check_top_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
         ra_node = find_first_reassigning(tail, reassigned)
         assert ra_node is not None
         raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
-    delta = head_result.delta if isinstance(head_result, Assigns) else {}
+    delta = head_outcome.delta if isinstance(head_outcome, Assigns) else {}
     rebound = {c for c in assigns_seq(tail) if isinstance(delta.get(c), Class)}
     if rebound:
         node = find_first_reassigning(tail, rebound)
@@ -185,7 +185,7 @@ def check_top_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
     return check_top_seq(tail, ctx_after)
 
 
-def check_top_statement(item: Statement, ctx: ModuleContext) -> ResultType:
+def check_top_statement(item: Statement, ctx: ModuleContext) -> StaticOutcome:
     """A class declaration is checked here; any other top-level statement is a
     plain statement, checked with no return type (top-stmt)."""
     if isinstance(item, ast.ClassDef):
@@ -196,18 +196,18 @@ def check_top_statement(item: Statement, ctx: ModuleContext) -> ResultType:
 
 def check_seq(
     items: list[Statement], ctx: ModuleContext, returns: Type | None = None
-) -> tuple[ResultType, ModuleContext]:
-    """Check a sequence, threading the context through it, and give its result
-    type and the context after it; nothing may follow a statement that
+) -> tuple[StaticOutcome, ModuleContext]:
+    """Check a sequence, threading the context through it, and give its static
+    outcome and the context after it; nothing may follow a statement that
     definitely returns."""
     if len(items) == 0:
         return ASSIGNS_EMPTY, ctx
     head, tail = items[0], items[1:]
-    head_result = check_statement(head, ctx, returns)
-    ctx_after = extend(head_result, ctx)
+    head_outcome = check_statement(head, ctx, returns)
+    ctx_after = extend(head_outcome, ctx)
     if len(tail) == 0:
-        return head_result, ctx_after
-    if isinstance(head_result, Returns):
+        return head_outcome, ctx_after
+    if isinstance(head_outcome, Returns):
         node: ast.AST = tail[0][0] if isinstance(tail[0], list) else tail[0]
         raise IllFormedModule(node, reasons.UnreachableStatement())
     reassigned = captures_statement(head) & assigns_seq(tail)
@@ -216,19 +216,19 @@ def check_seq(
         ra_node = find_first_reassigning(tail, reassigned)
         assert ra_node is not None
         raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
-    tail_result, final_ctx = check_seq(tail, ctx_after, returns)
-    return override_results(head_result, tail_result), final_ctx
+    tail_outcome, final_ctx = check_seq(tail, ctx_after, returns)
+    return override_outcomes(head_outcome, tail_outcome), final_ctx
 
 
-def extend(result: ResultType, ctx: ModuleContext) -> ModuleContext:
+def extend(outcome: StaticOutcome, ctx: ModuleContext) -> ModuleContext:
     return (
-        override_gamma(ctx, dict(result.delta)) if isinstance(result, Assigns) else ctx
+        override_gamma(ctx, dict(outcome.delta)) if isinstance(outcome, Assigns) else ctx
     )
 
 
 def check_statement(
     item: Statement, ctx: ModuleContext, returns: Type | None
-) -> ResultType:
+) -> StaticOutcome:
     if isinstance(item, list):
         check_mutual_region(item, ctx)
         return Assigns({d.name: signature(d, ctx) for d in item})
@@ -281,7 +281,7 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
     check_distinct_names(defs[1:], seen | {head.name})
 
 
-def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultType:
+def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> StaticOutcome:
     if isinstance(s, ast.Pass):
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Assign):
@@ -311,7 +311,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> ResultT
         branches.append(
             check_body(s.orelse, ctx, returns) if s.orelse else ASSIGNS_EMPTY
         )
-        return merge_results(branches)
+        return merge_outcomes(branches)
     if isinstance(s, ast.Assert):
         check_expr(s.test, Primitive.BOOL, ctx)
         if s.msg is not None:
@@ -328,12 +328,12 @@ def check_match_cases(
     subject: Type,
     ctx: ModuleContext,
     returns: Type | None,
-) -> ResultType:
+) -> StaticOutcome:
     deltas, partial = match_cases(cases, subject, ctx)
     branches = [
         check_case(case, delta, ctx, returns) for case, delta in zip(cases, deltas)
     ]
-    return merge_results(branches + ([ASSIGNS_EMPTY] if partial else []))
+    return merge_outcomes(branches + ([ASSIGNS_EMPTY] if partial else []))
 
 
 def match_cases(
@@ -379,10 +379,10 @@ def check_case(
     delta: VarContext,
     ctx: ModuleContext,
     returns: Type | None,
-) -> ResultType:
+) -> StaticOutcome:
     """Result of one case, whose body is checked under the bindings its pattern
     gives."""
-    return override_results(
+    return override_outcomes(
         Assigns(delta), check_body(case.body, override_var(ctx, delta), returns)
     )
 
