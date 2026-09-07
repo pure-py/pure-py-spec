@@ -135,7 +135,7 @@ tuples when every component synthesises (\ruleName{syn-tuple}); comprehensions w
 synthesises (\ruleName{syn-list-comp}, \ruleName{syn-dict-comp}); and non-empty lists and
 dictionaries when at least one element synthesises, the remaining elements checking against the join
 of the base types of the synthesising elements (\ruleName{syn-list}, \ruleName{syn-dict}). A list,
-dictionary or comprehension takes the base type of what its elements or body synthesise, since
+dictionary or comprehension takes the base type of the type its elements or body synthesise, since
 \pyinline{list} and \pyinline{dict} are invariant and a literal element type would keep the container from
 matching any other. Each of these forms also keeps its checking rule. An empty list or dictionary and a lambda have no
 synthesis rule at all, so checking is the only way to type them. A lambda applied to arguments is the
