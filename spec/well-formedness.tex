@@ -267,10 +267,11 @@ prefers a locally assigned name to one visible in an enclosing scope. The body i
 declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
-A \pyinline{match} scrutinee synthesises a type $\sigma$, and the judgement
-$\Sigma; \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L$ matches each case's pattern in turn
-against the values of $\sigma$ that the earlier cases have not matched, yielding each pattern's bindings
-$\Delta_i$ and the unmatched values $L$ (\secref{well-formedness-patterns}). The body of each case is
+A \pyinline{match} scrutinee synthesises a type $\sigma$, and the cases are checked using the auxiliary
+judgement $\Sigma; \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L$
+(\secref{well-formedness-patterns}), which matches each case's pattern in turn against the values of
+$\sigma$ that the earlier cases have not matched, yielding each pattern's bindings $\Delta_i$ and the
+unmatched values $L$. The body of each case is
 checked under its pattern's bindings, and each pattern must agree with $\sigma$ (\figref{agrees}). The
 \ruleName{match} rule applies where $L$ is empty; \ruleName{match-partial} applies otherwise, merging in
 $\Assigns{\varnothing}$ for the values that fall through. A literal-typed scrutinee is exhausted by covering its literals, so \pyinline{x = 42} admits a
