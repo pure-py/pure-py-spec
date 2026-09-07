@@ -108,7 +108,11 @@ $\fieldMap$, checks it against that field's type, and synthesises the class $C$ 
 synthesise a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(\Sigma, C)$
 (\ruleName{attr-object}). The signature of a predefined module binds
 $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type listed for it
-(\figref{predefined-types}, Definition~\ref{def:predefined}).
+(\figref{predefined-types}, Definition~\ref{def:predefined}). A module attribute reference
+$\exAttr{e}{x}$ resolves as a qualified name to a definitely assigned member
+(\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}. A variable bound to a module or
+class is not an expression on its own, and occurs only as the head of a qualified
+name\paperonly{ (\secref{no-first-class})}.
 In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
 (\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
 dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
@@ -160,11 +164,7 @@ A lambda within a comprehension may not capture a generator variable, a side con
 \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}. Python closures are
 late-binding and the comprehension rebinds the variable on each iteration, so the lambda would see the
 variable's final value; in \PurePy a lambda is only able to see the value of the generator variable at
-each iteration. A module attribute reference
-$\exAttr{e}{x}$ resolves as a qualified name to a definitely assigned member
-(\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}. A variable bound to a module or
-class is not an expression on its own, and occurs only as the head of a qualified
-name\paperonly{ (\secref{no-first-class})}.
+each iteration.
 
 
 \speconly{\subsubsection{Operators}\label{sec:well-formedness-operators}}%
