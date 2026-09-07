@@ -167,16 +167,16 @@ each iteration.
 \paperonly{\paragraph{Operators.}}
 
 Each operator is overloaded as specified in \figref{operator-overloads}. A \emph{resolved overload}
-$((\tau, \tau'), \tau^\dagger)$ pairs operand \emph{bounds}
+$((\tau_1, \tau_2), \tau)$ pairs operand \emph{bounds}
 with a result type; the judgements of the figure relate operand
 types to the resolved overloads of an operator.
 
 \begin{definition}[Overloads at operand types]
 \label{def:overloads}
-The set $\overloadsOf(\Sigma, \odot, \sigma, \sigma')$ consists of the tuples $((\tau, \tau'), \tau^\dagger)$ such
-that $\Sigma \vdash \odot(\sigma, \sigma') : ((\tau, \tau'), \tau^\dagger)$, ordered by componentwise subtyping in $\Sigma$ on their
-bounds $(\tau, \tau')$. The unary set $\overloadsOf(\Sigma, \ominus, \sigma)$ is defined in the same way from
-conclusions $\Sigma \vdash \ominus(\sigma) : (\tau, \tau^\dagger)$. In both cases $\min$ denotes the least element
+The set $\overloadsOf(\Sigma, \odot, \sigma_1, \sigma_2)$ consists of the tuples $((\tau_1, \tau_2), \tau)$ such
+that $\Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$, ordered by componentwise subtyping in $\Sigma$ on their
+bounds $(\tau_1, \tau_2)$. The unary set $\overloadsOf(\Sigma, \ominus, \sigma)$ is defined in the same way from
+conclusions $\Sigma \vdash \ominus(\sigma) : (\tau_1, \tau)$. In both cases $\min$ denotes the least element
 under this order, where one exists.
 \end{definition}
 
