@@ -362,7 +362,7 @@ def unmatched(
     p: ast.pattern,
     index: int,
     subject: Type,
-    seed: frozenset[Shape],
+    seed: tuple[Shape, ...],
     ctx: ModuleContext,
 ) -> IllFormedModule:
     """A case matches nothing either because no value of the scrutinee type has

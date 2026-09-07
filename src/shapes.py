@@ -74,7 +74,7 @@ class Dict:
 type Shape = Rest | Literal | Constr | Tuple | List | Dict
 type Seq = tuple[Shape, ...]
 
-NOTHING: frozenset[Shape] = frozenset()
+NOTHING: tuple[Shape, ...] = ()
 
 
 def shape_type(k: Shape) -> Type:
@@ -92,10 +92,11 @@ def shape_type(k: Shape) -> Type:
     return DictType(k.value)
 
 
-def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> frozenset[Shape]:
+def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> tuple[Shape, ...]:
     """Shapes of `t` that remain once the heads in `heads` are excluded."""
     if isinstance(t, UnionType):
-        return shapes(t.left, heads, ctx) | shapes(t.right, heads, ctx)
+        left = shapes(t.left, heads, ctx)
+        return left + tuple(k for k in shapes(t.right, heads, ctx) if k not in left)
     if isinstance(t, LiteralType) and t in heads:
         return NOTHING
     if t == Primitive.BOOL and {LiteralType(True), LiteralType(False)} <= heads:
@@ -107,10 +108,8 @@ def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> frozenset[S
     if t == Primitive.NEVER:
         return NOTHING
     if isinstance(t, DictType):
-        return frozenset(
-            {Dict(t.value, (), frozenset(k for k in heads if isinstance(k, str)))}
-        )
-    return frozenset({Rest(t, heads)})
+        return (Dict(t.value, (), frozenset(k for k in heads if isinstance(k, str))),)
+    return (Rest(t, heads),)
 
 
 def head_typed(h: object, t: Type, ctx: ModuleContext) -> bool:
@@ -131,6 +130,6 @@ def below_excluded(c: Class, heads: frozenset[object], ctx: ModuleContext) -> bo
     )
 
 
-def shapes_seq(ts: Sequence[Type], ctx: ModuleContext) -> frozenset[Seq]:
+def shapes_seq(ts: Sequence[Type], ctx: ModuleContext) -> tuple[Seq, ...]:
     """Sequences of shapes of a sequence of types: the second form of `shapes`."""
-    return frozenset(product(*(shapes(t, frozenset(), ctx) for t in ts)))
+    return tuple(product(*(shapes(t, frozenset(), ctx) for t in ts)))

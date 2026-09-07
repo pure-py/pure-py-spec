@@ -50,9 +50,9 @@ from type_syntax import (
     UnionType,
 )
 
-type Match = tuple[frozenset[Shape], frozenset[Shape], VarContext]
-type SeqMatch = tuple[frozenset[Seq], frozenset[Seq], VarContext]
-type Split = tuple[frozenset[Shape], frozenset[Shape]]
+type Match = tuple[tuple[Shape, ...], tuple[Shape, ...], VarContext]
+type SeqMatch = tuple[tuple[Seq, ...], tuple[Seq, ...], VarContext]
+type Split = tuple[tuple[Shape, ...], tuple[Shape, ...]]
 
 NO_BINDINGS: VarContext = {}
 
@@ -81,7 +81,7 @@ def match_as(k: Shape, p: ast.MatchAs, ctx: ModuleContext) -> Match | None:
     at the join over the shapes it matched."""
     if p.pattern is None:
         bare: VarContext = {} if p.name is None else {p.name: shape_type(k)}
-        return frozenset({k}), NOTHING, bare
+        return (k,), NOTHING, bare
     result = match(k, p.pattern, ctx)
     if result is None:
         return None
@@ -103,12 +103,12 @@ def match_split(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Match | None:
     if result is None:
         return None
     matched, left, delta = result
-    return matched, left | without, delta
+    return matched, left + without, delta
 
 
 def match_literal(k: Shape, ell: LiteralType) -> Match | None:
     if isinstance(k, Literal) and LiteralType(k.value) == ell:
-        return frozenset({k}), NOTHING, NO_BINDINGS
+        return (k,), NOTHING, NO_BINDINGS
     return None
 
 
@@ -175,7 +175,7 @@ def split(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Split | None:
 
 def split_literal(k: Shape, ell: LiteralType, ctx: ModuleContext) -> Split | None:
     if isinstance(k, Rest) and ell not in k.heads and subtype(ell, k.ty):
-        return frozenset({Literal(ell.value)}), shapes(k.ty, k.heads | {ell}, ctx)
+        return (Literal(ell.value),), shapes(k.ty, k.heads | {ell}, ctx)
     return None
 
 
@@ -187,7 +187,7 @@ def split_tuple(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
     if len(k.ty.components) != n:
         return None
     assert not k.heads
-    return frozenset(Tuple(ks) for ks in shapes_seq(k.ty.components, ctx)), NOTHING
+    return tuple(Tuple(ks) for ks in shapes_seq(k.ty.components, ctx)), NOTHING
 
 
 def split_list(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
@@ -195,7 +195,7 @@ def split_list(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
         return None
     elem = k.ty.elem
     return (
-        frozenset(List(elem, ks) for ks in shapes_seq((elem,) * n, ctx)),
+        tuple(List(elem, ks) for ks in shapes_seq((elem,) * n, ctx)),
         shapes(k.ty, k.heads | {n}, ctx),
     )
 
@@ -211,8 +211,8 @@ def split_key(
     if w is None or w in k.heads:
         return None
     return (
-        frozenset(with_keys(k, (w,), (m,)) for m in shapes(k.value, frozenset(), ctx)),
-        frozenset({Dict(k.value, k.bound, k.heads | {w})}),
+        tuple(with_keys(k, (w,), (m,)) for m in shapes(k.value, frozenset(), ctx)),
+        (Dict(k.value, k.bound, k.heads | {w}),),
     )
 
 
@@ -227,7 +227,7 @@ def split_class(k: Rest, cls: Class, ctx: ModuleContext) -> Split | None:
     types = tuple(declared_field(low.c, x) for x in fields(low.c))
     kept = typed_heads(k.heads, low, ctx)
     return (
-        frozenset(Constr(low.c, ks, kept) for ks in shapes_seq(types, ctx)),
+        tuple(Constr(low.c, ks, kept) for ks in shapes_seq(types, ctx)),
         shapes(k.ty, k.heads | {cls}, ctx),
     )
 
@@ -242,8 +242,8 @@ def split_subclass(k: Constr, cls: Class, ctx: ModuleContext) -> Split | None:
     own = tuple(declared_field(cls, x) for x in fields(cls)[len(k.args) :])
     kept = typed_heads(k.heads, ClassType(cls), ctx)
     return (
-        frozenset(Constr(cls, k.args + ks, kept) for ks in shapes_seq(own, ctx)),
-        frozenset({Constr(k.c, k.args, k.heads | {cls})}),
+        tuple(Constr(cls, k.args + ks, kept) for ks in shapes_seq(own, ctx)),
+        (Constr(k.c, k.args, k.heads | {cls}),),
     )
 
 
@@ -280,8 +280,8 @@ def match_seq(
     if any(s is None for s in matches):
         return None
     parts = [s for s in matches if s is not None]
-    matched = frozenset(product(*(m for m, _, _ in parts)))
-    left = frozenset(
+    matched = tuple(product(*(m for m, _, _ in parts)))
+    left = tuple(
         tuple(prefix) + (k,) + ks[i + 1 :]
         for i, (_, ls, _) in enumerate(parts)
         for prefix in product(*(parts[j][0] for j in range(i)))
@@ -291,15 +291,16 @@ def match_seq(
 
 
 def match_shapes(
-    ks: frozenset[Shape], p: ast.pattern, ctx: ModuleContext
+    ks: tuple[Shape, ...], p: ast.pattern, ctx: ModuleContext
 ) -> Match | None:
     """Shapes of `ks` that `p` matches, with the shapes it does not match passed
     into the residual, or nothing where it matches none of them."""
-    matches = {k: s for k in ordered(ks) if (s := match(k, p, ctx)) is not None}
+    matches = {k: s for k in ks if (s := match(k, p, ctx)) is not None}
     if len(matches) == 0:
         return None
     matched = union(m for m, _, _ in matches.values())
-    left = union(left for _, left, _ in matches.values()) | (ks - matches.keys())
+    unmatched = tuple(k for k in ks if k not in matches)
+    left = union(left for _, left, _ in matches.values()) + unmatched
     return matched, left, join_deltas([d for _, _, d in matches.values()], ctx)
 
 
@@ -370,14 +371,8 @@ def join_entries(entries: list[VarEntry], ctx: ModuleContext) -> VarEntry:
     return join(types)
 
 
-def ordered(ks: frozenset[Shape]) -> list[Shape]:
-    """Shapes in a fixed order, so that a join over them does not depend on how
-    the set happens to be iterated."""
-    return sorted(ks, key=repr)
-
-
-def union(sets: Iterable[frozenset[Shape]]) -> frozenset[Shape]:
-    return frozenset(k for s in sets for k in s)
+def union(seqs: Iterable[tuple[Shape, ...]]) -> tuple[Shape, ...]:
+    return tuple(k for s in seqs for k in s)
 
 
 def wrap(form: Callable[[Seq], Shape], seqs: SeqMatch | None) -> Match | None:
@@ -385,8 +380,8 @@ def wrap(form: Callable[[Seq], Shape], seqs: SeqMatch | None) -> Match | None:
         return None
     matched, left, delta = seqs
     return (
-        frozenset(form(ks) for ks in matched),
-        frozenset(form(ks) for ks in left),
+        tuple(form(ks) for ks in matched),
+        tuple(form(ks) for ks in left),
         delta,
     )
 
