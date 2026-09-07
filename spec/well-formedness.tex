@@ -251,7 +251,7 @@ statement may not assign a name that an earlier top-level statement bound to a c
 assignment can take a declared class's name. A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
 \pyinline{return} requires $\tau$ to admit \pyinline{None}. An annotated assignment checks the expression against the type of the annotation,
-and an unannotated assignment takes the type the expression synthesises (\ruleName{assign},
+and an unannotated assignment takes the type synthesised by the expression (\ruleName{assign},
 \ruleName{assign-unannot}). The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
 the class name to $\Type{C}$, requiring the class's own fields to be distinct and, where it extends
