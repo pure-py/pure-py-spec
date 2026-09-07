@@ -118,9 +118,10 @@ is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and an
 literal synthesises the negated literal type (\ruleName{unop-literal}), and \ruleName{unop} excludes that
 form, to keep the judgement deterministic. A subscript, attribute reference or call whose subject
 synthesises a union is typed at each member, with a variable in place of the subject, and synthesises the
-join of the results (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union}); a union
-is iterated at the join of its members' element types, computed by $\elemTy$. \citet{dunfield2004} state union elimination once, for every evaluation
-context; with four elimination forms a rule each is shorter.
+join of the results (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union}); iteration needs no
+such rule, because $\elemTy$ takes a union to the join of its members' element types.
+\citet{dunfield2004} give a single union-elimination rule, stated for an arbitrary evaluation context;
+with only four elimination forms, a rule for each is simpler than introducing evaluation contexts.
 
 Lambdas check, as do lists, tuples, dictionaries and comprehensions. Their types are not determined by
 the expression alone: $\exList{}$ is a list of any element type, and a lambda's parameters cannot be annotated in
