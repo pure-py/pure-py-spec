@@ -156,7 +156,6 @@ Typing a comprehension types its qualifiers, which bind the variables the body m
 (\figref{typing-check}). A generator's variable is bound at $\elemTy$ of the type synthesised by the
 iterated expression (\secref{types-auxiliary}). A
 tuple is iterated at the join of the base types of its components.
-
 A lambda within a comprehension may not capture a generator variable, a side condition of
 \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}. Python closures are
 late-binding and the comprehension rebinds the variable on each iteration, so the lambda would see the
