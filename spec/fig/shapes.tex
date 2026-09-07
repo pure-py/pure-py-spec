@@ -6,15 +6,15 @@
 \grammarGroup{Heads} \\
 $h$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $C$ & (Class) \\
-$N$ & $::=$ & $\set{h_1, \ldots, h_n}$ & (Exclusion set)
+$H$ & $::=$ & $\set{h_1, \ldots, h_n}$ & (Exclusion set)
    \\[3mm]
 \grammarGroup{Shapes} \\
-$k$ & $::=$ & $\shapeAny{\tau}{N}$ & (Rest) \\
+$k$ & $::=$ & $\shapeAny{\tau}{H}$ & (Rest) \\
     & $\mid$ & $\ell$ & (Literal) \\
-    & $\mid$ & $\shapeAny{\patConstr{C}{k_1, \ldots, k_n}}{N}$ & (Constr) \\
+    & $\mid$ & $\shapeAny{\patConstr{C}{k_1, \ldots, k_n}}{H}$ & (Constr) \\
     & $\mid$ & $\patTuple{k_1, \ldots, k_n}$ & (Tuple) \\
     & $\mid$ & $\shapeList{\tau}{k_1, \ldots, k_n}$ & (List) \\
-    & $\mid$ & $\shapeDict{\tau}{\beta}{N}$ & (Dict) \\
+    & $\mid$ & $\shapeDict{\tau}{\beta}{H}$ & (Dict) \\
 $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
 \end{tabular}
 \end{center}
@@ -56,11 +56,11 @@ $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
 \small
 \inferrule*[lab={\ruleName{shape-rest}}]
 {
-  \Sigma \vdash h : \tau \quad (\forall h \in N) \\
+  \Sigma \vdash h : \tau \quad (\forall h \in H) \\
   \tau \text{ neither union nor dictionary type}
 }
 {
-  \Sigma \vdash \shapeAny{\tau}{N} : \tau
+  \Sigma \vdash \shapeAny{\tau}{H} : \tau
 }
 \and
 \inferrule*[lab={\ruleName{shape-literal}}]
@@ -73,11 +73,11 @@ $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
 \and
 \inferrule*[lab={\ruleName{shape-constr}}]
 {
-  \Sigma \vdash h : C \quad (\forall h \in N) \\
+  \Sigma \vdash h : C \quad (\forall h \in H) \\
   \Sigma \vdash k_x : \sigma \quad (\forall \bind{x}{\sigma} \in \fields(\Sigma, C))
 }
 {
-  \Sigma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{N} : C
+  \Sigma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{H} : C
 }
 \and
 \inferrule*[lab={\ruleName{shape-tuple}}]
@@ -108,10 +108,10 @@ $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
 \inferrule*[lab={\ruleName{shape-dict}}]
 {
   \Sigma \vdash \beta(w) : \tau \quad (\forall w \in \dom(\beta)) \\
-  \dom(\beta) \cap N = \varnothing
+  \dom(\beta) \cap H = \varnothing
 }
 {
-  \Sigma \vdash \shapeDict{\tau}{\beta}{N} : \tyDict{\tau}
+  \Sigma \vdash \shapeDict{\tau}{\beta}{H} : \tyDict{\tau}
 }
 \end{mathpar}
 \caption{Shapes and shape typing}

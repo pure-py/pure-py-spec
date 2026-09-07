@@ -6,11 +6,11 @@
 \small
 \inferrule*[lab={\ruleName{split-literal}}]
 {
-  \ell \notin N \\
+  \ell \notin H \\
   \Sigma \vdash \tyLiteral{\ell} \subty \tau
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\tau}{N}, \ell \splits \set{\ell}, \shapesOf(\Sigma, \tau, N \cup \set{\ell})
+  \Sigma; \Gamma \vdash \shapeAny{\tau}{H}, \ell \splits \set{\ell}, \shapesOf(\Sigma, \tau, H \cup \set{\ell})
 }
 \and
 \inferrule*[lab={\ruleName{split-tuple}}]
@@ -23,31 +23,31 @@
 \and
 \inferrule*[lab={\ruleName{split-list}}]
 {
-  n \notin N
+  n \notin H
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\tyList{\tau}}{N}, \patList{p_1, \ldots, p_n} \splits \set{\shapeList{\tau}{\seq{k}} \mid \seq{k} \in \shapesOf(\Sigma, \tau, \varnothing)^n}, \shapesOf(\Sigma, \tyList{\tau}, N \cup \set{n})
+  \Sigma; \Gamma \vdash \shapeAny{\tyList{\tau}}{H}, \patList{p_1, \ldots, p_n} \splits \set{\shapeList{\tau}{\seq{k}} \mid \seq{k} \in \shapesOf(\Sigma, \tau, \varnothing)^n}, \shapesOf(\Sigma, \tyList{\tau}, H \cup \set{n})
 }
 \and
 \inferrule*[lab={\ruleName{split-key}}]
 {
-  w_i \notin \dom(\beta) \cup N \\
+  w_i \notin \dom(\beta) \cup H \\
   w_j \in \dom(\beta) \quad (\forall j < i)
 }
 {
-  \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \splits \set{\shapeDict{\tau}{\beta \override \set{\bind{w_i}{k}}}{N} \mid k \in \shapesOf(\Sigma, \tau, \varnothing)}, \set{\shapeDict{\tau}{\beta}{(N \cup \set{w_i})}}
+  \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{H}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \splits \set{\shapeDict{\tau}{\beta \override \set{\bind{w_i}{k}}}{H} \mid k \in \shapesOf(\Sigma, \tau, \varnothing)}, \set{\shapeDict{\tau}{\beta}{(H \cup \set{w_i})}}
 }
 \and
 \inferrule*[lab={\ruleName{split-class}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \ancestors(\Sigma, C) \cap N = \varnothing \\
+  \ancestors(\Sigma, C) \cap H = \varnothing \\
   D = \meetTy{\Sigma}{\tau}{C} \\
   \fields(\Sigma, D) = \bind{\seq{x}}{\seq{\sigma}} \\
-  N' = \set{h \in N \mid \Sigma \vdash h : D}
+  H' = \set{h \in H \mid \Sigma \vdash h : D}
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\tau}{N}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{D}{\seq{k}}}{N'} \mid \seq{k} \in \shapesOf(\Sigma, \seq{\sigma})}, \shapesOf(\Sigma, \tau, N \cup \set{C})
+  \Sigma; \Gamma \vdash \shapeAny{\tau}{H}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{D}{\seq{k}}}{H'} \mid \seq{k} \in \shapesOf(\Sigma, \seq{\sigma})}, \shapesOf(\Sigma, \tau, H \cup \set{C})
 }
 \and
 \inferrule*[lab={\ruleName{split-subclass}}]
@@ -55,12 +55,12 @@
   \Gamma \vdash q : \Type{D} \\
   \Sigma \vdash D \subty C \\
   D \neq C \\
-  \ancestors(\Sigma, D) \cap N = \varnothing \\
+  \ancestors(\Sigma, D) \cap H = \varnothing \\
   \fields(\Sigma, D) = \fields(\Sigma, C) \mathbin{\concat} \bind{\seq{y}}{\seq{\sigma}} \\
-  N' = \set{h \in N \mid \Sigma \vdash h : D}
+  H' = \set{h \in H \mid \Sigma \vdash h : D}
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{N}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{D}{\seq{k} \mathbin{\concat} \seq{k}\,'}}{N'} \mid \seq{k}\,' \in \shapesOf(\Sigma, \seq{\sigma})}, \set{\shapeAny{\patConstr{C}{\seq{k}}}{(N \cup \set{D})}}
+  \Sigma; \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{H}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{D}{\seq{k} \mathbin{\concat} \seq{k}\,'}}{H'} \mid \seq{k}\,' \in \shapesOf(\Sigma, \seq{\sigma})}, \set{\shapeAny{\patConstr{C}{\seq{k}}}{(H \cup \set{D})}}
 }
 \end{mathpar}
 \caption{Shape $k$ splits at the head tested by $p$, giving shapes $K$ and residual $L$}

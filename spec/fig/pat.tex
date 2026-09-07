@@ -68,7 +68,7 @@
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{N}, \patDict{\bind{\seq{w}}{\seq{p}}} \matches \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{m}}}}{N} \mid \seq{m} \in K}, \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{k}\,'}}}{N} \mid \seq{k}\,' \in L} \binding \Delta
+  \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{H}, \patDict{\bind{\seq{w}}{\seq{p}}} \matches \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{m}}}}{H} \mid \seq{m} \in K}, \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{k}\,'}}}{H} \mid \seq{k}\,' \in L} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-constr}}]
@@ -81,7 +81,7 @@
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \mathbin{\concat} \seq{p}\,' \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{N}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{C}{\seq{m}}}{N} \mid \seq{m} \in K}, \set{\shapeAny{\patConstr{C}{\seq{k}\,'}}{N} \mid \seq{k}\,' \in L} \binding \Delta
+  \Sigma; \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{H}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{C}{\seq{m}}}{H} \mid \seq{m} \in K}, \set{\shapeAny{\patConstr{C}{\seq{k}\,'}}{H} \mid \seq{k}\,' \in L} \binding \Delta
 }
 \end{mathpar}
 \caption{Pattern $p$ matches shape $k$, giving matched shapes $K$, residual $L$ and bindings $\Delta$}

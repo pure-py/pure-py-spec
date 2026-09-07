@@ -291,25 +291,25 @@ plays the role of the term descriptions of \citet{sestoft1996}, and the uncovere
 \citet{karachalias2015} likewise let the type exclude cases.
 
 The residual is represented as a finite ordered set of shapes. A \emph{shape} $k$
-denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{N}$ is a
-value of type $\tau$ whose outermost head is not among those in $N$. A head itself denotes values: a
+denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{H}$ is a
+value of type $\tau$ whose outermost head is not among those in $H$. A head itself denotes values: a
 class its instances, an integer at a list type the lists of that length, and a literal its value. Head
 typing $\Sigma \vdash h : \tau$ admits the heads whose values lie within $\tau$, and shape typing
 $\Sigma \vdash k : \tau$ types each excluded head and each component of a shape
 (\figref{shapes}). The other forms are literals, constructors, tuples, lists and dictionaries, each with shapes in place of
 sub-patterns. A list shape also records its element type, which the element shapes do not determine. A
-constructor shape carries an excluded set of its own: $\shapeAny{\patConstr{C}{\seq{k}}}{N}$ denotes the
-instances of $C$, or of a subclass not below a class of $N$, whose fields, those of $C$, have the shapes
-$\seq{k}$. The shapes of $\tau$ that remain once the heads in $N$ are excluded are
-$\shapesOf(\Sigma, \tau, N)$: one shape per member of a union, and none at all where $N$ exhausts $\tau$. No shape carries a
-union or dictionary type in the form $\shapeAny{\tau}{N}$, since $\shapesOf$ is the only source of
+constructor shape carries an excluded set of its own: $\shapeAny{\patConstr{C}{\seq{k}}}{H}$ denotes the
+instances of $C$, or of a subclass not below a class of $H$, whose fields, those of $C$, have the shapes
+$\seq{k}$. The shapes of $\tau$ that remain once the heads in $H$ are excluded are
+$\shapesOf(\Sigma, \tau, H)$: one shape per member of a union, and none at all where $H$ exhausts $\tau$. No shape carries a
+union or dictionary type in the form $\shapeAny{\tau}{H}$, since $\shapesOf$ is the only source of
 that form: it splits a union into its members and gives a dictionary type its dictionary shape.
 
 A pattern meets a shape of its own form, or splits it first (\figref{split}): splitting takes the head
 tested by the pattern, gives the shapes with that head, drawing the shapes of the component types from
 $\shapesOf$, and leaves the shape with that head excluded as well. \ruleName{pat-split} matches the
 pattern against the shapes the split gives and adds the shapes it leaves to the residual. Only the forms
-with an excluded set split, and no head types at a tuple type, so $N$ is empty there and
+with an excluded set split, and no head types at a tuple type, so $H$ is empty there and
 \ruleName{split-tuple} leaves nothing.
 
 \input{spec/fig/split}
@@ -329,8 +329,8 @@ derivation.
 
 \begin{lemma}[Preservation of shape type]
 \label{lem:shape-typing}
-If $\Sigma \vdash h : \tau$ for every $h \in N$ then $\Sigma \vdash k : \tau$ for each $k \in
-\shapesOf(\Sigma, \tau, N)$. Moreover, if $\Sigma \vdash k : \tau$ for each $k \in L$ and $\Sigma; \Gamma \vdash L, p
+If $\Sigma \vdash h : \tau$ for every $h \in H$ then $\Sigma \vdash k : \tau$ for each $k \in
+\shapesOf(\Sigma, \tau, H)$. Moreover, if $\Sigma \vdash k : \tau$ for each $k \in L$ and $\Sigma; \Gamma \vdash L, p
 \matches K, L' \binding \Delta$ then $\Sigma \vdash k : \tau$ for each $k \in K \cup L'$.
 \end{lemma}
 
@@ -346,9 +346,9 @@ $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple or list p
 \input{spec/fig/agrees}
 
 A dictionary shape has a form of its own,
-$\shapeDict{\tau}{\beta}{N}$, standing for dictionaries that hold each key of $\beta$ with a value of the
-shape $\beta$ gives it, and hold no key of $N$. A dictionary pattern takes its keys in order, no key twice. A key in
-neither $\beta$ nor $N$ splits the shape at that key (\ruleName{split-key}), adding to the residual the
+$\shapeDict{\tau}{\beta}{H}$, standing for dictionaries that hold each key of $\beta$ with a value of the
+shape $\beta$ gives it, and hold no key of $H$. A dictionary pattern takes its keys in order, no key twice. A key in
+neither $\beta$ nor $H$ splits the shape at that key (\ruleName{split-key}), adding to the residual the
 dictionaries that lack the key; once every key of the pattern is in $\beta$ the keys match as a sequence
 (\ruleName{pat-dict}), each against the shape $\beta$ records for it. The empty pattern matches every
 dictionary and leaves nothing, the case $n = 0$, so it alone exhausts a dictionary type.
