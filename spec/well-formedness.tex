@@ -157,8 +157,10 @@ A type with no clause, such as a class or a callable, cannot be iterated, and a 
 that type has no rule.
 
 A lambda within a comprehension may not capture a generator variable, a side condition of
-\ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}, because Python mutates the
-variable on each iteration and the lambda would see its final value. A module attribute reference
+\ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}, because Python closures are
+late-binding and the comprehension rebinds the variable on each iteration, so the lambda would see the
+variable's final value. A lambda applied to the generator variable receives the variable's value at
+that iteration. A module attribute reference
 $\exAttr{e}{x}$ resolves as a qualified name to a definitely assigned member
 (\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}. A variable bound to a module or
 class is not an expression on its own, and occurs only as the head of a qualified
