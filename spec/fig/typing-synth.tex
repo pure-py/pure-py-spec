@@ -94,10 +94,10 @@
 {
   \Sigma; \Gamma \vdash e \checks \tyBool \\
   I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \sigma_i} \neq \varnothing \\
-  \Sigma; \Gamma \vdash e_j \checks \bigJoinTy{\Sigma}{\set{\sigma_i \mid i \in I}} \quad (\forall j \notin I)
+  \Sigma; \Gamma \vdash e_j \checks \bigJoinTy{\Sigma}{(\sigma_i)_{i \in I}} \quad (\forall j \notin I)
 }
 {
-  \Sigma; \Gamma \vdash \exCondExpr{e_1}{e}{e_2} \synth \bigJoinTy{\Sigma}{\sigma_i \mid i \in I}
+  \Sigma; \Gamma \vdash \exCondExpr{e_1}{e}{e_2} \synth \bigJoinTy{\Sigma}{(\sigma_i)_{i \in I}}
 }
 \and
 \inferrule*[lab={\ruleName{and}}]
@@ -226,7 +226,7 @@
 \inferrule*[lab={\ruleName{syn-list}}]
 {
   I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \sigma_i} \neq \varnothing \\
-  \tau = \bigJoinTy{\Sigma}{\set{\baseType(\sigma_i) \mid i \in I}} \\
+  \tau = \bigJoinTy{\Sigma}{(\baseType(\sigma_i))_{i \in I}} \\
   \Sigma; \Gamma \vdash e_j \checks \tau \quad (\forall j \notin I)
 }
 {
@@ -245,7 +245,7 @@
 {
   \Sigma; \Gamma \vdash e_i \checks \tyStr \quad (\forall i) \\
   I = \set{i \mid \Sigma; \Gamma \vdash e_i' \synth \sigma_i} \neq \varnothing \\
-  \tau = \bigJoinTy{\Sigma}{\set{\baseType(\sigma_i) \mid i \in I}} \\
+  \tau = \bigJoinTy{\Sigma}{(\baseType(\sigma_i))_{i \in I}} \\
   \Sigma; \Gamma \vdash e_j' \checks \tau \quad (\forall j \notin I)
 }
 {

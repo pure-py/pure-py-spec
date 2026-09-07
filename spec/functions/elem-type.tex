@@ -1,5 +1,5 @@
 \elemTy(\Sigma, \tyList{\tau}) &{}= \tau \\*
 \elemTy(\Sigma, \tyStr) &{}= \tyStr \\*
 \elemTy(\Sigma, \tyDict{\tau}) &{}= \tyStr \\*
-\elemTy(\Sigma, \tyTuple{\seq{\tau}}) &{}= \bigJoinTy{\Sigma}{\set{\baseType(\tau_1), \ldots, \baseType(\tau_n)}} \\*
+\elemTy(\Sigma, \tyTuple{\seq{\tau}}) &{}= \bigJoinTy{\Sigma}{\baseType(\tau_1), \ldots, \baseType(\tau_n)} \\*
 \elemTy(\Sigma, \tyUnion{\sigma}{\tau}) &{}= \joinTy{\Sigma}{\elemTy(\Sigma, \sigma)}{\elemTy(\Sigma, \tau)}
