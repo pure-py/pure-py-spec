@@ -261,7 +261,8 @@ scope; every \PurePy class must declare itself a dataclass. Each rule that takes
 
 A function definition binds its parameters at their annotated types and its own name, as well as the names of the
 mutual region it belongs to, each at its $\pyinline{Callable}$ type; variables assigned in the body start
-at $\statusNotDefAssigned$ (\ruleName{def}). The body is checked with the
+at $\statusNotDefAssigned$ (\ruleName{def}), emulating Python's scoping of function bodies, which
+prefers a locally assigned name to one visible in an enclosing scope. The body is checked with the
 declared return type, and must have result type $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
