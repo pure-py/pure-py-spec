@@ -27,7 +27,7 @@ type expression denotes a type under a context (\figref{resolve-type}). Every de
 annotation for its parameters and return type, so the type of a definition is given rather than
 inferred from its body. A class name resolves to a
 class (\figref{resolve-name}) and every other name must resolve to a predefined entry
-(\figref{predefined-types}). The \emph{base type} $\baseType(\tau)$ discards the precision of a
+(\figref{predefined-types}). The function $\baseType(\tau)$ discards the precision of a
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and leaving every other type alone
 (\secref{types-auxiliary}).
 
