@@ -1,6 +1,6 @@
 ---
 name: purepy-editor
-description: Conventions for editing the PurePy spec and related GitHub issues.
+description: Conventions for editing the PurePy spec and its GitHub issues; defers to the github-issues skill for general issue, pull request and meeting conventions.
 ---
 
 # PurePy editor conventions
@@ -33,10 +33,6 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 
 ## References in conversation
 
-- When referring to an issue, give its number, its title and its URL, so it can be opened
-  without a search. For example: #181, Classes for built-in types,
-  https://github.com/pure-py/pure-py-spec/issues/181.
-
 - When referring to a figure, lemma, definition or section of the specification or paper, give its name
   and its number in the current PDF, so it can be found without a search. For example: the shape-typing
   figure, Figure 4.13 in the specification. Look the number up (a draft-mode `pdflatex` run's `.aux` has
@@ -44,33 +40,6 @@ description: Conventions for editing the PurePy spec and related GitHub issues.
 
 ## GitHub issues
 
+General issue, pull request and meeting conventions are in the `github-issues` skill; use it. PurePy-specific:
+
 - New issues: add to the PurePy project with Status either Planned or Proposed.
-
-- Add content to an issue, whether a body, a comment or a closing comment, only when asked to. Otherwise create, edit or close it and nothing more.
-
-- Issue titles and task-list items are noun phrases (e.g. "Syntax of types", not "Define the syntax of types").
-
-- When an issue references other issues or external resources, add a **See also** paragraph at the end with a bullet list of links. Example:
-
-  ```
-  ## See also
-
-  - Python language reference, §6.10 Comparisons: https://docs.python.org/3/reference/expressions.html#comparisons
-  - #36
-  - #50
-  ```
-
-  Use this for: cross-references to related issues, links to the Python language reference, links to other external specs.
-
-- When linking to another GitHub issue in a bullet list, write just the bare `#N` reference — GitHub renders the issue title inline.
-
-## Pull requests
-
-- Titles are noun phrases, like issue titles.
-- The body is empty, or `Closes #N` alone. The issue carries the content; do not summarise the changes in the PR.
-
-## Meetings
-
-- Meeting issues are titled `YYYY-MM-DD`; set Type to `Meeting`.
-- Body sections: `## Adjacent meetings` (links to previous), then `## To discuss` containing `### Resolved since [date]`, `### New issues since [date]`, `### Work since [date]`.
-- Bullet lists of bare `#N` for issues; brief notes for work items.
