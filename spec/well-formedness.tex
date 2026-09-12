@@ -316,10 +316,10 @@ with an excluded set split, and no head types at a tuple type, so $H$ is empty t
 
 \input{spec/fig/split}
 
-The
-matching judgement $\Sigma; \Gamma \vdash L, p \matches K, L' \binding \Delta$ divides an ordered set of shapes into the
-matched shapes $K$ and the \emph{residual} $L'$, binding $\Delta$, one shape at a time and one position at a time
-(\figrefTwo{pat}{pat-seq}). A pattern has no derivation against a shape that it cannot match, so
+The matching judgement $\Sigma; \Gamma \vdash L, p \matches K, L' \binding \Delta$ divides an ordered set of shapes into the
+matched shapes $K$ and the \emph{residual} $L'$, binding $\Delta$ (\figrefTwo{pat}{pat-seq}). It is defined from a
+judgement on a single shape, which for a tuple, list, dictionary or constructor shape matches the sub-patterns
+against the component shapes position by position. A pattern has no derivation against a shape that it cannot match, so
 \ruleName{pat-shapes} takes the shapes matched by the pattern, of which there must be at least one, and passes the
 unmatched shapes into the residual untouched. A variable pattern binds at $\shapeTy(k)$ for the shape $k$ it matches, and a
 pattern named by \pyinline{as} at the join over the shapes it matched, so a case for one alternative of a
@@ -352,12 +352,12 @@ $\shapeDict{\tau}{\beta}{H}$, standing for dictionaries that hold each key of $\
 shape $\beta$ gives it, and hold no key of $H$. A dictionary pattern takes its keys in order, no key twice. A key in
 neither $\beta$ nor $H$ splits the shape at that key (\ruleName{split-key}), adding to the residual the
 dictionaries that lack the key; once every key of the pattern is in $\beta$ the keys match as a sequence
-(\ruleName{pat-dict}), each against the shape $\beta$ records for it. The empty pattern matches every
-dictionary and leaves nothing, the case $n = 0$, so it alone exhausts a dictionary type.
+(\ruleName{pat-dict}), each against the shape $\beta$ records for it. The empty dictionary pattern matches every
+dictionary and leaves nothing.
 
 A union is exhausted
-by covering each member, a class type by a pattern for the class itself, and \pyinline{bool} by
-\pyinline{True} and \pyinline{False}, while \pyinline{int}, \pyinline{str} and lists have
+by covering each member, a class type by a pattern for the class itself, \pyinline{bool} by
+\pyinline{True} and \pyinline{False}, and a dictionary type by the empty dictionary pattern, while \pyinline{int}, \pyinline{str} and lists have
 unboundedly many heads and need a variable or wildcard. Exhaustiveness need not come from a catch-all: over
 $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave nothing,
