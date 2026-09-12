@@ -293,21 +293,21 @@ plays the role of the term descriptions of \citet{sestoft1996}, and the uncovere
 \citet{karachalias2015} likewise let the type exclude cases.
 
 The residual is represented as a finite ordered set of shapes. A \emph{shape} $k$
-denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{H}$ is a
-value of type $\tau$ whose outermost head is not among those in $H$. A head itself denotes values: a
+denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{H}$ denotes the
+values of type $\tau$ whose outermost head is not among those in $H$. A head itself denotes values: a
 class its instances, an integer at a list type the lists of that length, and a literal its value. Head
 typing $\Sigma \vdash h : \tau$ admits the heads whose values lie within $\tau$, and shape typing
-$\Sigma \vdash k : \tau$ types each excluded head and each component of a shape
+$\Sigma \vdash k : \tau$ checks each excluded head and each component of a shape
 (\figref{shapes}). The other forms are literals, constructors, tuples, lists and dictionaries, each with shapes in place of
 sub-patterns. A list shape also records its element type, which the element shapes do not determine. A
 constructor shape carries an excluded set of its own: $\shapeAny{\patConstr{C}{\seq{k}}}{H}$ denotes the
 instances of $C$, or of a subclass not below a class of $H$, whose fields, those of $C$, have the shapes
 $\seq{k}$. The shapes of $\tau$ that remain once the heads in $H$ are excluded are
-$\shapesOf(\Sigma, \tau, H)$: one shape per member of a union, and none at all where $H$ exhausts $\tau$. No shape carries a
+$\shapesOf(\Sigma, \tau, H)$: one shape per member of a union, and none at all when $H$ exhausts $\tau$. No shape carries a
 union or dictionary type in the form $\shapeAny{\tau}{H}$, since $\shapesOf$ is the only source of
 that form: it splits a union into its members and gives a dictionary type its dictionary shape.
 
-A pattern meets a shape of its own form, or splits it first (\figref{split}): splitting takes the head
+A pattern matches a shape of the same form directly, or splits it first (\figref{split}): splitting takes the head
 tested by the pattern, gives the shapes with that head, drawing the shapes of the component types from
 $\shapesOf$, and leaves the shape with that head excluded as well. \ruleName{pat-split} matches the
 pattern against the shapes the split gives and adds the shapes it leaves to the residual. Only the forms
@@ -319,8 +319,8 @@ with an excluded set split, and no head types at a tuple type, so $H$ is empty t
 The
 matching judgement $\Sigma; \Gamma \vdash L, p \matches K, L' \binding \Delta$ divides an ordered set of shapes into the
 matched shapes $K$ and the \emph{residual} $L'$, binding $\Delta$, one shape at a time and one position at a time
-(\figrefTwo{pat}{pat-seq}). A pattern that cannot match a shape has no derivation against it, so
-\ruleName{pat-shapes} takes the shapes the pattern does match, which must not be none, and passes the
+(\figrefTwo{pat}{pat-seq}). A pattern has no derivation against a shape that it cannot match, so
+\ruleName{pat-shapes} takes the shapes matched by the pattern, of which there must be at least one, and passes the
 unmatched shapes into the residual untouched. A variable pattern binds at $\shapeTy(k)$ for the shape $k$ it matches, and a
 pattern named by \pyinline{as} at the join over the shapes it matched, so a case for one alternative of a
 union leaves a later variable case bound at the remaining members alone. Bindings from the positions of a sequence, or from
@@ -333,7 +333,7 @@ derivation.
 \label{lem:shape-typing}
 If $\Sigma \vdash h : \tau$ for every $h \in H$ then $\Sigma \vdash k : \tau$ for each $k \in
 \shapesOf(\Sigma, \tau, H)$. Moreover, if $\Sigma \vdash k : \tau$ for each $k \in L$ and $\Sigma; \Gamma \vdash L, p
-\matches K, L' \binding \Delta$ then $\Sigma \vdash k : \tau$ for each $k \in K \cup L'$.
+\matches K, L' \binding \Delta$ then $\Sigma \vdash k : \tau$ for each $k \in K \disjunion L'$.
 \end{lemma}
 
 The match rules (\figref{typing-stmt}) take the cases in the order $\dispatch$ tries them at run
