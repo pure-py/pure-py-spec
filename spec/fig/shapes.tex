@@ -6,7 +6,7 @@
 \grammarGroup{Heads} \\
 $h$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $C$ & (Class) \\
-$H$ & $::=$ & $\set{h_1, \ldots, h_n}$ & (Exclusion set)
+$H$ & $::=$ & $\set{h_1, \ldots, h_n}$ & (Excluded heads)
    \\[3mm]
 \grammarGroup{Shapes} \\
 $k$ & $::=$ & $\shapeAny{\tau}{H}$ & (Rest) \\
@@ -107,6 +107,7 @@ $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
 \and
 \inferrule*[lab={\ruleName{shape-dict}}]
 {
+  \Sigma \vdash h : \tyStr \quad (\forall h \in H) \\
   \Sigma \vdash \beta(w) : \tau \quad (\forall w \in \dom(\beta)) \\
   \dom(\beta) \cap H = \varnothing
 }
