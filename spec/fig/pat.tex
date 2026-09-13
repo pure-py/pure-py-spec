@@ -84,13 +84,9 @@
   \Sigma; \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{H}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{C}{\seq{k}\,'}}{H} \mid \seq{k}\,' \in K}, \set{\shapeAny{\patConstr{C}{\seq{k}^\dagger}}{H} \mid \seq{k}^\dagger \in L} \binding \Delta
 }
 \end{mathpar}
-\caption{Pattern $p$ matches shape $k$, giving matched shapes $K$, residual $L$ and bindings $\Delta$}
-\label{fig:pat}
-\end{figure}
 
-\begin{figure}
-\small
-\setlength{\jot}{2pt}
+\vspace{2mm}
+
 \flushleft \shadebox{$\Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta$}
 \begin{mathpar}
 \small
@@ -118,6 +114,6 @@
   \Sigma; \Gamma \vdash L, p \matches \textstyle\bigdisjunion_{k \in L'} K_k, \; \textstyle\bigdisjunion_{k \in L'} L_k \disjunion (L \setminus L') \binding \Delta
 }
 \end{mathpar}
-\caption{Matching sequences and ordered sets of shapes}
-\label{fig:pat-seq}
+\caption{Pattern $p$ matches shape $k$, giving matched shapes $K$, residual $L$ and bindings $\Delta$; lifted to sequences and ordered sets of shapes}
+\label{fig:pat}
 \end{figure}
