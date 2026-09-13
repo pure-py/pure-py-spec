@@ -274,7 +274,7 @@ judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{h} : S, L'$ (\figref{typ
 the cases in turn: each case's pattern is matched against the \emph{residual} $L$, a static
 over-approximation of the values of $\sigma$ which are not matched by the earlier cases
 (\secref{well-formedness-patterns}), its body is checked under the pattern's bindings, and the outcomes
-are merged into $S$. Each pattern must agree with $\sigma$ (\figref{agrees}). The match rules start the
+are merged into $S$. Each pattern must be sequence-safe at $\sigma$ (\figref{seq-safe}). The match rules start the
 residual from $\sigma$; \ruleName{match} applies where the final residual is empty; \ruleName{match-partial} applies otherwise, merging in
 $\Assigns{\varnothing}$ for the values that fall through. A literal-typed scrutinee is exhausted by covering its literals, so \pyinline{x = 42} admits a
 match with a case for \pyinline{42} alone; \pyinline{x: int = 42} keeps the type open.
@@ -346,10 +346,10 @@ because the earlier cases already cover it. A constructor pattern whose class li
 class of the excluded set matches nothing, because an earlier case for the superclass took every
 instance. The evaluation rules apply a tuple or list pattern only to a value
 of its own kind, although Python would match either (\figref{eval-pat}); each case's pattern must
-therefore agree with the scrutinee's type (\figref{agrees}), so a match on
+therefore be \emph{sequence-safe} at the scrutinee's type (\figref{seq-safe}), so a match on
 $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple or list pattern.
 
-\input{spec/fig/agrees}
+\input{spec/fig/seq-safe}
 
 A dictionary shape has a form of its own,
 $\shapeDict{\tau}{\beta}{H}$, standing for dictionaries that hold each key of $\beta$ with a value of the
