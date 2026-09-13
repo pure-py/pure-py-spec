@@ -296,7 +296,7 @@ relation goes back to the ``usefulness'' algorithm for ML~\cite{maranget2007}. T
 role of the term descriptions of \citet{sestoft1996}, and the uncovered sets of \citet{karachalias2015}
 likewise let the type exclude cases.
 
-\input{spec/fig/split}
+\input{spec/fig/seq-safe}
 
 A \emph{shape} $k$
 denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{H}$ denotes the
@@ -333,7 +333,7 @@ union leaves a later variable case bound at the remaining members alone. Binding
 the keys of a dictionary pattern, compose by disjoint union, so a pattern that binds a name twice has no
 derivation.
 
-\input{spec/fig/seq-safe}
+\input{spec/fig/split}
 
 \begin{lemma}[Preservation of shape type]
 \label{lem:shape-typing}
