@@ -50,7 +50,7 @@
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \patTuple{k_1, \ldots, k_n}, \patTuple{p_1, \ldots, p_n} \matches \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in K}, \set{\patTuple{\seq{k}^\dagger} \mid \seq{k}^\dagger \in L} \binding \Delta
+  \Sigma; \Gamma \vdash \patTuple{\seq{k}}, \patTuple{\seq{p}} \matches \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in K}, \set{\patTuple{\seq{k}^\dagger} \mid \seq{k}^\dagger \in L} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-list}}]
@@ -58,7 +58,7 @@
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \shapeList{\tau}{k_1, \ldots, k_n}, \patList{p_1, \ldots, p_n} \matches \set{\shapeList{\tau}{\seq{k}\,'} \mid \seq{k}\,' \in K}, \set{\shapeList{\tau}{\seq{k}^\dagger} \mid \seq{k}^\dagger \in L} \binding \Delta
+  \Sigma; \Gamma \vdash \shapeList{\tau}{\seq{k}}, \patList{\seq{p}} \matches \set{\shapeList{\tau}{\seq{k}\,'} \mid \seq{k}\,' \in K}, \set{\shapeList{\tau}{\seq{k}^\dagger} \mid \seq{k}^\dagger \in L} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-dict}}]
@@ -92,6 +92,7 @@
 \small
 \inferrule*[lab={\ruleName{pat-seq}}]
 {
+  |\seq{k}| = |\seq{p}| \\
   \Sigma; \Gamma \vdash k_i, p_i \matches K_i, L_i \binding \Delta_i \quad (\forall i) \\
   L = \textstyle\bigdisjunion_i K_1 \times \cdots \times K_{i-1} \times L_i \times \set{k_{i+1}} \times \cdots \times \set{k_n}
 }
