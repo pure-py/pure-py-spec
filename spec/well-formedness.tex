@@ -320,7 +320,7 @@ with an excluded set split, and no head types at a tuple type, so $H$ is empty t
 The matching judgement $\Sigma; \Gamma \vdash L, p \matches K, L' \binding \Delta$ divides an ordered set of shapes $L$ into
 matched shapes $K$ and residual $L'$, binding $\Delta$ (\figrefTwo{pat}{pat-seq}). It is defined from a
 judgement on a single shape, which for a tuple, list, dictionary or constructor shape matches the sub-patterns
-against the component shapes position by position. A pattern has no derivation against a shape that it cannot match, so
+against the component shapes position by position. A pattern has no derivation against a shape it is unable to match, so
 \ruleName{pat-shapes} takes the shapes matched by the pattern, of which there must be at least one, and passes the
 unmatched shapes into the residual untouched. A variable pattern binds at $\shapeTy(k)$ for the shape $k$ it matches, and a
 pattern named by \pyinline{as} at the join over the shapes it matched, so a case for one alternative of a
