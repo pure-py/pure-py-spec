@@ -2,6 +2,10 @@
 \label{sec:syntax}
 
 The syntax of \PurePy is given in \figrefThree{syntax-stmt}{syntax-expr}{syntax-types}. \figref{metavariables} summarises the metavariables used throughout.
+A sequence $\seq{x}$ denotes $x_1, \ldots, x_n$ for some $n$; inside the brackets of a tuple, list, type
+application or argument list it stands for the comma-separated elements, so $\exTuple{\seq{e}}$ is
+$\exTuple{e_1, \ldots, e_n}$. The sequence $x \cons \seq{x}$ has head $x$ and tail $\seq{x}$, and
+$\seq{x} \mathbin{\concat} \seq{y}$ is concatenation.
 Comma-separated elements inside set braces are pairwise distinct, so $\set{x_1, \ldots, x_n}$ has $n$
 elements; the set of the elements of a sequence, $\set{\seq{x}}$, assumes no distinctness. A sequence
 comprehension $(x_i \mid i \in I)$, where the finite index set $I$ carries a total order, denotes the
