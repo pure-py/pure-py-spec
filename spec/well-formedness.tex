@@ -309,15 +309,15 @@ sub-patterns. A list shape also records its element type, which the element shap
 constructor shape carries an excluded set of its own: $\shapeAny{\patConstr{C}{\seq{k}}}{H}$ denotes the
 instances of $C$, or of a subclass not below a class of $H$, whose fields, those of $C$, have the shapes
 $\seq{k}$. The shapes of $\tau$ that remain once the heads in $H$ are excluded are
-$\shapesOf(\Sigma, \tau, H)$: one shape per member of a union, and none at all when $H$ exhausts $\tau$. No shape carries a
-union or dictionary type in the form $\shapeAny{\tau}{H}$, since $\shapesOf$ is the only source of
+$\shapes(\Sigma, \tau, H)$: one shape per member of a union, and none at all when $H$ exhausts $\tau$. No shape carries a
+union or dictionary type in the form $\shapeAny{\tau}{H}$, since $\shapes$ is the only source of
 that form: it splits a union into its members and gives a dictionary type its dictionary shape.
 
 \input{spec/fig/pat}
 
 A pattern matches a shape of the same form directly, or splits it first (\figref{split}): splitting takes the head
 tested by the pattern, gives the shapes with that head, drawing the shapes of the component types from
-$\shapesOf$, and leaves the shape with that head excluded as well. \ruleName{pat-split} matches the
+$\shapes$, and leaves the shape with that head excluded as well. \ruleName{pat-split} matches the
 pattern against the shapes the split gives and adds the shapes it leaves to the residual. Only the forms
 with an excluded set split, and no head types at a tuple type, so $H$ is empty there and
 \ruleName{split-tuple} leaves nothing.
@@ -338,7 +338,7 @@ derivation.
 \begin{lemma}[Preservation of shape type]
 \label{lem:shape-typing}
 If $\Sigma \vdash h : \tau$ for every $h \in H$ then $\Sigma \vdash k : \tau$ for each $k \in
-\shapesOf(\Sigma, \tau, H)$. Moreover, if $\Sigma \vdash k : \tau$ for each $k \in L$ and $\Sigma; \Gamma \vdash L, p
+\shapes(\Sigma, \tau, H)$. Moreover, if $\Sigma \vdash k : \tau$ for each $k \in L$ and $\Sigma; \Gamma \vdash L, p
 \matches K, L' \binding \Delta$ then $\Sigma \vdash k : \tau$ for each $k \in K \disjunion L'$.
 \end{lemma}
 

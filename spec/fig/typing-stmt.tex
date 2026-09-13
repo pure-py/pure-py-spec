@@ -115,7 +115,7 @@
 \inferrule*[lab={\ruleName{match}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta; \sigma \vdash \shapesOf(\Sigma, \sigma, \varnothing), \seq{h} : S, \varnothing
+  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{h} : S, \varnothing
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{h}} : S
@@ -124,7 +124,7 @@
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta; \sigma \vdash \shapesOf(\Sigma, \sigma, \varnothing), \seq{h} : S, L \\
+  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{h} : S, L \\
   L \neq \varnothing
 }
 {
