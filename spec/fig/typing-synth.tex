@@ -238,7 +238,7 @@
   \Sigma; \Gamma \vdash e_i \synth \tau_i \quad (\forall i)
 }
 {
-  \Sigma; \Gamma \vdash \exTuple{e_1, \ldots, e_n} \synth \tyTuple{\tau_1, \ldots, \tau_n}
+  \Sigma; \Gamma \vdash \exTuple{\seq{e}} \synth \tyTuple{\seq{\tau}}
 }
 \and
 \inferrule*[lab={\ruleName{syn-dict}}]
@@ -259,7 +259,7 @@
   \capturesE(e) \cap \dom(\Delta) = \varnothing
 }
 {
-  \Sigma; \Gamma \vdash \exListComp{e}{g_1\;\ldots\;g_n} \synth \tyList{\baseType(\tau)}
+  \Sigma; \Gamma \vdash \exListComp{e}{\seq{g}} \synth \tyList{\baseType(\tau)}
 }
 \and
 \inferrule*[lab={\ruleName{syn-dict-comp}}]
@@ -270,7 +270,7 @@
   \capturesE((e, e')) \cap \dom(\Delta) = \varnothing
 }
 {
-  \Sigma; \Gamma \vdash \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \synth \tyDict{\baseType(\tau)}
+  \Sigma; \Gamma \vdash \exDictComp{e}{e'}{\seq{g}} \synth \tyDict{\baseType(\tau)}
 }
 \end{mathpar}
 \caption{Expression synthesis: tuples, lists, dictionaries and comprehensions}

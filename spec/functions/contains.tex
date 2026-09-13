@@ -1,5 +1,5 @@
-\memOp(\exList{v_1, \ldots, v_n}, v) &{}= \memElems(v_1 \cons \ldots \cons v_n, v) \\*
-\memOp(\exTuple{v_1, \ldots, v_n}, v) &{}= \memElems(v_1 \cons \ldots \cons v_n, v) \\*
+\memOp(\exList{\seq{v}}, v) &{}= \memElems(\seq{v}, v) \\*
+\memOp(\exTuple{\seq{v}}, v) &{}= \memElems(\seq{v}, v) \\*
 \\
 \memOp(\delta, w) &{}= \pyinline{True} && \text{if } w \in \dom(\delta) \\*
 \memOp(\delta, w) &{}= \pyinline{False} && \text{if } w \notin \dom(\delta) \\*

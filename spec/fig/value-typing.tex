@@ -15,7 +15,7 @@
   \vdash v_i : \tau \quad (\forall i)
 }
 {
-  \vdash \exList{v_1, \ldots, v_n} : \tyList{\tau}
+  \vdash \exList{\seq{v}} : \tyList{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{val-tuple}}]
@@ -23,16 +23,16 @@
   \vdash v_i : \tau_i \quad (\forall i)
 }
 {
-  \vdash \exTuple{v_1, \ldots, v_n} : \tyTuple{\seq{\tau}}
+  \vdash \exTuple{\seq{v}} : \tyTuple{\seq{\tau}}
 }
 \and
 \inferrule*[lab={\ruleName{val-dict}}]
 {
   \vdash v_i : \tau \quad (\forall i) \\
-  w_1, \ldots, w_n \text{ distinct}
+  \seq{w} \text{ distinct}
 }
 {
-  \vdash \exDict{\bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}} : \tyDict{\tau}
+  \vdash \exDict{\bind{\seq{w}}{\seq{v}}} : \tyDict{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{val-lambda}}]

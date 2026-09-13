@@ -35,7 +35,7 @@
   \Sigma; \Gamma \vdash e_i \checks \tau \quad (\forall i)
 }
 {
-  \Sigma; \Gamma \vdash \exList{e_1, \ldots, e_n} \checks \tyList{\tau}
+  \Sigma; \Gamma \vdash \exList{\seq{e}} \checks \tyList{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{tuple}}]
@@ -72,7 +72,7 @@
   \capturesE(e) \cap \dom(\Delta) = \varnothing
 }
 {
-  \Sigma; \Gamma \vdash \exListComp{e}{g_1\;\ldots\;g_n} \checks \tyList{\tau}
+  \Sigma; \Gamma \vdash \exListComp{e}{\seq{g}} \checks \tyList{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{dict-comp}}]
@@ -83,7 +83,7 @@
   \capturesE((e, e')) \cap \dom(\Delta) = \varnothing
 }
 {
-  \Sigma; \Gamma \vdash \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \checks \tyDict{\tau}
+  \Sigma; \Gamma \vdash \exDictComp{e}{e'}{\seq{g}} \checks \tyDict{\tau}
 }
 \end{mathpar}
 \subcaption{Expression $e$ checks against type $\tau$}

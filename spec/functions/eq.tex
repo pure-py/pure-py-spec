@@ -6,8 +6,8 @@
 \eqOp(\pyinline{True}, \pyinline{False}) &{}= \pyinline{False} \\*
 \eqOp(\pyinline{False}, \pyinline{True}) &{}= \pyinline{False} \\*
 \\
-\eqOp(\exList{v_1, \ldots, v_n}, \exList{v'_1, \ldots, v'_m}) &{}= \eqElems(v_1 \cons \ldots \cons v_n, v'_1 \cons \ldots \cons v'_m) \\*
-\eqOp(\exTuple{v_1, \ldots, v_n}, \exTuple{v'_1, \ldots, v'_m}) &{}= \eqElems(v_1 \cons \ldots \cons v_n, v'_1 \cons \ldots \cons v'_m) \\*
+\eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) &{}= \eqElems(\seq{v}, \seq{v}\,') \\*
+\eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \eqElems(\seq{v}, \seq{v}\,') \\*
 \\
 \eqOp(\delta, \delta') &{}= \eqElems(v_1 \cons \ldots \cons v_n, \delta'(w_1) \cons \ldots \cons \delta'(w_n)) && \text{if } \dom(\delta) = \dom(\delta') \\*
 &\qquad \text{where } \delta = \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n} \\*

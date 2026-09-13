@@ -246,7 +246,7 @@
   \strut
 }
 {
-  \rho, \exLambda{x_1, \ldots, x_n}{e} \Rightarrow \val{\exLamClosure[\Gamma]{\rho}{\seq{x}}{e}}
+  \rho, \exLambda{\seq{x}}{e} \Rightarrow \val{\exLamClosure[\Gamma]{\rho}{\seq{x}}{e}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-unop}}]
@@ -261,18 +261,18 @@
 \and
 \inferrule*[lab={\ruleName{eval-list}}]
 {
-  \rho, e_1 \cons \ldots \cons e_n \Rightarrow \val{(v_1 \cons \ldots \cons v_n)}
+  \rho, \seq{e} \Rightarrow \val{\seq{v}}
 }
 {
-  \rho, \exList{e_1, \ldots, e_n} \Rightarrow \val{\exList{v_1, \ldots, v_n}}
+  \rho, \exList{\seq{e}} \Rightarrow \val{\exList{\seq{v}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-tuple}}]
 {
-  \rho, e_1 \cons \ldots \cons e_n \Rightarrow \val{(v_1 \cons \ldots \cons v_n)}
+  \rho, \seq{e} \Rightarrow \val{\seq{v}}
 }
 {
-  \rho, \exTuple{e_1, \ldots, e_n} \Rightarrow \val{\exTuple{v_1, \ldots, v_n}}
+  \rho, \exTuple{\seq{e}} \Rightarrow \val{\exTuple{\seq{v}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-dict}}]
@@ -285,21 +285,21 @@
 \and
 \inferrule*[lab={\ruleName{eval-list-comp}}]
 {
-  \rho, \seq{g} \Rightarrow \val{(\rho_1 \cons \ldots \cons \rho_m)} \\
+  \rho, \seq{g} \Rightarrow \val{\seq{\rho}} \\
   \rho_i, e \Rightarrow \val{v_i} \quad (\forall i)
 }
 {
-  \rho, \exListComp{e}{g_1\;\ldots\;g_n} \Rightarrow \val{\exList{v_1, \ldots, v_m}}
+  \rho, \exListComp{e}{\seq{g}} \Rightarrow \val{\exList{\seq{v}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-dict-comp}}]
 {
-  \rho, \seq{g} \Rightarrow \val{(\rho_1 \cons \ldots \cons \rho_m)} \\
+  \rho, \seq{g} \Rightarrow \val{\seq{\rho}} \\
   \rho_i, e \Rightarrow \val{w_i} \quad (\forall i) \\
   \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i)
 }
 {
-  \rho, \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \Rightarrow \val{\exDict{\entries(\varepsilon, \bind{w_1}{v_1} \cons \ldots \cons \bind{w_m}{v_m})}}
+  \rho, \exDictComp{e}{e'}{\seq{g}} \Rightarrow \val{\exDict{\entries(\varepsilon, \bind{\seq{w}}{\seq{v}})}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-attr-module}}]
@@ -353,7 +353,7 @@
   \rho' \override \set{\bind{\seq{x}}{\seq{u}}}, e' \Rightarrow r
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow r
+  \rho, \exCall{e}{\seq{e}} \Rightarrow r
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-def}}]
@@ -365,7 +365,7 @@
   \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, s_j \Rightarrow o
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \result(o)
+  \rho, \exCall{e}{\seq{e}} \Rightarrow \result(o)
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-prim}}]
@@ -374,7 +374,7 @@
   \rho, \seq{e} \Rightarrow \val{\seq{u}}
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \primFn(\seq{u})
+  \rho, \exCall{e}{\seq{e}} \Rightarrow \primFn(\seq{u})
 }
 \and
 \inferrule*[lab={\ruleName{eval-and-false}}]
@@ -521,7 +521,7 @@
   \rho, e \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \aborts{\kappa}
+  \rho, \exCall{e}{\seq{e}} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-fail-args}}]
@@ -530,23 +530,23 @@
   \rho, \seq{e} \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \aborts{\kappa}
+  \rho, \exCall{e}{\seq{e}} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-list-fail}}]
 {
-  \rho, e_1 \cons \ldots \cons e_n \Rightarrow \aborts{\kappa}
+  \rho, \seq{e} \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exList{e_1, \ldots, e_n} \Rightarrow \aborts{\kappa}
+  \rho, \exList{\seq{e}} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-tuple-fail}}]
 {
-  \rho, e_1 \cons \ldots \cons e_n \Rightarrow \aborts{\kappa}
+  \rho, \seq{e} \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exTuple{e_1, \ldots, e_n} \Rightarrow \aborts{\kappa}
+  \rho, \exTuple{\seq{e}} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-dict-fail}}]
@@ -562,17 +562,17 @@
   \rho, \seq{g} \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exListComp{e}{g_1\;\ldots\;g_n} \Rightarrow \aborts{\kappa}
+  \rho, \exListComp{e}{\seq{g}} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-list-comp-fail}}]
 {
-  \rho, \seq{g} \Rightarrow \val{(\rho_1 \cons \ldots \cons \rho_m)} \\
+  \rho, \seq{g} \Rightarrow \val{\seq{\rho}} \\
   \rho_i, e \Rightarrow \val{v_i} \quad (\forall i < j) \\
   \rho_j, e \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exListComp{e}{g_1\;\ldots\;g_n} \Rightarrow \aborts{\kappa}
+  \rho, \exListComp{e}{\seq{g}} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-dict-comp-fail-quals}}]
@@ -580,28 +580,28 @@
   \rho, \seq{g} \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \Rightarrow \aborts{\kappa}
+  \rho, \exDictComp{e}{e'}{\seq{g}} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-dict-comp-fail-key}}]
 {
-  \rho, \seq{g} \Rightarrow \val{(\rho_1 \cons \ldots \cons \rho_m)} \\
+  \rho, \seq{g} \Rightarrow \val{\seq{\rho}} \\
   \rho_i, e \Rightarrow \val{w_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
   \rho_j, e \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \Rightarrow \aborts{\kappa}
+  \rho, \exDictComp{e}{e'}{\seq{g}} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-dict-comp-fail-value}}]
 {
-  \rho, \seq{g} \Rightarrow \val{(\rho_1 \cons \ldots \cons \rho_m)} \\
+  \rho, \seq{g} \Rightarrow \val{\seq{\rho}} \\
   \rho_i, e \Rightarrow \val{w_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
   \rho_j, e \Rightarrow \val{w_j} \\
   \rho_j, e' \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exDictComp{e}{e'}{g_1\;\ldots\;g_n} \Rightarrow \aborts{\kappa}
+  \rho, \exDictComp{e}{e'}{\seq{g}} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-constr-fail}}]
@@ -637,7 +637,7 @@
   |\seq{x}| \neq |\seq{u}|
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \aborts{\errType}
+  \rho, \exCall{e}{\seq{e}} \Rightarrow \aborts{\errType}
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-def-arity}}]
@@ -648,7 +648,7 @@
   |\seq{x}_j| \neq |\seq{u}|
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n} \Rightarrow \aborts{\errType}
+  \rho, \exCall{e}{\seq{e}} \Rightarrow \aborts{\errType}
 }
 \and
 \input{spec/rules/eval-call-nonfun}
