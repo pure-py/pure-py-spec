@@ -90,14 +90,21 @@
 \flushleft \shadebox{$\Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{pat-seq}}]
+\inferrule*[lab={\ruleName{pat-nil}}]
 {
-  |\seq{k}| = |\seq{p}| \\
-  \Sigma; \Gamma \vdash k_i, p_i \matches K_i, L_i \binding \Delta_i \quad (\forall i) \\
-  L = \textstyle\bigdisjunion_i K_1 \times \cdots \times K_{i-1} \times L_i \times \set{k_{i+1}} \times \cdots \times \set{k_n}
+  \strut
 }
 {
-  \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K_1 \times \cdots \times K_n, L \binding \Delta_1 \disjunion \ldots \disjunion \Delta_n
+  \Sigma; \Gamma \vdash \varepsilon, \varepsilon \matches \set{\varepsilon}, \varnothing \binding \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{pat-cons}}]
+{
+  \Sigma; \Gamma \vdash k, p \matches K, L \binding \Delta \\
+  \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K', L' \binding \Delta'
+}
+{
+  \Sigma; \Gamma \vdash k \cons \seq{k}, p \cons \seq{p} \matches K \times K', (L \times \set{\seq{k}}) \disjunion (K \times L') \binding \Delta \disjunion \Delta'
 }
 \end{mathpar}
 
