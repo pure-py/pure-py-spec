@@ -1,4 +1,5 @@
-\shapes(\Sigma, \tyUnion{\sigma}{\tau}, H) &{}= \shapes(\Sigma, \sigma, H) \cup \shapes(\Sigma, \tau, H) \\*
+\shapes(\Sigma, \tyUnion{\sigma}{\tau}, H) &{}= \shapes(\Sigma, \sigma, H_\sigma) \cup \shapes(\Sigma, \tau, H_\tau) \\*
+&\qquad \rlap{$\text{where } H_\sigma = \set{h \in H \mid \Sigma \vdash h : \sigma} \text{ and } H_\tau = \set{h \in H \mid \Sigma \vdash h : \tau}$} \\*
 \shapes(\Sigma, \tyLiteral{\ell}, H) &{}= \varnothing && \text{if } \ell \in H \\*
 \shapes(\Sigma, \tyBool, H) &{}= \varnothing && \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq H \\*
 \shapes(\Sigma, \tyNone, H) &{}= \varnothing && \text{if } \pyinline{None} \in H \\*
