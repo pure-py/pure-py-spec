@@ -36,6 +36,10 @@ description: Conventions for editing the PurePy spec and its GitHub issues; defe
 
   Test: the noun before the modifier must be the grammatical subject of the modifier's verb, and no
   "no", "neither", "every" or "each" may appear inside the agent phrase of a participle.
+- When a sentence quantifies over a finite set it has already introduced, refer to that set definitely:
+  "not matched by any of the cases" (the cases of this match), not "not matched by any case"; "each of
+  the branches", not "each branch". This applies only when a specific set is in scope. A general claim
+  keeps the bare noun: "a variable pattern matches any shape".
 - Name things with nouns, not free relative clauses: "matched shapes", not "what it matches"; "the residual", not "what is left over".
 - Clause-final pro-forms ("leaves none", "the others", "the same holds", "so does") are a verbal tic: resist them even where unambiguous, because the pattern becomes conspicuous with repetition. Pointing back is fine when deliberate and clear; the default is to repeat the noun ("leaves an empty residual", "the remaining members") or restructure.
 - A condition takes "if" or "when", not "where": "undefined if two declarations share a name". "Where" reads as a place, so reserve it for quantifying over positions ("the rows differ where the pattern is a literal") and for binding a symbol ("where n is the arity").
