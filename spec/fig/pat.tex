@@ -33,7 +33,7 @@
   \Sigma; \Gamma \vdash k, p \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash k, p\;\pyinline{as}\;x \matches K, L \binding \Delta \disjunion \set{\bind{x}{\bigJoinTy{\Sigma}{(\shapeTy(m) \mid m \in K)}}}
+  \Sigma; \Gamma \vdash k, p\;\pyinline{as}\;x \matches K, L \binding \Delta \disjunion \set{\bind{x}{\bigJoinTy{\Sigma}{(\shapeTy(k') \mid k' \in K)}}}
 }
 \and
 \inferrule*[lab={\ruleName{pat-split}}]
@@ -50,7 +50,7 @@
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \patTuple{k_1, \ldots, k_n}, \patTuple{p_1, \ldots, p_n} \matches \set{\patTuple{\seq{m}} \mid \seq{m} \in K}, \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in L} \binding \Delta
+  \Sigma; \Gamma \vdash \patTuple{k_1, \ldots, k_n}, \patTuple{p_1, \ldots, p_n} \matches \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in K}, \set{\patTuple{\seq{k}^\dagger} \mid \seq{k}^\dagger \in L} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-list}}]
@@ -58,7 +58,7 @@
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \shapeList{\tau}{k_1, \ldots, k_n}, \patList{p_1, \ldots, p_n} \matches \set{\shapeList{\tau}{\seq{m}} \mid \seq{m} \in K}, \set{\shapeList{\tau}{\seq{k}\,'} \mid \seq{k}\,' \in L} \binding \Delta
+  \Sigma; \Gamma \vdash \shapeList{\tau}{k_1, \ldots, k_n}, \patList{p_1, \ldots, p_n} \matches \set{\shapeList{\tau}{\seq{k}\,'} \mid \seq{k}\,' \in K}, \set{\shapeList{\tau}{\seq{k}^\dagger} \mid \seq{k}^\dagger \in L} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-dict}}]
@@ -68,7 +68,7 @@
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{H}, \patDict{\bind{\seq{w}}{\seq{p}}} \matches \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{m}}}}{H} \mid \seq{m} \in K}, \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{k}\,'}}}{H} \mid \seq{k}\,' \in L} \binding \Delta
+  \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{H}, \patDict{\bind{\seq{w}}{\seq{p}}} \matches \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{k}\,'}}}{H} \mid \seq{k}\,' \in K}, \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{k}^\dagger}}}{H} \mid \seq{k}^\dagger \in L} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-constr}}]
@@ -81,7 +81,7 @@
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \mathbin{\concat} \seq{p}\,' \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{H}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{C}{\seq{m}}}{H} \mid \seq{m} \in K}, \set{\shapeAny{\patConstr{C}{\seq{k}\,'}}{H} \mid \seq{k}\,' \in L} \binding \Delta
+  \Sigma; \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{H}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{C}{\seq{k}\,'}}{H} \mid \seq{k}\,' \in K}, \set{\shapeAny{\patConstr{C}{\seq{k}^\dagger}}{H} \mid \seq{k}^\dagger \in L} \binding \Delta
 }
 \end{mathpar}
 \caption{Pattern $p$ matches shape $k$, giving matched shapes $K$, residual $L$ and bindings $\Delta$}
