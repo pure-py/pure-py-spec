@@ -118,22 +118,6 @@
   \Sigma; \Gamma \vdash L, p \matches \textstyle\bigdisjunion_{k \in L'} K_k, \; \textstyle\bigdisjunion_{k \in L'} L_k \disjunion (L \setminus L') \binding \Delta
 }
 \end{mathpar}
-
-\vspace{2mm}
-
-\flushleft \shadebox{$\Sigma; \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{pat-cases}}]
-{
-  L_0 = \shapesOf(\Sigma, \sigma, \varnothing) \\
-  \Sigma; \Gamma \vdash p_i \agrees \sigma \quad (\forall i) \\
-  \Sigma; \Gamma \vdash L_{i-1}, p_i \matches K_i, L_i \binding \Delta_i \quad (\forall i)
-}
-{
-  \Sigma; \Gamma; \sigma \vdash \seq{p} \matches \seq{\Delta}, L_{n+1}
-}
-\end{mathpar}
-\caption{Matching sequences, ordered sets of shapes, and case patterns}
+\caption{Matching sequences and ordered sets of shapes}
 \label{fig:pat-seq}
 \end{figure}
