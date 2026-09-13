@@ -270,12 +270,12 @@ declared return type, and must have static outcome $\Returns$ unless the functio
 so a function that declares a result definitely returns one.
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and the cases are checked using the auxiliary
-judgement $\Sigma; \Gamma; \zeta; \sigma \vdash \seq{h} : S, L$ (\figref{typing-cases}), which matches each
-case's pattern in turn against the values of $\sigma$ which have not been matched by the earlier cases,
-checks the body under the pattern's bindings, and merges the outcomes into $S$; the
-\emph{residual} $L$ is a static over-approximation of the values which are not matched by any of the cases
-(\secref{well-formedness-patterns}). Each pattern must agree with $\sigma$ (\figref{agrees}). The
-\ruleName{match} rule applies where $L$ is empty; \ruleName{match-partial} applies otherwise, merging in
+judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{h} : S, L'$ (\figref{typing-cases}), which takes
+the cases in turn: each case's pattern is matched against the \emph{residual} $L$, a static
+over-approximation of the values of $\sigma$ which are not matched by the earlier cases
+(\secref{well-formedness-patterns}), its body is checked under the pattern's bindings, and the outcomes
+are merged into $S$. Each pattern must agree with $\sigma$ (\figref{agrees}). The match rules start the
+residual from $\sigma$; \ruleName{match} applies where the final residual is empty; \ruleName{match-partial} applies otherwise, merging in
 $\Assigns{\varnothing}$ for the values that fall through. A literal-typed scrutinee is exhausted by covering its literals, so \pyinline{x = 42} admits a
 match with a case for \pyinline{42} alone; \pyinline{x: int = 42} keeps the type open.
 
@@ -340,7 +340,7 @@ If $\Sigma \vdash h : \tau$ for every $h \in H$ then $\Sigma \vdash k : \tau$ fo
 \matches K, L' \binding \Delta$ then $\Sigma \vdash k : \tau$ for each $k \in K \disjunion L'$.
 \end{lemma}
 
-The \ruleName{cases} rule (\figref{typing-cases}) takes the cases in the order $\dispatch$ tries them at run
+The case rules (\figref{typing-cases}) take the cases in the order $\dispatch$ tries them at run
 time. A case that matches nothing is rejected, whether because the scrutinee can never take that shape or
 because the earlier cases already cover it. A constructor pattern whose class lies below a
 class of the excluded set matches nothing, because an earlier case for the superclass took every
