@@ -284,16 +284,18 @@ match with a case for \pyinline{42} alone; \pyinline{x: int = 42} keeps the type
 
 \input{spec/fig/shapes}
 
-To check a \pyinline{match}, each case is matched in turn against the residual: those parts of the
-scrutinee's type which no earlier case has matched. A case that matches none of the
-residual is unreachable, and a match whose last case leaves an empty residual is exhaustive, so a
-single judgement decides both properties (\figrefTwo{pat}{pat-seq}). Because the residual starts
-from the type, a case whose values the type excludes is unreachable. A single relation deciding both
-properties goes back to the ``usefulness'' algorithm for ML~\cite{maranget2007}. The residual
-plays the role of the term descriptions of \citet{sestoft1996}, and the uncovered sets of
-\citet{karachalias2015} likewise let the type exclude cases.
+To check a \pyinline{match}, each case $\exCase{p}{s}$ is matched in turn against the residual, an
+ordered set of shapes drawn from the scrutinee's type and covering every value not matched by any of the
+earlier cases (\figrefTwo{pat}{pat-seq}). Matching the case removes from the residual the values matched
+by $p$. The pattern $p$ must match at least one shape of the residual (\ruleName{pat-shapes}); otherwise
+the case is unreachable and the match is rejected. A case for values outside the scrutinee's type is
+unreachable in particular. The match is exhaustive if the last case leaves the residual empty, and may
+otherwise fall through (\ruleName{match}, \ruleName{match-partial}). Reading both properties off one
+relation goes back to the ``usefulness'' algorithm for ML~\cite{maranget2007}. The residual plays the
+role of the term descriptions of \citet{sestoft1996}, and the uncovered sets of \citet{karachalias2015}
+likewise let the type exclude cases.
 
-The residual is represented as a finite ordered set of shapes. A \emph{shape} $k$
+A \emph{shape} $k$
 denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{H}$ denotes the
 values of type $\tau$ whose outermost head is not among those in $H$. A head itself denotes values: a
 class its instances, an integer at a list type the lists of that length, and a literal its value. Head
