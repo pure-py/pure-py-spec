@@ -108,7 +108,8 @@
 \small
 \inferrule*[lab={\ruleName{pat-shapes}}]
 {
-  \varnothing \neq L' = \set{k \in L \mid \Sigma; \Gamma \vdash k, p \matches K_k, L_k \binding \Delta_k} \\
+  L' = \set{k \in L \mid \Sigma; \Gamma \vdash k, p \matches K_k, L_k \binding \Delta_k} \\
+  L' \neq \varnothing \\
   \Delta = \set{\bind{x}{\bigJoinTy{\Sigma}{(\Delta_k(x) \mid k \in L')}} \mid x \in \binds(p)}
 }
 {
