@@ -1,7 +1,7 @@
 """Shapes, and the values each denotes.
 
 A shape denotes a set of values of a type. The form `Rest` is a value of its
-type whose head is not among those it excludes, and the others are a literal, a
+type whose head is not among those it excludes, and the others are a
 constructor, a tuple, a list and a dictionary, each with shapes in place of
 sub-patterns.
 """
@@ -24,13 +24,16 @@ from type_syntax import (
     UnionType,
 )
 
+# A head: a literal, a class, or a length n standing for the head list_n.
+type Head = LiteralType | Class | int
+
 
 @dataclass(frozen=True)
 class Rest:
     """Values of type `ty` whose head is not among `heads`."""
 
     ty: Type
-    heads: frozenset[object]
+    heads: frozenset[Head]
 
 
 @dataclass(frozen=True)
@@ -40,7 +43,7 @@ class Constr:
 
     c: Class
     args: tuple["Shape", ...]
-    heads: frozenset[object]
+    heads: frozenset[Head]
 
 
 @dataclass(frozen=True)
@@ -85,7 +88,7 @@ def shape_type(k: Shape) -> Type:
     return DictType(k.value)
 
 
-def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> tuple[Shape, ...]:
+def shapes(t: Type, heads: frozenset[Head], ctx: ModuleContext) -> tuple[Shape, ...]:
     """Shapes of `t` that remain once the heads in `heads` are excluded."""
     if isinstance(t, UnionType):
         left = shapes(t.left, typed_heads(heads, t.left, ctx), ctx)
@@ -102,30 +105,28 @@ def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> tuple[Shape
     if t == Primitive.NEVER:
         return NOTHING
     if isinstance(t, DictType):
-        return (Dict(t.value, (), frozenset(k for k in heads if isinstance(k, str))),)
+        assert not heads  # no head is typed at a dictionary type
+        return (Dict(t.value, (), frozenset()),)
     return (Rest(t, heads),)
 
 
-def head_typed(h: object, t: Type, ctx: ModuleContext) -> bool:
-    """Head typing: a literal below `t`, a class below `t`, or an integer read
-    as a length where `t` is a list type."""
+def head_typed(h: Head, t: Type, ctx: ModuleContext) -> bool:
+    """Head typing: a literal or class below `t`, or a length where `t` is a
+    list type."""
     if isinstance(h, Class):
         return subtype(ClassType(h), t)
     if isinstance(h, LiteralType):
         return subtype(h, t)
-    assert isinstance(h, int)
     return isinstance(t, ListType)
 
 
-def typed_heads(
-    heads: frozenset[object], t: Type, ctx: ModuleContext
-) -> frozenset[object]:
+def typed_heads(heads: frozenset[Head], t: Type, ctx: ModuleContext) -> frozenset[Head]:
     """The heads typed at `t`, kept when an excluded set passes to a shape of a
     narrower type."""
     return frozenset(h for h in heads if head_typed(h, t, ctx))
 
 
-def below_excluded(c: Class, heads: frozenset[object], ctx: ModuleContext) -> bool:
+def below_excluded(c: Class, heads: frozenset[Head], ctx: ModuleContext) -> bool:
     """Whether the class lies below a class of the excluded heads."""
     return any(
         isinstance(h, Class) and subtype(ClassType(c), ClassType(h)) for h in heads
