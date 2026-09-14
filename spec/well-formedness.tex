@@ -366,22 +366,22 @@ dictionaries that lack the key; once every key of the pattern is in $\beta$ the 
 (\ruleName{pat-dict}), each key $w$ against $\beta(w)$. The empty dictionary pattern matches every
 dictionary and leaves the empty residual.
 
+Which cases exhaust a match therefore depends on the type of the scrutinee: a union is exhausted
+by covering each member, a class type by a pattern for the class itself, \pyinline{bool} by
+\pyinline{True} and \pyinline{False}, and a dictionary type by the empty dictionary pattern, while \pyinline{int}, \pyinline{str} and lists have
+unboundedly many heads and need a variable or wildcard. A literal-typed scrutinee is exhausted by covering
+its literals, so \pyinline{x = 42} admits a match with a case for \pyinline{42} alone, while
+\pyinline{x: int = 42} keeps the type open. Over
+$\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
+$\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave the empty residual,
+although each covers only part of the type.
+
 \begin{lemma}[Preservation of shape type]
 \label{lem:shape-typing}
 If $\Sigma \vdash h : \tau$ for every $h \in H$ then $\Sigma \vdash k : \tau$ for each $k \in
 \shapes(\Sigma, \tau, H)$. Moreover, if $\Sigma \vdash k : \tau$ for each $k \in L$ and $\Sigma; \Gamma \vdash L, p
 \matches K, L' \binding \Delta$ then $\Sigma \vdash k : \tau$ for each $k \in K \disjunion L'$.
 \end{lemma}
-
-A union is exhausted
-by covering each member, a class type by a pattern for the class itself, \pyinline{bool} by
-\pyinline{True} and \pyinline{False}, and a dictionary type by the empty dictionary pattern, while \pyinline{int}, \pyinline{str} and lists have
-unboundedly many heads and need a variable or wildcard. A literal-typed scrutinee is exhausted by covering
-its literals, so \pyinline{x = 42} admits a match with a case for \pyinline{42} alone, while
-\pyinline{x: int = 42} keeps the type open. Exhaustiveness need not come from a catch-all: over
-$\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
-$\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave the empty residual,
-although each covers only part of the type.
 
 \subsection{Modules and programs}
 \label{sec:well-formedness-modules}
