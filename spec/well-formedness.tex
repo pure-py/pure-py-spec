@@ -300,7 +300,7 @@ denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). Th
 values of type $\tau$ whose outermost head is not among those in $H$; the other forms are constructor,
 tuple, list and dictionary shapes, each with shapes in place of sub-patterns. A list shape also records its
 element type, which the element shapes do not determine. A constructor shape also carries an excluded
-set: $\shapeAny{\patConstr{C}{\seq{k}}}{H}$ denotes the instances of $C$, or of a subclass not below a
+set: $\shapeAny{\patConstr{C}{\seq{k}}}{H}$ denotes the instances of $C$, or of any subclass not below a
 class of $H$, whose fields, those of $C$, have shapes $\seq{k}$.
 
 A head itself denotes a set of values: a literal its value, a class its instances, and $\headList{n}$
@@ -318,16 +318,16 @@ all when $H$ exhausts $\tau$. The rest form therefore never carries a union or d
 \input{spec/fig/pat}
 
 Matching (\figref{pat}) has three forms. The form on a single shape $k$ matches a pattern against that
-shape, giving the matched shapes $K$, residual $L$ and bindings $\Delta$; the form on sequences
-matches the sub-patterns of a tuple, list, dictionary or constructor pattern against the component
-shapes position by position; and the form on an ordered set of shapes $L$, used by the match rules,
-matches each shape of $L$ in turn. Some shapes of $L$ may admit no derivation for the pattern, so
-\ruleName{pat-shapes} takes the shapes of $L$ that do admit a derivation, of which there must be at least
-one, and passes the remaining shapes into the residual untouched. A variable pattern binds at $\shapeTy(k)$ for the shape $k$ it matches, and a
-pattern named by \pyinline{as} at the join over the shapes it matched, so a case for one alternative of a
-union leaves a later variable case bound at the remaining members alone. Bindings from the positions of a sequence, or from
-the keys of a dictionary pattern, compose by disjoint union, so a pattern that binds a name twice has no
-derivation.
+shape, giving matched shapes $K$, residual $L$ and bindings $\Delta$. A variable pattern binds at
+$\shapeTy(k)$, and a pattern named by \pyinline{as} at the join over the matched shapes, so a case for
+one alternative of a union leaves a later variable case bound at the remaining members alone. The form
+on sequences matches the sub-patterns of a tuple, list, dictionary or constructor pattern against the
+component shapes position by position, and the bindings of the positions, or of the keys of a dictionary
+pattern, compose by disjoint union, so a pattern that binds a name twice has no derivation. The form on
+an ordered set of shapes $L$, used by the match rules, matches each shape of $L$ in turn. Some shapes of
+$L$ may admit no derivation for the pattern, so \ruleName{pat-shapes} takes the shapes of $L$ that do
+admit a derivation, of which there must be at least one, and passes the remaining shapes into the
+residual untouched.
 
 \input{spec/fig/split}
 
