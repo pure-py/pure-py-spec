@@ -294,13 +294,12 @@ likewise let the type exclude cases.
 
 \input{spec/fig/shapes}
 
-A shape $k$
+A shape $k$ (\figref{shapes})
 denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{H}$ denotes the
 values of type $\tau$ whose outermost head is not among those in $H$. A head itself denotes values: a
 class its instances, an integer at a list type the lists of that length, and a literal its value. Head
 typing $\Sigma \vdash h : \tau$ admits the heads whose values lie within $\tau$, and shape typing
-$\Sigma \vdash k : \tau$ checks each excluded head and each component of a shape
-(\figref{shapes}). The other forms are literals, constructors, tuples, lists and dictionaries, each with shapes in place of
+$\Sigma \vdash k : \tau$ checks each excluded head and each component of a shape. The other forms are literals, constructors, tuples, lists and dictionaries, each with shapes in place of
 sub-patterns. A list shape also records its element type, which the element shapes do not determine. A
 constructor shape carries an excluded set of its own: $\shapeAny{\patConstr{C}{\seq{k}}}{H}$ denotes the
 instances of $C$, or of a subclass not below a class of $H$, whose fields, those of $C$, have the shapes
