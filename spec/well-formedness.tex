@@ -293,6 +293,9 @@ exhaustiveness with one relation follows the usefulness algorithm for ML~\cite{m
 role of the term descriptions of \citet{sestoft1996}, and the uncovered sets of \citet{karachalias2015}
 likewise let the type exclude cases.
 
+\speconly{\subsubsection{Shapes and shape typing}\label{sec:shapes}}%
+\paperonly{\paragraph{Shapes and shape typing.}}
+
 \input{spec/fig/shapes}
 
 A shape $k$ (\figref{shapes})
@@ -315,6 +318,9 @@ the dictionary form; every other type contributes the single shape $\shapeAny{\t
 all when $H$ exhausts $\tau$. The rest form therefore never carries a union or dictionary type, and
 \ruleName{shape-rest} states this restriction as a side condition.
 
+\speconly{\subsubsection{Matching}\label{sec:matching}}%
+\paperonly{\paragraph{Matching.}}
+
 \input{spec/fig/pat}
 
 Matching (\figref{pat}) has three forms. The form on a single shape $k$ matches a pattern against that
@@ -331,7 +337,7 @@ residual untouched.
 
 \input{spec/fig/split}
 
-A pattern matches a shape directly where the shape has the head tested by the pattern, and otherwise splits it first (\figref{split}): splitting takes the head
+A pattern matches a shape directly if the shape has the head tested by the pattern, and otherwise splits it first (\figref{split}): splitting takes the head
 tested by the pattern, gives the shapes with that head, drawing the shapes of the component types from
 $\shapes$, and leaves the shape with that head excluded as well. \ruleName{pat-split} matches the
 pattern against the shapes the split gives and adds the shapes it leaves to the residual. Only the forms
@@ -356,9 +362,7 @@ If $\Sigma \vdash h : \tau$ for every $h \in H$ then $\Sigma \vdash k : \tau$ fo
 \matches K, L' \binding \Delta$ then $\Sigma \vdash k : \tau$ for each $k \in K \disjunion L'$.
 \end{lemma}
 
-The case rules (\figref{typing-cases}) take the cases in the order $\dispatch$ tries them at run
-time. A case that matches nothing is rejected, whether because the scrutinee can never take that shape or
-because the earlier cases already cover it. The evaluation rules apply a tuple or list pattern only to a value
+The evaluation rules apply a tuple or list pattern only to a value
 of its own kind, although Python would match either (\figref{eval-pat}); each case's pattern must
 therefore be \emph{sequence-safe} at the scrutinee's type (\secref{types-auxiliary}), so a match on
 $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple or list pattern, and a match on
