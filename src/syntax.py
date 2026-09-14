@@ -229,8 +229,6 @@ def supported_pattern(node: ast.pattern) -> None:
         return
     if isinstance(node, ast.MatchSequence):
         for p in node.patterns:
-            if isinstance(p, ast.MatchStar):
-                raise NotYetSupported(node, "star patterns", 84)
             supported_pattern(p)
         return
     if isinstance(node, ast.MatchClass):
