@@ -14,7 +14,7 @@ only where an assignment covers every path to the reference. The \ruleName{var} 
 to be definitely assigned, so that $\Gamma(x)$ is a type; the \ruleName{assign} rules make it so, with
 $x = e$ assigning $\set{\bind{x}{\sigma}}$ for the type $\sigma$ of $e$; and the \ruleName{if} rules
 combine the branches with $\merge$, so that a conditional definitely assigns a variable only if every
-branch that does not definitely return assigns it, otherwise leaving it at $\statusNotDefAssigned$
+branch that does not definitely return assigns it, otherwise leaving it at $\False$
 (\secref{well-formedness-statements}). Branch-local
 variables are therefore permitted, but using one after the conditional is not:
 
@@ -35,7 +35,7 @@ with Python. The program assigns \pyinline{x} on every run, so this is stricter 
 \pyinline{x = 6} it hides on the other.
 
 Python's function-level scoping is kept as well. The \ruleName{def} rule introduces every variable the
-body assigns, $\assignsS(b)$, at $\statusNotDefAssigned$ before checking the body, so a reference before the
+body assigns, $\assignsS(b)$, at $\False$ before checking the body, so a reference before the
 assignment is rejected statically, where Python fails at run time with \pyinline{UnboundLocalError}:
 
 \begin{python}

@@ -1,0 +1,18 @@
+\seqSafe(\Sigma, \Gamma, p, \tyUnion{\sigma}{\tau}) &{}= \seqSafe(\Sigma, \Gamma, p, \sigma) \wedge \seqSafe(\Sigma, \Gamma, p, \tau) \\*
+\seqSafe(\Sigma, \Gamma, p\;\pyinline{as}\;x, \tau) &{}= \seqSafe(\Sigma, \Gamma, p, \tau) \\*
+\\
+\seqSafe(\Sigma, \Gamma, \patTuple{p_1, \ldots, p_n}, \tyTuple{\tau_1, \ldots, \tau_n}) &{}= \textstyle\bigwedge_i \seqSafe(\Sigma, \Gamma, p_i, \tau_i) \\*
+\seqSafe(\Sigma, \Gamma, \patTuple{\seq{p}}, \tyList{\tau}) &{}= \False \\*
+\seqSafe(\Sigma, \Gamma, \patTuple{\seq{p}}, \tySized) &{}= \False \\*
+\seqSafe(\Sigma, \Gamma, \patTuple{\seq{p}}, \tyObject) &{}= \False \\*
+\\
+\seqSafe(\Sigma, \Gamma, \patList{\seq{p}}, \tyList{\tau}) &{}= \textstyle\bigwedge_i \seqSafe(\Sigma, \Gamma, p_i, \tau) \\*
+\seqSafe(\Sigma, \Gamma, \patList{\seq{p}}, \tyTuple{\seq{\tau}}) &{}= \False \\*
+\seqSafe(\Sigma, \Gamma, \patList{\seq{p}}, \tySized) &{}= \False \\*
+\seqSafe(\Sigma, \Gamma, \patList{\seq{p}}, \tyObject) &{}= \False \\*
+\\
+\seqSafe(\Sigma, \Gamma, \patDict{\bind{\seq{w}}{\seq{p}}}, \tyDict{\tau}) &{}= \textstyle\bigwedge_i \seqSafe(\Sigma, \Gamma, p_i, \tau) \\*
+\seqSafe(\Sigma, \Gamma, \patConstr{q}{a}, \tau) &{}= \textstyle\bigwedge_i \seqSafe(\Sigma, \Gamma, p_i, \sigma_i) \\*
+&\qquad \rlap{$\text{where } \Gamma \vdash q : \Type{C},\ \fields(\Sigma, C) = \bind{\seq{x}}{\seq{\sigma}}$} \\*
+&\qquad \rlap{$\text{and } \fieldMap(\Sigma, C, a) = \set{\bind{\seq{x}}{\seq{p}}}$} \\*
+\seqSafe(\Sigma, \Gamma, p, \tau) &{}= \True && \text{otherwise}

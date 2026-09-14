@@ -50,7 +50,7 @@
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \patTuple{\seq{k}}, \patTuple{\seq{p}} \matches \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in K}, \set{\patTuple{\seq{k}^\dagger} \mid \seq{k}^\dagger \in L} \binding \Delta
+  \Sigma; \Gamma \vdash \patTuple{\seq{k}}, \patTuple{\seq{p}} \matches \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in K}, \set{\patTuple{\seq{l}} \mid \seq{l} \in L} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-list}}]
@@ -58,7 +58,7 @@
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \shapeList{\tau}{\seq{k}}, \patList{\seq{p}} \matches \set{\shapeList{\tau}{\seq{k}\,'} \mid \seq{k}\,' \in K}, \set{\shapeList{\tau}{\seq{k}^\dagger} \mid \seq{k}^\dagger \in L} \binding \Delta
+  \Sigma; \Gamma \vdash \shapeList{\tau}{\seq{k}}, \patList{\seq{p}} \matches \set{\shapeList{\tau}{\seq{k}\,'} \mid \seq{k}\,' \in K}, \set{\shapeList{\tau}{\seq{l}} \mid \seq{l} \in L} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-dict}}]
@@ -68,7 +68,7 @@
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{H}, \patDict{\bind{\seq{w}}{\seq{p}}} \matches \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{k}\,'}}}{H} \mid \seq{k}\,' \in K}, \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{k}^\dagger}}}{H} \mid \seq{k}^\dagger \in L} \binding \Delta
+  \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{H}, \patDict{\bind{\seq{w}}{\seq{p}}} \matches \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{k}\,'}}}{H} \mid \seq{k}\,' \in K}, \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{l}}}}{H} \mid \seq{l} \in L} \binding \Delta
 }
 \and
 \inferrule*[lab={\ruleName{pat-constr}}]
@@ -81,7 +81,7 @@
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \mathbin{\concat} \seq{p}\,' \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{H}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{C}{\seq{k}\,'}}{H} \mid \seq{k}\,' \in K}, \set{\shapeAny{\patConstr{C}{\seq{k}^\dagger}}{H} \mid \seq{k}^\dagger \in L} \binding \Delta
+  \Sigma; \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{H}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{C}{\seq{k}\,'}}{H} \mid \seq{k}\,' \in K}, \set{\shapeAny{\patConstr{C}{\seq{l}}}{H} \mid \seq{l} \in L} \binding \Delta
 }
 \end{mathpar}
 

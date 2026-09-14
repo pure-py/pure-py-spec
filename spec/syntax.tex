@@ -42,8 +42,8 @@ take the following forms:
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.155\textwidth}>{\raggedright\arraybackslash}p{0.555\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Entry & Form & Records \\
-variable & $\tau$ or $\statusNotDefAssigned$ & type of definitely assigned variable, and
-$\statusNotDefAssigned$ if not definitely assigned \\
+variable & $\tau$ or $\False$ & type of definitely assigned variable, and
+$\False$ if not definitely assigned \\
 module stub & $\modStub{q}$ & module $q$, named but not loaded \\
 module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$ \\
 class entry & $\Type{C}$ & name denotes class $C$ \\
@@ -71,8 +71,8 @@ acyclic.
 
 \noindent The class table is borrowed from Featherweight Java~\cite{igarashi2001}. Module references arise from import statements. A predefined name is a
 member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expression may mention: it names a
-type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}, and $\statusNotDefAssigned$ indicates \emph{not definitely assigned}.
-It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\statusNotDefAssigned(X)$ for the context $\set{\bind{x}{\statusNotDefAssigned} \mid x \in X}$.
+type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}, and $\False$ indicates \emph{not definitely assigned}.
+It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context where all variables are undefined. For a set of variables $X$, write $\False(X)$ for the context $\set{\bind{x}{\False} \mid x \in X}$.
 
 \subsubsection{Context operations}
 \label{sec:context-operations}
@@ -82,7 +82,7 @@ an idempotent commutative semigroup of parallel composition $\mergeS$ (``merge''
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\mergeS$, but left
 distributivity does not hold. Both are defined pointwise (\figref{context-ops}): override is right-biased
 and has $\bot$ as both left and right unit; merge is defined only on variable entries, returning
-$\statusNotDefAssigned$ where either argument is undefined or not definitely assigned, and the join of two
+$\False$ where either argument is undefined or not definitely assigned, and the join of two
 types otherwise, so $\bot$ is not a unit.
 \input{spec/fig/context-ops}
 
