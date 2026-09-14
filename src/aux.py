@@ -101,9 +101,8 @@ def fv_e_comprehension(
     if len(generators) == 0:
         return fv_e_list(elts)
     g = generators[0]
-    target_names = names_in_target(g.target)
     rest = fv_e_list(g.ifs) | fv_e_comprehension(elts, generators[1:])
-    return fv_e(g.iter) | rest - target_names
+    return fv_e(g.iter) | (rest - {target_name(g)})
 
 
 def dict_keys(e: ast.Dict) -> list[ast.expr]:
@@ -114,12 +113,10 @@ def dict_keys(e: ast.Dict) -> list[ast.expr]:
     return keys
 
 
-def names_in_target(target: ast.expr) -> set[str]:
-    if isinstance(target, ast.Name):
-        return {target.id}
-    if isinstance(target, ast.Tuple):
-        return {n for t in target.elts for n in names_in_target(t)}
-    return set()
+def target_name(g: ast.comprehension) -> str:
+    """Variable of a generator, which the subset restricts to a name."""
+    assert isinstance(g.target, ast.Name)
+    return g.target.id
 
 
 def captures_e(e: ast.expr) -> set[str]:
@@ -176,11 +173,11 @@ def captures_quals(generators: list[ast.comprehension]) -> set[str]:
         return set()
     g = generators[0]
     rest = captures_e_list(g.ifs) | captures_quals(generators[1:])
-    return captures_e(g.iter) | rest - names_in_target(g.target)
+    return captures_e(g.iter) | (rest - {target_name(g)})
 
 
 def binds_quals(generators: list[ast.comprehension]) -> set[str]:
-    return {n for g in generators for n in names_in_target(g.target)}
+    return {target_name(g) for g in generators}
 
 
 def fv_stmt(s: ast.stmt) -> set[str]:
@@ -224,9 +221,12 @@ def assigns_stmt(s: ast.stmt) -> set[str]:
     if isinstance(s, (ast.Pass, ast.Expr, ast.Return, ast.Assert)):
         return set()
     if isinstance(s, ast.Assign):
-        return {t.id for t in s.targets if isinstance(t, ast.Name)}
+        (target,) = s.targets
+        assert isinstance(target, ast.Name)
+        return {target.id}
     if isinstance(s, ast.AnnAssign):
-        return {s.target.id} if isinstance(s.target, ast.Name) else set()
+        assert isinstance(s.target, ast.Name)
+        return {s.target.id}
     if isinstance(s, ast.If):
         return assigns_body(s.body) | assigns_body(s.orelse)
     if isinstance(s, ast.Match):

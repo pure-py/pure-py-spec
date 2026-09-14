@@ -13,10 +13,10 @@ from aux import (
     captures_statement,
     dict_keys,
     find_first_reassigning,
-    names_in_target,
     own_fields,
     qualified_name,
     statements,
+    target_name,
 )
 from classes import Class, declared_type, field_map, field_type, fields, short_name
 from contexts import (
@@ -737,13 +737,10 @@ def check_quals(generators: list[ast.comprehension], ctx: ModuleContext) -> VarC
         return {}
     g = generators[0]
     entry = elem_entry(g.iter, ctx)
-    targets = names_in_target(g.target)
-    captured = targets & (captures_e_list(g.ifs) | captures_quals(generators[1:]))
-    if captured:
-        raise IllFormedModule(
-            g.target, reasons.CapturedGeneratorVariable(min(captured))
-        )
-    delta = {n: entry for n in targets}
+    x = target_name(g)
+    if x in captures_e_list(g.ifs) | captures_quals(generators[1:]):
+        raise IllFormedModule(g.target, reasons.CapturedGeneratorVariable(x))
+    delta = {x: entry}
     ctx_ = override_var(ctx, delta)
     for e in g.ifs:
         check_expr(e, Primitive.BOOL, ctx_)
