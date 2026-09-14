@@ -16,7 +16,7 @@ class UnknownBaseClass:
     base: str
 
     def message(self) -> str:
-        return f"base class '{self.base}' is not declared in this module"
+        return f"base class '{self.base}' is not a declared class"
 
 
 @dataclass(frozen=True)

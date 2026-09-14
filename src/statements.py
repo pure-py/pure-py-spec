@@ -784,10 +784,7 @@ def class_declared(node: ast.ClassDef, ctx: ModuleContext) -> Class:
         assert isinstance(node.bases[0], ast.Name)
         base = node.bases[0].id
         base_class = ctx.gamma.get(base)
-        if (
-            not isinstance(base_class, Class)
-            or base_class.name.rsplit(".", 1)[0] != ctx.q
-        ):
+        if not isinstance(base_class, Class):
             raise IllFormedModule(node, reasons.UnknownBaseClass(base))
         clash = set(names) & set(fields(base_class))
         if len(clash) > 0:
