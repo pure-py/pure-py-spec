@@ -299,8 +299,9 @@ A shape $k$ (\figref{shapes})
 denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{H}$ denotes the
 values of type $\tau$ whose outermost head is not among those in $H$. A head itself denotes a set of values: a
 literal its value, a class its instances, and $\headList{n}$ the lists of length $n$. Head
-typing $\Sigma \vdash h : \tau$ admits the heads whose values lie within $\tau$, and shape typing
-$\Sigma \vdash k : \tau$ checks each excluded head and each component of a shape. The other forms are constructors, tuples, lists and dictionaries, each with shapes in place of
+typing $\Sigma \vdash h : \tau$ holds when the values of $h$ lie within $\tau$. A shape is typed at
+$\tau$, $\Sigma \vdash k : \tau$, when each of its excluded heads is typed at $\tau$ and each of its
+component shapes at the type of that component. The other forms are constructors, tuples, lists and dictionaries, each with shapes in place of
 sub-patterns. A list shape also records its element type, which the element shapes do not determine. A
 constructor shape carries an excluded set of its own: $\shapeAny{\patConstr{C}{\seq{k}}}{H}$ denotes the
 instances of $C$, or of a subclass not below a class of $H$, whose fields, those of $C$, have the shapes
