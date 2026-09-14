@@ -272,7 +272,7 @@ so a function that declares a result definitely returns one.
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and the cases are checked using the auxiliary
 judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typing-cases}), which takes
 the cases in turn: each case's pattern is matched against the \emph{residual} $L$, a static
-over-approximation of the values of $\sigma$ which are not matched by the earlier cases
+over-approximation of the values of $\sigma$ which are not matched by earlier cases
 (\secref{well-formedness-patterns}), its body is checked under the pattern's bindings, and the outcomes
 are merged into $S$. Each pattern must be sequence-safe at $\sigma$ (\secref{types-auxiliary}). The match rules start the
 residual from $\sigma$; \ruleName{match} applies where the final residual is empty; \ruleName{match-partial} applies otherwise, merging in
@@ -284,7 +284,7 @@ match with a case for \pyinline{42} alone; \pyinline{x: int = 42} keeps the type
 \label{sec:well-formedness-patterns}
 
 To check a \pyinline{match}, each case $\exCase{p}{s}$ is matched in turn against the residual, an
-ordered set of \emph{shapes} (\figref{shapes}) drawn from the scrutinee's type and covering every value not matched by any of the
+ordered set of \emph{shapes} (\figref{shapes}) drawn from the scrutinee's type and covering every value not matched by
 earlier cases. Matching the case removes from the residual the values matched
 by $p$ (\figref{pat}); a case that matches no shape of the residual is unreachable and the match is rejected.
 The match is exhaustive if the last case leaves the residual empty, and may
