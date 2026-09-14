@@ -141,16 +141,7 @@ PRIMITIVE_SPELLINGS = {
     Primitive.SIZED: "Sized",
 }
 
-PRIMITIVE_NAMES = {
-    "object": Primitive.OBJECT,
-    "Never": Primitive.NEVER,
-    "None": Primitive.NONE,
-    "bool": Primitive.BOOL,
-    "int": Primitive.INT,
-    "float": Primitive.FLOAT,
-    "str": Primitive.STR,
-    "Sized": Primitive.SIZED,
-}
+PRIMITIVE_NAMES = {name: t for t, name in PRIMITIVE_SPELLINGS.items()}
 
 
 def render(t: Type) -> str:
