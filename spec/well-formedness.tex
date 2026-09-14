@@ -309,11 +309,11 @@ $\tau$. Shape typing $\Sigma \vdash k : \tau$ holds when $\shapeTy(k)$ is a subt
 well-formed: each excluded head is typed at the type of the shape (at $\tyStr$, for the keys of a
 dictionary shape) and each component shape at the type of that component.
 
-The shapes of $\tau$ that remain once the heads in $H$ are excluded are
-$\shapes(\Sigma, \tau, H)$: one shape per member of a union, and none at all when $H$ exhausts $\tau$. No shape carries a
-union or dictionary type in the form $\shapeAny{\tau}{H}$, and $\shapes$ is the only source of that
-form. A union has no head to exclude, so $\shapes$ splits it into its members, and a dictionary is
-refined by its keys rather than by a head, so $\shapes$ gives it the dictionary form.
+The auxiliary function $\shapes(\Sigma, \tau, H)$ (\secref{types-auxiliary}) gives the shapes of $\tau$
+once the heads in $H$ are excluded. A union contributes the shapes of its members and a dictionary type
+the dictionary form; every other type contributes the single shape $\shapeAny{\tau}{H}$, or no shape at
+all when $H$ exhausts $\tau$. The rest form therefore never carries a union or dictionary type, and
+\ruleName{shape-rest} states this restriction as a side condition.
 
 \input{spec/fig/pat}
 
