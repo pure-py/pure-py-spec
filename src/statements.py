@@ -601,7 +601,7 @@ def synthesises(e: ast.expr) -> bool:
 
 
 def dict_type(e: ast.expr, values: list[ast.expr], ctx: ModuleContext) -> DictType:
-    """A dictionary synthesises as a list of its values does."""
+    """A dictionary synthesises at the type of the list of its values."""
     return DictType(list_type(e, values, ctx).elem)
 
 
@@ -813,9 +813,7 @@ def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
 
 def describe(p: ast.pattern, ctx: ModuleContext) -> str:
     if isinstance(p, ast.MatchAs):
-        assert (
-            p.pattern is not None
-        )  # a bare variable or wildcard never conflicts and always matches
+        assert p.pattern is not None  # a bare variable or wildcard always matches
         return describe(p.pattern, ctx)
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
         return f"a pattern of type {render(literal_of(p))}"

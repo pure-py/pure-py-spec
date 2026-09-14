@@ -466,7 +466,7 @@ def format_result(result: Unsupported | None, filename: str) -> str:
 
 def main() -> None:
     if len(sys.argv) < 2:
-        print("Usage: parse.py <file.py> [<file.py> ...]")
+        print("Usage: syntax.py <file.py> [<file.py> ...]")
         sys.exit(1)
     exit_code = 0
     for filename in sys.argv[1:]:

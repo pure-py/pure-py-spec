@@ -84,7 +84,7 @@ type TypeExpr = (
 )
 
 
-# Types: a class type is the class entry itself.
+# Types: a class type wraps the class entry.
 
 
 @dataclass(frozen=True)

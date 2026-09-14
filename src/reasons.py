@@ -397,7 +397,7 @@ class MissingReturn:
         )
 
 
-Reason = (
+type Reason = (
     DuplicateFieldName
     | UnknownBaseClass
     | InheritedFieldClash
