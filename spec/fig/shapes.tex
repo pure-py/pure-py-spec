@@ -11,7 +11,6 @@ $H$ & $::=$ & $\set{h_1, \ldots, h_n}$ & (Excluded heads)
    \\[3mm]
 \grammarGroup{Shapes} \\
 $k$ & $::=$ & $\shapeAny{\tau}{H}$ & (Rest) \\
-    & $\mid$ & $\ell$ & (Literal) \\
     & $\mid$ & $\shapeAny{\patConstr{C}{k_1, \ldots, k_n}}{H}$ & (Constr) \\
     & $\mid$ & $\patTuple{k_1, \ldots, k_n}$ & (Tuple) \\
     & $\mid$ & $\shapeList{\tau}{k_1, \ldots, k_n}$ & (List) \\
@@ -62,14 +61,6 @@ $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
 }
 {
   \Sigma \vdash \shapeAny{\tau}{H} : \tau
-}
-\and
-\inferrule*[lab={\ruleName{shape-literal}}]
-{
-  \strut
-}
-{
-  \Sigma \vdash \ell : \tyLiteral{\ell}
 }
 \and
 \inferrule*[lab={\ruleName{shape-constr}}]

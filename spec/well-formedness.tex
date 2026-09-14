@@ -300,7 +300,7 @@ denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). Th
 values of type $\tau$ whose outermost head is not among those in $H$. A head itself denotes values: a
 literal its value, a class its instances, and $\headList{n}$ the lists of length $n$. Head
 typing $\Sigma \vdash h : \tau$ admits the heads whose values lie within $\tau$, and shape typing
-$\Sigma \vdash k : \tau$ checks each excluded head and each component of a shape. The other forms are literals, constructors, tuples, lists and dictionaries, each with shapes in place of
+$\Sigma \vdash k : \tau$ checks each excluded head and each component of a shape. The other forms are constructors, tuples, lists and dictionaries, each with shapes in place of
 sub-patterns. A list shape also records its element type, which the element shapes do not determine. A
 constructor shape carries an excluded set of its own: $\shapeAny{\patConstr{C}{\seq{k}}}{H}$ denotes the
 instances of $C$, or of a subclass not below a class of $H$, whose fields, those of $C$, have the shapes
@@ -324,7 +324,7 @@ derivation.
 
 \input{spec/fig/split}
 
-A pattern matches a shape of the same form directly, or splits it first (\figref{split}): splitting takes the head
+A pattern matches a shape directly where the shape has the head tested by the pattern, and otherwise splits it first (\figref{split}): splitting takes the head
 tested by the pattern, gives the shapes with that head, drawing the shapes of the component types from
 $\shapes$, and leaves the shape with that head excluded as well. \ruleName{pat-split} matches the
 pattern against the shapes the split gives and adds the shapes it leaves to the residual. Only the forms

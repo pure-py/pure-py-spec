@@ -7,10 +7,11 @@
 \inferrule*[lab={\ruleName{split-literal}}]
 {
   \ell \notin H \\
-  \Sigma \vdash \tyLiteral{\ell} \subty \tau
+  \Sigma \vdash \tyLiteral{\ell} \subty \tau \\
+  \tau \text{ not a literal type}
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\tau}{H}, \ell \splits \set{\ell}, \shapes(\Sigma, \tau, H \cup \set{\ell})
+  \Sigma; \Gamma \vdash \shapeAny{\tau}{H}, \ell \splits \set{\shapeAny{\tyLiteral{\ell}}{\varnothing}}, \shapes(\Sigma, \tau, H \cup \set{\ell})
 }
 \and
 \inferrule*[lab={\ruleName{split-tuple}}]

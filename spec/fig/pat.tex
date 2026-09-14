@@ -42,7 +42,7 @@
   \strut
 }
 {
-  \Sigma; \Gamma \vdash \ell, \ell \matches \set{\ell}, \varnothing \binding \varnothing
+  \Sigma; \Gamma \vdash \shapeAny{\tyLiteral{\ell}}{\varnothing}, \ell \matches \set{\shapeAny{\tyLiteral{\ell}}{\varnothing}}, \varnothing \binding \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{pat-tuple}}]

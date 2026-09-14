@@ -34,11 +34,6 @@ class Rest:
 
 
 @dataclass(frozen=True)
-class Literal:
-    value: object
-
-
-@dataclass(frozen=True)
 class Constr:
     """Instances of `c` or of a subclass not below `heads`, whose fields (those
     of `c`) have the given shapes."""
@@ -71,7 +66,7 @@ class Dict:
     heads: frozenset[str]
 
 
-type Shape = Rest | Literal | Constr | Tuple | List | Dict
+type Shape = Rest | Constr | Tuple | List | Dict
 type Seq = tuple[Shape, ...]
 
 NOTHING: tuple[Shape, ...] = ()
@@ -81,8 +76,6 @@ def shape_type(k: Shape) -> Type:
     """Least type of a shape."""
     if isinstance(k, Rest):
         return k.ty
-    if isinstance(k, Literal):
-        return LiteralType(k.value)
     if isinstance(k, Constr):
         return ClassType(k.c)
     if isinstance(k, Tuple):

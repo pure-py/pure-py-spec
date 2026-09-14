@@ -27,7 +27,6 @@ from shapes import (
     Constr,
     Dict,
     List,
-    Literal,
     Rest,
     Seq,
     Shape,
@@ -108,7 +107,8 @@ def match_split(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Match | None:
 
 
 def match_literal(k: Shape, ell: LiteralType) -> Match | None:
-    if isinstance(k, Literal) and LiteralType(k.value) == ell:
+    if isinstance(k, Rest) and k.ty == ell:
+        assert not k.heads
         return (k,), NOTHING, NO_BINDINGS
     return None
 
@@ -175,8 +175,13 @@ def split(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Split | None:
 
 
 def split_literal(k: Shape, ell: LiteralType, ctx: ModuleContext) -> Split | None:
-    if isinstance(k, Rest) and ell not in k.heads and subtype(ell, k.ty):
-        return (Literal(ell.value),), shapes(k.ty, k.heads | {ell}, ctx)
+    if (
+        isinstance(k, Rest)
+        and ell not in k.heads
+        and subtype(ell, k.ty)
+        and not isinstance(k.ty, LiteralType)
+    ):
+        return (Rest(ell, frozenset()),), shapes(k.ty, k.heads | {ell}, ctx)
     return None
 
 
