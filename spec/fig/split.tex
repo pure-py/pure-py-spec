@@ -23,10 +23,10 @@
 \and
 \inferrule*[lab={\ruleName{split-list}}]
 {
-  n \notin H
+  \headList{n} \notin H
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\tyList{\tau}}{H}, \patList{p_1, \ldots, p_n} \splits \set{\shapeList{\tau}{\seq{k}} \mid \seq{k} \in \shapes(\Sigma, \tau, \varnothing)^n}, \shapes(\Sigma, \tyList{\tau}, H \cup \set{n})
+  \Sigma; \Gamma \vdash \shapeAny{\tyList{\tau}}{H}, \patList{p_1, \ldots, p_n} \splits \set{\shapeList{\tau}{\seq{k}} \mid \seq{k} \in \shapes(\Sigma, \tau, \varnothing)^n}, \shapes(\Sigma, \tyList{\tau}, H \cup \set{\headList{n}})
 }
 \and
 \inferrule*[lab={\ruleName{split-key}}]

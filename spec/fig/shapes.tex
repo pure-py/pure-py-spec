@@ -6,6 +6,7 @@
 \grammarGroup{Heads} \\
 $h$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $C$ & (Class) \\
+    & $\mid$ & $\headList{n}$ & (List of length $n$) \\
 $H$ & $::=$ & $\set{h_1, \ldots, h_n}$ & (Excluded heads)
    \\[3mm]
 \grammarGroup{Shapes} \\
@@ -40,12 +41,12 @@ $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
   \Sigma \vdash C : \tau
 }
 \and
-\inferrule*[lab={\ruleName{head-length}}]
+\inferrule*[lab={\ruleName{head-list}}]
 {
-  n \text{ an integer}
+  \strut
 }
 {
-  \Sigma \vdash n : \tyList{\tau}
+  \Sigma \vdash \headList{n} : \tyList{\tau}
 }
 \end{mathpar}
 
