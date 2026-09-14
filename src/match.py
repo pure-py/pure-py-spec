@@ -256,7 +256,7 @@ def class_of_pattern(p: ast.MatchClass, ctx: ModuleContext) -> Class:
     """Class the pattern names."""
     cls = class_of_name(p.cls, ctx)
     if cls is None:
-        raise IllFormedModule(p, reasons.UnknownClassInPattern(class_name(p.cls)))
+        raise IllFormedModule(p, reasons.UnknownClassInPattern(qualified_name(p.cls)))
     return cls
 
 
@@ -379,12 +379,6 @@ def padded(ps: tuple[ast.pattern, ...], n: int) -> tuple[ast.pattern, ...]:
     """Pattern sequence padded with wildcards, for a shape of a subclass whose
     extra fields the pattern does not name."""
     return ps + tuple(ast.MatchAs() for _ in range(n - len(ps)))
-
-
-def class_name(cls: ast.expr) -> str:
-    if isinstance(cls, (ast.Name, ast.Attribute)):
-        return qualified_name(cls)
-    return ast.unparse(cls)
 
 
 def no_field_map(cls: Class, p: ast.MatchClass) -> IllFormedModule:
