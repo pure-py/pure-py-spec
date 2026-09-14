@@ -343,7 +343,7 @@ def match_cases(
 ) -> tuple[list[VarContext], bool]:
     """Bindings of each case, taken by matching against the residual, and
     whether some value of the scrutinee type falls through."""
-    seed = shapes(subject, frozenset(), ctx)
+    seed = shapes(subject, frozenset())
     left = seed
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):

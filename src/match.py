@@ -181,7 +181,7 @@ def split_literal(k: Shape, ell: LiteralType, ctx: ModuleContext) -> Split | Non
         and subtype(ell, k.ty)
         and not isinstance(k.ty, LiteralType)
     ):
-        return (Rest(ell, frozenset()),), shapes(k.ty, k.heads | {ell}, ctx)
+        return (Rest(ell, frozenset()),), shapes(k.ty, k.heads | {ell})
     return None
 
 
@@ -193,7 +193,7 @@ def split_tuple(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
     if len(k.ty.components) != n:
         return None
     assert not k.heads
-    return tuple(Tuple(ks) for ks in shapes_seq(k.ty.components, ctx)), NOTHING
+    return tuple(Tuple(ks) for ks in shapes_seq(k.ty.components)), NOTHING
 
 
 def split_list(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
@@ -201,8 +201,8 @@ def split_list(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
         return None
     elem = k.ty.elem
     return (
-        tuple(List(elem, ks) for ks in shapes_seq((elem,) * n, ctx)),
-        shapes(k.ty, k.heads | {n}, ctx),
+        tuple(List(elem, ks) for ks in shapes_seq((elem,) * n)),
+        shapes(k.ty, k.heads | {n}),
     )
 
 
@@ -217,7 +217,7 @@ def split_dict(
     if w is None or w in k.heads:
         return None
     return (
-        tuple(with_keys(k, (w,), (m,)) for m in shapes(k.value, frozenset(), ctx)),
+        tuple(with_keys(k, (w,), (m,)) for m in shapes(k.value, frozenset())),
         (Dict(k.value, k.bound, k.heads | {w}),),
     )
 
@@ -225,16 +225,16 @@ def split_dict(
 def split_class(k: Rest, cls: Class, ctx: ModuleContext) -> Split | None:
     """Instances of the meet of the shape's type and the pattern's class, with
     the heads which type at that class kept."""
-    if below_excluded(cls, k.heads, ctx):
+    if below_excluded(cls, k.heads):
         return None
     low = meet(k.ty, ClassType(cls))
     if not isinstance(low, ClassType):
         return None
     types = tuple(declared_field(low.c, x) for x in fields(low.c))
-    kept = typed_heads(k.heads, low, ctx)
+    kept = typed_heads(k.heads, low)
     return (
-        tuple(Constr(low.c, ks, kept) for ks in shapes_seq(types, ctx)),
-        shapes(k.ty, k.heads | {cls}, ctx),
+        tuple(Constr(low.c, ks, kept) for ks in shapes_seq(types)),
+        shapes(k.ty, k.heads | {cls}),
     )
 
 
@@ -243,12 +243,12 @@ def split_subclass(k: Constr, cls: Class, ctx: ModuleContext) -> Split | None:
     those of the shape followed by the ones the subclass declares."""
     if cls == k.c or not subtype(ClassType(cls), ClassType(k.c)):
         return None
-    if below_excluded(cls, k.heads, ctx):
+    if below_excluded(cls, k.heads):
         return None
     own = tuple(declared_field(cls, x) for x in fields(cls)[len(k.args) :])
-    kept = typed_heads(k.heads, ClassType(cls), ctx)
+    kept = typed_heads(k.heads, ClassType(cls))
     return (
-        tuple(Constr(cls, k.args + ks, kept) for ks in shapes_seq(own, ctx)),
+        tuple(Constr(cls, k.args + ks, kept) for ks in shapes_seq(own)),
         (Constr(k.c, k.args, k.heads | {cls}),),
     )
 
