@@ -10,7 +10,7 @@ description: Conventions for editing the PurePy spec and its GitHub issues; defe
 - Minimal. State the thing; stop.
 - No weasel-words like "honest", "clean", "obvious", "simply".
 - Table cells, figure captions and rule side conditions are telegraphic: no articles ("Rebinds variable", not "Rebinds a variable"; "neither list type nor union"). A gloss in apposition after a comma or colon within a cell keeps a leading article, which marks where the gloss begins, and no other: "head, a literal, class or list of length n", not "head, a literal, a class or a list of length n"; "context, a finite map from variables to entries".
-- Never write "entry" on its own: it is a context entry or a class entry.
+- Qualify a noun that the spec uses for more than one kind of thing, never writing it on its own: a context entry or a class entry, not "entry"; a static outcome or an evaluation outcome, not "outcome"; a module signature or a function signature, not "signature".
 - Use every metavariable of a sort before reaching for a prime: two types are sigma and tau, not tau and tau prime. A prime is for the third of a sort, or where the two are the same thing at different stages.
 - Object relative clauses are a recurring problem. In "the values that no case matches", the head noun
   "values" is the object of the verb inside the clause: the reader holds the noun while a new subject
