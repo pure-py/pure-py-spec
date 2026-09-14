@@ -304,7 +304,10 @@ values of type $\tau$ whose outermost head is not among those in $H$; the other 
 tuple, list and dictionary shapes, each with shapes in place of sub-patterns. A list shape also records its
 element type, which the element shapes do not determine. A constructor shape also carries an excluded
 set: $\shapeAny{\patConstr{C}{\seq{k}}}{H}$ denotes the instances of $C$, or of any subclass not below a
-class of $H$, whose fields, those of $C$, have shapes $\seq{k}$.
+class of $H$, whose fields, those of $C$, have shapes $\seq{k}$. A rest shape at a class type denotes
+the same values as the constructor shape with a rest shape at each field, and is expanded into that
+form only by splitting (\figref{split}): a class may refer to itself through its fields, so expanding
+in advance would not terminate.
 
 A head itself denotes a set of values: a literal its value, a class its instances, and $\headList{n}$
 the lists of length $n$. Head typing $\Sigma \vdash h : \tau$ holds when the values of $h$ lie within
