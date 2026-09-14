@@ -283,18 +283,17 @@ match with a case for \pyinline{42} alone; \pyinline{x: int = 42} keeps the type
 \label{sec:exhaustiveness}
 \label{sec:well-formedness-patterns}
 
-\input{spec/fig/shapes}
-
 To check a \pyinline{match}, each case $\exCase{p}{s}$ is matched in turn against the residual, an
-ordered set of \emph{shapes} drawn from the scrutinee's type and covering every value not matched by any of the
-earlier cases (\figref{pat}). Matching the case removes from the residual the values matched
-by $p$. The pattern $p$ must match at least one shape of the residual (\ruleName{pat-shapes}); otherwise
-the case is unreachable and the match is rejected. A case for values outside the scrutinee's type is
-unreachable in particular. The match is exhaustive if the last case leaves the residual empty, and may
+ordered set of \emph{shapes} (\figref{shapes}) drawn from the scrutinee's type and covering every value not matched by any of the
+earlier cases. Matching the case removes from the residual the values matched
+by $p$ (\figref{pat}); a case that matches no shape of the residual is unreachable and the match is rejected.
+The match is exhaustive if the last case leaves the residual empty, and may
 otherwise fall through (\ruleName{match}, \ruleName{match-partial}). Reading both properties off one
 relation goes back to the ``usefulness'' algorithm for ML~\cite{maranget2007}. The residual plays the
 role of the term descriptions of \citet{sestoft1996}, and the uncovered sets of \citet{karachalias2015}
 likewise let the type exclude cases.
+
+\input{spec/fig/shapes}
 
 A shape $k$
 denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{H}$ denotes the
@@ -313,13 +312,6 @@ that form: it splits a union into its members and gives a dictionary type its di
 
 \input{spec/fig/pat}
 
-A pattern matches a shape of the same form directly, or splits it first (\figref{split}): splitting takes the head
-tested by the pattern, gives the shapes with that head, drawing the shapes of the component types from
-$\shapes$, and leaves the shape with that head excluded as well. \ruleName{pat-split} matches the
-pattern against the shapes the split gives and adds the shapes it leaves to the residual. Only the forms
-with an excluded set split, and no head types at a tuple type, so $H$ is empty there and
-\ruleName{split-tuple} leaves nothing.
-
 The matching judgement $\Sigma; \Gamma \vdash L, p \matches K, L' \binding \Delta$ divides an ordered set of shapes $L$ into
 matched shapes $K$ and residual $L'$, binding $\Delta$ (\figref{pat}). It is defined from a
 judgement on a single shape, which for a tuple, list, dictionary or constructor shape matches the sub-patterns
@@ -333,6 +325,24 @@ derivation.
 
 \input{spec/fig/split}
 
+A pattern matches a shape of the same form directly, or splits it first (\figref{split}): splitting takes the head
+tested by the pattern, gives the shapes with that head, drawing the shapes of the component types from
+$\shapes$, and leaves the shape with that head excluded as well. \ruleName{pat-split} matches the
+pattern against the shapes the split gives and adds the shapes it leaves to the residual. Only the forms
+with an excluded set split, and no head types at a tuple type, so $H$ is empty there and
+\ruleName{split-tuple} leaves nothing.
+A constructor pattern whose class lies below a
+class of the excluded set matches nothing, because an earlier case for the superclass took every
+instance.
+
+A dictionary shape has a form of its own,
+$\shapeDict{\tau}{\beta}{H}$, standing for dictionaries that hold each key of $\beta$ with a value of the
+shape $\beta$ gives it, and hold no key of $H$. A dictionary pattern takes its keys in order, no key twice. A key in
+neither $\beta$ nor $H$ splits the shape at that key (\ruleName{split-key}), adding to the residual the
+dictionaries that lack the key; once every key of the pattern is in $\beta$ the keys match as a sequence
+(\ruleName{pat-dict}), each against the shape $\beta$ records for it. The empty dictionary pattern matches every
+dictionary and leaves nothing.
+
 \begin{lemma}[Preservation of shape type]
 \label{lem:shape-typing}
 If $\Sigma \vdash h : \tau$ for every $h \in H$ then $\Sigma \vdash k : \tau$ for each $k \in
@@ -342,21 +352,11 @@ If $\Sigma \vdash h : \tau$ for every $h \in H$ then $\Sigma \vdash k : \tau$ fo
 
 The case rules (\figref{typing-cases}) take the cases in the order $\dispatch$ tries them at run
 time. A case that matches nothing is rejected, whether because the scrutinee can never take that shape or
-because the earlier cases already cover it. A constructor pattern whose class lies below a
-class of the excluded set matches nothing, because an earlier case for the superclass took every
-instance. The evaluation rules apply a tuple or list pattern only to a value
+because the earlier cases already cover it. The evaluation rules apply a tuple or list pattern only to a value
 of its own kind, although Python would match either (\figref{eval-pat}); each case's pattern must
 therefore be \emph{sequence-safe} at the scrutinee's type (\secref{types-auxiliary}), so a match on
 $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple or list pattern, and a match on
 $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$ no tuple pattern.
-
-A dictionary shape has a form of its own,
-$\shapeDict{\tau}{\beta}{H}$, standing for dictionaries that hold each key of $\beta$ with a value of the
-shape $\beta$ gives it, and hold no key of $H$. A dictionary pattern takes its keys in order, no key twice. A key in
-neither $\beta$ nor $H$ splits the shape at that key (\ruleName{split-key}), adding to the residual the
-dictionaries that lack the key; once every key of the pattern is in $\beta$ the keys match as a sequence
-(\ruleName{pat-dict}), each against the shape $\beta$ records for it. The empty dictionary pattern matches every
-dictionary and leaves nothing.
 
 A union is exhausted
 by covering each member, a class type by a pattern for the class itself, \pyinline{bool} by
