@@ -66,6 +66,13 @@ def field_type(c: Class, x: str) -> Type | None:
     return field_type(base, x)
 
 
+def declared_field(c: Class, x: str) -> Type:
+    """Declared type of a field the class has."""
+    t = field_type(c, x)
+    assert t is not None
+    return t
+
+
 def field_map[T](
     c: Class,
     positional: Sequence[T],

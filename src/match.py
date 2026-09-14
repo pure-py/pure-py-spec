@@ -13,7 +13,7 @@ from itertools import product
 
 import reasons
 from aux import qualified_name
-from classes import Class, field_map, field_type, fields, short_name
+from classes import Class, declared_field, field_map, fields, short_name
 from contexts import (
     ModuleContext,
     Status,
@@ -330,12 +330,6 @@ def seq_safe(p: ast.pattern, t: Type, ctx: ModuleContext) -> bool:
     if isinstance(p, ast.MatchAs):
         return p.pattern is None or seq_safe(p.pattern, t, ctx)
     return True
-
-
-def declared_field(c: Class, x: str) -> Type:
-    t = field_type(c, x)
-    assert t is not None
-    return t
 
 
 def disjoint_union(deltas: list[VarContext], node: ast.AST) -> VarContext:

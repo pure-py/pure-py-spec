@@ -1,7 +1,7 @@
 import ast
 from collections.abc import Callable, Sequence
 
-from classes import Class, field_type, fields
+from classes import Class, declared_field, fields
 from subtyping import comparable, join, subtype
 from type_syntax import (
     CallableType,
@@ -55,13 +55,7 @@ def equality_type(t: Type) -> bool:
 
 
 def class_equality_type(c: Class) -> bool:
-    return all(equality_type(declared(c, x)) for x in fields(c))
-
-
-def declared(c: Class, x: str) -> Type:
-    t = field_type(c, x)
-    assert t is not None
-    return t
+    return all(equality_type(declared_field(c, x)) for x in fields(c))
 
 
 def membership_list(s: Type, t: Type) -> ResolvedOverload | None:
