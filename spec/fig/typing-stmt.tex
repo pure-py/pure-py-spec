@@ -115,20 +115,20 @@
 \inferrule*[lab={\ruleName{match}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{h} : S, \varnothing
+  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \varnothing
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{h}} : S
+  \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S
 }
 \and
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{h} : S, L \\
+  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, L \\
   L \neq \varnothing
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{h}} : S \mergeS \Assigns{\varnothing}
+  \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S \mergeS \Assigns{\varnothing}
 }
 \end{mathpar}
 \caption{Given optional return type $\zeta$, statement $s$ has static outcome $R$}

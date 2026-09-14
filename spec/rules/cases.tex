@@ -10,9 +10,9 @@
 \and
 \inferrule*[lab={\ruleName{cases}}]
 {
-  \Sigma; \Gamma; \zeta; \sigma \vdash L, h : S, L' \\
-  \Sigma; \Gamma; \zeta; \sigma \vdash L', \seq{h} : S', L^\dagger
+  \Sigma; \Gamma; \zeta; \sigma \vdash L, b : S, L' \\
+  \Sigma; \Gamma; \zeta; \sigma \vdash L', \seq{b} : S', L^\dagger
 }
 {
-  \Sigma; \Gamma; \zeta; \sigma \vdash L, h \cons \seq{h} : S \mergeS S', L^\dagger
+  \Sigma; \Gamma; \zeta; \sigma \vdash L, b \cons \seq{b} : S \mergeS S', L^\dagger
 }
