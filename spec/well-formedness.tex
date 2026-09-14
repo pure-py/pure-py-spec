@@ -323,6 +323,7 @@ all when $H$ exhausts $\tau$. The rest form therefore never carries a union or d
 
 \input{spec/fig/pat}
 
+Both reachability and exhaustiveness are determined by the residual left by matching.
 Matching (\figref{pat}) has three forms. The form on a single shape $k$ matches a pattern against that
 shape, giving matched shapes $K$, residual $L$ and bindings $\Delta$. A variable pattern binds at
 $\shapeTy(k)$, and a pattern named by \pyinline{as} at the join over the matched shapes, so a case for
@@ -337,10 +338,11 @@ residual untouched.
 
 \input{spec/fig/split}
 
-A pattern matches a shape directly if the shape has the head tested by the pattern, and otherwise splits it first (\figref{split}): splitting takes the head
-tested by the pattern, gives the shapes with that head, drawing the shapes of the component types from
-$\shapes$, and leaves the shape with that head excluded as well. \ruleName{pat-split} matches the
-pattern against the shapes the split gives and adds the shapes it leaves to the residual. Only the forms
+A pattern matches a shape directly if the shape has the head tested by the pattern. Otherwise the shape
+is first split by the auxiliary judgement $\Sigma; \Gamma \vdash k, p \splits K, L$ (\figref{split}):
+the shapes $K$ have the head tested by $p$, with the shapes of the component types drawn from $\shapes$,
+and the residual $L$ is the shape $k$ with that head excluded as well. \ruleName{pat-split} matches the
+pattern against $K$ and adds $L$ to the residual. Only the forms
 with an excluded set split, and no head types at a tuple type, so $H$ is empty there and
 \ruleName{split-tuple} leaves nothing.
 A constructor pattern whose class lies below a
