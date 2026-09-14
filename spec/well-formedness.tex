@@ -317,10 +317,11 @@ all when $H$ exhausts $\tau$. The rest form therefore never carries a union or d
 
 \input{spec/fig/pat}
 
-The matching judgement $\Sigma; \Gamma \vdash L, p \matches K, L' \binding \Delta$ divides an ordered set of shapes $L$ into
-matched shapes $K$ and residual $L'$, binding $\Delta$ (\figref{pat}). It is defined from a
-judgement on a single shape, which for a tuple, list, dictionary or constructor shape matches the sub-patterns
-against the component shapes position by position. A pattern has no derivation against a shape it is unable to match, so
+Matching (\figref{pat}) has three forms. The form on a single shape $k$ matches a pattern against that
+shape, giving the matched shapes $K$, the residual $L$ and the bindings $\Delta$; the form on sequences
+matches the sub-patterns of a tuple, list, dictionary or constructor pattern against the component
+shapes position by position; and the form on an ordered set of shapes $L$, used by the match rules,
+matches each shape of $L$ in turn. A pattern has no derivation against a shape it is unable to match, so
 \ruleName{pat-shapes} takes the shapes matched by the pattern, of which there must be at least one, and passes the
 unmatched shapes into the residual untouched. A variable pattern binds at $\shapeTy(k)$ for the shape $k$ it matches, and a
 pattern named by \pyinline{as} at the join over the shapes it matched, so a case for one alternative of a
