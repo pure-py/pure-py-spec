@@ -354,7 +354,7 @@ matched every instance.
 
 A dictionary shape has a form of its own,
 $\shapeDict{\tau}{\beta}{H}$, standing for the dictionaries that hold each key $w$ in the domain of
-$\beta$ with a value of shape $\beta(w)$, but that hold no key of $H$. A dictionary pattern takes its keys in order, no key twice. A key in
+$\beta$ with a value of shape $\beta(w)$, but that hold no key of $H$. A dictionary pattern takes its keys in order, with no key occurring twice. A key in
 neither $\beta$ nor $H$ splits the shape at that key (\ruleName{split-dict}), adding to the residual the
 dictionaries that lack the key; once every key of the pattern is in $\beta$ the keys match as a sequence
 (\ruleName{pat-dict}), each key $w$ against $\beta(w)$. The empty dictionary pattern matches every
