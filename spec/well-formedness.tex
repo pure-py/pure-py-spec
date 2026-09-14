@@ -272,11 +272,12 @@ so a function that declares a result definitely returns one.
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked using the auxiliary
 judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typing-cases}), which takes
 the cases in turn: each case's pattern is matched against the \emph{residual} $L$, a static
-over-approximation of the values of $\sigma$ which remain unmatched by earlier cases
-(\secref{well-formedness-patterns}), its body is checked under the pattern's bindings, and the outcomes
+over-approximation of the values of $\sigma$ which remain unmatched by earlier cases, its body is
+checked under the pattern's bindings, and the outcomes
 are merged into $S$. Each pattern must be sequence-safe at $\sigma$ (\secref{types-auxiliary}). The match rules start the
-residual from $\sigma$; \ruleName{match} applies where the final residual is empty; \ruleName{match-partial} applies otherwise, merging in
-$\Assigns{\varnothing}$ for the values that fall through.
+residual from the shapes of $\sigma$ (\figref{shapes}); \ruleName{match} applies where the final residual is empty; \ruleName{match-partial} applies otherwise, merging in
+$\Assigns{\varnothing}$ for the values that fall through. Shapes, matching a pattern against the residual,
+and sequence-safety are the subject of \secref{well-formedness-patterns}.
 
 \subsection{Pattern matching}
 \label{sec:exhaustiveness}
