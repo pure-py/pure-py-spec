@@ -154,17 +154,11 @@ def check_top_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
     ctx_after = extend(head_outcome, ctx)
     if len(tail) == 0:
         return ctx_after
-    reassigned = captures_statement(head) & assigns_seq(tail)
-    if reassigned:
-        name = min(reassigned)
-        ra_node = find_first_reassigning(tail, reassigned)
-        assert ra_node is not None
-        raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
+    check_captured_reassignment(head, tail)
     delta = head_outcome.delta if isinstance(head_outcome, Assigns) else {}
     rebound = {c for c in assigns_seq(tail) if isinstance(delta.get(c), Class)}
     if rebound:
         node = find_first_reassigning(tail, rebound)
-        assert node is not None
         raise IllFormedModule(node, reasons.ClassRebound(min(rebound)))
     return check_top_seq(tail, ctx_after)
 
@@ -194,14 +188,17 @@ def check_seq(
     if isinstance(head_outcome, Returns):
         node: ast.AST = tail[0][0] if isinstance(tail[0], list) else tail[0]
         raise IllFormedModule(node, reasons.UnreachableStatement())
-    reassigned = captures_statement(head) & assigns_seq(tail)
-    if reassigned:
-        name = min(reassigned)
-        ra_node = find_first_reassigning(tail, reassigned)
-        assert ra_node is not None
-        raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
+    check_captured_reassignment(head, tail)
     tail_outcome, final_ctx = check_seq(tail, ctx_after, returns)
     return override_outcomes(head_outcome, tail_outcome), final_ctx
+
+
+def check_captured_reassignment(head: Statement, tail: list[Statement]) -> None:
+    """A name captured by `head` is not reassigned in `tail`."""
+    reassigned = captures_statement(head) & assigns_seq(tail)
+    if reassigned:
+        node = find_first_reassigning(tail, reassigned)
+        raise IllFormedModule(node, reasons.CapturedReassignment(min(reassigned)))
 
 
 def extend(outcome: StaticOutcome, ctx: ModuleContext) -> ModuleContext:
