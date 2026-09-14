@@ -164,7 +164,7 @@ def split(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Split | None:
     if isinstance(p, PatList):
         return split_list(k, len(p.patterns), ctx)
     if isinstance(p, ast.MatchMapping):
-        return split_key(k, items(p), ctx)
+        return split_dict(k, items(p), ctx)
     assert isinstance(p, ast.MatchClass)
     cls = class_of_pattern(p, ctx)
     if isinstance(k, Rest):
@@ -206,7 +206,7 @@ def split_list(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
     )
 
 
-def split_key(
+def split_dict(
     k: Shape, ws: tuple[tuple[str, ast.pattern], ...], ctx: ModuleContext
 ) -> Split | None:
     """The first key of the pattern which the shape does not bind."""

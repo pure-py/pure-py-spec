@@ -31,13 +31,13 @@
   \Sigma; \Gamma \vdash \shapeAny{\tyList{\tau}}{H}, \patList{\seq{p}} \splits \set{\shapeList{\tau}{\seq{k}} \mid \seq{k} \in \shapes(\Sigma, \tau, \varnothing)^n}, \shapes(\Sigma, \tyList{\tau}, H \cup \set{\headList{n}})
 }
 \and
-\inferrule*[lab={\ruleName{split-key}}]
+\inferrule*[lab={\ruleName{split-dict}}]
 {
   w_i \notin \dom(\beta) \cup H \\
   w_j \in \dom(\beta) \quad (\forall j < i)
 }
 {
-  \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{H}, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}} \splits \set{\shapeDict{\tau}{\beta \override \set{\bind{w_i}{k}}}{H} \mid k \in \shapes(\Sigma, \tau, \varnothing)}, \set{\shapeDict{\tau}{\beta}{(H \cup \set{w_i})}}
+  \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{H}, \patDict{\bind{\seq{w}}{\seq{p}}} \splits \set{\shapeDict{\tau}{\beta \override \set{\bind{w_i}{k}}}{H} \mid k \in \shapes(\Sigma, \tau, \varnothing)}, \set{\shapeDict{\tau}{\beta}{(H \cup \set{w_i})}}
 }
 \and
 \inferrule*[lab={\ruleName{split-class}}]
