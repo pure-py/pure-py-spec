@@ -16,18 +16,19 @@
 \and
 \inferrule*[lab={\ruleName{split-tuple}}]
 {
-  \strut
+  |\seq{\tau}| = |\seq{p}|
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\tyTuple{\tau_1, \ldots, \tau_n}}{\varnothing}, \patTuple{p_1, \ldots, p_n} \splits \set{\patTuple{\seq{k}} \mid \seq{k} \in \shapes(\Sigma, \seq{\tau})}, \varnothing
+  \Sigma; \Gamma \vdash \shapeAny{\tyTuple{\seq{\tau}}}{\varnothing}, \patTuple{\seq{p}} \splits \set{\patTuple{\seq{k}} \mid \seq{k} \in \shapes(\Sigma, \seq{\tau})}, \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{split-list}}]
 {
+  n = |\seq{p}| \\
   \headList{n} \notin H
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\tyList{\tau}}{H}, \patList{p_1, \ldots, p_n} \splits \set{\shapeList{\tau}{\seq{k}} \mid \seq{k} \in \shapes(\Sigma, \tau, \varnothing)^n}, \shapes(\Sigma, \tyList{\tau}, H \cup \set{\headList{n}})
+  \Sigma; \Gamma \vdash \shapeAny{\tyList{\tau}}{H}, \patList{\seq{p}} \splits \set{\shapeList{\tau}{\seq{k}} \mid \seq{k} \in \shapes(\Sigma, \tau, \varnothing)^n}, \shapes(\Sigma, \tyList{\tau}, H \cup \set{\headList{n}})
 }
 \and
 \inferrule*[lab={\ruleName{split-key}}]
