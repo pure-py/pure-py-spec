@@ -65,8 +65,9 @@ $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
 \and
 \inferrule*[lab={\ruleName{shape-constr}}]
 {
+  \fields(\Sigma, C) = \bind{\seq{x}}{\seq{\sigma}} \\
   \Sigma \vdash h : C \quad (\forall h \in H) \\
-  \Sigma \vdash k_x : \sigma \quad (\forall \bind{x}{\sigma} \in \fields(\Sigma, C))
+  \Sigma \vdash k_i : \sigma_i \quad (\forall i)
 }
 {
   \Sigma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{H} : C
