@@ -269,7 +269,7 @@ prefers a locally assigned name to one visible in an enclosing scope. The body i
 declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
-A \pyinline{match} scrutinee synthesises a type $\sigma$, and the cases are checked using the auxiliary
+A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked using the auxiliary
 judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typing-cases}), which takes
 the cases in turn: each case's pattern is matched against the \emph{residual} $L$, a static
 over-approximation of the values of $\sigma$ which remain unmatched by earlier cases
