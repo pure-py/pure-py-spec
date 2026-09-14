@@ -286,7 +286,7 @@ and sequence-safety are the subject of \secref{well-formedness-patterns}.
 To check a \pyinline{match}, each case $\exCase{p}{s}$ is matched in turn against the residual, an
 ordered set of \emph{shapes} (\figref{shapes}). A shape denotes a set of values of a single type, and the
 residual denotes the values of the scrutinee's type which remain unmatched by earlier cases. Matching the case removes from the residual the values matched
-by $p$ (\figref{pat}); a case that matches no shape of the residual is unreachable and the match is rejected.
+by $p$ (\figref{pat}); a case that does not match any shape of the residual is unreachable and the match is rejected.
 The match is exhaustive if the last case leaves the residual empty, and may
 otherwise fall through (\ruleName{match}, \ruleName{match-partial}). Checking reachability and
 exhaustiveness with one relation follows the usefulness algorithm for ML~\cite{maranget2007}. The residual plays the
