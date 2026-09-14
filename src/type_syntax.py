@@ -234,7 +234,7 @@ def parse_subscript(e: ast.Subscript) -> TypeExpr | None:
     if not isinstance(e.value, ast.Name):
         return None
     if e.value.id == "Literal":
-        return parse_literal(e.slice)
+        return literal_type(e.slice)
     if e.value.id == "Callable":
         return parse_callable(subscript_args(e.slice))
     args = parse_annotations(subscript_args(e.slice))
@@ -249,16 +249,19 @@ def parse_subscript(e: ast.Subscript) -> TypeExpr | None:
     return None
 
 
-def parse_literal(s: ast.expr) -> TypeExpr | None:
-    if isinstance(s, ast.Constant):
-        return LiteralType(s.value)
-    if isinstance(s, ast.UnaryOp) and isinstance(s.op, ast.USub):
-        operand = s.operand
-        if isinstance(operand, ast.Constant) and isinstance(
-            operand.value, (int, float)
-        ):
-            return LiteralType(-operand.value)
-    return None
+def literal_type(e: ast.expr) -> LiteralType | None:
+    """Type of a literal `l` or a negated number `-n`, or nothing where `e` is
+    neither."""
+    if isinstance(e, ast.Constant):
+        return LiteralType(e.value)
+    if not (isinstance(e, ast.UnaryOp) and isinstance(e.op, ast.USub)):
+        return None
+    if not isinstance(e.operand, ast.Constant):
+        return None
+    n = e.operand.value
+    if isinstance(n, bool) or not isinstance(n, (int, float)):
+        return None
+    return LiteralType(-n)
 
 
 def parse_callable(args: tuple[ast.expr, ...]) -> TypeExpr | None:

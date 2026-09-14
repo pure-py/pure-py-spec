@@ -48,6 +48,7 @@ from type_syntax import (
     TupleType,
     Type,
     UnionType,
+    literal_type,
 )
 
 type Match = tuple[tuple[Shape, ...], tuple[Shape, ...], VarContext]
@@ -63,7 +64,7 @@ def match(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Match | None:
     if isinstance(p, ast.MatchAs):
         return match_as(k, p, ctx)
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
-        same = match_literal(k, LiteralType(literal_of(p)))
+        same = match_literal(k, literal_of(p))
     elif isinstance(p, PatTuple):
         same = match_tuple(k, p, ctx)
     elif isinstance(p, PatList):
@@ -158,7 +159,7 @@ def split(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Split | None:
     """Shapes of `k` carrying the head that `p` tests for, and the shapes `k`
     leaves without that head, or nothing where `k` does not split for `p`."""
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
-        return split_literal(k, LiteralType(literal_of(p)))
+        return split_literal(k, literal_of(p))
     if isinstance(p, PatTuple):
         return split_tuple(k, len(p.patterns))
     if isinstance(p, PatList):
@@ -411,24 +412,16 @@ def items(p: ast.MatchMapping) -> tuple[tuple[str, ast.pattern], ...]:
     return tuple(zip([dict_key(key) for key in p.keys], p.patterns))
 
 
-def literal_value(pat: ast.MatchValue) -> object:
-    v = pat.value
-    if isinstance(v, ast.Constant):
-        return v.value
-    if isinstance(v, ast.UnaryOp) and isinstance(v.operand, ast.Constant):
-        operand_value = v.operand.value
-        assert isinstance(operand_value, (int, float))
-        return -operand_value if isinstance(v.op, ast.USub) else operand_value
-    raise AssertionError(f"unexpected MatchValue payload: {type(v).__name__}")
-
-
 def dict_key(k: ast.expr) -> str:
     assert isinstance(k, ast.Constant) and isinstance(k.value, str)
     return k.value
 
 
-def literal_of(p: ast.pattern) -> object:
+def literal_of(p: ast.pattern) -> LiteralType:
+    """Type of a literal pattern."""
     if isinstance(p, ast.MatchSingleton):
-        return p.value
+        return LiteralType(p.value)
     assert isinstance(p, ast.MatchValue)
-    return literal_value(p)
+    t = literal_type(p.value)
+    assert t is not None
+    return t

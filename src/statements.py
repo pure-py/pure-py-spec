@@ -74,6 +74,7 @@ from type_syntax import (
     UnionExpr,
     UnionType,
     base_type,
+    literal_type,
     render,
 )
 
@@ -428,7 +429,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
         return binary(BINARY_NAMES[type(e.op)], e.left, e.right, e, ctx)
     if isinstance(e, ast.UnaryOp):
         operand = synth_expr(e.operand, ctx)
-        negated = negated_literal(e)
+        negated = literal_type(e)
         if negated is not None:
             return negated
         name = UNARY_NAMES[type(e.op)]
@@ -713,16 +714,6 @@ def lambda_of(n: int) -> str:
     return f"a lambda of {n} parameter{'' if n == 1 else 's'}"
 
 
-def negated_literal(e: ast.UnaryOp) -> Type | None:
-    """A negated numeric literal synthesises the negated literal type."""
-    if not isinstance(e.op, ast.USub) or not isinstance(e.operand, ast.Constant):
-        return None
-    v = e.operand.value
-    if isinstance(v, bool) or not isinstance(v, (int, float)):
-        return None
-    return LiteralType(-v)
-
-
 def binary(
     op: str, left: ast.expr, right: ast.expr, e: ast.expr, ctx: ModuleContext
 ) -> Type:
@@ -834,7 +825,7 @@ def describe(p: ast.pattern, ctx: ModuleContext) -> str:
         )  # a bare variable or wildcard never conflicts and always matches
         return describe(p.pattern, ctx)
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
-        return f"a pattern of type {render(LiteralType(literal_of(p)))}"
+        return f"a pattern of type {render(literal_of(p))}"
     if isinstance(p, PatList):
         return "a list pattern"
     if isinstance(p, PatTuple):
