@@ -20,14 +20,6 @@
   \Sigma; \Gamma \vdash k, \patWild \matches \set{k}, \varnothing \binding \varnothing
 }
 \and
-\inferrule*[lab={\ruleName{pat-literal}}]
-{
-  \strut
-}
-{
-  \Sigma; \Gamma \vdash \ell, \ell \matches \set{\ell}, \varnothing \binding \varnothing
-}
-\and
 \inferrule*[lab={\ruleName{pat-as}}]
 {
   \Sigma; \Gamma \vdash k, p \matches K, L \binding \Delta
@@ -38,11 +30,19 @@
 \and
 \inferrule*[lab={\ruleName{pat-split}}]
 {
-  \Sigma; \Gamma \vdash k, p \splits K', L' \\
-  \Sigma; \Gamma \vdash K', p \matches K, L \binding \Delta
+  \Sigma; \Gamma \vdash k, p \splits K, L \\
+  \Sigma; \Gamma \vdash K, p \matches K', L' \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash k, p \matches K, L \disjunion L' \binding \Delta
+  \Sigma; \Gamma \vdash k, p \matches K', L' \disjunion L \binding \Delta
+}
+\and
+\inferrule*[lab={\ruleName{pat-literal}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma \vdash \ell, \ell \matches \set{\ell}, \varnothing \binding \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{pat-tuple}}]
