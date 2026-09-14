@@ -341,8 +341,8 @@ residual untouched.
 A pattern matches a shape directly if the shape has the head tested by the pattern. Otherwise the shape
 is first \emph{split} by the auxiliary judgement $\Sigma; \Gamma \vdash k, p \splits K, L$ (\figref{split}):
 the shapes $K$ have the head tested by $p$, with the shapes of the component types drawn from $\shapes$,
-and the residual $L$ is the shape $k$ with that head excluded as well. \ruleName{pat-split} matches the
-pattern against $K$ and adds $L$ to the residual. Only the forms
+and the residual $L$ is the shape $k$ with that head excluded as well. The \ruleName{pat-split} rule matches
+the pattern against $K$ and adds $L$ to the residual. Only the forms
 with an excluded set split, and no head types at a tuple type, so $H$ is empty there and
 \ruleName{split-tuple} leaves nothing.
 A constructor pattern whose class lies below a
