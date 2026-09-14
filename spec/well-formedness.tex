@@ -297,8 +297,8 @@ likewise let the type exclude cases.
 
 A shape $k$ (\figref{shapes})
 denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{H}$ denotes the
-values of type $\tau$ whose outermost head is not among those in $H$; the other forms are constructors,
-tuples, lists and dictionaries, each with shapes in place of sub-patterns. A list shape also records its
+values of type $\tau$ whose outermost head is not among those in $H$; the other forms are constructor,
+tuple, list and dictionary shapes, each with shapes in place of sub-patterns. A list shape also records its
 element type, which the element shapes do not determine. A constructor shape also carries an excluded
 set: $\shapeAny{\patConstr{C}{\seq{k}}}{H}$ denotes the instances of $C$, or of a subclass not below a
 class of $H$, whose fields, those of $C$, have the shapes $\seq{k}$.
