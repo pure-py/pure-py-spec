@@ -396,10 +396,10 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
         if constructed is not None:
             c_name, xs = short_name(constructed), fields(constructed)
             kwd_names = [k.arg for k in e.keywords if k.arg is not None]
-            if (
-                field_map(constructed, e.args, kwd_names, [k.value for k in e.keywords])
-                is None
-            ):
+            args = field_map(
+                constructed, e.args, kwd_names, [k.value for k in e.keywords]
+            )
+            if args is None:
                 n = len(e.args)
                 if n + len(kwd_names) != len(xs):
                     raise IllFormedModule(
@@ -414,10 +414,6 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
                         c_name, tuple(sorted(set(xs[n:])))
                     ),
                 )
-            args = field_map(
-                constructed, e.args, kwd_names, [k.value for k in e.keywords]
-            )
-            assert args is not None
             for x, arg in args.items():
                 check_expr(arg, declared_type(constructed, x), ctx)
             return ClassType(constructed)
