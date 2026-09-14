@@ -23,7 +23,6 @@ from contexts import (
     ASSIGNS_EMPTY,
     RETURNS,
     Assigns,
-    Context,
     ModuleContext,
     ModuleLoaded,
     ModuleStub,
@@ -167,8 +166,7 @@ def check_top_statement(item: Statement, ctx: ModuleContext) -> StaticOutcome:
     """A class declaration is checked here; any other top-level statement is a
     plain statement, checked with no return type (top-stmt)."""
     if isinstance(item, ast.ClassDef):
-        check_class_decl(item, ctx.gamma, ctx.q)
-        return Assigns({item.name: class_declared(item, ctx.q, ctx.gamma)})
+        return Assigns({item.name: class_declared(item, ctx)})
     return check_statement(item, ctx, None)
 
 
@@ -772,40 +770,31 @@ def elem_entry(e: ast.expr, ctx: ModuleContext) -> Type:
     return elem
 
 
-def class_declared(node: ast.ClassDef, q: str, context: Context) -> Class:
-    base = (
-        node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
-    )
-    ctx = ModuleContext(gamma=context, q=q)
-    return Class(
-        context=context,
-        name=f"{q}.{node.name}",
-        own_fields=tuple(
-            (x, resolve_type(psi, node, ctx)) for x, psi in own_fields(node)
-        ),
-        base=base,
-    )
-
-
-def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
-    if not isinstance(gamma.get("dataclass"), PredefinedName):
+def class_declared(node: ast.ClassDef, ctx: ModuleContext) -> Class:
+    """Class entry of a declaration (class, class-extend)."""
+    if not isinstance(ctx.gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.DecoratorNotInScope("dataclass"))
-    for _, t in own_fields(node):
-        resolve_type(t, node, ModuleContext(gamma=gamma, q=q))
-    names = [x for x, _ in own_fields(node)]
+    own = tuple((x, resolve_type(psi, node, ctx)) for x, psi in own_fields(node))
+    names = [x for x, _ in own]
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
         raise IllFormedModule(node, reasons.DuplicateFieldName(dup, node.name))
-    if len(node.bases) == 0:
-        return
-    base = node.bases[0]
-    assert isinstance(base, ast.Name)
-    base_class = gamma.get(base.id)
-    if not isinstance(base_class, Class) or base_class.name.rsplit(".", 1)[0] != q:
-        raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
-    clash = set(names) & set(fields(base_class))
-    if len(clash) > 0:
-        raise IllFormedModule(node, reasons.InheritedFieldClash(min(clash), base.id))
+    base: str | None = None
+    if len(node.bases) > 0:
+        assert isinstance(node.bases[0], ast.Name)
+        base = node.bases[0].id
+        base_class = ctx.gamma.get(base)
+        if (
+            not isinstance(base_class, Class)
+            or base_class.name.rsplit(".", 1)[0] != ctx.q
+        ):
+            raise IllFormedModule(node, reasons.UnknownBaseClass(base))
+        clash = set(names) & set(fields(base_class))
+        if len(clash) > 0:
+            raise IllFormedModule(node, reasons.InheritedFieldClash(min(clash), base))
+    return Class(
+        context=ctx.gamma, name=f"{ctx.q}.{node.name}", own_fields=own, base=base
+    )
 
 
 def describe(p: ast.pattern, ctx: ModuleContext) -> str:
