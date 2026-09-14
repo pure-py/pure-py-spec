@@ -5,6 +5,9 @@ description: Discipline for keeping the checker (and other implementations) in o
 
 # Spec implementor
 
+Load the coding-conventions skill first; it holds the comment, identifier and commit rules shared
+with other implementations.
+
 Behavioral agreement is not the finish line. A sync is complete only when the
 spec and the implementation are in one-to-one correspondence, checked in both
 directions.

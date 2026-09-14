@@ -44,7 +44,6 @@ description: Conventions for editing the PurePy spec and its GitHub issues; defe
 - Clause-final pro-forms ("leaves none", "the others", "the same holds", "so does") are a verbal tic: resist them even where unambiguous, because the pattern becomes conspicuous with repetition. Pointing back is fine when deliberate and clear; the default is to repeat the noun ("leaves an empty residual", "the remaining members") or restructure.
 - A condition takes "if" or "when", not "where": "undefined if two declarations share a name". "Where" reads as a place, so reserve it for quantifying over positions ("the rows differ where the pattern is a literal") and for binding a symbol ("where n is the arity").
 - Do not coin terminology, in the spec or in conversation ("foreign module", "fresh position"). Use the spec's own terms or plain description ("a module other than the current one").
-- No defensive coding. If a case shouldn't arise, assert it; don't silently return a safe default.
 
 ## LaTeX
 
