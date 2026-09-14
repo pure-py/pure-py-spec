@@ -274,10 +274,16 @@ judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typ
 the cases in turn: each case's pattern is matched against the \emph{residual} $L$, a static
 over-approximation of the values of $\sigma$ which remain unmatched by earlier cases, its body is
 checked under the pattern's bindings, and the outcomes
-are merged into $S$. Each pattern must be sequence-safe at $\sigma$ (\secref{types-auxiliary}). The match rules start the
+are merged into $S$. The match rules start the
 residual from the shapes of $\sigma$ (\figref{shapes}); \ruleName{match} applies where the final residual is empty; \ruleName{match-partial} applies otherwise, merging in
-$\Assigns{\varnothing}$ for the values that fall through. Shapes, matching a pattern against the residual,
-and sequence-safety are the subject of \secref{well-formedness-patterns}.
+$\Assigns{\varnothing}$ for the values that fall through. Shapes and matching a pattern against the residual
+are the subject of \secref{well-formedness-patterns}.
+
+Each pattern must also be \emph{sequence-safe} at $\sigma$ (\secref{types-auxiliary}), because under the
+evaluation rules a tuple pattern matches only a tuple and a list pattern matches only a list, whereas
+Python matches both forms of pattern against both kinds of value (\figref{eval-pat}). A match on
+$\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ therefore admits no tuple or list pattern, and a
+match on $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple pattern.
 
 \subsection{Pattern matching}
 \label{sec:exhaustiveness}
@@ -366,13 +372,6 @@ If $\Sigma \vdash h : \tau$ for every $h \in H$ then $\Sigma \vdash k : \tau$ fo
 \shapes(\Sigma, \tau, H)$. Moreover, if $\Sigma \vdash k : \tau$ for each $k \in L$ and $\Sigma; \Gamma \vdash L, p
 \matches K, L' \binding \Delta$ then $\Sigma \vdash k : \tau$ for each $k \in K \disjunion L'$.
 \end{lemma}
-
-The case rules (\figref{typing-cases}) also require each pattern to be \emph{sequence-safe} at the
-type of the scrutinee (\secref{types-auxiliary}), because under the evaluation rules a tuple pattern
-matches only a tuple and a list pattern matches only a list, whereas Python matches both forms of
-pattern against both kinds of value (\figref{eval-pat}). A match on
-$\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ therefore admits no tuple or list pattern, and a
-match on $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple pattern.
 
 A union is exhausted
 by covering each member, a class type by a pattern for the class itself, \pyinline{bool} by
