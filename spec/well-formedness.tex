@@ -285,7 +285,7 @@ and sequence-safety are the subject of \secref{well-formedness-patterns}.
 
 To check a \pyinline{match}, each case $\exCase{p}{s}$ is matched in turn against the residual, an
 ordered set of \emph{shapes} (\figref{shapes}). A shape denotes a set of values of a single type, and the
-residual denotes the values of the scrutinee's type which remain unmatched by earlier cases. Matching the case removes from the residual the values matched
+residual denotes the values of the scrutinee type which remain unmatched by earlier cases. Matching the case removes from the residual the values matched
 by $p$ (\figref{pat}); a case that does not match any shape of the residual is unreachable and the match is rejected.
 The match is exhaustive if the last case leaves the residual empty, and may
 otherwise fall through (\ruleName{match}, \ruleName{match-partial}). Checking reachability and
@@ -368,10 +368,11 @@ If $\Sigma \vdash h : \tau$ for every $h \in H$ then $\Sigma \vdash k : \tau$ fo
 \end{lemma}
 
 The case rules (\figref{typing-cases}) also require each pattern to be \emph{sequence-safe} at the
-scrutinee's type (\secref{types-auxiliary}), because the evaluation rules apply a tuple or list pattern
-only to a value of its own kind, although Python would match either (\figref{eval-pat}). A match on
+type of the scrutinee (\secref{types-auxiliary}), because under the evaluation rules a tuple pattern
+matches only a tuple and a list pattern matches only a list, whereas Python matches both forms of
+pattern against both kinds of value (\figref{eval-pat}). A match on
 $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ therefore admits no tuple or list pattern, and a
-match on $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$ no tuple pattern.
+match on $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple pattern.
 
 A union is exhausted
 by covering each member, a class type by a pattern for the class itself, \pyinline{bool} by
