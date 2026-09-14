@@ -322,7 +322,7 @@ shape, giving the matched shapes $K$, residual $L$ and bindings $\Delta$; the fo
 matches the sub-patterns of a tuple, list, dictionary or constructor pattern against the component
 shapes position by position; and the form on an ordered set of shapes $L$, used by the match rules,
 matches each shape of $L$ in turn. Some shapes of $L$ may admit no derivation for the pattern, so
-\ruleName{pat-shapes} takes the shapes of $L$ that admit a derivation, of which there must be at least
+\ruleName{pat-shapes} takes the shapes of $L$ that do admit a derivation, of which there must be at least
 one, and passes the remaining shapes into the residual untouched. A variable pattern binds at $\shapeTy(k)$ for the shape $k$ it matches, and a
 pattern named by \pyinline{as} at the join over the shapes it matched, so a case for one alternative of a
 union leaves a later variable case bound at the remaining members alone. Bindings from the positions of a sequence, or from
