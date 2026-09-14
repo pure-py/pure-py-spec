@@ -297,7 +297,7 @@ likewise let the type exclude cases.
 
 A shape $k$ (\figref{shapes})
 denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{H}$ denotes the
-values of type $\tau$ whose outermost head is not among those in $H$. A head itself denotes values: a
+values of type $\tau$ whose outermost head is not among those in $H$. A head itself denotes a set of values: a
 literal its value, a class its instances, and $\headList{n}$ the lists of length $n$. Head
 typing $\Sigma \vdash h : \tau$ admits the heads whose values lie within $\tau$, and shape typing
 $\Sigma \vdash k : \tau$ checks each excluded head and each component of a shape. The other forms are constructors, tuples, lists and dictionaries, each with shapes in place of
@@ -306,8 +306,9 @@ constructor shape carries an excluded set of its own: $\shapeAny{\patConstr{C}{\
 instances of $C$, or of a subclass not below a class of $H$, whose fields, those of $C$, have the shapes
 $\seq{k}$. The shapes of $\tau$ that remain once the heads in $H$ are excluded are
 $\shapes(\Sigma, \tau, H)$: one shape per member of a union, and none at all when $H$ exhausts $\tau$. No shape carries a
-union or dictionary type in the form $\shapeAny{\tau}{H}$, since $\shapes$ is the only source of
-that form: it splits a union into its members and gives a dictionary type its dictionary shape.
+union or dictionary type in the form $\shapeAny{\tau}{H}$, and $\shapes$ is the only source of that
+form. A union has no head to exclude, so $\shapes$ splits it into its members, and a dictionary is
+refined by its keys rather than by a head, so $\shapes$ gives it the dictionary form.
 
 \input{spec/fig/pat}
 
