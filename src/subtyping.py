@@ -26,7 +26,8 @@ def join_two(s: Type, t: Type) -> Type:
 def meet(s: Type, t: Type) -> Type:
     """Greatest type below both: the smaller where they are comparable, and
     otherwise distributing over a union, componentwise on tuples of the same
-    length, and `Never` on any other pair."""
+    length, contravariantly on callables of the same arity, and `Never` on any
+    other pair."""
     if subtype(s, t):
         return s
     if subtype(t, s):
