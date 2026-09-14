@@ -158,23 +158,23 @@ def split(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Split | None:
     """Shapes of `k` carrying the head that `p` tests for, and the shapes `k`
     leaves without that head, or nothing where `k` does not split for `p`."""
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
-        return split_literal(k, LiteralType(literal_of(p)), ctx)
+        return split_literal(k, LiteralType(literal_of(p)))
     if isinstance(p, PatTuple):
-        return split_tuple(k, len(p.patterns), ctx)
+        return split_tuple(k, len(p.patterns))
     if isinstance(p, PatList):
-        return split_list(k, len(p.patterns), ctx)
+        return split_list(k, len(p.patterns))
     if isinstance(p, ast.MatchMapping):
-        return split_dict(k, items(p), ctx)
+        return split_dict(k, items(p))
     assert isinstance(p, ast.MatchClass)
     cls = class_of_pattern(p, ctx)
     if isinstance(k, Rest):
-        return split_class(k, cls, ctx)
+        return split_class(k, cls)
     if isinstance(k, Constr):
-        return split_subclass(k, cls, ctx)
+        return split_subclass(k, cls)
     return None
 
 
-def split_literal(k: Shape, ell: LiteralType, ctx: ModuleContext) -> Split | None:
+def split_literal(k: Shape, ell: LiteralType) -> Split | None:
     if (
         isinstance(k, Rest)
         and ell not in k.heads
@@ -185,7 +185,7 @@ def split_literal(k: Shape, ell: LiteralType, ctx: ModuleContext) -> Split | Non
     return None
 
 
-def split_tuple(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
+def split_tuple(k: Shape, n: int) -> Split | None:
     """No head types at a tuple type, so the shape excludes nothing and the
     split leaves nothing."""
     if not (isinstance(k, Rest) and isinstance(k.ty, TupleType)):
@@ -196,7 +196,7 @@ def split_tuple(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
     return tuple(Tuple(ks) for ks in shapes_seq(k.ty.components)), NOTHING
 
 
-def split_list(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
+def split_list(k: Shape, n: int) -> Split | None:
     if not (isinstance(k, Rest) and isinstance(k.ty, ListType) and n not in k.heads):
         return None
     elem = k.ty.elem
@@ -206,9 +206,7 @@ def split_list(k: Shape, n: int, ctx: ModuleContext) -> Split | None:
     )
 
 
-def split_dict(
-    k: Shape, ws: tuple[tuple[str, ast.pattern], ...], ctx: ModuleContext
-) -> Split | None:
+def split_dict(k: Shape, ws: tuple[tuple[str, ast.pattern], ...]) -> Split | None:
     """The first key of the pattern which the shape does not bind."""
     if not isinstance(k, Dict):
         return None
@@ -222,7 +220,7 @@ def split_dict(
     )
 
 
-def split_class(k: Rest, cls: Class, ctx: ModuleContext) -> Split | None:
+def split_class(k: Rest, cls: Class) -> Split | None:
     """Instances of the meet of the shape's type and the pattern's class, with
     the heads which type at that class kept."""
     if below_excluded(cls, k.heads):
@@ -238,7 +236,7 @@ def split_class(k: Rest, cls: Class, ctx: ModuleContext) -> Split | None:
     )
 
 
-def split_subclass(k: Constr, cls: Class, ctx: ModuleContext) -> Split | None:
+def split_subclass(k: Constr, cls: Class) -> Split | None:
     """Instances of a proper subclass of the shape's class, whose fields are
     those of the shape followed by the ones the subclass declares."""
     if cls == k.c or not subtype(ClassType(cls), ClassType(k.c)):
@@ -299,7 +297,7 @@ def match_shapes(
     matched = union(m for m, _, _ in matches.values())
     unmatched = tuple(k for k in ks if k not in matches)
     left = union(left for _, left, _ in matches.values()) + unmatched
-    return matched, left, join_deltas([d for _, _, d in matches.values()], ctx)
+    return matched, left, join_deltas([d for _, _, d in matches.values()])
 
 
 def seq_safe(p: ast.pattern, t: Type, ctx: ModuleContext) -> bool:
@@ -353,13 +351,13 @@ def disjoint_union(deltas: list[VarContext], node: ast.AST) -> VarContext:
     return merged
 
 
-def join_deltas(deltas: list[VarContext], ctx: ModuleContext) -> VarContext:
+def join_deltas(deltas: list[VarContext]) -> VarContext:
     """Bindings of a pattern that matches more than one shape, at the join of
     the types the shapes give each variable."""
-    return {x: join_entries([d[x] for d in deltas], ctx) for x in deltas[0]}
+    return {x: join_entries([d[x] for d in deltas]) for x in deltas[0]}
 
 
-def join_entries(entries: list[VarEntry], ctx: ModuleContext) -> VarEntry:
+def join_entries(entries: list[VarEntry]) -> VarEntry:
     """Bindings a pattern gives across the shapes it matches are all types, so
     they join."""
     types = [e for e in entries if not isinstance(e, Status)]

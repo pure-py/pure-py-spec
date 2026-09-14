@@ -252,17 +252,17 @@ def check_bodies(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
         declared = resolve_type(annotated(d.returns), d, ctx)
         result = check_body(d.body, body_ctx, declared)
         if not isinstance(result, Returns):
-            check_falls_off_end(d, declared, ctx)
+            check_falls_off_end(d, declared)
 
 
-def check_falls_off_end(d: ast.FunctionDef, declared: Type, ctx: ModuleContext) -> None:
+def check_falls_off_end(d: ast.FunctionDef, declared: Type) -> None:
     """A body that does not definitely return falls off the end, giving None,
     so the declared type must admit it."""
     if not subtype(Primitive.NONE, declared):
         raise IllFormedModule(d, reasons.MissingReturn(d.name, render(declared)))
 
 
-def check_returns_none(s: ast.Return, declared: Type, ctx: ModuleContext) -> None:
+def check_returns_none(s: ast.Return, declared: Type) -> None:
     if not subtype(Primitive.NONE, declared):
         raise IllFormedModule(
             s, reasons.TypeMismatch(render(declared), render(Primitive.NONE))
@@ -303,7 +303,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> StaticO
     if isinstance(s, ast.Return):
         assert returns is not None  # a return at the top level is rejected earlier
         if s.value is None:
-            check_returns_none(s, returns, ctx)
+            check_returns_none(s, returns)
         else:
             check_expr(s.value, returns, ctx)
         return RETURNS
@@ -785,7 +785,7 @@ def check_quals(generators: list[ast.comprehension], ctx: ModuleContext) -> VarC
     return delta | check_quals(generators[1:], ctx_)
 
 
-def elem_type(t: Type, ctx: ModuleContext) -> Type | None:
+def elem_type(t: Type) -> Type | None:
     """Type of the elements a generator draws from a value of type `t`."""
     if isinstance(t, ListType):
         return t.elem
@@ -796,7 +796,7 @@ def elem_type(t: Type, ctx: ModuleContext) -> Type | None:
     if isinstance(t, TupleType):
         return join([base_type(c) for c in t.components])
     if isinstance(t, UnionType):
-        left, right = elem_type(t.left, ctx), elem_type(t.right, ctx)
+        left, right = elem_type(t.left), elem_type(t.right)
         return None if left is None or right is None else join([left, right])
     return None
 
@@ -804,7 +804,7 @@ def elem_type(t: Type, ctx: ModuleContext) -> Type | None:
 def elem_entry(e: ast.expr, ctx: ModuleContext) -> Type:
     """Type a generator binds its target at."""
     t = synth_expr(e, ctx)
-    elem = elem_type(t, ctx)
+    elem = elem_type(t)
     if elem is None:
         raise IllFormedModule(e, reasons.NotIterable(render(t)))
     return elem
