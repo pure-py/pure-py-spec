@@ -5,9 +5,10 @@ on:
   push:
     paths-ignore:
       - README.md
-  pull_request:
-    paths-ignore:
-      - README.md
+
+concurrency:
+  group: submit-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
