@@ -3,6 +3,7 @@ import ast
 import reasons
 from aux import (
     Statement,
+    annotated,
     assigns_body,
     assigns_seq,
     binds_quals,
@@ -73,17 +74,8 @@ from type_syntax import (
     UnionExpr,
     UnionType,
     base_type,
-    parse_annotation,
     render,
 )
-
-
-def annotated_type(node: ast.AnnAssign) -> TypeExpr:
-    """Type expression an annotated assignment carries; the subset admits no
-    other annotation."""
-    t = parse_annotation(node.annotation)
-    assert t is not None
-    return t
 
 
 def signature(d: ast.FunctionDef, ctx: ModuleContext) -> CallableType:
@@ -141,15 +133,6 @@ def in_scope(x: str, node: ast.AST, ctx: ModuleContext) -> None:
     which an import brings into scope and an assignment takes away."""
     if not isinstance(ctx.gamma.get(x), PredefinedName):
         raise IllFormedModule(node, reasons.AnnotationNameNotInScope(x))
-
-
-def annotated(e: ast.expr | None) -> TypeExpr:
-    """Type expression an annotation carries; a definition annotates every
-    parameter and its return type, and the subset admits no other annotation."""
-    assert e is not None
-    t = parse_annotation(e)
-    assert t is not None
-    return t
 
 
 def check_body(
@@ -293,7 +276,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> StaticO
         return Assigns({target.id: synth_expr(s.value, ctx)})
     if isinstance(s, ast.AnnAssign):
         assert s.value is not None and isinstance(s.target, ast.Name)
-        declared = resolve_type(annotated_type(s), s, ctx)
+        declared = resolve_type(annotated(s.annotation), s, ctx)
         check_expr(s.value, declared, ctx)
         check_assign_target(s.target, captures_e(s.value))
         return Assigns({s.target.id: declared})

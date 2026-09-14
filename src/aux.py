@@ -343,13 +343,20 @@ def nested_statements(s: ast.stmt) -> list[ast.stmt]:
 
 def own_fields(node: ast.ClassDef) -> tuple[tuple[str, TypeExpr], ...]:
     """Fields a class declares, with their type expressions."""
-    declared = [
-        (t.target.id, parse_annotation(t.annotation))
+    return tuple(
+        (t.target.id, annotated(t.annotation))
         for t in node.body
         if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)
-    ]
-    assert all(t is not None for _, t in declared)
-    return tuple((x, t) for x, t in declared if t is not None)
+    )
+
+
+def annotated(e: ast.expr | None) -> TypeExpr:
+    """Type expression an annotation carries; a definition annotates every
+    parameter and its return type, and the subset admits no other annotation."""
+    assert e is not None
+    t = parse_annotation(e)
+    assert t is not None
+    return t
 
 
 def qualified_name(e: ast.expr) -> str:
