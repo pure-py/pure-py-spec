@@ -104,7 +104,7 @@ def match_split(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Match | None:
     if result is None:
         return None
     matched, left, delta = result
-    return matched, left + without, delta
+    return matched, without + left, delta
 
 
 def match_literal(k: Shape, ell: LiteralType) -> Match | None:
