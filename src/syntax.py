@@ -271,10 +271,7 @@ def supported_expr(node: ast.expr) -> None:
         supported_expr(node.right)
         return
     if isinstance(node, ast.UnaryOp):
-        if isinstance(node.op, ast.Not):
-            supported_expr(node.operand)
-            return
-        if isinstance(node.op, (ast.UAdd, ast.USub)):
+        if isinstance(node.op, (ast.Not, ast.UAdd, ast.USub)):
             supported_expr(node.operand)
             return
         sym = OP_SYMBOLS.get(type(node.op), type(node.op).__name__)
