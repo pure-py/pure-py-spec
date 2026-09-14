@@ -298,9 +298,6 @@ def match_shapes(
 
 
 def seq_safe(p: ast.pattern, t: Type, ctx: ModuleContext) -> bool:
-    """Whether `p` applies each tuple pattern only to tuples and each list
-    pattern only to lists: no tuple pattern in `p` is checked against a type
-    with list values, and no list pattern against a type with tuple values."""
     if isinstance(t, UnionType):
         return seq_safe(p, t.left, ctx) and seq_safe(p, t.right, ctx)
     if isinstance(p, PatTuple):
