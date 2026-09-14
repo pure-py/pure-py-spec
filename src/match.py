@@ -13,7 +13,7 @@ from itertools import product
 
 import reasons
 from aux import qualified_name
-from classes import Class, declared_field, field_map, fields, short_name
+from classes import Class, declared_type, field_map, fields, short_name
 from contexts import (
     ModuleContext,
     Status,
@@ -229,7 +229,7 @@ def split_class(k: Rest, cls: Class) -> Split | None:
     low = meet(k.ty, ClassType(cls))
     if not isinstance(low, ClassType):
         return None
-    types = tuple(declared_field(low.c, x) for x in fields(low.c))
+    types = tuple(declared_type(low.c, x) for x in fields(low.c))
     kept = typed_heads(k.heads, low)
     return (
         tuple(Constr(low.c, ks, kept) for ks in shapes_seq(types)),
@@ -244,7 +244,7 @@ def split_subclass(k: Constr, cls: Class) -> Split | None:
         return None
     if below_excluded(cls, k.heads):
         return None
-    own = tuple(declared_field(cls, x) for x in fields(cls)[len(k.args) :])
+    own = tuple(declared_type(cls, x) for x in fields(cls)[len(k.args) :])
     kept = typed_heads(k.heads, ClassType(cls))
     return (
         tuple(Constr(cls, k.args + ks, kept) for ks in shapes_seq(own)),
@@ -327,7 +327,7 @@ def seq_safe(p: ast.pattern, t: Type, ctx: ModuleContext) -> bool:
         args = field_map(cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
         if args is None:
             return True  # likewise
-        return all(seq_safe(args[x], declared_field(cls, x), ctx) for x in fields(cls))
+        return all(seq_safe(args[x], declared_type(cls, x), ctx) for x in fields(cls))
     if isinstance(p, ast.MatchAs):
         return p.pattern is None or seq_safe(p.pattern, t, ctx)
     return True

@@ -66,8 +66,8 @@ def field_type(c: Class, x: str) -> Type | None:
     return field_type(base, x)
 
 
-def declared_field(c: Class, x: str) -> Type:
-    """Declared type of a field the class has."""
+def declared_type(c: Class, x: str) -> Type:
+    """Declared type of field `x` of `c`."""
     t = field_type(c, x)
     assert t is not None
     return t

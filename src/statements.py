@@ -18,7 +18,7 @@ from aux import (
     qualified_name,
     statements,
 )
-from classes import Class, declared_field, field_map, field_type, fields, short_name
+from classes import Class, declared_type, field_map, field_type, fields, short_name
 from contexts import (
     ASSIGNS_EMPTY,
     RETURNS,
@@ -422,7 +422,7 @@ def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
             )
             assert args is not None
             for x, arg in args.items():
-                check_expr(arg, declared_field(constructed, x), ctx)
+                check_expr(arg, declared_type(constructed, x), ctx)
             return ClassType(constructed)
         return call(e, ctx)
     if isinstance(e, ast.BinOp):
