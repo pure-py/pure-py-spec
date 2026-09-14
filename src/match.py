@@ -33,10 +33,10 @@ from shapes import (
     Shape,
     Tuple,
     below_excluded,
-    head_typed,
     shape_type,
     shapes,
     shapes_seq,
+    typed_heads,
 )
 from subtyping import join, meet, subtype
 from syntax import PatList, PatTuple
@@ -45,6 +45,7 @@ from type_syntax import (
     DictType,
     ListType,
     LiteralType,
+    Primitive,
     TupleType,
     Type,
     UnionType,
@@ -263,14 +264,6 @@ def pattern_seq(cls: Class, p: ast.MatchClass) -> tuple[ast.pattern, ...]:
     return tuple(args[x] for x in fields(cls))
 
 
-def typed_heads(
-    heads: frozenset[object], t: Type, ctx: ModuleContext
-) -> frozenset[object]:
-    """The heads typed at `t`, kept when an excluded set passes to a shape of a
-    narrower type."""
-    return frozenset(h for h in heads if head_typed(h, t, ctx))
-
-
 def match_seq(
     ks: Seq, ps: tuple[ast.pattern, ...], node: ast.pattern, ctx: ModuleContext
 ) -> SeqMatch | None:
@@ -304,26 +297,27 @@ def match_shapes(
     return matched, left, join_deltas([d for _, _, d in matches.values()], ctx)
 
 
-def agrees(p: ast.pattern, t: Type, ctx: ModuleContext) -> bool:
-    """Whether every sequence pattern within `p` meets only its own kind at
-    type `t`."""
+def seq_safe(p: ast.pattern, t: Type, ctx: ModuleContext) -> bool:
+    """Whether `p` applies each tuple pattern only to tuples and each list
+    pattern only to lists: no tuple pattern in `p` is checked against a type
+    with list values, and no list pattern against a type with tuple values."""
     if isinstance(t, UnionType):
-        return agrees(p, t.left, ctx) and agrees(p, t.right, ctx)
+        return seq_safe(p, t.left, ctx) and seq_safe(p, t.right, ctx)
     if isinstance(p, PatTuple):
-        if isinstance(t, ListType):
+        if isinstance(t, ListType) or t in (Primitive.SIZED, Primitive.OBJECT):
             return False
         if isinstance(t, TupleType) and len(t.components) == len(p.patterns):
-            return all(agrees(q, c, ctx) for q, c in zip(p.patterns, t.components))
+            return all(seq_safe(q, c, ctx) for q, c in zip(p.patterns, t.components))
         return True
     if isinstance(p, PatList):
-        if isinstance(t, TupleType):
+        if isinstance(t, TupleType) or t in (Primitive.SIZED, Primitive.OBJECT):
             return False
         if isinstance(t, ListType):
-            return all(agrees(q, t.elem, ctx) for q in p.patterns)
+            return all(seq_safe(q, t.elem, ctx) for q in p.patterns)
         return True
     if isinstance(p, ast.MatchMapping):
         if isinstance(t, DictType):
-            return all(agrees(q, t.value, ctx) for q in p.patterns)
+            return all(seq_safe(q, t.value, ctx) for q in p.patterns)
         return True
     if isinstance(p, ast.MatchClass):
         cls = class_of_name(p.cls, ctx)
@@ -332,9 +326,9 @@ def agrees(p: ast.pattern, t: Type, ctx: ModuleContext) -> bool:
         args = field_map(cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
         if args is None:
             return True  # likewise
-        return all(agrees(args[x], declared_field(cls, x), ctx) for x in fields(cls))
+        return all(seq_safe(args[x], declared_field(cls, x), ctx) for x in fields(cls))
     if isinstance(p, ast.MatchAs):
-        return p.pattern is None or agrees(p.pattern, t, ctx)
+        return p.pattern is None or seq_safe(p.pattern, t, ctx)
     return True
 
 

@@ -27,8 +27,8 @@ from contexts import (
     ModuleLoaded,
     ModuleStub,
     PredefinedName,
-    StaticOutcome,
     Returns,
+    StaticOutcome,
     Status,
     VarContext,
     class_of_name,
@@ -42,7 +42,7 @@ from contexts import (
     resolve_name,
     var_type,
 )
-from match import agrees, literal_of, match_shapes
+from match import literal_of, match_shapes, seq_safe
 from operators import (
     BINARY_NAMES,
     UNARY_NAMES,
@@ -222,7 +222,9 @@ def check_seq(
 
 def extend(outcome: StaticOutcome, ctx: ModuleContext) -> ModuleContext:
     return (
-        override_gamma(ctx, dict(outcome.delta)) if isinstance(outcome, Assigns) else ctx
+        override_gamma(ctx, dict(outcome.delta))
+        if isinstance(outcome, Assigns)
+        else ctx
     )
 
 
@@ -345,7 +347,7 @@ def match_cases(
     left = seed
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):
-        if not agrees(case.pattern, subject, ctx):
+        if not seq_safe(case.pattern, subject, ctx):
             raise IllFormedModule(
                 case.pattern,
                 reasons.SequenceKindClash(describe(case.pattern, ctx), render(subject)),

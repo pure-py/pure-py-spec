@@ -1,4 +1,4 @@
-# rule: match -- a tuple pattern agrees with no list type
+# rule: case -- a tuple pattern is not sequence-safe at a union with a list member
 def f(s: list[int] | tuple[int, int]) -> int:
     match s:
         case (a, b):

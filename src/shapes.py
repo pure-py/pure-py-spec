@@ -95,8 +95,9 @@ def shape_type(k: Shape) -> Type:
 def shapes(t: Type, heads: frozenset[object], ctx: ModuleContext) -> tuple[Shape, ...]:
     """Shapes of `t` that remain once the heads in `heads` are excluded."""
     if isinstance(t, UnionType):
-        left = shapes(t.left, heads, ctx)
-        return left + tuple(k for k in shapes(t.right, heads, ctx) if k not in left)
+        left = shapes(t.left, typed_heads(heads, t.left, ctx), ctx)
+        right = shapes(t.right, typed_heads(heads, t.right, ctx), ctx)
+        return left + tuple(k for k in right if k not in left)
     if isinstance(t, LiteralType) and t in heads:
         return NOTHING
     if t == Primitive.BOOL and {LiteralType(True), LiteralType(False)} <= heads:
@@ -121,6 +122,14 @@ def head_typed(h: object, t: Type, ctx: ModuleContext) -> bool:
         return subtype(h, t)
     assert isinstance(h, int)
     return isinstance(t, ListType)
+
+
+def typed_heads(
+    heads: frozenset[object], t: Type, ctx: ModuleContext
+) -> frozenset[object]:
+    """The heads typed at `t`, kept when an excluded set passes to a shape of a
+    narrower type."""
+    return frozenset(h for h in heads if head_typed(h, t, ctx))
 
 
 def below_excluded(c: Class, heads: frozenset[object], ctx: ModuleContext) -> bool:

@@ -1,4 +1,4 @@
-# rule: match -- a sub-pattern agrees at the declared type of its field
+# rule: case -- a constructor pattern is sequence-safe only if each sub-pattern is, at the declared type of its field
 from dataclasses import dataclass
 
 

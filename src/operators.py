@@ -250,9 +250,7 @@ def minimum(rows: Sequence[ResolvedOverload]) -> ResolvedOverload | None:
     """The least element under the bounds order, or nothing where none
     exists."""
     for cand in rows:
-        if all(
-            all(subtype(a, b) for a, b in zip(cand[0], other[0])) for other in rows
-        ):
+        if all(all(subtype(a, b) for a, b in zip(cand[0], other[0])) for other in rows):
             return cand
     return None
 
@@ -260,4 +258,3 @@ def minimum(rows: Sequence[ResolvedOverload]) -> ResolvedOverload | None:
 def result_of_min(rows: Sequence[ResolvedOverload]) -> Type | None:
     chosen = minimum(rows)
     return chosen[1] if chosen is not None else None
-
