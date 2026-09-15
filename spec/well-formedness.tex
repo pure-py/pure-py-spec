@@ -28,7 +28,7 @@ type expression denotes a type under a context (\figref{resolve-type}). Every de
 annotation for its parameters and return type, so the type of a definition is given rather than
 inferred from its body. A class name resolves to a
 class (\figref{resolve-name}) and every other name must resolve to a predefined name
-(\figref{predefined-types}). The function $\baseType(\tau)$ discards the precision of a
+(\figref{predefined-signatures}). The function $\baseType(\tau)$ discards the precision of a
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and leaving every other type alone
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:base-type}}).
 
@@ -106,7 +106,7 @@ $\fieldMap$, checks it against that field's type, and synthesises the class $C$ 
 synthesise a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(\Sigma, C)$
 (\ruleName{attr-object}). The signature of a predefined module binds
 $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type listed for it
-(\figref{predefined-types}, Definition~\ref{def:predefined}). A module attribute reference
+(\figref{predefined-signatures}, Definition~\ref{def:predefined}). A module attribute reference
 $\exAttr{e}{x}$ resolves as a qualified name to a definitely assigned member
 (\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}. A variable bound to a module or
 class is not an expression on its own, and occurs only as the head of a qualified
@@ -260,7 +260,7 @@ and an unannotated assignment takes the type synthesised by the expression (\rul
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
 the class name to $\Type{C}$, requiring the fields it declares to be distinct and, when it extends
 another class, the base name to be bound to a class and the additional fields not to repeat an inherited field
-(\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-types}) to be in
+(\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
 scope; every \PurePy class must declare itself a dataclass. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
 

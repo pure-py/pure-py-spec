@@ -1,0 +1,43 @@
+\begin{figure}
+\small
+\centering
+\begin{tabular}{llll}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Module & Member & \multicolumn{2}{l}{Value} \\
+\textup{\pyinline{builtins}} & \pyinline{print} & & \\
+ & \pyinline{len} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
+ & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
+ & & $\quad \primFn(\seq{u}) = \aborts{\errType}$ & otherwise \\
+ & \pyinline{None} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{None}}$} \\
+ & \pyinline{object} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{object}}$} \\
+ & \pyinline{bool} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{bool}}$} \\
+ & \pyinline{int} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{int}}$} \\
+ & \pyinline{float} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{float}}$} \\
+ & \pyinline{str} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{str}}$} \\
+ & \pyinline{list} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{list}}$} \\
+ & \pyinline{dict} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{dict}}$} \\
+ & \pyinline{tuple} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{tuple}}$} \\
+\pyinline{math} & \pyinline{pi} & & \\
+ & \pyinline{e} & & \\
+ & \pyinline{sqrt} & & \\
+ & \pyinline{exp} & & \\
+ & \pyinline{log} & & \\
+ & \pyinline{sin} & & \\
+ & \pyinline{cos} & & \\
+ & \pyinline{tan} & & \\
+ & \pyinline{floor} & & \\
+ & \pyinline{ceil} & & \\
+\pyinline{sys} & \pyinline{argv} & & \\
+ & \pyinline{exit} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
+ & & $\quad \primFn(\varepsilon) = \aborts{\errExit{0}}$ & \\
+ & & $\quad \primFn(n) = \aborts{\errExit{n}}$ & \\
+\pyinline{typing} & \pyinline{Callable} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Callable}}$} \\
+ & \pyinline{Literal} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Literal}}$} \\
+ & \pyinline{Never} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Never}}$} \\
+ & \pyinline{Sized} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Sized}}$} \\
+\pyinline{dataclasses} & \pyinline{dataclass} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{dataclasses}.\pyinline{dataclass}}$}
+\end{tabular}
+
+\caption{Predefined modules and the values of their members}
+\label{fig:predefined-values}
+\end{figure}
