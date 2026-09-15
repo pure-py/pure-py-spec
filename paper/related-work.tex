@@ -53,7 +53,7 @@ Checking that the cases of a match are reachable and exhaustive goes back to the
 ML~\cite{maranget2007}, which decides whether a pattern matches some value that no preceding pattern
 matches, and to the term descriptions of \citet{sestoft1996}, which record the constructors established and
 excluded at each position of the scrutinee as match compilation proceeds. \PurePy computes
-both from a residual, the set of values no earlier case has matched, and seeds that residual from the type of
-the scrutinee, so the types of the bindings a pattern makes come from the same computation. Accounting for
-the type in this way follows the uncovered sets of \citet{karachalias2015}, which track what a GADT match
-leaves and rule out cases the indices make impossible.
+both from a residual, the set of values that no earlier case has matched, and seeds that residual from the
+type of the scrutinee, so the types of the variables bound by a pattern come from the same computation. The
+uncovered sets of \citet{karachalias2015} account for the type in the same way, tracking the values left
+unmatched by a GADT match and ruling out cases made impossible by the type indices.
