@@ -1,6 +1,6 @@
 # PurePy - A Pure Functional Subset of Python
 
-[![submit](https://github.com/pure-py/pure-py-spec/actions/workflows/submit.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/submit.yml)
+[![paper submission](https://github.com/pure-py/pure-py-spec/actions/workflows/paper-submission.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/paper-submission.yml)
 
 ## [v0.15.1](https://github.com/pure-py/pure-py-spec/releases/download/v0.15.1/PurePy-spec.pdf)
 
@@ -110,7 +110,7 @@ uv run --locked python src/check_program.py path/to/main.py
 
 ## Submission
 
-`make submit` builds the anonymised paper and `supplementary.zip`, which carries the anonymised
+`make paper-submission` builds the anonymised paper and `supplementary.zip`, which carries the anonymised
 specification and the Isabelle mechanisation. It refuses to build unless the `isabelle-purepy` submodule is
 checked out, has no uncommitted changes, and sits at a commit `origin/main` already contains, so a
 submission never ships a working copy. Check it out with:

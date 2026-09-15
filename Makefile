@@ -57,7 +57,7 @@ supplementary.zip: spec-anon.pdf check-mechanisation
 check-tests:
 	uv run --locked ./test/run-all.sh
 
-submit: check-tests paper-anon.pdf supplementary.zip
+paper-submission: check-tests paper-anon.pdf supplementary.zip
 
 # arXiv runs pdflatex but not bibtex, so the source ships with the .bbl of the current build.
 paper-arXiv.zip: paper.pdf
@@ -67,4 +67,4 @@ paper-arXiv.zip: paper.pdf
 clean:
 	rm -f $(AUX) *.pdf *.zip
 
-.PHONY: default submit clean check-mechanisation check-tests
+.PHONY: default paper-submission clean check-mechanisation check-tests
