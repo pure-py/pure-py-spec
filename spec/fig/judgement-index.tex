@@ -8,21 +8,21 @@ $\Sigma \vdash h : \tau$ & head $h$ has type $\tau$ & \figref{shapes} \\
 $\Sigma \vdash k : \tau$ & shape $k$ has type $\tau$ & \figref{shapes} \\
 $\Sigma; \Gamma \vdash k, p \splits K, L$ & shape $k$ splits at the head tested by $p$, giving $K$ and $L$ & \figref{split} \\
 $\Sigma; \Gamma \vdash k, p \matches K, L \binding \Delta$ & pattern $p$ matches shapes $K$ of $k$, leaving $L$ and binding $\Delta$ & \figref{pat} \\
-$\Gamma \vdash q : \theta$ & qualified name $q$ denotes entry $\theta$ & \figref{resolve-name} \\
+$\Gamma \vdash q : \theta$ & qualified name $q$ denotes context entry $\theta$ & \figref{resolve-name} \\
 $\Sigma; \Gamma \vdash e \synth \tau$ & expression $e$ synthesises type $\tau$ & \figref{typing-synth} \\
 $\Sigma; \Gamma \vdash e \checks \tau$ & expression $e$ checks against type $\tau$ & \figref{typing-check} \\
 $\Sigma; \Gamma \vdash \seq{g} : \Delta$ & comprehension qualifiers $\seq{g}$ bind $\Delta$ & \figref{typing-check} \\
 $\Sigma; \Gamma; \zeta \vdash s : R$ & statement $s$ has static outcome $R$, with return type $\zeta$ & \figref{typing-stmt} \\
 $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ & cases $\seq{b}$ have static outcome $S$, transforming residual $L$ to $L'$ & \figref{typing-cases} \\
-$\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ & top-level statement $t$ in module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$ & \figref{typing-top} \\
-$\Sigma \vdash \Gamma, x \importsR \theta \binding \Sigma'$ & name $x$ imported from module signature $\Gamma$ has entry $\theta$ & \figref{typing-imports} \\
+$\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ & top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$ & \figref{typing-top} \\
+$\Sigma \vdash \Gamma, x \importsR \theta \binding \Sigma'$ & name $x$ imported from module signature $\Gamma$ has context entry $\theta$ & \figref{typing-imports} \\
 $\Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma'$ & imports $\seq{\iota}$ of module $q$ yield context $\Gamma$ & \figref{typing-import-prefix} \\
-$\Sigma \vdash q, \theta \loadsAs \theta' \binding \Sigma'$ & importing module $q$ into entry $\theta$ gives entry $\theta'$ & \figref{typing-import-prefix} \\
+$\Sigma \vdash q, \theta \loadsAs \theta' \binding \Sigma'$ & importing module $q$ into context entry $\theta$ gives context entry $\theta'$ & \figref{typing-import-prefix} \\
 $\Sigma \vdash_{\mathsf{load}} q : \Gamma \binding \Sigma'$ & module $q$ statically loads with signature $\Gamma$ & \figref{typing-module} \\
 $\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{typing-module}
    \\[2mm]
 \metaGroup{Evaluation} \\
-$\vdash v : \theta$ & value $v$ has entry $\theta$ & \figref{value-typing} \\
+$\vdash v : \theta$ & value $v$ has context entry $\theta$ & \figref{value-typing} \\
 $\vdash \rho : \Gamma$ & environment $\rho$ has context $\Gamma$ & \figref{value-typing} \\
 $\rho, p, v \matches m$ & pattern $p$ matches value $v$ with match result $m$ & \figref{eval-pat} \\
 $\rho, s \Rightarrow o$ & statement $s$ evaluates to outcome $o$ & \figref{eval-block-outcome} \\
