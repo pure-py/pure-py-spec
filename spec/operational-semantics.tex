@@ -47,7 +47,7 @@ A value has a context entry, and an environment a context, by \figref{value-typi
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any statement $s$ with
 $\Gamma \vdash s : R$, the statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
 to outcome $o$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Top-level statements
-have a judgement of their own, $q; \rho, t \Rightarrow o$\speconly{ (\figref{eval-top})}, mirroring the static
+have a judgement of their own, $q, \rho, t \Rightarrow o$\speconly{ (\figref{eval-top})}, mirroring the static
 judgement (\figref{typing-top}): a sequence composes in the same way as a statement sequence, a class declaration binds
 its name to the class $\fq{q.c}$, and a plain statement is evaluated by the statement judgement
 (\ruleName{eval-top-stmt}). Function definitions delimit
