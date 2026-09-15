@@ -86,17 +86,17 @@ $\False$ where either argument is undefined or not definitely assigned, and the 
 types otherwise, so $\bot$ is not a unit.
 \input{spec/fig/context-ops}
 
-A third operation, \emph{context extension} $\Gamma \extend \Delta$, also \figref{context-ops},
+A third operation, \emph{context extension} $\Gamma \extend \Delta$ (also \figref{context-ops}),
 combines module references for the same module recursively, preferring loaded references to stubs, and is
-otherwise right-biased like override. It is used when processing import prefixes, where two imports rooted
-at the same module must combine rather than shadow.
+otherwise right-biased like override. It is used in processing an import prefix, in which two imports with the same root, such as
+\pyinline{a.b} and \pyinline{a.c}, both bind the root and must combine rather than shadow.
 
 \subsection{Expressions and statements}
 \label{sec:expressions-statements}
 
 Statements are sequenced by
 juxtaposition, $s\;s'$; a function body, a branch of a conditional and the body of a case are statements.
-A \emph{top-level statement} $t$ is a statement or a class declaration, sequenced likewise; the body of a
+A \emph{top-level statement} $t$ is a statement or a class declaration, also sequenced by juxtaposition; the body of a
 module after its imports is a top-level statement, so class declarations occur only at the top level of a
 module. A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal
 run of consecutive \pyinline{def} statements in a sequence: any other statement separates mutual
@@ -118,9 +118,9 @@ fills the field $x$. It is undefined unless every field receives exactly one arg
 \paragraph{Type annotations.}
 
 Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
-may be (\figref{syntax-types}). A type expression names a class by a qualified name; a marked name
+may be annotated (\figref{syntax-types}). A type expression names a class by a qualified name; a marked name
 $\fq{q}$ is fully qualified, and does not occur in source. A \emph{type} $\tau$ is a type expression whose
-class names are all marked; the type system resolves the one into the other\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
+class names are all marked; the type system resolves a type expression into a type\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
 \bind{x_n}{\psi_n}$. The well-formedness rules and operational semantics do not consult annotations, which are given
 meaning by the type system.
 
@@ -129,8 +129,8 @@ meaning by the type system.
 
 The metavariable $\odot$ ranges over the supported binary operators other than \pyinline{and} and
 \pyinline{or}, and $\ominus$ over the supported unary
-operators, both enumerated in \figref{precedence}. The operators \pyinline{and} and \pyinline{or} have their own
-expression forms; they do not evaluate both operands. The grammar of \figref{syntax-expr} is intentionally ambiguous
+operators, both enumerated in \figref{precedence}. The operators \pyinline{and} and \pyinline{or} are distinct
+expression forms, since they need not evaluate both operands. The grammar of \figref{syntax-expr} is intentionally ambiguous
 on operator forms; disambiguation is by the precedence and associativity given in \figref{precedence},
 which follow Python.
 
@@ -145,7 +145,7 @@ $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
 $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
 $\seq{\iota}$, its \emph{import prefix}, followed by a top-level statement $t$; since imports are not statements, they can appear neither
 within a statement nor after it. The statement begins with the
-assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$, which binds the module's name when it
+assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$, which binds the name of the module when the module
 loads (\secref{well-formedness-modules}).
 
 A second map $\mathcal{P}$ gives the
@@ -153,8 +153,8 @@ predefined modules of \figref{predefined}, which have no body: $\mathcal{P}$ tak
 environment and context (Definition~\ref{def:predefined}). The two domains are disjoint, and their union is
 prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$ is itself in
 $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: its modules are the \texttt{.py} files and the
-directories, each named by its path, so the domain is prefix-closed by construction. A module's statement is
-the statements of its \texttt{.py} file, or of its \texttt{\_\_init\_\_.py} for a directory, preceded by the
+directories, each named by its path, so the domain is prefix-closed by construction. The statement of a module is
+the statement sequence of its \texttt{.py} file, or of its \texttt{\_\_init\_\_.py} for a directory, preceded by the
 $\pymath{\_\_name\_\_}$ assignment; a directory without an \texttt{\_\_init\_\_.py} (a namespace package,
 PEP 420, \url{https://peps.python.org/pep-0420/}) contributes that assignment alone.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
 definitions that follow.
@@ -163,8 +163,7 @@ definitions that follow.
 \begin{definition}[Predefined contexts and environments]
 \label{def:predefined}
 $\mathcal{P}$ takes each module $q$ of \figref{predefined} to a pair $(\Gamma, \rho)$, where $\Gamma$
-binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member listed for $q$ in \figref{predefined-types} at
-its entry there, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value
+binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \figref{predefined-types}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value
 (\figref{predefined}). These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
 the predefined signatures.
