@@ -258,14 +258,14 @@ assignment can take a declared class's name. A
 and an unannotated assignment takes the type synthesised by the expression (\ruleName{assign},
 \ruleName{assign-unannot}). The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
-the class name to $\Type{C}$, requiring the class's own fields to be distinct and, where it extends
+the class name to $\Type{C}$, requiring the class's own fields to be distinct and, when it extends
 another class, the base name to be bound to a class and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-types}) to be in
 scope; every \PurePy class must declare itself a dataclass. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
 
-A function definition binds its parameters at their annotated types, plus the names of the
-mutual region it belongs to, including its own name, each at the appropriate $\pyinline{Callable}$ type; variables assigned in the body start
+A function definition binds its parameters at their annotated types, plus the names of its
+mutual region, including its own name, each at the appropriate $\pyinline{Callable}$ type; variables assigned in the body start
 at $\False$ (\ruleName{def}), emulating Python's scoping of function bodies, which
 prefers a locally assigned name to one visible in an enclosing scope. The body is checked with the
 declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
@@ -277,7 +277,7 @@ the cases in turn: each case's pattern is matched against the \emph{residual} $L
 over-approximation of the values of $\sigma$ which remain unmatched by earlier cases, its body is
 checked under the pattern's bindings, and the outcomes
 are merged into $S$. The match rules start the
-residual from the shapes of $\sigma$ (\figref{shapes}); \ruleName{match} applies where the final residual is empty; \ruleName{match-partial} applies otherwise, merging in
+residual from the shapes of $\sigma$ (\figref{shapes}); \ruleName{match} applies when the final residual is empty; \ruleName{match-partial} applies otherwise, merging in
 $\Assigns{\varnothing}$ for the values that fall through. Shapes and matching a pattern against the residual
 are the subject of \secref{well-formedness-patterns}.
 
@@ -296,8 +296,8 @@ ordered set of \emph{shapes} (\figref{shapes}). A shape denotes a set of values 
 residual denotes the values of the scrutinee type which remain unmatched by earlier cases. Matching the case removes from the residual the values matched
 by $p$ (\figref{pat}); a case that does not match any shape of the residual is unreachable and the match is rejected.
 The match is exhaustive if the last case leaves the residual empty, and may
-otherwise fall through (\ruleName{match}, \ruleName{match-partial}). Checking reachability and
-exhaustiveness with one relation follows the usefulness algorithm for ML~\cite{maranget2007}. The residual plays the
+otherwise fall through (\ruleName{match}, \ruleName{match-partial}). The usefulness algorithm for
+ML~\cite{maranget2007} also checks reachability and exhaustiveness with a single relation. The residual plays the
 role of the term descriptions of \citet{sestoft1996}, and the uncovered sets of \citet{karachalias2015}
 likewise let the type exclude cases.
 
@@ -368,7 +368,7 @@ dictionaries that lack the key; once every key of the pattern is in $\beta$ the 
 (\ruleName{pat-dict}), each key $w$ against $\beta(w)$. The empty dictionary pattern matches every
 dictionary and leaves the empty residual.
 
-Which cases exhaust a match therefore depends on the type of the scrutinee: a union is exhausted
+The cases needed to exhaust a match therefore depend on the type of the scrutinee: a union is exhausted
 by covering each member, a class type by a pattern for the class itself, \pyinline{bool} by
 \pyinline{True} and \pyinline{False}, and a dictionary type by the empty dictionary pattern, while \pyinline{int}, \pyinline{str} and lists have
 unboundedly many heads and need a variable or wildcard. A literal-typed scrutinee is exhausted by covering
@@ -405,16 +405,16 @@ descendant of the importing module is excluded outright\paperonly{ (\secref{no-l
 may thus require other modules to load first; the rules are interpreted inductively, so a program with an
 import cycle is ill-formed, because a module in a cycle could finish loading only after itself. Program
 well-formedness (\figref{typing-module}) requires the main module to be well typed and hence,
-recursively, every module the program can load; a module that is never imported is not checked.
+recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
 overridden by the imported context, so the members of \pyinline{builtins} are in scope
 unqualified.
 
 \input{spec/fig/typing-module}
 
-The signature $\Gamma$ that static loading produces (\figref{typing-module}) comprises the classes
-and variables a module defines, together with its intrinsic \pyinline{__name__} and a stub for each submodule,
-never the names it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
+The signature $\Gamma$ produced by static loading (\figref{typing-module}) comprises the classes
+and variables defined by a module, together with its intrinsic \pyinline{__name__} and a stub for each submodule,
+but not the names that it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
 name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own
 bindings are disjoint, because the module rules exclude a module that binds a name that is also the name of
 a submodule\paperonly{ (\secref{no-load-dependent})}.
