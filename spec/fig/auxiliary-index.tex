@@ -17,7 +17,7 @@
 \noalign{\vskip 2mm}
 \auxgroup{Types}
 \auxrow{$\baseType(\ell)$, $\baseType(\tau)$}{type}{base type of literal $\ell$, or of type $\tau$}{aux:base-type}
-\auxrow{$\joinTy{\Sigma}{\sigma}{\tau}$, $\bigJoinTy{\Sigma}{\seq{\tau}}$}{type}{larger type where comparable, union otherwise}{aux:join}
+\auxrow{$\joinTy{\Sigma}{\sigma}{\tau}$, $\bigJoinTy{\Sigma}{\seq{\tau}}$}{type}{larger type if comparable, and union otherwise}{aux:join}
 \auxrow{$\meetTy{\Sigma}{\sigma}{\tau}$}{type}{greatest type below both}{aux:meet}
 \auxrow{$\elemTy(\Sigma, \tau)$}{type}{type of elements drawn from $\tau$ by generator}{aux:elem-type}
 \auxrow{$\shapes(\Sigma, \tau, H)$, $\shapes(\Sigma, \seq{\tau})$}{ordered set of shapes or of shape sequences}{shapes of $\tau$ once heads in $H$ are excluded; sequences of shapes of $\seq{\tau}$}{aux:shapes}
@@ -39,9 +39,9 @@
 \auxrow{$\memOp(v, v')$}{Boolean}{whether $v'$ is element of $v$}{aux:contains}
 \specauxrow{$\memElems(\seq{v}, v)$}{Boolean}{whether $\seq{v}$ has element equal to $v$}{aux:contains-elems}
 \specauxrow{$\elems(v)$}{sequence of values}{elements of list, tuple or string}{aux:elems}
-\auxrow{$\iterOp(v)$}{sequence of values}{sequence generator draws from $v$; keys if $v$ is dictionary}{aux:iter}
+\auxrow{$\iterOp(v)$}{sequence of values}{sequence drawn from $v$ by generator; keys if $v$ is dictionary}{aux:iter}
 \auxrow{$\getitem(v, v')$}{value or abort}{subscripting; $\errIndex$ for index out of range, $\errKey$ for missing key, $\errType$ otherwise}{aux:getitem}
-\auxrow{$\result(o)$}{value or abort}{statement outcome as result: returned value, \pyinline{None} if block falls off end, abort unchanged}{aux:result}
+\auxrow{$\result(o)$}{value or abort}{statement outcome as result: returned value, \pyinline{None} if statement completes without returning, abort unchanged}{aux:result}
 \auxrow{$\dispatch(\rho, v, \seq{p}, \seq{s})$}{bindings and statement}{case taken by \pyinline{match}}{aux:dispatch}
 \specauxrow{$\entries(\delta, \delta')$}{dictionary entries}{$\delta$ extended by $\delta'$ in order, later overriding earlier}{aux:entries}
 \specauxrow{$\update(\delta, w, v)$}{dictionary entries}{$\delta$ with $w$ bound to $v$, replacing earlier binding}{aux:update}
