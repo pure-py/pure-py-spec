@@ -1,14 +1,14 @@
 \subsection{Metatheory}
 \label{sec:metatheory}
 
-Value typing (\figref{value-typing}) gives an ordinary value its type, and a module or
-class value the matching entry; an environment has the context binding its variables at those entries. The
+Value typing (\figref{value-typing}) gives an ordinary value its type and a module or class value the
+corresponding context entry; environment typing applies this pointwise, giving an environment a context. The
 predefined environments are well-formed by construction, and a module loads to an environment typed at its
 signature.
 
 \begin{theorem}[Loaded environments are well-formed]
 \label{thm:loaded}
-If $\vdash_{\mathsf{load}} q : \Gamma$ then every type in an entry of $\Gamma$ is well-formed in the
+If $\vdash_{\mathsf{load}} q : \Gamma$ then every type in a context entry of $\Gamma$ is well-formed in the
 context in which $q$ is checked.
 If $\mathcal{P}(q) = (\rho, \Gamma)$ then $\vdash \rho : \Gamma$.
 If $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \val{\rho}$ then $\vdash \rho : \Gamma$.
