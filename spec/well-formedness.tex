@@ -5,7 +5,8 @@
 Well-formedness is the static part, a judgement on programs defined in this \seckind{}; the operational
 semantics (\secref{operational-semantics}) is defined for well-formed programs. A program is well-formed
 when it is well typed, so the rules of this \seckind{} give each expression a type, each statement a
-static outcome recording what it assigns or returns, and each module a signature. The \seckind{} introduces
+static outcome recording either the assignments made or the fact that the statement definitely returns,
+and each module a signature. The \seckind{} introduces
 types and subtyping, then follows the syntax of \secref{syntax}, taking statements, expressions and
 patterns, then modules and programs, and \secref{operational-semantics} gives each of these a dynamic
 counterpart.
@@ -144,8 +145,8 @@ matching any other element type. An empty list or dictionary and a lambda have n
 synthesis rule at all, so checking is the only way to type them. A lambda applied to arguments is the
 exception, since the arguments give the parameter types, and the call then synthesises the type of the body
 or checks the body against an expected type (\ruleName{syn-call-lambda}, \ruleName{call-lambda}). A non-empty list has both, and the
-checking rule is still needed where the expected element type is wider than the one the elements
-synthesise, since \pyinline{list} is invariant.
+checking rule is still needed when the expected element type is wider than the type synthesised by the
+elements, since \pyinline{list} is invariant.
 
 Typing a comprehension types its qualifiers, which bind the variables that can be used in the body
 (\figref{typing-check}). A generator's variable is bound at $\elemTy$ of the type synthesised by the
