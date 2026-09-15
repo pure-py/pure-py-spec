@@ -16,7 +16,7 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 - `paper.tex` — the paper
 - `PurePy-spec.tex` — the language specification as a standalone document, separate from the paper (#134)
 - `spec/` — the specification's sources; the paper is assembled from these
-- `paper/` — the paper's own material
+- `paper/` — material that belongs only to the paper
 - `tex/` — macros and bibliography shared by both documents
 - `graduality.tex`, `graduality/` — draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
 - `agda/` — Agda mechanisation (distributivity proof), likely to migrate to Isabelle
