@@ -38,7 +38,7 @@ literal type, taking $\tyLiteral{42}$ to \pyinline{int} and leaving every other 
 Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and a class below its
 ancestors, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
 each of its members and below every type that is above all of them. A tuple type is covariant, below another of the
-same length whose components are above its own. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; both notations follow \citet{pierce2002}. Lists and
+same length when each of its components is below the corresponding component. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; both notations follow \citet{pierce2002}. Lists and
 dictionaries are related only when their components are equivalent, since both are invariant in mypy
 and covariance would accept programs rejected by mypy. A callable type is contravariant in its parameters
 and covariant in its result, following mypy. The types with a length, namely lists, dictionaries,
@@ -86,8 +86,8 @@ annotated and an empty list does not determine its element type, and elimination
 reference starts from a subterm whose type is known. Type systems that follow the recipe strictly usually
 rely on an annotation form $(e \mathbin{:} \tau)$, which synthesises by construction, so a checking form
 written with an annotation can be used in any context where synthesis is required. Python has no such form,
-allowing annotations only on parameters, returns and assignments, so \PurePy gives the introduction forms
-synthesis rules of their own wherever their parts determine the type; Swift, Kotlin and Scala
+allowing annotations only on parameters, returns and assignments, so \PurePy gives each introduction form
+a synthesis rule wherever its parts determine the type; Swift, Kotlin and Scala
 take similar approaches for similar reasons~\cite{swift2025,kotlin2025,odersky2025}.
 
 Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise.
@@ -122,8 +122,8 @@ form, to keep the judgement deterministic. A subscript, attribute reference or c
 synthesises a union is typed at each member, with a variable in place of the subject, and synthesises the
 join of the results (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union}); generators need no
 such rule, because $\elemTy$ takes a union to the join of its members' element types.
-\citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here each
-elimination form has its own rule.
+\citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
+stated separately for each elimination form.
 
 Lambdas check, as do lists, tuples, dictionaries and comprehensions. An expression that synthesises $\sigma$ checks against any supertype
 of $\sigma$ (\ruleName{check-synth}), which applies only when no other rule concludes $\Sigma; \Gamma \vdash e \checks
@@ -132,7 +132,7 @@ syntax-directed and an expression has at most one derivation in each.
 
 \input{spec/fig/typing-check}
 
-The forms with synthesis rules of their own are conditional expressions when a branch
+The forms that synthesise are conditional expressions when a branch
 synthesises, at the join of the two types when both branches synthesise and otherwise at the
 synthesising branch's type, the other branch checking against it (\ruleName{syn-cond});
 tuples when every component synthesises (\ruleName{syn-tuple}); comprehensions when the body
@@ -246,8 +246,8 @@ optional return type $\zeta$, statement $s$ has static outcome $R$ (\figref{typi
 A sequence $s\;s'$ (\ruleName{seq}) types $s$, types $s'$ under $\Gamma$ overridden by the context assigned
 by $s$, and requires that no variable captured by $s$ is assigned in $s'$. A conditional combines its
 branches with $\mergeS$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
-Top-level statements have a judgement of
-their own, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top}): a sequence composes in the same way as a statement sequence, a
+Top-level statements are checked by a separate
+judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top}): a sequence composes in the same way as a statement sequence, a
 class declaration is a top-level form, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A top-level
 statement may not assign a name that an earlier top-level statement bound to a class
@@ -258,14 +258,14 @@ assignment can take a declared class's name. A
 and an unannotated assignment takes the type synthesised by the expression (\ruleName{assign},
 \ruleName{assign-unannot}). The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
-the class name to $\Type{C}$, requiring the class's own fields to be distinct and, when it extends
+the class name to $\Type{C}$, requiring the fields it declares to be distinct and, when it extends
 another class, the base name to be bound to a class and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-types}) to be in
 scope; every \PurePy class must declare itself a dataclass. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
 
 A function definition binds its parameters at their annotated types, plus the names of its
-mutual region, including its own name, each at the appropriate $\pyinline{Callable}$ type; variables assigned in the body start
+mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables assigned in the body start
 at $\False$ (\ruleName{def}), emulating Python's scoping of function bodies, which
 prefers a locally assigned name to one visible in an enclosing scope. The body is checked with the
 declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
@@ -360,7 +360,7 @@ A constructor pattern whose class lies below a
 class of the excluded set matches nothing, because an earlier case for the superclass has already
 matched every instance.
 
-A dictionary shape has a form of its own,
+A dictionary shape has a separate form,
 $\shapeDict{\tau}{\beta}{H}$, standing for the dictionaries that hold each key $w$ in the domain of
 $\beta$ with a value of shape $\beta(w)$, but that hold no key of $H$. A dictionary pattern takes its keys in order, with no key occurring twice. A key in
 neither $\beta$ nor $H$ splits the shape at that key (\ruleName{split-dict}), adding to the residual the
@@ -415,7 +415,7 @@ unqualified.
 The signature $\Gamma$ produced by static loading (\figref{typing-module}) comprises the classes
 and variables defined by a module, together with its intrinsic \pyinline{__name__} and a stub for each submodule,
 but not the names that it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
-name is a private dependency, not re-exported as part of the interface. Submodule stubs and the module's own
-bindings are disjoint, because the module rules exclude a module that binds a name that is also the name of
+name is a private dependency, not re-exported as part of the interface. Submodule stubs and the bindings of the module
+body are disjoint, because the module rules exclude a module that binds a name that is also the name of
 a submodule\paperonly{ (\secref{no-load-dependent})}.
 

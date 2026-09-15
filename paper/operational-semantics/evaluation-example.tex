@@ -4,7 +4,7 @@ Concretely, \ruleName{eval-binop} evaluates both operands and binds the result o
 \end{mathpar}
 The meaning $\hat{\odot}(v, v')$ of the operator is likewise a partial map from operands to results, with
 an abort if Python raises an exception; an expression whose operator meaning is undefined has no
-derivation. An abort from the first operand is propagated by a rule of its own:
+derivation. An abort from the first operand is propagated by a separate rule:
 \begin{mathpar}
 \input{spec/rules/eval-binop-fail}
 \end{mathpar}

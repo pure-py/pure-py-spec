@@ -1,4 +1,4 @@
-% Draft notes for gradual typing, built as their own document (graduality.tex) rather than as
+% Draft notes for gradual typing, built as a separate document (graduality.tex) rather than as
 % a chapter of the specification.
 \section{Graduality}
 \label{sec:graduality}
@@ -136,7 +136,7 @@ the other outer type (\ruleName{three-sub-any-left}, \ruleName{three-sub-never-l
 an outer position reassociates, because its witness is a union, below a type exactly when both
 components are (\ruleName{three-sub-assoc}). Otherwise each outer witness shares its
 head with the gradual type that it witnesses, and neither is a union. In the middle, $\tyAny$ admits the witness $\tyObject$
-(\ruleName{three-sub-any}). A static middle type is its own sole concretisation, so sharing is
+(\ruleName{three-sub-any}). A static middle type concretises to itself alone, so sharing is
 trivial and two consistent subtyping checks remain (\ruleName{three-sub-static}). For a union in
 the middle, inversion sends each outer witness into one component: the same component
 (\ruleName{three-sub-union-left}, \ruleName{three-sub-union-right}), or different components, in

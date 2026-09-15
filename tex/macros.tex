@@ -11,7 +11,7 @@
 \newcommand*{\versionstring}{}
 
 % Audience. \specmode selects the specification; otherwise the paper. \paperonly and \speconly carry a
-% phrase for one document only; \paperinput reads a file of the paper's own material at that point.
+% phrase for one document only; \paperinput reads a file of material belonging only to the paper at that point.
 \ifdefined\specmode
   \newcommand*{\paperonly}[1]{}
   \newcommand*{\speconly}[1]{#1}
@@ -257,7 +257,7 @@
 \newcommand*{\prefixOf}{\preceq}
 \newcommand*{\properPrefixOf}{\prec}
 
-% Change markup (own copy of the shared change-tracking definitions; changebar loaded in the
+% Change markup (a local copy of the shared change-tracking definitions; changebar loaded in the
 % preamble).
 \input{tex/change-tracking}
 % A row of an align recording a deleted definition: grey in the paper, absent under \acceptchanges.

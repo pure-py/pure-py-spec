@@ -99,7 +99,7 @@ def odd(n):
     return even(n - 1)
 \end{python}
 
-\noindent This is rejected statically: \pyinline{even} forms a mutual region of its own in which \pyinline{odd}
+\noindent This is rejected statically: \pyinline{even} forms a mutual region by itself, in which \pyinline{odd}
 is not yet bound, so the reference fails the \ruleName{var} rule. Python accepts the program, since the
 call \pyinline{even(0)} never reaches \pyinline{odd}. A mutual region with two definitions of the same name is
 rejected by the distinct-names condition:
@@ -115,7 +115,7 @@ def g():     # error: g defined twice in the same mutual region
 \end{python}
 
 \noindent Python accepts this too, treating the second \pyinline{def g} as a reassignment of \pyinline{g},
-which late binding then makes the target of the call in \pyinline{f}. Finally, the branches of a conditional may contain mutual regions of their own, with any use of those
+which late binding then makes the target of the call in \pyinline{f}. Finally, the branches of a conditional may contain mutual regions, with any use of those
 functions after the conditional subject to the usual definite assignment rules (\secref{local-assignment}).
 
 \subsubsection{Pattern binding and reachability}
@@ -173,12 +173,12 @@ def foo(x):
 In Python a module's namespace is populated as loading proceeds, by the assignments in its body and, for
 a module with submodules, by the import system binding each submodule as it loads, so the referent of a qualified name can
 depend on which modules have loaded so far, anywhere in the program (\secref{no-load-dependent}). \PurePy gives each name a meaning fixed by the
-module's own text and imports. Imports come first in a module, so its dependencies are known before any
+text and imports of the module alone. Imports come first in a module, so its dependencies are known before any
 statement runs. Loading is checked statically: the \ruleName{module} rule checks a body and computes its
 signature, and the \ruleName{import} and \ruleName{from-import} rules statically load each target and its
 ancestors first, so an import cycle has no derivation. A module may not bind a name that is also the name of one of its
 submodules, a side condition of \ruleName{module}, since Python resolves the clash by load order. A
-qualified reference must resolve through the referring module's own imports to a definitely assigned
+qualified reference must resolve through the imports of the referring module to a definitely assigned
 member (\ruleName{attr-module}). A submodule is not an attribute of its parent until it is loaded, so
 \pyinline{import pkg} followed by \pyinline{pkg.sub.y} is rejected unless the module also imports
 \pyinline{pkg.sub}, whereas Python permits the reference whenever some earlier import, anywhere in the

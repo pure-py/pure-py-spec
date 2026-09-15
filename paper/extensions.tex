@@ -40,7 +40,7 @@ def length(Cons(x, xs)):
 \noindent Python has no way to define a function by pattern-matching on its arguments: \pyinline{def
 length(Cons(x, xs))} is a syntax error, since a parameter cannot be a pattern. Core \PurePy, a subset of
 Python, has no such form either. The extension adds this: the clauses together define \pyinline{length}, dispatching on
-the constructor of the argument. Because Python gives the pattern-clause form no meaning of its own, it is a
+the constructor of the argument. Because Python gives the pattern-clause form no meaning, it is a
 syntactic extension that needs no special notation to distinguish it from an ordinary \pyinline{def}.
 
 \subsection{Explicit variable definitions}
