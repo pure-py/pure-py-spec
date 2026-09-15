@@ -3,10 +3,10 @@
 
 \subsection{\PurePy-compatible standard libraries}
 
-Scientific computing in Python rests on libraries such as NumPy and Pandas, whose interfaces lean on
+Scientific computing in Python rests on libraries such as NumPy and Pandas, whose interfaces depend on
 mutation and indexing. \PurePy therefore needs compatible counterparts: libraries, or subsets of existing
 ones, whose operations are pure. Polars,\footnote{\url{https://docs.pola.rs/}} whose operations return new frames rather than
-updating in place, suggests the shape such interfaces can take.
+updating in place, is an example of such an interface.
 
 \subsection{Typed effects}
 
@@ -15,7 +15,7 @@ question is notational, because effect information must fit within annotations t
 already accept. A return type such as \pyinline{IO[int]} tracks effects as an ordinary generic type, in
 the Haskell style, although chaining is awkward in a language of statements without dedicated syntax.
 \pyinline{Annotated[int, Console]} (PEP 593) attaches effect metadata that mypy ignores and the \PurePy
-checker can read. Lightest is a decorator: with effects the default, \pyinline{@pure} marks functions in
+checker can read. The lightest option is a decorator: with effects the default, \pyinline{@pure} marks functions in
 which printing and other effects are rejected, and unannotated code keeps its current meaning. Under any
 of these, existing support for printing is not an obstacle, since printing can be reinterpreted as a typed
 output effect or kept native with essentially equivalent semantics, printed output never influencing a
@@ -26,6 +26,6 @@ to Scala's monadic effect libraries alongside the language's native effects.
 \subsection{Proof of agreement with Python}
 \label{sec:agreement}
 
-The guarantee of \secref{python-compatibility} is informal. To prove it we would need a reference semantics
-of Python to state it against; one candidate is the core calculus of Politz et al.~\cite{politz2013}, which
+The guarantee of \secref{python-compatibility} is informal. To prove the guarantee we would need a reference semantics
+of Python against which to state it; one candidate is the core calculus of Politz et al.~\cite{politz2013}, which
 covers a subset of Python and predates the current language.
