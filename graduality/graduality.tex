@@ -3,17 +3,17 @@
 \section{Graduality}
 \label{sec:graduality}
 
-\figref{graduality-precision} gives the gradual types. Define $\TypeSet$ to be the set of
+\figref{precision} gives the gradual types. Define $\TypeSet$ to be the set of
 types, as given in \specification, and $\GTypeSet$ to be the set
 of gradual types; $\sigma$ and $\tau$ range over $\TypeSet$, and $\gty{\sigma}$ and $\gty{\tau}$ over
 $\GTypeSet$. Concretisation and abstraction are from \citet{garcia2016}; precision is from
 \citet{siek2015}.
 
-\input{spec/fig/graduality-precision}
+\input{graduality/fig/precision}
 
 \begin{definition}[Precision]
 \label{def:precision}
-Precision $\precTy$, a partial order on gradual types, is defined in \figref{graduality-precision}.
+Precision $\precTy$, a partial order on gradual types, is defined in \figref{precision}.
 \end{definition}
 
 \begin{lemma}[Discreteness of static types]
@@ -23,10 +23,10 @@ If $\sigma \precTy \tau$ then $\sigma = \tau$.
 
 \begin{definition}[Concretisation]
 \label{def:concretisation}
-Concretisation $\gamma : \GTypeSet \to \powersetplus{\TypeSet}$ is defined in \figref{graduality-concretisation}.
+Concretisation $\gamma : \GTypeSet \to \powersetplus{\TypeSet}$ is defined in \figref{concretisation}.
 \end{definition}
 
-\input{spec/fig/graduality-concretisation}
+\input{graduality/fig/concretisation}
 
 \begin{lemma}[Preservation and reflection of precision]
 \label{lem:precision-concretisation}
@@ -48,7 +48,7 @@ is the least $\gty{\tau}$ that approximates $S$.
 \begin{proof}
 Since $\gamma(\sigma) = \set{\sigma}$ for every type $\sigma$, approximating $S$ is the same as
 bounding $S$ above under $\precTy$ (Lemma~\ref{lem:precision-concretisation}). The join of two
-gradual types (\figref{graduality-join}) is their least upper bound, by induction on the pair, so
+gradual types (\figref{join}) is their least upper bound, by induction on the pair, so
 every finite nonempty set of gradual types has a least upper bound, by induction on its size. Fix
 $\sigma \in S$. The gradual types above $\sigma$ are obtained by replacing subterms of $\sigma$ with
 $\tyAny$, so there are finitely many; the joins $\bigsqcup F$ for finite $F \subseteq S$ containing
@@ -57,7 +57,7 @@ $\tau \precTy \bigsqcup (F \cup \set{\tau}) = \bigsqcup F$ for every $\tau \in S
 $\bigsqcup F$ bounds $S$; and every bound of $S$ bounds $F$, so $\bigsqcup F$ is least.
 \end{proof}
 
-\input{spec/fig/graduality-join}
+\input{graduality/fig/join}
 
 \begin{definition}[Abstraction]
 \label{def:abstraction}
@@ -97,8 +97,8 @@ $\sigma \in \gamma(\gty{\sigma})$; likewise
 $\Sigma \vdash \threeEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, over equivalence.
 \end{definition}
 
-\figref{graduality-subtyping} defines \emph{consistent subtyping}, mutually with the consistent
-three-way subtype relation of \figref{graduality-three-sub}, by lifting the subtyping rules of
+\figref{subtyping} defines \emph{consistent subtyping}, mutually with the consistent
+three-way subtype relation of \figref{three-sub}, by lifting the subtyping rules of
 \specification: types become gradual types, subtyping premises become consistent subtyping,
 equivalence premises become consistent equivalence, and two axioms place $\tyAny$ below and above every
 gradual type. The two premises of \ruleName{gsubty-union} share $\gty{\sigma}$ and are
@@ -109,7 +109,7 @@ $\gamma(\tyList{\tyAny}) = \set{\tyList{\tau} \mid \tau \in \TypeSet}$, and
 $\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \subty \tyList{\tau}$ requires
 $\tyInt \tyEquiv \tau$ and $\tyStr \tyEquiv \tau$.
 
-\input{spec/fig/graduality-subtyping}
+\input{graduality/fig/subtyping}
 
 \begin{lemma}[Correctness of consistent subtyping]
 \label{lem:consistent-subtyping-correct}
@@ -118,7 +118,7 @@ $\Sigma \vdash \sigma \subty \tau$ for some $\sigma \in \gamma(\gty{\sigma})$ an
 $\tau \in \gamma(\gty{\tau})$.
 \end{lemma}
 
-\input{spec/fig/graduality-three-sub}
+\input{graduality/fig/three-sub}
 
 \begin{lemma}[Correctness of the three-way subtype relation]
 \label{lem:three-sub-correct}
@@ -150,18 +150,18 @@ Definition~\ref{def:three-sup-equiv}. Each appeal to the hypothesis decreases th
 
 \subsection{Rules for $\threeSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$}
 
-The rules of \figref{graduality-three-sub} take the supertype relation as premises at callable
-arguments. \figref{graduality-three-sup} gives rules for it by the case analysis of
+The rules of \figref{three-sub} take the supertype relation as premises at callable
+arguments. \figref{three-sup} gives rules for it by the case analysis of
 Lemma~\ref{lem:three-sub-correct}, with the subtyping constraints reversed; every case
 closes except one.
 
 \begin{lemma}[Soundness of the supertype rules]
 \label{lem:three-sup-sound}
-The rules of \figref{graduality-three-sup} derive only instances of the consistent three-way
+The rules of \figref{three-sup} derive only instances of the consistent three-way
 supertype relation.
 \end{lemma}
 
-\input{spec/fig/graduality-three-sup}
+\input{graduality/fig/three-sup}
 
 The residual case is a middle union $\tyUnion{\gty{\sigma}}{\gty{\sigma}'}$ that is not static.
 Its witness is a union, below a type exactly when both components are, so the two conjuncts become
@@ -186,7 +186,7 @@ equivalence relation and decidability of the three relations.
 \section{Constraints}
 \label{sec:constraints}
 
-The rules of \figref{graduality-three-sub} are incomplete:
+The rules of \figref{three-sub} are incomplete:
 $\threeSub{\tyUnion{\tyList{\tyInt}}{\tyList{\tyInt}}}{\tyList{\tyAny}}{\tyList{\tyInt}}$
 satisfies the lifting of its two conjuncts but has no derivation, because reassociation cannot
 reduce three list-headed components to two, so the completeness direction of
@@ -219,14 +219,14 @@ $\Sigma \vDash \set{\toTerm{\gty{\tau}} \subty t, \toTerm{\gty{\tau}'} \subty t}
 $t = \toTerm{\gty{\sigma}}$, the shared type contributing one term; consistent subtyping is the
 one-constraint case.
 
-\figref{graduality-solver} gives the solver steps. A step rewrites any one constraint, and a
+\figref{solver} gives the solver steps. A step rewrites any one constraint, and a
 choice is a disjunction, so $\consys$ is satisfiable exactly when some run succeeds. A ground
 constraint whose static check fails, or a constraint between operands with distinct constructor
 roots, fails the run. A run stops when every constraint relates a variable to a ground term; a
 variable is then assignable exactly when the join of its lower bounds lies below the meet of its
 upper bounds, up to the equivalences that constrain it, by the lattice of \specification.
 
-\input{spec/fig/graduality-solver}
+\input{graduality/fig/solver}
 
 Deferred: constraints in which both operands contain variables, equivalences involving union
 terms, and the correctness and termination arguments.

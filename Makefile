@@ -7,7 +7,7 @@ AUX := $(BUILD_AUX) *.bbl
 
 default: paper.pdf
 
-all: PurePy-spec.pdf paper.pdf paper-arXiv.zip paper-submission
+all: PurePy-spec.pdf paper.pdf graduality.pdf paper-arXiv.zip paper-submission
 
 # pdflatex only warns about these, so check the log of job $(1) before removing it.
 define check-log
@@ -22,6 +22,12 @@ endef
 	$(PDFLATEX) $<
 	$(call check-log,$*)
 	rm -f $(BUILD_AUX)
+
+# Draft notes on gradual typing, a separate document that is not part of the 1.0 specification or
+# paper. Its sources are not in $(INPUTS), so they do not ship with the arXiv source; the pattern rule
+# above supplies the recipe.
+GRADUALITY_INPUTS := $(wildcard graduality/*.tex graduality/*/*.tex)
+graduality.pdf: $(GRADUALITY_INPUTS)
 
 # Anonymised build of source $(2) under job name $(1).
 define anon
