@@ -3,7 +3,7 @@
 
 \PurePy is a subset of Python chosen so that its programs are well-behaved and broadly \emph{pure}, yet run
 unchanged under a standard Python interpreter and compute the same result. \secref{purity} makes the purity
-claim precise and sets out the excluded features, grouped by the discipline each one protects;
+claim precise and sets out the excluded features, grouped by the discipline that each one protects;
 \figref{prevented-errors} summarises the Python runtime errors ruled out by the type system, and
 \figref{roadmap} lists planned additions and features under consideration.
 
@@ -60,8 +60,8 @@ itself with loading order. If the result of a program is all that can be observe
 subexpressions are evaluated cannot affect that result, and so cannot meaningfully be part of the
 specification. However runtime errors, at least if they can be distinguished, remove that freedom: if
 division-by-zero reports differently from index-out-of-bounds, a program with two possible failures reveals
-which was reached first, and implementations which choose different orders might disagree about what such a
-program does. \PurePy aims to serve as a template for practical implementation, not as an idealised calculus,
+which was reached first, and implementations which choose different orders might disagree about the outcome of
+such a program. \PurePy aims to serve as a template for practical implementation, not as an idealised calculus,
 and practical implementations need to be able to report on different kinds of error, since those reports are
 important to users. The sequential semantics of module loading therefore remains an important part of the
 specification so that programs which fail do so deterministically under every implementation.
@@ -122,7 +122,7 @@ effect-free.
 A name's meaning in \PurePy must not depend on the order in which modules load or on runtime state, so several
 of Python's import and module behaviours are excluded. Imports must appear at the start of a module, never
 inside a function body or branch, nor after a statement. Wildcard imports (\pyinline{from q import
-*}) are excluded, since the names they introduce are not explicit; PEP 8 recommends against
+*}) are excluded, since the names introduced are not explicit; PEP 8 recommends against
 them.\footnote{\url{https://peps.python.org/pep-0008/}} A submodule may not import itself through its parent
 (\pyinline{from a import b} inside module \pyinline{a.b}): \PurePy treats the from-imported submodule as a
 dependency, so this is an import cycle. An \pyinline{import} (as opposed to a from-import) may not name a proper
@@ -178,8 +178,8 @@ print(pkg.sub)  # <module 'pkg.sub'>
 \end{center}
 
 Loading \pyinline{pkg.sub}, wherever in the program it happens, sets it as an attribute of the shared
-\pyinline{pkg} object, so the extra import changes what \pyinline{pkg.sub} means in a module that never
-mentions \pyinline{pkg.sub}. The name has no load-order-independent meaning, so \PurePy excludes the clash
+\pyinline{pkg} object, so the extra import changes the meaning of \pyinline{pkg.sub} in the main module, which does
+not import \pyinline{pkg.sub}. The name has no load-order-independent meaning, so \PurePy excludes the clash
 outright.
 
 \subsubsection{Modules and classes are not first-class}
