@@ -29,7 +29,7 @@ inferred from its body. A class name resolves to a
 class (\figref{resolve-name}) and every other name must resolve to a predefined entry
 (\figref{predefined-types}). The function $\baseType(\tau)$ discards the precision of a
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and leaving every other type alone
-(\secref{types-auxiliary}).
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:base-type}}).
 
 \speconly{\subsubsection{Subtyping}\label{sec:subtyping}}%
 \paperonly{\paragraph{Subtyping.}}
@@ -61,7 +61,7 @@ meet of incomparable types distributes over a union, takes tuples componentwise 
 parameters joined and results combined using meet, and is \pyinline{Never} otherwise, since no value belongs to both types.
 So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$. A sequence of types is joined by
-folding binary join over the sequence, with \pyinline{Never} as the unit (\secref{types-auxiliary}).
+folding binary join over the sequence, with \pyinline{Never} as the unit (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:join}}).
 
 \begin{lemma}[Types form a lattice]
 \label{lem:lattice}
@@ -149,7 +149,7 @@ synthesise, since \pyinline{list} is invariant.
 
 Typing a comprehension types its qualifiers, which bind the variables that can be used in the body
 (\figref{typing-check}). A generator's variable is bound at $\elemTy$ of the type synthesised by the
-iterated expression (\secref{types-auxiliary}). A
+iterated expression (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:elem-type}}). A
 tuple is iterated at the join of the base types of its components.
 A lambda within a comprehension may not capture a generator variable, a side condition of
 \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}. Python closures are
@@ -279,9 +279,9 @@ residual from the shapes of $\sigma$ (\figref{shapes}); \ruleName{match} applies
 $\Assigns{\varnothing}$ for the values that fall through. Shapes and matching a pattern against the residual
 are the subject of \secref{well-formedness-patterns}.
 
-Each pattern must also be \emph{sequence-safe} at $\sigma$ (\secref{types-auxiliary}), because under the
+Each pattern must also be \emph{sequence-safe} at $\sigma$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:seq-safe}}), because under the
 evaluation rules a tuple pattern matches only a tuple and a list pattern matches only a list, whereas
-Python matches both forms of pattern against both kinds of value (\figref{eval-pat}). A match on
+Python matches both forms of pattern against both kinds of value\speconly{ (\figref{eval-pat})}. A match on
 $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ therefore admits no tuple or list pattern, and a
 match on $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple pattern.
 
@@ -305,7 +305,7 @@ likewise let the type exclude cases.
 \input{spec/fig/shapes}
 
 A shape $k$ (\figref{shapes})
-denotes a set of values of its type $\shapeTy(k)$ (\secref{types-auxiliary}). The form $\shapeAny{\tau}{H}$ denotes the
+denotes a set of values of its type $\shapeTy(k)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:shape-type}}). The form $\shapeAny{\tau}{H}$ denotes the
 values of type $\tau$ whose outermost head is not among those in $H$; the other forms are constructor,
 tuple, list and dictionary shapes, each with shapes in place of sub-patterns. A list shape also records its
 element type, which the element shapes do not determine. A constructor shape also carries an excluded
@@ -321,7 +321,7 @@ $\tau$. Shape typing $\Sigma \vdash k : \tau$ holds when $\shapeTy(k)$ is a subt
 well-formed: each excluded head is typed at the type of the shape (at $\tyStr$, for the keys of a
 dictionary shape) and each component shape at the type of that component.
 
-The auxiliary function $\shapes(\Sigma, \tau, H)$ (\secref{types-auxiliary}) gives the shapes of $\tau$
+The auxiliary function $\shapes(\Sigma, \tau, H)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:shapes}}) gives the shapes of $\tau$
 once the heads in $H$ are excluded. A union contributes the shapes of its members and a dictionary type
 the dictionary form; every other type contributes the single shape $\shapeAny{\tau}{H}$, or no shape at
 all when $H$ exhausts $\tau$. The rest form therefore never carries a union or dictionary type, and
