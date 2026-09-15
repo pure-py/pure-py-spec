@@ -1,0 +1,232 @@
+% Draft notes for gradual typing, built as a separate document (graduality.tex) rather than as
+% a chapter of the specification.
+\section{Graduality}
+\label{sec:graduality}
+
+\figref{precision} gives the gradual types. Define $\TypeSet$ to be the set of
+types, as given in \specification, and $\GTypeSet$ to be the set
+of gradual types; $\sigma$ and $\tau$ range over $\TypeSet$, and $\gty{\sigma}$ and $\gty{\tau}$ over
+$\GTypeSet$. Concretisation and abstraction are from \citet{garcia2016}; precision is from
+\citet{siek2015}.
+
+\input{graduality/fig/precision}
+
+\begin{definition}[Precision]
+\label{def:precision}
+Precision $\precTy$, a partial order on gradual types, is defined in \figref{precision}.
+\end{definition}
+
+\begin{lemma}[Discreteness of static types]
+\label{lem:static-discrete}
+If $\sigma \precTy \tau$ then $\sigma = \tau$.
+\end{lemma}
+
+\begin{definition}[Concretisation]
+\label{def:concretisation}
+Concretisation $\gamma : \GTypeSet \to \powersetplus{\TypeSet}$ is defined in \figref{concretisation}.
+\end{definition}
+
+\input{graduality/fig/concretisation}
+
+\begin{lemma}[Preservation and reflection of precision]
+\label{lem:precision-concretisation}
+$\gty{\sigma} \precTy \gty{\tau}$ if and only if $\gamma(\gty{\sigma}) \subseteq \gamma(\gty{\tau})$.
+\end{lemma}
+
+A gradual type $\gty{\tau}$ \emph{approximates} a set $S$ of types when $S \subseteq \gamma(\gty{\tau})$;
+$\tyAny$ approximates every set of types. A least approximant is a best abstraction in the sense
+of \citet{cousot1977}. Preservation is monotonicity of concretisation. Reflection forces every
+approximant of $S$ to lie above the join of $S$, so the join is the least approximant; without
+reflection it would approximate $S$ but need not be least.
+
+\begin{lemma}[Least approximant]
+\label{lem:least-approximant}
+For every nonempty set $S$ of types, the least upper bound $\bigsqcup S$ under $\precTy$ exists and
+is the least $\gty{\tau}$ that approximates $S$.
+\end{lemma}
+
+\begin{proof}
+Since $\gamma(\sigma) = \set{\sigma}$ for every type $\sigma$, approximating $S$ is the same as
+bounding $S$ above under $\precTy$ (Lemma~\ref{lem:precision-concretisation}). The join of two
+gradual types (\figref{join}) is their least upper bound, by induction on the pair, so
+every finite nonempty set of gradual types has a least upper bound, by induction on its size. Fix
+$\sigma \in S$. The gradual types above $\sigma$ are obtained by replacing subterms of $\sigma$ with
+$\tyAny$, so there are finitely many; the joins $\bigsqcup F$ for finite $F \subseteq S$ containing
+$\sigma$ lie among them and increase with $F$, so some $\bigsqcup F$ is maximal. Then
+$\tau \precTy \bigsqcup (F \cup \set{\tau}) = \bigsqcup F$ for every $\tau \in S$ by maximality, so
+$\bigsqcup F$ bounds $S$; and every bound of $S$ bounds $F$, so $\bigsqcup F$ is least.
+\end{proof}
+
+\input{graduality/fig/join}
+
+\begin{definition}[Abstraction]
+\label{def:abstraction}
+Abstraction $\alpha : \powersetplus{\TypeSet} \to \GTypeSet$ is defined by
+$\alpha(S) = \bigsqcup S$ (Lemma~\ref{lem:least-approximant}).
+\end{definition}
+
+\noindent Every gradual type approximates the empty set, and $\GTypeSet$ has no least element under
+$\precTy$, so the empty set is excluded from the domain of $\alpha$. Concretisation and abstraction
+form a \emph{Galois insertion}: $\alpha(S) \precTy \gty{\tau}$ if and only if
+$S \subseteq \gamma(\gty{\tau})$ (Lemma~\ref{lem:least-approximant}), and
+$\alpha(\gamma(\gty{\tau})) = \gty{\tau}$ by reflection
+(Lemma~\ref{lem:precision-concretisation}).
+
+A relation on types lifts to gradual types through concretisation \citep{garcia2016}: the lifted
+relation holds when the concretisations contain a related pair. A conjunction of such statements
+lifts in the same way, with one witness for each metavariable; when the conjuncts share no
+metavariable the existentials factor, and the lifting is the conjunction of the lifted conjuncts.
+A shared metavariable makes the conjunction a relational composition, with the middle witness
+drawn from a concretisation rather than from all types; that the lifting of a composition is
+stronger than the composition of the liftings is standard \citep{garcia2016}. Subtyping and
+equivalence on types are as defined in \specification; equivalence lifts to \emph{consistent
+equivalence} \citep{sekiyama2019}.
+
+\begin{definition}[Consistent equivalence]
+\label{def:consistent-equivalence}
+$\Sigma \vdash \gty{\sigma} \gtyEquiv \gty{\tau}$ if and only if $\Sigma \vdash \sigma \tyEquiv \tau$ for some
+$\sigma \in \gamma(\gty{\sigma})$ and $\tau \in \gamma(\gty{\tau})$.
+\end{definition}
+
+\begin{definition}[Consistent three-way supertype and equivalence relations]
+\label{def:three-sup-equiv}
+$\Sigma \vdash \threeSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ if and only if
+$\Sigma \vdash \sigma \subty \tau$ and $\Sigma \vdash \sigma \subty \tau'$ for some
+$\tau \in \gamma(\gty{\tau})$, $\tau' \in \gamma(\gty{\tau}')$ and
+$\sigma \in \gamma(\gty{\sigma})$; likewise
+$\Sigma \vdash \threeEquiv{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$, over equivalence.
+\end{definition}
+
+\figref{subtyping} defines \emph{consistent subtyping}, mutually with the consistent
+three-way subtype relation of \figref{three-sub}, by lifting the subtyping rules of
+\specification: types become gradual types, subtyping premises become consistent subtyping,
+equivalence premises become consistent equivalence, and two axioms place $\tyAny$ below and above every
+gradual type. The two premises of \ruleName{gsubty-union} share $\gty{\sigma}$ and are
+replaced by the three-way premise; lifted separately they would derive
+$\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \gsubty \tyList{\tyAny}$, since
+$\tyInt \gtyEquiv \tyAny$ and $\tyStr \gtyEquiv \tyAny$, although
+$\gamma(\tyList{\tyAny}) = \set{\tyList{\tau} \mid \tau \in \TypeSet}$, and
+$\Sigma \vdash \tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}} \subty \tyList{\tau}$ requires
+$\tyInt \tyEquiv \tau$ and $\tyStr \tyEquiv \tau$.
+
+\input{graduality/fig/subtyping}
+
+\begin{lemma}[Correctness of consistent subtyping]
+\label{lem:consistent-subtyping-correct}
+$\Sigma \vdash \gty{\sigma} \gsubty \gty{\tau}$ if and only if
+$\Sigma \vdash \sigma \subty \tau$ for some $\sigma \in \gamma(\gty{\sigma})$ and
+$\tau \in \gamma(\gty{\tau})$.
+\end{lemma}
+
+\input{graduality/fig/three-sub}
+
+\begin{lemma}[Correctness of the three-way subtype relation]
+\label{lem:three-sub-correct}
+$\Sigma \vdash \threeSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ if and only if
+$\Sigma \vdash \tau \subty \sigma$ and $\Sigma \vdash \tau' \subty \sigma$ for some
+$\tau \in \gamma(\gty{\tau})$, $\tau' \in \gamma(\gty{\tau}')$ and
+$\sigma \in \gamma(\gty{\sigma})$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+By induction on the triple, ordered lexicographically by the total size of the three types and
+then by the size of the first; cases on the triple, each case matching one rule and being an equivalence. An outer
+type $\tyAny$ or $\tyNever$ takes the witness $\tyNever$, leaving a consistent subtyping check on
+the other outer type (\ruleName{three-sub-any-left}, \ruleName{three-sub-never-left}). A union in
+an outer position reassociates, because its witness is a union, below a type exactly when both
+components are (\ruleName{three-sub-assoc}). Otherwise each outer witness shares its
+head with the gradual type that it witnesses, and neither is a union. In the middle, $\tyAny$ admits the witness $\tyObject$
+(\ruleName{three-sub-any}). A static middle type concretises to itself alone, so sharing is
+trivial and two consistent subtyping checks remain (\ruleName{three-sub-static}). For a union in
+the middle, inversion sends each outer witness into one component: the same component
+(\ruleName{three-sub-union-left}, \ruleName{three-sub-union-right}), or different components, in
+which case the witnesses no longer interact (\ruleName{three-sub-split}). A constructor in the
+middle must head both outer types, or the case refutes. Tuples proceed componentwise
+(\ruleName{three-sub-tuple}); lists and dictionaries need one element witness equivalent to both
+element types (\ruleName{three-sub-list}, \ruleName{three-sub-dict}), and callable arguments one
+witness below both argument types (\ruleName{three-sub-callable}), the relations of
+Definition~\ref{def:three-sup-equiv}. Each appeal to the hypothesis decreases the order.
+\end{proof}
+
+\subsection{Rules for $\threeSup{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$}
+
+The rules of \figref{three-sub} take the supertype relation as premises at callable
+arguments. \figref{three-sup} gives rules for it by the case analysis of
+Lemma~\ref{lem:three-sub-correct}, with the subtyping constraints reversed; every case
+closes except one.
+
+\begin{lemma}[Soundness of the supertype rules]
+\label{lem:three-sup-sound}
+The rules of \figref{three-sup} derive only instances of the consistent three-way
+supertype relation.
+\end{lemma}
+
+\input{graduality/fig/three-sup}
+
+The residual case is a middle union $\tyUnion{\gty{\sigma}}{\gty{\sigma}'}$ that is not static.
+Its witness is a union, below a type exactly when both components are, so the two conjuncts become
+four constraints, relating each component witness to each outer witness; every witness now appears
+in two constraints. The case amounts to the two judgements
+$\threeSub{\gty{\sigma}}{\gty{\tau}}{\gty{\sigma}'}$ and
+$\threeSub{\gty{\sigma}}{\gty{\tau}'}{\gty{\sigma}'}$ with the witnesses for $\gty{\sigma}$ and
+$\gty{\sigma}'$ shared between them, a cycle of four constraints, which no one judgement
+expresses. Splitting the union instead, with one judgement per component, is unsound:
+$\threeSup{\tyList{\tyAny}}{\tyList{\tyInt}}{\tyList{\tyAny}}$ and
+$\threeSup{\tyList{\tyAny}}{\tyList{\tyStr}}{\tyList{\tyAny}}$ hold, but
+$\threeSup{\tyList{\tyAny}}{\tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}}}{\tyList{\tyAny}}$ needs
+an element witness equivalent to both $\tyInt$ and $\tyStr$.
+
+Sharing the pair of component witnesses suggests a judgement over four gradual types, but no
+fixed arity suffices: a union in an outer position then sends each component witness below
+one of its components independently, so the constraints no longer relate every pair. The general
+form is a finite set of subtyping and equivalence constraints over shared witnesses, a constraint
+system in the sense of \citet{garcia2015}. Its treatment is deferred, with rules for the
+equivalence relation and decidability of the three relations.
+
+\section{Constraints}
+\label{sec:constraints}
+
+The rules of \figref{three-sub} are incomplete:
+$\threeSub{\tyUnion{\tyList{\tyInt}}{\tyList{\tyInt}}}{\tyList{\tyAny}}{\tyList{\tyInt}}$
+satisfies the lifting of its two conjuncts but has no derivation, because reassociation cannot
+reduce three list-headed components to two, so the completeness direction of
+Lemma~\ref{lem:three-sub-correct} fails. With the residual case of the supertype relation, this
+motivates constraints over shared witnesses in place of judgements of fixed arity.
+
+\begin{definition}[Constraints]
+\label{def:constraints}
+Let $x$, $y$ and $z$ range over variables, and $t$ and $u$ over terms:
+\[
+t, u \mathrel{::=} x \mid \sigma \mid \tyList{t} \mid \tyDict{t} \mid \tyTuple{t_1, \ldots, t_n}
+  \mid \tyCallable{t_1, \ldots, t_n}{t} \mid \tyUnion{t}{u}
+\]
+where $\sigma$ is atomic, with neither a constructor nor a union at the root. A constraint is
+$t \subty u$ or $t \tyEquiv u$; a system $\consys$ is a finite set of constraints. Write
+$\toTerm{\gty{\tau}}$ for $\gty{\tau}$ read as a term with each occurrence of $\tyAny$ replaced
+by a fresh variable.
+\end{definition}
+
+\begin{definition}[Satisfaction]
+\label{def:satisfaction}
+$\Sigma \vDash \consys$ if and only if some map $\theta$ from variables to types validates every
+constraint of $\consys$ as the corresponding static judgement.
+\end{definition}
+
+\noindent The instances $\theta\toTerm{\gty{\tau}}$ are exactly the concretisation of
+$\gty{\tau}$, so the lifted relations are small systems:
+$\Sigma \vdash \threeSub{\gty{\tau}}{\gty{\sigma}}{\gty{\tau}'}$ if and only if
+$\Sigma \vDash \set{\toTerm{\gty{\tau}} \subty t, \toTerm{\gty{\tau}'} \subty t}$ where
+$t = \toTerm{\gty{\sigma}}$, the shared type contributing one term; consistent subtyping is the
+one-constraint case.
+
+\figref{solver} gives the solver steps. A step rewrites any one constraint, and a
+choice is a disjunction, so $\consys$ is satisfiable exactly when some run succeeds. A ground
+constraint whose static check fails, or a constraint between operands with distinct constructor
+roots, fails the run. A run stops when every constraint relates a variable to a ground term; a
+variable is then assignable exactly when the join of its lower bounds lies below the meet of its
+upper bounds, up to the equivalences that constrain it, by the lattice of \specification.
+
+\input{graduality/fig/solver}
+
+Deferred: constraints in which both operands contain variables, equivalences involving union
+terms, and the correctness and termination arguments.

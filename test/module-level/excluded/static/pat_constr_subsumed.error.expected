@@ -1,1 +1,1 @@
-case 2 unreachable: subsumed by case 1
+case 2 matches no value the earlier cases leave

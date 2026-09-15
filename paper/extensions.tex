@@ -19,9 +19,10 @@ f(5)(6)  # 11
 
 \noindent The syntax is valid Python, but Python raises a \pyinline{TypeError} at runtime, because
 \pyinline{f(5)} is missing an argument. For partial application to add meaning rather than change it, core
-\PurePy must reject such unsaturated calls, requiring every call to supply the declared arity. On that base,
+\PurePy must reject such unsaturated calls, requiring every call to supply the declared arity. On that basis,
 \pyinline{f(5)} denotes the function that adds \pyinline{5} to its argument, so \pyinline{f(5)(6)} evaluates to
-\pyinline{11}. This is a semantic extension: existing syntax, given a meaning the core withholds.
+\pyinline{11}. The extension is therefore semantic rather than syntactic: it gives a meaning to programs that
+the core rejects.
 
 \subsection{Piecewise function definitions}
 \label{sec:extension-piecewise}
@@ -38,8 +39,8 @@ def length(Cons(x, xs)):
 
 \noindent Python has no way to define a function by pattern-matching on its arguments: \pyinline{def
 length(Cons(x, xs))} is a syntax error, since a parameter cannot be a pattern. Core \PurePy, a subset of
-Python, has none either. The extension adds this: the clauses together define \pyinline{length}, dispatching on
-the constructor of the argument. Because Python gives the pattern-clause form no meaning of its own, it is a
+Python, has no such form either. The extension adds this: the clauses together define \pyinline{length}, dispatching on
+the constructor of the argument. Because Python gives the pattern-clause form no meaning, it is a
 syntactic extension that needs no special notation to distinguish it from an ordinary \pyinline{def}.
 
 \subsection{Explicit variable definitions}
@@ -63,6 +64,6 @@ return total + n
 \noindent \pyinline{def total = 0} declares \pyinline{total} and assigns it at once, whereas \pyinline{def n}
 declares \pyinline{n} with its assignment deferred, to be supplied later under the existing definite-assignment
 rules, so \pyinline{n} is usable only once every path has assigned it. Python has no such form: \pyinline{def}
-introduces a function, so a variable \pyinline{def} is a syntax error, and core \PurePy, a subset of Python, has
-none either. The implicit definitions of the core are the case in which every variable is introduced by
+introduces a function, so a variable \pyinline{def} is a syntax error; core \PurePy, a subset of Python, has no such
+form either. The implicit definitions of the core are the case in which every variable is introduced by
 \pyinline{def x = e}, so the core desugars into the explicit form.

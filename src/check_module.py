@@ -1,13 +1,13 @@
 import ast
 import sys
+from collections.abc import Mapping
 
 import reasons
 import syntax
 from aux import (
     assigns_body,
     assigns_stmt,
-    find_import,
-    find_nested_import,
+    first_return,
     split_imports,
     statements,
 )
@@ -19,13 +19,12 @@ from contexts import (
     ModuleContext,
     ModuleLoaded,
     ModuleStub,
-    Returns,
     Status,
     extend_context,
     predefined_context,
 )
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
-from statements import check_seq, result_type_statement
+from statements import check_top_seq
 
 
 def name_assign(q: str) -> ast.stmt:
@@ -79,10 +78,7 @@ def import_bindings(s: ast.stmt, ctx: ModuleContext) -> Context:
             raise IllFormedModule(s, reasons.OwnDescendantImport(q, ctx.q))
         delta = check_module(ctx.M[q], ctx.M, q)
         return {q.split(".")[0]: loads_as(q, ModuleLoaded(q, delta), ctx)}
-    assert isinstance(s, ast.ImportFrom)
-    if len(s.names) == 0:
-        raise IllFormedModule(s, reasons.EmptyFromImport())
-    assert s.module is not None
+    assert isinstance(s, ast.ImportFrom) and s.module is not None
     if s.module not in ctx.M:
         raise IllFormedModule(s, reasons.UnknownModule(s.module))
     delta = check_module(ctx.M[s.module], ctx.M, s.module)
@@ -92,7 +88,7 @@ def import_bindings(s: ast.stmt, ctx: ModuleContext) -> Context:
     return imports(s, delta, ctx)
 
 
-def submods(M: dict[str, ast.Module], q: str) -> Context:
+def submods(M: Mapping[str, ast.Module], q: str) -> Context:
     return {
         x: ModuleStub(f"{q}.{x}")
         for x in {
@@ -116,7 +112,7 @@ def imported_entry(
 
 def own_members(body: list[ast.stmt], q: str) -> set[str]:
     if q in PREDEFINED_MEMBERS:
-        return PREDEFINED_MEMBERS[q]
+        return set(PREDEFINED_MEMBERS[q])
     return assigns_body(body)
 
 
@@ -124,7 +120,7 @@ _signatures: dict[tuple[int, str], Context] = {}
 _loading: list[tuple[int, str]] = []
 
 
-def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
+def check_module(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context:
     key = (id(M), q)
     cached = _signatures.get(key)
     if cached is not None:
@@ -145,25 +141,16 @@ def check_module(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
     return result
 
 
-def check_module_(m: ast.Module, M: dict[str, ast.Module], q: str) -> Context:
-    nested = find_nested_import(m.body)
-    if nested is not None:
-        raise IllFormedModule(nested, reasons.NonTopLevelImport())
+def check_module_(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context:
     prefix, rest = split_imports(m.body)
-    stray = find_import(rest)
-    if stray is not None:
-        raise IllFormedModule(stray, reasons.ImportAfterStatement())
     gamma0 = check_imports_prefix(prefix, ModuleContext(gamma={}, M=M, q=q))
     body = [name_assign(q)] + rest
     gamma1 = {**predefined_context("builtins"), **gamma0}
+    returning = first_return(body)
+    if returning is not None:  # no return rule applies with an empty return type
+        raise IllFormedModule(returning, reasons.TopLevelReturn())
     items = statements(body)
-    returning = next(
-        (i for i in items if isinstance(result_type_statement(i), Returns)), None
-    )
-    if returning is not None:  # the module rule requires result type Assigns
-        node: ast.AST = returning[0] if isinstance(returning, list) else returning
-        raise IllFormedModule(node, reasons.TopLevelReturn())
-    final_ctx = check_seq(items, ModuleContext(gamma=gamma1, M=M, q=q))
+    final_ctx = check_top_seq(items, ModuleContext(gamma=gamma1, M=M, q=q))
     check_submodule_clash(m, gamma0, body, M, q)
     return signature(body, final_ctx, q)
 
@@ -172,7 +159,7 @@ def check_submodule_clash(
     m: ast.Module,
     gamma0: Context,
     body: list[ast.stmt],
-    M: dict[str, ast.Module],
+    M: Mapping[str, ast.Module],
     q: str,
 ) -> None:
     clash = sorted((set(gamma0) | own_members(body, q)) & set(submods(M, q)))
@@ -206,7 +193,9 @@ def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context
     return {**stubs, **own}
 
 
-def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> IllFormed | None:
+def module_result(
+    m: ast.Module, M: Mapping[str, ast.Module], q: str
+) -> IllFormed | None:
     try:
         check_module(m, M, q)
         return None
@@ -214,10 +203,13 @@ def module_result(m: ast.Module, M: dict[str, ast.Module], q: str) -> IllFormed 
         return e
 
 
-def check_file(filename: str) -> IllFormed | None:
+def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:
     with open(filename) as f:
         source = f.read()
     tree = syntax.parse(source, filename)
+    unsupported = syntax.supported_module(tree)
+    if unsupported is not None:
+        return unsupported
     M: dict[str, ast.Module] = {
         p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES
     }
@@ -225,7 +217,9 @@ def check_file(filename: str) -> IllFormed | None:
     return module_result(tree, M, "__main__")
 
 
-def format_result(result: IllFormed | None, filename: str) -> str:
+def format_result(result: IllFormed | syntax.Unsupported | None, filename: str) -> str:
+    if isinstance(result, syntax.Unsupported):
+        return syntax.format_result(result, filename)
     if result is None:
         return f"{filename}: ok"
     if isinstance(result, IllFormedModule):

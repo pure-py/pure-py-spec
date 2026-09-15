@@ -16,7 +16,7 @@ class UnknownBaseClass:
     base: str
 
     def message(self) -> str:
-        return f"base class '{self.base}' is not declared in this module"
+        return f"base class '{self.base}' is not a declared class"
 
 
 @dataclass(frozen=True)
@@ -29,12 +29,21 @@ class InheritedFieldClash:
 
 
 @dataclass(frozen=True)
-class DuplicateClassName:
+class ClassRebound:
     name: str
-    module: str
 
     def message(self) -> str:
-        return f"duplicate class name '{self.name}' in module '{self.module}'"
+        return (
+            f"'{self.name}' is bound to a class and cannot be rebound at the top level"
+        )
+
+
+@dataclass(frozen=True)
+class UndefinedVariable:
+    name: str
+
+    def message(self) -> str:
+        return f"'{self.name}' is not defined"
 
 
 @dataclass(frozen=True)
@@ -105,6 +114,30 @@ class PatternArityMismatch:
 
 
 @dataclass(frozen=True)
+class UnknownClassInAnnotation:
+    cls: str
+
+    def message(self) -> str:
+        return f"annotation names '{self.cls}', which is not a declared class"
+
+
+@dataclass(frozen=True)
+class AnnotationNameNotInScope:
+    name: str
+
+    def message(self) -> str:
+        return f"annotation names '{self.name}', which is not in scope"
+
+
+@dataclass(frozen=True)
+class DecoratorNotInScope:
+    name: str
+
+    def message(self) -> str:
+        return f"class declaration names '{self.name}', which is not in scope"
+
+
+@dataclass(frozen=True)
 class UnknownClassInPattern:
     cls: str
 
@@ -139,19 +172,10 @@ class DuplicateDictKey:
 
 @dataclass(frozen=True)
 class NonlinearPattern:
-    index: int
+    variable: str
 
     def message(self) -> str:
-        return f"repeated variable in pattern {self.index}"
-
-
-@dataclass(frozen=True)
-class UnreachableCase:
-    index: int
-    subsumed_by: int
-
-    def message(self) -> str:
-        return f"case {self.index} unreachable: subsumed by case {self.subsumed_by}"
+        return f"repeated variable '{self.variable}' in pattern"
 
 
 @dataclass(frozen=True)
@@ -160,18 +184,6 @@ class DuplicateMutualName:
 
     def message(self) -> str:
         return f"duplicate name '{self.name}' in mutual region"
-
-
-@dataclass(frozen=True)
-class NonTopLevelImport:
-    def message(self) -> str:
-        return "import only allowed at module top level"
-
-
-@dataclass(frozen=True)
-class ImportAfterStatement:
-    def message(self) -> str:
-        return "imports must precede all other statements"
 
 
 @dataclass(frozen=True)
@@ -204,12 +216,6 @@ class UnassignedMember:
 class TopLevelReturn:
     def message(self) -> str:
         return "top-level return not allowed (module body must not return)"
-
-
-@dataclass(frozen=True)
-class EmptyFromImport:
-    def message(self) -> str:
-        return "empty name list"
 
 
 @dataclass(frozen=True)
@@ -247,6 +253,14 @@ class OwnDescendantImport:
 
 
 @dataclass(frozen=True)
+class PredefinedNameAsValue:
+    name: str
+
+    def message(self) -> str:
+        return f"'{self.name}' is usable only in an annotation or as a decorator"
+
+
+@dataclass(frozen=True)
 class ClassAsValue:
     name: str
 
@@ -254,12 +268,142 @@ class ClassAsValue:
         return f"'{self.name}' refers to a class; classes are not first-class values"
 
 
-Reason = (
+@dataclass(frozen=True)
+class NoBinarySignature:
+    op: str
+    left: str
+    right: str
+
+    def message(self) -> str:
+        return f"no signature for '{self.op}' with operands of type {self.left} and {self.right}"
+
+
+@dataclass(frozen=True)
+class NoUnarySignature:
+    op: str
+    operand: str
+
+    def message(self) -> str:
+        return f"no signature for '{self.op}' with operand of type {self.operand}"
+
+
+@dataclass(frozen=True)
+class NotCallable:
+    ty: str
+
+    def message(self) -> str:
+        return f"call of a value of type {self.ty}, which is not callable"
+
+
+@dataclass(frozen=True)
+class CallArityMismatch:
+    expected: int
+    given: int
+
+    def message(self) -> str:
+        return f"call expects {self.expected} arguments, given {self.given}"
+
+
+@dataclass(frozen=True)
+class TypeMismatch:
+    expected: str
+    actual: str
+
+    def message(self) -> str:
+        return f"expected type {self.expected}, given {self.actual}"
+
+
+@dataclass(frozen=True)
+class NotSubscriptable:
+    ty: str
+
+    def message(self) -> str:
+        return f"subscript of a value of type {self.ty}, which has no subscript rule"
+
+
+@dataclass(frozen=True)
+class TupleIndexOutOfRange:
+    index: int
+    length: int
+
+    def message(self) -> str:
+        return f"index {self.index} out of range for a tuple of length {self.length}"
+
+
+@dataclass(frozen=True)
+class CaseMatchesNothing:
+    index: int
+
+    def message(self) -> str:
+        return f"case {self.index} matches no value the earlier cases leave"
+
+
+@dataclass(frozen=True)
+class PatternTypeMismatch:
+    pattern: str
+    ty: str
+
+    def message(self) -> str:
+        return f"{self.pattern} cannot match a value of type {self.ty}"
+
+
+@dataclass(frozen=True)
+class SequenceKindClash:
+    pattern: str
+    ty: str
+
+    def message(self) -> str:
+        return (
+            f"{self.pattern} against a value of type {self.ty}; Python matches "
+            "sequence patterns against lists and tuples alike, so PurePy "
+            "treats the two kinds as incompatible"
+        )
+
+
+@dataclass(frozen=True)
+class NotIterable:
+    ty: str
+
+    def message(self) -> str:
+        return f"iteration over a value of type {self.ty}, which has no element type"
+
+
+@dataclass(frozen=True)
+class UnknownField:
+    cls: str
+    field: str
+
+    def message(self) -> str:
+        return f"class '{self.cls}' has no field '{self.field}'"
+
+
+@dataclass(frozen=True)
+class NotSynthesised:
+    """No synthesis rule gives this expression a type, so it cannot stand where
+    a rule demands one."""
+
+    def message(self) -> str:
+        return "cannot determine the type of this expression"
+
+
+@dataclass(frozen=True)
+class MissingReturn:
+    name: str
+    ty: str
+
+    def message(self) -> str:
+        return (
+            f"'{self.name}' declares result type {self.ty} but does not always return"
+        )
+
+
+type Reason = (
     DuplicateFieldName
     | UnknownBaseClass
     | InheritedFieldClash
-    | DuplicateClassName
+    | ClassRebound
     | UnassignedVariable
+    | UndefinedVariable
     | CapturedReassignment
     | SelfCaptureAssignment
     | CapturedGeneratorVariable
@@ -267,25 +411,39 @@ Reason = (
     | ConstructorArityMismatch
     | PatternArityMismatch
     | UnknownClassInPattern
+    | UnknownClassInAnnotation
+    | AnnotationNameNotInScope
+    | DecoratorNotInScope
     | UnknownFieldInPattern
     | DuplicatePatternKeyword
     | UnknownModule
     | UnknownMember
     | ModuleAsValue
     | ClassAsValue
+    | PredefinedNameAsValue
     | UnknownConstructorKeyword
     | DuplicateDictKey
     | NonlinearPattern
-    | UnreachableCase
     | DuplicateMutualName
-    | NonTopLevelImport
     | TopLevelReturn
-    | EmptyFromImport
-    | ImportAfterStatement
     | SubmoduleNameClash
     | SubmoduleNotImported
     | OwnDescendantImport
     | UnassignedMember
+    | NoBinarySignature
+    | NoUnarySignature
+    | NotCallable
+    | CallArityMismatch
+    | TypeMismatch
+    | NotSubscriptable
+    | TupleIndexOutOfRange
+    | MissingReturn
+    | NotIterable
+    | PatternTypeMismatch
+    | SequenceKindClash
+    | CaseMatchesNothing
+    | NotSynthesised
+    | UnknownField
 )
 
 
@@ -300,7 +458,6 @@ class IllFormedModule(IllFormed):
     def __init__(self, node: ast.AST, reason: Reason):
         self.line: int | None = getattr(node, "lineno", None)
         self.col: int | None = getattr(node, "col_offset", None)
-        self.reason: Reason = reason
         self.msg = reason.message()
         self.module: str | None = None
         super().__init__(self.msg)

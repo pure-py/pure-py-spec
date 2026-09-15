@@ -1,26 +1,29 @@
 import ast
-from collections.abc import Sequence
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
+from classes import Class
+from subtyping import join
+from type_syntax import CallableType, ListType, Primitive, Type, dotted_name
+
 
 class Status(Enum):
-    TT = auto()
     FF = auto()
 
 
-# Lazily evaluated, so these may name ClassEntry before it is defined.
-type ContextEntry = Status | ModuleStub | ModuleLoaded | ClassEntry
+# The entry for a variable is its type, or Status.FF where it is not definitely
+# assigned. Lazily evaluated, so these may name Class before it is defined.
+type VarEntry = Status | Type
+type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName
 type Context = dict[str, ContextEntry]
-type VarContext = dict[str, Status]
+type VarContext = dict[str, VarEntry]
 
 
 @dataclass(frozen=True)
-class ClassEntry:
-    context: Context
-    name: str
-    own_fields: tuple[str, ...]
-    base: str | None
+class PredefinedName:
+    """Name usable only in an annotation or as a decorator: it names a type,
+    heads a type form, or decorates a class declaration."""
 
 
 @dataclass(frozen=True)
@@ -37,7 +40,7 @@ class ModuleLoaded:
 @dataclass(frozen=True)
 class ModuleContext:
     gamma: Context
-    M: dict[str, ast.Module] = field(default_factory=dict)
+    M: Mapping[str, ast.Module] = field(default_factory=dict)
     q: str = ""
 
 
@@ -45,18 +48,40 @@ def override_gamma(ctx: ModuleContext, delta: Context) -> ModuleContext:
     return ModuleContext(gamma={**ctx.gamma, **delta}, M=ctx.M, q=ctx.q)
 
 
-def override_var(ctx: ModuleContext, delta: VarContext) -> ModuleContext:
+def override_var(ctx: ModuleContext, delta: Mapping[str, VarEntry]) -> ModuleContext:
     return override_gamma(ctx, dict(delta))
 
 
-def var_status(ctx: ModuleContext, x: str) -> Status | None:
+def var_entry(ctx: ModuleContext, x: str) -> VarEntry | None:
     v = ctx.gamma.get(x)
-    return v if isinstance(v, Status) else None
+    return (
+        None
+        if v is None or isinstance(v, (ModuleStub, ModuleLoaded, Class, PredefinedName))
+        else v
+    )
 
 
-def class_of(ctx: ModuleContext, c: str) -> ClassEntry | None:
-    v = ctx.gamma.get(c)
-    return v if isinstance(v, ClassEntry) else None
+def var_type(ctx: ModuleContext, x: str) -> Type | None:
+    """The variable's type, where the context has one for it."""
+    v = var_entry(ctx, x)
+    return None if v is None or isinstance(v, Status) else v
+
+
+def is_assigned(ctx: ModuleContext, x: str) -> bool:
+    v = var_entry(ctx, x)
+    return v is not None and v != Status.FF
+
+
+def resolve_name(q: str, ctx: ModuleContext) -> ContextEntry | None:
+    """Entry a qualified name denotes: its first component in the context, and
+    each later one a member of the module the components before it denote."""
+    x, *rest = q.split(".")
+    entry = ctx.gamma.get(x)
+    for y in rest:
+        if not isinstance(entry, ModuleLoaded):
+            return None
+        entry = entry.members.get(y)
+    return entry
 
 
 def module_of(ctx: ModuleContext, x: str) -> ModuleStub | ModuleLoaded | None:
@@ -71,44 +96,87 @@ class Returns:
 
 @dataclass(frozen=True)
 class Assigns:
-    delta: VarContext = field(default_factory=dict)
+    delta: Mapping[str, ContextEntry] = field(default_factory=dict)
 
 
-type ResultType = Returns | Assigns
+type StaticOutcome = Returns | Assigns
 
 RETURNS = Returns()
 
 ASSIGNS_EMPTY = Assigns()
 
-PREDEFINED_MEMBERS: dict[str, set[str]] = {
-    "builtins": {"print", "len", "range"},
-    "math": {"pi", "e", "sqrt", "exp", "log", "sin", "cos", "tan", "floor", "ceil"},
-    "sys": {"argv", "exit"},
-    "typing": {"Any"},
-    "dataclasses": {"dataclass"},
+FLOAT_TO_FLOAT = CallableType((Primitive.FLOAT,), Primitive.FLOAT)
+FLOAT_TO_INT = CallableType((Primitive.FLOAT,), Primitive.INT)
+
+# The type of each predefined member, with PredefinedName for the members
+# usable only in an annotation or as a decorator.
+PREDEFINED_MEMBERS: dict[str, dict[str, ContextEntry]] = {
+    "builtins": {
+        "print": CallableType((Primitive.OBJECT,), Primitive.NONE),
+        "len": CallableType((Primitive.SIZED,), Primitive.INT),
+        "None": PredefinedName(),
+        "object": PredefinedName(),
+        "bool": PredefinedName(),
+        "int": PredefinedName(),
+        "float": PredefinedName(),
+        "str": PredefinedName(),
+        "list": PredefinedName(),
+        "dict": PredefinedName(),
+        "tuple": PredefinedName(),
+    },
+    "math": {
+        "pi": Primitive.FLOAT,
+        "e": Primitive.FLOAT,
+        "sqrt": FLOAT_TO_FLOAT,
+        "exp": FLOAT_TO_FLOAT,
+        "log": FLOAT_TO_FLOAT,
+        "sin": FLOAT_TO_FLOAT,
+        "cos": FLOAT_TO_FLOAT,
+        "tan": FLOAT_TO_FLOAT,
+        "floor": FLOAT_TO_INT,
+        "ceil": FLOAT_TO_INT,
+    },
+    "sys": {
+        "argv": ListType(Primitive.STR),
+        "exit": CallableType((Primitive.INT,), Primitive.NEVER),
+    },
+    "typing": {
+        "Callable": PredefinedName(),
+        "Literal": PredefinedName(),
+        "Never": PredefinedName(),
+        "Sized": PredefinedName(),
+    },
+    "dataclasses": {"dataclass": PredefinedName()},
 }
 
 PREDEFINED_MODULES = set(PREDEFINED_MEMBERS)
 
 
 def predefined_context(q: str) -> Context:
-    return {x: Status.TT for x in PREDEFINED_MEMBERS[q] | {"__name__"}}
+    return {**PREDEFINED_MEMBERS[q], "__name__": Primitive.STR}
 
 
-def merge_status(a: Status, b: Status) -> Status:
-    if a == Status.TT and b == Status.TT:
-        return Status.TT
-    return Status.FF
+def merge_entry(a: ContextEntry, b: ContextEntry) -> VarEntry:
+    """Assigned in both branches gives the join of the two types; assigned in
+    one alone is not definitely assigned. Only variables are assigned within a
+    branch, since a class is declared at the top level alone."""
+    assert not isinstance(a, (ModuleStub, ModuleLoaded, Class, PredefinedName))
+    assert not isinstance(b, (ModuleStub, ModuleLoaded, Class, PredefinedName))
+    if a == Status.FF or b == Status.FF:
+        return Status.FF
+    return join([a, b])
 
 
-def merge_delta(d1: VarContext, d2: VarContext) -> VarContext:
+def merge_delta(
+    d1: Mapping[str, ContextEntry], d2: Mapping[str, ContextEntry]
+) -> VarContext:
     return {
-        k: merge_status(d1[k], d2[k]) if k in d1 and k in d2 else Status.FF
+        k: merge_entry(d1[k], d2[k]) if k in d1 and k in d2 else Status.FF
         for k in set(d1.keys()) | set(d2.keys())
     }
 
 
-def merge_results(rs: list[ResultType]) -> ResultType:
+def merge_outcomes(rs: list[StaticOutcome]) -> StaticOutcome:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return RETURNS
@@ -116,17 +184,21 @@ def merge_results(rs: list[ResultType]) -> ResultType:
     return Assigns(fold_merge(delta, assigns_branches[1:]))
 
 
-def fold_merge(acc: VarContext, branches: list[Assigns]) -> VarContext:
+def fold_merge(
+    acc: Mapping[str, ContextEntry], branches: list[Assigns]
+) -> Mapping[str, ContextEntry]:
     if len(branches) == 0:
         return acc
     return fold_merge(merge_delta(acc, branches[0].delta), branches[1:])
 
 
-def override_delta(d1: VarContext, d2: VarContext) -> VarContext:
+def override_delta(
+    d1: Mapping[str, ContextEntry], d2: Mapping[str, ContextEntry]
+) -> Context:
     return {**d1, **d2}
 
 
-def override_results(r1: ResultType, r2: ResultType) -> ResultType:
+def override_outcomes(r1: StaticOutcome, r2: StaticOutcome) -> StaticOutcome:
     if isinstance(r1, Returns):
         return r1
     if isinstance(r2, Returns):
@@ -150,51 +222,10 @@ def extend_context(g1: Context, g2: Context) -> Context:
 
 
 def entry_of(e: ast.expr, ctx: ModuleContext) -> ContextEntry | None:
-    if isinstance(e, ast.Name):
-        return ctx.gamma.get(e.id)
-    if isinstance(e, ast.Attribute):
-        parent = entry_of(e.value, ctx)
-        if isinstance(parent, ModuleLoaded):
-            return parent.members.get(e.attr)
-        return None
-    return None
+    q = dotted_name(e)
+    return None if q is None else resolve_name(q, ctx)
 
 
-def class_entry(e: ast.expr, ctx: ModuleContext) -> ClassEntry | None:
+def class_of_name(e: ast.expr, ctx: ModuleContext) -> Class | None:
     entry = entry_of(e, ctx)
-    return entry if isinstance(entry, ClassEntry) else None
-
-
-def short_name(entry: ClassEntry) -> str:
-    return entry.name.rsplit(".", 1)[-1]
-
-
-def ancestors(entry: ClassEntry) -> list[ClassEntry]:
-    if entry.base is None:
-        return [entry]
-    base_entry = entry.context[entry.base]
-    assert isinstance(base_entry, ClassEntry)
-    return [entry] + ancestors(base_entry)
-
-
-def fields(entry: ClassEntry) -> tuple[str, ...]:
-    if entry.base is None:
-        return entry.own_fields
-    base_entry = entry.context[entry.base]
-    assert isinstance(base_entry, ClassEntry)
-    return fields(base_entry) + entry.own_fields
-
-
-def field_map[T](
-    entry: ClassEntry,
-    positional: Sequence[T],
-    kwd_names: Sequence[str],
-    kwd_values: Sequence[T],
-) -> dict[str, T] | None:
-    xs = fields(entry)
-    n = len(positional)
-    if n + len(kwd_names) != len(xs) or len(set(kwd_names)) != len(kwd_names):
-        return None
-    if set(kwd_names) != set(xs[n:]):
-        return None
-    return {**dict(zip(xs[:n], positional)), **dict(zip(kwd_names, kwd_values))}
+    return entry if isinstance(entry, Class) else None

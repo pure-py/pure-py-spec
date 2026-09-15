@@ -1,11 +1,13 @@
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class Point:
-    x: Any
-    y: Any
+    x: int
+    y: int
 
 p = Point(x=3, y=4)
 q = Point(5, y=6)
-print(p.x, p.y, q.x, q.y)
+print(p.x)
+print(p.y)
+print(q.x)
+print(q.y)

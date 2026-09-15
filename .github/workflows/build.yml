@@ -5,23 +5,48 @@ on:
   push:
     paths-ignore:
       - README.md
-  pull_request:
-    paths-ignore:
-      - README.md
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
-  make:
+  submit:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    container:
+      # Official image, with HOL prebuilt. Runs as root so that checkout and apt can write.
+      image: makarius/isabelle:Isabelle2025-2
+      options: --user root
     steps:
+      - name: Install packages
+        run: |
+          apt-get update -q
+          apt-get install -y -q --no-install-recommends \
+            git zip make ca-certificates \
+            texlive-latex-extra texlive-fonts-extra texlive-science \
+            texlive-publishers texlive-bibtex-extra texlive-plain-generic
+
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Build LaTeX document
-        uses: xu-cheng/latex-action@v4
         with:
-          root_file: |
-            paper.tex
-            PurePy-spec.tex
+          submodules: recursive
+          token: ${{ secrets.PURE_PY_ISABELLE }}
+
+      - name: Fetch mechanisation main for the ancestor check
+        run: git -C isabelle-purepy fetch -q origin main
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Add Isabelle to PATH
+        run: echo "/home/isabelle/Isabelle/bin" >> "$GITHUB_PATH"
+
+      - name: Build everything
+        run: make all

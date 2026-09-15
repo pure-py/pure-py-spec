@@ -1,11 +1,10 @@
 import builtins
 import math
 import sys
-from typing import Any
 from dataclasses import dataclass
 
 @dataclass
 class C:
-    x: Any
+    x: int
 
 print(builtins.len([1, 2, 3]))

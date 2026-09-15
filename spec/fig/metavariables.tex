@@ -5,7 +5,7 @@
 \metaGroup{Names and literals} \\
 $x$, $f$, $c$ & variable; idiomatically $f$ a function and $c$ a class & \secref{contexts} \\
 $q$ & qualified name of a module or class & \figref{syntax-stmt} \\
-$n$ & number; also a sequence length and an exit status & \figref{syntax-expr} \\
+$n$ & number, never negative; also sequence length and exit status & \figref{syntax-expr} \\
 $w$ & string & \figref{syntax-expr} \\
 $\ell$ & literal & \figref{syntax-expr} \\
 $\odot$, $\ominus$ & binary and unary operator & \figref{precedence}
@@ -14,39 +14,49 @@ $\odot$, $\ominus$ & binary and unary operator & \figref{precedence}
 $e$ & expression & \figref{syntax-expr} \\
 $p$ & pattern & \figref{syntax-expr} \\
 $g$ & comprehension qualifier & \figref{syntax-expr} \\
+$b$ & case of a \pyinline{match} & \figref{syntax-stmt} \\
 $s$ & statement & \figref{syntax-stmt} \\
 $d$ & function definition & \figref{syntax-stmt} \\
-$\tau$, $\sigma$ & type & \figref{syntax-types} \\
-$\pi$ & optional annotation & \figref{syntax-types} \\
-$\omega$ & optional return annotation & \figref{syntax-types} \\
+$\tau$, $\sigma$ & type, a type expression whose class names are all marked & \figref{syntax-types} \\
+$\psi$ & type expression, a type as written & \figref{syntax-types} \\
+$\nu$ & primitive type & \figref{syntax-types} \\
 $\iota$ & import & \figref{syntax-stmt} \\
 $\phi$ & field list of a dataclass & \figref{syntax-stmt} \\
 $t$ & top-level statement & \figref{syntax-stmt} \\
 $\mu$ & module body & \figref{syntax-stmt} \\
-$u$ & argument: an expression, a pattern or a value & \secref{syntax}
+$u$ & argument: an expression, pattern or value & \secref{syntax} \\
+$a$ & argument list & \figref{syntax-expr}
    \\[2mm]
 \metaGroup{Programs} \\
 $\mathcal{M}$ & program, a finite map from module names to bodies & \secref{modules-programs} \\
 $\mathcal{P}$ & predefined modules, each with its environment and context & \secref{modules-programs}
    \\[2mm]
 \metaGroup{Contexts} \\
-$\Gamma$, $\Delta$ & context, a finite map from variables to entries & Definition~\ref{def:context} \\
+$\Gamma$, $\Delta$ & context, a finite map from variables to context entries & Definition~\ref{def:context} \\
 $\theta$ & context entry & Definition~\ref{def:context} \\
-$a$ & definite-assignment status, $\statusDefAssigned$ or $\statusNotDefAssigned$ & Definition~\ref{def:context} \\
-$C$ & class entry & Definition~\ref{def:context} \\
-$R$ & result type & \secref{well-formedness-statements}
+$C$, $D$ & class, a fully qualified class name; also the type of its instances & Definition~\ref{def:class} \\
+$\Sigma$ & class table, a finite map from classes to class entries & Definition~\ref{def:class-table} \\
+$R$ & static outcome of a statement & \secref{well-formedness-statements} \\
+$\zeta$ & optional return type, $\tau$ or $\varepsilon$ & \speconly{\figref{typing-stmt}} \\
+\metaGroup{Shapes} \\
+$k$, $l$ & shape, denoting values of a type, idiomatically $l$ residual & \figref{shapes} \\
+$H$ & finite set of heads excluded by a shape & \figref{shapes} \\
+$h$ & head, a literal, class or list of length $n$ & \figref{shapes} \\
+$\beta$ & bindings of a dictionary shape, a finite map from keys to shapes & \figref{shapes} \\
+$K$, $L$ & ordered sets of shapes, idiomatically $K$ matched and $L$ residual & \figref{pat}
    \\[2mm]
 \metaGroup{Values and results} \\
 $v$ & value & \figref{values} \\
 $\rho$ & environment, a finite map from variables to values & \figref{values} \\
 $\delta$ & dictionary entries & \figref{values} \\
 $r$ & result of statement evaluation & \figref{values} \\
-$o$ & outcome of expression evaluation & \figref{values} \\
+$o$ & outcome of statement evaluation & \figref{values} \\
+$r$ & result of expression evaluation & \figref{values} \\
 $m$ & match result & \figref{values} \\
 $\kappa$ & termination kind & \figref{values} \\
-$\primFn$ & meaning of a primitive, a partial map from a sequence of values to an outcome & \figref{values}
+$\primFn$ & meaning of a primitive, a partial map from a sequence of values to a result & \figref{values}
 \end{tabular}
 \end{center}
-\caption{Metavariables used throughout the \thisdoc}
+\caption{Metavariables used throughout \thisdoc}
 \label{fig:metavariables}
 \end{figure}

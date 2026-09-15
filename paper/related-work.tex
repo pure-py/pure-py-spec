@@ -40,3 +40,20 @@ functional pipelines have been proposed for scientific computation in Python~\ci
 more functional, the community has moved in that direction, from lambda expressions in Python~1.0 to a recent
 proposal for deeply immutable objects~\cite{johnson2025}. Typed treatments of effects in functional languages,
 such as Prism,\footnote{\url{https://www.stephendiehl.com/posts/prism/}} are relevant to the structured effects \PurePy may add in a later release.
+
+\subsection{Typed Python}
+
+Static Python~\cite{lu2023} is a gradually typed dialect of Python
+combining concrete and transient enforcement so that typed code is sound. \PurePy adopts a static
+type system whose well-typed programs are accepted by mypy, leaving gradual typing to a later release.
+
+\subsection{Pattern matching}
+
+Checking that the cases of a match are reachable and exhaustive goes back to the usefulness algorithm for
+ML~\cite{maranget2007}, which decides whether a pattern matches some value not matched by any preceding
+pattern, and to the term descriptions of \citet{sestoft1996}, which record the constructors established and
+excluded at each position of the scrutinee as match compilation proceeds. \PurePy computes
+both from a residual, the set of values that no earlier case has matched, and seeds that residual from the
+type of the scrutinee, so the types of the variables bound by a pattern come from the same computation. The
+uncovered sets of \citet{karachalias2015} account for the type in the same way, tracking the values left
+unmatched by a GADT match and ruling out cases made impossible by the type indices.

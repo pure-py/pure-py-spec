@@ -11,7 +11,7 @@
 \newcommand*{\versionstring}{}
 
 % Audience. \specmode selects the specification; otherwise the paper. \paperonly and \speconly carry a
-% phrase for one document only; \paperinput reads a file of the paper's own material at that point.
+% phrase for one document only; \paperinput reads a file of material belonging only to the paper at that point.
 \ifdefined\specmode
   \newcommand*{\paperonly}[1]{}
   \newcommand*{\speconly}[1]{#1}
@@ -35,7 +35,7 @@
   \newcommand*{\auxgroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{\itshape #1} \\}
 \fi
 % Inline definitions: align* with tighter row spacing than a standalone figure.
-\newenvironment{defalign}{\setlength{\jot}{1pt}\csname align*\endcsname}{\csname endalign*\endcsname}
+\newenvironment{defalign}{\setlength{\jot}{1pt}\csname alignat*\endcsname{2}}{\csname endalignat*\endcsname}
 % How the paper refers to the specification document.
 \ifdefined\anonmode
   \newcommand*{\specification}{the supplementary material\xspace}
@@ -68,7 +68,6 @@
 \newcommand*{\shadebox}[1]{\fcolorbox{lightgray}{shadecolor}{\raisebox{0pt}[0.60\baselineskip][0.05\baselineskip]{#1}}}
 
 % General notation
-\newcommand*{\B}{\mathbb{B}}
 \newcommand*{\bind}[2]{#1\mathord{:}\,#2}
 \newcommand*{\concat}{\mathbin{{+}\mkern-3mu{+}}}
 \newcommand*{\cons}{\cdot}
@@ -120,17 +119,21 @@
 \newcommand*{\exImport}[1]{\pyinline{import}\;#1}
 
 % Types and annotations
-\newcommand*{\tyAny}{\pyinline{Any}}
+\newcommand*{\tyNever}{\pyinline{Never}}
+\newcommand*{\tyObject}{\pyinline{object}}
 \newcommand*{\tyNone}{\pyinline{None}}
 \newcommand*{\tyBool}{\pyinline{bool}}
 \newcommand*{\tyInt}{\pyinline{int}}
 \newcommand*{\tyFloat}{\pyinline{float}}
 \newcommand*{\tyStr}{\pyinline{str}}
+\newcommand*{\tySized}{\pyinline{Sized}}
 \newcommand*{\tyList}[1]{\pyinline{list}[#1]}
 \newcommand*{\tyTuple}[1]{\pyinline{tuple}[#1]}
 \newcommand*{\tyDict}[1]{\pyinline{dict}[\tyStr, #1]}
 \newcommand*{\tyCallable}[2]{\pyinline{Callable}[[#1], #2]}
 \newcommand*{\tyUnion}[2]{#1 \mathbin{|} #2}
+\newcommand*{\tyLiteral}[1]{\pyinline{Literal}[#1]}
+\newcommand*{\fq}[1]{\widetilde{#1}}
 \newcommand*{\exAnnot}[1]{\mathord{:}\;#1}
 \newcommand*{\exRetAnnot}[1]{\;\pymath{-\raisebox{-0.15ex}{>}}\;#1}
 
@@ -144,22 +147,47 @@
 % Values: closures and objects
 \newcommand*{\exDefClosure}[4][]{\mathsf{Def}_{#1}(#2, #3, #4)}
 \newcommand*{\exLamClosure}[4][]{\mathsf{Lam}_{#1}(#2, #3, #4)}
-\newcommand*{\exObj}[3]{\mathsf{Obj}_{#1}(#2, #3)}
+\newcommand*{\exObj}[2]{\mathsf{Obj}(#1, #2)}
 
 % Context entries
-\newcommand*{\clsEntry}[4]{\mathsf{Cls}_{#1}(#2, #3, #4)}
+\newcommand*{\clsRec}[2]{(#1;\, #2)}
 \newcommand*{\modLoaded}[2]{\mathsf{Mod}(#1, #2)}
 \newcommand*{\primFn}{\mathpzc{f}}
 \newcommand*{\primVal}[1]{\mathsf{Prim}(#1)}
 \newcommand*{\modStub}[1]{\mathsf{Mod}(#1)}
-\newcommand*{\statusDefAssigned}{\mathsf{tt}}
-\newcommand*{\statusNotDefAssigned}{\mathsf{ff}}
+\newcommand*{\predefName}{\mathsf{Predef}}
+\newcommand*{\Type}[1]{\mathsf{Type}(#1)}
+\newcommand*{\opaqueVal}[1]{\mathsf{Opaque}(#1)}
+\newcommand*{\True}{\mathsf{tt}}
+\newcommand*{\False}{\mathsf{ff}}
 
 % Context and environment operations
 \newcommand*{\disjunion}{\uplus}
-\newcommand*{\extend}{\lhd}
-\newcommand*{\meet}{\wedge}
+\newcommand*{\bigdisjunion}{\biguplus}
+\newcommand*{\extend}{\boxplus}
+\newcommand*{\synth}{\mathrel{\triangleright}}
+\newcommand*{\checks}{\mathrel{\triangleleft}}
+\newcommand*{\subty}{\mathrel{<:}}
+\newcommand*{\tyEquiv}{\mathrel{\equiv}}
+\newcommand*{\binding}{\mathrel{\dashv}}
+\newcommand*{\baseType}{\mathrm{base\text{-}type}}
+\newcommand*{\overloadsOf}{\mathrm{overloads}}
+\newcommand*{\eqType}{\mathrel{\mathrm{eq\text{-}type}}}
+\newcommand*{\joinTy}[3]{#2 \vee_{#1} #3}
+\newcommand*{\meetTy}[3]{#2 \wedge_{#1} #3}
+\newcommand*{\bigJoinTy}[2]{\textstyle\bigvee_{#1} #2}
+\newcommand*{\bigMeetTy}[2]{\textstyle\bigwedge_{#1} #2}
+\newcommand*{\shapeAny}[2]{#1 \setminus #2}
+\newcommand*{\shapeDict}[3]{#2 \setminus_{#1} #3}
+\newcommand*{\shapeList}[2]{[#2]_{#1}}
+\newcommand*{\headList}[1]{\pyinline{list}_{#1}}
+\newcommand*{\shapeTy}{\mathrm{shape\text{-}type}}
+\newcommand*{\splits}{\mathrel{\rightsquigarrow_{\mathsf{h}}}}
+\newcommand*{\shapes}{\mathrm{shapes}}
+\newcommand*{\seqSafe}{\mathrm{seq\text{-}safe}}
+\newcommand*{\elemTy}{\mathrm{elem\text{-}type}}
 \newcommand*{\merge}{\oplus}
+\newcommand*{\mergeS}{\mathbin{\merge_\Sigma}}
 \newcommand*{\override}{\otimes}
 
 % Outcomes (draft, \secref{errors})
@@ -176,8 +204,8 @@
 \newcommand*{\errZeroDiv}{\mathsf{ZeroDivisionError}}
 
 % Result types and results
-\newcommand*{\Assigns}[1]{\mathsf{Assigns}\;#1}
-\newcommand{\assigns}[1]{\mathsf{assigns}\;#1}
+\newcommand*{\Assigns}[1]{\mathsf{Assigns}(#1)}
+\newcommand{\assigns}[1]{\mathsf{assigns}(#1)}
 \newcommand*{\Returns}{\mathsf{Returns}}
 \newcommand{\returns}[1]{\mathsf{returns}\;#1}
 
@@ -215,7 +243,7 @@
 
 % Metafunctions: evaluation
 \newcommand*{\dispatch}{\mathrm{dispatch}}
-\newcommand*{\outcome}{\mathrm{outcome}}
+\newcommand*{\result}{\mathrm{result}}
 \newcommand*{\env}{\mathrm{env}}
 
 % Orders, relations, and judgement symbols
@@ -228,9 +256,8 @@
 \newcommand*{\notmatches}{\not\rightsquigarrow}
 \newcommand*{\prefixOf}{\preceq}
 \newcommand*{\properPrefixOf}{\prec}
-\newcommand*{\subsumed}{\sqsubseteq}
 
-% Change markup (own copy of the shared change-tracking definitions; changebar loaded in the
+% Change markup (a local copy of the shared change-tracking definitions; changebar loaded in the
 % preamble).
 \input{tex/change-tracking}
 % A row of an align recording a deleted definition: grey in the paper, absent under \acceptchanges.
@@ -242,5 +269,24 @@
 
 % Grammar figures: shaded heading row naming the syntactic category
 \definecolor{grammarheadcolor}{gray}{0.93}
+
+% An entry of the annex of auxiliary functions: the application form, its result and its label, then
+% prose and rows.
+\newenvironment{auxfunction}[3]{%
+  \par\addvspace{\bigskipamount}\phantomsection\label{#3}%
+  \noindent{\color{gray!60}\rule{\textwidth}{0.4pt}}\par\nobreak\vskip-\parskip\nointerlineskip
+  \noindent\colorbox{grammarheadcolor}{\parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
+    {\bfseries $#1$}\hfill{\itshape #2}}}\par\nobreak\vspace{2mm}\noindent\ignorespaces}
+  {\par\addvspace{\bigskipamount}}
+
+% Rows defining an auxiliary function, from spec/functions. Uniform row height: a negative
+% \lineskiplimit stops TeX adding interline glue for a taller row, such as one carrying an accent. That
+% also puts a full \baselineskip before the first row, which the display skip takes back.
+\newcommand*{\funcrows}[1]{%
+  \begingroup\lineskiplimit=-\baselineskip
+  \setlength{\abovedisplayskip}{\dimexpr\abovedisplayskip - \baselineskip\relax}%
+  \setlength{\abovedisplayshortskip}{\dimexpr\abovedisplayshortskip - \baselineskip\relax}%
+  \begin{align*}\input{spec/functions/#1}\end{align*}\endgroup}
+
 \newcommand*{\grammarGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{4}{l}{#1}}
 \newcommand*{\metaGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{#1}}

@@ -1,4 +1,4 @@
-def f(v):
+def f(v: list[int]) -> int:
     match v:
         case [a, b]:
             return a + b

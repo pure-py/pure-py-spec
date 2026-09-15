@@ -3,143 +3,217 @@ import ast
 import reasons
 from aux import (
     Statement,
+    annotated,
     assigns_body,
     assigns_seq,
-    binds,
     binds_quals,
     captures_e,
     captures_e_list,
     captures_quals,
     captures_statement,
+    dict_keys,
     find_first_reassigning,
-    names_in_target,
     own_fields,
     qualified_name,
     statements,
+    target_name,
 )
+from classes import Class, declared_type, field_map, field_type, fields, short_name
 from contexts import (
     ASSIGNS_EMPTY,
     RETURNS,
     Assigns,
-    ClassEntry,
-    Context,
     ModuleContext,
     ModuleLoaded,
     ModuleStub,
-    ResultType,
+    PredefinedName,
     Returns,
+    StaticOutcome,
     Status,
-    class_entry,
-    class_of,
+    VarContext,
+    class_of_name,
     entry_of,
-    field_map,
-    fields,
-    merge_results,
+    is_assigned,
+    merge_outcomes,
     module_of,
     override_gamma,
-    override_results,
+    override_outcomes,
     override_var,
-    short_name,
-    var_status,
+    resolve_name,
+    var_type,
 )
-from patterns import check_pattern_list, is_catch_all
+from match import literal_of, match_shapes, seq_safe
+from operators import (
+    BINARY_NAMES,
+    UNARY_NAMES,
+    overloads_binary,
+    overloads_unary,
+    result_of_min,
+)
 from reasons import IllFormedModule
+from shapes import Shape, shapes
+from subtyping import join, subtype
+from syntax import PatList, PatTuple
+from type_syntax import (
+    PRIMITIVE_SPELLINGS,
+    CallableExpr,
+    CallableType,
+    ClassName,
+    ClassType,
+    DictExpr,
+    DictType,
+    ListExpr,
+    ListType,
+    LiteralType,
+    Primitive,
+    TupleExpr,
+    TupleType,
+    Type,
+    TypeExpr,
+    UnionExpr,
+    UnionType,
+    base_type,
+    literal_type,
+    render,
+)
 
 
-def result_type(node: ast.stmt) -> ResultType:
-    if isinstance(node, ast.Pass):
-        return ASSIGNS_EMPTY
-    if isinstance(node, ast.Assign):
-        return Assigns(
-            {t.id: Status.TT for t in node.targets if isinstance(t, ast.Name)}
+def signature(d: ast.FunctionDef, ctx: ModuleContext) -> CallableType:
+    """Callable type of a definition, from its parameter and return
+    annotations."""
+    return CallableType(
+        tuple(resolve_type(annotated(a.annotation), a, ctx) for a in d.args.args),
+        resolve_type(annotated(d.returns), d, ctx),
+    )
+
+
+def parameters(d: ast.FunctionDef, ctx: ModuleContext) -> VarContext:
+    return {a.arg: resolve_type(annotated(a.annotation), a, ctx) for a in d.args.args}
+
+
+def resolve_type(psi: TypeExpr, node: ast.AST, ctx: ModuleContext) -> Type:
+    """Type that type expression `psi` denotes: each name it is written with
+    must be in scope, a class name resolving to the class that is its type and
+    every other spelling to the predefined entry its module gives it."""
+    if isinstance(psi, Primitive):
+        in_scope(PRIMITIVE_SPELLINGS[psi], node, ctx)
+        return psi
+    if isinstance(psi, LiteralType):
+        in_scope("Literal", node, ctx)
+        return psi
+    if isinstance(psi, ClassName):
+        c = resolve_name(psi.q, ctx)
+        if not isinstance(c, Class):
+            raise IllFormedModule(node, reasons.UnknownClassInAnnotation(psi.q))
+        return ClassType(c)
+    if isinstance(psi, ListExpr):
+        in_scope("list", node, ctx)
+        return ListType(resolve_type(psi.elem, node, ctx))
+    if isinstance(psi, DictExpr):
+        in_scope("dict", node, ctx)
+        in_scope("str", node, ctx)
+        return DictType(resolve_type(psi.value, node, ctx))
+    if isinstance(psi, TupleExpr):
+        in_scope("tuple", node, ctx)
+        return TupleType(tuple(resolve_type(c, node, ctx) for c in psi.components))
+    if isinstance(psi, CallableExpr):
+        in_scope("Callable", node, ctx)
+        return CallableType(
+            tuple(resolve_type(p, node, ctx) for p in psi.params),
+            resolve_type(psi.result, node, ctx),
         )
-    if isinstance(node, ast.Expr):
-        return ASSIGNS_EMPTY
-    if isinstance(node, ast.Assert):
-        return ASSIGNS_EMPTY
-    if isinstance(node, ast.Return):
-        return RETURNS
-    if isinstance(node, ast.FunctionDef):
-        return Assigns({node.name: Status.TT})
-    if isinstance(node, ast.If):
-        return merge_results(
-            [
-                result_type_body(node.body),
-                result_type_body(node.orelse) if node.orelse else ASSIGNS_EMPTY,
-            ]
-        )
-    if isinstance(node, ast.Match):
-        branches = [
-            override_results(
-                Assigns({x: Status.TT for x in binds(case.pattern)}),
-                result_type_body(case.body),
-            )
-            for case in node.cases
-        ]
-        if not is_catch_all(node.cases[-1].pattern):
-            branches.append(ASSIGNS_EMPTY)
-        return merge_results(branches)
-    if isinstance(node, ast.ClassDef):
-        return ASSIGNS_EMPTY
-    raise AssertionError(f"unexpected statement: {type(node).__name__}")
+    assert isinstance(psi, UnionExpr)
+    return UnionType(
+        resolve_type(psi.left, node, ctx), resolve_type(psi.right, node, ctx)
+    )
 
 
-def result_type_body(body: list[ast.stmt]) -> ResultType:
-    if len(body) == 1:
-        return result_type(body[0])
-    return override_results(result_type(body[0]), result_type_body(body[1:]))
+def in_scope(x: str, node: ast.AST, ctx: ModuleContext) -> None:
+    """A name an annotation is written with must still be the predefined one,
+    which an import brings into scope and an assignment takes away."""
+    if not isinstance(ctx.gamma.get(x), PredefinedName):
+        raise IllFormedModule(node, reasons.AnnotationNameNotInScope(x))
 
 
-def check_body(body: list[ast.stmt], ctx: ModuleContext) -> ModuleContext:
-    return check_seq(statements(body), ctx)
+def check_body(
+    body: list[ast.stmt], ctx: ModuleContext, returns: Type | None = None
+) -> StaticOutcome:
+    """Check a block in a function declared to return `returns`."""
+    outcome, _ = check_seq(statements(body), ctx, returns)
+    return outcome
 
 
-def check_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
+def check_top_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
+    """Check a module body's top-level statements, threading the context, and
+    give the context after them; class declarations are top-level forms."""
     if len(items) == 0:
         return ctx
-    head = items[0]
-    check_statement(head, ctx)
-    if len(items) == 1:
-        return next_ctx_after(head, ctx)
-    tail = items[1:]
-    if isinstance(result_type_statement(head), Returns):
-        first_unreachable = tail[0]
-        node: ast.AST = (
-            first_unreachable[0]
-            if isinstance(first_unreachable, list)
-            else first_unreachable
-        )
+    head, tail = items[0], items[1:]
+    head_outcome = check_top_statement(head, ctx)
+    ctx_after = extend(head_outcome, ctx)
+    if len(tail) == 0:
+        return ctx_after
+    check_captured_reassignment(head, tail)
+    delta = head_outcome.delta if isinstance(head_outcome, Assigns) else {}
+    rebound = {c for c in assigns_seq(tail) if isinstance(delta.get(c), Class)}
+    if rebound:
+        node = find_first_reassigning(tail, rebound)
+        raise IllFormedModule(node, reasons.ClassRebound(min(rebound)))
+    return check_top_seq(tail, ctx_after)
+
+
+def check_top_statement(item: Statement, ctx: ModuleContext) -> StaticOutcome:
+    """A class declaration is checked here; any other top-level statement is a
+    plain statement, checked with no return type (top-stmt)."""
+    if isinstance(item, ast.ClassDef):
+        return Assigns({item.name: class_declared(item, ctx)})
+    return check_statement(item, ctx, None)
+
+
+def check_seq(
+    items: list[Statement], ctx: ModuleContext, returns: Type | None = None
+) -> tuple[StaticOutcome, ModuleContext]:
+    """Check a sequence, threading the context through it, and give its static
+    outcome and the context after it; nothing may follow a statement that
+    definitely returns."""
+    if len(items) == 0:
+        return ASSIGNS_EMPTY, ctx
+    head, tail = items[0], items[1:]
+    head_outcome = check_statement(head, ctx, returns)
+    ctx_after = extend(head_outcome, ctx)
+    if len(tail) == 0:
+        return head_outcome, ctx_after
+    if isinstance(head_outcome, Returns):
+        node: ast.AST = tail[0][0] if isinstance(tail[0], list) else tail[0]
         raise IllFormedModule(node, reasons.UnreachableStatement())
+    check_captured_reassignment(head, tail)
+    tail_outcome, final_ctx = check_seq(tail, ctx_after, returns)
+    return override_outcomes(head_outcome, tail_outcome), final_ctx
+
+
+def check_captured_reassignment(head: Statement, tail: list[Statement]) -> None:
+    """A name captured by `head` is not reassigned in `tail`."""
     reassigned = captures_statement(head) & assigns_seq(tail)
     if reassigned:
-        name = min(reassigned)
-        ra_node = find_first_reassigning(tail, reassigned)
-        assert ra_node is not None
-        raise IllFormedModule(ra_node, reasons.CapturedReassignment(name))
-    return check_seq(tail, next_ctx_after(head, ctx))
+        node = find_first_reassigning(tail, reassigned)
+        raise IllFormedModule(node, reasons.CapturedReassignment(min(reassigned)))
 
 
-def next_ctx_after(head: Statement, ctx: ModuleContext) -> ModuleContext:
-    # Assigns {c: C} for a class statement: ResultType carries statuses only, so the class entry is
-    # added here rather than through the result type.
-    if isinstance(head, ast.ClassDef):
-        return override_gamma(ctx, {head.name: class_entry_for(head, ctx.q, ctx.gamma)})
-    head_result = result_type_statement(head)
-    delta = head_result.delta if isinstance(head_result, Assigns) else {}
-    return override_var(ctx, delta)
+def extend(outcome: StaticOutcome, ctx: ModuleContext) -> ModuleContext:
+    return (
+        override_gamma(ctx, dict(outcome.delta))
+        if isinstance(outcome, Assigns)
+        else ctx
+    )
 
 
-def result_type_statement(item: Statement) -> ResultType:
-    if isinstance(item, list):
-        return Assigns({d.name: Status.TT for d in item})
-    return result_type(item)
-
-
-def check_statement(item: Statement, ctx: ModuleContext) -> None:
+def check_statement(
+    item: Statement, ctx: ModuleContext, returns: Type | None
+) -> StaticOutcome:
     if isinstance(item, list):
         check_mutual_region(item, ctx)
-    else:
-        check_stmt(item, ctx)
+        return Assigns({d.name: signature(d, ctx) for d in item})
+    return check_stmt(item, ctx, returns)
 
 
 def check_mutual_region(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
@@ -148,24 +222,35 @@ def check_mutual_region(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None
 
 
 def check_bodies(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
-    f_names = {d.name: Status.TT for d in defs}
+    f_names: VarContext = {d.name: signature(d, ctx) for d in defs}
     for d in defs:
-        params = {a.arg for a in d.args.args}
-        locals_ = assigns_body(d.body) - params
-        delta = (
-            f_names | {p: Status.TT for p in params} | {x: Status.FF for x in locals_}
-        )
+        params = parameters(d, ctx)
+        locals_ = assigns_body(d.body) - set(params)
+        delta = f_names | params | {x: Status.FF for x in locals_}
         body_ctx = override_var(ctx, delta)
-        check_body(d.body, body_ctx)
+        declared = resolve_type(annotated(d.returns), d, ctx)
+        result = check_body(d.body, body_ctx, declared)
+        if not isinstance(result, Returns):
+            check_falls_off_end(d, declared)
 
 
-def check_assign_targets(targets: list[ast.expr], captured: set[str]) -> None:
-    if len(targets) == 0:
-        return
-    t = targets[0]
-    if isinstance(t, ast.Name) and t.id in captured:
-        raise IllFormedModule(t, reasons.SelfCaptureAssignment(t.id))
-    check_assign_targets(targets[1:], captured)
+def check_falls_off_end(d: ast.FunctionDef, declared: Type) -> None:
+    """A body that does not definitely return falls off the end, giving None,
+    so the declared type must admit it."""
+    if not subtype(Primitive.NONE, declared):
+        raise IllFormedModule(d, reasons.MissingReturn(d.name, render(declared)))
+
+
+def check_returns_none(s: ast.Return, declared: Type) -> None:
+    if not subtype(Primitive.NONE, declared):
+        raise IllFormedModule(
+            s, reasons.TypeMismatch(render(declared), render(Primitive.NONE))
+        )
+
+
+def check_assign_target(target: ast.Name, captured: set[str]) -> None:
+    if target.id in captured:
+        raise IllFormedModule(target, reasons.SelfCaptureAssignment(target.id))
 
 
 def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
@@ -177,73 +262,142 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
     check_distinct_names(defs[1:], seen | {head.name})
 
 
-def check_stmt(s: ast.stmt, ctx: ModuleContext) -> None:
+def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> StaticOutcome:
     if isinstance(s, ast.Pass):
-        return
+        return ASSIGNS_EMPTY
     if isinstance(s, ast.Assign):
-        check_expr(s.value, ctx)
-        check_assign_targets(s.targets, captures_e(s.value))
-        return
+        (target,) = s.targets
+        assert isinstance(target, ast.Name)
+        check_assign_target(target, captures_e(s.value))
+        return Assigns({target.id: synth_expr(s.value, ctx)})
+    if isinstance(s, ast.AnnAssign):
+        assert s.value is not None and isinstance(s.target, ast.Name)
+        declared = resolve_type(annotated(s.annotation), s, ctx)
+        check_expr(s.value, declared, ctx)
+        check_assign_target(s.target, captures_e(s.value))
+        return Assigns({s.target.id: declared})
     if isinstance(s, ast.Expr):
-        check_expr(s.value, ctx)
-        return
+        synth_expr(s.value, ctx)
+        return ASSIGNS_EMPTY
     if isinstance(s, ast.Return):
-        if s.value is not None:
-            check_expr(s.value, ctx)
-        return
+        assert returns is not None  # a return at the top level is rejected earlier
+        if s.value is None:
+            check_returns_none(s, returns)
+        else:
+            check_expr(s.value, returns, ctx)
+        return RETURNS
     if isinstance(s, ast.If):
-        check_expr(s.test, ctx)
-        check_body(s.body, ctx)
-        if s.orelse:
-            check_body(s.orelse, ctx)
-        return
+        check_expr(s.test, Primitive.BOOL, ctx)
+        branches = [check_body(s.body, ctx, returns)]
+        branches.append(
+            check_body(s.orelse, ctx, returns) if s.orelse else ASSIGNS_EMPTY
+        )
+        return merge_outcomes(branches)
     if isinstance(s, ast.Assert):
-        check_expr(s.test, ctx)
+        check_expr(s.test, Primitive.BOOL, ctx)
         if s.msg is not None:
-            check_expr(s.msg, ctx)
-        return
+            check_expr(s.msg, Primitive.STR, ctx)
+        return ASSIGNS_EMPTY
     if isinstance(s, ast.Match):
-        check_expr(s.subject, ctx)
-        check_pattern_list([c.pattern for c in s.cases], s, ctx)
-        check_match_cases(s.cases, ctx)
-        return
-    if isinstance(s, ast.ClassDef):
-        check_class_decl(s, ctx.gamma, ctx.q)
-        return
+        subject = synth_expr(s.subject, ctx)
+        return check_match_cases(s.cases, subject, ctx, returns)
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
-def check_match_cases(cases: list[ast.match_case], ctx: ModuleContext) -> None:
-    for case in cases:
-        check_body(
-            case.body, override_var(ctx, {x: Status.TT for x in binds(case.pattern)})
+def check_match_cases(
+    cases: list[ast.match_case],
+    subject: Type,
+    ctx: ModuleContext,
+    returns: Type | None,
+) -> StaticOutcome:
+    deltas, partial = match_cases(cases, subject, ctx)
+    branches = [
+        check_case(case, delta, ctx, returns) for case, delta in zip(cases, deltas)
+    ]
+    return merge_outcomes(branches + ([ASSIGNS_EMPTY] if partial else []))
+
+
+def match_cases(
+    cases: list[ast.match_case], subject: Type, ctx: ModuleContext
+) -> tuple[list[VarContext], bool]:
+    """Bindings of each case, taken by matching against the residual, and
+    whether some value of the scrutinee type falls through."""
+    seed = shapes(subject, frozenset())
+    left = seed
+    deltas: list[VarContext] = []
+    for index, case in enumerate(cases, 1):
+        if not seq_safe(case.pattern, subject, ctx):
+            raise IllFormedModule(
+                case.pattern,
+                reasons.SequenceKindClash(describe(case.pattern, ctx), render(subject)),
+            )
+        result = match_shapes(left, case.pattern, ctx)
+        if result is None:
+            raise unmatched(case.pattern, index, subject, seed, ctx)
+        _, left, delta = result
+        deltas.append(delta)
+    return deltas, len(left) > 0
+
+
+def unmatched(
+    p: ast.pattern,
+    index: int,
+    subject: Type,
+    seed: tuple[Shape, ...],
+    ctx: ModuleContext,
+) -> IllFormedModule:
+    """A case matches nothing either because no value of the scrutinee type has
+    its shape, or because the earlier cases have taken every shape it has."""
+    if match_shapes(seed, p, ctx) is None:
+        return IllFormedModule(
+            p, reasons.PatternTypeMismatch(describe(p, ctx), render(subject))
         )
+    return IllFormedModule(p, reasons.CaseMatchesNothing(index))
 
 
-def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
+def check_case(
+    case: ast.match_case,
+    delta: VarContext,
+    ctx: ModuleContext,
+    returns: Type | None,
+) -> StaticOutcome:
+    """Result of one case, whose body is checked under the bindings its pattern
+    gives."""
+    return override_outcomes(
+        Assigns(delta), check_body(case.body, override_var(ctx, delta), returns)
+    )
+
+
+def synth_expr(e: ast.expr, ctx: ModuleContext) -> Type:
+    """Type `e` synthesises. An expression with no synthesis rule, such as a
+    lambda or an empty list, is rejected here and must be checked instead."""
     if isinstance(e, ast.Name):
-        if var_status(ctx, e.id) != Status.TT:
+        if not is_assigned(ctx, e.id):
             if module_of(ctx, e.id) is not None:
                 raise IllFormedModule(e, reasons.ModuleAsValue(e.id))
-            if class_of(ctx, e.id) is not None:
+            if isinstance(ctx.gamma.get(e.id), Class):
                 raise IllFormedModule(e, reasons.ClassAsValue(e.id))
+            if isinstance(ctx.gamma.get(e.id), PredefinedName):
+                raise IllFormedModule(e, reasons.PredefinedNameAsValue(e.id))
+            if e.id not in ctx.gamma:
+                raise IllFormedModule(e, reasons.UndefinedVariable(e.id))
             raise IllFormedModule(e, reasons.UnassignedVariable(e.id))
-        return
+        t = var_type(ctx, e.id)
+        assert t is not None
+        return t
     if isinstance(e, ast.Constant):
-        return
+        return LiteralType(e.value)
     if isinstance(e, ast.Lambda):
-        params = {a.arg for a in e.args.args}
-        check_expr(e.body, override_var(ctx, {p: Status.TT for p in params}))
-        return
+        raise IllFormedModule(e, reasons.NotSynthesised())
     if isinstance(e, ast.Call):
-        constructed = class_entry(e.func, ctx)
+        constructed = class_of_name(e.func, ctx)
         if constructed is not None:
             c_name, xs = short_name(constructed), fields(constructed)
             kwd_names = [k.arg for k in e.keywords if k.arg is not None]
-            if (
-                field_map(constructed, e.args, kwd_names, [k.value for k in e.keywords])
-                is None
-            ):
+            args = field_map(
+                constructed, e.args, kwd_names, [k.value for k in e.keywords]
+            )
+            if args is None:
                 n = len(e.args)
                 if n + len(kwd_names) != len(xs):
                     raise IllFormedModule(
@@ -258,31 +412,32 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
                         c_name, tuple(sorted(set(xs[n:])))
                     ),
                 )
-            check_exprs(e.args, ctx)
-            check_exprs([k.value for k in e.keywords], ctx)
-            return
-        check_expr(e.func, ctx)
-        check_exprs(e.args, ctx)
-        return
+            for x, arg in args.items():
+                check_expr(arg, declared_type(constructed, x), ctx)
+            return ClassType(constructed)
+        return call(e, ctx)
     if isinstance(e, ast.BinOp):
-        check_expr(e.left, ctx)
-        check_expr(e.right, ctx)
-        return
+        return binary(BINARY_NAMES[type(e.op)], e.left, e.right, e, ctx)
     if isinstance(e, ast.UnaryOp):
-        check_expr(e.operand, ctx)
-        return
+        operand = synth_expr(e.operand, ctx)
+        negated = literal_type(e)
+        if negated is not None:
+            return negated
+        name = UNARY_NAMES[type(e.op)]
+        result = result_of_min(overloads_unary(name, operand))
+        if result is None:
+            raise IllFormedModule(e, reasons.NoUnarySignature(name, render(operand)))
+        return result
     if isinstance(e, ast.BoolOp):
-        check_exprs(e.values, ctx)
-        return
+        for v in e.values:
+            check_expr(v, Primitive.BOOL, ctx)
+        return Primitive.BOOL
     if isinstance(e, ast.Compare):
-        check_expr(e.left, ctx)
-        check_exprs(e.comparators, ctx)
-        return
+        assert len(e.ops) == 1
+        return binary(BINARY_NAMES[type(e.ops[0])], e.left, e.comparators[0], e, ctx)
     if isinstance(e, ast.IfExp):
-        check_expr(e.test, ctx)
-        check_expr(e.body, ctx)
-        check_expr(e.orelse, ctx)
-        return
+        check_expr(e.test, Primitive.BOOL, ctx)
+        return branch_type(e, ctx)
     if isinstance(e, ast.Attribute):
         parent = entry_of(e.value, ctx)
         if isinstance(parent, ModuleLoaded):
@@ -293,96 +448,365 @@ def check_expr(e: ast.expr, ctx: ModuleContext) -> None:
                 raise IllFormedModule(e, reasons.SubmoduleNotImported(entry.q))
             if isinstance(entry, ModuleLoaded):
                 raise IllFormedModule(e, reasons.ModuleAsValue(qualified_name(e)))
-            if isinstance(entry, ClassEntry):
+            if isinstance(entry, Class):
                 raise IllFormedModule(e, reasons.ClassAsValue(qualified_name(e)))
+            if isinstance(entry, PredefinedName):
+                raise IllFormedModule(
+                    e, reasons.PredefinedNameAsValue(qualified_name(e))
+                )
             if entry == Status.FF:
                 raise IllFormedModule(e, reasons.UnassignedMember(e.attr, parent.q))
-            return
+            assert not isinstance(entry, Status)
+            return entry
         if isinstance(parent, ModuleStub):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(parent.q))
-        check_expr(e.value, ctx)
-        return
+        return field_of(synth_expr(e.value, ctx), e, ctx)
     if isinstance(e, ast.Subscript):
-        check_expr(e.value, ctx)
-        check_expr(e.slice, ctx)
-        return
-    if isinstance(e, (ast.List, ast.Tuple)):
-        check_exprs(e.elts, ctx)
-        return
+        return subscript(e, ctx)
+    if isinstance(e, ast.Tuple):
+        return TupleType(tuple(synth_expr(x, ctx) for x in e.elts))
+    if isinstance(e, ast.List):
+        return list_type(e, e.elts, ctx)
     if isinstance(e, ast.Dict):
-        check_exprs([k for k in e.keys if k is not None], ctx)
-        check_exprs(e.values, ctx)
-        return
+        for k in dict_keys(e):
+            check_expr(k, Primitive.STR, ctx)
+        return dict_type(e, e.values, ctx)
     if isinstance(e, ast.ListComp):
-        check_comprehension([e.elt], e.generators, ctx)
-        return
+        return ListType(
+            base_type(synth_expr(e.elt, qual_context([e.elt], e.generators, ctx)))
+        )
     if isinstance(e, ast.DictComp):
-        check_comprehension([e.key, e.value], e.generators, ctx)
-        return
+        ctx_ = qual_context([e.key, e.value], e.generators, ctx)
+        check_expr(e.key, Primitive.STR, ctx_)
+        return DictType(base_type(synth_expr(e.value, ctx_)))
     raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
-def check_comprehension(
+def field_of(obj: Type, e: ast.Attribute, ctx: ModuleContext) -> Type:
+    """The type of a field of an object of type `obj`; at a union, the join
+    over the members."""
+    if isinstance(obj, UnionType):
+        return join([field_of(obj.left, e, ctx), field_of(obj.right, e, ctx)])
+    if not isinstance(obj, ClassType):
+        raise IllFormedModule(e, reasons.NotSynthesised())
+    member = field_type(obj.c, e.attr)
+    if member is None:
+        raise IllFormedModule(e, reasons.UnknownField(short_name(obj.c), e.attr))
+    return member
+
+
+def subscript(e: ast.Subscript, ctx: ModuleContext) -> Type:
+    return subscript_type(synth_expr(e.value, ctx), e, ctx)
+
+
+def subscript_type(container: Type, e: ast.Subscript, ctx: ModuleContext) -> Type:
+    """The type of a subscript, given the type of the container; at a union,
+    the join over the members."""
+    if isinstance(container, UnionType):
+        return join(
+            [
+                subscript_type(container.left, e, ctx),
+                subscript_type(container.right, e, ctx),
+            ]
+        )
+    if isinstance(container, ListType):
+        check_expr(e.slice, Primitive.INT, ctx)
+        return container.elem
+    if container == Primitive.STR:
+        check_expr(e.slice, Primitive.INT, ctx)
+        return Primitive.STR
+    if isinstance(container, DictType):
+        check_expr(e.slice, Primitive.STR, ctx)
+        return container.value
+    if isinstance(container, TupleType):
+        return tuple_subscript(container, e.slice, ctx)
+    raise IllFormedModule(e, reasons.NotSubscriptable(render(container)))
+
+
+def tuple_subscript(container: TupleType, index: ast.expr, ctx: ModuleContext) -> Type:
+    """A literal index gives the component at that position, counting from the
+    end where it is negative; any other index of type int gives their join."""
+    m = len(container.components)
+    actual = synth_expr(index, ctx)
+    i = literal_index(actual)
+    if i is None:
+        if actual != Primitive.INT:
+            raise IllFormedModule(
+                index, reasons.TypeMismatch(render(Primitive.INT), render(actual))
+            )
+        return join(container.components)
+    if not -m <= i < m:
+        raise IllFormedModule(index, reasons.TupleIndexOutOfRange(i, m))
+    return container.components[i]
+
+
+def literal_index(t: Type) -> int | None:
+    if not isinstance(t, LiteralType):
+        return None
+    v = t.value
+    return v if isinstance(v, int) and not isinstance(v, bool) else None
+
+
+def branch_type(e: ast.IfExp, ctx: ModuleContext) -> Type:
+    """A conditional expression synthesises at the join of the types its
+    synthesising branches give, which must not be none, the other branch
+    checking against that join."""
+    branches = [e.body, e.orelse]
+    synthesising = [x for x in branches if synthesises(x)]
+    if len(synthesising) == 0:
+        raise IllFormedModule(e, reasons.NotSynthesised())
+    t = join([synth_expr(x, ctx) for x in synthesising])
+    for x in branches:
+        if not synthesises(x):
+            check_expr(x, t, ctx)
+    return t
+
+
+def list_type(e: ast.expr, elts: list[ast.expr], ctx: ModuleContext) -> ListType:
+    """A list synthesises at the join of the base types of the elements that
+    synthesise, which must not be none, the others checking against it."""
+    synthesising = [x for x in elts if synthesises(x)]
+    if len(synthesising) == 0:
+        raise IllFormedModule(e, reasons.NotSynthesised())
+    t = join([base_type(synth_expr(x, ctx)) for x in synthesising])
+    for x in elts:
+        if not synthesises(x):
+            check_expr(x, t, ctx)
+    return ListType(t)
+
+
+def synthesises(e: ast.expr) -> bool:
+    """Whether some synthesis rule has the form of `e`: a lambda and an empty
+    list or dictionary have none, and a container or conditional expression has
+    one where its parts do."""
+    if isinstance(e, ast.Lambda):
+        return False
+    if isinstance(e, ast.IfExp):
+        return synthesises(e.body) or synthesises(e.orelse)
+    if isinstance(e, ast.List):
+        return any(synthesises(x) for x in e.elts)
+    if isinstance(e, ast.Dict):
+        return any(synthesises(v) for v in e.values)
+    if isinstance(e, ast.Tuple):
+        return all(synthesises(x) for x in e.elts)
+    if isinstance(e, ast.ListComp):
+        return synthesises(e.elt)
+    if isinstance(e, ast.DictComp):
+        return synthesises(e.value)
+    if isinstance(e, ast.Call) and isinstance(e.func, ast.Lambda):
+        return synthesises(e.func.body) and all(synthesises(a) for a in e.args)
+    return True
+
+
+def dict_type(e: ast.expr, values: list[ast.expr], ctx: ModuleContext) -> DictType:
+    """A dictionary synthesises at the type of the list of its values."""
+    return DictType(list_type(e, values, ctx).elem)
+
+
+def call(e: ast.Call, ctx: ModuleContext) -> Type:
+    """The result type of a call, checking each argument against its parameter
+    type; the callee must be a callable of the same arity."""
+    if isinstance(e.func, ast.Lambda):
+        return applied_lambda(e.func, e, ctx)
+    return result_type(synth_expr(e.func, ctx), e, ctx)
+
+
+def result_type(fn: Type, e: ast.Call, ctx: ModuleContext) -> Type:
+    """The result of a call at callee type `fn`; at a union, the join over the
+    members."""
+    if isinstance(fn, UnionType):
+        return join([result_type(fn.left, e, ctx), result_type(fn.right, e, ctx)])
+    if not isinstance(fn, CallableType):
+        raise IllFormedModule(e, reasons.NotCallable(render(fn)))
+    if len(fn.params) != len(e.args):
+        raise IllFormedModule(e, reasons.CallArityMismatch(len(fn.params), len(e.args)))
+    for arg, param in zip(e.args, fn.params):
+        check_expr(arg, param, ctx)
+    return fn.result
+
+
+def applied_lambda(f: ast.Lambda, e: ast.Call, ctx: ModuleContext) -> Type:
+    """A lambda applied to arguments takes its parameter types from the types
+    the arguments synthesise, and gives the type of its body."""
+    return synth_expr(f.body, override_var(ctx, lambda_arguments(f, e, ctx)))
+
+
+def lambda_arguments(f: ast.Lambda, e: ast.Call, ctx: ModuleContext) -> VarContext:
+    """Parameters of an applied lambda, at the types its arguments synthesise."""
+    params = [a.arg for a in f.args.args]
+    if len(params) != len(e.args):
+        raise IllFormedModule(e, reasons.CallArityMismatch(len(params), len(e.args)))
+    return {x: synth_expr(arg, ctx) for x, arg in zip(params, e.args)}
+
+
+def check_expr(e: ast.expr, expected: Type, ctx: ModuleContext) -> None:
+    """Check `e` against `expected`. A container display checks its parts against
+    the parts of the expected type; anything else synthesises and must be below
+    it."""
+    if isinstance(e, ast.Call) and isinstance(e.func, ast.Lambda):
+        check_expr(
+            e.func.body, expected, override_var(ctx, lambda_arguments(e.func, e, ctx))
+        )
+        return
+    if isinstance(e, ast.List) and isinstance(expected, ListType):
+        for x in e.elts:
+            check_expr(x, expected.elem, ctx)
+        return
+    if (
+        isinstance(e, ast.Tuple)
+        and isinstance(expected, TupleType)
+        and len(e.elts) == len(expected.components)
+    ):
+        for x, t in zip(e.elts, expected.components):
+            check_expr(x, t, ctx)
+        return
+    if isinstance(e, ast.Dict) and isinstance(expected, DictType):
+        for k in dict_keys(e):
+            check_expr(k, Primitive.STR, ctx)
+        for v in e.values:
+            check_expr(v, expected.value, ctx)
+        return
+    if isinstance(e, ast.Lambda):
+        check_lambda(e, expected, ctx)
+        return
+    if isinstance(e, ast.IfExp):
+        check_expr(e.test, Primitive.BOOL, ctx)
+        check_expr(e.body, expected, ctx)
+        check_expr(e.orelse, expected, ctx)
+        return
+    if isinstance(e, ast.ListComp) and isinstance(expected, ListType):
+        check_expr(e.elt, expected.elem, qual_context([e.elt], e.generators, ctx))
+        return
+    if isinstance(e, ast.DictComp) and isinstance(expected, DictType):
+        ctx_ = qual_context([e.key, e.value], e.generators, ctx)
+        check_expr(e.key, Primitive.STR, ctx_)
+        check_expr(e.value, expected.value, ctx_)
+        return
+    actual = synth_expr(e, ctx)
+    if not subtype(actual, expected):
+        raise IllFormedModule(e, reasons.TypeMismatch(render(expected), render(actual)))
+
+
+def check_lambda(e: ast.Lambda, expected: Type, ctx: ModuleContext) -> None:
+    """Check a lambda against a callable type, binding each parameter at the
+    type the callable gives it."""
+    params = [a.arg for a in e.args.args]
+    if not isinstance(expected, CallableType):
+        raise IllFormedModule(e, reasons.TypeMismatch(render(expected), "a lambda"))
+    if len(params) != len(expected.params):
+        raise IllFormedModule(
+            e, reasons.TypeMismatch(render(expected), lambda_of(len(params)))
+        )
+    delta = dict(zip(params, expected.params))
+    check_expr(e.body, expected.result, override_var(ctx, delta))
+
+
+def lambda_of(n: int) -> str:
+    return f"a lambda of {n} parameter{'' if n == 1 else 's'}"
+
+
+def binary(
+    op: str, left: ast.expr, right: ast.expr, e: ast.expr, ctx: ModuleContext
+) -> Type:
+    s, t = synth_expr(left, ctx), synth_expr(right, ctx)
+    result = result_of_min(overloads_binary(op, s, t))
+    if result is None:
+        raise IllFormedModule(e, reasons.NoBinarySignature(op, render(s), render(t)))
+    return result
+
+
+def qual_context(
     elts: list[ast.expr], generators: list[ast.comprehension], ctx: ModuleContext
-) -> None:
-    check_quals(generators, ctx)
-    bound = binds_quals(generators)
-    check_exprs(elts, override_var(ctx, {n: Status.TT for n in bound}))
-    captured = captures_e_list(elts) & bound
+) -> ModuleContext:
+    """Context a comprehension body is typed in, extended by the bindings of its
+    qualifiers."""
+    delta = check_quals(generators, ctx)
+    captured = captures_e_list(elts) & binds_quals(generators)
     if captured:
         node = generators[0].target
         raise IllFormedModule(node, reasons.CapturedGeneratorVariable(min(captured)))
+    return override_var(ctx, delta)
 
 
-def check_quals(generators: list[ast.comprehension], ctx: ModuleContext) -> None:
+def check_quals(generators: list[ast.comprehension], ctx: ModuleContext) -> VarContext:
+    """Bindings the qualifiers introduce, each generator binding its target at
+    the element type of the value it draws from."""
     if len(generators) == 0:
-        return
+        return {}
     g = generators[0]
-    check_expr(g.iter, ctx)
-    targets = names_in_target(g.target)
-    captured = targets & (captures_e_list(g.ifs) | captures_quals(generators[1:]))
-    if captured:
-        raise IllFormedModule(
-            g.target, reasons.CapturedGeneratorVariable(min(captured))
-        )
-    ctx_ = override_var(ctx, {n: Status.TT for n in targets})
-    check_exprs(g.ifs, ctx_)
-    check_quals(generators[1:], ctx_)
+    entry = elem_entry(g.iter, ctx)
+    x = target_name(g)
+    if x in captures_e_list(g.ifs) | captures_quals(generators[1:]):
+        raise IllFormedModule(g.target, reasons.CapturedGeneratorVariable(x))
+    delta = {x: entry}
+    ctx_ = override_var(ctx, delta)
+    for e in g.ifs:
+        check_expr(e, Primitive.BOOL, ctx_)
+    return delta | check_quals(generators[1:], ctx_)
 
 
-def check_exprs(es: list[ast.expr], ctx: ModuleContext) -> None:
-    if len(es) == 0:
-        return
-    check_expr(es[0], ctx)
-    check_exprs(es[1:], ctx)
+def elem_type(t: Type) -> Type | None:
+    """Type of the elements a generator draws from a value of type `t`."""
+    if isinstance(t, ListType):
+        return t.elem
+    if t == Primitive.STR:
+        return Primitive.STR
+    if isinstance(t, DictType):
+        return Primitive.STR
+    if isinstance(t, TupleType):
+        return join([base_type(c) for c in t.components])
+    if isinstance(t, UnionType):
+        left, right = elem_type(t.left), elem_type(t.right)
+        return None if left is None or right is None else join([left, right])
+    return None
 
 
-def class_entry_for(node: ast.ClassDef, q: str, context: Context) -> ClassEntry:
-    base = (
-        node.bases[0].id if node.bases and isinstance(node.bases[0], ast.Name) else None
-    )
-    return ClassEntry(
-        context=context,
-        name=f"{q}.{node.name}",
-        own_fields=tuple(own_fields(node)),
-        base=base,
-    )
+def elem_entry(e: ast.expr, ctx: ModuleContext) -> Type:
+    """Type a generator binds its target at."""
+    t = synth_expr(e, ctx)
+    elem = elem_type(t)
+    if elem is None:
+        raise IllFormedModule(e, reasons.NotIterable(render(t)))
+    return elem
 
 
-def check_class_decl(node: ast.ClassDef, gamma: Context, q: str) -> None:
-    if isinstance(gamma.get(node.name), ClassEntry):
-        raise IllFormedModule(node, reasons.DuplicateClassName(node.name, q))
-    names = own_fields(node)
+def class_declared(node: ast.ClassDef, ctx: ModuleContext) -> Class:
+    """Class entry of a declaration (class, class-extend)."""
+    if not isinstance(ctx.gamma.get("dataclass"), PredefinedName):
+        raise IllFormedModule(node, reasons.DecoratorNotInScope("dataclass"))
+    own = tuple((x, resolve_type(psi, node, ctx)) for x, psi in own_fields(node))
+    names = [x for x, _ in own]
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
         raise IllFormedModule(node, reasons.DuplicateFieldName(dup, node.name))
-    if len(node.bases) == 0:
-        return
-    base = node.bases[0]
-    assert isinstance(base, ast.Name)
-    entry = gamma.get(base.id)
-    if not isinstance(entry, ClassEntry) or entry.name.rsplit(".", 1)[0] != q:
-        raise IllFormedModule(node, reasons.UnknownBaseClass(base.id))
-    clash = set(names) & set(fields(entry))
-    if len(clash) > 0:
-        raise IllFormedModule(node, reasons.InheritedFieldClash(min(clash), base.id))
+    base: str | None = None
+    if len(node.bases) > 0:
+        assert isinstance(node.bases[0], ast.Name)
+        base = node.bases[0].id
+        base_class = ctx.gamma.get(base)
+        if not isinstance(base_class, Class):
+            raise IllFormedModule(node, reasons.UnknownBaseClass(base))
+        clash = set(names) & set(fields(base_class))
+        if len(clash) > 0:
+            raise IllFormedModule(node, reasons.InheritedFieldClash(min(clash), base))
+    return Class(
+        context=ctx.gamma, name=f"{ctx.q}.{node.name}", own_fields=own, base=base
+    )
+
+
+def describe(p: ast.pattern, ctx: ModuleContext) -> str:
+    if isinstance(p, ast.MatchAs):
+        assert p.pattern is not None  # a bare variable or wildcard always matches
+        return describe(p.pattern, ctx)
+    if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
+        return f"a pattern of type {render(literal_of(p))}"
+    if isinstance(p, PatList):
+        return "a list pattern"
+    if isinstance(p, PatTuple):
+        return "a tuple pattern"
+    if isinstance(p, ast.MatchMapping):
+        return "a dictionary pattern"
+    assert isinstance(p, ast.MatchClass)
+    cls = class_of_name(p.cls, ctx)
+    assert cls is not None
+    return f"a pattern for class {short_name(cls)}"

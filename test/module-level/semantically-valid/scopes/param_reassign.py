@@ -1,4 +1,4 @@
-def f(x):
+def f(x: int) -> int:
     a = x
     x = 5
     b = x

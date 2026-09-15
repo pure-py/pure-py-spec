@@ -1,0 +1,1 @@
+expected type Callable[[float], int], given Callable[[int], int]

@@ -1,8 +1,7 @@
 \section{Case studies}
 \label{sec:case-studies}
 
-This section reports two research languages for scientific computing that share \PurePy's Python-like surface:
-\Fortl and \Fluid. \todo{Is there a way to do this without deanonymising the paper?}
+This section reports two research languages for scientific computing built on \PurePy: \Fortl and \Fluid. \todo{Is there a way to do this without deanonymising the paper?}
 
 \subsection{\Fortl}
 \label{sec:case-study-fortl}
@@ -19,9 +18,6 @@ relationship to \PurePy}
 \label{sec:case-study-fluid}
 
 \Fluid is a pure, Pythonic, provenance-aware functional language for transparent research outputs. It is built
-on \PurePy, adding a runtime that records fine-grained dependencies between a computation's inputs and its
-outputs, so that a figure or value can be linked back to the data it was computed from. \Fluid supports pattern
-matching, destructuring, and partial application, and is aimed at researchers who need both computation and
-verifiable transparency. As a case study it exercises \PurePy as the functional core beneath a substantial
-additional runtime, and its surface motivates the partial-application and piecewise extensions of
-\secref{extensions}.
+on \PurePy, adding a runtime that records fine-grained dependencies between the inputs and outputs of a
+computation, so that a figure or summary can be linked back to the underlying data. \Fluid implements the
+partial-application and piecewise extensions of \secref{extensions}.

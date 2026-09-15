@@ -1,5 +1,5 @@
-def f():
+def f() -> None:
     pass
-def f():
+def f() -> None:
     pass
 x = 1

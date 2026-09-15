@@ -42,12 +42,16 @@ class Stage(StrEnum):
 
 
 HELPERS = "helpers"
+# Semantically-valid tests PurePy accepts and mypy rejects
+MYPY_INCOMPATIBLE = "mypy-incompatible"
+MYPY_INI = "mypy.ini"
 
 RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
+RULE_DEF = re.compile(r"lab=\{\\ruleName\{([a-z0-9-]+)\}\}")
 CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
 
 # Checker entry points under src/
-PARSE, CHECK, CHECK_PROGRAM = "syntax.py", "check_module.py", "check_program.py"
+CHECK, CHECK_PROGRAM = "check_module.py", "check_program.py"
 
 # Program-level test files (a test is a directory)
 MAIN = "main.py"
@@ -61,13 +65,12 @@ EXPECTED_FILE, EXPECTED_EXIT, EXPECTED_ERROR = (
 # PurePy exit codes (OK = accepted / ran clean)
 class Exit(IntEnum):
     OK = 0
-    PROHIBITED = 1  # syntax.py: prohibited syntactic form
-    NOT_YET = 2  # syntax.py: planned, not yet supported
-    ILL_FORMED = 3  # check_module.py: ill-formed
+    PROHIBITED = 1  # prohibited syntactic form
+    NOT_YET = 2  # planned, not yet supported
+    ILL_FORMED = 3  # ill-formed
 
 
 class Phase(StrEnum):
-    PARSE = "parse"
     CHECK = "check"
     PYTHON = "python"
     RUN = "run"
@@ -116,7 +119,6 @@ class Runner:
         self, cmd: list[str], expected: int, error_substr: str | None = None
     ) -> None:
         phase = {
-            PARSE: Phase.PARSE,
             CHECK: Phase.CHECK,
             CHECK_PROGRAM: Phase.CHECK,
         }.get(pathlib.Path(cmd[1]).name, Phase.PYTHON)
@@ -131,9 +133,6 @@ class Runner:
                     phase,
                     f"expected output containing {error_substr!r}, got: {output.strip()}",
                 )
-
-    def parse(self, path: pathlib.Path, expected: int, err: str | None = None) -> None:
-        self.expect_exit(script_cmd(PARSE, path), expected, error_substr=err)
 
     def check(self, path: pathlib.Path, expected: int, err: str | None = None) -> None:
         self.expect_exit(script_cmd(CHECK, path), expected, error_substr=err)
@@ -242,10 +241,9 @@ class Runner:
             err = substr(p.with_suffix(ERROR_EXPECTED))
 
             if dirs == (Verdict.SEMANTICALLY_VALID, Stage.PENDING):
-                self.parse(p, Exit.NOT_YET)
+                self.check(p, Exit.NOT_YET)
                 return
             if dirs[1:] == (Stage.STATIC, Stage.PENDING):
-                self.parse(p, Exit.OK)
                 self.check(p, Exit.OK)
                 self.python_evidence(
                     p,
@@ -265,12 +263,10 @@ class Runner:
             )
 
             if verdict == Verdict.SEMANTICALLY_VALID:
-                self.parse(p, Exit.OK)
                 self.check(p, Exit.OK)
             elif stage == Stage.SYNTACTIC:
-                self.parse(p, Exit.PROHIBITED, err)
+                self.check(p, Exit.PROHIBITED, err)
             else:
-                self.parse(p, Exit.OK)
                 self.check(
                     p,
                     Exit.ILL_FORMED if stage == Stage.STATIC else Exit.OK,
@@ -298,6 +294,24 @@ class Runner:
         print(f"{GREEN}✓ {total}/{total} passed{RESET}")
 
 
+def check_rule_names(r: Runner) -> None:
+    """A citation names one rule, so no two rules may carry the same name."""
+    where: dict[str, list[str]] = {}
+    for source in ("spec", "paper"):
+        for f in sorted((ROOT / source).rglob("*.tex")):
+            for name in RULE_DEF.findall(f.read_text(encoding="utf-8")):
+                where.setdefault(name, []).append(str(f.relative_to(ROOT)))
+    clashes = [
+        f"{name} in {', '.join(files)}"
+        for name, files in sorted(where.items())
+        if len(files) > 1
+    ]
+    if clashes:
+        r.bad("rule names", "; ".join(clashes))
+    else:
+        r.ok("rule names")
+
+
 def check_rule_citations(r: Runner, base: pathlib.Path) -> None:
     """Every `# rule: X` in a test must name a rule the spec defines, so a
     citation cannot outlive the rule it points at."""
@@ -320,6 +334,46 @@ def check_rule_citations(r: Runner, base: pathlib.Path) -> None:
         r.ok("rule citations")
 
 
+def check_mypy_tests(r: Runner, module: pathlib.Path) -> None:
+    """Every semantically-valid test must type-check under mypy, except those
+    under mypy-incompatible, which record where PurePy is the more permissive
+    of the two."""
+    paths = [
+        p
+        for p in sorted((module / Verdict.SEMANTICALLY_VALID).rglob("*.py"))
+        if Stage.PENDING not in p.parts
+    ]
+    # mypy reports paths relative to its working directory
+    relative = [p.relative_to(ROOT) for p in paths]
+    proc = subprocess.run(
+        [
+            "mypy",
+            "--config-file",
+            str(pathlib.Path("test") / MYPY_INI),
+            "--no-error-summary",
+            "--no-color-output",
+            *(str(p) for p in relative),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    rejected = {
+        line.split(":", 1)[0] for line in proc.stdout.splitlines() if ": error:" in line
+    }
+    expected = {str(p) for p in relative if MYPY_INCOMPATIBLE in p.parts}
+    misfiled = [
+        f"{p} {'rejected by mypy' if str(p) in rejected else 'accepted by mypy'}"
+        for p in relative
+        if (str(p) in rejected) != (str(p) in expected)
+    ]
+    if misfiled:
+        r.bad("mypy tests", "; ".join(misfiled))
+    else:
+        r.ok("mypy tests")
+
+
 def main() -> None:
     skip_mypy = "--no-mypy" in sys.argv
     if skip_mypy:
@@ -330,6 +384,7 @@ def main() -> None:
     r = Runner(interpreter)
 
     print("cross-references")
+    check_rule_names(r)
     check_rule_citations(r, base)
 
     if not skip_mypy:
@@ -344,6 +399,7 @@ def main() -> None:
             r.ok("src/")
         else:
             r.bad("src/", proc.stdout.strip()[:400])
+        check_mypy_tests(r, module)
 
     last = None
     for p in sorted(module.rglob("*.py"), key=lambda p: (p.parent.as_posix(), p.name)):

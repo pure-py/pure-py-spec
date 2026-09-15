@@ -1,0 +1,48 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{top-stmt}}]
+{
+  \Sigma; \Gamma; \varepsilon \vdash s : R
+}
+{
+  \Sigma; q; \Gamma \vdash s : R \binding \Sigma
+}
+\and
+\inferrule*[lab={\ruleName{top-seq}}]
+{
+  \Sigma; q; \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
+  \Sigma'; q; \Gamma \override \Delta \vdash t' : R \binding \Sigma^\dagger \\
+  \capturesS(t) \cap \assignsS(t') = \varnothing \\
+  c \notin \assignsS(t') \quad (\forall \bind{c}{\Type{C}} \in \Delta)
+}
+{
+  \Sigma; q; \Gamma \vdash t\;t' : \Assigns{\Delta} \override R \binding \Sigma^\dagger
+}
+\and
+\inferrule*[lab={\ruleName{class}}]
+{
+  \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
+  \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
+  \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i)
+}
+{
+  \Sigma; q; \Gamma \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}
+}
+\and
+\inferrule*[lab={\ruleName{class-extend}}]
+{
+  \bind{c'}{\Type{D}} \in \Gamma \\
+  \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
+  \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
+  \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
+  \seq{x} \cap \dom(\fields(\Sigma, D)) = \varnothing
+}
+{
+  \Sigma; q; \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\bind{\seq{x}}{\seq{\sigma}}}{D}}
+}
+\end{mathpar}
+\caption{Top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$}
+\label{fig:typing-top}
+\end{figure}

@@ -1,4 +1,4 @@
-def deco(c):
+def deco(c: object) -> object:
     return c
 
 @deco

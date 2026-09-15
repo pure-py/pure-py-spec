@@ -1,0 +1,111 @@
+\begin{figure}
+\flushleft \shadebox{$\rho, p, v \matches m$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-pat-lit}}]
+{
+  \eqOp(\ell, v) = \pyinline{True}
+}
+{
+  \rho, \ell, v \matches \matchOk{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{eval-pat-lit-no}}]
+{
+  \eqOp(\ell, v) = \pyinline{False}
+}
+{
+  \rho, \ell, v \matches \noMatch
+}
+\and
+\inferrule*[lab={\ruleName{eval-pat-neg-lit}}]
+{
+  \eqOp(-n, v) = \pyinline{True}
+}
+{
+  \rho, -n, v \matches \matchOk{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{eval-pat-neg-lit-no}}]
+{
+  \eqOp(-n, v) = \pyinline{False}
+}
+{
+  \rho, -n, v \matches \noMatch
+}
+\and
+\inferrule*[lab={\ruleName{eval-pat-var}}]
+{
+  \strut
+}
+{
+  \rho, x, v \matches \matchOk{\set{\bind{x}{v}}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-pat-wild}}]
+{
+  \strut
+}
+{
+  \rho, \patWild, v \matches \matchOk{\varnothing}
+}
+\and
+\input{spec/rules/eval-pat-list}
+\and
+\input{spec/rules/eval-pat-list-no}
+\and
+\inferrule*[lab={\ruleName{eval-pat-tuple}}]
+{
+  \rho, p_i, v_i \matches m_i \quad (\forall i)
+}
+{
+  \rho, \patTuple{p_1, \ldots, p_n}, \exTuple{v_1, \ldots, v_n} \matches m_1 \override \ldots \override m_n
+}
+\and
+\inferrule*[lab={\ruleName{eval-pat-tuple-no}}]
+{
+  v \text{ neither list nor tuple, or tuple of length} \neq n
+}
+{
+  \rho, \patTuple{p_1, \ldots, p_n}, v \matches \noMatch
+}
+\and
+\inferrule*[lab={\ruleName{eval-pat-dict}}]
+{
+  \bind{w_i}{v_i} \in \delta \quad (\forall i) \\
+  \rho, p_i, v_i \matches m_i \quad (\forall i)
+}
+{
+  \rho, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}}, \delta \matches m_1 \override \ldots \override m_n
+}
+\and
+\inferrule*[lab={\ruleName{eval-pat-dict-no}}]
+{
+  v \text{ not dictionary, or } \delta \text{ with } w_i \notin \dom(\delta) \text{ for some } i
+}
+{
+  \rho, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}}, v \matches \noMatch
+}
+\and
+\inferrule*[lab={\ruleName{eval-pat-as}}]
+{
+  \rho, p, v \matches m
+}
+{
+  \rho, p\;\pyinline{as}\;x, v \matches m \override \matchOk{\set{\bind{x}{v}}}
+}
+\and
+\input{spec/rules/eval-pat-constr}
+\and
+\inferrule*[lab={\ruleName{eval-pat-constr-no}}]
+{
+  \resolveClass(\rho, q) = C \\
+  v \text{ not object, or } \exObj{D}{\rho'} \text{ with } C \notin \ancestors(\Sigma, D)
+}
+{
+  \rho, \patConstr{q}{\seq{p}}, v \matches \noMatch
+}
+\end{mathpar}
+\caption{Pattern $p$ matches value $v$ under environment $\rho$, with result $m$}
+\label{fig:eval-pat}
+\end{figure}

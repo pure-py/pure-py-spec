@@ -1,6 +1,8 @@
 import ast
 from itertools import dropwhile, takewhile
 
+from type_syntax import TypeExpr, dotted_name, parse_annotation
+
 # A PurePy statement: a Python statement, or a mutual region of consecutive defs. A Python body
 # (a statement list) represents the spec's right-nested sequence s s'.
 type Statement = ast.stmt | list[ast.FunctionDef]
@@ -12,10 +14,6 @@ def is_import(s: ast.stmt) -> bool:
 
 def split_imports(body: list[ast.stmt]) -> tuple[list[ast.stmt], list[ast.stmt]]:
     return list(takewhile(is_import, body)), list(dropwhile(is_import, body))
-
-
-def find_import(stmts: list[ast.stmt]) -> ast.stmt | None:
-    return next((s for s in stmts if isinstance(s, (ast.Import, ast.ImportFrom))), None)
 
 
 def statements(body: list[ast.stmt]) -> list[Statement]:
@@ -39,27 +37,19 @@ def extend_region(
     return [region] + statements(rest)
 
 
-def binds_seq(pattern: ast.pattern) -> list[str]:
-    if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
-        return []
-    if isinstance(pattern, ast.MatchAs):
-        sub = binds_seq(pattern.pattern) if pattern.pattern is not None else []
-        return sub + ([pattern.name] if pattern.name else [])
-    if isinstance(pattern, ast.MatchSequence):
-        return [x for p in pattern.patterns for x in binds_seq(p)]
-    if isinstance(pattern, ast.MatchClass):
-        return [
-            x
-            for p in list(pattern.patterns) + list(pattern.kwd_patterns)
-            for x in binds_seq(p)
-        ]
-    if isinstance(pattern, ast.MatchMapping):
-        return [x for p in pattern.patterns for x in binds_seq(p)]
-    raise AssertionError(f"unexpected pattern: {type(pattern).__name__}")
-
-
 def binds(pattern: ast.pattern) -> set[str]:
-    return set(binds_seq(pattern))
+    """Variables the pattern introduces."""
+    if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
+        return set()
+    if isinstance(pattern, ast.MatchAs):
+        sub = binds(pattern.pattern) if pattern.pattern is not None else set()
+        return sub | ({pattern.name} if pattern.name else set())
+    if isinstance(pattern, (ast.MatchSequence, ast.MatchMapping)):
+        return set().union(*(binds(p) for p in pattern.patterns))
+    assert isinstance(pattern, ast.MatchClass)
+    return set().union(
+        *(binds(p) for p in list(pattern.patterns) + list(pattern.kwd_patterns))
+    )
 
 
 def fv_e(e: ast.expr) -> set[str]:
@@ -71,7 +61,9 @@ def fv_e(e: ast.expr) -> set[str]:
         params = {a.arg for a in e.args.args}
         return fv_e(e.body) - params
     if isinstance(e, ast.Call):
-        return fv_e(e.func) | fv_e_list(e.args)
+        return (
+            fv_e(e.func) | fv_e_list(e.args) | fv_e_list([k.value for k in e.keywords])
+        )
     if isinstance(e, ast.BinOp):
         return fv_e(e.left) | fv_e(e.right)
     if isinstance(e, ast.UnaryOp):
@@ -89,7 +81,7 @@ def fv_e(e: ast.expr) -> set[str]:
     if isinstance(e, (ast.List, ast.Tuple)):
         return fv_e_list(e.elts)
     if isinstance(e, ast.Dict):
-        return fv_e_list([k for k in e.keys if k is not None]) | fv_e_list(e.values)
+        return fv_e_list(dict_keys(e)) | fv_e_list(e.values)
     if isinstance(e, ast.ListComp):
         return fv_e_comprehension([e.elt], e.generators)
     if isinstance(e, ast.DictComp):
@@ -109,17 +101,22 @@ def fv_e_comprehension(
     if len(generators) == 0:
         return fv_e_list(elts)
     g = generators[0]
-    target_names = names_in_target(g.target)
     rest = fv_e_list(g.ifs) | fv_e_comprehension(elts, generators[1:])
-    return fv_e(g.iter) | rest - target_names
+    return fv_e(g.iter) | (rest - {target_name(g)})
 
 
-def names_in_target(target: ast.expr) -> set[str]:
-    if isinstance(target, ast.Name):
-        return {target.id}
-    if isinstance(target, ast.Tuple):
-        return {n for t in target.elts for n in names_in_target(t)}
-    return set()
+def dict_keys(e: ast.Dict) -> list[ast.expr]:
+    """Keys of a dictionary display; a missing key would mean unpacking, which
+    the syntax stage rejects."""
+    keys = [k for k in e.keys if k is not None]
+    assert len(keys) == len(e.keys)
+    return keys
+
+
+def target_name(g: ast.comprehension) -> str:
+    """Variable of a generator, which the subset restricts to a name."""
+    assert isinstance(g.target, ast.Name)
+    return g.target.id
 
 
 def captures_e(e: ast.expr) -> set[str]:
@@ -131,7 +128,11 @@ def captures_e(e: ast.expr) -> set[str]:
     if isinstance(e, ast.Constant):
         return set()
     if isinstance(e, ast.Call):
-        return captures_e(e.func) | captures_e_list(e.args)
+        return (
+            captures_e(e.func)
+            | captures_e_list(e.args)
+            | captures_e_list([k.value for k in e.keywords])
+        )
     if isinstance(e, ast.BinOp):
         return captures_e(e.left) | captures_e(e.right)
     if isinstance(e, ast.UnaryOp):
@@ -149,9 +150,7 @@ def captures_e(e: ast.expr) -> set[str]:
     if isinstance(e, (ast.List, ast.Tuple)):
         return captures_e_list(e.elts)
     if isinstance(e, ast.Dict):
-        return captures_e_list([k for k in e.keys if k is not None]) | captures_e_list(
-            e.values
-        )
+        return captures_e_list(dict_keys(e)) | captures_e_list(e.values)
     if isinstance(e, ast.ListComp):
         return captures_quals(e.generators) | (
             captures_e(e.elt) - binds_quals(e.generators)
@@ -174,11 +173,11 @@ def captures_quals(generators: list[ast.comprehension]) -> set[str]:
         return set()
     g = generators[0]
     rest = captures_e_list(g.ifs) | captures_quals(generators[1:])
-    return captures_e(g.iter) | rest - names_in_target(g.target)
+    return captures_e(g.iter) | (rest - {target_name(g)})
 
 
 def binds_quals(generators: list[ast.comprehension]) -> set[str]:
-    return {n for g in generators for n in names_in_target(g.target)}
+    return {target_name(g) for g in generators}
 
 
 def fv_stmt(s: ast.stmt) -> set[str]:
@@ -186,6 +185,8 @@ def fv_stmt(s: ast.stmt) -> set[str]:
         return set()
     if isinstance(s, ast.Assign):
         return fv_e(s.value)
+    if isinstance(s, ast.AnnAssign):
+        return fv_e(s.value) if s.value is not None else set()
     if isinstance(s, ast.Expr):
         return fv_e(s.value)
     if isinstance(s, ast.Return):
@@ -202,8 +203,9 @@ def fv_stmt(s: ast.stmt) -> set[str]:
             *(fv_body(case.body) - binds(case.pattern) for case in s.cases)
         )
     if isinstance(s, ast.FunctionDef):
+        # Parameters and variables assigned in the body are local to the function.
         params = {a.arg for a in s.args.args}
-        return fv_body(s.body) - params - {s.name}
+        return fv_body(s.body) - params - assigns_body(s.body) - {s.name}
     if isinstance(s, ast.ClassDef):
         return set()
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
@@ -219,7 +221,12 @@ def assigns_stmt(s: ast.stmt) -> set[str]:
     if isinstance(s, (ast.Pass, ast.Expr, ast.Return, ast.Assert)):
         return set()
     if isinstance(s, ast.Assign):
-        return {t.id for t in s.targets if isinstance(t, ast.Name)}
+        (target,) = s.targets
+        assert isinstance(target, ast.Name)
+        return {target.id}
+    if isinstance(s, ast.AnnAssign):
+        assert isinstance(s.target, ast.Name)
+        return {s.target.id}
     if isinstance(s, ast.If):
         return assigns_body(s.body) | assigns_body(s.orelse)
     if isinstance(s, ast.Match):
@@ -244,6 +251,8 @@ def captures(s: ast.stmt) -> set[str]:
         return set()
     if isinstance(s, ast.Assign):
         return captures_e(s.value)
+    if isinstance(s, ast.AnnAssign):
+        return captures_e(s.value) if s.value is not None else set()
     if isinstance(s, ast.Expr):
         return captures_e(s.value)
     if isinstance(s, ast.Return):
@@ -256,8 +265,9 @@ def captures(s: ast.stmt) -> set[str]:
     if isinstance(s, ast.If):
         return captures_e(s.test) | captures_body(s.body) | captures_body(s.orelse)
     if isinstance(s, ast.Match):
+        # A pattern variable is in the function's scope, so a capture of it counts.
         return captures_e(s.subject) | set().union(
-            *(captures_body(case.body) - binds(case.pattern) for case in s.cases)
+            *(captures_body(case.body) for case in s.cases)
         )
     if isinstance(s, ast.FunctionDef):
         return captures_region([s])
@@ -304,46 +314,52 @@ def assigns_seq(items: list[Statement]) -> set[str]:
     return assigns_statement(items[0]) | assigns_seq(items[1:])
 
 
-def find_first_reassigning(items: list[Statement], names: set[str]) -> ast.AST | None:
-    if len(items) == 0:
-        return None
+def find_first_reassigning(items: list[Statement], names: set[str]) -> ast.AST:
+    """First statement of `items` assigning a name in `names`."""
+    assert len(items) > 0
     if assigns_statement(items[0]) & names:
         return items[0][0] if isinstance(items[0], list) else items[0]
     return find_first_reassigning(items[1:], names)
 
 
-def find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST | None:
-    for s in stmts:
-        if nested and isinstance(s, (ast.Import, ast.ImportFrom)):
+def first_return(body: list[ast.stmt]) -> ast.Return | None:
+    """The first return in a statement list, not descending into definitions."""
+    for s in body:
+        if isinstance(s, ast.Return):
             return s
         if isinstance(s, ast.FunctionDef):
-            r = find_nested_import(s.body, nested=True)
-            if r is not None:
-                return r
-        if isinstance(s, ast.If):
-            r = find_nested_import(s.body, nested=True) or find_nested_import(
-                s.orelse, nested=True
-            )
-            if r is not None:
-                return r
-        if isinstance(s, ast.Match):
-            results = (find_nested_import(case.body, nested=True) for case in s.cases)
-            r = next((x for x in results if x is not None), None)
-            if r is not None:
-                return r
+            continue
+        nested = first_return(nested_statements(s))
+        if nested is not None:
+            return nested
     return None
 
 
-def own_fields(node: ast.ClassDef) -> list[str]:
-    return [
-        t.target.id
+def nested_statements(s: ast.stmt) -> list[ast.stmt]:
+    if isinstance(s, ast.Match):
+        return [t for case in s.cases for t in case.body]
+    return [c for c in ast.iter_child_nodes(s) if isinstance(c, ast.stmt)]
+
+
+def own_fields(node: ast.ClassDef) -> tuple[tuple[str, TypeExpr], ...]:
+    """Fields a class declares, with their type expressions."""
+    return tuple(
+        (t.target.id, annotated(t.annotation))
         for t in node.body
         if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)
-    ]
+    )
+
+
+def annotated(e: ast.expr | None) -> TypeExpr:
+    """Type expression an annotation carries; a definition annotates every
+    parameter and its return type, and the subset admits no other annotation."""
+    assert e is not None
+    t = parse_annotation(e)
+    assert t is not None
+    return t
 
 
 def qualified_name(e: ast.expr) -> str:
-    if isinstance(e, ast.Name):
-        return e.id
-    assert isinstance(e, ast.Attribute)
-    return qualified_name(e.value) + "." + e.attr
+    q = dotted_name(e)
+    assert q is not None
+    return q

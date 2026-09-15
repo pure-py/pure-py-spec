@@ -1,0 +1,121 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma \vdash \sigma \subty \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{subty-refl}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \tau \subty \tau
+}
+\and
+\inferrule*[lab={\ruleName{subty-class}}]
+{
+  D \in \ancestors(\Sigma, C)
+}
+{
+  \Sigma \vdash C \subty D
+}
+\and
+\inferrule*[lab={\ruleName{subty-never}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \tyNever \subty \tau
+}
+\and
+\inferrule*[lab={\ruleName{subty-object}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \tau \subty \tyObject
+}
+\and
+\inferrule*[lab={\ruleName{subty-int-float}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \tyInt \subty \tyFloat
+}
+\and
+\inferrule*[lab={\ruleName{subty-sized}}]
+{
+  \tau \text{ a list, dictionary, string or tuple type}
+}
+{
+  \Sigma \vdash \tau \subty \tySized
+}
+\and
+\inferrule*[lab={\ruleName{subty-list}}]
+{
+  \Sigma \vdash \sigma \tyEquiv \tau
+}
+{
+  \Sigma \vdash \tyList{\sigma} \subty \tyList{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{subty-dict}}]
+{
+  \Sigma \vdash \sigma \tyEquiv \tau
+}
+{
+  \Sigma \vdash \tyDict{\sigma} \subty \tyDict{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{subty-callable}}]
+{
+  \Sigma \vdash \tau_i \subty \sigma_i \quad (\forall i) \\
+  \Sigma \vdash \sigma \subty \tau
+}
+{
+  \Sigma \vdash \tyCallable{\sigma_1, \ldots, \sigma_n}{\sigma} \subty \tyCallable{\tau_1, \ldots, \tau_n}{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{subty-tuple}}]
+{
+  \Sigma \vdash \sigma_i \subty \tau_i \quad (\forall i)
+}
+{
+  \Sigma \vdash \tyTuple{\sigma_1, \ldots, \sigma_n} \subty \tyTuple{\tau_1, \ldots, \tau_n}
+}
+\and
+\inferrule*[lab={\ruleName{subty-literal}}]
+{
+  \Sigma \vdash \baseType(\ell) \subty \tau
+}
+{
+  \Sigma \vdash \tyLiteral{\ell} \subty \tau
+}
+\and
+\inferrule*[lab={\ruleName{subty-union-left}}]
+{
+  \Sigma \vdash \sigma \subty \tau
+}
+{
+  \Sigma \vdash \sigma \subty \tyUnion{\tau}{\tau'}
+}
+\and
+\inferrule*[lab={\ruleName{subty-union-right}}]
+{
+  \Sigma \vdash \sigma \subty \tau'
+}
+{
+  \Sigma \vdash \sigma \subty \tyUnion{\tau}{\tau'}
+}
+\and
+\inferrule*[lab={\ruleName{subty-union}}]
+{
+  \Sigma \vdash \tau \subty \sigma \\
+  \Sigma \vdash \tau' \subty \sigma
+}
+{
+  \Sigma \vdash \tyUnion{\tau}{\tau'} \subty \sigma
+}
+\end{mathpar}
+\caption{Subtyping}
+\label{fig:subtyping}
+\end{figure}

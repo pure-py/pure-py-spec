@@ -1,0 +1,113 @@
+\begin{figure}
+\small
+\setlength{\jot}{2pt}
+\begin{center}
+\begin{tabular}{rcll}
+\grammarGroup{Heads} \\
+$h$ & $::=$ & $\ell$ & (Literal) \\
+    & $\mid$ & $C$ & (Class) \\
+    & $\mid$ & $\headList{n}$ & (List of length $n$) \\
+$H$ & $::=$ & $\set{h_1, \ldots, h_n}$ & (Excluded heads)
+   \\[3mm]
+\grammarGroup{Shapes} \\
+$k$ & $::=$ & $\shapeAny{\tau}{H}$ & (Rest) \\
+    & $\mid$ & $\shapeAny{\patConstr{C}{k_1, \ldots, k_n}}{H}$ & (Constr) \\
+    & $\mid$ & $\patTuple{k_1, \ldots, k_n}$ & (Tuple) \\
+    & $\mid$ & $\shapeList{\tau}{k_1, \ldots, k_n}$ & (List) \\
+    & $\mid$ & $\shapeDict{\tau}{\beta}{H}$ & (Dict) \\
+$K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
+\end{tabular}
+\end{center}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\Sigma \vdash h : \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{head-literal}}]
+{
+  \Sigma \vdash \tyLiteral{\ell} \subty \tau
+}
+{
+  \Sigma \vdash \ell : \tau
+}
+\and
+\inferrule*[lab={\ruleName{head-class}}]
+{
+  \Sigma \vdash C \subty \tau
+}
+{
+  \Sigma \vdash C : \tau
+}
+\and
+\inferrule*[lab={\ruleName{head-list}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \headList{n} : \tyList{\tau}
+}
+\end{mathpar}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\Sigma \vdash k : \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{shape-rest}}]
+{
+  \Sigma \vdash h : \tau \quad (\forall h \in H) \\
+  \tau \text{ neither union nor dictionary type}
+}
+{
+  \Sigma \vdash \shapeAny{\tau}{H} : \tau
+}
+\and
+\inferrule*[lab={\ruleName{shape-constr}}]
+{
+  \fields(\Sigma, C) = \bind{\seq{x}}{\seq{\sigma}} \\
+  \Sigma \vdash h : C \quad (\forall h \in H) \\
+  \Sigma \vdash k_i : \sigma_i \quad (\forall i)
+}
+{
+  \Sigma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{H} : C
+}
+\and
+\inferrule*[lab={\ruleName{shape-tuple}}]
+{
+  \Sigma \vdash k_i : \tau_i \quad (\forall i)
+}
+{
+  \Sigma \vdash \patTuple{\seq{k}} : \tyTuple{\seq{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{shape-list}}]
+{
+  \Sigma \vdash k_i : \tau \quad (\forall i)
+}
+{
+  \Sigma \vdash \shapeList{\tau}{\seq{k}} : \tyList{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{shape-sub}}]
+{
+  \Sigma \vdash k : \sigma \\
+  \Sigma \vdash \sigma \subty \tau
+}
+{
+  \Sigma \vdash k : \tau
+}
+\and
+\inferrule*[lab={\ruleName{shape-dict}}]
+{
+  \Sigma \vdash h : \tyStr \quad (\forall h \in H) \\
+  \Sigma \vdash \beta(w) : \tau \quad (\forall w \in \dom(\beta)) \\
+  \dom(\beta) \cap H = \varnothing
+}
+{
+  \Sigma \vdash \shapeDict{\tau}{\beta}{H} : \tyDict{\tau}
+}
+\end{mathpar}
+\caption{Shapes and shape typing}
+\label{fig:shapes}
+\end{figure}

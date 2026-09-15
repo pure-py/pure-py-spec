@@ -1,2 +1,2 @@
-\resolveClass(\rho, c) &= \rho(c) \\*
-\resolveClass(\rho, q.c) &= \env(\rho, q)(c)
+\resolveClass(\rho, c) &= C && \text{if } \rho(c) = \Type{C} \\*
+\resolveClass(\rho, q.c) &= C && \text{if } \env(\rho, q)(c) = \Type{C}

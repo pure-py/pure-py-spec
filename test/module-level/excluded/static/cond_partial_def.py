@@ -1,5 +1,5 @@
 # rule: var
-def foo(b):
+def foo(b: bool) -> int:
     x = 6
     if b:
         x = 3

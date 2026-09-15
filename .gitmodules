@@ -1,0 +1,3 @@
+[submodule "isabelle-purepy"]
+	path = isabelle-purepy
+	url = git@github.com:pure-py/isabelle-purepy.git
