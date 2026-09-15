@@ -50,8 +50,9 @@ type system whose well-typed programs are accepted by mypy, leaving gradual typi
 \subsection{Pattern matching}
 
 Checking that the cases of a match are reachable and exhaustive goes back to the usefulness algorithm for
-ML~\cite{maranget2007}, which asks of each case whether some value reaches it, and to the term descriptions a
-match compiler carries as it decides a pattern one position at a time~\cite{sestoft1996}. \PurePy computes
+ML~\cite{maranget2007}, which decides whether a pattern matches some value that no preceding pattern
+matches, and to the term descriptions of \citet{sestoft1996}, which record the constructors established and
+excluded at each position of the scrutinee as match compilation proceeds. \PurePy computes
 both from a residual, the set of values no earlier case has matched, and seeds that residual from the type of
 the scrutinee, so the types of the bindings a pattern makes come from the same computation. Accounting for
 the type in this way follows the uncovered sets of \citet{karachalias2015}, which track what a GADT match
