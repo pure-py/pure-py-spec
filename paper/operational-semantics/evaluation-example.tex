@@ -8,9 +8,9 @@ derivation. An abort from the first operand is propagated by a rule of its own:
 \begin{mathpar}
 \input{spec/rules/eval-binop-fail}
 \end{mathpar}
-Rules may also originate an abort rather than propagate one. Calling a value that is neither closure nor
-primitive aborts with $\errType$, as Python raises \pyinline{TypeError}:
+An abort may also originate in a rule rather than be propagated from a premise. Calling a value that is
+neither closure nor primitive aborts with $\errType$, because Python raises \pyinline{TypeError}:
 \begin{mathpar}
 \input{spec/rules/eval-call-nonfun}
 \end{mathpar}
-The remaining rules follow the same pattern and are given in full in \specification.
+The remaining rules are of the same form and are given in full in \specification.
