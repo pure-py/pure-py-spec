@@ -21,12 +21,12 @@ counterpart.
 \input{spec/fig/resolve-type}
 
 The rules are intended as a refinement of mypy's: a well-typed
-\PurePy program should be accepted by mypy, and \PurePy may reject programs mypy accepts but not the
+\PurePy program should be accepted by mypy, and \PurePy may reject programs accepted by mypy but not the
 reverse. Function signatures, assignments and dataclass fields are annotated with type expressions, and a
 type expression denotes a type under a context (\figref{resolve-type}). Every definition carries an
 annotation for its parameters and return type, so the type of a definition is given rather than
 inferred from its body. A class name resolves to a
-class (\figref{resolve-name}) and every other name must resolve to a predefined entry
+class (\figref{resolve-name}) and every other name must resolve to a predefined name
 (\figref{predefined-types}). The function $\baseType(\tau)$ discards the precision of a
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and leaving every other type alone
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:base-type}}).
@@ -38,8 +38,8 @@ Subtyping (\figref{subtyping}) has every type below itself, a literal type below
 ancestors, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
 each of its members and below every type that is above all of them. A tuple type is covariant, below another of the
 same length whose components are above its own. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; both notations follow \citet{pierce2002}. Lists and
-dictionaries are related only where their components are equivalent, since both are invariant in mypy
-and covariance would accept programs mypy rejects. A callable type is contravariant in its parameters
+dictionaries are related only when their components are equivalent, since both are invariant in mypy
+and covariance would accept programs rejected by mypy. A callable type is contravariant in its parameters
 and covariant in its result, following mypy. The types with a length, namely lists, dictionaries,
 strings and tuples, are below \pyinline{Sized}. An \pyinline{int} is a \pyinline{float}, as PEP~484
 requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
@@ -97,7 +97,7 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 \input{spec/fig/typing-synth}
 
 The fields of a class $C$ form a sequence $\fields(\Sigma, C)$ of bindings $\bind{x}{\tau}$, one per
-field: the fields of its base class first, recursively, then the fields $C$ declares itself, each at its
+field: the fields of its base class first, recursively, then the fields declared by $C$ itself, each at its
 declared type. The order matters, because a constructor call pairs positional arguments with fields by
 position. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to
@@ -110,10 +110,10 @@ $\exAttr{e}{x}$ resolves as a qualified name to a definitely assigned member
 (\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}. A variable bound to a module or
 class is not an expression on its own, and occurs only as the head of a qualified
 name\paperonly{ (\secref{no-first-class})}.
-In a subscript $\exSubscript{e}{e'}$ there is a rule for each container $e$ can synthesise: a list
+In a subscript $\exSubscript{e}{e'}$ there is a rule for each container that $e$ can synthesise: a list
 (\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
 dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
-that synthesises a literal type gives the component type at that position, counting from the end where the index
+that synthesises a literal type gives the component type at that position, counting from the end when the index
 is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and any other index of type
 \pyinline{int} gives the join of the component types (\ruleName{subscript-tuple-int}). A negated numeric
 literal synthesises the negated literal type (\ruleName{unop-literal}), and \ruleName{unop} excludes that
@@ -125,7 +125,7 @@ such rule, because $\elemTy$ takes a union to the join of its members' element t
 elimination form has its own rule.
 
 Lambdas check, as do lists, tuples, dictionaries and comprehensions. An expression that synthesises $\sigma$ checks against any supertype
-of $\sigma$ (\ruleName{check-synth}), which applies only where no other rule concludes $\Sigma; \Gamma \vdash e \checks
+of $\sigma$ (\ruleName{check-synth}), which applies only when no other rule concludes $\Sigma; \Gamma \vdash e \checks
 \tau$, so both judgements are
 syntax-directed and an expression has at most one derivation in each.
 
@@ -138,7 +138,7 @@ tuples when every component synthesises (\ruleName{syn-tuple}); comprehensions w
 synthesises (\ruleName{syn-list-comp}, \ruleName{syn-dict-comp}); and non-empty lists and
 dictionaries when at least one element synthesises, the remaining elements checking against the join
 of the base types of the synthesising elements (\ruleName{syn-list}, \ruleName{syn-dict}). A list,
-dictionary or comprehension takes the base type of the type its elements or body synthesise, since
+dictionary or comprehension takes the base type of the type synthesised by its elements or body, since
 \pyinline{list} and \pyinline{dict} are invariant and a literal element type would keep the container from
 matching any other element type. An empty list or dictionary and a lambda have no
 synthesis rule at all, so checking is the only way to type them. A lambda applied to arguments is the
@@ -174,7 +174,7 @@ The set $\overloadsOf(\Sigma, \odot, \sigma_1, \sigma_2)$ consists of the tuples
 that $\Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$, ordered by componentwise subtyping in $\Sigma$ on their
 bounds $(\tau_1, \tau_2)$. The unary set $\overloadsOf(\Sigma, \ominus, \sigma)$ is defined in the same way from
 conclusions $\Sigma \vdash \ominus(\sigma) : (\tau, \tau')$. In both cases $\min$ denotes the least element
-under this order, where one exists.
+under this order, if one exists.
 \end{definition}
 
 \noindent The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the result type
