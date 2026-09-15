@@ -50,11 +50,3 @@ jobs:
 
       - name: Build documents and submission
         run: make PurePy-spec.pdf paper.pdf paper-submission
-
-      - name: Upload submission artefacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: submission
-          path: |
-            paper-anon.pdf
-            supplementary.zip

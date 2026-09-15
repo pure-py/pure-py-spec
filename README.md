@@ -119,6 +119,10 @@ submission never ships a working copy. Check it out with:
 git submodule update --init
 ```
 
+The mechanisation is type checked before packaging, so `isabelle` must be on `PATH`; the submodule's
+README gives the required version and installation steps. The `Paper submission` GitHub Action runs the
+same target on every push to validate the build, but the submission is always built locally.
+
 ## Release workflow
 
 Run the `Bump version` GitHub Action manually with a version in the form `x.y.z` (for example, `0.1.4`).
