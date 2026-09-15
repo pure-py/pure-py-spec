@@ -1,4 +1,2 @@
 \fields(\Sigma, C) &= \bind{\seq{x}}{\seq{\tau}} && \text{if } \Sigma(C) = \clsRec{\bind{\seq{x}}{\seq{\tau}}}{\bot} \\*
-\fields(\Sigma, C) &= \fields(\Sigma, D) \mathbin{\concat} \bind{\seq{x}}{\seq{\tau}} && \text{if } \Sigma(C) = \clsRec{\bind{\seq{x}}{\seq{\tau}}}{D} \\*[2mm]
-\fields(\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}) &= \seq{x} \\*
-\fields(\clsEntry{\Gamma}{q.c}{\seq{x}}{v}) &= \fields(v) \mathbin{\concat} \seq{x}
+\fields(\Sigma, C) &= \fields(\Sigma, D) \mathbin{\concat} \bind{\seq{x}}{\seq{\tau}} && \text{if } \Sigma(C) = \clsRec{\bind{\seq{x}}{\seq{\tau}}}{D}

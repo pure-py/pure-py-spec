@@ -3,7 +3,10 @@
 
 \subsection{Values and environments}
 
-Values, environments, outcomes and results are given in \figref{values}. For a statement $s$, the outcome
+Values, environments, outcomes and results are given in \figref{values}. A class value $\Type{C}$ is the
+context entry of the class, and an object $\exObj{C}{\rho}$ records its class by name; throughout this
+section, $\Sigma$ is the class table produced by static loading of the program
+(\secref{well-formedness-modules}) and, like $\mathcal{M}$ and $\mathcal{P}$, is ambient. For a statement $s$, the outcome
 $\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the outcome
 $\returns{v}$ represents \emph{abrupt completion} of $s$, with return value $v$; and the outcome
 $\aborts{\kappa}$ represents abrupt completion of the whole run, with termination kind $\kappa$.
@@ -90,9 +93,8 @@ A constructor pattern matches any object
 whose class has the pattern's class among its ancestors, and its sub-patterns bind the fields of the
 pattern's class\paperonly{:}\speconly{.}
 \paperinput{paper/operational-semantics/pattern-constr}%
-An object records its class, whose qualified name is the identity of the class:
-since a module declares each class name at most once, the class comparison in \ruleName{eval-pat-constr}
-amounts to a comparison of qualified names.
+Since an object records its class by name, the class test in \ruleName{eval-pat-constr} is a comparison of
+qualified names.
 
 \specinput{spec/fig/eval-pat}
 

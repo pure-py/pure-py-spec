@@ -1,9 +1,9 @@
 \inferrule*[lab={\ruleName{eval-pat-constr}}]
 {
   \resolveClass(\rho, q) = C \\
-  C \in \ancestors(D) \\
-  \rho, \fieldMap(C, \seq{p})(x), \rho'(x) \matches m_x \quad (\forall x \in \fields(C))
+  C \in \ancestors(\Sigma, D) \\
+  \rho, \fieldMap(\Sigma, C, \seq{p})(x), \rho'(x) \matches m_x \quad (\forall x \in \dom(\fields(\Sigma, C)))
 }
 {
-  \rho, \patConstr{q}{\seq{p}}, \exObj{\Gamma'}{D}{\rho'} \matches {\textstyle\bigotimes_{x \in \fields(C)}}\, m_x
+  \rho, \patConstr{q}{\seq{p}}, \exObj{D}{\rho'} \matches {\textstyle\bigotimes_{x \in \dom(\fields(\Sigma, C))}}\, m_x
 }

@@ -1,4 +1,2 @@
 \ancestors(\Sigma, C) &\;= \set{C} && \text{if } \Sigma(C) = \clsRec{\bind{\seq{x}}{\seq{\tau}}}{\bot} \\*
-\ancestors(\Sigma, C) &\;= \set{C} \cup \ancestors(\Sigma, D) && \text{if } \Sigma(C) = \clsRec{\bind{\seq{x}}{\seq{\tau}}}{D} \\*[2mm]
-\ancestors(\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}) &\;= \set{\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}} \\*
-\ancestors(\clsEntry{\Gamma}{q.c}{\seq{x}}{v}) &\;= \set{\clsEntry{\Gamma}{q.c}{\seq{x}}{v}} \cup \ancestors(v)
+\ancestors(\Sigma, C) &\;= \set{C} \cup \ancestors(\Sigma, D) && \text{if } \Sigma(C) = \clsRec{\bind{\seq{x}}{\seq{\tau}}}{D}

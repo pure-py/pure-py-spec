@@ -56,11 +56,10 @@
 \and
 \inferrule*[lab={\ruleName{val-obj}}]
 {
-  \vdash \rho(x) : \tau \quad (\forall \bind{x}{\tau} \in \fields(C)) \\
-  \vdash \rho : \Gamma
+  \vdash \rho(x) : \tau \quad (\forall \bind{x}{\tau} \in \fields(\Sigma, C))
 }
 {
-  \vdash \exObj{\Gamma}{C}{\rho} : C
+  \vdash \exObj{C}{\rho} : C
 }
 \and
 \inferrule*[lab={\ruleName{val-prim}}]
@@ -99,18 +98,10 @@
 \and
 \inferrule*[lab={\ruleName{val-class}}]
 {
-  \strut
+  C \in \dom(\Sigma)
 }
 {
-  \vdash \clsEntry{\Gamma}{q.c}{\seq{x}}{\bot} : \Type{\clsEntry{\Gamma}{q.c}{\seq{x}}{\bot}}
-}
-\and
-\inferrule*[lab={\ruleName{val-class-extend}}]
-{
-  \bind{c'}{\Type{C}} \in \Gamma
-}
-{
-  \vdash \clsEntry{\Gamma}{q.c}{\seq{x}}{c'} : \Type{\clsEntry{\Gamma}{q.c}{\seq{x}}{c'}}
+  \vdash \Type{C} : \Type{C}
 }
 \end{mathpar}
 
