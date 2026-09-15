@@ -199,8 +199,9 @@ comparing two functions is rejected statically. The final rule of each table clo
 judgement under base-typing, letting \pyinline{1 == 0} use the equality overload at \pyinline{int}, since
 two distinct literal types are not comparable; \pyinline{2 ** 3} is still an \pyinline{int}, since the
 direct instance's bounds $(\tyInt, \tyLiteral{3})$ lie below the base instance's
-$(\tyFloat, \tyFloat)$. Resolution is more precise than mypy for this operator, whose overloads give
-\pyinline{Any} as soon as the exponent is not a literal, where resolution gives \pyinline{float}.
+$(\tyFloat, \tyFloat)$. For this operator the \ruleName{binop} rule is more precise than mypy, whose
+overloads give \pyinline{Any} whenever the exponent is not a literal, whereas the least overload resolves to
+\pyinline{float}.
 
 \begin{lemma}[Least overload]
 \label{lem:least-overload}
