@@ -44,9 +44,13 @@ results of the same form, carrying an outcome, a sequence of values or an enviro
 \subsection{Expressions and statements}
 
 A value has a context entry, and an environment a context, by \figref{value-typing}.
-For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any top-level statement $t$ with
-$\Gamma \vdash t : R$, the statement evaluation judgement $\rho, t \Rightarrow o$ says that $t$ evaluates
-to outcome $o$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Function definitions delimit
+For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any statement $s$ with
+$\Gamma \vdash s : R$, the statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
+to outcome $o$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Top-level statements
+have a judgement of their own, $q; \rho, t \Rightarrow o$\speconly{ (\figref{eval-top})}, mirroring the static
+judgement (\figref{typing-top}): a sequence composes in the same way as a statement sequence, a class declaration binds
+its name to the class $\fq{q.c}$, and a plain statement is evaluated by the statement judgement
+(\ruleName{eval-top-stmt}). Function definitions delimit
 the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\result$\speconly{ (\S\ref{aux:result})} reads the outcome of a statement as
 the result of a call\speconly{; if the statement completes without returning, the result is $\val{\pyinline{None}}$.}\paperonly{:}
 \paperinput{paper/operational-semantics/result}

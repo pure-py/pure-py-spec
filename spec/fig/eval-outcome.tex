@@ -1,6 +1,6 @@
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, t \Rightarrow o$}
+\flushleft \shadebox{$\rho, s \Rightarrow o$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-pass}}]
@@ -134,36 +134,20 @@
 \and
 \inferrule*[lab={\ruleName{eval-seq}}]
 {
-  \rho, t \Rightarrow \assigns{\rho'} \\
-  \rho \override \rho', t' \Rightarrow o
+  \rho, s \Rightarrow \assigns{\rho'} \\
+  \rho \override \rho', s' \Rightarrow o
 }
 {
-  \rho, t\;t' \Rightarrow \assigns{\rho'} \override o
-}
-\and
-\inferrule*[lab={\ruleName{eval-class}}]
-{
-  \strut
-}
-{
-  \rho, \exDataclass{c}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{\fq{q.c}}}}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-class-extend}}]
-{
-  \strut
-}
-{
-  \rho, \exDataclassExtend{c}{c'}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{\fq{q.c}}}}}
+  \rho, s\;s' \Rightarrow \assigns{\rho'} \override o
 }
 \end{mathpar}
-\caption{Statement $t$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
+\caption{Statement $s$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
 \label{fig:eval-block-outcome}
 \end{figure}
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, t \Rightarrow o$ (continued)}
+\flushleft \shadebox{$\rho, s \Rightarrow o$ (continued)}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-assert-fail}}]
@@ -210,14 +194,64 @@
 \and
 \inferrule*[lab={\ruleName{eval-seq-fail}}]
 {
-  \rho, t \Rightarrow \aborts{\kappa}
+  \rho, s \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, t\;t' \Rightarrow \aborts{\kappa}
+  \rho, s\;s' \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
 \caption{Statement evaluation, continued (aborting cases)}
 \label{fig:eval-block-fails}
+\end{figure}
+
+\begin{figure}
+\small
+\flushleft \shadebox{$q; \rho, t \Rightarrow o$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-top-stmt}}]
+{
+  \rho, s \Rightarrow o
+}
+{
+  q; \rho, s \Rightarrow o
+}
+\and
+\inferrule*[lab={\ruleName{eval-top-seq}}]
+{
+  q; \rho, t \Rightarrow \assigns{\rho'} \\
+  q; \rho \override \rho', t' \Rightarrow o
+}
+{
+  q; \rho, t\;t' \Rightarrow \assigns{\rho'} \override o
+}
+\and
+\inferrule*[lab={\ruleName{eval-top-seq-fail}}]
+{
+  q; \rho, t \Rightarrow \aborts{\kappa}
+}
+{
+  q; \rho, t\;t' \Rightarrow \aborts{\kappa}
+}
+\and
+\inferrule*[lab={\ruleName{eval-class}}]
+{
+  \strut
+}
+{
+  q; \rho, \exDataclass{c}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{\fq{q.c}}}}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-class-extend}}]
+{
+  \strut
+}
+{
+  q; \rho, \exDataclassExtend{c}{c'}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{\fq{q.c}}}}}
+}
+\end{mathpar}
+\caption{Top-level statement $t$ of module $q$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
+\label{fig:eval-top}
 \end{figure}
 
 \begin{figure}
