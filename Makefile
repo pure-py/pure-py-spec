@@ -7,11 +7,18 @@ AUX := $(BUILD_AUX) *.bbl
 
 default: paper.pdf
 
+# pdflatex only warns about these, so check the log of job $(1) before removing it.
+define check-log
+@! grep -E "Reference .* undefined|Citation .* undefined|multiply defined" $(1).log || \
+	{ echo "$(1).log: unresolved references"; exit 1; }
+endef
+
 %.pdf: %.tex $(TEXFILES)
 	$(PDFLATEX) $<
 	bibtex "$*"
 	$(PDFLATEX) $<
 	$(PDFLATEX) $<
+	$(call check-log,$*)
 	rm -f $(BUILD_AUX)
 
 # Anonymised build of source $(2) under job name $(1).
@@ -20,6 +27,7 @@ $(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
 bibtex $(1)
 $(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
 $(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
+$(call check-log,$(1))
 rm -f $(BUILD_AUX)
 endef
 
