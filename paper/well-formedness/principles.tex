@@ -34,8 +34,8 @@ with Python. The program assigns \pyinline{x} on every run, so this is stricter 
 \pyinline{NameError}: the reference would denote the branch-local variable on one path and the
 \pyinline{x = 6} it hides on the other.
 
-Python's function-level scoping is kept as well. The \ruleName{def} rule introduces every variable the
-body assigns, $\assignsS(b)$, at $\False$ before checking the body, so a reference before the
+Python's function-level scoping is kept as well. The \ruleName{def} rule introduces every variable assigned by
+the body, $\assignsS(b)$, at $\False$ before checking the body, so a reference before the
 assignment is rejected statically, where Python fails at run time with \pyinline{UnboundLocalError}:
 
 \begin{python}
@@ -52,7 +52,7 @@ into nested function definitions, which have their own scope.
 \label{sec:captured-variables}
 
 In Python a closure holds a mutable binding, so a variable captured by a lambda or nested function
-definition may be reassigned afterwards, changing what the function sees (\secref{no-mutable-state}).
+definition may be reassigned afterwards, changing the value seen by the function (\secref{no-mutable-state}).
 \PurePy excludes this: a variable captured by a statement may not be assigned later in the same sequence, nor
 by that statement itself. The \ruleName{seq} rule imposes the first as a side condition on a sequence
 $t\;t'$: no variable in $\capturesS(t)$ may be in $\assignsS(t')$. In the example of \secref{no-mutable-state}, \pyinline{x} is captured by the
@@ -68,7 +68,7 @@ excluded outright (\secref{no-first-class}).
 
 Here $\capturesS(s)$ is the set of variables of the enclosing scope captured by the lambdas and nested
 function definitions within a statement $s$, with $\capturesE(e)$ computing the same for an expression $e$: the
-free variables of each such function's body, less its parameters and any variables the body assigns, which
+free variables of each such function's body, less its parameters and any variables assigned by the body, which
 are local to it. For a mutual region of function definitions (\figref{syntax-stmt}) the names of the functions
 themselves are also excluded, since the \ruleName{def} rule binds them in every body, consistent with
 Python's late binding semantics (\secref{mutual-recursion}).
@@ -171,7 +171,7 @@ def foo(x):
 \label{sec:load-order}
 
 In Python a module's namespace is populated as loading proceeds, by the assignments in its body and, for
-a module with submodules, by the import system binding each submodule as it loads, so what a qualified name denotes can
+a module with submodules, by the import system binding each submodule as it loads, so the referent of a qualified name can
 depend on which modules have loaded so far, anywhere in the program (\secref{no-load-dependent}). \PurePy gives each name a meaning fixed by the
 module's own text and imports. Imports come first in a module, so its dependencies are known before any
 statement runs. Loading is checked statically: the \ruleName{module} rule checks a body and computes its
@@ -202,7 +202,7 @@ print(pkg.sub.y)  # error: pkg.sub is not imported here
 
 \noindent Python accepts this because importing \pyinline{a} loads \pyinline{pkg.sub}; remove that import,
 which the main module does not otherwise use, and Python raises \pyinline{AttributeError}. It raises the
-same for a reference to a module member the body never assigns, such as \pyinline{lib.x} where
+same for a reference to a module member never assigned by the body, such as \pyinline{lib.x} where
 \pyinline{lib} assigns \pyinline{x} only on a branch that is not taken. \PurePy rejects all three programs
 statically (\secref{well-formedness-modules}).
 
