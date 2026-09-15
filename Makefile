@@ -1,4 +1,4 @@
-INPUTS := $(wildcard tex/*.tex spec/*.tex spec/*/*.tex paper/*.tex paper/*/*.tex)
+INPUTS := $(wildcard tex/*.tex spec/*.tex spec/*/*.tex spec/*/*/*.tex paper/*.tex paper/*/*.tex)
 TEXFILES := $(wildcard *.tex) $(INPUTS)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
 # Removed after each build; the .bbl is kept, since paper-arXiv.zip includes it.

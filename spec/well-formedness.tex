@@ -221,7 +221,7 @@ returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$).
 
 \input{spec/fig/typing-stmt}
 
-\input{spec/fig/typing-cases}
+\input{spec/fig/pattern-matching/typing-cases}
 
 \input{spec/fig/typing-top}
 
@@ -304,7 +304,7 @@ likewise let the type exclude cases.
 \speconly{\subsubsection{Shapes and shape typing}\label{sec:shapes}}%
 \paperonly{\paragraph{Shapes and shape typing.}}
 
-\input{spec/fig/shapes}
+\input{spec/fig/pattern-matching/shapes}
 
 A shape $k$ (\figref{shapes})
 denotes a set of values of its type $\shapeTy(k)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:shape-type}}). The form $\shapeAny{\tau}{H}$ denotes the
@@ -332,7 +332,7 @@ all when $H$ exhausts $\tau$. The rest form therefore never carries a union or d
 \speconly{\subsubsection{Exhaustiveness and reachability}\label{sec:exhaustiveness-reachability}}%
 \paperonly{\paragraph{Exhaustiveness and reachability.}}
 
-\input{spec/fig/pat}
+\input{spec/fig/pattern-matching/pat}
 
 Both reachability and exhaustiveness are determined by the residual left by \emph{matching}.
 Matching (\figref{pat}) has three forms. The form on a single shape $k$ matches a pattern against that
@@ -347,7 +347,7 @@ $L$ may admit no derivation for the pattern, so \ruleName{pat-shapes} takes the 
 admit a derivation, of which there must be at least one, and passes the remaining shapes into the
 residual untouched.
 
-\input{spec/fig/split}
+\input{spec/fig/pattern-matching/split}
 
 A pattern matches a shape directly if the shape has the head tested by the pattern. Otherwise the shape
 is first \emph{split} by the auxiliary judgement $\Sigma; \Gamma \vdash k, p \splits K, L$ (\figref{split}):
