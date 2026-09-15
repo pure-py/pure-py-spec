@@ -7,6 +7,8 @@ AUX := $(BUILD_AUX) *.bbl
 
 default: paper.pdf
 
+all: PurePy-spec.pdf paper.pdf paper-arXiv.zip paper-submission
+
 # pdflatex only warns about these, so check the log of job $(1) before removing it.
 define check-log
 @! grep -E "Reference .* undefined|Citation .* undefined|multiply defined" $(1).log || \
@@ -75,4 +77,4 @@ paper-arXiv.zip: paper.pdf
 clean:
 	rm -f $(AUX) *.pdf *.zip
 
-.PHONY: default paper-submission clean check-mechanisation check-tests
+.PHONY: default all paper-submission clean check-mechanisation check-tests

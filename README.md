@@ -1,6 +1,6 @@
 # PurePy - A Pure Functional Subset of Python
 
-[![paper submission](https://github.com/pure-py/pure-py-spec/actions/workflows/paper-submission.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/paper-submission.yml)
+[![build](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml)
 
 ## [v0.15.1](https://github.com/pure-py/pure-py-spec/releases/download/v0.15.1/PurePy-spec.pdf)
 
@@ -120,8 +120,9 @@ git submodule update --init
 ```
 
 The mechanisation is type checked before packaging, so `isabelle` must be on `PATH`; the submodule's
-README gives the required version and installation steps. The `Paper submission` GitHub Action runs the
-same target on every push to validate the build, but the submission is always built locally.
+README gives the required version and installation steps. The `Build` GitHub Action runs `make all`,
+which includes this target, on every push to validate the build, but the submission is always built
+locally.
 
 ## Release workflow
 
