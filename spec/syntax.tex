@@ -29,7 +29,7 @@ into abstract syntax follows Python, including the indentation that delimits blo
 \subsection{Contexts}
 \label{sec:contexts}
 
-Metavariables $x$, $f$, $c$ range over \emph{variables}, simple identifiers whatever they denote; idiomatically $f$ is used when the variable is expected to denote a function and $c$ when it is expected to denote a class. A \emph{qualified name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}); a variable is thus a qualified name with a single component.
+Metavariables $x$, $f$ and $c$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function and $c$ when it is expected to denote a class. A \emph{qualified name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}); a variable is thus a qualified name with a single component.
 
 \begin{definition}[Context]
 \label{def:context}
@@ -110,8 +110,10 @@ mutual region as one mutually-recursive binding\paperonly{ (see \secref{mutual-r
 
 An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by
 keyword arguments $x = u$, where an argument $u$ is an expression in a constructor call and a pattern in a
-constructor pattern. $\fieldMap$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:field-map}}) pairs the arguments of $a$ with the fields
-they supply.
+constructor pattern. The auxiliary function $\fieldMap$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:field-map}}) pairs each field of the class
+with an argument: the positional arguments fill the leading fields in order, and a keyword argument $x = u$
+fills the field $x$. It is undefined unless every field receives exactly one argument.
 
 \paragraph{Type annotations.}
 
