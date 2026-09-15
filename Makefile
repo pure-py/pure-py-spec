@@ -1,12 +1,9 @@
-TEXFILES := $(wildcard *.tex) $(wildcard tex/*.tex spec/*.tex spec/*/*.tex paper/*.tex paper/*/*.tex)
+INPUTS := $(wildcard tex/*.tex spec/*.tex spec/*/*.tex paper/*.tex paper/*/*.tex)
+TEXFILES := $(wildcard *.tex) $(INPUTS)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
 # Removed after each build; the .bbl is kept, since paper-arXiv.zip includes it.
 BUILD_AUX := *.aux *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
 AUX := $(BUILD_AUX) *.bbl
-ARXIV_FILES := \
-	paper.tex \
-	$(wildcard tex/*.tex spec/*.tex spec/*/*.tex paper/*.tex paper/*/*.tex) \
-	$(wildcard *.bbl *.bst tex/*.bib)
 
 default: paper.pdf
 
@@ -62,9 +59,10 @@ check-tests:
 
 submit: check-tests paper-anon.pdf supplementary.zip
 
-paper-arXiv.zip: $(ARXIV_FILES)
+# arXiv runs pdflatex but not bibtex, so the source ships with the .bbl of the current build.
+paper-arXiv.zip: paper.pdf
 	rm -f $@
-	zip -q -9 $@ $^
+	zip -q -9 $@ paper.tex paper.bbl $(INPUTS)
 
 clean:
 	rm -f $(AUX) *.pdf *.zip
