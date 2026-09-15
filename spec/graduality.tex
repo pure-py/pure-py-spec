@@ -130,12 +130,12 @@ $\sigma \in \gamma(\gty{\sigma})$.
 
 \begin{proof}[Proof sketch]
 By induction on the triple, ordered lexicographically by the total size of the three types and
-then by the size of the first; cases on the triple, where each case matches one rule and is an equivalence. An outer
+then by the size of the first; cases on the triple, each case matching one rule and being an equivalence. An outer
 type $\tyAny$ or $\tyNever$ takes the witness $\tyNever$, leaving a consistent subtyping check on
 the other outer type (\ruleName{three-sub-any-left}, \ruleName{three-sub-never-left}). A union in
 an outer position reassociates, because its witness is a union, below a type exactly when both
 components are (\ruleName{three-sub-assoc}). Otherwise each outer witness shares its
-head with the gradual type it witnesses, and neither is a union. In the middle, $\tyAny$ admits the witness $\tyObject$
+head with the gradual type that it witnesses, and neither is a union. In the middle, $\tyAny$ admits the witness $\tyObject$
 (\ruleName{three-sub-any}). A static middle type is its own sole concretisation, so sharing is
 trivial and two consistent subtyping checks remain (\ruleName{three-sub-static}). For a union in
 the middle, inversion sends each outer witness into one component: the same component
@@ -176,8 +176,8 @@ $\threeSup{\tyList{\tyAny}}{\tyList{\tyStr}}{\tyList{\tyAny}}$ hold, but
 $\threeSup{\tyList{\tyAny}}{\tyUnion{\tyList{\tyInt}}{\tyList{\tyStr}}}{\tyList{\tyAny}}$ needs
 an element witness equivalent to both $\tyInt$ and $\tyStr$.
 
-Sharing the pair of component witnesses suggests a judgement over four gradual types, but the
-widening does not stop there: a union in an outer position then sends each component witness below
+Sharing the pair of component witnesses suggests a judgement over four gradual types, but no
+fixed arity suffices: a union in an outer position then sends each component witness below
 one of its components independently, so the constraints no longer relate every pair. The general
 form is a finite set of subtyping and equivalence constraints over shared witnesses, a constraint
 system in the sense of \citet{garcia2015}. Its treatment is deferred, with rules for the
@@ -224,7 +224,7 @@ choice is a disjunction, so $\consys$ is satisfiable exactly when some run succe
 constraint whose static check fails, or a constraint between operands with distinct constructor
 roots, fails the run. A run stops when every constraint relates a variable to a ground term; a
 variable is then assignable exactly when the join of its lower bounds lies below the meet of its
-upper bounds, up to the equivalences that pin it, by the lattice of \specification.
+upper bounds, up to the equivalences that constrain it, by the lattice of \specification.
 
 \input{spec/fig/graduality-solver}
 
