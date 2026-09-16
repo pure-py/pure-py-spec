@@ -79,6 +79,7 @@ from type_syntax import (
     TypeExpr,
     UnionExpr,
     UnionType,
+    Var,
     base_type,
     literal_type,
     render,
@@ -132,7 +133,7 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
     )
 
 
-def check_in_scope(x: str, node: ast.AST, mod_ctx: ModuleContext) -> None:
+def check_in_scope(x: Var, node: ast.AST, mod_ctx: ModuleContext) -> None:
     if not isinstance(mod_ctx.gamma.get(x), PredefinedName):
         raise IllFormedModule(node, reasons.AnnotationNameNotInScope(x))
 
@@ -235,12 +236,12 @@ def check_returns_none(sigma: ClassTable, s: ast.Return, declared: Type) -> None
         )
 
 
-def check_assign_target(target: ast.Name, captured: set[str]) -> None:
+def check_assign_target(target: ast.Name, captured: set[Var]) -> None:
     if target.id in captured:
         raise IllFormedModule(target, reasons.SelfCaptureAssignment(target.id))
 
 
-def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
+def check_distinct_names(defs: list[ast.FunctionDef], seen: set[Var]) -> None:
     if len(defs) == 0:
         return
     head = defs[0]

@@ -5,7 +5,7 @@ from enum import Enum, auto
 
 from classes import Class, ClassTable
 from subtyping import join_seq
-from type_syntax import CallableType, ListType, Primitive, Type, dotted_name
+from type_syntax import CallableType, ListType, Primitive, Type, Var, dotted_name
 
 
 class Status(Enum):
@@ -16,8 +16,8 @@ class Status(Enum):
 # assigned. Lazily evaluated, so these may name Class before it is defined.
 type VarEntry = Status | Type
 type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName
-type Context = Mapping[str, ContextEntry]
-type VarContext = Mapping[str, VarEntry]
+type Context = Mapping[Var, ContextEntry]
+type VarContext = Mapping[Var, VarEntry]
 
 
 @dataclass(frozen=True)
@@ -50,19 +50,19 @@ def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
     )
 
 
-def var_entry(mod_ctx: ModuleContext, x: str) -> VarEntry | None:
+def var_entry(mod_ctx: ModuleContext, x: Var) -> VarEntry | None:
     v = mod_ctx.gamma.get(x)
     if v is None or isinstance(v, (ModuleStub, ModuleLoaded, Class, PredefinedName)):
         return None
     return v
 
 
-def var_type(mod_ctx: ModuleContext, x: str) -> Type | None:
+def var_type(mod_ctx: ModuleContext, x: Var) -> Type | None:
     v = var_entry(mod_ctx, x)
     return None if v is None or isinstance(v, Status) else v
 
 
-def is_assigned(mod_ctx: ModuleContext, x: str) -> bool:
+def is_assigned(mod_ctx: ModuleContext, x: Var) -> bool:
     v = var_entry(mod_ctx, x)
     return v is not None and v != Status.FF
 
@@ -75,7 +75,7 @@ def resolve_name(q: str, mod_ctx: ModuleContext) -> ContextEntry | None:
     return entry.members.get(x) if isinstance(entry, ModuleLoaded) else None
 
 
-def module_of(mod_ctx: ModuleContext, x: str) -> ModuleStub | ModuleLoaded | None:
+def module_of(mod_ctx: ModuleContext, x: Var) -> ModuleStub | ModuleLoaded | None:
     v = mod_ctx.gamma.get(x)
     return v if isinstance(v, (ModuleStub, ModuleLoaded)) else None
 
@@ -216,8 +216,8 @@ def extend_entry(
 
 
 def disjoint_union[V](
-    gamma: Mapping[str, V], gamma_: Mapping[str, V]
-) -> Mapping[str, V]:
+    gamma: Mapping[Var, V], gamma_: Mapping[Var, V]
+) -> Mapping[Var, V]:
     assert gamma.keys().isdisjoint(gamma_.keys())
     return {**gamma, **gamma_}
 

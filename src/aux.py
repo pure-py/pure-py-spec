@@ -1,7 +1,7 @@
 import ast
 from itertools import dropwhile, takewhile
 
-from type_syntax import TypeExpr, dotted_name, parse_annotation
+from type_syntax import TypeExpr, Var, dotted_name, parse_annotation
 
 # A PurePy statement: a Python statement, or a mutual region of consecutive defs. A Python body
 # (a statement list) represents the spec's right-nested sequence s s'.
@@ -37,7 +37,7 @@ def extend_region(
     return [region] + statements(rest)
 
 
-def binds(pattern: ast.pattern) -> set[str]:
+def binds(pattern: ast.pattern) -> set[Var]:
     if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
         return set()
     if isinstance(pattern, ast.MatchAs):
@@ -51,7 +51,7 @@ def binds(pattern: ast.pattern) -> set[str]:
     )
 
 
-def fv_e(e: ast.expr) -> set[str]:
+def fv_e(e: ast.expr) -> set[Var]:
     if isinstance(e, ast.Name):
         return {e.id}
     if isinstance(e, ast.Constant):
@@ -88,7 +88,7 @@ def fv_e(e: ast.expr) -> set[str]:
     raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
-def fv_e_list(es: list[ast.expr]) -> set[str]:
+def fv_e_list(es: list[ast.expr]) -> set[Var]:
     if len(es) == 0:
         return set()
     return fv_e(es[0]) | fv_e_list(es[1:])
@@ -96,7 +96,7 @@ def fv_e_list(es: list[ast.expr]) -> set[str]:
 
 def fv_e_comprehension(
     elts: list[ast.expr], generators: list[ast.comprehension]
-) -> set[str]:
+) -> set[Var]:
     if len(generators) == 0:
         return fv_e_list(elts)
     g = generators[0]
@@ -117,7 +117,7 @@ def target_name(g: ast.comprehension) -> str:
     return g.target.id
 
 
-def captures_e(e: ast.expr) -> set[str]:
+def captures_e(e: ast.expr) -> set[Var]:
     if isinstance(e, ast.Lambda):
         params = {a.arg for a in e.args.args}
         return fv_e(e.body) - params
@@ -160,13 +160,13 @@ def captures_e(e: ast.expr) -> set[str]:
     raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
-def captures_e_list(es: list[ast.expr]) -> set[str]:
+def captures_e_list(es: list[ast.expr]) -> set[Var]:
     if len(es) == 0:
         return set()
     return captures_e(es[0]) | captures_e_list(es[1:])
 
 
-def captures_quals(generators: list[ast.comprehension]) -> set[str]:
+def captures_quals(generators: list[ast.comprehension]) -> set[Var]:
     if len(generators) == 0:
         return set()
     g = generators[0]
@@ -174,11 +174,11 @@ def captures_quals(generators: list[ast.comprehension]) -> set[str]:
     return captures_e(g.iter) | (rest - {target_name(g)})
 
 
-def binds_quals(generators: list[ast.comprehension]) -> set[str]:
+def binds_quals(generators: list[ast.comprehension]) -> set[Var]:
     return {target_name(g) for g in generators}
 
 
-def fv_stmt(s: ast.stmt) -> set[str]:
+def fv_stmt(s: ast.stmt) -> set[Var]:
     if isinstance(s, ast.Pass):
         return set()
     if isinstance(s, ast.Assign):
@@ -209,13 +209,13 @@ def fv_stmt(s: ast.stmt) -> set[str]:
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
-def fv_body(body: list[ast.stmt]) -> set[str]:
+def fv_body(body: list[ast.stmt]) -> set[Var]:
     if len(body) == 0:
         return set()
     return fv_stmt(body[0]) | fv_body(body[1:])
 
 
-def assigns_stmt(s: ast.stmt) -> set[str]:
+def assigns_stmt(s: ast.stmt) -> set[Var]:
     if isinstance(s, (ast.Pass, ast.Expr, ast.Return, ast.Assert)):
         return set()
     if isinstance(s, ast.Assign):
@@ -238,13 +238,13 @@ def assigns_stmt(s: ast.stmt) -> set[str]:
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
-def assigns_body(body: list[ast.stmt]) -> set[str]:
+def assigns_body(body: list[ast.stmt]) -> set[Var]:
     if len(body) == 0:
         return set()
     return assigns_stmt(body[0]) | assigns_body(body[1:])
 
 
-def captures(s: ast.stmt) -> set[str]:
+def captures(s: ast.stmt) -> set[Var]:
     if isinstance(s, ast.Pass):
         return set()
     if isinstance(s, ast.Assign):
@@ -274,18 +274,18 @@ def captures(s: ast.stmt) -> set[str]:
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
-def captures_body(body: list[ast.stmt]) -> set[str]:
+def captures_body(body: list[ast.stmt]) -> set[Var]:
     if len(body) == 0:
         return set()
     return captures(body[0]) | captures_body(body[1:])
 
 
-def captures_region(defs: list[ast.FunctionDef]) -> set[str]:
+def captures_region(defs: list[ast.FunctionDef]) -> set[Var]:
     f_names = {d.name for d in defs}
     return captures_region_bodies(defs) - f_names
 
 
-def captures_region_bodies(defs: list[ast.FunctionDef]) -> set[str]:
+def captures_region_bodies(defs: list[ast.FunctionDef]) -> set[Var]:
     if len(defs) == 0:
         return set()
     d = defs[0]
@@ -294,25 +294,25 @@ def captures_region_bodies(defs: list[ast.FunctionDef]) -> set[str]:
     return own | captures_region_bodies(defs[1:])
 
 
-def captures_statement(s: Statement) -> set[str]:
+def captures_statement(s: Statement) -> set[Var]:
     if isinstance(s, list):
         return captures_region(s)
     return captures(s)
 
 
-def assigns_statement(s: Statement) -> set[str]:
+def assigns_statement(s: Statement) -> set[Var]:
     if isinstance(s, list):
         return {d.name for d in s}
     return assigns_stmt(s)
 
 
-def assigns_seq(ss: list[Statement]) -> set[str]:
+def assigns_seq(ss: list[Statement]) -> set[Var]:
     if len(ss) == 0:
         return set()
     return assigns_statement(ss[0]) | assigns_seq(ss[1:])
 
 
-def first_assigning_statement(ss: list[Statement], names: set[str]) -> ast.AST:
+def first_assigning_statement(ss: list[Statement], names: set[Var]) -> ast.AST:
     """First statement of `ss` assigning a name in `names`."""
     assert len(ss) > 0
     if not assigns_statement(ss[0]).isdisjoint(names):
@@ -320,7 +320,7 @@ def first_assigning_statement(ss: list[Statement], names: set[str]) -> ast.AST:
     return first_assigning_statement(ss[1:], names)
 
 
-def own_fields(node: ast.ClassDef) -> tuple[tuple[str, TypeExpr], ...]:
+def own_fields(node: ast.ClassDef) -> tuple[tuple[Var, TypeExpr], ...]:
     return tuple(
         (t.target.id, type_expr(t.annotation))
         for t in node.body

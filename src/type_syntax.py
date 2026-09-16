@@ -19,6 +19,10 @@ class Primitive(Enum):
     SIZED = auto()
 
 
+# Variables and fields, the spec's x.
+type Var = str
+
+
 @dataclass(frozen=True, eq=False)
 class LiteralType:
     """A literal type. Equality compares the value's Python type as well, since

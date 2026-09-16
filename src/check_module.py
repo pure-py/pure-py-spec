@@ -26,6 +26,7 @@ from contexts import (
 )
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
 from statements import check_top_seq
+from type_syntax import Var
 
 
 def name_assign(q: str) -> ast.stmt:
@@ -129,7 +130,7 @@ def imports_seq(
 
 
 def imports(
-    s: ast.stmt, x: str, q: str, gamma_src: Context, mod_ctx: ModuleContext
+    s: ast.stmt, x: Var, q: str, gamma_src: Context, mod_ctx: ModuleContext
 ) -> tuple[ContextEntry, ClassTable]:
     entry = gamma_src.get(x)
     if entry is None:
