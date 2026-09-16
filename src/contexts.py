@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
-from classes import Class
+from classes import Class, ClassTable
 from subtyping import join
 from type_syntax import CallableType, ListType, Primitive, Type, dotted_name
 
@@ -42,10 +42,13 @@ class ModuleContext:
     gamma: Context
     M: Mapping[str, ast.Module] = field(default_factory=dict)
     q: str = ""
+    sigma: ClassTable = field(default_factory=dict)
 
 
 def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
-    return ModuleContext(gamma={**mod_ctx.gamma, **delta}, M=mod_ctx.M, q=mod_ctx.q)
+    return ModuleContext(
+        gamma={**mod_ctx.gamma, **delta}, M=mod_ctx.M, q=mod_ctx.q, sigma=mod_ctx.sigma
+    )
 
 
 def override_var(
@@ -158,7 +161,7 @@ def predefined_context(q: str) -> Context:
     return {**PREDEFINED_MEMBERS[q], "__name__": Primitive.STR}
 
 
-def merge_entry(a: ContextEntry, b: ContextEntry) -> VarEntry:
+def merge_entry(sigma: ClassTable, a: ContextEntry, b: ContextEntry) -> VarEntry:
     """Assigned in both branches gives the join of the two types; assigned in
     one alone is not definitely assigned. Only variables are assigned within a
     branch, since a class is declared at the top level alone."""
@@ -166,32 +169,32 @@ def merge_entry(a: ContextEntry, b: ContextEntry) -> VarEntry:
     assert not isinstance(b, (ModuleStub, ModuleLoaded, Class, PredefinedName))
     if a == Status.FF or b == Status.FF:
         return Status.FF
-    return join([a, b])
+    return join(sigma, [a, b])
 
 
 def merge_delta(
-    d1: Mapping[str, ContextEntry], d2: Mapping[str, ContextEntry]
+    sigma: ClassTable, d1: Mapping[str, ContextEntry], d2: Mapping[str, ContextEntry]
 ) -> VarContext:
     return {
-        k: merge_entry(d1[k], d2[k]) if k in d1 and k in d2 else Status.FF
+        k: merge_entry(sigma, d1[k], d2[k]) if k in d1 and k in d2 else Status.FF
         for k in set(d1.keys()) | set(d2.keys())
     }
 
 
-def merge_outcomes(rs: list[StaticOutcome]) -> StaticOutcome:
+def merge_outcomes(sigma: ClassTable, rs: list[StaticOutcome]) -> StaticOutcome:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return RETURNS
     delta = assigns_branches[0].delta
-    return Assigns(fold_merge(delta, assigns_branches[1:]))
+    return Assigns(fold_merge(sigma, delta, assigns_branches[1:]))
 
 
 def fold_merge(
-    acc: Mapping[str, ContextEntry], branches: list[Assigns]
+    sigma: ClassTable, acc: Mapping[str, ContextEntry], branches: list[Assigns]
 ) -> Mapping[str, ContextEntry]:
     if len(branches) == 0:
         return acc
-    return fold_merge(merge_delta(acc, branches[0].delta), branches[1:])
+    return fold_merge(sigma, merge_delta(sigma, acc, branches[0].delta), branches[1:])
 
 
 def override_delta(

@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from classes import ancestors
+from classes import ClassTable, ancestors
 from type_syntax import (
     CallableType,
     ClassType,
@@ -15,87 +15,89 @@ from type_syntax import (
 )
 
 
-def join_two(s: Type, t: Type) -> Type:
-    if subtype(s, t):
+def join_two(sigma: ClassTable, s: Type, t: Type) -> Type:
+    if subtype(sigma, s, t):
         return t
-    if subtype(t, s):
+    if subtype(sigma, t, s):
         return s
     return UnionType(s, t)
 
 
-def meet(s: Type, t: Type) -> Type:
+def meet(sigma: ClassTable, s: Type, t: Type) -> Type:
     """Greatest type below both: the smaller where they are comparable, and
     otherwise distributing over a union, componentwise on tuples of the same
     length, contravariantly on callables of the same arity, and `Never` on any
     other pair."""
-    if subtype(s, t):
+    if subtype(sigma, s, t):
         return s
-    if subtype(t, s):
+    if subtype(sigma, t, s):
         return t
     if isinstance(s, UnionType):
-        return join_two(meet(s.left, t), meet(s.right, t))
+        return join_two(sigma, meet(sigma, s.left, t), meet(sigma, s.right, t))
     if isinstance(t, UnionType):
-        return join_two(meet(s, t.left), meet(s, t.right))
+        return join_two(sigma, meet(sigma, s, t.left), meet(sigma, s, t.right))
     if (
         isinstance(s, TupleType)
         and isinstance(t, TupleType)
         and len(s.components) == len(t.components)
     ):
-        return TupleType(tuple(meet(a, b) for a, b in zip(s.components, t.components)))
+        return TupleType(
+            tuple(meet(sigma, a, b) for a, b in zip(s.components, t.components))
+        )
     if (
         isinstance(s, CallableType)
         and isinstance(t, CallableType)
         and len(s.params) == len(t.params)
     ):
         return CallableType(
-            tuple(join_two(a, b) for a, b in zip(s.params, t.params)),
-            meet(s.result, t.result),
+            tuple(join_two(sigma, a, b) for a, b in zip(s.params, t.params)),
+            meet(sigma, s.result, t.result),
         )
     return Primitive.NEVER
 
 
-def join(ts: Sequence[Type]) -> Type:
+def join(sigma: ClassTable, ts: Sequence[Type]) -> Type:
     if len(ts) == 0:
         return Primitive.NEVER
-    return join_two(ts[0], join(ts[1:]))
+    return join_two(sigma, ts[0], join(sigma, ts[1:]))
 
 
-def subtype(s: Type, t: Type) -> bool:
+def subtype(sigma: ClassTable, s: Type, t: Type) -> bool:
     if s == t or s == Primitive.NEVER or t == Primitive.OBJECT:
         return True
     if s == Primitive.INT and t == Primitive.FLOAT:
         return True
     if isinstance(s, UnionType):
-        return subtype(s.left, t) and subtype(s.right, t)
+        return subtype(sigma, s.left, t) and subtype(sigma, s.right, t)
     if isinstance(t, UnionType):
-        return subtype(s, t.left) or subtype(s, t.right)
+        return subtype(sigma, s, t.left) or subtype(sigma, s, t.right)
     if isinstance(s, LiteralType):
-        return subtype(base_type(s.value), t)
+        return subtype(sigma, base_type(s.value), t)
     if t == Primitive.SIZED:
         return isinstance(s, (ListType, DictType, TupleType)) or s == Primitive.STR
     if isinstance(s, ClassType) and isinstance(t, ClassType):
-        return t.c in ancestors(s.c)
+        return t.c in ancestors(sigma, s.c)
     if isinstance(s, TupleType) and isinstance(t, TupleType):
         return len(s.components) == len(t.components) and all(
-            subtype(a, b) for a, b in zip(s.components, t.components)
+            subtype(sigma, a, b) for a, b in zip(s.components, t.components)
         )
     if isinstance(s, ListType) and isinstance(t, ListType):
-        return equivalent(s.elem, t.elem)
+        return equivalent(sigma, s.elem, t.elem)
     if isinstance(s, DictType) and isinstance(t, DictType):
-        return equivalent(s.value, t.value)
+        return equivalent(sigma, s.value, t.value)
     if isinstance(s, CallableType) and isinstance(t, CallableType):
         return (
             len(s.params) == len(t.params)
-            and all(subtype(b, a) for a, b in zip(s.params, t.params))
-            and subtype(s.result, t.result)
+            and all(subtype(sigma, b, a) for a, b in zip(s.params, t.params))
+            and subtype(sigma, s.result, t.result)
         )
     return False
 
 
-def equivalent(s: Type, t: Type) -> bool:
+def equivalent(sigma: ClassTable, s: Type, t: Type) -> bool:
     """Each a subtype of the other."""
-    return subtype(s, t) and subtype(t, s)
+    return subtype(sigma, s, t) and subtype(sigma, t, s)
 
 
-def comparable(s: Type, t: Type) -> bool:
-    return subtype(s, t) or subtype(t, s)
+def comparable(sigma: ClassTable, s: Type, t: Type) -> bool:
+    return subtype(sigma, s, t) or subtype(sigma, t, s)

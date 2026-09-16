@@ -23,48 +23,46 @@ class ClassTableEntry:
 
 type ClassTable = dict[Class, ClassTableEntry]
 
-# Ambient, extended by the class rule.
-sigma: ClassTable = {}
-
 
 def short_name(c: Class) -> str:
     return c.name.rsplit(".", 1)[-1]
 
 
-def ancestors(c: Class) -> list[Class]:
+def ancestors(sigma: ClassTable, c: Class) -> list[Class]:
     base = sigma[c].base
-    return [c] if base is None else [c] + ancestors(base)
+    return [c] if base is None else [c] + ancestors(sigma, base)
 
 
-def fields(c: Class) -> tuple[str, ...]:
+def fields(sigma: ClassTable, c: Class) -> tuple[str, ...]:
     entry = sigma[c]
     own = tuple(x for x, _ in entry.own_fields)
-    return own if entry.base is None else fields(entry.base) + own
+    return own if entry.base is None else fields(sigma, entry.base) + own
 
 
-def field_type(c: Class, x: str) -> Type | None:
+def field_type(sigma: ClassTable, c: Class, x: str) -> Type | None:
     """Declared type of field `x`, if the class records one."""
     entry = sigma[c]
     own = dict(entry.own_fields)
     if x in own:
         return own[x]
-    return None if entry.base is None else field_type(entry.base, x)
+    return None if entry.base is None else field_type(sigma, entry.base, x)
 
 
-def declared_type(c: Class, x: str) -> Type:
+def declared_type(sigma: ClassTable, c: Class, x: str) -> Type:
     """Declared type of field `x` of `c`."""
-    t = field_type(c, x)
+    t = field_type(sigma, c, x)
     assert t is not None
     return t
 
 
 def field_map[T](
+    sigma: ClassTable,
     c: Class,
     positional: Sequence[T],
     kwd_names: Sequence[str],
     kwd_values: Sequence[T],
 ) -> dict[str, T] | None:
-    xs = fields(c)
+    xs = fields(sigma, c)
     n = len(positional)
     if n + len(kwd_names) != len(xs) or len(set(kwd_names)) != len(kwd_names):
         return None

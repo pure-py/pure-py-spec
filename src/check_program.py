@@ -86,7 +86,7 @@ class Program(Mapping[str, ast.Module]):
 def check_program(entry_path: pathlib.Path) -> IllFormed | syntax.Unsupported | None:
     program = Program(entry_path)
     try:
-        check_module(program["__main__"], program, "__main__")
+        check_module(program["__main__"], program, "__main__", {})
         return None
     except IllFormedModule as e:
         e.msg = f"{program.path(e.module or '__main__')}: {e.msg}"

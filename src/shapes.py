@@ -10,7 +10,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product
 
-from classes import Class
+from classes import Class, ClassTable
 from subtyping import subtype
 from type_syntax import (
     ClassType,
@@ -87,11 +87,11 @@ def shape_type(k: Shape) -> Type:
     return DictType(k.value)
 
 
-def shapes(t: Type, heads: frozenset[Head]) -> tuple[Shape, ...]:
+def shapes(sigma: ClassTable, t: Type, heads: frozenset[Head]) -> tuple[Shape, ...]:
     """Shapes of `t` that remain once the heads in `heads` are excluded."""
     if isinstance(t, UnionType):
-        left = shapes(t.left, typed_heads(heads, t.left))
-        right = shapes(t.right, typed_heads(heads, t.right))
+        left = shapes(sigma, t.left, typed_heads(sigma, heads, t.left))
+        right = shapes(sigma, t.right, typed_heads(sigma, heads, t.right))
         return left + tuple(k for k in right if k not in left)
     if isinstance(t, LiteralType) and t in heads:
         return NOTHING
@@ -99,7 +99,7 @@ def shapes(t: Type, heads: frozenset[Head]) -> tuple[Shape, ...]:
         return NOTHING
     if t == Primitive.NONE and LiteralType(None) in heads:
         return NOTHING
-    if isinstance(t, ClassType) and below_excluded(t.c, heads):
+    if isinstance(t, ClassType) and below_excluded(sigma, t.c, heads):
         return NOTHING
     if t == Primitive.NEVER:
         return NOTHING
@@ -109,29 +109,30 @@ def shapes(t: Type, heads: frozenset[Head]) -> tuple[Shape, ...]:
     return (Rest(t, heads),)
 
 
-def head_typed(h: Head, t: Type) -> bool:
+def head_typed(sigma: ClassTable, h: Head, t: Type) -> bool:
     """Head typing: a literal or class below `t`, or a length where `t` is a
     list type."""
     if isinstance(h, Class):
-        return subtype(ClassType(h), t)
+        return subtype(sigma, ClassType(h), t)
     if isinstance(h, LiteralType):
-        return subtype(h, t)
+        return subtype(sigma, h, t)
     return isinstance(t, ListType)
 
 
-def typed_heads(heads: frozenset[Head], t: Type) -> frozenset[Head]:
+def typed_heads(sigma: ClassTable, heads: frozenset[Head], t: Type) -> frozenset[Head]:
     """The heads typed at `t`, kept when an excluded set passes to a shape of a
     narrower type."""
-    return frozenset(h for h in heads if head_typed(h, t))
+    return frozenset(h for h in heads if head_typed(sigma, h, t))
 
 
-def below_excluded(c: Class, heads: frozenset[Head]) -> bool:
+def below_excluded(sigma: ClassTable, c: Class, heads: frozenset[Head]) -> bool:
     """Whether the class lies below a class of the excluded heads."""
     return any(
-        isinstance(h, Class) and subtype(ClassType(c), ClassType(h)) for h in heads
+        isinstance(h, Class) and subtype(sigma, ClassType(c), ClassType(h))
+        for h in heads
     )
 
 
-def shapes_seq(ts: Sequence[Type]) -> tuple[Seq, ...]:
+def shapes_seq(sigma: ClassTable, ts: Sequence[Type]) -> tuple[Seq, ...]:
     """Sequences of shapes of a sequence of types: the second form of `shapes`."""
-    return tuple(product(*(shapes(t, frozenset()) for t in ts)))
+    return tuple(product(*(shapes(sigma, t, frozenset()) for t in ts)))

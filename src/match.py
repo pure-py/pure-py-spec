@@ -13,7 +13,7 @@ from itertools import product
 
 import reasons
 from aux import qualified_name
-from classes import Class, declared_type, field_map, fields, short_name
+from classes import Class, ClassTable, declared_type, field_map, fields, short_name
 from contexts import (
     ModuleContext,
     Status,
@@ -89,7 +89,7 @@ def match_as(k: Shape, p: ast.MatchAs, mod_ctx: ModuleContext) -> Match | None:
     matched, left, delta = result
     if p.name is None:
         return matched, left, delta
-    named = join([shape_type(m) for m in matched])
+    named = join(mod_ctx.sigma, [shape_type(m) for m in matched])
     return matched, left, disjoint_union([delta, {p.name: named}], p)
 
 
@@ -148,8 +148,8 @@ def match_dict(k: Shape, p: ast.MatchMapping, mod_ctx: ModuleContext) -> Match |
 
 def match_constr(k: Shape, p: ast.MatchClass, mod_ctx: ModuleContext) -> Match | None:
     cls = class_of_pattern(p, mod_ctx)
-    ps = pattern_seq(cls, p)
-    if isinstance(k, Constr) and subtype(ClassType(k.c), ClassType(cls)):
+    ps = pattern_seq(mod_ctx.sigma, cls, p)
+    if isinstance(k, Constr) and subtype(mod_ctx.sigma, ClassType(k.c), ClassType(cls)):
         seqs = match_seq(k.args, padded(ps, len(k.args)), p, mod_ctx)
         return wrap(lambda r: Constr(k.c, r, k.heads), seqs)
     return None
@@ -158,35 +158,36 @@ def match_constr(k: Shape, p: ast.MatchClass, mod_ctx: ModuleContext) -> Match |
 def split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Split | None:
     """Shapes of `k` carrying the head that `p` tests for, and the shapes `k`
     leaves without that head, or nothing where `k` does not split for `p`."""
+    sigma = mod_ctx.sigma
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
-        return split_literal(k, literal_of(p))
+        return split_literal(sigma, k, literal_of(p))
     if isinstance(p, PatTuple):
-        return split_tuple(k, len(p.patterns))
+        return split_tuple(sigma, k, len(p.patterns))
     if isinstance(p, PatList):
-        return split_list(k, len(p.patterns))
+        return split_list(sigma, k, len(p.patterns))
     if isinstance(p, ast.MatchMapping):
-        return split_dict(k, items(p))
+        return split_dict(sigma, k, items(p))
     assert isinstance(p, ast.MatchClass)
     cls = class_of_pattern(p, mod_ctx)
     if isinstance(k, Rest):
-        return split_class(k, cls)
+        return split_class(sigma, k, cls)
     if isinstance(k, Constr):
-        return split_subclass(k, cls)
+        return split_subclass(sigma, k, cls)
     return None
 
 
-def split_literal(k: Shape, ell: LiteralType) -> Split | None:
+def split_literal(sigma: ClassTable, k: Shape, ell: LiteralType) -> Split | None:
     if (
         isinstance(k, Rest)
         and ell not in k.heads
-        and subtype(ell, k.ty)
+        and subtype(sigma, ell, k.ty)
         and not isinstance(k.ty, LiteralType)
     ):
-        return (Rest(ell, frozenset()),), shapes(k.ty, k.heads | {ell})
+        return (Rest(ell, frozenset()),), shapes(sigma, k.ty, k.heads | {ell})
     return None
 
 
-def split_tuple(k: Shape, n: int) -> Split | None:
+def split_tuple(sigma: ClassTable, k: Shape, n: int) -> Split | None:
     """No head types at a tuple type, so the shape excludes nothing and the
     split leaves nothing."""
     if not (isinstance(k, Rest) and isinstance(k.ty, TupleType)):
@@ -194,20 +195,22 @@ def split_tuple(k: Shape, n: int) -> Split | None:
     if len(k.ty.components) != n:
         return None
     assert not k.heads
-    return tuple(Tuple(ks) for ks in shapes_seq(k.ty.components)), NOTHING
+    return tuple(Tuple(ks) for ks in shapes_seq(sigma, k.ty.components)), NOTHING
 
 
-def split_list(k: Shape, n: int) -> Split | None:
+def split_list(sigma: ClassTable, k: Shape, n: int) -> Split | None:
     if not (isinstance(k, Rest) and isinstance(k.ty, ListType) and n not in k.heads):
         return None
     elem = k.ty.elem
     return (
-        tuple(List(elem, ks) for ks in shapes_seq((elem,) * n)),
-        shapes(k.ty, k.heads | {n}),
+        tuple(List(elem, ks) for ks in shapes_seq(sigma, (elem,) * n)),
+        shapes(sigma, k.ty, k.heads | {n}),
     )
 
 
-def split_dict(k: Shape, ws: tuple[tuple[str, ast.pattern], ...]) -> Split | None:
+def split_dict(
+    sigma: ClassTable, k: Shape, ws: tuple[tuple[str, ast.pattern], ...]
+) -> Split | None:
     """The first key of the pattern which the shape does not bind."""
     if not isinstance(k, Dict):
         return None
@@ -216,38 +219,38 @@ def split_dict(k: Shape, ws: tuple[tuple[str, ast.pattern], ...]) -> Split | Non
     if w is None or w in k.heads:
         return None
     return (
-        tuple(with_keys(k, (w,), (m,)) for m in shapes(k.value, frozenset())),
+        tuple(with_keys(k, (w,), (m,)) for m in shapes(sigma, k.value, frozenset())),
         (Dict(k.value, k.bound, k.heads | {w}),),
     )
 
 
-def split_class(k: Rest, cls: Class) -> Split | None:
+def split_class(sigma: ClassTable, k: Rest, cls: Class) -> Split | None:
     """Instances of the meet of the shape's type and the pattern's class, with
     the heads which type at that class kept."""
-    if below_excluded(cls, k.heads):
+    if below_excluded(sigma, cls, k.heads):
         return None
-    low = meet(k.ty, ClassType(cls))
+    low = meet(sigma, k.ty, ClassType(cls))
     if not isinstance(low, ClassType):
         return None
-    types = tuple(declared_type(low.c, x) for x in fields(low.c))
-    kept = typed_heads(k.heads, low)
+    types = tuple(declared_type(sigma, low.c, x) for x in fields(sigma, low.c))
+    kept = typed_heads(sigma, k.heads, low)
     return (
-        tuple(Constr(low.c, ks, kept) for ks in shapes_seq(types)),
-        shapes(k.ty, k.heads | {cls}),
+        tuple(Constr(low.c, ks, kept) for ks in shapes_seq(sigma, types)),
+        shapes(sigma, k.ty, k.heads | {cls}),
     )
 
 
-def split_subclass(k: Constr, cls: Class) -> Split | None:
+def split_subclass(sigma: ClassTable, k: Constr, cls: Class) -> Split | None:
     """Instances of a proper subclass of the shape's class, whose fields are
     those of the shape followed by the ones the subclass declares."""
-    if cls == k.c or not subtype(ClassType(cls), ClassType(k.c)):
+    if cls == k.c or not subtype(sigma, ClassType(cls), ClassType(k.c)):
         return None
-    if below_excluded(cls, k.heads):
+    if below_excluded(sigma, cls, k.heads):
         return None
-    own = tuple(declared_type(cls, x) for x in fields(cls)[len(k.args) :])
-    kept = typed_heads(k.heads, ClassType(cls))
+    own = tuple(declared_type(sigma, cls, x) for x in fields(sigma, cls)[len(k.args) :])
+    kept = typed_heads(sigma, k.heads, ClassType(cls))
     return (
-        tuple(Constr(cls, k.args + ks, kept) for ks in shapes_seq(own)),
+        tuple(Constr(cls, k.args + ks, kept) for ks in shapes_seq(sigma, own)),
         (Constr(k.c, k.args, k.heads | {cls}),),
     )
 
@@ -260,12 +263,14 @@ def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
     return cls
 
 
-def pattern_seq(cls: Class, p: ast.MatchClass) -> tuple[ast.pattern, ...]:
+def pattern_seq(
+    sigma: ClassTable, cls: Class, p: ast.MatchClass
+) -> tuple[ast.pattern, ...]:
     """Pattern the arguments supply for each field of `cls`, by field-map."""
-    args = field_map(cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
+    args = field_map(sigma, cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
     if args is None:
-        raise no_field_map(cls, p)
-    return tuple(args[x] for x in fields(cls))
+        raise no_field_map(sigma, cls, p)
+    return tuple(args[x] for x in fields(sigma, cls))
 
 
 def match_seq(
@@ -298,7 +303,11 @@ def match_shapes(
     matched = union(m for m, _, _ in matches.values())
     unmatched = tuple(k for k in ks if k not in matches)
     left = union(left for _, left, _ in matches.values()) + unmatched
-    return matched, left, join_deltas([d for _, _, d in matches.values()])
+    return (
+        matched,
+        left,
+        join_deltas(mod_ctx.sigma, [d for _, _, d in matches.values()]),
+    )
 
 
 def seq_safe(p: ast.pattern, t: Type, mod_ctx: ModuleContext) -> bool:
@@ -326,11 +335,12 @@ def seq_safe(p: ast.pattern, t: Type, mod_ctx: ModuleContext) -> bool:
         cls = class_of_name(p.cls, mod_ctx)
         if cls is None:
             return True  # the match rules reject with a sharper reason
-        args = field_map(cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
+        args = field_map(mod_ctx.sigma, cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
         if args is None:
             return True  # likewise
         return all(
-            seq_safe(args[x], declared_type(cls, x), mod_ctx) for x in fields(cls)
+            seq_safe(args[x], declared_type(mod_ctx.sigma, cls, x), mod_ctx)
+            for x in fields(mod_ctx.sigma, cls)
         )
     if isinstance(p, ast.MatchAs):
         return p.pattern is None or seq_safe(p.pattern, t, mod_ctx)
@@ -350,18 +360,18 @@ def disjoint_union(deltas: list[VarContext], node: ast.AST) -> VarContext:
     return merged
 
 
-def join_deltas(deltas: list[VarContext]) -> VarContext:
+def join_deltas(sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
     """Bindings of a pattern that matches more than one shape, at the join of
     the types the shapes give each variable."""
-    return {x: join_entries([d[x] for d in deltas]) for x in deltas[0]}
+    return {x: join_entries(sigma, [d[x] for d in deltas]) for x in deltas[0]}
 
 
-def join_entries(entries: list[VarEntry]) -> VarEntry:
+def join_entries(sigma: ClassTable, entries: list[VarEntry]) -> VarEntry:
     """Bindings a pattern gives across the shapes it matches are all types, so
     they join."""
     types = [e for e in entries if not isinstance(e, Status)]
     assert len(types) == len(entries)
-    return join(types)
+    return join(sigma, types)
 
 
 def union(seqs: Iterable[tuple[Shape, ...]]) -> tuple[Shape, ...]:
@@ -385,9 +395,9 @@ def padded(ps: tuple[ast.pattern, ...], n: int) -> tuple[ast.pattern, ...]:
     return ps + tuple(ast.MatchAs() for _ in range(n - len(ps)))
 
 
-def no_field_map(cls: Class, p: ast.MatchClass) -> IllFormedModule:
+def no_field_map(sigma: ClassTable, cls: Class, p: ast.MatchClass) -> IllFormedModule:
     """Why field-map is undefined for the pattern's arguments."""
-    c, xs = short_name(cls), fields(cls)
+    c, xs = short_name(cls), fields(sigma, cls)
     n = len(p.patterns)
     if n + len(p.kwd_attrs) != len(xs):
         return IllFormedModule(

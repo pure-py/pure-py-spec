@@ -1,4 +1,5 @@
 import ast
+from dataclasses import replace
 
 import reasons
 from aux import (
@@ -20,13 +21,13 @@ from aux import (
 )
 from classes import (
     Class,
+    ClassTable,
     ClassTableEntry,
     declared_type,
     field_map,
     field_type,
     fields,
     short_name,
-    sigma,
 )
 from contexts import (
     ASSIGNS_EMPTY,
@@ -160,8 +161,8 @@ def check_top_seq(items: list[Statement], mod_ctx: ModuleContext) -> ModuleConte
     if len(items) == 0:
         return mod_ctx
     head, tail = items[0], items[1:]
-    head_outcome = check_top_statement(head, mod_ctx)
-    mod_ctx_after = extend(head_outcome, mod_ctx)
+    head_outcome, sigma = check_top_statement(head, mod_ctx)
+    mod_ctx_after = extend(head_outcome, replace(mod_ctx, sigma=sigma))
     if len(tail) == 0:
         return mod_ctx_after
     check_captured_reassignment(head, tail)
@@ -173,12 +174,16 @@ def check_top_seq(items: list[Statement], mod_ctx: ModuleContext) -> ModuleConte
     return check_top_seq(tail, mod_ctx_after)
 
 
-def check_top_statement(item: Statement, mod_ctx: ModuleContext) -> StaticOutcome:
-    """A class declaration is checked here; any other top-level statement is a
-    plain statement, checked with no return type (top-stmt)."""
+def check_top_statement(
+    item: Statement, mod_ctx: ModuleContext
+) -> tuple[StaticOutcome, ClassTable]:
+    """A class declaration is checked here and extends the class table; any
+    other top-level statement is a plain statement, checked with no return type
+    (top-stmt)."""
     if isinstance(item, ast.ClassDef):
-        return Assigns({item.name: class_declared(item, mod_ctx)})
-    return check_statement(item, mod_ctx, None)
+        c, sigma = class_declared(item, mod_ctx)
+        return Assigns({item.name: c}), sigma
+    return check_statement(item, mod_ctx, None), mod_ctx.sigma
 
 
 def check_seq(
@@ -242,18 +247,18 @@ def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
         declared = resolve_type(type_expr(d.returns), d, mod_ctx)
         result = check_body(d.body, body_ctx, declared)
         if not isinstance(result, Returns):
-            check_falls_off_end(d, declared)
+            check_falls_off_end(mod_ctx.sigma, d, declared)
 
 
-def check_falls_off_end(d: ast.FunctionDef, declared: Type) -> None:
+def check_falls_off_end(sigma: ClassTable, d: ast.FunctionDef, declared: Type) -> None:
     """A body that does not definitely return falls off the end, giving None,
     so the declared type must admit it."""
-    if not subtype(Primitive.NONE, declared):
+    if not subtype(sigma, Primitive.NONE, declared):
         raise IllFormedModule(d, reasons.MissingReturn(d.name, render(declared)))
 
 
-def check_returns_none(s: ast.Return, declared: Type) -> None:
-    if not subtype(Primitive.NONE, declared):
+def check_returns_none(sigma: ClassTable, s: ast.Return, declared: Type) -> None:
+    if not subtype(sigma, Primitive.NONE, declared):
         raise IllFormedModule(
             s, reasons.TypeMismatch(render(declared), render(Primitive.NONE))
         )
@@ -296,7 +301,7 @@ def check_stmt(
         if returns is None:  # no return rule with empty return type
             raise IllFormedModule(s, reasons.TopLevelReturn())
         if s.value is None:
-            check_returns_none(s, returns)
+            check_returns_none(mod_ctx.sigma, s, returns)
         else:
             check_expr(s.value, returns, mod_ctx)
         return RETURNS
@@ -306,7 +311,7 @@ def check_stmt(
         branches.append(
             check_body(s.orelse, mod_ctx, returns) if s.orelse else ASSIGNS_EMPTY
         )
-        return merge_outcomes(branches)
+        return merge_outcomes(mod_ctx.sigma, branches)
     if isinstance(s, ast.Assert):
         check_expr(s.test, Primitive.BOOL, mod_ctx)
         if s.msg is not None:
@@ -328,7 +333,9 @@ def check_match_cases(
     branches = [
         check_case(case, delta, mod_ctx, returns) for case, delta in zip(cases, deltas)
     ]
-    return merge_outcomes(branches + ([ASSIGNS_EMPTY] if partial else []))
+    return merge_outcomes(
+        mod_ctx.sigma, branches + ([ASSIGNS_EMPTY] if partial else [])
+    )
 
 
 def match_cases(
@@ -336,7 +343,7 @@ def match_cases(
 ) -> tuple[list[VarContext], bool]:
     """Bindings of each case, taken by matching against the residual, and
     whether some value of the scrutinee type falls through."""
-    seed = shapes(subject, frozenset())
+    seed = shapes(mod_ctx.sigma, subject, frozenset())
     left = seed
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):
@@ -408,10 +415,14 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
     if isinstance(e, ast.Call):
         constructed = class_of_name(e.func, mod_ctx)
         if constructed is not None:
-            c_name, xs = short_name(constructed), fields(constructed)
+            c_name, xs = short_name(constructed), fields(mod_ctx.sigma, constructed)
             kwd_names = [k.arg for k in e.keywords if k.arg is not None]
             args = field_map(
-                constructed, e.args, kwd_names, [k.value for k in e.keywords]
+                mod_ctx.sigma,
+                constructed,
+                e.args,
+                kwd_names,
+                [k.value for k in e.keywords],
             )
             if args is None:
                 n = len(e.args)
@@ -429,7 +440,7 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
                     ),
                 )
             for x, arg in args.items():
-                check_expr(arg, declared_type(constructed, x), mod_ctx)
+                check_expr(arg, declared_type(mod_ctx.sigma, constructed, x), mod_ctx)
             return ClassType(constructed)
         return call(e, mod_ctx)
     if isinstance(e, ast.BinOp):
@@ -440,7 +451,9 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         if negated is not None:
             return negated
         name = UNARY_NAMES[type(e.op)]
-        result = result_of_min(overloads_unary(name, operand))
+        result = result_of_min(
+            mod_ctx.sigma, overloads_unary(mod_ctx.sigma, name, operand)
+        )
         if result is None:
             raise IllFormedModule(e, reasons.NoUnarySignature(name, render(operand)))
         return result
@@ -504,10 +517,13 @@ def field_of(obj: Type, e: ast.Attribute, mod_ctx: ModuleContext) -> Type:
     """The type of a field of an object of type `obj`; at a union, the join
     over the members."""
     if isinstance(obj, UnionType):
-        return join([field_of(obj.left, e, mod_ctx), field_of(obj.right, e, mod_ctx)])
+        return join(
+            mod_ctx.sigma,
+            [field_of(obj.left, e, mod_ctx), field_of(obj.right, e, mod_ctx)],
+        )
     if not isinstance(obj, ClassType):
         raise IllFormedModule(e, reasons.NotSynthesised())
-    member = field_type(obj.c, e.attr)
+    member = field_type(mod_ctx.sigma, obj.c, e.attr)
     if member is None:
         raise IllFormedModule(e, reasons.UnknownField(short_name(obj.c), e.attr))
     return member
@@ -522,10 +538,11 @@ def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) ->
     the join over the members."""
     if isinstance(container, UnionType):
         return join(
+            mod_ctx.sigma,
             [
                 subscript_type(container.left, e, mod_ctx),
                 subscript_type(container.right, e, mod_ctx),
-            ]
+            ],
         )
     if isinstance(container, ListType):
         check_expr(e.slice, Primitive.INT, mod_ctx)
@@ -554,7 +571,7 @@ def tuple_subscript(
             raise IllFormedModule(
                 index, reasons.TypeMismatch(render(Primitive.INT), render(actual))
             )
-        return join(container.components)
+        return join(mod_ctx.sigma, container.components)
     if not -m <= i < m:
         raise IllFormedModule(index, reasons.TupleIndexOutOfRange(i, m))
     return container.components[i]
@@ -575,7 +592,7 @@ def branch_type(e: ast.IfExp, mod_ctx: ModuleContext) -> Type:
     synthesising = [x for x in branches if synthesises(x)]
     if len(synthesising) == 0:
         raise IllFormedModule(e, reasons.NotSynthesised())
-    t = join([synth_expr(x, mod_ctx) for x in synthesising])
+    t = join(mod_ctx.sigma, [synth_expr(x, mod_ctx) for x in synthesising])
     for x in branches:
         if not synthesises(x):
             check_expr(x, t, mod_ctx)
@@ -588,7 +605,7 @@ def list_type(e: ast.expr, elts: list[ast.expr], mod_ctx: ModuleContext) -> List
     synthesising = [x for x in elts if synthesises(x)]
     if len(synthesising) == 0:
         raise IllFormedModule(e, reasons.NotSynthesised())
-    t = join([base_type(synth_expr(x, mod_ctx)) for x in synthesising])
+    t = join(mod_ctx.sigma, [base_type(synth_expr(x, mod_ctx)) for x in synthesising])
     for x in elts:
         if not synthesises(x):
             check_expr(x, t, mod_ctx)
@@ -636,7 +653,8 @@ def result_type(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> Type:
     members."""
     if isinstance(fn, UnionType):
         return join(
-            [result_type(fn.left, e, mod_ctx), result_type(fn.right, e, mod_ctx)]
+            mod_ctx.sigma,
+            [result_type(fn.left, e, mod_ctx), result_type(fn.right, e, mod_ctx)],
         )
     if not isinstance(fn, CallableType):
         raise IllFormedModule(e, reasons.NotCallable(render(fn)))
@@ -707,7 +725,7 @@ def check_expr(e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
         check_expr(e.value, expected.value, mod_ctx_)
         return
     actual = synth_expr(e, mod_ctx)
-    if not subtype(actual, expected):
+    if not subtype(mod_ctx.sigma, actual, expected):
         raise IllFormedModule(e, reasons.TypeMismatch(render(expected), render(actual)))
 
 
@@ -733,7 +751,7 @@ def binary(
     op: str, left: ast.expr, right: ast.expr, e: ast.expr, mod_ctx: ModuleContext
 ) -> Type:
     s, t = synth_expr(left, mod_ctx), synth_expr(right, mod_ctx)
-    result = result_of_min(overloads_binary(op, s, t))
+    result = result_of_min(mod_ctx.sigma, overloads_binary(mod_ctx.sigma, op, s, t))
     if result is None:
         raise IllFormedModule(e, reasons.NoBinarySignature(op, render(s), render(t)))
     return result
@@ -771,7 +789,7 @@ def check_quals(
     return delta | check_quals(generators[1:], mod_ctx_)
 
 
-def elem_type(t: Type) -> Type | None:
+def elem_type(sigma: ClassTable, t: Type) -> Type | None:
     """Type of the elements a generator draws from a value of type `t`."""
     if isinstance(t, ListType):
         return t.elem
@@ -780,24 +798,27 @@ def elem_type(t: Type) -> Type | None:
     if isinstance(t, DictType):
         return Primitive.STR
     if isinstance(t, TupleType):
-        return join([base_type(c) for c in t.components])
+        return join(sigma, [base_type(c) for c in t.components])
     if isinstance(t, UnionType):
-        left, right = elem_type(t.left), elem_type(t.right)
-        return None if left is None or right is None else join([left, right])
+        left, right = elem_type(sigma, t.left), elem_type(sigma, t.right)
+        return None if left is None or right is None else join(sigma, [left, right])
     return None
 
 
 def elem_entry(e: ast.expr, mod_ctx: ModuleContext) -> Type:
     """Type a generator binds its target at."""
     t = synth_expr(e, mod_ctx)
-    elem = elem_type(t)
+    elem = elem_type(mod_ctx.sigma, t)
     if elem is None:
         raise IllFormedModule(e, reasons.NotIterable(render(t)))
     return elem
 
 
-def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> Class:
-    """Class entry of a declaration (class, class-extend)."""
+def class_declared(
+    node: ast.ClassDef, mod_ctx: ModuleContext
+) -> tuple[Class, ClassTable]:
+    """Class of a declaration (class, class-extend), and the class table
+    extended by its entry."""
     if not isinstance(mod_ctx.gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.DecoratorNotInScope("dataclass"))
     own = tuple((x, resolve_type(psi, node, mod_ctx)) for x, psi in own_fields(node))
@@ -813,15 +834,14 @@ def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> Class:
         if not isinstance(entry, Class):
             raise IllFormedModule(node, reasons.UnknownBaseClass(base_name))
         base = entry
-        clash = set(names) & set(fields(base))
+        clash = set(names) & set(fields(mod_ctx.sigma, base))
         if len(clash) > 0:
             raise IllFormedModule(
                 node, reasons.InheritedFieldClash(min(clash), base_name)
             )
     c = Class(f"{mod_ctx.q}.{node.name}")
-    assert c not in sigma, "redeclaration rejected by top-seq"
-    sigma[c] = ClassTableEntry(own_fields=own, base=base)
-    return c
+    assert c not in mod_ctx.sigma, "redeclaration rejected by top-seq"
+    return c, {**mod_ctx.sigma, c: ClassTableEntry(own_fields=own, base=base)}
 
 
 def describe(p: ast.pattern, mod_ctx: ModuleContext) -> str:
