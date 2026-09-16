@@ -141,9 +141,9 @@ def check_module(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context:
 
 
 def check_module_(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context:
-    imports, statement = split_imports(m.body)
+    imports, stmts = split_imports(m.body)
     gamma0 = check_imports_prefix(imports, ModuleContext(gamma={}, M=M, q=q))
-    body = [name_assign(q)] + statement
+    body = [name_assign(q)] + stmts
     ctx = check_top_seq(
         statements(body),
         ModuleContext(gamma={**predefined_context("builtins"), **gamma0}, M=M, q=q),
