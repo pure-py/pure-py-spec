@@ -99,14 +99,16 @@ def match_literal(k: Shape, ell: LiteralType) -> Match | None:
 def match_tuple(k: Shape, p: PatTuple, mod_ctx: ModuleContext) -> Match | None:
     ps = tuple(p.patterns)
     if isinstance(k, Tuple) and len(k.components) == len(ps):
-        return wrap(Tuple, match_seq(k.components, ps, p, mod_ctx))
+        return map_seq_match(Tuple, match_seq(k.components, ps, p, mod_ctx))
     return None
 
 
 def match_list(k: Shape, p: PatList, mod_ctx: ModuleContext) -> Match | None:
     ps = tuple(p.patterns)
     if isinstance(k, List) and len(k.elems) == len(ps):
-        return wrap(lambda r: List(k.elem, r), match_seq(k.elems, ps, p, mod_ctx))
+        return map_seq_match(
+            lambda r: List(k.elem, r), match_seq(k.elems, ps, p, mod_ctx)
+        )
     return None
 
 
@@ -123,7 +125,7 @@ def match_dict(k: Shape, p: ast.MatchMapping, mod_ctx: ModuleContext) -> Match |
         return None
     ks = tuple(bound[w] for w in keys)
     seqs = match_seq(ks, tuple(q for _, q in ws), p, mod_ctx)
-    return wrap(lambda r: with_keys(k, keys, r), seqs)
+    return map_seq_match(lambda r: with_keys(k, keys, r), seqs)
 
 
 def match_constr(k: Shape, p: ast.MatchClass, mod_ctx: ModuleContext) -> Match | None:
@@ -131,7 +133,7 @@ def match_constr(k: Shape, p: ast.MatchClass, mod_ctx: ModuleContext) -> Match |
     ps = pattern_seq(mod_ctx.sigma, cls, p)
     if isinstance(k, Constr) and subtype(mod_ctx.sigma, ClassType(k.c), ClassType(cls)):
         seqs = match_seq(k.args, padded(ps, len(k.args)), p, mod_ctx)
-        return wrap(lambda r: Constr(k.c, r, k.heads), seqs)
+        return map_seq_match(lambda r: Constr(k.c, r, k.heads), seqs)
     return None
 
 
@@ -336,7 +338,7 @@ def union(seqs: Iterable[tuple[Shape, ...]]) -> tuple[Shape, ...]:
     return tuple(k for s in seqs for k in s)
 
 
-def wrap(form: Callable[[Seq], Shape], seqs: SeqMatch | None) -> Match | None:
+def map_seq_match(form: Callable[[Seq], Shape], seqs: SeqMatch | None) -> Match | None:
     if seqs is None:
         return None
     matched, residual, delta = seqs
