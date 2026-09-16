@@ -1,12 +1,3 @@
-"""How a pattern matches a shape, and how a shape splits for a pattern.
-
-Matching a pattern against a shape gives the shapes it matches, the residual it
-leaves and the bindings it makes, so a case that matches nothing has no
-derivation and a match is exhaustive where the residual is empty. A shape which
-stands for many heads splits first, into the shapes carrying the head the
-pattern tests for and the shapes it leaves.
-"""
-
 import ast
 from collections.abc import Callable, Iterable
 from itertools import product
