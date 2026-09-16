@@ -221,7 +221,7 @@ def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:
     with open(filename) as f:
         source = f.read()
     tree = syntax.parse(source, filename)
-    unsupported = syntax.supported_module(tree)
+    unsupported = syntax.check_syntax_module(tree)
     if unsupported is not None:
         return unsupported
     M: dict[str, ast.Module] = {
