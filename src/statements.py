@@ -48,7 +48,6 @@ from contexts import (
     module_of,
     override_gamma,
     override_outcomes,
-    override_var,
     resolve_name,
     var_type,
 )
@@ -243,7 +242,7 @@ def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
         params = parameters(d, mod_ctx)
         locals_ = assigns_body(d.body) - set(params)
         delta = {**f_names, **params, **{x: Status.FF for x in locals_}}
-        body_ctx = override_var(mod_ctx, delta)
+        body_ctx = override_gamma(mod_ctx, delta)
         declared = resolve_type(type_expr(d.returns), d, mod_ctx)
         result = check_body(d.body, body_ctx, declared)
         if not isinstance(result, Returns):
@@ -387,7 +386,7 @@ def check_case(
     """Result of one case, whose body is checked under the bindings its pattern
     gives."""
     return override_outcomes(
-        Assigns(delta), check_body(case.body, override_var(mod_ctx, delta), returns)
+        Assigns(delta), check_body(case.body, override_gamma(mod_ctx, delta), returns)
     )
 
 
@@ -668,7 +667,7 @@ def result_type(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> Type:
 def applied_lambda(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> Type:
     """A lambda applied to arguments takes its parameter types from the types
     the arguments synthesise, and gives the type of its body."""
-    return synth_expr(f.body, override_var(mod_ctx, lambda_arguments(f, e, mod_ctx)))
+    return synth_expr(f.body, override_gamma(mod_ctx, lambda_arguments(f, e, mod_ctx)))
 
 
 def lambda_arguments(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> VarContext:
@@ -687,7 +686,7 @@ def check_expr(e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
         check_expr(
             e.func.body,
             expected,
-            override_var(mod_ctx, lambda_arguments(e.func, e, mod_ctx)),
+            override_gamma(mod_ctx, lambda_arguments(e.func, e, mod_ctx)),
         )
         return
     if isinstance(e, ast.List) and isinstance(expected, ListType):
@@ -740,7 +739,7 @@ def check_lambda(e: ast.Lambda, expected: Type, mod_ctx: ModuleContext) -> None:
             e, reasons.TypeMismatch(render(expected), lambda_of(len(params)))
         )
     delta = dict(zip(params, expected.params))
-    check_expr(e.body, expected.result, override_var(mod_ctx, delta))
+    check_expr(e.body, expected.result, override_gamma(mod_ctx, delta))
 
 
 def lambda_of(n: int) -> str:
@@ -767,7 +766,7 @@ def qual_context(
     if len(captured) > 0:
         node = generators[0].target
         raise IllFormedModule(node, reasons.CapturedGeneratorVariable(min(captured)))
-    return override_var(mod_ctx, delta)
+    return override_gamma(mod_ctx, delta)
 
 
 def check_quals(
@@ -783,7 +782,7 @@ def check_quals(
     if x in captures_e_list(g.ifs) | captures_quals(generators[1:]):
         raise IllFormedModule(g.target, reasons.CapturedGeneratorVariable(x))
     delta = {x: entry}
-    mod_ctx_ = override_var(mod_ctx, delta)
+    mod_ctx_ = override_gamma(mod_ctx, delta)
     for e in g.ifs:
         check_expr(e, Primitive.BOOL, mod_ctx_)
     return {**delta, **check_quals(generators[1:], mod_ctx_)}

@@ -51,17 +51,11 @@ def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
     )
 
 
-def override_var(mod_ctx: ModuleContext, delta: VarContext) -> ModuleContext:
-    return override_gamma(mod_ctx, delta)
-
-
 def var_entry(mod_ctx: ModuleContext, x: str) -> VarEntry | None:
     v = mod_ctx.gamma.get(x)
-    return (
-        None
-        if v is None or isinstance(v, (ModuleStub, ModuleLoaded, Class, PredefinedName))
-        else v
-    )
+    if v is None or isinstance(v, (ModuleStub, ModuleLoaded, Class, PredefinedName)):
+        return None
+    return v
 
 
 def var_type(mod_ctx: ModuleContext, x: str) -> Type | None:
