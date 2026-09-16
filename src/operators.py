@@ -258,10 +258,3 @@ def minimum(
         ):
             return candidate
     return None
-
-
-def result_of_min(
-    sigma: ClassTable, resolved: Sequence[ResolvedOverload]
-) -> Type | None:
-    chosen = minimum(sigma, resolved)
-    return chosen[1] if chosen is not None else None

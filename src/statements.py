@@ -53,9 +53,9 @@ from match import literal_of, match_shapes, seq_safe
 from operators import (
     BINARY_NAMES,
     UNARY_NAMES,
+    minimum,
     overloads_binary,
     overloads_unary,
-    result_of_min,
 )
 from reasons import IllFormedModule
 from shapes import Shape, shapes
@@ -421,11 +421,10 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         if negated is not None:
             return negated
         name = UNARY_NAMES[type(e.op)]
-        result = result_of_min(
-            mod_ctx.sigma, overloads_unary(mod_ctx.sigma, name, operand)
-        )
-        if result is None:
+        chosen = minimum(mod_ctx.sigma, overloads_unary(mod_ctx.sigma, name, operand))
+        if chosen is None:
             raise IllFormedModule(e, reasons.NoUnarySignature(name, render(operand)))
+        bounds, result = chosen
         return result
     if isinstance(e, ast.BoolOp):
         for v in e.values:
@@ -694,9 +693,10 @@ def binary(
     op: str, left: ast.expr, right: ast.expr, e: ast.expr, mod_ctx: ModuleContext
 ) -> Type:
     s, t = synth_expr(left, mod_ctx), synth_expr(right, mod_ctx)
-    result = result_of_min(mod_ctx.sigma, overloads_binary(mod_ctx.sigma, op, s, t))
-    if result is None:
+    chosen = minimum(mod_ctx.sigma, overloads_binary(mod_ctx.sigma, op, s, t))
+    if chosen is None:
         raise IllFormedModule(e, reasons.NoBinarySignature(op, render(s), render(t)))
+    bounds, result = chosen
     return result
 
 
