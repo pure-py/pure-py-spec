@@ -95,7 +95,9 @@ def imports(
     if entry is None:
         raise IllFormedModule(s, reasons.UnknownMember(x, q))
     if isinstance(entry, ModuleStub):
-        return ModuleLoaded(entry.q, check_module(mod_ctx.M[entry.q], mod_ctx.M, entry.q))
+        return ModuleLoaded(
+            entry.q, check_module(mod_ctx.M[entry.q], mod_ctx.M, entry.q)
+        )
     if entry == Status.FF:
         raise IllFormedModule(s, reasons.UnassignedMember(x, q))
     return entry

@@ -48,7 +48,9 @@ def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
     return ModuleContext(gamma={**mod_ctx.gamma, **delta}, M=mod_ctx.M, q=mod_ctx.q)
 
 
-def override_var(mod_ctx: ModuleContext, delta: Mapping[str, VarEntry]) -> ModuleContext:
+def override_var(
+    mod_ctx: ModuleContext, delta: Mapping[str, VarEntry]
+) -> ModuleContext:
     return override_gamma(mod_ctx, dict(delta))
 
 

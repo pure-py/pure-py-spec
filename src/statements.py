@@ -88,7 +88,9 @@ def signature(d: ast.FunctionDef, mod_ctx: ModuleContext) -> CallableType:
 
 
 def parameters(d: ast.FunctionDef, mod_ctx: ModuleContext) -> VarContext:
-    return {a.arg: resolve_type(type_expr(a.annotation), a, mod_ctx) for a in d.args.args}
+    return {
+        a.arg: resolve_type(type_expr(a.annotation), a, mod_ctx) for a in d.args.args
+    }
 
 
 def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
@@ -262,7 +264,9 @@ def check_distinct_names(defs: list[ast.FunctionDef], seen: set[str]) -> None:
     check_distinct_names(defs[1:], seen | {head.name})
 
 
-def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> StaticOutcome:
+def check_stmt(
+    s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None
+) -> StaticOutcome:
     if isinstance(s, ast.Pass):
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Assign):
@@ -330,7 +334,9 @@ def match_cases(
         if not seq_safe(case.pattern, subject, mod_ctx):
             raise IllFormedModule(
                 case.pattern,
-                reasons.SequenceKindClash(describe(case.pattern, mod_ctx), render(subject)),
+                reasons.SequenceKindClash(
+                    describe(case.pattern, mod_ctx), render(subject)
+                ),
             )
         result = match_shapes(left, case.pattern, mod_ctx)
         if result is None:
@@ -435,7 +441,9 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         return Primitive.BOOL
     if isinstance(e, ast.Compare):
         assert len(e.ops) == 1
-        return binary(BINARY_NAMES[type(e.ops[0])], e.left, e.comparators[0], e, mod_ctx)
+        return binary(
+            BINARY_NAMES[type(e.ops[0])], e.left, e.comparators[0], e, mod_ctx
+        )
     if isinstance(e, ast.IfExp):
         check_expr(e.test, Primitive.BOOL, mod_ctx)
         return branch_type(e, mod_ctx)
@@ -524,7 +532,9 @@ def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) ->
     raise IllFormedModule(e, reasons.NotSubscriptable(render(container)))
 
 
-def tuple_subscript(container: TupleType, index: ast.expr, mod_ctx: ModuleContext) -> Type:
+def tuple_subscript(
+    container: TupleType, index: ast.expr, mod_ctx: ModuleContext
+) -> Type:
     """A literal index gives the component at that position, counting from the
     end where it is negative; any other index of type int gives their join."""
     m = len(container.components)
@@ -616,7 +626,9 @@ def result_type(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> Type:
     """The result of a call at callee type `fn`; at a union, the join over the
     members."""
     if isinstance(fn, UnionType):
-        return join([result_type(fn.left, e, mod_ctx), result_type(fn.right, e, mod_ctx)])
+        return join(
+            [result_type(fn.left, e, mod_ctx), result_type(fn.right, e, mod_ctx)]
+        )
     if not isinstance(fn, CallableType):
         raise IllFormedModule(e, reasons.NotCallable(render(fn)))
     if len(fn.params) != len(e.args):
@@ -646,7 +658,9 @@ def check_expr(e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
     it."""
     if isinstance(e, ast.Call) and isinstance(e.func, ast.Lambda):
         check_expr(
-            e.func.body, expected, override_var(mod_ctx, lambda_arguments(e.func, e, mod_ctx))
+            e.func.body,
+            expected,
+            override_var(mod_ctx, lambda_arguments(e.func, e, mod_ctx)),
         )
         return
     if isinstance(e, ast.List) and isinstance(expected, ListType):
@@ -729,7 +743,9 @@ def qual_context(
     return override_var(mod_ctx, delta)
 
 
-def check_quals(generators: list[ast.comprehension], mod_ctx: ModuleContext) -> VarContext:
+def check_quals(
+    generators: list[ast.comprehension], mod_ctx: ModuleContext
+) -> VarContext:
     """Bindings the qualifiers introduce, each generator binding its target at
     the element type of the value it draws from."""
     if len(generators) == 0:
@@ -791,7 +807,10 @@ def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> Class:
         if len(clash) > 0:
             raise IllFormedModule(node, reasons.InheritedFieldClash(min(clash), base))
     return Class(
-        context=mod_ctx.gamma, name=f"{mod_ctx.q}.{node.name}", own_fields=own, base=base
+        context=mod_ctx.gamma,
+        name=f"{mod_ctx.q}.{node.name}",
+        own_fields=own,
+        base=base,
     )
 
 

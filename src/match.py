@@ -308,7 +308,9 @@ def seq_safe(p: ast.pattern, t: Type, mod_ctx: ModuleContext) -> bool:
         if isinstance(t, ListType) or t in (Primitive.SIZED, Primitive.OBJECT):
             return False
         if isinstance(t, TupleType) and len(t.components) == len(p.patterns):
-            return all(seq_safe(q, c, mod_ctx) for q, c in zip(p.patterns, t.components))
+            return all(
+                seq_safe(q, c, mod_ctx) for q, c in zip(p.patterns, t.components)
+            )
         return True
     if isinstance(p, PatList):
         if isinstance(t, TupleType) or t in (Primitive.SIZED, Primitive.OBJECT):
@@ -327,7 +329,9 @@ def seq_safe(p: ast.pattern, t: Type, mod_ctx: ModuleContext) -> bool:
         args = field_map(cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
         if args is None:
             return True  # likewise
-        return all(seq_safe(args[x], declared_type(cls, x), mod_ctx) for x in fields(cls))
+        return all(
+            seq_safe(args[x], declared_type(cls, x), mod_ctx) for x in fields(cls)
+        )
     if isinstance(p, ast.MatchAs):
         return p.pattern is None or seq_safe(p.pattern, t, mod_ctx)
     return True
