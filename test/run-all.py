@@ -307,9 +307,9 @@ def check_rule_names(r: Runner) -> None:
         if len(files) > 1
     ]
     if clashes:
-        r.bad("rule names", "; ".join(clashes))
+        r.bad("unique rule names", "; ".join(clashes))
     else:
-        r.ok("rule names")
+        r.ok("unique rule names")
 
 
 def check_rule_citations(r: Runner, base: pathlib.Path) -> None:
@@ -329,9 +329,9 @@ def check_rule_citations(r: Runner, base: pathlib.Path) -> None:
         if cited is not None and cited.group(1) not in spec:
             stale.append(f"{path.relative_to(base)} cites {cited.group(1)}")
     if stale:
-        r.bad("rule citations", "; ".join(stale))
+        r.bad("rule attribution", "; ".join(stale))
     else:
-        r.ok("rule citations")
+        r.ok("rule attribution")
 
 
 def check_mypy_tests(r: Runner, module: pathlib.Path) -> None:
@@ -369,9 +369,9 @@ def check_mypy_tests(r: Runner, module: pathlib.Path) -> None:
         if (str(p) in rejected) != (str(p) in expected)
     ]
     if misfiled:
-        r.bad("mypy tests", "; ".join(misfiled))
+        r.bad("mypy compatibility", "; ".join(misfiled))
     else:
-        r.ok("mypy tests")
+        r.ok("mypy compatibility")
 
 
 def main() -> None:
