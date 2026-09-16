@@ -57,10 +57,10 @@ class Program(Mapping[str, ast.Module]):
     def __init__(self, entry_path: pathlib.Path) -> None:
         self.base_dir = entry_path.parent
         self.paths: dict[str, pathlib.Path] = {"__main__": entry_path}
-        self.trees: dict[str, ast.Module] = {
+        self.parsed: dict[str, ast.Module] = {
             q: ast.Module(body=[], type_ignores=[]) for q in PREDEFINED_MODULES
         }
-        self.names = set(self.trees) | set(self.paths) | source_tree(self.base_dir)
+        self.names = set(self.parsed) | set(self.paths) | source_tree(self.base_dir)
 
     def path(self, name: str) -> pathlib.Path:
         if name not in self.paths:
@@ -72,9 +72,9 @@ class Program(Mapping[str, ast.Module]):
     def __getitem__(self, name: str) -> ast.Module:
         if name not in self.names:
             raise KeyError(name)
-        if name not in self.trees:
-            self.trees[name] = parse(self.path(name))
-        return self.trees[name]
+        if name not in self.parsed:
+            self.parsed[name] = parse(self.path(name))
+        return self.parsed[name]
 
     def __iter__(self) -> Iterator[str]:
         return iter(self.names)
