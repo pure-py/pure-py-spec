@@ -7,7 +7,6 @@ import syntax
 from aux import (
     assigns_body,
     assigns_stmt,
-    first_return,
     split_imports,
     statements,
 )
@@ -146,9 +145,6 @@ def check_module_(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context
     gamma0 = check_imports_prefix(prefix, ModuleContext(gamma={}, M=M, q=q))
     body = [name_assign(q)] + rest
     gamma1 = {**predefined_context("builtins"), **gamma0}
-    returning = first_return(body)
-    if returning is not None:  # no return rule applies with an empty return type
-        raise IllFormedModule(returning, reasons.TopLevelReturn())
     items = statements(body)
     final_ctx = check_top_seq(items, ModuleContext(gamma=gamma1, M=M, q=q))
     check_submodule_clash(m, gamma0, body, M, q)
