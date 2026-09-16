@@ -195,7 +195,14 @@ def override_outcomes(r: StaticOutcome, r_: StaticOutcome) -> StaticOutcome:
     return Assigns(override_context(r.delta, r_.delta))
 
 
-def extend_entry(theta: ContextEntry, theta_: ContextEntry) -> ContextEntry:
+def extend_entry(
+    theta: ContextEntry | None, theta_: ContextEntry | None
+) -> ContextEntry:
+    if theta is None:
+        assert theta_ is not None
+        return theta_
+    if theta_ is None:
+        return theta
     if (
         isinstance(theta, ModuleLoaded)
         and isinstance(theta_, ModuleLoaded)
@@ -232,11 +239,8 @@ def binding_types(entries: list[VarEntry]) -> list[Type]:
 
 def extend_context(gamma: Context, gamma_: Context) -> Context:
     return {
-        **gamma,
-        **{
-            x: extend_entry(gamma[x], theta) if x in gamma else theta
-            for x, theta in gamma_.items()
-        },
+        x: extend_entry(gamma.get(x), gamma_.get(x))
+        for x in list(gamma) + [x for x in gamma_ if x not in gamma]
     }
 
 
