@@ -216,16 +216,6 @@ def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context
     )
 
 
-def module_result(
-    m: ast.Module, M: Mapping[str, ast.Module], q: str
-) -> IllFormed | None:
-    try:
-        check_module(m, M, q, {})
-        return None
-    except IllFormed as e:
-        return e
-
-
 def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:
     with open(filename) as f:
         source = f.read()
@@ -237,7 +227,11 @@ def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:
         p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES
     }
     M["__main__"] = tree
-    return module_result(tree, M, "__main__")
+    try:
+        check_module(tree, M, "__main__", {})
+        return None
+    except IllFormed as e:
+        return e
 
 
 def format_result(result: IllFormed | syntax.Unsupported | None, filename: str) -> str:
