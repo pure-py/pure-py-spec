@@ -136,7 +136,7 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
 
 def check_in_scope(x: Var, node: ast.AST, mod_ctx: ModuleContext) -> None:
     if not isinstance(mod_ctx.gamma.get(x), PredefinedName):
-        raise IllFormedModule(node, reasons.AnnotationNameNotInScope(x))
+        raise IllFormedModule(node, reasons.NotPredefinedName(x))
 
 
 def check_body(
@@ -751,7 +751,7 @@ def class_declared(
     node: ast.ClassDef, mod_ctx: ModuleContext
 ) -> tuple[Class, ClassTable]:
     if not isinstance(mod_ctx.gamma.get("dataclass"), PredefinedName):
-        raise IllFormedModule(node, reasons.DecoratorNotInScope("dataclass"))
+        raise IllFormedModule(node, reasons.NotPredefinedName("dataclass"))
     own = tuple((x, resolve_type(psi, node, mod_ctx)) for x, psi in own_fields(node))
     names = [x for x, _ in own]
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)

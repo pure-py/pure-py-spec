@@ -124,19 +124,11 @@ class UnknownClassInAnnotation:
 
 
 @dataclass(frozen=True)
-class AnnotationNameNotInScope:
+class NotPredefinedName:
     name: str
 
     def message(self) -> str:
-        return f"annotation names '{self.name}', which is not in scope"
-
-
-@dataclass(frozen=True)
-class DecoratorNotInScope:
-    name: str
-
-    def message(self) -> str:
-        return f"class declaration names '{self.name}', which is not in scope"
+        return f"'{self.name}' is not bound as a predefined name"
 
 
 @dataclass(frozen=True)
@@ -413,8 +405,7 @@ type Reason = (
     | PatternArityMismatch
     | UnknownClassInPattern
     | UnknownClassInAnnotation
-    | AnnotationNameNotInScope
-    | DecoratorNotInScope
+    | NotPredefinedName
     | UnknownFieldInPattern
     | DuplicatePatternKeyword
     | UnknownModule
