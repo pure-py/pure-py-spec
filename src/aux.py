@@ -1,7 +1,7 @@
 import ast
 from itertools import dropwhile, takewhile
 
-from type_syntax import TypeExpr, Var, dotted_name, parse_annotation
+from type_syntax import QualifiedName, TypeExpr, Var, dotted_name, parse_annotation
 
 # A PurePy statement: a Python statement, or a mutual region of consecutive defs. A Python body
 # (a statement list) represents the spec's right-nested sequence s s'.
@@ -335,7 +335,7 @@ def type_expr(annotation: ast.expr | None) -> TypeExpr:
     return t
 
 
-def qualified_name(e: ast.expr) -> str:
+def qualified_name(e: ast.expr) -> QualifiedName:
     q = dotted_name(e)
     assert q is not None
     return q

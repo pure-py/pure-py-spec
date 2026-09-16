@@ -13,6 +13,8 @@ from aux import (
 )
 from classes import ClassTable
 from contexts import (
+    BUILTINS,
+    MAIN,
     PREDEFINED_MODULES,
     Context,
     ContextEntry,
@@ -26,40 +28,35 @@ from contexts import (
 )
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
 from statements import check_top_seq
-from type_syntax import Var
+from type_syntax import (
+    QualifiedName,
+    Var,
+    parent,
+    parse_qualified,
+    prefix_of,
+    proper_prefix_of,
+    proper_prefixes,
+    qualified,
+    root,
+)
 
 
-def name_assign(q: str) -> ast.stmt:
-    return ast.parse(f"__name__ = {q!r}").body[0]
-
-
-def prefix_of(p: str, q: str) -> bool:
-    return p == q or q.startswith(p + ".")
-
-
-def proper_prefix_of(p: str, q: str) -> bool:
-    return p != q and prefix_of(p, q)
+def name_assign(q: QualifiedName) -> ast.stmt:
+    return ast.parse(f"__name__ = {str(q)!r}").body[0]
 
 
 def loads_as(
-    q: str, theta: ContextEntry, mod_ctx: ModuleContext
+    q: QualifiedName, theta: ContextEntry, mod_ctx: ModuleContext
 ) -> tuple[ContextEntry, ClassTable]:
-    if "." not in q:
+    q_ = parent(q)
+    if q_ is None:
         return theta, mod_ctx.sigma
-    parent, x = q.rsplit(".", 1)
-    parent_ctx, sigma = check_module(
-        mod_ctx.M[parent], mod_ctx.M, parent, mod_ctx.sigma
-    )
+    gamma, sigma = check_module(mod_ctx.M[q_], mod_ctx.M, q_, mod_ctx.sigma)
     return loads_as(
-        parent,
-        ModuleLoaded(parent, extend_context(parent_ctx, {x: theta})),
+        q_,
+        ModuleLoaded(q_, extend_context(gamma, {q.parts[-1]: theta})),
         replace(mod_ctx, sigma=sigma),
     )
-
-
-def proper_prefixes(q: str) -> list[str]:
-    parts = q.split(".")
-    return [".".join(parts[:i]) for i in range(1, len(parts))]
 
 
 def check_imports_prefix(
@@ -76,30 +73,35 @@ def check_imports_prefix(
 
 def check_import(s: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, ClassTable]:
     if isinstance(s, ast.Import):
-        q = s.names[0].name
+        q = parse_qualified(s.names[0].name)
         if q not in mod_ctx.M:
-            raise IllFormedModule(s, reasons.UnknownModule(q))
+            raise IllFormedModule(s, reasons.UnknownModule(str(q)))
         if proper_prefix_of(mod_ctx.q, q):
-            raise IllFormedModule(s, reasons.OwnDescendantImport(q, mod_ctx.q))
+            raise IllFormedModule(
+                s, reasons.OwnDescendantImport(str(q), str(mod_ctx.q))
+            )
         delta, sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.sigma)
         theta, sigma = loads_as(
             q, ModuleLoaded(q, delta), replace(mod_ctx, sigma=sigma)
         )
-        return {q.split(".")[0]: theta}, sigma
+        return {root(q): theta}, sigma
     assert isinstance(s, ast.ImportFrom) and s.module is not None
-    if s.module not in mod_ctx.M:
-        raise IllFormedModule(s, reasons.UnknownModule(s.module))
-    delta, sigma = check_module(mod_ctx.M[s.module], mod_ctx.M, s.module, mod_ctx.sigma)
+    q = parse_qualified(s.module)
+    if q not in mod_ctx.M:
+        raise IllFormedModule(s, reasons.UnknownModule(str(q)))
+    delta, sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.sigma)
     sigma = load_ancestors(
-        [p for p in proper_prefixes(s.module) if not prefix_of(p, mod_ctx.q)],
+        [p for p in proper_prefixes(q) if not prefix_of(p, mod_ctx.q)],
         replace(mod_ctx, sigma=sigma),
     )
     return imports_seq(
-        s, [a.name for a in s.names], s.module, delta, replace(mod_ctx, sigma=sigma)
+        s, [a.name for a in s.names], q, delta, replace(mod_ctx, sigma=sigma)
     )
 
 
-def load_ancestors(ancestors: list[str], mod_ctx: ModuleContext) -> ClassTable:
+def load_ancestors(
+    ancestors: list[QualifiedName], mod_ctx: ModuleContext
+) -> ClassTable:
     if len(ancestors) == 0:
         return mod_ctx.sigma
     _, sigma = check_module(
@@ -108,17 +110,19 @@ def load_ancestors(ancestors: list[str], mod_ctx: ModuleContext) -> ClassTable:
     return load_ancestors(ancestors[1:], replace(mod_ctx, sigma=sigma))
 
 
-def submods(M: Mapping[str, ast.Module], q: str) -> Context:
+def submods(M: Mapping[QualifiedName, ast.Module], q: QualifiedName) -> Context:
     return {
-        x: ModuleStub(f"{q}.{x}")
-        for x in {
-            name[len(q) + 1 :].split(".")[0] for name in M if name.startswith(f"{q}.")
-        }
+        x: ModuleStub(qualified(q, x))
+        for x in {q_.parts[len(q.parts)] for q_ in M if proper_prefix_of(q, q_)}
     }
 
 
 def imports_seq(
-    s: ast.stmt, names: list[str], q: str, gamma_src: Context, mod_ctx: ModuleContext
+    s: ast.stmt,
+    names: list[Var],
+    q: QualifiedName,
+    gamma_src: Context,
+    mod_ctx: ModuleContext,
 ) -> tuple[Context, ClassTable]:
     if len(names) == 0:
         return {}, mod_ctx.sigma
@@ -130,34 +134,37 @@ def imports_seq(
 
 
 def imports(
-    s: ast.stmt, x: Var, q: str, gamma_src: Context, mod_ctx: ModuleContext
+    s: ast.stmt, x: Var, q: QualifiedName, gamma_src: Context, mod_ctx: ModuleContext
 ) -> tuple[ContextEntry, ClassTable]:
     entry = gamma_src.get(x)
     if entry is None:
-        raise IllFormedModule(s, reasons.UnknownMember(x, q))
+        raise IllFormedModule(s, reasons.UnknownMember(x, str(q)))
     if isinstance(entry, ModuleStub):
         members, sigma = check_module(
             mod_ctx.M[entry.q], mod_ctx.M, entry.q, mod_ctx.sigma
         )
         return ModuleLoaded(entry.q, members), sigma
     if entry == Status.FF:
-        raise IllFormedModule(s, reasons.UnassignedMember(x, q))
+        raise IllFormedModule(s, reasons.UnassignedMember(x, str(q)))
     return entry, mod_ctx.sigma
 
 
-_signatures: dict[tuple[int, str], Context] = {}
-_loading: list[tuple[int, str]] = []
+_signatures: dict[tuple[int, QualifiedName], Context] = {}
+_loading: list[tuple[int, QualifiedName]] = []
 
 
 def check_module(
-    m: ast.Module, M: Mapping[str, ast.Module], q: str, sigma: ClassTable
+    m: ast.Module,
+    M: Mapping[QualifiedName, ast.Module],
+    q: QualifiedName,
+    sigma: ClassTable,
 ) -> tuple[Context, ClassTable]:
     key = (id(M), q)
     cached = _signatures.get(key)
     if cached is not None:
         return cached, sigma
     if key in _loading:
-        cycle = [name for _, name in _loading[_loading.index(key) :]] + [q]
+        cycle = [str(name) for _, name in _loading[_loading.index(key) :]] + [str(q)]
         raise IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
     _loading.append(key)
     try:
@@ -173,7 +180,10 @@ def check_module(
 
 
 def check_module_(
-    m: ast.Module, M: Mapping[str, ast.Module], q: str, sigma: ClassTable
+    m: ast.Module,
+    M: Mapping[QualifiedName, ast.Module],
+    q: QualifiedName,
+    sigma: ClassTable,
 ) -> tuple[Context, ClassTable]:
     if q in PREDEFINED_MODULES:
         return predefined_context(q), sigma
@@ -185,7 +195,7 @@ def check_module_(
     mod_ctx = check_top_seq(
         statements(body),
         ModuleContext(
-            gamma={**predefined_context("builtins"), **gamma}, M=M, q=q, sigma=sigma
+            gamma={**predefined_context(BUILTINS), **gamma}, M=M, q=q, sigma=sigma
         ),
     )
     check_submodule_clash(m, gamma, body, M, q)
@@ -196,20 +206,20 @@ def check_submodule_clash(
     m: ast.Module,
     gamma: Context,
     body: list[ast.stmt],
-    M: Mapping[str, ast.Module],
-    q: str,
+    M: Mapping[QualifiedName, ast.Module],
+    q: QualifiedName,
 ) -> None:
     clash = sorted((set(gamma) | assigns_body(body)) & set(submods(M, q)))
     if len(clash) > 0:
         x = clash[0]
         node = find_binder(m.body, x)
         assert node is not None
-        raise IllFormedModule(node, reasons.SubmoduleNameClash(x, f"{q}.{x}"))
+        raise IllFormedModule(node, reasons.SubmoduleNameClash(x, str(qualified(q, x))))
 
 
 def binds_name(s: ast.stmt, x: str) -> bool:
     if isinstance(s, ast.Import):
-        return s.names[0].name.split(".")[0] == x
+        return root(parse_qualified(s.names[0].name)) == x
     if isinstance(s, ast.ImportFrom):
         return any(a.name == x for a in s.names)
     if isinstance(s, ast.ClassDef):
@@ -221,7 +231,9 @@ def find_binder(stmts: list[ast.stmt], x: str) -> ast.stmt | None:
     return next((s for s in stmts if binds_name(s, x)), None)
 
 
-def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context:
+def signature(
+    body: list[ast.stmt], final_ctx: ModuleContext, q: QualifiedName
+) -> Context:
     return override_context(
         submods(final_ctx.M, q), {x: final_ctx.gamma[x] for x in assigns_body(body)}
     )
@@ -234,12 +246,12 @@ def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:
     unsupported = syntax.check_syntax_module(m)
     if unsupported is not None:
         return unsupported
-    M: dict[str, ast.Module] = {
+    M: dict[QualifiedName, ast.Module] = {
         p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES
     }
-    M["__main__"] = m
+    M[MAIN] = m
     try:
-        check_module(m, M, "__main__", {})
+        check_module(m, M, MAIN, {})
         return None
     except IllFormed as e:
         return e

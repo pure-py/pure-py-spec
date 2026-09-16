@@ -22,6 +22,42 @@ class Primitive(Enum):
 type Var = str
 
 
+@dataclass(frozen=True)
+class QualifiedName:
+    parts: tuple[Var, ...]
+
+    def __str__(self) -> str:
+        return ".".join(self.parts)
+
+
+def parse_qualified(name: str) -> QualifiedName:
+    return QualifiedName(tuple(name.split(".")))
+
+
+def qualified(q: QualifiedName, x: Var) -> QualifiedName:
+    return QualifiedName(q.parts + (x,))
+
+
+def root(q: QualifiedName) -> Var:
+    return q.parts[0]
+
+
+def parent(q: QualifiedName) -> QualifiedName | None:
+    return QualifiedName(q.parts[:-1]) if len(q.parts) > 1 else None
+
+
+def prefix_of(p: QualifiedName, q: QualifiedName) -> bool:
+    return q.parts[: len(p.parts)] == p.parts
+
+
+def proper_prefix_of(p: QualifiedName, q: QualifiedName) -> bool:
+    return p != q and prefix_of(p, q)
+
+
+def proper_prefixes(q: QualifiedName) -> list[QualifiedName]:
+    return [QualifiedName(q.parts[:i]) for i in range(1, len(q.parts))]
+
+
 @dataclass(frozen=True, eq=False)
 class LiteralType:
     """A literal type. Equality compares the value's Python type as well, since
@@ -66,7 +102,7 @@ class CallableExpr:
 
 @dataclass(frozen=True)
 class ClassName:
-    q: str
+    q: QualifiedName
 
 
 @dataclass(frozen=True)
@@ -162,7 +198,7 @@ def render(t: Type) -> str:
     if isinstance(t, LiteralType):
         return f"Literal[{t.value!r}]"
     if isinstance(t, ClassType):
-        return t.c.name
+        return str(t.c.name)
     return f"{render(t.left)} | {render(t.right)}"
 
 
@@ -198,7 +234,7 @@ def parse_annotation(e: ast.expr) -> TypeExpr | None:
     if isinstance(e, ast.Constant) and e.value is None:
         return Primitive.NONE
     if isinstance(e, ast.Name):
-        return PRIMITIVE_NAMES.get(e.id, ClassName(e.id))
+        return PRIMITIVE_NAMES.get(e.id, ClassName(QualifiedName((e.id,))))
     if isinstance(e, ast.Attribute):
         q = dotted_name(e)
         return None if q is None else ClassName(q)
@@ -209,12 +245,12 @@ def parse_annotation(e: ast.expr) -> TypeExpr | None:
     return None
 
 
-def dotted_name(e: ast.expr) -> str | None:
+def dotted_name(e: ast.expr) -> QualifiedName | None:
     if isinstance(e, ast.Name):
-        return e.id
+        return QualifiedName((e.id,))
     if isinstance(e, ast.Attribute):
         q = dotted_name(e.value)
-        return None if q is None else f"{q}.{e.attr}"
+        return None if q is None else qualified(q, e.attr)
     return None
 
 

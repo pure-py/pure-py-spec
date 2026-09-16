@@ -1,12 +1,12 @@
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
-from type_syntax import Type, Var
+from type_syntax import QualifiedName, Type, Var
 
 
 @dataclass(frozen=True)
 class Class:
-    name: str
+    name: QualifiedName
 
     def __repr__(self) -> str:
         return f"Class({self.name})"
@@ -22,7 +22,7 @@ type ClassTable = Mapping[Class, ClassTableEntry]
 
 
 def short_name(c: Class) -> Var:
-    return c.name.rsplit(".", 1)[-1]
+    return c.name.parts[-1]
 
 
 def ancestors(sigma: ClassTable, c: Class) -> list[Class]:

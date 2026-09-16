@@ -5,7 +5,18 @@ from enum import Enum, auto
 
 from classes import Class, ClassTable
 from subtyping import join_seq
-from type_syntax import CallableType, ListType, Primitive, Type, Var, dotted_name
+from type_syntax import (
+    CallableType,
+    ListType,
+    Primitive,
+    QualifiedName,
+    Type,
+    Var,
+    dotted_name,
+    parent,
+    parse_qualified,
+    root,
+)
 
 
 class Status(Enum):
@@ -27,20 +38,20 @@ class PredefinedName:
 
 @dataclass(frozen=True)
 class ModuleStub:
-    q: str
+    q: QualifiedName
 
 
 @dataclass(frozen=True)
 class ModuleLoaded:
-    q: str
+    q: QualifiedName
     members: Context
 
 
 @dataclass(frozen=True)
 class ModuleContext:
     gamma: Context
-    M: Mapping[str, ast.Module]
-    q: str
+    M: Mapping[QualifiedName, ast.Module]
+    q: QualifiedName
     sigma: ClassTable
 
 
@@ -67,12 +78,12 @@ def is_assigned(mod_ctx: ModuleContext, x: Var) -> bool:
     return v is not None and v != Status.FF
 
 
-def resolve_name(q: str, mod_ctx: ModuleContext) -> ContextEntry | None:
-    if "." not in q:
-        return mod_ctx.gamma.get(q)
-    prefix, x = q.rsplit(".", 1)
-    entry = resolve_name(prefix, mod_ctx)
-    return entry.members.get(x) if isinstance(entry, ModuleLoaded) else None
+def resolve_name(q: QualifiedName, mod_ctx: ModuleContext) -> ContextEntry | None:
+    q_ = parent(q)
+    if q_ is None:
+        return mod_ctx.gamma.get(root(q))
+    entry = resolve_name(q_, mod_ctx)
+    return entry.members.get(q.parts[-1]) if isinstance(entry, ModuleLoaded) else None
 
 
 def module_of(mod_ctx: ModuleContext, x: Var) -> ModuleStub | ModuleLoaded | None:
@@ -137,11 +148,13 @@ PREDEFINED_MEMBERS: dict[str, Context] = {
     "dataclasses": {"dataclass": PredefinedName()},
 }
 
-PREDEFINED_MODULES = set(PREDEFINED_MEMBERS)
+PREDEFINED_MODULES = {parse_qualified(name) for name in PREDEFINED_MEMBERS}
+BUILTINS = parse_qualified("builtins")
+MAIN = parse_qualified("__main__")
 
 
-def predefined_context(q: str) -> Context:
-    return {**PREDEFINED_MEMBERS[q], "__name__": Primitive.STR}
+def predefined_context(q: QualifiedName) -> Context:
+    return {**PREDEFINED_MEMBERS[str(q)], "__name__": Primitive.STR}
 
 
 def merge_entry(

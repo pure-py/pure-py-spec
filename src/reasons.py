@@ -1,6 +1,8 @@
 import ast
 from dataclasses import dataclass
 
+from type_syntax import QualifiedName
+
 
 @dataclass(frozen=True)
 class DuplicateFieldName:
@@ -458,7 +460,7 @@ class IllFormedModule(IllFormed):
         self.line: int | None = getattr(node, "lineno", None)
         self.col: int | None = getattr(node, "col_offset", None)
         self.msg = reason.message()
-        self.module: str | None = None
+        self.module: QualifiedName | None = None
         super().__init__(self.msg)
 
 

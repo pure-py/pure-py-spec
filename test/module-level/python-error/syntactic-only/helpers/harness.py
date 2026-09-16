@@ -11,10 +11,11 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from check_module import PREDEFINED_MODULES, check_module
 from reasons import IllFormed
+from type_syntax import QualifiedName
 from syntax import check_syntax_module
 
 
-def ill_formedness(tree: ast.Module, M: dict[str, ast.Module], q: str) -> IllFormed | None:
+def ill_formedness(tree: ast.Module, M: dict[QualifiedName, ast.Module], q: QualifiedName) -> IllFormed | None:
     try:
         check_module(tree, M, q, {})
         return None
@@ -23,7 +24,7 @@ def ill_formedness(tree: ast.Module, M: dict[str, ast.Module], q: str) -> IllFor
 
 
 def expect_rejected(tree: ast.Module, msg_contains: str = "") -> None:
-    q = '<test>'
+    q = QualifiedName(('<test>',))
     M = {p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES}
     M[q] = tree
     result = check_syntax_module(tree) or ill_formedness(tree, M, q)

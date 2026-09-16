@@ -82,6 +82,7 @@ from type_syntax import (
     Var,
     base_type,
     literal_type,
+    qualified,
     render,
 )
 
@@ -109,7 +110,7 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
     if isinstance(psi, ClassName):
         c = resolve_name(psi.q, mod_ctx)
         if not isinstance(c, Class):
-            raise IllFormedModule(node, reasons.UnknownClassInAnnotation(psi.q))
+            raise IllFormedModule(node, reasons.UnknownClassInAnnotation(str(psi.q)))
         return ClassType(c)
     if isinstance(psi, ListExpr):
         check_in_scope("list", node, mod_ctx)
@@ -435,23 +436,25 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         if isinstance(parent, ModuleLoaded):
             entry = parent.members.get(e.attr)
             if entry is None:
-                raise IllFormedModule(e, reasons.UnknownMember(e.attr, parent.q))
+                raise IllFormedModule(e, reasons.UnknownMember(e.attr, str(parent.q)))
             if isinstance(entry, ModuleStub):
-                raise IllFormedModule(e, reasons.SubmoduleNotImported(entry.q))
+                raise IllFormedModule(e, reasons.SubmoduleNotImported(str(entry.q)))
             if isinstance(entry, ModuleLoaded):
-                raise IllFormedModule(e, reasons.ModuleAsValue(qualified_name(e)))
+                raise IllFormedModule(e, reasons.ModuleAsValue(str(qualified_name(e))))
             if isinstance(entry, Class):
-                raise IllFormedModule(e, reasons.ClassAsValue(qualified_name(e)))
+                raise IllFormedModule(e, reasons.ClassAsValue(str(qualified_name(e))))
             if isinstance(entry, PredefinedName):
                 raise IllFormedModule(
-                    e, reasons.PredefinedNameAsValue(qualified_name(e))
+                    e, reasons.PredefinedNameAsValue(str(qualified_name(e)))
                 )
             if entry == Status.FF:
-                raise IllFormedModule(e, reasons.UnassignedMember(e.attr, parent.q))
+                raise IllFormedModule(
+                    e, reasons.UnassignedMember(e.attr, str(parent.q))
+                )
             assert not isinstance(entry, Status)
             return entry
         if isinstance(parent, ModuleStub):
-            raise IllFormedModule(e, reasons.SubmoduleNotImported(parent.q))
+            raise IllFormedModule(e, reasons.SubmoduleNotImported(str(parent.q)))
         return attribute_type(synth_expr(e.value, mod_ctx), e, mod_ctx)
     if isinstance(e, ast.Subscript):
         return subscript_type(synth_expr(e.value, mod_ctx), e, mod_ctx)
@@ -767,7 +770,7 @@ def class_declared(
             raise IllFormedModule(
                 node, reasons.InheritedFieldClash(min(clash), base_name)
             )
-    c = Class(f"{mod_ctx.q}.{node.name}")
+    c = Class(qualified(mod_ctx.q, node.name))
     assert c not in mod_ctx.sigma, "redeclaration rejected by top-seq"
     return c, {**mod_ctx.sigma, c: ClassTableEntry(own_fields=own, base=base)}
 
