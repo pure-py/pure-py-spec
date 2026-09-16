@@ -19,3 +19,4 @@ __pycache__/
 *.toc
 *.cut
 .DS_Store
+tex/python-version.tex

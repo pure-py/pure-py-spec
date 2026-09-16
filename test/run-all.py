@@ -45,6 +45,7 @@ HELPERS = "helpers"
 # Semantically-valid tests PurePy accepts and mypy rejects
 MYPY_INCOMPATIBLE = "mypy-incompatible"
 MYPY_INI = "mypy.ini"
+PYTHON_VERSION = (ROOT / ".python-version").read_text().strip()
 
 RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
 RULE_DEF = re.compile(r"lab=\{\\ruleName\{([a-z0-9-]+)\}\}")
@@ -348,6 +349,8 @@ def check_mypy_tests(r: Runner, module: pathlib.Path) -> None:
     proc = subprocess.run(
         [
             "mypy",
+            "--python-version",
+            PYTHON_VERSION,
             "--config-file",
             str(pathlib.Path("test") / MYPY_INI),
             "--no-error-summary",
@@ -393,7 +396,7 @@ def main() -> None:
             str(ROOT / "test" / "run-all.py")
         ]
         for tool in (
-            ["mypy", "--strict"],
+            ["mypy", "--strict", "--python-version", PYTHON_VERSION],
             ["ruff", "check"],
             ["ruff", "format", "--check"],
         ):

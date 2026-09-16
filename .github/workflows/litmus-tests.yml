@@ -15,20 +15,24 @@ jobs:
       matrix:
         include:
           - runtime: CPython
-            version: "3.12"
 
           - runtime: GraalPy
             version: "graalpy-25.2"
 
           - runtime: Pyodide
-            version: "3.12"
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up CPython or GraalPy
-        if: matrix.runtime != 'Pyodide'
+      - name: Set up CPython
+        if: matrix.runtime == 'CPython'
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+
+      - name: Set up GraalPy
+        if: matrix.runtime == 'GraalPy'
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.version }}
@@ -50,8 +54,8 @@ jobs:
       - name: Install Pyodide
         if: matrix.runtime == 'Pyodide'
         run: |
-          uv python install pyodide@${{ matrix.version }}
-          PYODIDE_PYTHON="$(uv python find pyodide@${{ matrix.version }})"
+          uv python install "pyodide@$(cat .python-version)"
+          PYODIDE_PYTHON="$(uv python find "pyodide@$(cat .python-version)")"
           echo "PYODIDE_PYTHON=$PYODIDE_PYTHON" >> "$GITHUB_ENV"
 
       - name: Run tests with CPython

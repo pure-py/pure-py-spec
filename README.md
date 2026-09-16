@@ -39,8 +39,8 @@ See the Makefile.
 
 ## Running tests
 
-Install [uv](https://docs.astral.sh/uv/). The project requires Python 3.12
-or later, as specified in `pyproject.toml` and `.python-version`
+Install [uv](https://docs.astral.sh/uv/). The Python version is the one in `.python-version`, which uv,
+the workflows, mypy and the specification all read; `pyproject.toml` gives only the lower bound
 ([#39](https://github.com/pure-py/pure-py-spec/issues/39)).
 
 From the repository root, run:

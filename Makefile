@@ -1,6 +1,8 @@
 INPUTS := $(wildcard tex/*.tex spec/*.tex spec/*/*.tex spec/*/*/*.tex paper/*.tex paper/*/*.tex)
 BIBFILES := $(wildcard tex/*.bib)
-TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES)
+# Generated from .python-version, the one source of the Python version.
+PYTHON_VERSION_TEX := tex/python-version.tex
+TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
 # Removed after each build; the .bbl is kept, since paper-arXiv.zip includes it.
 BUILD_AUX := *.aux *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
@@ -15,6 +17,9 @@ define check-log
 @! grep -E "Reference .* undefined|Citation .* undefined|multiply defined" $(1).log || \
 	{ echo "$(1).log: unresolved references"; exit 1; }
 endef
+
+$(PYTHON_VERSION_TEX): .python-version
+	printf '\\newcommand*{\\pythonVersion}{%s}\n' "$$(cat $<)" > $@
 
 %.pdf: %.tex $(TEXFILES)
 	$(PDFLATEX) $<
@@ -79,9 +84,9 @@ paper-submission: check-tests paper-anon.pdf supplementary.zip
 # arXiv runs pdflatex but not bibtex, so the source ships with the .bbl of the current build.
 paper-arXiv.zip: paper.pdf
 	rm -f $@
-	zip -q -9 $@ paper.tex paper.bbl $(INPUTS)
+	zip -q -9 $@ paper.tex paper.bbl $(sort $(INPUTS) $(PYTHON_VERSION_TEX))
 
 clean:
-	rm -f $(AUX) *.pdf *.zip
+	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX)
 
 .PHONY: default all paper-submission clean check-mechanisation check-tests
