@@ -19,7 +19,6 @@ class Primitive(Enum):
     SIZED = auto()
 
 
-# Variables, the spec's x; fields and class names (c) are variables too.
 type Var = str
 
 
