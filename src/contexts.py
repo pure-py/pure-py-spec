@@ -211,7 +211,9 @@ def extend_entry(theta: ContextEntry, theta_: ContextEntry) -> ContextEntry:
     return theta_
 
 
-def disjoint_union(gamma: Context, gamma_: Context) -> Context:
+def disjoint_union[V](
+    gamma: Mapping[str, V], gamma_: Mapping[str, V]
+) -> Mapping[str, V]:
     assert gamma.keys().isdisjoint(gamma_.keys()), "overlap rejected by caller"
     return {**gamma, **gamma_}
 
