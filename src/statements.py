@@ -280,7 +280,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> StaticO
         synth_expr(s.value, ctx)
         return ASSIGNS_EMPTY
     if isinstance(s, ast.Return):
-        if returns is None:  # no return rule with an empty return type
+        if returns is None:  # no return rule with empty return type
             raise IllFormedModule(s, reasons.TopLevelReturn())
         if s.value is None:
             check_returns_none(s, returns)
