@@ -46,21 +46,21 @@ spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 
 # The Isabelle mechanisation, as a submodule so that it has a known location.
-MECHANISATION := isabelle-purepy
+ISABELLE := isabelle-purepy
 
 # A submission ships the mechanisation as it stands on main, so refuse to build
 # one from a working copy with uncommitted changes or with a checked-out commit
 # that is not on origin/main.
 check-mechanisation:
-	@test -e $(MECHANISATION)/ROOT || \
-		{ echo "$(MECHANISATION) not checked out: git submodule update --init"; exit 1; }
-	@test -z "$$(git -C $(MECHANISATION) status --porcelain)" || \
-		{ echo "$(MECHANISATION) has uncommitted changes"; exit 1; }
-	@git -C $(MECHANISATION) merge-base --is-ancestor HEAD origin/main || \
-		{ echo "$(MECHANISATION) HEAD is not in origin/main: push and merge first"; exit 1; }
+	@test -e $(ISABELLE)/ROOT || \
+		{ echo "$(ISABELLE) not checked out: git submodule update --init"; exit 1; }
+	@test -z "$$(git -C $(ISABELLE) status --porcelain)" || \
+		{ echo "$(ISABELLE) has uncommitted changes"; exit 1; }
+	@git -C $(ISABELLE) merge-base --is-ancestor HEAD origin/main || \
+		{ echo "$(ISABELLE) HEAD is not in origin/main: push and merge first"; exit 1; }
 	@command -v isabelle >/dev/null || \
-		{ echo "isabelle not on PATH: needed to check $(MECHANISATION)"; exit 1; }
-	$(MAKE) -C $(MECHANISATION) build
+		{ echo "isabelle not on PATH: needed to check $(ISABELLE)"; exit 1; }
+	$(MAKE) -C $(ISABELLE) build
 
 supplementary.zip: spec-anon.pdf check-mechanisation
 	rm -f $@ && rm -rf .submission
