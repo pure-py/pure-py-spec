@@ -218,10 +218,10 @@ def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
         declared = resolve_type(type_expr(d.returns), d, mod_ctx)
         result = check_body(d.body, body_ctx, declared)
         if not isinstance(result, Returns):
-            check_falls_off_end(mod_ctx.sigma, d, declared)
+            check_implicit_return(mod_ctx.sigma, d, declared)
 
 
-def check_falls_off_end(sigma: ClassTable, d: ast.FunctionDef, declared: Type) -> None:
+def check_implicit_return(sigma: ClassTable, d: ast.FunctionDef, declared: Type) -> None:
     if not subtype(sigma, Primitive.NONE, declared):
         raise IllFormedModule(d, reasons.MissingReturn(d.name, render(declared)))
 
