@@ -21,6 +21,7 @@ from contexts import (
     ModuleStub,
     Status,
     extend_context,
+    override_context,
     predefined_context,
 )
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
@@ -202,9 +203,9 @@ def find_binder(stmts: list[ast.stmt], x: str) -> ast.stmt | None:
 
 
 def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context:
-    stubs: Context = submods(final_ctx.M, q)
-    own = {name: final_ctx.gamma[name] for name in assigns_body(body)}
-    return {**stubs, **own}
+    return override_context(
+        submods(final_ctx.M, q), {x: final_ctx.gamma[x] for x in assigns_body(body)}
+    )
 
 
 def module_result(
