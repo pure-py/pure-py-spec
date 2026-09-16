@@ -53,13 +53,6 @@ def proper_prefixes(q: str) -> list[str]:
     return [".".join(parts[:i]) for i in range(1, len(parts))]
 
 
-def imports(s: ast.ImportFrom, gamma_src: Context, mod_ctx: ModuleContext) -> Context:
-    assert s.module is not None
-    return {
-        a.name: imported_entry(s, a.name, s.module, gamma_src, mod_ctx) for a in s.names
-    }
-
-
 def check_imports_prefix(prefix: list[ast.stmt], mod_ctx: ModuleContext) -> Context:
     if len(prefix) == 0:
         return {}
@@ -84,7 +77,7 @@ def check_import(s: ast.stmt, mod_ctx: ModuleContext) -> Context:
     for p in proper_prefixes(s.module):
         if not prefix_of(p, mod_ctx.q):
             check_module(mod_ctx.M[p], mod_ctx.M, p)
-    return imports(s, delta, mod_ctx)
+    return {a.name: imports(s, a.name, s.module, delta, mod_ctx) for a in s.names}
 
 
 def submods(M: Mapping[str, ast.Module], q: str) -> Context:
@@ -96,7 +89,7 @@ def submods(M: Mapping[str, ast.Module], q: str) -> Context:
     }
 
 
-def imported_entry(
+def imports(
     s: ast.stmt, x: str, q: str, gamma_src: Context, mod_ctx: ModuleContext
 ) -> ContextEntry:
     entry = gamma_src.get(x)
