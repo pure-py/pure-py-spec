@@ -60,18 +60,6 @@ Synchronize the project environment and install the development dependencies:
 uv sync --locked
 ```
 
-Run Ruff’s linter:
-
-```bash
-uv run --locked ruff check ./src ./test/run-all.py
-```
-
-Check formatting:
-
-```bash
-uv run --locked ruff format --check ./src ./test/run-all.py
-```
-
 Apply Ruff formatting:
 
 ```bash
