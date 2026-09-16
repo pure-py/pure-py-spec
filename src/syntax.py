@@ -392,10 +392,10 @@ def supported_import(node: ast.stmt) -> None:
 
 def supported_top_level(stmts: list[ast.stmt]) -> None:
     """A module body is its import prefix followed by a top-level statement."""
-    prefix, rest = split_imports(stmts)
-    for s in prefix:
+    imports, statement = split_imports(stmts)
+    for s in imports:
         supported_import(s)
-    for s in rest:
+    for s in statement:
         if is_import(s):
             raise Prohibited(s, "imports must precede all other statements")
         if isinstance(s, ast.ClassDef):
