@@ -147,21 +147,25 @@ def predefined_context(q: str) -> Context:
     return {**PREDEFINED_MEMBERS[q], "__name__": Primitive.STR}
 
 
-def merge_entry(sigma: ClassTable, a: ContextEntry, b: ContextEntry) -> VarEntry:
+def merge_entry(
+    sigma: ClassTable, theta: ContextEntry, theta_: ContextEntry
+) -> VarEntry:
     """Assigned in both branches gives the join of the two types; assigned in
     one alone is not definitely assigned. Only variables are assigned within a
     branch, since a class is declared at the top level alone."""
-    assert not isinstance(a, (ModuleStub, ModuleLoaded, Class, PredefinedName))
-    assert not isinstance(b, (ModuleStub, ModuleLoaded, Class, PredefinedName))
-    if a == Status.FF or b == Status.FF:
+    assert not isinstance(theta, (ModuleStub, ModuleLoaded, Class, PredefinedName))
+    assert not isinstance(theta_, (ModuleStub, ModuleLoaded, Class, PredefinedName))
+    if theta == Status.FF or theta_ == Status.FF:
         return Status.FF
-    return join(sigma, [a, b])
+    return join(sigma, [theta, theta_])
 
 
-def merge_context(sigma: ClassTable, g1: Context, g2: Context) -> VarContext:
+def merge_context(sigma: ClassTable, gamma: Context, gamma_: Context) -> VarContext:
     return {
-        k: merge_entry(sigma, g1[k], g2[k]) if k in g1 and k in g2 else Status.FF
-        for k in set(g1.keys()) | set(g2.keys())
+        x: merge_entry(sigma, gamma[x], gamma_[x])
+        if x in gamma and x in gamma_
+        else Status.FF
+        for x in set(gamma.keys()) | set(gamma_.keys())
     }
 
 
@@ -179,8 +183,8 @@ def fold_merge(sigma: ClassTable, acc: Context, branches: list[Assigns]) -> Cont
     return fold_merge(sigma, merge_context(sigma, acc, branches[0].delta), branches[1:])
 
 
-def override_context(g1: Context, g2: Context) -> Context:
-    return {**g1, **g2}
+def override_context(gamma: Context, delta: Context) -> Context:
+    return {**gamma, **delta}
 
 
 def override_outcomes(r1: StaticOutcome, r2: StaticOutcome) -> StaticOutcome:
@@ -191,18 +195,29 @@ def override_outcomes(r1: StaticOutcome, r2: StaticOutcome) -> StaticOutcome:
     return Assigns(override_context(r1.delta, r2.delta))
 
 
-def extend_entry(a: ContextEntry, b: ContextEntry) -> ContextEntry:
-    if isinstance(a, ModuleLoaded) and isinstance(b, ModuleLoaded) and a.q == b.q:
-        return ModuleLoaded(a.q, extend_context(a.members, b.members))
-    if isinstance(a, ModuleLoaded) and isinstance(b, ModuleStub) and a.q == b.q:
-        return a
-    return b
+def extend_entry(theta: ContextEntry, theta_: ContextEntry) -> ContextEntry:
+    if (
+        isinstance(theta, ModuleLoaded)
+        and isinstance(theta_, ModuleLoaded)
+        and theta.q == theta_.q
+    ):
+        return ModuleLoaded(theta.q, extend_context(theta.members, theta_.members))
+    if (
+        isinstance(theta, ModuleLoaded)
+        and isinstance(theta_, ModuleStub)
+        and theta.q == theta_.q
+    ):
+        return theta
+    return theta_
 
 
-def extend_context(g1: Context, g2: Context) -> Context:
+def extend_context(gamma: Context, gamma_: Context) -> Context:
     return {
-        **g1,
-        **{x: extend_entry(g1[x], e) if x in g1 else e for x, e in g2.items()},
+        **gamma,
+        **{
+            x: extend_entry(gamma[x], theta) if x in gamma else theta
+            for x, theta in gamma_.items()
+        },
     }
 
 
