@@ -3,7 +3,7 @@ import ast
 import reasons
 from aux import (
     Statement,
-    annotation,
+    type_expr,
     assigns_body,
     assigns_seq,
     binds_quals,
@@ -82,13 +82,13 @@ def signature(d: ast.FunctionDef, ctx: ModuleContext) -> CallableType:
     """Callable type of a definition, from its parameter and return
     annotations."""
     return CallableType(
-        tuple(resolve_type(annotated(a.annotation), a, ctx) for a in d.args.args),
-        resolve_type(annotated(d.returns), d, ctx),
+        tuple(resolve_type(type_expr(a.annotation), a, ctx) for a in d.args.args),
+        resolve_type(type_expr(d.returns), d, ctx),
     )
 
 
 def parameters(d: ast.FunctionDef, ctx: ModuleContext) -> VarContext:
-    return {a.arg: resolve_type(annotated(a.annotation), a, ctx) for a in d.args.args}
+    return {a.arg: resolve_type(type_expr(a.annotation), a, ctx) for a in d.args.args}
 
 
 def resolve_type(psi: TypeExpr, node: ast.AST, ctx: ModuleContext) -> Type:
@@ -228,7 +228,7 @@ def check_bodies(defs: list[ast.FunctionDef], ctx: ModuleContext) -> None:
         locals_ = assigns_body(d.body) - set(params)
         delta = f_names | params | {x: Status.FF for x in locals_}
         body_ctx = override_var(ctx, delta)
-        declared = resolve_type(annotated(d.returns), d, ctx)
+        declared = resolve_type(type_expr(d.returns), d, ctx)
         result = check_body(d.body, body_ctx, declared)
         if not isinstance(result, Returns):
             check_falls_off_end(d, declared)
@@ -272,7 +272,7 @@ def check_stmt(s: ast.stmt, ctx: ModuleContext, returns: Type | None) -> StaticO
         return Assigns({target.id: synth_expr(s.value, ctx)})
     if isinstance(s, ast.AnnAssign):
         assert s.value is not None and isinstance(s.target, ast.Name)
-        declared = resolve_type(annotated(s.annotation), s, ctx)
+        declared = resolve_type(type_expr(s.annotation), s, ctx)
         check_expr(s.value, declared, ctx)
         check_assign_target(s.target, captures_e(s.value))
         return Assigns({s.target.id: declared})

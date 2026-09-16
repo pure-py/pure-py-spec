@@ -325,17 +325,16 @@ def find_first_reassigning(items: list[Statement], names: set[str]) -> ast.AST:
 def own_fields(node: ast.ClassDef) -> tuple[tuple[str, TypeExpr], ...]:
     """Fields a class declares, with their type expressions."""
     return tuple(
-        (t.target.id, annotated(t.annotation))
+        (t.target.id, type_expr(t.annotation))
         for t in node.body
         if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)
     )
 
 
-def annotation(e: ast.expr | None) -> TypeExpr:
-    """Type expression an annotation carries; a definition annotates every
-    parameter and its return type, and the subset admits no other annotation."""
-    assert e is not None
-    t = parse_annotation(e)
+def type_expr(annotation: ast.expr | None) -> TypeExpr:
+    """Type expression an annotation denotes; absence already rejected by the syntax check."""
+    assert annotation is not None
+    t = parse_annotation(annotation)
     assert t is not None
     return t
 
