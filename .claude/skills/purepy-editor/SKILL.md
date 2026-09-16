@@ -36,6 +36,8 @@ description: Conventions for editing the PurePy spec and its GitHub issues; defe
 
   Test: the noun before the modifier must be the grammatical subject of the modifier's verb, and no
   "no", "neither", "every" or "each" may appear inside the agent phrase of a participle.
+  The test also catches a possessive relative, "a function whose cases overlap", where the head noun is
+  not the subject of "overlap": write "a function with overlapping cases".
 - When a sentence quantifies over a finite set it has already introduced, refer to that set definitely:
   "not matched by any of the cases" (the cases of this match), not "not matched by any case"; "each of
   the branches", not "each branch". This applies only when a specific set is in scope. A general claim
