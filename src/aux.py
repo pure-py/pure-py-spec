@@ -294,30 +294,30 @@ def captures_region_bodies(defs: list[ast.FunctionDef]) -> set[str]:
     return own | captures_region_bodies(defs[1:])
 
 
-def captures_statement(item: Statement) -> set[str]:
-    if isinstance(item, list):
-        return captures_region(item)
-    return captures(item)
+def captures_statement(s: Statement) -> set[str]:
+    if isinstance(s, list):
+        return captures_region(s)
+    return captures(s)
 
 
-def assigns_statement(item: Statement) -> set[str]:
-    if isinstance(item, list):
-        return {d.name for d in item}
-    return assigns_stmt(item)
+def assigns_statement(s: Statement) -> set[str]:
+    if isinstance(s, list):
+        return {d.name for d in s}
+    return assigns_stmt(s)
 
 
-def assigns_seq(items: list[Statement]) -> set[str]:
-    if len(items) == 0:
+def assigns_seq(ss: list[Statement]) -> set[str]:
+    if len(ss) == 0:
         return set()
-    return assigns_statement(items[0]) | assigns_seq(items[1:])
+    return assigns_statement(ss[0]) | assigns_seq(ss[1:])
 
 
-def first_assigning_statement(items: list[Statement], names: set[str]) -> ast.AST:
-    """First statement of `items` assigning a name in `names`."""
-    assert len(items) > 0
-    if not assigns_statement(items[0]).isdisjoint(names):
-        return items[0][0] if isinstance(items[0], list) else items[0]
-    return first_assigning_statement(items[1:], names)
+def first_assigning_statement(ss: list[Statement], names: set[str]) -> ast.AST:
+    """First statement of `ss` assigning a name in `names`."""
+    assert len(ss) > 0
+    if not assigns_statement(ss[0]).isdisjoint(names):
+        return ss[0][0] if isinstance(ss[0], list) else ss[0]
+    return first_assigning_statement(ss[1:], names)
 
 
 def own_fields(node: ast.ClassDef) -> tuple[tuple[str, TypeExpr], ...]:

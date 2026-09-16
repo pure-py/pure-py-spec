@@ -143,10 +143,10 @@ def check_body(
     return check_seq(statements(body), mod_ctx, returns)
 
 
-def check_top_seq(items: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
-    if len(items) == 0:
+def check_top_seq(ts: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
+    if len(ts) == 0:
         return mod_ctx
-    t, t_ = items[0], items[1:]
+    t, t_ = ts[0], ts[1:]
     r, sigma = check_top_statement(t, mod_ctx)
     assert isinstance(r, Assigns), "top-level return rejected by check_stmt"
     delta = r.delta
@@ -162,20 +162,20 @@ def check_top_seq(items: list[Statement], mod_ctx: ModuleContext) -> ModuleConte
 
 
 def check_top_statement(
-    item: Statement, mod_ctx: ModuleContext
+    t: Statement, mod_ctx: ModuleContext
 ) -> tuple[StaticOutcome, ClassTable]:
-    if isinstance(item, ast.ClassDef):
-        c, sigma = class_declared(item, mod_ctx)
-        return Assigns({item.name: c}), sigma
-    return check_statement(item, mod_ctx, None), mod_ctx.sigma
+    if isinstance(t, ast.ClassDef):
+        c, sigma = class_declared(t, mod_ctx)
+        return Assigns({t.name: c}), sigma
+    return check_statement(t, mod_ctx, None), mod_ctx.sigma
 
 
 def check_seq(
-    items: list[Statement], mod_ctx: ModuleContext, returns: Type | None = None
+    ss: list[Statement], mod_ctx: ModuleContext, returns: Type | None = None
 ) -> StaticOutcome:
-    if len(items) == 0:
+    if len(ss) == 0:
         return Assigns({})
-    s, s_ = items[0], items[1:]
+    s, s_ = ss[0], ss[1:]
     r = check_statement(s, mod_ctx, returns)
     if len(s_) == 0:
         return r
@@ -195,12 +195,12 @@ def check_captured_reassignment(s: Statement, s_: list[Statement]) -> None:
 
 
 def check_statement(
-    item: Statement, mod_ctx: ModuleContext, returns: Type | None
+    s: Statement, mod_ctx: ModuleContext, returns: Type | None
 ) -> StaticOutcome:
-    if isinstance(item, list):
-        check_mutual_region(item, mod_ctx)
-        return Assigns({d.name: signature(d, mod_ctx) for d in item})
-    return check_stmt(item, mod_ctx, returns)
+    if isinstance(s, list):
+        check_mutual_region(s, mod_ctx)
+        return Assigns({d.name: signature(d, mod_ctx) for d in s})
+    return check_stmt(s, mod_ctx, returns)
 
 
 def check_mutual_region(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
@@ -216,8 +216,8 @@ def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
         delta = {**f_names, **params, **{x: Status.FF for x in locals_}}
         body_ctx = override_gamma(mod_ctx, delta)
         declared = resolve_type(type_expr(d.returns), d, mod_ctx)
-        result = check_body(d.body, body_ctx, declared)
-        if not isinstance(result, Returns):
+        r = check_body(d.body, body_ctx, declared)
+        if not isinstance(r, Returns):
             check_implicit_return(mod_ctx.sigma, d, declared)
 
 
