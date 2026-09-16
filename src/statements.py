@@ -3,7 +3,6 @@ import ast
 import reasons
 from aux import (
     Statement,
-    type_expr,
     assigns_body,
     assigns_seq,
     binds_quals,
@@ -17,6 +16,7 @@ from aux import (
     qualified_name,
     statements,
     target_name,
+    type_expr,
 )
 from classes import Class, declared_type, field_map, field_type, fields, short_name
 from contexts import (
