@@ -11,7 +11,6 @@ from aux import (
     statements,
 )
 from contexts import (
-    PREDEFINED_MEMBERS,
     PREDEFINED_MODULES,
     Context,
     ContextEntry,
@@ -102,12 +101,6 @@ def imports(
     return entry
 
 
-def own_members(body: list[ast.stmt], q: str) -> set[str]:
-    if q in PREDEFINED_MEMBERS:
-        return set(PREDEFINED_MEMBERS[q])
-    return assigns_body(body)
-
-
 _signatures: dict[tuple[int, str], Context] = {}
 _loading: list[tuple[int, str]] = []
 
@@ -134,6 +127,8 @@ def check_module(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context:
 
 
 def check_module_(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context:
+    if q in PREDEFINED_MODULES:
+        return predefined_context(q)
     imports, stmts = split_imports(m.body)
     gamma0 = check_imports_prefix(imports, ModuleContext(gamma={}, M=M, q=q))
     body = [name_assign(q)] + stmts
@@ -152,7 +147,7 @@ def check_submodule_clash(
     M: Mapping[str, ast.Module],
     q: str,
 ) -> None:
-    clash = sorted((set(gamma0) | own_members(body, q)) & set(submods(M, q)))
+    clash = sorted((set(gamma0) | assigns_body(body)) & set(submods(M, q)))
     if len(clash) > 0:
         x = clash[0]
         node = find_binder(m.body, x)
@@ -176,10 +171,7 @@ def find_binder(stmts: list[ast.stmt], x: str) -> ast.stmt | None:
 
 def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context:
     stubs: Context = submods(final_ctx.M, q)
-    if q in PREDEFINED_MEMBERS:
-        own: Context = predefined_context(q)
-    else:
-        own = {name: final_ctx.gamma[name] for name in own_members(body, q)}
+    own = {name: final_ctx.gamma[name] for name in assigns_body(body)}
     return {**stubs, **own}
 
 
