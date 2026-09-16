@@ -1,11 +1,3 @@
-"""Shapes, and the values each denotes.
-
-A shape denotes a set of values of a type. The form `Rest` is a value of its
-type whose head is not among those it excludes, and the others are a
-constructor, a tuple, a list and a dictionary, each with shapes in place of
-sub-patterns.
-"""
-
 from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product

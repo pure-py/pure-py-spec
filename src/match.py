@@ -46,8 +46,6 @@ type Match = tuple[tuple[Shape, ...], tuple[Shape, ...], VarContext]
 type SeqMatch = tuple[tuple[Seq, ...], tuple[Seq, ...], VarContext]
 type Split = tuple[tuple[Shape, ...], tuple[Shape, ...]]
 
-NO_BINDINGS: VarContext = {}
-
 
 def match(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
     """Shapes of `k` that `p` matches, the shapes it leaves and the bindings it
@@ -101,7 +99,7 @@ def match_split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | Non
 def match_literal(k: Shape, ell: LiteralType) -> Match | None:
     if isinstance(k, Rest) and k.ty == ell:
         assert not k.heads
-        return (k,), NOTHING, NO_BINDINGS
+        return (k,), NOTHING, {}
     return None
 
 
