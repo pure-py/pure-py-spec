@@ -388,17 +388,23 @@ def main() -> None:
     check_rule_citations(r, base)
 
     if not skip_mypy:
-        print("mypy --strict src/")
+        print("mypy and ruff over src/")
         sources = sorted(str(p) for p in (ROOT / "src").glob("*.py")) + [
             str(ROOT / "test" / "run-all.py")
         ]
-        proc = subprocess.run(
-            ["mypy", "--strict", *sources], capture_output=True, text=True, check=False
-        )
-        if proc.returncode == 0:
-            r.ok("checker type-checks")
+        for tool in (
+            ["mypy", "--strict"],
+            ["ruff", "check"],
+            ["ruff", "format", "--check"],
+        ):
+            proc = subprocess.run(
+                [*tool, *sources], capture_output=True, text=True, check=False
+            )
+            if proc.returncode != 0:
+                r.bad("checker type-checks", (proc.stdout + proc.stderr).strip()[:400])
+                break
         else:
-            r.bad("checker type-checks", proc.stdout.strip()[:400])
+            r.ok("checker type-checks")
         check_mypy_tests(r, module)
 
     last = None

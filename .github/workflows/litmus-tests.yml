@@ -6,29 +6,6 @@ on:
   pull_request:
 
 jobs:
-  lint:
-    name: lint
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v6
-        with:
-          python-version: "3.12"
-          enable-cache: true
-
-      - name: Install development dependencies
-        run: uv sync --locked
-
-      - name: Run Ruff
-        run: uv run --locked ruff check ./src ./test/run-all.py
-
-      - name: Check formatting
-        run: uv run --locked ruff format --check ./src ./test/run-all.py
-
   test:
     name: test (${{ matrix.runtime }})
     runs-on: ubuntu-latest
