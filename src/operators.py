@@ -24,7 +24,6 @@ type UnaryOverload = Callable[[ClassTable, Type], ResolvedOverload | None]
 def both(
     sigma: ClassTable, s: Type, t: Type, bound: Type, result: Type
 ) -> ResolvedOverload | None:
-    """An overload bounding both positions by `bound`."""
     return (
         ((bound, bound), result)
         if subtype(sigma, s, bound) and subtype(sigma, t, bound)
@@ -236,8 +235,6 @@ UNARY_NAMES: dict[type[ast.AST], str] = {
 def overloads_binary(
     sigma: ClassTable, op: str, s: Type, t: Type
 ) -> list[ResolvedOverload]:
-    """Resolved overloads of `op` at the operand types, closed under
-    base-typing."""
     rows = [r for ov in BINARY_OVERLOADS[op] if (r := ov(sigma, s, t)) is not None] + [
         r
         for ov in BINARY_OVERLOADS[op]
@@ -256,8 +253,6 @@ def overloads_unary(sigma: ClassTable, op: str, s: Type) -> list[ResolvedOverloa
 def minimum(
     sigma: ClassTable, rows: Sequence[ResolvedOverload]
 ) -> ResolvedOverload | None:
-    """The least element under the bounds order, or nothing where none
-    exists."""
     for cand in rows:
         if all(
             all(subtype(sigma, a, b) for a, b in zip(cand[0], other[0]))

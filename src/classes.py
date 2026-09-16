@@ -6,9 +6,6 @@ from type_syntax import Type
 
 @dataclass(frozen=True)
 class Class:
-    """A class, identified by its qualified name: two classes with the same
-    name are the same class, and a class is also the type of its instances."""
-
     name: str
 
     def __repr__(self) -> str:
@@ -40,7 +37,6 @@ def fields(sigma: ClassTable, c: Class) -> tuple[str, ...]:
 
 
 def field_type(sigma: ClassTable, c: Class, x: str) -> Type | None:
-    """Declared type of field `x`, if the class records one."""
     entry = sigma[c]
     own = dict(entry.own_fields)
     if x in own:
@@ -49,7 +45,6 @@ def field_type(sigma: ClassTable, c: Class, x: str) -> Type | None:
 
 
 def declared_type(sigma: ClassTable, c: Class, x: str) -> Type:
-    """Declared type of field `x` of `c`."""
     t = field_type(sigma, c, x)
     assert t is not None
     return t

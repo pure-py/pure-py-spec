@@ -145,8 +145,6 @@ PRIMITIVE_NAMES = {name: t for t, name in PRIMITIVE_SPELLINGS.items()}
 
 
 def render(t: Type) -> str:
-    """The type as it is written in an annotation, a class by its qualified
-    name."""
     if isinstance(t, Primitive):
         return PRIMITIVE_SPELLINGS[t]
     if isinstance(t, ListType):
@@ -166,8 +164,6 @@ def render(t: Type) -> str:
 
 
 def base_type(v: object) -> Type:
-    """The base type of a literal, or of a type: a literal type at the base type
-    of its literal, and any other type unchanged."""
     if isinstance(v, LiteralType):
         return base_type(v.value)
     if isinstance(
@@ -211,8 +207,6 @@ def parse_annotation(e: ast.expr) -> TypeExpr | None:
 
 
 def dotted_name(e: ast.expr) -> str | None:
-    """The qualified name a chain of attribute references spells, or nothing
-    where the chain does not start at a name."""
     if isinstance(e, ast.Name):
         return e.id
     if isinstance(e, ast.Attribute):
@@ -241,8 +235,6 @@ def parse_subscript(e: ast.Subscript) -> TypeExpr | None:
 
 
 def literal_type(e: ast.expr) -> LiteralType | None:
-    """Type of a literal `l` or a negated number `-n`, or nothing where `e` is
-    neither."""
     if isinstance(e, ast.Constant):
         return LiteralType(e.value)
     if not (isinstance(e, ast.UnaryOp) and isinstance(e.op, ast.USub)):

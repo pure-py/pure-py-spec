@@ -24,10 +24,6 @@ def join_two(sigma: ClassTable, s: Type, t: Type) -> Type:
 
 
 def meet(sigma: ClassTable, s: Type, t: Type) -> Type:
-    """Greatest type below both: the smaller where they are comparable, and
-    otherwise distributing over a union, componentwise on tuples of the same
-    length, contravariantly on callables of the same arity, and `Never` on any
-    other pair."""
     if subtype(sigma, s, t):
         return s
     if subtype(sigma, t, s):
@@ -95,7 +91,6 @@ def subtype(sigma: ClassTable, s: Type, t: Type) -> bool:
 
 
 def equivalent(sigma: ClassTable, s: Type, t: Type) -> bool:
-    """Each a subtype of the other."""
     return subtype(sigma, s, t) and subtype(sigma, t, s)
 
 

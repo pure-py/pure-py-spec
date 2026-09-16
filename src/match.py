@@ -47,8 +47,6 @@ type Split = tuple[tuple[Shape, ...], tuple[Shape, ...]]
 
 
 def match(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
-    """Shapes of `k` that `p` matches, the shapes it leaves and the bindings it
-    makes, or nothing where `p` cannot match `k`."""
     if isinstance(p, ast.MatchAs):
         return match_as(k, p, mod_ctx)
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
@@ -66,8 +64,6 @@ def match(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
 
 
 def match_as(k: Shape, p: ast.MatchAs, mod_ctx: ModuleContext) -> Match | None:
-    """A variable or wildcard matches the whole shape; a named sub-pattern binds
-    at the join over the shapes it matched."""
     if p.pattern is None:
         bare: VarContext = {} if p.name is None else {p.name: shape_type(k)}
         return (k,), (), bare
@@ -82,8 +78,6 @@ def match_as(k: Shape, p: ast.MatchAs, mod_ctx: ModuleContext) -> Match | None:
 
 
 def match_split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
-    """The shapes the split gives, matched against the pattern, with the shapes
-    the split leaves passed into the residual."""
     parts = split(k, p, mod_ctx)
     if parts is None:
         return None
@@ -117,8 +111,6 @@ def match_list(k: Shape, p: PatList, mod_ctx: ModuleContext) -> Match | None:
 
 
 def match_dict(k: Shape, p: ast.MatchMapping, mod_ctx: ModuleContext) -> Match | None:
-    """Every key of the pattern is bound by the shape, so the keys match as a
-    sequence."""
     if not isinstance(k, Dict):
         return None
     ws = items(p)
@@ -144,8 +136,6 @@ def match_constr(k: Shape, p: ast.MatchClass, mod_ctx: ModuleContext) -> Match |
 
 
 def split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Split | None:
-    """Shapes of `k` carrying the head that `p` tests for, and the shapes `k`
-    leaves without that head, or nothing where `k` does not split for `p`."""
     sigma = mod_ctx.sigma
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
         return split_literal(sigma, k, literal_of(p))
@@ -176,8 +166,6 @@ def split_literal(sigma: ClassTable, k: Shape, ell: LiteralType) -> Split | None
 
 
 def split_tuple(sigma: ClassTable, k: Shape, n: int) -> Split | None:
-    """No head types at a tuple type, so the shape excludes nothing and the
-    split leaves nothing."""
     if not (isinstance(k, Rest) and isinstance(k.ty, TupleType)):
         return None
     if len(k.ty.components) != n:
@@ -199,7 +187,6 @@ def split_list(sigma: ClassTable, k: Shape, n: int) -> Split | None:
 def split_dict(
     sigma: ClassTable, k: Shape, ws: tuple[tuple[str, ast.pattern], ...]
 ) -> Split | None:
-    """The first key of the pattern which the shape does not bind."""
     if not isinstance(k, Dict):
         return None
     bound = dict(k.bound)
@@ -213,8 +200,6 @@ def split_dict(
 
 
 def split_class(sigma: ClassTable, k: Rest, cls: Class) -> Split | None:
-    """Instances of the meet of the shape's type and the pattern's class, with
-    the heads which type at that class kept."""
     if below_excluded(sigma, cls, k.heads):
         return None
     low = meet(sigma, k.ty, ClassType(cls))
@@ -229,8 +214,6 @@ def split_class(sigma: ClassTable, k: Rest, cls: Class) -> Split | None:
 
 
 def split_subclass(sigma: ClassTable, k: Constr, cls: Class) -> Split | None:
-    """Instances of a proper subclass of the shape's class, whose fields are
-    those of the shape followed by the ones the subclass declares."""
     if cls == k.c or not subtype(sigma, ClassType(cls), ClassType(k.c)):
         return None
     if below_excluded(sigma, cls, k.heads):
@@ -244,7 +227,6 @@ def split_subclass(sigma: ClassTable, k: Constr, cls: Class) -> Split | None:
 
 
 def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
-    """Class the pattern names."""
     cls = class_of_name(p.cls, mod_ctx)
     if cls is None:
         raise IllFormedModule(p, reasons.UnknownClassInPattern(qualified_name(p.cls)))
@@ -254,7 +236,6 @@ def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
 def pattern_seq(
     sigma: ClassTable, cls: Class, p: ast.MatchClass
 ) -> tuple[ast.pattern, ...]:
-    """Pattern the arguments supply for each field of `cls`, by field-map."""
     args = field_map(sigma, cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
     if args is None:
         raise no_field_map(sigma, cls, p)
@@ -264,8 +245,6 @@ def pattern_seq(
 def match_seq(
     ks: Seq, ps: tuple[ast.pattern, ...], node: ast.pattern, mod_ctx: ModuleContext
 ) -> SeqMatch | None:
-    """Sequences that match the sequence of patterns, and sequences that fail at
-    one position."""
     matches = [match(k, p, mod_ctx) for k, p in zip(ks, ps)]
     if any(s is None for s in matches):
         return None
@@ -283,8 +262,6 @@ def match_seq(
 def match_shapes(
     ks: tuple[Shape, ...], p: ast.pattern, mod_ctx: ModuleContext
 ) -> Match | None:
-    """Shapes of `ks` that `p` matches, with the shapes it does not match passed
-    into the residual, or nothing where it matches none of them."""
     matches = {k: s for k in ks if (s := match(k, p, mod_ctx)) is not None}
     if len(matches) == 0:
         return None
@@ -336,9 +313,6 @@ def seq_safe(p: ast.pattern, t: Type, mod_ctx: ModuleContext) -> bool:
 
 
 def disjoint_union(deltas: list[VarContext], node: ast.AST) -> VarContext:
-    """Bindings of sub-patterns taken together, which compose only where the
-    variables are distinct, so a pattern binding a name twice has no
-    derivation."""
     merged: VarContext = {}
     for delta in deltas:
         repeated = sorted(merged.keys() & delta.keys())
@@ -349,14 +323,10 @@ def disjoint_union(deltas: list[VarContext], node: ast.AST) -> VarContext:
 
 
 def join_deltas(sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
-    """Bindings of a pattern that matches more than one shape, at the join of
-    the types the shapes give each variable."""
     return {x: join_entries(sigma, [d[x] for d in deltas]) for x in deltas[0]}
 
 
 def join_entries(sigma: ClassTable, entries: list[VarEntry]) -> VarEntry:
-    """Bindings a pattern gives across the shapes it matches are all types, so
-    they join."""
     types = [e for e in entries if not isinstance(e, Status)]
     assert len(types) == len(entries)
     return join(sigma, types)
@@ -399,7 +369,6 @@ def no_field_map(sigma: ClassTable, cls: Class, p: ast.MatchClass) -> IllFormedM
 
 
 def with_keys(k: Dict, ws: tuple[str, ...], ks: Seq) -> Dict:
-    """Dictionary shape with each key of `ws` at the shape the sequence gives it."""
     bound = dict(k.bound) | dict(zip(ws, ks))
     return Dict(k.value, tuple(sorted(bound.items())), k.heads)
 
@@ -414,7 +383,6 @@ def dict_key(k: ast.expr) -> str:
 
 
 def literal_of(p: ast.pattern) -> LiteralType:
-    """Type of a literal pattern."""
     if isinstance(p, ast.MatchSingleton):
         return LiteralType(p.value)
     assert isinstance(p, ast.MatchValue)

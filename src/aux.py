@@ -38,7 +38,6 @@ def extend_region(
 
 
 def binds(pattern: ast.pattern) -> set[str]:
-    """Variables the pattern introduces."""
     if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
         return set()
     if isinstance(pattern, ast.MatchAs):
@@ -114,7 +113,6 @@ def dict_keys(e: ast.Dict) -> list[ast.expr]:
 
 
 def target_name(g: ast.comprehension) -> str:
-    """Variable of a generator, which the subset restricts to a name."""
     assert isinstance(g.target, ast.Name)
     return g.target.id
 
@@ -323,7 +321,6 @@ def first_assigning_statement(items: list[Statement], names: set[str]) -> ast.AS
 
 
 def own_fields(node: ast.ClassDef) -> tuple[tuple[str, TypeExpr], ...]:
-    """Fields a class declares, with their type expressions."""
     return tuple(
         (t.target.id, type_expr(t.annotation))
         for t in node.body
@@ -332,7 +329,6 @@ def own_fields(node: ast.ClassDef) -> tuple[tuple[str, TypeExpr], ...]:
 
 
 def type_expr(annotation: ast.expr | None) -> TypeExpr:
-    """Type expression parsed from annotation."""
     assert annotation is not None, "missing annotation rejected by syntax check"
     t = parse_annotation(annotation)
     assert t is not None, "unsupported annotation rejected by syntax check"

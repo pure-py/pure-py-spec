@@ -391,7 +391,6 @@ def supported_import(node: ast.stmt) -> None:
 
 
 def supported_top_level(body: list[ast.stmt]) -> None:
-    """A module body is its import prefix followed by a top-level statement."""
     imports, stmts = split_imports(body)
     for s in imports:
         supported_import(s)

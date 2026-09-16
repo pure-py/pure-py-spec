@@ -379,9 +379,6 @@ class UnknownField:
 
 @dataclass(frozen=True)
 class NotSynthesised:
-    """No synthesis rule gives this expression a type, so it cannot stand where
-    a rule demands one."""
-
     def message(self) -> str:
         return "cannot determine the type of this expression"
 

@@ -88,8 +88,6 @@ from type_syntax import (
 
 
 def signature(d: ast.FunctionDef, mod_ctx: ModuleContext) -> CallableType:
-    """Callable type of a definition, from its parameter and return
-    annotations."""
     return CallableType(
         tuple(resolve_type(type_expr(a.annotation), a, mod_ctx) for a in d.args.args),
         resolve_type(type_expr(d.returns), d, mod_ctx),
@@ -103,9 +101,6 @@ def parameters(d: ast.FunctionDef, mod_ctx: ModuleContext) -> VarContext:
 
 
 def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
-    """Type that type expression `psi` denotes: each name it is written with
-    must be in scope, a class name resolving to the class that is its type and
-    every other spelling to the predefined entry its module gives it."""
     if isinstance(psi, Primitive):
         in_scope(PRIMITIVE_SPELLINGS[psi], node, mod_ctx)
         return psi
@@ -140,8 +135,6 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
 
 
 def in_scope(x: str, node: ast.AST, mod_ctx: ModuleContext) -> None:
-    """A name an annotation is written with must still be the predefined one,
-    which an import brings into scope and an assignment takes away."""
     if not isinstance(mod_ctx.gamma.get(x), PredefinedName):
         raise IllFormedModule(node, reasons.AnnotationNameNotInScope(x))
 
@@ -149,14 +142,11 @@ def in_scope(x: str, node: ast.AST, mod_ctx: ModuleContext) -> None:
 def check_body(
     body: list[ast.stmt], mod_ctx: ModuleContext, returns: Type | None = None
 ) -> StaticOutcome:
-    """Check a block in a function declared to return `returns`."""
     outcome, _ = check_seq(statements(body), mod_ctx, returns)
     return outcome
 
 
 def check_top_seq(items: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
-    """Check a module body's top-level statements, threading the context, and
-    give the context after them; class declarations are top-level forms."""
     if len(items) == 0:
         return mod_ctx
     head, tail = items[0], items[1:]
@@ -176,9 +166,6 @@ def check_top_seq(items: list[Statement], mod_ctx: ModuleContext) -> ModuleConte
 def check_top_statement(
     item: Statement, mod_ctx: ModuleContext
 ) -> tuple[StaticOutcome, ClassTable]:
-    """A class declaration is checked here and extends the class table; any
-    other top-level statement is a plain statement, checked with no return type
-    (top-stmt)."""
     if isinstance(item, ast.ClassDef):
         c, sigma = class_declared(item, mod_ctx)
         return Assigns({item.name: c}), sigma
@@ -188,9 +175,6 @@ def check_top_statement(
 def check_seq(
     items: list[Statement], mod_ctx: ModuleContext, returns: Type | None = None
 ) -> tuple[StaticOutcome, ModuleContext]:
-    """Check a sequence, threading the context through it, and give its static
-    outcome and the context after it; nothing may follow a statement that
-    definitely returns."""
     if len(items) == 0:
         return ASSIGNS_EMPTY, mod_ctx
     head, tail = items[0], items[1:]
@@ -207,7 +191,6 @@ def check_seq(
 
 
 def check_captured_reassignment(head: Statement, tail: list[Statement]) -> None:
-    """A name captured by `head` is not reassigned in `tail`."""
     reassigned = captures_statement(head) & assigns_seq(tail)
     if len(reassigned) > 0:
         node = first_assigning_statement(tail, reassigned)
@@ -250,8 +233,6 @@ def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
 
 
 def check_falls_off_end(sigma: ClassTable, d: ast.FunctionDef, declared: Type) -> None:
-    """A body that does not definitely return falls off the end, giving None,
-    so the declared type must admit it."""
     if not subtype(sigma, Primitive.NONE, declared):
         raise IllFormedModule(d, reasons.MissingReturn(d.name, render(declared)))
 
@@ -340,8 +321,6 @@ def check_match_cases(
 def match_cases(
     cases: list[ast.match_case], subject: Type, mod_ctx: ModuleContext
 ) -> tuple[list[VarContext], bool]:
-    """Bindings of each case, taken by matching against the residual, and
-    whether some value of the scrutinee type falls through."""
     seed = shapes(mod_ctx.sigma, subject, frozenset())
     left = seed
     deltas: list[VarContext] = []
@@ -383,16 +362,12 @@ def check_case(
     mod_ctx: ModuleContext,
     returns: Type | None,
 ) -> StaticOutcome:
-    """Result of one case, whose body is checked under the bindings its pattern
-    gives."""
     return override_outcomes(
         Assigns(delta), check_body(case.body, override_gamma(mod_ctx, delta), returns)
     )
 
 
 def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
-    """Type `e` synthesises. An expression with no synthesis rule, such as a
-    lambda or an empty list, is rejected here and must be checked instead."""
     if isinstance(e, ast.Name):
         if not is_assigned(mod_ctx, e.id):
             if module_of(mod_ctx, e.id) is not None:
@@ -513,8 +488,6 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
 
 
 def field_of(obj: Type, e: ast.Attribute, mod_ctx: ModuleContext) -> Type:
-    """The type of a field of an object of type `obj`; at a union, the join
-    over the members."""
     if isinstance(obj, UnionType):
         return join(
             mod_ctx.sigma,
@@ -533,8 +506,6 @@ def subscript(e: ast.Subscript, mod_ctx: ModuleContext) -> Type:
 
 
 def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) -> Type:
-    """The type of a subscript, given the type of the container; at a union,
-    the join over the members."""
     if isinstance(container, UnionType):
         return join(
             mod_ctx.sigma,
@@ -560,8 +531,6 @@ def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) ->
 def tuple_subscript(
     container: TupleType, index: ast.expr, mod_ctx: ModuleContext
 ) -> Type:
-    """A literal index gives the component at that position, counting from the
-    end where it is negative; any other index of type int gives their join."""
     m = len(container.components)
     actual = synth_expr(index, mod_ctx)
     i = literal_index(actual)
@@ -584,9 +553,6 @@ def literal_index(t: Type) -> int | None:
 
 
 def branch_type(e: ast.IfExp, mod_ctx: ModuleContext) -> Type:
-    """A conditional expression synthesises at the join of the types its
-    synthesising branches give, which must not be none, the other branch
-    checking against that join."""
     branches = [e.body, e.orelse]
     synthesising = [x for x in branches if synthesises(x)]
     if len(synthesising) == 0:
@@ -599,8 +565,6 @@ def branch_type(e: ast.IfExp, mod_ctx: ModuleContext) -> Type:
 
 
 def list_type(e: ast.expr, elts: list[ast.expr], mod_ctx: ModuleContext) -> ListType:
-    """A list synthesises at the join of the base types of the elements that
-    synthesise, which must not be none, the others checking against it."""
     synthesising = [x for x in elts if synthesises(x)]
     if len(synthesising) == 0:
         raise IllFormedModule(e, reasons.NotSynthesised())
@@ -612,9 +576,6 @@ def list_type(e: ast.expr, elts: list[ast.expr], mod_ctx: ModuleContext) -> List
 
 
 def synthesises(e: ast.expr) -> bool:
-    """Whether some synthesis rule has the form of `e`: a lambda and an empty
-    list or dictionary have none, and a container or conditional expression has
-    one where its parts do."""
     if isinstance(e, ast.Lambda):
         return False
     if isinstance(e, ast.IfExp):
@@ -635,21 +596,16 @@ def synthesises(e: ast.expr) -> bool:
 
 
 def dict_type(e: ast.expr, values: list[ast.expr], mod_ctx: ModuleContext) -> DictType:
-    """A dictionary synthesises at the type of the list of its values."""
     return DictType(list_type(e, values, mod_ctx).elem)
 
 
 def call(e: ast.Call, mod_ctx: ModuleContext) -> Type:
-    """The result type of a call, checking each argument against its parameter
-    type; the callee must be a callable of the same arity."""
     if isinstance(e.func, ast.Lambda):
         return applied_lambda(e.func, e, mod_ctx)
     return result_type(synth_expr(e.func, mod_ctx), e, mod_ctx)
 
 
 def result_type(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> Type:
-    """The result of a call at callee type `fn`; at a union, the join over the
-    members."""
     if isinstance(fn, UnionType):
         return join(
             mod_ctx.sigma,
@@ -665,13 +621,10 @@ def result_type(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> Type:
 
 
 def applied_lambda(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> Type:
-    """A lambda applied to arguments takes its parameter types from the types
-    the arguments synthesise, and gives the type of its body."""
     return synth_expr(f.body, override_gamma(mod_ctx, lambda_arguments(f, e, mod_ctx)))
 
 
 def lambda_arguments(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> VarContext:
-    """Parameters of an applied lambda, at the types its arguments synthesise."""
     params = [a.arg for a in f.args.args]
     if len(params) != len(e.args):
         raise IllFormedModule(e, reasons.CallArityMismatch(len(params), len(e.args)))
@@ -679,9 +632,6 @@ def lambda_arguments(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> VarC
 
 
 def check_expr(e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
-    """Check `e` against `expected`. A container display checks its parts against
-    the parts of the expected type; anything else synthesises and must be below
-    it."""
     if isinstance(e, ast.Call) and isinstance(e.func, ast.Lambda):
         check_expr(
             e.func.body,
@@ -729,8 +679,6 @@ def check_expr(e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
 
 
 def check_lambda(e: ast.Lambda, expected: Type, mod_ctx: ModuleContext) -> None:
-    """Check a lambda against a callable type, binding each parameter at the
-    type the callable gives it."""
     params = [a.arg for a in e.args.args]
     if not isinstance(expected, CallableType):
         raise IllFormedModule(e, reasons.TypeMismatch(render(expected), "a lambda"))
@@ -759,8 +707,6 @@ def binary(
 def qual_context(
     elts: list[ast.expr], generators: list[ast.comprehension], mod_ctx: ModuleContext
 ) -> ModuleContext:
-    """Context a comprehension body is typed in, extended by the bindings of its
-    qualifiers."""
     delta = check_quals(generators, mod_ctx)
     captured = captures_e_list(elts) & binds_quals(generators)
     if len(captured) > 0:
@@ -772,8 +718,6 @@ def qual_context(
 def check_quals(
     generators: list[ast.comprehension], mod_ctx: ModuleContext
 ) -> VarContext:
-    """Bindings the qualifiers introduce, each generator binding its target at
-    the element type of the value it draws from."""
     if len(generators) == 0:
         return {}
     g = generators[0]
@@ -789,7 +733,6 @@ def check_quals(
 
 
 def elem_type(sigma: ClassTable, t: Type) -> Type | None:
-    """Type of the elements a generator draws from a value of type `t`."""
     if isinstance(t, ListType):
         return t.elem
     if t == Primitive.STR:
@@ -805,7 +748,6 @@ def elem_type(sigma: ClassTable, t: Type) -> Type | None:
 
 
 def elem_entry(e: ast.expr, mod_ctx: ModuleContext) -> Type:
-    """Type a generator binds its target at."""
     t = synth_expr(e, mod_ctx)
     elem = elem_type(mod_ctx.sigma, t)
     if elem is None:
@@ -816,8 +758,6 @@ def elem_entry(e: ast.expr, mod_ctx: ModuleContext) -> Type:
 def class_declared(
     node: ast.ClassDef, mod_ctx: ModuleContext
 ) -> tuple[Class, ClassTable]:
-    """Class of a declaration (class, class-extend), and the class table
-    extended by its entry."""
     if not isinstance(mod_ctx.gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.DecoratorNotInScope("dataclass"))
     own = tuple((x, resolve_type(psi, node, mod_ctx)) for x, psi in own_fields(node))
