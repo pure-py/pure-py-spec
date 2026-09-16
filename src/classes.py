@@ -21,7 +21,7 @@ class ClassTableEntry:
 type ClassTable = Mapping[Class, ClassTableEntry]
 
 
-def short_name(c: Class) -> str:
+def short_name(c: Class) -> Var:
     return c.name.rsplit(".", 1)[-1]
 
 
