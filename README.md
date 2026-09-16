@@ -126,6 +126,9 @@ avoid spurious diffs:
 - Citation key formula: auth.lower + year
 - Fields to omit from export: abstract, keywords
 
+Export the library to `tex/zotero-export.bib`. A reference not yet in the library goes in
+`tex/additional-refs.bib` by hand until it is imported.
+
 ## Extensions
 
 Implementations are allowed to have additional behaviours and syntax beyond the PurePy spec, as long as they maintain compatibility with the PurePy subset. For example, Python itself supports many additional features, like mutable variables and exceptions; Fluid has a matrix literal notation and allows functions to be defined by pattern-matching clauses.
