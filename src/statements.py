@@ -221,7 +221,9 @@ def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
             check_implicit_return(mod_ctx.sigma, d, declared)
 
 
-def check_implicit_return(sigma: ClassTable, d: ast.FunctionDef, declared: Type) -> None:
+def check_implicit_return(
+    sigma: ClassTable, d: ast.FunctionDef, declared: Type
+) -> None:
     if not subtype(sigma, Primitive.NONE, declared):
         raise IllFormedModule(d, reasons.MissingReturn(d.name, render(declared)))
 
