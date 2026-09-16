@@ -340,8 +340,6 @@ def map_seq_match(form: Callable[[Seq], Shape], seqs: SeqMatch | None) -> Match 
 
 
 def padded(ps: tuple[ast.pattern, ...], n: int) -> tuple[ast.pattern, ...]:
-    """Pattern sequence padded with wildcards, for a shape of a subclass whose
-    extra fields the pattern does not name."""
     return ps + tuple(ast.MatchAs() for _ in range(n - len(ps)))
 
 
