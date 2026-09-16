@@ -92,13 +92,9 @@ def check_import(s: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, ClassTab
     for p in proper_prefixes(s.module):
         if not prefix_of(p, mod_ctx.q):
             _, sigma = check_module(mod_ctx.M[p], mod_ctx.M, p, sigma)
-    gamma: Context = {}
-    for a in s.names:
-        theta, sigma = imports(
-            s, a.name, s.module, delta, replace(mod_ctx, sigma=sigma)
-        )
-        gamma = {**gamma, a.name: theta}
-    return gamma, sigma
+    return imports_seq(
+        s, [a.name for a in s.names], s.module, delta, replace(mod_ctx, sigma=sigma)
+    )
 
 
 def submods(M: Mapping[str, ast.Module], q: str) -> Context:
@@ -108,6 +104,18 @@ def submods(M: Mapping[str, ast.Module], q: str) -> Context:
             name[len(q) + 1 :].split(".")[0] for name in M if name.startswith(f"{q}.")
         }
     }
+
+
+def imports_seq(
+    s: ast.stmt, names: list[str], q: str, gamma_src: Context, mod_ctx: ModuleContext
+) -> tuple[Context, ClassTable]:
+    if len(names) == 0:
+        return {}, mod_ctx.sigma
+    theta, sigma = imports(s, names[0], q, gamma_src, mod_ctx)
+    gamma, sigma_ = imports_seq(
+        s, names[1:], q, gamma_src, replace(mod_ctx, sigma=sigma)
+    )
+    return override_context({names[0]: theta}, gamma), sigma_
 
 
 def imports(
