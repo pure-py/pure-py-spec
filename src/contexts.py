@@ -177,22 +177,22 @@ def merge_outcomes(sigma: ClassTable, rs: list[StaticOutcome]) -> StaticOutcome:
     return Assigns(fold_merge(sigma, delta, assigns_branches[1:]))
 
 
-def fold_merge(sigma: ClassTable, acc: Context, branches: list[Assigns]) -> Context:
-    if len(branches) == 0:
-        return acc
-    return fold_merge(sigma, merge_context(sigma, acc, branches[0].delta), branches[1:])
+def fold_merge(sigma: ClassTable, delta: Context, rs: list[Assigns]) -> Context:
+    if len(rs) == 0:
+        return delta
+    return fold_merge(sigma, merge_context(sigma, delta, rs[0].delta), rs[1:])
 
 
 def override_context(gamma: Context, delta: Context) -> Context:
     return {**gamma, **delta}
 
 
-def override_outcomes(r1: StaticOutcome, r2: StaticOutcome) -> StaticOutcome:
-    if isinstance(r1, Returns):
-        return r1
-    if isinstance(r2, Returns):
-        return r2
-    return Assigns(override_context(r1.delta, r2.delta))
+def override_outcomes(r: StaticOutcome, r_: StaticOutcome) -> StaticOutcome:
+    if isinstance(r, Returns):
+        return r
+    if isinstance(r_, Returns):
+        return r_
+    return Assigns(override_context(r.delta, r_.delta))
 
 
 def extend_entry(theta: ContextEntry, theta_: ContextEntry) -> ContextEntry:
