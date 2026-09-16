@@ -52,12 +52,12 @@ class ModuleContext:
     gamma: Context
     M: Mapping[QualifiedName, ast.Module]
     q: QualifiedName
-    sigma: ClassTable
+    Sigma: ClassTable
 
 
 def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
     return ModuleContext(
-        gamma={**mod_ctx.gamma, **delta}, M=mod_ctx.M, q=mod_ctx.q, sigma=mod_ctx.sigma
+        gamma={**mod_ctx.gamma, **delta}, M=mod_ctx.M, q=mod_ctx.q, Sigma=mod_ctx.Sigma
     )
 
 
@@ -158,7 +158,7 @@ def predefined_context(q: QualifiedName) -> Context:
 
 
 def merge_entry(
-    sigma: ClassTable, theta: ContextEntry, theta_: ContextEntry
+    Sigma: ClassTable, theta: ContextEntry, theta_: ContextEntry
 ) -> VarEntry:
     """Assigned in both branches gives the join of the two types; assigned in
     one alone is not definitely assigned. Only variables are assigned within a
@@ -167,30 +167,30 @@ def merge_entry(
     assert not isinstance(theta_, (ModuleStub, ModuleLoaded, Class, PredefinedName))
     if theta == Status.FF or theta_ == Status.FF:
         return Status.FF
-    return join_seq(sigma, [theta, theta_])
+    return join_seq(Sigma, [theta, theta_])
 
 
-def merge_context(sigma: ClassTable, gamma: Context, gamma_: Context) -> VarContext:
+def merge_context(Sigma: ClassTable, gamma: Context, gamma_: Context) -> VarContext:
     return {
-        x: merge_entry(sigma, gamma[x], gamma_[x])
+        x: merge_entry(Sigma, gamma[x], gamma_[x])
         if x in gamma and x in gamma_
         else Status.FF
         for x in set(gamma.keys()) | set(gamma_.keys())
     }
 
 
-def merge_outcomes(sigma: ClassTable, rs: list[StaticOutcome]) -> StaticOutcome:
+def merge_outcomes(Sigma: ClassTable, rs: list[StaticOutcome]) -> StaticOutcome:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return Returns()
     delta = assigns_branches[0].delta
-    return Assigns(fold_merge(sigma, delta, assigns_branches[1:]))
+    return Assigns(fold_merge(Sigma, delta, assigns_branches[1:]))
 
 
-def fold_merge(sigma: ClassTable, delta: Context, rs: list[Assigns]) -> Context:
+def fold_merge(Sigma: ClassTable, delta: Context, rs: list[Assigns]) -> Context:
     if len(rs) == 0:
         return delta
-    return fold_merge(sigma, merge_context(sigma, delta, rs[0].delta), rs[1:])
+    return fold_merge(Sigma, merge_context(Sigma, delta, rs[0].delta), rs[1:])
 
 
 def override_context(gamma: Context, delta: Context) -> Context:
@@ -235,9 +235,9 @@ def disjoint_union[V](
     return {**gamma, **gamma_}
 
 
-def join_context(sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
+def join_context(Sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
     return {
-        x: join_seq(sigma, binding_types([delta[x] for delta in deltas]))
+        x: join_seq(Sigma, binding_types([delta[x] for delta in deltas]))
         for x in deltas[0]
     }
 

@@ -67,45 +67,47 @@ def shape_type(k: Shape) -> Type:
     return DictType(k.value)
 
 
-def shapes(sigma: ClassTable, t: Type, heads: frozenset[Head]) -> Shapes:
-    if isinstance(t, UnionType):
-        left = shapes(sigma, t.left, typed_heads(sigma, heads, t.left))
-        right = shapes(sigma, t.right, typed_heads(sigma, heads, t.right))
+def shapes(Sigma: ClassTable, tau: Type, heads: frozenset[Head]) -> Shapes:
+    if isinstance(tau, UnionType):
+        left = shapes(Sigma, tau.left, typed_heads(Sigma, heads, tau.left))
+        right = shapes(Sigma, tau.right, typed_heads(Sigma, heads, tau.right))
         return left + tuple(k for k in right if k not in left)
-    if isinstance(t, LiteralType) and t in heads:
+    if isinstance(tau, LiteralType) and tau in heads:
         return ()
-    if t == Primitive.BOOL and {LiteralType(True), LiteralType(False)} <= heads:
+    if tau == Primitive.BOOL and {LiteralType(True), LiteralType(False)} <= heads:
         return ()
-    if t == Primitive.NONE and LiteralType(None) in heads:
+    if tau == Primitive.NONE and LiteralType(None) in heads:
         return ()
-    if isinstance(t, ClassType) and below_excluded(sigma, t.c, heads):
+    if isinstance(tau, ClassType) and below_excluded(Sigma, tau.c, heads):
         return ()
-    if t == Primitive.NEVER:
+    if tau == Primitive.NEVER:
         return ()
-    if isinstance(t, DictType):
+    if isinstance(tau, DictType):
         assert not heads  # no head is typed at a dictionary type
-        return (Dict(t.value, (), frozenset()),)
-    return (Rest(t, heads),)
+        return (Dict(tau.value, (), frozenset()),)
+    return (Rest(tau, heads),)
 
 
-def head_typed(sigma: ClassTable, h: Head, t: Type) -> bool:
+def head_typed(Sigma: ClassTable, h: Head, tau: Type) -> bool:
     if isinstance(h, Class):
-        return subtype(sigma, ClassType(h), t)
+        return subtype(Sigma, ClassType(h), tau)
     if isinstance(h, LiteralType):
-        return subtype(sigma, h, t)
-    return isinstance(t, ListType)
+        return subtype(Sigma, h, tau)
+    return isinstance(tau, ListType)
 
 
-def typed_heads(sigma: ClassTable, heads: frozenset[Head], t: Type) -> frozenset[Head]:
-    return frozenset(h for h in heads if head_typed(sigma, h, t))
+def typed_heads(
+    Sigma: ClassTable, heads: frozenset[Head], tau: Type
+) -> frozenset[Head]:
+    return frozenset(h for h in heads if head_typed(Sigma, h, tau))
 
 
-def below_excluded(sigma: ClassTable, c: Class, heads: frozenset[Head]) -> bool:
+def below_excluded(Sigma: ClassTable, c: Class, heads: frozenset[Head]) -> bool:
     return any(
-        isinstance(h, Class) and subtype(sigma, ClassType(c), ClassType(h))
+        isinstance(h, Class) and subtype(Sigma, ClassType(c), ClassType(h))
         for h in heads
     )
 
 
-def shapes_seq(sigma: ClassTable, ts: Sequence[Type]) -> tuple[Seq, ...]:
-    return tuple(product(*(shapes(sigma, t, frozenset()) for t in ts)))
+def shapes_seq(Sigma: ClassTable, taus: Sequence[Type]) -> tuple[Seq, ...]:
+    return tuple(product(*(shapes(Sigma, t, frozenset()) for t in taus)))

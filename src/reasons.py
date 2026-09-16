@@ -251,20 +251,20 @@ class ClassAsValue:
 @dataclass(frozen=True)
 class NoBinaryOverload:
     op: str
-    sigma: str
-    sigma_: str
+    Sigma: str
+    Sigma_: str
 
     def message(self) -> str:
-        return f"no overload of '{self.op}' at operand types {self.sigma} and {self.sigma_}"
+        return f"no overload of '{self.op}' at operand types {self.Sigma} and {self.Sigma_}"
 
 
 @dataclass(frozen=True)
 class NoUnaryOverload:
     op: str
-    sigma: str
+    Sigma: str
 
     def message(self) -> str:
-        return f"no overload of '{self.op}' at operand type {self.sigma}"
+        return f"no overload of '{self.op}' at operand type {self.Sigma}"
 
 
 @dataclass(frozen=True)

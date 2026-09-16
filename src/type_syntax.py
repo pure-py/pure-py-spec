@@ -183,23 +183,23 @@ PRIMITIVE_SPELLINGS = {
 PRIMITIVE_NAMES = {name: t for t, name in PRIMITIVE_SPELLINGS.items()}
 
 
-def render(t: Type) -> str:
-    if isinstance(t, Primitive):
-        return PRIMITIVE_SPELLINGS[t]
-    if isinstance(t, ListType):
-        return f"list[{render(t.elem)}]"
-    if isinstance(t, TupleType):
-        return f"tuple[{', '.join(render(c) for c in t.components)}]"
-    if isinstance(t, DictType):
-        return f"dict[str, {render(t.value)}]"
-    if isinstance(t, CallableType):
-        params = ", ".join(render(p) for p in t.params)
-        return f"Callable[[{params}], {render(t.result)}]"
-    if isinstance(t, LiteralType):
-        return f"Literal[{t.value!r}]"
-    if isinstance(t, ClassType):
-        return str(t.c.name)
-    return f"{render(t.left)} | {render(t.right)}"
+def render(tau: Type) -> str:
+    if isinstance(tau, Primitive):
+        return PRIMITIVE_SPELLINGS[tau]
+    if isinstance(tau, ListType):
+        return f"list[{render(tau.elem)}]"
+    if isinstance(tau, TupleType):
+        return f"tuple[{', '.join(render(c) for c in tau.components)}]"
+    if isinstance(tau, DictType):
+        return f"dict[str, {render(tau.value)}]"
+    if isinstance(tau, CallableType):
+        params = ", ".join(render(p) for p in tau.params)
+        return f"Callable[[{params}], {render(tau.result)}]"
+    if isinstance(tau, LiteralType):
+        return f"Literal[{tau.value!r}]"
+    if isinstance(tau, ClassType):
+        return str(tau.c.name)
+    return f"{render(tau.left)} | {render(tau.right)}"
 
 
 def base_type(v: object) -> Type:
@@ -303,5 +303,5 @@ def parse_annotations(es: Sequence[ast.expr]) -> tuple[TypeExpr, ...] | None:
     return None if any(t is None for t in ts) else tuple(t for t in ts if t is not None)
 
 
-def union(s: TypeExpr | None, t: TypeExpr | None) -> TypeExpr | None:
-    return None if s is None or t is None else UnionExpr(s, t)
+def union(psi: TypeExpr | None, psi_: TypeExpr | None) -> TypeExpr | None:
+    return None if psi is None or psi_ is None else UnionExpr(psi, psi_)

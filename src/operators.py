@@ -22,132 +22,152 @@ type UnaryOverload = Callable[[ClassTable, Type], ResolvedOverload | None]
 
 
 def both(
-    sigma: ClassTable, s: Type, t: Type, bound: Type, result: Type
+    Sigma: ClassTable, sigma: Type, tau: Type, bound: Type, result: Type
 ) -> ResolvedOverload | None:
     return (
         ((bound, bound), result)
-        if subtype(sigma, s, bound) and subtype(sigma, t, bound)
+        if subtype(Sigma, sigma, bound) and subtype(Sigma, tau, bound)
         else None
     )
 
 
-def equality(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    if not comparable(sigma, s, t):
+def equality(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:
+    if not comparable(Sigma, sigma, tau):
         return None
-    if not equality_type(sigma, s) or not equality_type(sigma, t):
+    if not equality_type(Sigma, sigma) or not equality_type(Sigma, tau):
         return None
-    return (s, t), Primitive.BOOL
+    return (sigma, tau), Primitive.BOOL
 
 
-def equality_type(sigma: ClassTable, t: Type) -> bool:
-    """Whether values of `t` can be compared for equality: every type but a
+def equality_type(Sigma: ClassTable, tau: Type) -> bool:
+    """Whether values of `tau` can be compared for equality: every type but a
     callable, and a container or class of equality types. A class cannot refer
     to itself through a field, since an annotation is evaluated where it
     appears."""
-    if isinstance(t, CallableType):
+    if isinstance(tau, CallableType):
         return False
-    if isinstance(t, ListType):
-        return equality_type(sigma, t.elem)
-    if isinstance(t, DictType):
-        return equality_type(sigma, t.value)
-    if isinstance(t, TupleType):
-        return all(equality_type(sigma, c) for c in t.components)
-    if isinstance(t, UnionType):
-        return equality_type(sigma, t.left) and equality_type(sigma, t.right)
-    if isinstance(t, ClassType):
-        return class_equality_type(sigma, t.c)
+    if isinstance(tau, ListType):
+        return equality_type(Sigma, tau.elem)
+    if isinstance(tau, DictType):
+        return equality_type(Sigma, tau.value)
+    if isinstance(tau, TupleType):
+        return all(equality_type(Sigma, c) for c in tau.components)
+    if isinstance(tau, UnionType):
+        return equality_type(Sigma, tau.left) and equality_type(Sigma, tau.right)
+    if isinstance(tau, ClassType):
+        return class_equality_type(Sigma, tau.c)
     return True
 
 
-def class_equality_type(sigma: ClassTable, c: Class) -> bool:
+def class_equality_type(Sigma: ClassTable, c: Class) -> bool:
     return all(
-        equality_type(sigma, declared_type(sigma, c, x)) for x in fields(sigma, c)
+        equality_type(Sigma, declared_type(Sigma, c, x)) for x in fields(Sigma, c)
     )
 
 
-def membership_list(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    if isinstance(t, ListType) and comparable(sigma, s, t.elem):
-        return (s, t), Primitive.BOOL
+def membership_list(
+    Sigma: ClassTable, sigma: Type, tau: Type
+) -> ResolvedOverload | None:
+    if isinstance(tau, ListType) and comparable(Sigma, sigma, tau.elem):
+        return (sigma, tau), Primitive.BOOL
     return None
 
 
-def membership_tuple(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    if isinstance(t, TupleType) and comparable(sigma, s, join_seq(sigma, t.components)):
-        return (s, t), Primitive.BOOL
+def membership_tuple(
+    Sigma: ClassTable, sigma: Type, tau: Type
+) -> ResolvedOverload | None:
+    if isinstance(tau, TupleType) and comparable(
+        Sigma, sigma, join_seq(Sigma, tau.components)
+    ):
+        return (sigma, tau), Primitive.BOOL
     return None
 
 
-def membership_str(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    return both(sigma, s, t, Primitive.STR, Primitive.BOOL)
+def membership_str(
+    Sigma: ClassTable, sigma: Type, tau: Type
+) -> ResolvedOverload | None:
+    return both(Sigma, sigma, tau, Primitive.STR, Primitive.BOOL)
 
 
-def membership_dict(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    if isinstance(t, DictType) and subtype(sigma, s, Primitive.STR):
-        return (Primitive.STR, t), Primitive.BOOL
+def membership_dict(
+    Sigma: ClassTable, sigma: Type, tau: Type
+) -> ResolvedOverload | None:
+    if isinstance(tau, DictType) and subtype(Sigma, sigma, Primitive.STR):
+        return (Primitive.STR, tau), Primitive.BOOL
     return None
 
 
-def ordering_number(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    return both(sigma, s, t, Primitive.FLOAT, Primitive.BOOL)
+def ordering_number(
+    Sigma: ClassTable, sigma: Type, tau: Type
+) -> ResolvedOverload | None:
+    return both(Sigma, sigma, tau, Primitive.FLOAT, Primitive.BOOL)
 
 
-def ordering_str(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    return both(sigma, s, t, Primitive.STR, Primitive.BOOL)
+def ordering_str(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:
+    return both(Sigma, sigma, tau, Primitive.STR, Primitive.BOOL)
 
 
-def arithmetic_int(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    return both(sigma, s, t, Primitive.INT, Primitive.INT)
+def arithmetic_int(
+    Sigma: ClassTable, sigma: Type, tau: Type
+) -> ResolvedOverload | None:
+    return both(Sigma, sigma, tau, Primitive.INT, Primitive.INT)
 
 
-def arithmetic_float(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    return both(sigma, s, t, Primitive.FLOAT, Primitive.FLOAT)
+def arithmetic_float(
+    Sigma: ClassTable, sigma: Type, tau: Type
+) -> ResolvedOverload | None:
+    return both(Sigma, sigma, tau, Primitive.FLOAT, Primitive.FLOAT)
 
 
-def concat_str(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    return both(sigma, s, t, Primitive.STR, Primitive.STR)
+def concat_str(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:
+    return both(Sigma, sigma, tau, Primitive.STR, Primitive.STR)
 
 
-def concat_list(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    if isinstance(s, ListType) and isinstance(t, ListType):
-        return (s, t), ListType(join_seq(sigma, (s.elem, t.elem)))
+def concat_list(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:
+    if isinstance(sigma, ListType) and isinstance(tau, ListType):
+        return (sigma, tau), ListType(join_seq(Sigma, (sigma.elem, tau.elem)))
     return None
 
 
-def concat_tuple(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    if isinstance(s, TupleType) and isinstance(t, TupleType):
-        return (s, t), TupleType(s.components + t.components)
+def concat_tuple(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:
+    if isinstance(sigma, TupleType) and isinstance(tau, TupleType):
+        return (sigma, tau), TupleType(sigma.components + tau.components)
     return None
 
 
-def repeat_str(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    if subtype(sigma, s, Primitive.STR) and subtype(sigma, t, Primitive.INT):
+def repeat_str(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:
+    if subtype(Sigma, sigma, Primitive.STR) and subtype(Sigma, tau, Primitive.INT):
         return (Primitive.STR, Primitive.INT), Primitive.STR
     return None
 
 
-def repeat_str_left(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    if subtype(sigma, s, Primitive.INT) and subtype(sigma, t, Primitive.STR):
+def repeat_str_left(
+    Sigma: ClassTable, sigma: Type, tau: Type
+) -> ResolvedOverload | None:
+    if subtype(Sigma, sigma, Primitive.INT) and subtype(Sigma, tau, Primitive.STR):
         return (Primitive.INT, Primitive.STR), Primitive.STR
     return None
 
 
-def repeat_list(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    if isinstance(s, ListType) and subtype(sigma, t, Primitive.INT):
-        return (s, Primitive.INT), s
+def repeat_list(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:
+    if isinstance(sigma, ListType) and subtype(Sigma, tau, Primitive.INT):
+        return (sigma, Primitive.INT), sigma
     return None
 
 
-def repeat_list_left(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    if subtype(sigma, s, Primitive.INT) and isinstance(t, ListType):
-        return (Primitive.INT, t), t
+def repeat_list_left(
+    Sigma: ClassTable, sigma: Type, tau: Type
+) -> ResolvedOverload | None:
+    if subtype(Sigma, sigma, Primitive.INT) and isinstance(tau, ListType):
+        return (Primitive.INT, tau), tau
     return None
 
 
-def power_int(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    if subtype(sigma, s, Primitive.INT) and isinstance(t, LiteralType):
-        exponent = t.value
+def power_int(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:
+    if subtype(Sigma, sigma, Primitive.INT) and isinstance(tau, LiteralType):
+        exponent = tau.value
         if isinstance(exponent, int) and not isinstance(exponent, bool):
-            return (Primitive.INT, t), (
+            return (Primitive.INT, tau), (
                 Primitive.FLOAT if exponent < 0 else Primitive.INT
             )
     return None
@@ -179,24 +199,26 @@ BINARY_OVERLOADS: dict[str, tuple[BinaryOverload, ...]] = {
 }
 
 
-def negate_bool(sigma: ClassTable, s: Type) -> ResolvedOverload | None:
+def negate_bool(Sigma: ClassTable, sigma: Type) -> ResolvedOverload | None:
     return (
         ((Primitive.BOOL,), Primitive.BOOL)
-        if subtype(sigma, s, Primitive.BOOL)
+        if subtype(Sigma, sigma, Primitive.BOOL)
         else None
     )
 
 
-def sign_int(sigma: ClassTable, s: Type) -> ResolvedOverload | None:
+def sign_int(Sigma: ClassTable, sigma: Type) -> ResolvedOverload | None:
     return (
-        ((Primitive.INT,), Primitive.INT) if subtype(sigma, s, Primitive.INT) else None
+        ((Primitive.INT,), Primitive.INT)
+        if subtype(Sigma, sigma, Primitive.INT)
+        else None
     )
 
 
-def sign_float(sigma: ClassTable, s: Type) -> ResolvedOverload | None:
+def sign_float(Sigma: ClassTable, sigma: Type) -> ResolvedOverload | None:
     return (
         ((Primitive.FLOAT,), Primitive.FLOAT)
-        if subtype(sigma, s, Primitive.FLOAT)
+        if subtype(Sigma, sigma, Primitive.FLOAT)
         else None
     )
 
@@ -233,27 +255,28 @@ UNARY_NAMES: dict[type[ast.AST], str] = {
 
 
 def overloads_binary(
-    sigma: ClassTable, op: str, s: Type, t: Type
+    Sigma: ClassTable, op: str, sigma: Type, tau: Type
 ) -> list[ResolvedOverload]:
-    candidates = [overload(sigma, s, t) for overload in BINARY_OVERLOADS[op]] + [
-        overload(sigma, base_type(s), base_type(t)) for overload in BINARY_OVERLOADS[op]
+    candidates = [overload(Sigma, sigma, tau) for overload in BINARY_OVERLOADS[op]] + [
+        overload(Sigma, base_type(sigma), base_type(tau))
+        for overload in BINARY_OVERLOADS[op]
     ]
     return list({resolved: None for resolved in candidates if resolved is not None})
 
 
-def overloads_unary(sigma: ClassTable, op: str, s: Type) -> list[ResolvedOverload]:
-    candidates = [overload(sigma, s) for overload in UNARY_OVERLOADS[op]] + [
-        overload(sigma, base_type(s)) for overload in UNARY_OVERLOADS[op]
+def overloads_unary(Sigma: ClassTable, op: str, sigma: Type) -> list[ResolvedOverload]:
+    candidates = [overload(Sigma, sigma) for overload in UNARY_OVERLOADS[op]] + [
+        overload(Sigma, base_type(sigma)) for overload in UNARY_OVERLOADS[op]
     ]
     return list({resolved: None for resolved in candidates if resolved is not None})
 
 
 def minimum(
-    sigma: ClassTable, resolved: Sequence[ResolvedOverload]
+    Sigma: ClassTable, resolved: Sequence[ResolvedOverload]
 ) -> ResolvedOverload | None:
     for candidate in resolved:
         if all(
-            all(subtype(sigma, a, b) for a, b in zip(candidate[0], other[0]))
+            all(subtype(Sigma, a, b) for a, b in zip(candidate[0], other[0]))
             for other in resolved
         ):
             return candidate
