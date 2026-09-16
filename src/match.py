@@ -264,7 +264,8 @@ def match_seq(
 def match_shapes(
     ks: tuple[Shape, ...], p: ast.pattern, mod_ctx: ModuleContext
 ) -> Match | None:
-    matches = {k: s for k in ks if (s := match(k, p, mod_ctx)) is not None}
+    results = {k: match(k, p, mod_ctx) for k in ks}
+    matches = {k: m for k, m in results.items() if m is not None}
     if len(matches) == 0:
         return None
     matched = union(m for m, _, _ in matches.values())
