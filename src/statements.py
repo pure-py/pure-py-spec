@@ -322,7 +322,7 @@ def match_cases(
     cases: list[ast.match_case], subject: Type, mod_ctx: ModuleContext
 ) -> tuple[list[VarContext], bool]:
     seed = shapes(mod_ctx.sigma, subject, frozenset())
-    left = seed
+    residual = seed
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):
         if not seq_safe(case.pattern, subject, mod_ctx):
@@ -332,12 +332,12 @@ def match_cases(
                     describe(case.pattern, mod_ctx), render(subject)
                 ),
             )
-        result = match_shapes(left, case.pattern, mod_ctx)
+        result = match_shapes(residual, case.pattern, mod_ctx)
         if result is None:
             raise unmatched(case.pattern, index, subject, seed, mod_ctx)
-        _, left, delta = result
+        _, residual, delta = result
         deltas.append(delta)
-    return deltas, len(left) > 0
+    return deltas, len(residual) > 0
 
 
 def unmatched(

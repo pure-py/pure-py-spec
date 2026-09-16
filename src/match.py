@@ -70,23 +70,23 @@ def match_as(k: Shape, p: ast.MatchAs, mod_ctx: ModuleContext) -> Match | None:
     result = match(k, p.pattern, mod_ctx)
     if result is None:
         return None
-    matched, left, delta = result
+    matched, residual, delta = result
     if p.name is None:
-        return matched, left, delta
+        return matched, residual, delta
     named = join(mod_ctx.sigma, [shape_type(m) for m in matched])
-    return matched, left, disjoint_union([delta, {p.name: named}], p)
+    return matched, residual, disjoint_union([delta, {p.name: named}], p)
 
 
 def match_split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
     parts = split(k, p, mod_ctx)
     if parts is None:
         return None
-    ks, without = parts
+    ks, residual = parts
     result = match_shapes(ks, p, mod_ctx)
     if result is None:
         return None
-    matched, left, delta = result
-    return matched, without + left, delta
+    matched, residual_, delta = result
+    return matched, residual + residual_, delta
 
 
 def match_literal(k: Shape, ell: LiteralType) -> Match | None:
@@ -250,13 +250,13 @@ def match_seq(
         return None
     parts = [s for s in matches if s is not None]
     matched = tuple(product(*(m for m, _, _ in parts)))
-    left = tuple(
+    residual = tuple(
         tuple(prefix) + (k,) + ks[i + 1 :]
         for i, (_, ls, _) in enumerate(parts)
         for prefix in product(*(parts[j][0] for j in range(i)))
         for k in ls
     )
-    return matched, left, disjoint_union([d for _, _, d in parts], node)
+    return matched, residual, disjoint_union([d for _, _, d in parts], node)
 
 
 def match_shapes(
@@ -267,10 +267,10 @@ def match_shapes(
         return None
     matched = union(m for m, _, _ in matches.values())
     unmatched = tuple(k for k in ks if k not in matches)
-    left = union(left for _, left, _ in matches.values()) + unmatched
+    residual = union(residual for _, residual, _ in matches.values()) + unmatched
     return (
         matched,
-        left,
+        residual,
         join_deltas(mod_ctx.sigma, [d for _, _, d in matches.values()]),
     )
 
@@ -339,10 +339,10 @@ def union(seqs: Iterable[tuple[Shape, ...]]) -> tuple[Shape, ...]:
 def wrap(form: Callable[[Seq], Shape], seqs: SeqMatch | None) -> Match | None:
     if seqs is None:
         return None
-    matched, left, delta = seqs
+    matched, residual, delta = seqs
     return (
         tuple(form(ks) for ks in matched),
-        tuple(form(ks) for ks in left),
+        tuple(form(ks) for ks in residual),
         delta,
     )
 
