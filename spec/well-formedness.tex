@@ -294,7 +294,7 @@ match on $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple pattern
 To check a \pyinline{match}, each case $\exCase{p}{s}$ is matched in turn against the residual, an
 ordered set of \emph{shapes} (\figref{shapes}). A shape denotes a set of values of a single type, and the
 residual denotes the values of the scrutinee type which remain unmatched by earlier cases. Matching the case removes from the residual the values matched
-by $p$ (\figref{pat}); a case that does not match any shape of the residual is unreachable and the match is rejected.
+by $p$ (\figref{typing-pat}); a case that does not match any shape of the residual is unreachable and the match is rejected.
 The match is exhaustive if the last case leaves the residual empty, and may
 otherwise fall through (\ruleName{match}, \ruleName{match-partial}). The usefulness algorithm for
 ML~\cite{maranget2007} also checks reachability and exhaustiveness with a single relation. The residual plays the
@@ -332,10 +332,10 @@ all when $H$ exhausts $\tau$. The rest form therefore never carries a union or d
 \speconly{\subsubsection{Exhaustiveness and reachability}\label{sec:exhaustiveness-reachability}}%
 \paperonly{\paragraph{Exhaustiveness and reachability.}}
 
-\input{spec/fig/pattern-matching/pat}
+\input{spec/fig/pattern-matching/typing-pat}
 
 Both reachability and exhaustiveness are determined by the residual left by \emph{matching}.
-Matching (\figref{pat}) has three forms. The form on a single shape $k$ matches a pattern against that
+Matching (\figref{typing-pat}) has three forms. The form on a single shape $k$ matches a pattern against that
 shape, giving matched shapes $K$, residual $L$ and bindings $\Delta$. A variable pattern binds at
 $\shapeTy(k)$, and a pattern named by \pyinline{as} at the join over the matched shapes, so a case for
 one alternative of a union leaves a later variable case bound at the remaining members alone. The form
