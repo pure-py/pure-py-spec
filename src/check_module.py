@@ -159,7 +159,7 @@ def check_submodule_clash(
     q: str,
 ) -> None:
     clash = sorted((set(gamma0) | own_members(body, q)) & set(submods(M, q)))
-    if clash:
+    if len(clash) > 0:
         x = clash[0]
         node = find_binder(m.body, x)
         assert node is not None
