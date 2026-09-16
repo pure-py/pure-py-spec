@@ -230,16 +230,16 @@ def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: str) -> Context
 def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:
     with open(filename) as f:
         source = f.read()
-    tree = syntax.parse(source, filename)
-    unsupported = syntax.check_syntax_module(tree)
+    m = syntax.parse(source, filename)
+    unsupported = syntax.check_syntax_module(m)
     if unsupported is not None:
         return unsupported
     M: dict[str, ast.Module] = {
         p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES
     }
-    M["__main__"] = tree
+    M["__main__"] = m
     try:
-        check_module(tree, M, "__main__", {})
+        check_module(m, M, "__main__", {})
         return None
     except IllFormed as e:
         return e

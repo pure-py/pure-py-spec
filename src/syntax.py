@@ -77,9 +77,9 @@ def classify_sequence(source: str) -> Callable[[ast.AST], ast.AST]:
 
 
 def parse(source: str, filename: str) -> ast.Module:
-    tree = map_tree(classify_sequence(source), ast.parse(source, filename=filename))
-    assert isinstance(tree, ast.Module)
-    return tree
+    m = map_tree(classify_sequence(source), ast.parse(source, filename=filename))
+    assert isinstance(m, ast.Module)
+    return m
 
 
 def check_syntax_stmt(node: ast.stmt) -> None:

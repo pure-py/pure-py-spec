@@ -22,14 +22,14 @@ def parse(path: pathlib.Path) -> ast.Module:
         return ast.Module(body=[], type_ignores=[])
     source = path.read_text()
     try:
-        tree = syntax.parse(source, str(path))
+        m = syntax.parse(source, str(path))
     except SyntaxError as e:
         raise IllFormedProgram(f"{path}: parse error: {e}") from e
-    unsupported = syntax.check_syntax_module(tree)
+    unsupported = syntax.check_syntax_module(m)
     if unsupported is not None:
         unsupported.msg = f"{path}: {unsupported.msg}"
         raise unsupported
-    return tree
+    return m
 
 
 def module_name(base_dir: pathlib.Path, path: pathlib.Path) -> tuple[str, ...]:
