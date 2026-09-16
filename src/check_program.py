@@ -9,7 +9,7 @@ from contexts import PREDEFINED_MODULES
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
 
 
-def is_module(name: str, base_dir: pathlib.Path) -> pathlib.Path | None:
+def module_path(name: str, base_dir: pathlib.Path) -> pathlib.Path | None:
     stem = name.replace(".", "/")
     for candidate in (base_dir / f"{stem}.py", base_dir / stem / "__init__.py"):
         if candidate.exists():
@@ -62,7 +62,7 @@ class Program(Mapping[str, ast.Module]):
 
     def path(self, name: str) -> pathlib.Path:
         if name not in self.paths:
-            found = is_module(name, self.base_dir)
+            found = module_path(name, self.base_dir)
             assert found is not None
             self.paths[name] = found
         return self.paths[name]

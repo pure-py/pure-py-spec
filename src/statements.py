@@ -453,7 +453,7 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             raise IllFormedModule(e, reasons.SubmoduleNotImported(parent.q))
         return attribute_type(synth_expr(e.value, mod_ctx), e, mod_ctx)
     if isinstance(e, ast.Subscript):
-        return subscript(e, mod_ctx)
+        return subscript_type(synth_expr(e.value, mod_ctx), e, mod_ctx)
     if isinstance(e, ast.Tuple):
         return TupleType(tuple(synth_expr(x, mod_ctx) for x in e.elts))
     if isinstance(e, ast.List):
@@ -488,10 +488,6 @@ def attribute_type(obj: Type, e: ast.Attribute, mod_ctx: ModuleContext) -> Type:
     if member is None:
         raise IllFormedModule(e, reasons.UnknownField(short_name(obj.c), e.attr))
     return member
-
-
-def subscript(e: ast.Subscript, mod_ctx: ModuleContext) -> Type:
-    return subscript_type(synth_expr(e.value, mod_ctx), e, mod_ctx)
 
 
 def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) -> Type:
