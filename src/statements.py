@@ -424,7 +424,7 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         chosen = minimum(mod_ctx.sigma, overloads_unary(mod_ctx.sigma, name, operand))
         if chosen is None:
             raise IllFormedModule(e, reasons.NoUnarySignature(name, render(operand)))
-        bounds, result = chosen
+        _, result = chosen
         return result
     if isinstance(e, ast.BoolOp):
         for v in e.values:
@@ -696,7 +696,7 @@ def binary(
     chosen = minimum(mod_ctx.sigma, overloads_binary(mod_ctx.sigma, op, s, t))
     if chosen is None:
         raise IllFormedModule(e, reasons.NoBinarySignature(op, render(s), render(t)))
-    bounds, result = chosen
+    _, result = chosen
     return result
 
 
