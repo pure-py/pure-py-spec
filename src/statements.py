@@ -334,8 +334,6 @@ def unmatched(
     seed: tuple[Shape, ...],
     mod_ctx: ModuleContext,
 ) -> IllFormedModule:
-    """A case matches nothing either because no value of the scrutinee type has
-    its shape, or because the earlier cases have taken every shape it has."""
     if match_shapes(seed, p, mod_ctx) is None:
         return IllFormedModule(
             p, reasons.PatternTypeMismatch(describe(p, mod_ctx), render(subject))
