@@ -2,7 +2,7 @@ import ast
 from collections.abc import Callable, Sequence
 
 from classes import Class, ClassTable, declared_type, fields
-from subtyping import comparable, join, subtype
+from subtyping import comparable, join_seq, subtype
 from type_syntax import (
     CallableType,
     ClassType,
@@ -72,7 +72,7 @@ def membership_list(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | N
 
 
 def membership_tuple(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
-    if isinstance(t, TupleType) and comparable(sigma, s, join(sigma, t.components)):
+    if isinstance(t, TupleType) and comparable(sigma, s, join_seq(sigma, t.components)):
         return (s, t), Primitive.BOOL
     return None
 
@@ -109,7 +109,7 @@ def concat_str(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
 
 def concat_list(sigma: ClassTable, s: Type, t: Type) -> ResolvedOverload | None:
     if isinstance(s, ListType) and isinstance(t, ListType):
-        return (s, t), ListType(join(sigma, (s.elem, t.elem)))
+        return (s, t), ListType(join_seq(sigma, (s.elem, t.elem)))
     return None
 
 

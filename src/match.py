@@ -27,7 +27,7 @@ from shapes import (
     shapes_seq,
     typed_heads,
 )
-from subtyping import join, meet, subtype
+from subtyping import join_seq, meet, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
     ClassType,
@@ -73,7 +73,7 @@ def match_as(k: Shape, p: ast.MatchAs, mod_ctx: ModuleContext) -> Match | None:
     matched, residual, delta = result
     if p.name is None:
         return matched, residual, delta
-    named = join(mod_ctx.sigma, [shape_type(m) for m in matched])
+    named = join_seq(mod_ctx.sigma, [shape_type(m) for m in matched])
     return matched, residual, pattern_bindings([delta, {p.name: named}], p)
 
 

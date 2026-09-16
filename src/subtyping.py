@@ -15,7 +15,7 @@ from type_syntax import (
 )
 
 
-def join_two(sigma: ClassTable, s: Type, t: Type) -> Type:
+def join(sigma: ClassTable, s: Type, t: Type) -> Type:
     if subtype(sigma, s, t):
         return t
     if subtype(sigma, t, s):
@@ -29,9 +29,9 @@ def meet(sigma: ClassTable, s: Type, t: Type) -> Type:
     if subtype(sigma, t, s):
         return t
     if isinstance(s, UnionType):
-        return join_two(sigma, meet(sigma, s.left, t), meet(sigma, s.right, t))
+        return join(sigma, meet(sigma, s.left, t), meet(sigma, s.right, t))
     if isinstance(t, UnionType):
-        return join_two(sigma, meet(sigma, s, t.left), meet(sigma, s, t.right))
+        return join(sigma, meet(sigma, s, t.left), meet(sigma, s, t.right))
     if (
         isinstance(s, TupleType)
         and isinstance(t, TupleType)
@@ -46,16 +46,16 @@ def meet(sigma: ClassTable, s: Type, t: Type) -> Type:
         and len(s.params) == len(t.params)
     ):
         return CallableType(
-            tuple(join_two(sigma, a, b) for a, b in zip(s.params, t.params)),
+            tuple(join(sigma, a, b) for a, b in zip(s.params, t.params)),
             meet(sigma, s.result, t.result),
         )
     return Primitive.NEVER
 
 
-def join(sigma: ClassTable, ts: Sequence[Type]) -> Type:
+def join_seq(sigma: ClassTable, ts: Sequence[Type]) -> Type:
     if len(ts) == 0:
         return Primitive.NEVER
-    return join_two(sigma, ts[0], join(sigma, ts[1:]))
+    return join(sigma, ts[0], join_seq(sigma, ts[1:]))
 
 
 def subtype(sigma: ClassTable, s: Type, t: Type) -> bool:

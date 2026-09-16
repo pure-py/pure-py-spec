@@ -59,7 +59,7 @@ from operators import (
 )
 from reasons import IllFormedModule
 from shapes import Shape, shapes
-from subtyping import join, subtype
+from subtyping import join_seq, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
     PRIMITIVE_SPELLINGS,
@@ -449,7 +449,7 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             return entry
         if isinstance(parent, ModuleStub):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(parent.q))
-        return field_of(synth_expr(e.value, mod_ctx), e, mod_ctx)
+        return attribute_type(synth_expr(e.value, mod_ctx), e, mod_ctx)
     if isinstance(e, ast.Subscript):
         return subscript(e, mod_ctx)
     if isinstance(e, ast.Tuple):
@@ -471,11 +471,14 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
     raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
-def field_of(obj: Type, e: ast.Attribute, mod_ctx: ModuleContext) -> Type:
+def attribute_type(obj: Type, e: ast.Attribute, mod_ctx: ModuleContext) -> Type:
     if isinstance(obj, UnionType):
-        return join(
+        return join_seq(
             mod_ctx.sigma,
-            [field_of(obj.left, e, mod_ctx), field_of(obj.right, e, mod_ctx)],
+            [
+                attribute_type(obj.left, e, mod_ctx),
+                attribute_type(obj.right, e, mod_ctx),
+            ],
         )
     if not isinstance(obj, ClassType):
         raise IllFormedModule(e, reasons.NotSynthesised())
@@ -491,7 +494,7 @@ def subscript(e: ast.Subscript, mod_ctx: ModuleContext) -> Type:
 
 def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) -> Type:
     if isinstance(container, UnionType):
-        return join(
+        return join_seq(
             mod_ctx.sigma,
             [
                 subscript_type(container.left, e, mod_ctx),
@@ -523,7 +526,7 @@ def tuple_subscript(
             raise IllFormedModule(
                 index, reasons.TypeMismatch(render(Primitive.INT), render(actual))
             )
-        return join(mod_ctx.sigma, container.components)
+        return join_seq(mod_ctx.sigma, container.components)
     if not -m <= i < m:
         raise IllFormedModule(index, reasons.TupleIndexOutOfRange(i, m))
     return container.components[i]
@@ -541,7 +544,7 @@ def branch_type(e: ast.IfExp, mod_ctx: ModuleContext) -> Type:
     synthesising = [x for x in branches if synthesises(x)]
     if len(synthesising) == 0:
         raise IllFormedModule(e, reasons.NotSynthesised())
-    t = join(mod_ctx.sigma, [synth_expr(x, mod_ctx) for x in synthesising])
+    t = join_seq(mod_ctx.sigma, [synth_expr(x, mod_ctx) for x in synthesising])
     for x in branches:
         if not synthesises(x):
             check_expr(x, t, mod_ctx)
@@ -552,7 +555,9 @@ def list_type(e: ast.expr, elts: list[ast.expr], mod_ctx: ModuleContext) -> List
     synthesising = [x for x in elts if synthesises(x)]
     if len(synthesising) == 0:
         raise IllFormedModule(e, reasons.NotSynthesised())
-    t = join(mod_ctx.sigma, [base_type(synth_expr(x, mod_ctx)) for x in synthesising])
+    t = join_seq(
+        mod_ctx.sigma, [base_type(synth_expr(x, mod_ctx)) for x in synthesising]
+    )
     for x in elts:
         if not synthesises(x):
             check_expr(x, t, mod_ctx)
@@ -591,7 +596,7 @@ def call(e: ast.Call, mod_ctx: ModuleContext) -> Type:
 
 def result_type(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> Type:
     if isinstance(fn, UnionType):
-        return join(
+        return join_seq(
             mod_ctx.sigma,
             [result_type(fn.left, e, mod_ctx), result_type(fn.right, e, mod_ctx)],
         )
@@ -725,10 +730,10 @@ def elem_type(sigma: ClassTable, t: Type) -> Type | None:
     if isinstance(t, DictType):
         return Primitive.STR
     if isinstance(t, TupleType):
-        return join(sigma, [base_type(c) for c in t.components])
+        return join_seq(sigma, [base_type(c) for c in t.components])
     if isinstance(t, UnionType):
         left, right = elem_type(sigma, t.left), elem_type(sigma, t.right)
-        return None if left is None or right is None else join(sigma, [left, right])
+        return None if left is None or right is None else join_seq(sigma, [left, right])
     return None
 
 

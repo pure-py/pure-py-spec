@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 
 from classes import Class, ClassTable
-from subtyping import join
+from subtyping import join_seq
 from type_syntax import CallableType, ListType, Primitive, Type, dotted_name
 
 
@@ -154,7 +154,7 @@ def merge_entry(
     assert not isinstance(theta_, (ModuleStub, ModuleLoaded, Class, PredefinedName))
     if theta == Status.FF or theta_ == Status.FF:
         return Status.FF
-    return join(sigma, [theta, theta_])
+    return join_seq(sigma, [theta, theta_])
 
 
 def merge_context(sigma: ClassTable, gamma: Context, gamma_: Context) -> VarContext:
@@ -224,7 +224,8 @@ def disjoint_union[V](
 
 def join_context(sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
     return {
-        x: join(sigma, binding_types([delta[x] for delta in deltas])) for x in deltas[0]
+        x: join_seq(sigma, binding_types([delta[x] for delta in deltas]))
+        for x in deltas[0]
     }
 
 
