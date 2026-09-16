@@ -105,10 +105,8 @@ def fv_e_comprehension(
 
 
 def dict_keys(e: ast.Dict) -> list[ast.expr]:
-    """Keys of a dictionary display; a missing key would mean unpacking, which
-    the syntax stage rejects."""
     keys = [k for k in e.keys if k is not None]
-    assert len(keys) == len(e.keys)
+    assert len(keys) == len(e.keys), "dict unpacking rejected by syntax check"
     return keys
 
 
