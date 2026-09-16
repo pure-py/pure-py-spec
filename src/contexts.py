@@ -40,9 +40,9 @@ class ModuleLoaded:
 @dataclass(frozen=True)
 class ModuleContext:
     gamma: Context
-    M: Mapping[str, ast.Module] = field(default_factory=dict)
-    q: str = ""
-    sigma: ClassTable = field(default_factory=dict)
+    M: Mapping[str, ast.Module]
+    q: str
+    sigma: ClassTable
 
 
 def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
