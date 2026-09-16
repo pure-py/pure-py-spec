@@ -64,11 +64,11 @@ def check_imports_prefix(prefix: list[ast.stmt], mod_ctx: ModuleContext) -> Cont
     if len(prefix) == 0:
         return {}
     return extend_context(
-        import_bindings(prefix[0], mod_ctx), check_imports_prefix(prefix[1:], mod_ctx)
+        check_import(prefix[0], mod_ctx), check_imports_prefix(prefix[1:], mod_ctx)
     )
 
 
-def import_bindings(s: ast.stmt, mod_ctx: ModuleContext) -> Context:
+def check_import(s: ast.stmt, mod_ctx: ModuleContext) -> Context:
     if isinstance(s, ast.Import):
         q = s.names[0].name
         if q not in mod_ctx.M:
