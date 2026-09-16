@@ -37,9 +37,7 @@ def module_name(base_dir: pathlib.Path, path: pathlib.Path) -> tuple[str, ...]:
     return rel.parent.parts if rel.name == "__init__.py" else rel.with_suffix("").parts
 
 
-def source_tree(base_dir: pathlib.Path) -> set[str]:
-    """Names of the modules under `base_dir`, the entry file among them under
-    its own name, and of the packages they imply."""
+def module_names(base_dir: pathlib.Path) -> set[str]:
     parts = (
         module_name(base_dir, p)
         for p in base_dir.rglob("*.py")
@@ -60,7 +58,7 @@ class Program(Mapping[str, ast.Module]):
         self.parsed: dict[str, ast.Module] = {
             q: ast.Module(body=[], type_ignores=[]) for q in PREDEFINED_MODULES
         }
-        self.names = set(self.parsed) | set(self.paths) | source_tree(self.base_dir)
+        self.names = set(self.parsed) | set(self.paths) | module_names(self.base_dir)
 
     def path(self, name: str) -> pathlib.Path:
         if name not in self.paths:
