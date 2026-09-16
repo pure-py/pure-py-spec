@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Anonymised copy of the mechanisation under <dest-dir>: renamed, scrubbed, type checked.
+# Anonymised copy of the mechanisation under <dest-dir>: CI removed, names replaced, type checked.
 set -euo pipefail
 
 SRC=isabelle-purepy
