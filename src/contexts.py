@@ -65,7 +65,6 @@ def var_entry(mod_ctx: ModuleContext, x: str) -> VarEntry | None:
 
 
 def var_type(mod_ctx: ModuleContext, x: str) -> Type | None:
-    """The variable's type, where the context has one for it."""
     v = var_entry(mod_ctx, x)
     return None if v is None or isinstance(v, Status) else v
 
