@@ -459,7 +459,7 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
     if isinstance(e, ast.Subscript):
         return subscript_type(synth_expr(e.value, mod_ctx), e, mod_ctx)
     if isinstance(e, ast.Tuple):
-        return TupleType(tuple(synth_expr(x, mod_ctx) for x in e.elts))
+        return TupleType(tuple(synth_expr(e_, mod_ctx) for e_ in e.elts))
     if isinstance(e, ast.List):
         return list_type(e, e.elts, mod_ctx)
     if isinstance(e, ast.Dict):
@@ -543,26 +543,24 @@ def literal_index(t: Type) -> int | None:
 
 def branch_type(e: ast.IfExp, mod_ctx: ModuleContext) -> Type:
     branches = [e.body, e.orelse]
-    synthesising = [x for x in branches if synthesises(x)]
-    if len(synthesising) == 0:
+    ts = [synth_expr(branch, mod_ctx) for branch in branches if synthesises(branch)]
+    if len(ts) == 0:
         raise IllFormedModule(e, reasons.NotSynthesised())
-    t = join_seq(mod_ctx.sigma, [synth_expr(x, mod_ctx) for x in synthesising])
-    for x in branches:
-        if not synthesises(x):
-            check_expr(x, t, mod_ctx)
+    t = join_seq(mod_ctx.sigma, ts)
+    for branch in branches:
+        if not synthesises(branch):
+            check_expr(branch, t, mod_ctx)
     return t
 
 
-def list_type(e: ast.expr, elts: list[ast.expr], mod_ctx: ModuleContext) -> ListType:
-    synthesising = [x for x in elts if synthesises(x)]
-    if len(synthesising) == 0:
-        raise IllFormedModule(e, reasons.NotSynthesised())
-    t = join_seq(
-        mod_ctx.sigma, [base_type(synth_expr(x, mod_ctx)) for x in synthesising]
-    )
-    for x in elts:
-        if not synthesises(x):
-            check_expr(x, t, mod_ctx)
+def list_type(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> ListType:
+    ts = [base_type(synth_expr(e, mod_ctx)) for e in es if synthesises(e)]
+    if len(ts) == 0:
+        raise IllFormedModule(node, reasons.NotSynthesised())
+    t = join_seq(mod_ctx.sigma, ts)
+    for e in es:
+        if not synthesises(e):
+            check_expr(e, t, mod_ctx)
     return ListType(t)
 
 
@@ -572,11 +570,11 @@ def synthesises(e: ast.expr) -> bool:
     if isinstance(e, ast.IfExp):
         return synthesises(e.body) or synthesises(e.orelse)
     if isinstance(e, ast.List):
-        return any(synthesises(x) for x in e.elts)
+        return any(synthesises(e_) for e_ in e.elts)
     if isinstance(e, ast.Dict):
         return any(synthesises(v) for v in e.values)
     if isinstance(e, ast.Tuple):
-        return all(synthesises(x) for x in e.elts)
+        return all(synthesises(e_) for e_ in e.elts)
     if isinstance(e, ast.ListComp):
         return synthesises(e.elt)
     if isinstance(e, ast.DictComp):
@@ -586,8 +584,8 @@ def synthesises(e: ast.expr) -> bool:
     return True
 
 
-def dict_type(e: ast.expr, values: list[ast.expr], mod_ctx: ModuleContext) -> DictType:
-    return DictType(list_type(e, values, mod_ctx).elem)
+def dict_type(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> DictType:
+    return DictType(list_type(node, es, mod_ctx).elem)
 
 
 def call(e: ast.Call, mod_ctx: ModuleContext) -> Type:
@@ -631,8 +629,8 @@ def check_expr(e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
         )
         return
     if isinstance(e, ast.List) and isinstance(expected, ListType):
-        for x in e.elts:
-            check_expr(x, expected.elem, mod_ctx)
+        for e_ in e.elts:
+            check_expr(e_, expected.elem, mod_ctx)
         return
     if (
         isinstance(e, ast.Tuple)
