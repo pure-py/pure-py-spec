@@ -58,32 +58,32 @@ type Split = tuple[tuple[Shape, ...], tuple[Shape, ...]]
 NO_BINDINGS: VarContext = {}
 
 
-def match(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Match | None:
+def match(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
     """Shapes of `k` that `p` matches, the shapes it leaves and the bindings it
     makes, or nothing where `p` cannot match `k`."""
     if isinstance(p, ast.MatchAs):
-        return match_as(k, p, ctx)
+        return match_as(k, p, mod_ctx)
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
         same = match_literal(k, literal_of(p))
     elif isinstance(p, PatTuple):
-        same = match_tuple(k, p, ctx)
+        same = match_tuple(k, p, mod_ctx)
     elif isinstance(p, PatList):
-        same = match_list(k, p, ctx)
+        same = match_list(k, p, mod_ctx)
     elif isinstance(p, ast.MatchMapping):
-        same = match_dict(k, p, ctx)
+        same = match_dict(k, p, mod_ctx)
     else:
         assert isinstance(p, ast.MatchClass)
-        same = match_constr(k, p, ctx)
-    return same if same is not None else match_split(k, p, ctx)
+        same = match_constr(k, p, mod_ctx)
+    return same if same is not None else match_split(k, p, mod_ctx)
 
 
-def match_as(k: Shape, p: ast.MatchAs, ctx: ModuleContext) -> Match | None:
+def match_as(k: Shape, p: ast.MatchAs, mod_ctx: ModuleContext) -> Match | None:
     """A variable or wildcard matches the whole shape; a named sub-pattern binds
     at the join over the shapes it matched."""
     if p.pattern is None:
         bare: VarContext = {} if p.name is None else {p.name: shape_type(k)}
         return (k,), NOTHING, bare
-    result = match(k, p.pattern, ctx)
+    result = match(k, p.pattern, mod_ctx)
     if result is None:
         return None
     matched, left, delta = result
@@ -93,14 +93,14 @@ def match_as(k: Shape, p: ast.MatchAs, ctx: ModuleContext) -> Match | None:
     return matched, left, disjoint_union([delta, {p.name: named}], p)
 
 
-def match_split(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Match | None:
+def match_split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
     """The shapes the split gives, matched against the pattern, with the shapes
     the split leaves passed into the residual."""
-    parts = split(k, p, ctx)
+    parts = split(k, p, mod_ctx)
     if parts is None:
         return None
     ks, without = parts
-    result = match_shapes(ks, p, ctx)
+    result = match_shapes(ks, p, mod_ctx)
     if result is None:
         return None
     matched, left, delta = result
@@ -114,21 +114,21 @@ def match_literal(k: Shape, ell: LiteralType) -> Match | None:
     return None
 
 
-def match_tuple(k: Shape, p: PatTuple, ctx: ModuleContext) -> Match | None:
+def match_tuple(k: Shape, p: PatTuple, mod_ctx: ModuleContext) -> Match | None:
     ps = tuple(p.patterns)
     if isinstance(k, Tuple) and len(k.components) == len(ps):
-        return wrap(Tuple, match_seq(k.components, ps, p, ctx))
+        return wrap(Tuple, match_seq(k.components, ps, p, mod_ctx))
     return None
 
 
-def match_list(k: Shape, p: PatList, ctx: ModuleContext) -> Match | None:
+def match_list(k: Shape, p: PatList, mod_ctx: ModuleContext) -> Match | None:
     ps = tuple(p.patterns)
     if isinstance(k, List) and len(k.elems) == len(ps):
-        return wrap(lambda r: List(k.elem, r), match_seq(k.elems, ps, p, ctx))
+        return wrap(lambda r: List(k.elem, r), match_seq(k.elems, ps, p, mod_ctx))
     return None
 
 
-def match_dict(k: Shape, p: ast.MatchMapping, ctx: ModuleContext) -> Match | None:
+def match_dict(k: Shape, p: ast.MatchMapping, mod_ctx: ModuleContext) -> Match | None:
     """Every key of the pattern is bound by the shape, so the keys match as a
     sequence."""
     if not isinstance(k, Dict):
@@ -142,20 +142,20 @@ def match_dict(k: Shape, p: ast.MatchMapping, ctx: ModuleContext) -> Match | Non
     if any(w not in bound for w in keys):
         return None
     ks = tuple(bound[w] for w in keys)
-    seqs = match_seq(ks, tuple(q for _, q in ws), p, ctx)
+    seqs = match_seq(ks, tuple(q for _, q in ws), p, mod_ctx)
     return wrap(lambda r: with_keys(k, keys, r), seqs)
 
 
-def match_constr(k: Shape, p: ast.MatchClass, ctx: ModuleContext) -> Match | None:
-    cls = class_of_pattern(p, ctx)
+def match_constr(k: Shape, p: ast.MatchClass, mod_ctx: ModuleContext) -> Match | None:
+    cls = class_of_pattern(p, mod_ctx)
     ps = pattern_seq(cls, p)
     if isinstance(k, Constr) and subtype(ClassType(k.c), ClassType(cls)):
-        seqs = match_seq(k.args, padded(ps, len(k.args)), p, ctx)
+        seqs = match_seq(k.args, padded(ps, len(k.args)), p, mod_ctx)
         return wrap(lambda r: Constr(k.c, r, k.heads), seqs)
     return None
 
 
-def split(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Split | None:
+def split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Split | None:
     """Shapes of `k` carrying the head that `p` tests for, and the shapes `k`
     leaves without that head, or nothing where `k` does not split for `p`."""
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
@@ -167,7 +167,7 @@ def split(k: Shape, p: ast.pattern, ctx: ModuleContext) -> Split | None:
     if isinstance(p, ast.MatchMapping):
         return split_dict(k, items(p))
     assert isinstance(p, ast.MatchClass)
-    cls = class_of_pattern(p, ctx)
+    cls = class_of_pattern(p, mod_ctx)
     if isinstance(k, Rest):
         return split_class(k, cls)
     if isinstance(k, Constr):
@@ -252,9 +252,9 @@ def split_subclass(k: Constr, cls: Class) -> Split | None:
     )
 
 
-def class_of_pattern(p: ast.MatchClass, ctx: ModuleContext) -> Class:
+def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
     """Class the pattern names."""
-    cls = class_of_name(p.cls, ctx)
+    cls = class_of_name(p.cls, mod_ctx)
     if cls is None:
         raise IllFormedModule(p, reasons.UnknownClassInPattern(qualified_name(p.cls)))
     return cls
@@ -269,11 +269,11 @@ def pattern_seq(cls: Class, p: ast.MatchClass) -> tuple[ast.pattern, ...]:
 
 
 def match_seq(
-    ks: Seq, ps: tuple[ast.pattern, ...], node: ast.pattern, ctx: ModuleContext
+    ks: Seq, ps: tuple[ast.pattern, ...], node: ast.pattern, mod_ctx: ModuleContext
 ) -> SeqMatch | None:
     """Sequences that match the sequence of patterns, and sequences that fail at
     one position."""
-    matches = [match(k, p, ctx) for k, p in zip(ks, ps)]
+    matches = [match(k, p, mod_ctx) for k, p in zip(ks, ps)]
     if any(s is None for s in matches):
         return None
     parts = [s for s in matches if s is not None]
@@ -288,11 +288,11 @@ def match_seq(
 
 
 def match_shapes(
-    ks: tuple[Shape, ...], p: ast.pattern, ctx: ModuleContext
+    ks: tuple[Shape, ...], p: ast.pattern, mod_ctx: ModuleContext
 ) -> Match | None:
     """Shapes of `ks` that `p` matches, with the shapes it does not match passed
     into the residual, or nothing where it matches none of them."""
-    matches = {k: s for k in ks if (s := match(k, p, ctx)) is not None}
+    matches = {k: s for k in ks if (s := match(k, p, mod_ctx)) is not None}
     if len(matches) == 0:
         return None
     matched = union(m for m, _, _ in matches.values())
@@ -301,35 +301,35 @@ def match_shapes(
     return matched, left, join_deltas([d for _, _, d in matches.values()])
 
 
-def seq_safe(p: ast.pattern, t: Type, ctx: ModuleContext) -> bool:
+def seq_safe(p: ast.pattern, t: Type, mod_ctx: ModuleContext) -> bool:
     if isinstance(t, UnionType):
-        return seq_safe(p, t.left, ctx) and seq_safe(p, t.right, ctx)
+        return seq_safe(p, t.left, mod_ctx) and seq_safe(p, t.right, mod_ctx)
     if isinstance(p, PatTuple):
         if isinstance(t, ListType) or t in (Primitive.SIZED, Primitive.OBJECT):
             return False
         if isinstance(t, TupleType) and len(t.components) == len(p.patterns):
-            return all(seq_safe(q, c, ctx) for q, c in zip(p.patterns, t.components))
+            return all(seq_safe(q, c, mod_ctx) for q, c in zip(p.patterns, t.components))
         return True
     if isinstance(p, PatList):
         if isinstance(t, TupleType) or t in (Primitive.SIZED, Primitive.OBJECT):
             return False
         if isinstance(t, ListType):
-            return all(seq_safe(q, t.elem, ctx) for q in p.patterns)
+            return all(seq_safe(q, t.elem, mod_ctx) for q in p.patterns)
         return True
     if isinstance(p, ast.MatchMapping):
         if isinstance(t, DictType):
-            return all(seq_safe(q, t.value, ctx) for q in p.patterns)
+            return all(seq_safe(q, t.value, mod_ctx) for q in p.patterns)
         return True
     if isinstance(p, ast.MatchClass):
-        cls = class_of_name(p.cls, ctx)
+        cls = class_of_name(p.cls, mod_ctx)
         if cls is None:
             return True  # the match rules reject with a sharper reason
         args = field_map(cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
         if args is None:
             return True  # likewise
-        return all(seq_safe(args[x], declared_type(cls, x), ctx) for x in fields(cls))
+        return all(seq_safe(args[x], declared_type(cls, x), mod_ctx) for x in fields(cls))
     if isinstance(p, ast.MatchAs):
-        return p.pattern is None or seq_safe(p.pattern, t, ctx)
+        return p.pattern is None or seq_safe(p.pattern, t, mod_ctx)
     return True
 
 

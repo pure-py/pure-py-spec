@@ -44,16 +44,16 @@ class ModuleContext:
     q: str = ""
 
 
-def override_gamma(ctx: ModuleContext, delta: Context) -> ModuleContext:
-    return ModuleContext(gamma={**ctx.gamma, **delta}, M=ctx.M, q=ctx.q)
+def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
+    return ModuleContext(gamma={**mod_ctx.gamma, **delta}, M=mod_ctx.M, q=mod_ctx.q)
 
 
-def override_var(ctx: ModuleContext, delta: Mapping[str, VarEntry]) -> ModuleContext:
-    return override_gamma(ctx, dict(delta))
+def override_var(mod_ctx: ModuleContext, delta: Mapping[str, VarEntry]) -> ModuleContext:
+    return override_gamma(mod_ctx, dict(delta))
 
 
-def var_entry(ctx: ModuleContext, x: str) -> VarEntry | None:
-    v = ctx.gamma.get(x)
+def var_entry(mod_ctx: ModuleContext, x: str) -> VarEntry | None:
+    v = mod_ctx.gamma.get(x)
     return (
         None
         if v is None or isinstance(v, (ModuleStub, ModuleLoaded, Class, PredefinedName))
@@ -61,22 +61,22 @@ def var_entry(ctx: ModuleContext, x: str) -> VarEntry | None:
     )
 
 
-def var_type(ctx: ModuleContext, x: str) -> Type | None:
+def var_type(mod_ctx: ModuleContext, x: str) -> Type | None:
     """The variable's type, where the context has one for it."""
-    v = var_entry(ctx, x)
+    v = var_entry(mod_ctx, x)
     return None if v is None or isinstance(v, Status) else v
 
 
-def is_assigned(ctx: ModuleContext, x: str) -> bool:
-    v = var_entry(ctx, x)
+def is_assigned(mod_ctx: ModuleContext, x: str) -> bool:
+    v = var_entry(mod_ctx, x)
     return v is not None and v != Status.FF
 
 
-def resolve_name(q: str, ctx: ModuleContext) -> ContextEntry | None:
+def resolve_name(q: str, mod_ctx: ModuleContext) -> ContextEntry | None:
     """Entry a qualified name denotes: its first component in the context, and
     each later one a member of the module the components before it denote."""
     x, *rest = q.split(".")
-    entry = ctx.gamma.get(x)
+    entry = mod_ctx.gamma.get(x)
     for y in rest:
         if not isinstance(entry, ModuleLoaded):
             return None
@@ -84,8 +84,8 @@ def resolve_name(q: str, ctx: ModuleContext) -> ContextEntry | None:
     return entry
 
 
-def module_of(ctx: ModuleContext, x: str) -> ModuleStub | ModuleLoaded | None:
-    v = ctx.gamma.get(x)
+def module_of(mod_ctx: ModuleContext, x: str) -> ModuleStub | ModuleLoaded | None:
+    v = mod_ctx.gamma.get(x)
     return v if isinstance(v, (ModuleStub, ModuleLoaded)) else None
 
 
@@ -221,11 +221,11 @@ def extend_context(g1: Context, g2: Context) -> Context:
     }
 
 
-def entry_of(e: ast.expr, ctx: ModuleContext) -> ContextEntry | None:
+def entry_of(e: ast.expr, mod_ctx: ModuleContext) -> ContextEntry | None:
     q = dotted_name(e)
-    return None if q is None else resolve_name(q, ctx)
+    return None if q is None else resolve_name(q, mod_ctx)
 
 
-def class_of_name(e: ast.expr, ctx: ModuleContext) -> Class | None:
-    entry = entry_of(e, ctx)
+def class_of_name(e: ast.expr, mod_ctx: ModuleContext) -> Class | None:
+    entry = entry_of(e, mod_ctx)
     return entry if isinstance(entry, Class) else None
