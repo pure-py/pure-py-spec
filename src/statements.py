@@ -410,10 +410,10 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         if negated is not None:
             return negated
         name = UNARY_NAMES[type(e.op)]
-        chosen = minimum(mod_ctx.sigma, overloads_unary(mod_ctx.sigma, name, operand))
-        if chosen is None:
+        resolved = minimum(mod_ctx.sigma, overloads_unary(mod_ctx.sigma, name, operand))
+        if resolved is None:
             raise IllFormedModule(e, reasons.NoUnaryOverload(name, render(operand)))
-        _, result = chosen
+        _, result = resolved
         return result
     if isinstance(e, ast.BoolOp):
         for v in e.values:
@@ -669,24 +669,24 @@ def check_lambda(e: ast.Lambda, expected: Type, mod_ctx: ModuleContext) -> None:
         raise IllFormedModule(e, reasons.TypeMismatch(render(expected), "a lambda"))
     if len(params) != len(expected.params):
         raise IllFormedModule(
-            e, reasons.TypeMismatch(render(expected), lambda_of(len(params)))
+            e,
+            reasons.TypeMismatch(
+                render(expected),
+                f"a lambda of {len(params)} parameter{'' if len(params) == 1 else 's'}",
+            ),
         )
     delta = dict(zip(params, expected.params))
     check_expr(e.body, expected.result, override_gamma(mod_ctx, delta))
-
-
-def lambda_of(n: int) -> str:
-    return f"a lambda of {n} parameter{'' if n == 1 else 's'}"
 
 
 def binary(
     op: str, left: ast.expr, right: ast.expr, e: ast.expr, mod_ctx: ModuleContext
 ) -> Type:
     s, t = synth_expr(left, mod_ctx), synth_expr(right, mod_ctx)
-    chosen = minimum(mod_ctx.sigma, overloads_binary(mod_ctx.sigma, op, s, t))
-    if chosen is None:
+    resolved = minimum(mod_ctx.sigma, overloads_binary(mod_ctx.sigma, op, s, t))
+    if resolved is None:
         raise IllFormedModule(e, reasons.NoBinaryOverload(op, render(s), render(t)))
-    _, result = chosen
+    _, result = resolved
     return result
 
 
