@@ -18,7 +18,16 @@ from aux import (
     target_name,
     type_expr,
 )
-from classes import Class, declared_type, field_map, field_type, fields, short_name
+from classes import (
+    Class,
+    ClassTableEntry,
+    declared_type,
+    field_map,
+    field_type,
+    fields,
+    short_name,
+    sigma,
+)
 from contexts import (
     ASSIGNS_EMPTY,
     RETURNS,
@@ -796,22 +805,23 @@ def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> Class:
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
         raise IllFormedModule(node, reasons.DuplicateFieldName(dup, node.name))
-    base: str | None = None
+    base: Class | None = None
     if len(node.bases) > 0:
         assert isinstance(node.bases[0], ast.Name)
-        base = node.bases[0].id
-        base_class = mod_ctx.gamma.get(base)
-        if not isinstance(base_class, Class):
-            raise IllFormedModule(node, reasons.UnknownBaseClass(base))
-        clash = set(names) & set(fields(base_class))
+        base_name = node.bases[0].id
+        entry = mod_ctx.gamma.get(base_name)
+        if not isinstance(entry, Class):
+            raise IllFormedModule(node, reasons.UnknownBaseClass(base_name))
+        base = entry
+        clash = set(names) & set(fields(base))
         if len(clash) > 0:
-            raise IllFormedModule(node, reasons.InheritedFieldClash(min(clash), base))
-    return Class(
-        context=mod_ctx.gamma,
-        name=f"{mod_ctx.q}.{node.name}",
-        own_fields=own,
-        base=base,
-    )
+            raise IllFormedModule(
+                node, reasons.InheritedFieldClash(min(clash), base_name)
+            )
+    c = Class(f"{mod_ctx.q}.{node.name}")
+    assert c not in sigma, "redeclaration rejected by top-seq"
+    sigma[c] = ClassTableEntry(own_fields=own, base=base)
+    return c
 
 
 def describe(p: ast.pattern, mod_ctx: ModuleContext) -> str:

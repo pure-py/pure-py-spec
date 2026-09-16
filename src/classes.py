@@ -1,37 +1,30 @@
-"""Classes, as Definition 2.2 gives them.
-
-A class is identified by its qualified name, records the context it was declared
-in, its own fields with their declared types, and its base class.
-"""
-
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
 from type_syntax import Type
 
-if TYPE_CHECKING:
-    from contexts import Context
 
-
-@dataclass(frozen=True, eq=False)
+@dataclass(frozen=True)
 class Class:
     """A class, identified by its qualified name: two classes with the same
     name are the same class, and a class is also the type of its instances."""
 
-    context: "Context"
     name: str
-    own_fields: tuple[tuple[str, Type], ...]
-    base: str | None
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, Class) and self.name == other.name
-
-    def __hash__(self) -> int:
-        return hash(self.name)
 
     def __repr__(self) -> str:
         return f"Class({self.name})"
+
+
+@dataclass(frozen=True)
+class ClassTableEntry:
+    own_fields: tuple[tuple[str, Type], ...]
+    base: Class | None
+
+
+type ClassTable = dict[Class, ClassTableEntry]
+
+# Ambient, extended by the class rule.
+sigma: ClassTable = {}
 
 
 def short_name(c: Class) -> str:
@@ -39,31 +32,23 @@ def short_name(c: Class) -> str:
 
 
 def ancestors(c: Class) -> list[Class]:
-    if c.base is None:
-        return [c]
-    base = c.context[c.base]
-    assert isinstance(base, Class)
-    return [c] + ancestors(base)
+    base = sigma[c].base
+    return [c] if base is None else [c] + ancestors(base)
 
 
 def fields(c: Class) -> tuple[str, ...]:
-    if c.base is None:
-        return tuple(x for x, _ in c.own_fields)
-    base = c.context[c.base]
-    assert isinstance(base, Class)
-    return fields(base) + tuple(x for x, _ in c.own_fields)
+    entry = sigma[c]
+    own = tuple(x for x, _ in entry.own_fields)
+    return own if entry.base is None else fields(entry.base) + own
 
 
 def field_type(c: Class, x: str) -> Type | None:
     """Declared type of field `x`, if the class records one."""
-    own = dict(c.own_fields)
+    entry = sigma[c]
+    own = dict(entry.own_fields)
     if x in own:
         return own[x]
-    if c.base is None:
-        return None
-    base = c.context[c.base]
-    assert isinstance(base, Class)
-    return field_type(base, x)
+    return None if entry.base is None else field_type(entry.base, x)
 
 
 def declared_type(c: Class, x: str) -> Type:
