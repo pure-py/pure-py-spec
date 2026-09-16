@@ -45,9 +45,9 @@ def field_type(Sigma: ClassTable, c: Class, x: Var) -> Type | None:
 
 
 def declared_type(Sigma: ClassTable, c: Class, x: Var) -> Type:
-    t = field_type(Sigma, c, x)
-    assert t is not None
-    return t
+    tau = field_type(Sigma, c, x)
+    assert tau is not None
+    return tau
 
 
 def field_map[T](

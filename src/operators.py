@@ -40,10 +40,6 @@ def equality(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | No
 
 
 def equality_type(Sigma: ClassTable, tau: Type) -> bool:
-    """Whether values of `tau` can be compared for equality: every type but a
-    callable, and a container or class of equality types. A class cannot refer
-    to itself through a field, since an annotation is evaluated where it
-    appears."""
     if isinstance(tau, CallableType):
         return False
     if isinstance(tau, ListType):

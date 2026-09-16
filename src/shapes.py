@@ -110,4 +110,4 @@ def below_excluded(Sigma: ClassTable, c: Class, heads: frozenset[Head]) -> bool:
 
 
 def shapes_seq(Sigma: ClassTable, taus: Sequence[Type]) -> tuple[Seq, ...]:
-    return tuple(product(*(shapes(Sigma, t, frozenset()) for t in taus)))
+    return tuple(product(*(shapes(Sigma, tau, frozenset()) for tau in taus)))

@@ -299,8 +299,12 @@ def subscript_args(s: ast.expr) -> tuple[ast.expr, ...]:
 
 
 def parse_annotations(es: Sequence[ast.expr]) -> tuple[TypeExpr, ...] | None:
-    ts = tuple(parse_annotation(e) for e in es)
-    return None if any(t is None for t in ts) else tuple(t for t in ts if t is not None)
+    psis = tuple(parse_annotation(e) for e in es)
+    return (
+        None
+        if any(psi is None for psi in psis)
+        else tuple(psi for psi in psis if psi is not None)
+    )
 
 
 def union(psi: TypeExpr | None, psi_: TypeExpr | None) -> TypeExpr | None:

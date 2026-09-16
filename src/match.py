@@ -376,6 +376,6 @@ def literal_of(p: ast.pattern) -> LiteralType:
     if isinstance(p, ast.MatchSingleton):
         return LiteralType(p.value)
     assert isinstance(p, ast.MatchValue)
-    t = literal_type(p.value)
-    assert t is not None
-    return t
+    tau = literal_type(p.value)
+    assert tau is not None
+    return tau
