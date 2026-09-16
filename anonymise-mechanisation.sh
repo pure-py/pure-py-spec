@@ -11,7 +11,7 @@ mkdir -p "$DEST/$NAME"
 git -C "$SRC" archive --format=tar HEAD | tar -x -C "$DEST/$NAME"
 cd "$DEST/$NAME"
 
-# CI configuration and references to it have no place in a submission.
+# Remove CI configuration and the README's references to it; both name the repository.
 rm -rf .github
 grep -vE 'badge\.svg|\.github/workflows' README.md > README.tmp && mv README.tmp README.md
 
