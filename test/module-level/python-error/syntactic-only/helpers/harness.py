@@ -9,15 +9,24 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(ROOT / "src"))
 
-from check_module import PREDEFINED_MODULES, module_result
+from check_module import PREDEFINED_MODULES, check_module
+from reasons import IllFormed
 from syntax import check_syntax_module
+
+
+def ill_formedness(tree: ast.Module, M: dict[str, ast.Module], q: str) -> IllFormed | None:
+    try:
+        check_module(tree, M, q, {})
+        return None
+    except IllFormed as e:
+        return e
 
 
 def expect_rejected(tree: ast.Module, msg_contains: str = "") -> None:
     q = '<test>'
     M = {p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES}
     M[q] = tree
-    result = check_syntax_module(tree) or module_result(tree, M, q)
+    result = check_syntax_module(tree) or ill_formedness(tree, M, q)
     if result is None:
         print("FAIL: expected rejection but got ok", file=sys.stderr)
         sys.exit(1)
