@@ -52,6 +52,7 @@ class Dict:
 
 type Shape = Rest | Constr | Tuple | List | Dict
 type Seq = tuple[Shape, ...]
+type Shapes = tuple[Shape, ...]
 
 
 def shape_type(k: Shape) -> Type:
@@ -66,7 +67,7 @@ def shape_type(k: Shape) -> Type:
     return DictType(k.value)
 
 
-def shapes(sigma: ClassTable, t: Type, heads: frozenset[Head]) -> tuple[Shape, ...]:
+def shapes(sigma: ClassTable, t: Type, heads: frozenset[Head]) -> Shapes:
     if isinstance(t, UnionType):
         left = shapes(sigma, t.left, typed_heads(sigma, heads, t.left))
         right = shapes(sigma, t.right, typed_heads(sigma, heads, t.right))

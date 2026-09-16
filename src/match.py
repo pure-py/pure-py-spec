@@ -20,6 +20,7 @@ from shapes import (
     Rest,
     Seq,
     Shape,
+    Shapes,
     Tuple,
     below_excluded,
     shape_type,
@@ -41,9 +42,9 @@ from type_syntax import (
     literal_type,
 )
 
-type Match = tuple[tuple[Shape, ...], tuple[Shape, ...], VarContext]
+type Match = tuple[Shapes, Shapes, VarContext]
 type SeqMatch = tuple[tuple[Seq, ...], tuple[Seq, ...], VarContext]
-type Split = tuple[tuple[Shape, ...], tuple[Shape, ...]]
+type Split = tuple[Shapes, Shapes]
 
 
 def match(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
@@ -261,9 +262,7 @@ def match_seq(
     return matched, residual, pattern_bindings([d for _, _, d in parts], node)
 
 
-def match_shapes(
-    ks: tuple[Shape, ...], p: ast.pattern, mod_ctx: ModuleContext
-) -> Match | None:
+def match_shapes(ks: Shapes, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
     results = {k: match(k, p, mod_ctx) for k in ks}
     matches = {k: m for k, m in results.items() if m is not None}
     if len(matches) == 0:
@@ -325,7 +324,7 @@ def pattern_bindings(deltas: list[VarContext], node: ast.AST) -> VarContext:
     return merged
 
 
-def union(seqs: Iterable[tuple[Shape, ...]]) -> tuple[Shape, ...]:
+def union(seqs: Iterable[Shapes]) -> Shapes:
     return tuple(k for s in seqs for k in s)
 
 

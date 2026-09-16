@@ -58,7 +58,7 @@ from operators import (
     overloads_unary,
 )
 from reasons import IllFormedModule
-from shapes import Shape, shapes
+from shapes import shapes
 from subtyping import join_seq, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
@@ -291,18 +291,18 @@ def check_stmt(
             check_expr(s.msg, Primitive.STR, mod_ctx)
         return Assigns({})
     if isinstance(s, ast.Match):
-        subject = synth_expr(s.subject, mod_ctx)
-        return check_match_cases(s.cases, subject, mod_ctx, returns)
+        t = synth_expr(s.subject, mod_ctx)
+        return check_match_cases(s.cases, t, mod_ctx, returns)
     raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
 def check_match_cases(
     cases: list[ast.match_case],
-    subject: Type,
+    t: Type,
     mod_ctx: ModuleContext,
     returns: Type | None,
 ) -> StaticOutcome:
-    deltas, partial = match_cases(cases, subject, mod_ctx)
+    deltas, partial = match_cases(cases, t, mod_ctx)
     branches = [
         check_case(case, delta, mod_ctx, returns) for case, delta in zip(cases, deltas)
     ]
@@ -310,22 +310,19 @@ def check_match_cases(
 
 
 def match_cases(
-    cases: list[ast.match_case], subject: Type, mod_ctx: ModuleContext
+    cases: list[ast.match_case], t: Type, mod_ctx: ModuleContext
 ) -> tuple[list[VarContext], bool]:
-    seed = shapes(mod_ctx.sigma, subject, frozenset())
-    residual = seed
+    residual = shapes(mod_ctx.sigma, t, frozenset())
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):
-        if not seq_safe(case.pattern, subject, mod_ctx):
+        if not seq_safe(case.pattern, t, mod_ctx):
             raise IllFormedModule(
                 case.pattern,
-                reasons.SequenceKindClash(
-                    describe(case.pattern, mod_ctx), render(subject)
-                ),
+                reasons.SequenceKindClash(describe(case.pattern, mod_ctx), render(t)),
             )
         result = match_shapes(residual, case.pattern, mod_ctx)
         if result is None:
-            raise case_matches_nothing(case.pattern, index, subject, seed, mod_ctx)
+            raise case_matches_nothing(case.pattern, index, t, mod_ctx)
         _, residual, delta = result
         deltas.append(delta)
     return deltas, len(residual) > 0
@@ -334,13 +331,12 @@ def match_cases(
 def case_matches_nothing(
     p: ast.pattern,
     index: int,
-    subject: Type,
-    seed: tuple[Shape, ...],
+    t: Type,
     mod_ctx: ModuleContext,
 ) -> IllFormedModule:
-    if match_shapes(seed, p, mod_ctx) is None:
+    if match_shapes(shapes(mod_ctx.sigma, t, frozenset()), p, mod_ctx) is None:
         return IllFormedModule(
-            p, reasons.PatternTypeMismatch(describe(p, mod_ctx), render(subject))
+            p, reasons.PatternTypeMismatch(describe(p, mod_ctx), render(t))
         )
     return IllFormedModule(p, reasons.CaseMatchesNothing(index))
 
