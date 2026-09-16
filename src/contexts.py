@@ -22,8 +22,7 @@ type VarContext = Mapping[str, VarEntry]
 
 @dataclass(frozen=True)
 class PredefinedName:
-    """Name usable only in an annotation or as a decorator: it names a type,
-    heads a type form, or decorates a class declaration."""
+    pass
 
 
 @dataclass(frozen=True)
