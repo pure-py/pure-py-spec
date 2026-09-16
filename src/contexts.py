@@ -226,7 +226,7 @@ def join_context(sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
 
 def binding_types(entries: list[VarEntry]) -> list[Type]:
     types = [e for e in entries if not isinstance(e, Status)]
-    assert len(types) == len(entries), "pattern bindings are types"
+    assert len(types) == len(entries)
     return types
 
 
