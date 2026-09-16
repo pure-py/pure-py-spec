@@ -14,14 +14,6 @@ class DuplicateFieldName:
 
 
 @dataclass(frozen=True)
-class UnknownBaseClass:
-    base: str
-
-    def message(self) -> str:
-        return f"base class '{self.base}' is not a declared class"
-
-
-@dataclass(frozen=True)
 class InheritedFieldClash:
     field: str
     base: str
@@ -116,14 +108,6 @@ class PatternArityMismatch:
 
 
 @dataclass(frozen=True)
-class UnknownClassInAnnotation:
-    cls: str
-
-    def message(self) -> str:
-        return f"annotation names '{self.cls}', which is not a declared class"
-
-
-@dataclass(frozen=True)
 class NotPredefinedName:
     name: str
 
@@ -132,11 +116,11 @@ class NotPredefinedName:
 
 
 @dataclass(frozen=True)
-class UnknownClassInPattern:
-    cls: str
+class NotClass:
+    name: str
 
     def message(self) -> str:
-        return f"'{self.cls}' is not a declared class"
+        return f"'{self.name}' is not a declared class"
 
 
 @dataclass(frozen=True)
@@ -392,7 +376,6 @@ class MissingReturn:
 
 type Reason = (
     DuplicateFieldName
-    | UnknownBaseClass
     | InheritedFieldClash
     | ClassRebound
     | UnassignedVariable
@@ -403,8 +386,7 @@ type Reason = (
     | UnreachableStatement
     | ConstructorArityMismatch
     | PatternArityMismatch
-    | UnknownClassInPattern
-    | UnknownClassInAnnotation
+    | NotClass
     | NotPredefinedName
     | UnknownFieldInPattern
     | DuplicatePatternKeyword

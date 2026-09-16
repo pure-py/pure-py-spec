@@ -231,9 +231,7 @@ def split_subclass(sigma: ClassTable, k: Constr, cls: Class) -> Split | None:
 def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
     cls = class_of_name(p.cls, mod_ctx)
     if cls is None:
-        raise IllFormedModule(
-            p, reasons.UnknownClassInPattern(str(qualified_name(p.cls)))
-        )
+        raise IllFormedModule(p, reasons.NotClass(str(qualified_name(p.cls))))
     return cls
 
 

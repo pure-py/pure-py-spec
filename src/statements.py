@@ -110,7 +110,7 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
     if isinstance(psi, ClassName):
         c = resolve_name(psi.q, mod_ctx)
         if not isinstance(c, Class):
-            raise IllFormedModule(node, reasons.UnknownClassInAnnotation(str(psi.q)))
+            raise IllFormedModule(node, reasons.NotClass(str(psi.q)))
         return ClassType(c)
     if isinstance(psi, ListExpr):
         check_in_scope("list", node, mod_ctx)
@@ -763,7 +763,7 @@ def class_declared(
         base_name = node.bases[0].id
         entry = mod_ctx.gamma.get(base_name)
         if not isinstance(entry, Class):
-            raise IllFormedModule(node, reasons.UnknownBaseClass(base_name))
+            raise IllFormedModule(node, reasons.NotClass(base_name))
         base = entry
         clash = set(names) & set(fields(mod_ctx.sigma, base))
         if len(clash) > 0:
