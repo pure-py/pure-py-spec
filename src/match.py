@@ -356,7 +356,7 @@ def disjoint_union(deltas: list[VarContext], node: ast.AST) -> VarContext:
         repeated = sorted(merged.keys() & delta.keys())
         if len(repeated) > 0:
             raise IllFormedModule(node, reasons.NonlinearPattern(repeated[0]))
-        merged = merged | delta
+        merged = {**merged, **delta}
     return merged
 
 

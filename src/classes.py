@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 from type_syntax import Type
@@ -21,7 +21,7 @@ class ClassTableEntry:
     base: Class | None
 
 
-type ClassTable = dict[Class, ClassTableEntry]
+type ClassTable = Mapping[Class, ClassTableEntry]
 
 
 def short_name(c: Class) -> str:

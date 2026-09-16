@@ -16,8 +16,8 @@ class Status(Enum):
 # assigned. Lazily evaluated, so these may name Class before it is defined.
 type VarEntry = Status | Type
 type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName
-type Context = dict[str, ContextEntry]
-type VarContext = dict[str, VarEntry]
+type Context = Mapping[str, ContextEntry]
+type VarContext = Mapping[str, VarEntry]
 
 
 @dataclass(frozen=True)
@@ -51,10 +51,8 @@ def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
     )
 
 
-def override_var(
-    mod_ctx: ModuleContext, delta: Mapping[str, VarEntry]
-) -> ModuleContext:
-    return override_gamma(mod_ctx, dict(delta))
+def override_var(mod_ctx: ModuleContext, delta: VarContext) -> ModuleContext:
+    return override_gamma(mod_ctx, delta)
 
 
 def var_entry(mod_ctx: ModuleContext, x: str) -> VarEntry | None:
@@ -101,7 +99,7 @@ class Returns:
 
 @dataclass(frozen=True)
 class Assigns:
-    delta: Mapping[str, ContextEntry] = field(default_factory=dict)
+    delta: Context = field(default_factory=dict)
 
 
 type StaticOutcome = Returns | Assigns
@@ -115,7 +113,7 @@ FLOAT_TO_INT = CallableType((Primitive.FLOAT,), Primitive.INT)
 
 # The type of each predefined member, with PredefinedName for the members
 # usable only in an annotation or as a decorator.
-PREDEFINED_MEMBERS: dict[str, dict[str, ContextEntry]] = {
+PREDEFINED_MEMBERS: dict[str, Context] = {
     "builtins": {
         "print": CallableType((Primitive.OBJECT,), Primitive.NONE),
         "len": CallableType((Primitive.SIZED,), Primitive.INT),
@@ -172,12 +170,10 @@ def merge_entry(sigma: ClassTable, a: ContextEntry, b: ContextEntry) -> VarEntry
     return join(sigma, [a, b])
 
 
-def merge_delta(
-    sigma: ClassTable, d1: Mapping[str, ContextEntry], d2: Mapping[str, ContextEntry]
-) -> VarContext:
+def merge_context(sigma: ClassTable, g1: Context, g2: Context) -> VarContext:
     return {
-        k: merge_entry(sigma, d1[k], d2[k]) if k in d1 and k in d2 else Status.FF
-        for k in set(d1.keys()) | set(d2.keys())
+        k: merge_entry(sigma, g1[k], g2[k]) if k in g1 and k in g2 else Status.FF
+        for k in set(g1.keys()) | set(g2.keys())
     }
 
 
@@ -189,18 +185,14 @@ def merge_outcomes(sigma: ClassTable, rs: list[StaticOutcome]) -> StaticOutcome:
     return Assigns(fold_merge(sigma, delta, assigns_branches[1:]))
 
 
-def fold_merge(
-    sigma: ClassTable, acc: Mapping[str, ContextEntry], branches: list[Assigns]
-) -> Mapping[str, ContextEntry]:
+def fold_merge(sigma: ClassTable, acc: Context, branches: list[Assigns]) -> Context:
     if len(branches) == 0:
         return acc
-    return fold_merge(sigma, merge_delta(sigma, acc, branches[0].delta), branches[1:])
+    return fold_merge(sigma, merge_context(sigma, acc, branches[0].delta), branches[1:])
 
 
-def override_delta(
-    d1: Mapping[str, ContextEntry], d2: Mapping[str, ContextEntry]
-) -> Context:
-    return {**d1, **d2}
+def override_context(g1: Context, g2: Context) -> Context:
+    return {**g1, **g2}
 
 
 def override_outcomes(r1: StaticOutcome, r2: StaticOutcome) -> StaticOutcome:
@@ -208,7 +200,7 @@ def override_outcomes(r1: StaticOutcome, r2: StaticOutcome) -> StaticOutcome:
         return r1
     if isinstance(r2, Returns):
         return r2
-    return Assigns(override_delta(r1.delta, r2.delta))
+    return Assigns(override_context(r1.delta, r2.delta))
 
 
 def extend_entry(a: ContextEntry, b: ContextEntry) -> ContextEntry:

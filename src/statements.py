@@ -217,7 +217,7 @@ def check_captured_reassignment(head: Statement, tail: list[Statement]) -> None:
 
 def extend(outcome: StaticOutcome, mod_ctx: ModuleContext) -> ModuleContext:
     return (
-        override_gamma(mod_ctx, dict(outcome.delta))
+        override_gamma(mod_ctx, outcome.delta)
         if isinstance(outcome, Assigns)
         else mod_ctx
     )
@@ -242,7 +242,7 @@ def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
     for d in defs:
         params = parameters(d, mod_ctx)
         locals_ = assigns_body(d.body) - set(params)
-        delta = f_names | params | {x: Status.FF for x in locals_}
+        delta = {**f_names, **params, **{x: Status.FF for x in locals_}}
         body_ctx = override_var(mod_ctx, delta)
         declared = resolve_type(type_expr(d.returns), d, mod_ctx)
         result = check_body(d.body, body_ctx, declared)
@@ -786,7 +786,7 @@ def check_quals(
     mod_ctx_ = override_var(mod_ctx, delta)
     for e in g.ifs:
         check_expr(e, Primitive.BOOL, mod_ctx_)
-    return delta | check_quals(generators[1:], mod_ctx_)
+    return {**delta, **check_quals(generators[1:], mod_ctx_)}
 
 
 def elem_type(sigma: ClassTable, t: Type) -> Type | None:
