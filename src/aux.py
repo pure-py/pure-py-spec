@@ -314,12 +314,12 @@ def assigns_seq(items: list[Statement]) -> set[str]:
     return assigns_statement(items[0]) | assigns_seq(items[1:])
 
 
-def find_first_reassigning(items: list[Statement], names: set[str]) -> ast.AST:
+def first_assigning_statement(items: list[Statement], names: set[str]) -> ast.AST:
     """First statement of `items` assigning a name in `names`."""
     assert len(items) > 0
     if not assigns_statement(items[0]).isdisjoint(names):
         return items[0][0] if isinstance(items[0], list) else items[0]
-    return find_first_reassigning(items[1:], names)
+    return first_assigning_statement(items[1:], names)
 
 
 def own_fields(node: ast.ClassDef) -> tuple[tuple[str, TypeExpr], ...]:

@@ -12,7 +12,7 @@ from aux import (
     captures_quals,
     captures_statement,
     dict_keys,
-    find_first_reassigning,
+    first_assigning_statement,
     own_fields,
     qualified_name,
     statements,
@@ -157,7 +157,7 @@ def check_top_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
     delta = head_outcome.delta if isinstance(head_outcome, Assigns) else {}
     rebound = {c for c in assigns_seq(tail) if isinstance(delta.get(c), Class)}
     if rebound:
-        node = find_first_reassigning(tail, rebound)
+        node = first_assigning_statement(tail, rebound)
         raise IllFormedModule(node, reasons.ClassRebound(min(rebound)))
     return check_top_seq(tail, ctx_after)
 
@@ -195,7 +195,7 @@ def check_captured_reassignment(head: Statement, tail: list[Statement]) -> None:
     """A name captured by `head` is not reassigned in `tail`."""
     reassigned = captures_statement(head) & assigns_seq(tail)
     if reassigned:
-        node = find_first_reassigning(tail, reassigned)
+        node = first_assigning_statement(tail, reassigned)
         raise IllFormedModule(node, reasons.CapturedReassignment(min(reassigned)))
 
 
