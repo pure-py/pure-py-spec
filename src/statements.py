@@ -513,11 +513,11 @@ def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) ->
         check_expr(e.slice, Primitive.STR, mod_ctx)
         return container.value
     if isinstance(container, TupleType):
-        return tuple_subscript(container, e.slice, mod_ctx)
+        return tuple_subscript_type(container, e.slice, mod_ctx)
     raise IllFormedModule(e, reasons.NotSubscriptable(render(container)))
 
 
-def tuple_subscript(
+def tuple_subscript_type(
     container: TupleType, index: ast.expr, mod_ctx: ModuleContext
 ) -> Type:
     m = len(container.components)
