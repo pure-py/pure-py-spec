@@ -1,1 +1,1 @@
-no signature for '-' with operand of type Literal['a']
+no overload of '-' at operand type Literal['a']

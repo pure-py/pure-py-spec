@@ -1,1 +1,1 @@
-no signature for '==' with operands of type Callable[[int], int] and Callable[[int], int]
+no overload of '==' at operand types Callable[[int], int] and Callable[[int], int]

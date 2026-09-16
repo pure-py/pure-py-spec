@@ -423,7 +423,7 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         name = UNARY_NAMES[type(e.op)]
         chosen = minimum(mod_ctx.sigma, overloads_unary(mod_ctx.sigma, name, operand))
         if chosen is None:
-            raise IllFormedModule(e, reasons.NoUnarySignature(name, render(operand)))
+            raise IllFormedModule(e, reasons.NoUnaryOverload(name, render(operand)))
         _, result = chosen
         return result
     if isinstance(e, ast.BoolOp):
@@ -695,7 +695,7 @@ def binary(
     s, t = synth_expr(left, mod_ctx), synth_expr(right, mod_ctx)
     chosen = minimum(mod_ctx.sigma, overloads_binary(mod_ctx.sigma, op, s, t))
     if chosen is None:
-        raise IllFormedModule(e, reasons.NoBinarySignature(op, render(s), render(t)))
+        raise IllFormedModule(e, reasons.NoBinaryOverload(op, render(s), render(t)))
     _, result = chosen
     return result
 

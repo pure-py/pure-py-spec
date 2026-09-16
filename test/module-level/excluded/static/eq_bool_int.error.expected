@@ -1,1 +1,1 @@
-no signature for '==' with operands of type Literal[True] and Literal[1]
+no overload of '==' at operand types Literal[True] and Literal[1]

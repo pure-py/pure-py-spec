@@ -269,22 +269,24 @@ class ClassAsValue:
 
 
 @dataclass(frozen=True)
-class NoBinarySignature:
+class NoBinaryOverload:
     op: str
     left: str
     right: str
 
     def message(self) -> str:
-        return f"no signature for '{self.op}' with operands of type {self.left} and {self.right}"
+        return (
+            f"no overload of '{self.op}' at operand types {self.left} and {self.right}"
+        )
 
 
 @dataclass(frozen=True)
-class NoUnarySignature:
+class NoUnaryOverload:
     op: str
     operand: str
 
     def message(self) -> str:
-        return f"no signature for '{self.op}' with operand of type {self.operand}"
+        return f"no overload of '{self.op}' at operand type {self.operand}"
 
 
 @dataclass(frozen=True)
@@ -427,8 +429,8 @@ type Reason = (
     | SubmoduleNotImported
     | OwnDescendantImport
     | UnassignedMember
-    | NoBinarySignature
-    | NoUnarySignature
+    | NoBinaryOverload
+    | NoUnaryOverload
     | NotCallable
     | CallArityMismatch
     | TypeMismatch
