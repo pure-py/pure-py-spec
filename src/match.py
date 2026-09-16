@@ -7,10 +7,10 @@ from aux import qualified_name
 from classes import Class, ClassTable, declared_type, field_map, fields, short_name
 from contexts import (
     ModuleContext,
-    Status,
     VarContext,
-    VarEntry,
     class_of_name,
+    disjoint_union,
+    join_context,
 )
 from reasons import IllFormedModule
 from shapes import (
@@ -74,7 +74,7 @@ def match_as(k: Shape, p: ast.MatchAs, mod_ctx: ModuleContext) -> Match | None:
     if p.name is None:
         return matched, residual, delta
     named = join(mod_ctx.sigma, [shape_type(m) for m in matched])
-    return matched, residual, disjoint_union([delta, {p.name: named}], p)
+    return matched, residual, pattern_bindings([delta, {p.name: named}], p)
 
 
 def match_split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
@@ -258,7 +258,7 @@ def match_seq(
         for prefix in product(*(parts[j][0] for j in range(i)))
         for k in ls
     )
-    return matched, residual, disjoint_union([d for _, _, d in parts], node)
+    return matched, residual, pattern_bindings([d for _, _, d in parts], node)
 
 
 def match_shapes(
@@ -273,7 +273,7 @@ def match_shapes(
     return (
         matched,
         residual,
-        join_deltas(mod_ctx.sigma, [d for _, _, d in matches.values()]),
+        join_context(mod_ctx.sigma, [d for _, _, d in matches.values()]),
     )
 
 
@@ -314,24 +314,14 @@ def seq_safe(p: ast.pattern, t: Type, mod_ctx: ModuleContext) -> bool:
     return True
 
 
-def disjoint_union(deltas: list[VarContext], node: ast.AST) -> VarContext:
+def pattern_bindings(deltas: list[VarContext], node: ast.AST) -> VarContext:
     merged: VarContext = {}
     for delta in deltas:
         repeated = sorted(merged.keys() & delta.keys())
         if len(repeated) > 0:
             raise IllFormedModule(node, reasons.NonlinearPattern(repeated[0]))
-        merged = {**merged, **delta}
+        merged = disjoint_union(merged, delta)
     return merged
-
-
-def join_deltas(sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
-    return {x: join_entries(sigma, [d[x] for d in deltas]) for x in deltas[0]}
-
-
-def join_entries(sigma: ClassTable, entries: list[VarEntry]) -> VarEntry:
-    types = [e for e in entries if not isinstance(e, Status)]
-    assert len(types) == len(entries)
-    return join(sigma, types)
 
 
 def union(seqs: Iterable[tuple[Shape, ...]]) -> tuple[Shape, ...]:

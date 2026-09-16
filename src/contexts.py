@@ -211,6 +211,21 @@ def extend_entry(theta: ContextEntry, theta_: ContextEntry) -> ContextEntry:
     return theta_
 
 
+def disjoint_union(gamma: Context, gamma_: Context) -> Context:
+    assert gamma.keys().isdisjoint(gamma_.keys()), "overlap rejected by caller"
+    return {**gamma, **gamma_}
+
+
+def join_context(sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
+    return {x: join_entries(sigma, [delta[x] for delta in deltas]) for x in deltas[0]}
+
+
+def join_entries(sigma: ClassTable, entries: list[VarEntry]) -> VarEntry:
+    types = [e for e in entries if not isinstance(e, Status)]
+    assert len(types) == len(entries)
+    return join(sigma, types)
+
+
 def extend_context(gamma: Context, gamma_: Context) -> Context:
     return {
         **gamma,
