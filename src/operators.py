@@ -235,33 +235,33 @@ UNARY_NAMES: dict[type[ast.AST], str] = {
 def overloads_binary(
     sigma: ClassTable, op: str, s: Type, t: Type
 ) -> list[ResolvedOverload]:
-    rows = [r for ov in BINARY_OVERLOADS[op] if (r := ov(sigma, s, t)) is not None] + [
-        r
-        for ov in BINARY_OVERLOADS[op]
-        if (r := ov(sigma, base_type(s), base_type(t))) is not None
+    candidates = [overload(sigma, s, t) for overload in BINARY_OVERLOADS[op]] + [
+        overload(sigma, base_type(s), base_type(t)) for overload in BINARY_OVERLOADS[op]
     ]
-    return list(dict.fromkeys(rows))
+    return list({resolved: None for resolved in candidates if resolved is not None})
 
 
 def overloads_unary(sigma: ClassTable, op: str, s: Type) -> list[ResolvedOverload]:
-    rows = [r for ov in UNARY_OVERLOADS[op] if (r := ov(sigma, s)) is not None] + [
-        r for ov in UNARY_OVERLOADS[op] if (r := ov(sigma, base_type(s))) is not None
+    candidates = [overload(sigma, s) for overload in UNARY_OVERLOADS[op]] + [
+        overload(sigma, base_type(s)) for overload in UNARY_OVERLOADS[op]
     ]
-    return list(dict.fromkeys(rows))
+    return list({resolved: None for resolved in candidates if resolved is not None})
 
 
 def minimum(
-    sigma: ClassTable, rows: Sequence[ResolvedOverload]
+    sigma: ClassTable, resolved: Sequence[ResolvedOverload]
 ) -> ResolvedOverload | None:
-    for cand in rows:
+    for candidate in resolved:
         if all(
-            all(subtype(sigma, a, b) for a, b in zip(cand[0], other[0]))
-            for other in rows
+            all(subtype(sigma, a, b) for a, b in zip(candidate[0], other[0]))
+            for other in resolved
         ):
-            return cand
+            return candidate
     return None
 
 
-def result_of_min(sigma: ClassTable, rows: Sequence[ResolvedOverload]) -> Type | None:
-    chosen = minimum(sigma, rows)
+def result_of_min(
+    sigma: ClassTable, resolved: Sequence[ResolvedOverload]
+) -> Type | None:
+    chosen = minimum(sigma, resolved)
     return chosen[1] if chosen is not None else None
