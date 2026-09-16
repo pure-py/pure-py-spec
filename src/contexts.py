@@ -1,6 +1,6 @@
 import ast
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum, auto
 
 from classes import Class, ClassTable
@@ -87,14 +87,14 @@ class Returns:
 
 @dataclass(frozen=True)
 class Assigns:
-    delta: Context = field(default_factory=dict)
+    delta: Context
 
 
 type StaticOutcome = Returns | Assigns
 
 RETURNS = Returns()
 
-ASSIGNS_EMPTY = Assigns()
+ASSIGNS_EMPTY = Assigns({})
 
 FLOAT_TO_FLOAT = CallableType((Primitive.FLOAT,), Primitive.FLOAT)
 FLOAT_TO_INT = CallableType((Primitive.FLOAT,), Primitive.INT)
