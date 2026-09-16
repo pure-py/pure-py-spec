@@ -136,7 +136,7 @@ def match_dict(k: Shape, p: ast.MatchMapping, ctx: ModuleContext) -> Match | Non
     ws = items(p)
     keys = tuple(w for w, _ in ws)
     repeated = [w for i, w in enumerate(keys) if w in keys[:i]]
-    if repeated:
+    if len(repeated) > 0:
         raise IllFormedModule(p, reasons.DuplicateDictKey(repeated[0]))
     bound = dict(k.bound)
     if any(w not in bound for w in keys):
@@ -340,7 +340,7 @@ def disjoint_union(deltas: list[VarContext], node: ast.AST) -> VarContext:
     merged: VarContext = {}
     for delta in deltas:
         repeated = sorted(merged.keys() & delta.keys())
-        if repeated:
+        if len(repeated) > 0:
             raise IllFormedModule(node, reasons.NonlinearPattern(repeated[0]))
         merged = merged | delta
     return merged

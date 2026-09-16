@@ -156,7 +156,7 @@ def check_top_seq(items: list[Statement], ctx: ModuleContext) -> ModuleContext:
     check_captured_reassignment(head, tail)
     delta = head_outcome.delta if isinstance(head_outcome, Assigns) else {}
     rebound = {c for c in assigns_seq(tail) if isinstance(delta.get(c), Class)}
-    if rebound:
+    if len(rebound) > 0:
         node = first_assigning_statement(tail, rebound)
         raise IllFormedModule(node, reasons.ClassRebound(min(rebound)))
     return check_top_seq(tail, ctx_after)
@@ -194,7 +194,7 @@ def check_seq(
 def check_captured_reassignment(head: Statement, tail: list[Statement]) -> None:
     """A name captured by `head` is not reassigned in `tail`."""
     reassigned = captures_statement(head) & assigns_seq(tail)
-    if reassigned:
+    if len(reassigned) > 0:
         node = first_assigning_statement(tail, reassigned)
         raise IllFormedModule(node, reasons.CapturedReassignment(min(reassigned)))
 
@@ -723,7 +723,7 @@ def qual_context(
     qualifiers."""
     delta = check_quals(generators, ctx)
     captured = captures_e_list(elts) & binds_quals(generators)
-    if captured:
+    if len(captured) > 0:
         node = generators[0].target
         raise IllFormedModule(node, reasons.CapturedGeneratorVariable(min(captured)))
     return override_var(ctx, delta)
