@@ -317,7 +317,7 @@ def assigns_seq(items: list[Statement]) -> set[str]:
 def find_first_reassigning(items: list[Statement], names: set[str]) -> ast.AST:
     """First statement of `items` assigning a name in `names`."""
     assert len(items) > 0
-    if assigns_statement(items[0]) & names:
+    if not assigns_statement(items[0]).isdisjoint(names):
         return items[0][0] if isinstance(items[0], list) else items[0]
     return find_first_reassigning(items[1:], names)
 

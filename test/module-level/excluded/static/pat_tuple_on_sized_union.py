@@ -1,4 +1,4 @@
-# rule: case -- a tuple pattern is not sequence-safe at Sized, which has list values
+# rule: match-case -- a tuple pattern is not sequence-safe at Sized, which has list values
 from typing import Sized
 
 
