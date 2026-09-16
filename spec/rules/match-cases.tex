@@ -1,4 +1,4 @@
-\inferrule*[lab={\ruleName{case}}]
+\inferrule*[lab={\ruleName{match-case}}]
 {
   \seqSafe(\Sigma, \Gamma, p, \sigma) \\
   \Sigma; \Gamma \vdash L, p \matches K, L' \binding \Delta \\
@@ -8,7 +8,7 @@
   \Sigma; \Gamma; \zeta; \sigma \vdash L, \exCase{p}{s} : \Assigns{\Delta} \override R, L'
 }
 \and
-\inferrule*[lab={\ruleName{cases}}]
+\inferrule*[lab={\ruleName{match-cases}}]
 {
   \Sigma; \Gamma; \zeta; \sigma \vdash L, b : S, L' \\
   \Sigma; \Gamma; \zeta; \sigma \vdash L', \seq{b} : S', L^\dagger
