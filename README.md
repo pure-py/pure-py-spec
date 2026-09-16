@@ -101,7 +101,7 @@ uv run --locked python src/check_program.py path/to/main.py
 
 `make paper-submission` builds the anonymised paper and `supplementary.zip`, which carries the anonymised
 specification and the Isabelle mechanisation. It refuses to build unless the `isabelle-purepy` submodule is
-checked out, has no uncommitted changes, and sits at a commit `origin/main` already contains, so a
+checked out, has no uncommitted changes, and sits at a commit that is on `origin/main`, so a
 submission never ships a working copy. Check it out with:
 
 ```bash

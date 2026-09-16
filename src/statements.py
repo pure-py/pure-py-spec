@@ -30,8 +30,6 @@ from classes import (
     short_name,
 )
 from contexts import (
-    ASSIGNS_EMPTY,
-    RETURNS,
     Assigns,
     ModuleContext,
     ModuleLoaded,
@@ -176,7 +174,7 @@ def check_seq(
     items: list[Statement], mod_ctx: ModuleContext, returns: Type | None = None
 ) -> tuple[StaticOutcome, ModuleContext]:
     if len(items) == 0:
-        return ASSIGNS_EMPTY, mod_ctx
+        return Assigns({}), mod_ctx
     head, tail = items[0], items[1:]
     head_outcome = check_statement(head, mod_ctx, returns)
     mod_ctx_after = extend(head_outcome, mod_ctx)
@@ -262,7 +260,7 @@ def check_stmt(
     s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None
 ) -> StaticOutcome:
     if isinstance(s, ast.Pass):
-        return ASSIGNS_EMPTY
+        return Assigns({})
     if isinstance(s, ast.Assign):
         (target,) = s.targets
         assert isinstance(target, ast.Name)
@@ -276,7 +274,7 @@ def check_stmt(
         return Assigns({s.target.id: declared})
     if isinstance(s, ast.Expr):
         synth_expr(s.value, mod_ctx)
-        return ASSIGNS_EMPTY
+        return Assigns({})
     if isinstance(s, ast.Return):
         if returns is None:  # no return rule with empty return type
             raise IllFormedModule(s, reasons.TopLevelReturn())
@@ -284,19 +282,19 @@ def check_stmt(
             check_returns_none(mod_ctx.sigma, s, returns)
         else:
             check_expr(s.value, returns, mod_ctx)
-        return RETURNS
+        return Returns()
     if isinstance(s, ast.If):
         check_expr(s.test, Primitive.BOOL, mod_ctx)
         branches = [check_body(s.body, mod_ctx, returns)]
         branches.append(
-            check_body(s.orelse, mod_ctx, returns) if s.orelse else ASSIGNS_EMPTY
+            check_body(s.orelse, mod_ctx, returns) if s.orelse else Assigns({})
         )
         return merge_outcomes(mod_ctx.sigma, branches)
     if isinstance(s, ast.Assert):
         check_expr(s.test, Primitive.BOOL, mod_ctx)
         if s.msg is not None:
             check_expr(s.msg, Primitive.STR, mod_ctx)
-        return ASSIGNS_EMPTY
+        return Assigns({})
     if isinstance(s, ast.Match):
         subject = synth_expr(s.subject, mod_ctx)
         return check_match_cases(s.cases, subject, mod_ctx, returns)
@@ -313,9 +311,7 @@ def check_match_cases(
     branches = [
         check_case(case, delta, mod_ctx, returns) for case, delta in zip(cases, deltas)
     ]
-    return merge_outcomes(
-        mod_ctx.sigma, branches + ([ASSIGNS_EMPTY] if partial else [])
-    )
+    return merge_outcomes(mod_ctx.sigma, branches + ([Assigns({})] if partial else []))
 
 
 def match_cases(

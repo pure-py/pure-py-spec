@@ -92,9 +92,6 @@ class Assigns:
 
 type StaticOutcome = Returns | Assigns
 
-RETURNS = Returns()
-
-ASSIGNS_EMPTY = Assigns({})
 
 FLOAT_TO_FLOAT = CallableType((Primitive.FLOAT,), Primitive.FLOAT)
 FLOAT_TO_INT = CallableType((Primitive.FLOAT,), Primitive.INT)
@@ -172,7 +169,7 @@ def merge_context(sigma: ClassTable, gamma: Context, gamma_: Context) -> VarCont
 def merge_outcomes(sigma: ClassTable, rs: list[StaticOutcome]) -> StaticOutcome:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
-        return RETURNS
+        return Returns()
     delta = assigns_branches[0].delta
     return Assigns(fold_merge(sigma, delta, assigns_branches[1:]))
 
