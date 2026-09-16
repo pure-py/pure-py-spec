@@ -78,7 +78,10 @@ def check_import(s: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, ClassTab
             raise IllFormedModule(s, reasons.UnknownModule(str(q)))
         if proper_prefix_of(mod_ctx.q, q):
             raise IllFormedModule(
-                s, reasons.OwnDescendantImport(str(q), str(mod_ctx.q))
+                s,
+                reasons.ImportOfContainedModule(
+                    str(q), str(mod_ctx.q), f"from {parent(q)} import {q.parts[-1]}"
+                ),
             )
         delta, sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.sigma)
         theta, sigma = loads_as(
@@ -90,7 +93,7 @@ def check_import(s: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, ClassTab
     if q not in mod_ctx.M:
         raise IllFormedModule(s, reasons.UnknownModule(str(q)))
     delta, sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.sigma)
-    sigma = load_ancestors(
+    sigma = load_containing(
         [p for p in proper_prefixes(q) if not prefix_of(p, mod_ctx.q)],
         replace(mod_ctx, sigma=sigma),
     )
@@ -99,15 +102,15 @@ def check_import(s: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, ClassTab
     )
 
 
-def load_ancestors(
-    ancestors: list[QualifiedName], mod_ctx: ModuleContext
+def load_containing(
+    containing: list[QualifiedName], mod_ctx: ModuleContext
 ) -> ClassTable:
-    if len(ancestors) == 0:
+    if len(containing) == 0:
         return mod_ctx.sigma
     _, sigma = check_module(
-        mod_ctx.M[ancestors[0]], mod_ctx.M, ancestors[0], mod_ctx.sigma
+        mod_ctx.M[containing[0]], mod_ctx.M, containing[0], mod_ctx.sigma
     )
-    return load_ancestors(ancestors[1:], replace(mod_ctx, sigma=sigma))
+    return load_containing(containing[1:], replace(mod_ctx, sigma=sigma))
 
 
 def submods(M: Mapping[QualifiedName, ast.Module], q: QualifiedName) -> Context:

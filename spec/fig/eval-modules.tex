@@ -86,7 +86,7 @@
   q, \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
 }
 \and
-\inferrule*[lab={\ruleName{eval-from-import-fail-ancestor}}]
+\inferrule*[lab={\ruleName{eval-from-import-fail-containing}}]
 {
   q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
   q^\dagger \Rightarrow_{\mathsf{load}} \aborts{\kappa} \quad (\text{some } q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q)
@@ -133,7 +133,7 @@
   q.x, v \loadsAs v'
 }
 \end{mathpar}
-\subcaption{Reference $v$ for module $q$ loads as reference $v'$ for root of $q$, loading ancestors of $q$}
+\subcaption{Reference $v$ for module $q$ loads as reference $v'$ for root of $q$, loading the modules containing $q$}
 \end{subfigure}
 \caption{Import evaluation}
 \label{fig:eval-import-prefix}

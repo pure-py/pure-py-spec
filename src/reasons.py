@@ -220,12 +220,16 @@ class ModuleAsValue:
 
 
 @dataclass(frozen=True)
-class OwnDescendantImport:
+class ImportOfContainedModule:
     q: str
     q_: str
+    from_import: str
 
     def message(self) -> str:
-        return f"'{self.q}' is a descendant of the importing module '{self.q_}'; import it with a from-import"
+        return (
+            f"'{self.q}' is contained in the importing module '{self.q_}'; "
+            f"a plain import is not allowed, write '{self.from_import}'"
+        )
 
 
 @dataclass(frozen=True)
@@ -396,7 +400,7 @@ type Reason = (
     | TopLevelReturn
     | SubmoduleNameClash
     | SubmoduleNotImported
-    | OwnDescendantImport
+    | ImportOfContainedModule
     | UnassignedMember
     | NoBinaryOverload
     | NoUnaryOverload

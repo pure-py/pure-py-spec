@@ -110,8 +110,8 @@ of $q$ and then its statement, mirroring static loading $\vdash_{\mathsf{load}} 
 (\figref{typing-module}); as with the static rules, the mutual
 recursion between loading and evaluation is grounded by program well-formedness, which rules out
 import cycles (\secref{modules-programs}).
-Loading takes a single module; an import loads the ancestors of its target from the root down, each
-before its descendant, mirroring the static rules\speconly{, by the loads-as judgement for a plain import and
+Loading takes a single module; an import loads the modules containing its target from the root down, each
+before the module it contains, mirroring the static rules\speconly{, by the loads-as judgement for a plain import and
 as premises of the from-import rule}.
 
 Since

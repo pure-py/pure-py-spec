@@ -393,15 +393,15 @@ $\Sigma \vdash_{\mathsf{load}} q : \Gamma \binding \Sigma'$ (\figref{typing-modu
 (\secref{operational-semantics}). The \ruleName{module} rule types the body as a top-level statement, and
 the \ruleName{predefined} rule gives a predefined module the signature of
 Definition~\ref{def:predefined}.
-Both import forms statically load their target, together with its ancestors
+Both import forms statically load their target, together with its containing modules
 (\figref{typing-import-prefix}). A plain import also records each of these modules as a member of its
 parent (the static loads-as judgement), so that the binding created for the root of the target gives attribute
-access along the whole chain. A from-import also loads any imported name that denotes a submodule. An
-ancestor of the target is exempt from loading first if it is the importing module or one of its
-ancestors, since at runtime it may still be loading. The exemption applies only to from-imports, because
+access along the whole chain. A from-import also loads any imported name that denotes a submodule. A
+containing module of the target is exempt from loading first if it is the importing module or one of its
+containing modules, since at runtime it may still be loading. The exemption applies only to from-imports, because
 for a plain import
-the only ancestor that could never load first is the importing module itself, and an import naming a proper
-descendant of the importing module is excluded outright\paperonly{ (\secref{no-load-dependent})}. Loading a module
+the only containing module that could never load first is the importing module itself, and an import naming a
+module contained in the importing module is excluded outright\paperonly{ (\secref{no-load-dependent})}. Loading a module
 may thus require other modules to load first; the rules are interpreted inductively, so a program with an
 import cycle is ill-formed, because a module in a cycle could finish loading only after itself. Program
 well-formedness (\figref{typing-module}) requires the main module to be well typed and hence,

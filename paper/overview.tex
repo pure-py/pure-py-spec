@@ -125,8 +125,8 @@ inside a function body or branch, nor after a statement. Wildcard imports (\pyin
 *}) are excluded, since the names introduced are not explicit; PEP 8 recommends against
 them.\footnote{\url{https://peps.python.org/pep-0008/}} A submodule may not import itself through its parent
 (\pyinline{from a import b} inside module \pyinline{a.b}): \PurePy treats the from-imported submodule as a
-dependency, so this is an import cycle. An \pyinline{import} (as opposed to a from-import) may not name a proper
-descendant of the importing module (\pyinline{import x.y} inside module \pyinline{x}), since the binding for
+dependency, so this is an import cycle. An \pyinline{import} (as opposed to a from-import) may not name a
+module contained in the importing module (\pyinline{import x.y} inside module \pyinline{x}), since the binding for
 the head would denote the still-loading module.
 
 A module may not bind a name that is also the name of one of its submodules. In Python an attribute of a
