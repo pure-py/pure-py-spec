@@ -132,24 +132,24 @@ def check_module_(m: ast.Module, M: Mapping[str, ast.Module], q: str) -> Context
     if q in PREDEFINED_MODULES:
         return predefined_context(q)
     imports, stmts = split_imports(m.body)
-    gamma0 = check_imports_prefix(imports, ModuleContext(gamma={}, M=M, q=q))
+    gamma = check_imports_prefix(imports, ModuleContext(gamma={}, M=M, q=q))
     body = [name_assign(q)] + stmts
     mod_ctx = check_top_seq(
         statements(body),
-        ModuleContext(gamma={**predefined_context("builtins"), **gamma0}, M=M, q=q),
+        ModuleContext(gamma={**predefined_context("builtins"), **gamma}, M=M, q=q),
     )
-    check_submodule_clash(m, gamma0, body, M, q)
+    check_submodule_clash(m, gamma, body, M, q)
     return signature(body, mod_ctx, q)
 
 
 def check_submodule_clash(
     m: ast.Module,
-    gamma0: Context,
+    gamma: Context,
     body: list[ast.stmt],
     M: Mapping[str, ast.Module],
     q: str,
 ) -> None:
-    clash = sorted((set(gamma0) | assigns_body(body)) & set(submods(M, q)))
+    clash = sorted((set(gamma) | assigns_body(body)) & set(submods(M, q)))
     if len(clash) > 0:
         x = clash[0]
         node = find_binder(m.body, x)
