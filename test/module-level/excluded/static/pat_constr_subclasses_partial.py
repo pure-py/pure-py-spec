@@ -1,5 +1,5 @@
-# rule: def -- cases for every declared subclass leave the base class's own
-# instances, so the match is partial and the function may fall off the end
+# rule: def -- cases for every declared subclass leave the instances of the base
+# class itself, so the match is partial and the function may fall off the end
 from dataclasses import dataclass
 
 @dataclass
