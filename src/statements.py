@@ -325,13 +325,13 @@ def match_cases(
             )
         result = match_shapes(residual, case.pattern, mod_ctx)
         if result is None:
-            raise unmatched(case.pattern, index, subject, seed, mod_ctx)
+            raise case_matches_nothing(case.pattern, index, subject, seed, mod_ctx)
         _, residual, delta = result
         deltas.append(delta)
     return deltas, len(residual) > 0
 
 
-def unmatched(
+def case_matches_nothing(
     p: ast.pattern,
     index: int,
     subject: Type,
