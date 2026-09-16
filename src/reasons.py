@@ -6,70 +6,68 @@ from type_syntax import QualifiedName
 
 @dataclass(frozen=True)
 class DuplicateFieldName:
-    name: str
-    cls: str
+    x: str
+    c: str
 
     def message(self) -> str:
-        return f"duplicate field name '{self.name}' in class '{self.cls}'"
+        return f"duplicate field name '{self.x}' in class '{self.c}'"
 
 
 @dataclass(frozen=True)
 class InheritedFieldClash:
-    field: str
-    base: str
+    x: str
+    c: str
 
     def message(self) -> str:
-        return f"field '{self.field}' clashes with inherited field from '{self.base}'"
+        return f"field '{self.x}' clashes with inherited field from '{self.c}'"
 
 
 @dataclass(frozen=True)
 class ClassRebound:
-    name: str
+    c: str
 
     def message(self) -> str:
-        return (
-            f"'{self.name}' is bound to a class and cannot be rebound at the top level"
-        )
+        return f"'{self.c}' is bound to a class and cannot be rebound at the top level"
 
 
 @dataclass(frozen=True)
 class UndefinedVariable:
-    name: str
+    x: str
 
     def message(self) -> str:
-        return f"'{self.name}' is not defined"
+        return f"'{self.x}' is not defined"
 
 
 @dataclass(frozen=True)
 class UnassignedVariable:
-    name: str
+    x: str
 
     def message(self) -> str:
-        return f"'{self.name}' is not definitely assigned"
+        return f"'{self.x}' is not definitely assigned"
 
 
 @dataclass(frozen=True)
 class CapturedReassignment:
-    name: str
+    x: str
 
     def message(self) -> str:
-        return f"'{self.name}' captured by previous statement, reassigned here"
+        return f"'{self.x}' captured by previous statement, reassigned here"
 
 
 @dataclass(frozen=True)
 class SelfCaptureAssignment:
-    name: str
+    x: str
 
     def message(self) -> str:
-        return f"'{self.name}' captured by right-hand side"
+        return f"'{self.x}' captured by right-hand side"
 
 
 @dataclass(frozen=True)
 class CapturedGeneratorVariable:
-    name: str
+    x: str
 
     def message(self) -> str:
-        return f"'{self.name}' bound by a generator, captured by a lambda"
+        return f"'{self.x}' bound by a generator, captured by a lambda"
 
 
 @dataclass(frozen=True)
@@ -80,97 +78,97 @@ class UnreachableStatement:
 
 @dataclass(frozen=True)
 class ConstructorArityMismatch:
-    cls: str
+    c: str
     expected: int
     got: int
 
     def message(self) -> str:
-        return f"constructor for '{self.cls}' expects {self.expected} arguments, got {self.got}"
+        return f"constructor for '{self.c}' expects {self.expected} arguments, got {self.got}"
 
 
 @dataclass(frozen=True)
 class UnknownConstructorKeyword:
-    cls: str
-    expected_fields: tuple[str, ...]
+    c: str
+    xs: tuple[str, ...]
 
     def message(self) -> str:
-        return f"constructor keywords for '{self.cls}' must be {', '.join(self.expected_fields)}"
+        return f"constructor keywords for '{self.c}' must be {', '.join(self.xs)}"
 
 
 @dataclass(frozen=True)
 class PatternArityMismatch:
-    cls: str
+    c: str
     expected: int
     got: int
 
     def message(self) -> str:
-        return f"pattern for '{self.cls}' expects {self.expected} sub-patterns, got {self.got}"
+        return f"pattern for '{self.c}' expects {self.expected} sub-patterns, got {self.got}"
 
 
 @dataclass(frozen=True)
 class NotPredefinedName:
-    name: str
+    x: str
 
     def message(self) -> str:
-        return f"'{self.name}' is not bound as a predefined name"
+        return f"'{self.x}' is not bound as a predefined name"
 
 
 @dataclass(frozen=True)
 class NotClass:
-    name: str
+    q: str
 
     def message(self) -> str:
-        return f"'{self.name}' is not a declared class"
+        return f"'{self.q}' is not a declared class"
 
 
 @dataclass(frozen=True)
 class UnknownFieldInPattern:
-    cls: str
-    expected_fields: tuple[str, ...]
+    c: str
+    xs: tuple[str, ...]
 
     def message(self) -> str:
-        return f"pattern keywords for '{self.cls}' must be {', '.join(self.expected_fields)}"
+        return f"pattern keywords for '{self.c}' must be {', '.join(self.xs)}"
 
 
 @dataclass(frozen=True)
 class DuplicatePatternKeyword:
-    cls: str
+    c: str
 
     def message(self) -> str:
-        return f"duplicate keyword in pattern for '{self.cls}'"
+        return f"duplicate keyword in pattern for '{self.c}'"
 
 
 @dataclass(frozen=True)
 class DuplicateDictKey:
-    key: str
+    w: str
 
     def message(self) -> str:
-        return f"duplicate key '{self.key}' in dict pattern"
+        return f"duplicate key '{self.w}' in dict pattern"
 
 
 @dataclass(frozen=True)
 class NonlinearPattern:
-    variable: str
+    x: str
 
     def message(self) -> str:
-        return f"repeated variable '{self.variable}' in pattern"
+        return f"repeated variable '{self.x}' in pattern"
 
 
 @dataclass(frozen=True)
 class DuplicateMutualName:
-    name: str
+    x: str
 
     def message(self) -> str:
-        return f"duplicate name '{self.name}' in mutual region"
+        return f"duplicate name '{self.x}' in mutual region"
 
 
 @dataclass(frozen=True)
 class SubmoduleNameClash:
-    name: str
-    submodule: str
+    x: str
+    q: str
 
     def message(self) -> str:
-        return f"binding '{self.name}' clashes with submodule '{self.submodule}'"
+        return f"binding '{self.x}' clashes with submodule '{self.q}'"
 
 
 @dataclass(frozen=True)
@@ -215,64 +213,62 @@ class UnknownMember:
 
 @dataclass(frozen=True)
 class ModuleAsValue:
-    name: str
+    q: str
 
     def message(self) -> str:
-        return f"'{self.name}' refers to a module; modules are not first-class values"
+        return f"'{self.q}' refers to a module; modules are not first-class values"
 
 
 @dataclass(frozen=True)
 class OwnDescendantImport:
     q: str
-    q0: str
+    q_: str
 
     def message(self) -> str:
-        return f"'{self.q}' is a descendant of the importing module '{self.q0}'; import it with a from-import"
+        return f"'{self.q}' is a descendant of the importing module '{self.q_}'; import it with a from-import"
 
 
 @dataclass(frozen=True)
 class PredefinedNameAsValue:
-    name: str
+    q: str
 
     def message(self) -> str:
-        return f"'{self.name}' is usable only in an annotation or as a decorator"
+        return f"'{self.q}' is usable only in an annotation or as a decorator"
 
 
 @dataclass(frozen=True)
 class ClassAsValue:
-    name: str
+    q: str
 
     def message(self) -> str:
-        return f"'{self.name}' refers to a class; classes are not first-class values"
+        return f"'{self.q}' refers to a class; classes are not first-class values"
 
 
 @dataclass(frozen=True)
 class NoBinaryOverload:
     op: str
-    left: str
-    right: str
+    sigma: str
+    sigma_: str
 
     def message(self) -> str:
-        return (
-            f"no overload of '{self.op}' at operand types {self.left} and {self.right}"
-        )
+        return f"no overload of '{self.op}' at operand types {self.sigma} and {self.sigma_}"
 
 
 @dataclass(frozen=True)
 class NoUnaryOverload:
     op: str
-    operand: str
+    sigma: str
 
     def message(self) -> str:
-        return f"no overload of '{self.op}' at operand type {self.operand}"
+        return f"no overload of '{self.op}' at operand type {self.sigma}"
 
 
 @dataclass(frozen=True)
 class NotCallable:
-    ty: str
+    tau: str
 
     def message(self) -> str:
-        return f"call of a value of type {self.ty}, which is not callable"
+        return f"call of a value of type {self.tau}, which is not callable"
 
 
 @dataclass(frozen=True)
@@ -295,10 +291,10 @@ class TypeMismatch:
 
 @dataclass(frozen=True)
 class NotSubscriptable:
-    ty: str
+    tau: str
 
     def message(self) -> str:
-        return f"subscript of a value of type {self.ty}, which has no subscript rule"
+        return f"subscript of a value of type {self.tau}, which has no subscript rule"
 
 
 @dataclass(frozen=True)
@@ -321,20 +317,20 @@ class CaseMatchesNothing:
 @dataclass(frozen=True)
 class PatternTypeMismatch:
     pattern: str
-    ty: str
+    tau: str
 
     def message(self) -> str:
-        return f"{self.pattern} cannot match a value of type {self.ty}"
+        return f"{self.pattern} cannot match a value of type {self.tau}"
 
 
 @dataclass(frozen=True)
 class SequenceKindClash:
     pattern: str
-    ty: str
+    tau: str
 
     def message(self) -> str:
         return (
-            f"{self.pattern} against a value of type {self.ty}; Python matches "
+            f"{self.pattern} against a value of type {self.tau}; Python matches "
             "sequence patterns against lists and tuples alike, so PurePy "
             "treats the two kinds as incompatible"
         )
@@ -342,19 +338,19 @@ class SequenceKindClash:
 
 @dataclass(frozen=True)
 class NotIterable:
-    ty: str
+    tau: str
 
     def message(self) -> str:
-        return f"iteration over a value of type {self.ty}, which has no element type"
+        return f"iteration over a value of type {self.tau}, which has no element type"
 
 
 @dataclass(frozen=True)
 class UnknownField:
-    cls: str
-    field: str
+    c: str
+    x: str
 
     def message(self) -> str:
-        return f"class '{self.cls}' has no field '{self.field}'"
+        return f"class '{self.c}' has no field '{self.x}'"
 
 
 @dataclass(frozen=True)
@@ -365,13 +361,11 @@ class NotSynthesised:
 
 @dataclass(frozen=True)
 class MissingReturn:
-    name: str
-    ty: str
+    x: str
+    tau: str
 
     def message(self) -> str:
-        return (
-            f"'{self.name}' declares result type {self.ty} but does not always return"
-        )
+        return f"'{self.x}' declares result type {self.tau} but does not always return"
 
 
 type Reason = (
