@@ -68,15 +68,11 @@ def is_assigned(mod_ctx: ModuleContext, x: str) -> bool:
 
 
 def resolve_name(q: str, mod_ctx: ModuleContext) -> ContextEntry | None:
-    """Entry a qualified name denotes: its first component in the context, and
-    each later one a member of the module the components before it denote."""
-    x, *rest = q.split(".")
-    entry = mod_ctx.gamma.get(x)
-    for y in rest:
-        if not isinstance(entry, ModuleLoaded):
-            return None
-        entry = entry.members.get(y)
-    return entry
+    if "." not in q:
+        return mod_ctx.gamma.get(q)
+    prefix, x = q.rsplit(".", 1)
+    entry = resolve_name(prefix, mod_ctx)
+    return entry.members.get(x) if isinstance(entry, ModuleLoaded) else None
 
 
 def module_of(mod_ctx: ModuleContext, x: str) -> ModuleStub | ModuleLoaded | None:
