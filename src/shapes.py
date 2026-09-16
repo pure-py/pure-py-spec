@@ -63,8 +63,6 @@ class Dict:
 type Shape = Rest | Constr | Tuple | List | Dict
 type Seq = tuple[Shape, ...]
 
-NOTHING: tuple[Shape, ...] = ()
-
 
 def shape_type(k: Shape) -> Type:
     """Least type of a shape."""
@@ -86,15 +84,15 @@ def shapes(sigma: ClassTable, t: Type, heads: frozenset[Head]) -> tuple[Shape, .
         right = shapes(sigma, t.right, typed_heads(sigma, heads, t.right))
         return left + tuple(k for k in right if k not in left)
     if isinstance(t, LiteralType) and t in heads:
-        return NOTHING
+        return ()
     if t == Primitive.BOOL and {LiteralType(True), LiteralType(False)} <= heads:
-        return NOTHING
+        return ()
     if t == Primitive.NONE and LiteralType(None) in heads:
-        return NOTHING
+        return ()
     if isinstance(t, ClassType) and below_excluded(sigma, t.c, heads):
-        return NOTHING
+        return ()
     if t == Primitive.NEVER:
-        return NOTHING
+        return ()
     if isinstance(t, DictType):
         assert not heads  # no head is typed at a dictionary type
         return (Dict(t.value, (), frozenset()),)

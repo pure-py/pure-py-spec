@@ -14,7 +14,6 @@ from contexts import (
 )
 from reasons import IllFormedModule
 from shapes import (
-    NOTHING,
     Constr,
     Dict,
     List,
@@ -71,7 +70,7 @@ def match_as(k: Shape, p: ast.MatchAs, mod_ctx: ModuleContext) -> Match | None:
     at the join over the shapes it matched."""
     if p.pattern is None:
         bare: VarContext = {} if p.name is None else {p.name: shape_type(k)}
-        return (k,), NOTHING, bare
+        return (k,), (), bare
     result = match(k, p.pattern, mod_ctx)
     if result is None:
         return None
@@ -99,7 +98,7 @@ def match_split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | Non
 def match_literal(k: Shape, ell: LiteralType) -> Match | None:
     if isinstance(k, Rest) and k.ty == ell:
         assert not k.heads
-        return (k,), NOTHING, {}
+        return (k,), (), {}
     return None
 
 
@@ -184,7 +183,7 @@ def split_tuple(sigma: ClassTable, k: Shape, n: int) -> Split | None:
     if len(k.ty.components) != n:
         return None
     assert not k.heads
-    return tuple(Tuple(ks) for ks in shapes_seq(sigma, k.ty.components)), NOTHING
+    return tuple(Tuple(ks) for ks in shapes_seq(sigma, k.ty.components)), ()
 
 
 def split_list(sigma: ClassTable, k: Shape, n: int) -> Split | None:
