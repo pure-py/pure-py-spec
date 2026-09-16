@@ -154,10 +154,10 @@ def check_top_seq(items: list[Statement], mod_ctx: ModuleContext) -> ModuleConte
     if len(tail) == 0:
         return mod_ctx_after
     check_captured_reassignment(head, tail)
-    rebound = {c for c in assigns_seq(tail) if isinstance(delta.get(c), Class)}
-    if len(rebound) > 0:
-        node = first_assigning_statement(tail, rebound)
-        raise IllFormedModule(node, reasons.ClassRebound(min(rebound)))
+    rebound_classes = {c for c in assigns_seq(tail) if isinstance(delta.get(c), Class)}
+    if len(rebound_classes) > 0:
+        node = first_assigning_statement(tail, rebound_classes)
+        raise IllFormedModule(node, reasons.ClassRebound(min(rebound_classes)))
     return check_top_seq(tail, mod_ctx_after)
 
 
