@@ -3,7 +3,7 @@ import ast
 import reasons
 from aux import (
     Statement,
-    annotated,
+    annotation,
     assigns_body,
     assigns_seq,
     binds_quals,

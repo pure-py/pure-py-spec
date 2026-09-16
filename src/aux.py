@@ -331,7 +331,7 @@ def own_fields(node: ast.ClassDef) -> tuple[tuple[str, TypeExpr], ...]:
     )
 
 
-def annotated(e: ast.expr | None) -> TypeExpr:
+def annotation(e: ast.expr | None) -> TypeExpr:
     """Type expression an annotation carries; a definition annotates every
     parameter and its return type, and the subset admits no other annotation."""
     assert e is not None
