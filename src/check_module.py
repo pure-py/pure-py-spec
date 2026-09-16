@@ -27,6 +27,7 @@ from statements import check_top_seq
 
 
 def name_assign(q: str) -> ast.stmt:
+    """Assignment `__name__ = name(q)` that opens module body."""
     return ast.parse(f"__name__ = {q!r}").body[0]
 
 
