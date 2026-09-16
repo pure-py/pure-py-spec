@@ -332,10 +332,10 @@ def own_fields(node: ast.ClassDef) -> tuple[tuple[str, TypeExpr], ...]:
 
 
 def type_expr(annotation: ast.expr | None) -> TypeExpr:
-    """Type expression an annotation denotes; absence already rejected by the syntax check."""
-    assert annotation is not None
+    """Type expression an annotation denotes."""
+    assert annotation is not None, "missing annotation rejected by the syntax check"
     t = parse_annotation(annotation)
-    assert t is not None
+    assert t is not None, "unsupported annotation rejected by the syntax check"
     return t
 
 
