@@ -140,8 +140,7 @@ def check_in_scope(x: str, node: ast.AST, mod_ctx: ModuleContext) -> None:
 def check_body(
     body: list[ast.stmt], mod_ctx: ModuleContext, returns: Type | None = None
 ) -> StaticOutcome:
-    outcome, _ = check_seq(statements(body), mod_ctx, returns)
-    return outcome
+    return check_seq(statements(body), mod_ctx, returns)
 
 
 def check_top_seq(items: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
@@ -149,11 +148,12 @@ def check_top_seq(items: list[Statement], mod_ctx: ModuleContext) -> ModuleConte
         return mod_ctx
     head, tail = items[0], items[1:]
     head_outcome, sigma = check_top_statement(head, mod_ctx)
-    mod_ctx_after = extend(head_outcome, replace(mod_ctx, sigma=sigma))
+    assert isinstance(head_outcome, Assigns), "top-level return rejected by check_stmt"
+    delta = head_outcome.delta
+    mod_ctx_after = override_gamma(replace(mod_ctx, sigma=sigma), delta)
     if len(tail) == 0:
         return mod_ctx_after
     check_captured_reassignment(head, tail)
-    delta = head_outcome.delta if isinstance(head_outcome, Assigns) else {}
     rebound = {c for c in assigns_seq(tail) if isinstance(delta.get(c), Class)}
     if len(rebound) > 0:
         node = first_assigning_statement(tail, rebound)
@@ -172,20 +172,19 @@ def check_top_statement(
 
 def check_seq(
     items: list[Statement], mod_ctx: ModuleContext, returns: Type | None = None
-) -> tuple[StaticOutcome, ModuleContext]:
+) -> StaticOutcome:
     if len(items) == 0:
-        return Assigns({}), mod_ctx
+        return Assigns({})
     head, tail = items[0], items[1:]
     head_outcome = check_statement(head, mod_ctx, returns)
-    mod_ctx_after = extend(head_outcome, mod_ctx)
     if len(tail) == 0:
-        return head_outcome, mod_ctx_after
+        return head_outcome
     if isinstance(head_outcome, Returns):
         node: ast.AST = tail[0][0] if isinstance(tail[0], list) else tail[0]
         raise IllFormedModule(node, reasons.UnreachableStatement())
     check_captured_reassignment(head, tail)
-    tail_outcome, final_ctx = check_seq(tail, mod_ctx_after, returns)
-    return override_outcomes(head_outcome, tail_outcome), final_ctx
+    tail_outcome = check_seq(tail, override_gamma(mod_ctx, head_outcome.delta), returns)
+    return override_outcomes(head_outcome, tail_outcome)
 
 
 def check_captured_reassignment(head: Statement, tail: list[Statement]) -> None:
@@ -193,14 +192,6 @@ def check_captured_reassignment(head: Statement, tail: list[Statement]) -> None:
     if len(reassigned) > 0:
         node = first_assigning_statement(tail, reassigned)
         raise IllFormedModule(node, reasons.CapturedReassignment(min(reassigned)))
-
-
-def extend(outcome: StaticOutcome, mod_ctx: ModuleContext) -> ModuleContext:
-    return (
-        override_gamma(mod_ctx, outcome.delta)
-        if isinstance(outcome, Assigns)
-        else mod_ctx
-    )
 
 
 def check_statement(
