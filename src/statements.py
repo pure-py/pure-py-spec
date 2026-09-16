@@ -100,10 +100,10 @@ def parameters(d: ast.FunctionDef, mod_ctx: ModuleContext) -> VarContext:
 
 def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
     if isinstance(psi, Primitive):
-        in_scope(PRIMITIVE_SPELLINGS[psi], node, mod_ctx)
+        check_in_scope(PRIMITIVE_SPELLINGS[psi], node, mod_ctx)
         return psi
     if isinstance(psi, LiteralType):
-        in_scope("Literal", node, mod_ctx)
+        check_in_scope("Literal", node, mod_ctx)
         return psi
     if isinstance(psi, ClassName):
         c = resolve_name(psi.q, mod_ctx)
@@ -111,17 +111,17 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
             raise IllFormedModule(node, reasons.UnknownClassInAnnotation(psi.q))
         return ClassType(c)
     if isinstance(psi, ListExpr):
-        in_scope("list", node, mod_ctx)
+        check_in_scope("list", node, mod_ctx)
         return ListType(resolve_type(psi.elem, node, mod_ctx))
     if isinstance(psi, DictExpr):
-        in_scope("dict", node, mod_ctx)
-        in_scope("str", node, mod_ctx)
+        check_in_scope("dict", node, mod_ctx)
+        check_in_scope("str", node, mod_ctx)
         return DictType(resolve_type(psi.value, node, mod_ctx))
     if isinstance(psi, TupleExpr):
-        in_scope("tuple", node, mod_ctx)
+        check_in_scope("tuple", node, mod_ctx)
         return TupleType(tuple(resolve_type(c, node, mod_ctx) for c in psi.components))
     if isinstance(psi, CallableExpr):
-        in_scope("Callable", node, mod_ctx)
+        check_in_scope("Callable", node, mod_ctx)
         return CallableType(
             tuple(resolve_type(p, node, mod_ctx) for p in psi.params),
             resolve_type(psi.result, node, mod_ctx),
@@ -132,7 +132,7 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
     )
 
 
-def in_scope(x: str, node: ast.AST, mod_ctx: ModuleContext) -> None:
+def check_in_scope(x: str, node: ast.AST, mod_ctx: ModuleContext) -> None:
     if not isinstance(mod_ctx.gamma.get(x), PredefinedName):
         raise IllFormedModule(node, reasons.AnnotationNameNotInScope(x))
 
