@@ -1,5 +1,6 @@
 INPUTS := $(wildcard tex/*.tex spec/*.tex spec/*/*.tex spec/*/*/*.tex paper/*.tex paper/*/*.tex)
-TEXFILES := $(wildcard *.tex) $(INPUTS)
+BIBFILES := $(wildcard tex/*.bib)
+TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
 # Removed after each build; the .bbl is kept, since paper-arXiv.zip includes it.
 BUILD_AUX := *.aux *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
