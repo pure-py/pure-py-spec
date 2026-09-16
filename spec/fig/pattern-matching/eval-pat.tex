@@ -99,7 +99,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-pat-constr-no}}]
 {
-  \resolveClass(\rho, q) = C \\
+  \resolve(\rho, q) = \Type{C} \\
   v \text{ not object, or } \exObj{D}{\rho'} \text{ with } C \notin \ancestors(\Sigma, D)
 }
 {

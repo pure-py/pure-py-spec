@@ -314,7 +314,7 @@
   \rho, e_1 \cons e_1' \cons \ldots \cons e_n \cons e_n' \Rightarrow \val{(w_1 \cons v_1 \cons \ldots \cons w_n \cons v_n)}
 }
 {
-  \rho, \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \Rightarrow \val{\exDict{\entries(\varepsilon, \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n})}}
+  \rho, \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \Rightarrow \val{\exDict{\update(\varepsilon, \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n})}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-list-comp}}]
@@ -333,7 +333,7 @@
   \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i)
 }
 {
-  \rho, \exDictComp{e}{e'}{\seq{g}} \Rightarrow \val{\exDict{\entries(\varepsilon, \bind{\seq{w}}{\seq{v}})}}
+  \rho, \exDictComp{e}{e'}{\seq{g}} \Rightarrow \val{\exDict{\update(\varepsilon, \bind{\seq{w}}{\seq{v}})}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-attr-module}}]
@@ -356,7 +356,7 @@
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \val{(v_1 \cons \ldots \cons v_{n+m})} \\
-  \resolveClass(\rho, q) = C 
+  \resolve(\rho, q) = \Type{C} 
 }
 {
   \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{C}{\fieldMap(\Sigma, C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m}))}}

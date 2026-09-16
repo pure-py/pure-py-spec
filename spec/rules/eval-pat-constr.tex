@@ -1,6 +1,6 @@
 \inferrule*[lab={\ruleName{eval-pat-constr}}]
 {
-  \resolveClass(\rho, q) = C \\
+  \resolve(\rho, q) = \Type{C} \\
   C \in \ancestors(\Sigma, D) \\
   \rho, \fieldMap(\Sigma, C, \seq{p})(x), \rho'(x) \matches m_x \quad (\forall x \in \dom(\fields(\Sigma, C)))
 }

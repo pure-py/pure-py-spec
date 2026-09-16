@@ -115,14 +115,9 @@ the resolution of qualified names in an environment.
 \funcrows{field-map}
 \end{auxfunction}
 
-\begin{auxfunction}{\env(\rho, q)}{environment}{aux:env}
-\input{spec/functions/env-text}
-\funcrows{env}
-\end{auxfunction}
-
-\begin{auxfunction}{\resolveClass(\rho, q)}{class}{aux:resolve-class}
-\input{spec/functions/resolve-class-text}
-\funcrows{resolve-class}
+\begin{auxfunction}{\resolve(\rho, q)}{value}{aux:resolve}
+\input{spec/functions/resolve-text}
+\funcrows{resolve}
 \end{auxfunction}
 
 \begin{auxfunction}{\nameOf(q)}{string}{aux:name}
@@ -196,12 +191,12 @@ The functions on values used by the evaluation rules.
 \funcrows{dispatch}
 \end{auxfunction}
 
-\begin{auxfunction}{\entries(\delta, \delta')}{dictionary entries}{aux:entries}
-\input{spec/functions/entries-text}
-\funcrows{entries}
-\end{auxfunction}
-
-\begin{auxfunction}{\update(\delta, w, v)}{dictionary entries}{aux:update}
+\begin{auxfunction}{\update(\delta, \delta')}{dictionary entries}{aux:update}
 \input{spec/functions/update-text}
 \funcrows{update}
+\end{auxfunction}
+
+\begin{auxfunction}{\setitem(\delta, w, v)}{dictionary entries}{aux:setitem}
+\input{spec/functions/setitem-text}
+\funcrows{setitem}
 \end{auxfunction}
