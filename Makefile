@@ -49,8 +49,8 @@ spec-anon.pdf: $(TEXFILES)
 MECHANISATION := isabelle-purepy
 
 # A submission ships the mechanisation as it stands on main, so refuse to build
-# one from a working copy that has changes, unpushed commits, or a branch that
-# origin/main does not already contain.
+# one from a working copy with uncommitted changes or with a checked-out commit
+# that is not on origin/main.
 check-mechanisation:
 	@test -e $(MECHANISATION)/ROOT || \
 		{ echo "$(MECHANISATION) not checked out: git submodule update --init"; exit 1; }
