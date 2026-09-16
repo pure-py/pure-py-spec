@@ -89,12 +89,22 @@ def check_import(s: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, ClassTab
     if s.module not in mod_ctx.M:
         raise IllFormedModule(s, reasons.UnknownModule(s.module))
     delta, sigma = check_module(mod_ctx.M[s.module], mod_ctx.M, s.module, mod_ctx.sigma)
-    for p in proper_prefixes(s.module):
-        if not prefix_of(p, mod_ctx.q):
-            _, sigma = check_module(mod_ctx.M[p], mod_ctx.M, p, sigma)
+    sigma = load_ancestors(
+        [p for p in proper_prefixes(s.module) if not prefix_of(p, mod_ctx.q)],
+        replace(mod_ctx, sigma=sigma),
+    )
     return imports_seq(
         s, [a.name for a in s.names], s.module, delta, replace(mod_ctx, sigma=sigma)
     )
+
+
+def load_ancestors(ancestors: list[str], mod_ctx: ModuleContext) -> ClassTable:
+    if len(ancestors) == 0:
+        return mod_ctx.sigma
+    _, sigma = check_module(
+        mod_ctx.M[ancestors[0]], mod_ctx.M, ancestors[0], mod_ctx.sigma
+    )
+    return load_ancestors(ancestors[1:], replace(mod_ctx, sigma=sigma))
 
 
 def submods(M: Mapping[str, ast.Module], q: str) -> Context:
