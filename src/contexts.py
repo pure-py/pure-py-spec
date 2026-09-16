@@ -219,13 +219,15 @@ def disjoint_union[V](
 
 
 def join_context(sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
-    return {x: join_entries(sigma, [delta[x] for delta in deltas]) for x in deltas[0]}
+    return {
+        x: join(sigma, binding_types([delta[x] for delta in deltas])) for x in deltas[0]
+    }
 
 
-def join_entries(sigma: ClassTable, entries: list[VarEntry]) -> VarEntry:
+def binding_types(entries: list[VarEntry]) -> list[Type]:
     types = [e for e in entries if not isinstance(e, Status)]
-    assert len(types) == len(entries)
-    return join(sigma, types)
+    assert len(types) == len(entries), "pattern bindings are types"
+    return types
 
 
 def extend_context(gamma: Context, gamma_: Context) -> Context:
