@@ -115,7 +115,7 @@ def match_list(k: Shape, p: PatList, mod_ctx: ModuleContext) -> Match | None:
 def match_dict(k: Shape, p: ast.MatchMapping, mod_ctx: ModuleContext) -> Match | None:
     if not isinstance(k, Dict):
         return None
-    ws = items(p)
+    ws = key_patterns(p)
     keys = tuple(w for w, _ in ws)
     repeated = [w for i, w in enumerate(keys) if w in keys[:i]]
     if len(repeated) > 0:
@@ -146,7 +146,7 @@ def split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Split | None:
     if isinstance(p, PatList):
         return split_list(sigma, k, len(p.patterns))
     if isinstance(p, ast.MatchMapping):
-        return split_dict(sigma, k, items(p))
+        return split_dict(sigma, k, key_patterns(p))
     assert isinstance(p, ast.MatchClass)
     cls = class_of_pattern(p, mod_ctx)
     if isinstance(k, Rest):
@@ -363,11 +363,11 @@ def with_keys(k: Dict, ws: tuple[str, ...], ks: Seq) -> Dict:
     return Dict(k.value, tuple(sorted(bound.items())), k.heads)
 
 
-def items(p: ast.MatchMapping) -> tuple[tuple[str, ast.pattern], ...]:
-    return tuple(zip([dict_key(key) for key in p.keys], p.patterns))
+def key_patterns(p: ast.MatchMapping) -> tuple[tuple[str, ast.pattern], ...]:
+    return tuple(zip([string_literal(key) for key in p.keys], p.patterns))
 
 
-def dict_key(k: ast.expr) -> str:
+def string_literal(k: ast.expr) -> str:
     assert isinstance(k, ast.Constant) and isinstance(k.value, str)
     return k.value
 
