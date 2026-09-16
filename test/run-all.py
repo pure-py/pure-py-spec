@@ -396,9 +396,9 @@ def main() -> None:
             ["mypy", "--strict", *sources], capture_output=True, text=True, check=False
         )
         if proc.returncode == 0:
-            r.ok("checker typing")
+            r.ok("checker type-checks")
         else:
-            r.bad("checker typing", proc.stdout.strip()[:400])
+            r.bad("checker type-checks", proc.stdout.strip()[:400])
         check_mypy_tests(r, module)
 
     last = None
