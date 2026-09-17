@@ -129,10 +129,6 @@ avoid spurious diffs:
 Export the library to `tex/zotero-export.bib`. A reference not yet in the library goes in
 `tex/additional-refs.bib` by hand until it is imported.
 
-## Extensions
-
-Implementations are allowed to have additional behaviours and syntax beyond the PurePy spec, as long as they maintain compatibility with the PurePy subset. For example, Python itself supports many additional features, like mutable variables and exceptions; Fluid has a matrix literal notation and allows functions to be defined by pattern-matching clauses.
-
 ## Existing implementations
 
 Languages/language implementations we would like to be PurePy compliant:
