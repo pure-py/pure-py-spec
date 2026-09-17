@@ -347,7 +347,7 @@ def padded(ps: tuple[ast.pattern, ...], n: int) -> tuple[ast.pattern, ...]:
 
 
 def no_field_map(Sigma: ClassTable, c: Class, p: ast.MatchClass) -> IllFormedModule:
-    """Why field-map is undefined for the pattern's arguments."""
+    """Why field-map is undefined for a pattern's arguments."""
     name, xs = short_name(c), fields(Sigma, c)
     n = len(p.patterns)
     if n + len(p.kwd_attrs) != len(xs):
