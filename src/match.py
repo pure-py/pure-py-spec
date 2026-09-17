@@ -92,7 +92,7 @@ def match_split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | Non
 
 def match_literal(k: Shape, ell: LiteralType) -> Match | None:
     if isinstance(k, Rest) and k.ty == ell:
-        assert not k.heads
+        assert len(k.hs) == 0
         return (k,), (), {}
     return None
 
@@ -134,7 +134,7 @@ def match_constr(k: Shape, p: ast.MatchClass, mod_ctx: ModuleContext) -> Match |
     ps = pattern_seq(mod_ctx.Sigma, c, p)
     if isinstance(k, Constr) and subtype(mod_ctx.Sigma, ClassType(k.c), ClassType(c)):
         result = match_seq(k.args, padded(ps, len(k.args)), p, mod_ctx)
-        return map_seq_match(lambda ks: Constr(k.c, ks, k.heads), result)
+        return map_seq_match(lambda ks: Constr(k.c, ks, k.hs), result)
     return None
 
 
@@ -160,11 +160,11 @@ def split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Split | None:
 def split_literal(Sigma: ClassTable, k: Shape, ell: LiteralType) -> Split | None:
     if (
         isinstance(k, Rest)
-        and ell not in k.heads
+        and ell not in k.hs
         and subtype(Sigma, ell, k.ty)
         and not isinstance(k.ty, LiteralType)
     ):
-        return (Rest(ell, frozenset()),), shapes(Sigma, k.ty, k.heads | {ell})
+        return (Rest(ell, frozenset()),), shapes(Sigma, k.ty, k.hs | {ell})
     return None
 
 
@@ -173,17 +173,17 @@ def split_tuple(Sigma: ClassTable, k: Shape, n: int) -> Split | None:
         return None
     if len(k.ty.components) != n:
         return None
-    assert not k.heads
+    assert len(k.hs) == 0
     return tuple(Tuple(ks) for ks in shapes_seq(Sigma, k.ty.components)), ()
 
 
 def split_list(Sigma: ClassTable, k: Shape, n: int) -> Split | None:
-    if not (isinstance(k, Rest) and isinstance(k.ty, ListType) and n not in k.heads):
+    if not (isinstance(k, Rest) and isinstance(k.ty, ListType) and n not in k.hs):
         return None
     elem = k.ty.elem
     return (
         tuple(List(elem, ks) for ks in shapes_seq(Sigma, (elem,) * n)),
-        shapes(Sigma, k.ty, k.heads | {n}),
+        shapes(Sigma, k.ty, k.hs | {n}),
     )
 
 
@@ -194,39 +194,39 @@ def split_dict(
         return None
     beta = dict(k.beta)
     w = next((w for w, _ in ws if w not in beta), None)
-    if w is None or w in k.heads:
+    if w is None or w in k.hs:
         return None
     return (
         tuple(with_keys(k, (w,), (m,)) for m in shapes(Sigma, k.value, frozenset())),
-        (Dict(k.value, k.beta, k.heads | {w}),),
+        (Dict(k.value, k.beta, k.hs | {w}),),
     )
 
 
 def split_class(Sigma: ClassTable, k: Rest, c: Class) -> Split | None:
-    if below_excluded(Sigma, c, k.heads):
+    if below_excluded(Sigma, c, k.hs):
         return None
     tau = meet(Sigma, k.ty, ClassType(c))
     if not isinstance(tau, ClassType):
         return None
     d = tau.c
     sigmas = tuple(declared_type(Sigma, d, x) for x in fields(Sigma, d))
-    heads_ = typed_heads(Sigma, k.heads, tau)
+    hs_ = typed_heads(Sigma, k.hs, tau)
     return (
-        tuple(Constr(d, ks, heads_) for ks in shapes_seq(Sigma, sigmas)),
-        shapes(Sigma, k.ty, k.heads | {c}),
+        tuple(Constr(d, ks, hs_) for ks in shapes_seq(Sigma, sigmas)),
+        shapes(Sigma, k.ty, k.hs | {c}),
     )
 
 
 def split_subclass(Sigma: ClassTable, k: Constr, c: Class) -> Split | None:
     if c == k.c or not subtype(Sigma, ClassType(c), ClassType(k.c)):
         return None
-    if below_excluded(Sigma, c, k.heads):
+    if below_excluded(Sigma, c, k.hs):
         return None
     sigmas = tuple(declared_type(Sigma, c, x) for x in fields(Sigma, c)[len(k.args) :])
-    heads_ = typed_heads(Sigma, k.heads, ClassType(c))
+    hs_ = typed_heads(Sigma, k.hs, ClassType(c))
     return (
-        tuple(Constr(c, k.args + ks, heads_) for ks in shapes_seq(Sigma, sigmas)),
-        (Constr(k.c, k.args, k.heads | {c}),),
+        tuple(Constr(c, k.args + ks, hs_) for ks in shapes_seq(Sigma, sigmas)),
+        (Constr(k.c, k.args, k.hs | {c}),),
     )
 
 
@@ -363,7 +363,7 @@ def no_field_map(Sigma: ClassTable, c: Class, p: ast.MatchClass) -> IllFormedMod
 
 def with_keys(k: Dict, ws: tuple[str, ...], ks: Seq) -> Dict:
     beta = dict(k.beta) | dict(zip(ws, ks))
-    return Dict(k.value, tuple(sorted(beta.items())), k.heads)
+    return Dict(k.value, tuple(sorted(beta.items())), k.hs)
 
 
 def key_patterns(p: ast.MatchMapping) -> tuple[tuple[str, ast.pattern], ...]:
