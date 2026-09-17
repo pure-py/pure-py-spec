@@ -199,23 +199,23 @@ def check_module_(
             gamma={**predefined_context(BUILTINS), **gamma}, M=M, q=q, Sigma=Sigma
         ),
     )
-    check_submodule_clash(m, gamma, body, M, q)
+    check_submodule_names(m, gamma, body, M, q)
     return signature(body, mod_ctx, q), mod_ctx.Sigma
 
 
-def check_submodule_clash(
+def check_submodule_names(
     m: ast.Module,
     gamma: Context,
     body: list[ast.stmt],
     M: Mapping[QualifiedName, ast.Module],
     q: QualifiedName,
 ) -> None:
-    clash = sorted((set(gamma) | assigns_body(body)) & set(submods(M, q)))
-    if len(clash) > 0:
-        x = clash[0]
+    xs = sorted((set(gamma) | assigns_body(body)) & set(submods(M, q)))
+    if len(xs) > 0:
+        x = xs[0]
         node = find_binder(m.body, x)
         assert node is not None
-        raise IllFormedModule(node, reasons.SubmoduleNameClash(x, str(qualified(q, x))))
+        raise IllFormedModule(node, reasons.SubmoduleNameBound(x, str(qualified(q, x))))
 
 
 def binds_name(s: ast.stmt, x: str) -> bool:

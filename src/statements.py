@@ -318,7 +318,9 @@ def match_cases(
         if not seq_safe(case.pattern, tau, mod_ctx):
             raise IllFormedModule(
                 case.pattern,
-                reasons.SequenceKindClash(describe(case.pattern, mod_ctx), render(tau)),
+                reasons.SequenceKindMismatch(
+                    describe(case.pattern, mod_ctx), render(tau)
+                ),
             )
         result = match_shapes(residual, case.pattern, mod_ctx)
         if result is None:
@@ -750,9 +752,11 @@ def class_declared(
         if not isinstance(theta, Class):
             raise IllFormedModule(node, reasons.NotClass(base_name))
         base = theta
-        clash = set(names) & set(fields(mod_ctx.Sigma, base))
-        if len(clash) > 0:
-            raise IllFormedModule(node, reasons.DuplicateField(min(clash), node.name))
+        duplicates = set(names) & set(fields(mod_ctx.Sigma, base))
+        if len(duplicates) > 0:
+            raise IllFormedModule(
+                node, reasons.DuplicateField(min(duplicates), node.name)
+            )
     c = Class(qualified(mod_ctx.q, node.name))
     assert c not in mod_ctx.Sigma, "redeclaration rejected by top-seq"
     return c, {**mod_ctx.Sigma, c: ClassTableEntry(own_fields=own, base=base)}

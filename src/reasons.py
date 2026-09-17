@@ -154,12 +154,14 @@ class DuplicateMutualName:
 
 
 @dataclass(frozen=True)
-class SubmoduleNameClash:
+class SubmoduleNameBound:
     x: str
     q: str
 
     def message(self) -> str:
-        return f"binding '{self.x}' clashes with submodule '{self.q}'"
+        return (
+            f"'{self.x}' is bound in the module and also names its submodule '{self.q}'"
+        )
 
 
 @dataclass(frozen=True)
@@ -310,7 +312,7 @@ class UnreachableCase:
 
 
 @dataclass(frozen=True)
-class SequenceKindClash:
+class SequenceKindMismatch:
     pattern: str
     tau: str
 
@@ -386,7 +388,7 @@ type Reason = (
     | NonlinearPattern
     | DuplicateMutualName
     | TopLevelReturn
-    | SubmoduleNameClash
+    | SubmoduleNameBound
     | SubmoduleNotImported
     | ImportOfContainedModule
     | UnassignedMember
@@ -399,7 +401,7 @@ type Reason = (
     | TupleIndexOutOfRange
     | MissingReturn
     | NotIterable
-    | SequenceKindClash
+    | SequenceKindMismatch
     | UnreachableCase
     | NotSynthesised
     | NoAttributes
