@@ -19,19 +19,22 @@ from type_syntax import (
 
 # A head: a literal, a class, or a length n standing for the head list_n.
 type Head = LiteralType | Class | int
+# Sets of heads and of keys are frozen so that a shape is hashable.
+type Heads = Heads
+type Keys = frozenset[str]
 
 
 @dataclass(frozen=True)
 class Rest:
     ty: Type
-    hs: frozenset[Head]
+    hs: Heads
 
 
 @dataclass(frozen=True)
 class Constr:
     c: Class
     args: tuple[Shape, ...]
-    hs: frozenset[Head]
+    hs: Heads
 
 
 @dataclass(frozen=True)
@@ -49,7 +52,7 @@ class List:
 class Dict:
     value: Type
     beta: KeyShapes
-    hs: frozenset[str]
+    hs: Keys
 
 
 type Shape = Rest | Constr | Tuple | List | Dict
@@ -71,7 +74,7 @@ def shape_type(k: Shape) -> Type:
     return DictType(k.value)
 
 
-def shapes(Sigma: ClassTable, tau: Type, hs: frozenset[Head]) -> Shapes:
+def shapes(Sigma: ClassTable, tau: Type, hs: Heads) -> Shapes:
     if isinstance(tau, UnionType):
         left = shapes(Sigma, tau.left, typed_heads(Sigma, hs, tau.left))
         right = shapes(Sigma, tau.right, typed_heads(Sigma, hs, tau.right))
@@ -100,11 +103,11 @@ def head_typed(Sigma: ClassTable, h: Head, tau: Type) -> bool:
     return isinstance(tau, ListType)
 
 
-def typed_heads(Sigma: ClassTable, hs: frozenset[Head], tau: Type) -> frozenset[Head]:
+def typed_heads(Sigma: ClassTable, hs: Heads, tau: Type) -> Heads:
     return frozenset(h for h in hs if head_typed(Sigma, h, tau))
 
 
-def below_excluded(Sigma: ClassTable, c: Class, hs: frozenset[Head]) -> bool:
+def below_excluded(Sigma: ClassTable, c: Class, hs: Heads) -> bool:
     return any(
         isinstance(h, Class) and subtype(Sigma, ClassType(c), ClassType(h)) for h in hs
     )
