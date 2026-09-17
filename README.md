@@ -2,7 +2,7 @@
 
 [![build](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml)
 
-## [v0.15.1](https://github.com/pure-py/pure-py-spec/releases/download/v0.15.1/PurePy-spec.pdf)
+## [v0.16.0](https://github.com/pure-py/pure-py-spec/releases/download/v0.16.0/PurePy-spec.pdf)
 
 PurePy defines a pure (side-effect free) subset of Python, intended initially for use by researchers in
 programming languages and programming pedagogy, with a view to evolving it into a common language for scientific computing, supporting efficient, portable applications in modelling, data processing, data analysis and visualisation.
