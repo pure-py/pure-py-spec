@@ -1,1 +1,1 @@
-a pattern for class C against a value of type __main__.C; Python matches sequence patterns against lists and tuples alike, so PurePy treats the two kinds as incompatible
+a pattern for class C against a value of type __main__.C; a list pattern matches only lists and a tuple pattern only tuples

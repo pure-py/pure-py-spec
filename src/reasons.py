@@ -334,9 +334,8 @@ class SequenceKindClash:
 
     def message(self) -> str:
         return (
-            f"{self.pattern} against a value of type {self.tau}; Python matches "
-            "sequence patterns against lists and tuples alike, so PurePy "
-            "treats the two kinds as incompatible"
+            f"{self.pattern} against a value of type {self.tau}; a list pattern "
+            "matches only lists and a tuple pattern only tuples"
         )
 
 
@@ -345,7 +344,7 @@ class NotIterable:
     tau: str
 
     def message(self) -> str:
-        return f"iteration over a value of type {self.tau}, which has no element type"
+        return f"a value of type {self.tau} cannot be iterated"
 
 
 @dataclass(frozen=True)
