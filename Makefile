@@ -1,10 +1,10 @@
 INPUTS := $(wildcard tex/*.tex spec/*.tex spec/*/*.tex spec/*/*/*.tex paper/*.tex paper/*/*.tex)
 BIBFILES := $(wildcard tex/*.bib)
-# Generated from .python-version, the one source of the Python version.
+# Generated from .python-version.
 PYTHON_VERSION_TEX := tex/python-version.tex
 TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
-# Removed after each build; the .bbl is kept, since paper-arXiv.zip includes it.
+# Removed after each build; .bbl kept for paper-arXiv.zip.
 BUILD_AUX := *.aux *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
 AUX := $(BUILD_AUX) *.bbl
 
@@ -12,7 +12,7 @@ default: paper.pdf
 
 all: PurePy-spec.pdf paper.pdf graduality.pdf paper-arXiv.zip paper-submission
 
-# pdflatex only warns about these, so check the log of job $(1) before removing it.
+# Unresolved references are only warnings to pdflatex.
 define check-log
 @! grep -E "Reference .* undefined|Citation .* undefined|multiply defined" $(1).log || \
 	{ echo "$(1).log: unresolved references"; exit 1; }
@@ -29,9 +29,7 @@ $(PYTHON_VERSION_TEX): .python-version
 	$(call check-log,$*)
 	rm -f $(BUILD_AUX)
 
-# Draft notes on gradual typing, a separate document that is not part of the 1.0 specification or
-# paper. Its sources are not in $(INPUTS), so they do not ship with the arXiv source; the pattern rule
-# above supplies the recipe.
+# Draft notes on gradual typing, not part of the 1.0 specification or paper.
 GRADUALITY_INPUTS := $(wildcard graduality/*.tex graduality/*/*.tex)
 graduality.pdf: $(GRADUALITY_INPUTS)
 
@@ -51,12 +49,10 @@ paper-anon.pdf: $(TEXFILES)
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 
-# The Isabelle mechanisation, as a submodule so that it has a known location.
+# Isabelle mechanisation submodule.
 ISABELLE := isabelle-purepy
 
-# A submission ships the mechanisation as it stands on main, so refuse to build
-# one from a working copy with uncommitted changes or with a checked-out commit
-# that is not on origin/main.
+# Submodule must be clean and at a commit on origin/main.
 check-mechanisation:
 	@test -e $(ISABELLE)/ROOT || \
 		{ echo "$(ISABELLE) not checked out: git submodule update --init"; exit 1; }
@@ -75,13 +71,13 @@ supplementary.zip: spec-anon.pdf check-mechanisation
 	cd .submission && zip -q -9 -r ../$@ mechanisation
 	rm -rf .submission
 
-# Tests are included in the paper as examples, so a submission requires a passing suite.
+# Paper examples are tests.
 check-tests:
 	uv run --locked ./test/run-all.sh
 
 paper-submission: check-tests paper-anon.pdf supplementary.zip
 
-# arXiv runs pdflatex but not bibtex, so the source ships with the .bbl of the current build.
+# arXiv runs pdflatex without bibtex, so include the .bbl.
 paper-arXiv.zip: paper.pdf
 	rm -f $@
 	zip -q -9 $@ paper.tex paper.bbl $(sort $(INPUTS) $(PYTHON_VERSION_TEX))
