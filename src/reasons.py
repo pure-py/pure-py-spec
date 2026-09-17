@@ -315,7 +315,7 @@ class CaseMatchesNothing:
     index: int
 
     def message(self) -> str:
-        return f"case {self.index} matches no value the earlier cases leave"
+        return f"case {self.index} matches no value left by the earlier cases"
 
 
 @dataclass(frozen=True)
