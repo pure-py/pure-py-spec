@@ -1,10 +1,8 @@
 INPUTS := $(wildcard tex/*.tex spec/*.tex spec/*/*.tex spec/*/*/*.tex paper/*.tex paper/*/*.tex)
 BIBFILES := $(wildcard tex/*.bib)
-# Generated from .python-version.
 PYTHON_VERSION_TEX := tex/python-version.tex
 TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
-# Removed after each build; .bbl kept for paper-arXiv.zip.
 BUILD_AUX := *.aux *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
 AUX := $(BUILD_AUX) *.bbl
 
@@ -49,10 +47,8 @@ paper-anon.pdf: $(TEXFILES)
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 
-# Isabelle mechanisation submodule.
 ISABELLE := isabelle-purepy
 
-# Submodule must be clean and at a commit on origin/main.
 check-mechanisation:
 	@test -e $(ISABELLE)/ROOT || \
 		{ echo "$(ISABELLE) not checked out: git submodule update --init"; exit 1; }

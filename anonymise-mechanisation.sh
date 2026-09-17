@@ -11,11 +11,11 @@ mkdir -p "$DEST/$NAME"
 git -C "$SRC" archive --format=tar HEAD | tar -x -C "$DEST/$NAME"
 cd "$DEST/$NAME"
 
-# Remove CI configuration and the README's references to it; both name the repository.
+# Both name the repository.
 rm -rf .github
 grep -vE 'badge\.svg|\.github/workflows' README.md > README.tmp && mv README.tmp README.md
 
-# Language and repository names, as in the anonymised paper and specification.
+# Language and repository names.
 for f in README.md ROOT document/root.tex; do
   sed -e "s/isabelle-purepy/$NAME/g" -e 's/pure-py/ourlang/g' -e 's/PurePy/OurLang/g' \
     "$f" > "$f.tmp" && mv "$f.tmp" "$f"
@@ -24,5 +24,4 @@ sed -e 's/\\author{nhuber}/\\author{Anonymous}/' \
     -e "s/\\\\title{$NAME}/\\\\title{OurLang mechanisation in Isabelle\\/HOL}/" \
   document/root.tex > root.tmp && mv root.tmp document/root.tex
 
-# The anonymised copy must still type check.
 make build
