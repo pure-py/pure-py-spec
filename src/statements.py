@@ -741,7 +741,7 @@ def class_declared(
     names = [x for x, _ in own]
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
-        raise IllFormedModule(node, reasons.DuplicateFieldName(dup, node.name))
+        raise IllFormedModule(node, reasons.DuplicateField(dup, node.name))
     base: Class | None = None
     if len(node.bases) > 0:
         assert isinstance(node.bases[0], ast.Name)
@@ -752,9 +752,7 @@ def class_declared(
         base = theta
         clash = set(names) & set(fields(mod_ctx.Sigma, base))
         if len(clash) > 0:
-            raise IllFormedModule(
-                node, reasons.InheritedFieldClash(min(clash), base_name)
-            )
+            raise IllFormedModule(node, reasons.DuplicateField(min(clash), node.name))
     c = Class(qualified(mod_ctx.q, node.name))
     assert c not in mod_ctx.Sigma, "redeclaration rejected by top-seq"
     return c, {**mod_ctx.Sigma, c: ClassTableEntry(own_fields=own, base=base)}

@@ -5,21 +5,12 @@ from type_syntax import QualifiedName
 
 
 @dataclass(frozen=True)
-class DuplicateFieldName:
+class DuplicateField:
     x: str
     c: str
 
     def message(self) -> str:
-        return f"duplicate field name '{self.x}' in class '{self.c}'"
-
-
-@dataclass(frozen=True)
-class InheritedFieldClash:
-    x: str
-    c: str
-
-    def message(self) -> str:
-        return f"field '{self.x}' clashes with inherited field from '{self.c}'"
+        return f"duplicate field '{self.x}' in class '{self.c}'"
 
 
 @dataclass(frozen=True)
@@ -371,8 +362,7 @@ class MissingReturn:
 
 
 type Reason = (
-    DuplicateFieldName
-    | InheritedFieldClash
+    DuplicateField
     | ClassRebound
     | UnassignedVariable
     | UndefinedVariable
