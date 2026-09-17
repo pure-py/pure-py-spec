@@ -226,7 +226,7 @@ class Runner:
         Python-side evidence fixed by the verdict (the category directory name)."""
         python_accepts = category_root.name != Verdict.PYTHON_ERROR
         for dir_ in sorted(
-            p for p in category_root.rglob("*") if p.is_dir() and (p / MAIN).exists()
+            path for path in category_root.rglob("*") if path.is_dir() and (path / MAIN).exists()
         ):
             with self.test(dir_.relative_to(ROOT)):
                 main_py = dir_ / MAIN
