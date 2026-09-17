@@ -51,31 +51,31 @@ def match(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
     if isinstance(p, ast.MatchAs):
         return match_as(k, p, mod_ctx)
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
-        same = match_literal(k, literal_of(p))
+        result = match_literal(k, literal_of(p))
     elif isinstance(p, PatTuple):
-        same = match_tuple(k, p, mod_ctx)
+        result = match_tuple(k, p, mod_ctx)
     elif isinstance(p, PatList):
-        same = match_list(k, p, mod_ctx)
+        result = match_list(k, p, mod_ctx)
     elif isinstance(p, ast.MatchMapping):
-        same = match_dict(k, p, mod_ctx)
+        result = match_dict(k, p, mod_ctx)
     else:
         assert isinstance(p, ast.MatchClass)
-        same = match_constr(k, p, mod_ctx)
-    return same if same is not None else match_split(k, p, mod_ctx)
+        result = match_constr(k, p, mod_ctx)
+    return result if result is not None else match_split(k, p, mod_ctx)
 
 
 def match_as(k: Shape, p: ast.MatchAs, mod_ctx: ModuleContext) -> Match | None:
     if p.pattern is None:
-        bare: VarContext = {} if p.name is None else {p.name: shape_type(k)}
-        return (k,), (), bare
+        delta: VarContext = {} if p.name is None else {p.name: shape_type(k)}
+        return (k,), (), delta
     result = match(k, p.pattern, mod_ctx)
     if result is None:
         return None
     matched, residual, delta = result
     if p.name is None:
         return matched, residual, delta
-    named = join_seq(mod_ctx.Sigma, [shape_type(m) for m in matched])
-    return matched, residual, pattern_bindings([delta, {p.name: named}], p)
+    tau = join_seq(mod_ctx.Sigma, [shape_type(k_) for k_ in matched])
+    return matched, residual, pattern_bindings([delta, {p.name: tau}], p)
 
 
 def match_split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
