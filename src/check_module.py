@@ -161,23 +161,23 @@ def check_module(
     Sigma: ClassTable,
 ) -> tuple[Context, ClassTable]:
     key = (id(M), q)
-    cached = _signatures.get(key)
-    if cached is not None:
-        return cached, Sigma
+    gamma = _signatures.get(key)
+    if gamma is not None:
+        return gamma, Sigma
     if key in _loading:
-        cycle = [str(name) for _, name in _loading[_loading.index(key) :]] + [str(q)]
+        cycle = [str(q_) for _, q_ in _loading[_loading.index(key) :]] + [str(q)]
         raise IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
     _loading.append(key)
     try:
-        result, Sigma = check_module_(m, M, q, Sigma)
+        gamma, Sigma = check_module_(m, M, q, Sigma)
     except IllFormedModule as e:
         if e.module is None:
             e.module = q
         raise
     finally:
         _loading.pop()
-    _signatures[key] = result
-    return result, Sigma
+    _signatures[key] = gamma
+    return gamma, Sigma
 
 
 def check_module_(
