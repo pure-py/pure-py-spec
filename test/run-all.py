@@ -42,7 +42,7 @@ class Stage(StrEnum):
 
 
 HELPERS = "helpers"
-# Semantically-valid tests PurePy accepts and mypy rejects
+# Semantically-valid tests mypy rejects: to-dos for #92, not accepted differences
 MYPY_INCOMPATIBLE = "mypy-incompatible"
 MYPY_INI = "mypy.ini"
 PYTHON_VERSION = (ROOT / ".python-version").read_text().strip()
@@ -306,9 +306,6 @@ def check_rule_attribution(r: Runner, base: pathlib.Path) -> None:
 
 
 def check_mypy_compatibility(r: Runner, module: pathlib.Path) -> None:
-    """Every semantically-valid test must type-check under mypy, except those
-    under mypy-incompatible, which record where PurePy is the more permissive
-    of the two."""
     paths = [
         path
         for path in sorted((module / Verdict.SEMANTICALLY_VALID).rglob("*.py"))
