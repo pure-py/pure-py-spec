@@ -10,8 +10,7 @@ dev = [
 ]
 
 [tool.mypy]
-python_version = "3.12"
 strict = true
 
 [tool.ruff]
-target-version = "py312"
+line-length = 100

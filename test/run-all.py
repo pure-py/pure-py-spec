@@ -42,12 +42,17 @@ class Stage(StrEnum):
 
 
 HELPERS = "helpers"
+# Semantically-valid tests mypy rejects: to-dos for #92, not accepted differences
+MYPY_INCOMPATIBLE = "mypy-incompatible"
+MYPY_INI = "mypy.ini"
+PYTHON_VERSION = (ROOT / ".python-version").read_text().strip()
 
 RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
+RULE_DEF = re.compile(r"lab=\{\\ruleName\{([a-z0-9-]+)\}\}")
 CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
 
 # Checker entry points under src/
-PARSE, CHECK, CHECK_PROGRAM = "syntax.py", "check_module.py", "check_program.py"
+CHECK, CHECK_PROGRAM = "check_module.py", "check_program.py"
 
 # Program-level test files (a test is a directory)
 MAIN = "main.py"
@@ -61,16 +66,29 @@ EXPECTED_FILE, EXPECTED_EXIT, EXPECTED_ERROR = (
 # PurePy exit codes (OK = accepted / ran clean)
 class Exit(IntEnum):
     OK = 0
-    PROHIBITED = 1  # syntax.py: prohibited syntactic form
-    NOT_YET = 2  # syntax.py: planned, not yet supported
-    ILL_FORMED = 3  # check_module.py: ill-formed
+    PROHIBITED = 1  # prohibited syntactic form
+    NOT_YET = 2  # planned, not yet supported
+    ILL_FORMED = 3  # ill-formed
 
 
 class Phase(StrEnum):
-    PARSE = "parse"
     CHECK = "check"
     PYTHON = "python"
     RUN = "run"
+
+
+# Expected outcomes by verdict and stage: checker exit status, whether the checker's
+# message must match .error.expected, and whether Python accepts the test (None: not run)
+EXPECTATIONS: dict[tuple[Verdict, Stage | None], tuple[Exit, bool, bool | None]] = {
+    (Verdict.SEMANTICALLY_VALID, None): (Exit.OK, False, True),
+    (Verdict.SEMANTICALLY_VALID, Stage.PENDING): (Exit.NOT_YET, False, None),
+    (Verdict.EXCLUDED, Stage.SYNTACTIC): (Exit.PROHIBITED, True, True),
+    (Verdict.EXCLUDED, Stage.STATIC): (Exit.ILL_FORMED, True, True),
+    (Verdict.EXCLUDED, Stage.DYNAMIC): (Exit.OK, False, True),
+    (Verdict.PYTHON_ERROR, Stage.SYNTACTIC): (Exit.PROHIBITED, True, False),
+    (Verdict.PYTHON_ERROR, Stage.STATIC): (Exit.ILL_FORMED, True, False),
+    (Verdict.PYTHON_ERROR, Stage.DYNAMIC): (Exit.OK, False, False),
+}
 
 
 def script_cmd(script: str, path: pathlib.Path) -> list[str]:
@@ -112,11 +130,8 @@ class Runner:
     def _fail(self, phase: Phase, msg: str) -> None:
         self._failures.append(f"{phase}: {msg}")
 
-    def expect_exit(
-        self, cmd: list[str], expected: int, error_substr: str | None = None
-    ) -> None:
+    def expect_exit(self, cmd: list[str], expected: int, error_substr: str | None = None) -> None:
         phase = {
-            PARSE: Phase.PARSE,
             CHECK: Phase.CHECK,
             CHECK_PROGRAM: Phase.CHECK,
         }.get(pathlib.Path(cmd[1]).name, Phase.PYTHON)
@@ -131,9 +146,6 @@ class Runner:
                     phase,
                     f"expected output containing {error_substr!r}, got: {output.strip()}",
                 )
-
-    def parse(self, path: pathlib.Path, expected: int, err: str | None = None) -> None:
-        self.expect_exit(script_cmd(PARSE, path), expected, error_substr=err)
 
     def check(self, path: pathlib.Path, expected: int, err: str | None = None) -> None:
         self.expect_exit(script_cmd(CHECK, path), expected, error_substr=err)
@@ -203,9 +215,7 @@ class Runner:
                 self.run_expecting_output(path, expected_path, cwd=cwd)
         else:
             if expected_path.exists():
-                self._fail(
-                    Phase.RUN, f"python-error must not have {expected_path.name}"
-                )
+                self._fail(Phase.RUN, f"python-error must not have {expected_path.name}")
             elif not exception_path.exists():
                 self._fail(Phase.RUN, f"missing {EXCEPTION_EXPECTED}")
             else:
@@ -215,79 +225,41 @@ class Runner:
         """Each subdir is a test: main.py, expected_exit, plus fixtures and the
         Python-side evidence fixed by the verdict (the category directory name)."""
         python_accepts = category_root.name != Verdict.PYTHON_ERROR
-        for d in sorted(
-            p for p in category_root.rglob("*") if p.is_dir() and (p / MAIN).exists()
+        for dir_ in sorted(
+            path for path in category_root.rglob("*") if path.is_dir() and (path / MAIN).exists()
         ):
-            with self.test(d.relative_to(ROOT)):
-                main_py = d / MAIN
+            with self.test(dir_.relative_to(ROOT)):
+                main_py = dir_ / MAIN
                 self.expect_exit(
                     script_cmd(CHECK_PROGRAM, main_py),
-                    int((d / EXPECTED_EXIT).read_text().strip()),
-                    error_substr=substr(d / EXPECTED_ERROR),
+                    int((dir_ / EXPECTED_EXIT).read_text().strip()),
+                    error_substr=substr(dir_ / EXPECTED_ERROR),
                 )
                 self.python_evidence(
-                    main_py, python_accepts, expected_path=d / EXPECTED_FILE, cwd=d
+                    main_py, python_accepts, expected_path=dir_ / EXPECTED_FILE, cwd=dir_
                 )
 
-    def module_test(self, p: pathlib.Path, module: pathlib.Path) -> None:
-        """Assert a module-level test from its path: <verdict>[/<stage>].
-
-        verdict in {semantically-valid, excluded, python-error} fixes how PurePy and
-        Python must each respond; stage in {syntactic, static,
-        dynamic} fixes where PurePy stops (dynamic = checker
-        accepts, but evaluation is stuck)."""
-        rel = p.relative_to(ROOT)
+    def module_test(self, path: pathlib.Path, module: pathlib.Path) -> None:
+        rel = path.relative_to(ROOT)
         with self.test(rel):
-            dirs = p.parent.relative_to(module).parts
-            err = substr(p.with_suffix(ERROR_EXPECTED))
-
-            if dirs == (Verdict.SEMANTICALLY_VALID, Stage.PENDING):
-                self.parse(p, Exit.NOT_YET)
-                return
-            if dirs[1:] == (Stage.STATIC, Stage.PENDING):
-                self.parse(p, Exit.OK)
-                self.check(p, Exit.OK)
-                self.python_evidence(
-                    p,
-                    Verdict(dirs[0]) != Verdict.PYTHON_ERROR,
-                    expected_path=p.with_suffix(EXPECTED),
-                )
-                return
-            if dirs == (Verdict.PYTHON_ERROR, Stage.SYNTACTIC_ONLY):
-                self.python(p)
-                return
-
+            dirs = path.parent.relative_to(module).parts
             verdict = Verdict(dirs[0])
-            stage = (
-                Stage(dirs[1])
-                if len(dirs) > 1 and dirs[1] in {s.value for s in Stage}
-                else None
-            )
-
-            if verdict == Verdict.SEMANTICALLY_VALID:
-                self.parse(p, Exit.OK)
-                self.check(p, Exit.OK)
-            elif stage == Stage.SYNTACTIC:
-                self.parse(p, Exit.PROHIBITED, err)
-            else:
-                self.parse(p, Exit.OK)
-                self.check(
-                    p,
-                    Exit.ILL_FORMED if stage == Stage.STATIC else Exit.OK,
-                    err if stage == Stage.STATIC else None,
-                )
-
-            if verdict != Verdict.PYTHON_ERROR and stage == Stage.SYNTACTIC:
-                if p.with_suffix(EXCEPTION_EXPECTED).exists():
+            stage = Stage(dirs[1]) if len(dirs) > 1 and dirs[1] in Stage else None
+            if stage == Stage.SYNTACTIC_ONLY:
+                self.python(path)
+                return
+            status, message_checked, python_accepts = EXPECTATIONS[verdict, stage]
+            err = substr(path.with_suffix(ERROR_EXPECTED)) if message_checked else None
+            self.check(path, status, err)
+            if python_accepts is None:
+                return
+            if stage == Stage.SYNTACTIC and python_accepts:
+                if path.with_suffix(EXCEPTION_EXPECTED).exists():
                     self._fail(Phase.RUN, f"must not have {EXCEPTION_EXPECTED}")
                 else:
-                    self.python(p)
+                    self.python(path)
             else:
-                self.python_evidence(
-                    p,
-                    verdict != Verdict.PYTHON_ERROR,
-                    expected_path=p.with_suffix(EXPECTED),
-                )
+                self.python_evidence(path, python_accepts, expected_path=path.with_suffix(EXPECTED))
 
     def summary(self) -> None:
         total = self.passed + self.failed
@@ -298,9 +270,22 @@ class Runner:
         print(f"{GREEN}✓ {total}/{total} passed{RESET}")
 
 
-def check_rule_citations(r: Runner, base: pathlib.Path) -> None:
-    """Every `# rule: X` in a test must name a rule the spec defines, so a
-    citation cannot outlive the rule it points at."""
+def check_unique_rule_names(r: Runner) -> None:
+    where: dict[str, list[str]] = {}
+    for source in ("spec", "paper"):
+        for f in sorted((ROOT / source).rglob("*.tex")):
+            for name in RULE_DEF.findall(f.read_text(encoding="utf-8")):
+                where.setdefault(name, []).append(str(f.relative_to(ROOT)))
+    duplicates = [
+        f"{name} in {', '.join(files)}" for name, files in sorted(where.items()) if len(files) > 1
+    ]
+    if duplicates:
+        r.bad("unique rule names", "; ".join(duplicates))
+    else:
+        r.ok("unique rule names")
+
+
+def check_rule_attribution(r: Runner, base: pathlib.Path) -> None:
     spec = {
         m
         for f in sorted((ROOT / "spec").rglob("*.tex"))
@@ -315,9 +300,46 @@ def check_rule_citations(r: Runner, base: pathlib.Path) -> None:
         if cited is not None and cited.group(1) not in spec:
             stale.append(f"{path.relative_to(base)} cites {cited.group(1)}")
     if stale:
-        r.bad("rule citations", "; ".join(stale))
+        r.bad("rule attribution", "; ".join(stale))
     else:
-        r.ok("rule citations")
+        r.ok("rule attribution")
+
+
+def check_mypy_compatibility(r: Runner, module: pathlib.Path) -> None:
+    paths = [
+        path
+        for path in sorted((module / Verdict.SEMANTICALLY_VALID).rglob("*.py"))
+        if Stage.PENDING not in path.parts
+    ]
+    # mypy reports paths relative to its working directory
+    relative = [path.relative_to(ROOT) for path in paths]
+    proc = subprocess.run(
+        [
+            "mypy",
+            "--python-version",
+            PYTHON_VERSION,
+            "--config-file",
+            str(pathlib.Path("test") / MYPY_INI),
+            "--no-error-summary",
+            "--no-color-output",
+            *(str(path) for path in relative),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    rejected = {line.split(":", 1)[0] for line in proc.stdout.splitlines() if ": error:" in line}
+    expected = {str(path) for path in relative if MYPY_INCOMPATIBLE in path.parts}
+    misfiled = [
+        f"{path} {'rejected by mypy' if str(path) in rejected else 'accepted by mypy'}"
+        for path in relative
+        if (str(path) in rejected) != (str(path) in expected)
+    ]
+    if misfiled:
+        r.bad("mypy compatibility", "; ".join(misfiled))
+    else:
+        r.ok("mypy compatibility")
 
 
 def main() -> None:
@@ -330,30 +352,36 @@ def main() -> None:
     r = Runner(interpreter)
 
     print("cross-references")
-    check_rule_citations(r, base)
+    check_unique_rule_names(r)
+    check_rule_attribution(r, base)
 
     if not skip_mypy:
-        print("mypy --strict src/")
-        sources = sorted(str(p) for p in (ROOT / "src").glob("*.py")) + [
+        print("mypy and ruff over src/")
+        sources = sorted(str(path) for path in (ROOT / "src").glob("*.py")) + [
             str(ROOT / "test" / "run-all.py")
         ]
-        proc = subprocess.run(
-            ["mypy", "--strict", *sources], capture_output=True, text=True, check=False
-        )
-        if proc.returncode == 0:
-            r.ok("src/")
+        for tool in (
+            ["mypy", "--strict", "--python-version", PYTHON_VERSION],
+            ["ruff", "check"],
+            ["ruff", "format", "--check"],
+        ):
+            proc = subprocess.run([*tool, *sources], capture_output=True, text=True, check=False)
+            if proc.returncode != 0:
+                r.bad("checker type-checks", (proc.stdout + proc.stderr).strip()[:400])
+                break
         else:
-            r.bad("src/", proc.stdout.strip()[:400])
+            r.ok("checker type-checks")
+        check_mypy_compatibility(r, module)
 
     last = None
-    for p in sorted(module.rglob("*.py"), key=lambda p: (p.parent.as_posix(), p.name)):
-        if HELPERS in p.parts:
+    for path in sorted(module.rglob("*.py"), key=lambda path: (path.parent.as_posix(), path.name)):
+        if HELPERS in path.parts:
             continue
-        header = p.parent.relative_to(base)
+        header = path.parent.relative_to(base)
         if header != last:
             print(header)
             last = header
-        r.module_test(p, module)
+        r.module_test(path, module)
 
     for verdict in Verdict:
         print(f"{PROGRAM_LEVEL}/{verdict}")

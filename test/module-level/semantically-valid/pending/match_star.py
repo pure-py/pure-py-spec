@@ -1,6 +1,7 @@
 xs = [1, 2, 3, 4]
 match xs:
     case [a, *rest]:
-        print(a, rest)
+        print(a)
+        print(rest)
     case _:
         print("empty")

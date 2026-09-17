@@ -1,6 +1,6 @@
-def f():
+def f() -> int:
     x = 5
-    def g():
+    def g() -> int:
         nonlocal x
         return x
     return g()

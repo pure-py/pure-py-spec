@@ -1,72 +1,64 @@
 import ast
 from dataclasses import dataclass
 
-
-@dataclass(frozen=True)
-class DuplicateFieldName:
-    name: str
-    cls: str
-
-    def message(self) -> str:
-        return f"duplicate field name '{self.name}' in class '{self.cls}'"
+from type_syntax import QualifiedName, Type, Var, render
 
 
 @dataclass(frozen=True)
-class UnknownBaseClass:
-    base: str
+class DuplicateField:
+    x: Var
+    c: Var
 
     def message(self) -> str:
-        return f"base class '{self.base}' is not declared in this module"
+        return f"duplicate field '{self.x}' in class '{self.c}'"
 
 
 @dataclass(frozen=True)
-class InheritedFieldClash:
-    field: str
-    base: str
+class ClassRebound:
+    c: Var
 
     def message(self) -> str:
-        return f"field '{self.field}' clashes with inherited field from '{self.base}'"
+        return f"'{self.c}' is bound to a class and cannot be rebound at top level"
 
 
 @dataclass(frozen=True)
-class DuplicateClassName:
-    name: str
-    module: str
+class UndefinedVariable:
+    x: Var
 
     def message(self) -> str:
-        return f"duplicate class name '{self.name}' in module '{self.module}'"
+        return f"'{self.x}' is not defined"
 
 
 @dataclass(frozen=True)
 class UnassignedVariable:
-    name: str
+    x: Var
 
     def message(self) -> str:
-        return f"'{self.name}' is not definitely assigned"
+        return f"'{self.x}' is not definitely assigned"
 
 
 @dataclass(frozen=True)
 class CapturedReassignment:
-    name: str
+    x: Var
 
     def message(self) -> str:
-        return f"'{self.name}' captured by previous statement, reassigned here"
+        return f"'{self.x}' captured by previous statement, reassigned here"
 
 
 @dataclass(frozen=True)
 class SelfCaptureAssignment:
-    name: str
+    x: Var
 
     def message(self) -> str:
-        return f"'{self.name}' captured by right-hand side"
+        return f"'{self.x}' captured by right-hand side"
 
 
 @dataclass(frozen=True)
 class CapturedGeneratorVariable:
-    name: str
+    x: Var
 
     def message(self) -> str:
-        return f"'{self.name}' bound by a generator, captured by a lambda"
+        return f"'{self.x}' bound by generator, captured by lambda"
 
 
 @dataclass(frozen=True)
@@ -77,115 +69,105 @@ class UnreachableStatement:
 
 @dataclass(frozen=True)
 class ConstructorArityMismatch:
-    cls: str
+    c: Var
     expected: int
     got: int
 
     def message(self) -> str:
-        return f"constructor for '{self.cls}' expects {self.expected} arguments, got {self.got}"
+        return f"constructor for '{self.c}' expects {self.expected} arguments, got {self.got}"
 
 
 @dataclass(frozen=True)
 class UnknownConstructorKeyword:
-    cls: str
-    expected_fields: tuple[str, ...]
+    c: Var
+    xs: tuple[Var, ...]
 
     def message(self) -> str:
-        return f"constructor keywords for '{self.cls}' must be {', '.join(self.expected_fields)}"
+        return f"constructor keywords for '{self.c}' must be {', '.join(self.xs)}"
 
 
 @dataclass(frozen=True)
 class PatternArityMismatch:
-    cls: str
+    c: Var
     expected: int
     got: int
 
     def message(self) -> str:
-        return f"pattern for '{self.cls}' expects {self.expected} sub-patterns, got {self.got}"
+        return f"pattern for '{self.c}' expects {self.expected} sub-patterns, got {self.got}"
 
 
 @dataclass(frozen=True)
-class UnknownClassInPattern:
-    cls: str
+class NotPredefinedName:
+    x: Var
 
     def message(self) -> str:
-        return f"'{self.cls}' is not a declared class"
+        return f"'{self.x}' is not bound as a predefined name"
+
+
+@dataclass(frozen=True)
+class NotClass:
+    q: QualifiedName
+
+    def message(self) -> str:
+        return f"'{self.q}' is not a declared class"
 
 
 @dataclass(frozen=True)
 class UnknownFieldInPattern:
-    cls: str
-    expected_fields: tuple[str, ...]
+    c: Var
+    xs: tuple[Var, ...]
 
     def message(self) -> str:
-        return f"pattern keywords for '{self.cls}' must be {', '.join(self.expected_fields)}"
+        return f"pattern keywords for '{self.c}' must be {', '.join(self.xs)}"
 
 
 @dataclass(frozen=True)
 class DuplicatePatternKeyword:
-    cls: str
+    c: Var
 
     def message(self) -> str:
-        return f"duplicate keyword in pattern for '{self.cls}'"
+        return f"duplicate keyword in pattern for '{self.c}'"
 
 
 @dataclass(frozen=True)
 class DuplicateDictKey:
-    key: str
+    w: str
 
     def message(self) -> str:
-        return f"duplicate key '{self.key}' in dict pattern"
+        return f"duplicate key '{self.w}' in dict pattern"
 
 
 @dataclass(frozen=True)
 class NonlinearPattern:
-    index: int
+    x: Var
 
     def message(self) -> str:
-        return f"repeated variable in pattern {self.index}"
-
-
-@dataclass(frozen=True)
-class UnreachableCase:
-    index: int
-    subsumed_by: int
-
-    def message(self) -> str:
-        return f"case {self.index} unreachable: subsumed by case {self.subsumed_by}"
+        return f"repeated variable '{self.x}' in pattern"
 
 
 @dataclass(frozen=True)
 class DuplicateMutualName:
-    name: str
+    x: Var
 
     def message(self) -> str:
-        return f"duplicate name '{self.name}' in mutual region"
+        return f"duplicate name '{self.x}' in mutual region"
 
 
 @dataclass(frozen=True)
-class NonTopLevelImport:
-    def message(self) -> str:
-        return "import only allowed at module top level"
-
-
-@dataclass(frozen=True)
-class ImportAfterStatement:
-    def message(self) -> str:
-        return "imports must precede all other statements"
-
-
-@dataclass(frozen=True)
-class SubmoduleNameClash:
-    name: str
-    submodule: str
+class DuplicateMember:
+    x: Var
+    q: QualifiedName
 
     def message(self) -> str:
-        return f"binding '{self.name}' clashes with submodule '{self.submodule}'"
+        return (
+            f"duplicate member of module '{self.q}': "
+            f"it defines '{self.x}' and also has submodule '{self.q}.{self.x}'"
+        )
 
 
 @dataclass(frozen=True)
 class SubmoduleNotImported:
-    q: str
+    q: QualifiedName
 
     def message(self) -> str:
         return f"submodule '{self.q}' is not imported"
@@ -193,8 +175,8 @@ class SubmoduleNotImported:
 
 @dataclass(frozen=True)
 class UnassignedMember:
-    x: str
-    q: str
+    x: Var
+    q: QualifiedName
 
     def message(self) -> str:
         return f"member '{self.x}' of module '{self.q}' is not definitely assigned"
@@ -207,85 +189,236 @@ class TopLevelReturn:
 
 
 @dataclass(frozen=True)
-class EmptyFromImport:
-    def message(self) -> str:
-        return "empty name list"
-
-
-@dataclass(frozen=True)
 class UnknownModule:
-    q: str
+    q: QualifiedName
 
     def message(self) -> str:
-        return f"unknown module {self.q!r}"
+        return f"unknown module '{self.q}'"
 
 
 @dataclass(frozen=True)
 class UnknownMember:
-    x: str
-    q: str
+    x: Var
+    q: QualifiedName
 
     def message(self) -> str:
-        return f"module {self.q!r} has no member {self.x!r}"
+        return f"module '{self.q}' has no member '{self.x}'"
 
 
 @dataclass(frozen=True)
 class ModuleAsValue:
-    name: str
+    q: QualifiedName
 
     def message(self) -> str:
-        return f"'{self.name}' refers to a module; modules are not first-class values"
+        return f"'{self.q}' refers to a module; modules are not first-class values"
 
 
 @dataclass(frozen=True)
-class OwnDescendantImport:
-    q: str
-    q0: str
+class ImportOfContainedModule:
+    q: QualifiedName
+    q_: QualifiedName
+    from_import: str
 
     def message(self) -> str:
-        return f"'{self.q}' is a descendant of the importing module '{self.q0}'; import it with a from-import"
+        return (
+            f"'{self.q}' is contained in importing module '{self.q_}'; "
+            f"plain import not allowed, write '{self.from_import}'"
+        )
+
+
+@dataclass(frozen=True)
+class PredefinedNameAsValue:
+    q: QualifiedName
+
+    def message(self) -> str:
+        return f"'{self.q}' is usable only in annotations or as a decorator"
 
 
 @dataclass(frozen=True)
 class ClassAsValue:
-    name: str
+    q: QualifiedName
 
     def message(self) -> str:
-        return f"'{self.name}' refers to a class; classes are not first-class values"
+        return f"'{self.q}' refers to a class; classes are not first-class values"
 
 
-Reason = (
-    DuplicateFieldName
-    | UnknownBaseClass
-    | InheritedFieldClash
-    | DuplicateClassName
+@dataclass(frozen=True)
+class NoBinaryOverload:
+    op: str
+    sigma: Type
+    sigma_: Type
+
+    def message(self) -> str:
+        return f"no overload of '{self.op}' at operand types {render(self.sigma)} and {render(self.sigma_)}"
+
+
+@dataclass(frozen=True)
+class NoUnaryOverload:
+    op: str
+    sigma: Type
+
+    def message(self) -> str:
+        return f"no overload of '{self.op}' at operand type {render(self.sigma)}"
+
+
+@dataclass(frozen=True)
+class NotCallable:
+    tau: Type
+
+    def message(self) -> str:
+        return f"values of type {render(self.tau)} cannot be called"
+
+
+@dataclass(frozen=True)
+class CallArityMismatch:
+    expected: int
+    given: int
+
+    def message(self) -> str:
+        return f"call expects {self.expected} arguments, given {self.given}"
+
+
+@dataclass(frozen=True)
+class TypeMismatch:
+    expected: Type
+    actual: Type
+
+    def message(self) -> str:
+        return f"expected type {render(self.expected)}, given {render(self.actual)}"
+
+
+@dataclass(frozen=True)
+class LambdaTypeMismatch:
+    expected: Type
+    arity: int | None
+
+    def message(self) -> str:
+        given = (
+            "a lambda"
+            if self.arity is None
+            else f"a lambda of {self.arity} parameter{'' if self.arity == 1 else 's'}"
+        )
+        return f"expected type {render(self.expected)}, given {given}"
+
+
+@dataclass(frozen=True)
+class NotSubscriptable:
+    tau: Type
+
+    def message(self) -> str:
+        return f"values of type {render(self.tau)} cannot be subscripted"
+
+
+@dataclass(frozen=True)
+class TupleIndexOutOfRange:
+    index: int
+    length: int
+
+    def message(self) -> str:
+        return f"index {self.index} out of range for tuple of length {self.length}"
+
+
+@dataclass(frozen=True)
+class UnreachableCase:
+    index: int
+
+    def message(self) -> str:
+        return f"case {self.index} is unreachable"
+
+
+@dataclass(frozen=True)
+class SequenceKindMismatch:
+    kind: str
+    tau: Type
+
+    def message(self) -> str:
+        return f"{self.kind} pattern requires values of {self.kind} type, not {render(self.tau)}"
+
+
+@dataclass(frozen=True)
+class NotIterable:
+    tau: Type
+
+    def message(self) -> str:
+        return f"values of type {render(self.tau)} cannot be iterated"
+
+
+@dataclass(frozen=True)
+class UnknownField:
+    c: Var
+    x: Var
+
+    def message(self) -> str:
+        return f"class '{self.c}' has no field '{self.x}'"
+
+
+@dataclass(frozen=True)
+class NotSynthesised:
+    def message(self) -> str:
+        return "cannot infer type of this expression; annotate the assignment"
+
+
+@dataclass(frozen=True)
+class NoAttributes:
+    tau: Type
+
+    def message(self) -> str:
+        return f"values of type {render(self.tau)} have no attributes"
+
+
+@dataclass(frozen=True)
+class MissingReturn:
+    x: Var
+    tau: Type
+
+    def message(self) -> str:
+        return f"'{self.x}' declares result type {render(self.tau)} but does not always return"
+
+
+type Reason = (
+    DuplicateField
+    | ClassRebound
     | UnassignedVariable
+    | UndefinedVariable
     | CapturedReassignment
     | SelfCaptureAssignment
     | CapturedGeneratorVariable
     | UnreachableStatement
     | ConstructorArityMismatch
     | PatternArityMismatch
-    | UnknownClassInPattern
+    | NotClass
+    | NotPredefinedName
     | UnknownFieldInPattern
     | DuplicatePatternKeyword
     | UnknownModule
     | UnknownMember
     | ModuleAsValue
     | ClassAsValue
+    | PredefinedNameAsValue
     | UnknownConstructorKeyword
     | DuplicateDictKey
     | NonlinearPattern
-    | UnreachableCase
     | DuplicateMutualName
-    | NonTopLevelImport
     | TopLevelReturn
-    | EmptyFromImport
-    | ImportAfterStatement
-    | SubmoduleNameClash
+    | DuplicateMember
     | SubmoduleNotImported
-    | OwnDescendantImport
+    | ImportOfContainedModule
     | UnassignedMember
+    | NoBinaryOverload
+    | NoUnaryOverload
+    | NotCallable
+    | CallArityMismatch
+    | TypeMismatch
+    | LambdaTypeMismatch
+    | NotSubscriptable
+    | TupleIndexOutOfRange
+    | MissingReturn
+    | NotIterable
+    | SequenceKindMismatch
+    | UnreachableCase
+    | NotSynthesised
+    | NoAttributes
+    | UnknownField
 )
 
 
@@ -300,9 +433,8 @@ class IllFormedModule(IllFormed):
     def __init__(self, node: ast.AST, reason: Reason):
         self.line: int | None = getattr(node, "lineno", None)
         self.col: int | None = getattr(node, "col_offset", None)
-        self.reason: Reason = reason
         self.msg = reason.message()
-        self.module: str | None = None
+        self.module: QualifiedName | None = None
         super().__init__(self.msg)
 
 

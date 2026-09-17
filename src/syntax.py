@@ -2,6 +2,9 @@ import ast
 import sys
 from collections.abc import Callable
 
+from aux import is_import, split_imports
+from type_syntax import parse_annotation
+
 OP_SYMBOLS: dict[type, str] = {
     ast.BitOr: "|",
     ast.BitAnd: "&",
@@ -13,7 +16,7 @@ OP_SYMBOLS: dict[type, str] = {
 }
 
 
-class ParseError(Exception):
+class Unsupported(Exception):
     exit_code: int  # overridden by subclass
     msg: str
 
@@ -24,11 +27,11 @@ class ParseError(Exception):
         super().__init__(msg)
 
 
-class Prohibited(ParseError):
+class Prohibited(Unsupported):
     exit_code = 1
 
 
-class NotYetSupported(ParseError):
+class NotYetSupported(Unsupported):
     exit_code = 2
 
     def __init__(self, node: ast.AST, feature: str, issue: int):
@@ -36,11 +39,11 @@ class NotYetSupported(ParseError):
 
 
 class PatList(ast.MatchSequence):
-    """Sequence pattern written with brackets."""
+    pass
 
 
 class PatTuple(ast.MatchSequence):
-    """Sequence pattern written with parentheses, or bare."""
+    pass
 
 
 def map_tree(f: Callable[[ast.AST], ast.AST], node: ast.AST) -> ast.AST:
@@ -48,13 +51,14 @@ def map_tree(f: Callable[[ast.AST], ast.AST], node: ast.AST) -> ast.AST:
     fields: dict[str, object] = {}
     for name in node._fields:
         v = getattr(node, name)
-        if isinstance(v, ast.AST):
-            fields[name] = map_tree(f, v)
-        elif isinstance(v, list):
-            new = [map_tree(f, x) if isinstance(x, ast.AST) else x for x in v]
-            fields[name] = v if all(a is b for a, b in zip(new, v)) else new
-        else:
-            fields[name] = v
+        match v:
+            case ast.AST():
+                fields[name] = map_tree(f, v)
+            case list():
+                new = [map_tree(f, x) if isinstance(x, ast.AST) else x for x in v]
+                fields[name] = v if all(a is b for a, b in zip(new, v)) else new
+            case _:
+                fields[name] = v
     unchanged = all(fields[name] is getattr(node, name) for name in node._fields)
     return f(node if unchanged else ast.copy_location(type(node)(**fields), node))
 
@@ -74,112 +78,104 @@ def classify_sequence(source: str) -> Callable[[ast.AST], ast.AST]:
 
 
 def parse(source: str, filename: str) -> ast.Module:
-    tree = map_tree(classify_sequence(source), ast.parse(source, filename=filename))
-    assert isinstance(tree, ast.Module)
-    return tree
+    m = map_tree(classify_sequence(source), ast.parse(source, filename=filename))
+    assert isinstance(m, ast.Module)
+    return m
 
 
-def check_stmt(node: ast.stmt) -> None:
-    if isinstance(node, ast.Pass):
-        return
-    if isinstance(node, ast.Assign):
-        if len(node.targets) != 1:
-            raise Prohibited(node, "multiple assignment targets")
-        target = node.targets[0]
-        if isinstance(target, ast.Subscript):
-            raise Prohibited(node, "item assignment prohibited")
-        if isinstance(target, ast.Attribute):
-            raise Prohibited(node, "attribute assignment prohibited")
-        if not isinstance(target, ast.Name):
-            raise NotYetSupported(node, "destructuring assignment", 54)
-        check_expr(node.value)
-        return
-    if isinstance(node, ast.Return):
-        if node.value is not None:
-            check_expr(node.value)
-        return
-    if isinstance(node, ast.If):
-        check_expr(node.test)
-        check_body(node.body)
-        check_body(node.orelse)
-        return
-    if isinstance(node, ast.FunctionDef):
-        check_arguments(node.args)
-        if len(node.decorator_list) > 0:
-            raise NotYetSupported(node, "decorators", 58)
-        if node.returns is not None:
-            raise Prohibited(node, "return type annotations prohibited")
-        check_body(node.body)
-        return
-    if isinstance(node, ast.Expr):
-        check_expr(node.value)
-        return
-    if isinstance(node, ast.Assert):
-        check_expr(node.test)
-        if node.msg is not None:
-            check_expr(node.msg)
-        return
-    if isinstance(node, ast.AugAssign):
-        raise Prohibited(node, "augmented assignment (+=, etc.) prohibited")
-    if isinstance(node, ast.AnnAssign):
-        raise Prohibited(node, "annotated assignment prohibited")
-    if isinstance(node, ast.Delete):
-        raise Prohibited(node, "del prohibited")
-    if isinstance(node, ast.For):
-        raise Prohibited(node, "for loops prohibited")
-    if isinstance(node, ast.While):
-        raise Prohibited(node, "while loops prohibited")
-    if isinstance(node, ast.With):
-        raise Prohibited(node, "with statements prohibited")
-    if isinstance(node, ast.AsyncFunctionDef):
-        raise Prohibited(node, "async prohibited")
-    if isinstance(node, ast.AsyncFor):
-        raise Prohibited(node, "async prohibited")
-    if isinstance(node, ast.AsyncWith):
-        raise Prohibited(node, "async prohibited")
-    if isinstance(node, ast.Raise):
-        raise Prohibited(node, "raise prohibited")
-    if isinstance(node, ast.Try):
-        raise Prohibited(node, "try/except prohibited")
-    if isinstance(node, ast.Import):
-        if len(node.names) != 1:
-            raise NotYetSupported(node, "multi-target import (import a, b)", 53)
-        if node.names[0].asname is not None:
-            raise NotYetSupported(node, "import-as", 53)
-        return
-    if isinstance(node, ast.ImportFrom):
-        if node.level > 0:
-            raise NotYetSupported(node, "relative imports", 53)
-        if node.module is None:
-            raise NotYetSupported(node, "from-import with no module", 53)
-        for alias in node.names:
-            if alias.name == "*":
-                raise NotYetSupported(node, "from M import *", 53)
-            if alias.asname is not None:
-                raise NotYetSupported(node, "from-import-as", 53)
-        return
-    if isinstance(node, ast.Global):
-        raise Prohibited(node, "global prohibited")
-    if isinstance(node, ast.Nonlocal):
-        raise Prohibited(node, "nonlocal prohibited")
-    if isinstance(node, ast.ClassDef):
-        raise Prohibited(node, "class declaration only at module top level")
-    if isinstance(node, ast.Match):
-        check_expr(node.subject)
-        for case in node.cases:
-            if case.guard is not None:
-                raise NotYetSupported(case, "case guards", 83)
-            check_pattern(case.pattern)
-            check_body(case.body)
-        return
-    if isinstance(node, ast.Break):
-        raise Prohibited(node, "break prohibited")
-    if isinstance(node, ast.Continue):
-        raise Prohibited(node, "continue prohibited")
-    raise Prohibited(node, f"unknown statement type: {type(node).__name__}")
+def check_syntax_stmt(node: ast.stmt) -> None:
+    match node:
+        case ast.Pass():
+            pass
+        case ast.Assign():
+            if len(node.targets) != 1:
+                raise Prohibited(node, "multiple assignment targets")
+            target = node.targets[0]
+            match target:
+                case ast.Subscript():
+                    raise Prohibited(node, "item assignment prohibited")
+                case ast.Attribute():
+                    raise Prohibited(node, "attribute assignment prohibited")
+                case ast.Name():
+                    check_syntax_expr(node.value)
+                case _:
+                    raise NotYetSupported(node, "destructuring assignment", 54)
+        case ast.Return():
+            if node.value is not None:
+                check_syntax_expr(node.value)
+        case ast.If():
+            check_syntax_expr(node.test)
+            check_syntax_body(node.body)
+            check_syntax_body(node.orelse)
+        case ast.FunctionDef():
+            check_syntax_arguments(node.args)
+            if len(node.decorator_list) > 0:
+                raise NotYetSupported(node, "decorators", 58)
+            if any(a.annotation is None for a in node.args.args):
+                raise Prohibited(node, "parameters must be annotated")
+            if node.returns is None:
+                raise Prohibited(node, "return type must be annotated")
+            check_syntax_annotation(node.returns)
+            check_syntax_body(node.body)
+        case ast.Expr():
+            check_syntax_expr(node.value)
+        case ast.Assert():
+            check_syntax_expr(node.test)
+            if node.msg is not None:
+                check_syntax_expr(node.msg)
+        case ast.AugAssign():
+            raise Prohibited(node, "augmented assignment (+=, etc.) prohibited")
+        case ast.AnnAssign():
+            if node.value is None:
+                raise Prohibited(node, "annotation without assignment prohibited")
+            if not isinstance(node.target, ast.Name):
+                raise Prohibited(node, "assignment target must be a simple name")
+            check_syntax_annotation(node.annotation)
+            check_syntax_expr(node.value)
+        case ast.Delete():
+            raise Prohibited(node, "del prohibited")
+        case ast.For():
+            raise Prohibited(node, "for loops prohibited")
+        case ast.While():
+            raise Prohibited(node, "while loops prohibited")
+        case ast.With():
+            raise Prohibited(node, "with statements prohibited")
+        case ast.AsyncFunctionDef():
+            raise Prohibited(node, "async prohibited")
+        case ast.AsyncFor():
+            raise Prohibited(node, "async prohibited")
+        case ast.AsyncWith():
+            raise Prohibited(node, "async prohibited")
+        case ast.Raise():
+            raise Prohibited(node, "raise prohibited")
+        case ast.Try():
+            raise Prohibited(node, "try/except prohibited")
+        case ast.Import():
+            raise Prohibited(node, "import only allowed at module top level")
+        case ast.ImportFrom():
+            raise Prohibited(node, "import only allowed at module top level")
+        case ast.Global():
+            raise Prohibited(node, "global prohibited")
+        case ast.Nonlocal():
+            raise Prohibited(node, "nonlocal prohibited")
+        case ast.ClassDef():
+            raise Prohibited(node, "class declaration only at module top level")
+        case ast.Match():
+            check_syntax_expr(node.subject)
+            for case in node.cases:
+                if case.guard is not None:
+                    raise NotYetSupported(case, "case guards", 190)
+                check_syntax_pattern(case.pattern)
+                check_syntax_body(case.body)
+        case ast.Break():
+            raise Prohibited(node, "break prohibited")
+        case ast.Continue():
+            raise Prohibited(node, "continue prohibited")
+        case _:
+            raise Prohibited(node, f"unknown statement type: {type(node).__name__}")
 
 
-def check_classdef(node: ast.ClassDef) -> None:
+def check_syntax_classdef(node: ast.ClassDef) -> None:
     if any(isinstance(b, ast.Name) and b.id == "Enum" for b in node.bases):
         raise NotYetSupported(node, "enum classes", 86)
     if len(node.decorator_list) != 1:
@@ -196,219 +192,231 @@ def check_classdef(node: ast.ClassDef) -> None:
     if len(node.body) == 1 and isinstance(node.body[0], ast.Pass):
         return
     for stmt in node.body:
-        check_field(stmt)
+        check_syntax_field(stmt)
 
 
-def check_field(stmt: ast.stmt) -> None:
+def check_syntax_field(stmt: ast.stmt) -> None:
     if not isinstance(stmt, ast.AnnAssign):
         raise Prohibited(stmt, "dataclass body may contain only field declarations")
     if not isinstance(stmt.target, ast.Name):
         raise Prohibited(stmt, "field target must be a simple name")
     if stmt.value is not None:
         raise Prohibited(stmt, "field default values prohibited")
-    if not (isinstance(stmt.annotation, ast.Name) and stmt.annotation.id == "Any"):
-        raise Prohibited(stmt, "field type annotation must be Any")
+    check_syntax_annotation(stmt.annotation)
 
 
-def is_qualified_name(node: ast.expr) -> bool:
-    return isinstance(node, ast.Name) or (
-        isinstance(node, ast.Attribute) and is_qualified_name(node.value)
-    )
+def check_syntax_pattern(node: ast.pattern) -> None:
+    match node:
+        case ast.MatchValue():
+            v = node.value
+            match v:
+                case ast.Constant():
+                    if isinstance(v.value, (int, float, str)):
+                        return
+                case ast.UnaryOp(op=ast.USub(), operand=ast.Constant(value=value)):
+                    if isinstance(value, (int, float)):
+                        return
+                case ast.Attribute():
+                    raise NotYetSupported(node, "attribute value patterns", 86)
+            raise Prohibited(node, "complex and bytes literal patterns prohibited")
+        case ast.MatchSingleton():
+            pass
+        case ast.MatchAs():
+            if node.pattern is not None:
+                check_syntax_pattern(node.pattern)
+        case ast.MatchSequence():
+            for p in node.patterns:
+                check_syntax_pattern(p)
+        case ast.MatchClass():
+            for p in list(node.patterns) + list(node.kwd_patterns):
+                check_syntax_pattern(p)
+        case ast.MatchMapping():
+            if node.rest is not None:
+                raise NotYetSupported(node, "rest capture in dict patterns", 84)
+            for key in node.keys:
+                if not (isinstance(key, ast.Constant) and isinstance(key.value, str)):
+                    raise Prohibited(key, "dict pattern keys must be string literals")
+            for sub in node.patterns:
+                check_syntax_pattern(sub)
+        case ast.MatchOr():
+            raise NotYetSupported(node, "or-patterns", 85)
+        case ast.MatchStar():
+            raise NotYetSupported(node, "star patterns", 84)
+        case _:
+            raise Prohibited(node, f"unknown pattern type: {type(node).__name__}")
 
 
-def check_pattern(node: ast.pattern) -> None:
-    if isinstance(node, ast.MatchValue):
-        v = node.value
-        if isinstance(v, ast.Constant) and isinstance(v.value, (int, float, str)):
-            return
-        if (
-            isinstance(v, ast.UnaryOp)
-            and isinstance(v.op, (ast.UAdd, ast.USub))
-            and isinstance(v.operand, ast.Constant)
-            and isinstance(v.operand.value, (int, float))
-        ):
-            return
-        if isinstance(v, ast.Attribute):
-            raise NotYetSupported(node, "attribute value patterns", 86)
-        raise NotYetSupported(node, "complex value patterns", 83)
-    if isinstance(node, ast.MatchSingleton):
-        return
-    if isinstance(node, ast.MatchAs):
-        if node.pattern is not None:
-            check_pattern(node.pattern)
-        return
-    if isinstance(node, ast.MatchSequence):
-        for p in node.patterns:
-            if isinstance(p, ast.MatchStar):
-                raise NotYetSupported(node, "star patterns", 84)
-            check_pattern(p)
-        return
-    if isinstance(node, ast.MatchClass):
-        if not is_qualified_name(node.cls):
-            raise Prohibited(node, "class pattern head must be a qualified name")
-        for p in list(node.patterns) + list(node.kwd_patterns):
-            check_pattern(p)
-        return
-    if isinstance(node, ast.MatchMapping):
-        if node.rest is not None:
-            raise NotYetSupported(node, "rest capture in dict patterns", 84)
-        for key in node.keys:
-            if not (isinstance(key, ast.Constant) and isinstance(key.value, str)):
-                raise Prohibited(key, "dict pattern keys must be string literals")
-        for sub in node.patterns:
-            check_pattern(sub)
-        return
-    if isinstance(node, ast.MatchOr):
-        raise NotYetSupported(node, "or-patterns", 85)
-    if isinstance(node, ast.MatchStar):
-        raise NotYetSupported(node, "star patterns", 84)
-    raise Prohibited(node, f"unknown pattern type: {type(node).__name__}")
-
-
-def check_expr(node: ast.expr) -> None:
-    if isinstance(node, ast.Constant):
-        if isinstance(node.value, (int, float, str, bool, type(None))):
-            return
-        if isinstance(node.value, (bytes, complex)):
-            raise Prohibited(node, f"{type(node.value).__name__} literals prohibited")
-        raise Prohibited(node, f"prohibited literal type: {type(node.value).__name__}")
-    if isinstance(node, ast.Name):
-        return
-    if isinstance(node, ast.BinOp):
-        allowed = (ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv, ast.Mod, ast.Pow)
-        if not isinstance(node.op, allowed):
+def check_syntax_expr(node: ast.expr) -> None:
+    match node:
+        case ast.Constant():
+            if isinstance(node.value, (int, float, str, bool, type(None))):
+                return
+            if isinstance(node.value, (bytes, complex)):
+                raise Prohibited(node, f"{type(node.value).__name__} literals prohibited")
+            raise Prohibited(node, f"prohibited literal type: {type(node.value).__name__}")
+        case ast.Name():
+            pass
+        case ast.BinOp():
+            allowed = (
+                ast.Add,
+                ast.Sub,
+                ast.Mult,
+                ast.Div,
+                ast.FloorDiv,
+                ast.Mod,
+                ast.Pow,
+            )
+            if not isinstance(node.op, allowed):
+                sym = OP_SYMBOLS.get(type(node.op), type(node.op).__name__)
+                raise Prohibited(node, f"binary operator '{sym}' prohibited")
+            check_syntax_expr(node.left)
+            check_syntax_expr(node.right)
+        case ast.UnaryOp():
+            if isinstance(node.op, (ast.Not, ast.UAdd, ast.USub)):
+                check_syntax_expr(node.operand)
+                return
             sym = OP_SYMBOLS.get(type(node.op), type(node.op).__name__)
-            raise Prohibited(node, f"binary operator '{sym}' prohibited")
-        check_expr(node.left)
-        check_expr(node.right)
-        return
-    if isinstance(node, ast.UnaryOp):
-        if isinstance(node.op, ast.Not):
-            check_expr(node.operand)
-            return
-        if isinstance(node.op, (ast.UAdd, ast.USub)):
-            check_expr(node.operand)
-            return
-        sym = OP_SYMBOLS.get(type(node.op), type(node.op).__name__)
-        raise Prohibited(node, f"unary operator '{sym}' prohibited")
-    if isinstance(node, ast.BoolOp):
-        if len(node.values) > 2:
-            raise NotYetSupported(node, "chained boolean operator", 82)
-        for v in node.values:
-            check_expr(v)
-        return
-    if isinstance(node, ast.Compare):
-        if len(node.ops) > 1:
-            raise NotYetSupported(node, "chained comparison", 82)
-        for op in node.ops:
-            if isinstance(op, (ast.Is, ast.IsNot)):
-                raise NotYetSupported(node, "identity operator (is/is not)", 81)
-        check_expr(node.left)
-        for c in node.comparators:
-            check_expr(c)
-        return
-    if isinstance(node, ast.Call):
-        check_expr(node.func)
-        for a in node.args:
-            check_expr(a)
-        for k in node.keywords:
-            check_keyword(k)
-        return
-    if isinstance(node, ast.IfExp):
-        check_expr(node.test)
-        check_expr(node.body)
-        check_expr(node.orelse)
-        return
-    if isinstance(node, ast.Lambda):
-        check_arguments(node.args)
-        check_expr(node.body)
-        return
-    if isinstance(node, ast.List):
-        for e in node.elts:
-            check_expr(e)
-        return
-    if isinstance(node, ast.Tuple):
-        for e in node.elts:
-            check_expr(e)
-        return
-    if isinstance(node, ast.Dict):
-        for key in node.keys:
-            if key is not None:
-                check_expr(key)
-        for v in node.values:
-            check_expr(v)
-        return
-    if isinstance(node, ast.Set):
-        raise NotYetSupported(node, "set literals", 147)
-    if isinstance(node, ast.Attribute):
-        check_expr(node.value)
-        return
-    if isinstance(node, ast.Subscript):
-        check_expr(node.value)
-        check_expr(node.slice)
-        return
-    if isinstance(node, ast.ListComp):
-        check_expr(node.elt)
-        for g in node.generators:
-            check_generator(g)
-        return
-    if isinstance(node, ast.DictComp):
-        check_expr(node.key)
-        check_expr(node.value)
-        for g in node.generators:
-            check_generator(g)
-        return
-    if isinstance(node, ast.SetComp):
-        raise NotYetSupported(node, "set comprehensions", 147)
-    if isinstance(node, ast.Slice):
-        raise NotYetSupported(node, "slicing", 59)
-    if isinstance(node, ast.GeneratorExp):
-        raise Prohibited(node, "generator expressions prohibited")
-    if isinstance(node, ast.NamedExpr):
-        raise Prohibited(node, "walrus operator (:=) prohibited")
-    if isinstance(node, ast.Starred):
-        raise Prohibited(node, "starred expressions prohibited")
-    if isinstance(node, ast.Await):
-        raise Prohibited(node, "async prohibited")
-    if isinstance(node, ast.Yield):
-        raise Prohibited(node, "yield prohibited")
-    if isinstance(node, ast.YieldFrom):
-        raise Prohibited(node, "yield prohibited")
-    if isinstance(node, ast.JoinedStr):
-        raise NotYetSupported(node, "f-strings", 55)
-    if isinstance(node, ast.FormattedValue):
-        raise NotYetSupported(node, "f-strings", 55)
-    raise Prohibited(node, f"unknown expression type: {type(node).__name__}")
+            raise Prohibited(node, f"unary operator '{sym}' prohibited")
+        case ast.BoolOp():
+            if len(node.values) > 2:
+                raise NotYetSupported(node, "chained boolean operator", 82)
+            for v in node.values:
+                check_syntax_expr(v)
+        case ast.Compare():
+            if len(node.ops) > 1:
+                raise NotYetSupported(node, "chained comparison", 82)
+            for op in node.ops:
+                if isinstance(op, (ast.Is, ast.IsNot)):
+                    raise NotYetSupported(node, "identity operator (is/is not)", 81)
+            check_syntax_expr(node.left)
+            for c in node.comparators:
+                check_syntax_expr(c)
+        case ast.Call():
+            check_syntax_expr(node.func)
+            for a in node.args:
+                check_syntax_expr(a)
+            for k in node.keywords:
+                check_syntax_keyword(k)
+        case ast.IfExp():
+            check_syntax_expr(node.test)
+            check_syntax_expr(node.body)
+            check_syntax_expr(node.orelse)
+        case ast.Lambda():
+            check_syntax_arguments(node.args)
+            check_syntax_expr(node.body)
+        case ast.List():
+            for e in node.elts:
+                check_syntax_expr(e)
+        case ast.Tuple():
+            for e in node.elts:
+                check_syntax_expr(e)
+        case ast.Dict():
+            for key in node.keys:
+                if key is None:
+                    raise Prohibited(node, "dict unpacking prohibited")
+                check_syntax_expr(key)
+            for v in node.values:
+                check_syntax_expr(v)
+        case ast.Set():
+            raise NotYetSupported(node, "set literals", 147)
+        case ast.Attribute():
+            check_syntax_expr(node.value)
+        case ast.Subscript():
+            check_syntax_expr(node.value)
+            check_syntax_expr(node.slice)
+        case ast.ListComp():
+            check_syntax_expr(node.elt)
+            for g in node.generators:
+                check_syntax_generator(g)
+        case ast.DictComp():
+            check_syntax_expr(node.key)
+            check_syntax_expr(node.value)
+            for g in node.generators:
+                check_syntax_generator(g)
+        case ast.SetComp():
+            raise NotYetSupported(node, "set comprehensions", 147)
+        case ast.Slice():
+            raise NotYetSupported(node, "slicing", 59)
+        case ast.GeneratorExp():
+            raise Prohibited(node, "generator expressions prohibited")
+        case ast.NamedExpr():
+            raise Prohibited(node, "walrus operator (:=) prohibited")
+        case ast.Starred():
+            raise Prohibited(node, "starred expressions prohibited")
+        case ast.Await():
+            raise Prohibited(node, "async prohibited")
+        case ast.Yield():
+            raise Prohibited(node, "yield prohibited")
+        case ast.YieldFrom():
+            raise Prohibited(node, "yield prohibited")
+        case ast.JoinedStr():
+            raise NotYetSupported(node, "f-strings", 55)
+        case ast.FormattedValue():
+            raise NotYetSupported(node, "f-strings", 55)
+        case _:
+            raise Prohibited(node, f"unknown expression type: {type(node).__name__}")
 
 
-def check_body(stmts: list[ast.stmt]) -> None:
+def check_syntax_body(stmts: list[ast.stmt]) -> None:
     for s in stmts:
-        check_stmt(s)
+        check_syntax_stmt(s)
 
 
-def check_top_level(stmts: list[ast.stmt]) -> None:
+def check_syntax_import(node: ast.stmt) -> None:
+    match node:
+        case ast.Import():
+            if len(node.names) != 1:
+                raise NotYetSupported(node, "multi-target import (import a, b)", 135)
+            if node.names[0].asname is not None:
+                raise NotYetSupported(node, "import-as", 135)
+        case ast.ImportFrom():
+            if len(node.names) == 0:
+                raise Prohibited(node, "empty name list")
+            if node.level > 0:
+                raise NotYetSupported(node, "relative imports", 126)
+            assert node.module is not None  # absent only in a relative import
+            for alias in node.names:
+                if alias.name == "*":
+                    raise NotYetSupported(node, "from M import *", 105)
+                if alias.asname is not None:
+                    raise NotYetSupported(node, "from-import-as", 135)
+        case _:
+            raise AssertionError(f"unexpected statement: {type(node).__name__}")
+
+
+def check_syntax_top_level(body: list[ast.stmt]) -> None:
+    iotas, stmts = split_imports(body)
+    for iota in iotas:
+        check_syntax_import(iota)
     for s in stmts:
+        if is_import(s):
+            raise Prohibited(s, "imports must precede all other statements")
         if isinstance(s, ast.ClassDef):
-            check_classdef(s)
+            check_syntax_classdef(s)
         else:
-            check_stmt(s)
+            check_syntax_stmt(s)
 
 
-def check_keyword(node: ast.keyword) -> None:
-    check_expr(node.value)
+def check_syntax_keyword(node: ast.keyword) -> None:
+    check_syntax_expr(node.value)
 
 
-def check_generator(node: ast.comprehension) -> None:
+def check_syntax_generator(node: ast.comprehension) -> None:
     if node.is_async:
         raise Prohibited(node, "async comprehensions prohibited")
     if not isinstance(node.target, ast.Name):
         raise NotYetSupported(node, "destructuring in comprehensions", 54)
-    check_expr(node.iter)
+    check_syntax_expr(node.iter)
     for i in node.ifs:
-        check_expr(i)
+        check_syntax_expr(i)
 
 
-def check_arguments(node: ast.arguments) -> None:
+def check_syntax_annotation(node: ast.expr | None) -> None:
+    if node is not None and parse_annotation(node) is None:
+        raise Prohibited(node, "unsupported type annotation")
+
+
+def check_syntax_arguments(node: ast.arguments) -> None:
     if node.vararg is not None:
         raise NotYetSupported(node, "*args", 57)
     if node.kwarg is not None:
@@ -421,23 +429,25 @@ def check_arguments(node: ast.arguments) -> None:
         raise NotYetSupported(node, "default arguments", 56)
     if len(node.posonlyargs) > 0:
         raise Prohibited(node, "positional-only arguments prohibited")
+    for a in node.args:
+        check_syntax_annotation(a.annotation)
 
 
-def check_module(node: ast.Module) -> ParseError | None:
+def check_syntax_module(node: ast.Module) -> Unsupported | None:
     try:
-        check_top_level(node.body)
+        check_syntax_top_level(node.body)
         return None
-    except ParseError as e:
+    except Unsupported as e:
         return e
 
 
-def check_file(filename: str) -> ParseError | None:
+def check_file(filename: str) -> Unsupported | None:
     with open(filename) as f:
         source = f.read()
-    return check_module(parse(source, filename))
+    return check_syntax_module(parse(source, filename))
 
 
-def format_result(result: ParseError | None, filename: str) -> str:
+def format_result(result: Unsupported | None, filename: str) -> str:
     if result is None:
         return f"{filename}: ok"
     if result.line is not None:
@@ -447,7 +457,7 @@ def format_result(result: ParseError | None, filename: str) -> str:
 
 def main() -> None:
     if len(sys.argv) < 2:
-        print("Usage: parse.py <file.py> [<file.py> ...]")
+        print("Usage: syntax.py <file.py> [<file.py> ...]")
         sys.exit(1)
     exit_code = 0
     for filename in sys.argv[1:]:

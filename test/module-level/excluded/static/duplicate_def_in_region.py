@@ -1,9 +1,9 @@
-# rule: def -- the names of a mutual region must be distinct
-def f():
+# rule: def
+def f() -> int:
     return 0
-def g():
+def g() -> int:
     return 0
-def g():  # PurePy: error (duplicate name in contiguous block); Python: ok (rebinds g)
+def g() -> int:
     return f()
 
 print(g())

@@ -1,0 +1,135 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma \vdash \Gamma, x \importsR \theta \binding \Sigma'$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{imp-member}}]
+{
+  \Gamma \vdash x : \theta
+}
+{
+  \Sigma \vdash \Gamma, x \importsR \theta \binding \Sigma
+}
+\and
+\inferrule*[lab={\ruleName{imp-submodule}}]
+{
+  \bind{x}{\modStub{q}} \in \Gamma \\
+  \Sigma \vdash_{\mathsf{load}} q : \Delta \binding \Sigma'
+}
+{
+  \Sigma \vdash \Gamma, x \importsR \modLoaded{q}{\Delta} \binding \Sigma'
+}
+\end{mathpar}
+
+\caption{Name $x$ imported from module signature $\Gamma$ has context entry $\theta$}
+\label{fig:typing-imports}
+\end{figure}
+
+\begin{figure}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma'$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{imports-nil}}]
+{
+  \strut
+}
+{
+  \Sigma; q \vdash \varepsilon : \varnothing \binding \Sigma
+}
+\and
+\inferrule*[lab={\ruleName{import}}]
+{
+  q' = x \cons \seq{x} \\
+  q \not\properPrefixOf q' \\
+  \Sigma \vdash_{\mathsf{load}} q' : \Delta \binding \Sigma_1 \\
+  \Sigma_1 \vdash q', \modLoaded{q'}{\Delta} \loadsAs \theta \binding \Sigma_2 \\
+  \Sigma_2; q \vdash \seq{\iota} : \Gamma \binding \Sigma'
+}
+{
+  \Sigma; q \vdash \exImport{q'} \cons \seq{\iota} : \set{\bind{x}{\theta}} \extend \Gamma \binding \Sigma'
+}
+\and
+\inferrule*[lab={\ruleName{from-import}}]
+{
+  \Sigma \vdash_{\mathsf{load}} q' : \Delta \binding \Sigma_0 \\
+  q^\dagger_1 \properPrefixOf \cdots \properPrefixOf q^\dagger_m \text{ the } q^\dagger \properPrefixOf q' \text{ with } q^\dagger \not\prefixOf q \\
+  \Sigma_{j-1} \vdash_{\mathsf{load}} q^\dagger_j : \Delta_j \binding \Sigma_j \quad (\forall j) \\
+  \Sigma_{m+i-1} \vdash \Delta, x_i \importsR \theta_i \binding \Sigma_{m+i} \quad (\forall i) \\
+  \Sigma_{m+n+1}; q \vdash \seq{\iota} : \Gamma \binding \Sigma'
+}
+{
+  \Sigma; q \vdash \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} : \set{\bind{x_1}{\theta_1}, \ldots, \bind{x_{n+1}}{\theta_{n+1}}} \extend \Gamma \binding \Sigma'
+}
+\end{mathpar}
+
+\subcaption{Import prefix $\seq{\iota}$ of module $q$ produces bindings $\Gamma$}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Sigma \vdash q, \theta \loadsAs \theta' \binding \Sigma'$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{loads-as-simple}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash x, \theta \loadsAs \theta \binding \Sigma
+}
+\and
+\inferrule*[lab={\ruleName{loads-as-qualified}}]
+{
+  \Sigma \vdash_{\mathsf{load}} q : \Gamma' \binding \Sigma_1 \\
+  \Sigma_1 \vdash q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsAs \theta' \binding \Sigma'
+}
+{
+  \Sigma \vdash q.x, \theta \loadsAs \theta' \binding \Sigma'
+}
+\end{mathpar}
+\subcaption{Reference $\theta$ for module $q$ loads as reference $\theta'$ for root of $q$, statically loading the modules containing $q$}
+\end{subfigure}
+\caption{Import typing}
+\label{fig:typing-import-prefix}
+\end{figure}
+
+\begin{figure}
+\flushleft \shadebox{$\Sigma \vdash_{\mathsf{load}} q : \Gamma \binding \Sigma'$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{predefined}}]
+{
+  \mathcal{P}(q) = (\Gamma', \rho)
+}
+{
+  \Sigma \vdash_{\mathsf{load}} q : \Gamma' \binding \Sigma
+}
+\and
+\inferrule*[lab={\ruleName{module}}]
+{
+  \mathcal{M}(q) = \seq{\iota}\;t \\
+  \Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma_1 \\
+  \mathcal{P}(\pyinline{builtins}) = (\Gamma', \rho) \\
+  \Sigma_1; q; \Gamma' \mathbin{\override} \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
+  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
+}
+{
+  \Sigma \vdash_{\mathsf{load}} q : \submods(q) \override \Delta \binding \Sigma'
+}
+\end{mathpar}
+
+\flushleft \shadebox{$\vdash \mathcal{M}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{program}}]
+{
+  \varnothing \vdash_{\mathsf{load}} \pymath{\_\_main\_\_} : \Gamma \binding \Sigma
+}
+{
+  \vdash \mathcal{M}
+}
+\end{mathpar}
+\caption{Module typing}
+\label{fig:typing-module}
+\end{figure}

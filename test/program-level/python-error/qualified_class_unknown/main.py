@@ -1,6 +1,6 @@
 import mod
 
-def f(v):
+def f(v: int) -> int:
     match v:
         case mod.NotAClass():
             return 1

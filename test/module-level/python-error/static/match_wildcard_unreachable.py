@@ -1,4 +1,4 @@
-# rule: sub-wild -- a wildcard case makes a later case unreachable
+# rule: pat-wild
 v = 1
 match v:
     case _:

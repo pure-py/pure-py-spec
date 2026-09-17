@@ -1,8 +1,7 @@
 from dataclasses import dataclass
-from typing import Any
 @dataclass
 class P:
-    x: Any
+    x: int
 p = P(1)
 p.x = 2
 print(p.x)

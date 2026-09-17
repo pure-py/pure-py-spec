@@ -1,0 +1,128 @@
+\begin{figure}
+\small
+\setlength{\jot}{2pt}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash k, p \matches K, L \binding \Delta$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{pat-var}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma \vdash k, x \matches \set{k}, \varnothing \binding \set{\bind{x}{\shapeTy(k)}}
+}
+\and
+\inferrule*[lab={\ruleName{pat-wild}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma \vdash k, \patWild \matches \set{k}, \varnothing \binding \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{pat-as}}]
+{
+  \Sigma; \Gamma \vdash k, p \matches K, L \binding \Delta
+}
+{
+  \Sigma; \Gamma \vdash k, p\;\pyinline{as}\;x \matches K, L \binding \Delta \disjunion \set{\bind{x}{\bigJoinTy{\Sigma}{(\shapeTy(k') \mid k' \in K)}}}
+}
+\and
+\inferrule*[lab={\ruleName{pat-split}}]
+{
+  \Sigma; \Gamma \vdash k, p \splits K, L \\
+  \Sigma; \Gamma \vdash K, p \matches K', L' \binding \Delta
+}
+{
+  \Sigma; \Gamma \vdash k, p \matches K', L \disjunion L' \binding \Delta
+}
+\and
+\inferrule*[lab={\ruleName{pat-literal}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma \vdash \shapeAny{\tyLiteral{\ell}}{\varnothing}, \ell \matches \set{\shapeAny{\tyLiteral{\ell}}{\varnothing}}, \varnothing \binding \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{pat-tuple}}]
+{
+  \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
+}
+{
+  \Sigma; \Gamma \vdash \patTuple{\seq{k}}, \patTuple{\seq{p}} \matches \set{\patTuple{\seq{k}\,'} \mid \seq{k}\,' \in K}, \set{\patTuple{\seq{l}} \mid \seq{l} \in L} \binding \Delta
+}
+\and
+\inferrule*[lab={\ruleName{pat-list}}]
+{
+  \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
+}
+{
+  \Sigma; \Gamma \vdash \shapeList{\tau}{\seq{k}}, \patList{\seq{p}} \matches \set{\shapeList{\tau}{\seq{k}\,'} \mid \seq{k}\,' \in K}, \set{\shapeList{\tau}{\seq{l}} \mid \seq{l} \in L} \binding \Delta
+}
+\and
+\inferrule*[lab={\ruleName{pat-dict}}]
+{
+  \seq{w} \text{ distinct} \\
+  k_i = \beta(w_i) \quad (\forall i) \\
+  \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta
+}
+{
+  \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{H}, \patDict{\bind{\seq{w}}{\seq{p}}} \matches \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{k}\,'}}}{H} \mid \seq{k}\,' \in K}, \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{l}}}}{H} \mid \seq{l} \in L} \binding \Delta
+}
+\and
+\inferrule*[lab={\ruleName{pat-constr}}]
+{
+  \Gamma \vdash q : \Type{D} \\
+  \Sigma \vdash C \subty D \\
+  \fields(\Sigma, D) = \bind{\seq{x}}{\seq{\sigma}} \\
+  \fieldMap(\Sigma, D, a) = \set{\bind{\seq{x}}{\seq{p}}} \\
+  p'_i = \patWild \quad (\forall i) \\
+  \Sigma; \Gamma \vdash \seq{k}, \seq{p} \mathbin{\concat} \seq{p}\,' \matches K, L \binding \Delta
+}
+{
+  \Sigma; \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{H}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{C}{\seq{k}\,'}}{H} \mid \seq{k}\,' \in K}, \set{\shapeAny{\patConstr{C}{\seq{l}}}{H} \mid \seq{l} \in L} \binding \Delta
+}
+\end{mathpar}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L \binding \Delta$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{pat-nil}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma \vdash \varepsilon, \varepsilon \matches \set{\varepsilon}, \varnothing \binding \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{pat-cons}}]
+{
+  \Sigma; \Gamma \vdash k, p \matches K, L \binding \Delta \\
+  \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K', L' \binding \Delta'
+}
+{
+  \Sigma; \Gamma \vdash k \cons \seq{k}, p \cons \seq{p} \matches K \times K', (L \times \set{\seq{k}}) \disjunion (K \times L') \binding \Delta \disjunion \Delta'
+}
+\end{mathpar}
+
+\vspace{2mm}
+
+\flushleft \shadebox{$\Sigma; \Gamma \vdash L, p \matches K, L' \binding \Delta$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{pat-shapes}}]
+{
+  L' = \set{k \in L \mid \Sigma; \Gamma \vdash k, p \matches K_k, L_k \binding \Delta_k} \\
+  L' \neq \varnothing \\
+  \Delta = \set{\bind{x}{\bigJoinTy{\Sigma}{(\Delta_k(x) \mid k \in L')}} \mid x \in \binds(p)}
+}
+{
+  \Sigma; \Gamma \vdash L, p \matches \textstyle\bigdisjunion_{k \in L'} K_k, \; \textstyle\bigdisjunion_{k \in L'} L_k \disjunion (L \setminus L') \binding \Delta
+}
+\end{mathpar}
+\caption{Pattern $p$ matches shape $k$, giving matched shapes $K$, residual $L$ and bindings $\Delta$; lifted to sequences and ordered sets of shapes}
+\label{fig:typing-pat}
+\end{figure}

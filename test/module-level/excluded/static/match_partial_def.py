@@ -1,5 +1,5 @@
-# rule: match definite assignment -- y assigned in only one arm
-v = 1
+# rule: match-partial
+v: int = 1
 match v:
     case 1:
         y = 10

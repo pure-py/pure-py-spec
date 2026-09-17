@@ -1,0 +1,39 @@
+\begin{figure}
+\small
+\centering
+\begin{tabular}{lll}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Module & Member & Entry \\
+\textup{\pyinline{builtins}} & \pyinline{print} & $\tyCallable{\tyObject}{\tyNone}$ \\
+ & \pyinline{len} & $\tyCallable{\tySized}{\tyInt}$ \\
+ & \pyinline{None} & $\predefName$ \\
+ & \pyinline{object} & $\predefName$ \\
+ & \pyinline{bool} & $\predefName$ \\
+ & \pyinline{int} & $\predefName$ \\
+ & \pyinline{float} & $\predefName$ \\
+ & \pyinline{str} & $\predefName$ \\
+ & \pyinline{list} & $\predefName$ \\
+ & \pyinline{dict} & $\predefName$ \\
+ & \pyinline{tuple} & $\predefName$ \\
+\pyinline{math} & \pyinline{pi} & $\tyFloat$ \\
+ & \pyinline{e} & $\tyFloat$ \\
+ & \pyinline{sqrt} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
+ & \pyinline{exp} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
+ & \pyinline{log} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
+ & \pyinline{sin} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
+ & \pyinline{cos} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
+ & \pyinline{tan} & $\tyCallable{\tyFloat}{\tyFloat}$ \\
+ & \pyinline{floor} & $\tyCallable{\tyFloat}{\tyInt}$ \\
+ & \pyinline{ceil} & $\tyCallable{\tyFloat}{\tyInt}$ \\
+\pyinline{sys} & \pyinline{argv} & $\tyList{\tyStr}$ \\
+ & \pyinline{exit} & $\tyCallable{\tyInt}{\tyNever}$ \\
+\pyinline{typing} & \pyinline{Callable} & $\predefName$ \\
+ & \pyinline{Literal} & $\predefName$ \\
+ & \pyinline{Never} & $\predefName$ \\
+ & \pyinline{Sized} & $\predefName$ \\
+\pyinline{dataclasses} & \pyinline{dataclass} & $\predefName$
+\end{tabular}
+
+\caption{Signature of each predefined module}
+\label{fig:predefined-signatures}
+\end{figure}

@@ -1,45 +1,39 @@
-% Annex of auxiliary functions (specification only). Each entry states the function's meaning and the
+% Annex of auxiliary functions (specification only). Each row states the function's meaning and the
 % cases its rows do not show; the rows are shared with the paper's figures. In the rows, a side condition
-% (if or where) goes in the condition column; a row too wide for that puts its condition on a
+% (if or where) goes in the condition column; a row too wide for that has its condition on a
 % continuation line indented under the right-hand side.
 \chapter{Auxiliary functions (normative)}
 \label{ch:auxiliary-functions}
 
 This annex is normative. It defines the auxiliary functions used by the well-formedness rules
-(\secref{well-formedness}) and the operational semantics (\secref{operational-semantics}).
+(\secref{well-formedness}) and the operational semantics (\secref{operational-semantics}). When more than one
+case applies, the first defines the value, so a function with overlapping cases is still determined: two
+equivalent types join to the second of them, for instance.
 
 \section{Syntactic analyses}
 \label{sec:auxiliary-syntactic}
 
-The syntactic analyses introduced in \secref{well-formedness-auxiliary} are defined by their principal cases; the remaining
+The syntactic analyses introduced in \secref{well-formedness} are defined by their principal cases; the remaining
 cases are stated with each.
 
 \begin{auxfunction}{\assignsS(t)}{set of variables}{aux:assigns}
 \input{spec/functions/assigns-text}
-\begin{align*}
-\input{spec/functions/assigns}
-\end{align*}
+\funcrows{assigns}
 \end{auxfunction}
 
 \begin{auxfunction}{\binds(p)}{set of variables}{aux:binds}
 \input{spec/functions/binds-text}
-\begin{align*}
-\input{spec/functions/binds}
-\end{align*}
+\funcrows{binds}
 \end{auxfunction}
 
 \begin{auxfunction}{\capturesS(t)}{set of variables}{aux:captures}
 \input{spec/functions/captures-text}
-\begin{align*}
-\input{spec/functions/captures}
-\end{align*}
+\funcrows{captures}
 \end{auxfunction}
 
 \begin{auxfunction}{\capturesE(e)}{set of variables}{aux:captures-e}
 \input{spec/functions/captures-e-text}
-\begin{align*}
-\input{spec/functions/captures-e}
-\end{align*}
+\funcrows{captures-e}
 \end{auxfunction}
 
 \begin{auxfunction}{\fvS(s)}{set of variables}{aux:fv}
@@ -50,59 +44,80 @@ cases are stated with each.
 \input{spec/functions/fv-e-text}
 \end{auxfunction}
 
+\section{Types}
+\label{sec:types-auxiliary}
+
+The functions on types and shapes introduced in \secref{types}, each defined by its cases.
+
+\begin{auxfunction}{\baseType(\ell), \baseType(\tau)}{type}{aux:base-type}
+\input{spec/functions/base-type-text}
+\funcrows{base-type}
+\end{auxfunction}
+
+\begin{auxfunction}{\joinTy{\Sigma}{\sigma}{\tau}, \bigJoinTy{\Sigma}{\seq{\tau}}}{type}{aux:join}
+\input{spec/functions/join-text}
+\funcrows{join}
+\end{auxfunction}
+
+\begin{auxfunction}{\meetTy{\Sigma}{\sigma}{\tau}}{type}{aux:meet}
+\input{spec/functions/meet-text}
+\funcrows{meet}
+\end{auxfunction}
+
+\begin{auxfunction}{\elemTy(\Sigma, \tau)}{type}{aux:elem-type}
+\input{spec/functions/elem-type-text}
+\funcrows{elem-type}
+\end{auxfunction}
+
+\begin{auxfunction}{\shapes(\Sigma, \tau, H), \shapes(\Sigma, \seq{\tau})}{ordered set of shapes or of shape sequences}{aux:shapes}
+\input{spec/functions/shapes-text}
+\funcrows{shapes}
+\end{auxfunction}
+
+\begin{auxfunction}{\shapeTy(k)}{type}{aux:shape-type}
+\input{spec/functions/shape-type-text}
+\funcrows{shape-type}
+\end{auxfunction}
+
+\begin{auxfunction}{\seqSafe(\Sigma, \Gamma, p, \tau)}{Boolean}{aux:seq-safe}
+\input{spec/functions/seq-safe-text}
+\funcrows{seq-safe}
+\end{auxfunction}
+
 \section{Classes and modules}
 \label{sec:auxiliary-classes}
 
-The functions on module names, field lists and class entries introduced in \secref{modules-programs}, and
+The functions on module names, field lists and classes introduced in \secref{modules-programs}, and
 the resolution of qualified names in an environment.
 
 \begin{auxfunction}{\submods(q)}{context}{aux:submods}
 \input{spec/functions/submods-text}
-\begin{align*}
-\input{spec/functions/submods}
-\end{align*}
+\funcrows{submods}
 \end{auxfunction}
 
-\begin{auxfunction}{\ownFields(\phi)}{sequence of variables}{aux:own-fields}
+\begin{auxfunction}{\ownFields(\phi)}{sequence of bindings}{aux:own-fields}
 \input{spec/functions/own-fields-text}
-\begin{align*}
-\input{spec/functions/own-fields}
-\end{align*}
+\funcrows{own-fields}
 \end{auxfunction}
 
-\begin{auxfunction}{\fields(C)}{sequence of variables}{aux:fields}
+\begin{auxfunction}{\fields(\Sigma, C)}{sequence of bindings}{aux:fields}
 \input{spec/functions/fields-text}
-\begin{align*}
-\input{spec/functions/fields}
-\end{align*}
+\funcrows{fields}
 \end{auxfunction}
 
-\begin{auxfunction}{\ancestors(C)}{set of class entries}{aux:ancestors}
+\begin{auxfunction}{\ancestors(\Sigma, C)}{set of classes}{aux:ancestors}
 \input{spec/functions/ancestors-text}
-\begin{align*}
-\input{spec/functions/ancestors}
-\end{align*}
+\funcrows{ancestors}
 \end{auxfunction}
 
-\begin{auxfunction}{\fieldMap(C, \seq{u})}{map from variables}{aux:field-map}
+\begin{auxfunction}{\fieldMap(\Sigma, C, \seq{u})}{map from variables}{aux:field-map}
 \input{spec/functions/field-map-text}
-\begin{align*}
-\input{spec/functions/field-map}
-\end{align*}
+\funcrows{field-map}
 \end{auxfunction}
 
-\begin{auxfunction}{\env(\rho, q)}{environment}{aux:env}
-\input{spec/functions/env-text}
-\begin{align*}
-\input{spec/functions/env}
-\end{align*}
-\end{auxfunction}
-
-\begin{auxfunction}{\resolveClass(\rho, q)}{class entry}{aux:resolve-class}
-\input{spec/functions/resolve-class-text}
-\begin{align*}
-\input{spec/functions/resolve-class}
-\end{align*}
+\begin{auxfunction}{\resolve(\rho, q)}{value}{aux:resolve}
+\input{spec/functions/resolve-text}
+\funcrows{resolve}
 \end{auxfunction}
 
 \begin{auxfunction}{\nameOf(q)}{string}{aux:name}
@@ -115,7 +130,7 @@ the resolution of qualified names in an environment.
 The functions on values used by the evaluation rules.
 \input{spec/functions/operators-text}
 
-\begin{auxfunction}{\hat{\odot}(v, v')}{outcome}{aux:binop}
+\begin{auxfunction}{\hat{\odot}(v, v')}{result}{aux:binop}
 \input{spec/functions/binop-text}
 \begin{center}
 \small
@@ -123,7 +138,7 @@ The functions on values used by the evaluation rules.
 \end{center}
 \end{auxfunction}
 
-\begin{auxfunction}{\hat{\ominus}(v)}{outcome}{aux:unop}
+\begin{auxfunction}{\hat{\ominus}(v)}{result}{aux:unop}
 \input{spec/functions/unop-text}
 \begin{center}
 \small
@@ -133,77 +148,55 @@ The functions on values used by the evaluation rules.
 
 \begin{auxfunction}{\eqOp(v, v')}{Boolean}{aux:eq}
 \input{spec/functions/eq-text}
-\begin{align*}
-\input{spec/functions/eq}
-\end{align*}
+\funcrows{eq}
 \end{auxfunction}
 
 \begin{auxfunction}{\eqElems(\seq{v}, \seq{v}\,')}{Boolean}{aux:eq-elems}
 \input{spec/functions/eq-elems-text}
-\begin{align*}
-\input{spec/functions/eq-elems}
-\end{align*}
+\funcrows{eq-elems}
 \end{auxfunction}
 
 \begin{auxfunction}{\memOp(v, v')}{Boolean}{aux:contains}
 \input{spec/functions/contains-text}
-\begin{align*}
-\input{spec/functions/contains}
-\end{align*}
+\funcrows{contains}
 \end{auxfunction}
 
 \begin{auxfunction}{\memElems(\seq{v}, v)}{Boolean}{aux:contains-elems}
 \input{spec/functions/contains-elems-text}
-\begin{align*}
-\input{spec/functions/contains-elems}
-\end{align*}
+\funcrows{contains-elems}
 \end{auxfunction}
 
 \begin{auxfunction}{\elems(v)}{sequence of values}{aux:elems}
 \input{spec/functions/elems-text}
-\begin{align*}
-\input{spec/functions/elems}
-\end{align*}
+\funcrows{elems}
 \end{auxfunction}
 
 \begin{auxfunction}{\iterOp(v)}{sequence of values}{aux:iter}
 \input{spec/functions/iter-text}
-\begin{align*}
-\input{spec/functions/iter}
-\end{align*}
+\funcrows{iter}
 \end{auxfunction}
 
-\begin{auxfunction}{\getitem(v, v')}{outcome}{aux:getitem}
+\begin{auxfunction}{\getitem(v, v')}{result}{aux:getitem}
 \input{spec/functions/getitem-text}
-\begin{align*}
-\input{spec/functions/getitem}
-\end{align*}
+\funcrows{getitem}
 \end{auxfunction}
 
-\begin{auxfunction}{\outcome(r)}{outcome}{aux:outcome}
-\input{spec/functions/outcome-text}
-\begin{align*}
-\input{spec/functions/outcome}
-\end{align*}
+\begin{auxfunction}{\result(o)}{result}{aux:result}
+\input{spec/functions/result-text}
+\funcrows{result}
 \end{auxfunction}
 
 \begin{auxfunction}{\dispatch(\rho, v, \seq{p}, \seq{s})}{bindings and statement}{aux:dispatch}
 \input{spec/functions/dispatch-text}
-\begin{align*}
-\input{spec/functions/dispatch}
-\end{align*}
+\funcrows{dispatch}
 \end{auxfunction}
 
-\begin{auxfunction}{\entries(\delta, \delta')}{dictionary entries}{aux:entries}
-\input{spec/functions/entries-text}
-\begin{align*}
-\input{spec/functions/entries}
-\end{align*}
-\end{auxfunction}
-
-\begin{auxfunction}{\update(\delta, w, v)}{dictionary entries}{aux:update}
+\begin{auxfunction}{\update(\delta, \delta')}{dictionary entries}{aux:update}
 \input{spec/functions/update-text}
-\begin{align*}
-\input{spec/functions/update}
-\end{align*}
+\funcrows{update}
+\end{auxfunction}
+
+\begin{auxfunction}{\setitem(\delta, w, v)}{dictionary entries}{aux:setitem}
+\input{spec/functions/setitem-text}
+\funcrows{setitem}
 \end{auxfunction}

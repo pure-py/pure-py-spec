@@ -1,0 +1,2 @@
+# rule: unop
+print(-"a")

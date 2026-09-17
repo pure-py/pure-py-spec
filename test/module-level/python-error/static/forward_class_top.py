@@ -1,10 +1,9 @@
-# rule: class (top-down, no forward refs at module top level)
+# rule: class
 from dataclasses import dataclass
-from typing import Any
 
-p = Point(1, 2)  # Point not yet declared
+p = Point(1, 2)
 
 @dataclass
 class Point:
-    x: Any
-    y: Any
+    x: int
+    y: int

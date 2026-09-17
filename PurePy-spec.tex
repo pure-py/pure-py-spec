@@ -33,14 +33,13 @@
 \renewcommand*{\textfraction}{0.05}
 \renewcommand*{\floatpagefraction}{0.8}
 \usepackage{needspace}
+\usepackage{placeins}
 \usepackage{xspace}
 \usepackage{enumitem}
 \usepackage{changebar}
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage[colorlinks,allcolors=blue!50!black]{hyperref}
 
-% The specification carries no change markup.
-\newcommand{\acceptchanges}{}
 \newcommand{\specmode}{}
 % The paper's top-level sections are chapters here.
 \newcommand*{\seckind}{chapter}
@@ -59,15 +58,6 @@
 \newtheorem{lemma}{Lemma}[chapter]
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[chapter]
-
-% An entry of the annex of auxiliary functions: the application form, its result and its label, then
-% prose and rows.
-\newenvironment{auxfunction}[3]{%
-  \par\addvspace{\bigskipamount}\phantomsection\label{#3}%
-  \noindent{\color{gray!60}\rule{\textwidth}{0.4pt}}\par\nobreak\vskip-\parskip\nointerlineskip
-  \noindent\colorbox{grammarheadcolor}{\parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
-    {\bfseries $#1$}\hfill{\itshape #2}}}\par\nobreak\vspace{2mm}\noindent\ignorespaces}
-  {\par\addvspace{\bigskipamount}}
 
 \version{0}{15}{1}
 
@@ -88,18 +78,31 @@
 \addchap{Summary}
 \label{ch:summary}
 
-\addsec{Judgement forms}
+% Figures of the summary are numbered separately, since the summary is not a numbered chapter.
+\renewcommand*{\thefigure}{S\arabic{figure}}
+\setcounter{figure}{0}
 
-The judgement forms of the well-formedness rules and the operational semantics, with the figure defining
-each.
+This chapter collects the notation of the specification: the metavariables
+(\figref{metavariables}), the judgement forms with the figure defining each
+(\figref{judgement-index}), and the auxiliary functions with the section defining each
+(\figref{auxiliary-index}).
 
+\input{spec/fig/metavariables}
+
+\begin{figure}
 \input{spec/fig/judgement-index}
+\caption{Judgement forms}
+\label{fig:judgement-index}
+\end{figure}
 
-\addsec{Auxiliary functions}
-
-The auxiliary functions used by the rules, with the section defining each.
-
+\begin{figure}
 \input{spec/fig/auxiliary-index}
+\caption{Auxiliary functions}
+\label{fig:auxiliary-index}
+\end{figure}
+
+\FloatBarrier
+\renewcommand*{\thefigure}{\thechapter.\arabic{figure}}
 
 % The shared sources use \section for what is a chapter here; shift the heading levels, innermost first,
 % and restore them afterwards.
@@ -124,6 +127,6 @@ The auxiliary functions used by the rules, with the section defining each.
 \input{spec/annex-exclusions}
 
 \bibliographystyle{plainnat}
-\bibliography{tex/refs,tex/additional-refs}
+\bibliography{tex/zotero-export,tex/additional-refs}
 
 \end{document}

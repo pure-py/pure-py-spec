@@ -1,0 +1,8 @@
+Shapes of type $\tau$ that remain once the heads in $H$ are excluded. A union has no head to exclude, so
+the members of the union are taken separately, each with the heads of $H$ typed at that member. A
+dictionary is refined by its keys rather than by a head, so a dictionary type gives the dictionary form
+with no key bound. Every other type gives the rest form $\shapeAny{\tau}{H}$, except that no shape
+remains when $H$ exhausts $\tau$: a literal type whose literal is in $H$, $\tyBool$ when both
+$\pyinline{True}$ and $\pyinline{False}$ are in $H$, $\tyNone$ when $\pyinline{None}$ is in $H$, a class
+below a class in $H$, and $\tyNever$. A sequence of types yields the sequences of shapes of its
+components.

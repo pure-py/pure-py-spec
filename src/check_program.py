@@ -1,141 +1,95 @@
 import ast
 import pathlib
 import sys
+from collections.abc import Iterator, Mapping
 
 import syntax
-from check_module import check_module, proper_prefixes
-from contexts import PREDEFINED_MODULES
+from check_module import check_module
+from contexts import MAIN, PREDEFINED_MODULES
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
+from type_syntax import QualifiedName, proper_prefixes
 
 
-def import_targets(tree: ast.Module, base_dir: pathlib.Path) -> set[str]:
-    froms = [
-        (n.module, n.names)
-        for n in ast.walk(tree)
-        if isinstance(n, ast.ImportFrom) and n.module is not None
-    ]
-    return (
-        {a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
-        | {m for m, _ in froms}
-        | {
-            f"{m}.{a.name}"
-            for m, names in froms
-            for a in names
-            if is_module(f"{m}.{a.name}", base_dir) is not None
-        }
-    )
-
-
-def is_module(name: str, base_dir: pathlib.Path) -> pathlib.Path | None:
-    stem = name.replace(".", "/")
+def module_path(q: QualifiedName, base_dir: pathlib.Path) -> pathlib.Path | None:
+    stem = pathlib.Path(*q.parts)
     for candidate in (base_dir / f"{stem}.py", base_dir / stem / "__init__.py"):
         if candidate.exists():
             return candidate
     return base_dir / stem if (base_dir / stem).is_dir() else None
 
 
-def load(name: str, base_dir: pathlib.Path) -> ast.Module:
-    path = is_module(name, base_dir)
-    if path is None:
-        raise IllFormedProgram(f"module {name!r} not found under {base_dir}")
+def parse(path: pathlib.Path) -> ast.Module:
     if path.is_dir():
         return ast.Module(body=[], type_ignores=[])
     source = path.read_text()
     try:
-        tree = syntax.parse(source, str(path))
+        m = syntax.parse(source, str(path))
     except SyntaxError as e:
         raise IllFormedProgram(f"{path}: parse error: {e}") from e
-    parse_err = syntax.check_module(tree)
-    if parse_err is not None:
-        raise IllFormedProgram(f"{path}: {parse_err.msg}")
-    return tree
+    unsupported = syntax.check_syntax_module(m)
+    if unsupported is not None:
+        unsupported.msg = f"{path}: {unsupported.msg}"
+        raise unsupported
+    return m
 
 
-def check_program(entry_path: pathlib.Path) -> IllFormed | None:
-    try:
-        walk_program(entry_path)
-        return None
-    except IllFormed as e:
-        return e
-
-
-def module_name(base_dir: pathlib.Path, path: pathlib.Path) -> tuple[str, ...]:
+def module_name(base_dir: pathlib.Path, path: pathlib.Path) -> QualifiedName | None:
     rel = path.relative_to(base_dir)
-    return rel.parent.parts if rel.name == "__init__.py" else rel.with_suffix("").parts
+    parts = rel.parent.parts if rel.name == "__init__.py" else rel.with_suffix("").parts
+    return QualifiedName(parts) if len(parts) > 0 else None
 
 
-def source_tree(base_dir: pathlib.Path, entry_path: pathlib.Path) -> set[str]:
-    parts = (
-        module_name(base_dir, p)
-        for p in base_dir.rglob("*.py")
-        if p != entry_path and "__pycache__" not in p.parts
-    )
-    names = {".".join(p) for p in parts if p}
-    return {n for name in names for n in {name, *proper_prefixes(name)}}
+def module_names(base_dir: pathlib.Path) -> set[QualifiedName]:
+    names = {
+        module_name(base_dir, p) for p in base_dir.rglob("*.py") if "__pycache__" not in p.parts
+    }
+    return {p for q in names if q is not None for p in [q, *proper_prefixes(q)]}
 
 
-Discovery = tuple[dict[str, tuple[pathlib.Path, ast.Module]], dict[str, set[str]]]
+class Program(Mapping[QualifiedName, ast.Module]):
+    """The program: every module under the entry's directory by name, with the
+    predefined modules, each body parsed when the module is first loaded, so a
+    module that is never imported is not checked."""
+
+    def __init__(self, entry_path: pathlib.Path) -> None:
+        self.base_dir = entry_path.parent
+        self.paths: dict[QualifiedName, pathlib.Path] = {MAIN: entry_path}
+        self.parsed: dict[QualifiedName, ast.Module] = {
+            q: ast.Module(body=[], type_ignores=[]) for q in PREDEFINED_MODULES
+        }
+        self.names = set(self.parsed) | set(self.paths) | module_names(self.base_dir)
+
+    def path(self, q: QualifiedName) -> pathlib.Path:
+        if q not in self.paths:
+            found = module_path(q, self.base_dir)
+            assert found is not None
+            self.paths[q] = found
+        return self.paths[q]
+
+    def __getitem__(self, q: QualifiedName) -> ast.Module:
+        if q not in self.names:
+            raise KeyError(q)
+        if q not in self.parsed:
+            self.parsed[q] = parse(self.path(q))
+        return self.parsed[q]
+
+    def __iter__(self) -> Iterator[QualifiedName]:
+        return iter(self.names)
+
+    def __len__(self) -> int:
+        return len(self.names)
 
 
-def with_proper_prefixes(imps: set[str]) -> list[str]:
-    return sorted({q for imp in imps for q in {imp, *proper_prefixes(imp)}})
-
-
-def discover(queue: list[str], found: Discovery, base_dir: pathlib.Path) -> Discovery:
-    if len(queue) == 0:
-        return found
-    name, rest = queue[0], queue[1:]
-    modules, imports_by = found
-    if name in modules:
-        return discover(rest, found, base_dir)
-    path = is_module(name, base_dir)
-    if path is None and name in PREDEFINED_MODULES:
-        return discover(
-            rest,
-            (
-                modules
-                | {
-                    name: (
-                        pathlib.Path(f"<{name}>"),
-                        ast.Module(body=[], type_ignores=[]),
-                    )
-                },
-                imports_by | {name: set()},
-            ),
-            base_dir,
-        )
-    tree = load(name, base_dir)
-    assert path is not None
-    imps = import_targets(tree, base_dir)
-    return discover(
-        rest + with_proper_prefixes(imps),
-        (modules | {name: (path, tree)}, imports_by | {name: imps}),
-        base_dir,
-    )
-
-
-def walk_program(entry_path: pathlib.Path) -> None:
-    base_dir = entry_path.parent
-    entry_tree = load(entry_path.stem, base_dir)
-    entry_imports = import_targets(entry_tree, base_dir)
-    queue = [
-        *sorted(PREDEFINED_MODULES),
-        *sorted(source_tree(base_dir, entry_path)),
-        *with_proper_prefixes(entry_imports),
-    ]
-    modules, _ = discover(
-        queue,
-        ({"__main__": (entry_path, entry_tree)}, {"__main__": entry_imports}),
-        base_dir,
-    )
-
-    M = {name: tree for name, (_, tree) in modules.items()}
+def check_program(entry_path: pathlib.Path) -> IllFormed | syntax.Unsupported | None:
+    program = Program(entry_path)
     try:
-        check_module(modules["__main__"][1], M, "__main__")
+        check_module(program[MAIN], program, MAIN, {})
+        return None
     except IllFormedModule as e:
-        path = modules[e.module or "__main__"][0]
-        e.msg = f"{path}: {e.msg}"
-        raise
+        e.msg = f"{program.path(e.module or MAIN)}: {e.msg}"
+        return e
+    except (IllFormed, syntax.Unsupported) as e:
+        return e
 
 
 def main() -> None:
@@ -147,7 +101,6 @@ def main() -> None:
     if result is None:
         print(f"{entry}: ok")
         sys.exit(0)
-    assert result is not None
     print(result.msg)
     sys.exit(result.exit_code)
 

@@ -1,17 +1,15 @@
 # rule: pat-constr
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class Point:
-    x: Any
-    y: Any
+    x: int
+    y: int
 
-# Subject isn't a Point: Python skips the keyword lookup; GraalPy doesn't
-# propagate AttributeError. PurePy rejects the pattern statically regardless.
+# Subject not a Point, so no runtime keyword lookup, on which CPython and GraalPy differ
 p = None
 match p:
-    case Point(x=a, z=b):  # PurePy: error ('z' not a field)
+    case Point(x=a, z=b):
         pass
     case _:
         pass

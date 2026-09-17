@@ -1,0 +1,136 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma; \Gamma; \zeta \vdash s : R$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{pass}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exPass : \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{assign}}]
+{
+  \Gamma \vdash \psi \synth \sigma \\
+  \Sigma; \Gamma \vdash e \checks \sigma \\
+  x \notin \capturesE(e)
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exAssign{x \exAnnot{\psi}}{e} : \Assigns{\set{\bind{x}{\sigma}}}
+}
+\and
+\inferrule*[lab={\ruleName{assign-unannot}}]
+{
+  \Sigma; \Gamma \vdash e \synth \sigma \\
+  x \notin \capturesE(e)
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exAssign{x}{e} : \Assigns{\set{\bind{x}{\sigma}}}
+}
+\and
+\inferrule*[lab={\ruleName{expr-stmt}}]
+{
+  \Sigma; \Gamma \vdash e \synth \sigma
+}
+{
+  \Sigma; \Gamma; \zeta \vdash e : \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{assert}}]
+{
+  \Sigma; \Gamma \vdash e \checks \tyBool
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exAssert{e} : \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{assert-msg}}]
+{
+  \Sigma; \Gamma \vdash e \checks \tyBool \\
+  \Sigma; \Gamma \vdash e' \checks \tyStr
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exAssertMsg{e}{e'} : \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{return-none}}]
+{
+  \Sigma \vdash \tyNone \subty \tau
+}
+{
+  \Sigma; \Gamma; \tau \vdash \exReturnNone : \Returns
+}
+\and
+\inferrule*[lab={\ruleName{return}}]
+{
+  \Sigma; \Gamma \vdash e \checks \tau
+}
+{
+  \Sigma; \Gamma; \tau \vdash \exReturn{e} : \Returns
+}
+\and
+\inferrule*[lab={\ruleName{if}}]
+{
+  \Sigma; \Gamma \vdash e_i \checks \tyBool \quad (\forall i) \\
+  \Sigma; \Gamma; \zeta \vdash s_i : R_i \quad (\forall i)
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \mergeS \ldots \mergeS R_{n+1} \: \mergeS \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{if-else}}]
+{
+  \Sigma; \Gamma \vdash e_i \checks \tyBool \quad (\forall i) \\
+  \Sigma; \Gamma; \zeta \vdash s_i : R_i \quad (\forall i)
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \mergeS \ldots \mergeS R_{n+2}
+}
+\and
+\inferrule*[lab={\ruleName{seq}}]
+{
+  \Sigma; \Gamma; \zeta \vdash s : \Assigns{\Delta} \\
+  \Sigma; \Gamma \override \Delta ; \zeta \vdash s' : R \\
+  \capturesS(s) \cap \assignsS(s') = \varnothing
+}
+{
+  \Sigma; \Gamma; \zeta \vdash s\;s' : \Assigns{\Delta} \override R
+}
+\and
+\inferrule*[lab={\ruleName{def}}]
+{
+  \Delta_i = \set{\bind{\seq{x}_i}{\seq{\sigma}_i}} \quad (\forall i) \\
+  \Delta' = \set{\bind{f_1}{\tyCallable{\seq{\sigma}_1}{\tau_1}}, \ldots, \bind{f_{n+1}}{\tyCallable{\seq{\sigma}_{n+1}}{\tau_{n+1}}}} \\
+  \Sigma; \Gamma \override \Delta' \override \Delta_i \override \False(\assignsS(s_i) \setminus \dom(\Delta_i)); \tau_i \vdash s_i : R_i \quad (\forall i)
+  \\
+  R_i = \Returns \text{ or } \Sigma \vdash \tyNone \subty \tau_i \quad (\forall i) \\
+  \Gamma \vdash \seq{\psi}_i \synth \seq{\sigma}_i \quad (\forall i) \\
+  \Gamma \vdash \psi_i \synth \tau_i \quad (\forall i)
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exDef{f_1}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{s_{n+1}} : \Assigns{\Delta'}
+}
+\and
+\inferrule*[lab={\ruleName{match}}]
+{
+  \Sigma; \Gamma \vdash e \synth \sigma \\
+  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \varnothing
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S
+}
+\and
+\inferrule*[lab={\ruleName{match-partial}}]
+{
+  \Sigma; \Gamma \vdash e \synth \sigma \\
+  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, L \\
+  L \neq \varnothing
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S \mergeS \Assigns{\varnothing}
+}
+\end{mathpar}
+\caption{Given optional return type $\zeta$, statement $s$ has static outcome $R$}
+\label{fig:typing-stmt}
+\end{figure}

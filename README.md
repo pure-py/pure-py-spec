@@ -1,5 +1,7 @@
 # PurePy - A Pure Functional Subset of Python
 
+[![build](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml)
+
 ## [v0.15.1](https://github.com/pure-py/pure-py-spec/releases/download/v0.15.1/PurePy-spec.pdf)
 
 PurePy defines a pure (side-effect free) subset of Python, intended initially for use by researchers in
@@ -14,9 +16,11 @@ expected to behave in a way which conforms to, or at least coheres with, the for
 - `paper.tex` — the paper
 - `PurePy-spec.tex` — the language specification as a standalone document, separate from the paper (#134)
 - `spec/` — the specification's sources; the paper is assembled from these
-- `paper/` — the paper's own material
+- `paper/` — material that belongs only to the paper
 - `tex/` — macros and bibliography shared by both documents
-- `agda/` — Agda mechanisation (distributivity proof)
+- `graduality.tex`, `graduality/` — draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
+- `agda/` — Agda mechanisation (distributivity proof), likely to migrate to Isabelle
+- `isabelle-purepy/` — Isabelle/HOL mechanisation, a submodule of the `isabelle-purepy` repository
 - `src/` — reference checker (Python `ast`-based), organised to mirror the spec's sections
 - `test/` — litmus tests
 
@@ -35,8 +39,8 @@ See the Makefile.
 
 ## Running tests
 
-Install [uv](https://docs.astral.sh/uv/). The project requires Python 3.12
-or later, as specified in `pyproject.toml` and `.python-version`
+Install [uv](https://docs.astral.sh/uv/). The Python version is the one in `.python-version`, which uv,
+the workflows, mypy and the specification all read; `pyproject.toml` gives only the lower bound
 ([#39](https://github.com/pure-py/pure-py-spec/issues/39)).
 
 From the repository root, run:
@@ -54,18 +58,6 @@ Synchronize the project environment and install the development dependencies:
 
 ```bash
 uv sync --locked
-```
-
-Run Ruff’s linter:
-
-```bash
-uv run --locked ruff check ./src ./test/run-all.py
-```
-
-Check formatting:
-
-```bash
-uv run --locked ruff format --check ./src ./test/run-all.py
 ```
 
 Apply Ruff formatting:
@@ -92,6 +84,7 @@ Tests are organised by tier (module-level and program-level) and then by verdict
 - `excluded/` — Python accepts but PurePy excludes by design; `syntactic/` is rejected at parse, `static/` at check, `dynamic/` at run time
 - `python-error/` — neither language gives a result (a genuine error); stages as above, plus `syntactic-only/`, tested via AST construction (not expressible as `.py`)
 - `pending/` — not yet decided by the checker; `semantically-valid/pending/` will become semantically valid, `<verdict>/static/pending/` will be rejected at check
+- `semantically-valid/mypy-incompatible/` — PurePy accepts but mypy rejects; each is a to-do for [#92](https://github.com/pure-py/pure-py-spec/issues/92), not an accepted difference. Every other semantically-valid test must type-check under mypy (`test/mypy.ini`)
 
 The invariant — `excluded` ⇒ Python runs it, `python-error` ⇒ Python raises — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails.
 
@@ -103,6 +96,22 @@ Check a single module, or a whole program from its entry module:
 uv run --locked python src/check_module.py path/to/module.py
 uv run --locked python src/check_program.py path/to/main.py
 ```
+
+## PLDI 2027 submission
+
+`make paper-submission` builds the anonymised paper and `supplementary.zip`, which carries the anonymised
+specification and the Isabelle mechanisation. It refuses to build unless the `isabelle-purepy` submodule is
+checked out, has no uncommitted changes, and sits at a commit that is on `origin/main`, so a
+submission never ships a working copy. Check it out with:
+
+```bash
+git submodule update --init
+```
+
+The mechanisation is type checked before packaging, so `isabelle` must be on `PATH`; the submodule's
+README gives the required version and installation steps. The `Build` GitHub Action runs `make all`,
+which includes this target, on every push to validate the build, but the submission is always built
+locally.
 
 ## Release workflow
 
@@ -117,9 +126,8 @@ avoid spurious diffs:
 - Citation key formula: auth.lower + year
 - Fields to omit from export: abstract, keywords
 
-## Extensions
-
-Implementations are allowed to have additional behaviours and syntax beyond the PurePy spec, as long as they maintain compatibility with the PurePy subset. For example, Python itself supports many additional features, like mutable variables and exceptions; Fluid has a matrix literal notation and allows functions to be defined by pattern-matching clauses.
+Export the library to `tex/zotero-export.bib`. A reference not yet in the library goes in
+`tex/additional-refs.bib` by hand until it is imported.
 
 ## Existing implementations
 

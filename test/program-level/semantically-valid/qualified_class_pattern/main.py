@@ -2,6 +2,5 @@ import shapes
 p = shapes.Point(5, 6)
 match p:
     case shapes.Point(x, y):
-        print(x, y)
-    case _:
-        print("no match")
+        print(x)
+        print(y)

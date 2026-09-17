@@ -1,17 +1,14 @@
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class Base:
-    x: Any
+    x: int
 
 @dataclass
 class Sub(Base):
-    y: Any
+    y: int
 
 s = Sub(1, 2)
 match s:
-    case Base(x):  # matches: Sub derives from Base; binds Base's field
+    case Base(x):
         print(x)
-    case _:
-        print("other")

@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class Empty:
@@ -7,9 +6,10 @@ class Empty:
 
 @dataclass
 class Point:
-    x: Any
-    y: Any
+    x: int
+    y: int
 
 Empty()
 p = Point(1, 2)
-print(p.x, p.y)
+print(p.x)
+print(p.y)

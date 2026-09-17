@@ -1,14 +1,12 @@
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class Point:
-    x: Any
-    y: Any
+    x: int
+    y: int
 
 p = Point(0, 1)
 match p:
     case Point(x, y):
-        print(x, y)
-    case _:
-        print("other")
+        print(x)
+        print(y)

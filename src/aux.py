@@ -1,6 +1,8 @@
 import ast
 from itertools import dropwhile, takewhile
 
+from type_syntax import QualifiedName, TypeExpr, Var, dotted_name, parse_annotation
+
 # A PurePy statement: a Python statement, or a mutual region of consecutive defs. A Python body
 # (a statement list) represents the spec's right-nested sequence s s'.
 type Statement = ast.stmt | list[ast.FunctionDef]
@@ -14,10 +16,6 @@ def split_imports(body: list[ast.stmt]) -> tuple[list[ast.stmt], list[ast.stmt]]
     return list(takewhile(is_import, body)), list(dropwhile(is_import, body))
 
 
-def find_import(stmts: list[ast.stmt]) -> ast.stmt | None:
-    return next((s for s in stmts if isinstance(s, (ast.Import, ast.ImportFrom))), None)
-
-
 def statements(body: list[ast.stmt]) -> list[Statement]:
     if len(body) == 0:
         return []
@@ -28,9 +26,7 @@ def statements(body: list[ast.stmt]) -> list[Statement]:
     return [head] + statements(rest)
 
 
-def extend_region(
-    region: list[ast.FunctionDef], rest: list[ast.stmt]
-) -> list[Statement]:
+def extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[Statement]:
     if len(rest) == 0:
         return [region]
     head = rest[0]
@@ -39,245 +35,270 @@ def extend_region(
     return [region] + statements(rest)
 
 
-def binds_seq(pattern: ast.pattern) -> list[str]:
-    if isinstance(pattern, (ast.MatchValue, ast.MatchSingleton)):
-        return []
-    if isinstance(pattern, ast.MatchAs):
-        sub = binds_seq(pattern.pattern) if pattern.pattern is not None else []
-        return sub + ([pattern.name] if pattern.name else [])
-    if isinstance(pattern, ast.MatchSequence):
-        return [x for p in pattern.patterns for x in binds_seq(p)]
-    if isinstance(pattern, ast.MatchClass):
-        return [
-            x
-            for p in list(pattern.patterns) + list(pattern.kwd_patterns)
-            for x in binds_seq(p)
-        ]
-    if isinstance(pattern, ast.MatchMapping):
-        return [x for p in pattern.patterns for x in binds_seq(p)]
-    raise AssertionError(f"unexpected pattern: {type(pattern).__name__}")
+def binds(pattern: ast.pattern) -> set[Var]:
+    match pattern:
+        case ast.MatchValue():
+            return set()
+        case ast.MatchSingleton():
+            return set()
+        case ast.MatchAs(pattern=p, name=x):
+            sub = binds(p) if p is not None else set()
+            return sub | ({x} if x else set())
+        case ast.MatchSequence(patterns=ps):
+            return set().union(*(binds(p) for p in ps))
+        case ast.MatchMapping(patterns=ps):
+            return set().union(*(binds(p) for p in ps))
+        case ast.MatchClass(patterns=ps, kwd_patterns=ps_):
+            return set().union(*(binds(p) for p in list(ps) + list(ps_)))
+        case _:
+            raise AssertionError(f"unexpected pattern: {type(pattern).__name__}")
 
 
-def binds(pattern: ast.pattern) -> set[str]:
-    return set(binds_seq(pattern))
+def fv_e(e: ast.expr) -> set[Var]:
+    match e:
+        case ast.Name(id=x):
+            return {x}
+        case ast.Constant():
+            return set()
+        case ast.Lambda():
+            params = {a.arg for a in e.args.args}
+            return fv_e(e.body) - params
+        case ast.Call():
+            return fv_e(e.func) | fv_e_list(e.args) | fv_e_list([k.value for k in e.keywords])
+        case ast.BinOp():
+            return fv_e(e.left) | fv_e(e.right)
+        case ast.UnaryOp(operand=e_):
+            return fv_e(e_)
+        case ast.BoolOp(values=es):
+            return fv_e_list(es)
+        case ast.Compare(left=e_, comparators=es):
+            return fv_e(e_) | fv_e_list(es)
+        case ast.IfExp():
+            return fv_e(e.test) | fv_e(e.body) | fv_e(e.orelse)
+        case ast.Attribute(value=e_):
+            return fv_e(e_)
+        case ast.Subscript():
+            return fv_e(e.value) | fv_e(e.slice)
+        case ast.List(elts=es):
+            return fv_e_list(es)
+        case ast.Tuple(elts=es):
+            return fv_e_list(es)
+        case ast.Dict():
+            return fv_e_list(dict_keys(e)) | fv_e_list(e.values)
+        case ast.ListComp():
+            return fv_e_comprehension([e.elt], e.generators)
+        case ast.DictComp():
+            return fv_e_comprehension([e.key, e.value], e.generators)
+        case _:
+            raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
-def fv_e(e: ast.expr) -> set[str]:
-    if isinstance(e, ast.Name):
-        return {e.id}
-    if isinstance(e, ast.Constant):
-        return set()
-    if isinstance(e, ast.Lambda):
-        params = {a.arg for a in e.args.args}
-        return fv_e(e.body) - params
-    if isinstance(e, ast.Call):
-        return fv_e(e.func) | fv_e_list(e.args)
-    if isinstance(e, ast.BinOp):
-        return fv_e(e.left) | fv_e(e.right)
-    if isinstance(e, ast.UnaryOp):
-        return fv_e(e.operand)
-    if isinstance(e, ast.BoolOp):
-        return fv_e_list(e.values)
-    if isinstance(e, ast.Compare):
-        return fv_e(e.left) | fv_e_list(e.comparators)
-    if isinstance(e, ast.IfExp):
-        return fv_e(e.test) | fv_e(e.body) | fv_e(e.orelse)
-    if isinstance(e, ast.Attribute):
-        return fv_e(e.value)
-    if isinstance(e, ast.Subscript):
-        return fv_e(e.value) | fv_e(e.slice)
-    if isinstance(e, (ast.List, ast.Tuple)):
-        return fv_e_list(e.elts)
-    if isinstance(e, ast.Dict):
-        return fv_e_list([k for k in e.keys if k is not None]) | fv_e_list(e.values)
-    if isinstance(e, ast.ListComp):
-        return fv_e_comprehension([e.elt], e.generators)
-    if isinstance(e, ast.DictComp):
-        return fv_e_comprehension([e.key, e.value], e.generators)
-    raise AssertionError(f"unexpected expression: {type(e).__name__}")
-
-
-def fv_e_list(es: list[ast.expr]) -> set[str]:
+def fv_e_list(es: list[ast.expr]) -> set[Var]:
     if len(es) == 0:
         return set()
     return fv_e(es[0]) | fv_e_list(es[1:])
 
 
-def fv_e_comprehension(
-    elts: list[ast.expr], generators: list[ast.comprehension]
-) -> set[str]:
+def fv_e_comprehension(elts: list[ast.expr], generators: list[ast.comprehension]) -> set[Var]:
     if len(generators) == 0:
         return fv_e_list(elts)
     g = generators[0]
-    target_names = names_in_target(g.target)
     rest = fv_e_list(g.ifs) | fv_e_comprehension(elts, generators[1:])
-    return fv_e(g.iter) | rest - target_names
+    return fv_e(g.iter) | (rest - {target_name(g)})
 
 
-def names_in_target(target: ast.expr) -> set[str]:
-    if isinstance(target, ast.Name):
-        return {target.id}
-    if isinstance(target, ast.Tuple):
-        return {n for t in target.elts for n in names_in_target(t)}
-    return set()
+def dict_keys(e: ast.Dict) -> list[ast.expr]:
+    keys = [k for k in e.keys if k is not None]
+    assert len(keys) == len(e.keys), "dict unpacking rejected by syntax check"
+    return keys
 
 
-def captures_e(e: ast.expr) -> set[str]:
-    if isinstance(e, ast.Lambda):
-        params = {a.arg for a in e.args.args}
-        return fv_e(e.body) - params
-    if isinstance(e, ast.Name):
-        return set()
-    if isinstance(e, ast.Constant):
-        return set()
-    if isinstance(e, ast.Call):
-        return captures_e(e.func) | captures_e_list(e.args)
-    if isinstance(e, ast.BinOp):
-        return captures_e(e.left) | captures_e(e.right)
-    if isinstance(e, ast.UnaryOp):
-        return captures_e(e.operand)
-    if isinstance(e, ast.BoolOp):
-        return captures_e_list(e.values)
-    if isinstance(e, ast.Compare):
-        return captures_e(e.left) | captures_e_list(e.comparators)
-    if isinstance(e, ast.IfExp):
-        return captures_e(e.test) | captures_e(e.body) | captures_e(e.orelse)
-    if isinstance(e, ast.Attribute):
-        return captures_e(e.value)
-    if isinstance(e, ast.Subscript):
-        return captures_e(e.value) | captures_e(e.slice)
-    if isinstance(e, (ast.List, ast.Tuple)):
-        return captures_e_list(e.elts)
-    if isinstance(e, ast.Dict):
-        return captures_e_list([k for k in e.keys if k is not None]) | captures_e_list(
-            e.values
-        )
-    if isinstance(e, ast.ListComp):
-        return captures_quals(e.generators) | (
-            captures_e(e.elt) - binds_quals(e.generators)
-        )
-    if isinstance(e, ast.DictComp):
-        return captures_quals(e.generators) | (
-            (captures_e(e.key) | captures_e(e.value)) - binds_quals(e.generators)
-        )
-    raise AssertionError(f"unexpected expression: {type(e).__name__}")
+def target_name(g: ast.comprehension) -> str:
+    assert isinstance(g.target, ast.Name)
+    return g.target.id
 
 
-def captures_e_list(es: list[ast.expr]) -> set[str]:
+def captures_e(e: ast.expr) -> set[Var]:
+    match e:
+        case ast.Lambda():
+            params = {a.arg for a in e.args.args}
+            return fv_e(e.body) - params
+        case ast.Name():
+            return set()
+        case ast.Constant():
+            return set()
+        case ast.Call():
+            return (
+                captures_e(e.func)
+                | captures_e_list(e.args)
+                | captures_e_list([k.value for k in e.keywords])
+            )
+        case ast.BinOp():
+            return captures_e(e.left) | captures_e(e.right)
+        case ast.UnaryOp(operand=e_):
+            return captures_e(e_)
+        case ast.BoolOp(values=es):
+            return captures_e_list(es)
+        case ast.Compare(left=e_, comparators=es):
+            return captures_e(e_) | captures_e_list(es)
+        case ast.IfExp():
+            return captures_e(e.test) | captures_e(e.body) | captures_e(e.orelse)
+        case ast.Attribute(value=e_):
+            return captures_e(e_)
+        case ast.Subscript():
+            return captures_e(e.value) | captures_e(e.slice)
+        case ast.List(elts=es):
+            return captures_e_list(es)
+        case ast.Tuple(elts=es):
+            return captures_e_list(es)
+        case ast.Dict():
+            return captures_e_list(dict_keys(e)) | captures_e_list(e.values)
+        case ast.ListComp():
+            return captures_quals(e.generators) | (captures_e(e.elt) - binds_quals(e.generators))
+        case ast.DictComp():
+            return captures_quals(e.generators) | (
+                (captures_e(e.key) | captures_e(e.value)) - binds_quals(e.generators)
+            )
+        case _:
+            raise AssertionError(f"unexpected expression: {type(e).__name__}")
+
+
+def captures_e_list(es: list[ast.expr]) -> set[Var]:
     if len(es) == 0:
         return set()
     return captures_e(es[0]) | captures_e_list(es[1:])
 
 
-def captures_quals(generators: list[ast.comprehension]) -> set[str]:
+def captures_quals(generators: list[ast.comprehension]) -> set[Var]:
     if len(generators) == 0:
         return set()
     g = generators[0]
     rest = captures_e_list(g.ifs) | captures_quals(generators[1:])
-    return captures_e(g.iter) | rest - names_in_target(g.target)
+    return captures_e(g.iter) | (rest - {target_name(g)})
 
 
-def binds_quals(generators: list[ast.comprehension]) -> set[str]:
-    return {n for g in generators for n in names_in_target(g.target)}
+def binds_quals(generators: list[ast.comprehension]) -> set[Var]:
+    return {target_name(g) for g in generators}
 
 
-def fv_stmt(s: ast.stmt) -> set[str]:
-    if isinstance(s, ast.Pass):
-        return set()
-    if isinstance(s, ast.Assign):
-        return fv_e(s.value)
-    if isinstance(s, ast.Expr):
-        return fv_e(s.value)
-    if isinstance(s, ast.Return):
-        return fv_e(s.value) if s.value is not None else set()
-    if isinstance(s, ast.Assert):
-        result = fv_e(s.test)
-        if s.msg is not None:
-            result = result | fv_e(s.msg)
-        return result
-    if isinstance(s, ast.If):
-        return fv_e(s.test) | fv_body(s.body) | fv_body(s.orelse)
-    if isinstance(s, ast.Match):
-        return fv_e(s.subject) | set().union(
-            *(fv_body(case.body) - binds(case.pattern) for case in s.cases)
-        )
-    if isinstance(s, ast.FunctionDef):
-        params = {a.arg for a in s.args.args}
-        return fv_body(s.body) - params - {s.name}
-    if isinstance(s, ast.ClassDef):
-        return set()
-    raise AssertionError(f"unexpected statement: {type(s).__name__}")
+def fv_stmt(s: ast.stmt) -> set[Var]:
+    match s:
+        case ast.Pass():
+            return set()
+        case ast.Assign(value=e):
+            return fv_e(e)
+        case ast.AnnAssign(value=e):
+            return fv_e(e) if e is not None else set()
+        case ast.Expr(value=e):
+            return fv_e(e)
+        case ast.Return(value=e):
+            return fv_e(e) if e is not None else set()
+        case ast.Assert():
+            result = fv_e(s.test)
+            if s.msg is not None:
+                result = result | fv_e(s.msg)
+            return result
+        case ast.If(test=e, body=ss, orelse=ss_):
+            return fv_e(e) | fv_body(ss) | fv_body(ss_)
+        case ast.Match():
+            return fv_e(s.subject) | set().union(
+                *(fv_body(case.body) - binds(case.pattern) for case in s.cases)
+            )
+        case ast.FunctionDef():
+            # Parameters and variables assigned in the body are local to the function.
+            params = {a.arg for a in s.args.args}
+            return fv_body(s.body) - params - assigns_body(s.body) - {s.name}
+        case ast.ClassDef():
+            return set()
+        case _:
+            raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
-def fv_body(body: list[ast.stmt]) -> set[str]:
+def fv_body(body: list[ast.stmt]) -> set[Var]:
     if len(body) == 0:
         return set()
     return fv_stmt(body[0]) | fv_body(body[1:])
 
 
-def assigns_stmt(s: ast.stmt) -> set[str]:
-    if isinstance(s, (ast.Pass, ast.Expr, ast.Return, ast.Assert)):
-        return set()
-    if isinstance(s, ast.Assign):
-        return {t.id for t in s.targets if isinstance(t, ast.Name)}
-    if isinstance(s, ast.If):
-        return assigns_body(s.body) | assigns_body(s.orelse)
-    if isinstance(s, ast.Match):
-        return set().union(
-            *(binds(case.pattern) | assigns_body(case.body) for case in s.cases)
-        )
-    if isinstance(s, ast.FunctionDef):
-        return {s.name}
-    if isinstance(s, ast.ClassDef):
-        return {s.name}
-    raise AssertionError(f"unexpected statement: {type(s).__name__}")
+def assigns_stmt(s: ast.stmt) -> set[Var]:
+    match s:
+        case ast.Pass():
+            return set()
+        case ast.Expr():
+            return set()
+        case ast.Return():
+            return set()
+        case ast.Assert():
+            return set()
+        case ast.Assign():
+            (target,) = s.targets
+            assert isinstance(target, ast.Name)
+            return {target.id}
+        case ast.AnnAssign():
+            assert isinstance(s.target, ast.Name)
+            return {s.target.id}
+        case ast.If(body=ss, orelse=ss_):
+            return assigns_body(ss) | assigns_body(ss_)
+        case ast.Match():
+            return set().union(*(binds(case.pattern) | assigns_body(case.body) for case in s.cases))
+        case ast.FunctionDef(name=x):
+            return {x}
+        case ast.ClassDef(name=x):
+            return {x}
+        case _:
+            raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
-def assigns_body(body: list[ast.stmt]) -> set[str]:
+def assigns_body(body: list[ast.stmt]) -> set[Var]:
     if len(body) == 0:
         return set()
     return assigns_stmt(body[0]) | assigns_body(body[1:])
 
 
-def captures(s: ast.stmt) -> set[str]:
-    if isinstance(s, ast.Pass):
-        return set()
-    if isinstance(s, ast.Assign):
-        return captures_e(s.value)
-    if isinstance(s, ast.Expr):
-        return captures_e(s.value)
-    if isinstance(s, ast.Return):
-        return captures_e(s.value) if s.value is not None else set()
-    if isinstance(s, ast.Assert):
-        result = captures_e(s.test)
-        if s.msg is not None:
-            result = result | captures_e(s.msg)
-        return result
-    if isinstance(s, ast.If):
-        return captures_e(s.test) | captures_body(s.body) | captures_body(s.orelse)
-    if isinstance(s, ast.Match):
-        return captures_e(s.subject) | set().union(
-            *(captures_body(case.body) - binds(case.pattern) for case in s.cases)
-        )
-    if isinstance(s, ast.FunctionDef):
-        return captures_region([s])
-    if isinstance(s, ast.ClassDef):
-        return set()
-    raise AssertionError(f"unexpected statement: {type(s).__name__}")
+def captures(s: ast.stmt) -> set[Var]:
+    match s:
+        case ast.Pass():
+            return set()
+        case ast.Assign(value=e):
+            return captures_e(e)
+        case ast.AnnAssign(value=e):
+            return captures_e(e) if e is not None else set()
+        case ast.Expr(value=e):
+            return captures_e(e)
+        case ast.Return(value=e):
+            return captures_e(e) if e is not None else set()
+        case ast.Assert():
+            result = captures_e(s.test)
+            if s.msg is not None:
+                result = result | captures_e(s.msg)
+            return result
+        case ast.If(test=e, body=ss, orelse=ss_):
+            return captures_e(e) | captures_body(ss) | captures_body(ss_)
+        case ast.Match():
+            # A pattern variable is in the function's scope, so a capture of it counts.
+            return captures_e(s.subject) | set().union(
+                *(captures_body(case.body) for case in s.cases)
+            )
+        case ast.FunctionDef():
+            return captures_region([s])
+        case ast.ClassDef():
+            return set()
+        case _:
+            raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
-def captures_body(body: list[ast.stmt]) -> set[str]:
+def captures_body(body: list[ast.stmt]) -> set[Var]:
     if len(body) == 0:
         return set()
     return captures(body[0]) | captures_body(body[1:])
 
 
-def captures_region(defs: list[ast.FunctionDef]) -> set[str]:
+def captures_region(defs: list[ast.FunctionDef]) -> set[Var]:
     f_names = {d.name for d in defs}
     return captures_region_bodies(defs) - f_names
 
 
-def captures_region_bodies(defs: list[ast.FunctionDef]) -> set[str]:
+def captures_region_bodies(defs: list[ast.FunctionDef]) -> set[Var]:
     if len(defs) == 0:
         return set()
     d = defs[0]
@@ -286,64 +307,48 @@ def captures_region_bodies(defs: list[ast.FunctionDef]) -> set[str]:
     return own | captures_region_bodies(defs[1:])
 
 
-def captures_statement(item: Statement) -> set[str]:
-    if isinstance(item, list):
-        return captures_region(item)
-    return captures(item)
+def captures_statement(s: Statement) -> set[Var]:
+    if isinstance(s, list):
+        return captures_region(s)
+    return captures(s)
 
 
-def assigns_statement(item: Statement) -> set[str]:
-    if isinstance(item, list):
-        return {d.name for d in item}
-    return assigns_stmt(item)
+def assigns_statement(s: Statement) -> set[Var]:
+    if isinstance(s, list):
+        return {d.name for d in s}
+    return assigns_stmt(s)
 
 
-def assigns_seq(items: list[Statement]) -> set[str]:
-    if len(items) == 0:
+def assigns_seq(ss: list[Statement]) -> set[Var]:
+    if len(ss) == 0:
         return set()
-    return assigns_statement(items[0]) | assigns_seq(items[1:])
+    return assigns_statement(ss[0]) | assigns_seq(ss[1:])
 
 
-def find_first_reassigning(items: list[Statement], names: set[str]) -> ast.AST | None:
-    if len(items) == 0:
-        return None
-    if assigns_statement(items[0]) & names:
-        return items[0][0] if isinstance(items[0], list) else items[0]
-    return find_first_reassigning(items[1:], names)
+def first_assigning_statement(ss: list[Statement], names: set[Var]) -> ast.AST:
+    """First statement of `ss` assigning a name in `names`."""
+    assert len(ss) > 0
+    if not assigns_statement(ss[0]).isdisjoint(names):
+        return ss[0][0] if isinstance(ss[0], list) else ss[0]
+    return first_assigning_statement(ss[1:], names)
 
 
-def find_nested_import(stmts: list[ast.stmt], nested: bool = False) -> ast.AST | None:
-    for s in stmts:
-        if nested and isinstance(s, (ast.Import, ast.ImportFrom)):
-            return s
-        if isinstance(s, ast.FunctionDef):
-            r = find_nested_import(s.body, nested=True)
-            if r is not None:
-                return r
-        if isinstance(s, ast.If):
-            r = find_nested_import(s.body, nested=True) or find_nested_import(
-                s.orelse, nested=True
-            )
-            if r is not None:
-                return r
-        if isinstance(s, ast.Match):
-            results = (find_nested_import(case.body, nested=True) for case in s.cases)
-            r = next((x for x in results if x is not None), None)
-            if r is not None:
-                return r
-    return None
-
-
-def own_fields(node: ast.ClassDef) -> list[str]:
-    return [
-        t.target.id
+def own_fields(node: ast.ClassDef) -> tuple[tuple[Var, TypeExpr], ...]:
+    return tuple(
+        (t.target.id, type_expr(t.annotation))
         for t in node.body
         if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)
-    ]
+    )
 
 
-def qualified_name(e: ast.expr) -> str:
-    if isinstance(e, ast.Name):
-        return e.id
-    assert isinstance(e, ast.Attribute)
-    return qualified_name(e.value) + "." + e.attr
+def type_expr(annotation: ast.expr | None) -> TypeExpr:
+    assert annotation is not None, "missing annotation rejected by syntax check"
+    t = parse_annotation(annotation)
+    assert t is not None, "unsupported annotation rejected by syntax check"
+    return t
+
+
+def qualified_name(e: ast.expr) -> QualifiedName:
+    q = dotted_name(e)
+    assert q is not None
+    return q

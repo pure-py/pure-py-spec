@@ -1,6 +1,7 @@
-# rule: match-partial (var leak — x not definitely assigned after partial match)
-v = (1, 2)
+# rule: match-partial
+v: tuple[int, int] = (1, 2)
 match v:
-    case (x, y):
-        print(x, y)
-print(x)  # PurePy: error (x not definitely assigned); Python: 1
+    case (x, 2):
+        print(x)
+        print(2)
+print(x)

@@ -1,0 +1,278 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash e \synth \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{var}}]
+{
+  \bind{x}{\tau} \in \Gamma
+}
+{
+  \Sigma; \Gamma \vdash x \synth \tau
+}
+\and
+\inferrule*[lab={\ruleName{literal}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma \vdash \ell \synth \tyLiteral{\ell}
+}
+\and
+\inferrule*[lab={\ruleName{attr-module}}]
+{
+  \Gamma \vdash \exAttr{e}{x} : \tau
+}
+{
+  \Sigma; \Gamma \vdash \exAttr{e}{x} \synth \tau
+}
+\and
+\inferrule*[lab={\ruleName{attr-object}}]
+{
+  \Sigma; \Gamma \vdash e \synth C \\
+  \bind{x}{\tau} \in \fields(\Sigma, C)
+}
+{
+  \Sigma; \Gamma \vdash \exAttr{e}{x} \synth \tau
+}
+\and
+\inferrule*[lab={\ruleName{call}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyCallable{\tau_1, \ldots, \tau_n}{\tau} \\
+  \Sigma; \Gamma \vdash e_i \checks \tau_i \quad (\forall i)
+}
+{
+  \Sigma; \Gamma \vdash \exCall{e}{e_1, \ldots, e_n} \synth \tau
+}
+\and
+\inferrule*[lab={\ruleName{syn-call-lambda}}]
+{
+  \Sigma; \Gamma \vdash e_i \synth \tau_i \quad (\forall i) \\
+  \Sigma; \Gamma \override \set{\bind{x_1}{\tau_1}, \ldots, \bind{x_n}{\tau_n}} \vdash e \synth \tau
+}
+{
+  \Sigma; \Gamma \vdash \exCall{(\exLambda{x_1, \ldots, x_n}{e})}{e_1, \ldots, e_n} \synth \tau
+}
+\and
+\inferrule*[lab={\ruleName{constr}}]
+{
+  \Gamma \vdash q : \Type{C} \\
+  \Sigma; \Gamma \vdash \fieldMap(\Sigma, C, a)(x) \checks \tau \quad (\forall \bind{x}{\tau} \in \fields(\Sigma, C))
+}
+{
+  \Sigma; \Gamma \vdash \exConstr{q}{a} \synth C
+}
+\and
+\inferrule*[lab={\ruleName{binop}}]
+{
+  \Sigma; \Gamma \vdash e \synth \sigma \\
+  \Sigma; \Gamma \vdash e' \synth \sigma' \\
+  \min(\overloadsOf(\Sigma, \odot, \sigma, \sigma')) = ((\tau, \tau'), \tau^\dagger)
+}
+{
+  \Sigma; \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \tau^\dagger
+}
+\and
+\inferrule*[lab={\ruleName{unop}}]
+{
+  \Sigma; \Gamma \vdash e \synth \sigma \\
+  \exUnOp{\ominus}{e} \neq \exUnOp{\pyinline{-}}{n} \quad (\forall n) \\
+  \min(\overloadsOf(\Sigma, \ominus, \sigma)) = (\tau, \tau^\dagger)
+}
+{
+  \Sigma; \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau^\dagger
+}
+\and
+\inferrule*[lab={\ruleName{unop-literal}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma \vdash \exUnOp{\pyinline{-}}{n} \synth \tyLiteral{-n}
+}
+\and
+\inferrule*[lab={\ruleName{syn-cond}}]
+{
+  \Sigma; \Gamma \vdash e \checks \tyBool \\
+  I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \sigma_i} \neq \varnothing \\
+  \Sigma; \Gamma \vdash e_j \checks \bigJoinTy{\Sigma}{(\sigma_i \mid i \in I)} \quad (\forall j \notin I)
+}
+{
+  \Sigma; \Gamma \vdash \exCondExpr{e_1}{e}{e_2} \synth \bigJoinTy{\Sigma}{(\sigma_i \mid i \in I)}
+}
+\and
+\inferrule*[lab={\ruleName{and}}]
+{
+  \Sigma; \Gamma \vdash e \checks \tyBool \\
+  \Sigma; \Gamma \vdash e' \checks \tyBool
+}
+{
+  \Sigma; \Gamma \vdash \exAnd{e}{e'} \synth \tyBool
+}
+\and
+\inferrule*[lab={\ruleName{or}}]
+{
+  \Sigma; \Gamma \vdash e \checks \tyBool \\
+  \Sigma; \Gamma \vdash e' \checks \tyBool
+}
+{
+  \Sigma; \Gamma \vdash \exOr{e}{e'} \synth \tyBool
+}
+\end{mathpar}
+\caption{Expression synthesis: names, literals, attributes, calls and operators}
+\label{fig:typing-synth}
+\end{figure}
+
+\begin{figure}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash e \synth \tau$ (continued)}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{subscript-list}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyList{\tau} \\
+  \Sigma; \Gamma \vdash e' \checks \tyInt
+}
+{
+  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau
+}
+\and
+\inferrule*[lab={\ruleName{subscript-str}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyStr \\
+  \Sigma; \Gamma \vdash e' \checks \tyInt
+}
+{
+  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tyStr
+}
+\and
+\inferrule*[lab={\ruleName{subscript-dict}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyDict{\tau} \\
+  \Sigma; \Gamma \vdash e' \checks \tyStr
+}
+{
+  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau
+}
+\and
+\inferrule*[lab={\ruleName{subscript-tuple}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyTuple{\seq{\tau}} \\
+  \Sigma; \Gamma \vdash e' \synth \tyLiteral{n} \\
+  0 \leq n < |\seq{\tau}|
+}
+{
+  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{n+1}
+}
+\and
+\inferrule*[lab={\ruleName{subscript-tuple-neg}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyTuple{\seq{\tau}} \\
+  \Sigma; \Gamma \vdash e' \synth \tyLiteral{-n} \\
+  m = |\seq{\tau}| \\
+  0 < n \leq m
+}
+{
+  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{(m-n)+1}
+}
+\and
+\inferrule*[lab={\ruleName{subscript-tuple-int}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyTuple{\seq{\tau}} \\
+  \Sigma; \Gamma \vdash e' \synth \tyInt
+}
+{
+  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \bigJoinTy{\Sigma}{\seq{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{subscript-union}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
+  \Sigma; \Gamma \override \set{\bind{y}{\sigma}} \vdash \exSubscript{y}{e'} \synth \tau \\
+  \Sigma; \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exSubscript{y}{e'} \synth \tau' \\
+  y \notin \fvE(e')
+}
+{
+  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \joinTy{\Sigma}{\tau}{\tau'}
+}
+\and
+\inferrule*[lab={\ruleName{attr-union}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
+  \Sigma; \Gamma \override \set{\bind{y}{\sigma}} \vdash \exAttr{y}{x} \synth \tau \\
+  \Sigma; \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exAttr{y}{x} \synth \tau'
+}
+{
+  \Sigma; \Gamma \vdash \exAttr{e}{x} \synth \joinTy{\Sigma}{\tau}{\tau'}
+}
+\and
+\inferrule*[lab={\ruleName{call-union}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
+  \Sigma; \Gamma \override \set{\bind{y}{\sigma}} \vdash \exCall{y}{\seq{e}} \synth \tau \\
+  \Sigma; \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exCall{y}{\seq{e}} \synth \tau' \\
+  y \notin \fvE(e_i) \quad (\forall i)
+}
+{
+  \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \joinTy{\Sigma}{\tau}{\tau'}
+}
+\end{mathpar}
+\caption{Expression synthesis: subscripts, and elimination at a union}
+\label{fig:typing-synth-elim}
+\end{figure}
+
+\begin{figure}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash e \synth \tau$ (continued)}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{syn-list}}]
+{
+  I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \sigma_i} \neq \varnothing \\
+  \tau = \bigJoinTy{\Sigma}{(\baseType(\sigma_i) \mid i \in I)} \\
+  \Sigma; \Gamma \vdash e_j \checks \tau \quad (\forall j \notin I)
+}
+{
+  \Sigma; \Gamma \vdash \exList{e_1, \ldots, e_{n+1}} \synth \tyList{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{syn-tuple}}]
+{
+  \Sigma; \Gamma \vdash e_i \synth \tau_i \quad (\forall i)
+}
+{
+  \Sigma; \Gamma \vdash \exTuple{\seq{e}} \synth \tyTuple{\seq{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{syn-dict}}]
+{
+  \Sigma; \Gamma \vdash e_i \checks \tyStr \quad (\forall i) \\
+  I = \set{i \mid \Sigma; \Gamma \vdash e_i' \synth \sigma_i} \neq \varnothing \\
+  \tau = \bigJoinTy{\Sigma}{(\baseType(\sigma_i) \mid i \in I)} \\
+  \Sigma; \Gamma \vdash e_j' \checks \tau \quad (\forall j \notin I)
+}
+{
+  \Sigma; \Gamma \vdash \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_{n+1}}{e_{n+1}'}} \synth \tyDict{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{syn-list-comp}}]
+{
+  \Sigma; \Gamma \vdash \seq{g} : \Delta \\
+  \Sigma; \Gamma \override \Delta \vdash e \synth \tau \\
+  \capturesE(e) \cap \dom(\Delta) = \varnothing
+}
+{
+  \Sigma; \Gamma \vdash \exListComp{e}{\seq{g}} \synth \tyList{\baseType(\tau)}
+}
+\and
+\inferrule*[lab={\ruleName{syn-dict-comp}}]
+{
+  \Sigma; \Gamma \vdash \seq{g} : \Delta \\
+  \Sigma; \Gamma \override \Delta \vdash e \checks \tyStr \\
+  \Sigma; \Gamma \override \Delta \vdash e' \synth \tau \\
+  \capturesE((e, e')) \cap \dom(\Delta) = \varnothing
+}
+{
+  \Sigma; \Gamma \vdash \exDictComp{e}{e'}{\seq{g}} \synth \tyDict{\baseType(\tau)}
+}
+\end{mathpar}
+\caption{Expression synthesis: tuples, lists, dictionaries and comprehensions}
+\label{fig:typing-synth-ctd}
+\end{figure}

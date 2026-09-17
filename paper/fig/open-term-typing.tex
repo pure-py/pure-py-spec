@@ -18,7 +18,7 @@ $\Delta$ & $::=$ & $\Delta : (\Sigma, \Gamma)$ & (frame stack) \\
 \flushleft \shadebox{$\Delta \vdash e \carrow{n} \tau, \Delta'$}
 \begin{mathpar}
 \footnotesize
-\inferrule*[lab={\ruleName{const}}]
+\inferrule*[lab={\ruleName{open-const}}]
 {
     \strut
 }
@@ -26,7 +26,7 @@ $\Delta$ & $::=$ & $\Delta : (\Sigma, \Gamma)$ & (frame stack) \\
     \Delta \vdash c \carrow{n} \varnothing, \Delta
 }
 \and%
-\inferrule*[lab={\ruleName{lambda}}]
+\inferrule*[lab={\ruleName{open-lambda}}]
 {
     \Delta : (\varnothing, [\overline{x} \mapsto \varnothing]) \vdash e \carrow{n+1} \tau, \underline{\;\;}
 }
@@ -34,7 +34,7 @@ $\Delta$ & $::=$ & $\Delta : (\Sigma, \Gamma)$ & (frame stack) \\
     \Delta \vdash \exLambda{\overline{x}}{e} \carrow{n} \tau, \Delta
 }
 \and%
-\inferrule*[lab={\ruleName{var1}}]
+\inferrule*[lab={\ruleName{open-var1}}]
 {
     x \in \mathrm{dom}(\Gamma)
 }
@@ -42,7 +42,7 @@ $\Delta$ & $::=$ & $\Delta : (\Sigma, \Gamma)$ & (frame stack) \\
     \Delta : (\Sigma, \Gamma) \vdash x \carrow{n} \Gamma (x), \Delta : (\Sigma, \Gamma)
 }
 \and%
-\inferrule*[lab={\ruleName{var2}}]
+\inferrule*[lab={\ruleName{open-var2}}]
 {
     x \notin \mathrm{dom}(\Gamma) \qquad \mathrm{bound}(\Delta, x) = \hat{\Gamma}
 }
@@ -50,7 +50,7 @@ $\Delta$ & $::=$ & $\Delta : (\Sigma, \Gamma)$ & (frame stack) \\
     \Delta : (\Sigma, \Gamma) \vdash x \carrow{n} \hat{\Gamma}(x), \mathrm{mark}(\Delta, x) : (\Sigma, \Gamma)
 }
 \and%
-\inferrule*[lab={\ruleName{var3}}]
+\inferrule*[lab={\ruleName{open-var3}}]
 {
     n > 0 \qquad x \notin \mathrm{dom}(\Gamma) \qquad \nexists\, \hat{\Gamma} \,.\, \mathrm{bound}(\Delta, x) = \hat{\Gamma}
 }
@@ -82,7 +82,7 @@ $\Delta$ & $::=$ & $\Delta : (\Sigma, \Gamma)$ & (frame stack) \\
 \flushleft \shadebox{$\Delta \vdash s \carrow{n} \tau, \Delta'$}
 \begin{mathpar}
 \footnotesize
-\inferrule*[lab={\ruleName{pass}}]
+\inferrule*[lab={\ruleName{open-pass}}]
 {
     \strut
 }
@@ -90,7 +90,7 @@ $\Delta$ & $::=$ & $\Delta : (\Sigma, \Gamma)$ & (frame stack) \\
     \Delta \vdash \exPass \carrow{n} \varnothing, \Delta
 }
 \and%
-\inferrule*[lab={\ruleName{assign}}]
+\inferrule*[lab={\ruleName{open-assign}}]
 {
     (\nexists\, y \,.\, x \in \Gamma(y)) \lor \lnot\, \mathrm{captured}(\Delta, x) \qquad \Delta : (\Sigma, \Gamma) \vdash e \carrow{n} \tau, \Delta' : (\Sigma', \Gamma')
 }
@@ -98,7 +98,7 @@ $\Delta$ & $::=$ & $\Delta : (\Sigma, \Gamma)$ & (frame stack) \\
     \Delta \vdash \exAssign{x}{e} \carrow{n} \tau \setminus \{ x \}, \Delta' : (\Sigma', \mathrm{close}(\Gamma'[x \mapsto \tau], x))
 }
 \and%
-\inferrule*[lab={\ruleName{if1}}]
+\inferrule*[lab={\ruleName{open-if1}}]
 {
     n > 0 \qquad \Delta \vdash e_1 \carrow{n} \gamma_1, \Delta_{[1]} \qquad \Delta_{[1]} \vdash s_1 \carrow{n} \gamma_2, 
     \Delta_{[2]} \qquad \cdots \qquad \Delta_{[n-1]} \vdash e_n \carrow{n} \gamma_n,  \Delta_{[n]}
@@ -107,7 +107,7 @@ $\Delta$ & $::=$ & $\Delta : (\Sigma, \Gamma)$ & (frame stack) \\
     \Delta \vdash \exIfElse{e_1}{s_1}{[\exElif{e_i}{s_i}]}{e_n} \carrow{n} \bigcup \gamma_i, \Delta_{[n]}
 }
 \and%
-\inferrule*[lab={\ruleName{if2}}]
+\inferrule*[lab={\ruleName{open-if2}}]
 {
      \forall i: \Delta \vdash e_i / s_i \carrow{0} \varnothing, \Delta
 }
@@ -115,7 +115,7 @@ $\Delta$ & $::=$ & $\Delta : (\Sigma, \Gamma)$ & (frame stack) \\
     \Delta \vdash \exIfElse{e_1}{s_1}{[\exElif{e_i}{s_i}]}{e_n} \carrow{0} \varnothing, \Delta
 }
 \and%
-\inferrule*[lab={\ruleName{def}}]
+\inferrule*[lab={\ruleName{open-def}}]
 {
     \Delta : (\varnothing, [f \mapsto \varnothing, \overline{x} \mapsto \varnothing]) \vdash s \carrow{n+1} \tau, 
     \Delta' : (\Sigma', \Gamma') : \underline{\;\;}
@@ -124,7 +124,7 @@ $\Delta$ & $::=$ & $\Delta : (\Sigma, \Gamma)$ & (frame stack) \\
     \Delta \vdash \exDef{f}{\bar{x}}{s} \carrow{n} \tau, \Delta' : (\Sigma', \mathrm{close}(\Gamma'[f \mapsto \tau], f))
 }
 \and%
-\inferrule*[lab={\ruleName{return}}]
+\inferrule*[lab={\ruleName{open-return}}]
 {
     n > 0 \qquad \Delta \vdash e \carrow{n} \tau, \Delta'
 }
@@ -140,7 +140,7 @@ $\Delta$ & $::=$ & $\Delta : (\Sigma, \Gamma)$ & (frame stack) \\
     \Delta \vdash \exReturnNone \carrow{n} \varnothing, \Delta
 }
 \and%
-\inferrule*[lab={\ruleName{seq}}]
+\inferrule*[lab={\ruleName{open-seq}}]
 {
     \Delta \vdash s_1 \carrow{n} \tau_1, \Delta' \qquad \Delta' \vdash s_2 \carrow{n} \tau_2, \Delta''
 }

@@ -1,13 +1,12 @@
-# rule: class
+# rule: class-extend
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass
 class Base:
-    x: Any
+    x: int
 
 @dataclass
 class Sub(Base):
-    x: Any  # PurePy: error (field clashes with inherited); Python: ok (override)
+    x: int
 
 print("ok")

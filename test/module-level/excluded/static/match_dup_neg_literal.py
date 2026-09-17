@@ -1,4 +1,4 @@
-# rule: sub-neg-lit -- a repeated negative-literal pattern is unreachable
+# rule: split-literal
 v = -1
 match v:
     case -1:

@@ -1,1 +1,1 @@
-field 'x' clashes with inherited field from 'Base'
+duplicate field 'x' in class 'Sub'
