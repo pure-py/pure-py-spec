@@ -121,10 +121,10 @@ def match_dict(k: Shape, p: ast.MatchMapping, mod_ctx: ModuleContext) -> Match |
     repeated = [w for i, w in enumerate(keys) if w in keys[:i]]
     if len(repeated) > 0:
         raise IllFormedModule(p, reasons.DuplicateDictKey(repeated[0]))
-    bound = dict(k.bound)
-    if any(w not in bound for w in keys):
+    beta = dict(k.beta)
+    if any(w not in beta for w in keys):
         return None
-    ks = tuple(bound[w] for w in keys)
+    ks = tuple(beta[w] for w in keys)
     result = match_seq(ks, tuple(q for _, q in ws), p, mod_ctx)
     return map_seq_match(lambda ks_: with_keys(k, keys, ks_), result)
 
@@ -192,13 +192,13 @@ def split_dict(
 ) -> Split | None:
     if not isinstance(k, Dict):
         return None
-    bound = dict(k.bound)
-    w = next((w for w, _ in ws if w not in bound), None)
+    beta = dict(k.beta)
+    w = next((w for w, _ in ws if w not in beta), None)
     if w is None or w in k.heads:
         return None
     return (
         tuple(with_keys(k, (w,), (m,)) for m in shapes(Sigma, k.value, frozenset())),
-        (Dict(k.value, k.bound, k.heads | {w}),),
+        (Dict(k.value, k.beta, k.heads | {w}),),
     )
 
 
@@ -362,8 +362,8 @@ def no_field_map(Sigma: ClassTable, c: Class, p: ast.MatchClass) -> IllFormedMod
 
 
 def with_keys(k: Dict, ws: tuple[str, ...], ks: Seq) -> Dict:
-    bound = dict(k.bound) | dict(zip(ws, ks))
-    return Dict(k.value, tuple(sorted(bound.items())), k.heads)
+    beta = dict(k.beta) | dict(zip(ws, ks))
+    return Dict(k.value, tuple(sorted(beta.items())), k.heads)
 
 
 def key_patterns(p: ast.MatchMapping) -> tuple[tuple[str, ast.pattern], ...]:

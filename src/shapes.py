@@ -48,11 +48,13 @@ class List:
 @dataclass(frozen=True)
 class Dict:
     value: Type
-    bound: tuple[tuple[str, Shape], ...]
+    beta: KeyShapes
     heads: frozenset[str]
 
 
 type Shape = Rest | Constr | Tuple | List | Dict
+# The spec's beta, a finite map from keys to shapes, as sorted pairs so a shape is hashable.
+type KeyShapes = tuple[tuple[str, Shape], ...]
 type Seq = tuple[Shape, ...]
 type Shapes = tuple[Shape, ...]
 
