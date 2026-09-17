@@ -359,7 +359,15 @@ class UnknownField:
 @dataclass(frozen=True)
 class NotSynthesised:
     def message(self) -> str:
-        return "cannot determine the type of this expression"
+        return "cannot infer the type of this expression; add an annotation to the assignment"
+
+
+@dataclass(frozen=True)
+class NoAttributes:
+    tau: str
+
+    def message(self) -> str:
+        return f"values of type {self.tau} have no attributes"
 
 
 @dataclass(frozen=True)
@@ -414,6 +422,7 @@ type Reason = (
     | SequenceKindClash
     | CaseMatchesNothing
     | NotSynthesised
+    | NoAttributes
     | UnknownField
 )
 

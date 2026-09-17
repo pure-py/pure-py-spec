@@ -483,7 +483,7 @@ def attribute_type(obj: Type, e: ast.Attribute, mod_ctx: ModuleContext) -> Type:
             ],
         )
     if not isinstance(obj, ClassType):
-        raise IllFormedModule(e, reasons.NotSynthesised())
+        raise IllFormedModule(e, reasons.NoAttributes(render(obj)))
     member = field_type(mod_ctx.Sigma, obj.c, e.attr)
     if member is None:
         raise IllFormedModule(e, reasons.UnknownField(short_name(obj.c), e.attr))
