@@ -43,7 +43,7 @@ def equality_type(Sigma: ClassTable, tau: Type) -> bool:
     if isinstance(tau, CallableType):
         return False
     if isinstance(tau, ListType):
-        return equality_type(Sigma, tau.tau)
+        return equality_type(Sigma, tau.elem)
     if isinstance(tau, DictType):
         return equality_type(Sigma, tau.value)
     if isinstance(tau, TupleType):
@@ -64,7 +64,7 @@ def class_equality_type(Sigma: ClassTable, c: Class) -> bool:
 def membership_list(
     Sigma: ClassTable, sigma: Type, tau: Type
 ) -> ResolvedOverload | None:
-    if isinstance(tau, ListType) and comparable(Sigma, sigma, tau.tau):
+    if isinstance(tau, ListType) and comparable(Sigma, sigma, tau.elem):
         return (sigma, tau), Primitive.BOOL
     return None
 
@@ -121,7 +121,7 @@ def concat_str(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | 
 
 def concat_list(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:
     if isinstance(sigma, ListType) and isinstance(tau, ListType):
-        return (sigma, tau), ListType(join_seq(Sigma, (sigma.tau, tau.tau)))
+        return (sigma, tau), ListType(join_seq(Sigma, (sigma.elem, tau.elem)))
     return None
 
 
