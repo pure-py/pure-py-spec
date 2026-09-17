@@ -1,1 +1,1 @@
-pattern for class C against values of type __main__.C; list patterns match only lists and tuple patterns only tuples
+tuple pattern requires values of tuple type, not list[int] | tuple[int, int]

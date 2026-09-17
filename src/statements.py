@@ -49,7 +49,7 @@ from contexts import (
     override_outcomes,
     resolve_name,
 )
-from match import literal_of, match_shapes, seq_safe
+from match import match_shapes, sequence_kind_mismatch
 from operators import (
     BINARY_NAMES,
     UNARY_NAMES,
@@ -60,7 +60,7 @@ from operators import (
 from reasons import IllFormedModule
 from shapes import shapes
 from subtyping import join_seq, subtype
-from syntax import PatList, PatTuple
+from syntax import PatList
 from type_syntax import (
     CallableExpr,
     CallableType,
@@ -83,7 +83,6 @@ from type_syntax import (
     base_type,
     literal_type,
     qualified,
-    render,
 )
 
 
@@ -303,11 +302,11 @@ def match_cases(
     residual = shapes(mod_ctx.Sigma, tau, frozenset())
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):
-        if not seq_safe(case.pattern, tau, mod_ctx):
-            raise IllFormedModule(
-                case.pattern,
-                reasons.SequenceKindMismatch(describe(case.pattern, mod_ctx), tau),
-            )
+        mismatch = sequence_kind_mismatch(case.pattern, tau, mod_ctx)
+        if mismatch is not None:
+            q, sigma = mismatch
+            kind = "list" if isinstance(q, PatList) else "tuple"
+            raise IllFormedModule(q, reasons.SequenceKindMismatch(kind, sigma))
         result = match_shapes(residual, case.pattern, mod_ctx)
         if result is None:
             raise IllFormedModule(case.pattern, reasons.UnreachableCase(index))
@@ -723,26 +722,3 @@ def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, C
     c = Class(qualified(mod_ctx.q, node.name))
     assert c not in mod_ctx.Sigma, "redeclaration rejected by top-seq"
     return c, {**mod_ctx.Sigma, c: ClassTableEntry(own_fields=own, base=base)}
-
-
-def describe(p: ast.pattern, mod_ctx: ModuleContext) -> str:
-    match p:
-        case ast.MatchAs(pattern=p_):
-            assert p_ is not None  # a bare variable or wildcard always matches
-            return describe(p_, mod_ctx)
-        case ast.MatchValue():
-            return f"pattern of type {render(literal_of(p))}"
-        case ast.MatchSingleton():
-            return f"pattern of type {render(literal_of(p))}"
-        case PatList():
-            return "list pattern"
-        case PatTuple():
-            return "tuple pattern"
-        case ast.MatchMapping():
-            return "dictionary pattern"
-        case ast.MatchClass(cls=e):
-            c = class_of_name(e, mod_ctx)
-            assert c is not None
-            return f"pattern for class {short_name(c)}"
-        case _:
-            raise AssertionError(f"unexpected pattern: {type(p).__name__}")

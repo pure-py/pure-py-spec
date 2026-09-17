@@ -1,1 +1,1 @@
-list pattern against values of type tuple[Literal[1], Literal[2]]; list patterns match only lists and tuple patterns only tuples
+list pattern requires values of list type, not tuple[Literal[1], Literal[2]]

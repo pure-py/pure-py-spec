@@ -328,14 +328,11 @@ class UnreachableCase:
 
 @dataclass(frozen=True)
 class SequenceKindMismatch:
-    pattern: str
+    kind: str
     tau: Type
 
     def message(self) -> str:
-        return (
-            f"{self.pattern} against values of type {render(self.tau)}; list patterns "
-            "match only lists and tuple patterns only tuples"
-        )
+        return f"{self.kind} pattern requires values of {self.kind} type, not {render(self.tau)}"
 
 
 @dataclass(frozen=True)

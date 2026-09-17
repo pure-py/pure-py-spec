@@ -314,41 +314,57 @@ def match_shapes(residual: Shapes, p: ast.pattern, mod_ctx: ModuleContext) -> Ma
     )
 
 
-def seq_safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> bool:
-    if isinstance(tau, UnionType):
-        return seq_safe(p, tau.left, mod_ctx) and seq_safe(p, tau.right, mod_ctx)
+def sequence_kind_mismatch(
+    p: ast.pattern, tau: Type, mod_ctx: ModuleContext
+) -> tuple[ast.pattern, Type] | None:
+    match tau:
+        case UnionType(sigma, sigma_):
+            mismatch = first_mismatch([(p, sigma), (p, sigma_)], mod_ctx)
+            if mismatch is None:
+                return None
+            q, sigma = mismatch
+            return (q, tau) if q is p else (q, sigma)
+        case _:
+            pass
     match p:
         case PatTuple(patterns=ps):
             if isinstance(tau, ListType) or tau in (Primitive.SIZED, Primitive.OBJECT):
-                return False
+                return (p, tau)
             if isinstance(tau, TupleType) and len(tau.components) == len(ps):
-                return all(seq_safe(q, c, mod_ctx) for q, c in zip(ps, tau.components))
-            return True
+                return first_mismatch(list(zip(ps, tau.components)), mod_ctx)
+            return None
         case PatList(patterns=ps):
             if isinstance(tau, TupleType) or tau in (Primitive.SIZED, Primitive.OBJECT):
-                return False
+                return (p, tau)
             if isinstance(tau, ListType):
-                return all(seq_safe(q, tau.elem, mod_ctx) for q in ps)
-            return True
+                return first_mismatch([(q, tau.elem) for q in ps], mod_ctx)
+            return None
         case ast.MatchMapping(patterns=ps):
             if isinstance(tau, DictType):
-                return all(seq_safe(q, tau.value, mod_ctx) for q in ps)
-            return True
+                return first_mismatch([(q, tau.value) for q in ps], mod_ctx)
+            return None
         case ast.MatchClass():
             c = class_of_name(p.cls, mod_ctx)
             if c is None:
-                return True  # the match rules reject with a sharper reason
+                return None  # the match rules reject with a sharper reason
             args = field_map(mod_ctx.Sigma, c, p.patterns, p.kwd_attrs, p.kwd_patterns)
             if args is None:
-                return True  # likewise
-            return all(
-                seq_safe(args[x], declared_type(mod_ctx.Sigma, c, x), mod_ctx)
-                for x in fields(mod_ctx.Sigma, c)
+                return None  # likewise
+            return first_mismatch(
+                [(args[x], declared_type(mod_ctx.Sigma, c, x)) for x in fields(mod_ctx.Sigma, c)],
+                mod_ctx,
             )
         case ast.MatchAs():
-            return p.pattern is None or seq_safe(p.pattern, tau, mod_ctx)
+            return None if p.pattern is None else sequence_kind_mismatch(p.pattern, tau, mod_ctx)
         case _:
-            return True
+            return None
+
+
+def first_mismatch(
+    pairs: list[tuple[ast.pattern, Type]], mod_ctx: ModuleContext
+) -> tuple[ast.pattern, Type] | None:
+    mismatches = (sequence_kind_mismatch(q, sigma, mod_ctx) for q, sigma in pairs)
+    return next((mismatch for mismatch in mismatches if mismatch is not None), None)
 
 
 def pattern_bindings(deltas: list[VarContext], node: ast.AST) -> VarContext:

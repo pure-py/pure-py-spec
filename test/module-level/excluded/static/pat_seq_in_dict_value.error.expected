@@ -1,1 +1,1 @@
-dictionary pattern against values of type dict[str, list[int] | tuple[int, int]]; list patterns match only lists and tuple patterns only tuples
+tuple pattern requires values of tuple type, not list[int] | tuple[int, int]

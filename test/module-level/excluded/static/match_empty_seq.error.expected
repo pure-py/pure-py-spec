@@ -1,1 +1,1 @@
-list pattern against values of type list[int] | tuple[]; list patterns match only lists and tuple patterns only tuples
+list pattern requires values of list type, not list[int] | tuple[]
