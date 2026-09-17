@@ -26,9 +26,7 @@ def statements(body: list[ast.stmt]) -> list[Statement]:
     return [head] + statements(rest)
 
 
-def extend_region(
-    region: list[ast.FunctionDef], rest: list[ast.stmt]
-) -> list[Statement]:
+def extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[Statement]:
     if len(rest) == 0:
         return [region]
     head = rest[0]
@@ -66,11 +64,7 @@ def fv_e(e: ast.expr) -> set[Var]:
             params = {a.arg for a in e.args.args}
             return fv_e(e.body) - params
         case ast.Call():
-            return (
-                fv_e(e.func)
-                | fv_e_list(e.args)
-                | fv_e_list([k.value for k in e.keywords])
-            )
+            return fv_e(e.func) | fv_e_list(e.args) | fv_e_list([k.value for k in e.keywords])
         case ast.BinOp():
             return fv_e(e.left) | fv_e(e.right)
         case ast.UnaryOp(operand=e_):
@@ -105,9 +99,7 @@ def fv_e_list(es: list[ast.expr]) -> set[Var]:
     return fv_e(es[0]) | fv_e_list(es[1:])
 
 
-def fv_e_comprehension(
-    elts: list[ast.expr], generators: list[ast.comprehension]
-) -> set[Var]:
+def fv_e_comprehension(elts: list[ast.expr], generators: list[ast.comprehension]) -> set[Var]:
     if len(generators) == 0:
         return fv_e_list(elts)
     g = generators[0]
@@ -162,9 +154,7 @@ def captures_e(e: ast.expr) -> set[Var]:
         case ast.Dict():
             return captures_e_list(dict_keys(e)) | captures_e_list(e.values)
         case ast.ListComp():
-            return captures_quals(e.generators) | (
-                captures_e(e.elt) - binds_quals(e.generators)
-            )
+            return captures_quals(e.generators) | (captures_e(e.elt) - binds_quals(e.generators))
         case ast.DictComp():
             return captures_quals(e.generators) | (
                 (captures_e(e.key) | captures_e(e.value)) - binds_quals(e.generators)
@@ -250,9 +240,7 @@ def assigns_stmt(s: ast.stmt) -> set[Var]:
         case ast.If(body=ss, orelse=ss_):
             return assigns_body(ss) | assigns_body(ss_)
         case ast.Match():
-            return set().union(
-                *(binds(case.pattern) | assigns_body(case.body) for case in s.cases)
-            )
+            return set().union(*(binds(case.pattern) | assigns_body(case.body) for case in s.cases))
         case ast.FunctionDef(name=x):
             return {x}
         case ast.ClassDef(name=x):

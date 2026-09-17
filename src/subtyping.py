@@ -30,13 +30,9 @@ def meet(Sigma: ClassTable, sigma: Type, tau: Type) -> Type:
         return tau
     match (sigma, tau):
         case (UnionType(), _):
-            return join(
-                Sigma, meet(Sigma, sigma.left, tau), meet(Sigma, sigma.right, tau)
-            )
+            return join(Sigma, meet(Sigma, sigma.left, tau), meet(Sigma, sigma.right, tau))
         case (_, UnionType()):
-            return join(
-                Sigma, meet(Sigma, sigma, tau.left), meet(Sigma, sigma, tau.right)
-            )
+            return join(Sigma, meet(Sigma, sigma, tau.left), meet(Sigma, sigma, tau.right))
         case (TupleType(sigmas), TupleType(taus)):
             return (
                 TupleType(tuple(meet(Sigma, a, b) for a, b in zip(sigmas, taus)))
@@ -92,10 +88,7 @@ def subtype(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
             )
         case _:
             if tau == Primitive.SIZED:
-                return (
-                    isinstance(sigma, (ListType, DictType, TupleType))
-                    or sigma == Primitive.STR
-                )
+                return isinstance(sigma, (ListType, DictType, TupleType)) or sigma == Primitive.STR
             return False
 
 

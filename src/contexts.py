@@ -63,9 +63,7 @@ def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
 
 def var_entry(mod_ctx: ModuleContext, x: Var) -> VarEntry | None:
     theta = mod_ctx.gamma.get(x)
-    if theta is None or isinstance(
-        theta, (ModuleStub, ModuleLoaded, Class, PredefinedName)
-    ):
+    if theta is None or isinstance(theta, (ModuleStub, ModuleLoaded, Class, PredefinedName)):
         return None
     return theta
 
@@ -159,9 +157,7 @@ def predefined_context(q: QualifiedName) -> Context:
     return {**PREDEFINED_MEMBERS[str(q)], "__name__": Primitive.STR}
 
 
-def merge_entry(
-    Sigma: ClassTable, theta: ContextEntry, theta_: ContextEntry
-) -> VarEntry:
+def merge_entry(Sigma: ClassTable, theta: ContextEntry, theta_: ContextEntry) -> VarEntry:
     """Assigned in both branches gives the join of the two types; assigned in
     one alone is not definitely assigned. Only variables are assigned within a
     branch, since a class is declared at the top level alone."""
@@ -174,9 +170,7 @@ def merge_entry(
 
 def merge_context(Sigma: ClassTable, gamma: Context, gamma_: Context) -> VarContext:
     return {
-        x: merge_entry(Sigma, gamma[x], gamma_[x])
-        if x in gamma and x in gamma_
-        else Status.FF
+        x: merge_entry(Sigma, gamma[x], gamma_[x]) if x in gamma and x in gamma_ else Status.FF
         for x in set(gamma.keys()) | set(gamma_.keys())
     }
 
@@ -209,9 +203,7 @@ def override_outcomes(r: StaticOutcome, r_: StaticOutcome) -> StaticOutcome:
             return Assigns(override_context(delta, delta_))
 
 
-def extend_entry(
-    theta: ContextEntry | None, theta_: ContextEntry | None
-) -> ContextEntry:
+def extend_entry(theta: ContextEntry | None, theta_: ContextEntry | None) -> ContextEntry:
     if theta is None:
         assert theta_ is not None
         return theta_
@@ -226,18 +218,13 @@ def extend_entry(
             return theta_
 
 
-def disjoint_union[V](
-    gamma: Mapping[Var, V], gamma_: Mapping[Var, V]
-) -> Mapping[Var, V]:
+def disjoint_union[V](gamma: Mapping[Var, V], gamma_: Mapping[Var, V]) -> Mapping[Var, V]:
     assert gamma.keys().isdisjoint(gamma_.keys())
     return {**gamma, **gamma_}
 
 
 def join_context(Sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
-    return {
-        x: join_seq(Sigma, binding_types([delta[x] for delta in deltas]))
-        for x in deltas[0]
-    }
+    return {x: join_seq(Sigma, binding_types([delta[x] for delta in deltas])) for x in deltas[0]}
 
 
 def binding_types(entries: list[VarEntry]) -> list[Type]:

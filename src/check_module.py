@@ -65,9 +65,7 @@ def check_imports_prefix(
     if len(iotas) == 0:
         return {}, mod_ctx.Sigma
     gamma, Sigma = check_import(iotas[0], mod_ctx)
-    gamma_rest, sigma_rest = check_imports_prefix(
-        iotas[1:], replace(mod_ctx, Sigma=Sigma)
-    )
+    gamma_rest, sigma_rest = check_imports_prefix(iotas[1:], replace(mod_ctx, Sigma=Sigma))
     return extend_context(gamma, gamma_rest), sigma_rest
 
 
@@ -85,9 +83,7 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
                     ),
                 )
             delta, Sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
-            theta, Sigma = loads_as(
-                q, ModuleLoaded(q, delta), replace(mod_ctx, Sigma=Sigma)
-            )
+            theta, Sigma = loads_as(q, ModuleLoaded(q, delta), replace(mod_ctx, Sigma=Sigma))
             return {root(q): theta}, Sigma
         case ast.ImportFrom():
             assert iota.module is not None
@@ -110,14 +106,10 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
             raise AssertionError(f"unexpected statement: {type(iota).__name__}")
 
 
-def load_containing(
-    containing: list[QualifiedName], mod_ctx: ModuleContext
-) -> ClassTable:
+def load_containing(containing: list[QualifiedName], mod_ctx: ModuleContext) -> ClassTable:
     if len(containing) == 0:
         return mod_ctx.Sigma
-    _, Sigma = check_module(
-        mod_ctx.M[containing[0]], mod_ctx.M, containing[0], mod_ctx.Sigma
-    )
+    _, Sigma = check_module(mod_ctx.M[containing[0]], mod_ctx.M, containing[0], mod_ctx.Sigma)
     return load_containing(containing[1:], replace(mod_ctx, Sigma=Sigma))
 
 
@@ -149,9 +141,7 @@ def imports(
     if theta is None:
         raise IllFormedModule(iota, reasons.UnknownMember(x, q))
     if isinstance(theta, ModuleStub):
-        members, Sigma = check_module(
-            mod_ctx.M[theta.q], mod_ctx.M, theta.q, mod_ctx.Sigma
-        )
+        members, Sigma = check_module(mod_ctx.M[theta.q], mod_ctx.M, theta.q, mod_ctx.Sigma)
         return ModuleLoaded(theta.q, members), Sigma
     if theta == Status.FF:
         raise IllFormedModule(iota, reasons.UnassignedMember(x, q))
@@ -197,15 +187,11 @@ def check_module_(
     if q in PREDEFINED_MODULES:
         return predefined_context(q), Sigma
     iotas, stmts = split_imports(m.body)
-    gamma, Sigma = check_imports_prefix(
-        iotas, ModuleContext(gamma={}, M=M, q=q, Sigma=Sigma)
-    )
+    gamma, Sigma = check_imports_prefix(iotas, ModuleContext(gamma={}, M=M, q=q, Sigma=Sigma))
     body = [name_assign(q)] + stmts
     mod_ctx = check_top_seq(
         statements(body),
-        ModuleContext(
-            gamma={**predefined_context(BUILTINS), **gamma}, M=M, q=q, Sigma=Sigma
-        ),
+        ModuleContext(gamma={**predefined_context(BUILTINS), **gamma}, M=M, q=q, Sigma=Sigma),
     )
     check_submodule_names(m, gamma, body, M, q)
     return signature(body, mod_ctx, q), mod_ctx.Sigma
@@ -242,9 +228,7 @@ def find_binder(stmts: list[ast.stmt], x: str) -> ast.stmt | None:
     return next((s for s in stmts if binds_name(s, x)), None)
 
 
-def signature(
-    body: list[ast.stmt], final_ctx: ModuleContext, q: QualifiedName
-) -> Context:
+def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: QualifiedName) -> Context:
     return override_context(
         submods(final_ctx.M, q), {x: final_ctx.gamma[x] for x in assigns_body(body)}
     )

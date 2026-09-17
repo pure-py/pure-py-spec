@@ -252,12 +252,8 @@ def check_syntax_expr(node: ast.expr) -> None:
             if isinstance(node.value, (int, float, str, bool, type(None))):
                 return
             if isinstance(node.value, (bytes, complex)):
-                raise Prohibited(
-                    node, f"{type(node.value).__name__} literals prohibited"
-                )
-            raise Prohibited(
-                node, f"prohibited literal type: {type(node.value).__name__}"
-            )
+                raise Prohibited(node, f"{type(node.value).__name__} literals prohibited")
+            raise Prohibited(node, f"prohibited literal type: {type(node.value).__name__}")
         case ast.Name():
             pass
         case ast.BinOp():

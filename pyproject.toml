@@ -11,3 +11,6 @@ dev = [
 
 [tool.mypy]
 strict = true
+
+[tool.ruff]
+line-length = 100

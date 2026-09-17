@@ -116,9 +116,7 @@ class Runner:
     def _fail(self, phase: Phase, msg: str) -> None:
         self._failures.append(f"{phase}: {msg}")
 
-    def expect_exit(
-        self, cmd: list[str], expected: int, error_substr: str | None = None
-    ) -> None:
+    def expect_exit(self, cmd: list[str], expected: int, error_substr: str | None = None) -> None:
         phase = {
             CHECK: Phase.CHECK,
             CHECK_PROGRAM: Phase.CHECK,
@@ -203,9 +201,7 @@ class Runner:
                 self.run_expecting_output(path, expected_path, cwd=cwd)
         else:
             if expected_path.exists():
-                self._fail(
-                    Phase.RUN, f"python-error must not have {expected_path.name}"
-                )
+                self._fail(Phase.RUN, f"python-error must not have {expected_path.name}")
             elif not exception_path.exists():
                 self._fail(Phase.RUN, f"missing {EXCEPTION_EXPECTED}")
             else:
@@ -215,9 +211,7 @@ class Runner:
         """Each subdir is a test: main.py, expected_exit, plus fixtures and the
         Python-side evidence fixed by the verdict (the category directory name)."""
         python_accepts = category_root.name != Verdict.PYTHON_ERROR
-        for d in sorted(
-            p for p in category_root.rglob("*") if p.is_dir() and (p / MAIN).exists()
-        ):
+        for d in sorted(p for p in category_root.rglob("*") if p.is_dir() and (p / MAIN).exists()):
             with self.test(d.relative_to(ROOT)):
                 main_py = d / MAIN
                 self.expect_exit(
@@ -258,9 +252,7 @@ class Runner:
 
             verdict = Verdict(dirs[0])
             stage = (
-                Stage(dirs[1])
-                if len(dirs) > 1 and dirs[1] in {s.value for s in Stage}
-                else None
+                Stage(dirs[1]) if len(dirs) > 1 and dirs[1] in {s.value for s in Stage} else None
             )
 
             if verdict == Verdict.SEMANTICALLY_VALID:
@@ -303,9 +295,7 @@ def check_rule_names(r: Runner) -> None:
             for name in RULE_DEF.findall(f.read_text(encoding="utf-8")):
                 where.setdefault(name, []).append(str(f.relative_to(ROOT)))
     clashes = [
-        f"{name} in {', '.join(files)}"
-        for name, files in sorted(where.items())
-        if len(files) > 1
+        f"{name} in {', '.join(files)}" for name, files in sorted(where.items()) if len(files) > 1
     ]
     if clashes:
         r.bad("unique rule names", "; ".join(clashes))
@@ -362,9 +352,7 @@ def check_mypy_tests(r: Runner, module: pathlib.Path) -> None:
         text=True,
         check=False,
     )
-    rejected = {
-        line.split(":", 1)[0] for line in proc.stdout.splitlines() if ": error:" in line
-    }
+    rejected = {line.split(":", 1)[0] for line in proc.stdout.splitlines() if ": error:" in line}
     expected = {str(p) for p in relative if MYPY_INCOMPATIBLE in p.parts}
     misfiled = [
         f"{p} {'rejected by mypy' if str(p) in rejected else 'accepted by mypy'}"
@@ -400,9 +388,7 @@ def main() -> None:
             ["ruff", "check"],
             ["ruff", "format", "--check"],
         ):
-            proc = subprocess.run(
-                [*tool, *sources], capture_output=True, text=True, check=False
-            )
+            proc = subprocess.run([*tool, *sources], capture_output=True, text=True, check=False)
             if proc.returncode != 0:
                 r.bad("checker type-checks", (proc.stdout + proc.stderr).strip()[:400])
                 break

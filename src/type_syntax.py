@@ -114,14 +114,7 @@ class UnionExpr:
 
 
 type TypeExpr = (
-    Primitive
-    | ListExpr
-    | TupleExpr
-    | DictExpr
-    | CallableExpr
-    | LiteralType
-    | ClassName
-    | UnionExpr
+    Primitive | ListExpr | TupleExpr | DictExpr | CallableExpr | LiteralType | ClassName | UnionExpr
 )
 
 
@@ -161,14 +154,7 @@ class UnionType:
 
 
 type Type = (
-    Primitive
-    | ListType
-    | TupleType
-    | DictType
-    | CallableType
-    | LiteralType
-    | ClassType
-    | UnionType
+    Primitive | ListType | TupleType | DictType | CallableType | LiteralType | ClassType | UnionType
 )
 
 
@@ -298,9 +284,7 @@ def subscript_args(s: ast.expr) -> tuple[ast.expr, ...]:
 def parse_annotations(es: Sequence[ast.expr]) -> tuple[TypeExpr, ...] | None:
     psis = tuple(parse_annotation(e) for e in es)
     return (
-        None
-        if any(psi is None for psi in psis)
-        else tuple(psi for psi in psis if psi is not None)
+        None if any(psi is None for psi in psis) else tuple(psi for psi in psis if psi is not None)
     )
 
 

@@ -113,9 +113,7 @@ def typed_heads(Sigma: ClassTable, hs: Heads, tau: Type) -> Heads:
 
 
 def below_excluded(Sigma: ClassTable, c: Class, hs: Heads) -> bool:
-    return any(
-        isinstance(h, Class) and subtype(Sigma, ClassType(c), ClassType(h)) for h in hs
-    )
+    return any(isinstance(h, Class) and subtype(Sigma, ClassType(c), ClassType(h)) for h in hs)
 
 
 def shapes_seq(Sigma: ClassTable, taus: Sequence[Type]) -> ShapeSeqs:

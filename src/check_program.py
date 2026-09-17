@@ -41,9 +41,7 @@ def module_name(base_dir: pathlib.Path, path: pathlib.Path) -> QualifiedName | N
 
 def module_names(base_dir: pathlib.Path) -> set[QualifiedName]:
     names = {
-        module_name(base_dir, p)
-        for p in base_dir.rglob("*.py")
-        if "__pycache__" not in p.parts
+        module_name(base_dir, p) for p in base_dir.rglob("*.py") if "__pycache__" not in p.parts
     }
     return {p for q in names if q is not None for p in [q, *proper_prefixes(q)]}
 

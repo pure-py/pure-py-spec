@@ -122,9 +122,7 @@ def match_list(k: Shape, p: PatList, mod_ctx: ModuleContext) -> Match | None:
     match k:
         case List(tau, ks):
             if len(ks) == len(ps):
-                return map_seq_match(
-                    lambda ks_: List(tau, ks_), match_seq(ks, ps, p, mod_ctx)
-                )
+                return map_seq_match(lambda ks_: List(tau, ks_), match_seq(ks, ps, p, mod_ctx))
             return None
         case _:
             return None
@@ -190,11 +188,7 @@ def split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Split | None:
 def split_literal(Sigma: ClassTable, k: Shape, ell: LiteralType) -> Split | None:
     match k:
         case Rest(tau, hs):
-            if (
-                ell not in hs
-                and subtype(Sigma, ell, tau)
-                and not isinstance(tau, LiteralType)
-            ):
+            if ell not in hs and subtype(Sigma, ell, tau) and not isinstance(tau, LiteralType):
                 return (Rest(ell, frozenset()),), shapes(Sigma, tau, hs | {ell})
             return None
         case _:
@@ -235,10 +229,7 @@ def split_dict(
             if w is None or w in k.hs:
                 return None
             return (
-                tuple(
-                    with_keys(k, (w,), (m,))
-                    for m in shapes(Sigma, k.value, frozenset())
-                ),
+                tuple(with_keys(k, (w,), (m,)) for m in shapes(Sigma, k.value, frozenset())),
                 (Dict(k.value, k.beta, k.hs | {w}),),
             )
         case _:
@@ -281,9 +272,7 @@ def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
     return c
 
 
-def pattern_seq(
-    Sigma: ClassTable, c: Class, p: ast.MatchClass
-) -> tuple[ast.pattern, ...]:
+def pattern_seq(Sigma: ClassTable, c: Class, p: ast.MatchClass) -> tuple[ast.pattern, ...]:
     args = field_map(Sigma, c, p.patterns, p.kwd_attrs, p.kwd_patterns)
     if args is None:
         raise no_field_map(Sigma, c, p)
@@ -310,9 +299,7 @@ def match_seq(
     return matched, residual, pattern_bindings(deltas, node)
 
 
-def match_shapes(
-    residual: Shapes, p: ast.pattern, mod_ctx: ModuleContext
-) -> Match | None:
+def match_shapes(residual: Shapes, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
     results = {k: match(k, p, mod_ctx) for k in residual}
     matches = {k: result for k, result in results.items() if result is not None}
     if len(matches) == 0:
@@ -378,9 +365,7 @@ def union(kss: Iterable[Shapes]) -> Shapes:
     return tuple(k for ks in kss for k in ks)
 
 
-def map_seq_match(
-    form: Callable[[ShapeSeq], Shape], result: SeqMatch | None
-) -> Match | None:
+def map_seq_match(form: Callable[[ShapeSeq], Shape], result: SeqMatch | None) -> Match | None:
     if result is None:
         return None
     matched, residual, delta = result
@@ -400,14 +385,10 @@ def no_field_map(Sigma: ClassTable, c: Class, p: ast.MatchClass) -> IllFormedMod
     name, xs = short_name(c), fields(Sigma, c)
     n = len(p.patterns)
     if n + len(p.kwd_attrs) != len(xs):
-        return IllFormedModule(
-            p, reasons.PatternArityMismatch(name, len(xs), n + len(p.kwd_attrs))
-        )
+        return IllFormedModule(p, reasons.PatternArityMismatch(name, len(xs), n + len(p.kwd_attrs)))
     if len(p.kwd_attrs) != len(set(p.kwd_attrs)):
         return IllFormedModule(p, reasons.DuplicatePatternKeyword(name))
-    return IllFormedModule(
-        p, reasons.UnknownFieldInPattern(name, tuple(sorted(set(xs[n:]))))
-    )
+    return IllFormedModule(p, reasons.UnknownFieldInPattern(name, tuple(sorted(set(xs[n:])))))
 
 
 def with_keys(k: Dict, ws: tuple[str, ...], ks: ShapeSeq) -> Dict:
