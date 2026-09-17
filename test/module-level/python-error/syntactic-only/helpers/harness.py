@@ -12,26 +12,23 @@ sys.path.insert(0, str(ROOT / "src"))
 from check_module import PREDEFINED_MODULES, check_module
 from reasons import IllFormed
 from type_syntax import QualifiedName
-from syntax import check_syntax_module
+from syntax import Unsupported, check_syntax_module
 
 
-def ill_formedness(tree: ast.Module, M: dict[QualifiedName, ast.Module], q: QualifiedName) -> IllFormed | None:
-    try:
-        check_module(tree, M, q, {})
-        return None
-    except IllFormed as e:
-        return e
-
-
-def expect_rejected(tree: ast.Module, msg_contains: str = "") -> None:
+def expect_rejected(m: ast.Module, msg_contains: str = "") -> None:
     q = QualifiedName(('<test>',))
     M = {p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES}
-    M[q] = tree
-    result = check_syntax_module(tree) or ill_formedness(tree, M, q)
+    M[q] = m
+    result: IllFormed | Unsupported | None = check_syntax_module(m)
+    if result is None:
+        try:
+            check_module(m, M, q, {})
+        except IllFormed as e:
+            result = e
     if result is None:
         print("FAIL: expected rejection but got ok", file=sys.stderr)
         sys.exit(1)
-    if msg_contains and msg_contains not in result.msg:
+    if len(msg_contains) > 0 and msg_contains not in result.msg:
         print(f"FAIL: expected message containing {msg_contains!r}, got {result.msg!r}", file=sys.stderr)
         sys.exit(1)
     print(f"ok: {result.msg}")
