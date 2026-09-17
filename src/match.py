@@ -18,9 +18,10 @@ from shapes import (
     Dict,
     List,
     Rest,
-    Seq,
     Shape,
     Shapes,
+    ShapeSeq,
+    ShapeSeqs,
     Tuple,
     below_excluded,
     shape_type,
@@ -43,7 +44,7 @@ from type_syntax import (
 )
 
 type Match = tuple[Shapes, Shapes, VarContext]
-type SeqMatch = tuple[tuple[Seq, ...], tuple[Seq, ...], VarContext]
+type SeqMatch = tuple[ShapeSeqs, ShapeSeqs, VarContext]
 type Split = tuple[Shapes, Shapes]
 
 
@@ -247,33 +248,38 @@ def pattern_seq(
 
 
 def match_seq(
-    ks: Seq, ps: tuple[ast.pattern, ...], node: ast.pattern, mod_ctx: ModuleContext
+    ks: ShapeSeq, ps: tuple[ast.pattern, ...], node: ast.pattern, mod_ctx: ModuleContext
 ) -> SeqMatch | None:
-    matches = [match(k, p, mod_ctx) for k, p in zip(ks, ps)]
-    if any(s is None for s in matches):
+    results = [match(k, p, mod_ctx) for k, p in zip(ks, ps)]
+    if any(result is None for result in results):
         return None
-    parts = [s for s in matches if s is not None]
-    matched = tuple(product(*(m for m, _, _ in parts)))
+    matches = [result for result in results if result is not None]
+    matched_sets = [matched for matched, _, _ in matches]
+    residual_sets = [residual for _, residual, _ in matches]
+    deltas = [delta for _, _, delta in matches]
+    matched = tuple(product(*matched_sets))
     residual = tuple(
-        tuple(prefix) + (k,) + ks[i + 1 :]
-        for i, (_, ls, _) in enumerate(parts)
-        for prefix in product(*(parts[j][0] for j in range(i)))
+        prefix + (k,) + ks[i + 1 :]
+        for i, ls in enumerate(residual_sets)
+        for prefix in product(*matched_sets[:i])
         for k in ls
     )
-    return matched, residual, pattern_bindings([d for _, _, d in parts], node)
+    return matched, residual, pattern_bindings(deltas, node)
 
 
-def match_shapes(ks: Shapes, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
-    results = {k: match(k, p, mod_ctx) for k in ks}
-    matches = {k: m for k, m in results.items() if m is not None}
+def match_shapes(
+    residual: Shapes, p: ast.pattern, mod_ctx: ModuleContext
+) -> Match | None:
+    results = {k: match(k, p, mod_ctx) for k in residual}
+    matches = {k: result for k, result in results.items() if result is not None}
     if len(matches) == 0:
         return None
-    matched = union(m for m, _, _ in matches.values())
-    unmatched = tuple(k for k in ks if k not in matches)
-    residual = union(residual for _, residual, _ in matches.values()) + unmatched
+    matched = union(matched_k for matched_k, _, _ in matches.values())
+    unmatched = tuple(k for k in residual if k not in matches)
+    residual_ = union(residual_k for _, residual_k, _ in matches.values()) + unmatched
     return (
         matched,
-        residual,
+        residual_,
         join_context(mod_ctx.Sigma, [d for _, _, d in matches.values()]),
     )
 
@@ -330,7 +336,7 @@ def union(kss: Iterable[Shapes]) -> Shapes:
 
 
 def map_seq_match(
-    form: Callable[[Seq], Shape], result: SeqMatch | None
+    form: Callable[[ShapeSeq], Shape], result: SeqMatch | None
 ) -> Match | None:
     if result is None:
         return None
@@ -361,7 +367,7 @@ def no_field_map(Sigma: ClassTable, c: Class, p: ast.MatchClass) -> IllFormedMod
     )
 
 
-def with_keys(k: Dict, ws: tuple[str, ...], ks: Seq) -> Dict:
+def with_keys(k: Dict, ws: tuple[str, ...], ks: ShapeSeq) -> Dict:
     beta = dict(k.beta) | dict(zip(ws, ks))
     return Dict(k.value, tuple(sorted(beta.items())), k.hs)
 

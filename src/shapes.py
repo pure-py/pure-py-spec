@@ -33,19 +33,19 @@ class Rest:
 @dataclass(frozen=True)
 class Constr:
     c: Class
-    args: tuple[Shape, ...]
+    args: ShapeSeq
     hs: Heads
 
 
 @dataclass(frozen=True)
 class Tuple:
-    components: tuple[Shape, ...]
+    components: ShapeSeq
 
 
 @dataclass(frozen=True)
 class List:
     elem: Type
-    elems: tuple[Shape, ...]
+    elems: ShapeSeq
 
 
 @dataclass(frozen=True)
@@ -58,7 +58,8 @@ class Dict:
 type Shape = Rest | Constr | Tuple | List | Dict
 # The spec's beta, a finite map from keys to shapes, as sorted pairs so a shape is hashable.
 type KeyShapes = tuple[tuple[str, Shape], ...]
-type Seq = tuple[Shape, ...]
+type ShapeSeq = tuple[Shape, ...]
+type ShapeSeqs = tuple[ShapeSeq, ...]
 type Shapes = tuple[Shape, ...]
 
 
@@ -113,5 +114,5 @@ def below_excluded(Sigma: ClassTable, c: Class, hs: Heads) -> bool:
     )
 
 
-def shapes_seq(Sigma: ClassTable, taus: Sequence[Type]) -> tuple[Seq, ...]:
+def shapes_seq(Sigma: ClassTable, taus: Sequence[Type]) -> ShapeSeqs:
     return tuple(product(*(shapes(Sigma, tau, frozenset()) for tau in taus)))
