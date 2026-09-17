@@ -188,9 +188,9 @@ def check_module_(
 ) -> tuple[Context, ClassTable]:
     if q in PREDEFINED_MODULES:
         return predefined_context(q), Sigma
-    imports, stmts = split_imports(m.body)
+    iotas, stmts = split_imports(m.body)
     gamma, Sigma = check_imports_prefix(
-        imports, ModuleContext(gamma={}, M=M, q=q, Sigma=Sigma)
+        iotas, ModuleContext(gamma={}, M=M, q=q, Sigma=Sigma)
     )
     body = [name_assign(q)] + stmts
     mod_ctx = check_top_seq(

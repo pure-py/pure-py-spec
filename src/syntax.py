@@ -391,9 +391,9 @@ def check_syntax_import(node: ast.stmt) -> None:
 
 
 def check_syntax_top_level(body: list[ast.stmt]) -> None:
-    imports, stmts = split_imports(body)
-    for s in imports:
-        check_syntax_import(s)
+    iotas, stmts = split_imports(body)
+    for iota in iotas:
+        check_syntax_import(iota)
     for s in stmts:
         if is_import(s):
             raise Prohibited(s, "imports must precede all other statements")
