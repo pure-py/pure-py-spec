@@ -77,6 +77,20 @@ class Phase(StrEnum):
     RUN = "run"
 
 
+# Expected outcomes by verdict and stage: checker exit status, whether the checker's
+# message must match .error.expected, and whether Python accepts the test (None: not run)
+EXPECTATIONS: dict[tuple[Verdict, Stage | None], tuple[Exit, bool, bool | None]] = {
+    (Verdict.SEMANTICALLY_VALID, None): (Exit.OK, False, True),
+    (Verdict.SEMANTICALLY_VALID, Stage.PENDING): (Exit.NOT_YET, False, None),
+    (Verdict.EXCLUDED, Stage.SYNTACTIC): (Exit.PROHIBITED, True, True),
+    (Verdict.EXCLUDED, Stage.STATIC): (Exit.ILL_FORMED, True, True),
+    (Verdict.EXCLUDED, Stage.DYNAMIC): (Exit.OK, False, True),
+    (Verdict.PYTHON_ERROR, Stage.SYNTACTIC): (Exit.PROHIBITED, True, False),
+    (Verdict.PYTHON_ERROR, Stage.STATIC): (Exit.ILL_FORMED, True, False),
+    (Verdict.PYTHON_ERROR, Stage.DYNAMIC): (Exit.OK, False, False),
+}
+
+
 def script_cmd(script: str, path: pathlib.Path) -> list[str]:
     return ["python3", str(ROOT / "src" / script), str(path)]
 
@@ -224,59 +238,26 @@ class Runner:
                 )
 
     def module_test(self, p: pathlib.Path, module: pathlib.Path) -> None:
-        """Assert a module-level test from its path: <verdict>[/<stage>].
-
-        verdict in {semantically-valid, excluded, python-error} fixes how PurePy and
-        Python must each respond; stage in {syntactic, static,
-        dynamic} fixes where PurePy stops (dynamic = checker
-        accepts, but evaluation is stuck)."""
         rel = p.relative_to(ROOT)
         with self.test(rel):
             dirs = p.parent.relative_to(module).parts
-            err = substr(p.with_suffix(ERROR_EXPECTED))
-
-            if dirs == (Verdict.SEMANTICALLY_VALID, Stage.PENDING):
-                self.check(p, Exit.NOT_YET)
-                return
-            if dirs[1:] == (Stage.STATIC, Stage.PENDING):
-                self.check(p, Exit.OK)
-                self.python_evidence(
-                    p,
-                    Verdict(dirs[0]) != Verdict.PYTHON_ERROR,
-                    expected_path=p.with_suffix(EXPECTED),
-                )
-                return
-            if dirs == (Verdict.PYTHON_ERROR, Stage.SYNTACTIC_ONLY):
+            verdict = Verdict(dirs[0])
+            stage = Stage(dirs[1]) if len(dirs) > 1 and dirs[1] in Stage else None
+            if stage == Stage.SYNTACTIC_ONLY:
                 self.python(p)
                 return
-
-            verdict = Verdict(dirs[0])
-            stage = (
-                Stage(dirs[1]) if len(dirs) > 1 and dirs[1] in {s.value for s in Stage} else None
-            )
-
-            if verdict == Verdict.SEMANTICALLY_VALID:
-                self.check(p, Exit.OK)
-            elif stage == Stage.SYNTACTIC:
-                self.check(p, Exit.PROHIBITED, err)
-            else:
-                self.check(
-                    p,
-                    Exit.ILL_FORMED if stage == Stage.STATIC else Exit.OK,
-                    err if stage == Stage.STATIC else None,
-                )
-
-            if verdict != Verdict.PYTHON_ERROR and stage == Stage.SYNTACTIC:
+            status, message_checked, python_accepts = EXPECTATIONS[verdict, stage]
+            err = substr(p.with_suffix(ERROR_EXPECTED)) if message_checked else None
+            self.check(p, status, err)
+            if python_accepts is None:
+                return
+            if stage == Stage.SYNTACTIC and python_accepts:
                 if p.with_suffix(EXCEPTION_EXPECTED).exists():
                     self._fail(Phase.RUN, f"must not have {EXCEPTION_EXPECTED}")
                 else:
                     self.python(p)
             else:
-                self.python_evidence(
-                    p,
-                    verdict != Verdict.PYTHON_ERROR,
-                    expected_path=p.with_suffix(EXPECTED),
-                )
+                self.python_evidence(p, python_accepts, expected_path=p.with_suffix(EXPECTED))
 
     def summary(self) -> None:
         total = self.passed + self.failed
