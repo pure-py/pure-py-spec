@@ -1,4 +1,4 @@
-# rule: split-subclass -- a subclass case leaves the base class's other instances
+# rule: split-subclass
 from dataclasses import dataclass
 
 @dataclass

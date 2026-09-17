@@ -1,4 +1,4 @@
-# rule: match -- a case the literal-typed scrutinee cannot reach is rejected
+# rule: match
 x = 42
 match x:
     case 42:

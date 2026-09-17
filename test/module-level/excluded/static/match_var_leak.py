@@ -1,4 +1,4 @@
-# rule: match-partial (var leak — x not definitely assigned after partial match)
+# rule: match-partial
 v: tuple[int, int] = (1, 2)
 match v:
     case (x, 2):

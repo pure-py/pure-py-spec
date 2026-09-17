@@ -1,4 +1,4 @@
-# rule: var -- a name used in a lambda body must be definitely assigned
+# rule: var
 from typing import Callable
 
 f: Callable[[int], int] = lambda x: 0 if x == 0 else g(x - 1)  # PurePy: error (g not yet assigned); Python: late binding

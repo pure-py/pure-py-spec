@@ -1,5 +1,4 @@
-# rule: pat-tuple -- a tuple type's shapes carry component shapes, a dictionary
-# component its dictionary form
+# rule: pat-tuple
 def f(t: tuple[dict[str, int], int]) -> int:
     match t:
         case ({"a": n}, 1):

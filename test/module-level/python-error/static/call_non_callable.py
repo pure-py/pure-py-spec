@@ -1,5 +1,4 @@
-# calling a non-closure. Python raises TypeError; PurePy's eval-call-nonfun gives fails
-# TypeError, after evaluating the arguments.
+# rule: call
 def g() -> int:
     print("arg")
     return 3

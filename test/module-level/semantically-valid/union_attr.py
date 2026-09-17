@@ -1,4 +1,4 @@
-# rule: attr-union -- an attribute reference on a union synthesises the join over the members
+# rule: attr-union
 from dataclasses import dataclass
 
 @dataclass

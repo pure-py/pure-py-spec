@@ -1,4 +1,4 @@
-# rule: unop -- the unary signatures at int, float and bool
+# rule: unop
 x = 5
 y = 2.5
 b = True

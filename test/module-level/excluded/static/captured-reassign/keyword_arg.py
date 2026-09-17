@@ -1,4 +1,4 @@
-# rule: seq -- a keyword argument's value is a free variable of the call
+# rule: seq
 from dataclasses import dataclass
 
 @dataclass

@@ -1,5 +1,4 @@
-# rule: split-class -- expansion takes the lower of the shape's type and
-# the pattern's class, so a later case for the type itself can match
+# rule: split-class
 from dataclasses import dataclass
 
 

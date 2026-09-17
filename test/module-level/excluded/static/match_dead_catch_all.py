@@ -1,4 +1,4 @@
-# rule: pat-shapes -- a case must match some shape the earlier cases leave
+# rule: pat-shapes
 x = None
 match x:
     case None:

@@ -1,5 +1,4 @@
-# rule: match -- empty list and tuple patterns are sequence patterns too,
-# so a union of the kinds admits neither
+# rule: match
 def f(s: list[int] | tuple[()]) -> str:
     match s:
         case []:

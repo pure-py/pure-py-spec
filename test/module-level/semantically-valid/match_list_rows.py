@@ -1,4 +1,4 @@
-# rule: pat-list -- a list shape an earlier case left is matched position by position
+# rule: pat-list
 def f(xs: list[int]) -> int:
     match xs:
         case [1, b]:

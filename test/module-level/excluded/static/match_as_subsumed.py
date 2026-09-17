@@ -1,4 +1,4 @@
-# rule: pat-as -- a case matching nothing the earlier cases leave is rejected
+# rule: pat-as
 v = 1
 match v:
     case 1:

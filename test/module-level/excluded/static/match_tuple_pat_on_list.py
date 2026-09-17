@@ -1,4 +1,4 @@
-# rule: match-case -- a tuple pattern is not sequence-safe at a list type
+# rule: match-case
 v = [1, 2]
 match v:
     case (a, b):

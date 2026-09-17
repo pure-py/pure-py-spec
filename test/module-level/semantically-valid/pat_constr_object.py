@@ -1,4 +1,4 @@
-# rule: split-class -- a class pattern meets an object scrutinee at the class
+# rule: split-class
 from dataclasses import dataclass
 
 

@@ -1,4 +1,4 @@
-# rule: split-class -- a case for an unrelated class leaves the others
+# rule: split-class
 from dataclasses import dataclass
 
 @dataclass

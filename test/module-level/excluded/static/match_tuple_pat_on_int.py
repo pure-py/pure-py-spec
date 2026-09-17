@@ -1,4 +1,4 @@
-# rule: pat-shapes -- a tuple pattern matches only a tuple shape of the same length
+# rule: pat-shapes
 v = 5
 match v:
     case (a, b):

@@ -1,4 +1,4 @@
-# rule: subty-callable -- a callable is contravariant in its parameters
+# rule: subty-callable
 from typing import Callable
 
 def f(x: float) -> int:

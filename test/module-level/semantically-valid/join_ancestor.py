@@ -1,4 +1,4 @@
-# rule: if-else -- branches assigning a class and its ancestor merge at the ancestor
+# rule: if-else
 from dataclasses import dataclass
 
 @dataclass

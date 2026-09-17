@@ -1,4 +1,4 @@
-# rule: seq -- captures(s) and assigns of the rest of the block must be disjoint
+# rule: seq
 from typing import Callable
 
 def g() -> int:

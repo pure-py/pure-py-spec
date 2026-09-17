@@ -1,4 +1,4 @@
-# rule: ty-class -- a class name in an annotation may be qualified
+# rule: ty-class
 import shapes
 
 p: shapes.Point = shapes.Point(3, 4)

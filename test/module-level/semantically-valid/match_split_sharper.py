@@ -1,4 +1,4 @@
-# rule: pat-cons -- matching component by component exhausts what no single case covers
+# rule: pat-cons
 def f(p: tuple[bool, bool]) -> int:
     match p:
         case (True, _):

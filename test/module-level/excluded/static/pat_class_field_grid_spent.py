@@ -1,4 +1,4 @@
-# rule: pat-shapes -- the field grid spends the class, leaving nothing for a later class case
+# rule: pat-shapes
 from dataclasses import dataclass
 
 @dataclass

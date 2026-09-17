@@ -1,4 +1,4 @@
-# rule: top-seq -- a class binding is permanent, so no second class can take its name
+# rule: top-seq
 from dataclasses import dataclass
 
 

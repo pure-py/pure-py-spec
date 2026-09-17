@@ -1,2 +1,2 @@
-# rule: assert -- a condition must be a bool
+# rule: assert
 assert 0

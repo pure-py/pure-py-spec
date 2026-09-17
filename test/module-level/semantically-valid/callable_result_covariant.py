@@ -1,4 +1,4 @@
-# rule: subty-callable -- a callable is covariant in its result
+# rule: subty-callable
 from typing import Callable
 
 def f(n: int) -> int:

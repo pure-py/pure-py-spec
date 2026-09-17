@@ -1,2 +1,2 @@
-# rule: subty-sized -- len takes a Sized, and an int is not one
+# rule: subty-sized
 print(len(5))

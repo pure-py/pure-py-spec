@@ -1,4 +1,4 @@
-# rule: pat-shapes -- a literal pattern matches only where its type is below the shape's
+# rule: pat-shapes
 v = [1, 2]
 match v:
     case 1:

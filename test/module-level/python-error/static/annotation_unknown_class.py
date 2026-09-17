@@ -1,3 +1,3 @@
-# rule: ty-class -- annotation names class in scope
+# rule: ty-class
 x: Nonexistent = 5
 print(x)

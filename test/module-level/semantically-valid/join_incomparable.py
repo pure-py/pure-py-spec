@@ -1,4 +1,4 @@
-# rule: if-else -- branches assigning incomparable types merge at their union
+# rule: if-else
 def f(b: bool) -> int | str:
     x: int | str = 0
     if b:

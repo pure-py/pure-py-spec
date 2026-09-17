@@ -1,4 +1,4 @@
-# rule: seq -- a return has result type Returns, so nothing may follow it
+# rule: seq
 def foo(x: int) -> int:
     return x + 1
     return x  # PurePy: error (unreachable); Python: silently ignored

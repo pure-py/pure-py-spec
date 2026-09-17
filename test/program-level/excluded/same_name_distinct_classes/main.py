@@ -1,4 +1,4 @@
-# rule: subty-class -- a class is identified by its qualified name, so two modules' classes called C are distinct types
+# rule: subty-class
 import a
 import b
 

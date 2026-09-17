@@ -1,4 +1,4 @@
-# rule: top-seq -- a class binding is permanent, so a name cannot be freed for redeclaration
+# rule: top-seq
 from dataclasses import dataclass
 
 

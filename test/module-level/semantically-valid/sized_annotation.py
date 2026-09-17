@@ -1,4 +1,4 @@
-# rule: subty-sized -- a list is below Sized
+# rule: subty-sized
 from typing import Sized
 
 x: Sized = [1, 2]

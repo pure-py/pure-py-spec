@@ -1,4 +1,4 @@
-# rule: syn-cond -- the branch that does not synthesise checks against the join
+# rule: syn-cond
 def f(b: bool) -> int:
     xs = [] if b else [1]
     return len(xs)

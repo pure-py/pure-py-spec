@@ -1,4 +1,4 @@
-# rule: if / eval-if -- elif chain (>=3 branches; selects the elif)
+# rule: eval-if
 def classify(n: int) -> str:
     if n == 0:
         return "zero"

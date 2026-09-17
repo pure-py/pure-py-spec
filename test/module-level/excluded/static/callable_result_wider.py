@@ -1,4 +1,4 @@
-# rule: subty-callable -- results do not widen
+# rule: subty-callable
 from typing import Callable
 
 def f(n: int) -> float:

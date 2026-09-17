@@ -1,4 +1,4 @@
-# rule: top-seq -- a class binding is permanent at the top level
+# rule: top-seq
 from dataclasses import dataclass
 
 

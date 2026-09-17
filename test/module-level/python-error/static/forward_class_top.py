@@ -1,4 +1,4 @@
-# rule: class (top-down, no forward refs at module top level)
+# rule: class
 from dataclasses import dataclass
 
 p = Point(1, 2)  # Point not yet declared

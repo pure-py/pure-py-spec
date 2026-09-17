@@ -1,4 +1,4 @@
-# rule: def -- the names of a mutual region must be distinct
+# rule: def
 def f() -> int:
     return 0
 def g() -> int:

@@ -1,4 +1,4 @@
-# rule: seq -- a variable assigned in a nested definition is local to it, so the outer definition does not capture it
+# rule: seq
 def f() -> int:
     def g() -> int:
         z = 1

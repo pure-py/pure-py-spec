@@ -1,4 +1,4 @@
-# rule: constr -- field-map accepts any split of the arguments that covers the fields
+# rule: constr
 from dataclasses import dataclass
 
 @dataclass

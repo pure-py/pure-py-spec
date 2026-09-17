@@ -1,4 +1,4 @@
-# rule: qual-generator -- elem-type of a union is the join of the element types
+# rule: qual-generator
 def f(xs: list[int] | list[str]) -> int:
     return len([x for x in xs])
 

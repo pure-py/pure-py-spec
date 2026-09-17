@@ -1,5 +1,4 @@
-# rule: split-class -- one shape per member of a union field, so the cases
-# exhaust it; mypy wants a catch-all
+# rule: split-class
 from dataclasses import dataclass
 
 

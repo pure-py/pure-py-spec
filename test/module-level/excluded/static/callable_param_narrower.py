@@ -1,4 +1,4 @@
-# rule: subty-callable -- parameters do not narrow
+# rule: subty-callable
 from typing import Callable
 
 def f(n: int) -> int:

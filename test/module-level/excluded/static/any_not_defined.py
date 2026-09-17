@@ -1,4 +1,4 @@
-# rule: predefined -- typing has no member Any in this version
+# rule: predefined
 from typing import Any
 
 x: int = 1

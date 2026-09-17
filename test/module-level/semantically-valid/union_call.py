@@ -1,4 +1,4 @@
-# rule: call-union -- a call of a union of callables synthesises the join over the members
+# rule: call-union
 from typing import Callable
 
 def g(n: int) -> int:

@@ -1,5 +1,4 @@
-# rule: split-list -- a list's element shapes come from shapes, a dictionary
-# element taking its dictionary form
+# rule: split-list
 def f(xs: list[dict[str, int]]) -> int:
     match xs:
         case [{"a": n}]:

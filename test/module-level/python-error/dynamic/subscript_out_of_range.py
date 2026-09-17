@@ -1,4 +1,3 @@
-# list index past the end. Python raises IndexError; PurePy's eval-subscript-range gives
-# fails IndexError.
+# rule: eval-subscript
 xs = [1, 2, 3]
 print(xs[3])

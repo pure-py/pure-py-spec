@@ -1,5 +1,4 @@
-# rule: split-subclass -- a subclass case after a superclass case matches the
-# instances the superclass case left
+# rule: split-subclass
 from dataclasses import dataclass
 
 

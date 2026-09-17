@@ -1,4 +1,4 @@
-# rule: attr-module -- a predefined member has the type the figure lists
+# rule: attr-module
 import math
 
 x: float = math.sqrt(2.0)

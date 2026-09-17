@@ -1,2 +1,2 @@
-# rule: and -- operands must be bools
+# rule: and
 print(1 and True)

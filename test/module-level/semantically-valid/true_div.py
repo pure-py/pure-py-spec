@@ -1,3 +1,3 @@
-# rule: binop -- / has only the float signature
+# rule: binop
 x: float = 7 / 2
 print(x)

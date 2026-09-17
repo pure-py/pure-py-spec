@@ -1,4 +1,4 @@
-# rule: constr -- too many positional arguments
+# rule: constr
 from dataclasses import dataclass
 @dataclass
 class Point:

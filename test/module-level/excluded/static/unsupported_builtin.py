@@ -1,2 +1,2 @@
-# rule: var -- abs is not a member of builtins
+# rule: var
 y = abs(-1)

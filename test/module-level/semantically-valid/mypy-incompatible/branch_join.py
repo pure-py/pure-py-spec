@@ -1,4 +1,4 @@
-# rule: if-else -- PurePy joins the branch types; mypy declares the variable from the first branch
+# rule: if-else
 def f(b: bool) -> int | str:
     if b:
         x = 1

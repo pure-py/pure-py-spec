@@ -1,4 +1,4 @@
-# rule: if / definite assignment -- if/elif with no else does not definitely assign y
+# rule: if
 x = 1
 if x == 0:
     y = 1

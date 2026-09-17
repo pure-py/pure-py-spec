@@ -1,4 +1,4 @@
-# rule: match-case -- a tuple pattern is sequence-safe only if each component pattern is, at the component type
+# rule: match-case
 def f(t: tuple[list[str], int] | tuple[tuple[int, int], int]) -> int:
     match t:
         case ([a, b], n):

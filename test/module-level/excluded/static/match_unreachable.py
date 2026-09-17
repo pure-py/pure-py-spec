@@ -1,4 +1,4 @@
-# rule: pat-shapes -- a case must match some shape the earlier cases leave
+# rule: pat-shapes
 v = (1, 2)
 match v:
     case (a, b):

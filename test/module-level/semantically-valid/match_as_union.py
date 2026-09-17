@@ -1,4 +1,4 @@
-# rule: pat-as -- a named pattern binds at the join over the shapes it matched
+# rule: pat-as
 def f(xs: list[int] | list[str]) -> list[int] | list[str]:
     match xs:
         case [_] as t:

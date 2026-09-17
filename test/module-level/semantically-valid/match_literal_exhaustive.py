@@ -1,4 +1,4 @@
-# rule: match -- a literal-typed scrutinee is exhausted by covering its literals
+# rule: match
 x = 42
 match x:
     case 42:

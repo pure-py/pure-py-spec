@@ -1,4 +1,4 @@
-# rule: top-seq -- a def region cannot take a class's name at the top level
+# rule: top-seq
 from dataclasses import dataclass
 
 

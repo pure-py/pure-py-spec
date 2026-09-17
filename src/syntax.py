@@ -39,11 +39,11 @@ class NotYetSupported(Unsupported):
 
 
 class PatList(ast.MatchSequence):
-    """Sequence pattern written with brackets."""
+    pass
 
 
 class PatTuple(ast.MatchSequence):
-    """Sequence pattern written with parentheses, or bare."""
+    pass
 
 
 def map_tree(f: Callable[[ast.AST], ast.AST], node: ast.AST) -> ast.AST:

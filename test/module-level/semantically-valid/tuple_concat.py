@@ -1,3 +1,3 @@
-# rule: binop -- tuple concatenation appends the component types
+# rule: binop
 t: tuple[int, str] = (1,) + ("a",)
 print(t)

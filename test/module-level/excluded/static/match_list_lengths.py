@@ -1,5 +1,4 @@
-# rule: split-list -- a list type has a shape for every length, so fixed-length
-# patterns never exhaust it
+# rule: split-list
 def f(xs: list[int]) -> int:
     match xs:
         case []:

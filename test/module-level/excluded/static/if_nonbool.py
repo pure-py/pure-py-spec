@@ -1,3 +1,3 @@
-# rule: if -- a condition must be a bool
+# rule: if
 if 5:
     print("yes")

@@ -1,4 +1,4 @@
-# rule: class -- class declaration names dataclass, which must be in scope
+# rule: class
 @dataclass
 class P:
     x: int

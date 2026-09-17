@@ -1,4 +1,4 @@
-# rule: attr-object -- the field must be one the class declares
+# rule: attr-object
 from dataclasses import dataclass
 
 @dataclass

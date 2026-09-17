@@ -1,4 +1,4 @@
-# rule: split-literal -- a negative literal case leaves nothing for the same literal
+# rule: split-literal
 v = -1
 match v:
     case -1:

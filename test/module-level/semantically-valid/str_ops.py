@@ -1,4 +1,4 @@
-# rule: binop -- the str signatures of +, < and *
+# rule: binop
 print("a" + "b")
 print("a" < "b")
 print("ab" * 2)

@@ -1,2 +1,2 @@
-# rule: qual-generator -- a value of a type with no element type cannot be iterated
+# rule: qual-generator
 print([x for x in 5])

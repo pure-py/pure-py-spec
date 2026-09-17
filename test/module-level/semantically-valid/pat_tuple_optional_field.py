@@ -1,4 +1,4 @@
-# rule: split-class -- a union field has one shape per member
+# rule: split-class
 from dataclasses import dataclass
 
 

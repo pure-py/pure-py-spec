@@ -1,4 +1,4 @@
-# rule: pat-constr -- a constructor pattern for a zero-field class
+# rule: pat-constr
 from dataclasses import dataclass
 @dataclass
 class Empty:

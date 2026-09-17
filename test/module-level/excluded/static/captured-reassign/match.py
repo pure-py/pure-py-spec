@@ -1,4 +1,4 @@
-# rule: seq -- a pattern variable is in the function's scope, so a case body captures it like any other
+# rule: seq
 def f(v: int) -> int:
     match v:
         case y:

@@ -1,4 +1,4 @@
-# rule: split-class -- a dictionary field takes its dictionary shape
+# rule: split-class
 from dataclasses import dataclass
 
 

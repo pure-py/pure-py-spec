@@ -1,4 +1,4 @@
-# rule: match-case -- a match on a union of list and tuple admits no sequence pattern
+# rule: match-case
 def f(s: list[int] | tuple[int, int]) -> str:
     match s:
         case [a, b]:

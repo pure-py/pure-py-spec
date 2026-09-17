@@ -1,4 +1,4 @@
-# rule: lambda -- one parameter type for each parameter
+# rule: lambda
 from typing import Callable
 
 f: Callable[[int, int], int] = lambda x: x

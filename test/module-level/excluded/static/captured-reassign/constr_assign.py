@@ -1,4 +1,4 @@
-# rule: top-seq -- reassigning the captured class name is now rejected as rebinding a class
+# rule: top-seq
 from dataclasses import dataclass
 
 @dataclass
