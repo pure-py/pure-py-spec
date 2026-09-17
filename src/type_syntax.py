@@ -130,7 +130,7 @@ type TypeExpr = (
 
 @dataclass(frozen=True)
 class ListType:
-    elem: Type
+    tau: Type
 
 
 @dataclass(frozen=True)
@@ -189,7 +189,7 @@ def render(tau: Type) -> str:
     if isinstance(tau, Primitive):
         return PRIMITIVE_SPELLINGS[tau]
     if isinstance(tau, ListType):
-        return f"list[{render(tau.elem)}]"
+        return f"list[{render(tau.tau)}]"
     if isinstance(tau, TupleType):
         return f"tuple[{', '.join(render(c) for c in tau.components)}]"
     if isinstance(tau, DictType):

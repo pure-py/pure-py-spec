@@ -181,9 +181,9 @@ def split_tuple(Sigma: ClassTable, k: Shape, n: int) -> Split | None:
 def split_list(Sigma: ClassTable, k: Shape, n: int) -> Split | None:
     if not (isinstance(k, Rest) and isinstance(k.ty, ListType) and n not in k.hs):
         return None
-    elem = k.ty.elem
+    tau = k.ty.tau
     return (
-        tuple(List(elem, ks) for ks in shapes_seq(Sigma, (elem,) * n)),
+        tuple(List(tau, ks) for ks in shapes_seq(Sigma, (tau,) * n)),
         shapes(Sigma, k.ty, k.hs | {n}),
     )
 
@@ -299,7 +299,7 @@ def seq_safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> bool:
         if isinstance(tau, TupleType) or tau in (Primitive.SIZED, Primitive.OBJECT):
             return False
         if isinstance(tau, ListType):
-            return all(seq_safe(q, tau.elem, mod_ctx) for q in p.patterns)
+            return all(seq_safe(q, tau.tau, mod_ctx) for q in p.patterns)
         return True
     if isinstance(p, ast.MatchMapping):
         if isinstance(tau, DictType):

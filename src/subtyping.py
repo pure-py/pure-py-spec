@@ -80,7 +80,7 @@ def subtype(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
             subtype(Sigma, a, b) for a, b in zip(sigma.components, tau.components)
         )
     if isinstance(sigma, ListType) and isinstance(tau, ListType):
-        return equivalent(Sigma, sigma.elem, tau.elem)
+        return equivalent(Sigma, sigma.tau, tau.tau)
     if isinstance(sigma, DictType) and isinstance(tau, DictType):
         return equivalent(Sigma, sigma.value, tau.value)
     if isinstance(sigma, CallableType) and isinstance(tau, CallableType):

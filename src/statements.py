@@ -487,7 +487,7 @@ def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) ->
         )
     if isinstance(container, ListType):
         check_expr(e.slice, Primitive.INT, mod_ctx)
-        return container.elem
+        return container.tau
     if container == Primitive.STR:
         check_expr(e.slice, Primitive.INT, mod_ctx)
         return Primitive.STR
@@ -565,7 +565,7 @@ def synthesises(e: ast.expr) -> bool:
 
 
 def dict_type(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> DictType:
-    return DictType(list_type(node, es, mod_ctx).elem)
+    return DictType(list_type(node, es, mod_ctx).tau)
 
 
 def call(e: ast.Call, mod_ctx: ModuleContext) -> Type:
@@ -610,7 +610,7 @@ def check_expr(e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
         return
     if isinstance(e, ast.List) and isinstance(expected, ListType):
         for e_ in e.elts:
-            check_expr(e_, expected.elem, mod_ctx)
+            check_expr(e_, expected.tau, mod_ctx)
         return
     if (
         isinstance(e, ast.Tuple)
@@ -635,7 +635,7 @@ def check_expr(e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
         check_expr(e.orelse, expected, mod_ctx)
         return
     if isinstance(e, ast.ListComp) and isinstance(expected, ListType):
-        check_expr(e.elt, expected.elem, qual_context([e.elt], e.generators, mod_ctx))
+        check_expr(e.elt, expected.tau, qual_context([e.elt], e.generators, mod_ctx))
         return
     if isinstance(e, ast.DictComp) and isinstance(expected, DictType):
         mod_ctx_ = qual_context([e.key, e.value], e.generators, mod_ctx)
@@ -703,7 +703,7 @@ def check_quals(
 
 def elem_type(Sigma: ClassTable, tau: Type) -> Type | None:
     if isinstance(tau, ListType):
-        return tau.elem
+        return tau.tau
     if tau == Primitive.STR:
         return Primitive.STR
     if isinstance(tau, DictType):
