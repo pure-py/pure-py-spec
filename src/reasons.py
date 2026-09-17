@@ -154,12 +154,15 @@ class DuplicateMutualName:
 
 
 @dataclass(frozen=True)
-class SubmoduleNameBound:
+class DuplicateMember:
     x: Var
     q: QualifiedName
 
     def message(self) -> str:
-        return f"module '{self.q}' binds '{self.x}' and also has submodule '{self.q}.{self.x}'"
+        return (
+            f"duplicate member '{self.x}' of module '{self.q}': "
+            f"the module defines '{self.x}' and also has submodule '{self.q}.{self.x}'"
+        )
 
 
 @dataclass(frozen=True)
@@ -400,7 +403,7 @@ type Reason = (
     | NonlinearPattern
     | DuplicateMutualName
     | TopLevelReturn
-    | SubmoduleNameBound
+    | DuplicateMember
     | SubmoduleNotImported
     | ImportOfContainedModule
     | UnassignedMember

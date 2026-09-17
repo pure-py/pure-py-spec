@@ -215,7 +215,7 @@ def check_submodule_names(
         x = xs[0]
         node = find_binder(m.body, x)
         assert node is not None
-        raise IllFormedModule(node, reasons.SubmoduleNameBound(x, q))
+        raise IllFormedModule(node, reasons.DuplicateMember(x, q))
 
 
 def binds_name(s: ast.stmt, x: str) -> bool:
