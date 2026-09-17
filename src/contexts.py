@@ -70,7 +70,7 @@ def var_entry(mod_ctx: ModuleContext, x: Var) -> VarEntry | None:
     return theta
 
 
-def var_type(mod_ctx: ModuleContext, x: Var) -> Type | None:
+def assigned_type(mod_ctx: ModuleContext, x: Var) -> Type | None:
     theta = var_entry(mod_ctx, x)
     return None if theta is None or isinstance(theta, Status) else theta
 

@@ -39,6 +39,7 @@ from contexts import (
     StaticOutcome,
     Status,
     VarContext,
+    assigned_type,
     class_of_name,
     entry_of,
     is_assigned,
@@ -47,7 +48,6 @@ from contexts import (
     override_gamma,
     override_outcomes,
     resolve_name,
-    var_type,
 )
 from match import literal_of, match_shapes, seq_safe
 from operators import (
@@ -364,9 +364,9 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             if e.id not in mod_ctx.gamma:
                 raise IllFormedModule(e, reasons.UndefinedVariable(e.id))
             raise IllFormedModule(e, reasons.UnassignedVariable(e.id))
-        t = var_type(mod_ctx, e.id)
-        assert t is not None
-        return t
+        tau = assigned_type(mod_ctx, e.id)
+        assert tau is not None
+        return tau
     if isinstance(e, ast.Constant):
         return LiteralType(e.value)
     if isinstance(e, ast.Lambda):
