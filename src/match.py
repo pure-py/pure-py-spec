@@ -125,16 +125,16 @@ def match_dict(k: Shape, p: ast.MatchMapping, mod_ctx: ModuleContext) -> Match |
     if any(w not in bound for w in keys):
         return None
     ks = tuple(bound[w] for w in keys)
-    seqs = match_seq(ks, tuple(q for _, q in ws), p, mod_ctx)
-    return map_seq_match(lambda r: with_keys(k, keys, r), seqs)
+    result = match_seq(ks, tuple(q for _, q in ws), p, mod_ctx)
+    return map_seq_match(lambda ks_: with_keys(k, keys, ks_), result)
 
 
 def match_constr(k: Shape, p: ast.MatchClass, mod_ctx: ModuleContext) -> Match | None:
     cls = class_of_pattern(p, mod_ctx)
     ps = pattern_seq(mod_ctx.Sigma, cls, p)
     if isinstance(k, Constr) and subtype(mod_ctx.Sigma, ClassType(k.c), ClassType(cls)):
-        seqs = match_seq(k.args, padded(ps, len(k.args)), p, mod_ctx)
-        return map_seq_match(lambda r: Constr(k.c, r, k.heads), seqs)
+        result = match_seq(k.args, padded(ps, len(k.args)), p, mod_ctx)
+        return map_seq_match(lambda ks: Constr(k.c, ks, k.heads), result)
     return None
 
 
@@ -324,14 +324,16 @@ def pattern_bindings(deltas: list[VarContext], node: ast.AST) -> VarContext:
     return merged
 
 
-def union(seqs: Iterable[Shapes]) -> Shapes:
-    return tuple(k for s in seqs for k in s)
+def union(kss: Iterable[Shapes]) -> Shapes:
+    return tuple(k for ks in kss for k in ks)
 
 
-def map_seq_match(form: Callable[[Seq], Shape], seqs: SeqMatch | None) -> Match | None:
-    if seqs is None:
+def map_seq_match(
+    form: Callable[[Seq], Shape], result: SeqMatch | None
+) -> Match | None:
+    if result is None:
         return None
-    matched, residual, delta = seqs
+    matched, residual, delta = result
     return (
         tuple(form(ks) for ks in matched),
         tuple(form(ks) for ks in residual),
