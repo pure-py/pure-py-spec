@@ -1,1 +1,1 @@
-dictionary pattern cannot match values of type list[int] | tuple[int, int]
+case 1 is unreachable

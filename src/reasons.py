@@ -319,15 +319,6 @@ class UnreachableCase:
 
 
 @dataclass(frozen=True)
-class PatternTypeMismatch:
-    pattern: str
-    tau: str
-
-    def message(self) -> str:
-        return f"{self.pattern} cannot match values of type {self.tau}"
-
-
-@dataclass(frozen=True)
 class SequenceKindClash:
     pattern: str
     tau: str
@@ -418,7 +409,6 @@ type Reason = (
     | TupleIndexOutOfRange
     | MissingReturn
     | NotIterable
-    | PatternTypeMismatch
     | SequenceKindClash
     | UnreachableCase
     | NotSynthesised

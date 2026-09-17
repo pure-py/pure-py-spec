@@ -1,1 +1,1 @@
-pattern of type Literal[1] cannot match values of type list[int]
+case 1 is unreachable

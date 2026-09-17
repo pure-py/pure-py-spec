@@ -1,1 +1,1 @@
-tuple pattern cannot match values of type Literal[5]
+case 1 is unreachable

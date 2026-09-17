@@ -322,23 +322,10 @@ def match_cases(
             )
         result = match_shapes(residual, case.pattern, mod_ctx)
         if result is None:
-            raise case_matches_nothing(case.pattern, index, tau, mod_ctx)
+            raise IllFormedModule(case.pattern, reasons.UnreachableCase(index))
         _, residual, delta = result
         deltas.append(delta)
     return deltas, len(residual) > 0
-
-
-def case_matches_nothing(
-    p: ast.pattern,
-    index: int,
-    tau: Type,
-    mod_ctx: ModuleContext,
-) -> IllFormedModule:
-    if match_shapes(shapes(mod_ctx.Sigma, tau, frozenset()), p, mod_ctx) is None:
-        return IllFormedModule(
-            p, reasons.PatternTypeMismatch(describe(p, mod_ctx), render(tau))
-        )
-    return IllFormedModule(p, reasons.UnreachableCase(index))
 
 
 def check_case(
