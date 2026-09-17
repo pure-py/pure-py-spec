@@ -60,25 +60,25 @@ def loads_as(
 
 
 def check_imports_prefix(
-    prefix: list[ast.stmt], mod_ctx: ModuleContext
+    iotas: list[ast.stmt], mod_ctx: ModuleContext
 ) -> tuple[Context, ClassTable]:
-    if len(prefix) == 0:
+    if len(iotas) == 0:
         return {}, mod_ctx.Sigma
-    gamma, Sigma = check_import(prefix[0], mod_ctx)
+    gamma, Sigma = check_import(iotas[0], mod_ctx)
     gamma_rest, sigma_rest = check_imports_prefix(
-        prefix[1:], replace(mod_ctx, Sigma=Sigma)
+        iotas[1:], replace(mod_ctx, Sigma=Sigma)
     )
     return extend_context(gamma, gamma_rest), sigma_rest
 
 
-def check_import(s: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, ClassTable]:
-    if isinstance(s, ast.Import):
-        q = parse_qualified(s.names[0].name)
+def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, ClassTable]:
+    if isinstance(iota, ast.Import):
+        q = parse_qualified(iota.names[0].name)
         if q not in mod_ctx.M:
-            raise IllFormedModule(s, reasons.UnknownModule(str(q)))
+            raise IllFormedModule(iota, reasons.UnknownModule(str(q)))
         if proper_prefix_of(mod_ctx.q, q):
             raise IllFormedModule(
-                s,
+                iota,
                 reasons.ImportOfContainedModule(
                     str(q), str(mod_ctx.q), f"from {parent(q)} import {q.parts[-1]}"
                 ),
@@ -88,17 +88,17 @@ def check_import(s: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, ClassTab
             q, ModuleLoaded(q, delta), replace(mod_ctx, Sigma=Sigma)
         )
         return {root(q): theta}, Sigma
-    assert isinstance(s, ast.ImportFrom) and s.module is not None
-    q = parse_qualified(s.module)
+    assert isinstance(iota, ast.ImportFrom) and iota.module is not None
+    q = parse_qualified(iota.module)
     if q not in mod_ctx.M:
-        raise IllFormedModule(s, reasons.UnknownModule(str(q)))
+        raise IllFormedModule(iota, reasons.UnknownModule(str(q)))
     delta, Sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
     Sigma = load_containing(
         [p for p in proper_prefixes(q) if not prefix_of(p, mod_ctx.q)],
         replace(mod_ctx, Sigma=Sigma),
     )
     return imports_seq(
-        s, [a.name for a in s.names], q, delta, replace(mod_ctx, Sigma=Sigma)
+        iota, [a.name for a in iota.names], q, delta, replace(mod_ctx, Sigma=Sigma)
     )
 
 
@@ -121,34 +121,32 @@ def submods(M: Mapping[QualifiedName, ast.Module], q: QualifiedName) -> Context:
 
 
 def imports_seq(
-    s: ast.stmt,
-    names: list[Var],
+    iota: ast.stmt,
+    xs: list[Var],
     q: QualifiedName,
-    gamma_src: Context,
+    gamma: Context,
     mod_ctx: ModuleContext,
 ) -> tuple[Context, ClassTable]:
-    if len(names) == 0:
+    if len(xs) == 0:
         return {}, mod_ctx.Sigma
-    theta, Sigma = imports(s, names[0], q, gamma_src, mod_ctx)
-    gamma, Sigma_ = imports_seq(
-        s, names[1:], q, gamma_src, replace(mod_ctx, Sigma=Sigma)
-    )
-    return override_context({names[0]: theta}, gamma), Sigma_
+    theta, Sigma = imports(iota, xs[0], q, gamma, mod_ctx)
+    gamma, Sigma_ = imports_seq(iota, xs[1:], q, gamma, replace(mod_ctx, Sigma=Sigma))
+    return override_context({xs[0]: theta}, gamma), Sigma_
 
 
 def imports(
-    s: ast.stmt, x: Var, q: QualifiedName, gamma_src: Context, mod_ctx: ModuleContext
+    iota: ast.stmt, x: Var, q: QualifiedName, gamma: Context, mod_ctx: ModuleContext
 ) -> tuple[ContextEntry, ClassTable]:
-    entry = gamma_src.get(x)
+    entry = gamma.get(x)
     if entry is None:
-        raise IllFormedModule(s, reasons.UnknownMember(x, str(q)))
+        raise IllFormedModule(iota, reasons.UnknownMember(x, str(q)))
     if isinstance(entry, ModuleStub):
         members, Sigma = check_module(
             mod_ctx.M[entry.q], mod_ctx.M, entry.q, mod_ctx.Sigma
         )
         return ModuleLoaded(entry.q, members), Sigma
     if entry == Status.FF:
-        raise IllFormedModule(s, reasons.UnassignedMember(x, str(q)))
+        raise IllFormedModule(iota, reasons.UnassignedMember(x, str(q)))
     return entry, mod_ctx.Sigma
 
 
