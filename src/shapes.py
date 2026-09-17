@@ -64,15 +64,17 @@ type Shapes = tuple[Shape, ...]
 
 
 def shape_type(k: Shape) -> Type:
-    if isinstance(k, Rest):
-        return k.ty
-    if isinstance(k, Constr):
-        return ClassType(k.c)
-    if isinstance(k, Tuple):
-        return TupleType(tuple(shape_type(c) for c in k.components))
-    if isinstance(k, List):
-        return ListType(k.elem)
-    return DictType(k.value)
+    match k:
+        case Rest(tau, _):
+            return tau
+        case Constr(c, _, _):
+            return ClassType(c)
+        case Tuple(ks):
+            return TupleType(tuple(shape_type(c) for c in ks))
+        case List(tau, _):
+            return ListType(tau)
+        case Dict(tau, _, _):
+            return DictType(tau)
 
 
 def shapes(Sigma: ClassTable, tau: Type, hs: Heads) -> Shapes:
@@ -97,11 +99,13 @@ def shapes(Sigma: ClassTable, tau: Type, hs: Heads) -> Shapes:
 
 
 def head_typed(Sigma: ClassTable, h: Head, tau: Type) -> bool:
-    if isinstance(h, Class):
-        return subtype(Sigma, ClassType(h), tau)
-    if isinstance(h, LiteralType):
-        return subtype(Sigma, h, tau)
-    return isinstance(tau, ListType)
+    match h:
+        case Class():
+            return subtype(Sigma, ClassType(h), tau)
+        case LiteralType():
+            return subtype(Sigma, h, tau)
+        case int():
+            return isinstance(tau, ListType)
 
 
 def typed_heads(Sigma: ClassTable, hs: Heads, tau: Type) -> Heads:

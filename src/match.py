@@ -49,19 +49,23 @@ type Split = tuple[Shapes, Shapes]
 
 
 def match(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
-    if isinstance(p, ast.MatchAs):
-        return match_as(k, p, mod_ctx)
-    if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
-        result = match_literal(k, literal_of(p))
-    elif isinstance(p, PatTuple):
-        result = match_tuple(k, p, mod_ctx)
-    elif isinstance(p, PatList):
-        result = match_list(k, p, mod_ctx)
-    elif isinstance(p, ast.MatchMapping):
-        result = match_dict(k, p, mod_ctx)
-    else:
-        assert isinstance(p, ast.MatchClass)
-        result = match_constr(k, p, mod_ctx)
+    match p:
+        case ast.MatchAs():
+            return match_as(k, p, mod_ctx)
+        case ast.MatchValue():
+            result = match_literal(k, literal_of(p))
+        case ast.MatchSingleton():
+            result = match_literal(k, literal_of(p))
+        case PatTuple():
+            result = match_tuple(k, p, mod_ctx)
+        case PatList():
+            result = match_list(k, p, mod_ctx)
+        case ast.MatchMapping():
+            result = match_dict(k, p, mod_ctx)
+        case ast.MatchClass():
+            result = match_constr(k, p, mod_ctx)
+        case _:
+            assert False
     return result if result is not None else match_split(k, p, mod_ctx)
 
 
@@ -92,130 +96,169 @@ def match_split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | Non
 
 
 def match_literal(k: Shape, ell: LiteralType) -> Match | None:
-    if isinstance(k, Rest) and k.ty == ell:
-        assert len(k.hs) == 0
-        return (k,), (), {}
-    return None
+    match k:
+        case Rest(tau, hs):
+            if tau == ell:
+                assert len(hs) == 0
+                return (k,), (), {}
+            return None
+        case _:
+            return None
 
 
 def match_tuple(k: Shape, p: PatTuple, mod_ctx: ModuleContext) -> Match | None:
     ps = tuple(p.patterns)
-    if isinstance(k, Tuple) and len(k.components) == len(ps):
-        return map_seq_match(Tuple, match_seq(k.components, ps, p, mod_ctx))
-    return None
+    match k:
+        case Tuple(ks):
+            if len(ks) == len(ps):
+                return map_seq_match(Tuple, match_seq(ks, ps, p, mod_ctx))
+            return None
+        case _:
+            return None
 
 
 def match_list(k: Shape, p: PatList, mod_ctx: ModuleContext) -> Match | None:
     ps = tuple(p.patterns)
-    if isinstance(k, List) and len(k.elems) == len(ps):
-        return map_seq_match(
-            lambda ks: List(k.elem, ks), match_seq(k.elems, ps, p, mod_ctx)
-        )
-    return None
+    match k:
+        case List(tau, ks):
+            if len(ks) == len(ps):
+                return map_seq_match(
+                    lambda ks_: List(tau, ks_), match_seq(ks, ps, p, mod_ctx)
+                )
+            return None
+        case _:
+            return None
 
 
 def match_dict(k: Shape, p: ast.MatchMapping, mod_ctx: ModuleContext) -> Match | None:
-    if not isinstance(k, Dict):
-        return None
-    ws = key_patterns(p)
-    keys = tuple(w for w, _ in ws)
-    repeated = [w for i, w in enumerate(keys) if w in keys[:i]]
-    if len(repeated) > 0:
-        raise IllFormedModule(p, reasons.DuplicateDictKey(repeated[0]))
-    beta = dict(k.beta)
-    if any(w not in beta for w in keys):
-        return None
-    ks = tuple(beta[w] for w in keys)
-    result = match_seq(ks, tuple(q for _, q in ws), p, mod_ctx)
-    return map_seq_match(lambda ks_: with_keys(k, keys, ks_), result)
+    match k:
+        case Dict():
+            ws = key_patterns(p)
+            keys = tuple(w for w, _ in ws)
+            repeated = [w for i, w in enumerate(keys) if w in keys[:i]]
+            if len(repeated) > 0:
+                raise IllFormedModule(p, reasons.DuplicateDictKey(repeated[0]))
+            beta = dict(k.beta)
+            if any(w not in beta for w in keys):
+                return None
+            ks = tuple(beta[w] for w in keys)
+            result = match_seq(ks, tuple(q for _, q in ws), p, mod_ctx)
+            return map_seq_match(lambda ks_: with_keys(k, keys, ks_), result)
+        case _:
+            return None
 
 
 def match_constr(k: Shape, p: ast.MatchClass, mod_ctx: ModuleContext) -> Match | None:
     c = class_of_pattern(p, mod_ctx)
     ps = pattern_seq(mod_ctx.Sigma, c, p)
-    if isinstance(k, Constr) and subtype(mod_ctx.Sigma, ClassType(k.c), ClassType(c)):
-        result = match_seq(k.args, padded(ps, len(k.args)), p, mod_ctx)
-        return map_seq_match(lambda ks: Constr(k.c, ks, k.hs), result)
-    return None
+    match k:
+        case Constr(d, ks, hs):
+            if subtype(mod_ctx.Sigma, ClassType(d), ClassType(c)):
+                result = match_seq(ks, padded(ps, len(ks)), p, mod_ctx)
+                return map_seq_match(lambda ks_: Constr(d, ks_, hs), result)
+            return None
+        case _:
+            return None
 
 
 def split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Split | None:
     Sigma = mod_ctx.Sigma
-    if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
-        return split_literal(Sigma, k, literal_of(p))
-    if isinstance(p, PatTuple):
-        return split_tuple(Sigma, k, len(p.patterns))
-    if isinstance(p, PatList):
-        return split_list(Sigma, k, len(p.patterns))
-    if isinstance(p, ast.MatchMapping):
-        return split_dict(Sigma, k, key_patterns(p))
-    assert isinstance(p, ast.MatchClass)
-    c = class_of_pattern(p, mod_ctx)
-    if isinstance(k, Rest):
-        return split_class(Sigma, k, c)
-    if isinstance(k, Constr):
-        return split_subclass(Sigma, k, c)
-    return None
+    match p:
+        case ast.MatchValue():
+            return split_literal(Sigma, k, literal_of(p))
+        case ast.MatchSingleton():
+            return split_literal(Sigma, k, literal_of(p))
+        case PatTuple(patterns=ps):
+            return split_tuple(Sigma, k, len(ps))
+        case PatList(patterns=ps):
+            return split_list(Sigma, k, len(ps))
+        case ast.MatchMapping():
+            return split_dict(Sigma, k, key_patterns(p))
+        case ast.MatchClass():
+            c = class_of_pattern(p, mod_ctx)
+            match k:
+                case Rest():
+                    return split_class(Sigma, k, c)
+                case Constr():
+                    return split_subclass(Sigma, k, c)
+                case _:
+                    return None
+        case _:
+            assert False
 
 
 def split_literal(Sigma: ClassTable, k: Shape, ell: LiteralType) -> Split | None:
-    if (
-        isinstance(k, Rest)
-        and ell not in k.hs
-        and subtype(Sigma, ell, k.ty)
-        and not isinstance(k.ty, LiteralType)
-    ):
-        return (Rest(ell, frozenset()),), shapes(Sigma, k.ty, k.hs | {ell})
-    return None
+    match k:
+        case Rest(tau, hs):
+            if (
+                ell not in hs
+                and subtype(Sigma, ell, tau)
+                and not isinstance(tau, LiteralType)
+            ):
+                return (Rest(ell, frozenset()),), shapes(Sigma, tau, hs | {ell})
+            return None
+        case _:
+            return None
 
 
 def split_tuple(Sigma: ClassTable, k: Shape, n: int) -> Split | None:
-    if not (isinstance(k, Rest) and isinstance(k.ty, TupleType)):
-        return None
-    if len(k.ty.components) != n:
-        return None
-    assert len(k.hs) == 0
-    return tuple(Tuple(ks) for ks in shapes_seq(Sigma, k.ty.components)), ()
+    match k:
+        case Rest(TupleType(taus), hs):
+            if len(taus) != n:
+                return None
+            assert len(hs) == 0
+            return tuple(Tuple(ks) for ks in shapes_seq(Sigma, taus)), ()
+        case _:
+            return None
 
 
 def split_list(Sigma: ClassTable, k: Shape, n: int) -> Split | None:
-    if not (isinstance(k, Rest) and isinstance(k.ty, ListType) and n not in k.hs):
-        return None
-    tau = k.ty.elem
-    return (
-        tuple(List(tau, ks) for ks in shapes_seq(Sigma, (tau,) * n)),
-        shapes(Sigma, k.ty, k.hs | {n}),
-    )
+    match k:
+        case Rest(ListType(tau), hs):
+            if n in hs:
+                return None
+            return (
+                tuple(List(tau, ks) for ks in shapes_seq(Sigma, (tau,) * n)),
+                shapes(Sigma, k.ty, hs | {n}),
+            )
+        case _:
+            return None
 
 
 def split_dict(
     Sigma: ClassTable, k: Shape, ws: tuple[tuple[str, ast.pattern], ...]
 ) -> Split | None:
-    if not isinstance(k, Dict):
-        return None
-    beta = dict(k.beta)
-    w = next((w for w, _ in ws if w not in beta), None)
-    if w is None or w in k.hs:
-        return None
-    return (
-        tuple(with_keys(k, (w,), (m,)) for m in shapes(Sigma, k.value, frozenset())),
-        (Dict(k.value, k.beta, k.hs | {w}),),
-    )
+    match k:
+        case Dict():
+            beta = dict(k.beta)
+            w = next((w for w, _ in ws if w not in beta), None)
+            if w is None or w in k.hs:
+                return None
+            return (
+                tuple(
+                    with_keys(k, (w,), (m,))
+                    for m in shapes(Sigma, k.value, frozenset())
+                ),
+                (Dict(k.value, k.beta, k.hs | {w}),),
+            )
+        case _:
+            return None
 
 
 def split_class(Sigma: ClassTable, k: Rest, c: Class) -> Split | None:
     if below_excluded(Sigma, c, k.hs):
         return None
     tau = meet(Sigma, k.ty, ClassType(c))
-    if not isinstance(tau, ClassType):
-        return None
-    d = tau.c
-    sigmas = tuple(declared_type(Sigma, d, x) for x in fields(Sigma, d))
-    hs_ = typed_heads(Sigma, k.hs, tau)
-    return (
-        tuple(Constr(d, ks, hs_) for ks in shapes_seq(Sigma, sigmas)),
-        shapes(Sigma, k.ty, k.hs | {c}),
-    )
+    match tau:
+        case ClassType(d):
+            sigmas = tuple(declared_type(Sigma, d, x) for x in fields(Sigma, d))
+            hs_ = typed_heads(Sigma, k.hs, tau)
+            return (
+                tuple(Constr(d, ks, hs_) for ks in shapes_seq(Sigma, sigmas)),
+                shapes(Sigma, k.ty, k.hs | {c}),
+            )
+        case _:
+            return None
 
 
 def split_subclass(Sigma: ClassTable, k: Constr, c: Class) -> Split | None:
@@ -287,38 +330,38 @@ def match_shapes(
 def seq_safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> bool:
     if isinstance(tau, UnionType):
         return seq_safe(p, tau.left, mod_ctx) and seq_safe(p, tau.right, mod_ctx)
-    if isinstance(p, PatTuple):
-        if isinstance(tau, ListType) or tau in (Primitive.SIZED, Primitive.OBJECT):
-            return False
-        if isinstance(tau, TupleType) and len(tau.components) == len(p.patterns):
+    match p:
+        case PatTuple(patterns=ps):
+            if isinstance(tau, ListType) or tau in (Primitive.SIZED, Primitive.OBJECT):
+                return False
+            if isinstance(tau, TupleType) and len(tau.components) == len(ps):
+                return all(seq_safe(q, c, mod_ctx) for q, c in zip(ps, tau.components))
+            return True
+        case PatList(patterns=ps):
+            if isinstance(tau, TupleType) or tau in (Primitive.SIZED, Primitive.OBJECT):
+                return False
+            if isinstance(tau, ListType):
+                return all(seq_safe(q, tau.elem, mod_ctx) for q in ps)
+            return True
+        case ast.MatchMapping(patterns=ps):
+            if isinstance(tau, DictType):
+                return all(seq_safe(q, tau.value, mod_ctx) for q in ps)
+            return True
+        case ast.MatchClass():
+            c = class_of_name(p.cls, mod_ctx)
+            if c is None:
+                return True  # the match rules reject with a sharper reason
+            args = field_map(mod_ctx.Sigma, c, p.patterns, p.kwd_attrs, p.kwd_patterns)
+            if args is None:
+                return True  # likewise
             return all(
-                seq_safe(q, c, mod_ctx) for q, c in zip(p.patterns, tau.components)
+                seq_safe(args[x], declared_type(mod_ctx.Sigma, c, x), mod_ctx)
+                for x in fields(mod_ctx.Sigma, c)
             )
-        return True
-    if isinstance(p, PatList):
-        if isinstance(tau, TupleType) or tau in (Primitive.SIZED, Primitive.OBJECT):
-            return False
-        if isinstance(tau, ListType):
-            return all(seq_safe(q, tau.elem, mod_ctx) for q in p.patterns)
-        return True
-    if isinstance(p, ast.MatchMapping):
-        if isinstance(tau, DictType):
-            return all(seq_safe(q, tau.value, mod_ctx) for q in p.patterns)
-        return True
-    if isinstance(p, ast.MatchClass):
-        c = class_of_name(p.cls, mod_ctx)
-        if c is None:
-            return True  # the match rules reject with a sharper reason
-        args = field_map(mod_ctx.Sigma, c, p.patterns, p.kwd_attrs, p.kwd_patterns)
-        if args is None:
-            return True  # likewise
-        return all(
-            seq_safe(args[x], declared_type(mod_ctx.Sigma, c, x), mod_ctx)
-            for x in fields(mod_ctx.Sigma, c)
-        )
-    if isinstance(p, ast.MatchAs):
-        return p.pattern is None or seq_safe(p.pattern, tau, mod_ctx)
-    return True
+        case ast.MatchAs():
+            return p.pattern is None or seq_safe(p.pattern, tau, mod_ctx)
+        case _:
+            return True
 
 
 def pattern_bindings(deltas: list[VarContext], node: ast.AST) -> VarContext:
@@ -382,9 +425,12 @@ def string_literal(k: ast.expr) -> str:
 
 
 def literal_of(p: ast.pattern) -> LiteralType:
-    if isinstance(p, ast.MatchSingleton):
-        return LiteralType(p.value)
-    assert isinstance(p, ast.MatchValue)
-    tau = literal_type(p.value)
-    assert tau is not None
-    return tau
+    match p:
+        case ast.MatchSingleton():
+            return LiteralType(p.value)
+        case ast.MatchValue(value=e):
+            tau = literal_type(e)
+            assert tau is not None
+            return tau
+        case _:
+            assert False
