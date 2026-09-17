@@ -137,17 +137,17 @@ def imports_seq(
 def imports(
     iota: ast.stmt, x: Var, q: QualifiedName, gamma: Context, mod_ctx: ModuleContext
 ) -> tuple[ContextEntry, ClassTable]:
-    entry = gamma.get(x)
-    if entry is None:
+    theta = gamma.get(x)
+    if theta is None:
         raise IllFormedModule(iota, reasons.UnknownMember(x, str(q)))
-    if isinstance(entry, ModuleStub):
+    if isinstance(theta, ModuleStub):
         members, Sigma = check_module(
-            mod_ctx.M[entry.q], mod_ctx.M, entry.q, mod_ctx.Sigma
+            mod_ctx.M[theta.q], mod_ctx.M, theta.q, mod_ctx.Sigma
         )
-        return ModuleLoaded(entry.q, members), Sigma
-    if entry == Status.FF:
+        return ModuleLoaded(theta.q, members), Sigma
+    if theta == Status.FF:
         raise IllFormedModule(iota, reasons.UnassignedMember(x, str(q)))
-    return entry, mod_ctx.Sigma
+    return theta, mod_ctx.Sigma
 
 
 _signatures: dict[tuple[int, QualifiedName], Context] = {}

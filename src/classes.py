@@ -31,17 +31,17 @@ def ancestors(Sigma: ClassTable, c: Class) -> list[Class]:
 
 
 def fields(Sigma: ClassTable, c: Class) -> tuple[Var, ...]:
-    entry = Sigma[c]
-    own = tuple(x for x, _ in entry.own_fields)
-    return own if entry.base is None else fields(Sigma, entry.base) + own
+    class_entry = Sigma[c]
+    own = tuple(x for x, _ in class_entry.own_fields)
+    return own if class_entry.base is None else fields(Sigma, class_entry.base) + own
 
 
 def field_type(Sigma: ClassTable, c: Class, x: Var) -> Type | None:
-    entry = Sigma[c]
-    own = dict(entry.own_fields)
+    class_entry = Sigma[c]
+    own = dict(class_entry.own_fields)
     if x in own:
         return own[x]
-    return None if entry.base is None else field_type(Sigma, entry.base, x)
+    return None if class_entry.base is None else field_type(Sigma, class_entry.base, x)
 
 
 def declared_type(Sigma: ClassTable, c: Class, x: Var) -> Type:

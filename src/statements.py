@@ -430,25 +430,25 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
     if isinstance(e, ast.Attribute):
         parent = entry_of(e.value, mod_ctx)
         if isinstance(parent, ModuleLoaded):
-            entry = parent.members.get(e.attr)
-            if entry is None:
+            theta = parent.members.get(e.attr)
+            if theta is None:
                 raise IllFormedModule(e, reasons.UnknownMember(e.attr, str(parent.q)))
-            if isinstance(entry, ModuleStub):
-                raise IllFormedModule(e, reasons.SubmoduleNotImported(str(entry.q)))
-            if isinstance(entry, ModuleLoaded):
+            if isinstance(theta, ModuleStub):
+                raise IllFormedModule(e, reasons.SubmoduleNotImported(str(theta.q)))
+            if isinstance(theta, ModuleLoaded):
                 raise IllFormedModule(e, reasons.ModuleAsValue(str(qualified_name(e))))
-            if isinstance(entry, Class):
+            if isinstance(theta, Class):
                 raise IllFormedModule(e, reasons.ClassAsValue(str(qualified_name(e))))
-            if isinstance(entry, PredefinedName):
+            if isinstance(theta, PredefinedName):
                 raise IllFormedModule(
                     e, reasons.PredefinedNameAsValue(str(qualified_name(e)))
                 )
-            if entry == Status.FF:
+            if theta == Status.FF:
                 raise IllFormedModule(
                     e, reasons.UnassignedMember(e.attr, str(parent.q))
                 )
-            assert not isinstance(entry, Status)
-            return entry
+            assert not isinstance(theta, Status)
+            return theta
         if isinstance(parent, ModuleStub):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(str(parent.q)))
         return attribute_type(synth_expr(e.value, mod_ctx), e, mod_ctx)
@@ -711,11 +711,11 @@ def check_quals(
     if len(generators) == 0:
         return {}
     g = generators[0]
-    entry = elem_entry(g.iter, mod_ctx)
+    tau = iterated_type(g.iter, mod_ctx)
     x = target_name(g)
     if x in captures_e_list(g.ifs) | captures_quals(generators[1:]):
         raise IllFormedModule(g.target, reasons.CapturedGeneratorVariable(x))
-    delta = {x: entry}
+    delta = {x: tau}
     mod_ctx_ = override_gamma(mod_ctx, delta)
     for e in g.ifs:
         check_expr(e, Primitive.BOOL, mod_ctx_)
@@ -737,7 +737,7 @@ def elem_type(Sigma: ClassTable, tau: Type) -> Type | None:
     return None
 
 
-def elem_entry(e: ast.expr, mod_ctx: ModuleContext) -> Type:
+def iterated_type(e: ast.expr, mod_ctx: ModuleContext) -> Type:
     t = synth_expr(e, mod_ctx)
     elem = elem_type(mod_ctx.Sigma, t)
     if elem is None:
@@ -759,10 +759,10 @@ def class_declared(
     if len(node.bases) > 0:
         assert isinstance(node.bases[0], ast.Name)
         base_name = node.bases[0].id
-        entry = mod_ctx.gamma.get(base_name)
-        if not isinstance(entry, Class):
+        theta = mod_ctx.gamma.get(base_name)
+        if not isinstance(theta, Class):
             raise IllFormedModule(node, reasons.NotClass(base_name))
-        base = entry
+        base = theta
         clash = set(names) & set(fields(mod_ctx.Sigma, base))
         if len(clash) > 0:
             raise IllFormedModule(

@@ -82,8 +82,8 @@ def resolve_name(q: QualifiedName, mod_ctx: ModuleContext) -> ContextEntry | Non
     q_ = parent(q)
     if q_ is None:
         return mod_ctx.gamma.get(root(q))
-    entry = resolve_name(q_, mod_ctx)
-    return entry.members.get(q.parts[-1]) if isinstance(entry, ModuleLoaded) else None
+    theta = resolve_name(q_, mod_ctx)
+    return theta.members.get(q.parts[-1]) if isinstance(theta, ModuleLoaded) else None
 
 
 def module_of(mod_ctx: ModuleContext, x: Var) -> ModuleStub | ModuleLoaded | None:
@@ -261,5 +261,5 @@ def entry_of(e: ast.expr, mod_ctx: ModuleContext) -> ContextEntry | None:
 
 
 def class_of_name(e: ast.expr, mod_ctx: ModuleContext) -> Class | None:
-    entry = entry_of(e, mod_ctx)
-    return entry if isinstance(entry, Class) else None
+    theta = entry_of(e, mod_ctx)
+    return theta if isinstance(theta, Class) else None
