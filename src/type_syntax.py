@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import ast
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -81,23 +83,23 @@ class LiteralType:
 
 @dataclass(frozen=True)
 class ListExpr:
-    elem: "TypeExpr"
+    elem: TypeExpr
 
 
 @dataclass(frozen=True)
 class TupleExpr:
-    components: tuple["TypeExpr", ...]
+    components: tuple[TypeExpr, ...]
 
 
 @dataclass(frozen=True)
 class DictExpr:
-    value: "TypeExpr"
+    value: TypeExpr
 
 
 @dataclass(frozen=True)
 class CallableExpr:
-    params: tuple["TypeExpr", ...]
-    result: "TypeExpr"
+    params: tuple[TypeExpr, ...]
+    result: TypeExpr
 
 
 @dataclass(frozen=True)
@@ -107,8 +109,8 @@ class ClassName:
 
 @dataclass(frozen=True)
 class UnionExpr:
-    left: "TypeExpr"
-    right: "TypeExpr"
+    left: TypeExpr
+    right: TypeExpr
 
 
 type TypeExpr = (
@@ -128,34 +130,34 @@ type TypeExpr = (
 
 @dataclass(frozen=True)
 class ListType:
-    elem: "Type"
+    elem: Type
 
 
 @dataclass(frozen=True)
 class TupleType:
-    components: tuple["Type", ...]
+    components: tuple[Type, ...]
 
 
 @dataclass(frozen=True)
 class DictType:
-    value: "Type"
+    value: Type
 
 
 @dataclass(frozen=True)
 class CallableType:
-    params: tuple["Type", ...]
-    result: "Type"
+    params: tuple[Type, ...]
+    result: Type
 
 
 @dataclass(frozen=True)
 class ClassType:
-    c: "Class"
+    c: Class
 
 
 @dataclass(frozen=True)
 class UnionType:
-    left: "Type"
-    right: "Type"
+    left: Type
+    right: Type
 
 
 type Type = (

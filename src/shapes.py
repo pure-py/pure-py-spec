@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product
@@ -28,25 +30,25 @@ class Rest:
 @dataclass(frozen=True)
 class Constr:
     c: Class
-    args: tuple["Shape", ...]
+    args: tuple[Shape, ...]
     heads: frozenset[Head]
 
 
 @dataclass(frozen=True)
 class Tuple:
-    components: tuple["Shape", ...]
+    components: tuple[Shape, ...]
 
 
 @dataclass(frozen=True)
 class List:
     elem: Type
-    elems: tuple["Shape", ...]
+    elems: tuple[Shape, ...]
 
 
 @dataclass(frozen=True)
 class Dict:
     value: Type
-    bound: tuple[tuple[str, "Shape"], ...]
+    bound: tuple[tuple[str, Shape], ...]
     heads: frozenset[str]
 
 
