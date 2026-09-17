@@ -75,12 +75,12 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
     if isinstance(iota, ast.Import):
         q = parse_qualified(iota.names[0].name)
         if q not in mod_ctx.M:
-            raise IllFormedModule(iota, reasons.UnknownModule(str(q)))
+            raise IllFormedModule(iota, reasons.UnknownModule(q))
         if proper_prefix_of(mod_ctx.q, q):
             raise IllFormedModule(
                 iota,
                 reasons.ImportOfContainedModule(
-                    str(q), str(mod_ctx.q), f"from {parent(q)} import {q.parts[-1]}"
+                    q, mod_ctx.q, f"from {parent(q)} import {q.parts[-1]}"
                 ),
             )
         delta, Sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
@@ -91,7 +91,7 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
     assert isinstance(iota, ast.ImportFrom) and iota.module is not None
     q = parse_qualified(iota.module)
     if q not in mod_ctx.M:
-        raise IllFormedModule(iota, reasons.UnknownModule(str(q)))
+        raise IllFormedModule(iota, reasons.UnknownModule(q))
     delta, Sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
     Sigma = load_containing(
         [p for p in proper_prefixes(q) if not prefix_of(p, mod_ctx.q)],
@@ -139,14 +139,14 @@ def imports(
 ) -> tuple[ContextEntry, ClassTable]:
     theta = gamma.get(x)
     if theta is None:
-        raise IllFormedModule(iota, reasons.UnknownMember(x, str(q)))
+        raise IllFormedModule(iota, reasons.UnknownMember(x, q))
     if isinstance(theta, ModuleStub):
         members, Sigma = check_module(
             mod_ctx.M[theta.q], mod_ctx.M, theta.q, mod_ctx.Sigma
         )
         return ModuleLoaded(theta.q, members), Sigma
     if theta == Status.FF:
-        raise IllFormedModule(iota, reasons.UnassignedMember(x, str(q)))
+        raise IllFormedModule(iota, reasons.UnassignedMember(x, q))
     return theta, mod_ctx.Sigma
 
 
@@ -215,7 +215,7 @@ def check_submodule_names(
         x = xs[0]
         node = find_binder(m.body, x)
         assert node is not None
-        raise IllFormedModule(node, reasons.SubmoduleNameBound(x, str(qualified(q, x))))
+        raise IllFormedModule(node, reasons.SubmoduleNameBound(x, q))
 
 
 def binds_name(s: ast.stmt, x: str) -> bool:

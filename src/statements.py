@@ -73,6 +73,7 @@ from type_syntax import (
     ListType,
     LiteralType,
     Primitive,
+    QualifiedName,
     TupleExpr,
     TupleType,
     Type,
@@ -110,7 +111,7 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
     if isinstance(psi, ClassName):
         c = resolve_name(psi.q, mod_ctx)
         if not isinstance(c, Class):
-            raise IllFormedModule(node, reasons.NotClass(str(psi.q)))
+            raise IllFormedModule(node, reasons.NotClass(psi.q))
         return ClassType(c)
     if isinstance(psi, ListExpr):
         check_in_scope("list", node, mod_ctx)
@@ -227,14 +228,12 @@ def check_implicit_return(
     Sigma: ClassTable, d: ast.FunctionDef, declared: Type
 ) -> None:
     if not subtype(Sigma, Primitive.NONE, declared):
-        raise IllFormedModule(d, reasons.MissingReturn(d.name, render(declared)))
+        raise IllFormedModule(d, reasons.MissingReturn(d.name, declared))
 
 
 def check_returns_none(Sigma: ClassTable, s: ast.Return, declared: Type) -> None:
     if not subtype(Sigma, Primitive.NONE, declared):
-        raise IllFormedModule(
-            s, reasons.TypeMismatch(render(declared), render(Primitive.NONE))
-        )
+        raise IllFormedModule(s, reasons.TypeMismatch(declared, Primitive.NONE))
 
 
 def check_assign_target(target: ast.Name, captured: set[Var]) -> None:
@@ -318,9 +317,7 @@ def match_cases(
         if not seq_safe(case.pattern, tau, mod_ctx):
             raise IllFormedModule(
                 case.pattern,
-                reasons.SequenceKindMismatch(
-                    describe(case.pattern, mod_ctx), render(tau)
-                ),
+                reasons.SequenceKindMismatch(describe(case.pattern, mod_ctx), tau),
             )
         result = match_shapes(residual, case.pattern, mod_ctx)
         if result is None:
@@ -345,11 +342,13 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
     if isinstance(e, ast.Name):
         if not is_assigned(mod_ctx, e.id):
             if module_of(mod_ctx, e.id) is not None:
-                raise IllFormedModule(e, reasons.ModuleAsValue(e.id))
+                raise IllFormedModule(e, reasons.ModuleAsValue(QualifiedName((e.id,))))
             if isinstance(mod_ctx.gamma.get(e.id), Class):
-                raise IllFormedModule(e, reasons.ClassAsValue(e.id))
+                raise IllFormedModule(e, reasons.ClassAsValue(QualifiedName((e.id,))))
             if isinstance(mod_ctx.gamma.get(e.id), PredefinedName):
-                raise IllFormedModule(e, reasons.PredefinedNameAsValue(e.id))
+                raise IllFormedModule(
+                    e, reasons.PredefinedNameAsValue(QualifiedName((e.id,)))
+                )
             if e.id not in mod_ctx.gamma:
                 raise IllFormedModule(e, reasons.UndefinedVariable(e.id))
             raise IllFormedModule(e, reasons.UnassignedVariable(e.id))
@@ -401,7 +400,7 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         name = UNARY_NAMES[type(e.op)]
         resolved = minimum(mod_ctx.Sigma, overloads_unary(mod_ctx.Sigma, name, operand))
         if resolved is None:
-            raise IllFormedModule(e, reasons.NoUnaryOverload(name, render(operand)))
+            raise IllFormedModule(e, reasons.NoUnaryOverload(name, operand))
         _, result = resolved
         return result
     if isinstance(e, ast.BoolOp):
@@ -421,25 +420,23 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         if isinstance(parent, ModuleLoaded):
             theta = parent.members.get(e.attr)
             if theta is None:
-                raise IllFormedModule(e, reasons.UnknownMember(e.attr, str(parent.q)))
+                raise IllFormedModule(e, reasons.UnknownMember(e.attr, parent.q))
             if isinstance(theta, ModuleStub):
-                raise IllFormedModule(e, reasons.SubmoduleNotImported(str(theta.q)))
+                raise IllFormedModule(e, reasons.SubmoduleNotImported(theta.q))
             if isinstance(theta, ModuleLoaded):
-                raise IllFormedModule(e, reasons.ModuleAsValue(str(qualified_name(e))))
+                raise IllFormedModule(e, reasons.ModuleAsValue(qualified_name(e)))
             if isinstance(theta, Class):
-                raise IllFormedModule(e, reasons.ClassAsValue(str(qualified_name(e))))
+                raise IllFormedModule(e, reasons.ClassAsValue(qualified_name(e)))
             if isinstance(theta, PredefinedName):
                 raise IllFormedModule(
-                    e, reasons.PredefinedNameAsValue(str(qualified_name(e)))
+                    e, reasons.PredefinedNameAsValue(qualified_name(e))
                 )
             if theta == Status.FF:
-                raise IllFormedModule(
-                    e, reasons.UnassignedMember(e.attr, str(parent.q))
-                )
+                raise IllFormedModule(e, reasons.UnassignedMember(e.attr, parent.q))
             assert not isinstance(theta, Status)
             return theta
         if isinstance(parent, ModuleStub):
-            raise IllFormedModule(e, reasons.SubmoduleNotImported(str(parent.q)))
+            raise IllFormedModule(e, reasons.SubmoduleNotImported(parent.q))
         return attribute_type(synth_expr(e.value, mod_ctx), e, mod_ctx)
     if isinstance(e, ast.Subscript):
         return subscript_type(synth_expr(e.value, mod_ctx), e, mod_ctx)
@@ -472,7 +469,7 @@ def attribute_type(obj: Type, e: ast.Attribute, mod_ctx: ModuleContext) -> Type:
             ],
         )
     if not isinstance(obj, ClassType):
-        raise IllFormedModule(e, reasons.NoAttributes(render(obj)))
+        raise IllFormedModule(e, reasons.NoAttributes(obj))
     member = field_type(mod_ctx.Sigma, obj.c, e.attr)
     if member is None:
         raise IllFormedModule(e, reasons.UnknownField(short_name(obj.c), e.attr))
@@ -499,7 +496,7 @@ def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) ->
         return container.value
     if isinstance(container, TupleType):
         return tuple_subscript_type(container, e.slice, mod_ctx)
-    raise IllFormedModule(e, reasons.NotSubscriptable(render(container)))
+    raise IllFormedModule(e, reasons.NotSubscriptable(container))
 
 
 def tuple_subscript_type(
@@ -510,9 +507,7 @@ def tuple_subscript_type(
     i = literal_index(actual)
     if i is None:
         if actual != Primitive.INT:
-            raise IllFormedModule(
-                index, reasons.TypeMismatch(render(Primitive.INT), render(actual))
-            )
+            raise IllFormedModule(index, reasons.TypeMismatch(Primitive.INT, actual))
         return join_seq(mod_ctx.Sigma, container.components)
     if not -m <= i < m:
         raise IllFormedModule(index, reasons.TupleIndexOutOfRange(i, m))
@@ -586,7 +581,7 @@ def result_type(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> Type:
             [result_type(fn.left, e, mod_ctx), result_type(fn.right, e, mod_ctx)],
         )
     if not isinstance(fn, CallableType):
-        raise IllFormedModule(e, reasons.NotCallable(render(fn)))
+        raise IllFormedModule(e, reasons.NotCallable(fn))
     if len(fn.params) != len(e.args):
         raise IllFormedModule(e, reasons.CallArityMismatch(len(fn.params), len(e.args)))
     for arg, param in zip(e.args, fn.params):
@@ -649,20 +644,17 @@ def check_expr(e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
         return
     actual = synth_expr(e, mod_ctx)
     if not subtype(mod_ctx.Sigma, actual, expected):
-        raise IllFormedModule(e, reasons.TypeMismatch(render(expected), render(actual)))
+        raise IllFormedModule(e, reasons.TypeMismatch(expected, actual))
 
 
 def check_lambda(e: ast.Lambda, expected: Type, mod_ctx: ModuleContext) -> None:
     params = [a.arg for a in e.args.args]
     if not isinstance(expected, CallableType):
-        raise IllFormedModule(e, reasons.TypeMismatch(render(expected), "a lambda"))
+        raise IllFormedModule(e, reasons.LambdaTypeMismatch(expected, None))
     if len(params) != len(expected.params):
         raise IllFormedModule(
             e,
-            reasons.TypeMismatch(
-                render(expected),
-                f"a lambda of {len(params)} parameter{'' if len(params) == 1 else 's'}",
-            ),
+            reasons.LambdaTypeMismatch(expected, len(params)),
         )
     delta = dict(zip(params, expected.params))
     check_expr(e.body, expected.result, override_gamma(mod_ctx, delta))
@@ -676,9 +668,7 @@ def binary(
         mod_ctx.Sigma, overloads_binary(mod_ctx.Sigma, op, sigma, sigma_)
     )
     if resolved is None:
-        raise IllFormedModule(
-            e, reasons.NoBinaryOverload(op, render(sigma), render(sigma_))
-        )
+        raise IllFormedModule(e, reasons.NoBinaryOverload(op, sigma, sigma_))
     _, result = resolved
     return result
 
@@ -730,7 +720,7 @@ def iterated_type(e: ast.expr, mod_ctx: ModuleContext) -> Type:
     t = synth_expr(e, mod_ctx)
     elem = elem_type(mod_ctx.Sigma, t)
     if elem is None:
-        raise IllFormedModule(e, reasons.NotIterable(render(t)))
+        raise IllFormedModule(e, reasons.NotIterable(t))
     return elem
 
 
@@ -750,7 +740,7 @@ def class_declared(
         base_name = node.bases[0].id
         theta = mod_ctx.gamma.get(base_name)
         if not isinstance(theta, Class):
-            raise IllFormedModule(node, reasons.NotClass(base_name))
+            raise IllFormedModule(node, reasons.NotClass(QualifiedName((base_name,))))
         base = theta
         duplicates = set(names) & set(fields(mod_ctx.Sigma, base))
         if len(duplicates) > 0:

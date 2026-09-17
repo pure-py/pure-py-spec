@@ -1,1 +1,1 @@
-'sub' is bound in the module and also names its submodule 'pkg.sub'
+module 'pkg' binds 'sub' and also has submodule 'pkg.sub'
