@@ -268,25 +268,22 @@ class Runner:
         print(f"{GREEN}✓ {total}/{total} passed{RESET}")
 
 
-def check_rule_names(r: Runner) -> None:
-    """A citation names one rule, so no two rules may carry the same name."""
+def check_unique_rule_names(r: Runner) -> None:
     where: dict[str, list[str]] = {}
     for source in ("spec", "paper"):
         for f in sorted((ROOT / source).rglob("*.tex")):
             for name in RULE_DEF.findall(f.read_text(encoding="utf-8")):
                 where.setdefault(name, []).append(str(f.relative_to(ROOT)))
-    clashes = [
+    duplicates = [
         f"{name} in {', '.join(files)}" for name, files in sorted(where.items()) if len(files) > 1
     ]
-    if clashes:
-        r.bad("unique rule names", "; ".join(clashes))
+    if duplicates:
+        r.bad("unique rule names", "; ".join(duplicates))
     else:
         r.ok("unique rule names")
 
 
-def check_rule_citations(r: Runner, base: pathlib.Path) -> None:
-    """Every `# rule: X` in a test must name a rule the spec defines, so a
-    citation cannot outlive the rule it points at."""
+def check_rule_attribution(r: Runner, base: pathlib.Path) -> None:
     spec = {
         m
         for f in sorted((ROOT / "spec").rglob("*.tex"))
@@ -306,7 +303,7 @@ def check_rule_citations(r: Runner, base: pathlib.Path) -> None:
         r.ok("rule attribution")
 
 
-def check_mypy_tests(r: Runner, module: pathlib.Path) -> None:
+def check_mypy_compatibility(r: Runner, module: pathlib.Path) -> None:
     """Every semantically-valid test must type-check under mypy, except those
     under mypy-incompatible, which record where PurePy is the more permissive
     of the two."""
@@ -356,8 +353,8 @@ def main() -> None:
     r = Runner(interpreter)
 
     print("cross-references")
-    check_rule_names(r)
-    check_rule_citations(r, base)
+    check_unique_rule_names(r)
+    check_rule_attribution(r, base)
 
     if not skip_mypy:
         print("mypy and ruff over src/")
@@ -375,7 +372,7 @@ def main() -> None:
                 break
         else:
             r.ok("checker type-checks")
-        check_mypy_tests(r, module)
+        check_mypy_compatibility(r, module)
 
     last = None
     for p in sorted(module.rglob("*.py"), key=lambda p: (p.parent.as_posix(), p.name)):
