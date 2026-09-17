@@ -351,32 +351,8 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         case ast.Lambda():
             raise IllFormedModule(e, reasons.NotSynthesised())
         case ast.Call():
-            constructed = class_of_name(e.func, mod_ctx)
-            if constructed is not None:
-                c_name, xs = short_name(constructed), fields(mod_ctx.Sigma, constructed)
-                kwd_names = [k.arg for k in e.keywords if k.arg is not None]
-                args = field_map(
-                    mod_ctx.Sigma,
-                    constructed,
-                    e.args,
-                    kwd_names,
-                    [k.value for k in e.keywords],
-                )
-                if args is None:
-                    n = len(e.args)
-                    if n + len(kwd_names) != len(xs):
-                        raise IllFormedModule(
-                            e,
-                            reasons.ConstructorArityMismatch(c_name, len(xs), n + len(kwd_names)),
-                        )
-                    raise IllFormedModule(
-                        e,
-                        reasons.UnknownConstructorKeyword(c_name, tuple(sorted(set(xs[n:])))),
-                    )
-                for x, arg in args.items():
-                    check_expr(arg, declared_type(mod_ctx.Sigma, constructed, x), mod_ctx)
-                return ClassType(constructed)
-            return call(e, mod_ctx)
+            c = class_of_name(e.func, mod_ctx)
+            return call(e, mod_ctx) if c is None else constr(c, e, mod_ctx)
         case ast.BinOp():
             return binary(BINARY_NAMES[type(e.op)], e.left, e.right, e, mod_ctx)
         case ast.UnaryOp():
@@ -553,6 +529,24 @@ def synthesises(e: ast.expr) -> bool:
 
 def dict_type(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> DictType:
     return DictType(list_type(node, es, mod_ctx).elem)
+
+
+def constr(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> Type:
+    xs = fields(mod_ctx.Sigma, c)
+    kwd_names = [k.arg for k in e.keywords if k.arg is not None]
+    args = field_map(mod_ctx.Sigma, c, e.args, kwd_names, [k.value for k in e.keywords])
+    if args is None:
+        n = len(e.args)
+        if n + len(kwd_names) != len(xs):
+            raise IllFormedModule(
+                e, reasons.ConstructorArityMismatch(short_name(c), len(xs), n + len(kwd_names))
+            )
+        raise IllFormedModule(
+            e, reasons.UnknownConstructorKeyword(short_name(c), tuple(sorted(set(xs[n:]))))
+        )
+    for x, arg in args.items():
+        check_expr(arg, declared_type(mod_ctx.Sigma, c, x), mod_ctx)
+    return ClassType(c)
 
 
 def call(e: ast.Call, mod_ctx: ModuleContext) -> Type:
