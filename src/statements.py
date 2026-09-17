@@ -404,24 +404,7 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             parent = entry_of(e_, mod_ctx)
             match parent:
                 case ModuleLoaded():
-                    theta = parent.members.get(x)
-                    match theta:
-                        case None:
-                            raise IllFormedModule(e, reasons.UnknownMember(x, parent.q))
-                        case ModuleStub(q):
-                            raise IllFormedModule(e, reasons.SubmoduleNotImported(q))
-                        case ModuleLoaded():
-                            raise IllFormedModule(e, reasons.ModuleAsValue(qualified_name(e)))
-                        case Class():
-                            raise IllFormedModule(e, reasons.ClassAsValue(qualified_name(e)))
-                        case PredefinedName():
-                            raise IllFormedModule(
-                                e, reasons.PredefinedNameAsValue(qualified_name(e))
-                            )
-                        case Status():
-                            raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
-                        case _:
-                            return theta
+                    return attr_module(parent, x, e)
                 case ModuleStub(q):
                     raise IllFormedModule(e, reasons.SubmoduleNotImported(q))
                 case _:
@@ -444,6 +427,25 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             return DictType(base_type(synth_expr(e.value, mod_ctx_)))
         case _:
             raise AssertionError(f"unexpected expression: {type(e).__name__}")
+
+
+def attr_module(parent: ModuleLoaded, x: Var, e: ast.Attribute) -> Type:
+    theta = parent.members.get(x)
+    match theta:
+        case None:
+            raise IllFormedModule(e, reasons.UnknownMember(x, parent.q))
+        case ModuleStub(q):
+            raise IllFormedModule(e, reasons.SubmoduleNotImported(q))
+        case ModuleLoaded():
+            raise IllFormedModule(e, reasons.ModuleAsValue(qualified_name(e)))
+        case Class():
+            raise IllFormedModule(e, reasons.ClassAsValue(qualified_name(e)))
+        case PredefinedName():
+            raise IllFormedModule(e, reasons.PredefinedNameAsValue(qualified_name(e)))
+        case Status():
+            raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
+        case _:
+            return theta
 
 
 def attribute_type(obj: Type, e: ast.Attribute, mod_ctx: ModuleContext) -> Type:
