@@ -62,20 +62,22 @@ def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
 
 
 def var_entry(mod_ctx: ModuleContext, x: Var) -> VarEntry | None:
-    v = mod_ctx.gamma.get(x)
-    if v is None or isinstance(v, (ModuleStub, ModuleLoaded, Class, PredefinedName)):
+    theta = mod_ctx.gamma.get(x)
+    if theta is None or isinstance(
+        theta, (ModuleStub, ModuleLoaded, Class, PredefinedName)
+    ):
         return None
-    return v
+    return theta
 
 
 def var_type(mod_ctx: ModuleContext, x: Var) -> Type | None:
-    v = var_entry(mod_ctx, x)
-    return None if v is None or isinstance(v, Status) else v
+    theta = var_entry(mod_ctx, x)
+    return None if theta is None or isinstance(theta, Status) else theta
 
 
 def is_assigned(mod_ctx: ModuleContext, x: Var) -> bool:
-    v = var_entry(mod_ctx, x)
-    return v is not None and v != Status.FF
+    theta = var_entry(mod_ctx, x)
+    return theta is not None and theta != Status.FF
 
 
 def resolve_name(q: QualifiedName, mod_ctx: ModuleContext) -> ContextEntry | None:
@@ -87,8 +89,8 @@ def resolve_name(q: QualifiedName, mod_ctx: ModuleContext) -> ContextEntry | Non
 
 
 def module_of(mod_ctx: ModuleContext, x: Var) -> ModuleStub | ModuleLoaded | None:
-    v = mod_ctx.gamma.get(x)
-    return v if isinstance(v, (ModuleStub, ModuleLoaded)) else None
+    theta = mod_ctx.gamma.get(x)
+    return theta if isinstance(theta, (ModuleStub, ModuleLoaded)) else None
 
 
 @dataclass(frozen=True)
