@@ -97,7 +97,7 @@ uv run --locked python src/check_module.py path/to/module.py
 uv run --locked python src/check_program.py path/to/main.py
 ```
 
-## Submission
+## PLDI 2027 submission
 
 `make paper-submission` builds the anonymised paper and `supplementary.zip`, which carries the anonymised
 specification and the Isabelle mechanisation. It refuses to build unless the `isabelle-purepy` submodule is
