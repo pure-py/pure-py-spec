@@ -108,7 +108,7 @@ def match_list(k: Shape, p: PatList, mod_ctx: ModuleContext) -> Match | None:
     ps = tuple(p.patterns)
     if isinstance(k, List) and len(k.elems) == len(ps):
         return map_seq_match(
-            lambda r: List(k.elem, r), match_seq(k.elems, ps, p, mod_ctx)
+            lambda ks: List(k.elem, ks), match_seq(k.elems, ps, p, mod_ctx)
         )
     return None
 
@@ -130,9 +130,9 @@ def match_dict(k: Shape, p: ast.MatchMapping, mod_ctx: ModuleContext) -> Match |
 
 
 def match_constr(k: Shape, p: ast.MatchClass, mod_ctx: ModuleContext) -> Match | None:
-    cls = class_of_pattern(p, mod_ctx)
-    ps = pattern_seq(mod_ctx.Sigma, cls, p)
-    if isinstance(k, Constr) and subtype(mod_ctx.Sigma, ClassType(k.c), ClassType(cls)):
+    c = class_of_pattern(p, mod_ctx)
+    ps = pattern_seq(mod_ctx.Sigma, c, p)
+    if isinstance(k, Constr) and subtype(mod_ctx.Sigma, ClassType(k.c), ClassType(c)):
         result = match_seq(k.args, padded(ps, len(k.args)), p, mod_ctx)
         return map_seq_match(lambda ks: Constr(k.c, ks, k.heads), result)
     return None
@@ -149,11 +149,11 @@ def split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Split | None:
     if isinstance(p, ast.MatchMapping):
         return split_dict(Sigma, k, key_patterns(p))
     assert isinstance(p, ast.MatchClass)
-    cls = class_of_pattern(p, mod_ctx)
+    c = class_of_pattern(p, mod_ctx)
     if isinstance(k, Rest):
-        return split_class(Sigma, k, cls)
+        return split_class(Sigma, k, c)
     if isinstance(k, Constr):
-        return split_subclass(Sigma, k, cls)
+        return split_subclass(Sigma, k, c)
     return None
 
 
@@ -202,47 +202,48 @@ def split_dict(
     )
 
 
-def split_class(Sigma: ClassTable, k: Rest, cls: Class) -> Split | None:
-    if below_excluded(Sigma, cls, k.heads):
+def split_class(Sigma: ClassTable, k: Rest, c: Class) -> Split | None:
+    if below_excluded(Sigma, c, k.heads):
         return None
-    low = meet(Sigma, k.ty, ClassType(cls))
-    if not isinstance(low, ClassType):
+    tau = meet(Sigma, k.ty, ClassType(c))
+    if not isinstance(tau, ClassType):
         return None
-    types = tuple(declared_type(Sigma, low.c, x) for x in fields(Sigma, low.c))
-    kept = typed_heads(Sigma, k.heads, low)
+    d = tau.c
+    sigmas = tuple(declared_type(Sigma, d, x) for x in fields(Sigma, d))
+    heads_ = typed_heads(Sigma, k.heads, tau)
     return (
-        tuple(Constr(low.c, ks, kept) for ks in shapes_seq(Sigma, types)),
-        shapes(Sigma, k.ty, k.heads | {cls}),
+        tuple(Constr(d, ks, heads_) for ks in shapes_seq(Sigma, sigmas)),
+        shapes(Sigma, k.ty, k.heads | {c}),
     )
 
 
-def split_subclass(Sigma: ClassTable, k: Constr, cls: Class) -> Split | None:
-    if cls == k.c or not subtype(Sigma, ClassType(cls), ClassType(k.c)):
+def split_subclass(Sigma: ClassTable, k: Constr, c: Class) -> Split | None:
+    if c == k.c or not subtype(Sigma, ClassType(c), ClassType(k.c)):
         return None
-    if below_excluded(Sigma, cls, k.heads):
+    if below_excluded(Sigma, c, k.heads):
         return None
-    own = tuple(declared_type(Sigma, cls, x) for x in fields(Sigma, cls)[len(k.args) :])
-    kept = typed_heads(Sigma, k.heads, ClassType(cls))
+    sigmas = tuple(declared_type(Sigma, c, x) for x in fields(Sigma, c)[len(k.args) :])
+    heads_ = typed_heads(Sigma, k.heads, ClassType(c))
     return (
-        tuple(Constr(cls, k.args + ks, kept) for ks in shapes_seq(Sigma, own)),
-        (Constr(k.c, k.args, k.heads | {cls}),),
+        tuple(Constr(c, k.args + ks, heads_) for ks in shapes_seq(Sigma, sigmas)),
+        (Constr(k.c, k.args, k.heads | {c}),),
     )
 
 
 def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
-    cls = class_of_name(p.cls, mod_ctx)
-    if cls is None:
-        raise IllFormedModule(p, reasons.NotClass(str(qualified_name(p.cls))))
-    return cls
+    c = class_of_name(p.c, mod_ctx)
+    if c is None:
+        raise IllFormedModule(p, reasons.NotClass(str(qualified_name(p.c))))
+    return c
 
 
 def pattern_seq(
-    Sigma: ClassTable, cls: Class, p: ast.MatchClass
+    Sigma: ClassTable, c: Class, p: ast.MatchClass
 ) -> tuple[ast.pattern, ...]:
-    args = field_map(Sigma, cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
+    args = field_map(Sigma, c, p.patterns, p.kwd_attrs, p.kwd_patterns)
     if args is None:
-        raise no_field_map(Sigma, cls, p)
-    return tuple(args[x] for x in fields(Sigma, cls))
+        raise no_field_map(Sigma, c, p)
+    return tuple(args[x] for x in fields(Sigma, c))
 
 
 def match_seq(
@@ -299,15 +300,15 @@ def seq_safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> bool:
             return all(seq_safe(q, tau.value, mod_ctx) for q in p.patterns)
         return True
     if isinstance(p, ast.MatchClass):
-        cls = class_of_name(p.cls, mod_ctx)
-        if cls is None:
+        c = class_of_name(p.c, mod_ctx)
+        if c is None:
             return True  # the match rules reject with a sharper reason
-        args = field_map(mod_ctx.Sigma, cls, p.patterns, p.kwd_attrs, p.kwd_patterns)
+        args = field_map(mod_ctx.Sigma, c, p.patterns, p.kwd_attrs, p.kwd_patterns)
         if args is None:
             return True  # likewise
         return all(
-            seq_safe(args[x], declared_type(mod_ctx.Sigma, cls, x), mod_ctx)
-            for x in fields(mod_ctx.Sigma, cls)
+            seq_safe(args[x], declared_type(mod_ctx.Sigma, c, x), mod_ctx)
+            for x in fields(mod_ctx.Sigma, c)
         )
     if isinstance(p, ast.MatchAs):
         return p.pattern is None or seq_safe(p.pattern, tau, mod_ctx)
@@ -345,9 +346,9 @@ def padded(ps: tuple[ast.pattern, ...], n: int) -> tuple[ast.pattern, ...]:
     return ps + tuple(ast.MatchAs() for _ in range(n - len(ps)))
 
 
-def no_field_map(Sigma: ClassTable, cls: Class, p: ast.MatchClass) -> IllFormedModule:
+def no_field_map(Sigma: ClassTable, c: Class, p: ast.MatchClass) -> IllFormedModule:
     """Why field-map is undefined for the pattern's arguments."""
-    c, xs = short_name(cls), fields(Sigma, cls)
+    c, xs = short_name(c), fields(Sigma, c)
     n = len(p.patterns)
     if n + len(p.kwd_attrs) != len(xs):
         return IllFormedModule(

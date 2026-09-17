@@ -786,6 +786,6 @@ def describe(p: ast.pattern, mod_ctx: ModuleContext) -> str:
     if isinstance(p, ast.MatchMapping):
         return "a dictionary pattern"
     assert isinstance(p, ast.MatchClass)
-    cls = class_of_name(p.cls, mod_ctx)
-    assert cls is not None
-    return f"a pattern for class {short_name(cls)}"
+    c = class_of_name(p.c, mod_ctx)
+    assert c is not None
+    return f"a pattern for class {short_name(c)}"
