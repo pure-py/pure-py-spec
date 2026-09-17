@@ -338,7 +338,7 @@ def case_matches_nothing(
         return IllFormedModule(
             p, reasons.PatternTypeMismatch(describe(p, mod_ctx), render(tau))
         )
-    return IllFormedModule(p, reasons.CaseMatchesNothing(index))
+    return IllFormedModule(p, reasons.UnreachableCase(index))
 
 
 def check_case(
@@ -778,14 +778,14 @@ def describe(p: ast.pattern, mod_ctx: ModuleContext) -> str:
         assert p.pattern is not None  # a bare variable or wildcard always matches
         return describe(p.pattern, mod_ctx)
     if isinstance(p, (ast.MatchValue, ast.MatchSingleton)):
-        return f"a pattern of type {render(literal_of(p))}"
+        return f"pattern of type {render(literal_of(p))}"
     if isinstance(p, PatList):
-        return "a list pattern"
+        return "list pattern"
     if isinstance(p, PatTuple):
-        return "a tuple pattern"
+        return "tuple pattern"
     if isinstance(p, ast.MatchMapping):
-        return "a dictionary pattern"
+        return "dictionary pattern"
     assert isinstance(p, ast.MatchClass)
     c = class_of_name(p.cls, mod_ctx)
     assert c is not None
-    return f"a pattern for class {short_name(c)}"
+    return f"pattern for class {short_name(c)}"

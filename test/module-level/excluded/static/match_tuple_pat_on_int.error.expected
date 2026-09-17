@@ -1,1 +1,1 @@
-a tuple pattern cannot match a value of type Literal[5]
+tuple pattern cannot match values of type Literal[5]

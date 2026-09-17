@@ -27,7 +27,7 @@ class ClassRebound:
     c: str
 
     def message(self) -> str:
-        return f"'{self.c}' is bound to a class and cannot be rebound at the top level"
+        return f"'{self.c}' is bound to a class and cannot be rebound at top level"
 
 
 @dataclass(frozen=True)
@@ -67,7 +67,7 @@ class CapturedGeneratorVariable:
     x: str
 
     def message(self) -> str:
-        return f"'{self.x}' bound by a generator, captured by a lambda"
+        return f"'{self.x}' bound by generator, captured by lambda"
 
 
 @dataclass(frozen=True)
@@ -199,7 +199,7 @@ class UnknownModule:
     q: str
 
     def message(self) -> str:
-        return f"unknown module {self.q!r}"
+        return f"unknown module '{self.q}'"
 
 
 @dataclass(frozen=True)
@@ -208,7 +208,7 @@ class UnknownMember:
     q: str
 
     def message(self) -> str:
-        return f"module {self.q!r} has no member {self.x!r}"
+        return f"module '{self.q}' has no member '{self.x}'"
 
 
 @dataclass(frozen=True)
@@ -227,8 +227,8 @@ class ImportOfContainedModule:
 
     def message(self) -> str:
         return (
-            f"'{self.q}' is contained in the importing module '{self.q_}'; "
-            f"a plain import is not allowed, write '{self.from_import}'"
+            f"'{self.q}' is contained in importing module '{self.q_}'; "
+            f"plain import not allowed, write '{self.from_import}'"
         )
 
 
@@ -237,7 +237,7 @@ class PredefinedNameAsValue:
     q: str
 
     def message(self) -> str:
-        return f"'{self.q}' is usable only in an annotation or as a decorator"
+        return f"'{self.q}' is usable only in annotations or as a decorator"
 
 
 @dataclass(frozen=True)
@@ -307,15 +307,15 @@ class TupleIndexOutOfRange:
     length: int
 
     def message(self) -> str:
-        return f"index {self.index} out of range for a tuple of length {self.length}"
+        return f"index {self.index} out of range for tuple of length {self.length}"
 
 
 @dataclass(frozen=True)
-class CaseMatchesNothing:
+class UnreachableCase:
     index: int
 
     def message(self) -> str:
-        return f"case {self.index} matches no value left by the earlier cases"
+        return f"case {self.index} is unreachable"
 
 
 @dataclass(frozen=True)
@@ -324,7 +324,7 @@ class PatternTypeMismatch:
     tau: str
 
     def message(self) -> str:
-        return f"{self.pattern} cannot match a value of type {self.tau}"
+        return f"{self.pattern} cannot match values of type {self.tau}"
 
 
 @dataclass(frozen=True)
@@ -334,8 +334,8 @@ class SequenceKindClash:
 
     def message(self) -> str:
         return (
-            f"{self.pattern} against a value of type {self.tau}; a list pattern "
-            "matches only lists and a tuple pattern only tuples"
+            f"{self.pattern} against values of type {self.tau}; list patterns "
+            "match only lists and tuple patterns only tuples"
         )
 
 
@@ -344,7 +344,7 @@ class NotIterable:
     tau: str
 
     def message(self) -> str:
-        return f"a value of type {self.tau} cannot be iterated"
+        return f"values of type {self.tau} cannot be iterated"
 
 
 @dataclass(frozen=True)
@@ -359,7 +359,7 @@ class UnknownField:
 @dataclass(frozen=True)
 class NotSynthesised:
     def message(self) -> str:
-        return "cannot infer the type of this expression; add an annotation to the assignment"
+        return "cannot infer type of this expression; annotate the assignment"
 
 
 @dataclass(frozen=True)
@@ -420,7 +420,7 @@ type Reason = (
     | NotIterable
     | PatternTypeMismatch
     | SequenceKindClash
-    | CaseMatchesNothing
+    | UnreachableCase
     | NotSynthesised
     | NoAttributes
     | UnknownField

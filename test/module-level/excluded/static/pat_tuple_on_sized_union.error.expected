@@ -1,1 +1,1 @@
-a tuple pattern against a value of type Sized | tuple[int, int]; a list pattern matches only lists and a tuple pattern only tuples
+tuple pattern against values of type Sized | tuple[int, int]; list patterns match only lists and tuple patterns only tuples

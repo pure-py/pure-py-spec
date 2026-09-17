@@ -1,1 +1,1 @@
-a tuple pattern against a value of type tuple[list[str], int] | tuple[tuple[int, int], int]; a list pattern matches only lists and a tuple pattern only tuples
+tuple pattern against values of type tuple[list[str], int] | tuple[tuple[int, int], int]; list patterns match only lists and tuple patterns only tuples

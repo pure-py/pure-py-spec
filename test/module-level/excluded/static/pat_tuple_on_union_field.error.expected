@@ -1,1 +1,1 @@
-a pattern for class C against a value of type __main__.C; a list pattern matches only lists and a tuple pattern only tuples
+pattern for class C against values of type __main__.C; list patterns match only lists and tuple patterns only tuples
