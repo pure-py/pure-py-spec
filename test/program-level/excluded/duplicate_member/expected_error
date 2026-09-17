@@ -1,1 +1,1 @@
-duplicate member 'sub' of module 'pkg': the module defines 'sub' and also has submodule 'pkg.sub'
+duplicate member of module 'pkg': it defines 'sub' and also has submodule 'pkg.sub'

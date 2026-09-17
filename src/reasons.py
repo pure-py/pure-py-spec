@@ -160,8 +160,8 @@ class DuplicateMember:
 
     def message(self) -> str:
         return (
-            f"duplicate member '{self.x}' of module '{self.q}': "
-            f"the module defines '{self.x}' and also has submodule '{self.q}.{self.x}'"
+            f"duplicate member of module '{self.q}': "
+            f"it defines '{self.x}' and also has submodule '{self.q}.{self.x}'"
         )
 
 
