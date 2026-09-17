@@ -28,28 +28,32 @@ def meet(Sigma: ClassTable, sigma: Type, tau: Type) -> Type:
         return sigma
     if subtype(Sigma, tau, sigma):
         return tau
-    if isinstance(sigma, UnionType):
-        return join(Sigma, meet(Sigma, sigma.left, tau), meet(Sigma, sigma.right, tau))
-    if isinstance(tau, UnionType):
-        return join(Sigma, meet(Sigma, sigma, tau.left), meet(Sigma, sigma, tau.right))
-    if (
-        isinstance(sigma, TupleType)
-        and isinstance(tau, TupleType)
-        and len(sigma.components) == len(tau.components)
-    ):
-        return TupleType(
-            tuple(meet(Sigma, a, b) for a, b in zip(sigma.components, tau.components))
-        )
-    if (
-        isinstance(sigma, CallableType)
-        and isinstance(tau, CallableType)
-        and len(sigma.params) == len(tau.params)
-    ):
-        return CallableType(
-            tuple(join(Sigma, a, b) for a, b in zip(sigma.params, tau.params)),
-            meet(Sigma, sigma.result, tau.result),
-        )
-    return Primitive.NEVER
+    match (sigma, tau):
+        case (UnionType(), _):
+            return join(
+                Sigma, meet(Sigma, sigma.left, tau), meet(Sigma, sigma.right, tau)
+            )
+        case (_, UnionType()):
+            return join(
+                Sigma, meet(Sigma, sigma, tau.left), meet(Sigma, sigma, tau.right)
+            )
+        case (TupleType(sigmas), TupleType(taus)):
+            return (
+                TupleType(tuple(meet(Sigma, a, b) for a, b in zip(sigmas, taus)))
+                if len(sigmas) == len(taus)
+                else Primitive.NEVER
+            )
+        case (CallableType(sigmas, sigma_), CallableType(taus, tau_)):
+            return (
+                CallableType(
+                    tuple(join(Sigma, a, b) for a, b in zip(sigmas, taus)),
+                    meet(Sigma, sigma_, tau_),
+                )
+                if len(sigmas) == len(taus)
+                else Primitive.NEVER
+            )
+        case _:
+            return Primitive.NEVER
 
 
 def join_seq(Sigma: ClassTable, taus: Sequence[Type]) -> Type:
@@ -63,33 +67,36 @@ def subtype(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
         return True
     if sigma == Primitive.INT and tau == Primitive.FLOAT:
         return True
-    if isinstance(sigma, UnionType):
-        return subtype(Sigma, sigma.left, tau) and subtype(Sigma, sigma.right, tau)
-    if isinstance(tau, UnionType):
-        return subtype(Sigma, sigma, tau.left) or subtype(Sigma, sigma, tau.right)
-    if isinstance(sigma, LiteralType):
-        return subtype(Sigma, base_type(sigma.value), tau)
-    if tau == Primitive.SIZED:
-        return (
-            isinstance(sigma, (ListType, DictType, TupleType)) or sigma == Primitive.STR
-        )
-    if isinstance(sigma, ClassType) and isinstance(tau, ClassType):
-        return tau.c in ancestors(Sigma, sigma.c)
-    if isinstance(sigma, TupleType) and isinstance(tau, TupleType):
-        return len(sigma.components) == len(tau.components) and all(
-            subtype(Sigma, a, b) for a, b in zip(sigma.components, tau.components)
-        )
-    if isinstance(sigma, ListType) and isinstance(tau, ListType):
-        return equivalent(Sigma, sigma.elem, tau.elem)
-    if isinstance(sigma, DictType) and isinstance(tau, DictType):
-        return equivalent(Sigma, sigma.value, tau.value)
-    if isinstance(sigma, CallableType) and isinstance(tau, CallableType):
-        return (
-            len(sigma.params) == len(tau.params)
-            and all(subtype(Sigma, b, a) for a, b in zip(sigma.params, tau.params))
-            and subtype(Sigma, sigma.result, tau.result)
-        )
-    return False
+    match (sigma, tau):
+        case (UnionType(), _):
+            return subtype(Sigma, sigma.left, tau) and subtype(Sigma, sigma.right, tau)
+        case (_, UnionType()):
+            return subtype(Sigma, sigma, tau.left) or subtype(Sigma, sigma, tau.right)
+        case (LiteralType(), _):
+            return subtype(Sigma, base_type(sigma.value), tau)
+        case (ClassType(c), ClassType(d)):
+            return d in ancestors(Sigma, c)
+        case (TupleType(sigmas), TupleType(taus)):
+            return len(sigmas) == len(taus) and all(
+                subtype(Sigma, a, b) for a, b in zip(sigmas, taus)
+            )
+        case (ListType(sigma_), ListType(tau_)):
+            return equivalent(Sigma, sigma_, tau_)
+        case (DictType(sigma_), DictType(tau_)):
+            return equivalent(Sigma, sigma_, tau_)
+        case (CallableType(sigmas, sigma_), CallableType(taus, tau_)):
+            return (
+                len(sigmas) == len(taus)
+                and all(subtype(Sigma, b, a) for a, b in zip(sigmas, taus))
+                and subtype(Sigma, sigma_, tau_)
+            )
+        case _:
+            if tau == Primitive.SIZED:
+                return (
+                    isinstance(sigma, (ListType, DictType, TupleType))
+                    or sigma == Primitive.STR
+                )
+            return False
 
 
 def equivalent(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:

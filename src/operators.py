@@ -40,19 +40,23 @@ def equality(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | No
 
 
 def equality_type(Sigma: ClassTable, tau: Type) -> bool:
-    if isinstance(tau, CallableType):
-        return False
-    if isinstance(tau, ListType):
-        return equality_type(Sigma, tau.elem)
-    if isinstance(tau, DictType):
-        return equality_type(Sigma, tau.value)
-    if isinstance(tau, TupleType):
-        return all(equality_type(Sigma, c) for c in tau.components)
-    if isinstance(tau, UnionType):
-        return equality_type(Sigma, tau.left) and equality_type(Sigma, tau.right)
-    if isinstance(tau, ClassType):
-        return class_equality_type(Sigma, tau.c)
-    return True
+    match tau:
+        case CallableType():
+            return False
+        case ListType(sigma):
+            return equality_type(Sigma, sigma)
+        case DictType(sigma):
+            return equality_type(Sigma, sigma)
+        case TupleType(taus):
+            return all(equality_type(Sigma, c) for c in taus)
+        case UnionType(sigma, tau_):
+            return equality_type(Sigma, sigma) and equality_type(Sigma, tau_)
+        case ClassType(c):
+            return class_equality_type(Sigma, c)
+        case Primitive():
+            return True
+        case LiteralType():
+            return True
 
 
 def class_equality_type(Sigma: ClassTable, c: Class) -> bool:

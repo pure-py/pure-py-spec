@@ -200,11 +200,13 @@ def override_context(gamma: Context, delta: Context) -> Context:
 
 
 def override_outcomes(r: StaticOutcome, r_: StaticOutcome) -> StaticOutcome:
-    if isinstance(r, Returns):
-        return r
-    if isinstance(r_, Returns):
-        return r_
-    return Assigns(override_context(r.delta, r_.delta))
+    match (r, r_):
+        case (Returns(), _):
+            return r
+        case (_, Returns()):
+            return r_
+        case (Assigns(delta), Assigns(delta_)):
+            return Assigns(override_context(delta, delta_))
 
 
 def extend_entry(
@@ -215,19 +217,13 @@ def extend_entry(
         return theta_
     if theta_ is None:
         return theta
-    if (
-        isinstance(theta, ModuleLoaded)
-        and isinstance(theta_, ModuleLoaded)
-        and theta.q == theta_.q
-    ):
-        return ModuleLoaded(theta.q, extend_context(theta.members, theta_.members))
-    if (
-        isinstance(theta, ModuleLoaded)
-        and isinstance(theta_, ModuleStub)
-        and theta.q == theta_.q
-    ):
-        return theta
-    return theta_
+    match (theta, theta_):
+        case (ModuleLoaded(q, gamma), ModuleLoaded(q_, gamma_)):
+            return ModuleLoaded(q, extend_context(gamma, gamma_)) if q == q_ else theta_
+        case (ModuleLoaded(q), ModuleStub(q_)):
+            return theta if q == q_ else theta_
+        case _:
+            return theta_
 
 
 def disjoint_union[V](

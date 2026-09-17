@@ -173,22 +173,24 @@ type Type = (
 
 
 def render(tau: Type) -> str:
-    if isinstance(tau, Primitive):
-        return tau.value
-    if isinstance(tau, ListType):
-        return f"list[{render(tau.elem)}]"
-    if isinstance(tau, TupleType):
-        return f"tuple[{', '.join(render(c) for c in tau.components)}]"
-    if isinstance(tau, DictType):
-        return f"dict[str, {render(tau.value)}]"
-    if isinstance(tau, CallableType):
-        params = ", ".join(render(p) for p in tau.params)
-        return f"Callable[[{params}], {render(tau.result)}]"
-    if isinstance(tau, LiteralType):
-        return f"Literal[{tau.value!r}]"
-    if isinstance(tau, ClassType):
-        return str(tau.c.name)
-    return f"{render(tau.left)} | {render(tau.right)}"
+    match tau:
+        case Primitive():
+            return tau.value
+        case ListType(sigma):
+            return f"list[{render(sigma)}]"
+        case TupleType(taus):
+            return f"tuple[{', '.join(render(c) for c in taus)}]"
+        case DictType(sigma):
+            return f"dict[str, {render(sigma)}]"
+        case CallableType(sigmas, tau_):
+            params = ", ".join(render(p) for p in sigmas)
+            return f"Callable[[{params}], {render(tau_)}]"
+        case LiteralType():
+            return f"Literal[{tau.value!r}]"
+        case ClassType(c):
+            return str(c.name)
+        case UnionType(sigma, tau_):
+            return f"{render(sigma)} | {render(tau_)}"
 
 
 def base_type(v: object) -> Type:
@@ -220,30 +222,34 @@ def base_type(v: object) -> Type:
 
 
 def parse_annotation(e: ast.expr) -> TypeExpr | None:
-    if isinstance(e, ast.Constant) and e.value is None:
-        return Primitive.NONE
-    if isinstance(e, ast.Name):
-        return next(
-            (nu for nu in Primitive if nu.value == e.id),
-            ClassName(QualifiedName((e.id,))),
-        )
-    if isinstance(e, ast.Attribute):
-        q = dotted_name(e)
-        return None if q is None else ClassName(q)
-    if isinstance(e, ast.BinOp) and isinstance(e.op, ast.BitOr):
-        return union(parse_annotation(e.left), parse_annotation(e.right))
-    if isinstance(e, ast.Subscript):
-        return parse_subscript(e)
-    return None
+    match e:
+        case ast.Constant(value=None):
+            return Primitive.NONE
+        case ast.Name(id=x):
+            return next(
+                (nu for nu in Primitive if nu.value == x),
+                ClassName(QualifiedName((x,))),
+            )
+        case ast.Attribute():
+            q = dotted_name(e)
+            return None if q is None else ClassName(q)
+        case ast.BinOp(op=ast.BitOr()):
+            return union(parse_annotation(e.left), parse_annotation(e.right))
+        case ast.Subscript():
+            return parse_subscript(e)
+        case _:
+            return None
 
 
 def dotted_name(e: ast.expr) -> QualifiedName | None:
-    if isinstance(e, ast.Name):
-        return QualifiedName((e.id,))
-    if isinstance(e, ast.Attribute):
-        q = dotted_name(e.value)
-        return None if q is None else qualified(q, e.attr)
-    return None
+    match e:
+        case ast.Name(id=x):
+            return QualifiedName((x,))
+        case ast.Attribute(value=e_, attr=x):
+            q = dotted_name(e_)
+            return None if q is None else qualified(q, x)
+        case _:
+            return None
 
 
 def parse_subscript(e: ast.Subscript) -> TypeExpr | None:
@@ -266,16 +272,15 @@ def parse_subscript(e: ast.Subscript) -> TypeExpr | None:
 
 
 def literal_type(e: ast.expr) -> LiteralType | None:
-    if isinstance(e, ast.Constant):
-        return LiteralType(e.value)
-    if not (isinstance(e, ast.UnaryOp) and isinstance(e.op, ast.USub)):
-        return None
-    if not isinstance(e.operand, ast.Constant):
-        return None
-    n = e.operand.value
-    if isinstance(n, bool) or not isinstance(n, (int, float)):
-        return None
-    return LiteralType(-n)
+    match e:
+        case ast.Constant():
+            return LiteralType(e.value)
+        case ast.UnaryOp(op=ast.USub(), operand=ast.Constant(value=n)):
+            if isinstance(n, bool) or not isinstance(n, (int, float)):
+                return None
+            return LiteralType(-n)
+        case _:
+            return None
 
 
 def parse_callable(args: tuple[ast.expr, ...]) -> TypeExpr | None:

@@ -72,34 +72,42 @@ def check_imports_prefix(
 
 
 def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, ClassTable]:
-    if isinstance(iota, ast.Import):
-        q = parse_qualified(iota.names[0].name)
-        if q not in mod_ctx.M:
-            raise IllFormedModule(iota, reasons.UnknownModule(q))
-        if proper_prefix_of(mod_ctx.q, q):
-            raise IllFormedModule(
-                iota,
-                reasons.ImportOfContainedModule(
-                    q, mod_ctx.q, f"from {parent(q)} import {q.parts[-1]}"
-                ),
+    match iota:
+        case ast.Import():
+            q = parse_qualified(iota.names[0].name)
+            if q not in mod_ctx.M:
+                raise IllFormedModule(iota, reasons.UnknownModule(q))
+            if proper_prefix_of(mod_ctx.q, q):
+                raise IllFormedModule(
+                    iota,
+                    reasons.ImportOfContainedModule(
+                        q, mod_ctx.q, f"from {parent(q)} import {q.parts[-1]}"
+                    ),
+                )
+            delta, Sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
+            theta, Sigma = loads_as(
+                q, ModuleLoaded(q, delta), replace(mod_ctx, Sigma=Sigma)
             )
-        delta, Sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
-        theta, Sigma = loads_as(
-            q, ModuleLoaded(q, delta), replace(mod_ctx, Sigma=Sigma)
-        )
-        return {root(q): theta}, Sigma
-    assert isinstance(iota, ast.ImportFrom) and iota.module is not None
-    q = parse_qualified(iota.module)
-    if q not in mod_ctx.M:
-        raise IllFormedModule(iota, reasons.UnknownModule(q))
-    delta, Sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
-    Sigma = load_containing(
-        [p for p in proper_prefixes(q) if not prefix_of(p, mod_ctx.q)],
-        replace(mod_ctx, Sigma=Sigma),
-    )
-    return imports_seq(
-        iota, [a.name for a in iota.names], q, delta, replace(mod_ctx, Sigma=Sigma)
-    )
+            return {root(q): theta}, Sigma
+        case ast.ImportFrom():
+            assert iota.module is not None
+            q = parse_qualified(iota.module)
+            if q not in mod_ctx.M:
+                raise IllFormedModule(iota, reasons.UnknownModule(q))
+            delta, Sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
+            Sigma = load_containing(
+                [p for p in proper_prefixes(q) if not prefix_of(p, mod_ctx.q)],
+                replace(mod_ctx, Sigma=Sigma),
+            )
+            return imports_seq(
+                iota,
+                [a.name for a in iota.names],
+                q,
+                delta,
+                replace(mod_ctx, Sigma=Sigma),
+            )
+        case _:
+            raise AssertionError(f"unexpected statement: {type(iota).__name__}")
 
 
 def load_containing(
@@ -219,13 +227,15 @@ def check_submodule_names(
 
 
 def binds_name(s: ast.stmt, x: str) -> bool:
-    if isinstance(s, ast.Import):
-        return root(parse_qualified(s.names[0].name)) == x
-    if isinstance(s, ast.ImportFrom):
-        return any(a.name == x for a in s.names)
-    if isinstance(s, ast.ClassDef):
-        return s.name == x
-    return x in assigns_stmt(s)
+    match s:
+        case ast.Import():
+            return root(parse_qualified(s.names[0].name)) == x
+        case ast.ImportFrom():
+            return any(a.name == x for a in s.names)
+        case ast.ClassDef():
+            return s.name == x
+        case _:
+            return x in assigns_stmt(s)
 
 
 def find_binder(stmts: list[ast.stmt], x: str) -> ast.stmt | None:
@@ -259,13 +269,15 @@ def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:
 
 
 def format_result(result: IllFormed | syntax.Unsupported | None, filename: str) -> str:
-    if isinstance(result, syntax.Unsupported):
-        return syntax.format_result(result, filename)
-    if result is None:
-        return f"{filename}: ok"
-    if isinstance(result, IllFormedModule):
-        return f"{filename}:{result.line}:{result.col}: {result.msg}"
-    return f"{filename}: {result.msg}"
+    match result:
+        case syntax.Unsupported():
+            return syntax.format_result(result, filename)
+        case None:
+            return f"{filename}: ok"
+        case IllFormedModule():
+            return f"{filename}:{result.line}:{result.col}: {result.msg}"
+        case _:
+            return f"{filename}: {result.msg}"
 
 
 def main() -> None:
