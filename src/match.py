@@ -231,9 +231,9 @@ def split_subclass(Sigma: ClassTable, k: Constr, c: Class) -> Split | None:
 
 
 def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
-    c = class_of_name(p.c, mod_ctx)
+    c = class_of_name(p.cls, mod_ctx)
     if c is None:
-        raise IllFormedModule(p, reasons.NotClass(str(qualified_name(p.c))))
+        raise IllFormedModule(p, reasons.NotClass(str(qualified_name(p.cls))))
     return c
 
 
@@ -300,7 +300,7 @@ def seq_safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> bool:
             return all(seq_safe(q, tau.value, mod_ctx) for q in p.patterns)
         return True
     if isinstance(p, ast.MatchClass):
-        c = class_of_name(p.c, mod_ctx)
+        c = class_of_name(p.cls, mod_ctx)
         if c is None:
             return True  # the match rules reject with a sharper reason
         args = field_map(mod_ctx.Sigma, c, p.patterns, p.kwd_attrs, p.kwd_patterns)
