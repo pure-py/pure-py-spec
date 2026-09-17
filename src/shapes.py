@@ -20,7 +20,7 @@ from type_syntax import (
 # A head: a literal, a class, or a length n standing for the head list_n.
 type Head = LiteralType | Class | int
 # Sets of heads and of keys are frozen so that a shape is hashable.
-type Heads = Heads
+type Heads = frozenset[Head]
 type Keys = frozenset[str]
 
 
