@@ -78,9 +78,6 @@ class LiteralType:
         return hash((type(self.value).__name__, self.value))
 
 
-# Type expressions: types as written, naming a class by a qualified name.
-
-
 @dataclass(frozen=True)
 class ListExpr:
     elem: TypeExpr
@@ -116,9 +113,6 @@ class UnionExpr:
 type TypeExpr = (
     Primitive | ListExpr | TupleExpr | DictExpr | CallableExpr | LiteralType | ClassName | UnionExpr
 )
-
-
-# Types: a class type wraps the class entry.
 
 
 @dataclass(frozen=True)
