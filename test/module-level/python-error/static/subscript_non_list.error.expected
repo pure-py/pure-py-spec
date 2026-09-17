@@ -1,1 +1,1 @@
-subscript of a value of type Literal[5], which has no subscript rule
+values of type Literal[5] cannot be subscripted

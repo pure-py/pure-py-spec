@@ -272,7 +272,7 @@ class NotCallable:
     tau: str
 
     def message(self) -> str:
-        return f"call of a value of type {self.tau}, which is not callable"
+        return f"values of type {self.tau} cannot be called"
 
 
 @dataclass(frozen=True)
@@ -298,7 +298,7 @@ class NotSubscriptable:
     tau: str
 
     def message(self) -> str:
-        return f"subscript of a value of type {self.tau}, which has no subscript rule"
+        return f"values of type {self.tau} cannot be subscripted"
 
 
 @dataclass(frozen=True)
