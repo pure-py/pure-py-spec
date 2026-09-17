@@ -10,5 +10,5 @@ class Sub(Base):
 
 s = Sub(1, 2)
 match s:
-    case Base(x):  # matches: Sub derives from Base; binds Base's field
+    case Base(x):
         print(x)

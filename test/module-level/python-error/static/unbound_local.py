@@ -2,7 +2,7 @@
 y = 7
 
 def f() -> None:
-    x = y  # UnboundLocalError: y is local due to assignment below
+    x = y
     y = 8
 
 f()

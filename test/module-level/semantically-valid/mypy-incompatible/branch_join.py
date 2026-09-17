@@ -3,7 +3,7 @@ def f(b: bool) -> int | str:
     if b:
         x = 1
     else:
-        x = "a"  # mypy: incompatible with the int declared by the first branch
+        x = "a"
     return x
 
 print(f(True))

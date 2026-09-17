@@ -10,7 +10,7 @@ class Sub(Base):
 
 b = Base(1)
 match b:
-    case Sub(x, y):  # no match: Base does not derive from Sub
+    case Sub(x, y):
         print(x)
         print(y)
     case _:

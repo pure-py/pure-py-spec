@@ -3,7 +3,7 @@ from dataclasses import dataclass
 value = 1
 
 @dataclass
-class value:  # allowed: the name held a variable, not a class
+class value:
     x: int
 
 v = value(2)

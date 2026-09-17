@@ -6,8 +6,7 @@ class Point:
     x: int
     y: int
 
-# Subject isn't a Point: Python skips the keyword lookup; GraalPy doesn't
-# propagate AttributeError. PurePy rejects the pattern statically regardless.
+# Subject not a Point, so no runtime keyword lookup, on which CPython and GraalPy differ
 p = None
 match p:
     case Point(x=a, z=b):

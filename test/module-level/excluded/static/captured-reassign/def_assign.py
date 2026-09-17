@@ -4,6 +4,6 @@ def f() -> int:
     def g() -> int:
         return x
     x = 6
-    return x + g()  # 12
+    return x + g()
 
 print(f())

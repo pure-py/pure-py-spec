@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 def make() -> int:
-    return Point(7, 8).x  # Point referenced in def body, declared later
+    return Point(7, 8).x
 
 @dataclass
 class Point:

@@ -5,7 +5,7 @@ def g() -> int:
 
 if b:
     def f() -> int:
-        return g()  # sibling g, bound simultaneously, not the outer g
+        return g()
     def g() -> int:
         return 1
     print(f())
