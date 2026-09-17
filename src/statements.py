@@ -62,7 +62,6 @@ from shapes import shapes
 from subtyping import join_seq, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
-    PRIMITIVE_SPELLINGS,
     CallableExpr,
     CallableType,
     ClassName,
@@ -103,7 +102,7 @@ def parameters(d: ast.FunctionDef, mod_ctx: ModuleContext) -> VarContext:
 
 def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
     if isinstance(psi, Primitive):
-        check_in_scope(PRIMITIVE_SPELLINGS[psi], node, mod_ctx)
+        check_in_scope(psi.value, node, mod_ctx)
         return psi
     if isinstance(psi, LiteralType):
         check_in_scope("Literal", node, mod_ctx)

@@ -3,7 +3,7 @@ from __future__ import annotations
 import ast
 from collections.abc import Sequence
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -11,14 +11,14 @@ if TYPE_CHECKING:
 
 
 class Primitive(Enum):
-    OBJECT = auto()
-    NEVER = auto()
-    NONE = auto()
-    BOOL = auto()
-    INT = auto()
-    FLOAT = auto()
-    STR = auto()
-    SIZED = auto()
+    OBJECT = "object"
+    NEVER = "Never"
+    NONE = "None"
+    BOOL = "bool"
+    INT = "int"
+    FLOAT = "float"
+    STR = "str"
+    SIZED = "Sized"
 
 
 type Var = str
@@ -171,23 +171,10 @@ type Type = (
     | UnionType
 )
 
-PRIMITIVE_SPELLINGS = {
-    Primitive.OBJECT: "object",
-    Primitive.NEVER: "Never",
-    Primitive.NONE: "None",
-    Primitive.BOOL: "bool",
-    Primitive.INT: "int",
-    Primitive.FLOAT: "float",
-    Primitive.STR: "str",
-    Primitive.SIZED: "Sized",
-}
-
-PRIMITIVE_NAMES = {name: t for t, name in PRIMITIVE_SPELLINGS.items()}
-
 
 def render(tau: Type) -> str:
     if isinstance(tau, Primitive):
-        return PRIMITIVE_SPELLINGS[tau]
+        return tau.value
     if isinstance(tau, ListType):
         return f"list[{render(tau.tau)}]"
     if isinstance(tau, TupleType):
@@ -236,7 +223,10 @@ def parse_annotation(e: ast.expr) -> TypeExpr | None:
     if isinstance(e, ast.Constant) and e.value is None:
         return Primitive.NONE
     if isinstance(e, ast.Name):
-        return PRIMITIVE_NAMES.get(e.id, ClassName(QualifiedName((e.id,))))
+        return next(
+            (nu for nu in Primitive if nu.value == e.id),
+            ClassName(QualifiedName((e.id,))),
+        )
     if isinstance(e, ast.Attribute):
         q = dotted_name(e)
         return None if q is None else ClassName(q)
