@@ -6,7 +6,7 @@ def g() -> int:
 
 h: Callable[[], int] = lambda: g()
 
-def g() -> int:  # PurePy: error (g rebound after capture by h); Python: late binding (h sees this g)
+def g() -> int:
     return 1
 
 print(h())

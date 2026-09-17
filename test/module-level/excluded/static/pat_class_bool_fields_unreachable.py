@@ -16,6 +16,6 @@ match v:
         print("ft")
     case Flags(False, False):
         print("ff")
-    case Flags(a, b):  # PurePy: error (field space spent); Python: silently unreachable
+    case Flags(a, b):
         print(a)
         print(b)

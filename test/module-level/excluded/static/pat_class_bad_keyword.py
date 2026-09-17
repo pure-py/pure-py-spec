@@ -10,7 +10,7 @@ class Point:
 # propagate AttributeError. PurePy rejects the pattern statically regardless.
 p = None
 match p:
-    case Point(x=a, z=b):  # PurePy: error ('z' not a field)
+    case Point(x=a, z=b):
         pass
     case _:
         pass

@@ -7,7 +7,7 @@ def f() -> int:
     return x  # captures x (the variable)
 
 @dataclass
-class x:  # PurePy: error (x captured by f, reassigned here); Python: f sees this class
+class x:
     y: int
 
 print("ok")

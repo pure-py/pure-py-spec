@@ -8,5 +8,5 @@ class Point:
 
 p = Point(1, 2)
 match p:
-    case Point():  # PurePy: error (under-saturated); Python: ok (matches any Point)
+    case Point():
         pass

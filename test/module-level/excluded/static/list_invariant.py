@@ -1,4 +1,4 @@
 # rule: subty-list
 xs: list[int] = [1]
-ys: list[float] = xs  # PurePy: error (list is invariant); Python: runs
+ys: list[float] = xs
 print(ys)

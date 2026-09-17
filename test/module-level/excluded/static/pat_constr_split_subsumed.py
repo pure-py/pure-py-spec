@@ -12,5 +12,5 @@ match v:
         print("first")
         print(a)
         print(b)
-    case P(x=1, y=2):  # PurePy: error (subsumed by previous); Python: silently unreachable
+    case P(x=1, y=2):
         print("second")

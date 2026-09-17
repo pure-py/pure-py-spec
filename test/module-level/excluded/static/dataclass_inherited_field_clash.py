@@ -7,6 +7,6 @@ class Base:
 
 @dataclass
 class Sub(Base):
-    x: int  # PurePy: error (field clashes with inherited); Python: ok (override)
+    x: int
 
 print("ok")

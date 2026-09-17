@@ -10,4 +10,4 @@ else:
     def f() -> str:
         return "f only"
 
-print(g())  # PurePy: error (g not definitely assigned); Python: ok when b is True
+print(g())

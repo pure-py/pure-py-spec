@@ -8,5 +8,5 @@ class P:
 y = 1
 def f() -> P:
     return P(x=y)
-y = 2  # PurePy: error (y captured by f, reassigned here); Python: f sees this y
+y = 2
 print(f().x)

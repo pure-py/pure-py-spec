@@ -14,7 +14,7 @@ match v:
     case Base(a):
         print("base")
         print(a)
-    case Derived(a, b):  # PurePy: error (subsumed by previous); Python: silently unreachable
+    case Derived(a, b):
         print("derived")
         print(a)
         print(b)

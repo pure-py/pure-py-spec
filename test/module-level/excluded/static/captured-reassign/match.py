@@ -4,7 +4,7 @@ def f(v: int) -> int:
         case y:
             def g() -> int:
                 return y
-    y = 2  # PurePy: error (y captured by g, reassigned here); Python: g sees this y
+    y = 2
     return g()
 
 print(f(1))

@@ -5,5 +5,5 @@ match v:
         print("seq")
         print(a)
         print(b)
-    case (1, 2):  # PurePy: error (subsumed by previous); Python: silently unreachable
+    case (1, 2):
         print("lit")

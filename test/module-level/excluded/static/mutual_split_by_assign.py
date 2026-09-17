@@ -4,7 +4,7 @@ def f(n: int) -> int:
         return 0
     return g(n - 1)
 
-c = 100  # PurePy: error (assignment splits mutual block of {f, g}); Python: ok
+c = 100
 
 def g(n: int) -> int:
     if n == 0:

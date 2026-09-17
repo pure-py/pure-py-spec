@@ -6,7 +6,7 @@ def foo(b: bool) -> int:
         y = x + 1
     else:
         y = 0
-    return x  # PurePy: error (partially defined); Python: 3 or 6
+    return x
 
 print(foo(True))
 print(foo(False))

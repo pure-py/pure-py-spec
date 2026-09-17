@@ -6,4 +6,4 @@ class Point:
     x: int
     y: int
 
-p = Point(1)  # PurePy: error (arity mismatch); Python: TypeError
+p = Point(1)

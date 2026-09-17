@@ -4,7 +4,7 @@ def even(n: int) -> bool:
         return True
     return odd(n - 1)
 
-even(10)  # PurePy: error (intervening call splits mutual block); Python: NameError (odd undefined)
+even(10)
 
 def odd(n: int) -> bool:
     if n == 0:
