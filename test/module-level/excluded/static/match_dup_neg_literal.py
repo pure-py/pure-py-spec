@@ -1,5 +1,5 @@
 # rule: split-literal
-v = -1
+v: int = -1
 match v:
     case -1:
         print("a")

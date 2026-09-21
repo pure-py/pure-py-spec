@@ -181,45 +181,6 @@ def binds_quals(generators: list[ast.comprehension]) -> set[Var]:
     return {target_name(g) for g in generators}
 
 
-def fv_stmt(s: ast.stmt) -> set[Var]:
-    match s:
-        case ast.Pass():
-            return set()
-        case ast.Assign(value=e):
-            return fv_e(e)
-        case ast.AnnAssign(value=e):
-            return fv_e(e) if e is not None else set()
-        case ast.Expr(value=e):
-            return fv_e(e)
-        case ast.Return(value=e):
-            return fv_e(e) if e is not None else set()
-        case ast.Assert():
-            result = fv_e(s.test)
-            if s.msg is not None:
-                result = result | fv_e(s.msg)
-            return result
-        case ast.If(test=e, body=ss, orelse=ss_):
-            return fv_e(e) | fv_body(ss) | fv_body(ss_)
-        case ast.Match():
-            return fv_e(s.subject) | set().union(
-                *(fv_body(case.body) - binds(case.pattern) for case in s.cases)
-            )
-        case ast.FunctionDef():
-            # Parameters and variables assigned in the body are local to the function.
-            params = {a.arg for a in s.args.args}
-            return fv_body(s.body) - params - assigns_body(s.body) - {s.name}
-        case ast.ClassDef():
-            return set()
-        case _:
-            raise AssertionError(f"unexpected statement: {type(s).__name__}")
-
-
-def fv_body(body: list[ast.stmt]) -> set[Var]:
-    if len(body) == 0:
-        return set()
-    return fv_stmt(body[0]) | fv_body(body[1:])
-
-
 def assigns_stmt(s: ast.stmt) -> set[Var]:
     match s:
         case ast.Pass():
@@ -255,82 +216,32 @@ def assigns_body(body: list[ast.stmt]) -> set[Var]:
     return assigns_stmt(body[0]) | assigns_body(body[1:])
 
 
-def captures(s: ast.stmt) -> set[Var]:
+def declares(s: ast.stmt) -> list[tuple[Var, ast.AST]]:
+    """Names declared in `s` with their declaring nodes, in textual order and with repeats."""
     match s:
-        case ast.Pass():
-            return set()
-        case ast.Assign(value=e):
-            return captures_e(e)
-        case ast.AnnAssign(value=e):
-            return captures_e(e) if e is not None else set()
-        case ast.Expr(value=e):
-            return captures_e(e)
-        case ast.Return(value=e):
-            return captures_e(e) if e is not None else set()
-        case ast.Assert():
-            result = captures_e(s.test)
-            if s.msg is not None:
-                result = result | captures_e(s.msg)
-            return result
-        case ast.If(test=e, body=ss, orelse=ss_):
-            return captures_e(e) | captures_body(ss) | captures_body(ss_)
+        case ast.AnnAssign():
+            assert isinstance(s.target, ast.Name)
+            return [(s.target.id, s)]
+        case ast.If(body=ss, orelse=ss_):
+            return declares_body(ss) + declares_body(ss_)
         case ast.Match():
-            # A pattern variable is in the function's scope, so a capture of it counts.
-            return captures_e(s.subject) | set().union(
-                *(captures_body(case.body) for case in s.cases)
-            )
-        case ast.FunctionDef():
-            return captures_region([s])
-        case ast.ClassDef():
-            return set()
+            return [d for case in s.cases for d in declares_body(case.body)]
+        case ast.FunctionDef(name=x):
+            return [(x, s)]
+        case ast.ClassDef(name=x):
+            return [(x, s)]
         case _:
-            raise AssertionError(f"unexpected statement: {type(s).__name__}")
+            return []
 
 
-def captures_body(body: list[ast.stmt]) -> set[Var]:
-    if len(body) == 0:
-        return set()
-    return captures(body[0]) | captures_body(body[1:])
+def declares_body(body: list[ast.stmt]) -> list[tuple[Var, ast.AST]]:
+    return [d for s in body for d in declares(s)]
 
 
-def captures_region(defs: list[ast.FunctionDef]) -> set[Var]:
-    f_names = {d.name for d in defs}
-    return captures_region_bodies(defs) - f_names
-
-
-def captures_region_bodies(defs: list[ast.FunctionDef]) -> set[Var]:
-    if len(defs) == 0:
-        return set()
-    d = defs[0]
-    params = {a.arg for a in d.args.args}
-    own = fv_body(d.body) - params - assigns_body(d.body)
-    return own | captures_region_bodies(defs[1:])
-
-
-def captures_statement(s: Statement) -> set[Var]:
-    if isinstance(s, list):
-        return captures_region(s)
-    return captures(s)
-
-
-def assigns_statement(s: Statement) -> set[Var]:
-    if isinstance(s, list):
-        return {d.name for d in s}
-    return assigns_stmt(s)
-
-
-def assigns_seq(ss: list[Statement]) -> set[Var]:
-    if len(ss) == 0:
-        return set()
-    return assigns_statement(ss[0]) | assigns_seq(ss[1:])
-
-
-def first_assigning_statement(ss: list[Statement], names: set[Var]) -> ast.AST:
-    """First statement of `ss` assigning a name in `names`."""
-    assert len(ss) > 0
-    if not assigns_statement(ss[0]).isdisjoint(names):
-        return ss[0][0] if isinstance(ss[0], list) else ss[0]
-    return first_assigning_statement(ss[1:], names)
+def redeclaration(body: list[ast.stmt]) -> tuple[Var, ast.AST] | None:
+    """Second declaration of a name declared twice in `body`, if any."""
+    ds = declares_body(body)
+    return next(((x, node) for i, (x, node) in enumerate(ds) if x in [y for y, _ in ds[:i]]), None)
 
 
 def own_fields(node: ast.ClassDef) -> tuple[tuple[Var, TypeExpr], ...]:

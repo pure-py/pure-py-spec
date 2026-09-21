@@ -1,2 +1,2 @@
-x = 5
+x: int = 5
 del x

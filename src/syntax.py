@@ -126,12 +126,11 @@ def check_syntax_stmt(node: ast.stmt) -> None:
         case ast.AugAssign():
             raise Prohibited(node, "augmented assignment (+=, etc.) prohibited")
         case ast.AnnAssign():
-            if node.value is None:
-                raise Prohibited(node, "annotation without assignment prohibited")
             if not isinstance(node.target, ast.Name):
                 raise Prohibited(node, "assignment target must be a simple name")
             check_syntax_annotation(node.annotation)
-            check_syntax_expr(node.value)
+            if node.value is not None:
+                check_syntax_expr(node.value)
         case ast.Delete():
             raise Prohibited(node, "del prohibited")
         case ast.For():

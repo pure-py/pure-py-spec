@@ -1,3 +1,3 @@
 from helper import sys
 
-y = 1
+y: int = 1

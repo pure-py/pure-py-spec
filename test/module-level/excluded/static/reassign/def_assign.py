@@ -1,5 +1,6 @@
-# rule: seq
+# rule: assign
 def f() -> int:
+    x: int
     x = 5
     def g() -> int:
         return x

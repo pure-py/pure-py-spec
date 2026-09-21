@@ -12,7 +12,7 @@ class B(A):
 class C(B):
     z: int
 
-v = C(1, 2, 3)
+v: C = C(1, 2, 3)
 match v:
     case A(x):
         print(x)

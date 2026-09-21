@@ -1,7 +1,7 @@
-# rule: seq
+# rule: class
 from dataclasses import dataclass
 
-x = 1
+x: int = 1
 
 def f() -> int:
     return x

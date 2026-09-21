@@ -5,16 +5,13 @@ import reasons
 from aux import (
     Statement,
     assigns_body,
-    assigns_seq,
     binds_quals,
-    captures_e,
     captures_e_list,
     captures_quals,
-    captures_statement,
     dict_keys,
-    first_assigning_statement,
     own_fields,
     qualified_name,
+    redeclaration,
     statements,
     target_name,
     type_expr,
@@ -31,13 +28,15 @@ from classes import (
 )
 from contexts import (
     Assigns,
+    Decl,
+    DeclTy,
     ModuleContext,
     ModuleLoaded,
     ModuleStub,
+    PartiallyAssigned,
     PredefinedName,
     Returns,
     StaticOutcome,
-    Status,
     VarContext,
     assigned_type,
     class_of_name,
@@ -49,7 +48,7 @@ from contexts import (
     override_outcomes,
     resolve_name,
 )
-from match import match_shapes, sequence_kind_mismatch
+from match import match_shapes, seq_safe
 from operators import (
     BINARY_NAMES,
     UNARY_NAMES,
@@ -107,6 +106,8 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
             return psi
         case ClassName(q):
             c = resolve_name(q, mod_ctx)
+            if isinstance(c, Decl):
+                raise IllFormedModule(node, reasons.UseBeforeDeclaration(str(q)))
             if not isinstance(c, Class):
                 raise IllFormedModule(node, reasons.NotClass(q))
             return ClassType(c)
@@ -154,11 +155,6 @@ def check_top_seq(ts: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
     mod_ctx_after = override_gamma(replace(mod_ctx, Sigma=Sigma), delta)
     if len(t_) == 0:
         return mod_ctx_after
-    check_captured_reassignment(t, t_)
-    rebound_classes = {c for c in assigns_seq(t_) if isinstance(delta.get(c), Class)}
-    if len(rebound_classes) > 0:
-        stmt = first_assigning_statement(t_, rebound_classes)
-        raise IllFormedModule(stmt, reasons.ClassRebound(min(rebound_classes)))
     return check_top_seq(t_, mod_ctx_after)
 
 
@@ -181,16 +177,8 @@ def check_seq(
     if isinstance(r, Returns):
         stmt: ast.AST = s_[0][0] if isinstance(s_[0], list) else s_[0]
         raise IllFormedModule(stmt, reasons.UnreachableStatement())
-    check_captured_reassignment(s, s_)
     r_ = check_seq(s_, override_gamma(mod_ctx, r.delta), returns)
     return override_outcomes(r, r_)
-
-
-def check_captured_reassignment(s: Statement, s_: list[Statement]) -> None:
-    reassigned = captures_statement(s) & assigns_seq(s_)
-    if len(reassigned) > 0:
-        stmt = first_assigning_statement(s_, reassigned)
-        raise IllFormedModule(stmt, reasons.CapturedReassignment(min(reassigned)))
 
 
 def check_statement(s: Statement, mod_ctx: ModuleContext, returns: Type | None) -> StaticOutcome:
@@ -201,16 +189,19 @@ def check_statement(s: Statement, mod_ctx: ModuleContext, returns: Type | None) 
 
 
 def check_mutual_region(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
-    check_distinct_names(defs, set())
+    for d in defs:
+        if mod_ctx.gamma.get(d.name) != Decl():
+            raise IllFormedModule(d, reasons.Redeclaration(d.name))
     check_bodies(defs, mod_ctx)
 
 
 def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
     f_names: VarContext = {d.name: signature(d, mod_ctx) for d in defs}
     for d in defs:
+        check_distinct_declarations(d.body)
         params = parameters(d, mod_ctx)
         locals_ = assigns_body(d.body) - set(params)
-        delta = {**f_names, **params, **{x: Status.FF for x in locals_}}
+        delta = {**f_names, **params, **{x: Decl() for x in locals_}}
         body_ctx = override_gamma(mod_ctx, delta)
         declared = resolve_type(type_expr(d.returns), d, mod_ctx)
         r = check_body(d.body, body_ctx, declared)
@@ -228,18 +219,16 @@ def check_returns_none(Sigma: ClassTable, s: ast.Return, declared: Type) -> None
         raise IllFormedModule(s, reasons.TypeMismatch(declared, Primitive.NONE))
 
 
-def check_assign_target(target: ast.Name, captured: set[Var]) -> None:
-    if target.id in captured:
-        raise IllFormedModule(target, reasons.SelfCaptureAssignment(target.id))
+def check_distinct_declarations(body: list[ast.stmt]) -> None:
+    repeated = redeclaration(body)
+    if repeated is not None:
+        x, node = repeated
+        raise IllFormedModule(node, reasons.Redeclaration(x))
 
 
-def check_distinct_names(defs: list[ast.FunctionDef], seen: set[Var]) -> None:
-    if len(defs) == 0:
-        return
-    head = defs[0]
-    if head.name in seen:
-        raise IllFormedModule(head, reasons.DuplicateMutualName(head.name))
-    check_distinct_names(defs[1:], seen | {head.name})
+def check_declarable(x: Var, node: ast.AST, mod_ctx: ModuleContext) -> None:
+    if mod_ctx.gamma.get(x) != Decl():
+        raise IllFormedModule(node, reasons.Redeclaration(x))
 
 
 def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> StaticOutcome:
@@ -249,14 +238,31 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
         case ast.Assign():
             (target,) = s.targets
             assert isinstance(target, ast.Name)
-            check_assign_target(target, captures_e(s.value))
-            return Assigns({target.id: synth_expr(s.value, mod_ctx)})
+            x = target.id
+            match mod_ctx.gamma.get(x):
+                case DeclTy(tau):
+                    check_expr(s.value, tau, mod_ctx)
+                    return Assigns({x: tau})
+                case Decl():
+                    raise IllFormedModule(s, reasons.UndeclaredAssignment(x))
+                case PartiallyAssigned():
+                    raise IllFormedModule(s, reasons.MaybeAssigned(x))
+                case Class() | ModuleStub() | ModuleLoaded() | PredefinedName():
+                    raise IllFormedModule(s, reasons.Redeclaration(x))
+                case _:
+                    assert x in mod_ctx.gamma, (
+                        "name assigned in scope pre-populated by def or module"
+                    )
+                    raise IllFormedModule(s, reasons.Reassignment(x))
         case ast.AnnAssign():
-            assert s.value is not None and isinstance(s.target, ast.Name)
-            declared = resolve_type(type_expr(s.annotation), s, mod_ctx)
-            check_expr(s.value, declared, mod_ctx)
-            check_assign_target(s.target, captures_e(s.value))
-            return Assigns({s.target.id: declared})
+            assert isinstance(s.target, ast.Name)
+            x = s.target.id
+            check_declarable(x, s, mod_ctx)
+            tau = resolve_type(type_expr(s.annotation), s, mod_ctx)
+            if s.value is None:
+                return Assigns({x: DeclTy(tau)})
+            check_expr(s.value, tau, mod_ctx)
+            return Assigns({x: tau})
         case ast.Expr(value=e):
             synth_expr(e, mod_ctx)
             return Assigns({})
@@ -272,7 +278,7 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
             check_expr(e, Primitive.BOOL, mod_ctx)
             branches = [check_body(ss, mod_ctx, returns)]
             branches.append(check_body(ss_, mod_ctx, returns) if ss_ else Assigns({}))
-            return merge_outcomes(mod_ctx.Sigma, branches)
+            return merge_outcomes(branches)
         case ast.Assert(test=e, msg=e_):
             check_expr(e, Primitive.BOOL, mod_ctx)
             if e_ is not None:
@@ -293,7 +299,7 @@ def check_match_cases(
 ) -> StaticOutcome:
     deltas, partial = match_cases(cases, tau, mod_ctx)
     branches = [check_case(case, delta, mod_ctx, returns) for case, delta in zip(cases, deltas)]
-    return merge_outcomes(mod_ctx.Sigma, branches + ([Assigns({})] if partial else []))
+    return merge_outcomes(branches + ([Assigns({})] if partial else []))
 
 
 def match_cases(
@@ -302,7 +308,7 @@ def match_cases(
     residual = shapes(mod_ctx.Sigma, tau, frozenset())
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):
-        mismatch = sequence_kind_mismatch(case.pattern, tau, mod_ctx)
+        mismatch = seq_safe(case.pattern, tau, mod_ctx)
         if mismatch is not None:
             q, sigma = mismatch
             kind = "list" if isinstance(q, PatList) else "tuple"
@@ -338,10 +344,14 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
                         raise IllFormedModule(e, reasons.ClassAsValue(QualifiedName((x,))))
                     case PredefinedName():
                         raise IllFormedModule(e, reasons.PredefinedNameAsValue(QualifiedName((x,))))
-                    case _:
-                        if x not in mod_ctx.gamma:
-                            raise IllFormedModule(e, reasons.UndefinedVariable(x))
+                    case Decl():
+                        raise IllFormedModule(e, reasons.UseBeforeDeclaration(x))
+                    case DeclTy():
                         raise IllFormedModule(e, reasons.UnassignedVariable(x))
+                    case PartiallyAssigned():
+                        raise IllFormedModule(e, reasons.UnassignedVariable(x))
+                    case _:
+                        raise IllFormedModule(e, reasons.UndefinedVariable(x))
             tau = assigned_type(mod_ctx, x)
             assert tau is not None
             return tau
@@ -417,7 +427,11 @@ def attr_module(parent: ModuleLoaded, x: Var, e: ast.Attribute) -> Type:
             raise IllFormedModule(e, reasons.ClassAsValue(qualified_name(e)))
         case PredefinedName():
             raise IllFormedModule(e, reasons.PredefinedNameAsValue(qualified_name(e)))
-        case Status():
+        case Decl():
+            raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
+        case DeclTy():
+            raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
+        case PartiallyAssigned():
             raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
         case _:
             return theta
@@ -701,6 +715,7 @@ def iterated_type(e: ast.expr, mod_ctx: ModuleContext) -> Type:
 
 
 def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, ClassTable]:
+    check_declarable(node.name, node, mod_ctx)
     if not isinstance(mod_ctx.gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.NotPredefinedName("dataclass"))
     own = tuple((x, resolve_type(psi, node, mod_ctx)) for x, psi in own_fields(node))
@@ -720,5 +735,5 @@ def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, C
         if len(duplicates) > 0:
             raise IllFormedModule(node, reasons.DuplicateField(min(duplicates), node.name))
     c = Class(qualified(mod_ctx.q, node.name))
-    assert c not in mod_ctx.Sigma, "redeclaration rejected by top-seq"
+    assert c not in mod_ctx.Sigma, "redeclaration rejected by class rule"
     return c, {**mod_ctx.Sigma, c: ClassTableEntry(own_fields=own, base=base)}

@@ -1,7 +1,6 @@
 import ast
 from collections.abc import Mapping
 from dataclasses import dataclass
-from enum import Enum, auto
 
 from classes import Class, ClassTable
 from subtyping import join_seq
@@ -19,13 +18,23 @@ from type_syntax import (
 )
 
 
-class Status(Enum):
-    FF = auto()
+@dataclass(frozen=True)
+class Decl:
+    pass
 
 
-# The entry for a variable is its type, or Status.FF where it is not definitely
-# assigned. Lazily evaluated, so these may name Class before it is defined.
-type VarEntry = Status | Type
+@dataclass(frozen=True)
+class DeclTy:
+    tau: Type
+
+
+@dataclass(frozen=True)
+class PartiallyAssigned:
+    pass
+
+
+# Lazily evaluated, so these may name Class before it is defined.
+type VarEntry = Decl | DeclTy | PartiallyAssigned | Type
 type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName
 type Context = Mapping[Var, ContextEntry]
 type VarContext = Mapping[Var, VarEntry]
@@ -70,12 +79,11 @@ def var_entry(mod_ctx: ModuleContext, x: Var) -> VarEntry | None:
 
 def assigned_type(mod_ctx: ModuleContext, x: Var) -> Type | None:
     theta = var_entry(mod_ctx, x)
-    return None if theta is None or isinstance(theta, Status) else theta
+    return None if theta is None or isinstance(theta, (Decl, DeclTy, PartiallyAssigned)) else theta
 
 
 def is_assigned(mod_ctx: ModuleContext, x: Var) -> bool:
-    theta = var_entry(mod_ctx, x)
-    return theta is not None and theta != Status.FF
+    return assigned_type(mod_ctx, x) is not None
 
 
 def resolve_name(q: QualifiedName, mod_ctx: ModuleContext) -> ContextEntry | None:
@@ -157,36 +165,31 @@ def predefined_context(q: QualifiedName) -> Context:
     return {**PREDEFINED_MEMBERS[str(q)], "__name__": Primitive.STR}
 
 
-def merge_entry(Sigma: ClassTable, theta: ContextEntry, theta_: ContextEntry) -> VarEntry:
-    """Assigned in both branches gives the join of the two types; assigned in
-    one alone is not definitely assigned. Only variables are assigned within a
-    branch, since a class is declared at the top level alone."""
+def merge_entry(theta: ContextEntry, theta_: ContextEntry) -> VarEntry:
     assert not isinstance(theta, (ModuleStub, ModuleLoaded, Class, PredefinedName))
     assert not isinstance(theta_, (ModuleStub, ModuleLoaded, Class, PredefinedName))
-    if theta == Status.FF or theta_ == Status.FF:
-        return Status.FF
-    return join_seq(Sigma, [theta, theta_])
+    return theta if theta == theta_ else PartiallyAssigned()
 
 
-def merge_context(Sigma: ClassTable, gamma: Context, gamma_: Context) -> VarContext:
+def merge_context(gamma: Context, gamma_: Context) -> VarContext:
     return {
-        x: merge_entry(Sigma, gamma[x], gamma_[x]) if x in gamma and x in gamma_ else Status.FF
+        x: merge_entry(gamma[x], gamma_[x]) if x in gamma and x in gamma_ else PartiallyAssigned()
         for x in set(gamma.keys()) | set(gamma_.keys())
     }
 
 
-def merge_outcomes(Sigma: ClassTable, rs: list[StaticOutcome]) -> StaticOutcome:
+def merge_outcomes(rs: list[StaticOutcome]) -> StaticOutcome:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return Returns()
     delta = assigns_branches[0].delta
-    return Assigns(fold_merge(Sigma, delta, assigns_branches[1:]))
+    return Assigns(fold_merge(delta, assigns_branches[1:]))
 
 
-def fold_merge(Sigma: ClassTable, delta: Context, rs: list[Assigns]) -> Context:
+def fold_merge(delta: Context, rs: list[Assigns]) -> Context:
     if len(rs) == 0:
         return delta
-    return fold_merge(Sigma, merge_context(Sigma, delta, rs[0].delta), rs[1:])
+    return fold_merge(merge_context(delta, rs[0].delta), rs[1:])
 
 
 def override_context(gamma: Context, delta: Context) -> Context:
@@ -228,7 +231,7 @@ def join_context(Sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
 
 
 def binding_types(entries: list[VarEntry]) -> list[Type]:
-    types = [e for e in entries if not isinstance(e, Status)]
+    types = [e for e in entries if not isinstance(e, (Decl, DeclTy, PartiallyAssigned))]
     assert len(types) == len(entries)
     return types
 

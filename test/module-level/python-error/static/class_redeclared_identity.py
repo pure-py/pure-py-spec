@@ -1,4 +1,4 @@
-# rule: top-seq
+# rule: assign-annot
 from dataclasses import dataclass
 
 
@@ -7,8 +7,8 @@ class C:
     n: int
 
 
-x = C(1)
-C = 5
+x: C = C(1)
+C: int = 5
 
 
 @dataclass

@@ -1,5 +1,5 @@
 # rule: syn-list
-xs = [[], [1]]
+xs: list[list[int]] = [[], [1]]
 print(xs)
-d = {"a": [], "b": [1]}
+d: dict[str, list[int]] = {"a": [], "b": [1]}
 print(d)

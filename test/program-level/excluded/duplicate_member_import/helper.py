@@ -1,1 +1,1 @@
-sub = 5
+sub: int = 5

@@ -6,7 +6,7 @@ class Point:
     x: int
     y: int
 
-p = Point(1, 2)
+p: Point = Point(1, 2)
 match p:
     case Point():
         pass

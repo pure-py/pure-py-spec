@@ -1,2 +1,2 @@
 import lib
-z = lib.print
+z: int = lib.print

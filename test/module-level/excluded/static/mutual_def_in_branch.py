@@ -1,4 +1,5 @@
-b = True
+# rule: def
+b: bool = True
 
 if b:
     def f() -> str:

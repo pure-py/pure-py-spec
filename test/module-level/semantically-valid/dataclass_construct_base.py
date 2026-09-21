@@ -8,5 +8,5 @@ class Base:
 class Sub(Base):
     y: int
 
-b = Base(1)
+b: Base = Base(1)
 print(b.x)

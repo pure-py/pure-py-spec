@@ -1,4 +1,5 @@
-b = True
+# rule: def
+b: bool = True
 
 def g() -> int:
     return 0

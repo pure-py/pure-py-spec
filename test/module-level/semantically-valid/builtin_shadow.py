@@ -1,3 +1,3 @@
 # rule: var
-len = 3
+len: int = 3
 print(len)

@@ -18,17 +18,20 @@ from contexts import (
     PREDEFINED_MODULES,
     Context,
     ContextEntry,
+    Decl,
+    DeclTy,
     ModuleContext,
     ModuleLoaded,
     ModuleStub,
-    Status,
+    PartiallyAssigned,
     extend_context,
     override_context,
     predefined_context,
 )
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
-from statements import check_top_seq
+from statements import check_distinct_declarations, check_top_seq
 from type_syntax import (
+    Primitive,
     QualifiedName,
     Var,
     parent,
@@ -39,10 +42,6 @@ from type_syntax import (
     qualified,
     root,
 )
-
-
-def name_assign(q: QualifiedName) -> ast.stmt:
-    return ast.parse(f"__name__ = {str(q)!r}").body[0]
 
 
 def loads_as(
@@ -143,7 +142,7 @@ def imports(
     if isinstance(theta, ModuleStub):
         members, Sigma = check_module(mod_ctx.M[theta.q], mod_ctx.M, theta.q, mod_ctx.Sigma)
         return ModuleLoaded(theta.q, members), Sigma
-    if theta == Status.FF:
+    if isinstance(theta, (Decl, DeclTy, PartiallyAssigned)):
         raise IllFormedModule(iota, reasons.UnassignedMember(x, q))
     return theta, mod_ctx.Sigma
 
@@ -188,10 +187,14 @@ def check_module_(
         return predefined_context(q), Sigma
     iotas, stmts = split_imports(m.body)
     gamma, Sigma = check_imports_prefix(iotas, ModuleContext(gamma={}, M=M, q=q, Sigma=Sigma))
-    body = [name_assign(q)] + stmts
+    body = stmts
+    check_distinct_declarations(body)
+    bound = {x: Decl() for x in assigns_body(body)}
     mod_ctx = check_top_seq(
         statements(body),
-        ModuleContext(gamma={**predefined_context(BUILTINS), **gamma}, M=M, q=q, Sigma=Sigma),
+        ModuleContext(
+            gamma={**predefined_context(BUILTINS), **bound, **gamma}, M=M, q=q, Sigma=Sigma
+        ),
     )
     check_submodule_names(m, gamma, body, M, q)
     return signature(body, mod_ctx, q), mod_ctx.Sigma
@@ -229,9 +232,8 @@ def find_binder(stmts: list[ast.stmt], x: str) -> ast.stmt | None:
 
 
 def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: QualifiedName) -> Context:
-    return override_context(
-        submods(final_ctx.M, q), {x: final_ctx.gamma[x] for x in assigns_body(body)}
-    )
+    members = {x: final_ctx.gamma[x] for x in assigns_body(body)}
+    return override_context(submods(final_ctx.M, q), {**members, "__name__": Primitive.STR})
 
 
 def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:

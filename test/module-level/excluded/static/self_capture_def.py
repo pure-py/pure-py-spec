@@ -1,5 +1,6 @@
+# rule: def
 def f() -> int:
-    x = 5
+    x: int = 5
     def x(n: int) -> int:
         if n == 0:
             return 0

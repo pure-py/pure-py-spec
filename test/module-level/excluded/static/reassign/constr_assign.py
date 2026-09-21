@@ -1,4 +1,4 @@
-# rule: top-seq
+# rule: assign-annot
 from dataclasses import dataclass
 
 @dataclass
@@ -8,6 +8,6 @@ class C:
 def mk() -> C:
     return C(1)
 
-C = 5
+C: int = 5
 
 print("ok")

@@ -1,4 +1,4 @@
-helper = 1
+helper: int = 1
 def f() -> int:
     return helper
 import helper

@@ -1,4 +1,4 @@
-# rule: seq
+# rule: assign
 def f(v: int) -> int:
     match v:
         case y:

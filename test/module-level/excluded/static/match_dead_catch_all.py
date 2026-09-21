@@ -1,5 +1,5 @@
 # rule: pat-shapes
-x = None
+x: None = None
 match x:
     case None:
         print("none")

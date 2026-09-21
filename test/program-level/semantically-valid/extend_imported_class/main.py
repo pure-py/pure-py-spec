@@ -5,7 +5,7 @@ from base import Base
 class Derived(Base):
     y: int
 
-d = Derived(1, 2)
+d: Derived = Derived(1, 2)
 print(d.x + d.y)
 match d:
     case Base(x):

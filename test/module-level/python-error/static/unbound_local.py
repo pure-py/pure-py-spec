@@ -1,8 +1,8 @@
 # rule: var
-y = 7
+y: int = 7
 
 def f() -> None:
-    x = y
-    y = 8
+    x: int = y
+    y: int = 8
 
 f()

@@ -1,3 +1,4 @@
+# rule: def
 def g() -> int:
     return 0
 

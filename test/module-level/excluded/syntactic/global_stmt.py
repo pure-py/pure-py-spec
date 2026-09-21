@@ -1,4 +1,4 @@
-x = 5
+x: int = 5
 
 def f() -> int:
     global x

@@ -1,3 +1,3 @@
 from a import b
-y = 1
+y: int = 1
 print(b.y)

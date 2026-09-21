@@ -1,5 +1,5 @@
 # rule: pat-shapes
-v = 5
+v: int = 5
 match v:
     case (a, b):
         print(a)

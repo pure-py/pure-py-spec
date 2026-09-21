@@ -1,4 +1,4 @@
-v = 1
+v: int = 1
 match v:
     case x:
         print(x)

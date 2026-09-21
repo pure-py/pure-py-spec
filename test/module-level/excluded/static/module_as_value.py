@@ -1,4 +1,4 @@
 # rule: var
 import sys
 
-z = sys
+z: int = sys

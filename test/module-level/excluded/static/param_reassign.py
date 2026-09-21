@@ -1,7 +1,8 @@
+# rule: assign
 def f(x: int) -> int:
-    a = x
+    a: int = x
     x = 5
-    b = x
+    b: int = x
     return a + b
 
 print(f(10))

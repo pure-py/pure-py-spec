@@ -1,2 +1,2 @@
 from mid import y
-z = 1
+z: int = 1

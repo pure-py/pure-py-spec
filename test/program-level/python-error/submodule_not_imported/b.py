@@ -1,3 +1,3 @@
 import pkg
-x = pkg.sub.y
+x: int = pkg.sub.y
 print(x)

@@ -5,7 +5,7 @@ class Point:
     x: int
     y: int
 
-p = Point(0, 1)
+p: Point = Point(0, 1)
 match p:
     case Point(x, y):
         print(x)

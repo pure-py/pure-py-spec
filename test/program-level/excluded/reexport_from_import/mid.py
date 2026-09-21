@@ -1,2 +1,2 @@
 from defs import y
-x = y
+x: int = y

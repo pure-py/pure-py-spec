@@ -2,5 +2,5 @@
 def g() -> int:
     print("arg")
     return 3
-x = 5
-y = x(g())
+x: int = 5
+y: int = x(g())

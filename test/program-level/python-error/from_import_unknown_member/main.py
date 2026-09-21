@@ -1,3 +1,3 @@
 from mod import Missing
 
-y = 1
+y: int = 1

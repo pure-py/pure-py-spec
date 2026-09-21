@@ -6,4 +6,4 @@ class Point:
     x: int
     y: int
 
-p = Point(1)
+p: Point = Point(1)

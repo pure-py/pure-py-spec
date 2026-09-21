@@ -1,4 +1,4 @@
-# rule: seq
+# rule: def
 from typing import Callable
 
 def g() -> int:

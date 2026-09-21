@@ -9,7 +9,7 @@ class Base:
 class Derived(Base):
     y: int
 
-v = Derived(1, 2)
+v: Derived = Derived(1, 2)
 match v:
     case Base(a):
         print("base")

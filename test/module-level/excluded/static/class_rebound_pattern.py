@@ -1,4 +1,4 @@
-# rule: top-seq
+# rule: pat-var
 from dataclasses import dataclass
 
 

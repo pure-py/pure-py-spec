@@ -1,6 +1,6 @@
 # rule: if-else
 def f(b: bool) -> int | str:
-    x: int | str = 0
+    x: int | str
     if b:
         x = 1
     else:

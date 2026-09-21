@@ -87,7 +87,7 @@ definitely assigned; the \ruleName{assign} rule requires that entry, checks the 
 makes the variable definitely assigned, so that $\Gamma(x)$ is a type, as the \ruleName{var} rule requires; an
 annotated assignment does both at once; and the \ruleName{if} rules combine the branches with $\merge$, so
 that a conditional definitely assigns a variable only if every branch that does not definitely return
-assigns it, otherwise leaving it at $\Decl$ (\secref{well-formedness-statements}). A variable is thus
+assigns it, otherwise leaving it at $\False$ (\secref{well-formedness-statements}). A variable is thus
 declared once in its scope and assigned at most once on any path, as a blank final in
 Java~\cite[\S16]{gosling2025}. Branch-local variables are therefore permitted, but using one after the
 conditional is not, nor is completing a partial assignment:

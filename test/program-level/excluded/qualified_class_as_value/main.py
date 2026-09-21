@@ -1,3 +1,3 @@
 import mod
-y = mod.C
+y: int = mod.C
 print(0)

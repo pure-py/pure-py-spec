@@ -8,5 +8,5 @@ class Point:
 def negate(n: int) -> int:
     return -n
 
-p = Point(1)
+p: Point = Point(1)
 print(negate(p.x))
