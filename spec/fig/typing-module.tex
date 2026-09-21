@@ -112,7 +112,7 @@
   \Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma_1 \\
   \mathcal{P}(\pyinline{builtins}) = (\Gamma', \rho) \\
   \added{\declaresS(t) \text{ distinct}} \\
-  \Sigma_1; q; \Gamma' \override \added{\False(\assignsS(t)) \override} \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
+  \Sigma_1; q; \Gamma' \override \added{\set{\bind{x}{\Decl} \mid x \in \assignsS(t)} \override} \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {

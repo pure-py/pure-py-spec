@@ -259,7 +259,7 @@ assignment can take a declared class's name.} A
 of its annotation, without assigning it (\ruleName{declare}); an assignment requires the variable to be
 declared and not yet assigned, and checks the expression against the declared type (\ruleName{assign}); an
 annotated assignment declares and assigns at once (\ruleName{assign-annot}). Each of the three requires the
-entry for the variable to be $\False$ or $\FalseTy{\tau}$, so a variable is declared once in its scope and
+entry for the variable to be $\Decl$ or $\DeclTy{\tau}$, so a variable is declared once in its scope and
 assigned at most once on any path, as a blank final in Java~\cite[\S16]{gosling2025}, and a name bound to a
 class, module or predefined name cannot be declared or assigned. A closure captures only definitely assigned
 variables, which are never assigned again, so a closure sees a fixed value\paperonly{ (\secref{no-mutable-state})}.}{An annotated assignment checks the expression against the type of the annotation,
@@ -274,7 +274,7 @@ scope; every \PurePy class must declare itself a dataclass. Each rule that takes
 
 A function definition binds its parameters at their annotated types, plus the names of its
 mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables \Added{declared or} assigned in the body start
-at $\False$ (\ruleName{def}), emulating Python's scoping of function bodies, which
+at $\Decl$ (\ruleName{def}), emulating Python's scoping of function bodies, which
 prefers a locally \Replaced{bound}{assigned} name to one visible in an enclosing scope. \Added{The names of the region must be
 undeclared where it occurs, and the names declared in a body must be distinct, as mypy requires.} The body is checked with the
 declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
@@ -416,7 +416,7 @@ import cycle is ill-formed, because a module in a cycle could finish loading onl
 well-formedness (\figref{typing-module}) requires the main module to be well typed and hence,
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
-\Replaced{overridden by $\False$ for each name the body binds and then by the imported context, so the members of
+\Replaced{overridden by $\Decl$ for each name the body binds and then by the imported context, so the members of
 \pyinline{builtins} are in scope unqualified, a name bound by the body shadows a builtin throughout, and an
 imported name cannot be declared or assigned by the body. The names declared by the body must be distinct.}{overridden by the imported context, so the members of \pyinline{builtins} are in scope
 unqualified.}

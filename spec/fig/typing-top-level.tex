@@ -23,7 +23,7 @@
 \and
 \inferrule*[lab={\ruleName{class}}]
 {
-  \added{\Gamma(c) = \False} \\
+  \added{\Gamma(c) = \Decl} \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
   \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i)
@@ -34,7 +34,7 @@
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \added{\Gamma(c) = \False} \\
+  \added{\Gamma(c) = \Decl} \\
   \bind{c'}{\Type{D}} \in \Gamma \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
