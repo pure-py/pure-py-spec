@@ -18,18 +18,17 @@ from contexts import (
     PREDEFINED_MODULES,
     Context,
     ContextEntry,
-    Decl,
     DeclTy,
     ModuleContext,
     ModuleLoaded,
     ModuleStub,
-    PartiallyAssigned,
+    Unbound,
     extend_context,
     override_context,
     predefined_context,
 )
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
-from statements import check_distinct_declarations, check_top_seq
+from statements import check_assignments_declared, check_distinct_declarations, check_top_seq
 from type_syntax import (
     Primitive,
     QualifiedName,
@@ -142,7 +141,7 @@ def imports(
     if isinstance(theta, ModuleStub):
         members, Sigma = check_module(mod_ctx.M[theta.q], mod_ctx.M, theta.q, mod_ctx.Sigma)
         return ModuleLoaded(theta.q, members), Sigma
-    if isinstance(theta, (Decl, DeclTy, PartiallyAssigned)):
+    if isinstance(theta, (Unbound, DeclTy)):
         raise IllFormedModule(iota, reasons.UnassignedMember(x, q))
     return theta, mod_ctx.Sigma
 
@@ -189,7 +188,8 @@ def check_module_(
     gamma, Sigma = check_imports_prefix(iotas, ModuleContext(gamma={}, M=M, q=q, Sigma=Sigma))
     body = stmts
     check_distinct_declarations(body)
-    bound = {x: Decl() for x in assigns_body(body)}
+    check_assignments_declared(body, set())
+    bound = {x: Unbound() for x in assigns_body(body)}
     mod_ctx = check_top_seq(
         statements(body),
         ModuleContext(

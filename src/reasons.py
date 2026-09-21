@@ -30,11 +30,11 @@ class UnassignedVariable:
 
 
 @dataclass(frozen=True)
-class UseBeforeDeclaration:
+class UnboundName:
     x: Var
 
     def message(self) -> str:
-        return f"'{self.x}' is used before its declaration"
+        return f"'{self.x}' is unbound"
 
 
 @dataclass(frozen=True)
@@ -50,7 +50,15 @@ class UndeclaredAssignment:
     x: Var
 
     def message(self) -> str:
-        return f"'{self.x}' is assigned before any declaration"
+        return f"'{self.x}' is assigned but never declared"
+
+
+@dataclass(frozen=True)
+class AssignmentBeforeDeclaration:
+    x: Var
+
+    def message(self) -> str:
+        return f"'{self.x}' is assigned before its declaration"
 
 
 @dataclass(frozen=True)
@@ -387,7 +395,8 @@ type Reason = (
     DuplicateField
     | UnassignedVariable
     | UndefinedVariable
-    | UseBeforeDeclaration
+    | UnboundName
+    | AssignmentBeforeDeclaration
     | Redeclaration
     | UndeclaredAssignment
     | Reassignment

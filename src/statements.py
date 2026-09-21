@@ -4,12 +4,15 @@ from dataclasses import replace
 import reasons
 from aux import (
     Statement,
+    assign_targets,
     assigns_body,
     binds_quals,
     captures_e_list,
     captures_quals,
+    declares_body,
     dict_keys,
     own_fields,
+    pattern_bound,
     qualified_name,
     redeclaration,
     statements,
@@ -28,15 +31,14 @@ from classes import (
 )
 from contexts import (
     Assigns,
-    Decl,
     DeclTy,
     ModuleContext,
     ModuleLoaded,
     ModuleStub,
-    PartiallyAssigned,
     PredefinedName,
     Returns,
     StaticOutcome,
+    Unbound,
     VarContext,
     assigned_type,
     class_of_name,
@@ -106,8 +108,8 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
             return psi
         case ClassName(q):
             c = resolve_name(q, mod_ctx)
-            if isinstance(c, Decl):
-                raise IllFormedModule(node, reasons.UseBeforeDeclaration(str(q)))
+            if isinstance(c, Unbound):
+                raise IllFormedModule(node, reasons.UnboundName(str(q)))
             if not isinstance(c, Class):
                 raise IllFormedModule(node, reasons.NotClass(q))
             return ClassType(c)
@@ -190,7 +192,7 @@ def check_statement(s: Statement, mod_ctx: ModuleContext, returns: Type | None) 
 
 def check_mutual_region(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
     for d in defs:
-        if mod_ctx.gamma.get(d.name) != Decl():
+        if mod_ctx.gamma.get(d.name) != Unbound():
             raise IllFormedModule(d, reasons.Redeclaration(d.name))
     check_bodies(defs, mod_ctx)
 
@@ -200,8 +202,9 @@ def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
     for d in defs:
         check_distinct_declarations(d.body)
         params = parameters(d, mod_ctx)
+        check_assignments_declared(d.body, set(params))
         locals_ = assigns_body(d.body) - set(params)
-        delta = {**f_names, **params, **{x: Decl() for x in locals_}}
+        delta = {**f_names, **params, **{x: Unbound() for x in locals_}}
         body_ctx = override_gamma(mod_ctx, delta)
         declared = resolve_type(type_expr(d.returns), d, mod_ctx)
         r = check_body(d.body, body_ctx, declared)
@@ -226,8 +229,26 @@ def check_distinct_declarations(body: list[ast.stmt]) -> None:
         raise IllFormedModule(node, reasons.Redeclaration(x))
 
 
+def check_assignments_declared(body: list[ast.stmt], bound: set[Var]) -> None:
+    """Diagnostics for assignments the rules reject as unbound: a target never declared in the
+    scope, other than a parameter or pattern variable, or one declared only later in the text."""
+    first_declaration: dict[Var, ast.stmt] = {}
+    for x, node in reversed(declares_body(body)):
+        first_declaration[x] = node
+    for x, node in assign_targets(body):
+        if x not in first_declaration:
+            if x not in bound and x not in pattern_bound(body):
+                raise IllFormedModule(node, reasons.UndeclaredAssignment(x))
+        elif position(first_declaration[x]) > position(node):
+            raise IllFormedModule(node, reasons.AssignmentBeforeDeclaration(x))
+
+
+def position(node: ast.stmt) -> tuple[int, int]:
+    return (node.lineno, node.col_offset)
+
+
 def check_declarable(x: Var, node: ast.AST, mod_ctx: ModuleContext) -> None:
-    if mod_ctx.gamma.get(x) != Decl():
+    if mod_ctx.gamma.get(x) != Unbound():
         raise IllFormedModule(node, reasons.Redeclaration(x))
 
 
@@ -243,9 +264,7 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
                 case DeclTy(tau):
                     check_expr(s.value, tau, mod_ctx)
                     return Assigns({x: tau})
-                case Decl():
-                    raise IllFormedModule(s, reasons.UndeclaredAssignment(x))
-                case PartiallyAssigned():
+                case Unbound():
                     raise IllFormedModule(s, reasons.MaybeAssigned(x))
                 case Class() | ModuleStub() | ModuleLoaded() | PredefinedName():
                     raise IllFormedModule(s, reasons.Redeclaration(x))
@@ -344,11 +363,9 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
                         raise IllFormedModule(e, reasons.ClassAsValue(QualifiedName((x,))))
                     case PredefinedName():
                         raise IllFormedModule(e, reasons.PredefinedNameAsValue(QualifiedName((x,))))
-                    case Decl():
-                        raise IllFormedModule(e, reasons.UseBeforeDeclaration(x))
+                    case Unbound():
+                        raise IllFormedModule(e, reasons.UnboundName(x))
                     case DeclTy():
-                        raise IllFormedModule(e, reasons.UnassignedVariable(x))
-                    case PartiallyAssigned():
                         raise IllFormedModule(e, reasons.UnassignedVariable(x))
                     case _:
                         raise IllFormedModule(e, reasons.UndefinedVariable(x))
@@ -427,11 +444,9 @@ def attr_module(parent: ModuleLoaded, x: Var, e: ast.Attribute) -> Type:
             raise IllFormedModule(e, reasons.ClassAsValue(qualified_name(e)))
         case PredefinedName():
             raise IllFormedModule(e, reasons.PredefinedNameAsValue(qualified_name(e)))
-        case Decl():
+        case Unbound():
             raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
         case DeclTy():
-            raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
-        case PartiallyAssigned():
             raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
         case _:
             return theta

@@ -6,8 +6,8 @@ import reasons
 from aux import qualified_name
 from classes import Class, ClassTable, declared_type, field_map, fields, short_name
 from contexts import (
-    Decl,
     ModuleContext,
+    Unbound,
     VarContext,
     class_of_name,
     disjoint_union,
@@ -71,7 +71,7 @@ def match(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
 
 
 def match_as(k: Shape, p: ast.MatchAs, mod_ctx: ModuleContext) -> Match | None:
-    if p.name is not None and mod_ctx.gamma.get(p.name) != Decl():
+    if p.name is not None and mod_ctx.gamma.get(p.name) != Unbound():
         raise IllFormedModule(p, reasons.Redeclaration(p.name))
     if p.pattern is None:
         delta: VarContext = {} if p.name is None else {p.name: shape_type(k)}

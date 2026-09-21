@@ -6,7 +6,7 @@
 \small
 \inferrule*[lab={\ruleName{pat-var}}]
 {
-  \added{\Gamma(x) = \Decl}
+  \added{\Gamma(x) = \Unbound}
 }
 {
   \Sigma; \Gamma \vdash k, x \matches \set{k}, \varnothing \binding \set{\bind{x}{\shapeTy(k)}}
@@ -22,7 +22,7 @@
 \and
 \inferrule*[lab={\ruleName{pat-as}}]
 {
-  \added{\Gamma(x) = \Decl} \\
+  \added{\Gamma(x) = \Unbound} \\
   \Sigma; \Gamma \vdash k, p \matches K, L \binding \Delta
 }
 {

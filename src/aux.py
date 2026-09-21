@@ -216,7 +216,7 @@ def assigns_body(body: list[ast.stmt]) -> set[Var]:
     return assigns_stmt(body[0]) | assigns_body(body[1:])
 
 
-def declares(s: ast.stmt) -> list[tuple[Var, ast.AST]]:
+def declares(s: ast.stmt) -> list[tuple[Var, ast.stmt]]:
     """Names declared in `s` with their declaring nodes, in textual order and with repeats."""
     match s:
         case ast.AnnAssign():
@@ -234,11 +234,43 @@ def declares(s: ast.stmt) -> list[tuple[Var, ast.AST]]:
             return []
 
 
-def declares_body(body: list[ast.stmt]) -> list[tuple[Var, ast.AST]]:
+def declares_body(body: list[ast.stmt]) -> list[tuple[Var, ast.stmt]]:
     return [d for s in body for d in declares(s)]
 
 
-def redeclaration(body: list[ast.stmt]) -> tuple[Var, ast.AST] | None:
+def assign_targets(body: list[ast.stmt]) -> list[tuple[Var, ast.stmt]]:
+    """Targets of the unannotated assignments in `body`, in textual order, not descending into defs."""
+    out: list[tuple[Var, ast.stmt]] = []
+    for s in body:
+        match s:
+            case ast.Assign(targets=[ast.Name(id=x)]):
+                out.append((x, s))
+            case ast.If(body=ss, orelse=ss_):
+                out += assign_targets(ss) + assign_targets(ss_)
+            case ast.Match():
+                out += [t for case in s.cases for t in assign_targets(case.body)]
+            case _:
+                pass
+    return out
+
+
+def pattern_bound(body: list[ast.stmt]) -> set[Var]:
+    """Variables bound by the patterns of the match statements in `body`, not descending into defs."""
+    out: set[Var] = set()
+    for s in body:
+        match s:
+            case ast.If(body=ss, orelse=ss_):
+                out |= pattern_bound(ss) | pattern_bound(ss_)
+            case ast.Match():
+                out |= set().union(
+                    *(binds(case.pattern) | pattern_bound(case.body) for case in s.cases)
+                )
+            case _:
+                pass
+    return out
+
+
+def redeclaration(body: list[ast.stmt]) -> tuple[Var, ast.stmt] | None:
     """Second declaration of a name declared twice in `body`, if any."""
     ds = declares_body(body)
     return next(((x, node) for i, (x, node) in enumerate(ds) if x in [y for y, _ in ds[:i]]), None)

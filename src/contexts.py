@@ -19,7 +19,7 @@ from type_syntax import (
 
 
 @dataclass(frozen=True)
-class Decl:
+class Unbound:
     pass
 
 
@@ -28,13 +28,8 @@ class DeclTy:
     tau: Type
 
 
-@dataclass(frozen=True)
-class PartiallyAssigned:
-    pass
-
-
 # Lazily evaluated, so these may name Class before it is defined.
-type VarEntry = Decl | DeclTy | PartiallyAssigned | Type
+type VarEntry = Unbound | DeclTy | Type
 type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName
 type Context = Mapping[Var, ContextEntry]
 type VarContext = Mapping[Var, VarEntry]
@@ -79,7 +74,7 @@ def var_entry(mod_ctx: ModuleContext, x: Var) -> VarEntry | None:
 
 def assigned_type(mod_ctx: ModuleContext, x: Var) -> Type | None:
     theta = var_entry(mod_ctx, x)
-    return None if theta is None or isinstance(theta, (Decl, DeclTy, PartiallyAssigned)) else theta
+    return None if theta is None or isinstance(theta, (Unbound, DeclTy)) else theta
 
 
 def is_assigned(mod_ctx: ModuleContext, x: Var) -> bool:
@@ -168,12 +163,12 @@ def predefined_context(q: QualifiedName) -> Context:
 def merge_entry(theta: ContextEntry, theta_: ContextEntry) -> VarEntry:
     assert not isinstance(theta, (ModuleStub, ModuleLoaded, Class, PredefinedName))
     assert not isinstance(theta_, (ModuleStub, ModuleLoaded, Class, PredefinedName))
-    return theta if theta == theta_ else PartiallyAssigned()
+    return theta if theta == theta_ else Unbound()
 
 
 def merge_context(gamma: Context, gamma_: Context) -> VarContext:
     return {
-        x: merge_entry(gamma[x], gamma_[x]) if x in gamma and x in gamma_ else PartiallyAssigned()
+        x: merge_entry(gamma[x], gamma_[x]) if x in gamma and x in gamma_ else Unbound()
         for x in set(gamma.keys()) | set(gamma_.keys())
     }
 
@@ -231,7 +226,7 @@ def join_context(Sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
 
 
 def binding_types(entries: list[VarEntry]) -> list[Type]:
-    types = [e for e in entries if not isinstance(e, (Decl, DeclTy, PartiallyAssigned))]
+    types = [e for e in entries if not isinstance(e, (Unbound, DeclTy))]
     assert len(types) == len(entries)
     return types
 
