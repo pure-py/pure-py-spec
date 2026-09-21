@@ -5,6 +5,7 @@
 \grammarGroup{Statements} \\
 $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $s\;s'$ & (Seq) \\
+    & $\mid$ & \added{$x\exAnnot{\psi}$} & \added{(Declare)} \\
     & $\mid$ & $\exAssign{x}{e}$ & (Assign) \\
     & $\mid$ & $\exAssign{x\exAnnot{\psi}}{e}$ & (AnnAssign) \\
     & $\mid$ & $e$ & (ExprStmt) \\

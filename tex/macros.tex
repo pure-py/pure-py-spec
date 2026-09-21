@@ -161,6 +161,7 @@
 \newcommand*{\opaqueVal}[1]{\mathsf{Opaque}(#1)}
 \newcommand*{\True}{\mathsf{tt}}
 \newcommand*{\False}{\mathsf{ff}}
+\newcommand*{\FalseTy}[1]{\False\,#1}
 
 % Context and environment operations
 \newcommand*{\disjunion}{\uplus}
@@ -187,8 +188,7 @@
 \newcommand*{\shapes}{\mathrm{shapes}}
 \newcommand*{\seqSafe}{\mathrm{seq\text{-}safe}}
 \newcommand*{\elemTy}{\mathrm{elem\text{-}type}}
-\newcommand*{\merge}{\oplus}
-\newcommand*{\mergeS}{\mathbin{\merge_\Sigma}}
+\newcommand*{\merge}{\mathbin{\oplus}}
 \newcommand*{\override}{\otimes}
 
 % Outcomes (draft, \secref{errors})
@@ -212,6 +212,7 @@
 
 % Metafunctions: definite assignment and free variables
 \newcommand*{\assignsS}{\mathrm{assigns}}
+\newcommand*{\declaresS}{\mathrm{declares}}
 \newcommand*{\binds}{\mathrm{binds}}
 \newcommand*{\capturesE}{\mathrm{captures}_{\mathsf{e}}}
 \newcommand*{\capturesS}{\mathrm{captures}}

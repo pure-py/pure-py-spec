@@ -14,8 +14,8 @@
 {
   \Sigma; q; \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
   \Sigma'; q; \Gamma \override \Delta \vdash t' : R \binding \Sigma^\dagger \\
-  \capturesS(t) \cap \assignsS(t') = \varnothing \\
-  c \notin \assignsS(t') \quad (\forall \bind{c}{\Type{C}} \in \Delta)
+  \deleted{\capturesS(t) \cap \assignsS(t') = \varnothing} \\
+  \deleted{c \notin \assignsS(t') \quad (\forall \bind{c}{\Type{C}} \in \Delta)}
 }
 {
   \Sigma; q; \Gamma \vdash t\;t' : \Assigns{\Delta} \override R \binding \Sigma^\dagger
@@ -23,6 +23,7 @@
 \and
 \inferrule*[lab={\ruleName{class}}]
 {
+  \added{\Gamma(c) = \False} \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
   \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i)
@@ -33,6 +34,7 @@
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
+  \added{\Gamma(c) = \False} \\
   \bind{c'}{\Type{D}} \in \Gamma \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\

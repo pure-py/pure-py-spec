@@ -10,23 +10,34 @@
   \Sigma; \Gamma; \zeta \vdash \exPass : \Assigns{\varnothing}
 }
 \and
-\inferrule*[lab={\ruleName{assign}}]
+\inferrule*[lab={\ruleName{declare}}]
 {
-  \Gamma \vdash \psi \synth \sigma \\
-  \Sigma; \Gamma \vdash e \checks \sigma \\
-  x \notin \capturesE(e)
+  \added{\Gamma(x) = \False} \\
+  \added{\Gamma \vdash \psi \synth \tau}
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exAssign{x \exAnnot{\psi}}{e} : \Assigns{\set{\bind{x}{\sigma}}}
+  \added{\Sigma; \Gamma; \zeta \vdash x\exAnnot{\psi} : \Assigns{\set{\bind{x}{\FalseTy{\tau}}}}}
 }
 \and
-\inferrule*[lab={\ruleName{assign-unannot}}]
+\inferrule*[lab={\ruleName{assign}}]
 {
-  \Sigma; \Gamma \vdash e \synth \sigma \\
-  x \notin \capturesE(e)
+  \added{\Gamma(x) = \FalseTy{\tau}} \\
+  \replaced{\Sigma; \Gamma \vdash e \checks \tau}{\Sigma; \Gamma \vdash e \synth \sigma} \\
+  \deleted{x \notin \capturesE(e)}
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exAssign{x}{e} : \Assigns{\set{\bind{x}{\sigma}}}
+  \Sigma; \Gamma; \zeta \vdash \exAssign{x}{e} : \Assigns{\set{\bind{x}{\replaced{\tau}{\sigma}}}}
+}
+\and
+\inferrule*[lab={\ruleName{assign-annot}}]
+{
+  \added{\Gamma(x) = \False} \\
+  \Gamma \vdash \psi \synth \replaced{\tau}{\sigma} \\
+  \Sigma; \Gamma \vdash e \checks \replaced{\tau}{\sigma} \\
+  \deleted{x \notin \capturesE(e)}
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exAssign{x\exAnnot{\psi}}{e} : \Assigns{\set{\bind{x}{\replaced{\tau}{\sigma}}}}
 }
 \and
 \inferrule*[lab={\ruleName{expr-stmt}}]
@@ -76,7 +87,7 @@
   \Sigma; \Gamma; \zeta \vdash s_i : R_i \quad (\forall i)
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \mergeS \ldots \mergeS R_{n+1} \: \mergeS \Assigns{\varnothing}
+  \Sigma; \Gamma; \zeta \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \merge \ldots \merge R_{n+1} \: \merge \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{if-else}}]
@@ -85,14 +96,14 @@
   \Sigma; \Gamma; \zeta \vdash s_i : R_i \quad (\forall i)
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \mergeS \ldots \mergeS R_{n+2}
+  \Sigma; \Gamma; \zeta \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
 }
 \and
 \inferrule*[lab={\ruleName{seq}}]
 {
   \Sigma; \Gamma; \zeta \vdash s : \Assigns{\Delta} \\
   \Sigma; \Gamma \override \Delta ; \zeta \vdash s' : R \\
-  \capturesS(s) \cap \assignsS(s') = \varnothing
+  \deleted{\capturesS(s) \cap \assignsS(s') = \varnothing}
 }
 {
   \Sigma; \Gamma; \zeta \vdash s\;s' : \Assigns{\Delta} \override R
@@ -100,6 +111,8 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
+  \added{\Gamma(f_i) = \False \quad (\forall i)} \\
+  \added{\declaresS(s_i) \text{ distinct} \quad (\forall i)} \\
   \Delta_i = \set{\bind{\seq{x}_i}{\seq{\sigma}_i}} \quad (\forall i) \\
   \Delta' = \set{\bind{f_1}{\tyCallable{\seq{\sigma}_1}{\tau_1}}, \ldots, \bind{f_{n+1}}{\tyCallable{\seq{\sigma}_{n+1}}{\tau_{n+1}}}} \\
   \Sigma; \Gamma \override \Delta' \override \Delta_i \override \False(\assignsS(s_i) \setminus \dom(\Delta_i)); \tau_i \vdash s_i : R_i \quad (\forall i)
@@ -128,7 +141,7 @@
   L \neq \varnothing
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S \mergeS \Assigns{\varnothing}
+  \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S \merge \Assigns{\varnothing}
 }
 \end{mathpar}
 \caption{Given optional return type $\zeta$, statement $s$ has static outcome $R$}

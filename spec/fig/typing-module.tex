@@ -111,7 +111,8 @@
   \mathcal{M}(q) = \seq{\iota}\;t \\
   \Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma_1 \\
   \mathcal{P}(\pyinline{builtins}) = (\Gamma', \rho) \\
-  \Sigma_1; q; \Gamma' \mathbin{\override} \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
+  \added{\declaresS(t) \text{ distinct}} \\
+  \Sigma_1; q; \Gamma' \override \added{\False(\assignsS(t)) \override} \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {

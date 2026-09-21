@@ -27,6 +27,14 @@
   \rho, \exAssign{x\exAnnot{\psi}}{e} \Rightarrow \mlet{v}{r}{\assigns{\set{\bind{x}{v}}}}
 }
 \and
+\inferrule*[lab={\ruleName{eval-declare}}]
+{
+  \strut
+}
+{
+  \added{\rho, x\exAnnot{\psi} \Rightarrow \assigns{\varnothing}}
+}
+\and
 \inferrule*[lab={\ruleName{eval-expr-stmt}}]
 {
   \rho, e \Rightarrow r
