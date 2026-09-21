@@ -26,6 +26,14 @@ class UnassignedVariable:
     x: Var
 
     def message(self) -> str:
+        return f"'{self.x}' is declared but not yet assigned"
+
+
+@dataclass(frozen=True)
+class PossiblyUnassigned:
+    x: Var
+
+    def message(self) -> str:
         return f"'{self.x}' is not definitely assigned"
 
 
@@ -394,6 +402,7 @@ class MissingReturn:
 type Reason = (
     DuplicateField
     | UnassignedVariable
+    | PossiblyUnassigned
     | UndefinedVariable
     | UnboundName
     | AssignmentBeforeDeclaration

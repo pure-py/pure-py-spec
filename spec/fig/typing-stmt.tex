@@ -16,12 +16,12 @@
   \added{\Gamma \vdash \psi \synth \tau}
 }
 {
-  \added{\Sigma; \Gamma; \zeta \vdash x\exAnnot{\psi} : \Assigns{\set{\bind{x}{\DeclTy{\tau}}}}}
+  \added{\Sigma; \Gamma; \zeta \vdash x\exAnnot{\psi} : \Assigns{\set{\bind{x}{\DU{\tau}}}}}
 }
 \and
 \inferrule*[lab={\ruleName{assign}}]
 {
-  \added{\Gamma(x) = \DeclTy{\tau}} \\
+  \added{\Gamma(x) = \DU{\tau}} \\
   \replaced{\Sigma; \Gamma \vdash e \checks \tau}{\Sigma; \Gamma \vdash e \synth \sigma} \\
   \deleted{x \notin \capturesE(e)}
 }

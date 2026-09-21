@@ -24,12 +24,17 @@ class Unbound:
 
 
 @dataclass(frozen=True)
-class DeclTy:
+class DU:
+    tau: Type
+
+
+@dataclass(frozen=True)
+class PU:
     tau: Type
 
 
 # Lazily evaluated, so these may name Class before it is defined.
-type VarEntry = Unbound | DeclTy | Type
+type VarEntry = Unbound | DU | PU | Type
 type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName
 type Context = Mapping[Var, ContextEntry]
 type VarContext = Mapping[Var, VarEntry]
@@ -74,7 +79,7 @@ def var_entry(mod_ctx: ModuleContext, x: Var) -> VarEntry | None:
 
 def assigned_type(mod_ctx: ModuleContext, x: Var) -> Type | None:
     theta = var_entry(mod_ctx, x)
-    return None if theta is None or isinstance(theta, (Unbound, DeclTy)) else theta
+    return None if theta is None or isinstance(theta, (Unbound, DU, PU)) else theta
 
 
 def is_assigned(mod_ctx: ModuleContext, x: Var) -> bool:
@@ -163,14 +168,29 @@ def predefined_context(q: QualifiedName) -> Context:
 def merge_entry(theta: ContextEntry, theta_: ContextEntry) -> VarEntry:
     assert not isinstance(theta, (ModuleStub, ModuleLoaded, Class, PredefinedName))
     assert not isinstance(theta_, (ModuleStub, ModuleLoaded, Class, PredefinedName))
-    return theta if theta == theta_ else Unbound()
+    return theta if theta == theta_ else PU(declared_type_of(theta))
 
 
 def merge_context(gamma: Context, gamma_: Context) -> VarContext:
     return {
-        x: merge_entry(gamma[x], gamma_[x]) if x in gamma and x in gamma_ else Unbound()
+        x: merge_entry(gamma[x], gamma_[x])
+        if x in gamma and x in gamma_
+        else PU(declared_type_of(gamma[x] if x in gamma else gamma_[x]))
         for x in set(gamma.keys()) | set(gamma_.keys())
     }
+
+
+def declared_type_of(theta: ContextEntry) -> Type:
+    match theta:
+        case DU(tau):
+            return tau
+        case PU(tau):
+            return tau
+        case _:
+            assert not isinstance(
+                theta, (Unbound, ModuleStub, ModuleLoaded, Class, PredefinedName)
+            ), "merged entries are assigned or declared variables"
+            return theta
 
 
 def merge_outcomes(rs: list[StaticOutcome]) -> StaticOutcome:
@@ -226,7 +246,7 @@ def join_context(Sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
 
 
 def binding_types(entries: list[VarEntry]) -> list[Type]:
-    types = [e for e in entries if not isinstance(e, (Unbound, DeclTy))]
+    types = [e for e in entries if not isinstance(e, (Unbound, DU, PU))]
     assert len(types) == len(entries)
     return types
 

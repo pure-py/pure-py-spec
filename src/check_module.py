@@ -14,11 +14,12 @@ from aux import (
 from classes import ClassTable
 from contexts import (
     BUILTINS,
+    DU,
     MAIN,
     PREDEFINED_MODULES,
+    PU,
     Context,
     ContextEntry,
-    DeclTy,
     ModuleContext,
     ModuleLoaded,
     ModuleStub,
@@ -141,7 +142,7 @@ def imports(
     if isinstance(theta, ModuleStub):
         members, Sigma = check_module(mod_ctx.M[theta.q], mod_ctx.M, theta.q, mod_ctx.Sigma)
         return ModuleLoaded(theta.q, members), Sigma
-    if isinstance(theta, (Unbound, DeclTy)):
+    if isinstance(theta, (Unbound, DU, PU)):
         raise IllFormedModule(iota, reasons.UnassignedMember(x, q))
     return theta, mod_ctx.Sigma
 

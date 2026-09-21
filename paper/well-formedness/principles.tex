@@ -82,12 +82,12 @@ in scope throughout the function body, wherever the assignment occurs. \PurePy r
 form of a bare annotation such as \pyinline{x: int}, which Python has allowed since version 3.6, and separates
 declaring a variable from assigning it through \emph{definite assignment}: a variable may be referenced only
 where an assignment covers every path to the reference, and assigned only where no path has assigned it
-already. The \ruleName{declare} rule binds the variable at $\DeclTy{\tau}$, declared at $\tau$ but not
-definitely assigned; the \ruleName{assign} rule requires that entry, checks the expression against $\tau$ and
+already. The \ruleName{declare} rule binds the variable at $\DU{\tau}$, declared at $\tau$ and
+definitely unassigned; the \ruleName{assign} rule requires that entry, checks the expression against $\tau$ and
 makes the variable definitely assigned, so that $\Gamma(x)$ is a type, as the \ruleName{var} rule requires; an
 annotated assignment does both at once; and the \ruleName{if} rules combine the branches with $\merge$, so
 that a conditional definitely assigns a variable only if every branch that does not definitely return
-assigns it, otherwise leaving it $\Unbound$ (\secref{well-formedness-statements}). A variable is thus
+assigns it, otherwise leaving it possibly unassigned, $\PU{\tau}$ (\secref{well-formedness-statements}). A variable is thus
 declared once in its scope and assigned at most once on any path, as a blank final in
 Java~\cite[\S16]{gosling2025}. Branch-local variables are therefore permitted, but using one after the
 conditional is not, nor is completing a partial assignment:

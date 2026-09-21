@@ -259,8 +259,8 @@ assignment can take a declared class's name.} A
 of its annotation, without assigning it (\ruleName{declare}); an assignment requires the variable to be
 declared and not yet assigned, and checks the expression against the declared type (\ruleName{assign}); an
 annotated assignment declares and assigns at once (\ruleName{assign-annot}). Each of the three requires the
-entry for the variable to be $\Unbound$ or $\DeclTy{\tau}$, so a variable is declared once in its scope and
-assigned at most once on any path, since a variable assigned on some path is unbound after the merge, as a blank final in Java~\cite[\S16]{gosling2025}, and a name bound to a
+entry for the variable to be $\Unbound$ or $\DU{\tau}$, so a variable is declared once in its scope and
+assigned at most once on any path, since a variable assigned on some path is possibly unassigned after the merge, as a blank final in Java~\cite[\S16]{gosling2025}, and a name bound to a
 class, module or predefined name cannot be declared or assigned. A closure captures only definitely assigned
 variables, which are never assigned again, so a closure sees a fixed value\paperonly{ (\secref{no-mutable-state})}.}{An annotated assignment checks the expression against the type of the annotation,
 and an unannotated assignment takes the type synthesised by the expression (\ruleName{assign},

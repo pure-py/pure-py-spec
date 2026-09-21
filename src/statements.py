@@ -30,8 +30,9 @@ from classes import (
     short_name,
 )
 from contexts import (
+    DU,
+    PU,
     Assigns,
-    DeclTy,
     ModuleContext,
     ModuleLoaded,
     ModuleStub,
@@ -230,21 +231,12 @@ def check_distinct_declarations(body: list[ast.stmt]) -> None:
 
 
 def check_assignments_declared(body: list[ast.stmt], bound: set[Var]) -> None:
-    """Diagnostics for assignments the rules reject as unbound: a target never declared in the
-    scope, other than a parameter or pattern variable, or one declared only later in the text."""
-    first_declaration: dict[Var, ast.stmt] = {}
-    for x, node in reversed(declares_body(body)):
-        first_declaration[x] = node
+    """Diagnostic for an assignment the rules reject as unbound: a target never declared in the
+    scope, other than a parameter or pattern variable."""
+    declared = {x for x, _ in declares_body(body)}
     for x, node in assign_targets(body):
-        if x not in first_declaration:
-            if x not in bound and x not in pattern_bound(body):
-                raise IllFormedModule(node, reasons.UndeclaredAssignment(x))
-        elif position(first_declaration[x]) > position(node):
-            raise IllFormedModule(node, reasons.AssignmentBeforeDeclaration(x))
-
-
-def position(node: ast.stmt) -> tuple[int, int]:
-    return (node.lineno, node.col_offset)
+        if x not in declared and x not in bound and x not in pattern_bound(body):
+            raise IllFormedModule(node, reasons.UndeclaredAssignment(x))
 
 
 def check_declarable(x: Var, node: ast.AST, mod_ctx: ModuleContext) -> None:
@@ -261,11 +253,13 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
             assert isinstance(target, ast.Name)
             x = target.id
             match mod_ctx.gamma.get(x):
-                case DeclTy(tau):
+                case DU(tau):
                     check_expr(s.value, tau, mod_ctx)
                     return Assigns({x: tau})
-                case Unbound():
+                case PU():
                     raise IllFormedModule(s, reasons.MaybeAssigned(x))
+                case Unbound():
+                    raise IllFormedModule(s, reasons.AssignmentBeforeDeclaration(x))
                 case Class() | ModuleStub() | ModuleLoaded() | PredefinedName():
                     raise IllFormedModule(s, reasons.Redeclaration(x))
                 case _:
@@ -279,7 +273,7 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
             check_declarable(x, s, mod_ctx)
             tau = resolve_type(type_expr(s.annotation), s, mod_ctx)
             if s.value is None:
-                return Assigns({x: DeclTy(tau)})
+                return Assigns({x: DU(tau)})
             check_expr(s.value, tau, mod_ctx)
             return Assigns({x: tau})
         case ast.Expr(value=e):
@@ -365,8 +359,10 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
                         raise IllFormedModule(e, reasons.PredefinedNameAsValue(QualifiedName((x,))))
                     case Unbound():
                         raise IllFormedModule(e, reasons.UnboundName(x))
-                    case DeclTy():
+                    case DU():
                         raise IllFormedModule(e, reasons.UnassignedVariable(x))
+                    case PU():
+                        raise IllFormedModule(e, reasons.PossiblyUnassigned(x))
                     case _:
                         raise IllFormedModule(e, reasons.UndefinedVariable(x))
             tau = assigned_type(mod_ctx, x)
@@ -446,7 +442,9 @@ def attr_module(parent: ModuleLoaded, x: Var, e: ast.Attribute) -> Type:
             raise IllFormedModule(e, reasons.PredefinedNameAsValue(qualified_name(e)))
         case Unbound():
             raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
-        case DeclTy():
+        case DU():
+            raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
+        case PU():
             raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
         case _:
             return theta
