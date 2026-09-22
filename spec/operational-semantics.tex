@@ -43,7 +43,7 @@ results of the same form, carrying an outcome, a sequence of values or an enviro
 
 \subsection{Expressions and statements}
 
-A value has a context entry, and an environment a context, by \figref{typing-values}.
+\Replaced{A value is well-formed at a context entry, and an environment at a context, by \figref{well-formed-values}.}{A value has a context entry, and an environment a context, by \figref{well-formed-values}.}
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any statement $s$ with
 $\Gamma \vdash s : R$, the statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
 to outcome $o$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Top-level statements
@@ -70,7 +70,7 @@ aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the except
 dictionary subscripted by a value other than a string is undefined. Likewise an attribute reference on a
 value other than a module or object has no derivation: the attributes of built-in values are undefined.
 
-\input{spec/fig/typing-values}
+\input{spec/fig/well-formed-values}
 
 \specinput{spec/fig/eval-outcome}
 

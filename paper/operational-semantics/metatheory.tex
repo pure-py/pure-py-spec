@@ -1,10 +1,13 @@
 \subsection{Metatheory}
 \label{sec:metatheory}
 
-Value typing (\figref{typing-values}) gives an ordinary value its type and a module or class value the
-corresponding context entry; environment typing applies value typing pointwise, giving an environment a context. The
-predefined environments are well-formed by construction, and a module loads to an environment typed at its
-signature.
+\Replaced{Value well-formedness (\figref{well-formed-values}) gives an ordinary value its type and a module or class
+value the corresponding context entry; environment well-formedness applies it pointwise, giving an environment a
+context. The predefined environments are well-formed by construction, and a module loads to an environment
+well-formed at its signature.}{Value typing (\figref{well-formed-values}) gives an ordinary value its type and a
+module or class value the corresponding context entry; environment typing applies value typing pointwise, giving an
+environment a context. The predefined environments are well-formed by construction, and a module loads to an
+environment typed at its signature.}
 
 \begin{theorem}[Loaded environments are well-formed]
 \label{thm:loaded}
