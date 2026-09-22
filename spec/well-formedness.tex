@@ -269,7 +269,7 @@ merge with a path that does not assign it, a variable is assigned at most once o
 rule for blank finals~\cite[\S16]{gosling2025}; a name
 bound to a class, module or predefined name cannot be assigned at all. The declaration rules do not consult the context for the variable being declared; instead \ruleName{def} and
 \ruleName{module} require the declarations of a scope, including the parameters of a function or the imported
-names of a module, to be distinct from one another and from its pattern variables. A name therefore cannot be declared twice in a scope,
+names of a module, to be distinct from one another and from any pattern variables in the scope. A name therefore cannot be declared twice in a scope,
 whether on one path or in different branches, nor can a declaration share its name with a pattern variable of
 the same scope. Each of these cases is rejected by mypy as a redefinition. The body of a lambda or nested definition is checked under the context in force where it is defined,
 so a variable of the enclosing scope referenced by the body must be definitely assigned at that point. Since
@@ -289,7 +289,7 @@ A function definition binds its parameters at their annotated types, plus the na
 mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables \Added{declared or} assigned in the body start
 \replaced{unbound}{at $\False$} (\ruleName{def}), emulating Python's scoping of function bodies, which
 prefers a locally \Replaced{bound}{assigned} name to one visible in an enclosing scope. \Added{As with any scope, the declarations of the function, including its parameters, must be distinct from one
-another and from its pattern variables. The function names of the mutual region are not among these; they are
+another and from any pattern variables in its body. The function names of the mutual region are not among these; they are
 declarations of the enclosing scope, where the same condition applies to them.} The body is checked with the
 declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
@@ -435,7 +435,7 @@ The rule \ruleName{module} types a module body under the context of $\mathcal{P}
 \Replaced{overridden by $\Unbound$ for each name bound by the body and then by the imported context, so the members of
 \pyinline{builtins} are in scope unqualified and a name bound by the body shadows a builtin throughout. As with any
 scope, the declarations of the module, including its imported names, must be distinct from one another and
-from its pattern variables.}{overridden by the imported context, so the members of \pyinline{builtins} are in scope
+from any pattern variables in its body.}{overridden by the imported context, so the members of \pyinline{builtins} are in scope
 unqualified.}
 
 \input{spec/fig/typing-module}
