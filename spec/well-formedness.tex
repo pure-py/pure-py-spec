@@ -266,8 +266,9 @@ declaration with an assignment declares and assigns at once (\ruleName{declare-a
 entry for the variable to be $\DU{\tau}$, so a variable is assigned at most once on any path, since a variable
 assigned on some path is possibly unassigned after the merge, following Java's rule for blank finals~\cite[\S16]{gosling2025}, and a
 name bound to a class, module or predefined name cannot be assigned. That a variable is declared once in its scope
-is a condition on the scope (\ruleName{def}, \ruleName{module}). A closure captures only definitely assigned
-variables, which are never assigned again, so a closure sees a fixed value\paperonly{ (\secref{no-mutable-state})}.}{An annotated assignment checks the expression against the type of the annotation,
+is a condition on the scope (\ruleName{def}, \ruleName{module}). The body of a lambda or nested definition is checked under the context in force where it is defined,
+so a variable of the enclosing scope that the body references must be definitely assigned at that point. Since
+no variable is assigned twice, the value captured by a closure never changes\paperonly{ (\secref{no-mutable-state})}.}{An annotated assignment checks the expression against the type of the annotation,
 and an unannotated assignment takes the type synthesised by the expression (\ruleName{assign},
 \ruleName{assign-unannot}).} The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
