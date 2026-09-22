@@ -22,7 +22,7 @@ $s$ & $::=$ & $\exPass$ & (Pass) \\
 $t$ & $::=$ & $s$ & (Stmt) \\
     & $\mid$ & $t\;t'$ & (TopSeq) \\
     & $\mid$ & \replaced{$\exDataclass{c[\seq{\alpha}]}{\phi}$}{$\exDataclass{c}{\phi}$} & (Dataclass) \\
-    & $\mid$ & \replaced{$\exDataclassExtend{c[\seq{\alpha}]}{c'[\seq{\psi}]}{\phi}$}{$\exDataclassExtend{c}{c'}{\phi}$} & (DataclassExtend) \\
+    & $\mid$ & \replaced{$\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}$}{$\exDataclassExtend{c}{c'}{\phi}$} & (DataclassExtend) \\
     & $\mid$ & \added{$\exTypeAlias{x[\seq{\alpha}]}{\psi}$} & \added{(TypeAlias)}
    \\[3mm]
 \grammarGroup{Imports} \\

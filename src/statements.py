@@ -83,6 +83,7 @@ from type_syntax import (
     UnionType,
     Var,
     base_type,
+    dotted_name,
     literal_type,
     qualified,
 )
@@ -739,11 +740,11 @@ def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, C
         raise IllFormedModule(node, reasons.DuplicateField(dup, node.name))
     base: Class | None = None
     if len(node.bases) > 0:
-        assert isinstance(node.bases[0], ast.Name)
-        base_name = node.bases[0].id
-        theta = mod_ctx.gamma.get(base_name)
+        q = dotted_name(node.bases[0])
+        assert q is not None, "base class checked by the syntax stage"
+        theta = resolve_name(q, mod_ctx)
         if not isinstance(theta, Class):
-            raise IllFormedModule(node, reasons.NotClass(QualifiedName((base_name,))))
+            raise IllFormedModule(node, reasons.NotClass(q))
         base = theta
         duplicates = set(names) & set(fields(mod_ctx.Sigma, base))
         if len(duplicates) > 0:

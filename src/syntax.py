@@ -211,13 +211,9 @@ def check_syntax_classdef(node: ast.ClassDef) -> None:
 
 
 def check_syntax_base(base: ast.expr) -> None:
-    match base:
-        case ast.Name():
-            pass
-        case ast.Subscript(value=ast.Name()):
-            check_syntax_annotation(base)
-        case _:
-            raise Prohibited(base, "base class must be a simple name")
+    if not isinstance(parse_annotation(base), TypeName):
+        raise Prohibited(base, "base class must be a qualified name")
+    check_syntax_annotation(base)
 
 
 def check_syntax_type_alias(node: ast.TypeAlias) -> None:

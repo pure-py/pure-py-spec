@@ -101,7 +101,7 @@ A \emph{top-level statement} $t$ is a statement\Replaced{, a class declaration o
 module after its imports is a top-level statement, so class declarations \Added{and \pyinline{type} statements} occur only at the top level of a
 module. \Added{A function definition, a class declaration and a \pyinline{type} statement bind \emph{type parameters}
 $\seq{\alpha}$, written in brackets after the name as in Python 3.12. A \pyinline{type} statement declares a
-\emph{type alias}, and the base class of a dataclass takes type arguments.} A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal
+\emph{type alias}, and the base class of a dataclass is a qualified name applied to type arguments.} A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal
 run of consecutive \pyinline{def} statements in a sequence: any other statement separates mutual
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single mutual region. The well-formedness rules treat each
