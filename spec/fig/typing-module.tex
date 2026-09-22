@@ -82,8 +82,8 @@
 \and
 \inferrule*[lab={\ruleName{loads-as-qualified}}]
 {
-  \Sigma \vdash_{\mathsf{load}} q : \Gamma' \binding \Sigma_1 \\
-  \Sigma_1 \vdash q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsAs \theta' \binding \Sigma'
+  \Sigma \vdash_{\mathsf{load}} q : \Gamma' \binding \replaced{\Sigma^\dagger}{\Sigma_1} \\
+  \replaced{\Sigma^\dagger}{\Sigma_1} \vdash q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsAs \theta' \binding \Sigma'
 }
 {
   \Sigma \vdash q.x, \theta \loadsAs \theta' \binding \Sigma'
@@ -110,11 +110,10 @@
 \inferrule*[lab={\ruleName{module}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;t \\
-  \Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma_1 \\
+  \Sigma; q \vdash \seq{\iota} : \Gamma \binding \replaced{\Sigma^\dagger}{\Sigma_1} \\
   \mathcal{P}(\pyinline{builtins}) = (\Gamma', \rho) \\
-  \added{\declaresS(t) \text{ distinct}} \\
-  \added{\set{\declaresS(t)} \cap (\dom(\Gamma) \cup \binds(t)) = \varnothing} \\
-  \Sigma_1; q; \Gamma' \override \added{\set{\bind{x}{\Unbound} \mid x \in \assignsS(t)}} \mathbin{\added{\override}} \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
+  \replaced{\Sigma^\dagger}{\Sigma_1}; q; \Gamma' \override \added{\set{\bind{x}{\Unbound} \mid x \in \assignsS(t)}} \mathbin{\added{\override}} \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
+  \added{\wellScoped(\set{\declaresS(\seq{\iota})}, t)} \\
   (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {

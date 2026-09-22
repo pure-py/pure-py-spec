@@ -192,7 +192,7 @@ def check_statement(s: Statement, mod_ctx: ModuleContext, returns: Type | None) 
 def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
     f_names: VarContext = {d.name: signature(d, mod_ctx) for d in defs}
     for d in defs:
-        check_binders([a.arg for a in d.args.args], d.body)
+        well_scoped({a.arg for a in d.args.args}, d.body)
         params = parameters(d, mod_ctx)
         check_assignments_declared(d.body, set(params))
         locals_ = assigns_body(d.body) - set(params)
@@ -214,15 +214,17 @@ def check_returns_none(Sigma: ClassTable, s: ast.Return, declared: Type) -> None
         raise IllFormedModule(s, reasons.TypeMismatch(declared, Primitive.NONE))
 
 
-def check_binders(bound: list[Var], body: list[ast.stmt]) -> None:
-    """Parameters or imported names `bound` and the declarations of `body` are distinct, and no
-    declaration names a pattern-bound variable."""
-    seen = list(bound)
+def well_scoped(ys: set[Var], body: list[ast.stmt]) -> None:
+    """Declarations of `body` distinct from one another, from the parameters or imported names `ys`
+    and from the pattern-bound variables of `body`, and `ys` disjoint from those variables."""
     patterns = pattern_bound(body)
+    seen = set(ys)
     for x, node in declares_body(body):
         if x in seen or x in patterns:
             raise IllFormedModule(node, reasons.Redeclaration(x))
-        seen.append(x)
+        seen.add(x)
+    for x in sorted(ys & patterns.keys()):
+        raise IllFormedModule(patterns[x], reasons.Redeclaration(x))
 
 
 def check_assignments_declared(body: list[ast.stmt], bound: set[Var]) -> None:

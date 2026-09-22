@@ -1,7 +1,15 @@
 import ast
 from itertools import dropwhile, takewhile
 
-from type_syntax import QualifiedName, TypeExpr, Var, dotted_name, parse_annotation
+from type_syntax import (
+    QualifiedName,
+    TypeExpr,
+    Var,
+    dotted_name,
+    parse_annotation,
+    parse_qualified,
+    root,
+)
 
 # A PurePy statement: a Python statement, or a mutual region of consecutive defs. A Python body
 # (a statement list) represents the spec's right-nested sequence s s'.
@@ -217,7 +225,8 @@ def assigns_body(body: list[ast.stmt]) -> set[Var]:
 
 
 def declares(s: ast.stmt) -> list[tuple[Var, ast.stmt]]:
-    """Names declared in `s` with their declaring nodes, in textual order and with repeats."""
+    """Names declared in `s`, or bound by import `s`, with their nodes, in textual order and
+    with repeats."""
     match s:
         case ast.AnnAssign():
             assert isinstance(s.target, ast.Name)
@@ -230,6 +239,11 @@ def declares(s: ast.stmt) -> list[tuple[Var, ast.stmt]]:
             return [(x, s)]
         case ast.ClassDef(name=x):
             return [(x, s)]
+        case ast.Import():
+            (alias,) = s.names
+            return [(root(parse_qualified(alias.name)), s)]
+        case ast.ImportFrom():
+            return [(alias.name, s) for alias in s.names]
         case _:
             return []
 
@@ -254,17 +268,21 @@ def assign_targets(body: list[ast.stmt]) -> list[tuple[Var, ast.stmt]]:
     return out
 
 
-def pattern_bound(body: list[ast.stmt]) -> set[Var]:
-    """Variables bound by the patterns of the match statements in `body`, not descending into defs."""
-    out: set[Var] = set()
+def pattern_bound(body: list[ast.stmt]) -> dict[Var, ast.Match]:
+    """Variables bound by the patterns of the match statements in `body`, each with a match
+    statement binding it, not descending into defs."""
+    out: dict[Var, ast.Match] = {}
     for s in body:
         match s:
             case ast.If(body=ss, orelse=ss_):
-                out |= pattern_bound(ss) | pattern_bound(ss_)
+                for x, m in (pattern_bound(ss) | pattern_bound(ss_)).items():
+                    out.setdefault(x, m)
             case ast.Match():
-                out |= set().union(
-                    *(binds(case.pattern) | pattern_bound(case.body) for case in s.cases)
-                )
+                for case in s.cases:
+                    for x in binds(case.pattern):
+                        out.setdefault(x, s)
+                    for x, m in pattern_bound(case.body).items():
+                        out.setdefault(x, m)
             case _:
                 pass
     return out
