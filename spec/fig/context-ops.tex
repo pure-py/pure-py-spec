@@ -7,8 +7,9 @@
 \opname{$\override$ (override)} && \bot \override \theta &= \theta \override \bot = \theta \\
 \opblank && \theta \override \theta' &= \theta' \quad \text{otherwise} \\[2mm]
 \opname{$\merge$ (merge)} && \added{\theta \merge \theta} &\added{= \theta} \\
+\opblank && \added{\theta \merge \bot = \bot \merge \theta} &\added{= \PU{\tau} \quad \text{for } \theta \in \set{\tau, \DU{\tau}, \PU{\tau}}} \\
 \opblank && \added{\theta \merge \theta'} &\added{= \PU{\tau} \quad \text{otherwise, for } \theta, \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}}} \\
-\opblank && \deleted{\bot \merge \bot} &\deleted{= \bot} \\
+\opblank && \bot \merge \bot &= \bot \\
 \opblank && \deleted{\tau \merge \bot = \bot \merge \tau} &\deleted{= \False} \\
 \opblank && \deleted{\False \merge \theta = \theta \merge \False} &\deleted{= \False} \\
 \opblank && \deleted{\sigma \merge \tau} &\deleted{= \joinTy{\Sigma}{\sigma}{\tau}} \\[2mm]

@@ -84,10 +84,9 @@ Contexts admit a non-commutative monoid of sequential composition $\Gamma \overr
 an idempotent commutative semigroup of parallel composition $\merge$ (``merge'')\Deleted{, indexed by a class table $\Sigma$}. Together these form a
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
 distributivity does not hold. Both are defined pointwise (\figref{context-ops}): override is right-biased
-and has $\bot$ as both left and right unit; merge is defined only \Replaced{when both arguments are variable entries sharing a type $\tau$, each
-being $\tau$, $\DU{\tau}$ or $\PU{\tau}$, and yields the common entry when the two coincide and $\PU{\tau}$
-when they differ}{on variable entries, returning $\False$ if either argument is undefined or not definitely assigned, and the join of two
-types otherwise}, so $\bot$ is not a unit.
+and has $\bot$ as both left and right unit\Replaced{, whereas merge has no unit, since a variable bound on one side
+only is possibly unassigned.}{; merge is defined only on variable entries, returning $\False$ if either argument is undefined or not definitely assigned, and the join of two
+types otherwise, so $\bot$ is not a unit.}
 \input{spec/fig/context-ops}
 
 A third operation, \emph{context extension} $\Gamma \extend \Delta$ (also \figref{context-ops}),
