@@ -261,6 +261,16 @@ assignment can take a declared class's name.} A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
 \pyinline{return} \Replaced{requires \pyinline{None} to be a subtype of $\tau$}{requires $\tau$ to admit \pyinline{None}}.
 
+\Added{The rules for variables serve two aims: that a program has no mutable state, so a variable never changes
+value, and that a well-typed program is also well typed under mypy. Within these limits the rules permit as
+much as possible. For the first aim, a variable is introduced by a declaration, parameter, import, pattern or
+generator, and receives its value at most once, with its declaration or by later assignment; an assignment never
+introduces a variable and never changes one already assigned. Python rebinds a generator variable on each
+iteration, so a lambda in a comprehension may not capture such a variable, since otherwise it would see a later
+value. For the second aim, a declaration may not reuse a name of its own scope, whether of a parameter, imported
+name, pattern variable or other declaration, since mypy rejects such reuse as a redefinition, whereas a name in a
+nested scope may shadow a name of an enclosing scope or builtin, which mypy permits.}
+
 \Replaced{A declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment requires the variable to be
 declared and not yet assigned, and checks the expression against the declared type (\ruleName{assign}); a
