@@ -121,7 +121,7 @@ fills the field $x$. It is undefined unless every field receives exactly one arg
 \paragraph{Type annotations.}
 
 Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
-may be annotated (\figref{syntax-types}). A type expression names a class by a qualified name; \Replaced{a class $\fq{q}$, written with a tilde, does not occur in source}{a marked name $\fq{q}$ is fully qualified, and does not occur in source}. A \emph{type} $\tau$ is a type expression whose class names \Replaced{have been resolved to classes}{are all marked}; the type system resolves a type expression into a type\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
+may be annotated (\figref{syntax-types}). A type expression names a class by a qualified name; \Replaced{a class $\fq{q}$, written with a tilde, does not occur in source text}{a marked name $\fq{q}$ is fully qualified, and does not occur in source}. A \emph{type} $\tau$ is a type expression whose class names \Replaced{have been resolved to classes}{are all marked}; the type system resolves a type expression into a type\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
 \bind{x_n}{\psi_n}$. The well-formedness rules and operational semantics do not consult annotations, which are given
 meaning by the type system.
 
