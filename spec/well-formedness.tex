@@ -270,8 +270,9 @@ rule for blank finals~\cite[\S16]{gosling2025}; a name
 bound to a class, module or predefined name cannot be assigned at all. The declaration rules do not consult the context for the variable being declared; instead \ruleName{def} and
 \ruleName{module} require the declarations of a scope, together with its parameters or its imported names,
 to be distinct and none of them to be bound by a pattern in the scope. A name therefore cannot be declared
-twice in a scope, whether on one path or in different branches, nor declared over a parameter, an imported
-name or a pattern variable, as mypy requires. The body of a lambda or nested definition is checked under the context in force where it is defined,
+twice in a scope, whether on one path or in different branches, nor can a declaration share its name with a
+parameter, an imported name or a pattern variable of the same scope. Each of these cases is rejected by mypy as
+a redefinition. The body of a lambda or nested definition is checked under the context in force where it is defined,
 so a variable of the enclosing scope that the body references must be definitely assigned at that point. Since
 no variable is assigned twice, the value captured by a closure never changes\paperonly{ (\secref{no-mutable-state})}.}{An annotated assignment checks the expression against the type of the annotation,
 and an unannotated assignment takes the type synthesised by the expression (\ruleName{assign},
