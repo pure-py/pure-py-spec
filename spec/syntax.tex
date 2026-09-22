@@ -24,7 +24,10 @@ The grammar of \PurePy is an abstract syntax, and its metavariables range over v
 over source text: $n$ is a number and $w$ is a string, not the lexemes that denote them. A number is never
 negative, since Python writes a negative number as unary minus applied to a literal, and a length or an
 exit status is an integer. The translation of source text
-into abstract syntax follows Python, including the indentation that delimits blocks.
+into abstract syntax follows Python, including the indentation that delimits blocks. \Added{A list of type
+parameters or type arguments is always present in the abstract syntax and may be empty; in source the
+brackets are omitted with the list, since Python admits no empty brackets, and the empty tuple type is
+written \pyinline{tuple[()]}.}
 
 \subsection{Contexts}
 \label{sec:contexts}
@@ -97,9 +100,8 @@ juxtaposition, $s\;s'$; a function body, a branch of a conditional and the body 
 A \emph{top-level statement} $t$ is a statement\Replaced{, a class declaration or a \pyinline{type} statement}{ or a class declaration}, also sequenced by juxtaposition; the body of a
 module after its imports is a top-level statement, so class declarations \Added{and \pyinline{type} statements} occur only at the top level of a
 module. \Added{A function definition, a class declaration and a \pyinline{type} statement bind \emph{type parameters}
-$\seq{\alpha}$, written in brackets after the name as in Python 3.12; the brackets are omitted when the list is empty,
-as Python requires. A \pyinline{type} statement declares a \emph{type alias}, and the base class of a dataclass may
-be applied to type arguments.} A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal
+$\seq{\alpha}$, written in brackets after the name as in Python 3.12. A \pyinline{type} statement declares a
+\emph{type alias}, and the base class of a dataclass takes type arguments.} A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal
 run of consecutive \pyinline{def} statements in a sequence: any other statement separates mutual
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single mutual region. The well-formedness rules treat each
@@ -119,8 +121,8 @@ fills the field $x$. It is undefined unless every field receives exactly one arg
 \paragraph{Type annotations.}
 
 Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
-may be annotated (\figref{syntax-types}). A type expression names a class \Added{or a type alias} by a qualified name\Added{,
-applied to type arguments when the class or alias has type parameters, and a type parameter by its variable}; a marked name
+may be annotated (\figref{syntax-types}). A type expression names a class \Added{or a type alias} by a qualified name\Added{
+applied to type arguments, and a type parameter by its variable}; a marked name
 $\fq{q}$ is fully qualified, and does not occur in source. A \emph{type} $\tau$ is a type expression whose
 class names are all marked\Added{ and which does not mention any alias}; the type system resolves a type expression into a type\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
 \bind{x_n}{\psi_n}$. The well-formedness rules and operational semantics do not consult annotations, which are given

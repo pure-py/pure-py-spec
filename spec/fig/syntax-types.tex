@@ -22,10 +22,8 @@ $\psi$ & $::=$ & $\nu$ & (Primitive) \\
     & $\mid$ & $\tyLiteral{\ell}$ & (Literal) \\
     & $\mid$ & $\tyLiteral{-n}$ & (Negative literal) \\
     & $\mid$ & \added{$\alpha$} & \added{(TypeVar)} \\
-    & $\mid$ & $q$ & \replaced{(TypeName)}{(ClassName)} \\
-    & $\mid$ & \added{$q[\psi_1, \ldots, \psi_{n+1}]$} & \added{(Application)} \\
-    & $\mid$ & $\fq{q}$ & (Class) \\
-    & $\mid$ & \added{$\fq{q}[\psi_1, \ldots, \psi_{n+1}]$} & \added{(Parameterised class)} \\
+    & $\mid$ & \replaced{$q[\psi_1, \ldots, \psi_n]$}{$q$} & \replaced{(TypeName)}{(ClassName)} \\
+    & $\mid$ & \replaced{$\fq{q}[\psi_1, \ldots, \psi_n]$}{$\fq{q}$} & (Class) \\
     & $\mid$ & $\tyUnion{\psi}{\psi'}$ & (Union)
 \end{tabular}
 \end{center}

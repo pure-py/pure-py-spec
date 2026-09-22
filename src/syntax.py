@@ -4,12 +4,12 @@ from collections.abc import Callable
 
 from aux import is_import, split_imports
 from type_syntax import (
-    ApplicationExpr,
     CallableExpr,
     DictExpr,
     ListExpr,
     TupleExpr,
     TypeExpr,
+    TypeName,
     UnionExpr,
     parse_annotation,
 )
@@ -464,24 +464,24 @@ def check_syntax_annotation(node: ast.expr | None) -> None:
     psi = parse_annotation(node)
     if psi is None:
         raise Prohibited(node, "unsupported type annotation")
-    if has_application(psi):
+    if has_type_arguments(psi):
         raise NotYetSupported(node, "type arguments", 187)
 
 
-def has_application(psi: TypeExpr) -> bool:
+def has_type_arguments(psi: TypeExpr) -> bool:
     match psi:
-        case ApplicationExpr():
-            return True
+        case TypeName(_, args):
+            return len(args) > 0 or any(has_type_arguments(a) for a in args)
         case ListExpr(elem):
-            return has_application(elem)
+            return has_type_arguments(elem)
         case TupleExpr(components):
-            return any(has_application(c) for c in components)
+            return any(has_type_arguments(c) for c in components)
         case DictExpr(value):
-            return has_application(value)
+            return has_type_arguments(value)
         case CallableExpr(params, result):
-            return any(has_application(p) for p in params) or has_application(result)
+            return any(has_type_arguments(p) for p in params) or has_type_arguments(result)
         case UnionExpr(left, right):
-            return has_application(left) or has_application(right)
+            return has_type_arguments(left) or has_type_arguments(right)
         case _:
             return False
 

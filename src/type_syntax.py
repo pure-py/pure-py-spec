@@ -102,11 +102,6 @@ class CallableExpr:
 @dataclass(frozen=True)
 class TypeName:
     q: QualifiedName
-
-
-@dataclass(frozen=True)
-class ApplicationExpr:
-    q: QualifiedName
     args: tuple[TypeExpr, ...]
 
 
@@ -117,15 +112,7 @@ class UnionExpr:
 
 
 type TypeExpr = (
-    Primitive
-    | ListExpr
-    | TupleExpr
-    | DictExpr
-    | CallableExpr
-    | LiteralType
-    | TypeName
-    | ApplicationExpr
-    | UnionExpr
+    Primitive | ListExpr | TupleExpr | DictExpr | CallableExpr | LiteralType | TypeName | UnionExpr
 )
 
 
@@ -222,11 +209,11 @@ def parse_annotation(e: ast.expr) -> TypeExpr | None:
         case ast.Name(id=x):
             return next(
                 (nu for nu in Primitive if nu.value == x),
-                TypeName(QualifiedName((x,))),
+                TypeName(QualifiedName((x,)), ()),
             )
         case ast.Attribute():
             q = dotted_name(e)
-            return None if q is None else TypeName(q)
+            return None if q is None else TypeName(q, ())
         case ast.BinOp(op=ast.BitOr()):
             return union(parse_annotation(e.left), parse_annotation(e.right))
         case ast.Subscript():
@@ -262,7 +249,7 @@ def parse_subscript(e: ast.Subscript) -> TypeExpr | None:
     if head == "dict":
         return DictExpr(args[1]) if len(args) == 2 and args[0] == Primitive.STR else None
     q = dotted_name(e.value)
-    return None if q is None else ApplicationExpr(q, args)
+    return None if q is None else TypeName(q, args)
 
 
 def literal_type(e: ast.expr) -> LiteralType | None:
