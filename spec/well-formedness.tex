@@ -216,13 +216,14 @@ $\overloadsOf(\Sigma, \ominus, \sigma)$.}
 \subsection{Statements}
 \label{sec:well-formedness-statements}
 
-Every well-typed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
-$\Delta$, which may be empty. \Replaced{The base cases are that $\exReturn{e}$ definitely returns, that
-$x\exAnnot{\psi}$ definitely assigns $\set{\bind{x}{\DU{\tau}}}$, and that $\exAssign{x}{e}$ and
-$\exAssign{x\exAnnot{\psi}}{e}$ definitely assign $\set{\bind{x}{\tau}}$, for the type $\tau$ denoted by
-$\psi$.}{The base cases are that \pyinline{return e} definitely returns, and \pyinline{x = e} definitely assigns
-$\set{\bind{\pyinline{x}}{\sigma}}$ for the type $\sigma$ of \pyinline{e}.} \Replaced{A \emph{static outcome} $R$ records which of the two holds: $\Returns$, for definitely returns, or
-$\Assigns{\Delta}$, for definitely assigns $\Delta$.}{\emph{Static outcomes} $R$ classify the two completions: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$).}
+\Replaced{A well-typed statement has a \emph{static outcome} $R$: either $\Returns$, when the statement \emph{definitely
+returns}, or $\Assigns{\Delta}$ for a context $\Delta$, possibly empty, recording the variables the statement
+declares or assigns: a variable at its type if the statement \emph{definitely assigns} it, at $\DU{\tau}$ if it
+declares it without assigning it, and at $\PU{\tau}$ if it assigns it on some paths only. The base cases are
+that $\exReturn{e}$ definitely returns, that $x\exAnnot{\psi}$ declares $x$, and that $\exAssign{x}{e}$ and
+$\exAssign{x\exAnnot{\psi}}{e}$ definitely assign it, at the declared type of $x$.}{Every well-typed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
+$\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x = e} definitely assigns
+$\set{\bind{\pyinline{x}}{\sigma}}$ for the type $\sigma$ of \pyinline{e}. \emph{Static outcomes} $R$ classify the two completions: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$).}
 
 \input{spec/fig/typing-stmt}
 
