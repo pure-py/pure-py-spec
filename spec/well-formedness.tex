@@ -289,7 +289,7 @@ scope; every \PurePy class must declare itself a dataclass. Each rule that takes
 A function definition binds its parameters at their annotated types, plus the names of its
 mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables \Added{declared or} assigned in the body start
 \replaced{unbound}{at $\False$} (\ruleName{def}), emulating Python's scoping of function bodies, which
-prefers a locally \Replaced{bound}{assigned} name to one visible in an enclosing scope. \Added{As for any scope, the parameters together with the names declared in the body must be distinct and not
+prefers a locally \Replaced{bound}{assigned} name to one visible in an enclosing scope. \Added{As with any scope, the parameters together with the names declared in the body must be distinct and not
 bound by a pattern in the body. The function names of the mutual region are not among these; they are
 declarations of the enclosing scope, where the same condition applies to them.} The body is checked with the
 declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
@@ -434,7 +434,7 @@ well-formedness (\figref{typing-module}) requires the main module to be well typ
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
 \Replaced{overridden by $\Unbound$ for each name bound by the body and then by the imported context, so the members of
-\pyinline{builtins} are in scope unqualified and a name bound by the body shadows a builtin throughout. As for any
+\pyinline{builtins} are in scope unqualified and a name bound by the body shadows a builtin throughout. As with any
 scope, the imported names together with the names declared by the body must be distinct and not bound by a
 pattern in the body.}{overridden by the imported context, so the members of \pyinline{builtins} are in scope
 unqualified.}
