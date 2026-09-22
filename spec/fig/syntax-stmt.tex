@@ -21,8 +21,9 @@ $s$ & $::=$ & $\exPass$ & (Pass) \\
 \grammarGroup{Top-level statements} \\
 $t$ & $::=$ & $s$ & (Stmt) \\
     & $\mid$ & $t\;t'$ & (TopSeq) \\
-    & $\mid$ & $\exDataclass{c}{\phi}$ & (Dataclass) \\
-    & $\mid$ & $\exDataclassExtend{c}{c'}{\phi}$ & (DataclassExtend)
+    & $\mid$ & \replaced{$\exDataclass{c[\seq{\alpha}]}{\phi}$}{$\exDataclass{c}{\phi}$} & (Dataclass) \\
+    & $\mid$ & \replaced{$\exDataclassExtend{c[\seq{\alpha}]}{c'[\seq{\psi}]}{\phi}$}{$\exDataclassExtend{c}{c'}{\phi}$} & (DataclassExtend) \\
+    & $\mid$ & \added{$\exTypeAlias{x[\seq{\alpha}]}{\psi}$} & \added{(TypeAlias)}
    \\[3mm]
 \grammarGroup{Imports} \\
 $\iota$ & $::=$ & $\exImport{q}$ & (Import) \\
@@ -42,7 +43,7 @@ $\mu$ & $::=$ & $\iota_1 \;\ldots\; \iota_n \;\; t$ & (ModuleBody)
 $q$ & $::=$ & $x_1.\cdots.x_{n+1}$ & (Name)
    \\[3mm]
 \grammarGroup{Function definitions} \\
-$d$ & $::=$ & $\exDef{f}{\bind{x_1}{\psi_1}, \ldots, \bind{x_n}{\psi_n}}{\exRetAnnot{\psi}}{s}$ & (Def)
+$d$ & $::=$ & \replaced{$\exDef{f[\seq{\alpha}]}{\bind{x_1}{\psi_1}, \ldots, \bind{x_n}{\psi_n}}{\exRetAnnot{\psi}}{s}$}{$\exDef{f}{\bind{x_1}{\psi_1}, \ldots, \bind{x_n}{\psi_n}}{\exRetAnnot{\psi}}{s}$} & (Def)
 \end{tabular}
 \end{center}
 \caption{Modules and statements}

@@ -64,9 +64,9 @@ from shapes import shapes
 from subtyping import join_seq, subtype
 from syntax import PatList
 from type_syntax import (
+    ApplicationExpr,
     CallableExpr,
     CallableType,
-    ClassName,
     ClassType,
     DictExpr,
     DictType,
@@ -79,6 +79,7 @@ from type_syntax import (
     TupleType,
     Type,
     TypeExpr,
+    TypeName,
     UnionExpr,
     UnionType,
     Var,
@@ -107,13 +108,15 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
         case LiteralType():
             check_in_scope("Literal", node, mod_ctx)
             return psi
-        case ClassName(q):
+        case TypeName(q):
             c = resolve_name(q, mod_ctx)
             if isinstance(c, Unbound):
                 raise IllFormedModule(node, reasons.UnboundName(str(q)))
             if not isinstance(c, Class):
                 raise IllFormedModule(node, reasons.NotClass(q))
             return ClassType(c)
+        case ApplicationExpr():
+            raise AssertionError("type arguments are rejected by the syntax stage")
         case ListExpr(psi_):
             check_in_scope("list", node, mod_ctx)
             return ListType(resolve_type(psi_, node, mod_ctx))

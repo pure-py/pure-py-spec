@@ -29,7 +29,7 @@ into abstract syntax follows Python, including the indentation that delimits blo
 \subsection{Contexts}
 \label{sec:contexts}
 
-Metavariables $x$, $f$ and $c$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function and $c$ when it is expected to denote a class. A \emph{qualified name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}); a variable is thus a qualified name with a single component.
+Metavariables $x$, $f$\Replaced{, $c$ and $\alpha$}{ and $c$} range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function\Replaced{, $c$ when it is expected to denote a class and $\alpha$ when it is a type parameter}{ and $c$ when it is expected to denote a class}. A \emph{qualified name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}); a variable is thus a qualified name with a single component.
 
 \begin{definition}[Context]
 \label{def:context}
@@ -94,9 +94,12 @@ otherwise right-biased like override. It is used in processing an import prefix,
 
 Statements are sequenced by
 juxtaposition, $s\;s'$; a function body, a branch of a conditional and the body of a case are statements.
-A \emph{top-level statement} $t$ is a statement or a class declaration, also sequenced by juxtaposition; the body of a
-module after its imports is a top-level statement, so class declarations occur only at the top level of a
-module. A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal
+A \emph{top-level statement} $t$ is a statement\Replaced{, a class declaration or a \pyinline{type} statement}{ or a class declaration}, also sequenced by juxtaposition; the body of a
+module after its imports is a top-level statement, so class declarations \Added{and \pyinline{type} statements} occur only at the top level of a
+module. \Added{A function definition, a class declaration and a \pyinline{type} statement bind \emph{type parameters}
+$\seq{\alpha}$, written in brackets after the name as in Python 3.12; the brackets are omitted when the list is empty,
+as Python requires. A \pyinline{type} statement declares a \emph{type alias}, and the base class of a dataclass may
+be applied to type arguments.} A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal
 run of consecutive \pyinline{def} statements in a sequence: any other statement separates mutual
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single mutual region. The well-formedness rules treat each
@@ -116,9 +119,10 @@ fills the field $x$. It is undefined unless every field receives exactly one arg
 \paragraph{Type annotations.}
 
 Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
-may be annotated (\figref{syntax-types}). A type expression names a class by a qualified name; a marked name
+may be annotated (\figref{syntax-types}). A type expression names a class \Added{or a type alias} by a qualified name\Added{,
+applied to type arguments when the class or alias has type parameters, and a type parameter by its variable}; a marked name
 $\fq{q}$ is fully qualified, and does not occur in source. A \emph{type} $\tau$ is a type expression whose
-class names are all marked; the type system resolves a type expression into a type\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
+class names are all marked\Added{ and which does not mention any alias}; the type system resolves a type expression into a type\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
 \bind{x_n}{\psi_n}$. The well-formedness rules and operational semantics do not consult annotations, which are given
 meaning by the type system.
 

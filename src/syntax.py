@@ -3,7 +3,16 @@ import sys
 from collections.abc import Callable
 
 from aux import is_import, split_imports
-from type_syntax import parse_annotation
+from type_syntax import (
+    ApplicationExpr,
+    CallableExpr,
+    DictExpr,
+    ListExpr,
+    TupleExpr,
+    TypeExpr,
+    UnionExpr,
+    parse_annotation,
+)
 
 OP_SYMBOLS: dict[type, str] = {
     ast.BitOr: "|",
@@ -108,6 +117,7 @@ def check_syntax_stmt(node: ast.stmt) -> None:
             check_syntax_body(node.body)
             check_syntax_body(node.orelse)
         case ast.FunctionDef():
+            check_syntax_type_params(node)
             check_syntax_arguments(node.args)
             if len(node.decorator_list) > 0:
                 raise NotYetSupported(node, "decorators", 58)
@@ -117,6 +127,8 @@ def check_syntax_stmt(node: ast.stmt) -> None:
                 raise Prohibited(node, "return type must be annotated")
             check_syntax_annotation(node.returns)
             check_syntax_body(node.body)
+            if len(node.type_params) > 0:
+                raise NotYetSupported(node, "type parameters", 187)
         case ast.Expr():
             check_syntax_expr(node.value)
         case ast.Assert():
@@ -159,6 +171,8 @@ def check_syntax_stmt(node: ast.stmt) -> None:
             raise Prohibited(node, "nonlocal prohibited")
         case ast.ClassDef():
             raise Prohibited(node, "class declaration only at module top level")
+        case ast.TypeAlias():
+            raise Prohibited(node, "type statement only at module top level")
         case ast.Match():
             check_syntax_expr(node.subject)
             for case in node.cases:
@@ -177,6 +191,7 @@ def check_syntax_stmt(node: ast.stmt) -> None:
 def check_syntax_classdef(node: ast.ClassDef) -> None:
     if any(isinstance(b, ast.Name) and b.id == "Enum" for b in node.bases):
         raise NotYetSupported(node, "enum classes", 86)
+    check_syntax_type_params(node)
     if len(node.decorator_list) != 1:
         raise Prohibited(node, "class must have exactly the @dataclass decorator")
     deco = node.decorator_list[0]
@@ -184,14 +199,45 @@ def check_syntax_classdef(node: ast.ClassDef) -> None:
         raise Prohibited(node, "only the @dataclass decorator is supported on classes")
     if len(node.bases) > 1:
         raise Prohibited(node, "multiple inheritance prohibited")
-    if len(node.bases) > 0 and not isinstance(node.bases[0], ast.Name):
-        raise Prohibited(node, "base class must be a simple name")
+    if len(node.bases) > 0:
+        check_syntax_base(node.bases[0])
     if len(node.keywords) > 0:
         raise Prohibited(node, "class keyword arguments prohibited")
-    if len(node.body) == 1 and isinstance(node.body[0], ast.Pass):
-        return
-    for stmt in node.body:
-        check_syntax_field(stmt)
+    if not (len(node.body) == 1 and isinstance(node.body[0], ast.Pass)):
+        for stmt in node.body:
+            check_syntax_field(stmt)
+    if len(node.type_params) > 0:
+        raise NotYetSupported(node, "type parameters", 187)
+
+
+def check_syntax_base(base: ast.expr) -> None:
+    match base:
+        case ast.Name():
+            pass
+        case ast.Subscript(value=ast.Name()):
+            check_syntax_annotation(base)
+        case _:
+            raise Prohibited(base, "base class must be a simple name")
+
+
+def check_syntax_type_alias(node: ast.TypeAlias) -> None:
+    check_syntax_type_params(node)
+    check_syntax_annotation(node.value)
+    raise NotYetSupported(node, "type statements", 187)
+
+
+def check_syntax_type_params(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlias) -> None:
+    for param in node.type_params:
+        match param:
+            case ast.TypeVar():
+                if param.bound is not None:
+                    raise Prohibited(param, "type parameter bounds and constraints prohibited")
+            case ast.ParamSpec():
+                raise Prohibited(param, "ParamSpec prohibited")
+            case ast.TypeVarTuple():
+                raise Prohibited(param, "TypeVarTuple prohibited")
+            case _:
+                raise AssertionError(f"unexpected type parameter: {type(param).__name__}")
 
 
 def check_syntax_field(stmt: ast.stmt) -> None:
@@ -392,6 +438,8 @@ def check_syntax_top_level(body: list[ast.stmt]) -> None:
             raise Prohibited(s, "imports must precede all other statements")
         if isinstance(s, ast.ClassDef):
             check_syntax_classdef(s)
+        elif isinstance(s, ast.TypeAlias):
+            check_syntax_type_alias(s)
         else:
             check_syntax_stmt(s)
 
@@ -411,8 +459,31 @@ def check_syntax_generator(node: ast.comprehension) -> None:
 
 
 def check_syntax_annotation(node: ast.expr | None) -> None:
-    if node is not None and parse_annotation(node) is None:
+    if node is None:
+        return
+    psi = parse_annotation(node)
+    if psi is None:
         raise Prohibited(node, "unsupported type annotation")
+    if has_application(psi):
+        raise NotYetSupported(node, "type arguments", 187)
+
+
+def has_application(psi: TypeExpr) -> bool:
+    match psi:
+        case ApplicationExpr():
+            return True
+        case ListExpr(elem):
+            return has_application(elem)
+        case TupleExpr(components):
+            return any(has_application(c) for c in components)
+        case DictExpr(value):
+            return has_application(value)
+        case CallableExpr(params, result):
+            return any(has_application(p) for p in params) or has_application(result)
+        case UnionExpr(left, right):
+            return has_application(left) or has_application(right)
+        case _:
+            return False
 
 
 def check_syntax_arguments(node: ast.arguments) -> None:

@@ -100,8 +100,14 @@ class CallableExpr:
 
 
 @dataclass(frozen=True)
-class ClassName:
+class TypeName:
     q: QualifiedName
+
+
+@dataclass(frozen=True)
+class ApplicationExpr:
+    q: QualifiedName
+    args: tuple[TypeExpr, ...]
 
 
 @dataclass(frozen=True)
@@ -111,7 +117,15 @@ class UnionExpr:
 
 
 type TypeExpr = (
-    Primitive | ListExpr | TupleExpr | DictExpr | CallableExpr | LiteralType | ClassName | UnionExpr
+    Primitive
+    | ListExpr
+    | TupleExpr
+    | DictExpr
+    | CallableExpr
+    | LiteralType
+    | TypeName
+    | ApplicationExpr
+    | UnionExpr
 )
 
 
@@ -208,11 +222,11 @@ def parse_annotation(e: ast.expr) -> TypeExpr | None:
         case ast.Name(id=x):
             return next(
                 (nu for nu in Primitive if nu.value == x),
-                ClassName(QualifiedName((x,))),
+                TypeName(QualifiedName((x,))),
             )
         case ast.Attribute():
             q = dotted_name(e)
-            return None if q is None else ClassName(q)
+            return None if q is None else TypeName(q)
         case ast.BinOp(op=ast.BitOr()):
             return union(parse_annotation(e.left), parse_annotation(e.right))
         case ast.Subscript():
@@ -233,22 +247,22 @@ def dotted_name(e: ast.expr) -> QualifiedName | None:
 
 
 def parse_subscript(e: ast.Subscript) -> TypeExpr | None:
-    if not isinstance(e.value, ast.Name):
-        return None
-    if e.value.id == "Literal":
+    head = e.value.id if isinstance(e.value, ast.Name) else None
+    if head == "Literal":
         return literal_type(e.slice)
-    if e.value.id == "Callable":
+    if head == "Callable":
         return parse_callable(subscript_args(e.slice))
     args = parse_annotations(subscript_args(e.slice))
     if args is None:
         return None
-    if e.value.id == "list" and len(args) == 1:
-        return ListExpr(args[0])
-    if e.value.id == "tuple":
+    if head == "list":
+        return ListExpr(args[0]) if len(args) == 1 else None
+    if head == "tuple":
         return TupleExpr(args)
-    if e.value.id == "dict" and len(args) == 2 and args[0] == Primitive.STR:
-        return DictExpr(args[1])
-    return None
+    if head == "dict":
+        return DictExpr(args[1]) if len(args) == 2 and args[0] == Primitive.STR else None
+    q = dotted_name(e.value)
+    return None if q is None else ApplicationExpr(q, args)
 
 
 def literal_type(e: ast.expr) -> LiteralType | None:

@@ -21,8 +21,11 @@ $\psi$ & $::=$ & $\nu$ & (Primitive) \\
     & $\mid$ & $\tyCallable{\psi_1, \ldots, \psi_n}{\psi}$ & (Callable) \\
     & $\mid$ & $\tyLiteral{\ell}$ & (Literal) \\
     & $\mid$ & $\tyLiteral{-n}$ & (Negative literal) \\
-    & $\mid$ & $q$ & (ClassName) \\
+    & $\mid$ & \added{$\alpha$} & \added{(TypeVar)} \\
+    & $\mid$ & $q$ & \replaced{(TypeName)}{(ClassName)} \\
+    & $\mid$ & \added{$q[\psi_1, \ldots, \psi_{n+1}]$} & \added{(Application)} \\
     & $\mid$ & $\fq{q}$ & (Class) \\
+    & $\mid$ & \added{$\fq{q}[\psi_1, \ldots, \psi_{n+1}]$} & \added{(Parameterised class)} \\
     & $\mid$ & $\tyUnion{\psi}{\psi'}$ & (Union)
 \end{tabular}
 \end{center}
