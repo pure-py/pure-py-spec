@@ -180,7 +180,7 @@ under this order, if one exists.
 \end{DeletedBlock}
 
 \noindent The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the result type
-of \Replaced{the least overload at the operand types, $\resolveOp$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:resolve-op}})}{$\min(\overloadsOf(\Sigma, \odot, \sigma_1, \sigma_2))$}, so \pyinline{1 + 2} is an
+of \Replaced{the most specific overload at the operand types, $\resolveOp$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:resolve-op}})}{$\min(\overloadsOf(\Sigma, \odot, \sigma_1, \sigma_2))$}, so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
 An \emph{equality type} is one for which structural equality is
@@ -201,11 +201,11 @@ judgement under base-typing, letting \pyinline{1 == 0} use the equality overload
 two distinct literal types are not comparable; \pyinline{2 ** 3} is still an \pyinline{int}, since the
 direct instance's bounds $(\tyInt, \tyLiteral{3})$ lie below the base instance's
 $(\tyFloat, \tyFloat)$. For this operator the \ruleName{binop} rule is more precise than mypy, whose
-overloads give \pyinline{Any} whenever the exponent is not a literal, whereas the least overload resolves to
+overloads give \pyinline{Any} whenever the exponent is not a literal, whereas the \Replaced{most specific}{least} overload resolves to
 \pyinline{float}.
 
-\begin{lemma}[Least overload]
-\label{lem:least-overload}
+\begin{lemma}[\replaced{Most specific}{Least} overload]
+\label{lem:most-specific-overload}
 \Replaced{If neither $\sigma_1$ nor $\sigma_2$ is a subtype of \pyinline{Never} and some overload of $\odot$ applies at
 $(\sigma_1, \sigma_2)$, then $\resolveOp(\Sigma, \odot, \sigma_1, \sigma_2)$ is defined; likewise
 $\resolveOp(\Sigma, \ominus, \sigma)$.}{If neither $\sigma_1$ nor $\sigma_2$ is a subtype of \pyinline{Never} and
