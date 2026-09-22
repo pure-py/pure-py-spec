@@ -37,26 +37,28 @@
 \and
 \inferrule*[lab={\ruleName{call}}]
 {
-  \Sigma; \Gamma \vdash e \synth \tyCallable{\tau_1, \ldots, \tau_n}{\tau} \\
-  \Sigma; \Gamma \vdash e_i \checks \tau_i \quad (\forall i)
+  \Sigma; \Gamma \vdash e \synth \replaced{\tyCallable{\seq{\tau}}{\tau}}{\tyCallable{\tau_1, \ldots, \tau_n}{\tau}} \\
+  \replaced{\Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}}{\Sigma; \Gamma \vdash e_i \checks \tau_i \quad (\forall i)}
 }
 {
-  \Sigma; \Gamma \vdash \exCall{e}{e_1, \ldots, e_n} \synth \tau
+  \Sigma; \Gamma \vdash \exCall{e}{\replaced{\seq{e}}{e_1, \ldots, e_n}} \synth \tau
 }
 \and
 \inferrule*[lab={\ruleName{syn-call-lambda}}]
 {
-  \Sigma; \Gamma \vdash e_i \synth \tau_i \quad (\forall i) \\
-  \Sigma; \Gamma \override \set{\bind{x_1}{\tau_1}, \ldots, \bind{x_n}{\tau_n}} \vdash e \synth \tau
+  \replaced{\Sigma; \Gamma \vdash \seq{e} \synth \seq{\tau}}{\Sigma; \Gamma \vdash e_i \synth \tau_i \quad (\forall i)} \\
+  \Sigma; \Gamma \override \set{\replaced{\bind{\seq{x}}{\seq{\tau}}}{\bind{x_1}{\tau_1}, \ldots, \bind{x_n}{\tau_n}}} \vdash e \synth \tau
 }
 {
-  \Sigma; \Gamma \vdash \exCall{(\exLambda{x_1, \ldots, x_n}{e})}{e_1, \ldots, e_n} \synth \tau
+  \Sigma; \Gamma \vdash \exCall{(\exLambda{\replaced{\seq{x}}{x_1, \ldots, x_n}}{e})}{\replaced{\seq{e}}{e_1, \ldots, e_n}} \synth \tau
 }
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \Sigma; \Gamma \vdash \fieldMap(\Sigma, C, a)(x) \checks \tau \quad (\forall \bind{x}{\tau} \in \fields(\Sigma, C))
+  \added{\fields(\Sigma, C) = \bind{\seq{x}}{\seq{\tau}}} \\
+  \added{\fieldMap(\Sigma, C, a) = \set{\bind{\seq{x}}{\seq{e}}}} \\
+  \replaced{\Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}}{\Sigma; \Gamma \vdash \fieldMap(\Sigma, C, a)(x) \checks \tau \quad (\forall \bind{x}{\tau} \in \fields(\Sigma, C))}
 }
 {
   \Sigma; \Gamma \vdash \exConstr{q}{a} \synth C
@@ -66,7 +68,7 @@
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
   \Sigma; \Gamma \vdash e' \synth \sigma' \\
-  \min(\overloadsOf(\Sigma, \odot, \sigma, \sigma')) = ((\tau, \tau'), \tau^\dagger)
+  \replaced{\resolveOp(\Sigma, \odot, \sigma, \sigma') = \tau^\dagger}{\min(\overloadsOf(\Sigma, \odot, \sigma, \sigma')) = ((\tau, \tau'), \tau^\dagger)}
 }
 {
   \Sigma; \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \tau^\dagger
@@ -76,7 +78,7 @@
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
   \exUnOp{\ominus}{e} \neq \exUnOp{\pyinline{-}}{n} \quad (\forall n) \\
-  \min(\overloadsOf(\Sigma, \ominus, \sigma)) = (\tau, \tau^\dagger)
+  \replaced{\resolveOp(\Sigma, \ominus, \sigma) = \tau^\dagger}{\min(\overloadsOf(\Sigma, \ominus, \sigma)) = (\tau, \tau^\dagger)}
 }
 {
   \Sigma; \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau^\dagger

@@ -9,7 +9,8 @@ $\seq{x} \mathbin{\concat} \seq{y}$ is concatenation.
 Comma-separated elements inside set braces are pairwise distinct, so $\set{x_1, \ldots, x_n}$ has $n$
 elements; the set of the elements of a sequence, $\set{\seq{x}}$, assumes no distinctness. A sequence
 comprehension $(x_i \mid i \in I)$, where the finite index set $I$ carries a total order, denotes the
-sequence of the $x_i$ in that order. When the order of its elements matters, a set $\set{x_1, \ldots, x_n}$ is
+sequence of the $x_i$ in that order. \Added{A judgement applied to sequences of equal length holds pointwise, so that
+$\Gamma \vdash \seq{\psi} \synth \seq{\tau}$ abbreviates $\Gamma \vdash \psi_i \synth \tau_i$ for each $i$.} When the order of its elements matters, a set $\set{x_1, \ldots, x_n}$ is
 \emph{ordered} by position. A comprehension over an ordered set preserves the order of its source;
 $X \setminus Y$ keeps the surviving elements of $X$ in their order; $X \disjunion Y$, defined when $X$
 and $Y$ are disjoint, appends the elements of $Y$ to those of $X$; $X \cup Y$ appends the elements of

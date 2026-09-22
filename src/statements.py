@@ -55,9 +55,8 @@ from match import match_shapes, seq_safe
 from operators import (
     BINARY_NAMES,
     UNARY_NAMES,
-    minimum,
-    overloads_binary,
-    overloads_unary,
+    resolve_op_binary,
+    resolve_op_unary,
 )
 from reasons import IllFormedModule
 from shapes import shapes
@@ -383,10 +382,9 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             if negated is not None:
                 return negated
             name = UNARY_NAMES[type(e.op)]
-            resolved = minimum(mod_ctx.Sigma, overloads_unary(mod_ctx.Sigma, name, operand))
-            if resolved is None:
+            result = resolve_op_unary(mod_ctx.Sigma, name, operand)
+            if result is None:
                 raise IllFormedModule(e, reasons.NoUnaryOverload(name, operand))
-            _, result = resolved
             return result
         case ast.BoolOp(values=es):
             for v in es:
@@ -669,10 +667,9 @@ def check_lambda(e: ast.Lambda, expected: Type, mod_ctx: ModuleContext) -> None:
 
 def binary(op: str, left: ast.expr, right: ast.expr, e: ast.expr, mod_ctx: ModuleContext) -> Type:
     sigma, sigma_ = synth_expr(left, mod_ctx), synth_expr(right, mod_ctx)
-    resolved = minimum(mod_ctx.Sigma, overloads_binary(mod_ctx.Sigma, op, sigma, sigma_))
-    if resolved is None:
+    result = resolve_op_binary(mod_ctx.Sigma, op, sigma, sigma_)
+    if result is None:
         raise IllFormedModule(e, reasons.NoBinaryOverload(op, sigma, sigma_))
-    _, result = resolved
     return result
 
 
