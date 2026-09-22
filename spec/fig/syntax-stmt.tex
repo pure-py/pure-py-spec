@@ -15,7 +15,7 @@ $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $\exReturn{e}$ & (Return) \\
     & $\mid$ & $\exIf{e}{s}{\exElif{e_1}{s_1}\;\ldots\;\exElif{e_n}{s_n}}$ & (If) \\
     & $\mid$ & $\exIfElse{e}{s}{\exElif{e_1}{s_1}\;\ldots\;\exElif{e_n}{s_n}}{s'}$ & (IfElse) \\
-    & $\mid$ & $\exMatch{e}{h_1 \;\ldots\; h_{n+1}}$ & (Match) \\
+    & $\mid$ & \replaced{$\exMatch{e}{b_1 \;\ldots\; b_{n+1}}$}{$\exMatch{e}{h_1 \;\ldots\; h_{n+1}}$} & (Match) \\
     & $\mid$ & $d_1 \;\ldots\; d_{n+1}$ & (MutualRegion)
    \\[3mm]
 \grammarGroup{Top-level statements} \\
