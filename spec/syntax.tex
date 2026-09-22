@@ -42,7 +42,7 @@ take the following forms:
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.155\textwidth}>{\raggedright\arraybackslash}p{0.555\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Entry & Form & Records \\
-variable & \replaced{$\tau$, $\DU{\tau}$, $\PU{\tau}$ or $\Unbound$}{$\tau$ or $\False$} & \replaced{type of definitely assigned variable; $\DU{\tau}$ if declared at $\tau$ and definitely unassigned, on no path; $\PU{\tau}$ if declared at $\tau$ and possibly unassigned, on some paths only; $\Unbound$ if its binding statement has not been reached}{type of definitely assigned variable, and
+variable & \replaced{$\tau$, $\DU{\tau}$, $\PU{\tau}$ or $\Unbound$}{$\tau$ or $\False$} & \replaced{type of definitely assigned variable; $\DU{\tau}$ if declared at $\tau$ and definitely unassigned; $\PU{\tau}$ if declared at $\tau$ and possibly unassigned; $\Unbound$ if its binding statement has not been reached}{type of definitely assigned variable, and
 $\False$ if not definitely assigned} \\
 module stub & $\modStub{q}$ & module $q$, named but not loaded \\
 module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$ \\
