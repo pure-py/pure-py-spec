@@ -52,7 +52,8 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \Sigma \vdash_{\mathsf{load}} q' : \Delta \binding \Sigma_0 \\
-  q^\dagger_1 \properPrefixOf \cdots \properPrefixOf q^\dagger_m \text{ the } q^\dagger \properPrefixOf q' \text{ with } q^\dagger \not\prefixOf q \\
+  \replaced{\set{q^\dagger_1, \ldots, q^\dagger_m} = \set{q^\dagger \properPrefixOf q' \mid q^\dagger \not\prefixOf q}}{q^\dagger_1 \properPrefixOf \cdots \properPrefixOf q^\dagger_m \text{ the } q^\dagger \properPrefixOf q' \text{ with } q^\dagger \not\prefixOf q} \\
+  \added{q^\dagger_1 \properPrefixOf \cdots \properPrefixOf q^\dagger_m} \\
   \Sigma_{j-1} \vdash_{\mathsf{load}} q^\dagger_j : \Delta_j \binding \Sigma_j \quad (\forall j) \\
   \Sigma_{m+i-1} \vdash \Delta, x_i \importsR \theta_i \binding \Sigma_{m+i} \quad (\forall i) \\
   \Sigma_{m+n+1}; q \vdash \seq{\iota} : \Gamma \binding \Sigma'
