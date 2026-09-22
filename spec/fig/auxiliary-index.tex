@@ -10,7 +10,7 @@
 \auxgroup{Syntactic analyses}
 \auxrow{$\assignsS(t)$}{set of variables}{variables \added{declared or }assigned in $t$, not descending into nested functions}{aux:assigns}
 \auxrow{\added{$\declaresS(t)$}}{\added{sequence of variables}}{\added{names declared in $t$, in order and with repeats, not descending into nested functions}}{aux:declares}
-\auxrow{$\binds(p)$, $\binds(\seq{g})$\added{, $\binds(s)$}}{set of variables}{variables bound by pattern $p$, or by generators of qualifiers $\seq{g}$\added{, or by patterns within statement $s$}}{aux:binds}
+\auxrow{$\binds(p)$, $\binds(\seq{g})$\added{, $\binds(s)$}}{set of variables}{variables bound by pattern $p$, \deleted{or }by generators of qualifiers $\seq{g}$\added{, or by patterns within statement $s$}}{aux:binds}
 \auxrow{$\replaced{\captures}{\capturesE}(e)$}{set of variables}{variables of enclosing scope captured by lambdas in $e$}{aux:captures-e}
 \auxrow{\replaced{$\captures(\seq{g})$}{$\captures(t)$, $\captures(\seq{g})$}}{set of variables}{\replaced{variables of enclosing scope captured by lambdas in qualifiers $\seq{g}$}{variables of enclosing scope captured by lambdas and nested functions in $t$, or in $\seq{g}$}}{aux:captures}
 \specauxrow{\deleted{$\fvS(s)$}}{\deleted{set of variables}}{\deleted{free variables of statement $s$}}{aux:fv}
