@@ -264,7 +264,7 @@ assignment can take a declared class's name.} A
 declared and not yet assigned, and checks the expression against the declared type (\ruleName{assign}); a
 declaration with an assignment declares and assigns at once (\ruleName{declare-assign}). An assignment requires the
 entry for the variable to be $\DU{\tau}$, so a variable is assigned at most once on any path, since a variable
-assigned on some path is possibly unassigned after the merge, as a blank final in Java~\cite[\S16]{gosling2025}, and a
+assigned on some path is possibly unassigned after the merge, following Java's rule for blank finals~\cite[\S16]{gosling2025}, and a
 name bound to a class, module or predefined name cannot be assigned. That a variable is declared once in its scope
 is a condition on the scope (\ruleName{def}, \ruleName{module}). A closure captures only definitely assigned
 variables, which are never assigned again, so a closure sees a fixed value\paperonly{ (\secref{no-mutable-state})}.}{An annotated assignment checks the expression against the type of the annotation,
