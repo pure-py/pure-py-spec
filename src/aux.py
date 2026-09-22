@@ -270,12 +270,6 @@ def pattern_bound(body: list[ast.stmt]) -> set[Var]:
     return out
 
 
-def redeclaration(body: list[ast.stmt]) -> tuple[Var, ast.stmt] | None:
-    """Second declaration of a name declared twice in `body`, if any."""
-    ds = declares_body(body)
-    return next(((x, node) for i, (x, node) in enumerate(ds) if x in [y for y, _ in ds[:i]]), None)
-
-
 def own_fields(node: ast.ClassDef) -> tuple[tuple[Var, TypeExpr], ...]:
     return tuple(
         (t.target.id, type_expr(t.annotation))

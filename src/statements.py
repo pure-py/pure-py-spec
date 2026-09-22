@@ -14,7 +14,6 @@ from aux import (
     own_fields,
     pattern_bound,
     qualified_name,
-    redeclaration,
     statements,
     target_name,
     type_expr,
@@ -185,22 +184,15 @@ def check_seq(
 
 def check_statement(s: Statement, mod_ctx: ModuleContext, returns: Type | None) -> StaticOutcome:
     if isinstance(s, list):
-        check_mutual_region(s, mod_ctx)
+        check_bodies(s, mod_ctx)
         return Assigns({d.name: signature(d, mod_ctx) for d in s})
     return check_stmt(s, mod_ctx, returns)
-
-
-def check_mutual_region(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
-    for d in defs:
-        if mod_ctx.gamma.get(d.name) != Unbound():
-            raise IllFormedModule(d, reasons.Redeclaration(d.name))
-    check_bodies(defs, mod_ctx)
 
 
 def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
     f_names: VarContext = {d.name: signature(d, mod_ctx) for d in defs}
     for d in defs:
-        check_distinct_declarations(d.body)
+        check_binders([a.arg for a in d.args.args], d.body)
         params = parameters(d, mod_ctx)
         check_assignments_declared(d.body, set(params))
         locals_ = assigns_body(d.body) - set(params)
@@ -222,11 +214,15 @@ def check_returns_none(Sigma: ClassTable, s: ast.Return, declared: Type) -> None
         raise IllFormedModule(s, reasons.TypeMismatch(declared, Primitive.NONE))
 
 
-def check_distinct_declarations(body: list[ast.stmt]) -> None:
-    repeated = redeclaration(body)
-    if repeated is not None:
-        x, node = repeated
-        raise IllFormedModule(node, reasons.Redeclaration(x))
+def check_binders(bound: list[Var], body: list[ast.stmt]) -> None:
+    """Parameters or imported names `bound` and the declarations of `body` are distinct, and no
+    declaration names a pattern-bound variable."""
+    seen = list(bound)
+    patterns = pattern_bound(body)
+    for x, node in declares_body(body):
+        if x in seen or x in patterns:
+            raise IllFormedModule(node, reasons.Redeclaration(x))
+        seen.append(x)
 
 
 def check_assignments_declared(body: list[ast.stmt], bound: set[Var]) -> None:
@@ -236,11 +232,6 @@ def check_assignments_declared(body: list[ast.stmt], bound: set[Var]) -> None:
     for x, node in assign_targets(body):
         if x not in declared and x not in bound and x not in pattern_bound(body):
             raise IllFormedModule(node, reasons.UndeclaredAssignment(x))
-
-
-def check_declarable(x: Var, node: ast.AST, mod_ctx: ModuleContext) -> None:
-    if mod_ctx.gamma.get(x) != Unbound():
-        raise IllFormedModule(node, reasons.Redeclaration(x))
 
 
 def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> StaticOutcome:
@@ -269,7 +260,6 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
         case ast.AnnAssign():
             assert isinstance(s.target, ast.Name)
             x = s.target.id
-            check_declarable(x, s, mod_ctx)
             tau = resolve_type(type_expr(s.annotation), s, mod_ctx)
             if s.value is None:
                 return Assigns({x: DU(tau)})
@@ -725,7 +715,6 @@ def iterated_type(e: ast.expr, mod_ctx: ModuleContext) -> Type:
 
 
 def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, ClassTable]:
-    check_declarable(node.name, node, mod_ctx)
     if not isinstance(mod_ctx.gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.NotPredefinedName("dataclass"))
     own = tuple((x, resolve_type(psi, node, mod_ctx)) for x, psi in own_fields(node))

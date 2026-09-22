@@ -106,8 +106,8 @@ def foo(b: bool) -> int:
 \noindent Python assigns \pyinline{x} twice when \pyinline{b} is true, so no pure reading of the program
 agrees with Python: under shadowing, \pyinline{return x} would refer to a different variable from the one
 assigned in the branch. Following mypy, a name may be declared only once in a scope, so a second annotation
-of the same name is rejected even in another branch of a conditional, as is a declaration of a parameter or
-of an imported name.
+of the same name is rejected even in another branch of a conditional, as is a declaration of a parameter, of
+an imported name or of a name bound by a pattern.
 
 Python's function-level scoping is kept as well. The \ruleName{def} rule introduces every variable declared
 or assigned by the body, $\assignsS(s)$, at $\Unbound$ before checking the body, so a reference before the

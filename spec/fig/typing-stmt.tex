@@ -12,7 +12,6 @@
 \and
 \inferrule*[lab={\ruleName{declare}}]
 {
-  \added{\Gamma(x) = \Unbound} \\
   \added{\Gamma \vdash \psi \synth \tau}
 }
 {
@@ -31,7 +30,6 @@
 \and
 \inferrule*[lab={\ruleName{declare-assign}}]
 {
-  \added{\Gamma(x) = \Unbound} \\
   \Gamma \vdash \psi \synth \replaced{\tau}{\sigma} \\
   \Sigma; \Gamma \vdash e \checks \replaced{\tau}{\sigma} \\
   \deleted{x \notin \capturesE(e)}
@@ -111,8 +109,8 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \added{\Gamma(f_i) = \Unbound \quad (\forall i)} \\
-  \added{\declaresS(s_i) \text{ distinct} \quad (\forall i)} \\
+  \added{\seq{x}_i \mathbin{\concat} \declaresS(s_i) \text{ distinct} \quad (\forall i)} \\
+  \added{\set{\seq{x}_i \mathbin{\concat} \declaresS(s_i)} \cap \binds(s_i) = \varnothing \quad (\forall i)} \\
   \Delta_i = \set{\bind{\seq{x}_i}{\seq{\sigma}_i}} \quad (\forall i) \\
   \Delta' = \set{\bind{f_1}{\tyCallable{\seq{\sigma}_1}{\tau_1}}, \ldots, \bind{f_{n+1}}{\tyCallable{\seq{\sigma}_{n+1}}{\tau_{n+1}}}} \\
   \Sigma; \Gamma \override \Delta' \override \Delta_i \override \set{\bind{x}{\Unbound} \mid x \in \assignsS(s_i) \setminus \dom(\Delta_i)}; \tau_i \vdash s_i : R_i \quad (\forall i)

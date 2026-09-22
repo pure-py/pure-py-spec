@@ -262,10 +262,11 @@ assignment can take a declared class's name.} A
 \pyinline{return} requires $\tau$ to admit \pyinline{None}. \Replaced{A bare annotation declares a variable at the type
 of its annotation, without assigning it (\ruleName{declare}); an assignment requires the variable to be
 declared and not yet assigned, and checks the expression against the declared type (\ruleName{assign}); a
-declaration with an assignment declares and assigns at once (\ruleName{declare-assign}). Each of the three requires the
-entry for the variable to be $\Unbound$ or $\DU{\tau}$, so a variable is declared once in its scope and
-assigned at most once on any path, since a variable assigned on some path is possibly unassigned after the merge, as a blank final in Java~\cite[\S16]{gosling2025}, and a name bound to a
-class, module or predefined name cannot be declared or assigned. A closure captures only definitely assigned
+declaration with an assignment declares and assigns at once (\ruleName{declare-assign}). An assignment requires the
+entry for the variable to be $\DU{\tau}$, so a variable is assigned at most once on any path, since a variable
+assigned on some path is possibly unassigned after the merge, as a blank final in Java~\cite[\S16]{gosling2025}, and a
+name bound to a class, module or predefined name cannot be assigned. That a variable is declared once in its scope
+is a condition on the scope (\ruleName{def}, \ruleName{module}). A closure captures only definitely assigned
 variables, which are never assigned again, so a closure sees a fixed value\paperonly{ (\secref{no-mutable-state})}.}{An annotated assignment checks the expression against the type of the annotation,
 and an unannotated assignment takes the type synthesised by the expression (\ruleName{assign},
 \ruleName{assign-unannot}).} The conditions of \pyinline{if} and \pyinline{assert}
@@ -279,8 +280,8 @@ scope; every \PurePy class must declare itself a dataclass. Each rule that takes
 A function definition binds its parameters at their annotated types, plus the names of its
 mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables \Added{declared or} assigned in the body start
 \replaced{unbound}{at $\False$} (\ruleName{def}), emulating Python's scoping of function bodies, which
-prefers a locally \Replaced{bound}{assigned} name to one visible in an enclosing scope. \Added{The names of the region must be
-undeclared where it occurs, and the names declared in a body must be distinct, as mypy requires.} The body is checked with the
+prefers a locally \Replaced{bound}{assigned} name to one visible in an enclosing scope. \Added{The parameters and the names declared in a body must be distinct, and none of them may be bound by a
+pattern in the body, as mypy requires; the names of the region are declarations of the enclosing scope.} The body is checked with the
 declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
@@ -422,7 +423,8 @@ recursively, every module that the program can load; a module that is never impo
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
 \Replaced{overridden by $\Unbound$ for each name the body binds and then by the imported context, so the members of
 \pyinline{builtins} are in scope unqualified, a name bound by the body shadows a builtin throughout, and an
-imported name cannot be declared or assigned by the body. The names declared by the body must be distinct.}{overridden by the imported context, so the members of \pyinline{builtins} are in scope
+imported name cannot be assigned by the body. The names declared by the body must be distinct, and none may be
+an imported name or a name bound by a pattern.}{overridden by the imported context, so the members of \pyinline{builtins} are in scope
 unqualified.}
 
 \input{spec/fig/typing-module}
