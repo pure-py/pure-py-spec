@@ -12,7 +12,7 @@ Walrus operator \pyinline{:=} & Assigns within expression & Syntactic & Not in g
 Item assignment \pyinline{xs[0] = v} & Updates container in place & Syntactic & Not in grammar; assignment targets are variables \\[1mm]
 Attribute assignment \pyinline{p.x = v} & Updates object in place & Syntactic & Not in grammar; assignment targets are variables \\[1mm]
 Mutating methods, such as \pyinline{list.append} & Update value in place & Dynamic & Attribute reference undefined \\[1mm]
-\replaced{Reassignment}{Reassignment of captured variable} & Closure sees new value & Static & \replaced{Variable declared once and assigned at most once on any path}{Variable captured by statement may not be assigned later in sequence, nor by statement itself} \\[1mm]
+Reassignment & Closure sees new value & Static & Variable declared once and assigned at most once on any path \\[1mm]
 Lambdas capturing comprehension variable & Variable mutated on each iteration; lambda sees final value & Static & Lambda may not capture generator variable
 \end{tabular}
 \caption{Python mutation of state excluded by \PurePy}

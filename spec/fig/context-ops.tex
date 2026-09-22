@@ -6,12 +6,8 @@
 \begin{alignat*}{2}
 \opname{$\override$ (override)} && \bot \override \theta &= \theta \override \bot = \theta \\
 \opblank && \theta \override \theta' &= \theta' \quad \text{otherwise} \\[2mm]
-\opname{$\merge$ (merge)} && \added{\theta \merge \theta} &\added{= \theta} \\
-\opblank && \added{\theta \merge \theta'} &\added{= \PU{\tau} \quad \text{otherwise, for the declared type } \tau \text{ of } \theta \text{ or } \theta'} \\
-\opblank && \deleted{\bot \merge \bot} &\deleted{= \bot} \\
-\opblank && \deleted{\tau \merge \bot = \bot \merge \tau} &\deleted{= \False} \\
-\opblank && \deleted{\False \merge \theta = \theta \merge \False} &\deleted{= \False} \\
-\opblank && \deleted{\sigma \merge \tau} &\deleted{= \joinTy{\Sigma}{\sigma}{\tau}} \\[2mm]
+\opname{$\merge$ (merge)} && \theta \merge \theta &= \theta \\
+\opblank && \theta \merge \theta' &= \PU{\tau} \quad \text{otherwise, for the declared type } \tau \text{ of } \theta \text{ or } \theta' \\[2mm]
 \opname{$\extend$ (extension)} && \modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} &= \modLoaded{q}{\Gamma \extend \Gamma'} \\
 \opblank && \modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} &= \modLoaded{q}{\Gamma} \\
 \opblank && \bot \extend \theta = \theta \extend \bot &= \theta \\

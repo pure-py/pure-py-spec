@@ -42,8 +42,7 @@ take the following forms:
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.155\textwidth}>{\raggedright\arraybackslash}p{0.555\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Entry & Form & Records \\
-variable & \replaced{$\tau$, $\DU{\tau}$, $\PU{\tau}$ or $\Unbound$}{$\tau$ or $\False$} & \replaced{type of definitely assigned variable; $\DU{\tau}$ if declared at $\tau$ and definitely unassigned, on no path; $\PU{\tau}$ if declared at $\tau$ and possibly unassigned, on some paths only; $\Unbound$ if its binding statement has not been reached}{type of definitely assigned variable, and
-$\False$ if not definitely assigned} \\
+variable & $\tau$, $\DU{\tau}$, $\PU{\tau}$ or $\Unbound$ & type of definitely assigned variable; $\DU{\tau}$ if declared at $\tau$ and definitely unassigned, on no path; $\PU{\tau}$ if declared at $\tau$ and possibly unassigned, on some paths only; $\Unbound$ if its binding statement has not been reached \\
 module stub & $\modStub{q}$ & module $q$, named but not loaded \\
 module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$ \\
 class entry & $\Type{C}$ & name denotes class $C$ \\
@@ -71,19 +70,18 @@ acyclic.
 
 \noindent The class table is borrowed from Featherweight Java~\cite{igarashi2001}. Module references arise from import statements. A predefined name is a
 member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expression may mention: it names a
-type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}\Replaced{; $\DU{\tau}$ records a variable declared at $\tau$ and \emph{definitely unassigned}, on no path, as a blank final in Java before its assignment; $\PU{\tau}$ one \emph{possibly unassigned}, on some paths only, so neither definitely assigned nor definitely unassigned; and $\Unbound$ a name whose binding statement has not been reached, which Python reports as an unbound local.}{, and $\False$ indicates \emph{not definitely assigned}.}
+type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}; $\DU{\tau}$ records a variable declared at $\tau$ and \emph{definitely unassigned}, on no path, as a blank final in Java before its assignment; $\PU{\tau}$ one \emph{possibly unassigned}, on some paths only, so neither definitely assigned nor definitely unassigned; and $\Unbound$ a name whose binding statement has not been reached, which Python reports as an unbound local.
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
 
 \subsubsection{Context operations}
 \label{sec:context-operations}
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
-an idempotent commutative semigroup of parallel composition $\merge$ (``merge'')\Deleted{, indexed by a class table $\Sigma$}. Together these form a
+an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
 distributivity does not hold. Both are defined pointwise (\figref{context-ops}): override is right-biased
-and has $\bot$ as both left and right unit; merge is defined only on variable entries, returning \Replaced{the
-entry when both arguments are equal and $\PU{\tau}$ otherwise, for the declared type $\tau$ the arguments carry}{$\False$ if either argument is undefined or not definitely assigned, and the join of two
-types otherwise}, so $\bot$ is not a unit.
+and has $\bot$ as both left and right unit; merge is defined only on variable entries, returning the
+entry when both arguments are equal and $\PU{\tau}$ otherwise, for the declared type $\tau$ the arguments carry, so $\bot$ is not a unit.
 \input{spec/fig/context-ops}
 
 A third operation, \emph{context extension} $\Gamma \extend \Delta$ (also \figref{context-ops}),
@@ -158,7 +156,6 @@ the statement sequence of its \texttt{.py} file, or of its \texttt{\_\_init\_\_.
 $\pymath{\_\_name\_\_}$ assignment; a directory without an \texttt{\_\_init\_\_.py} (a namespace package,
 PEP 420, \url{https://peps.python.org/pep-0420/}) contributes that assignment alone.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
 definitions that follow.
-
 
 \begin{definition}[Predefined contexts and environments]
 \label{def:predefined}

@@ -1,4 +1,4 @@
-\added{\declaresS(x\exAnnot{\psi}) = \declaresS(\exAssign{x\exAnnot{\psi}}{e})} &\added{= x} \\*
-\added{\declaresS(t\;t')} &\added{= \declaresS(t) \mathbin{\concat} \declaresS(t')} \\*
-\added{\declaresS(\seq{d})} &\added{{}= \seq{f} \quad \text{where } d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i}} \\*
-\added{\declaresS(\exDataclass{c}{\phi}) = \declaresS(\exDataclassExtend{c}{c'}{\phi})} &\added{= c}
+\declaresS(x\exAnnot{\psi}) = \declaresS(\exAssign{x\exAnnot{\psi}}{e}) &= x \\*
+\declaresS(t\;t') &= \declaresS(t) \mathbin{\concat} \declaresS(t') \\*
+\declaresS(\seq{d}) &{}= \seq{f} \quad \text{where } d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \\*
+\declaresS(\exDataclass{c}{\phi}) = \declaresS(\exDataclassExtend{c}{c'}{\phi}) &= c

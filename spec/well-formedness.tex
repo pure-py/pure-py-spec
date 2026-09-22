@@ -73,7 +73,6 @@ is the least upper bound of $\sigma$ and $\tau$, $\meetTy{\Sigma}{\sigma}{\tau}$
 
 \input{spec/fig/subtyping}
 
-
 \subsection{Expressions}
 \label{sec:expression-typing}
 
@@ -158,7 +157,6 @@ late-binding and the comprehension rebinds the variable on each iteration, so th
 variable's final value; in \PurePy a lambda is only able to see the value of the generator variable at
 each iteration.
 
-
 \speconly{\subsubsection{Operators}\label{sec:well-formedness-operators}}%
 \paperonly{\paragraph{Operators.}}
 
@@ -215,9 +213,8 @@ $\overloadsOf(\Sigma, \ominus, \sigma)$.
 
 Every well-typed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and
-\pyinline{x = e} definitely assigns \Replaced{$\set{\bind{\pyinline{x}}{\tau}}$ for the declared type $\tau$ of
-\pyinline{x}.}{$\set{\bind{\pyinline{x}}{\sigma}}$ for the type $\sigma$ of
-\pyinline{e}.} \emph{Static outcomes} $R$ classify the two completions: $R$ is either $\Returns$ (definitely
+\pyinline{x = e} definitely assigns $\set{\bind{\pyinline{x}}{\tau}}$ for the declared type $\tau$ of
+\pyinline{x}. \emph{Static outcomes} $R$ classify the two completions: $R$ is either $\Returns$ (definitely
 returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$).
 
 \input{spec/fig/typing-stmt}
@@ -244,27 +241,22 @@ R \override \Returns = \Returns \override R & = \Returns
 
 The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\Gamma$ and
 optional return type $\zeta$, statement $s$ has static outcome $R$ (\figref{typing-stmt}); every rule passes $\zeta$ down unchanged.
-A sequence $s\;s'$ (\ruleName{seq}) types $s$, \Added{then} types $s'$ under $\Gamma$ overridden by the context assigned
-by $s$\Deleted{, and requires that no variable captured by $s$ is assigned in $s'$}. A conditional combines its
+A sequence $s\;s'$ (\ruleName{seq}) types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
+by $s$. A conditional combines its
 branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
 Top-level statements are checked by a separate
 judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, a
 class declaration is a top-level form, and a plain statement is checked with no return type
-(\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. \Deleted{A top-level
-statement may not assign a name that an earlier top-level statement bound to a class
-(\ruleName{top-seq}), so a class binding is permanent in its module and no later declaration or
-assignment can take a declared class's name.} A
+(\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
-\pyinline{return} requires $\tau$ to admit \pyinline{None}. \Replaced{A bare annotation declares a variable at the type
+\pyinline{return} requires $\tau$ to admit \pyinline{None}. A bare annotation declares a variable at the type
 of its annotation, without assigning it (\ruleName{declare}); an assignment requires the variable to be
 declared and not yet assigned, and checks the expression against the declared type (\ruleName{assign}); an
 annotated assignment declares and assigns at once (\ruleName{assign-annot}). Each of the three requires the
 entry for the variable to be $\Unbound$ or $\DU{\tau}$, so a variable is declared once in its scope and
 assigned at most once on any path, since a variable assigned on some path is possibly unassigned after the merge, as a blank final in Java~\cite[\S16]{gosling2025}, and a name bound to a
 class, module or predefined name cannot be declared or assigned. A closure captures only definitely assigned
-variables, which are never assigned again, so a closure sees a fixed value\paperonly{ (\secref{no-mutable-state})}.}{An annotated assignment checks the expression against the type of the annotation,
-and an unannotated assignment takes the type synthesised by the expression (\ruleName{assign},
-\ruleName{assign-unannot}).} The conditions of \pyinline{if} and \pyinline{assert}
+variables, which are never assigned again, so a closure sees a fixed value\paperonly{ (\secref{no-mutable-state})}. The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
 the class name to $\Type{C}$, requiring the fields it declares to be distinct and, when it extends
 another class, the base name to be bound to a class and the additional fields not to repeat an inherited field
@@ -273,10 +265,10 @@ scope; every \PurePy class must declare itself a dataclass. Each rule that takes
 (\figref{resolve-type}).
 
 A function definition binds its parameters at their annotated types, plus the names of its
-mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables \Added{declared or} assigned in the body start
-\replaced{unbound}{at $\False$} (\ruleName{def}), emulating Python's scoping of function bodies, which
-prefers a locally \Replaced{bound}{assigned} name to one visible in an enclosing scope. \Added{The names of the region must be
-undeclared where it occurs, and the names declared in a body must be distinct, as mypy requires.} The body is checked with the
+mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables declared or assigned in the body start
+unbound (\ruleName{def}), emulating Python's scoping of function bodies, which
+prefers a locally bound name to one visible in an enclosing scope. The names of the region must be
+undeclared where it occurs, and the names declared in a body must be distinct, as mypy requires. The body is checked with the
 declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
@@ -416,10 +408,9 @@ import cycle is ill-formed, because a module in a cycle could finish loading onl
 well-formedness (\figref{typing-module}) requires the main module to be well typed and hence,
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
-\Replaced{overridden by $\Unbound$ for each name the body binds and then by the imported context, so the members of
+overridden by $\Unbound$ for each name the body binds and then by the imported context, so the members of
 \pyinline{builtins} are in scope unqualified, a name bound by the body shadows a builtin throughout, and an
-imported name cannot be declared or assigned by the body. The names declared by the body must be distinct.}{overridden by the imported context, so the members of \pyinline{builtins} are in scope
-unqualified.}
+imported name cannot be declared or assigned by the body. The names declared by the body must be distinct.
 
 \input{spec/fig/typing-module}
 
@@ -429,4 +420,3 @@ but not the names that it imports: following PEP 484\footnote{\url{https://peps.
 name is a private dependency, not re-exported as part of the interface. Submodule stubs and the bindings of the module
 body are disjoint, because the module rules exclude a module that binds a name that is also the name of
 a submodule\paperonly{ (\secref{no-load-dependent})}.
-

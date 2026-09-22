@@ -1,11 +1,8 @@
-\Replaced{Four}{Three} syntactic analyses support the well-formedness rules: $\assignsS(t)$, the set of variables \Added{declared or} assigned
+Four syntactic analyses support the well-formedness rules: $\assignsS(t)$, the set of variables declared or assigned
 anywhere in $t$ (without descending into nested function definitions, which have their own scope, so that
-$\assignsS(t) = \dom(\Delta)$ when $t : \Assigns{\Delta}$); \Added{$\declaresS(t)$, the sequence of names declared in $t$, with
-repeats, so that a scope can require its declarations to be distinct;} $\binds(p)$, the set of variables introduced by a
-pattern $p$, and likewise $\binds(\seq{g})$ by the generators of a qualifier sequence; \Replaced{and $\capturesS(\seq{g})$, the
+$\assignsS(t) = \dom(\Delta)$ when $t : \Assigns{\Delta}$); $\declaresS(t)$, the sequence of names declared in $t$, with
+repeats, so that a scope can require its declarations to be distinct; $\binds(p)$, the set of variables introduced by a
+pattern $p$, and likewise $\binds(\seq{g})$ by the generators of a qualifier sequence; and $\capturesS(\seq{g})$, the
 set of variables from the enclosing scope that are captured by lambdas within a qualifier sequence, with companion
-$\capturesE(e)$ on expressions.}{and $\capturesS(t)$, the
-set of variables from the enclosing scope that are captured by lambdas and nested function definitions
-within $t$, and likewise $\capturesS(\seq{g})$ by lambdas within a qualifier sequence, with companion
-$\capturesE(e)$ on expressions.}
+$\capturesE(e)$ on expressions.
 All are defined in \secref{auxiliary-syntactic}.

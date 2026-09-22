@@ -8,12 +8,11 @@
 \fi
 \textbf{Function} & \textbf{Result} & \textbf{Meaning}\speconly{ & \textbf{Section}} \\[1mm]
 \auxgroup{Syntactic analyses}
-\auxrow{$\assignsS(t)$}{set of variables}{variables \added{declared or }assigned in $t$, not descending into nested functions}{aux:assigns}
-\auxrow{\added{$\declaresS(t)$}}{\added{sequence of variables}}{\added{names declared in $t$, in order and with repeats, not descending into nested functions}}{aux:declares}
+\auxrow{$\assignsS(t)$}{set of variables}{variables declared or assigned in $t$, not descending into nested functions}{aux:assigns}
+\auxrow{$\declaresS(t)$}{sequence of variables}{names declared in $t$, in order and with repeats, not descending into nested functions}{aux:declares}
 \auxrow{$\binds(p)$, $\binds(\seq{g})$}{set of variables}{variables bound by pattern $p$, or by generators of qualifiers $\seq{g}$}{aux:binds}
-\auxrow{\replaced{$\capturesS(\seq{g})$}{$\capturesS(t)$, $\capturesS(\seq{g})$}}{set of variables}{\replaced{variables of enclosing scope captured by lambdas in qualifiers $\seq{g}$}{variables of enclosing scope captured by lambdas and nested functions in $t$, or in $\seq{g}$}}{aux:captures}
+\auxrow{$\capturesS(\seq{g})$}{set of variables}{variables of enclosing scope captured by lambdas in qualifiers $\seq{g}$}{aux:captures}
 \auxrow{$\capturesE(e)$}{set of variables}{variables of enclosing scope captured by lambdas in $e$}{aux:captures-e}
-\specauxrow{\deleted{$\fvS(s)$}}{\deleted{set of variables}}{\deleted{free variables of statement $s$}}{aux:fv}
 \specauxrow{$\fvE(e)$}{set of variables}{free variables of expression $e$}{aux:fv-e}
 \noalign{\vskip 2mm}
 \auxgroup{Types}

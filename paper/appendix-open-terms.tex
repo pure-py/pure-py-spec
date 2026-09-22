@@ -6,16 +6,6 @@
 Python uses a form of \emph{late binding}, where most variables only need to be defined at execution time. For example, 
 the following program is valid: 
 
-\begin{DeletedBlock}
-\begin{python}
-def foo():
-    return x
-
-x = 10
-y = foo()
-\end{python}
-\end{DeletedBlock}
-\begin{AddedBlock}
 \begin{python}
 def foo() -> int:
     return x
@@ -23,26 +13,13 @@ def foo() -> int:
 x: int = 10
 y: int = foo()
 \end{python}
-\end{AddedBlock}
 
 While \pyinline{x} is not defined before its usage inside the definition of \pyinline{foo}, it is defined by the
 time the function is called. Therefore, Python uses a limited form of \emph{dynamic scoping}. In PurePy, we would
 like to restrict this form of scoping to something that is easier to statically analyse, and less error-prone 
-(see \replaced{\secref{local-assignment}}{\secref{captured-variables}}). However, some forms of late binding must be allowed, as we could otherwise not
+(see \secref{local-assignment}). However, some forms of late binding must be allowed, as we could otherwise not
 define (mutually) recursive functions:
 
-\begin{DeletedBlock}
-\begin{python}
-def even(n):
-    if n == 0: return True
-    else: odd (n-1)
-
-def odd(n):
-    if n == 0: return False
-    else: return even (n-1)
-\end{python}
-\end{DeletedBlock}
-\begin{AddedBlock}
 \begin{python}
 def even(n: int) -> bool:
     if n == 0: return True
@@ -52,7 +29,6 @@ def odd(n: int) -> bool:
     if n == 0: return False
     else: return even(n - 1)
 \end{python}
-\end{AddedBlock}
 
 The function \pyinline{even} refers to \pyinline{odd} before that function is defined. We restrict the
 allowed forms of late binding by the introduction of a type system, which uses \emph{open term types},
@@ -66,7 +42,7 @@ As with other programming languages, scoping in Python and PurePy has nesting, i
 and \pyinline{lambda} opens a new scope. Therefore, the typing rules are expressed in terms of 
 \emph{frames} $\Psi$, which correspond to the different nesting levels. A particular frame $\Psi$ consists
 of the set of \emph{closure variables} $\Sigma$, i.e., the set of variables defined in the current frame
-that are used within a closure (see \replaced{\secref{local-assignment}}{\secref{captured-variables}}), and an \emph{environment} $\Gamma$,
+that are used within a closure (see \secref{local-assignment}), and an \emph{environment} $\Gamma$,
 which maps variable names to open term types. Finally, a \emph{frame stack} $\Delta$ holds the nested
 scoping frames.
 
@@ -81,7 +57,7 @@ We will start by illustrating the typing rules for expressions. A constant has a
 the stack. For variables, there are three different cases. In $\ruleName{open-var1}$, the variable is
 already bound in the current scope $\Gamma$. Therefore, its type can be read from the environment, and the
 variable itself is added to the set of closure variables at the current scope level (to circumvent the issue explained in
-\replaced{\secref{local-assignment}}{\secref{captured-variables}}). If the variable is not bound in the current environment, it is typed at the
+\secref{local-assignment}). If the variable is not bound in the current environment, it is typed at the
 surrounding scope as shown in $\ruleName{open-var2}$. The base-case is illustrated by $\ruleName{open-var3}$, where a variable
 is typed at the global scope (i.e. $\carrow{0}$). If the variable is not defined at the global scope either, it receives
 itself as an open term type.
@@ -115,4 +91,3 @@ appear inside function definitions and not on a global scope.
 The rule for statement sequence is also trivial.
 
 \input{paper/fig/open-term-typing}
-
