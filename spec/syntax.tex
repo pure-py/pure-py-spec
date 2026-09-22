@@ -113,7 +113,8 @@ mutual region as one mutually-recursive binding\paperonly{ (see \secref{mutual-r
 
 An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by
 keyword arguments $x = u$, where an argument $u$ is an expression in a constructor call and a pattern in a
-constructor pattern. The auxiliary function $\fieldMap$
+constructor pattern. \Added{A constructor call also passes type arguments to the class; a constructor pattern
+cannot, since Python admits only a name in a class pattern.} The auxiliary function $\fieldMap$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:field-map}}) pairs each field of the class
 with an argument: the positional arguments fill the leading fields in order, and a keyword argument $x = u$
 fills the field $x$. It is undefined unless every field receives exactly one argument.

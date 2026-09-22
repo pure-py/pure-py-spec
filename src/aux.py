@@ -206,6 +206,8 @@ def assigns_stmt(s: ast.stmt) -> set[Var]:
             return {x}
         case ast.ClassDef(name=x):
             return {x}
+        case ast.TypeAlias(name=ast.Name(id=x)):
+            return {x}
         case _:
             raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
@@ -229,6 +231,8 @@ def declares(s: ast.stmt) -> list[tuple[Var, ast.stmt]]:
         case ast.FunctionDef(name=x):
             return [(x, s)]
         case ast.ClassDef(name=x):
+            return [(x, s)]
+        case ast.TypeAlias(name=ast.Name(id=x)):
             return [(x, s)]
         case _:
             return []

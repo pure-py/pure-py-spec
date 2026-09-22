@@ -6,7 +6,7 @@
 $e$ & $::=$ & $x$ & (Var) \\
     & $\mid$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exCall{e}{e_1, \ldots, e_n}$ & (Call) \\
-    & $\mid$ & $\exConstr{q}{a}$ & (Constr) \\
+    & $\mid$ & \replaced{$\exConstr{q[\seq{\psi}]}{a}$}{$\exConstr{q}{a}$} & (Constr) \\
     & $\mid$ & $\exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}}$ & (Dict) \\
     & $\mid$ & $\exAttr{e}{x}$ & (Attribute) \\
     & $\mid$ & $\exSubscript{e}{e'}$ & (Subscript) \\

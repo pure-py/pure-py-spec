@@ -1,4 +1,5 @@
 \declaresS(x\exAnnot{\psi}) = \declaresS(\exAssign{x\exAnnot{\psi}}{e}) &= x \\*
 \declaresS(t\;t') &= \declaresS(t) \mathbin{\concat} \declaresS(t') \\*
-\declaresS(\seq{d}) &{}= \seq{f} \quad \text{where } d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \\*
-\declaresS(\exDataclass{c}{\phi}) = \declaresS(\exDataclassExtend{c}{c'}{\phi}) &= c
+\declaresS(\seq{d}) &{}= \seq{f} \quad \text{where } d_i = \exDef{f_i\added{[\seq{\alpha}_i]}}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \\*
+\declaresS(\exDataclass{c\added{[\seq{\alpha}]}}{\phi}) = \declaresS(\exDataclassExtend{c\added{[\seq{\alpha}]}}{\replaced{q[\seq{\psi}]}{c'}}{\phi}) &= c \\*
+\added{\declaresS(\exTypeAlias{x[\seq{\alpha}]}{\psi})} &\added{= x}

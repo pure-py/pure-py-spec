@@ -27,7 +27,7 @@
   \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i)
 }
 {
-  \Sigma; q; \Gamma \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}
+  \Sigma; q; \Gamma \vdash \exDataclass{c\added{[\seq{\alpha}]}}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
@@ -40,7 +40,7 @@
   \seq{x} \cap \dom(\fields(\Sigma, D)) = \varnothing
 }
 {
-  \Sigma; q; \Gamma \vdash \exDataclassExtend{c}{\replaced{q'}{c'}}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\bind{\seq{x}}{\seq{\sigma}}}{D}}
+  \Sigma; q; \Gamma \vdash \exDataclassExtend{c\added{[\seq{\alpha}]}}{\replaced{q'[\seq{\psi}]}{c'}}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\bind{\seq{x}}{\seq{\sigma}}}{D}}
 }
 \end{mathpar}
 \caption{Top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$}

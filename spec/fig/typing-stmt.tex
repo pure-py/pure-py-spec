@@ -119,7 +119,7 @@
   \Gamma \vdash \psi_i \synth \tau_i \quad (\forall i)
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exDef{f_1}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{s_{n+1}} : \Assigns{\Delta'}
+  \Sigma; \Gamma; \zeta \vdash \exDef{f_1\added{[\seq{\alpha}_1]}}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{s_1} \cons \ldots \cons \exDef{f_{n+1}\added{[\seq{\alpha}_{n+1}]}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{s_{n+1}} : \Assigns{\Delta'}
 }
 \and
 \inferrule*[lab={\ruleName{match}}]
