@@ -217,9 +217,9 @@ $\overloadsOf(\Sigma, \ominus, \sigma)$.}
 \label{sec:well-formedness-statements}
 
 Every well-typed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
-$\Delta$, which may be empty. \Replaced{The base cases are that \pyinline{return e} definitely returns, that
-\pyinline{x: }$\psi$ definitely assigns $\set{\bind{\pyinline{x}}{\DU{\tau}}}$, and that \pyinline{x = e} and
-\pyinline{x: }$\psi$\pyinline{ = e} definitely assign $\set{\bind{\pyinline{x}}{\tau}}$, for the type $\tau$ denoted by
+$\Delta$, which may be empty. \Replaced{The base cases are that $\exReturn{e}$ definitely returns, that
+$x\exAnnot{\psi}$ definitely assigns $\set{\bind{x}{\DU{\tau}}}$, and that $\exAssign{x}{e}$ and
+$\exAssign{x\exAnnot{\psi}}{e}$ definitely assign $\set{\bind{x}{\tau}}$, for the type $\tau$ denoted by
 $\psi$.}{The base cases are that \pyinline{return e} definitely returns, and \pyinline{x = e} definitely assigns
 $\set{\bind{\pyinline{x}}{\sigma}}$ for the type $\sigma$ of \pyinline{e}.} \Replaced{A \emph{static outcome} $R$ records which of the two holds: $\Returns$, for definitely returns, or
 $\Assigns{\Delta}$, for definitely assigns $\Delta$.}{\emph{Static outcomes} $R$ classify the two completions: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$).}
