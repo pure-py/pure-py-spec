@@ -69,7 +69,7 @@
 {
   \Sigma; \Gamma \vdash \seq{g} : \Delta \\
   \Sigma; \Gamma \override \Delta \vdash e \checks \tau \\
-  \capturesE(e) \cap \dom(\Delta) = \varnothing
+  \replaced{\captures}{\capturesE}(e) \cap \dom(\Delta) = \varnothing
 }
 {
   \Sigma; \Gamma \vdash \exListComp{e}{\seq{g}} \checks \tyList{\tau}
@@ -80,7 +80,7 @@
   \Sigma; \Gamma \vdash \seq{g} : \Delta \\
   \Sigma; \Gamma \override \Delta \vdash e \checks \tyStr \\
   \Sigma; \Gamma \override \Delta \vdash e' \checks \tau \\
-  \capturesE((e, e')) \cap \dom(\Delta) = \varnothing
+  \replaced{\captures}{\capturesE}((e, e')) \cap \dom(\Delta) = \varnothing
 }
 {
   \Sigma; \Gamma \vdash \exDictComp{e}{e'}{\seq{g}} \checks \tyDict{\tau}
@@ -117,7 +117,7 @@
   \Sigma; \Gamma \vdash e \synth \tau \\
   \elemTy(\Sigma, \tau) = \sigma \\
   \Sigma; \Gamma \override \set{\bind{x}{\sigma}} \vdash \seq{g} : \Delta \\
-  x \notin \capturesS(\seq{g})
+  x \notin \captures(\seq{g})
 }
 {
   \Sigma; \Gamma \vdash \qualGenerator{x}{e} \cons \seq{g} : \set{\bind{x}{\sigma}} \override \Delta

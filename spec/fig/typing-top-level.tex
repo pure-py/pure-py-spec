@@ -14,7 +14,7 @@
 {
   \Sigma; q; \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
   \Sigma'; q; \Gamma \override \Delta \vdash t' : R \binding \Sigma^\dagger \\
-  \deleted{\capturesS(t) \cap \assignsS(t') = \varnothing} \\
+  \deleted{\captures(t) \cap \assignsS(t') = \varnothing} \\
   \deleted{c \notin \assignsS(t') \quad (\forall \bind{c}{\Type{C}} \in \Delta)}
 }
 {

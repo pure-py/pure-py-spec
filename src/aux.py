@@ -118,7 +118,7 @@ def target_name(g: ast.comprehension) -> str:
     return g.target.id
 
 
-def captures_e(e: ast.expr) -> set[Var]:
+def captures(e: ast.expr) -> set[Var]:
     match e:
         case ast.Lambda():
             params = {a.arg for a in e.args.args}
@@ -129,52 +129,52 @@ def captures_e(e: ast.expr) -> set[Var]:
             return set()
         case ast.Call():
             return (
-                captures_e(e.func)
-                | captures_e_list(e.args)
-                | captures_e_list([k.value for k in e.keywords])
+                captures(e.func)
+                | captures_list(e.args)
+                | captures_list([k.value for k in e.keywords])
             )
         case ast.BinOp():
-            return captures_e(e.left) | captures_e(e.right)
+            return captures(e.left) | captures(e.right)
         case ast.UnaryOp(operand=e_):
-            return captures_e(e_)
+            return captures(e_)
         case ast.BoolOp(values=es):
-            return captures_e_list(es)
+            return captures_list(es)
         case ast.Compare(left=e_, comparators=es):
-            return captures_e(e_) | captures_e_list(es)
+            return captures(e_) | captures_list(es)
         case ast.IfExp():
-            return captures_e(e.test) | captures_e(e.body) | captures_e(e.orelse)
+            return captures(e.test) | captures(e.body) | captures(e.orelse)
         case ast.Attribute(value=e_):
-            return captures_e(e_)
+            return captures(e_)
         case ast.Subscript():
-            return captures_e(e.value) | captures_e(e.slice)
+            return captures(e.value) | captures(e.slice)
         case ast.List(elts=es):
-            return captures_e_list(es)
+            return captures_list(es)
         case ast.Tuple(elts=es):
-            return captures_e_list(es)
+            return captures_list(es)
         case ast.Dict():
-            return captures_e_list(dict_keys(e)) | captures_e_list(e.values)
+            return captures_list(dict_keys(e)) | captures_list(e.values)
         case ast.ListComp():
-            return captures_quals(e.generators) | (captures_e(e.elt) - binds_quals(e.generators))
+            return captures_quals(e.generators) | (captures(e.elt) - binds_quals(e.generators))
         case ast.DictComp():
             return captures_quals(e.generators) | (
-                (captures_e(e.key) | captures_e(e.value)) - binds_quals(e.generators)
+                (captures(e.key) | captures(e.value)) - binds_quals(e.generators)
             )
         case _:
             raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
-def captures_e_list(es: list[ast.expr]) -> set[Var]:
+def captures_list(es: list[ast.expr]) -> set[Var]:
     if len(es) == 0:
         return set()
-    return captures_e(es[0]) | captures_e_list(es[1:])
+    return captures(es[0]) | captures_list(es[1:])
 
 
 def captures_quals(generators: list[ast.comprehension]) -> set[Var]:
     if len(generators) == 0:
         return set()
     g = generators[0]
-    rest = captures_e_list(g.ifs) | captures_quals(generators[1:])
-    return captures_e(g.iter) | (rest - {target_name(g)})
+    rest = captures_list(g.ifs) | captures_quals(generators[1:])
+    return captures(g.iter) | (rest - {target_name(g)})
 
 
 def binds_quals(generators: list[ast.comprehension]) -> set[Var]:

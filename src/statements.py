@@ -7,7 +7,7 @@ from aux import (
     assign_targets,
     assigns_body,
     binds_quals,
-    captures_e_list,
+    captures_list,
     captures_quals,
     declares_body,
     dict_keys,
@@ -680,7 +680,7 @@ def qual_context(
     elts: list[ast.expr], generators: list[ast.comprehension], mod_ctx: ModuleContext
 ) -> ModuleContext:
     delta = check_quals(generators, mod_ctx)
-    captured = captures_e_list(elts) & binds_quals(generators)
+    captured = captures_list(elts) & binds_quals(generators)
     if len(captured) > 0:
         node = generators[0].target
         raise IllFormedModule(node, reasons.CapturedGeneratorVariable(min(captured)))
@@ -693,7 +693,7 @@ def check_quals(generators: list[ast.comprehension], mod_ctx: ModuleContext) -> 
     g = generators[0]
     tau = iterated_type(g.iter, mod_ctx)
     x = target_name(g)
-    if x in captures_e_list(g.ifs) | captures_quals(generators[1:]):
+    if x in captures_list(g.ifs) | captures_quals(generators[1:]):
         raise IllFormedModule(g.target, reasons.CapturedGeneratorVariable(x))
     delta = {x: tau}
     mod_ctx_ = override_gamma(mod_ctx, delta)

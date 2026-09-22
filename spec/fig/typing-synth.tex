@@ -256,7 +256,7 @@
 {
   \Sigma; \Gamma \vdash \seq{g} : \Delta \\
   \Sigma; \Gamma \override \Delta \vdash e \synth \tau \\
-  \capturesE(e) \cap \dom(\Delta) = \varnothing
+  \replaced{\captures}{\capturesE}(e) \cap \dom(\Delta) = \varnothing
 }
 {
   \Sigma; \Gamma \vdash \exListComp{e}{\seq{g}} \synth \tyList{\baseType(\tau)}
@@ -267,7 +267,7 @@
   \Sigma; \Gamma \vdash \seq{g} : \Delta \\
   \Sigma; \Gamma \override \Delta \vdash e \checks \tyStr \\
   \Sigma; \Gamma \override \Delta \vdash e' \synth \tau \\
-  \capturesE((e, e')) \cap \dom(\Delta) = \varnothing
+  \replaced{\captures}{\capturesE}((e, e')) \cap \dom(\Delta) = \varnothing
 }
 {
   \Sigma; \Gamma \vdash \exDictComp{e}{e'}{\seq{g}} \synth \tyDict{\baseType(\tau)}

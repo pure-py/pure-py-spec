@@ -54,7 +54,7 @@ In Python a closure holds a mutable binding, so a variable captured by a lambda 
 definition may be reassigned afterwards, changing the value seen by the function (\secref{no-mutable-state}).
 \PurePy excludes this: a variable captured by a statement may not be assigned later in the same sequence, nor
 by that statement itself. The \ruleName{seq} rule imposes the first as a side condition on a sequence
-$t\;t'$: no variable in $\capturesS(t)$ may be in $\assignsS(t')$. In the example of \secref{no-mutable-state}, \pyinline{x} is captured by the
+$t\;t'$: no variable in $\captures(t)$ may be in $\assignsS(t')$. In the example of \secref{no-mutable-state}, \pyinline{x} is captured by the
 definition of \pyinline{g} and assigned by \pyinline{x = 6}, so the program is rejected. The
 \ruleName{assign} rule imposes the second, $x \notin \capturesE(e)$ for an assignment $x = e$, rejecting
 for instance \pyinline{x = lambda: x}, where under Python's late binding the lambda would return itself. A
@@ -65,7 +65,7 @@ iteration, so a lambda in the body or in a later qualifier may not capture one, 
 \pyinline{x**3}. A dataclass declaration counts as an assignment of its class name here, although re-declaring a class name is
 excluded outright (\secref{no-first-class}).
 
-Here $\capturesS(s)$ is the set of variables of the enclosing scope captured by the lambdas and nested
+Here $\captures(s)$ is the set of variables of the enclosing scope captured by the lambdas and nested
 function definitions within a statement $s$, with $\capturesE(e)$ computing the same for an expression $e$: the
 free variables of each such function's body, less its parameters and any variables assigned by the body, which
 are local to it. For a mutual region of function definitions (\figref{syntax-stmt}) the names of the functions
@@ -136,7 +136,7 @@ condition of \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-gener
 \pyinline{[lambda x: x**i for i in [1, 2, 3]]} is rejected, since under Python each lambda in the list would
 compute \pyinline{x**3}.
 
-Here $\capturesS(\seq{g})$ is the set of variables of the enclosing scope captured by the lambdas within the
+Here $\captures(\seq{g})$ is the set of variables of the enclosing scope captured by the lambdas within the
 qualifiers $\seq{g}$ of a comprehension, with $\capturesE(e)$ computing the same for an expression $e$: the
 free variables of each lambda's body, less its parameters.
 
