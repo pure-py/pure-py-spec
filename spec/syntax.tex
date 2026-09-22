@@ -42,7 +42,7 @@ take the following forms:
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.155\textwidth}>{\raggedright\arraybackslash}p{0.555\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Entry & Form & Records \\
-variable & \replaced{$\tau$, $\DU{\tau}$, $\PU{\tau}$ or $\Unbound$}{$\tau$ or $\False$} & \replaced{type of definitely assigned variable; $\DU{\tau}$ if declared at $\tau$ and definitely unassigned; $\PU{\tau}$ if declared at $\tau$ and possibly unassigned; $\Unbound$ if its binding statement has not been reached}{type of definitely assigned variable, and
+variable & \replaced{$\tau$, $\DU{\tau}$, $\PU{\tau}$ or $\Unbound$}{$\tau$ or $\False$} & \replaced{type of definitely assigned variable; $\DU{\tau}$ if declared at $\tau$ and definitely unassigned; $\PU{\tau}$ if declared at $\tau$ and possibly unassigned; $\Unbound$ if its declaration has not been reached}{type of definitely assigned variable, and
 $\False$ if not definitely assigned} \\
 module stub & $\modStub{q}$ & module $q$, named but not loaded \\
 module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$ \\
@@ -71,7 +71,7 @@ acyclic.
 
 \noindent The class table is borrowed from Featherweight Java~\cite{igarashi2001}. Module references arise from import statements. A predefined name is a
 member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expression may mention: it names a
-type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}\Replaced{; $\DU{\tau}$ records a variable declared at $\tau$ and \emph{definitely unassigned}, on no path, as a blank final in Java before its assignment; $\PU{\tau}$ one \emph{possibly unassigned}, on some paths only, so neither definitely assigned nor definitely unassigned; and $\Unbound$ a name whose binding statement has not been reached, which Python reports as an unbound local.}{, and $\False$ indicates \emph{not definitely assigned}.}
+type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}\Replaced{; $\DU{\tau}$ records a variable declared at $\tau$ and \emph{definitely unassigned}, on no path, as a blank final in Java before its assignment; $\PU{\tau}$ one \emph{possibly unassigned}, on some paths only, so neither definitely assigned nor definitely unassigned; and $\Unbound$ a name whose declaration has not been reached, which Python reports as an unbound local.}{, and $\False$ indicates \emph{not definitely assigned}.}
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
 
 \subsubsection{Context operations}
