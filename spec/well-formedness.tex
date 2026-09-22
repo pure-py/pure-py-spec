@@ -273,7 +273,7 @@ to be distinct and none of them to be bound by a pattern in the scope. A name th
 twice in a scope, whether on one path or in different branches, nor can a declaration share its name with a
 parameter, an imported name or a pattern variable of the same scope. Each of these cases is rejected by mypy as
 a redefinition. The body of a lambda or nested definition is checked under the context in force where it is defined,
-so a variable of the enclosing scope that the body references must be definitely assigned at that point. Since
+so a variable of the enclosing scope referenced by the body must be definitely assigned at that point. Since
 no variable is assigned twice, the value captured by a closure never changes\paperonly{ (\secref{no-mutable-state})}.}{An annotated assignment checks the expression against the type of the annotation,
 and an unannotated assignment takes the type synthesised by the expression (\ruleName{assign},
 \ruleName{assign-unannot}).}
@@ -433,7 +433,7 @@ import cycle is ill-formed, because a module in a cycle could finish loading onl
 well-formedness (\figref{typing-module}) requires the main module to be well typed and hence,
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
-\Replaced{overridden by $\Unbound$ for each name the body binds and then by the imported context, so the members of
+\Replaced{overridden by $\Unbound$ for each name bound by the body and then by the imported context, so the members of
 \pyinline{builtins} are in scope unqualified, a name bound by the body shadows a builtin throughout, and an
 imported name cannot be assigned by the body. The names declared by the body must be distinct, and none may be
 an imported name or a name bound by a pattern.}{overridden by the imported context, so the members of \pyinline{builtins} are in scope
