@@ -10,9 +10,9 @@ and is placed where the static rules place the entry $\Unbound$, so that a shado
 is not visible}; throughout this
 section, $\Sigma$ is the class table produced by static loading of the program
 (\secref{well-formedness-modules}) and, like $\mathcal{M}$ and $\mathcal{P}$, is ambient. For a statement $s$, the outcome
-$\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the outcome
-$\returns{v}$ represents \emph{abrupt completion} of $s$, with return value $v$; and the outcome
-$\aborts{\kappa}$ represents abrupt completion of the whole run, with termination kind $\kappa$.
+\Replaced{$\assigns{\rho}$ represents $s$ running to its end, with accumulated environment $\rho$; the outcome
+$\returns{v}$ represents $s$ returning the value $v$; and the outcome $\aborts{\kappa}$ represents the whole run
+aborting, with termination kind $\kappa$.}{$\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the outcome $\returns{v}$ represents \emph{abrupt completion} of $s$, with return value $v$; and the outcome $\aborts{\kappa}$ represents abrupt completion of the whole run, with termination kind $\kappa$.}
 Composing statements sequentially composes their outcomes according to the following partial monoid, analogous
 to sequential composition of static outcomes:
 \begin{defalign}

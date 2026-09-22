@@ -220,8 +220,8 @@ Every well-typed statement either \emph{definitely returns}, or \emph{definitely
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and
 \pyinline{x = e} definitely assigns \Replaced{$\set{\bind{\pyinline{x}}{\tau}}$ for the declared type $\tau$ of
 \pyinline{x}.}{$\set{\bind{\pyinline{x}}{\sigma}}$ for the type $\sigma$ of
-\pyinline{e}.} \emph{Static outcomes} $R$ classify the two completions: $R$ is either $\Returns$ (definitely
-returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$).
+\pyinline{e}.} \Replaced{A \emph{static outcome} $R$ records which of the two holds: $\Returns$, for definitely returns, or
+$\Assigns{\Delta}$, for definitely assigns $\Delta$.}{\emph{Static outcomes} $R$ classify the two completions: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$).}
 
 \input{spec/fig/typing-stmt}
 
