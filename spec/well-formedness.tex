@@ -434,9 +434,9 @@ well-formedness (\figref{typing-module}) requires the main module to be well typ
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
 \Replaced{overridden by $\Unbound$ for each name bound by the body and then by the imported context, so the members of
-\pyinline{builtins} are in scope unqualified, a name bound by the body shadows a builtin throughout, and an
-imported name cannot be assigned by the body. The names declared by the body must be distinct, and none may be
-an imported name or a name bound by a pattern.}{overridden by the imported context, so the members of \pyinline{builtins} are in scope
+\pyinline{builtins} are in scope unqualified and a name bound by the body shadows a builtin throughout. As for any
+scope, the imported names together with the names declared by the body must be distinct and not bound by a
+pattern in the body.}{overridden by the imported context, so the members of \pyinline{builtins} are in scope
 unqualified.}
 
 \input{spec/fig/typing-module}
