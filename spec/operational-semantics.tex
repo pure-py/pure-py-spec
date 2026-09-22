@@ -4,7 +4,10 @@
 \subsection{Values and environments}
 
 Values, environments, outcomes and results are given in \figref{values}. A class value $\Type{C}$ is the
-context entry of the class, and an object $\exObj{C}{\rho}$ records its class by name; throughout this
+context entry of the class, and an object $\exObj{C}{\rho}$ records its class by name\Added{; the value $\Unbound$
+marks a variable of the current scope whose binding statement has not been reached, as Python's unbound local,
+and is placed where the static rules place the entry $\Unbound$, so that a shadowed binding of an enclosing scope
+is not visible}; throughout this
 section, $\Sigma$ is the class table produced by static loading of the program
 (\secref{well-formedness-modules}) and, like $\mathcal{M}$ and $\mathcal{P}$, is ambient. For a statement $s$, the outcome
 $\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the outcome

@@ -404,7 +404,7 @@
   d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \quad (\forall i) \\
   v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
-  \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, s_j \Rightarrow o
+  \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}} \override \added{\set{\bind{x}{\Unbound} \mid x \in \assignsS(s_j) \setminus \set{\seq{x}_j}}}, s_j \Rightarrow o
 }
 {
   \rho, \exCall{e}{\seq{e}} \Rightarrow \result(o)

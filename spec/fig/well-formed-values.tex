@@ -103,6 +103,22 @@
 {
   \vdash \Type{C} : \Type{C}
 }
+\and
+\inferrule*[lab={\ruleName{val-unbound}}]
+{
+  \added{\theta \in \set{\Unbound, \DU{\tau}, \PU{\tau}}}
+}
+{
+  \added{\vdash \Unbound : \theta}
+}
+\and
+\inferrule*[lab={\ruleName{val-possibly-unassigned}}]
+{
+  \added{\vdash v : \tau}
+}
+{
+  \added{\vdash v : \PU{\tau}}
+}
 \end{mathpar}
 
 \vspace{2mm}
