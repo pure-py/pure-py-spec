@@ -157,9 +157,9 @@
 \and
 \inferrule*[lab={\ruleName{subscript-tuple}}]
 {
-  \Sigma; \Gamma \vdash e \synth \tyTuple{\seq{\tau}} \\
+  \Sigma; \Gamma \vdash e \synth \replaced{\tyTuple{\tau_1, \ldots, \tau_m}}{\tyTuple{\seq{\tau}}} \\
   \Sigma; \Gamma \vdash e' \synth \tyLiteral{n} \\
-  0 \leq n < |\seq{\tau}|
+  0 \leq n < \replaced{m}{|\seq{\tau}|}
 }
 {
   \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{n+1}
@@ -167,9 +167,9 @@
 \and
 \inferrule*[lab={\ruleName{subscript-tuple-neg}}]
 {
-  \Sigma; \Gamma \vdash e \synth \tyTuple{\seq{\tau}} \\
+  \Sigma; \Gamma \vdash e \synth \replaced{\tyTuple{\tau_1, \ldots, \tau_m}}{\tyTuple{\seq{\tau}}} \\
   \Sigma; \Gamma \vdash e' \synth \tyLiteral{-n} \\
-  m = |\seq{\tau}| \\
+  \deleted{m = |\seq{\tau}|} \\
   0 < n \leq m
 }
 {
