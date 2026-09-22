@@ -35,6 +35,22 @@
   \newcommand*{\specauxrow}[4]{}
   \newcommand*{\auxgroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{\itshape #1} \\}
 \fi
+% Table of the auxiliary-functions index: the specification adds the section defining each.
+\newenvironment{auxindex}{%
+  \begin{center}\small
+  \ifdefined\specmode
+    \begin{tabular}{>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.08\textwidth}}
+  \else
+    \begin{tabular}{>{\raggedright\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.2\textwidth}>{\raggedright\arraybackslash}p{0.54\textwidth}}
+  \fi
+  \textbf{Function} & \textbf{Result} & \textbf{Meaning}\speconly{ & \textbf{Section}} \\[1mm]
+}{\end{tabular}\end{center}}
+% Rows of the index from spec/fig/auxiliary-index-<name>.tex, read by the input primitive so that a
+% coloured group row may follow directly.
+\makeatletter
+\newcommand*{\auxrows}[1]{\@@input spec/fig/auxiliary-index-#1.tex }
+\makeatother
+
 % Inline definitions: align* with tighter row spacing than a standalone figure.
 \newenvironment{defalign}{\setlength{\jot}{1pt}\csname alignat*\endcsname{2}}{\csname endalignat*\endcsname}
 % How the paper refers to the specification document.

@@ -85,7 +85,7 @@
 This chapter collects the notation of the specification: the metavariables
 (\figref{metavariables}), the judgement forms with the figure defining each
 (\figref{judgement-index}), and the auxiliary functions with the section defining each
-(\figref{auxiliary-index}).
+(\figrefTwo{auxiliary-index}{auxiliary-index-values}).
 
 \input{spec/fig/metavariables}
 
@@ -96,9 +96,19 @@ This chapter collects the notation of the specification: the metavariables
 \end{figure}
 
 \begin{figure}
-\input{spec/fig/auxiliary-index}
-\caption{Auxiliary functions}
+\begin{auxindex}
+\auxrows{analyses-types}
+\end{auxindex}
+\caption{Auxiliary functions: syntactic analyses and types}
 \label{fig:auxiliary-index}
+\end{figure}
+
+\begin{figure}
+\begin{auxindex}
+\auxrows{classes-values}
+\end{auxindex}
+\caption{Auxiliary functions: classes, modules and values}
+\label{fig:auxiliary-index-values}
 \end{figure}
 
 \FloatBarrier
