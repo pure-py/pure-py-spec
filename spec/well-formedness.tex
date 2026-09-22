@@ -259,8 +259,8 @@ statement may not assign a name that an earlier top-level statement bound to a c
 (\ruleName{top-seq}), so a class binding is permanent in its module and no later declaration or
 assignment can take a declared class's name.} A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
-\pyinline{return} \Replaced{requires \pyinline{None} to be a subtype of $\tau$}{requires $\tau$ to admit \pyinline{None}}. \Replaced{A bare annotation declares a variable at the type
-of its annotation, without assigning it (\ruleName{declare}); an assignment requires the variable to be
+\pyinline{return} \Replaced{requires \pyinline{None} to be a subtype of $\tau$}{requires $\tau$ to admit \pyinline{None}}. \Replaced{A declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
+(\ruleName{declare}); an assignment requires the variable to be
 declared and not yet assigned, and checks the expression against the declared type (\ruleName{assign}); a
 declaration with an assignment declares and assigns at once (\ruleName{declare-assign}). An assignment requires the
 entry for the variable to be $\DU{\tau}$, so a variable is assigned at most once on any path, since a variable
