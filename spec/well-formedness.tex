@@ -264,8 +264,9 @@ assignment can take a declared class's name.} A
 \Replaced{A declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment requires the variable to be
 declared and not yet assigned, and checks the expression against the declared type (\ruleName{assign}); a
-declaration with an assignment declares and assigns at once (\ruleName{declare-assign}). Since an assignment on some path leaves the variable possibly unassigned after the merge, a variable is
-assigned at most once on any path, following Java's rule for blank finals~\cite[\S16]{gosling2025}; a name
+declaration with an assignment declares and assigns at once (\ruleName{declare-assign}). Since an assignment leaves the variable definitely assigned on that path, and possibly unassigned after a
+merge with a path that does not assign it, a variable is assigned at most once on any path, following Java's
+rule for blank finals~\cite[\S16]{gosling2025}; a name
 bound to a class, module or predefined name cannot be assigned at all. That a variable is declared once in its scope
 is a condition on the scope (\ruleName{def}, \ruleName{module}). The body of a lambda or nested definition is checked under the context in force where it is defined,
 so a variable of the enclosing scope that the body references must be definitely assigned at that point. Since
