@@ -259,7 +259,9 @@ statement may not assign a name that an earlier top-level statement bound to a c
 (\ruleName{top-seq}), so a class binding is permanent in its module and no later declaration or
 assignment can take a declared class's name.} A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
-\pyinline{return} \Replaced{requires \pyinline{None} to be a subtype of $\tau$}{requires $\tau$ to admit \pyinline{None}}. \Replaced{A declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
+\pyinline{return} \Replaced{requires \pyinline{None} to be a subtype of $\tau$}{requires $\tau$ to admit \pyinline{None}}.
+
+\Replaced{A declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment requires the variable to be
 declared and not yet assigned, and checks the expression against the declared type (\ruleName{assign}); a
 declaration with an assignment declares and assigns at once (\ruleName{declare-assign}). An assignment requires the
@@ -270,7 +272,9 @@ is a condition on the scope (\ruleName{def}, \ruleName{module}). The body of a l
 so a variable of the enclosing scope that the body references must be definitely assigned at that point. Since
 no variable is assigned twice, the value captured by a closure never changes\paperonly{ (\secref{no-mutable-state})}.}{An annotated assignment checks the expression against the type of the annotation,
 and an unannotated assignment takes the type synthesised by the expression (\ruleName{assign},
-\ruleName{assign-unannot}).} The conditions of \pyinline{if} and \pyinline{assert}
+\ruleName{assign-unannot}).}
+
+The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
 the class name to $\Type{C}$, requiring the fields it declares to be distinct and, when it extends
 another class, the base name to be bound to a class and the additional fields not to repeat an inherited field
