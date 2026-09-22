@@ -259,6 +259,22 @@ class PredefinedNameAsValue:
 
 
 @dataclass(frozen=True)
+class TypeParameterAsValue:
+    x: str
+
+    def message(self) -> str:
+        return f"'{self.x}' is a type parameter, usable only in annotations"
+
+
+@dataclass(frozen=True)
+class TypeAliasAsValue:
+    q: QualifiedName
+
+    def message(self) -> str:
+        return f"'{self.q}' is a type alias, usable only in annotations"
+
+
+@dataclass(frozen=True)
 class ClassAsValue:
     q: QualifiedName
 
@@ -423,6 +439,8 @@ type Reason = (
     | ModuleAsValue
     | ClassAsValue
     | PredefinedNameAsValue
+    | TypeParameterAsValue
+    | TypeAliasAsValue
     | UnknownConstructorKeyword
     | DuplicateDictKey
     | NonlinearPattern

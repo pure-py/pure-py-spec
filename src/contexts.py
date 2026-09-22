@@ -33,9 +33,22 @@ class PU:
     tau: Type
 
 
+@dataclass(frozen=True)
+class TypeVar:
+    pass
+
+
+@dataclass(frozen=True)
+class TypeAlias:
+    params: tuple[Var, ...]
+    tau: Type
+
+
 # Lazily evaluated, so these may name Class before it is defined.
 type VarEntry = Unbound | DU | PU | Type
-type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName
+type ContextEntry = (
+    VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName | TypeVar | TypeAlias
+)
 type Context = Mapping[Var, ContextEntry]
 type VarContext = Mapping[Var, VarEntry]
 
@@ -56,6 +69,9 @@ class ModuleLoaded:
     members: Context
 
 
+NON_VARIABLE_ENTRIES = (ModuleStub, ModuleLoaded, Class, PredefinedName, TypeVar, TypeAlias)
+
+
 @dataclass(frozen=True)
 class ModuleContext:
     gamma: Context
@@ -72,7 +88,7 @@ def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
 
 def var_entry(mod_ctx: ModuleContext, x: Var) -> VarEntry | None:
     theta = mod_ctx.gamma.get(x)
-    if theta is None or isinstance(theta, (ModuleStub, ModuleLoaded, Class, PredefinedName)):
+    if theta is None or isinstance(theta, NON_VARIABLE_ENTRIES):
         return None
     return theta
 
@@ -166,8 +182,8 @@ def predefined_context(q: QualifiedName) -> Context:
 
 
 def merge_entry(theta: ContextEntry, theta_: ContextEntry) -> VarEntry:
-    assert not isinstance(theta, (ModuleStub, ModuleLoaded, Class, PredefinedName))
-    assert not isinstance(theta_, (ModuleStub, ModuleLoaded, Class, PredefinedName))
+    assert not isinstance(theta, NON_VARIABLE_ENTRIES)
+    assert not isinstance(theta_, NON_VARIABLE_ENTRIES)
     return theta if theta == theta_ else PU(declared_type_of(theta))
 
 
@@ -187,9 +203,9 @@ def declared_type_of(theta: ContextEntry) -> Type:
         case PU(tau):
             return tau
         case _:
-            assert not isinstance(
-                theta, (Unbound, ModuleStub, ModuleLoaded, Class, PredefinedName)
-            ), "merged entries are assigned or declared variables"
+            assert not isinstance(theta, (Unbound, *NON_VARIABLE_ENTRIES)), (
+                "merged entries are assigned or declared variables"
+            )
             return theta
 
 

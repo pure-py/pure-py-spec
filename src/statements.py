@@ -39,6 +39,8 @@ from contexts import (
     PredefinedName,
     Returns,
     StaticOutcome,
+    TypeAlias,
+    TypeVar,
     Unbound,
     VarContext,
     assigned_type,
@@ -262,7 +264,14 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
                     raise IllFormedModule(s, reasons.MaybeAssigned(x))
                 case Unbound():
                     raise IllFormedModule(s, reasons.AssignmentBeforeDeclaration(x))
-                case Class() | ModuleStub() | ModuleLoaded() | PredefinedName():
+                case (
+                    Class()
+                    | ModuleStub()
+                    | ModuleLoaded()
+                    | PredefinedName()
+                    | TypeVar()
+                    | TypeAlias()
+                ):
                     raise IllFormedModule(s, reasons.Redeclaration(x))
                 case _:
                     assert x in mod_ctx.gamma, (
@@ -359,6 +368,10 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
                         raise IllFormedModule(e, reasons.ClassAsValue(QualifiedName((x,))))
                     case PredefinedName():
                         raise IllFormedModule(e, reasons.PredefinedNameAsValue(QualifiedName((x,))))
+                    case TypeVar():
+                        raise IllFormedModule(e, reasons.TypeParameterAsValue(x))
+                    case TypeAlias():
+                        raise IllFormedModule(e, reasons.TypeAliasAsValue(QualifiedName((x,))))
                     case Unbound():
                         raise IllFormedModule(e, reasons.UnboundName(x))
                     case DU():
@@ -442,6 +455,10 @@ def attr_module(parent: ModuleLoaded, x: Var, e: ast.Attribute) -> Type:
             raise IllFormedModule(e, reasons.ClassAsValue(qualified_name(e)))
         case PredefinedName():
             raise IllFormedModule(e, reasons.PredefinedNameAsValue(qualified_name(e)))
+        case TypeAlias():
+            raise IllFormedModule(e, reasons.TypeAliasAsValue(qualified_name(e)))
+        case TypeVar():
+            raise AssertionError("type parameters are local to a definition or class")
         case Unbound():
             raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
         case DU():

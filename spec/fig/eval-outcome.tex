@@ -257,6 +257,14 @@
 {
   q, \rho, \exDataclassExtend{c\added{[\seq{\alpha}]}}{\replaced{q'[\seq{\psi}]}{c'}}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{\fq{q.c}}}}}
 }
+\and
+\inferrule*[lab={\ruleName{eval-type-alias}}]
+{
+  \added{\Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \vdash \psi \synth \tau}
+}
+{
+  \added{q, \rho, \exTypeAlias{x[\seq{\alpha}]}{\psi} \Rightarrow \assigns{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}}}
+}
 \end{mathpar}
 \caption{Top-level statement $t$ of module $q$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
 \label{fig:eval-top-level}

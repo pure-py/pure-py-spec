@@ -103,6 +103,14 @@
 {
   \vdash \Type{C} : \Type{C}
 }
+\and
+\inferrule*[lab={\ruleName{val-type-alias}}]
+{
+  \strut
+}
+{
+  \added{\vdash \TypeAlias{\seq{\alpha}}{\tau} : \TypeAlias{\seq{\alpha}}{\tau}}
+}
 \end{mathpar}
 
 \vspace{2mm}

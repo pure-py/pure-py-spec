@@ -49,6 +49,8 @@ variable & $\tau$, $\DU{\tau}$, $\PU{\tau}$ or $\Unbound$ & type of definitely a
 module stub & $\modStub{q}$ & module $q$, named but not loaded \\
 module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$ \\
 class entry & $\Type{C}$ & name denotes class $C$ \\
+\added{type parameter} & \added{$\TypeVar$} & \added{name is a type parameter in scope} \\
+\added{type alias} & \added{$\TypeAlias{\seq{\alpha}}{\tau}$} & \added{name denotes type $\tau$ with type parameters $\seq{\alpha}$} \\
 predefined name & $\predefName$ & name usable only in annotation or as decorator \\
 \end{tabular}
 \end{center}
@@ -73,7 +75,10 @@ acyclic.
 
 \noindent The class table is borrowed from Featherweight Java~\cite{igarashi2001}. Module references arise from import statements. A predefined name is a
 member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expression may mention: it names a
-type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}; $\DU{\tau}$ records a variable declared at $\tau$ and \emph{definitely unassigned}, on no path, as a blank final in Java before its assignment; $\PU{\tau}$ one \emph{possibly unassigned}, on some paths only, so neither definitely assigned nor definitely unassigned; and $\Unbound$ a name whose binding statement has not been reached, which Python reports as an unbound local.
+type, heads a type form, or decorates a class declaration. \Added{A type parameter and a type alias may likewise be
+mentioned only by a type expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias{\seq{\alpha}}{\tau}$ are
+named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \pyinline{typing.TypeAliasType} of
+the objects that a class name, a type parameter and an alias name denote at run time.} The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}; $\DU{\tau}$ records a variable declared at $\tau$ and \emph{definitely unassigned}, on no path, as a blank final in Java before its assignment; $\PU{\tau}$ one \emph{possibly unassigned}, on some paths only, so neither definitely assigned nor definitely unassigned; and $\Unbound$ a name whose binding statement has not been reached, which Python reports as an unbound local.
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
 
 \subsubsection{Context operations}
