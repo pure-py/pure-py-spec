@@ -268,8 +268,8 @@ generator, and receives its value at most once, with its declaration or by later
 introduces a variable and never changes one already assigned. Python rebinds a generator variable on each
 iteration, so a lambda in a comprehension may not capture such a variable, since otherwise it would see a later
 value. For the second aim, a declaration may not reuse a name of its own scope, whether of a parameter, imported
-name, pattern variable or other declaration, since mypy rejects such reuse as a redefinition, whereas a name in a
-nested scope may shadow a name of an enclosing scope or builtin, which mypy permits.}
+name, pattern variable or other declaration, since mypy rejects such reuse as a redefinition, whereas a name may shadow
+a name of an enclosing scope or builtin, which mypy permits.}
 
 \Replaced{A declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment requires the variable to be
@@ -281,7 +281,7 @@ bound to a class, module or predefined name cannot be assigned at all. The decla
 \ruleName{module} require the scope to be well-scoped (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:well-scoped}}): its declarations, including the parameters of a function or the imported
 names of a module, must be distinct from one another and from any pattern variables in the scope. A name therefore cannot be declared twice in a scope,
 whether on one path or in different branches, nor can a declaration share its name with a pattern variable of
-the same scope. Each of these cases is rejected by mypy as a redefinition. The body of a lambda or nested definition is checked under the context in force where it is defined,
+the same scope. The body of a lambda or nested definition is checked under the context in force where it is defined,
 so a variable of the enclosing scope referenced by the body must be definitely assigned at that point. Since
 no variable is assigned twice, the value captured by a closure never changes\paperonly{ (\secref{no-mutable-state})}.}{An annotated assignment checks the expression against the type of the annotation,
 and an unannotated assignment takes the type synthesised by the expression (\ruleName{assign},
