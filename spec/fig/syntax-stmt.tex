@@ -7,7 +7,7 @@ $s$ & $::=$ & $\exPass$ & (Pass) \\
     & $\mid$ & $s\;s'$ & (Seq) \\
     & $\mid$ & \added{$x\exAnnot{\psi}$} & \added{(Declare)} \\
     & $\mid$ & $\exAssign{x}{e}$ & (Assign) \\
-    & $\mid$ & $\exAssign{x\exAnnot{\psi}}{e}$ & (AnnAssign) \\
+    & $\mid$ & $\exAssign{x\exAnnot{\psi}}{e}$ & \replaced{(DeclareAssign)}{(AnnAssign)} \\
     & $\mid$ & $e$ & (ExprStmt) \\
     & $\mid$ & $\exAssert{e}$ & (Assert) \\
     & $\mid$ & $\exAssertMsg{e}{e'}$ & (AssertMsg) \\

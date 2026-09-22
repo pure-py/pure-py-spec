@@ -29,7 +29,7 @@
   \Sigma; \Gamma; \zeta \vdash \exAssign{x}{e} : \Assigns{\set{\bind{x}{\replaced{\tau}{\sigma}}}}
 }
 \and
-\inferrule*[lab={\ruleName{assign-annot}}]
+\inferrule*[lab={\ruleName{declare-assign}}]
 {
   \added{\Gamma(x) = \Unbound} \\
   \Gamma \vdash \psi \synth \replaced{\tau}{\sigma} \\

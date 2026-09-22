@@ -258,7 +258,7 @@ assignment can take a declared class's name.} A
 \pyinline{return} requires $\tau$ to admit \pyinline{None}. \Replaced{A bare annotation declares a variable at the type
 of its annotation, without assigning it (\ruleName{declare}); an assignment requires the variable to be
 declared and not yet assigned, and checks the expression against the declared type (\ruleName{assign}); an
-annotated assignment declares and assigns at once (\ruleName{assign-annot}). Each of the three requires the
+declaration with an assignment declares and assigns at once (\ruleName{declare-assign}). Each of the three requires the
 entry for the variable to be $\Unbound$ or $\DU{\tau}$, so a variable is declared once in its scope and
 assigned at most once on any path, since a variable assigned on some path is possibly unassigned after the merge, as a blank final in Java~\cite[\S16]{gosling2025}, and a name bound to a
 class, module or predefined name cannot be declared or assigned. A closure captures only definitely assigned
