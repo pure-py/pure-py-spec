@@ -267,12 +267,11 @@ much as possible. For the first aim, a variable is introduced by a declaration, 
 generator, and receives its value at most once, with its declaration or by later assignment; an assignment never
 introduces a variable and never changes one already assigned. Python rebinds a generator variable on each
 iteration, so a lambda in a comprehension may not capture such a variable, since otherwise it would see a later
-value. For the second aim, a language with lexical scoping may let a declaration reuse a name of its own scope,
-introducing a new variable distinct from the earlier one, and whether to allow this is a matter of convenience
-rather than of semantics. Since mypy rejects such a declaration as a redefinition, and compatibility with mypy
-is a requirement, \PurePy rejects it too, whether the earlier name is that of a parameter, imported name,
-pattern variable or other declaration. A name may still shadow a name of an enclosing scope or builtin, which
-mypy permits.}
+value. The second aim settles one question, whether a declaration may reuse a name of its own scope.
+Under lexical scoping such reuse introduces a new variable, distinct from the earlier one, so a language is
+free to allow it or not as a matter of convenience. Because mypy rejects it as a redefinition, \PurePy rejects
+it too, whether the earlier name is that of a parameter, imported name, pattern variable or other declaration.
+A name may still shadow a name of an enclosing scope or builtin, which mypy permits.}
 
 \Replaced{A declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment requires the variable to be
