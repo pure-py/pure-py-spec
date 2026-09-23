@@ -4,6 +4,31 @@
 Well-formedness enforces several constraints, summarised here with the programs each accepts and rejects;
 the rules follow in \secref{well-formedness-statements} and \secref{well-formedness-modules}.
 
+\Added{The rules for variables serve two aims: that a program has no mutable state (\secref{no-mutable-state}), so a
+variable never changes value, and that a well-typed program is also well typed under mypy. Within these limits
+the rules permit as much as possible. For the first aim, a variable is introduced by a declaration, parameter,
+import, pattern or generator, and receives its value at most once, with its declaration or by later assignment;
+an assignment never introduces a variable and never changes one already assigned. Python rebinds a generator
+variable on each iteration, so a lambda in a comprehension may not capture such a variable, since otherwise it
+would see a later value. The second aim concerns scope. A notion of scope usually determines the parts of a
+program within which names must be unique, so that a scope declares a name at most once. Two choices then
+remain to a language: how a program decomposes into scopes, and whether a scope may shadow a name of an
+enclosing scope. A \PurePy program is a Python program, so a scope is the body of a module, function, lambda
+or comprehension, and the builtins enclose every module. Python itself does not distinguish definition from
+assignment: a name is defined by assigning it, and assigning it again reassigns the existing variable. mypy,
+by contrast, treats an annotation as a definition, and rejects a declaration whose name is already that of a
+parameter, imported name, pattern variable or declaration of the same scope. On the second choice mypy permits
+shadowing, and so does \PurePy. A function body, for example, is a single scope, so it cannot declare a name
+twice, whether on one path or in different branches, nor redeclare one of its parameters; since shadowing is
+permitted, it may declare a name of an enclosing body or a builtin. Since a name denotes one variable throughout
+a scope, a declaration hides the enclosing variable everywhere in the scope, so a use before the declaration
+finds the name unbound rather than referring to the enclosing variable. mypy agrees, with one exception: at
+module level a use before the declaration of a builtin name refers to the builtin, as it does when Python runs
+the module. \PurePy makes no exception, treating the builtins as an enclosing scope like any other, and so
+rejects a program that mypy accepts. A pattern introduces its variables rather than assigning them, so a pattern
+cannot bind a name declared in its scope either, although several cases of one match may bind the same
+variable.}
+
 \begin{DeletedBlock}
 \subsubsection{Assignment is definition}
 
@@ -103,9 +128,7 @@ def foo(b: bool) -> int:
 
 \noindent Python assigns \pyinline{x} twice when \pyinline{b} is true, so no pure reading of the program
 agrees with Python: under shadowing, \pyinline{return x} would refer to a different variable from the one
-assigned in the branch. Following mypy, a name may be declared only once in a scope, so a second annotation
-of the same name is rejected even in another branch of a conditional, as is a declaration of a parameter, of
-an imported name or of a name bound by a pattern.
+assigned in the branch.
 
 Python's function-level scoping is kept as well. The \ruleName{def} rule introduces every variable declared
 or assigned by the body, $\assignsS(s)$, at $\Unbound$ before checking the body, so a reference before the
@@ -121,6 +144,15 @@ def f() -> int:
 
 \noindent Here $\assignsS(s)$ is the set of variables declared or assigned anywhere in a statement $s$, not
 descending into nested function definitions, which have their own scope.
+
+A module body is a scope in the same way, with the builtins as its enclosing scope, so a declaration in the body
+hides a builtin throughout the module. Here \PurePy is stricter than mypy, which resolves a use before the
+declaration to the builtin, following Python's run-time lookup:
+
+\begin{python}
+n: int = len([1])  # error: len is bound by the module
+len: int = 2
+\end{python}
 
 \subsubsection{No capture of comprehension variables}
 \label{sec:captured-variables}

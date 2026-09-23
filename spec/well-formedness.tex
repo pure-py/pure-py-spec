@@ -11,6 +11,14 @@ types and subtyping, then follows the syntax of \secref{syntax}, taking statemen
 patterns, then modules and programs, and \secref{operational-semantics} gives each of these a dynamic
 counterpart.
 
+\speconly{\Added{The rules for variables serve two aims: that a program has no mutable state, so a variable never
+changes value, and that a well-typed program is also well typed under mypy. Within these limits the rules
+permit as much as possible. A variable is introduced by a declaration, parameter, import, pattern or generator,
+and receives its value at most once, with its declaration or by later assignment; an assignment never
+introduces a variable and never changes one already assigned. A scope is the body of a module, function, lambda
+or comprehension, as in Python, and the builtins enclose every module. A scope declares a name at most once and
+may shadow a name of an enclosing scope, hiding it throughout the scope.}}
+
 \specinput{spec/well-formedness/auxiliary}
 \paperinput{paper/well-formedness/principles}
 
@@ -21,9 +29,9 @@ counterpart.
 
 \input{spec/fig/resolve-type}
 
-The rules are intended as a refinement of mypy's: a well-typed
+\Deleted{The rules are intended as a refinement of mypy's: a well-typed
 \PurePy program should be accepted by mypy, and \PurePy may reject programs accepted by mypy but not the
-reverse. Function signatures, assignments and dataclass fields are annotated with type expressions, and a
+reverse.} Function signatures, assignments and dataclass fields are annotated with type expressions, and a
 type expression denotes a type under a context (\figref{resolve-type}). Every definition carries an
 annotation for its parameters and return type, so the type of a definition is given rather than
 inferred from its body. A class name resolves to a
@@ -261,31 +269,6 @@ assignment can take a declared class's name.} A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
 \pyinline{return} \Replaced{requires \pyinline{None} to be a subtype of $\tau$}{requires $\tau$ to admit \pyinline{None}}.
 
-\Added{The rules for variables serve two aims: that a program has no mutable state, so a variable never
-changes value, and that a well-typed program is also well typed under mypy. Within these limits the rules
-permit as much as possible. For the first aim, a variable is introduced by a declaration, parameter, import,
-pattern or generator, and receives its value at most once, with its declaration or by later assignment; an
-assignment never introduces a variable and never changes one already assigned. Python rebinds a generator
-variable on each iteration, so a lambda in a comprehension may not capture such a variable, since otherwise it
-would see a later value. The second aim concerns scope. A notion of scope usually determines the parts of a
-program within which names must be unique, so that a scope declares a name at most once. Two choices then
-remain to a language: how a program decomposes into scopes, and whether a scope may shadow a name of an
-enclosing scope. A \PurePy program is a Python program, so a scope is the body of a module, function, lambda
-or comprehension, and the builtins enclose every module. Python itself does not distinguish definition from
-assignment: a name is defined by assigning it, and assigning it again reassigns the existing variable. mypy,
-by contrast, treats an annotation as a definition, and rejects a declaration whose name is already that of a
-parameter, imported name, pattern variable or declaration of the same scope. On the second choice mypy permits
-shadowing, and so does \PurePy. A function body, for example, is a single scope, so it cannot declare a name
-twice, whether on one path or in different branches, nor redeclare one of its parameters; since shadowing is
-permitted, it may declare a name of an enclosing body or a builtin. Since a name denotes one variable throughout
-a scope, a declaration hides the enclosing variable everywhere in the scope, so a use before the declaration
-finds the name unbound rather than referring to the enclosing variable. mypy agrees, with one exception: at
-module level a use before the declaration of a builtin name refers to the builtin, as it does when Python runs
-the module. \PurePy makes no exception, treating the builtins as an enclosing scope like any other, and so
-rejects a program that mypy accepts. A pattern introduces its variables rather than assigning them, so a pattern
-cannot bind a name declared in its scope either, although several cases of one match may bind the same
-variable.}
-
 \Replaced{A declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment requires the variable to be
 declared and not yet assigned, and checks the expression against the declared type (\ruleName{assign}); a
@@ -459,7 +442,8 @@ recursively, every module that the program can load; a module that is never impo
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
 \Replaced{overridden by the imported context, with each name assigned in the body starting unbound, following
 \ruleName{def}, so the members of \pyinline{builtins} are in scope unqualified and a name bound by the body shadows a
-builtin throughout. As with any
+builtin throughout, so a use of the name before its declaration is rejected, whereas mypy, following
+Python's run-time lookup, resolves it to the builtin. As with any
 scope, the declarations of the module, including its imported names, must be distinct from one another and
 from any pattern variables in its body.}{overridden by the imported context, so the members of \pyinline{builtins} are in scope
 unqualified.}
