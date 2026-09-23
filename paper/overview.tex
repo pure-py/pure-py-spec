@@ -82,8 +82,8 @@ assigned, so} features associated with mutation and shared state are excluded: \
 the walrus operator (\pyinline{:=}), which assigns within an expression. \Replaced{A Python closure captures a binding rather than a value, so a change to the binding is visible through
 the closure. Excluding reassignment removes such changes, a discipline Java imposes on captured locals, which must
 be effectively final~\cite[\S15.27.2]{gosling2025}. One case remains: Python implements a comprehension by updating
-its generator variables in place on each iteration, so a lambda within a comprehension may not capture one, since
-the updates would otherwise be visible through the lambda (\secref{captured-variables}):}{Reassignment of a variable already
+its generator variables in place on each iteration, so \PurePy forbids a lambda within a comprehension from
+capturing one, since the updates would otherwise be visible through the lambda (\secref{captured-variables}):}{Reassignment of a variable already
 captured by a closure is excluded for the same reason. In Python a closure captures a mutable binding, so a
 later reassignment is visible through the closure:}
 
