@@ -3,7 +3,7 @@
   \mathcal{M}(q) = \seq{\iota}\;t \\
   q, \seq{\iota} \Rightarrow \val{\rho} \\
   \mathcal{P}(\pyinline{builtins}) = (\rho', \Gamma') \\
-  q, \rho' \mathbin{\override} \added{\set{\bind{x}{\Unbound} \mid x \in \assignsS(t)}} \mathbin{\added{\override}} \rho, t \Rightarrow \assigns{\rho^\dagger}
+  q, \rho' \mathbin{\override} \rho \mathbin{\added{\override}} \added{\set{\bind{x}{\Unbound} \mid x \in \assignsS(t)}}, t \Rightarrow \assigns{\rho^\dagger}
 }
 {
   q \Rightarrow_{\mathsf{load}} \val{(\submods(q) \override \rho^\dagger)}

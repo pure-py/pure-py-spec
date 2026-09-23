@@ -195,7 +195,7 @@ def check_module_(
     mod_ctx = check_top_seq(
         statements(body),
         ModuleContext(
-            gamma={**predefined_context(BUILTINS), **bound, **gamma}, M=M, q=q, Sigma=Sigma
+            gamma={**predefined_context(BUILTINS), **gamma, **bound}, M=M, q=q, Sigma=Sigma
         ),
     )
     check_submodule_names(m, gamma, body, M, q)

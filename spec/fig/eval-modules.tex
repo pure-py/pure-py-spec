@@ -167,7 +167,7 @@
   \mathcal{M}(q) = \seq{\iota}\;t \\
   q, \seq{\iota} \Rightarrow \val{\rho} \\
   \mathcal{P}(\pyinline{builtins}) = (\Gamma', \rho') \\
-  q, \rho' \mathbin{\override} \rho, t \Rightarrow \aborts{\kappa}
+  q, \rho' \mathbin{\override} \rho \mathbin{\added{\override}} \added{\set{\bind{x}{\Unbound} \mid x \in \assignsS(t)}}, t \Rightarrow \aborts{\kappa}
 }
 {
   q \Rightarrow_{\mathsf{load}} \aborts{\kappa}
