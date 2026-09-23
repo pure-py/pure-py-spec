@@ -6,8 +6,8 @@ the rules follow in \secref{well-formedness-statements} and \secref{well-formedn
 
 \input{spec/well-formedness/variable-aims}
 \Added{Python rebinds a generator
-variable on each iteration, so a lambda in a comprehension may not capture such a variable, since otherwise it
-would see a later value. The second aim has consequences for scope. A notion of scope usually determines the parts of a
+variable on each iteration, so \PurePy forbids a lambda in a comprehension from capturing such a variable, since
+otherwise it would see a later value. The second aim has consequences for scope. A notion of scope usually determines the parts of a
 program within which names must be unique, so that a scope declares a name at most once. Two choices then
 remain to a language: how a program decomposes into scopes, and whether a scope may shadow a name of an
 enclosing scope. A \PurePy program is a Python program, so a scope is the body of a module, function, lambda
@@ -158,8 +158,8 @@ In Python a closure holds a mutable binding, so a variable captured by a lambda 
 definition may be reassigned afterwards, changing the value seen by the function (\secref{no-mutable-state}).
 This cannot arise in \PurePy: a closure can capture only a definitely assigned variable, and no later
 statement may assign one. One case remains, in comprehensions: in Python a comprehension mutates its generator
-variables on each iteration, so a lambda in the body or in a later qualifier may not capture one, a side
-condition of \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}, illustrated in
+variables on each iteration, so \PurePy forbids a lambda in the body or in a later qualifier from capturing one, a
+side condition of \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}, illustrated in
 \secref{no-mutable-state}.
 
 Here $\captures(\seq{g})$ is the set of variables of the enclosing scope captured by the lambdas within the
