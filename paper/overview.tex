@@ -78,10 +78,11 @@ feature that leaves the core purity benefits of \PurePy untouched.
 A variable in \PurePy denotes a fixed value once definitely assigned, so features associated with mutation and
 shared state are excluded: \pyinline{global} and \pyinline{nonlocal}, which direct assignments to a variable of an enclosing scope;
 \pyinline{del}, which removes a binding; augmented assignment (\pyinline{+=}, \pyinline{-=}, and so on); and
-the walrus operator (\pyinline{:=}), which assigns within an expression. \Replaced{Reassignment is excluded outright: a
-variable is declared once, by an annotation, and assigned at most once on any path, so a closure never sees a
-changed value. In Python a closure captures a mutable binding, and a later reassignment is visible through the
-closure:}{Reassignment of a variable already
+the walrus operator (\pyinline{:=}), which assigns within an expression. \Replaced{A variable is declared once and
+assigned at most once on any path (\secref{local-assignment}), so a closure captures a value rather than a mutable
+cell, as with Java's requirement that captured locals be effectively final~\cite[\S15.27.2]{gosling2025}. One form
+of rebinding remains in the syntax: Python implements a comprehension by updating its generator variables in place
+on each iteration, so a lambda within a comprehension may not capture one (\secref{captured-variables}):}{Reassignment of a variable already
 captured by a closure is excluded for the same reason. In Python a closure captures a mutable binding, so a
 later reassignment is visible through the closure:}
 
@@ -97,20 +98,16 @@ def f():
 \end{DeletedBlock}
 \begin{AddedBlock}
 \begin{python}
-def f() -> int:
-    x: int = 5
-    def g() -> int:
-        return x
-    x = 6
-    return x + g()
+[lambda x: x**i for i in [1, 2, 3]]  # error: lambda captures i
 \end{python}
 \end{AddedBlock}
 
-\noindent Here \pyinline{g()} returns \pyinline{6} in Python and the result is \pyinline{12}; under a pure
+\noindent \Replaced{Here each lambda computes \pyinline{x**3} in Python, since all three share the one binding of
+\pyinline{i}.}{Here \pyinline{g()} returns \pyinline{6} in Python and the result is \pyinline{12}; under a pure
 reading in which \pyinline{x = 6} shadows the earlier binding, \pyinline{g()} would return \pyinline{5} and the
-result \pyinline{11}. \PurePy rejects the program, \Added{since \pyinline{x} is assigned twice,} keeping closures over
+result \pyinline{11}. \PurePy rejects the program, keeping closures over
 values rather than mutable cells, as with Java's requirement that captured locals be effectively
-final~\cite[\S15.27.2]{gosling2025}. The rules that enforce this are given in \replaced{\secref{local-assignment}}{\secref{captured-variables}}.
+final~\cite[\S15.27.2]{gosling2025}. The rules that enforce this are given in \secref{captured-variables}.}
 
 \input{spec/exclusions/mutable-state}
 
