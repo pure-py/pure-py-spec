@@ -165,9 +165,9 @@
 \inferrule*[lab={\ruleName{eval-module-fail-body}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;t \\
-  q, \seq{\iota} \Rightarrow \val{\rho} \\
-  \mathcal{P}(\pyinline{builtins}) = (\Gamma', \rho') \\
-  q, \rho' \mathbin{\override} \rho \mathbin{\added{\override}} \added{\set{\bind{x}{\Unbound} \mid x \in \assignsS(t)}}, t \Rightarrow \aborts{\kappa}
+  \mathcal{P}(\pyinline{builtins}) = (\replaced{\Gamma}{\Gamma'}, \replaced{\rho}{\rho'}) \\
+  q, \seq{\iota} \Rightarrow \val{\replaced{\rho'}{\rho}} \\
+  q, \replaced{\rho}{\rho'} \mathbin{\override} \replaced{\rho'}{\rho} \mathbin{\added{\override}} \added{\set{\bind{x}{\Unbound} \mid x \in \assignsS(t)}}, t \Rightarrow \aborts{\kappa}
 }
 {
   q \Rightarrow_{\mathsf{load}} \aborts{\kappa}

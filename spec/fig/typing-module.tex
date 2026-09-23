@@ -101,20 +101,20 @@
 \small
 \inferrule*[lab={\ruleName{predefined}}]
 {
-  \mathcal{P}(q) = (\Gamma', \rho)
+  \mathcal{P}(q) = (\replaced{\Gamma}{\Gamma'}, \rho)
 }
 {
-  \Sigma \vdash_{\mathsf{load}} q : \Gamma' \binding \Sigma
+  \Sigma \vdash_{\mathsf{load}} q : \replaced{\Gamma}{\Gamma'} \binding \Sigma
 }
 \and
 \inferrule*[lab={\ruleName{module}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;t \\
-  \Sigma; q \vdash \seq{\iota} : \Gamma \binding \replaced{\Sigma^\dagger}{\Sigma_1} \\
-  \mathcal{P}(\pyinline{builtins}) = (\Gamma', \rho) \\
-  \replaced{\Sigma^\dagger}{\Sigma_1}; q; \Gamma' \override \Gamma \mathbin{\added{\override}} \added{\set{\bind{x}{\Unbound} \mid x \in \assignsS(t)}} \vdash t : \Assigns{\Delta} \binding \Sigma' \\
+  \mathcal{P}(\pyinline{builtins}) = (\replaced{\Gamma}{\Gamma'}, \rho) \\
+  \Sigma; q \vdash \seq{\iota} : \replaced{\Gamma'}{\Gamma} \binding \replaced{\Sigma^\dagger}{\Sigma_1} \\
+  \replaced{\Sigma^\dagger}{\Sigma_1}; q; \replaced{\Gamma}{\Gamma'} \override \replaced{\Gamma'}{\Gamma} \mathbin{\added{\override}} \added{\set{\bind{x}{\Unbound} \mid x \in \assignsS(t)}} \vdash t : \Assigns{\Delta} \binding \Sigma' \\
   \added{\wellScoped(\set{\declaresS(\seq{\iota})}, t)} \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
+  (\dom(\replaced{\Gamma'}{\Gamma}) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {
   \Sigma \vdash_{\mathsf{load}} q : \submods(q) \override \Delta \binding \Sigma'
