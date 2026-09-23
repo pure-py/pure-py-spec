@@ -261,17 +261,25 @@ assignment can take a declared class's name.} A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
 \pyinline{return} \Replaced{requires \pyinline{None} to be a subtype of $\tau$}{requires $\tau$ to admit \pyinline{None}}.
 
-\Added{The rules for variables serve two aims: that a program has no mutable state, so a variable never changes
-value, and that a well-typed program is also well typed under mypy. Within these limits the rules permit as
-much as possible. For the first aim, a variable is introduced by a declaration, parameter, import, pattern or
-generator, and receives its value at most once, with its declaration or by later assignment; an assignment never
-introduces a variable and never changes one already assigned. Python rebinds a generator variable on each
-iteration, so a lambda in a comprehension may not capture such a variable, since otherwise it would see a later
-value. The second aim settles one question, whether a declaration may reuse a name of its own scope.
-Under lexical scoping such reuse introduces a new variable, distinct from the earlier one, so a language is
-free to allow it or not as a matter of convenience. Because mypy rejects it as a redefinition, \PurePy rejects
-it too, whether the earlier name is that of a parameter, imported name, pattern variable or other declaration.
-A name may still shadow a name of an enclosing scope or builtin, which mypy permits.}
+\Added{The rules for variables serve two aims: that a program has no mutable state, so a variable never
+changes value, and that a well-typed program is also well typed under mypy. Within these limits the rules
+permit as much as possible. For the first aim, a variable is introduced by a declaration, parameter, import,
+pattern or generator, and receives its value at most once, with its declaration or by later assignment; an
+assignment never introduces a variable and never changes one already assigned. Python rebinds a generator
+variable on each iteration, so a lambda in a comprehension may not capture such a variable, since otherwise it
+would see a later value. The second aim concerns scope. A notion of scope usually determines the parts of a
+program within which names must be unique, so that a scope declares a name at most once. Two choices then
+remain to a language: how a program decomposes into scopes, and whether a scope may shadow a name of an
+enclosing scope. A \PurePy program is a Python program, so a scope is the body of a module, function, lambda
+or comprehension, and the builtins enclose every module. Python itself does not distinguish definition from
+assignment: a name is defined by assigning it, and assigning it again reassigns the existing variable. mypy,
+by contrast, treats an annotation as a definition, and rejects a declaration whose name is already that of a
+parameter, imported name, pattern variable or declaration of the same scope. On the second choice mypy permits
+shadowing, and so does \PurePy. A function body, for example, is a single scope, so it cannot declare a name
+twice, whether on one path or in different branches, nor redeclare one of its parameters; since shadowing is
+permitted, it may declare a name of an enclosing body or a builtin. A pattern introduces its variables rather
+than assigning them, so a pattern cannot bind a name declared in its scope either, although several cases of
+one match may bind the same variable.}
 
 \Replaced{A declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment requires the variable to be
