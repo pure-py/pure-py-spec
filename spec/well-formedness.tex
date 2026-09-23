@@ -277,9 +277,14 @@ by contrast, treats an annotation as a definition, and rejects a declaration who
 parameter, imported name, pattern variable or declaration of the same scope. On the second choice mypy permits
 shadowing, and so does \PurePy. A function body, for example, is a single scope, so it cannot declare a name
 twice, whether on one path or in different branches, nor redeclare one of its parameters; since shadowing is
-permitted, it may declare a name of an enclosing body or a builtin. A pattern introduces its variables rather
-than assigning them, so a pattern cannot bind a name declared in its scope either, although several cases of
-one match may bind the same variable.}
+permitted, it may declare a name of an enclosing body or a builtin. Since a name denotes one variable throughout
+a scope, a declaration hides the enclosing variable everywhere in the scope, so a use before the declaration
+finds the name unbound rather than referring to the enclosing variable. mypy agrees, with one exception: at
+module level a use before the declaration of a builtin name refers to the builtin, as it does when Python runs
+the module. \PurePy makes no exception, treating the builtins as an enclosing scope like any other, and so
+rejects a program that mypy accepts. A pattern introduces its variables rather than assigning them, so a pattern
+cannot bind a name declared in its scope either, although several cases of one match may bind the same
+variable.}
 
 \Replaced{A declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment requires the variable to be
