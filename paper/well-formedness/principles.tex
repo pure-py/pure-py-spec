@@ -162,9 +162,8 @@ definition may be reassigned afterwards, changing the value seen by the function
 This cannot arise in \PurePy: a closure can capture only a definitely assigned variable, and no later
 statement may assign one. One case remains, in comprehensions: in Python a comprehension mutates its generator
 variables on each iteration, so a lambda in the body or in a later qualifier may not capture one, a side
-condition of \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}. For instance
-\pyinline{[lambda x: x**i for i in [1, 2, 3]]} is rejected, since under Python each lambda in the list would
-compute \pyinline{x**3}.
+condition of \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}, illustrated in
+\secref{no-mutable-state}.
 
 Here $\captures(\seq{g})$ is the set of variables of the enclosing scope captured by the lambdas within the
 qualifiers $\seq{g}$ of a comprehension, with $\captures(e)$ computing the same for an expression $e$: the
