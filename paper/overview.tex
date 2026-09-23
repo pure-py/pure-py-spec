@@ -75,14 +75,15 @@ feature that leaves the core purity benefits of \PurePy untouched.
 \subsubsection{Mutable state}
 \label{sec:no-mutable-state}
 
-A variable in \PurePy denotes a fixed value once definitely assigned, so features associated with mutation and
-shared state are excluded: \pyinline{global} and \pyinline{nonlocal}, which direct assignments to a variable of an enclosing scope;
+\Replaced{A variable in \PurePy is declared once and assigned at most once on any path (\secref{local-assignment}),
+so it denotes a fixed value once assigned, and}{A variable in \PurePy denotes a fixed value once definitely
+assigned, so} features associated with mutation and shared state are excluded: \pyinline{global} and \pyinline{nonlocal}, which direct assignments to a variable of an enclosing scope;
 \pyinline{del}, which removes a binding; augmented assignment (\pyinline{+=}, \pyinline{-=}, and so on); and
-the walrus operator (\pyinline{:=}), which assigns within an expression. \Replaced{A variable is declared once and
-assigned at most once on any path (\secref{local-assignment}), so a closure captures a value rather than a mutable
-cell, as with Java's requirement that captured locals be effectively final~\cite[\S15.27.2]{gosling2025}. One form
-of rebinding remains in the syntax: Python implements a comprehension by updating its generator variables in place
-on each iteration, so a lambda within a comprehension may not capture one (\secref{captured-variables}):}{Reassignment of a variable already
+the walrus operator (\pyinline{:=}), which assigns within an expression. \Replaced{A Python closure captures a binding rather than a value; since no binding changes, the difference
+cannot be observed, a discipline Java imposes on captured locals, which must be effectively
+final~\cite[\S15.27.2]{gosling2025}. One binding does change: Python implements a comprehension by updating its
+generator variables in place on each iteration, so a lambda within a comprehension may not capture one, since the
+updates would otherwise be observable through it (\secref{captured-variables}):}{Reassignment of a variable already
 captured by a closure is excluded for the same reason. In Python a closure captures a mutable binding, so a
 later reassignment is visible through the closure:}
 
