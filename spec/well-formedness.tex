@@ -273,7 +273,7 @@ declaration with an assignment declares and assigns at once (\ruleName{declare-a
 merge with a path that does not assign it, a variable is assigned at most once on any path, following Java's
 rule for blank finals~\cite[\S16]{gosling2025}; a name
 bound to a class, module or predefined name cannot be assigned at all. The declaration rules do not consult the context for the variable being declared; instead \ruleName{def} and
-\ruleName{module} require the scope to be well-scoped (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:well-scoped}}): its declarations, including the parameters of a function or the imported
+\ruleName{module} require the scope to be well-scoped (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:well-scoped}}): the names declared in the scope, including the parameters of a function or the imported
 names of a module, must be distinct from one another and from any pattern variables in the scope. A name therefore cannot be declared twice in a scope,
 whether on one path or in different branches, nor can a declaration share its name with a pattern variable of
 the same scope. The body of a lambda or nested definition is checked under the context in force where it is defined,
@@ -293,9 +293,9 @@ scope; every \PurePy class must declare itself a dataclass. Each rule that takes
 A function definition binds its parameters at their annotated types, plus the names of its
 mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables \Added{declared or} assigned in the body start
 \replaced{unbound}{at $\False$} (\ruleName{def}), emulating Python's scoping of function bodies, which
-prefers a locally \Replaced{bound}{assigned} name to one visible in an enclosing scope. \Added{As with any scope, the declarations of the function, including its parameters, must be distinct from one
+prefers a locally \Replaced{bound}{assigned} name to one visible in an enclosing scope. \Added{As with any scope, the names declared in the function, including its parameters, must be distinct from one
 another and from any pattern variables in its body. The function names of the mutual region are not among these; they are
-declarations of the enclosing scope, where the same condition applies to them.} The body is checked with the
+declared in the enclosing scope, where the same condition applies to them.} The body is checked with the
 declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
@@ -441,7 +441,7 @@ The rule \ruleName{module} types a module body under the context of $\mathcal{P}
 \ruleName{def}, so the members of \pyinline{builtins} are in scope unqualified and a name bound by the body shadows a
 builtin throughout, so a use of the name before its declaration is rejected, whereas mypy, following
 Python's run-time lookup, resolves it to the builtin. As with any
-scope, the declarations of the module, including its imported names, must be distinct from one another and
+scope, the names declared in the module, including its imported names, must be distinct from one another and
 from any pattern variables in its body.}{overridden by the imported context, so the members of \pyinline{builtins} are in scope
 unqualified.}
 
