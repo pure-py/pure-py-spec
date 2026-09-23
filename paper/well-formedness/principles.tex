@@ -7,7 +7,9 @@ the rules follow in \secref{well-formedness-statements} and \secref{well-formedn
 \input{spec/well-formedness/variable-aims}
 \Added{Python rebinds a generator
 variable on each iteration, so \PurePy forbids a lambda in a comprehension from capturing such a variable, since
-otherwise it would see a later value. The second aim has consequences for scope. A notion of scope usually determines the parts of a
+otherwise it would see a later value.}
+
+\Added{The second aim has consequences for scope. A notion of scope usually determines the parts of a
 program within which names must be unique, so that a scope declares a name at most once. Two choices then
 remain to a language: how a program decomposes into scopes, and whether a scope may shadow a name of an
 enclosing scope. A \PurePy program is a Python program, so a scope is the body of a module, function, lambda
