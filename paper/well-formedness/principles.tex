@@ -23,8 +23,8 @@ permitted, it may declare a name of an enclosing body or a builtin. Since a name
 a scope, a declaration hides the enclosing variable everywhere in the scope, so a use before the declaration
 is rejected as unbound rather than referring to the enclosing variable. mypy agrees, with one exception: at
 module level a use before the declaration of a builtin name refers to the builtin, as it does when Python runs
-the module. \PurePy treats the builtins as an enclosing scope like any other, and therefore rejects a module that
-uses a builtin name before declaring that name. A pattern introduces its variables rather than assigning them, so a pattern
+the module. \PurePy treats the builtins as an enclosing scope like any other, and therefore rejects a use of a builtin
+name if the module later declares that name. A pattern introduces its variables rather than assigning them, so a pattern
 cannot bind a name declared in its scope either, although several cases of one match may bind the same
 variable.}
 
