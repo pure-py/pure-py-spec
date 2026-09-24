@@ -136,8 +136,8 @@ In Python a closure holds a mutable binding, so a variable captured by a lambda 
 definition may be reassigned afterwards, changing the value seen by the function (\secref{no-mutable-state}).
 This cannot arise in \PurePy: a closure captures only definitely assigned variables, and a definitely
 assigned variable is never assigned again. One case remains, in comprehensions: in Python a comprehension mutates its generator
-variables on each iteration, so \PurePy forbids a lambda in the body or in a later qualifier from capturing one, a
-side condition of \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}, illustrated in
+variables on each iteration, so \PurePy forbids a lambda in the body or in a later qualifier from capturing a generator
+variable, a side condition of \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}, illustrated in
 \secref{no-mutable-state}.
 
 Here $\captures(\seq{g})$ is the set of variables of the enclosing scope captured by the lambdas within the
