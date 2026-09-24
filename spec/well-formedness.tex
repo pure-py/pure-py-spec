@@ -288,8 +288,8 @@ scope; every \PurePy class must declare itself a dataclass. Each rule that takes
 (\figref{resolve-type}).
 
 A function definition binds its parameters at their annotated types, plus the names of its
-mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables \Added{declared or} assigned in the body start
-\replaced{unbound}{at $\False$} (\ruleName{def}\Added{, $\scopeS$}), emulating Python's scoping of function bodies, which
+mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables \Replaced{declared in the body or bound by a pattern in it}{assigned in the body} start
+\replaced{unbound}{at $\False$} (\ruleName{def}\Added{, $\scopeS(\set{\seq{x}}, s)$}), emulating Python's scoping of function bodies, which
 prefers a locally \Replaced{bound}{assigned} name to one visible in an enclosing scope. \Added{A variable of the
 enclosing scope referenced by the body must be definitely assigned at the point at which the function is defined,
 whereas Python resolves the reference only when the body runs. As with any scope, the names declared in the function, including
