@@ -32,7 +32,7 @@ reverse.} Function signatures, assignments and dataclass fields are annotated wi
 type expression denotes a type under a context (\figref{resolve-type}). Every definition carries an
 annotation for its parameters and return type, so the type of a definition is given rather than
 inferred from its body. A class name resolves to a
-class (\figref{resolve-name}) and every other name must resolve to a predefined name
+class (\figref{resolve-name}) and every other name must \Replaced{be}{resolve to} a predefined name
 (\figref{predefined-signatures}). The function $\baseType(\tau)$ discards the precision of a
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and leaving every other type alone
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:base-type}}).
@@ -270,8 +270,8 @@ assignment can take a declared class's name.} A
 checks $e$ against the declared type (\ruleName{assign}); the form $\exAssign{x\exAnnot{\psi}}{e}$ declares and
 assigns $x$ at once (\ruleName{declare-assign}). Since an assignment leaves the variable definitely assigned on that path, and possibly unassigned after a
 merge with a path that does not assign it, a variable is assigned at most once on any path, following Java's
-rule for blank finals~\cite[\S16]{gosling2025}; a name
-bound to a class, module or predefined name cannot be assigned at all. The variable declaration rules do not consult the context for the variable being declared; instead \ruleName{def} and
+rule for blank finals~\cite[\S16]{gosling2025}; a class name,
+module name or predefined name cannot be assigned at all. The variable declaration rules do not consult the context for the variable being declared; instead \ruleName{def} and
 \ruleName{module} require the scope to be well-scoped (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:well-scoped}}): the names declared in the scope, including the parameters of a function or the imported
 names of a module, must be distinct from one another and from any pattern variables in the scope. A name therefore cannot be declared twice in a scope,
 whether on one path or in different branches, nor can a declaration share its name with a pattern variable of
