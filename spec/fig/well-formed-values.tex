@@ -62,6 +62,15 @@
   \vdash \exObj{C}{\rho} : C
 }
 \and
+\inferrule*[lab={\ruleName{val-sub}}]
+{
+  \added{\vdash v : \sigma} \\
+  \added{\Sigma \vdash \sigma \subty \tau}
+}
+{
+  \added{\vdash v : \tau}
+}
+\and
 \inferrule*[lab={\ruleName{val-prim}}]
 {
   \mathcal{P}(q) = (\Gamma, \rho) \\
