@@ -271,7 +271,7 @@ declared and not yet assigned, and checks the expression against the declared ty
 declaration with an assignment declares and assigns at once (\ruleName{declare-assign}). Since an assignment leaves the variable definitely assigned on that path, and possibly unassigned after a
 merge with a path that does not assign it, a variable is assigned at most once on any path, following Java's
 rule for blank finals~\cite[\S16]{gosling2025}; a name
-bound to a class, module or predefined name cannot be assigned at all. The declaration rules do not consult the context for the variable being declared; instead \ruleName{def} and
+bound to a class, module or predefined name cannot be assigned at all. The variable declaration rules do not consult the context for the variable being declared; instead \ruleName{def} and
 \ruleName{module} require the scope to be well-scoped (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:well-scoped}}): the names declared in the scope, including the parameters of a function or the imported
 names of a module, must be distinct from one another and from any pattern variables in the scope. A name therefore cannot be declared twice in a scope,
 whether on one path or in different branches, nor can a declaration share its name with a pattern variable of

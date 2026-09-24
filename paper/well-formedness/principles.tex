@@ -98,11 +98,11 @@ Python's late binding semantics (\secref{mutual-recursion}).
 
 \end{DeletedBlock}
 \begin{AddedBlock}
-\subsubsection{Declaration and definite assignment}
+\subsubsection{Variable declaration and definite assignment}
 \label{sec:local-assignment}
 
 Python has no variable declarations: a variable is introduced by assigning to it, and a local variable is
-in scope throughout the function body, wherever the assignment occurs. \PurePy requires a declaration, an annotation of the name such as \pyinline{x: int}, which Python has allowed since version 3.6, and separates
+in scope throughout the function body, wherever the assignment occurs. \PurePy requires a variable declaration, a type annotation such as \pyinline{x: int}, which Python has allowed since version 3.6, and separates
 declaring a variable from assigning it through \emph{definite assignment}: a variable may be referenced only
 where an assignment covers every path to the reference, and assigned only where no path has assigned it
 already. The \ruleName{declare} rule binds the variable at $\DU{\tau}$, declared at $\tau$ and
