@@ -167,7 +167,7 @@
   \mathcal{M}(q) = \seq{\iota}\;t \\
   \mathcal{P}(\pyinline{builtins}) = (\replaced{\Gamma}{\Gamma'}, \replaced{\rho}{\rho'}) \\
   q, \seq{\iota} \Rightarrow \val{\replaced{\rho'}{\rho}} \\
-  q, \replaced{\rho}{\rho'} \mathbin{\override} \replaced{\rho'}{\rho} \mathbin{\added{\override}} \added{\set{\bind{x}{\Unbound} \mid x \in \assignsS(t)}}, t \Rightarrow \aborts{\kappa}
+  q, \replaced{\rho}{\rho'} \mathbin{\override} \replaced{\rho'}{\rho} \mathbin{\added{\override}} \added{\scopeS(\set{\declaresS(\seq{\iota})}, t)}, t \Rightarrow \aborts{\kappa}
 }
 {
   q \Rightarrow_{\mathsf{load}} \aborts{\kappa}
