@@ -137,8 +137,7 @@ definition may be reassigned afterwards, changing the value seen by the function
 This cannot arise in \PurePy: a closure captures only definitely assigned variables, and a definitely
 assigned variable is never assigned again. One case remains, in comprehensions: in Python a comprehension mutates its generator
 variables on each iteration, so \PurePy forbids a lambda in the body or in a later qualifier from capturing a generator
-variable, a side condition of \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}, illustrated in
-\secref{no-mutable-state}.
+variable, a side condition of \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}.
 
 Here $\captures(\seq{g})$ is the set of variables of the enclosing scope captured by the lambdas within the
 qualifiers $\seq{g}$ of a comprehension, with $\captures(e)$ computing the same for an expression $e$: the
