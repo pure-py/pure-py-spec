@@ -269,8 +269,9 @@ assignment can take a declared class's name.} A
 (\ruleName{declare}); an assignment $\exAssign{x}{e}$ requires $x$ to be a declared but unassigned variable, and
 checks $e$ against its declared type (\ruleName{assign}); the form $\exAssign{x\exAnnot{\psi}}{e}$ declares and
 assigns $x$ at once (\ruleName{declare-assign}). A declaration does not check
-whether its name is already declared; that check is made once for the whole scope, by the rules for function
-definitions and modules ($\wellScoped$, \paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:well-scoped}}).}{An annotated assignment checks the expression against the type of the annotation,
+whether its name is already declared; that check is made once for the whole scope, when the rules for function
+definitions and modules introduce its variables as unbound ($\scopeS$,
+\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:scope}}).}{An annotated assignment checks the expression against the type of the annotation,
 and an unannotated assignment takes the type synthesised by the expression (\ruleName{assign},
 \ruleName{assign-unannot}).}
 
@@ -284,7 +285,7 @@ scope; every \PurePy class must declare itself a dataclass. Each rule that takes
 
 A function definition binds its parameters at their annotated types, plus the names of its
 mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables \Added{declared or} assigned in the body start
-\replaced{unbound}{at $\False$} (\ruleName{def}), emulating Python's scoping of function bodies, which
+\replaced{unbound}{at $\False$} (\ruleName{def}\Added{, $\scopeS$}), emulating Python's scoping of function bodies, which
 prefers a locally \Replaced{bound}{assigned} name to one visible in an enclosing scope. \Added{A variable of the
 enclosing scope referenced by the body must be definitely assigned at the point at which the function is defined,
 whereas Python resolves the reference only when the body runs. As with any scope, the names declared in the function, including
@@ -433,7 +434,7 @@ well-formedness (\figref{typing-module}) requires the main module to be well typ
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
 \Replaced{overridden by the imported context and then, as in \ruleName{def}, by an unbound entry for each name
-assigned in the body. The members of \pyinline{builtins} are thus in scope unqualified, and a name bound by the body
+declared or assigned in the body ($\scopeS$). The members of \pyinline{builtins} are thus in scope unqualified, and a name bound by the body
 shadows a builtin throughout the module, so a use of the name before its declaration is rejected. Under mypy such a
 use instead resolves to the builtin, following Python's run-time lookup. As with any scope, the names declared in the
 module, including its imported names, must be distinct from one another and from any pattern variables in its

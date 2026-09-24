@@ -192,11 +192,10 @@ def check_statement(s: Statement, mod_ctx: ModuleContext, returns: Type | None) 
 def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
     f_names: VarContext = {d.name: signature(d, mod_ctx) for d in defs}
     for d in defs:
-        well_scoped({a.arg for a in d.args.args}, d.body)
+        locals_ = scope({a.arg for a in d.args.args}, d.body)
         params = parameters(d, mod_ctx)
         check_assignments_declared(d.body, set(params))
-        locals_ = assigns_body(d.body) - set(params)
-        delta = {**f_names, **params, **{x: Unbound() for x in locals_}}
+        delta = {**f_names, **params, **locals_}
         body_ctx = override_gamma(mod_ctx, delta)
         declared = resolve_type(type_expr(d.returns), d, mod_ctx)
         r = check_body(d.body, body_ctx, declared)
@@ -214,9 +213,7 @@ def check_returns_none(Sigma: ClassTable, s: ast.Return, declared: Type) -> None
         raise IllFormedModule(s, reasons.TypeMismatch(declared, Primitive.NONE))
 
 
-def well_scoped(ys: set[Var], body: list[ast.stmt]) -> None:
-    """Declarations of `body` distinct from one another, from the parameters or imported names `ys`
-    and from the pattern-bound variables of `body`, and `ys` disjoint from those variables."""
+def scope(ys: set[Var], body: list[ast.stmt]) -> VarContext:
     patterns = pattern_bound(body)
     seen = set(ys)
     for x, node in declares_body(body):
@@ -225,6 +222,7 @@ def well_scoped(ys: set[Var], body: list[ast.stmt]) -> None:
         seen.add(x)
     for x in sorted(ys & patterns.keys()):
         raise IllFormedModule(patterns[x], reasons.Redeclaration(x))
+    return {x: Unbound() for x in assigns_body(body)}
 
 
 def check_assignments_declared(body: list[ast.stmt], bound: set[Var]) -> None:

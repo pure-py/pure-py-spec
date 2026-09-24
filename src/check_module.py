@@ -30,7 +30,7 @@ from contexts import (
     predefined_context,
 )
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
-from statements import check_assignments_declared, check_top_seq, well_scoped
+from statements import check_assignments_declared, check_top_seq, scope
 from type_syntax import (
     Primitive,
     QualifiedName,
@@ -189,9 +189,8 @@ def check_module_(
     iotas, stmts = split_imports(m.body)
     gamma, Sigma = check_imports_prefix(iotas, ModuleContext(gamma={}, M=M, q=q, Sigma=Sigma))
     body = stmts
-    well_scoped({x for x, _ in declares_body(iotas)}, body)
+    bound = scope({x for x, _ in declares_body(iotas)}, body)
     check_assignments_declared(body, set())
-    bound = {x: Unbound() for x in assigns_body(body)}
     mod_ctx = check_top_seq(
         statements(body),
         ModuleContext(

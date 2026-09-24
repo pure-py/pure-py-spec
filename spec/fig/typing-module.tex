@@ -112,8 +112,7 @@
   \mathcal{M}(q) = \seq{\iota}\;t \\
   \mathcal{P}(\pyinline{builtins}) = (\replaced{\Gamma}{\Gamma'}, \rho) \\
   \Sigma; q \vdash \seq{\iota} : \replaced{\Gamma'}{\Gamma} \binding \replaced{\Sigma^\dagger}{\Sigma_1} \\
-  \replaced{\Sigma^\dagger}{\Sigma_1}; q; \replaced{\Gamma}{\Gamma'} \override \replaced{\Gamma'}{\Gamma} \mathbin{\added{\override}} \added{\set{\bind{x}{\Unbound} \mid x \in \assignsS(t)}} \vdash t : \Assigns{\Delta} \binding \Sigma' \\
-  \added{\wellScoped(\set{\declaresS(\seq{\iota})}, t)} \\
+  \replaced{\Sigma^\dagger}{\Sigma_1}; q; \replaced{\Gamma}{\Gamma'} \override \replaced{\Gamma'}{\Gamma} \mathbin{\added{\override}} \added{\scopeS(\set{\declaresS(\seq{\iota})}, t)} \vdash t : \Assigns{\Delta} \binding \Sigma' \\
   (\dom(\replaced{\Gamma'}{\Gamma}) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {
