@@ -2,31 +2,9 @@
 \label{sec:principles}
 
 Well-formedness enforces several constraints, summarised here with the programs each accepts and rejects;
-the rules follow in \secref{well-formedness-statements} and \secref{well-formedness-modules}.
-
-\input{spec/well-formedness/variable-aims}
-\Added{Python rebinds a generator
-variable on each iteration, so \PurePy forbids a lambda in a comprehension from capturing such a variable, since
-otherwise it would see a later value.}
-
-\Added{The second aim has consequences for scope. A notion of scope usually determines the parts of a
-program within which names must be unique, so that a scope declares a name at most once. Two choices then
-remain to a language: how a program decomposes into scopes, and whether a scope may shadow a name of an
-enclosing scope. A \PurePy program is a Python program, so a scope is the body of a module, function, lambda
-or comprehension, and the builtins enclose every module. Python itself does not distinguish definition from
-assignment: a name is defined by assigning it, and assigning it again reassigns the existing variable. mypy,
-by contrast, treats an annotation as a definition, and rejects a declaration whose name is already that of a
-parameter, imported name, pattern variable or declaration of the same scope. On the second choice mypy permits
-shadowing, and so does \PurePy. A function body, for example, is a single scope, so it cannot declare a name
-twice, whether on one path or in different branches, nor redeclare one of its parameters; since shadowing is
-permitted, it may declare a name of an enclosing body or a builtin. Since a name denotes one variable throughout
-a scope, a declaration hides the enclosing variable everywhere in the scope, so a use before the declaration
-is rejected as unbound rather than referring to the enclosing variable. mypy agrees, with one exception: at
-module level a use before the declaration of a builtin name refers to the builtin, as it does when Python runs
-the module. \PurePy treats the builtins as an enclosing scope like any other, and therefore rejects a use of a builtin
-name if the module later declares that name. A pattern introduces its variables rather than assigning them, so a pattern
-cannot bind a name declared in its scope either, although several cases of one match may bind the same
-variable.}
+the rules follow in \secref{well-formedness-statements} and \secref{well-formedness-modules}. \Added{The rules for
+variables serve the two aims of \secref{no-mutable-state} and \secref{python-compatibility}, no mutable state and
+compatibility with mypy, and within these limits permit as much as possible.}
 
 \begin{DeletedBlock}
 \subsubsection{Assignment is definition}
@@ -101,17 +79,14 @@ Python's late binding semantics (\secref{mutual-recursion}).
 \subsubsection{Variable declaration and definite assignment}
 \label{sec:local-assignment}
 
-Python has no variable declarations: a variable is introduced by assigning to it, and a local variable is
-in scope throughout the function body, wherever the assignment occurs. \PurePy requires a variable declaration, a type annotation such as \pyinline{x: int}, which Python has allowed since version 3.6, and separates
-declaring a variable from assigning it through \emph{definite assignment}: a variable may be referenced only
+\emph{Definite assignment} enforces the discipline of \secref{no-mutable-state}: a variable may be referenced only
 where an assignment covers every path to the reference, and assigned only where no path has assigned it
-already. The \ruleName{declare} rule binds the variable at $\DU{\tau}$, declared at $\tau$ and
+already, the rule Java applies to blank finals~\cite[\S16]{gosling2025}. The \ruleName{declare} rule binds the variable at $\DU{\tau}$, declared at $\tau$ and
 definitely unassigned; the \ruleName{assign} rule requires that entry, checks the expression against $\tau$ and
 makes the variable definitely assigned, so that $\Gamma(x)$ is a type, as the \ruleName{var} rule requires; an
 annotated assignment does both at once; and the \ruleName{if} rules combine the branches with $\merge$, so
 that a variable is definitely assigned after a conditional only if each branch either assigns it or definitely
-returns, and is otherwise possibly unassigned, $\PU{\tau}$ (\secref{well-formedness-statements}). A variable is thus
-declared once in its scope and assigned at most once on any path, following Java's rule for blank finals~\cite[\S16]{gosling2025}. Branch-local variables are therefore permitted, but using one after the
+returns, and is otherwise possibly unassigned, $\PU{\tau}$ (\secref{well-formedness-statements}). Branch-local variables are therefore permitted, but using one after the
 conditional is not, nor is completing a partial assignment:
 
 \begin{python}
@@ -129,9 +104,9 @@ def foo(b: bool) -> int:
 agrees with Python: under shadowing, \pyinline{return x} would refer to a different variable from the one
 assigned in the branch.
 
-Python's function-level scoping is kept as well. The \ruleName{def} rule introduces every variable declared
-or assigned by the body, $\assignsS(s)$, at $\Unbound$ before checking the body, so a reference before the
-declaration is rejected statically, where Python fails at run time with \pyinline{UnboundLocalError}:
+The \ruleName{def} rule introduces every variable declared or assigned by the body, $\assignsS(s)$, at $\Unbound$
+before checking the body, so a reference before the declaration is rejected statically, whereas Python fails at
+run time with \pyinline{UnboundLocalError}:
 
 \begin{python}
 y: int = 7
@@ -144,9 +119,8 @@ def f() -> int:
 \noindent Here $\assignsS(s)$ is the set of variables declared or assigned anywhere in a statement $s$, not
 descending into nested function definitions, which have their own scope.
 
-A module body is a scope in the same way, with the builtins as its enclosing scope, so a declaration in the body
-hides a builtin throughout the module. Here \PurePy is stricter than mypy, which resolves a use before the
-declaration to the builtin, following Python's run-time lookup:
+The \ruleName{module} rule does the same for a module body, with the builtins as the enclosing scope
+(\secref{scope}), so a use of a builtin name is rejected if the module later declares that name:
 
 \begin{python}
 n: int = len([1])  # error: len is bound by the module

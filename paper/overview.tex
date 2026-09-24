@@ -36,8 +36,13 @@ claim precise and sets out the excluded features, grouped by the discipline that
 \label{fig:taxonomy}
 \end{figure}
 
+\begin{DeletedBlock}
 \todo{Python has no variable declarations, so a name's binding structure is not evident from the syntax.
-\replaced{\PurePy requires every variable to be declared with a type annotation (\secref{well-formedness}).}{This motivates the definite-assignment analysis (\secref{well-formedness}).}}
+This motivates the definite-assignment analysis (\secref{well-formedness}).}
+\end{DeletedBlock}
+
+\Added{\PurePy also aims at compatibility with the mypy type checker: a well-typed \PurePy program is well typed
+under mypy. This aim constrains the rules for variables, in particular how names are scoped (\secref{scope}).}
 
 \subsection{Purity}
 \label{sec:purity}
@@ -75,8 +80,11 @@ feature that leaves the core purity benefits of \PurePy untouched.
 \subsubsection{Mutable state}
 \label{sec:no-mutable-state}
 
-\Replaced{A variable in \PurePy is declared once and assigned at most once on any path (\secref{local-assignment}),
-so it denotes a fixed value once assigned, and}{A variable in \PurePy denotes a fixed value once definitely
+\Replaced{A variable in \PurePy is introduced by a declaration, or as a parameter, imported name, pattern variable
+or generator variable; a declaration is a type annotation such as \pyinline{x: int}, a form Python has allowed since
+version 3.6. A variable is assigned at most once on any path, either in its declaration or afterwards, and an
+assignment never introduces a variable nor reassigns one (\secref{local-assignment}). A variable therefore denotes
+a fixed value once assigned, and}{A variable in \PurePy denotes a fixed value once definitely
 assigned, so} features associated with mutation and shared state are excluded: \pyinline{global} and \pyinline{nonlocal}, which direct assignments to a variable of an enclosing scope;
 \pyinline{del}, which removes a binding; augmented assignment (\pyinline{+=}, \pyinline{-=}, and so on); and
 the walrus operator (\pyinline{:=}), which assigns within an expression. \Replaced{A Python closure captures a binding rather than a value, so a change to the binding is visible through
@@ -111,6 +119,30 @@ values rather than mutable cells, as with Java's requirement that captured local
 final~\cite[\S15.27.2]{gosling2025}. The rules that enforce this are given in \secref{captured-variables}.}
 
 \input{spec/exclusions/mutable-state}
+
+\begin{AddedBlock}
+\subsubsection{Scope}
+\label{sec:scope}
+
+Compatibility with mypy (\secref{python-compatibility}) settles the scoping of names in \PurePy. A notion of scope
+usually determines the parts of a program within which names must be unique, so that a scope declares a name at
+most once. Two choices then remain to a language: how a program decomposes into scopes, and whether a scope may
+shadow a name of an enclosing scope. A \PurePy program is a Python program, so a scope is the body of a module,
+function, lambda or comprehension, and the builtins enclose every module. Python itself does not distinguish
+definition from assignment: a name is defined by assigning it, and assigning it again reassigns the existing
+variable. mypy, by contrast, treats an annotation as a definition, and rejects a declaration whose name is already
+that of a parameter, imported name, pattern variable or declaration of the same scope. On the second choice mypy
+permits shadowing, and so does \PurePy. A function body, for example, is a single scope, so it cannot declare a
+name twice, whether on one path or in different branches, nor redeclare one of its parameters; since shadowing is
+permitted, it may declare a name of an enclosing body or a builtin. Since a name denotes one variable throughout
+a scope, a declaration hides the enclosing variable everywhere in the scope, so a use before the declaration is
+rejected as unbound rather than referring to the enclosing variable. mypy agrees, with one exception: at module
+level a use before the declaration of a builtin name refers to the builtin, as it does when Python runs the
+module. \PurePy treats the builtins as an enclosing scope like any other, and therefore rejects a use of a builtin
+name if the module later declares that name. A pattern introduces its variables rather than assigning them, so a
+pattern cannot bind a name declared in its scope either, although several cases of one match may bind the same
+variable.
+\end{AddedBlock}
 
 \subsubsection{Control flow and effects}
 \label{sec:no-effects}
