@@ -4,4 +4,6 @@ statically\paperonly{ (\secref{no-coercions})}\speconly{ (summarised in the info
 produces the Python result; on any other run it may abort at the dynamically excluded operation, or simply
 produce the Python result. The conformance suite
 (\paperonly{\secref{reference-implementation}}\speconly{\secref{conformance-suite}}) organises its tests by verdict: semantically valid \PurePy, excluded by
-\PurePy (syntactically, statically or dynamically), or failing under Python.
+\PurePy (syntactically, statically or dynamically), or failing under Python.\paperonly{ \Added{\PurePy is also
+designed so that every well-formed program is well typed under the mypy type checker, a requirement that
+constrains the rules for variables, in particular how names are scoped (\secref{scope}).}}
