@@ -432,12 +432,12 @@ import cycle is ill-formed, because a module in a cycle could finish loading onl
 well-formedness (\figref{typing-module}) requires the main module to be well typed and hence,
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
-\Replaced{overridden by the imported context, with each name assigned in the body starting unbound, following
-\ruleName{def}, so the members of \pyinline{builtins} are in scope unqualified and a name bound by the body shadows a
-builtin throughout, so a use of the name before its declaration is rejected, whereas mypy, following
-Python's run-time lookup, resolves it to the builtin. As with any
-scope, the names declared in the module, including its imported names, must be distinct from one another and
-from any pattern variables in its body.}{overridden by the imported context, so the members of \pyinline{builtins} are in scope
+\Replaced{overridden by the imported context and then, as in \ruleName{def}, by an unbound entry for each name
+assigned in the body. The members of \pyinline{builtins} are thus in scope unqualified, and a name bound by the body
+shadows a builtin throughout the module, so a use of the name before its declaration is rejected. Under mypy such a
+use instead resolves to the builtin, following Python's run-time lookup. As with any scope, the names declared in the
+module, including its imported names, must be distinct from one another and from any pattern variables in its
+body.}{overridden by the imported context, so the members of \pyinline{builtins} are in scope
 unqualified.}
 
 \input{spec/fig/typing-module}
