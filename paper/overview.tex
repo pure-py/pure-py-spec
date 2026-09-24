@@ -73,7 +73,7 @@ feature that leaves the core purity benefits of \PurePy untouched.
 \label{sec:no-mutable-state}
 
 \Replaced{A variable in \PurePy is introduced by a declaration, or as a parameter, imported name, pattern variable
-or generator variable; a declaration is a type annotation such as \pyinline{x: int}, a form Python has allowed since
+or generator variable; a declaration is a type annotation such as \pyinline{x: int}, a form allowed in Python since
 version 3.6 (PEP 526\footnote{\url{https://peps.python.org/pep-0526/}}). A variable is assigned at most once on any path, either in its declaration or afterwards, and an
 assignment never introduces a variable nor reassigns one (\secref{local-assignment}). A variable therefore denotes
 a fixed value once assigned, and}{A variable in \PurePy denotes a fixed value once definitely

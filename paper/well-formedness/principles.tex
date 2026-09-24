@@ -1,8 +1,8 @@
 \subsection[Key concepts]{\Replaced{Key concepts}{Design principles}}
 \label{sec:principles}
 
-\Replaced{This section introduces the concepts on which the rules depend, each with the programs it admits and
-rejects; the rules follow in \secref{expression-typing} to \secref{well-formedness-modules}.}{Well-formedness
+\Replaced{This section introduces the concepts underlying the rules, each illustrated by admitted and rejected
+programs; the rules follow in \secref{expression-typing} to \secref{well-formedness-modules}.}{Well-formedness
 enforces several constraints, summarised here with the programs each accepts and rejects; the rules follow in
 \secref{well-formedness-statements} and \secref{well-formedness-modules}.} \Added{The rules for
 variables serve the two aims of \secref{no-mutable-state} and \secref{python-compatibility}, no mutable state and
@@ -83,7 +83,7 @@ Python's late binding semantics (\secref{mutual-recursion}).
 
 \emph{Definite assignment} enforces the discipline of \secref{no-mutable-state}: a variable may be referenced only
 where an assignment covers every path to the reference, and assigned only where no path has assigned it
-already, the rule Java applies to blank finals~\cite[\S16]{gosling2025}. The \ruleName{declare} rule binds the variable at $\DU{\tau}$, declared at $\tau$ and
+already, the rule applied by Java to blank finals~\cite[\S16]{gosling2025}. The \ruleName{declare} rule binds the variable at $\DU{\tau}$, declared at $\tau$ and
 definitely unassigned; the \ruleName{assign} rule requires that entry, checks the expression against $\tau$ and
 makes the variable definitely assigned, so that $\Gamma(x)$ is a type, as the \ruleName{var} rule requires; an
 annotated assignment does both at once; and the \ruleName{if} rules combine the branches with $\merge$, so
