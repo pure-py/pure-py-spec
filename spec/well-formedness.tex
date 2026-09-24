@@ -305,9 +305,10 @@ are the subject of \secref{well-formedness-patterns}.
 
 Each pattern must also be \emph{sequence-safe} at $\sigma$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:seq-safe}}), because under the
 evaluation rules a tuple pattern matches only a tuple and a list pattern matches only a list, whereas
-Python matches both forms of pattern against both kinds of value\speconly{ (\figref{eval-pat})}. \Replaced{Neither a tuple pattern nor a list pattern is therefore sequence-safe at
-$\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$, and a tuple pattern is not sequence-safe at
-$\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$.}{A match on
+Python matches both forms of pattern against both kinds of value\speconly{ (\figref{eval-pat})}. \Replaced{A tuple pattern is therefore sequence-safe only at a type with no list values, and a list pattern only
+at a type with no tuple values. A union has the values of its members, so both kinds of pattern fail the condition
+at $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$, and at $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$,
+since $\tySized$ has both list and tuple values.}{A match on
 $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ therefore admits no tuple or list pattern, and a
 match on $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple pattern.}
 
