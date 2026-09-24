@@ -74,7 +74,7 @@ feature that leaves the core purity benefits of \PurePy untouched.
 
 \Replaced{A variable in \PurePy is introduced by a declaration, or as a parameter, imported name, pattern variable
 or generator variable; a declaration is a type annotation such as \pyinline{x: int}, a form Python has allowed since
-version 3.6. A variable is assigned at most once on any path, either in its declaration or afterwards, and an
+version 3.6~\cite{gonzalez2016}. A variable is assigned at most once on any path, either in its declaration or afterwards, and an
 assignment never introduces a variable nor reassigns one (\secref{local-assignment}). A variable therefore denotes
 a fixed value once assigned, and}{A variable in \PurePy denotes a fixed value once definitely
 assigned, so} features associated with mutation and shared state are excluded: \pyinline{global} and \pyinline{nonlocal}, which direct assignments to a variable of an enclosing scope;
