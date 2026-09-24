@@ -64,11 +64,11 @@
 \and
 \inferrule*[lab={\ruleName{val-sub}}]
 {
-  \added{\vdash v : \sigma} \\
-  \added{\Sigma \vdash \sigma \subty \tau}
+  \vdash v : \sigma \\
+  \Sigma \vdash \sigma \subty \tau
 }
 {
-  \added{\vdash v : \tau}
+  \vdash v : \tau
 }
 \and
 \inferrule*[lab={\ruleName{val-prim}}]
@@ -115,18 +115,18 @@
 \and
 \inferrule*[lab={\ruleName{val-unbound}}]
 {
-  \added{\theta \in \set{\Unbound, \DU{\tau}}}
+  \theta \in \set{\Unbound, \DU{\tau}}
 }
 {
-  \added{\vdash \Unbound : \theta}
+  \vdash \Unbound : \theta
 }
 \and
 \inferrule*[lab={\ruleName{val-pu}}]
 {
-  \added{v = \Unbound \text{ or } \vdash v : \tau}
+  v = \Unbound \text{ or } \vdash v : \tau
 }
 {
-  \added{\vdash v : \PU{\tau}}
+  \vdash v : \PU{\tau}
 }
 \end{mathpar}
 
@@ -152,6 +152,6 @@
   \vdash \set{\bind{x}{v}} \override \rho : \set{\bind{x}{\theta}} \override \Gamma
 }
 \end{mathpar}
-\caption{Value and environment \replaced{well-formedness}{typing}}
+\caption{Value and environment well-formedness}
 \label{fig:well-formed-values}
 \end{figure}

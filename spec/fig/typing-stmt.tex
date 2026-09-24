@@ -12,30 +12,28 @@
 \and
 \inferrule*[lab={\ruleName{declare}}]
 {
-  \added{\Gamma \vdash \psi \synth \tau}
+  \Gamma \vdash \psi \synth \tau
 }
 {
-  \added{\Sigma; \Gamma; \zeta \vdash x\exAnnot{\psi} : \Assigns{\set{\bind{x}{\DU{\tau}}}}}
+  \Sigma; \Gamma; \zeta \vdash x\exAnnot{\psi} : \Assigns{\set{\bind{x}{\DU{\tau}}}}
 }
 \and
 \inferrule*[lab={\ruleName{assign}}]
 {
-  \added{\Gamma(x) = \DU{\tau}} \\
-  \replaced{\Sigma; \Gamma \vdash e \checks \tau}{\Sigma; \Gamma \vdash e \synth \sigma} \\
-  \deleted{x \notin \capturesE(e)}
+  \Gamma(x) = \DU{\tau} \\
+  \Sigma; \Gamma \vdash e \checks \tau \\
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exAssign{x}{e} : \Assigns{\set{\bind{x}{\replaced{\tau}{\sigma}}}}
+  \Sigma; \Gamma; \zeta \vdash \exAssign{x}{e} : \Assigns{\set{\bind{x}{\tau}}}
 }
 \and
 \inferrule*[lab={\ruleName{declare-assign}}]
 {
-  \Gamma \vdash \psi \synth \replaced{\tau}{\sigma} \\
-  \Sigma; \Gamma \vdash e \checks \replaced{\tau}{\sigma} \\
-  \deleted{x \notin \capturesE(e)}
+  \Gamma \vdash \psi \synth \tau \\
+  \Sigma; \Gamma \vdash e \checks \tau \\
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exAssign{x\exAnnot{\psi}}{e} : \Assigns{\set{\bind{x}{\replaced{\tau}{\sigma}}}}
+  \Sigma; \Gamma; \zeta \vdash \exAssign{x\exAnnot{\psi}}{e} : \Assigns{\set{\bind{x}{\tau}}}
 }
 \and
 \inferrule*[lab={\ruleName{expr-stmt}}]
@@ -101,7 +99,6 @@
 {
   \Sigma; \Gamma; \zeta \vdash s : \Assigns{\Delta} \\
   \Sigma; \Gamma \override \Delta ; \zeta \vdash s' : R \\
-  \deleted{\captures(s) \cap \assignsS(s') = \varnothing}
 }
 {
   \Sigma; \Gamma; \zeta \vdash s\;s' : \Assigns{\Delta} \override R
@@ -109,10 +106,10 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \added{\seq{x}_i \text{ distinct} \quad (\forall i)} \\
+  \seq{x}_i \text{ distinct} \quad (\forall i) \\
   \Delta_i = \set{\bind{\seq{x}_i}{\seq{\sigma}_i}} \quad (\forall i) \\
   \Delta' = \set{\bind{f_1}{\tyCallable{\seq{\sigma}_1}{\tau_1}}, \ldots, \bind{f_{n+1}}{\tyCallable{\seq{\sigma}_{n+1}}{\tau_{n+1}}}} \\
-  \Sigma; \Gamma \override \Delta' \override \Delta_i \override \replaced{\scopeS(\set{\seq{x}_i}, s_i)}{\set{\bind{x}{\Unbound} \mid x \in \assignsS(s_i) \setminus \dom(\Delta_i)}}; \tau_i \vdash s_i : R_i \quad (\forall i)
+  \Sigma; \Gamma \override \Delta' \override \Delta_i \override \scopeS(\set{\seq{x}_i}, s_i); \tau_i \vdash s_i : R_i \quad (\forall i)
   \\
   R_i = \Returns \text{ or } \Sigma \vdash \tyNone \subty \tau_i \quad (\forall i) \\
   \Gamma \vdash \seq{\psi}_i \synth \seq{\sigma}_i \quad (\forall i) \\

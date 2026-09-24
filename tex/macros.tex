@@ -235,10 +235,8 @@
 \newcommand*{\declaresS}{\mathrm{declares}}
 \newcommand*{\scopeS}{\mathrm{scope}}
 \newcommand*{\binds}{\mathrm{binds}}
-\newcommand*{\capturesE}{\mathrm{captures}_{\mathsf{e}}}
 \newcommand*{\captures}{\mathrm{captures}}
 \newcommand*{\fvE}{\mathrm{fv}_{\mathsf{e}}}
-\newcommand*{\fvS}{\mathrm{fv}}
 
 % Metafunctions: classes
 \newcommand*{\ancestors}{\mathrm{ancestors}}
@@ -282,12 +280,6 @@
 % Change markup (a local copy of the shared change-tracking definitions; changebar loaded in the
 % preamble).
 \input{tex/change-tracking}
-% A row of an align recording a deleted definition: grey in the paper, absent under \acceptchanges.
-\ifdefined\acceptchanges
-  \newcommand*{\deletedrow}[2]{}
-\else
-  \newcommand*{\deletedrow}[2]{\deleted{#1} &\deleted{{}#2} \\*}
-\fi
 
 % Grammar figures: shaded heading row naming the syntactic category
 \definecolor{grammarheadcolor}{gray}{0.93}

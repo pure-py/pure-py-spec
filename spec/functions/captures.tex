@@ -1,7 +1,3 @@
-\deletedrow{\captures(t\;t')}{= \captures(t) \cup \captures(t')}
-\deletedrow{\captures(\seq{d})}{{}= \textstyle\bigcup_i \big(\fvS(b_i) \setminus (\set{\seq{x}_i} \cup \assignsS(b_i))\big) \setminus \set{\seq{f}}}
-\deletedrow{}{\qquad \text{where } d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i}}
-\deletedrow{\captures(\exMatch{e}{\exCase{p_1}{b_1}\;\ldots\;\exCase{p_{n+1}}{b_{n+1}}})}{= \capturesE(e) \cup \textstyle\bigcup_i \captures(b_i)}
 \captures(\varepsilon) &= \varnothing \\*
-\captures(\qualGuard{e} \cons \seq{g}) &= \replaced{\captures}{\capturesE}(e) \cup \captures(\seq{g}) \\*
-\captures(\qualGenerator{x}{e} \cons \seq{g}) &= \replaced{\captures}{\capturesE}(e) \cup (\captures(\seq{g}) \setminus \set{x})
+\captures(\qualGuard{e} \cons \seq{g}) &= \captures(e) \cup \captures(\seq{g}) \\*
+\captures(\qualGenerator{x}{e} \cons \seq{g}) &= \captures(e) \cup (\captures(\seq{g}) \setminus \set{x})

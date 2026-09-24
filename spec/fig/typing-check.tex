@@ -15,19 +15,19 @@
 \and
 \inferrule*[lab={\ruleName{lambda}}]
 {
-  \Sigma; \Gamma \override \set{\replaced{\bind{\seq{x}}{\seq{\tau}}}{\bind{x_1}{\tau_1}, \ldots, \bind{x_n}{\tau_n}}} \vdash e \checks \tau
+  \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\tau}}} \vdash e \checks \tau
 }
 {
-  \Sigma; \Gamma \vdash \exLambda{\replaced{\seq{x}}{x_1, \ldots, x_n}}{e} \checks \replaced{\tyCallable{\seq{\tau}}{\tau}}{\tyCallable{\tau_1, \ldots, \tau_n}{\tau}}
+  \Sigma; \Gamma \vdash \exLambda{\seq{x}}{e} \checks \tyCallable{\seq{\tau}}{\tau}
 }
 \and
 \inferrule*[lab={\ruleName{call-lambda}}]
 {
-  \replaced{\Sigma; \Gamma \vdash \seq{e} \synth \seq{\tau}}{\Sigma; \Gamma \vdash e_i \synth \tau_i \quad (\forall i)} \\
-  \Sigma; \Gamma \override \set{\replaced{\bind{\seq{x}}{\seq{\tau}}}{\bind{x_1}{\tau_1}, \ldots, \bind{x_n}{\tau_n}}} \vdash e \checks \tau
+  \Sigma; \Gamma \vdash \seq{e} \synth \seq{\tau} \\
+  \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\tau}}} \vdash e \checks \tau
 }
 {
-  \Sigma; \Gamma \vdash \exCall{(\exLambda{\replaced{\seq{x}}{x_1, \ldots, x_n}}{e})}{\replaced{\seq{e}}{e_1, \ldots, e_n}} \checks \tau
+  \Sigma; \Gamma \vdash \exCall{(\exLambda{\seq{x}}{e})}{\seq{e}} \checks \tau
 }
 \and
 \inferrule*[lab={\ruleName{list}}]
@@ -69,7 +69,7 @@
 {
   \Sigma; \Gamma \vdash \seq{g} : \Delta \\
   \Sigma; \Gamma \override \Delta \vdash e \checks \tau \\
-  \replaced{\captures}{\capturesE}(e) \cap \dom(\Delta) = \varnothing
+  \captures(e) \cap \dom(\Delta) = \varnothing
 }
 {
   \Sigma; \Gamma \vdash \exListComp{e}{\seq{g}} \checks \tyList{\tau}
@@ -80,7 +80,7 @@
   \Sigma; \Gamma \vdash \seq{g} : \Delta \\
   \Sigma; \Gamma \override \Delta \vdash e \checks \tyStr \\
   \Sigma; \Gamma \override \Delta \vdash e' \checks \tau \\
-  \replaced{\captures}{\capturesE}((e, e')) \cap \dom(\Delta) = \varnothing
+  \captures((e, e')) \cap \dom(\Delta) = \varnothing
 }
 {
   \Sigma; \Gamma \vdash \exDictComp{e}{e'}{\seq{g}} \checks \tyDict{\tau}

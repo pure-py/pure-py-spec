@@ -3,5 +3,5 @@
 \binds(\varepsilon) &= \varnothing \\*
 \binds(\qualGuard{e} \cons \seq{g}) &= \binds(\seq{g}) \\*
 \binds(\qualGenerator{x}{e} \cons \seq{g}) &= \set{x} \cup \binds(\seq{g}) \\*
-\added{\binds(\exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}})} &\added{{}= \textstyle\bigcup_i \big(\binds(p_i) \cup \binds(s_i)\big)} \\*
-\added{\binds(s\;s')} &\added{= \binds(s) \cup \binds(s')}
+\binds(\exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}}) &{}= \textstyle\bigcup_i \big(\binds(p_i) \cup \binds(s_i)\big) \\*
+\binds(s\;s') &= \binds(s) \cup \binds(s')

@@ -6,18 +6,14 @@
 \begin{alignat*}{2}
 \opname{$\override$ (override)} && \bot \override \theta &= \theta \override \bot = \theta \\
 \opblank && \theta \override \theta' &= \theta' \quad \text{otherwise} \\[2mm]
-\opname{$\merge$ (merge)} && \added{\theta \merge \theta} &\added{= \theta} \\
-\opblank && \added{\theta \merge \theta'} &\added{= \PU{\tau} \quad \text{otherwise}} \\
-\opblank && &\added{\qquad \text{for } \theta, \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}, \bot}} \\
-\opblank && \deleted{\bot \merge \bot} &\deleted{= \bot} \\
-\opblank && \deleted{\tau \merge \bot = \bot \merge \tau} &\deleted{= \False} \\
-\opblank && \deleted{\False \merge \theta = \theta \merge \False} &\deleted{= \False} \\
-\opblank && \deleted{\sigma \merge \tau} &\deleted{= \joinTy{\Sigma}{\sigma}{\tau}} \\[2mm]
+\opname{$\merge$ (merge)} && \theta \merge \theta &= \theta \\
+\opblank && \theta \merge \theta' &= \PU{\tau} \quad \text{otherwise} \\
+\opblank && &\qquad \text{for } \theta, \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}, \bot} \\[2mm]
 \opname{$\extend$ (extension)} && \modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} &= \modLoaded{q}{\Gamma \extend \Gamma'} \\
 \opblank && \modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} &= \modLoaded{q}{\Gamma} \\
 \opblank && \bot \extend \theta = \theta \extend \bot &= \theta \\
 \opblank && \theta \extend \theta' &= \theta' \quad \text{otherwise}
 \end{alignat*}
-\caption{\replaced{Operations on context entries, lifted pointwise to contexts by}{Context operations, defined on context entries and lifted pointwise to contexts:} $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$}
+\caption{Operations on context entries, lifted pointwise to contexts by $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$}
 \label{fig:context-ops}
 \end{figure}

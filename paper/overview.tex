@@ -72,47 +72,27 @@ feature that leaves the core purity benefits of \PurePy untouched.
 \subsubsection{Mutable state}
 \label{sec:no-mutable-state}
 
-\Replaced{A variable in \PurePy is introduced by a declaration, or as a parameter, imported name, pattern variable
+A variable in \PurePy is introduced by a declaration, or as a parameter, imported name, pattern variable
 or generator variable; a declaration is a type annotation such as \pyinline{x: int}, a form allowed in Python since
 version 3.6 (PEP 526\footnote{\url{https://peps.python.org/pep-0526/}}). A variable is assigned at most once on any path, either in its declaration or afterwards, and an
 assignment never introduces a variable nor reassigns one (\secref{local-assignment}). A variable therefore denotes
-a fixed value once assigned, and}{A variable in \PurePy denotes a fixed value once definitely
-assigned, so} features associated with mutation and shared state are excluded: \pyinline{global} and \pyinline{nonlocal}, which direct assignments to a variable of an enclosing scope;
+a fixed value once assigned, and features associated with mutation and shared state are excluded: \pyinline{global} and \pyinline{nonlocal}, which direct assignments to a variable of an enclosing scope;
 \pyinline{del}, which removes a binding; augmented assignment (\pyinline{+=}, \pyinline{-=}, and so on); and
-the walrus operator (\pyinline{:=}), which assigns within an expression. \Replaced{A Python closure captures a binding rather than a value, so a change to the binding is visible through
+the walrus operator (\pyinline{:=}), which assigns within an expression. A Python closure captures a binding rather than a value, so a change to the binding is visible through
 the closure. Excluding reassignment removes such changes, a discipline Java imposes on captured locals, which must
 be effectively final~\cite[\S15.27.2]{gosling2025}. One case remains: Python implements a comprehension by updating
 its generator variables in place on each iteration, so \PurePy forbids a lambda within a comprehension from
-capturing a generator variable, since the updates would otherwise be visible through the lambda (\secref{captured-variables}):}{Reassignment of a variable already
-captured by a closure is excluded for the same reason. In Python a closure captures a mutable binding, so a
-later reassignment is visible through the closure:}
+capturing a generator variable, since the updates would otherwise be visible through the lambda (\secref{captured-variables}):
 
-\begin{DeletedBlock}
-\begin{python}
-def f():
-    x = 5
-    def g():
-        return x
-    x = 6
-    return x + g()
-\end{python}
-\end{DeletedBlock}
-\begin{AddedBlock}
 \begin{python}
 [lambda x: x**i for i in [1, 2, 3]]  # error: lambda captures i
 \end{python}
-\end{AddedBlock}
 
-\noindent \Replaced{Here each lambda computes \pyinline{x**3} in Python, since all three share the one binding of
-\pyinline{i}.}{Here \pyinline{g()} returns \pyinline{6} in Python and the result is \pyinline{12}; under a pure
-reading in which \pyinline{x = 6} shadows the earlier binding, \pyinline{g()} would return \pyinline{5} and the
-result \pyinline{11}. \PurePy rejects the program, keeping closures over
-values rather than mutable cells, as with Java's requirement that captured locals be effectively
-final~\cite[\S15.27.2]{gosling2025}. The rules that enforce this are given in \secref{captured-variables}.}
+\noindent Here each lambda computes \pyinline{x**3} in Python, since all three share the one binding of
+\pyinline{i}.
 
 \input{spec/exclusions/mutable-state}
 
-\begin{AddedBlock}
 \subsubsection{Scope}
 \label{sec:scope}
 
@@ -134,7 +114,6 @@ module. \PurePy treats the builtins as an enclosing scope like any other, and th
 name if the module later declares that name. A pattern introduces its variables rather than assigning them, so a
 pattern cannot bind a name declared in its scope either, although several cases of one match may bind the same
 variable.
-\end{AddedBlock}
 
 \subsubsection{Control flow and effects}
 \label{sec:no-effects}
@@ -171,18 +150,10 @@ module can be set both by an assignment in the module body and by loading a same
 overwriting the other, so the value of the attribute depends on load order. Consider a program with four modules:
 
 \begin{minipage}[t]{0.2\textwidth}
-\begin{DeletedBlock}
-\begin{python}
-# pkg
-sub = 1
-\end{python}
-\end{DeletedBlock}
-\begin{AddedBlock}
 \begin{python}
 # pkg
 sub: int = 1
 \end{python}
-\end{AddedBlock}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.2\textwidth}
@@ -234,7 +205,7 @@ For now, modules and classes are not values in \PurePy. In Python a module is a 
 is an assignment, so both flow through programs as data. Treating them as first-class would complicate the
 static account, so the present subset keeps them second-class rather than ruling the feature out; a later
 release may revisit it. A module name may be projected by member access but not used as a value, and a class
-name appears only at constructor and pattern positions, with \Replaced{class declarations}{declarations} confined to module level. Because a
+name appears only at constructor and pattern positions, with class declarations confined to module level. Because a
 class is identified by its qualified name, a dataclass declaration may not re-declare a name that already
 denotes a class in the module; Python permits the re-declaration, leaving the earlier class reachable only
 through its existing instances.
@@ -290,7 +261,7 @@ Postponed annotation evaluation & \issue{128} \\
 Primitive operations & \issue{132} \\
 Annotated lambdas and generator targets & \issue{178} \\
 Members for built-in types & \issue{181} \\
-\deleted{Bare annotations as declarations} & \deleted{\issue{184}} \\
+& \\
 \end{tabular}
 \end{minipage}
 \end{center}

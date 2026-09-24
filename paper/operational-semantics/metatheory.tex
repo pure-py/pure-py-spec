@@ -1,13 +1,10 @@
 \subsection{Metatheory}
 \label{sec:metatheory}
 
-\Replaced{Value well-formedness (\figref{well-formed-values}) determines the types at which an ordinary value is
+Value well-formedness (\figref{well-formed-values}) determines the types at which an ordinary value is
 well-formed, and the context entry of a module or class value; environment well-formedness applies it pointwise,
 relating an environment to a context. The predefined environments are well-formed by construction, and a module loads to an environment
-well-formed at its signature.}{Value typing (\figref{well-formed-values}) gives an ordinary value its type and a
-module or class value the corresponding context entry; environment typing applies value typing pointwise, giving an
-environment a context. The predefined environments are well-formed by construction, and a module loads to an
-environment typed at its signature.}
+well-formed at its signature.
 
 \begin{theorem}[Loaded environments are well-formed]
 \label{thm:loaded}
@@ -17,7 +14,6 @@ If $\mathcal{P}(q) = (\rho, \Gamma)$ then $\vdash \rho : \Gamma$.
 If $\vdash_{\mathsf{load}} q : \Gamma$ and $q \Rightarrow_{\mathsf{load}} \val{\rho}$ then $\vdash \rho : \Gamma$.
 \end{theorem}
 
-\begin{AddedBlock}
 \begin{lemma}[Variables are bound at run time]
 \label{lem:variables-bound}
 If $\vdash \rho : \Gamma$ and $\Sigma; \Gamma \vdash x \synth \tau$ then $\rho(x) \neq \Unbound$.
@@ -26,5 +22,4 @@ If $\vdash \rho : \Gamma$ and $\Sigma; \Gamma \vdash x \synth \tau$ then $\rho(x
 \noindent The \ruleName{var} rule requires $x$ to be definitely assigned, and no value other than $\Unbound$ is
 well-formed at $\Unbound$ or $\DU{\tau}$, so a well-formed program never raises Python's
 \pyinline{UnboundLocalError}. \todo{Unproven.}
-\end{AddedBlock}
 

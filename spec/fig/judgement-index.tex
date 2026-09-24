@@ -22,8 +22,8 @@ $\Sigma \vdash_{\mathsf{load}} q : \Gamma \binding \Sigma'$ & module $q$ statica
 $\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{typing-module}
    \\[2mm]
 \metaGroup{Evaluation} \\
-$\vdash v : \theta$ & value $v$ \replaced{is well-formed at}{has} context entry $\theta$ & \figref{well-formed-values} \\
-$\vdash \rho : \Gamma$ & environment $\rho$ \replaced{is well-formed at}{has} context $\Gamma$ & \figref{well-formed-values} \\
+$\vdash v : \theta$ & value $v$ is well-formed at context entry $\theta$ & \figref{well-formed-values} \\
+$\vdash \rho : \Gamma$ & environment $\rho$ is well-formed at context $\Gamma$ & \figref{well-formed-values} \\
 $\rho, p, v \matches m$ & pattern $p$ matches value $v$ with match result $m$ & \figref{eval-pat} \\
 $\rho, s \Rightarrow o$ & statement $s$ evaluates to outcome $o$ & \figref{eval-block-outcome} \\
 $q, \rho, t \Rightarrow o$ & top-level statement $t$ of module $q$ evaluates to outcome $o$ & \figref{eval-top-level} \\
