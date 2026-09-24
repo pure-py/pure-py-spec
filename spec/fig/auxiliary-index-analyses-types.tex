@@ -2,7 +2,7 @@
 \auxgroup{Syntactic analyses}
 \auxrow{$\assignsS(t)$}{set of variables}{variables \added{declared or }assigned in $t$, not descending into nested functions}{aux:assigns}
 \auxrow{\added{$\declaresS(t)$, $\declaresS(\seq{\iota})$}}{\added{sequence of variables}}{\added{names declared in $t$, or bound by imports $\seq{\iota}$, in order and with repeats, not descending into nested functions}}{aux:declares}
-\auxrow{\added{$\scopeS(Y, s)$}}{\added{context}}{\added{each variable declared or assigned in $s$ unbound; defined iff names declared in $s$ distinct from one another, from names $Y$ and from pattern variables of $s$}}{aux:scope}
+\auxrow{\added{$\scopeS(Y, s)$}}{\added{context}}{\added{each variable declared or assigned in $s$ unbound; defined iff names declared in $s$, names in $Y$ and pattern variables of $s$ pairwise distinct}}{aux:scope}
 \auxrow{$\binds(p)$, $\binds(\seq{g})$\added{, $\binds(s)$}}{set of variables}{variables bound by pattern $p$, \deleted{or }by generators of qualifiers $\seq{g}$\added{, or by patterns within statement $s$}}{aux:binds}
 \auxrow{$\replaced{\captures}{\capturesE}(e)$}{set of variables}{variables of enclosing scope captured by lambdas in $e$}{aux:captures-e}
 \auxrow{\replaced{$\captures(\seq{g})$}{$\captures(t)$, $\captures(\seq{g})$}}{set of variables}{\replaced{variables of enclosing scope captured by lambdas in qualifiers $\seq{g}$}{variables of enclosing scope captured by lambdas and nested functions in $t$, or in $\seq{g}$}}{aux:captures}
