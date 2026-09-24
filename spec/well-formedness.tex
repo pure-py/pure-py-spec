@@ -222,10 +222,9 @@ $\overloadsOf(\Sigma, \ominus, \sigma)$.}
 \label{sec:well-formedness-statements}
 
 \Replaced{A well-typed statement has a \emph{static outcome} $R$: either $\Returns$, when the statement \emph{definitely
-returns}, or $\Assigns{\Delta}$ for a context $\Delta$, possibly empty, recording the variables the statement
-declares or assigns (Definition~\ref{def:context}): a variable at its type if the statement \emph{definitely
-assigns} it, at $\DU{\tau}$, definitely unassigned, if it declares it without assigning it, and at $\PU{\tau}$,
-possibly unassigned, if it assigns it on some paths only.}{Every well-typed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
+returns}, or $\Assigns{\Delta}$ for a context $\Delta$ with an entry for any variable declared or assigned by the
+statement (Definition~\ref{def:context}), recording whether the variable is definitely assigned, definitely
+unassigned or possibly unassigned after the statement.}{Every well-typed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
 $\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and \pyinline{x = e} definitely assigns
 $\set{\bind{\pyinline{x}}{\sigma}}$ for the type $\sigma$ of \pyinline{e}. \emph{Static outcomes} $R$ classify the two completions: $R$ is either $\Returns$ (definitely returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$).}
 
