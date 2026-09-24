@@ -1,8 +1,10 @@
-\subsection{Design principles}
+\subsection[Key concepts]{\Replaced{Key concepts}{Design principles}}
 \label{sec:principles}
 
-Well-formedness enforces several constraints, summarised here with the programs each accepts and rejects;
-the rules follow in \secref{well-formedness-statements} and \secref{well-formedness-modules}. \Added{The rules for
+\Replaced{This section introduces the concepts on which the rules depend, each with the programs it admits and
+rejects; the rules follow in \secref{expression-typing} to \secref{well-formedness-modules}.}{Well-formedness
+enforces several constraints, summarised here with the programs each accepts and rejects; the rules follow in
+\secref{well-formedness-statements} and \secref{well-formedness-modules}.} \Added{The rules for
 variables serve the two aims of \secref{no-mutable-state} and \secref{python-compatibility}, no mutable state and
 compatibility with mypy, and within these limits permit as much as possible.}
 
@@ -127,7 +129,7 @@ n: int = len([1])  # error: len is bound by the module
 len: int = 2
 \end{python}
 
-\subsubsection{No capture of comprehension variables}
+\subsubsection{Variable capture}
 \label{sec:captured-variables}
 
 In Python a closure holds a mutable binding, so a variable captured by a lambda or nested function
@@ -275,7 +277,7 @@ match v:
 \end{python}
 \end{AddedBlock}
 
-\subsubsection{No unreachable code}
+\subsubsection[Reachability]{\Replaced{Reachability}{No unreachable code}}
 \label{sec:unreachable}
 
 Python accepts statements that can never run, such as code after a \pyinline{return}. \PurePy rejects
