@@ -289,7 +289,7 @@ A function definition binds its parameters at their annotated types, plus the na
 mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables \Added{declared or} assigned in the body start
 \replaced{unbound}{at $\False$} (\ruleName{def}), emulating Python's scoping of function bodies, which
 prefers a locally \Replaced{bound}{assigned} name to one visible in an enclosing scope. \Added{A variable of the
-enclosing scope referenced by the body must be definitely assigned where the definition occurs, whereas Python
+enclosing scope referenced by the body must be definitely assigned where the function is defined, whereas Python
 resolves the reference only when the body runs. As with any scope, the names declared in the function, including
 its parameters, must be distinct from one another and from any pattern variables in its body. The function names of the mutual region are not among these; they are
 declared in the enclosing scope, where the same condition applies to them.} The body is checked with the
