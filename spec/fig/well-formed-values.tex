@@ -106,15 +106,15 @@
 \and
 \inferrule*[lab={\ruleName{val-unbound}}]
 {
-  \added{\theta \in \set{\Unbound, \DU{\tau}, \PU{\tau}}}
+  \added{\theta \in \set{\Unbound, \DU{\tau}}}
 }
 {
   \added{\vdash \Unbound : \theta}
 }
 \and
-\inferrule*[lab={\ruleName{val-possibly-unassigned}}]
+\inferrule*[lab={\ruleName{val-pu}}]
 {
-  \added{\vdash v : \tau}
+  \added{v = \Unbound \text{ or } \vdash v : \tau}
 }
 {
   \added{\vdash v : \PU{\tau}}
