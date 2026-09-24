@@ -134,8 +134,8 @@ len: int = 2
 
 In Python a closure holds a mutable binding, so a variable captured by a lambda or nested function
 definition may be reassigned afterwards, changing the value seen by the function (\secref{no-mutable-state}).
-This cannot arise in \PurePy: a closure can capture only a definitely assigned variable, and no later
-statement may assign one. One case remains, in comprehensions: in Python a comprehension mutates its generator
+This cannot arise in \PurePy: a closure captures only definitely assigned variables, and a definitely
+assigned variable is never assigned again. One case remains, in comprehensions: in Python a comprehension mutates its generator
 variables on each iteration, so \PurePy forbids a lambda in the body or in a later qualifier from capturing one, a
 side condition of \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}, illustrated in
 \secref{no-mutable-state}.
