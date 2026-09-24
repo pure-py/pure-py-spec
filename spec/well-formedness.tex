@@ -438,7 +438,7 @@ well-formedness (\figref{typing-module}) requires the main module to be well typ
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
 \Replaced{overridden by the imported context and then, as in \ruleName{def}, by an unbound entry for each name
-declared or assigned in the body ($\scopeS$). The members of \pyinline{builtins} are thus in scope unqualified, and a name bound by the body
+declared in the body or bound by a pattern in it. The members of \pyinline{builtins} are thus in scope unqualified, and a name bound by the body
 shadows a builtin throughout the module, so a use of the name before its declaration is rejected. Under mypy such a
 use instead resolves to the builtin, following Python's run-time lookup. As with any scope, the names declared in the
 module, including its imported names, must be distinct from one another and from any pattern variables in its
