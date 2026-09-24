@@ -7,14 +7,13 @@ from aux import (
     assign_targets,
     assigns_body,
     binds_quals,
-    captures_e_list,
+    captures_list,
     captures_quals,
     declares_body,
     dict_keys,
     own_fields,
     pattern_bound,
     qualified_name,
-    redeclaration,
     statements,
     target_name,
     type_expr,
@@ -57,9 +56,8 @@ from match import match_shapes, seq_safe
 from operators import (
     BINARY_NAMES,
     UNARY_NAMES,
-    minimum,
-    overloads_binary,
-    overloads_unary,
+    resolve_op_binary,
+    resolve_op_unary,
 )
 from reasons import IllFormedModule
 from shapes import shapes
@@ -190,26 +188,18 @@ def check_seq(
 
 def check_statement(s: Statement, mod_ctx: ModuleContext, returns: Type | None) -> StaticOutcome:
     if isinstance(s, list):
-        check_mutual_region(s, mod_ctx)
+        check_bodies(s, mod_ctx)
         return Assigns({d.name: signature(d, mod_ctx) for d in s})
     return check_stmt(s, mod_ctx, returns)
-
-
-def check_mutual_region(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
-    for d in defs:
-        if mod_ctx.gamma.get(d.name) != Unbound():
-            raise IllFormedModule(d, reasons.Redeclaration(d.name))
-    check_bodies(defs, mod_ctx)
 
 
 def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
     f_names: VarContext = {d.name: signature(d, mod_ctx) for d in defs}
     for d in defs:
-        check_distinct_declarations(d.body)
+        locals_ = scope({a.arg for a in d.args.args}, d.body)
         params = parameters(d, mod_ctx)
         check_assignments_declared(d.body, set(params))
-        locals_ = assigns_body(d.body) - set(params)
-        delta = {**f_names, **params, **{x: Unbound() for x in locals_}}
+        delta = {**f_names, **params, **locals_}
         body_ctx = override_gamma(mod_ctx, delta)
         declared = resolve_type(type_expr(d.returns), d, mod_ctx)
         r = check_body(d.body, body_ctx, declared)
@@ -227,11 +217,16 @@ def check_returns_none(Sigma: ClassTable, s: ast.Return, declared: Type) -> None
         raise IllFormedModule(s, reasons.TypeMismatch(declared, Primitive.NONE))
 
 
-def check_distinct_declarations(body: list[ast.stmt]) -> None:
-    repeated = redeclaration(body)
-    if repeated is not None:
-        x, node = repeated
-        raise IllFormedModule(node, reasons.Redeclaration(x))
+def scope(ys: set[Var], body: list[ast.stmt]) -> VarContext:
+    patterns = pattern_bound(body)
+    seen = set(ys)
+    for x, node in declares_body(body):
+        if x in seen or x in patterns:
+            raise IllFormedModule(node, reasons.Redeclaration(x))
+        seen.add(x)
+    for x in sorted(ys & patterns.keys()):
+        raise IllFormedModule(patterns[x], reasons.Redeclaration(x))
+    return {x: Unbound() for x in assigns_body(body)}
 
 
 def check_assignments_declared(body: list[ast.stmt], bound: set[Var]) -> None:
@@ -241,11 +236,6 @@ def check_assignments_declared(body: list[ast.stmt], bound: set[Var]) -> None:
     for x, node in assign_targets(body):
         if x not in declared and x not in bound and x not in pattern_bound(body):
             raise IllFormedModule(node, reasons.UndeclaredAssignment(x))
-
-
-def check_declarable(x: Var, node: ast.AST, mod_ctx: ModuleContext) -> None:
-    if mod_ctx.gamma.get(x) != Unbound():
-        raise IllFormedModule(node, reasons.Redeclaration(x))
 
 
 def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> StaticOutcome:
@@ -281,7 +271,6 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
         case ast.AnnAssign():
             assert isinstance(s.target, ast.Name)
             x = s.target.id
-            check_declarable(x, s, mod_ctx)
             tau = resolve_type(type_expr(s.annotation), s, mod_ctx)
             if s.value is None:
                 return Assigns({x: DU(tau)})
@@ -398,10 +387,9 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             if negated is not None:
                 return negated
             name = UNARY_NAMES[type(e.op)]
-            resolved = minimum(mod_ctx.Sigma, overloads_unary(mod_ctx.Sigma, name, operand))
-            if resolved is None:
+            result = resolve_op_unary(mod_ctx.Sigma, name, operand)
+            if result is None:
                 raise IllFormedModule(e, reasons.NoUnaryOverload(name, operand))
-            _, result = resolved
             return result
         case ast.BoolOp(values=es):
             for v in es:
@@ -688,10 +676,9 @@ def check_lambda(e: ast.Lambda, expected: Type, mod_ctx: ModuleContext) -> None:
 
 def binary(op: str, left: ast.expr, right: ast.expr, e: ast.expr, mod_ctx: ModuleContext) -> Type:
     sigma, sigma_ = synth_expr(left, mod_ctx), synth_expr(right, mod_ctx)
-    resolved = minimum(mod_ctx.Sigma, overloads_binary(mod_ctx.Sigma, op, sigma, sigma_))
-    if resolved is None:
+    result = resolve_op_binary(mod_ctx.Sigma, op, sigma, sigma_)
+    if result is None:
         raise IllFormedModule(e, reasons.NoBinaryOverload(op, sigma, sigma_))
-    _, result = resolved
     return result
 
 
@@ -699,7 +686,7 @@ def qual_context(
     elts: list[ast.expr], generators: list[ast.comprehension], mod_ctx: ModuleContext
 ) -> ModuleContext:
     delta = check_quals(generators, mod_ctx)
-    captured = captures_e_list(elts) & binds_quals(generators)
+    captured = captures_list(elts) & binds_quals(generators)
     if len(captured) > 0:
         node = generators[0].target
         raise IllFormedModule(node, reasons.CapturedGeneratorVariable(min(captured)))
@@ -712,7 +699,7 @@ def check_quals(generators: list[ast.comprehension], mod_ctx: ModuleContext) -> 
     g = generators[0]
     tau = iterated_type(g.iter, mod_ctx)
     x = target_name(g)
-    if x in captures_e_list(g.ifs) | captures_quals(generators[1:]):
+    if x in captures_list(g.ifs) | captures_quals(generators[1:]):
         raise IllFormedModule(g.target, reasons.CapturedGeneratorVariable(x))
     delta = {x: tau}
     mod_ctx_ = override_gamma(mod_ctx, delta)
@@ -747,7 +734,6 @@ def iterated_type(e: ast.expr, mod_ctx: ModuleContext) -> Type:
 
 
 def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, ClassTable]:
-    check_declarable(node.name, node, mod_ctx)
     if not isinstance(mod_ctx.gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.NotPredefinedName("dataclass"))
     own = tuple((x, resolve_type(psi, node, mod_ctx)) for x, psi in own_fields(node))

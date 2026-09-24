@@ -62,6 +62,15 @@
   \vdash \exObj{C}{\rho} : C
 }
 \and
+\inferrule*[lab={\ruleName{val-sub}}]
+{
+  \vdash v : \sigma \\
+  \Sigma \vdash \sigma \subty \tau
+}
+{
+  \vdash v : \tau
+}
+\and
 \inferrule*[lab={\ruleName{val-prim}}]
 {
   \mathcal{P}(q) = (\Gamma, \rho) \\
@@ -111,6 +120,22 @@
 {
   \added{\vdash \TypeAlias{\seq{\alpha}}{\tau} : \TypeAlias{\seq{\alpha}}{\tau}}
 }
+\and
+\inferrule*[lab={\ruleName{val-unbound}}]
+{
+  \theta \in \set{\Unbound, \DU{\tau}}
+}
+{
+  \vdash \Unbound : \theta
+}
+\and
+\inferrule*[lab={\ruleName{val-pu}}]
+{
+  v = \Unbound \text{ or } \vdash v : \tau
+}
+{
+  \vdash v : \PU{\tau}
+}
 \end{mathpar}
 
 \vspace{2mm}
@@ -135,6 +160,6 @@
   \vdash \set{\bind{x}{v}} \override \rho : \set{\bind{x}{\theta}} \override \Gamma
 }
 \end{mathpar}
-\caption{Value and environment typing}
-\label{fig:typing-values}
+\caption{Value and environment well-formedness}
+\label{fig:well-formed-values}
 \end{figure}

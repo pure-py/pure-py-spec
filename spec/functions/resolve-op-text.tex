@@ -1,0 +1,6 @@
+Result type of the most specific overload of an operator at the operand types. The overloads of $\odot$ at $(\sigma_1, \sigma_2)$
+are the resolved overloads $((\tau_1, \tau_2), \tau)$ with $\Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$
+(\figref{operator-overloads}), ordered by componentwise subtyping in $\Sigma$ on their bounds $(\tau_1, \tau_2)$; the
+overloads of $\ominus$ at $\sigma$ are defined in the same way from conclusions $\Sigma \vdash \ominus(\sigma) : (\tau, \tau')$.
+The most specific overload, the least element under this order, exists when some overload applies and neither operand type is below
+\pyinline{Never} (Lemma~\ref{lem:most-specific-overload}); otherwise the function is undefined.

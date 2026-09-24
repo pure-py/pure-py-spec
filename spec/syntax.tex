@@ -9,7 +9,8 @@ $\seq{x} \mathbin{\concat} \seq{y}$ is concatenation.
 Comma-separated elements inside set braces are pairwise distinct, so $\set{x_1, \ldots, x_n}$ has $n$
 elements; the set of the elements of a sequence, $\set{\seq{x}}$, assumes no distinctness. A sequence
 comprehension $(x_i \mid i \in I)$, where the finite index set $I$ carries a total order, denotes the
-sequence of the $x_i$ in that order. When the order of its elements matters, a set $\set{x_1, \ldots, x_n}$ is
+sequence of the $x_i$ in that order. A judgement applied to sequences of equal length holds pointwise, so that
+$\Gamma \vdash \seq{\psi} \synth \seq{\tau}$ abbreviates $\Gamma \vdash \psi_i \synth \tau_i$ for each $i$. When the order of its elements matters, a set $\set{x_1, \ldots, x_n}$ is
 \emph{ordered} by position. A comprehension over an ordered set preserves the order of its source;
 $X \setminus Y$ keeps the surviving elements of $X$ in their order; $X \disjunion Y$, defined when $X$
 and $Y$ are disjoint, appends the elements of $Y$ to those of $X$; $X \cup Y$ appends the elements of
@@ -45,7 +46,7 @@ take the following forms:
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.155\textwidth}>{\raggedright\arraybackslash}p{0.555\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Entry & Form & Records \\
-variable & $\tau$, $\DU{\tau}$, $\PU{\tau}$ or $\Unbound$ & type of definitely assigned variable; $\DU{\tau}$ if declared at $\tau$ and definitely unassigned, on no path; $\PU{\tau}$ if declared at $\tau$ and possibly unassigned, on some paths only; $\Unbound$ if its binding statement has not been reached \\
+variable & $\tau$, $\DU{\tau}$, $\PU{\tau}$ or $\Unbound$ & type of definitely assigned variable; $\DU{\tau}$ if declared at $\tau$ and definitely unassigned; $\PU{\tau}$ if declared at $\tau$ and possibly unassigned; $\Unbound$ if its declaration has not been reached \\
 module stub & $\modStub{q}$ & module $q$, named but not loaded \\
 module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$ \\
 class entry & $\Type{C}$ & name denotes class $C$ \\
@@ -59,7 +60,7 @@ predefined name & $\predefName$ & name usable only in annotation or as decorator
 
 \begin{definition}[Class]
 \label{def:class}
-A class $C$ is a marked name $\fq{q.c}$: a module $q$ and a class name $c$ declared in $q$. A module
+A class $C$ is a fully qualified name $\fq{q.c}$, written with a tilde: a module $q$ and a class name $c$ declared in $q$. A module
 declares each class name at most once, so the fully qualified name of a class is the identity of the
 class. A class is also the type of its instances.
 \end{definition}
@@ -78,7 +79,10 @@ member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expressio
 type, heads a type form, or decorates a class declaration. \Added{A type parameter and a type alias may likewise be
 mentioned only by a type expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias{\seq{\alpha}}{\tau}$ are
 named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \pyinline{typing.TypeAliasType} of
-the objects that a class name, a type parameter and an alias name denote at run time.} The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}; $\DU{\tau}$ records a variable declared at $\tau$ and \emph{definitely unassigned}, on no path, as a blank final in Java before its assignment; $\PU{\tau}$ one \emph{possibly unassigned}, on some paths only, so neither definitely assigned nor definitely unassigned; and $\Unbound$ a name whose binding statement has not been reached, which Python reports as an unbound local.
+the objects that a class name, a type parameter and an alias name denote at run time.} The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
+and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
+is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A variable
+with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
 
 \subsubsection{Context operations}
@@ -88,8 +92,8 @@ Contexts admit a non-commutative monoid of sequential composition $\Gamma \overr
 an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
 distributivity does not hold. Both are defined pointwise (\figref{context-ops}): override is right-biased
-and has $\bot$ as both left and right unit; merge is defined only on variable entries, returning the
-entry when both arguments are equal and $\PU{\tau}$ otherwise, for the declared type $\tau$ the arguments carry, so $\bot$ is not a unit.
+and has $\bot$ as both left and right unit, whereas merge has no unit, since a variable bound on one side
+only is possibly unassigned.
 \input{spec/fig/context-ops}
 
 A third operation, \emph{context extension} $\Gamma \extend \Delta$ (also \figref{context-ops}),
@@ -127,12 +131,8 @@ fills the field $x$. It is undefined unless every field receives exactly one arg
 \paragraph{Type annotations.}
 
 Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
-may be annotated (\figref{syntax-types}). A type expression names a class \Added{or a type alias} by a qualified name\Added{
-applied to type arguments, and a type parameter by its variable}; a marked name
-$\fq{q}$ is fully qualified, and does not occur in source. A \emph{type} $\tau$ is a type expression whose
-class names are all marked\Added{ and which does not mention any alias}; the type system resolves a type expression into a type\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
-\bind{x_n}{\psi_n}$. The well-formedness rules and operational semantics do not consult annotations, which are given
-meaning by the type system.
+may be annotated (\figref{syntax-types}). A type expression names a class \Added{or a type alias} by a qualified name\Added{ applied to type arguments, and a type parameter by its variable}; a class $\fq{q}$, written with a tilde, does not occur in source text. A \emph{type} $\tau$ is a type expression whose class names have been resolved to classes\Added{ and which does not mention any alias}; the type system resolves a type expression into a type\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
+\bind{x_n}{\psi_n}$.
 
 \subsubsection{Operators}
 \label{sec:syntax-operators}

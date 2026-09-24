@@ -12,7 +12,6 @@
 \and
 \inferrule*[lab={\ruleName{declare}}]
 {
-  \Gamma(x) = \Unbound \\
   \Gamma \vdash \psi \synth \tau
 }
 {
@@ -28,9 +27,8 @@
   \Sigma; \Gamma; \zeta \vdash \exAssign{x}{e} : \Assigns{\set{\bind{x}{\tau}}}
 }
 \and
-\inferrule*[lab={\ruleName{assign-annot}}]
+\inferrule*[lab={\ruleName{declare-assign}}]
 {
-  \Gamma(x) = \Unbound \\
   \Gamma \vdash \psi \synth \tau \\
   \Sigma; \Gamma \vdash e \checks \tau
 }
@@ -108,11 +106,10 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \Gamma(f_i) = \Unbound \quad (\forall i) \\
-  \declaresS(s_i) \text{ distinct} \quad (\forall i) \\
+  \seq{x}_i \text{ distinct} \quad (\forall i)
   \Delta_i = \set{\bind{\seq{x}_i}{\seq{\sigma}_i}} \quad (\forall i) \\
   \Delta' = \set{\bind{f_1}{\tyCallable{\seq{\sigma}_1}{\tau_1}}, \ldots, \bind{f_{n+1}}{\tyCallable{\seq{\sigma}_{n+1}}{\tau_{n+1}}}} \\
-  \Sigma; \Gamma \override \Delta' \override \Delta_i \override \set{\bind{x}{\Unbound} \mid x \in \assignsS(s_i) \setminus \dom(\Delta_i)}; \tau_i \vdash s_i : R_i \quad (\forall i)
+  \Sigma; \Gamma \override \Delta' \override \Delta_i \override \scopeS(\set{\seq{x}_i}, s_i); \tau_i \vdash s_i : R_i \quad (\forall i)
   \\
   R_i = \Returns \text{ or } \Sigma \vdash \tyNone \subty \tau_i \quad (\forall i) \\
   \Gamma \vdash \seq{\psi}_i \synth \seq{\sigma}_i \quad (\forall i) \\

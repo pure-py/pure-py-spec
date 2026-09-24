@@ -1,25 +1,22 @@
-\subsection{Design principles}
+\subsection{Key concepts}
 \label{sec:principles}
 
-Well-formedness enforces several constraints, summarised here with the programs each accepts and rejects;
-the rules follow in \secref{well-formedness-statements} and \secref{well-formedness-modules}.
+This section introduces the concepts underlying the rules, each illustrated by admitted and rejected
+programs; the rules follow in \secref{expression-typing} to \secref{well-formedness-modules}. The rules for
+variables serve the two aims of \secref{no-mutable-state} and \secref{python-compatibility}, no mutable state and
+compatibility with mypy.
 
-\subsubsection{Declaration and definite assignment}
+\subsubsection{Variable declaration and definite assignment}
 \label{sec:local-assignment}
 
-Python has no variable declarations: a variable is introduced by assigning to it, and a local variable is
-in scope throughout the function body, wherever the assignment occurs. \PurePy requires a declaration, in the
-form of a bare annotation such as \pyinline{x: int}, which Python has allowed since version 3.6, and separates
-declaring a variable from assigning it through \emph{definite assignment}: a variable may be referenced only
+\emph{Definite assignment} enforces the discipline of \secref{no-mutable-state}: a variable may be referenced only
 where an assignment covers every path to the reference, and assigned only where no path has assigned it
-already. The \ruleName{declare} rule binds the variable at $\DU{\tau}$, declared at $\tau$ and
+already. Java imposes similar conditions on blank finals~\cite[\S16]{gosling2025}. The \ruleName{declare} rule binds the variable at $\DU{\tau}$, declared at $\tau$ and
 definitely unassigned; the \ruleName{assign} rule requires that entry, checks the expression against $\tau$ and
 makes the variable definitely assigned, so that $\Gamma(x)$ is a type, as the \ruleName{var} rule requires; an
 annotated assignment does both at once; and the \ruleName{if} rules combine the branches with $\merge$, so
-that a conditional definitely assigns a variable only if every branch that does not definitely return
-assigns it, otherwise leaving it possibly unassigned, $\PU{\tau}$ (\secref{well-formedness-statements}). A variable is thus
-declared once in its scope and assigned at most once on any path, as a blank final in
-Java~\cite[\S16]{gosling2025}. Branch-local variables are therefore permitted, but using one after the
+that a variable is definitely assigned after a conditional only if each branch either assigns it or definitely
+returns, and is otherwise possibly unassigned, $\PU{\tau}$ (\secref{well-formedness-statements}). Branch-local variables are therefore permitted, but using one after the
 conditional is not, nor is completing a partial assignment:
 
 \begin{python}
@@ -35,13 +32,11 @@ def foo(b: bool) -> int:
 
 \noindent Python assigns \pyinline{x} twice when \pyinline{b} is true, so no pure reading of the program
 agrees with Python: under shadowing, \pyinline{return x} would refer to a different variable from the one
-assigned in the branch. Following mypy, a name may be declared only once in a scope, so a second annotation
-of the same name is rejected even in another branch of a conditional, as is a declaration of a parameter or
-of an imported name.
+assigned in the branch.
 
-Python's function-level scoping is kept as well. The \ruleName{def} rule introduces every variable declared
-or assigned by the body, $\assignsS(s)$, at $\Unbound$ before checking the body, so a reference before the
-declaration is rejected statically, where Python fails at run time with \pyinline{UnboundLocalError}:
+The \ruleName{def} rule introduces every variable declared or assigned by the body, $\assignsS(s)$, at $\Unbound$
+before checking the body, so a reference before the declaration is rejected statically, whereas Python fails at
+run time with \pyinline{UnboundLocalError}:
 
 \begin{python}
 y: int = 7
@@ -54,20 +49,26 @@ def f() -> int:
 \noindent Here $\assignsS(s)$ is the set of variables declared or assigned anywhere in a statement $s$, not
 descending into nested function definitions, which have their own scope.
 
-\subsubsection{No capture of comprehension variables}
+The \ruleName{module} rule does the same for a module body, with the builtins as the enclosing scope
+(\secref{scope}), so a use of a builtin name is rejected if the module later declares that name:
+
+\begin{python}
+n: int = len([1])  # error: len is bound by the module
+len: int = 2
+\end{python}
+
+\subsubsection{Variable capture}
 \label{sec:captured-variables}
 
 In Python a closure holds a mutable binding, so a variable captured by a lambda or nested function
 definition may be reassigned afterwards, changing the value seen by the function (\secref{no-mutable-state}).
-Single assignment excludes this: a closure can capture only a definitely assigned variable, which no later
-statement may assign. One case remains, in comprehensions: in Python a comprehension mutates its generator
-variables on each iteration, so a lambda in the body or in a later qualifier may not capture one, a side
-condition of \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}. For instance
-\pyinline{[lambda x: x**i for i in [1, 2, 3]]} is rejected, since under Python each lambda in the list would
-compute \pyinline{x**3}.
+This cannot arise in \PurePy: a closure captures only definitely assigned variables, and a definitely
+assigned variable is never assigned again. One case remains, in comprehensions: in Python a comprehension mutates its generator
+variables on each iteration, so \PurePy forbids a lambda in the body or in a later qualifier from capturing a generator
+variable, a side condition of \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}.
 
-Here $\capturesS(\seq{g})$ is the set of variables of the enclosing scope captured by the lambdas within the
-qualifiers $\seq{g}$ of a comprehension, with $\capturesE(e)$ computing the same for an expression $e$: the
+Here $\captures(\seq{g})$ is the set of variables of the enclosing scope captured by the lambdas within the
+qualifiers $\seq{g}$ of a comprehension, with $\captures(e)$ computing the same for an expression $e$: the
 free variables of each lambda's body, less its parameters.
 
 \subsubsection{Mutual regions}
@@ -149,7 +150,7 @@ match v:
         print("lit")
 \end{python}
 
-\subsubsection{No unreachable code}
+\subsubsection{Reachability}
 \label{sec:unreachable}
 
 Python accepts statements that can never run, such as code after a \pyinline{return}. \PurePy rejects
@@ -202,3 +203,4 @@ which the main module does not otherwise use, and Python raises \pyinline{Attrib
 same for a reference to a module member never assigned by the body, such as \pyinline{lib.x} where
 \pyinline{lib} assigns \pyinline{x} only on a branch that is not taken. \PurePy rejects all three programs
 statically (\secref{well-formedness-modules}).
+

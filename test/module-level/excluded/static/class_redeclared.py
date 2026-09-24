@@ -1,4 +1,4 @@
-# rule: assign-annot
+# rule: declare-assign
 from dataclasses import dataclass
 
 

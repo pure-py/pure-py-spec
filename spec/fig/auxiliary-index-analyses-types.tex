@@ -1,0 +1,19 @@
+% Rows of the auxiliary-functions index; the auxindex environment supplies the table.
+\auxgroup{Syntactic analyses}
+\auxrow{$\assignsS(t)$}{set of variables}{variables declared or assigned in $t$, not descending into nested functions}{aux:assigns}
+\auxrow{$\declaresS(t)$, $\declaresS(\seq{\iota})$}{sequence of variables}{names declared in $t$, or bound by imports $\seq{\iota}$, in order and with repeats, not descending into nested functions}{aux:declares}
+\auxrow{$\scopeS(Y, s)$}{context}{each variable declared or assigned in $s$ unbound; defined iff names declared in $s$, names in $Y$ and pattern variables of $s$ pairwise distinct}{aux:scope}
+\auxrow{$\binds(p)$, $\binds(\seq{g})$, $\binds(s)$}{set of variables}{variables bound by pattern $p$, by generators of qualifiers $\seq{g}$, or by patterns within statement $s$}{aux:binds}
+\auxrow{$\captures(e)$}{set of variables}{variables of enclosing scope captured by lambdas in $e$}{aux:captures-e}
+\auxrow{$\captures(\seq{g})$}{set of variables}{variables of enclosing scope captured by lambdas in qualifiers $\seq{g}$}{aux:captures}
+\specauxrow{$\fv(e)$, $\fv(\seq{e})$}{set of variables}{free variables of expression $e$, or of each expression in $\seq{e}$}{aux:fv}
+\noalign{\vskip 2mm}
+\auxgroup{Types}
+\auxrow{$\baseType(\ell)$, $\baseType(\tau)$}{type}{base type of literal $\ell$, or of type $\tau$}{aux:base-type}
+\auxrow{$\joinTy{\Sigma}{\sigma}{\tau}$, $\bigJoinTy{\Sigma}{\seq{\tau}}$}{type}{larger type if comparable, and union otherwise}{aux:join}
+\auxrow{$\meetTy{\Sigma}{\sigma}{\tau}$}{type}{greatest type below both}{aux:meet}
+\auxrow{$\elemTy(\Sigma, \tau)$}{type}{type of elements drawn from $\tau$ by generator}{aux:elem-type}
+\auxrow{$\shapes(\Sigma, \tau, H)$, $\shapes(\Sigma, \seq{\tau})$}{ordered set of shapes or of shape sequences}{shapes of $\tau$ once heads in $H$ are excluded; sequences of shapes of $\seq{\tau}$}{aux:shapes}
+\auxrow{$\shapeTy(k)$}{type}{least type of shape $k$}{aux:shape-type}
+\auxrow{$\seqSafe(\Sigma, \Gamma, p, \tau)$}{Boolean}{tuple patterns in $p$ never checked against lists, list patterns never against tuples}{aux:seq-safe}
+\auxrow{$\resolveOp(\Sigma, \odot, \sigma_1, \sigma_2)$, $\resolveOp(\Sigma, \ominus, \sigma)$}{type}{result type of most specific overload at the operand types}{aux:resolve-op}

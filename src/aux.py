@@ -1,7 +1,15 @@
 import ast
 from itertools import dropwhile, takewhile
 
-from type_syntax import QualifiedName, TypeExpr, Var, dotted_name, parse_annotation
+from type_syntax import (
+    QualifiedName,
+    TypeExpr,
+    Var,
+    dotted_name,
+    parse_annotation,
+    parse_qualified,
+    root,
+)
 
 # A PurePy statement: a Python statement, or a mutual region of consecutive defs. A Python body
 # (a statement list) represents the spec's right-nested sequence s s'.
@@ -118,7 +126,7 @@ def target_name(g: ast.comprehension) -> str:
     return g.target.id
 
 
-def captures_e(e: ast.expr) -> set[Var]:
+def captures(e: ast.expr) -> set[Var]:
     match e:
         case ast.Lambda():
             params = {a.arg for a in e.args.args}
@@ -129,52 +137,52 @@ def captures_e(e: ast.expr) -> set[Var]:
             return set()
         case ast.Call():
             return (
-                captures_e(e.func)
-                | captures_e_list(e.args)
-                | captures_e_list([k.value for k in e.keywords])
+                captures(e.func)
+                | captures_list(e.args)
+                | captures_list([k.value for k in e.keywords])
             )
         case ast.BinOp():
-            return captures_e(e.left) | captures_e(e.right)
+            return captures(e.left) | captures(e.right)
         case ast.UnaryOp(operand=e_):
-            return captures_e(e_)
+            return captures(e_)
         case ast.BoolOp(values=es):
-            return captures_e_list(es)
+            return captures_list(es)
         case ast.Compare(left=e_, comparators=es):
-            return captures_e(e_) | captures_e_list(es)
+            return captures(e_) | captures_list(es)
         case ast.IfExp():
-            return captures_e(e.test) | captures_e(e.body) | captures_e(e.orelse)
+            return captures(e.test) | captures(e.body) | captures(e.orelse)
         case ast.Attribute(value=e_):
-            return captures_e(e_)
+            return captures(e_)
         case ast.Subscript():
-            return captures_e(e.value) | captures_e(e.slice)
+            return captures(e.value) | captures(e.slice)
         case ast.List(elts=es):
-            return captures_e_list(es)
+            return captures_list(es)
         case ast.Tuple(elts=es):
-            return captures_e_list(es)
+            return captures_list(es)
         case ast.Dict():
-            return captures_e_list(dict_keys(e)) | captures_e_list(e.values)
+            return captures_list(dict_keys(e)) | captures_list(e.values)
         case ast.ListComp():
-            return captures_quals(e.generators) | (captures_e(e.elt) - binds_quals(e.generators))
+            return captures_quals(e.generators) | (captures(e.elt) - binds_quals(e.generators))
         case ast.DictComp():
             return captures_quals(e.generators) | (
-                (captures_e(e.key) | captures_e(e.value)) - binds_quals(e.generators)
+                (captures(e.key) | captures(e.value)) - binds_quals(e.generators)
             )
         case _:
             raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
-def captures_e_list(es: list[ast.expr]) -> set[Var]:
+def captures_list(es: list[ast.expr]) -> set[Var]:
     if len(es) == 0:
         return set()
-    return captures_e(es[0]) | captures_e_list(es[1:])
+    return captures(es[0]) | captures_list(es[1:])
 
 
 def captures_quals(generators: list[ast.comprehension]) -> set[Var]:
     if len(generators) == 0:
         return set()
     g = generators[0]
-    rest = captures_e_list(g.ifs) | captures_quals(generators[1:])
-    return captures_e(g.iter) | (rest - {target_name(g)})
+    rest = captures_list(g.ifs) | captures_quals(generators[1:])
+    return captures(g.iter) | (rest - {target_name(g)})
 
 
 def binds_quals(generators: list[ast.comprehension]) -> set[Var]:
@@ -219,7 +227,8 @@ def assigns_body(body: list[ast.stmt]) -> set[Var]:
 
 
 def declares(s: ast.stmt) -> list[tuple[Var, ast.stmt]]:
-    """Names declared in `s` with their declaring nodes, in textual order and with repeats."""
+    """Names declared in `s`, or bound by import `s`, with their nodes, in textual order and
+    with repeats."""
     match s:
         case ast.AnnAssign():
             assert isinstance(s.target, ast.Name)
@@ -234,6 +243,11 @@ def declares(s: ast.stmt) -> list[tuple[Var, ast.stmt]]:
             return [(x, s)]
         case ast.TypeAlias(name=ast.Name(id=x)):
             return [(x, s)]
+        case ast.Import():
+            (alias,) = s.names
+            return [(root(parse_qualified(alias.name)), s)]
+        case ast.ImportFrom():
+            return [(alias.name, s) for alias in s.names]
         case _:
             return []
 
@@ -258,26 +272,24 @@ def assign_targets(body: list[ast.stmt]) -> list[tuple[Var, ast.stmt]]:
     return out
 
 
-def pattern_bound(body: list[ast.stmt]) -> set[Var]:
-    """Variables bound by the patterns of the match statements in `body`, not descending into defs."""
-    out: set[Var] = set()
+def pattern_bound(body: list[ast.stmt]) -> dict[Var, ast.Match]:
+    """Variables bound by the patterns of the match statements in `body`, each with a match
+    statement binding it, not descending into defs."""
+    out: dict[Var, ast.Match] = {}
     for s in body:
         match s:
             case ast.If(body=ss, orelse=ss_):
-                out |= pattern_bound(ss) | pattern_bound(ss_)
+                for x, m in (pattern_bound(ss) | pattern_bound(ss_)).items():
+                    out.setdefault(x, m)
             case ast.Match():
-                out |= set().union(
-                    *(binds(case.pattern) | pattern_bound(case.body) for case in s.cases)
-                )
+                for case in s.cases:
+                    for x in binds(case.pattern):
+                        out.setdefault(x, s)
+                    for x, m in pattern_bound(case.body).items():
+                        out.setdefault(x, m)
             case _:
                 pass
     return out
-
-
-def redeclaration(body: list[ast.stmt]) -> tuple[Var, ast.stmt] | None:
-    """Second declaration of a name declared twice in `body`, if any."""
-    ds = declares_body(body)
-    return next(((x, node) for i, (x, node) in enumerate(ds) if x in [y for y, _ in ds[:i]]), None)
 
 
 def own_fields(node: ast.ClassDef) -> tuple[tuple[Var, TypeExpr], ...]:

@@ -37,26 +37,28 @@
 \and
 \inferrule*[lab={\ruleName{call}}]
 {
-  \Sigma; \Gamma \vdash e \synth \tyCallable{\tau_1, \ldots, \tau_n}{\tau} \\
-  \Sigma; \Gamma \vdash e_i \checks \tau_i \quad (\forall i)
+  \Sigma; \Gamma \vdash e \synth \tyCallable{\seq{\tau}}{\tau} \\
+  \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}
 }
 {
-  \Sigma; \Gamma \vdash \exCall{e}{e_1, \ldots, e_n} \synth \tau
+  \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \tau
 }
 \and
 \inferrule*[lab={\ruleName{syn-call-lambda}}]
 {
-  \Sigma; \Gamma \vdash e_i \synth \tau_i \quad (\forall i) \\
-  \Sigma; \Gamma \override \set{\bind{x_1}{\tau_1}, \ldots, \bind{x_n}{\tau_n}} \vdash e \synth \tau
+  \Sigma; \Gamma \vdash \seq{e} \synth \seq{\tau} \\
+  \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\tau}}} \vdash e \synth \tau
 }
 {
-  \Sigma; \Gamma \vdash \exCall{(\exLambda{x_1, \ldots, x_n}{e})}{e_1, \ldots, e_n} \synth \tau
+  \Sigma; \Gamma \vdash \exCall{(\exLambda{\seq{x}}{e})}{\seq{e}} \synth \tau
 }
 \and
 \inferrule*[lab={\ruleName{constr}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \Sigma; \Gamma \vdash \fieldMap(\Sigma, C, a)(x) \checks \tau \quad (\forall \bind{x}{\tau} \in \fields(\Sigma, C))
+  \fields(\Sigma, C) = \bind{\seq{x}}{\seq{\tau}} \\
+  \fieldMap(\Sigma, C, a) = \set{\bind{\seq{x}}{\seq{e}}} \\
+  \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}
 }
 {
   \Sigma; \Gamma \vdash \exConstr{q}{a} \synth C
@@ -66,7 +68,7 @@
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
   \Sigma; \Gamma \vdash e' \synth \sigma' \\
-  \min(\overloadsOf(\Sigma, \odot, \sigma, \sigma')) = ((\tau, \tau'), \tau^\dagger)
+  \resolveOp(\Sigma, \odot, \sigma, \sigma') = \tau^\dagger
 }
 {
   \Sigma; \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \tau^\dagger
@@ -76,7 +78,7 @@
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
   \exUnOp{\ominus}{e} \neq \exUnOp{\pyinline{-}}{n} \quad (\forall n) \\
-  \min(\overloadsOf(\Sigma, \ominus, \sigma)) = (\tau, \tau^\dagger)
+  \resolveOp(\Sigma, \ominus, \sigma) = \tau^\dagger
 }
 {
   \Sigma; \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau^\dagger
@@ -155,9 +157,9 @@
 \and
 \inferrule*[lab={\ruleName{subscript-tuple}}]
 {
-  \Sigma; \Gamma \vdash e \synth \tyTuple{\seq{\tau}} \\
+  \Sigma; \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_m} \\
   \Sigma; \Gamma \vdash e' \synth \tyLiteral{n} \\
-  0 \leq n < |\seq{\tau}|
+  0 \leq n < m
 }
 {
   \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{n+1}
@@ -165,9 +167,9 @@
 \and
 \inferrule*[lab={\ruleName{subscript-tuple-neg}}]
 {
-  \Sigma; \Gamma \vdash e \synth \tyTuple{\seq{\tau}} \\
+  \Sigma; \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_m} \\
   \Sigma; \Gamma \vdash e' \synth \tyLiteral{-n} \\
-  m = |\seq{\tau}| \\
+  \\
   0 < n \leq m
 }
 {
@@ -209,7 +211,7 @@
   \Sigma; \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
   \Sigma; \Gamma \override \set{\bind{y}{\sigma}} \vdash \exCall{y}{\seq{e}} \synth \tau \\
   \Sigma; \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exCall{y}{\seq{e}} \synth \tau' \\
-  y \notin \fv(e_i) \quad (\forall i)
+  y \notin \fv(\seq{e})
 }
 {
   \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \joinTy{\Sigma}{\tau}{\tau'}
@@ -256,7 +258,7 @@
 {
   \Sigma; \Gamma \vdash \seq{g} : \Delta \\
   \Sigma; \Gamma \override \Delta \vdash e \synth \tau \\
-  \capturesE(e) \cap \dom(\Delta) = \varnothing
+  \captures(e) \cap \dom(\Delta) = \varnothing
 }
 {
   \Sigma; \Gamma \vdash \exListComp{e}{\seq{g}} \synth \tyList{\baseType(\tau)}
@@ -267,7 +269,7 @@
   \Sigma; \Gamma \vdash \seq{g} : \Delta \\
   \Sigma; \Gamma \override \Delta \vdash e \checks \tyStr \\
   \Sigma; \Gamma \override \Delta \vdash e' \synth \tau \\
-  \capturesE((e, e')) \cap \dom(\Delta) = \varnothing
+  \captures((e, e')) \cap \dom(\Delta) = \varnothing
 }
 {
   \Sigma; \Gamma \vdash \exDictComp{e}{e'}{\seq{g}} \synth \tyDict{\baseType(\tau)}

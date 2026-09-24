@@ -12,16 +12,15 @@
 \and
 \inferrule*[lab={\ruleName{top-seq}}]
 {
-  \Sigma; q; \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
-  \Sigma'; q; \Gamma \override \Delta \vdash t' : R \binding \Sigma^\dagger
+  \Sigma; q; \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma^\dagger \\
+  \Sigma^\dagger; q; \Gamma \override \Delta \vdash t' : R \binding \Sigma' \\
 }
 {
-  \Sigma; q; \Gamma \vdash t\;t' : \Assigns{\Delta} \override R \binding \Sigma^\dagger
+  \Sigma; q; \Gamma \vdash t\;t' : \Assigns{\Delta} \override R \binding \Sigma'
 }
 \and
 \inferrule*[lab={\ruleName{class}}]
 {
-  \Gamma(c) = \Unbound \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
   \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i)
@@ -32,7 +31,6 @@
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \Gamma(c) = \Unbound \\
   \replaced{\Gamma \vdash q' : \Type{D}}{\bind{c'}{\Type{D}} \in \Gamma} \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
