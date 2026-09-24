@@ -274,8 +274,8 @@ assignment can take a declared class's name.} A
 checks $e$ against its declared type (\ruleName{assign}); the form $\exAssign{x\exAnnot{\psi}}{e}$ declares and
 assigns $x$ at once (\ruleName{declare-assign}). A declaration does not check
 whether its name is already declared; that check is made once for the whole scope, when the rules for function
-definitions and modules introduce the variables of the scope as unbound ($\scopeS$,
-\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:scope}}).}{An annotated assignment checks the expression against the type of the annotation,
+definitions and modules introduce the variables of the scope as unbound, using the function $\scopeS(Y, s)$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:scope}}).}{An annotated assignment checks the expression against the type of the annotation,
 and an unannotated assignment takes the type synthesised by the expression (\ruleName{assign},
 \ruleName{assign-unannot}).}
 
