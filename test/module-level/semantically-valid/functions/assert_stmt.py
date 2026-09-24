@@ -1,3 +1,3 @@
-x = 5
+x: int = 5
 assert x == 5
 print(x)

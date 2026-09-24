@@ -1,2 +1,2 @@
 from pkg.a.b import z
-w = z
+w: int = z

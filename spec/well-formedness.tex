@@ -11,6 +11,15 @@ types and subtyping, then follows the syntax of \secref{syntax}, taking statemen
 patterns, then modules and programs, and \secref{operational-semantics} gives each of these a dynamic
 counterpart.
 
+\speconly{The rules for variables serve two aims: that a program has no mutable state, so a variable never
+changes value, and that a well-typed program is also well typed under mypy. Within these limits the rules permit
+as much as possible. For the first aim, a variable is introduced by a declaration, parameter, import, pattern or
+generator, and is assigned at most once, either in its declaration or afterwards; an assignment never introduces
+a variable nor reassigns one.
+For the second, a scope is the body of a module, function, lambda or comprehension, as in Python, and the
+builtins enclose every module; a scope declares a name at most once and may shadow a name of an enclosing scope,
+hiding it throughout the scope.}
+
 \specinput{spec/well-formedness/auxiliary}
 \paperinput{paper/well-formedness/principles}
 
@@ -21,13 +30,11 @@ counterpart.
 
 \input{spec/fig/resolve-type}
 
-The rules are intended as a refinement of mypy's: a well-typed
-\PurePy program should be accepted by mypy, and \PurePy may reject programs accepted by mypy but not the
-reverse. Function signatures, assignments and dataclass fields are annotated with type expressions, and a
+Function signatures, assignments and dataclass fields are annotated with type expressions, and a
 type expression denotes a type under a context (\figref{resolve-type}). Every definition carries an
 annotation for its parameters and return type, so the type of a definition is given rather than
 inferred from its body. A class name resolves to a
-class (\figref{resolve-name}) and every other name must resolve to a predefined name
+class (\figref{resolve-name}) and every other name must be a predefined name
 (\figref{predefined-signatures}). The function $\baseType(\tau)$ discards the precision of a
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and leaving every other type alone
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:base-type}}).
@@ -72,7 +79,6 @@ is the least upper bound of $\sigma$ and $\tau$, $\meetTy{\Sigma}{\sigma}{\tau}$
 \end{lemma}
 
 \input{spec/fig/subtyping}
-
 
 \subsection{Expressions}
 \label{sec:expression-typing}
@@ -158,7 +164,6 @@ late-binding and the comprehension rebinds the variable on each iteration, so th
 variable's final value; in \PurePy a lambda is only able to see the value of the generator variable at
 each iteration.
 
-
 \speconly{\subsubsection{Operators}\label{sec:well-formedness-operators}}%
 \paperonly{\paragraph{Operators.}}
 
@@ -169,17 +174,8 @@ types to the resolved overloads of an operator.
 
 \input{spec/fig/operator-overloads}
 
-\begin{definition}[Overloads at operand types]
-\label{def:overloads}
-The set $\overloadsOf(\Sigma, \odot, \sigma_1, \sigma_2)$ consists of the tuples $((\tau_1, \tau_2), \tau)$ such
-that $\Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$, ordered by componentwise subtyping in $\Sigma$ on their
-bounds $(\tau_1, \tau_2)$. The unary set $\overloadsOf(\Sigma, \ominus, \sigma)$ is defined in the same way from
-conclusions $\Sigma \vdash \ominus(\sigma) : (\tau, \tau')$. In both cases $\min$ denotes the least element
-under this order, if one exists.
-\end{definition}
-
 \noindent The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the result type
-of $\min(\overloadsOf(\Sigma, \odot, \sigma_1, \sigma_2))$, so \pyinline{1 + 2} is an
+of the most specific overload at the operand types, $\resolveOp$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:resolve-op}}), so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
 An \emph{equality type} is one for which structural equality is
@@ -200,24 +196,23 @@ judgement under base-typing, letting \pyinline{1 == 0} use the equality overload
 two distinct literal types are not comparable; \pyinline{2 ** 3} is still an \pyinline{int}, since the
 direct instance's bounds $(\tyInt, \tyLiteral{3})$ lie below the base instance's
 $(\tyFloat, \tyFloat)$. For this operator the \ruleName{binop} rule is more precise than mypy, whose
-overloads give \pyinline{Any} whenever the exponent is not a literal, whereas the least overload resolves to
+overloads give \pyinline{Any} whenever the exponent is not a literal, whereas the most specific overload resolves to
 \pyinline{float}.
 
-\begin{lemma}[Least overload]
-\label{lem:least-overload}
-If neither $\sigma_1$ nor $\sigma_2$ is a subtype of \pyinline{Never} and
-$\overloadsOf(\Sigma, \odot, \sigma_1, \sigma_2)$ is not empty, then the set has a least element; likewise
-$\overloadsOf(\Sigma, \ominus, \sigma)$.
+\begin{lemma}[Most specific overload]
+\label{lem:most-specific-overload}
+If neither $\sigma_1$ nor $\sigma_2$ is a subtype of \pyinline{Never} and some overload of $\odot$ applies at
+$(\sigma_1, \sigma_2)$, then $\resolveOp(\Sigma, \odot, \sigma_1, \sigma_2)$ is defined; likewise
+$\resolveOp(\Sigma, \ominus, \sigma)$.
 \end{lemma}
 
 \subsection{Statements}
 \label{sec:well-formedness-statements}
 
-Every well-typed statement either \emph{definitely returns}, or \emph{definitely assigns} a context
-$\Delta$, which may be empty. The base cases are that \pyinline{return e} definitely returns, and
-\pyinline{x = e} definitely assigns $\set{\bind{\pyinline{x}}{\sigma}}$ for the type $\sigma$ of
-\pyinline{e}. \emph{Static outcomes} $R$ classify the two completions: $R$ is either $\Returns$ (definitely
-returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$).
+A well-typed statement has a \emph{static outcome} $R$: either $\Returns$, when the statement \emph{definitely
+returns}, or $\Assigns{\Delta}$ for a context $\Delta$ with an entry for any variable declared or assigned by the
+statement (Definition~\ref{def:context}), recording whether the variable is definitely assigned, definitely
+unassigned or possibly unassigned after the statement.
 
 \input{spec/fig/typing-stmt}
 
@@ -225,12 +220,12 @@ returns) or $\Assigns{\Delta}$ (definitely assigns $\Delta$).
 
 \input{spec/fig/typing-top-level}
 
-Context operations $\override$ and $\mergeS$ lift to a right semiring over static outcomes $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\mergeS$ and zero for $\override$.
+Context operations $\override$ and $\merge$ lift to a right semiring over static outcomes $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge$ and zero for $\override$.
 
 \begin{definition}[Override and merge on static outcomes]
 \begin{defalign}
-\Assigns{\Delta} \mergeS \Assigns{\Delta'} & = \Assigns{\Delta \mergeS \Delta'} \\
-R \mergeS \Returns = \Returns \mergeS R & = R \\
+\Assigns{\Delta} \merge \Assigns{\Delta'} & = \Assigns{\Delta \merge \Delta'} \\
+R \merge \Returns = \Returns \merge R & = R \\
 \\
 \Assigns{\Delta} \override \Assigns{\Delta'} & = \Assigns{\Delta \override \Delta'} \\
 R \override \Returns = \Returns \override R & = \Returns
@@ -243,20 +238,25 @@ R \override \Returns = \Returns \override R & = \Returns
 
 The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\Gamma$ and
 optional return type $\zeta$, statement $s$ has static outcome $R$ (\figref{typing-stmt}); every rule passes $\zeta$ down unchanged.
-A sequence $s\;s'$ (\ruleName{seq}) types $s$, types $s'$ under $\Gamma$ overridden by the context assigned
-by $s$, and requires that no variable captured by $s$ is assigned in $s'$. A conditional combines its
-branches with $\mergeS$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
+A sequence $s\;s'$ (\ruleName{seq}) types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
+by $s$. A conditional combines its
+branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
 Top-level statements are checked by a separate
 judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, a
 class declaration is a top-level form, and a plain statement is checked with no return type
-(\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A top-level
-statement may not assign a name that an earlier top-level statement bound to a class
-(\ruleName{top-seq}), so a class binding is permanent in its module and no later declaration or
-assignment can take a declared class's name. A
+(\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
-\pyinline{return} requires $\tau$ to admit \pyinline{None}. An annotated assignment checks the expression against the type of the annotation,
-and an unannotated assignment takes the type synthesised by the expression (\ruleName{assign},
-\ruleName{assign-unannot}). The conditions of \pyinline{if} and \pyinline{assert}
+\pyinline{return} requires \pyinline{None} to be a subtype of $\tau$.
+
+A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
+(\ruleName{declare}); an assignment $\exAssign{x}{e}$ requires $x$ to be a declared but unassigned variable, and
+checks $e$ against its declared type (\ruleName{assign}); the form $\exAssign{x\exAnnot{\psi}}{e}$ declares and
+assigns $x$ at once (\ruleName{declare-assign}). A declaration does not check
+whether its name is already declared; that check is made once for the whole scope, when the rules for function
+definitions and modules introduce the variables of the scope as unbound, using the function $\scopeS(Y, s)$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:scope}}).
+
+The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
 the class name to $\Type{C}$, requiring the fields it declares to be distinct and, when it extends
 another class, the base name to be bound to a class and the additional fields not to repeat an inherited field
@@ -265,9 +265,13 @@ scope; every \PurePy class must declare itself a dataclass. Each rule that takes
 (\figref{resolve-type}).
 
 A function definition binds its parameters at their annotated types, plus the names of its
-mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables assigned in the body start
-at $\False$ (\ruleName{def}), emulating Python's scoping of function bodies, which
-prefers a locally assigned name to one visible in an enclosing scope. The body is checked with the
+mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables declared or assigned in the body start
+unbound (\ruleName{def}), emulating Python's scoping of function bodies, which
+prefers a locally bound name to one visible in an enclosing scope. A variable of the
+enclosing scope referenced by the body must be definitely assigned at the point at which the function is defined,
+whereas Python resolves the reference only when the body runs. As with any scope, the names declared in the function, including
+its parameters, must be distinct from one another and from any pattern variables in its body. The function names of the mutual region are not among these; they are
+declared in the enclosing scope, where the same condition applies to them. The body is checked with the
 declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
@@ -283,9 +287,10 @@ are the subject of \secref{well-formedness-patterns}.
 
 Each pattern must also be \emph{sequence-safe} at $\sigma$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:seq-safe}}), because under the
 evaluation rules a tuple pattern matches only a tuple and a list pattern matches only a list, whereas
-Python matches both forms of pattern against both kinds of value\speconly{ (\figref{eval-pat})}. A match on
-$\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$ therefore admits no tuple or list pattern, and a
-match on $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$ admits no tuple pattern.
+Python matches both forms of pattern against both kinds of value\speconly{ (\figref{eval-pat})}. A tuple pattern is therefore sequence-safe only at a type with no list values, and a list pattern only
+at a type with no tuple values. A union has the values of its members, so both kinds of pattern fail the condition
+at $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$, and at $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$,
+since $\tySized$ has both list and tuple values.
 
 \subsection{Pattern matching}
 \label{sec:exhaustiveness}
@@ -407,8 +412,12 @@ import cycle is ill-formed, because a module in a cycle could finish loading onl
 well-formedness (\figref{typing-module}) requires the main module to be well typed and hence,
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
-overridden by the imported context, so the members of \pyinline{builtins} are in scope
-unqualified.
+overridden by the imported context and then, as in \ruleName{def}, by an unbound entry for each name
+declared in the body or bound by a pattern in it. The members of \pyinline{builtins} are thus in scope unqualified, and a name bound by the body
+shadows a builtin throughout the module, so a use of the name before its declaration is rejected. Under mypy such a
+use instead resolves to the builtin, following Python's run-time lookup. As with any scope, the names declared in the
+module, including its imported names, must be distinct from one another and from any pattern variables in its
+body.
 
 \input{spec/fig/typing-module}
 

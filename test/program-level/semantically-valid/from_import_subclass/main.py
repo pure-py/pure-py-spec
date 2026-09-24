@@ -1,6 +1,6 @@
 from shapes import Derived
 
-d = Derived(1, 2)
+d: Derived = Derived(1, 2)
 print(d.x)
 print(d.y)
 

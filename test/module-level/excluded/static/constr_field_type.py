@@ -6,5 +6,5 @@ class Point:
     x: int
     y: int
 
-p = Point(1, "b")
+p: Point = Point(1, "b")
 print(p.y)

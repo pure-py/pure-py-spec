@@ -1,2 +1,2 @@
 import y
-w = 1
+w: int = 1

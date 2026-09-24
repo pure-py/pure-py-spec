@@ -8,7 +8,7 @@ class Base:
 class Sub(Base):
     y: int
 
-s = Sub(1, 2)
+s: Sub = Sub(1, 2)
 match s:
     case Base(x):
         print(x)

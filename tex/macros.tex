@@ -35,6 +35,23 @@
   \newcommand*{\specauxrow}[4]{}
   \newcommand*{\auxgroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{\itshape #1} \\}
 \fi
+% Table of the auxiliary-functions index: the specification adds the section defining each.
+\newenvironment{auxindex}{%
+  \begin{center}\small
+  \setlength{\tabcolsep}{4pt}
+  \ifdefined\specmode
+    \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.08\textwidth}}
+  \else
+    \begin{tabular}{>{\raggedright\arraybackslash}p{0.21\textwidth}>{\raggedright\arraybackslash}p{0.2\textwidth}>{\raggedright\arraybackslash}p{0.54\textwidth}}
+  \fi
+  \textbf{Function} & \textbf{Result} & \textbf{Meaning}\speconly{ & \textbf{Section}} \\[1mm]
+}{\end{tabular}\end{center}}
+% Rows of the index from spec/fig/auxiliary-index-<name>.tex, read by the input primitive so that a
+% coloured group row may follow directly.
+\makeatletter
+\newcommand*{\auxrows}[1]{\@@input spec/fig/auxiliary-index-#1.tex }
+\makeatother
+
 % Inline definitions: align* with tighter row spacing than a standalone figure.
 \newenvironment{defalign}{\setlength{\jot}{1pt}\csname alignat*\endcsname{2}}{\csname endalignat*\endcsname}
 % How the paper refers to the specification document.
@@ -161,6 +178,9 @@
 \newcommand*{\opaqueVal}[1]{\mathsf{Opaque}(#1)}
 \newcommand*{\True}{\mathsf{tt}}
 \newcommand*{\False}{\mathsf{ff}}
+\newcommand*{\Unbound}{\mathsf{Unbound}}
+\newcommand*{\DU}[1]{\mathsf{DU}(#1)}
+\newcommand*{\PU}[1]{\mathsf{PU}(#1)}
 
 % Context and environment operations
 \newcommand*{\disjunion}{\uplus}
@@ -173,6 +193,7 @@
 \newcommand*{\binding}{\mathrel{\dashv}}
 \newcommand*{\baseType}{\mathrm{base\text{-}type}}
 \newcommand*{\overloadsOf}{\mathrm{overloads}}
+\newcommand*{\resolveOp}{\mathrm{resolve\text{-}op}}
 \newcommand*{\eqType}{\mathrel{\mathrm{eq\text{-}type}}}
 \newcommand*{\joinTy}[3]{#2 \vee_{#1} #3}
 \newcommand*{\meetTy}[3]{#2 \wedge_{#1} #3}
@@ -187,8 +208,7 @@
 \newcommand*{\shapes}{\mathrm{shapes}}
 \newcommand*{\seqSafe}{\mathrm{seq\text{-}safe}}
 \newcommand*{\elemTy}{\mathrm{elem\text{-}type}}
-\newcommand*{\merge}{\oplus}
-\newcommand*{\mergeS}{\mathbin{\merge_\Sigma}}
+\newcommand*{\merge}{\mathbin{\oplus}}
 \newcommand*{\override}{\otimes}
 
 % Outcomes (draft, \secref{errors})
@@ -212,11 +232,11 @@
 
 % Metafunctions: definite assignment and free variables
 \newcommand*{\assignsS}{\mathrm{assigns}}
+\newcommand*{\declaresS}{\mathrm{declares}}
+\newcommand*{\scopeS}{\mathrm{scope}}
 \newcommand*{\binds}{\mathrm{binds}}
-\newcommand*{\capturesE}{\mathrm{captures}_{\mathsf{e}}}
-\newcommand*{\capturesS}{\mathrm{captures}}
+\newcommand*{\captures}{\mathrm{captures}}
 \newcommand*{\fvE}{\mathrm{fv}_{\mathsf{e}}}
-\newcommand*{\fvS}{\mathrm{fv}}
 
 % Metafunctions: classes
 \newcommand*{\ancestors}{\mathrm{ancestors}}
@@ -260,12 +280,6 @@
 % Change markup (a local copy of the shared change-tracking definitions; changebar loaded in the
 % preamble).
 \input{tex/change-tracking}
-% A row of an align recording a deleted definition: grey in the paper, absent under \acceptchanges.
-\ifdefined\acceptchanges
-  \newcommand*{\deletedrow}[2]{}
-\else
-  \newcommand*{\deletedrow}[2]{\deleted{#1} &\deleted{{}#2} \\*}
-\fi
 
 % Grammar figures: shaded heading row naming the syntactic category
 \definecolor{grammarheadcolor}{gray}{0.93}

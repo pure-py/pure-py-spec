@@ -1,3 +1,3 @@
 import mod
 
-y = mod.missing
+y: int = mod.missing

@@ -4,7 +4,7 @@ def f(n: int) -> int:
         return 0
     return g(n - 1)
 
-c = 100
+c: int = 100
 
 def g(n: int) -> int:
     if n == 0:

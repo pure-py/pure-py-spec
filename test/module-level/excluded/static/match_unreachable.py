@@ -1,5 +1,5 @@
 # rule: pat-shapes
-v = (1, 2)
+v: tuple[int, int] = (1, 2)
 match v:
     case (a, b):
         print("seq")

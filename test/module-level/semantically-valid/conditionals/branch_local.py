@@ -1,5 +1,7 @@
 def foo(b: bool) -> int:
-    z = 6
+    z: int = 6
+    x: int
+    y: int
     if b:
         x = 3
         y = x + 1

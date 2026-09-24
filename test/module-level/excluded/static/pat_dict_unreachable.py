@@ -1,4 +1,4 @@
-d = {"a": 1}
+d: dict[str, int] = {"a": 1}
 match d:
     case {"a": x}:
         print(x)

@@ -1,3 +1,3 @@
 # rule: attr-object
-x = 5
-y = x.foo
+x: int = 5
+y: int = x.foo

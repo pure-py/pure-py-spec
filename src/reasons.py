@@ -14,14 +14,6 @@ class DuplicateField:
 
 
 @dataclass(frozen=True)
-class ClassRebound:
-    c: Var
-
-    def message(self) -> str:
-        return f"'{self.c}' is bound to a class and cannot be rebound at top level"
-
-
-@dataclass(frozen=True)
 class UndefinedVariable:
     x: Var
 
@@ -34,23 +26,63 @@ class UnassignedVariable:
     x: Var
 
     def message(self) -> str:
+        return f"'{self.x}' is declared but not yet assigned"
+
+
+@dataclass(frozen=True)
+class PossiblyUnassigned:
+    x: Var
+
+    def message(self) -> str:
         return f"'{self.x}' is not definitely assigned"
 
 
 @dataclass(frozen=True)
-class CapturedReassignment:
+class UnboundName:
     x: Var
 
     def message(self) -> str:
-        return f"'{self.x}' captured by previous statement, reassigned here"
+        return f"'{self.x}' is unbound"
 
 
 @dataclass(frozen=True)
-class SelfCaptureAssignment:
+class Redeclaration:
     x: Var
 
     def message(self) -> str:
-        return f"'{self.x}' captured by right-hand side"
+        return f"'{self.x}' is already declared"
+
+
+@dataclass(frozen=True)
+class UndeclaredAssignment:
+    x: Var
+
+    def message(self) -> str:
+        return f"'{self.x}' is assigned but never declared"
+
+
+@dataclass(frozen=True)
+class AssignmentBeforeDeclaration:
+    x: Var
+
+    def message(self) -> str:
+        return f"'{self.x}' is assigned before its declaration"
+
+
+@dataclass(frozen=True)
+class Reassignment:
+    x: Var
+
+    def message(self) -> str:
+        return f"'{self.x}' is already assigned"
+
+
+@dataclass(frozen=True)
+class MaybeAssigned:
+    x: Var
+
+    def message(self) -> str:
+        return f"'{self.x}' may already be assigned"
 
 
 @dataclass(frozen=True)
@@ -143,14 +175,6 @@ class NonlinearPattern:
 
     def message(self) -> str:
         return f"repeated variable '{self.x}' in pattern"
-
-
-@dataclass(frozen=True)
-class DuplicateMutualName:
-    x: Var
-
-    def message(self) -> str:
-        return f"duplicate name '{self.x}' in mutual region"
 
 
 @dataclass(frozen=True)
@@ -355,7 +379,7 @@ class UnknownField:
 @dataclass(frozen=True)
 class NotSynthesised:
     def message(self) -> str:
-        return "cannot infer type of this expression; annotate the assignment"
+        return "cannot infer type of this expression"
 
 
 @dataclass(frozen=True)
@@ -377,11 +401,15 @@ class MissingReturn:
 
 type Reason = (
     DuplicateField
-    | ClassRebound
     | UnassignedVariable
+    | PossiblyUnassigned
     | UndefinedVariable
-    | CapturedReassignment
-    | SelfCaptureAssignment
+    | UnboundName
+    | AssignmentBeforeDeclaration
+    | Redeclaration
+    | UndeclaredAssignment
+    | Reassignment
+    | MaybeAssigned
     | CapturedGeneratorVariable
     | UnreachableStatement
     | ConstructorArityMismatch
@@ -398,7 +426,6 @@ type Reason = (
     | UnknownConstructorKeyword
     | DuplicateDictKey
     | NonlinearPattern
-    | DuplicateMutualName
     | TopLevelReturn
     | DuplicateMember
     | SubmoduleNotImported

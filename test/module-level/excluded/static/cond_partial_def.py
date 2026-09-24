@@ -1,6 +1,7 @@
 # rule: var
 def foo(b: bool) -> int:
-    x = 6
+    x: int
+    y: int
     if b:
         x = 3
         y = x + 1
@@ -9,4 +10,3 @@ def foo(b: bool) -> int:
     return x
 
 print(foo(True))
-print(foo(False))

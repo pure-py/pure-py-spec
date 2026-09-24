@@ -1,6 +1,6 @@
 # rule: assign
 def f() -> int:
-    x = 5
+    x: int = 5
     x = lambda: x
     return x()
 

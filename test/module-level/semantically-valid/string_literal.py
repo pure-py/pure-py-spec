@@ -1,2 +1,2 @@
-s = "abc"
+s: str = "abc"
 print(s)

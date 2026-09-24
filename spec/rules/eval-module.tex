@@ -1,9 +1,9 @@
 \inferrule*[lab={\ruleName{eval-module}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;t \\
-  q, \seq{\iota} \Rightarrow \val{\rho} \\
-  \mathcal{P}(\pyinline{builtins}) = (\rho', \Gamma') \\
-  q, \rho' \mathbin{\override} \rho, t \Rightarrow \assigns{\rho^\dagger}
+  \mathcal{P}(\pyinline{builtins}) = (\Gamma, \rho) \\
+  q, \seq{\iota} \Rightarrow \val{\rho'} \\
+  q, \rho \mathbin{\override} \rho' \mathbin{\override} \scopeS(\set{\declaresS(\seq{\iota})}, t), t \Rightarrow \assigns{\rho^\dagger}
 }
 {
   q \Rightarrow_{\mathsf{load}} \val{(\submods(q) \override \rho^\dagger)}

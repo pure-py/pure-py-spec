@@ -12,13 +12,12 @@
 \and
 \inferrule*[lab={\ruleName{top-seq}}]
 {
-  \Sigma; q; \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
-  \Sigma'; q; \Gamma \override \Delta \vdash t' : R \binding \Sigma^\dagger \\
-  \capturesS(t) \cap \assignsS(t') = \varnothing \\
-  c \notin \assignsS(t') \quad (\forall \bind{c}{\Type{C}} \in \Delta)
+  \Sigma; q; \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma^\dagger \\
+  \Sigma^\dagger; q; \Gamma \override \Delta \vdash t' : R \binding \Sigma' \\
+  \\
 }
 {
-  \Sigma; q; \Gamma \vdash t\;t' : \Assigns{\Delta} \override R \binding \Sigma^\dagger
+  \Sigma; q; \Gamma \vdash t\;t' : \Assigns{\Delta} \override R \binding \Sigma'
 }
 \and
 \inferrule*[lab={\ruleName{class}}]

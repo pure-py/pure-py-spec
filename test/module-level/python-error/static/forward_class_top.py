@@ -1,7 +1,7 @@
-# rule: class
+# rule: ty-class
 from dataclasses import dataclass
 
-p = Point(1, 2)
+p: Point = Point(1, 2)
 
 @dataclass
 class Point:

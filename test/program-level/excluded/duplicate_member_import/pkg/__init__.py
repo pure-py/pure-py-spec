@@ -1,2 +1,2 @@
 from helper import sub
-w = 1
+w: int = 1

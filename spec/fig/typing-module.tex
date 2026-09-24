@@ -52,7 +52,8 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   \Sigma \vdash_{\mathsf{load}} q' : \Delta \binding \Sigma_0 \\
-  q^\dagger_1 \properPrefixOf \cdots \properPrefixOf q^\dagger_m \text{ the } q^\dagger \properPrefixOf q' \text{ with } q^\dagger \not\prefixOf q \\
+  \set{q^\dagger_1, \ldots, q^\dagger_m} = \set{q^\dagger \properPrefixOf q' \mid q^\dagger \not\prefixOf q} \\
+  q^\dagger_1 \properPrefixOf \cdots \properPrefixOf q^\dagger_m \\
   \Sigma_{j-1} \vdash_{\mathsf{load}} q^\dagger_j : \Delta_j \binding \Sigma_j \quad (\forall j) \\
   \Sigma_{m+i-1} \vdash \Delta, x_i \importsR \theta_i \binding \Sigma_{m+i} \quad (\forall i) \\
   \Sigma_{m+n+1}; q \vdash \seq{\iota} : \Gamma \binding \Sigma'
@@ -81,8 +82,8 @@
 \and
 \inferrule*[lab={\ruleName{loads-as-qualified}}]
 {
-  \Sigma \vdash_{\mathsf{load}} q : \Gamma' \binding \Sigma_1 \\
-  \Sigma_1 \vdash q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsAs \theta' \binding \Sigma'
+  \Sigma \vdash_{\mathsf{load}} q : \Gamma' \binding \Sigma^\dagger \\
+  \Sigma^\dagger \vdash q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsAs \theta' \binding \Sigma'
 }
 {
   \Sigma \vdash q.x, \theta \loadsAs \theta' \binding \Sigma'
@@ -100,19 +101,19 @@
 \small
 \inferrule*[lab={\ruleName{predefined}}]
 {
-  \mathcal{P}(q) = (\Gamma', \rho)
+  \mathcal{P}(q) = (\Gamma, \rho)
 }
 {
-  \Sigma \vdash_{\mathsf{load}} q : \Gamma' \binding \Sigma
+  \Sigma \vdash_{\mathsf{load}} q : \Gamma \binding \Sigma
 }
 \and
 \inferrule*[lab={\ruleName{module}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;t \\
-  \Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma_1 \\
-  \mathcal{P}(\pyinline{builtins}) = (\Gamma', \rho) \\
-  \Sigma_1; q; \Gamma' \mathbin{\override} \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma' \\
-  (\dom(\Gamma) \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
+  \mathcal{P}(\pyinline{builtins}) = (\Gamma, \rho) \\
+  \Sigma; q \vdash \seq{\iota} : \Gamma' \binding \Sigma^\dagger \\
+  \Sigma^\dagger; q; \Gamma \override \Gamma' \mathbin{\override} \scopeS(\set{\declaresS(\seq{\iota})}, t) \vdash t : \Assigns{\Delta} \binding \Sigma' \\
+  (\dom(\Gamma') \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {
   \Sigma \vdash_{\mathsf{load}} q : \submods(q) \override \Delta \binding \Sigma'

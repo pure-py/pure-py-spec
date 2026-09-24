@@ -4,12 +4,14 @@
 \subsection{Values and environments}
 
 Values, environments, outcomes and results are given in \figref{values}. A class value $\Type{C}$ is the
-context entry of the class, and an object $\exObj{C}{\rho}$ records its class by name; throughout this
-section, $\Sigma$ is the class table produced by static loading of the program
+context entry of the class, and an object $\exObj{C}{\rho}$ records its class by name; the value $\Unbound$
+marks a variable of the current scope before its declaration is reached, a state reported by Python as an unbound
+local, and an environment binds a variable to $\Unbound$ wherever the corresponding context binds the variable to
+the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible. Throughout this section, $\Sigma$ is the class table produced by static loading of the program
 (\secref{well-formedness-modules}) and, like $\mathcal{M}$ and $\mathcal{P}$, is ambient. For a statement $s$, the outcome
-$\assigns{\rho}$ represents \emph{normal completion} of $s$, with accumulated environment $\rho$; the outcome
-$\returns{v}$ represents \emph{abrupt completion} of $s$, with return value $v$; and the outcome
-$\aborts{\kappa}$ represents abrupt completion of the whole run, with termination kind $\kappa$.
+$\assigns{\rho}$ represents $s$ running to its end, with accumulated environment $\rho$; the outcome
+$\returns{v}$ represents $s$ returning the value $v$; and the outcome $\aborts{\kappa}$ represents the whole run
+aborting, with termination kind $\kappa$.
 Composing statements sequentially composes their outcomes according to the following partial monoid, analogous
 to sequential composition of static outcomes:
 \begin{defalign}
@@ -43,7 +45,7 @@ results of the same form, carrying an outcome, a sequence of values or an enviro
 
 \subsection{Expressions and statements}
 
-A value has a context entry, and an environment a context, by \figref{typing-values}.
+A value is well-formed at a context entry, and an environment at a context (\figref{well-formed-values}).
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any statement $s$ with
 $\Gamma \vdash s : R$, the statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
 to outcome $o$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Top-level statements
@@ -70,7 +72,7 @@ aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the except
 dictionary subscripted by a value other than a string is undefined. Likewise an attribute reference on a
 value other than a module or object has no derivation: the attributes of built-in values are undefined.
 
-\input{spec/fig/typing-values}
+\input{spec/fig/well-formed-values}
 
 \specinput{spec/fig/eval-outcome}
 
@@ -118,7 +120,8 @@ Since
 imports precede statements, every module that a statement can reference is loaded before the statement runs, and
 loading is deterministic, so the semantics needs no cache
 of loaded modules. The rule \ruleName{eval-module} runs a module body in $\mathcal{P}(\pyinline{builtins})$ overridden by
-the environment of its imports, mirroring \ruleName{module} (\secref{well-formedness-modules})\paperonly{:}\speconly{.}
+the environment of its imports, with each name declared in the body or bound by a pattern in it starting
+unbound, mirroring \ruleName{module} (\secref{well-formedness-modules})\paperonly{:}\speconly{.}
 \paperinput{paper/operational-semantics/module}%
 A program evaluates to a termination kind (\figref{values}): $\errExit{0}$ if the main module
 loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exited with status $n$\paperonly{:}\speconly{.}

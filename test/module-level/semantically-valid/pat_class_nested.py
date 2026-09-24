@@ -10,7 +10,7 @@ class Pair:
     a: tuple[int, list[int]]
     b: Inner
 
-p = Pair((1, [2, 3]), Inner(4, 5))
+p: Pair = Pair((1, [2, 3]), Inner(4, 5))
 match p:
     case Pair((1, [x, y]) as t, Inner(z, _)):
         print(t)

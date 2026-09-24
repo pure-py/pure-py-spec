@@ -1,5 +1,5 @@
 # rule: pat-shapes
-v = [1, 2]
+v: list[int] = [1, 2]
 match v:
     case 1:
         print("yes")

@@ -10,6 +10,6 @@ class Point:
     y: int
 
 Empty()
-p = Point(1, 2)
+p: Point = Point(1, 2)
 print(p.x)
 print(p.y)

@@ -1,77 +1,75 @@
-\subsection{Design principles}
+\subsection{Key concepts}
 \label{sec:principles}
 
-Well-formedness enforces several constraints, summarised here with the programs each accepts and rejects;
-the rules follow in \secref{well-formedness-statements} and \secref{well-formedness-modules}.
+This section introduces the concepts underlying the rules, each illustrated by admitted and rejected
+programs; the rules follow in \secref{expression-typing} to \secref{well-formedness-modules}. The rules for
+variables serve the two aims of \secref{no-mutable-state} and \secref{python-compatibility}, no mutable state and
+compatibility with mypy.
 
-\subsubsection{Assignment is definition}
+\subsubsection{Variable declaration and definite assignment}
 \label{sec:local-assignment}
 
-Python has no variable declarations: a variable is introduced by assigning to it, and a local variable is
-in scope throughout the function body, wherever the assignment occurs. \PurePy keeps the syntax but gives
-each reference a unique lexical referent through \emph{definite assignment}: a variable may be referenced
-only where an assignment covers every path to the reference. The \ruleName{var} rule requires the variable
-to be definitely assigned, so that $\Gamma(x)$ is a type; the \ruleName{assign} rules make it so, with
-$x = e$ assigning $\set{\bind{x}{\sigma}}$ for the type $\sigma$ of $e$; and the \ruleName{if} rules
-combine the branches with $\merge$, so that a conditional definitely assigns a variable only if every
-branch that does not definitely return assigns it, otherwise leaving it at $\False$
-(\secref{well-formedness-statements}). Branch-local
-variables are therefore permitted, but using one after the conditional is not:
+\emph{Definite assignment} enforces the discipline of \secref{no-mutable-state}: a variable may be referenced only
+where an assignment covers every path to the reference, and assigned only where no path has assigned it
+already. Java imposes similar conditions on blank finals~\cite[\S16]{gosling2025}. The \ruleName{declare} rule binds the variable at $\DU{\tau}$, declared at $\tau$ and
+definitely unassigned; the \ruleName{assign} rule requires that entry, checks the expression against $\tau$ and
+makes the variable definitely assigned, so that $\Gamma(x)$ is a type, as the \ruleName{var} rule requires; an
+annotated assignment does both at once; and the \ruleName{if} rules combine the branches with $\merge$, so
+that a variable is definitely assigned after a conditional only if each branch either assigns it or definitely
+returns, and is otherwise possibly unassigned, $\PU{\tau}$ (\secref{well-formedness-statements}). Branch-local variables are therefore permitted, but using one after the
+conditional is not, nor is completing a partial assignment:
 
 \begin{python}
-def foo():
-    x = 6
+def foo(b: bool) -> int:
+    x: int
     if b:
         x = 3
-        y = x + 1
-    else:
-        y = 0
-    return x  # error: partially defined
+        y: int = x + 1
+        print(y)
+    x = 0     # error: x assigned on the path through the branch
+    return x
 \end{python}
 
-\noindent Python returns \pyinline{3} when \pyinline{b} is true, so no pure reading of the program agrees
-with Python. The program assigns \pyinline{x} on every run, so this is stricter than avoiding Python's
-\pyinline{NameError}: the \pyinline{x} in \pyinline{return x} would refer to the branch-local variable on
-one path and to the variable assigned by \pyinline{x = 6} on the other.
+\noindent Python assigns \pyinline{x} twice when \pyinline{b} is true, so no pure reading of the program
+agrees with Python: under shadowing, \pyinline{return x} would refer to a different variable from the one
+assigned in the branch.
 
-Python's function-level scoping is kept as well. The \ruleName{def} rule introduces every variable assigned by
-the body, $\assignsS(b)$, at $\False$ before checking the body, so a reference before the
-assignment is rejected statically, where Python fails at run time with \pyinline{UnboundLocalError}:
+The \ruleName{def} rule introduces every variable declared or assigned by the body, $\assignsS(s)$, at $\Unbound$
+before checking the body, so a reference before the declaration is rejected statically, whereas Python fails at
+run time with \pyinline{UnboundLocalError}:
 
 \begin{python}
-y = 7
-def f():
-    x = y  # error: y is local, because of the assignment below
-    y = 8
+y: int = 7
+def f() -> int:
+    x: int = y  # error: y is local, because of the declaration below
+    y: int = 8
+    return x
 \end{python}
 
-\noindent Here $\assignsS(s)$ is the set of variables assigned anywhere in a statement $s$, not descending
-into nested function definitions, which have their own scope.
+\noindent Here $\assignsS(s)$ is the set of variables declared or assigned anywhere in a statement $s$, not
+descending into nested function definitions, which have their own scope.
 
-\subsubsection{No reassignment of captured variables}
+The \ruleName{module} rule does the same for a module body, with the builtins as the enclosing scope
+(\secref{scope}), so a use of a builtin name is rejected if the module later declares that name:
+
+\begin{python}
+n: int = len([1])  # error: len is bound by the module
+len: int = 2
+\end{python}
+
+\subsubsection{Variable capture}
 \label{sec:captured-variables}
 
 In Python a closure holds a mutable binding, so a variable captured by a lambda or nested function
 definition may be reassigned afterwards, changing the value seen by the function (\secref{no-mutable-state}).
-\PurePy excludes this: a variable captured by a statement may not be assigned later in the same sequence, nor
-by that statement itself. The \ruleName{seq} rule imposes the first as a side condition on a sequence
-$t\;t'$: no variable in $\capturesS(t)$ may be in $\assignsS(t')$. In the example of \secref{no-mutable-state}, \pyinline{x} is captured by the
-definition of \pyinline{g} and assigned by \pyinline{x = 6}, so the program is rejected. The
-\ruleName{assign} rule imposes the second, $x \notin \capturesE(e)$ for an assignment $x = e$, rejecting
-for instance \pyinline{x = lambda: x}, where under Python's late binding the lambda would return itself. A
-third case arises in comprehensions: in Python a comprehension mutates its generator variables on each
-iteration, so a lambda in the body or in a later qualifier may not capture one, a side condition of
-\ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}. For instance
-\pyinline{[lambda x: x**i for i in [1, 2, 3]]} is rejected, since under Python each lambda in the list would compute
-\pyinline{x**3}. A dataclass declaration counts as an assignment of its class name here, although re-declaring a class name is
-excluded outright (\secref{no-first-class}).
+This cannot arise in \PurePy: a closure captures only definitely assigned variables, and a definitely
+assigned variable is never assigned again. One case remains, in comprehensions: in Python a comprehension mutates its generator
+variables on each iteration, so \PurePy forbids a lambda in the body or in a later qualifier from capturing a generator
+variable, a side condition of \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}.
 
-Here $\capturesS(s)$ is the set of variables of the enclosing scope captured by the lambdas and nested
-function definitions within a statement $s$, with $\capturesE(e)$ computing the same for an expression $e$: the
-free variables of each such function's body, less its parameters and any variables assigned by the body, which
-are local to it. For a mutual region of function definitions (\figref{syntax-stmt}) the names of the functions
-themselves are also excluded, since the \ruleName{def} rule binds them in every body, consistent with
-Python's late binding semantics (\secref{mutual-recursion}).
+Here $\captures(\seq{g})$ is the set of variables of the enclosing scope captured by the lambdas within the
+qualifiers $\seq{g}$ of a comprehension, with $\captures(e)$ computing the same for an expression $e$: the
+free variables of each lambda's body, less its parameters.
 
 \subsubsection{Mutual regions}
 \label{sec:mutual-recursion}
@@ -86,14 +84,14 @@ to any other, and requires the names to be distinct. Self-recursion is the speci
 mutual region. Any other statement between two definitions separates them into different mutual regions:
 
 \begin{python}
-def even(n):
+def even(n: int) -> bool:
     if n == 0:
         return True
     return odd(n - 1)  # error: odd is not yet bound
 
-x = even(0)  # intervening statement separates the mutual regions
+x: bool = even(0)  # intervening statement separates the mutual regions
 
-def odd(n):
+def odd(n: int) -> bool:
     if n == 0:
         return False
     return even(n - 1)
@@ -105,12 +103,12 @@ call \pyinline{even(0)} never reaches \pyinline{odd}. A mutual region with two d
 rejected by the distinct-names condition:
 
 \begin{python}
-def g():
+def g() -> int:
     return 0
 
-def f():
+def f() -> int:
     return g()
-def g():     # error: g defined twice in the same mutual region
+def g() -> int:  # error: g defined twice in the same mutual region
     return 1
 \end{python}
 
@@ -123,7 +121,7 @@ functions after the conditional subject to the usual definite assignment rules (
 
 A \pyinline{case} pattern binds variables, and Python scopes them as it does assignments: they remain in
 scope after the \pyinline{match} statement. \PurePy follows: each case is treated as a branch, and its pattern as an
-assignment of the variables it binds. The set of variables a pattern $p$ introduces is $\binds(p)$; the
+assignment of the variables it binds, which must not be declared already (\ruleName{pat-var}). The set of variables a pattern $p$ introduces is $\binds(p)$; the
 \ruleName{match} rule checks each body in a context in which they are definitely assigned, and combines
 the cases with $\merge$ as the \ruleName{if} rules do, so a variable is definitely assigned after the match
 only if every case binds it or returns. A match whose cases leave some value of the scrutinee type
@@ -131,7 +129,7 @@ unmatched may fall through; in this case the \ruleName{match-partial} rule merge
 set, as for a conditional without an \pyinline{else}:
 
 \begin{python}
-v = (1, 2)
+v: tuple[int, int] = (1, 2)
 match v:
     case (x, y):
         print(x, y)
@@ -144,7 +142,7 @@ that can match only values already matched by an earlier case (\secref{well-form
 Python leaves silently unreachable:
 
 \begin{python}
-v = (1, 2)
+v: tuple[int, int] = (1, 2)
 match v:
     case (a, b):
         print("seq", a, b)
@@ -152,7 +150,7 @@ match v:
         print("lit")
 \end{python}
 
-\subsubsection{No unreachable code}
+\subsubsection{Reachability}
 \label{sec:unreachable}
 
 Python accepts statements that can never run, such as code after a \pyinline{return}. \PurePy rejects
@@ -162,7 +160,7 @@ rule requires the first statement of a sequence to have static outcome $\Assigns
 (\secref{well-formedness-statements}), so a statement following a \pyinline{return} has no derivation:
 
 \begin{python}
-def foo(x):
+def foo(x: int) -> int:
     return x + 1
     return x  # error: unreachable
 \end{python}

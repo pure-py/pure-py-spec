@@ -7,7 +7,7 @@ class Point:
     y: int
 
 # Subject not a Point, so no runtime keyword lookup, on which CPython and GraalPy differ
-p = None
+p: None = None
 match p:
     case Point(x=a, z=b):
         pass

@@ -19,12 +19,20 @@
   \rho, \exAssign{x}{e} \Rightarrow \mlet{v}{r}{\assigns{\set{\bind{x}{v}}}}
 }
 \and
-\inferrule*[lab={\ruleName{eval-assign-annot}}]
+\inferrule*[lab={\ruleName{eval-declare-assign}}]
 {
   \rho, e \Rightarrow r
 }
 {
   \rho, \exAssign{x\exAnnot{\psi}}{e} \Rightarrow \mlet{v}{r}{\assigns{\set{\bind{x}{v}}}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-declare}}]
+{
+  \strut
+}
+{
+  \rho, x\exAnnot{\psi} \Rightarrow \assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{eval-expr-stmt}}]
@@ -396,7 +404,7 @@
   d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \quad (\forall i) \\
   v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
-  \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}}, s_j \Rightarrow o
+  \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}} \override \scopeS(\set{\seq{x}_j}, s_j), s_j \Rightarrow o
 }
 {
   \rho, \exCall{e}{\seq{e}} \Rightarrow \result(o)

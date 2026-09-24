@@ -1,2 +1,2 @@
 from m import x
-y = x
+y: int = x

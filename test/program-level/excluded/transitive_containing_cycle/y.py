@@ -1,2 +1,2 @@
 import x.z
-v = 2
+v: int = 2

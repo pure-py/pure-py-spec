@@ -6,7 +6,7 @@ class Triple:
     y: int
     z: int
 
-t = Triple(1, 2, 3)
+t: Triple = Triple(1, 2, 3)
 match t:
     case Triple(1, z=zz, y=yy):
         print(yy)

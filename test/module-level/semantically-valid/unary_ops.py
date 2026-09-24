@@ -1,7 +1,7 @@
 # rule: unop
-x = 5
-y = 2.5
-b = True
+x: int = 5
+y: float = 2.5
+b: bool = True
 print(-x)
 print(+x)
 print(-y)

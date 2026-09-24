@@ -5,7 +5,7 @@ class C:
     a: int
     b: int
 
-p = C(1, 2)
+p: C = C(1, 2)
 match p:
     case C(x, x):
         pass

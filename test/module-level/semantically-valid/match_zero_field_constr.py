@@ -3,7 +3,7 @@ from dataclasses import dataclass
 @dataclass
 class Empty:
     pass
-e = Empty()
+e: Empty = Empty()
 match e:
     case Empty():
         print("empty")

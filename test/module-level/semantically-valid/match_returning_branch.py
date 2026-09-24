@@ -1,4 +1,5 @@
 def f(v: tuple[int, int] | int) -> int:
+    r: int
     match v:
         case (x, y):
             r = x + y

@@ -5,7 +5,7 @@ class Flags:
     x: bool
     y: bool
 
-v = Flags(True, False)
+v: Flags = Flags(True, False)
 match v:
     case Flags(True, True):
         print("tt")

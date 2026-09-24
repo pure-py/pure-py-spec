@@ -1,1 +1,1 @@
-values of type Literal[5] cannot be called
+values of type int cannot be called

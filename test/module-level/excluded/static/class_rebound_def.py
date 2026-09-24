@@ -1,4 +1,4 @@
-# rule: top-seq
+# rule: def
 from dataclasses import dataclass
 
 

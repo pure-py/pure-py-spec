@@ -6,7 +6,7 @@ class P:
     x: int
     y: int
 
-v = P(1, 2)
+v: P = P(1, 2)
 match v:
     case P(a, y=b):
         print("first")

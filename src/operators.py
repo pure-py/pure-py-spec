@@ -232,6 +232,16 @@ def overloads_unary(Sigma: ClassTable, op: str, sigma: Type) -> list[ResolvedOve
     return list({resolved: None for resolved in candidates if resolved is not None})
 
 
+def resolve_op_binary(Sigma: ClassTable, op: str, sigma: Type, tau: Type) -> Type | None:
+    least = minimum(Sigma, overloads_binary(Sigma, op, sigma, tau))
+    return None if least is None else least[1]
+
+
+def resolve_op_unary(Sigma: ClassTable, op: str, sigma: Type) -> Type | None:
+    least = minimum(Sigma, overloads_unary(Sigma, op, sigma))
+    return None if least is None else least[1]
+
+
 def minimum(Sigma: ClassTable, resolved: Sequence[ResolvedOverload]) -> ResolvedOverload | None:
     for candidate in resolved:
         if all(

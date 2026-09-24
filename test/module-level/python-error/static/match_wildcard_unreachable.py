@@ -1,5 +1,5 @@
 # rule: pat-wild
-v = 1
+v: int = 1
 match v:
     case _:
         print("a")

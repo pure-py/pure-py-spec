@@ -1,5 +1,5 @@
 # rule: var
 from typing import Callable
 
-x = Callable
+x: int = Callable
 print(x)

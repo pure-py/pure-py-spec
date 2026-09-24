@@ -1,3 +1,3 @@
 # rule: subscript-list
-x = 5
-y = x[0]
+x: int = 5
+y: int = x[0]

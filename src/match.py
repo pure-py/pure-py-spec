@@ -7,6 +7,7 @@ from aux import qualified_name
 from classes import Class, ClassTable, declared_type, field_map, fields, short_name
 from contexts import (
     ModuleContext,
+    Unbound,
     VarContext,
     class_of_name,
     disjoint_union,
@@ -70,6 +71,8 @@ def match(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
 
 
 def match_as(k: Shape, p: ast.MatchAs, mod_ctx: ModuleContext) -> Match | None:
+    if p.name is not None and mod_ctx.gamma.get(p.name) != Unbound():
+        raise IllFormedModule(p, reasons.Redeclaration(p.name))
     if p.pattern is None:
         delta: VarContext = {} if p.name is None else {p.name: shape_type(k)}
         return (k,), (), delta
@@ -314,12 +317,10 @@ def match_shapes(residual: Shapes, p: ast.pattern, mod_ctx: ModuleContext) -> Ma
     )
 
 
-def sequence_kind_mismatch(
-    p: ast.pattern, tau: Type, mod_ctx: ModuleContext
-) -> tuple[ast.pattern, Type] | None:
+def seq_safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> tuple[ast.pattern, Type] | None:
     match tau:
         case UnionType(sigma, sigma_):
-            mismatch = first_mismatch([(p, sigma), (p, sigma_)], mod_ctx)
+            mismatch = first_unsafe([(p, sigma), (p, sigma_)], mod_ctx)
             if mismatch is None:
                 return None
             q, sigma = mismatch
@@ -331,17 +332,17 @@ def sequence_kind_mismatch(
             if isinstance(tau, ListType) or tau in (Primitive.SIZED, Primitive.OBJECT):
                 return (p, tau)
             if isinstance(tau, TupleType) and len(tau.components) == len(ps):
-                return first_mismatch(list(zip(ps, tau.components)), mod_ctx)
+                return first_unsafe(list(zip(ps, tau.components)), mod_ctx)
             return None
         case PatList(patterns=ps):
             if isinstance(tau, TupleType) or tau in (Primitive.SIZED, Primitive.OBJECT):
                 return (p, tau)
             if isinstance(tau, ListType):
-                return first_mismatch([(q, tau.elem) for q in ps], mod_ctx)
+                return first_unsafe([(q, tau.elem) for q in ps], mod_ctx)
             return None
         case ast.MatchMapping(patterns=ps):
             if isinstance(tau, DictType):
-                return first_mismatch([(q, tau.value) for q in ps], mod_ctx)
+                return first_unsafe([(q, tau.value) for q in ps], mod_ctx)
             return None
         case ast.MatchClass():
             c = class_of_name(p.cls, mod_ctx)
@@ -350,20 +351,20 @@ def sequence_kind_mismatch(
             args = field_map(mod_ctx.Sigma, c, p.patterns, p.kwd_attrs, p.kwd_patterns)
             if args is None:
                 return None  # likewise
-            return first_mismatch(
+            return first_unsafe(
                 [(args[x], declared_type(mod_ctx.Sigma, c, x)) for x in fields(mod_ctx.Sigma, c)],
                 mod_ctx,
             )
         case ast.MatchAs():
-            return None if p.pattern is None else sequence_kind_mismatch(p.pattern, tau, mod_ctx)
+            return None if p.pattern is None else seq_safe(p.pattern, tau, mod_ctx)
         case _:
             return None
 
 
-def first_mismatch(
+def first_unsafe(
     pairs: list[tuple[ast.pattern, Type]], mod_ctx: ModuleContext
 ) -> tuple[ast.pattern, Type] | None:
-    mismatches = (sequence_kind_mismatch(q, sigma, mod_ctx) for q, sigma in pairs)
+    mismatches = (seq_safe(q, sigma, mod_ctx) for q, sigma in pairs)
     return next((mismatch for mismatch in mismatches if mismatch is not None), None)
 
 

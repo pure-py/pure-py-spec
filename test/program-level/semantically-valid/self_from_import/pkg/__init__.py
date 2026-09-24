@@ -1,2 +1,2 @@
 from pkg.sub import z
-w = z + 1
+w: int = z + 1

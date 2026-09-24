@@ -1,1 +1,1 @@
-values of type Literal[5] cannot be subscripted
+values of type int cannot be subscripted

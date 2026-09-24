@@ -1,4 +1,4 @@
 # rule: attr-module
 import math
-x = math.tau
+x: float = math.tau
 print(x)

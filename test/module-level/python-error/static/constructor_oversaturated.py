@@ -4,4 +4,4 @@ from dataclasses import dataclass
 class Point:
     x: int
     y: int
-p = Point(1, 2, 3)
+p: Point = Point(1, 2, 3)

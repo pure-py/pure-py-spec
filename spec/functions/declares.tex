@@ -1,0 +1,8 @@
+\declaresS(x\exAnnot{\psi}) = \declaresS(\exAssign{x\exAnnot{\psi}}{e}) &= x \\*
+\declaresS(t\;t') &= \declaresS(t) \mathbin{\concat} \declaresS(t') \\*
+\declaresS(\seq{d}) &{}= \seq{f} \\*
+&\qquad \rlap{$\text{where } d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i}$} \\*
+\declaresS(\exDataclass{c}{\phi}) &{}= c \\*
+\declaresS(\exDataclassExtend{c}{c'}{\phi}) &{}= c \\*
+\declaresS(\exImport{q} \cons \seq{\iota}) &{}= x \cons \declaresS(\seq{\iota}) \quad \text{where } q = x \cons \seq{x} \\*
+\declaresS(\exFromImport{q}{x_1, \ldots, x_{n+1}} \cons \seq{\iota}) &{}= x_1 \cons \cdots \cons x_{n+1} \cons \declaresS(\seq{\iota})

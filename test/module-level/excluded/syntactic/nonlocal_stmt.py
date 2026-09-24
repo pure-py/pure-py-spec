@@ -1,5 +1,5 @@
 def f() -> int:
-    x = 5
+    x: int = 5
     def g() -> int:
         nonlocal x
         return x

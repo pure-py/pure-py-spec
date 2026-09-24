@@ -1,4 +1,4 @@
-v = (1, [2, 3])
+v: tuple[int, list[int]] = (1, [2, 3])
 match v:
     case (a, [b, c]):
         print(a)

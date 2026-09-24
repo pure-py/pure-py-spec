@@ -1,4 +1,4 @@
-# rule: top-seq
+# rule: declare-assign
 from dataclasses import dataclass
 
 
@@ -7,5 +7,5 @@ class C:
     n: int
 
 
-C = 5
+C: int = 5
 print(C + 1)

@@ -1,2 +1,2 @@
 # rule: var
-y = abs(-1)
+y: int = abs(-1)

@@ -1,3 +1,3 @@
 from mod import C
 
-obj = C(1, 2)
+obj: C = C(1, 2)

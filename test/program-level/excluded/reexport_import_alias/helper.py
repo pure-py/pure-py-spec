@@ -1,3 +1,3 @@
 import sys
 
-x = len(sys.argv)
+x: int = len(sys.argv)

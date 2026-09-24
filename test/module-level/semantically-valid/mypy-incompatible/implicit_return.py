@@ -1,4 +1,4 @@
 def foo() -> None:
-    x = 3
+    x: int = 3
 
 print(foo())

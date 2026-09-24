@@ -1,11 +1,11 @@
-# rule: top-seq
+# rule: class
 from dataclasses import dataclass
 
 @dataclass
 class C:
     x: int
 
-a = C(1)
+a: C = C(1)
 
 @dataclass
 class C:

@@ -21,26 +21,32 @@ cases are stated with each.
 \funcrows{assigns}
 \end{auxfunction}
 
-\begin{auxfunction}{\binds(p)}{set of variables}{aux:binds}
+\begin{auxfunction}{\binds(p), \binds(s)}{set of variables}{aux:binds}
 \input{spec/functions/binds-text}
 \funcrows{binds}
 \end{auxfunction}
 
-\begin{auxfunction}{\capturesS(t)}{set of variables}{aux:captures}
-\input{spec/functions/captures-text}
-\funcrows{captures}
+\begin{auxfunction}{\declaresS(t), \declaresS(\seq{\iota})}{sequence of variables}{aux:declares}
+\input{spec/functions/declares-text}
+\funcrows{declares}
 \end{auxfunction}
 
-\begin{auxfunction}{\capturesE(e)}{set of variables}{aux:captures-e}
+\begin{auxfunction}{\scopeS(Y, s)}{context}{aux:scope}
+\input{spec/functions/scope-text}
+\funcrows{scope}
+\end{auxfunction}
+
+\begin{auxfunction}{\captures(e)}{set of variables}{aux:captures-e}
 \input{spec/functions/captures-e-text}
 \funcrows{captures-e}
 \end{auxfunction}
 
-\begin{auxfunction}{\fvS(s)}{set of variables}{aux:fv}
-\input{spec/functions/fv-text}
+\begin{auxfunction}{\captures(\seq{g})}{set of variables}{aux:captures}
+\input{spec/functions/captures-text}
+\funcrows{captures}
 \end{auxfunction}
 
-\begin{auxfunction}{\fvE(e)}{set of variables}{aux:fv-e}
+\begin{auxfunction}{\fvE(e), \fvE(\seq{e})}{set of variables}{aux:fv-e}
 \input{spec/functions/fv-e-text}
 \end{auxfunction}
 
@@ -82,6 +88,11 @@ The functions on types and shapes introduced in \secref{types}, each defined by 
 \begin{auxfunction}{\seqSafe(\Sigma, \Gamma, p, \tau)}{Boolean}{aux:seq-safe}
 \input{spec/functions/seq-safe-text}
 \funcrows{seq-safe}
+\end{auxfunction}
+
+\begin{auxfunction}{\resolveOp(\Sigma, \odot, \sigma_1, \sigma_2), \resolveOp(\Sigma, \ominus, \sigma)}{type}{aux:resolve-op}
+\input{spec/functions/resolve-op-text}
+\funcrows{resolve-op}
 \end{auxfunction}
 
 \section{Classes and modules}

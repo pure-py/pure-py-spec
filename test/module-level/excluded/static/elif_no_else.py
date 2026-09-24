@@ -1,5 +1,6 @@
 # rule: if
-x = 1
+x: int = 1
+y: int
 if x == 0:
     y = 1
 elif x == 1:
