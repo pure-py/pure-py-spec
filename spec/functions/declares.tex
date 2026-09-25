@@ -1,9 +1,9 @@
 \declaresS(x\exAnnot{\psi}) = \declaresS(\exAssign{x\exAnnot{\psi}}{e}) &= x \\*
 \declaresS(t\;t') &= \declaresS(t) \mathbin{\concat} \declaresS(t') \\*
 \declaresS(\seq{d}) &{}= \seq{f} \\*
-&\qquad \rlap{$\text{where } d_i = \exDef{f_i\added{[\seq{\alpha}_i]}}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i}$} \\*
-\declaresS(\exDataclass{c\added{[\seq{\alpha}]}}{\phi}) &{}= c \\*
-\declaresS(\exDataclassExtend{c\added{[\seq{\alpha}]}}{\replaced{q[\seq{\psi}]}{c'}}{\phi}) &{}= c \\*
-\added{\declaresS(\exTypeAlias{x[\seq{\alpha}]}{\psi})} &\added{= x} \\*
+&\qquad \rlap{$\text{where } d_i = \exDef{f_i[\seq{\alpha}_i]}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i}$} \\*
+\declaresS(\exDataclass{c[\seq{\alpha}]}{\phi}) &{}= c \\*
+\declaresS(\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}) &{}= c \\*
+\declaresS(\exTypeAlias{x[\seq{\alpha}]}{\psi}) &= x \\*
 \declaresS(\exImport{q} \cons \seq{\iota}) &{}= x \cons \declaresS(\seq{\iota}) \quad \text{where } q = x \cons \seq{x} \\*
 \declaresS(\exFromImport{q}{x_1, \ldots, x_{n+1}} \cons \seq{\iota}) &{}= x_1 \cons \cdots \cons x_{n+1} \cons \declaresS(\seq{\iota})

@@ -21,24 +21,23 @@ $\psi$ & $::=$ & $\nu$ & (Primitive) \\
     & $\mid$ & $\tyCallable{\psi_1, \ldots, \psi_n}{\psi}$ & (Callable) \\
     & $\mid$ & $\tyLiteral{\ell}$ & (Literal) \\
     & $\mid$ & $\tyLiteral{-n}$ & (Negative literal) \\
-    & $\mid$ & \added{$\alpha$} & \added{(TypeVar)} \\
-    & $\mid$ & \replaced{$q[\psi_1, \ldots, \psi_n]$}{$q$} & \replaced{(TypeName)}{(ClassName)} \\
-    & $\mid$ & \deleted{$\fq{q}$} & \deleted{(Class)} \\
+    & $\mid$ & $\alpha$ & (TypeVar) \\
+    & $\mid$ & $q[\psi_1, \ldots, \psi_n]$ & (TypeName) \\
     & $\mid$ & $\tyUnion{\psi}{\psi'}$ & (Union)
    \\[3mm]
-\grammarGroup{\added{Types}} \\
-\added{$\tau$} & \added{$::=$} & \added{$\nu$} & \added{(Primitive)} \\
-    & \added{$\mid$} & \added{$\tyList{\tau}$} & \added{(List)} \\
-    & \added{$\mid$} & \added{$\tyTuple{\tau_1, \ldots, \tau_n}$} & \added{(Tuple)} \\
-    & \added{$\mid$} & \added{$\tyDict{\tau}$} & \added{(Dict)} \\
-    & \added{$\mid$} & \added{$\tyCallable{\tau_1, \ldots, \tau_n}{\tau}$} & \added{(Callable)} \\
-    & \added{$\mid$} & \added{$\tyLiteral{\ell}$} & \added{(Literal)} \\
-    & \added{$\mid$} & \added{$\tyLiteral{-n}$} & \added{(Negative literal)} \\
-    & \added{$\mid$} & \added{$\alpha$} & \added{(TypeVar)} \\
-    & \added{$\mid$} & \added{$C[\tau_1, \ldots, \tau_n]$} & \added{(Class)} \\
-    & \added{$\mid$} & \added{$\tyUnion{\sigma}{\tau}$} & \added{(Union)}
+\grammarGroup{Types} \\
+$\tau$ & $::=$ & $\nu$ & (Primitive) \\
+    & $\mid$ & $\tyList{\tau}$ & (List) \\
+    & $\mid$ & $\tyTuple{\tau_1, \ldots, \tau_n}$ & (Tuple) \\
+    & $\mid$ & $\tyDict{\tau}$ & (Dict) \\
+    & $\mid$ & $\tyCallable{\tau_1, \ldots, \tau_n}{\tau}$ & (Callable) \\
+    & $\mid$ & $\tyLiteral{\ell}$ & (Literal) \\
+    & $\mid$ & $\tyLiteral{-n}$ & (Negative literal) \\
+    & $\mid$ & $\alpha$ & (TypeVar) \\
+    & $\mid$ & $C[\tau_1, \ldots, \tau_n]$ & (Class) \\
+    & $\mid$ & $\tyUnion{\sigma}{\tau}$ & (Union)
 \end{tabular}
 \end{center}
-\caption{Type expressions \added{and types}}
+\caption{Type expressions and types}
 \label{fig:syntax-types}
 \end{figure}

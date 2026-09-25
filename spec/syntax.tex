@@ -25,15 +25,15 @@ The grammar of \PurePy is an abstract syntax, and its metavariables range over v
 over source text: $n$ is a number and $w$ is a string, not the lexemes that denote them. A number is never
 negative, since Python writes a negative number as unary minus applied to a literal, and a length or an
 exit status is an integer. The translation of source text
-into abstract syntax follows Python, including the indentation that delimits blocks. \Added{A list of type
+into abstract syntax follows Python, including the indentation that delimits blocks. A list of type
 parameters or type arguments is always present in the abstract syntax and may be empty. In source an empty
 list is always omitted, along with its brackets, since Python's concrete syntax requires at least one element
-between brackets; the empty tuple type, for example, is written \pyinline{tuple[()]}.}
+between brackets; the empty tuple type, for example, is written \pyinline{tuple[()]}.
 
 \subsection{Contexts}
 \label{sec:contexts}
 
-Metavariables $x$, $f$\Replaced{, $c$ and $\alpha$}{ and $c$} range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function\Replaced{, $c$ when it is expected to denote a class, and $\alpha$ when it is a type parameter}{ and $c$ when it is expected to denote a class}. \Replaced{A \emph{name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}): a variable is a \emph{simple name}, and a name with at least one dot is \emph{qualified}. A name is \emph{fully qualified} when it is read from the root of the module hierarchy; modules (\secref{modules-programs}) and classes (Definition~\ref{def:class}) are identified by fully-qualified name.}{A \emph{qualified name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}); a variable is thus a qualified name with a single component.}
+Metavariables $x$, $f$, $c$ and $\alpha$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function, $c$ when it is expected to denote a class, and $\alpha$ when it is a type parameter. A \emph{name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}): a variable is a \emph{simple name}, and a name with at least one dot is \emph{qualified}. A name is \emph{fully qualified} when it is read from the root of the module hierarchy; modules (\secref{modules-programs}) and classes (Definition~\ref{def:class}) are identified by fully-qualified name.
 
 \begin{definition}[Context]
 \label{def:context}
@@ -50,8 +50,8 @@ variable & $\tau$, $\DU{\tau}$, $\PU{\tau}$ or $\Unbound$ & type of definitely a
 module stub & $\modStub{q}$ & module $q$, named but not loaded \\
 module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$ \\
 class entry & $\Type{C}$ & name denotes class $C$ \\
-\added{type parameter} & \added{$\TypeVar$} & \added{name is a type parameter in scope} \\
-\added{type alias} & \added{$\TypeAlias{\seq{\alpha}}{\tau}$} & \added{name denotes type $\tau$ with type parameters $\seq{\alpha}$} \\
+type parameter & $\TypeVar$ & name is a type parameter in scope \\
+type alias & $\TypeAlias{\seq{\alpha}}{\tau}$ & name denotes type $\tau$ with type parameters $\seq{\alpha}$ \\
 predefined name & $\predefName$ & name usable only in annotation or as decorator \\
 \end{tabular}
 \end{center}
@@ -60,8 +60,8 @@ predefined name & $\predefName$ & name usable only in annotation or as decorator
 
 \begin{definition}[Class]
 \label{def:class}
-A class $C$ is a \Replaced{fully-qualified}{fully qualified} name $\fq{q.c}$, written with a tilde: a module $q$ and a class name $c$ declared in $q$. A module
-declares each class name at most once, so the \Replaced{fully-qualified}{fully qualified} name of a class is the identity of the
+A class $C$ is a fully-qualified name $\fq{q.c}$, written with a tilde: a module $q$ and a class name $c$ declared in $q$. A module
+declares each class name at most once, so the fully-qualified name of a class is the identity of the
 class. A class is also the type of its instances.
 \end{definition}
 
@@ -74,14 +74,12 @@ $\dom(\Sigma)$, and the relation taking each class of $\Sigma$ to its base class
 acyclic.
 \end{definition}
 
-\noindent The class table is borrowed from Featherweight Java~\cite{igarashi2001}. Module references arise from import statements. \Replaced{A predefined name is a
+\noindent The class table is borrowed from Featherweight Java~\cite{igarashi2001}. Module references arise from import statements. A predefined name is a
 member, such as $\pyinline{Callable}$ or $\pyinline{dataclass}$, that cannot appear in an expression: it names a
-type, is applied to type arguments as in \pyinline{list[int]}, or decorates a class declaration.}{A predefined name is a
-member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expression may mention: it names a
-type, heads a type form, or decorates a class declaration.} \Added{A type parameter or type alias may likewise be
+type, is applied to type arguments as in \pyinline{list[int]}, or decorates a class declaration. A type parameter or type alias may likewise be
 mentioned only by a type expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias{\seq{\alpha}}{\tau}$ are
 named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \pyinline{typing.TypeAliasType} of
-the objects denoted by a class name, type parameter or alias at run time.} The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
+the objects denoted by a class name, type parameter or alias at run time. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
 and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
 is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A variable
 with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
@@ -107,12 +105,12 @@ otherwise right-biased like override. It is used in processing an import prefix,
 \label{sec:expressions-statements}
 
 Statements are sequenced by
-juxtaposition, $s\;s'$; \Replaced{a function body, branch of a conditional and body of a case are statements}{a function body, a branch of a conditional and the body of a case are statements}.
-A \emph{top-level statement} $t$ is a statement\Replaced{, class declaration or \pyinline{type} statement}{ or a class declaration}, also sequenced by juxtaposition; the body of a
-module after its imports is a top-level statement, so class declarations \Added{and \pyinline{type} statements} occur only at the top level of a
-module. \Added{A \pyinline{type} statement declares a \emph{type alias}. Function definitions, class declarations and
+juxtaposition, $s\;s'$; a function body, branch of a conditional and body of a case are statements.
+A \emph{top-level statement} $t$ is a statement, class declaration or \pyinline{type} statement, also sequenced by juxtaposition; the body of a
+module after its imports is a top-level statement, so class declarations and \pyinline{type} statements occur only at the top level of a
+module. A \pyinline{type} statement declares a \emph{type alias}. Function definitions, class declarations and
 \pyinline{type} statements bind \emph{type parameters} $\seq{\alpha}$, written in brackets after the name as in
-Python 3.12.} A \emph{mutual region} $d_1 \ldots d_{n+1}$ \Replaced{is a maximal contiguous block of \pyinline{def} statements}{is a maximal run of consecutive \pyinline{def} statements in a sequence}: any other statement separates mutual
+Python 3.12. A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal contiguous block of \pyinline{def} statements: any other statement separates mutual
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single mutual region. The well-formedness rules treat each
 mutual region as one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
@@ -123,16 +121,16 @@ mutual region as one mutually-recursive binding\paperonly{ (see \secref{mutual-r
 
 An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by
 keyword arguments $x = u$, where an argument $u$ is an expression in a constructor call and a pattern in a
-constructor pattern. \Added{A constructor call may also pass type arguments to the class; a constructor pattern
-cannot, since Python does not permit type arguments in a class pattern.} The auxiliary function $\fieldMap$
+constructor pattern. A constructor call may also pass type arguments to the class; a constructor pattern
+cannot, since Python does not permit type arguments in a class pattern. The auxiliary function $\fieldMap$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:field-map}}) pairs each field of the class
 with an argument: the positional arguments fill the leading fields in order, and a keyword argument $x = u$
-fills the field $x$. It is \Replaced{defined only if every field receives exactly one argument}{undefined unless every field receives exactly one argument}.
+fills the field $x$. It is defined only if every field receives exactly one argument.
 
 \paragraph{Type annotations.}
 
 Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
-may be annotated (\figref{syntax-types}). \Deleted{A type expression names a class by a qualified name; a class $\fq{q}$, written with a tilde, does not occur in source text.} \Added{A dataclass specifies its base class by a type expression of the form $q[\seq{\psi}]$.} \Replaced{A \emph{type} $\tau$ has the forms of a type expression, except that a class $C$ rather than a qualified name is applied to type arguments, written $C$ when there are none; the type system resolves a type expression to a type, expanding class names to classes and type aliases to types}{A \emph{type} $\tau$ is a type expression whose class names have been resolved to classes; the type system resolves a type expression into a type}\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
+may be annotated (\figref{syntax-types}). A dataclass specifies its base class by a type expression of the form $q[\seq{\psi}]$. A \emph{type} $\tau$ has the forms of a type expression, except that a class $C$ rather than a name is applied to type arguments, written $C$ when there are none; the type system resolves a type expression to a type, expanding class names to classes and type aliases to types\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
 \bind{x_n}{\psi_n}$.
 
 \subsubsection{Operators}

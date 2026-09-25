@@ -21,9 +21,9 @@ $s$ & $::=$ & $\exPass$ & (Pass) \\
 \grammarGroup{Top-level statements} \\
 $t$ & $::=$ & $s$ & (Stmt) \\
     & $\mid$ & $t\;t'$ & (TopSeq) \\
-    & $\mid$ & \replaced{$\exDataclass{c[\seq{\alpha}]}{\phi}$}{$\exDataclass{c}{\phi}$} & (Dataclass) \\
-    & $\mid$ & \replaced{$\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}$}{$\exDataclassExtend{c}{c'}{\phi}$} & (DataclassExtend) \\
-    & $\mid$ & \added{$\exTypeAlias{x[\seq{\alpha}]}{\psi}$} & \added{(TypeAlias)}
+    & $\mid$ & $\exDataclass{c[\seq{\alpha}]}{\phi}$ & (Dataclass) \\
+    & $\mid$ & $\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}$ & (DataclassExtend) \\
+    & $\mid$ & $\exTypeAlias{x[\seq{\alpha}]}{\psi}$ & (TypeAlias)
    \\[3mm]
 \grammarGroup{Imports} \\
 $\iota$ & $::=$ & $\exImport{q}$ & (Import) \\
@@ -39,11 +39,11 @@ $\phi$ & $::=$ & $\exField{x_1}{\psi_1} \;\ldots\; \exField{x_{n+1}}{\psi_{n+1}}
 \grammarGroup{Module bodies} \\
 $\mu$ & $::=$ & $\iota_1 \;\ldots\; \iota_n \;\; t$ & (ModuleBody)
    \\[3mm]
-\grammarGroup{\replaced{Names}{Qualified names}} \\
+\grammarGroup{Names} \\
 $q$ & $::=$ & $x_1.\cdots.x_{n+1}$ & (Name)
    \\[3mm]
 \grammarGroup{Function definitions} \\
-$d$ & $::=$ & \replaced{$\exDef{f[\seq{\alpha}]}{\bind{x_1}{\psi_1}, \ldots, \bind{x_n}{\psi_n}}{\exRetAnnot{\psi}}{s}$}{$\exDef{f}{\bind{x_1}{\psi_1}, \ldots, \bind{x_n}{\psi_n}}{\exRetAnnot{\psi}}{s}$} & (Def)
+$d$ & $::=$ & $\exDef{f[\seq{\alpha}]}{\bind{x_1}{\psi_1}, \ldots, \bind{x_n}{\psi_n}}{\exRetAnnot{\psi}}{s}$ & (Def)
 \end{tabular}
 \end{center}
 \caption{Modules and statements}
