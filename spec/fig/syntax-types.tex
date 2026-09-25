@@ -23,10 +23,22 @@ $\psi$ & $::=$ & $\nu$ & (Primitive) \\
     & $\mid$ & $\tyLiteral{-n}$ & (Negative literal) \\
     & $\mid$ & \added{$\alpha$} & \added{(TypeVar)} \\
     & $\mid$ & \replaced{$q[\psi_1, \ldots, \psi_n]$}{$q$} & \replaced{(TypeName)}{(ClassName)} \\
-    & $\mid$ & \replaced{$\fq{q}[\psi_1, \ldots, \psi_n]$}{$\fq{q}$} & (Class) \\
+    & $\mid$ & \deleted{$\fq{q}$} & \deleted{(Class)} \\
     & $\mid$ & $\tyUnion{\psi}{\psi'}$ & (Union)
+   \\[3mm]
+\grammarGroup{\added{Types}} \\
+\added{$\tau$} & \added{$::=$} & \added{$\nu$} & \added{(Primitive)} \\
+    & \added{$\mid$} & \added{$\tyList{\tau}$} & \added{(List)} \\
+    & \added{$\mid$} & \added{$\tyTuple{\tau_1, \ldots, \tau_n}$} & \added{(Tuple)} \\
+    & \added{$\mid$} & \added{$\tyDict{\tau}$} & \added{(Dict)} \\
+    & \added{$\mid$} & \added{$\tyCallable{\tau_1, \ldots, \tau_n}{\tau}$} & \added{(Callable)} \\
+    & \added{$\mid$} & \added{$\tyLiteral{\ell}$} & \added{(Literal)} \\
+    & \added{$\mid$} & \added{$\tyLiteral{-n}$} & \added{(Negative literal)} \\
+    & \added{$\mid$} & \added{$\alpha$} & \added{(TypeVar)} \\
+    & \added{$\mid$} & \added{$C[\tau_1, \ldots, \tau_n]$} & \added{(Class)} \\
+    & \added{$\mid$} & \added{$\tyUnion{\sigma}{\tau}$} & \added{(Union)}
 \end{tabular}
 \end{center}
-\caption{Type expressions}
+\caption{Type expressions \added{and types}}
 \label{fig:syntax-types}
 \end{figure}
