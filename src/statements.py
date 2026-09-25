@@ -444,7 +444,7 @@ def attr_module(parent: ModuleLoaded, x: Var, e: ast.Attribute) -> Type:
         case TypeAlias():
             raise IllFormedModule(e, reasons.TypeAliasAsValue(qualified_name(e)))
         case TypeVar():
-            raise AssertionError("type parameters are local to a definition or class")
+            raise AssertionError
         case Unbound():
             raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
         case DU():
