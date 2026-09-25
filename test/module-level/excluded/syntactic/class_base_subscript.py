@@ -6,8 +6,11 @@ class Base:
     value: int
 
 
+bases = (Base,)
+
+
 @dataclass
-class Derived(Base.__mro__[0]):
+class Derived(bases[0]):
     pass
 
 
