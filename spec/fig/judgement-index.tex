@@ -8,7 +8,7 @@ $\Sigma \vdash h : \tau$ & head $h$ has type $\tau$ & \figref{shapes} \\
 $\Sigma \vdash k : \tau$ & shape $k$ has type $\tau$ & \figref{shapes} \\
 $\Sigma; \Gamma \vdash k, p \splits K, L$ & shape $k$ splits at the head tested by $p$, giving $K$ and $L$ & \figref{split} \\
 $\Sigma; \Gamma \vdash k, p \matches K, L \binding \Delta$ & pattern $p$ matches shapes $K$ of $k$, leaving $L$ and binding $\Delta$ & \figref{typing-pat} \\
-$\Gamma \vdash q : \theta$ & qualified name $q$ denotes context entry $\theta$ & \figref{resolve-name} \\
+$\Gamma \vdash q : \theta$ & \replaced{name}{qualified name} $q$ denotes context entry $\theta$ & \figref{resolve-name} \\
 $\Sigma; \Gamma \vdash e \synth \tau$ & expression $e$ synthesises type $\tau$ & \figref{typing-synth} \\
 $\Sigma; \Gamma \vdash e \checks \tau$ & expression $e$ checks against type $\tau$ & \figref{typing-check} \\
 $\Sigma; \Gamma \vdash \seq{g} : \Delta$ & comprehension qualifiers $\seq{g}$ are well-formed and bind $\Delta$ & \figref{typing-check} \\

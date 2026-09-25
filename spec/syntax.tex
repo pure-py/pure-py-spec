@@ -33,7 +33,7 @@ between brackets; the empty tuple type, for example, is written \pyinline{tuple[
 \subsection{Contexts}
 \label{sec:contexts}
 
-Metavariables $x$, $f$\Replaced{, $c$ and $\alpha$}{ and $c$} range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function\Replaced{, $c$ when it is expected to denote a class, and $\alpha$ when it is a type parameter}{ and $c$ when it is expected to denote a class}. A \emph{qualified name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}); a variable is thus a qualified name with a single component.
+Metavariables $x$, $f$\Replaced{, $c$ and $\alpha$}{ and $c$} range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function\Replaced{, $c$ when it is expected to denote a class, and $\alpha$ when it is a type parameter}{ and $c$ when it is expected to denote a class}. \Replaced{A \emph{name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}): a variable is a \emph{simple name}, and a name with at least one dot is \emph{qualified}. A name is \emph{fully qualified} when it is read from the root of the module hierarchy, as are the names of modules (\secref{modules-programs}) and classes (Definition~\ref{def:class}).}{A \emph{qualified name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}); a variable is thus a qualified name with a single component.}
 
 \begin{definition}[Context]
 \label{def:context}
@@ -150,10 +150,10 @@ which follow Python.
 \subsection{Modules and programs}
 \label{sec:modules-programs}
 
-A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
+A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully\Replaced{ }{-}qualified module names}
 (\figref{syntax-stmt}) to \emph{module bodies} $\mu$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
-$\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
+$\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully\Replaced{ }{-}qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
 $\seq{\iota}$, its \emph{import prefix}, followed by a top-level statement $t$; since imports are not statements, they can appear neither
 within a statement nor after it. The statement begins with the
 assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$, which binds the name of the module when the module
