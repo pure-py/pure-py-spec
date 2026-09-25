@@ -12,7 +12,7 @@
 \and
 \inferrule*[lab={\ruleName{subty-class}}]
 {
-  \replaced{D[\seq{\sigma}] \in \ancestors(\Sigma, C[\seq{\tau}])}{D \in \ancestors(\Sigma, C)}
+  \replaced{D[\seq{\sigma}] \in \tyInst{\ancestors(\Sigma, C)}{\seq{\tau}}}{D \in \ancestors(\Sigma, C)}
 }
 {
   \Sigma \vdash \replaced{C[\seq{\tau}] \subty D[\seq{\sigma}]}{C \subty D}

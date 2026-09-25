@@ -102,9 +102,11 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 
 \input{spec/fig/typing-synth}
 
-The fields of a class $C$ form a sequence $\fields(\Sigma, C)$ of bindings $\bind{x}{\tau}$, one per
+\Replaced{The fields of a class $C$ form a scheme $\fields(\Sigma, C)$ over its type parameters, whose body is a sequence of bindings $\bind{x}{\tau}$, one per
+field: the fields of its base class first, recursively and instantiated at the type arguments of the base, then the fields declared by $C$ itself, each at its
+declared type; an instantiated class $C[\seq{\tau}]$ has the fields $\tyInst{\fields(\Sigma, C)}{\seq{\tau}}$.}{The fields of a class $C$ form a sequence $\fields(\Sigma, C)$ of bindings $\bind{x}{\tau}$, one per
 field: the fields of its base class first, recursively, then the fields declared by $C$ itself, each at its
-declared type. The order matters, because a constructor call pairs positional arguments with fields by
+declared type.} The order matters, because a constructor call pairs positional arguments with fields by
 position. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to
 (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must
@@ -186,7 +188,7 @@ defined:
 & \Sigma \vdash \tyDict{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \\
 & \Sigma \vdash \tyTuple{\seq{\tau}} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau_i \eqType \quad (\forall i) \\
 & \Sigma \vdash \tyUnion{\sigma}{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \sigma \eqType \text{ and } \Sigma \vdash \tau \eqType \\
-& \Sigma \vdash \replaced{C[\seq{\sigma}]}{C} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \fields(\Sigma, \replaced{C[\seq{\sigma}]}{C})
+& \Sigma \vdash \replaced{C[\seq{\sigma}]}{C} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \replaced{\tyInst{\fields(\Sigma, C)}{\seq{\sigma}}}{\fields(\Sigma, C)}
 \end{defalign}
 
 \noindent A callable type is not an equality type, and neither is any type with a callable component, so

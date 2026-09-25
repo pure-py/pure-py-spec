@@ -1,4 +1,2 @@
-\ancestors(\Sigma, C) &\;= \set{C} && \text{if } \Sigma(C) = \replaced{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{\bot}}{(\bind{\seq{x}}{\seq{\tau}};\, \bot)} \\*
-\ancestors(\Sigma, C) &\;= \set{C} \cup \ancestors(\Sigma, D) && \text{if } \Sigma(C) = \replaced{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{D[\seq{\sigma}]}}{(\bind{\seq{x}}{\seq{\tau}};\, D)} \\*
-\added{\ancestors(\Sigma, C[\seq{\tau}])} &\added{\;= \set{C[\seq{\tau}]}} && \added{\text{if } \Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\upsilon}}}{\bot}} \\*
-\added{\ancestors(\Sigma, C[\seq{\tau}])} &\added{\;= \set{C[\seq{\tau}]} \cup \ancestors(\Sigma, \subst{\seq{\tau}}{\seq{\alpha}}{D[\seq{\sigma}]})} && \added{\text{if } \Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\upsilon}}}{D[\seq{\sigma}]}}
+\ancestors(\Sigma, C) &\;= \replaced{\tyScheme{\seq{\alpha}}{\set{C[\seq{\alpha}]}}}{\set{C}} && \text{if } \Sigma(C) = \replaced{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{\bot}}{(\bind{\seq{x}}{\seq{\tau}};\, \bot)} \\*
+\ancestors(\Sigma, C) &\;= \replaced{\tyScheme{\seq{\alpha}}{(\set{C[\seq{\alpha}]} \cup \tyInst{\ancestors(\Sigma, D)}{\seq{\sigma}})}}{\set{C} \cup \ancestors(\Sigma, D)} && \text{if } \Sigma(C) = \replaced{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{D[\seq{\sigma}]}}{(\bind{\seq{x}}{\seq{\tau}};\, D)}
