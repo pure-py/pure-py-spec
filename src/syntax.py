@@ -202,7 +202,9 @@ def check_syntax_classdef(node: ast.ClassDef) -> None:
     if len(node.bases) > 0:
         base = node.bases[0]
         if not isinstance(parse_annotation(base), TypeName):
-            raise Prohibited(base, "base class must be a qualified name applied to type arguments")
+            raise Prohibited(
+                base, "base class must be a qualified name, optionally applied to type arguments"
+            )
         check_syntax_annotation(base)
     if len(node.keywords) > 0:
         raise Prohibited(node, "class keyword arguments prohibited")

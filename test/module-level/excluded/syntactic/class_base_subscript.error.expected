@@ -1,1 +1,1 @@
-base class must be a qualified name applied to type arguments
+base class must be a qualified name, optionally applied to type arguments
