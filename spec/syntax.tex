@@ -74,9 +74,11 @@ $\dom(\Sigma)$, and the relation taking each class of $\Sigma$ to its base class
 acyclic.
 \end{definition}
 
-\noindent The class table is borrowed from Featherweight Java~\cite{igarashi2001}. Module references arise from import statements. A predefined name is a
+\noindent The class table is borrowed from Featherweight Java~\cite{igarashi2001}. Module references arise from import statements. \Replaced{A predefined name is a
+member, such as $\pyinline{Callable}$ or $\pyinline{dataclass}$, that cannot appear in an expression: it names a
+type, is applied to type arguments as in \pyinline{list[int]}, or decorates a class declaration.}{A predefined name is a
 member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expression may mention: it names a
-type, heads a type form, or decorates a class declaration. \Added{A type parameter and a type alias may likewise be
+type, heads a type form, or decorates a class declaration.} \Added{A type parameter and a type alias may likewise be
 mentioned only by a type expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias{\seq{\alpha}}{\tau}$ are
 named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \pyinline{typing.TypeAliasType} of
 the objects that a class name, a type parameter and an alias name denote at run time.} The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
