@@ -112,8 +112,7 @@ A \emph{top-level statement} $t$ is a statement\Replaced{, a class declaration o
 module after its imports is a top-level statement, so class declarations \Added{and \pyinline{type} statements} occur only at the top level of a
 module. \Added{A function definition, a class declaration and a \pyinline{type} statement bind \emph{type parameters}
 $\seq{\alpha}$, written in brackets after the name as in Python 3.12. A \pyinline{type} statement declares a
-\emph{type alias}, and the base class of a dataclass is a qualified name applied to type arguments.} A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal
-run of consecutive \pyinline{def} statements in a sequence: any other statement separates mutual
+\emph{type alias}, and the base class of a dataclass is a qualified name applied to type arguments.} A \emph{mutual region} $d_1 \ldots d_{n+1}$ \Replaced{is a maximal non-empty sequence of consecutive \pyinline{def} statements}{is a maximal run of consecutive \pyinline{def} statements in a sequence}: any other statement separates mutual
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single mutual region. The well-formedness rules treat each
 mutual region as one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
@@ -125,7 +124,7 @@ mutual region as one mutually-recursive binding\paperonly{ (see \secref{mutual-r
 An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by
 keyword arguments $x = u$, where an argument $u$ is an expression in a constructor call and a pattern in a
 constructor pattern. \Added{A constructor call also passes type arguments to the class; a constructor pattern
-cannot, since Python admits only a name in a class pattern.} The auxiliary function $\fieldMap$
+cannot, since Python permits only a name in a class pattern.} The auxiliary function $\fieldMap$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:field-map}}) pairs each field of the class
 with an argument: the positional arguments fill the leading fields in order, and a keyword argument $x = u$
 fills the field $x$. It is undefined unless every field receives exactly one argument.
