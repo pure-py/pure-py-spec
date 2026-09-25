@@ -22,6 +22,14 @@ class Primitive(Enum):
     SIZED = "Sized"
 
 
+class TypeConstructor(Enum):
+    LIST = "list"
+    TUPLE = "tuple"
+    DICT = "dict"
+    CALLABLE = "Callable"
+    LITERAL = "Literal"
+
+
 type Var = str
 
 
@@ -231,18 +239,18 @@ def dotted_name(e: ast.expr) -> QualifiedName | None:
 
 def parse_subscript(e: ast.Subscript) -> TypeExpr | None:
     head = e.value.id if isinstance(e.value, ast.Name) else None
-    if head == "Literal":
+    if head == TypeConstructor.LITERAL.value:
         return literal_type(e.slice)
-    if head == "Callable":
+    if head == TypeConstructor.CALLABLE.value:
         return parse_callable(subscript_args(e.slice))
     args = parse_annotations(subscript_args(e.slice))
     if args is None:
         return None
-    if head == "list":
+    if head == TypeConstructor.LIST.value:
         return ListExpr(args[0]) if len(args) == 1 else None
-    if head == "tuple":
+    if head == TypeConstructor.TUPLE.value:
         return TupleExpr(args)
-    if head == "dict":
+    if head == TypeConstructor.DICT.value:
         return DictExpr(args[1]) if len(args) == 2 and args[0] == Primitive.STR else None
     q = dotted_name(e.value)
     return None if q is None else TypeName(q, args)
