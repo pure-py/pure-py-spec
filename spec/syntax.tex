@@ -81,7 +81,7 @@ member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expressio
 type, heads a type form, or decorates a class declaration.} \Added{A type parameter or type alias may likewise be
 mentioned only by a type expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias{\seq{\alpha}}{\tau}$ are
 named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \pyinline{typing.TypeAliasType} of
-the objects denoted at run time by a class name, type parameter or alias name.} The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
+the objects denoted by a class name, type parameter or alias name at run time.} The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
 and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
 is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A variable
 with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
