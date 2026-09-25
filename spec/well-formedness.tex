@@ -296,7 +296,7 @@ evaluation rules a tuple pattern matches only a tuple and a list pattern matches
 Python matches both forms of pattern against both kinds of value\speconly{ (\figref{eval-pat})}. A tuple pattern is therefore sequence-safe only at a type with no list values, and a list pattern only
 at a type with no tuple values. A union has the values of its members, so both kinds of pattern fail the condition
 at $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$, and at $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$,
-since $\tySized$ has both list and tuple values.
+since $\tySized$ has both list and tuple values\Added{, as does a type variable, which may stand for any type}.
 
 \subsection{Pattern matching}
 \label{sec:exhaustiveness}
