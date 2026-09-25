@@ -409,10 +409,10 @@
 \inferrule*[lab={\ruleName{eval-call-def}}]
 {
   \rho, e \Rightarrow \val{\exDefClosure[\Delta]{\rho'}{\seq{d}}{j}} \\
-  d_i = \exDef{f_i\added{[\seq{\alpha}_i]}}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \quad (\forall i) \\
+  \replaced{d_j = \exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}}{d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \quad (\forall i)} \\
   v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
-  \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}} \override \scopeS(\set{\seq{x}_j}, s_j), s_j \Rightarrow o
+  \rho' \override \set{\bind{\replaced{\declaresS(\seq{d})}{\seq{f}}}{\seq{v}}} \override \set{\bind{\replaced{\seq{x}}{\seq{x}_j}}{\seq{u}}} \override \scopeS(\set{\replaced{\seq{x}}{\seq{x}_j}}, \replaced{s}{s_j}), \replaced{s}{s_j} \Rightarrow o
 }
 {
   \rho, \exCall{e}{\seq{e}} \Rightarrow \result(o)
