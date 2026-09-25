@@ -117,7 +117,7 @@ def fv_comprehension(elts: list[ast.expr], generators: list[ast.comprehension]) 
 
 def dict_keys(e: ast.Dict) -> list[ast.expr]:
     keys = [k for k in e.keys if k is not None]
-    assert len(keys) == len(e.keys), "dict unpacking rejected by syntax check"
+    assert len(keys) == len(e.keys)
     return keys
 
 
@@ -301,9 +301,9 @@ def own_fields(node: ast.ClassDef) -> tuple[tuple[Var, TypeExpr], ...]:
 
 
 def type_expr(annotation: ast.expr | None) -> TypeExpr:
-    assert annotation is not None, "missing annotation rejected by syntax check"
+    assert annotation is not None
     t = parse_annotation(annotation)
-    assert t is not None, "unsupported annotation rejected by syntax check"
+    assert t is not None
     return t
 
 

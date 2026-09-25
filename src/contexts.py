@@ -202,9 +202,7 @@ def declared_type_of(theta: ContextEntry) -> Type:
         case PU(tau):
             return tau
         case _:
-            assert not isinstance(theta, (Unbound, *NON_VARIABLE_ENTRIES)), (
-                "merged entries are assigned or declared variables"
-            )
+            assert not isinstance(theta, (Unbound, *NON_VARIABLE_ENTRIES))
             return theta
 
 

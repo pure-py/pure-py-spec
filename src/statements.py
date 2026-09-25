@@ -109,7 +109,7 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
             check_in_scope("Literal", node, mod_ctx)
             return psi
         case TypeName(q, args):
-            assert len(args) == 0, "type arguments are rejected by the syntax stage"
+            assert len(args) == 0
             c = resolve_name(q, mod_ctx)
             if isinstance(c, Unbound):
                 raise IllFormedModule(node, reasons.UnboundName(str(q)))
@@ -155,7 +155,7 @@ def check_top_seq(ts: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
         return mod_ctx
     t, t_ = ts[0], ts[1:]
     r, Sigma = check_top_statement(t, mod_ctx)
-    assert isinstance(r, Assigns), "top-level return rejected by check_stmt"
+    assert isinstance(r, Assigns)
     delta = r.delta
     mod_ctx_after = override_gamma(replace(mod_ctx, Sigma=Sigma), delta)
     if len(t_) == 0:
@@ -264,9 +264,7 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
                 ):
                     raise IllFormedModule(s, reasons.Redeclaration(x))
                 case _:
-                    assert x in mod_ctx.gamma, (
-                        "name assigned in scope pre-populated by def or module"
-                    )
+                    assert x in mod_ctx.gamma
                     raise IllFormedModule(s, reasons.Reassignment(x))
         case ast.AnnAssign():
             assert isinstance(s.target, ast.Name)
@@ -744,7 +742,7 @@ def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, C
     base: Class | None = None
     if len(node.bases) > 0:
         q = dotted_name(node.bases[0])
-        assert q is not None, "base class checked by the syntax stage"
+        assert q is not None
         theta = resolve_name(q, mod_ctx)
         if not isinstance(theta, Class):
             raise IllFormedModule(node, reasons.NotClass(q))
@@ -753,5 +751,5 @@ def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, C
         if len(duplicates) > 0:
             raise IllFormedModule(node, reasons.DuplicateField(min(duplicates), node.name))
     c = Class(qualified(mod_ctx.q, node.name))
-    assert c not in mod_ctx.Sigma, "redeclaration rejected by class rule"
+    assert c not in mod_ctx.Sigma
     return c, {**mod_ctx.Sigma, c: ClassTableEntry(own_fields=own, base=base)}
