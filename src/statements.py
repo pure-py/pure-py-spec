@@ -499,7 +499,7 @@ def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) ->
 def tuple_subscript_type(container: TupleType, index: ast.expr, mod_ctx: ModuleContext) -> Type:
     m = len(container.components)
     actual = synth_expr(index, mod_ctx)
-    i = literal_index(actual)
+    i = integer_literal(actual)
     if i is None:
         if actual != Primitive.INT:
             raise IllFormedModule(index, reasons.TypeMismatch(Primitive.INT, actual))
@@ -509,7 +509,7 @@ def tuple_subscript_type(container: TupleType, index: ast.expr, mod_ctx: ModuleC
     return container.components[i]
 
 
-def literal_index(tau: Type) -> int | None:
+def integer_literal(tau: Type) -> int | None:
     if not isinstance(tau, LiteralType):
         return None
     v = tau.ell.value
