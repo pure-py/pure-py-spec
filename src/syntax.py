@@ -459,7 +459,7 @@ def check_syntax_annotation(node: ast.expr | None) -> None:
         return
     psi = parse_annotation(node)
     if psi is None:
-        raise Prohibited(node, "annotation of unrecognised form")
+        raise Prohibited(node, "annotation that is not a type expression")
     if has_type_arguments(psi):
         raise NotYetSupported(node, "type arguments", 187)
 
