@@ -107,12 +107,12 @@ otherwise right-biased like override. It is used in processing an import prefix,
 \label{sec:expressions-statements}
 
 Statements are sequenced by
-juxtaposition, $s\;s'$; a function body, a branch of a conditional and the body of a case are statements.
-A \emph{top-level statement} $t$ is a statement\Replaced{, a class declaration or a \pyinline{type} statement}{ or a class declaration}, also sequenced by juxtaposition; the body of a
+juxtaposition, $s\;s'$; \Replaced{a function body, branch of a conditional and body of a case are statements}{a function body, a branch of a conditional and the body of a case are statements}.
+A \emph{top-level statement} $t$ is a statement\Replaced{, class declaration or \pyinline{type} statement}{ or a class declaration}, also sequenced by juxtaposition; the body of a
 module after its imports is a top-level statement, so class declarations \Added{and \pyinline{type} statements} occur only at the top level of a
-module. \Added{A function definition, a class declaration and a \pyinline{type} statement bind \emph{type parameters}
-$\seq{\alpha}$, written in brackets after the name as in Python 3.12. A \pyinline{type} statement declares a
-\emph{type alias}, and the base class of a dataclass is a qualified name applied to type arguments.} A \emph{mutual region} $d_1 \ldots d_{n+1}$ \Replaced{is a maximal non-empty sequence of consecutive \pyinline{def} statements}{is a maximal run of consecutive \pyinline{def} statements in a sequence}: any other statement separates mutual
+module. \Added{A \pyinline{type} statement declares a \emph{type alias}. A function definition, class declaration and
+\pyinline{type} statement bind \emph{type parameters} $\seq{\alpha}$, written in brackets after the name as in
+Python 3.12.} A \emph{mutual region} $d_1 \ldots d_{n+1}$ \Replaced{is a maximal non-empty sequence of consecutive \pyinline{def} statements}{is a maximal run of consecutive \pyinline{def} statements in a sequence}: any other statement separates mutual
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single mutual region. The well-formedness rules treat each
 mutual region as one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
@@ -127,12 +127,12 @@ constructor pattern. \Added{A constructor call also passes type arguments to the
 cannot, since Python permits only a name in a class pattern.} The auxiliary function $\fieldMap$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:field-map}}) pairs each field of the class
 with an argument: the positional arguments fill the leading fields in order, and a keyword argument $x = u$
-fills the field $x$. It is undefined unless every field receives exactly one argument.
+fills the field $x$. It is \Replaced{defined if and only if every field receives exactly one argument}{undefined unless every field receives exactly one argument}.
 
 \paragraph{Type annotations.}
 
 Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
-may be annotated (\figref{syntax-types}). A type expression names a class \Added{or a type alias} by a qualified name\Added{ applied to type arguments, and a type parameter by its variable}; a class $\fq{q}$, written with a tilde, does not occur in source text. A \emph{type} $\tau$ is a type expression whose class names have been resolved to classes\Added{ and which does not mention any alias}; the type system resolves a type expression into a type\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
+may be annotated (\figref{syntax-types}). A type expression names a class \Added{or type alias} by a qualified name\Added{ applied to type arguments, and a type parameter by its variable}; a class $\fq{q}$, written with a tilde, does not occur in source text. \Added{The base class of a dataclass is also a qualified name applied to type arguments.} A \emph{type} $\tau$ is a type expression whose class names have been resolved to classes\Added{ and which does not mention any alias}; the type system resolves a type expression into a type\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
 \bind{x_n}{\psi_n}$.
 
 \subsubsection{Operators}

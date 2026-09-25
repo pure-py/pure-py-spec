@@ -2,7 +2,7 @@ The auxiliary functions used by the rules are summarised in \figref{auxiliary-fu
 \specification.
 A dataclass names its fields in a fixed order, and a constructor supplies each field exactly once,
 positionally or by keyword. The metafunction $\fieldMap(\Sigma, C, \seq{u})$ maps each field of $C$ to the argument supplied for that field,
-and is undefined if the arguments do not cover the fields exactly. Constructor patterns and expressions
+and is \Replaced{defined if and only if the arguments cover the fields exactly}{undefined if the arguments do not cover the fields exactly}. Constructor patterns and expressions
 use it to check and evaluate field-by-field, so the rules do not depend on the split of the arguments between positional and
 keyword.
 
