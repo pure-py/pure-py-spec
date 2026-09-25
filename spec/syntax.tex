@@ -112,7 +112,7 @@ A \emph{top-level statement} $t$ is a statement\Replaced{, class declaration or 
 module after its imports is a top-level statement, so class declarations \Added{and \pyinline{type} statements} occur only at the top level of a
 module. \Added{A \pyinline{type} statement declares a \emph{type alias}. Function definitions, class declarations and
 \pyinline{type} statements bind \emph{type parameters} $\seq{\alpha}$, written in brackets after the name as in
-Python 3.12.} A \emph{mutual region} $d_1 \ldots d_{n+1}$ \Replaced{is a maximal non-empty sequence of consecutive \pyinline{def} statements}{is a maximal run of consecutive \pyinline{def} statements in a sequence}: any other statement separates mutual
+Python 3.12.} A \emph{mutual region} $d_1 \ldots d_{n+1}$ \Replaced{is a maximal contiguous block of \pyinline{def} statements}{is a maximal run of consecutive \pyinline{def} statements in a sequence}: any other statement separates mutual
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single mutual region. The well-formedness rules treat each
 mutual region as one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
