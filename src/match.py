@@ -36,12 +36,13 @@ from type_syntax import (
     ClassType,
     DictType,
     ListType,
+    Literal,
     LiteralType,
     Primitive,
     TupleType,
     Type,
     UnionType,
-    literal_type,
+    literal,
 )
 
 type Match = tuple[Shapes, Shapes, VarContext]
@@ -98,10 +99,10 @@ def match_split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | Non
     return matched, residual + residual_, delta
 
 
-def match_literal(k: Shape, ell: LiteralType) -> Match | None:
+def match_literal(k: Shape, ell: Literal) -> Match | None:
     match k:
         case Rest(tau, hs):
-            if tau == ell:
+            if tau == LiteralType(ell):
                 assert len(hs) == 0
                 return (k,), (), {}
             return None
@@ -188,11 +189,15 @@ def split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Split | None:
             assert False
 
 
-def split_literal(Sigma: ClassTable, k: Shape, ell: LiteralType) -> Split | None:
+def split_literal(Sigma: ClassTable, k: Shape, ell: Literal) -> Split | None:
     match k:
         case Rest(tau, hs):
-            if ell not in hs and subtype(Sigma, ell, tau) and not isinstance(tau, LiteralType):
-                return (Rest(ell, frozenset()),), shapes(Sigma, tau, hs | {ell})
+            if (
+                ell not in hs
+                and subtype(Sigma, LiteralType(ell), tau)
+                and not isinstance(tau, LiteralType)
+            ):
+                return (Rest(LiteralType(ell), frozenset()),), shapes(Sigma, tau, hs | {ell})
             return None
         case _:
             return None
@@ -422,13 +427,13 @@ def string_literal(k: ast.expr) -> str:
     return k.value
 
 
-def literal_of(p: ast.pattern) -> LiteralType:
+def literal_of(p: ast.pattern) -> Literal:
     match p:
         case ast.MatchSingleton():
-            return LiteralType(p.value)
+            return Literal(p.value)
         case ast.MatchValue(value=e):
-            tau = literal_type(e)
-            assert tau is not None
-            return tau
+            ell = literal(e)
+            assert ell is not None
+            return ell
         case _:
             assert False

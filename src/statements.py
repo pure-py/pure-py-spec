@@ -371,7 +371,9 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             assert tau is not None
             return tau
         case ast.Constant():
-            return LiteralType(e.value)
+            tau = literal_type(e)
+            assert tau is not None
+            return tau
         case ast.Lambda():
             raise IllFormedModule(e, reasons.NotSynthesised())
         case ast.Call():
@@ -509,7 +511,7 @@ def tuple_subscript_type(container: TupleType, index: ast.expr, mod_ctx: ModuleC
 def literal_index(tau: Type) -> int | None:
     if not isinstance(tau, LiteralType):
         return None
-    v = tau.value
+    v = tau.ell.value
     return v if isinstance(v, int) and not isinstance(v, bool) else None
 
 
