@@ -1,1 +1,1 @@
-type statement only at module top level
+type statement outside the module top level prohibited
