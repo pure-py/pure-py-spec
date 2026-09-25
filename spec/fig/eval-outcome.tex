@@ -693,9 +693,9 @@
 \inferrule*[lab={\ruleName{eval-call-def-arity}}]
 {
   \rho, e \Rightarrow \val{\exDefClosure[\Delta]{\rho'}{\seq{d}}{j}} \\
-  d_j = \exDef{f_j\added{[\seq{\alpha}_j]}}{\bind{\seq{x}_j}{\seq{\psi}_j}}{\exRetAnnot{\psi_j}}{s_j} \\
+  d_j = \replaced{\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}}{\exDef{f_j}{\bind{\seq{x}_j}{\seq{\psi}_j}}{\exRetAnnot{\psi_j}}{s_j}} \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
-  |\seq{x}_j| \neq |\seq{u}|
+  |\replaced{\seq{x}}{\seq{x}_j}| \neq |\seq{u}|
 }
 {
   \rho, \exCall{e}{\seq{e}} \Rightarrow \aborts{\errType}
