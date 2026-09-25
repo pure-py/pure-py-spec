@@ -44,7 +44,6 @@ class TypeAlias:
     tau: Type
 
 
-# Lazily evaluated, so these may name Class before it is defined.
 type VarEntry = Unbound | DU | PU | Type
 type ContextEntry = (
     VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName | TypeVar | TypeAlias
