@@ -509,7 +509,7 @@ def tuple_subscript_type(container: TupleType, index: ast.expr, mod_ctx: ModuleC
     return container.components[i]
 
 
-# Used only to choose among the tuple subscript rules.
+# Used to choose among the tuple subscript rules.
 def integer_literal(tau: Type) -> int | None:
     if not isinstance(tau, LiteralType):
         return None
