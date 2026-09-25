@@ -230,12 +230,14 @@ def check_syntax_type_params(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlia
     for param in node.type_params:
         match param:
             case ast.TypeVar():
+                if isinstance(param.bound, ast.Tuple):
+                    raise Prohibited(param, f"constraints on type parameter {param.name}")
                 if param.bound is not None:
-                    raise Prohibited(param, "type parameter bounds and constraints")
+                    raise Prohibited(param, f"bound on type parameter {param.name}")
             case ast.ParamSpec():
-                raise Prohibited(param, "ParamSpec")
+                raise Prohibited(param, f"ParamSpec type parameter **{param.name}")
             case ast.TypeVarTuple():
-                raise Prohibited(param, "TypeVarTuple")
+                raise Prohibited(param, f"TypeVarTuple type parameter *{param.name}")
             case _:
                 raise AssertionError(f"unexpected type parameter: {type(param).__name__}")
 
