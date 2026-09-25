@@ -2,12 +2,12 @@ import ast
 from itertools import dropwhile, takewhile
 
 from type_syntax import (
-    QualifiedName,
+    Name,
     TypeExpr,
     Var,
     dotted_name,
     parse_annotation,
-    parse_qualified,
+    parse_name,
     root,
 )
 
@@ -245,7 +245,7 @@ def declares(s: ast.stmt) -> list[tuple[Var, ast.stmt]]:
             return [(x, s)]
         case ast.Import():
             (alias,) = s.names
-            return [(root(parse_qualified(alias.name)), s)]
+            return [(root(parse_name(alias.name)), s)]
         case ast.ImportFrom():
             return [(alias.name, s) for alias in s.names]
         case _:
@@ -307,7 +307,7 @@ def type_expr(annotation: ast.expr | None) -> TypeExpr:
     return t
 
 
-def qualified_name(e: ast.expr) -> QualifiedName:
+def name_of(e: ast.expr) -> Name:
     q = dotted_name(e)
     assert q is not None
     return q

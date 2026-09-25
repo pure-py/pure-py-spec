@@ -1,12 +1,12 @@
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
-from type_syntax import QualifiedName, Type, Var
+from type_syntax import Name, Type, Var
 
 
 @dataclass(frozen=True)
 class Class:
-    name: QualifiedName
+    name: Name
 
     def __repr__(self) -> str:
         return f"Class({self.name})"

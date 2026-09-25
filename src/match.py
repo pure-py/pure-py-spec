@@ -3,7 +3,7 @@ from collections.abc import Callable, Iterable
 from itertools import product
 
 import reasons
-from aux import qualified_name
+from aux import name_of
 from classes import Class, ClassTable, declared_type, field_map, fields, short_name
 from contexts import (
     ModuleContext,
@@ -276,7 +276,7 @@ def split_subclass(Sigma: ClassTable, k: Constr, c: Class) -> Split | None:
 def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
     c = class_of_name(p.cls, mod_ctx)
     if c is None:
-        raise IllFormedModule(p, reasons.NotClass(qualified_name(p.cls)))
+        raise IllFormedModule(p, reasons.NotClass(name_of(p.cls)))
     return c
 
 

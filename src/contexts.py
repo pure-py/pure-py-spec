@@ -7,14 +7,14 @@ from subtyping import join_seq
 from type_syntax import (
     CallableType,
     ListType,
+    Name,
     Primitive,
-    QualifiedName,
     Type,
     TypeConstructor,
     Var,
     dotted_name,
     parent,
-    parse_qualified,
+    parse_name,
     root,
 )
 
@@ -60,12 +60,12 @@ class PredefinedName:
 
 @dataclass(frozen=True)
 class ModuleStub:
-    q: QualifiedName
+    q: Name
 
 
 @dataclass(frozen=True)
 class ModuleLoaded:
-    q: QualifiedName
+    q: Name
     members: Context
 
 
@@ -75,8 +75,8 @@ NON_VARIABLE_ENTRIES = (ModuleStub, ModuleLoaded, Class, PredefinedName, TypeVar
 @dataclass(frozen=True)
 class ModuleContext:
     gamma: Context
-    M: Mapping[QualifiedName, ast.Module]
-    q: QualifiedName
+    M: Mapping[Name, ast.Module]
+    q: Name
     Sigma: ClassTable
 
 
@@ -102,7 +102,7 @@ def is_assigned(mod_ctx: ModuleContext, x: Var) -> bool:
     return assigned_type(mod_ctx, x) is not None
 
 
-def resolve_name(q: QualifiedName, mod_ctx: ModuleContext) -> ContextEntry | None:
+def resolve_name(q: Name, mod_ctx: ModuleContext) -> ContextEntry | None:
     q_ = parent(q)
     if q_ is None:
         return mod_ctx.gamma.get(root(q))
@@ -172,12 +172,12 @@ PREDEFINED_MEMBERS: dict[str, Context] = {
     "dataclasses": {"dataclass": PredefinedName()},
 }
 
-PREDEFINED_MODULES = {parse_qualified(name) for name in PREDEFINED_MEMBERS}
-BUILTINS = parse_qualified("builtins")
-MAIN = parse_qualified("__main__")
+PREDEFINED_MODULES = {parse_name(name) for name in PREDEFINED_MEMBERS}
+BUILTINS = parse_name("builtins")
+MAIN = parse_name("__main__")
 
 
-def predefined_context(q: QualifiedName) -> Context:
+def predefined_context(q: Name) -> Context:
     return {**PREDEFINED_MEMBERS[str(q)], "__name__": Primitive.STR}
 
 

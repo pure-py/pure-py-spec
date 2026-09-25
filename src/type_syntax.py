@@ -34,39 +34,39 @@ type Var = str
 
 
 @dataclass(frozen=True)
-class QualifiedName:
+class Name:
     parts: tuple[Var, ...]
 
     def __str__(self) -> str:
         return ".".join(self.parts)
 
 
-def parse_qualified(name: str) -> QualifiedName:
-    return QualifiedName(tuple(name.split(".")))
+def parse_name(name: str) -> Name:
+    return Name(tuple(name.split(".")))
 
 
-def qualified(q: QualifiedName, x: Var) -> QualifiedName:
-    return QualifiedName(q.parts + (x,))
+def qualified(q: Name, x: Var) -> Name:
+    return Name(q.parts + (x,))
 
 
-def root(q: QualifiedName) -> Var:
+def root(q: Name) -> Var:
     return q.parts[0]
 
 
-def parent(q: QualifiedName) -> QualifiedName | None:
-    return QualifiedName(q.parts[:-1]) if len(q.parts) > 1 else None
+def parent(q: Name) -> Name | None:
+    return Name(q.parts[:-1]) if len(q.parts) > 1 else None
 
 
-def prefix_of(p: QualifiedName, q: QualifiedName) -> bool:
+def prefix_of(p: Name, q: Name) -> bool:
     return q.parts[: len(p.parts)] == p.parts
 
 
-def proper_prefix_of(p: QualifiedName, q: QualifiedName) -> bool:
+def proper_prefix_of(p: Name, q: Name) -> bool:
     return p != q and prefix_of(p, q)
 
 
-def proper_prefixes(q: QualifiedName) -> list[QualifiedName]:
-    return [QualifiedName(q.parts[:i]) for i in range(1, len(q.parts))]
+def proper_prefixes(q: Name) -> list[Name]:
+    return [Name(q.parts[:i]) for i in range(1, len(q.parts))]
 
 
 @dataclass(frozen=True, eq=False)
@@ -115,7 +115,7 @@ class CallableExpr:
 
 @dataclass(frozen=True)
 class TypeName:
-    q: QualifiedName
+    q: Name
     args: tuple[TypeExpr, ...]
 
 
@@ -213,7 +213,7 @@ def parse_annotation(e: ast.expr) -> TypeExpr | None:
         case ast.Name(id=x):
             return next(
                 (nu for nu in Primitive if nu.value == x),
-                TypeName(QualifiedName((x,)), ()),
+                TypeName(Name((x,)), ()),
             )
         case ast.Attribute():
             q = dotted_name(e)
@@ -226,10 +226,10 @@ def parse_annotation(e: ast.expr) -> TypeExpr | None:
             return None
 
 
-def dotted_name(e: ast.expr) -> QualifiedName | None:
+def dotted_name(e: ast.expr) -> Name | None:
     match e:
         case ast.Name(id=x):
-            return QualifiedName((x,))
+            return Name((x,))
         case ast.Attribute(value=e_, attr=x):
             q = dotted_name(e_)
             return None if q is None else qualified(q, x)

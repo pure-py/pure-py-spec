@@ -11,9 +11,9 @@ from aux import (
     captures_quals,
     declares_body,
     dict_keys,
+    name_of,
     own_fields,
     pattern_bound,
-    qualified_name,
     statements,
     target_name,
     type_expr,
@@ -72,8 +72,8 @@ from type_syntax import (
     ListExpr,
     ListType,
     LiteralType,
+    Name,
     Primitive,
-    QualifiedName,
     TupleExpr,
     TupleType,
     Type,
@@ -349,17 +349,17 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         case ast.Name(id=x):
             if not is_assigned(mod_ctx, x):
                 if module_of(mod_ctx, x) is not None:
-                    raise IllFormedModule(e, reasons.ModuleAsValue(QualifiedName((x,))))
+                    raise IllFormedModule(e, reasons.ModuleAsValue(Name((x,))))
                 theta = mod_ctx.gamma.get(x)
                 match theta:
                     case Class():
-                        raise IllFormedModule(e, reasons.ClassAsValue(QualifiedName((x,))))
+                        raise IllFormedModule(e, reasons.ClassAsValue(Name((x,))))
                     case PredefinedName():
-                        raise IllFormedModule(e, reasons.PredefinedNameAsValue(QualifiedName((x,))))
+                        raise IllFormedModule(e, reasons.PredefinedNameAsValue(Name((x,))))
                     case TypeVar():
                         raise IllFormedModule(e, reasons.TypeParameterAsValue(x))
                     case TypeAlias():
-                        raise IllFormedModule(e, reasons.TypeAliasAsValue(QualifiedName((x,))))
+                        raise IllFormedModule(e, reasons.TypeAliasAsValue(Name((x,))))
                     case Unbound():
                         raise IllFormedModule(e, reasons.UnboundName(x))
                     case DU():
@@ -439,13 +439,13 @@ def attr_module(parent: ModuleLoaded, x: Var, e: ast.Attribute) -> Type:
         case ModuleStub(q):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(q))
         case ModuleLoaded():
-            raise IllFormedModule(e, reasons.ModuleAsValue(qualified_name(e)))
+            raise IllFormedModule(e, reasons.ModuleAsValue(name_of(e)))
         case Class():
-            raise IllFormedModule(e, reasons.ClassAsValue(qualified_name(e)))
+            raise IllFormedModule(e, reasons.ClassAsValue(name_of(e)))
         case PredefinedName():
-            raise IllFormedModule(e, reasons.PredefinedNameAsValue(qualified_name(e)))
+            raise IllFormedModule(e, reasons.PredefinedNameAsValue(name_of(e)))
         case TypeAlias():
-            raise IllFormedModule(e, reasons.TypeAliasAsValue(qualified_name(e)))
+            raise IllFormedModule(e, reasons.TypeAliasAsValue(name_of(e)))
         case TypeVar():
             raise AssertionError
         case Unbound():
