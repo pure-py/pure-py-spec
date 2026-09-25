@@ -262,8 +262,8 @@ another class, the base name to be bound to a class and the additional fields no
 scope; every \PurePy class must declare itself a dataclass. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
 
-\Replaced{A mutual region of function definitions (\ruleName{def}) gives each definition its \pyinline{Callable} type
-from its annotations (\ruleName{def-signature}, \figref{typing-def}), binds the names of the mutual region,
+\Replaced{A mutual region of function definitions (\ruleName{def}) resolves the annotations of each definition to a
+\pyinline{Callable} type (\ruleName{def-signature}, \figref{typing-def}), binds the names of the mutual region,
 including the name of each function itself, at those types, and checks each definition against its type
 (\ruleName{def-body}). A definition binds its parameters at their annotated types; variables declared or
 assigned in the body start unbound, emulating}{A function definition binds its parameters at their annotated types, plus the names of its
