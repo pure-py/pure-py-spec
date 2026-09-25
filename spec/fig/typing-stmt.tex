@@ -106,17 +106,18 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \seq{x}_i \text{ distinct} \quad (\forall i) \\
-  \Delta_i = \set{\bind{\seq{x}_i}{\seq{\sigma}_i}} \quad (\forall i) \\
-  \Delta' = \set{\bind{f_1}{\tyCallable{\seq{\sigma}_1}{\tau_1}}, \ldots, \bind{f_{n+1}}{\tyCallable{\seq{\sigma}_{n+1}}{\tau_{n+1}}}} \\
-  \Sigma; \Gamma \override \Delta' \override \Delta_i \override \scopeS(\set{\seq{x}_i}, s_i); \tau_i \vdash s_i : R_i \quad (\forall i)
-  \\
-  R_i = \Returns \text{ or } \Sigma \vdash \tyNone \subty \tau_i \quad (\forall i) \\
-  \Gamma \vdash \seq{\psi}_i \synth \seq{\sigma}_i \quad (\forall i) \\
-  \Gamma \vdash \psi_i \synth \tau_i \quad (\forall i)
+  \added{\Gamma \vdash d_i \synth \tau_i \quad (\forall i)} \\
+  \replaced{\Delta' = \set{\bind{\declaresS(\seq{d})}{\seq{\tau}}}}{\Delta' = \set{\bind{f_1}{\tyCallable{\seq{\sigma}_1}{\tau_1}}, \ldots, \bind{f_{n+1}}{\tyCallable{\seq{\sigma}_{n+1}}{\tau_{n+1}}}}} \\
+  \added{\Sigma; \Gamma \override \Delta' \vdash d_i \checks \tau_i \quad (\forall i)} \\
+  \deleted{\seq{x}_i \text{ distinct} \quad (\forall i)} \\
+  \deleted{\Delta_i = \set{\bind{\seq{x}_i}{\seq{\sigma}_i}} \quad (\forall i)} \\
+  \deleted{\Sigma; \Gamma \override \Delta' \override \Delta_i \override \scopeS(\set{\seq{x}_i}, s_i); \tau_i \vdash s_i : R_i \quad (\forall i)} \\
+  \deleted{R_i = \Returns \text{ or } \Sigma \vdash \tyNone \subty \tau_i \quad (\forall i)} \\
+  \deleted{\Gamma \vdash \seq{\psi}_i \synth \seq{\sigma}_i \quad (\forall i)} \\
+  \deleted{\Gamma \vdash \psi_i \synth \tau_i \quad (\forall i)}
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exDef{f_1\added{[\seq{\alpha}_1]}}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{s_1} \cons \ldots \cons \exDef{f_{n+1}\added{[\seq{\alpha}_{n+1}]}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{s_{n+1}} : \Assigns{\Delta'}
+  \Sigma; \Gamma; \zeta \vdash \replaced{\seq{d}}{\exDef{f_1}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{s_{n+1}}} : \Assigns{\Delta'}
 }
 \and
 \inferrule*[lab={\ruleName{match}}]

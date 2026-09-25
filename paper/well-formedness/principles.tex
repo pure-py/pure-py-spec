@@ -34,7 +34,7 @@ def foo(b: bool) -> int:
 agrees with Python: under shadowing, \pyinline{return x} would refer to a different variable from the one
 assigned in the branch.
 
-The \ruleName{def} rule introduces every variable declared or assigned by the body, $\assignsS(s)$, at $\Unbound$
+The \Replaced{\ruleName{def-body}}{\ruleName{def}} rule introduces every variable declared or assigned by the body, $\assignsS(s)$, at $\Unbound$
 before checking the body, so a reference before the declaration is rejected statically, whereas Python fails at
 run time with \pyinline{UnboundLocalError}:
 
