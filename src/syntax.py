@@ -334,7 +334,7 @@ def check_syntax_expr(node: ast.expr) -> None:
             for a in node.args:
                 check_syntax_expr(a)
             for k in node.keywords:
-                check_syntax_keyword(k)
+                check_syntax_expr(k.value)
         case ast.IfExp():
             check_syntax_expr(node.test)
             check_syntax_expr(node.body)
@@ -435,10 +435,6 @@ def check_syntax_top_level(body: list[ast.stmt]) -> None:
             check_syntax_type_alias(s)
         else:
             check_syntax_stmt(s)
-
-
-def check_syntax_keyword(node: ast.keyword) -> None:
-    check_syntax_expr(node.value)
 
 
 def check_syntax_generator(node: ast.comprehension) -> None:
