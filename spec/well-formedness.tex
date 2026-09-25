@@ -27,7 +27,6 @@ hiding it throughout the scope.}
 \label{sec:types}
 
 \input{spec/fig/resolve-name}
-
 \input{spec/fig/resolve-type}
 
 Function signatures, assignments and dataclass fields are annotated with type expressions, and a
@@ -215,11 +214,8 @@ statement (Definition~\ref{def:context}), recording whether the variable is defi
 unassigned or possibly unassigned after the statement.
 
 \input{spec/fig/typing-stmt}
-
 \input{spec/fig/typing-def}
-
 \input{spec/fig/pattern-matching/typing-cases}
-
 \input{spec/fig/typing-top-level}
 
 Context operations $\override$ and $\merge$ lift to a right semiring over static outcomes $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge$ and zero for $\override$.
