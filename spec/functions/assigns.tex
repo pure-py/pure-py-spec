@@ -1,6 +1,7 @@
 \assignsS(x\exAnnot{\psi}) = \assignsS(\exAssign{x}{e}) = \assignsS(\exAssign{x\exAnnot{\psi}}{e}) &= \set{x} \\*
 \assignsS(t\;t') &= \assignsS(t) \cup \assignsS(t') \\*
-\assignsS(\seq{d}) &{}= \set{\seq{f}} \quad \text{where } d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \\*
+\assignsS(\seq{d}) &{}= \set{\seq{f}} \quad \text{where } d_i = \exDef{f_i[\seq{\alpha}_i]}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \\*
 \assignsS(\exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}}) &= \textstyle\bigcup_i \big(\binds(p_i) \cup \assignsS(s_i)\big) \\*
-\assignsS(\exDataclass{c}{\phi}) &= \set{c} \\*
-\assignsS(\exDataclassExtend{c}{c'}{\phi}) &= \set{c}
+\assignsS(\exDataclass{c[\seq{\alpha}]}{\phi}) &= \set{c} \\*
+\assignsS(\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}) &= \set{c} \\*
+\assignsS(\exTypeAlias{x[\seq{\alpha}]}{\psi}) &= \set{x}

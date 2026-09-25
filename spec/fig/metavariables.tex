@@ -3,8 +3,8 @@
 \begin{center}
 \begin{tabular}{rll}
 \metaGroup{Names and literals} \\
-$x$, $f$, $c$ & variable; idiomatically $f$ a function and $c$ a class & \secref{contexts} \\
-$q$ & qualified name of a module or class & \figref{syntax-stmt} \\
+$x$, $f$, $c$, $\alpha$ & variable; idiomatically $f$ a function, $c$ a class and $\alpha$ a type parameter & \secref{contexts} \\
+$q$ & name of a module, class or type alias & \figref{syntax-stmt} \\
 $n$ & number, never negative; also sequence length and exit status & \figref{syntax-expr} \\
 $w$ & string & \figref{syntax-expr} \\
 $\ell$ & literal & \figref{syntax-expr} \\
@@ -17,7 +17,7 @@ $g$ & comprehension qualifier & \figref{syntax-expr} \\
 $b$ & case of a \pyinline{match} & \figref{syntax-stmt} \\
 $s$ & statement & \figref{syntax-stmt} \\
 $d$ & function definition & \figref{syntax-stmt} \\
-$\tau$, $\sigma$ & type, a type expression whose class names are resolved to classes & \figref{syntax-types} \\
+$\tau$, $\sigma$ & type& \figref{syntax-types} \\
 $\psi$ & type expression, a type as written & \figref{syntax-types} \\
 $\nu$ & primitive type & \figref{syntax-types} \\
 $\iota$ & import & \figref{syntax-stmt} \\
@@ -34,7 +34,7 @@ $\mathcal{P}$ & predefined modules, each with its environment and context & \sec
 \metaGroup{Contexts} \\
 $\Gamma$, $\Delta$ & context, a finite map from variables to context entries & Definition~\ref{def:context} \\
 $\theta$ & context entry & Definition~\ref{def:context} \\
-$C$, $D$ & class, a fully qualified class name; also the type of its instances & Definition~\ref{def:class} \\
+$C$, $D$ & class, a fully-qualified class name; also the type of its instances & Definition~\ref{def:class} \\
 $\Sigma$ & class table, a finite map from classes to class entries & Definition~\ref{def:class-table} \\
 $R$ & static outcome of a statement & \secref{well-formedness-statements} \\
 $\zeta$ & optional return type, $\tau$ or $\varepsilon$ & \speconly{\figref{typing-stmt}} \\

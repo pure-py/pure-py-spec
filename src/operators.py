@@ -143,7 +143,7 @@ def repeat_list_left(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverl
 
 def power_int(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:
     if subtype(Sigma, sigma, Primitive.INT) and isinstance(tau, LiteralType):
-        exponent = tau.value
+        exponent = tau.ell.value
         if isinstance(exponent, int) and not isinstance(exponent, bool):
             return (Primitive.INT, tau), (Primitive.FLOAT if exponent < 0 else Primitive.INT)
     return None

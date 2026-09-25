@@ -1,5 +1,5 @@
 Whether $p$ applies each tuple pattern only to tuples and each list pattern only to lists: no tuple
 pattern in $p$ is checked against a type with list values, and no list pattern against a type with tuple
 values. The list types, $\tySized$ and $\tyObject$ have list values; the tuple types, $\tySized$ and
-$\tyObject$ have tuple values; a union has the values of its members. The final case gives $\True$ for a
+$\tyObject$ have tuple values; a union has the values of its members; a type variable may stand for any type and so has both. The final case gives $\True$ for a
 pattern at a type that it cannot match, such as a tuple pattern at a tuple type of another arity.

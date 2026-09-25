@@ -190,7 +190,7 @@
   \Sigma; \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
   \Sigma; \Gamma \override \set{\bind{y}{\sigma}} \vdash \exSubscript{y}{e'} \synth \tau \\
   \Sigma; \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exSubscript{y}{e'} \synth \tau' \\
-  y \notin \fvE(e')
+  y \notin \fv(e')
 }
 {
   \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \joinTy{\Sigma}{\tau}{\tau'}
@@ -211,7 +211,7 @@
   \Sigma; \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
   \Sigma; \Gamma \override \set{\bind{y}{\sigma}} \vdash \exCall{y}{\seq{e}} \synth \tau \\
   \Sigma; \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exCall{y}{\seq{e}} \synth \tau' \\
-  y \notin \fvE(\seq{e})
+  y \notin \fv(\seq{e})
 }
 {
   \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \joinTy{\Sigma}{\tau}{\tau'}

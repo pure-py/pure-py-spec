@@ -132,6 +132,7 @@
 \newcommand*{\exDataclass}[2]{@\pyinline{dataclass}\;\pyinline{class}\;#1:\;#2}
 \newcommand*{\exDataclassExtend}[3]{@\pyinline{dataclass}\;\pyinline{class}\;#1(#2):\;#3}
 \newcommand*{\exDef}[4]{\pyinline{def}\;#1(#2)\,#3\mathord{:}\;#4}
+\newcommand*{\exTypeAlias}[2]{\pyinline{type}\;#1 = #2}
 \newcommand*{\exField}[2]{#1\exAnnot{#2}}
 \newcommand*{\exFromImport}[2]{\pyinline{from}\;#1\;\pyinline{import}\;#2}
 \newcommand*{\exImport}[1]{\pyinline{import}\;#1}
@@ -175,6 +176,8 @@
 \newcommand*{\modStub}[1]{\mathsf{Mod}(#1)}
 \newcommand*{\predefName}{\mathsf{Predef}}
 \newcommand*{\Type}[1]{\mathsf{Type}(#1)}
+\newcommand*{\TypeVar}{\mathsf{TypeVar}}
+\newcommand*{\TypeAlias}[2]{\mathsf{TypeAlias}(#1, #2)}
 \newcommand*{\opaqueVal}[1]{\mathsf{Opaque}(#1)}
 \newcommand*{\True}{\mathsf{tt}}
 \newcommand*{\False}{\mathsf{ff}}
@@ -236,7 +239,7 @@
 \newcommand*{\scopeS}{\mathrm{scope}}
 \newcommand*{\binds}{\mathrm{binds}}
 \newcommand*{\captures}{\mathrm{captures}}
-\newcommand*{\fvE}{\mathrm{fv}_{\mathsf{e}}}
+\newcommand*{\fv}{\mathrm{fv}}
 
 % Metafunctions: classes
 \newcommand*{\ancestors}{\mathrm{ancestors}}

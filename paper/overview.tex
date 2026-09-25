@@ -206,7 +206,7 @@ is an assignment, so both flow through programs as data. Treating them as first-
 static account, so the present subset keeps them second-class rather than ruling the feature out; a later
 release may revisit it. A module name may be projected by member access but not used as a value, and a class
 name appears only at constructor and pattern positions, with class declarations confined to module level. Because a
-class is identified by its qualified name, a dataclass declaration may not re-declare a name that already
+class is identified by its fully-qualified name, a dataclass declaration may not re-declare a name that already
 denotes a class in the module; Python permits the re-declaration, leaving the earlier class reachable only
 through its existing instances.
 

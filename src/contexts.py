@@ -7,13 +7,14 @@ from subtyping import join_seq
 from type_syntax import (
     CallableType,
     ListType,
+    Name,
     Primitive,
-    QualifiedName,
     Type,
+    TypeConstructor,
     Var,
     dotted_name,
     parent,
-    parse_qualified,
+    parse_name,
     root,
 )
 
@@ -33,9 +34,21 @@ class PU:
     tau: Type
 
 
-# Lazily evaluated, so these may name Class before it is defined.
+@dataclass(frozen=True)
+class TypeVar:
+    pass
+
+
+@dataclass(frozen=True)
+class TypeAlias:
+    params: tuple[Var, ...]
+    tau: Type
+
+
 type VarEntry = Unbound | DU | PU | Type
-type ContextEntry = VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName
+type ContextEntry = (
+    VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName | TypeVar | TypeAlias
+)
 type Context = Mapping[Var, ContextEntry]
 type VarContext = Mapping[Var, VarEntry]
 
@@ -47,20 +60,23 @@ class PredefinedName:
 
 @dataclass(frozen=True)
 class ModuleStub:
-    q: QualifiedName
+    q: Name
 
 
 @dataclass(frozen=True)
 class ModuleLoaded:
-    q: QualifiedName
+    q: Name
     members: Context
+
+
+NON_VARIABLE_ENTRIES = (ModuleStub, ModuleLoaded, Class, PredefinedName, TypeVar, TypeAlias)
 
 
 @dataclass(frozen=True)
 class ModuleContext:
     gamma: Context
-    M: Mapping[QualifiedName, ast.Module]
-    q: QualifiedName
+    M: Mapping[Name, ast.Module]
+    q: Name
     Sigma: ClassTable
 
 
@@ -72,7 +88,7 @@ def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
 
 def var_entry(mod_ctx: ModuleContext, x: Var) -> VarEntry | None:
     theta = mod_ctx.gamma.get(x)
-    if theta is None or isinstance(theta, (ModuleStub, ModuleLoaded, Class, PredefinedName)):
+    if theta is None or isinstance(theta, NON_VARIABLE_ENTRIES):
         return None
     return theta
 
@@ -86,7 +102,7 @@ def is_assigned(mod_ctx: ModuleContext, x: Var) -> bool:
     return assigned_type(mod_ctx, x) is not None
 
 
-def resolve_name(q: QualifiedName, mod_ctx: ModuleContext) -> ContextEntry | None:
+def resolve_name(q: Name, mod_ctx: ModuleContext) -> ContextEntry | None:
     q_ = parent(q)
     if q_ is None:
         return mod_ctx.gamma.get(root(q))
@@ -121,15 +137,15 @@ PREDEFINED_MEMBERS: dict[str, Context] = {
     "builtins": {
         "print": CallableType((Primitive.OBJECT,), Primitive.NONE),
         "len": CallableType((Primitive.SIZED,), Primitive.INT),
-        "None": PredefinedName(),
-        "object": PredefinedName(),
-        "bool": PredefinedName(),
-        "int": PredefinedName(),
-        "float": PredefinedName(),
-        "str": PredefinedName(),
-        "list": PredefinedName(),
-        "dict": PredefinedName(),
-        "tuple": PredefinedName(),
+        Primitive.NONE.value: PredefinedName(),
+        Primitive.OBJECT.value: PredefinedName(),
+        Primitive.BOOL.value: PredefinedName(),
+        Primitive.INT.value: PredefinedName(),
+        Primitive.FLOAT.value: PredefinedName(),
+        Primitive.STR.value: PredefinedName(),
+        TypeConstructor.LIST.value: PredefinedName(),
+        TypeConstructor.DICT.value: PredefinedName(),
+        TypeConstructor.TUPLE.value: PredefinedName(),
     },
     "math": {
         "pi": Primitive.FLOAT,
@@ -148,26 +164,26 @@ PREDEFINED_MEMBERS: dict[str, Context] = {
         "exit": CallableType((Primitive.INT,), Primitive.NEVER),
     },
     "typing": {
-        "Callable": PredefinedName(),
-        "Literal": PredefinedName(),
-        "Never": PredefinedName(),
-        "Sized": PredefinedName(),
+        TypeConstructor.CALLABLE.value: PredefinedName(),
+        TypeConstructor.LITERAL.value: PredefinedName(),
+        Primitive.NEVER.value: PredefinedName(),
+        Primitive.SIZED.value: PredefinedName(),
     },
     "dataclasses": {"dataclass": PredefinedName()},
 }
 
-PREDEFINED_MODULES = {parse_qualified(name) for name in PREDEFINED_MEMBERS}
-BUILTINS = parse_qualified("builtins")
-MAIN = parse_qualified("__main__")
+PREDEFINED_MODULES = {parse_name(name) for name in PREDEFINED_MEMBERS}
+BUILTINS = parse_name("builtins")
+MAIN = parse_name("__main__")
 
 
-def predefined_context(q: QualifiedName) -> Context:
+def predefined_context(q: Name) -> Context:
     return {**PREDEFINED_MEMBERS[str(q)], "__name__": Primitive.STR}
 
 
 def merge_entry(theta: ContextEntry, theta_: ContextEntry) -> VarEntry:
-    assert not isinstance(theta, (ModuleStub, ModuleLoaded, Class, PredefinedName))
-    assert not isinstance(theta_, (ModuleStub, ModuleLoaded, Class, PredefinedName))
+    assert not isinstance(theta, NON_VARIABLE_ENTRIES)
+    assert not isinstance(theta_, NON_VARIABLE_ENTRIES)
     return theta if theta == theta_ else PU(declared_type_of(theta))
 
 
@@ -187,9 +203,7 @@ def declared_type_of(theta: ContextEntry) -> Type:
         case PU(tau):
             return tau
         case _:
-            assert not isinstance(
-                theta, (Unbound, ModuleStub, ModuleLoaded, Class, PredefinedName)
-            ), "merged entries are assigned or declared variables"
+            assert not isinstance(theta, (Unbound, *NON_VARIABLE_ENTRIES))
             return theta
 
 

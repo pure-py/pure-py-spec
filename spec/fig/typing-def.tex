@@ -1,0 +1,38 @@
+\begin{figure}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Gamma \vdash d \synth \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{def-signature}}]
+{
+  \Gamma \vdash \seq{\psi} \synth \seq{\sigma} \\
+  \Gamma \vdash \psi \synth \tau
+}
+{
+  \Gamma \vdash \exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s} \synth \tyCallable{\seq{\sigma}}{\tau}
+}
+\end{mathpar}
+\subcaption{Definition $d$ synthesises type $\tau$}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash d \checks \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{def-body}}]
+{
+  \seq{x} \text{ distinct} \\
+  \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\sigma}}} \override \scopeS(\set{\seq{x}}, s); \tau \vdash s : R \\
+  R = \Returns \text{ or } \Sigma \vdash \tyNone \subty \tau
+}
+{
+  \Sigma; \Gamma \vdash \exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s} \checks \tyCallable{\seq{\sigma}}{\tau}
+}
+\end{mathpar}
+\subcaption{Definition $d$ checks against type $\tau$}
+\end{subfigure}
+\caption{Function definitions}
+\label{fig:typing-def}
+\end{figure}

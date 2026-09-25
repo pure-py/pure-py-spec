@@ -11,9 +11,9 @@ from aux import (
     captures_quals,
     declares_body,
     dict_keys,
+    name_of,
     own_fields,
     pattern_bound,
-    qualified_name,
     statements,
     target_name,
     type_expr,
@@ -38,6 +38,8 @@ from contexts import (
     PredefinedName,
     Returns,
     StaticOutcome,
+    TypeAlias,
+    TypeVar,
     Unbound,
     VarContext,
     assigned_type,
@@ -64,23 +66,25 @@ from syntax import PatList
 from type_syntax import (
     CallableExpr,
     CallableType,
-    ClassName,
     ClassType,
     DictExpr,
     DictType,
     ListExpr,
     ListType,
     LiteralType,
+    Name,
     Primitive,
-    QualifiedName,
     TupleExpr,
     TupleType,
     Type,
+    TypeConstructor,
     TypeExpr,
+    TypeName,
     UnionExpr,
     UnionType,
     Var,
     base_type,
+    dotted_name,
     literal_type,
     qualified,
 )
@@ -103,9 +107,10 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
             check_in_scope(psi.value, node, mod_ctx)
             return psi
         case LiteralType():
-            check_in_scope("Literal", node, mod_ctx)
+            check_in_scope(TypeConstructor.LITERAL.value, node, mod_ctx)
             return psi
-        case ClassName(q):
+        case TypeName(q, args):
+            assert len(args) == 0
             c = resolve_name(q, mod_ctx)
             if isinstance(c, Unbound):
                 raise IllFormedModule(node, reasons.UnboundName(str(q)))
@@ -113,17 +118,17 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
                 raise IllFormedModule(node, reasons.NotClass(q))
             return ClassType(c)
         case ListExpr(psi_):
-            check_in_scope("list", node, mod_ctx)
+            check_in_scope(TypeConstructor.LIST.value, node, mod_ctx)
             return ListType(resolve_type(psi_, node, mod_ctx))
         case DictExpr(psi_):
-            check_in_scope("dict", node, mod_ctx)
-            check_in_scope("str", node, mod_ctx)
+            check_in_scope(TypeConstructor.DICT.value, node, mod_ctx)
+            check_in_scope(Primitive.STR.value, node, mod_ctx)
             return DictType(resolve_type(psi_, node, mod_ctx))
         case TupleExpr(psis):
-            check_in_scope("tuple", node, mod_ctx)
+            check_in_scope(TypeConstructor.TUPLE.value, node, mod_ctx)
             return TupleType(tuple(resolve_type(c, node, mod_ctx) for c in psis))
         case CallableExpr(psis, psi_):
-            check_in_scope("Callable", node, mod_ctx)
+            check_in_scope(TypeConstructor.CALLABLE.value, node, mod_ctx)
             return CallableType(
                 tuple(resolve_type(p, node, mod_ctx) for p in psis),
                 resolve_type(psi_, node, mod_ctx),
@@ -151,7 +156,7 @@ def check_top_seq(ts: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
         return mod_ctx
     t, t_ = ts[0], ts[1:]
     r, Sigma = check_top_statement(t, mod_ctx)
-    assert isinstance(r, Assigns), "top-level return rejected by check_stmt"
+    assert isinstance(r, Assigns)
     delta = r.delta
     mod_ctx_after = override_gamma(replace(mod_ctx, Sigma=Sigma), delta)
     if len(t_) == 0:
@@ -250,12 +255,17 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
                     raise IllFormedModule(s, reasons.MaybeAssigned(x))
                 case Unbound():
                     raise IllFormedModule(s, reasons.AssignmentBeforeDeclaration(x))
-                case Class() | ModuleStub() | ModuleLoaded() | PredefinedName():
+                case (
+                    Class()
+                    | ModuleStub()
+                    | ModuleLoaded()
+                    | PredefinedName()
+                    | TypeVar()
+                    | TypeAlias()
+                ):
                     raise IllFormedModule(s, reasons.Redeclaration(x))
                 case _:
-                    assert x in mod_ctx.gamma, (
-                        "name assigned in scope pre-populated by def or module"
-                    )
+                    assert x in mod_ctx.gamma
                     raise IllFormedModule(s, reasons.Reassignment(x))
         case ast.AnnAssign():
             assert isinstance(s.target, ast.Name)
@@ -339,13 +349,17 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         case ast.Name(id=x):
             if not is_assigned(mod_ctx, x):
                 if module_of(mod_ctx, x) is not None:
-                    raise IllFormedModule(e, reasons.ModuleAsValue(QualifiedName((x,))))
+                    raise IllFormedModule(e, reasons.ModuleAsValue(Name((x,))))
                 theta = mod_ctx.gamma.get(x)
                 match theta:
                     case Class():
-                        raise IllFormedModule(e, reasons.ClassAsValue(QualifiedName((x,))))
+                        raise IllFormedModule(e, reasons.ClassAsValue(Name((x,))))
                     case PredefinedName():
-                        raise IllFormedModule(e, reasons.PredefinedNameAsValue(QualifiedName((x,))))
+                        raise IllFormedModule(e, reasons.PredefinedNameAsValue(Name((x,))))
+                    case TypeVar():
+                        raise IllFormedModule(e, reasons.TypeParameterAsValue(x))
+                    case TypeAlias():
+                        raise IllFormedModule(e, reasons.TypeAliasAsValue(Name((x,))))
                     case Unbound():
                         raise IllFormedModule(e, reasons.UnboundName(x))
                     case DU():
@@ -358,7 +372,9 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             assert tau is not None
             return tau
         case ast.Constant():
-            return LiteralType(e.value)
+            tau = literal_type(e)
+            assert tau is not None
+            return tau
         case ast.Lambda():
             raise IllFormedModule(e, reasons.NotSynthesised())
         case ast.Call():
@@ -423,11 +439,15 @@ def attr_module(parent: ModuleLoaded, x: Var, e: ast.Attribute) -> Type:
         case ModuleStub(q):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(q))
         case ModuleLoaded():
-            raise IllFormedModule(e, reasons.ModuleAsValue(qualified_name(e)))
+            raise IllFormedModule(e, reasons.ModuleAsValue(name_of(e)))
         case Class():
-            raise IllFormedModule(e, reasons.ClassAsValue(qualified_name(e)))
+            raise IllFormedModule(e, reasons.ClassAsValue(name_of(e)))
         case PredefinedName():
-            raise IllFormedModule(e, reasons.PredefinedNameAsValue(qualified_name(e)))
+            raise IllFormedModule(e, reasons.PredefinedNameAsValue(name_of(e)))
+        case TypeAlias():
+            raise IllFormedModule(e, reasons.TypeAliasAsValue(name_of(e)))
+        case TypeVar():
+            raise AssertionError
         case Unbound():
             raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
         case DU():
@@ -479,7 +499,7 @@ def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) ->
 def tuple_subscript_type(container: TupleType, index: ast.expr, mod_ctx: ModuleContext) -> Type:
     m = len(container.components)
     actual = synth_expr(index, mod_ctx)
-    i = literal_index(actual)
+    i = integer_literal(actual)
     if i is None:
         if actual != Primitive.INT:
             raise IllFormedModule(index, reasons.TypeMismatch(Primitive.INT, actual))
@@ -489,10 +509,11 @@ def tuple_subscript_type(container: TupleType, index: ast.expr, mod_ctx: ModuleC
     return container.components[i]
 
 
-def literal_index(tau: Type) -> int | None:
+# Used to choose among the tuple subscript rules.
+def integer_literal(tau: Type) -> int | None:
     if not isinstance(tau, LiteralType):
         return None
-    v = tau.value
+    v = tau.ell.value
     return v if isinstance(v, int) and not isinstance(v, bool) else None
 
 
@@ -724,15 +745,15 @@ def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, C
         raise IllFormedModule(node, reasons.DuplicateField(dup, node.name))
     base: Class | None = None
     if len(node.bases) > 0:
-        assert isinstance(node.bases[0], ast.Name)
-        base_name = node.bases[0].id
-        theta = mod_ctx.gamma.get(base_name)
+        q = dotted_name(node.bases[0])
+        assert q is not None
+        theta = resolve_name(q, mod_ctx)
         if not isinstance(theta, Class):
-            raise IllFormedModule(node, reasons.NotClass(QualifiedName((base_name,))))
+            raise IllFormedModule(node, reasons.NotClass(q))
         base = theta
         duplicates = set(names) & set(fields(mod_ctx.Sigma, base))
         if len(duplicates) > 0:
             raise IllFormedModule(node, reasons.DuplicateField(min(duplicates), node.name))
     c = Class(qualified(mod_ctx.q, node.name))
-    assert c not in mod_ctx.Sigma, "redeclaration rejected by class rule"
+    assert c not in mod_ctx.Sigma
     return c, {**mod_ctx.Sigma, c: ClassTableEntry(own_fields=own, base=base)}

@@ -61,7 +61,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-def}}]
 {
-  d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \quad (\forall i) \\
+  \declaresS(\seq{d}) = \seq{f} \\
   v_i = \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} \quad (\forall i)
 }
 {
@@ -247,7 +247,7 @@
   \strut
 }
 {
-  q, \rho, \exDataclass{c}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{\fq{q.c}}}}}
+  q, \rho, \exDataclass{c[\seq{\alpha}]}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{\fq{q.c}}}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-class-extend}}]
@@ -255,7 +255,15 @@
   \strut
 }
 {
-  q, \rho, \exDataclassExtend{c}{c'}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{\fq{q.c}}}}}
+  q, \rho, \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}]}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{\fq{q.c}}}}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-type-alias}}]
+{
+  \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \vdash \psi \synth \tau
+}
+{
+  q, \rho, \exTypeAlias{x[\seq{\alpha}]}{\psi} \Rightarrow \assigns{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}}
 }
 \end{mathpar}
 \caption{Top-level statement $t$ of module $q$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
@@ -367,7 +375,7 @@
   \resolve(\rho, q) = \Type{C} 
 }
 {
-  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{C}{\fieldMap(\Sigma, C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m}))}}
+  \rho, \exConstr{q[\seq{\psi}]}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{C}{\fieldMap(\Sigma, C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m}))}}
 }
 \end{mathpar}
 \caption{Expression $e$ evaluates to result $r$ under environment $\rho : \Gamma$}
@@ -401,10 +409,10 @@
 \inferrule*[lab={\ruleName{eval-call-def}}]
 {
   \rho, e \Rightarrow \val{\exDefClosure[\Delta]{\rho'}{\seq{d}}{j}} \\
-  d_i = \exDef{f_i}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i} \quad (\forall i) \\
+  d_j = \exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s} \\
   v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
-  \rho' \override \set{\bind{\seq{f}}{\seq{v}}} \override \set{\bind{\seq{x}_j}{\seq{u}}} \override \scopeS(\set{\seq{x}_j}, s_j), s_j \Rightarrow o
+  \rho' \override \set{\bind{\declaresS(\seq{d})}{\seq{v}}} \override \set{\bind{\seq{x}}{\seq{u}}} \override \scopeS(\set{\seq{x}}, s), s \Rightarrow o
 }
 {
   \rho, \exCall{e}{\seq{e}} \Rightarrow \result(o)
@@ -651,7 +659,7 @@
   \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exConstr{q}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \aborts{\kappa}
+  \rho, \exConstr{q[\seq{\psi}]}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
 \caption{Expression evaluation, continued (propagation from subexpressions)}
@@ -685,9 +693,9 @@
 \inferrule*[lab={\ruleName{eval-call-def-arity}}]
 {
   \rho, e \Rightarrow \val{\exDefClosure[\Delta]{\rho'}{\seq{d}}{j}} \\
-  d_j = \exDef{f_j}{\bind{\seq{x}_j}{\seq{\psi}_j}}{\exRetAnnot{\psi_j}}{s_j} \\
+  d_j = \exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s} \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
-  |\seq{x}_j| \neq |\seq{u}|
+  |\seq{x}| \neq |\seq{u}|
 }
 {
   \rho, \exCall{e}{\seq{e}} \Rightarrow \aborts{\errType}
@@ -778,4 +786,3 @@
 \caption{Comprehension qualifiers $\seq{g}$ evaluate to result $r$ under environment $\rho : \Gamma$}
 \label{fig:eval-quals-result}
 \end{figure}
-

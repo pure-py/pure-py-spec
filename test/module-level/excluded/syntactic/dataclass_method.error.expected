@@ -1,1 +1,1 @@
-dataclass body may contain only field declarations
+dataclass member other than a field declaration prohibited

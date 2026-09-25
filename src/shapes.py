@@ -10,6 +10,7 @@ from type_syntax import (
     ClassType,
     DictType,
     ListType,
+    Literal,
     LiteralType,
     Primitive,
     TupleType,
@@ -18,7 +19,7 @@ from type_syntax import (
 )
 
 # A head: a literal, a class, or a length n standing for the head list_n.
-type Head = LiteralType | Class | int
+type Head = Literal | Class | int
 # Sets of heads and of keys are frozen so that a shape is hashable.
 type Heads = frozenset[Head]
 type Keys = frozenset[str]
@@ -82,11 +83,11 @@ def shapes(Sigma: ClassTable, tau: Type, hs: Heads) -> Shapes:
         left = shapes(Sigma, tau.left, typed_heads(Sigma, hs, tau.left))
         right = shapes(Sigma, tau.right, typed_heads(Sigma, hs, tau.right))
         return left + tuple(k for k in right if k not in left)
-    if isinstance(tau, LiteralType) and tau in hs:
+    if isinstance(tau, LiteralType) and tau.ell in hs:
         return ()
-    if tau == Primitive.BOOL and {LiteralType(True), LiteralType(False)} <= hs:
+    if tau == Primitive.BOOL and {Literal(True), Literal(False)} <= hs:
         return ()
-    if tau == Primitive.NONE and LiteralType(None) in hs:
+    if tau == Primitive.NONE and Literal(None) in hs:
         return ()
     if isinstance(tau, ClassType) and below_excluded(Sigma, tau.c, hs):
         return ()
@@ -102,8 +103,8 @@ def head_typed(Sigma: ClassTable, h: Head, tau: Type) -> bool:
     match h:
         case Class():
             return subtype(Sigma, ClassType(h), tau)
-        case LiteralType():
-            return subtype(Sigma, h, tau)
+        case Literal():
+            return subtype(Sigma, LiteralType(h), tau)
         case int():
             return isinstance(tau, ListType)
 

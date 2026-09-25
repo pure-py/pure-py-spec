@@ -1,7 +1,7 @@
 import ast
 from dataclasses import dataclass
 
-from type_syntax import QualifiedName, Type, Var, render
+from type_syntax import Name, Type, Var, render
 
 
 @dataclass(frozen=True)
@@ -138,7 +138,7 @@ class NotPredefinedName:
 
 @dataclass(frozen=True)
 class NotClass:
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"'{self.q}' is not a declared class"
@@ -180,7 +180,7 @@ class NonlinearPattern:
 @dataclass(frozen=True)
 class DuplicateMember:
     x: Var
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return (
@@ -191,7 +191,7 @@ class DuplicateMember:
 
 @dataclass(frozen=True)
 class SubmoduleNotImported:
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"submodule '{self.q}' is not imported"
@@ -200,7 +200,7 @@ class SubmoduleNotImported:
 @dataclass(frozen=True)
 class UnassignedMember:
     x: Var
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"member '{self.x}' of module '{self.q}' is not definitely assigned"
@@ -214,7 +214,7 @@ class TopLevelReturn:
 
 @dataclass(frozen=True)
 class UnknownModule:
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"unknown module '{self.q}'"
@@ -223,7 +223,7 @@ class UnknownModule:
 @dataclass(frozen=True)
 class UnknownMember:
     x: Var
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"module '{self.q}' has no member '{self.x}'"
@@ -231,7 +231,7 @@ class UnknownMember:
 
 @dataclass(frozen=True)
 class ModuleAsValue:
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"'{self.q}' refers to a module; modules are not first-class values"
@@ -239,8 +239,8 @@ class ModuleAsValue:
 
 @dataclass(frozen=True)
 class ImportOfContainedModule:
-    q: QualifiedName
-    q_: QualifiedName
+    q: Name
+    q_: Name
     from_import: str
 
     def message(self) -> str:
@@ -252,15 +252,31 @@ class ImportOfContainedModule:
 
 @dataclass(frozen=True)
 class PredefinedNameAsValue:
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"'{self.q}' is usable only in annotations or as a decorator"
 
 
 @dataclass(frozen=True)
+class TypeParameterAsValue:
+    x: str
+
+    def message(self) -> str:
+        return f"'{self.x}' is a type parameter, usable only in annotations"
+
+
+@dataclass(frozen=True)
+class TypeAliasAsValue:
+    q: Name
+
+    def message(self) -> str:
+        return f"'{self.q}' is a type alias, usable only in annotations"
+
+
+@dataclass(frozen=True)
 class ClassAsValue:
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"'{self.q}' refers to a class; classes are not first-class values"
@@ -423,6 +439,8 @@ type Reason = (
     | ModuleAsValue
     | ClassAsValue
     | PredefinedNameAsValue
+    | TypeParameterAsValue
+    | TypeAliasAsValue
     | UnknownConstructorKeyword
     | DuplicateDictKey
     | NonlinearPattern
@@ -461,7 +479,7 @@ class IllFormedModule(IllFormed):
         self.line: int | None = getattr(node, "lineno", None)
         self.col: int | None = getattr(node, "col_offset", None)
         self.msg = reason.message()
-        self.module: QualifiedName | None = None
+        self.module: Name | None = None
         super().__init__(self.msg)
 
 

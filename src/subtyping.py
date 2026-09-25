@@ -69,7 +69,7 @@ def subtype(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
         case (_, UnionType()):
             return subtype(Sigma, sigma, tau.left) or subtype(Sigma, sigma, tau.right)
         case (LiteralType(), _):
-            return subtype(Sigma, base_type(sigma.value), tau)
+            return subtype(Sigma, base_type(sigma), tau)
         case (ClassType(c), ClassType(d)):
             return d in ancestors(Sigma, c)
         case (TupleType(sigmas), TupleType(taus)):

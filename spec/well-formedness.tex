@@ -27,7 +27,6 @@ hiding it throughout the scope.}
 \label{sec:types}
 
 \input{spec/fig/resolve-name}
-
 \input{spec/fig/resolve-type}
 
 Function signatures, assignments and dataclass fields are annotated with type expressions, and a
@@ -215,9 +214,8 @@ statement (Definition~\ref{def:context}), recording whether the variable is defi
 unassigned or possibly unassigned after the statement.
 
 \input{spec/fig/typing-stmt}
-
+\input{spec/fig/typing-def}
 \input{spec/fig/pattern-matching/typing-cases}
-
 \input{spec/fig/typing-top-level}
 
 Context operations $\override$ and $\merge$ lift to a right semiring over static outcomes $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge$ and zero for $\override$.
@@ -264,9 +262,11 @@ another class, the base name to be bound to a class and the additional fields no
 scope; every \PurePy class must declare itself a dataclass. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
 
-A function definition binds its parameters at their annotated types, plus the names of its
-mutual region, including the name of the function itself, each at the appropriate $\pyinline{Callable}$ type; variables declared or assigned in the body start
-unbound (\ruleName{def}), emulating Python's scoping of function bodies, which
+A mutual region of function definitions (\ruleName{def}) resolves the annotations of each definition to a
+\pyinline{Callable} type (\ruleName{def-signature}, \figref{typing-def}), binds the names of the mutual region,
+including the name of each function itself, at those types, and checks each definition against its type
+(\ruleName{def-body}). A definition binds its parameters at their annotated types; variables declared or
+assigned in the body start unbound, emulating Python's scoping of function bodies, which
 prefers a locally bound name to one visible in an enclosing scope. A variable of the
 enclosing scope referenced by the body must be definitely assigned at the point at which the function is defined,
 whereas Python resolves the reference only when the body runs. As with any scope, the names declared in the function, including
@@ -290,7 +290,7 @@ evaluation rules a tuple pattern matches only a tuple and a list pattern matches
 Python matches both forms of pattern against both kinds of value\speconly{ (\figref{eval-pat})}. A tuple pattern is therefore sequence-safe only at a type with no list values, and a list pattern only
 at a type with no tuple values. A union has the values of its members, so both kinds of pattern fail the condition
 at $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$, and at $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$,
-since $\tySized$ has both list and tuple values.
+since $\tySized$ has both list and tuple values, as does a type variable, which may stand for any type.
 
 \subsection{Pattern matching}
 \label{sec:exhaustiveness}
@@ -412,7 +412,7 @@ import cycle is ill-formed, because a module in a cycle could finish loading onl
 well-formedness (\figref{typing-module}) requires the main module to be well typed and hence,
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
-overridden by the imported context and then, as in \ruleName{def}, by an unbound entry for each name
+overridden by the imported context and then, as in \ruleName{def-body}, by an unbound entry for each name
 declared in the body or bound by a pattern in it. The members of \pyinline{builtins} are thus in scope unqualified, and a name bound by the body
 shadows a builtin throughout the module, so a use of the name before its declaration is rejected. Under mypy such a
 use instead resolves to the builtin, following Python's run-time lookup. As with any scope, the names declared in the

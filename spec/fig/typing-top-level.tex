@@ -14,7 +14,6 @@
 {
   \Sigma; q; \Gamma \vdash t : \Assigns{\Delta} \binding \Sigma^\dagger \\
   \Sigma^\dagger; q; \Gamma \override \Delta \vdash t' : R \binding \Sigma' \\
-  \\
 }
 {
   \Sigma; q; \Gamma \vdash t\;t' : \Assigns{\Delta} \override R \binding \Sigma'
@@ -27,19 +26,19 @@
   \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i)
 }
 {
-  \Sigma; q; \Gamma \vdash \exDataclass{c}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}
+  \Sigma; q; \Gamma \vdash \exDataclass{c[\seq{\alpha}]}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \bind{c'}{\Type{D}} \in \Gamma \\
+  \Gamma \vdash q' : \Type{D} \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
   \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
   \seq{x} \cap \dom(\fields(\Sigma, D)) = \varnothing
 }
 {
-  \Sigma; q; \Gamma \vdash \exDataclassExtend{c}{c'}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\bind{\seq{x}}{\seq{\sigma}}}{D}}
+  \Sigma; q; \Gamma \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}]}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\bind{\seq{x}}{\seq{\sigma}}}{D}}
 }
 \end{mathpar}
 \caption{Top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$}
