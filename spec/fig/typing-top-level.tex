@@ -22,23 +22,26 @@
 \inferrule*[lab={\ruleName{class}}]
 {
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
+  \added{\Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}}} \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i)
+  \replaced{\Gamma'}{\Gamma} \vdash \psi_i \synth \sigma_i \quad (\forall i)
 }
 {
-  \Sigma; q; \Gamma \vdash \exDataclass{c[\seq{\alpha}]}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}
+  \Sigma; q; \Gamma \vdash \exDataclass{c[\seq{\alpha}]}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\replaced{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}{(\bind{\seq{x}}{\seq{\sigma}};\, \bot)}}
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \Gamma \vdash q' : \Type{D} \\
+  \added{\Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}}} \\
+  \replaced{\Gamma'}{\Gamma} \vdash q' : \Type{D} \\
+  \added{\Gamma' \vdash \psi'_i \synth \sigma'_i \quad (\forall i), \; D \text{ has } |\seq{\sigma}'| \text{ type parameters in } \Sigma} \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
+  \replaced{\Gamma'}{\Gamma} \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
   \seq{x} \cap \dom(\fields(\Sigma, D)) = \varnothing
 }
 {
-  \Sigma; q; \Gamma \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}]}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\bind{\seq{x}}{\seq{\sigma}}}{D}}
+  \Sigma; q; \Gamma \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\replaced{\seq{\psi}'}{\seq{\psi}}]}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\replaced{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}{(\bind{\seq{x}}{\seq{\sigma}};\, D)}}
 }
 \end{mathpar}
 \caption{Top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$}

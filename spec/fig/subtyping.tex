@@ -12,10 +12,10 @@
 \and
 \inferrule*[lab={\ruleName{subty-class}}]
 {
-  D \in \ancestors(\Sigma, C)
+  \replaced{D[\seq{\sigma}] \in \ancestors(\Sigma, C[\seq{\tau}])}{D \in \ancestors(\Sigma, C)}
 }
 {
-  \Sigma \vdash C \subty D
+  \Sigma \vdash \replaced{C[\seq{\tau}] \subty D[\seq{\sigma}]}{C \subty D}
 }
 \and
 \inferrule*[lab={\ruleName{subty-never}}]

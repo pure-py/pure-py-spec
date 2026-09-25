@@ -52,6 +52,7 @@ module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$ 
 class entry & $\Type{C}$ & name denotes class $C$ \\
 type parameter & $\TypeVar$ & name is a type parameter in scope \\
 type alias & $\TypeAlias{\seq{\alpha}}{\tau}$ & name denotes type $\tau$ with type parameters $\seq{\alpha}$ \\
+\added{type scheme} & \added{$\tyScheme{\seq{\alpha}}{\tau}$} & \added{type of definitely assigned function with type parameters $\seq{\alpha}$; $\tyScheme{\varepsilon}{\tau}$ written $\tau$} \\
 predefined name & $\predefName$ & name usable only in annotation or as decorator \\
 \end{tabular}
 \end{center}
@@ -68,9 +69,11 @@ class. A class is also the type of its instances.
 \begin{definition}[Class table]
 \label{def:class-table}
 A class table $\Sigma$ is a finite map from classes to class table entries, with $\Sigma(C)$ of the form
-$\clsRec{\bind{\seq{x}}{\seq{\tau}}}{D}$: the distinct fields $\seq{x}$ of $C$ with their declared types
-$\seq{\tau}$, and its base class $D$, or $\bot$ if it has none. Every class named in $\Sigma$ is in
-$\dom(\Sigma)$, and the relation taking each class of $\Sigma$ to its base class is
+\Replaced{$\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{D[\seq{\sigma}]}$: the type parameters $\seq{\alpha}$ of $C$, its distinct fields $\seq{x}$ with their declared types
+$\seq{\tau}$, and its base class $D[\seq{\sigma}]$, an instantiated class, or $\bot$ if it has none; the field types and the
+type arguments of the base may mention $\seq{\alpha}$}{$(\bind{\seq{x}}{\seq{\tau}};\, D)$: the distinct fields $\seq{x}$ of $C$ with their declared types
+$\seq{\tau}$, and its base class $D$, or $\bot$ if it has none}. Every class named in $\Sigma$ is in
+$\dom(\Sigma)$, and the relation taking each class of $\Sigma$ to \Replaced{the class of its base}{its base class} is
 acyclic.
 \end{definition}
 
@@ -130,7 +133,7 @@ fills the field $x$. It is defined only if every field receives exactly one argu
 \paragraph{Type annotations.}
 
 Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
-may be annotated (\figref{syntax-types}). A dataclass specifies its base class by a type expression of the form $q[\seq{\psi}]$. A \emph{type} $\tau$ has the forms of a type expression, except that a class $C$ rather than a name is applied to type arguments, written $C$ when there are none; the type system resolves a type expression to a type, expanding class names to classes and type aliases to types\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
+may be annotated (\figref{syntax-types}). A dataclass specifies its base class by a type expression of the form $q[\seq{\psi}]$. A \emph{type} $\tau$ has the forms of a type expression, except that a class $C$ rather than a name is applied to type arguments, written $C$ when there are none; the type system resolves a type expression to a type, expanding class names to classes and type aliases to types\speconly{ (\secref{types})}. \Added{The substitution $\subst{\seq{\tau}}{\seq{\alpha}}{\sigma}$ replaces each $\alpha_i$ in $\sigma$ by $\tau_i$, structurally, since a type binds no variables, and applies pointwise to a sequence of types or of bindings; it is defined only if $\seq{\tau}$ and $\seq{\alpha}$ have the same length.} We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
 \bind{x_n}{\psi_n}$.
 
 \subsubsection{Operators}

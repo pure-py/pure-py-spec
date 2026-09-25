@@ -1,2 +1,3 @@
-\fields(\Sigma, C) &= \bind{\seq{x}}{\seq{\tau}} && \text{if } \Sigma(C) = \clsRec{\bind{\seq{x}}{\seq{\tau}}}{\bot} \\*
-\fields(\Sigma, C) &= \fields(\Sigma, D) \mathbin{\concat} \bind{\seq{x}}{\seq{\tau}} && \text{if } \Sigma(C) = \clsRec{\bind{\seq{x}}{\seq{\tau}}}{D}
+\fields(\Sigma, C) &= \bind{\seq{x}}{\seq{\tau}} && \text{if } \Sigma(C) = \replaced{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{\bot}}{(\bind{\seq{x}}{\seq{\tau}};\, \bot)} \\*
+\fields(\Sigma, C) &= \fields(\Sigma, \replaced{D[\seq{\sigma}]}{D}) \mathbin{\concat} \bind{\seq{x}}{\seq{\tau}} && \text{if } \Sigma(C) = \replaced{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{D[\seq{\sigma}]}}{(\bind{\seq{x}}{\seq{\tau}};\, D)} \\*
+\added{\fields(\Sigma, C[\seq{\tau}])} &\added{{}= \subst{\seq{\tau}}{\seq{\alpha}}{\fields(\Sigma, C)}} && \added{\text{if } C \text{ has type parameters } \seq{\alpha} \text{ in } \Sigma}
