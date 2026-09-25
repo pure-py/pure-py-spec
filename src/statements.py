@@ -106,7 +106,7 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
             check_in_scope(psi.value, node, mod_ctx)
             return psi
         case LiteralType():
-            check_in_scope("Literal", node, mod_ctx)
+            check_in_scope(LiteralType.name, node, mod_ctx)
             return psi
         case TypeName(q, args):
             assert len(args) == 0
@@ -117,17 +117,17 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
                 raise IllFormedModule(node, reasons.NotClass(q))
             return ClassType(c)
         case ListExpr(psi_):
-            check_in_scope("list", node, mod_ctx)
+            check_in_scope(ListExpr.name, node, mod_ctx)
             return ListType(resolve_type(psi_, node, mod_ctx))
         case DictExpr(psi_):
-            check_in_scope("dict", node, mod_ctx)
-            check_in_scope("str", node, mod_ctx)
+            check_in_scope(DictExpr.name, node, mod_ctx)
+            check_in_scope(Primitive.STR.value, node, mod_ctx)
             return DictType(resolve_type(psi_, node, mod_ctx))
         case TupleExpr(psis):
-            check_in_scope("tuple", node, mod_ctx)
+            check_in_scope(TupleExpr.name, node, mod_ctx)
             return TupleType(tuple(resolve_type(c, node, mod_ctx) for c in psis))
         case CallableExpr(psis, psi_):
-            check_in_scope("Callable", node, mod_ctx)
+            check_in_scope(CallableExpr.name, node, mod_ctx)
             return CallableType(
                 tuple(resolve_type(p, node, mod_ctx) for p in psis),
                 resolve_type(psi_, node, mod_ctx),

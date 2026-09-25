@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import Enum
 from types import EllipsisType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from classes import Class
@@ -81,26 +81,31 @@ class Literal:
 
 @dataclass(frozen=True)
 class LiteralType:
+    name: ClassVar[str] = "Literal"
     ell: Literal
 
 
 @dataclass(frozen=True)
 class ListExpr:
+    name: ClassVar[str] = "list"
     elem: TypeExpr
 
 
 @dataclass(frozen=True)
 class TupleExpr:
+    name: ClassVar[str] = "tuple"
     components: tuple[TypeExpr, ...]
 
 
 @dataclass(frozen=True)
 class DictExpr:
+    name: ClassVar[str] = "dict"
     value: TypeExpr
 
 
 @dataclass(frozen=True)
 class CallableExpr:
+    name: ClassVar[str] = "Callable"
     params: tuple[TypeExpr, ...]
     result: TypeExpr
 
@@ -231,18 +236,18 @@ def dotted_name(e: ast.expr) -> QualifiedName | None:
 
 def parse_subscript(e: ast.Subscript) -> TypeExpr | None:
     head = e.value.id if isinstance(e.value, ast.Name) else None
-    if head == "Literal":
+    if head == LiteralType.name:
         return literal_type(e.slice)
-    if head == "Callable":
+    if head == CallableExpr.name:
         return parse_callable(subscript_args(e.slice))
     args = parse_annotations(subscript_args(e.slice))
     if args is None:
         return None
-    if head == "list":
+    if head == ListExpr.name:
         return ListExpr(args[0]) if len(args) == 1 else None
-    if head == "tuple":
+    if head == TupleExpr.name:
         return TupleExpr(args)
-    if head == "dict":
+    if head == DictExpr.name:
         return DictExpr(args[1]) if len(args) == 2 and args[0] == Primitive.STR else None
     q = dotted_name(e.value)
     return None if q is None else TypeName(q, args)
