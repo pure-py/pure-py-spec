@@ -152,8 +152,14 @@ class CallableType:
 
 
 @dataclass(frozen=True)
+class TypeVariable:
+    alpha: Var
+
+
+@dataclass(frozen=True)
 class ClassType:
     c: Class
+    args: tuple[Type, ...]
 
 
 @dataclass(frozen=True)
@@ -163,8 +169,49 @@ class UnionType:
 
 
 type Type = (
-    Primitive | ListType | TupleType | DictType | CallableType | LiteralType | ClassType | UnionType
+    Primitive
+    | ListType
+    | TupleType
+    | DictType
+    | CallableType
+    | LiteralType
+    | TypeVariable
+    | ClassType
+    | UnionType
 )
+
+
+@dataclass(frozen=True)
+class FieldScheme:
+    type_params: tuple[Var, ...]
+    fields: tuple[tuple[Var, Type], ...]
+
+
+def substitute(taus: Sequence[Type], alphas: Sequence[Var], sigma: Type) -> Type:
+    assert len(taus) == len(alphas)
+    match sigma:
+        case TypeVariable(alpha):
+            return taus[alphas.index(alpha)] if alpha in alphas else sigma
+        case ListType(sigma_):
+            return ListType(substitute(taus, alphas, sigma_))
+        case TupleType(sigmas):
+            return TupleType(tuple(substitute(taus, alphas, c) for c in sigmas))
+        case DictType(sigma_):
+            return DictType(substitute(taus, alphas, sigma_))
+        case CallableType(sigmas, sigma_):
+            return CallableType(
+                tuple(substitute(taus, alphas, p) for p in sigmas), substitute(taus, alphas, sigma_)
+            )
+        case ClassType(c, sigmas):
+            return ClassType(c, tuple(substitute(taus, alphas, a) for a in sigmas))
+        case UnionType(sigma_, tau_):
+            return UnionType(substitute(taus, alphas, sigma_), substitute(taus, alphas, tau_))
+        case _:
+            return sigma
+
+
+def instantiate(pi: FieldScheme, taus: Sequence[Type]) -> tuple[tuple[Var, Type], ...]:
+    return tuple((x, substitute(taus, pi.type_params, sigma)) for x, sigma in pi.fields)
 
 
 def render(tau: Type) -> str:
@@ -182,8 +229,11 @@ def render(tau: Type) -> str:
             return f"Callable[[{params}], {render(tau_)}]"
         case LiteralType(ell):
             return f"Literal[{ell.value!r}]"
-        case ClassType(c):
-            return str(c.name)
+        case TypeVariable(alpha):
+            return alpha
+        case ClassType(c, taus):
+            args = ", ".join(render(a) for a in taus)
+            return str(c.name) if len(taus) == 0 else f"{c.name}[{args}]"
         case UnionType(sigma, tau_):
             return f"{render(sigma)} | {render(tau_)}"
 

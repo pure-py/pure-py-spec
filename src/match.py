@@ -4,7 +4,14 @@ from itertools import product
 
 import reasons
 from aux import name_of
-from classes import Class, ClassTable, declared_type, field_map, fields, short_name
+from classes import (
+    Class,
+    ClassTable,
+    field_map,
+    field_names,
+    instantiated_fields,
+    short_name,
+)
 from contexts import (
     ModuleContext,
     Unbound,
@@ -31,7 +38,7 @@ from shapes import (
     typed_heads,
 )
 from subtyping import join_seq, meet, subtype
-from syntax import PatList, PatTuple
+from syntax import NotYetSupported, PatList, PatTuple
 from type_syntax import (
     ClassType,
     DictType,
@@ -155,7 +162,7 @@ def match_constr(k: Shape, p: ast.MatchClass, mod_ctx: ModuleContext) -> Match |
     ps = pattern_seq(mod_ctx.Sigma, c, p)
     match k:
         case Constr(d, ks, hs):
-            if subtype(mod_ctx.Sigma, ClassType(d), ClassType(c)):
+            if subtype(mod_ctx.Sigma, ClassType(d, ()), ClassType(c, ())):
                 result = match_seq(ks, padded(ps, len(ks)), p, mod_ctx)
                 return map_seq_match(lambda ks_: Constr(d, ks_, hs), result)
             return None
@@ -247,10 +254,10 @@ def split_dict(
 def split_class(Sigma: ClassTable, k: Rest, c: Class) -> Split | None:
     if below_excluded(Sigma, c, k.hs):
         return None
-    tau = meet(Sigma, k.ty, ClassType(c))
+    tau = meet(Sigma, k.ty, ClassType(c, ()))
     match tau:
-        case ClassType(d):
-            sigmas = tuple(declared_type(Sigma, d, x) for x in fields(Sigma, d))
+        case ClassType(d, _):
+            sigmas = tuple(sigma for _, sigma in instantiated_fields(Sigma, tau))
             hs_ = typed_heads(Sigma, k.hs, tau)
             return (
                 tuple(Constr(d, ks, hs_) for ks in shapes_seq(Sigma, sigmas)),
@@ -261,12 +268,13 @@ def split_class(Sigma: ClassTable, k: Rest, c: Class) -> Split | None:
 
 
 def split_subclass(Sigma: ClassTable, k: Constr, c: Class) -> Split | None:
-    if c == k.c or not subtype(Sigma, ClassType(c), ClassType(k.c)):
+    tau = ClassType(c, ())
+    if c == k.c or not subtype(Sigma, tau, ClassType(k.c, ())):
         return None
     if below_excluded(Sigma, c, k.hs):
         return None
-    sigmas = tuple(declared_type(Sigma, c, x) for x in fields(Sigma, c)[len(k.args) :])
-    hs_ = typed_heads(Sigma, k.hs, ClassType(c))
+    sigmas = tuple(sigma for _, sigma in instantiated_fields(Sigma, tau)[len(k.args) :])
+    hs_ = typed_heads(Sigma, k.hs, tau)
     return (
         tuple(Constr(c, k.args + ks, hs_) for ks in shapes_seq(Sigma, sigmas)),
         (Constr(k.c, k.args, k.hs | {c}),),
@@ -277,6 +285,8 @@ def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
     c = class_of_name(p.cls, mod_ctx)
     if c is None:
         raise IllFormedModule(p, reasons.NotClass(name_of(p.cls)))
+    if len(mod_ctx.Sigma[c].type_params) > 0:
+        raise NotYetSupported(p, "class pattern of a generic class", 187)
     return c
 
 
@@ -284,7 +294,7 @@ def pattern_seq(Sigma: ClassTable, c: Class, p: ast.MatchClass) -> tuple[ast.pat
     args = field_map(Sigma, c, p.patterns, p.kwd_attrs, p.kwd_patterns)
     if args is None:
         raise no_field_map(Sigma, c, p)
-    return tuple(args[x] for x in fields(Sigma, c))
+    return tuple(args[x] for x in field_names(Sigma, c))
 
 
 def match_seq(
@@ -351,13 +361,16 @@ def seq_safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> tuple[ast.pat
             return None
         case ast.MatchClass():
             c = class_of_name(p.cls, mod_ctx)
-            if c is None:
+            if c is None or len(mod_ctx.Sigma[c].type_params) > 0:
                 return None  # the match rules reject with a sharper reason
             args = field_map(mod_ctx.Sigma, c, p.patterns, p.kwd_attrs, p.kwd_patterns)
             if args is None:
                 return None  # likewise
             return first_unsafe(
-                [(args[x], declared_type(mod_ctx.Sigma, c, x)) for x in fields(mod_ctx.Sigma, c)],
+                [
+                    (args[x], sigma)
+                    for x, sigma in instantiated_fields(mod_ctx.Sigma, ClassType(c, ()))
+                ],
                 mod_ctx,
             )
         case ast.MatchAs():
@@ -404,7 +417,7 @@ def padded(ps: tuple[ast.pattern, ...], n: int) -> tuple[ast.pattern, ...]:
 
 def no_field_map(Sigma: ClassTable, c: Class, p: ast.MatchClass) -> IllFormedModule:
     """Why field-map is undefined for a pattern's arguments."""
-    name, xs = short_name(c), fields(Sigma, c)
+    name, xs = short_name(c), field_names(Sigma, c)
     n = len(p.patterns)
     if n + len(p.kwd_attrs) != len(xs):
         return IllFormedModule(p, reasons.PatternArityMismatch(name, len(xs), n + len(p.kwd_attrs)))

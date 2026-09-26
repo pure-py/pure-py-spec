@@ -4,13 +4,7 @@ from collections.abc import Callable
 
 from aux import is_import, split_imports
 from type_syntax import (
-    CallableExpr,
-    DictExpr,
-    ListExpr,
-    TupleExpr,
-    TypeExpr,
     TypeName,
-    UnionExpr,
     parse_annotation,
 )
 
@@ -216,8 +210,6 @@ def check_syntax_classdef(node: ast.ClassDef) -> None:
     if not (len(node.body) == 1 and isinstance(node.body[0], ast.Pass)):
         for stmt in node.body:
             check_syntax_field(stmt)
-    if len(node.type_params) > 0:
-        raise NotYetSupported(node, "type parameters", 187)
 
 
 def check_syntax_type_alias(node: ast.TypeAlias) -> None:
@@ -460,26 +452,6 @@ def check_syntax_annotation(node: ast.expr | None) -> None:
     psi = parse_annotation(node)
     if psi is None:
         raise Prohibited(node, "annotation that is not a type expression")
-    if has_type_arguments(psi):
-        raise NotYetSupported(node, "type arguments", 187)
-
-
-def has_type_arguments(psi: TypeExpr) -> bool:
-    match psi:
-        case TypeName(_, args):
-            return len(args) > 0 or any(has_type_arguments(a) for a in args)
-        case ListExpr(elem):
-            return has_type_arguments(elem)
-        case TupleExpr(components):
-            return any(has_type_arguments(c) for c in components)
-        case DictExpr(value):
-            return has_type_arguments(value)
-        case CallableExpr(params, result):
-            return any(has_type_arguments(p) for p in params) or has_type_arguments(result)
-        case UnionExpr(left, right):
-            return has_type_arguments(left) or has_type_arguments(right)
-        case _:
-            return False
 
 
 def check_syntax_arguments(node: ast.arguments) -> None:

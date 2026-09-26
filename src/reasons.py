@@ -145,6 +145,16 @@ class NotClass:
 
 
 @dataclass(frozen=True)
+class BaseClassArityMismatch:
+    q: Name
+    expected: int
+    given: int
+
+    def message(self) -> str:
+        return f"base class '{self.q}' expects {self.expected} type arguments, given {self.given}"
+
+
+@dataclass(frozen=True)
 class UnknownFieldInPattern:
     c: Var
     xs: tuple[Var, ...]
@@ -431,6 +441,7 @@ type Reason = (
     | ConstructorArityMismatch
     | PatternArityMismatch
     | NotClass
+    | BaseClassArityMismatch
     | NotPredefinedName
     | UnknownFieldInPattern
     | DuplicatePatternKeyword

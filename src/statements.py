@@ -24,8 +24,8 @@ from classes import (
     ClassTableEntry,
     declared_type,
     field_map,
+    field_names,
     field_type,
-    fields,
     short_name,
 )
 from contexts import (
@@ -62,7 +62,7 @@ from operators import (
 from reasons import IllFormedModule
 from shapes import shapes
 from subtyping import join_seq, subtype
-from syntax import PatList
+from syntax import NotYetSupported, PatList
 from type_syntax import (
     CallableExpr,
     CallableType,
@@ -80,12 +80,13 @@ from type_syntax import (
     TypeConstructor,
     TypeExpr,
     TypeName,
+    TypeVariable,
     UnionExpr,
     UnionType,
     Var,
     base_type,
-    dotted_name,
     literal_type,
+    parse_annotation,
     qualified,
 )
 
@@ -110,13 +111,16 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
             check_in_scope(TypeConstructor.LITERAL.value, node, mod_ctx)
             return psi
         case TypeName(q, args):
-            assert len(args) == 0
-            c = resolve_name(q, mod_ctx)
-            if isinstance(c, Unbound):
+            theta = resolve_name(q, mod_ctx)
+            if isinstance(theta, Unbound):
                 raise IllFormedModule(node, reasons.UnboundName(str(q)))
-            if not isinstance(c, Class):
+            if isinstance(theta, TypeVar) and len(args) == 0:
+                return TypeVariable(str(q))
+            if not isinstance(theta, Class):
                 raise IllFormedModule(node, reasons.NotClass(q))
-            return ClassType(c)
+            if len(args) > 0 or len(mod_ctx.Sigma[theta].type_params) > 0:
+                raise NotYetSupported(node, "type arguments in a type expression", 187)
+            return ClassType(theta, ())
         case ListExpr(psi_):
             check_in_scope(TypeConstructor.LIST.value, node, mod_ctx)
             return ListType(resolve_type(psi_, node, mod_ctx))
@@ -465,8 +469,8 @@ def attribute_type(obj: Type, e: ast.Attribute, mod_ctx: ModuleContext) -> Type:
                 mod_ctx.Sigma,
                 [attribute_type(sigma, e, mod_ctx), attribute_type(tau, e, mod_ctx)],
             )
-        case ClassType(c):
-            member = field_type(mod_ctx.Sigma, c, e.attr)
+        case ClassType(c, _):
+            member = field_type(mod_ctx.Sigma, obj, e.attr)
             if member is None:
                 raise IllFormedModule(e, reasons.UnknownField(short_name(c), e.attr))
             return member
@@ -567,7 +571,9 @@ def dict_type(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> Dic
 
 
 def constr(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> Type:
-    xs = fields(mod_ctx.Sigma, c)
+    if len(mod_ctx.Sigma[c].type_params) > 0:
+        raise NotYetSupported(e, "constructor call of a generic class", 187)
+    xs = field_names(mod_ctx.Sigma, c)
     kwd_names = [k.arg for k in e.keywords if k.arg is not None]
     args = field_map(mod_ctx.Sigma, c, e.args, kwd_names, [k.value for k in e.keywords])
     if args is None:
@@ -579,9 +585,10 @@ def constr(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> Type:
         raise IllFormedModule(
             e, reasons.UnknownConstructorKeyword(short_name(c), tuple(sorted(set(xs[n:]))))
         )
+    tau = ClassType(c, ())
     for x, arg in args.items():
-        check_expr(arg, declared_type(mod_ctx.Sigma, c, x), mod_ctx)
-    return ClassType(c)
+        check_expr(arg, declared_type(mod_ctx.Sigma, tau, x), mod_ctx)
+    return tau
 
 
 def call(e: ast.Call, mod_ctx: ModuleContext) -> Type:
@@ -738,22 +745,38 @@ def iterated_type(e: ast.expr, mod_ctx: ModuleContext) -> Type:
 def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, ClassTable]:
     if not isinstance(mod_ctx.gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.NotPredefinedName("dataclass"))
-    own = tuple((x, resolve_type(psi, node, mod_ctx)) for x, psi in own_fields(node))
+    alphas = tuple(type_param_names(node))
+    mod_ctx_ = override_gamma(mod_ctx, {alpha: TypeVar() for alpha in alphas})
+    own = tuple((x, resolve_type(psi, node, mod_ctx_)) for x, psi in own_fields(node))
     names = [x for x, _ in own]
     dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
     if dup is not None:
         raise IllFormedModule(node, reasons.DuplicateField(dup, node.name))
-    base: Class | None = None
+    base: ClassType | None = None
     if len(node.bases) > 0:
-        q = dotted_name(node.bases[0])
-        assert q is not None
-        theta = resolve_name(q, mod_ctx)
+        psi = parse_annotation(node.bases[0])
+        assert isinstance(psi, TypeName)
+        theta = resolve_name(psi.q, mod_ctx_)
         if not isinstance(theta, Class):
-            raise IllFormedModule(node, reasons.NotClass(q))
-        base = theta
-        duplicates = set(names) & set(fields(mod_ctx.Sigma, base))
+            raise IllFormedModule(node, reasons.NotClass(psi.q))
+        sigmas = tuple(resolve_type(psi_, node, mod_ctx_) for psi_ in psi.args)
+        expected = len(mod_ctx.Sigma[theta].type_params)
+        if len(sigmas) != expected:
+            raise IllFormedModule(
+                node, reasons.BaseClassArityMismatch(psi.q, expected, len(sigmas))
+            )
+        base = ClassType(theta, sigmas)
+        duplicates = set(names) & set(field_names(mod_ctx.Sigma, theta))
         if len(duplicates) > 0:
             raise IllFormedModule(node, reasons.DuplicateField(min(duplicates), node.name))
     c = Class(qualified(mod_ctx.q, node.name))
     assert c not in mod_ctx.Sigma
-    return c, {**mod_ctx.Sigma, c: ClassTableEntry(own_fields=own, base=base)}
+    return c, {**mod_ctx.Sigma, c: ClassTableEntry(alphas, own, base)}
+
+
+def type_param_names(node: ast.ClassDef) -> list[Var]:
+    names: list[Var] = []
+    for param in node.type_params:
+        assert isinstance(param, ast.TypeVar)
+        names.append(param.name)
+    return names

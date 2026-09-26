@@ -69,7 +69,7 @@ def shape_type(k: Shape) -> Type:
         case Rest(tau, _):
             return tau
         case Constr(c, _, _):
-            return ClassType(c)
+            return ClassType(c, ())
         case Tuple(ks):
             return TupleType(tuple(shape_type(c) for c in ks))
         case List(tau, _):
@@ -102,7 +102,7 @@ def shapes(Sigma: ClassTable, tau: Type, hs: Heads) -> Shapes:
 def head_typed(Sigma: ClassTable, h: Head, tau: Type) -> bool:
     match h:
         case Class():
-            return subtype(Sigma, ClassType(h), tau)
+            return subtype(Sigma, ClassType(h, ()), tau)
         case Literal():
             return subtype(Sigma, LiteralType(h), tau)
         case int():
@@ -114,7 +114,9 @@ def typed_heads(Sigma: ClassTable, hs: Heads, tau: Type) -> Heads:
 
 
 def below_excluded(Sigma: ClassTable, c: Class, hs: Heads) -> bool:
-    return any(isinstance(h, Class) and subtype(Sigma, ClassType(c), ClassType(h)) for h in hs)
+    return any(
+        isinstance(h, Class) and subtype(Sigma, ClassType(c, ()), ClassType(h, ())) for h in hs
+    )
 
 
 def shapes_seq(Sigma: ClassTable, taus: Sequence[Type]) -> ShapeSeqs:

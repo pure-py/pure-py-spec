@@ -251,7 +251,7 @@ def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:
     try:
         check_module(m, M, MAIN, {})
         return None
-    except IllFormed as e:
+    except (IllFormed, syntax.Unsupported) as e:
         return e
 
 
