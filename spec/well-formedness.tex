@@ -32,9 +32,9 @@ hiding it throughout the scope.}
 Function signatures, assignments and dataclass fields are annotated with type expressions, and a
 type expression denotes a type under a context (\figref{resolve-type}). Every definition carries an
 annotation for its parameters and return type, so the type of a definition is given rather than
-inferred from its body. A class name resolves to a
-class (\figref{resolve-name})\Added{, a type parameter in scope to itself (\ruleName{ty-var}),} and every other name must be a predefined name
-(\figref{predefined-signatures}). The function $\baseType(\tau)$ discards the precision of a
+inferred from its body. \Replaced{Within a type expression, class names resolve to classes, type parameters in scope denote the type variables of those names, and all other names must be predefined names (\figref{resolve-type}).}{A class name resolves to a
+class (\figref{resolve-name}) and every other name must be a predefined name
+(\figref{predefined-signatures}).} The function $\baseType(\tau)$ discards the precision of a
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and leaving every other type alone
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:base-type}}).
 
