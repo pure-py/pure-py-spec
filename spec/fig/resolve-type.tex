@@ -6,6 +6,14 @@
 { \bind{\nu}{\predefName} \in \Gamma }
 { \Gamma \vdash \nu \synth \nu }
 \and
+\inferrule*[lab={\ruleName{ty-var}}]
+{
+  \bind{\alpha}{\TypeVar} \in \Gamma
+}
+{
+  \Gamma \vdash \alpha \synth \alpha
+}
+\and
 \inferrule*[lab={\ruleName{ty-class}}]
 { \Gamma \vdash q : \Type{C} }
 { \Gamma \vdash q \synth C }

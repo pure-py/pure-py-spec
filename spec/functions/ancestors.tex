@@ -1,2 +1,2 @@
-\ancestors(\Sigma, C) &\;= \set{C} && \text{if } \Sigma(C) = \clsRec{\bind{\seq{x}}{\seq{\tau}}}{\bot} \\*
-\ancestors(\Sigma, C) &\;= \set{C} \cup \ancestors(\Sigma, D) && \text{if } \Sigma(C) = \clsRec{\bind{\seq{x}}{\seq{\tau}}}{D}
+\ancestors(\Sigma, C) &\;= \set{C} && \text{if } \Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{\bot} \\*
+\ancestors(\Sigma, C) &\;= \set{C} \cup \ancestors(\Sigma, D) && \text{if } \Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{D[\seq{\sigma}]}

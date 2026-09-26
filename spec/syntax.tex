@@ -9,7 +9,7 @@ $\seq{x} \mathbin{\concat} \seq{y}$ is concatenation.
 Comma-separated elements inside set braces are pairwise distinct, so $\set{x_1, \ldots, x_n}$ has $n$
 elements; the set of the elements of a sequence, $\set{\seq{x}}$, assumes no distinctness. A sequence
 comprehension $(x_i \mid i \in I)$, where the finite index set $I$ carries a total order, denotes the
-sequence of the $x_i$ in that order. A judgement applied to sequences of equal length holds pointwise, so that
+sequence of the $x_i$ in that order. Two sequences of equal length paired by a colon, $\bind{\seq{x}}{\seq{\psi}}$, denote the sequence of pairs $\bind{x_1}{\psi_1}, \ldots, \bind{x_n}{\psi_n}$. A judgement applied to sequences of equal length holds pointwise, so that
 $\Gamma \vdash \seq{\psi} \synth \seq{\tau}$ abbreviates $\Gamma \vdash \psi_i \synth \tau_i$ for each $i$. When the order of its elements matters, a set $\set{x_1, \ldots, x_n}$ is
 \emph{ordered} by position. A comprehension over an ordered set preserves the order of its source;
 $X \setminus Y$ keeps the surviving elements of $X$ in their order; $X \disjunion Y$, defined when $X$
@@ -48,15 +48,29 @@ take the following forms:
 \rowcolor{grammarheadcolor}Entry & Form & Records \\
 variable & $\tau$, $\DU{\tau}$, $\PU{\tau}$ or $\Unbound$ & type of definitely assigned variable; $\DU{\tau}$ if declared at $\tau$ and definitely unassigned; $\PU{\tau}$ if declared at $\tau$ and possibly unassigned; $\Unbound$ if its declaration has not been reached \\
 module stub & $\modStub{q}$ & module $q$, named but not loaded \\
-module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$ \\
+module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$, bound by an import \\
 class entry & $\Type{C}$ & name denotes class $C$ \\
 type parameter & $\TypeVar$ & name is a type parameter in scope \\
 type alias & $\TypeAlias{\seq{\alpha}}{\tau}$ & name denotes type $\tau$ with type parameters $\seq{\alpha}$ \\
+type scheme & $\scheme{\seq{\alpha}}{\tau}$ & type of function bound by \pyinline{def}, generalised over its type parameters $\seq{\alpha}$ \\
 predefined name & $\predefName$ & name usable only in annotation or as decorator \\
 \end{tabular}
 \end{center}
 }
 \end{definition}
+
+\noindent A predefined name is a member of a predefined module whose meaning is fixed by the \thisdoc, such as \pyinline{list} or
+\pyinline{dataclass}; its entry records only that it is in scope, and it does not denote a value, so it cannot appear in
+an expression. A type parameter or type alias denotes a type rather than a value, so it too can be mentioned only by a type
+expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias{\seq{\alpha}}{\tau}$ are
+named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \pyinline{typing.TypeAliasType} of
+the objects denoted by a class name, type parameter or alias at run time.
+
+The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
+and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
+is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A variable
+with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
+It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
 
 \begin{definition}[Class]
 \label{def:class}
@@ -68,22 +82,14 @@ class. A class is also the type of its instances.
 \begin{definition}[Class table]
 \label{def:class-table}
 A class table $\Sigma$ is a finite map from classes to class table entries, with $\Sigma(C)$ of the form
-$\clsRec{\bind{\seq{x}}{\seq{\tau}}}{D}$: the distinct fields $\seq{x}$ of $C$ with their declared types
-$\seq{\tau}$, and its base class $D$, or $\bot$ if it has none. Every class named in $\Sigma$ is in
-$\dom(\Sigma)$, and the relation taking each class of $\Sigma$ to its base class is
+$\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{D[\seq{\sigma}]}$: the type parameters $\seq{\alpha}$ of $C$, its distinct fields $\seq{x}$ with their declared types
+$\seq{\tau}$, and its instantiated base class $D[\seq{\sigma}]$, or $\bot$ if it has none; the field types and the
+type arguments of the base may mention $\seq{\alpha}$. Every class named in $\Sigma$ is in
+$\dom(\Sigma)$, and the relation taking each class of $\Sigma$ to its base class $D$ is
 acyclic.
 \end{definition}
 
-\noindent The class table is borrowed from Featherweight Java~\cite{igarashi2001}. Module references arise from import statements. A predefined name is a
-member, such as $\pyinline{Callable}$ or $\pyinline{dataclass}$, that cannot appear in an expression: it names a
-type, is applied to type arguments as in \pyinline{list[int]}, or decorates a class declaration. A type parameter or type alias may likewise be
-mentioned only by a type expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias{\seq{\alpha}}{\tau}$ are
-named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \pyinline{typing.TypeAliasType} of
-the objects denoted by a class name, type parameter or alias at run time. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
-and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
-is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A variable
-with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
-It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
+\noindent The class table is similar to Featherweight Java's~\cite{igarashi2001}; the well-formedness rules build the table as they check the class declarations of a program (\figref{typing-top-level}).
 
 \subsubsection{Context operations}
 \label{sec:context-operations}
@@ -127,11 +133,11 @@ cannot, since Python does not permit type arguments in a class pattern. The auxi
 with an argument: the positional arguments fill the leading fields in order, and a keyword argument $x = u$
 fills the field $x$. It is defined only if every field receives exactly one argument.
 
-\paragraph{Type annotations.}
+\speconly{\subsubsection{Type annotations}\label{sec:type-annotations}}%
+\paperonly{\paragraph{Type annotations.}}
 
 Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
-may be annotated (\figref{syntax-types}). A dataclass specifies its base class by a type expression of the form $q[\seq{\psi}]$. A \emph{type} $\tau$ has the forms of a type expression, except that a class $C$ rather than a name is applied to type arguments, written $C$ when there are none; the type system resolves a type expression to a type, expanding class names to classes and type aliases to types\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
-\bind{x_n}{\psi_n}$.
+may be annotated (\figref{syntax-types}). A dataclass specifies its base class by a type expression of the form $q[\seq{\psi}]$. A \emph{type} $\tau$ has the forms of a type expression, with an \emph{instantiated class} $C[\seq{\tau}]$, a class applied to type arguments and written $C$ when there are no arguments, in place of $q[\seq{\psi}]$. Resolution\speconly{ (\secref{types})} takes $q[\seq{\psi}]$ to $C[\seq{\tau}]$ when $q$ denotes the class $C$, and to the instantiation of the alias when $q$ denotes a type alias. The substitution $\subst{\seq{\tau}}{\seq{\alpha}}{\sigma}$ replaces each occurrence of $\alpha_i$ in $\sigma$ by $\tau_i$, a plain replacement, since every type variable in a type is free, and is defined only if $\seq{\tau}$ and $\seq{\alpha}$ have the same length. A \emph{scheme} $\pi$ (\figref{syntax-types}) binds type parameters $\seq{\alpha}$ in its body. The body of a \emph{type scheme} $\scheme{\seq{\alpha}}{\tau}$ is a type; the body of a \emph{field scheme} $\scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}$ is a sequence of fields $\seq{x}$ with their types $\seq{\tau}$. The \emph{instantiation} of $\pi$ at $\seq{\sigma}$, written $\tyInst{\pi}{\seq{\sigma}}$, substitutes $\seq{\sigma}$ for $\seq{\alpha}$ in the body: $\subst{\seq{\sigma}}{\seq{\alpha}}{\tau}$ for a type scheme and $\bind{\seq{x}}{\subst{\seq{\sigma}}{\seq{\alpha}}{\seq{\tau}}}$ for a field scheme. A scheme with no type parameters is written as its body, with the $\forall\seq{\alpha}$ omitted. The fields of a class (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:fields}}) form a field scheme.
 
 \subsubsection{Operators}
 \label{sec:syntax-operators}

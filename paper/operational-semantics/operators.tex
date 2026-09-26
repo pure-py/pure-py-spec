@@ -19,7 +19,7 @@ print([1, "a"] == [1, 3])  # undefined: "a" against 3
 \end{python}
 
 \noindent Dictionaries are compared in the key order of the left operand for the same reason. The membership
-function $\memOp$ tests for a key of a dictionary, a substring of a string, or an element of a list or tuple,
+function $\contains$ tests for a key of a dictionary, a substring of a string, or an element of a list or tuple,
 the last by structural equality with the same short-circuiting. The strict operators are given by
 $\hat{\odot}$ and $\hat{\ominus}$ (\figref{operators}); the definitions of all of these are given in
 \specification.

@@ -12,10 +12,11 @@
 \and
 \inferrule*[lab={\ruleName{subty-class}}]
 {
-  D \in \ancestors(\Sigma, C)
+  \Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}'}}{D[\seq{\sigma}]} \\
+  \Sigma \vdash D[\subst{\seq{\tau}}{\seq{\alpha}}{\seq{\sigma}}] \subty \tau'
 }
 {
-  \Sigma \vdash C \subty D
+  \Sigma \vdash C[\seq{\tau}] \subty \tau'
 }
 \and
 \inferrule*[lab={\ruleName{subty-never}}]

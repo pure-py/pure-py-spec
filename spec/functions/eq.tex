@@ -14,5 +14,5 @@
 \eqOp(\delta, \delta') &{}= \pyinline{False} && \text{if } \dom(\delta) \neq \dom(\delta') \\*
 \\
 \eqOp(\exObj{C}{\rho}, \exObj{C}{\rho'}) &{}= \eqElems(\rho(x_1) \cons \ldots \cons \rho(x_n), \rho'(x_1) \cons \ldots \cons \rho'(x_n)) \\*
-&\qquad \text{if } \dom(\fields(\Sigma, C)) = x_1, \ldots, x_n \\*
+&\qquad \text{if } \fields(\Sigma, C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\*
 \eqOp(\exObj{C}{\rho}, \exObj{D}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq D

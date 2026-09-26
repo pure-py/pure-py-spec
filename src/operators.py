@@ -1,7 +1,7 @@
 import ast
 from collections.abc import Callable, Sequence
 
-from classes import Class, ClassTable, declared_type, fields
+from classes import ClassTable, fields
 from subtyping import comparable, join_seq, subtype
 from type_syntax import (
     CallableType,
@@ -12,8 +12,10 @@ from type_syntax import (
     Primitive,
     TupleType,
     Type,
+    TypeVariable,
     UnionType,
     base_type,
+    instantiate,
 )
 
 type ResolvedOverload = tuple[tuple[Type, ...], Type]
@@ -43,24 +45,20 @@ def equality_type(Sigma: ClassTable, tau: Type) -> bool:
     match tau:
         case CallableType():
             return False
-        case ListType(sigma):
-            return equality_type(Sigma, sigma)
-        case DictType(sigma):
+        case ListType(sigma) | DictType(sigma):
             return equality_type(Sigma, sigma)
         case TupleType(taus):
             return all(equality_type(Sigma, c) for c in taus)
         case UnionType(sigma, tau_):
             return equality_type(Sigma, sigma) and equality_type(Sigma, tau_)
-        case ClassType(c):
-            return class_equality_type(Sigma, c)
-        case Primitive():
+        case ClassType(c, taus):
+            return all(
+                equality_type(Sigma, sigma) for _, sigma in instantiate(fields(Sigma, c), taus)
+            )
+        case Primitive() | LiteralType():
             return True
-        case LiteralType():
-            return True
-
-
-def class_equality_type(Sigma: ClassTable, c: Class) -> bool:
-    return all(equality_type(Sigma, declared_type(Sigma, c, x)) for x in fields(Sigma, c))
+        case TypeVariable():
+            raise AssertionError
 
 
 def membership_list(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:

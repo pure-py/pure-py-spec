@@ -76,9 +76,7 @@ def subtype(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
             return len(sigmas) == len(taus) and all(
                 subtype(Sigma, a, b) for a, b in zip(sigmas, taus)
             )
-        case (ListType(sigma_), ListType(tau_)):
-            return equivalent(Sigma, sigma_, tau_)
-        case (DictType(sigma_), DictType(tau_)):
+        case (ListType(sigma_), ListType(tau_)) | (DictType(sigma_), DictType(tau_)):
             return equivalent(Sigma, sigma_, tau_)
         case (CallableType(sigmas, sigma_), CallableType(taus, tau_)):
             return (

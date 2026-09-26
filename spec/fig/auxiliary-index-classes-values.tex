@@ -2,7 +2,7 @@
 \auxgroup{Classes and modules}
 \auxrow{$\submods(q)$}{context}{stub for each submodule of $q$}{aux:submods}
 \auxrow{$\ownFields(\phi)$}{sequence of bindings}{fields declared by field list $\phi$, with their type expressions}{aux:own-fields}
-\auxrow{$\fields(\Sigma, C)$}{sequence of bindings}{fields of class $C$ with their types, inherited first}{aux:fields}
+\auxrow{$\fields(\Sigma, C)$}{field scheme}{fields of class $C$ with their types, inherited first, under its type parameters}{aux:fields}
 \auxrow{$\ancestors(\Sigma, C)$}{set of classes}{$C$ and its base classes}{aux:ancestors}
 \auxrow{$\fieldMap(\Sigma, C, \seq{u})$}{map from variables}{argument supplied for each field of $C$; defined iff arguments cover them exactly}{aux:field-map}
 \specauxrow{$\resolve(\rho, q)$}{value}{value denoted by name $q$ in $\rho$}{aux:resolve}
@@ -11,8 +11,8 @@
 \auxgroup{Values}
 \auxrow{$\eqOp(v, v')$}{Boolean}{structural equality; undefined between unrelated values}{aux:eq}
 \specauxrow{$\eqElems(\seq{v}, \seq{v}\,')$}{Boolean}{elementwise equality of value sequences}{aux:eq-elems}
-\auxrow{$\memOp(v, v')$}{Boolean}{whether $v'$ is element of $v$}{aux:contains}
-\specauxrow{$\memElems(\seq{v}, v)$}{Boolean}{whether $\seq{v}$ has element equal to $v$}{aux:contains-elems}
+\auxrow{$\contains(v, v')$}{Boolean}{whether $v'$ is element of $v$}{aux:contains}
+\specauxrow{$\containsElems(\seq{v}, v)$}{Boolean}{whether $\seq{v}$ has element equal to $v$}{aux:contains-elems}
 \specauxrow{$\elems(v)$}{sequence of values}{elements of list, tuple or string}{aux:elems}
 \auxrow{$\iterOp(v)$}{sequence of values}{sequence drawn from $v$ by generator; keys if $v$ is dictionary}{aux:iter}
 \auxrow{$\getitem(v, v')$}{value or abort}{subscripting; $\errIndex$ for index out of range, $\errKey$ for missing key, $\errType$ otherwise}{aux:getitem}

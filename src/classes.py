@@ -1,7 +1,7 @@
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
-from type_syntax import Name, Type, Var
+from type_syntax import ClassType, FieldScheme, Name, Type, Var, instantiate
 
 
 @dataclass(frozen=True)
@@ -14,8 +14,9 @@ class Class:
 
 @dataclass(frozen=True)
 class ClassTableEntry:
+    type_params: tuple[Var, ...]
     own_fields: tuple[tuple[Var, Type], ...]
-    base: Class | None
+    base: ClassType | None
 
 
 type ClassTable = Mapping[Class, ClassTableEntry]
@@ -27,27 +28,29 @@ def short_name(c: Class) -> Var:
 
 def ancestors(Sigma: ClassTable, c: Class) -> list[Class]:
     base = Sigma[c].base
-    return [c] if base is None else [c] + ancestors(Sigma, base)
+    return [c] if base is None else [c] + ancestors(Sigma, base.c)
 
 
-def fields(Sigma: ClassTable, c: Class) -> tuple[Var, ...]:
+def fields(Sigma: ClassTable, c: Class) -> FieldScheme:
     class_entry = Sigma[c]
-    own = tuple(x for x, _ in class_entry.own_fields)
-    return own if class_entry.base is None else fields(Sigma, class_entry.base) + own
+    if class_entry.base is None:
+        return FieldScheme(class_entry.type_params, class_entry.own_fields)
+    inherited = instantiate(fields(Sigma, class_entry.base.c), class_entry.base.args)
+    return FieldScheme(class_entry.type_params, inherited + class_entry.own_fields)
 
 
-def field_type(Sigma: ClassTable, c: Class, x: Var) -> Type | None:
-    class_entry = Sigma[c]
-    own = dict(class_entry.own_fields)
-    if x in own:
-        return own[x]
-    return None if class_entry.base is None else field_type(Sigma, class_entry.base, x)
+def field_names(Sigma: ClassTable, c: Class) -> tuple[Var, ...]:
+    return tuple(x for x, _ in fields(Sigma, c).fields)
 
 
-def declared_type(Sigma: ClassTable, c: Class, x: Var) -> Type:
-    tau = field_type(Sigma, c, x)
-    assert tau is not None
-    return tau
+def field_type(Sigma: ClassTable, tau: ClassType, x: Var) -> Type | None:
+    return dict(instantiate(fields(Sigma, tau.c), tau.args)).get(x)
+
+
+def declared_type(Sigma: ClassTable, tau: ClassType, x: Var) -> Type:
+    sigma = field_type(Sigma, tau, x)
+    assert sigma is not None
+    return sigma
 
 
 def field_map[T](
@@ -57,10 +60,39 @@ def field_map[T](
     kwd_names: Sequence[str],
     kwd_values: Sequence[T],
 ) -> dict[Var, T] | None:
-    xs = fields(Sigma, c)
+    xs = field_names(Sigma, c)
     n = len(positional)
     if n + len(kwd_names) != len(xs) or len(set(kwd_names)) != len(kwd_names):
         return None
     if set(kwd_names) != set(xs[n:]):
         return None
     return {**dict(zip(xs[:n], positional)), **dict(zip(kwd_names, kwd_values))}
+
+
+@dataclass(frozen=True)
+class ArityMismatch:
+    expected: int
+    given: int
+
+
+@dataclass(frozen=True)
+class RepeatedKeywordArg:
+    pass
+
+
+@dataclass(frozen=True)
+class UnknownKeywordArgs:
+    xs: tuple[Var, ...]
+
+
+type FieldMapFailure = ArityMismatch | RepeatedKeywordArg | UnknownKeywordArgs
+
+
+def no_field_map(Sigma: ClassTable, c: Class, n: int, kwd_names: Sequence[str]) -> FieldMapFailure:
+    """Why field-map is undefined for n positional arguments and the keywords kwd_names."""
+    xs = field_names(Sigma, c)
+    if n + len(kwd_names) != len(xs):
+        return ArityMismatch(len(xs), n + len(kwd_names))
+    if len(set(kwd_names)) != len(kwd_names):
+        return RepeatedKeywordArg()
+    return UnknownKeywordArgs(tuple(sorted(set(xs[n:]))))

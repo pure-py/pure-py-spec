@@ -2,8 +2,9 @@
 {
   \resolve(\rho, q) = \Type{C} \\
   C \in \ancestors(\Sigma, D) \\
-  \rho, \fieldMap(\Sigma, C, \seq{p})(x), \rho'(x) \matches m_x \quad (\forall x \in \dom(\fields(\Sigma, C)))
+  \fields(\Sigma, C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
+  \rho, \fieldMap(\Sigma, C, \seq{p})(x_i), \rho'(x_i) \matches m_i \quad (\forall i)
 }
 {
-  \rho, \patConstr{q}{\seq{p}}, \exObj{D}{\rho'} \matches {\textstyle\bigotimes_{x \in \dom(\fields(\Sigma, C))}}\, m_x
+  \rho, \patConstr{q}{\seq{p}}, \exObj{D}{\rho'} \matches m_1 \override \ldots \override m_n
 }

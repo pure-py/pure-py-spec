@@ -36,8 +36,12 @@ $\tau$ & $::=$ & $\nu$ & (Primitive) \\
     & $\mid$ & $\alpha$ & (TypeVar) \\
     & $\mid$ & $C[\tau_1, \ldots, \tau_n]$ & (Class) \\
     & $\mid$ & $\tyUnion{\sigma}{\tau}$ & (Union)
+   \\[3mm]
+\grammarGroup{Schemes} \\
+$\pi$ & $::=$ & $\scheme{\seq{\alpha}}{\tau}$ & (Type scheme) \\
+    & $\mid$ & $\scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}$ & (Field scheme)
 \end{tabular}
 \end{center}
-\caption{Type expressions and types}
+\caption{Type expressions, types and schemes}
 \label{fig:syntax-types}
 \end{figure}
