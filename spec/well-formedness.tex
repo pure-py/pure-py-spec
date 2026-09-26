@@ -103,8 +103,8 @@ field: the fields of its base class first, recursively and instantiated at the t
 declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the instantiation $\tyInst{\fields(\Sigma, C)}{\seq{\tau}}$. The order matters, because a constructor call pairs positional arguments with fields by
 position. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to
-(\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must
-synthesise \Replaced{an instantiated class $C[\seq{\tau}]$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\tyInst{\fields(\Sigma, C)}{\seq{\tau}}$}{a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(\Sigma, C)$}
+(\ruleName{constr}). \Replaced{An attribute reference $\exAttr{e}{x}$ has the type of field $x$ in the class that $e$ synthesises}{In an attribute reference $\exAttr{e}{x}$ the object $e$ must
+synthesise a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(\Sigma, C)$}
 (\ruleName{attr-object}). The signature of a predefined module binds
 $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type listed for it
 (\figref{predefined-signatures}, Definition~\ref{def:predefined}). A module attribute reference
