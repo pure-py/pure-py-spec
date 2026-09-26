@@ -71,7 +71,9 @@ def subtype(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
             return subtype(Sigma, sigma, tau.left) or subtype(Sigma, sigma, tau.right)
         case (LiteralType(), _):
             return subtype(Sigma, base_type(sigma), tau)
-        case (ClassType(c, taus), ClassType()):
+        case (ClassType(c, taus), ClassType(d, sigmas)):
+            if c == d and all(equivalent(Sigma, a, b) for a, b in zip(taus, sigmas)):
+                return True
             base = Sigma[c].base
             return base is not None and subtype(
                 Sigma, substitute(taus, Sigma[c].type_params, base), tau

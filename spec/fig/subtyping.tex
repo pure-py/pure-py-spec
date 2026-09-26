@@ -10,13 +10,21 @@
   \Sigma \vdash \tau \subty \tau
 }
 \and
-\inferrule*[lab={\ruleName{subty-class}}]
+\inferrule*[lab={\ruleName{\replaced{subty-class-extend}{subty-class}}}]
 {
   \Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}'}}{D[\seq{\sigma}]} \\
   \Sigma \vdash D[\subst{\seq{\tau}}{\seq{\alpha}}{\seq{\sigma}}] \subty \tau'
 }
 {
   \Sigma \vdash C[\seq{\tau}] \subty \tau'
+}
+\and
+\inferrule*[lab={\ruleName{\added{subty-class}}}]
+{
+  \added{\Sigma \vdash \sigma_i \tyEquiv \tau_i \quad (\forall i)}
+}
+{
+  \added{\Sigma \vdash C[\seq{\sigma}] \subty C[\seq{\tau}]}
 }
 \and
 \inferrule*[lab={\ruleName{subty-never}}]
