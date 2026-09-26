@@ -76,16 +76,16 @@ class ArityMismatch:
 
 
 @dataclass(frozen=True)
-class RepeatedKeyword:
+class RepeatedKeywordArgument:
     pass
 
 
 @dataclass(frozen=True)
-class UnknownKeywords:
+class UnknownKeywordArguments:
     xs: tuple[Var, ...]
 
 
-type FieldMapFailure = ArityMismatch | RepeatedKeyword | UnknownKeywords
+type FieldMapFailure = ArityMismatch | RepeatedKeywordArgument | UnknownKeywordArguments
 
 
 def no_field_map(Sigma: ClassTable, c: Class, n: int, kwd_names: Sequence[str]) -> FieldMapFailure:
@@ -94,5 +94,5 @@ def no_field_map(Sigma: ClassTable, c: Class, n: int, kwd_names: Sequence[str]) 
     if n + len(kwd_names) != len(xs):
         return ArityMismatch(len(xs), n + len(kwd_names))
     if len(set(kwd_names)) != len(kwd_names):
-        return RepeatedKeyword()
-    return UnknownKeywords(tuple(sorted(set(xs[n:]))))
+        return RepeatedKeywordArgument()
+    return UnknownKeywordArguments(tuple(sorted(set(xs[n:]))))

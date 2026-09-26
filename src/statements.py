@@ -23,8 +23,8 @@ from classes import (
     Class,
     ClassTable,
     ClassTableEntry,
-    RepeatedKeyword,
-    UnknownKeywords,
+    RepeatedKeywordArgument,
+    UnknownKeywordArguments,
     declared_type,
     field_map,
     field_names,
@@ -578,9 +578,9 @@ def constr(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> Type:
         match no_field_map(mod_ctx.Sigma, c, len(e.args), kwd_names):
             case ArityMismatch(expected, given):
                 raise IllFormedModule(e, reasons.ConstructorArityMismatch(name, expected, given))
-            case UnknownKeywords(xs):
+            case UnknownKeywordArguments(xs):
                 raise IllFormedModule(e, reasons.UnknownConstructorKeyword(name, xs))
-            case RepeatedKeyword():
+            case RepeatedKeywordArgument():
                 raise AssertionError  # a syntax error in Python
     tau = ClassType(c, ())
     for x, arg in args.items():

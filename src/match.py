@@ -8,8 +8,8 @@ from classes import (
     ArityMismatch,
     Class,
     ClassTable,
-    RepeatedKeyword,
-    UnknownKeywords,
+    RepeatedKeywordArgument,
+    UnknownKeywordArguments,
     field_map,
     field_names,
     fields,
@@ -298,9 +298,9 @@ def pattern_seq(Sigma: ClassTable, c: Class, p: ast.MatchClass) -> tuple[ast.pat
         match no_field_map(Sigma, c, len(p.patterns), p.kwd_attrs):
             case ArityMismatch(expected, given):
                 raise IllFormedModule(p, reasons.PatternArityMismatch(name, expected, given))
-            case RepeatedKeyword():
+            case RepeatedKeywordArgument():
                 raise IllFormedModule(p, reasons.DuplicatePatternKeyword(name))
-            case UnknownKeywords(xs):
+            case UnknownKeywordArguments(xs):
                 raise IllFormedModule(p, reasons.UnknownFieldInPattern(name, xs))
     return tuple(args[x] for x in field_names(Sigma, c))
 

@@ -11,8 +11,8 @@
 \auxgroup{Values}
 \auxrow{$\eqOp(v, v')$}{Boolean}{structural equality; undefined between unrelated values}{aux:eq}
 \specauxrow{$\eqElems(\seq{v}, \seq{v}\,')$}{Boolean}{elementwise equality of value sequences}{aux:eq-elems}
-\auxrow{$\memOp(v, v')$}{Boolean}{whether $v'$ is element of $v$}{aux:contains}
-\specauxrow{$\memElems(\seq{v}, v)$}{Boolean}{whether $\seq{v}$ has element equal to $v$}{aux:contains-elems}
+\auxrow{$\contains(v, v')$}{Boolean}{whether $v'$ is element of $v$}{aux:contains}
+\specauxrow{$\containsElems(\seq{v}, v)$}{Boolean}{whether $\seq{v}$ has element equal to $v$}{aux:contains-elems}
 \specauxrow{$\elems(v)$}{sequence of values}{elements of list, tuple or string}{aux:elems}
 \auxrow{$\iterOp(v)$}{sequence of values}{sequence drawn from $v$ by generator; keys if $v$ is dictionary}{aux:iter}
 \auxrow{$\getitem(v, v')$}{value or abort}{subscripting; $\errIndex$ for index out of range, $\errKey$ for missing key, $\errType$ otherwise}{aux:getitem}
