@@ -745,36 +745,29 @@ def iterated_type(e: ast.expr, mod_ctx: ModuleContext) -> Type:
 def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, ClassTable]:
     if not isinstance(mod_ctx.gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.NotPredefinedName("dataclass"))
-    alphas = tuple(type_param_names(node))
+    alphas = tuple(p.name for p in node.type_params if isinstance(p, ast.TypeVar))
+    assert len(alphas) == len(node.type_params)
     mod_ctx_ = override_gamma(mod_ctx, {alpha: TypeVar() for alpha in alphas})
     own = tuple((x, resolve_type(psi, node, mod_ctx_)) for x, psi in own_fields(node))
-    names = [x for x, _ in own]
-    dup = next((n for i, n in enumerate(names) if n in names[:i]), None)
+    base = None if len(node.bases) == 0 else base_class(node, mod_ctx_)
+    inherited = () if base is None else field_names(mod_ctx.Sigma, base.c)
+    names = inherited + tuple(x for x, _ in own)
+    dup = next((x for i, x in enumerate(names) if x in names[:i]), None)
     if dup is not None:
         raise IllFormedModule(node, reasons.DuplicateField(dup, node.name))
-    base: ClassType | None = None
-    if len(node.bases) > 0:
-        psi = parse_annotation(node.bases[0])
-        assert isinstance(psi, TypeName)
-        theta = resolve_name(psi.q, mod_ctx_)
-        if not isinstance(theta, Class):
-            raise IllFormedModule(node, reasons.NotClass(psi.q))
-        sigmas = tuple(resolve_type(psi_, node, mod_ctx_) for psi_ in psi.args)
-        expected = len(mod_ctx.Sigma[theta].type_params)
-        if len(sigmas) != expected:
-            raise IllFormedModule(node, reasons.ClassArityMismatch(psi.q, expected, len(sigmas)))
-        base = ClassType(theta, sigmas)
-        duplicates = set(names) & set(field_names(mod_ctx.Sigma, theta))
-        if len(duplicates) > 0:
-            raise IllFormedModule(node, reasons.DuplicateField(min(duplicates), node.name))
     c = Class(qualified(mod_ctx.q, node.name))
     assert c not in mod_ctx.Sigma
     return c, {**mod_ctx.Sigma, c: ClassTableEntry(alphas, own, base)}
 
 
-def type_param_names(node: ast.ClassDef) -> list[Var]:
-    names: list[Var] = []
-    for param in node.type_params:
-        assert isinstance(param, ast.TypeVar)
-        names.append(param.name)
-    return names
+def base_class(node: ast.ClassDef, mod_ctx: ModuleContext) -> ClassType:
+    psi = parse_annotation(node.bases[0])
+    assert isinstance(psi, TypeName)
+    theta = resolve_name(psi.q, mod_ctx)
+    if not isinstance(theta, Class):
+        raise IllFormedModule(node, reasons.NotClass(psi.q))
+    sigmas = tuple(resolve_type(psi_, node, mod_ctx) for psi_ in psi.args)
+    expected = len(mod_ctx.Sigma[theta].type_params)
+    if len(sigmas) != expected:
+        raise IllFormedModule(node, reasons.ClassArityMismatch(psi.q, expected, len(sigmas)))
+    return ClassType(theta, sigmas)
