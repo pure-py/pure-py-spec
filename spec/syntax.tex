@@ -61,7 +61,7 @@ predefined name & $\predefName$ & name usable only in annotation or as decorator
 
 \noindent \Added{\Replaced{A predefined name is a member of a predefined module whose meaning is fixed by the \thisdoc, such as \pyinline{list} or
 \pyinline{dataclass}; its entry records only that it is in scope, and it does not denote a value, so it cannot appear in
-an expression. A type parameter or type alias is mentioned only by a type expression, so it too cannot appear in an
+an expression. A type parameter or type alias denotes a type rather than a value, so it too is mentioned only by a type
 expression.}{A predefined name is a
 member, such as $\pyinline{Callable}$ or $\pyinline{dataclass}$, that cannot appear in an expression: it names a
 type, is applied to type arguments as in \pyinline{list[int]}, or decorates a class declaration. A type parameter or type alias may likewise be
