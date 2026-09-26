@@ -361,16 +361,10 @@ def seq_safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> tuple[ast.pat
                 return first_unsafe([(q, tau.value) for q in ps], mod_ctx)
             return None
         case ast.MatchClass():
-            c = class_of_name(p.cls, mod_ctx)
-            if c is None or len(mod_ctx.Sigma[c].type_params) > 0:
-                return None  # the match rules reject with a sharper reason
-            args = field_map(mod_ctx.Sigma, c, p.patterns, p.kwd_attrs, p.kwd_patterns)
-            if args is None:
-                return None  # likewise
-            return first_unsafe(
-                [(args[x], sigma) for x, sigma in instantiate(fields(mod_ctx.Sigma, c), ())],
-                mod_ctx,
-            )
+            c = class_of_pattern(p, mod_ctx)
+            qs = pattern_seq(mod_ctx.Sigma, c, p)
+            sigmas = [sigma for _, sigma in instantiate(fields(mod_ctx.Sigma, c), ())]
+            return first_unsafe(list(zip(qs, sigmas)), mod_ctx)
         case ast.MatchAs():
             return None if p.pattern is None else seq_safe(p.pattern, tau, mod_ctx)
         case _:
