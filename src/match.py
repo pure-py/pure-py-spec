@@ -336,7 +336,7 @@ def match_shapes(residual: Shapes, p: ast.pattern, mod_ctx: ModuleContext) -> Ma
 def seq_safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> tuple[ast.pattern, Type] | None:
     match tau:
         case UnionType(sigma, sigma_):
-            mismatch = first_unsafe([(p, sigma), (p, sigma_)], mod_ctx)
+            mismatch = first_seq_unsafe([(p, sigma), (p, sigma_)], mod_ctx)
             if mismatch is None:
                 return None
             q, sigma = mismatch
@@ -348,30 +348,30 @@ def seq_safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> tuple[ast.pat
             if isinstance(tau, ListType) or tau in (Primitive.SIZED, Primitive.OBJECT):
                 return (p, tau)
             if isinstance(tau, TupleType) and len(tau.components) == len(ps):
-                return first_unsafe(list(zip(ps, tau.components)), mod_ctx)
+                return first_seq_unsafe(list(zip(ps, tau.components)), mod_ctx)
             return None
         case PatList(patterns=ps):
             if isinstance(tau, TupleType) or tau in (Primitive.SIZED, Primitive.OBJECT):
                 return (p, tau)
             if isinstance(tau, ListType):
-                return first_unsafe([(q, tau.elem) for q in ps], mod_ctx)
+                return first_seq_unsafe([(q, tau.elem) for q in ps], mod_ctx)
             return None
         case ast.MatchMapping(patterns=ps):
             if isinstance(tau, DictType):
-                return first_unsafe([(q, tau.value) for q in ps], mod_ctx)
+                return first_seq_unsafe([(q, tau.value) for q in ps], mod_ctx)
             return None
         case ast.MatchClass():
             c = class_of_pattern(p, mod_ctx)
             qs = pattern_seq(mod_ctx.Sigma, c, p)
             sigmas = [sigma for _, sigma in instantiate(fields(mod_ctx.Sigma, c), ())]
-            return first_unsafe(list(zip(qs, sigmas)), mod_ctx)
+            return first_seq_unsafe(list(zip(qs, sigmas)), mod_ctx)
         case ast.MatchAs():
             return None if p.pattern is None else seq_safe(p.pattern, tau, mod_ctx)
         case _:
             return None
 
 
-def first_unsafe(
+def first_seq_unsafe(
     pairs: list[tuple[ast.pattern, Type]], mod_ctx: ModuleContext
 ) -> tuple[ast.pattern, Type] | None:
     mismatches = (seq_safe(q, sigma, mod_ctx) for q, sigma in pairs)
