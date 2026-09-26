@@ -30,9 +30,9 @@ hiding it throughout the scope.}
 \input{spec/fig/resolve-type}
 
 Function signatures, assignments and dataclass fields are annotated with type expressions, and a
-type expression denotes a type under a context (\figref{resolve-type}). Every definition carries an
+type expression denotes a type under a context\Added{ and a class table} (\figref{resolve-type}). Every definition carries an
 annotation for its parameters and return type, so the type of a definition is given rather than
-inferred from its body. Within a type expression, class names resolve to classes, type parameters in scope denote the type variables of those names, and all other names must be predefined names (\figref{resolve-type}). The function $\baseType(\tau)$ discards the precision of a
+inferred from its body. Within a type expression, \Replaced{a class name applied to as many type arguments as the class has parameters resolves to an instantiated class, an alias name applied to type arguments resolves to the instantiation of its alias, type parameters in scope denote the type variables of those names}{class names resolve to classes, type parameters in scope denote the type variables of those names}, and all other names must be predefined names (\figref{resolve-type}). The function $\baseType(\tau)$ discards the precision of a
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as the identity
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:base-type}}).
 
@@ -253,7 +253,7 @@ definitions and modules introduce the variables of the scope as unbound, using t
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
 the class name to $\Type{C}$, resolves the field annotations with its type parameters in scope, and requires the fields it declares to be distinct and, when it extends
-another class, the base name to be bound to a class, applied to as many type arguments as that class has parameters, and the additional fields not to repeat an inherited field
+another class, \Replaced{the base to resolve to an instantiated class}{the base name to be bound to a class, applied to as many type arguments as that class has parameters}, and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
 scope; every \PurePy class must declare itself a dataclass. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).

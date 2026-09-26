@@ -1,47 +1,62 @@
 \begin{figure}
-\flushleft \shadebox{$\Gamma \vdash \psi \synth \tau$}
+\flushleft \shadebox{$\replaced{\Sigma; \Gamma}{\Gamma} \vdash \psi \synth \tau$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{ty-name}}]
 { \bind{\nu}{\predefName} \in \Gamma }
-{ \Gamma \vdash \nu \synth \nu }
+{ \replaced{\Sigma; \Gamma}{\Gamma} \vdash \nu \synth \nu }
 \and
 \inferrule*[lab={\ruleName{ty-var}}]
 {
   \bind{\alpha}{\TypeVar} \in \Gamma
 }
 {
-  \Gamma \vdash \alpha \synth \alpha
+  \replaced{\Sigma; \Gamma}{\Gamma} \vdash \alpha \synth \alpha
 }
 \and
 \inferrule*[lab={\ruleName{ty-class}}]
-{ \Gamma \vdash q : \Type{C} }
-{ \Gamma \vdash q \synth C }
+{
+  \Gamma \vdash q : \Type{C} \\
+  \added{\Sigma; \Gamma \vdash \seq{\psi} \synth \seq{\tau}} \\
+  \added{C \text{ has } |\seq{\tau}| \text{ type parameters in } \Sigma}
+}
+{
+  \replaced{\Sigma; \Gamma}{\Gamma} \vdash \replaced{q[\seq{\psi}]}{q} \synth \replaced{C[\seq{\tau}]}{C}
+}
+\and
+\inferrule*[lab={\ruleName{ty-alias}}]
+{
+  \added{\Gamma \vdash q : \TypeAlias{\seq{\alpha}}{\tau}} \\
+  \added{\Sigma; \Gamma \vdash \seq{\psi} \synth \seq{\sigma}}
+}
+{
+  \added{\Sigma; \Gamma \vdash q[\seq{\psi}] \synth \subst{\seq{\sigma}}{\seq{\alpha}}{\tau}}
+}
 \and
 \inferrule*[lab={\ruleName{ty-literal}}]
 { \bind{\pyinline{Literal}}{\predefName} \in \Gamma }
-{ \Gamma \vdash \tyLiteral{\ell} \synth \tyLiteral{\ell} }
+{ \replaced{\Sigma; \Gamma}{\Gamma} \vdash \tyLiteral{\ell} \synth \tyLiteral{\ell} }
 \and
 \inferrule*[lab={\ruleName{ty-list}}]
-{ \bind{\pyinline{list}}{\predefName} \in \Gamma \\ \Gamma \vdash \psi \synth \tau }
-{ \Gamma \vdash \tyList{\psi} \synth \tyList{\tau} }
+{ \bind{\pyinline{list}}{\predefName} \in \Gamma \\ \replaced{\Sigma; \Gamma}{\Gamma} \vdash \psi \synth \tau }
+{ \replaced{\Sigma; \Gamma}{\Gamma} \vdash \tyList{\psi} \synth \tyList{\tau} }
 \and
 \inferrule*[lab={\ruleName{ty-dict}}]
-{ \bind{\pyinline{dict}}{\predefName} \in \Gamma \\ \bind{\pyinline{str}}{\predefName} \in \Gamma \\ \Gamma \vdash \psi \synth \tau }
-{ \Gamma \vdash \tyDict{\psi} \synth \tyDict{\tau} }
+{ \bind{\pyinline{dict}}{\predefName} \in \Gamma \\ \bind{\pyinline{str}}{\predefName} \in \Gamma \\ \replaced{\Sigma; \Gamma}{\Gamma} \vdash \psi \synth \tau }
+{ \replaced{\Sigma; \Gamma}{\Gamma} \vdash \tyDict{\psi} \synth \tyDict{\tau} }
 \and
 \inferrule*[lab={\ruleName{ty-tuple}}]
-{ \bind{\pyinline{tuple}}{\predefName} \in \Gamma \\ \Gamma \vdash \psi_i \synth \tau_i \quad (\forall i) }
-{ \Gamma \vdash \tyTuple{\seq{\psi}} \synth \tyTuple{\seq{\tau}} }
+{ \bind{\pyinline{tuple}}{\predefName} \in \Gamma \\ \replaced{\Sigma; \Gamma}{\Gamma} \vdash \psi_i \synth \tau_i \quad (\forall i) }
+{ \replaced{\Sigma; \Gamma}{\Gamma} \vdash \tyTuple{\seq{\psi}} \synth \tyTuple{\seq{\tau}} }
 \and
 \inferrule*[lab={\ruleName{ty-callable}}]
-{ \bind{\pyinline{Callable}}{\predefName} \in \Gamma \\ \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\ \Gamma \vdash \psi \synth \tau }
-{ \Gamma \vdash \tyCallable{\seq{\psi}}{\psi} \synth \tyCallable{\seq{\sigma}}{\tau} }
+{ \bind{\pyinline{Callable}}{\predefName} \in \Gamma \\ \replaced{\Sigma; \Gamma}{\Gamma} \vdash \psi_i \synth \sigma_i \quad (\forall i) \\ \replaced{\Sigma; \Gamma}{\Gamma} \vdash \psi \synth \tau }
+{ \replaced{\Sigma; \Gamma}{\Gamma} \vdash \tyCallable{\seq{\psi}}{\psi} \synth \tyCallable{\seq{\sigma}}{\tau} }
 \and
 \inferrule*[lab={\ruleName{ty-union}}]
-{ \Gamma \vdash \psi \synth \sigma \\ \Gamma \vdash \psi' \synth \tau }
-{ \Gamma \vdash \tyUnion{\psi}{\psi'} \synth \tyUnion{\sigma}{\tau} }
+{ \replaced{\Sigma; \Gamma}{\Gamma} \vdash \psi \synth \sigma \\ \replaced{\Sigma; \Gamma}{\Gamma} \vdash \psi' \synth \tau }
+{ \replaced{\Sigma; \Gamma}{\Gamma} \vdash \tyUnion{\psi}{\psi'} \synth \tyUnion{\sigma}{\tau} }
 \end{mathpar}
-\caption{Type expression $\psi$ denotes type $\tau$ under $\Gamma$}
+\caption{Type expression $\psi$ denotes type $\tau$ under $\Gamma$\added{ and $\Sigma$}}
 \label{fig:resolve-type}
 \end{figure}
