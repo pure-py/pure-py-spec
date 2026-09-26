@@ -45,8 +45,8 @@ Subtyping (\figref{subtyping}) has every type below itself, a literal type below
 ancestors,} with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
 each of its members and below every type that is above all of them. A tuple type is covariant, below another of the
 same length when each of its components is below the corresponding component. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; \Replaced{the notations $\subty$ and $\tyEquiv$}{both notations} follow \citet{pierce2002}. Lists and
-dictionaries are related only when their components are equivalent, since both are invariant in mypy
-and covariance would accept programs rejected by mypy. A callable type is contravariant in its parameters
+dictionaries are related only when their components are equivalent, since both are invariant in mypy\Deleted{
+and covariance would accept programs rejected by mypy}. A callable type is contravariant in its parameters
 and covariant in its result, following mypy. The types with a length, namely lists, dictionaries,
 strings and tuples, are below \pyinline{Sized}. An \pyinline{int} is a \pyinline{float}, as PEP~484
 requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
