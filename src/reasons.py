@@ -145,13 +145,13 @@ class NotClass:
 
 
 @dataclass(frozen=True)
-class BaseClassArityMismatch:
+class ClassArityMismatch:
     q: Name
     expected: int
     given: int
 
     def message(self) -> str:
-        return f"base class '{self.q}' expects {self.expected} type arguments, given {self.given}"
+        return f"class '{self.q}' expects {self.expected} type arguments, given {self.given}"
 
 
 @dataclass(frozen=True)
@@ -441,7 +441,7 @@ type Reason = (
     | ConstructorArityMismatch
     | PatternArityMismatch
     | NotClass
-    | BaseClassArityMismatch
+    | ClassArityMismatch
     | NotPredefinedName
     | UnknownFieldInPattern
     | DuplicatePatternKeyword

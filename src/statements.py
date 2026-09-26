@@ -762,9 +762,7 @@ def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, C
         sigmas = tuple(resolve_type(psi_, node, mod_ctx_) for psi_ in psi.args)
         expected = len(mod_ctx.Sigma[theta].type_params)
         if len(sigmas) != expected:
-            raise IllFormedModule(
-                node, reasons.BaseClassArityMismatch(psi.q, expected, len(sigmas))
-            )
+            raise IllFormedModule(node, reasons.ClassArityMismatch(psi.q, expected, len(sigmas)))
         base = ClassType(theta, sigmas)
         duplicates = set(names) & set(field_names(mod_ctx.Sigma, theta))
         if len(duplicates) > 0:
