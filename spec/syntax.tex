@@ -77,7 +77,7 @@ $\dom(\Sigma)$, and the relation taking each class of $\Sigma$ to its base class
 acyclic.
 \end{definition}
 
-\noindent \Deleted{The class table is borrowed from Featherweight Java~\cite{igarashi2001}.} Module references arise from import statements. A predefined name is a
+\noindent \Replaced{The well-formedness rules accumulate the class table, one entry per class declaration (\figref{typing-top-level}), a device of Featherweight Java~\cite{igarashi2001}.}{The class table is borrowed from Featherweight Java~\cite{igarashi2001}.} Module references arise from import statements. A predefined name is a
 member, such as $\pyinline{Callable}$ or $\pyinline{dataclass}$, that cannot appear in an expression: it names a
 type, is applied to type arguments as in \pyinline{list[int]}, or decorates a class declaration. A type parameter or type alias may likewise be
 mentioned only by a type expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias{\seq{\alpha}}{\tau}$ are
