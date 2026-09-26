@@ -37,10 +37,11 @@ $\tau$ & $::=$ & $\nu$ & (Primitive) \\
     & $\mid$ & $C[\tau_1, \ldots, \tau_n]$ & (Class) \\
     & $\mid$ & $\tyUnion{\sigma}{\tau}$ & (Union)
    \\[3mm]
-\grammarGroup{\added{Type schemes}} \\
-\added{$\pi$} & \added{$::=$} & \added{$\tyScheme{\seq{\alpha}}{\tau}$} & \added{(Scheme)}
+\grammarGroup{\added{Schemes}} \\
+\added{$\pi$} & \added{$::=$} & \added{$\scheme{\seq{\alpha}}{\tau}$} & \added{(Type scheme)} \\
+    & \added{$\mid$} & \added{$\scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}$} & \added{(Field scheme)}
 \end{tabular}
 \end{center}
-\caption{Type expressions\replaced{, types and type schemes}{ and types}}
+\caption{Type expressions\replaced{, types and schemes}{ and types}}
 \label{fig:syntax-types}
 \end{figure}

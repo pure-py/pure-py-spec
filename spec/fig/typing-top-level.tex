@@ -38,7 +38,8 @@
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
   \replaced{\Gamma'}{\Gamma} \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
-  \seq{x} \cap \dom(\fields(\Sigma, D)) = \varnothing
+  \added{\fields(\Sigma, D) = \scheme{\seq{\alpha}'}{\bind{\seq{y}}{\seq{\tau}}}} \\
+  \replaced{\set{\seq{x}} \cap \set{\seq{y}} = \varnothing}{\seq{x} \cap \dom(\fields(\Sigma, D)) = \varnothing}
 }
 {
   \Sigma; q; \Gamma \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\replaced{\seq{\psi}'}{\seq{\psi}}]}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\replaced{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}{(\bind{\seq{x}}{\seq{\sigma}};\, D)}}

@@ -102,7 +102,7 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 
 \input{spec/fig/typing-synth}
 
-\Replaced{The fields of a class $C$ form a scheme $\fields(\Sigma, C)$ over its type parameters, whose body is a sequence of bindings $\bind{x}{\tau}$, one per
+\Replaced{The fields of a class $C$ form a field scheme $\fields(\Sigma, C)$ over its type parameters, with one binding $\bind{x}{\tau}$ per
 field: the fields of its base class first, recursively and instantiated at the type arguments of the base, then the fields declared by $C$ itself, each at its
 declared type; an instantiated class $C[\seq{\tau}]$ has the fields $\tyInst{\fields(\Sigma, C)}{\seq{\tau}}$.}{The fields of a class $C$ form a sequence $\fields(\Sigma, C)$ of bindings $\bind{x}{\tau}$, one per
 field: the fields of its base class first, recursively, then the fields declared by $C$ itself, each at its
