@@ -45,16 +45,12 @@ def extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[S
 
 def binds(pattern: ast.pattern) -> set[Var]:
     match pattern:
-        case ast.MatchValue():
-            return set()
-        case ast.MatchSingleton():
+        case ast.MatchValue() | ast.MatchSingleton():
             return set()
         case ast.MatchAs(pattern=p, name=x):
             sub = binds(p) if p is not None else set()
             return sub | ({x} if x else set())
-        case ast.MatchSequence(patterns=ps):
-            return set().union(*(binds(p) for p in ps))
-        case ast.MatchMapping(patterns=ps):
+        case ast.MatchSequence(patterns=ps) | ast.MatchMapping(patterns=ps):
             return set().union(*(binds(p) for p in ps))
         case ast.MatchClass(patterns=ps, kwd_patterns=ps_):
             return set().union(*(binds(p) for p in list(ps) + list(ps_)))
@@ -87,9 +83,7 @@ def fv(e: ast.expr) -> set[Var]:
             return fv(e_)
         case ast.Subscript():
             return fv(e.value) | fv(e.slice)
-        case ast.List(elts=es):
-            return fv_list(es)
-        case ast.Tuple(elts=es):
+        case ast.List(elts=es) | ast.Tuple(elts=es):
             return fv_list(es)
         case ast.Dict():
             return fv_list(dict_keys(e)) | fv_list(e.values)
@@ -131,9 +125,7 @@ def captures(e: ast.expr) -> set[Var]:
         case ast.Lambda():
             params = {a.arg for a in e.args.args}
             return fv(e.body) - params
-        case ast.Name():
-            return set()
-        case ast.Constant():
+        case ast.Name() | ast.Constant():
             return set()
         case ast.Call():
             return (
@@ -155,9 +147,7 @@ def captures(e: ast.expr) -> set[Var]:
             return captures(e_)
         case ast.Subscript():
             return captures(e.value) | captures(e.slice)
-        case ast.List(elts=es):
-            return captures_list(es)
-        case ast.Tuple(elts=es):
+        case ast.List(elts=es) | ast.Tuple(elts=es):
             return captures_list(es)
         case ast.Dict():
             return captures_list(dict_keys(e)) | captures_list(e.values)
@@ -191,13 +181,7 @@ def binds_quals(generators: list[ast.comprehension]) -> set[Var]:
 
 def assigns_stmt(s: ast.stmt) -> set[Var]:
     match s:
-        case ast.Pass():
-            return set()
-        case ast.Expr():
-            return set()
-        case ast.Return():
-            return set()
-        case ast.Assert():
+        case ast.Pass() | ast.Expr() | ast.Return() | ast.Assert():
             return set()
         case ast.Assign():
             (target,) = s.targets
@@ -210,11 +194,7 @@ def assigns_stmt(s: ast.stmt) -> set[Var]:
             return assigns_body(ss) | assigns_body(ss_)
         case ast.Match():
             return set().union(*(binds(case.pattern) | assigns_body(case.body) for case in s.cases))
-        case ast.FunctionDef(name=x):
-            return {x}
-        case ast.ClassDef(name=x):
-            return {x}
-        case ast.TypeAlias(name=ast.Name(id=x)):
+        case ast.FunctionDef(name=x) | ast.ClassDef(name=x) | ast.TypeAlias(name=ast.Name(id=x)):
             return {x}
         case _:
             raise AssertionError(f"unexpected statement: {type(s).__name__}")
@@ -237,11 +217,7 @@ def declares(s: ast.stmt) -> list[tuple[Var, ast.stmt]]:
             return declares_body(ss) + declares_body(ss_)
         case ast.Match():
             return [d for case in s.cases for d in declares_body(case.body)]
-        case ast.FunctionDef(name=x):
-            return [(x, s)]
-        case ast.ClassDef(name=x):
-            return [(x, s)]
-        case ast.TypeAlias(name=ast.Name(id=x)):
+        case ast.FunctionDef(name=x) | ast.ClassDef(name=x) | ast.TypeAlias(name=ast.Name(id=x)):
             return [(x, s)]
         case ast.Import():
             (alias,) = s.names

@@ -45,9 +45,7 @@ def equality_type(Sigma: ClassTable, tau: Type) -> bool:
     match tau:
         case CallableType():
             return False
-        case ListType(sigma):
-            return equality_type(Sigma, sigma)
-        case DictType(sigma):
+        case ListType(sigma) | DictType(sigma):
             return equality_type(Sigma, sigma)
         case TupleType(taus):
             return all(equality_type(Sigma, c) for c in taus)
@@ -57,9 +55,7 @@ def equality_type(Sigma: ClassTable, tau: Type) -> bool:
             return all(
                 equality_type(Sigma, sigma) for _, sigma in instantiate(fields(Sigma, c), taus)
             )
-        case Primitive():
-            return True
-        case LiteralType():
+        case Primitive() | LiteralType():
             return True
         case TypeVariable():
             raise AssertionError

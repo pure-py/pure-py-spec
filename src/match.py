@@ -62,9 +62,7 @@ def match(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
     match p:
         case ast.MatchAs():
             return match_as(k, p, mod_ctx)
-        case ast.MatchValue():
-            result = match_literal(k, literal_of(p))
-        case ast.MatchSingleton():
+        case ast.MatchValue() | ast.MatchSingleton():
             result = match_literal(k, literal_of(p))
         case PatTuple():
             result = match_tuple(k, p, mod_ctx)
@@ -174,9 +172,7 @@ def match_constr(k: Shape, p: ast.MatchClass, mod_ctx: ModuleContext) -> Match |
 def split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Split | None:
     Sigma = mod_ctx.Sigma
     match p:
-        case ast.MatchValue():
-            return split_literal(Sigma, k, literal_of(p))
-        case ast.MatchSingleton():
+        case ast.MatchValue() | ast.MatchSingleton():
             return split_literal(Sigma, k, literal_of(p))
         case PatTuple(patterns=ps):
             return split_tuple(Sigma, k, len(ps))

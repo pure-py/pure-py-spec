@@ -452,11 +452,7 @@ def attr_module(parent: ModuleLoaded, x: Var, e: ast.Attribute) -> Type:
             raise IllFormedModule(e, reasons.TypeAliasAsValue(name_of(e)))
         case TypeVar():
             raise AssertionError
-        case Unbound():
-            raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
-        case DU():
-            raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
-        case PU():
+        case Unbound() | DU() | PU():
             raise IllFormedModule(e, reasons.UnassignedMember(x, parent.q))
         case _:
             return theta
@@ -556,9 +552,7 @@ def synthesises(e: ast.expr) -> bool:
             return any(synthesises(v) for v in es)
         case ast.Tuple(elts=es):
             return all(synthesises(e_) for e_ in es)
-        case ast.ListComp(elt=e_):
-            return synthesises(e_)
-        case ast.DictComp(value=e_):
+        case ast.ListComp(elt=e_) | ast.DictComp(value=e_):
             return synthesises(e_)
         case ast.Call(func=ast.Lambda(body=e_), args=es):
             return synthesises(e_) and all(synthesises(a) for a in es)
@@ -573,22 +567,25 @@ def dict_type(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> Dic
 def constr(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> Type:
     if len(mod_ctx.Sigma[c].type_params) > 0:
         raise NotYetSupported(e, "constructor call of a generic class", 187)
-    xs = field_names(mod_ctx.Sigma, c)
     kwd_names = [k.arg for k in e.keywords if k.arg is not None]
     args = field_map(mod_ctx.Sigma, c, e.args, kwd_names, [k.value for k in e.keywords])
     if args is None:
-        n = len(e.args)
-        if n + len(kwd_names) != len(xs):
-            raise IllFormedModule(
-                e, reasons.ConstructorArityMismatch(short_name(c), len(xs), n + len(kwd_names))
-            )
-        raise IllFormedModule(
-            e, reasons.UnknownConstructorKeyword(short_name(c), tuple(sorted(set(xs[n:]))))
-        )
+        raise no_field_map(mod_ctx.Sigma, c, e, kwd_names)
     tau = ClassType(c, ())
     for x, arg in args.items():
         check_expr(arg, declared_type(mod_ctx.Sigma, tau, x), mod_ctx)
     return tau
+
+
+def no_field_map(Sigma: ClassTable, c: Class, e: ast.Call, kwd_names: list[str]) -> IllFormedModule:
+    """Why field-map is undefined for a constructor call's arguments."""
+    name, xs = short_name(c), field_names(Sigma, c)
+    n = len(e.args)
+    if n + len(kwd_names) != len(xs):
+        return IllFormedModule(
+            e, reasons.ConstructorArityMismatch(name, len(xs), n + len(kwd_names))
+        )
+    return IllFormedModule(e, reasons.UnknownConstructorKeyword(name, tuple(sorted(set(xs[n:])))))
 
 
 def call(e: ast.Call, mod_ctx: ModuleContext) -> Type:

@@ -148,19 +148,13 @@ def check_syntax_stmt(node: ast.stmt) -> None:
             raise Prohibited(node, "while loops")
         case ast.With():
             raise Prohibited(node, "with statements")
-        case ast.AsyncFunctionDef():
-            raise Prohibited(node, "async")
-        case ast.AsyncFor():
-            raise Prohibited(node, "async")
-        case ast.AsyncWith():
+        case ast.AsyncFunctionDef() | ast.AsyncFor() | ast.AsyncWith():
             raise Prohibited(node, "async")
         case ast.Raise():
             raise Prohibited(node, "raise")
         case ast.Try():
             raise Prohibited(node, "try/except")
-        case ast.Import():
-            raise Prohibited(node, "import outside the module top level")
-        case ast.ImportFrom():
+        case ast.Import() | ast.ImportFrom():
             raise Prohibited(node, "import outside the module top level")
         case ast.Global():
             raise Prohibited(node, "global")
@@ -341,10 +335,7 @@ def check_syntax_expr(node: ast.expr) -> None:
         case ast.Lambda():
             check_syntax_arguments(node.args)
             check_syntax_expr(node.body)
-        case ast.List():
-            for e in node.elts:
-                check_syntax_expr(e)
-        case ast.Tuple():
+        case ast.List() | ast.Tuple():
             for e in node.elts:
                 check_syntax_expr(e)
         case ast.Dict():
@@ -382,13 +373,9 @@ def check_syntax_expr(node: ast.expr) -> None:
             raise Prohibited(node, "starred expressions")
         case ast.Await():
             raise Prohibited(node, "async")
-        case ast.Yield():
+        case ast.Yield() | ast.YieldFrom():
             raise Prohibited(node, "yield")
-        case ast.YieldFrom():
-            raise Prohibited(node, "yield")
-        case ast.JoinedStr():
-            raise NotYetSupported(node, "f-strings", 55)
-        case ast.FormattedValue():
+        case ast.JoinedStr() | ast.FormattedValue():
             raise NotYetSupported(node, "f-strings", 55)
         case _:
             raise Prohibited(node, f"{type(node).__name__} expression")

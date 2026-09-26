@@ -198,9 +198,7 @@ def merge_context(gamma: Context, gamma_: Context) -> VarContext:
 
 def declared_type_of(theta: ContextEntry) -> Type:
     match theta:
-        case DU(tau):
-            return tau
-        case PU(tau):
+        case DU(tau) | PU(tau):
             return tau
         case _:
             assert not isinstance(theta, (Unbound, *NON_VARIABLE_ENTRIES))

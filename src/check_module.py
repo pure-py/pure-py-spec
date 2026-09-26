@@ -73,8 +73,6 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
     match iota:
         case ast.Import():
             q = parse_name(iota.names[0].name)
-            if q not in mod_ctx.M:
-                raise IllFormedModule(iota, reasons.UnknownModule(q))
             if proper_prefix_of(mod_ctx.q, q):
                 raise IllFormedModule(
                     iota,
@@ -82,15 +80,13 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
                         q, mod_ctx.q, f"from {parent(q)} import {q.parts[-1]}"
                     ),
                 )
-            delta, Sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
+            delta, Sigma = check_imported(q, iota, mod_ctx)
             theta, Sigma = loads_as(q, ModuleLoaded(q, delta), replace(mod_ctx, Sigma=Sigma))
             return {root(q): theta}, Sigma
         case ast.ImportFrom():
             assert iota.module is not None
             q = parse_name(iota.module)
-            if q not in mod_ctx.M:
-                raise IllFormedModule(iota, reasons.UnknownModule(q))
-            delta, Sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
+            delta, Sigma = check_imported(q, iota, mod_ctx)
             Sigma = load_containing(
                 [p for p in proper_prefixes(q) if not prefix_of(p, mod_ctx.q)],
                 replace(mod_ctx, Sigma=Sigma),
@@ -104,6 +100,12 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
             )
         case _:
             raise AssertionError(f"unexpected statement: {type(iota).__name__}")
+
+
+def check_imported(q: Name, iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, ClassTable]:
+    if q not in mod_ctx.M:
+        raise IllFormedModule(iota, reasons.UnknownModule(q))
+    return check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
 
 
 def load_containing(containing: list[Name], mod_ctx: ModuleContext) -> ClassTable:
