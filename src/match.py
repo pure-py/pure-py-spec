@@ -10,6 +10,7 @@ from classes import (
     ClassTable,
     RepeatedKeywordArg,
     UnknownKeywordArgs,
+    ancestors,
     field_map,
     field_names,
     fields,
@@ -41,8 +42,8 @@ from shapes import (
     shapes_seq,
     typed_heads,
 )
-from subtyping import join_seq, meet, subtype
-from syntax import NotYetSupported, PatList, PatTuple
+from subtyping import Undetermined, instance, join_seq, meet, subtype
+from syntax import PatList, PatTuple
 from type_syntax import (
     ClassType,
     DictType,
@@ -164,10 +165,10 @@ def match_constr(k: Shape, p: ast.MatchClass, mod_ctx: ModuleContext) -> Match |
     c = class_of_pattern(p, mod_ctx)
     ps = pattern_seq(mod_ctx.Sigma, c, p)
     match k:
-        case Constr(d, ks, hs):
-            if subtype(mod_ctx.Sigma, ClassType(d, ()), ClassType(c, ())):
+        case Constr(tau, ks, hs):
+            if c in ancestors(mod_ctx.Sigma, tau.c):
                 result = match_seq(ks, padded(ps, len(ks)), p, mod_ctx)
-                return map_seq_match(lambda ks_: Constr(d, ks_, hs), result)
+                return map_seq_match(lambda ks_: Constr(tau, ks_, hs), result)
             return None
         case _:
             return None
@@ -188,9 +189,9 @@ def split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Split | None:
             c = class_of_pattern(p, mod_ctx)
             match k:
                 case Rest():
-                    return split_class(Sigma, k, c)
+                    return split_class(Sigma, k, c, p)
                 case Constr():
-                    return split_subclass(Sigma, k, c)
+                    return split_subclass(Sigma, k, c, p)
                 case _:
                     return None
         case _:
@@ -252,42 +253,48 @@ def split_dict(
             return None
 
 
-def split_class(Sigma: ClassTable, k: Rest, c: Class) -> Split | None:
+def split_class(Sigma: ClassTable, k: Rest, c: Class, p: ast.MatchClass) -> Split | None:
     if below_excluded(Sigma, c, k.hs):
         return None
-    tau = meet(Sigma, k.ty, ClassType(c, ()))
-    match tau:
-        case ClassType(d, taus):
-            sigmas = tuple(sigma for _, sigma in instantiate(fields(Sigma, d), taus))
-            hs_ = typed_heads(Sigma, k.hs, tau)
-            return (
-                tuple(Constr(d, ks, hs_) for ks in shapes_seq(Sigma, sigmas)),
-                shapes(Sigma, k.ty, k.hs | {c}),
-            )
-        case _:
-            return None
-
-
-def split_subclass(Sigma: ClassTable, k: Constr, c: Class) -> Split | None:
-    tau = ClassType(c, ())
-    if c == k.c or not subtype(Sigma, tau, ClassType(k.c, ())):
+    sigma = pattern_instance(Sigma, c, k.ty, p)
+    if sigma is None:
         return None
-    if below_excluded(Sigma, c, k.hs):
-        return None
-    sigmas = tuple(sigma for _, sigma in instantiate(fields(Sigma, c), ())[len(k.args) :])
+    tau = meet(Sigma, k.ty, sigma)
+    assert isinstance(tau, ClassType)
+    sigmas = tuple(sigma_ for _, sigma_ in instantiate(fields(Sigma, tau.c), tau.args))
     hs_ = typed_heads(Sigma, k.hs, tau)
     return (
-        tuple(Constr(c, k.args + ks, hs_) for ks in shapes_seq(Sigma, sigmas)),
-        (Constr(k.c, k.args, k.hs | {c}),),
+        tuple(Constr(tau, ks, hs_) for ks in shapes_seq(Sigma, sigmas)),
+        shapes(Sigma, k.ty, k.hs | {c}),
     )
+
+
+def split_subclass(Sigma: ClassTable, k: Constr, c: Class, p: ast.MatchClass) -> Split | None:
+    sigma = pattern_instance(Sigma, c, k.ty, p)
+    if sigma is None or c == k.ty.c or not subtype(Sigma, sigma, k.ty):
+        return None
+    if below_excluded(Sigma, c, k.hs):
+        return None
+    sigmas = tuple(sigma_ for _, sigma_ in instantiate(fields(Sigma, c), sigma.args)[len(k.args) :])
+    hs_ = typed_heads(Sigma, k.hs, sigma)
+    return (
+        tuple(Constr(sigma, k.args + ks, hs_) for ks in shapes_seq(Sigma, sigmas)),
+        (Constr(k.ty, k.args, k.hs | {c}),),
+    )
+
+
+def pattern_instance(Sigma: ClassTable, c: Class, tau: Type, p: ast.MatchClass) -> ClassType | None:
+    match instance(Sigma, c, tau):
+        case Undetermined():
+            raise IllFormedModule(p, reasons.PatternClassUndetermined(short_name(c), tau))
+        case sigma:
+            return sigma
 
 
 def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
     c = class_of_name(p.cls, mod_ctx)
     if c is None:
         raise IllFormedModule(p, reasons.NotClass(name_of(p.cls)))
-    if len(mod_ctx.Sigma[c].type_params) > 0:
-        raise NotYetSupported(p, "class pattern of a generic class", 187)
     return c
 
 
@@ -370,7 +377,10 @@ def seq_safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> tuple[ast.pat
         case ast.MatchClass():
             c = class_of_pattern(p, mod_ctx)
             qs = pattern_seq(mod_ctx.Sigma, c, p)
-            sigmas = [sigma for _, sigma in instantiate(fields(mod_ctx.Sigma, c), ())]
+            cls = instance(mod_ctx.Sigma, c, tau)
+            if not isinstance(cls, ClassType):
+                return None
+            sigmas = [sigma_ for _, sigma_ in instantiate(fields(mod_ctx.Sigma, c), cls.args)]
             return first_seq_unsafe(list(zip(qs, sigmas)), mod_ctx)
         case ast.MatchAs():
             return None if p.pattern is None else seq_safe(p.pattern, tau, mod_ctx)

@@ -1,6 +1,7 @@
 from collections.abc import Sequence
+from dataclasses import dataclass
 
-from classes import ClassTable
+from classes import Class, ClassTable, ancestors
 from type_syntax import (
     CallableType,
     ClassType,
@@ -10,7 +11,9 @@ from type_syntax import (
     Primitive,
     TupleType,
     Type,
+    TypeVariable,
     UnionType,
+    Var,
     base_type,
     substitute,
 )
@@ -102,3 +105,76 @@ def equivalent(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
 
 def comparable(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
     return subtype(Sigma, sigma, tau) or subtype(Sigma, tau, sigma)
+
+
+@dataclass(frozen=True)
+class Undetermined:
+    pass
+
+
+def instance(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
+    alphas = Sigma[c].type_params
+    match tau:
+        case ClassType(d, _):
+            if c in ancestors(Sigma, d):
+                return instantiated_ancestor(Sigma, tau, c)
+            if d not in ancestors(Sigma, c):
+                return None
+            generic = ClassType(c, tuple(TypeVariable(alpha) for alpha in alphas))
+            bindings: dict[Var, Type] = {}
+            if not match_type(
+                Sigma, instantiated_ancestor(Sigma, generic, d), tau, alphas, bindings
+            ):
+                return None
+            if any(alpha not in bindings for alpha in alphas):
+                return Undetermined()
+            return ClassType(c, tuple(bindings[alpha] for alpha in alphas))
+        case Primitive.OBJECT:
+            return ClassType(c, ()) if len(alphas) == 0 else Undetermined()
+        case _:
+            return None
+
+
+def instantiated_ancestor(Sigma: ClassTable, tau: ClassType, d: Class) -> ClassType:
+    """Instantiation of ancestor d of tau's class reached along the base classes."""
+    while tau.c != d:
+        base = Sigma[tau.c].base
+        assert base is not None
+        sigma = substitute(tau.args, Sigma[tau.c].type_params, base)
+        assert isinstance(sigma, ClassType)
+        tau = sigma
+    return tau
+
+
+def match_type(
+    Sigma: ClassTable, sigma: Type, tau: Type, alphas: Sequence[Var], bindings: dict[Var, Type]
+) -> bool:
+    """Bind the type variables alphas of sigma so that sigma becomes tau, up to equivalence."""
+    match (sigma, tau):
+        case (TypeVariable(alpha), _) if alpha in alphas:
+            if alpha in bindings:
+                return equivalent(Sigma, bindings[alpha], tau)
+            bindings[alpha] = tau
+            return True
+        case (ListType(sigma_), ListType(tau_)) | (DictType(sigma_), DictType(tau_)):
+            return match_type(Sigma, sigma_, tau_, alphas, bindings)
+        case (TupleType(sigmas), TupleType(taus)):
+            return len(sigmas) == len(taus) and all(
+                match_type(Sigma, a, b, alphas, bindings) for a, b in zip(sigmas, taus)
+            )
+        case (CallableType(sigmas, sigma_), CallableType(taus, tau_)):
+            return (
+                len(sigmas) == len(taus)
+                and all(match_type(Sigma, a, b, alphas, bindings) for a, b in zip(sigmas, taus))
+                and match_type(Sigma, sigma_, tau_, alphas, bindings)
+            )
+        case (ClassType(c, sigmas), ClassType(d, taus)):
+            return c == d and all(
+                match_type(Sigma, a, b, alphas, bindings) for a, b in zip(sigmas, taus)
+            )
+        case (UnionType(sigma1, sigma2), UnionType(tau1, tau2)):
+            return match_type(Sigma, sigma1, tau1, alphas, bindings) and match_type(
+                Sigma, sigma2, tau2, alphas, bindings
+            )
+        case _:
+            return equivalent(Sigma, sigma, tau)

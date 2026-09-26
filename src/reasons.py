@@ -377,6 +377,15 @@ class UnreachableCase:
 
 
 @dataclass(frozen=True)
+class PatternClassUndetermined:
+    c: Var
+    tau: Type
+
+    def message(self) -> str:
+        return f"type arguments of '{self.c}' in pattern not determined by type {render(self.tau)}"
+
+
+@dataclass(frozen=True)
 class SequenceKindMismatch:
     kind: str
     tau: Type
@@ -472,6 +481,7 @@ type Reason = (
     | NotIterable
     | SequenceKindMismatch
     | UnreachableCase
+    | PatternClassUndetermined
     | NotSynthesised
     | NoAttributes
     | UnknownField
