@@ -7,8 +7,6 @@ description: House style for drafting and editing technical prose (papers, speci
 
 Direct, factual, conventional prose. Minimal: state the thing and stop. Every rule below comes from a specific correction during drafting; the before/after pairs are from those sessions.
 
-This skill is kept in two places, `~/.claude/skills` and `.claude/skills` in the pure-py-spec repository; keep the copies identical.
-
 ## Sentence construction
 
 - Avoid overly pity constructions: "It's yours, not a leftover." is too blunt and relies too heavily on the comma as a pivot from assertion to contrast point.

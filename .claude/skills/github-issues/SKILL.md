@@ -5,8 +5,6 @@ description: Conventions for creating, editing, closing, referring to and organi
 
 # GitHub issue conventions
 
-This skill is kept in two places, `~/.claude/skills` and `.claude/skills` in the pure-py-spec repository; keep the copies identical.
-
 ## Terse style
 
 Commit messages, issue titles and bulleted lists are telegraphic. Write them tersely:
