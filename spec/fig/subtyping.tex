@@ -12,10 +12,11 @@
 \and
 \inferrule*[lab={\ruleName{subty-class}}]
 {
-  \replaced{D[\seq{\sigma}] \in \tyInst{\ancestors(\Sigma, C)}{\seq{\tau}}}{D \in \ancestors(\Sigma, C)}
+  \replaced{\Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}'}}{D[\seq{\sigma}]} \\
+  \Sigma \vdash D[\subst{\seq{\tau}}{\seq{\alpha}}{\seq{\sigma}}] \subty \tau'}{D \in \ancestors(\Sigma, C)}
 }
 {
-  \Sigma \vdash \replaced{C[\seq{\tau}] \subty D[\seq{\sigma}]}{C \subty D}
+  \Sigma \vdash \replaced{C[\seq{\tau}] \subty \tau'}{C \subty D}
 }
 \and
 \inferrule*[lab={\ruleName{subty-never}}]
