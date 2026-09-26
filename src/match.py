@@ -256,7 +256,7 @@ def split_dict(
 def split_class(Sigma: ClassTable, k: Rest, c: Class, p: ast.MatchClass) -> Split | None:
     if below_excluded(Sigma, c, k.hs):
         return None
-    sigma = pattern_instance(Sigma, c, k.ty, p)
+    sigma = pattern_instance(Sigma, c, k.ty)
     if sigma is None:
         return None
     tau = meet(Sigma, k.ty, sigma)
@@ -270,7 +270,7 @@ def split_class(Sigma: ClassTable, k: Rest, c: Class, p: ast.MatchClass) -> Spli
 
 
 def split_subclass(Sigma: ClassTable, k: Constr, c: Class, p: ast.MatchClass) -> Split | None:
-    sigma = pattern_instance(Sigma, c, k.ty, p)
+    sigma = pattern_instance(Sigma, c, k.ty)
     if sigma is None or c == k.ty.c or not subtype(Sigma, sigma, k.ty):
         return None
     if below_excluded(Sigma, c, k.hs):
@@ -283,12 +283,10 @@ def split_subclass(Sigma: ClassTable, k: Constr, c: Class, p: ast.MatchClass) ->
     )
 
 
-def pattern_instance(Sigma: ClassTable, c: Class, tau: Type, p: ast.MatchClass) -> ClassType | None:
-    match instance(Sigma, c, tau):
-        case Undetermined():
-            raise IllFormedModule(p, reasons.PatternClassUndetermined(short_name(c), tau))
-        case sigma:
-            return sigma
+def pattern_instance(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | None:
+    sigma = instance(Sigma, c, tau)
+    assert not isinstance(sigma, Undetermined)  # safe holds at the scrutinee type
+    return sigma
 
 
 def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
@@ -347,10 +345,10 @@ def match_shapes(residual: Shapes, p: ast.pattern, mod_ctx: ModuleContext) -> Ma
     )
 
 
-def seq_safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> tuple[ast.pattern, Type] | None:
+def safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> tuple[ast.pattern, Type] | None:
     match tau:
         case UnionType(sigma, sigma_):
-            mismatch = first_seq_unsafe([(p, sigma), (p, sigma_)], mod_ctx)
+            mismatch = first_unsafe([(p, sigma), (p, sigma_)], mod_ctx)
             if mismatch is None:
                 return None
             q, sigma = mismatch
@@ -362,36 +360,41 @@ def seq_safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> tuple[ast.pat
             if isinstance(tau, ListType) or tau in (Primitive.SIZED, Primitive.OBJECT):
                 return (p, tau)
             if isinstance(tau, TupleType) and len(tau.components) == len(ps):
-                return first_seq_unsafe(list(zip(ps, tau.components)), mod_ctx)
+                return first_unsafe(list(zip(ps, tau.components)), mod_ctx)
             return None
         case PatList(patterns=ps):
             if isinstance(tau, TupleType) or tau in (Primitive.SIZED, Primitive.OBJECT):
                 return (p, tau)
             if isinstance(tau, ListType):
-                return first_seq_unsafe([(q, tau.elem) for q in ps], mod_ctx)
+                return first_unsafe([(q, tau.elem) for q in ps], mod_ctx)
             return None
         case ast.MatchMapping(patterns=ps):
             if isinstance(tau, DictType):
-                return first_seq_unsafe([(q, tau.value) for q in ps], mod_ctx)
+                return first_unsafe([(q, tau.value) for q in ps], mod_ctx)
             return None
         case ast.MatchClass():
             c = class_of_pattern(p, mod_ctx)
             qs = pattern_seq(mod_ctx.Sigma, c, p)
-            cls = instance(mod_ctx.Sigma, c, tau)
-            if not isinstance(cls, ClassType):
-                return None
-            sigmas = [sigma_ for _, sigma_ in instantiate(fields(mod_ctx.Sigma, c), cls.args)]
-            return first_seq_unsafe(list(zip(qs, sigmas)), mod_ctx)
+            match instance(mod_ctx.Sigma, c, tau):
+                case Undetermined():
+                    raise IllFormedModule(p, reasons.PatternClassUndetermined(short_name(c), tau))
+                case None:
+                    return None
+                case cls:
+                    sigmas = [
+                        sigma_ for _, sigma_ in instantiate(fields(mod_ctx.Sigma, c), cls.args)
+                    ]
+                    return first_unsafe(list(zip(qs, sigmas)), mod_ctx)
         case ast.MatchAs():
-            return None if p.pattern is None else seq_safe(p.pattern, tau, mod_ctx)
+            return None if p.pattern is None else safe(p.pattern, tau, mod_ctx)
         case _:
             return None
 
 
-def first_seq_unsafe(
+def first_unsafe(
     pairs: list[tuple[ast.pattern, Type]], mod_ctx: ModuleContext
 ) -> tuple[ast.pattern, Type] | None:
-    mismatches = (seq_safe(q, sigma, mod_ctx) for q, sigma in pairs)
+    mismatches = (safe(q, sigma, mod_ctx) for q, sigma in pairs)
     return next((mismatch for mismatch in mismatches if mismatch is not None), None)
 
 

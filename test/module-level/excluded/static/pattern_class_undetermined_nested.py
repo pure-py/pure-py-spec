@@ -7,16 +7,17 @@ class Box[T]:
 
 @dataclass
 class IntBox(Box[int]):
-    extra: str
+    pass
 
-def unbox(b: Box[int]) -> Box[int]:
-    return b
+@dataclass
+class Wrap:
+    inner: object
 
-def first(o: object) -> int:
-    match o:
-        case Box(v):
+def first(w: Wrap) -> int:
+    match w:
+        case Wrap(Box(v)):
             return 1
         case _:
             return 0
 
-print(first(IntBox(1, "a")))
+print(first(Wrap(IntBox(1))))

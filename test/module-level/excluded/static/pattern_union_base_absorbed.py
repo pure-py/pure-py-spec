@@ -1,4 +1,4 @@
-# rule: split-class
+# rule: match-case
 from dataclasses import dataclass
 
 @dataclass
