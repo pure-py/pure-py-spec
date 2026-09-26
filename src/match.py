@@ -5,11 +5,15 @@ from itertools import product
 import reasons
 from aux import name_of
 from classes import (
+    ArityMismatch,
     Class,
     ClassTable,
+    RepeatedKeyword,
+    UnknownKeywords,
     field_map,
     field_names,
     fields,
+    no_field_map,
     short_name,
 )
 from contexts import (
@@ -290,7 +294,14 @@ def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
 def pattern_seq(Sigma: ClassTable, c: Class, p: ast.MatchClass) -> tuple[ast.pattern, ...]:
     args = field_map(Sigma, c, p.patterns, p.kwd_attrs, p.kwd_patterns)
     if args is None:
-        raise no_field_map(Sigma, c, p)
+        name = short_name(c)
+        match no_field_map(Sigma, c, len(p.patterns), p.kwd_attrs):
+            case ArityMismatch(expected, given):
+                raise IllFormedModule(p, reasons.PatternArityMismatch(name, expected, given))
+            case RepeatedKeyword():
+                raise IllFormedModule(p, reasons.DuplicatePatternKeyword(name))
+            case UnknownKeywords(xs):
+                raise IllFormedModule(p, reasons.UnknownFieldInPattern(name, xs))
     return tuple(args[x] for x in field_names(Sigma, c))
 
 
@@ -401,17 +412,6 @@ def map_seq_match(form: Callable[[ShapeSeq], Shape], result: SeqMatch | None) ->
 
 def padded(ps: tuple[ast.pattern, ...], n: int) -> tuple[ast.pattern, ...]:
     return ps + tuple(ast.MatchAs() for _ in range(n - len(ps)))
-
-
-def no_field_map(Sigma: ClassTable, c: Class, p: ast.MatchClass) -> IllFormedModule:
-    """Why field-map is undefined for a pattern's arguments."""
-    name, xs = short_name(c), field_names(Sigma, c)
-    n = len(p.patterns)
-    if n + len(p.kwd_attrs) != len(xs):
-        return IllFormedModule(p, reasons.PatternArityMismatch(name, len(xs), n + len(p.kwd_attrs)))
-    if len(p.kwd_attrs) != len(set(p.kwd_attrs)):
-        return IllFormedModule(p, reasons.DuplicatePatternKeyword(name))
-    return IllFormedModule(p, reasons.UnknownFieldInPattern(name, tuple(sorted(set(xs[n:])))))
 
 
 def with_keys(k: Dict, ws: tuple[str, ...], ks: ShapeSeq) -> Dict:

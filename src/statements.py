@@ -19,13 +19,17 @@ from aux import (
     type_expr,
 )
 from classes import (
+    ArityMismatch,
     Class,
     ClassTable,
     ClassTableEntry,
+    RepeatedKeyword,
+    UnknownKeywords,
     declared_type,
     field_map,
     field_names,
     field_type,
+    no_field_map,
     short_name,
 )
 from contexts import (
@@ -570,22 +574,18 @@ def constr(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> Type:
     kwd_names = [k.arg for k in e.keywords if k.arg is not None]
     args = field_map(mod_ctx.Sigma, c, e.args, kwd_names, [k.value for k in e.keywords])
     if args is None:
-        raise no_field_map(mod_ctx.Sigma, c, e, kwd_names)
+        name = short_name(c)
+        match no_field_map(mod_ctx.Sigma, c, len(e.args), kwd_names):
+            case ArityMismatch(expected, given):
+                raise IllFormedModule(e, reasons.ConstructorArityMismatch(name, expected, given))
+            case UnknownKeywords(xs):
+                raise IllFormedModule(e, reasons.UnknownConstructorKeyword(name, xs))
+            case RepeatedKeyword():
+                raise AssertionError  # a syntax error in Python
     tau = ClassType(c, ())
     for x, arg in args.items():
         check_expr(arg, declared_type(mod_ctx.Sigma, tau, x), mod_ctx)
     return tau
-
-
-def no_field_map(Sigma: ClassTable, c: Class, e: ast.Call, kwd_names: list[str]) -> IllFormedModule:
-    """Why field-map is undefined for a constructor call's arguments."""
-    name, xs = short_name(c), field_names(Sigma, c)
-    n = len(e.args)
-    if n + len(kwd_names) != len(xs):
-        return IllFormedModule(
-            e, reasons.ConstructorArityMismatch(name, len(xs), n + len(kwd_names))
-        )
-    return IllFormedModule(e, reasons.UnknownConstructorKeyword(name, tuple(sorted(set(xs[n:])))))
 
 
 def call(e: ast.Call, mod_ctx: ModuleContext) -> Type:

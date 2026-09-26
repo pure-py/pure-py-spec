@@ -67,3 +67,32 @@ def field_map[T](
     if set(kwd_names) != set(xs[n:]):
         return None
     return {**dict(zip(xs[:n], positional)), **dict(zip(kwd_names, kwd_values))}
+
+
+@dataclass(frozen=True)
+class ArityMismatch:
+    expected: int
+    given: int
+
+
+@dataclass(frozen=True)
+class RepeatedKeyword:
+    pass
+
+
+@dataclass(frozen=True)
+class UnknownKeywords:
+    xs: tuple[Var, ...]
+
+
+type FieldMapFailure = ArityMismatch | RepeatedKeyword | UnknownKeywords
+
+
+def no_field_map(Sigma: ClassTable, c: Class, n: int, kwd_names: Sequence[str]) -> FieldMapFailure:
+    """Why field-map is undefined for n positional arguments and the keywords kwd_names."""
+    xs = field_names(Sigma, c)
+    if n + len(kwd_names) != len(xs):
+        return ArityMismatch(len(xs), n + len(kwd_names))
+    if len(set(kwd_names)) != len(kwd_names):
+        return RepeatedKeyword()
+    return UnknownKeywords(tuple(sorted(set(xs[n:]))))
