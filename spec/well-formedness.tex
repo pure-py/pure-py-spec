@@ -30,7 +30,7 @@ hiding it throughout the scope.}
 \input{spec/fig/resolve-type}
 
 Function signatures, assignments and dataclass fields are annotated with type expressions, and a
-type expression denotes a type under a context\Added{ and a class table} (\figref{resolve-type}). Every definition carries an
+type expression denotes a type under a context\Added{ and class table} (\figref{resolve-type}). Every definition carries an
 annotation for its parameters and return type, so the type of a definition is given rather than
 inferred from its body. Within a type expression, \Replaced{a class name applied to as many type arguments as the class has parameters resolves to an instantiated class, an alias name applied to type arguments resolves to the instantiation of its alias, type parameters in scope denote the type variables of those names}{class names resolve to classes, type parameters in scope denote the type variables of those names}, and all other names must be predefined names (\figref{resolve-type}). The function $\baseType(\tau)$ discards the precision of a
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as the identity
