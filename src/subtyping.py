@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
+from itertools import product
 
 from classes import Class, ClassTable, ancestors
 from type_syntax import (
@@ -15,6 +16,7 @@ from type_syntax import (
     UnionType,
     Var,
     base_type,
+    render,
     substitute,
 )
 
@@ -115,20 +117,20 @@ class Undetermined:
 def instance(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
     alphas = Sigma[c].type_params
     match tau:
-        case ClassType(d, _):
+        case ClassType(d, sigmas):
             if c in ancestors(Sigma, d):
                 return instantiated_ancestor(Sigma, tau, c)
             if d not in ancestors(Sigma, c):
                 return None
             generic = ClassType(c, tuple(TypeVariable(alpha) for alpha in alphas))
-            bindings: dict[Var, Type] = {}
-            if not match_type(
-                Sigma, instantiated_ancestor(Sigma, generic, d), tau, alphas, bindings
-            ):
-                return None
-            if any(alpha not in bindings for alpha in alphas):
-                return Undetermined()
-            return ClassType(c, tuple(bindings[alpha] for alpha in alphas))
+            rhos = instantiated_ancestor(Sigma, generic, d).args
+            match solutions(Sigma, rhos, sigmas, alphas):
+                case []:
+                    return None
+                case [taus]:
+                    return ClassType(c, taus)
+                case _:
+                    return Undetermined()
         case Primitive.OBJECT:
             return ClassType(c, ()) if len(alphas) == 0 else Undetermined()
         case _:
@@ -146,35 +148,93 @@ def instantiated_ancestor(Sigma: ClassTable, tau: ClassType, d: Class) -> ClassT
     return tau
 
 
-def match_type(
-    Sigma: ClassTable, sigma: Type, tau: Type, alphas: Sequence[Var], bindings: dict[Var, Type]
-) -> bool:
-    """Bind the type variables alphas of sigma so that sigma becomes tau, up to equivalence."""
-    match (sigma, tau):
-        case (TypeVariable(alpha), _) if alpha in alphas:
-            if alpha in bindings:
-                return equivalent(Sigma, bindings[alpha], tau)
-            bindings[alpha] = tau
-            return True
-        case (ListType(sigma_), ListType(tau_)) | (DictType(sigma_), DictType(tau_)):
-            return match_type(Sigma, sigma_, tau_, alphas, bindings)
-        case (TupleType(sigmas), TupleType(taus)):
-            return len(sigmas) == len(taus) and all(
-                match_type(Sigma, a, b, alphas, bindings) for a, b in zip(sigmas, taus)
-            )
-        case (CallableType(sigmas, sigma_), CallableType(taus, tau_)):
-            return (
-                len(sigmas) == len(taus)
-                and all(match_type(Sigma, a, b, alphas, bindings) for a, b in zip(sigmas, taus))
-                and match_type(Sigma, sigma_, tau_, alphas, bindings)
-            )
-        case (ClassType(c, sigmas), ClassType(d, taus)):
-            return c == d and all(
-                match_type(Sigma, a, b, alphas, bindings) for a, b in zip(sigmas, taus)
-            )
-        case (UnionType(sigma1, sigma2), UnionType(tau1, tau2)):
-            return match_type(Sigma, sigma1, tau1, alphas, bindings) and match_type(
-                Sigma, sigma2, tau2, alphas, bindings
-            )
+def solutions(
+    Sigma: ClassTable, rhos: Sequence[Type], sigmas: Sequence[Type], alphas: Sequence[Var]
+) -> list[tuple[Type, ...]]:
+    """Instantiations of alphas making rhos equivalent to sigmas, pairwise inequivalent, at most two.
+    A variable outside any union is fixed by its position; the others range over unions of the
+    non-union subterms of sigmas and object, which suffice to decide existence and uniqueness."""
+    bindings: dict[Var, Type] = {}
+    for rho, sigma in zip(rhos, sigmas):
+        bind_outside_unions(Sigma, rho, sigma, alphas, bindings)
+    free = [alpha for alpha in alphas if alpha not in bindings]
+    atoms = sorted(
+        {a for sigma in sigmas for a in non_union_subterms(sigma)} | {Primitive.OBJECT}, key=render
+    )
+    found: list[tuple[Type, ...]] = []
+    for choice in product(*(subsets(atoms) for _ in free)):
+        chosen = {**bindings, **{alpha: join_seq(Sigma, ts) for alpha, ts in zip(free, choice)}}
+        taus = tuple(chosen[alpha] for alpha in alphas)
+        if all(
+            equivalent(Sigma, substitute(taus, alphas, rho), sigma)
+            for rho, sigma in zip(rhos, sigmas)
+        ) and not any(all(equivalent(Sigma, a, b) for a, b in zip(taus, taus_)) for taus_ in found):
+            found.append(taus)
+            if len(found) == 2:
+                break
+    return found
+
+
+def bind_outside_unions(
+    Sigma: ClassTable, rho: Type, sigma: Type, alphas: Sequence[Var], bindings: dict[Var, Type]
+) -> None:
+    """Bind each variable of rho outside any union to the part of sigma at its position."""
+    match rho:
+        case TypeVariable(alpha) if alpha in alphas:
+            bindings.setdefault(alpha, sigma)
+        case UnionType():
+            pass
         case _:
-            return equivalent(Sigma, sigma, tau)
+            match (rho, atom(Sigma, sigma)):
+                case (ListType(rho_), ListType(sigma_)) | (DictType(rho_), DictType(sigma_)):
+                    bind_outside_unions(Sigma, rho_, sigma_, alphas, bindings)
+                case (TupleType(rhos), TupleType(sigmas)) | (
+                    ClassType(_, rhos),
+                    ClassType(_, sigmas),
+                ):
+                    for rho_, sigma_ in zip(rhos, sigmas):
+                        bind_outside_unions(Sigma, rho_, sigma_, alphas, bindings)
+                case (CallableType(rhos, rho_), CallableType(sigmas, sigma_)):
+                    for rho__, sigma__ in zip(rhos, sigmas):
+                        bind_outside_unions(Sigma, rho__, sigma__, alphas, bindings)
+                    bind_outside_unions(Sigma, rho_, sigma_, alphas, bindings)
+                case _:
+                    pass
+
+
+def atom(Sigma: ClassTable, tau: Type) -> Type:
+    """The member of union tau above its other members, if there is one; otherwise tau."""
+    if isinstance(tau, UnionType):
+        for sigma in members(tau):
+            if subtype(Sigma, tau, sigma):
+                return sigma
+    return tau
+
+
+def members(tau: Type) -> list[Type]:
+    match tau:
+        case UnionType(sigma, sigma_):
+            return members(sigma) + members(sigma_)
+        case _:
+            return [tau]
+
+
+def non_union_subterms(tau: Type) -> set[Type]:
+    match tau:
+        case UnionType(sigma, sigma_):
+            return non_union_subterms(sigma) | non_union_subterms(sigma_)
+        case ListType(sigma) | DictType(sigma):
+            return {tau} | non_union_subterms(sigma)
+        case TupleType(sigmas) | ClassType(_, sigmas):
+            return {tau}.union(*(non_union_subterms(sigma) for sigma in sigmas))
+        case CallableType(sigmas, sigma):
+            return {tau}.union(non_union_subterms(sigma), *(non_union_subterms(s) for s in sigmas))
+        case _:
+            return {tau}
+
+
+def subsets[T](xs: Sequence[T]) -> list[tuple[T, ...]]:
+    return [
+        tuple(x for x, keep in zip(xs, keeps) if keep)
+        for keeps in product((False, True), repeat=len(xs))
+    ]

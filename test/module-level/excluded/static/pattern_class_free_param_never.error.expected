@@ -1,0 +1,1 @@
+type arguments of 'Leaf' in pattern not determined by type __main__.Tree[Never]
