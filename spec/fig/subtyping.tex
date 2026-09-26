@@ -12,8 +12,8 @@
 \and
 \inferrule*[lab={\ruleName{subty-class}}]
 {
-  \replaced{\Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}'}}{D[\seq{\sigma}]} \\
-  \Sigma \vdash D[\subst{\seq{\tau}}{\seq{\alpha}}{\seq{\sigma}}] \subty \tau'}{D \in \ancestors(\Sigma, C)}
+  \replaced{\Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}'}}{D[\seq{\sigma}]}}{D \in \ancestors(\Sigma, C)} \\
+  \added{\Sigma \vdash D[\subst{\seq{\tau}}{\seq{\alpha}}{\seq{\sigma}}] \subty \tau'}
 }
 {
   \Sigma \vdash \replaced{C[\seq{\tau}] \subty \tau'}{C \subty D}
