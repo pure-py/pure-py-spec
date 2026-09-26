@@ -1,15 +1,15 @@
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Gamma \vdash d \synth \tau$}
+\flushleft \shadebox{$\replaced{\Sigma; \Gamma}{\Gamma} \vdash d \synth \tau$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{def-signature}}]
 {
-  \Gamma \vdash \seq{\psi} \synth \seq{\sigma} \\
-  \Gamma \vdash \psi \synth \tau
+  \replaced{\Sigma; \Gamma}{\Gamma} \vdash \seq{\psi} \synth \seq{\sigma} \\
+  \replaced{\Sigma; \Gamma}{\Gamma} \vdash \psi \synth \tau
 }
 {
-  \Gamma \vdash \exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s} \synth \tyCallable{\seq{\sigma}}{\tau}
+  \replaced{\Sigma; \Gamma}{\Gamma} \vdash \exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s} \synth \tyCallable{\seq{\sigma}}{\tau}
 }
 \end{mathpar}
 \subcaption{Definition $d$ synthesises type $\tau$}

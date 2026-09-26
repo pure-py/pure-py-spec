@@ -1,4 +1,4 @@
-# rule: subty-class
+# rule: subty-class-extend
 import a
 import b
 

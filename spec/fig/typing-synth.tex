@@ -28,11 +28,11 @@
 \and
 \inferrule*[lab={\ruleName{attr-object}}]
 {
-  \Sigma; \Gamma \vdash e \synth C \\
-  \bind{x}{\tau} \in \fields(\Sigma, C)
+  \Sigma; \Gamma \vdash e \synth \replaced{C[\seq{\tau}]}{C} \\
+  \bind{x}{\sigma} \in \replaced{\tyInst{\fields(\Sigma, C)}{\seq{\tau}}}{\fields(\Sigma, C)}
 }
 {
-  \Sigma; \Gamma \vdash \exAttr{e}{x} \synth \tau
+  \Sigma; \Gamma \vdash \exAttr{e}{x} \synth \sigma
 }
 \and
 \inferrule*[lab={\ruleName{call}}]

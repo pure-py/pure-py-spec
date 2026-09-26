@@ -24,7 +24,7 @@
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \Gamma' \vdash \psi_i \synth \sigma_i \quad (\forall i)
+  \replaced{\Sigma; \Gamma'}{\Gamma'} \vdash \psi_i \synth \sigma_i \quad (\forall i)
 }
 {
   \Sigma; q; \Gamma \vdash \exDataclass{c[\seq{\alpha}]}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}
@@ -33,11 +33,11 @@
 \inferrule*[lab={\ruleName{class-extend}}]
 {
   \Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
-  \Gamma' \vdash q' : \Type{D} \\
-  \Gamma' \vdash \psi'_i \synth \sigma'_i \quad (\forall i), \; D \text{ has } |\seq{\sigma}'| \text{ type parameters in } \Sigma \\
+  \replaced{\Sigma; \Gamma' \vdash q'[\seq{\psi}'] \synth D[\seq{\sigma}']}{\Gamma' \vdash q' : \Type{D}} \\
+  \deleted{\Gamma' \vdash \psi'_i \synth \sigma'_i \quad (\forall i), \; D \text{ has } |\seq{\sigma}'| \text{ type parameters in } \Sigma} \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \Gamma' \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
+  \replaced{\Sigma; \Gamma'}{\Gamma'} \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
   \fields(\Sigma, D) = \scheme{\seq{\alpha}'}{\bind{\seq{y}}{\seq{\tau}}} \\
   \set{\seq{x}} \cap \set{\seq{y}} = \varnothing
 }

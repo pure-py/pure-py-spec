@@ -260,7 +260,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-type-alias}}]
 {
-  \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \vdash \psi \synth \tau
+  \replaced{\Sigma; \Gamma}{\Gamma} \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \vdash \psi \synth \tau
 }
 {
   q, \rho, \exTypeAlias{x[\seq{\alpha}]}{\psi} \Rightarrow \assigns{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}}

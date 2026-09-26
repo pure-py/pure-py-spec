@@ -12,7 +12,7 @@
 \and
 \inferrule*[lab={\ruleName{declare}}]
 {
-  \Gamma \vdash \psi \synth \tau
+  \replaced{\Sigma; \Gamma}{\Gamma} \vdash \psi \synth \tau
 }
 {
   \Sigma; \Gamma; \zeta \vdash x\exAnnot{\psi} : \Assigns{\set{\bind{x}{\DU{\tau}}}}
@@ -29,7 +29,7 @@
 \and
 \inferrule*[lab={\ruleName{declare-assign}}]
 {
-  \Gamma \vdash \psi \synth \tau \\
+  \replaced{\Sigma; \Gamma}{\Gamma} \vdash \psi \synth \tau \\
   \Sigma; \Gamma \vdash e \checks \tau
 }
 {
@@ -106,7 +106,7 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \Gamma \vdash d_i \synth \tau_i \quad (\forall i) \\
+  \replaced{\Sigma; \Gamma}{\Gamma} \vdash d_i \synth \tau_i \quad (\forall i) \\
   \Delta' = \set{\bind{\declaresS(\seq{d})}{\seq{\tau}}} \\
   \Sigma; \Gamma \override \Delta' \vdash d_i \checks \tau_i \quad (\forall i)
 }

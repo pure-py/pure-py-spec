@@ -122,9 +122,11 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
                 return TypeVariable(str(q))
             if not isinstance(theta, Class):
                 raise IllFormedModule(node, reasons.NotClass(q))
-            if len(args) > 0 or len(mod_ctx.Sigma[theta].type_params) > 0:
-                raise NotYetSupported(node, "type arguments in a type expression", 187)
-            return ClassType(theta, ())
+            taus = tuple(resolve_type(psi_, node, mod_ctx) for psi_ in args)
+            expected = len(mod_ctx.Sigma[theta].type_params)
+            if len(taus) != expected:
+                raise IllFormedModule(node, reasons.ClassArityMismatch(q, expected, len(taus)))
+            return ClassType(theta, taus)
         case ListExpr(psi_):
             check_in_scope(TypeConstructor.LIST.value, node, mod_ctx)
             return ListType(resolve_type(psi_, node, mod_ctx))
@@ -760,11 +762,7 @@ def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, C
 def base_class(node: ast.ClassDef, mod_ctx: ModuleContext) -> ClassType:
     psi = parse_annotation(node.bases[0])
     assert isinstance(psi, TypeName)
-    theta = resolve_name(psi.q, mod_ctx)
-    if not isinstance(theta, Class):
+    tau = resolve_type(psi, node, mod_ctx)
+    if not isinstance(tau, ClassType):
         raise IllFormedModule(node, reasons.NotClass(psi.q))
-    sigmas = tuple(resolve_type(psi_, node, mod_ctx) for psi_ in psi.args)
-    expected = len(mod_ctx.Sigma[theta].type_params)
-    if len(sigmas) != expected:
-        raise IllFormedModule(node, reasons.ClassArityMismatch(psi.q, expected, len(sigmas)))
-    return ClassType(theta, sigmas)
+    return tau

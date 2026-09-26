@@ -30,16 +30,16 @@ hiding it throughout the scope.}
 \input{spec/fig/resolve-type}
 
 Function signatures, assignments and dataclass fields are annotated with type expressions, and a
-type expression denotes a type under a context (\figref{resolve-type}). Every definition carries an
+type expression denotes a type under a context\Added{ and class table} (\figref{resolve-type}). Every definition carries an
 annotation for its parameters and return type, so the type of a definition is given rather than
-inferred from its body. Within a type expression, class names resolve to classes, type parameters in scope denote the type variables of those names, and all other names must be predefined names (\figref{resolve-type}). The function $\baseType(\tau)$ discards the precision of a
+inferred from its body. Within a type expression, \Replaced{a class name applied to as many type arguments as the class has parameters resolves to an instantiated class, an alias name applied to type arguments resolves to the instantiation of its alias, type parameters in scope denote the type variables of those names}{class names resolve to classes, type parameters in scope denote the type variables of those names}, and all other names must be predefined names (\figref{resolve-type}). The function $\baseType(\tau)$ discards the precision of a
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as the identity
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:base-type}}).
 
 \speconly{\subsubsection{Subtyping}\label{sec:subtyping}}%
 \paperonly{\paragraph{Subtyping.}}
 
-Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base (\ruleName{subty-class}), so that a class applied to distinct type arguments is related to itself by reflexivity alone and type arguments are invariant; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
+Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base (\Replaced{\ruleName{subty-class-extend}}{\ruleName{subty-class}})\Replaced{, and below $C[\seq{\sigma}]$ when $\seq{\tau}$ and $\seq{\sigma}$ are equivalent (\ruleName{subty-class}), so that type arguments are invariant, as for lists and dictionaries}{, so that a class applied to distinct type arguments is related to itself by reflexivity alone and type arguments are invariant}; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
 each of its members and below every type that is above all of them. A tuple type is covariant, below another of the
 same length when each of its components is below the corresponding component. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{pierce2002}. Lists and
 dictionaries are related only when their components are equivalent, since both are invariant in mypy. A callable type is contravariant in its parameters
@@ -62,7 +62,7 @@ when either is a subtype of the other. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. Two comparable types \emph{meet} to the smaller type; a
 meet of incomparable types distributes over a union, takes tuples componentwise and callables with
 parameters joined and results combined using meet, and is \pyinline{Never} otherwise, since no value belongs to both types.
-So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
+So joining a type with itself gives that type, joining a class with \Replaced{its base class gives the base class}{one of its ancestors gives the ancestor}, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$. A sequence of types is joined by
 folding binary join over the sequence, with \pyinline{Never} as the unit (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:join}}).
 
@@ -103,8 +103,8 @@ field: the fields of its base class first, recursively and instantiated at the t
 declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the instantiation $\tyInst{\fields(\Sigma, C)}{\seq{\tau}}$. The order matters, because a constructor call pairs positional arguments with fields by
 position. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to
-(\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must
-synthesise a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(\Sigma, C)$
+(\ruleName{constr}). \Replaced{An attribute reference $\exAttr{e}{x}$ has the type of the field $x$ of the class synthesised by $e$}{In an attribute reference $\exAttr{e}{x}$ the object $e$ must
+synthesise a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(\Sigma, C)$}
 (\ruleName{attr-object}). The signature of a predefined module binds
 $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type listed for it
 (\figref{predefined-signatures}, Definition~\ref{def:predefined}). A module attribute reference
@@ -253,7 +253,7 @@ definitions and modules introduce the variables of the scope as unbound, using t
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
 the class name to $\Type{C}$, resolves the field annotations with its type parameters in scope, and requires the fields it declares to be distinct and, when it extends
-another class, the base name to be bound to a class, applied to as many type arguments as that class has parameters, and the additional fields not to repeat an inherited field
+another class, \Replaced{the base to resolve to an instantiated class}{the base name to be bound to a class, applied to as many type arguments as that class has parameters}, and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
 scope; every \PurePy class must declare itself a dataclass. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
