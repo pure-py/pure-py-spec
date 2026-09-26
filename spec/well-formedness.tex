@@ -32,21 +32,17 @@ hiding it throughout the scope.}
 Function signatures, assignments and dataclass fields are annotated with type expressions, and a
 type expression denotes a type under a context (\figref{resolve-type}). Every definition carries an
 annotation for its parameters and return type, so the type of a definition is given rather than
-inferred from its body. \Replaced{Within a type expression, class names resolve to classes, type parameters in scope denote the type variables of those names, and all other names must be predefined names (\figref{resolve-type}).}{A class name resolves to a
-class (\figref{resolve-name}) and every other name must be a predefined name
-(\figref{predefined-signatures}).} The function $\baseType(\tau)$ discards the precision of a
-literal type, taking $\tyLiteral{42}$ to \pyinline{int} and \Replaced{otherwise acting as the identity}{leaving every other type alone}
+inferred from its body. Within a type expression, class names resolve to classes, type parameters in scope denote the type variables of those names, and all other names must be predefined names (\figref{resolve-type}). The function $\baseType(\tau)$ discards the precision of a
+literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as the identity
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:base-type}}).
 
 \speconly{\subsubsection{Subtyping}\label{sec:subtyping}}%
 \paperonly{\paragraph{Subtyping.}}
 
-Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and \Replaced{an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base (\ruleName{subty-class}), so that a class applied to distinct type arguments is related to itself by reflexivity alone and type arguments are invariant; a type variable is below itself and \pyinline{object} alone,}{a class below its
-ancestors,} with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
+Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base (\ruleName{subty-class}), so that a class applied to distinct type arguments is related to itself by reflexivity alone and type arguments are invariant; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
 each of its members and below every type that is above all of them. A tuple type is covariant, below another of the
-same length when each of its components is below the corresponding component. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; \Replaced{the notations $\subty$ and $\tyEquiv$}{both notations} follow \citet{pierce2002}. Lists and
-dictionaries are related only when their components are equivalent, since both are invariant in mypy\Deleted{
-and covariance would accept programs rejected by mypy}. A callable type is contravariant in its parameters
+same length when each of its components is below the corresponding component. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{pierce2002}. Lists and
+dictionaries are related only when their components are equivalent, since both are invariant in mypy. A callable type is contravariant in its parameters
 and covariant in its result, following mypy. The types with a length, namely lists, dictionaries,
 strings and tuples, are below \pyinline{Sized}. An \pyinline{int} is a \pyinline{float}, as PEP~484
 requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
@@ -102,11 +98,9 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 
 \input{spec/fig/typing-synth}
 
-\Replaced{The fields of a class $C$ form a field scheme $\fields(\Sigma, C)$ over its type parameters, with one binding $\bind{x}{\tau}$ per
+The fields of a class $C$ form a field scheme $\fields(\Sigma, C)$ over its type parameters, with one binding $\bind{x}{\tau}$ per
 field: the fields of its base class first, recursively and instantiated at the type arguments of the base, then the fields declared by $C$ itself, each at its
-declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the instantiation $\tyInst{\fields(\Sigma, C)}{\seq{\tau}}$.}{The fields of a class $C$ form a sequence $\fields(\Sigma, C)$ of bindings $\bind{x}{\tau}$, one per
-field: the fields of its base class first, recursively, then the fields declared by $C$ itself, each at its
-declared type.} The order matters, because a constructor call pairs positional arguments with fields by
+declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the instantiation $\tyInst{\fields(\Sigma, C)}{\seq{\tau}}$. The order matters, because a constructor call pairs positional arguments with fields by
 position. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to
 (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must
@@ -188,7 +182,7 @@ defined:
 & \Sigma \vdash \tyDict{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \\
 & \Sigma \vdash \tyTuple{\seq{\tau}} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau_i \eqType \quad (\forall i) \\
 & \Sigma \vdash \tyUnion{\sigma}{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \sigma \eqType \text{ and } \Sigma \vdash \tau \eqType \\
-& \Sigma \vdash \replaced{C[\seq{\sigma}]}{C} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \replaced{\tyInst{\fields(\Sigma, C)}{\seq{\sigma}}}{\fields(\Sigma, C)}
+& \Sigma \vdash C[\seq{\sigma}] \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \tyInst{\fields(\Sigma, C)}{\seq{\sigma}}
 \end{defalign}
 
 \noindent A callable type is not an equality type, and neither is any type with a callable component, so
@@ -258,8 +252,8 @@ definitions and modules introduce the variables of the scope as unbound, using t
 
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
-the class name to $\Type{C}$, \Added{resolves the field annotations with its type parameters in scope,} \Replaced{and requires}{requiring} the fields it declares to be distinct and, when it extends
-another class, the base name to be bound to a class\Added{, applied to as many type arguments as that class has parameters,} and the additional fields not to repeat an inherited field
+the class name to $\Type{C}$, resolves the field annotations with its type parameters in scope, and requires the fields it declares to be distinct and, when it extends
+another class, the base name to be bound to a class, applied to as many type arguments as that class has parameters, and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
 scope; every \PurePy class must declare itself a dataclass. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).

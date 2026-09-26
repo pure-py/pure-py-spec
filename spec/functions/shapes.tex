@@ -3,7 +3,7 @@
 \shapes(\Sigma, \tyLiteral{\ell}, H) &{}= \varnothing && \text{if } \ell \in H \\*
 \shapes(\Sigma, \tyBool, H) &{}= \varnothing && \text{if } \set{\pyinline{True}, \pyinline{False}} \subseteq H \\*
 \shapes(\Sigma, \tyNone, H) &{}= \varnothing && \text{if } \pyinline{None} \in H \\*
-\shapes(\Sigma, \replaced{C[\seq{\tau}]}{C}, H) &{}= \varnothing && \text{if } \replaced{D \in \ancestors(\Sigma, C)}{\Sigma \vdash C \subty D} \text{ for some } D \in H \\*
+\shapes(\Sigma, C[\seq{\tau}], H) &{}= \varnothing && \text{if } D \in \ancestors(\Sigma, C) \text{ for some } D \in H \\*
 \shapes(\Sigma, \tyNever, H) &{}= \varnothing \\*
 \shapes(\Sigma, \tyDict{\tau}, H) &{}= \set{\shapeDict{\tau}{\varnothing}{H}} \\*
 \shapes(\Sigma, \tau, H) &{}= \set{\shapeAny{\tau}{H}} && \text{otherwise} \\*[2mm]
