@@ -1,7 +1,7 @@
 import ast
 from collections.abc import Callable, Sequence
 
-from classes import ClassTable, instantiated_fields
+from classes import ClassTable, fields
 from subtyping import comparable, join_seq, subtype
 from type_syntax import (
     CallableType,
@@ -15,6 +15,7 @@ from type_syntax import (
     TypeVariable,
     UnionType,
     base_type,
+    instantiate,
 )
 
 type ResolvedOverload = tuple[tuple[Type, ...], Type]
@@ -52,8 +53,10 @@ def equality_type(Sigma: ClassTable, tau: Type) -> bool:
             return all(equality_type(Sigma, c) for c in taus)
         case UnionType(sigma, tau_):
             return equality_type(Sigma, sigma) and equality_type(Sigma, tau_)
-        case ClassType():
-            return all(equality_type(Sigma, sigma) for _, sigma in instantiated_fields(Sigma, tau))
+        case ClassType(c, taus):
+            return all(
+                equality_type(Sigma, sigma) for _, sigma in instantiate(fields(Sigma, c), taus)
+            )
         case Primitive():
             return True
         case LiteralType():

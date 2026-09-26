@@ -9,7 +9,7 @@ from classes import (
     ClassTable,
     field_map,
     field_names,
-    instantiated_fields,
+    fields,
     short_name,
 )
 from contexts import (
@@ -49,6 +49,7 @@ from type_syntax import (
     TupleType,
     Type,
     UnionType,
+    instantiate,
     literal,
 )
 
@@ -256,8 +257,8 @@ def split_class(Sigma: ClassTable, k: Rest, c: Class) -> Split | None:
         return None
     tau = meet(Sigma, k.ty, ClassType(c, ()))
     match tau:
-        case ClassType(d, _):
-            sigmas = tuple(sigma for _, sigma in instantiated_fields(Sigma, tau))
+        case ClassType(d, taus):
+            sigmas = tuple(sigma for _, sigma in instantiate(fields(Sigma, d), taus))
             hs_ = typed_heads(Sigma, k.hs, tau)
             return (
                 tuple(Constr(d, ks, hs_) for ks in shapes_seq(Sigma, sigmas)),
@@ -273,7 +274,7 @@ def split_subclass(Sigma: ClassTable, k: Constr, c: Class) -> Split | None:
         return None
     if below_excluded(Sigma, c, k.hs):
         return None
-    sigmas = tuple(sigma for _, sigma in instantiated_fields(Sigma, tau)[len(k.args) :])
+    sigmas = tuple(sigma for _, sigma in instantiate(fields(Sigma, c), ())[len(k.args) :])
     hs_ = typed_heads(Sigma, k.hs, tau)
     return (
         tuple(Constr(c, k.args + ks, hs_) for ks in shapes_seq(Sigma, sigmas)),
@@ -367,10 +368,7 @@ def seq_safe(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> tuple[ast.pat
             if args is None:
                 return None  # likewise
             return first_unsafe(
-                [
-                    (args[x], sigma)
-                    for x, sigma in instantiated_fields(mod_ctx.Sigma, ClassType(c, ()))
-                ],
+                [(args[x], sigma) for x, sigma in instantiate(fields(mod_ctx.Sigma, c), ())],
                 mod_ctx,
             )
         case ast.MatchAs():

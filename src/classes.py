@@ -43,12 +43,8 @@ def field_names(Sigma: ClassTable, c: Class) -> tuple[Var, ...]:
     return tuple(x for x, _ in fields(Sigma, c).fields)
 
 
-def instantiated_fields(Sigma: ClassTable, tau: ClassType) -> tuple[tuple[Var, Type], ...]:
-    return instantiate(fields(Sigma, tau.c), tau.args)
-
-
 def field_type(Sigma: ClassTable, tau: ClassType, x: Var) -> Type | None:
-    return dict(instantiated_fields(Sigma, tau)).get(x)
+    return dict(instantiate(fields(Sigma, tau.c), tau.args)).get(x)
 
 
 def declared_type(Sigma: ClassTable, tau: ClassType, x: Var) -> Type:
