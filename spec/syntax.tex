@@ -59,6 +59,17 @@ predefined name & $\predefName$ & name usable only in annotation or as decorator
 }
 \end{definition}
 
+\noindent \Added{A predefined name is a
+member, such as $\pyinline{Callable}$ or $\pyinline{dataclass}$, that cannot appear in an expression: it names a
+type, is applied to type arguments as in \pyinline{list[int]}, or decorates a class declaration. A type parameter or type alias may likewise be
+mentioned only by a type expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias{\seq{\alpha}}{\tau}$ are
+named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \pyinline{typing.TypeAliasType} of
+the objects denoted by a class name, type parameter or alias at run time. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
+and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
+is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A variable
+with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
+It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.}
+
 \begin{definition}[Class]
 \label{def:class}
 A class $C$ is a fully-qualified name $\fq{q.c}$, written with a tilde: a module $q$ and a class name $c$ declared in $q$. A module
@@ -77,7 +88,9 @@ $\dom(\Sigma)$, and the relation taking each class of $\Sigma$ to its base class
 acyclic.
 \end{definition}
 
-\noindent \Replaced{The well-formedness rules accumulate the class table, one entry per class declaration (\figref{typing-top-level}). Its design is similar to that of Featherweight Java~\cite{igarashi2001}.}{The class table is borrowed from Featherweight Java~\cite{igarashi2001}. Module references arise from import statements.} A predefined name is a
+\noindent \Replaced{The class table takes the form of Featherweight Java's~\cite{igarashi2001}; the well-formedness rules build it as they check the class declarations of a program, one entry each (\figref{typing-top-level}).}{The class table is borrowed from Featherweight Java~\cite{igarashi2001}. Module references arise from import statements.}
+
+\Deleted{A predefined name is a
 member, such as $\pyinline{Callable}$ or $\pyinline{dataclass}$, that cannot appear in an expression: it names a
 type, is applied to type arguments as in \pyinline{list[int]}, or decorates a class declaration. A type parameter or type alias may likewise be
 mentioned only by a type expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias{\seq{\alpha}}{\tau}$ are
@@ -86,7 +99,7 @@ the objects denoted by a class name, type parameter or alias at run time. The de
 and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
 is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A variable
 with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
-It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
+It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.}
 
 \subsubsection{Context operations}
 \label{sec:context-operations}
