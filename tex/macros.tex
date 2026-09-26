@@ -132,10 +132,10 @@
 \newcommand*{\exDataclass}[2]{@\pyinline{dataclass}\;\pyinline{class}\;#1:\;#2}
 \newcommand*{\exDataclassExtend}[3]{@\pyinline{dataclass}\;\pyinline{class}\;#1(#2):\;#3}
 \newcommand*{\exDef}[4]{\pyinline{def}\;#1(#2)\,#3\mathord{:}\;#4}
-\newcommand*{\exTypeAlias}[2]{\pyinline{type}\;#1 = #2}
 \newcommand*{\exField}[2]{#1\exAnnot{#2}}
 \newcommand*{\exFromImport}[2]{\pyinline{from}\;#1\;\pyinline{import}\;#2}
 \newcommand*{\exImport}[1]{\pyinline{import}\;#1}
+\newcommand*{\exTypeAlias}[2]{\pyinline{type}\;#1 = #2}
 
 % Types and annotations
 \newcommand*{\tyNever}{\pyinline{Never}}
@@ -156,6 +156,11 @@
 \newcommand*{\exAnnot}[1]{\mathord{:}\;#1}
 \newcommand*{\exRetAnnot}[1]{\;\pymath{-\raisebox{-0.15ex}{>}}\;#1}
 
+% Schemes and substitution
+\newcommand*{\scheme}[2]{\forall #1.\, #2}
+\newcommand*{\subst}[3]{[#1/#2]#3}
+\newcommand*{\tyInst}[2]{#1[#2]}
+
 % Terms: patterns
 \newcommand*{\patConstr}[2]{#1(#2)}
 \newcommand*{\patDict}[1]{\{#1\}}
@@ -170,9 +175,6 @@
 
 % Context entries
 \newcommand*{\clsRec}[3]{(#1;\, #2;\, #3)}
-\newcommand*{\scheme}[2]{\forall #1.\, #2}
-\newcommand*{\subst}[3]{[#1/#2]#3}
-\newcommand*{\tyInst}[2]{#1[#2]}
 \newcommand*{\modLoaded}[2]{\mathsf{Mod}(#1, #2)}
 \newcommand*{\primFn}{\mathpzc{f}}
 \newcommand*{\primVal}[1]{\mathsf{Prim}(#1)}
@@ -238,11 +240,11 @@
 
 % Metafunctions: definite assignment and free variables
 \newcommand*{\assignsS}{\mathrm{assigns}}
-\newcommand*{\declaresS}{\mathrm{declares}}
-\newcommand*{\scopeS}{\mathrm{scope}}
 \newcommand*{\binds}{\mathrm{binds}}
 \newcommand*{\captures}{\mathrm{captures}}
+\newcommand*{\declaresS}{\mathrm{declares}}
 \newcommand*{\fv}{\mathrm{fv}}
+\newcommand*{\scopeS}{\mathrm{scope}}
 
 % Metafunctions: classes
 \newcommand*{\ancestors}{\mathrm{ancestors}}
