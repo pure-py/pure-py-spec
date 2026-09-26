@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from classes import ClassTable, ancestors
+from classes import ClassTable
 from type_syntax import (
     CallableType,
     ClassType,
@@ -12,6 +12,7 @@ from type_syntax import (
     Type,
     UnionType,
     base_type,
+    substitute,
 )
 
 
@@ -70,8 +71,11 @@ def subtype(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
             return subtype(Sigma, sigma, tau.left) or subtype(Sigma, sigma, tau.right)
         case (LiteralType(), _):
             return subtype(Sigma, base_type(sigma), tau)
-        case (ClassType(c), ClassType(d)):
-            return d in ancestors(Sigma, c)
+        case (ClassType(c, taus), ClassType()):
+            base = Sigma[c].base
+            return base is not None and subtype(
+                Sigma, substitute(taus, Sigma[c].type_params, base), tau
+            )
         case (TupleType(sigmas), TupleType(taus)):
             return len(sigmas) == len(taus) and all(
                 subtype(Sigma, a, b) for a, b in zip(sigmas, taus)
