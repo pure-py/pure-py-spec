@@ -40,6 +40,10 @@ description: Conventions for editing the PurePy spec and its GitHub issues; defe
   "no", "neither", "every" or "each" may appear inside the agent phrase of a participle.
   The test also catches a possessive relative, "a function whose cases overlap", where the head noun is
   not the subject of "overlap": write "a function with overlapping cases".
+- A negation goes on the verb, not on a noun phrase, whether that phrase is the agent of a participle
+  (form 3 above) or the object of a verb: "does not fix any length", not "fixes no length"; "is not
+  bound in either branch", not "is bound in neither branch". Where an affirmative statement says the
+  same thing, prefer it: "admits values of every length".
 - When a sentence quantifies over a finite set it has already introduced, refer to that set definitely:
   "not matched by any of the cases" (the cases of this match), not "not matched by any case"; "each of
   the branches", not "each branch". This applies only when a specific set is in scope. A general claim
