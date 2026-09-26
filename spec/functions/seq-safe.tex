@@ -15,6 +15,6 @@
 \\
 \seqSafe(\Sigma, \Gamma, \patDict{\bind{\seq{w}}{\seq{p}}}, \tyDict{\tau}) &{}= \textstyle\bigwedge_i \seqSafe(\Sigma, \Gamma, p_i, \tau) \\*
 \seqSafe(\Sigma, \Gamma, \patConstr{q}{a}, \tau) &{}= \textstyle\bigwedge_i \seqSafe(\Sigma, \Gamma, p_i, \sigma_i) \\*
-&\qquad \rlap{$\text{where } \Gamma \vdash q : \Type{C},\ \fields(\Sigma, C) = \bind{\seq{x}}{\seq{\sigma}}$} \\*
+&\qquad \rlap{$\text{where } \Gamma \vdash q : \Type{C},\ \replaced{C[\seq{\sigma}'] = \instance(\Sigma, C, \tau),\ \tyInst{\fields(\Sigma, C)}{\seq{\sigma}'} = \bind{\seq{x}}{\seq{\sigma}}}{\fields(\Sigma, C) = \bind{\seq{x}}{\seq{\sigma}}}$} \\*
 &\qquad \rlap{$\text{and } \fieldMap(\Sigma, C, a) = \set{\bind{\seq{x}}{\seq{p}}}$} \\*
 \seqSafe(\Sigma, \Gamma, p, \tau) &{}= \True && \text{otherwise}

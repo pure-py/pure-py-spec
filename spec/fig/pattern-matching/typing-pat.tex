@@ -75,14 +75,14 @@
 \inferrule*[lab={\ruleName{pat-constr}}]
 {
   \Gamma \vdash q : \Type{D} \\
-  \Sigma \vdash C \subty D \\
-  \fields(\Sigma, D) = \bind{\seq{x}}{\seq{\sigma}} \\
+  \replaced{D \in \ancestors(\Sigma, C)}{\Sigma \vdash C \subty D} \\
+  \fields(\Sigma, D) = \replaced{\scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}}{\bind{\seq{x}}{\seq{\sigma}}} \\
   \fieldMap(\Sigma, D, a) = \set{\bind{\seq{x}}{\seq{p}}} \\
   p'_i = \patWild \quad (\forall i) \\
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \mathbin{\concat} \seq{p}\,' \matches K, L \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{H}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{C}{\seq{k}\,'}}{H} \mid \seq{k}\,' \in K}, \set{\shapeAny{\patConstr{C}{\seq{l}}}{H} \mid \seq{l} \in L} \binding \Delta
+  \Sigma; \Gamma \vdash \shapeAny{\patConstr{\replaced{C[\seq{\tau}]}{C}}{\seq{k}}}{H}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{\replaced{C[\seq{\tau}]}{C}}{\seq{k}\,'}}{H} \mid \seq{k}\,' \in K}, \set{\shapeAny{\patConstr{\replaced{C[\seq{\tau}]}{C}}{\seq{l}}}{H} \mid \seq{l} \in L} \binding \Delta
 }
 \end{mathpar}
 
