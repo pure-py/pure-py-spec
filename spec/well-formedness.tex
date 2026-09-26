@@ -62,7 +62,7 @@ when either is a subtype of the other. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. Two comparable types \emph{meet} to the smaller type; a
 meet of incomparable types distributes over a union, takes tuples componentwise and callables with
 parameters joined and results combined using meet, and is \pyinline{Never} otherwise, since no value belongs to both types.
-So joining a type with itself gives that type, joining a class with one of its ancestors gives the ancestor, and
+So joining a type with itself gives that type, joining a class with \Replaced{an instantiation of one of its ancestors above it gives that instantiation}{one of its ancestors gives the ancestor}, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$. A sequence of types is joined by
 folding binary join over the sequence, with \pyinline{Never} as the unit (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:join}}).
 
@@ -104,7 +104,7 @@ declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the insta
 position. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to
 (\ruleName{constr}). In an attribute reference $\exAttr{e}{x}$ the object $e$ must
-synthesise a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(\Sigma, C)$
+synthesise \Replaced{an instantiated class $C[\seq{\tau}]$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\tyInst{\fields(\Sigma, C)}{\seq{\tau}}$}{a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(\Sigma, C)$}
 (\ruleName{attr-object}). The signature of a predefined module binds
 $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type listed for it
 (\figref{predefined-signatures}, Definition~\ref{def:predefined}). A module attribute reference
