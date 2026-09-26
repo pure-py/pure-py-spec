@@ -5,15 +5,11 @@ description: Conventions for editing the PurePy spec and its GitHub issues; defe
 
 # PurePy editor conventions
 
-Prose style is in the `technical-authoring` skill; load it first. PurePy-specific:
+Prose style is in the `technical-authoring` skill and code and commit conventions in the `coding-conventions` skill; load them first. PurePy-specific:
 
 ## Style
 
 - Nouns the spec uses for more than one kind of thing: "entry" is generic enough to need qualifying always (a context entry or a class entry); "outcome" needs it where static and evaluation outcomes are both in play; "signature" rarely, since a module signature and a function signature seldom share a paragraph.
-
-## Git
-
-- Commit after every coherent change; don't sit on uncommitted work.
 
 ## GitHub issues
 
