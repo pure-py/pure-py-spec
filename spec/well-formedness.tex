@@ -280,12 +280,12 @@ residual from the shapes of $\sigma$ (\figref{shapes}); \ruleName{match} applies
 $\Assigns{\varnothing}$ for the values that fall through. Shapes and matching a pattern against the residual
 are the subject of \secref{well-formedness-patterns}.
 
-Each pattern must also be \emph{sequence-safe} at $\sigma$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:seq-safe}}), because under the
+Each pattern must also be \Replaced{\emph{safe}}{\emph{sequence-safe}} at $\sigma$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:safe}})\Replaced{. Under}{, because under} the
 evaluation rules a tuple pattern matches only a tuple and a list pattern matches only a list, whereas
-Python matches both forms of pattern against both kinds of value\speconly{ (\figref{eval-pat})}. A tuple pattern is therefore sequence-safe only at a type with no list values, and a list pattern only
+Python matches both forms of pattern against both kinds of value\speconly{ (\figref{eval-pat})}. A tuple pattern is therefore \Replaced{safe}{sequence-safe} only at a type with no list values, and a list pattern only
 at a type with no tuple values. A union has the values of its members, so both kinds of pattern fail the condition
 at $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$, and at $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$,
-since $\tySized$ has both list and tuple values, as does a type variable, which may stand for any type.
+since $\tySized$ has both list and tuple values, as does a type variable, which may stand for any type. \Added{A constructor pattern is safe only where the scrutinee type determines the type arguments of its class (\secref{well-formedness-patterns}).}
 
 \subsection{Pattern matching}
 \label{sec:exhaustiveness}
@@ -358,7 +358,7 @@ with an excluded set split, and no head types at a tuple type, so the excluded s
 empty and \ruleName{split-tuple} leaves the empty residual.
 A constructor pattern whose class lies below a
 class of the excluded set matches nothing, because an earlier case for the superclass has already
-matched every instance. \Added{A constructor pattern names its class without type arguments, and matches the instantiation comparable with the scrutinee type, $\instance(\Sigma, C, \tau)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:instance}}): a pattern \pyinline{Leaf(v)} at \pyinline{Tree[int]} matches \pyinline{Leaf[int]} and binds \pyinline{v} at \pyinline{int}. A class whose type arguments the scrutinee type does not determine, such as a class with type parameters at \tyObject, has no such instantiation and so cannot be matched.}
+matched every instance. \Added{A constructor pattern names its class without type arguments, and matches the instantiation comparable with the scrutinee type, $\instance(\Sigma, C, \tau)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:instance}}): a pattern \pyinline{Leaf(v)} at \pyinline{Tree[int]} matches \pyinline{Leaf[int]} and binds \pyinline{v} at \pyinline{int}. A class whose type arguments are not determined by the type of the scrutinee, such as a class with type parameters at \tyObject, has no such instantiation, so a pattern naming it is not safe at the type.}
 
 A dictionary shape has a separate form,
 $\shapeDict{\tau}{\beta}{H}$, standing for the dictionaries that hold each key $w$ in the domain of

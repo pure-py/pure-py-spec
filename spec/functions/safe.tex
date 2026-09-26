@@ -1,0 +1,23 @@
+\safe(\Sigma, \Gamma, p, \tyUnion{\sigma}{\tau}) &{}= \safe(\Sigma, \Gamma, p, \sigma) \wedge \safe(\Sigma, \Gamma, p, \tau) \\*
+\safe(\Sigma, \Gamma, p\;\pyinline{as}\;x, \tau) &{}= \safe(\Sigma, \Gamma, p, \tau) \\*
+\\
+\safe(\Sigma, \Gamma, \patTuple{p_1, \ldots, p_n}, \tyTuple{\tau_1, \ldots, \tau_n}) &{}= \textstyle\bigwedge_i \safe(\Sigma, \Gamma, p_i, \tau_i) \\*
+\safe(\Sigma, \Gamma, \patTuple{\seq{p}}, \tyList{\tau}) &{}= \False \\*
+\safe(\Sigma, \Gamma, \patTuple{\seq{p}}, \tySized) &{}= \False \\*
+\safe(\Sigma, \Gamma, \patTuple{\seq{p}}, \tyObject) &{}= \False \\*
+\safe(\Sigma, \Gamma, \patTuple{\seq{p}}, \alpha) &{}= \False \\*
+\\
+\safe(\Sigma, \Gamma, \patList{\seq{p}}, \tyList{\tau}) &{}= \textstyle\bigwedge_i \safe(\Sigma, \Gamma, p_i, \tau) \\*
+\safe(\Sigma, \Gamma, \patList{\seq{p}}, \tyTuple{\seq{\tau}}) &{}= \False \\*
+\safe(\Sigma, \Gamma, \patList{\seq{p}}, \tySized) &{}= \False \\*
+\safe(\Sigma, \Gamma, \patList{\seq{p}}, \tyObject) &{}= \False \\*
+\safe(\Sigma, \Gamma, \patList{\seq{p}}, \alpha) &{}= \False \\*
+\\
+\safe(\Sigma, \Gamma, \patDict{\bind{\seq{w}}{\seq{p}}}, \tyDict{\tau}) &{}= \textstyle\bigwedge_i \safe(\Sigma, \Gamma, p_i, \tau) \\*
+\added{\safe(\Sigma, \Gamma, \patConstr{q}{a}, \tau)} &{}\added{= \False} \\*
+&\qquad \rlap{$\added{\text{if } \Gamma \vdash q : \Type{C} \text{ and } C[\seq{\sigma}], C[\seq{\sigma}'] \text{ comparable with } \tau}$} \\*
+&\qquad \rlap{$\added{\text{for some } \seq{\sigma} \not\tyEquiv \seq{\sigma}'}$} \\*
+\safe(\Sigma, \Gamma, \patConstr{q}{a}, \tau) &{}= \textstyle\bigwedge_i \safe(\Sigma, \Gamma, p_i, \sigma_i) \\*
+&\qquad \rlap{$\text{where } \Gamma \vdash q : \Type{C},\ \replaced{C[\seq{\sigma}'] = \instance(\Sigma, C, \tau),\ \tyInst{\fields(\Sigma, C)}{\seq{\sigma}'} = \bind{\seq{x}}{\seq{\sigma}}}{\fields(\Sigma, C) = \bind{\seq{x}}{\seq{\sigma}}}$} \\*
+&\qquad \rlap{$\text{and } \fieldMap(\Sigma, C, a) = \set{\bind{\seq{x}}{\seq{p}}}$} \\*
+\safe(\Sigma, \Gamma, p, \tau) &{}= \True && \text{otherwise}

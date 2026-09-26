@@ -15,5 +15,5 @@
 \auxrow{$\elemTy(\Sigma, \tau)$}{type}{type of elements drawn from $\tau$ by generator}{aux:elem-type}
 \auxrow{$\shapes(\Sigma, \tau, H)$, $\shapes(\Sigma, \seq{\tau})$}{ordered set of shapes or of shape sequences}{shapes of $\tau$ once heads in $H$ are excluded; sequences of shapes of $\seq{\tau}$}{aux:shapes}
 \auxrow{$\shapeTy(k)$}{type}{least type of shape $k$}{aux:shape-type}
-\auxrow{$\seqSafe(\Sigma, \Gamma, p, \tau)$}{Boolean}{tuple patterns in $p$ never checked against lists, list patterns never against tuples}{aux:seq-safe}
+\auxrow{$\replaced{\safe}{\mathrm{seq\text{-}safe}}(\Sigma, \Gamma, p, \tau)$}{Boolean}{tuple patterns in $p$ never checked against lists, list patterns never against tuples\added{, constructor patterns never against types with several instantiations of their class}}{aux:safe}
 \auxrow{$\resolveOp(\Sigma, \odot, \sigma_1, \sigma_2)$, $\resolveOp(\Sigma, \ominus, \sigma)$}{type}{result type of most specific overload at the operand types}{aux:resolve-op}
