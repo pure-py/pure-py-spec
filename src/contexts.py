@@ -78,9 +78,9 @@ class ModuleContext:
     M: Mapping[Name, ast.Module]
     q: Name
     Sigma: ClassTable
-    # Matches exhaustive by shapes but not for mypy, shared by every context of the module, for the
-    # missing-return message
-    partial_for_mypy: list[ast.Match] = field(default_factory=list)
+    # Matches with an empty final residual but a remaining type other than Never, each with that type,
+    # shared by every context of the module, for the missing-return message
+    partial_for_mypy: list[tuple[ast.Match, Type]] = field(default_factory=list)
 
 
 def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:

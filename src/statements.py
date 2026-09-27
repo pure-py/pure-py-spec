@@ -223,12 +223,13 @@ def check_implicit_return(d: ast.FunctionDef, declared: Type, mod_ctx: ModuleCon
     if subtype(mod_ctx.Sigma, Primitive.NONE, declared):
         return
     assert d.end_lineno is not None
-    matches = [m for m in mod_ctx.partial_for_mypy if d.lineno <= m.lineno <= d.end_lineno]
+    matches = [
+        (m, rest) for m, rest in mod_ctx.partial_for_mypy if d.lineno <= m.lineno <= d.end_lineno
+    ]
     if len(matches) == 0:
         raise IllFormedModule(d, reasons.MissingReturn(d.name, declared))
-    raise MypyCompatibility(
-        d, reasons.MissingReturnMatchPartial(d.name, declared, matches[-1].lineno)
-    )
+    m, rest = matches[-1]
+    raise MypyCompatibility(m, reasons.MissingReturnMatchPartial(d.name, rest))
 
 
 def check_returns_none(Sigma: ClassTable, s: ast.Return, declared: Type) -> None:
@@ -349,11 +350,12 @@ def match_cases(
             raise IllFormedModule(case.pattern, reasons.UnreachableCase(ast.unparse(case.pattern)))
         _, residual, delta = result
         deltas.append(delta)
-    partial = remaining_seq(tau, [case.pattern for case in cases], mod_ctx) != Primitive.NEVER
+    rest = remaining_seq(tau, [case.pattern for case in cases], mod_ctx)
+    partial = rest != Primitive.NEVER
     if not partial:
         assert len(residual) == 0  # the remaining type is coarser than the residual
     elif len(residual) == 0:
-        mod_ctx.partial_for_mypy.append(match)
+        mod_ctx.partial_for_mypy.append((match, rest))
     return deltas, partial
 
 

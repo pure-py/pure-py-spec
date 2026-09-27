@@ -1,1 +1,1 @@
-'f' declares result type int but does not always return; the match at line 3 is exhaustive by shapes but not for mypy (mypy compatibility)
+cases leave remaining type tuple[bool, bool], so 'f' does not always return (mypy compatibility)

@@ -443,13 +443,12 @@ class MissingReturn:
 @dataclass(frozen=True)
 class MissingReturnMatchPartial:
     x: Var
-    tau: Type
-    line: int
+    remaining: Type
 
     def message(self) -> str:
         return (
-            f"'{self.x}' declares result type {render(self.tau)} but does not always return; "
-            f"the match at line {self.line} is exhaustive by shapes but not for mypy"
+            f"cases leave remaining type {render(self.remaining)}, "
+            f"so '{self.x}' does not always return"
         )
 
 
