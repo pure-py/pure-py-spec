@@ -8,6 +8,7 @@ $\Sigma \vdash h : \tau$ & head $h$ has type $\tau$ & \figref{shapes} \\
 $\Sigma \vdash k : \tau$ & shape $k$ has type $\tau$ & \figref{shapes} \\
 $\Sigma; \Gamma \vdash k, p \splits K, L$ & shape $k$ splits at the head tested by $p$, giving $K$ and $L$ & \figref{split} \\
 $\Sigma; \Gamma \vdash k, p \matches K, L \binding \Delta$ & pattern $p$ matches shapes $K$ of $k$, leaving $L$ and binding $\Delta$ & \figref{typing-pat} \\
+\added{$\Sigma; \Gamma \vdash p \checks \tau$} & \added{pattern $p$ checks against type $\tau$} & \added{\figref{checking-pat}} \\
 $\Gamma \vdash q : \theta$ & name $q$ denotes context entry $\theta$ & \figref{resolve-name} \\
 $\Sigma; \Gamma \vdash \psi \synth \tau$ & type expression $\psi$ denotes type $\tau$ & \figref{resolve-type} \\
 $\Sigma; \Gamma \vdash e \synth \tau$ & expression $e$ synthesises type $\tau$ & \figref{typing-synth} \\

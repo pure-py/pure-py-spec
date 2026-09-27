@@ -1,0 +1,103 @@
+\begin{figure}
+\small
+\setlength{\jot}{2pt}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash p \checks \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{check-atomic}}]
+{
+  p \text{ a variable, wildcard or literal}
+}
+{
+  \Sigma; \Gamma \vdash p \checks \tau
+}
+\and
+\inferrule*[lab={\ruleName{check-as}}]
+{
+  \Sigma; \Gamma \vdash p \checks \tau
+}
+{
+  \Sigma; \Gamma \vdash p\;\pyinline{as}\;x \checks \tau
+}
+\and
+\inferrule*[lab={\ruleName{check-union}}]
+{
+  \Sigma; \Gamma \vdash p \checks \sigma \\
+  \Sigma; \Gamma \vdash p \checks \tau
+}
+{
+  \Sigma; \Gamma \vdash p \checks \tyUnion{\sigma}{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{check-tuple}}]
+{
+  \Sigma; \Gamma \vdash p_i \checks \tau_i \quad (\forall i)
+}
+{
+  \Sigma; \Gamma \vdash \patTuple{p_1, \ldots, p_n} \checks \tyTuple{\tau_1, \ldots, \tau_n}
+}
+\and
+\inferrule*[lab={\ruleName{check-tuple-none}}]
+{
+  \tau \text{ not a union, list type, tuple type of length } |\seq{p}| \text{, } \tySized \text{, } \tyObject \text{ or type variable}
+}
+{
+  \Sigma; \Gamma \vdash \patTuple{\seq{p}} \checks \tau
+}
+\and
+\inferrule*[lab={\ruleName{check-list}}]
+{
+  \Sigma; \Gamma \vdash p_i \checks \tau \quad (\forall i)
+}
+{
+  \Sigma; \Gamma \vdash \patList{\seq{p}} \checks \tyList{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{check-list-none}}]
+{
+  \tau \text{ not a union, list type, tuple type, } \tySized \text{, } \tyObject \text{ or type variable}
+}
+{
+  \Sigma; \Gamma \vdash \patList{\seq{p}} \checks \tau
+}
+\and
+\inferrule*[lab={\ruleName{check-dict}}]
+{
+  \Sigma; \Gamma \vdash p_i \checks \tau \quad (\forall i)
+}
+{
+  \Sigma; \Gamma \vdash \patDict{\bind{\seq{w}}{\seq{p}}} \checks \tyDict{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{check-dict-none}}]
+{
+  \tau \text{ not a union or dictionary type}
+}
+{
+  \Sigma; \Gamma \vdash \patDict{\bind{\seq{w}}{\seq{p}}} \checks \tau
+}
+\and
+\inferrule*[lab={\ruleName{check-constr}}]
+{
+  \Gamma \vdash q : \Type{C} \\
+  C[\seq{\sigma}] = \instance(\Sigma, C, \tau) \\
+  \tyInst{\fields(\Sigma, C)}{\seq{\sigma}} = \bind{\seq{x}}{\seq{\sigma}'} \\
+  \fieldMap(\Sigma, C, a) = \set{\bind{\seq{x}}{\seq{p}}} \\
+  \Sigma; \Gamma \vdash p_i \checks \sigma'_i \quad (\forall i)
+}
+{
+  \Sigma; \Gamma \vdash \patConstr{q}{a} \checks \tau
+}
+\and
+\inferrule*[lab={\ruleName{check-constr-none}}]
+{
+  \Gamma \vdash q : \Type{C} \\
+  \text{no instantiation of } C \text{ comparable with } \tau
+}
+{
+  \Sigma; \Gamma \vdash \patConstr{q}{a} \checks \tau
+}
+\end{mathpar}
+\caption{Pattern $p$ checks against type $\tau$}
+\label{fig:checking-pat}
+\end{figure}

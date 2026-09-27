@@ -1,5 +1,0 @@
-Whether $p$ applies each tuple pattern only to tuples\Replaced{,}{ and} each list pattern only to lists\Added{, and each constructor pattern only where its class has at most one comparable instantiation}: no tuple
-pattern in $p$ is checked against a type with list values, \Deleted{and} no list pattern against a type with tuple
-values\Added{, and no constructor pattern against a type comparable with several instantiations of its class, since the pattern then does not determine the type arguments of the values matched}. The list types, $\tySized$ and $\tyObject$ have list values; the tuple types, $\tySized$ and
-$\tyObject$ have tuple values; a union has the values of its members; a type variable may stand for any type and so has both. The final case gives $\True$ for a
-pattern at a type that it cannot match, such as a tuple pattern at a tuple type of another arity \Added{or a constructor pattern naming a class with no instantiation comparable with the type}.
