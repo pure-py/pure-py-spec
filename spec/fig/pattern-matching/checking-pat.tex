@@ -1,7 +1,7 @@
 \begin{figure}
 \small
 \setlength{\jot}{2pt}
-\flushleft \shadebox{$\Sigma \vdash C, \tau \synth C[\seq{\sigma}]$}
+\flushleft \shadebox{$\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{instance-above}}]
@@ -10,7 +10,7 @@
   \seq{\sigma}' \tyEquiv \seq{\sigma} \text{ whenever } \Sigma \vdash \tau \subty C[\seq{\sigma}']
 }
 {
-  \Sigma \vdash C, \tau \synth C[\seq{\sigma}]
+  \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau
 }
 \and
 \inferrule*[lab={\ruleName{instance-below}}]
@@ -19,7 +19,7 @@
   \seq{\sigma}' \tyEquiv \seq{\sigma} \text{ whenever } \Sigma \vdash C[\seq{\sigma}'] \subty \tau
 }
 {
-  \Sigma \vdash C, \tau \synth C[\seq{\sigma}]
+  \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau
 }
 \end{mathpar}
 
@@ -120,7 +120,7 @@
 \inferrule*[lab={\ruleName{check-constr}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \Sigma \vdash C, \tau \synth C[\seq{\sigma}] \\
+  \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau \\
   \tyInst{\fields(\Sigma, C)}{\seq{\sigma}} = \bind{\seq{x}}{\seq{\sigma}'} \\
   \fieldMap(\Sigma, C, a) = \set{\bind{\seq{x}}{\seq{p}}} \\
   \Sigma; \Gamma \vdash p_i \checks \sigma'_i \quad (\forall i)
@@ -138,6 +138,6 @@
   \Sigma; \Gamma \vdash \patConstr{q}{a} \checks \tau
 }
 \end{mathpar}
-\caption{Class $C$ at type $\tau$ has instance $C[\seq{\sigma}]$; pattern $p$ checks against type $\tau$}
+\caption{$C[\seq{\sigma}]$ is the instance of $C$ at $\tau$; pattern $p$ checks against type $\tau$}
 \label{fig:checking-pat}
 \end{figure}
