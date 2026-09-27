@@ -277,10 +277,10 @@ over-approximation of the values of $\sigma$ which remain unmatched by earlier c
 checked under the pattern's bindings, and the outcomes
 are merged into $S$. The match rules start the
 residual from the shapes of $\sigma$ (\figref{shapes}); \ruleName{match} applies when the final residual is empty; \ruleName{match-partial} applies otherwise, merging in
-$\Assigns{\varnothing}$ for the values that fall through. Shapes and matching a pattern against the residual
+$\Assigns{\varnothing}$ for the values that fall through. \Added{Each pattern must also check against $\sigma$ (\ruleName{match-case}, \paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}}).} Shapes and matching a pattern against the residual
 are the subject of \secref{well-formedness-patterns}.
 
-\Replaced{Each pattern must also check against $\sigma$ (\paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}}).}{Each pattern must also be \emph{sequence-safe} at $\sigma$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:seq-safe}}), because under the
+\Deleted{Each pattern must also be \emph{sequence-safe} at $\sigma$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:seq-safe}}), because under the
 evaluation rules a tuple pattern matches only a tuple and a list pattern matches only a list, whereas
 Python matches both forms of pattern against both kinds of value\speconly{ (\figref{eval-pat})}. A tuple pattern is therefore sequence-safe only at a type with no list values, and a list pattern only
 at a type with no tuple values. A union has the values of its members, so both kinds of pattern fail the condition
