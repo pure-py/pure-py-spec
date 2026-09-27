@@ -376,7 +376,7 @@ with an excluded set split, and no head types at a tuple type, so the excluded s
 empty and \ruleName{split-tuple} leaves the empty residual.
 A constructor pattern whose class lies below a
 class of the excluded set matches nothing, because an earlier case for the superclass has already
-matched every instance. \Added{A constructor pattern matches the instance of its class at the type of the shape (\figref{checking-pat}): a pattern \pyinline{Leaf(v)} at \pyinline{Tree[int]} matches \pyinline{Leaf[int]} and binds \pyinline{v} at \pyinline{int}.}
+matched every instance. \Added{A constructor pattern matches the instance of its class at the type of the shape (\figref{instance}): a pattern \pyinline{Leaf(v)} at \pyinline{Tree[int]} matches \pyinline{Leaf[int]} and binds \pyinline{v} at \pyinline{int}.}
 
 A dictionary shape has a separate form,
 $\shapeDict{\tau}{\beta}{H}$, standing for the dictionaries that hold each key $w$ in the domain of

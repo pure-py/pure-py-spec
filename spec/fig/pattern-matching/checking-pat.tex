@@ -1,6 +1,6 @@
 \begin{figure}
-\small
 \setlength{\jot}{2pt}
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$}
 \begin{mathpar}
 \small
@@ -22,7 +22,13 @@
   \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau
 }
 \end{mathpar}
+\subcaption{$C[\seq{\sigma}]$ is the instance of $C$ at $\tau$}
+\label{fig:instance}
+\end{subfigure}
 
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma; \Gamma \vdash p \checks \tau$}
 \begin{mathpar}
 \small
@@ -138,6 +144,9 @@
   \Sigma; \Gamma \vdash \patConstr{q}{a} \checks \tau
 }
 \end{mathpar}
-\caption{$C[\seq{\sigma}]$ is the instance of $C$ at $\tau$; pattern $p$ checks against type $\tau$}
+\subcaption{Pattern $p$ checks against type $\tau$}
 \label{fig:checking-pat}
+\end{subfigure}
+\caption{Pattern checking}
+\label{fig:pattern-checking}
 \end{figure}
