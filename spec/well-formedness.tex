@@ -282,9 +282,8 @@ are merged into $S$. The match rules start the
 residual from the shapes of $\sigma$ (\figref{shapes})\Replaced{. Exhaustiveness is decided by the \emph{remaining type}
 $\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases, an over-approximation of the values of $\sigma$ left unmatched once
 each case has failed (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}), which follows
-mypy's narrowing of a match scrutinee so that a match exhaustive by the rules is exhaustive for mypy.
-\ruleName{match} applies when the remaining type is $\tyNever$, and the final residual is then empty;
-\ruleName{match-partial} applies otherwise, merging in $\Assigns{\varnothing}$ for the values that fall through.
+mypy's narrowing of a match scrutinee. The \ruleName{match} rule applies when the remaining type is $\tyNever$,
+and the final residual is then empty; the \ruleName{match-partial} rule applies otherwise, merging in $\Assigns{\varnothing}$ for the values that fall through.
 The residual is the finer of the two, because mypy subtracts a class only for a constructor pattern that
 matches every value of the class, and a tuple only through one refutable component, so cases that between
 them cover a field of a class leave an empty residual and still count as partial. The residual alone
