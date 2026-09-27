@@ -1,6 +1,6 @@
 import ast
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from classes import Class, ClassTable
 from subtyping import join_seq
@@ -78,11 +78,18 @@ class ModuleContext:
     M: Mapping[Name, ast.Module]
     q: Name
     Sigma: ClassTable
+    # Matches exhaustive by shapes but not for mypy, shared by every context of the module, for the
+    # missing-return message
+    partial_for_mypy: list[ast.Match] = field(default_factory=list)
 
 
 def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
     return ModuleContext(
-        gamma={**mod_ctx.gamma, **delta}, M=mod_ctx.M, q=mod_ctx.q, Sigma=mod_ctx.Sigma
+        gamma={**mod_ctx.gamma, **delta},
+        M=mod_ctx.M,
+        q=mod_ctx.q,
+        Sigma=mod_ctx.Sigma,
+        partial_for_mypy=mod_ctx.partial_for_mypy,
     )
 
 

@@ -57,7 +57,7 @@ from contexts import (
     override_outcomes,
     resolve_name,
 )
-from match import check_pattern, match_shapes
+from match import check_pattern, match_shapes, remaining_cases
 from operators import (
     BINARY_NAMES,
     UNARY_NAMES,
@@ -216,12 +216,19 @@ def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
         declared = resolve_type(type_expr(d.returns), d, mod_ctx)
         r = check_body(d.body, body_ctx, declared)
         if not isinstance(r, Returns):
-            check_implicit_return(mod_ctx.Sigma, d, declared)
+            check_implicit_return(d, declared, mod_ctx)
 
 
-def check_implicit_return(Sigma: ClassTable, d: ast.FunctionDef, declared: Type) -> None:
-    if not subtype(Sigma, Primitive.NONE, declared):
+def check_implicit_return(d: ast.FunctionDef, declared: Type, mod_ctx: ModuleContext) -> None:
+    if subtype(mod_ctx.Sigma, Primitive.NONE, declared):
+        return
+    assert d.end_lineno is not None
+    matches = [m for m in mod_ctx.partial_for_mypy if d.lineno <= m.lineno <= d.end_lineno]
+    if len(matches) == 0:
         raise IllFormedModule(d, reasons.MissingReturn(d.name, declared))
+    raise MypyCompatibility(
+        d, reasons.MissingReturnMatchPartial(d.name, declared, matches[-1].lineno)
+    )
 
 
 def check_returns_none(Sigma: ClassTable, s: ast.Return, declared: Type) -> None:
@@ -312,27 +319,27 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
             if e_ is not None:
                 check_expr(e_, Primitive.STR, mod_ctx)
             return Assigns({})
-        case ast.Match(subject=e, cases=cases):
+        case ast.Match(subject=e):
             tau = synth_expr(e, mod_ctx)
-            return check_match_cases(cases, tau, mod_ctx, returns)
+            return check_match_cases(s, tau, mod_ctx, returns)
         case _:
             raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
 def check_match_cases(
-    cases: list[ast.match_case],
-    tau: Type,
-    mod_ctx: ModuleContext,
-    returns: Type | None,
+    match: ast.Match, tau: Type, mod_ctx: ModuleContext, returns: Type | None
 ) -> StaticOutcome:
-    deltas, partial = match_cases(cases, tau, mod_ctx)
-    branches = [check_case(case, delta, mod_ctx, returns) for case, delta in zip(cases, deltas)]
+    deltas, partial = match_cases(match, tau, mod_ctx)
+    branches = [
+        check_case(case, delta, mod_ctx, returns) for case, delta in zip(match.cases, deltas)
+    ]
     return merge_outcomes(branches + ([Assigns({})] if partial else []))
 
 
 def match_cases(
-    cases: list[ast.match_case], tau: Type, mod_ctx: ModuleContext
+    match: ast.Match, tau: Type, mod_ctx: ModuleContext
 ) -> tuple[list[VarContext], bool]:
+    cases = match.cases
     residual = shapes(mod_ctx.Sigma, tau, frozenset())
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):
@@ -342,7 +349,10 @@ def match_cases(
             raise IllFormedModule(case.pattern, reasons.UnreachableCase(index))
         _, residual, delta = result
         deltas.append(delta)
-    return deltas, len(residual) > 0
+    partial = remaining_cases(tau, cases, mod_ctx) != Primitive.NEVER
+    if partial and len(residual) == 0:
+        mod_ctx.partial_for_mypy.append(match)
+    return deltas, partial
 
 
 def check_case(

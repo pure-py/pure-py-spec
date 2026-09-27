@@ -42,7 +42,7 @@ from shapes import (
     shapes_seq,
     typed_heads,
 )
-from subtyping import Undetermined, instance, join_seq, meet, members, subtype
+from subtyping import Undetermined, instance, join, join_seq, meet, members, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
     ClassType,
@@ -53,6 +53,7 @@ from type_syntax import (
     Primitive,
     TupleType,
     Type,
+    UnionType,
     instantiate,
     literal,
 )
@@ -385,6 +386,58 @@ def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> None:
             check_pattern(q, tau, mod_ctx)
         case _:
             pass
+
+
+def remaining_cases(tau: Type, cases: list[ast.match_case], mod_ctx: ModuleContext) -> Type:
+    for case in cases:
+        tau = remaining(tau, case.pattern, mod_ctx)
+    return tau
+
+
+def remaining(tau: Type, p: ast.pattern, mod_ctx: ModuleContext) -> Type:
+    Sigma = mod_ctx.Sigma
+    match tau, p:
+        case UnionType(sigma, sigma_), _:
+            return join(Sigma, remaining(sigma, p, mod_ctx), remaining(sigma_, p, mod_ctx))
+        case _, ast.MatchAs(pattern=None):
+            return Primitive.NEVER
+        case _, ast.MatchAs(pattern=ast.pattern() as q):
+            return remaining(tau, q, mod_ctx)
+        case _, ast.MatchValue() | ast.MatchSingleton():
+            ell = literal_of(p)
+            if tau == LiteralType(ell) or (tau == Primitive.NONE and ell == Literal(None)):
+                return Primitive.NEVER
+            if tau == Primitive.BOOL and isinstance(ell.value, bool):
+                return LiteralType(Literal(not ell.value))
+            return tau
+        case TupleType(taus), PatTuple(patterns=ps) if len(taus) == len(ps):
+            rests = [remaining(sigma, q, mod_ctx) for sigma, q in zip(taus, ps)]
+            match [i for i, rest in enumerate(rests) if rest != Primitive.NEVER]:
+                case []:
+                    return Primitive.NEVER
+                case [i]:
+                    return TupleType(
+                        tuple(rests[i] if j == i else tau_ for j, tau_ in enumerate(taus))
+                    )
+                case _:
+                    return tau
+        case DictType(), ast.MatchMapping(keys=[]):
+            return Primitive.NEVER
+        case _, ast.MatchClass():
+            c = class_of_pattern(p, mod_ctx)
+            cls = instance(Sigma, c, tau)
+            assert not isinstance(cls, Undetermined)  # pattern checks against the scrutinee type
+            if cls is None or not subtype(Sigma, tau, cls):
+                return tau
+            qs = pattern_seq(Sigma, c, p)
+            sigmas = [sigma_ for _, sigma_ in instantiate(fields(Sigma, c), cls.args)]
+            if all(
+                remaining(sigma_, q, mod_ctx) == Primitive.NEVER for q, sigma_ in zip(qs, sigmas)
+            ):
+                return Primitive.NEVER
+            return tau
+        case _:
+            return tau
 
 
 def has_list_values(Sigma: ClassTable, tau: Type) -> bool:

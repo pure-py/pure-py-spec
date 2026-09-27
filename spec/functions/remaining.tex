@@ -1,0 +1,19 @@
+\remaining(\Sigma, \Gamma, \tau, \varepsilon) &{}= \tau \\*
+\remaining(\Sigma, \Gamma, \tau, \exCase{p}{s} \cons \seq{b}) &{}= \remaining(\Sigma, \Gamma, \remaining(\Sigma, \Gamma, \tau, p), \seq{b}) \\*
+\remaining(\Sigma, \Gamma, \tyUnion{\sigma}{\tau}, p) &{}= \joinTy{\Sigma}{\remaining(\Sigma, \Gamma, \sigma, p)}{\remaining(\Sigma, \Gamma, \tau, p)} \\*
+\remaining(\Sigma, \Gamma, \tau, x) &{}= \tyNever \\*
+\remaining(\Sigma, \Gamma, \tau, \patWild) &{}= \tyNever \\*
+\remaining(\Sigma, \Gamma, \tau, p\;\pyinline{as}\;x) &{}= \remaining(\Sigma, \Gamma, \tau, p) \\*
+\remaining(\Sigma, \Gamma, \tyLiteral{\ell}, \ell) &{}= \tyNever \\*
+\remaining(\Sigma, \Gamma, \tyBool, \pyinline{True}) &{}= \tyLiteral{\pyinline{False}} \\*
+\remaining(\Sigma, \Gamma, \tyBool, \pyinline{False}) &{}= \tyLiteral{\pyinline{True}} \\*
+\remaining(\Sigma, \Gamma, \tyNone, \pyinline{None}) &{}= \tyNever \\*
+\remaining(\Sigma, \Gamma, \tyTuple{\seq{\tau}}, \patTuple{\seq{p}}) &{}= \tyNever \\*
+&\qquad \rlap{$\text{if } \remaining(\Sigma, \Gamma, \tau_i, p_i) = \tyNever \quad (\forall i)$} \\*
+\remaining(\Sigma, \Gamma, \tyTuple{\seq{\tau}}, \patTuple{\seq{p}}) &{}= \tyTuple{\tau_1, \ldots, \tau_{i-1}, \remaining(\Sigma, \Gamma, \tau_i, p_i), \tau_{i+1}, \ldots, \tau_n} \\*
+&\qquad \rlap{$\text{if } \remaining(\Sigma, \Gamma, \tau_j, p_j) = \tyNever \quad (\forall j \neq i)$} \\*
+\remaining(\Sigma, \Gamma, \tyDict{\tau}, \patDict{}) &{}= \tyNever \\*
+\remaining(\Sigma, \Gamma, \tau, \patConstr{q}{a}) &{}= \tyNever \\*
+&\qquad \rlap{$\text{if } \Gamma \vdash q : \Type{C} \text{, } \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau \text{, } \Sigma \vdash \tau \subty C[\seq{\sigma}] \text{, } \tyInst{\fields(\Sigma, C)}{\seq{\sigma}} = \bind{\seq{x}}{\seq{\sigma}'} \text{,}$} \\*
+&\qquad \rlap{$\fieldMap(\Sigma, C, a) = \set{\bind{\seq{x}}{\seq{p}}} \text{ and } \remaining(\Sigma, \Gamma, \sigma'_i, p_i) = \tyNever \quad (\forall i)$} \\*
+\remaining(\Sigma, \Gamma, \tau, p) &{}= \tau

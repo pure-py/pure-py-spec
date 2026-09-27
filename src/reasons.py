@@ -440,6 +440,19 @@ class MissingReturn:
         return f"'{self.x}' declares result type {render(self.tau)} but does not always return"
 
 
+@dataclass(frozen=True)
+class MissingReturnMatchPartial:
+    x: Var
+    tau: Type
+    line: int
+
+    def message(self) -> str:
+        return (
+            f"'{self.x}' declares result type {render(self.tau)} but does not always return; "
+            f"the match at line {self.line} is exhaustive by shapes but not for mypy"
+        )
+
+
 type Reason = (
     DuplicateField
     | UnassignedVariable
@@ -485,6 +498,7 @@ type Reason = (
     | NotSubscriptable
     | TupleIndexOutOfRange
     | MissingReturn
+    | MissingReturnMatchPartial
     | NotIterable
     | SequenceKindMismatch
     | UnreachableCase

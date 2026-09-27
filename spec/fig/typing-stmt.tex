@@ -126,7 +126,8 @@
 \inferrule*[lab={\ruleName{match}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \varnothing
+  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \varnothing \\
+  \added{\remaining(\Sigma, \Gamma, \sigma, \seq{b}) = \tyNever}
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S
@@ -136,7 +137,7 @@
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
   \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, L \\
-  L \neq \varnothing
+  \replaced{\remaining(\Sigma, \Gamma, \sigma, \seq{b}) \neq \tyNever}{L \neq \varnothing}
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S \merge \Assigns{\varnothing}

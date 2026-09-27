@@ -1,0 +1,1 @@
+'f' declares result type int but does not always return; the match at line 11 is exhaustive by shapes but not for mypy (mypy compatibility)

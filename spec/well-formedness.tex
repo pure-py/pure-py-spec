@@ -279,8 +279,16 @@ the cases in turn: each case's pattern is matched against the \emph{residual} $L
 over-approximation of the values of $\sigma$ which remain unmatched by earlier cases, its body is
 checked under the pattern's bindings, and the outcomes
 are merged into $S$. The match rules start the
-residual from the shapes of $\sigma$ (\figref{shapes}); \ruleName{match} applies when the final residual is empty; \ruleName{match-partial} applies otherwise, merging in
-$\Assigns{\varnothing}$ for the values that fall through. \Added{Each pattern must also check against $\sigma$ (\ruleName{match-case}, \paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}}).} Shapes and matching a pattern against the residual
+residual from the shapes of $\sigma$ (\figref{shapes})\Replaced{. Exhaustiveness is decided as mypy decides it, by the
+type $\remaining(\Sigma, \Gamma, \sigma, \seq{b})$ to which mypy narrows the scrutinee once each case has failed
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}). \ruleName{match} applies when that type is
+$\tyNever$, and the final residual is then empty; \ruleName{match-partial} applies otherwise, merging in
+$\Assigns{\varnothing}$ for the values that fall through. The residual is the finer of the two, because mypy
+subtracts a class only for a constructor pattern that matches every value of the class, and a tuple only
+through one refutable component, so cases that between them cover a field of a class leave an empty residual
+and still count as partial. The remaining type exists only for compatibility with mypy, and the residual alone
+determines reachability and bindings.}{; \ruleName{match} applies when the final residual is empty; \ruleName{match-partial} applies otherwise, merging in
+$\Assigns{\varnothing}$ for the values that fall through.} \Added{Each pattern must also check against $\sigma$ (\ruleName{match-case}, \paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}}).} Shapes and matching a pattern against the residual
 are the subject of \secref{well-formedness-patterns}.
 
 \Deleted{Each pattern must also be \emph{sequence-safe} at $\sigma$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:seq-safe}}), because under the
@@ -355,7 +363,7 @@ all when $H$ exhausts $\tau$. The rest form therefore never carries a union or d
 
 \input{spec/fig/pattern-matching/typing-pat}
 
-Both reachability and exhaustiveness are determined by the residual left by \emph{matching}.
+\Replaced{Reachability is determined by the residual left by \emph{matching}, and exhaustiveness by the residual together with the remaining type (\secref{well-formedness-statements}).}{Both reachability and exhaustiveness are determined by the residual left by \emph{matching}.}
 Matching (\figref{typing-pat}) has three forms. The form on a single shape $k$ matches a pattern against that
 shape, giving matched shapes $K$, residual $L$ and bindings $\Delta$. A variable pattern binds at
 $\shapeTy(k)$, and a pattern named by \pyinline{as} at the join over the matched shapes, so a case for

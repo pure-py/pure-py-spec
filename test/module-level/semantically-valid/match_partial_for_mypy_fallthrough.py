@@ -1,4 +1,4 @@
-# rule: split-class
+# rule: match-partial
 from dataclasses import dataclass
 
 
@@ -13,6 +13,7 @@ def f(c: C) -> int:
             return 0
         case C((a, b)):
             return a + b
+    return -1
 
 
 print(f(C((1, 2))))
