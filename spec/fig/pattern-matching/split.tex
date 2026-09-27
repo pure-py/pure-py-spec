@@ -44,7 +44,7 @@
 {
   \Gamma \vdash q : \Type{C} \\
   \ancestors(\Sigma, C) \cap H = \varnothing \\
-  \replaced{D[\seq{\sigma}] = \meetTy{\Sigma}{\tau}{\instance(\Sigma, C, \tau)}}{D = \meetTy{\Sigma}{\tau}{C}} \\
+  \replaced{\meetTy{\Sigma}{\tau}{\instance(\Sigma, C, \tau)} = D[\seq{\sigma}]}{D = \meetTy{\Sigma}{\tau}{C}} \\
   \replaced{\tyInst{\fields(\Sigma, D)}{\seq{\sigma}} = \bind{\seq{x}}{\seq{\sigma}'}}{\fields(\Sigma, D) = \bind{\seq{x}}{\seq{\sigma}}} \\
   H' = \set{h \in H \mid \Sigma \vdash h : \replaced{D[\seq{\sigma}]}{D}}
 }
@@ -55,7 +55,7 @@
 \inferrule*[lab={\ruleName{split-subclass}}]
 {
   \Gamma \vdash q : \Type{D} \\
-  \added{D[\seq{\sigma}] = \instance(\Sigma, D, C[\seq{\tau}])} \\
+  \added{\instance(\Sigma, D, C[\seq{\tau}]) = D[\seq{\sigma}]} \\
   \Sigma \vdash \replaced{D[\seq{\sigma}] \subty C[\seq{\tau}]}{D \subty C} \\
   D \neq C \\
   \ancestors(\Sigma, D) \cap H = \varnothing \\
