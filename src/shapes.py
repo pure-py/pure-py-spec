@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from itertools import product
 
 from classes import Class, ClassTable, ancestors
-from subtyping import Undetermined, instance, subtype
+from subtyping import instance_below, subtype
 from type_syntax import (
     ClassType,
     DictType,
@@ -102,13 +102,7 @@ def shapes(Sigma: ClassTable, tau: Type, hs: Heads) -> Shapes:
 def head_typed(Sigma: ClassTable, h: Head, tau: Type) -> bool:
     match h:
         case Class():
-            match instance(Sigma, h, tau):
-                case ClassType() as sigma:
-                    return subtype(Sigma, sigma, tau)
-                case Undetermined():
-                    return True
-                case None:
-                    return False
+            return instance_below(Sigma, h, tau) is not None
         case Literal():
             return subtype(Sigma, LiteralType(h), tau)
         case int():

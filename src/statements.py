@@ -66,7 +66,7 @@ from operators import (
 from reasons import IllFormedModule
 from shapes import shapes
 from subtyping import join_seq, subtype
-from syntax import NotYetSupported, PatList
+from syntax import NotYetSupported
 from type_syntax import (
     CallableExpr,
     CallableType,
@@ -330,11 +330,7 @@ def match_cases(
     residual = shapes(mod_ctx.Sigma, tau, frozenset())
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):
-        mismatch = check_pattern(case.pattern, tau, mod_ctx)
-        if mismatch is not None:
-            q, sigma = mismatch
-            kind = "list" if isinstance(q, PatList) else "tuple"
-            raise IllFormedModule(q, reasons.SequenceKindMismatch(kind, sigma))
+        check_pattern(case.pattern, tau, mod_ctx)
         result = match_shapes(residual, case.pattern, mod_ctx)
         if result is None:
             raise IllFormedModule(case.pattern, reasons.UnreachableCase(index))

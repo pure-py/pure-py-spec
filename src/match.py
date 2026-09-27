@@ -42,7 +42,7 @@ from shapes import (
     shapes_seq,
     typed_heads,
 )
-from subtyping import Undetermined, instance, join_seq, meet, subtype
+from subtyping import Undetermined, instance, join_seq, meet, members, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
     ClassType,
@@ -53,7 +53,6 @@ from type_syntax import (
     Primitive,
     TupleType,
     Type,
-    UnionType,
     instantiate,
     literal,
 )
@@ -345,59 +344,63 @@ def match_shapes(residual: Shapes, p: ast.pattern, mod_ctx: ModuleContext) -> Ma
     )
 
 
-def check_pattern(
-    p: ast.pattern, tau: Type, mod_ctx: ModuleContext
-) -> tuple[ast.pattern, Type] | None:
-    match tau:
-        case UnionType(sigma, sigma_):
-            mismatch = first_mismatch([(p, sigma), (p, sigma_)], mod_ctx)
-            if mismatch is None:
-                return None
-            q, sigma = mismatch
-            return (q, tau) if q is p else (q, sigma)
-        case _:
-            pass
+def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> None:
+    Sigma = mod_ctx.Sigma
     match p:
         case PatTuple(patterns=ps):
-            if isinstance(tau, ListType) or tau in (Primitive.SIZED, Primitive.OBJECT):
-                return (p, tau)
-            if isinstance(tau, TupleType) and len(tau.components) == len(ps):
-                return first_mismatch(list(zip(ps, tau.components)), mod_ctx)
-            return None
+            if has_list_values(Sigma, tau):
+                raise IllFormedModule(p, reasons.SequenceKindMismatch("tuple", tau))
+            for sigma in members(tau):
+                if isinstance(sigma, TupleType) and len(sigma.components) == len(ps):
+                    for q, sigma_ in zip(ps, sigma.components):
+                        check_pattern(q, sigma_, mod_ctx)
         case PatList(patterns=ps):
-            if isinstance(tau, TupleType) or tau in (Primitive.SIZED, Primitive.OBJECT):
-                return (p, tau)
-            if isinstance(tau, ListType):
-                return first_mismatch([(q, tau.elem) for q in ps], mod_ctx)
-            return None
+            if has_tuple_values(Sigma, tau):
+                raise IllFormedModule(p, reasons.SequenceKindMismatch("list", tau))
+            for sigma in members(tau):
+                if isinstance(sigma, ListType):
+                    for q in ps:
+                        check_pattern(q, sigma.elem, mod_ctx)
         case ast.MatchMapping(patterns=ps):
-            if isinstance(tau, DictType):
-                return first_mismatch([(q, tau.value) for q in ps], mod_ctx)
-            return None
+            for sigma in members(tau):
+                if isinstance(sigma, DictType):
+                    for q in ps:
+                        check_pattern(q, sigma.value, mod_ctx)
         case ast.MatchClass():
             c = class_of_pattern(p, mod_ctx)
-            qs = pattern_seq(mod_ctx.Sigma, c, p)
-            match instance(mod_ctx.Sigma, c, tau):
-                case Undetermined():
-                    raise IllFormedModule(p, reasons.PatternClassUndetermined(short_name(c), tau))
-                case None:
-                    return None
-                case cls:
-                    sigmas = [
-                        sigma_ for _, sigma_ in instantiate(fields(mod_ctx.Sigma, c), cls.args)
-                    ]
-                    return first_mismatch(list(zip(qs, sigmas)), mod_ctx)
-        case ast.MatchAs():
-            return None if p.pattern is None else check_pattern(p.pattern, tau, mod_ctx)
+            qs = pattern_seq(Sigma, c, p)
+            for sigma in members(tau):
+                match instance(Sigma, c, sigma):
+                    case Undetermined():
+                        raise IllFormedModule(
+                            p, reasons.PatternClassUndetermined(short_name(c), sigma)
+                        )
+                    case None:
+                        pass
+                    case cls:
+                        sigmas = [sigma_ for _, sigma_ in instantiate(fields(Sigma, c), cls.args)]
+                        for q, sigma_ in zip(qs, sigmas):
+                            check_pattern(q, sigma_, mod_ctx)
+        case ast.MatchAs(pattern=q) if q is not None:
+            check_pattern(q, tau, mod_ctx)
         case _:
-            return None
+            pass
 
 
-def first_mismatch(
-    pairs: list[tuple[ast.pattern, Type]], mod_ctx: ModuleContext
-) -> tuple[ast.pattern, Type] | None:
-    mismatches = (check_pattern(q, sigma, mod_ctx) for q, sigma in pairs)
-    return next((mismatch for mismatch in mismatches if mismatch is not None), None)
+def has_list_values(Sigma: ClassTable, tau: Type) -> bool:
+    # A member other than a list type is above every list type or none, so list[object] stands for all
+    return any(
+        isinstance(sigma, ListType) or subtype(Sigma, ListType(Primitive.OBJECT), sigma)
+        for sigma in members(tau)
+    )
+
+
+def has_tuple_values(Sigma: ClassTable, tau: Type) -> bool:
+    # A member other than a tuple type is above every tuple type or none, so tuple[()] stands for all
+    return any(
+        isinstance(sigma, TupleType) or subtype(Sigma, TupleType(()), sigma)
+        for sigma in members(tau)
+    )
 
 
 def pattern_bindings(deltas: list[VarContext], node: ast.AST) -> VarContext:

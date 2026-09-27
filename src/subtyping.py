@@ -130,6 +130,7 @@ def instance_above(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undete
 
 
 def instance_below(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
+    assert not isinstance(tau, UnionType)  # instances are taken at the members of a union
     alphas = Sigma[c].type_params
     match tau:
         case ClassType(d, sigmas) if d in ancestors(Sigma, c):
@@ -163,19 +164,13 @@ def solutions(
     Sigma: ClassTable, rhos: Sequence[Type], sigmas: Sequence[Type], alphas: Sequence[Var]
 ) -> list[tuple[Type, ...]]:
     """Instantiations of alphas making rhos equivalent to sigmas, pairwise inequivalent, at most two.
-    A variable outside any union is fixed by its position; the others range over unions of the
-    non-union subterms of sigmas and object, which suffice to decide existence and uniqueness."""
-    bindings: dict[Var, Type] = {}
-    for rho, sigma in zip(rhos, sigmas):
-        bind_outside_unions(Sigma, rho, sigma, alphas, bindings)
-    free = [alpha for alpha in alphas if alpha not in bindings]
+    The variables range over unions of the non-union subterms of sigmas and object."""
     atoms = sorted(
         {a for sigma in sigmas for a in non_union_subterms(sigma)} | {Primitive.OBJECT}, key=render
     )
     found: list[tuple[Type, ...]] = []
-    for choice in product(*(subsets(atoms) for _ in free)):
-        chosen = {**bindings, **{alpha: join_seq(Sigma, ts) for alpha, ts in zip(free, choice)}}
-        taus = tuple(chosen[alpha] for alpha in alphas)
+    for choice in product(subsets(atoms), repeat=len(alphas)):
+        taus = tuple(join_seq(Sigma, ts) for ts in choice)
         if all(
             equivalent(Sigma, substitute(taus, alphas, rho), sigma)
             for rho, sigma in zip(rhos, sigmas)
@@ -184,42 +179,6 @@ def solutions(
             if len(found) == 2:
                 break
     return found
-
-
-def bind_outside_unions(
-    Sigma: ClassTable, rho: Type, sigma: Type, alphas: Sequence[Var], bindings: dict[Var, Type]
-) -> None:
-    """Bind each variable of rho outside any union to the part of sigma at its position."""
-    match rho:
-        case TypeVariable(alpha) if alpha in alphas:
-            bindings.setdefault(alpha, sigma)
-        case UnionType():
-            pass
-        case _:
-            match (rho, atom(Sigma, sigma)):
-                case (ListType(rho_), ListType(sigma_)) | (DictType(rho_), DictType(sigma_)):
-                    bind_outside_unions(Sigma, rho_, sigma_, alphas, bindings)
-                case (TupleType(rhos), TupleType(sigmas)) | (
-                    ClassType(_, rhos),
-                    ClassType(_, sigmas),
-                ):
-                    for rho_, sigma_ in zip(rhos, sigmas):
-                        bind_outside_unions(Sigma, rho_, sigma_, alphas, bindings)
-                case (CallableType(rhos, rho_), CallableType(sigmas, sigma_)):
-                    for rho__, sigma__ in zip(rhos, sigmas):
-                        bind_outside_unions(Sigma, rho__, sigma__, alphas, bindings)
-                    bind_outside_unions(Sigma, rho_, sigma_, alphas, bindings)
-                case _:
-                    pass
-
-
-def atom(Sigma: ClassTable, tau: Type) -> Type:
-    """The member of union tau above its other members, if there is one; otherwise tau."""
-    if isinstance(tau, UnionType):
-        for sigma in members(tau):
-            if subtype(Sigma, tau, sigma):
-                return sigma
-    return tau
 
 
 def members(tau: Type) -> list[Type]:
