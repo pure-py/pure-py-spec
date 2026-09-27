@@ -319,8 +319,8 @@ To check a \pyinline{match}, each case $\exCase{p}{s}$ is matched in turn agains
 ordered set of \emph{shapes} (\figref{shapes}). A shape denotes a set of values of a single type, and the
 residual denotes the values of the scrutinee type which remain unmatched by earlier cases. Matching the case removes from the residual the values matched
 by $p$ (\figref{typing-pat}); a case that does not match any shape of the residual is unreachable and the match is rejected.
-The match is exhaustive if the last case leaves the residual empty, and may
-otherwise fall through (\ruleName{match}, \ruleName{match-partial}). The usefulness algorithm for
+\Replaced{The match is exhaustive if the remaining type (\secref{well-formedness-statements}) is $\tyNever$, in which case the last case leaves the residual empty, and may otherwise fall through (\ruleName{match}, \ruleName{match-partial}).}{The match is exhaustive if the last case leaves the residual empty, and may
+otherwise fall through (\ruleName{match}, \ruleName{match-partial}).} The usefulness algorithm for
 ML~\cite{maranget2007} also checks reachability and exhaustiveness with a single relation. The residual plays the
 role of the term descriptions of \citet{sestoft1996}, and the uncovered sets of \citet{karachalias2015}
 likewise let the type exclude cases.
