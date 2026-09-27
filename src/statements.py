@@ -57,7 +57,7 @@ from contexts import (
     override_outcomes,
     resolve_name,
 )
-from match import check_pattern, match_shapes, remaining_cases
+from match import check_pattern, match_shapes, remaining_seq
 from operators import (
     BINARY_NAMES,
     UNARY_NAMES,
@@ -349,7 +349,7 @@ def match_cases(
             raise IllFormedModule(case.pattern, reasons.UnreachableCase(index))
         _, residual, delta = result
         deltas.append(delta)
-    partial = remaining_cases(tau, cases, mod_ctx) != Primitive.NEVER
+    partial = remaining_seq(tau, [case.pattern for case in cases], mod_ctx) != Primitive.NEVER
     if partial and len(residual) == 0:
         mod_ctx.partial_for_mypy.append(match)
     return deltas, partial

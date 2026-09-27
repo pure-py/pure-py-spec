@@ -280,7 +280,7 @@ over-approximation of the values of $\sigma$ which remain unmatched by earlier c
 checked under the pattern's bindings, and the outcomes
 are merged into $S$. The match rules start the
 residual from the shapes of $\sigma$ (\figref{shapes})\Replaced{. Exhaustiveness is decided by the \emph{remaining type}
-$\remaining(\Sigma, \Gamma, \sigma, \seq{b})$, an over-approximation of the values of $\sigma$ left unmatched once
+$\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases, an over-approximation of the values of $\sigma$ left unmatched once
 each case has failed (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}), which follows
 mypy's narrowing of a match scrutinee so that a match exhaustive by the rules is exhaustive for mypy.
 \ruleName{match} applies when the remaining type is $\tyNever$, and the final residual is then empty;

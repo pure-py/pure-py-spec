@@ -388,9 +388,9 @@ def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> None:
             pass
 
 
-def remaining_cases(tau: Type, cases: list[ast.match_case], mod_ctx: ModuleContext) -> Type:
-    for case in cases:
-        tau = remaining(tau, case.pattern, mod_ctx)
+def remaining_seq(tau: Type, ps: list[ast.pattern], mod_ctx: ModuleContext) -> Type:
+    for p in ps:
+        tau = remaining(tau, p, mod_ctx)
     return tau
 
 
