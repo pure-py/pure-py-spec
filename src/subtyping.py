@@ -115,13 +115,24 @@ class Undetermined:
 
 
 def instance(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
+    above = instance_above(Sigma, c, tau)
+    return above if above is not None else instance_below(Sigma, c, tau)
+
+
+def instance_above(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
+    match tau:
+        case ClassType(d, _) if c in ancestors(Sigma, d):
+            return instantiated_ancestor(Sigma, tau, c)
+        case Primitive.NEVER:
+            return ClassType(c, ()) if len(Sigma[c].type_params) == 0 else Undetermined()
+        case _:
+            return None
+
+
+def instance_below(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
     alphas = Sigma[c].type_params
     match tau:
-        case ClassType(d, sigmas):
-            if c in ancestors(Sigma, d):
-                return instantiated_ancestor(Sigma, tau, c)
-            if d not in ancestors(Sigma, c):
-                return None
+        case ClassType(d, sigmas) if d in ancestors(Sigma, c):
             generic = ClassType(c, tuple(TypeVariable(alpha) for alpha in alphas))
             rhos = instantiated_ancestor(Sigma, generic, d).args
             match solutions(Sigma, rhos, sigmas, alphas):
@@ -131,7 +142,7 @@ def instance(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined
                     return ClassType(c, taus)
                 case _:
                     return Undetermined()
-        case Primitive.OBJECT | Primitive.NEVER:
+        case Primitive.OBJECT:
             return ClassType(c, ()) if len(alphas) == 0 else Undetermined()
         case _:
             return None
