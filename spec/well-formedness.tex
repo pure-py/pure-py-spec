@@ -279,10 +279,19 @@ threads a \emph{residual} $L$ through the cases, initially the shapes of $\sigma
 case a set of shapes over-approximating the values of $\sigma$ which are not matched by any of the earlier
 cases. Each case's pattern is checked against $\sigma$ (\ruleName{match-case},
 \paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}}) and matched against the residual. A
-case is reachable if its pattern matches at least one shape of the residual, and a match with an
+case is \emph{reachable} if its pattern matches at least one shape of the residual, and a match with an
 unreachable case is ill-formed. For a reachable case, the matched shapes give the types of its pattern
 variables, the body is checked under those bindings, the outcomes are merged into $S$, and the shapes left
-after matching are the residual for the cases that follow. A match is exhaustive when its cases between them match every value of $\sigma$. The match
+after matching are the residual for the cases that follow.}{using the auxiliary
+judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typing-cases}), which takes
+the cases in turn: each case's pattern is matched against the \emph{residual} $L$, a static
+over-approximation of the values of $\sigma$ which remain unmatched by earlier cases, its body is
+checked under the pattern's bindings, and the outcomes
+are merged into $S$. The match rules start the
+residual from the shapes of $\sigma$ (\figref{shapes}); \ruleName{match} applies when the final residual is empty; \ruleName{match-partial} applies otherwise, merging in
+$\Assigns{\varnothing}$ for the values that fall through.}
+
+\Added{A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. The match
 rules decide exhaustiveness not by the final residual but by the \emph{remaining type}
 $\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}), a second (and coarser)
@@ -292,14 +301,7 @@ class only for a constructor pattern that matches every value of the class, and 
 refutable component, so cases that between them cover a field of a class leave an empty
 residual but a remaining type other than $\tyNever$. The \ruleName{match} rule applies when the remaining
 type is $\tyNever$, in which case the final residual is also empty; the \ruleName{match-partial} rule
-applies otherwise, merging in $\Assigns{\varnothing}$ for the values that fall through.}{using the auxiliary
-judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typing-cases}), which takes
-the cases in turn: each case's pattern is matched against the \emph{residual} $L$, a static
-over-approximation of the values of $\sigma$ which remain unmatched by earlier cases, its body is
-checked under the pattern's bindings, and the outcomes
-are merged into $S$. The match rules start the
-residual from the shapes of $\sigma$ (\figref{shapes}); \ruleName{match} applies when the final residual is empty; \ruleName{match-partial} applies otherwise, merging in
-$\Assigns{\varnothing}$ for the values that fall through.} Shapes and matching a pattern against the residual
+applies otherwise, merging in $\Assigns{\varnothing}$ for the values that fall through.} Shapes and matching a pattern against the residual
 are the subject of \secref{well-formedness-patterns}.
 
 \Deleted{Each pattern must also be \emph{sequence-safe} at $\sigma$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:seq-safe}}), because under the
