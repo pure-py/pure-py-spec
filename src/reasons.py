@@ -442,13 +442,12 @@ class MissingReturn:
 
 @dataclass(frozen=True)
 class MissingReturnMatchPartial:
-    x: Var
     remaining: Type
 
     def message(self) -> str:
         return (
             f"cases leave remaining type {render(self.remaining)}, "
-            f"so '{self.x}' does not always return"
+            "so the function does not always return"
         )
 
 

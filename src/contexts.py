@@ -1,6 +1,6 @@
 import ast
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from classes import Class, ClassTable
 from subtyping import join_seq
@@ -78,9 +78,6 @@ class ModuleContext:
     M: Mapping[Name, ast.Module]
     q: Name
     Sigma: ClassTable
-    # Matches with an empty final residual but a remaining type other than Never, each with that type,
-    # shared by every context of the module, for the missing-return message
-    partial_for_mypy: list[tuple[ast.Match, Type]] = field(default_factory=list)
 
 
 def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
@@ -89,7 +86,6 @@ def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
         M=mod_ctx.M,
         q=mod_ctx.q,
         Sigma=mod_ctx.Sigma,
-        partial_for_mypy=mod_ctx.partial_for_mypy,
     )
 
 

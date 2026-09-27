@@ -1,1 +1,1 @@
-cases leave remaining type __main__.C, so 'f' does not always return (mypy compatibility)
+cases leave remaining type __main__.C, so the function does not always return (mypy compatibility)
