@@ -126,21 +126,23 @@
 \inferrule*[lab={\ruleName{match}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \replaced{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}}{\seq{b}} : S, \varnothing \\
+  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \varnothing \\
+  \added{b_i = \exCase{p_i}{s_i} \quad (\forall i)} \\
   \added{\remaining(\Sigma, \Gamma, \sigma, \seq{p}) = \tyNever}
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\replaced{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}}{\seq{b}}} : S
+  \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S
 }
 \and
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \replaced{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}}{\seq{b}} : S, L \\
+  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, L \\
+  \added{b_i = \exCase{p_i}{s_i} \quad (\forall i)} \\
   \replaced{\remaining(\Sigma, \Gamma, \sigma, \seq{p}) \neq \tyNever}{L \neq \varnothing}
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\replaced{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}}{\seq{b}}} : S \merge \Assigns{\varnothing}
+  \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S \merge \Assigns{\varnothing}
 }
 \end{mathpar}
 \caption{Given optional return type $\zeta$, statement $s$ has static outcome $R$}
