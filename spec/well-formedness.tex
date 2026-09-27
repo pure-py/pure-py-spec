@@ -285,11 +285,11 @@ variables, the body is checked under those bindings, the outcomes are merged int
 after matching are the residual for the cases that follow. A match is exhaustive when its cases between them match every value of $\sigma$. The match
 rules decide exhaustiveness not by the final residual but by the \emph{remaining type}
 $\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}), a second over-approximation of
-the values of $\sigma$ which are not matched by any of the cases, as a type rather than a set of shapes. The
-remaining type follows mypy's narrowing of a match scrutinee, and is coarser than the residual, because mypy
-subtracts a class only for a constructor pattern that matches every value of the class, and a tuple only
-through one refutable component, so cases that between them cover a field of a class leave an empty
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}), a second (and coarser)
+over-approximation of the values of $\sigma$ which are not matched by any of the cases, as a type rather
+than a set of shapes. The remaining type follows mypy's narrowing of a match scrutinee, which subtracts a
+class only for a constructor pattern that matches every value of the class, and a tuple only through one
+refutable component, so cases that between them cover a field of a class leave an empty
 residual but a remaining type other than $\tyNever$. The \ruleName{match} rule applies when the remaining
 type is $\tyNever$, in which case the final residual is also empty; the \ruleName{match-partial} rule
 applies otherwise, merging in $\Assigns{\varnothing}$ for the values that fall through.}{using the auxiliary
