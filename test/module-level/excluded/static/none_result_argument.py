@@ -1,3 +1,4 @@
+# rule: call
 def foo() -> None:
     return
 

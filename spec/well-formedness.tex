@@ -239,7 +239,10 @@ judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top
 class declaration is a top-level form, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
-\pyinline{return} requires \pyinline{None} to be a subtype of $\tau$.
+\pyinline{return} requires \pyinline{None} to be a subtype of $\tau$. \Added{An expression statement synthesises a type and discards it
+(\ruleName{expr-stmt}). A call to a callable with result \tyNone{} is not an expression, because
+\ruleName{call} requires a result other than \tyNone, and is typed as a statement by \ruleName{call-stmt}.
+The restriction exists only for compatibility with mypy, which rejects any use of the value of such a call.}
 
 A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment $\exAssign{x}{e}$ requires $x$ to be a declared but unassigned variable, and

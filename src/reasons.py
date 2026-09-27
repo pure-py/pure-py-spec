@@ -412,6 +412,12 @@ class UnknownField:
 
 
 @dataclass(frozen=True)
+class NoneResult:
+    def message(self) -> str:
+        return "call returning None used as an expression (mypy compatibility)"
+
+
+@dataclass(frozen=True)
 class NotSynthesised:
     def message(self) -> str:
         return "cannot infer type of this expression"
@@ -473,6 +479,7 @@ type Reason = (
     | NoUnaryOverload
     | NotCallable
     | CallArityMismatch
+    | NoneResult
     | TypeMismatch
     | LambdaTypeMismatch
     | NotSubscriptable

@@ -1,4 +1,5 @@
 import ast
+from collections.abc import Sequence
 from dataclasses import replace
 
 import reasons
@@ -285,6 +286,11 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
                 return Assigns({x: DU(tau)})
             check_expr(s.value, tau, mod_ctx)
             return Assigns({x: tau})
+        case ast.Expr(value=ast.Call(func=f) as e) if not isinstance(f, ast.Lambda) and (
+            class_of_name(f, mod_ctx) is None
+        ):
+            call_stmt(e, mod_ctx)
+            return Assigns({})
         case ast.Expr(value=e):
             synth_expr(e, mod_ctx)
             return Assigns({})
@@ -592,6 +598,14 @@ def call(e: ast.Call, mod_ctx: ModuleContext) -> Type:
     return result_type(synth_expr(e.func, mod_ctx), e, mod_ctx)
 
 
+def call_stmt(e: ast.Call, mod_ctx: ModuleContext) -> None:
+    match synth_expr(e.func, mod_ctx):
+        case CallableType(sigmas, Primitive.NONE):
+            check_args(e, sigmas, mod_ctx)
+        case fn:
+            result_type(fn, e, mod_ctx)
+
+
 def result_type(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> Type:
     match fn:
         case UnionType(sigma, tau):
@@ -600,13 +614,19 @@ def result_type(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> Type:
                 [result_type(sigma, e, mod_ctx), result_type(tau, e, mod_ctx)],
             )
         case CallableType(sigmas, tau):
-            if len(sigmas) != len(e.args):
-                raise IllFormedModule(e, reasons.CallArityMismatch(len(sigmas), len(e.args)))
-            for arg, param in zip(e.args, sigmas):
-                check_expr(arg, param, mod_ctx)
+            check_args(e, sigmas, mod_ctx)
+            if tau == Primitive.NONE:
+                raise IllFormedModule(e, reasons.NoneResult())
             return tau
         case _:
             raise IllFormedModule(e, reasons.NotCallable(fn))
+
+
+def check_args(e: ast.Call, sigmas: Sequence[Type], mod_ctx: ModuleContext) -> None:
+    if len(sigmas) != len(e.args):
+        raise IllFormedModule(e, reasons.CallArityMismatch(len(sigmas), len(e.args)))
+    for arg, param in zip(e.args, sigmas):
+        check_expr(arg, param, mod_ctx)
 
 
 def applied_lambda(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> Type:

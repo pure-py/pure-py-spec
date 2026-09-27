@@ -44,6 +44,15 @@
   \Sigma; \Gamma; \zeta \vdash e : \Assigns{\varnothing}
 }
 \and
+\added{\inferrule*[lab={\ruleName{call-stmt}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyCallable{\seq{\tau}}{\tyNone} \\
+  \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exCall{e}{\seq{e}} : \Assigns{\varnothing}
+}}
+\and
 \inferrule*[lab={\ruleName{assert}}]
 {
   \Sigma; \Gamma \vdash e \checks \tyBool

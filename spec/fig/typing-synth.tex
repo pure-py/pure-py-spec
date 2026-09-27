@@ -38,7 +38,8 @@
 \inferrule*[lab={\ruleName{call}}]
 {
   \Sigma; \Gamma \vdash e \synth \tyCallable{\seq{\tau}}{\tau} \\
-  \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}
+  \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau} \\
+  \added{\tau \neq \tyNone}
 }
 {
   \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \tau
