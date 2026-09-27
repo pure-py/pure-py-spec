@@ -425,8 +425,7 @@ def remaining(tau: Type, p: ast.pattern, mod_ctx: ModuleContext) -> Type:
             return Primitive.NEVER
         case _, ast.MatchClass():
             c = class_of_pattern(p, mod_ctx)
-            cls = instance(Sigma, c, tau)
-            assert not isinstance(cls, Undetermined)  # pattern checks against the scrutinee type
+            cls = pattern_instance(Sigma, c, tau)
             if cls is None or not subtype(Sigma, tau, cls):
                 return tau
             qs = pattern_seq(Sigma, c, p)

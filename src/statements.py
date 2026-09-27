@@ -350,7 +350,9 @@ def match_cases(
         _, residual, delta = result
         deltas.append(delta)
     partial = remaining_seq(tau, [case.pattern for case in cases], mod_ctx) != Primitive.NEVER
-    if partial and len(residual) == 0:
+    if not partial:
+        assert len(residual) == 0  # the remaining type is coarser than the residual
+    elif len(residual) == 0:
         mod_ctx.partial_for_mypy.append(match)
     return deltas, partial
 
