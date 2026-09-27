@@ -1,1 +1,1 @@
-unreachable case
+case P(x=1, y=2) is unreachable

@@ -1,1 +1,1 @@
-unreachable case
+case Right(b) is unreachable

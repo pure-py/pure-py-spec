@@ -346,7 +346,7 @@ def match_cases(
         check_pattern(case.pattern, tau, mod_ctx)
         result = match_shapes(residual, case.pattern, mod_ctx)
         if result is None:
-            raise IllFormedModule(case.pattern, reasons.UnreachableCase())
+            raise IllFormedModule(case.pattern, reasons.UnreachableCase(ast.unparse(case.pattern)))
         _, residual, delta = result
         deltas.append(delta)
     partial = remaining_seq(tau, [case.pattern for case in cases], mod_ctx) != Primitive.NEVER
