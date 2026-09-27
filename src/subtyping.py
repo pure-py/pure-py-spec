@@ -168,17 +168,27 @@ def solutions(
     atoms = sorted(
         {a for sigma in sigmas for a in non_union_subterms(sigma)} | {Primitive.OBJECT}, key=render
     )
-    found: list[tuple[Type, ...]] = []
-    for choice in product(subsets(atoms), repeat=len(alphas)):
-        taus = tuple(join_seq(Sigma, ts) for ts in choice)
+    candidates = (
+        tuple(join_seq(Sigma, ts) for ts in choice)
+        for choice in product(subsets(atoms), repeat=len(alphas))
+    )
+    solving = (
+        taus
+        for taus in candidates
         if all(
             equivalent(Sigma, substitute(taus, alphas, rho), sigma)
             for rho, sigma in zip(rhos, sigmas)
-        ) and not any(all(equivalent(Sigma, a, b) for a, b in zip(taus, taus_)) for taus_ in found):
-            found.append(taus)
-            if len(found) == 2:
-                break
-    return found
+        )
+    )
+    first = next(solving, None)
+    if first is None:
+        return []
+    second = next((taus for taus in solving if not equivalent_seq(Sigma, taus, first)), None)
+    return [first] if second is None else [first, second]
+
+
+def equivalent_seq(Sigma: ClassTable, sigmas: Sequence[Type], taus: Sequence[Type]) -> bool:
+    return all(equivalent(Sigma, sigma, tau) for sigma, tau in zip(sigmas, taus))
 
 
 def members(tau: Type) -> list[Type]:
