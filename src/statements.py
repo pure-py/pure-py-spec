@@ -64,7 +64,7 @@ from operators import (
     resolve_op_binary,
     resolve_op_unary,
 )
-from reasons import IllFormedModule
+from reasons import IllFormedModule, MypyCompatibility
 from shapes import shapes
 from subtyping import join_seq, subtype
 from syntax import NotYetSupported
@@ -616,7 +616,7 @@ def result_type(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> Type:
         case CallableType(sigmas, tau):
             check_args(e, sigmas, mod_ctx)
             if tau == Primitive.NONE:
-                raise IllFormedModule(e, reasons.NoneResult())
+                raise MypyCompatibility(e, reasons.NoneResult())
             return tau
         case _:
             raise IllFormedModule(e, reasons.NotCallable(fn))

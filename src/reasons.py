@@ -414,7 +414,7 @@ class UnknownField:
 @dataclass(frozen=True)
 class NoneResult:
     def message(self) -> str:
-        return "call returning None used as an expression (mypy compatibility)"
+        return "call returning None used as an expression"
 
 
 @dataclass(frozen=True)
@@ -509,6 +509,14 @@ class IllFormedModule(IllFormed):
         self.msg = reason.message()
         self.module: Name | None = None
         super().__init__(self.msg)
+
+
+class MypyCompatibility(IllFormedModule):
+    """Ill-formedness required only for compatibility with mypy."""
+
+    def __init__(self, node: ast.AST, reason: Reason):
+        super().__init__(node, reason)
+        self.msg = f"{self.msg} (mypy compatibility)"
 
 
 class IllFormedProgram(IllFormed):
