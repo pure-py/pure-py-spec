@@ -1,1 +1,1 @@
-tuple pattern requires values of tuple type, not list[int] | tuple[int, int]
+tuple pattern at list[int] | tuple[int, int], which has list values

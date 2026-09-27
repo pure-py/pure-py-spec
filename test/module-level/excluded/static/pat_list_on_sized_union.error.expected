@@ -1,1 +1,1 @@
-list pattern requires values of list type, not Sized | list[int]
+list pattern at Sized | list[int], which has tuple values

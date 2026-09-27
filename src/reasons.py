@@ -391,7 +391,8 @@ class SequenceKindMismatch:
     tau: Type
 
     def message(self) -> str:
-        return f"{self.kind} pattern requires values of {self.kind} type, not {render(self.tau)}"
+        other = "list" if self.kind == "tuple" else "tuple"
+        return f"{self.kind} pattern at {render(self.tau)}, which has {other} values"
 
 
 @dataclass(frozen=True)
