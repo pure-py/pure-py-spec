@@ -56,7 +56,7 @@ from contexts import (
     override_outcomes,
     resolve_name,
 )
-from match import match_shapes, safe
+from match import check_pattern, match_shapes
 from operators import (
     BINARY_NAMES,
     UNARY_NAMES,
@@ -330,7 +330,7 @@ def match_cases(
     residual = shapes(mod_ctx.Sigma, tau, frozenset())
     deltas: list[VarContext] = []
     for index, case in enumerate(cases, 1):
-        mismatch = safe(case.pattern, tau, mod_ctx)
+        mismatch = check_pattern(case.pattern, tau, mod_ctx)
         if mismatch is not None:
             q, sigma = mismatch
             kind = "list" if isinstance(q, PatList) else "tuple"

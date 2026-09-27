@@ -1,4 +1,4 @@
-# rule: match-case
+# rule: check-constr
 from dataclasses import dataclass
 from typing import Never
 

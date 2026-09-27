@@ -1,4 +1,4 @@
-# rule: match-case
+# rule: check-tuple-none
 v: list[int] = [1, 2]
 match v:
     case (a, b):
