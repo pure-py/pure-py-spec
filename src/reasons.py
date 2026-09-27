@@ -370,10 +370,8 @@ class TupleIndexOutOfRange:
 
 @dataclass(frozen=True)
 class UnreachableCase:
-    index: int
-
     def message(self) -> str:
-        return f"case {self.index} is unreachable"
+        return "unreachable case"
 
 
 @dataclass(frozen=True)

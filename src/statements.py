@@ -342,11 +342,11 @@ def match_cases(
     cases = match.cases
     residual = shapes(mod_ctx.Sigma, tau, frozenset())
     deltas: list[VarContext] = []
-    for index, case in enumerate(cases, 1):
+    for case in cases:
         check_pattern(case.pattern, tau, mod_ctx)
         result = match_shapes(residual, case.pattern, mod_ctx)
         if result is None:
-            raise IllFormedModule(case.pattern, reasons.UnreachableCase(index))
+            raise IllFormedModule(case.pattern, reasons.UnreachableCase())
         _, residual, delta = result
         deltas.append(delta)
     partial = remaining_seq(tau, [case.pattern for case in cases], mod_ctx) != Primitive.NEVER
