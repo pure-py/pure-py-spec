@@ -369,6 +369,9 @@ def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> None:
                         check_pattern(q, sigma.value, mod_ctx)
         case ast.MatchClass():
             c = class_of_pattern(p, mod_ctx)
+            # Field map checked before the instance is known. The rules require it only in check-constr
+            # and reject a pattern at a type with no instance as unreachable: same verdict, more specific
+            # diagnostic
             qs = pattern_seq(Sigma, c, p)
             for sigma in members(tau):
                 match instance(Sigma, c, sigma):
