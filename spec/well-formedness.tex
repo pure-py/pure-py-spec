@@ -300,7 +300,9 @@ over-approximation of the values of $\sigma$ which are not matched by any of the
 than a set of shapes. The remaining type follows mypy's narrowing of a match scrutinee, which subtracts a
 class only for a constructor pattern that matches every value of the class, and a tuple only through one
 refutable component, so cases that between them cover a field of a class leave an empty
-residual but a remaining type other than $\tyNever$. The \ruleName{match} rule applies when the remaining
+residual but a remaining type other than $\tyNever$. Exhaustiveness decided by the residual alone would
+therefore accept a function which returns from each case of such a match but which is rejected by mypy as
+not always returning. The \ruleName{match} rule applies when the remaining
 type is $\tyNever$, in which case the final residual is also empty; the \ruleName{match-partial} rule
 applies otherwise, merging in $\Assigns{\varnothing}$ for the values that fall through.} \Deleted{Shapes and matching a pattern against the residual
 are the subject of \secref{well-formedness-patterns}.}
