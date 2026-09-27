@@ -8,5 +8,5 @@ literal pattern at $\tyBool$; a tuple pattern with exactly one sub-pattern that 
 that component; a union is narrowed member by member; and any other pattern leaves $\tau$ unchanged. The
 function follows mypy's narrowing of a match scrutinee, so that a match which is exhaustive by the
 remaining type is exhaustive for mypy. The remaining type is coarser than the residual
-(\secref{exhaustiveness-reachability}), since a constructor pattern with a refutable sub-pattern, or a
+(\secref{well-formedness-patterns}), since a constructor pattern with a refutable sub-pattern, or a
 tuple pattern with two refutable components, leaves the type untouched.
