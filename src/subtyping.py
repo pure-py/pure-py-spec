@@ -131,7 +131,7 @@ def instance(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined
                     return ClassType(c, taus)
                 case _:
                     return Undetermined()
-        case Primitive.OBJECT:
+        case Primitive.OBJECT | Primitive.NEVER:
             return ClassType(c, ()) if len(alphas) == 0 else Undetermined()
         case _:
             return None
