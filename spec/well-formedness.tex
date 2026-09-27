@@ -278,8 +278,8 @@ auxiliary judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\
 a residual $L$ of shapes through the cases, starting from the shapes of $\sigma$ (\figref{shapes}), and merges
 their outcomes into $S$. The \ruleName{match} rule applies when the remaining type
 $\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}) is $\tyNever$, the condition for the
-match to be exhaustive; the \ruleName{match-partial} rule applies otherwise, merging in $\Assigns{\varnothing}$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}) is $\tyNever$, meaning the match is
+exhaustive; the \ruleName{match-partial} rule applies otherwise, merging in $\Assigns{\varnothing}$
 for the values that fall through. The residual, reachability and exhaustiveness are the subject of
 \secref{well-formedness-patterns}.}{using the auxiliary
 judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typing-cases}), which takes
