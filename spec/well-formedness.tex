@@ -279,10 +279,10 @@ threads a \emph{residual} $L$ through the cases, initially the shapes of $\sigma
 case a set of shapes over-approximating the values of $\sigma$ which are not matched by any of the earlier
 cases. Each case's pattern is checked against $\sigma$ (\ruleName{match-case},
 \paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}}) and matched against the residual. A
-case is unreachable, and has no derivation, if its pattern does not match any shape of the residual;
-otherwise the matched shapes give the types of its pattern variables, the body is checked under those
-bindings, the outcomes are merged into $S$, and the residual left by matching is the residual for the cases
-that follow. A match is exhaustive when its cases between them match every value of $\sigma$. The match
+case is reachable if its pattern matches at least one shape of the residual, and a match with an
+unreachable case is ill-formed. For a reachable case, the matched shapes give the types of its pattern
+variables, the body is checked under those bindings, the outcomes are merged into $S$, and the residual
+left by matching is the residual for the cases that follow. A match is exhaustive when its cases between them match every value of $\sigma$. The match
 rules decide exhaustiveness not by the final residual but by the \emph{remaining type}
 $\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}), a second over-approximation of
