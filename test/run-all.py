@@ -42,8 +42,6 @@ class Stage(StrEnum):
 
 
 HELPERS = "helpers"
-# Semantically-valid tests mypy rejects: to-dos for #92, not accepted differences
-MYPY_INCOMPATIBLE = "mypy-incompatible"
 MYPY_INI = "mypy.ini"
 PYTHON_VERSION = (ROOT / ".python-version").read_text().strip()
 
@@ -330,14 +328,10 @@ def check_mypy_compatibility(r: Runner, module: pathlib.Path) -> None:
         check=False,
     )
     rejected = {line.split(":", 1)[0] for line in proc.stdout.splitlines() if ": error:" in line}
-    expected = {str(path) for path in relative if MYPY_INCOMPATIBLE in path.parts}
-    misfiled = [
-        f"{path} {'rejected by mypy' if str(path) in rejected else 'accepted by mypy'}"
-        for path in relative
-        if (str(path) in rejected) != (str(path) in expected)
-    ]
-    if misfiled:
-        r.bad("mypy compatibility", "; ".join(misfiled))
+    if rejected:
+        r.bad(
+            "mypy compatibility", "; ".join(f"{path} rejected by mypy" for path in sorted(rejected))
+        )
     else:
         r.ok("mypy compatibility")
 

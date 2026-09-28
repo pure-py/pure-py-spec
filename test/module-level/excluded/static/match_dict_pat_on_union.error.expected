@@ -1,1 +1,1 @@
-case 1 is unreachable
+case {'k': x} is unreachable

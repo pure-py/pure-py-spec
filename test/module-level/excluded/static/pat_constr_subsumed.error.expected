@@ -1,1 +1,1 @@
-case 2 is unreachable
+case Derived(a, b) is unreachable

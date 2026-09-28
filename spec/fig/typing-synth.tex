@@ -28,8 +28,8 @@
 \and
 \inferrule*[lab={\ruleName{attr-object}}]
 {
-  \Sigma; \Gamma \vdash e \synth \replaced{C[\seq{\tau}]}{C} \\
-  \bind{x}{\sigma} \in \replaced{\tyInst{\fields(\Sigma, C)}{\seq{\tau}}}{\fields(\Sigma, C)}
+  \Sigma; \Gamma \vdash e \synth C[\seq{\tau}] \\
+  \bind{x}{\sigma} \in \tyInst{\fields(\Sigma, C)}{\seq{\tau}}
 }
 {
   \Sigma; \Gamma \vdash \exAttr{e}{x} \synth \sigma
@@ -38,7 +38,8 @@
 \inferrule*[lab={\ruleName{call}}]
 {
   \Sigma; \Gamma \vdash e \synth \tyCallable{\seq{\tau}}{\tau} \\
-  \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}
+  \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau} \\
+  \tau \neq \tyNone
 }
 {
   \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \tau

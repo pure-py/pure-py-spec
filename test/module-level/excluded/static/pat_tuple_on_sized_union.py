@@ -1,4 +1,4 @@
-# rule: match-case
+# rule: check-tuple-none
 from typing import Sized
 
 

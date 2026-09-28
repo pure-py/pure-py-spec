@@ -1,3 +1,4 @@
+# rule: split-class
 from dataclasses import dataclass
 
 

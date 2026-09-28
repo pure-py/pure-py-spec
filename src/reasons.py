@@ -370,10 +370,19 @@ class TupleIndexOutOfRange:
 
 @dataclass(frozen=True)
 class UnreachableCase:
-    index: int
+    pattern: str
 
     def message(self) -> str:
-        return f"case {self.index} is unreachable"
+        return f"case {self.pattern} is unreachable"
+
+
+@dataclass(frozen=True)
+class PatternClassUndetermined:
+    c: Var
+    tau: Type
+
+    def message(self) -> str:
+        return f"type arguments of '{self.c}' in pattern not determined by type {render(self.tau)}"
 
 
 @dataclass(frozen=True)
@@ -382,7 +391,8 @@ class SequenceKindMismatch:
     tau: Type
 
     def message(self) -> str:
-        return f"{self.kind} pattern requires values of {self.kind} type, not {render(self.tau)}"
+        other = "list" if self.kind == "tuple" else "tuple"
+        return f"{self.kind} pattern at {render(self.tau)}, which has {other} values"
 
 
 @dataclass(frozen=True)
@@ -400,6 +410,12 @@ class UnknownField:
 
     def message(self) -> str:
         return f"class '{self.c}' has no field '{self.x}'"
+
+
+@dataclass(frozen=True)
+class NoneResult:
+    def message(self) -> str:
+        return "call returning None used as an expression"
 
 
 @dataclass(frozen=True)
@@ -423,6 +439,17 @@ class MissingReturn:
 
     def message(self) -> str:
         return f"'{self.x}' declares result type {render(self.tau)} but does not always return"
+
+
+@dataclass(frozen=True)
+class MissingReturnMatchPartial:
+    remaining: Type
+
+    def message(self) -> str:
+        return (
+            f"cases leave remaining type {render(self.remaining)}, "
+            "so the function does not always return"
+        )
 
 
 type Reason = (
@@ -464,14 +491,17 @@ type Reason = (
     | NoUnaryOverload
     | NotCallable
     | CallArityMismatch
+    | NoneResult
     | TypeMismatch
     | LambdaTypeMismatch
     | NotSubscriptable
     | TupleIndexOutOfRange
     | MissingReturn
+    | MissingReturnMatchPartial
     | NotIterable
     | SequenceKindMismatch
     | UnreachableCase
+    | PatternClassUndetermined
     | NotSynthesised
     | NoAttributes
     | UnknownField
@@ -492,6 +522,14 @@ class IllFormedModule(IllFormed):
         self.msg = reason.message()
         self.module: Name | None = None
         super().__init__(self.msg)
+
+
+class MypyCompatibility(IllFormedModule):
+    """Ill-formedness required only for compatibility with mypy."""
+
+    def __init__(self, node: ast.AST, reason: Reason):
+        super().__init__(node, reason)
+        self.msg = f"{self.msg} (mypy compatibility)"
 
 
 class IllFormedProgram(IllFormed):

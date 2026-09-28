@@ -1,6 +1,6 @@
 \inferrule*[lab={\ruleName{match-case}}]
 {
-  \seqSafe(\Sigma, \Gamma, p, \sigma) \\
+  \Sigma; \Gamma \vdash p \checks \sigma \\
   \Sigma; \Gamma \vdash L, p \matches K, L' \binding \Delta \\
   \Sigma; \Gamma \override \Delta; \zeta \vdash s : R
 }

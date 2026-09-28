@@ -30,16 +30,16 @@ hiding it throughout the scope.}
 \input{spec/fig/resolve-type}
 
 Function signatures, assignments and dataclass fields are annotated with type expressions, and a
-type expression denotes a type under a context\Added{ and class table} (\figref{resolve-type}). Every definition carries an
+type expression denotes a type under a context and class table (\figref{resolve-type}). Every definition carries an
 annotation for its parameters and return type, so the type of a definition is given rather than
-inferred from its body. Within a type expression, \Replaced{a class name applied to as many type arguments as the class has parameters resolves to an instantiated class, an alias name applied to type arguments resolves to the instantiation of its alias, type parameters in scope denote the type variables of those names}{class names resolve to classes, type parameters in scope denote the type variables of those names}, and all other names must be predefined names (\figref{resolve-type}). The function $\baseType(\tau)$ discards the precision of a
+inferred from its body. Within a type expression, a class name applied to as many type arguments as the class has parameters resolves to an instantiated class, an alias name applied to type arguments resolves to the instantiation of its alias, type parameters in scope denote the type variables of those names, and all other names must be predefined names (\figref{resolve-type}). The function $\baseType(\tau)$ discards the precision of a
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as the identity
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:base-type}}).
 
 \speconly{\subsubsection{Subtyping}\label{sec:subtyping}}%
 \paperonly{\paragraph{Subtyping.}}
 
-Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base (\Replaced{\ruleName{subty-class-extend}}{\ruleName{subty-class}})\Replaced{, and below $C[\seq{\sigma}]$ when $\seq{\tau}$ and $\seq{\sigma}$ are equivalent (\ruleName{subty-class}), so that type arguments are invariant, as for lists and dictionaries}{, so that a class applied to distinct type arguments is related to itself by reflexivity alone and type arguments are invariant}; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. A union is above
+Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base (\ruleName{subty-class-extend}), and below $C[\seq{\sigma}]$ when $\seq{\tau}$ and $\seq{\sigma}$ are equivalent (\ruleName{subty-class}), so that type arguments are invariant, as for lists and dictionaries; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. The \emph{members} of a union $\tyUnion{\sigma}{\tau}$ are the members of $\sigma$ and of $\tau$, and any other type is its own only member. A union is above
 each of its members and below every type that is above all of them. A tuple type is covariant, below another of the
 same length when each of its components is below the corresponding component. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{pierce2002}. Lists and
 dictionaries are related only when their components are equivalent, since both are invariant in mypy. A callable type is contravariant in its parameters
@@ -62,7 +62,7 @@ when either is a subtype of the other. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. Two comparable types \emph{meet} to the smaller type; a
 meet of incomparable types distributes over a union, takes tuples componentwise and callables with
 parameters joined and results combined using meet, and is \pyinline{Never} otherwise, since no value belongs to both types.
-So joining a type with itself gives that type, joining a class with \Replaced{its base class gives the base class}{one of its ancestors gives the ancestor}, and
+So joining a type with itself gives that type, joining a class with its base class gives the base class, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$. A sequence of types is joined by
 folding binary join over the sequence, with \pyinline{Never} as the unit (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:join}}).
 
@@ -103,8 +103,7 @@ field: the fields of its base class first, recursively and instantiated at the t
 declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the instantiation $\tyInst{\fields(\Sigma, C)}{\seq{\tau}}$. The order matters, because a constructor call pairs positional arguments with fields by
 position. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to
-(\ruleName{constr}). \Replaced{An attribute reference $\exAttr{e}{x}$ has the type of the field $x$ of the class synthesised by $e$}{In an attribute reference $\exAttr{e}{x}$ the object $e$ must
-synthesise a class $C$, and $\exAttr{e}{x}$ then has the type bound to $x$ in $\fields(\Sigma, C)$}
+(\ruleName{constr}). An attribute reference $\exAttr{e}{x}$ has the type of the field $x$ of the class synthesised by $e$
 (\ruleName{attr-object}). The signature of a predefined module binds
 $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type listed for it
 (\figref{predefined-signatures}, Definition~\ref{def:predefined}). A module attribute reference
@@ -240,7 +239,10 @@ judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top
 class declaration is a top-level form, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
-\pyinline{return} requires \pyinline{None} to be a subtype of $\tau$.
+\pyinline{return} requires \pyinline{None} to be a subtype of $\tau$. An expression statement synthesises a type and discards it
+(\ruleName{expr-stmt}). A call to a callable with result \tyNone{} is not an expression, because
+\ruleName{call} requires a result other than \tyNone, and is typed as a statement by \ruleName{call-stmt}.
+The restriction exists only for compatibility with mypy, which rejects any use of the value of such a call.
 
 A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment $\exAssign{x}{e}$ requires $x$ to be a declared but unassigned variable, and
@@ -253,7 +255,7 @@ definitions and modules introduce the variables of the scope as unbound, using t
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
 the class name to $\Type{C}$, resolves the field annotations with its type parameters in scope, and requires the fields it declares to be distinct and, when it extends
-another class, \Replaced{the base to resolve to an instantiated class}{the base name to be bound to a class, applied to as many type arguments as that class has parameters}, and the additional fields not to repeat an inherited field
+another class, the base to resolve to an instantiated class, and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
 scope; every \PurePy class must declare itself a dataclass. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
@@ -271,36 +273,61 @@ declared in the enclosing scope, where the same condition applies to them. The b
 declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
 so a function that declares a result definitely returns one.
 
-A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked using the auxiliary
-judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typing-cases}), which takes
-the cases in turn: each case's pattern is matched against the \emph{residual} $L$, a static
-over-approximation of the values of $\sigma$ which remain unmatched by earlier cases, its body is
-checked under the pattern's bindings, and the outcomes
-are merged into $S$. The match rules start the
-residual from the shapes of $\sigma$ (\figref{shapes}); \ruleName{match} applies when the final residual is empty; \ruleName{match-partial} applies otherwise, merging in
-$\Assigns{\varnothing}$ for the values that fall through. Shapes and matching a pattern against the residual
-are the subject of \secref{well-formedness-patterns}.
-
-Each pattern must also be \emph{sequence-safe} at $\sigma$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:seq-safe}}), because under the
-evaluation rules a tuple pattern matches only a tuple and a list pattern matches only a list, whereas
-Python matches both forms of pattern against both kinds of value\speconly{ (\figref{eval-pat})}. A tuple pattern is therefore sequence-safe only at a type with no list values, and a list pattern only
-at a type with no tuple values. A union has the values of its members, so both kinds of pattern fail the condition
-at $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$, and at $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$,
-since $\tySized$ has both list and tuple values, as does a type variable, which may stand for any type.
+A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
+auxiliary judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typing-cases}), which threads
+a residual $L$ of shapes through the cases, starting from the shapes of $\sigma$ (\figref{shapes}), and merges
+their outcomes into $S$. The \ruleName{match} rule applies when the remaining type
+$\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}) is $\tyNever$, meaning the match is
+exhaustive; the \ruleName{match-partial} rule applies otherwise, merging in $\Assigns{\varnothing}$
+for the values that fall through. The residual, reachability and exhaustiveness are the subject of
+\secref{well-formedness-patterns}.
 
 \subsection{Pattern matching}
 \label{sec:exhaustiveness}
 \label{sec:well-formedness-patterns}
 
-To check a \pyinline{match}, each case $\exCase{p}{s}$ is matched in turn against the residual, an
-ordered set of \emph{shapes} (\figref{shapes}). A shape denotes a set of values of a single type, and the
-residual denotes the values of the scrutinee type which remain unmatched by earlier cases. Matching the case removes from the residual the values matched
-by $p$ (\figref{typing-pat}); a case that does not match any shape of the residual is unreachable and the match is rejected.
-The match is exhaustive if the last case leaves the residual empty, and may
-otherwise fall through (\ruleName{match}, \ruleName{match-partial}). The usefulness algorithm for
-ML~\cite{maranget2007} also checks reachability and exhaustiveness with a single relation. The residual plays the
-role of the term descriptions of \citet{sestoft1996}, and the uncovered sets of \citet{karachalias2015}
-likewise let the type exclude cases.
+To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement
+$\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typing-cases}) threads a \emph{residual} $L$
+through the cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a set of
+values of a single type, and over-approximates the values of $\sigma$ which are not matched by any of the
+earlier cases; the match rules start the residual from the shapes of $\sigma$. Each case's pattern is
+checked against $\sigma$ (\paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}}) and matched
+against the residual (\paperonly{\figref{typing-pat}}\speconly{\secref{matching}}). A case is
+\emph{reachable} if its pattern matches at least one shape of the residual, and a match with an unreachable
+case is ill-formed. For a reachable case, the matched shapes give the types of its pattern variables, the
+body is checked under those bindings, the outcomes are merged into $S$, and the shapes left after matching
+are the residual for the cases that follow.
+
+A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. The match
+rules decide exhaustiveness not by the final residual but by the \emph{remaining type}
+$\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}), a coarser over-approximation
+of the values of $\sigma$ which are not matched by any of the cases, as a type rather than a set of
+shapes. The remaining type follows mypy's narrowing of a match scrutinee, which subtracts a class only
+for a constructor pattern that matches every value of the class, and a tuple only through one refutable
+component, so cases that between them cover a field of a class leave an empty residual but a remaining
+type other than $\tyNever$. Exhaustiveness decided by the residual alone would therefore accept a function
+which returns from each case of such a match but which is rejected by mypy as not always returning. The
+usefulness algorithm for ML~\cite{maranget2007} also checks reachability and exhaustiveness with a single
+relation. The residual plays the role of the term descriptions of \citet{sestoft1996}, and the uncovered
+sets of \citet{karachalias2015} likewise let the type exclude cases.
+
+\speconly{\subsubsection{Pattern checking}\label{sec:pattern-checking}}%
+\paperonly{\paragraph{Pattern checking.}}
+
+\input{spec/fig/pattern-matching/checking-pat}
+
+A pattern must \emph{check} against the scrutinee type, $\Sigma; \Gamma \vdash p \checks \tau$ (\figref{checking-pat}), before it is matched against the residual (\ruleName{match-case}). The judgement holds when every tuple pattern in $p$ is at a type which has no list values, every list pattern is at a type which has no tuple values, and every constructor pattern is at a type with at most one comparable instantiation of its class, up to equivalence. List values and tuple values are defined by subtyping:
+\begin{defalign}
+\tau \text{ has list values} & {}\iff \Sigma \vdash \tyList{\sigma} \subty \tau \text{ for some } \sigma \text{, or a member of } \tau \text{ is a type variable} \\
+\tau \text{ has tuple values} & {}\iff \Sigma \vdash \tyTuple{\seq{\sigma}} \subty \tau \text{ for some } \seq{\sigma} \text{, or a member of } \tau \text{ is a type variable}
+\end{defalign}
+So list types, $\tySized$ and $\tyObject$ have list values; tuple types, $\tySized$ and $\tyObject$ have tuple values; and a type variable, which may stand for any type, has both. The rules check a sub-pattern at the type of its position, a tuple component, list element, dictionary value or field, and a pattern at a union at each of its members. A pattern also checks against a type when it cannot match any value of that type, as with a tuple pattern at a tuple type of another length or a constructor pattern naming a class with no comparable instantiation (\ruleName{check-tuple-none}, \ruleName{check-list-none}, \ruleName{check-dict-none}, \ruleName{check-constr-none}); matching then leaves the values of the type to later cases.
+
+The conditions on tuple and list patterns ensure that pattern matching always has a result. Under the evaluation rules, matching a tuple pattern against a list or a list pattern against a tuple is undefined\speconly{ (\figref{eval-pat})}, although Python permits both. Both forms of pattern therefore fail at $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$, at $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$, and at a type variable.
+
+The condition on constructor patterns supplies the type arguments omitted by the pattern: they are recovered by the judgement $\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$ from the type $\tau$ at which the pattern is checked, the \emph{instance} of $C$ at $\tau$ being the instantiation of $C$ above $\tau$, or the instantiation below $\tau$, when there is one up to equivalence (\ruleName{instance-above}, \ruleName{instance-below}). Below $C$ the base classes of the type determine the instance: at \pyinline{IntLeaf}, a subclass of \pyinline{Leaf[int]}, the instance of \pyinline{Leaf} is \pyinline{Leaf[int]}. Above $C$ the base arguments of $C$ determine it: at \pyinline{Tree[int]} the instance of \pyinline{Leaf} is \pyinline{Leaf[int]}, because \pyinline{Leaf[T]} extends \pyinline{Tree[T]}, whereas at \tyObject{} a class with type parameters has no instance, since every instantiation lies below \tyObject.
 
 \speconly{\subsubsection{Shapes and shape typing}\label{sec:shapes}}%
 \paperonly{\paragraph{Shapes and shape typing.}}
@@ -312,7 +339,7 @@ denotes a set of values of its type $\shapeTy(k)$ (\paperonly{\figref{auxiliary-
 values of type $\tau$ whose outermost head is not among those in $H$; the other forms are constructor,
 tuple, list and dictionary shapes, each with shapes in place of sub-patterns. A list shape also records its
 element type, which the element shapes do not determine. A constructor shape also carries an excluded
-set: $\shapeAny{\patConstr{C}{\seq{k}}}{H}$ denotes the instances of $C$, or of any subclass not below a
+set: $\shapeAny{\patConstr{C[\seq{\tau}]}{\seq{k}}}{H}$ denotes the instances of $C[\seq{\tau}]$, or of any subclass not below a
 class of $H$, whose fields, those of $C$, have shapes $\seq{k}$. A rest shape at a class type denotes
 the same values as the constructor shape with a rest shape at each field, and is expanded into that
 form only by splitting (\figref{split}): a class may refer to itself through its fields, so expanding
@@ -330,13 +357,12 @@ the dictionary form; every other type contributes the single shape $\shapeAny{\t
 all when $H$ exhausts $\tau$. The rest form therefore never carries a union or dictionary type, and
 \ruleName{shape-rest} states this restriction as a side condition.
 
-\speconly{\subsubsection{Exhaustiveness and reachability}\label{sec:exhaustiveness-reachability}}%
-\paperonly{\paragraph{Exhaustiveness and reachability.}}
+\speconly{\subsubsection{Matching}\label{sec:matching}}%
+\paperonly{\paragraph{Matching.}}
 
 \input{spec/fig/pattern-matching/typing-pat}
 
-Both reachability and exhaustiveness are determined by the residual left by \emph{matching}.
-Matching (\figref{typing-pat}) has three forms. The form on a single shape $k$ matches a pattern against that
+\emph{Matching} (\figref{typing-pat}) has three forms. The form on a single shape $k$ matches a pattern against that
 shape, giving matched shapes $K$, residual $L$ and bindings $\Delta$. A variable pattern binds at
 $\shapeTy(k)$, and a pattern named by \pyinline{as} at the join over the matched shapes, so a case for
 one alternative of a union leaves a later variable case bound at the remaining members alone. The form
@@ -359,7 +385,7 @@ with an excluded set split, and no head types at a tuple type, so the excluded s
 empty and \ruleName{split-tuple} leaves the empty residual.
 A constructor pattern whose class lies below a
 class of the excluded set matches nothing, because an earlier case for the superclass has already
-matched every instance.
+matched every instance. A constructor pattern matches the instance of its class at the type of the shape (\figref{instance}): a pattern \pyinline{Leaf(v)} at \pyinline{Tree[int]} matches \pyinline{Leaf[int]} and binds \pyinline{v} at \pyinline{int}.
 
 A dictionary shape has a separate form,
 $\shapeDict{\tau}{\beta}{H}$, standing for the dictionaries that hold each key $w$ in the domain of

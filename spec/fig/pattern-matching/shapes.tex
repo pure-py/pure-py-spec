@@ -11,7 +11,7 @@ $H$ & $::=$ & $\set{h_1, \ldots, h_n}$ & (Excluded heads)
    \\[3mm]
 \grammarGroup{Shapes} \\
 $k$ & $::=$ & $\shapeAny{\tau}{H}$ & (Rest) \\
-    & $\mid$ & $\shapeAny{\patConstr{C}{k_1, \ldots, k_n}}{H}$ & (Constr) \\
+    & $\mid$ & $\shapeAny{\patConstr{C[\seq{\tau}]}{k_1, \ldots, k_n}}{H}$ & (Constr) \\
     & $\mid$ & $\patTuple{k_1, \ldots, k_n}$ & (Tuple) \\
     & $\mid$ & $\shapeList{\tau}{k_1, \ldots, k_n}$ & (List) \\
     & $\mid$ & $\shapeDict{\tau}{\beta}{H}$ & (Dict) \\
@@ -34,7 +34,7 @@ $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
 \and
 \inferrule*[lab={\ruleName{head-class}}]
 {
-  \Sigma \vdash C \subty \tau
+  \Sigma \vdash C[\seq{\sigma}] \subty \tau
 }
 {
   \Sigma \vdash C : \tau
@@ -65,12 +65,12 @@ $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
 \and
 \inferrule*[lab={\ruleName{shape-constr}}]
 {
-  \fields(\Sigma, C) = \bind{\seq{x}}{\seq{\sigma}} \\
-  \Sigma \vdash h : C \quad (\forall h \in H) \\
+  \tyInst{\fields(\Sigma, C)}{\seq{\tau}} = \bind{\seq{x}}{\seq{\sigma}} \\
+  \Sigma \vdash h : C[\seq{\tau}] \quad (\forall h \in H) \\
   \Sigma \vdash k_i : \sigma_i \quad (\forall i)
 }
 {
-  \Sigma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{H} : C
+  \Sigma \vdash \shapeAny{\patConstr{C[\seq{\tau}]}{\seq{k}}}{H} : C[\seq{\tau}]
 }
 \and
 \inferrule*[lab={\ruleName{shape-tuple}}]

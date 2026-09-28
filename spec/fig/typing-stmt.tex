@@ -12,7 +12,7 @@
 \and
 \inferrule*[lab={\ruleName{declare}}]
 {
-  \replaced{\Sigma; \Gamma}{\Gamma} \vdash \psi \synth \tau
+  \Sigma; \Gamma \vdash \psi \synth \tau
 }
 {
   \Sigma; \Gamma; \zeta \vdash x\exAnnot{\psi} : \Assigns{\set{\bind{x}{\DU{\tau}}}}
@@ -29,7 +29,7 @@
 \and
 \inferrule*[lab={\ruleName{declare-assign}}]
 {
-  \replaced{\Sigma; \Gamma}{\Gamma} \vdash \psi \synth \tau \\
+  \Sigma; \Gamma \vdash \psi \synth \tau \\
   \Sigma; \Gamma \vdash e \checks \tau
 }
 {
@@ -42,6 +42,15 @@
 }
 {
   \Sigma; \Gamma; \zeta \vdash e : \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{call-stmt}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyCallable{\seq{\tau}}{\tyNone} \\
+  \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exCall{e}{\seq{e}} : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assert}}]
@@ -106,7 +115,7 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \replaced{\Sigma; \Gamma}{\Gamma} \vdash d_i \synth \tau_i \quad (\forall i) \\
+  \Sigma; \Gamma \vdash d_i \synth \tau_i \quad (\forall i) \\
   \Delta' = \set{\bind{\declaresS(\seq{d})}{\seq{\tau}}} \\
   \Sigma; \Gamma \override \Delta' \vdash d_i \checks \tau_i \quad (\forall i)
 }
@@ -117,7 +126,9 @@
 \inferrule*[lab={\ruleName{match}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \varnothing
+  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \varnothing \\
+  b_i = \exCase{p_i}{s_i} \quad (\forall i) \\
+  \remaining(\Sigma, \Gamma, \sigma, \seq{p}) = \tyNever
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S
@@ -127,7 +138,8 @@
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
   \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, L \\
-  L \neq \varnothing
+  b_i = \exCase{p_i}{s_i} \quad (\forall i) \\
+  \remaining(\Sigma, \Gamma, \sigma, \seq{p}) \neq \tyNever
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S \merge \Assigns{\varnothing}

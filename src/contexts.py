@@ -82,7 +82,10 @@ class ModuleContext:
 
 def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
     return ModuleContext(
-        gamma={**mod_ctx.gamma, **delta}, M=mod_ctx.M, q=mod_ctx.q, Sigma=mod_ctx.Sigma
+        gamma={**mod_ctx.gamma, **delta},
+        M=mod_ctx.M,
+        q=mod_ctx.q,
+        Sigma=mod_ctx.Sigma,
     )
 
 

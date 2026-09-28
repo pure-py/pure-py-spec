@@ -1,4 +1,5 @@
 import ast
+from collections.abc import Sequence
 from dataclasses import replace
 
 import reasons
@@ -56,17 +57,17 @@ from contexts import (
     override_outcomes,
     resolve_name,
 )
-from match import match_shapes, seq_safe
+from match import check_pattern, match_shapes, remaining_seq
 from operators import (
     BINARY_NAMES,
     UNARY_NAMES,
     resolve_op_binary,
     resolve_op_unary,
 )
-from reasons import IllFormedModule
-from shapes import shapes
+from reasons import IllFormedModule, MypyCompatibility
+from shapes import Shapes, shapes
 from subtyping import join_seq, subtype
-from syntax import NotYetSupported, PatList
+from syntax import NotYetSupported
 from type_syntax import (
     CallableExpr,
     CallableType,
@@ -155,10 +156,11 @@ def check_in_scope(x: Var, node: ast.AST, mod_ctx: ModuleContext) -> None:
         raise IllFormedModule(node, reasons.NotPredefinedName(x))
 
 
+# tail: the body ends a function body, so a fall-through is a missing return
 def check_body(
-    body: list[ast.stmt], mod_ctx: ModuleContext, returns: Type | None = None
+    body: list[ast.stmt], mod_ctx: ModuleContext, returns: Type | None = None, tail: bool = False
 ) -> StaticOutcome:
-    return check_seq(statements(body), mod_ctx, returns)
+    return check_seq(statements(body), mod_ctx, returns, tail)
 
 
 def check_top_seq(ts: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
@@ -182,26 +184,28 @@ def check_top_statement(t: Statement, mod_ctx: ModuleContext) -> tuple[StaticOut
 
 
 def check_seq(
-    ss: list[Statement], mod_ctx: ModuleContext, returns: Type | None = None
+    ss: list[Statement], mod_ctx: ModuleContext, returns: Type | None = None, tail: bool = False
 ) -> StaticOutcome:
     if len(ss) == 0:
         return Assigns({})
     s, s_ = ss[0], ss[1:]
-    r = check_statement(s, mod_ctx, returns)
+    r = check_statement(s, mod_ctx, returns, tail and len(s_) == 0)
     if len(s_) == 0:
         return r
     if isinstance(r, Returns):
         stmt: ast.AST = s_[0][0] if isinstance(s_[0], list) else s_[0]
         raise IllFormedModule(stmt, reasons.UnreachableStatement())
-    r_ = check_seq(s_, override_gamma(mod_ctx, r.delta), returns)
+    r_ = check_seq(s_, override_gamma(mod_ctx, r.delta), returns, tail)
     return override_outcomes(r, r_)
 
 
-def check_statement(s: Statement, mod_ctx: ModuleContext, returns: Type | None) -> StaticOutcome:
+def check_statement(
+    s: Statement, mod_ctx: ModuleContext, returns: Type | None, tail: bool = False
+) -> StaticOutcome:
     if isinstance(s, list):
         check_bodies(s, mod_ctx)
         return Assigns({d.name: signature(d, mod_ctx) for d in s})
-    return check_stmt(s, mod_ctx, returns)
+    return check_stmt(s, mod_ctx, returns, tail)
 
 
 def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
@@ -213,14 +217,9 @@ def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
         delta = {**f_names, **params, **locals_}
         body_ctx = override_gamma(mod_ctx, delta)
         declared = resolve_type(type_expr(d.returns), d, mod_ctx)
-        r = check_body(d.body, body_ctx, declared)
-        if not isinstance(r, Returns):
-            check_implicit_return(mod_ctx.Sigma, d, declared)
-
-
-def check_implicit_return(Sigma: ClassTable, d: ast.FunctionDef, declared: Type) -> None:
-    if not subtype(Sigma, Primitive.NONE, declared):
-        raise IllFormedModule(d, reasons.MissingReturn(d.name, declared))
+        r = check_body(d.body, body_ctx, declared, tail=True)
+        if not isinstance(r, Returns) and not subtype(mod_ctx.Sigma, Primitive.NONE, declared):
+            raise IllFormedModule(d, reasons.MissingReturn(d.name, declared))
 
 
 def check_returns_none(Sigma: ClassTable, s: ast.Return, declared: Type) -> None:
@@ -249,7 +248,9 @@ def check_assignments_declared(body: list[ast.stmt], bound: set[Var]) -> None:
             raise IllFormedModule(node, reasons.UndeclaredAssignment(x))
 
 
-def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> StaticOutcome:
+def check_stmt(
+    s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None, tail: bool = False
+) -> StaticOutcome:
     match s:
         case ast.Pass():
             return Assigns({})
@@ -285,6 +286,11 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
                 return Assigns({x: DU(tau)})
             check_expr(s.value, tau, mod_ctx)
             return Assigns({x: tau})
+        case ast.Expr(value=ast.Call(func=f) as e) if not isinstance(f, ast.Lambda) and (
+            class_of_name(f, mod_ctx) is None
+        ):
+            call_stmt(e, mod_ctx)
+            return Assigns({})
         case ast.Expr(value=e):
             synth_expr(e, mod_ctx)
             return Assigns({})
@@ -298,49 +304,58 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
             return Returns()
         case ast.If(test=e, body=ss, orelse=ss_):
             check_expr(e, Primitive.BOOL, mod_ctx)
-            branches = [check_body(ss, mod_ctx, returns)]
-            branches.append(check_body(ss_, mod_ctx, returns) if ss_ else Assigns({}))
+            branches = [check_body(ss, mod_ctx, returns, tail)]
+            branches.append(check_body(ss_, mod_ctx, returns, tail) if ss_ else Assigns({}))
             return merge_outcomes(branches)
         case ast.Assert(test=e, msg=e_):
             check_expr(e, Primitive.BOOL, mod_ctx)
             if e_ is not None:
                 check_expr(e_, Primitive.STR, mod_ctx)
             return Assigns({})
-        case ast.Match(subject=e, cases=cases):
+        case ast.Match(subject=e):
             tau = synth_expr(e, mod_ctx)
-            return check_match_cases(cases, tau, mod_ctx, returns)
+            return check_match_cases(s, tau, mod_ctx, returns, tail)
         case _:
             raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
 def check_match_cases(
-    cases: list[ast.match_case],
-    tau: Type,
-    mod_ctx: ModuleContext,
-    returns: Type | None,
+    match: ast.Match, tau: Type, mod_ctx: ModuleContext, returns: Type | None, tail: bool
 ) -> StaticOutcome:
-    deltas, partial = match_cases(cases, tau, mod_ctx)
-    branches = [check_case(case, delta, mod_ctx, returns) for case, delta in zip(cases, deltas)]
+    deltas, rest, residual = match_cases(match, tau, mod_ctx)
+    branches = [
+        check_case(case, delta, mod_ctx, returns, tail) for case, delta in zip(match.cases, deltas)
+    ]
+    partial = rest != Primitive.NEVER
+    if (
+        partial
+        and tail
+        and returns is not None
+        and not subtype(mod_ctx.Sigma, Primitive.NONE, returns)
+        and len(residual) == 0
+        and all(isinstance(r, Returns) for r in branches)
+    ):
+        raise MypyCompatibility(match, reasons.MissingReturnMatchPartial(rest))
     return merge_outcomes(branches + ([Assigns({})] if partial else []))
 
 
 def match_cases(
-    cases: list[ast.match_case], tau: Type, mod_ctx: ModuleContext
-) -> tuple[list[VarContext], bool]:
+    match: ast.Match, tau: Type, mod_ctx: ModuleContext
+) -> tuple[list[VarContext], Type, Shapes]:
+    cases = match.cases
     residual = shapes(mod_ctx.Sigma, tau, frozenset())
     deltas: list[VarContext] = []
-    for index, case in enumerate(cases, 1):
-        mismatch = seq_safe(case.pattern, tau, mod_ctx)
-        if mismatch is not None:
-            q, sigma = mismatch
-            kind = "list" if isinstance(q, PatList) else "tuple"
-            raise IllFormedModule(q, reasons.SequenceKindMismatch(kind, sigma))
+    for case in cases:
+        check_pattern(case.pattern, tau, mod_ctx)
         result = match_shapes(residual, case.pattern, mod_ctx)
         if result is None:
-            raise IllFormedModule(case.pattern, reasons.UnreachableCase(index))
+            raise IllFormedModule(case.pattern, reasons.UnreachableCase(ast.unparse(case.pattern)))
         _, residual, delta = result
         deltas.append(delta)
-    return deltas, len(residual) > 0
+    rest = remaining_seq(tau, [case.pattern for case in cases], mod_ctx)
+    if rest == Primitive.NEVER:
+        assert len(residual) == 0  # the remaining type is coarser than the residual
+    return deltas, rest, residual
 
 
 def check_case(
@@ -348,9 +363,10 @@ def check_case(
     delta: VarContext,
     mod_ctx: ModuleContext,
     returns: Type | None,
+    tail: bool,
 ) -> StaticOutcome:
     return override_outcomes(
-        Assigns(delta), check_body(case.body, override_gamma(mod_ctx, delta), returns)
+        Assigns(delta), check_body(case.body, override_gamma(mod_ctx, delta), returns, tail)
     )
 
 
@@ -596,6 +612,14 @@ def call(e: ast.Call, mod_ctx: ModuleContext) -> Type:
     return result_type(synth_expr(e.func, mod_ctx), e, mod_ctx)
 
 
+def call_stmt(e: ast.Call, mod_ctx: ModuleContext) -> None:
+    match synth_expr(e.func, mod_ctx):
+        case CallableType(sigmas, Primitive.NONE):
+            check_args(e, sigmas, mod_ctx)
+        case fn:
+            result_type(fn, e, mod_ctx)
+
+
 def result_type(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> Type:
     match fn:
         case UnionType(sigma, tau):
@@ -604,13 +628,19 @@ def result_type(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> Type:
                 [result_type(sigma, e, mod_ctx), result_type(tau, e, mod_ctx)],
             )
         case CallableType(sigmas, tau):
-            if len(sigmas) != len(e.args):
-                raise IllFormedModule(e, reasons.CallArityMismatch(len(sigmas), len(e.args)))
-            for arg, param in zip(e.args, sigmas):
-                check_expr(arg, param, mod_ctx)
+            check_args(e, sigmas, mod_ctx)
+            if tau == Primitive.NONE:
+                raise MypyCompatibility(e, reasons.NoneResult())
             return tau
         case _:
             raise IllFormedModule(e, reasons.NotCallable(fn))
+
+
+def check_args(e: ast.Call, sigmas: Sequence[Type], mod_ctx: ModuleContext) -> None:
+    if len(sigmas) != len(e.args):
+        raise IllFormedModule(e, reasons.CallArityMismatch(len(sigmas), len(e.args)))
+    for arg, param in zip(e.args, sigmas):
+        check_expr(arg, param, mod_ctx)
 
 
 def applied_lambda(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> Type:
