@@ -21,6 +21,7 @@ EXPECTED = ".expected"
 EXCEPTION_EXPECTED = f".exception{EXPECTED}"
 ERROR_EXPECTED = f".error{EXPECTED}"
 OUTPUT_EXPECTED = f".output{EXPECTED}"
+STATUS_EXPECTED = f".status{EXPECTED}"  # exit status when nonzero
 
 # Tier directory names
 MODULE_LEVEL, PROGRAM_LEVEL = "module-level", "program-level"
@@ -54,10 +55,11 @@ CHECK, CHECK_PROGRAM = "check_module.py", "check_program.py"
 
 # Program-level test files (a test is a directory)
 MAIN = "main.py"
-EXPECTED_FILE, EXPECTED_EXIT, EXPECTED_ERROR = (
+EXPECTED_FILE, EXPECTED_EXIT, EXPECTED_ERROR, EXPECTED_STATUS = (
     "expected",
     "expected_exit",
     "expected_error",
+    "expected_status",
 )
 
 
@@ -167,12 +169,14 @@ class Runner:
         self,
         path: pathlib.Path,
         expected_path: pathlib.Path,
+        status_path: pathlib.Path,
         cwd: pathlib.Path | None = None,
     ) -> None:
         phase = Phase.RUN
         proc = self._run(path, cwd)
-        if proc.returncode != 0:
-            self._fail(phase, f"exit {proc.returncode}: {proc.stderr.strip()}")
+        status = int(status_path.read_text()) if status_path.exists() else 0
+        if proc.returncode != status:
+            self._fail(phase, f"exit {proc.returncode}, expected {status}: {proc.stderr.strip()}")
         elif proc.stdout != expected_path.read_text():
             self._fail(phase, "output mismatch")
 
@@ -198,11 +202,13 @@ class Runner:
         path: pathlib.Path,
         python_accepts: bool,
         expected_path: pathlib.Path,
+        status_path: pathlib.Path,
         cwd: pathlib.Path | None = None,
     ) -> None:
         """Python must corroborate the verdict: run with the expected output
-        (python_accepts) or raise the exception named in the sibling file. A
-        test must carry the one piece of evidence and not the other."""
+        (python_accepts), and the exit status in the sibling file if any, or raise
+        the exception named in the sibling file. A test must carry the one piece
+        of evidence and not the other."""
         exception_path = path.with_suffix(EXCEPTION_EXPECTED)
         if python_accepts:
             if exception_path.exists():
@@ -210,7 +216,7 @@ class Runner:
             elif not expected_path.exists():
                 self._fail(Phase.RUN, f"missing {expected_path.name}")
             else:
-                self.run_expecting_output(path, expected_path, cwd=cwd)
+                self.run_expecting_output(path, expected_path, status_path, cwd=cwd)
         else:
             if expected_path.exists():
                 self._fail(Phase.RUN, f"python-error must not have {expected_path.name}")
@@ -234,7 +240,11 @@ class Runner:
                     error_substr=substr(dir_ / EXPECTED_ERROR),
                 )
                 self.python_evidence(
-                    main_py, python_accepts, expected_path=dir_ / EXPECTED_FILE, cwd=dir_
+                    main_py,
+                    python_accepts,
+                    expected_path=dir_ / EXPECTED_FILE,
+                    status_path=dir_ / EXPECTED_STATUS,
+                    cwd=dir_,
                 )
 
     def module_test(self, path: pathlib.Path, module: pathlib.Path) -> None:
@@ -257,7 +267,12 @@ class Runner:
                 else:
                     self.python(path)
             else:
-                self.python_evidence(path, python_accepts, expected_path=path.with_suffix(EXPECTED))
+                self.python_evidence(
+                    path,
+                    python_accepts,
+                    expected_path=path.with_suffix(EXPECTED),
+                    status_path=path.with_suffix(STATUS_EXPECTED),
+                )
 
     def summary(self) -> None:
         total = self.passed + self.failed

@@ -85,7 +85,7 @@ Tests are organised by tier (module-level and program-level) and then by verdict
 - `python-error/` — neither language gives a result (a genuine error); stages as above, plus `syntactic-only/`, tested via AST construction (not expressible as `.py`)
 - `pending/` — not yet decided by the checker; `semantically-valid/pending/` will become semantically valid, `<verdict>/static/pending/` will be rejected at check
 
-The invariant — `excluded` ⇒ Python runs it, `python-error` ⇒ Python raises — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails.
+The invariant — `excluded` ⇒ Python runs it, `python-error` ⇒ Python raises — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails. A test that runs but exits with a nonzero status, via `sys.exit`, states the status in `.status.expected` (`expected_status` at program level).
 
 ## Reference checker (`src/`)
 
