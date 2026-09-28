@@ -323,7 +323,7 @@ for a constructor pattern that matches every value of the class, and a tuple onl
 component, so cases that between them cover a field of a class leave an empty residual but a remaining
 type other than $\tyNever$. Exhaustiveness decided by the residual alone would therefore accept a function
 which returns from each case of such a match but which is rejected by mypy as not always returning. \Added{The
-remaining type also gives the types of pattern variables, for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}), and the residual
+remaining type also determines the types of pattern variables, for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}), and the residual
 decides reachability alone.} The
 usefulness algorithm for ML~\cite{maranget2007} also checks reachability and exhaustiveness with a single
 relation. The residual plays the role of the term descriptions of \citet{sestoft1996}, and the uncovered
