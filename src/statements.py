@@ -57,7 +57,7 @@ from contexts import (
     override_outcomes,
     resolve_name,
 )
-from match import check_pattern, match_shapes, remaining_seq
+from match import check_pattern, match_shapes, remaining
 from operators import (
     BINARY_NAMES,
     UNARY_NAMES,
@@ -371,19 +371,18 @@ def check_match_cases(
 def match_cases(
     match: ast.Match, tau: Type, mod_ctx: ModuleContext
 ) -> tuple[list[VarContext], Type, Shapes]:
-    cases = match.cases
     residual = shapes(mod_ctx.Sigma, tau, frozenset())
+    rest = tau
     deltas: list[VarContext] = []
-    for case in cases:
-        check_pattern(case.pattern, tau, mod_ctx)
+    for case in match.cases:
+        deltas.append(check_pattern(case.pattern, rest, mod_ctx))
         result = match_shapes(residual, case.pattern, mod_ctx)
         if result is None:
             raise IllFormedModule(
                 case.pattern, reasons.UnreachableCase(render_pattern(case.pattern))
             )
-        _, residual, delta = result
-        deltas.append(delta)
-    rest = remaining_seq(tau, [case.pattern for case in cases], mod_ctx)
+        _, residual = result
+        rest = remaining(rest, case.pattern, mod_ctx)
     if rest == Primitive.NEVER:
         assert len(residual) == 0  # the remaining type is coarser than the residual
     return deltas, rest, residual

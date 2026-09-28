@@ -1,9 +1,9 @@
 import ast
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Sequence
 from itertools import product
 
 import reasons
-from aux import name_of
+from aux import binds, name_of
 from classes import (
     ArityMismatch,
     Class,
@@ -37,12 +37,11 @@ from shapes import (
     ShapeSeqs,
     Tuple,
     below_excluded,
-    shape_type,
     shapes,
     shapes_seq,
     typed_heads,
 )
-from subtyping import Undetermined, disjuncts, instance, join, join_seq, meet, subtype
+from subtyping import Undetermined, disjuncts, instance, join, meet, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
     ClassType,
@@ -54,12 +53,13 @@ from type_syntax import (
     TupleType,
     Type,
     UnionType,
+    Var,
     instantiate,
     literal,
 )
 
-type Match = tuple[Shapes, Shapes, VarContext]
-type SeqMatch = tuple[ShapeSeqs, ShapeSeqs, VarContext]
+type Match = tuple[Shapes, Shapes]
+type SeqMatch = tuple[ShapeSeqs, ShapeSeqs]
 type Split = tuple[Shapes, Shapes]
 
 
@@ -83,19 +83,9 @@ def match(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
 
 
 def match_as(k: Shape, p: ast.MatchAs, mod_ctx: ModuleContext) -> Match | None:
-    if p.name is not None and mod_ctx.gamma.get(p.name) != Unbound():
-        raise IllFormedModule(p, reasons.Redeclaration(p.name))
     if p.pattern is None:
-        delta: VarContext = {} if p.name is None else {p.name: shape_type(k)}
-        return (k,), (), delta
-    result = match(k, p.pattern, mod_ctx)
-    if result is None:
-        return None
-    matched, residual, delta = result
-    if p.name is None:
-        return matched, residual, delta
-    tau = join_seq(mod_ctx.Sigma, [shape_type(k_) for k_ in matched])
-    return matched, residual, pattern_bindings([delta, {p.name: tau}], p)
+        return (k,), ()
+    return match(k, p.pattern, mod_ctx)
 
 
 def match_split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
@@ -106,8 +96,8 @@ def match_split(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | Non
     result = match_shapes(ks, p, mod_ctx)
     if result is None:
         return None
-    matched, residual_, delta = result
-    return matched, residual + residual_, delta
+    matched, residual_ = result
+    return matched, residual + residual_
 
 
 def match_literal(k: Shape, ell: Literal) -> Match | None:
@@ -115,7 +105,7 @@ def match_literal(k: Shape, ell: Literal) -> Match | None:
         case Rest(tau, hs):
             if tau == LiteralType(ell):
                 assert len(hs) == 0
-                return (k,), (), {}
+                return (k,), ()
             return None
         case _:
             return None
@@ -317,9 +307,8 @@ def match_seq(
     if any(result is None for result in results):
         return None
     matches = [result for result in results if result is not None]
-    matched_sets = [matched for matched, _, _ in matches]
-    residual_sets = [residual for _, residual, _ in matches]
-    deltas = [delta for _, _, delta in matches]
+    matched_sets = [matched for matched, _ in matches]
+    residual_sets = [residual for _, residual in matches]
     matched = tuple(product(*matched_sets))
     residual = tuple(
         prefix + (k,) + ks[i + 1 :]
@@ -327,7 +316,7 @@ def match_seq(
         for prefix in product(*matched_sets[:i])
         for k in ls
     )
-    return matched, residual, pattern_bindings(deltas, node)
+    return matched, residual
 
 
 def match_shapes(residual: Shapes, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
@@ -335,66 +324,133 @@ def match_shapes(residual: Shapes, p: ast.pattern, mod_ctx: ModuleContext) -> Ma
     matches = {k: result for k, result in results.items() if result is not None}
     if len(matches) == 0:
         return None
-    matched = union(matched_k for matched_k, _, _ in matches.values())
+    matched = union(matched_k for matched_k, _ in matches.values())
     unmatched = tuple(k for k in residual if k not in matches)
-    residual_ = union(residual_k for _, residual_k, _ in matches.values()) + unmatched
-    return (
-        matched,
-        residual_,
-        join_context(mod_ctx.Sigma, [d for _, _, d in matches.values()]),
-    )
+    residual_ = union(residual_k for _, residual_k in matches.values()) + unmatched
+    return matched, residual_
 
 
-def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> None:
+def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> VarContext:
     Sigma = mod_ctx.Sigma
     match p:
+        case ast.MatchAs(pattern=None, name=None):
+            return {}
+        case ast.MatchAs(pattern=None, name=str() as x):
+            check_unbound(x, p, mod_ctx)
+            return {x: tau}
+        case ast.MatchAs(pattern=ast.pattern() as q, name=str() as x):
+            check_unbound(x, p, mod_ctx)
+            delta = check_pattern(q, tau, mod_ctx)
+            return pattern_bindings([delta, {x: narrowed(tau, q, mod_ctx)}], p)
+        case ast.MatchValue() | ast.MatchSingleton():
+            return {}
         case PatTuple(patterns=ps):
             if has_list_values(Sigma, tau):
                 raise IllFormedModule(p, reasons.SequenceKindMismatch("tuple", tau))
-            for sigma in disjuncts(tau):
-                if isinstance(sigma, TupleType) and len(sigma.components) == len(ps):
-                    for q, sigma_ in zip(ps, sigma.components):
-                        check_pattern(q, sigma_, mod_ctx)
+            return bindings_at(
+                tau,
+                p,
+                mod_ctx,
+                lambda sigma: (
+                    check_seq(ps, sigma.components, p, mod_ctx)
+                    if isinstance(sigma, TupleType) and len(sigma.components) == len(ps)
+                    else None
+                ),
+            )
         case PatList(patterns=ps):
             if has_tuple_values(Sigma, tau):
                 raise IllFormedModule(p, reasons.SequenceKindMismatch("list", tau))
-            for sigma in disjuncts(tau):
-                if isinstance(sigma, ListType):
-                    for q in ps:
-                        check_pattern(q, sigma.elem, mod_ctx)
+            return bindings_at(
+                tau,
+                p,
+                mod_ctx,
+                lambda sigma: (
+                    check_seq(ps, [sigma.elem] * len(ps), p, mod_ctx)
+                    if isinstance(sigma, ListType)
+                    else None
+                ),
+            )
         case ast.MatchMapping(patterns=ps):
-            for sigma in disjuncts(tau):
-                if isinstance(sigma, DictType):
-                    for q in ps:
-                        check_pattern(q, sigma.value, mod_ctx)
+            return bindings_at(
+                tau,
+                p,
+                mod_ctx,
+                lambda sigma: (
+                    check_seq(ps, [sigma.value] * len(ps), p, mod_ctx)
+                    if isinstance(sigma, DictType)
+                    else None
+                ),
+            )
         case ast.MatchClass():
             c = class_of_pattern(p, mod_ctx)
             # Checked before the instance; the rules would report a pattern with no instance as unreachable
             qs = pattern_seq(Sigma, c, p)
-            for sigma in disjuncts(tau):
+
+            def at_disjunct(sigma: Type) -> VarContext | None:
                 match instance(Sigma, c, sigma):
                     case Undetermined():
                         raise IllFormedModule(
                             p, reasons.PatternClassUndetermined(short_name(c), sigma)
                         )
                     case None:
-                        pass
+                        return None
                     case cls:
                         sigmas = [sigma_ for _, sigma_ in instantiate(fields(Sigma, c), cls.args)]
-                        for q, sigma_ in zip(qs, sigmas):
-                            check_pattern(q, sigma_, mod_ctx)
-        case ast.MatchAs(pattern=q) if q is not None:
-            check_pattern(q, tau, mod_ctx)
+                        return check_seq(qs, sigmas, p, mod_ctx)
+
+            return bindings_at(tau, p, mod_ctx, at_disjunct)
         case _:
-            pass
+            assert False
 
 
-def remaining_seq(tau: Type, ps: list[ast.pattern], mod_ctx: ModuleContext) -> Type:
-    match ps:
-        case [p, *ps_]:
-            return remaining_seq(remaining(tau, p, mod_ctx), ps_, mod_ctx)
-        case _:
+def check_unbound(x: Var, p: ast.pattern, mod_ctx: ModuleContext) -> None:
+    if mod_ctx.gamma.get(x) != Unbound():
+        raise IllFormedModule(p, reasons.Redeclaration(x))
+
+
+def check_seq(
+    ps: tuple[ast.pattern, ...] | list[ast.pattern],
+    taus: Sequence[Type],
+    node: ast.pattern,
+    mod_ctx: ModuleContext,
+) -> VarContext:
+    return pattern_bindings([check_pattern(q, sigma, mod_ctx) for q, sigma in zip(ps, taus)], node)
+
+
+# Bindings joined over the disjuncts (check-union); a disjunct the pattern can't match binds at Never
+def bindings_at(
+    tau: Type,
+    p: ast.pattern,
+    mod_ctx: ModuleContext,
+    at_disjunct: Callable[[Type], VarContext | None],
+) -> VarContext:
+    never: VarContext = {x: Primitive.NEVER for x in binds(p)}
+    deltas = [at_disjunct(sigma) for sigma in disjuncts(tau)]
+    return join_context(mod_ctx.Sigma, [never if delta is None else delta for delta in deltas])
+
+
+def narrowed(tau: Type, p: ast.pattern, mod_ctx: ModuleContext) -> Type:
+    Sigma = mod_ctx.Sigma
+    match tau, p:
+        case UnionType(sigma, sigma_), _:
+            return join(Sigma, narrowed(sigma, p, mod_ctx), narrowed(sigma_, p, mod_ctx))
+        case _, ast.MatchAs(pattern=None):
             return tau
+        case _, ast.MatchAs(pattern=ast.pattern() as q):
+            return narrowed(tau, q, mod_ctx)
+        case _, ast.MatchValue() | ast.MatchSingleton():
+            return meet(Sigma, LiteralType(literal_of(p)), tau)
+        case TupleType(taus), PatTuple(patterns=ps) if len(taus) == len(ps):
+            return TupleType(tuple(narrowed(sigma, q, mod_ctx) for sigma, q in zip(taus, ps)))
+        case ListType(), PatList():
+            return tau
+        case DictType(), ast.MatchMapping():
+            return tau
+        case _, ast.MatchClass():
+            cls = pattern_instance(Sigma, class_of_pattern(p, mod_ctx), tau)
+            return Primitive.NEVER if cls is None else meet(Sigma, tau, cls)
+        case _:
+            return Primitive.NEVER
 
 
 def remaining(tau: Type, p: ast.pattern, mod_ctx: ModuleContext) -> Type:
@@ -475,12 +531,8 @@ def union(kss: Iterable[Shapes]) -> Shapes:
 def map_seq_match(form: Callable[[ShapeSeq], Shape], result: SeqMatch | None) -> Match | None:
     if result is None:
         return None
-    matched, residual, delta = result
-    return (
-        tuple(form(ks) for ks in matched),
-        tuple(form(ks) for ks in residual),
-        delta,
-    )
+    matched, residual = result
+    return tuple(form(ks) for ks in matched), tuple(form(ks) for ks in residual)
 
 
 def padded(ps: tuple[ast.pattern, ...], n: int) -> tuple[ast.pattern, ...]:

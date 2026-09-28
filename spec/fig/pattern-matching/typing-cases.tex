@@ -1,9 +1,9 @@
 \begin{figure}
-\flushleft \shadebox{$\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$}
+\flushleft \shadebox{$\Sigma; \Gamma; \zeta\deleted{; \sigma} \vdash \added{\tau, }L, \seq{b} : S, \added{\tau', }L'$}
 \begin{mathpar}
 \small
 \input{spec/rules/match-cases}
 \end{mathpar}
-\caption{Given optional return type $\zeta$ and scrutinee type $\sigma$, cases $\seq{b}$ have static outcome $S$ and transform residual $L$ to $L'$}
+\caption{Given optional return type $\zeta$\deleted{ and scrutinee type $\sigma$}, cases $\seq{b}$ have static outcome $S$ and transform \added{remaining type $\tau$ and }residual $L$ to \added{$\tau'$ and }$L'$}
 \label{fig:typing-cases}
 \end{figure}

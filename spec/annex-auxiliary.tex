@@ -85,7 +85,14 @@ The functions on types and shapes introduced in \secref{types}, each defined by 
 \funcrows{shape-type}
 \end{auxfunction}
 
-\begin{auxfunction}{\remaining(\Sigma, \Gamma, \tau, p), \remaining(\Sigma, \Gamma, \tau, \seq{p})}{type}{aux:remaining}
+\begin{AddedBlock}
+\begin{auxfunction}{\narrowed(\Sigma, \Gamma, \tau, p)}{type}{aux:narrowed}
+\input{spec/functions/narrowed-text}
+\funcrows{narrowed}
+\end{auxfunction}
+\end{AddedBlock}
+
+\begin{auxfunction}{\remaining(\Sigma, \Gamma, \tau, p)\deleted{, \remaining(\Sigma, \Gamma, \tau, \seq{p})}}{type}{aux:remaining}
 \input{spec/functions/remaining-text}
 \funcrows{remaining}
 \end{auxfunction}

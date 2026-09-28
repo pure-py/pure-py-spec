@@ -126,9 +126,9 @@
 \inferrule*[lab={\ruleName{match}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \varnothing \\
-  b_i = \exCase{p_i}{s_i} \quad (\forall i) \\
-  \remaining(\Sigma, \Gamma, \sigma, \seq{p}) = \tyNever
+  \Sigma; \Gamma; \zeta\deleted{; \sigma} \vdash \added{\sigma, }\shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \added{\tyNever, }\varnothing \\
+  \deleted{b_i = \exCase{p_i}{s_i} \quad (\forall i)} \\
+  \deleted{\remaining(\Sigma, \Gamma, \sigma, \seq{p}) = \tyNever}
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S
@@ -137,9 +137,9 @@
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, L \\
-  b_i = \exCase{p_i}{s_i} \quad (\forall i) \\
-  \remaining(\Sigma, \Gamma, \sigma, \seq{p}) \neq \tyNever
+  \Sigma; \Gamma; \zeta\deleted{; \sigma} \vdash \added{\sigma, }\shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \added{\tau, }L \\
+  \deleted{b_i = \exCase{p_i}{s_i} \quad (\forall i)} \\
+  \replaced{\tau \neq \tyNever}{\remaining(\Sigma, \Gamma, \sigma, \seq{p}) \neq \tyNever}
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S \merge \Assigns{\varnothing}
