@@ -35,7 +35,6 @@ from type_syntax import (
     Name,
     Primitive,
     Var,
-    parent,
     parse_name,
     prefix_of,
     proper_prefix_of,
@@ -46,17 +45,20 @@ from type_syntax import (
 
 
 def loads_as(
-    q: Name, theta: ContextEntry, mod_ctx: ModuleContext
+    theta: ModuleLoaded, xs: list[Var], iota: ast.stmt, mod_ctx: ModuleContext
 ) -> tuple[ContextEntry, ClassTable]:
-    q_ = parent(q)
-    if q_ is None:
-        return theta, mod_ctx.Sigma
-    gamma, Sigma = check_module(mod_ctx.M[q_], mod_ctx.M, q_, mod_ctx.Sigma)
-    return loads_as(
-        q_,
-        ModuleLoaded(q_, extend_context(gamma, {q.parts[-1]: theta})),
-        replace(mod_ctx, Sigma=Sigma),
-    )
+    match xs:
+        case []:
+            return theta, mod_ctx.Sigma
+        case [x, *xs_]:
+            q = qualified(theta.q, x)
+            gamma, Sigma = check_imported(q, iota, mod_ctx)
+            theta_, Sigma = loads_as(
+                ModuleLoaded(q, gamma), xs_, iota, replace(mod_ctx, Sigma=Sigma)
+            )
+            return ModuleLoaded(theta.q, extend_context(theta.members, {x: theta_})), Sigma
+        case _:
+            assert False
 
 
 def check_imports_prefix(
@@ -78,8 +80,11 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
                     iota,
                     reasons.ImportOfContainedModule(q, mod_ctx.q, f"from {q} import <name>"),
                 )
-            delta, Sigma = check_imported(q, iota, mod_ctx)
-            theta, Sigma = loads_as(q, ModuleLoaded(q, delta), replace(mod_ctx, Sigma=Sigma))
+            x = Name((root(q),))
+            delta, Sigma = check_imported(x, iota, mod_ctx)
+            theta, Sigma = loads_as(
+                ModuleLoaded(x, delta), list(q.parts[1:]), iota, replace(mod_ctx, Sigma=Sigma)
+            )
             return {root(q): theta}, Sigma
         case ast.ImportFrom():
             assert iota.module is not None

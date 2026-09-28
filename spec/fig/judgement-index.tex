@@ -22,7 +22,7 @@ $\Sigma; \Gamma; \zeta\deleted{; \sigma} \vdash \added{\tau, }L, \seq{b} : S, \a
 $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ & top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$ & \figref{typing-top-level} \\
 $\Sigma \vdash \Gamma, x \importsR \theta \binding \Sigma'$ & name $x$ imported from module signature $\Gamma$ has context entry $\theta$ & \figref{typing-imports} \\
 $\Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma'$ & imports $\seq{\iota}$ of module $q$ yield context $\Gamma$ & \figref{typing-import-prefix} \\
-$\Sigma \vdash q, \theta \loadsAs \theta' \binding \Sigma'$ & importing module $q$ into context entry $\theta$ gives context entry $\theta'$ & \figref{typing-import-prefix} \\
+$\Sigma \vdash \replaced{\theta, \seq{x}}{q, \theta} \loadsAs \theta' \binding \Sigma'$ & \replaced{loaded module $\theta$ extended along chain $\seq{x}$ of submodule names gives context entry $\theta'$}{importing module $q$ into context entry $\theta$ gives context entry $\theta'$} & \figref{typing-import-prefix} \\
 $\Sigma \vdash_{\mathsf{load}} q : \Gamma \binding \Sigma'$ & module $q$ statically loads with signature $\Gamma$ & \figref{typing-module} \\
 $\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{typing-module}
    \\[2mm]
@@ -37,7 +37,7 @@ $\rho, \seq{e} \Rightarrow r$ & expressions $\seq{e}$ evaluate, left to right, t
 $\rho, \seq{g} \Rightarrow r$ & comprehension qualifiers $\seq{g}$ evaluate to result $r$ & \figref{eval-quals-result} \\
 $\rho, x \importsR r$ & name $x$ imported from module environment $\rho$ has result $r$ & \figref{eval-imports} \\
 $q, \seq{\iota} \Rightarrow r$ & imports $\seq{\iota}$ of module $q$ evaluate to result $r$ & \figref{eval-import-prefix} \\
-$q, v \loadsAs v'$ & importing module $q$ into value $v$ gives value $v'$ & \figref{eval-import-prefix} \\
+$\replaced{v, \seq{x}}{q, v} \loadsAs \replaced{r}{v'}$ & \replaced{loaded module $v$ extended along chain $\seq{x}$ of submodule names gives result $r$}{importing module $q$ into value $v$ gives value $v'$} & \figref{eval-import-prefix} \\
 $q \Rightarrow_{\mathsf{load}} r$ & module $q$ loads to result $r$ & \figref{eval-modules} \\
 $\mathcal{M} \Rightarrow \kappa$ & program $\mathcal{M}$ evaluates to termination kind $\kappa$ & \figref{eval-modules}
 \end{tabular}
