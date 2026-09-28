@@ -89,6 +89,10 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
         case ast.ImportFrom():
             assert iota.module is not None
             q = parse_name(iota.module)
+            xs = [a.name for a in iota.names]
+            dup = next((x for i, x in enumerate(xs) if x in xs[:i]), None)
+            if dup is not None:
+                raise IllFormedModule(iota, reasons.DuplicateImportedName(dup))
             delta, Sigma = check_imported(q, iota, mod_ctx)
             Sigma = load_containing(
                 [p for p in proper_prefixes(q) if not prefix_of(p, mod_ctx.q)],
@@ -96,7 +100,7 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
             )
             return imports_seq(
                 iota,
-                [a.name for a in iota.names],
+                xs,
                 q,
                 delta,
                 replace(mod_ctx, Sigma=Sigma),

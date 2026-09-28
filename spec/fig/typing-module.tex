@@ -51,6 +51,7 @@
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
+  \added{x_1, \ldots, x_{n+1} \text{ distinct}} \\
   \Sigma \vdash_{\mathsf{load}} q' : \Delta \binding \Sigma_0 \\
   \set{q^\dagger_1, \ldots, q^\dagger_m} = \set{q^\dagger \properPrefixOf q' \mid q^\dagger \not\prefixOf q} \\
   q^\dagger_1 \properPrefixOf \cdots \properPrefixOf q^\dagger_m \\

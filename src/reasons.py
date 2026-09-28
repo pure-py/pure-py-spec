@@ -241,6 +241,14 @@ class UnknownModule:
 
 
 @dataclass(frozen=True)
+class DuplicateImportedName:
+    x: Var
+
+    def message(self) -> str:
+        return f"name '{self.x}' imported twice"
+
+
+@dataclass(frozen=True)
 class UnknownMember:
     x: Var
     q: Name
@@ -508,6 +516,7 @@ type Reason = (
     | UnknownFieldInPattern
     | DuplicatePatternKeyword
     | UnknownModule
+    | DuplicateImportedName
     | UnknownMember
     | ModuleAsValue
     | ClassAsValue
