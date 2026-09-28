@@ -367,9 +367,9 @@ below $\tau$ are the $C[\seq{\tau}]$ for which the instantiation of $D$ reached 
 classes has arguments equivalent to $\seq{\sigma}$, and Lemma~\ref{lem:candidate-instances} bounds the $\seq{\tau}$
 to be examined to finitely many candidates: one candidate up to equivalence gives the instance
 (\ruleName{instance-below}), none means that $C$ has no instance at $\tau$, and two that are not equivalent mean
-that $C$ has a comparable instantiation at $\tau$ but no instance, so that a constructor pattern at $\tau$ is
+that $C$ has an instantiation comparable with $\tau$ but no instance, so that a constructor pattern at $\tau$ is
 ill-formed. At \tyObject{} and at \tyNever{} every instantiation of $C$ is comparable with $\tau$, so $C$ has an
-instance only if it has no type parameters. At any other type $C$ has no comparable instantiation and no instance.
+instance only if it has no type parameters. At any other type $C$ has no instantiation comparable with $\tau$, and no instance.
 \begin{lemma}[Candidate instances]
 \label{lem:candidate-instances}
 Suppose $D \in \ancestors(\Sigma, C)$, with $\Sigma(C)$ having type parameters $\seq{\alpha}$. A \emph{candidate} for $C$ at
