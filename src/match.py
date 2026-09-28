@@ -341,7 +341,7 @@ def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> VarConte
         case ast.MatchAs(pattern=ast.pattern() as q, name=str() as x):
             check_unbound(x, p, mod_ctx)
             delta = check_pattern(q, tau, mod_ctx)
-            return pattern_bindings([delta, {x: narrowed(tau, q, mod_ctx)}], p)
+            return pattern_bindings([delta, {x: matched_as(tau, q, mod_ctx)}], p)
         case ast.MatchValue() | ast.MatchSingleton():
             return {}
         case PatTuple(patterns=ps):
@@ -429,19 +429,19 @@ def bindings_at(
     return join_context(mod_ctx.Sigma, [never if delta is None else delta for delta in deltas])
 
 
-def narrowed(tau: Type, p: ast.pattern, mod_ctx: ModuleContext) -> Type:
+def matched_as(tau: Type, p: ast.pattern, mod_ctx: ModuleContext) -> Type:
     Sigma = mod_ctx.Sigma
     match tau, p:
         case UnionType(sigma, sigma_), _:
-            return join(Sigma, narrowed(sigma, p, mod_ctx), narrowed(sigma_, p, mod_ctx))
+            return join(Sigma, matched_as(sigma, p, mod_ctx), matched_as(sigma_, p, mod_ctx))
         case _, ast.MatchAs(pattern=None):
             return tau
         case _, ast.MatchAs(pattern=ast.pattern() as q):
-            return narrowed(tau, q, mod_ctx)
+            return matched_as(tau, q, mod_ctx)
         case _, ast.MatchValue() | ast.MatchSingleton():
             return meet(Sigma, LiteralType(literal_of(p)), tau)
         case TupleType(taus), PatTuple(patterns=ps) if len(taus) == len(ps):
-            return TupleType(tuple(narrowed(sigma, q, mod_ctx) for sigma, q in zip(taus, ps)))
+            return TupleType(tuple(matched_as(sigma, q, mod_ctx) for sigma, q in zip(taus, ps)))
         case ListType(), PatList():
             return tau
         case DictType(), ast.MatchMapping():

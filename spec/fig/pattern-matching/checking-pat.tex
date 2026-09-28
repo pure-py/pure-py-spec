@@ -62,7 +62,7 @@
   \Sigma; \Gamma \vdash p \checks \tau \added{\binding \Delta}
 }
 {
-  \Sigma; \Gamma \vdash p\;\pyinline{as}\;x \checks \tau \added{\binding \Delta \disjunion \set{\bind{x}{\narrowed(\Sigma, \Gamma, \tau, p)}}}
+  \Sigma; \Gamma \vdash p\;\pyinline{as}\;x \checks \tau \added{\binding \Delta \disjunion \set{\bind{x}{\matchedAs(\Sigma, \Gamma, \tau, p)}}}
 }
 \and
 \inferrule*[lab={\ruleName{check-union}}]
