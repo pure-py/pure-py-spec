@@ -304,15 +304,14 @@ checked against \Replaced{the remaining type}{$\sigma$} (\paperonly{\figref{chec
 against the residual (\paperonly{\figref{typing-pat}}\speconly{\secref{matching}}). A case is
 \emph{reachable} if its pattern matches at least one shape of the residual, and a match with an unreachable
 case is ill-formed. \Replaced{For a reachable case, the body is checked under the bindings and its outcome merged into $S$; the
-shapes left after matching and the type remaining if the pattern fails are the residual and the remaining type for
+shapes left after matching and the type remaining if the pattern fails, $\remaining(\Sigma, \Gamma, \tau, p)$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}), are the residual and the remaining type for
 the case that follows.}{For a reachable case, the matched shapes give the types of its pattern variables, the
 body is checked under those bindings, the outcomes are merged into $S$, and the shapes left after matching
 are the residual for the cases that follow.}
 
 A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. The match
-rules decide exhaustiveness not by the final residual but by the \Replaced{final remaining type, computed by
-$\remaining(\Sigma, \Gamma, \tau, p)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}) for each pattern $p$
-in turn}{\emph{remaining type}
+rules decide exhaustiveness not by the final residual but by the \Replaced{final remaining type}{\emph{remaining type}
 $\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}), a coarser over-approximation
 of the values of $\sigma$ which are not matched by any of the cases, as a type rather than a set of
