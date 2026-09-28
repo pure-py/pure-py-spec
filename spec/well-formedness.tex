@@ -276,7 +276,7 @@ its parameters, must be distinct from one another and from any pattern variables
 declared in the enclosing scope, where the same condition applies to them. The body is checked with the
 declared return type, and must have static outcome $\Returns$ unless \Replaced{the return type is equivalent to \pyinline{None}}{the function returns \pyinline{None}},
 so a function that declares a result definitely returns one. \Added{A return type such as $\tyUnion{\tyInt}{\tyNone}$
-does not exempt the body from returning, nor permit a bare \pyinline{return} (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).}
+does not exempt the body from returning, nor permit a bare \pyinline{return}, for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).}
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement \Replaced{$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$}{$\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$} (\figref{typing-cases}), which threads
@@ -320,8 +320,8 @@ for a constructor pattern that matches every value of the class, and a tuple onl
 component, so cases that between them cover a field of a class leave an empty residual but a remaining
 type other than $\tyNever$. Exhaustiveness decided by the residual alone would therefore accept a function
 which returns from each case of such a match but which is rejected by mypy as not always returning. \Added{The
-remaining type also gives the types of pattern variables (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}), and the residual decides
-reachability alone.} The
+remaining type also gives the types of pattern variables, for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}), and the residual
+decides reachability alone.} The
 usefulness algorithm for ML~\cite{maranget2007} also checks reachability and exhaustiveness with a single
 relation. The residual plays the role of the term descriptions of \citet{sestoft1996}, and the uncovered
 sets of \citet{karachalias2015} likewise let the type exclude cases.
