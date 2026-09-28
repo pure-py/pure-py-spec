@@ -516,7 +516,7 @@ def attribute_type(obj: Type, e: ast.Attribute, mod_ctx: ModuleContext) -> Type:
 
 
 def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) -> Type:
-    if container == Primitive.STR:
+    if base_type(container) == Primitive.STR:
         check_expr(e.slice, Primitive.INT, mod_ctx)
         return Primitive.STR
     match container:
@@ -770,7 +770,7 @@ def check_quals(generators: list[ast.comprehension], mod_ctx: ModuleContext) -> 
 
 
 def elem_type(Sigma: ClassTable, tau: Type) -> Type | None:
-    if tau == Primitive.STR:
+    if base_type(tau) == Primitive.STR:
         return Primitive.STR
     match tau:
         case ListType(sigma):

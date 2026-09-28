@@ -133,7 +133,8 @@
 \and
 \inferrule*[lab={\ruleName{subscript-str}}]
 {
-  \Sigma; \Gamma \vdash e \synth \tyStr \\
+  \Sigma; \Gamma \vdash e \synth \sigma \\
+  \baseType(\sigma) = \tyStr \\
   \Sigma; \Gamma \vdash e' \checks \tyInt
 }
 {
