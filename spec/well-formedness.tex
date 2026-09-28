@@ -299,15 +299,16 @@ To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgemen
 \Added{and a \emph{remaining type} $\tau$} through the cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a set of
 values of a single type, and over-approximates the values of $\sigma$ which are not matched by any of the
 earlier cases; the match rules start the residual from the shapes of $\sigma$. \Added{The remaining type is a coarser
-over-approximation of the same values, as a type rather than a set of shapes, and starts from $\sigma$ itself; the type to which
-$\tau$ is narrowed if a pattern $p$ matches, $\matchedAs(\Sigma, \Gamma, \tau, p)$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:matched-as}}), over-approximates the matched shapes in the same way.} Each case's pattern is
+over-approximation of the same values, as a type rather than a set of shapes, and starts from $\sigma$ itself. Two auxiliary
+functions narrow a type $\tau$ by a pattern $p$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:matched-as}}):
+$\matchedAs(\Sigma, \Gamma, \tau, p)$ is the type to which $\tau$ is narrowed if $p$ matches, and
+$\remaining(\Sigma, \Gamma, \tau, p)$ the type remaining if $p$ fails, each an over-approximation as a type of the shapes
+matched or left by the pattern.} Each case's pattern is
 checked against \Replaced{the remaining type}{$\sigma$} (\paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}})\Added{, binding its pattern variables,} and matched
 against the residual (\paperonly{\figref{typing-pat}}\speconly{\secref{matching}}). A case is
 \emph{reachable} if its pattern matches at least one shape of the residual, and a match with an unreachable
 case is ill-formed. \Replaced{For a reachable case, the body is checked under the bindings and its outcome merged into $S$; the
-shapes left after matching and the type remaining if the pattern fails, $\remaining(\Sigma, \Gamma, \tau, p)$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}), are the residual and the remaining type for
+shapes left after matching and $\remaining(\Sigma, \Gamma, \tau, p)$ are the residual and the remaining type for
 the case that follows.}{For a reachable case, the matched shapes give the types of its pattern variables, the
 body is checked under those bindings, the outcomes are merged into $S$, and the shapes left after matching
 are the residual for the cases that follow.}
