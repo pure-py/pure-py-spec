@@ -235,8 +235,8 @@ A sequence $s\;s'$ (\ruleName{seq}) types $s$, then types $s'$ under $\Gamma$ ov
 by $s$. A conditional combines its
 branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
 Top-level statements are checked by a separate
-judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, a
-class declaration is a top-level form, and a plain statement is checked with no return type
+judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, class
+declarations and \pyinline{type} statements are top-level forms, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
 \pyinline{return} requires \pyinline{None} to be a subtype of $\tau$. An expression statement synthesises a type and discards it
@@ -257,7 +257,13 @@ check against \pyinline{bool}, and an assertion message against \pyinline{str}. 
 the class name to $\Type{C}$, resolves the field annotations with its type parameters in scope, and requires the fields it declares to be distinct and, when it extends
 another class, the base to resolve to an instantiated class, and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
-scope; every \PurePy class must declare itself a dataclass. Each rule that takes an annotation resolves it to a type
+scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement binds its name to the type alias
+$\TypeAlias{\seq{\alpha}}{\tau}$, where $\tau$ is the type denoted by its body with the type parameters $\seq{\alpha}$ in scope
+(\ruleName{type-alias}). A type expression that applies the alias to type arguments denotes the instantiation of $\tau$ at
+those arguments (\ruleName{ty-alias}), so a type never mentions an alias. Since the names declared by a module are unbound
+until their declarations are checked (\secref{well-formedness-modules}), the body can name only a class or alias declared
+earlier in the module, and cannot name the alias itself. Python evaluates the body lazily, and mypy accordingly accepts a
+forward reference in it and a self-reference under a type constructor. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
 
 A mutual region of function definitions (\ruleName{def}) resolves the annotations of each definition to a
@@ -443,7 +449,7 @@ body.
 
 \input{spec/fig/typing-module}
 
-The signature $\Gamma$ produced by static loading (\figref{typing-module}) comprises the classes
+The signature $\Gamma$ produced by static loading (\figref{typing-module}) comprises the classes, type aliases
 and variables defined by a module, together with its intrinsic \pyinline{__name__} and a stub for each submodule,
 but not the names that it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
 name is a private dependency, not re-exported as part of the interface. Submodule stubs and the bindings of the module

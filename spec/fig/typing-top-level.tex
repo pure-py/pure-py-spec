@@ -44,6 +44,15 @@
 {
   \Sigma; q; \Gamma \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}']}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}
 }
+\and
+\inferrule*[lab={\ruleName{type-alias}}]
+{
+  \Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
+  \Sigma; \Gamma' \vdash \psi \synth \tau
+}
+{
+  \Sigma; q; \Gamma \vdash \exTypeAlias{x[\seq{\alpha}]}{\psi} : \Assigns{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}} \binding \Sigma
+}
 \end{mathpar}
 \caption{Top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$}
 \label{fig:typing-top-level}
