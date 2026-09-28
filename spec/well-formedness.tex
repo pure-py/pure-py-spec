@@ -322,10 +322,11 @@ are the residual for the cases that follow.}
 
 \Replaced{A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. Exhaustiveness is decided by
 the final remaining type, which the \ruleName{match} rule requires to be $\tyNever$, with \ruleName{match-partial}
-applying otherwise. The remaining type, which thus determines exhaustiveness as well as the types of pattern variables,
-follows mypy's narrowing of a match scrutinee (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}),
-subtracting a class only for a constructor pattern that matches every value of the class, and a tuple only through one
-refutable component. Cases that between them cover a field of a class therefore leave an empty residual but a remaining
+applying otherwise. The remaining type thus determines exhaustiveness as well as the types of pattern variables. The typing
+specification leaves narrowing largely unspecified,\footnote{\url{https://typing.python.org/en/latest/spec/narrowing.html}}
+so the remaining type follows mypy's narrowing of a match scrutinee
+(\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}), subtracting a class only for a
+constructor pattern that matches every value of the class, and a tuple only through one refutable component. Cases that between them cover a field of a class therefore leave an empty residual but a remaining
 type other than $\tyNever$, so a function which returns from each of the cases is rejected as not always returning, and
 at a class with a field of type $\tyUnion{\tyInt}{\tyNone}$ a case \pyinline{Box(n)} after a case \pyinline{Box(None)}
 binds \pyinline{n} at $\tyUnion{\tyInt}{\tyNone}$ rather than at \pyinline{int}.}{A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. The match
@@ -364,14 +365,14 @@ instantiated class $D[\seq{\rho}]$ with $C$ an ancestor of $D$, the instance is 
 from $D[\seq{\rho}]$ along the base classes, which is unique because type arguments are invariant
 (\ruleName{instance-above}). If $\tau$ is $D[\seq{\sigma}]$ with $D$ an ancestor of $C$, the instantiations of $C$
 below $\tau$ are the $C[\seq{\tau}]$ for which the instantiation of $D$ reached from $C[\seq{\tau}]$ along the base
-classes has arguments equivalent to $\seq{\sigma}$, and Lemma~\ref{lem:candidate-instances} bounds the instantiations
+classes has arguments equivalent to $\seq{\sigma}$, and Lemma~\ref{lem:sufficiency-of-candidates} bounds the instantiations
 to be examined to finitely many candidates: one candidate up to equivalence gives the instance
 (\ruleName{instance-below}), none means that $C$ has no instance at $\tau$, and two that are not equivalent mean
 that $C$ has an instantiation comparable with $\tau$ but no instance, so that a constructor pattern at $\tau$ is
 ill-formed. At \tyObject{} and at \tyNever{} every instantiation of $C$ is comparable with $\tau$, so $C$ has an
 instance only if it has no type parameters. At any other type $C$ has no instantiation comparable with $\tau$, and no instance.
-\begin{lemma}[Candidate instances]
-\label{lem:candidate-instances}
+\begin{lemma}[Sufficiency of candidates]
+\label{lem:sufficiency-of-candidates}
 Suppose $D \in \ancestors(\Sigma, C)$. A \emph{candidate} for $C$ at $D[\seq{\sigma}]$ is an instantiation $C[\seq{\tau}]$ in
 which each $\tau_i$ is the join of a subset of $\subterms(\seq{\sigma}) \cup \set{\tyObject}$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}). If any instantiation of $C$ is below

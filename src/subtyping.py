@@ -163,7 +163,7 @@ def instantiated_ancestor(Sigma: ClassTable, tau: ClassType, d: Class) -> ClassT
 def candidate_instances(
     Sigma: ClassTable, rhos: Sequence[Type], sigmas: Sequence[Type], alphas: Sequence[Var]
 ) -> list[tuple[Type, ...]]:
-    """Candidates for alphas making rhos equivalent to sigmas (lemma on candidate instances):
+    """Candidates for alphas making rhos equivalent to sigmas (lemma on sufficiency of candidates):
     at most two, pairwise inequivalent."""
     atoms = sorted(
         {a for sigma in sigmas for a in subterms(sigma)} | {Primitive.OBJECT}, key=render
