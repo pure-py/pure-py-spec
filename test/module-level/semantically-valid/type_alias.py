@@ -1,3 +1,4 @@
+# rule: type-alias
 type Num = int
 
 n: Num = 1

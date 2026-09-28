@@ -93,6 +93,7 @@ from type_syntax import (
     literal_type,
     parse_annotation,
     qualified,
+    substitute,
 )
 
 
@@ -121,6 +122,13 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
                 raise IllFormedModule(node, reasons.UnboundName(str(q)))
             if isinstance(theta, TypeVar) and len(args) == 0:
                 return TypeVariable(str(q))
+            if isinstance(theta, TypeAlias):
+                sigmas = tuple(resolve_type(psi_, node, mod_ctx) for psi_ in args)
+                if len(sigmas) != len(theta.params):
+                    raise IllFormedModule(
+                        node, reasons.TypeAliasArityMismatch(q, len(theta.params), len(sigmas))
+                    )
+                return substitute(sigmas, theta.params, theta.tau)
             if not isinstance(theta, Class):
                 raise IllFormedModule(node, reasons.NotClass(q))
             taus = tuple(resolve_type(psi_, node, mod_ctx) for psi_ in args)
@@ -180,6 +188,9 @@ def check_top_statement(t: Statement, mod_ctx: ModuleContext) -> tuple[StaticOut
     if isinstance(t, ast.ClassDef):
         c, Sigma = class_declared(t, mod_ctx)
         return Assigns({t.name: c}), Sigma
+    if isinstance(t, ast.TypeAlias):
+        assert isinstance(t.name, ast.Name)
+        return Assigns({t.name.id: type_alias_declared(t, mod_ctx)}), mod_ctx.Sigma
     return check_statement(t, mod_ctx, None), mod_ctx.Sigma
 
 
@@ -787,6 +798,13 @@ def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, C
     c = Class(qualified(mod_ctx.q, node.name))
     assert c not in mod_ctx.Sigma
     return c, {**mod_ctx.Sigma, c: ClassTableEntry(alphas, own, base)}
+
+
+def type_alias_declared(node: ast.TypeAlias, mod_ctx: ModuleContext) -> TypeAlias:
+    alphas = tuple(p.name for p in node.type_params if isinstance(p, ast.TypeVar))
+    assert len(alphas) == len(node.type_params)
+    mod_ctx_ = override_gamma(mod_ctx, {alpha: TypeVar() for alpha in alphas})
+    return TypeAlias(alphas, resolve_type(type_expr(node.value), node, mod_ctx_))
 
 
 def base_class(node: ast.ClassDef, mod_ctx: ModuleContext) -> ClassType:

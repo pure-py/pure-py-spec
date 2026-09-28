@@ -209,7 +209,6 @@ def check_syntax_classdef(node: ast.ClassDef) -> None:
 def check_syntax_type_alias(node: ast.TypeAlias) -> None:
     check_syntax_type_params(node)
     check_syntax_annotation(node.value)
-    raise NotYetSupported(node, "type statements", 187)
 
 
 def check_syntax_type_params(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlias) -> None:

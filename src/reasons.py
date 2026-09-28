@@ -155,6 +155,16 @@ class ClassArityMismatch:
 
 
 @dataclass(frozen=True)
+class TypeAliasArityMismatch:
+    q: Name
+    expected: int
+    given: int
+
+    def message(self) -> str:
+        return f"type alias '{self.q}' expects {self.expected} type arguments, given {self.given}"
+
+
+@dataclass(frozen=True)
 class UnknownFieldInPattern:
     c: Var
     xs: tuple[Var, ...]
@@ -469,6 +479,7 @@ type Reason = (
     | PatternArityMismatch
     | NotClass
     | ClassArityMismatch
+    | TypeAliasArityMismatch
     | NotPredefinedName
     | UnknownFieldInPattern
     | DuplicatePatternKeyword
