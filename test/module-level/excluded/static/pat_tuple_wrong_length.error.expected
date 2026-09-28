@@ -1,1 +1,1 @@
-case c is unreachable
+case (a, b, c) is unreachable

@@ -76,9 +76,7 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
             if proper_prefix_of(mod_ctx.q, q):
                 raise IllFormedModule(
                     iota,
-                    reasons.ImportOfContainedModule(
-                        q, mod_ctx.q, f"from {parent(q)} import {q.parts[-1]}"
-                    ),
+                    reasons.ImportOfContainedModule(q, mod_ctx.q, f"from {q} import <name>"),
                 )
             delta, Sigma = check_imported(q, iota, mod_ctx)
             theta, Sigma = loads_as(q, ModuleLoaded(q, delta), replace(mod_ctx, Sigma=Sigma))

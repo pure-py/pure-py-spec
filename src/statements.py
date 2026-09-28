@@ -67,7 +67,7 @@ from operators import (
 from reasons import IllFormedModule, MypyCompatibility
 from shapes import Shapes, shapes
 from subtyping import join_seq, subtype
-from syntax import NotYetSupported
+from syntax import NotYetSupported, render_pattern
 from type_syntax import (
     CallableExpr,
     CallableType,
@@ -222,7 +222,11 @@ def check_statement(
 def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
     f_names: VarContext = {d.name: signature(d, mod_ctx) for d in defs}
     for d in defs:
-        locals_ = scope({a.arg for a in d.args.args}, d.body)
+        xs = [a.arg for a in d.args.args]
+        dup = next((x for i, x in enumerate(xs) if x in xs[:i]), None)
+        if dup is not None:
+            raise IllFormedModule(d, reasons.DuplicateParameter(dup, d.name))
+        locals_ = scope(set(xs), d.body)
         params = parameters(d, mod_ctx)
         check_assignments_declared(d.body, set(params))
         delta = {**f_names, **params, **locals_}
@@ -360,7 +364,9 @@ def match_cases(
         check_pattern(case.pattern, tau, mod_ctx)
         result = match_shapes(residual, case.pattern, mod_ctx)
         if result is None:
-            raise IllFormedModule(case.pattern, reasons.UnreachableCase(ast.unparse(case.pattern)))
+            raise IllFormedModule(
+                case.pattern, reasons.UnreachableCase(render_pattern(case.pattern))
+            )
         _, residual, delta = result
         deltas.append(delta)
     rest = remaining_seq(tau, [case.pattern for case in cases], mod_ctx)
@@ -648,6 +654,8 @@ def result_type(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> Type:
 
 
 def check_args(e: ast.Call, sigmas: Sequence[Type], mod_ctx: ModuleContext) -> None:
+    if len(e.keywords) > 0:
+        raise IllFormedModule(e, reasons.KeywordArgumentsNotConstructor())
     if len(sigmas) != len(e.args):
         raise IllFormedModule(e, reasons.CallArityMismatch(len(sigmas), len(e.args)))
     for arg, param in zip(e.args, sigmas):
@@ -660,6 +668,8 @@ def applied_lambda(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> Type:
 
 def lambda_arguments(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> VarContext:
     params = [a.arg for a in f.args.args]
+    if len(e.keywords) > 0:
+        raise IllFormedModule(e, reasons.KeywordArgumentsNotConstructor())
     if len(params) != len(e.args):
         raise IllFormedModule(e, reasons.CallArityMismatch(len(params), len(e.args)))
     return {x: synth_expr(arg, mod_ctx) for x, arg in zip(params, e.args)}

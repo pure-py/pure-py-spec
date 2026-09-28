@@ -330,6 +330,21 @@ class NotCallable:
 
 
 @dataclass(frozen=True)
+class KeywordArgumentsNotConstructor:
+    def message(self) -> str:
+        return "keyword arguments in a call other than a constructor call"
+
+
+@dataclass(frozen=True)
+class DuplicateParameter:
+    x: Var
+    f: Var
+
+    def message(self) -> str:
+        return f"duplicate parameter '{self.x}' in function '{self.f}'"
+
+
+@dataclass(frozen=True)
 class CallArityMismatch:
     expected: int
     given: int
@@ -502,6 +517,8 @@ type Reason = (
     | NoUnaryOverload
     | NotCallable
     | CallArityMismatch
+    | KeywordArgumentsNotConstructor
+    | DuplicateParameter
     | NoneResult
     | TypeMismatch
     | LambdaTypeMismatch
