@@ -318,13 +318,18 @@ rules decide exhaustiveness \Replaced{by the final remaining type, which the \ru
 $\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}), a coarser over-approximation
 of the values of $\sigma$ which are not matched by any of the cases, as a type rather than a set of
-shapes}. The remaining type follows mypy's narrowing of a match scrutinee, which subtracts a class only
+shapes}. \Replaced{The residual decides reachability alone; exhaustiveness and the types of pattern variables are decided by the
+remaining type, which follows mypy's narrowing of a match scrutinee
+(\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}), subtracting a class only for a constructor
+pattern that matches every value of the class, and a tuple only through one refutable component. Cases that between them
+cover a field of a class therefore leave an empty residual but a remaining type other than $\tyNever$, so a function which
+returns from each of the cases is rejected as not always returning, and at a class with a field of type
+$\tyUnion{\tyInt}{\tyNone}$ a case \pyinline{Box(n)} after a case \pyinline{Box(None)} binds \pyinline{n} at
+$\tyUnion{\tyInt}{\tyNone}$ rather than at \pyinline{int}. Both verdicts are mypy's.}{The remaining type follows mypy's narrowing of a match scrutinee, which subtracts a class only
 for a constructor pattern that matches every value of the class, and a tuple only through one refutable
 component, so cases that between them cover a field of a class leave an empty residual but a remaining
 type other than $\tyNever$. Exhaustiveness decided by the residual alone would therefore accept a function
-which returns from each case of such a match but which is rejected by mypy as not always returning. \Added{The
-remaining type also determines the types of pattern variables, for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}), and the residual
-decides reachability alone.} The
+which returns from each case of such a match but which is rejected by mypy as not always returning.} The
 usefulness algorithm for ML~\cite{maranget2007} also checks reachability and exhaustiveness with a single
 relation. The residual plays the role of the term descriptions of \citet{sestoft1996}, and the uncovered
 sets of \citet{karachalias2015} likewise let the type exclude cases.
