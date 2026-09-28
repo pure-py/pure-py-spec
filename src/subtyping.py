@@ -130,7 +130,7 @@ def instance_above(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undete
 
 
 def instance_below(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
-    assert not isinstance(tau, UnionType)  # instances are taken at the members of a union
+    assert not isinstance(tau, UnionType)  # instances are taken at the disjuncts of a union
     alphas = Sigma[c].type_params
     match tau:
         case ClassType(d, sigmas) if d in ancestors(Sigma, c):
@@ -191,10 +191,10 @@ def equivalent_seq(Sigma: ClassTable, sigmas: Sequence[Type], taus: Sequence[Typ
     return all(equivalent(Sigma, sigma, tau) for sigma, tau in zip(sigmas, taus))
 
 
-def members(tau: Type) -> list[Type]:
+def disjuncts(tau: Type) -> list[Type]:
     match tau:
         case UnionType(sigma, sigma_):
-            return members(sigma) + members(sigma_)
+            return disjuncts(sigma) + disjuncts(sigma_)
         case _:
             return [tau]
 

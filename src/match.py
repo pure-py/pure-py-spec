@@ -42,7 +42,7 @@ from shapes import (
     shapes_seq,
     typed_heads,
 )
-from subtyping import Undetermined, instance, join, join_seq, meet, members, subtype
+from subtyping import Undetermined, disjuncts, instance, join, join_seq, meet, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
     ClassType,
@@ -351,19 +351,19 @@ def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> None:
         case PatTuple(patterns=ps):
             if has_list_values(Sigma, tau):
                 raise IllFormedModule(p, reasons.SequenceKindMismatch("tuple", tau))
-            for sigma in members(tau):
+            for sigma in disjuncts(tau):
                 if isinstance(sigma, TupleType) and len(sigma.components) == len(ps):
                     for q, sigma_ in zip(ps, sigma.components):
                         check_pattern(q, sigma_, mod_ctx)
         case PatList(patterns=ps):
             if has_tuple_values(Sigma, tau):
                 raise IllFormedModule(p, reasons.SequenceKindMismatch("list", tau))
-            for sigma in members(tau):
+            for sigma in disjuncts(tau):
                 if isinstance(sigma, ListType):
                     for q in ps:
                         check_pattern(q, sigma.elem, mod_ctx)
         case ast.MatchMapping(patterns=ps):
-            for sigma in members(tau):
+            for sigma in disjuncts(tau):
                 if isinstance(sigma, DictType):
                     for q in ps:
                         check_pattern(q, sigma.value, mod_ctx)
@@ -371,7 +371,7 @@ def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> None:
             c = class_of_pattern(p, mod_ctx)
             # Checked before the instance; the rules would report a pattern with no instance as unreachable
             qs = pattern_seq(Sigma, c, p)
-            for sigma in members(tau):
+            for sigma in disjuncts(tau):
                 match instance(Sigma, c, sigma):
                     case Undetermined():
                         raise IllFormedModule(
@@ -443,18 +443,18 @@ def remaining(tau: Type, p: ast.pattern, mod_ctx: ModuleContext) -> Type:
 
 
 def has_list_values(Sigma: ClassTable, tau: Type) -> bool:
-    # A member other than a list type is above every list type or none, so list[object] stands for all
+    # A disjunct other than a list type is above every list type or none, so list[object] stands for all
     return any(
         isinstance(sigma, ListType) or subtype(Sigma, ListType(Primitive.OBJECT), sigma)
-        for sigma in members(tau)
+        for sigma in disjuncts(tau)
     )
 
 
 def has_tuple_values(Sigma: ClassTable, tau: Type) -> bool:
-    # A member other than a tuple type is above every tuple type or none, so tuple[()] stands for all
+    # A disjunct other than a tuple type is above every tuple type or none, so tuple[()] stands for all
     return any(
         isinstance(sigma, TupleType) or subtype(Sigma, TupleType(()), sigma)
-        for sigma in members(tau)
+        for sigma in disjuncts(tau)
     )
 
 

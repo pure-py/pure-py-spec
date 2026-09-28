@@ -84,7 +84,7 @@
 \inferrule*[lab={\ruleName{check-tuple-none}}]
 {
   \tau \text{ has no list values} \\
-  \text{no member of } \tau \text{ a tuple type of length } |\seq{p}|
+  \text{no disjunct of } \tau \text{ a tuple type of length } |\seq{p}|
 }
 {
   \Sigma; \Gamma \vdash \patTuple{\seq{p}} \checks \tau
@@ -101,7 +101,7 @@
 \inferrule*[lab={\ruleName{check-list-none}}]
 {
   \tau \text{ has no tuple values} \\
-  \text{no member of } \tau \text{ a list type}
+  \text{no disjunct of } \tau \text{ a list type}
 }
 {
   \Sigma; \Gamma \vdash \patList{\seq{p}} \checks \tau
@@ -117,7 +117,7 @@
 \and
 \inferrule*[lab={\ruleName{check-dict-none}}]
 {
-  \text{no member of } \tau \text{ a dictionary type}
+  \text{no disjunct of } \tau \text{ a dictionary type}
 }
 {
   \Sigma; \Gamma \vdash \patDict{\bind{\seq{w}}{\seq{p}}} \checks \tau
