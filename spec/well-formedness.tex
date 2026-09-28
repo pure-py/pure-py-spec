@@ -374,10 +374,10 @@ instance only if it has no type parameters. At any other type $C$ has no instant
 \label{lem:candidate-instances}
 Suppose $D \in \ancestors(\Sigma, C)$, with $\Sigma(C)$ having type parameters $\seq{\alpha}$. A \emph{candidate} for $C$ at
 $D[\seq{\sigma}]$ is a sequence $\seq{\tau}$ of the length of $\seq{\alpha}$ in which each $\tau_i$ is the join of a subset of
-$\subterms(\seq{\sigma}) \cup \set{\tyObject}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}). Then
-$\Sigma \vdash C[\seq{\sigma}'] \instanceAt D[\seq{\sigma}]$ holds by \ruleName{instance-below} if and only if some candidate
-$\seq{\tau}$ has $\Sigma \vdash C[\seq{\tau}] \subty D[\seq{\sigma}]$ and all such candidates are equivalent, in which case
-$\seq{\sigma}' \tyEquiv \seq{\tau}$.
+$\subterms(\seq{\sigma}) \cup \set{\tyObject}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}). If any
+instantiation of $C$ is below $D[\seq{\sigma}]$, then some candidate $\seq{\tau}$ has $C[\seq{\tau}]$ below $D[\seq{\sigma}]$;
+and if two instantiations of $C$ that are not equivalent are below $D[\seq{\sigma}]$, then two such candidates are not
+equivalent.
 \end{lemma}
 \end{AddedBlock}
 
