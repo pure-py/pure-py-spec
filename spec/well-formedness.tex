@@ -260,7 +260,7 @@ scope; every \PurePy class must declare itself a dataclass. \Added{A \pyinline{t
 declares $x$ as an alias of the type denoted by $\psi$ with the type parameters $\seq{\alpha}$ in scope
 (\ruleName{type-alias}). An application of the alias such as \pyinline{Pair[int]} denotes that type at the given
 arguments (\ruleName{ty-alias}), here \pyinline{tuple[int, int]}, so types never mention aliases. Since the names declared by a module are unbound
-until their declarations are checked (\secref{well-formedness-modules}), $\psi$ can name only classes and aliases declared
+before their declarations (\secref{well-formedness-modules}), $\psi$ can name only classes and aliases declared
 earlier in the module, and cannot name $x$ itself. Python evaluates $\psi$ lazily, so mypy accepts a forward reference
 in $\psi$ and a reference to $x$ under a type constructor.} Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
