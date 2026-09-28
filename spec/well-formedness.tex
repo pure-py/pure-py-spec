@@ -294,39 +294,46 @@ for the values that fall through}. The \Added{remaining type, the} residual, rea
 \label{sec:exhaustiveness}
 \label{sec:well-formedness-patterns}
 
-To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement
-\Replaced{$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$}{$\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$} (\figref{typing-cases}) threads a \emph{residual} $L$
-\Added{and a \emph{remaining type} $\tau$} through the cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a set of
+\Replaced{To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement
+$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}) threads a \emph{remaining type}
+$\tau$ and a \emph{residual} $L$ through the cases, both over-approximations of the values of $\sigma$ which are not
+matched by any of the earlier cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a
+set of values of a single type, and starts from the shapes of $\sigma$; the remaining type is coarser, a type rather
+than a set of shapes, and starts from $\sigma$ itself. Two auxiliary functions narrow a type $\tau$ by a pattern $p$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:matched-as}}): $\matchedAs(\Sigma, \Gamma, \tau, p)$ is
+the type to which $\tau$ is narrowed if $p$ matches, and $\remaining(\Sigma, \Gamma, \tau, p)$ is the type remaining if
+$p$ fails. Each case's pattern is checked against the remaining type
+(\paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}}), binding its pattern variables, and matched
+against the residual (\paperonly{\figref{typing-pat}}\speconly{\secref{matching}}). Reachability is decided by the
+residual: a case is \emph{reachable} if its pattern matches at least one shape of the residual, and a match with an
+unreachable case is ill-formed. For a reachable case, the body is checked under the bindings and its outcome merged
+into $S$; the shapes left after matching and the type remaining if the pattern fails become the residual and remaining
+type for the case that follows.}{To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement
+$\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typing-cases}) threads a \emph{residual} $L$
+through the cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a set of
 values of a single type, and over-approximates the values of $\sigma$ which are not matched by any of the
-earlier cases; the match rules start the residual from the shapes of $\sigma$. \Added{The remaining type is a coarser
-over-approximation of the same values, as a type rather than a set of shapes, and starts from $\sigma$ itself. Two auxiliary
-functions narrow a type $\tau$ by a pattern $p$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:matched-as}}):
-$\matchedAs(\Sigma, \Gamma, \tau, p)$ is the type to which $\tau$ is narrowed if $p$ matches, and
-$\remaining(\Sigma, \Gamma, \tau, p)$ is the type remaining if $p$ fails, each an over-approximation as a type of the shapes
-matched or left by the pattern.} Each case's pattern is
-checked against \Replaced{the remaining type}{$\sigma$} (\paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}})\Added{, binding its pattern variables,} and matched
+earlier cases; the match rules start the residual from the shapes of $\sigma$. Each case's pattern is
+checked against $\sigma$ (\paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}}) and matched
 against the residual (\paperonly{\figref{typing-pat}}\speconly{\secref{matching}}). A case is
 \emph{reachable} if its pattern matches at least one shape of the residual, and a match with an unreachable
-case is ill-formed. \Replaced{For a reachable case, the body is checked under the bindings and its outcome merged into $S$; the
-shapes left after matching and the type remaining if the pattern fails become the residual and remaining type for
-the case that follows.}{For a reachable case, the matched shapes give the types of its pattern variables, the
+case is ill-formed. For a reachable case, the matched shapes give the types of its pattern variables, the
 body is checked under those bindings, the outcomes are merged into $S$, and the shapes left after matching
 are the residual for the cases that follow.}
 
-A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. The match
-rules decide exhaustiveness \Replaced{by the final remaining type, which the \ruleName{match} rule requires to be $\tyNever$, with
-\ruleName{match-partial} applying otherwise}{not by the final residual but by the \emph{remaining type}
+\Replaced{A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. Exhaustiveness is decided by
+the final remaining type, which the \ruleName{match} rule requires to be $\tyNever$, with \ruleName{match-partial}
+applying otherwise. The remaining type, which thus determines exhaustiveness as well as the types of pattern variables,
+follows mypy's narrowing of a match scrutinee (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}),
+subtracting a class only for a constructor pattern that matches every value of the class, and a tuple only through one
+refutable component. Cases that between them cover a field of a class therefore leave an empty residual but a remaining
+type other than $\tyNever$, so a function which returns from each of the cases is rejected as not always returning, and
+at a class with a field of type $\tyUnion{\tyInt}{\tyNone}$ a case \pyinline{Box(n)} after a case \pyinline{Box(None)}
+binds \pyinline{n} at $\tyUnion{\tyInt}{\tyNone}$ rather than at \pyinline{int}. Both verdicts are mypy's.}{A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. The match
+rules decide exhaustiveness not by the final residual but by the \emph{remaining type}
 $\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}), a coarser over-approximation
 of the values of $\sigma$ which are not matched by any of the cases, as a type rather than a set of
-shapes}. \Replaced{The residual decides reachability alone; exhaustiveness and the types of pattern variables are decided by the
-remaining type, which follows mypy's narrowing of a match scrutinee
-(\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}), subtracting a class only for a constructor
-pattern that matches every value of the class, and a tuple only through one refutable component. Cases that between them
-cover a field of a class therefore leave an empty residual but a remaining type other than $\tyNever$, so a function which
-returns from each of the cases is rejected as not always returning, and at a class with a field of type
-$\tyUnion{\tyInt}{\tyNone}$ a case \pyinline{Box(n)} after a case \pyinline{Box(None)} binds \pyinline{n} at
-$\tyUnion{\tyInt}{\tyNone}$ rather than at \pyinline{int}. Both verdicts are mypy's.}{The remaining type follows mypy's narrowing of a match scrutinee, which subtracts a class only
+shapes. The remaining type follows mypy's narrowing of a match scrutinee, which subtracts a class only
 for a constructor pattern that matches every value of the class, and a tuple only through one refutable
 component, so cases that between them cover a field of a class leave an empty residual but a remaining
 type other than $\tyNever$. Exhaustiveness decided by the residual alone would therefore accept a function
