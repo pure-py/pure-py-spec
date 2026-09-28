@@ -65,6 +65,12 @@ Direct, factual, conventional prose. Minimal: state the thing and stop. Every ru
   "not matched by any of the cases" (the cases of this match), not "not matched by any case"; "each of
   the branches", not "each branch". This applies only when a specific set is in scope. A general claim
   keeps the bare noun: "a variable pattern matches any shape".
+- Make a general claim in the plural rather than with a generic singular and its indefinite article; the
+  singular reads as a claim about one thing and stacks articles.
+  - Before: "so a type never mentions an alias"
+  - After: "so types never mention aliases"
+  The singular stays where one particular thing is meant ("a variable pattern matches any shape" describes
+  each such pattern) and in lists, where items are plural noun phrases.
 - Name things with nouns, not free relative clauses: "matched shapes", not "what it matches"; "the residual", not "what is left over".
 - A symbol must be bound in the sentence or by a judgement form stated just before it; otherwise name the thing.
   - Before: "A return checks its expression against τ" (nothing in the paragraph binds τ).
