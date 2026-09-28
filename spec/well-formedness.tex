@@ -347,6 +347,29 @@ So list types, $\tySized$ and $\tyObject$ have list values; tuple types, $\tySiz
 The conditions on tuple and list patterns ensure that pattern matching always has a result. Under the evaluation rules, matching a tuple pattern against a list or a list pattern against a tuple is undefined\speconly{ (\figref{eval-pat})}, although Python permits both. Both forms of pattern therefore fail at $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$, at $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$, and at a type variable.
 
 The condition on constructor patterns supplies the type arguments omitted by the pattern: they are recovered by the judgement $\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$ from the type $\tau$ at which the pattern is checked, the \emph{instance} of $C$ at $\tau$ being the instantiation of $C$ above $\tau$, or the instantiation below $\tau$, when there is one up to equivalence (\ruleName{instance-above}, \ruleName{instance-below}). Below $C$ the base classes of the type determine the instance: at \pyinline{IntLeaf}, a subclass of \pyinline{Leaf[int]}, the instance of \pyinline{Leaf} is \pyinline{Leaf[int]}. Above $C$ the base arguments of $C$ determine it: at \pyinline{Tree[int]} the instance of \pyinline{Leaf} is \pyinline{Leaf[int]}, because \pyinline{Leaf[T]} extends \pyinline{Tree[T]}, whereas at \tyObject{} a class with type parameters has no instance, since every instantiation lies below \tyObject.
+\begin{AddedBlock}
+\begin{lemma}[Candidate instances]
+\label{lem:candidate-instances}
+Let $D \in \ancestors(\Sigma, C)$, let $\seq{\alpha}$ be the type parameters of $C$, and call a sequence $\seq{\tau}$ of the
+length of $\seq{\alpha}$ a \emph{candidate} for $C$ at $D[\seq{\sigma}]$ if each $\tau_i$ is the join of a subset of
+$\subterms(\seq{\sigma}) \cup \set{\tyObject}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}). If $\Sigma \vdash C[\seq{\tau}] \subty D[\seq{\sigma}]$ for some
+$\seq{\tau}$, then for some candidate; and if for two sequences that are not equivalent, then for two candidates that
+are not equivalent. Hence $\Sigma \vdash C[\seq{\sigma}'] \instanceAt D[\seq{\sigma}]$ holds by \ruleName{instance-below} if
+and only if exactly one candidate up to equivalence is below $D[\seq{\sigma}]$, with $\seq{\sigma}'$ equivalent to it.
+\end{lemma}
+\begin{proof}[Proof sketch]
+Let $D[\seq{\rho}]$ be the instantiation of $D$ reached from $C[\seq{\alpha}]$ along the base classes. By
+\ruleName{subty-class-extend} and the invariance of type arguments, $C[\seq{\tau}]$ is below $D[\seq{\sigma}]$ exactly
+when $\subst{\seq{\tau}}{\seq{\alpha}}{\rho_i} \tyEquiv \sigma_i$ for each $i$. Where a parameter occurs in $\rho_i$ outside
+every union, the equation fixes it up to equivalence at the subterm of $\sigma_i$ in the same position, which is a
+candidate. Where it occurs only inside unions, a type that is not a union is below a union only through one of the
+disjuncts, so each subterm of $\sigma_i$ below the union is below the parameter's value or below the rest of the union,
+and replacing each value by the join of the subterms below it preserves the equations, which gives the first claim.
+For the second, if every solution had the same join, every subterm would be below every solution and the solutions
+would be equivalent; otherwise some subterm is below the rest of its union, and the joins with and without it are two
+candidates that are not equivalent.
+\end{proof}
+\end{AddedBlock}
 
 \speconly{\subsubsection{Shapes and shape typing}\label{sec:shapes}}%
 \paperonly{\paragraph{Shapes and shape typing.}}

@@ -136,7 +136,7 @@ def instance_below(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undete
         case ClassType(d, sigmas) if d in ancestors(Sigma, c):
             generic = ClassType(c, tuple(TypeVariable(alpha) for alpha in alphas))
             rhos = instantiated_ancestor(Sigma, generic, d).args
-            match solutions(Sigma, rhos, sigmas, alphas):
+            match candidate_instances(Sigma, rhos, sigmas, alphas):
                 case []:
                     return None
                 case [taus]:
@@ -160,13 +160,13 @@ def instantiated_ancestor(Sigma: ClassTable, tau: ClassType, d: Class) -> ClassT
     return tau
 
 
-def solutions(
+def candidate_instances(
     Sigma: ClassTable, rhos: Sequence[Type], sigmas: Sequence[Type], alphas: Sequence[Var]
 ) -> list[tuple[Type, ...]]:
-    """Instantiations of alphas making rhos equivalent to sigmas, pairwise inequivalent, at most two.
-    The variables range over unions of the non-union subterms of sigmas and object."""
+    """Candidates for alphas making rhos equivalent to sigmas (lemma on candidate instances):
+    at most two, pairwise inequivalent."""
     atoms = sorted(
-        {a for sigma in sigmas for a in non_union_subterms(sigma)} | {Primitive.OBJECT}, key=render
+        {a for sigma in sigmas for a in subterms(sigma)} | {Primitive.OBJECT}, key=render
     )
     candidates = (
         tuple(join_seq(Sigma, ts) for ts in choice)
@@ -199,16 +199,16 @@ def disjuncts(tau: Type) -> list[Type]:
             return [tau]
 
 
-def non_union_subterms(tau: Type) -> set[Type]:
+def subterms(tau: Type) -> set[Type]:
     match tau:
         case UnionType(sigma, sigma_):
-            return non_union_subterms(sigma) | non_union_subterms(sigma_)
+            return subterms(sigma) | subterms(sigma_)
         case ListType(sigma) | DictType(sigma):
-            return {tau} | non_union_subterms(sigma)
+            return {tau} | subterms(sigma)
         case TupleType(sigmas) | ClassType(_, sigmas):
-            return {tau}.union(*(non_union_subterms(sigma) for sigma in sigmas))
+            return {tau}.union(*(subterms(sigma) for sigma in sigmas))
         case CallableType(sigmas, sigma):
-            return {tau}.union(non_union_subterms(sigma), *(non_union_subterms(s) for s in sigmas))
+            return {tau}.union(subterms(sigma), *(subterms(s) for s in sigmas))
         case _:
             return {tau}
 
