@@ -181,7 +181,7 @@ definitions that follow.
 \label{def:predefined}
 $\mathcal{P}$ takes each module $q$ of \figref{predefined-values} to a pair $(\Gamma, \rho)$, where $\Gamma$
 binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \figref{predefined-signatures}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value
-(\figref{predefined-values}). \Added{A callable type fixes the number of arguments, so \pyinline{sys.exit} requires its status.} These signatures name types
+(\figref{predefined-values}). \Added{A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument.} These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
 the predefined signatures.
 \end{definition}
