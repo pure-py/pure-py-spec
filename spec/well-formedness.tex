@@ -360,7 +360,7 @@ The condition on constructor patterns supplies the type arguments omitted by the
 \begin{AddedBlock}
 \begin{lemma}[Candidate instances]
 \label{lem:candidate-instances}
-Let $\Sigma(C)$ have type parameters $\seq{\alpha}$ and let $D \in \ancestors(\Sigma, C)$. A \emph{candidate} for $C$ at
+Suppose $D \in \ancestors(\Sigma, C)$, with $\Sigma(C)$ having type parameters $\seq{\alpha}$. A \emph{candidate} for $C$ at
 $D[\seq{\sigma}]$ is a sequence $\seq{\tau}$ of the length of $\seq{\alpha}$ in which each $\tau_i$ is the join of a subset of
 $\subterms(\seq{\sigma}) \cup \set{\tyObject}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}). Then
 $\Sigma \vdash C[\seq{\sigma}'] \instanceAt D[\seq{\sigma}]$ holds by \ruleName{instance-below} if and only if some candidate
