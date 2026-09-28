@@ -6,7 +6,7 @@ sub-patterns leaves nothing, or after a constructor pattern at a type below the 
 each of whose sub-patterns leaves nothing at the field types; the other Boolean literal remains after a
 literal pattern at $\tyBool$; a tuple pattern with exactly one sub-pattern that leaves something narrows
 that component; a union is narrowed \Replaced{disjunct by disjunct}{member by member}; and any other pattern leaves $\tau$ unchanged. The
-function follows mypy's observed narrowing of a match scrutinee, so that a match which is exhaustive by the
+function follows the narrowing of a match scrutinee observed in mypy, so that a match which is exhaustive by the
 remaining type is exhaustive for mypy. The remaining type is coarser than the residual
 (\secref{well-formedness-patterns}), since a constructor pattern with a refutable sub-pattern, or a
 tuple pattern with two refutable components, leaves the type untouched. \Added{The remaining type after the

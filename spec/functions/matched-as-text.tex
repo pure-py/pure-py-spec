@@ -3,6 +3,6 @@ values, as a type. A variable or wildcard pattern narrows nothing; a literal pat
 type; a tuple pattern narrows each component; a list or dictionary pattern narrows to the list or
 dictionary type; a constructor pattern narrows to the instance of its class at $\tau$, or to $\tau$ itself
 when $\tau$ is below the instance; a union is narrowed disjunct by disjunct; and any other pattern, which
-does not match any value of $\tau$, narrows to $\tyNever$. The function follows mypy's observed narrowing of a
+does not match any value of $\tau$, narrows to $\tyNever$. The function follows the narrowing observed in mypy of a
 match scrutinee within a case, and gives the type of a pattern named by \pyinline{as}
 (\ruleName{check-as}).
