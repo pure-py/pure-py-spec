@@ -37,6 +37,16 @@ class Prohibited(Unsupported):
         super().__init__(node, f"{construct} prohibited")
 
 
+class ParseError(Unsupported):
+    exit_code = 1
+
+    def __init__(self, e: SyntaxError):
+        self.line = e.lineno
+        self.col = None if e.offset is None else e.offset - 1
+        self.msg = f"parse error: {e.msg}"
+        Exception.__init__(self, self.msg)
+
+
 class NotYetSupported(Unsupported):
     exit_code = 2
 

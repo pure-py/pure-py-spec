@@ -240,7 +240,10 @@ def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: Name) -> Contex
 def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:
     with open(filename) as f:
         source = f.read()
-    m = syntax.parse(source, filename)
+    try:
+        m = syntax.parse(source, filename)
+    except SyntaxError as e:
+        return syntax.ParseError(e)
     unsupported = syntax.check_syntax_module(m)
     if unsupported is not None:
         return unsupported
