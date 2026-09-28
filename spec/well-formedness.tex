@@ -360,12 +360,12 @@ The condition on constructor patterns supplies the type arguments omitted by the
 \begin{AddedBlock}
 \begin{lemma}[Candidate instances]
 \label{lem:candidate-instances}
-Let $D \in \ancestors(\Sigma, C)$, let $\seq{\alpha}$ be the type parameters of $C$, and call a sequence $\seq{\tau}$ of the
-length of $\seq{\alpha}$ a \emph{candidate} for $C$ at $D[\seq{\sigma}]$ if each $\tau_i$ is the join of a subset of
-$\subterms(\seq{\sigma}) \cup \set{\tyObject}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}). If $\Sigma \vdash C[\seq{\tau}] \subty D[\seq{\sigma}]$ for some
-$\seq{\tau}$, then for some candidate; and if for two sequences that are not equivalent, then for two candidates that
-are not equivalent. Hence $\Sigma \vdash C[\seq{\sigma}'] \instanceAt D[\seq{\sigma}]$ holds by \ruleName{instance-below} if
-and only if exactly one candidate up to equivalence is below $D[\seq{\sigma}]$, with $\seq{\sigma}'$ equivalent to it.
+Let $\Sigma(C)$ have type parameters $\seq{\alpha}$ and let $D \in \ancestors(\Sigma, C)$. A \emph{candidate} for $C$ at
+$D[\seq{\sigma}]$ is a sequence $\seq{\tau}$ of the length of $\seq{\alpha}$ in which each $\tau_i$ is the join of a subset of
+$\subterms(\seq{\sigma}) \cup \set{\tyObject}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}). Then
+$\Sigma \vdash C[\seq{\sigma}'] \instanceAt D[\seq{\sigma}]$ holds by \ruleName{instance-below} if and only if some candidate
+$\seq{\tau}$ has $\Sigma \vdash C[\seq{\tau}] \subty D[\seq{\sigma}]$ and all such candidates are equivalent, in which case
+$\seq{\sigma}' \tyEquiv \seq{\tau}$.
 \end{lemma}
 \begin{proof}[Proof sketch]
 Let $D[\seq{\rho}]$ be the instantiation of $D$ reached from $C[\seq{\alpha}]$ along the base classes. By
