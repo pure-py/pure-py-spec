@@ -1,2 +1,0 @@
-import helper
-print("ok")
