@@ -136,7 +136,7 @@ def instance_below(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undete
         case ClassType(d, sigmas) if d in ancestors(Sigma, c):
             generic = ClassType(c, tuple(TypeVariable(alpha) for alpha in alphas))
             rhos = instantiated_ancestor(Sigma, generic, d).args
-            match candidate_instances(Sigma, rhos, sigmas, alphas):
+            match instantiation_candidates(Sigma, rhos, sigmas, alphas):
                 case []:
                     return None
                 case [taus]:
@@ -160,10 +160,10 @@ def instantiated_ancestor(Sigma: ClassTable, tau: ClassType, d: Class) -> ClassT
     return tau
 
 
-def candidate_instances(
+def instantiation_candidates(
     Sigma: ClassTable, rhos: Sequence[Type], sigmas: Sequence[Type], alphas: Sequence[Var]
 ) -> list[tuple[Type, ...]]:
-    """Candidates for alphas making rhos equivalent to sigmas (lemma on sufficiency of candidates):
+    """Instantiation candidates for alphas making rhos equivalent to sigmas (lemma on their sufficiency):
     at most two, pairwise inequivalent."""
     atoms = sorted(
         {a for sigma in sigmas for a in subterms(sigma)} | {Primitive.OBJECT}, key=render
