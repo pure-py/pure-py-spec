@@ -302,7 +302,7 @@ earlier cases; the match rules start the residual from the shapes of $\sigma$. \
 over-approximation of the same values, as a type rather than a set of shapes, and starts from $\sigma$ itself. Two auxiliary
 functions narrow a type $\tau$ by a pattern $p$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:matched-as}}):
 $\matchedAs(\Sigma, \Gamma, \tau, p)$ is the type to which $\tau$ is narrowed if $p$ matches, and
-$\remaining(\Sigma, \Gamma, \tau, p)$ the type remaining if $p$ fails, each an over-approximation as a type of the shapes
+$\remaining(\Sigma, \Gamma, \tau, p)$ is the type remaining if $p$ fails, each an over-approximation as a type of the shapes
 matched or left by the pattern.} Each case's pattern is
 checked against \Replaced{the remaining type}{$\sigma$} (\paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}})\Added{, binding its pattern variables,} and matched
 against the residual (\paperonly{\figref{typing-pat}}\speconly{\secref{matching}}). A case is
