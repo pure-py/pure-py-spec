@@ -475,7 +475,7 @@ $\Sigma \vdash_{\mathsf{load}} q : \Gamma \binding \Sigma'$ (\figref{typing-modu
 the \ruleName{predefined} rule gives a predefined module the signature of
 Definition~\ref{def:predefined}.
 Both import forms statically load their target, together with its containing modules
-(\figref{typing-import-prefix})\Added{, from the root down}. A plain import \Replaced{loads the root first and then each module
+(\figref{typing-import-prefix}). A plain import \Replaced{loads the root first and then each module
 along the chain of names, recording each as a member of its parent}{also records each of these modules as a member of its
 parent} (the static loads-as judgement), so that the binding created for the root of the target gives attribute
 access along the whole chain. A from-import also loads any imported name that denotes a submodule\Added{, and the
