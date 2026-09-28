@@ -10,9 +10,9 @@
 \and
 \inferrule*[lab={\ruleName{match-cases}}]
 {
-  \Sigma; \Gamma; \zeta\deleted{; \sigma} \vdash \added{\tau, }L, b : S, \added{\tau', }L' \\
-  \Sigma; \Gamma; \zeta\deleted{; \sigma} \vdash \added{\tau', }L', \seq{b} : S', \added{\tau^\dagger, }L^\dagger
+  \Sigma; \Gamma; \zeta\deleted{; \sigma} \vdash \added{\tau, }L, b : S, \added{\sigma, }L' \\
+  \Sigma; \Gamma; \zeta\deleted{; \sigma} \vdash \added{\sigma, }L', \seq{b} : S', \added{\tau', }L^\dagger
 }
 {
-  \Sigma; \Gamma; \zeta\deleted{; \sigma} \vdash \added{\tau, }L, b \cons \seq{b} : S \merge S', \added{\tau^\dagger, }L^\dagger
+  \Sigma; \Gamma; \zeta\deleted{; \sigma} \vdash \added{\tau, }L, b \cons \seq{b} : S \merge S', \added{\tau', }L^\dagger
 }
