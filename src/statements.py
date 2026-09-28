@@ -256,7 +256,7 @@ def scope(ys: set[Var], body: list[ast.stmt]) -> VarContext:
         seen.add(x)
     for x in sorted(ys & patterns.keys()):
         raise IllFormedModule(patterns[x], reasons.Redeclaration(x))
-    return {x: Unbound() for x in assigns_body(body)}
+    return {x: Unbound() for x in assigns_body(body) if x not in ys}
 
 
 def check_assignments_declared(body: list[ast.stmt], bound: set[Var]) -> None:
