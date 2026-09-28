@@ -16,7 +16,7 @@ from enum import IntEnum, StrEnum
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 GREEN, RED, RESET = "\033[32m", "\033[31m", "\033[0m"
 
-# Expected-output suffixes (module-level: sibling files of <test>.py)
+# Expected-output suffixes: sibling files of <test>.py, or of main.py for a program-level test
 EXPECTED = ".expected"
 EXCEPTION_EXPECTED = f".exception{EXPECTED}"
 ERROR_EXPECTED = f".error{EXPECTED}"
@@ -53,14 +53,8 @@ CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
 # Checker entry points under src/
 CHECK, CHECK_PROGRAM = "check_module.py", "check_program.py"
 
-# Program-level test files (a test is a directory)
+# Entry module of a program-level test (a test is a directory)
 MAIN = "main.py"
-EXPECTED_FILE, EXPECTED_EXIT, EXPECTED_ERROR, EXPECTED_STATUS = (
-    "expected",
-    "expected_exit",
-    "expected_error",
-    "expected_status",
-)
 
 
 # PurePy exit codes (OK = accepted / ran clean)
@@ -68,7 +62,8 @@ class Exit(IntEnum):
     OK = 0
     PROHIBITED = 1  # prohibited syntactic form
     NOT_YET = 2  # planned, not yet supported
-    ILL_FORMED = 3  # ill-formed
+    ILL_FORMED = 3  # ill-formed module
+    ILL_FORMED_PROGRAM = 4  # ill-formed program, such as an import cycle
 
 
 class Phase(StrEnum):
@@ -130,14 +125,20 @@ class Runner:
     def _fail(self, phase: Phase, msg: str) -> None:
         self._failures.append(f"{phase}: {msg}")
 
-    def expect_exit(self, cmd: list[str], expected: int, error_substr: str | None = None) -> None:
+    def expect_exit(
+        self,
+        cmd: list[str],
+        expected: set[int],
+        error_substr: str | None = None,
+        cwd: pathlib.Path | None = None,
+    ) -> None:
         phase = {
             CHECK: Phase.CHECK,
             CHECK_PROGRAM: Phase.CHECK,
         }.get(pathlib.Path(cmd[1]).name, Phase.PYTHON)
-        proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
-        if proc.returncode != expected:
-            self._fail(phase, f"expected exit {expected}, got {proc.returncode}")
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=False, cwd=cwd)
+        if proc.returncode not in expected:
+            self._fail(phase, f"expected exit {sorted(expected)}, got {proc.returncode}")
             return
         if error_substr is not None:
             output = proc.stdout + proc.stderr
@@ -147,11 +148,9 @@ class Runner:
                     f"expected output containing {error_substr!r}, got: {output.strip()}",
                 )
 
-    def check(self, path: pathlib.Path, expected: int, err: str | None = None) -> None:
-        self.expect_exit(script_cmd(CHECK, path), expected, error_substr=err)
-
-    def python(self, path: pathlib.Path, expected: int = Exit.OK) -> None:
-        self.expect_exit([self.interpreter, str(path)], expected)
+    def python(self, path: pathlib.Path, cwd: pathlib.Path | None = None) -> None:
+        cmd_path = path.name if cwd is not None else str(path)
+        self.expect_exit([self.interpreter, cmd_path], {Exit.OK}, cwd=cwd)
 
     def _run(
         self, path: pathlib.Path, cwd: pathlib.Path | None
@@ -225,53 +224,40 @@ class Runner:
             else:
                 self.run_expecting_exception(path, exception_path, cwd=cwd)
 
-    def run_multi_file_tests(self, category_root: pathlib.Path) -> None:
-        """Each subdir is a test: main.py, expected_exit, plus fixtures and the
-        Python-side evidence fixed by the verdict (the category directory name)."""
-        python_accepts = category_root.name != Verdict.PYTHON_ERROR
-        for dir_ in sorted(
-            path for path in category_root.rglob("*") if path.is_dir() and (path / MAIN).exists()
-        ):
-            with self.test(dir_.relative_to(ROOT)):
-                main_py = dir_ / MAIN
-                self.expect_exit(
-                    script_cmd(CHECK_PROGRAM, main_py),
-                    int((dir_ / EXPECTED_EXIT).read_text().strip()),
-                    error_substr=substr(dir_ / EXPECTED_ERROR),
-                )
-                self.python_evidence(
-                    main_py,
-                    python_accepts,
-                    expected_path=dir_ / EXPECTED_FILE,
-                    status_path=dir_ / EXPECTED_STATUS,
-                    cwd=dir_,
-                )
-
-    def module_test(self, path: pathlib.Path, module: pathlib.Path) -> None:
-        rel = path.relative_to(ROOT)
-        with self.test(rel):
-            dirs = path.parent.relative_to(module).parts
+    def run_test(self, path: pathlib.Path, tier: pathlib.Path, program: bool) -> None:
+        """A test's path under its tier is its specification: <verdict>[/<stage>]/.../<test>.
+        A program-level test is the directory of its main.py, checked as a program and run
+        from that directory; its expectations are siblings of main.py."""
+        test_dir = path.parent if program else None
+        with self.test((path.parent if program else path).relative_to(ROOT)):
+            dirs = (path.parent.parent if program else path.parent).relative_to(tier).parts
             verdict = Verdict(dirs[0])
             stage = Stage(dirs[1]) if len(dirs) > 1 and dirs[1] in Stage else None
             if stage == Stage.SYNTACTIC_ONLY:
-                self.python(path)
+                self.python(path, cwd=test_dir)
                 return
             status, message_checked, python_accepts = EXPECTATIONS[verdict, stage]
             err = substr(path.with_suffix(ERROR_EXPECTED)) if message_checked else None
-            self.check(path, status, err)
+            statuses = {int(status)}
+            if program and status == Exit.ILL_FORMED:
+                statuses.add(Exit.ILL_FORMED_PROGRAM)
+            self.expect_exit(
+                script_cmd(CHECK_PROGRAM if program else CHECK, path), statuses, error_substr=err
+            )
             if python_accepts is None:
                 return
             if stage == Stage.SYNTACTIC and python_accepts:
                 if path.with_suffix(EXCEPTION_EXPECTED).exists():
                     self._fail(Phase.RUN, f"must not have {EXCEPTION_EXPECTED}")
                 else:
-                    self.python(path)
+                    self.python(path, cwd=test_dir)
             else:
                 self.python_evidence(
                     path,
                     python_accepts,
                     expected_path=path.with_suffix(EXPECTED),
                     status_path=path.with_suffix(STATUS_EXPECTED),
+                    cwd=test_dir,
                 )
 
     def summary(self) -> None:
@@ -382,19 +368,19 @@ def main() -> None:
             r.ok("checker type-checks")
         check_mypy_compatibility(r, module)
 
-    last = None
-    for path in sorted(module.rglob("*.py"), key=lambda path: (path.parent.as_posix(), path.name)):
-        if HELPERS in path.parts:
-            continue
-        header = path.parent.relative_to(base)
-        if header != last:
-            print(header)
-            last = header
-        r.module_test(path, module)
-
-    for verdict in Verdict:
-        print(f"{PROGRAM_LEVEL}/{verdict}")
-        r.run_multi_file_tests(base / PROGRAM_LEVEL / verdict)
+    for tier, program in ((module, False), (base / PROGRAM_LEVEL, True)):
+        last = None
+        for path in sorted(
+            tier.rglob(MAIN if program else "*.py"),
+            key=lambda path: (path.parent.as_posix(), path.name),
+        ):
+            if HELPERS in path.parts or "__pycache__" in path.parts:
+                continue
+            header = (path.parent.parent if program else path.parent).relative_to(base)
+            if header != last:
+                print(header)
+                last = header
+            r.run_test(path, tier, program)
 
     r.summary()
 

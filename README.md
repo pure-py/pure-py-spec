@@ -79,13 +79,13 @@ pyproject.toml
 uv.lock
 ```
 
-Tests are organised by tier (module-level and program-level) and then by verdict. The verdict directory *is* the test's specification: the runner derives every assertion from the path.
+Tests are organised by tier (module-level and program-level) and then by verdict. The verdict directory *is* the test's specification: the runner derives every assertion from the path. A module-level test is a `.py` file with its expectations as siblings (`.expected`, `.error.expected`, `.exception.expected`, `.status.expected`); a program-level test is a directory under the same verdict and stage directories, holding `main.py`, its expectations as siblings of `main.py`, and the other modules of the program.
 - `semantically-valid/` — PurePy accepts; Python runs it and gives the same result, and it type-checks under mypy (`test/mypy.ini`)
 - `excluded/` — Python accepts but PurePy excludes by design; `syntactic/` is rejected at parse, `static/` at check, `dynamic/` at run time
 - `python-error/` — neither language gives a result (a genuine error); stages as above, plus `syntactic-only/`, tested via AST construction (not expressible as `.py`)
 - `pending/` — not yet decided by the checker; `semantically-valid/pending/` will become semantically valid, `<verdict>/static/pending/` will be rejected at check
 
-The invariant — `excluded` ⇒ Python runs it, `python-error` ⇒ Python raises — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails. A test that runs but exits with a nonzero status, via `sys.exit`, states the status in `.status.expected` (`expected_status` at program level).
+The invariant — `excluded` ⇒ Python runs it, `python-error` ⇒ Python raises — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails. A test that runs but exits with a nonzero status, via `sys.exit`, states the status in `.status.expected`.
 
 ## Reference checker (`src/`)
 
