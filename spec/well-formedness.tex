@@ -162,14 +162,12 @@ each iteration.
 \speconly{\subsubsection{Operators}\label{sec:well-formedness-operators}}%
 \paperonly{\paragraph{Operators.}}
 
+\input{spec/fig/operator-overloads}
+
 Each operator is overloaded as specified in \figref{operator-overloads}. A \emph{resolved overload}
 $((\tau_1, \tau_2), \tau)$ pairs operand \emph{bounds}
 with a result type; the judgements of the figure relate operand
-types to the resolved overloads of an operator.
-
-\input{spec/fig/operator-overloads}
-
-\noindent The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the result type
+types to the resolved overloads of an operator. The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the result type
 of the most specific overload at the operand types, $\resolveOp$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:resolve-op}}), so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
