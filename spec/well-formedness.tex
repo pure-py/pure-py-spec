@@ -258,7 +258,7 @@ another class, the base to \Added{name a class rather than an alias and to} reso
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
 scope; every \PurePy class must declare itself a dataclass. \Added{A \pyinline{type} statement $\exTypeAlias{x[\seq{\alpha}]}{\psi}$, such as \pyinline{type Pair[T] = tuple[T, T]},
 declares $x$ as an alias of the type denoted by $\psi$ with the type parameters $\seq{\alpha}$ in scope
-(\ruleName{type-alias}), and an application of the alias such as \pyinline{Pair[int]} denotes that type at the given
+(\ruleName{type-alias}). An application of the alias such as \pyinline{Pair[int]} denotes that type at the given
 arguments, here \pyinline{tuple[int, int]} (\ruleName{ty-alias}), so types never mention aliases. Since the names declared by a module are unbound
 until their declarations are checked (\secref{well-formedness-modules}), the body can name only a class or alias declared
 earlier in the module, and cannot name the alias itself. Python evaluates the body lazily, and mypy accordingly accepts a
