@@ -222,10 +222,7 @@ def check_statement(
 def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
     f_names: VarContext = {d.name: signature(d, mod_ctx) for d in defs}
     for d in defs:
-        xs = [a.arg for a in d.args.args]
-        dup = next((x for i, x in enumerate(xs) if x in xs[:i]), None)
-        if dup is not None:
-            raise IllFormedModule(d, reasons.DuplicateParameter(dup, d.name))
+        xs = parameter_names(d.args, d, d.name)
         locals_ = scope(set(xs), d.body)
         params = parameters(d, mod_ctx)
         check_assignments_declared(d.body, set(params))
@@ -235,6 +232,14 @@ def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
         r = check_body(d.body, body_ctx, declared, tail=True)
         if not isinstance(r, Returns) and not subtype(mod_ctx.Sigma, Primitive.NONE, declared):
             raise IllFormedModule(d, reasons.MissingReturn(d.name, declared))
+
+
+def parameter_names(args: ast.arguments, node: ast.AST, f: Var | None) -> list[Var]:
+    xs = [a.arg for a in args.args]
+    dup = next((x for i, x in enumerate(xs) if x in xs[:i]), None)
+    if dup is not None:
+        raise IllFormedModule(node, reasons.DuplicateParameter(dup, f))
+    return xs
 
 
 def check_returns_none(Sigma: ClassTable, s: ast.Return, declared: Type) -> None:
@@ -667,7 +672,7 @@ def applied_lambda(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> Type:
 
 
 def lambda_arguments(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> VarContext:
-    params = [a.arg for a in f.args.args]
+    params = parameter_names(f.args, f, None)
     if len(e.keywords) > 0:
         raise IllFormedModule(e, reasons.KeywordArgumentsNotConstructor())
     if len(params) != len(e.args):
@@ -721,7 +726,7 @@ def check_expr(e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
 
 
 def check_lambda(e: ast.Lambda, expected: Type, mod_ctx: ModuleContext) -> None:
-    params = [a.arg for a in e.args.args]
+    params = parameter_names(e.args, e, None)
     if not isinstance(expected, CallableType):
         raise IllFormedModule(e, reasons.LambdaTypeMismatch(expected, None))
     if len(params) != len(expected.params):
@@ -820,6 +825,8 @@ def type_alias_declared(node: ast.TypeAlias, mod_ctx: ModuleContext) -> TypeAlia
 def base_class(node: ast.ClassDef, mod_ctx: ModuleContext) -> ClassType:
     psi = parse_annotation(node.bases[0])
     assert isinstance(psi, TypeName)
+    if isinstance(resolve_name(psi.q, mod_ctx), TypeAlias):
+        raise IllFormedModule(node, reasons.NotClass(psi.q))
     tau = resolve_type(psi, node, mod_ctx)
     if not isinstance(tau, ClassType):
         raise IllFormedModule(node, reasons.NotClass(psi.q))

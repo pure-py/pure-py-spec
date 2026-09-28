@@ -338,10 +338,11 @@ class KeywordArgumentsNotConstructor:
 @dataclass(frozen=True)
 class DuplicateParameter:
     x: Var
-    f: Var
+    f: Var | None
 
     def message(self) -> str:
-        return f"duplicate parameter '{self.x}' in function '{self.f}'"
+        where = "lambda" if self.f is None else f"function '{self.f}'"
+        return f"duplicate parameter '{self.x}' in {where}"
 
 
 @dataclass(frozen=True)

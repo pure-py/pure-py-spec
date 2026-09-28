@@ -33,6 +33,7 @@
 \inferrule*[lab={\ruleName{class-extend}}]
 {
   \Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
+  \Gamma \vdash q' : \Type{D} \\
   \Sigma; \Gamma' \vdash q'[\seq{\psi}'] \synth D[\seq{\sigma}'] \\
   \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
