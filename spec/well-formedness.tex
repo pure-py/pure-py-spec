@@ -367,18 +367,6 @@ $\Sigma \vdash C[\seq{\sigma}'] \instanceAt D[\seq{\sigma}]$ holds by \ruleName{
 $\seq{\tau}$ has $\Sigma \vdash C[\seq{\tau}] \subty D[\seq{\sigma}]$ and all such candidates are equivalent, in which case
 $\seq{\sigma}' \tyEquiv \seq{\tau}$.
 \end{lemma}
-\begin{proof}[Proof sketch]
-Let $D[\seq{\rho}]$ be the instantiation of $D$ reached from $C[\seq{\alpha}]$ along the base classes. By
-\ruleName{subty-class-extend} and the invariance of type arguments, $C[\seq{\tau}]$ is below $D[\seq{\sigma}]$ exactly
-when $\subst{\seq{\tau}}{\seq{\alpha}}{\rho_i} \tyEquiv \sigma_i$ for each $i$. Where a parameter occurs in $\rho_i$ outside
-every union, the equation fixes it up to equivalence at the subterm of $\sigma_i$ in the same position, which is a
-candidate. Where it occurs only inside unions, a type that is not a union is below a union only through one of the
-disjuncts, so each subterm of $\sigma_i$ below the union is below the parameter's value or below the rest of the union,
-and replacing each value by the join of the subterms below it preserves the equations, which gives the first claim.
-For the second, if every solution had the same join, every subterm would be below every solution and the solutions
-would be equivalent; otherwise some subterm is below the rest of its union, and the joins with and without it are two
-candidates that are not equivalent.
-\end{proof}
 \end{AddedBlock}
 
 \speconly{\subsubsection{Shapes and shape typing}\label{sec:shapes}}%
