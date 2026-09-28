@@ -187,6 +187,10 @@ def check_module(
     return gamma, Sigma
 
 
+# Declared by every module
+NAME = "__name__"
+
+
 def check_module_(
     m: ast.Module,
     M: Mapping[Name, ast.Module],
@@ -196,10 +200,15 @@ def check_module_(
     if q in PREDEFINED_MODULES:
         return predefined_context(q), Sigma
     iotas, stmts = split_imports(m.body)
+    imported = {x for x, _ in declares_body(iotas)}
+    if NAME in imported:
+        binder = find_binder(iotas, NAME)
+        assert binder is not None
+        raise IllFormedModule(binder, reasons.Redeclaration(NAME))
     gamma, Sigma = check_imports_prefix(iotas, ModuleContext(gamma={}, M=M, q=q, Sigma=Sigma))
     body = stmts
-    bound = scope({x for x, _ in declares_body(iotas)}, body)
-    check_assignments_declared(body, set())
+    bound = scope(imported | {NAME}, body)
+    check_assignments_declared(body, {NAME})
     mod_ctx = check_top_seq(
         statements(body),
         ModuleContext(
@@ -243,7 +252,7 @@ def find_binder(stmts: list[ast.stmt], x: str) -> ast.stmt | None:
 
 def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: Name) -> Context:
     members = {x: final_ctx.gamma[x] for x in assigns_body(body)}
-    return override_context(submods(final_ctx.M, q), {**members, "__name__": Primitive.STR})
+    return override_context(submods(final_ctx.M, q), {**members, NAME: Primitive.STR})
 
 
 def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:

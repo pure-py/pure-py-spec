@@ -163,7 +163,7 @@ $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
 $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
 $\seq{\iota}$, its \emph{import prefix}, followed by a top-level statement $t$; since imports are not statements, they can appear neither
 within a statement nor after it. The statement begins with the
-assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$, which binds the name of the module when the module
+\Replaced{declaration $\exAssign{\pymath{\_\_name\_\_}\exAnnot{\tyStr}}{\nameOf(q)}$}{assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$}, which binds the name of the module when the module
 loads (\secref{well-formedness-modules}).
 
 A second map $\mathcal{P}$ gives the
