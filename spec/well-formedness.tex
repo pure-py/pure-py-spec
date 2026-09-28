@@ -421,10 +421,12 @@ one alternative of a union leaves a later variable case bound at the remaining m
 on sequences matches the sub-patterns of a tuple, list, dictionary or constructor pattern against the
 component shapes position by position\Deleted{, and the bindings of the positions, or of the keys of a dictionary
 pattern, compose by disjoint union, so a pattern that binds a name twice has no derivation}. The form on
-an ordered set of shapes $L$, used by the match rules, matches each shape of $L$ in turn. Some shapes of
+an ordered set of shapes $L$, used by the match rules, matches each shape of $L$ in turn. \Replaced{The pattern need not match every shape of $L$, so \ruleName{pat-shapes} takes the shapes of $L$
+matched by the pattern, of which there must be at least one, and passes the unmatched shapes into the
+residual untouched.}{Some shapes of
 $L$ may admit no derivation for the pattern, so \ruleName{pat-shapes} takes the shapes of $L$ that do
 admit a derivation, of which there must be at least one, and passes the remaining shapes into the
-residual untouched.
+residual untouched.}
 
 \input{spec/fig/pattern-matching/split}
 
