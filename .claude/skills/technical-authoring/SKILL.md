@@ -71,6 +71,8 @@ Direct, factual, conventional prose. Minimal: state the thing and stop. Every ru
   - After: "so types never mention aliases"
   The singular stays where one particular thing is meant ("a variable pattern matches any shape" describes
   each such pattern) and in lists, where items are plural noun phrases.
+- Do not repeat an article across the items of an enumeration that share it: "the residual and
+  remaining type", not "the residual and the remaining type".
 - Name things with nouns, not free relative clauses: "matched shapes", not "what it matches"; "the residual", not "what is left over".
 - A symbol must be bound in the sentence or by a judgement form stated just before it; otherwise name the thing.
   - Before: "A return checks its expression against τ" (nothing in the paragraph binds τ).
