@@ -364,7 +364,7 @@ instantiated class $D[\seq{\rho}]$ with $C$ an ancestor of $D$, the instance is 
 from $D[\seq{\rho}]$ along the base classes, which is unique because type arguments are invariant
 (\ruleName{instance-above}). If $\tau$ is $D[\seq{\sigma}]$ with $D$ an ancestor of $C$, the instantiations of $C$
 below $\tau$ are the $C[\seq{\tau}]$ for which the instantiation of $D$ reached from $C[\seq{\tau}]$ along the base
-classes has arguments equivalent to $\seq{\sigma}$, and Lemma~\ref{lem:candidate-instances} bounds the $\seq{\tau}$
+classes has arguments equivalent to $\seq{\sigma}$, and Lemma~\ref{lem:candidate-instances} bounds the instantiations
 to be examined to finitely many candidates: one candidate up to equivalence gives the instance
 (\ruleName{instance-below}), none means that $C$ has no instance at $\tau$, and two that are not equivalent mean
 that $C$ has an instantiation comparable with $\tau$ but no instance, so that a constructor pattern at $\tau$ is
@@ -372,12 +372,11 @@ ill-formed. At \tyObject{} and at \tyNever{} every instantiation of $C$ is compa
 instance only if it has no type parameters. At any other type $C$ has no instantiation comparable with $\tau$, and no instance.
 \begin{lemma}[Candidate instances]
 \label{lem:candidate-instances}
-Suppose $D \in \ancestors(\Sigma, C)$, with $\Sigma(C)$ having type parameters $\seq{\alpha}$. A \emph{candidate} for $C$ at
-$D[\seq{\sigma}]$ is a sequence $\seq{\tau}$ of the length of $\seq{\alpha}$ in which each $\tau_i$ is the join of a subset of
-$\subterms(\seq{\sigma}) \cup \set{\tyObject}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}). If any
-instantiation of $C$ is below $D[\seq{\sigma}]$, then some candidate $\seq{\tau}$ has $C[\seq{\tau}]$ below $D[\seq{\sigma}]$;
-and if two instantiations of $C$ that are not equivalent are below $D[\seq{\sigma}]$, then two such candidates are not
-equivalent.
+Suppose $D \in \ancestors(\Sigma, C)$. A \emph{candidate} for $C$ at $D[\seq{\sigma}]$ is an instantiation $C[\seq{\tau}]$ in
+which each $\tau_i$ is the join of a subset of $\subterms(\seq{\sigma}) \cup \set{\tyObject}$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}). If any instantiation of $C$ is below
+$D[\seq{\sigma}]$, then some candidate is below $D[\seq{\sigma}]$; and if two instantiations of $C$ that are not equivalent
+are below $D[\seq{\sigma}]$, then two candidates below $D[\seq{\sigma}]$ are not equivalent.
 \end{lemma}
 \end{AddedBlock}
 
