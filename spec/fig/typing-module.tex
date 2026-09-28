@@ -107,7 +107,7 @@
   \Sigma \vdash \modLoaded{q}{\Gamma}, x \cons \seq{x} \loadsAs \modLoaded{q}{\Gamma \extend \set{\bind{x}{\theta'}}} \binding \Sigma'
 }}
 \end{mathpar}
-\subcaption{\replaced{Loaded module $\theta$ with the submodules named by $\seq{x}$ statically loaded and nested as members is $\theta'$}{Reference $\theta$ for module $q$ loads as reference $\theta'$ for root of $q$, statically loading the modules containing $q$}}
+\subcaption{\replaced{Loaded module $\theta$ extends to $\theta'$ by statically loading the modules named along $\seq{x}$ and recording each as a member of its parent}{Reference $\theta$ for module $q$ loads as reference $\theta'$ for root of $q$, statically loading the modules containing $q$}}
 \end{subfigure}
 \caption{Import typing}
 \label{fig:typing-import-prefix}
