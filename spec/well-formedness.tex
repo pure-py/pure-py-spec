@@ -42,7 +42,7 @@ literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as 
 Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base (\ruleName{subty-class-extend}), and below $C[\seq{\sigma}]$ when $\seq{\tau}$ and $\seq{\sigma}$ are equivalent (\ruleName{subty-class}), so that type arguments are invariant, as for lists and dictionaries; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. \Replaced{A type that is not a union has one \emph{disjunct}, the type itself; the disjuncts of a union $\tyUnion{\sigma}{\tau}$ are the disjuncts of $\sigma$ together with the disjuncts of $\tau$.}{The \emph{members} of a union $\tyUnion{\sigma}{\tau}$ are the members of $\sigma$ and of $\tau$, and any other type is its own only member.} A union is above
 each of its \Replaced{disjuncts}{members} and below every type that is above all of them. A tuple type is covariant, below another of the
 same length when each of its components is below the corresponding component. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{pierce2002}. Lists and
-dictionaries are related only when their components are equivalent, since both are invariant in mypy. A callable type is contravariant in its parameters
+dictionaries are related only when their components are equivalent, since both are invariant in mypy\Added{ (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}})}. A callable type is contravariant in its parameters
 and covariant in its result, following mypy. The types with a length, namely lists, dictionaries,
 strings and tuples, are below \pyinline{Sized}. An \pyinline{int} is a \pyinline{float}, as PEP~484
 requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
@@ -241,7 +241,7 @@ declarations and \pyinline{type} statements are top-level forms}{a class declara
 \pyinline{return} requires \Replaced{$\tau$ to be equivalent to \pyinline{None}}{\pyinline{None} to be a subtype of $\tau$}. An expression statement synthesises a type and discards it
 (\ruleName{expr-stmt}). A call to a callable with result \tyNone{} is not an expression, because
 \ruleName{call} requires a result other than \tyNone, and is typed as a statement by \ruleName{call-stmt}.
-The restriction exists only for compatibility with mypy, which rejects any use of the value of such a call.
+\Replaced{The restriction is for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).}{The restriction exists only for compatibility with mypy, which rejects any use of the value of such a call.}
 
 A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment $\exAssign{x}{e}$ requires $x$ to be a declared but unassigned variable, and
@@ -276,12 +276,12 @@ its parameters, must be distinct from one another and from any pattern variables
 declared in the enclosing scope, where the same condition applies to them. The body is checked with the
 declared return type, and must have static outcome $\Returns$ unless \Replaced{the return type is equivalent to \pyinline{None}}{the function returns \pyinline{None}},
 so a function that declares a result definitely returns one. \Added{A return type such as $\tyUnion{\tyInt}{\tyNone}$
-does not exempt the body from returning, nor permit a bare \pyinline{return}, for compatibility with mypy.}
+does not exempt the body from returning, nor permit a bare \pyinline{return} (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).}
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement \Replaced{$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$}{$\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$} (\figref{typing-cases}), which threads
 \Replaced{a remaining type, starting from $\sigma$, and a residual $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
-through the cases and merges their outcomes into $S$}{a residual $L$ of shapes through the cases, starting from the shapes of $\sigma$ (\figref{shapes}), and merges
+through the cases, merging their outcomes into $S$}{a residual $L$ of shapes through the cases, starting from the shapes of $\sigma$ (\figref{shapes}), and merges
 their outcomes into $S$}. The \ruleName{match} rule applies when the \Replaced{final remaining type}{remaining type
 $\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}})} is $\tyNever$, meaning the match is
@@ -320,11 +320,8 @@ for a constructor pattern that matches every value of the class, and a tuple onl
 component, so cases that between them cover a field of a class leave an empty residual but a remaining
 type other than $\tyNever$. Exhaustiveness decided by the residual alone would therefore accept a function
 which returns from each case of such a match but which is rejected by mypy as not always returning. \Added{The
-remaining type also gives the types of pattern variables, so that they agree with mypy: after a case \pyinline{Box(None)} at
-a class with a field of type $\tyUnion{\tyInt}{\tyNone}$, a case \pyinline{Box(n)} binds \pyinline{n} at
-$\tyUnion{\tyInt}{\tyNone}$, although the residual has excluded \pyinline{None}, whereas after a case \pyinline{None} at
-$\tyUnion{\tyInt}{\tyNone}$ a case \pyinline{n} binds \pyinline{n} at \pyinline{int}, the remaining type. The residual
-decides reachability alone.} The
+remaining type also gives the types of pattern variables (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}), and the residual decides
+reachability alone.} The
 usefulness algorithm for ML~\cite{maranget2007} also checks reachability and exhaustiveness with a single
 relation. The residual plays the role of the term descriptions of \citet{sestoft1996}, and the uncovered
 sets of \citet{karachalias2015} likewise let the type exclude cases.
