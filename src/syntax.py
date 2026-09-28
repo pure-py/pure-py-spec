@@ -62,6 +62,10 @@ class PatTuple(ast.MatchSequence):
     pass
 
 
+class OpenTuple(ast.Tuple):
+    """Tuple display written without parentheses."""
+
+
 def render_pattern(p: ast.pattern) -> str:
     match p:
         case ast.MatchValue(value=e):
@@ -123,15 +127,27 @@ def fold_negative(node: ast.AST) -> ast.AST:
 
 
 def classify_sequence(source: str) -> Callable[[ast.AST], ast.AST]:
-    """Python's parser gives list and tuple patterns one node type; the source text tells them apart."""
+    """Python's parser gives list and tuple patterns one node type, and a tuple display one node with
+    or without parentheses; the source text tells them apart."""
 
     def classify(node: ast.AST) -> ast.AST:
-        if not isinstance(node, ast.MatchSequence):
-            return node
-        segment = ast.get_source_segment(source, node)
-        assert segment is not None
-        cls = PatList if segment.startswith("[") else PatTuple
-        return ast.copy_location(cls(patterns=node.patterns), node)
+        match node:
+            case ast.MatchSequence(patterns=ps):
+                segment = ast.get_source_segment(source, node)
+                assert segment is not None
+                if segment.startswith("["):
+                    return ast.copy_location(PatList(patterns=ps), node)
+                if segment.startswith("("):
+                    return ast.copy_location(PatTuple(patterns=ps), node)
+                return node
+            case ast.Tuple(elts=es, ctx=ctx):
+                segment = ast.get_source_segment(source, node)
+                assert segment is not None
+                if segment.startswith("("):
+                    return node
+                return ast.copy_location(OpenTuple(elts=es, ctx=ctx), node)
+            case _:
+                return node
 
     return classify
 
@@ -307,9 +323,11 @@ def check_syntax_pattern(node: ast.pattern) -> None:
         case ast.MatchAs():
             if node.pattern is not None:
                 check_syntax_pattern(node.pattern)
-        case ast.MatchSequence():
+        case PatList() | PatTuple():
             for p in node.patterns:
                 check_syntax_pattern(p)
+        case ast.MatchSequence():
+            raise Prohibited(node, "sequence pattern without brackets or parentheses")
         case ast.MatchClass():
             for p in list(node.patterns) + list(node.kwd_patterns):
                 check_syntax_pattern(p)
@@ -387,6 +405,8 @@ def check_syntax_expr(node: ast.expr) -> None:
         case ast.Lambda():
             check_syntax_arguments(node.args)
             check_syntax_expr(node.body)
+        case OpenTuple():
+            raise Prohibited(node, "tuple without parentheses")
         case ast.List() | ast.Tuple():
             for e in node.elts:
                 check_syntax_expr(e)

@@ -7,6 +7,7 @@
 \rowcolor{grammarheadcolor}Construct & Python & Exclusion & Mechanism \\
 Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & Static & Checked against \pyinline{bool} \\[1mm]
 Sequence patterns & List patterns match tuples, and tuple patterns lists & Static & List patterns match only lists, tuple patterns only tuples \\[1mm]
+Sequence patterns without delimiters & \pyinline{case a, b:} matches lists and tuples alike & Syntactic & Not in grammar; a tuple pattern is parenthesised, a list pattern bracketed \\[1mm]
 Constructor patterns & Positional class patterns may supply fewer sub-patterns than class has fields & Static & Require exact arity \\[1mm]
 Dictionary keys & Any hashable value, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Syntactic in patterns, static in expressions & Strings only \\[1mm]
 \pyinline{assert} message & Any object, shown in traceback & Static & Strings only \\[1mm]
