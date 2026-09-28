@@ -285,8 +285,9 @@ through the cases, merging their outcomes into $S$}{a residual $L$ of shapes thr
 their outcomes into $S$}. The \ruleName{match} rule applies when the \Replaced{final remaining type}{remaining type
 $\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}})} is $\tyNever$, meaning the match is
-exhaustive; the \ruleName{match-partial} rule applies otherwise, merging in $\Assigns{\varnothing}$
-for the values that fall through. The \Added{remaining type, the} residual, reachability and exhaustiveness are the subject of
+exhaustive; the \ruleName{match-partial} rule applies otherwise\Replaced{ and also merges in $\Assigns{\varnothing}$, the
+outcome of the path on which the scrutinee is not matched by any of the cases}{, merging in $\Assigns{\varnothing}$
+for the values that fall through}. The \Added{remaining type, the} residual, reachability and exhaustiveness are the subject of
 \secref{well-formedness-patterns}.
 
 \subsection{Pattern matching}
