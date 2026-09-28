@@ -459,6 +459,14 @@ class NoAttributes:
 
 
 @dataclass(frozen=True)
+class BareReturn:
+    tau: Type
+
+    def message(self) -> str:
+        return f"bare return in function with result type {render(self.tau)}"
+
+
+@dataclass(frozen=True)
 class MissingReturn:
     x: Var
     tau: Type
@@ -525,6 +533,7 @@ type Reason = (
     | LambdaTypeMismatch
     | NotSubscriptable
     | TupleIndexOutOfRange
+    | BareReturn
     | MissingReturn
     | MissingReturnMatchPartial
     | NotIterable

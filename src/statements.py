@@ -66,7 +66,7 @@ from operators import (
 )
 from reasons import IllFormedModule, MypyCompatibility
 from shapes import Shapes, shapes
-from subtyping import join_seq, subtype
+from subtyping import equivalent, join_seq, subtype
 from syntax import NotYetSupported, render_pattern
 from type_syntax import (
     CallableExpr,
@@ -230,8 +230,10 @@ def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
         body_ctx = override_gamma(mod_ctx, delta)
         declared = resolve_type(type_expr(d.returns), d, mod_ctx)
         r = check_body(d.body, body_ctx, declared, tail=True)
-        if not isinstance(r, Returns) and not subtype(mod_ctx.Sigma, Primitive.NONE, declared):
-            raise IllFormedModule(d, reasons.MissingReturn(d.name, declared))
+        if not isinstance(r, Returns) and not equivalent(mod_ctx.Sigma, declared, Primitive.NONE):
+            raise mypy_only_if(subtype(mod_ctx.Sigma, Primitive.NONE, declared))(
+                d, reasons.MissingReturn(d.name, declared)
+            )
 
 
 def parameter_names(args: ast.arguments, node: ast.AST, f: Var | None) -> list[Var]:
@@ -243,8 +245,15 @@ def parameter_names(args: ast.arguments, node: ast.AST, f: Var | None) -> list[V
 
 
 def check_returns_none(Sigma: ClassTable, s: ast.Return, declared: Type) -> None:
-    if not subtype(Sigma, Primitive.NONE, declared):
-        raise IllFormedModule(s, reasons.TypeMismatch(declared, Primitive.NONE))
+    if not equivalent(Sigma, declared, Primitive.NONE):
+        raise mypy_only_if(subtype(Sigma, Primitive.NONE, declared))(
+            s, reasons.BareReturn(declared)
+        )
+
+
+# Failure is for mypy compatibility only when the program is otherwise well-formed.
+def mypy_only_if(otherwise_well_formed: bool) -> type[IllFormedModule]:
+    return MypyCompatibility if otherwise_well_formed else IllFormedModule
 
 
 def scope(ys: set[Var], body: list[ast.stmt]) -> VarContext:
@@ -351,7 +360,7 @@ def check_match_cases(
         partial
         and tail
         and returns is not None
-        and not subtype(mod_ctx.Sigma, Primitive.NONE, returns)
+        and not equivalent(mod_ctx.Sigma, returns, Primitive.NONE)
         and len(residual) == 0
         and all(isinstance(r, Returns) for r in branches)
     ):

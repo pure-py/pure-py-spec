@@ -238,7 +238,7 @@ judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top
 declarations and \pyinline{type} statements are top-level forms, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
-\pyinline{return} requires \pyinline{None} to be a subtype of $\tau$. An expression statement synthesises a type and discards it
+\pyinline{return} requires $\tau$ to be equivalent to \pyinline{None}. An expression statement synthesises a type and discards it
 (\ruleName{expr-stmt}). A call to a callable with result \tyNone{} is not an expression, because
 \ruleName{call} requires a result other than \tyNone, and is typed as a statement by \ruleName{call-stmt}.
 The restriction exists only for compatibility with mypy, which rejects any use of the value of such a call.
@@ -275,8 +275,9 @@ enclosing scope referenced by the body must be definitely assigned at the point 
 whereas Python resolves the reference only when the body runs. As with any scope, the names declared in the function, including
 its parameters, must be distinct from one another and from any pattern variables in its body. The function names of the mutual region are not among these; they are
 declared in the enclosing scope, where the same condition applies to them. The body is checked with the
-declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
-so a function that declares a result definitely returns one.
+declared return type, and must have static outcome $\Returns$ unless the return type is equivalent to \pyinline{None},
+so a function that declares a result definitely returns one. A return type such as $\tyUnion{\tyInt}{\tyNone}$
+does not exempt the body from returning, nor permit a bare \pyinline{return}, for compatibility with mypy.
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typing-cases}), which threads
