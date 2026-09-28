@@ -328,7 +328,7 @@ subtracting a class only for a constructor pattern that matches every value of t
 refutable component. Cases that between them cover a field of a class therefore leave an empty residual but a remaining
 type other than $\tyNever$, so a function which returns from each of the cases is rejected as not always returning, and
 at a class with a field of type $\tyUnion{\tyInt}{\tyNone}$ a case \pyinline{Box(n)} after a case \pyinline{Box(None)}
-binds \pyinline{n} at $\tyUnion{\tyInt}{\tyNone}$ rather than at \pyinline{int}. Both verdicts are mypy's.}{A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. The match
+binds \pyinline{n} at $\tyUnion{\tyInt}{\tyNone}$ rather than at \pyinline{int}.}{A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. The match
 rules decide exhaustiveness not by the final residual but by the \emph{remaining type}
 $\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}), a coarser over-approximation
