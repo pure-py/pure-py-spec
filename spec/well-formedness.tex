@@ -116,9 +116,7 @@ In a subscript $\exSubscript{e}{e'}$ there is a rule for each container that $e$
 dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
 that synthesises a literal type gives the component type at that position, counting from the end when the index
 is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and any other index of type
-\pyinline{int} gives the join of the component types (\ruleName{subscript-tuple-int}). A negated numeric
-literal synthesises the negated literal type (\ruleName{unop-literal}), and \ruleName{unop} excludes that
-form, to keep the judgement deterministic. A subscript, attribute reference or call whose subject
+\pyinline{int} gives the join of the component types (\ruleName{subscript-tuple-int}). A subscript, attribute reference or call whose subject
 synthesises a union is typed at each member, with a variable in place of the subject, and synthesises the
 join of the results (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union}); generators need no
 such rule, because $\elemTy$ takes a union to the join of its members' element types.

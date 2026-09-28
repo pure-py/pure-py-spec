@@ -86,14 +86,6 @@
   \Sigma; \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau^\dagger
 }
 \and
-\inferrule*[lab={\ruleName{unop-literal}}]
-{
-  \strut
-}
-{
-  \Sigma; \Gamma \vdash \exUnOp{\pyinline{-}}{n} \synth \tyLiteral{-n}
-}
-\and
 \inferrule*[lab={\ruleName{syn-cond}}]
 {
   \Sigma; \Gamma \vdash e \checks \tyBool \\
@@ -170,12 +162,12 @@
 \inferrule*[lab={\ruleName{subscript-tuple-neg}}]
 {
   \Sigma; \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_m} \\
-  \Sigma; \Gamma \vdash e' \synth \tyLiteral{-n} \\
+  \Sigma; \Gamma \vdash e' \synth \tyLiteral{n} \\
   \\
-  0 < n \leq m
+  -m \leq n < 0
 }
 {
-  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{(m-n)+1}
+  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{m+n+1}
 }
 \and
 \inferrule*[lab={\ruleName{subscript-tuple-int}}]

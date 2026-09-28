@@ -111,6 +111,17 @@ def map_tree(f: Callable[[ast.AST], ast.AST], node: ast.AST) -> ast.AST:
     return f(node if unchanged else ast.copy_location(type(node)(**fields), node))
 
 
+def fold_negative(node: ast.AST) -> ast.AST:
+    """Unary minus applied to a number literal is a literal."""
+    match node:
+        case ast.UnaryOp(op=ast.USub(), operand=ast.Constant(value=n)) if isinstance(
+            n, (int, float)
+        ) and not isinstance(n, bool):
+            return ast.copy_location(ast.Constant(value=-n), node)
+        case _:
+            return node
+
+
 def classify_sequence(source: str) -> Callable[[ast.AST], ast.AST]:
     """Python's parser gives list and tuple patterns one node type; the source text tells them apart."""
 
@@ -126,7 +137,8 @@ def classify_sequence(source: str) -> Callable[[ast.AST], ast.AST]:
 
 
 def parse(source: str, filename: str) -> ast.Module:
-    m = map_tree(classify_sequence(source), ast.parse(source, filename=filename))
+    classify = classify_sequence(source)
+    m = map_tree(lambda node: classify(fold_negative(node)), ast.parse(source, filename=filename))
     assert isinstance(m, ast.Module)
     return m
 
@@ -286,9 +298,6 @@ def check_syntax_pattern(node: ast.pattern) -> None:
             match v:
                 case ast.Constant():
                     if isinstance(v.value, (int, float, str)):
-                        return
-                case ast.UnaryOp(op=ast.USub(), operand=ast.Constant(value=value)):
-                    if isinstance(value, (int, float)):
                         return
                 case ast.Attribute():
                     raise NotYetSupported(node, "attribute value patterns", 86)

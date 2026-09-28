@@ -18,22 +18,6 @@
   \rho, \ell, v \matches \noMatch
 }
 \and
-\inferrule*[lab={\ruleName{eval-pat-neg-lit}}]
-{
-  \eqOp(-n, v) = \pyinline{True}
-}
-{
-  \rho, -n, v \matches \matchOk{\varnothing}
-}
-\and
-\inferrule*[lab={\ruleName{eval-pat-neg-lit-no}}]
-{
-  \eqOp(-n, v) = \pyinline{False}
-}
-{
-  \rho, -n, v \matches \noMatch
-}
-\and
 \inferrule*[lab={\ruleName{eval-pat-var}}]
 {
   \strut

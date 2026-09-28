@@ -310,10 +310,6 @@ def literal(e: ast.expr) -> Literal | None:
     match e:
         case ast.Constant(value=v):
             return None if isinstance(v, (bytes, complex, EllipsisType)) else Literal(v)
-        case ast.UnaryOp(op=ast.USub(), operand=ast.Constant(value=n)):
-            if isinstance(n, bool) or not isinstance(n, (int, float)):
-                return None
-            return Literal(-n)
         case _:
             return None
 

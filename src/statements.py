@@ -432,9 +432,6 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             return binary(BINARY_NAMES[type(e.op)], e.left, e.right, e, mod_ctx)
         case ast.UnaryOp():
             operand = synth_expr(e.operand, mod_ctx)
-            negated = literal_type(e)
-            if negated is not None:
-                return negated
             name = UNARY_NAMES[type(e.op)]
             result = resolve_op_unary(mod_ctx.Sigma, name, operand)
             if result is None:
