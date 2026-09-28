@@ -47,7 +47,7 @@
 \and
 \inferrule*[lab={\ruleName{syn-call-lambda}}]
 {
-  \seq{x} \text{ distinct} \\
+  \added{\seq{x} \text{ distinct}} \\
   \Sigma; \Gamma \vdash \seq{e} \synth \seq{\tau} \\
   \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\tau}}} \vdash e \synth \tau
 }
@@ -85,6 +85,14 @@
 {
   \Sigma; \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau^\dagger
 }
+\and
+\deleted{\inferrule*[lab={\ruleName{unop-literal}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma \vdash \exUnOp{\pyinline{-}}{n} \synth \tyLiteral{-n}
+}}
 \and
 \inferrule*[lab={\ruleName{syn-cond}}]
 {
@@ -133,8 +141,8 @@
 \and
 \inferrule*[lab={\ruleName{subscript-str}}]
 {
-  \Sigma; \Gamma \vdash e \synth \sigma \\
-  \baseType(\sigma) = \tyStr \\
+  \Sigma; \Gamma \vdash e \synth \replaced{\sigma}{\tyStr} \\
+  \added{\baseType(\sigma) = \tyStr} \\
   \Sigma; \Gamma \vdash e' \checks \tyInt
 }
 {
@@ -163,12 +171,12 @@
 \inferrule*[lab={\ruleName{subscript-tuple-neg}}]
 {
   \Sigma; \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_m} \\
-  \Sigma; \Gamma \vdash e' \synth \tyLiteral{n} \\
+  \Sigma; \Gamma \vdash e' \synth \tyLiteral{\replaced{n}{-n}} \\
   \\
-  -m \leq n < 0
+  \replaced{-m \leq n < 0}{0 < n \leq m}
 }
 {
-  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{m+n+1}
+  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{\replaced{m+n+1}{(m-n)+1}}
 }
 \and
 \inferrule*[lab={\ruleName{subscript-tuple-int}}]

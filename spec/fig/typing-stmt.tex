@@ -72,7 +72,7 @@
 \and
 \inferrule*[lab={\ruleName{return-none}}]
 {
-  \Sigma \vdash \tau \tyEquiv \tyNone
+  \replaced{\Sigma \vdash \tau \tyEquiv \tyNone}{\Sigma \vdash \tyNone \subty \tau}
 }
 {
   \Sigma; \Gamma; \tau \vdash \exReturnNone : \Returns

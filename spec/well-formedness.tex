@@ -39,8 +39,8 @@ literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as 
 \speconly{\subsubsection{Subtyping}\label{sec:subtyping}}%
 \paperonly{\paragraph{Subtyping.}}
 
-Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base (\ruleName{subty-class-extend}), and below $C[\seq{\sigma}]$ when $\seq{\tau}$ and $\seq{\sigma}$ are equivalent (\ruleName{subty-class}), so that type arguments are invariant, as for lists and dictionaries; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. A type that is not a union has one \emph{disjunct}, the type itself; the disjuncts of a union $\tyUnion{\sigma}{\tau}$ are the disjuncts of $\sigma$ together with the disjuncts of $\tau$. A union is above
-each of its disjuncts and below every type that is above all of them. A tuple type is covariant, below another of the
+Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base (\ruleName{subty-class-extend}), and below $C[\seq{\sigma}]$ when $\seq{\tau}$ and $\seq{\sigma}$ are equivalent (\ruleName{subty-class}), so that type arguments are invariant, as for lists and dictionaries; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. \Replaced{A type that is not a union has one \emph{disjunct}, the type itself; the disjuncts of a union $\tyUnion{\sigma}{\tau}$ are the disjuncts of $\sigma$ together with the disjuncts of $\tau$.}{The \emph{members} of a union $\tyUnion{\sigma}{\tau}$ are the members of $\sigma$ and of $\tau$, and any other type is its own only member.} A union is above
+each of its \Replaced{disjuncts}{members} and below every type that is above all of them. A tuple type is covariant, below another of the
 same length when each of its components is below the corresponding component. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{pierce2002}. Lists and
 dictionaries are related only when their components are equivalent, since both are invariant in mypy. A callable type is contravariant in its parameters
 and covariant in its result, following mypy. The types with a length, namely lists, dictionaries,
@@ -116,10 +116,12 @@ In a subscript $\exSubscript{e}{e'}$ there is a rule for each container that $e$
 dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
 that synthesises a literal type gives the component type at that position, counting from the end when the index
 is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and any other index of type
-\pyinline{int} gives the join of the component types (\ruleName{subscript-tuple-int}). A subscript, attribute reference or call whose subject
-synthesises a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
+\pyinline{int} gives the join of the component types (\ruleName{subscript-tuple-int}). \Deleted{A negated numeric
+literal synthesises the negated literal type (\ruleName{unop-literal}), and \ruleName{unop} excludes that
+form, to keep the judgement deterministic.} A subscript, attribute reference or call whose subject
+synthesises a union is typed at each \Replaced{disjunct}{member}, with a variable in place of the subject, and synthesises the
 join of the results (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union}); generators need no
-such rule, because $\elemTy$ takes a union to the join of its disjuncts' element types.
+such rule, because $\elemTy$ takes a union to the join of its \Replaced{disjuncts'}{members'} element types.
 \citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form.
 
@@ -142,8 +144,8 @@ dictionary or comprehension takes the base type of the type synthesised by its e
 matching any other element type. An empty list or dictionary and a lambda have no
 synthesis rule at all, so checking is the only way to type them. A lambda applied to arguments is the
 exception, since the arguments give the parameter types, and the call then synthesises the type of the body
-or checks the body against an expected type (\ruleName{syn-call-lambda}, \ruleName{call-lambda}). The parameters of a
-lambda must be distinct, as for a function. A non-empty list has both, and the
+or checks the body against an expected type (\ruleName{syn-call-lambda}, \ruleName{call-lambda}). \Added{The parameters of a
+lambda must be distinct, as for a function.} A non-empty list has both, and the
 checking rule is still needed when the expected element type is wider than the type synthesised by the
 elements, since \pyinline{list} is invariant.
 
@@ -195,7 +197,7 @@ overloads give \pyinline{Any} whenever the exponent is not a literal, whereas th
 \begin{lemma}[Most specific overload]
 \label{lem:most-specific-overload}
 If neither $\sigma_1$ nor $\sigma_2$ is a subtype of \pyinline{Never} and some overload of $\odot$ applies at
-$(\sigma_1, \sigma_2)$, then $\resolveOp(\Sigma, \odot, \sigma_1, \sigma_2)$ is defined, and similarly for
+$(\sigma_1, \sigma_2)$, then $\resolveOp(\Sigma, \odot, \sigma_1, \sigma_2)$ is defined\Replaced{, and similarly for}{; likewise}
 $\resolveOp(\Sigma, \ominus, \sigma)$.
 \end{lemma}
 
@@ -234,11 +236,11 @@ A sequence $s\;s'$ (\ruleName{seq}) types $s$, then types $s'$ under $\Gamma$ ov
 by $s$. A conditional combines its
 branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
 Top-level statements are checked by a separate
-judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, class
-declarations and \pyinline{type} statements are top-level forms, and a plain statement is checked with no return type
+judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, \Replaced{class
+declarations and \pyinline{type} statements are top-level forms}{a class declaration is a top-level form}, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
-\pyinline{return} requires $\tau$ to be equivalent to \pyinline{None}. An expression statement synthesises a type and discards it
+\pyinline{return} requires \Replaced{$\tau$ to be equivalent to \pyinline{None}}{\pyinline{None} to be a subtype of $\tau$}. An expression statement synthesises a type and discards it
 (\ruleName{expr-stmt}). A call to a callable with result \tyNone{} is not an expression, because
 \ruleName{call} requires a result other than \tyNone, and is typed as a statement by \ruleName{call-stmt}.
 The restriction exists only for compatibility with mypy, which rejects any use of the value of such a call.
@@ -254,15 +256,15 @@ definitions and modules introduce the variables of the scope as unbound, using t
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
 the class name to $\Type{C}$, resolves the field annotations with its type parameters in scope, and requires the fields it declares to be distinct and, when it extends
-another class, the base to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
+another class, the base to \Added{name a class rather than an alias and to} resolve to an instantiated class, and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
-scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement binds its name to the type alias
+scope; every \PurePy class must declare itself a dataclass. \Added{A \pyinline{type} statement binds its name to the type alias
 $\TypeAlias{\seq{\alpha}}{\tau}$, where $\tau$ is the type denoted by its body with the type parameters $\seq{\alpha}$ in scope
 (\ruleName{type-alias}). A type expression that applies the alias to type arguments denotes the instantiation of $\tau$ at
 those arguments (\ruleName{ty-alias}), so a type never mentions an alias. Since the names declared by a module are unbound
 until their declarations are checked (\secref{well-formedness-modules}), the body can name only a class or alias declared
 earlier in the module, and cannot name the alias itself. Python evaluates the body lazily, and mypy accordingly accepts a
-forward reference in it and a self-reference under a type constructor. Each rule that takes an annotation resolves it to a type
+forward reference in it and a self-reference under a type constructor.} Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
 
 A mutual region of function definitions (\ruleName{def}) resolves the annotations of each definition to a
@@ -275,9 +277,9 @@ enclosing scope referenced by the body must be definitely assigned at the point 
 whereas Python resolves the reference only when the body runs. As with any scope, the names declared in the function, including
 its parameters, must be distinct from one another and from any pattern variables in its body. The function names of the mutual region are not among these; they are
 declared in the enclosing scope, where the same condition applies to them. The body is checked with the
-declared return type, and must have static outcome $\Returns$ unless the return type is equivalent to \pyinline{None},
-so a function that declares a result definitely returns one. A return type such as $\tyUnion{\tyInt}{\tyNone}$
-does not exempt the body from returning, nor permit a bare \pyinline{return}, for compatibility with mypy.
+declared return type, and must have static outcome $\Returns$ unless \Replaced{the return type is equivalent to \pyinline{None}}{the function returns \pyinline{None}},
+so a function that declares a result definitely returns one. \Added{A return type such as $\tyUnion{\tyInt}{\tyNone}$
+does not exempt the body from returning, nor permit a bare \pyinline{return}, for compatibility with mypy.}
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typing-cases}), which threads
@@ -326,10 +328,10 @@ sets of \citet{karachalias2015} likewise let the type exclude cases.
 
 A pattern must \emph{check} against the scrutinee type, $\Sigma; \Gamma \vdash p \checks \tau$ (\figref{checking-pat}), before it is matched against the residual (\ruleName{match-case}). The judgement holds when every tuple pattern in $p$ is at a type which has no list values, every list pattern is at a type which has no tuple values, and every constructor pattern is at a type with at most one comparable instantiation of its class, up to equivalence. List values and tuple values are defined by subtyping:
 \begin{defalign}
-\tau \text{ has list values} & {}\iff \Sigma \vdash \tyList{\sigma} \subty \tau \text{ for some } \sigma \text{, or a disjunct of } \tau \text{ is a type variable} \\
-\tau \text{ has tuple values} & {}\iff \Sigma \vdash \tyTuple{\seq{\sigma}} \subty \tau \text{ for some } \seq{\sigma} \text{, or a disjunct of } \tau \text{ is a type variable}
+\tau \text{ has list values} & {}\iff \Sigma \vdash \tyList{\sigma} \subty \tau \text{ for some } \sigma \text{, or a \replaced{disjunct}{member} of } \tau \text{ is a type variable} \\
+\tau \text{ has tuple values} & {}\iff \Sigma \vdash \tyTuple{\seq{\sigma}} \subty \tau \text{ for some } \seq{\sigma} \text{, or a \replaced{disjunct}{member} of } \tau \text{ is a type variable}
 \end{defalign}
-So list types, $\tySized$ and $\tyObject$ have list values; tuple types, $\tySized$ and $\tyObject$ have tuple values; and a type variable, which may stand for any type, has both. The rules check a sub-pattern at the type of its position, a tuple component, list element, dictionary value or field, and a pattern at a union at each of its disjuncts. A pattern also checks against a type which has no disjunct of the form matched by the pattern: a tuple pattern when no disjunct is a tuple type of the pattern's length, a list pattern when no disjunct is a list type, a dictionary pattern when no disjunct is a dictionary type, and a constructor pattern when its class has no comparable instantiation (\ruleName{check-tuple-none}, \ruleName{check-list-none}, \ruleName{check-dict-none}, \ruleName{check-constr-none}). Such a pattern matches no shape of the type, so at one disjunct of a union it leaves the values of that disjunct to later cases, and a case with a pattern matching no shape at all is unreachable.
+So list types, $\tySized$ and $\tyObject$ have list values; tuple types, $\tySized$ and $\tyObject$ have tuple values; and a type variable, which may stand for any type, has both. The rules check a sub-pattern at the type of its position, a tuple component, list element, dictionary value or field, and a pattern at a union at each of its \Replaced{disjuncts}{members}. \Replaced{A pattern also checks against a type which has no disjunct of the form matched by the pattern: a tuple pattern when no disjunct is a tuple type of the pattern's length, a list pattern when no disjunct is a list type, a dictionary pattern when no disjunct is a dictionary type, and a constructor pattern when its class has no comparable instantiation (\ruleName{check-tuple-none}, \ruleName{check-list-none}, \ruleName{check-dict-none}, \ruleName{check-constr-none}). Such a pattern matches no shape of the type, so at one disjunct of a union it leaves the values of that disjunct to later cases, and a case with a pattern matching no shape at all is unreachable.}{A pattern also checks against a type when it cannot match any value of that type, as with a tuple pattern at a tuple type of another length or a constructor pattern naming a class with no comparable instantiation (\ruleName{check-tuple-none}, \ruleName{check-list-none}, \ruleName{check-dict-none}, \ruleName{check-constr-none}); matching then leaves the values of the type to later cases.}
 
 The conditions on tuple and list patterns ensure that pattern matching always has a result. Under the evaluation rules, matching a tuple pattern against a list or a list pattern against a tuple is undefined\speconly{ (\figref{eval-pat})}, although Python permits both. Both forms of pattern therefore fail at $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$, at $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$, and at a type variable.
 
@@ -358,7 +360,7 @@ well-formed: each excluded head is typed at the type of the shape (at $\tyStr$, 
 dictionary shape) and each component shape at the type of that component.
 
 The auxiliary function $\shapes(\Sigma, \tau, H)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:shapes}}) gives the shapes of $\tau$
-once the heads in $H$ are excluded. A union contributes the shapes of its disjuncts and a dictionary type
+once the heads in $H$ are excluded. A union contributes the shapes of its \Replaced{disjuncts}{members} and a dictionary type
 the dictionary form; every other type contributes the single shape $\shapeAny{\tau}{H}$, or no shape at
 all when $H$ exhausts $\tau$. The rest form therefore never carries a union or dictionary type, and
 \ruleName{shape-rest} states this restriction as a side condition.
@@ -402,10 +404,10 @@ dictionaries that lack the key; once every key of the pattern is in $\beta$ the 
 dictionary and leaves the empty residual.
 
 The cases needed to exhaust a match therefore depend on the type of the scrutinee: a union is exhausted
-by covering each disjunct, a class type by a pattern for the class itself, \pyinline{bool} by
+by covering each \Replaced{disjunct}{member}, a class type by a pattern for the class itself, \pyinline{bool} by
 \pyinline{True} and \pyinline{False}, and a dictionary type by the empty dictionary pattern, while \pyinline{int}, \pyinline{str} and lists have
 unboundedly many heads and need a variable or wildcard. A literal-typed scrutinee is exhausted by covering
-its literals, so \pyinline{x: Literal[42] = 42} admits a match with a case for \pyinline{42} alone, while
+its literals, so \Replaced{\pyinline{x: Literal[42] = 42}}{\pyinline{x = 42}} admits a match with a case for \pyinline{42} alone, while
 \pyinline{x: int = 42} keeps the type open. Over
 $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave the empty residual,
@@ -449,7 +451,7 @@ body.
 
 \input{spec/fig/typing-module}
 
-The signature $\Gamma$ produced by static loading (\figref{typing-module}) comprises the classes, type aliases
+The signature $\Gamma$ produced by static loading (\figref{typing-module}) comprises the classes\Added{, type aliases}
 and variables defined by a module, together with its intrinsic \pyinline{__name__} and a stub for each submodule,
 but not the names that it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
 name is a private dependency, not re-exported as part of the interface. Submodule stubs and the bindings of the module
