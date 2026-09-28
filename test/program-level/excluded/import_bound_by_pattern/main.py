@@ -1,4 +1,4 @@
-# rule: module
+# rule: pat-var
 from m import x
 
 match [1]:

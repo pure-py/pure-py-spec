@@ -1,4 +1,4 @@
-# rule: pat-as
+# rule: split-literal
 v: int = 1
 match v:
     case 1:

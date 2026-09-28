@@ -1,4 +1,4 @@
-# rule: def
+# rule: module
 b: bool = True
 
 def g() -> int:

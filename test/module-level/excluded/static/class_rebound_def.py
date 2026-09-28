@@ -1,4 +1,4 @@
-# rule: def
+# rule: module
 from dataclasses import dataclass
 
 

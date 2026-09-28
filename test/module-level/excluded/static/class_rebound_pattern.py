@@ -1,4 +1,4 @@
-# rule: pat-var
+# rule: module
 from dataclasses import dataclass
 
 

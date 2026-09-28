@@ -1,4 +1,4 @@
-# rule: split-tuple
+# rule: pat-var
 def f(t: tuple[int | str, int]) -> int:
     match t:
         case s:

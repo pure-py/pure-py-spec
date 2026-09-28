@@ -1,0 +1,1 @@
+expected type tuple[int, str, int], given tuple[int, str]

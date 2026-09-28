@@ -1,4 +1,4 @@
-# rule: module
+# rule: def-body
 def f(b: bool) -> int:
     if b:
         y: int = 1

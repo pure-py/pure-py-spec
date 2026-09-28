@@ -1,4 +1,4 @@
-# rule: def
+# rule: def-body
 def f() -> int:
     x: int = 5
     def x(n: int) -> int:

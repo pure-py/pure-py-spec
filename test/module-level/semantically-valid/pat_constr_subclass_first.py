@@ -1,4 +1,4 @@
-# rule: split-subclass
+# rule: split-class
 from dataclasses import dataclass
 
 @dataclass

@@ -1,4 +1,4 @@
-# rule: class
+# rule: module
 from dataclasses import dataclass
 from m import C
 
