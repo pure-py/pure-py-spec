@@ -104,10 +104,6 @@ def signature(d: ast.FunctionDef, mod_ctx: ModuleContext) -> CallableType:
     )
 
 
-def parameters(d: ast.FunctionDef, mod_ctx: ModuleContext) -> VarContext:
-    return {a.arg: resolve_type(type_expr(a.annotation), a, mod_ctx) for a in d.args.args}
-
-
 def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
     match psi:
         case Primitive():
@@ -214,26 +210,28 @@ def check_statement(
     s: Statement, mod_ctx: ModuleContext, returns: Type | None, tail: bool = False
 ) -> StaticOutcome:
     if isinstance(s, list):
-        check_bodies(s, mod_ctx)
-        return Assigns({d.name: signature(d, mod_ctx) for d in s})
+        return check_defs(s, mod_ctx)
     return check_stmt(s, mod_ctx, returns, tail)
 
 
-def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
-    f_names: VarContext = {d.name: signature(d, mod_ctx) for d in defs}
-    for d in defs:
-        xs = parameter_names(d.args, d, d.name)
-        locals_ = scope(set(xs), d.body)
-        params = parameters(d, mod_ctx)
-        check_assignments_declared(d.body, set(params))
-        delta = {**f_names, **params, **locals_}
-        body_ctx = override_gamma(mod_ctx, delta)
-        declared = resolve_type(type_expr(d.returns), d, mod_ctx)
-        r = check_body(d.body, body_ctx, declared, tail=True)
-        if not isinstance(r, Returns) and not equivalent(mod_ctx.Sigma, declared, Primitive.NONE):
-            raise mypy_only_if(subtype(mod_ctx.Sigma, Primitive.NONE, declared))(
-                d, reasons.MissingReturn(d.name, declared)
-            )
+def check_defs(ds: list[ast.FunctionDef], mod_ctx: ModuleContext) -> Assigns:
+    taus = {d.name: signature(d, mod_ctx) for d in ds}
+    delta: VarContext = {**taus}
+    for d in ds:
+        def_body(d, taus[d.name], override_gamma(mod_ctx, delta))
+    return Assigns(delta)
+
+
+def def_body(d: ast.FunctionDef, tau: CallableType, mod_ctx: ModuleContext) -> None:
+    xs = parameter_names(d.args, d, d.name)
+    check_assignments_declared(d.body, set(xs))
+    params = dict(zip(xs, tau.params, strict=True))
+    body_ctx = override_gamma(mod_ctx, {**params, **scope(set(xs), d.body)})
+    r = check_body(d.body, body_ctx, tau.result, tail=True)
+    if not isinstance(r, Returns) and not equivalent(mod_ctx.Sigma, tau.result, Primitive.NONE):
+        raise mypy_only_if(subtype(mod_ctx.Sigma, Primitive.NONE, tau.result))(
+            d, reasons.MissingReturn(d.name, tau.result)
+        )
 
 
 def parameter_names(args: ast.arguments, node: ast.AST, f: Var | None) -> list[Var]:
