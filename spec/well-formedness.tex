@@ -268,14 +268,15 @@ schemes, and the \ruleName{def-body} rule checks each definition against its typ
 body $s$.}{A mutual region of function definitions (\ruleName{def}) resolves the annotations of each definition to a
 \pyinline{Callable} type (\ruleName{def-signature}, \figref{typing-def}), binds the names of the mutual region,
 including the name of each function itself, at those types, and checks each definition against its type
-(\ruleName{def-body}).} \added{A type scheme without type parameters is written as its \pyinline{Callable} type, so a function without type parameters is a variable like any other, whereas a generic function is not an expression on its own.} A definition binds its parameters at their annotated types; variables declared or
-assigned in the body start unbound, emulating Python's scoping of function bodies, which
+(\ruleName{def-body}).} \added{A type scheme without type parameters is written as its \pyinline{Callable} type, so a function without type parameters is a variable like any other, whereas a generic function is not an expression on its own.} \replaced{The parameters $\seq{x}$ are bound at the types denoted by $\seq{\psi}$}{A definition binds its parameters at their annotated types}; variables declared or
+assigned in \replaced{$s$}{the body} start unbound, emulating Python's scoping of function bodies, which
 prefers a locally bound name to one visible in an enclosing scope. A variable of the
 enclosing scope referenced by the body must be definitely assigned at the point at which the function is defined,
 whereas Python resolves the reference only when the body runs. As with any scope, the names declared in the function, including
-its parameters, must be distinct from one another and from any pattern variables in its body. The function names of the mutual region are not among these; they are
-declared in the enclosing scope, where the same condition applies to them. The body is checked with the
-declared return type, and must have static outcome $\Returns$ unless the return type is equivalent to \pyinline{None},
+\replaced{the parameters $\seq{x}$}{its parameters}, must be distinct from one another and from any pattern variables in \replaced{$s$}{its body}. \replaced{The function names of the mutual region are
+declared in the enclosing scope rather than in the function, and must be distinct from the other names declared there.}{The function names of the mutual region are not among these; they are
+declared in the enclosing scope, where the same condition applies to them.} The body \added{$s$} is checked with the
+\replaced{return type denoted by $\psi$}{declared return type}, and must have static outcome $\Returns$ unless \replaced{that type}{the return type} is equivalent to \pyinline{None},
 so a function that declares a result definitely returns one. A return type such as $\tyUnion{\tyInt}{\tyNone}$
 does not exempt the body from returning, nor permit a bare \pyinline{return}, for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).
 
