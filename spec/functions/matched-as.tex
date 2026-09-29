@@ -6,5 +6,6 @@
 \matchedAs(\Sigma, \Gamma, \tyTuple{\tau_1, \ldots, \tau_n}, \patTuple{p_1, \ldots, p_n}) &{}= \tyTuple{\matchedAs(\Sigma, \Gamma, \tau_1, p_1), \ldots, \matchedAs(\Sigma, \Gamma, \tau_n, p_n)} \\*
 \matchedAs(\Sigma, \Gamma, \tyList{\tau}, \patList{\seq{p}}) &{}= \tyList{\tau} \\*
 \matchedAs(\Sigma, \Gamma, \tyDict{\tau}, \patDict{\bind{\seq{w}}{\seq{p}}}) &{}= \tyDict{\tau} \\*
-\matchedAs(\Sigma, \Gamma, \tau, \patConstr{q}{a}) &{}= \meetTy{\Sigma}{\tau}{C[\seq{\sigma}]} && \text{if } \Gamma \vdash q : \Type{C} \text{ and } \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau \\*
+\matchedAs(\Sigma, \Gamma, \tau, \patConstr{q}{a}) &{}= \meetTy{\Sigma}{\tau}{C[\seq{\sigma}]} \\*
+&\qquad \rlap{$\text{if } \Gamma \vdash q : \Type{C} \text{ and } \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$} \\*
 \matchedAs(\Sigma, \Gamma, \tau, p) &{}= \tyNever && \text{otherwise}
