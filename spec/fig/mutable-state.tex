@@ -13,7 +13,6 @@ Item assignment \pyinline{xs[0] = v} & Updates container in place & Syntactic & 
 Attribute assignment \pyinline{p.x = v} & Updates object in place & Syntactic & Not in grammar; assignment targets are variables \\[1mm]
 Mutating methods, such as \pyinline{list.append} & Update value in place & \replaced{Static}{Dynamic} & \replaced{Attribute reference has no rule}{Attribute reference undefined} \\[1mm]
 Reassignment & Changes value of variable & Static & Variable declared once and assigned at most once on any path \\[1mm]
-\added{Repeated name in a from-import} & \added{Binds name twice} & \added{Static} & \added{Imported names distinct (\ruleName{from-import})} \\[1mm]
 Lambdas capturing comprehension variable & Variable mutated on each iteration; lambda sees final value & Static & Lambda may not capture generator variable
 \end{tabular}
 \caption{Python mutation of state excluded by \PurePy}
