@@ -5,11 +5,11 @@ description: House style for drafting and editing technical prose (papers, speci
 
 # Technical authoring style
 
-Direct, factual, conventional prose. Minimal: state the thing and stop. Every rule below comes from a specific correction during drafting; the before/after pairs are from those sessions.
+Direct, factual, conventional prose: state the thing and stop.
 
 ## Sentence construction
 
-- Avoid overly pity constructions: "It's yours, not a leftover." is too blunt and relies too heavily on the comma as a pivot from assertion to contrast point.
+- No pithy constructions pivoting on a comma from assertion to contrast: "It's yours, not a leftover."
 - Spell out logical connectives; prefer "because X" or "so that X" over a bare colon-assertion.
   - Before: "The Boolean Jacobian instead records 1: disjunction cannot cancel."
   - After: "The Boolean Jacobian instead records 1, because dependency information combines by disjunction and disjunction cannot cancel."
@@ -22,25 +22,21 @@ Direct, factual, conventional prose. Minimal: state the thing and stop. Every ru
   - Before: "A match scrutinee synthesises a type, and each case checks against it."
   - After: "A match scrutinee synthesises a type, against which each case is checked."
   - Before: "every rule passes it down unchanged, and a return has no rule where it is empty" (the second "it" reads as the return).
-  This belongs with the comma-pivot and cleft rules above: all three use rhythm where a subordinating word would state the relation.
 - Do not hang a comparison on a trailing "as in X" or "as X do", and never end a sentence on "do" or "does" standing in for an earlier verb phrase; name the shared thing and state the relation, or lead with "following".
   - Before: "Matching a pattern against a shape takes the scrutinee's type into account, as the uncovered sets of Karachalias et al. do."
   - After: "Matching a pattern against a shape takes the scrutinee's type into account, following the uncovered sets of Karachalias et al."
-- Clause-final pro-forms ("leaves none", "the others", "the same holds", "so does") are a verbal tic: resist them even where unambiguous, because the pattern becomes conspicuous with repetition. Pointing back is fine when deliberate and clear; the default is to repeat the noun ("leaves an empty residual", "the remaining members") or restructure.
+- Avoid clause-final pro-forms ("leaves none", "the others", "the same holds", "so does") even where unambiguous; repeat the noun ("leaves an empty residual", "the remaining members") or restructure.
 - No zero relative clauses stacking a noun against a bare subject-verb ("every edge a rule adds"); use a
   participle ("every edge added by a rule").
   - Before: "Every edge a rule adds runs forward in evaluation order."
   - After: "Every edge added by a rule points forward in evaluation order."
-- Object relative clauses are a recurring problem. In "the values that no case matches", the head noun
-  "values" is the object of the verb inside the clause: the reader holds the noun while a new subject
-  ("no case") appears, then attaches the noun as the object of "matches". The construction has three
-  forms, all banned:
+- Object relative clauses, in which the head noun is the object of the verb inside the clause ("the
+  values that no case matches"), are banned in all three forms:
   1. Relativiser dropped: "the values no case matches", "the type the expression synthesises", "the
      variables the body assigns".
   2. Relativiser present: "the values that no case matches", "the type which the expression synthesises".
   3. Reduced to a passive participle whose agent carries a negation or a quantifier: "the values matched
-     by no case", "the shapes matched by every case", "a name bound by neither branch". The negation or
-     quantifier is hidden in the agent phrase and the reader has to expand it.
+     by no case", "the shapes matched by every case", "a name bound by neither branch".
 
   The fix is to make the head noun the subject of its own modifier:
   - Name the thing where a term or metafunction exists: "the residual", not "the values that no case
@@ -65,8 +61,7 @@ Direct, factual, conventional prose. Minimal: state the thing and stop. Every ru
   "not matched by any of the cases" (the cases of this match), not "not matched by any case"; "each of
   the branches", not "each branch". This applies only when a specific set is in scope. A general claim
   keeps the bare noun: "a variable pattern matches any shape".
-- Make a general claim in the plural rather than with a generic singular and its indefinite article; the
-  singular reads as a claim about one thing and stacks articles.
+- Make a general claim in the plural rather than with a generic singular and its indefinite article.
   - Before: "so a type never mentions an alias"
   - After: "so types never mention aliases"
   The singular stays where one particular thing is meant ("a variable pattern matches any shape" describes
@@ -81,11 +76,9 @@ Direct, factual, conventional prose. Minimal: state the thing and stop. Every ru
 - No nested colons or semicolons within a sentence.
 - Never open a sentence with a metafunction name, a rule name, or other mathematics ("captures(s) is the set of ...", "var applies whenever ..."); lead with a word ("The set of ... is captures(s)", "The var rule applies whenever ...").
 - A condition takes "if" or "when", not "where": "undefined if two declarations share a name". "Where" reads as a place, so reserve it for quantifying over positions ("the rows differ where the pattern is a literal") and for binding a symbol ("where n is the arity").
-- State the goal before the construction; do not stipulate a requirement ("we require the meet to cohere") before saying what it achieves — it reads as apropos of nothing. Similarly avoid "the coherence pays off", which implies an obligation never stated.
+- State the goal before the construction: not "we require the meet to cohere" before saying what coherence achieves, and not "the coherence pays off", which implies an obligation never stated.
 
 ## Word choice
-
-Each of these has drawn a correction:
 
 - Editorial colour and weasel-words: "honest"/"honestly", "fib", "conceal", "arguably", "to be fair", "clean", "obvious", "simply".
 - Metaphor and private jargon: "lands", "spine", "swept across", "walking the axis", "destination", "stage-factorisation" and similar compounds. "Story" sparingly; prefer a concrete noun ("the semimodule picture").
@@ -102,7 +95,7 @@ Each of these has drawn a correction:
 - Introduce a term before relying on it; if it first appears mid-argument ("orthogonality", "specialising", "De Morgan dual"), move its introduction to where the concept first appears. Italicise on first definition only, and drop italics that add nothing.
 - Qualify a noun that the document uses for more than one kind of thing wherever the bare noun could be misread: a context entry or a class entry, not "entry".
 - Do not shorten a term to its head noun: "mutual region", never "region" on its own, even on a
-  second mention in the same paragraph. The head noun alone reads as an ordinary word.
+  second mention in the same paragraph.
 - Keep variable sorts consistent within a section (a, b for scalars; x, y for semimodule elements).
 - Use every metavariable of a sort before reaching for a prime: two types are sigma and tau, not tau and tau prime. A prime is for the third of a sort, or where the two are the same thing at different stages.
 - One notation per object across the paper: S² rather than a mix of S ⊕ S and 𝕀; follow whichever convention earlier sections established.
@@ -116,9 +109,7 @@ Each of these has drawn a correction:
 
 ## Comments and checklists
 
-- Do not state a date or time without first checking it against the clock or the record; relative
-  words like "yesterday" and "today" go wrong when a session crosses midnight.
-
+- Check a date or time against the clock or the record before stating it, including "yesterday" and "today".
 - Code comments: see the coding-conventions skill.
 - Checklists and issues: state the task directly ("Move X here; add Y"), no scene-setting.
 - Meta-commentary about the document (what moved where, what supersedes what) belongs in the issue tracker, never in the text — including inside change markup.
@@ -138,7 +129,6 @@ Each of these has drawn a correction:
 
 ## References in conversation
 
-- When referring to a figure, lemma, definition or section of the specification or paper, give its name
-  and its number in the current PDF, so it can be found without a search. For example: the shape-typing
-  figure, Figure 4.13 in the specification. Look the number up (a draft-mode `pdflatex` run's `.aux` has
-  every label's number); don't guess it.
+- Refer to a figure, lemma, definition or section of the specification or paper by name and number in
+  the current PDF (the shape-typing figure, Figure 4.13 in the specification). Look the number up in the
+  `.aux` of a draft-mode `pdflatex` run; don't guess it.

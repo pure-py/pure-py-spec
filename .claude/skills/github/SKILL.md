@@ -7,19 +7,18 @@ description: Conventions for commits, GitHub issues, pull requests, the project 
 
 ## Terse style
 
-Commit messages, issue titles and bulleted lists are telegraphic. Write them tersely:
+Commit messages, issue titles and bulleted lists are telegraphic:
 
 - Drop articles and filler ("Rebinds variable", not "Rebinds a variable")
-- Titles and task-list items are noun phrases, naming the thing, not the action ("Syntax of types", not "Define the syntax of types")
-- One point per bullet; state it and stop, no framing or hedging clauses
+- Titles and task-list items are noun phrases naming the thing, not the action ("Syntax of types", not "Define the syntax of types")
+- One point per bullet, no framing or hedging clauses
 - No weasel-words ("honest", "clean", "obvious", "simply")
 - No trailing period on a bullet or a title
-- Commit subject line: short, imperative or noun phrase; put any detail in the body
+- Commit subject line short, imperative or noun phrase; detail in the body
 
 ## Commits
 
-- Fix a committed mistake with a new commit; never amend, and never `git stash`. History is linear
-  and every unit of work is visible
+- Fix a committed mistake with a new commit; never amend, and never `git stash`
 
 ## Permissions
 
@@ -28,16 +27,15 @@ Commit messages, issue titles and bulleted lists are telegraphic. Write them ter
 
 ## Referring to an issue
 
-- When referring to an issue, give its number, its title and its URL, so it can be opened
-  without a search. For example: #181, Classes for built-in types,
+- Give its number, title and URL: #181, Classes for built-in types,
   https://github.com/OWNER/REPO/issues/181
 
 ## Issues
 
 - Before starting work on an issue, assign it to the user and to the account you run as (`gh api user --jq .login`)
 - Check with the user before creating an issue, unless explicitly instructed to create one
-- Add content to an issue, whether a body, a comment or a closing comment, only when asked to. Otherwise create, edit or close it and nothing more
-- When an issue references other issues or external resources, add a **See also** paragraph at the end with a bullet list of links. Example:
+- Add content to an issue (body, comment, closing comment) only when asked; otherwise create, edit or close it and nothing more
+- When an issue references other issues or external resources, end with a **See also** paragraph:
 
   ```
   ## See also
@@ -47,8 +45,7 @@ Commit messages, issue titles and bulleted lists are telegraphic. Write them ter
   - #50
   ```
 
-  Use this for cross-references to related issues and links to external specifications or documentation
-- When linking to another GitHub issue in a bullet list, write just the bare `#N` reference, so GitHub renders the issue title inline
+- In a bullet list, link another issue as bare `#N`, which GitHub renders with its title
 
 ## Project board
 
@@ -60,7 +57,7 @@ Commit messages, issue titles and bulleted lists are telegraphic. Write them ter
 ## Pull requests
 
 - Titles are noun phrases, in the terse style above
-- The body is empty, or `Closes #N` alone. The issue carries the content; do not summarise the changes in the PR
+- The body is empty, or `Closes #N` alone: no summary of the changes, no attribution footer, no session link
 
 ## Meeting issues
 

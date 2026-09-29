@@ -30,7 +30,7 @@ Language-specific skills (agda-implementor, spec-implementor) add to these and d
 ## Commits
 
 - Commit each verified unit of work as you go; don't sit on uncommitted work. Message style and
-  branch, issue and pull request conventions are in the github-issues skill.
+  branch, issue and pull request conventions are in the github skill.
 
 ## Reporting
 
