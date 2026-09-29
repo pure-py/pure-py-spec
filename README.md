@@ -138,8 +138,11 @@ the adoption of new languages. Later versions may add
 
 ## Design concerns
 
-Users may confuse valid PurePy with Python, for example by using exceptions or other non-PurePy features in a
-PurePy-compliant language other than Python. The converse also arises. In Python, `[x, *xs]` copies `xs`,
-whereas a pure language can share `xs` with the new list; code written in that style is unidiomatic and slow
-when taken back to Python. We nevertheless consider a pure dialect of Python a fruitful direction, lowering the
-barriers to new language ideas in support of science.
+One risk is that it is easy for users to get
+confused about what is, and is not, valid PurePy syntax, e.g., writing Python code in another
+PurePy-compliant language which does not accept non-PurePy Python features (such as exceptions). These points can be quite subtle, and could also cause problems in the other direction. For example, in Python one cannot efficiently construct a list by writing
+```python
+[x, *xs]
+```
+since `xs` is always copied. In a pure language with no assignment, this can be efficiently implemented by sharing `xs` into the new list. But encouraging users of PurePy to write list-manipulating code in this FP style might not be a good idea, since taking that style back to standard Python would result in non-idiomatic, unperformant code. Neverthless, we think a pure dialect of Python is a fruitful direction to explore, potentially enabling a flourishing of new language
+ideas to benefit science in a way that reduces friction and barriers to entry.
