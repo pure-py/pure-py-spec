@@ -9,5 +9,4 @@ that component; a union is narrowed \Replaced{disjunct by disjunct}{member by me
 function emulates the narrowing of a match scrutinee observed in mypy, so that a match which is exhaustive by the
 remaining type is \Replaced{also exhaustive under}{exhaustive for} mypy. The remaining type is coarser than the residual
 (\secref{well-formedness-patterns}), since a constructor pattern with a refutable sub-pattern, or a
-tuple pattern with two refutable components, leaves the type untouched. \Added{The remaining type after the
-earlier cases of a match is the type against which the pattern of a later case is checked (\ruleName{match-case}).}
+tuple pattern with two refutable components, leaves the type untouched.
