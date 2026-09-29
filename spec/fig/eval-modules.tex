@@ -50,8 +50,8 @@
 \inferrule*[lab={\ruleName{eval-import}}]
 {
   q' = x \cons \seq{x} \\
-  \replaced{x}{q'} \Rightarrow_{\mathsf{load}} \val{\rho} \\
-  \replaced{\modLoaded{x}{\rho}, \seq{x} \loadsAs \val{v}}{q', \modLoaded{q'}{\rho} \loadsAs v} \\
+  x \Rightarrow_{\mathsf{load}} \val{\rho} \\
+  \modLoaded{x}{\rho}, \seq{x} \loadsAs \val{v} \\
   q, \seq{\iota} \Rightarrow r
 }
 {
@@ -61,13 +61,13 @@
 \inferrule*[lab={\ruleName{eval-import-fail}}]
 {
   q' = x \cons \seq{x} \\
-  \replaced{x}{q'} \Rightarrow_{\mathsf{load}} \aborts{\kappa}
+  x \Rightarrow_{\mathsf{load}} \aborts{\kappa}
 }
 {
   q, \exImport{q'} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
 }
 \and
-\added{\inferrule*[lab={\ruleName{eval-import-fail-chain}}]
+\inferrule*[lab={\ruleName{eval-import-fail-chain}}]
 {
   q' = x \cons \seq{x} \\
   x \Rightarrow_{\mathsf{load}} \val{\rho} \\
@@ -75,14 +75,13 @@
 }
 {
   q, \exImport{q'} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
-}}
+}
 \and
 \inferrule*[lab={\ruleName{eval-from-import}}]
 {
-  \deleted{q' \Rightarrow_{\mathsf{load}} \val{\rho}} \\
-  \added{\seq{q}^\dagger = \containing(q, q')} \\
-  \replaced{q^\dagger_j \Rightarrow_{\mathsf{load}} \val{\rho_j} \quad (\forall j)}{q^\dagger \Rightarrow_{\mathsf{load}} \val{\rho_{q^\dagger}} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q)} \\
-  \added{q' \Rightarrow_{\mathsf{load}} \val{\rho}} \\
+  \seq{q}^\dagger = \containing(q, q') \\
+  q^\dagger_j \Rightarrow_{\mathsf{load}} \val{\rho_j} \quad (\forall j) \\
+  q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
   \rho, x_i \importsR \val{v_i} \quad (\forall i) \\
   q, \seq{\iota} \Rightarrow r
 }
@@ -92,8 +91,8 @@
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail}}]
 {
-  \added{\seq{q}^\dagger = \containing(q, q')} \\
-  \added{q^\dagger_j \Rightarrow_{\mathsf{load}} \val{\rho_j} \quad (\forall j)} \\
+  \seq{q}^\dagger = \containing(q, q') \\
+  q^\dagger_j \Rightarrow_{\mathsf{load}} \val{\rho_j} \quad (\forall j) \\
   q' \Rightarrow_{\mathsf{load}} \aborts{\kappa}
 }
 {
@@ -102,10 +101,9 @@
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail-containing}}]
 {
-  \deleted{q' \Rightarrow_{\mathsf{load}} \val{\rho}} \\
-  \added{\seq{q}^\dagger = \containing(q, q')} \\
-  \replaced{q^\dagger_j \Rightarrow_{\mathsf{load}} \aborts{\kappa}}{q^\dagger \Rightarrow_{\mathsf{load}} \aborts{\kappa} \quad (\text{some } q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q)} \\
-  \added{q^\dagger_k \Rightarrow_{\mathsf{load}} \val{\rho_k} \quad (\forall k < j)}
+  \seq{q}^\dagger = \containing(q, q') \\
+  q^\dagger_j \Rightarrow_{\mathsf{load}} \aborts{\kappa} \\
+  q^\dagger_k \Rightarrow_{\mathsf{load}} \val{\rho_k} \quad (\forall k < j)
 }
 {
   q, \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
@@ -113,8 +111,8 @@
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail-member}}]
 {
-  \added{\seq{q}^\dagger = \containing(q, q')} \\
-  \replaced{q^\dagger_k \Rightarrow_{\mathsf{load}} \val{\rho_k} \quad (\forall k)}{q^\dagger \Rightarrow_{\mathsf{load}} \val{\rho_{q^\dagger}} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q)} \\
+  \seq{q}^\dagger = \containing(q, q') \\
+  q^\dagger_k \Rightarrow_{\mathsf{load}} \val{\rho_k} \quad (\forall k) \\
   q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
   \rho, x_i \importsR \val{v_i} \quad (\forall i < j) \\
   \rho, x_j \importsR \aborts{\kappa}
@@ -130,52 +128,35 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\replaced{v, \seq{x}}{q, v} \loadsAs \replaced{r}{v'}$}
+\flushleft \shadebox{$v, \seq{x} \loadsAs r$}
 \begin{mathpar}
 \small
-\deleted{\inferrule*[lab={\ruleName{eval-loads-as-simple}}]
-{
-  \strut
-}
-{
-  x, v \loadsAs v
-}}
-\and
-\deleted{\inferrule*[lab={\ruleName{eval-loads-as-qualified}}]
-{
-  q \Rightarrow_{\mathsf{load}} \val{\rho} \\
-  q, \modLoaded{q}{\rho \extend \set{\bind{x}{v}}} \loadsAs v'
-}
-{
-  q.x, v \loadsAs v'
-}}
-\and
-\added{\inferrule*[lab={\ruleName{eval-loads-as-nil}}]
+\inferrule*[lab={\ruleName{eval-loads-as-nil}}]
 {
   \strut
 }
 {
   v, \varepsilon \loadsAs \val{v}
-}}
+}
 \and
-\added{\inferrule*[lab={\ruleName{eval-loads-as-cons}}]
+\inferrule*[lab={\ruleName{eval-loads-as-cons}}]
 {
   q.x \Rightarrow_{\mathsf{load}} \val{\rho'} \\
   \modLoaded{q.x}{\rho'}, \seq{x} \loadsAs r
 }
 {
   \modLoaded{q}{\rho}, x \cons \seq{x} \loadsAs \mlet{v}{r}{\val{\modLoaded{q}{\rho \extend \set{\bind{x}{v}}}}}
-}}
+}
 \and
-\added{\inferrule*[lab={\ruleName{eval-loads-as-fail}}]
+\inferrule*[lab={\ruleName{eval-loads-as-fail}}]
 {
   q.x \Rightarrow_{\mathsf{load}} \aborts{\kappa}
 }
 {
   \modLoaded{q}{\rho}, x \cons \seq{x} \loadsAs \aborts{\kappa}
-}}
+}
 \end{mathpar}
-\subcaption{\replaced{Loaded module $v$ with submodule chain $\seq{x}$ loads to result $r$}{Reference $v$ for module $q$ loads as reference $v'$ for root of $q$, loading the modules containing $q$}}
+\subcaption{Loaded module $v$ with submodule chain $\seq{x}$ loads to result $r$}
 \end{subfigure}
 \caption{Import evaluation}
 \label{fig:eval-import-prefix}

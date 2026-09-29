@@ -72,7 +72,7 @@
 \and
 \inferrule*[lab={\ruleName{return-none}}]
 {
-  \replaced{\Sigma \vdash \tau \tyEquiv \tyNone}{\Sigma \vdash \tyNone \subty \tau}
+  \Sigma \vdash \tau \tyEquiv \tyNone
 }
 {
   \Sigma; \Gamma; \tau \vdash \exReturnNone : \Returns
@@ -126,9 +126,7 @@
 \inferrule*[lab={\ruleName{match}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta\deleted{; \sigma} \vdash \added{\sigma, }\shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \added{\tyNever, }\varnothing \\
-  \deleted{b_i = \exCase{p_i}{s_i} \quad (\forall i)} \\
-  \deleted{\remaining(\Sigma, \Gamma, \sigma, \seq{p}) = \tyNever}
+  \Sigma; \Gamma; \zeta \vdash \sigma, \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \tyNever, \varnothing
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S
@@ -137,9 +135,8 @@
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta\deleted{; \sigma} \vdash \added{\sigma, }\shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \added{\tau, }L \\
-  \deleted{b_i = \exCase{p_i}{s_i} \quad (\forall i)} \\
-  \replaced{\tau \neq \tyNever}{\remaining(\Sigma, \Gamma, \sigma, \seq{p}) \neq \tyNever}
+  \Sigma; \Gamma; \zeta \vdash \sigma, \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \tau, L \\
+  \tau \neq \tyNever
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S \merge \Assigns{\varnothing}

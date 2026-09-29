@@ -22,13 +22,10 @@ $Y$ not in $X$; and a product of ordered sets is ordered lexicographically.
 \label{sec:lexical}
 
 The grammar of \PurePy is an abstract syntax, and its metavariables range over values rather than
-over source text: $n$ is a number and $w$ is a string, not the lexemes that denote them. \Replaced{Python writes a
+over source text: $n$ is a number and $w$ is a string, not the lexemes that denote them. Python writes a
 negative number as unary minus applied to a number literal; the translation to abstract syntax folds the minus
 into the literal, so a number may be negative. The translation of
-source text into abstract syntax otherwise follows Python}{A number is never
-negative, since Python writes a negative number as unary minus applied to a literal, and a length or an
-exit status is an integer. The translation of source text
-into abstract syntax follows Python}, including the indentation that delimits blocks. A list of type
+source text into abstract syntax otherwise follows Python, including the indentation that delimits blocks. A list of type
 parameters or type arguments is always present in the abstract syntax and may be empty. In source an empty
 list is always omitted, along with its brackets, since Python's concrete syntax requires at least one element
 between brackets; the empty tuple type, for example, is written \pyinline{tuple[()]}.
@@ -163,7 +160,7 @@ $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
 $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
 $\seq{\iota}$, its \emph{import prefix}, followed by a top-level statement $t$; since imports are not statements, they can appear neither
 within a statement nor after it. The statement begins with the
-\Replaced{declaration $\exAssign{\pymath{\_\_name\_\_}\exAnnot{\tyStr}}{\nameOf(q)}$}{assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$}, which binds the name of the module when the module
+declaration $\exAssign{\pymath{\_\_name\_\_}\exAnnot{\tyStr}}{\nameOf(q)}$, which binds the name of the module when the module
 loads (\secref{well-formedness-modules}).
 
 A second map $\mathcal{P}$ gives the
@@ -181,7 +178,7 @@ definitions that follow.
 \label{def:predefined}
 $\mathcal{P}$ takes each module $q$ of \figref{predefined-values} to a pair $(\Gamma, \rho)$, where $\Gamma$
 binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \figref{predefined-signatures}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value
-(\figref{predefined-values}). \Added{A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument.} These signatures name types
+(\figref{predefined-values}). A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
 the predefined signatures.
 \end{definition}

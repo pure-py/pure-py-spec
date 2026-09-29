@@ -26,21 +26,21 @@
   \Gamma \vdash c : \Type{C}
 }
 \and
-\added{\inferrule*[lab={\ruleName{simple-alias}}]
+\inferrule*[lab={\ruleName{simple-alias}}]
 {
   \bind{x}{\TypeAlias{\seq{\alpha}}{\tau}} \in \Gamma
 }
 {
   \Gamma \vdash x : \TypeAlias{\seq{\alpha}}{\tau}
-}}
+}
 \and
-\added{\inferrule*[lab={\ruleName{simple-predef}}]
+\inferrule*[lab={\ruleName{simple-predef}}]
 {
   \bind{x}{\predefName} \in \Gamma
 }
 {
   \Gamma \vdash x : \predefName
-}}
+}
 \and
 \inferrule*[lab={\ruleName{qualified}}]
 {

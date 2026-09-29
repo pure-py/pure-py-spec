@@ -15,7 +15,7 @@
 \and
 \inferrule*[lab={\ruleName{lambda}}]
 {
-  \added{\seq{x} \text{ distinct}} \\
+  \seq{x} \text{ distinct} \\
   \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\tau}}} \vdash e \checks \tau
 }
 {
@@ -24,7 +24,7 @@
 \and
 \inferrule*[lab={\ruleName{call-lambda}}]
 {
-  \added{\seq{x} \text{ distinct}} \\
+  \seq{x} \text{ distinct} \\
   \Sigma; \Gamma \vdash \seq{e} \synth \seq{\tau} \\
   \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\tau}}} \vdash e \checks \tau
 }

@@ -12,10 +12,10 @@
 \auxrow{$\baseType(\ell)$, $\baseType(\tau)$}{type}{base type of literal $\ell$, or of type $\tau$}{aux:base-type}
 \auxrow{$\joinTy{\Sigma}{\sigma}{\tau}$, $\bigJoinTy{\Sigma}{\seq{\tau}}$}{type}{larger type if comparable, and union otherwise}{aux:join}
 \auxrow{$\meetTy{\Sigma}{\sigma}{\tau}$}{type}{greatest type below both}{aux:meet}
-\auxrow{\added{$\subterms(\tau)$, $\subterms(\seq{\tau})$}}{\added{set of types}}{\added{subterms of $\tau$, or of each type in $\seq{\tau}$, other than unions}}{aux:subterms}
+\auxrow{$\subterms(\tau)$, $\subterms(\seq{\tau})$}{set of types}{subterms of $\tau$, or of each type in $\seq{\tau}$, other than unions}{aux:subterms}
 \auxrow{$\elemTy(\Sigma, \tau)$}{type}{type of elements drawn from $\tau$ by generator}{aux:elem-type}
 \auxrow{$\shapes(\Sigma, \tau, H)$, $\shapes(\Sigma, \seq{\tau})$}{ordered set of shapes or of shape sequences}{shapes of $\tau$ once heads in $H$ are excluded; sequences of shapes of $\seq{\tau}$}{aux:shapes}
 \auxrow{$\shapeTy(k)$}{type}{least type of shape $k$}{aux:shape-type}
-\auxrow{\added{$\matchedAs(\Sigma, \Gamma, \tau, p)$}}{\added{type}}{\added{type $\tau$ is matched as by pattern $p$}}{aux:matched-as}
-\auxrow{$\remaining(\Sigma, \Gamma, \tau, p)$\deleted{, $\remaining(\Sigma, \Gamma, \tau, \seq{p})$}}{type}{type remaining from $\tau$ \replaced{if pattern $p$ fails to match}{once pattern $p$\deleted{, or each of patterns $\seq{p}$,} has failed to match}}{aux:remaining}
+\auxrow{$\matchedAs(\Sigma, \Gamma, \tau, p)$}{type}{type $\tau$ is matched as by pattern $p$}{aux:matched-as}
+\auxrow{$\remaining(\Sigma, \Gamma, \tau, p)$}{type}{type remaining from $\tau$ if pattern $p$ fails to match}{aux:remaining}
 \auxrow{$\resolveOp(\Sigma, \odot, \sigma_1, \sigma_2)$, $\resolveOp(\Sigma, \ominus, \sigma)$}{type}{result type of most specific overload at the operand types}{aux:resolve-op}

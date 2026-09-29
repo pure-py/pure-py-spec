@@ -19,8 +19,8 @@
 & \Sigma \vdash \pyinline{*}(\sigma_1, \sigma_2) : ((\tyInt, \tyStr), \tyStr) && \quad \text{if } \Sigma \vdash \sigma_1 \subty \tyInt \text{ and } \Sigma \vdash \sigma_2 \subty \tyStr \\
 & \Sigma \vdash \pyinline{*}(\tyList{\tau}, \sigma_2) : ((\tyList{\tau}, \tyInt), \tyList{\tau}) && \quad \text{if } \Sigma \vdash \sigma_2 \subty \tyInt \\
 & \Sigma \vdash \pyinline{*}(\sigma_1, \tyList{\tau}) : ((\tyInt, \tyList{\tau}), \tyList{\tau}) && \quad \text{if } \Sigma \vdash \sigma_1 \subty \tyInt \\
-& \Sigma \vdash \pyinline{**}(\sigma_1, \tyLiteral{n}) : ((\tyInt, \tyLiteral{n}), \tyInt) && \quad \text{if } \Sigma \vdash \sigma_1 \subty \tyInt \text{ and } n \replaced{\text{ a non-negative integer}}{\text{ an integer}} \\
-& \Sigma \vdash \pyinline{**}(\sigma_1, \tyLiteral{\replaced{n}{-n}}) : ((\tyInt, \tyLiteral{\replaced{n}{-n}}), \tyFloat) && \quad \text{if } \Sigma \vdash \sigma_1 \subty \tyInt \text{ and } n \replaced{\text{ a negative integer}}{\text{ a positive integer}} \\
+& \Sigma \vdash \pyinline{**}(\sigma_1, \tyLiteral{n}) : ((\tyInt, \tyLiteral{n}), \tyInt) && \quad \text{if } \Sigma \vdash \sigma_1 \subty \tyInt \text{ and } n \text{ a non-negative integer} \\
+& \Sigma \vdash \pyinline{**}(\sigma_1, \tyLiteral{n}) : ((\tyInt, \tyLiteral{n}), \tyFloat) && \quad \text{if } \Sigma \vdash \sigma_1 \subty \tyInt \text{ and } n \text{ a negative integer} \\
 & \Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau) && \quad \text{if } \Sigma \vdash {\odot}(\baseType(\sigma_1), \baseType(\sigma_2)) : ((\tau_1, \tau_2), \tau)
 \end{defalign}
 
