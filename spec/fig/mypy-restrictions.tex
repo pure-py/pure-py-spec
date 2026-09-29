@@ -11,7 +11,7 @@
 \added{Match whose cases cover a class field by field} & \added{Narrows the scrutinee by whole classes, so reports a missing return} & \added{Exhaustiveness decided by the remaining type (\ruleName{match})} \\\rowgap
 \added{Pattern variable after a case excluding a field value} & \added{Binds at the field type} & \added{Bindings taken from the remaining type (\ruleName{match-case}, \ruleName{check-var})} \\\rowgap
 \added{\pyinline{list[bool]} below \pyinline{list[int]}} & \added{Rejects; list and dictionary types invariant} & \added{\ruleName{subty-list} and \ruleName{subty-dict} require equivalent components} \\\rowgap
-\added{Declaration of a name already a parameter, imported name, pattern variable or declaration of the scope} & \added{Rejects the redeclaration} & \added{$\scopeS$ undefined unless the names are pairwise distinct}
+\added{Declaration of a name already a parameter, imported name, pattern variable or declaration of the scope} & \added{Rejects the redeclaration} & \added{Context $\scopeS(Y, s)$ of the body undefined unless the names are pairwise distinct}
 \end{tabular}
 \caption{Restrictions imposed for compatibility with mypy}
 \label{fig:mypy-restrictions}
