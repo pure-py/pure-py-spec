@@ -5,15 +5,15 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.29\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Construct & Python & Exclusion & Mechanism \\
-Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & \replaced{Static}{Dynamic} & \replaced{Checked against \pyinline{bool}}{Must already be Boolean} \\[1mm]
-Sequence patterns & List patterns match tuples, and tuple patterns lists & \replaced{Static}{Dynamic} & List patterns match only lists, tuple patterns only tuples \\[1mm]
-\added{Sequence patterns without delimiters} & \added{\pyinline{case a, b:} matches lists and tuples alike} & \added{Syntactic} & \added{Tuple patterns are parenthesised and list patterns bracketed} \\[1mm]
-Constructor patterns & Positional class patterns may supply fewer sub-patterns than class has fields & Static & Require exact arity \\[1mm]
-Dictionary keys & Any hashable value, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & \replaced{Syntactic in patterns, static in expressions}{Static in patterns, dynamic in expressions} & Strings only \\[1mm]
-\pyinline{assert} message & Any object, shown in traceback & \replaced{Static}{Dynamic} & Strings only \\[1mm]
-Duplicate name in \pyinline{from} import & Repeated name rebinds harmlessly & Static & Imported names distinct \\[1mm]
-\pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & \replaced{Static; dynamic at \pyinline{object}}{Dynamic} & \replaced{Comparable operand types; at \pyinline{object}, undefined between values of different forms, such as number and string, or list and tuple, except that \pyinline{None} compares with any value}{Undefined between, for example, number and string, or list and tuple; only \pyinline{None} compares with anything} \\[1mm]
-Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & \replaced{Static; dynamic at \pyinline{object}}{Dynamic} & Equality undefined \\[1mm]
+Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & \replaced{Static}{Dynamic} & \replaced{Checked against \pyinline{bool}}{Must already be Boolean} \\\rowgap
+Sequence patterns & List patterns match tuples, and tuple patterns lists & \replaced{Static}{Dynamic} & List patterns \replaced{only match}{match only} lists, tuple patterns only tuples \\\rowgap
+\added{Sequence patterns without delimiters} & \added{\pyinline{case a, b:} matches lists and tuples alike} & \added{Syntactic} & \added{Tuple patterns are parenthesised and list patterns bracketed} \\\rowgap
+Constructor patterns & Positional class patterns may supply fewer sub-patterns than class has fields & Static & Require exact arity \\\rowgap
+Dictionary keys & Any hashable value, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & \replaced{Syntactic in patterns, static in expressions}{Static in patterns, dynamic in expressions} & Strings only \\\rowgap
+\pyinline{assert} message & Any object, shown in traceback & \replaced{Static}{Dynamic} & Strings only \\\rowgap
+Duplicate name in \pyinline{from} import & Repeated name rebinds harmlessly & Static & Imported names distinct \\\rowgap
+\pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & \replaced{Static; dynamic at \pyinline{object}}{Dynamic} & \replaced{Comparable operand types; at \pyinline{object}, undefined between values of different forms, such as number and string, or list and tuple, except that \pyinline{None} compares with any value}{Undefined between, for example, number and string, or list and tuple; only \pyinline{None} compares with anything} \\\rowgap
+Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & \replaced{Static; dynamic at \pyinline{object}}{Dynamic} & Equality undefined \\\rowgap
 \pyinline{nan} comparison via container equality & Elements compared by identity before equality, so identical NaNs match but distinct ones do not & Dynamic & Undefined when both elements are \pyinline{nan}
 \end{tabular}
 \caption{Python coercions and lax matches excluded by \PurePy}
