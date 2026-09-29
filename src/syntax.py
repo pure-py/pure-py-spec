@@ -64,8 +64,8 @@ class PatTuple(ast.MatchSequence):
     pass
 
 
-class OpenTuple(ast.Tuple):
-    """Tuple display written without parentheses."""
+class UnparenthesisedTuple(ast.Tuple):
+    pass
 
 
 def render_pattern(p: ast.pattern) -> str:
@@ -129,8 +129,8 @@ def fold_negative(node: ast.AST) -> ast.AST:
 
 
 def classify_sequence(source: str) -> Callable[[ast.AST], ast.AST]:
-    """Python's parser gives list and tuple patterns one node type, and a tuple display one node with
-    or without parentheses; the source text tells them apart."""
+    """Python's parser gives list and tuple patterns one node type, and a tuple one node with or
+    without parentheses; the source text tells them apart."""
 
     def classify(node: ast.AST) -> ast.AST:
         match node:
@@ -147,7 +147,7 @@ def classify_sequence(source: str) -> Callable[[ast.AST], ast.AST]:
                 assert segment is not None
                 if segment.startswith("("):
                     return node
-                return ast.copy_location(OpenTuple(elts=es, ctx=ctx), node)
+                return ast.copy_location(UnparenthesisedTuple(elts=es, ctx=ctx), node)
             case _:
                 return node
 
@@ -407,7 +407,7 @@ def check_syntax_expr(node: ast.expr) -> None:
         case ast.Lambda():
             check_syntax_arguments(node.args)
             check_syntax_expr(node.body)
-        case OpenTuple():
+        case UnparenthesisedTuple():
             raise Prohibited(node, "tuple without parentheses")
         case ast.List() | ast.Tuple():
             for e in node.elts:
