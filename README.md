@@ -118,24 +118,6 @@ Install the Better BibTeX plugin with the following changes to the default setti
 Export the library to `tex/zotero-export.bib`. A reference not yet in the library goes in
 `tex/additional-refs.bib` by hand until imported.
 
-## Existing implementations
-
-Candidate PurePy-compliant languages and implementations:
-
-- Python
-- JAX
-- [Fluid](https://github.com/fluid-org/fluid)
-- fortl
-
-Fluid needs changes to be PurePy-compliant, especially to lists, which resemble Python lists but behave
-differently, since Python has no equivalent of cons.
-
-## Long-term aims
-
-The longer-term aim is to stimulate new language developments in support of science; a common syntax eases
-the adoption of new languages. Later versions may add
-[Python array API](https://data-apis.org/array-api/latest/)-compatible arrays and other features.
-
 ## Design concerns
 
 One risk is that it is easy for users to get
