@@ -129,8 +129,8 @@ def fold_negative(node: ast.AST) -> ast.AST:
 
 
 def classify_sequence(source: str) -> Callable[[ast.AST], ast.AST]:
-    """Python's parser gives list and tuple patterns one node type, and a tuple one node with or
-    without parentheses; the source text tells them apart."""
+    """AST doesn't record brackets or parentheses; classify sequence patterns and tuples by source
+    text."""
 
     def classify(node: ast.AST) -> ast.AST:
         match node:
