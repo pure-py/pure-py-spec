@@ -350,8 +350,8 @@ The conditions on tuple and list patterns ensure that pattern matching always ha
 The condition on constructor patterns supplies the type arguments omitted by the pattern: they are recovered by the judgement $\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$ from the type $\tau$ at which the pattern is checked, the \emph{instance} of $C$ at $\tau$ being the instantiation of $C$ above $\tau$, or the instantiation below $\tau$, when there is one up to equivalence (\ruleName{instance-above}, \ruleName{instance-below}). Below $C$ the base classes of the type determine the instance: at \pyinline{IntLeaf}, a subclass of \pyinline{Leaf[int]}, the instance of \pyinline{Leaf} is \pyinline{Leaf[int]}. Above $C$ the base arguments of $C$ determine it: at \pyinline{Tree[int]} the instance of \pyinline{Leaf} is \pyinline{Leaf[int]}, because \pyinline{Leaf[T]} extends \pyinline{Tree[T]}, whereas at \tyObject{} a class with type parameters has no instance, since every instantiation lies below \tyObject.
 The instance judgement is decided as follows. A pattern is checked at the disjuncts of a union separately
 (\ruleName{check-union}), so the type $\tau$ at which an instance is taken is never a union. If $\tau$ is an
-instantiated class $D[\seq{\rho}]$ with $C$ an ancestor of $D$, the instance is the instantiation of $C$ reached
-from $D[\seq{\rho}]$ along the base classes, which is unique because type arguments are invariant
+instantiated class $D[\replaced{\seq{\sigma}}{\seq{\rho}}]$ with $C$ an ancestor of $D$, the instance is the instantiation of $C$ reached
+from $D[\replaced{\seq{\sigma}}{\seq{\rho}}]$ along the base classes, which is unique because type arguments are invariant
 (\ruleName{instance-above}). If $\tau$ is $D[\seq{\sigma}]$ with $D$ an ancestor of $C$, the instantiations of $C$
 below $\tau$ are the $C[\seq{\tau}]$ for which the instantiation of $D$ reached from $C[\seq{\tau}]$ along the base
 classes has arguments equivalent to $\seq{\sigma}$, and Lemma~\ref{lem:instantiation-candidates} bounds the instantiations
