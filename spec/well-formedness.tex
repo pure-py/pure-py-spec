@@ -125,8 +125,7 @@ stated separately for each elimination form.
 
 \added{A call of a name bound at a type scheme instantiates the type parameters from the arguments
 (\ruleName{call-scheme}). The arguments that synthesise constrain the type parameters through
-$\constraints(\Sigma, \sigma, \tau)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:constraints}}), which relates a parameter type $\sigma$ to the base type
-$\tau$ of the argument, and the type arguments $\typeArgs(\Sigma, \seq{\alpha}, \seq{\sigma}, \seq{\tau})$
+$\constraints(\Sigma, \sigma, \tau)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:constraints}}), which relates a parameter type $\sigma$ to the type $\tau$ of the argument, and the type arguments $\typeArgs(\Sigma, \seq{\alpha}, \seq{\sigma}, \seq{\tau})$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) are the joins of the constraints on each type parameter, undefined if a type parameter is
 unconstrained. The call is then typed as a call of the instantiated \pyinline{Callable} type, with a variable in
 place of the callee, so that every argument, including one that does not synthesise, is checked against the

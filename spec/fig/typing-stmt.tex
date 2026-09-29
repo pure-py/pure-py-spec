@@ -58,7 +58,7 @@
   \added{\Gamma \vdash q : \scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}} \\
   \added{|\seq{e}| = |\seq{\sigma}|} \\
   \added{I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \tau_i}} \\
-  \added{\seq{\tau}' = \typeArgs(\Sigma, \seq{\alpha}, (\sigma_i \mid i \in I), (\baseType(\tau_i) \mid i \in I))} \\
+  \added{\seq{\tau}' = \typeArgs(\Sigma, \seq{\alpha}, (\sigma_i \mid i \in I), (\tau_i \mid i \in I))} \\
   \added{\Sigma; \Gamma \override \set{\bind{y}{\subst{\seq{\tau}'}{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}}}; \zeta \vdash \exCall{y}{\seq{e}} : \Assigns{\varnothing}} \\
   \added{y \notin \fv(\seq{e})}
 }

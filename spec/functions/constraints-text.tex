@@ -1,5 +1,5 @@
 Constraints on the type variables of $\sigma$ from a type $\tau$ at which $\sigma$ is to be instantiated, as a
-sequence of pairs in the order found. A type variable is constrained to $\tau$; lists, dictionaries, tuples and
+sequence of pairs in the order found. A type variable is constrained to the base type of $\tau$; lists, dictionaries, tuples and
 callables constrain componentwise; an instantiated class constrains through the instance of the class at $\tau$
 (\figref{instance}); and a union with exactly one disjunct mentioning type variables constrains that disjunct by
 the disjuncts of $\tau$ which are not below the other disjuncts. A type without type variables, or of a form
