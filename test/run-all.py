@@ -204,10 +204,10 @@ class Runner:
         status_path: pathlib.Path,
         cwd: pathlib.Path | None = None,
     ) -> None:
-        """Python must corroborate the verdict: run with the expected output
-        (python_accepts), and the exit status in the sibling file if any, or raise
-        the exception named in the sibling file. A test must carry the one piece
-        of evidence and not the other."""
+        """Python corroborates the verdict. If python_accepts, output must match .expected
+        (exit status .status.expected if present) and .exception.expected must be absent;
+        otherwise run must raise exception named in .exception.expected and .expected must
+        be absent."""
         exception_path = path.with_suffix(EXCEPTION_EXPECTED)
         if python_accepts:
             if exception_path.exists():
