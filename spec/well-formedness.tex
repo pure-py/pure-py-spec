@@ -326,7 +326,7 @@ applying otherwise. The remaining type thus determines exhaustiveness as well as
 specification leaves narrowing largely unspecified,\footnote{\url{https://typing.python.org/en/latest/spec/narrowing.html}}
 so the remaining type emulates the narrowing of a match scrutinee observed in mypy
 (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}), which subtracts a class only for a
-constructor pattern that matches every value of the class, and a tuple only through one refutable component. Cases that between them cover a field of a class therefore leave an empty residual but a remaining
+constructor pattern that matches every value of the class, and a tuple only through one refutable component, i.e.~one whose pattern can fail to match. Cases that between them cover a field of a class therefore leave an empty residual but a remaining
 type other than $\tyNever$, so a function which returns from each of the cases is rejected as not always returning, and
 at a class with a field of type $\tyUnion{\tyInt}{\tyNone}$ a case \pyinline{Box(n)} after a case \pyinline{Box(None)}
 binds \pyinline{n} at $\tyUnion{\tyInt}{\tyNone}$ rather than at \pyinline{int}.}{A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. The match
