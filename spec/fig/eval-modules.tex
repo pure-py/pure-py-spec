@@ -80,7 +80,8 @@
 \inferrule*[lab={\ruleName{eval-from-import}}]
 {
   \deleted{q' \Rightarrow_{\mathsf{load}} \val{\rho}} \\
-  q^\dagger \Rightarrow_{\mathsf{load}} \val{\rho_{q^\dagger}} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q) \\
+  \added{q^\dagger_1 \cons \cdots \cons q^\dagger_m = \containing(q, q')} \\
+  \replaced{q^\dagger_j \Rightarrow_{\mathsf{load}} \val{\rho_j} \quad (\forall j)}{q^\dagger \Rightarrow_{\mathsf{load}} \val{\rho_{q^\dagger}} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q)} \\
   \added{q' \Rightarrow_{\mathsf{load}} \val{\rho}} \\
   \rho, x_i \importsR \val{v_i} \quad (\forall i) \\
   q, \seq{\iota} \Rightarrow r
@@ -91,7 +92,8 @@
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail}}]
 {
-  \added{q^\dagger \Rightarrow_{\mathsf{load}} \val{\rho_{q^\dagger}} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q)} \\
+  \added{q^\dagger_1 \cons \cdots \cons q^\dagger_m = \containing(q, q')} \\
+  \added{q^\dagger_j \Rightarrow_{\mathsf{load}} \val{\rho_j} \quad (\forall j)} \\
   q' \Rightarrow_{\mathsf{load}} \aborts{\kappa}
 }
 {
@@ -101,8 +103,9 @@
 \inferrule*[lab={\ruleName{eval-from-import-fail-containing}}]
 {
   \deleted{q' \Rightarrow_{\mathsf{load}} \val{\rho}} \\
-  q^\dagger \Rightarrow_{\mathsf{load}} \aborts{\kappa} \quad (\text{some } q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q) \\
-  \added{q^\ddagger \Rightarrow_{\mathsf{load}} \val{\rho_{q^\ddagger}} \quad (\forall q^\ddagger \properPrefixOf q^\dagger,\; q^\ddagger \not\prefixOf q)}
+  \added{q^\dagger_1 \cons \cdots \cons q^\dagger_m = \containing(q, q')} \\
+  \replaced{q^\dagger_j \Rightarrow_{\mathsf{load}} \aborts{\kappa}}{q^\dagger \Rightarrow_{\mathsf{load}} \aborts{\kappa} \quad (\text{some } q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q)} \\
+  \added{q^\dagger_k \Rightarrow_{\mathsf{load}} \val{\rho_k} \quad (\forall k < j)}
 }
 {
   q, \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
@@ -110,8 +113,9 @@
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail-member}}]
 {
+  \added{q^\dagger_1 \cons \cdots \cons q^\dagger_m = \containing(q, q')} \\
+  \replaced{q^\dagger_k \Rightarrow_{\mathsf{load}} \val{\rho_k} \quad (\forall k)}{q^\dagger \Rightarrow_{\mathsf{load}} \val{\rho_{q^\dagger}} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q)} \\
   q' \Rightarrow_{\mathsf{load}} \val{\rho} \\
-  q^\dagger \Rightarrow_{\mathsf{load}} \val{\rho_{q^\dagger}} \quad (\forall q^\dagger \properPrefixOf q',\; q^\dagger \not\prefixOf q) \\
   \rho, x_i \importsR \val{v_i} \quad (\forall i < j) \\
   \rho, x_j \importsR \aborts{\kappa}
 }

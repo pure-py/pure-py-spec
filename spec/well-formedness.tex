@@ -481,7 +481,7 @@ parent} (\Replaced{\ruleName{loads-as-cons}}{the static loads-as judgement}), so
 access along the whole chain. A from-import also \Added{statically }loads any imported name that denotes a submodule\Added{, and the
 names it imports must be distinct}. A
 containing module of the target is exempt from \Replaced{static loading}{loading first} if it is the importing module or one of its
-containing modules, \Replaced{because at runtime it may still be loading when the import executes}{since at runtime it may still be loading}. The exemption applies only to from-imports, because
+containing modules\Added{\speconly{ (\S\ref{aux:containing})}}, \Replaced{because at runtime it may still be loading when the import executes}{since at runtime it may still be loading}. The exemption applies only to from-imports, because
 for a plain import
 the only containing module that could never load first is the importing module itself, and an import naming a
 module contained in the importing module is excluded outright\paperonly{ (\secref{no-load-dependent})}. \Replaced{Static loading is defined inductively, so a program with an import cycle is ill-formed.}{Loading a module

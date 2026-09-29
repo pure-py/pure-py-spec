@@ -94,10 +94,7 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
             if dup is not None:
                 raise IllFormedModule(iota, reasons.DuplicateImportedName(dup))
             delta, Sigma = check_imported(q, iota, mod_ctx)
-            Sigma = load_containing(
-                [p for p in proper_prefixes(q) if not prefix_of(p, mod_ctx.q)],
-                replace(mod_ctx, Sigma=Sigma),
-            )
+            Sigma = load_containing(containing(mod_ctx.q, q), replace(mod_ctx, Sigma=Sigma))
             return imports_seq(
                 iota,
                 xs,
@@ -115,11 +112,15 @@ def check_imported(q: Name, iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Con
     return check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
 
 
-def load_containing(containing: list[Name], mod_ctx: ModuleContext) -> ClassTable:
-    if len(containing) == 0:
+def containing(q: Name, q_: Name) -> list[Name]:
+    return [p for p in proper_prefixes(q_) if not prefix_of(p, q)]
+
+
+def load_containing(qs: list[Name], mod_ctx: ModuleContext) -> ClassTable:
+    if len(qs) == 0:
         return mod_ctx.Sigma
-    _, Sigma = check_module(mod_ctx.M[containing[0]], mod_ctx.M, containing[0], mod_ctx.Sigma)
-    return load_containing(containing[1:], replace(mod_ctx, Sigma=Sigma))
+    _, Sigma = check_module(mod_ctx.M[qs[0]], mod_ctx.M, qs[0], mod_ctx.Sigma)
+    return load_containing(qs[1:], replace(mod_ctx, Sigma=Sigma))
 
 
 def submods(M: Mapping[Name, ast.Module], q: Name) -> Context:
