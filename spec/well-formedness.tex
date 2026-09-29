@@ -261,12 +261,14 @@ before their declarations (\secref{well-formedness-modules}), $\psi$ can name on
 earlier in the module, and cannot name $x$ itself. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
 
-A mutual region of function definitions (\ruleName{def}) \replaced{synthesises a type scheme for each definition
-$\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$ (\ruleName{def-signature}, \figref{typing-def}), with
-type parameters $\seq{\alpha}$ in scope in the annotations and in the body $s$. The \ruleName{def} rule binds}{resolves the annotations of each definition to a
-\pyinline{Callable} type (\ruleName{def-signature}, \figref{typing-def}), binds} \replaced{all the function names}{the names} of the mutual region\deleted{,
-including the name of each function itself,} at those \replaced{type schemes}{types}, and checks each definition against its \replaced{type scheme}{type}
-(\ruleName{def-body}). \added{A type scheme without type parameters is written as its \pyinline{Callable} type, so a function without type parameters is a variable like any other, whereas a generic function is not an expression on its own.} A definition binds its parameters at their annotated types; variables declared or
+\replaced{For each definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$ of a mutual region, the
+\ruleName{def-signature} rule (\figref{typing-def}) synthesises a type scheme, with type parameters $\seq{\alpha}$ in scope in
+the annotations. The \ruleName{def} rule binds all the function names of the mutual region at the synthesised type
+schemes, and the \ruleName{def-body} rule checks each definition against its type scheme, with $\seq{\alpha}$ in scope in the
+body $s$.}{A mutual region of function definitions (\ruleName{def}) resolves the annotations of each definition to a
+\pyinline{Callable} type (\ruleName{def-signature}, \figref{typing-def}), binds the names of the mutual region,
+including the name of each function itself, at those types, and checks each definition against its type
+(\ruleName{def-body}).} \added{A type scheme without type parameters is written as its \pyinline{Callable} type, so a function without type parameters is a variable like any other, whereas a generic function is not an expression on its own.} A definition binds its parameters at their annotated types; variables declared or
 assigned in the body start unbound, emulating Python's scoping of function bodies, which
 prefers a locally bound name to one visible in an enclosing scope. A variable of the
 enclosing scope referenced by the body must be definitely assigned at the point at which the function is defined,
