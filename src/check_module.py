@@ -33,7 +33,6 @@ from reasons import IllFormed, IllFormedModule, IllFormedProgram
 from statements import check_assignments_declared, check_top_seq, scope
 from type_syntax import (
     Name,
-    Primitive,
     Var,
     parse_name,
     prefix_of,
@@ -188,8 +187,19 @@ def check_module(
     return gamma, Sigma
 
 
-# Declared by every module
 NAME = "__name__"
+
+
+# Declaration `__name__: str = name(q)` beginning the body of module q, located at the module start
+def name_declaration(q: Name) -> ast.AnnAssign:
+    return ast.AnnAssign(
+        target=ast.Name(id=NAME, ctx=ast.Store()),
+        annotation=ast.Name(id="str", ctx=ast.Load()),
+        value=ast.Constant(value=str(q)),
+        simple=1,
+        lineno=1,
+        col_offset=0,
+    )
 
 
 def check_module_(
@@ -202,14 +212,10 @@ def check_module_(
         return predefined_context(q), Sigma
     iotas, stmts = split_imports(m.body)
     imported = {x for x, _ in declares_body(iotas)}
-    if NAME in imported:
-        binder = find_binder(iotas, NAME)
-        assert binder is not None
-        raise IllFormedModule(binder, reasons.Redeclaration(NAME))
     gamma, Sigma = check_imports_prefix(iotas, ModuleContext(gamma={}, M=M, q=q, Sigma=Sigma))
-    body = stmts
-    bound = scope(imported | {NAME}, body)
-    check_assignments_declared(body, {NAME})
+    body = [name_declaration(q), *stmts]
+    bound = scope(imported, body)
+    check_assignments_declared(body, set())
     mod_ctx = check_top_seq(
         statements(body),
         ModuleContext(
@@ -253,7 +259,7 @@ def find_binder(stmts: list[ast.stmt], x: str) -> ast.stmt | None:
 
 def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: Name) -> Context:
     members = {x: final_ctx.gamma[x] for x in assigns_body(body)}
-    return override_context(submods(final_ctx.M, q), {**members, NAME: Primitive.STR})
+    return override_context(submods(final_ctx.M, q), members)
 
 
 def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:
