@@ -3,8 +3,8 @@
 \constraints(\Sigma, \tyDict{\sigma}, \tyDict{\tau}) &{}= \constraints(\Sigma, \sigma, \tau) \\*
 \constraints(\Sigma, \tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) &{}= \constraints(\Sigma, \seq{\sigma}, \seq{\tau}) \\*
 \constraints(\Sigma, \tyCallable{\seq{\sigma}}{\sigma}, \tyCallable{\seq{\tau}}{\tau}) &{}= \constraints(\Sigma, \sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) \\*
-\constraints(\Sigma, C[\seq{\sigma}], \tau) &{}= \constraints(\Sigma, \seq{\sigma}, \seq{\rho}) \\*
-&\qquad \rlap{$\text{if } \Sigma \vdash C[\seq{\rho}] \instanceAt \tau$} \\*
+\constraints(\Sigma, C[\seq{\sigma}], \tau) &{}= \constraints(\Sigma, \seq{\sigma}, \seq{\tau}') \\*
+&\qquad \rlap{$\text{if } \Sigma \vdash C[\seq{\tau}'] \instanceAt \tau$} \\*
 \constraints(\Sigma, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \constraints(\Sigma, \sigma'', \tau') \\*
 &\qquad \rlap{$\text{if } \sigma'' \text{ is the only disjunct of } \tyUnion{\sigma}{\sigma'} \text{ with type variables}$} \\*
 &\qquad \rlap{$\text{and } \tau' \text{ is the join of the disjuncts of } \tau \text{ not below the}$} \\*
