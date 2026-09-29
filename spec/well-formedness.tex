@@ -171,7 +171,7 @@ types to the resolved overloads of an operator. The \ruleName{binop} and \ruleNa
 of the most specific overload at the operand types, $\resolveOp$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:resolve-op}}), so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
-\Replaced{The values of an \emph{equality type} are compared by structural equality, which is undefined only at the dynamically excluded comparisons (\secref{no-coercions})}{An \emph{equality type} is one for which structural equality is
+\Replaced{The values of an \emph{equality type} are compared by structural equality, which is defined except at the dynamically excluded comparisons (\secref{no-coercions})}{An \emph{equality type} is one for which structural equality is
 defined}:
 \begin{defalign}
 & \Sigma \vdash \nu \eqType \\
