@@ -7,7 +7,7 @@
 \rowcolor{grammarheadcolor}Construct & Python & Exclusion & Mechanism \\
 Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & \replaced{Static}{Dynamic} & \replaced{Checked against \pyinline{bool}}{Must already be Boolean} \\[1mm]
 Sequence patterns & List patterns match tuples, and tuple patterns lists & \replaced{Static}{Dynamic} & List patterns match only lists, tuple patterns only tuples \\[1mm]
-\added{Sequence patterns without delimiters} & \added{\pyinline{case a, b:} matches lists and tuples alike} & \added{Syntactic} & \added{Not in grammar; a tuple pattern is parenthesised, a list pattern bracketed} \\[1mm]
+\added{Sequence patterns without delimiters} & \added{\pyinline{case a, b:} matches lists and tuples alike} & \added{Syntactic} & \added{Tuple patterns are parenthesised and list patterns bracketed} \\[1mm]
 Constructor patterns & Positional class patterns may supply fewer sub-patterns than class has fields & Static & Require exact arity \\[1mm]
 Dictionary keys & Any hashable value, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & \replaced{Syntactic in patterns, static in expressions}{Static in patterns, dynamic in expressions} & Strings only \\[1mm]
 \pyinline{assert} message & Any object, shown in traceback & \replaced{Static}{Dynamic} & Strings only \\[1mm]
