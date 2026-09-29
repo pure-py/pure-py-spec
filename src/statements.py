@@ -182,11 +182,9 @@ def check_top_seq(ts: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
 
 def check_top_statement(t: Statement, mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
     if isinstance(t, ast.ClassDef):
-        c, Sigma = class_declared(t, mod_ctx)
-        return Assigns({t.name: c}), Sigma
+        return dataclass(t, mod_ctx)
     if isinstance(t, ast.TypeAlias):
-        assert isinstance(t.name, ast.Name)
-        return Assigns({t.name.id: type_alias_declared(t, mod_ctx)}), mod_ctx.Sigma
+        return type_alias(t, mod_ctx)
     return check_statement(t, mod_ctx, None), mod_ctx.Sigma
 
 
@@ -800,7 +798,7 @@ def iterated_type(e: ast.expr, mod_ctx: ModuleContext) -> Type:
     return elem
 
 
-def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, ClassTable]:
+def dataclass(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
     if not isinstance(mod_ctx.gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.NotPredefinedName("dataclass"))
     alphas = tuple(p.name for p in node.type_params if isinstance(p, ast.TypeVar))
@@ -815,14 +813,16 @@ def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, C
         raise IllFormedModule(node, reasons.DuplicateField(dup, node.name))
     c = Class(qualified(mod_ctx.q, node.name))
     assert c not in mod_ctx.Sigma
-    return c, {**mod_ctx.Sigma, c: ClassTableEntry(alphas, own, base)}
+    return Assigns({node.name: c}), {**mod_ctx.Sigma, c: ClassTableEntry(alphas, own, base)}
 
 
-def type_alias_declared(node: ast.TypeAlias, mod_ctx: ModuleContext) -> TypeAlias:
+def type_alias(node: ast.TypeAlias, mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
+    assert isinstance(node.name, ast.Name)
     alphas = tuple(p.name for p in node.type_params if isinstance(p, ast.TypeVar))
     assert len(alphas) == len(node.type_params)
     mod_ctx_ = override_gamma(mod_ctx, {alpha: TypeVar() for alpha in alphas})
-    return TypeAlias(alphas, resolve_type(type_expr(node.value), node, mod_ctx_))
+    tau = resolve_type(type_expr(node.value), node, mod_ctx_)
+    return Assigns({node.name.id: TypeAlias(alphas, tau)}), mod_ctx.Sigma
 
 
 def base_class(node: ast.ClassDef, mod_ctx: ModuleContext) -> ClassType:
