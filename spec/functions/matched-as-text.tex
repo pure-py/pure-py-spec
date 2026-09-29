@@ -1,8 +1,8 @@
 Type to which $\tau$ is narrowed if pattern $p$ matches: an over-approximation of the matched
-values, as a type. A variable or wildcard pattern leaves $\tau$ unchanged; a literal pattern narrows to its literal
-type; a tuple pattern narrows each component; a list or dictionary pattern narrows to the list or
-dictionary type; a constructor pattern narrows to the instance of its class at $\tau$, or to $\tau$ itself
-when $\tau$ is below the instance; a union is narrowed disjunct by disjunct; and any other pattern, which
-does not match any value of $\tau$, narrows to $\tyNever$. The function follows the narrowing of a match scrutinee
-observed in mypy within a case, and gives the type of a pattern named by \pyinline{as}
+values, as a type. Variable and wildcard patterns leave $\tau$ unchanged; literal patterns narrow to their literal
+types; tuple patterns narrow each component; list and dictionary patterns narrow to the list or
+dictionary type; constructor patterns narrow to the instance of their class at $\tau$, or to $\tau$ itself
+when $\tau$ is below the instance; unions are narrowed disjunct by disjunct; and other patterns, which
+do not match any value of $\tau$, narrow to $\tyNever$. The function follows the narrowing of a match scrutinee
+observed in mypy within a case, and gives the types of patterns named by \pyinline{as}
 (\ruleName{check-as}).
