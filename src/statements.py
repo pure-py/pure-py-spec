@@ -57,7 +57,7 @@ from contexts import (
     override_outcomes,
     resolve_name,
 )
-from match import check_pattern, match_shapes, remaining_seq
+from match import check_pattern, match_shapes, remaining
 from operators import (
     BINARY_NAMES,
     UNARY_NAMES,
@@ -66,8 +66,8 @@ from operators import (
 )
 from reasons import IllFormedModule, MypyCompatibility
 from shapes import Shapes, shapes
-from subtyping import join_seq, subtype
-from syntax import NotYetSupported
+from subtyping import equivalent, join_seq, subtype
+from syntax import NotYetSupported, render_pattern
 from type_syntax import (
     CallableExpr,
     CallableType,
@@ -93,6 +93,7 @@ from type_syntax import (
     literal_type,
     parse_annotation,
     qualified,
+    substitute,
 )
 
 
@@ -101,10 +102,6 @@ def signature(d: ast.FunctionDef, mod_ctx: ModuleContext) -> CallableType:
         tuple(resolve_type(type_expr(a.annotation), a, mod_ctx) for a in d.args.args),
         resolve_type(type_expr(d.returns), d, mod_ctx),
     )
-
-
-def parameters(d: ast.FunctionDef, mod_ctx: ModuleContext) -> VarContext:
-    return {a.arg: resolve_type(type_expr(a.annotation), a, mod_ctx) for a in d.args.args}
 
 
 def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
@@ -121,6 +118,13 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
                 raise IllFormedModule(node, reasons.UnboundName(str(q)))
             if isinstance(theta, TypeVar) and len(args) == 0:
                 return TypeVariable(str(q))
+            if isinstance(theta, TypeAlias):
+                sigmas = tuple(resolve_type(psi_, node, mod_ctx) for psi_ in args)
+                if len(sigmas) != len(theta.params):
+                    raise IllFormedModule(
+                        node, reasons.TypeAliasArityMismatch(q, len(theta.params), len(sigmas))
+                    )
+                return substitute(sigmas, theta.params, theta.tau)
             if not isinstance(theta, Class):
                 raise IllFormedModule(node, reasons.NotClass(q))
             taus = tuple(resolve_type(psi_, node, mod_ctx) for psi_ in args)
@@ -178,8 +182,9 @@ def check_top_seq(ts: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
 
 def check_top_statement(t: Statement, mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
     if isinstance(t, ast.ClassDef):
-        c, Sigma = class_declared(t, mod_ctx)
-        return Assigns({t.name: c}), Sigma
+        return dataclass(t, mod_ctx)
+    if isinstance(t, ast.TypeAlias):
+        return type_alias(t, mod_ctx)
     return check_statement(t, mod_ctx, None), mod_ctx.Sigma
 
 
@@ -203,28 +208,48 @@ def check_statement(
     s: Statement, mod_ctx: ModuleContext, returns: Type | None, tail: bool = False
 ) -> StaticOutcome:
     if isinstance(s, list):
-        check_bodies(s, mod_ctx)
-        return Assigns({d.name: signature(d, mod_ctx) for d in s})
+        return check_defs(s, mod_ctx)
     return check_stmt(s, mod_ctx, returns, tail)
 
 
-def check_bodies(defs: list[ast.FunctionDef], mod_ctx: ModuleContext) -> None:
-    f_names: VarContext = {d.name: signature(d, mod_ctx) for d in defs}
-    for d in defs:
-        locals_ = scope({a.arg for a in d.args.args}, d.body)
-        params = parameters(d, mod_ctx)
-        check_assignments_declared(d.body, set(params))
-        delta = {**f_names, **params, **locals_}
-        body_ctx = override_gamma(mod_ctx, delta)
-        declared = resolve_type(type_expr(d.returns), d, mod_ctx)
-        r = check_body(d.body, body_ctx, declared, tail=True)
-        if not isinstance(r, Returns) and not subtype(mod_ctx.Sigma, Primitive.NONE, declared):
-            raise IllFormedModule(d, reasons.MissingReturn(d.name, declared))
+def check_defs(ds: list[ast.FunctionDef], mod_ctx: ModuleContext) -> Assigns:
+    taus = {d.name: signature(d, mod_ctx) for d in ds}
+    delta: VarContext = {**taus}
+    for d in ds:
+        def_body(d, taus[d.name], override_gamma(mod_ctx, delta))
+    return Assigns(delta)
+
+
+def def_body(d: ast.FunctionDef, tau: CallableType, mod_ctx: ModuleContext) -> None:
+    xs = parameter_names(d.args, d, d.name)
+    check_assignments_declared(d.body, set(xs))
+    params = dict(zip(xs, tau.params, strict=True))
+    body_ctx = override_gamma(mod_ctx, {**params, **scope(set(xs), d.body)})
+    r = check_body(d.body, body_ctx, tau.result, tail=True)
+    if not isinstance(r, Returns) and not equivalent(mod_ctx.Sigma, tau.result, Primitive.NONE):
+        raise mypy_only_if(subtype(mod_ctx.Sigma, Primitive.NONE, tau.result))(
+            d, reasons.MissingReturn(d.name, tau.result)
+        )
+
+
+def parameter_names(args: ast.arguments, node: ast.AST, f: Var | None) -> list[Var]:
+    xs = [a.arg for a in args.args]
+    dup = next((x for i, x in enumerate(xs) if x in xs[:i]), None)
+    if dup is not None:
+        raise IllFormedModule(node, reasons.DuplicateParameter(dup, f))
+    return xs
 
 
 def check_returns_none(Sigma: ClassTable, s: ast.Return, declared: Type) -> None:
-    if not subtype(Sigma, Primitive.NONE, declared):
-        raise IllFormedModule(s, reasons.TypeMismatch(declared, Primitive.NONE))
+    if not equivalent(Sigma, declared, Primitive.NONE):
+        raise mypy_only_if(subtype(Sigma, Primitive.NONE, declared))(
+            s, reasons.BareReturn(declared)
+        )
+
+
+# Failure is for mypy compatibility only when the program is otherwise well-formed.
+def mypy_only_if(otherwise_well_formed: bool) -> type[IllFormedModule]:
+    return MypyCompatibility if otherwise_well_formed else IllFormedModule
 
 
 def scope(ys: set[Var], body: list[ast.stmt]) -> VarContext:
@@ -236,7 +261,7 @@ def scope(ys: set[Var], body: list[ast.stmt]) -> VarContext:
         seen.add(x)
     for x in sorted(ys & patterns.keys()):
         raise IllFormedModule(patterns[x], reasons.Redeclaration(x))
-    return {x: Unbound() for x in assigns_body(body)}
+    return {x: Unbound() for x in assigns_body(body) if x not in ys}
 
 
 def check_assignments_declared(body: list[ast.stmt], bound: set[Var]) -> None:
@@ -331,7 +356,7 @@ def check_match_cases(
         partial
         and tail
         and returns is not None
-        and not subtype(mod_ctx.Sigma, Primitive.NONE, returns)
+        and not equivalent(mod_ctx.Sigma, returns, Primitive.NONE)
         and len(residual) == 0
         and all(isinstance(r, Returns) for r in branches)
     ):
@@ -342,17 +367,18 @@ def check_match_cases(
 def match_cases(
     match: ast.Match, tau: Type, mod_ctx: ModuleContext
 ) -> tuple[list[VarContext], Type, Shapes]:
-    cases = match.cases
     residual = shapes(mod_ctx.Sigma, tau, frozenset())
+    rest = tau
     deltas: list[VarContext] = []
-    for case in cases:
-        check_pattern(case.pattern, tau, mod_ctx)
+    for case in match.cases:
+        deltas.append(check_pattern(case.pattern, rest, mod_ctx))
         result = match_shapes(residual, case.pattern, mod_ctx)
         if result is None:
-            raise IllFormedModule(case.pattern, reasons.UnreachableCase(ast.unparse(case.pattern)))
-        _, residual, delta = result
-        deltas.append(delta)
-    rest = remaining_seq(tau, [case.pattern for case in cases], mod_ctx)
+            raise IllFormedModule(
+                case.pattern, reasons.UnreachableCase(render_pattern(case.pattern))
+            )
+        _, residual = result
+        rest = remaining(rest, case.pattern, mod_ctx)
     if rest == Primitive.NEVER:
         assert len(residual) == 0  # the remaining type is coarser than the residual
     return deltas, rest, residual
@@ -410,9 +436,6 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             return binary(BINARY_NAMES[type(e.op)], e.left, e.right, e, mod_ctx)
         case ast.UnaryOp():
             operand = synth_expr(e.operand, mod_ctx)
-            negated = literal_type(e)
-            if negated is not None:
-                return negated
             name = UNARY_NAMES[type(e.op)]
             result = resolve_op_unary(mod_ctx.Sigma, name, operand)
             if result is None:
@@ -497,7 +520,7 @@ def attribute_type(obj: Type, e: ast.Attribute, mod_ctx: ModuleContext) -> Type:
 
 
 def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) -> Type:
-    if container == Primitive.STR:
+    if base_type(container) == Primitive.STR:
         check_expr(e.slice, Primitive.INT, mod_ctx)
         return Primitive.STR
     match container:
@@ -637,6 +660,8 @@ def result_type(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> Type:
 
 
 def check_args(e: ast.Call, sigmas: Sequence[Type], mod_ctx: ModuleContext) -> None:
+    if len(e.keywords) > 0:
+        raise IllFormedModule(e, reasons.KeywordArgumentsNotConstructor())
     if len(sigmas) != len(e.args):
         raise IllFormedModule(e, reasons.CallArityMismatch(len(sigmas), len(e.args)))
     for arg, param in zip(e.args, sigmas):
@@ -648,7 +673,9 @@ def applied_lambda(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> Type:
 
 
 def lambda_arguments(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> VarContext:
-    params = [a.arg for a in f.args.args]
+    params = parameter_names(f.args, f, None)
+    if len(e.keywords) > 0:
+        raise IllFormedModule(e, reasons.KeywordArgumentsNotConstructor())
     if len(params) != len(e.args):
         raise IllFormedModule(e, reasons.CallArityMismatch(len(params), len(e.args)))
     return {x: synth_expr(arg, mod_ctx) for x, arg in zip(params, e.args)}
@@ -700,7 +727,7 @@ def check_expr(e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
 
 
 def check_lambda(e: ast.Lambda, expected: Type, mod_ctx: ModuleContext) -> None:
-    params = [a.arg for a in e.args.args]
+    params = parameter_names(e.args, e, None)
     if not isinstance(expected, CallableType):
         raise IllFormedModule(e, reasons.LambdaTypeMismatch(expected, None))
     if len(params) != len(expected.params):
@@ -747,7 +774,7 @@ def check_quals(generators: list[ast.comprehension], mod_ctx: ModuleContext) -> 
 
 
 def elem_type(Sigma: ClassTable, tau: Type) -> Type | None:
-    if tau == Primitive.STR:
+    if base_type(tau) == Primitive.STR:
         return Primitive.STR
     match tau:
         case ListType(sigma):
@@ -771,7 +798,7 @@ def iterated_type(e: ast.expr, mod_ctx: ModuleContext) -> Type:
     return elem
 
 
-def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, ClassTable]:
+def dataclass(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
     if not isinstance(mod_ctx.gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.NotPredefinedName("dataclass"))
     alphas = tuple(p.name for p in node.type_params if isinstance(p, ast.TypeVar))
@@ -786,12 +813,23 @@ def class_declared(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Class, C
         raise IllFormedModule(node, reasons.DuplicateField(dup, node.name))
     c = Class(qualified(mod_ctx.q, node.name))
     assert c not in mod_ctx.Sigma
-    return c, {**mod_ctx.Sigma, c: ClassTableEntry(alphas, own, base)}
+    return Assigns({node.name: c}), {**mod_ctx.Sigma, c: ClassTableEntry(alphas, own, base)}
+
+
+def type_alias(node: ast.TypeAlias, mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
+    assert isinstance(node.name, ast.Name)
+    alphas = tuple(p.name for p in node.type_params if isinstance(p, ast.TypeVar))
+    assert len(alphas) == len(node.type_params)
+    mod_ctx_ = override_gamma(mod_ctx, {alpha: TypeVar() for alpha in alphas})
+    tau = resolve_type(type_expr(node.value), node, mod_ctx_)
+    return Assigns({node.name.id: TypeAlias(alphas, tau)}), mod_ctx.Sigma
 
 
 def base_class(node: ast.ClassDef, mod_ctx: ModuleContext) -> ClassType:
     psi = parse_annotation(node.bases[0])
     assert isinstance(psi, TypeName)
+    if isinstance(resolve_name(psi.q, mod_ctx), TypeAlias):
+        raise IllFormedModule(node, reasons.NotClass(psi.q))
     tau = resolve_type(psi, node, mod_ctx)
     if not isinstance(tau, ClassType):
         raise IllFormedModule(node, reasons.NotClass(psi.q))

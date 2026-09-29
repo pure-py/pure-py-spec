@@ -155,6 +155,16 @@ class ClassArityMismatch:
 
 
 @dataclass(frozen=True)
+class TypeAliasArityMismatch:
+    q: Name
+    expected: int
+    given: int
+
+    def message(self) -> str:
+        return f"type alias '{self.q}' expects {self.expected} type arguments, given {self.given}"
+
+
+@dataclass(frozen=True)
 class UnknownFieldInPattern:
     c: Var
     xs: tuple[Var, ...]
@@ -228,6 +238,14 @@ class UnknownModule:
 
     def message(self) -> str:
         return f"unknown module '{self.q}'"
+
+
+@dataclass(frozen=True)
+class DuplicateImportedName:
+    x: Var
+
+    def message(self) -> str:
+        return f"name '{self.x}' imported twice"
 
 
 @dataclass(frozen=True)
@@ -317,6 +335,22 @@ class NotCallable:
 
     def message(self) -> str:
         return f"values of type {render(self.tau)} cannot be called"
+
+
+@dataclass(frozen=True)
+class KeywordArgumentsNotConstructor:
+    def message(self) -> str:
+        return "keyword arguments in a call other than a constructor call"
+
+
+@dataclass(frozen=True)
+class DuplicateParameter:
+    x: Var
+    f: Var | None
+
+    def message(self) -> str:
+        where = "lambda" if self.f is None else f"function '{self.f}'"
+        return f"duplicate parameter '{self.x}' in {where}"
 
 
 @dataclass(frozen=True)
@@ -433,6 +467,14 @@ class NoAttributes:
 
 
 @dataclass(frozen=True)
+class BareReturn:
+    tau: Type
+
+    def message(self) -> str:
+        return f"bare return in function with result type {render(self.tau)}"
+
+
+@dataclass(frozen=True)
 class MissingReturn:
     x: Var
     tau: Type
@@ -469,10 +511,12 @@ type Reason = (
     | PatternArityMismatch
     | NotClass
     | ClassArityMismatch
+    | TypeAliasArityMismatch
     | NotPredefinedName
     | UnknownFieldInPattern
     | DuplicatePatternKeyword
     | UnknownModule
+    | DuplicateImportedName
     | UnknownMember
     | ModuleAsValue
     | ClassAsValue
@@ -491,11 +535,14 @@ type Reason = (
     | NoUnaryOverload
     | NotCallable
     | CallArityMismatch
+    | KeywordArgumentsNotConstructor
+    | DuplicateParameter
     | NoneResult
     | TypeMismatch
     | LambdaTypeMismatch
     | NotSubscriptable
     | TupleIndexOutOfRange
+    | BareReturn
     | MissingReturn
     | MissingReturnMatchPartial
     | NotIterable

@@ -1,2 +1,6 @@
-def f(x=1):
-    return 1
+def f(x: int = 1) -> int:
+    return x
+
+
+print(f())
+print(f(2))

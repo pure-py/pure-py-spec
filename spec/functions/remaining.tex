@@ -1,5 +1,3 @@
-\remaining(\Sigma, \Gamma, \tau, \varepsilon) &{}= \tau \\*
-\remaining(\Sigma, \Gamma, \tau, p \cons \seq{p}) &{}= \remaining(\Sigma, \Gamma, \remaining(\Sigma, \Gamma, \tau, p), \seq{p}) \\*
 \remaining(\Sigma, \Gamma, \tyUnion{\sigma}{\tau}, p) &{}= \joinTy{\Sigma}{\remaining(\Sigma, \Gamma, \sigma, p)}{\remaining(\Sigma, \Gamma, \tau, p)} \\*
 \remaining(\Sigma, \Gamma, \tau, x) &{}= \tyNever \\*
 \remaining(\Sigma, \Gamma, \tau, \patWild) &{}= \tyNever \\*

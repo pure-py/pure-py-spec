@@ -12,7 +12,7 @@ patterns, then modules and programs, and \secref{operational-semantics} gives ea
 counterpart.
 
 \speconly{The rules for variables serve two aims: that a program has no mutable state, so a variable never
-changes value, and that a well-typed program is also well typed under mypy. Within these limits the rules permit
+changes value, and that a well-typed program is also well typed under mypy (the restrictions this imposes are collected in \secref{mypy-restrictions}). Within these limits the rules permit
 as much as possible. For the first aim, a variable is introduced by a declaration, parameter, import, pattern or
 generator, and is assigned at most once, either in its declaration or afterwards; an assignment never introduces
 a variable nor reassigns one.
@@ -39,10 +39,10 @@ literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as 
 \speconly{\subsubsection{Subtyping}\label{sec:subtyping}}%
 \paperonly{\paragraph{Subtyping.}}
 
-Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base (\ruleName{subty-class-extend}), and below $C[\seq{\sigma}]$ when $\seq{\tau}$ and $\seq{\sigma}$ are equivalent (\ruleName{subty-class}), so that type arguments are invariant, as for lists and dictionaries; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. The \emph{members} of a union $\tyUnion{\sigma}{\tau}$ are the members of $\sigma$ and of $\tau$, and any other type is its own only member. A union is above
-each of its members and below every type that is above all of them. A tuple type is covariant, below another of the
+Subtyping (\figref{subtyping}) has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base (\ruleName{subty-class-extend}), and below $C[\seq{\sigma}]$ when $\seq{\tau}$ and $\seq{\sigma}$ are equivalent (\ruleName{subty-class}), so that type arguments are invariant, as for lists and dictionaries; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. A type that is not a union has one \emph{disjunct}, the type itself; the disjuncts of a union $\tyUnion{\sigma}{\tau}$ are the disjuncts of $\sigma$ together with the disjuncts of $\tau$. A union is above
+each of its disjuncts and below every type that is above all of them. A tuple type is covariant, below another of the
 same length when each of its components is below the corresponding component. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{pierce2002}. Lists and
-dictionaries are related only when their components are equivalent, since both are invariant in mypy. A callable type is contravariant in its parameters
+dictionaries are related only when their components are equivalent, since both are invariant in mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}). A callable type is contravariant in its parameters
 and covariant in its result, following mypy. The types with a length, namely lists, dictionaries,
 strings and tuples, are below \pyinline{Sized}. An \pyinline{int} is a \pyinline{float}, as PEP~484
 requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
@@ -116,12 +116,10 @@ In a subscript $\exSubscript{e}{e'}$ there is a rule for each container that $e$
 dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
 that synthesises a literal type gives the component type at that position, counting from the end when the index
 is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and any other index of type
-\pyinline{int} gives the join of the component types (\ruleName{subscript-tuple-int}). A negated numeric
-literal synthesises the negated literal type (\ruleName{unop-literal}), and \ruleName{unop} excludes that
-form, to keep the judgement deterministic. A subscript, attribute reference or call whose subject
-synthesises a union is typed at each member, with a variable in place of the subject, and synthesises the
+\pyinline{int} gives the join of the component types (\ruleName{subscript-tuple-int}). A subscript, attribute reference or call whose subject
+synthesises a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
 join of the results (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union}); generators need no
-such rule, because $\elemTy$ takes a union to the join of its members' element types.
+such rule, because $\elemTy$ takes a union to the join of its disjuncts' element types.
 \citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form.
 
@@ -144,7 +142,8 @@ dictionary or comprehension takes the base type of the type synthesised by its e
 matching any other element type. An empty list or dictionary and a lambda have no
 synthesis rule at all, so checking is the only way to type them. A lambda applied to arguments is the
 exception, since the arguments give the parameter types, and the call then synthesises the type of the body
-or checks the body against an expected type (\ruleName{syn-call-lambda}, \ruleName{call-lambda}). A non-empty list has both, and the
+or checks the body against an expected type (\ruleName{syn-call-lambda}, \ruleName{call-lambda}). The parameters of a
+lambda must be distinct, as for a function. A non-empty list has both, and the
 checking rule is still needed when the expected element type is wider than the type synthesised by the
 elements, since \pyinline{list} is invariant.
 
@@ -161,19 +160,16 @@ each iteration.
 \speconly{\subsubsection{Operators}\label{sec:well-formedness-operators}}%
 \paperonly{\paragraph{Operators.}}
 
+\input{spec/fig/operator-overloads}
+
 Each operator is overloaded as specified in \figref{operator-overloads}. A \emph{resolved overload}
 $((\tau_1, \tau_2), \tau)$ pairs operand \emph{bounds}
 with a result type; the judgements of the figure relate operand
-types to the resolved overloads of an operator.
-
-\input{spec/fig/operator-overloads}
-
-\noindent The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the result type
+types to the resolved overloads of an operator. The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the result type
 of the most specific overload at the operand types, $\resolveOp$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:resolve-op}}), so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
-An \emph{equality type} is one for which structural equality is
-defined:
+The values of an \emph{equality type} are compared by structural equality, which is defined except at the dynamically excluded comparisons (\secref{no-coercions}):
 \begin{defalign}
 & \Sigma \vdash \nu \eqType \\
 & \Sigma \vdash \tyLiteral{\ell} \eqType \\
@@ -196,7 +192,7 @@ overloads give \pyinline{Any} whenever the exponent is not a literal, whereas th
 \begin{lemma}[Most specific overload]
 \label{lem:most-specific-overload}
 If neither $\sigma_1$ nor $\sigma_2$ is a subtype of \pyinline{Never} and some overload of $\odot$ applies at
-$(\sigma_1, \sigma_2)$, then $\resolveOp(\Sigma, \odot, \sigma_1, \sigma_2)$ is defined; likewise
+$(\sigma_1, \sigma_2)$, then $\resolveOp(\Sigma, \odot, \sigma_1, \sigma_2)$ is defined, and similarly for
 $\resolveOp(\Sigma, \ominus, \sigma)$.
 \end{lemma}
 
@@ -235,14 +231,14 @@ A sequence $s\;s'$ (\ruleName{seq}) types $s$, then types $s'$ under $\Gamma$ ov
 by $s$. A conditional combines its
 branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
 Top-level statements are checked by a separate
-judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, a
-class declaration is a top-level form, and a plain statement is checked with no return type
+judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, class
+declarations and \pyinline{type} statements are top-level forms, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
-\pyinline{return} requires \pyinline{None} to be a subtype of $\tau$. An expression statement synthesises a type and discards it
+\pyinline{return} requires $\tau$ to be equivalent to \pyinline{None}. An expression statement synthesises a type and discards it
 (\ruleName{expr-stmt}). A call to a callable with result \tyNone{} is not an expression, because
 \ruleName{call} requires a result other than \tyNone, and is typed as a statement by \ruleName{call-stmt}.
-The restriction exists only for compatibility with mypy, which rejects any use of the value of such a call.
+The restriction is for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).
 
 A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment $\exAssign{x}{e}$ requires $x$ to be a declared but unassigned variable, and
@@ -255,9 +251,14 @@ definitions and modules introduce the variables of the scope as unbound, using t
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
 the class name to $\Type{C}$, resolves the field annotations with its type parameters in scope, and requires the fields it declares to be distinct and, when it extends
-another class, the base to resolve to an instantiated class, and the additional fields not to repeat an inherited field
+another class, the base to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
-scope; every \PurePy class must declare itself a dataclass. Each rule that takes an annotation resolves it to a type
+scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement $\exTypeAlias{x[\seq{\alpha}]}{\psi}$, such as \pyinline{type Pair[T] = tuple[T, T]},
+declares $x$ as an alias of the type denoted by $\psi$ with the type parameters $\seq{\alpha}$ in scope
+(\ruleName{type-alias}). An application of the alias such as \pyinline{Pair[int]} denotes that type at the given
+arguments (\ruleName{ty-alias}), here \pyinline{tuple[int, int]}, so types never mention aliases. Since the names declared by a module are unbound
+before their declarations (\secref{well-formedness-modules}), $\psi$ can name only classes and aliases declared
+earlier in the module, and cannot name $x$ itself. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
 
 A mutual region of function definitions (\ruleName{def}) resolves the annotations of each definition to a
@@ -270,17 +271,16 @@ enclosing scope referenced by the body must be definitely assigned at the point 
 whereas Python resolves the reference only when the body runs. As with any scope, the names declared in the function, including
 its parameters, must be distinct from one another and from any pattern variables in its body. The function names of the mutual region are not among these; they are
 declared in the enclosing scope, where the same condition applies to them. The body is checked with the
-declared return type, and must have static outcome $\Returns$ unless the function returns \pyinline{None},
-so a function that declares a result definitely returns one.
+declared return type, and must have static outcome $\Returns$ unless the return type is equivalent to \pyinline{None},
+so a function that declares a result definitely returns one. A return type such as $\tyUnion{\tyInt}{\tyNone}$
+does not exempt the body from returning, nor permit a bare \pyinline{return}, for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
-auxiliary judgement $\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typing-cases}), which threads
-a residual $L$ of shapes through the cases, starting from the shapes of $\sigma$ (\figref{shapes}), and merges
-their outcomes into $S$. The \ruleName{match} rule applies when the remaining type
-$\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}) is $\tyNever$, meaning the match is
-exhaustive; the \ruleName{match-partial} rule applies otherwise, merging in $\Assigns{\varnothing}$
-for the values that fall through. The residual, reachability and exhaustiveness are the subject of
+auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}), which threads
+a remaining type, starting from $\sigma$, and a residual $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
+through the cases, merging their outcomes into $S$. The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
+exhaustive; the \ruleName{match-partial} rule applies otherwise and also merges in $\Assigns{\varnothing}$, the
+outcome of the path on which the scrutinee is not matched by any of the cases. The remaining type, the residual, reachability and exhaustiveness are the subject of
 \secref{well-formedness-patterns}.
 
 \subsection{Pattern matching}
@@ -288,27 +288,31 @@ for the values that fall through. The residual, reachability and exhaustiveness 
 \label{sec:well-formedness-patterns}
 
 To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement
-$\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ (\figref{typing-cases}) threads a \emph{residual} $L$
-through the cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a set of
-values of a single type, and over-approximates the values of $\sigma$ which are not matched by any of the
-earlier cases; the match rules start the residual from the shapes of $\sigma$. Each case's pattern is
-checked against $\sigma$ (\paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}}) and matched
-against the residual (\paperonly{\figref{typing-pat}}\speconly{\secref{matching}}). A case is
-\emph{reachable} if its pattern matches at least one shape of the residual, and a match with an unreachable
-case is ill-formed. For a reachable case, the matched shapes give the types of its pattern variables, the
-body is checked under those bindings, the outcomes are merged into $S$, and the shapes left after matching
-are the residual for the cases that follow.
+$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}) threads a \emph{remaining type}
+$\tau$ and a \emph{residual} $L$ through the cases, both over-approximations of the values of $\sigma$ which are not
+matched by any of the earlier cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a
+set of values of a single type, and starts from the shapes of $\sigma$; the remaining type is coarser, a type rather
+than a set of shapes, and starts from $\sigma$ itself. Two auxiliary functions narrow a type $\tau$ by a pattern $p$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:matched-as}}): $\matchedAs(\Sigma, \Gamma, \tau, p)$ is
+the type to which $\tau$ is narrowed if $p$ matches, and $\remaining(\Sigma, \Gamma, \tau, p)$ is the type remaining if
+$p$ fails. Each case's pattern is checked against the remaining type
+(\paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}}), binding its pattern variables, and matched
+against the residual (\paperonly{\figref{typing-pat}}\speconly{\secref{matching}}). Reachability is decided by the
+residual: a case is \emph{reachable} if its pattern matches at least one shape of the residual, and a match with an
+unreachable case is ill-formed. For a reachable case, the body is checked under the bindings and its outcome merged
+into $S$; the shapes left after matching and the type remaining if the pattern fails become the residual and remaining
+type for the case that follows.
 
-A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. The match
-rules decide exhaustiveness not by the final residual but by the \emph{remaining type}
-$\remaining(\Sigma, \Gamma, \sigma, \seq{p})$ for the patterns $\seq{p}$ of the cases
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:remaining}}), a coarser over-approximation
-of the values of $\sigma$ which are not matched by any of the cases, as a type rather than a set of
-shapes. The remaining type follows mypy's narrowing of a match scrutinee, which subtracts a class only
-for a constructor pattern that matches every value of the class, and a tuple only through one refutable
-component, so cases that between them cover a field of a class leave an empty residual but a remaining
-type other than $\tyNever$. Exhaustiveness decided by the residual alone would therefore accept a function
-which returns from each case of such a match but which is rejected by mypy as not always returning. The
+A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. Exhaustiveness is decided by
+the final remaining type, which the \ruleName{match} rule requires to be $\tyNever$, with \ruleName{match-partial}
+applying otherwise. The remaining type thus determines exhaustiveness as well as the types of pattern variables. The Python typing
+specification leaves narrowing largely unspecified,\footnote{\url{https://typing.python.org/en/latest/spec/narrowing.html}}
+so the remaining type emulates the narrowing of a match scrutinee observed in mypy
+(\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}), which subtracts a class only for a
+constructor pattern that matches every value of the class, and a tuple only through one refutable component, i.e.~one whose pattern can fail to match a value of the component's type. Cases that between them cover a field of a class therefore leave an empty residual but a remaining
+type other than $\tyNever$, so a function which returns from each of the cases is rejected as not always returning, and
+at a class with a field of type $\tyUnion{\tyInt}{\tyNone}$ a case \pyinline{Box(n)} after a case \pyinline{Box(None)}
+binds \pyinline{n} at $\tyUnion{\tyInt}{\tyNone}$ rather than at \pyinline{int}. The
 usefulness algorithm for ML~\cite{maranget2007} also checks reachability and exhaustiveness with a single
 relation. The residual plays the role of the term descriptions of \citet{sestoft1996}, and the uncovered
 sets of \citet{karachalias2015} likewise let the type exclude cases.
@@ -318,16 +322,36 @@ sets of \citet{karachalias2015} likewise let the type exclude cases.
 
 \input{spec/fig/pattern-matching/checking-pat}
 
-A pattern must \emph{check} against the scrutinee type, $\Sigma; \Gamma \vdash p \checks \tau$ (\figref{checking-pat}), before it is matched against the residual (\ruleName{match-case}). The judgement holds when every tuple pattern in $p$ is at a type which has no list values, every list pattern is at a type which has no tuple values, and every constructor pattern is at a type with at most one comparable instantiation of its class, up to equivalence. List values and tuple values are defined by subtyping:
+A pattern must \emph{check} against the remaining type, $\Sigma; \Gamma \vdash p \checks \tau \binding \Delta$ (\figref{checking-pat}), before it is matched against the residual (\ruleName{match-case}). The bindings $\Delta$ give the types of the pattern variables. The judgement holds when every tuple pattern in $p$ is at a type which has no list values, every list pattern is at a type which has no tuple values, and every constructor pattern is at a type with at most one comparable instantiation of its class, up to equivalence. List values and tuple values are defined by subtyping:
 \begin{defalign}
-\tau \text{ has list values} & {}\iff \Sigma \vdash \tyList{\sigma} \subty \tau \text{ for some } \sigma \text{, or a member of } \tau \text{ is a type variable} \\
-\tau \text{ has tuple values} & {}\iff \Sigma \vdash \tyTuple{\seq{\sigma}} \subty \tau \text{ for some } \seq{\sigma} \text{, or a member of } \tau \text{ is a type variable}
+\tau \text{ has list values} & {}\iff \Sigma \vdash \tyList{\sigma} \subty \tau \text{ for some } \sigma \text{, or a disjunct of } \tau \text{ is a type variable} \\
+\tau \text{ has tuple values} & {}\iff \Sigma \vdash \tyTuple{\seq{\sigma}} \subty \tau \text{ for some } \seq{\sigma} \text{, or a disjunct of } \tau \text{ is a type variable}
 \end{defalign}
-So list types, $\tySized$ and $\tyObject$ have list values; tuple types, $\tySized$ and $\tyObject$ have tuple values; and a type variable, which may stand for any type, has both. The rules check a sub-pattern at the type of its position, a tuple component, list element, dictionary value or field, and a pattern at a union at each of its members. A pattern also checks against a type when it cannot match any value of that type, as with a tuple pattern at a tuple type of another length or a constructor pattern naming a class with no comparable instantiation (\ruleName{check-tuple-none}, \ruleName{check-list-none}, \ruleName{check-dict-none}, \ruleName{check-constr-none}); matching then leaves the values of the type to later cases.
+So list types, $\tySized$ and $\tyObject$ have list values; tuple types, $\tySized$ and $\tyObject$ have tuple values; and a type variable, which may stand for any type, has both. The rules check a sub-pattern at the type of its position, a tuple component, list element, dictionary value or field, and a pattern at a union at each of its disjuncts. A variable pattern binds at the type at which it is checked, and a pattern named by \pyinline{as} is bound at $\matchedAs(\Sigma, \Gamma, \tau, p)$; the bindings of sub-patterns compose by disjoint union, so a pattern that binds a name twice is ill-formed, and at a union the bindings of the disjuncts are joined. A pattern also checks against a type which has no disjunct of the form matched by the pattern: a tuple pattern when no disjunct is a tuple type of the pattern's length, a list pattern when no disjunct is a list type, a dictionary pattern when no disjunct is a dictionary type, or a constructor pattern when its class has no comparable instantiation (\ruleName{check-tuple-none}, \ruleName{check-list-none}, \ruleName{check-dict-none}, \ruleName{check-constr-none}). Such a pattern matches no shape of the type and binds its variables at $\tyNever$, the unit of the join. At one disjunct of a union it therefore leaves the values of that disjunct to later cases, and a case with a pattern matching no shape at all is unreachable.
 
 The conditions on tuple and list patterns ensure that pattern matching always has a result. Under the evaluation rules, matching a tuple pattern against a list or a list pattern against a tuple is undefined\speconly{ (\figref{eval-pat})}, although Python permits both. Both forms of pattern therefore fail at $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$, at $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$, and at a type variable.
 
 The condition on constructor patterns supplies the type arguments omitted by the pattern: they are recovered by the judgement $\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$ from the type $\tau$ at which the pattern is checked, the \emph{instance} of $C$ at $\tau$ being the instantiation of $C$ above $\tau$, or the instantiation below $\tau$, when there is one up to equivalence (\ruleName{instance-above}, \ruleName{instance-below}). Below $C$ the base classes of the type determine the instance: at \pyinline{IntLeaf}, a subclass of \pyinline{Leaf[int]}, the instance of \pyinline{Leaf} is \pyinline{Leaf[int]}. Above $C$ the base arguments of $C$ determine it: at \pyinline{Tree[int]} the instance of \pyinline{Leaf} is \pyinline{Leaf[int]}, because \pyinline{Leaf[T]} extends \pyinline{Tree[T]}, whereas at \tyObject{} a class with type parameters has no instance, since every instantiation lies below \tyObject.
+The instance judgement is decided as follows. A pattern is checked at the disjuncts of a union separately
+(\ruleName{check-union}), so the type $\tau$ at which an instance is taken is never a union. If $\tau$ is an
+instantiated class $D[\seq{\rho}]$ with $C$ an ancestor of $D$, the instance is the instantiation of $C$ reached
+from $D[\seq{\rho}]$ along the base classes, which is unique because type arguments are invariant
+(\ruleName{instance-above}). If $\tau$ is $D[\seq{\sigma}]$ with $D$ an ancestor of $C$, the instantiations of $C$
+below $\tau$ are the $C[\seq{\tau}]$ for which the instantiation of $D$ reached from $C[\seq{\tau}]$ along the base
+classes has arguments equivalent to $\seq{\sigma}$, and Lemma~\ref{lem:instantiation-candidates} bounds the instantiations
+to be examined to finitely many instantiation candidates: one instantiation candidate up to equivalence gives the instance
+(\ruleName{instance-below}), none means that $C$ has no instance at $\tau$, and two that are not equivalent mean
+that $C$ has an instantiation comparable with $\tau$ but no instance, so that a constructor pattern at $\tau$ is
+ill-formed. At \tyObject{} and at \tyNever{} every instantiation of $C$ is comparable with $\tau$, so $C$ has an
+instance only if it has no type parameters. At any other type $C$ has no instantiation comparable with $\tau$, and no instance.
+\begin{lemma}[Sufficiency of instantiation candidates]
+\label{lem:instantiation-candidates}
+Suppose $D \in \ancestors(\Sigma, C)$. An \emph{instantiation candidate} for $C$ at $D[\seq{\sigma}]$ is an instantiation $C[\seq{\tau}]$ in
+which each $\tau_i$ is the join of a subset of $\subterms(\seq{\sigma}) \cup \set{\tyObject}$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}). If any instantiation of $C$ is below
+$D[\seq{\sigma}]$, then some instantiation candidate is below $D[\seq{\sigma}]$; and if two instantiations of $C$ that are not equivalent
+are below $D[\seq{\sigma}]$, then two instantiation candidates below $D[\seq{\sigma}]$ are not equivalent.
+\end{lemma}
 
 \speconly{\subsubsection{Shapes and shape typing}\label{sec:shapes}}%
 \paperonly{\paragraph{Shapes and shape typing.}}
@@ -352,7 +376,7 @@ well-formed: each excluded head is typed at the type of the shape (at $\tyStr$, 
 dictionary shape) and each component shape at the type of that component.
 
 The auxiliary function $\shapes(\Sigma, \tau, H)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:shapes}}) gives the shapes of $\tau$
-once the heads in $H$ are excluded. A union contributes the shapes of its members and a dictionary type
+once the heads in $H$ are excluded. A union contributes the shapes of its disjuncts and a dictionary type
 the dictionary form; every other type contributes the single shape $\shapeAny{\tau}{H}$, or no shape at
 all when $H$ exhausts $\tau$. The rest form therefore never carries a union or dictionary type, and
 \ruleName{shape-rest} states this restriction as a side condition.
@@ -363,15 +387,11 @@ all when $H$ exhausts $\tau$. The rest form therefore never carries a union or d
 \input{spec/fig/pattern-matching/typing-pat}
 
 \emph{Matching} (\figref{typing-pat}) has three forms. The form on a single shape $k$ matches a pattern against that
-shape, giving matched shapes $K$, residual $L$ and bindings $\Delta$. A variable pattern binds at
-$\shapeTy(k)$, and a pattern named by \pyinline{as} at the join over the matched shapes, so a case for
-one alternative of a union leaves a later variable case bound at the remaining members alone. The form
+shape, giving matched shapes $K$ and residual $L$. The form
 on sequences matches the sub-patterns of a tuple, list, dictionary or constructor pattern against the
-component shapes position by position, and the bindings of the positions, or of the keys of a dictionary
-pattern, compose by disjoint union, so a pattern that binds a name twice has no derivation. The form on
-an ordered set of shapes $L$, used by the match rules, matches each shape of $L$ in turn. Some shapes of
-$L$ may admit no derivation for the pattern, so \ruleName{pat-shapes} takes the shapes of $L$ that do
-admit a derivation, of which there must be at least one, and passes the remaining shapes into the
+component shapes position by position. The form on
+an ordered set of shapes $L$, used by the match rules, matches each shape of $L$ in turn. The pattern need not match every shape of $L$, so \ruleName{pat-shapes} takes the shapes of $L$
+matched by the pattern, of which there must be at least one, and passes the unmatched shapes into the
 residual untouched.
 
 \input{spec/fig/pattern-matching/split}
@@ -396,10 +416,10 @@ dictionaries that lack the key; once every key of the pattern is in $\beta$ the 
 dictionary and leaves the empty residual.
 
 The cases needed to exhaust a match therefore depend on the type of the scrutinee: a union is exhausted
-by covering each member, a class type by a pattern for the class itself, \pyinline{bool} by
+by covering each disjunct, a class type by a pattern for the class itself, \pyinline{bool} by
 \pyinline{True} and \pyinline{False}, and a dictionary type by the empty dictionary pattern, while \pyinline{int}, \pyinline{str} and lists have
 unboundedly many heads and need a variable or wildcard. A literal-typed scrutinee is exhausted by covering
-its literals, so \pyinline{x = 42} admits a match with a case for \pyinline{42} alone, while
+its literals, so \pyinline{x: Literal[42] = 42} admits a match with a case for \pyinline{42} alone, while
 \pyinline{x: int = 42} keeps the type open. Over
 $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave the empty residual,
@@ -409,7 +429,7 @@ although each covers only part of the type.
 \label{lem:shape-typing}
 If $\Sigma \vdash h : \tau$ for every $h \in H$ then $\Sigma \vdash k : \tau$ for each $k \in
 \shapes(\Sigma, \tau, H)$. Moreover, if $\Sigma \vdash k : \tau$ for each $k \in L$ and $\Sigma; \Gamma \vdash L, p
-\matches K, L' \binding \Delta$ then $\Sigma \vdash k : \tau$ for each $k \in K \disjunion L'$.
+\matches K, L'$ then $\Sigma \vdash k : \tau$ for each $k \in K \disjunion L'$.
 \end{lemma}
 
 \subsection{Modules and programs}
@@ -421,16 +441,15 @@ $\Sigma \vdash_{\mathsf{load}} q : \Gamma \binding \Sigma'$ (\figref{typing-modu
 the \ruleName{predefined} rule gives a predefined module the signature of
 Definition~\ref{def:predefined}.
 Both import forms statically load their target, together with its containing modules
-(\figref{typing-import-prefix}). A plain import also records each of these modules as a member of its
-parent (the static loads-as judgement), so that the binding created for the root of the target gives attribute
-access along the whole chain. A from-import also loads any imported name that denotes a submodule. A
-containing module of the target is exempt from loading first if it is the importing module or one of its
-containing modules, since at runtime it may still be loading. The exemption applies only to from-imports, because
+(\figref{typing-import-prefix}). A plain import statically loads the root and then each module
+along the chain of names, recording each as a member of its parent (\ruleName{loads-as-cons}), so that the binding for the root gives attribute
+access along the whole chain. A from-import also statically loads any imported name that denotes a submodule, and the
+names it imports must be distinct. A
+containing module of the target is exempt from static loading if it is the importing module or one of its
+containing modules\speconly{ (\S\ref{aux:containing})}, because at runtime it may still be loading when the import executes. The exemption applies only to from-imports, because
 for a plain import
 the only containing module that could never load first is the importing module itself, and an import naming a
-module contained in the importing module is excluded outright\paperonly{ (\secref{no-load-dependent})}. Loading a module
-may thus require other modules to load first; the rules are interpreted inductively, so a program with an
-import cycle is ill-formed, because a module in a cycle could finish loading only after itself. Program
+module contained in the importing module is excluded outright\paperonly{ (\secref{no-load-dependent})}. Static loading is defined inductively, so a program with an import cycle is ill-formed. Program
 well-formedness (\figref{typing-module}) requires the main module to be well typed and hence,
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
@@ -439,11 +458,12 @@ declared in the body or bound by a pattern in it. The members of \pyinline{built
 shadows a builtin throughout the module, so a use of the name before its declaration is rejected. Under mypy such a
 use instead resolves to the builtin, following Python's run-time lookup. As with any scope, the names declared in the
 module, including its imported names, must be distinct from one another and from any pattern variables in its
-body.
+body. Since every module declares \pyinline{__name__} (\secref{modules-programs}), a module is ill-formed if its body
+declares that name again, imports it, or binds it in a pattern.
 
 \input{spec/fig/typing-module}
 
-The signature $\Gamma$ produced by static loading (\figref{typing-module}) comprises the classes
+The signature $\Gamma$ produced by static loading (\figref{typing-module}) comprises the classes, type aliases
 and variables defined by a module, together with its intrinsic \pyinline{__name__} and a stub for each submodule,
 but not the names that it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
 name is a private dependency, not re-exported as part of the interface. Submodule stubs and the bindings of the module

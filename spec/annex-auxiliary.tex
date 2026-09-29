@@ -70,6 +70,11 @@ The functions on types and shapes introduced in \secref{types}, each defined by 
 \funcrows{meet}
 \end{auxfunction}
 
+\begin{auxfunction}{\subterms(\tau), \subterms(\seq{\tau})}{set of types}{aux:subterms}
+\input{spec/functions/subterms-text}
+\funcrows{subterms}
+\end{auxfunction}
+
 \begin{auxfunction}{\elemTy(\Sigma, \tau)}{type}{aux:elem-type}
 \input{spec/functions/elem-type-text}
 \funcrows{elem-type}
@@ -85,7 +90,12 @@ The functions on types and shapes introduced in \secref{types}, each defined by 
 \funcrows{shape-type}
 \end{auxfunction}
 
-\begin{auxfunction}{\remaining(\Sigma, \Gamma, \tau, p), \remaining(\Sigma, \Gamma, \tau, \seq{p})}{type}{aux:remaining}
+\begin{auxfunction}{\matchedAs(\Sigma, \Gamma, \tau, p)}{type}{aux:matched-as}
+\input{spec/functions/matched-as-text}
+\funcrows{matched-as}
+\end{auxfunction}
+
+\begin{auxfunction}{\remaining(\Sigma, \Gamma, \tau, p)}{type}{aux:remaining}
 \input{spec/functions/remaining-text}
 \funcrows{remaining}
 \end{auxfunction}
@@ -104,6 +114,11 @@ the resolution of names in an environment.
 \begin{auxfunction}{\submods(q)}{context}{aux:submods}
 \input{spec/functions/submods-text}
 \funcrows{submods}
+\end{auxfunction}
+
+\begin{auxfunction}{\containing(q, q')}{sequence of module names}{aux:containing}
+\input{spec/functions/containing-text}
+\funcrows{containing}
 \end{auxfunction}
 
 \begin{auxfunction}{\ownFields(\phi)}{sequence of bindings}{aux:own-fields}

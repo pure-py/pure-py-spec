@@ -6,3 +6,4 @@ def f(v: list[int]) -> int:
             return 0
 
 print(f([3, 4]))
+print(f([1]))

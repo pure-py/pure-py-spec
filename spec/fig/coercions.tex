@@ -5,15 +5,16 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.29\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Construct & Python & Exclusion & Mechanism \\
-Tests of \pyinline{if} and \pyinline{assert} & Coerced to \pyinline{bool} & Dynamic & Must already be Boolean \\[1mm]
-Sequence patterns & List patterns match tuples, and tuple patterns lists & Dynamic & List patterns match only lists, tuple patterns only tuples \\[1mm]
-Constructor patterns & Positional class patterns may supply fewer sub-patterns than class has fields & Static & Require exact arity \\[1mm]
-Dictionary keys & Any hashable value, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Static in patterns, dynamic in expressions & Strings only \\[1mm]
-\pyinline{assert} message & Any object, shown in traceback & Dynamic & Strings only \\[1mm]
-Duplicate name in \pyinline{from} import & Repeated name rebinds harmlessly & Static & Imported names distinct \\[1mm]
-\pyinline{==} and \pyinline{!=} & Compare any two operands, giving \pyinline{False} when unrelated & Dynamic & Undefined between, for example, number and string, or list and tuple; only \pyinline{None} compares with anything \\[1mm]
-Functions under \pyinline{==} & Compared by identity, so two textually identical lambdas are unequal & Dynamic & Equality undefined \\[1mm]
-\pyinline{nan} comparison via container equality & Elements compared by identity before equality, so identical NaNs match but distinct ones do not & Dynamic & Undefined when both elements are \pyinline{nan}
+Non-Boolean test of \pyinline{if} or \pyinline{assert} & Coerced to \pyinline{bool} & Static & Test checked against \pyinline{bool} (\ruleName{if}, \ruleName{assert}) \\\rowgap
+List pattern at tuple, or tuple pattern at list & Matches, since list and tuple patterns both match lists and tuples & Static & Pattern does not match any value; case unreachable (\ruleName{check-list-none}, \ruleName{check-tuple-none}) \\\rowgap
+Pattern \pyinline{a, b} without brackets or parentheses & Matches lists and tuples alike & Syntactic & Tuple patterns parenthesised, list patterns bracketed \\\rowgap
+Positional class pattern with fewer sub-patterns than fields & Matches, ignoring remaining fields & Static & Arguments cover fields exactly ($\fieldMap$) \\\rowgap
+Non-string dictionary key & Any hashable value accepted, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Syntactic in patterns, static in expressions & Keys are string literals in patterns, of type \pyinline{str} in expressions (\ruleName{dict}) \\\rowgap
+Non-string \pyinline{assert} message & Any object accepted, shown in traceback & Static & Message checked against \pyinline{str} (\ruleName{assert-msg}) \\\rowgap
+\pyinline{==} or \pyinline{!=} between operands of unrelated types & Defined, giving \pyinline{False} & Static & Operand types must be comparable (\ruleName{binop}) \\\rowgap
+Boolean against number under \pyinline{==} or \pyinline{!=} & Compared as numbers, so \pyinline{True} equals \pyinline{1} & Static; dynamic at \pyinline{object} & \pyinline{bool} and \pyinline{int} incomparable (\ruleName{binop}); at \pyinline{object}, equality undefined \\\rowgap
+Function under \pyinline{==} or \pyinline{!=} & Compared by identity, so two textually identical lambdas are unequal & Static; dynamic at \pyinline{object} & Callable types not equality types (\ruleName{binop}); at \pyinline{object}, undefined between functions \\\rowgap
+\pyinline{nan} under container equality & Elements compared by identity before equality, so identical NaNs match but distinct ones do not & Dynamic & Undefined when both elements are \pyinline{nan}
 \end{tabular}
 \caption{Python coercions and lax matches excluded by \PurePy}
 \label{fig:coercions}

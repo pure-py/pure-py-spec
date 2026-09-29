@@ -1,1 +1,1 @@
-case d is unreachable
+case [c, d] is unreachable

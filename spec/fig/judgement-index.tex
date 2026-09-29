@@ -7,9 +7,9 @@
 $\Sigma \vdash h : \tau$ & head $h$ has type $\tau$ & \figref{shapes} \\
 $\Sigma \vdash k : \tau$ & shape $k$ has type $\tau$ & \figref{shapes} \\
 $\Sigma; \Gamma \vdash k, p \splits K, L$ & shape $k$ splits at the head tested by $p$, giving $K$ and $L$ & \figref{split} \\
-$\Sigma; \Gamma \vdash k, p \matches K, L \binding \Delta$ & pattern $p$ matches shapes $K$ of $k$, leaving $L$ and binding $\Delta$ & \figref{typing-pat} \\
+$\Sigma; \Gamma \vdash k, p \matches K, L$ & pattern $p$ matches shapes $K$ of $k$, leaving $L$ & \figref{typing-pat} \\
 $\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$ & $C[\seq{\sigma}]$ is the instance of $C$ at $\tau$ & \figref{instance} \\
-$\Sigma; \Gamma \vdash p \checks \tau$ & pattern $p$ checks against type $\tau$ & \figref{checking-pat} \\
+$\Sigma; \Gamma \vdash p \checks \tau \binding \Delta$ & pattern $p$ checks against type $\tau$, binding $\Delta$ & \figref{checking-pat} \\
 $\Gamma \vdash q : \theta$ & name $q$ denotes context entry $\theta$ & \figref{resolve-name} \\
 $\Sigma; \Gamma \vdash \psi \synth \tau$ & type expression $\psi$ denotes type $\tau$ & \figref{resolve-type} \\
 $\Sigma; \Gamma \vdash e \synth \tau$ & expression $e$ synthesises type $\tau$ & \figref{typing-synth} \\
@@ -18,11 +18,11 @@ $\Sigma; \Gamma \vdash \seq{g} : \Delta$ & comprehension qualifiers $\seq{g}$ ar
 $\Sigma; \Gamma; \zeta \vdash s : R$ & statement $s$ has static outcome $R$, with return type $\zeta$ & \figref{typing-stmt} \\
 $\Sigma; \Gamma \vdash d \synth \tau$ & definition $d$ synthesises type $\tau$ & \figref{typing-def-synth} \\
 $\Sigma; \Gamma \vdash d \checks \tau$ & definition $d$ checks against type $\tau$ & \figref{typing-def-check} \\
-$\Sigma; \Gamma; \zeta; \sigma \vdash L, \seq{b} : S, L'$ & cases $\seq{b}$ have static outcome $S$, transforming residual $L$ to $L'$ & \figref{typing-cases} \\
+$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ & cases $\seq{b}$ have static outcome $S$, transforming remaining type $\tau$ and residual $L$ to $\tau'$ and $L'$ & \figref{typing-cases} \\
 $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ & top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$ & \figref{typing-top-level} \\
 $\Sigma \vdash \Gamma, x \importsR \theta \binding \Sigma'$ & name $x$ imported from module signature $\Gamma$ has context entry $\theta$ & \figref{typing-imports} \\
 $\Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma'$ & imports $\seq{\iota}$ of module $q$ yield context $\Gamma$ & \figref{typing-import-prefix} \\
-$\Sigma \vdash q, \theta \loadsAs \theta' \binding \Sigma'$ & importing module $q$ into context entry $\theta$ gives context entry $\theta'$ & \figref{typing-import-prefix} \\
+$\Sigma \vdash \theta, \seq{x} \loadsAs \theta' \binding \Sigma'$ & loaded module $\theta$ extended along chain $\seq{x}$ of submodule names gives context entry $\theta'$ & \figref{typing-import-prefix} \\
 $\Sigma \vdash_{\mathsf{load}} q : \Gamma \binding \Sigma'$ & module $q$ statically loads with signature $\Gamma$ & \figref{typing-module} \\
 $\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{typing-module}
    \\[2mm]
@@ -37,7 +37,7 @@ $\rho, \seq{e} \Rightarrow r$ & expressions $\seq{e}$ evaluate, left to right, t
 $\rho, \seq{g} \Rightarrow r$ & comprehension qualifiers $\seq{g}$ evaluate to result $r$ & \figref{eval-quals-result} \\
 $\rho, x \importsR r$ & name $x$ imported from module environment $\rho$ has result $r$ & \figref{eval-imports} \\
 $q, \seq{\iota} \Rightarrow r$ & imports $\seq{\iota}$ of module $q$ evaluate to result $r$ & \figref{eval-import-prefix} \\
-$q, v \loadsAs v'$ & importing module $q$ into value $v$ gives value $v'$ & \figref{eval-import-prefix} \\
+$v, \seq{x} \loadsAs r$ & loaded module $v$ extended along chain $\seq{x}$ of submodule names gives result $r$ & \figref{eval-import-prefix} \\
 $q \Rightarrow_{\mathsf{load}} r$ & module $q$ loads to result $r$ & \figref{eval-modules} \\
 $\mathcal{M} \Rightarrow \kappa$ & program $\mathcal{M}$ evaluates to termination kind $\kappa$ & \figref{eval-modules}
 \end{tabular}

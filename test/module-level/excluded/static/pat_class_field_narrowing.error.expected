@@ -1,0 +1,1 @@
+no overload of '+' at operand types int | None and Literal[1]

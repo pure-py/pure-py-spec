@@ -1,1 +1,1 @@
-case 2 is unreachable
+case (1, 2) is unreachable

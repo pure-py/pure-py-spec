@@ -114,7 +114,8 @@ recursion between loading and evaluation is grounded by program well-formedness,
 import cycles (\secref{modules-programs}).
 Loading takes a single module; an import loads the modules containing its target from the root down, each
 before the module it contains, mirroring the static rules\speconly{, by the loads-as judgement for a plain import and
-as premises of the from-import rule}.
+as premises of the from-import rule}. If loading one of these modules aborts, the import aborts for the same reason and the modules after it are
+not loaded.
 
 Since
 imports precede statements, every module that a statement can reference is loaded before the statement runs, and

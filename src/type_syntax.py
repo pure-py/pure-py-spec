@@ -309,12 +309,7 @@ def parse_subscript(e: ast.Subscript) -> TypeExpr | None:
 def literal(e: ast.expr) -> Literal | None:
     match e:
         case ast.Constant(value=v):
-            assert not isinstance(v, (bytes, complex, EllipsisType))
-            return Literal(v)
-        case ast.UnaryOp(op=ast.USub(), operand=ast.Constant(value=n)):
-            if isinstance(n, bool) or not isinstance(n, (int, float)):
-                return None
-            return Literal(-n)
+            return None if isinstance(v, (bytes, complex, EllipsisType)) else Literal(v)
         case _:
             return None
 

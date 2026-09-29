@@ -1,6 +1,6 @@
 ---
 name: purepy-editor
-description: PurePy-specific additions to the technical-authoring, coding-conventions and github-issues skills.
+description: PurePy-specific additions to the technical-authoring, coding-conventions and github skills.
 ---
 
 # PurePy editor conventions

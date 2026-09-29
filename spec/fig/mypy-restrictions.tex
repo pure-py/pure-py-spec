@@ -1,0 +1,18 @@
+\begin{figure}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.40\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Construct & mypy & Mechanism \\
+Call returning \pyinline{None} as an expression & Rejects any use of the value & \ruleName{call} requires a result other than \pyinline{None}; the call is a statement (\ruleName{call-stmt}) \\\rowgap
+Body that may fall through at a return type such as \pyinline{int | None} & Reports a missing return & \ruleName{def-body} requires outcome $\Returns$ unless the return type is equivalent to \pyinline{None} \\\rowgap
+Bare \pyinline{return} at such a return type & Reports a missing return value & \ruleName{return-none} requires the return type equivalent to \pyinline{None} \\\rowgap
+Match whose cases cover a class field by field & Narrows the scrutinee by whole classes, so reports a missing return & Exhaustiveness decided by the remaining type (\ruleName{match}) \\\rowgap
+Pattern variable after a case excluding a field value & Binds at the field type & Bindings taken from the remaining type (\ruleName{match-case}, \ruleName{check-var}) \\\rowgap
+\pyinline{list[bool]} below \pyinline{list[int]} & Rejects; list and dictionary types invariant & \ruleName{subty-list} and \ruleName{subty-dict} require equivalent components \\\rowgap
+Declaration of a name already a parameter, imported name, pattern variable or declaration of the scope & Rejects the redeclaration & Context $\scopeS(Y, s)$ of the body undefined unless the names are pairwise distinct
+\end{tabular}
+\caption{Restrictions imposed for compatibility with mypy}
+\label{fig:mypy-restrictions}
+\end{figure}

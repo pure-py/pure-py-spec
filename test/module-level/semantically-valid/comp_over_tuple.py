@@ -1,2 +1,4 @@
+# rule: qual-generator
 t: tuple[int, str] = (1, "a")
-print([x for x in t])
+ys: list[int | str] = [x for x in t]
+print(ys)

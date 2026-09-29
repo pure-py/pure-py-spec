@@ -37,6 +37,18 @@ class Prohibited(Unsupported):
         super().__init__(node, f"{construct} prohibited")
 
 
+class ParseError(Unsupported):
+    exit_code = 1
+
+    def __init__(self, e: SyntaxError):
+        self.line = e.lineno
+        self.col = None if e.offset is None else e.offset - 1
+        self.end_line = e.end_lineno
+        self.end_col = None if e.end_offset is None else e.end_offset - 1
+        self.msg = f"parse error: {e.msg}"
+        Exception.__init__(self, self.msg)
+
+
 class NotYetSupported(Unsupported):
     exit_code = 2
 
@@ -50,6 +62,42 @@ class PatList(ast.MatchSequence):
 
 class PatTuple(ast.MatchSequence):
     pass
+
+
+class UnparenthesisedTuple(ast.Tuple):
+    pass
+
+
+def render_pattern(p: ast.pattern) -> str:
+    match p:
+        case ast.MatchValue(value=e):
+            return ast.unparse(e)
+        case ast.MatchSingleton(value=v):
+            return repr(v)
+        case PatList(patterns=ps):
+            return "[" + ", ".join(render_pattern(q) for q in ps) + "]"
+        case PatTuple(patterns=ps):
+            return "(" + ", ".join(render_pattern(q) for q in ps) + ")"
+        case ast.MatchMapping(keys=ks, patterns=ps):
+            return (
+                "{"
+                + ", ".join(f"{ast.unparse(k)}: {render_pattern(q)}" for k, q in zip(ks, ps))
+                + "}"
+            )
+        case ast.MatchClass(cls=c, patterns=ps, kwd_attrs=xs, kwd_patterns=qs):
+            args = [render_pattern(q) for q in ps] + [
+                f"{x}={render_pattern(q)}" for x, q in zip(xs, qs)
+            ]
+            return f"{ast.unparse(c)}({', '.join(args)})"
+        case ast.MatchAs(pattern=None, name=None):
+            return "_"
+        case ast.MatchAs(pattern=None, name=x):
+            return str(x)
+        case ast.MatchAs(pattern=q, name=x):
+            assert q is not None
+            return f"{render_pattern(q)} as {x}"
+        case _:
+            raise AssertionError
 
 
 def map_tree(f: Callable[[ast.AST], ast.AST], node: ast.AST) -> ast.AST:
@@ -69,22 +117,46 @@ def map_tree(f: Callable[[ast.AST], ast.AST], node: ast.AST) -> ast.AST:
     return f(node if unchanged else ast.copy_location(type(node)(**fields), node))
 
 
+def fold_negative(node: ast.AST) -> ast.AST:
+    """Unary minus applied to a number literal is a literal."""
+    match node:
+        case ast.UnaryOp(op=ast.USub(), operand=ast.Constant(value=n)) if isinstance(
+            n, (int, float)
+        ) and not isinstance(n, bool):
+            return ast.copy_location(ast.Constant(value=-n), node)
+        case _:
+            return node
+
+
 def classify_sequence(source: str) -> Callable[[ast.AST], ast.AST]:
-    """Python's parser gives list and tuple patterns one node type; the source text tells them apart."""
+    """AST doesn't record brackets or parentheses; classify sequence patterns and tuples by source
+    text."""
 
     def classify(node: ast.AST) -> ast.AST:
-        if not isinstance(node, ast.MatchSequence):
-            return node
-        segment = ast.get_source_segment(source, node)
-        assert segment is not None
-        cls = PatList if segment.startswith("[") else PatTuple
-        return ast.copy_location(cls(patterns=node.patterns), node)
+        match node:
+            case ast.MatchSequence(patterns=ps):
+                segment = ast.get_source_segment(source, node)
+                assert segment is not None
+                if segment.startswith("["):
+                    return ast.copy_location(PatList(patterns=ps), node)
+                if segment.startswith("("):
+                    return ast.copy_location(PatTuple(patterns=ps), node)
+                return node
+            case ast.Tuple(elts=es, ctx=ctx):
+                segment = ast.get_source_segment(source, node)
+                assert segment is not None
+                if segment.startswith("("):
+                    return node
+                return ast.copy_location(UnparenthesisedTuple(elts=es, ctx=ctx), node)
+            case _:
+                return node
 
     return classify
 
 
 def parse(source: str, filename: str) -> ast.Module:
-    m = map_tree(classify_sequence(source), ast.parse(source, filename=filename))
+    classify = classify_sequence(source)
+    m = map_tree(lambda node: classify(fold_negative(node)), ast.parse(source, filename=filename))
     assert isinstance(m, ast.Module)
     return m
 
@@ -152,7 +224,7 @@ def check_syntax_stmt(node: ast.stmt) -> None:
             raise Prohibited(node, "async")
         case ast.Raise():
             raise Prohibited(node, "raise")
-        case ast.Try():
+        case ast.Try() | ast.TryStar():
             raise Prohibited(node, "try/except")
         case ast.Import() | ast.ImportFrom():
             raise Prohibited(node, "import outside the module top level")
@@ -209,7 +281,6 @@ def check_syntax_classdef(node: ast.ClassDef) -> None:
 def check_syntax_type_alias(node: ast.TypeAlias) -> None:
     check_syntax_type_params(node)
     check_syntax_annotation(node.value)
-    raise NotYetSupported(node, "type statements", 187)
 
 
 def check_syntax_type_params(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlias) -> None:
@@ -246,9 +317,6 @@ def check_syntax_pattern(node: ast.pattern) -> None:
                 case ast.Constant():
                     if isinstance(v.value, (int, float, str)):
                         return
-                case ast.UnaryOp(op=ast.USub(), operand=ast.Constant(value=value)):
-                    if isinstance(value, (int, float)):
-                        return
                 case ast.Attribute():
                     raise NotYetSupported(node, "attribute value patterns", 86)
             raise Prohibited(node, "complex and bytes literal patterns")
@@ -257,9 +325,11 @@ def check_syntax_pattern(node: ast.pattern) -> None:
         case ast.MatchAs():
             if node.pattern is not None:
                 check_syntax_pattern(node.pattern)
-        case ast.MatchSequence():
+        case PatList() | PatTuple():
             for p in node.patterns:
                 check_syntax_pattern(p)
+        case ast.MatchSequence():
+            raise Prohibited(node, "sequence pattern without brackets or parentheses")
         case ast.MatchClass():
             for p in list(node.patterns) + list(node.kwd_patterns):
                 check_syntax_pattern(p)
@@ -327,6 +397,8 @@ def check_syntax_expr(node: ast.expr) -> None:
             for a in node.args:
                 check_syntax_expr(a)
             for k in node.keywords:
+                if k.arg is None:
+                    raise Prohibited(k, "dict unpacking in argument list")
                 check_syntax_expr(k.value)
         case ast.IfExp():
             check_syntax_expr(node.test)
@@ -335,6 +407,8 @@ def check_syntax_expr(node: ast.expr) -> None:
         case ast.Lambda():
             check_syntax_arguments(node.args)
             check_syntax_expr(node.body)
+        case UnparenthesisedTuple():
+            raise Prohibited(node, "tuple without parentheses")
         case ast.List() | ast.Tuple():
             for e in node.elts:
                 check_syntax_expr(e)

@@ -8,9 +8,8 @@ description: Discipline for keeping the checker (and other implementations) in o
 Load the coding-conventions skill first; it holds the comment, identifier and commit rules shared
 with other implementations.
 
-Behavioral agreement is not the finish line. A sync is complete only when the
-spec and the implementation are in one-to-one correspondence, checked in both
-directions.
+A sync is complete only when the spec and the implementation are in one-to-one
+correspondence, checked in both directions, not when their verdicts agree.
 
 ## Method
 
@@ -28,6 +27,8 @@ directions.
 4. Diagnostics may refine the spec's single failure mode into specific reasons;
    that is a sanctioned refinement. Name each reason after the prohibition or
    premise it enforces.
+5. Run the inventory comparison even when all tests pass; verdict checks miss
+   misnamed functions, displaced terminology, dead helpers and stale taxonomy.
 
 ## Sequential check against the spec
 
@@ -71,24 +72,14 @@ else is tested.
 - **Whole-program conditions**: test both sides of the boundary, the smallest
   broken case and the largest legal case that resembles one (a self-import
   and a two-module cycle against a diamond).
-- **The spec's prose is a test plan the authors already wrote**: every worked
-  example, counterexample, and justifying sentence describes a program; each
-  should exist as a test.
+- **Spec prose**: every worked example, counterexample and justifying sentence
+  describes a program; each should exist as a test.
 - Use programs large enough that recursive rules actually recurse; a
   one-level example can pass for the wrong reason.
-- Audit the suite by mutation: deliberately weaken the implementation and
-  confirm a test fails; a green suite has a hole.
-
-## Why behavioral auditing misses this
-
-Walking the spec's rules and asking "does the implementation compute the right
-verdict" filters out every divergence that changes no verdict: misnamed
-functions, displaced terminology, dead helpers, stale taxonomy. Those are
-visible only to the inventory comparison above, so run it even when all tests
-pass.
+- Audit the suite by mutation: weaken the implementation deliberately and
+  confirm a test fails.
 
 ## Tooling
 
-A list of things to check goes stale silently: point checkers at whole
-directories rather than named files, and occasionally verify that every
-checker still sees everything it should.
+Point checkers at whole directories rather than named files, and occasionally
+verify that every checker still sees everything it should.

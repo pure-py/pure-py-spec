@@ -1,0 +1,12 @@
+\matchedAs(\Sigma, \Gamma, \tyUnion{\sigma}{\tau}, p) &{}= \joinTy{\Sigma}{\matchedAs(\Sigma, \Gamma, \sigma, p)}{\matchedAs(\Sigma, \Gamma, \tau, p)} \\*
+\matchedAs(\Sigma, \Gamma, \tau, x) &{}= \tau \\*
+\matchedAs(\Sigma, \Gamma, \tau, \patWild) &{}= \tau \\*
+\matchedAs(\Sigma, \Gamma, \tau, p\;\pyinline{as}\;x) &{}= \matchedAs(\Sigma, \Gamma, \tau, p) \\*
+\matchedAs(\Sigma, \Gamma, \tau, \ell) &{}= \meetTy{\Sigma}{\tyLiteral{\ell}}{\tau} \\*
+\matchedAs(\Sigma, \Gamma, \tyTuple{\tau_1, \ldots, \tau_n}, \patTuple{p_1, \ldots, p_n}) &{}= \tyTuple{\sigma_1, \ldots, \sigma_n} \\*
+&\qquad \rlap{$\text{where } \sigma_i = \matchedAs(\Sigma, \Gamma, \tau_i, p_i) \quad (\forall i)$} \\*
+\matchedAs(\Sigma, \Gamma, \tyList{\tau}, \patList{\seq{p}}) &{}= \tyList{\tau} \\*
+\matchedAs(\Sigma, \Gamma, \tyDict{\tau}, \patDict{\bind{\seq{w}}{\seq{p}}}) &{}= \tyDict{\tau} \\*
+\matchedAs(\Sigma, \Gamma, \tau, \patConstr{q}{a}) &{}= \meetTy{\Sigma}{\tau}{C[\seq{\sigma}]} \\*
+&\qquad \rlap{$\text{if } \Gamma \vdash q : \Type{C} \text{ and } \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$} \\*
+\matchedAs(\Sigma, \Gamma, \tau, p) &{}= \tyNever \quad \text{otherwise}

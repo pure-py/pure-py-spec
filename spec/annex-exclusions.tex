@@ -4,8 +4,7 @@
 \label{sec:exclusions}
 
 This annex is informative and imposes no requirements. It summarises the Python behaviours excluded by \PurePy and the stage at which each
-exclusion takes effect; the normative basis is the well-formedness rules (\secref{well-formedness}) and the operational
-semantics (\secref{operational-semantics}).
+exclusion takes effect.
 
 \section{Mutable state}
 \label{sec:no-mutable-state}
@@ -16,6 +15,11 @@ semantics (\secref{operational-semantics}).
 \label{sec:no-coercions}
 
 \input{spec/exclusions/coercions}
+
+\section{Compatibility with mypy}
+\label{sec:mypy-restrictions}
+
+\input{spec/exclusions/mypy-restrictions}
 
 \section{Runtime errors}
 \label{sec:runtime-errors}

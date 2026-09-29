@@ -41,8 +41,8 @@
 {
   q' = x \cons \seq{x} \\
   q \not\properPrefixOf q' \\
-  \Sigma \vdash_{\mathsf{load}} q' : \Delta \binding \Sigma_1 \\
-  \Sigma_1 \vdash q', \modLoaded{q'}{\Delta} \loadsAs \theta \binding \Sigma_2 \\
+  \Sigma \vdash_{\mathsf{load}} x : \Delta \binding \Sigma_1 \\
+  \Sigma_1 \vdash \modLoaded{x}{\Delta}, \seq{x} \loadsAs \theta \binding \Sigma_2 \\
   \Sigma_2; q \vdash \seq{\iota} : \Gamma \binding \Sigma'
 }
 {
@@ -51,9 +51,9 @@
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
+  x_1, \ldots, x_{n+1} \text{ distinct} \\
   \Sigma \vdash_{\mathsf{load}} q' : \Delta \binding \Sigma_0 \\
-  \set{q^\dagger_1, \ldots, q^\dagger_m} = \set{q^\dagger \properPrefixOf q' \mid q^\dagger \not\prefixOf q} \\
-  q^\dagger_1 \properPrefixOf \cdots \properPrefixOf q^\dagger_m \\
+  q^\dagger_1 \cons \cdots \cons q^\dagger_m = \containing(q, q') \\
   \Sigma_{j-1} \vdash_{\mathsf{load}} q^\dagger_j : \Delta_j \binding \Sigma_j \quad (\forall j) \\
   \Sigma_{m+i-1} \vdash \Delta, x_i \importsR \theta_i \binding \Sigma_{m+i} \quad (\forall i) \\
   \Sigma_{m+n+1}; q \vdash \seq{\iota} : \Gamma \binding \Sigma'
@@ -69,27 +69,27 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Sigma \vdash q, \theta \loadsAs \theta' \binding \Sigma'$}
+\flushleft \shadebox{$\Sigma \vdash \theta, \seq{x} \loadsAs \theta' \binding \Sigma'$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{loads-as-simple}}]
+\inferrule*[lab={\ruleName{loads-as-nil}}]
 {
   \strut
 }
 {
-  \Sigma \vdash x, \theta \loadsAs \theta \binding \Sigma
+  \Sigma \vdash \theta, \varepsilon \loadsAs \theta \binding \Sigma
 }
 \and
-\inferrule*[lab={\ruleName{loads-as-qualified}}]
+\inferrule*[lab={\ruleName{loads-as-cons}}]
 {
-  \Sigma \vdash_{\mathsf{load}} q : \Gamma' \binding \Sigma^\dagger \\
-  \Sigma^\dagger \vdash q, \modLoaded{q}{\Gamma' \extend \set{\bind{x}{\theta}}} \loadsAs \theta' \binding \Sigma'
+  \Sigma \vdash_{\mathsf{load}} q.x : \Gamma' \binding \Sigma^\dagger \\
+  \Sigma^\dagger \vdash \modLoaded{q.x}{\Gamma'}, \seq{x} \loadsAs \theta' \binding \Sigma'
 }
 {
-  \Sigma \vdash q.x, \theta \loadsAs \theta' \binding \Sigma'
+  \Sigma \vdash \modLoaded{q}{\Gamma}, x \cons \seq{x} \loadsAs \modLoaded{q}{\Gamma \extend \set{\bind{x}{\theta'}}} \binding \Sigma'
 }
 \end{mathpar}
-\subcaption{Reference $\theta$ for module $q$ loads as reference $\theta'$ for root of $q$, statically loading the modules containing $q$}
+\subcaption{Loaded module $\theta$ with submodule chain $\seq{x}$ loads as $\theta'$}
 \end{subfigure}
 \caption{Import typing}
 \label{fig:typing-import-prefix}
