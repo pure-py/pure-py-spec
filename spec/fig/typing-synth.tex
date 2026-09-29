@@ -48,14 +48,13 @@
 \inferrule*[lab={\ruleName{call-scheme}}]
 {
   \added{\Gamma \vdash q : \scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}} \\
-  \added{|\seq{e}| = |\seq{\sigma}|} \\
   \added{I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \tau_i}} \\
   \added{\seq{\tau}' = \typeArgs(\Sigma, \seq{\alpha}, (\sigma_i \mid i \in I), (\tau_i \mid i \in I))} \\
-  \added{\Sigma; \Gamma \override \set{\bind{y}{\subst{\seq{\tau}'}{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}}} \vdash \exCall{y}{\seq{e}} \synth \tau} \\
-  \added{y \notin \fv(\seq{e})}
+  \added{\Sigma; \Gamma \vdash \seq{e} \checks \subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}} \\
+  \added{\subst{\seq{\tau}'}{\seq{\alpha}}{\sigma} \neq \tyNone}
 }
 {
-  \added{\Sigma; \Gamma \vdash \exCall{q}{\seq{e}} \synth \tau}
+  \added{\Sigma; \Gamma \vdash \exCall{q}{\seq{e}} \synth \subst{\seq{\tau}'}{\seq{\alpha}}{\sigma}}
 }
 \and
 \inferrule*[lab={\ruleName{syn-call-lambda}}]
