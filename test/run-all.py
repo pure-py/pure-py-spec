@@ -1,10 +1,4 @@
 #!/usr/bin/env python3
-"""PurePy test runner.
-
-Walks the test directories, runs each test through the appropriate steps
-(parse, check, run) and reports pass/fail counts.
-"""
-
 import contextlib
 import pathlib
 import re
@@ -16,18 +10,15 @@ from enum import IntEnum, StrEnum
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 GREEN, RED, RESET = "\033[32m", "\033[31m", "\033[0m"
 
-# Expected-output suffixes: sibling files of <test>.py, or of main.py for a program-level test
 EXPECTED = ".expected"
 EXCEPTION_EXPECTED = f".exception{EXPECTED}"
 ERROR_EXPECTED = f".error{EXPECTED}"
 OUTPUT_EXPECTED = f".output{EXPECTED}"
-STATUS_EXPECTED = f".status{EXPECTED}"  # exit status when nonzero
+STATUS_EXPECTED = f".status{EXPECTED}"
 
-# Tier directory names
 MODULE_LEVEL, PROGRAM_LEVEL = "module-level", "program-level"
 
 
-# Verdict / stage directory names: a test's path is its specification
 class Verdict(StrEnum):
     SEMANTICALLY_VALID = "semantically-valid"
     EXCLUDED = "excluded"
@@ -50,20 +41,16 @@ RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
 RULE_DEF = re.compile(r"lab=\{\\ruleName\{([a-z0-9-]+)\}\}")
 CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
 
-# Checker entry points under src/
 CHECK, CHECK_PROGRAM = "check_module.py", "check_program.py"
-
-# Entry module of a program-level test (a test is a directory)
 MAIN = "main.py"
 
 
-# PurePy exit codes (OK = accepted / ran clean)
 class Exit(IntEnum):
     OK = 0
-    PROHIBITED = 1  # prohibited syntactic form
-    NOT_YET = 2  # planned, not yet supported
-    ILL_FORMED = 3  # ill-formed module
-    ILL_FORMED_PROGRAM = 4  # ill-formed program, such as an import cycle
+    PROHIBITED = 1
+    NOT_YET = 2
+    ILL_FORMED = 3
+    ILL_FORMED_PROGRAM = 4
 
 
 class Phase(StrEnum):
@@ -72,8 +59,7 @@ class Phase(StrEnum):
     RUN = "run"
 
 
-# Expected outcomes by verdict and stage: checker exit status, whether the checker's
-# message must match .error.expected, and whether Python accepts the test (None: not run)
+# Checker exit status, whether .error.expected must match, whether Python accepts (None: not run)
 EXPECTATIONS: dict[tuple[Verdict, Stage | None], tuple[Exit, bool, bool | None]] = {
     (Verdict.SEMANTICALLY_VALID, None): (Exit.OK, False, True),
     (Verdict.SEMANTICALLY_VALID, Stage.PENDING): (Exit.NOT_YET, False, None),
@@ -111,8 +97,6 @@ class Runner:
 
     @contextlib.contextmanager
     def test(self, label: object) -> Iterator[None]:
-        """Group a test's phases into one result: a single pass line if every
-        phase passes, else a single fail line listing the phases that failed."""
         self._failures = []
         try:
             yield
@@ -204,10 +188,6 @@ class Runner:
         status_path: pathlib.Path,
         cwd: pathlib.Path | None = None,
     ) -> None:
-        """Python corroborates the verdict. If python_accepts, output must match .expected
-        (exit status .status.expected if present) and .exception.expected must be absent;
-        otherwise run must raise exception named in .exception.expected and .expected must
-        be absent."""
         exception_path = path.with_suffix(EXCEPTION_EXPECTED)
         if python_accepts:
             if exception_path.exists():
@@ -225,9 +205,7 @@ class Runner:
                 self.run_expecting_exception(path, exception_path, cwd=cwd)
 
     def run_test(self, path: pathlib.Path, tier: pathlib.Path, program: bool) -> None:
-        """A test's path under its tier is its specification: <verdict>[/<stage>]/.../<test>.
-        A program-level test is the directory of its main.py, checked as a program and run
-        from that directory; its expectations are siblings of main.py."""
+        """Path under tier: <verdict>[/<stage>]/.../<test>.py or .../<test>/main.py (program)."""
         test_dir = path.parent if program else None
         with self.test((path.parent if program else path).relative_to(ROOT)):
             dirs = (path.parent.parent if program else path.parent).relative_to(tier).parts
