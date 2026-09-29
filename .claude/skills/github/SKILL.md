@@ -1,9 +1,9 @@
 ---
-name: github-issues
-description: Conventions for creating, editing, closing, referring to and organising GitHub issues, pull requests and meeting issues, including a terse writing style for titles, commit messages and bullet lists. Use whenever working with GitHub issues or pull requests.
+name: github
+description: Conventions for commits, GitHub issues, pull requests, the project board and meeting issues, including a terse writing style for titles, commit messages and bullet lists. Use whenever committing or working with GitHub issues or pull requests.
 ---
 
-# GitHub issue conventions
+# Git and GitHub conventions
 
 ## Terse style
 
@@ -16,6 +16,11 @@ Commit messages, issue titles and bulleted lists are telegraphic. Write them ter
 - No trailing period on a bullet or a title
 - Commit subject line: short, imperative or noun phrase; put any detail in the body
 
+## Commits
+
+- Fix a committed mistake with a new commit; never amend, and never `git stash`. History is linear
+  and every unit of work is visible
+
 ## Referring to an issue
 
 - When referring to an issue, give its number, its title and its URL, so it can be opened
@@ -24,6 +29,8 @@ Commit messages, issue titles and bulleted lists are telegraphic. Write them ter
 
 ## Issues
 
+- Before starting work on an issue, assign it to the user and to the account you run as (`gh api user --jq .login`)
+- Check with the user before creating an issue, unless explicitly instructed to create one
 - Add content to an issue, whether a body, a comment or a closing comment, only when asked to. Otherwise create, edit or close it and nothing more
 - When an issue references other issues or external resources, add a **See also** paragraph at the end with a bullet list of links. Example:
 
@@ -37,6 +44,13 @@ Commit messages, issue titles and bulleted lists are telegraphic. Write them ter
 
   Use this for cross-references to related issues and links to external specifications or documentation
 - When linking to another GitHub issue in a bullet list, write just the bare `#N` reference, so GitHub renders the issue title inline
+
+## Project board
+
+- To read or set an issue's board Status, query the `projectItems` of the issue (in fluid,
+  `script/issue-status.sh <issue> [Status]`); never `gh project item-list`, which fetches the
+  whole board and trips the GraphQL rate limit
+- Closing an issue does not change its Status; set `Done` or `Rejected` explicitly
 
 ## Pull requests
 
