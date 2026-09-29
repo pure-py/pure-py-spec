@@ -22,6 +22,16 @@
   \Sigma; \Gamma \vdash \exLambda{\seq{x}}{e} \checks \tyCallable{\seq{\tau}}{\tau}
 }
 \and
+\inferrule*[lab={\ruleName{var-scheme}}]
+{
+  \added{\Gamma \vdash q : \scheme{\seq{\alpha}}{\sigma}} \\
+  \added{\seq{\rho} = \typeArgs(\Sigma, \seq{\alpha}, \sigma, \tau)} \\
+  \added{\Sigma \vdash \subst{\seq{\rho}}{\seq{\alpha}}{\sigma} \subty \tau}
+}
+{
+  \added{\Sigma; \Gamma \vdash q \checks \tau}
+}
+\and
 \inferrule*[lab={\ruleName{call-lambda}}]
 {
   \seq{x} \text{ distinct} \\

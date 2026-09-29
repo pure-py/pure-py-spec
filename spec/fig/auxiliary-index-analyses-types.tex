@@ -13,6 +13,8 @@
 \auxrow{$\joinTy{\Sigma}{\sigma}{\tau}$, $\bigJoinTy{\Sigma}{\seq{\tau}}$}{type}{larger type if comparable, and union otherwise}{aux:join}
 \auxrow{$\meetTy{\Sigma}{\sigma}{\tau}$}{type}{greatest type below both}{aux:meet}
 \auxrow{$\subterms(\tau)$, $\subterms(\seq{\tau})$}{set of types}{subterms of $\tau$, or of each type in $\seq{\tau}$, other than unions}{aux:subterms}
+\auxrow{\added{$\constraints(\Sigma, \sigma, \tau)$, $\constraints(\Sigma, \seq{\sigma}, \seq{\tau})$}}{\added{sequence of constraints}}{\added{constraints on type variables of $\sigma$ from $\tau$, or of $\seq{\sigma}$ from $\seq{\tau}$}}{aux:constraints}
+\auxrow{\added{$\typeArgs(\Sigma, \seq{\alpha}, \seq{\sigma}, \seq{\tau})$}}{\added{sequence of types}}{\added{least type arguments for $\seq{\alpha}$ under constraints of $\seq{\sigma}$ from $\seq{\tau}$}}{aux:type-args}
 \auxrow{$\elemTy(\Sigma, \tau)$}{type}{type of elements drawn from $\tau$ by generator}{aux:elem-type}
 \auxrow{$\shapes(\Sigma, \tau, H)$, $\shapes(\Sigma, \seq{\tau})$}{ordered set of shapes or of shape sequences}{shapes of $\tau$ once heads in $H$ are excluded; sequences of shapes of $\seq{\tau}$}{aux:shapes}
 \auxrow{$\shapeTy(k)$}{type}{least type of shape $k$}{aux:shape-type}

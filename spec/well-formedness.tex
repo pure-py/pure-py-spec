@@ -123,7 +123,18 @@ such rule, because $\elemTy$ takes a union to the join of its disjuncts' element
 \citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form.
 
-Lambdas check, as do lists, tuples, dictionaries and comprehensions. An expression that synthesises $\sigma$ checks against any supertype
+\added{A call of a name bound at a type scheme instantiates the type parameters from the arguments
+(\ruleName{call-scheme}). The arguments that synthesise constrain the type parameters through
+$\constraints(\Sigma, \sigma, \tau)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:constraints}}), which relates a parameter type $\sigma$ to the base type
+$\tau$ of the argument, and the type arguments $\typeArgs(\Sigma, \seq{\alpha}, \seq{\sigma}, \seq{\tau})$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) are the joins of the constraints on each type parameter, undefined if a type parameter is
+unconstrained. The call is then typed as a call of the instantiated \pyinline{Callable} type, with a variable in
+place of the callee, so that every argument, including one that does not synthesise, is checked against the
+instantiated parameter type. A call of such a name with result \tyNone{} is a statement (\ruleName{call-stmt-scheme}).}
+
+Lambdas check, as do lists, tuples, dictionaries and comprehensions. \added{A name bound at a type scheme checks against a type
+by instantiating the type parameters with the type arguments from that type, provided the instantiation is below the type
+(\ruleName{var-scheme}), so a function with type parameters can be passed where a \pyinline{Callable} type is expected.} An expression that synthesises $\sigma$ checks against any supertype
 of $\sigma$ (\ruleName{check-synth}), which applies only when no other rule concludes $\Sigma; \Gamma \vdash e \checks
 \tau$, so both judgements are
 syntax-directed and an expression has at most one derivation in each.
@@ -268,7 +279,7 @@ schemes, and the \ruleName{def-body} rule checks each definition against its typ
 body $s$.}{A mutual region of function definitions (\ruleName{def}) resolves the annotations of each definition to a
 \pyinline{Callable} type (\ruleName{def-signature}, \figref{typing-def}), binds the names of the mutual region,
 including the name of each function itself, at those types, and checks each definition against its type
-(\ruleName{def-body}).} \added{A type scheme without type parameters is written as its \pyinline{Callable} type, so the name of a function without type parameters is a variable of that type. The name of a function with type parameters is not an expression. Since annotations do not denote type schemes, such a name cannot be declared or assigned as a variable.} \replaced{In the body, the parameters $\seq{x}$ are bound at the types denoted by $\seq{\psi}$}{A definition binds its parameters at their annotated types}; variables declared or
+(\ruleName{def-body}).} \added{A type scheme without type parameters is written as its \pyinline{Callable} type, so the name of a function without type parameters is a variable of that type. The name of a function with type parameters synthesises no type, and is instantiated where the type parameters are determined: at a call, from the argument types (\ruleName{call-scheme}, \ruleName{call-stmt-scheme}), and against a \pyinline{Callable} type (\ruleName{var-scheme}). Since annotations do not denote type schemes, declarations and assignments do not bind variables at type schemes.} \replaced{In the body, the parameters $\seq{x}$ are bound at the types denoted by $\seq{\psi}$}{A definition binds its parameters at their annotated types}; variables declared or
 assigned in \replaced{$s$}{the body} start unbound, emulating Python's scoping of function bodies, which
 prefers a locally bound name to one visible in an enclosing scope. A variable of the
 enclosing scope referenced by the body must be definitely assigned at the point at which the function is defined,

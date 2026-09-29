@@ -34,6 +34,14 @@
   \Gamma \vdash x : \TypeAlias{\seq{\alpha}}{\tau}
 }
 \and
+\inferrule*[lab={\ruleName{simple-scheme}}]
+{
+  \added{\bind{x}{\scheme{\seq{\alpha}}{\tau}} \in \Gamma}
+}
+{
+  \added{\Gamma \vdash x : \scheme{\seq{\alpha}}{\tau}}
+}
+\and
 \inferrule*[lab={\ruleName{simple-predef}}]
 {
   \bind{x}{\predefName} \in \Gamma

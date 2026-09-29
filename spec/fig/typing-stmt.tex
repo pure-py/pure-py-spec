@@ -53,6 +53,19 @@
   \Sigma; \Gamma; \zeta \vdash \exCall{e}{\seq{e}} : \Assigns{\varnothing}
 }
 \and
+\inferrule*[lab={\ruleName{call-stmt-scheme}}]
+{
+  \added{\Gamma \vdash q : \scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}} \\
+  \added{|\seq{e}| = |\seq{\sigma}|} \\
+  \added{I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \tau_i}} \\
+  \added{\seq{\rho} = \typeArgs(\Sigma, \seq{\alpha}, (\sigma_i \mid i \in I), (\baseType(\tau_i) \mid i \in I))} \\
+  \added{\Sigma; \Gamma \override \set{\bind{y}{\subst{\seq{\rho}}{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}}}; \zeta \vdash \exCall{y}{\seq{e}} : \Assigns{\varnothing}} \\
+  \added{y \notin \fv(\seq{e})}
+}
+{
+  \added{\Sigma; \Gamma; \zeta \vdash \exCall{q}{\seq{e}} : \Assigns{\varnothing}}
+}
+\and
 \inferrule*[lab={\ruleName{assert}}]
 {
   \Sigma; \Gamma \vdash e \checks \tyBool

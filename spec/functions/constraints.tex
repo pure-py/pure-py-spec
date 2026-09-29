@@ -1,0 +1,14 @@
+\constraints(\Sigma, \alpha, \tau) &{}= (\alpha, \tau) \\*
+\constraints(\Sigma, \tyList{\sigma}, \tyList{\tau}) &{}= \constraints(\Sigma, \sigma, \tau) \\*
+\constraints(\Sigma, \tyDict{\sigma}, \tyDict{\tau}) &{}= \constraints(\Sigma, \sigma, \tau) \\*
+\constraints(\Sigma, \tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) &{}= \constraints(\Sigma, \seq{\sigma}, \seq{\tau}) \\*
+\constraints(\Sigma, \tyCallable{\seq{\sigma}}{\sigma}, \tyCallable{\seq{\tau}}{\tau}) &{}= \constraints(\Sigma, \sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) \\*
+\constraints(\Sigma, C[\seq{\sigma}], \tau) &{}= \constraints(\Sigma, \seq{\sigma}, \seq{\rho}) \\*
+&\qquad \rlap{$\text{if } \Sigma \vdash C[\seq{\rho}] \instanceAt \tau$} \\*
+\constraints(\Sigma, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \constraints(\Sigma, \sigma'', \tau') \\*
+&\qquad \rlap{$\text{if } \sigma'' \text{ is the only disjunct of } \tyUnion{\sigma}{\sigma'} \text{ with type variables}$} \\*
+&\qquad \rlap{$\text{and } \tau' \text{ is the join of the disjuncts of } \tau \text{ not below the}$} \\*
+&\qquad \rlap{$\text{join of the other disjuncts of } \tyUnion{\sigma}{\sigma'}$} \\*
+\constraints(\Sigma, \sigma, \tau) &{}= \varepsilon \qquad \text{otherwise} \\*[2mm]
+\constraints(\Sigma, \varepsilon, \varepsilon) &{}= \varepsilon \\*
+\constraints(\Sigma, \sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) &{}= \constraints(\Sigma, \sigma, \tau) \concat \constraints(\Sigma, \seq{\sigma}, \seq{\tau})

@@ -45,6 +45,19 @@
   \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \tau
 }
 \and
+\inferrule*[lab={\ruleName{call-scheme}}]
+{
+  \added{\Gamma \vdash q : \scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}} \\
+  \added{|\seq{e}| = |\seq{\sigma}|} \\
+  \added{I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \tau_i}} \\
+  \added{\seq{\rho} = \typeArgs(\Sigma, \seq{\alpha}, (\sigma_i \mid i \in I), (\baseType(\tau_i) \mid i \in I))} \\
+  \added{\Sigma; \Gamma \override \set{\bind{y}{\subst{\seq{\rho}}{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}}} \vdash \exCall{y}{\seq{e}} \synth \tau} \\
+  \added{y \notin \fv(\seq{e})}
+}
+{
+  \added{\Sigma; \Gamma \vdash \exCall{q}{\seq{e}} \synth \tau}
+}
+\and
 \inferrule*[lab={\ruleName{syn-call-lambda}}]
 {
   \seq{x} \text{ distinct} \\
