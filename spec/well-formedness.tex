@@ -268,7 +268,7 @@ schemes, and the \ruleName{def-body} rule checks each definition against its typ
 body $s$.}{A mutual region of function definitions (\ruleName{def}) resolves the annotations of each definition to a
 \pyinline{Callable} type (\ruleName{def-signature}, \figref{typing-def}), binds the names of the mutual region,
 including the name of each function itself, at those types, and checks each definition against its type
-(\ruleName{def-body}).} \added{A type scheme without type parameters is written as its \pyinline{Callable} type, so the name of a function without type parameters is a variable of that type. The name of a function with type parameters is not an expression.} \replaced{In the body, the parameters $\seq{x}$ are bound at the types denoted by $\seq{\psi}$}{A definition binds its parameters at their annotated types}; variables declared or
+(\ruleName{def-body}).} \added{A type scheme without type parameters is written as its \pyinline{Callable} type, so the name of a function without type parameters is a variable of that type. The name of a function with type parameters is not an expression. Since annotations do not denote type schemes, such a name cannot be declared or assigned as a variable.} \replaced{In the body, the parameters $\seq{x}$ are bound at the types denoted by $\seq{\psi}$}{A definition binds its parameters at their annotated types}; variables declared or
 assigned in \replaced{$s$}{the body} start unbound, emulating Python's scoping of function bodies, which
 prefers a locally bound name to one visible in an enclosing scope. A variable of the
 enclosing scope referenced by the body must be definitely assigned at the point at which the function is defined,
