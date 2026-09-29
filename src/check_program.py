@@ -6,7 +6,7 @@ from collections.abc import Iterator, Mapping
 import syntax
 from check_module import check_module
 from contexts import MAIN, PREDEFINED_MODULES
-from reasons import IllFormed, IllFormedModule, IllFormedProgram
+from reasons import IllFormed, IllFormedModule
 from type_syntax import Name, proper_prefixes
 
 
@@ -25,7 +25,9 @@ def parse(path: pathlib.Path) -> ast.Module:
     try:
         m = syntax.parse(source, str(path))
     except SyntaxError as e:
-        raise IllFormedProgram(f"{path}: parse error: {e}") from e
+        error = syntax.ParseError(e)
+        error.msg = f"{path}: {error.msg}"
+        raise error from e
     unsupported = syntax.check_syntax_module(m)
     if unsupported is not None:
         unsupported.msg = f"{path}: {unsupported.msg}"

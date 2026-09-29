@@ -43,6 +43,8 @@ class ParseError(Unsupported):
     def __init__(self, e: SyntaxError):
         self.line = e.lineno
         self.col = None if e.offset is None else e.offset - 1
+        self.end_line = e.end_lineno
+        self.end_col = None if e.end_offset is None else e.end_offset - 1
         self.msg = f"parse error: {e.msg}"
         Exception.__init__(self, self.msg)
 
