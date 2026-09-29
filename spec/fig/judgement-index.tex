@@ -13,6 +13,7 @@ $\Sigma; \Gamma \vdash p \checks \tau \binding \Delta$ & pattern $p$ checks agai
 $\Gamma \vdash q : \theta$ & name $q$ denotes context entry $\theta$ & \figref{resolve-name} \\
 $\Sigma; \Gamma \vdash \psi \synth \tau$ & type expression $\psi$ denotes type $\tau$ & \figref{resolve-type} \\
 $\Sigma; \Gamma \vdash e \synth \tau$ & expression $e$ synthesises type $\tau$ & \figref{typing-synth} \\
+\added{$\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$} & \added{callee $e$ at arguments $\seq{e}$ synthesises parameter types $\seq{\sigma}$ and result type $\sigma$} & \added{\figref{typing-callee}} \\
 $\Sigma; \Gamma \vdash e \checks \tau$ & expression $e$ checks against type $\tau$ & \figref{typing-check-expr} \\
 $\Sigma; \Gamma \vdash \seq{g} : \Delta$ & comprehension qualifiers $\seq{g}$ are well-formed and bind $\Delta$ & \figref{typing-quals} \\
 $\Sigma; \Gamma; \zeta \vdash s : R$ & statement $s$ has static outcome $R$, with return type $\zeta$ & \figref{typing-stmt} \\

@@ -46,23 +46,11 @@
 \and
 \inferrule*[lab={\ruleName{call-stmt}}]
 {
-  \Sigma; \Gamma \vdash e \synth \tyCallable{\seq{\tau}}{\tyNone} \\
+  \replaced{\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\tau}, \tyNone}{\Sigma; \Gamma \vdash e \synth \tyCallable{\seq{\tau}}{\tyNone}} \\
   \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exCall{e}{\seq{e}} : \Assigns{\varnothing}
-}
-\and
-\inferrule*[lab={\ruleName{call-stmt-scheme}}]
-{
-  \added{\Gamma \vdash q : \scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}} \\
-  \added{I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \tau_i}} \\
-  \added{\seq{\tau}' = \typeArgs(\Sigma, \seq{\alpha}, (\sigma_i \mid i \in I), (\tau_i \mid i \in I))} \\
-  \added{\Sigma; \Gamma \vdash \seq{e} \checks \subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}} \\
-  \added{\subst{\seq{\tau}'}{\seq{\alpha}}{\sigma} = \tyNone}
-}
-{
-  \added{\Sigma; \Gamma; \zeta \vdash \exCall{q}{\seq{e}} : \Assigns{\varnothing}}
 }
 \and
 \inferrule*[lab={\ruleName{assert}}]

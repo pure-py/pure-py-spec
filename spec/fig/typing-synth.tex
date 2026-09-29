@@ -37,24 +37,12 @@
 \and
 \inferrule*[lab={\ruleName{call}}]
 {
-  \Sigma; \Gamma \vdash e \synth \tyCallable{\seq{\tau}}{\tau} \\
+  \replaced{\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\tau}, \tau}{\Sigma; \Gamma \vdash e \synth \tyCallable{\seq{\tau}}{\tau}} \\
   \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau} \\
   \tau \neq \tyNone
 }
 {
   \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \tau
-}
-\and
-\inferrule*[lab={\ruleName{call-scheme}}]
-{
-  \added{\Gamma \vdash q : \scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}} \\
-  \added{I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \tau_i}} \\
-  \added{\seq{\tau}' = \typeArgs(\Sigma, \seq{\alpha}, (\sigma_i \mid i \in I), (\tau_i \mid i \in I))} \\
-  \added{\Sigma; \Gamma \vdash \seq{e} \checks \subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}} \\
-  \added{\subst{\seq{\tau}'}{\seq{\alpha}}{\sigma} \neq \tyNone}
-}
-{
-  \added{\Sigma; \Gamma \vdash \exCall{q}{\seq{e}} \synth \subst{\seq{\tau}'}{\seq{\alpha}}{\sigma}}
 }
 \and
 \inferrule*[lab={\ruleName{syn-call-lambda}}]
