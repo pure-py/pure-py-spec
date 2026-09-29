@@ -21,6 +21,11 @@ Commit messages, issue titles and bulleted lists are telegraphic. Write them ter
 - Fix a committed mistake with a new commit; never amend, and never `git stash`. History is linear
   and every unit of work is visible
 
+## Permissions
+
+- When an action is refused for lack of permission, stop and report it; never work around the refusal
+  with another account, another token or a bypass flag
+
 ## Referring to an issue
 
 - When referring to an issue, give its number, its title and its URL, so it can be opened
