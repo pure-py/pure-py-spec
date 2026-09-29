@@ -250,7 +250,7 @@ definitions and modules introduce the variables of the scope as unbound, using t
 
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
-the class name to $\Type{C}$, resolves the field annotations with its type parameters in scope, and requires the fields it declares to be distinct and, when it extends
+the class name to $\Type{C}$, resolves the field annotations\replaced{, which may mention the type parameters of the class,}{ with its type parameters in scope}, and requires the fields it declares to be distinct and, when it extends
 another class, the base to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
 scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement $\exTypeAlias{x[\seq{\alpha}]}{\psi}$, such as \pyinline{type Pair[T] = tuple[T, T]},
@@ -261,8 +261,8 @@ before their declarations (\secref{well-formedness-modules}), $\psi$ can name on
 earlier in the module, and cannot name $x$ itself. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
 
-A mutual region of function definitions (\ruleName{def}) resolves the annotations of each definition\added{, with its
-type parameters in scope,} to a
+A mutual region of function definitions (\ruleName{def}) resolves the annotations of each definition\added{, which may mention the type parameters of the
+definition,} to a
 \pyinline{Callable} type\added{, generalised over the type parameters as a type scheme} (\ruleName{def-signature}, \figref{typing-def}), binds the names of the mutual region,
 including the name of each function itself, at those \replaced{schemes}{types}, and checks each definition against its \replaced{scheme}{type}
 (\ruleName{def-body}). \added{A scheme without type parameters is written as its \pyinline{Callable} type, so a function without type parameters is a variable like any other, whereas a generic function is not an expression on its own.} A definition binds its parameters at their annotated types\added{, with its type parameters in scope throughout the body}; variables declared or
