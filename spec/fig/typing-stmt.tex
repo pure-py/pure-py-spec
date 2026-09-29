@@ -115,9 +115,9 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \Sigma; \Gamma \vdash d_i \synth \tau_i \quad (\forall i) \\
-  \Delta' = \set{\bind{\declaresS(\seq{d})}{\seq{\tau}}} \\
-  \Sigma; \Gamma \override \Delta' \vdash d_i \checks \tau_i \quad (\forall i)
+  \Sigma; \Gamma \vdash d_i \synth \replaced{\pi_i}{\tau_i} \quad (\forall i) \\
+  \Delta' = \set{\bind{\declaresS(\seq{d})}{\replaced{\seq{\pi}}{\seq{\tau}}}} \\
+  \Sigma; \Gamma \override \Delta' \vdash d_i \checks \replaced{\pi_i}{\tau_i} \quad (\forall i)
 }
 {
   \Sigma; \Gamma; \zeta \vdash \seq{d} : \Assigns{\Delta'}
