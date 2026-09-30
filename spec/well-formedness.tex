@@ -105,8 +105,8 @@ position. \replaced{A constructor call $\exConstr{q}{a}$ pairs each argument wit
 infers type arguments $\seq{\tau}'$ for the class $C$ that $q$ resolves to, using $\typeArgs{\Sigma}$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) over the arguments that synthesise, as
 in \ruleName{callee-scheme} (\ruleName{constr}). The arguments are checked against the field types instantiated at
-$\seq{\tau}'$, and the call synthesises $C[\seq{\tau}']$. A constructor call $\exConstr{q[\seq{\psi}]}{a}$ takes the
-type arguments denoted by $\seq{\psi}$ instead (\ruleName{constr-explicit}).}{A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
+$\seq{\tau}'$, and the call synthesises $C[\seq{\tau}']$. A constructor call of the form $\exConstr{q[\seq{\psi}]}{a}$ takes
+the type arguments denoted by $\seq{\psi}$ instead (\ruleName{constr-explicit}).}{A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap{\Sigma}$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to
 (\ruleName{constr}).} An attribute reference $\exAttr{e}{x}$ has the type of the field $x$ of the class synthesised by $e$
 (\ruleName{attr-object}). The signature of a predefined module binds
