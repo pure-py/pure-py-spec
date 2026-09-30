@@ -30,6 +30,7 @@ from classes import (
     field_map,
     field_names,
     field_type,
+    fields,
     no_field_map,
     short_name,
 )
@@ -69,7 +70,7 @@ from operators import (
 from reasons import IllFormedModule, MypyCompatibility
 from shapes import Shapes, shapes
 from subtyping import equivalent, join_seq, subtype, type_args_seq
-from syntax import NotYetSupported, render_pattern
+from syntax import render_pattern
 from type_syntax import (
     CallableExpr,
     CallableType,
@@ -445,6 +446,8 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             return tau
         case ast.Lambda():
             raise IllFormedModule(e, reasons.NotSynthesised())
+        case ast.Call(func=ast.Subscript(value=e_)) if class_of_name(e_, mod_ctx) is not None:
+            return constr_explicit(e, mod_ctx)
         case ast.Call():
             c = class_of_name(e.func, mod_ctx)
             return call(e, mod_ctx) if c is None else constr(c, e, mod_ctx)
@@ -628,8 +631,29 @@ def dict_type(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> Dic
 
 
 def constr(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> Type:
-    if len(mod_ctx.Sigma[c].type_params) > 0:
-        raise NotYetSupported(e, "constructor call of a generic class", 187)
+    args = constructor_args(c, e, mod_ctx)
+    pi = fields(mod_ctx.Sigma, c)
+    sigmas = dict(pi.fields)
+    synthesising = [
+        (sigmas[x], synth_expr(arg, mod_ctx)) for x, arg in args.items() if synthesises(arg)
+    ]
+    gamma = type_args_seq(mod_ctx.Sigma, [s for s, _ in synthesising], [t for _, t in synthesising])
+    tau = ClassType(c, tuple(type_arguments(gamma, pi.type_params, e)))
+    for x, arg in args.items():
+        check_expr(arg, declared_type(mod_ctx.Sigma, tau, x), mod_ctx)
+    return tau
+
+
+def constr_explicit(e: ast.Call, mod_ctx: ModuleContext) -> Type:
+    tau = resolve_type(type_expr(e.func), e, mod_ctx)
+    assert isinstance(tau, ClassType)
+    for x, arg in constructor_args(tau.c, e, mod_ctx).items():
+        check_expr(arg, declared_type(mod_ctx.Sigma, tau, x), mod_ctx)
+    return tau
+
+
+def constructor_args(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> dict[Var, ast.expr]:
+    """field-map, with each failure diagnosed"""
     kwd_names = [k.arg for k in e.keywords if k.arg is not None]
     args = field_map(mod_ctx.Sigma, c, e.args, kwd_names, [k.value for k in e.keywords])
     if args is None:
@@ -641,10 +665,7 @@ def constr(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> Type:
                 raise IllFormedModule(e, reasons.UnknownConstructorKeyword(name, xs))
             case RepeatedKeywordArg():
                 raise AssertionError  # a syntax error in Python
-    tau = ClassType(c, ())
-    for x, arg in args.items():
-        check_expr(arg, declared_type(mod_ctx.Sigma, tau, x), mod_ctx)
-    return tau
+    return args
 
 
 def call(e: ast.Call, mod_ctx: ModuleContext) -> Type:

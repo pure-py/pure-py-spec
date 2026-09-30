@@ -399,7 +399,12 @@ def check_syntax_expr(node: ast.expr) -> None:
             for c in node.comparators:
                 check_syntax_expr(c)
         case ast.Call():
-            check_syntax_expr(node.func)
+            match node.func:
+                case ast.Subscript(value=e_, slice=UnparenthesisedTuple()):
+                    check_syntax_expr(e_)
+                    check_syntax_annotation(node.func)
+                case _:
+                    check_syntax_expr(node.func)
             for a in node.args:
                 check_syntax_expr(a)
             for k in node.keywords:
