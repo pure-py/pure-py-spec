@@ -1,4 +1,4 @@
-# rule: syn-cond
+# rule: cond-syn
 def f(b: bool) -> int:
     return ([] if b else [1])[0]
 

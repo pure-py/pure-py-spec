@@ -1,4 +1,4 @@
-# rule: syn-cond
+# rule: cond-syn
 from dataclasses import dataclass
 
 @dataclass

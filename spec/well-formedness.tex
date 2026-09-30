@@ -145,7 +145,7 @@ syntax-directed and an expression has at most one derivation in each.
 
 The forms that synthesise are conditional expressions when a branch
 synthesises, at the join of the two types when both branches synthesise and otherwise at the
-synthesising branch's type, the other branch checking against it (\ruleName{syn-cond});
+synthesising branch's type, the other branch checking against it (\ruleName{cond-syn});
 tuples when every component synthesises (\ruleName{syn-tuple}); comprehensions when the body
 synthesises (\ruleName{syn-list-comp}, \ruleName{syn-dict-comp}); and non-empty lists and
 dictionaries when at least one element synthesises, the remaining elements checking against the join
