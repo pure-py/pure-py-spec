@@ -12,4 +12,7 @@
 &\qquad \rlap{$\text{otherwise}$} \\*
 \typeArgs(\Sigma, \sigma, \tau) &{}= \varnothing \qquad \text{otherwise} \\*[2mm]
 \typeArgs(\Sigma, \varepsilon, \varepsilon) &{}= \varnothing \\*
-\typeArgs(\Sigma, \sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) &{}= \joinTy{\Sigma}{\typeArgs(\Sigma, \sigma, \tau)}{\typeArgs(\Sigma, \seq{\sigma}, \seq{\tau})}
+\typeArgs(\Sigma, \sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) &{}= \joinTy{\Sigma}{\typeArgs(\Sigma, \sigma, \tau)}{\typeArgs(\Sigma, \seq{\sigma}, \seq{\tau})} \\*[2mm]
+(\joinTy{\Sigma}{m}{m'})(\alpha) &{}= \joinTy{\Sigma}{m(\alpha)}{m'(\alpha)} \qquad \text{if } \alpha \in \dom(m) \cap \dom(m') \\*
+(\joinTy{\Sigma}{m}{m'})(\alpha) &{}= m(\alpha) \qquad \text{if } \alpha \in \dom(m) \setminus \dom(m') \\*
+(\joinTy{\Sigma}{m}{m'})(\alpha) &{}= m'(\alpha) \qquad \text{if } \alpha \in \dom(m') \setminus \dom(m)

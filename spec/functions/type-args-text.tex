@@ -4,7 +4,7 @@ $\tau$; a union $\tau$ contributes by each disjunct; lists, dictionaries, tuples
 an instantiated class is taken through the instance of the class at $\tau$ (\figref{instance}); and a union $\sigma$
 contributes nothing when $\tau$ is below one of its disjuncts, as \pyinline{None} is below \pyinline{T | None}, and
 otherwise contributes by each disjunct. In every other case, in particular for a type without type variables, the map
-is empty. Contributions combine by pointwise join, written $\joinTy{\Sigma}{}{}$ as for types, so a type variable found
+is empty. Maps combine by pointwise join, written $\joinTy{\Sigma}{}{}$ as for types, so a type variable found
 at several positions takes the join of the types found, the least choice under the lower bounds they give. Positions
 are covariant (tuple components and \pyinline{Callable} results), contravariant (\pyinline{Callable} parameters) or
 invariant (list, dictionary and class arguments), following the subtyping rules (\figref{subtyping}). The type argument
