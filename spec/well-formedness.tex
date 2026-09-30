@@ -292,8 +292,8 @@ context with $\TypeVar$ entries for the type parameters $\seq{\alpha}$.}{A mutua
 including the name of each function itself, at those types, and checks each definition against its type
 (\ruleName{def-body}).} \added{A type scheme without type parameters is identical to its \pyinline{Callable} type, so the \ruleName{def} rule binds the name of a
 function without type parameters as a variable of that type. The type schemes of functions with type parameters are instantiated
-where the type parameters are determined, at a call from the argument types (\ruleName{callee-scheme}) and against a
-\pyinline{Callable} type (\ruleName{var-scheme}). Since annotations denote types, not type schemes, declarations and
+when the type parameters are determined, namely at a call, from the argument types (\ruleName{callee-scheme}), and when
+checked against a \pyinline{Callable} type (\ruleName{var-scheme}). Since annotations denote types, not type schemes, declarations and
 assignments never bind variables at type schemes, only at types.}
 
 \replaced{In the body, the parameters $\seq{x}$ are bound at the types denoted by $\seq{\psi}$}{A definition binds its parameters at their annotated types}; variables declared or
