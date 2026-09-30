@@ -116,6 +116,8 @@ Direct, factual, conventional prose: state the thing and stop.
 - State the current design and nothing about how it evolved; never contrast it with a superseded design
   ("an earlier design allocated addresses"). When the design changes, delete superseded claims rather than
   annotating them as outdated.
+- When reporting what remains of a list of tasks or issues, give the remaining items only; do not
+  mention items already resolved, removed or deferred, even to explain why they no longer appear.
 
 ## Structure
 
