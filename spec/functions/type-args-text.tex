@@ -1,7 +1,5 @@
 Arguments for the type variables of $\sigma$, found by one-way unification of $\sigma$ with $\tau$ and given as a
-finite map from type variables to types. The rules apply the map to the type parameters $\seq{\alpha}$ of a scheme,
-writing $\typeArgs(\Sigma, \sigma, \tau)(\seq{\alpha})$ for the sequence of its entries at $\alpha_1, \ldots, \alpha_n$,
-undefined if some $\alpha_i$ has no entry. A type variable takes the base type of
+finite map from type variables to types. A type variable takes the base type of
 $\tau$; a union $\tau$ contributes by each disjunct; lists, dictionaries, tuples and callables are taken componentwise;
 an instantiated class is taken through the instance of the class at $\tau$ (\figref{instance}); and a union $\sigma$
 contributes nothing when $\tau$ is below one of its disjuncts, as \pyinline{None} is below \pyinline{T | None}, and
