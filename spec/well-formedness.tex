@@ -126,7 +126,7 @@ such rule, because $\elemTy$ takes a union to the join of its disjuncts' element
 stated separately for each elimination form.
 
 \added{A call $\exCall{e}{\seq{e}}$ is typed in two steps. The judgement $\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$
-(\figref{typing-callee}) synthesises, from the callee and the arguments together, the parameter types $\seq{\sigma}$
+(\figref{typing-callee}) synthesises, from the callee along with its arguments, the parameter types $\seq{\sigma}$
 against which the arguments are then checked and the result type $\sigma$: a callee that synthesises a
 \pyinline{Callable} type gives the parameter and result types of that type (\ruleName{callee}), and a name bound at a
 type scheme instantiates the type parameters from the arguments (\ruleName{callee-scheme}). The
