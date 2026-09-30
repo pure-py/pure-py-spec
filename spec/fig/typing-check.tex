@@ -25,7 +25,7 @@
 \inferrule*[lab={\ruleName{var-scheme}}]
 {
   \added{\Gamma \vdash q : \scheme{\seq{\alpha}}{\sigma}} \\
-  \added{\seq{\tau}' = \typeArgs{\Sigma}(\sigma, \tau)(\seq{\alpha})} \\
+  \added{\typeArgs{\Sigma}(\sigma, \tau)(\seq{\alpha}) = \seq{\tau}'} \\
   \added{\Sigma \vdash \subst{\seq{\tau}'}{\seq{\alpha}}{\sigma} \subty \tau}
 }
 {
