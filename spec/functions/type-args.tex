@@ -8,7 +8,7 @@
 &\qquad \rlap{$\text{if } \Sigma \vdash C[\seq{\tau}'] \instanceAt \tau$} \\*
 \typeArgs{\Sigma}(\tyUnion{\sigma}{\sigma'}, \tau) &{}= \varnothing \\*
 &\qquad \rlap{$\text{if } \Sigma \vdash \tau \subty \sigma \text{ or } \Sigma \vdash \tau \subty \sigma'$} \\*
-\typeArgs{\Sigma}(\tyUnion{\sigma}{\sigma'}, \tau) &{}= \joinTy{\Sigma}{\typeArgs{\Sigma}(\sigma, \tau)}{\typeArgs{\Sigma}(\sigma', \tau)} \quad \text{otherwise} \\*
-\typeArgs{\Sigma}(\sigma, \tau) &{}= \varnothing \quad \text{otherwise} \\*[2mm]
+\typeArgs{\Sigma}(\tyUnion{\sigma}{\sigma'}, \tau) &{}= \joinTy{\Sigma}{\typeArgs{\Sigma}(\sigma, \tau)}{\typeArgs{\Sigma}(\sigma', \tau)} \quad \text{(otherwise)} \\*
+\typeArgs{\Sigma}(\sigma, \tau) &{}= \varnothing \quad \text{(otherwise)} \\*[2mm]
 \typeArgs{\Sigma}(\varepsilon, \varepsilon) &{}= \varnothing \\*
 \typeArgs{\Sigma}(\sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) &{}= \joinTy{\Sigma}{\typeArgs{\Sigma}(\sigma, \tau)}{\typeArgs{\Sigma}(\seq{\sigma}, \seq{\tau})}

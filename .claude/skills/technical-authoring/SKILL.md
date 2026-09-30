@@ -134,7 +134,7 @@ Direct, factual, conventional prose: state the thing and stop.
 - Side conditions of a definition are aligned with one another: all in the condition column, or all on
   their own line under the equation, indented alike. Do not mix the two within a definition, and do not
   leave one condition overfull while the rest align. A bare "otherwise" is the exception: it follows the
-  equation on the same line after a `\quad`.
+  equation on the same line after a `\quad`, in parentheses.
 
 ## References in conversation
 

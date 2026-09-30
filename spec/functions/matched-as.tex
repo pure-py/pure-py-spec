@@ -9,4 +9,4 @@
 \matchedAs{\Sigma}(\Gamma, \tyDict{\tau}, \patDict{\bind{\seq{w}}{\seq{p}}}) &{}= \tyDict{\tau} \\*
 \matchedAs{\Sigma}(\Gamma, \tau, \patConstr{q}{a}) &{}= \meetTy{\Sigma}{\tau}{C[\seq{\sigma}]} \\*
 &\qquad \rlap{$\text{if } \Gamma \vdash q : \Type{C} \text{ and } \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$} \\*
-\matchedAs{\Sigma}(\Gamma, \tau, p) &{}= \tyNever \quad \text{otherwise}
+\matchedAs{\Sigma}(\Gamma, \tau, p) &{}= \tyNever \quad \text{(otherwise)}
