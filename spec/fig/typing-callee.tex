@@ -4,22 +4,22 @@
 \small
 \inferrule*[lab={\ruleName{callee}}]
 {
-  \added{\Sigma; \Gamma \vdash e \synth \tyCallable{\seq{\sigma}}{\sigma}}
+  \Sigma; \Gamma \vdash e \synth \tyCallable{\seq{\sigma}}{\sigma}
 }
 {
-  \added{\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma}
+  \Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma
 }
 \and
 \inferrule*[lab={\ruleName{callee-scheme}}]
 {
-  \added{\Gamma \vdash q : \scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}} \\
-  \added{I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \tau_i}} \\
-  \added{\typeArgs{\Sigma}((\sigma_i \mid i \in I), (\tau_i \mid i \in I))(\seq{\alpha}) = \seq{\tau}'}
+  \Gamma \vdash q : \scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}} \\
+  I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \tau_i} \\
+  \typeArgs{\Sigma}((\sigma_i \mid i \in I), (\tau_i \mid i \in I))(\seq{\alpha}) = \seq{\tau}'
 }
 {
-  \added{\Sigma; \Gamma \vdash q, \seq{e} \synth \subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}, \subst{\seq{\tau}'}{\seq{\alpha}}{\sigma}}
+  \Sigma; \Gamma \vdash q, \seq{e} \synth \subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}, \subst{\seq{\tau}'}{\seq{\alpha}}{\sigma}
 }
 \end{mathpar}
-\caption{\added{Callee $e$ at arguments $\seq{e}$ synthesises parameter types $\seq{\sigma}$ and result type $\sigma$}}
+\caption{Callee $e$ at arguments $\seq{e}$ synthesises parameter types $\seq{\sigma}$ and result type $\sigma$}
 \label{fig:typing-callee}
 \end{figure}

@@ -1,40 +1,40 @@
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Sigma; \Gamma \vdash d \synth \replaced{\pi}{\tau}$}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash d \synth \pi$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{def-signature}}]
 {
-  \added{\Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}}} \\
-  \Sigma; \Gamma\added{'} \vdash \seq{\psi} \synth \seq{\sigma} \\
-  \Sigma; \Gamma\added{'} \vdash \psi \synth \tau
+  \Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
+  \Sigma; \Gamma' \vdash \seq{\psi} \synth \seq{\sigma} \\
+  \Sigma; \Gamma' \vdash \psi \synth \tau
 }
 {
-  \Sigma; \Gamma \vdash \exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s} \synth \added{\scheme{\seq{\alpha}}{}}\tyCallable{\seq{\sigma}}{\tau}
+  \Sigma; \Gamma \vdash \exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s} \synth \scheme{\seq{\alpha}}{}\tyCallable{\seq{\sigma}}{\tau}
 }
 \end{mathpar}
-\subcaption{Definition $d$ synthesises \replaced{type scheme $\pi$}{type $\tau$}}
+\subcaption{Definition $d$ synthesises type scheme $\pi$}
 \label{fig:typing-def-synth}
 \end{subfigure}
 
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Sigma; \Gamma \vdash d \checks \replaced{\pi}{\tau}$}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash d \checks \pi$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{def-body}}]
 {
   \seq{x} \text{ distinct} \\
-  \added{\Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}}} \\
-  \Sigma; \Gamma\added{'} \override \set{\bind{\seq{x}}{\seq{\sigma}}} \override \scopeS(\set{\seq{x}}, s); \tau \vdash s : R \\
+  \Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
+  \Sigma; \Gamma' \override \set{\bind{\seq{x}}{\seq{\sigma}}} \override \scopeS(\set{\seq{x}}, s); \tau \vdash s : R \\
   R = \Returns \text{ or } \Sigma \vdash \tau \tyEquiv \tyNone
 }
 {
-  \Sigma; \Gamma \vdash \exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s} \checks \added{\scheme{\seq{\alpha}}{}}\tyCallable{\seq{\sigma}}{\tau}
+  \Sigma; \Gamma \vdash \exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s} \checks \scheme{\seq{\alpha}}{}\tyCallable{\seq{\sigma}}{\tau}
 }
 \end{mathpar}
-\subcaption{Definition $d$ checks against \replaced{type scheme $\pi$}{type $\tau$}}
+\subcaption{Definition $d$ checks against type scheme $\pi$}
 \label{fig:typing-def-check}
 \end{subfigure}
 \caption{Function definitions}

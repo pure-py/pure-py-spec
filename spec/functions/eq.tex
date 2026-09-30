@@ -14,10 +14,10 @@
 \eqOp(\delta, \delta') &{}= \pyinline{False} \\*
 &\qquad \text{if } \dom(\delta) \neq \dom(\delta') \\*
 \\
-\added{\eqOp(v, v')} &{}\added{= \eqElems(\iterOp(v), \iterOp(v'))} \\*
-&\qquad \added{\text{if } v \text{ and } v' \text{ are values of } \clsRange} \\*
+\eqOp(v, v') &{}= \eqElems(\iterOp(v), \iterOp(v')) \\*
+&\qquad \text{if } v \text{ and } v' \text{ are values of } \clsRange \\*
 \eqOp(\exObj{C}{\rho}, \exObj{C}{\rho'}) &{}= \eqElems(\rho(x_1) \cons \ldots \cons \rho(x_n), \rho'(x_1) \cons \ldots \cons \rho'(x_n)) \\*
-&\qquad \text{if } \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}\added{ \text{ and } C \neq \clsRange} \\*
+&\qquad \text{if } \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \text{ and } C \neq \clsRange \\*
 \eqOp(\exObj{C}{\rho}, \exObj{D}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq D \\*
 \\
 \eqOp(v, v') &{}= \pyinline{False} \\*

@@ -74,7 +74,7 @@
 \inferrule*[lab={\ruleName{pat-constr}}]
 {
   \Gamma \vdash q : \Type{D} \\
-  \added{D \neq \clsRange} \\
+  D \neq \clsRange \\
   D \in \ancestors{\Sigma}(C) \\
   \fields{\Sigma}(D) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
   \fieldMap{\Sigma}(D, a) = \set{\bind{\seq{x}}{\seq{p}}} \\

@@ -52,7 +52,7 @@ module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$,
 class entry & $\Type{C}$ & name denotes class $C$ \\
 type parameter & $\TypeVar$ & name is a type parameter in scope \\
 type alias & $\TypeAlias{\seq{\alpha}}{\tau}$ & name denotes type $\tau$ with type parameters $\seq{\alpha}$ \\
-type scheme & $\scheme{\seq{\alpha}}{\tau}$ & type of function bound by \pyinline{def}, generalised over \replaced{one or more}{its} type parameters $\seq{\alpha}$ \\
+type scheme & $\scheme{\seq{\alpha}}{\tau}$ & type of function bound by \pyinline{def}, generalised over one or more type parameters $\seq{\alpha}$ \\
 predefined name & $\predefName$ & name usable only in annotation or as decorator \\
 \end{tabular}
 \end{center}
@@ -74,7 +74,7 @@ It is useful to represent contexts as total functions on the set of all variable
 
 \begin{definition}[Class]
 \label{def:class}
-A class $C$ is a fully-qualified name $q.c$\deleted{, written with a tilde}: a module $q$ and a class name $c$ declared in $q$. A module
+A class $C$ is a fully-qualified name $q.c$: a module $q$ and a class name $c$ declared in $q$. A module
 declares each class name at most once, so the fully-qualified name of a class is the identity of the
 class. A class is also the type of its instances.
 \end{definition}
@@ -180,8 +180,8 @@ $\mathcal{P}$ takes each module $q$ of \figref{predefined-values} to a pair $(\G
 binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \figref{predefined-signatures}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value
 (\figref{predefined-values}). A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
-the predefined signatures. \added{The class table $\SigmaPredef$ of the predefined modules has the single entry
-$\SigmaPredef(\clsRange) = \clsRec{\varepsilon}{\bind{\pyinline{stop}}{\tyInt}}{\bot}$.}
+the predefined signatures. The class table $\SigmaPredef$ of the predefined modules has the single entry
+$\SigmaPredef(\clsRange) = \clsRec{\varepsilon}{\bind{\pyinline{stop}}{\tyInt}}{\bot}$.
 \end{definition}
 
 \input{spec/fig/predefined-signatures}

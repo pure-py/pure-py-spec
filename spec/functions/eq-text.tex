@@ -1,5 +1,5 @@
 Structural equality: literals by value, lists and tuples by their elements, dictionaries with the same
-keys by their values, and objects of the same class by their field values, each through $\eqElems$\added{, except ranges,
-which are compared by their sequences, so that \pyinline{range(-1) == range(-2)}}.
+keys by their values, and objects of the same class by their field values, each through $\eqElems$, except ranges,
+which are compared by their sequences, so that \pyinline{range(-1) == range(-2)}.
 The forms of values are those of \figref{values}, with literals distinguished as numbers, strings, Booleans and \pyinline{None}, and closures and primitives taken together as functions. Values of different forms are unequal, except a Boolean and a number, for which equality is undefined because Python compares them numerically. Equality is also undefined between functions and between two \pyinline{nan} values, which Python compares by identity.
 Dictionaries are compared in the entry order of the left operand.

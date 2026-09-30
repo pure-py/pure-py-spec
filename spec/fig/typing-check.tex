@@ -24,12 +24,12 @@
 \and
 \inferrule*[lab={\ruleName{var-scheme}}]
 {
-  \added{\Gamma \vdash q : \scheme{\seq{\alpha}}{\sigma}} \\
-  \added{\typeArgs{\Sigma}(\sigma, \tau)(\seq{\alpha}) = \seq{\tau}'} \\
-  \added{\Sigma \vdash \subst{\seq{\tau}'}{\seq{\alpha}}{\sigma} \subty \tau}
+  \Gamma \vdash q : \scheme{\seq{\alpha}}{\sigma} \\
+  \typeArgs{\Sigma}(\sigma, \tau)(\seq{\alpha}) = \seq{\tau}' \\
+  \Sigma \vdash \subst{\seq{\tau}'}{\seq{\alpha}}{\sigma} \subty \tau
 }
 {
-  \added{\Sigma; \Gamma \vdash q \checks \tau}
+  \Sigma; \Gamma \vdash q \checks \tau
 }
 \and
 \inferrule*[lab={\ruleName{call-lambda}}]

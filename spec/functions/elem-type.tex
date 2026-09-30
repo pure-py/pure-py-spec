@@ -2,6 +2,6 @@
 \elemTy{\Sigma}(\tyStr) &{}= \tyStr \\*
 \elemTy{\Sigma}(\tyLiteral{w}) &{}= \tyStr \\*
 \elemTy{\Sigma}(\tyDict{\tau}) &{}= \tyStr \\*
-\added{\elemTy{\Sigma}(\clsRange)} &{}\added{= \tyInt} \\*
+\elemTy{\Sigma}(\clsRange) &{}= \tyInt \\*
 \elemTy{\Sigma}(\tyTuple{\seq{\tau}}) &{}= \bigJoinTy{\Sigma}{\baseType(\tau_1), \ldots, \baseType(\tau_n)} \\*
 \elemTy{\Sigma}(\tyUnion{\sigma}{\tau}) &{}= \joinTy{\Sigma}{\elemTy{\Sigma}(\sigma)}{\elemTy{\Sigma}(\tau)}
