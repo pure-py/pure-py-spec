@@ -1,2 +1,2 @@
-\typeArgs(\Sigma, \seq{\alpha}, \seq{\sigma}, \seq{\tau}) &{}= \seq{\tau}' && \text{where } \tau'_i = \bigJoinTy{\Sigma}{(\sigma' \mid (\alpha_i, \sigma') \in \constraints(\Sigma, \seq{\sigma}, \seq{\tau}))} \\*
-&&& \qquad \text{defined iff each } \alpha_i \text{ occurs in } \constraints(\Sigma, \seq{\sigma}, \seq{\tau})
+\typeArgs(\Sigma, \seq{\alpha}, \seq{\sigma}, \seq{\tau}) &{}= \seq{\tau}' && \text{where } \tau'_i = \bigJoinTy{\Sigma}{(\sigma' \mid (\alpha_i, \sigma') \in \lowerBounds(\Sigma, \seq{\sigma}, \seq{\tau}))} \\*
+&&& \qquad \text{defined iff each } \alpha_i \text{ occurs in } \lowerBounds(\Sigma, \seq{\sigma}, \seq{\tau})

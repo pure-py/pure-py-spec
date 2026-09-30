@@ -1,0 +1,14 @@
+\lowerBounds(\Sigma, \alpha, \tau) &{}= (\alpha, \baseType(\tau)) \\*
+\lowerBounds(\Sigma, \tyList{\sigma}, \tyList{\tau}) &{}= \lowerBounds(\Sigma, \sigma, \tau) \\*
+\lowerBounds(\Sigma, \tyDict{\sigma}, \tyDict{\tau}) &{}= \lowerBounds(\Sigma, \sigma, \tau) \\*
+\lowerBounds(\Sigma, \tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) &{}= \lowerBounds(\Sigma, \seq{\sigma}, \seq{\tau}) \\*
+\lowerBounds(\Sigma, \tyCallable{\seq{\sigma}}{\sigma}, \tyCallable{\seq{\tau}}{\tau}) &{}= \lowerBounds(\Sigma, \sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) \\*
+\lowerBounds(\Sigma, C[\seq{\sigma}], \tau) &{}= \lowerBounds(\Sigma, \seq{\sigma}, \seq{\tau}') \\*
+&\qquad \rlap{$\text{if } \Sigma \vdash C[\seq{\tau}'] \instanceAt \tau$} \\*
+\lowerBounds(\Sigma, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \lowerBounds(\Sigma, \sigma'', \tau') \\*
+&\qquad \rlap{$\text{if } \sigma'' \text{ is the only disjunct of } \tyUnion{\sigma}{\sigma'} \text{ with type variables}$} \\*
+&\qquad \rlap{$\text{and } \tau' \text{ is the join of the disjuncts of } \tau \text{ not below the}$} \\*
+&\qquad \rlap{$\text{join of the other disjuncts of } \tyUnion{\sigma}{\sigma'}$} \\*
+\lowerBounds(\Sigma, \sigma, \tau) &{}= \varepsilon \qquad \text{otherwise} \\*[2mm]
+\lowerBounds(\Sigma, \varepsilon, \varepsilon) &{}= \varepsilon \\*
+\lowerBounds(\Sigma, \sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) &{}= \lowerBounds(\Sigma, \sigma, \tau) \concat \lowerBounds(\Sigma, \seq{\sigma}, \seq{\tau})

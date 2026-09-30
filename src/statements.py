@@ -69,7 +69,7 @@ from operators import (
 )
 from reasons import IllFormedModule, MypyCompatibility
 from shapes import Shapes, shapes
-from subtyping import constraints_seq, equivalent, join_seq, subtype
+from subtyping import equivalent, join_seq, lower_bounds_seq, subtype
 from syntax import NotYetSupported, render_pattern
 from type_syntax import (
     CallableExpr,
@@ -684,8 +684,8 @@ def type_args(
     node: ast.AST,
     mod_ctx: ModuleContext,
 ) -> list[Type]:
-    ks = constraints_seq(mod_ctx.Sigma, sigmas, taus)
-    bounds = {alpha: [tau for a, tau in ks if a == alpha] for alpha in alphas}
+    pairs = lower_bounds_seq(mod_ctx.Sigma, sigmas, taus)
+    bounds = {alpha: [tau for a, tau in pairs if a == alpha] for alpha in alphas}
     unconstrained = next((alpha for alpha, ts in bounds.items() if len(ts) == 0), None)
     if unconstrained is not None:
         raise IllFormedModule(node, reasons.UnconstrainedTypeParameter(unconstrained))
