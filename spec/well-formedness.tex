@@ -290,7 +290,7 @@ scheme from the annotations (\ruleName{def-signature}) and check the body $s$ (\
 context with $\TypeVar$ entries for the type parameters $\seq{\alpha}$.}{A mutual region of function definitions (\ruleName{def}) resolves the annotations of each definition to a
 \pyinline{Callable} type (\ruleName{def-signature}, \figref{typing-def}), binds the names of the mutual region,
 including the name of each function itself, at those types, and checks each definition against its type
-(\ruleName{def-body}).} \added{A type scheme without type parameters is its \pyinline{Callable} type, so the \ruleName{def} rule binds the names of
+(\ruleName{def-body}).} \added{A type scheme without type parameters is identical to its \pyinline{Callable} type, so the \ruleName{def} rule binds the names of
 functions without type parameters as variables of those types. The type schemes of functions with type parameters are instantiated
 where the type parameters are determined, at a call from the argument types (\ruleName{callee-scheme}) and against a
 \pyinline{Callable} type (\ruleName{var-scheme}). Since annotations denote types, not type schemes, declarations and
