@@ -133,10 +133,11 @@ type scheme instantiates the type parameters from the arguments (\ruleName{calle
 $e_i$ with synthesised type $\tau_i$ constrains the type parameters: $\constraints(\Sigma, \sigma_i, \tau_i)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:constraints}}) pairs every type variable in parameter
 type $\sigma_i$ with the type at the corresponding position of $\tau_i$. An argument without a synthesised type, such as a lambda, contributes
-nothing. The type arguments $\typeArgs(\Sigma, \seq{\alpha}, \seq{\sigma}, \seq{\tau})$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) take each type parameter to the join of the
-types paired with it, and are undefined if a type parameter is not paired with any type. The \ruleName{call} rule then
-checks every argument against the instantiated parameter types and synthesises the instantiated result type.}
+nothing. The type arguments are the sequence $\seq{\tau}' = \typeArgs(\Sigma, \seq{\alpha}, \seq{\sigma}, \seq{\tau})$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}), with $\tau'_i$ the join of the types paired
+with $\alpha_i$, undefined if some $\alpha_i$ is not paired with any type. The \ruleName{call} rule then checks every
+argument against the instantiated parameter types $\subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}$ and synthesises the
+instantiated result type $\subst{\seq{\tau}'}{\seq{\alpha}}{\sigma}$.}
 
 \replaced{Lambdas, applied lambdas, lists, tuples, dictionaries, conditional expressions and comprehensions check
 (\ruleName{lambda}, \ruleName{call-lambda}, \ruleName{list}, \ruleName{tuple}, \ruleName{dict}, \ruleName{cond},
