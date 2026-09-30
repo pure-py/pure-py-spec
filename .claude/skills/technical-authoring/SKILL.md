@@ -84,8 +84,6 @@ Direct, factual, conventional prose: state the thing and stop.
 - Metaphor and private jargon: "lands", "spine", "swept across", "walking the axis", "destination", "stage-factorisation" and similar compounds. "Story" sparingly; prefer a concrete noun ("the semimodule picture").
 - "Rung" and "ladder": banned project-wide, in prose and in discussion.
 - Vague nominal back-reference: "the algebra", "the structure". Name the referent.
-- Pronoun tails on a preposition ("to it", "of it", "for it") and dense runs of "it"/"its": name the
-  referent or restructure the sentence.
 - "Own" as a distinguishing qualifier ("the node's own positions"): state the distinction instead
   (the positions at the node itself, not those of its descendants).
 - Invented terms where standard ones exist: "translation" not "shift"; "the other factor" not "cofactor". Check a term is standard before leaning on it, and cite where useful. Do not coin terminology, in the text or in conversation ("foreign module", "fresh position"); use the document's own terms or plain description ("a module other than the current one").
