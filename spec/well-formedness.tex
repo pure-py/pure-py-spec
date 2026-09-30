@@ -137,7 +137,9 @@ $\sigma$ to the type $\tau$ of the argument, and the type arguments $\typeArgs(\
 type parameter, undefined if a type parameter is unconstrained. The \ruleName{call} rule then checks every argument,
 including one that does not synthesise, against the parameter types and synthesises the result type.}
 
-Lambdas check, as do lists, tuples, dictionaries and comprehensions. \added{A name bound at a type scheme checks against a type
+\replaced{Lambdas, applied lambdas, lists, tuples, dictionaries, conditional expressions and comprehensions check
+(\ruleName{lambda}, \ruleName{call-lambda}, \ruleName{list}, \ruleName{tuple}, \ruleName{dict}, \ruleName{cond},
+\ruleName{list-comp}, \ruleName{dict-comp}).}{Lambdas check, as do lists, tuples, dictionaries and comprehensions.} \added{A name bound at a type scheme checks against a type
 by instantiating the type parameters with the type arguments from that type, provided the instantiation is below the type
 (\ruleName{var-scheme}), so a function with type parameters can be passed where a \pyinline{Callable} type is expected.} An expression that synthesises $\sigma$ checks against any supertype
 of $\sigma$ (\ruleName{check-synth}), which applies only when no other rule concludes $\Sigma; \Gamma \vdash e \checks
