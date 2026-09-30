@@ -102,7 +102,7 @@ The fields of a class $C$ form a field scheme $\fields{\Sigma}(C)$ over its type
 field: the fields of its base class first, recursively and instantiated at the type arguments of the base, then the fields declared by $C$ itself, each at its
 declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the instantiation $\tyInst{\fields{\Sigma}(C)}{\seq{\tau}}$. The order matters, because a constructor call pairs positional arguments with fields by
 position. \replaced{A constructor call $\exConstr{q}{a}$ pairs each argument with a field using $\fieldMap{\Sigma}$ and
-infers type arguments $\seq{\tau}'$ for the class $C$ that $q$ resolves to by $\typeArgs{\Sigma}$
+infers type arguments $\seq{\tau}'$ for the class $C$ that $q$ resolves to, using $\typeArgs{\Sigma}$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) over the arguments that synthesise, as
 in \ruleName{callee-scheme} (\ruleName{constr}). The arguments are checked against the field types instantiated at
 $\seq{\tau}'$, and the call synthesises $C[\seq{\tau}']$. A constructor call $\exConstr{q[\seq{\psi}]}{a}$ takes the
