@@ -125,10 +125,10 @@ such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts'
 \citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form.
 
-\added{A call $\exCall{e}{\seq{e}}$ is typed in two steps. First, the auxiliary judgement
-$\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$ (\figref{typing-callee}) determines parameter types
-$\seq{\sigma}$ and result type $\sigma$ from the callee along with its arguments. Second, the \ruleName{call} rule
-checks the arguments against $\seq{\sigma}$ and synthesises $\sigma$. The first step has two rules. A callee that synthesises a
+\added{The \ruleName{call} rule types a call $\exCall{e}{\seq{e}}$ in two steps. Its first premise, the auxiliary
+judgement $\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$ (\figref{typing-callee}), determines parameter
+types $\seq{\sigma}$ and result type $\sigma$ from the callee along with its arguments. Its remaining premises check
+the arguments against $\seq{\sigma}$, and the call synthesises $\sigma$. The auxiliary judgement has two rules. A callee that synthesises a
 \pyinline{Callable} type gives the parameter and result types of that type (\ruleName{callee}). A name bound at a
 type scheme $\scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}$ instantiates the type parameters from the arguments
 (\ruleName{callee-scheme}). The type arguments are collected by $\typeArgs{\Sigma}$
@@ -139,7 +139,7 @@ An argument that does not synthesise, such as a lambda, is left out. The
 \ruleName{callee-scheme} rule applies the resulting map to the type parameters $\seq{\alpha}$, giving type arguments $\seq{\tau}'$, undefined if
 the map lacks an entry for any type parameter, and concludes with the instantiated parameter types
 $\subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}$ and result type $\subst{\seq{\tau}'}{\seq{\alpha}}{\sigma}$, which the
-second step takes as $\seq{\sigma}$ and $\sigma$.}
+\ruleName{call} rule takes as $\seq{\sigma}$ and $\sigma$.}
 
 \replaced{Lambdas, applied lambdas, lists, tuples, dictionaries, conditional expressions and comprehensions check
 (\ruleName{lambda}, \ruleName{call-lambda}, \ruleName{list}, \ruleName{tuple}, \ruleName{dict}, \ruleName{cond},
