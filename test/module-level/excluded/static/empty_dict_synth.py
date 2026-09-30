@@ -1,2 +1,2 @@
-# rule: check-synth
+# rule: check-syn
 print({})
