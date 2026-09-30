@@ -136,9 +136,10 @@ unifying each parameter type one way with the synthesised type: a type variable 
 position in the synthesised type, and a type variable found at several positions takes the join of the types found.
 An argument that does not synthesise, such as a lambda, is left out. The
 \ruleName{callee-scheme} rule applies the resulting map to the type parameters $\seq{\alpha}$, giving type arguments $\seq{\tau}'$, undefined if
-the map lacks an entry for any type parameter. The \ruleName{call}
-rule then checks every argument against $\subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}$ and synthesises
-$\subst{\seq{\tau}'}{\seq{\alpha}}{\sigma}$.}
+the map lacks an entry for any type parameter, and concludes with the instantiated parameter types
+$\subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}$ and result type $\subst{\seq{\tau}'}{\seq{\alpha}}{\sigma}$. The second
+step is the \ruleName{call} rule, which checks the arguments against the parameter types and synthesises the result
+type, for a callee at a type scheme as for any other callee.}
 
 \replaced{Lambdas, applied lambdas, lists, tuples, dictionaries, conditional expressions and comprehensions check
 (\ruleName{lambda}, \ruleName{call-lambda}, \ruleName{list}, \ruleName{tuple}, \ruleName{dict}, \ruleName{cond},
