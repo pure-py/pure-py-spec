@@ -196,8 +196,6 @@ def check_syntax_stmt(node: ast.stmt) -> None:
                 raise Prohibited(node, "unannotated return type")
             check_syntax_annotation(node.returns)
             check_syntax_body(node.body)
-            if len(node.type_params) > 0:
-                raise NotYetSupported(node, "type parameters", 187)
         case ast.Expr():
             check_syntax_expr(node.value)
         case ast.Assert():
@@ -284,6 +282,14 @@ def check_syntax_type_alias(node: ast.TypeAlias) -> None:
 
 
 def check_syntax_type_params(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlias) -> None:
+    names = [
+        param.name
+        for param in node.type_params
+        if isinstance(param, (ast.TypeVar, ast.ParamSpec, ast.TypeVarTuple))
+    ]
+    dup = next((x for i, x in enumerate(names) if x in names[:i]), None)
+    if dup is not None:
+        raise Prohibited(node, f"duplicate type parameter {dup}")
     for param in node.type_params:
         match param:
             case ast.TypeVar():

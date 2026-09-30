@@ -295,6 +295,32 @@ class TypeParameterAsValue:
 
 
 @dataclass(frozen=True)
+class TypeSchemeAsValue:
+    q: Name
+
+    def message(self) -> str:
+        return (
+            f"'{self.q}' has type parameters; call it or use it where a Callable type is expected"
+        )
+
+
+@dataclass(frozen=True)
+class UnconstrainedTypeParameter:
+    alpha: Var
+
+    def message(self) -> str:
+        return f"type parameter '{self.alpha}' unconstrained"
+
+
+@dataclass(frozen=True)
+class TypeSchemeInBranch:
+    x: Var
+
+    def message(self) -> str:
+        return f"'{self.x}' bound at a type scheme in one branch cannot be merged with the other"
+
+
+@dataclass(frozen=True)
 class TypeAliasAsValue:
     q: Name
 
@@ -522,6 +548,9 @@ type Reason = (
     | ClassAsValue
     | PredefinedNameAsValue
     | TypeParameterAsValue
+    | TypeSchemeAsValue
+    | UnconstrainedTypeParameter
+    | TypeSchemeInBranch
     | TypeAliasAsValue
     | UnknownConstructorKeyword
     | DuplicateDictKey

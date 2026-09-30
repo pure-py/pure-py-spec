@@ -185,6 +185,43 @@ def instantiation_candidates(
     return [first] if second is None else [first, second]
 
 
+def constraints(Sigma: ClassTable, sigma: Type, tau: Type) -> list[tuple[Var, Type]]:
+    match sigma, tau:
+        case TypeVariable(alpha), _:
+            return [(alpha, base_type(tau))]
+        case (ListType(sigma_), ListType(tau_)) | (DictType(sigma_), DictType(tau_)):
+            return constraints(Sigma, sigma_, tau_)
+        case TupleType(sigmas), TupleType(taus):
+            return constraints_seq(Sigma, sigmas, taus)
+        case CallableType(sigmas, sigma_), CallableType(taus, tau_):
+            return constraints_seq(Sigma, (sigma_, *sigmas), (tau_, *taus))
+        case ClassType(c, sigmas), _:
+            match instance(Sigma, c, tau):
+                case ClassType(_, taus):
+                    return constraints_seq(Sigma, sigmas, taus)
+                case _:
+                    return []
+        case UnionType(), _:
+            with_variables = [d for d in disjuncts(sigma) if mentions_type_variable(d)]
+            if len(with_variables) != 1:
+                return []
+            others = join_seq(Sigma, [d for d in disjuncts(sigma) if not mentions_type_variable(d)])
+            remaining = [d for d in disjuncts(tau) if not subtype(Sigma, d, others)]
+            return constraints(Sigma, with_variables[0], join_seq(Sigma, remaining))
+        case _:
+            return []
+
+
+def constraints_seq(
+    Sigma: ClassTable, sigmas: Sequence[Type], taus: Sequence[Type]
+) -> list[tuple[Var, Type]]:
+    return [k for sigma, tau in zip(sigmas, taus) for k in constraints(Sigma, sigma, tau)]
+
+
+def mentions_type_variable(tau: Type) -> bool:
+    return any(isinstance(sigma, TypeVariable) for sigma in subterms(tau))
+
+
 def equivalent_seq(Sigma: ClassTable, sigmas: Sequence[Type], taus: Sequence[Type]) -> bool:
     return all(equivalent(Sigma, sigma, tau) for sigma, tau in zip(sigmas, taus))
 

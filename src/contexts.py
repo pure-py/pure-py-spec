@@ -2,7 +2,9 @@ import ast
 from collections.abc import Mapping
 from dataclasses import dataclass
 
+import reasons
 from classes import Class, ClassTable
+from reasons import IllFormedModule
 from subtyping import join_seq
 from type_syntax import (
     CallableType,
@@ -45,9 +47,15 @@ class TypeAlias:
     tau: Type
 
 
+@dataclass(frozen=True)
+class TypeScheme:
+    params: tuple[Var, ...]  # non-empty
+    tau: Type
+
+
 type VarEntry = Unbound | DU | PU | Type
 type ContextEntry = (
-    VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName | TypeVar | TypeAlias
+    VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName | TypeVar | TypeAlias | TypeScheme
 )
 type Context = Mapping[Var, ContextEntry]
 type VarContext = Mapping[Var, VarEntry]
@@ -69,7 +77,15 @@ class ModuleLoaded:
     members: Context
 
 
-NON_VARIABLE_ENTRIES = (ModuleStub, ModuleLoaded, Class, PredefinedName, TypeVar, TypeAlias)
+NON_VARIABLE_ENTRIES = (
+    ModuleStub,
+    ModuleLoaded,
+    Class,
+    PredefinedName,
+    TypeVar,
+    TypeAlias,
+    TypeScheme,
+)
 
 
 @dataclass(frozen=True)
@@ -184,18 +200,22 @@ def predefined_context(q: Name) -> Context:
     return {**PREDEFINED_MEMBERS[str(q)], "__name__": Primitive.STR}
 
 
-def merge_entry(theta: ContextEntry, theta_: ContextEntry) -> VarEntry:
-    assert not isinstance(theta, NON_VARIABLE_ENTRIES)
-    assert not isinstance(theta_, NON_VARIABLE_ENTRIES)
-    return theta if theta == theta_ else PU(declared_type_of(theta))
+def merge_entry(
+    x: Var, theta: ContextEntry | None, theta_: ContextEntry | None, node: ast.AST
+) -> ContextEntry:
+    if theta == theta_:
+        assert theta is not None
+        return theta
+    if isinstance(theta, TypeScheme) or isinstance(theta_, TypeScheme):
+        raise IllFormedModule(node, reasons.TypeSchemeInBranch(x))
+    present = theta if theta is not None else theta_
+    assert present is not None
+    return PU(declared_type_of(present))
 
 
-def merge_context(gamma: Context, gamma_: Context) -> VarContext:
+def merge_context(gamma: Context, gamma_: Context, node: ast.AST) -> Context:
     return {
-        x: merge_entry(gamma[x], gamma_[x])
-        if x in gamma and x in gamma_
-        else PU(declared_type_of(gamma[x] if x in gamma else gamma_[x]))
-        for x in set(gamma.keys()) | set(gamma_.keys())
+        x: merge_entry(x, gamma.get(x), gamma_.get(x), node) for x in gamma.keys() | gamma_.keys()
     }
 
 
@@ -208,18 +228,18 @@ def declared_type_of(theta: ContextEntry) -> Type:
             return theta
 
 
-def merge_outcomes(rs: list[StaticOutcome]) -> StaticOutcome:
+def merge_outcomes(rs: list[StaticOutcome], node: ast.AST) -> StaticOutcome:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return Returns()
     delta = assigns_branches[0].delta
-    return Assigns(fold_merge(delta, assigns_branches[1:]))
+    return Assigns(fold_merge(delta, assigns_branches[1:], node))
 
 
-def fold_merge(delta: Context, rs: list[Assigns]) -> Context:
+def fold_merge(delta: Context, rs: list[Assigns], node: ast.AST) -> Context:
     if len(rs) == 0:
         return delta
-    return fold_merge(merge_context(delta, rs[0].delta), rs[1:])
+    return fold_merge(merge_context(delta, rs[0].delta, node), rs[1:], node)
 
 
 def override_context(gamma: Context, delta: Context) -> Context:
