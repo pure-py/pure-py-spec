@@ -281,9 +281,9 @@ earlier in the module, and cannot name $x$ itself. Each rule that takes an annot
 
 \replaced{The \ruleName{def} rule for a mutual region of function definitions synthesises a type scheme for each definition
 (\figref{typing-def}), binds all the function names of the mutual region at the synthesised type schemes, and checks each
-definition against its type scheme. For a definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$,
-the type parameters $\seq{\alpha}$ are in scope in the \ruleName{def-signature} rule, which synthesises the type scheme from
-the annotations, and in the \ruleName{def-body} rule, which checks the body $s$.}{A mutual region of function definitions (\ruleName{def}) resolves the annotations of each definition to a
+definition against its scheme. For a definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$,
+the \ruleName{def-signature} rule synthesises the type scheme from the annotations, and the \ruleName{def-body} rule checks
+the body $s$. Both rules extend the context with a $\TypeVar$ entry for each of the type parameters $\seq{\alpha}$.}{A mutual region of function definitions (\ruleName{def}) resolves the annotations of each definition to a
 \pyinline{Callable} type (\ruleName{def-signature}, \figref{typing-def}), binds the names of the mutual region,
 including the name of each function itself, at those types, and checks each definition against its type
 (\ruleName{def-body}).} \added{A type scheme without type parameters is written as its \pyinline{Callable} type, so the name of a function without type parameters is a variable of that type. The name of a function with type parameters does not synthesise a type. Its type scheme is instantiated where the type parameters are determined, at a call from the argument types (\ruleName{callee-scheme}) and against a \pyinline{Callable} type (\ruleName{var-scheme}). Since annotations denote types, not type schemes, declarations and assignments never bind variables at type schemes, only at types.} \replaced{In the body, the parameters $\seq{x}$ are bound at the types denoted by $\seq{\psi}$}{A definition binds its parameters at their annotated types}; variables declared or
