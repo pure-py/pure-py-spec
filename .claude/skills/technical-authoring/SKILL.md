@@ -130,8 +130,10 @@ Direct, factual, conventional prose: state the thing and stop.
 - A macro is named after what it renders (\baseType for base-type, not \widen), and is renamed when the
   rendered name changes.
 - After a build, render each changed page and look at it: no figure, rule, table or definition row may run
-  off the page or noticeably into the margin. Move long side conditions to their own line rather than
-  leaving an overfull row.
+  off the page or noticeably into the margin.
+- Side conditions of a definition are aligned with one another: all in the condition column, or all on
+  their own line under the equation, indented alike. Do not mix the two within a definition, and do not
+  leave one condition overfull while the rest align.
 
 ## References in conversation
 
