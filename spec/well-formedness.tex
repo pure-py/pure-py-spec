@@ -302,7 +302,7 @@ prefers a locally bound name to one visible in an enclosing scope. A variable of
 enclosing scope referenced by the body must be definitely assigned at the point at which the function is defined,
 whereas Python resolves the reference only when the body runs. As with any scope, the names declared in the function, including
 \replaced{the parameters $\seq{x}$}{its parameters}, must be distinct from one another and from any pattern variables in \replaced{$s$}{its body}. \replaced{The function names of the mutual region are
-declared in the enclosing scope rather than in the function, and must be distinct from the other names declared there.}{The function names of the mutual region are not among these; they are
+declared in the enclosing scope rather than in the function, and must be distinct from the other names declared in that scope.}{The function names of the mutual region are not among these; they are
 declared in the enclosing scope, where the same condition applies to them.}
 
 The body \added{$s$} is checked with the
