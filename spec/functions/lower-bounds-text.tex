@@ -2,7 +2,7 @@ Lower bounds on the type variables of $\sigma$ from a type $\tau$ at which $\sig
 sequence of pairs in the order found, each pairing a type variable with the type at the corresponding position of
 $\tau$. A type variable is bounded by the base type of $\tau$; lists, dictionaries, tuples and callables are taken
 componentwise; an instantiated class is taken through the instance of the class at $\tau$ (\figref{instance}); and a
-union with exactly one disjunct mentioning type variables bounds that disjunct by the disjuncts of $\tau$ which are
-not below the other disjuncts. A type without type variables, or of a form other than that of $\tau$, gives the
+union $\sigma$ with exactly one disjunct mentioning type variables bounds that disjunct by the disjuncts of $\tau$ which
+are not below the join of the other disjuncts of $\sigma$. A type without type variables, or of a form other than that of $\tau$, gives the
 empty sequence. The relation that holds at a position depends on its variance, and the argument check of the
 \ruleName{call} rule enforces it once the type arguments are chosen.
