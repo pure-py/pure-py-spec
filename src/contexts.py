@@ -49,8 +49,11 @@ class TypeAlias:
 
 @dataclass(frozen=True)
 class TypeScheme:
-    params: tuple[Var, ...]  # non-empty
+    params: tuple[Var, ...]
     tau: Type
+
+    def __post_init__(self) -> None:
+        assert len(self.params) > 0
 
 
 type VarEntry = Unbound | DU | PU | Type
