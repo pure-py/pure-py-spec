@@ -106,8 +106,9 @@ position. A constructor call $\exConstr{q}{a}$ pairs each argument with a field 
 $\fieldMap$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to
 (\ruleName{constr}). An attribute reference $\exAttr{e}{x}$ has the type of the field $x$ of the class synthesised by $e$
 (\ruleName{attr-object}). The signature of a predefined module binds
-$\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type listed for it
-(\figref{predefined-signatures}, Definition~\ref{def:predefined}). A module attribute reference
+$\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type \replaced{given in \figref{predefined-signatures}
+(Definition~\ref{def:predefined})}{listed for it
+(\figref{predefined-signatures}, Definition~\ref{def:predefined})}. A module attribute reference
 $\exAttr{e}{x}$ resolves as a qualified name to a definitely assigned member
 (\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}. A variable bound to a module or
 class is not an expression on its own, and occurs only as the head of a qualified
