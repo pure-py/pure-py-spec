@@ -4,8 +4,8 @@ $\tau$. A type variable is bounded by the base type of $\tau$; lists, dictionari
 componentwise; an instantiated class is taken through the instance of the class at $\tau$ (\figref{instance}); and a
 union $\sigma$ with exactly one disjunct mentioning type variables bounds that disjunct by the disjuncts of $\tau$ which
 are not below the join of the other disjuncts of $\sigma$. In every other case, in particular for a type without type variables, the sequence
-is empty. Whether the type argument chosen for a type variable must be a supertype of the bound, a subtype
-of it or equivalent to it depends on the position, following the subtyping rules (\figref{subtyping}): a supertype in
+is empty. Whether the type argument chosen for a type variable must be a supertype, a subtype or an equivalent
+of the bound depends on the position, following the subtyping rules (\figref{subtyping}): a supertype in
 a tuple component or \pyinline{Callable} result, a subtype in a \pyinline{Callable} parameter, and equivalent in a
 list, dictionary or class argument. The argument check of the \ruleName{call} rule enforces the requirement once the
 type arguments are chosen.
