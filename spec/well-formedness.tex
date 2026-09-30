@@ -129,13 +129,14 @@ stated separately for each elimination form.
 (\figref{typing-callee}) synthesises, from the callee along with its arguments, parameter types $\seq{\sigma}$
 and result type $\sigma$: a callee that synthesises a
 \pyinline{Callable} type gives the parameter and result types of that type (\ruleName{callee}), and a name bound at a
-type scheme instantiates the type parameters from the arguments (\ruleName{callee-scheme}). The
-arguments that synthesise constrain the type parameters through $\constraints(\Sigma, \sigma, \tau)$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:constraints}}), which relates a parameter type
-$\sigma$ to the type $\tau$ of the argument, and the type arguments $\typeArgs(\Sigma, \seq{\alpha}, \seq{\sigma}, \seq{\tau})$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) are the joins of the constraints on each
-type parameter, undefined if a type parameter is unconstrained. The \ruleName{call} rule then checks every argument,
-including one that does not synthesise, against the parameter types and synthesises the result type.}
+type scheme instantiates the type parameters from the arguments (\ruleName{callee-scheme}). Each argument
+$e_i$ with a synthesised type $\tau_i$ constrains the type parameters: $\constraints(\Sigma, \sigma_i, \tau_i)$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:constraints}}) pairs every type variable in the parameter
+type $\sigma_i$ with the type it meets in $\tau_i$. An argument without a synthesised type, such as a lambda, does not
+contribute a pair. The type arguments $\typeArgs(\Sigma, \seq{\alpha}, \seq{\sigma}, \seq{\tau})$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) take each type parameter to the join of the
+types paired with it, and are undefined if a type parameter is not paired with any type. The \ruleName{call} rule then
+checks every argument against the instantiated parameter types and synthesises the instantiated result type.}
 
 \replaced{Lambdas, applied lambdas, lists, tuples, dictionaries, conditional expressions and comprehensions check
 (\ruleName{lambda}, \ruleName{call-lambda}, \ruleName{list}, \ruleName{tuple}, \ruleName{dict}, \ruleName{cond},
