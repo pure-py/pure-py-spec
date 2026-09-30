@@ -146,13 +146,14 @@ instantiated at the type arguments given by the context, which must bind every t
 (\ruleName{lambda}, \ruleName{call-lambda}, \ruleName{list}, \ruleName{tuple}, \ruleName{dict}, \ruleName{cond},
 \ruleName{list-comp}, \ruleName{dict-comp}).}{Lambdas check, as do lists, tuples, dictionaries and comprehensions.} \added{A name bound at a type scheme $\scheme{\seq{\alpha}}{\sigma}$ checks against a type $\tau$
 by instantiating $\seq{\alpha}$ at the type arguments collected by $\typeArgs{\Sigma}$ from $\sigma$ and $\tau$, provided the
-instantiated $\sigma$ is below $\tau$ (\ruleName{var-scheme}), so a function with type parameters can be passed where a \pyinline{Callable} type is expected.
-The \ruleName{simple-scheme} resolution rule (\figref{resolve-name}) requires the type parameters to be non-empty, so
-\ruleName{callee-scheme} and \ruleName{var-scheme} do not apply to names bound at \pyinline{Callable} types; they would
-conclude the same as \ruleName{callee} and \ruleName{check-syn}, but the restriction keeps the rules syntax-directed.} An expression that synthesises $\sigma$ checks against any supertype
+instantiated $\sigma$ is below $\tau$ (\ruleName{var-scheme}), so a function with type parameters can be passed where a \pyinline{Callable} type is expected.}
+An expression that synthesises $\sigma$ checks against any supertype
 of $\sigma$ (\ruleName{check-syn}), which applies only when no other rule concludes $\Sigma; \Gamma \vdash e \checks
 \tau$, so both judgements are
-syntax-directed and an expression has at most one derivation in each.
+syntax-directed and an expression has at most one derivation in each. \added{The \ruleName{simple-scheme} resolution rule
+(\figref{resolve-name}) requires the type parameters to be non-empty, so \ruleName{callee-scheme} and \ruleName{var-scheme}
+do not apply to names bound at \pyinline{Callable} types, although they would conclude the same as \ruleName{callee} and
+\ruleName{check-syn}.}
 
 \input{spec/fig/typing-check}
 
