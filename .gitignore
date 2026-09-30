@@ -20,3 +20,4 @@ __pycache__/
 *.cut
 .DS_Store
 tex/python-version.tex
+.render/

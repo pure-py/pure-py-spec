@@ -1,4 +1,13 @@
-Type arguments for $\seq{\alpha}$ at which $\seq{\sigma}$ is instantiated to fit $\seq{\tau}$. Each type
-argument is the join of the lower bounds on the type parameter, so the instantiation is the least under the lower
-bounds; the type arguments are undefined if a type parameter does not occur in any pair. Single types $\sigma$ and
-$\tau$ stand for sequences of length one.
+Type arguments for the type variables of $\sigma$ at which $\sigma$ is instantiated to fit $\tau$, as a finite map
+from type variables to types; applied to a sequence $\seq{\alpha}$, a map gives the sequence of its entries at
+$\alpha_1, \ldots, \alpha_n$, undefined if some $\alpha_i$ is outside its domain. A type variable takes the base type of
+$\tau$; a union $\tau$ contributes by each disjunct; lists, dictionaries, tuples and callables are taken componentwise;
+an instantiated class is taken through the instance of the class at $\tau$ (\figref{instance}); and a union $\sigma$
+contributes nothing when $\tau$ is below one of its disjuncts, as \pyinline{None} is below \pyinline{T | None}, and
+otherwise contributes by each disjunct. In every other case, in particular for a type without type variables, the map
+is empty. Contributions combine by pointwise join, written $\joinTy{\Sigma}{}{}$ as for types, so a type variable found
+at several positions takes the join of the types found, the least choice under the lower bounds they give. Positions
+are covariant (tuple components and \pyinline{Callable} results), contravariant (\pyinline{Callable} parameters) or
+invariant (list, dictionary and class arguments), following the subtyping rules (\figref{subtyping}). The type argument
+for a type variable must accordingly be a supertype, a subtype or an equivalent of the type found, which the argument
+check of the \ruleName{call} rule enforces once the type arguments are chosen.

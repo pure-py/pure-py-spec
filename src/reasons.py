@@ -305,11 +305,11 @@ class TypeSchemeAsValue:
 
 
 @dataclass(frozen=True)
-class UnconstrainedTypeParameter:
+class NoTypeArgument:
     alpha: Var
 
     def message(self) -> str:
-        return f"type parameter '{self.alpha}' unconstrained"
+        return f"type parameter '{self.alpha}' has no type argument"
 
 
 @dataclass(frozen=True)
@@ -549,7 +549,7 @@ type Reason = (
     | PredefinedNameAsValue
     | TypeParameterAsValue
     | TypeSchemeAsValue
-    | UnconstrainedTypeParameter
+    | NoTypeArgument
     | TypeSchemeInBranch
     | TypeAliasAsValue
     | UnknownConstructorKeyword

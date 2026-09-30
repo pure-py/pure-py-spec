@@ -1,1 +1,1 @@
-type parameter 'T' unconstrained
+type parameter 'T' has no type argument

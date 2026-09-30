@@ -1,2 +1,15 @@
-\typeArgs(\Sigma, \seq{\alpha}, \seq{\sigma}, \seq{\tau}) &{}= \seq{\tau}' && \text{where } \tau'_i = \bigJoinTy{\Sigma}{(\sigma' \mid (\alpha_i, \sigma') \in \lowerBounds(\Sigma, \seq{\sigma}, \seq{\tau}))} \\*
-&&& \qquad \text{defined iff each } \alpha_i \text{ occurs in } \lowerBounds(\Sigma, \seq{\sigma}, \seq{\tau})
+\typeArgs(\Sigma, \alpha, \tau) &{}= \set{\bind{\alpha}{\baseType(\tau)}} \\*
+\typeArgs(\Sigma, \sigma, \tyUnion{\tau}{\tau'}) &{}= \joinTy{\Sigma}{\typeArgs(\Sigma, \sigma, \tau)}{\typeArgs(\Sigma, \sigma, \tau')} \\*
+\typeArgs(\Sigma, \tyList{\sigma}, \tyList{\tau}) &{}= \typeArgs(\Sigma, \sigma, \tau) \\*
+\typeArgs(\Sigma, \tyDict{\sigma}, \tyDict{\tau}) &{}= \typeArgs(\Sigma, \sigma, \tau) \\*
+\typeArgs(\Sigma, \tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) &{}= \typeArgs(\Sigma, \seq{\sigma}, \seq{\tau}) \\*
+\typeArgs(\Sigma, \tyCallable{\seq{\sigma}}{\sigma}, \tyCallable{\seq{\tau}}{\tau}) &{}= \typeArgs(\Sigma, \sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) \\*
+\typeArgs(\Sigma, C[\seq{\sigma}], \tau) &{}= \typeArgs(\Sigma, \seq{\sigma}, \seq{\tau}') \\*
+&\qquad \rlap{$\text{if } \Sigma \vdash C[\seq{\tau}'] \instanceAt \tau$} \\*
+\typeArgs(\Sigma, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \varnothing \\*
+&\qquad \rlap{$\text{if } \Sigma \vdash \tau \subty \sigma \text{ or } \Sigma \vdash \tau \subty \sigma'$} \\*
+\typeArgs(\Sigma, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \joinTy{\Sigma}{\typeArgs(\Sigma, \sigma, \tau)}{\typeArgs(\Sigma, \sigma', \tau)} \\*
+&\qquad \rlap{$\text{otherwise}$} \\*
+\typeArgs(\Sigma, \sigma, \tau) &{}= \varnothing \qquad \text{otherwise} \\*[2mm]
+\typeArgs(\Sigma, \varepsilon, \varepsilon) &{}= \varnothing \\*
+\typeArgs(\Sigma, \sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) &{}= \joinTy{\Sigma}{\typeArgs(\Sigma, \sigma, \tau)}{\typeArgs(\Sigma, \seq{\sigma}, \seq{\tau})}

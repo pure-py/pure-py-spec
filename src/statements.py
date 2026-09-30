@@ -69,7 +69,7 @@ from operators import (
 )
 from reasons import IllFormedModule, MypyCompatibility
 from shapes import Shapes, shapes
-from subtyping import equivalent, join_seq, lower_bounds_seq, subtype
+from subtyping import equivalent, join_seq, subtype, type_args_seq
 from syntax import NotYetSupported, render_pattern
 from type_syntax import (
     CallableExpr,
@@ -671,30 +671,21 @@ def callee(e: ast.Call, mod_ctx: ModuleContext) -> Type:
         for sigma, arg in zip(pi.tau.params, e.args)
         if synthesises(arg)
     ]
-    taus = type_args(
-        pi.params, [s for s, _ in synthesising], [t for _, t in synthesising], e, mod_ctx
-    )
-    return substitute(taus, pi.params, pi.tau)
+    m = type_args_seq(mod_ctx.Sigma, [s for s, _ in synthesising], [t for _, t in synthesising])
+    return substitute(type_arguments(m, pi.params, e), pi.params, pi.tau)
 
 
-def type_args(
-    alphas: Sequence[Var],
-    sigmas: Sequence[Type],
-    taus: Sequence[Type],
-    node: ast.AST,
-    mod_ctx: ModuleContext,
-) -> list[Type]:
-    pairs = lower_bounds_seq(mod_ctx.Sigma, sigmas, taus)
-    bounds = {alpha: [tau for a, tau in pairs if a == alpha] for alpha in alphas}
-    unconstrained = next((alpha for alpha, ts in bounds.items() if len(ts) == 0), None)
-    if unconstrained is not None:
-        raise IllFormedModule(node, reasons.UnconstrainedTypeParameter(unconstrained))
-    return [join_seq(mod_ctx.Sigma, bounds[alpha]) for alpha in alphas]
+def type_arguments(m: dict[Var, Type], alphas: Sequence[Var], node: ast.AST) -> list[Type]:
+    """Map applied to the sequence of type parameters"""
+    missing = next((alpha for alpha in alphas if alpha not in m), None)
+    if missing is not None:
+        raise IllFormedModule(node, reasons.NoTypeArgument(missing))
+    return [m[alpha] for alpha in alphas]
 
 
 def var_scheme(pi: TypeScheme, e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
-    taus = type_args(pi.params, [pi.tau], [expected], e, mod_ctx)
-    actual = substitute(taus, pi.params, pi.tau)
+    m = type_args_seq(mod_ctx.Sigma, [pi.tau], [expected])
+    actual = substitute(type_arguments(m, pi.params, e), pi.params, pi.tau)
     if not subtype(mod_ctx.Sigma, actual, expected):
         raise IllFormedModule(e, reasons.TypeMismatch(expected, actual))
 

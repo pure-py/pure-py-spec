@@ -185,36 +185,46 @@ def instantiation_candidates(
     return [first] if second is None else [first, second]
 
 
-def lower_bounds(Sigma: ClassTable, sigma: Type, tau: Type) -> list[tuple[Var, Type]]:
+def type_args(Sigma: ClassTable, sigma: Type, tau: Type) -> dict[Var, Type]:
     match sigma, tau:
         case TypeVariable(alpha), _:
-            return [(alpha, base_type(tau))]
+            return {alpha: base_type(tau)}
         case _, UnionType(tau_, tau__):
-            return lower_bounds(Sigma, sigma, tau_) + lower_bounds(Sigma, sigma, tau__)
+            return join_map(Sigma, type_args(Sigma, sigma, tau_), type_args(Sigma, sigma, tau__))
         case (ListType(sigma_), ListType(tau_)) | (DictType(sigma_), DictType(tau_)):
-            return lower_bounds(Sigma, sigma_, tau_)
+            return type_args(Sigma, sigma_, tau_)
         case TupleType(sigmas), TupleType(taus):
-            return lower_bounds_seq(Sigma, sigmas, taus)
+            return type_args_seq(Sigma, sigmas, taus)
         case CallableType(sigmas, sigma_), CallableType(taus, tau_):
-            return lower_bounds_seq(Sigma, (sigma_, *sigmas), (tau_, *taus))
+            return type_args_seq(Sigma, (sigma_, *sigmas), (tau_, *taus))
         case ClassType(c, sigmas), _:
             match instance(Sigma, c, tau):
                 case ClassType(_, taus):
-                    return lower_bounds_seq(Sigma, sigmas, taus)
+                    return type_args_seq(Sigma, sigmas, taus)
                 case _:
-                    return []
+                    return {}
         case UnionType(sigma_, sigma__), _:
             if subtype(Sigma, tau, sigma_) or subtype(Sigma, tau, sigma__):
-                return []
-            return lower_bounds(Sigma, sigma_, tau) + lower_bounds(Sigma, sigma__, tau)
+                return {}
+            return join_map(Sigma, type_args(Sigma, sigma_, tau), type_args(Sigma, sigma__, tau))
         case _:
-            return []
+            return {}
 
 
-def lower_bounds_seq(
+def type_args_seq(
     Sigma: ClassTable, sigmas: Sequence[Type], taus: Sequence[Type]
-) -> list[tuple[Var, Type]]:
-    return [k for sigma, tau in zip(sigmas, taus) for k in lower_bounds(Sigma, sigma, tau)]
+) -> dict[Var, Type]:
+    result: dict[Var, Type] = {}
+    for sigma, tau in zip(sigmas, taus):
+        result = join_map(Sigma, result, type_args(Sigma, sigma, tau))
+    return result
+
+
+def join_map(Sigma: ClassTable, m: dict[Var, Type], m_: dict[Var, Type]) -> dict[Var, Type]:
+    return {
+        alpha: join(Sigma, m[alpha], m_[alpha]) if alpha in m and alpha in m_ else (m | m_)[alpha]
+        for alpha in m.keys() | m_.keys()
+    }
 
 
 def equivalent_seq(Sigma: ClassTable, sigmas: Sequence[Type], taus: Sequence[Type]) -> bool:
