@@ -189,6 +189,8 @@ def lower_bounds(Sigma: ClassTable, sigma: Type, tau: Type) -> list[tuple[Var, T
     match sigma, tau:
         case TypeVariable(alpha), _:
             return [(alpha, base_type(tau))]
+        case _, UnionType(tau_, tau__):
+            return lower_bounds(Sigma, sigma, tau_) + lower_bounds(Sigma, sigma, tau__)
         case (ListType(sigma_), ListType(tau_)) | (DictType(sigma_), DictType(tau_)):
             return lower_bounds(Sigma, sigma_, tau_)
         case TupleType(sigmas), TupleType(taus):
@@ -201,13 +203,10 @@ def lower_bounds(Sigma: ClassTable, sigma: Type, tau: Type) -> list[tuple[Var, T
                     return lower_bounds_seq(Sigma, sigmas, taus)
                 case _:
                     return []
-        case UnionType(), _:
-            with_variables = [d for d in disjuncts(sigma) if mentions_type_variable(d)]
-            if len(with_variables) != 1:
+        case UnionType(sigma_, sigma__), _:
+            if subtype(Sigma, tau, sigma_) or subtype(Sigma, tau, sigma__):
                 return []
-            others = join_seq(Sigma, [d for d in disjuncts(sigma) if not mentions_type_variable(d)])
-            remaining = [d for d in disjuncts(tau) if not subtype(Sigma, d, others)]
-            return lower_bounds(Sigma, with_variables[0], join_seq(Sigma, remaining))
+            return lower_bounds(Sigma, sigma_, tau) + lower_bounds(Sigma, sigma__, tau)
         case _:
             return []
 
@@ -216,10 +215,6 @@ def lower_bounds_seq(
     Sigma: ClassTable, sigmas: Sequence[Type], taus: Sequence[Type]
 ) -> list[tuple[Var, Type]]:
     return [k for sigma, tau in zip(sigmas, taus) for k in lower_bounds(Sigma, sigma, tau)]
-
-
-def mentions_type_variable(tau: Type) -> bool:
-    return any(isinstance(sigma, TypeVariable) for sigma in subterms(tau))
 
 
 def equivalent_seq(Sigma: ClassTable, sigmas: Sequence[Type], taus: Sequence[Type]) -> bool:

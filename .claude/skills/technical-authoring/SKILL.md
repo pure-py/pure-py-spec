@@ -126,6 +126,9 @@ Direct, factual, conventional prose: state the thing and stop.
   follows the file name.
 - A macro is named after what it renders (\baseType for base-type, not \widen), and is renamed when the
   rendered name changes.
+- After a build, render each changed page and look at it: no figure, rule, table or definition row may run
+  off the page or noticeably into the margin. Move long side conditions to their own line rather than
+  leaving an overfull row.
 
 ## References in conversation
 
