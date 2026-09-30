@@ -38,7 +38,6 @@ from contexts import (
     PU,
     Assigns,
     Context,
-    ContextEntry,
     ModuleContext,
     ModuleLoaded,
     ModuleStub,
@@ -225,13 +224,14 @@ def check_statement(
 
 
 def check_defs(ds: list[ast.FunctionDef], mod_ctx: ModuleContext) -> Assigns:
-    delta: Context = {d.name: def_signature(d, mod_ctx) for d in ds}
+    pis = {d.name: def_signature(d, mod_ctx) for d in ds}
+    delta: Context = dict(pis)
     for d in ds:
-        def_body(d, delta[d.name], override_gamma(mod_ctx, delta))
+        def_body(d, pis[d.name], override_gamma(mod_ctx, delta))
     return Assigns(delta)
 
 
-def def_body(d: ast.FunctionDef, pi: ContextEntry, mod_ctx: ModuleContext) -> None:
+def def_body(d: ast.FunctionDef, pi: CallableType | TypeScheme, mod_ctx: ModuleContext) -> None:
     alphas, tau = (pi.params, pi.tau) if isinstance(pi, TypeScheme) else ((), pi)
     assert isinstance(tau, CallableType)
     xs = parameter_names(d.args, d, d.name)
