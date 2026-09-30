@@ -125,11 +125,11 @@ such rule, because $\elemTy$ takes a union to the join of its disjuncts' element
 \citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form.
 
-\added{The callee of a call is typed by a judgement of its own, $\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$
-(\figref{typing-callee}), which synthesises the parameter types $\seq{\sigma}$ and result type $\sigma$ of callee $e$ at
-arguments $\seq{e}$: a callee that synthesises a \pyinline{Callable} type has the parameter and result types of that
-type (\ruleName{callee}), and a name bound at a type scheme instantiates the type parameters from the arguments
-(\ruleName{callee-scheme}). The
+\added{A call $\exCall{e}{\seq{e}}$ is typed in two steps. The judgement $\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$
+(\figref{typing-callee}) synthesises, from the callee and the arguments together, the parameter types $\seq{\sigma}$
+against which the arguments are then checked and the result type $\sigma$: a callee that synthesises a
+\pyinline{Callable} type gives the parameter and result types of that type (\ruleName{callee}), and a name bound at a
+type scheme instantiates the type parameters from the arguments (\ruleName{callee-scheme}). The
 arguments that synthesise constrain the type parameters through $\constraints(\Sigma, \sigma, \tau)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:constraints}}), which relates a parameter type
 $\sigma$ to the type $\tau$ of the argument, and the type arguments $\typeArgs(\Sigma, \seq{\alpha}, \seq{\sigma}, \seq{\tau})$
