@@ -140,7 +140,6 @@
 % Types and annotations
 \newcommand*{\exAnnot}[1]{\mathord{:}\;#1}
 \newcommand*{\exRetAnnot}[1]{\;\pymath{-\raisebox{-0.15ex}{>}}\;#1}
-\newcommand*{\fq}[1]{\widetilde{#1}}
 \newcommand*{\tyBool}{\pyinline{bool}}
 \newcommand*{\tyCallable}[2]{\pyinline{Callable}[[#1], #2]}
 \newcommand*{\tyDict}[1]{\pyinline{dict}[\tyStr, #1]}
@@ -152,7 +151,7 @@
 \newcommand*{\tyNone}{\pyinline{None}}
 \newcommand*{\tyObject}{\pyinline{object}}
 \newcommand*{\tySized}{\pyinline{Sized}}
-\newcommand*{\clsRange}{\pyinline{range}}
+\newcommand*{\clsRange}{\pyinline{builtins}.\pyinline{range}}
 \newcommand*{\SigmaPredef}{\Sigma_{\mathcal{P}}}
 \newcommand*{\tyStr}{\pyinline{str}}
 \newcommand*{\tyTuple}[1]{\pyinline{tuple}[#1]}

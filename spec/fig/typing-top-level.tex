@@ -27,7 +27,7 @@
   \Sigma; \Gamma' \vdash \psi_i \synth \sigma_i \quad (\forall i)
 }
 {
-  \Sigma; q; \Gamma \vdash \exDataclass{c[\seq{\alpha}]}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}
+  \Sigma; q; \Gamma \vdash \exDataclass{c[\seq{\alpha}]}{\phi} : \Assigns{\set{\bind{c}{\Type{q.c}}}} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
@@ -43,7 +43,7 @@
   \set{\seq{x}} \cap \set{\seq{y}} = \varnothing
 }
 {
-  \Sigma; q; \Gamma \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}']}{\phi} : \Assigns{\set{\bind{c}{\Type{\fq{q.c}}}}} \binding \Sigma, \bind{\fq{q.c}}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}
+  \Sigma; q; \Gamma \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}']}{\phi} : \Assigns{\set{\bind{c}{\Type{q.c}}}} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}
 }
 \and
 \inferrule*[lab={\ruleName{type-alias}}]

@@ -74,7 +74,7 @@ It is useful to represent contexts as total functions on the set of all variable
 
 \begin{definition}[Class]
 \label{def:class}
-A class $C$ is a fully-qualified name $\fq{q.c}$, written with a tilde: a module $q$ and a class name $c$ declared in $q$. A module
+A class $C$ is a fully-qualified name $q.c$\deleted{, written with a tilde}: a module $q$ and a class name $c$ declared in $q$. A module
 declares each class name at most once, so the fully-qualified name of a class is the identity of the
 class. A class is also the type of its instances.
 \end{definition}
@@ -181,8 +181,7 @@ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context 
 (\figref{predefined-values}). A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
 the predefined signatures. \added{The class table $\SigmaPredef$ of the predefined modules has the single entry
-$\SigmaPredef(\clsRange) = \clsRec{\varepsilon}{\bind{\pyinline{stop}}{\tyInt}}{\bot}$ for the class \clsRange{} of
-\pyinline{builtins}.}
+$\SigmaPredef(\clsRange) = \clsRec{\varepsilon}{\bind{\pyinline{stop}}{\tyInt}}{\bot}$.}
 \end{definition}
 
 \input{spec/fig/predefined-signatures}
