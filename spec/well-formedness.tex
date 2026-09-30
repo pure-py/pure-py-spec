@@ -135,7 +135,7 @@ $e_i$ with synthesised type $\tau_i$ constrains the type parameters: $\constrain
 type $\sigma_i$ with the type at the corresponding position of $\tau_i$. An argument without a synthesised type, such as a lambda, contributes
 nothing. The type arguments are the sequence $\seq{\tau}' = \typeArgs(\Sigma, \seq{\alpha}, \seq{\sigma}, \seq{\tau})$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}), with each $\tau'_i$ the join of the types paired
-with $\alpha_i$, undefined if some $\alpha_i$ is not paired with any type. The \ruleName{call} rule then checks every
+with $\alpha_i$. The sequence is undefined if some $\alpha_i$ is not paired with any type. The \ruleName{call} rule then checks every
 argument against the instantiated parameter types $\subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}$ and synthesises the
 instantiated result type $\subst{\seq{\tau}'}{\seq{\alpha}}{\sigma}$.}
 
