@@ -113,6 +113,9 @@ Direct, factual, conventional prose: state the thing and stop.
 - Code comments: see the coding-conventions skill.
 - Checklists and issues: state the task directly ("Move X here; add Y"), no scene-setting.
 - Meta-commentary about the document (what moved where, what supersedes what) belongs in the issue tracker, never in the text — including inside change markup.
+- State the current design and nothing about how it evolved; never contrast it with a superseded design
+  ("an earlier design allocated addresses"). When the design changes, delete superseded claims rather than
+  annotating them as outdated.
 
 ## Structure
 
