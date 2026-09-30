@@ -127,8 +127,8 @@ stated separately for each elimination form.
 
 \added{A call $\exCall{e}{\seq{e}}$ is typed in two steps. The auxiliary judgement $\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$
 (\figref{typing-callee}) synthesises, from the callee along with its arguments, parameter types $\seq{\sigma}$
-and result type $\sigma$: a callee that synthesises a
-\pyinline{Callable} type gives the parameter and result types of that type (\ruleName{callee}), and a name bound at a
+and result type $\sigma$. A callee that synthesises a
+\pyinline{Callable} type gives the parameter and result types of that type (\ruleName{callee}). A name bound at a
 type scheme instantiates the type parameters from the arguments (\ruleName{callee-scheme}). Each argument
 $e_i$ with synthesised type $\tau_i$ bounds the type parameters from below: $\lowerBounds(\Sigma, \sigma_i, \tau_i)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:lower-bounds}}) pairs every type variable in parameter
