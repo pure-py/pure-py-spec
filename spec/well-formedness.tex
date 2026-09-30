@@ -101,9 +101,14 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 The fields of a class $C$ form a field scheme $\fields{\Sigma}(C)$ over its type parameters, with one binding $\bind{x}{\tau}$ per
 field: the fields of its base class first, recursively and instantiated at the type arguments of the base, then the fields declared by $C$ itself, each at its
 declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the instantiation $\tyInst{\fields{\Sigma}(C)}{\seq{\tau}}$. The order matters, because a constructor call pairs positional arguments with fields by
-position. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
+position. \replaced{A constructor call $\exConstr{q}{a}$ pairs each argument with a field using $\fieldMap{\Sigma}$ and
+infers type arguments $\seq{\tau}'$ for the class $C$ that $q$ resolves to by $\typeArgs{\Sigma}$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) over the arguments that synthesise, as
+in \ruleName{callee-scheme} (\ruleName{constr}). The arguments are checked against the field types instantiated at
+$\seq{\tau}'$, and the call synthesises $C[\seq{\tau}']$. A constructor call $\exConstr{q[\seq{\psi}]}{a}$ takes the
+type arguments denoted by $\seq{\psi}$ instead (\ruleName{constr-explicit}).}{A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
 $\fieldMap{\Sigma}$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to
-(\ruleName{constr}). An attribute reference $\exAttr{e}{x}$ has the type of the field $x$ of the class synthesised by $e$
+(\ruleName{constr}).} An attribute reference $\exAttr{e}{x}$ has the type of the field $x$ of the class synthesised by $e$
 (\ruleName{attr-object}). The signature of a predefined module binds
 $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type \replaced{given in \figref{predefined-signatures}
 (Definition~\ref{def:predefined})}{listed for it

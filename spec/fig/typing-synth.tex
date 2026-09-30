@@ -58,12 +58,26 @@
 \inferrule*[lab={\ruleName{constr}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \fields{\Sigma}(C) = \bind{\seq{x}}{\seq{\tau}} \\
+  \fields{\Sigma}(C) = \replaced{\scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}}{\bind{\seq{x}}{\seq{\tau}}} \\
   \fieldMap{\Sigma}(C, a) = \set{\bind{\seq{x}}{\seq{e}}} \\
-  \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}
+  \added{I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \tau_i}} \\
+  \added{\typeArgs{\Sigma}((\sigma_i \mid i \in I), (\tau_i \mid i \in I))(\seq{\alpha}) = \seq{\tau}'} \\
+  \Sigma; \Gamma \vdash \seq{e} \checks \replaced{\subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}}{\seq{\tau}}
 }
 {
-  \Sigma; \Gamma \vdash \exConstr{q}{a} \synth C
+  \Sigma; \Gamma \vdash \exConstr{q}{a} \synth C\added{[\seq{\tau}']}
+}
+\and
+\inferrule*[lab={\ruleName{constr-explicit}}]
+{
+  \added{\Gamma \vdash q : \Type{C}} \\
+  \added{\fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}} \\
+  \added{\Sigma; \Gamma \vdash \seq{\psi} \synth \seq{\tau}} \\
+  \added{\fieldMap{\Sigma}(C, a) = \set{\bind{\seq{x}}{\seq{e}}}} \\
+  \added{\Sigma; \Gamma \vdash \seq{e} \checks \subst{\seq{\tau}}{\seq{\alpha}}{\seq{\sigma}}}
+}
+{
+  \added{\Sigma; \Gamma \vdash \exConstr{q[\seq{\psi}]}{a} \synth C[\seq{\tau}]}
 }
 \and
 \inferrule*[lab={\ruleName{binop}}]
