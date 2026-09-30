@@ -190,7 +190,9 @@ def type_args(Sigma: ClassTable, sigma: Type, tau: Type) -> dict[Var, Type]:
         case TypeVariable(alpha), _:
             return {alpha: base_type(tau)}
         case _, UnionType(tau_, tau__):
-            return join_map(Sigma, type_args(Sigma, sigma, tau_), type_args(Sigma, sigma, tau__))
+            return join_context(
+                Sigma, type_args(Sigma, sigma, tau_), type_args(Sigma, sigma, tau__)
+            )
         case (ListType(sigma_), ListType(tau_)) | (DictType(sigma_), DictType(tau_)):
             return type_args(Sigma, sigma_, tau_)
         case TupleType(sigmas), TupleType(taus):
@@ -206,7 +208,9 @@ def type_args(Sigma: ClassTable, sigma: Type, tau: Type) -> dict[Var, Type]:
         case UnionType(sigma_, sigma__), _:
             if subtype(Sigma, tau, sigma_) or subtype(Sigma, tau, sigma__):
                 return {}
-            return join_map(Sigma, type_args(Sigma, sigma_, tau), type_args(Sigma, sigma__, tau))
+            return join_context(
+                Sigma, type_args(Sigma, sigma_, tau), type_args(Sigma, sigma__, tau)
+            )
         case _:
             return {}
 
@@ -216,14 +220,18 @@ def type_args_seq(
 ) -> dict[Var, Type]:
     result: dict[Var, Type] = {}
     for sigma, tau in zip(sigmas, taus):
-        result = join_map(Sigma, result, type_args(Sigma, sigma, tau))
+        result = join_context(Sigma, result, type_args(Sigma, sigma, tau))
     return result
 
 
-def join_map(Sigma: ClassTable, m: dict[Var, Type], m_: dict[Var, Type]) -> dict[Var, Type]:
+def join_context(
+    Sigma: ClassTable, gamma: dict[Var, Type], gamma_: dict[Var, Type]
+) -> dict[Var, Type]:
     return {
-        alpha: join(Sigma, m[alpha], m_[alpha]) if alpha in m and alpha in m_ else (m | m_)[alpha]
-        for alpha in m.keys() | m_.keys()
+        alpha: join(Sigma, gamma[alpha], gamma_[alpha])
+        if alpha in gamma and alpha in gamma_
+        else (gamma | gamma_)[alpha]
+        for alpha in gamma.keys() | gamma_.keys()
     }
 
 

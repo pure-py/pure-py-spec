@@ -135,7 +135,7 @@ type scheme $\scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}$ instantia
 by a one-way unification of each parameter type with the synthesised type: a type variable takes the type found at the same
 position in the synthesised type, and a type variable found at several positions takes the join of those types.
 Arguments that do not synthesise, such as lambdas, are left out. The parameter and result types are
-instantiated at the type arguments given by the map, which must have an entry for every type parameter.}
+instantiated at the type arguments given by the context, which must bind every type parameter.}
 
 \replaced{Lambdas, applied lambdas, lists, tuples, dictionaries, conditional expressions and comprehensions check
 (\ruleName{lambda}, \ruleName{call-lambda}, \ruleName{list}, \ruleName{tuple}, \ruleName{dict}, \ruleName{cond},

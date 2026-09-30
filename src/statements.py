@@ -671,21 +671,21 @@ def callee(e: ast.Call, mod_ctx: ModuleContext) -> Type:
         for sigma, arg in zip(pi.tau.params, e.args)
         if synthesises(arg)
     ]
-    m = type_args_seq(mod_ctx.Sigma, [s for s, _ in synthesising], [t for _, t in synthesising])
-    return substitute(type_arguments(m, pi.params, e), pi.params, pi.tau)
+    gamma = type_args_seq(mod_ctx.Sigma, [s for s, _ in synthesising], [t for _, t in synthesising])
+    return substitute(type_arguments(gamma, pi.params, e), pi.params, pi.tau)
 
 
-def type_arguments(m: dict[Var, Type], alphas: Sequence[Var], node: ast.AST) -> list[Type]:
-    """Map applied to the sequence of type parameters"""
-    missing = next((alpha for alpha in alphas if alpha not in m), None)
+def type_arguments(gamma: dict[Var, Type], alphas: Sequence[Var], node: ast.AST) -> list[Type]:
+    """Context applied to the sequence of type parameters"""
+    missing = next((alpha for alpha in alphas if alpha not in gamma), None)
     if missing is not None:
         raise IllFormedModule(node, reasons.NoTypeArgument(missing))
-    return [m[alpha] for alpha in alphas]
+    return [gamma[alpha] for alpha in alphas]
 
 
 def var_scheme(pi: TypeScheme, e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
-    m = type_args_seq(mod_ctx.Sigma, [pi.tau], [expected])
-    actual = substitute(type_arguments(m, pi.params, e), pi.params, pi.tau)
+    gamma = type_args_seq(mod_ctx.Sigma, [pi.tau], [expected])
+    actual = substitute(type_arguments(gamma, pi.params, e), pi.params, pi.tau)
     if not subtype(mod_ctx.Sigma, actual, expected):
         raise IllFormedModule(e, reasons.TypeMismatch(expected, actual))
 
