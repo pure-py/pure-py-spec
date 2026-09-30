@@ -25,7 +25,7 @@
 \inferrule*[lab={\ruleName{var-scheme}}]
 {
   \added{\Gamma \vdash q : \scheme{\seq{\alpha}}{\sigma}} \\
-  \added{\seq{\tau}' = \typeArgs(\Sigma, \sigma, \tau)(\seq{\alpha})} \\
+  \added{\seq{\tau}' = \typeArgs{\Sigma}(\sigma, \tau)(\seq{\alpha})} \\
   \added{\Sigma \vdash \subst{\seq{\tau}'}{\seq{\alpha}}{\sigma} \subty \tau}
 }
 {
@@ -128,7 +128,7 @@
 \inferrule*[lab={\ruleName{qual-generator}}]
 {
   \Sigma; \Gamma \vdash e \synth \tau \\
-  \elemTy(\Sigma, \tau) = \sigma \\
+  \elemTy{\Sigma}(\tau) = \sigma \\
   \Sigma; \Gamma \override \set{\bind{x}{\sigma}} \vdash \seq{g} : \Delta \\
   x \notin \captures(\seq{g})
 }

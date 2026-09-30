@@ -99,11 +99,11 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 \input{spec/fig/typing-synth}
 \input{spec/fig/typing-callee}
 
-The fields of a class $C$ form a field scheme $\fields(\Sigma, C)$ over its type parameters, with one binding $\bind{x}{\tau}$ per
+The fields of a class $C$ form a field scheme $\fields{\Sigma}(C)$ over its type parameters, with one binding $\bind{x}{\tau}$ per
 field: the fields of its base class first, recursively and instantiated at the type arguments of the base, then the fields declared by $C$ itself, each at its
-declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the instantiation $\tyInst{\fields(\Sigma, C)}{\seq{\tau}}$. The order matters, because a constructor call pairs positional arguments with fields by
+declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the instantiation $\tyInst{\fields{\Sigma}(C)}{\seq{\tau}}$. The order matters, because a constructor call pairs positional arguments with fields by
 position. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using
-$\fieldMap$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to
+$\fieldMap{\Sigma}$, checks it against that field's type, and synthesises the class $C$ that $q$ resolves to
 (\ruleName{constr}). An attribute reference $\exAttr{e}{x}$ has the type of the field $x$ of the class synthesised by $e$
 (\ruleName{attr-object}). The signature of a predefined module binds
 $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type \replaced{given in \figref{predefined-signatures}
@@ -121,7 +121,7 @@ is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and an
 \pyinline{int} gives the join of the component types (\ruleName{subscript-tuple-int}). A subscript, attribute reference or call whose subject
 synthesises a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
 join of the results (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union}); generators need no
-such rule, because $\elemTy$ takes a union to the join of its disjuncts' element types.
+such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts' element types.
 \citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form.
 
@@ -130,11 +130,10 @@ stated separately for each elimination form.
 and result type $\sigma$. A callee that synthesises a
 \pyinline{Callable} type gives the parameter and result types of that type (\ruleName{callee}). A name bound at a
 type scheme $\scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}$ instantiates the type parameters from the arguments
-(\ruleName{callee-scheme}). The type arguments are collected by $\typeArgs$
+(\ruleName{callee-scheme}). The type arguments are collected by $\typeArgs{\Sigma}$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) over the arguments with a synthesised type,
 matching each parameter type against the argument type: a type variable takes the type found at the same position
-in the argument type, and a type variable found at several positions takes the join of the types found, the least
-choice under the lower bounds they give. An argument without a synthesised type, such as a lambda, is left out. The
+in the argument type, and a type variable found at several positions takes the join of the types found. An argument without a synthesised type, such as a lambda, is left out. The
 rule applies the resulting map to the type parameters $\seq{\alpha}$, giving the type arguments $\seq{\tau}'$, undefined
 if some type parameter is not found at any position. The \ruleName{call}
 rule then checks every argument against $\subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}$ and synthesises
@@ -169,7 +168,7 @@ checking rule is still needed when the expected element type is wider than the t
 elements, since \pyinline{list} is invariant.
 
 Typing a comprehension types its qualifiers, which bind the variables that can be used in the body
-(\figref{typing-check}). A generator's variable is bound at $\elemTy$ of the type synthesised by the
+(\figref{typing-check}). A generator's variable is bound at $\elemTy{\Sigma}$ of the type synthesised by the
 iterated expression (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:elem-type}}). A
 tuple is iterated at the join of the base types of its components.
 A lambda within a comprehension may not capture a generator variable, a side condition of
@@ -187,7 +186,7 @@ Each operator is overloaded as specified in \figref{operator-overloads}. A \emph
 $((\tau_1, \tau_2), \tau)$ pairs operand \emph{bounds}
 with a result type; the judgements of the figure relate operand
 types to the resolved overloads of an operator. The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the result type
-of the most specific overload at the operand types, $\resolveOp$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:resolve-op}}), so \pyinline{1 + 2} is an
+of the most specific overload at the operand types, $\resolveOp{\Sigma}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:resolve-op}}), so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
 The values of an \emph{equality type} are compared by structural equality, which is defined except at the dynamically excluded comparisons (\secref{no-coercions}):
@@ -198,7 +197,7 @@ The values of an \emph{equality type} are compared by structural equality, which
 & \Sigma \vdash \tyDict{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \\
 & \Sigma \vdash \tyTuple{\seq{\tau}} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau_i \eqType \quad (\forall i) \\
 & \Sigma \vdash \tyUnion{\sigma}{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \sigma \eqType \text{ and } \Sigma \vdash \tau \eqType \\
-& \Sigma \vdash C[\seq{\sigma}] \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \tyInst{\fields(\Sigma, C)}{\seq{\sigma}}
+& \Sigma \vdash C[\seq{\sigma}] \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \tyInst{\fields{\Sigma}(C)}{\seq{\sigma}}
 \end{defalign}
 
 \noindent A callable type is not an equality type, and neither is any type with a callable component, so
@@ -213,8 +212,8 @@ overloads give \pyinline{Any} whenever the exponent is not a literal, whereas th
 \begin{lemma}[Most specific overload]
 \label{lem:most-specific-overload}
 If neither $\sigma_1$ nor $\sigma_2$ is a subtype of \pyinline{Never} and some overload of $\odot$ applies at
-$(\sigma_1, \sigma_2)$, then $\resolveOp(\Sigma, \odot, \sigma_1, \sigma_2)$ is defined, and similarly for
-$\resolveOp(\Sigma, \ominus, \sigma)$.
+$(\sigma_1, \sigma_2)$, then $\resolveOp{\Sigma}(\odot, \sigma_1, \sigma_2)$ is defined, and similarly for
+$\resolveOp{\Sigma}(\ominus, \sigma)$.
 \end{lemma}
 
 \subsection{Statements}
@@ -319,8 +318,8 @@ $\tau$ and a \emph{residual} $L$ through the cases, both over-approximations of 
 matched by any of the earlier cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a
 set of values of a single type, and starts from the shapes of $\sigma$; the remaining type is coarser, a type rather
 than a set of shapes, and starts from $\sigma$ itself. Two auxiliary functions narrow a type $\tau$ by a pattern $p$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:matched-as}}): $\matchedAs(\Sigma, \Gamma, \tau, p)$ is
-the type to which $\tau$ is narrowed if $p$ matches, and $\remaining(\Sigma, \Gamma, \tau, p)$ is the type remaining if
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:matched-as}}): $\matchedAs{\Sigma}(\Gamma, \tau, p)$ is
+the type to which $\tau$ is narrowed if $p$ matches, and $\remaining{\Sigma}(\Gamma, \tau, p)$ is the type remaining if
 $p$ fails. Each case's pattern is checked against the remaining type
 (\paperonly{\figref{checking-pat}}\speconly{\secref{pattern-checking}}), binding its pattern variables, and matched
 against the residual (\paperonly{\figref{typing-pat}}\speconly{\secref{matching}}). Reachability is decided by the
@@ -353,7 +352,7 @@ A pattern must \emph{check} against the remaining type, $\Sigma; \Gamma \vdash p
 \tau \text{ has list values} & {}\iff \Sigma \vdash \tyList{\sigma} \subty \tau \text{ for some } \sigma \text{, or a disjunct of } \tau \text{ is a type variable} \\
 \tau \text{ has tuple values} & {}\iff \Sigma \vdash \tyTuple{\seq{\sigma}} \subty \tau \text{ for some } \seq{\sigma} \text{, or a disjunct of } \tau \text{ is a type variable}
 \end{defalign}
-So list types, $\tySized$ and $\tyObject$ have list values; tuple types, $\tySized$ and $\tyObject$ have tuple values; and a type variable, which may stand for any type, has both. The rules check a sub-pattern at the type of its position, a tuple component, list element, dictionary value or field, and a pattern at a union at each of its disjuncts. A variable pattern binds at the type at which it is checked, and a pattern named by \pyinline{as} is bound at $\matchedAs(\Sigma, \Gamma, \tau, p)$; the bindings of sub-patterns compose by disjoint union, so a pattern that binds a name twice is ill-formed, and at a union the bindings of the disjuncts are joined. A pattern also checks against a type which has no disjunct of the form matched by the pattern: a tuple pattern when no disjunct is a tuple type of the pattern's length, a list pattern when no disjunct is a list type, a dictionary pattern when no disjunct is a dictionary type, or a constructor pattern when its class has no comparable instantiation (\ruleName{check-tuple-none}, \ruleName{check-list-none}, \ruleName{check-dict-none}, \ruleName{check-constr-none}). Such a pattern matches no shape of the type and binds its variables at $\tyNever$, the unit of the join. At one disjunct of a union it therefore leaves the values of that disjunct to later cases, and a case with a pattern matching no shape at all is unreachable.
+So list types, $\tySized$ and $\tyObject$ have list values; tuple types, $\tySized$ and $\tyObject$ have tuple values; and a type variable, which may stand for any type, has both. The rules check a sub-pattern at the type of its position, a tuple component, list element, dictionary value or field, and a pattern at a union at each of its disjuncts. A variable pattern binds at the type at which it is checked, and a pattern named by \pyinline{as} is bound at $\matchedAs{\Sigma}(\Gamma, \tau, p)$; the bindings of sub-patterns compose by disjoint union, so a pattern that binds a name twice is ill-formed, and at a union the bindings of the disjuncts are joined. A pattern also checks against a type which has no disjunct of the form matched by the pattern: a tuple pattern when no disjunct is a tuple type of the pattern's length, a list pattern when no disjunct is a list type, a dictionary pattern when no disjunct is a dictionary type, or a constructor pattern when its class has no comparable instantiation (\ruleName{check-tuple-none}, \ruleName{check-list-none}, \ruleName{check-dict-none}, \ruleName{check-constr-none}). Such a pattern matches no shape of the type and binds its variables at $\tyNever$, the unit of the join. At one disjunct of a union it therefore leaves the values of that disjunct to later cases, and a case with a pattern matching no shape at all is unreachable.
 
 The conditions on tuple and list patterns ensure that pattern matching always has a result. Under the evaluation rules, matching a tuple pattern against a list or a list pattern against a tuple is undefined\speconly{ (\figref{eval-pat})}, although Python permits both. Both forms of pattern therefore fail at $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$, at $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$, and at a type variable.
 
@@ -372,7 +371,7 @@ ill-formed. At \tyObject{} and at \tyNever{} every instantiation of $C$ is compa
 instance only if it has no type parameters. At any other type $C$ has no instantiation comparable with $\tau$, and no instance.
 \begin{lemma}[Sufficiency of instantiation candidates]
 \label{lem:instantiation-candidates}
-Suppose $D \in \ancestors(\Sigma, C)$. An \emph{instantiation candidate} for $C$ at $D[\seq{\sigma}]$ is an instantiation $C[\seq{\tau}]$ in
+Suppose $D \in \ancestors{\Sigma}(C)$. An \emph{instantiation candidate} for $C$ at $D[\seq{\sigma}]$ is an instantiation $C[\seq{\tau}]$ in
 which each $\tau_i$ is the join of a subset of $\subterms(\seq{\sigma}) \cup \set{\tyObject}$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}). If any instantiation of $C$ is below
 $D[\seq{\sigma}]$, then some instantiation candidate is below $D[\seq{\sigma}]$; and if two instantiations of $C$ that are not equivalent
@@ -401,7 +400,7 @@ $\tau$. Shape typing $\Sigma \vdash k : \tau$ holds when $\shapeTy(k)$ is a subt
 well-formed: each excluded head is typed at the type of the shape (at $\tyStr$, for the keys of a
 dictionary shape) and each component shape at the type of that component.
 
-The auxiliary function $\shapes(\Sigma, \tau, H)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:shapes}}) gives the shapes of $\tau$
+The auxiliary function $\shapes{\Sigma}(\tau, H)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:shapes}}) gives the shapes of $\tau$
 once the heads in $H$ are excluded. A union contributes the shapes of its disjuncts and a dictionary type
 the dictionary form; every other type contributes the single shape $\shapeAny{\tau}{H}$, or no shape at
 all when $H$ exhausts $\tau$. The rest form therefore never carries a union or dictionary type, and
@@ -424,7 +423,7 @@ residual untouched.
 
 A pattern matches a shape directly if the shape has the head tested by the pattern. Otherwise the shape
 is first \emph{split} by the auxiliary judgement $\Sigma; \Gamma \vdash k, p \splits K, L$ (\figref{split}):
-the shapes $K$ have the head tested by $p$, with the shapes of the component types drawn from $\shapes$,
+the shapes $K$ have the head tested by $p$, with the shapes of the component types drawn from $\shapes{\Sigma}$,
 and the residual $L$ is the shape $k$ with that head excluded as well. The \ruleName{pat-split} rule matches
 the pattern against $K$ and adds $L$ to the residual. Only the forms
 with an excluded set split, and no head types at a tuple type, so the excluded set of a tuple shape is
@@ -454,7 +453,7 @@ although each covers only part of the type.
 \begin{lemma}[Preservation of shape type]
 \label{lem:shape-typing}
 If $\Sigma \vdash h : \tau$ for every $h \in H$ then $\Sigma \vdash k : \tau$ for each $k \in
-\shapes(\Sigma, \tau, H)$. Moreover, if $\Sigma \vdash k : \tau$ for each $k \in L$ and $\Sigma; \Gamma \vdash L, p
+\shapes{\Sigma}(\tau, H)$. Moreover, if $\Sigma \vdash k : \tau$ for each $k \in L$ and $\Sigma; \Gamma \vdash L, p
 \matches K, L'$ then $\Sigma \vdash k : \tau$ for each $k \in K \disjunion L'$.
 \end{lemma}
 

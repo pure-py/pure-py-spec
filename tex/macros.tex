@@ -198,7 +198,7 @@
 \newcommand*{\binding}{\mathrel{\dashv}}
 \newcommand*{\checks}{\mathrel{\triangleleft}}
 \newcommand*{\disjunion}{\uplus}
-\newcommand*{\elemTy}{\mathrm{elem\text{-}type}}
+\newcommand*{\elemTy}[1]{\mathrm{elem\text{-}type}_{#1}}
 \newcommand*{\eqType}{\mathrel{\mathrm{eq\text{-}type}}}
 \newcommand*{\extend}{\boxplus}
 \newcommand*{\headList}[1]{\pyinline{list}_{#1}}
@@ -208,16 +208,16 @@
 \newcommand*{\merge}{\mathbin{\oplus}}
 \newcommand*{\overloadsOf}{\mathrm{overloads}}
 \newcommand*{\override}{\otimes}
-\newcommand*{\resolveOp}{\mathrm{resolve\text{-}op}}
+\newcommand*{\resolveOp}[1]{\mathrm{resolve\text{-}op}_{#1}}
 \newcommand*{\shapeAny}[2]{#1 \setminus #2}
 \newcommand*{\shapeDict}[3]{#2 \setminus_{#1} #3}
 \newcommand*{\shapeList}[2]{[#2]_{#1}}
-\newcommand*{\shapes}{\mathrm{shapes}}
+\newcommand*{\shapes}[1]{\mathrm{shapes}_{#1}}
 \newcommand*{\subterms}{\mathrm{subterms}}
-\newcommand*{\typeArgs}{\mathrm{type\text{-}args}}
+\newcommand*{\typeArgs}[1]{\mathrm{type\text{-}args}_{#1}}
 \newcommand*{\shapeTy}{\mathrm{shape\text{-}type}}
-\newcommand*{\matchedAs}{\mathrm{matched\text{-}as}}
-\newcommand*{\remaining}{\mathrm{remaining}}
+\newcommand*{\matchedAs}[1]{\mathrm{matched\text{-}as}_{#1}}
+\newcommand*{\remaining}[1]{\mathrm{remaining}_{#1}}
 \newcommand*{\splits}{\mathrel{\rightsquigarrow_{\mathsf{h}}}}
 \newcommand*{\subty}{\mathrel{<:}}
 \newcommand*{\synth}{\mathrel{\triangleright}}
@@ -251,9 +251,9 @@
 \newcommand*{\scopeS}{\mathrm{scope}}
 
 % Metafunctions: classes
-\newcommand*{\ancestors}{\mathrm{ancestors}}
-\newcommand*{\fieldMap}{\mathrm{field\text{-}map}}
-\newcommand*{\fields}{\mathrm{fields}}
+\newcommand*{\ancestors}[1]{\mathrm{ancestors}_{#1}}
+\newcommand*{\fieldMap}[1]{\mathrm{field\text{-}map}_{#1}}
+\newcommand*{\fields}[1]{\mathrm{fields}_{#1}}
 \newcommand*{\ownFields}{\mathrm{own\text{-}fields}}
 \newcommand*{\resolve}{\mathrm{resolve}}
 

@@ -62,7 +62,7 @@
   \Sigma; \Gamma \vdash p \checks \tau \binding \Delta
 }
 {
-  \Sigma; \Gamma \vdash p\;\pyinline{as}\;x \checks \tau \binding \Delta \disjunion \set{\bind{x}{\matchedAs(\Sigma, \Gamma, \tau, p)}}
+  \Sigma; \Gamma \vdash p\;\pyinline{as}\;x \checks \tau \binding \Delta \disjunion \set{\bind{x}{\matchedAs{\Sigma}(\Gamma, \tau, p)}}
 }
 \and
 \inferrule*[lab={\ruleName{check-union}}]
@@ -128,8 +128,8 @@
 {
   \Gamma \vdash q : \Type{C} \\
   \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau \\
-  \tyInst{\fields(\Sigma, C)}{\seq{\sigma}} = \bind{\seq{x}}{\seq{\sigma}'} \\
-  \fieldMap(\Sigma, C, a) = \set{\bind{\seq{x}}{\seq{p}}} \\
+  \tyInst{\fields{\Sigma}(C)}{\seq{\sigma}} = \bind{\seq{x}}{\seq{\sigma}'} \\
+  \fieldMap{\Sigma}(C, a) = \set{\bind{\seq{x}}{\seq{p}}} \\
   \Sigma; \Gamma \vdash p_i \checks \sigma'_i \binding \Delta_i \quad (\forall i)
 }
 {

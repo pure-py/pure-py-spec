@@ -29,7 +29,7 @@
 \inferrule*[lab={\ruleName{attr-object}}]
 {
   \Sigma; \Gamma \vdash e \synth C[\seq{\tau}] \\
-  \bind{x}{\sigma} \in \tyInst{\fields(\Sigma, C)}{\seq{\tau}}
+  \bind{x}{\sigma} \in \tyInst{\fields{\Sigma}(C)}{\seq{\tau}}
 }
 {
   \Sigma; \Gamma \vdash \exAttr{e}{x} \synth \sigma
@@ -58,8 +58,8 @@
 \inferrule*[lab={\ruleName{constr}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \fields(\Sigma, C) = \bind{\seq{x}}{\seq{\tau}} \\
-  \fieldMap(\Sigma, C, a) = \set{\bind{\seq{x}}{\seq{e}}} \\
+  \fields{\Sigma}(C) = \bind{\seq{x}}{\seq{\tau}} \\
+  \fieldMap{\Sigma}(C, a) = \set{\bind{\seq{x}}{\seq{e}}} \\
   \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}
 }
 {
@@ -70,7 +70,7 @@
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
   \Sigma; \Gamma \vdash e' \synth \sigma' \\
-  \resolveOp(\Sigma, \odot, \sigma, \sigma') = \tau^\dagger
+  \resolveOp{\Sigma}(\odot, \sigma, \sigma') = \tau^\dagger
 }
 {
   \Sigma; \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \tau^\dagger
@@ -80,7 +80,7 @@
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
   \exUnOp{\ominus}{e} \neq \exUnOp{\pyinline{-}}{n} \quad (\forall n) \\
-  \resolveOp(\Sigma, \ominus, \sigma) = \tau^\dagger
+  \resolveOp{\Sigma}(\ominus, \sigma) = \tau^\dagger
 }
 {
   \Sigma; \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau^\dagger

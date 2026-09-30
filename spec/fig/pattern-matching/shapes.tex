@@ -65,7 +65,7 @@ $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
 \and
 \inferrule*[lab={\ruleName{shape-constr}}]
 {
-  \tyInst{\fields(\Sigma, C)}{\seq{\tau}} = \bind{\seq{x}}{\seq{\sigma}} \\
+  \tyInst{\fields{\Sigma}(C)}{\seq{\tau}} = \bind{\seq{x}}{\seq{\sigma}} \\
   \Sigma \vdash h : C[\seq{\tau}] \quad (\forall h \in H) \\
   \Sigma \vdash k_i : \sigma_i \quad (\forall i)
 }

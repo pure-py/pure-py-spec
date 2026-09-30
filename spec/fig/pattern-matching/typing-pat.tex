@@ -74,9 +74,9 @@
 \inferrule*[lab={\ruleName{pat-constr}}]
 {
   \Gamma \vdash q : \Type{D} \\
-  D \in \ancestors(\Sigma, C) \\
-  \fields(\Sigma, D) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
-  \fieldMap(\Sigma, D, a) = \set{\bind{\seq{x}}{\seq{p}}} \\
+  D \in \ancestors{\Sigma}(C) \\
+  \fields{\Sigma}(D) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
+  \fieldMap{\Sigma}(D, a) = \set{\bind{\seq{x}}{\seq{p}}} \\
   p'_i = \patWild \quad (\forall i) \\
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \mathbin{\concat} \seq{p}\,' \matches K, L
 }

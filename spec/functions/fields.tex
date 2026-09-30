@@ -1,2 +1,2 @@
-\fields(\Sigma, C) &= \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} && \text{if } \Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{\bot} \\*
-\fields(\Sigma, C) &= \scheme{\seq{\alpha}}{(\tyInst{\fields(\Sigma, D)}{\seq{\sigma}} \mathbin{\concat} \bind{\seq{x}}{\seq{\tau}})} && \text{if } \Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{D[\seq{\sigma}]}
+\fields{\Sigma}(C) &= \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} && \text{if } \Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{\bot} \\*
+\fields{\Sigma}(C) &= \scheme{\seq{\alpha}}{(\tyInst{\fields{\Sigma}(D)}{\seq{\sigma}} \mathbin{\concat} \bind{\seq{x}}{\seq{\tau}})} && \text{if } \Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{D[\seq{\sigma}]}

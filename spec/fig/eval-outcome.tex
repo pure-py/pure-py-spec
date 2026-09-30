@@ -375,7 +375,7 @@
   \resolve(\rho, q) = \Type{C} 
 }
 {
-  \rho, \exConstr{q[\seq{\psi}]}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{C}{\fieldMap(\Sigma, C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m}))}}
+  \rho, \exConstr{q[\seq{\psi}]}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{C}{\fieldMap{\Sigma}(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m}))}}
 }
 \end{mathpar}
 \caption{Expression $e$ evaluates to result $r$ under environment $\rho : \Gamma$}

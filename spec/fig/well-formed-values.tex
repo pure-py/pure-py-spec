@@ -56,7 +56,7 @@
 \and
 \inferrule*[lab={\ruleName{val-obj}}]
 {
-  \vdash \rho(x) : \tau \quad (\forall \bind{x}{\tau} \in \fields(\Sigma, C))
+  \vdash \rho(x) : \tau \quad (\forall \bind{x}{\tau} \in \fields{\Sigma}(C))
 }
 {
   \vdash \exObj{C}{\rho} : C
