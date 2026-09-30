@@ -10,9 +10,13 @@
 &\qquad \rlap{$\text{if } \Sigma \vdash \tau \subty \sigma \text{ or } \Sigma \vdash \tau \subty \sigma'$} \\*
 \typeArgs(\Sigma, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \joinTy{\Sigma}{\typeArgs(\Sigma, \sigma, \tau)}{\typeArgs(\Sigma, \sigma', \tau)} \\*
 &\qquad \rlap{$\text{otherwise}$} \\*
-\typeArgs(\Sigma, \sigma, \tau) &{}= \varnothing \qquad \text{otherwise} \\*[2mm]
+\typeArgs(\Sigma, \sigma, \tau) &{}= \varnothing \\*
+&\qquad \rlap{$\text{otherwise}$} \\*[2mm]
 \typeArgs(\Sigma, \varepsilon, \varepsilon) &{}= \varnothing \\*
 \typeArgs(\Sigma, \sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) &{}= \joinTy{\Sigma}{\typeArgs(\Sigma, \sigma, \tau)}{\typeArgs(\Sigma, \seq{\sigma}, \seq{\tau})} \\*[2mm]
-(\joinTy{\Sigma}{m}{m'})(\alpha) &{}= \joinTy{\Sigma}{m(\alpha)}{m'(\alpha)} \qquad \text{if } \alpha \in \dom(m) \cap \dom(m') \\*
-(\joinTy{\Sigma}{m}{m'})(\alpha) &{}= m(\alpha) \qquad \text{if } \alpha \in \dom(m) \setminus \dom(m') \\*
-(\joinTy{\Sigma}{m}{m'})(\alpha) &{}= m'(\alpha) \qquad \text{if } \alpha \in \dom(m') \setminus \dom(m)
+(\joinTy{\Sigma}{m}{m'})(\alpha) &{}= \joinTy{\Sigma}{m(\alpha)}{m'(\alpha)} \\*
+&\qquad \rlap{$\text{if } \alpha \in \dom(m) \cap \dom(m')$} \\*
+(\joinTy{\Sigma}{m}{m'})(\alpha) &{}= m(\alpha) \\*
+&\qquad \rlap{$\text{if } \alpha \in \dom(m) \setminus \dom(m')$} \\*
+(\joinTy{\Sigma}{m}{m'})(\alpha) &{}= m'(\alpha) \\*
+&\qquad \rlap{$\text{if } \alpha \in \dom(m') \setminus \dom(m)$}
