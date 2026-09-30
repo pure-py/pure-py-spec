@@ -400,9 +400,8 @@ def check_syntax_expr(node: ast.expr) -> None:
                 check_syntax_expr(c)
         case ast.Call():
             match node.func:
-                case ast.Subscript(value=e_, slice=UnparenthesisedTuple()):
+                case ast.Subscript(value=e_) if isinstance(parse_annotation(node.func), TypeName):
                     check_syntax_expr(e_)
-                    check_syntax_annotation(node.func)
                 case _:
                     check_syntax_expr(node.func)
             for a in node.args:
