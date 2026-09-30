@@ -132,7 +132,7 @@ and result type $\sigma$: a callee that synthesises a
 type scheme instantiates the type parameters from the arguments (\ruleName{callee-scheme}). Each argument
 $e_i$ with synthesised type $\tau_i$ constrains the type parameters: $\constraints(\Sigma, \sigma_i, \tau_i)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:constraints}}) pairs every type variable in parameter
-type $\sigma_i$ with the type it meets in $\tau_i$. An argument without a synthesised type, such as a lambda, does not
+type $\sigma_i$ with the type at the corresponding position of $\tau_i$. An argument without a synthesised type, such as a lambda, does not
 contribute a pair. The type arguments $\typeArgs(\Sigma, \seq{\alpha}, \seq{\sigma}, \seq{\tau})$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) take each type parameter to the join of the
 types paired with it, and are undefined if a type parameter is not paired with any type. The \ruleName{call} rule then
