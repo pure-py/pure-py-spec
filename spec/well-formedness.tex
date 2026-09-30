@@ -155,7 +155,7 @@ dictionary or comprehension takes the base type of the type synthesised by its e
 matching any other element type. An empty list or dictionary and a lambda have no
 synthesis rule at all, so checking is the only way to type them. A lambda applied to arguments is the
 exception, since the arguments give the parameter types, and the call then synthesises the type of the body
-or checks the body against an expected type (\ruleName{syn-call-lambda}, \ruleName{call-lambda}). The parameters of a
+or checks the body against an expected type (\ruleName{call-lambda-syn}, \ruleName{call-lambda}). The parameters of a
 lambda must be distinct, as for a function. A non-empty list has both, and the
 checking rule is still needed when the expected element type is wider than the type synthesised by the
 elements, since \pyinline{list} is invariant.
