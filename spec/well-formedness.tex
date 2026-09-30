@@ -93,7 +93,7 @@ take similar approaches for similar reasons~\cite{swift2025,kotlin2025,odersky20
 
 Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise.
 The \ruleName{var} rule applies whenever $\Gamma(x)$ is a type, so a variable that is not definitely
-assigned\added{, or a name bound at a type scheme,} has no rule. A
+assigned\added{, or a name bound at a type scheme,} \replaced{does not synthesise a type}{has no rule}. A
 literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 
 \input{spec/fig/typing-synth}
