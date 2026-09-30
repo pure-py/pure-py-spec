@@ -133,7 +133,7 @@ the arguments against $\seq{\sigma}$, and the call synthesises $\sigma$. The aux
 type scheme $\scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}$ instantiates the type parameters from the arguments
 (\ruleName{callee-scheme}). The type arguments are collected by $\typeArgs{\Sigma}$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) over the arguments that synthesise,
-unifying each parameter type one way with the synthesised type: a type variable takes the type found at the same
+by a one-way unification of each parameter type with the synthesised type: a type variable takes the type found at the same
 position in the synthesised type, and a type variable found at several positions takes the join of the types found.
 An argument that does not synthesise, such as a lambda, is left out. The
 \ruleName{callee-scheme} rule applies the resulting map to the type parameters $\seq{\alpha}$, giving type arguments $\seq{\tau}'$, undefined if
