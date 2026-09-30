@@ -124,8 +124,8 @@ such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts'
 \citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form.
 
-\added{The \ruleName{call} rule types a call $\exCall{e}{\seq{e}}$ in two steps. The auxiliary
-judgement $\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$ (\figref{typing-callee}) determines parameter
+\added{The \ruleName{call} rule for a call $\exCall{e}{\seq{e}}$ uses the auxiliary
+judgement $\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$ (\figref{typing-callee}), which determines parameter
 types $\seq{\sigma}$ and result type $\sigma$ from the callee along with its arguments. The remaining premises check
 the arguments against $\seq{\sigma}$, and the call synthesises $\sigma$. The auxiliary judgement has two rules. A callee that synthesises a
 \pyinline{Callable} type gives the parameter and result types of that type (\ruleName{callee}). A name bound at a
