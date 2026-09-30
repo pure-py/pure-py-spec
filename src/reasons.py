@@ -137,6 +137,12 @@ class NotPredefinedName:
 
 
 @dataclass(frozen=True)
+class RangePattern:
+    def message(self) -> str:
+        return "constructor pattern on range"
+
+
+@dataclass(frozen=True)
 class NotClass:
     q: Name
 
@@ -536,6 +542,7 @@ type Reason = (
     | ConstructorArityMismatch
     | PatternArityMismatch
     | NotClass
+    | RangePattern
     | ClassArityMismatch
     | TypeAliasArityMismatch
     | NotPredefinedName

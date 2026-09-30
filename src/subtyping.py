@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product
 
-from classes import Class, ClassTable, ancestors
+from classes import RANGE, Class, ClassTable, ancestors
 from type_syntax import (
     CallableType,
     ClassType,
@@ -97,7 +97,11 @@ def subtype(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
             )
         case _:
             if tau == Primitive.SIZED:
-                return isinstance(sigma, (ListType, DictType, TupleType)) or sigma == Primitive.STR
+                return (
+                    isinstance(sigma, (ListType, DictType, TupleType))
+                    or sigma == Primitive.STR
+                    or sigma == ClassType(RANGE, ())
+                )
             return False
 
 

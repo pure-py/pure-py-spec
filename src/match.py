@@ -5,6 +5,7 @@ from itertools import product
 import reasons
 from aux import binds, name_of
 from classes import (
+    RANGE,
     ArityMismatch,
     Class,
     ClassTable,
@@ -283,6 +284,8 @@ def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
     c = class_of_name(p.cls, mod_ctx)
     if c is None:
         raise IllFormedModule(p, reasons.NotClass(name_of(p.cls)))
+    if c == RANGE:
+        raise IllFormedModule(p, reasons.RangePattern())
     return c
 
 

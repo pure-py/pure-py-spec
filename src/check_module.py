@@ -12,7 +12,7 @@ from aux import (
     split_imports,
     statements,
 )
-from classes import ClassTable
+from classes import PREDEFINED_CLASSES, ClassTable
 from contexts import (
     BUILTINS,
     DU,
@@ -277,7 +277,7 @@ def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:
     }
     M[MAIN] = m
     try:
-        check_module(m, M, MAIN, {})
+        check_module(m, M, MAIN, PREDEFINED_CLASSES)
         return None
     except (IllFormed, syntax.Unsupported) as e:
         return e

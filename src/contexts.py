@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 import reasons
-from classes import Class, ClassTable
+from classes import RANGE, Class, ClassTable
 from reasons import IllFormedModule
 from subtyping import join_seq
 from type_syntax import (
@@ -159,6 +159,7 @@ PREDEFINED_MEMBERS: dict[str, Context] = {
     "builtins": {
         "print": CallableType((Primitive.OBJECT,), Primitive.NONE),
         "len": CallableType((Primitive.SIZED,), Primitive.INT),
+        "range": RANGE,
         Primitive.NONE.value: PredefinedName(),
         Primitive.OBJECT.value: PredefinedName(),
         Primitive.BOOL.value: PredefinedName(),

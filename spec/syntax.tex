@@ -180,7 +180,9 @@ $\mathcal{P}$ takes each module $q$ of \figref{predefined-values} to a pair $(\G
 binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \figref{predefined-signatures}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value
 (\figref{predefined-values}). A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
-the predefined signatures.
+the predefined signatures. \added{The class table $\SigmaPredef$ of the predefined modules has the single entry
+$\SigmaPredef(\clsRange) = \clsRec{\varepsilon}{\bind{\pyinline{stop}}{\tyInt}}{\bot}$ for the class \clsRange{} of
+\pyinline{builtins}.}
 \end{definition}
 
 \input{spec/fig/predefined-signatures}

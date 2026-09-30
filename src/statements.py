@@ -20,6 +20,7 @@ from aux import (
     type_expr,
 )
 from classes import (
+    RANGE,
     ArityMismatch,
     Class,
     ClassTable,
@@ -854,6 +855,8 @@ def elem_type(Sigma: ClassTable, tau: Type) -> Type | None:
             return sigma
         case DictType():
             return Primitive.STR
+        case ClassType(c, ()) if c == RANGE:
+            return Primitive.INT
         case TupleType(taus):
             return join_seq(Sigma, [base_type(c) for c in taus])
         case UnionType(sigma, sigma_):
