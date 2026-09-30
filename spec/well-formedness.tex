@@ -139,9 +139,9 @@ instantiated at the type arguments given by the map, which must have an entry fo
 
 \replaced{Lambdas, applied lambdas, lists, tuples, dictionaries, conditional expressions and comprehensions check
 (\ruleName{lambda}, \ruleName{call-lambda}, \ruleName{list}, \ruleName{tuple}, \ruleName{dict}, \ruleName{cond},
-\ruleName{list-comp}, \ruleName{dict-comp}).}{Lambdas check, as do lists, tuples, dictionaries and comprehensions.} \added{A name bound at a type scheme checks against a type $\tau$
-by instantiating the type parameters with the type arguments from $\tau$, provided the instantiation is below $\tau$
-(\ruleName{var-scheme}), so a function with type parameters can be passed where a \pyinline{Callable} type is expected.} An expression that synthesises $\sigma$ checks against any supertype
+\ruleName{list-comp}, \ruleName{dict-comp}).}{Lambdas check, as do lists, tuples, dictionaries and comprehensions.} \added{A name bound at a type scheme $\scheme{\seq{\alpha}}{\sigma}$ checks against a type $\tau$
+by instantiating $\seq{\alpha}$ at the type arguments collected by $\typeArgs{\Sigma}$ from $\sigma$ and $\tau$, provided the
+instantiated $\sigma$ is below $\tau$ (\ruleName{var-scheme}), so a function with type parameters can be passed where a \pyinline{Callable} type is expected.} An expression that synthesises $\sigma$ checks against any supertype
 of $\sigma$ (\ruleName{check-syn}), which applies only when no other rule concludes $\Sigma; \Gamma \vdash e \checks
 \tau$, so both judgements are
 syntax-directed and an expression has at most one derivation in each.
