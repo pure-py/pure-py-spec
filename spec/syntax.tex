@@ -68,7 +68,7 @@ the objects denoted by a class name, type parameter or alias at run time.
 
 The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
 and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
-is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. \added{A function name with entry $\PU{\pi}$ is bound at type scheme $\pi$ on some paths but not on all.} A variable
+is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. \added{A function name with entry $\PU{\scheme{\seq{\alpha}}{\tau}}$ is bound at the type scheme $\scheme{\seq{\alpha}}{\tau}$ on some paths but not on all.} A variable
 with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
 
