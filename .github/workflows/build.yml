@@ -31,7 +31,7 @@ jobs:
             texlive-publishers texlive-bibtex-extra texlive-plain-generic
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: recursive
           token: ${{ secrets.PURE_PY_ISABELLE }}
@@ -40,7 +40,7 @@ jobs:
         run: git -C isabelle-purepy fetch -q origin main
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v10.2.0
         with:
           enable-cache: true
 

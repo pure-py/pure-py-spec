@@ -23,23 +23,23 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up CPython
         if: matrix.runtime == 'CPython'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version-file: .python-version
 
       - name: Set up GraalPy
         if: matrix.runtime == 'GraalPy'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.version }}
 
       - name: Set up uv for CPython
         if: matrix.runtime == 'CPython'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v10.2.0
         with:
           enable-cache: true
 
@@ -49,7 +49,7 @@ jobs:
 
       - name: Set up uv for Pyodide
         if: matrix.runtime == 'Pyodide'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v10.2.0
 
       - name: Install Pyodide
         if: matrix.runtime == 'Pyodide'
