@@ -657,7 +657,7 @@ def constr_explicit(e: ast.Call, mod_ctx: ModuleContext) -> Type:
 
 
 def constructor_args(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> dict[Var, ast.expr]:
-    """field-map, with each failure diagnosed"""
+    """Pair fields with arguments by field-map"""
     kwd_names = [k.arg for k in e.keywords if k.arg is not None]
     args = field_map(mod_ctx.Sigma, c, e.args, kwd_names, [k.value for k in e.keywords])
     if args is None:
