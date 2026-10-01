@@ -32,10 +32,12 @@ def foo(b: bool) -> int:
 
 \noindent Python assigns \pyinline{x} twice when \pyinline{b} is true, so no pure reading of the program
 agrees with Python: under shadowing, \pyinline{return x} would refer to a different variable from the one
-assigned in the branch. \added{A function defined in a branch can be used only within that branch. Its name is possibly
-unassigned after the conditional, and no other branch can complete the definition, because a definition is also a
-declaration and a scope declares a name at most once. A variable of \pyinline{Callable} type, declared before the
-conditional and assigned in each branch, can be used where a function is needed afterwards.}
+assigned in the branch.
+
+\added{A function defined in a branch can also be used only within that branch; its name is possibly unassigned after the
+conditional, and no other branch can complete the definition, because a definition is also a declaration and a scope
+declares a name at most once. A variable of \pyinline{Callable} type, declared before the conditional and assigned in
+each branch, can be used where a function is needed afterwards.}
 
 The \ruleName{def-body} rule introduces every variable declared or assigned by the body, $\assignsS(s)$, at $\Unbound$
 before checking the body, so a reference before the declaration is rejected statically, whereas Python fails at
