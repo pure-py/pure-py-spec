@@ -32,9 +32,11 @@ class UnassignedVariable:
 @dataclass(frozen=True)
 class PossiblyUnassigned:
     x: Var
+    declared_in_branch: bool
 
     def message(self) -> str:
-        return f"'{self.x}' is not definitely assigned"
+        qualifier = ": declared in a branch" if self.declared_in_branch else ""
+        return f"'{self.x}' is not definitely assigned{qualifier}"
 
 
 @dataclass(frozen=True)

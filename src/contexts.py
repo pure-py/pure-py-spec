@@ -41,6 +41,7 @@ class DU:
 @dataclass(frozen=True)
 class PU:
     tau: Type | TypeScheme
+    declared_in_branch: bool = False  # diagnostic only
 
 
 @dataclass(frozen=True)
@@ -202,17 +203,22 @@ def predefined_context(q: Name) -> Context:
     return {**PREDEFINED_MEMBERS[str(q)], "__name__": Primitive.STR}
 
 
-def merge_entry(theta: ContextEntry | None, theta_: ContextEntry | None) -> ContextEntry:
+def merge_entry(
+    theta: ContextEntry | None, theta_: ContextEntry | None, before: ContextEntry | None
+) -> ContextEntry:
     if theta == theta_:
         assert theta is not None
         return theta
     present = theta if theta is not None else theta_
     assert present is not None
-    return PU(declared_type_of(present))
+    return PU(declared_type_of(present), isinstance(before, Unbound))
 
 
-def merge_context(gamma: Context, gamma_: Context) -> Context:
-    return {x: merge_entry(gamma.get(x), gamma_.get(x)) for x in gamma.keys() | gamma_.keys()}
+def merge_context(delta: Context, delta_: Context, gamma: Context) -> Context:
+    return {
+        x: merge_entry(delta.get(x), delta_.get(x), gamma.get(x))
+        for x in delta.keys() | delta_.keys()
+    }
 
 
 def declared_type_of(theta: ContextEntry) -> Type | TypeScheme:
@@ -226,18 +232,18 @@ def declared_type_of(theta: ContextEntry) -> Type | TypeScheme:
             return theta
 
 
-def merge_outcomes(rs: list[StaticOutcome]) -> StaticOutcome:
+def merge_outcomes(rs: list[StaticOutcome], gamma: Context) -> StaticOutcome:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return Returns()
     delta = assigns_branches[0].delta
-    return Assigns(fold_merge(delta, assigns_branches[1:]))
+    return Assigns(fold_merge(delta, assigns_branches[1:], gamma))
 
 
-def fold_merge(delta: Context, rs: list[Assigns]) -> Context:
+def fold_merge(delta: Context, rs: list[Assigns], gamma: Context) -> Context:
     if len(rs) == 0:
         return delta
-    return fold_merge(merge_context(delta, rs[0].delta), rs[1:])
+    return fold_merge(merge_context(delta, rs[0].delta, gamma), rs[1:], gamma)
 
 
 def override_context(gamma: Context, delta: Context) -> Context:

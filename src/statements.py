@@ -347,7 +347,7 @@ def check_stmt(
             check_expr(e, Primitive.BOOL, mod_ctx)
             branches = [check_body(ss, mod_ctx, returns, tail)]
             branches.append(check_body(ss_, mod_ctx, returns, tail) if ss_ else Assigns({}))
-            return merge_outcomes(branches)
+            return merge_outcomes(branches, mod_ctx.gamma)
         case ast.Assert(test=e, msg=e_):
             check_expr(e, Primitive.BOOL, mod_ctx)
             if e_ is not None:
@@ -377,7 +377,7 @@ def check_match_cases(
         and all(isinstance(r, Returns) for r in branches)
     ):
         raise MypyCompatibility(match, reasons.MissingReturnMatchPartial(rest))
-    return merge_outcomes(branches + ([Assigns({})] if partial else []))
+    return merge_outcomes(branches + ([Assigns({})] if partial else []), mod_ctx.gamma)
 
 
 def match_cases(
@@ -434,8 +434,8 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
                         raise IllFormedModule(e, reasons.UnboundName(x))
                     case DU():
                         raise IllFormedModule(e, reasons.UnassignedVariable(x))
-                    case PU():
-                        raise IllFormedModule(e, reasons.PossiblyUnassigned(x))
+                    case PU(_, declared_in_branch):
+                        raise IllFormedModule(e, reasons.PossiblyUnassigned(x, declared_in_branch))
                     case _:
                         raise IllFormedModule(e, reasons.UndefinedVariable(x))
             tau = assigned_type(mod_ctx, x)
