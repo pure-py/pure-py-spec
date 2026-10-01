@@ -40,7 +40,7 @@ jobs:
         run: git -C isabelle-purepy fetch -q origin main
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v10
+        uses: astral-sh/setup-uv@v10.2.0
         with:
           enable-cache: true
 
