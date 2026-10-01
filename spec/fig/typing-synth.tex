@@ -28,24 +28,26 @@
 \and
 \inferrule*[lab={\ruleName{attr-object}}]
 {
-  \Sigma; \Gamma \vdash e \synth C \\
-  \bind{x}{\tau} \in \fields(\Sigma, C)
+  \Sigma; \Gamma \vdash e \synth C[\seq{\tau}] \\
+  \bind{x}{\sigma} \in \tyInst{\fields{\Sigma}(C)}{\seq{\tau}}
 }
 {
-  \Sigma; \Gamma \vdash \exAttr{e}{x} \synth \tau
+  \Sigma; \Gamma \vdash \exAttr{e}{x} \synth \sigma
 }
 \and
 \inferrule*[lab={\ruleName{call}}]
 {
-  \Sigma; \Gamma \vdash e \synth \tyCallable{\seq{\tau}}{\tau} \\
-  \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}
+  \Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\tau}, \tau \\
+  \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau} \\
+  \tau \neq \tyNone
 }
 {
   \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \tau
 }
 \and
-\inferrule*[lab={\ruleName{syn-call-lambda}}]
+\inferrule*[lab={\ruleName{call-lambda-syn}}]
 {
+  \seq{x} \text{ distinct} \\
   \Sigma; \Gamma \vdash \seq{e} \synth \seq{\tau} \\
   \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\tau}}} \vdash e \synth \tau
 }
@@ -56,19 +58,33 @@
 \inferrule*[lab={\ruleName{constr}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \fields(\Sigma, C) = \bind{\seq{x}}{\seq{\tau}} \\
-  \fieldMap(\Sigma, C, a) = \set{\bind{\seq{x}}{\seq{e}}} \\
-  \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}
+  \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
+  \fieldMap{\Sigma}(C, a) = \set{\bind{\seq{x}}{\seq{e}}} \\
+  I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \tau_i} \\
+  \typeArgs{\Sigma}((\sigma_i \mid i \in I), (\tau_i \mid i \in I))(\seq{\alpha}) = \seq{\tau}' \\
+  \Sigma; \Gamma \vdash \seq{e} \checks \subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}
 }
 {
-  \Sigma; \Gamma \vdash \exConstr{q}{a} \synth C
+  \Sigma; \Gamma \vdash \exConstr{q}{a} \synth C[\seq{\tau}']
+}
+\and
+\inferrule*[lab={\ruleName{constr-explicit}}]
+{
+  \Gamma \vdash q : \Type{C} \\
+  \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
+  \Sigma; \Gamma \vdash \seq{\psi} \synth \seq{\tau} \\
+  \fieldMap{\Sigma}(C, a) = \set{\bind{\seq{x}}{\seq{e}}} \\
+  \Sigma; \Gamma \vdash \seq{e} \checks \subst{\seq{\tau}}{\seq{\alpha}}{\seq{\sigma}}
+}
+{
+  \Sigma; \Gamma \vdash \exConstr{q[\seq{\psi}]}{a} \synth C[\seq{\tau}]
 }
 \and
 \inferrule*[lab={\ruleName{binop}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
   \Sigma; \Gamma \vdash e' \synth \sigma' \\
-  \resolveOp(\Sigma, \odot, \sigma, \sigma') = \tau^\dagger
+  \resolveOp{\Sigma}(\odot, \sigma, \sigma') = \tau^\dagger
 }
 {
   \Sigma; \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \tau^\dagger
@@ -78,21 +94,13 @@
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
   \exUnOp{\ominus}{e} \neq \exUnOp{\pyinline{-}}{n} \quad (\forall n) \\
-  \resolveOp(\Sigma, \ominus, \sigma) = \tau^\dagger
+  \resolveOp{\Sigma}(\ominus, \sigma) = \tau^\dagger
 }
 {
   \Sigma; \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau^\dagger
 }
 \and
-\inferrule*[lab={\ruleName{unop-literal}}]
-{
-  \strut
-}
-{
-  \Sigma; \Gamma \vdash \exUnOp{\pyinline{-}}{n} \synth \tyLiteral{-n}
-}
-\and
-\inferrule*[lab={\ruleName{syn-cond}}]
+\inferrule*[lab={\ruleName{cond-syn}}]
 {
   \Sigma; \Gamma \vdash e \checks \tyBool \\
   I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \sigma_i} \neq \varnothing \\
@@ -124,6 +132,8 @@
 \label{fig:typing-synth}
 \end{figure}
 
+\input{spec/fig/typing-callee}
+
 \begin{figure}
 \flushleft \shadebox{$\Sigma; \Gamma \vdash e \synth \tau$ (continued)}
 \begin{mathpar}
@@ -139,7 +149,8 @@
 \and
 \inferrule*[lab={\ruleName{subscript-str}}]
 {
-  \Sigma; \Gamma \vdash e \synth \tyStr \\
+  \Sigma; \Gamma \vdash e \synth \sigma \\
+  \baseType(\sigma) = \tyStr \\
   \Sigma; \Gamma \vdash e' \checks \tyInt
 }
 {
@@ -168,12 +179,12 @@
 \inferrule*[lab={\ruleName{subscript-tuple-neg}}]
 {
   \Sigma; \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_m} \\
-  \Sigma; \Gamma \vdash e' \synth \tyLiteral{-n} \\
+  \Sigma; \Gamma \vdash e' \synth \tyLiteral{n} \\
   \\
-  0 < n \leq m
+  -m \leq n < 0
 }
 {
-  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{(m-n)+1}
+  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{m+n+1}
 }
 \and
 \inferrule*[lab={\ruleName{subscript-tuple-int}}]
@@ -190,7 +201,7 @@
   \Sigma; \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
   \Sigma; \Gamma \override \set{\bind{y}{\sigma}} \vdash \exSubscript{y}{e'} \synth \tau \\
   \Sigma; \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exSubscript{y}{e'} \synth \tau' \\
-  y \notin \fvE(e')
+  y \notin \fv(e')
 }
 {
   \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \joinTy{\Sigma}{\tau}{\tau'}
@@ -211,7 +222,7 @@
   \Sigma; \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
   \Sigma; \Gamma \override \set{\bind{y}{\sigma}} \vdash \exCall{y}{\seq{e}} \synth \tau \\
   \Sigma; \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exCall{y}{\seq{e}} \synth \tau' \\
-  y \notin \fvE(\seq{e})
+  y \notin \fv(\seq{e})
 }
 {
   \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \joinTy{\Sigma}{\tau}{\tau'}

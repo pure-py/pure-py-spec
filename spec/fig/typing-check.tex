@@ -3,7 +3,7 @@
 \flushleft \shadebox{$\Sigma; \Gamma \vdash e \checks \tau$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{check-synth}}]
+\inferrule*[lab={\ruleName{check-syn}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
   \Sigma \vdash \sigma \subty \tau \\
@@ -15,14 +15,26 @@
 \and
 \inferrule*[lab={\ruleName{lambda}}]
 {
+  \seq{x} \text{ distinct} \\
   \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\tau}}} \vdash e \checks \tau
 }
 {
   \Sigma; \Gamma \vdash \exLambda{\seq{x}}{e} \checks \tyCallable{\seq{\tau}}{\tau}
 }
 \and
+\inferrule*[lab={\ruleName{var-scheme}}]
+{
+  \Gamma \vdash q : \scheme{\seq{\alpha}}{\sigma} \\
+  \typeArgs{\Sigma}(\sigma, \tau)(\seq{\alpha}) = \seq{\tau}' \\
+  \Sigma \vdash \subst{\seq{\tau}'}{\seq{\alpha}}{\sigma} \subty \tau
+}
+{
+  \Sigma; \Gamma \vdash q \checks \tau
+}
+\and
 \inferrule*[lab={\ruleName{call-lambda}}]
 {
+  \seq{x} \text{ distinct} \\
   \Sigma; \Gamma \vdash \seq{e} \synth \seq{\tau} \\
   \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\tau}}} \vdash e \checks \tau
 }
@@ -87,6 +99,7 @@
 }
 \end{mathpar}
 \subcaption{Expression $e$ checks against type $\tau$}
+\label{fig:typing-check-expr}
 \end{subfigure}
 
 \vspace{2mm}
@@ -115,7 +128,7 @@
 \inferrule*[lab={\ruleName{qual-generator}}]
 {
   \Sigma; \Gamma \vdash e \synth \tau \\
-  \elemTy(\Sigma, \tau) = \sigma \\
+  \elemTy{\Sigma}(\tau) = \sigma \\
   \Sigma; \Gamma \override \set{\bind{x}{\sigma}} \vdash \seq{g} : \Delta \\
   x \notin \captures(\seq{g})
 }
@@ -124,6 +137,7 @@
 }
 \end{mathpar}
 \subcaption{Comprehension qualifiers $\seq{g}$ are well-formed and bind $\Delta$}
+\label{fig:typing-quals}
 \end{subfigure}
 \caption{Expression checking}
 \label{fig:typing-check}

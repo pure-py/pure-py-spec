@@ -10,12 +10,21 @@
   \Sigma \vdash \tau \subty \tau
 }
 \and
-\inferrule*[lab={\ruleName{subty-class}}]
+\inferrule*[lab={\ruleName{subty-class-extend}}]
 {
-  D \in \ancestors(\Sigma, C)
+  \Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}'}}{D[\seq{\sigma}]} \\
+  \Sigma \vdash D[\subst{\seq{\tau}}{\seq{\alpha}}{\seq{\sigma}}] \subty \tau'
 }
 {
-  \Sigma \vdash C \subty D
+  \Sigma \vdash C[\seq{\tau}] \subty \tau'
+}
+\and
+\inferrule*[lab={\ruleName{subty-class}}]
+{
+  \Sigma \vdash \sigma_i \tyEquiv \tau_i \quad (\forall i)
+}
+{
+  \Sigma \vdash C[\seq{\sigma}] \subty C[\seq{\tau}]
 }
 \and
 \inferrule*[lab={\ruleName{subty-never}}]
@@ -44,7 +53,7 @@
 \and
 \inferrule*[lab={\ruleName{subty-sized}}]
 {
-  \tau \text{ a list, dictionary, string or tuple type}
+  \tau \text{ a list, dictionary, string or tuple type, or } \clsRange
 }
 {
   \Sigma \vdash \tau \subty \tySized

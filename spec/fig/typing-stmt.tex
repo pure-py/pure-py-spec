@@ -12,7 +12,7 @@
 \and
 \inferrule*[lab={\ruleName{declare}}]
 {
-  \Gamma \vdash \psi \synth \tau
+  \Sigma; \Gamma \vdash \psi \synth \tau
 }
 {
   \Sigma; \Gamma; \zeta \vdash x\exAnnot{\psi} : \Assigns{\set{\bind{x}{\DU{\tau}}}}
@@ -21,7 +21,7 @@
 \inferrule*[lab={\ruleName{assign}}]
 {
   \Gamma(x) = \DU{\tau} \\
-  \Sigma; \Gamma \vdash e \checks \tau \\
+  \Sigma; \Gamma \vdash e \checks \tau
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exAssign{x}{e} : \Assigns{\set{\bind{x}{\tau}}}
@@ -29,8 +29,8 @@
 \and
 \inferrule*[lab={\ruleName{declare-assign}}]
 {
-  \Gamma \vdash \psi \synth \tau \\
-  \Sigma; \Gamma \vdash e \checks \tau \\
+  \Sigma; \Gamma \vdash \psi \synth \tau \\
+  \Sigma; \Gamma \vdash e \checks \tau
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exAssign{x\exAnnot{\psi}}{e} : \Assigns{\set{\bind{x}{\tau}}}
@@ -42,6 +42,15 @@
 }
 {
   \Sigma; \Gamma; \zeta \vdash e : \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{call-stmt}}]
+{
+  \Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\tau}, \tyNone \\
+  \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exCall{e}{\seq{e}} : \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{assert}}]
@@ -63,7 +72,7 @@
 \and
 \inferrule*[lab={\ruleName{return-none}}]
 {
-  \Sigma \vdash \tyNone \subty \tau
+  \Sigma \vdash \tau \tyEquiv \tyNone
 }
 {
   \Sigma; \Gamma; \tau \vdash \exReturnNone : \Returns
@@ -98,7 +107,7 @@
 \inferrule*[lab={\ruleName{seq}}]
 {
   \Sigma; \Gamma; \zeta \vdash s : \Assigns{\Delta} \\
-  \Sigma; \Gamma \override \Delta ; \zeta \vdash s' : R \\
+  \Sigma; \Gamma \override \Delta ; \zeta \vdash s' : R
 }
 {
   \Sigma; \Gamma; \zeta \vdash s\;s' : \Assigns{\Delta} \override R
@@ -106,23 +115,18 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \seq{x}_i \text{ distinct} \quad (\forall i) \\
-  \Delta_i = \set{\bind{\seq{x}_i}{\seq{\sigma}_i}} \quad (\forall i) \\
-  \Delta' = \set{\bind{f_1}{\tyCallable{\seq{\sigma}_1}{\tau_1}}, \ldots, \bind{f_{n+1}}{\tyCallable{\seq{\sigma}_{n+1}}{\tau_{n+1}}}} \\
-  \Sigma; \Gamma \override \Delta' \override \Delta_i \override \scopeS(\set{\seq{x}_i}, s_i); \tau_i \vdash s_i : R_i \quad (\forall i)
-  \\
-  R_i = \Returns \text{ or } \Sigma \vdash \tyNone \subty \tau_i \quad (\forall i) \\
-  \Gamma \vdash \seq{\psi}_i \synth \seq{\sigma}_i \quad (\forall i) \\
-  \Gamma \vdash \psi_i \synth \tau_i \quad (\forall i)
+  \Sigma; \Gamma \vdash d_i \synth \pi_i \quad (\forall i) \\
+  \Delta' = \set{\bind{\declaresS(\seq{d})}{\seq{\pi}}} \\
+  \Sigma; \Gamma \override \Delta' \vdash d_i \checks \pi_i \quad (\forall i)
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exDef{f_1}{\bind{\seq{x}_1}{\seq{\psi}_1}}{\exRetAnnot{\psi_1}}{s_1} \cons \ldots \cons \exDef{f_{n+1}}{\bind{\seq{x}_{n+1}}{\seq{\psi}_{n+1}}}{\exRetAnnot{\psi_{n+1}}}{s_{n+1}} : \Assigns{\Delta'}
+  \Sigma; \Gamma; \zeta \vdash \seq{d} : \Assigns{\Delta'}
 }
 \and
 \inferrule*[lab={\ruleName{match}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \varnothing
+  \Sigma; \Gamma; \zeta \vdash \sigma, \shapes{\Sigma}(\sigma, \varnothing), \seq{b} : S, \tyNever, \varnothing
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S
@@ -131,8 +135,8 @@
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta; \sigma \vdash \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, L \\
-  L \neq \varnothing
+  \Sigma; \Gamma; \zeta \vdash \sigma, \shapes{\Sigma}(\sigma, \varnothing), \seq{b} : S, \tau, L \\
+  \tau \neq \tyNever
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S \merge \Assigns{\varnothing}

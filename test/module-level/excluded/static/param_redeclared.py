@@ -1,4 +1,4 @@
-# rule: declare
+# rule: def-body
 def f(x: int) -> int:
     x: int
     return x

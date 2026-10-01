@@ -1,6 +1,8 @@
 from collections.abc import Sequence
+from dataclasses import dataclass
+from itertools import product
 
-from classes import ClassTable, ancestors
+from classes import RANGE, Class, ClassTable, ancestors
 from type_syntax import (
     CallableType,
     ClassType,
@@ -10,8 +12,12 @@ from type_syntax import (
     Primitive,
     TupleType,
     Type,
+    TypeVariable,
     UnionType,
+    Var,
     base_type,
+    render,
+    substitute,
 )
 
 
@@ -69,16 +75,19 @@ def subtype(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
         case (_, UnionType()):
             return subtype(Sigma, sigma, tau.left) or subtype(Sigma, sigma, tau.right)
         case (LiteralType(), _):
-            return subtype(Sigma, base_type(sigma.value), tau)
-        case (ClassType(c), ClassType(d)):
-            return d in ancestors(Sigma, c)
+            return subtype(Sigma, base_type(sigma), tau)
+        case (ClassType(c, taus), ClassType(d, sigmas)):
+            if c == d and all(equivalent(Sigma, a, b) for a, b in zip(taus, sigmas)):
+                return True
+            base = Sigma[c].base
+            return base is not None and subtype(
+                Sigma, substitute(taus, Sigma[c].type_params, base), tau
+            )
         case (TupleType(sigmas), TupleType(taus)):
             return len(sigmas) == len(taus) and all(
                 subtype(Sigma, a, b) for a, b in zip(sigmas, taus)
             )
-        case (ListType(sigma_), ListType(tau_)):
-            return equivalent(Sigma, sigma_, tau_)
-        case (DictType(sigma_), DictType(tau_)):
+        case (ListType(sigma_), ListType(tau_)) | (DictType(sigma_), DictType(tau_)):
             return equivalent(Sigma, sigma_, tau_)
         case (CallableType(sigmas, sigma_), CallableType(taus, tau_)):
             return (
@@ -88,7 +97,11 @@ def subtype(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
             )
         case _:
             if tau == Primitive.SIZED:
-                return isinstance(sigma, (ListType, DictType, TupleType)) or sigma == Primitive.STR
+                return (
+                    isinstance(sigma, (ListType, DictType, TupleType))
+                    or sigma == Primitive.STR
+                    or sigma == ClassType(RANGE, ())
+                )
             return False
 
 
@@ -98,3 +111,162 @@ def equivalent(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
 
 def comparable(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
     return subtype(Sigma, sigma, tau) or subtype(Sigma, tau, sigma)
+
+
+@dataclass(frozen=True)
+class Undetermined:
+    pass
+
+
+def instance(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
+    above = instance_above(Sigma, c, tau)
+    return above if above is not None else instance_below(Sigma, c, tau)
+
+
+def instance_above(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
+    match tau:
+        case ClassType(d, _) if c in ancestors(Sigma, d):
+            return instantiated_ancestor(Sigma, tau, c)
+        case Primitive.NEVER:
+            return ClassType(c, ()) if len(Sigma[c].type_params) == 0 else Undetermined()
+        case _:
+            return None
+
+
+def instance_below(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
+    assert not isinstance(tau, UnionType)  # instances are taken at the disjuncts of a union
+    alphas = Sigma[c].type_params
+    match tau:
+        case ClassType(d, sigmas) if d in ancestors(Sigma, c):
+            generic = ClassType(c, tuple(TypeVariable(alpha) for alpha in alphas))
+            rhos = instantiated_ancestor(Sigma, generic, d).args
+            match instantiation_candidates(Sigma, rhos, sigmas, alphas):
+                case []:
+                    return None
+                case [taus]:
+                    return ClassType(c, taus)
+                case _:
+                    return Undetermined()
+        case Primitive.OBJECT:
+            return ClassType(c, ()) if len(alphas) == 0 else Undetermined()
+        case _:
+            return None
+
+
+def instantiated_ancestor(Sigma: ClassTable, tau: ClassType, d: Class) -> ClassType:
+    """Instantiation of ancestor d of tau's class reached along the base classes."""
+    while tau.c != d:
+        base = Sigma[tau.c].base
+        assert base is not None
+        sigma = substitute(tau.args, Sigma[tau.c].type_params, base)
+        assert isinstance(sigma, ClassType)
+        tau = sigma
+    return tau
+
+
+def instantiation_candidates(
+    Sigma: ClassTable, rhos: Sequence[Type], sigmas: Sequence[Type], alphas: Sequence[Var]
+) -> list[tuple[Type, ...]]:
+    atoms = sorted(
+        {a for sigma in sigmas for a in subterms(sigma)} | {Primitive.OBJECT}, key=render
+    )
+    candidates = (
+        tuple(join_seq(Sigma, ts) for ts in choice)
+        for choice in product(subsets(atoms), repeat=len(alphas))
+    )
+    solving = (
+        taus
+        for taus in candidates
+        if all(
+            equivalent(Sigma, substitute(taus, alphas, rho), sigma)
+            for rho, sigma in zip(rhos, sigmas)
+        )
+    )
+    first = next(solving, None)
+    if first is None:
+        return []
+    second = next((taus for taus in solving if not equivalent_seq(Sigma, taus, first)), None)
+    return [first] if second is None else [first, second]
+
+
+def type_args(Sigma: ClassTable, sigma: Type, tau: Type) -> dict[Var, Type]:
+    match sigma, tau:
+        case TypeVariable(alpha), _:
+            return {alpha: base_type(tau)}
+        case _, UnionType(tau_, tau__):
+            return join_context(
+                Sigma, type_args(Sigma, sigma, tau_), type_args(Sigma, sigma, tau__)
+            )
+        case (ListType(sigma_), ListType(tau_)) | (DictType(sigma_), DictType(tau_)):
+            return type_args(Sigma, sigma_, tau_)
+        case TupleType(sigmas), TupleType(taus):
+            return type_args_seq(Sigma, sigmas, taus)
+        case CallableType(sigmas, sigma_), CallableType(taus, tau_):
+            return type_args_seq(Sigma, (sigma_, *sigmas), (tau_, *taus))
+        case ClassType(c, sigmas), _:
+            match instance(Sigma, c, tau):
+                case ClassType(_, taus):
+                    return type_args_seq(Sigma, sigmas, taus)
+                case _:
+                    return {}
+        case UnionType(sigma_, sigma__), _:
+            if subtype(Sigma, tau, sigma_) or subtype(Sigma, tau, sigma__):
+                return {}
+            return join_context(
+                Sigma, type_args(Sigma, sigma_, tau), type_args(Sigma, sigma__, tau)
+            )
+        case _:
+            return {}
+
+
+def type_args_seq(
+    Sigma: ClassTable, sigmas: Sequence[Type], taus: Sequence[Type]
+) -> dict[Var, Type]:
+    result: dict[Var, Type] = {}
+    for sigma, tau in zip(sigmas, taus):
+        result = join_context(Sigma, result, type_args(Sigma, sigma, tau))
+    return result
+
+
+def join_context(
+    Sigma: ClassTable, gamma: dict[Var, Type], gamma_: dict[Var, Type]
+) -> dict[Var, Type]:
+    return {
+        alpha: join(Sigma, gamma[alpha], gamma_[alpha])
+        if alpha in gamma and alpha in gamma_
+        else (gamma | gamma_)[alpha]
+        for alpha in gamma.keys() | gamma_.keys()
+    }
+
+
+def equivalent_seq(Sigma: ClassTable, sigmas: Sequence[Type], taus: Sequence[Type]) -> bool:
+    return all(equivalent(Sigma, sigma, tau) for sigma, tau in zip(sigmas, taus))
+
+
+def disjuncts(tau: Type) -> list[Type]:
+    match tau:
+        case UnionType(sigma, sigma_):
+            return disjuncts(sigma) + disjuncts(sigma_)
+        case _:
+            return [tau]
+
+
+def subterms(tau: Type) -> set[Type]:
+    match tau:
+        case UnionType(sigma, sigma_):
+            return subterms(sigma) | subterms(sigma_)
+        case ListType(sigma) | DictType(sigma):
+            return {tau} | subterms(sigma)
+        case TupleType(sigmas) | ClassType(_, sigmas):
+            return {tau}.union(*(subterms(sigma) for sigma in sigmas))
+        case CallableType(sigmas, sigma):
+            return {tau}.union(subterms(sigma), *(subterms(s) for s in sigmas))
+        case _:
+            return {tau}
+
+
+def subsets[T](xs: Sequence[T]) -> list[tuple[T, ...]]:
+    return [
+        tuple(x for x, keep in zip(xs, keeps) if keep)
+        for keeps in product((False, True), repeat=len(xs))
+    ]

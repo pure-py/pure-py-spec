@@ -12,7 +12,7 @@ from aux import (
     split_imports,
     statements,
 )
-from classes import ClassTable
+from classes import PREDEFINED_CLASSES, ClassTable
 from contexts import (
     BUILTINS,
     DU,
@@ -32,11 +32,9 @@ from contexts import (
 from reasons import IllFormed, IllFormedModule, IllFormedProgram
 from statements import check_assignments_declared, check_top_seq, scope
 from type_syntax import (
-    Primitive,
-    QualifiedName,
+    Name,
     Var,
-    parent,
-    parse_qualified,
+    parse_name,
     prefix_of,
     proper_prefix_of,
     proper_prefixes,
@@ -46,17 +44,20 @@ from type_syntax import (
 
 
 def loads_as(
-    q: QualifiedName, theta: ContextEntry, mod_ctx: ModuleContext
+    theta: ModuleLoaded, xs: list[Var], iota: ast.stmt, mod_ctx: ModuleContext
 ) -> tuple[ContextEntry, ClassTable]:
-    q_ = parent(q)
-    if q_ is None:
-        return theta, mod_ctx.Sigma
-    gamma, Sigma = check_module(mod_ctx.M[q_], mod_ctx.M, q_, mod_ctx.Sigma)
-    return loads_as(
-        q_,
-        ModuleLoaded(q_, extend_context(gamma, {q.parts[-1]: theta})),
-        replace(mod_ctx, Sigma=Sigma),
-    )
+    match xs:
+        case []:
+            return theta, mod_ctx.Sigma
+        case [x, *xs_]:
+            q = qualified(theta.q, x)
+            gamma, Sigma = check_imported(q, iota, mod_ctx)
+            theta_, Sigma = loads_as(
+                ModuleLoaded(q, gamma), xs_, iota, replace(mod_ctx, Sigma=Sigma)
+            )
+            return ModuleLoaded(theta.q, extend_context(theta.members, {x: theta_})), Sigma
+        case _:
+            assert False
 
 
 def check_imports_prefix(
@@ -72,32 +73,30 @@ def check_imports_prefix(
 def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, ClassTable]:
     match iota:
         case ast.Import():
-            q = parse_qualified(iota.names[0].name)
-            if q not in mod_ctx.M:
-                raise IllFormedModule(iota, reasons.UnknownModule(q))
+            q = parse_name(iota.names[0].name)
             if proper_prefix_of(mod_ctx.q, q):
                 raise IllFormedModule(
                     iota,
-                    reasons.ImportOfContainedModule(
-                        q, mod_ctx.q, f"from {parent(q)} import {q.parts[-1]}"
-                    ),
+                    reasons.ImportOfContainedModule(q, mod_ctx.q, f"from {q} import <name>"),
                 )
-            delta, Sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
-            theta, Sigma = loads_as(q, ModuleLoaded(q, delta), replace(mod_ctx, Sigma=Sigma))
+            x = Name((root(q),))
+            delta, Sigma = check_imported(x, iota, mod_ctx)
+            theta, Sigma = loads_as(
+                ModuleLoaded(x, delta), list(q.parts[1:]), iota, replace(mod_ctx, Sigma=Sigma)
+            )
             return {root(q): theta}, Sigma
         case ast.ImportFrom():
             assert iota.module is not None
-            q = parse_qualified(iota.module)
-            if q not in mod_ctx.M:
-                raise IllFormedModule(iota, reasons.UnknownModule(q))
-            delta, Sigma = check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
-            Sigma = load_containing(
-                [p for p in proper_prefixes(q) if not prefix_of(p, mod_ctx.q)],
-                replace(mod_ctx, Sigma=Sigma),
-            )
+            q = parse_name(iota.module)
+            xs = [a.name for a in iota.names]
+            dup = next((x for i, x in enumerate(xs) if x in xs[:i]), None)
+            if dup is not None:
+                raise IllFormedModule(iota, reasons.DuplicateImportedName(dup))
+            delta, Sigma = check_imported(q, iota, mod_ctx)
+            Sigma = load_containing(containing(mod_ctx.q, q), replace(mod_ctx, Sigma=Sigma))
             return imports_seq(
                 iota,
-                [a.name for a in iota.names],
+                xs,
                 q,
                 delta,
                 replace(mod_ctx, Sigma=Sigma),
@@ -106,14 +105,24 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
             raise AssertionError(f"unexpected statement: {type(iota).__name__}")
 
 
-def load_containing(containing: list[QualifiedName], mod_ctx: ModuleContext) -> ClassTable:
-    if len(containing) == 0:
+def check_imported(q: Name, iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, ClassTable]:
+    if q not in mod_ctx.M:
+        raise IllFormedModule(iota, reasons.UnknownModule(q))
+    return check_module(mod_ctx.M[q], mod_ctx.M, q, mod_ctx.Sigma)
+
+
+def containing(q: Name, q_: Name) -> list[Name]:
+    return [p for p in proper_prefixes(q_) if not prefix_of(p, q)]
+
+
+def load_containing(qs: list[Name], mod_ctx: ModuleContext) -> ClassTable:
+    if len(qs) == 0:
         return mod_ctx.Sigma
-    _, Sigma = check_module(mod_ctx.M[containing[0]], mod_ctx.M, containing[0], mod_ctx.Sigma)
-    return load_containing(containing[1:], replace(mod_ctx, Sigma=Sigma))
+    _, Sigma = check_module(mod_ctx.M[qs[0]], mod_ctx.M, qs[0], mod_ctx.Sigma)
+    return load_containing(qs[1:], replace(mod_ctx, Sigma=Sigma))
 
 
-def submods(M: Mapping[QualifiedName, ast.Module], q: QualifiedName) -> Context:
+def submods(M: Mapping[Name, ast.Module], q: Name) -> Context:
     return {
         x: ModuleStub(qualified(q, x))
         for x in {q_.parts[len(q.parts)] for q_ in M if proper_prefix_of(q, q_)}
@@ -123,7 +132,7 @@ def submods(M: Mapping[QualifiedName, ast.Module], q: QualifiedName) -> Context:
 def imports_seq(
     iota: ast.stmt,
     xs: list[Var],
-    q: QualifiedName,
+    q: Name,
     gamma: Context,
     mod_ctx: ModuleContext,
 ) -> tuple[Context, ClassTable]:
@@ -135,7 +144,7 @@ def imports_seq(
 
 
 def imports(
-    iota: ast.stmt, x: Var, q: QualifiedName, gamma: Context, mod_ctx: ModuleContext
+    iota: ast.stmt, x: Var, q: Name, gamma: Context, mod_ctx: ModuleContext
 ) -> tuple[ContextEntry, ClassTable]:
     theta = gamma.get(x)
     if theta is None:
@@ -148,14 +157,14 @@ def imports(
     return theta, mod_ctx.Sigma
 
 
-_signatures: dict[tuple[int, QualifiedName], Context] = {}
-_loading: list[tuple[int, QualifiedName]] = []
+_signatures: dict[tuple[int, Name], Context] = {}
+_loading: list[tuple[int, Name]] = []
 
 
 def check_module(
     m: ast.Module,
-    M: Mapping[QualifiedName, ast.Module],
-    q: QualifiedName,
+    M: Mapping[Name, ast.Module],
+    q: Name,
     Sigma: ClassTable,
 ) -> tuple[Context, ClassTable]:
     key = (id(M), q)
@@ -178,18 +187,34 @@ def check_module(
     return gamma, Sigma
 
 
+NAME = "__name__"
+
+
+# Declaration `__name__: str = name(q)` beginning the body of module q, located at the module start
+def name_declaration(q: Name) -> ast.AnnAssign:
+    return ast.AnnAssign(
+        target=ast.Name(id=NAME, ctx=ast.Store()),
+        annotation=ast.Name(id="str", ctx=ast.Load()),
+        value=ast.Constant(value=str(q)),
+        simple=1,
+        lineno=1,
+        col_offset=0,
+    )
+
+
 def check_module_(
     m: ast.Module,
-    M: Mapping[QualifiedName, ast.Module],
-    q: QualifiedName,
+    M: Mapping[Name, ast.Module],
+    q: Name,
     Sigma: ClassTable,
 ) -> tuple[Context, ClassTable]:
     if q in PREDEFINED_MODULES:
         return predefined_context(q), Sigma
     iotas, stmts = split_imports(m.body)
+    imported = {x for x, _ in declares_body(iotas)}
     gamma, Sigma = check_imports_prefix(iotas, ModuleContext(gamma={}, M=M, q=q, Sigma=Sigma))
-    body = stmts
-    bound = scope({x for x, _ in declares_body(iotas)}, body)
+    body = [name_declaration(q), *stmts]
+    bound = scope(imported, body)
     check_assignments_declared(body, set())
     mod_ctx = check_top_seq(
         statements(body),
@@ -205,8 +230,8 @@ def check_submodule_names(
     m: ast.Module,
     gamma: Context,
     body: list[ast.stmt],
-    M: Mapping[QualifiedName, ast.Module],
-    q: QualifiedName,
+    M: Mapping[Name, ast.Module],
+    q: Name,
 ) -> None:
     xs = sorted((set(gamma) | assigns_body(body)) & set(submods(M, q)))
     if len(xs) > 0:
@@ -219,7 +244,7 @@ def check_submodule_names(
 def binds_name(s: ast.stmt, x: str) -> bool:
     match s:
         case ast.Import():
-            return root(parse_qualified(s.names[0].name)) == x
+            return root(parse_name(s.names[0].name)) == x
         case ast.ImportFrom():
             return any(a.name == x for a in s.names)
         case ast.ClassDef():
@@ -232,26 +257,29 @@ def find_binder(stmts: list[ast.stmt], x: str) -> ast.stmt | None:
     return next((s for s in stmts if binds_name(s, x)), None)
 
 
-def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: QualifiedName) -> Context:
+def signature(body: list[ast.stmt], final_ctx: ModuleContext, q: Name) -> Context:
     members = {x: final_ctx.gamma[x] for x in assigns_body(body)}
-    return override_context(submods(final_ctx.M, q), {**members, "__name__": Primitive.STR})
+    return override_context(submods(final_ctx.M, q), members)
 
 
 def check_file(filename: str) -> IllFormed | syntax.Unsupported | None:
     with open(filename) as f:
         source = f.read()
-    m = syntax.parse(source, filename)
+    try:
+        m = syntax.parse(source, filename)
+    except SyntaxError as e:
+        return syntax.ParseError(e)
     unsupported = syntax.check_syntax_module(m)
     if unsupported is not None:
         return unsupported
-    M: dict[QualifiedName, ast.Module] = {
+    M: dict[Name, ast.Module] = {
         p: ast.Module(body=[], type_ignores=[]) for p in PREDEFINED_MODULES
     }
     M[MAIN] = m
     try:
-        check_module(m, M, MAIN, {})
+        check_module(m, M, MAIN, PREDEFINED_CLASSES)
         return None
-    except IllFormed as e:
+    except (IllFormed, syntax.Unsupported) as e:
         return e
 
 

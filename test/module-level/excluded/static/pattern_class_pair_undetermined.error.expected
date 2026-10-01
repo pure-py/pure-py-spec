@@ -1,0 +1,1 @@
+type arguments of 'Pair' in pattern not determined by type __main__.Box[int]

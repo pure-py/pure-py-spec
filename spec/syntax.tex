@@ -9,8 +9,8 @@ $\seq{x} \mathbin{\concat} \seq{y}$ is concatenation.
 Comma-separated elements inside set braces are pairwise distinct, so $\set{x_1, \ldots, x_n}$ has $n$
 elements; the set of the elements of a sequence, $\set{\seq{x}}$, assumes no distinctness. A sequence
 comprehension $(x_i \mid i \in I)$, where the finite index set $I$ carries a total order, denotes the
-sequence of the $x_i$ in that order. A judgement applied to sequences of equal length holds pointwise, so that
-$\Gamma \vdash \seq{\psi} \synth \seq{\tau}$ abbreviates $\Gamma \vdash \psi_i \synth \tau_i$ for each $i$. When the order of its elements matters, a set $\set{x_1, \ldots, x_n}$ is
+sequence of the $x_i$ in that order. Two sequences of equal length paired by a colon, $\bind{\seq{x}}{\seq{\psi}}$, denote the sequence of pairs $\bind{x_1}{\psi_1}, \ldots, \bind{x_n}{\psi_n}$. A judgement applied to sequences of equal length holds pointwise, so that
+$\Sigma; \Gamma \vdash \seq{\psi} \synth \seq{\tau}$ abbreviates $\Sigma; \Gamma \vdash \psi_i \synth \tau_i$ for each $i$. When the order of its elements matters, a set $\set{x_1, \ldots, x_n}$ is
 \emph{ordered} by position. A comprehension over an ordered set preserves the order of its source;
 $X \setminus Y$ keeps the surviving elements of $X$ in their order; $X \disjunion Y$, defined when $X$
 and $Y$ are disjoint, appends the elements of $Y$ to those of $X$; $X \cup Y$ appends the elements of
@@ -22,15 +22,18 @@ $Y$ not in $X$; and a product of ordered sets is ordered lexicographically.
 \label{sec:lexical}
 
 The grammar of \PurePy is an abstract syntax, and its metavariables range over values rather than
-over source text: $n$ is a number and $w$ is a string, not the lexemes that denote them. A number is never
-negative, since Python writes a negative number as unary minus applied to a literal, and a length or an
-exit status is an integer. The translation of source text
-into abstract syntax follows Python, including the indentation that delimits blocks.
+over source text: $n$ is a number and $w$ is a string, not the lexemes that denote them. Python writes a
+negative number as unary minus applied to a number literal; the translation to abstract syntax folds the minus
+into the literal, so a number may be negative. The translation of
+source text into abstract syntax otherwise follows Python, including the indentation that delimits blocks. A list of type
+parameters or type arguments is always present in the abstract syntax and may be empty. In source an empty
+list is always omitted, along with its brackets, since Python's concrete syntax requires at least one element
+between brackets; the empty tuple type, for example, is written \pyinline{tuple[()]}.
 
 \subsection{Contexts}
 \label{sec:contexts}
 
-Metavariables $x$, $f$ and $c$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function and $c$ when it is expected to denote a class. A \emph{qualified name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}); a variable is thus a qualified name with a single component.
+Metavariables $x$, $f$, $c$ and $\alpha$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function, $c$ when it is expected to denote a class, and $\alpha$ when it is a type parameter. A \emph{name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}): a variable is a \emph{simple name}, and a name with at least one dot is \emph{qualified}. A name is \emph{fully qualified} when it is read from the root of the module hierarchy; modules (\secref{modules-programs}) and classes (Definition~\ref{def:class}) are identified by fully-qualified name.
 
 \begin{definition}[Context]
 \label{def:context}
@@ -40,42 +43,53 @@ take the following forms:
 {\normalfont
 \begin{center}
 \small
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.155\textwidth}>{\raggedright\arraybackslash}p{0.555\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.21\textwidth}>{\raggedright\arraybackslash}p{0.53\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Entry & Form & Records \\
 variable & $\tau$, $\DU{\tau}$, $\PU{\tau}$ or $\Unbound$ & type of definitely assigned variable; $\DU{\tau}$ if declared at $\tau$ and definitely unassigned; $\PU{\tau}$ if declared at $\tau$ and possibly unassigned; $\Unbound$ if its declaration has not been reached \\
 module stub & $\modStub{q}$ & module $q$, named but not loaded \\
-module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$ \\
+module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$, bound by an import \\
 class entry & $\Type{C}$ & name denotes class $C$ \\
+type parameter & $\TypeVar$ & name is a type parameter in scope \\
+type alias & $\TypeAlias{\seq{\alpha}}{\tau}$ & name denotes type $\tau$ with type parameters $\seq{\alpha}$ \\
+type scheme & $\scheme{\seq{\alpha}}{\tau}$ or $\PU{\scheme{\seq{\alpha}}{\tau}}$ & type of function bound by \pyinline{def}, generalised over one or more type parameters $\seq{\alpha}$; $\PU{\scheme{\seq{\alpha}}{\tau}}$ if possibly unassigned \\
 predefined name & $\predefName$ & name usable only in annotation or as decorator \\
 \end{tabular}
 \end{center}
 }
 \end{definition}
 
+\noindent A predefined name is a member of a predefined module whose meaning is fixed by the \thisdoc, such as \pyinline{list} or
+\pyinline{dataclass}; its entry records only that it is in scope, and it does not denote a value, so it cannot appear in
+an expression. A type parameter or type alias denotes a type rather than a value, so it too can be mentioned only by a type
+expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias{\seq{\alpha}}{\tau}$ are
+named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \pyinline{typing.TypeAliasType} of
+the objects denoted by a class name, type parameter or alias at run time.
+
+The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
+and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
+is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A function name with entry $\PU{\scheme{\seq{\alpha}}{\tau}}$ is bound at the type scheme $\scheme{\seq{\alpha}}{\tau}$ on some paths but not on all. A variable
+with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
+It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
+
 \begin{definition}[Class]
 \label{def:class}
-A class $C$ is a fully qualified name $\fq{q.c}$, written with a tilde: a module $q$ and a class name $c$ declared in $q$. A module
-declares each class name at most once, so the fully qualified name of a class is the identity of the
+A class $C$ is a fully-qualified name $q.c$: a module $q$ and a class name $c$ declared in $q$. A module
+declares each class name at most once, so the fully-qualified name of a class is the identity of the
 class. A class is also the type of its instances.
 \end{definition}
 
 \begin{definition}[Class table]
 \label{def:class-table}
 A class table $\Sigma$ is a finite map from classes to class table entries, with $\Sigma(C)$ of the form
-$\clsRec{\bind{\seq{x}}{\seq{\tau}}}{D}$: the distinct fields $\seq{x}$ of $C$ with their declared types
-$\seq{\tau}$, and its base class $D$, or $\bot$ if it has none. Every class named in $\Sigma$ is in
-$\dom(\Sigma)$, and the relation taking each class of $\Sigma$ to its base class is
+$\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{D[\seq{\sigma}]}$: the type parameters $\seq{\alpha}$ of $C$, its distinct fields $\seq{x}$ with their declared types
+$\seq{\tau}$, and its instantiated base class $D[\seq{\sigma}]$, or $\bot$ if it has none; the field types and the
+type arguments of the base may mention $\seq{\alpha}$. Every class named in $\Sigma$ is in
+$\dom(\Sigma)$, and the relation taking each class of $\Sigma$ to its base class $D$ is
 acyclic.
 \end{definition}
 
-\noindent The class table is borrowed from Featherweight Java~\cite{igarashi2001}. Module references arise from import statements. A predefined name is a
-member such as $\pyinline{Callable}$ or $\pyinline{dataclass}$ that no expression may mention: it names a
-type, heads a type form, or decorates a class declaration. The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
-and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
-is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A variable
-with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
-It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
+\noindent The class table is similar to Featherweight Java's~\cite{igarashi2001}; the well-formedness rules build the table as they check the class declarations of a program (\figref{typing-top-level}).
 
 \subsubsection{Context operations}
 \label{sec:context-operations}
@@ -97,11 +111,12 @@ otherwise right-biased like override. It is used in processing an import prefix,
 \label{sec:expressions-statements}
 
 Statements are sequenced by
-juxtaposition, $s\;s'$; a function body, a branch of a conditional and the body of a case are statements.
-A \emph{top-level statement} $t$ is a statement or a class declaration, also sequenced by juxtaposition; the body of a
-module after its imports is a top-level statement, so class declarations occur only at the top level of a
-module. A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal
-run of consecutive \pyinline{def} statements in a sequence: any other statement separates mutual
+juxtaposition, $s\;s'$; a function body, branch of a conditional and body of a case are statements.
+A \emph{top-level statement} $t$ is a statement, class declaration or \pyinline{type} statement, also sequenced by juxtaposition; the body of a
+module after its imports is a top-level statement, so class declarations and \pyinline{type} statements occur only at the top level of a
+module. A \pyinline{type} statement declares a \emph{type alias}. Function definitions, class declarations and
+\pyinline{type} statements bind \emph{type parameters} $\seq{\alpha}$, written in brackets after the name as in
+Python 3.12. A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal contiguous block of \pyinline{def} statements: any other statement separates mutual
 regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single mutual region. The well-formedness rules treat each
 mutual region as one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
@@ -112,16 +127,17 @@ mutual region as one mutually-recursive binding\paperonly{ (see \secref{mutual-r
 
 An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by
 keyword arguments $x = u$, where an argument $u$ is an expression in a constructor call and a pattern in a
-constructor pattern. The auxiliary function $\fieldMap$
+constructor pattern. A constructor call may also pass type arguments to the class; a constructor pattern
+cannot, since Python does not permit type arguments in a class pattern. The auxiliary function $\fieldMap{\Sigma}$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:field-map}}) pairs each field of the class
 with an argument: the positional arguments fill the leading fields in order, and a keyword argument $x = u$
-fills the field $x$. It is undefined unless every field receives exactly one argument.
+fills the field $x$. It is defined only if every field receives exactly one argument.
 
-\paragraph{Type annotations.}
+\speconly{\subsubsection{Type annotations}\label{sec:type-annotations}}%
+\paperonly{\paragraph{Type annotations.}}
 
 Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
-may be annotated (\figref{syntax-types}). A type expression names a class by a qualified name; a class $\fq{q}$, written with a tilde, does not occur in source text. A \emph{type} $\tau$ is a type expression whose class names have been resolved to classes; the type system resolves a type expression into a type\speconly{ (\secref{types})}. We write $\bind{\seq{x}}{\seq{\psi}}$ for the parameter list $\bind{x_1}{\psi_1}, \ldots,
-\bind{x_n}{\psi_n}$.
+may be annotated (\figref{syntax-types}). A dataclass specifies its base class by a type expression of the form $q[\seq{\psi}]$. A \emph{type} $\tau$ has the forms of a type expression, with an \emph{instantiated class} $C[\seq{\tau}]$, a class applied to type arguments and written $C$ when there are no arguments, in place of $q[\seq{\psi}]$. Resolution\speconly{ (\secref{types})} takes $q[\seq{\psi}]$ to $C[\seq{\tau}]$ when $q$ denotes the class $C$, and to the instantiation of the alias when $q$ denotes a type alias. The substitution $\subst{\seq{\tau}}{\seq{\alpha}}{\sigma}$ replaces each occurrence of $\alpha_i$ in $\sigma$ by $\tau_i$, a plain replacement, since every type variable in a type is free, and is defined only if $\seq{\tau}$ and $\seq{\alpha}$ have the same length. A \emph{scheme} $\pi$ (\figref{syntax-types}) binds type parameters $\seq{\alpha}$ in its body. The body of a \emph{type scheme} $\scheme{\seq{\alpha}}{\tau}$ is a type; the body of a \emph{field scheme} $\scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}$ is a sequence of fields $\seq{x}$ with their types $\seq{\tau}$. The \emph{instantiation} of $\pi$ at $\seq{\sigma}$, written $\tyInst{\pi}{\seq{\sigma}}$, substitutes $\seq{\sigma}$ for $\seq{\alpha}$ in the body: $\subst{\seq{\sigma}}{\seq{\alpha}}{\tau}$ for a type scheme and $\bind{\seq{x}}{\subst{\seq{\sigma}}{\seq{\alpha}}{\seq{\tau}}}$ for a field scheme. A scheme without type parameters is its body, with the $\forall\seq{\alpha}$ omitted. The fields of a class (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:fields}}) form a field scheme.
 
 \subsubsection{Operators}
 \label{sec:syntax-operators}
@@ -144,7 +160,7 @@ $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
 $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
 $\seq{\iota}$, its \emph{import prefix}, followed by a top-level statement $t$; since imports are not statements, they can appear neither
 within a statement nor after it. The statement begins with the
-assignment $\exAssign{\pymath{\_\_name\_\_}}{\nameOf(q)}$, which binds the name of the module when the module
+declaration $\exAssign{\pymath{\_\_name\_\_}\exAnnot{\tyStr}}{\nameOf(q)}$, which binds the name of the module when the module
 loads (\secref{well-formedness-modules}).
 
 A second map $\mathcal{P}$ gives the
@@ -162,9 +178,10 @@ definitions that follow.
 \label{def:predefined}
 $\mathcal{P}$ takes each module $q$ of \figref{predefined-values} to a pair $(\Gamma, \rho)$, where $\Gamma$
 binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \figref{predefined-signatures}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value
-(\figref{predefined-values}). These signatures name types
+(\figref{predefined-values}). A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
-the predefined signatures.
+the predefined signatures. The class table $\SigmaPredef$ of the predefined modules has the single entry
+$\SigmaPredef(\clsRange) = \clsRec{\varepsilon}{\bind{\pyinline{stop}}{\tyInt}}{\bot}$.
 \end{definition}
 
 \input{spec/fig/predefined-signatures}

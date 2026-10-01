@@ -1,0 +1,153 @@
+\begin{figure}
+\setlength{\jot}{2pt}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{instance-above}}]
+{
+  \Sigma \vdash \tau \subty C[\seq{\sigma}] \\
+  \seq{\sigma}' \tyEquiv \seq{\sigma} \text{ whenever } \Sigma \vdash \tau \subty C[\seq{\sigma}']
+}
+{
+  \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau
+}
+\and
+\inferrule*[lab={\ruleName{instance-below}}]
+{
+  \Sigma \vdash C[\seq{\sigma}] \subty \tau \\
+  \seq{\sigma}' \tyEquiv \seq{\sigma} \text{ whenever } \Sigma \vdash C[\seq{\sigma}'] \subty \tau
+}
+{
+  \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau
+}
+\end{mathpar}
+\subcaption{$C[\seq{\sigma}]$ is the instance of $C$ at $\tau$}
+\label{fig:instance}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash p \checks \tau \binding \Delta$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{check-var}}]
+{
+  \Gamma(x) = \Unbound
+}
+{
+  \Sigma; \Gamma \vdash x \checks \tau \binding \set{\bind{x}{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{check-wild}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma \vdash \patWild \checks \tau \binding \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{check-literal}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma \vdash \ell \checks \tau \binding \varnothing
+}
+\and
+\inferrule*[lab={\ruleName{check-as}}]
+{
+  \Gamma(x) = \Unbound \\
+  \Sigma; \Gamma \vdash p \checks \tau \binding \Delta
+}
+{
+  \Sigma; \Gamma \vdash p\;\pyinline{as}\;x \checks \tau \binding \Delta \disjunion \set{\bind{x}{\matchedAs{\Sigma}(\Gamma, \tau, p)}}
+}
+\and
+\inferrule*[lab={\ruleName{check-union}}]
+{
+  \Sigma; \Gamma \vdash p \checks \sigma \binding \Delta \\
+  \Sigma; \Gamma \vdash p \checks \tau \binding \Delta'
+}
+{
+  \Sigma; \Gamma \vdash p \checks \tyUnion{\sigma}{\tau} \binding \set{\bind{x}{\joinTy{\Sigma}{\Delta(x)}{\Delta'(x)}} \mid x \in \binds(p)}
+}
+\and
+\inferrule*[lab={\ruleName{check-tuple}}]
+{
+  \Sigma; \Gamma \vdash p_i \checks \tau_i \binding \Delta_i \quad (\forall i)
+}
+{
+  \Sigma; \Gamma \vdash \patTuple{p_1, \ldots, p_n} \checks \tyTuple{\tau_1, \ldots, \tau_n} \binding \Delta_1 \disjunion \cdots \disjunion \Delta_n
+}
+\and
+\inferrule*[lab={\ruleName{check-tuple-none}}]
+{
+  \tau \text{ has no list values} \\
+  \text{no disjunct of } \tau \text{ a tuple type of length } |\seq{p}|
+}
+{
+  \Sigma; \Gamma \vdash \patTuple{\seq{p}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\patTuple{\seq{p}})}
+}
+\and
+\inferrule*[lab={\ruleName{check-list}}]
+{
+  \Sigma; \Gamma \vdash p_i \checks \tau \binding \Delta_i \quad (\forall i)
+}
+{
+  \Sigma; \Gamma \vdash \patList{\seq{p}} \checks \tyList{\tau} \binding \Delta_1 \disjunion \cdots \disjunion \Delta_n
+}
+\and
+\inferrule*[lab={\ruleName{check-list-none}}]
+{
+  \tau \text{ has no tuple values} \\
+  \text{no disjunct of } \tau \text{ a list type}
+}
+{
+  \Sigma; \Gamma \vdash \patList{\seq{p}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\patList{\seq{p}})}
+}
+\and
+\inferrule*[lab={\ruleName{check-dict}}]
+{
+  \Sigma; \Gamma \vdash p_i \checks \tau \binding \Delta_i \quad (\forall i)
+}
+{
+  \Sigma; \Gamma \vdash \patDict{\bind{\seq{w}}{\seq{p}}} \checks \tyDict{\tau} \binding \Delta_1 \disjunion \cdots \disjunion \Delta_n
+}
+\and
+\inferrule*[lab={\ruleName{check-dict-none}}]
+{
+  \text{no disjunct of } \tau \text{ a dictionary type}
+}
+{
+  \Sigma; \Gamma \vdash \patDict{\bind{\seq{w}}{\seq{p}}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\patDict{\bind{\seq{w}}{\seq{p}}})}
+}
+\and
+\inferrule*[lab={\ruleName{check-constr}}]
+{
+  \Gamma \vdash q : \Type{C} \\
+  \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau \\
+  \tyInst{\fields{\Sigma}(C)}{\seq{\sigma}} = \bind{\seq{x}}{\seq{\sigma}'} \\
+  \fieldMap{\Sigma}(C, a) = \set{\bind{\seq{x}}{\seq{p}}} \\
+  \Sigma; \Gamma \vdash p_i \checks \sigma'_i \binding \Delta_i \quad (\forall i)
+}
+{
+  \Sigma; \Gamma \vdash \patConstr{q}{a} \checks \tau \binding \Delta_1 \disjunion \cdots \disjunion \Delta_n
+}
+\and
+\inferrule*[lab={\ruleName{check-constr-none}}]
+{
+  \Gamma \vdash q : \Type{C} \\
+  \Sigma \nvdash \tau \subty C[\seq{\sigma}] \text{ and } \Sigma \nvdash C[\seq{\sigma}] \subty \tau \quad (\forall \seq{\sigma})
+}
+{
+  \Sigma; \Gamma \vdash \patConstr{q}{a} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\patConstr{q}{a})}
+}
+\end{mathpar}
+\subcaption{Pattern $p$ checks against type $\tau$, binding $\Delta$}
+\label{fig:checking-pat}
+\end{subfigure}
+\caption{Pattern checking}
+\label{fig:pattern-checking}
+\end{figure}

@@ -11,7 +11,7 @@
   \tau \text{ not a literal type}
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\tau}{H}, \ell \splits \set{\shapeAny{\tyLiteral{\ell}}{\varnothing}}, \shapes(\Sigma, \tau, H \cup \set{\ell})
+  \Sigma; \Gamma \vdash \shapeAny{\tau}{H}, \ell \splits \set{\shapeAny{\tyLiteral{\ell}}{\varnothing}}, \shapes{\Sigma}(\tau, H \cup \set{\ell})
 }
 \and
 \inferrule*[lab={\ruleName{split-tuple}}]
@@ -19,7 +19,7 @@
   |\seq{\tau}| = |\seq{p}|
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\tyTuple{\seq{\tau}}}{\varnothing}, \patTuple{\seq{p}} \splits \set{\patTuple{\seq{k}} \mid \seq{k} \in \shapes(\Sigma, \seq{\tau})}, \varnothing
+  \Sigma; \Gamma \vdash \shapeAny{\tyTuple{\seq{\tau}}}{\varnothing}, \patTuple{\seq{p}} \splits \set{\patTuple{\seq{k}} \mid \seq{k} \in \shapes{\Sigma}(\seq{\tau})}, \varnothing
 }
 \and
 \inferrule*[lab={\ruleName{split-list}}]
@@ -28,7 +28,7 @@
   \headList{n} \notin H
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\tyList{\tau}}{H}, \patList{\seq{p}} \splits \set{\shapeList{\tau}{\seq{k}} \mid \seq{k} \in \shapes(\Sigma, \tau, \varnothing)^n}, \shapes(\Sigma, \tyList{\tau}, H \cup \set{\headList{n}})
+  \Sigma; \Gamma \vdash \shapeAny{\tyList{\tau}}{H}, \patList{\seq{p}} \splits \set{\shapeList{\tau}{\seq{k}} \mid \seq{k} \in \shapes{\Sigma}(\tau, \varnothing)^n}, \shapes{\Sigma}(\tyList{\tau}, H \cup \set{\headList{n}})
 }
 \and
 \inferrule*[lab={\ruleName{split-dict}}]
@@ -37,32 +37,34 @@
   w_j \in \dom(\beta) \quad (\forall j < i)
 }
 {
-  \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{H}, \patDict{\bind{\seq{w}}{\seq{p}}} \splits \set{\shapeDict{\tau}{\beta \override \set{\bind{w_i}{k}}}{H} \mid k \in \shapes(\Sigma, \tau, \varnothing)}, \set{\shapeDict{\tau}{\beta}{(H \cup \set{w_i})}}
+  \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{H}, \patDict{\bind{\seq{w}}{\seq{p}}} \splits \set{\shapeDict{\tau}{\beta \override \set{\bind{w_i}{k}}}{H} \mid k \in \shapes{\Sigma}(\tau, \varnothing)}, \set{\shapeDict{\tau}{\beta}{(H \cup \set{w_i})}}
 }
 \and
 \inferrule*[lab={\ruleName{split-class}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \ancestors(\Sigma, C) \cap H = \varnothing \\
-  D = \meetTy{\Sigma}{\tau}{C} \\
-  \fields(\Sigma, D) = \bind{\seq{x}}{\seq{\sigma}} \\
-  H' = \set{h \in H \mid \Sigma \vdash h : D}
+  \ancestors{\Sigma}(C) \cap H = \varnothing \\
+  \Sigma \vdash C[\seq{\tau}'] \instanceAt \tau \\
+  \meetTy{\Sigma}{\tau}{C[\seq{\tau}']} = D[\seq{\sigma}] \\
+  \tyInst{\fields{\Sigma}(D)}{\seq{\sigma}} = \bind{\seq{x}}{\seq{\sigma}'} \\
+  H' = \set{h \in H \mid \Sigma \vdash h : D[\seq{\sigma}]}
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\tau}{H}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{D}{\seq{k}}}{H'} \mid \seq{k} \in \shapes(\Sigma, \seq{\sigma})}, \shapes(\Sigma, \tau, H \cup \set{C})
+  \Sigma; \Gamma \vdash \shapeAny{\tau}{H}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{D[\seq{\sigma}]}{\seq{k}}}{H'} \mid \seq{k} \in \shapes{\Sigma}(\seq{\sigma}')}, \shapes{\Sigma}(\tau, H \cup \set{C})
 }
 \and
 \inferrule*[lab={\ruleName{split-subclass}}]
 {
   \Gamma \vdash q : \Type{D} \\
-  \Sigma \vdash D \subty C \\
+  \Sigma \vdash D[\seq{\sigma}] \instanceAt C[\seq{\tau}] \\
+  \Sigma \vdash D[\seq{\sigma}] \subty C[\seq{\tau}] \\
   D \neq C \\
-  \ancestors(\Sigma, D) \cap H = \varnothing \\
-  \fields(\Sigma, D) = \fields(\Sigma, C) \mathbin{\concat} \bind{\seq{y}}{\seq{\sigma}} \\
-  H' = \set{h \in H \mid \Sigma \vdash h : D}
+  \ancestors{\Sigma}(D) \cap H = \varnothing \\
+  \tyInst{\fields{\Sigma}(D)}{\seq{\sigma}} = \tyInst{\fields{\Sigma}(C)}{\seq{\tau}} \mathbin{\concat} \bind{\seq{y}}{\seq{\sigma}'} \\
+  H' = \set{h \in H \mid \Sigma \vdash h : D[\seq{\sigma}]}
 }
 {
-  \Sigma; \Gamma \vdash \shapeAny{\patConstr{C}{\seq{k}}}{H}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{D}{\seq{k} \mathbin{\concat} \seq{k}\,'}}{H'} \mid \seq{k}\,' \in \shapes(\Sigma, \seq{\sigma})}, \set{\shapeAny{\patConstr{C}{\seq{k}}}{(H \cup \set{D})}}
+  \Sigma; \Gamma \vdash \shapeAny{\patConstr{C[\seq{\tau}]}{\seq{k}}}{H}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{D[\seq{\sigma}]}{\seq{k} \mathbin{\concat} \seq{k}\,'}}{H'} \mid \seq{k}\,' \in \shapes{\Sigma}(\seq{\sigma}')}, \set{\shapeAny{\patConstr{C[\seq{\tau}]}{\seq{k}}}{(H \cup \set{D})}}
 }
 \end{mathpar}
 \caption{Shape $k$ splits at the head tested by $p$, giving shapes $K$ and residual $L$}

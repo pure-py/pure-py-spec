@@ -4,93 +4,82 @@
 
 ## [v0.17.0](https://github.com/pure-py/pure-py-spec/releases/download/v0.17.0/PurePy-spec.pdf)
 
-PurePy defines a pure (side-effect free) subset of Python, intended initially for use by researchers in
-programming languages and programming pedagogy, with a view to evolving it into a common language for scientific computing, supporting efficient, portable applications in modelling, data processing, data analysis and visualisation.
+PurePy is a pure (side-effect free) subset of Python, intended initially for researchers in programming
+languages and programming pedagogy, and in the longer term as a common language for scientific computing,
+supporting efficient, portable applications in modelling, data processing, data analysis and visualisation.
 
-The PurePy language standard will define a (versioned) formal grammar for the language, a formal semantics, and a reference interpreter.
-All languages which are PurePy-compliant must accept any valid PurePy program and are
-expected to behave in a way which conforms to, or at least coheres with, the formal semantics.
+The specification defines a versioned formal grammar and a formal semantics for the language, and `src/`
+holds a reference checker. A PurePy-compliant language accepts every valid PurePy program and is expected
+to conform to the formal semantics.
 
 ## Project structure
 
-- `paper.tex` — the paper
-- `PurePy-spec.tex` — the language specification as a standalone document, separate from the paper (#134)
-- `spec/` — the specification's sources; the paper is assembled from these
-- `paper/` — material that belongs only to the paper
-- `tex/` — macros and bibliography shared by both documents
-- `graduality.tex`, `graduality/` — draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
-- `agda/` — Agda mechanisation (distributivity proof), likely to migrate to Isabelle
-- `isabelle-purepy/` — Isabelle/HOL mechanisation, a submodule of the `isabelle-purepy` repository
-- `src/` — reference checker (Python `ast`-based), organised to mirror the spec's sections
-- `test/` — litmus tests
+- `paper.tex`: the paper
+- `PurePy-spec.tex`: the language specification, a standalone document
+- `spec/`: sources of the specification, from which the paper is also assembled
+- `paper/`: material belonging only to the paper
+- `tex/`: macros and bibliography shared by both documents
+- `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
+- `agda/`: Agda mechanisation of the distributivity proof
+- `isabelle-purepy/`: Isabelle/HOL mechanisation, a submodule of the `isabelle-purepy` repository
+- `src/`: reference checker, built on Python's `ast` and organised to mirror the sections of the specification
+- `test/`: litmus tests
 
-The specification is the source of truth; the paper is built from its sections and definitions.
-Material that belongs only to the paper is kept under `paper/`. To insert such material into a shared
-section, write `\paperinput{file}` in the specification source where the material should go. The paper
-includes the file at that point; the specification does not. `\specinput{file}` is the reverse: the
-specification includes the file and the paper does not. `\paperonly{...}` and `\speconly{...}` do the
-same for a phrase. The subfolders of `spec/` are self-explanatory, except that `spec/rules/` holds any
-rules the paper needs to include on an individual basis, so that each has one source; all other rules
-live in their figures.
+`\paperinput{file}` at a point in a specification source includes the file in the paper only, and
+`\specinput{file}` in the specification only; `\paperonly{...}` and `\speconly{...}` restrict a phrase to
+one document. Rules included individually in the paper are defined in `spec/rules/`, so that each rule has
+one source; all other rules are defined in the figures.
 
 ## Building
 
 See the Makefile.
 
-## Running tests
+## Tests
 
-Install [uv](https://docs.astral.sh/uv/). The Python version is the one in `.python-version`, which uv,
-the workflows, mypy and the specification all read; `pyproject.toml` gives only the lower bound
-([#39](https://github.com/pure-py/pure-py-spec/issues/39)).
-
-From the repository root, run:
+Install [uv](https://docs.astral.sh/uv/). The Python version in `.python-version` is read by uv, the
+workflows, mypy and the specification; `pyproject.toml` gives only the lower bound. From the repository root:
 
 ```bash
 uv run --locked ./test/run-all.sh
 ```
 
-This command creates the project environment, installs the locked development
-dependencies, and runs the test suite.
+The command creates the project environment, installs the locked development dependencies and runs the suite,
+which begins with mypy and ruff over `src/`.
+
+Tests are organised by tier, `module-level/` and `program-level/`, then by verdict and stage; the runner
+derives every assertion from the path. A module-level test is a `.py` file with expectation files as siblings
+(`.expected`, `.error.expected`, `.exception.expected`, `.status.expected`); a program-level test is a
+directory holding `main.py`, the expectation files of `main.py` and the other modules of the program.
+
+- `semantically-valid/`: accepted by PurePy; runs under Python with the expected output and type-checks under mypy (`test/mypy.ini`)
+- `excluded/`: accepted by Python but excluded by PurePy, in `syntactic/` at parse, in `static/` at check and in `dynamic/` at run time
+- `python-error/`: rejected by both languages, with stages as above plus `syntactic-only/`, whose tests construct the form as an AST because Python source cannot express the form
+- `semantically-valid/pending/`: not yet accepted by the checker
+
+The runner requires an `excluded` test to run under Python and a `python-error` test to raise, so a test has
+either `.expected` or `.exception.expected` and a misfiled test fails. A test that exits with a nonzero status
+through `sys.exit` states the status in `.status.expected`.
 
 ## Development
 
-Synchronize the project environment and install the development dependencies:
+Synchronise the project environment and install the development dependencies:
 
 ```bash
 uv sync --locked
 ```
 
-Apply Ruff formatting:
+Format the sources:
 
 ```bash
 uv run --locked ruff format ./src ./test/run-all.py
 ```
 
-When changing project dependencies or metadata, run:
-
-```bash
-uv lock
-```
-
-Review and commit the resulting changes to:
-
-```text
-pyproject.toml
-uv.lock
-```
-
-Tests are organised by tier (module-level and program-level) and then by verdict. The verdict directory *is* the test's specification: the runner derives every assertion from the path.
-- `semantically-valid/` — PurePy accepts; Python runs it and gives the same result
-- `excluded/` — Python accepts but PurePy excludes by design; `syntactic/` is rejected at parse, `static/` at check, `dynamic/` at run time
-- `python-error/` — neither language gives a result (a genuine error); stages as above, plus `syntactic-only/`, tested via AST construction (not expressible as `.py`)
-- `pending/` — not yet decided by the checker; `semantically-valid/pending/` will become semantically valid, `<verdict>/static/pending/` will be rejected at check
-- `semantically-valid/mypy-incompatible/` — PurePy accepts but mypy rejects; each is a to-do for [#92](https://github.com/pure-py/pure-py-spec/issues/92), not an accepted difference. Every other semantically-valid test must type-check under mypy (`test/mypy.ini`)
-
-The invariant — `excluded` ⇒ Python runs it, `python-error` ⇒ Python raises — is enforced by the runner (a test must carry `.expected` xor `.exception.expected`), so a misfiled test fails.
+After changing dependencies or metadata in `pyproject.toml`, run `uv lock` and commit `pyproject.toml` and
+`uv.lock`.
 
 ## Reference checker (`src/`)
 
-Check a single module, or a whole program from its entry module:
+Check a single module, or a whole program from the entry module:
 
 ```bash
 uv run --locked python src/check_module.py path/to/module.py
@@ -100,50 +89,34 @@ uv run --locked python src/check_program.py path/to/main.py
 ## PLDI 2027 submission
 
 `make paper-submission` builds the anonymised paper and `supplementary.zip`, which carries the anonymised
-specification and the Isabelle mechanisation. It refuses to build unless the `isabelle-purepy` submodule is
-checked out, has no uncommitted changes, and sits at a commit that is on `origin/main`, so a
-submission never ships a working copy. Check it out with:
+specification and the Isabelle mechanisation. The target refuses to build unless the `isabelle-purepy`
+submodule is checked out, has no uncommitted changes and sits at a commit on `origin/main`, so a submission
+never ships a working copy. Check the submodule out with:
 
 ```bash
 git submodule update --init
 ```
 
-The mechanisation is type checked before packaging, so `isabelle` must be on `PATH`; the submodule's
-README gives the required version and installation steps. The `Build` GitHub Action runs `make all`,
-which includes this target, on every push to validate the build, but the submission is always built
-locally.
+The mechanisation is type checked before packaging, so `isabelle` must be on `PATH`; the README of the
+submodule gives the required version and installation steps. The `Build` GitHub Action runs `make all`, which
+includes the submission target, on every push, but the submission is always built locally.
 
 ## Release workflow
 
-Run the `Bump version` GitHub Action manually with a version in the form `x.y.z` (for example, `0.1.4`).
-This updates version numbers on `main`, commits them, creates and pushes tag `v0.1.4`, then builds `PurePy-spec.pdf` and uploads it to the GitHub Release for that tag.
+Run the `Bump version` GitHub Action manually with a version in the form `x.y.z` (for example, `0.1.4`). The
+action updates and commits the version numbers on `main`, creates and pushes the tag `v0.1.4`, then builds
+`PurePy-spec.pdf` and attaches the PDF to the GitHub Release for the tag.
 
 ### Zotero export settings
 
-Use the [PurePy Zotero library](https://www.zotero.org/groups/6458996/purepy/library) for bibliography
-management. Install the Better BibTeX plugin, with the following modifications to the default settings to
-avoid spurious diffs:
+Bibliography management uses the [PurePy Zotero library](https://www.zotero.org/groups/6458996/purepy/library).
+Install the Better BibTeX plugin with the following changes to the default settings, which avoid spurious diffs:
+
 - Citation key formula: auth.lower + year
 - Fields to omit from export: abstract, keywords
 
 Export the library to `tex/zotero-export.bib`. A reference not yet in the library goes in
-`tex/additional-refs.bib` by hand until it is imported.
-
-## Existing implementations
-
-Languages/language implementations we would like to be PurePy compliant:
-
-- Python
-- JAX
-- [Fluid](https://github.com/explorable-viz/fluid)
-- fortl
-
-Fluid will require some changes to be PurePy-compliant, especially with regard to lists, which in some ways look in some ways like Python lists, but behave quite differently. (There is no equivalent of "cons" in Python.)
-
-## Long-term aims
-
-The longer-term aim is to stimulate new language developments to support science. Centering around a common syntax
-eases adoption and engagement with these new language techniques and ideas. In later version we may add support for type annotations, [Python array API](https://data-apis.org/array-api/latest/)-compatible arrays, and other features.
+`tex/additional-refs.bib` by hand until imported.
 
 ## Design concerns
 

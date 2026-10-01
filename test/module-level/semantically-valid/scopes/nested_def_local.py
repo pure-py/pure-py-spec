@@ -1,4 +1,4 @@
-# rule: seq
+# rule: def-body
 def f() -> int:
     def g() -> int:
         z: int = 1

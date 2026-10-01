@@ -1,1 +1,1 @@
-class declaration only at module top level
+class declaration outside the module top level prohibited

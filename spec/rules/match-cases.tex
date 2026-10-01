@@ -1,18 +1,18 @@
 \inferrule*[lab={\ruleName{match-case}}]
 {
-  \seqSafe(\Sigma, \Gamma, p, \sigma) \\
-  \Sigma; \Gamma \vdash L, p \matches K, L' \binding \Delta \\
+  \Sigma; \Gamma \vdash p \checks \tau \binding \Delta \\
+  \Sigma; \Gamma \vdash L, p \matches K, L' \\
   \Sigma; \Gamma \override \Delta; \zeta \vdash s : R
 }
 {
-  \Sigma; \Gamma; \zeta; \sigma \vdash L, \exCase{p}{s} : \Assigns{\Delta} \override R, L'
+  \Sigma; \Gamma; \zeta \vdash \tau, L, \exCase{p}{s} : \Assigns{\Delta} \override R, \remaining{\Sigma}(\Gamma, \tau, p), L'
 }
 \and
 \inferrule*[lab={\ruleName{match-cases}}]
 {
-  \Sigma; \Gamma; \zeta; \sigma \vdash L, b : S, L' \\
-  \Sigma; \Gamma; \zeta; \sigma \vdash L', \seq{b} : S', L^\dagger
+  \Sigma; \Gamma; \zeta \vdash \tau, L, b : S, \sigma, L' \\
+  \Sigma; \Gamma; \zeta \vdash \sigma, L', \seq{b} : S', \tau', L^\dagger
 }
 {
-  \Sigma; \Gamma; \zeta; \sigma \vdash L, b \cons \seq{b} : S \merge S', L^\dagger
+  \Sigma; \Gamma; \zeta \vdash \tau, L, b \cons \seq{b} : S \merge S', \tau', L^\dagger
 }

@@ -1,0 +1,1 @@
+cases leave remaining type tuple[bool, bool], so the function does not always return (mypy compatibility)

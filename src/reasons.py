@@ -1,7 +1,7 @@
 import ast
 from dataclasses import dataclass
 
-from type_syntax import QualifiedName, Type, Var, render
+from type_syntax import Name, Type, Var, render
 
 
 @dataclass(frozen=True)
@@ -32,9 +32,11 @@ class UnassignedVariable:
 @dataclass(frozen=True)
 class PossiblyUnassigned:
     x: Var
+    declared_in_branch: bool
 
     def message(self) -> str:
-        return f"'{self.x}' is not definitely assigned"
+        qualifier = ": declared in a branch" if self.declared_in_branch else ""
+        return f"'{self.x}' is not definitely assigned{qualifier}"
 
 
 @dataclass(frozen=True)
@@ -137,11 +139,37 @@ class NotPredefinedName:
 
 
 @dataclass(frozen=True)
+class RangePattern:
+    def message(self) -> str:
+        return "'range' not permitted in a constructor pattern"
+
+
+@dataclass(frozen=True)
 class NotClass:
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"'{self.q}' is not a declared class"
+
+
+@dataclass(frozen=True)
+class ClassArityMismatch:
+    q: Name
+    expected: int
+    given: int
+
+    def message(self) -> str:
+        return f"class '{self.q}' expects {self.expected} type arguments, given {self.given}"
+
+
+@dataclass(frozen=True)
+class TypeAliasArityMismatch:
+    q: Name
+    expected: int
+    given: int
+
+    def message(self) -> str:
+        return f"type alias '{self.q}' expects {self.expected} type arguments, given {self.given}"
 
 
 @dataclass(frozen=True)
@@ -180,7 +208,7 @@ class NonlinearPattern:
 @dataclass(frozen=True)
 class DuplicateMember:
     x: Var
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return (
@@ -191,7 +219,7 @@ class DuplicateMember:
 
 @dataclass(frozen=True)
 class SubmoduleNotImported:
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"submodule '{self.q}' is not imported"
@@ -200,7 +228,7 @@ class SubmoduleNotImported:
 @dataclass(frozen=True)
 class UnassignedMember:
     x: Var
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"member '{self.x}' of module '{self.q}' is not definitely assigned"
@@ -214,16 +242,24 @@ class TopLevelReturn:
 
 @dataclass(frozen=True)
 class UnknownModule:
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"unknown module '{self.q}'"
 
 
 @dataclass(frozen=True)
+class DuplicateImportedName:
+    x: Var
+
+    def message(self) -> str:
+        return f"name '{self.x}' imported twice"
+
+
+@dataclass(frozen=True)
 class UnknownMember:
     x: Var
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"module '{self.q}' has no member '{self.x}'"
@@ -231,7 +267,7 @@ class UnknownMember:
 
 @dataclass(frozen=True)
 class ModuleAsValue:
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"'{self.q}' refers to a module; modules are not first-class values"
@@ -239,8 +275,8 @@ class ModuleAsValue:
 
 @dataclass(frozen=True)
 class ImportOfContainedModule:
-    q: QualifiedName
-    q_: QualifiedName
+    q: Name
+    q_: Name
     from_import: str
 
     def message(self) -> str:
@@ -252,15 +288,47 @@ class ImportOfContainedModule:
 
 @dataclass(frozen=True)
 class PredefinedNameAsValue:
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"'{self.q}' is usable only in annotations or as a decorator"
 
 
 @dataclass(frozen=True)
+class TypeParameterAsValue:
+    x: str
+
+    def message(self) -> str:
+        return f"'{self.x}' is a type parameter, usable only in annotations"
+
+
+@dataclass(frozen=True)
+class TypeSchemeAsValue:
+    q: Name
+
+    def message(self) -> str:
+        return f"type arguments of '{self.q}' cannot be inferred"
+
+
+@dataclass(frozen=True)
+class NoTypeArgument:
+    alpha: Var
+
+    def message(self) -> str:
+        return f"type parameter '{self.alpha}' has no type argument"
+
+
+@dataclass(frozen=True)
+class TypeAliasAsValue:
+    q: Name
+
+    def message(self) -> str:
+        return f"'{self.q}' is a type alias, usable only in annotations"
+
+
+@dataclass(frozen=True)
 class ClassAsValue:
-    q: QualifiedName
+    q: Name
 
     def message(self) -> str:
         return f"'{self.q}' refers to a class; classes are not first-class values"
@@ -291,6 +359,22 @@ class NotCallable:
 
     def message(self) -> str:
         return f"values of type {render(self.tau)} cannot be called"
+
+
+@dataclass(frozen=True)
+class KeywordArgumentsNotConstructor:
+    def message(self) -> str:
+        return "keyword arguments in a call other than a constructor call"
+
+
+@dataclass(frozen=True)
+class DuplicateParameter:
+    x: Var
+    f: Var | None
+
+    def message(self) -> str:
+        where = "lambda" if self.f is None else f"function '{self.f}'"
+        return f"duplicate parameter '{self.x}' in {where}"
 
 
 @dataclass(frozen=True)
@@ -344,10 +428,19 @@ class TupleIndexOutOfRange:
 
 @dataclass(frozen=True)
 class UnreachableCase:
-    index: int
+    pattern: str
 
     def message(self) -> str:
-        return f"case {self.index} is unreachable"
+        return f"case {self.pattern} is unreachable"
+
+
+@dataclass(frozen=True)
+class PatternClassUndetermined:
+    c: Var
+    tau: Type
+
+    def message(self) -> str:
+        return f"type arguments of '{self.c}' in pattern not determined by type {render(self.tau)}"
 
 
 @dataclass(frozen=True)
@@ -356,7 +449,8 @@ class SequenceKindMismatch:
     tau: Type
 
     def message(self) -> str:
-        return f"{self.kind} pattern requires values of {self.kind} type, not {render(self.tau)}"
+        other = "list" if self.kind == "tuple" else "tuple"
+        return f"{self.kind} pattern at {render(self.tau)}, which has {other} values"
 
 
 @dataclass(frozen=True)
@@ -377,6 +471,12 @@ class UnknownField:
 
 
 @dataclass(frozen=True)
+class NoneResult:
+    def message(self) -> str:
+        return "call returning None used as an expression"
+
+
+@dataclass(frozen=True)
 class NotSynthesised:
     def message(self) -> str:
         return "cannot infer type of this expression"
@@ -391,12 +491,31 @@ class NoAttributes:
 
 
 @dataclass(frozen=True)
+class BareReturn:
+    tau: Type
+
+    def message(self) -> str:
+        return f"bare return in function with result type {render(self.tau)}"
+
+
+@dataclass(frozen=True)
 class MissingReturn:
     x: Var
     tau: Type
 
     def message(self) -> str:
         return f"'{self.x}' declares result type {render(self.tau)} but does not always return"
+
+
+@dataclass(frozen=True)
+class MissingReturnMatchPartial:
+    remaining: Type
+
+    def message(self) -> str:
+        return (
+            f"cases leave remaining type {render(self.remaining)}, "
+            "so the function does not always return"
+        )
 
 
 type Reason = (
@@ -415,14 +534,22 @@ type Reason = (
     | ConstructorArityMismatch
     | PatternArityMismatch
     | NotClass
+    | RangePattern
+    | ClassArityMismatch
+    | TypeAliasArityMismatch
     | NotPredefinedName
     | UnknownFieldInPattern
     | DuplicatePatternKeyword
     | UnknownModule
+    | DuplicateImportedName
     | UnknownMember
     | ModuleAsValue
     | ClassAsValue
     | PredefinedNameAsValue
+    | TypeParameterAsValue
+    | TypeSchemeAsValue
+    | NoTypeArgument
+    | TypeAliasAsValue
     | UnknownConstructorKeyword
     | DuplicateDictKey
     | NonlinearPattern
@@ -435,14 +562,20 @@ type Reason = (
     | NoUnaryOverload
     | NotCallable
     | CallArityMismatch
+    | KeywordArgumentsNotConstructor
+    | DuplicateParameter
+    | NoneResult
     | TypeMismatch
     | LambdaTypeMismatch
     | NotSubscriptable
     | TupleIndexOutOfRange
+    | BareReturn
     | MissingReturn
+    | MissingReturnMatchPartial
     | NotIterable
     | SequenceKindMismatch
     | UnreachableCase
+    | PatternClassUndetermined
     | NotSynthesised
     | NoAttributes
     | UnknownField
@@ -461,8 +594,16 @@ class IllFormedModule(IllFormed):
         self.line: int | None = getattr(node, "lineno", None)
         self.col: int | None = getattr(node, "col_offset", None)
         self.msg = reason.message()
-        self.module: QualifiedName | None = None
+        self.module: Name | None = None
         super().__init__(self.msg)
+
+
+class MypyCompatibility(IllFormedModule):
+    """Ill-formedness required only for compatibility with mypy."""
+
+    def __init__(self, node: ast.AST, reason: Reason):
+        super().__init__(node, reason)
+        self.msg = f"{self.msg} (mypy compatibility)"
 
 
 class IllFormedProgram(IllFormed):

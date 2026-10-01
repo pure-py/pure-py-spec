@@ -8,6 +8,7 @@
  & \pyinline{len} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
  & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
  & & $\quad \primFn(\seq{u}) = \aborts{\errType}$ & otherwise \\
+ & \pyinline{range} & \multicolumn{2}{l}{$\Type{\clsRange}$} \\
  & \pyinline{None} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{None}}$} \\
  & \pyinline{object} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{object}}$} \\
  & \pyinline{bool} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{bool}}$} \\
@@ -29,7 +30,6 @@
  & \pyinline{ceil} & & \\
 \pyinline{sys} & \pyinline{argv} & & \\
  & \pyinline{exit} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
- & & $\quad \primFn(\varepsilon) = \aborts{\errExit{0}}$ & \\
  & & $\quad \primFn(n) = \aborts{\errExit{n}}$ & \\
 \pyinline{typing} & \pyinline{Callable} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Callable}}$} \\
  & \pyinline{Literal} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Literal}}$} \\

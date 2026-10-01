@@ -46,8 +46,8 @@ cases are stated with each.
 \funcrows{captures}
 \end{auxfunction}
 
-\begin{auxfunction}{\fvE(e), \fvE(\seq{e})}{set of variables}{aux:fv-e}
-\input{spec/functions/fv-e-text}
+\begin{auxfunction}{\fv(e), \fv(\seq{e})}{set of variables}{aux:fv}
+\input{spec/functions/fv-text}
 \end{auxfunction}
 
 \section{Types}
@@ -70,12 +70,24 @@ The functions on types and shapes introduced in \secref{types}, each defined by 
 \funcrows{meet}
 \end{auxfunction}
 
-\begin{auxfunction}{\elemTy(\Sigma, \tau)}{type}{aux:elem-type}
+\begin{auxfunction}{\subterms(\tau), \subterms(\seq{\tau})}{set of types}{aux:subterms}
+\input{spec/functions/subterms-text}
+\funcrows{subterms}
+\end{auxfunction}
+
+\begin{auxfunction}{\typeArgs{\Sigma}(\sigma, \tau), \typeArgs{\Sigma}(\seq{\sigma}, \seq{\tau})}{context binding type variables at types}{aux:type-args}
+\input{spec/functions/type-args-text}
+\funcrows{type-args}
+\vspace{-\baselineskip}
+\funcrows{join-map}
+\end{auxfunction}
+
+\begin{auxfunction}{\elemTy{\Sigma}(\tau)}{type}{aux:elem-type}
 \input{spec/functions/elem-type-text}
 \funcrows{elem-type}
 \end{auxfunction}
 
-\begin{auxfunction}{\shapes(\Sigma, \tau, H), \shapes(\Sigma, \seq{\tau})}{ordered set of shapes or of shape sequences}{aux:shapes}
+\begin{auxfunction}{\shapes{\Sigma}(\tau, H), \shapes{\Sigma}(\seq{\tau})}{ordered set of shapes or of shape sequences}{aux:shapes}
 \input{spec/functions/shapes-text}
 \funcrows{shapes}
 \end{auxfunction}
@@ -85,12 +97,17 @@ The functions on types and shapes introduced in \secref{types}, each defined by 
 \funcrows{shape-type}
 \end{auxfunction}
 
-\begin{auxfunction}{\seqSafe(\Sigma, \Gamma, p, \tau)}{Boolean}{aux:seq-safe}
-\input{spec/functions/seq-safe-text}
-\funcrows{seq-safe}
+\begin{auxfunction}{\matchedAs{\Sigma}(\Gamma, \tau, p)}{type}{aux:matched-as}
+\input{spec/functions/matched-as-text}
+\funcrows{matched-as}
 \end{auxfunction}
 
-\begin{auxfunction}{\resolveOp(\Sigma, \odot, \sigma_1, \sigma_2), \resolveOp(\Sigma, \ominus, \sigma)}{type}{aux:resolve-op}
+\begin{auxfunction}{\remaining{\Sigma}(\Gamma, \tau, p)}{type}{aux:remaining}
+\input{spec/functions/remaining-text}
+\funcrows{remaining}
+\end{auxfunction}
+
+\begin{auxfunction}{\resolveOp{\Sigma}(\odot, \sigma_1, \sigma_2), \resolveOp{\Sigma}(\ominus, \sigma)}{type}{aux:resolve-op}
 \input{spec/functions/resolve-op-text}
 \funcrows{resolve-op}
 \end{auxfunction}
@@ -99,11 +116,16 @@ The functions on types and shapes introduced in \secref{types}, each defined by 
 \label{sec:auxiliary-classes}
 
 The functions on module names, field lists and classes introduced in \secref{modules-programs}, and
-the resolution of qualified names in an environment.
+the resolution of names in an environment.
 
 \begin{auxfunction}{\submods(q)}{context}{aux:submods}
 \input{spec/functions/submods-text}
 \funcrows{submods}
+\end{auxfunction}
+
+\begin{auxfunction}{\containing(q, q')}{sequence of module names}{aux:containing}
+\input{spec/functions/containing-text}
+\funcrows{containing}
 \end{auxfunction}
 
 \begin{auxfunction}{\ownFields(\phi)}{sequence of bindings}{aux:own-fields}
@@ -111,17 +133,17 @@ the resolution of qualified names in an environment.
 \funcrows{own-fields}
 \end{auxfunction}
 
-\begin{auxfunction}{\fields(\Sigma, C)}{sequence of bindings}{aux:fields}
+\begin{auxfunction}{\fields{\Sigma}(C)}{field scheme}{aux:fields}
 \input{spec/functions/fields-text}
 \funcrows{fields}
 \end{auxfunction}
 
-\begin{auxfunction}{\ancestors(\Sigma, C)}{set of classes}{aux:ancestors}
+\begin{auxfunction}{\ancestors{\Sigma}(C)}{set of classes}{aux:ancestors}
 \input{spec/functions/ancestors-text}
 \funcrows{ancestors}
 \end{auxfunction}
 
-\begin{auxfunction}{\fieldMap(\Sigma, C, \seq{u})}{map from variables}{aux:field-map}
+\begin{auxfunction}{\fieldMap{\Sigma}(C, \seq{u})}{map from variables}{aux:field-map}
 \input{spec/functions/field-map-text}
 \funcrows{field-map}
 \end{auxfunction}
@@ -144,7 +166,6 @@ The functions on values used by the evaluation rules.
 \begin{auxfunction}{\hat{\odot}(v, v')}{result}{aux:binop}
 \input{spec/functions/binop-text}
 \begin{center}
-\small
 \input{spec/functions/binop-meaning}
 \end{center}
 \end{auxfunction}
@@ -152,7 +173,6 @@ The functions on values used by the evaluation rules.
 \begin{auxfunction}{\hat{\ominus}(v)}{result}{aux:unop}
 \input{spec/functions/unop-text}
 \begin{center}
-\small
 \input{spec/functions/unop-meaning}
 \end{center}
 \end{auxfunction}
@@ -167,12 +187,12 @@ The functions on values used by the evaluation rules.
 \funcrows{eq-elems}
 \end{auxfunction}
 
-\begin{auxfunction}{\memOp(v, v')}{Boolean}{aux:contains}
+\begin{auxfunction}{\contains(v, v')}{Boolean}{aux:contains}
 \input{spec/functions/contains-text}
 \funcrows{contains}
 \end{auxfunction}
 
-\begin{auxfunction}{\memElems(\seq{v}, v)}{Boolean}{aux:contains-elems}
+\begin{auxfunction}{\containsElems(\seq{v}, v)}{Boolean}{aux:contains-elems}
 \input{spec/functions/contains-elems-text}
 \funcrows{contains-elems}
 \end{auxfunction}

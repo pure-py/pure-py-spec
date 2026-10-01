@@ -1,0 +1,2 @@
+# rule: syn-tuple
+print(([],))

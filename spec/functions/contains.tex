@@ -1,8 +1,8 @@
-\memOp(\exList{\seq{v}}, v) &{}= \memElems(\seq{v}, v) \\*
-\memOp(\exTuple{\seq{v}}, v) &{}= \memElems(\seq{v}, v) \\*
+\contains(\exList{\seq{v}}, v) &{}= \containsElems(\seq{v}, v) \\*
+\contains(\exTuple{\seq{v}}, v) &{}= \containsElems(\seq{v}, v) \\*
 \\
-\memOp(\delta, w) &{}= \pyinline{True} && \text{if } w \in \dom(\delta) \\*
-\memOp(\delta, w) &{}= \pyinline{False} && \text{if } w \notin \dom(\delta) \\*
+\contains(\delta, w) &{}= \pyinline{True} && \text{if } w \in \dom(\delta) \\*
+\contains(\delta, w) &{}= \pyinline{False} && \text{if } w \notin \dom(\delta) \\*
 \\
-\memOp(w', w) &{}= \pyinline{True} && \text{if } w' = w_1 \concat w \concat w_2 \text{ for some } w_1, w_2 \\*
-\memOp(w', w) &{}= \pyinline{False} && \text{otherwise}
+\contains(w', w) &{}= \pyinline{True} && \text{if } w' = w_1 \concat w \concat w_2 \text{ for some } w_1, w_2 \\*
+\contains(w', w) &{}= \pyinline{False} && \text{otherwise}

@@ -1,1 +1,1 @@
-only the @dataclass decorator is supported
+class decorator other than @dataclass prohibited

@@ -1,4 +1,4 @@
-# rule: declare-assign
+# rule: module
 from dataclasses import dataclass
 
 

@@ -26,6 +26,31 @@
   \Gamma \vdash c : \Type{C}
 }
 \and
+\inferrule*[lab={\ruleName{simple-alias}}]
+{
+  \bind{x}{\TypeAlias{\seq{\alpha}}{\tau}} \in \Gamma
+}
+{
+  \Gamma \vdash x : \TypeAlias{\seq{\alpha}}{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{simple-scheme}}]
+{
+  \bind{x}{\scheme{\seq{\alpha}}{\tau}} \in \Gamma \\
+  |\seq{\alpha}| > 0
+}
+{
+  \Gamma \vdash x : \scheme{\seq{\alpha}}{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{simple-predef}}]
+{
+  \bind{x}{\predefName} \in \Gamma
+}
+{
+  \Gamma \vdash x : \predefName
+}
+\and
 \inferrule*[lab={\ruleName{qualified}}]
 {
   \Gamma \vdash q : \modLoaded{q'}{\Gamma'} \\
@@ -35,6 +60,6 @@
   \Gamma \vdash q.x : \theta
 }
 \end{mathpar}
-\caption{Qualified name $q$ resolves to context entry $\theta$ under $\Gamma$}
+\caption{Name $q$ resolves to context entry $\theta$ under $\Gamma$}
 \label{fig:resolve-name}
 \end{figure}
