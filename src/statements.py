@@ -10,6 +10,7 @@ from aux import (
     binds_quals,
     captures_list,
     captures_quals,
+    declares,
     declares_body,
     dict_keys,
     name_of,
@@ -347,7 +348,7 @@ def check_stmt(
             check_expr(e, Primitive.BOOL, mod_ctx)
             branches = [check_body(ss, mod_ctx, returns, tail)]
             branches.append(check_body(ss_, mod_ctx, returns, tail) if ss_ else Assigns({}))
-            return merge_outcomes(branches, mod_ctx.gamma)
+            return merge_outcomes(branches, {x for x, _ in declares(s)})
         case ast.Assert(test=e, msg=e_):
             check_expr(e, Primitive.BOOL, mod_ctx)
             if e_ is not None:
@@ -377,7 +378,9 @@ def check_match_cases(
         and all(isinstance(r, Returns) for r in branches)
     ):
         raise MypyCompatibility(match, reasons.MissingReturnMatchPartial(rest))
-    return merge_outcomes(branches + ([Assigns({})] if partial else []), mod_ctx.gamma)
+    return merge_outcomes(
+        branches + ([Assigns({})] if partial else []), {x for x, _ in declares(match)}
+    )
 
 
 def match_cases(

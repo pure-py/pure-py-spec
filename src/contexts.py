@@ -204,19 +204,19 @@ def predefined_context(q: Name) -> Context:
 
 
 def merge_entry(
-    theta: ContextEntry | None, theta_: ContextEntry | None, before: ContextEntry | None
+    theta: ContextEntry | None, theta_: ContextEntry | None, declared_in_branch: bool
 ) -> ContextEntry:
     if theta == theta_:
         assert theta is not None
         return theta
     present = theta if theta is not None else theta_
     assert present is not None
-    return PU(declared_type_of(present), isinstance(before, Unbound))
+    return PU(declared_type_of(present), declared_in_branch)
 
 
-def merge_context(delta: Context, delta_: Context, gamma: Context) -> Context:
+def merge_context(delta: Context, delta_: Context, declared: set[Var]) -> Context:
     return {
-        x: merge_entry(delta.get(x), delta_.get(x), gamma.get(x))
+        x: merge_entry(delta.get(x), delta_.get(x), x in declared)
         for x in delta.keys() | delta_.keys()
     }
 
@@ -232,18 +232,18 @@ def declared_type_of(theta: ContextEntry) -> Type | TypeScheme:
             return theta
 
 
-def merge_outcomes(rs: list[StaticOutcome], gamma: Context) -> StaticOutcome:
+def merge_outcomes(rs: list[StaticOutcome], declared: set[Var]) -> StaticOutcome:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return Returns()
     delta = assigns_branches[0].delta
-    return Assigns(fold_merge(delta, assigns_branches[1:], gamma))
+    return Assigns(fold_merge(delta, assigns_branches[1:], declared))
 
 
-def fold_merge(delta: Context, rs: list[Assigns], gamma: Context) -> Context:
+def fold_merge(delta: Context, rs: list[Assigns], declared: set[Var]) -> Context:
     if len(rs) == 0:
         return delta
-    return fold_merge(merge_context(delta, rs[0].delta, gamma), rs[1:], gamma)
+    return fold_merge(merge_context(delta, rs[0].delta, declared), rs[1:], declared)
 
 
 def override_context(gamma: Context, delta: Context) -> Context:
