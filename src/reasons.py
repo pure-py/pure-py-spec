@@ -307,9 +307,7 @@ class TypeSchemeAsValue:
     q: Name
 
     def message(self) -> str:
-        return (
-            f"'{self.q}' has type parameters; call it or use it where a Callable type is expected"
-        )
+        return f"type arguments of '{self.q}' cannot be inferred"
 
 
 @dataclass(frozen=True)
