@@ -32,9 +32,11 @@ class UnassignedVariable:
 @dataclass(frozen=True)
 class PossiblyUnassigned:
     x: Var
+    declared_in_branch: bool
 
     def message(self) -> str:
-        return f"'{self.x}' is not definitely assigned"
+        qualifier = ": declared in a branch" if self.declared_in_branch else ""
+        return f"'{self.x}' is not definitely assigned{qualifier}"
 
 
 @dataclass(frozen=True)
@@ -134,6 +136,12 @@ class NotPredefinedName:
 
     def message(self) -> str:
         return f"'{self.x}' is not bound as a predefined name"
+
+
+@dataclass(frozen=True)
+class RangePattern:
+    def message(self) -> str:
+        return "'range' not permitted in a constructor pattern"
 
 
 @dataclass(frozen=True)
@@ -292,6 +300,22 @@ class TypeParameterAsValue:
 
     def message(self) -> str:
         return f"'{self.x}' is a type parameter, usable only in annotations"
+
+
+@dataclass(frozen=True)
+class TypeSchemeAsValue:
+    q: Name
+
+    def message(self) -> str:
+        return f"type arguments of '{self.q}' cannot be inferred"
+
+
+@dataclass(frozen=True)
+class NoTypeArgument:
+    alpha: Var
+
+    def message(self) -> str:
+        return f"type parameter '{self.alpha}' has no type argument"
 
 
 @dataclass(frozen=True)
@@ -510,6 +534,7 @@ type Reason = (
     | ConstructorArityMismatch
     | PatternArityMismatch
     | NotClass
+    | RangePattern
     | ClassArityMismatch
     | TypeAliasArityMismatch
     | NotPredefinedName
@@ -522,6 +547,8 @@ type Reason = (
     | ClassAsValue
     | PredefinedNameAsValue
     | TypeParameterAsValue
+    | TypeSchemeAsValue
+    | NoTypeArgument
     | TypeAliasAsValue
     | UnknownConstructorKeyword
     | DuplicateDictKey

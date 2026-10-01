@@ -113,6 +113,11 @@ Direct, factual, conventional prose: state the thing and stop.
 - Code comments: see the coding-conventions skill.
 - Checklists and issues: state the task directly ("Move X here; add Y"), no scene-setting.
 - Meta-commentary about the document (what moved where, what supersedes what) belongs in the issue tracker, never in the text — including inside change markup.
+- State the current design and nothing about how it evolved; never contrast it with a superseded design
+  ("an earlier design allocated addresses"). When the design changes, delete superseded claims rather than
+  annotating them as outdated.
+- When reporting what remains of a list of tasks or issues, give the remaining items only; do not
+  mention items already resolved, removed or deferred, even to explain why they no longer appear.
 
 ## Structure
 
@@ -126,6 +131,12 @@ Direct, factual, conventional prose: state the thing and stop.
   follows the file name.
 - A macro is named after what it renders (\baseType for base-type, not \widen), and is renamed when the
   rendered name changes.
+- After a build, render each changed page and look at it: no figure, rule, table or definition row may run
+  off the page or noticeably into the margin.
+- Side conditions of a definition are aligned with one another: all in the condition column, or all on
+  their own line under the equation, indented alike. Do not mix the two within a definition, and do not
+  leave one condition overfull while the rest align. A bare "otherwise" is the exception: it follows the
+  equation on the same line after a `\quad`, in parentheses.
 
 ## References in conversation
 

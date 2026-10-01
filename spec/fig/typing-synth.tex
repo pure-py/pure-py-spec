@@ -29,7 +29,7 @@
 \inferrule*[lab={\ruleName{attr-object}}]
 {
   \Sigma; \Gamma \vdash e \synth C[\seq{\tau}] \\
-  \bind{x}{\sigma} \in \tyInst{\fields(\Sigma, C)}{\seq{\tau}}
+  \bind{x}{\sigma} \in \tyInst{\fields{\Sigma}(C)}{\seq{\tau}}
 }
 {
   \Sigma; \Gamma \vdash \exAttr{e}{x} \synth \sigma
@@ -37,7 +37,7 @@
 \and
 \inferrule*[lab={\ruleName{call}}]
 {
-  \Sigma; \Gamma \vdash e \synth \tyCallable{\seq{\tau}}{\tau} \\
+  \Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\tau}, \tau \\
   \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau} \\
   \tau \neq \tyNone
 }
@@ -45,7 +45,7 @@
   \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \tau
 }
 \and
-\inferrule*[lab={\ruleName{syn-call-lambda}}]
+\inferrule*[lab={\ruleName{call-lambda-syn}}]
 {
   \seq{x} \text{ distinct} \\
   \Sigma; \Gamma \vdash \seq{e} \synth \seq{\tau} \\
@@ -58,19 +58,33 @@
 \inferrule*[lab={\ruleName{constr}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \fields(\Sigma, C) = \bind{\seq{x}}{\seq{\tau}} \\
-  \fieldMap(\Sigma, C, a) = \set{\bind{\seq{x}}{\seq{e}}} \\
-  \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}
+  \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
+  \fieldMap{\Sigma}(C, a) = \set{\bind{\seq{x}}{\seq{e}}} \\
+  I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \tau_i} \\
+  \typeArgs{\Sigma}((\sigma_i \mid i \in I), (\tau_i \mid i \in I))(\seq{\alpha}) = \seq{\tau}' \\
+  \Sigma; \Gamma \vdash \seq{e} \checks \subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}
 }
 {
-  \Sigma; \Gamma \vdash \exConstr{q}{a} \synth C
+  \Sigma; \Gamma \vdash \exConstr{q}{a} \synth C[\seq{\tau}']
+}
+\and
+\inferrule*[lab={\ruleName{constr-explicit}}]
+{
+  \Gamma \vdash q : \Type{C} \\
+  \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
+  \Sigma; \Gamma \vdash \seq{\psi} \synth \seq{\tau} \\
+  \fieldMap{\Sigma}(C, a) = \set{\bind{\seq{x}}{\seq{e}}} \\
+  \Sigma; \Gamma \vdash \seq{e} \checks \subst{\seq{\tau}}{\seq{\alpha}}{\seq{\sigma}}
+}
+{
+  \Sigma; \Gamma \vdash \exConstr{q[\seq{\psi}]}{a} \synth C[\seq{\tau}]
 }
 \and
 \inferrule*[lab={\ruleName{binop}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
   \Sigma; \Gamma \vdash e' \synth \sigma' \\
-  \resolveOp(\Sigma, \odot, \sigma, \sigma') = \tau^\dagger
+  \resolveOp{\Sigma}(\odot, \sigma, \sigma') = \tau^\dagger
 }
 {
   \Sigma; \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \tau^\dagger
@@ -80,13 +94,13 @@
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
   \exUnOp{\ominus}{e} \neq \exUnOp{\pyinline{-}}{n} \quad (\forall n) \\
-  \resolveOp(\Sigma, \ominus, \sigma) = \tau^\dagger
+  \resolveOp{\Sigma}(\ominus, \sigma) = \tau^\dagger
 }
 {
   \Sigma; \Gamma \vdash \exUnOp{\ominus}{e} \synth \tau^\dagger
 }
 \and
-\inferrule*[lab={\ruleName{syn-cond}}]
+\inferrule*[lab={\ruleName{cond-syn}}]
 {
   \Sigma; \Gamma \vdash e \checks \tyBool \\
   I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \sigma_i} \neq \varnothing \\
@@ -117,6 +131,8 @@
 \caption{Expression synthesis: names, literals, attributes, calls and operators}
 \label{fig:typing-synth}
 \end{figure}
+
+\input{spec/fig/typing-callee}
 
 \begin{figure}
 \flushleft \shadebox{$\Sigma; \Gamma \vdash e \synth \tau$ (continued)}

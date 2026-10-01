@@ -46,7 +46,7 @@
 \and
 \inferrule*[lab={\ruleName{call-stmt}}]
 {
-  \Sigma; \Gamma \vdash e \synth \tyCallable{\seq{\tau}}{\tyNone} \\
+  \Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\tau}, \tyNone \\
   \Sigma; \Gamma \vdash \seq{e} \checks \seq{\tau}
 }
 {
@@ -115,9 +115,9 @@
 \and
 \inferrule*[lab={\ruleName{def}}]
 {
-  \Sigma; \Gamma \vdash d_i \synth \tau_i \quad (\forall i) \\
-  \Delta' = \set{\bind{\declaresS(\seq{d})}{\seq{\tau}}} \\
-  \Sigma; \Gamma \override \Delta' \vdash d_i \checks \tau_i \quad (\forall i)
+  \Sigma; \Gamma \vdash d_i \synth \pi_i \quad (\forall i) \\
+  \Delta' = \set{\bind{\declaresS(\seq{d})}{\seq{\pi}}} \\
+  \Sigma; \Gamma \override \Delta' \vdash d_i \checks \pi_i \quad (\forall i)
 }
 {
   \Sigma; \Gamma; \zeta \vdash \seq{d} : \Assigns{\Delta'}
@@ -126,7 +126,7 @@
 \inferrule*[lab={\ruleName{match}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta \vdash \sigma, \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \tyNever, \varnothing
+  \Sigma; \Gamma; \zeta \vdash \sigma, \shapes{\Sigma}(\sigma, \varnothing), \seq{b} : S, \tyNever, \varnothing
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S
@@ -135,7 +135,7 @@
 \inferrule*[lab={\ruleName{match-partial}}]
 {
   \Sigma; \Gamma \vdash e \synth \sigma \\
-  \Sigma; \Gamma; \zeta \vdash \sigma, \shapes(\Sigma, \sigma, \varnothing), \seq{b} : S, \tau, L \\
+  \Sigma; \Gamma; \zeta \vdash \sigma, \shapes{\Sigma}(\sigma, \varnothing), \seq{b} : S, \tau, L \\
   \tau \neq \tyNever
 }
 {

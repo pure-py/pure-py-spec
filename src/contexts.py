@@ -2,7 +2,7 @@ import ast
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from classes import Class, ClassTable
+from classes import RANGE, Class, ClassTable
 from subtyping import join_seq
 from type_syntax import (
     CallableType,
@@ -25,13 +25,23 @@ class Unbound:
 
 
 @dataclass(frozen=True)
+class TypeScheme:
+    params: tuple[Var, ...]
+    tau: Type
+
+    def __post_init__(self) -> None:
+        assert len(self.params) > 0
+
+
+@dataclass(frozen=True)
 class DU:
     tau: Type
 
 
 @dataclass(frozen=True)
 class PU:
-    tau: Type
+    tau: Type | TypeScheme
+    declared_in_branch: bool = False  # diagnostic only
 
 
 @dataclass(frozen=True)
@@ -47,7 +57,7 @@ class TypeAlias:
 
 type VarEntry = Unbound | DU | PU | Type
 type ContextEntry = (
-    VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName | TypeVar | TypeAlias
+    VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName | TypeVar | TypeAlias | TypeScheme
 )
 type Context = Mapping[Var, ContextEntry]
 type VarContext = Mapping[Var, VarEntry]
@@ -69,7 +79,15 @@ class ModuleLoaded:
     members: Context
 
 
-NON_VARIABLE_ENTRIES = (ModuleStub, ModuleLoaded, Class, PredefinedName, TypeVar, TypeAlias)
+NON_VARIABLE_ENTRIES = (
+    ModuleStub,
+    ModuleLoaded,
+    Class,
+    PredefinedName,
+    TypeVar,
+    TypeAlias,
+    TypeScheme,
+)
 
 
 @dataclass(frozen=True)
@@ -140,6 +158,7 @@ PREDEFINED_MEMBERS: dict[str, Context] = {
     "builtins": {
         "print": CallableType((Primitive.OBJECT,), Primitive.NONE),
         "len": CallableType((Primitive.SIZED,), Primitive.INT),
+        "range": RANGE,
         Primitive.NONE.value: PredefinedName(),
         Primitive.OBJECT.value: PredefinedName(),
         Primitive.BOOL.value: PredefinedName(),
@@ -184,42 +203,47 @@ def predefined_context(q: Name) -> Context:
     return {**PREDEFINED_MEMBERS[str(q)], "__name__": Primitive.STR}
 
 
-def merge_entry(theta: ContextEntry, theta_: ContextEntry) -> VarEntry:
-    assert not isinstance(theta, NON_VARIABLE_ENTRIES)
-    assert not isinstance(theta_, NON_VARIABLE_ENTRIES)
-    return theta if theta == theta_ else PU(declared_type_of(theta))
+def merge_entry(
+    theta: ContextEntry | None, theta_: ContextEntry | None, declared_in_branch: bool
+) -> ContextEntry:
+    if theta == theta_:
+        assert theta is not None
+        return theta
+    present = theta if theta is not None else theta_
+    assert present is not None
+    return PU(declared_type_of(present), declared_in_branch)
 
 
-def merge_context(gamma: Context, gamma_: Context) -> VarContext:
+def merge_context(delta: Context, delta_: Context, declared: set[Var]) -> Context:
     return {
-        x: merge_entry(gamma[x], gamma_[x])
-        if x in gamma and x in gamma_
-        else PU(declared_type_of(gamma[x] if x in gamma else gamma_[x]))
-        for x in set(gamma.keys()) | set(gamma_.keys())
+        x: merge_entry(delta.get(x), delta_.get(x), x in declared)
+        for x in delta.keys() | delta_.keys()
     }
 
 
-def declared_type_of(theta: ContextEntry) -> Type:
+def declared_type_of(theta: ContextEntry) -> Type | TypeScheme:
     match theta:
         case DU(tau) | PU(tau):
             return tau
+        case TypeScheme():
+            return theta
         case _:
             assert not isinstance(theta, (Unbound, *NON_VARIABLE_ENTRIES))
             return theta
 
 
-def merge_outcomes(rs: list[StaticOutcome]) -> StaticOutcome:
+def merge_outcomes(rs: list[StaticOutcome], declared: set[Var]) -> StaticOutcome:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return Returns()
     delta = assigns_branches[0].delta
-    return Assigns(fold_merge(delta, assigns_branches[1:]))
+    return Assigns(fold_merge(delta, assigns_branches[1:], declared))
 
 
-def fold_merge(delta: Context, rs: list[Assigns]) -> Context:
+def fold_merge(delta: Context, rs: list[Assigns], declared: set[Var]) -> Context:
     if len(rs) == 0:
         return delta
-    return fold_merge(merge_context(delta, rs[0].delta), rs[1:])
+    return fold_merge(merge_context(delta, rs[0].delta, declared), rs[1:], declared)
 
 
 def override_context(gamma: Context, delta: Context) -> Context:

@@ -1,7 +1,7 @@
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
-from type_syntax import ClassType, FieldScheme, Name, Type, Var, instantiate
+from type_syntax import ClassType, FieldScheme, Name, Primitive, Type, Var, instantiate, parse_name
 
 
 @dataclass(frozen=True)
@@ -20,6 +20,10 @@ class ClassTableEntry:
 
 
 type ClassTable = Mapping[Class, ClassTableEntry]
+
+RANGE = Class(parse_name("builtins.range"))
+
+PREDEFINED_CLASSES: ClassTable = {RANGE: ClassTableEntry((), (("stop", Primitive.INT),), None)}
 
 
 def short_name(c: Class) -> Var:

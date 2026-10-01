@@ -5,6 +5,7 @@ from collections.abc import Iterator, Mapping
 
 import syntax
 from check_module import check_module
+from classes import PREDEFINED_CLASSES
 from contexts import MAIN, PREDEFINED_MODULES
 from reasons import IllFormed, IllFormedModule
 from type_syntax import Name, proper_prefixes
@@ -85,7 +86,7 @@ class Program(Mapping[Name, ast.Module]):
 def check_program(entry_path: pathlib.Path) -> IllFormed | syntax.Unsupported | None:
     program = Program(entry_path)
     try:
-        check_module(program[MAIN], program, MAIN, {})
+        check_module(program[MAIN], program, MAIN, PREDEFINED_CLASSES)
         return None
     except IllFormedModule as e:
         e.msg = f"{program.path(e.module or MAIN)}: {e.msg}"

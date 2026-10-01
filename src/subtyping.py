@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product
 
-from classes import Class, ClassTable, ancestors
+from classes import RANGE, Class, ClassTable, ancestors
 from type_syntax import (
     CallableType,
     ClassType,
@@ -97,7 +97,11 @@ def subtype(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
             )
         case _:
             if tau == Primitive.SIZED:
-                return isinstance(sigma, (ListType, DictType, TupleType)) or sigma == Primitive.STR
+                return (
+                    isinstance(sigma, (ListType, DictType, TupleType))
+                    or sigma == Primitive.STR
+                    or sigma == ClassType(RANGE, ())
+                )
             return False
 
 
@@ -183,6 +187,56 @@ def instantiation_candidates(
         return []
     second = next((taus for taus in solving if not equivalent_seq(Sigma, taus, first)), None)
     return [first] if second is None else [first, second]
+
+
+def type_args(Sigma: ClassTable, sigma: Type, tau: Type) -> dict[Var, Type]:
+    match sigma, tau:
+        case TypeVariable(alpha), _:
+            return {alpha: base_type(tau)}
+        case _, UnionType(tau_, tau__):
+            return join_context(
+                Sigma, type_args(Sigma, sigma, tau_), type_args(Sigma, sigma, tau__)
+            )
+        case (ListType(sigma_), ListType(tau_)) | (DictType(sigma_), DictType(tau_)):
+            return type_args(Sigma, sigma_, tau_)
+        case TupleType(sigmas), TupleType(taus):
+            return type_args_seq(Sigma, sigmas, taus)
+        case CallableType(sigmas, sigma_), CallableType(taus, tau_):
+            return type_args_seq(Sigma, (sigma_, *sigmas), (tau_, *taus))
+        case ClassType(c, sigmas), _:
+            match instance(Sigma, c, tau):
+                case ClassType(_, taus):
+                    return type_args_seq(Sigma, sigmas, taus)
+                case _:
+                    return {}
+        case UnionType(sigma_, sigma__), _:
+            if subtype(Sigma, tau, sigma_) or subtype(Sigma, tau, sigma__):
+                return {}
+            return join_context(
+                Sigma, type_args(Sigma, sigma_, tau), type_args(Sigma, sigma__, tau)
+            )
+        case _:
+            return {}
+
+
+def type_args_seq(
+    Sigma: ClassTable, sigmas: Sequence[Type], taus: Sequence[Type]
+) -> dict[Var, Type]:
+    result: dict[Var, Type] = {}
+    for sigma, tau in zip(sigmas, taus):
+        result = join_context(Sigma, result, type_args(Sigma, sigma, tau))
+    return result
+
+
+def join_context(
+    Sigma: ClassTable, gamma: dict[Var, Type], gamma_: dict[Var, Type]
+) -> dict[Var, Type]:
+    return {
+        alpha: join(Sigma, gamma[alpha], gamma_[alpha])
+        if alpha in gamma and alpha in gamma_
+        else (gamma | gamma_)[alpha]
+        for alpha in gamma.keys() | gamma_.keys()
+    }
 
 
 def equivalent_seq(Sigma: ClassTable, sigmas: Sequence[Type], taus: Sequence[Type]) -> bool:

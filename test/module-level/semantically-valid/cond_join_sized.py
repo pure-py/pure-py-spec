@@ -1,4 +1,4 @@
-# rule: syn-cond
+# rule: cond-syn
 def f(b: bool, xs: list[int]) -> int:
     return len(xs if b else "ab")
 

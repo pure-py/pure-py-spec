@@ -1,9 +1,9 @@
 \inferrule*[lab={\ruleName{eval-pat-constr}}]
 {
   \resolve(\rho, q) = \Type{C} \\
-  C \in \ancestors(\Sigma, D) \\
-  \fields(\Sigma, C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
-  \rho, \fieldMap(\Sigma, C, \seq{p})(x_i), \rho'(x_i) \matches m_i \quad (\forall i)
+  C \in \ancestors{\Sigma}(D) \\
+  \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
+  \rho, \fieldMap{\Sigma}(C, \seq{p})(x_i), \rho'(x_i) \matches m_i \quad (\forall i)
 }
 {
   \rho, \patConstr{q}{\seq{p}}, \exObj{D}{\rho'} \matches m_1 \override \ldots \override m_n

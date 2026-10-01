@@ -8,7 +8,7 @@
 Non-Boolean test of \pyinline{if} or \pyinline{assert} & Coerced to \pyinline{bool} & Static & Test checked against \pyinline{bool} (\ruleName{if}, \ruleName{assert}) \\\rowgap
 List pattern at tuple, or tuple pattern at list & Matches, since list and tuple patterns both match lists and tuples & Static & Pattern does not match any value; case unreachable (\ruleName{check-list-none}, \ruleName{check-tuple-none}) \\\rowgap
 Pattern \pyinline{a, b} without brackets or parentheses & Matches lists and tuples alike & Syntactic & Tuple patterns parenthesised, list patterns bracketed \\\rowgap
-Positional class pattern with fewer sub-patterns than fields & Matches, ignoring remaining fields & Static & Arguments cover fields exactly ($\fieldMap$) \\\rowgap
+Positional class pattern with fewer sub-patterns than fields & Matches, ignoring remaining fields & Static & Arguments cover fields exactly ($\fieldMap{\Sigma}$) \\\rowgap
 Non-string dictionary key & Any hashable value accepted, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Syntactic in patterns, static in expressions & Keys are string literals in patterns, of type \pyinline{str} in expressions (\ruleName{dict}) \\\rowgap
 Non-string \pyinline{assert} message & Any object accepted, shown in traceback & Static & Message checked against \pyinline{str} (\ruleName{assert-msg}) \\\rowgap
 \pyinline{==} or \pyinline{!=} between operands of unrelated types & Defined, giving \pyinline{False} & Static & Operand types must be comparable (\ruleName{binop}) \\\rowgap
