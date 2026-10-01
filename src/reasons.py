@@ -141,7 +141,7 @@ class NotPredefinedName:
 @dataclass(frozen=True)
 class RangePattern:
     def message(self) -> str:
-        return "'range' is not permitted in a constructor pattern"
+        return "'range' not permitted in a constructor pattern"
 
 
 @dataclass(frozen=True)
