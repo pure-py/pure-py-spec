@@ -1,1 +1,1 @@
-'identity' has type parameters
+type arguments of 'identity' cannot be inferred
