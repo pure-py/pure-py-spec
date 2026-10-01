@@ -2,9 +2,7 @@ import ast
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-import reasons
 from classes import RANGE, Class, ClassTable
-from reasons import IllFormedModule
 from subtyping import join_seq
 from type_syntax import (
     CallableType,
@@ -27,13 +25,22 @@ class Unbound:
 
 
 @dataclass(frozen=True)
+class TypeScheme:
+    params: tuple[Var, ...]
+    tau: Type
+
+    def __post_init__(self) -> None:
+        assert len(self.params) > 0
+
+
+@dataclass(frozen=True)
 class DU:
     tau: Type
 
 
 @dataclass(frozen=True)
 class PU:
-    tau: Type
+    tau: Type | TypeScheme
 
 
 @dataclass(frozen=True)
@@ -45,15 +52,6 @@ class TypeVar:
 class TypeAlias:
     params: tuple[Var, ...]
     tau: Type
-
-
-@dataclass(frozen=True)
-class TypeScheme:
-    params: tuple[Var, ...]
-    tau: Type
-
-    def __post_init__(self) -> None:
-        assert len(self.params) > 0
 
 
 type VarEntry = Unbound | DU | PU | Type
@@ -204,46 +202,42 @@ def predefined_context(q: Name) -> Context:
     return {**PREDEFINED_MEMBERS[str(q)], "__name__": Primitive.STR}
 
 
-def merge_entry(
-    x: Var, theta: ContextEntry | None, theta_: ContextEntry | None, node: ast.AST
-) -> ContextEntry:
+def merge_entry(theta: ContextEntry | None, theta_: ContextEntry | None) -> ContextEntry:
     if theta == theta_:
         assert theta is not None
         return theta
-    if isinstance(theta, TypeScheme) or isinstance(theta_, TypeScheme):
-        raise IllFormedModule(node, reasons.TypeSchemeInBranch(x))
     present = theta if theta is not None else theta_
     assert present is not None
     return PU(declared_type_of(present))
 
 
-def merge_context(gamma: Context, gamma_: Context, node: ast.AST) -> Context:
-    return {
-        x: merge_entry(x, gamma.get(x), gamma_.get(x), node) for x in gamma.keys() | gamma_.keys()
-    }
+def merge_context(gamma: Context, gamma_: Context) -> Context:
+    return {x: merge_entry(gamma.get(x), gamma_.get(x)) for x in gamma.keys() | gamma_.keys()}
 
 
-def declared_type_of(theta: ContextEntry) -> Type:
+def declared_type_of(theta: ContextEntry) -> Type | TypeScheme:
     match theta:
         case DU(tau) | PU(tau):
             return tau
+        case TypeScheme():
+            return theta
         case _:
             assert not isinstance(theta, (Unbound, *NON_VARIABLE_ENTRIES))
             return theta
 
 
-def merge_outcomes(rs: list[StaticOutcome], node: ast.AST) -> StaticOutcome:
+def merge_outcomes(rs: list[StaticOutcome]) -> StaticOutcome:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return Returns()
     delta = assigns_branches[0].delta
-    return Assigns(fold_merge(delta, assigns_branches[1:], node))
+    return Assigns(fold_merge(delta, assigns_branches[1:]))
 
 
-def fold_merge(delta: Context, rs: list[Assigns], node: ast.AST) -> Context:
+def fold_merge(delta: Context, rs: list[Assigns]) -> Context:
     if len(rs) == 0:
         return delta
-    return fold_merge(merge_context(delta, rs[0].delta, node), rs[1:], node)
+    return fold_merge(merge_context(delta, rs[0].delta), rs[1:])
 
 
 def override_context(gamma: Context, delta: Context) -> Context:

@@ -347,7 +347,7 @@ def check_stmt(
             check_expr(e, Primitive.BOOL, mod_ctx)
             branches = [check_body(ss, mod_ctx, returns, tail)]
             branches.append(check_body(ss_, mod_ctx, returns, tail) if ss_ else Assigns({}))
-            return merge_outcomes(branches, s)
+            return merge_outcomes(branches)
         case ast.Assert(test=e, msg=e_):
             check_expr(e, Primitive.BOOL, mod_ctx)
             if e_ is not None:
@@ -377,7 +377,7 @@ def check_match_cases(
         and all(isinstance(r, Returns) for r in branches)
     ):
         raise MypyCompatibility(match, reasons.MissingReturnMatchPartial(rest))
-    return merge_outcomes(branches + ([Assigns({})] if partial else []), match)
+    return merge_outcomes(branches + ([Assigns({})] if partial else []))
 
 
 def match_cases(

@@ -319,14 +319,6 @@ class NoTypeArgument:
 
 
 @dataclass(frozen=True)
-class TypeSchemeInBranch:
-    x: Var
-
-    def message(self) -> str:
-        return f"'{self.x}' bound at a type scheme in one branch cannot be merged with the other"
-
-
-@dataclass(frozen=True)
 class TypeAliasAsValue:
     q: Name
 
@@ -557,7 +549,6 @@ type Reason = (
     | TypeParameterAsValue
     | TypeSchemeAsValue
     | NoTypeArgument
-    | TypeSchemeInBranch
     | TypeAliasAsValue
     | UnknownConstructorKeyword
     | DuplicateDictKey
