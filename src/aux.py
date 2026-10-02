@@ -13,7 +13,8 @@ from type_syntax import (
 
 # A PurePy statement: a Python statement, or a mutual region of consecutive defs. A Python body
 # (a statement list) represents the spec's right-nested sequence s s'.
-type Statement = ast.stmt | list[ast.FunctionDef]
+type TypeDeclaration = ast.ClassDef | ast.TypeAlias
+type Statement = ast.stmt | list[ast.FunctionDef] | list[TypeDeclaration]
 
 
 def is_import(s: ast.stmt) -> bool:
@@ -31,6 +32,8 @@ def statements(body: list[ast.stmt]) -> list[Statement]:
     rest = body[1:]
     if isinstance(head, ast.FunctionDef):
         return extend_region([head], rest)
+    if isinstance(head, (ast.ClassDef, ast.TypeAlias)):
+        return extend_type_region([head], rest)
     return [head] + statements(rest)
 
 
@@ -40,6 +43,15 @@ def extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[S
     head = rest[0]
     if isinstance(head, ast.FunctionDef):
         return extend_region(region + [head], rest[1:])
+    return [region] + statements(rest)
+
+
+def extend_type_region(region: list[TypeDeclaration], rest: list[ast.stmt]) -> list[Statement]:
+    if len(rest) == 0:
+        return [region]
+    head = rest[0]
+    if isinstance(head, (ast.ClassDef, ast.TypeAlias)):
+        return extend_type_region(region + [head], rest[1:])
     return [region] + statements(rest)
 
 
