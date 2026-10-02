@@ -76,16 +76,16 @@ Here $\captures(\seq{g})$ is the set of variables of the enclosing scope capture
 qualifiers $\seq{g}$ of a comprehension, with $\captures(e)$ computing the same for an expression $e$: the
 free variables of each lambda's body, less its parameters.
 
-\subsubsection{Mutual regions}
+\subsubsection{Mutual def regions}
 \label{sec:mutual-recursion}
 
 Mutual recursion in Python relies on late binding: the free variables of a function are resolved when
 they are evaluated, so two functions may refer to each other whatever order they are defined in, provided
 both exist by the time the reference is evaluated. \PurePy makes the
-dependency static: a \emph{mutual region}, a maximal contiguous block of \pyinline{def} statements (\figref{syntax-stmt}), is a single simultaneous binding. The \ruleName{def} rule checks each body in a
-context in which every name of the mutual region is definitely assigned, so any function in the region may refer
+dependency static: a \emph{mutual def region}, a maximal contiguous block of \pyinline{def} statements (\figref{syntax-stmt}), is a single simultaneous binding. The \ruleName{def} rule checks each body in a
+context in which every name of the mutual def region is definitely assigned, so any function in the region may refer
 to any other, and requires the names to be distinct. Self-recursion is the special case of a singleton
-mutual region. Any other statement between two definitions separates them into different mutual regions:
+mutual def region. Any other statement between two definitions separates them into different mutual def regions:
 
 \begin{python}
 def even(n: int) -> bool:
@@ -93,7 +93,7 @@ def even(n: int) -> bool:
         return True
     return odd(n - 1)  # error: odd is not yet bound
 
-x: bool = even(0)  # intervening statement separates the mutual regions
+x: bool = even(0)  # intervening statement separates the mutual def regions
 
 def odd(n: int) -> bool:
     if n == 0:
@@ -101,9 +101,9 @@ def odd(n: int) -> bool:
     return even(n - 1)
 \end{python}
 
-\noindent This is rejected statically: \pyinline{even} forms a mutual region by itself, in which \pyinline{odd}
+\noindent This is rejected statically: \pyinline{even} forms a mutual def region by itself, in which \pyinline{odd}
 is not yet bound, so the reference fails the \ruleName{var} rule. Python accepts the program, since the
-call \pyinline{even(0)} never reaches \pyinline{odd}. A mutual region with two definitions of the same name is
+call \pyinline{even(0)} never reaches \pyinline{odd}. A mutual def region with two definitions of the same name is
 rejected by the distinct-names condition:
 
 \begin{python}
@@ -112,12 +112,12 @@ def g() -> int:
 
 def f() -> int:
     return g()
-def g() -> int:  # error: g defined twice in the same mutual region
+def g() -> int:  # error: g defined twice in the same mutual def region
     return 1
 \end{python}
 
 \noindent Python accepts this too, treating the second \pyinline{def g} as a reassignment of \pyinline{g},
-which late binding then makes the target of the call in \pyinline{f}. Finally, the branches of a conditional may contain mutual regions, with any use of those
+which late binding then makes the target of the call in \pyinline{f}. Finally, the branches of a conditional may contain mutual def regions, with any use of those
 functions after the conditional subject to the usual definite assignment rules (\secref{local-assignment}).
 
 \subsubsection{Pattern binding and reachability}

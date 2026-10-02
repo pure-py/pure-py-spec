@@ -11,7 +11,7 @@ from type_syntax import (
     root,
 )
 
-# A PurePy statement: a Python statement, or a mutual region of consecutive defs. A Python body
+# A PurePy statement: a Python statement, a mutual def region or a mutual type region. A Python body
 # (a statement list) represents the spec's right-nested sequence s s'.
 type TypeDeclaration = ast.ClassDef | ast.TypeAlias
 type Statement = ast.stmt | list[ast.FunctionDef] | list[TypeDeclaration]
@@ -31,18 +31,18 @@ def statements(body: list[ast.stmt]) -> list[Statement]:
     head = body[0]
     rest = body[1:]
     if isinstance(head, ast.FunctionDef):
-        return extend_region([head], rest)
+        return extend_def_region([head], rest)
     if isinstance(head, (ast.ClassDef, ast.TypeAlias)):
         return extend_type_region([head], rest)
     return [head] + statements(rest)
 
 
-def extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[Statement]:
+def extend_def_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[Statement]:
     if len(rest) == 0:
         return [region]
     head = rest[0]
     if isinstance(head, ast.FunctionDef):
-        return extend_region(region + [head], rest[1:])
+        return extend_def_region(region + [head], rest[1:])
     return [region] + statements(rest)
 
 
