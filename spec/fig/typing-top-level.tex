@@ -19,6 +19,24 @@
   \Sigma; q; \Gamma \vdash t\;t' : \Assigns{\Delta} \override R \binding \Sigma'
 }
 \and
+\inferrule*[lab={\ruleName{types}}]
+{
+  \added{\Delta = \Delta_1 \override \cdots \override \Delta_n} \\
+  \added{\Sigma' = \Sigma, \Sigma_1, \ldots, \Sigma_n} \\
+  \added{\text{aliases of } \seq{\xi} \text{ acyclic}} \\
+  \added{\Sigma'; q; \Gamma \override \Delta \vdash \xi_i : \Delta_i \binding \Sigma_i \quad (\xi_i \text{ a type statement})} \\
+  \added{\Sigma'; q; \Gamma \override \Delta_1 \override \cdots \override \Delta_{i-1} \vdash \xi_i : \Delta_i \binding \Sigma_i \quad (\xi_i \text{ a class declaration})}
+}
+{
+  \added{\Sigma; q; \Gamma \vdash \seq{\xi} : \Assigns{\Delta} \binding \Sigma'}
+}
+\end{mathpar}
+
+\vspace{2mm}
+
+\flushleft \added{\shadebox{$\Sigma; q; \Gamma \vdash \xi : \Delta \binding \Sigma'$}}
+\begin{mathpar}
+\small
 \inferrule*[lab={\ruleName{class}}]
 {
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
@@ -27,7 +45,7 @@
   \Sigma; \Gamma' \vdash \psi_i \synth \sigma_i \quad (\forall i)
 }
 {
-  \Sigma; q; \Gamma \vdash \exDataclass{c[\seq{\alpha}]}{\phi} : \Assigns{\set{\bind{c}{\Type{q.c}}}} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}
+  \Sigma; q; \Gamma \vdash \exDataclass{c[\seq{\alpha}]}{\phi} : \deleted{\mathsf{Assigns}(}\set{\bind{c}{\Type{q.c}}}\deleted{)} \binding \replaced{\{}{\Sigma, }\bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}\added{\}}
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
@@ -43,7 +61,7 @@
   \set{\seq{x}} \cap \set{\seq{y}} = \varnothing
 }
 {
-  \Sigma; q; \Gamma \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}']}{\phi} : \Assigns{\set{\bind{c}{\Type{q.c}}}} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}
+  \Sigma; q; \Gamma \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}']}{\phi} : \deleted{\mathsf{Assigns}(}\set{\bind{c}{\Type{q.c}}}\deleted{)} \binding \replaced{\{}{\Sigma, }\bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}\added{\}}
 }
 \and
 \inferrule*[lab={\ruleName{type-alias}}]
@@ -52,9 +70,9 @@
   \Sigma; \Gamma' \vdash \psi \synth \tau
 }
 {
-  \Sigma; q; \Gamma \vdash \exTypeAlias{x[\seq{\alpha}]}{\psi} : \Assigns{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}} \binding \Sigma
+  \Sigma; q; \Gamma \vdash \exTypeAlias{x[\seq{\alpha}]}{\psi} : \deleted{\mathsf{Assigns}(}\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}\deleted{)} \binding \replaced{\varnothing}{\Sigma}
 }
 \end{mathpar}
-\caption{Top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$}
+\caption{Top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$\added{; type declaration $\xi$ binds $\Delta$, with class table entries $\Sigma'$}}
 \label{fig:typing-top-level}
 \end{figure}

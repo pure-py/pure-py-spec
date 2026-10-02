@@ -273,16 +273,31 @@ definitions and modules introduce the variables of the scope as unbound, using t
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:scope}}).
 
 The conditions of \pyinline{if} and \pyinline{assert}
-check against \pyinline{bool}, and an assertion message against \pyinline{str}. A class declaration binds
-the class name to $\Type{C}$, resolves the field annotations, which may mention the type parameters of the class,, and requires the fields it declares to be distinct and, when it extends
+check against \pyinline{bool}, and an assertion message against \pyinline{str}.
+
+\added{The \ruleName{types} rule (\figref{typing-top-level}) checks a mutual type region $\seq{\xi}$ as one mutually recursive binding.
+The auxiliary judgement $\Sigma; q; \Gamma \vdash \xi : \Delta \binding \Sigma'$ gives, for each type declaration $\xi_i$, the
+binding $\Delta_i$ of the declared name and the class table entries $\Sigma_i$, empty for a \pyinline{type} statement. The
+rule binds all the declared names together, and checks every type declaration under the class table extended with the
+class table entries of the whole mutual type region. The context of the check depends on the form of the declaration. A
+\pyinline{type} statement is checked with every name of the mutual type region bound, so its body may name classes and
+aliases declared later. A class declaration is checked with only the earlier names bound, because Python evaluates the
+field annotations and base of a class when the class statement runs, but evaluates the body of a \pyinline{type} statement
+only when the alias is first used. A recursive datatype is therefore declared with its alias before its classes, as in
+\pyinline{type Expr = Num | Add} followed by declarations of \pyinline{Num} and of \pyinline{Add} with fields of type
+\pyinline{Expr}. The relation taking each alias of a mutual type region to the aliases of that mutual type region named in
+its body must be acyclic, which excludes \pyinline{type T = list[T]}.}
+
+A class declaration binds
+the class name to $\Type{C}$, resolves the field annotations, which may mention the type parameters of the class\deleted{,}, and requires the fields it declares to be distinct and, when it extends
 another class, the base to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
 scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement $\exTypeAlias{x[\seq{\alpha}]}{\psi}$, such as \pyinline{type Pair[T] = tuple[T, T]},
 declares $x$ as an alias of the type denoted by $\psi$ with the type parameters $\seq{\alpha}$ in scope
 (\ruleName{type-alias}). An application of the alias such as \pyinline{Pair[int]} denotes that type at the given
-arguments (\ruleName{ty-alias}), here \pyinline{tuple[int, int]}, so types never mention aliases. Since the names declared by a module are unbound
+arguments (\ruleName{ty-alias}), here \pyinline{tuple[int, int]}, so types never mention aliases. \deleted{Since the names declared by a module are unbound
 before their declarations (\secref{well-formedness-modules}), $\psi$ can name only classes and aliases declared
-earlier in the module, and cannot name $x$ itself. Each rule that takes an annotation resolves it to a type
+earlier in the module, and cannot name $x$ itself.} Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
 
 The \ruleName{def} rule for a mutual region of function definitions synthesises a type scheme for each definition
