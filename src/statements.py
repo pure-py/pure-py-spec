@@ -1,10 +1,13 @@
 import ast
 from collections.abc import Sequence
 from dataclasses import replace
+from graphlib import CycleError, TopologicalSorter
+from typing import cast
 
 import reasons
 from aux import (
     Statement,
+    TypeDeclaration,
     assign_targets,
     assigns_body,
     binds_quals,
@@ -195,11 +198,71 @@ def check_top_seq(ts: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
 
 
 def check_top_statement(t: Statement, mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
-    if isinstance(t, ast.ClassDef):
-        return dataclass(t, mod_ctx)
-    if isinstance(t, ast.TypeAlias):
-        return type_alias(t, mod_ctx)
+    if isinstance(t, list) and isinstance(t[0], (ast.ClassDef, ast.TypeAlias)):
+        return types(t, mod_ctx)
     return check_statement(t, mod_ctx, None), mod_ctx.Sigma
+
+
+def types(xis: list[TypeDeclaration], mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
+    classes = [xi for xi in xis if isinstance(xi, ast.ClassDef)]
+    names: Context = {xi.name: Class(qualified(mod_ctx.q, xi.name)) for xi in classes}
+    Sigma: ClassTable = {
+        **mod_ctx.Sigma,
+        **{Class(qualified(mod_ctx.q, xi.name)): header(xi) for xi in classes},
+    }
+    aliases: Context = {}
+    for alias in alias_order(xis):
+        mod_ctx_ = replace(override_gamma(mod_ctx, {**names, **aliases}), Sigma=Sigma)
+        aliases = {**aliases, **type_alias(alias, mod_ctx_)}
+    delta: Context = {}
+    for xi in xis:
+        if isinstance(xi, ast.ClassDef):
+            delta_i, Sigma_i = dataclass(xi, replace(override_gamma(mod_ctx, delta), Sigma=Sigma))
+            delta, Sigma = {**delta, **delta_i}, {**Sigma, **Sigma_i}
+        else:
+            assert isinstance(xi.name, ast.Name)
+            delta = {**delta, xi.name.id: aliases[xi.name.id]}
+    return Assigns(delta), Sigma
+
+
+def header(xi: ast.ClassDef) -> ClassTableEntry:
+    """Class table entry giving type parameters only"""
+    return ClassTableEntry(type_params(xi), (), None)
+
+
+def alias_order(xis: list[TypeDeclaration]) -> list[ast.TypeAlias]:
+    """Type statements, each after the aliases named in its body"""
+    aliases = {
+        xi.name.id: xi
+        for xi in xis
+        if isinstance(xi, ast.TypeAlias) and isinstance(xi.name, ast.Name)
+    }
+    named = {
+        x: (names_of(type_expr(xi.value)) - set(type_params(xi))) & aliases.keys()
+        for x, xi in aliases.items()
+    }
+    try:
+        return [aliases[x] for x in TopologicalSorter(named).static_order()]
+    except CycleError as e:
+        x = e.args[1][0]
+        raise IllFormedModule(aliases[x], reasons.CyclicTypeAlias(x)) from None
+
+
+def names_of(psi: TypeExpr) -> set[Var]:
+    """Simple names occurring in type expression"""
+    match psi:
+        case TypeName(q, args):
+            return ({q.parts[0]} if len(q.parts) == 1 else set()).union(*map(names_of, args))
+        case ListExpr(psi_) | DictExpr(psi_):
+            return names_of(psi_)
+        case TupleExpr(psis):
+            return set().union(*map(names_of, psis))
+        case CallableExpr(psis, psi_):
+            return names_of(psi_).union(*map(names_of, psis))
+        case UnionExpr(psi_, psi__):
+            return names_of(psi_) | names_of(psi__)
+        case _:
+            return set()
 
 
 def check_seq(
@@ -222,7 +285,7 @@ def check_statement(
     s: Statement, mod_ctx: ModuleContext, returns: Type | None, tail: bool = False
 ) -> StaticOutcome:
     if isinstance(s, list):
-        return check_defs(s, mod_ctx)
+        return check_defs(cast(list[ast.FunctionDef], s), mod_ctx)
     return check_stmt(s, mod_ctx, returns, tail)
 
 
@@ -637,12 +700,13 @@ def dict_type(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> Dic
 def constr(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> Type:
     args = constructor_args(c, e, mod_ctx)
     pi = fields(mod_ctx.Sigma, c)
-    sigmas = dict(pi.fields)
+    alphas = fresh(pi.type_params)
+    sigmas = {x: rename(alphas, pi.type_params, sigma) for x, sigma in pi.fields}
     synthesising = [
         (sigmas[x], synth_expr(arg, mod_ctx)) for x, arg in args.items() if synthesises(arg)
     ]
     gamma = type_args_seq(mod_ctx.Sigma, [s for s, _ in synthesising], [t for _, t in synthesising])
-    tau = ClassType(c, tuple(type_arguments(gamma, pi.type_params, e)))
+    tau = ClassType(c, tuple(type_arguments(gamma, alphas, e)))
     for x, arg in args.items():
         check_expr(arg, declared_type(mod_ctx.Sigma, tau, x), mod_ctx)
     return tau
@@ -690,27 +754,40 @@ def callee(e: ast.Call, mod_ctx: ModuleContext) -> Type:
     pi = entry_of(e.func, mod_ctx)
     if not isinstance(pi, TypeScheme):
         return synth_expr(e.func, mod_ctx)
-    assert isinstance(pi.tau, CallableType)
+    alphas = fresh(pi.params)
+    tau = rename(alphas, pi.params, pi.tau)
+    assert isinstance(tau, CallableType)
     synthesising = [
         (sigma, synth_expr(arg, mod_ctx))
-        for sigma, arg in zip(pi.tau.params, e.args)
+        for sigma, arg in zip(tau.params, e.args)
         if synthesises(arg)
     ]
     gamma = type_args_seq(mod_ctx.Sigma, [s for s, _ in synthesising], [t for _, t in synthesising])
-    return substitute(type_arguments(gamma, pi.params, e), pi.params, pi.tau)
+    return substitute(type_arguments(gamma, alphas, e), alphas, tau)
+
+
+def fresh(alphas: Sequence[Var]) -> tuple[Var, ...]:
+    """Type parameters renamed to variables distinct from any in scope"""
+    return tuple(alpha + "'" for alpha in alphas)
+
+
+def rename(alphas: Sequence[Var], betas: Sequence[Var], sigma: Type) -> Type:
+    return substitute([TypeVariable(alpha) for alpha in alphas], betas, sigma)
 
 
 def type_arguments(gamma: dict[Var, Type], alphas: Sequence[Var], node: ast.AST) -> list[Type]:
     """Context applied to the sequence of type parameters"""
     missing = next((alpha for alpha in alphas if alpha not in gamma), None)
     if missing is not None:
-        raise IllFormedModule(node, reasons.NoTypeArgument(missing))
+        raise IllFormedModule(node, reasons.NoTypeArgument(missing.removesuffix("'")))
     return [gamma[alpha] for alpha in alphas]
 
 
 def var_scheme(pi: TypeScheme, e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
-    gamma = type_args_seq(mod_ctx.Sigma, [pi.tau], [expected])
-    actual = substitute(type_arguments(gamma, pi.params, e), pi.params, pi.tau)
+    alphas = fresh(pi.params)
+    tau = rename(alphas, pi.params, pi.tau)
+    gamma = type_args_seq(mod_ctx.Sigma, [tau], [expected])
+    actual = substitute(type_arguments(gamma, alphas, e), alphas, tau)
     if not subtype(mod_ctx.Sigma, actual, expected):
         raise IllFormedModule(e, reasons.TypeMismatch(expected, actual))
 
@@ -877,7 +954,7 @@ def iterated_type(e: ast.expr, mod_ctx: ModuleContext) -> Type:
     return elem
 
 
-def dataclass(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
+def dataclass(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Context, ClassTable]:
     if not isinstance(mod_ctx.gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.NotPredefinedName("dataclass"))
     alphas = type_params(node)
@@ -890,16 +967,15 @@ def dataclass(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[StaticOutcome
     if dup is not None:
         raise IllFormedModule(node, reasons.DuplicateField(dup, node.name))
     c = Class(qualified(mod_ctx.q, node.name))
-    assert c not in mod_ctx.Sigma
-    return Assigns({node.name: c}), {**mod_ctx.Sigma, c: ClassTableEntry(alphas, own, base)}
+    return {node.name: c}, {c: ClassTableEntry(alphas, own, base)}
 
 
-def type_alias(node: ast.TypeAlias, mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
+def type_alias(node: ast.TypeAlias, mod_ctx: ModuleContext) -> Context:
     assert isinstance(node.name, ast.Name)
     alphas = type_params(node)
     mod_ctx_ = override_gamma(mod_ctx, {alpha: TypeVar() for alpha in alphas})
     tau = resolve_type(type_expr(node.value), node, mod_ctx_)
-    return Assigns({node.name.id: TypeAlias(alphas, tau)}), mod_ctx.Sigma
+    return {node.name.id: TypeAlias(alphas, tau)}
 
 
 def base_class(node: ast.ClassDef, mod_ctx: ModuleContext) -> ClassType:
