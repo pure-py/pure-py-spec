@@ -82,7 +82,7 @@ free variables of each lambda's body, less its parameters.
 Mutual recursion in Python relies on late binding: the free variables of a function are resolved when
 they are evaluated, so two functions may refer to each other whatever order they are defined in, provided
 both exist by the time the reference is evaluated. \PurePy makes the
-dependency static: a \emph{mutual def region}, a maximal contiguous block of \pyinline{def} statements (\figref{syntax-stmt}), is a single simultaneous binding. The \ruleName{def} rule checks each body in a
+dependency static: a \emph{mutual def region}, a maximal contiguous block of \pyinline{def} statements (\figref{syntax-stmt}), is a single simultaneous binding. The \ruleName{defs} rule checks each body in a
 context in which every name of the mutual def region is definitely assigned, so any function in the region may refer
 to any other, and requires the names to be distinct. Self-recursion is the special case of a singleton
 mutual def region. Any other statement between two definitions separates them into different mutual def regions:

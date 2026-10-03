@@ -300,12 +300,12 @@ before their declarations (\secref{well-formedness-modules}), $\psi$ can name on
 earlier in the module, and cannot name $x$ itself.} Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).
 
-The \ruleName{def} rule for a mutual def region of function definitions synthesises a type scheme for each definition
+The \ruleName{defs} rule for a mutual def region of function definitions synthesises a type scheme for each definition
 (\figref{typing-def}), binds all the function names of the mutual def region at the synthesised type schemes, and checks each
 definition against its scheme. For a definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$,
 the auxiliary judgements $\Sigma; \Gamma \vdash d \synth \pi$ and $\Sigma; \Gamma \vdash d \checks \pi$ synthesise the type
 scheme from the annotations (\ruleName{def-signature}) and check the body $s$ (\ruleName{def-body}). Both rules extend the
-context with $\TypeVar$ entries for the type parameters $\seq{\alpha}$. A type scheme without type parameters is identical to its \pyinline{Callable} type, so the \ruleName{def} rule binds the name of a
+context with $\TypeVar$ entries for the type parameters $\seq{\alpha}$. A type scheme without type parameters is identical to its \pyinline{Callable} type, so the \ruleName{defs} rule binds the name of a
 function without type parameters as a variable of that type. The type schemes of functions with type parameters are instantiated
 at a call, by the argument types (\ruleName{callee-scheme}), and when checked against a \pyinline{Callable} type, by that
 type (\ruleName{var-scheme}). Since annotations denote types, not type schemes, declarations and
