@@ -44,9 +44,9 @@
 \inferrule*[lab={\ruleName{class}}]
 {
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
-  \replaced{\Gamma''}{\Gamma'} = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
+  \replaced{\Gamma^\dagger}{\Gamma'} = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \Sigma; \replaced{\Gamma''}{\Gamma'} \vdash \psi_i \synth \sigma_i \quad (\forall i)
+  \Sigma; \replaced{\Gamma^\dagger}{\Gamma'} \vdash \psi_i \synth \sigma_i \quad (\forall i)
 }
 {
   \Sigma; q; \Gamma\added{; \Gamma'} \vdash \exDataclass{c[\seq{\alpha}]}{\phi} : \deleted{\Assigns{\set{\bind{c}{\Type{q.c}}}} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}} \\
@@ -55,13 +55,13 @@
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \replaced{\Gamma''}{\Gamma'} = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
+  \replaced{\Gamma^\dagger}{\Gamma'} = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
   \Gamma \vdash q' : \Type{D} \\
-  \Sigma; \replaced{\Gamma''}{\Gamma'} \vdash q'[\seq{\psi}'] \synth D[\seq{\sigma}'] \\
+  \Sigma; \replaced{\Gamma^\dagger}{\Gamma'} \vdash q'[\seq{\psi}'] \synth D[\seq{\sigma}'] \\
   \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \Sigma; \replaced{\Gamma''}{\Gamma'} \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
+  \Sigma; \replaced{\Gamma^\dagger}{\Gamma'} \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
   \fields{\Sigma}(D) = \scheme{\seq{\alpha}'}{\bind{\seq{y}}{\seq{\tau}}} \\
   \set{\seq{x}} \cap \set{\seq{y}} = \varnothing
 }
@@ -72,8 +72,8 @@
 \and
 \inferrule*[lab={\ruleName{type-alias}}]
 {
-  \replaced{\Gamma''}{\Gamma'} = \Gamma\added{'} \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
-  \Sigma; \replaced{\Gamma''}{\Gamma'} \vdash \psi \synth \tau
+  \replaced{\Gamma^\dagger}{\Gamma'} = \Gamma\added{'} \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
+  \Sigma; \replaced{\Gamma^\dagger}{\Gamma'} \vdash \psi \synth \tau
 }
 {
   \Sigma; q; \Gamma\added{; \Gamma'} \vdash \exTypeAlias{x[\seq{\alpha}]}{\psi} : \replaced{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}} \binding \varnothing}{\Assigns{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}} \binding \Sigma}
