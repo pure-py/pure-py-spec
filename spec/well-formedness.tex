@@ -284,8 +284,10 @@ rule binds all the declared names simultaneously, and checks every type declarat
 class table entries of the whole mutual type region. The judgement takes two contexts: class declarations resolve their
 field annotations and base classes in $\Gamma$, and \pyinline{type} statements resolve their bodies in $\Gamma'$. For the $i$-th
 declaration the rule passes as $\Gamma$ the context binding only the earlier names of the mutual type region, and as
-$\Gamma'$ the context binding all of them, because Python evaluates the field annotations and base class of a class when the class
-statement runs, but evaluates the body of a \pyinline{type} statement only when the alias is first used. So the bodies of
+$\Gamma'$ the context binding all of them, because Python~\pythonVersion{} evaluates the field annotations and base class of a class when the class
+statement runs, but evaluates the body of a \pyinline{type} statement only when the alias is first used.\footnote{\PurePy does
+not support the import \pyinline{from __future__ import annotations}, under which Python defers the evaluation of
+annotations, as Python 3.14 does by default (PEP 649, \url{https://peps.python.org/pep-0649/}).} So the bodies of
 \pyinline{type} statements may name classes and aliases declared later, whereas class declarations may name only earlier
 ones, and recursive datatypes are declared with their aliases before their classes, as in \pyinline{type Expr = Num | Add}
 followed by declarations of \pyinline{Num} and of \pyinline{Add} with fields of type \pyinline{Expr}. The aliases of
