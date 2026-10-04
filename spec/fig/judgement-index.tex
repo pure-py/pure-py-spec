@@ -21,7 +21,7 @@ $\Sigma; \Gamma \vdash d \synth \tau$ & definition $d$ synthesises type $\tau$ &
 $\Sigma; \Gamma \vdash d \checks \tau$ & definition $d$ checks against type $\tau$ & \figref{typing-def-check} \\
 $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ & cases $\seq{b}$ have static outcome $S$, transforming remaining type $\tau$ and residual $L$ to $\tau'$ and $L'$ & \figref{typing-cases} \\
 $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ & top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$ & \replaced{\figref{typing-top-level-stmt}}{\figref{typing-top-level}} \\
-\added{$\Sigma; q; \Gamma \vdash \xi : \Delta \binding \Sigma'$} & \added{type declaration $\xi$ of module $q$ binds $\Delta$, with class table entries $\Sigma'$} & \added{\figref{typing-top-level-decl}} \\
+\added{$\Sigma; q; \Gamma; \Gamma' \vdash \xi : \Delta \binding \Sigma'$} & \added{type declaration $\xi$ of module $q$ binds $\Delta$, with class table entries $\Sigma'$, under $\Gamma$ for class declarations and $\Gamma'$ for type statements} & \added{\figref{typing-top-level-decl}} \\
 $\Sigma \vdash \Gamma, x \importsR \theta \binding \Sigma'$ & name $x$ imported from module signature $\Gamma$ has context entry $\theta$ & \figref{typing-imports} \\
 $\Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma'$ & imports $\seq{\iota}$ of module $q$ yield context $\Gamma$ & \figref{typing-import-prefix} \\
 $\Sigma \vdash \theta, \seq{x} \loadsAs \theta' \binding \Sigma'$ & loaded module $\theta$ extended along chain $\seq{x}$ of submodule names gives context entry $\theta'$ & \figref{typing-import-prefix} \\

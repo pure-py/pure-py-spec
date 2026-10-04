@@ -24,9 +24,8 @@
 {
   \added{\Delta = \Delta_1 \override \cdots \override \Delta_n} \\
   \added{\Sigma' = \Sigma, \Sigma_1, \ldots, \Sigma_n} \\
-  \added{\text{aliases of } \seq{\xi} \text{ acyclic}} \\
-  \added{\Sigma'; q; \Gamma \override \Delta \vdash \xi_i : \Delta_i \binding \Sigma_i \quad (\xi_i \text{ a type statement})} \\
-  \added{\Sigma'; q; \Gamma \override \Delta_1 \override \cdots \override \Delta_{i-1} \vdash \xi_i : \Delta_i \binding \Sigma_i \quad (\xi_i \text{ a class declaration})}
+  \added{\aliasDep{\seq{\xi}} \text{ acyclic}} \\
+  \added{\Sigma'; q; \Gamma \override \Delta_1 \override \cdots \override \Delta_{i-1}; \Gamma \override \Delta \vdash \xi_i : \Delta_i \binding \Sigma_i \quad (\forall i)}
 }
 {
   \added{\Sigma; q; \Gamma \vdash \seq{\xi} : \Assigns{\Delta} \binding \Sigma'}
@@ -39,48 +38,48 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \added{\shadebox{$\Sigma; q; \Gamma \vdash \xi : \Delta \binding \Sigma'$}}
+\flushleft \added{\shadebox{$\Sigma; q; \Gamma; \Gamma' \vdash \xi : \Delta \binding \Sigma'$}}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{class}}]
 {
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
-  \Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
+  \replaced{\Gamma''}{\Gamma'} = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \Sigma; \Gamma' \vdash \psi_i \synth \sigma_i \quad (\forall i)
+  \Sigma; \replaced{\Gamma''}{\Gamma'} \vdash \psi_i \synth \sigma_i \quad (\forall i)
 }
 {
-  \Sigma; q; \Gamma \vdash \exDataclass{c[\seq{\alpha}]}{\phi} : \deleted{\Assigns{\set{\bind{c}{\Type{q.c}}}} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}} \\
+  \Sigma; q; \Gamma\added{; \Gamma'} \vdash \exDataclass{c[\seq{\alpha}]}{\phi} : \deleted{\Assigns{\set{\bind{c}{\Type{q.c}}}} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}} \\
   \added{\set{\bind{c}{\Type{q.c}}} \binding \set{\bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}}}
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
+  \replaced{\Gamma''}{\Gamma'} = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
   \Gamma \vdash q' : \Type{D} \\
-  \Sigma; \Gamma' \vdash q'[\seq{\psi}'] \synth D[\seq{\sigma}'] \\
+  \Sigma; \replaced{\Gamma''}{\Gamma'} \vdash q'[\seq{\psi}'] \synth D[\seq{\sigma}'] \\
   \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \Sigma; \Gamma' \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
+  \Sigma; \replaced{\Gamma''}{\Gamma'} \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
   \fields{\Sigma}(D) = \scheme{\seq{\alpha}'}{\bind{\seq{y}}{\seq{\tau}}} \\
   \set{\seq{x}} \cap \set{\seq{y}} = \varnothing
 }
 {
-  \Sigma; q; \Gamma \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}']}{\phi} : \deleted{\Assigns{\set{\bind{c}{\Type{q.c}}}} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}} \\
+  \Sigma; q; \Gamma\added{; \Gamma'} \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}']}{\phi} : \deleted{\Assigns{\set{\bind{c}{\Type{q.c}}}} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}} \\
   \added{\set{\bind{c}{\Type{q.c}}} \binding \set{\bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}}}
 }
 \and
 \inferrule*[lab={\ruleName{type-alias}}]
 {
-  \Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
-  \Sigma; \Gamma' \vdash \psi \synth \tau
+  \replaced{\Gamma''}{\Gamma'} = \Gamma\added{'} \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
+  \Sigma; \replaced{\Gamma''}{\Gamma'} \vdash \psi \synth \tau
 }
 {
-  \Sigma; q; \Gamma \vdash \exTypeAlias{x[\seq{\alpha}]}{\psi} : \replaced{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}} \binding \varnothing}{\Assigns{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}} \binding \Sigma}
+  \Sigma; q; \Gamma\added{; \Gamma'} \vdash \exTypeAlias{x[\seq{\alpha}]}{\psi} : \replaced{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}} \binding \varnothing}{\Assigns{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}} \binding \Sigma}
 }
 \end{mathpar}
-\subcaption{\added{Type declaration $\xi$ of module $q$ binds $\Delta$, with class table entries $\Sigma'$}}
+\subcaption{\added{Type declaration $\xi$ of module $q$ binds $\Delta$, with class table entries $\Sigma'$, under $\Gamma$ for class declarations and $\Gamma'$ for type statements}}
 \label{fig:typing-top-level-decl}
 \end{subfigure}
 \caption{Top-level statements\added{ and type declarations}}
