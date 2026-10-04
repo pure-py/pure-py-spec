@@ -133,7 +133,7 @@ the arguments against $\seq{\sigma}$, and the call synthesises $\sigma$. The aux
 \pyinline{Callable} type gives the parameter and result types of that type (\ruleName{callee}). A name bound at a
 type scheme $\scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}$ instantiates the type parameters from the arguments
 (\ruleName{callee-scheme}). \added{The type parameters $\seq{\alpha}$ matched by \ruleName{callee-scheme}, \ruleName{var-scheme}
-and \ruleName{constr} are chosen distinct from the type variables in scope, so that a recursive call inside a function with
+and \ruleName{constr} are chosen to be distinct from the type variables in scope, so that a recursive call inside a function with
 type parameters does not confuse the parameters of the type scheme with the type variables of the body.} The type arguments are collected by $\typeArgs{\Sigma}$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) over the arguments that synthesise,
 by a one-way unification of each parameter type with the synthesised type: a type variable takes the type found at the same
