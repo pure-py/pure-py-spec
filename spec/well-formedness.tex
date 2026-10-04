@@ -132,7 +132,9 @@ types $\seq{\sigma}$ and result type $\sigma$ from the callee along with its arg
 the arguments against $\seq{\sigma}$, and the call synthesises $\sigma$. The auxiliary judgement has two rules. A callee that synthesises a
 \pyinline{Callable} type gives the parameter and result types of that type (\ruleName{callee}). A name bound at a
 type scheme $\scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}$ instantiates the type parameters from the arguments
-(\ruleName{callee-scheme}). The type arguments are collected by $\typeArgs{\Sigma}$
+(\ruleName{callee-scheme}). \added{The type parameters $\seq{\alpha}$ matched by \ruleName{callee-scheme}, \ruleName{var-scheme}
+and \ruleName{constr} are chosen distinct from the type variables in scope, so that a recursive call inside a function with
+type parameters does not confuse the parameters of the type scheme with the type variables of the body.} The type arguments are collected by $\typeArgs{\Sigma}$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) over the arguments that synthesise,
 by a one-way unification of each parameter type with the synthesised type: a type variable takes the type found at the same
 position in the synthesised type, and a type variable found at several positions takes the join of those types.
