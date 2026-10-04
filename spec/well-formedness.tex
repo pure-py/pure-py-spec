@@ -282,9 +282,9 @@ The auxiliary judgement $\Sigma; q; \Gamma; \Gamma' \vdash \xi : \Delta \binding
 the binding $\Delta_i$ of the declared name and the class table entries $\Sigma_i$, which are empty for a \pyinline{type} statement. The
 rule binds all the declared names simultaneously, and checks every type declaration under the class table extended with the
 class table entries of the whole mutual type region. The judgement takes two contexts: a class declaration resolves its
-field annotations and base in $\Gamma$, and a \pyinline{type} statement resolves its body in $\Gamma'$. For the $i$-th
+field annotations and base class in $\Gamma$, and a \pyinline{type} statement resolves its body in $\Gamma'$. For the $i$-th
 declaration the rule passes as $\Gamma$ the context binding only the earlier names of the mutual type region, and as
-$\Gamma'$ the context binding all of them, because Python evaluates the field annotations and base of a class when the class
+$\Gamma'$ the context binding all of them, because Python evaluates the field annotations and base class of a class when the class
 statement runs, but evaluates the body of a \pyinline{type} statement only when the alias is first used. So the body of a
 \pyinline{type} statement may name classes and aliases declared later, whereas a class declaration may name only earlier
 ones, and a recursive datatype is declared with its alias before its classes, as in \pyinline{type Expr = Num | Add}
@@ -296,7 +296,7 @@ which excludes \pyinline{type T = list[T]}.}
 
 A class declaration binds
 the class name to $\Type{C}$, resolves the field annotations, which may mention the type parameters of the class\deleted{,}, and requires the fields it declares to be distinct and, when it extends
-another class, the base to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
+another class, the base \added{class} to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
 scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement $\exTypeAlias{x[\seq{\alpha}]}{\psi}$, such as \pyinline{type Pair[T] = tuple[T, T]},
 declares $x$ as an alias of the type denoted by $\psi$ with the type parameters $\seq{\alpha}$ in scope

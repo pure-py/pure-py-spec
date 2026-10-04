@@ -84,7 +84,7 @@ class. A class is also the type of its instances.
 A class table $\Sigma$ is a finite map from classes to class table entries, with $\Sigma(C)$ of the form
 $\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{D[\seq{\sigma}]}$: the type parameters $\seq{\alpha}$ of $C$, its distinct fields $\seq{x}$ with their declared types
 $\seq{\tau}$, and its instantiated base class $D[\seq{\sigma}]$, or $\bot$ if it has none; the field types and the
-type arguments of the base may mention $\seq{\alpha}$. Every class named in $\Sigma$ is in
+type arguments of the base \added{class} may mention $\seq{\alpha}$. Every class named in $\Sigma$ is in
 $\dom(\Sigma)$, and the relation taking each class of $\Sigma$ to its base class $D$ is
 acyclic.
 \end{definition}
