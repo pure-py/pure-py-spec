@@ -280,7 +280,7 @@ check against \pyinline{bool}, and an assertion message against \pyinline{str}.
 \added{The \ruleName{types} rule (\figref{typing-top-level}) checks a mutual type region $\seq{\xi}$ as one mutually recursive binding.
 The auxiliary judgement $\Sigma; q; \Gamma; \Gamma' \vdash \xi : \Delta \binding \Sigma'$ gives, for each type declaration $\xi_i$,
 the binding $\Delta_i$ of the declared name and the class table entries $\Sigma_i$, which are empty for a \pyinline{type} statement. The
-rule binds all the declared names together, and checks every type declaration under the class table extended with the
+rule binds all the declared names simultaneously, and checks every type declaration under the class table extended with the
 class table entries of the whole mutual type region. The judgement takes two contexts: a class declaration resolves its
 field annotations and base in $\Gamma$, and a \pyinline{type} statement resolves its body in $\Gamma'$. For the $i$-th
 declaration the rule passes as $\Gamma$ the context binding only the earlier names of the mutual type region, and as
