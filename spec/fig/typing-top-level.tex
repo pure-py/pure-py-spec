@@ -1,4 +1,5 @@
 \begin{figure}
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$}
 \begin{mathpar}
 \small
@@ -31,9 +32,13 @@
   \added{\Sigma; q; \Gamma \vdash \seq{\xi} : \Assigns{\Delta} \binding \Sigma'}
 }
 \end{mathpar}
+\subcaption{Top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$}
+\label{fig:typing-top-level-stmt}
+\end{subfigure}
 
 \vspace{2mm}
 
+\begin{subfigure}{\textwidth}
 \flushleft \added{\shadebox{$\Sigma; q; \Gamma \vdash \xi : \Delta \binding \Sigma'$}}
 \begin{mathpar}
 \small
@@ -45,7 +50,8 @@
   \Sigma; \Gamma' \vdash \psi_i \synth \sigma_i \quad (\forall i)
 }
 {
-  \Sigma; q; \Gamma \vdash \exDataclass{c[\seq{\alpha}]}{\phi} : \deleted{\mathsf{Assigns}(}\set{\bind{c}{\Type{q.c}}}\deleted{)} \binding \replaced{\{}{\Sigma, }\bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}\added{\}}
+  \Sigma; q; \Gamma \vdash \exDataclass{c[\seq{\alpha}]}{\phi} : \deleted{\Assigns{\set{\bind{c}{\Type{q.c}}}} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}} \\
+  \added{\set{\bind{c}{\Type{q.c}}} \binding \set{\bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}}}
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
@@ -61,7 +67,8 @@
   \set{\seq{x}} \cap \set{\seq{y}} = \varnothing
 }
 {
-  \Sigma; q; \Gamma \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}']}{\phi} : \deleted{\mathsf{Assigns}(}\set{\bind{c}{\Type{q.c}}}\deleted{)} \binding \replaced{\{}{\Sigma, }\bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}\added{\}}
+  \Sigma; q; \Gamma \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}']}{\phi} : \deleted{\Assigns{\set{\bind{c}{\Type{q.c}}}} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}} \\
+  \added{\set{\bind{c}{\Type{q.c}}} \binding \set{\bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}}}
 }
 \and
 \inferrule*[lab={\ruleName{type-alias}}]
@@ -70,9 +77,12 @@
   \Sigma; \Gamma' \vdash \psi \synth \tau
 }
 {
-  \Sigma; q; \Gamma \vdash \exTypeAlias{x[\seq{\alpha}]}{\psi} : \deleted{\mathsf{Assigns}(}\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}\deleted{)} \binding \replaced{\varnothing}{\Sigma}
+  \Sigma; q; \Gamma \vdash \exTypeAlias{x[\seq{\alpha}]}{\psi} : \replaced{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}} \binding \varnothing}{\Assigns{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}} \binding \Sigma}
 }
 \end{mathpar}
-\caption{Top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$\added{; type declaration $\xi$ binds $\Delta$, with class table entries $\Sigma'$}}
+\subcaption{\added{Type declaration $\xi$ of module $q$ binds $\Delta$, with class table entries $\Sigma'$}}
+\label{fig:typing-top-level-decl}
+\end{subfigure}
+\caption{Top-level statements\added{ and type declarations}}
 \label{fig:typing-top-level}
 \end{figure}

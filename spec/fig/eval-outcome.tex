@@ -214,6 +214,7 @@
 
 \begin{figure}
 \small
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$q, \rho, t \Rightarrow o$}
 \begin{mathpar}
 \small
@@ -251,9 +252,13 @@
   \added{q, \rho, \seq{\xi} \Rightarrow \assigns{\rho'}}
 }
 \end{mathpar}
+\subcaption{Top-level statement $t$ of module $q$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
+\label{fig:eval-top-level-stmt}
+\end{subfigure}
 
 \vspace{2mm}
 
+\begin{subfigure}{\textwidth}
 \flushleft \added{\shadebox{$q, \Gamma, \xi \Rightarrow \rho$}}
 \begin{mathpar}
 \small
@@ -281,7 +286,10 @@
   q, \replaced{\Gamma}{\rho}, \exTypeAlias{x[\seq{\alpha}]}{\psi} \Rightarrow \deleted{\mathsf{assigns}(}\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}\deleted{)}
 }
 \end{mathpar}
-\caption{Top-level statement $t$ of module $q$ evaluates to outcome $o$ under environment $\rho : \Gamma$\added{; type declaration $\xi$ evaluates to bindings $\rho$ under context $\Gamma$}}
+\subcaption{\added{Type declaration $\xi$ of module $q$ evaluates to bindings $\rho$ under context $\Gamma$}}
+\label{fig:eval-top-level-decl}
+\end{subfigure}
+\caption{Top-level statements\added{ and type declarations}}
 \label{fig:eval-top-level}
 \end{figure}
 

@@ -1,4 +1,6 @@
 % Copy of agent-workflows src/paper_authoring/change-tracking.tex; keep in sync manually.
+% Local extension: inline code inside markup takes the markup colour (\codecolor, \ifcodeinmarkup;
+% see tex/listings.tex).
 % Change-tracking macros for paper_authoring workflow.
 % Requires: xcolor, changebar, marginnote packages.
 % Note: does NOT require soul/\sout — deleted text is greyed out, not struck through.
@@ -6,6 +8,8 @@
 
 % Inline change markup. Define \acceptchanges before loading to accept all changes
 % (render added text plainly, drop deleted text).
+\providecommand*{\codecolor}{base05}
+\newif\ifcodeinmarkup
 \ifdefined\acceptchanges
   \newcommand{\added}[1]{#1}
   \newcommand{\deleted}[1]{}
@@ -13,9 +17,10 @@
 \else
   \definecolor{addedcolor}{RGB}{0,160,0}
   \definecolor{deletedcolor}{RGB}{180,180,180}
-  \newcommand{\added}[1]{\textcolor{addedcolor}{#1}}
-  \newcommand{\deleted}[1]{\textcolor{deletedcolor}{#1}}
-  \newcommand{\replaced}[2]{\textcolor{deletedcolor}{#2}\textcolor{addedcolor}{#1}}
+  \DeclareRobustCommand{\markupcolor}[2]{\textcolor{#1}{\codeinmarkuptrue\renewcommand*{\codecolor}{#1}#2}}
+  \newcommand{\added}[1]{\markupcolor{addedcolor}{#1}}
+  \newcommand{\deleted}[1]{\markupcolor{deletedcolor}{#1}}
+  \newcommand{\replaced}[2]{\markupcolor{deletedcolor}{#2}\markupcolor{addedcolor}{#1}}
 \fi
 
 % Changebar-marked variants and display blocks (require the changebar package; xspace for the
@@ -33,8 +38,8 @@
   \newcommand{\Added}[1]{\leavevmode\protect\cbstart\added{#1}\protect\cbend\xspace}
   \newcommand{\Deleted}[1]{\leavevmode\protect\cbstart\deleted{#1}\protect\cbend\xspace}
   \newcommand{\Replaced}[2]{\leavevmode\protect\cbstart\replaced{#1}{#2\ }\protect\cbend\xspace}
-  \newenvironment{DeletedBlock}{\par\cbstart\color{deletedcolor}}{\cbend\par}
-  \newenvironment{AddedBlock}{\par\cbstart\color{addedcolor}}{\cbend\par}
+  \newenvironment{DeletedBlock}{\par\cbstart\color{deletedcolor}\codeinmarkuptrue\renewcommand*{\codecolor}{deletedcolor}}{\cbend\par}
+  \newenvironment{AddedBlock}{\par\cbstart\color{addedcolor}\codeinmarkuptrue\renewcommand*{\codecolor}{addedcolor}}{\cbend\par}
 \fi
 
 % Change bars for human review — red: proposed edit; blue: task selection.
