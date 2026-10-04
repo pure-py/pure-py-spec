@@ -281,13 +281,13 @@ check against \pyinline{bool}, and an assertion message against \pyinline{str}.
 The auxiliary judgement $\Sigma; q; \Gamma; \Gamma' \vdash \xi : \Delta \binding \Sigma'$ gives, for each type declaration $\xi_i$,
 the binding $\Delta_i$ of the declared name and the class table entries $\Sigma_i$, which are empty for a \pyinline{type} statement. The
 rule binds all the declared names simultaneously, and checks every type declaration under the class table extended with the
-class table entries of the whole mutual type region. The judgement takes two contexts: a class declaration resolves its
-field annotations and base class in $\Gamma$, and a \pyinline{type} statement resolves its body in $\Gamma'$. For the $i$-th
+class table entries of the whole mutual type region. The judgement takes two contexts: class declarations resolve their
+field annotations and base classes in $\Gamma$, and \pyinline{type} statements resolve their bodies in $\Gamma'$. For the $i$-th
 declaration the rule passes as $\Gamma$ the context binding only the earlier names of the mutual type region, and as
 $\Gamma'$ the context binding all of them, because Python evaluates the field annotations and base class of a class when the class
-statement runs, but evaluates the body of a \pyinline{type} statement only when the alias is first used. So the body of a
-\pyinline{type} statement may name classes and aliases declared later, whereas a class declaration may name only earlier
-ones, and a recursive datatype is declared with its alias before its classes, as in \pyinline{type Expr = Num | Add}
+statement runs, but evaluates the body of a \pyinline{type} statement only when the alias is first used. So the bodies of
+\pyinline{type} statements may name classes and aliases declared later, whereas class declarations may name only earlier
+ones, and recursive datatypes are declared with their aliases before their classes, as in \pyinline{type Expr = Num | Add}
 followed by declarations of \pyinline{Num} and of \pyinline{Add} with fields of type \pyinline{Expr}. The aliases of
 $\seq{\xi}$ are ordered by $\aliasDep{\seq{\xi}}$, where $x \aliasDep{\seq{\xi}} y$ when $\seq{\xi}$ contains
 $\exTypeAlias{x[\seq{\alpha}]}{\psi}$ and an alias $y$ with $y \in \namesOf(\psi) \setminus \set{\seq{\alpha}}$
