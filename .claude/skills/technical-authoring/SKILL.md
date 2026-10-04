@@ -10,6 +10,9 @@ Direct, factual, conventional prose: state the thing and stop.
 ## Sentence construction
 
 - No pithy constructions pivoting on a comma from assertion to contrast: "It's yours, not a leftover."
+- No verbless clause tacked on after a comma to qualify the preceding noun: "the class table entries,
+  empty for a type statement". Give it a verb ("which are empty for a type statement") or a sentence of
+  its own.
 - Spell out logical connectives; prefer "because X" or "so that X" over a bare colon-assertion.
   - Before: "The Boolean Jacobian instead records 1: disjunction cannot cancel."
   - After: "The Boolean Jacobian instead records 1, because dependency information combines by disjunction and disjunction cannot cancel."
