@@ -289,7 +289,7 @@ statement runs, but evaluates the body of a \pyinline{type} statement only when 
 not support \pyinline{from __future__ import annotations}, under which Python~\pythonVersion{} defers evaluation
 of annotations.} So the bodies of
 \pyinline{type} statements may name classes and aliases declared later, whereas class declarations may name only earlier
-ones, and recursive datatypes are declared with their aliases before their classes, as in \pyinline{type Expr = Num | Add}
+ones, and recursive datatypes must be declared with their aliases before their classes, as in \pyinline{type Expr = Num | Add}
 followed by declarations of \pyinline{Num} and of \pyinline{Add} with fields of type \pyinline{Expr}. The aliases of
 $\seq{\xi}$ are ordered by $\aliasDep{\seq{\xi}}$, where $x \aliasDep{\seq{\xi}} y$ when $\seq{\xi}$ contains
 $\exTypeAlias{x[\seq{\alpha}]}{\psi}$ and an alias $y$ with $y \in \namesOf(\psi) \setminus \set{\seq{\alpha}}$
