@@ -277,24 +277,20 @@ definitions and modules introduce the variables of the scope as unbound, using t
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}.
 
-\added{The \ruleName{types} rule (\figref{typing-top-level}) checks a mutual type region $\seq{\xi}$ as one mutually recursive binding.
-The auxiliary judgement $\Sigma; q; \Gamma; \Gamma' \vdash \xi : \Delta \binding \Sigma'$ gives, for each type declaration $\xi_i$,
-the binding $\Delta_i$ of the declared name and the class table entries $\Sigma_i$, which are empty for a \pyinline{type} statement. The
-rule binds all the declared names simultaneously, and checks every type declaration under the class table extended with the
-class table entries of the whole mutual type region. The judgement takes two contexts: class declarations resolve their
-field annotations and base classes in $\Gamma$, and \pyinline{type} statements resolve their bodies in $\Gamma'$. For the $i$-th
-declaration the rule passes as $\Gamma$ the context binding only the earlier names of the mutual type region, and as
-$\Gamma'$ the context binding all of them, because Python~\pythonVersion{} evaluates the field annotations and base class of a class when the class
+\added{The \ruleName{types} rule (\figref{typing-top-level}) checks the type declarations of a mutual type region $\seq{\xi}$ in order,
+threading the class table, after extending it with an entry for each class of the region holding its type parameters
+alone, so that type expressions may name any class of the region. The auxiliary judgement $\Sigma; q; \Gamma; \Gamma' \vdash \xi : \Delta \binding \Sigma'$
+gives the binding $\Delta$ of the declared name and extends $\Sigma$ with the class table entry of a class declaration. It takes
+two contexts: class declarations resolve their field annotations and base classes in $\Gamma$, which binds the earlier names
+of the mutual type region, and \pyinline{type} statements resolve their bodies in $\Gamma'$, which binds every class of the region
+as well, because Python~\pythonVersion{} evaluates the field annotations and base class of a class when the class
 statement runs, but evaluates the body of a \pyinline{type} statement only when the alias is first used.\footnote{\PurePy does
 not support \pyinline{from __future__ import annotations}, under which Python~\pythonVersion{} defers evaluation
 of annotations.} So the bodies of
-\pyinline{type} statements may name classes and aliases declared later, whereas class declarations may name only earlier
+\pyinline{type} statements may name classes declared later, whereas class declarations may name only earlier
 ones, and recursive datatypes must be declared with their aliases before their classes, as in \pyinline{type Expr = Num | Add}
-followed by declarations of \pyinline{Num} and of \pyinline{Add} with fields of type \pyinline{Expr}. The aliases of
-$\seq{\xi}$ are ordered by $\aliasDep{\seq{\xi}}$, where $x \aliasDep{\seq{\xi}} y$ when $\seq{\xi}$ contains
-$\exTypeAlias{x[\seq{\alpha}]}{\psi}$ and an alias $y$ with $y \in \namesOf(\psi) \setminus \set{\seq{\alpha}}$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:names}}); the rule requires this relation to be acyclic,
-which excludes \pyinline{type T = list[T]}.}
+followed by declarations of \pyinline{Num} and of \pyinline{Add} with fields of type \pyinline{Expr}. A \pyinline{type}
+statement may name only earlier aliases, although Python accepts any order, which excludes \pyinline{type T = list[T]}.}
 
 A class declaration binds
 the class name to $\Type{C}$, resolves the field annotations, which may mention the type parameters of the class\deleted{,}, and requires the fields it declares to be distinct and, when it extends

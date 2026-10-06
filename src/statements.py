@@ -2,7 +2,6 @@ import ast
 from collections.abc import Sequence
 from dataclasses import replace
 from functools import reduce
-from graphlib import CycleError, TopologicalSorter
 from typing import cast
 
 import reasons
@@ -206,71 +205,29 @@ def check_top_statement(t: Statement, mod_ctx: ModuleContext) -> tuple[StaticOut
 
 def types(xis: list[TypeDeclaration], mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
     classes = [xi for xi in xis if isinstance(xi, ast.ClassDef)]
-    names: Context = {xi.name: Class(qualified(mod_ctx.q, xi.name)) for xi in classes}
-    Sigma: ClassTable = {
+    Sigma_0: ClassTable = {
         **mod_ctx.Sigma,
         **{Class(qualified(mod_ctx.q, xi.name)): header(xi) for xi in classes},
     }
-
-    def alias(aliases: Context, xi: ast.TypeAlias) -> Context:
-        return {
-            **aliases,
-            **type_alias(xi, replace(override_gamma(mod_ctx, {**names, **aliases}), Sigma=Sigma)),
-        }
-
-    aliases = reduce(alias, alias_order(xis), cast(Context, {}))
+    delta_dagger: Context = {xi.name: Class(qualified(mod_ctx.q, xi.name)) for xi in classes}
 
     def declaration(
         acc: tuple[Context, ClassTable], xi: TypeDeclaration
     ) -> tuple[Context, ClassTable]:
-        delta, Sigma_ = acc
+        delta, Sigma = acc
+        mod_ctx_i = replace(override_gamma(mod_ctx, delta), Sigma=Sigma)
         if isinstance(xi, ast.ClassDef):
-            delta_i, Sigma_i = dataclass(xi, replace(override_gamma(mod_ctx, delta), Sigma=Sigma_))
-            return {**delta, **delta_i}, {**Sigma_, **Sigma_i}
-        assert isinstance(xi.name, ast.Name)
-        return {**delta, xi.name.id: aliases[xi.name.id]}, Sigma_
+            delta_i, Sigma_i = dataclass(xi, mod_ctx_i)
+            return {**delta, **delta_i}, {**Sigma, **Sigma_i}
+        return {**delta, **type_alias(xi, override_gamma(mod_ctx_i, delta_dagger))}, Sigma
 
-    delta, Sigma_ = reduce(declaration, xis, (cast(Context, {}), Sigma))
-    return Assigns(delta), Sigma_
+    delta, Sigma = reduce(declaration, xis, (cast(Context, {}), Sigma_0))
+    return Assigns(delta), Sigma
 
 
 def header(xi: ast.ClassDef) -> ClassTableEntry:
     """Class table entry giving type parameters only"""
     return ClassTableEntry(type_params(xi), (), None)
-
-
-def alias_order(xis: list[TypeDeclaration]) -> list[ast.TypeAlias]:
-    """Type statements, each after aliases named in its body"""
-    aliases = {
-        xi.name.id: xi
-        for xi in xis
-        if isinstance(xi, ast.TypeAlias) and isinstance(xi.name, ast.Name)
-    }
-    named = {
-        x: (names(type_expr(xi.value)) - set(type_params(xi))) & aliases.keys()
-        for x, xi in aliases.items()
-    }
-    try:
-        return [aliases[x] for x in TopologicalSorter(named).static_order()]
-    except CycleError as e:
-        x = e.args[1][0]
-        raise IllFormedModule(aliases[x], reasons.CyclicTypeAlias(x)) from None
-
-
-def names(psi: TypeExpr) -> set[Var]:
-    match psi:
-        case TypeName(q, args):
-            return ({q.parts[0]} if len(q.parts) == 1 else set()).union(*map(names, args))
-        case ListExpr(psi_) | DictExpr(psi_):
-            return names(psi_)
-        case TupleExpr(psis):
-            return set().union(*map(names, psis))
-        case CallableExpr(psis, psi_):
-            return names(psi_).union(*map(names, psis))
-        case UnionExpr(psi_, psi__):
-            return names(psi_) | names(psi__)
-        case _:
-            return set()
 
 
 def check_seq(

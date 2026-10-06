@@ -245,11 +245,11 @@
 \and
 \inferrule*[lab={\ruleName{eval-types}}]
 {
-  \added{\rho' = \rho_1 \override \cdots \override \rho_n} \\
-  \added{q, \Gamma \override \rho', \xi_i \Rightarrow \rho_i \quad (\forall i)}
+  \added{\Delta^\dagger = \set{\bind{c}{\Type{q.c}} \mid \seq{\xi} \text{ declares class } c}} \\
+  \added{q, \Gamma \override \Delta^\dagger \override \rho_1 \override \cdots \override \rho_{i-1}, \xi_i \Rightarrow \rho_i \quad (\forall i)}
 }
 {
-  \added{q, \rho, \seq{\xi} \Rightarrow \assigns{\rho'}}
+  \added{q, \rho, \seq{\xi} \Rightarrow \assigns{\rho_1 \override \cdots \override \rho_n}}
 }
 \end{mathpar}
 \subcaption{Top-level statement $t$ of module $q$ evaluates to outcome $o$ under environment $\rho : \Gamma$}

@@ -1,3 +1,4 @@
+# rule: types
 type Pair = tuple[Elem, Elem]
 type Elem = int | str
 
