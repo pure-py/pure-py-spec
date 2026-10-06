@@ -286,7 +286,7 @@ field annotations and base classes in $\Gamma$, and \pyinline{type} statements r
 declaration the rule passes as $\Gamma$ the context binding only the earlier names of the mutual type region, and as
 $\Gamma'$ the context binding all of them, because Python~\pythonVersion{} evaluates the field annotations and base class of a class when the class
 statement runs, but evaluates the body of a \pyinline{type} statement only when the alias is first used.\footnote{\PurePy does
-not support \pyinline{from __future__ import annotations}, under which Python~\pythonVersion{} defers the evaluation
+not support \pyinline{from __future__ import annotations}, under which Python~\pythonVersion{} defers evaluation
 of annotations.} So the bodies of
 \pyinline{type} statements may name classes and aliases declared later, whereas class declarations may name only earlier
 ones, and recursive datatypes are declared with their aliases before their classes, as in \pyinline{type Expr = Num | Add}
