@@ -231,14 +231,14 @@ def header(xi: ast.ClassDef) -> ClassTableEntry:
 
 
 def alias_order(xis: list[TypeDeclaration]) -> list[ast.TypeAlias]:
-    """Type statements, each after the aliases named in its body"""
+    """Type statements, each after aliases named in its body"""
     aliases = {
         xi.name.id: xi
         for xi in xis
         if isinstance(xi, ast.TypeAlias) and isinstance(xi.name, ast.Name)
     }
     named = {
-        x: (names_of(type_expr(xi.value)) - set(type_params(xi))) & aliases.keys()
+        x: (names(type_expr(xi.value)) - set(type_params(xi))) & aliases.keys()
         for x, xi in aliases.items()
     }
     try:
@@ -248,19 +248,18 @@ def alias_order(xis: list[TypeDeclaration]) -> list[ast.TypeAlias]:
         raise IllFormedModule(aliases[x], reasons.CyclicTypeAlias(x)) from None
 
 
-def names_of(psi: TypeExpr) -> set[Var]:
-    """Simple names occurring in type expression"""
+def names(psi: TypeExpr) -> set[Var]:
     match psi:
         case TypeName(q, args):
-            return ({q.parts[0]} if len(q.parts) == 1 else set()).union(*map(names_of, args))
+            return ({q.parts[0]} if len(q.parts) == 1 else set()).union(*map(names, args))
         case ListExpr(psi_) | DictExpr(psi_):
-            return names_of(psi_)
+            return names(psi_)
         case TupleExpr(psis):
-            return set().union(*map(names_of, psis))
+            return set().union(*map(names, psis))
         case CallableExpr(psis, psi_):
-            return names_of(psi_).union(*map(names_of, psis))
+            return names(psi_).union(*map(names, psis))
         case UnionExpr(psi_, psi__):
-            return names_of(psi_) | names_of(psi__)
+            return names(psi_) | names(psi__)
         case _:
             return set()
 

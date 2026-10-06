@@ -11,8 +11,8 @@ from type_syntax import (
     root,
 )
 
-# A PurePy statement: a Python statement, a mutual def region or a mutual type region. A Python body
-# (a statement list) represents the spec's right-nested sequence s s'.
+# PurePy statement: Python statement, mutual def region or mutual type region. Python body (statement
+# list) represents spec's right-nested sequence s s'.
 type TypeDeclaration = ast.ClassDef | ast.TypeAlias
 type Statement = ast.stmt | list[ast.FunctionDef] | list[TypeDeclaration]
 
