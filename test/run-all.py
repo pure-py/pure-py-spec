@@ -3,6 +3,7 @@ import argparse
 import contextlib
 import pathlib
 import re
+import shlex
 import subprocess
 import sys
 from collections.abc import Iterator
@@ -77,10 +78,11 @@ def run(cmd: list[str], cwd: pathlib.Path | None = None) -> "subprocess.Complete
 
 
 class Runner:
-    def __init__(self, interpreter: str) -> None:
-        self.interpreter = interpreter
+    def __init__(self, interpreter: str | None, checker: list[str] | None) -> None:
+        self.interpreter = interpreter  # None: tests not run
+        self.checker = checker  # command given the test path; None: the reference checker
         self.passed = 0
-        self.failed = 0
+        self.failed: list[str] = []
         self.failures: list[str] = []
 
     @contextlib.contextmanager
@@ -88,8 +90,8 @@ class Runner:
         self.failures = []
         yield
         if self.failures:
-            self.failed += 1
-            print(f"  {RED}✗{RESET} {label} ({'; '.join(self.failures)})")
+            self.failed.append(f"{label} ({'; '.join(self.failures)})")
+            print(f"  {RED}✗{RESET} {self.failed[-1]}")
         else:
             self.passed += 1
             print(f"  {GREEN}✓{RESET} {label}")
@@ -98,13 +100,12 @@ class Runner:
         self.failures.append(msg)
 
     def check(self, path: pathlib.Path, program: bool, exit: Exit, error_checked: bool) -> None:
-        proc = run(
-            ["python3", str(ROOT / "src" / (CHECK_PROGRAM if program else CHECK)), str(path)]
-        )
+        reference = ["python3", str(ROOT / "src" / (CHECK_PROGRAM if program else CHECK))]
+        proc = run([*(self.checker or reference), str(path)])
         exits = {exit, Exit.ILL_FORMED_PROGRAM} if program and exit == Exit.ILL_FORMED else {exit}
         if proc.returncode not in exits:
             self.fail(f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}")
-        elif error_checked:
+        elif error_checked and self.checker is None:  # messages are the reference checker's
             error = path.with_suffix(ERROR_EXPECTED)
             output = proc.stdout + proc.stderr
             if not error.exists():
@@ -113,6 +114,7 @@ class Runner:
                 self.fail(f"check: expected {error.read_text().strip()!r}, got: {output.strip()}")
 
     def python(self, path: pathlib.Path, accepts: bool) -> None:
+        assert self.interpreter is not None
         expected = path.with_suffix(EXPECTED)
         exception = path.with_suffix(EXCEPTION_EXPECTED)
         if expected.exists() == exception.exists():
@@ -148,14 +150,37 @@ class Runner:
             path = test / MAIN if program else test
             if exit is not None:
                 self.check(path, program, exit, error_checked)
-            if python_accepts is not None:
+            if python_accepts is not None and self.interpreter is not None:
                 self.python(path, python_accepts)
 
-    def summary(self) -> None:
-        total = self.passed + self.failed
+    def summary(self, known_failures: pathlib.Path | None, update: bool) -> None:
+        """Pass if no test failed, or if the failures are exactly those listed in known_failures."""
+        total = self.passed + len(self.failed)
         print()
+        if known_failures is not None:
+            actual = "".join(line + "\n" for line in sorted(self.failed))
+            if update:
+                known_failures.write_text(actual)
+                print(f"{len(self.failed)} failures written to {known_failures}")
+                return
+            known = (
+                set(known_failures.read_text().splitlines()) if known_failures.exists() else set()
+            )
+            unexpected = set(self.failed) - known
+            fixed = known - set(self.failed)
+            for line in sorted(unexpected):
+                print(f"{RED}unexpected:{RESET} {line}")
+            for line in sorted(fixed):
+                print(f"{GREEN}fixed:{RESET} {line}")
+            if unexpected or fixed:
+                print(f"{RED}✗ {known_failures} out of date; rerun with --update{RESET}")
+                sys.exit(1)
+            print(
+                f"{GREEN}✓ {self.passed}/{total} passed, {len(self.failed)} known failures{RESET}"
+            )
+            return
         if self.failed:
-            print(f"{RED}✗ {self.passed}/{total} passed, {self.failed} failed{RESET}")
+            print(f"{RED}✗ {self.passed}/{total} passed, {len(self.failed)} failed{RESET}")
             sys.exit(1)
         print(f"{GREEN}✓ {total}/{total} passed{RESET}")
 
@@ -236,8 +261,21 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("interpreter", nargs="?", default="python3")
     parser.add_argument("--no-mypy", action="store_true")
+    parser.add_argument("--no-run", action="store_true", help="check only; do not run the tests")
+    parser.add_argument(
+        "--checker", help="checker command in place of src/, given the path of each test"
+    )
+    parser.add_argument(
+        "--known-failures", type=pathlib.Path, help="file listing the failures expected"
+    )
+    parser.add_argument(
+        "--update", action="store_true", help="rewrite the known failures from this run"
+    )
     args = parser.parse_args()
-    r = Runner(args.interpreter)
+    r = Runner(
+        None if args.no_run else args.interpreter,
+        shlex.split(args.checker) if args.checker else None,
+    )
 
     print("cross-references")
     check_unique_rule_names(r)
@@ -263,7 +301,7 @@ def main() -> None:
                 last = header
             r.run_test(test, program)
 
-    r.summary()
+    r.summary(args.known_failures, args.update)
 
 
 if __name__ == "__main__":
