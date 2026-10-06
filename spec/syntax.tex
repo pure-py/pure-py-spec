@@ -99,7 +99,8 @@ an idempotent commutative semigroup of parallel composition $\merge$ (``merge'')
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
 distributivity does not hold. Both are defined pointwise (\figref{context-ops}): override is right-biased
 and has $\bot$ as both left and right unit, whereas merge has no unit, since a variable bound on one side
-only is possibly unassigned.
+only is possibly unassigned. \added{Override is defined in the same way on any finite map with $\bot$ for
+undefined, such as an environment or class table.}
 \input{spec/fig/context-ops}
 
 A third operation, \emph{context extension} $\Gamma \extend \Delta$ (also \figref{context-ops}),

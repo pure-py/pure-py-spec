@@ -23,7 +23,7 @@
 \inferrule*[lab={\ruleName{types}}]
 {
   \added{\Delta = \Delta_1 \override \cdots \override \Delta_n} \\
-  \added{\Sigma' = \Sigma, \Sigma_1, \ldots, \Sigma_n} \\
+  \added{\Sigma' = \Sigma \override \Sigma_1 \override \cdots \override \Sigma_n} \\
   \added{\aliasDep{\seq{\xi}} \text{ acyclic}} \\
   \added{\Sigma'; q; \Gamma \override \Delta_1 \override \cdots \override \Delta_{i-1}; \Gamma \override \Delta \vdash \xi_i : \Delta_i \binding \Sigma_i \quad (\forall i)}
 }
@@ -79,7 +79,7 @@
   \Sigma; q; \Gamma\added{; \Gamma'} \vdash \exTypeAlias{x[\seq{\alpha}]}{\psi} : \replaced{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}} \binding \varnothing}{\Assigns{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}} \binding \Sigma}
 }
 \end{mathpar}
-\subcaption{\added{Type declaration $\xi$ of module $q$ binds $\Delta$, with class table entries $\Sigma'$, under $\Gamma$ for class declarations and $\Gamma'$ for type statements}}
+\subcaption{\added{Type declaration $\xi$ of module $q$ binds $\Delta$, with class table entries $\Sigma'$}}
 \label{fig:typing-top-level-decl}
 \end{subfigure}
 \caption{Top-level statements\added{ and type declarations}}
