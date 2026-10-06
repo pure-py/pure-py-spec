@@ -104,7 +104,10 @@ class Runner:
         proc = run([*(self.checker or reference), str(path)])
         exits = {exit, Exit.ILL_FORMED_PROGRAM} if program and exit == Exit.ILL_FORMED else {exit}
         if proc.returncode not in exits:
-            self.fail(f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}")
+            output = (proc.stdout + proc.stderr).strip().split("\n", 1)[0]
+            self.fail(
+                f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}: {output}"
+            )
         elif error_checked and self.checker is None:  # messages are the reference checker's
             error = path.with_suffix(ERROR_EXPECTED)
             output = proc.stdout + proc.stderr
