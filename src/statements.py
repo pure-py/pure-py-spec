@@ -1,6 +1,7 @@
 import ast
 from collections.abc import Sequence
 from dataclasses import replace
+from functools import reduce
 from graphlib import CycleError, TopologicalSorter
 from typing import cast
 
@@ -210,19 +211,27 @@ def types(xis: list[TypeDeclaration], mod_ctx: ModuleContext) -> tuple[StaticOut
         **mod_ctx.Sigma,
         **{Class(qualified(mod_ctx.q, xi.name)): header(xi) for xi in classes},
     }
-    aliases: Context = {}
-    for alias in alias_order(xis):
-        mod_ctx_ = replace(override_gamma(mod_ctx, {**names, **aliases}), Sigma=Sigma)
-        aliases = {**aliases, **type_alias(alias, mod_ctx_)}
-    delta: Context = {}
-    for xi in xis:
+
+    def alias(aliases: Context, xi: ast.TypeAlias) -> Context:
+        return {
+            **aliases,
+            **type_alias(xi, replace(override_gamma(mod_ctx, {**names, **aliases}), Sigma=Sigma)),
+        }
+
+    aliases = reduce(alias, alias_order(xis), cast(Context, {}))
+
+    def declaration(
+        acc: tuple[Context, ClassTable], xi: TypeDeclaration
+    ) -> tuple[Context, ClassTable]:
+        delta, Sigma_ = acc
         if isinstance(xi, ast.ClassDef):
-            delta_i, Sigma_i = dataclass(xi, replace(override_gamma(mod_ctx, delta), Sigma=Sigma))
-            delta, Sigma = {**delta, **delta_i}, {**Sigma, **Sigma_i}
-        else:
-            assert isinstance(xi.name, ast.Name)
-            delta = {**delta, xi.name.id: aliases[xi.name.id]}
-    return Assigns(delta), Sigma
+            delta_i, Sigma_i = dataclass(xi, replace(override_gamma(mod_ctx, delta), Sigma=Sigma_))
+            return {**delta, **delta_i}, {**Sigma_, **Sigma_i}
+        assert isinstance(xi.name, ast.Name)
+        return {**delta, xi.name.id: aliases[xi.name.id]}, Sigma_
+
+    delta, Sigma_ = reduce(declaration, xis, (cast(Context, {}), Sigma))
+    return Assigns(delta), Sigma_
 
 
 def header(xi: ast.ClassDef) -> ClassTableEntry:
