@@ -257,8 +257,8 @@ A sequence $s\;s'$ (\ruleName{seq}) types $s$, then types $s'$ under $\Gamma$ ov
 by $s$. A conditional combines its
 branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
 Top-level statements are checked by a separate
-judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, class
-declarations and \pyinline{type} statements are top-level forms, and a plain statement is checked with no return type
+judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, \replaced{a mutual type region of class
+declarations and \pyinline{type} statements is a top-level form, checked by \ruleName{types}}{class declarations and \pyinline{type} statements are top-level forms}, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level. A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
 \pyinline{return} requires $\tau$ to be equivalent to \pyinline{None}. An expression statement synthesises a type and discards it
@@ -298,8 +298,8 @@ Each declaration is checked under the extended class table and the context $\typ
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}), by the auxiliary judgement $\Sigma; \Gamma \vdash \chi$, which binds
 every name of the type region for a \pyinline{type} statement and only the earlier names for a class declaration, as above.}
 
-A class declaration binds
-the class name to $\Type{C}$, resolves the field annotations, which may mention the type parameters of the class\deleted{,}, and requires the fields it declares to be distinct and, when it extends
+\replaced{The declaration judgement $\Sigma; \Gamma \vdash \chi$ checks a class declaration by resolving}{A class declaration binds
+the class name to $\Type{C}$, resolves} the field annotations, which may mention the type parameters of the class\deleted{,}, and \replaced{requiring}{requires} the fields it declares to be distinct and, when it extends
 another class, the base \added{class} to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
 scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement $\exTypeAlias{x[\seq{\alpha}]}{\psi}$, such as \pyinline{type Pair[T] = tuple[T, T]},
