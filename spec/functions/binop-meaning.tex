@@ -1,10 +1,10 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.62\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}$\odot$ & $\hat{\odot}(v, v')$ \\
-\pyinline{==} & $\val{\pyinline{False}}$ if both operands are \pyinline{nan}, and $\val{\eqOp{\Sigma}(v, v')}$ otherwise \\
-\pyinline{!=} & $\val{\pyinline{True}}$ if both operands are \pyinline{nan} or $\eqOp{\Sigma}(v, v') = \pyinline{False}$, and $\val{\pyinline{False}}$ if $\eqOp{\Sigma}(v, v') = \pyinline{True}$ \\
-\pyinline{in} & $\val{\contains{\Sigma}(v', v)}$ \\
-\pyinline{not in} & $\val{\pyinline{True}}$ if $\contains{\Sigma}(v', v) = \pyinline{False}$, and $\val{\pyinline{False}}$ if $\contains{\Sigma}(v', v) = \pyinline{True}$ \\
+\pyinline{==} & $\val{\pyinline{False}}$ if both operands are \pyinline{nan}, and $\eqOp{\Sigma}(v, v')$ otherwise \\
+\pyinline{!=} & $\val{\pyinline{True}}$ if both operands are \pyinline{nan} or $\eqOp{\Sigma}(v, v') = \val{\pyinline{False}}$, $\val{\pyinline{False}}$ if $\eqOp{\Sigma}(v, v') = \val{\pyinline{True}}$, and otherwise $\eqOp{\Sigma}(v, v')$ \\
+\pyinline{in} & $\contains{\Sigma}(v', v)$ \\
+\pyinline{not in} & $\val{\pyinline{True}}$ if $\contains{\Sigma}(v', v) = \val{\pyinline{False}}$, $\val{\pyinline{False}}$ if $\contains{\Sigma}(v', v) = \val{\pyinline{True}}$, and otherwise $\contains{\Sigma}(v', v)$ \\
 \pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & \todo{Ordering, as in Python} \\
 \pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}\quad\pyinline{**} & \todo{Arithmetic, as in Python. Float precision is left to the implementation. $\aborts{\errZeroDiv}$ where the divisor is zero, and $\aborts{\errType}$ where an operand is not a number}
 \end{tabular}

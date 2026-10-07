@@ -4,7 +4,7 @@
 \small
 \inferrule*[lab={\ruleName{eval-pat-lit}}]
 {
-  \eqOp{\Sigma}(\ell, v) = \pyinline{True}
+  \eqOp{\Sigma}(\ell, v) = \val{\pyinline{True}}
 }
 {
   \rho, \ell, v \matches \matchOk{\varnothing}
@@ -12,7 +12,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-pat-lit-no}}]
 {
-  \eqOp{\Sigma}(\ell, v) = \pyinline{False}
+  \eqOp{\Sigma}(\ell, v) = \val{\pyinline{False}}
 }
 {
   \rho, \ell, v \matches \noMatch
