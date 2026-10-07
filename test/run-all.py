@@ -284,8 +284,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--checker",
-        help="command run on the path of each test in place of src/, with the same exit codes; "
-        "error messages are not compared and pending tests are skipped",
+        help="command run on the path of each test in place of the reference checker, with the same "
+        "exit codes; error messages are not compared and pending tests are skipped",
     )
     parser.add_argument(
         "--known-failures",

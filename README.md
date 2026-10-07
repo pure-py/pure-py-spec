@@ -60,8 +60,7 @@ The runner requires an `excluded` test to run under Python and a `python-error` 
 either `.expected` or `.exception.expected` and a misfiled test fails. A test that exits with a nonzero status
 through `sys.exit` states the status in `.status.expected`.
 
-Another checker can be run over the suite in place of `src/` with `--checker`, with the exit codes of
-`check_module.py`; `run-all.py --help` lists the options.
+Another checker can be run over the suite with `--checker`; `run-all.py --help` lists the options.
 
 ## Development
 
