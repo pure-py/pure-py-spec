@@ -282,7 +282,8 @@ its classes to the class table before checking its declarations. The context ent
 $\Type{q.c}$ for a class declaration, and for a \pyinline{type} statement the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$.
 The class table is extended with the definition $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$ of each class of the type region
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:class-table}}). Aliases and class definitions carry the type region and
-declaring context $\Gamma$, because alias bodies, field annotations and base classes are resolved later.
+declaring context $\Gamma$, because alias bodies, field annotations and base classes are resolved at each use rather than when the
+type region is checked.
 Each declaration is checked under the extended class table and the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}), by the auxiliary judgement $\Sigma; \Gamma \vdash \chi$. For a \pyinline{type}
 statement this context binds every name of the type region, so an alias may name any class or alias of the type region, in any order, and a cyclic alias such as
