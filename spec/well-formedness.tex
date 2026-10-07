@@ -255,14 +255,14 @@ The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\G
 optional return type $\zeta$, statement $s$ has static outcome $R$ (\figref{typing-stmt}); every rule passes $\zeta$ down unchanged.
 A sequence $s\;s'$ (\ruleName{seq}) types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
 by $s$. A conditional combines its
-branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
+branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch\added{ (\ruleName{if}, \ruleName{if-else})}.
 \deleted{Top-level statements are checked by a separate
 judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, class
 declarations and \pyinline{type} statements are top-level forms, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level.}
 A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
-\pyinline{return} requires $\tau$ to be equivalent to \pyinline{None}. An expression statement synthesises a type and discards it
+\pyinline{return} requires $\tau$ to be equivalent to \pyinline{None}\added{ (\ruleName{return}, \ruleName{return-none})}. An expression statement synthesises a type and discards it
 (\ruleName{expr-stmt}). A call to a callable with result \tyNone{} is not an expression, because
 \ruleName{call} requires a result other than \tyNone, and is typed as a statement by \ruleName{call-stmt}.
 The restriction is for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).
@@ -276,7 +276,7 @@ definitions and modules introduce the variables of the scope as unbound, using t
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:scope}}).
 
 The conditions of \pyinline{if} and \pyinline{assert}
-check against \pyinline{bool}, and an assertion message against \pyinline{str}.
+check against \pyinline{bool}, and an assertion message against \pyinline{str}\added{ (\ruleName{assert}, \ruleName{assert-msg})}.
 \deleted{A class declaration binds
 the class name to $\Type{C}$, resolves the field annotations, which may mention the type parameters of the class,, and requires the fields it declares to be distinct and, when it extends
 another class, the base to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
@@ -323,7 +323,7 @@ outcome of the path on which the scrutinee is not matched by any of the cases. T
 
 \added{Top-level statements are checked by a separate
 judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, a mutual type region of class
-declarations and \pyinline{type} statements is a top-level form, checked by \ruleName{types}, and a plain statement is checked with no return type
+declarations and \pyinline{type} statements is a top-level form, checked by the \ruleName{types} rule, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level.}
 
 \added{Within a mutual type region, a \pyinline{type} statement may name any class or alias of the type region, in any
