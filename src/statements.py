@@ -44,8 +44,9 @@ from contexts import (
     PU,
     Assigns,
     Context,
+    ContextEntry,
+    ModuleChecked,
     ModuleContext,
-    ModuleLoaded,
     ModuleStub,
     PredefinedName,
     Returns,
@@ -121,6 +122,9 @@ def type_params(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlias) -> tuple[V
     return alphas
 
 
+_resolving: list[tuple[Name, Var]] = []
+
+
 def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
     match psi:
         case Primitive():
@@ -136,12 +140,30 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
             if isinstance(theta, TypeVar) and len(args) == 0:
                 return TypeVariable(str(q))
             if isinstance(theta, TypeAlias):
+                xi = theta.xis[theta.i]
+                assert isinstance(xi, ast.TypeAlias) and isinstance(xi.name, ast.Name)
+                alphas = type_params(xi)
                 sigmas = tuple(resolve_type(psi_, node, mod_ctx) for psi_ in args)
-                if len(sigmas) != len(theta.params):
+                if len(sigmas) != len(alphas):
                     raise IllFormedModule(
-                        node, reasons.TypeAliasArityMismatch(q, len(theta.params), len(sigmas))
+                        node, reasons.TypeAliasArityMismatch(q, len(alphas), len(sigmas))
                     )
-                return substitute(sigmas, theta.params, theta.tau)
+                delta = region(theta.gamma, theta.q, theta.xis)
+                mod_ctx_ = ModuleContext(
+                    gamma={**theta.gamma, **delta, **{alpha: TypeVar() for alpha in alphas}},
+                    M=mod_ctx.M,
+                    q=theta.q,
+                    Sigma=mod_ctx.Sigma,
+                )
+                key = (theta.q, xi.name.id)
+                if key in _resolving:
+                    raise IllFormedModule(node, reasons.CyclicTypeAlias(xi.name.id))
+                _resolving.append(key)
+                try:
+                    tau = resolve_type(type_expr(xi.value), node, mod_ctx_)
+                finally:
+                    _resolving.pop()
+                return substitute(sigmas, alphas, tau)
             if not isinstance(theta, Class):
                 raise IllFormedModule(node, reasons.NotClass(q))
             taus = tuple(resolve_type(psi_, node, mod_ctx) for psi_ in args)
@@ -209,20 +231,35 @@ def types(xis: list[TypeDeclaration], mod_ctx: ModuleContext) -> tuple[StaticOut
         **mod_ctx.Sigma,
         **{Class(qualified(mod_ctx.q, xi.name)): header(xi) for xi in classes},
     }
-    delta_dagger: Context = {xi.name: Class(qualified(mod_ctx.q, xi.name)) for xi in classes}
+    delta_n = region(mod_ctx.gamma, mod_ctx.q, tuple(xis))
+    deltas = [{x: delta_n[x]} for xi in xis for x, _ in declares(xi)]
+    gamma_n = override_gamma(mod_ctx, delta_n)
 
     def declaration(
-        acc: tuple[Context, ClassTable], xi: TypeDeclaration
+        acc: tuple[Context, ClassTable], xi_delta: tuple[TypeDeclaration, Context]
     ) -> tuple[Context, ClassTable]:
         delta, Sigma = acc
+        xi, delta_i = xi_delta
         mod_ctx_i = replace(override_gamma(mod_ctx, delta), Sigma=Sigma)
         if isinstance(xi, ast.ClassDef):
-            delta_i, Sigma_i = dataclass(xi, mod_ctx_i)
-            return {**delta, **delta_i}, {**Sigma, **Sigma_i}
-        return {**delta, **type_alias(xi, override_gamma(mod_ctx_i, delta_dagger))}, Sigma
+            return {**delta, **delta_i}, dataclass(xi, mod_ctx_i)
+        type_alias(xi, replace(gamma_n, Sigma=Sigma))
+        return {**delta, **delta_i}, Sigma
 
-    delta, Sigma = reduce(declaration, xis, (cast(Context, {}), Sigma_0))
+    delta, Sigma = reduce(declaration, zip(xis, deltas, strict=True), (cast(Context, {}), Sigma_0))
     return Assigns(delta), Sigma
+
+
+def entry(gamma: Context, q: Name, xis: tuple[TypeDeclaration, ...], i: int) -> ContextEntry:
+    xi = xis[i]
+    if isinstance(xi, ast.ClassDef):
+        return Class(qualified(q, xi.name))
+    return TypeAlias(gamma, q, xis, i)
+
+
+def region(gamma: Context, q: Name, xis: tuple[TypeDeclaration, ...]) -> Context:
+    """Bindings of mutual type region: declares(xis) at entry(gamma, q, xis, i)"""
+    return {x: entry(gamma, q, xis, i) for i, xi in enumerate(xis) for x, _ in declares(xi)}
 
 
 def header(xi: ast.ClassDef) -> ClassTableEntry:
@@ -339,7 +376,7 @@ def check_stmt(
                 case (
                     Class()
                     | ModuleStub()
-                    | ModuleLoaded()
+                    | ModuleChecked()
                     | PredefinedName()
                     | TypeVar()
                     | TypeAlias()
@@ -505,7 +542,7 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         case ast.Attribute(value=e_, attr=x):
             parent = entry_of(e_, mod_ctx)
             match parent:
-                case ModuleLoaded():
+                case ModuleChecked():
                     return attr_module(parent, x, e)
                 case ModuleStub(q):
                     raise IllFormedModule(e, reasons.SubmoduleNotImported(q))
@@ -531,14 +568,14 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
-def attr_module(parent: ModuleLoaded, x: Var, e: ast.Attribute) -> Type:
+def attr_module(parent: ModuleChecked, x: Var, e: ast.Attribute) -> Type:
     theta = parent.members.get(x)
     match theta:
         case None:
             raise IllFormedModule(e, reasons.UnknownMember(x, parent.q))
         case ModuleStub(q):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(q))
-        case ModuleLoaded():
+        case ModuleChecked():
             raise IllFormedModule(e, reasons.ModuleAsValue(name_of(e)))
         case Class():
             raise IllFormedModule(e, reasons.ClassAsValue(name_of(e)))
@@ -919,7 +956,7 @@ def iterated_type(e: ast.expr, mod_ctx: ModuleContext) -> Type:
     return elem
 
 
-def dataclass(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Context, ClassTable]:
+def dataclass(node: ast.ClassDef, mod_ctx: ModuleContext) -> ClassTable:
     if not isinstance(mod_ctx.gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.NotPredefinedName("dataclass"))
     alphas = type_params(node)
@@ -932,15 +969,13 @@ def dataclass(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[Context, Clas
     if dup is not None:
         raise IllFormedModule(node, reasons.DuplicateField(dup, node.name))
     c = Class(qualified(mod_ctx.q, node.name))
-    return {node.name: c}, {c: ClassTableEntry(alphas, own, base)}
+    return {**mod_ctx.Sigma, c: ClassTableEntry(alphas, own, base)}
 
 
-def type_alias(node: ast.TypeAlias, mod_ctx: ModuleContext) -> Context:
-    assert isinstance(node.name, ast.Name)
+def type_alias(node: ast.TypeAlias, mod_ctx: ModuleContext) -> None:
     alphas = type_params(node)
     mod_ctx_ = override_gamma(mod_ctx, {alpha: TypeVar() for alpha in alphas})
-    tau = resolve_type(type_expr(node.value), node, mod_ctx_)
-    return {node.name.id: TypeAlias(alphas, tau)}
+    resolve_type(type_expr(node.value), node, mod_ctx_)
 
 
 def base_class(node: ast.ClassDef, mod_ctx: ModuleContext) -> ClassType:

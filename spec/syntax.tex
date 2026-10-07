@@ -51,7 +51,7 @@ module stub & $\modStub{q}$ & module $q$, named but not \replaced{checked}{loade
 \replaced{checked module}{module reference} & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$, bound by an import \\
 class entry & $\Type{C}$ & name denotes class $C$ \\
 type parameter & $\TypeVar$ & name is a type parameter in scope \\
-type alias & $\TypeAlias{\seq{\alpha}}{\tau}$ & name denotes type $\tau$ with type parameters $\seq{\alpha}$ \\
+type alias & \replaced{$\TypeAlias[\Gamma]{q}{\seq{\xi}}{i}$}{$\mathsf{TypeAlias}(\seq{\alpha}, \tau)$} & \replaced{name denotes alias declared by $i$-th declaration of mutual type region $\seq{\xi}$ of module $q$, resolved under $\Gamma$}{name denotes type $\tau$ with type parameters $\seq{\alpha}$} \\
 type scheme & $\scheme{\seq{\alpha}}{\tau}$ or $\PU{\scheme{\seq{\alpha}}{\tau}}$ & type of function bound by \pyinline{def}, generalised over one or more type parameters $\seq{\alpha}$; $\PU{\scheme{\seq{\alpha}}{\tau}}$ if possibly unassigned \\
 predefined name & $\predefName$ & name usable only in annotation or as decorator \\
 \end{tabular}
@@ -62,7 +62,7 @@ predefined name & $\predefName$ & name usable only in annotation or as decorator
 \noindent A predefined name is a member of a predefined module whose meaning is fixed by the \thisdoc, such as \pyinline{list} or
 \pyinline{dataclass}; its entry records only that it is in scope, and it does not denote a value, so it cannot appear in
 an expression. A type parameter or type alias denotes a type rather than a value, so it too can be mentioned only by a type
-expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias{\seq{\alpha}}{\tau}$ are
+expression. The entries $\Type{C}$, $\TypeVar$ and \replaced{$\TypeAlias[\Gamma]{q}{\seq{\xi}}{i}$}{$\mathsf{TypeAlias}(\seq{\alpha}, \tau)$} are
 named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \pyinline{typing.TypeAliasType} of
 the objects denoted by a class name, type parameter or alias at run time.
 

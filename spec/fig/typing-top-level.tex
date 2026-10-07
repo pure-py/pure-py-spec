@@ -23,9 +23,9 @@
 \inferrule*[lab={\ruleName{types}}]
 {
   \added{\Sigma_0 = \Sigma \override \set{\bind{q.c}{\clsRec{\seq{\alpha}}{\varepsilon}{\bot}} \mid \seq{\xi} \text{ declares class } c[\seq{\alpha}]}} \\
-  \added{\Delta^\dagger = \set{\bind{c}{\Type{q.c}} \mid \seq{\xi} \text{ declares class } c}} \\
+  \added{\Delta_i = \set{\bind{\declaresS(\xi_i)}{\entryOf{\Gamma}(q, \seq{\xi}, i)}} \quad (\forall i)} \\
   \added{\Gamma_i = \Gamma \override \Delta_1 \override \cdots \override \Delta_{i-1}} \\
-  \added{\Sigma_{i-1}; q; \Gamma_i; \Gamma_i \override \Delta^\dagger \vdash \xi_i : \Delta_i \binding \Sigma_i \quad (\forall i)}
+  \added{\Sigma_{i-1}; q; \Gamma_i; \Gamma_{n+1} \vdash \xi_i \binding \Sigma_i \quad (\forall i)}
 }
 {
   \added{\Sigma; q; \Gamma \vdash \seq{\xi} : \Assigns{\Delta_1 \override \cdots \override \Delta_n} \binding \Sigma_n}
@@ -38,7 +38,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \added{\shadebox{$\Sigma; q; \Gamma; \Gamma' \vdash \xi : \Delta \binding \Sigma'$}}
+\flushleft \added{\shadebox{$\Sigma; q; \Gamma; \Gamma' \vdash \xi \binding \Sigma'$}}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{class}}]
@@ -49,7 +49,7 @@
   \Sigma; \replaced{\Gamma^\dagger}{\Gamma'} \vdash \psi_i \synth \sigma_i \quad (\forall i)
 }
 {
-  \Sigma; q; \Gamma\added{; \Gamma'} \vdash \exDataclass{c[\seq{\alpha}]}{\phi} : \deleted{\mathsf{Assigns}(}\set{\bind{c}{\Type{q.c}}}\deleted{)} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}
+  \Sigma; q; \Gamma\added{; \Gamma'} \vdash \exDataclass{c[\seq{\alpha}]}{\phi} \deleted{: \mathsf{Assigns}(\set{\bind{c}{\Type{q.c}}})} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
@@ -65,7 +65,7 @@
   \set{\seq{x}} \cap \set{\seq{y}} = \varnothing
 }
 {
-  \Sigma; q; \Gamma\added{; \Gamma'} \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}']}{\phi} : \deleted{\mathsf{Assigns}(}\set{\bind{c}{\Type{q.c}}}\deleted{)} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}
+  \Sigma; q; \Gamma\added{; \Gamma'} \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}']}{\phi} \deleted{: \mathsf{Assigns}(\set{\bind{c}{\Type{q.c}}})} \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}
 }
 \and
 \inferrule*[lab={\ruleName{type-alias}}]
@@ -74,10 +74,10 @@
   \Sigma; \replaced{\Gamma^\dagger}{\Gamma'} \vdash \psi \synth \tau
 }
 {
-  \Sigma; q; \Gamma\added{; \Gamma'} \vdash \exTypeAlias{x[\seq{\alpha}]}{\psi} : \deleted{\mathsf{Assigns}(}\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}\deleted{)} \binding \Sigma
+  \Sigma; q; \Gamma\added{; \Gamma'} \vdash \exTypeAlias{x[\seq{\alpha}]}{\psi} \deleted{: \mathsf{Assigns}(\set{\bind{x}{\mathsf{TypeAlias}(\seq{\alpha}, \tau)}})} \binding \Sigma
 }
 \end{mathpar}
-\subcaption{\added{Type declaration $\xi$ of module $q$ binds $\Delta$, extending $\Sigma$ to $\Sigma'$}}
+\subcaption{\added{Type declaration $\xi$ of module $q$ is well-formed, extending $\Sigma$ to $\Sigma'$}}
 \label{fig:typing-top-level-decl}
 \end{subfigure}
 \caption{Top-level statements\added{ and type declarations}}

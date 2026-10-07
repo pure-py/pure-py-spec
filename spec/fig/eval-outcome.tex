@@ -214,7 +214,6 @@
 
 \begin{figure}
 \small
-\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$q, \rho, t \Rightarrow o$}
 \begin{mathpar}
 \small
@@ -245,21 +244,13 @@
 \and
 \inferrule*[lab={\ruleName{eval-types}}]
 {
-  \added{\Delta^\dagger = \set{\bind{c}{\Type{q.c}} \mid \seq{\xi} \text{ declares class } c}} \\
-  \added{q, \Gamma \override \Delta^\dagger \override \rho_1 \override \cdots \override \rho_{i-1}, \xi_i \Rightarrow \rho_i \quad (\forall i)}
+  \added{\rho_i = \set{\bind{\declaresS(\xi_i)}{\entryOf{\Gamma}(q, \seq{\xi}, i)}} \quad (\forall i)}
 }
 {
   \added{q, \rho, \seq{\xi} \Rightarrow \assigns{\rho_1 \override \cdots \override \rho_n}}
 }
 \end{mathpar}
-\subcaption{Top-level statement $t$ of module $q$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
-\label{fig:eval-top-level-stmt}
-\end{subfigure}
-
-\vspace{2mm}
-
-\begin{subfigure}{\textwidth}
-\flushleft \added{\shadebox{$q, \Gamma, \xi \Rightarrow \rho$}}
+\begin{DeletedBlock}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-class}}]
@@ -267,7 +258,7 @@
   \strut
 }
 {
-  q, \replaced{\Gamma}{\rho}, \exDataclass{c[\seq{\alpha}]}{\phi} \Rightarrow \deleted{\mathsf{assigns}(}\set{\bind{c}{\Type{q.c}}}\deleted{)}
+  q, \rho, \exDataclass{c[\seq{\alpha}]}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{q.c}}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-class-extend}}]
@@ -275,7 +266,7 @@
   \strut
 }
 {
-  q, \replaced{\Gamma}{\rho}, \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}]}{\phi} \Rightarrow \deleted{\mathsf{assigns}(}\set{\bind{c}{\Type{q.c}}}\deleted{)}
+  q, \rho, \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}]}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{q.c}}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-type-alias}}]
@@ -283,13 +274,11 @@
   \Sigma; \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \vdash \psi \synth \tau
 }
 {
-  q, \replaced{\Gamma}{\rho}, \exTypeAlias{x[\seq{\alpha}]}{\psi} \Rightarrow \deleted{\mathsf{assigns}(}\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}\deleted{)}
+  q, \rho, \exTypeAlias{x[\seq{\alpha}]}{\psi} \Rightarrow \assigns{\set{\bind{x}{\mathsf{TypeAlias}(\seq{\alpha}, \tau)}}}
 }
 \end{mathpar}
-\subcaption{\added{Type declaration $\xi$ of module $q$ evaluates to bindings $\rho$ under context $\Gamma$}}
-\label{fig:eval-top-level-decl}
-\end{subfigure}
-\caption{Top-level statements\added{ and type declarations}}
+\end{DeletedBlock}
+\caption{Top-level statement $t$ of module $q$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
 \label{fig:eval-top-level}
 \end{figure}
 

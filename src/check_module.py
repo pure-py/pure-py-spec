@@ -21,8 +21,8 @@ from contexts import (
     PU,
     Context,
     ContextEntry,
+    ModuleChecked,
     ModuleContext,
-    ModuleLoaded,
     ModuleStub,
     Unbound,
     extend_context,
@@ -43,8 +43,8 @@ from type_syntax import (
 )
 
 
-def loads_as(
-    theta: ModuleLoaded, xs: list[Var], iota: ast.stmt, mod_ctx: ModuleContext
+def submodules(
+    theta: ModuleChecked, xs: list[Var], iota: ast.stmt, mod_ctx: ModuleContext
 ) -> tuple[ContextEntry, ClassTable]:
     match xs:
         case []:
@@ -52,10 +52,10 @@ def loads_as(
         case [x, *xs_]:
             q = qualified(theta.q, x)
             gamma, Sigma = check_imported(q, iota, mod_ctx)
-            theta_, Sigma = loads_as(
-                ModuleLoaded(q, gamma), xs_, iota, replace(mod_ctx, Sigma=Sigma)
+            theta_, Sigma = submodules(
+                ModuleChecked(q, gamma), xs_, iota, replace(mod_ctx, Sigma=Sigma)
             )
-            return ModuleLoaded(theta.q, extend_context(theta.members, {x: theta_})), Sigma
+            return ModuleChecked(theta.q, extend_context(theta.members, {x: theta_})), Sigma
         case _:
             assert False
 
@@ -81,8 +81,8 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
                 )
             x = Name((root(q),))
             delta, Sigma = check_imported(x, iota, mod_ctx)
-            theta, Sigma = loads_as(
-                ModuleLoaded(x, delta), list(q.parts[1:]), iota, replace(mod_ctx, Sigma=Sigma)
+            theta, Sigma = submodules(
+                ModuleChecked(x, delta), list(q.parts[1:]), iota, replace(mod_ctx, Sigma=Sigma)
             )
             return {root(q): theta}, Sigma
         case ast.ImportFrom():
@@ -93,7 +93,7 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
             if dup is not None:
                 raise IllFormedModule(iota, reasons.DuplicateImportedName(dup))
             delta, Sigma = check_imported(q, iota, mod_ctx)
-            Sigma = load_containing(containing(mod_ctx.q, q), replace(mod_ctx, Sigma=Sigma))
+            Sigma = check_containing(containing(mod_ctx.q, q), replace(mod_ctx, Sigma=Sigma))
             return imports_seq(
                 iota,
                 xs,
@@ -115,11 +115,11 @@ def containing(q: Name, q_: Name) -> list[Name]:
     return [p for p in proper_prefixes(q_) if not prefix_of(p, q)]
 
 
-def load_containing(qs: list[Name], mod_ctx: ModuleContext) -> ClassTable:
+def check_containing(qs: list[Name], mod_ctx: ModuleContext) -> ClassTable:
     if len(qs) == 0:
         return mod_ctx.Sigma
     _, Sigma = check_module(mod_ctx.M[qs[0]], mod_ctx.M, qs[0], mod_ctx.Sigma)
-    return load_containing(qs[1:], replace(mod_ctx, Sigma=Sigma))
+    return check_containing(qs[1:], replace(mod_ctx, Sigma=Sigma))
 
 
 def submods(M: Mapping[Name, ast.Module], q: Name) -> Context:
@@ -151,7 +151,7 @@ def imports(
         raise IllFormedModule(iota, reasons.UnknownMember(x, q))
     if isinstance(theta, ModuleStub):
         members, Sigma = check_module(mod_ctx.M[theta.q], mod_ctx.M, theta.q, mod_ctx.Sigma)
-        return ModuleLoaded(theta.q, members), Sigma
+        return ModuleChecked(theta.q, members), Sigma
     if isinstance(theta, (Unbound, DU, PU)):
         raise IllFormedModule(iota, reasons.UnassignedMember(x, q))
     return theta, mod_ctx.Sigma

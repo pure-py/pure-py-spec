@@ -1,1 +1,1 @@
-'Right' is unbound
+type alias 'Right' is cyclic

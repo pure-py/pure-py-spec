@@ -51,13 +51,22 @@ class TypeVar:
 
 @dataclass(frozen=True)
 class TypeAlias:
-    params: tuple[Var, ...]
-    tau: Type
+    gamma: "Context"
+    q: Name
+    xis: tuple[ast.ClassDef | ast.TypeAlias, ...]
+    i: int
 
 
 type VarEntry = Unbound | DU | PU | Type
 type ContextEntry = (
-    VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName | TypeVar | TypeAlias | TypeScheme
+    VarEntry
+    | ModuleStub
+    | ModuleChecked
+    | Class
+    | PredefinedName
+    | TypeVar
+    | TypeAlias
+    | TypeScheme
 )
 type Context = Mapping[Var, ContextEntry]
 type VarContext = Mapping[Var, VarEntry]
@@ -74,14 +83,14 @@ class ModuleStub:
 
 
 @dataclass(frozen=True)
-class ModuleLoaded:
+class ModuleChecked:
     q: Name
     members: Context
 
 
 NON_VARIABLE_ENTRIES = (
     ModuleStub,
-    ModuleLoaded,
+    ModuleChecked,
     Class,
     PredefinedName,
     TypeVar,
@@ -92,7 +101,7 @@ NON_VARIABLE_ENTRIES = (
 
 @dataclass(frozen=True)
 class ModuleContext:
-    gamma: Context
+    gamma: "Context"
     M: Mapping[Name, ast.Module]
     q: Name
     Sigma: ClassTable
@@ -128,12 +137,12 @@ def resolve_name(q: Name, mod_ctx: ModuleContext) -> ContextEntry | None:
     if q_ is None:
         return mod_ctx.gamma.get(root(q))
     theta = resolve_name(q_, mod_ctx)
-    return theta.members.get(q.parts[-1]) if isinstance(theta, ModuleLoaded) else None
+    return theta.members.get(q.parts[-1]) if isinstance(theta, ModuleChecked) else None
 
 
-def module_of(mod_ctx: ModuleContext, x: Var) -> ModuleStub | ModuleLoaded | None:
+def module_of(mod_ctx: ModuleContext, x: Var) -> ModuleStub | ModuleChecked | None:
     theta = mod_ctx.gamma.get(x)
-    return theta if isinstance(theta, (ModuleStub, ModuleLoaded)) else None
+    return theta if isinstance(theta, (ModuleStub, ModuleChecked)) else None
 
 
 @dataclass(frozen=True)
@@ -267,9 +276,9 @@ def extend_entry(theta: ContextEntry | None, theta_: ContextEntry | None) -> Con
     if theta_ is None:
         return theta
     match (theta, theta_):
-        case (ModuleLoaded(q, gamma), ModuleLoaded(q_, gamma_)):
-            return ModuleLoaded(q, extend_context(gamma, gamma_)) if q == q_ else theta_
-        case (ModuleLoaded(q), ModuleStub(q_)):
+        case (ModuleChecked(q, gamma), ModuleChecked(q_, gamma_)):
+            return ModuleChecked(q, extend_context(gamma, gamma_)) if q == q_ else theta_
+        case (ModuleChecked(q), ModuleStub(q_)):
             return theta if q == q_ else theta_
         case _:
             return theta_
