@@ -289,6 +289,15 @@ before their declarations (\secref{well-formedness-modules}), $\psi$ can name on
 earlier in the module, and cannot name $x$ itself. Each rule that takes an annotation resolves it to a type
 (\figref{resolve-type}).}
 
+A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
+auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}), which threads
+a remaining type, starting from $\sigma$, and a residual $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
+through the cases, merging their outcomes into $S$. The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
+exhaustive; the \ruleName{match-partial} rule applies otherwise and also merges in $\Assigns{\varnothing}$, the
+outcome of the path on which the scrutinee is not matched by any of the cases. The remaining type, the residual, reachability and exhaustiveness are the subject of
+\secref{well-formedness-patterns}.
+
+\speconly{\subsubsection{Function definitions}\label{sec:well-formedness-defs}}%
 The \ruleName{defs} rule for a mutual def region of function definitions synthesises a type scheme for each definition
 (\figref{typing-def}), binds all the function names of the mutual def region at the synthesised type schemes, and checks each
 definition against its scheme. For a definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$,
@@ -313,14 +322,7 @@ return type denoted by $\psi$, and must have static outcome $\Returns$ unless th
 so a function that declares a result definitely returns one. A return type such as $\tyUnion{\tyInt}{\tyNone}$
 does not exempt the body from returning, nor permit a bare \pyinline{return}, for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).
 
-A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
-auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}), which threads
-a remaining type, starting from $\sigma$, and a residual $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
-through the cases, merging their outcomes into $S$. The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
-exhaustive; the \ruleName{match-partial} rule applies otherwise and also merges in $\Assigns{\varnothing}$, the
-outcome of the path on which the scrutinee is not matched by any of the cases. The remaining type, the residual, reachability and exhaustiveness are the subject of
-\secref{well-formedness-patterns}.
-
+\speconly{\subsubsection{Top-level statements}\label{sec:well-formedness-top-level}}%
 \added{Top-level statements are checked by a separate
 judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, a mutual type region of class
 declarations and \pyinline{type} statements is a top-level form, checked by the \ruleName{types} rule, and a plain statement is checked with no return type
