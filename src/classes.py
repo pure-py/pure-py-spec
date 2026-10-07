@@ -51,7 +51,7 @@ from type_syntax import (
 class ClassDef:
     gamma: Context
     q: Name
-    xis: tuple[TypeDeclaration, ...]
+    chis: tuple[TypeDeclaration, ...]
     i: int
 
 
@@ -62,26 +62,26 @@ def short_name(c: Class) -> Var:
     return c.name.parts[-1]
 
 
-def class_table(gamma: Context, q: Name, xis: tuple[TypeDeclaration, ...], i: int) -> ClassTable:
-    xi = xis[i]
-    if isinstance(xi, ast.ClassDef):
-        return {Class(qualified(q, xi.name)): ClassDef(gamma, q, xis, i)}
+def class_table(gamma: Context, q: Name, chis: tuple[TypeDeclaration, ...], i: int) -> ClassTable:
+    chi = chis[i]
+    if isinstance(chi, ast.ClassDef):
+        return {Class(qualified(q, chi.name)): ClassDef(gamma, q, chis, i)}
     return {}
 
 
 def class_declaration(Sigma: ClassTable, c: Class) -> ast.ClassDef:
     """Declaration of c, from its definition"""
     definition = Sigma[c]
-    xi = definition.xis[definition.i]
-    assert isinstance(xi, ast.ClassDef)
-    return xi
+    chi = definition.chis[definition.i]
+    assert isinstance(chi, ast.ClassDef)
+    return chi
 
 
 def definition_context(Sigma: ClassTable, c: Class) -> ModuleContext:
     """Module context resolving type expressions of definition of c: type-context under Sigma.
     Resolution never checks a module, so M is empty."""
     definition = Sigma[c]
-    gamma = type_context(definition.gamma, definition.q, definition.xis, definition.i)
+    gamma = type_context(definition.gamma, definition.q, definition.chis, definition.i)
     return ModuleContext(gamma=gamma, M={}, q=definition.q, Sigma=Sigma)
 
 
@@ -90,10 +90,10 @@ def type_params(Sigma: ClassTable, c: Class) -> tuple[Var, ...]:
 
 
 def base(Sigma: ClassTable, c: Class) -> ClassType | None:
-    xi = class_declaration(Sigma, c)
-    if len(xi.bases) == 0:
+    chi = class_declaration(Sigma, c)
+    if len(chi.bases) == 0:
         return None
-    tau = resolve_type(type_expr(xi.bases[0]), xi, definition_context(Sigma, c))
+    tau = resolve_type(type_expr(chi.bases[0]), chi, definition_context(Sigma, c))
     assert isinstance(tau, ClassType)
     return tau
 
@@ -104,9 +104,9 @@ def ancestors(Sigma: ClassTable, c: Class) -> list[Class]:
 
 
 def fields(Sigma: ClassTable, c: Class) -> FieldScheme:
-    xi = class_declaration(Sigma, c)
+    chi = class_declaration(Sigma, c)
     own = tuple(
-        (x, resolve_type(psi, xi, definition_context(Sigma, c))) for x, psi in own_fields(xi)
+        (x, resolve_type(psi, chi, definition_context(Sigma, c))) for x, psi in own_fields(chi)
     )
     base_ = base(Sigma, c)
     if base_ is None:
@@ -133,26 +133,26 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
             if isinstance(theta, TypeVar) and len(args) == 0:
                 return TypeVariable(str(q))
             if isinstance(theta, TypeAlias):
-                xi = theta.xis[theta.i]
-                assert isinstance(xi, ast.TypeAlias) and isinstance(xi.name, ast.Name)
-                alphas = type_param_names(xi)
+                chi = theta.chis[theta.i]
+                assert isinstance(chi, ast.TypeAlias) and isinstance(chi.name, ast.Name)
+                alphas = type_param_names(chi)
                 sigmas = tuple(resolve_type(psi_, node, mod_ctx) for psi_ in args)
                 if len(sigmas) != len(alphas):
                     raise IllFormedModule(
                         node, reasons.TypeAliasArityMismatch(q, len(alphas), len(sigmas))
                     )
                 mod_ctx_ = ModuleContext(
-                    gamma=type_context(theta.gamma, theta.q, theta.xis, theta.i),
+                    gamma=type_context(theta.gamma, theta.q, theta.chis, theta.i),
                     M=mod_ctx.M,
                     q=theta.q,
                     Sigma=mod_ctx.Sigma,
                 )
-                key = (theta.q, xi.name.id)
+                key = (theta.q, chi.name.id)
                 if key in _resolving:
-                    raise IllFormedModule(node, reasons.CyclicTypeAlias(xi.name.id))
+                    raise IllFormedModule(node, reasons.CyclicTypeAlias(chi.name.id))
                 _resolving.append(key)
                 try:
-                    tau = resolve_type(type_expr(xi.value), node, mod_ctx_)
+                    tau = resolve_type(type_expr(chi.value), node, mod_ctx_)
                 finally:
                     _resolving.pop()
                 return substitute(sigmas, alphas, tau)

@@ -59,7 +59,7 @@ class TypeVar:
 class TypeAlias:
     gamma: "Context"
     q: Name
-    xis: tuple[TypeDeclaration, ...]
+    chis: tuple[TypeDeclaration, ...]
     i: int
 
 
@@ -295,18 +295,18 @@ def disjoint_union[V](gamma: Mapping[Var, V], gamma_: Mapping[Var, V]) -> Mappin
     return {**gamma, **gamma_}
 
 
-def type_entry(gamma: Context, q: Name, xis: tuple[TypeDeclaration, ...], i: int) -> ContextEntry:
-    xi = xis[i]
-    if isinstance(xi, ast.ClassDef):
-        return Class(qualified(q, xi.name))
-    return TypeAlias(gamma, q, xis, i)
+def type_entry(gamma: Context, q: Name, chis: tuple[TypeDeclaration, ...], i: int) -> ContextEntry:
+    chi = chis[i]
+    if isinstance(chi, ast.ClassDef):
+        return Class(qualified(q, chi.name))
+    return TypeAlias(gamma, q, chis, i)
 
 
-def type_context(gamma: Context, q: Name, xis: tuple[TypeDeclaration, ...], i: int) -> Context:
-    xi = xis[i]
-    earlier = range(i if isinstance(xi, ast.ClassDef) else len(xis))
-    deltas = [{x: type_entry(gamma, q, xis, j) for x, _ in declares(xis[j])} for j in earlier]
-    alphas = {alpha: TypeVar() for alpha in type_param_names(xi)}
+def type_context(gamma: Context, q: Name, chis: tuple[TypeDeclaration, ...], i: int) -> Context:
+    chi = chis[i]
+    earlier = range(i if isinstance(chi, ast.ClassDef) else len(chis))
+    deltas = [{x: type_entry(gamma, q, chis, j) for x, _ in declares(chis[j])} for j in earlier]
+    alphas = {alpha: TypeVar() for alpha in type_param_names(chi)}
     return {**gamma, **{x: theta for delta in deltas for x, theta in delta.items()}, **alphas}
 
 

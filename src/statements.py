@@ -137,29 +137,30 @@ def check_top_statement(t: Statement, mod_ctx: ModuleContext) -> tuple[StaticOut
     return check_statement(t, mod_ctx, None), mod_ctx.Sigma
 
 
-def types(xis: list[TypeDeclaration], mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
-    xis_ = tuple(xis)
+def types(chis: list[TypeDeclaration], mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
+    chis_ = tuple(chis)
     gamma, q = mod_ctx.gamma, mod_ctx.q
     deltas = [
-        {x: type_entry(gamma, q, xis_, i) for x, _ in declares(xi)} for i, xi in enumerate(xis_)
+        {x: type_entry(gamma, q, chis_, i) for x, _ in declares(chi)} for i, chi in enumerate(chis_)
     ]
     Sigma = reduce(
-        lambda Sigma, i: {**Sigma, **class_table(gamma, q, xis_, i)},
-        range(len(xis_)),
+        lambda Sigma, i: {**Sigma, **class_table(gamma, q, chis_, i)},
+        range(len(chis_)),
         mod_ctx.Sigma,
     )
-    for i, xi in enumerate(xis_):
+    for i, chi in enumerate(chis_):
         declaration(
-            xi, ModuleContext(gamma=type_context(gamma, q, xis_, i), M=mod_ctx.M, q=q, Sigma=Sigma)
+            chi,
+            ModuleContext(gamma=type_context(gamma, q, chis_, i), M=mod_ctx.M, q=q, Sigma=Sigma),
         )
     return Assigns({x: theta for delta in deltas for x, theta in delta.items()}), Sigma
 
 
-def declaration(xi: TypeDeclaration, mod_ctx: ModuleContext) -> None:
-    if isinstance(xi, ast.ClassDef):
-        dataclass(xi, mod_ctx)
+def declaration(chi: TypeDeclaration, mod_ctx: ModuleContext) -> None:
+    if isinstance(chi, ast.ClassDef):
+        dataclass(chi, mod_ctx)
     else:
-        type_alias(xi, mod_ctx)
+        type_alias(chi, mod_ctx)
 
 
 def check_seq(
