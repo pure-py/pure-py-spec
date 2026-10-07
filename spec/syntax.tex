@@ -51,7 +51,7 @@ module stub & $\modStub{q}$ & module $q$, named but not \replaced{checked}{loade
 \replaced{checked module}{module reference} & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$, bound by an import \\
 class entry & $\Type{C}$ & name denotes class $C$ \\
 type parameter & $\TypeVar$ & name is a type parameter in scope \\
-type alias & \replaced{$\TypeAlias[\Gamma]{q}{\seq{\xi}}{i}$}{$\mathsf{TypeAlias}(\seq{\alpha}, \tau)$} & \replaced{name denotes alias declared by $i$-th declaration of mutual type region $\seq{\xi}$ of module $q$, resolved under $\Gamma$}{name denotes type $\tau$ with type parameters $\seq{\alpha}$} \\
+type alias & \replaced{$\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$}{$\mathsf{TypeAlias}(\seq{\alpha}, \tau)$} & \replaced{name denotes alias declared by $i$-th declaration of mutual type region $\seq{\chi}$ of module $q$, resolved under $\Gamma$}{name denotes type $\tau$ with type parameters $\seq{\alpha}$} \\
 type scheme & $\scheme{\seq{\alpha}}{\tau}$ or $\PU{\scheme{\seq{\alpha}}{\tau}}$ & type of function bound by \pyinline{def}, generalised over one or more type parameters $\seq{\alpha}$; $\PU{\scheme{\seq{\alpha}}{\tau}}$ if possibly unassigned \\
 predefined name & $\predefName$ & name usable only in annotation or as decorator \\
 \end{tabular}
@@ -62,7 +62,7 @@ predefined name & $\predefName$ & name usable only in annotation or as decorator
 \noindent A predefined name is a member of a predefined module whose meaning is fixed by the \thisdoc, such as \pyinline{list} or
 \pyinline{dataclass}; its entry records only that it is in scope, and it does not denote a value, so it cannot appear in
 an expression. A type parameter or type alias denotes a type rather than a value, so it too can be mentioned only by a type
-expression. The entries $\Type{C}$, $\TypeVar$ and \replaced{$\TypeAlias[\Gamma]{q}{\seq{\xi}}{i}$}{$\mathsf{TypeAlias}(\seq{\alpha}, \tau)$} are
+expression. The entries $\Type{C}$, $\TypeVar$ and \replaced{$\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$}{$\mathsf{TypeAlias}(\seq{\alpha}, \tau)$} are
 named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \pyinline{typing.TypeAliasType} of
 the objects denoted by a class name, type parameter or alias at run time.
 
@@ -113,14 +113,14 @@ otherwise right-biased like override. It is used in processing an import prefix,
 
 Statements are sequenced by
 juxtaposition, $s\;s'$; a function body, branch of a conditional and body of a case are statements.
-\added{A \emph{type declaration} $\xi$ is a class declaration or \pyinline{type} statement.}
+\added{A \emph{type declaration} $\chi$ is a class declaration or \pyinline{type} statement.}
 A \emph{top-level statement} $t$ is a statement\replaced{ or mutual type region}{, class declaration or \pyinline{type} statement}, also sequenced by juxtaposition; the body of a
 module after its imports is a top-level statement, so \replaced{type declarations}{class declarations and \pyinline{type} statements} occur only at the top level of a
 module. A \pyinline{type} statement declares a \emph{type alias}. Function definitions, class declarations and
 \pyinline{type} statements bind \emph{type parameters} $\seq{\alpha}$, written in brackets after the name as in
 Python 3.12. A \emph{mutual def region} $d_1 \ldots d_{n+1}$ is a maximal contiguous block of \pyinline{def} statements: any other statement separates mutual
 def regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
-grouping consecutive \pyinline{def}s into a single mutual def region. \added{A \emph{mutual type region} $\xi_1 \ldots \xi_{n+1}$ is a
+grouping consecutive \pyinline{def}s into a single mutual def region. \added{A \emph{mutual type region} $\chi_1 \ldots \chi_{n+1}$ is a
 maximal contiguous block of type declarations, grouped by the parser in the same way.} The well-formedness rules treat each
 mutual def region \added{and each mutual type region} as one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
 

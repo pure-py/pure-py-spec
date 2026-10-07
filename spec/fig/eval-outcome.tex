@@ -244,10 +244,10 @@
 \and
 \inferrule*[lab={\ruleName{eval-types}}]
 {
-  \added{\rho_i = \set{\bind{\declaresS(\xi_i)}{\entryOf{\Gamma}(q, \seq{\xi}, i)}} \quad (\forall i)}
+  \added{\rho_i = \set{\bind{\declaresS(\chi_i)}{\entryOf{\Gamma}(q, \seq{\chi}, i)}} \quad (\forall i)}
 }
 {
-  \added{q, \rho, \seq{\xi} \Rightarrow \assigns{\rho_1 \override \cdots \override \rho_n}}
+  \added{q, \rho, \seq{\chi} \Rightarrow \assigns{\rho_1 \override \cdots \override \rho_n}}
 }
 \end{mathpar}
 \begin{DeletedBlock}

@@ -21,10 +21,10 @@ $s$ & $::=$ & $\exPass$ & (Pass) \\
 \grammarGroup{Top-level statements} \\
 $t$ & $::=$ & $s$ & (Stmt) \\
     & $\mid$ & $t\;t'$ & (TopSeq) \\
-    & $\mid$ & \added{$\xi_1 \;\ldots\; \xi_{n+1}$} & \added{(MutualTypeRegion)}
+    & $\mid$ & \added{$\chi_1 \;\ldots\; \chi_{n+1}$} & \added{(MutualTypeRegion)}
    \\[3mm]
 \grammarGroup{\added{Type declarations}} \\
-\added{$\xi$} & \added{$::=$} & $\exDataclass{c[\seq{\alpha}]}{\phi}$ & (Dataclass) \\
+\added{$\chi$} & \added{$::=$} & $\exDataclass{c[\seq{\alpha}]}{\phi}$ & (Dataclass) \\
     & $\mid$ & $\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}$ & (DataclassExtend) \\
     & $\mid$ & $\exTypeAlias{x[\seq{\alpha}]}{\psi}$ & (TypeAlias)
    \\[3mm]

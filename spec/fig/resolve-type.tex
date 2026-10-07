@@ -26,9 +26,9 @@
 \and
 \inferrule*[lab={\ruleName{ty-alias}}]
 {
-  \Gamma \vdash q : \replaced{\TypeAlias[\Gamma']{q'}{\seq{\xi}}{i}}{\mathsf{TypeAlias}(\seq{\alpha}, \tau)} \\
-  \added{\xi_i = \exTypeAlias{x[\seq{\alpha}]}{\psi'}} \\
-  \added{\Delta = \set{\bind{\declaresS(\seq{\xi})}{\entryOf{\Gamma'}(q', \seq{\xi}, 1), \ldots, \entryOf{\Gamma'}(q', \seq{\xi}, n)}}} \\
+  \Gamma \vdash q : \replaced{\TypeAlias[\Gamma']{q'}{\seq{\chi}}{i}}{\mathsf{TypeAlias}(\seq{\alpha}, \tau)} \\
+  \added{\chi_i = \exTypeAlias{x[\seq{\alpha}]}{\psi'}} \\
+  \added{\Delta = \set{\bind{\declaresS(\seq{\chi})}{\entryOf{\Gamma'}(q', \seq{\chi}, 1), \ldots, \entryOf{\Gamma'}(q', \seq{\chi}, n)}}} \\
   \added{\Sigma; \Gamma' \override \Delta \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_m}{\TypeVar}} \vdash \psi' \synth \tau} \\
   \Sigma; \Gamma \vdash \seq{\psi} \synth \seq{\sigma}
 }

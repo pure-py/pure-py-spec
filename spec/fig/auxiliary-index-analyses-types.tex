@@ -2,7 +2,7 @@
 \auxgroup{Syntactic analyses}
 \auxrow{$\assignsS(t)$}{set of variables}{variables declared or assigned in $t$, not descending into nested functions}{aux:assigns}
 \auxrow{$\declaresS(t)$, $\declaresS(\seq{\iota})$}{sequence of variables}{names declared in $t$, or bound by imports $\seq{\iota}$, in order and with repeats, not descending into nested functions}{aux:declares}
-\specauxrow{\added{$\entryOf{\Gamma}(q, \seq{\xi}, i)$}}{\added{context entry}}{\added{entry bound by $i$-th declaration of mutual type region $\seq{\xi}$ of module $q$ under $\Gamma$}}{aux:entry}
+\specauxrow{\added{$\entryOf{\Gamma}(q, \seq{\chi}, i)$}}{\added{context entry}}{\added{entry bound by $i$-th declaration of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$}}{aux:entry}
 \auxrow{$\scopeS(Y, s)$}{context}{each variable declared or assigned in $s$ unbound; defined iff names declared in $s$, names in $Y$ and pattern variables of $s$ pairwise distinct}{aux:scope}
 \auxrow{$\binds(p)$, $\binds(\seq{g})$, $\binds(s)$}{set of variables}{variables bound by pattern $p$, by generators of qualifiers $\seq{g}$, or by patterns within statement $s$}{aux:binds}
 \auxrow{$\captures(e)$}{set of variables}{variables of enclosing scope captured by lambdas in $e$}{aux:captures-e}

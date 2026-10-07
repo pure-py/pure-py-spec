@@ -22,13 +22,13 @@
 \and
 \inferrule*[lab={\ruleName{types}}]
 {
-  \added{\Sigma_0 = \Sigma \override \set{\bind{q.c}{\clsRec{\seq{\alpha}}{\varepsilon}{\bot}} \mid \seq{\xi} \text{ declares class } c[\seq{\alpha}]}} \\
-  \added{\Delta_i = \set{\bind{\declaresS(\xi_i)}{\entryOf{\Gamma}(q, \seq{\xi}, i)}} \quad (\forall i)} \\
+  \added{\Sigma_0 = \Sigma \override \set{\bind{q.c}{\clsRec{\seq{\alpha}}{\varepsilon}{\bot}} \mid \seq{\chi} \text{ declares class } c[\seq{\alpha}]}} \\
+  \added{\Delta_i = \set{\bind{\declaresS(\chi_i)}{\entryOf{\Gamma}(q, \seq{\chi}, i)}} \quad (\forall i)} \\
   \added{\Gamma_i = \Gamma \override \Delta_1 \override \cdots \override \Delta_{i-1}} \\
-  \added{\Sigma_{i-1}; q; \Gamma_i; \Gamma_{n+1} \vdash \xi_i \binding \Sigma_i \quad (\forall i)}
+  \added{\Sigma_{i-1}; q; \Gamma_i; \Gamma_{n+1} \vdash \chi_i \binding \Sigma_i \quad (\forall i)}
 }
 {
-  \added{\Sigma; q; \Gamma \vdash \seq{\xi} : \Assigns{\Delta_1 \override \cdots \override \Delta_n} \binding \Sigma_n}
+  \added{\Sigma; q; \Gamma \vdash \seq{\chi} : \Assigns{\Delta_1 \override \cdots \override \Delta_n} \binding \Sigma_n}
 }
 \end{mathpar}
 \subcaption{Top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$}
@@ -38,7 +38,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \added{\shadebox{$\Sigma; q; \Gamma; \Gamma' \vdash \xi \binding \Sigma'$}}
+\flushleft \added{\shadebox{$\Sigma; q; \Gamma; \Gamma' \vdash \chi \binding \Sigma'$}}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{class}}]
@@ -77,7 +77,7 @@
   \Sigma; q; \Gamma\added{; \Gamma'} \vdash \exTypeAlias{x[\seq{\alpha}]}{\psi} \deleted{: \mathsf{Assigns}(\set{\bind{x}{\mathsf{TypeAlias}(\seq{\alpha}, \tau)}})} \binding \Sigma
 }
 \end{mathpar}
-\subcaption{\added{Type declaration $\xi$ of module $q$ is well-formed, extending $\Sigma$ to $\Sigma'$}}
+\subcaption{\added{Type declaration $\chi$ of module $q$ is well-formed, extending $\Sigma$ to $\Sigma'$}}
 \label{fig:typing-top-level-decl}
 \end{subfigure}
 \caption{Top-level statements\added{ and type declarations}}
