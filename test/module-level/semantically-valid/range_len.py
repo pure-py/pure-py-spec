@@ -1,1 +1,1 @@
-print(len(range(5)))
+print(len(range(0, 5)))

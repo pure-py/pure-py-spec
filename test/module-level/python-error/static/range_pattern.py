@@ -1,5 +1,5 @@
-match range(3):
-    case range(3):
+match range(0, 3):
+    case range(0, 3):
         print("three")
     case _:
         print("other")

@@ -181,7 +181,7 @@ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context 
 (\figref{predefined-values}). A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
 the predefined signatures. The class table $\SigmaPredef$ of the predefined modules has the single entry
-$\SigmaPredef(\clsRange) = \clsRec{\varepsilon}{\bind{\pyinline{stop}}{\tyInt}}{\bot}$.
+$\SigmaPredef(\clsRange) = \clsRec{\varepsilon}{\bind{\pyinline{start}}{\tyInt} \cons \bind{\pyinline{stop}}{\tyInt}}{\bot}$.
 \end{definition}
 
 \input{spec/fig/predefined-signatures}
