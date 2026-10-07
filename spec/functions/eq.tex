@@ -18,7 +18,8 @@
 &\qquad \text{if } v \text{ and } v' \text{ are values of } \clsRange \\*
 \eqOp(\exObj{C}{\rho}, \exObj{C}{\rho'}) &{}= \eqElems(\rho(x_1) \cons \ldots \cons \rho(x_n), \rho'(x_1) \cons \ldots \cons \rho'(x_n)) \\*
 &\qquad \text{if } \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \text{ and } C \neq \clsRange \\*
-\eqOp(\exObj{C}{\rho}, \exObj{D}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq D \\*
+\eqOp(\exObj{C}{\rho}, \exObj{D}{\rho'}) &{}= \pyinline{False} \\*
+&\qquad \text{if } C \neq D \\*
 \\
 \eqOp(v, v') &{}= \pyinline{False} \\*
 &\qquad \text{if } v \text{ and } v' \text{ are of different forms and are not a Boolean and a number}
