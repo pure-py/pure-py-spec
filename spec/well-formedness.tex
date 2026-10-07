@@ -355,8 +355,7 @@ another class, the base class to name a class rather than an alias and to resolv
 scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement $\exTypeAlias{x[\seq{\alpha}]}{\psi}$, such as \pyinline{type Pair[T] = tuple[T, T]},
 declares $x$ as an alias of the type denoted by $\psi$ with the type parameters $\seq{\alpha}$ in scope
 (\ruleName{type-alias}). An application of the alias such as \pyinline{Pair[int]} denotes that type at the given
-arguments (\ruleName{ty-alias}), here \pyinline{tuple[int, int]}, so types never mention aliases.  Each rule that takes an annotation resolves it to a type
-(\figref{resolve-type}).}
+arguments (\ruleName{ty-alias}), here \pyinline{tuple[int, int]}, so types never mention aliases.}
 
 \subsection{Pattern matching}
 \label{sec:exhaustiveness}
