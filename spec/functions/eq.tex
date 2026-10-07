@@ -6,7 +6,8 @@
 \eqOp{\Sigma}(\pyinline{True}, \pyinline{True}) &{}= \eqOp{\Sigma}(\pyinline{False}, \pyinline{False}) = \val{\pyinline{True}} \\*
 \eqOp{\Sigma}(\pyinline{True}, \pyinline{False}) &{}= \eqOp{\Sigma}(\pyinline{False}, \pyinline{True}) = \val{\pyinline{False}} \\*
 \eqOp{\Sigma}(\pyinline{None}, \pyinline{None}) &{}= \val{\pyinline{True}} \\*
-\eqOp{\Sigma}(\pyinline{True}, n) &{}= \eqOp{\Sigma}(\pyinline{False}, n) = \eqOp{\Sigma}(n, \pyinline{True}) = \eqOp{\Sigma}(n, \pyinline{False}) = \undefinedResult \\*
+\eqOp{\Sigma}(\pyinline{True}, n) &{}= \eqOp{\Sigma}(\pyinline{False}, n) = \undefinedResult \\*
+\eqOp{\Sigma}(n, \pyinline{True}) &{}= \eqOp{\Sigma}(n, \pyinline{False}) = \undefinedResult \\*
 \\
 \eqOp{\Sigma}(\exList{\seq{v}}, \exList{\seq{v}\,'}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*
 \eqOp{\Sigma}(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*
