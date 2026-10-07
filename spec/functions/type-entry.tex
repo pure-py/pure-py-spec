@@ -1,2 +1,4 @@
-\typeEntry{\Gamma}(q, \seq{\chi}, i) &{}= \Type{q.c} && \text{if } \chi_i \text{ declares class } c \\*
-\typeEntry{\Gamma}(q, \seq{\chi}, i) &{}= \TypeAlias[\Gamma]{q}{\seq{\chi}}{i} && \text{(otherwise)}
+\typeEntry{\Gamma}(q, \seq{\chi}, i) &{}= \Type{q.c} && \text{if } \chi_i = \exDataclass{c[\seq{\alpha}]}{\phi} \\*
+\typeEntry{\Gamma}(q, \seq{\chi}, i) &{}= \Type{q.c} && \text{if } \chi_i = \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}]}{\phi} \\*
+\typeEntry{\Gamma}(q, \seq{\chi}, i) &{}= \TypeAlias[\Gamma]{q}{\seq{\chi}}{i} && \text{if } \chi_i = \exTypeAlias{x[\seq{\alpha}]}{\psi} \\*
+\typeEntry{\Gamma}(q, \seq{\chi}) &{}= \typeEntry{\Gamma}(q, \seq{\chi}, 1) \cons \ldots \cons \typeEntry{\Gamma}(q, \seq{\chi}, n) && \text{where } n = |\seq{\chi}|

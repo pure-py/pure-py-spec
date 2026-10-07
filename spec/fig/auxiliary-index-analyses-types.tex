@@ -2,7 +2,7 @@
 \auxgroup{Syntactic analyses}
 \auxrow{$\assignsS(t)$}{set of variables}{variables declared or assigned in $t$, not descending into nested functions}{aux:assigns}
 \auxrow{$\declaresS(t)$, $\declaresS(\seq{\iota})$}{sequence of variables}{names declared in $t$, or bound by imports $\seq{\iota}$, in order and with repeats, not descending into nested functions}{aux:declares}
-\auxrow{\added{$\typeEntry{\Gamma}(q, \seq{\chi}, i)$}}{\added{context entry}}{\added{context entry bound by $i$-th declaration of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$}}{aux:type-entry}
+\auxrow{\added{$\typeEntry{\Gamma}(q, \seq{\chi}, i)$, $\typeEntry{\Gamma}(q, \seq{\chi})$}}{\added{context entry, or sequence of context entries}}{\added{context entry bound by $i$-th declaration of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$, or by each declaration}}{aux:type-entry}
 \auxrow{\added{$\typeContext{\Gamma}(q, \seq{\chi}, i)$}}{\added{context}}{\added{context resolving type expressions of $i$-th declaration of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$}}{aux:type-context}
 \auxrow{\added{$\classTable{\Gamma}(q, \seq{\chi}, i)$, $\classTable{\Gamma}(q, \seq{\chi})$}}{\added{class table}}{\added{class definitions contributed by $i$-th declaration, or by all declarations, of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$}}{aux:class-table}
 \auxrow{$\scopeS(Y, s)$}{context}{each variable declared or assigned in $s$ unbound; defined iff names declared in $s$, names in $Y$ and pattern variables of $s$ pairwise distinct}{aux:scope}

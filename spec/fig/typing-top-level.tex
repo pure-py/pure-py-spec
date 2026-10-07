@@ -22,12 +22,12 @@
 \and
 \inferrule*[lab={\ruleName{types}}]
 {
-  \added{\Delta_i = \set{\bind{\declaresS(\chi_i)}{\typeEntry{\Gamma}(q, \seq{\chi}, i)}} \quad (\forall i)} \\
+  \added{\Delta = \set{\bind{\declaresS(\seq{\chi})}{\typeEntry{\Gamma}(q, \seq{\chi})}}} \\
   \added{\Sigma' = \Sigma \override \classTable{\Gamma}(q, \seq{\chi})} \\
   \added{\Sigma'; \typeContext{\Gamma}(q, \seq{\chi}, i) \vdash \chi_i \quad (\forall i)}
 }
 {
-  \added{\Sigma; q; \Gamma \vdash \seq{\chi} : \Assigns{\Delta_1 \override \cdots \override \Delta_n} \binding \Sigma'}
+  \added{\Sigma; q; \Gamma \vdash \seq{\chi} : \Assigns{\Delta} \binding \Sigma'}
 }
 \end{mathpar}
 \subcaption{Top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$}
