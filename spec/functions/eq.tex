@@ -13,7 +13,7 @@
 \eqOp{\Sigma}(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*
 \\
 \eqOp{\Sigma}(\delta, \delta') &{}= \eqElems{\Sigma}(v_1 \cons \ldots \cons v_n, \delta'(w_1) \cons \ldots \cons \delta'(w_n)) \\*
-&\qquad \text{if } \dom(\delta) = \dom(\delta') \text{, where } \delta = \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n} \\*
+&\qquad \text{if } \dom(\delta) = \dom(\delta') \text{ and } \delta = \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n} \\*
 \eqOp{\Sigma}(\delta, \delta') &{}= \val{\pyinline{False}} \\*
 &\qquad \text{if } \dom(\delta) \neq \dom(\delta') \\*
 \\
