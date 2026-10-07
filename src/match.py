@@ -5,9 +5,7 @@ from itertools import product
 import reasons
 from aux import binds, name_of
 from classes import (
-    RANGE,
     ArityMismatch,
-    Class,
     ClassTable,
     RepeatedKeywordArg,
     UnknownKeywordArgs,
@@ -19,12 +17,14 @@ from classes import (
     short_name,
 )
 from contexts import (
+    DU,
+    PU,
     ModuleContext,
     Unbound,
     VarContext,
+    VarEntry,
     class_of_name,
     disjoint_union,
-    join_context,
 )
 from reasons import IllFormedModule
 from shapes import (
@@ -42,9 +42,11 @@ from shapes import (
     shapes_seq,
     typed_heads,
 )
-from subtyping import Undetermined, disjuncts, instance, join, meet, subtype
+from subtyping import Undetermined, disjuncts, instance, join, join_seq, meet, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
+    RANGE,
+    Class,
     ClassType,
     DictType,
     ListType,
@@ -566,3 +568,13 @@ def literal_of(p: ast.pattern) -> Literal:
             return ell
         case _:
             assert False
+
+
+def join_context(Sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
+    return {x: join_seq(Sigma, binding_types([delta[x] for delta in deltas])) for x in deltas[0]}
+
+
+def binding_types(entries: list[VarEntry]) -> list[Type]:
+    types = [e for e in entries if not isinstance(e, (Unbound, DU, PU))]
+    assert len(types) == len(entries)
+    return types

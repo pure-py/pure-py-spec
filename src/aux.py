@@ -280,6 +280,12 @@ def pattern_bound(body: list[ast.stmt]) -> dict[Var, ast.Match]:
     return out
 
 
+def type_param_names(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlias) -> tuple[Var, ...]:
+    alphas = tuple(p.name for p in node.type_params if isinstance(p, ast.TypeVar))
+    assert len(alphas) == len(node.type_params)
+    return alphas
+
+
 def own_fields(node: ast.ClassDef) -> tuple[tuple[Var, TypeExpr], ...]:
     return tuple(
         (t.target.id, type_expr(t.annotation))

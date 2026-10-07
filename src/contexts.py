@@ -1,11 +1,13 @@
 import ast
 from collections.abc import Mapping
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from classes import RANGE, Class, ClassTable
-from subtyping import join_seq
+from aux import TypeDeclaration, declares, type_param_names
 from type_syntax import (
+    RANGE,
     CallableType,
+    Class,
     ListType,
     Name,
     Primitive,
@@ -15,8 +17,12 @@ from type_syntax import (
     dotted_name,
     parent,
     parse_name,
+    qualified,
     root,
 )
+
+if TYPE_CHECKING:
+    from classes import ClassTable
 
 
 @dataclass(frozen=True)
@@ -53,7 +59,7 @@ class TypeVar:
 class TypeAlias:
     gamma: "Context"
     q: Name
-    xis: tuple[ast.ClassDef | ast.TypeAlias, ...]
+    xis: tuple[TypeDeclaration, ...]
     i: int
 
 
@@ -104,7 +110,7 @@ class ModuleContext:
     gamma: "Context"
     M: Mapping[Name, ast.Module]
     q: Name
-    Sigma: ClassTable
+    Sigma: "ClassTable"
 
 
 def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
@@ -289,14 +295,19 @@ def disjoint_union[V](gamma: Mapping[Var, V], gamma_: Mapping[Var, V]) -> Mappin
     return {**gamma, **gamma_}
 
 
-def join_context(Sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
-    return {x: join_seq(Sigma, binding_types([delta[x] for delta in deltas])) for x in deltas[0]}
+def type_entry(gamma: Context, q: Name, xis: tuple[TypeDeclaration, ...], i: int) -> ContextEntry:
+    xi = xis[i]
+    if isinstance(xi, ast.ClassDef):
+        return Class(qualified(q, xi.name))
+    return TypeAlias(gamma, q, xis, i)
 
 
-def binding_types(entries: list[VarEntry]) -> list[Type]:
-    types = [e for e in entries if not isinstance(e, (Unbound, DU, PU))]
-    assert len(types) == len(entries)
-    return types
+def type_context(gamma: Context, q: Name, xis: tuple[TypeDeclaration, ...], i: int) -> Context:
+    xi = xis[i]
+    earlier = range(i if isinstance(xi, ast.ClassDef) else len(xis))
+    deltas = [{x: type_entry(gamma, q, xis, j) for x, _ in declares(xis[j])} for j in earlier]
+    alphas = {alpha: TypeVar() for alpha in type_param_names(xi)}
+    return {**gamma, **{x: theta for delta in deltas for x, theta in delta.items()}, **alphas}
 
 
 def extend_context(gamma: Context, gamma_: Context) -> Context:

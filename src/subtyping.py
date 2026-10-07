@@ -2,9 +2,11 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product
 
-from classes import RANGE, Class, ClassTable, ancestors
+from classes import ClassTable, ancestors, base, type_params
 from type_syntax import (
+    RANGE,
     CallableType,
+    Class,
     ClassType,
     DictType,
     ListType,
@@ -79,9 +81,9 @@ def subtype(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
         case (ClassType(c, taus), ClassType(d, sigmas)):
             if c == d and all(equivalent(Sigma, a, b) for a, b in zip(taus, sigmas)):
                 return True
-            base = Sigma[c].base
-            return base is not None and subtype(
-                Sigma, substitute(taus, Sigma[c].type_params, base), tau
+            base_ = base(Sigma, c)
+            return base_ is not None and subtype(
+                Sigma, substitute(taus, type_params(Sigma, c), base_), tau
             )
         case (TupleType(sigmas), TupleType(taus)):
             return len(sigmas) == len(taus) and all(
@@ -128,14 +130,14 @@ def instance_above(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undete
         case ClassType(d, _) if c in ancestors(Sigma, d):
             return instantiated_ancestor(Sigma, tau, c)
         case Primitive.NEVER:
-            return ClassType(c, ()) if len(Sigma[c].type_params) == 0 else Undetermined()
+            return ClassType(c, ()) if len(type_params(Sigma, c)) == 0 else Undetermined()
         case _:
             return None
 
 
 def instance_below(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
     assert not isinstance(tau, UnionType)  # instances are taken at the disjuncts of a union
-    alphas = Sigma[c].type_params
+    alphas = type_params(Sigma, c)
     match tau:
         case ClassType(d, sigmas) if d in ancestors(Sigma, c):
             generic = ClassType(c, tuple(TypeVariable(alpha) for alpha in alphas))
@@ -156,9 +158,9 @@ def instance_below(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undete
 def instantiated_ancestor(Sigma: ClassTable, tau: ClassType, d: Class) -> ClassType:
     """Instantiation of ancestor d of tau's class reached along the base classes."""
     while tau.c != d:
-        base = Sigma[tau.c].base
-        assert base is not None
-        sigma = substitute(tau.args, Sigma[tau.c].type_params, base)
+        base_ = base(Sigma, tau.c)
+        assert base_ is not None
+        sigma = substitute(tau.args, type_params(Sigma, tau.c), base_)
         assert isinstance(sigma, ClassType)
         tau = sigma
     return tau

@@ -5,10 +5,6 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import Enum
 from types import EllipsisType
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from classes import Class
 
 
 class Primitive(Enum):
@@ -154,6 +150,17 @@ class CallableType:
 @dataclass(frozen=True)
 class TypeVariable:
     alpha: Var
+
+
+@dataclass(frozen=True)
+class Class:
+    name: Name
+
+    def __repr__(self) -> str:
+        return f"Class({self.name})"
+
+
+RANGE = Class(parse_name("builtins.range"))
 
 
 @dataclass(frozen=True)
