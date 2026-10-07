@@ -108,8 +108,8 @@ fully-qualified names.
 \subsection{Modules and programs}
 
 \speconly{Module and program evaluation are given in \figref{eval-modules}; import evaluation in \figref{eval-import-prefix}; importing names from a loaded module in
-\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specification.}\speconly{ Context extension (\figref{context-ops}) applies to environments as well, with the same equations on values in place of context entries, except that a loaded module value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a context.} \emph{Loading}, the judgement $q \Rightarrow_{\mathsf{mod}} r$, evaluates the import prefix
-of $q$ and then its statement, mirroring \replaced{module checking $\vdash_{\mathsf{mod}} q : \Gamma$}{static loading $\vdash_{\mathsf{load}} q : \Gamma$}
+\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specification.}\speconly{ Context extension (\figref{context-ops}) applies to environments as well, with the same equations on values in place of context entries, except that a loaded module value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a context.} \emph{Loading}, the judgement $q \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} r$, evaluates the import prefix
+of $q$ and then its statement, mirroring \replaced{module checking}{static loading} $\vdash_{\replaced{\mathsf{mod}}{\mathsf{load}}} q : \Gamma$
 (\figref{typing-module}); as with the static rules, the mutual
 recursion between loading and evaluation is grounded by program well-formedness, which rules out
 import cycles (\secref{modules-programs}).

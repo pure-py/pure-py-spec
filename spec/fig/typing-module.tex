@@ -13,7 +13,7 @@
 \inferrule*[lab={\ruleName{imp-submodule}}]
 {
   \bind{x}{\modStub{q}} \in \Gamma \\
-  \Sigma \vdash_{\mathsf{mod}} q : \Delta \binding \Sigma'
+  \Sigma \vdash_{\replaced{\mathsf{mod}}{\mathsf{load}}} q : \Delta \binding \Sigma'
 }
 {
   \Sigma \vdash \Gamma, x \importsR \modLoaded{q}{\Delta} \binding \Sigma'
@@ -41,8 +41,8 @@
 {
   q' = x \cons \seq{x} \\
   q \not\properPrefixOf q' \\
-  \Sigma \vdash_{\mathsf{mod}} x : \Delta \binding \Sigma_1 \\
-  \Sigma_1 \vdash_{\mathsf{sub}} \modLoaded{x}{\Delta}, \seq{x} : \theta \binding \Sigma_2 \\
+  \Sigma \vdash_{\replaced{\mathsf{mod}}{\mathsf{load}}} x : \Delta \binding \Sigma_1 \\
+  \Sigma_1 \vdash_{\added{\mathsf{sub}}} \modLoaded{x}{\Delta}, \seq{x} \replaced{:}{\mathsf{loads\mbox{-}as}} \theta \binding \Sigma_2 \\
   \Sigma_2; q \vdash \seq{\iota} : \Gamma \binding \Sigma'
 }
 {
@@ -52,9 +52,9 @@
 \inferrule*[lab={\ruleName{from-import}}]
 {
   x_1, \ldots, x_{n+1} \text{ distinct} \\
-  \Sigma \vdash_{\mathsf{mod}} q' : \Delta \binding \Sigma_0 \\
+  \Sigma \vdash_{\replaced{\mathsf{mod}}{\mathsf{load}}} q' : \Delta \binding \Sigma_0 \\
   q^\dagger_1 \cons \cdots \cons q^\dagger_m = \containing(q, q') \\
-  \Sigma_{j-1} \vdash_{\mathsf{mod}} q^\dagger_j : \Delta_j \binding \Sigma_j \quad (\forall j) \\
+  \Sigma_{j-1} \vdash_{\replaced{\mathsf{mod}}{\mathsf{load}}} q^\dagger_j : \Delta_j \binding \Sigma_j \quad (\forall j) \\
   \Sigma_{m+i-1} \vdash \Delta, x_i \importsR \theta_i \binding \Sigma_{m+i} \quad (\forall i) \\
   \Sigma_{m+n+1}; q \vdash \seq{\iota} : \Gamma \binding \Sigma'
 }
@@ -69,34 +69,34 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Sigma \vdash_{\mathsf{sub}} \theta, \seq{x} : \theta' \binding \Sigma'$}
+\flushleft \shadebox{$\Sigma \vdash_{\added{\mathsf{sub}}} \theta, \seq{x} \replaced{:}{\mathsf{loads\mbox{-}as}} \theta' \binding \Sigma'$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{submodules-nil}}]
+\inferrule*[lab={\ruleName{\replaced{submodules-nil}{loads-as-nil}}}]
 {
   \strut
 }
 {
-  \Sigma \vdash_{\mathsf{sub}} \theta, \varepsilon : \theta \binding \Sigma
+  \Sigma \vdash_{\added{\mathsf{sub}}} \theta, \varepsilon \replaced{:}{\mathsf{loads\mbox{-}as}} \theta \binding \Sigma
 }
 \and
-\inferrule*[lab={\ruleName{submodules-cons}}]
+\inferrule*[lab={\ruleName{\replaced{submodules-cons}{loads-as-cons}}}]
 {
-  \Sigma \vdash_{\mathsf{mod}} q.x : \Gamma' \binding \Sigma^\dagger \\
-  \Sigma^\dagger \vdash_{\mathsf{sub}} \modLoaded{q.x}{\Gamma'}, \seq{x} : \theta' \binding \Sigma'
+  \Sigma \vdash_{\replaced{\mathsf{mod}}{\mathsf{load}}} q.x : \Gamma' \binding \Sigma^\dagger \\
+  \Sigma^\dagger \vdash_{\added{\mathsf{sub}}} \modLoaded{q.x}{\Gamma'}, \seq{x} \replaced{:}{\mathsf{loads\mbox{-}as}} \theta' \binding \Sigma'
 }
 {
-  \Sigma \vdash_{\mathsf{sub}} \modLoaded{q}{\Gamma}, x \cons \seq{x} : \modLoaded{q}{\Gamma \extend \set{\bind{x}{\theta'}}} \binding \Sigma'
+  \Sigma \vdash_{\added{\mathsf{sub}}} \modLoaded{q}{\Gamma}, x \cons \seq{x} \replaced{:}{\mathsf{loads\mbox{-}as}} \modLoaded{q}{\Gamma \extend \set{\bind{x}{\theta'}}} \binding \Sigma'
 }
 \end{mathpar}
-\subcaption{Checked module $\theta$ with submodule chain $\seq{x}$ gives $\theta'$}
+\subcaption{\replaced{Checked}{Loaded} module $\theta$ with submodule chain $\seq{x}$ \replaced{gives}{loads as} $\theta'$}
 \end{subfigure}
 \caption{Import typing}
 \label{fig:typing-import-prefix}
 \end{figure}
 
 \begin{figure}
-\flushleft \shadebox{$\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$}
+\flushleft \shadebox{$\Sigma \vdash_{\replaced{\mathsf{mod}}{\mathsf{load}}} q : \Gamma \binding \Sigma'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{predefined}}]
@@ -104,7 +104,7 @@
   \mathcal{P}(q) = (\Gamma, \rho)
 }
 {
-  \Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma
+  \Sigma \vdash_{\replaced{\mathsf{mod}}{\mathsf{load}}} q : \Gamma \binding \Sigma
 }
 \and
 \inferrule*[lab={\ruleName{module}}]
@@ -116,7 +116,7 @@
   (\dom(\Gamma') \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {
-  \Sigma \vdash_{\mathsf{mod}} q : \submods(q) \override \Delta \binding \Sigma'
+  \Sigma \vdash_{\replaced{\mathsf{mod}}{\mathsf{load}}} q : \submods(q) \override \Delta \binding \Sigma'
 }
 \end{mathpar}
 
@@ -125,7 +125,7 @@
 \small
 \inferrule*[lab={\ruleName{program}}]
 {
-  \SigmaPredef \vdash_{\mathsf{mod}} \pymath{\_\_main\_\_} : \Gamma \binding \Sigma
+  \SigmaPredef \vdash_{\replaced{\mathsf{mod}}{\mathsf{load}}} \pymath{\_\_main\_\_} : \Gamma \binding \Sigma
 }
 {
   \vdash \mathcal{M}

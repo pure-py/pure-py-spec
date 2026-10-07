@@ -1,6 +1,6 @@
 \inferrule*[lab={\ruleName{eval-program-abort}}]
 {
-  \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
+  \pymath{\_\_main\_\_} \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \aborts{\kappa}
 }
 {
   \mathcal{M} \Rightarrow \kappa

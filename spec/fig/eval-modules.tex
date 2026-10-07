@@ -14,7 +14,7 @@
 \inferrule*[lab={\ruleName{eval-imp-submodule}}]
 {
   \bind{x}{\modStub{q'}} \in \rho \\
-  q' \Rightarrow_{\mathsf{mod}} \val{\rho'}
+  q' \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \val{\rho'}
 }
 {
   \rho, x \importsR \val{\modLoaded{q'}{\rho'}}
@@ -23,7 +23,7 @@
 \inferrule*[lab={\ruleName{eval-imp-submodule-fail}}]
 {
   \bind{x}{\modStub{q'}} \in \rho \\
-  q' \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
+  q' \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \aborts{\kappa}
 }
 {
   \rho, x \importsR \aborts{\kappa}
@@ -50,8 +50,8 @@
 \inferrule*[lab={\ruleName{eval-import}}]
 {
   q' = x \cons \seq{x} \\
-  x \Rightarrow_{\mathsf{mod}} \val{\rho} \\
-  \modLoaded{x}{\rho}, \seq{x} \Rightarrow_{\mathsf{sub}} \val{v} \\
+  x \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \val{\rho} \\
+  \modLoaded{x}{\rho}, \seq{x} \replaced{\Rightarrow_{\mathsf{sub}}}{\mathsf{loads\mbox{-}as}} \val{v} \\
   q, \seq{\iota} \Rightarrow r
 }
 {
@@ -61,7 +61,7 @@
 \inferrule*[lab={\ruleName{eval-import-fail}}]
 {
   q' = x \cons \seq{x} \\
-  x \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
+  x \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \aborts{\kappa}
 }
 {
   q, \exImport{q'} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
@@ -70,8 +70,8 @@
 \inferrule*[lab={\ruleName{eval-import-fail-chain}}]
 {
   q' = x \cons \seq{x} \\
-  x \Rightarrow_{\mathsf{mod}} \val{\rho} \\
-  \modLoaded{x}{\rho}, \seq{x} \Rightarrow_{\mathsf{sub}} \aborts{\kappa}
+  x \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \val{\rho} \\
+  \modLoaded{x}{\rho}, \seq{x} \replaced{\Rightarrow_{\mathsf{sub}}}{\mathsf{loads\mbox{-}as}} \aborts{\kappa}
 }
 {
   q, \exImport{q'} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
@@ -80,8 +80,8 @@
 \inferrule*[lab={\ruleName{eval-from-import}}]
 {
   \seq{q}^\dagger = \containing(q, q') \\
-  q^\dagger_j \Rightarrow_{\mathsf{mod}} \val{\rho_j} \quad (\forall j) \\
-  q' \Rightarrow_{\mathsf{mod}} \val{\rho} \\
+  q^\dagger_j \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \val{\rho_j} \quad (\forall j) \\
+  q' \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \val{\rho} \\
   \rho, x_i \importsR \val{v_i} \quad (\forall i) \\
   q, \seq{\iota} \Rightarrow r
 }
@@ -92,8 +92,8 @@
 \inferrule*[lab={\ruleName{eval-from-import-fail}}]
 {
   \seq{q}^\dagger = \containing(q, q') \\
-  q^\dagger_j \Rightarrow_{\mathsf{mod}} \val{\rho_j} \quad (\forall j) \\
-  q' \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
+  q^\dagger_j \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \val{\rho_j} \quad (\forall j) \\
+  q' \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \aborts{\kappa}
 }
 {
   q, \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
@@ -102,8 +102,8 @@
 \inferrule*[lab={\ruleName{eval-from-import-fail-containing}}]
 {
   \seq{q}^\dagger = \containing(q, q') \\
-  q^\dagger_j \Rightarrow_{\mathsf{mod}} \aborts{\kappa} \\
-  q^\dagger_k \Rightarrow_{\mathsf{mod}} \val{\rho_k} \quad (\forall k < j)
+  q^\dagger_j \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \aborts{\kappa} \\
+  q^\dagger_k \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \val{\rho_k} \quad (\forall k < j)
 }
 {
   q, \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
@@ -112,8 +112,8 @@
 \inferrule*[lab={\ruleName{eval-from-import-fail-member}}]
 {
   \seq{q}^\dagger = \containing(q, q') \\
-  q^\dagger_k \Rightarrow_{\mathsf{mod}} \val{\rho_k} \quad (\forall k) \\
-  q' \Rightarrow_{\mathsf{mod}} \val{\rho} \\
+  q^\dagger_k \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \val{\rho_k} \quad (\forall k) \\
+  q' \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \val{\rho} \\
   \rho, x_i \importsR \val{v_i} \quad (\forall i < j) \\
   \rho, x_j \importsR \aborts{\kappa}
 }
@@ -128,32 +128,32 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$v, \seq{x} \Rightarrow_{\mathsf{sub}} r$}
+\flushleft \shadebox{$v, \seq{x} \replaced{\Rightarrow_{\mathsf{sub}}}{\mathsf{loads\mbox{-}as}} r$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{eval-submodules-nil}}]
+\inferrule*[lab={\ruleName{\replaced{eval-submodules-nil}{eval-loads-as-nil}}}]
 {
   \strut
 }
 {
-  v, \varepsilon \Rightarrow_{\mathsf{sub}} \val{v}
+  v, \varepsilon \replaced{\Rightarrow_{\mathsf{sub}}}{\mathsf{loads\mbox{-}as}} \val{v}
 }
 \and
-\inferrule*[lab={\ruleName{eval-submodules-cons}}]
+\inferrule*[lab={\ruleName{\replaced{eval-submodules-cons}{eval-loads-as-cons}}}]
 {
-  q.x \Rightarrow_{\mathsf{mod}} \val{\rho'} \\
-  \modLoaded{q.x}{\rho'}, \seq{x} \Rightarrow_{\mathsf{sub}} r
+  q.x \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \val{\rho'} \\
+  \modLoaded{q.x}{\rho'}, \seq{x} \replaced{\Rightarrow_{\mathsf{sub}}}{\mathsf{loads\mbox{-}as}} r
 }
 {
-  \modLoaded{q}{\rho}, x \cons \seq{x} \Rightarrow_{\mathsf{sub}} \mlet{v}{r}{\val{\modLoaded{q}{\rho \extend \set{\bind{x}{v}}}}}
+  \modLoaded{q}{\rho}, x \cons \seq{x} \replaced{\Rightarrow_{\mathsf{sub}}}{\mathsf{loads\mbox{-}as}} \mlet{v}{r}{\val{\modLoaded{q}{\rho \extend \set{\bind{x}{v}}}}}
 }
 \and
-\inferrule*[lab={\ruleName{eval-submodules-fail}}]
+\inferrule*[lab={\ruleName{\replaced{eval-submodules-fail}{eval-loads-as-fail}}}]
 {
-  q.x \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
+  q.x \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \aborts{\kappa}
 }
 {
-  \modLoaded{q}{\rho}, x \cons \seq{x} \Rightarrow_{\mathsf{sub}} \aborts{\kappa}
+  \modLoaded{q}{\rho}, x \cons \seq{x} \replaced{\Rightarrow_{\mathsf{sub}}}{\mathsf{loads\mbox{-}as}} \aborts{\kappa}
 }
 \end{mathpar}
 \subcaption{Loaded module $v$ with submodule chain $\seq{x}$ loads to result $r$}
@@ -163,7 +163,7 @@
 \end{figure}
 
 \begin{figure}
-\flushleft \shadebox{$q \Rightarrow_{\mathsf{mod}} r$}
+\flushleft \shadebox{$q \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} r$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-predefined}}]
@@ -171,7 +171,7 @@
   \mathcal{P}(q) = (\Gamma, \rho)
 }
 {
-  q \Rightarrow_{\mathsf{mod}} \val{\rho}
+  q \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \val{\rho}
 }
 \and
 \input{spec/rules/eval-module}
@@ -182,7 +182,7 @@
   q, \seq{\iota} \Rightarrow \aborts{\kappa}
 }
 {
-  q \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
+  q \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-module-fail-body}}]
@@ -193,7 +193,7 @@
   q, \rho \mathbin{\override} \rho' \mathbin{\override} \scopeS(\set{\declaresS(\seq{\iota})}, t), t \Rightarrow \aborts{\kappa}
 }
 {
-  q \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
+  q \Rightarrow_{\replaced{\mathsf{mod}}{\mathsf{load}}} \aborts{\kappa}
 }
 \end{mathpar}
 
