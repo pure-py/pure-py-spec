@@ -84,7 +84,7 @@ class. A class is also the type of its instances.
 A class table $\Sigma$ is a finite map from classes to \replaced{class definitions, with $\Sigma(C)$ of the form
 $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$: the $i$-th declaration of mutual type region $\seq{\chi}$ of module $q$
 (\figref{syntax-stmt}), which declares $C$, together with the context $\Gamma$ in which the type region appears. The
-type parameters, fields and base class of $C$ are read from its definition by the auxiliary functions
+type parameters, fields and base class of $C$ are read from its definition by auxiliary functions
 $\typeParams{\Sigma}$, $\fields{\Sigma}$ and $\base{\Sigma}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{sec:auxiliary-classes}}), the latter two resolving
 the field annotations and base class of the declaration under the context given by $\typeContext{\Gamma}(q, \seq{\chi}, i)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}). Every class named in a definition in $\Sigma$ is in $\dom(\Sigma)$, and the
