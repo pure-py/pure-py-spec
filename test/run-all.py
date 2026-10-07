@@ -271,15 +271,21 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("interpreter", nargs="?", default="python3")
     parser.add_argument("--no-mypy", action="store_true")
-    parser.add_argument("--no-run", action="store_true", help="check only; do not run the tests")
     parser.add_argument(
-        "--checker", help="checker command in place of src/, given the path of each test"
+        "--no-run", action="store_true", help="check the tests without running them"
     )
     parser.add_argument(
-        "--known-failures", type=pathlib.Path, help="file listing the failures expected"
+        "--checker",
+        help="command run on the path of each test in place of src/, with the same exit codes; "
+        "error messages are not compared and pending tests are skipped",
     )
     parser.add_argument(
-        "--update", action="store_true", help="rewrite the known failures from this run"
+        "--known-failures",
+        type=pathlib.Path,
+        help="file listing the expected failures; the run passes if its failures are exactly these",
+    )
+    parser.add_argument(
+        "--update", action="store_true", help="rewrite the known failures file from this run"
     )
     args = parser.parse_args()
     r = Runner(
