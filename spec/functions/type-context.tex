@@ -1,0 +1,7 @@
+\typeContext{\Gamma}(q, \seq{\chi}, i) &{}= \Gamma \override \Delta_1 \override \cdots \override \Delta_{i-1} \override \set{\bind{\seq{\alpha}}{\TypeVar}} \\*
+&\qquad \text{if } \chi_i = \exDataclass{c[\seq{\alpha}]}{\phi} \\*
+\typeContext{\Gamma}(q, \seq{\chi}, i) &{}= \Gamma \override \Delta_1 \override \cdots \override \Delta_{i-1} \override \set{\bind{\seq{\alpha}}{\TypeVar}} \\*
+&\qquad \text{if } \chi_i = \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}]}{\phi} \\*
+\typeContext{\Gamma}(q, \seq{\chi}, i) &{}= \Gamma \override \Delta_1 \override \cdots \override \Delta_n \override \set{\bind{\seq{\alpha}}{\TypeVar}} \\*
+&\qquad \text{if } \chi_i = \exTypeAlias{x[\seq{\alpha}]}{\psi} \\*
+&\qquad \text{where } \Delta_j = \set{\bind{\declaresS(\chi_j)}{\typeEntry{\Gamma}(q, \seq{\chi}, j)}} \text{ for each } j

@@ -36,6 +36,16 @@ cases are stated with each.
 \input{spec/functions/type-entry-text}
 \funcrows{type-entry}
 \end{auxfunction}
+
+\begin{auxfunction}{\typeContext{\Gamma}(q, \seq{\chi}, i)}{context}{aux:type-context}
+\input{spec/functions/type-context-text}
+\funcrows{type-context}
+\end{auxfunction}
+
+\begin{auxfunction}{\classTable{\Gamma}(q, \seq{\chi}, i)}{class table}{aux:class-table}
+\input{spec/functions/class-table-text}
+\funcrows{class-table}
+\end{auxfunction}
 \end{AddedBlock}
 
 \begin{auxfunction}{\scopeS(Y, s)}{context}{aux:scope}
@@ -136,19 +146,41 @@ the resolution of names in an environment.
 \funcrows{containing}
 \end{auxfunction}
 
-\begin{auxfunction}{\ownFields(\phi)}{sequence of bindings}{aux:own-fields}
+\begin{auxfunction}{\ownFields(\phi)\added{, \ownFields(\chi)}}{sequence of bindings}{aux:own-fields}
 \input{spec/functions/own-fields-text}
 \funcrows{own-fields}
 \end{auxfunction}
 
+\begin{AddedBlock}
+\begin{auxfunction}{\typeParams{\Sigma}(C)}{sequence of type parameters}{aux:type-params}
+\input{spec/functions/type-params-text}
+\funcrows{type-params}
+\end{auxfunction}
+
+\begin{auxfunction}{\base{\Sigma}(C)}{instantiated class or $\bot$}{aux:base}
+\input{spec/functions/base-text}
+\funcrows{base}
+\end{auxfunction}
+\end{AddedBlock}
+
 \begin{auxfunction}{\fields{\Sigma}(C)}{field scheme}{aux:fields}
 \input{spec/functions/fields-text}
+\begin{DeletedBlock}
+\funcrows{fields-old}
+\end{DeletedBlock}
+\begin{AddedBlock}
 \funcrows{fields}
+\end{AddedBlock}
 \end{auxfunction}
 
 \begin{auxfunction}{\ancestors{\Sigma}(C)}{set of classes}{aux:ancestors}
 \input{spec/functions/ancestors-text}
+\begin{DeletedBlock}
+\funcrows{ancestors-old}
+\end{DeletedBlock}
+\begin{AddedBlock}
 \funcrows{ancestors}
+\end{AddedBlock}
 \end{auxfunction}
 
 \begin{auxfunction}{\fieldMap{\Sigma}(C, \seq{u})}{map from variables}{aux:field-map}

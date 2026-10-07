@@ -81,12 +81,19 @@ class. A class is also the type of its instances.
 
 \begin{definition}[Class table]
 \label{def:class-table}
-A class table $\Sigma$ is a finite map from classes to class table entries, with $\Sigma(C)$ of the form
+A class table $\Sigma$ is a finite map from classes to \replaced{class definitions, with $\Sigma(C)$ of the form
+$\Dataclass[\Gamma]{q}{\seq{\chi}}{i}$: the $i$-th declaration of mutual type region $\seq{\chi}$ of module $q$
+(\figref{syntax-stmt}), which declares $C$, together with the context $\Gamma$ in which the type region appears. The
+type parameters, fields and base class of $C$ are read from its definition by the auxiliary functions
+$\typeParams{\Sigma}$, $\fields{\Sigma}$ and $\base{\Sigma}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{sec:auxiliary-classes}}), the latter two resolving
+the field annotations and base class of the declaration under the context given by $\typeContext{\Gamma}(q, \seq{\chi}, i)$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}). Every class named in a definition in $\Sigma$ is in $\dom(\Sigma)$, and the
+relation taking each class of $\Sigma$ to its base class is acyclic.}{class table entries, with $\Sigma(C)$ of the form
 $\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{D[\seq{\sigma}]}$: the type parameters $\seq{\alpha}$ of $C$, its distinct fields $\seq{x}$ with their declared types
 $\seq{\tau}$, and its instantiated base class $D[\seq{\sigma}]$, or $\bot$ if it has none; the field types and the
-type arguments of the base \added{class} may mention $\seq{\alpha}$. Every class named in $\Sigma$ is in
+type arguments of the base class may mention $\seq{\alpha}$. Every class named in $\Sigma$ is in
 $\dom(\Sigma)$, and the relation taking each class of $\Sigma$ to its base class $D$ is
-acyclic.
+acyclic.}
 \end{definition}
 
 \noindent The class table is similar to Featherweight Java's~\cite{igarashi2001}; the well-formedness rules build the table as they check the class declarations of a program (\figref{typing-top-level}).
@@ -184,7 +191,8 @@ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context 
 (\figref{predefined-values}). A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
 the predefined signatures. The class table $\SigmaPredef$ of the predefined modules has the single entry
-$\SigmaPredef(\clsRange) = \clsRec{\varepsilon}{\bind{\pyinline{stop}}{\tyInt}}{\bot}$.
+\replaced{$\SigmaPredef(\clsRange) = \Dataclass[\Gamma]{\pyinline{builtins}}{\chi}{1}$, where $\chi$ is the declaration
+\pyinline{@dataclass class range: stop: int} and $\Gamma$ is the signature of \pyinline{builtins}}{$\SigmaPredef(\clsRange) = \clsRec{\varepsilon}{\bind{\pyinline{stop}}{\tyInt}}{\bot}$}.
 \end{definition}
 
 \input{spec/fig/predefined-signatures}

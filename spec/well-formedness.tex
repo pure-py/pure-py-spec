@@ -277,20 +277,20 @@ definitions and modules introduce the variables of the scope as unbound, using t
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str}.
 
-\added{The \ruleName{types} rule (\figref{typing-top-level}) binds the names of a mutual type region $\seq{\chi}$ before
-checking its declarations, as \ruleName{defs} binds the names of a mutual def region at their signatures before checking
+\added{The \ruleName{types} rule (\figref{typing-top-level}) binds the names of a mutual type region $\seq{\chi}$ and enters
+its classes in the class table before checking its declarations, as \ruleName{defs} binds the names of a mutual def region at their signatures before checking
 the bodies. The context entry bound to the $i$-th name is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-entry}}): the class
-$\Type{q.c}$ for a class declaration, and for a \pyinline{type} statement the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$,
-which carries the region and the context $\Gamma$ under which it was declared, so that the body of the alias is resolved
-at each use (\ruleName{ty-alias}) under $\Gamma$ extended with the bindings of the type region, as a \pyinline{def} closure
-carries its mutual def region. An alias may therefore name any class or alias of the type region, in any order, and a cyclic alias such as
-\pyinline{type T = list[T]} has no derivation, because resolving its body resolves the alias again. The class table
-is extended first with an entry for each class of the type region holding its type parameters alone, so that type
-expressions may name any class of the type region, and the declarations are then checked in order, threading the class
-table. The auxiliary judgement $\Sigma; q; \Gamma; \Gamma' \vdash \chi \binding \Sigma'$ takes two contexts: class
-declarations resolve their field annotations and base classes in $\Gamma$, which binds the earlier names of the
-mutual type region, and \pyinline{type} statements resolve their bodies in $\Gamma'$, which binds every name of the type
-region, because Python~\pythonVersion{} evaluates the field annotations and base class of a class when the class
+$\Type{q.c}$ for a class declaration, and for a \pyinline{type} statement the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$.
+The class table is extended with the definition $\Dataclass[\Gamma]{q}{\seq{\chi}}{i}$ of each class of the type region
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:class-table}}). Both the alias and the class definition carry the type region and the
+context $\Gamma$ under which it was declared, as a \pyinline{def} closure carries its mutual def region, so that the body of the alias
+is resolved at each use (\ruleName{ty-alias}), and the field annotations and base class of the class are resolved whenever its
+fields or base class are read ($\fields{\Sigma}$, $\base{\Sigma}$), under the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}). The declarations are then each checked under the
+extended class table and that context, by the auxiliary judgement $\Sigma; \Gamma \vdash \chi$. For a \pyinline{type}
+statement the context binds every name of the type region, so an alias may name any class or alias of the type region, in any order, and a cyclic alias such as
+\pyinline{type T = list[T]} has no derivation, because resolving its body resolves the alias again. For a class declaration
+the context binds only the earlier names of the type region, because Python~\pythonVersion{} evaluates the field annotations and base class of a class when the class
 statement runs, but evaluates the body of a \pyinline{type} statement only when the alias is first used.\footnote{\PurePy does
 not support \pyinline{from __future__ import annotations}, under which Python~\pythonVersion{} defers evaluation
 of annotations.} So class declarations may name only earlier classes and aliases, and recursive datatypes must be

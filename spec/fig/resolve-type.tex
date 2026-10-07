@@ -18,7 +18,7 @@
 {
   \Gamma \vdash q : \Type{C} \\
   \Sigma; \Gamma \vdash \seq{\psi} \synth \seq{\tau} \\
-  C \text{ has } |\seq{\tau}| \text{ type parameters in } \Sigma
+  \replaced{|\seq{\tau}| = |\typeParams{\Sigma}(C)|}{C \text{ has } |\seq{\tau}| \text{ type parameters in } \Sigma}
 }
 {
   \Sigma; \Gamma \vdash q[\seq{\psi}] \synth C[\seq{\tau}]
@@ -28,8 +28,7 @@
 {
   \Gamma \vdash q : \replaced{\TypeAlias[\Gamma']{q'}{\seq{\chi}}{i}}{\mathsf{TypeAlias}(\seq{\alpha}, \tau)} \\
   \added{\chi_i = \exTypeAlias{x[\seq{\alpha}]}{\psi'}} \\
-  \added{\Delta = \set{\bind{\declaresS(\seq{\chi})}{\typeEntry{\Gamma'}(q', \seq{\chi}, 1), \ldots, \typeEntry{\Gamma'}(q', \seq{\chi}, n)}}} \\
-  \added{\Sigma; \Gamma' \override \Delta \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_m}{\TypeVar}} \vdash \psi' \synth \tau} \\
+  \added{\Sigma; \typeContext{\Gamma'}(q', \seq{\chi}, i) \vdash \psi' \synth \tau} \\
   \Sigma; \Gamma \vdash \seq{\psi} \synth \seq{\sigma}
 }
 {
