@@ -23,7 +23,9 @@ type ClassTable = Mapping[Class, ClassTableEntry]
 
 RANGE = Class(parse_name("builtins.range"))
 
-PREDEFINED_CLASSES: ClassTable = {RANGE: ClassTableEntry((), (("stop", Primitive.INT),), None)}
+PREDEFINED_CLASSES: ClassTable = {
+    RANGE: ClassTableEntry((), (("start", Primitive.INT), ("stop", Primitive.INT)), None)
+}
 
 
 def short_name(c: Class) -> Var:

@@ -1,1 +1,1 @@
-print(len(range("a")))
+print(len(range(0, "a")))
