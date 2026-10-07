@@ -7,7 +7,7 @@ Values, environments, outcomes and results are given in \figref{values}. A class
 context entry of the class, and an object $\exObj{C}{\rho}$ records its class by name; the value $\Unbound$
 marks a variable of the current scope before its declaration is reached, a state reported by Python as an unbound
 local, and an environment binds a variable to $\Unbound$ wherever the corresponding context binds the variable to
-the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible. Throughout this section, $\Sigma$ is the class table produced by static loading of the program
+the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible. Throughout this section, $\Sigma$ is the class table produced by \replaced{module checking}{static loading} of the program
 (\secref{well-formedness-modules}) and, like $\mathcal{M}$ and $\mathcal{P}$, is ambient. For a statement $s$, the outcome
 $\assigns{\rho}$ represents $s$ running to its end, with accumulated environment $\rho$; the outcome
 $\returns{v}$ represents $s$ returning the value $v$; and the outcome $\aborts{\kappa}$ represents the whole run
@@ -108,13 +108,13 @@ fully-qualified names.
 \subsection{Modules and programs}
 
 \speconly{Module and program evaluation are given in \figref{eval-modules}; import evaluation in \figref{eval-import-prefix}; importing names from a loaded module in
-\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specification.}\speconly{ Context extension (\figref{context-ops}) applies to environments as well, with the same equations on values in place of context entries, except that a loaded module value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a context.} \emph{Loading}, the judgement $q \Rightarrow_{\mathsf{load}} r$, evaluates the import prefix
-of $q$ and then its statement, mirroring static loading $\vdash_{\mathsf{load}} q : \Gamma$
+\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specification.}\speconly{ Context extension (\figref{context-ops}) applies to environments as well, with the same equations on values in place of context entries, except that a loaded module value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a context.} \emph{Loading}, the judgement $q \Rightarrow_{\mathsf{mod}} r$, evaluates the import prefix
+of $q$ and then its statement, mirroring \replaced{module checking $\vdash_{\mathsf{mod}} q : \Gamma$}{static loading $\vdash_{\mathsf{load}} q : \Gamma$}
 (\figref{typing-module}); as with the static rules, the mutual
 recursion between loading and evaluation is grounded by program well-formedness, which rules out
 import cycles (\secref{modules-programs}).
 Loading takes a single module; an import loads the modules containing its target from the root down, each
-before the module it contains, mirroring the static rules\speconly{, by the loads-as judgement for a plain import and
+before the module it contains, mirroring the static rules\speconly{, by the \replaced{submodules}{loads-as} judgement for a plain import and
 as premises of the from-import rule}. If loading one of these modules aborts, the import aborts for the same reason and the modules after it are
 not loaded.
 

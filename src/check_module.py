@@ -158,7 +158,7 @@ def imports(
 
 
 _signatures: dict[tuple[int, Name], Context] = {}
-_loading: list[tuple[int, Name]] = []
+_checking: list[tuple[int, Name]] = []
 
 
 def check_module(
@@ -171,10 +171,10 @@ def check_module(
     gamma = _signatures.get(key)
     if gamma is not None:
         return gamma, Sigma
-    if key in _loading:
-        cycle = [str(q_) for _, q_ in _loading[_loading.index(key) :]] + [str(q)]
+    if key in _checking:
+        cycle = [str(q_) for _, q_ in _checking[_checking.index(key) :]] + [str(q)]
         raise IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
-    _loading.append(key)
+    _checking.append(key)
     try:
         gamma, Sigma = check_module_(m, M, q, Sigma)
     except IllFormedModule as e:
@@ -182,7 +182,7 @@ def check_module(
             e.module = q
         raise
     finally:
-        _loading.pop()
+        _checking.pop()
     _signatures[key] = gamma
     return gamma, Sigma
 

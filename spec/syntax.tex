@@ -47,8 +47,8 @@ take the following forms:
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Entry & Form & Records \\
 variable & $\tau$, $\DU{\tau}$, $\PU{\tau}$ or $\Unbound$ & type of definitely assigned variable; $\DU{\tau}$ if declared at $\tau$ and definitely unassigned; $\PU{\tau}$ if declared at $\tau$ and possibly unassigned; $\Unbound$ if its declaration has not been reached \\
-module stub & $\modStub{q}$ & module $q$, named but not loaded \\
-module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$, bound by an import \\
+module stub & $\modStub{q}$ & module $q$, named but not \replaced{checked}{loaded} \\
+\replaced{checked module}{module reference} & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$, bound by an import \\
 class entry & $\Type{C}$ & name denotes class $C$ \\
 type parameter & $\TypeVar$ & name is a type parameter in scope \\
 type alias & $\TypeAlias{\seq{\alpha}}{\tau}$ & name denotes type $\tau$ with type parameters $\seq{\alpha}$ \\
@@ -104,7 +104,7 @@ undefined, such as an environment or class table.}
 \input{spec/fig/context-ops}
 
 A third operation, \emph{context extension} $\Gamma \extend \Delta$ (also \figref{context-ops}),
-combines module references for the same module recursively, preferring loaded references to stubs, and is
+combines module references for the same module recursively, preferring \replaced{checked modules}{loaded references} to stubs, and is
 otherwise right-biased like override. It is used in processing an import prefix, in which two imports with the same root, such as
 \pyinline{a.b} and \pyinline{a.c}, both bind the root and must combine rather than shadow.
 
