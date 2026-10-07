@@ -82,7 +82,7 @@ class. A class is also the type of its instances.
 \begin{definition}[Class table]
 \label{def:class-table}
 A class table $\Sigma$ is a finite map from classes to \replaced{class definitions, with $\Sigma(C)$ of the form
-$\Dataclass[\Gamma]{q}{\seq{\chi}}{i}$: the $i$-th declaration of mutual type region $\seq{\chi}$ of module $q$
+$\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$: the $i$-th declaration of mutual type region $\seq{\chi}$ of module $q$
 (\figref{syntax-stmt}), which declares $C$, together with the context $\Gamma$ in which the type region appears. The
 type parameters, fields and base class of $C$ are read from its definition by the auxiliary functions
 $\typeParams{\Sigma}$, $\fields{\Sigma}$ and $\base{\Sigma}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{sec:auxiliary-classes}}), the latter two resolving
@@ -191,7 +191,7 @@ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context 
 (\figref{predefined-values}). A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
 the predefined signatures. The class table $\SigmaPredef$ of the predefined modules has the single entry
-\replaced{$\SigmaPredef(\clsRange) = \Dataclass[\Gamma]{\pyinline{builtins}}{\chi}{1}$, where $\chi$ is the declaration
+\replaced{$\SigmaPredef(\clsRange) = \ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}$, where $\chi$ is the declaration
 \pyinline{@dataclass class range: stop: int} and $\Gamma$ is the signature of \pyinline{builtins}}{$\SigmaPredef(\clsRange) = \clsRec{\varepsilon}{\bind{\pyinline{stop}}{\tyInt}}{\bot}$}.
 \end{definition}
 

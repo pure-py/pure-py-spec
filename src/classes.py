@@ -48,14 +48,14 @@ from type_syntax import (
 
 
 @dataclass(frozen=True)
-class Dataclass:
+class ClassDef:
     gamma: Context
     q: Name
     xis: tuple[TypeDeclaration, ...]
     i: int
 
 
-type ClassTable = Mapping[Class, Dataclass]
+type ClassTable = Mapping[Class, ClassDef]
 
 
 def short_name(c: Class) -> Var:
@@ -65,7 +65,7 @@ def short_name(c: Class) -> Var:
 def class_table(gamma: Context, q: Name, xis: tuple[TypeDeclaration, ...], i: int) -> ClassTable:
     xi = xis[i]
     if isinstance(xi, ast.ClassDef):
-        return {Class(qualified(q, xi.name)): Dataclass(gamma, q, xis, i)}
+        return {Class(qualified(q, xi.name)): ClassDef(gamma, q, xis, i)}
     return {}
 
 
@@ -254,5 +254,5 @@ RANGE_DECLARATION = ast.parse("@dataclass\nclass range:\n    stop: int\n").body[
 assert isinstance(RANGE_DECLARATION, ast.ClassDef)
 
 PREDEFINED_CLASSES: ClassTable = {
-    RANGE: Dataclass(predefined_context(BUILTINS), BUILTINS, (RANGE_DECLARATION,), 0)
+    RANGE: ClassDef(predefined_context(BUILTINS), BUILTINS, (RANGE_DECLARATION,), 0)
 }

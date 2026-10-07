@@ -2,5 +2,5 @@
 &\qquad \text{if } \base{\Sigma}(C) = \bot \\*
 \fields{\Sigma}(C) &{}= \scheme{\seq{\alpha}}{(\tyInst{\fields{\Sigma}(D)}{\seq{\sigma}} \mathbin{\concat} \bind{\seq{x}}{\seq{\tau}})} \\*
 &\qquad \text{if } \base{\Sigma}(C) = D[\seq{\sigma}] \\*
-&\qquad \text{where } \Sigma(C) = \Dataclass[\Gamma]{q}{\seq{\chi}}{i}, \; \seq{\alpha} = \typeParams{\Sigma}(C), \; \ownFields(\chi_i) = \bind{\seq{x}}{\seq{\psi}} \\*
+&\qquad \text{where } \Sigma(C) = \ClassDef[\Gamma]{q}{\seq{\chi}}{i}, \; \seq{\alpha} = \typeParams{\Sigma}(C), \; \ownFields(\chi_i) = \bind{\seq{x}}{\seq{\psi}} \\*
 &\qquad \text{and } \Sigma; \typeContext{\Gamma}(q, \seq{\chi}, i) \vdash \seq{\psi} \synth \seq{\tau}
