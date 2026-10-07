@@ -282,11 +282,10 @@ its classes to the class table before checking its declarations. The context ent
 $\Type{q.c}$ for a class declaration, and for a \pyinline{type} statement the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$.
 The class table is extended with the definition $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$ of each class of the type region
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:class-table}}). Aliases and class definitions carry the type region and
-declaring context $\Gamma$, because alias bodies, field annotations and base classes are resolved later, under
-the context in force at their declaration, $\typeContext{\Gamma}(q, \seq{\chi}, i)$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}). The declarations are then each checked under the
-extended class table and that context, by the auxiliary judgement $\Sigma; \Gamma \vdash \chi$. For a \pyinline{type}
-statement the context binds every name of the type region, so an alias may name any class or alias of the type region, in any order, and a cyclic alias such as
+declaring context $\Gamma$, because alias bodies, field annotations and base classes are resolved later.
+Each declaration is checked under the extended class table and the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}), by the auxiliary judgement $\Sigma; \Gamma \vdash \chi$. For a \pyinline{type}
+statement this context binds every name of the type region, so an alias may name any class or alias of the type region, in any order, and a cyclic alias such as
 \pyinline{type T = list[T]} has no derivation, because resolving its body resolves the alias again. For a class declaration
 the context binds only the earlier names of the type region, because Python~\pythonVersion{} evaluates the field annotations and base class of a class when the class
 statement runs, but evaluates the body of a \pyinline{type} statement only when the alias is first used.\footnote{\PurePy does
