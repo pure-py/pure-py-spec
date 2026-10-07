@@ -12,8 +12,8 @@
 \and
 \inferrule*[lab={\ruleName{subty-class-extend}}]
 {
-  \replaced{\typeParams{\Sigma}(C) = \seq{\alpha}}{\Sigma(C) = \clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}'}}{D[\seq{\sigma}]}} \\
-  \added{\base{\Sigma}(C) = D[\seq{\sigma}]} \\
+  \typeParams{\Sigma}(C) = \seq{\alpha} \\
+  \base{\Sigma}(C) = D[\seq{\sigma}] \\
   \Sigma \vdash D[\subst{\seq{\tau}}{\seq{\alpha}}{\seq{\sigma}}] \subty \tau'
 }
 {

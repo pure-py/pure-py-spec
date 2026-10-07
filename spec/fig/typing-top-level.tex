@@ -22,12 +22,12 @@
 \and
 \inferrule*[lab={\ruleName{types}}]
 {
-  \added{\Delta = \set{\bind{\declaresS(\seq{\chi})}{\typeEntry{\Gamma}(q, \seq{\chi})}}} \\
-  \added{\Sigma' = \Sigma \override \classTable{\Gamma}(q, \seq{\chi})} \\
-  \added{\Sigma'; \typeContext{\Gamma}(q, \seq{\chi}, i) \vdash \chi_i \quad (\forall i)}
+  \Delta = \set{\bind{\declaresS(\seq{\chi})}{\typeEntry{\Gamma}(q, \seq{\chi})}} \\
+  \Sigma' = \Sigma \override \classTable{\Gamma}(q, \seq{\chi}) \\
+  \Sigma'; \typeContext{\Gamma}(q, \seq{\chi}, i) \vdash \chi_i \quad (\forall i)
 }
 {
-  \added{\Sigma; q; \Gamma \vdash \seq{\chi} : \Assigns{\Delta} \binding \Sigma'}
+  \Sigma; q; \Gamma \vdash \seq{\chi} : \Assigns{\Delta} \binding \Sigma'
 }
 \end{mathpar}
 \subcaption{Top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$}
@@ -37,48 +37,45 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \added{\shadebox{$\Sigma; \Gamma \vdash \chi$}}
+\flushleft \shadebox{$\Sigma; \Gamma \vdash \chi$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{class}}]
 {
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
-  \deleted{\Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}}} \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \Sigma; \replaced{\Gamma}{\Gamma'} \vdash \psi_i \synth \sigma_i \quad (\forall i)
+  \Sigma; \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i)
 }
 {
-  \Sigma; \deleted{q;} \Gamma \vdash \exDataclass{c[\seq{\alpha}]}{\phi} \deleted{: \mathsf{Assigns}(\set{\bind{c}{\Type{q.c}}}) \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{\bot}}}
+  \Sigma; \Gamma \vdash \exDataclass{c[\seq{\alpha}]}{\phi}
 }
 \and
 \inferrule*[lab={\ruleName{class-extend}}]
 {
-  \deleted{\Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}}} \\
   \Gamma \vdash q' : \Type{D} \\
-  \Sigma; \replaced{\Gamma}{\Gamma'} \vdash q'[\seq{\psi}'] \synth D[\seq{\sigma}'] \\
+  \Sigma; \Gamma \vdash q'[\seq{\psi}'] \synth D[\seq{\sigma}'] \\
   \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\
   \ownFields(\phi) = \bind{\seq{x}}{\seq{\psi}}, \; \seq{x} \text{ distinct} \\
-  \Sigma; \replaced{\Gamma}{\Gamma'} \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
+  \Sigma; \Gamma \vdash \psi_i \synth \sigma_i \quad (\forall i) \\
   \fields{\Sigma}(D) = \scheme{\seq{\alpha}'}{\bind{\seq{y}}{\seq{\tau}}} \\
   \set{\seq{x}} \cap \set{\seq{y}} = \varnothing
 }
 {
-  \Sigma; \deleted{q;} \Gamma \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}']}{\phi} \deleted{: \mathsf{Assigns}(\set{\bind{c}{\Type{q.c}}}) \binding \Sigma, \bind{q.c}{\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}{D[\seq{\sigma}']}}}
+  \Sigma; \Gamma \vdash \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}']}{\phi}
 }
 \and
 \inferrule*[lab={\ruleName{type-alias}}]
 {
-  \deleted{\Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}}} \\
-  \Sigma; \replaced{\Gamma}{\Gamma'} \vdash \psi \synth \tau
+  \Sigma; \Gamma \vdash \psi \synth \tau
 }
 {
-  \Sigma; \deleted{q;} \Gamma \vdash \exTypeAlias{x[\seq{\alpha}]}{\psi} \deleted{: \mathsf{Assigns}(\set{\bind{x}{\mathsf{TypeAlias}(\seq{\alpha}, \tau)}}) \binding \Sigma}
+  \Sigma; \Gamma \vdash \exTypeAlias{x[\seq{\alpha}]}{\psi}
 }
 \end{mathpar}
-\subcaption{\added{Type declaration $\chi$ is well-formed}}
+\subcaption{Type declaration $\chi$ is well-formed}
 \label{fig:typing-top-level-decl}
 \end{subfigure}
-\caption{Top-level statements\added{ and type declarations}}
+\caption{Top-level statements and type declarations}
 \label{fig:typing-top-level}
 \end{figure}

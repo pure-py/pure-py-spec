@@ -13,7 +13,7 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\modStub{q}$ & (ModuleStub) \\
     & $\mid$ & $\modLoaded{q}{\rho}$ & (LoadedModule) \\
     & $\mid$ & $\Type{C}$ & (Class) \\
-    & $\mid$ & \replaced{$\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$}{$\mathsf{TypeAlias}(\seq{\alpha}, \tau)$} & (TypeAlias) \\
+    & $\mid$ & $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ & (TypeAlias) \\
     & $\mid$ & $\Unbound$ & (Unbound) \\
     & $\mid$ & $\primVal{\primFn}$ & (Primitive) \\
     & $\mid$ & $\opaqueVal{q.x}$ & (Opaque)
@@ -32,7 +32,7 @@ $o$ & $::=$ & $\assigns{\rho}$ & (Assigns) \\
 \grammarGroup{Results} \\
 $r$ & $::=$ & $\val{v}$ & (Val) \\
   & $\mid$ & $\aborts{\kappa}$ & (Aborts) \\
-  & $\mid$ & \added{$\undefinedResult$} & \added{(Undefined)}
+  & $\mid$ & $\undefinedResult$ & (Undefined)
    \\[3mm]
 \grammarGroup{Match results} \\
 $m$ & $::=$ & $\matchOk{\rho}$ & (Match) \\

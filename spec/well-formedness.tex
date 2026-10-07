@@ -132,9 +132,9 @@ types $\seq{\sigma}$ and result type $\sigma$ from the callee along with its arg
 the arguments against $\seq{\sigma}$, and the call synthesises $\sigma$. The auxiliary judgement has two rules. A callee that synthesises a
 \pyinline{Callable} type gives the parameter and result types of that type (\ruleName{callee}). A name bound at a
 type scheme $\scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}$ instantiates the type parameters from the arguments
-(\ruleName{callee-scheme}). \added{The type parameters $\seq{\alpha}$ matched by \ruleName{callee-scheme}, \ruleName{var-scheme}
+(\ruleName{callee-scheme}). The type parameters $\seq{\alpha}$ matched by \ruleName{callee-scheme}, \ruleName{var-scheme}
 and \ruleName{constr} are chosen to be distinct from the type variables in scope, so that a recursive call inside a function with
-type parameters does not confuse the parameters of the type scheme with the type variables of the body.} The type arguments are collected by $\typeArgs{\Sigma}$
+type parameters does not confuse the parameters of the type scheme with the type variables of the body. The type arguments are collected by $\typeArgs{\Sigma}$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) over the arguments that synthesise,
 by a one-way unification of each parameter type with the synthesised type: a type variable takes the type found at the same
 position in the synthesised type, and a type variable found at several positions takes the join of those types.
@@ -255,16 +255,12 @@ The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\G
 optional return type $\zeta$, statement $s$ has static outcome $R$ (\figref{typing-stmt}); every rule passes $\zeta$ down unchanged.
 A sequence $s\;s'$ (\ruleName{seq}) types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
 by $s$. A conditional combines its
-branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch\added{ (\ruleName{if}, \ruleName{if-else})}.
-\deleted{Top-level statements are checked by a separate
-judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, class
-declarations and \pyinline{type} statements are top-level forms, and a plain statement is checked with no return type
-(\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level.}
+branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch (\ruleName{if}, \ruleName{if-else}).
 A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
-\pyinline{return} requires $\tau$ to be equivalent to \pyinline{None}\added{ (\ruleName{return}, \ruleName{return-none})}. An expression statement synthesises a type and discards it
+\pyinline{return} requires $\tau$ to be equivalent to \pyinline{None} (\ruleName{return}, \ruleName{return-none}). An expression statement synthesises a type and discards it
 (\ruleName{expr-stmt}). A call to a callable with result \tyNone{} is not an expression, because
-\ruleName{call} requires a result other than \tyNone, and is typed as a statement\added{ (\ruleName{call-stmt})}\deleted{ by \ruleName{call-stmt}}.
+\ruleName{call} requires a result other than \tyNone, and is typed as a statement (\ruleName{call-stmt}).
 The restriction is for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).
 
 A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
@@ -276,18 +272,7 @@ definitions and modules introduce the variables of the scope as unbound, using t
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:scope}}).
 
 The conditions of \pyinline{if} and \pyinline{assert}
-check against \pyinline{bool}, and an assertion message against \pyinline{str}\added{ (\ruleName{assert}, \ruleName{assert-msg})}.
-\deleted{A class declaration binds
-the class name to $\Type{C}$, resolves the field annotations, which may mention the type parameters of the class,, and requires the fields it declares to be distinct and, when it extends
-another class, the base to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
-(\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
-scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement $\exTypeAlias{x[\seq{\alpha}]}{\psi}$, such as \pyinline{type Pair[T] = tuple[T, T]},
-declares $x$ as an alias of the type denoted by $\psi$ with the type parameters $\seq{\alpha}$ in scope
-(\ruleName{type-alias}). An application of the alias such as \pyinline{Pair[int]} denotes that type at the given
-arguments (\ruleName{ty-alias}), here \pyinline{tuple[int, int]}, so types never mention aliases. Since the names declared by a module are unbound
-before their declarations (\secref{well-formedness-modules}), $\psi$ can name only classes and aliases declared
-earlier in the module, and cannot name $x$ itself. Each rule that takes an annotation resolves it to a type
-(\figref{resolve-type}).}
+check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}).
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}), which threads
@@ -323,12 +308,12 @@ so a function that declares a result definitely returns one. A return type such 
 does not exempt the body from returning, nor permit a bare \pyinline{return}, for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).
 
 \speconly{\subsubsection{Top-level statements}\label{sec:well-formedness-top-level}}%
-\added{Top-level statements are checked by a separate
+Top-level statements are checked by a separate
 judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, a mutual type region of class
 declarations and \pyinline{type} statements is a top-level form, checked by the \ruleName{types} rule, and a plain statement is checked with no return type
-(\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level.}
+(\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level.
 
-\added{Within a mutual type region, a \pyinline{type} statement may name any class or alias of the type region, in any
+Within a mutual type region, a \pyinline{type} statement may name any class or alias of the type region, in any
 order, but a class declaration may name only earlier classes and aliases, because Python~\pythonVersion{} evaluates the
 field annotations and base class of a class when the class statement runs, but evaluates the body of a \pyinline{type}
 statement only when the alias is first used.\footnote{\PurePy does
@@ -336,9 +321,9 @@ not support \pyinline{from __future__ import annotations}, under which Python~\p
 of annotations.} Recursive datatypes are therefore declared with their aliases before their classes, as in
 \pyinline{type Expr = Num | Add} followed by declarations of \pyinline{Num} and of \pyinline{Add} with fields of type
 \pyinline{Expr}. A cyclic alias such as \pyinline{type T = list[T]} has no derivation, because resolving its body
-resolves the alias again.}
+resolves the alias again.
 
-\added{The \ruleName{types} rule (\figref{typing-top-level}) binds the names of a mutual type region $\seq{\chi}$ and adds
+The \ruleName{types} rule (\figref{typing-top-level}) binds the names of a mutual type region $\seq{\chi}$ and adds
 its classes to the class table before checking its declarations. The context entry bound to the $i$-th name is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-entry}}): the class
 $\Type{q.c}$ for a class declaration, and for a \pyinline{type} statement the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$.
 The class table is extended with $\classTable{\Gamma}(q, \seq{\chi})$
@@ -347,15 +332,15 @@ declaring context $\Gamma$, because alias bodies, field annotations and base cla
 type region is checked.
 Each declaration is checked under the extended class table and the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}), by the auxiliary judgement $\Sigma; \Gamma \vdash \chi$, which binds
-every name of the type region for a \pyinline{type} statement and only the earlier names for a class declaration, as above.}
+every name of the type region for a \pyinline{type} statement and only the earlier names for a class declaration, as above.
 
-\added{The declaration judgement $\Sigma; \Gamma \vdash \chi$ checks a class declaration by resolving the field annotations, which may mention the type parameters of the class, and requiring the fields it declares to be distinct and, when it extends
+The declaration judgement $\Sigma; \Gamma \vdash \chi$ checks a class declaration by resolving the field annotations, which may mention the type parameters of the class, and requiring the fields it declares to be distinct and, when it extends
 another class, the base class to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
 scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement $\exTypeAlias{x[\seq{\alpha}]}{\psi}$, such as \pyinline{type Pair[T] = tuple[T, T]},
 declares $x$ as an alias of the type denoted by $\psi$ with the type parameters $\seq{\alpha}$ in scope
 (\ruleName{type-alias}). An application of the alias such as \pyinline{Pair[int]} denotes that type at the given
-arguments (\ruleName{ty-alias}), here \pyinline{tuple[int, int]}, so types never mention aliases.}
+arguments (\ruleName{ty-alias}), here \pyinline{tuple[int, int]}, so types never mention aliases.
 
 \subsection{Pattern matching}
 \label{sec:exhaustiveness}
@@ -510,21 +495,21 @@ If $\Sigma \vdash h : \tau$ for every $h \in H$ then $\Sigma \vdash k : \tau$ fo
 \subsection{Modules and programs}
 \label{sec:well-formedness-modules}
 
-\replaced{\emph{Module checking}}{\emph{Static loading}} types a module's body and computes its signature $\Gamma$, the judgement
-$\Sigma \vdash_{\replaced{\mathsf{mod}}{\mathsf{load}}} q : \Gamma \binding \Sigma'$ (\figref{typing-module}); it mirrors loading at run time
+\emph{Module checking} types a module's body and computes its signature $\Gamma$, the judgement
+$\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$ (\figref{typing-module}); it mirrors loading at run time
 (\secref{operational-semantics}). The \ruleName{module} rule types the body as a top-level statement, and
 the \ruleName{predefined} rule gives a predefined module the signature of
 Definition~\ref{def:predefined}.
-Both import forms \replaced{check}{statically load} their target, together with its containing modules
-(\figref{typing-import-prefix}). A plain import \replaced{checks}{statically loads} the root and then each module
-along the chain of names, recording each as a member of its parent (\ruleName{\replaced{submodules-cons}{loads-as-cons}}), so that the binding for the root gives attribute
-access along the whole chain. A from-import also \replaced{checks}{statically loads} any imported name that denotes a submodule, and the
+Both import forms check their target, together with its containing modules
+(\figref{typing-import-prefix}). A plain import checks the root and then each module
+along the chain of names, recording each as a member of its parent (\ruleName{submodules-cons}), so that the binding for the root gives attribute
+access along the whole chain. A from-import also checks any imported name that denotes a submodule, and the
 names it imports must be distinct. A
-containing module of the target is exempt from \replaced{checking}{static loading} if it is the importing module or one of its
+containing module of the target is exempt from checking if it is the importing module or one of its
 containing modules\speconly{ (\S\ref{aux:containing})}, because at runtime it may still be loading when the import executes. The exemption applies only to from-imports, because
 for a plain import
 the only containing module that could never load first is the importing module itself, and an import naming a
-module contained in the importing module is excluded outright\paperonly{ (\secref{no-load-dependent})}. \replaced{Module checking}{Static loading} is defined inductively, so a program with an import cycle is ill-formed. Program
+module contained in the importing module is excluded outright\paperonly{ (\secref{no-load-dependent})}. Module checking is defined inductively, so a program with an import cycle is ill-formed. Program
 well-formedness (\figref{typing-module}) requires the main module to be well typed and hence,
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
@@ -538,7 +523,7 @@ declares that name again, imports it, or binds it in a pattern.
 
 \input{spec/fig/typing-module}
 
-The signature $\Gamma$ produced by \replaced{module checking}{static loading} (\figref{typing-module}) comprises the classes, type aliases
+The signature $\Gamma$ produced by module checking (\figref{typing-module}) comprises the classes, type aliases
 and variables defined by a module, together with its intrinsic \pyinline{__name__} and a stub for each submodule,
 but not the names that it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
 name is a private dependency, not re-exported as part of the interface. Submodule stubs and the bindings of the module

@@ -244,40 +244,12 @@
 \and
 \inferrule*[lab={\ruleName{eval-types}}]
 {
-  \added{\rho' = \set{\bind{\declaresS(\seq{\chi})}{\typeEntry{\Gamma}(q, \seq{\chi})}}}
+  \rho' = \set{\bind{\declaresS(\seq{\chi})}{\typeEntry{\Gamma}(q, \seq{\chi})}}
 }
 {
-  \added{q, \rho, \seq{\chi} \Rightarrow \assigns{\rho'}}
+  q, \rho, \seq{\chi} \Rightarrow \assigns{\rho'}
 }
 \end{mathpar}
-\begin{DeletedBlock}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{eval-class}}]
-{
-  \strut
-}
-{
-  q, \rho, \exDataclass{c[\seq{\alpha}]}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{q.c}}}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-class-extend}}]
-{
-  \strut
-}
-{
-  q, \rho, \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}]}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{q.c}}}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-type-alias}}]
-{
-  \Sigma; \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \vdash \psi \synth \tau
-}
-{
-  q, \rho, \exTypeAlias{x[\seq{\alpha}]}{\psi} \Rightarrow \assigns{\set{\bind{x}{\mathsf{TypeAlias}(\seq{\alpha}, \tau)}}}
-}
-\end{mathpar}
-\end{DeletedBlock}
 \caption{Top-level statement $t$ of module $q$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
 \label{fig:eval-top-level}
 \end{figure}

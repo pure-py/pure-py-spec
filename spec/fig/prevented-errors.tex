@@ -4,7 +4,7 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.23\textwidth}>{\raggedright\arraybackslash}p{0.55\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Python error & Ruled out when & See \\
-\pyinline{NameError}, \pyinline{UnboundLocalError} & Always: a variable may be referenced only where it is definitely assigned\added{, and the fields and base class of a class may name only earlier type declarations}. & \figref{typing-stmt}, \figref{typing-synth}\added{, \figref{typing-top-level}} \\\rowgap
+\pyinline{NameError}, \pyinline{UnboundLocalError} & Always: a variable may be referenced only where it is definitely assigned, and the fields and base class of a class may name only earlier type declarations. & \figref{typing-stmt}, \figref{typing-synth}, \figref{typing-top-level} \\\rowgap
 \pyinline{ModuleNotFoundError} & Always: an import requires its target to be a module of the program. & \figref{typing-import-prefix} \\\rowgap
 \pyinline{ImportError} & Always: a from-import requires each imported name to be a member of the source module, and import cycles are rejected. (A Python cycle may run or fail, depending on where the cycle is entered.) & \figref{typing-imports}, \figref{typing-module} \\\rowgap
 \pyinline{AttributeError} & The reference is a module attribute, which must resolve to a definitely assigned member.  & \figref{typing-synth} \\\rowgap

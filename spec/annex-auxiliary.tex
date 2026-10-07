@@ -31,7 +31,6 @@ cases are stated with each.
 \funcrows{declares}
 \end{auxfunction}
 
-\begin{AddedBlock}
 \begin{auxfunction}{\typeEntry{\Gamma}(q, \seq{\chi}, i), \typeEntry{\Gamma}(q, \seq{\chi})}{context entry, or sequence of context entries}{aux:type-entry}
 \input{spec/functions/type-entry-text}
 \funcrows{type-entry}
@@ -50,7 +49,6 @@ cases are stated with each.
 \vspace{-\baselineskip}
 \funcrows{class-table-region}
 \end{auxfunction}
-\end{AddedBlock}
 
 \begin{auxfunction}{\scopeS(Y, s)}{context}{aux:scope}
 \input{spec/functions/scope-text}
@@ -70,7 +68,6 @@ cases are stated with each.
 \begin{auxfunction}{\fv(e), \fv(\seq{e})}{set of variables}{aux:fv}
 \input{spec/functions/fv-text}
 \end{auxfunction}
-
 
 \section{Types}
 \label{sec:types-auxiliary}
@@ -150,12 +147,11 @@ the resolution of names in an environment.
 \funcrows{containing}
 \end{auxfunction}
 
-\begin{auxfunction}{\ownFields(\phi)\added{, \ownFields(\chi)}}{sequence of bindings}{aux:own-fields}
+\begin{auxfunction}{\ownFields(\phi), \ownFields(\chi)}{sequence of bindings}{aux:own-fields}
 \input{spec/functions/own-fields-text}
 \funcrows{own-fields}
 \end{auxfunction}
 
-\begin{AddedBlock}
 \begin{auxfunction}{\typeParams{\Sigma}(C)}{sequence of type parameters}{aux:type-params}
 \input{spec/functions/type-params-text}
 \funcrows{type-params}
@@ -165,26 +161,15 @@ the resolution of names in an environment.
 \input{spec/functions/base-text}
 \funcrows{base}
 \end{auxfunction}
-\end{AddedBlock}
 
 \begin{auxfunction}{\fields{\Sigma}(C)}{field scheme}{aux:fields}
 \input{spec/functions/fields-text}
-\begin{DeletedBlock}
-\funcrows{fields-old}
-\end{DeletedBlock}
-\begin{AddedBlock}
 \funcrows{fields}
-\end{AddedBlock}
 \end{auxfunction}
 
 \begin{auxfunction}{\ancestors{\Sigma}(C)}{set of classes}{aux:ancestors}
 \input{spec/functions/ancestors-text}
-\begin{DeletedBlock}
-\funcrows{ancestors-old}
-\end{DeletedBlock}
-\begin{AddedBlock}
 \funcrows{ancestors}
-\end{AddedBlock}
 \end{auxfunction}
 
 \begin{auxfunction}{\fieldMap{\Sigma}(C, \seq{u})}{map from variables}{aux:field-map}
