@@ -138,8 +138,10 @@
 \newcommand*{\exTypeAlias}[2]{\pyinline{type}\;#1 = #2}
 
 % Types and annotations
+\newcommand*{\clsRange}{\pyinline{builtins}.\pyinline{range}}
 \newcommand*{\exAnnot}[1]{\mathord{:}\;#1}
 \newcommand*{\exRetAnnot}[1]{\;\pymath{-\raisebox{-0.15ex}{>}}\;#1}
+\newcommand*{\SigmaPredef}{\Sigma_{\mathcal{P}}}
 \newcommand*{\tyBool}{\pyinline{bool}}
 \newcommand*{\tyCallable}[2]{\pyinline{Callable}[[#1], #2]}
 \newcommand*{\tyDict}[1]{\pyinline{dict}[\tyStr, #1]}
@@ -151,8 +153,6 @@
 \newcommand*{\tyNone}{\pyinline{None}}
 \newcommand*{\tyObject}{\pyinline{object}}
 \newcommand*{\tySized}{\pyinline{Sized}}
-\newcommand*{\clsRange}{\pyinline{builtins}.\pyinline{range}}
-\newcommand*{\SigmaPredef}{\Sigma_{\mathcal{P}}}
 \newcommand*{\tyStr}{\pyinline{str}}
 \newcommand*{\tyTuple}[1]{\pyinline{tuple}[#1]}
 \newcommand*{\tyUnion}[2]{#1 \mathbin{|} #2}
@@ -175,6 +175,7 @@
 \newcommand*{\exObj}[2]{\mathsf{Obj}(#1, #2)}
 
 % Context entries
+\newcommand*{\ClassDef}[4][]{\mathsf{ClassDef}_{#1}(#2, #3, #4)}
 \newcommand*{\DU}[1]{\mathsf{DU}(#1)}
 \newcommand*{\False}{\mathsf{ff}}
 \newcommand*{\modLoaded}[2]{\mathsf{Mod}(#1, #2)}
@@ -187,12 +188,6 @@
 \newcommand*{\True}{\mathsf{tt}}
 \newcommand*{\Type}[1]{\mathsf{Type}(#1)}
 \newcommand*{\TypeAlias}[4][]{\mathsf{TypeAlias}_{#1}(#2, #3, #4)}
-\newcommand*{\ClassDef}[4][]{\mathsf{ClassDef}_{#1}(#2, #3, #4)}
-\newcommand*{\typeEntry}[1]{\mathrm{type\text{-}entry}_{#1}}
-\newcommand*{\typeContext}[1]{\mathrm{type\text{-}context}_{#1}}
-\newcommand*{\classTable}[1]{\mathrm{class\text{-}table}_{#1}}
-\newcommand*{\typeParams}[1]{\mathrm{type\text{-}params}_{#1}}
-\newcommand*{\base}[1]{\mathrm{base}_{#1}}
 \newcommand*{\TypeVar}{\mathsf{TypeVar}}
 \newcommand*{\Unbound}{\mathsf{Unbound}}
 
@@ -210,24 +205,24 @@
 \newcommand*{\headList}[1]{\pyinline{list}_{#1}}
 \newcommand*{\instanceAt}{\mathrel{\asymp}}
 \newcommand*{\joinTy}[3]{#2 \vee_{#1} #3}
+\newcommand*{\matchedAs}[1]{\mathrm{matched\text{-}as}_{#1}}
 \newcommand*{\meetTy}[3]{#2 \wedge_{#1} #3}
 \newcommand*{\merge}{\mathbin{\oplus}}
 \newcommand*{\overloadsOf}{\mathrm{overloads}}
 \newcommand*{\override}{\otimes}
+\newcommand*{\remaining}[1]{\mathrm{remaining}_{#1}}
 \newcommand*{\resolveOp}[1]{\mathrm{resolve\text{-}op}_{#1}}
 \newcommand*{\shapeAny}[2]{#1 \setminus #2}
 \newcommand*{\shapeDict}[3]{#2 \setminus_{#1} #3}
 \newcommand*{\shapeList}[2]{[#2]_{#1}}
 \newcommand*{\shapes}[1]{\mathrm{shapes}_{#1}}
-\newcommand*{\subterms}{\mathrm{subterms}}
-\newcommand*{\typeArgs}[1]{\mathrm{type\text{-}args}_{#1}}
 \newcommand*{\shapeTy}{\mathrm{shape\text{-}type}}
-\newcommand*{\matchedAs}[1]{\mathrm{matched\text{-}as}_{#1}}
-\newcommand*{\remaining}[1]{\mathrm{remaining}_{#1}}
 \newcommand*{\splits}{\mathrel{\rightsquigarrow_{\mathsf{h}}}}
+\newcommand*{\subterms}{\mathrm{subterms}}
 \newcommand*{\subty}{\mathrel{<:}}
 \newcommand*{\synth}{\mathrel{\triangleright}}
 \newcommand*{\tyEquiv}{\mathrel{\equiv}}
+\newcommand*{\typeArgs}[1]{\mathrm{type\text{-}args}_{#1}}
 
 % Outcomes (draft, \secref{errors})
 \newcommand*{\aborts}[1]{\mathsf{aborts}\;#1}
@@ -240,8 +235,8 @@
 \newcommand*{\errType}{\mathsf{TypeError}}
 \newcommand*{\errZeroDiv}{\mathsf{ZeroDivisionError}}
 \newcommand*{\mlet}[3]{\mathsf{let}\;#1 \leftarrow #2\;\mathsf{in}\;#3}
-\newcommand*{\val}[1]{\mathsf{val}\;#1}
 \newcommand*{\undefinedResult}{\mathsf{undefined}}
+\newcommand*{\val}[1]{\mathsf{val}\;#1}
 
 % Result types and results
 \newcommand*{\Assigns}[1]{\mathsf{Assigns}(#1)}
@@ -249,27 +244,32 @@
 \newcommand*{\Returns}{\mathsf{Returns}}
 \newcommand{\returns}[1]{\mathsf{returns}\;#1}
 
-% Metafunctions: definite assignment and free variables
+% Metafunctions: syntactic analyses
 \newcommand*{\assignsS}{\mathrm{assigns}}
 \newcommand*{\binds}{\mathrm{binds}}
 \newcommand*{\captures}{\mathrm{captures}}
+\newcommand*{\classTable}[1]{\mathrm{class\text{-}table}_{#1}}
 \newcommand*{\declaresS}{\mathrm{declares}}
 \newcommand*{\fv}{\mathrm{fv}}
 \newcommand*{\scopeS}{\mathrm{scope}}
+\newcommand*{\typeContext}[1]{\mathrm{type\text{-}context}_{#1}}
+\newcommand*{\typeEntry}[1]{\mathrm{type\text{-}entry}_{#1}}
 
 % Metafunctions: classes
 \newcommand*{\ancestors}[1]{\mathrm{ancestors}_{#1}}
+\newcommand*{\base}[1]{\mathrm{base}_{#1}}
 \newcommand*{\fieldMap}[1]{\mathrm{field\text{-}map}_{#1}}
 \newcommand*{\fields}[1]{\mathrm{fields}_{#1}}
 \newcommand*{\ownFields}{\mathrm{own\text{-}fields}}
 \newcommand*{\resolve}{\mathrm{resolve}}
+\newcommand*{\typeParams}[1]{\mathrm{type\text{-}params}_{#1}}
 
 % Metafunctions: modules
-\newcommand*{\nameOf}{\mathrm{name}}
-\newcommand*{\submods}{\mathrm{submods}}
 \newcommand*{\containing}{\mathrm{containing}}
+\newcommand*{\nameOf}{\mathrm{name}}
 % Gap between table rows; \\[1mm] only deepens the last cell and is lost when another cell is taller
 \newcommand*{\rowgap}{\noalign{\vskip 1mm}}
+\newcommand*{\submods}{\mathrm{submods}}
 
 % Metafunctions: lists, tuples, and dictionaries
 \newcommand*{\elems}{\mathrm{elems}}
