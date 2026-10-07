@@ -2,7 +2,7 @@
 
 [![build](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml)
 
-## [v0.18.0](https://github.com/pure-py/pure-py-spec/releases/download/v0.18.0/PurePy-spec.pdf)
+## [v0.18.1](https://github.com/pure-py/pure-py-spec/releases/download/v0.18.1/PurePy-spec.pdf)
 
 PurePy is a pure (side-effect free) subset of Python, intended initially for researchers in programming
 languages and programming pedagogy, and in the longer term as a common language for scientific computing,
@@ -59,6 +59,8 @@ directory holding `main.py`, the expectation files of `main.py` and the other mo
 The runner requires an `excluded` test to run under Python and a `python-error` test to raise, so a test has
 either `.expected` or `.exception.expected` and a misfiled test fails. A test that exits with a nonzero status
 through `sys.exit` states the status in `.status.expected`.
+
+Another checker can be run over the suite with `--checker`; `run-all.py --help` lists the options.
 
 ## Development
 
