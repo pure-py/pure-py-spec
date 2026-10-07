@@ -282,8 +282,8 @@ its classes to the class table before checking its declarations, as \ruleName{de
 the bodies. The context entry bound to the $i$-th name is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-entry}}): the class
 $\Type{q.c}$ for a class declaration, and for a \pyinline{type} statement the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$.
 The class table is extended with the definition $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$ of each class of the type region
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:class-table}}). Alias and class definition both carry the type region and the
-context $\Gamma$ under which it was declared, as a \pyinline{def} closure carries its mutual def region, so that the body of the alias
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:class-table}}). Aliases and class definitions carry the type region and the
+context $\Gamma$ under which the type region was declared, so that the body of the alias
 is resolved at each use (\ruleName{ty-alias}), and the field annotations and base class of the class are resolved whenever its
 fields or base class are read ($\fields{\Sigma}$, $\base{\Sigma}$), under the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}). The declarations are then each checked under the
