@@ -264,7 +264,7 @@ A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
 \pyinline{return} requires $\tau$ to be equivalent to \pyinline{None}\added{ (\ruleName{return}, \ruleName{return-none})}. An expression statement synthesises a type and discards it
 (\ruleName{expr-stmt}). A call to a callable with result \tyNone{} is not an expression, because
-\ruleName{call} requires a result other than \tyNone, and is typed as a statement by \ruleName{call-stmt}.
+\ruleName{call} requires a result other than \tyNone, and is typed as a statement\added{ (\ruleName{call-stmt})}\deleted{ by \ruleName{call-stmt}}.
 The restriction is for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).
 
 A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
