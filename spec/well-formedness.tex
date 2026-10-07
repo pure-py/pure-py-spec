@@ -283,7 +283,7 @@ $\Type{q.c}$ for a class declaration, and for a \pyinline{type} statement the al
 The class table is extended with the definition $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$ of each class of the type region
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:class-table}}). Aliases and class definitions carry the type region and the
 context $\Gamma$ under which the type region was declared, so that the body of the alias
-is resolved at each use (\ruleName{ty-alias}), and the field annotations and base class of the class are resolved whenever its
+can be resolved at each use (\ruleName{ty-alias}), and the field annotations and base class of the class whenever its
 fields or base class are read ($\fields{\Sigma}$, $\base{\Sigma}$), under the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}). The declarations are then each checked under the
 extended class table and that context, by the auxiliary judgement $\Sigma; \Gamma \vdash \chi$. For a \pyinline{type}
