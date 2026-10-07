@@ -83,6 +83,7 @@ class Runner:
         self.checker = checker  # command given the test path; None: the reference checker
         self.passed = 0
         self.failed: list[str] = []
+        self.skipped: list[str] = []
         self.failures: list[str] = []
 
     @contextlib.contextmanager
@@ -145,10 +146,14 @@ class Runner:
 
     def run_test(self, test: pathlib.Path, program: bool) -> None:
         """Path under tier: <verdict>[/<stage>]/.../<test>.py or .../<test>/main.py (program)."""
+        dirs = test.relative_to(TEST).parts[1:-1]
+        verdict = Verdict(dirs[0])
+        stage = Stage(dirs[1]) if len(dirs) > 1 and dirs[1] in Stage else None
+        if stage == Stage.PENDING and self.checker is not None:
+            # spec doesn't define pending forms, so only the reference checker is held to them
+            self.skipped.append(str(test.relative_to(ROOT)))
+            return
         with self.test(test.relative_to(ROOT)):
-            dirs = test.relative_to(TEST).parts[1:-1]
-            verdict = Verdict(dirs[0])
-            stage = Stage(dirs[1]) if len(dirs) > 1 and dirs[1] in Stage else None
             exit, error_checked, python_accepts = EXPECTATIONS[verdict, stage]
             path = test / MAIN if program else test
             if exit is not None:
@@ -160,6 +165,8 @@ class Runner:
         """Pass if no test failed, or if the failures are exactly those listed in known_failures."""
         total = self.passed + len(self.failed)
         print()
+        if self.skipped:
+            print(f"{len(self.skipped)} pending tests skipped: {', '.join(self.skipped)}")
         if known_failures is not None:
             actual = "".join(line + "\n" for line in sorted(self.failed))
             if update:

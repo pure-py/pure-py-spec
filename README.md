@@ -62,7 +62,7 @@ through `sys.exit` states the status in `.status.expected`.
 
 Another implementation of PurePy runs the suite with `--checker CMD`, a command given the path of each test in
 place of `src/`, exiting 0 if the test is accepted, 1 if prohibited and 3 if ill-formed (4 for an ill-formed
-program); error messages are then not compared. The run stage takes the interpreter as the positional argument,
+program); error messages are then not compared, and `pending/` tests are skipped and listed. The run stage takes the interpreter as the positional argument,
 or `--no-run` skips it. With `--known-failures FILE`, the run passes when its failures are exactly those listed
 in the file, which `--update` rewrites.
 
