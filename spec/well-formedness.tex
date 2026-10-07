@@ -279,7 +279,7 @@ check against \pyinline{bool}, and an assertion message against \pyinline{str}.
 
 \added{The \ruleName{types} rule (\figref{typing-top-level}) binds the names of a mutual type region $\seq{\chi}$ before
 checking its declarations, as \ruleName{defs} binds the names of a mutual def region at their signatures before checking
-the bodies. The context entry bound to the $i$-th name is $\entryOf{\Gamma}(q, \seq{\chi}, i)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:entry}}): the class
+the bodies. The context entry bound to the $i$-th name is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-entry}}): the class
 $\Type{q.c}$ for a class declaration, and for a \pyinline{type} statement the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$,
 which carries the region and the context $\Gamma$ under which it was declared, so that the body of the alias is resolved
 at each use (\ruleName{ty-alias}) under $\Gamma$ extended with the bindings of the type region, as a \pyinline{def} closure

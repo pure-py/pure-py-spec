@@ -28,7 +28,7 @@
 {
   \Gamma \vdash q : \replaced{\TypeAlias[\Gamma']{q'}{\seq{\chi}}{i}}{\mathsf{TypeAlias}(\seq{\alpha}, \tau)} \\
   \added{\chi_i = \exTypeAlias{x[\seq{\alpha}]}{\psi'}} \\
-  \added{\Delta = \set{\bind{\declaresS(\seq{\chi})}{\entryOf{\Gamma'}(q', \seq{\chi}, 1), \ldots, \entryOf{\Gamma'}(q', \seq{\chi}, n)}}} \\
+  \added{\Delta = \set{\bind{\declaresS(\seq{\chi})}{\typeEntry{\Gamma'}(q', \seq{\chi}, 1), \ldots, \typeEntry{\Gamma'}(q', \seq{\chi}, n)}}} \\
   \added{\Sigma; \Gamma' \override \Delta \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_m}{\TypeVar}} \vdash \psi' \synth \tau} \\
   \Sigma; \Gamma \vdash \seq{\psi} \synth \seq{\sigma}
 }

@@ -244,7 +244,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-types}}]
 {
-  \added{\rho_i = \set{\bind{\declaresS(\chi_i)}{\entryOf{\Gamma}(q, \seq{\chi}, i)}} \quad (\forall i)}
+  \added{\rho_i = \set{\bind{\declaresS(\chi_i)}{\typeEntry{\Gamma}(q, \seq{\chi}, i)}} \quad (\forall i)}
 }
 {
   \added{q, \rho, \seq{\chi} \Rightarrow \assigns{\rho_1 \override \cdots \override \rho_n}}

@@ -250,7 +250,7 @@ def types(xis: list[TypeDeclaration], mod_ctx: ModuleContext) -> tuple[StaticOut
     return Assigns(delta), Sigma
 
 
-def entry(gamma: Context, q: Name, xis: tuple[TypeDeclaration, ...], i: int) -> ContextEntry:
+def type_entry(gamma: Context, q: Name, xis: tuple[TypeDeclaration, ...], i: int) -> ContextEntry:
     xi = xis[i]
     if isinstance(xi, ast.ClassDef):
         return Class(qualified(q, xi.name))
@@ -258,8 +258,8 @@ def entry(gamma: Context, q: Name, xis: tuple[TypeDeclaration, ...], i: int) -> 
 
 
 def region(gamma: Context, q: Name, xis: tuple[TypeDeclaration, ...]) -> Context:
-    """Bindings of mutual type region: declares(xis) at entry(gamma, q, xis, i)"""
-    return {x: entry(gamma, q, xis, i) for i, xi in enumerate(xis) for x, _ in declares(xi)}
+    """Bindings of mutual type region: declares(xis) at type_entry(gamma, q, xis, i)"""
+    return {x: type_entry(gamma, q, xis, i) for i, xi in enumerate(xis) for x, _ in declares(xi)}
 
 
 def header(xi: ast.ClassDef) -> ClassTableEntry:

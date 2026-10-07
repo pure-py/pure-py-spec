@@ -23,7 +23,7 @@
 \inferrule*[lab={\ruleName{types}}]
 {
   \added{\Sigma_0 = \Sigma \override \set{\bind{q.c}{\clsRec{\seq{\alpha}}{\varepsilon}{\bot}} \mid \seq{\chi} \text{ declares class } c[\seq{\alpha}]}} \\
-  \added{\Delta_i = \set{\bind{\declaresS(\chi_i)}{\entryOf{\Gamma}(q, \seq{\chi}, i)}} \quad (\forall i)} \\
+  \added{\Delta_i = \set{\bind{\declaresS(\chi_i)}{\typeEntry{\Gamma}(q, \seq{\chi}, i)}} \quad (\forall i)} \\
   \added{\Gamma_i = \Gamma \override \Delta_1 \override \cdots \override \Delta_{i-1}} \\
   \added{\Sigma_{i-1}; q; \Gamma_i; \Gamma_{n+1} \vdash \chi_i \binding \Sigma_i \quad (\forall i)}
 }
