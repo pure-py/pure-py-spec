@@ -1,3 +1,3 @@
-\containsElems(\varepsilon, v) &{}= \pyinline{False} \\*
-\containsElems(v' \cons \seq{v}, v) &{}= \pyinline{True} && \text{if } \eqOp(v, v') = \pyinline{True} \\*
-\containsElems(v' \cons \seq{v}, v) &{}= \containsElems(\seq{v}, v) && \text{if } \eqOp(v, v') = \pyinline{False}
+\containsElems{\Sigma}(\varepsilon, v) &{}= \pyinline{False} \\*
+\containsElems{\Sigma}(v' \cons \seq{v}, v) &{}= \pyinline{True} && \text{if } \eqOp{\Sigma}(v, v') = \pyinline{True} \\*
+\containsElems{\Sigma}(v' \cons \seq{v}, v) &{}= \containsElems{\Sigma}(\seq{v}, v) && \text{if } \eqOp{\Sigma}(v, v') = \pyinline{False}
