@@ -50,9 +50,8 @@ For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any statement $s$ with
 $\Gamma \vdash s : R$, the statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
 to outcome $o$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Top-level statements
 are evaluated by a separate judgement, $q, \rho, t \Rightarrow o$\speconly{ (\figref{eval-top-level})}, mirroring the static
-judgement (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, \added{a mutual type region binds each of its names to $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\ruleName{eval-types}), because
-class entries $\Type{q.c}$ and alias entries $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ are values as well as context entries, so the environment
-binds the names of the type region to the same entries as the context,} \deleted{a class declaration binds
+judgement (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, \added{a mutual type region binds each of its names to $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\ruleName{eval-types}), since
+class and alias entries are also values,} \deleted{a class declaration binds
 its name to the class, a \pyinline{type} statement binds its name to the alias,} and a plain statement is evaluated by the statement judgement
 (\ruleName{eval-top-stmt}). Function definitions delimit
 the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\result$\speconly{ (\S\ref{aux:result})} reads the outcome of a statement as
