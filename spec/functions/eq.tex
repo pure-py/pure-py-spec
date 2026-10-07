@@ -1,10 +1,10 @@
-\eqOp{\Sigma}(\ell, \ell) &{}= \pyinline{True} && \text{if } \ell \text{ is not } \pyinline{nan} \\*
+\eqOp{\Sigma}(n, n') &{}= \pyinline{True} && \text{if } n = n' \text{ and } n \text{ is not } \pyinline{nan} \\*
 \eqOp{\Sigma}(n, n') &{}= \pyinline{False} && \text{if } n \neq n' \\*
+\eqOp{\Sigma}(w, w') &{}= \pyinline{True} && \text{if } w = w' \\*
 \eqOp{\Sigma}(w, w') &{}= \pyinline{False} && \text{if } w \neq w' \\*
-\eqOp{\Sigma}(\pyinline{None}, v) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\*
-\eqOp{\Sigma}(v, \pyinline{None}) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\*
-\eqOp{\Sigma}(\pyinline{True}, \pyinline{False}) &{}= \pyinline{False} \\*
-\eqOp{\Sigma}(\pyinline{False}, \pyinline{True}) &{}= \pyinline{False} \\*
+\eqOp{\Sigma}(\pyinline{True}, \pyinline{True}) &{}= \eqOp{\Sigma}(\pyinline{False}, \pyinline{False}) = \pyinline{True} \\*
+\eqOp{\Sigma}(\pyinline{True}, \pyinline{False}) &{}= \eqOp{\Sigma}(\pyinline{False}, \pyinline{True}) = \pyinline{False} \\*
+\eqOp{\Sigma}(\pyinline{None}, \pyinline{None}) &{}= \pyinline{True} \\*
 \\
 \eqOp{\Sigma}(\exList{\seq{v}}, \exList{\seq{v}\,'}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*
 \eqOp{\Sigma}(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*
@@ -22,4 +22,5 @@
 &\qquad \text{if } C \neq D \\*
 \\
 \eqOp{\Sigma}(v, v') &{}= \pyinline{False} \\*
-&\qquad \text{if } v \text{ and } v' \text{ are of different forms, unless one is a Boolean and the other a number}
+&\qquad \text{if } v \text{ and } v' \text{ are of different forms,} \\*
+&\qquad \text{unless one is a Boolean and the other a number}
