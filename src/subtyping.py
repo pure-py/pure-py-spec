@@ -18,6 +18,7 @@ from type_syntax import (
     UnionType,
     Var,
     base_type,
+    fv,
     render,
     substitute,
 )
@@ -191,42 +192,45 @@ def instantiation_candidates(
     return [first] if second is None else [first, second]
 
 
-def type_args(Sigma: ClassTable, sigma: Type, tau: Type) -> dict[Var, Type]:
+def type_args(Sigma: ClassTable, alphas: Sequence[Var], sigma: Type, tau: Type) -> dict[Var, Type]:
     match sigma, tau:
-        case TypeVariable(alpha), _:
+        case TypeVariable(alpha), _ if alpha in alphas:
             return {alpha: base_type(tau)}
         case _, UnionType(tau_, tau__):
             return join_context(
-                Sigma, type_args(Sigma, sigma, tau_), type_args(Sigma, sigma, tau__)
+                Sigma, type_args(Sigma, alphas, sigma, tau_), type_args(Sigma, alphas, sigma, tau__)
             )
         case (ListType(sigma_), ListType(tau_)) | (DictType(sigma_), DictType(tau_)):
-            return type_args(Sigma, sigma_, tau_)
+            return type_args(Sigma, alphas, sigma_, tau_)
         case TupleType(sigmas), TupleType(taus):
-            return type_args_seq(Sigma, sigmas, taus)
+            return type_args_seq(Sigma, alphas, sigmas, taus)
         case CallableType(sigmas, sigma_), CallableType(taus, tau_):
-            return type_args_seq(Sigma, (sigma_, *sigmas), (tau_, *taus))
+            return type_args_seq(Sigma, alphas, (sigma_, *sigmas), (tau_, *taus))
         case ClassType(c, sigmas), _:
             match instance(Sigma, c, tau):
                 case ClassType(_, taus):
-                    return type_args_seq(Sigma, sigmas, taus)
+                    return type_args_seq(Sigma, alphas, sigmas, taus)
                 case _:
                     return {}
         case UnionType(sigma_, sigma__), _:
-            if subtype(Sigma, tau, sigma_) or subtype(Sigma, tau, sigma__):
+            if any(
+                fv(disjunct).isdisjoint(alphas) and subtype(Sigma, tau, disjunct)
+                for disjunct in (sigma_, sigma__)
+            ):
                 return {}
             return join_context(
-                Sigma, type_args(Sigma, sigma_, tau), type_args(Sigma, sigma__, tau)
+                Sigma, type_args(Sigma, alphas, sigma_, tau), type_args(Sigma, alphas, sigma__, tau)
             )
         case _:
             return {}
 
 
 def type_args_seq(
-    Sigma: ClassTable, sigmas: Sequence[Type], taus: Sequence[Type]
+    Sigma: ClassTable, alphas: Sequence[Var], sigmas: Sequence[Type], taus: Sequence[Type]
 ) -> dict[Var, Type]:
     result: dict[Var, Type] = {}
     for sigma, tau in zip(sigmas, taus):
-        result = join_context(Sigma, result, type_args(Sigma, sigma, tau))
+        result = join_context(Sigma, result, type_args(Sigma, alphas, sigma, tau))
     return result
 
 

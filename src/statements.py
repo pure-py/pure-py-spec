@@ -91,7 +91,6 @@ from type_syntax import (
     TupleType,
     Type,
     TypeName,
-    TypeVariable,
     UnionType,
     Var,
     base_type,
@@ -598,12 +597,14 @@ def dict_type(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> Dic
 def constr(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> Type:
     args = constructor_args(c, e, mod_ctx)
     pi = fields(mod_ctx.Sigma, c)
-    alphas = fresh(pi.type_params)
-    sigmas = {x: rename(alphas, pi.type_params, sigma) for x, sigma in pi.fields}
+    alphas = pi.type_params
+    sigmas = dict(pi.fields)
     synthesising = [
         (sigmas[x], synth_expr(arg, mod_ctx)) for x, arg in args.items() if synthesises(arg)
     ]
-    gamma = type_args_seq(mod_ctx.Sigma, [s for s, _ in synthesising], [t for _, t in synthesising])
+    gamma = type_args_seq(
+        mod_ctx.Sigma, alphas, [s for s, _ in synthesising], [t for _, t in synthesising]
+    )
     tau = ClassType(c, tuple(type_arguments(gamma, alphas, e)))
     for x, arg in args.items():
         check_expr(arg, declared_type(mod_ctx.Sigma, tau, x), mod_ctx)
@@ -652,39 +653,30 @@ def callee(e: ast.Call, mod_ctx: ModuleContext) -> Type:
     pi = entry_of(e.func, mod_ctx)
     if not isinstance(pi, TypeScheme):
         return synth_expr(e.func, mod_ctx)
-    alphas = fresh(pi.params)
-    tau = rename(alphas, pi.params, pi.tau)
+    alphas, tau = pi.params, pi.tau
     assert isinstance(tau, CallableType)
     synthesising = [
         (sigma, synth_expr(arg, mod_ctx))
         for sigma, arg in zip(tau.params, e.args)
         if synthesises(arg)
     ]
-    gamma = type_args_seq(mod_ctx.Sigma, [s for s, _ in synthesising], [t for _, t in synthesising])
+    gamma = type_args_seq(
+        mod_ctx.Sigma, alphas, [s for s, _ in synthesising], [t for _, t in synthesising]
+    )
     return substitute(type_arguments(gamma, alphas, e), alphas, tau)
-
-
-def fresh(alphas: Sequence[Var]) -> tuple[Var, ...]:
-    """Type parameters renamed to variables distinct from any in scope"""
-    return tuple(alpha + "'" for alpha in alphas)
-
-
-def rename(alphas: Sequence[Var], betas: Sequence[Var], sigma: Type) -> Type:
-    return substitute([TypeVariable(alpha) for alpha in alphas], betas, sigma)
 
 
 def type_arguments(gamma: dict[Var, Type], alphas: Sequence[Var], node: ast.AST) -> list[Type]:
     """Context applied to the sequence of type parameters"""
     missing = next((alpha for alpha in alphas if alpha not in gamma), None)
     if missing is not None:
-        raise IllFormedModule(node, reasons.NoTypeArgument(missing.removesuffix("'")))
+        raise IllFormedModule(node, reasons.NoTypeArgument(missing))
     return [gamma[alpha] for alpha in alphas]
 
 
 def var_scheme(pi: TypeScheme, e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
-    alphas = fresh(pi.params)
-    tau = rename(alphas, pi.params, pi.tau)
-    gamma = type_args_seq(mod_ctx.Sigma, [tau], [expected])
+    alphas, tau = pi.params, pi.tau
+    gamma = type_args_seq(mod_ctx.Sigma, alphas, [tau], [expected])
     actual = substitute(type_arguments(gamma, alphas, e), alphas, tau)
     if not subtype(mod_ctx.Sigma, actual, expected):
         raise IllFormedModule(e, reasons.TypeMismatch(expected, actual))
