@@ -63,10 +63,11 @@ def short_name(c: Class) -> Var:
 
 
 def class_table(gamma: Context, q: Name, chis: tuple[TypeDeclaration, ...], i: int) -> ClassTable:
-    chi = chis[i]
-    if isinstance(chi, ast.ClassDef):
-        return {Class(qualified(q, chi.name)): ClassDef(gamma, q, chis, i)}
-    return {}
+    match chis[i]:
+        case ast.ClassDef(name=c):
+            return {Class(qualified(q, c)): ClassDef(gamma, q, chis, i)}
+        case _:
+            return {}
 
 
 def class_declaration(Sigma: ClassTable, c: Class) -> ast.ClassDef:
