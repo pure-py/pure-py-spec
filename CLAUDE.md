@@ -15,7 +15,6 @@ See README.md for project structure, build, test, and release docs.
 - Give new issues either **Planned** or **Proposed** status.
 - Default label: `spec-1.0` (unless the issue is an extension or config).
 - Features under consideration (not yet committed to) also get the `Proposed` label.
-- Link issues from the to-do table in §2 of the spec using the `\issue{N}` macro.
 
 ## LaTeX
 
