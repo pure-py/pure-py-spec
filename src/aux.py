@@ -13,8 +13,8 @@ from type_syntax import (
 
 # PurePy statement: Python statement, mutual def region or mutual type region. Python body (statement
 # list) represents spec's right-nested sequence s s'.
-type TypeDeclaration = ast.ClassDef | ast.TypeAlias
-type Statement = ast.stmt | list[ast.FunctionDef] | list[TypeDeclaration]
+type TypeDefinition = ast.ClassDef | ast.TypeAlias
+type Statement = ast.stmt | list[ast.FunctionDef] | list[TypeDefinition]
 
 
 def is_import(s: ast.stmt) -> bool:
@@ -46,7 +46,7 @@ def extend_def_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> li
     return [region] + statements(rest)
 
 
-def extend_type_region(region: list[TypeDeclaration], rest: list[ast.stmt]) -> list[Statement]:
+def extend_type_region(region: list[TypeDefinition], rest: list[ast.stmt]) -> list[Statement]:
     if len(rest) == 0:
         return [region]
     head = rest[0]

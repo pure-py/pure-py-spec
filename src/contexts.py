@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from aux import TypeDeclaration, declares, type_param_names
+from aux import TypeDefinition, declares, type_param_names
 from type_syntax import (
     RANGE,
     CallableType,
@@ -59,7 +59,7 @@ class TypeVar:
 class TypeAlias:
     gamma: "Context"
     q: Name
-    chis: tuple[TypeDeclaration, ...]
+    chis: tuple[TypeDefinition, ...]
     i: int
 
 
@@ -295,14 +295,14 @@ def disjoint_union[V](gamma: Mapping[Var, V], gamma_: Mapping[Var, V]) -> Mappin
     return {**gamma, **gamma_}
 
 
-def type_entry(gamma: Context, q: Name, chis: tuple[TypeDeclaration, ...], i: int) -> ContextEntry:
+def type_entry(gamma: Context, q: Name, chis: tuple[TypeDefinition, ...], i: int) -> ContextEntry:
     chi = chis[i]
     if isinstance(chi, ast.ClassDef):
         return Class(qualified(q, chi.name))
     return TypeAlias(gamma, q, chis, i)
 
 
-def type_context(gamma: Context, q: Name, chis: tuple[TypeDeclaration, ...], i: int) -> Context:
+def type_context(gamma: Context, q: Name, chis: tuple[TypeDefinition, ...], i: int) -> Context:
     chi = chis[i]
     earlier = range(i if isinstance(chi, ast.ClassDef) else len(chis))
     deltas = [{x: type_entry(gamma, q, chis, j) for x, _ in declares(chis[j])} for j in earlier]

@@ -7,7 +7,7 @@ from typing import cast
 import reasons
 from aux import (
     Statement,
-    TypeDeclaration,
+    TypeDefinition,
     assign_targets,
     assigns_body,
     binds_quals,
@@ -136,7 +136,7 @@ def check_top_statement(t: Statement, mod_ctx: ModuleContext) -> tuple[StaticOut
     return check_statement(t, mod_ctx, None), mod_ctx.Sigma
 
 
-def types(chis: list[TypeDeclaration], mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
+def types(chis: list[TypeDefinition], mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
     chis_ = tuple(chis)
     gamma, q = mod_ctx.gamma, mod_ctx.q
     deltas = [
@@ -148,14 +148,14 @@ def types(chis: list[TypeDeclaration], mod_ctx: ModuleContext) -> tuple[StaticOu
         mod_ctx.Sigma,
     )
     for i, chi in enumerate(chis_):
-        declaration(
+        definition(
             chi,
             ModuleContext(gamma=type_context(gamma, q, chis_, i), M=mod_ctx.M, q=q, Sigma=Sigma),
         )
     return Assigns({x: theta for delta in deltas for x, theta in delta.items()}), Sigma
 
 
-def declaration(chi: TypeDeclaration, mod_ctx: ModuleContext) -> None:
+def definition(chi: TypeDefinition, mod_ctx: ModuleContext) -> None:
     if isinstance(chi, ast.ClassDef):
         dataclass(chi, mod_ctx)
     else:

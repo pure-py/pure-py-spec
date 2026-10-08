@@ -3,7 +3,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 import reasons
-from aux import TypeDeclaration, own_fields, type_expr, type_param_names
+from aux import TypeDefinition, own_fields, type_expr, type_param_names
 from contexts import (
     BUILTINS,
     Context,
@@ -51,7 +51,7 @@ from type_syntax import (
 class ClassDef:
     gamma: Context
     q: Name
-    chis: tuple[TypeDeclaration, ...]
+    chis: tuple[TypeDefinition, ...]
     i: int
 
 
@@ -62,7 +62,7 @@ def short_name(c: Class) -> Var:
     return c.name.parts[-1]
 
 
-def class_table(gamma: Context, q: Name, chis: tuple[TypeDeclaration, ...], i: int) -> ClassTable:
+def class_table(gamma: Context, q: Name, chis: tuple[TypeDefinition, ...], i: int) -> ClassTable:
     match chis[i]:
         case ast.ClassDef(name=c):
             return {Class(qualified(q, c)): ClassDef(gamma, q, chis, i)}
