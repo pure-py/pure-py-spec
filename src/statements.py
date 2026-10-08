@@ -148,14 +148,14 @@ def types(chis: list[TypeDefinition], mod_ctx: ModuleContext) -> tuple[StaticOut
         mod_ctx.Sigma,
     )
     for i, chi in enumerate(chis_):
-        definition(
+        check_type_definition(
             chi,
             ModuleContext(gamma=type_context(gamma, q, chis_, i), M=mod_ctx.M, q=q, Sigma=Sigma),
         )
     return Assigns({x: theta for delta in deltas for x, theta in delta.items()}), Sigma
 
 
-def definition(chi: TypeDefinition, mod_ctx: ModuleContext) -> None:
+def check_type_definition(chi: TypeDefinition, mod_ctx: ModuleContext) -> None:
     if isinstance(chi, ast.ClassDef):
         dataclass(chi, mod_ctx)
     else:
