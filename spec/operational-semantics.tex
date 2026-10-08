@@ -13,7 +13,7 @@ $\assigns{\rho}$ represents $s$ running to its end, with accumulated environment
 $\returns{v}$ represents $s$ returning the value $v$; and the outcome $\aborts{\kappa}$ represents the whole run
 aborting, with termination kind $\kappa$.
 
-\begin{specdefinition}{\added{Composition of outcomes}}
+\begin{specdefinition}{Composition of outcomes}
 Composing statements sequentially composes their outcomes according to the following partial monoid, analogous
 to sequential composition of static outcomes:
 \begin{defalign}
@@ -90,8 +90,8 @@ $\rho, p, v \matches m$\speconly{ (\figref{eval-pat})}. A \emph{match result} $m
 the variables of the pattern to the values that they matched, or $\noMatch$, a failure to match. \speconly{When a
 pattern and a value are not comparable, such as a list pattern against a tuple, there is no derivation and the
 run has no result.} 
-\begin{specdefinition}{\added{Composition of match results}}
-\replaced{The match results of sub-patterns compose with}{Sub-results compose with}
+\begin{specdefinition}{Composition of match results}
+The match results of sub-patterns compose with
 $\override$, matching sequentially:
 \begin{defalign}
 \matchOk{\rho} \override \matchOk{\rho'} & {}= \matchOk{(\rho \disjunion \rho')} \\

@@ -57,7 +57,7 @@ If $\Sigma \vdash \sigma \subty \tau$ and $\Sigma \vdash \tau \subty \tau'$ then
 because distinct types such as $\tyUnion{\sigma}{\tau}$ and $\tyUnion{\tau}{\sigma}$ are
 equivalent.
 
-\begin{specdefinition}{\added{Comparability, join and meet}}
+\begin{specdefinition}{Comparability, join and meet}
 Two types are \emph{comparable}
 when either is a subtype of the other. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. Two comparable types \emph{meet} to the smaller type; a
@@ -191,7 +191,7 @@ each iteration.
 
 Each operator is overloaded as specified in \figref{operator-overloads}.
 
-\begin{specdefinition}{\added{Resolved overload}}
+\begin{specdefinition}{Resolved overload}
 A \emph{resolved overload}
 $((\tau_1, \tau_2), \tau)$ pairs operand \emph{bounds}
 with a result type; the judgements of the figure relate operand
@@ -202,7 +202,7 @@ The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the 
 of the most specific overload at the operand types, $\resolveOp{\Sigma}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:resolve-op}}), so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
-\begin{specdefinition}{\added{Equality type}}
+\begin{specdefinition}{Equality type}
 The values of an \emph{equality type} are compared by structural equality, which is defined except at the dynamically excluded comparisons (\secref{no-coercions}):
 \begin{defalign}
 & \Sigma \vdash \nu \eqType \\
@@ -234,7 +234,7 @@ $\resolveOp{\Sigma}(\ominus, \sigma)$.
 \subsection{Statements}
 \label{sec:well-formedness-statements}
 
-\begin{specdefinition}{\added{Static outcome}}
+\begin{specdefinition}{Static outcome}
 A well-typed statement has a \emph{static outcome} $R$: either $\Returns$, when the statement \emph{definitely
 returns}, or $\Assigns{\Delta}$ for a context $\Delta$ with an entry for any variable declared or assigned by the
 statement (Definition~\ref{def:context}), recording whether the variable is definitely assigned, definitely
@@ -320,40 +320,38 @@ does not exempt the body from returning, nor permit a bare \pyinline{return}, fo
 
 \speconly{\subsubsection{Top-level statements}\label{sec:well-formedness-top-level}}%
 Top-level statements are checked by a separate
-judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, \replaced{a mutual type region of class
-definitions and}{a mutual type region of class
-declarations and} \pyinline{type} statements is a top-level form, checked by the \ruleName{types} rule, and a plain statement is checked with no return type
+judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, a mutual type region of class
+definitions and \pyinline{type} statements is a top-level form, checked by the \ruleName{types} rule, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level.
 
 Within a mutual type region, a \pyinline{type} statement may name any class or alias of the type region, in any
-order, \replaced{but a class definition may name}{but a class declaration may name} only earlier classes and aliases, because Python~\pythonVersion{} evaluates the
+order, but a class definition may name only earlier classes and aliases, because Python~\pythonVersion{} evaluates the
 field annotations and base class of a class when the class statement runs, but evaluates the body of a \pyinline{type}
 statement only when the alias is first used.\footnote{\PurePy does
 not support \pyinline{from __future__ import annotations}, under which Python~\pythonVersion{} defers evaluation
 of annotations.} Recursive datatypes are therefore declared with their aliases before their classes, as in
-\pyinline{type Expr = Num | Add} \replaced{followed by definitions of}{followed by declarations of} \pyinline{Num} and of \pyinline{Add} with fields of type
+\pyinline{type Expr = Num | Add} followed by definitions of \pyinline{Num} and of \pyinline{Add} with fields of type
 \pyinline{Expr}. A cyclic alias such as \pyinline{type T = list[T]} has no derivation, because resolving its body
 resolves the alias again.
 
 The \ruleName{types} rule (\figref{typing-top-level}) binds the names of a mutual type region $\seq{\chi}$ and adds
-its classes to the class table \replaced{before checking its definitions.}{before checking its declarations.} The context entry bound to the name declared by \replaced{$\chi_i$}{the $i$-th definition} is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-entry}}): the class
-\replaced{$\Type{q.c}$ if $\chi_i$ is a class definition, and the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ if it is a \pyinline{type} statement}{$\Type{q.c}$ for a class declaration, and for a \pyinline{type} statement the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$}.
+its classes to the class table before checking its definitions. The context entry bound to the name declared by $\chi_i$ is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-entry}}): the class
+$\Type{q.c}$ if $\chi_i$ is a class definition, and the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ if it is a \pyinline{type} statement.
 The class table is extended with $\classTable{\Gamma}(q, \seq{\chi})$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:class-table}}), a class table defining all the classes of the type region. \added{A class thus has three static forms, as a function has: the
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:class-table}}), a class table defining all the classes of the type region. A class thus has three static forms, as a function has: the
 class statement $\chi_i$, which defines it; the context entry $\Type{q.c}$, by which a variable refers to it by name; and
 $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$ in the class table, the class statement together with its type region and defining
 context, from which its fields and base class are read. For a function the three are the \pyinline{def} statement, the
-type scheme bound to its name and the closure $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$.} \replaced{Aliases and class table entries carry the type region and
-defining context}{Aliases and class definitions carry the type region and
-declaring context} $\Gamma$, because alias bodies, field annotations and base classes are resolved at each use rather than when the
+type scheme bound to its name and the closure $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$. Aliases and class table entries carry the type region and
+defining context $\Gamma$, because alias bodies, field annotations and base classes are resolved at each use rather than when the
 type region is checked.
-\replaced{Each definition $\chi_i$ is checked under}{Each declaration is checked under} the extended class table and the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$
+Each definition $\chi_i$ is checked under the extended class table and the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}), by the auxiliary judgement $\Sigma; \Gamma \vdash \chi$, which binds
-every name of the type region for a \pyinline{type} statement and only the \replaced{earlier names for a class definition, as above.}{earlier names for a class declaration, as above.}
+every name of the type region for a \pyinline{type} statement and only the earlier names for a class definition, as above.
 
-\replaced{The judgement $\Sigma; \Gamma \vdash \chi$ checks a class definition by}{The declaration judgement $\Sigma; \Gamma \vdash \chi$ checks a class declaration by} resolving the field annotations, which may mention the type parameters of the class, and requiring the fields it declares to be distinct and, when it extends
+The judgement $\Sigma; \Gamma \vdash \chi$ checks a class definition by resolving the field annotations, which may mention the type parameters of the class, and requiring the fields it declares to be distinct and, when it extends
 another class, the base class to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
-(\ruleName{class}, \ruleName{class-extend}). \replaced{Class definitions also require}{Class declarations also require} the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
+(\ruleName{class}, \ruleName{class-extend}). Class definitions also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
 scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement $\exTypeAlias{x[\seq{\alpha}]}{\psi}$, such as \pyinline{type Pair[T] = tuple[T, T]},
 declares $x$ as an alias of the type denoted by $\psi$ with the type parameters $\seq{\alpha}$ in scope
 (\ruleName{type-alias}). An application of the alias such as \pyinline{Pair[int]} denotes that type at the given
@@ -421,17 +419,15 @@ to be examined to finitely many instantiation candidates: one instantiation cand
 that $C$ has an instantiation comparable with $\tau$ but no instance, so that a constructor pattern at $\tau$ is
 ill-formed. At \tyObject{} and at \tyNever{} every instantiation of $C$ is comparable with $\tau$, so $C$ has an
 instance only if it has no type parameters. At any other type $C$ has no instantiation comparable with $\tau$, and no instance.
-\begin{specdefinition}{\added{Instantiation candidate}}
-\added{Suppose $D \in \ancestors{\Sigma}(C)$. An \emph{instantiation candidate} for $C$ at $D[\seq{\sigma}]$ is an instantiation $C[\seq{\tau}]$ in
+\begin{specdefinition}{Instantiation candidate}
+Suppose $D \in \ancestors{\Sigma}(C)$. An \emph{instantiation candidate} for $C$ at $D[\seq{\sigma}]$ is an instantiation $C[\seq{\tau}]$ in
 which each $\tau_i$ is the join of a subset of $\subterms(\seq{\sigma}) \cup \set{\tyObject}$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}).}
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}).
 \end{specdefinition}
 
 \begin{lemma}[Sufficiency of instantiation candidates]
 \label{lem:instantiation-candidates}
-Suppose $D \in \ancestors{\Sigma}(C)$. \deleted{An \emph{instantiation candidate} for $C$ at $D[\seq{\sigma}]$ is an instantiation $C[\seq{\tau}]$ in
-which each $\tau_i$ is the join of a subset of $\subterms(\seq{\sigma}) \cup \set{\tyObject}$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}).} If any instantiation of $C$ is below
+Suppose $D \in \ancestors{\Sigma}(C)$. If any instantiation of $C$ is below
 $D[\seq{\sigma}]$, then some instantiation candidate is below $D[\seq{\sigma}]$; and if two instantiations of $C$ that are not equivalent
 are below $D[\seq{\sigma}]$, then two instantiation candidates below $D[\seq{\sigma}]$ are not equivalent.
 \end{lemma}
