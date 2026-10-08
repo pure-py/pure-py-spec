@@ -80,7 +80,8 @@ def class_definition(Sigma: ClassTable, c: ClassName) -> ast.ClassDef:
 
 
 def definition_context(Sigma: ClassTable, c: ClassName) -> ModuleContext:
-    """Module context for resolving annotations of class c; empty module map, because resolve_type doesn't check modules"""
+    """Module context for resolving annotations of class c; empty module map, because type
+    resolution doesn't check modules"""
     match Sigma[c]:
         case ClassDef(gamma, q, chis, i):
             return ModuleContext(gamma=type_context(gamma, q, chis, i), M={}, q=q, Sigma=Sigma)

@@ -17,6 +17,9 @@ Language-specific skills (agda-implementor, spec-implementor) add to these and d
 - A definition named after a construct of the specification or paper it implements needs no
   docstring; the specification defines it. Describe only helpers with no counterpart there.
 - Plain terms in identifiers and comments; no coined vocabulary.
+- Don't name code identifiers in a comment or docstring, because a rename leaves the comment stale
+  without any error; describe the operation in plain words ("type resolution", not "resolve_type").
+  Parameters of the documented definition are exempt.
 
 ## Identifiers
 
