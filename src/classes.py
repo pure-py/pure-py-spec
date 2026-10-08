@@ -116,10 +116,17 @@ def fields(Sigma: ClassTable, c: Class) -> FieldScheme:
     return FieldScheme(type_params(Sigma, c), inherited + own)
 
 
-_resolving: list[tuple[Name, Var]] = []
+type Resolving = frozenset[tuple[Name, Var]]
 
 
-def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
+def resolve_type(
+    psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext, resolving: Resolving = frozenset()
+) -> Type:
+    """resolving: aliases whose bodies are being resolved, to reject a cyclic alias"""
+
+    def resolve(psi_: TypeExpr) -> Type:
+        return resolve_type(psi_, node, mod_ctx, resolving)
+
     match psi:
         case Primitive():
             check_in_scope(psi.value, node, mod_ctx)
@@ -128,63 +135,67 @@ def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
             check_in_scope(TypeConstructor.LITERAL.value, node, mod_ctx)
             return psi
         case TypeName(q, args):
-            theta = resolve_name(q, mod_ctx)
-            if isinstance(theta, Unbound):
-                raise IllFormedModule(node, reasons.UnboundName(str(q)))
-            if isinstance(theta, TypeVar) and len(args) == 0:
-                return TypeVariable(str(q))
-            if isinstance(theta, TypeAlias):
-                chi = theta.chis[theta.i]
-                assert isinstance(chi, ast.TypeAlias) and isinstance(chi.name, ast.Name)
-                alphas = type_param_names(chi)
-                sigmas = tuple(resolve_type(psi_, node, mod_ctx) for psi_ in args)
-                if len(sigmas) != len(alphas):
-                    raise IllFormedModule(
-                        node, reasons.TypeAliasArityMismatch(q, len(alphas), len(sigmas))
-                    )
-                mod_ctx_ = ModuleContext(
-                    gamma=type_context(theta.gamma, theta.q, theta.chis, theta.i),
-                    M=mod_ctx.M,
-                    q=theta.q,
-                    Sigma=mod_ctx.Sigma,
-                )
-                key = (theta.q, chi.name.id)
-                if key in _resolving:
-                    raise IllFormedModule(node, reasons.CyclicTypeAlias(chi.name.id))
-                _resolving.append(key)
-                try:
-                    tau = resolve_type(type_expr(chi.value), node, mod_ctx_)
-                finally:
-                    _resolving.pop()
-                return substitute(sigmas, alphas, tau)
-            if not isinstance(theta, Class):
-                raise IllFormedModule(node, reasons.NotClass(q))
-            taus = tuple(resolve_type(psi_, node, mod_ctx) for psi_ in args)
-            expected = len(type_params(mod_ctx.Sigma, theta))
-            if len(taus) != expected:
-                raise IllFormedModule(node, reasons.ClassArityMismatch(q, expected, len(taus)))
-            return ClassType(theta, taus)
+            match resolve_name(q, mod_ctx):
+                case Unbound():
+                    raise IllFormedModule(node, reasons.UnboundName(str(q)))
+                case TypeVar() if len(args) == 0:
+                    return TypeVariable(str(q))
+                case TypeAlias() as theta:
+                    return ty_alias(theta, q, tuple(map(resolve, args)), node, mod_ctx, resolving)
+                case Class() as c:
+                    return ty_class(c, q, tuple(map(resolve, args)), node, mod_ctx)
+                case _:
+                    raise IllFormedModule(node, reasons.NotClass(q))
         case ListExpr(psi_):
             check_in_scope(TypeConstructor.LIST.value, node, mod_ctx)
-            return ListType(resolve_type(psi_, node, mod_ctx))
+            return ListType(resolve(psi_))
         case DictExpr(psi_):
             check_in_scope(TypeConstructor.DICT.value, node, mod_ctx)
             check_in_scope(Primitive.STR.value, node, mod_ctx)
-            return DictType(resolve_type(psi_, node, mod_ctx))
+            return DictType(resolve(psi_))
         case TupleExpr(psis):
             check_in_scope(TypeConstructor.TUPLE.value, node, mod_ctx)
-            return TupleType(tuple(resolve_type(c, node, mod_ctx) for c in psis))
+            return TupleType(tuple(map(resolve, psis)))
         case CallableExpr(psis, psi_):
             check_in_scope(TypeConstructor.CALLABLE.value, node, mod_ctx)
-            return CallableType(
-                tuple(resolve_type(p, node, mod_ctx) for p in psis),
-                resolve_type(psi_, node, mod_ctx),
-            )
+            return CallableType(tuple(map(resolve, psis)), resolve(psi_))
         case UnionExpr():
-            return UnionType(
-                resolve_type(psi.left, node, mod_ctx),
-                resolve_type(psi.right, node, mod_ctx),
-            )
+            return UnionType(resolve(psi.left), resolve(psi.right))
+
+
+def ty_alias(
+    theta: TypeAlias,
+    q: Name,
+    sigmas: tuple[Type, ...],
+    node: ast.AST,
+    mod_ctx: ModuleContext,
+    resolving: Resolving,
+) -> Type:
+    chi = theta.chis[theta.i]
+    assert isinstance(chi, ast.TypeAlias) and isinstance(chi.name, ast.Name)
+    alphas = type_param_names(chi)
+    if len(sigmas) != len(alphas):
+        raise IllFormedModule(node, reasons.TypeAliasArityMismatch(q, len(alphas), len(sigmas)))
+    alias = (theta.q, chi.name.id)
+    if alias in resolving:
+        raise IllFormedModule(node, reasons.CyclicTypeAlias(chi.name.id))
+    mod_ctx_ = ModuleContext(
+        gamma=type_context(theta.gamma, theta.q, theta.chis, theta.i),
+        M=mod_ctx.M,
+        q=theta.q,
+        Sigma=mod_ctx.Sigma,
+    )
+    tau = resolve_type(type_expr(chi.value), node, mod_ctx_, resolving | {alias})
+    return substitute(sigmas, alphas, tau)
+
+
+def ty_class(
+    c: Class, q: Name, taus: tuple[Type, ...], node: ast.AST, mod_ctx: ModuleContext
+) -> Type:
+    expected = len(type_params(mod_ctx.Sigma, c))
+    if len(taus) != expected:
+        raise IllFormedModule(node, reasons.ClassArityMismatch(q, expected, len(taus)))
+    return ClassType(c, taus)
 
 
 def check_in_scope(x: Var, node: ast.AST, mod_ctx: ModuleContext) -> None:
