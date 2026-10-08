@@ -70,28 +70,28 @@ def class_table(gamma: Context, q: Name, chis: tuple[TypeDeclaration, ...], i: i
             return {}
 
 
-def class_declaration(Sigma: ClassTable, c: Class) -> ast.ClassDef:
-    """Declaration of c, from its definition"""
-    definition = Sigma[c]
-    chi = definition.chis[definition.i]
+def class_definition(Sigma: ClassTable, c: Class) -> ast.ClassDef:
+    """Class definition of c, from its class table entry"""
+    entry = Sigma[c]
+    chi = entry.chis[entry.i]
     assert isinstance(chi, ast.ClassDef)
     return chi
 
 
 def definition_context(Sigma: ClassTable, c: Class) -> ModuleContext:
-    """Module context for resolving annotations of class c, under type-context of definition of c
-    and class table Sigma. Module map empty, because resolving a type never imports a module."""
-    definition = Sigma[c]
-    gamma = type_context(definition.gamma, definition.q, definition.chis, definition.i)
-    return ModuleContext(gamma=gamma, M={}, q=definition.q, Sigma=Sigma)
+    """Module context for resolving annotations of class c, under type-context of its class table
+    entry and class table Sigma. Module map empty, because resolving a type never imports a module."""
+    entry = Sigma[c]
+    gamma = type_context(entry.gamma, entry.q, entry.chis, entry.i)
+    return ModuleContext(gamma=gamma, M={}, q=entry.q, Sigma=Sigma)
 
 
 def type_params(Sigma: ClassTable, c: Class) -> tuple[Var, ...]:
-    return type_param_names(class_declaration(Sigma, c))
+    return type_param_names(class_definition(Sigma, c))
 
 
 def base(Sigma: ClassTable, c: Class) -> ClassType | None:
-    chi = class_declaration(Sigma, c)
+    chi = class_definition(Sigma, c)
     if len(chi.bases) == 0:
         return None
     tau = resolve_type(type_expr(chi.bases[0]), chi, definition_context(Sigma, c))
@@ -105,7 +105,7 @@ def ancestors(Sigma: ClassTable, c: Class) -> list[Class]:
 
 
 def fields(Sigma: ClassTable, c: Class) -> FieldScheme:
-    chi = class_declaration(Sigma, c)
+    chi = class_definition(Sigma, c)
     own = tuple(
         (x, resolve_type(psi, chi, definition_context(Sigma, c))) for x, psi in own_fields(chi)
     )

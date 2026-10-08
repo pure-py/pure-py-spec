@@ -51,7 +51,7 @@ module stub & $\modStub{q}$ & module $q$, named but not checked \\
 checked module & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$, bound by an import \\
 class entry & $\Type{C}$ & name denotes class $C$ \\
 type parameter & $\TypeVar$ & name is a type parameter in scope \\
-type alias & $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ & name denotes alias declared by $i$-th declaration of mutual type region $\seq{\chi}$ of module $q$, resolved under $\Gamma$ \\
+type alias & $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ & name denotes alias declared by $i$-th definition of mutual type region $\seq{\chi}$ of module $q$, resolved under $\Gamma$ \\
 type scheme & $\scheme{\seq{\alpha}}{\tau}$ or $\PU{\scheme{\seq{\alpha}}{\tau}}$ & type of function bound by \pyinline{def}, generalised over one or more type parameters $\seq{\alpha}$; $\PU{\scheme{\seq{\alpha}}{\tau}}$ if possibly unassigned \\
 predefined name & $\predefName$ & name usable only in annotation or as decorator \\
 \end{tabular}
@@ -81,17 +81,17 @@ class. A class is also the type of its instances.
 
 \begin{definition}[Class table]
 \label{def:class-table}
-A class table $\Sigma$ is a finite map from classes to class definitions, with $\Sigma(C)$ of the form
-$\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$: the $i$-th declaration of mutual type region $\seq{\chi}$ of module $q$
+A class table $\Sigma$ is a finite map from classes to class table entries, with $\Sigma(C)$ of the form
+$\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$: the $i$-th definition of mutual type region $\seq{\chi}$ of module $q$
 (\figref{syntax-stmt}), which declares $C$, together with the context $\Gamma$ in which the type region appears. The
-type parameters, fields and base class of $C$ are read from its definition by auxiliary functions
+type parameters, fields and base class of $C$ are read from its class table entry by auxiliary functions
 $\typeParams{\Sigma}$, $\fields{\Sigma}$ and $\base{\Sigma}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{sec:auxiliary-classes}}), the latter two resolving
-the field annotations and base class of the declaration under the context given by $\typeContext{\Gamma}(q, \seq{\chi}, i)$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}). Every class named in a definition in $\Sigma$ is in $\dom(\Sigma)$, and the
+the field annotations and base class of the definition under the context given by $\typeContext{\Gamma}(q, \seq{\chi}, i)$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}). Every class named in a class table entry of $\Sigma$ is in $\dom(\Sigma)$, and the
 relation taking each class of $\Sigma$ to its base class is acyclic.
 \end{definition}
 
-\noindent The class table is similar to Featherweight Java's~\cite{igarashi2001}; the well-formedness rules build the table as they check the class declarations of a program (\figref{typing-top-level}).
+\noindent The class table is similar to Featherweight Java's~\cite{igarashi2001}; the well-formedness rules build the table from the class definitions of a program as they check them (\figref{typing-top-level}).
 
 \subsubsection{Context operations}
 \label{sec:context-operations}
@@ -115,15 +115,15 @@ otherwise right-biased like override. It is used in processing an import prefix,
 
 Statements are sequenced by
 juxtaposition, $s\;s'$; a function body, branch of a conditional and body of a case are statements.
-A \emph{type declaration} $\chi$ is a class declaration or \pyinline{type} statement.
+A \emph{type definition} $\chi$ is a class definition or \pyinline{type} statement.
 A \emph{top-level statement} $t$ is a statement or mutual type region, also sequenced by juxtaposition; the body of a
-module after its imports is a top-level statement, so type declarations occur only at the top level of a
-module. A \pyinline{type} statement declares a \emph{type alias}. Function definitions, class declarations and
+module after its imports is a top-level statement, so type definitions occur only at the top level of a
+module. A \pyinline{type} statement declares a \emph{type alias}. Function definitions, class definitions and
 \pyinline{type} statements bind \emph{type parameters} $\seq{\alpha}$, written in brackets after the name as in
 Python 3.12. A \emph{mutual def region} $d_1 \ldots d_{n+1}$ is a maximal contiguous block of \pyinline{def} statements: any other statement separates mutual
 def regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single mutual def region. A \emph{mutual type region} $\chi_1 \ldots \chi_{n+1}$ is a
-maximal contiguous block of type declarations, grouped by the parser in the same way. The well-formedness rules treat each
+maximal contiguous block of type definitions, grouped by the parser in the same way. The well-formedness rules treat each
 mutual def region and each mutual type region as one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
 
 \input{spec/fig/syntax-stmt}
@@ -186,7 +186,7 @@ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context 
 (\figref{predefined-values}). A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
 the predefined signatures. The class table $\SigmaPredef$ of the predefined modules has the single entry
-$\SigmaPredef(\clsRange) = \ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}$, where $\chi$ is the declaration
+$\SigmaPredef(\clsRange) = \ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}$, where $\chi$ is the definition
 \pyinline{@dataclass class range: stop: int} and $\Gamma$ is the signature of \pyinline{builtins}.
 \end{definition}
 

@@ -2,9 +2,9 @@
 \auxgroup{Syntactic analyses}
 \auxrow{$\assignsS(t)$}{set of variables}{variables declared or assigned in $t$, not descending into nested functions}{aux:assigns}
 \auxrow{$\declaresS(t)$, $\declaresS(\seq{\iota})$}{sequence of variables}{names declared in $t$, or bound by imports $\seq{\iota}$, in order and with repeats, not descending into nested functions}{aux:declares}
-\auxrow{$\typeEntry{\Gamma}(q, \seq{\chi}, i)$, $\typeEntry{\Gamma}(q, \seq{\chi})$}{context entry, or sequence of context entries}{context entry associated with $i$-th declaration of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$, or by each declaration}{aux:type-entry}
-\auxrow{$\typeContext{\Gamma}(q, \seq{\chi}, i)$}{context}{context resolving type expressions of $i$-th declaration of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$}{aux:type-context}
-\auxrow{$\classTable{\Gamma}(q, \seq{\chi}, i)$, $\classTable{\Gamma}(q, \seq{\chi})$}{class table}{class definitions contributed by $i$-th declaration, or by all declarations, of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$}{aux:class-table}
+\auxrow{$\typeEntry{\Gamma}(q, \seq{\chi}, i)$, $\typeEntry{\Gamma}(q, \seq{\chi})$}{context entry, or sequence of context entries}{context entry associated with $i$-th definition of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$, or with each definition}{aux:type-entry}
+\auxrow{$\typeContext{\Gamma}(q, \seq{\chi}, i)$}{context}{context resolving type expressions of $i$-th definition of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$}{aux:type-context}
+\auxrow{$\classTable{\Gamma}(q, \seq{\chi}, i)$, $\classTable{\Gamma}(q, \seq{\chi})$}{class table}{class table entries contributed by $i$-th definition, or by all definitions, of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$}{aux:class-table}
 \auxrow{$\scopeS(Y, s)$}{context}{each variable declared or assigned in $s$ unbound; defined iff names declared in $s$, names in $Y$ and pattern variables of $s$ pairwise distinct}{aux:scope}
 \auxrow{$\binds(p)$, $\binds(\seq{g})$, $\binds(s)$}{set of variables}{variables bound by pattern $p$, by generators of qualifiers $\seq{g}$, or by patterns within statement $s$}{aux:binds}
 \auxrow{$\captures(e)$}{set of variables}{variables of enclosing scope captured by lambdas in $e$}{aux:captures-e}

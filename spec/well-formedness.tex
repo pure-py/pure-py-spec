@@ -309,37 +309,37 @@ does not exempt the body from returning, nor permit a bare \pyinline{return}, fo
 \speconly{\subsubsection{Top-level statements}\label{sec:well-formedness-top-level}}%
 Top-level statements are checked by a separate
 judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, a mutual type region of class
-declarations and \pyinline{type} statements is a top-level form, checked by the \ruleName{types} rule, and a plain statement is checked with no return type
+definitions and \pyinline{type} statements is a top-level form, checked by the \ruleName{types} rule, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level.
 
 Within a mutual type region, a \pyinline{type} statement may name any class or alias of the type region, in any
-order, but a class declaration may name only earlier classes and aliases, because Python~\pythonVersion{} evaluates the
+order, but a class definition may name only earlier classes and aliases, because Python~\pythonVersion{} evaluates the
 field annotations and base class of a class when the class statement runs, but evaluates the body of a \pyinline{type}
 statement only when the alias is first used.\footnote{\PurePy does
 not support \pyinline{from __future__ import annotations}, under which Python~\pythonVersion{} defers evaluation
 of annotations.} Recursive datatypes are therefore declared with their aliases before their classes, as in
-\pyinline{type Expr = Num | Add} followed by declarations of \pyinline{Num} and of \pyinline{Add} with fields of type
+\pyinline{type Expr = Num | Add} followed by definitions of \pyinline{Num} and of \pyinline{Add} with fields of type
 \pyinline{Expr}. A cyclic alias such as \pyinline{type T = list[T]} has no derivation, because resolving its body
 resolves the alias again.
 
 The \ruleName{types} rule (\figref{typing-top-level}) binds the names of a mutual type region $\seq{\chi}$ and adds
-its classes to the class table before checking its declarations. The context entry bound to the $i$-th name is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-entry}}): the class
-$\Type{q.c}$ for a class declaration, and for a \pyinline{type} statement the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$.
+its classes to the class table before checking its definitions. The context entry bound to the $i$-th name is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-entry}}): the class
+$\Type{q.c}$ for a class definition, and for a \pyinline{type} statement the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$.
 The class table is extended with $\classTable{\Gamma}(q, \seq{\chi})$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:class-table}}), a class table defining all the classes of the type region. A class thus has three static forms, as a function has: the
-class statement $\chi_i$, which declares it; the context entry $\Type{q.c}$, by which a variable refers to it by name; and
-$\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$ in the class table, the class statement together with its type region and declaring
+class statement $\chi_i$, which defines it; the context entry $\Type{q.c}$, by which a variable refers to it by name; and
+$\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$ in the class table, the class statement together with its type region and defining
 context, from which its fields and base class are read. For a function the three are the \pyinline{def} statement, the
-type scheme bound to its name and the closure $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$. Aliases and class definitions carry the type region and
-declaring context $\Gamma$, because alias bodies, field annotations and base classes are resolved at each use rather than when the
+type scheme bound to its name and the closure $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$. Aliases and class table entries carry the type region and
+defining context $\Gamma$, because alias bodies, field annotations and base classes are resolved at each use rather than when the
 type region is checked.
-Each declaration is checked under the extended class table and the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$
+Each definition is checked under the extended class table and the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}), by the auxiliary judgement $\Sigma; \Gamma \vdash \chi$, which binds
-every name of the type region for a \pyinline{type} statement and only the earlier names for a class declaration, as above.
+every name of the type region for a \pyinline{type} statement and only the earlier names for a class definition, as above.
 
-The declaration judgement $\Sigma; \Gamma \vdash \chi$ checks a class declaration by resolving the field annotations, which may mention the type parameters of the class, and requiring the fields it declares to be distinct and, when it extends
+The judgement $\Sigma; \Gamma \vdash \chi$ checks a class definition by resolving the field annotations, which may mention the type parameters of the class, and requiring the fields it declares to be distinct and, when it extends
 another class, the base class to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
-(\ruleName{class}, \ruleName{class-extend}). Class declarations also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
+(\ruleName{class}, \ruleName{class-extend}). Class definitions also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
 scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement $\exTypeAlias{x[\seq{\alpha}]}{\psi}$, such as \pyinline{type Pair[T] = tuple[T, T]},
 declares $x$ as an alias of the type denoted by $\psi$ with the type parameters $\seq{\alpha}$ in scope
 (\ruleName{type-alias}). An application of the alias such as \pyinline{Pair[int]} denotes that type at the given
