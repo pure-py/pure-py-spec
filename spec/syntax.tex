@@ -74,14 +74,16 @@ It is useful to represent contexts as total functions on the set of all variable
 
 \begin{definition}[Class]
 \label{def:class}
-A class $C$ is a fully-qualified name $q.c$: a module $q$ and a class name $c$ declared in $q$. A module
+\replaced{A class name $C$ is a fully-qualified name $q.c$: a module $q$ and the unqualified name $c$ under which the
+class is defined in $q$. A module defines each unqualified name at most once, so a class name identifies a
+class, and we write ``class $C$'' for the class named $C$. A class is also the type of its instances.}{A class $C$ is a fully-qualified name $q.c$: a module $q$ and a class name $c$ declared in $q$. A module
 declares each class name at most once, so the fully-qualified name of a class is the identity of the
-class. A class is also the type of its instances.
+class. A class is also the type of its instances.}
 \end{definition}
 
 \begin{definition}[Class table]
 \label{def:class-table}
-A class table $\Sigma$ is a finite map from \replaced{classes to class table entries, with}{classes to class definitions, with} $\Sigma(C)$ of the form
+A class table $\Sigma$ is a finite map from \replaced{class names to class table entries, with}{classes to class definitions, with} $\Sigma(C)$ of the form
 $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$: the $i$-th definition of mutual type region $\seq{\chi}$ of module $q$
 (\figref{syntax-stmt}), which declares $C$, together with the context $\Gamma$ in which the type region appears. The
 type parameters, fields and base class of $C$ are \replaced{read from its class table entry by}{read from its definition by} auxiliary functions
