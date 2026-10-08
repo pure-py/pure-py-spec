@@ -6,7 +6,7 @@ from classes import ClassTable, ancestors, base, type_params
 from type_syntax import (
     RANGE,
     CallableType,
-    Class,
+    ClassName,
     ClassType,
     DictType,
     ListType,
@@ -121,12 +121,12 @@ class Undetermined:
     pass
 
 
-def instance(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
+def instance(Sigma: ClassTable, c: ClassName, tau: Type) -> ClassType | Undetermined | None:
     above = instance_above(Sigma, c, tau)
     return above if above is not None else instance_below(Sigma, c, tau)
 
 
-def instance_above(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
+def instance_above(Sigma: ClassTable, c: ClassName, tau: Type) -> ClassType | Undetermined | None:
     match tau:
         case ClassType(d, _) if c in ancestors(Sigma, d):
             return instantiated_ancestor(Sigma, tau, c)
@@ -136,7 +136,7 @@ def instance_above(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undete
             return None
 
 
-def instance_below(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
+def instance_below(Sigma: ClassTable, c: ClassName, tau: Type) -> ClassType | Undetermined | None:
     assert not isinstance(tau, UnionType)  # instances are taken at the disjuncts of a union
     alphas = type_params(Sigma, c)
     match tau:
@@ -156,7 +156,7 @@ def instance_below(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undete
             return None
 
 
-def instantiated_ancestor(Sigma: ClassTable, tau: ClassType, d: Class) -> ClassType:
+def instantiated_ancestor(Sigma: ClassTable, tau: ClassType, d: ClassName) -> ClassType:
     """Instantiation of ancestor d of tau's class reached along the base classes."""
     while tau.c != d:
         base_ = base(Sigma, tau.c)

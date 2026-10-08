@@ -7,7 +7,7 @@ from aux import TypeDefinition, declares, type_param_names
 from type_syntax import (
     RANGE,
     CallableType,
-    Class,
+    ClassName,
     ListType,
     Name,
     Primitive,
@@ -68,7 +68,7 @@ type ContextEntry = (
     VarEntry
     | ModuleStub
     | ModuleChecked
-    | Class
+    | ClassName
     | PredefinedName
     | TypeVar
     | TypeAlias
@@ -97,7 +97,7 @@ class ModuleChecked:
 NON_VARIABLE_ENTRIES = (
     ModuleStub,
     ModuleChecked,
-    Class,
+    ClassName,
     PredefinedName,
     TypeVar,
     TypeAlias,
@@ -298,7 +298,7 @@ def disjoint_union[V](gamma: Mapping[Var, V], gamma_: Mapping[Var, V]) -> Mappin
 def type_entry(gamma: Context, q: Name, chis: tuple[TypeDefinition, ...], i: int) -> ContextEntry:
     chi = chis[i]
     if isinstance(chi, ast.ClassDef):
-        return Class(qualified(q, chi.name))
+        return ClassName(qualified(q, chi.name))
     return TypeAlias(gamma, q, chis, i)
 
 
@@ -322,6 +322,6 @@ def entry_of(e: ast.expr, mod_ctx: ModuleContext) -> ContextEntry | None:
     return None if q is None else resolve_name(q, mod_ctx)
 
 
-def class_of_name(e: ast.expr, mod_ctx: ModuleContext) -> Class | None:
+def class_of_name(e: ast.expr, mod_ctx: ModuleContext) -> ClassName | None:
     theta = entry_of(e, mod_ctx)
-    return theta if isinstance(theta, Class) else None
+    return theta if isinstance(theta, ClassName) else None

@@ -46,7 +46,7 @@ from subtyping import Undetermined, disjuncts, instance, join, join_seq, meet, s
 from syntax import PatList, PatTuple
 from type_syntax import (
     RANGE,
-    Class,
+    ClassName,
     ClassType,
     DictType,
     ListType,
@@ -246,7 +246,7 @@ def split_dict(
             return None
 
 
-def split_class(Sigma: ClassTable, k: Rest, c: Class, p: ast.MatchClass) -> Split | None:
+def split_class(Sigma: ClassTable, k: Rest, c: ClassName, p: ast.MatchClass) -> Split | None:
     if below_excluded(Sigma, c, k.hs):
         return None
     sigma = pattern_instance(Sigma, c, k.ty)
@@ -262,7 +262,7 @@ def split_class(Sigma: ClassTable, k: Rest, c: Class, p: ast.MatchClass) -> Spli
     )
 
 
-def split_subclass(Sigma: ClassTable, k: Constr, c: Class, p: ast.MatchClass) -> Split | None:
+def split_subclass(Sigma: ClassTable, k: Constr, c: ClassName, p: ast.MatchClass) -> Split | None:
     sigma = pattern_instance(Sigma, c, k.ty)
     if sigma is None or c == k.ty.c or not subtype(Sigma, sigma, k.ty):
         return None
@@ -276,13 +276,13 @@ def split_subclass(Sigma: ClassTable, k: Constr, c: Class, p: ast.MatchClass) ->
     )
 
 
-def pattern_instance(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | None:
+def pattern_instance(Sigma: ClassTable, c: ClassName, tau: Type) -> ClassType | None:
     sigma = instance(Sigma, c, tau)
     assert not isinstance(sigma, Undetermined)  # pattern checks against the scrutinee type
     return sigma
 
 
-def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
+def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> ClassName:
     c = class_of_name(p.cls, mod_ctx)
     if c is None:
         raise IllFormedModule(p, reasons.NotClass(name_of(p.cls)))
@@ -291,7 +291,7 @@ def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
     return c
 
 
-def pattern_seq(Sigma: ClassTable, c: Class, p: ast.MatchClass) -> tuple[ast.pattern, ...]:
+def pattern_seq(Sigma: ClassTable, c: ClassName, p: ast.MatchClass) -> tuple[ast.pattern, ...]:
     args = field_map(Sigma, c, p.patterns, p.kwd_attrs, p.kwd_patterns)
     if args is None:
         name = short_name(c)

@@ -21,7 +21,7 @@ from type_syntax import (
     RANGE,
     CallableExpr,
     CallableType,
-    Class,
+    ClassName,
     ClassType,
     DictExpr,
     DictType,
@@ -55,30 +55,30 @@ class ClassDef:
     i: int
 
 
-type ClassTable = Mapping[Class, ClassDef]
+type ClassTable = Mapping[ClassName, ClassDef]
 
 
-def short_name(c: Class) -> Var:
+def short_name(c: ClassName) -> Var:
     return c.name.parts[-1]
 
 
 def class_table(gamma: Context, q: Name, chis: tuple[TypeDefinition, ...], i: int) -> ClassTable:
     match chis[i]:
         case ast.ClassDef(name=c):
-            return {Class(qualified(q, c)): ClassDef(gamma, q, chis, i)}
+            return {ClassName(qualified(q, c)): ClassDef(gamma, q, chis, i)}
         case _:
             return {}
 
 
-def class_definition(Sigma: ClassTable, c: Class) -> ast.ClassDef:
-    """Class definition of c, from its class table entry"""
+def class_definition(Sigma: ClassTable, c: ClassName) -> ast.ClassDef:
+    """ClassName definition of c, from its class table entry"""
     entry = Sigma[c]
     chi = entry.chis[entry.i]
     assert isinstance(chi, ast.ClassDef)
     return chi
 
 
-def definition_context(Sigma: ClassTable, c: Class) -> ModuleContext:
+def definition_context(Sigma: ClassTable, c: ClassName) -> ModuleContext:
     """Module context for resolving annotations of class c, under type-context of its class table
     entry and class table Sigma. Module map empty, because resolving a type never imports a module."""
     entry = Sigma[c]
@@ -86,11 +86,11 @@ def definition_context(Sigma: ClassTable, c: Class) -> ModuleContext:
     return ModuleContext(gamma=gamma, M={}, q=entry.q, Sigma=Sigma)
 
 
-def type_params(Sigma: ClassTable, c: Class) -> tuple[Var, ...]:
+def type_params(Sigma: ClassTable, c: ClassName) -> tuple[Var, ...]:
     return type_param_names(class_definition(Sigma, c))
 
 
-def base(Sigma: ClassTable, c: Class) -> ClassType | None:
+def base(Sigma: ClassTable, c: ClassName) -> ClassType | None:
     chi = class_definition(Sigma, c)
     if len(chi.bases) == 0:
         return None
@@ -99,12 +99,12 @@ def base(Sigma: ClassTable, c: Class) -> ClassType | None:
     return tau
 
 
-def ancestors(Sigma: ClassTable, c: Class) -> list[Class]:
+def ancestors(Sigma: ClassTable, c: ClassName) -> list[ClassName]:
     base_ = base(Sigma, c)
     return [c] if base_ is None else [c] + ancestors(Sigma, base_.c)
 
 
-def fields(Sigma: ClassTable, c: Class) -> FieldScheme:
+def fields(Sigma: ClassTable, c: ClassName) -> FieldScheme:
     chi = class_definition(Sigma, c)
     own = tuple(
         (x, resolve_type(psi, chi, definition_context(Sigma, c))) for x, psi in own_fields(chi)
@@ -142,7 +142,7 @@ def resolve_type(
                     return TypeVariable(str(q))
                 case TypeAlias() as theta:
                     return ty_alias(theta, q, tuple(map(resolve, args)), node, mod_ctx, resolving)
-                case Class() as c:
+                case ClassName() as c:
                     return ty_class(c, q, tuple(map(resolve, args)), node, mod_ctx)
                 case _:
                     raise IllFormedModule(node, reasons.NotClass(q))
@@ -190,7 +190,7 @@ def ty_alias(
 
 
 def ty_class(
-    c: Class, q: Name, taus: tuple[Type, ...], node: ast.AST, mod_ctx: ModuleContext
+    c: ClassName, q: Name, taus: tuple[Type, ...], node: ast.AST, mod_ctx: ModuleContext
 ) -> Type:
     expected = len(type_params(mod_ctx.Sigma, c))
     if len(taus) != expected:
@@ -203,7 +203,7 @@ def check_in_scope(x: Var, node: ast.AST, mod_ctx: ModuleContext) -> None:
         raise IllFormedModule(node, reasons.NotPredefinedName(x))
 
 
-def field_names(Sigma: ClassTable, c: Class) -> tuple[Var, ...]:
+def field_names(Sigma: ClassTable, c: ClassName) -> tuple[Var, ...]:
     return tuple(x for x, _ in fields(Sigma, c).fields)
 
 
@@ -219,7 +219,7 @@ def declared_type(Sigma: ClassTable, tau: ClassType, x: Var) -> Type:
 
 def field_map[T](
     Sigma: ClassTable,
-    c: Class,
+    c: ClassName,
     positional: Sequence[T],
     kwd_names: Sequence[str],
     kwd_values: Sequence[T],
@@ -252,7 +252,9 @@ class UnknownKeywordArgs:
 type FieldMapFailure = ArityMismatch | RepeatedKeywordArg | UnknownKeywordArgs
 
 
-def no_field_map(Sigma: ClassTable, c: Class, n: int, kwd_names: Sequence[str]) -> FieldMapFailure:
+def no_field_map(
+    Sigma: ClassTable, c: ClassName, n: int, kwd_names: Sequence[str]
+) -> FieldMapFailure:
     """Why field-map is undefined for n positional arguments and the keywords kwd_names."""
     xs = field_names(Sigma, c)
     if n + len(kwd_names) != len(xs):

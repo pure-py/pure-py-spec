@@ -81,7 +81,7 @@ from syntax import render_pattern
 from type_syntax import (
     RANGE,
     CallableType,
-    Class,
+    ClassName,
     ClassType,
     DictType,
     ListType,
@@ -269,7 +269,7 @@ def check_stmt(
                 case Unbound():
                     raise IllFormedModule(s, reasons.AssignmentBeforeDeclaration(x))
                 case (
-                    Class()
+                    ClassName()
                     | ModuleStub()
                     | ModuleChecked()
                     | PredefinedName()
@@ -383,7 +383,7 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
                     raise IllFormedModule(e, reasons.ModuleAsValue(Name((x,))))
                 theta = mod_ctx.gamma.get(x)
                 match theta:
-                    case Class():
+                    case ClassName():
                         raise IllFormedModule(e, reasons.ClassAsValue(Name((x,))))
                     case PredefinedName():
                         raise IllFormedModule(e, reasons.PredefinedNameAsValue(Name((x,))))
@@ -472,7 +472,7 @@ def attr_module(parent: ModuleChecked, x: Var, e: ast.Attribute) -> Type:
             raise IllFormedModule(e, reasons.SubmoduleNotImported(q))
         case ModuleChecked():
             raise IllFormedModule(e, reasons.ModuleAsValue(name_of(e)))
-        case Class():
+        case ClassName():
             raise IllFormedModule(e, reasons.ClassAsValue(name_of(e)))
         case PredefinedName():
             raise IllFormedModule(e, reasons.PredefinedNameAsValue(name_of(e)))
@@ -594,7 +594,7 @@ def dict_type(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> Dic
     return DictType(list_type(node, es, mod_ctx).elem)
 
 
-def constr(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> Type:
+def constr(c: ClassName, e: ast.Call, mod_ctx: ModuleContext) -> Type:
     args = constructor_args(c, e, mod_ctx)
     pi = fields(mod_ctx.Sigma, c)
     alphas = pi.type_params
@@ -619,7 +619,7 @@ def constr_explicit(e: ast.Call, mod_ctx: ModuleContext) -> Type:
     return tau
 
 
-def constructor_args(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> dict[Var, ast.expr]:
+def constructor_args(c: ClassName, e: ast.Call, mod_ctx: ModuleContext) -> dict[Var, ast.expr]:
     """Pair fields with arguments by field-map"""
     kwd_names = [k.arg for k in e.keywords if k.arg is not None]
     args = field_map(mod_ctx.Sigma, c, e.args, kwd_names, [k.value for k in e.keywords])

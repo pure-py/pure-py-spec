@@ -153,19 +153,19 @@ class TypeVariable:
 
 
 @dataclass(frozen=True)
-class Class:
+class ClassName:
     name: Name
 
     def __repr__(self) -> str:
-        return f"Class({self.name})"
+        return f"ClassName({self.name})"
 
 
-RANGE = Class(parse_name("builtins.range"))
+RANGE = ClassName(parse_name("builtins.range"))
 
 
 @dataclass(frozen=True)
 class ClassType:
-    c: Class
+    c: ClassName
     args: tuple[Type, ...]
 
 
