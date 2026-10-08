@@ -1,5 +1,4 @@
-\typeArgs{\Sigma}(\seq{\alpha}, \alpha, \tau) &{}= \set{\bind{\alpha}{\baseType(\tau)}} \\*
-&\qquad \rlap{$\text{if } \alpha \in \seq{\alpha}$} \\*
+\typeArgs{\Sigma}(\seq{\alpha}, \alpha_i, \tau) &{}= \set{\bind{\alpha_i}{\baseType(\tau)}} \\*
 \typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tyUnion{\tau}{\tau'}) &{}= \joinTy{\Sigma}{\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau)}{\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau')} \\*
 \typeArgs{\Sigma}(\seq{\alpha}, \tyList{\sigma}, \tyList{\tau}) &{}= \typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau) \\*
 \typeArgs{\Sigma}(\seq{\alpha}, \tyDict{\sigma}, \tyDict{\tau}) &{}= \typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau) \\*
