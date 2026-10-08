@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import ast
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -57,7 +59,7 @@ class TypeVar:
 
 @dataclass(frozen=True)
 class TypeAlias:
-    gamma: "Context"
+    gamma: Context
     q: Name
     chis: tuple[TypeDefinition, ...]
     i: int
@@ -107,10 +109,10 @@ NON_VARIABLE_ENTRIES = (
 
 @dataclass(frozen=True)
 class ModuleContext:
-    gamma: "Context"
+    gamma: Context
     M: Mapping[Name, ast.Module]
     q: Name
-    Sigma: "ClassTable"
+    Sigma: ClassTable
 
 
 def override_gamma(mod_ctx: ModuleContext, delta: Context) -> ModuleContext:
