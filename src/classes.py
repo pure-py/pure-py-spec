@@ -71,7 +71,7 @@ def class_table(gamma: Context, q: Name, chis: tuple[TypeDefinition, ...], i: in
 
 
 def class_definition(Sigma: ClassTable, c: ClassName) -> ast.ClassDef:
-    """ClassName definition of c, from its class table entry"""
+    """Class definition of c, from its class table entry"""
     entry = Sigma[c]
     chi = entry.chis[entry.i]
     assert isinstance(chi, ast.ClassDef)
