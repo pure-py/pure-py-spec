@@ -79,8 +79,8 @@ def class_declaration(Sigma: ClassTable, c: Class) -> ast.ClassDef:
 
 
 def definition_context(Sigma: ClassTable, c: Class) -> ModuleContext:
-    """Module context resolving type expressions of definition of c: type-context under Sigma.
-    Resolution never checks a module, so M is empty."""
+    """Context for resolving the annotations of c: type-context of its definition, with Sigma.
+    No module map: resolving a type never imports a module."""
     definition = Sigma[c]
     gamma = type_context(definition.gamma, definition.q, definition.chis, definition.i)
     return ModuleContext(gamma=gamma, M={}, q=definition.q, Sigma=Sigma)
