@@ -91,7 +91,7 @@ the variables of the pattern to the values that they matched, or $\noMatch$, a f
 pattern and a value are not comparable, such as a list pattern against a tuple, there is no derivation and the
 run has no result.} 
 \begin{specdefinition}{\added{Composition of match results}}
-\replaced{The match results of the components of a pattern compose with}{Sub-results compose with}
+\replaced{The match results of sub-patterns compose with}{Sub-results compose with}
 $\override$, matching sequentially:
 \begin{defalign}
 \matchOk{\rho} \override \matchOk{\rho'} & {}= \matchOk{(\rho \disjunion \rho')} \\
