@@ -61,7 +61,7 @@
   \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
   \fieldMap{\Sigma}(C, a) = \set{\bind{\seq{x}}{\seq{e}}} \\
   I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \tau_i} \\
-  \typeArgs{\Sigma}(\seq{\alpha}; (\sigma_i \mid i \in I), (\tau_i \mid i \in I))(\seq{\alpha}) = \seq{\tau}' \\
+  \replaced{\typeArgs{\Sigma}(\seq{\alpha}; (\sigma_i \mid i \in I), (\tau_i \mid i \in I))(\seq{\alpha}) = \seq{\tau}'}{\typeArgs{\Sigma}((\sigma_i \mid i \in I), (\tau_i \mid i \in I))(\seq{\alpha}) = \seq{\tau}'} \\
   \Sigma; \Gamma \vdash \seq{e} \checks \subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}
 }
 {
