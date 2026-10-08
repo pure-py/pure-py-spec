@@ -72,7 +72,7 @@ is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on 
 with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
 
-\begin{definition}[Class]
+\begin{definition}[\replaced{Class name}{Class}]
 \label{def:class}
 \replaced{A class name $C$ is a fully-qualified name $q.c$: a module $q$ and the unqualified name $c$ under which the
 class is defined in $q$. A module defines each unqualified name at most once, so a class name identifies a
