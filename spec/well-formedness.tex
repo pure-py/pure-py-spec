@@ -326,7 +326,11 @@ The \ruleName{types} rule (\figref{typing-top-level}) binds the names of a mutua
 its classes to the class table before checking its declarations. The context entry bound to the $i$-th name is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-entry}}): the class
 $\Type{q.c}$ for a class declaration, and for a \pyinline{type} statement the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$.
 The class table is extended with $\classTable{\Gamma}(q, \seq{\chi})$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:class-table}}), a class table defining all the classes of the type region. Aliases and class definitions carry the type region and
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:class-table}}), a class table defining all the classes of the type region. A class thus has three static forms, as a function has: the
+class statement $\chi_i$, which declares it; the context entry $\Type{q.c}$, by which a variable refers to it by name; and
+$\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$ in the class table, the class statement together with its type region and declaring
+context, from which its fields and base class are read. For a function the three are the \pyinline{def} statement, the
+type scheme bound to its name and the closure $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$. Aliases and class definitions carry the type region and
 declaring context $\Gamma$, because alias bodies, field annotations and base classes are resolved at each use rather than when the
 type region is checked.
 Each declaration is checked under the extended class table and the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$
