@@ -265,7 +265,7 @@ def no_field_map(
     return UnknownKeywordArgs(tuple(sorted(set(xs[n:]))))
 
 
-RANGE_DECLARATION = ast.parse("@dataclass\nclass range:\n    stop: int\n").body[0]
+RANGE_DECLARATION = ast.parse("@dataclass\nclass range:\n    start: int\n    stop: int\n").body[0]
 assert isinstance(RANGE_DECLARATION, ast.ClassDef)
 
 PREDEFINED_CLASSES: ClassTable = {

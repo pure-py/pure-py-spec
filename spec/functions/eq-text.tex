@@ -1,4 +1,4 @@
 Structural equality: literals by value, lists and tuples by their elements, dictionaries with the same
 keys by their values, and objects of the same class by their field values, each through $\eqElems{\Sigma}$, except ranges,
-which are compared by their sequences, so that \pyinline{range(-1) == range(-2)}. Any other pair of values is unequal, except that equality is undefined between two functions and between two \pyinline{nan} values in a container, which Python compares by identity, and between a Boolean and a number, which Python compares numerically. Compared directly, two \pyinline{nan} values are unequal in both languages (\S\ref{aux:binop}).
+which are compared by their sequences, so that \pyinline{range(0, -1) == range(0, -2)}. Any other pair of values is unequal, except that equality is undefined between two functions and between two \pyinline{nan} values in a container, which Python compares by identity, and between a Boolean and a number, which Python compares numerically. Compared directly, two \pyinline{nan} values are unequal in both languages (\S\ref{aux:binop}).
 Dictionaries are compared in the entry order of the left operand.
