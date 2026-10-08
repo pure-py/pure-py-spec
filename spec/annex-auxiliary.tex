@@ -65,7 +65,7 @@ cases are stated with each.
 \funcrows{captures}
 \end{auxfunction}
 
-\begin{auxfunction}{\fv(e), \fv(\seq{e})}{set of variables}{aux:fv}
+\begin{auxfunction}{\fv(e), \fv(\seq{e}), \fv(\tau)}{set of variables}{aux:fv}
 \input{spec/functions/fv-text}
 \end{auxfunction}
 
@@ -94,7 +94,7 @@ The functions on types and shapes introduced in \secref{types}, each defined by 
 \funcrows{subterms}
 \end{auxfunction}
 
-\begin{auxfunction}{\typeArgs{\Sigma}(\sigma, \tau), \typeArgs{\Sigma}(\seq{\sigma}, \seq{\tau})}{context binding type variables at types}{aux:type-args}
+\begin{auxfunction}{\typeArgs{\Sigma}(\seq{\alpha}; \sigma, \tau), \typeArgs{\Sigma}(\seq{\alpha}; \seq{\sigma}, \seq{\tau})}{context binding type variables at types}{aux:type-args}
 \input{spec/functions/type-args-text}
 \funcrows{type-args}
 \vspace{-\baselineskip}

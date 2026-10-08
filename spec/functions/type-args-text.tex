@@ -1,8 +1,9 @@
-Arguments for the type variables of $\sigma$, found by one-way unification of $\sigma$ with $\tau$ and given as a
-context binding type variables at types. A type variable takes the base type of
+Arguments for the type variables $\seq{\alpha}$ of $\sigma$, found by one-way unification of $\sigma$ with $\tau$ in
+which $\seq{\alpha}$ are the unknowns and any other type variable is a constant, given as a context binding type
+variables at types. A variable of $\seq{\alpha}$ takes the base type of
 $\tau$; a union $\tau$ contributes by each disjunct; lists, dictionaries, tuples and callables are taken componentwise;
 an instantiated class is taken through the instance of the class at $\tau$ (\figref{instance}); and a union $\sigma$
-contributes nothing when $\tau$ is below one of its disjuncts, as \pyinline{None} is below \pyinline{T | None}, and
+contributes nothing when $\tau$ is below one of its disjuncts without a variable of $\seq{\alpha}$, as \pyinline{None} is below \pyinline{T | None}, and
 otherwise contributes by each disjunct. In every other case, in particular for a type without type variables, the context
 is empty. Positions are covariant (tuple components and \pyinline{Callable} results), contravariant
 (\pyinline{Callable} parameters) or invariant (list, dictionary and class arguments), following the subtyping rules
