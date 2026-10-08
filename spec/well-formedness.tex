@@ -324,8 +324,8 @@ of annotations.} Recursive datatypes are therefore declared with their aliases b
 resolves the alias again.
 
 The \ruleName{types} rule (\figref{typing-top-level}) binds the names of a mutual type region $\seq{\chi}$ and adds
-its classes to the class table \replaced{before checking its definitions.}{before checking its declarations.} The context entry bound to the $i$-th name is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-entry}}): the class
-\replaced{$\Type{q.c}$ for a class definition,}{$\Type{q.c}$ for a class declaration,} and for a \pyinline{type} statement the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$.
+its classes to the class table \replaced{before checking its definitions.}{before checking its declarations.} The context entry bound to the name declared by \replaced{$\chi_i$}{the $i$-th definition} is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-entry}}): the class
+\replaced{$\Type{q.c}$ if $\chi_i$ is a class definition, and the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ if it is a \pyinline{type} statement}{$\Type{q.c}$ for a class declaration, and for a \pyinline{type} statement the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$}.
 The class table is extended with $\classTable{\Gamma}(q, \seq{\chi})$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:class-table}}), a class table defining all the classes of the type region. \added{A class thus has three static forms, as a function has: the
 class statement $\chi_i$, which defines it; the context entry $\Type{q.c}$, by which a variable refers to it by name; and
@@ -335,7 +335,7 @@ type scheme bound to its name and the closure $\exDefClosure[\Gamma]{\rho}{\seq{
 defining context}{Aliases and class definitions carry the type region and
 declaring context} $\Gamma$, because alias bodies, field annotations and base classes are resolved at each use rather than when the
 type region is checked.
-\replaced{Each definition is checked under}{Each declaration is checked under} the extended class table and the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$
+\replaced{Each definition $\chi_i$ is checked under}{Each declaration is checked under} the extended class table and the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}), by the auxiliary judgement $\Sigma; \Gamma \vdash \chi$, which binds
 every name of the type region for a \pyinline{type} statement and only the \replaced{earlier names for a class definition, as above.}{earlier names for a class declaration, as above.}
 
