@@ -14,7 +14,7 @@
 {
   \Gamma \vdash q : \scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}} \\
   I = \set{i \mid \Sigma; \Gamma \vdash e_i \synth \tau_i} \\
-  \replaced{\typeArgs{\Sigma}(\seq{\alpha}, (\sigma_i \mid i \in I), (\tau_i \mid i \in I))(\seq{\alpha}) = \seq{\tau}'}{\typeArgs{\Sigma}((\sigma_i \mid i \in I), (\tau_i \mid i \in I))(\seq{\alpha}) = \seq{\tau}'}
+  \typeArgs{\Sigma}(\seq{\alpha}, (\sigma_i \mid i \in I), (\tau_i \mid i \in I))(\seq{\alpha}) = \seq{\tau}'
 }
 {
   \Sigma; \Gamma \vdash q, \seq{e} \synth \subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}, \subst{\seq{\tau}'}{\seq{\alpha}}{\sigma}

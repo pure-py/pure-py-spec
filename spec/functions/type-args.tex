@@ -7,8 +7,9 @@
 \typeArgs{\Sigma}(\seq{\alpha}, C[\seq{\sigma}], \tau) &{}= \typeArgs{\Sigma}(\seq{\alpha}, \seq{\sigma}, \seq{\tau}') \\*
 &\qquad \rlap{$\text{if } \Sigma \vdash C[\seq{\tau}'] \instanceAt \tau$} \\*
 \typeArgs{\Sigma}(\seq{\alpha}, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \varnothing \\*
-&\qquad \rlap{$\text{if } \Sigma \vdash \tau \subty \sigma \text{ and } \fv(\sigma) \cap \set{\seq{\alpha}} = \varnothing \text{,}$} \\*
-&\qquad \rlap{$\text{or } \Sigma \vdash \tau \subty \sigma' \text{ and } \fv(\sigma') \cap \set{\seq{\alpha}} = \varnothing$} \\*
+&\qquad \rlap{$\text{if } \Sigma \vdash \tau \subty \sigma \text{ and } \fv(\sigma) \cap \set{\seq{\alpha}} = \varnothing$} \\*
+\typeArgs{\Sigma}(\seq{\alpha}, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \varnothing \\*
+&\qquad \rlap{$\text{if } \Sigma \vdash \tau \subty \sigma' \text{ and } \fv(\sigma') \cap \set{\seq{\alpha}} = \varnothing$} \\*
 \typeArgs{\Sigma}(\seq{\alpha}, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \joinTy{\Sigma}{\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau)}{\typeArgs{\Sigma}(\seq{\alpha}, \sigma', \tau)} \quad \text{(otherwise)} \\*
 \typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau) &{}= \varnothing \quad \text{(otherwise)} \\*[2mm]
 \typeArgs{\Sigma}(\seq{\alpha}, \varepsilon, \varepsilon) &{}= \varnothing \\*

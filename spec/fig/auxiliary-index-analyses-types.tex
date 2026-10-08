@@ -9,14 +9,14 @@
 \auxrow{$\binds(p)$, $\binds(\seq{g})$, $\binds(s)$}{set of variables}{variables bound by pattern $p$, by generators of qualifiers $\seq{g}$, or by patterns within statement $s$}{aux:binds}
 \auxrow{$\captures(e)$}{set of variables}{variables of enclosing scope captured by lambdas in $e$}{aux:captures-e}
 \auxrow{$\captures(\seq{g})$}{set of variables}{variables of enclosing scope captured by lambdas in qualifiers $\seq{g}$}{aux:captures}
-\specauxrow{$\fv(e)$, $\fv(\seq{e})$\added{, $\fv(\tau)$}}{set of variables}{free variables of expression $e$, or of each expression in $\seq{e}$\added{; type variables of type $\tau$}}{aux:fv}
+\specauxrow{$\fv(e)$, $\fv(\seq{e})$, $\fv(\tau)$}{set of variables}{free variables of expression $e$, or of each expression in $\seq{e}$; type variables of type $\tau$}{aux:fv}
 \noalign{\vskip 2mm}
 \auxgroup{Types}
 \auxrow{$\baseType(\ell)$, $\baseType(\tau)$}{type}{base type of literal $\ell$, or of type $\tau$}{aux:base-type}
 \auxrow{$\joinTy{\Sigma}{\sigma}{\tau}$, $\bigJoinTy{\Sigma}{\seq{\tau}}$}{type}{larger type if comparable, and union otherwise}{aux:join}
 \auxrow{$\meetTy{\Sigma}{\sigma}{\tau}$}{type}{greatest type below both}{aux:meet}
 \auxrow{$\subterms(\tau)$, $\subterms(\seq{\tau})$}{set of types}{subterms of $\tau$, or of each type in $\seq{\tau}$, other than unions}{aux:subterms}
-\auxrow{\replaced{$\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau)$, $\typeArgs{\Sigma}(\seq{\alpha}, \seq{\sigma}, \seq{\tau})$}{$\typeArgs{\Sigma}(\sigma, \tau)$, $\typeArgs{\Sigma}(\seq{\sigma}, \seq{\tau})$}}{context binding type variables at types}{type arguments from one-way unification of $\sigma$ with $\tau$, or of $\seq{\sigma}$ with $\seq{\tau}$}{aux:type-args}
+\auxrow{$\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau)$, $\typeArgs{\Sigma}(\seq{\alpha}, \seq{\sigma}, \seq{\tau})$}{context binding type variables at types}{type arguments from one-way unification of $\sigma$ with $\tau$, or of $\seq{\sigma}$ with $\seq{\tau}$}{aux:type-args}
 \auxrow{$\elemTy{\Sigma}(\tau)$}{type}{type of elements drawn from $\tau$ by generator}{aux:elem-type}
 \auxrow{$\shapes{\Sigma}(\tau, H)$, $\shapes{\Sigma}(\seq{\tau})$}{ordered set of shapes or of shape sequences}{shapes of $\tau$ once heads in $H$ are excluded; sequences of shapes of $\seq{\tau}$}{aux:shapes}
 \auxrow{$\shapeTy(k)$}{type}{least type of shape $k$}{aux:shape-type}

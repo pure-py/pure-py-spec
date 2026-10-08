@@ -65,7 +65,7 @@ cases are stated with each.
 \funccases{captures}
 \end{auxfunction}
 
-\begin{auxfunction}{\fv(e), \fv(\seq{e})\added{, \fv(\tau)}}{set of variables}{aux:fv}
+\begin{auxfunction}{\fv(e), \fv(\seq{e}), \fv(\tau)}{set of variables}{aux:fv}
 \input{spec/functions/fv-text}
 \end{auxfunction}
 
@@ -94,14 +94,9 @@ The functions on types and shapes introduced in \secref{types}, each defined by 
 \funccases{subterms}
 \end{auxfunction}
 
-\begin{auxfunction}{\replaced{\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau), \typeArgs{\Sigma}(\seq{\alpha}, \seq{\sigma}, \seq{\tau})}{\typeArgs{\Sigma}(\sigma, \tau), \typeArgs{\Sigma}(\seq{\sigma}, \seq{\tau})}}{context binding type variables at types}{aux:type-args}
+\begin{auxfunction}{\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau), \typeArgs{\Sigma}(\seq{\alpha}, \seq{\sigma}, \seq{\tau})}{context binding type variables at types}{aux:type-args}
 \input{spec/functions/type-args-text}
-\begin{DeletedBlock}
-\funccases{type-args-old}
-\end{DeletedBlock}
-\begin{AddedBlock}
 \funccases{type-args}
-\end{AddedBlock}
 \vspace{-\baselineskip}
 \funccases{join-map}
 \end{auxfunction}
