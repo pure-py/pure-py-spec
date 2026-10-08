@@ -161,6 +161,7 @@ which follow Python.
 \subsection{Modules and programs}
 \label{sec:modules-programs}
 
+\begin{specdefinition}{Program}
 A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
 (\figref{syntax-stmt}) to \emph{module bodies} $\mu$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
@@ -169,6 +170,7 @@ $\seq{\iota}$, its \emph{import prefix}, followed by a top-level statement $t$; 
 within a statement nor after it. The statement begins with the
 declaration $\exAssign{\pymath{\_\_name\_\_}\exAnnot{\tyStr}}{\nameOf(q)}$, which binds the name of the module when the module
 loads (\secref{well-formedness-modules}).
+\end{specdefinition}
 
 A second map $\mathcal{P}$ gives the
 predefined modules of \figref{predefined-values}, which have no body: $\mathcal{P}$ takes each such name to its
@@ -196,8 +198,12 @@ $\SigmaPredef(\clsRange) = \ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}$, \re
 
 \input{spec/fig/predefined-values}
 
+\begin{specdefinition}{Containing modules}
 Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' = q.q^\dagger$ for some $q^\dagger$, and $\properPrefixOf$ for
 the strict order; the proper prefixes of a module name are its \emph{containing modules}, and it is
-\emph{contained} in each of them.\speconly{ The metafunctions
+\emph{contained} in each of them.
+\end{specdefinition}
+
+\speconly{The metafunctions
 on modules and classes are defined in \secref{auxiliary-classes}.}
 \paperinput{paper/syntax/classes}

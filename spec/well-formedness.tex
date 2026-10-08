@@ -57,6 +57,7 @@ If $\Sigma \vdash \sigma \subty \tau$ and $\Sigma \vdash \tau \subty \tau'$ then
 because distinct types such as $\tyUnion{\sigma}{\tau}$ and $\tyUnion{\tau}{\sigma}$ are
 equivalent.
 
+\begin{specdefinition}{Comparability, join and meet}
 Two types are \emph{comparable}
 when either is a subtype of the other. Two comparable types
 \emph{join} to the larger type and two incomparable types to their union. Two comparable types \emph{meet} to the smaller type; a
@@ -65,6 +66,7 @@ parameters joined and results combined using meet, and is \pyinline{Never} other
 So joining a type with itself gives that type, joining a class with its base class gives the base class, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$. A sequence of types is joined by
 folding binary join over the sequence, with \pyinline{Never} as the unit (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:join}}).
+\end{specdefinition}
 
 \begin{lemma}[Types form a lattice]
 \label{lem:lattice}
@@ -187,13 +189,20 @@ each iteration.
 
 \input{spec/fig/operator-overloads}
 
-Each operator is overloaded as specified in \figref{operator-overloads}. A \emph{resolved overload}
+Each operator is overloaded as specified in \figref{operator-overloads}.
+
+\begin{specdefinition}{Resolved overload}
+A \emph{resolved overload}
 $((\tau_1, \tau_2), \tau)$ pairs operand \emph{bounds}
 with a result type; the judgements of the figure relate operand
-types to the resolved overloads of an operator. The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the result type
+types to the resolved overloads of an operator.
+\end{specdefinition}
+
+The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the result type
 of the most specific overload at the operand types, $\resolveOp{\Sigma}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:resolve-op}}), so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
+\begin{specdefinition}{Equality type}
 The values of an \emph{equality type} are compared by structural equality, which is defined except at the dynamically excluded comparisons (\secref{no-coercions}):
 \begin{defalign}
 & \Sigma \vdash \nu \eqType \\
@@ -204,6 +213,7 @@ The values of an \emph{equality type} are compared by structural equality, which
 & \Sigma \vdash \tyUnion{\sigma}{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \sigma \eqType \text{ and } \Sigma \vdash \tau \eqType \\
 & \Sigma \vdash C[\seq{\sigma}] \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \tyInst{\fields{\Sigma}(C)}{\seq{\sigma}}
 \end{defalign}
+\end{specdefinition}
 
 \noindent A callable type is not an equality type, and neither is any type with a callable component, so
 comparing two functions is rejected statically. The final rule of each table closes the
@@ -224,10 +234,12 @@ $\resolveOp{\Sigma}(\ominus, \sigma)$.
 \subsection{Statements}
 \label{sec:well-formedness-statements}
 
+\begin{specdefinition}{Static outcome}
 A well-typed statement has a \emph{static outcome} $R$: either $\Returns$, when the statement \emph{definitely
 returns}, or $\Assigns{\Delta}$ for a context $\Delta$ with an entry for any variable declared or assigned by the
 statement (Definition~\ref{def:context}), recording whether the variable is definitely assigned, definitely
 unassigned or possibly unassigned after the statement.
+\end{specdefinition}
 
 \input{spec/fig/typing-stmt}
 \input{spec/fig/typing-def}
@@ -409,11 +421,15 @@ to be examined to finitely many instantiation candidates: one instantiation cand
 that $C$ has an instantiation comparable with $\tau$ but no instance, so that a constructor pattern at $\tau$ is
 ill-formed. At \tyObject{} and at \tyNever{} every instantiation of $C$ is comparable with $\tau$, so $C$ has an
 instance only if it has no type parameters. At any other type $C$ has no instantiation comparable with $\tau$, and no instance.
-\begin{lemma}[Sufficiency of instantiation candidates]
-\label{lem:instantiation-candidates}
+\begin{specdefinition}{Instantiation candidate}
 Suppose $D \in \ancestors{\Sigma}(C)$. An \emph{instantiation candidate} for $C$ at $D[\seq{\sigma}]$ is an instantiation $C[\seq{\tau}]$ in
 which each $\tau_i$ is the join of a subset of $\subterms(\seq{\sigma}) \cup \set{\tyObject}$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}). If any instantiation of $C$ is below
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:subterms}}).
+\end{specdefinition}
+
+\begin{lemma}[Sufficiency of instantiation candidates]
+\label{lem:instantiation-candidates}
+Suppose $D \in \ancestors{\Sigma}(C)$. If any instantiation of $C$ is below
 $D[\seq{\sigma}]$, then some instantiation candidate is below $D[\seq{\sigma}]$; and if two instantiations of $C$ that are not equivalent
 are below $D[\seq{\sigma}]$, then two instantiation candidates below $D[\seq{\sigma}]$ are not equivalent.
 \end{lemma}
