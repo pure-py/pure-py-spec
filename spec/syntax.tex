@@ -161,7 +161,7 @@ which follow Python.
 \subsection{Modules and programs}
 \label{sec:modules-programs}
 
-\begin{specdefinition}{Program}
+\begin{specdefinition}{\added{Program}}
 A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
 (\figref{syntax-stmt}) to \emph{module bodies} $\mu$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
@@ -198,7 +198,7 @@ $\SigmaPredef(\clsRange) = \ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}$, \re
 
 \input{spec/fig/predefined-values}
 
-\begin{specdefinition}{Containing modules}
+\begin{specdefinition}{\added{Containing modules}}
 Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' = q.q^\dagger$ for some $q^\dagger$, and $\properPrefixOf$ for
 the strict order; the proper prefixes of a module name are its \emph{containing modules}, and it is
 \emph{contained} in each of them.
