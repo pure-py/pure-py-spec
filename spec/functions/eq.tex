@@ -1,24 +1,27 @@
-\eqOp(\ell, \ell) &{}= \pyinline{True} && \text{if } \ell \text{ is not } \pyinline{nan} \\*
-\eqOp(n, n') &{}= \pyinline{False} && \text{if } n \neq n' \\*
-\eqOp(w, w') &{}= \pyinline{False} && \text{if } w \neq w' \\*
-\eqOp(\pyinline{None}, v) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\*
-\eqOp(v, \pyinline{None}) &{}= \pyinline{False} && \text{if } v \neq \pyinline{None} \\*
-\eqOp(\pyinline{True}, \pyinline{False}) &{}= \pyinline{False} \\*
-\eqOp(\pyinline{False}, \pyinline{True}) &{}= \pyinline{False} \\*
+\eqOp{\Sigma}(n, n') &{}= \val{\pyinline{True}} && \text{if } n = n' \text{ and } n \text{ is not } \pyinline{nan} \\*
+\eqOp{\Sigma}(n, n') &{}= \val{\pyinline{False}} && \text{if } n \neq n' \\*
+\eqOp{\Sigma}(n, n) &{}= \undefinedResult && \text{if } n \text{ is } \pyinline{nan} \\*
+\eqOp{\Sigma}(w, w') &{}= \val{\pyinline{True}} && \text{if } w = w' \\*
+\eqOp{\Sigma}(w, w') &{}= \val{\pyinline{False}} && \text{if } w \neq w' \\*
+\eqOp{\Sigma}(\pyinline{True}, \pyinline{True}) &{}= \eqOp{\Sigma}(\pyinline{False}, \pyinline{False}) = \val{\pyinline{True}} \\*
+\eqOp{\Sigma}(\pyinline{True}, \pyinline{False}) &{}= \eqOp{\Sigma}(\pyinline{False}, \pyinline{True}) = \val{\pyinline{False}} \\*
+\eqOp{\Sigma}(\pyinline{None}, \pyinline{None}) &{}= \val{\pyinline{True}} \\*
+\eqOp{\Sigma}(\pyinline{True}, n) &{}= \eqOp{\Sigma}(\pyinline{False}, n) = \undefinedResult \\*
+\eqOp{\Sigma}(n, \pyinline{True}) &{}= \eqOp{\Sigma}(n, \pyinline{False}) = \undefinedResult \\*
 \\
-\eqOp(\exList{\seq{v}}, \exList{\seq{v}\,'}) &{}= \eqElems(\seq{v}, \seq{v}\,') \\*
-\eqOp(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \eqElems(\seq{v}, \seq{v}\,') \\*
+\eqOp{\Sigma}(\exList{\seq{v}}, \exList{\seq{v}\,'}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*
+\eqOp{\Sigma}(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*
 \\
-\eqOp(\delta, \delta') &{}= \eqElems(v_1 \cons \ldots \cons v_n, \delta'(w_1) \cons \ldots \cons \delta'(w_n)) \\*
-&\qquad \text{if } \dom(\delta) = \dom(\delta') \text{, where } \delta = \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n} \\*
-\eqOp(\delta, \delta') &{}= \pyinline{False} \\*
+\eqOp{\Sigma}(\delta, \delta') &{}= \eqElems{\Sigma}(v_1 \cons \ldots \cons v_n, \delta'(w_1) \cons \ldots \cons \delta'(w_n)) \\*
+&\qquad \text{if } \dom(\delta) = \dom(\delta') \text{ and } \delta = \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n} \\*
+\eqOp{\Sigma}(\delta, \delta') &{}= \val{\pyinline{False}} \\*
 &\qquad \text{if } \dom(\delta) \neq \dom(\delta') \\*
 \\
-\eqOp(v, v') &{}= \eqElems(\iterOp(v), \iterOp(v')) \\*
+\eqOp{\Sigma}(v, v') &{}= \eqElems{\Sigma}(\iterOp(v), \iterOp(v')) \\*
 &\qquad \text{if } v \text{ and } v' \text{ are values of } \clsRange \\*
-\eqOp(\exObj{C}{\rho}, \exObj{C}{\rho'}) &{}= \eqElems(\rho(x_1) \cons \ldots \cons \rho(x_n), \rho'(x_1) \cons \ldots \cons \rho'(x_n)) \\*
+\eqOp{\Sigma}(\exObj{C}{\rho}, \exObj{C}{\rho'}) &{}= \eqElems{\Sigma}(\rho(x_1) \cons \ldots \cons \rho(x_n), \rho'(x_1) \cons \ldots \cons \rho'(x_n)) \\*
 &\qquad \text{if } \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \text{ and } C \neq \clsRange \\*
-\eqOp(\exObj{C}{\rho}, \exObj{D}{\rho'}) &{}= \pyinline{False} && \text{if } C \neq D \\*
 \\
-\eqOp(v, v') &{}= \pyinline{False} \\*
-&\qquad \text{if } v \text{ and } v' \text{ are of different forms and are not a Boolean and a number}
+\eqOp{\Sigma}(v, v') &{}= \undefinedResult \\*
+&\qquad \text{if } v \text{ and } v' \text{ are closures or primitives} \\*
+\eqOp{\Sigma}(v, v') &{}= \val{\pyinline{False}} \quad \text{(otherwise)}

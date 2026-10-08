@@ -4,9 +4,10 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product
 
-from classes import Class, ClassTable, ancestors
+from classes import ClassTable, ancestors
 from subtyping import instance_below, subtype
 from type_syntax import (
+    ClassName,
     ClassType,
     DictType,
     ListType,
@@ -19,7 +20,7 @@ from type_syntax import (
 )
 
 # A head: a literal, a class, or a length n standing for the head list_n.
-type Head = Literal | Class | int
+type Head = Literal | ClassName | int
 # Sets of heads and of keys are frozen so that a shape is hashable.
 type Heads = frozenset[Head]
 type Keys = frozenset[str]
@@ -101,7 +102,7 @@ def shapes(Sigma: ClassTable, tau: Type, hs: Heads) -> Shapes:
 
 def head_typed(Sigma: ClassTable, h: Head, tau: Type) -> bool:
     match h:
-        case Class():
+        case ClassName():
             return instance_below(Sigma, h, tau) is not None
         case Literal():
             return subtype(Sigma, LiteralType(h), tau)
@@ -113,8 +114,8 @@ def typed_heads(Sigma: ClassTable, hs: Heads, tau: Type) -> Heads:
     return frozenset(h for h in hs if head_typed(Sigma, h, tau))
 
 
-def below_excluded(Sigma: ClassTable, c: Class, hs: Heads) -> bool:
-    return any(h in ancestors(Sigma, c) for h in hs if isinstance(h, Class))
+def below_excluded(Sigma: ClassTable, c: ClassName, hs: Heads) -> bool:
+    return any(h in ancestors(Sigma, c) for h in hs if isinstance(h, ClassName))
 
 
 def shapes_seq(Sigma: ClassTable, taus: Sequence[Type]) -> ShapeSeqs:

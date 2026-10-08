@@ -85,7 +85,7 @@ its generator variables in place on each iteration, so \PurePy forbids a lambda 
 capturing a generator variable, since the updates would otherwise be visible through the lambda (\secref{captured-variables}):
 
 \begin{python}
-[lambda x: x**i for i in [1, 2, 3]]  # error: lambda captures i
+[lambda x: x**i for i in [1, 2, 3]] # error: lambda captures i
 \end{python}
 
 \noindent Here each lambda computes \pyinline{x**3} in Python, since all three share the one binding of
@@ -174,7 +174,7 @@ import pkg.sub
 \begin{python}
 # __main__
 import pkg
-print(pkg.sub)  # 1
+print(pkg.sub) # 1
 \end{python}
 \end{minipage}
 
@@ -188,7 +188,7 @@ otherwise use:
 # __main__
 import helper
 import pkg
-print(pkg.sub)  # <module 'pkg.sub'>
+print(pkg.sub) # <module 'pkg.sub'>
 \end{python}
 \end{minipage}
 \end{center}
@@ -201,12 +201,12 @@ outright.
 \subsubsection{Modules and classes are not first-class}
 \label{sec:no-first-class}
 
-For now, modules and classes are not values in \PurePy. In Python a module is a value and a class declaration
+For now, modules and classes are not values in \PurePy. In Python a module is a value and a class definition
 is an assignment, so both flow through programs as data. Treating them as first-class would complicate the
 static account, so the present subset keeps them second-class rather than ruling the feature out; a later
 release may revisit it. A module name may be projected by member access but not used as a value, and a class
-name appears only at constructor and pattern positions, with class declarations confined to module level. Because a
-class is identified by its fully-qualified name, a dataclass declaration may not re-declare a name that already
+name appears only at constructor and pattern positions, with class definitions confined to module level. Because a
+class is identified by its fully-qualified name, a dataclass definition may not re-declare a name that already
 denotes a class in the module; Python permits the re-declaration, leaving the earlier class reachable only
 through its existing instances.
 

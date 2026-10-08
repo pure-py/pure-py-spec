@@ -59,7 +59,7 @@
   \rho, \exReturnNone \Rightarrow \returns{\pyinline{None}}
 }
 \and
-\inferrule*[lab={\ruleName{eval-def}}]
+\inferrule*[lab={\ruleName{eval-defs}}]
 {
   \declaresS(\seq{d}) = \seq{f} \\
   v_i = \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} \quad (\forall i)
@@ -242,28 +242,12 @@
   q, \rho, t\;t' \Rightarrow \aborts{\kappa}
 }
 \and
-\inferrule*[lab={\ruleName{eval-class}}]
+\inferrule*[lab={\ruleName{eval-types}}]
 {
-  \strut
+  \rho' = \set{\bind{\declaresS(\seq{\chi})}{\typeEntry{\Gamma}(q, \seq{\chi})}}
 }
 {
-  q, \rho, \exDataclass{c[\seq{\alpha}]}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{q.c}}}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-class-extend}}]
-{
-  \strut
-}
-{
-  q, \rho, \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}]}{\phi} \Rightarrow \assigns{\set{\bind{c}{\Type{q.c}}}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-type-alias}}]
-{
-  \Sigma; \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \vdash \psi \synth \tau
-}
-{
-  q, \rho, \exTypeAlias{x[\seq{\alpha}]}{\psi} \Rightarrow \assigns{\set{\bind{x}{\TypeAlias{\seq{\alpha}}{\tau}}}}
+  q, \rho, \seq{\chi} \Rightarrow \assigns{\rho'}
 }
 \end{mathpar}
 \caption{Top-level statement $t$ of module $q$ evaluates to outcome $o$ under environment $\rho : \Gamma$}

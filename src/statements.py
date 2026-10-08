@@ -1,10 +1,13 @@
 import ast
 from collections.abc import Sequence
 from dataclasses import replace
+from functools import reduce
+from typing import cast
 
 import reasons
 from aux import (
     Statement,
+    TypeDefinition,
     assign_targets,
     assigns_body,
     binds_quals,
@@ -19,21 +22,21 @@ from aux import (
     statements,
     target_name,
     type_expr,
+    type_param_names,
 )
 from classes import (
-    RANGE,
     ArityMismatch,
-    Class,
     ClassTable,
-    ClassTableEntry,
     RepeatedKeywordArg,
     UnknownKeywordArgs,
+    class_table,
     declared_type,
     field_map,
     field_names,
     field_type,
     fields,
     no_field_map,
+    resolve_type,
     short_name,
 )
 from contexts import (
@@ -41,8 +44,8 @@ from contexts import (
     PU,
     Assigns,
     Context,
+    ModuleChecked,
     ModuleContext,
-    ModuleLoaded,
     ModuleStub,
     PredefinedName,
     Returns,
@@ -61,6 +64,8 @@ from contexts import (
     override_gamma,
     override_outcomes,
     resolve_name,
+    type_context,
+    type_entry,
 )
 from match import check_pattern, match_shapes, remaining
 from operators import (
@@ -74,104 +79,35 @@ from shapes import Shapes, shapes
 from subtyping import equivalent, join_seq, subtype, type_args_seq
 from syntax import render_pattern
 from type_syntax import (
-    CallableExpr,
+    RANGE,
     CallableType,
+    ClassName,
     ClassType,
-    DictExpr,
     DictType,
-    ListExpr,
     ListType,
     LiteralType,
     Name,
     Primitive,
-    TupleExpr,
     TupleType,
     Type,
-    TypeConstructor,
-    TypeExpr,
     TypeName,
-    TypeVariable,
-    UnionExpr,
     UnionType,
     Var,
     base_type,
     literal_type,
     parse_annotation,
-    qualified,
     substitute,
 )
 
 
 def def_signature(d: ast.FunctionDef, mod_ctx: ModuleContext) -> CallableType | TypeScheme:
-    alphas = type_params(d)
+    alphas = type_param_names(d)
     mod_ctx_ = override_gamma(mod_ctx, {alpha: TypeVar() for alpha in alphas})
     tau = CallableType(
         tuple(resolve_type(type_expr(a.annotation), a, mod_ctx_) for a in d.args.args),
         resolve_type(type_expr(d.returns), d, mod_ctx_),
     )
     return tau if len(alphas) == 0 else TypeScheme(alphas, tau)
-
-
-def type_params(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlias) -> tuple[Var, ...]:
-    alphas = tuple(p.name for p in node.type_params if isinstance(p, ast.TypeVar))
-    assert len(alphas) == len(node.type_params)
-    return alphas
-
-
-def resolve_type(psi: TypeExpr, node: ast.AST, mod_ctx: ModuleContext) -> Type:
-    match psi:
-        case Primitive():
-            check_in_scope(psi.value, node, mod_ctx)
-            return psi
-        case LiteralType():
-            check_in_scope(TypeConstructor.LITERAL.value, node, mod_ctx)
-            return psi
-        case TypeName(q, args):
-            theta = resolve_name(q, mod_ctx)
-            if isinstance(theta, Unbound):
-                raise IllFormedModule(node, reasons.UnboundName(str(q)))
-            if isinstance(theta, TypeVar) and len(args) == 0:
-                return TypeVariable(str(q))
-            if isinstance(theta, TypeAlias):
-                sigmas = tuple(resolve_type(psi_, node, mod_ctx) for psi_ in args)
-                if len(sigmas) != len(theta.params):
-                    raise IllFormedModule(
-                        node, reasons.TypeAliasArityMismatch(q, len(theta.params), len(sigmas))
-                    )
-                return substitute(sigmas, theta.params, theta.tau)
-            if not isinstance(theta, Class):
-                raise IllFormedModule(node, reasons.NotClass(q))
-            taus = tuple(resolve_type(psi_, node, mod_ctx) for psi_ in args)
-            expected = len(mod_ctx.Sigma[theta].type_params)
-            if len(taus) != expected:
-                raise IllFormedModule(node, reasons.ClassArityMismatch(q, expected, len(taus)))
-            return ClassType(theta, taus)
-        case ListExpr(psi_):
-            check_in_scope(TypeConstructor.LIST.value, node, mod_ctx)
-            return ListType(resolve_type(psi_, node, mod_ctx))
-        case DictExpr(psi_):
-            check_in_scope(TypeConstructor.DICT.value, node, mod_ctx)
-            check_in_scope(Primitive.STR.value, node, mod_ctx)
-            return DictType(resolve_type(psi_, node, mod_ctx))
-        case TupleExpr(psis):
-            check_in_scope(TypeConstructor.TUPLE.value, node, mod_ctx)
-            return TupleType(tuple(resolve_type(c, node, mod_ctx) for c in psis))
-        case CallableExpr(psis, psi_):
-            check_in_scope(TypeConstructor.CALLABLE.value, node, mod_ctx)
-            return CallableType(
-                tuple(resolve_type(p, node, mod_ctx) for p in psis),
-                resolve_type(psi_, node, mod_ctx),
-            )
-        case UnionExpr():
-            return UnionType(
-                resolve_type(psi.left, node, mod_ctx),
-                resolve_type(psi.right, node, mod_ctx),
-            )
-
-
-def check_in_scope(x: Var, node: ast.AST, mod_ctx: ModuleContext) -> None:
-    if not isinstance(mod_ctx.gamma.get(x), PredefinedName):
-        raise IllFormedModule(node, reasons.NotPredefinedName(x))
 
 
 # tail: the body ends a function body, so a fall-through is a missing return
@@ -195,11 +131,35 @@ def check_top_seq(ts: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
 
 
 def check_top_statement(t: Statement, mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
-    if isinstance(t, ast.ClassDef):
-        return dataclass(t, mod_ctx)
-    if isinstance(t, ast.TypeAlias):
-        return type_alias(t, mod_ctx)
+    if isinstance(t, list) and isinstance(t[0], (ast.ClassDef, ast.TypeAlias)):
+        return types(t, mod_ctx)
     return check_statement(t, mod_ctx, None), mod_ctx.Sigma
+
+
+def types(chis: list[TypeDefinition], mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
+    chis_ = tuple(chis)
+    gamma, q = mod_ctx.gamma, mod_ctx.q
+    deltas = [
+        {x: type_entry(gamma, q, chis_, i) for x, _ in declares(chi)} for i, chi in enumerate(chis_)
+    ]
+    Sigma = reduce(
+        lambda Sigma, i: {**Sigma, **class_table(gamma, q, chis_, i)},
+        range(len(chis_)),
+        mod_ctx.Sigma,
+    )
+    for i, chi in enumerate(chis_):
+        check_type_definition(
+            chi,
+            ModuleContext(gamma=type_context(gamma, q, chis_, i), M=mod_ctx.M, q=q, Sigma=Sigma),
+        )
+    return Assigns({x: theta for delta in deltas for x, theta in delta.items()}), Sigma
+
+
+def check_type_definition(chi: TypeDefinition, mod_ctx: ModuleContext) -> None:
+    if isinstance(chi, ast.ClassDef):
+        dataclass(chi, mod_ctx)
+    else:
+        type_alias(chi, mod_ctx)
 
 
 def check_seq(
@@ -222,7 +182,7 @@ def check_statement(
     s: Statement, mod_ctx: ModuleContext, returns: Type | None, tail: bool = False
 ) -> StaticOutcome:
     if isinstance(s, list):
-        return check_defs(s, mod_ctx)
+        return check_defs(cast(list[ast.FunctionDef], s), mod_ctx)
     return check_stmt(s, mod_ctx, returns, tail)
 
 
@@ -309,9 +269,9 @@ def check_stmt(
                 case Unbound():
                     raise IllFormedModule(s, reasons.AssignmentBeforeDeclaration(x))
                 case (
-                    Class()
+                    ClassName()
                     | ModuleStub()
-                    | ModuleLoaded()
+                    | ModuleChecked()
                     | PredefinedName()
                     | TypeVar()
                     | TypeAlias()
@@ -423,7 +383,7 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
                     raise IllFormedModule(e, reasons.ModuleAsValue(Name((x,))))
                 theta = mod_ctx.gamma.get(x)
                 match theta:
-                    case Class():
+                    case ClassName():
                         raise IllFormedModule(e, reasons.ClassAsValue(Name((x,))))
                     case PredefinedName():
                         raise IllFormedModule(e, reasons.PredefinedNameAsValue(Name((x,))))
@@ -477,7 +437,7 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         case ast.Attribute(value=e_, attr=x):
             parent = entry_of(e_, mod_ctx)
             match parent:
-                case ModuleLoaded():
+                case ModuleChecked():
                     return attr_module(parent, x, e)
                 case ModuleStub(q):
                     raise IllFormedModule(e, reasons.SubmoduleNotImported(q))
@@ -503,16 +463,16 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
-def attr_module(parent: ModuleLoaded, x: Var, e: ast.Attribute) -> Type:
+def attr_module(parent: ModuleChecked, x: Var, e: ast.Attribute) -> Type:
     theta = parent.members.get(x)
     match theta:
         case None:
             raise IllFormedModule(e, reasons.UnknownMember(x, parent.q))
         case ModuleStub(q):
             raise IllFormedModule(e, reasons.SubmoduleNotImported(q))
-        case ModuleLoaded():
+        case ModuleChecked():
             raise IllFormedModule(e, reasons.ModuleAsValue(name_of(e)))
-        case Class():
+        case ClassName():
             raise IllFormedModule(e, reasons.ClassAsValue(name_of(e)))
         case PredefinedName():
             raise IllFormedModule(e, reasons.PredefinedNameAsValue(name_of(e)))
@@ -634,15 +594,18 @@ def dict_type(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> Dic
     return DictType(list_type(node, es, mod_ctx).elem)
 
 
-def constr(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> Type:
+def constr(c: ClassName, e: ast.Call, mod_ctx: ModuleContext) -> Type:
     args = constructor_args(c, e, mod_ctx)
     pi = fields(mod_ctx.Sigma, c)
+    alphas = pi.type_params
     sigmas = dict(pi.fields)
     synthesising = [
         (sigmas[x], synth_expr(arg, mod_ctx)) for x, arg in args.items() if synthesises(arg)
     ]
-    gamma = type_args_seq(mod_ctx.Sigma, [s for s, _ in synthesising], [t for _, t in synthesising])
-    tau = ClassType(c, tuple(type_arguments(gamma, pi.type_params, e)))
+    gamma = type_args_seq(
+        mod_ctx.Sigma, alphas, [s for s, _ in synthesising], [t for _, t in synthesising]
+    )
+    tau = ClassType(c, tuple(type_arguments(gamma, alphas, e)))
     for x, arg in args.items():
         check_expr(arg, declared_type(mod_ctx.Sigma, tau, x), mod_ctx)
     return tau
@@ -656,7 +619,7 @@ def constr_explicit(e: ast.Call, mod_ctx: ModuleContext) -> Type:
     return tau
 
 
-def constructor_args(c: Class, e: ast.Call, mod_ctx: ModuleContext) -> dict[Var, ast.expr]:
+def constructor_args(c: ClassName, e: ast.Call, mod_ctx: ModuleContext) -> dict[Var, ast.expr]:
     """Pair fields with arguments by field-map"""
     kwd_names = [k.arg for k in e.keywords if k.arg is not None]
     args = field_map(mod_ctx.Sigma, c, e.args, kwd_names, [k.value for k in e.keywords])
@@ -690,14 +653,17 @@ def callee(e: ast.Call, mod_ctx: ModuleContext) -> Type:
     pi = entry_of(e.func, mod_ctx)
     if not isinstance(pi, TypeScheme):
         return synth_expr(e.func, mod_ctx)
-    assert isinstance(pi.tau, CallableType)
+    alphas, tau = pi.params, pi.tau
+    assert isinstance(tau, CallableType)
     synthesising = [
         (sigma, synth_expr(arg, mod_ctx))
-        for sigma, arg in zip(pi.tau.params, e.args)
+        for sigma, arg in zip(tau.params, e.args)
         if synthesises(arg)
     ]
-    gamma = type_args_seq(mod_ctx.Sigma, [s for s, _ in synthesising], [t for _, t in synthesising])
-    return substitute(type_arguments(gamma, pi.params, e), pi.params, pi.tau)
+    gamma = type_args_seq(
+        mod_ctx.Sigma, alphas, [s for s, _ in synthesising], [t for _, t in synthesising]
+    )
+    return substitute(type_arguments(gamma, alphas, e), alphas, tau)
 
 
 def type_arguments(gamma: dict[Var, Type], alphas: Sequence[Var], node: ast.AST) -> list[Type]:
@@ -709,8 +675,9 @@ def type_arguments(gamma: dict[Var, Type], alphas: Sequence[Var], node: ast.AST)
 
 
 def var_scheme(pi: TypeScheme, e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
-    gamma = type_args_seq(mod_ctx.Sigma, [pi.tau], [expected])
-    actual = substitute(type_arguments(gamma, pi.params, e), pi.params, pi.tau)
+    alphas, tau = pi.params, pi.tau
+    gamma = type_args_seq(mod_ctx.Sigma, alphas, [tau], [expected])
+    actual = substitute(type_arguments(gamma, alphas, e), alphas, tau)
     if not subtype(mod_ctx.Sigma, actual, expected):
         raise IllFormedModule(e, reasons.TypeMismatch(expected, actual))
 
@@ -877,29 +844,20 @@ def iterated_type(e: ast.expr, mod_ctx: ModuleContext) -> Type:
     return elem
 
 
-def dataclass(node: ast.ClassDef, mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
+def dataclass(node: ast.ClassDef, mod_ctx: ModuleContext) -> None:
     if not isinstance(mod_ctx.gamma.get("dataclass"), PredefinedName):
         raise IllFormedModule(node, reasons.NotPredefinedName("dataclass"))
-    alphas = type_params(node)
-    mod_ctx_ = override_gamma(mod_ctx, {alpha: TypeVar() for alpha in alphas})
-    own = tuple((x, resolve_type(psi, node, mod_ctx_)) for x, psi in own_fields(node))
-    base = None if len(node.bases) == 0 else base_class(node, mod_ctx_)
+    own = tuple((x, resolve_type(psi, node, mod_ctx)) for x, psi in own_fields(node))
+    base = None if len(node.bases) == 0 else base_class(node, mod_ctx)
     inherited = () if base is None else field_names(mod_ctx.Sigma, base.c)
     names = inherited + tuple(x for x, _ in own)
     dup = next((x for i, x in enumerate(names) if x in names[:i]), None)
     if dup is not None:
         raise IllFormedModule(node, reasons.DuplicateField(dup, node.name))
-    c = Class(qualified(mod_ctx.q, node.name))
-    assert c not in mod_ctx.Sigma
-    return Assigns({node.name: c}), {**mod_ctx.Sigma, c: ClassTableEntry(alphas, own, base)}
 
 
-def type_alias(node: ast.TypeAlias, mod_ctx: ModuleContext) -> tuple[StaticOutcome, ClassTable]:
-    assert isinstance(node.name, ast.Name)
-    alphas = type_params(node)
-    mod_ctx_ = override_gamma(mod_ctx, {alpha: TypeVar() for alpha in alphas})
-    tau = resolve_type(type_expr(node.value), node, mod_ctx_)
-    return Assigns({node.name.id: TypeAlias(alphas, tau)}), mod_ctx.Sigma
+def type_alias(node: ast.TypeAlias, mod_ctx: ModuleContext) -> None:
+    resolve_type(type_expr(node.value), node, mod_ctx)
 
 
 def base_class(node: ast.ClassDef, mod_ctx: ModuleContext) -> ClassType:

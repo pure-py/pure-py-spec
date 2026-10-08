@@ -20,11 +20,12 @@ $\Sigma; \Gamma; \zeta \vdash s : R$ & statement $s$ has static outcome $R$, wit
 $\Sigma; \Gamma \vdash d \synth \tau$ & definition $d$ synthesises type $\tau$ & \figref{typing-def-synth} \\
 $\Sigma; \Gamma \vdash d \checks \tau$ & definition $d$ checks against type $\tau$ & \figref{typing-def-check} \\
 $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ & cases $\seq{b}$ have static outcome $S$, transforming remaining type $\tau$ and residual $L$ to $\tau'$ and $L'$ & \figref{typing-cases} \\
-$\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ & top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$ & \figref{typing-top-level} \\
+$\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ & top-level statement $t$ of module $q$ has static outcome $R$, extending $\Sigma$ to $\Sigma'$ & \figref{typing-top-level-stmt} \\
+$\Sigma; \Gamma \vdash \chi$ & type definition $\chi$ is well-formed & \figref{typing-top-level-decl} \\
 $\Sigma \vdash \Gamma, x \importsR \theta \binding \Sigma'$ & name $x$ imported from module signature $\Gamma$ has context entry $\theta$ & \figref{typing-imports} \\
 $\Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma'$ & imports $\seq{\iota}$ of module $q$ yield context $\Gamma$ & \figref{typing-import-prefix} \\
-$\Sigma \vdash \theta, \seq{x} \loadsAs \theta' \binding \Sigma'$ & loaded module $\theta$ extended along chain $\seq{x}$ of submodule names gives context entry $\theta'$ & \figref{typing-import-prefix} \\
-$\Sigma \vdash_{\mathsf{load}} q : \Gamma \binding \Sigma'$ & module $q$ statically loads with signature $\Gamma$ & \figref{typing-module} \\
+$\Sigma \vdash_{\mathsf{sub}} \theta, \seq{x} : \theta' \binding \Sigma'$ & checked module $\theta$ extended along chain $\seq{x}$ of submodule names gives context entry $\theta'$ & \figref{typing-import-prefix} \\
+$\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$ & module $q$ checks with signature $\Gamma$ & \figref{typing-module} \\
 $\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{typing-module}
    \\[2mm]
 \metaGroup{Evaluation} \\
@@ -38,8 +39,8 @@ $\rho, \seq{e} \Rightarrow r$ & expressions $\seq{e}$ evaluate, left to right, t
 $\rho, \seq{g} \Rightarrow r$ & comprehension qualifiers $\seq{g}$ evaluate to result $r$ & \figref{eval-quals-result} \\
 $\rho, x \importsR r$ & name $x$ imported from module environment $\rho$ has result $r$ & \figref{eval-imports} \\
 $q, \seq{\iota} \Rightarrow r$ & imports $\seq{\iota}$ of module $q$ evaluate to result $r$ & \figref{eval-import-prefix} \\
-$v, \seq{x} \loadsAs r$ & loaded module $v$ extended along chain $\seq{x}$ of submodule names gives result $r$ & \figref{eval-import-prefix} \\
-$q \Rightarrow_{\mathsf{load}} r$ & module $q$ loads to result $r$ & \figref{eval-modules} \\
+$v, \seq{x} \Rightarrow_{\mathsf{sub}} r$ & loaded module $v$ extended along chain $\seq{x}$ of submodule names gives result $r$ & \figref{eval-import-prefix} \\
+$q \Rightarrow_{\mathsf{mod}} r$ & module $q$ loads to result $r$ & \figref{eval-modules} \\
 $\mathcal{M} \Rightarrow \kappa$ & program $\mathcal{M}$ evaluates to termination kind $\kappa$ & \figref{eval-modules}
 \end{tabular}
 \end{center}

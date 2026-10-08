@@ -7,11 +7,13 @@ Values, environments, outcomes and results are given in \figref{values}. A class
 context entry of the class, and an object $\exObj{C}{\rho}$ records its class by name; the value $\Unbound$
 marks a variable of the current scope before its declaration is reached, a state reported by Python as an unbound
 local, and an environment binds a variable to $\Unbound$ wherever the corresponding context binds the variable to
-the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible. Throughout this section, $\Sigma$ is the class table produced by static loading of the program
+the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible. Throughout this section, $\Sigma$ is the class table produced by module checking of the program
 (\secref{well-formedness-modules}) and, like $\mathcal{M}$ and $\mathcal{P}$, is ambient. For a statement $s$, the outcome
 $\assigns{\rho}$ represents $s$ running to its end, with accumulated environment $\rho$; the outcome
 $\returns{v}$ represents $s$ returning the value $v$; and the outcome $\aborts{\kappa}$ represents the whole run
 aborting, with termination kind $\kappa$.
+
+\begin{specdefinition}{Composition of outcomes}
 Composing statements sequentially composes their outcomes according to the following partial monoid, analogous
 to sequential composition of static outcomes:
 \begin{defalign}
@@ -21,6 +23,7 @@ to sequential composition of static outcomes:
 \end{defalign}
 
 \noindent with $\assigns{\varnothing}$ as left and right unit.
+\end{specdefinition}
 
 \input{spec/fig/eval-values}
 
@@ -50,8 +53,8 @@ For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any statement $s$ with
 $\Gamma \vdash s : R$, the statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
 to outcome $o$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Top-level statements
 are evaluated by a separate judgement, $q, \rho, t \Rightarrow o$\speconly{ (\figref{eval-top-level})}, mirroring the static
-judgement (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, a class declaration binds
-its name to the class, a \pyinline{type} statement binds its name to the alias, and a plain statement is evaluated by the statement judgement
+judgement (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, a mutual type region binds each of its names to $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\ruleName{eval-types}), since
+class and alias entries are also values, and a plain statement is evaluated by the statement judgement
 (\ruleName{eval-top-stmt}). Function definitions delimit
 the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\result$\speconly{ (\S\ref{aux:result})} reads the outcome of a statement as
 the result of a call\speconly{; if the statement completes without returning, the result is $\val{\pyinline{None}}$.}\paperonly{:}
@@ -86,7 +89,9 @@ Whether a pattern matches is determined by the pattern-matching judgement
 $\rho, p, v \matches m$\speconly{ (\figref{eval-pat})}. A \emph{match result} $m$ is either $\matchOk{\rho'}$, a match, where $\rho'$ binds
 the variables of the pattern to the values that they matched, or $\noMatch$, a failure to match. \speconly{When a
 pattern and a value are not comparable, such as a list pattern against a tuple, there is no derivation and the
-run has no result.} Sub-results compose with
+run has no result.} 
+\begin{specdefinition}{Composition of match results}
+The match results of sub-patterns compose with
 $\override$, matching sequentially:
 \begin{defalign}
 \matchOk{\rho} \override \matchOk{\rho'} & {}= \matchOk{(\rho \disjunion \rho')} \\
@@ -94,6 +99,7 @@ m \override \noMatch = \noMatch \override m & {}= \noMatch
 \end{defalign}
 
 \noindent with $\matchOk{\varnothing}$ as left and right unit.
+\end{specdefinition}
 \paperinput{paper/operational-semantics/pattern-list}%
 A constructor pattern matches any object
 whose class has the pattern's class among its ancestors, and its sub-patterns bind the fields of the
@@ -107,13 +113,13 @@ fully-qualified names.
 \subsection{Modules and programs}
 
 \speconly{Module and program evaluation are given in \figref{eval-modules}; import evaluation in \figref{eval-import-prefix}; importing names from a loaded module in
-\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specification.}\speconly{ Context extension (\figref{context-ops}) applies to environments as well, with the same equations on values in place of context entries, except that a loaded module value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a context.} \emph{Loading}, the judgement $q \Rightarrow_{\mathsf{load}} r$, evaluates the import prefix
-of $q$ and then its statement, mirroring static loading $\vdash_{\mathsf{load}} q : \Gamma$
+\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specification.}\speconly{ Context extension (\figref{context-ops}) applies to environments as well, with the same equations on values in place of context entries, except that a loaded module value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a context.} \emph{Loading}, the judgement $q \Rightarrow_{\mathsf{mod}} r$, evaluates the import prefix
+of $q$ and then its statement, mirroring module checking $\vdash_{\mathsf{mod}} q : \Gamma$
 (\figref{typing-module}); as with the static rules, the mutual
 recursion between loading and evaluation is grounded by program well-formedness, which rules out
 import cycles (\secref{modules-programs}).
 Loading takes a single module; an import loads the modules containing its target from the root down, each
-before the module it contains, mirroring the static rules\speconly{, by the loads-as judgement for a plain import and
+before the module it contains, mirroring the static rules\speconly{, by the submodules judgement for a plain import and
 as premises of the from-import rule}. If loading one of these modules aborts, the import aborts for the same reason and the modules after it are
 not loaded.
 

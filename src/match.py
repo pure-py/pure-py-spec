@@ -5,9 +5,7 @@ from itertools import product
 import reasons
 from aux import binds, name_of
 from classes import (
-    RANGE,
     ArityMismatch,
-    Class,
     ClassTable,
     RepeatedKeywordArg,
     UnknownKeywordArgs,
@@ -19,12 +17,14 @@ from classes import (
     short_name,
 )
 from contexts import (
+    DU,
+    PU,
     ModuleContext,
     Unbound,
     VarContext,
+    VarEntry,
     class_of_name,
     disjoint_union,
-    join_context,
 )
 from reasons import IllFormedModule
 from shapes import (
@@ -42,9 +42,11 @@ from shapes import (
     shapes_seq,
     typed_heads,
 )
-from subtyping import Undetermined, disjuncts, instance, join, meet, subtype
+from subtyping import Undetermined, disjuncts, instance, join, join_seq, meet, subtype
 from syntax import PatList, PatTuple
 from type_syntax import (
+    RANGE,
+    ClassName,
     ClassType,
     DictType,
     ListType,
@@ -244,7 +246,7 @@ def split_dict(
             return None
 
 
-def split_class(Sigma: ClassTable, k: Rest, c: Class, p: ast.MatchClass) -> Split | None:
+def split_class(Sigma: ClassTable, k: Rest, c: ClassName, p: ast.MatchClass) -> Split | None:
     if below_excluded(Sigma, c, k.hs):
         return None
     sigma = pattern_instance(Sigma, c, k.ty)
@@ -260,7 +262,7 @@ def split_class(Sigma: ClassTable, k: Rest, c: Class, p: ast.MatchClass) -> Spli
     )
 
 
-def split_subclass(Sigma: ClassTable, k: Constr, c: Class, p: ast.MatchClass) -> Split | None:
+def split_subclass(Sigma: ClassTable, k: Constr, c: ClassName, p: ast.MatchClass) -> Split | None:
     sigma = pattern_instance(Sigma, c, k.ty)
     if sigma is None or c == k.ty.c or not subtype(Sigma, sigma, k.ty):
         return None
@@ -274,13 +276,13 @@ def split_subclass(Sigma: ClassTable, k: Constr, c: Class, p: ast.MatchClass) ->
     )
 
 
-def pattern_instance(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | None:
+def pattern_instance(Sigma: ClassTable, c: ClassName, tau: Type) -> ClassType | None:
     sigma = instance(Sigma, c, tau)
     assert not isinstance(sigma, Undetermined)  # pattern checks against the scrutinee type
     return sigma
 
 
-def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
+def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> ClassName:
     c = class_of_name(p.cls, mod_ctx)
     if c is None:
         raise IllFormedModule(p, reasons.NotClass(name_of(p.cls)))
@@ -289,7 +291,7 @@ def class_of_pattern(p: ast.MatchClass, mod_ctx: ModuleContext) -> Class:
     return c
 
 
-def pattern_seq(Sigma: ClassTable, c: Class, p: ast.MatchClass) -> tuple[ast.pattern, ...]:
+def pattern_seq(Sigma: ClassTable, c: ClassName, p: ast.MatchClass) -> tuple[ast.pattern, ...]:
     args = field_map(Sigma, c, p.patterns, p.kwd_attrs, p.kwd_patterns)
     if args is None:
         name = short_name(c)
@@ -566,3 +568,13 @@ def literal_of(p: ast.pattern) -> Literal:
             return ell
         case _:
             assert False
+
+
+def join_context(Sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
+    return {x: join_seq(Sigma, binding_types([delta[x] for delta in deltas])) for x in deltas[0]}
+
+
+def binding_types(entries: list[VarEntry]) -> list[Type]:
+    types = [e for e in entries if not isinstance(e, (Unbound, DU, PU))]
+    assert len(types) == len(entries)
+    return types

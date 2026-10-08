@@ -1,11 +1,15 @@
+from __future__ import annotations
+
 import ast
 from collections.abc import Mapping
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from classes import RANGE, Class, ClassTable
-from subtyping import join_seq
+from aux import TypeDefinition, declares, type_param_names
 from type_syntax import (
+    RANGE,
     CallableType,
+    ClassName,
     ListType,
     Name,
     Primitive,
@@ -15,8 +19,12 @@ from type_syntax import (
     dotted_name,
     parent,
     parse_name,
+    qualified,
     root,
 )
+
+if TYPE_CHECKING:
+    from classes import ClassTable
 
 
 @dataclass(frozen=True)
@@ -51,13 +59,22 @@ class TypeVar:
 
 @dataclass(frozen=True)
 class TypeAlias:
-    params: tuple[Var, ...]
-    tau: Type
+    gamma: Context
+    q: Name
+    chis: tuple[TypeDefinition, ...]
+    i: int
 
 
 type VarEntry = Unbound | DU | PU | Type
 type ContextEntry = (
-    VarEntry | ModuleStub | ModuleLoaded | Class | PredefinedName | TypeVar | TypeAlias | TypeScheme
+    VarEntry
+    | ModuleStub
+    | ModuleChecked
+    | ClassName
+    | PredefinedName
+    | TypeVar
+    | TypeAlias
+    | TypeScheme
 )
 type Context = Mapping[Var, ContextEntry]
 type VarContext = Mapping[Var, VarEntry]
@@ -74,15 +91,15 @@ class ModuleStub:
 
 
 @dataclass(frozen=True)
-class ModuleLoaded:
+class ModuleChecked:
     q: Name
     members: Context
 
 
 NON_VARIABLE_ENTRIES = (
     ModuleStub,
-    ModuleLoaded,
-    Class,
+    ModuleChecked,
+    ClassName,
     PredefinedName,
     TypeVar,
     TypeAlias,
@@ -128,12 +145,12 @@ def resolve_name(q: Name, mod_ctx: ModuleContext) -> ContextEntry | None:
     if q_ is None:
         return mod_ctx.gamma.get(root(q))
     theta = resolve_name(q_, mod_ctx)
-    return theta.members.get(q.parts[-1]) if isinstance(theta, ModuleLoaded) else None
+    return theta.members.get(q.parts[-1]) if isinstance(theta, ModuleChecked) else None
 
 
-def module_of(mod_ctx: ModuleContext, x: Var) -> ModuleStub | ModuleLoaded | None:
+def module_of(mod_ctx: ModuleContext, x: Var) -> ModuleStub | ModuleChecked | None:
     theta = mod_ctx.gamma.get(x)
-    return theta if isinstance(theta, (ModuleStub, ModuleLoaded)) else None
+    return theta if isinstance(theta, (ModuleStub, ModuleChecked)) else None
 
 
 @dataclass(frozen=True)
@@ -267,9 +284,9 @@ def extend_entry(theta: ContextEntry | None, theta_: ContextEntry | None) -> Con
     if theta_ is None:
         return theta
     match (theta, theta_):
-        case (ModuleLoaded(q, gamma), ModuleLoaded(q_, gamma_)):
-            return ModuleLoaded(q, extend_context(gamma, gamma_)) if q == q_ else theta_
-        case (ModuleLoaded(q), ModuleStub(q_)):
+        case (ModuleChecked(q, gamma), ModuleChecked(q_, gamma_)):
+            return ModuleChecked(q, extend_context(gamma, gamma_)) if q == q_ else theta_
+        case (ModuleChecked(q), ModuleStub(q_)):
             return theta if q == q_ else theta_
         case _:
             return theta_
@@ -280,14 +297,19 @@ def disjoint_union[V](gamma: Mapping[Var, V], gamma_: Mapping[Var, V]) -> Mappin
     return {**gamma, **gamma_}
 
 
-def join_context(Sigma: ClassTable, deltas: list[VarContext]) -> VarContext:
-    return {x: join_seq(Sigma, binding_types([delta[x] for delta in deltas])) for x in deltas[0]}
+def type_entry(gamma: Context, q: Name, chis: tuple[TypeDefinition, ...], i: int) -> ContextEntry:
+    chi = chis[i]
+    if isinstance(chi, ast.ClassDef):
+        return ClassName(qualified(q, chi.name))
+    return TypeAlias(gamma, q, chis, i)
 
 
-def binding_types(entries: list[VarEntry]) -> list[Type]:
-    types = [e for e in entries if not isinstance(e, (Unbound, DU, PU))]
-    assert len(types) == len(entries)
-    return types
+def type_context(gamma: Context, q: Name, chis: tuple[TypeDefinition, ...], i: int) -> Context:
+    chi = chis[i]
+    earlier = range(i if isinstance(chi, ast.ClassDef) else len(chis))
+    deltas = [{x: type_entry(gamma, q, chis, j) for x, _ in declares(chis[j])} for j in earlier]
+    alphas = {alpha: TypeVar() for alpha in type_param_names(chi)}
+    return {**gamma, **{x: theta for delta in deltas for x, theta in delta.items()}, **alphas}
 
 
 def extend_context(gamma: Context, gamma_: Context) -> Context:
@@ -302,6 +324,6 @@ def entry_of(e: ast.expr, mod_ctx: ModuleContext) -> ContextEntry | None:
     return None if q is None else resolve_name(q, mod_ctx)
 
 
-def class_of_name(e: ast.expr, mod_ctx: ModuleContext) -> Class | None:
+def class_of_name(e: ast.expr, mod_ctx: ModuleContext) -> ClassName | None:
     theta = entry_of(e, mod_ctx)
-    return theta if isinstance(theta, Class) else None
+    return theta if isinstance(theta, ClassName) else None

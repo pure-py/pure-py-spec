@@ -1,8 +1,8 @@
-\contains(\exList{\seq{v}}, v) &{}= \containsElems(\seq{v}, v) \\*
-\contains(\exTuple{\seq{v}}, v) &{}= \containsElems(\seq{v}, v) \\*
+\contains{\Sigma}(\exList{\seq{v}}, v) &{}= \containsElems{\Sigma}(\seq{v}, v) \\*
+\contains{\Sigma}(\exTuple{\seq{v}}, v) &{}= \containsElems{\Sigma}(\seq{v}, v) \\*
 \\
-\contains(\delta, w) &{}= \pyinline{True} && \text{if } w \in \dom(\delta) \\*
-\contains(\delta, w) &{}= \pyinline{False} && \text{if } w \notin \dom(\delta) \\*
+\contains{\Sigma}(\delta, w) &{}= \val{\pyinline{True}} && \text{if } w \in \dom(\delta) \\*
+\contains{\Sigma}(\delta, w) &{}= \val{\pyinline{False}} && \text{if } w \notin \dom(\delta) \\*
 \\
-\contains(w', w) &{}= \pyinline{True} && \text{if } w' = w_1 \concat w \concat w_2 \text{ for some } w_1, w_2 \\*
-\contains(w', w) &{}= \pyinline{False} && \text{otherwise}
+\contains{\Sigma}(w', w) &{}= \val{\pyinline{True}} && \text{if } w' = w_1 \concat w \concat w_2 \text{ for some } w_1, w_2 \\*
+\contains{\Sigma}(w', w) &{}= \val{\pyinline{False}} && \text{otherwise}

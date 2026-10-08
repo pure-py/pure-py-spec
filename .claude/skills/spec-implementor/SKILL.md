@@ -49,6 +49,12 @@ definition you changed.
 Spec first, then tests, then implementation. When the spec changes, write or
 adjust the failing test before touching the checker.
 
+## Implementation style
+
+Write the checker in PurePy-like Python: no reassignment of a variable once bound, no in-place
+mutation, no loops that accumulate into a variable. Build each value in one expression, by
+comprehension, recursion or `functools.reduce`, so that a definition reads like the rule it implements.
+
 ## Testing
 
 A test is a small program with an expected outcome: accepted, rejected, or

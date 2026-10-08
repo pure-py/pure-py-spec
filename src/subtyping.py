@@ -2,9 +2,11 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product
 
-from classes import RANGE, Class, ClassTable, ancestors
+from classes import ClassTable, ancestors, base, type_params
 from type_syntax import (
+    RANGE,
     CallableType,
+    ClassName,
     ClassType,
     DictType,
     ListType,
@@ -16,6 +18,7 @@ from type_syntax import (
     UnionType,
     Var,
     base_type,
+    fv,
     render,
     substitute,
 )
@@ -79,9 +82,9 @@ def subtype(Sigma: ClassTable, sigma: Type, tau: Type) -> bool:
         case (ClassType(c, taus), ClassType(d, sigmas)):
             if c == d and all(equivalent(Sigma, a, b) for a, b in zip(taus, sigmas)):
                 return True
-            base = Sigma[c].base
-            return base is not None and subtype(
-                Sigma, substitute(taus, Sigma[c].type_params, base), tau
+            base_ = base(Sigma, c)
+            return base_ is not None and subtype(
+                Sigma, substitute(taus, type_params(Sigma, c), base_), tau
             )
         case (TupleType(sigmas), TupleType(taus)):
             return len(sigmas) == len(taus) and all(
@@ -118,24 +121,24 @@ class Undetermined:
     pass
 
 
-def instance(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
+def instance(Sigma: ClassTable, c: ClassName, tau: Type) -> ClassType | Undetermined | None:
     above = instance_above(Sigma, c, tau)
     return above if above is not None else instance_below(Sigma, c, tau)
 
 
-def instance_above(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
+def instance_above(Sigma: ClassTable, c: ClassName, tau: Type) -> ClassType | Undetermined | None:
     match tau:
         case ClassType(d, _) if c in ancestors(Sigma, d):
             return instantiated_ancestor(Sigma, tau, c)
         case Primitive.NEVER:
-            return ClassType(c, ()) if len(Sigma[c].type_params) == 0 else Undetermined()
+            return ClassType(c, ()) if len(type_params(Sigma, c)) == 0 else Undetermined()
         case _:
             return None
 
 
-def instance_below(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undetermined | None:
+def instance_below(Sigma: ClassTable, c: ClassName, tau: Type) -> ClassType | Undetermined | None:
     assert not isinstance(tau, UnionType)  # instances are taken at the disjuncts of a union
-    alphas = Sigma[c].type_params
+    alphas = type_params(Sigma, c)
     match tau:
         case ClassType(d, sigmas) if d in ancestors(Sigma, c):
             generic = ClassType(c, tuple(TypeVariable(alpha) for alpha in alphas))
@@ -153,12 +156,12 @@ def instance_below(Sigma: ClassTable, c: Class, tau: Type) -> ClassType | Undete
             return None
 
 
-def instantiated_ancestor(Sigma: ClassTable, tau: ClassType, d: Class) -> ClassType:
-    """Instantiation of ancestor d of tau's class reached along the base classes."""
+def instantiated_ancestor(Sigma: ClassTable, tau: ClassType, d: ClassName) -> ClassType:
+    """Supertype of tau with class d"""
     while tau.c != d:
-        base = Sigma[tau.c].base
-        assert base is not None
-        sigma = substitute(tau.args, Sigma[tau.c].type_params, base)
+        base_ = base(Sigma, tau.c)
+        assert base_ is not None
+        sigma = substitute(tau.args, type_params(Sigma, tau.c), base_)
         assert isinstance(sigma, ClassType)
         tau = sigma
     return tau
@@ -189,42 +192,45 @@ def instantiation_candidates(
     return [first] if second is None else [first, second]
 
 
-def type_args(Sigma: ClassTable, sigma: Type, tau: Type) -> dict[Var, Type]:
+def type_args(Sigma: ClassTable, alphas: Sequence[Var], sigma: Type, tau: Type) -> dict[Var, Type]:
     match sigma, tau:
-        case TypeVariable(alpha), _:
+        case TypeVariable(alpha), _ if alpha in alphas:
             return {alpha: base_type(tau)}
         case _, UnionType(tau_, tau__):
             return join_context(
-                Sigma, type_args(Sigma, sigma, tau_), type_args(Sigma, sigma, tau__)
+                Sigma, type_args(Sigma, alphas, sigma, tau_), type_args(Sigma, alphas, sigma, tau__)
             )
         case (ListType(sigma_), ListType(tau_)) | (DictType(sigma_), DictType(tau_)):
-            return type_args(Sigma, sigma_, tau_)
+            return type_args(Sigma, alphas, sigma_, tau_)
         case TupleType(sigmas), TupleType(taus):
-            return type_args_seq(Sigma, sigmas, taus)
+            return type_args_seq(Sigma, alphas, sigmas, taus)
         case CallableType(sigmas, sigma_), CallableType(taus, tau_):
-            return type_args_seq(Sigma, (sigma_, *sigmas), (tau_, *taus))
+            return type_args_seq(Sigma, alphas, (sigma_, *sigmas), (tau_, *taus))
         case ClassType(c, sigmas), _:
             match instance(Sigma, c, tau):
                 case ClassType(_, taus):
-                    return type_args_seq(Sigma, sigmas, taus)
+                    return type_args_seq(Sigma, alphas, sigmas, taus)
                 case _:
                     return {}
         case UnionType(sigma_, sigma__), _:
-            if subtype(Sigma, tau, sigma_) or subtype(Sigma, tau, sigma__):
+            if any(
+                fv(disjunct).isdisjoint(alphas) and subtype(Sigma, tau, disjunct)
+                for disjunct in (sigma_, sigma__)
+            ):
                 return {}
             return join_context(
-                Sigma, type_args(Sigma, sigma_, tau), type_args(Sigma, sigma__, tau)
+                Sigma, type_args(Sigma, alphas, sigma_, tau), type_args(Sigma, alphas, sigma__, tau)
             )
         case _:
             return {}
 
 
 def type_args_seq(
-    Sigma: ClassTable, sigmas: Sequence[Type], taus: Sequence[Type]
+    Sigma: ClassTable, alphas: Sequence[Var], sigmas: Sequence[Type], taus: Sequence[Type]
 ) -> dict[Var, Type]:
     result: dict[Var, Type] = {}
     for sigma, tau in zip(sigmas, taus):
-        result = join_context(Sigma, result, type_args(Sigma, sigma, tau))
+        result = join_context(Sigma, result, type_args(Sigma, alphas, sigma, tau))
     return result
 
 

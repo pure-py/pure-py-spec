@@ -1,14 +1,16 @@
-\typeArgs{\Sigma}(\alpha, \tau) &{}= \set{\bind{\alpha}{\baseType(\tau)}} \\*
-\typeArgs{\Sigma}(\sigma, \tyUnion{\tau}{\tau'}) &{}= \joinTy{\Sigma}{\typeArgs{\Sigma}(\sigma, \tau)}{\typeArgs{\Sigma}(\sigma, \tau')} \\*
-\typeArgs{\Sigma}(\tyList{\sigma}, \tyList{\tau}) &{}= \typeArgs{\Sigma}(\sigma, \tau) \\*
-\typeArgs{\Sigma}(\tyDict{\sigma}, \tyDict{\tau}) &{}= \typeArgs{\Sigma}(\sigma, \tau) \\*
-\typeArgs{\Sigma}(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) &{}= \typeArgs{\Sigma}(\seq{\sigma}, \seq{\tau}) \\*
-\typeArgs{\Sigma}(\tyCallable{\seq{\sigma}}{\sigma}, \tyCallable{\seq{\tau}}{\tau}) &{}= \typeArgs{\Sigma}(\sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) \\*
-\typeArgs{\Sigma}(C[\seq{\sigma}], \tau) &{}= \typeArgs{\Sigma}(\seq{\sigma}, \seq{\tau}') \\*
+\typeArgs{\Sigma}(\seq{\alpha}, \alpha_i, \tau) &{}= \set{\bind{\alpha_i}{\baseType(\tau)}} \\*
+\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tyUnion{\tau}{\tau'}) &{}= \joinTy{\Sigma}{\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau)}{\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau')} \\*
+\typeArgs{\Sigma}(\seq{\alpha}, \tyList{\sigma}, \tyList{\tau}) &{}= \typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau) \\*
+\typeArgs{\Sigma}(\seq{\alpha}, \tyDict{\sigma}, \tyDict{\tau}) &{}= \typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau) \\*
+\typeArgs{\Sigma}(\seq{\alpha}, \tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) &{}= \typeArgs{\Sigma}(\seq{\alpha}, \seq{\sigma}, \seq{\tau}) \\*
+\typeArgs{\Sigma}(\seq{\alpha}, \tyCallable{\seq{\sigma}}{\sigma}, \tyCallable{\seq{\tau}}{\tau}) &{}= \typeArgs{\Sigma}(\seq{\alpha}, \sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) \\*
+\typeArgs{\Sigma}(\seq{\alpha}, C[\seq{\sigma}], \tau) &{}= \typeArgs{\Sigma}(\seq{\alpha}, \seq{\sigma}, \seq{\tau}') \\*
 &\qquad \rlap{$\text{if } \Sigma \vdash C[\seq{\tau}'] \instanceAt \tau$} \\*
-\typeArgs{\Sigma}(\tyUnion{\sigma}{\sigma'}, \tau) &{}= \varnothing \\*
-&\qquad \rlap{$\text{if } \Sigma \vdash \tau \subty \sigma \text{ or } \Sigma \vdash \tau \subty \sigma'$} \\*
-\typeArgs{\Sigma}(\tyUnion{\sigma}{\sigma'}, \tau) &{}= \joinTy{\Sigma}{\typeArgs{\Sigma}(\sigma, \tau)}{\typeArgs{\Sigma}(\sigma', \tau)} \quad \text{(otherwise)} \\*
-\typeArgs{\Sigma}(\sigma, \tau) &{}= \varnothing \quad \text{(otherwise)} \\*[2mm]
-\typeArgs{\Sigma}(\varepsilon, \varepsilon) &{}= \varnothing \\*
-\typeArgs{\Sigma}(\sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) &{}= \joinTy{\Sigma}{\typeArgs{\Sigma}(\sigma, \tau)}{\typeArgs{\Sigma}(\seq{\sigma}, \seq{\tau})}
+\typeArgs{\Sigma}(\seq{\alpha}, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \varnothing \\*
+&\qquad \rlap{$\text{if } \Sigma \vdash \tau \subty \sigma \text{ and } \fv(\sigma) \cap \set{\seq{\alpha}} = \varnothing$} \\*
+\typeArgs{\Sigma}(\seq{\alpha}, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \varnothing \\*
+&\qquad \rlap{$\text{if } \Sigma \vdash \tau \subty \sigma' \text{ and } \fv(\sigma') \cap \set{\seq{\alpha}} = \varnothing$} \\*
+\typeArgs{\Sigma}(\seq{\alpha}, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \joinTy{\Sigma}{\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau)}{\typeArgs{\Sigma}(\seq{\alpha}, \sigma', \tau)} \quad \text{(otherwise)} \\*
+\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau) &{}= \varnothing \quad \text{(otherwise)} \\*[2mm]
+\typeArgs{\Sigma}(\seq{\alpha}, \varepsilon, \varepsilon) &{}= \varnothing \\*
+\typeArgs{\Sigma}(\seq{\alpha}, \sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) &{}= \joinTy{\Sigma}{\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau)}{\typeArgs{\Sigma}(\seq{\alpha}, \seq{\sigma}, \seq{\tau})}

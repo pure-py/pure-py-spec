@@ -39,11 +39,14 @@
 
 \lstnewenvironment{python}[1][]{\lstset{style=base16python,#1}}{}
 
+% Colour of inline code: base05, or the markup colour inside change markup (tex/change-tracking.tex)
+\providecommand*{\codecolor}{base05}
+
 % for use in inferrule
 \newcommand{\pytext}[1]{%
-  {\renewcommand\ttdefault{cmtt}\ttfamily\small\color{base05}#1}%
+  {\renewcommand\ttdefault{cmtt}\ttfamily\small\color{\codecolor}#1}%
 }
-\newcommand{\pyinlinetext}[2]{\text{{\renewcommand\ttdefault{cmtt}\ttfamily\upshape#1\color{base05}#2}}}
+\newcommand{\pyinlinetext}[2]{\text{{\renewcommand\ttdefault{cmtt}\ttfamily\upshape#1\color{\codecolor}#2}}}
 % \pymath: math-safe inline code (no \lstinline, so it works inside an
 % inferrule). Unlike \pyinline it does not read its argument verbatim, so the
 % caller escapes special characters, e.g. \pymath{\_\_name\_\_}.
@@ -55,5 +58,11 @@
     {\pyinlinetext{\tiny}{#1}}%
 }
 \newcommand{\pyinline}[1]{%
-  \ifmmode \pymath{#1}\else \mbox{\lstinline[style=base16python]{#1}}\fi
+  \ifmmode \pymath{#1}\else
+    \ifcodeinmarkup
+      \mbox{\lstinline[style=base16python,basicstyle={\renewcommand\ttdefault{cmtt}\ttfamily\small\color{\codecolor}},keywordstyle=\color{\codecolor},stringstyle=\color{\codecolor},identifierstyle=\color{\codecolor}]{#1}}%
+    \else
+      \mbox{\lstinline[style=base16python]{#1}}%
+    \fi
+  \fi
 }
