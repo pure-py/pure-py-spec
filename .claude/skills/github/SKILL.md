@@ -35,7 +35,8 @@ Commit messages, issue titles and bulleted lists are telegraphic:
 - Before starting work on an issue, assign it to the user and to the account you run as (`gh api user --jq .login`)
 - Check with the user before creating an issue, unless explicitly instructed to create one
 - Add content to an issue (body, comment, closing comment) only when asked; otherwise create, edit or close it and nothing more
-- When an issue references other issues or external resources, end with a **See also** paragraph:
+- Link an issue or external resource inline where the body mentions it. Only for related issues or
+  resources not mentioned in the body, end with a **See also** paragraph:
 
   ```
   ## See also
