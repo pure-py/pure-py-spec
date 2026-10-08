@@ -157,7 +157,7 @@ def instance_below(Sigma: ClassTable, c: ClassName, tau: Type) -> ClassType | Un
 
 
 def instantiated_ancestor(Sigma: ClassTable, tau: ClassType, d: ClassName) -> ClassType:
-    """Instantiation of ancestor d of tau's class reached along the base classes."""
+    """Supertype of tau with class d"""
     while tau.c != d:
         base_ = base(Sigma, tau.c)
         assert base_ is not None
