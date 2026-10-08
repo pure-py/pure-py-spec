@@ -314,10 +314,10 @@
     {\bfseries $#1$}\hfill{\itshape #2}}}\par\nobreak\vspace{2mm}\noindent\ignorespaces}
   {\par\addvspace{\bigskipamount}}
 
-% Rows defining an auxiliary function, from spec/functions. Uniform row height: a negative
-% \lineskiplimit stops TeX adding interline glue for a taller row, such as one carrying an accent. That
-% also puts a full \baselineskip before the first row, which the display skip takes back.
-\newcommand*{\funcrows}[1]{%
+% Cases defining an auxiliary function, from spec/functions. Uniform line height: a negative
+% \lineskiplimit stops TeX adding interline glue for a taller case, such as one carrying an accent. That
+% also puts a full \baselineskip before the first case, which the display skip takes back.
+\newcommand*{\funccases}[1]{%
   \begingroup\lineskiplimit=-\baselineskip
   \setlength{\abovedisplayskip}{\dimexpr\abovedisplayskip - \baselineskip\relax}%
   \setlength{\abovedisplayshortskip}{\dimexpr\abovedisplayshortskip - \baselineskip\relax}%
