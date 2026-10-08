@@ -50,9 +50,7 @@ def module_names(base_dir: pathlib.Path) -> set[Name]:
 
 
 class Program(Mapping[Name, ast.Module]):
-    """The program: every module under the entry's directory by name, with the
-    predefined modules, each body parsed when the module is first checked, so a
-    module that is never imported is not checked."""
+    """Modules by name; each parsed on first access"""
 
     def __init__(self, entry_path: pathlib.Path) -> None:
         self.base_dir = entry_path.parent
