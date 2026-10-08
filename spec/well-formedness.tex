@@ -342,7 +342,7 @@ The class table is extended with $\classTable{\Gamma}(q, \seq{\chi})$
 class statement $\chi_i$, which defines it; the context entry $\Type{q.c}$, by which a variable refers to it by name; and
 $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$ in the class table, the class statement together with its type region and defining
 context, from which its fields and base class are read. For a function the three are the \pyinline{def} statement, the
-type scheme bound to its name and the closure $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$. Aliases and \replaced{class definitions under their defining contexts}{class table entries} carry the type region and
+type scheme bound to its name and the closure $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$. Aliases and class definitions under their defining contexts carry the type region and
 defining context $\Gamma$, because alias bodies, field annotations and base classes are resolved at each use rather than when the
 type region is checked.
 Each definition $\chi_i$ is checked under the extended class table and the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$

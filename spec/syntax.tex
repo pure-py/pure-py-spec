@@ -81,15 +81,13 @@ classes, and we write ``class $C$'' for the class named $C$. A class is also the
 
 \begin{definition}[Class table]
 \label{def:class-table}
-A class table $\Sigma$ is a finite map from class names to \replaced{class definitions under their defining contexts, with $\Sigma(C)$ of the form
+A class table $\Sigma$ is a finite map from class names to class definitions under their defining contexts, with $\Sigma(C)$ of the form
 $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$: the class definition $\chi_i$ of mutual type region $\seq{\chi}$ of module $q$
-(\figref{syntax-stmt}), which defines $C$, under the context $\Gamma$ in which the type region appears}{class table entries, with $\Sigma(C)$ of the form
-$\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$: the $i$-th definition of mutual type region $\seq{\chi}$ of module $q$
-(\figref{syntax-stmt}), which declares $C$, together with the context $\Gamma$ in which the type region appears}. The
-type parameters, fields and base class of $C$ are read from \replaced{$\Sigma(C)$}{its class table entry} by auxiliary functions
+(\figref{syntax-stmt}), which defines $C$, under the context $\Gamma$ in which the type region appears. The
+type parameters, fields and base class of $C$ are read from $\Sigma(C)$ by auxiliary functions
 $\typeParams{\Sigma}$, $\fields{\Sigma}$ and $\base{\Sigma}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{sec:auxiliary-classes}}), the latter two resolving
 the field annotations and base class of the definition under the context given by $\typeContext{\Gamma}(q, \seq{\chi}, i)$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}). Every class named in \replaced{a definition of}{a class table entry of} $\Sigma$ is in $\dom(\Sigma)$, and the
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}). Every class named in a definition of $\Sigma$ is in $\dom(\Sigma)$, and the
 relation taking each class of $\Sigma$ to its base class is acyclic.
 \end{definition}
 
