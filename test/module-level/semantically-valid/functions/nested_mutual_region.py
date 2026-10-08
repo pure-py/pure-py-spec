@@ -1,4 +1,4 @@
-# rule: def
+# rule: defs
 def outer(n: int) -> bool:
     def even(k: int) -> bool:
         if k == 0:

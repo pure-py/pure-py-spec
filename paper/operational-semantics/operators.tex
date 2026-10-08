@@ -3,7 +3,7 @@
 
 \input{spec/functions/operators-text}
 
-Structural equality $\eqOp$ compares literals by value, lists and tuples elementwise, dictionaries with
+Structural equality $\eqOp{\Sigma}$ compares literals by value, lists and tuples elementwise, dictionaries with
 the same keys by their values, and objects of the same class by their fields. Values of different forms, such
 as a number and a string or a list and a tuple, are unequal. Equality is undefined between a Boolean and a
 number, which Python compares numerically, between functions, which Python compares by identity, and between
@@ -20,7 +20,7 @@ print([1.0, x] == [1.0, x])  # undefined: nan against nan
 \end{python}
 
 \noindent Dictionaries are compared in the key order of the left operand for the same reason. The membership
-function $\contains$ tests for a key of a dictionary, a substring of a string, or an element of a list or tuple,
+function $\contains{\Sigma}$ tests for a key of a dictionary, a substring of a string, or an element of a list or tuple,
 the last by structural equality with the same short-circuiting. The strict operators are given by
 $\hat{\odot}$ and $\hat{\ominus}$ (\figref{operators}); the definitions of all of these are given in
 \specification.

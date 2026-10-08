@@ -11,9 +11,10 @@ from type_syntax import (
     root,
 )
 
-# A PurePy statement: a Python statement, or a mutual region of consecutive defs. A Python body
-# (a statement list) represents the spec's right-nested sequence s s'.
-type Statement = ast.stmt | list[ast.FunctionDef]
+# PurePy statement: Python statement, mutual def region or mutual type region. Python body (statement
+# list) represents spec's right-nested sequence s s'.
+type TypeDefinition = ast.ClassDef | ast.TypeAlias
+type Statement = ast.stmt | list[ast.FunctionDef] | list[TypeDefinition]
 
 
 def is_import(s: ast.stmt) -> bool:
@@ -30,16 +31,27 @@ def statements(body: list[ast.stmt]) -> list[Statement]:
     head = body[0]
     rest = body[1:]
     if isinstance(head, ast.FunctionDef):
-        return extend_region([head], rest)
+        return extend_def_region([head], rest)
+    if isinstance(head, (ast.ClassDef, ast.TypeAlias)):
+        return extend_type_region([head], rest)
     return [head] + statements(rest)
 
 
-def extend_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[Statement]:
+def extend_def_region(region: list[ast.FunctionDef], rest: list[ast.stmt]) -> list[Statement]:
     if len(rest) == 0:
         return [region]
     head = rest[0]
     if isinstance(head, ast.FunctionDef):
-        return extend_region(region + [head], rest[1:])
+        return extend_def_region(region + [head], rest[1:])
+    return [region] + statements(rest)
+
+
+def extend_type_region(region: list[TypeDefinition], rest: list[ast.stmt]) -> list[Statement]:
+    if len(rest) == 0:
+        return [region]
+    head = rest[0]
+    if isinstance(head, (ast.ClassDef, ast.TypeAlias)):
+        return extend_type_region(region + [head], rest[1:])
     return [region] + statements(rest)
 
 
@@ -266,6 +278,12 @@ def pattern_bound(body: list[ast.stmt]) -> dict[Var, ast.Match]:
             case _:
                 pass
     return out
+
+
+def type_param_names(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlias) -> tuple[Var, ...]:
+    alphas = tuple(p.name for p in node.type_params if isinstance(p, ast.TypeVar))
+    assert len(alphas) == len(node.type_params)
+    return alphas
 
 
 def own_fields(node: ast.ClassDef) -> tuple[tuple[Var, TypeExpr], ...]:

@@ -10,6 +10,9 @@ Direct, factual, conventional prose: state the thing and stop.
 ## Sentence construction
 
 - No pithy constructions pivoting on a comma from assertion to contrast: "It's yours, not a leftover."
+- No verbless clause tacked on after a comma to qualify the preceding noun: "the class table entries,
+  empty for a type statement". Give it a verb ("which are empty for a type statement") or a sentence of
+  its own.
 - Spell out logical connectives; prefer "because X" or "so that X" over a bare colon-assertion.
   - Before: "The Boolean Jacobian instead records 1: disjunction cannot cancel."
   - After: "The Boolean Jacobian instead records 1, because dependency information combines by disjunction and disjunction cannot cancel."
@@ -94,7 +97,7 @@ Direct, factual, conventional prose: state the thing and stop.
 
 - Introduce a term before relying on it; if it first appears mid-argument ("orthogonality", "specialising", "De Morgan dual"), move its introduction to where the concept first appears. Italicise on first definition only, and drop italics that add nothing.
 - Qualify a noun that the document uses for more than one kind of thing wherever the bare noun could be misread: a context entry or a class entry, not "entry".
-- Do not shorten a term to its head noun: "mutual region", never "region" on its own, even on a
+- Do not shorten a compound term to its head noun: "hash table", never "table" on its own, even on a
   second mention in the same paragraph.
 - Keep variable sorts consistent within a section (a, b for scalars; x, y for semimodule elements).
 - Use every metavariable of a sort before reaching for a prime: two types are sigma and tau, not tau and tau prime. A prime is for the third of a sort, or where the two are the same thing at different stages.

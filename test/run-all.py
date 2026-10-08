@@ -3,6 +3,7 @@ import argparse
 import contextlib
 import pathlib
 import re
+import shlex
 import subprocess
 import sys
 from collections.abc import Iterator
@@ -77,10 +78,12 @@ def run(cmd: list[str], cwd: pathlib.Path | None = None) -> "subprocess.Complete
 
 
 class Runner:
-    def __init__(self, interpreter: str) -> None:
-        self.interpreter = interpreter
+    def __init__(self, interpreter: str | None, checker: list[str] | None) -> None:
+        self.interpreter = interpreter  # None: tests not run
+        self.checker = checker  # command given the test path; None: the reference checker
         self.passed = 0
-        self.failed = 0
+        self.failed: list[str] = []
+        self.skipped: list[str] = []
         self.failures: list[str] = []
 
     @contextlib.contextmanager
@@ -88,8 +91,8 @@ class Runner:
         self.failures = []
         yield
         if self.failures:
-            self.failed += 1
-            print(f"  {RED}✗{RESET} {label} ({'; '.join(self.failures)})")
+            self.failed.append(f"{label} ({'; '.join(self.failures)})")
+            print(f"  {RED}✗{RESET} {self.failed[-1]}")
         else:
             self.passed += 1
             print(f"  {GREEN}✓{RESET} {label}")
@@ -98,13 +101,15 @@ class Runner:
         self.failures.append(msg)
 
     def check(self, path: pathlib.Path, program: bool, exit: Exit, error_checked: bool) -> None:
-        proc = run(
-            ["python3", str(ROOT / "src" / (CHECK_PROGRAM if program else CHECK)), str(path)]
-        )
+        reference = ["python3", str(ROOT / "src" / (CHECK_PROGRAM if program else CHECK))]
+        proc = run([*(self.checker or reference), str(path)])
         exits = {exit, Exit.ILL_FORMED_PROGRAM} if program and exit == Exit.ILL_FORMED else {exit}
         if proc.returncode not in exits:
-            self.fail(f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}")
-        elif error_checked:
+            output = (proc.stdout + proc.stderr).strip().split("\n", 1)[0]
+            self.fail(
+                f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}: {output}"
+            )
+        elif error_checked and self.checker is None:  # messages are the reference checker's
             error = path.with_suffix(ERROR_EXPECTED)
             output = proc.stdout + proc.stderr
             if not error.exists():
@@ -113,6 +118,7 @@ class Runner:
                 self.fail(f"check: expected {error.read_text().strip()!r}, got: {output.strip()}")
 
     def python(self, path: pathlib.Path, accepts: bool) -> None:
+        assert self.interpreter is not None
         expected = path.with_suffix(EXPECTED)
         exception = path.with_suffix(EXCEPTION_EXPECTED)
         if expected.exists() == exception.exists():
@@ -140,24 +146,61 @@ class Runner:
 
     def run_test(self, test: pathlib.Path, program: bool) -> None:
         """Path under tier: <verdict>[/<stage>]/.../<test>.py or .../<test>/main.py (program)."""
+        dirs = test.relative_to(TEST).parts[1:-1]
+        verdict = Verdict(dirs[0])
+        stage = Stage(dirs[1]) if len(dirs) > 1 and dirs[1] in Stage else None
+        if stage == Stage.PENDING and self.checker is not None:
+            # spec doesn't define pending forms, so only the reference checker is held to them
+            self.skipped.append(str(test.relative_to(ROOT)))
+            return
         with self.test(test.relative_to(ROOT)):
-            dirs = test.relative_to(TEST).parts[1:-1]
-            verdict = Verdict(dirs[0])
-            stage = Stage(dirs[1]) if len(dirs) > 1 and dirs[1] in Stage else None
             exit, error_checked, python_accepts = EXPECTATIONS[verdict, stage]
             path = test / MAIN if program else test
             if exit is not None:
                 self.check(path, program, exit, error_checked)
-            if python_accepts is not None:
+            if python_accepts is not None and self.interpreter is not None:
                 self.python(path, python_accepts)
 
     def summary(self) -> None:
-        total = self.passed + self.failed
+        total = self.passed + len(self.failed)
         print()
+        if self.skipped:
+            print(f"{len(self.skipped)} pending tests skipped: {', '.join(self.skipped)}")
         if self.failed:
-            print(f"{RED}✗ {self.passed}/{total} passed, {self.failed} failed{RESET}")
-            sys.exit(1)
-        print(f"{GREEN}✓ {total}/{total} passed{RESET}")
+            print(f"{RED}✗ {self.passed}/{total} passed, {len(self.failed)} failed{RESET}")
+        else:
+            print(f"{GREEN}✓ {total}/{total} passed{RESET}")
+
+
+def compare_known_failures(failed: list[str], known_failures: pathlib.Path, update: bool) -> bool:
+    """Whether the failures are exactly those listed; with update, rewrite the list instead."""
+    if update:
+        known_failures.write_text("".join(line + "\n" for line in sorted(failed)))
+        print(f"{len(failed)} failures written to {known_failures}")
+        return True
+    known = set(known_failures.read_text().splitlines()) if known_failures.exists() else set()
+    for line in sorted(set(failed) - known):
+        print(f"{RED}unexpected:{RESET} {line}")
+    for line in sorted(known - set(failed)):
+        print(f"{GREEN}fixed:{RESET} {line}")
+    if set(failed) != known:
+        print(f"{RED}✗ {known_failures} out of date; rerun with --update{RESET}")
+        return False
+    print(f"{GREEN}✓ failures as listed in {known_failures}{RESET}")
+    return True
+
+
+def tests() -> Iterator[tuple[pathlib.Path, bool]]:
+    """Tests of both tiers in path order, each with whether it is a program."""
+    for tier, program in ((MODULE_LEVEL, False), (PROGRAM_LEVEL, True)):
+        found = (TEST / tier).rglob(MAIN if program else "*.py")
+        paths = [
+            path.parent if program else path
+            for path in found
+            if HELPERS not in path.parts and "__pycache__" not in path.parts
+        ]
+        for test in sorted(paths, key=lambda test: (test.parent.as_posix(), test.name)):
+            yield test, program
 
 
 def check_unique_rule_names(r: Runner) -> None:
@@ -236,8 +279,27 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("interpreter", nargs="?", default="python3")
     parser.add_argument("--no-mypy", action="store_true")
+    parser.add_argument(
+        "--no-run", action="store_true", help="check the tests without running them"
+    )
+    parser.add_argument(
+        "--checker",
+        help="command run on the path of each test in place of the reference checker, with the same "
+        "exit codes; error messages are not compared and pending tests are skipped",
+    )
+    parser.add_argument(
+        "--known-failures",
+        type=pathlib.Path,
+        help="file listing the expected failures; the run passes if its failures are exactly these",
+    )
+    parser.add_argument(
+        "--update", action="store_true", help="rewrite the known failures file from this run"
+    )
     args = parser.parse_args()
-    r = Runner(args.interpreter)
+    r = Runner(
+        None if args.no_run else args.interpreter,
+        shlex.split(args.checker) if args.checker else None,
+    )
 
     print("cross-references")
     check_unique_rule_names(r)
@@ -248,22 +310,19 @@ def main() -> None:
         check_lint(r)
         check_mypy_compatibility(r)
 
-    for tier, program in ((MODULE_LEVEL, False), (PROGRAM_LEVEL, True)):
-        found = (TEST / tier).rglob(MAIN if program else "*.py")
-        tests = [
-            path.parent if program else path
-            for path in found
-            if HELPERS not in path.parts and "__pycache__" not in path.parts
-        ]
-        last = None
-        for test in sorted(tests, key=lambda test: (test.parent.as_posix(), test.name)):
-            header = test.parent.relative_to(TEST)
-            if header != last:
-                print(header)
-                last = header
-            r.run_test(test, program)
+    last = None
+    for test, program in tests():
+        header = test.parent.relative_to(TEST)
+        if header != last:
+            print(header)
+            last = header
+        r.run_test(test, program)
 
     r.summary()
+    ok = not r.failed
+    if args.known_failures is not None:
+        ok = compare_known_failures(r.failed, args.known_failures, args.update)
+    sys.exit(0 if ok else 1)
 
 
 if __name__ == "__main__":

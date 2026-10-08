@@ -2,6 +2,7 @@
 \declaresS(t\;t') &= \declaresS(t) \mathbin{\concat} \declaresS(t') \\*
 \declaresS(\seq{d}) &{}= \seq{f} \\*
 &\qquad \rlap{$\text{where } d_i = \exDef{f_i[\seq{\alpha}_i]}{\bind{\seq{x}_i}{\seq{\psi}_i}}{\exRetAnnot{\psi_i}}{s_i}$} \\*
+\declaresS(\chi_1 \ldots \chi_{n+1}) &{}= \declaresS(\chi_1) \mathbin{\concat} \cdots \mathbin{\concat} \declaresS(\chi_{n+1}) \\*
 \declaresS(\exDataclass{c[\seq{\alpha}]}{\phi}) &{}= c \\*
 \declaresS(\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}) &{}= c \\*
 \declaresS(\exTypeAlias{x[\seq{\alpha}]}{\psi}) &= x \\*

@@ -47,11 +47,11 @@ take the following forms:
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Entry & Form & Records \\
 variable & $\tau$, $\DU{\tau}$, $\PU{\tau}$ or $\Unbound$ & type of definitely assigned variable; $\DU{\tau}$ if declared at $\tau$ and definitely unassigned; $\PU{\tau}$ if declared at $\tau$ and possibly unassigned; $\Unbound$ if its declaration has not been reached \\
-module stub & $\modStub{q}$ & module $q$, named but not loaded \\
-module reference & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$, bound by an import \\
+module stub & $\modStub{q}$ & module $q$, named but not checked \\
+checked module & $\modLoaded{q}{\Gamma}$ & module $q$ with signature $\Gamma$, bound by an import \\
 class entry & $\Type{C}$ & name denotes class $C$ \\
 type parameter & $\TypeVar$ & name is a type parameter in scope \\
-type alias & $\TypeAlias{\seq{\alpha}}{\tau}$ & name denotes type $\tau$ with type parameters $\seq{\alpha}$ \\
+type alias & $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ & name denotes alias declared by $i$-th definition of mutual type region $\seq{\chi}$ of module $q$, resolved under $\Gamma$ \\
 type scheme & $\scheme{\seq{\alpha}}{\tau}$ or $\PU{\scheme{\seq{\alpha}}{\tau}}$ & type of function bound by \pyinline{def}, generalised over one or more type parameters $\seq{\alpha}$; $\PU{\scheme{\seq{\alpha}}{\tau}}$ if possibly unassigned \\
 predefined name & $\predefName$ & name usable only in annotation or as decorator \\
 \end{tabular}
@@ -62,7 +62,7 @@ predefined name & $\predefName$ & name usable only in annotation or as decorator
 \noindent A predefined name is a member of a predefined module whose meaning is fixed by the \thisdoc, such as \pyinline{list} or
 \pyinline{dataclass}; its entry records only that it is in scope, and it does not denote a value, so it cannot appear in
 an expression. A type parameter or type alias denotes a type rather than a value, so it too can be mentioned only by a type
-expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias{\seq{\alpha}}{\tau}$ are
+expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ are
 named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \pyinline{typing.TypeAliasType} of
 the objects denoted by a class name, type parameter or alias at run time.
 
@@ -72,24 +72,26 @@ is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on 
 with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
 
-\begin{definition}[Class]
+\begin{definition}[Class name]
 \label{def:class}
-A class $C$ is a fully-qualified name $q.c$: a module $q$ and a class name $c$ declared in $q$. A module
-declares each class name at most once, so the fully-qualified name of a class is the identity of the
-class. A class is also the type of its instances.
+A class name $C$ is a fully-qualified name $q.c$: a module $q$ and the unqualified name $c$ under which the
+class is defined in $q$. A module defines each unqualified name at most once, so class names identify
+classes, and we write ``class $C$'' for the class named $C$. A class is also the type of its instances.
 \end{definition}
 
 \begin{definition}[Class table]
 \label{def:class-table}
-A class table $\Sigma$ is a finite map from classes to class table entries, with $\Sigma(C)$ of the form
-$\clsRec{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}{D[\seq{\sigma}]}$: the type parameters $\seq{\alpha}$ of $C$, its distinct fields $\seq{x}$ with their declared types
-$\seq{\tau}$, and its instantiated base class $D[\seq{\sigma}]$, or $\bot$ if it has none; the field types and the
-type arguments of the base may mention $\seq{\alpha}$. Every class named in $\Sigma$ is in
-$\dom(\Sigma)$, and the relation taking each class of $\Sigma$ to its base class $D$ is
-acyclic.
+A class table $\Sigma$ is a finite map from class names to class definitions under their defining contexts, with $\Sigma(C)$ of the form
+$\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$: the class definition $\chi_i$ of mutual type region $\seq{\chi}$ of module $q$
+(\figref{syntax-stmt}), which defines $C$, under the context $\Gamma$ in which the type region appears. The
+type parameters, fields and base class of $C$ are read from $\Sigma(C)$ by auxiliary functions
+$\typeParams{\Sigma}$, $\fields{\Sigma}$ and $\base{\Sigma}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{sec:auxiliary-classes}}), the latter two resolving
+the field annotations and base class of the definition under the context given by $\typeContext{\Gamma}(q, \seq{\chi}, i)$
+(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}). Every class named in a definition of $\Sigma$ is in $\dom(\Sigma)$, and the
+relation taking each class of $\Sigma$ to its base class is acyclic.
 \end{definition}
 
-\noindent The class table is similar to Featherweight Java's~\cite{igarashi2001}; the well-formedness rules build the table as they check the class declarations of a program (\figref{typing-top-level}).
+\noindent The class table is similar to the class table of Featherweight Java~\cite{igarashi2001}; the well-formedness rules build it while checking the class definitions of the program (\figref{typing-top-level}).
 
 \subsubsection{Context operations}
 \label{sec:context-operations}
@@ -99,11 +101,12 @@ an idempotent commutative semigroup of parallel composition $\merge$ (``merge'')
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
 distributivity does not hold. Both are defined pointwise (\figref{context-ops}): override is right-biased
 and has $\bot$ as both left and right unit, whereas merge has no unit, since a variable bound on one side
-only is possibly unassigned.
+only is possibly unassigned. Override is defined in the same way on any finite map with $\bot$ for
+undefined, such as an environment or class table.
 \input{spec/fig/context-ops}
 
 A third operation, \emph{context extension} $\Gamma \extend \Delta$ (also \figref{context-ops}),
-combines module references for the same module recursively, preferring loaded references to stubs, and is
+combines module references for the same module recursively, preferring checked modules to stubs, and is
 otherwise right-biased like override. It is used in processing an import prefix, in which two imports with the same root, such as
 \pyinline{a.b} and \pyinline{a.c}, both bind the root and must combine rather than shadow.
 
@@ -112,14 +115,16 @@ otherwise right-biased like override. It is used in processing an import prefix,
 
 Statements are sequenced by
 juxtaposition, $s\;s'$; a function body, branch of a conditional and body of a case are statements.
-A \emph{top-level statement} $t$ is a statement, class declaration or \pyinline{type} statement, also sequenced by juxtaposition; the body of a
-module after its imports is a top-level statement, so class declarations and \pyinline{type} statements occur only at the top level of a
-module. A \pyinline{type} statement declares a \emph{type alias}. Function definitions, class declarations and
+A \emph{type definition} $\chi$ is a class definition or \pyinline{type} statement.
+A \emph{top-level statement} $t$ is a statement or mutual type region, also sequenced by juxtaposition; the body of a
+module after its imports is a top-level statement, so type definitions occur only at the top level of a
+module. A \pyinline{type} statement declares a \emph{type alias}. Function definitions, class definitions and
 \pyinline{type} statements bind \emph{type parameters} $\seq{\alpha}$, written in brackets after the name as in
-Python 3.12. A \emph{mutual region} $d_1 \ldots d_{n+1}$ is a maximal contiguous block of \pyinline{def} statements: any other statement separates mutual
-regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
-grouping consecutive \pyinline{def}s into a single mutual region. The well-formedness rules treat each
-mutual region as one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
+Python 3.12. A \emph{mutual def region} $d_1 \ldots d_{n+1}$ is a maximal contiguous block of \pyinline{def} statements: any other statement separates mutual
+def regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
+grouping consecutive \pyinline{def}s into a single mutual def region. A \emph{mutual type region} $\chi_1 \ldots \chi_{n+1}$ is a
+maximal contiguous block of type definitions, grouped by the parser in the same way. The well-formedness rules treat each
+mutual def region and each mutual type region as one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
 
 \input{spec/fig/syntax-stmt}
 \input{spec/fig/syntax-expr}
@@ -137,7 +142,7 @@ fills the field $x$. It is defined only if every field receives exactly one argu
 \paperonly{\paragraph{Type annotations.}}
 
 Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
-may be annotated (\figref{syntax-types}). A dataclass specifies its base class by a type expression of the form $q[\seq{\psi}]$. A \emph{type} $\tau$ has the forms of a type expression, with an \emph{instantiated class} $C[\seq{\tau}]$, a class applied to type arguments and written $C$ when there are no arguments, in place of $q[\seq{\psi}]$. Resolution\speconly{ (\secref{types})} takes $q[\seq{\psi}]$ to $C[\seq{\tau}]$ when $q$ denotes the class $C$, and to the instantiation of the alias when $q$ denotes a type alias. The substitution $\subst{\seq{\tau}}{\seq{\alpha}}{\sigma}$ replaces each occurrence of $\alpha_i$ in $\sigma$ by $\tau_i$, a plain replacement, since every type variable in a type is free, and is defined only if $\seq{\tau}$ and $\seq{\alpha}$ have the same length. A \emph{scheme} $\pi$ (\figref{syntax-types}) binds type parameters $\seq{\alpha}$ in its body. The body of a \emph{type scheme} $\scheme{\seq{\alpha}}{\tau}$ is a type; the body of a \emph{field scheme} $\scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}$ is a sequence of fields $\seq{x}$ with their types $\seq{\tau}$. The \emph{instantiation} of $\pi$ at $\seq{\sigma}$, written $\tyInst{\pi}{\seq{\sigma}}$, substitutes $\seq{\sigma}$ for $\seq{\alpha}$ in the body: $\subst{\seq{\sigma}}{\seq{\alpha}}{\tau}$ for a type scheme and $\bind{\seq{x}}{\subst{\seq{\sigma}}{\seq{\alpha}}{\seq{\tau}}}$ for a field scheme. A scheme without type parameters is its body, with the $\forall\seq{\alpha}$ omitted. The fields of a class (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:fields}}) form a field scheme.
+may be annotated (\figref{syntax-types}). A dataclass specifies its base class by a type expression of the form $q[\seq{\psi}]$. A \emph{type} $\tau$ has the forms of a type expression, with an \emph{instantiated class} $C[\seq{\tau}]$, a class applied to type arguments and written $C$ when there are no arguments, in place of $q[\seq{\psi}]$. Resolution\speconly{ (\secref{types})} takes $q[\seq{\psi}]$ to $C[\seq{\tau}]$ when $q$ denotes the class $C$, and to the instantiation of the alias when $q$ denotes a type alias. The substitution $\subst{\seq{\tau}}{\seq{\alpha}}{\sigma}$ replaces each occurrence of $\alpha_i$ in $\sigma$ by $\tau_i$, a plain replacement, since every type variable in a type is free, and is defined only if $\seq{\tau}$ and $\seq{\alpha}$ have the same length. A \emph{scheme} $\pi$ (\figref{syntax-types}) binds type parameters $\seq{\alpha}$ in its body. Schemes are identified up to renaming of their type parameters. The body of a \emph{type scheme} $\scheme{\seq{\alpha}}{\tau}$ is a type; the body of a \emph{field scheme} $\scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}$ is a sequence of fields $\seq{x}$ with their types $\seq{\tau}$. The \emph{instantiation} of $\pi$ at $\seq{\sigma}$, written $\tyInst{\pi}{\seq{\sigma}}$, substitutes $\seq{\sigma}$ for $\seq{\alpha}$ in the body: $\subst{\seq{\sigma}}{\seq{\alpha}}{\tau}$ for a type scheme and $\bind{\seq{x}}{\subst{\seq{\sigma}}{\seq{\alpha}}{\seq{\tau}}}$ for a field scheme. A scheme without type parameters is its body, with the $\forall\seq{\alpha}$ omitted. The fields of a class (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:fields}}) form a field scheme.
 
 \subsubsection{Operators}
 \label{sec:syntax-operators}
@@ -154,6 +159,7 @@ which follow Python.
 \subsection{Modules and programs}
 \label{sec:modules-programs}
 
+\begin{specdefinition}{Program}
 A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
 (\figref{syntax-stmt}) to \emph{module bodies} $\mu$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
@@ -162,6 +168,7 @@ $\seq{\iota}$, its \emph{import prefix}, followed by a top-level statement $t$; 
 within a statement nor after it. The statement begins with the
 declaration $\exAssign{\pymath{\_\_name\_\_}\exAnnot{\tyStr}}{\nameOf(q)}$, which binds the name of the module when the module
 loads (\secref{well-formedness-modules}).
+\end{specdefinition}
 
 A second map $\mathcal{P}$ gives the
 predefined modules of \figref{predefined-values}, which have no body: $\mathcal{P}$ takes each such name to its
@@ -181,15 +188,20 @@ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context 
 (\figref{predefined-values}). A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
 the predefined signatures. The class table $\SigmaPredef$ of the predefined modules has the single entry
-$\SigmaPredef(\clsRange) = \clsRec{\varepsilon}{\bind{\pyinline{stop}}{\tyInt}}{\bot}$.
+$\SigmaPredef(\clsRange) = \ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}$, where $\chi$ is the definition
+\pyinline{@dataclass class range: stop: int} and $\Gamma$ is the signature of \pyinline{builtins}.
 \end{definition}
 
 \input{spec/fig/predefined-signatures}
 
 \input{spec/fig/predefined-values}
 
+\begin{specdefinition}{Containing modules}
 Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' = q.q^\dagger$ for some $q^\dagger$, and $\properPrefixOf$ for
 the strict order; the proper prefixes of a module name are its \emph{containing modules}, and it is
-\emph{contained} in each of them.\speconly{ The metafunctions
+\emph{contained} in each of them.
+\end{specdefinition}
+
+\speconly{The metafunctions
 on modules and classes are defined in \secref{auxiliary-classes}.}
 \paperinput{paper/syntax/classes}

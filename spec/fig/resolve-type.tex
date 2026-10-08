@@ -18,7 +18,7 @@
 {
   \Gamma \vdash q : \Type{C} \\
   \Sigma; \Gamma \vdash \seq{\psi} \synth \seq{\tau} \\
-  C \text{ has } |\seq{\tau}| \text{ type parameters in } \Sigma
+  |\seq{\tau}| = |\typeParams{\Sigma}(C)|
 }
 {
   \Sigma; \Gamma \vdash q[\seq{\psi}] \synth C[\seq{\tau}]
@@ -26,7 +26,9 @@
 \and
 \inferrule*[lab={\ruleName{ty-alias}}]
 {
-  \Gamma \vdash q : \TypeAlias{\seq{\alpha}}{\tau} \\
+  \Gamma \vdash q : \TypeAlias[\Gamma']{q'}{\seq{\chi}}{i} \\
+  \chi_i = \exTypeAlias{x[\seq{\alpha}]}{\psi'} \\
+  \Sigma; \typeContext{\Gamma'}(q', \seq{\chi}, i) \vdash \psi' \synth \tau \\
   \Sigma; \Gamma \vdash \seq{\psi} \synth \seq{\sigma}
 }
 {

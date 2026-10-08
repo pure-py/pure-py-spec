@@ -5,10 +5,6 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import Enum
 from types import EllipsisType
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from classes import Class
 
 
 class Primitive(Enum):
@@ -157,8 +153,19 @@ class TypeVariable:
 
 
 @dataclass(frozen=True)
+class ClassName:
+    name: Name
+
+    def __repr__(self) -> str:
+        return f"ClassName({self.name})"
+
+
+RANGE = ClassName(parse_name("builtins.range"))
+
+
+@dataclass(frozen=True)
 class ClassType:
-    c: Class
+    c: ClassName
     args: tuple[Type, ...]
 
 
@@ -212,6 +219,24 @@ def substitute(taus: Sequence[Type], alphas: Sequence[Var], sigma: Type) -> Type
 
 def instantiate(pi: FieldScheme, taus: Sequence[Type]) -> tuple[tuple[Var, Type], ...]:
     return tuple((x, substitute(taus, pi.type_params, sigma)) for x, sigma in pi.fields)
+
+
+def fv(tau: Type) -> set[Var]:
+    match tau:
+        case TypeVariable(alpha):
+            return {alpha}
+        case ListType(sigma) | DictType(sigma):
+            return fv(sigma)
+        case TupleType(sigmas):
+            return set().union(*(fv(c) for c in sigmas))
+        case CallableType(sigmas, sigma):
+            return set().union(fv(sigma), *(fv(p) for p in sigmas))
+        case ClassType(_, sigmas):
+            return set().union(*(fv(a) for a in sigmas))
+        case UnionType(sigma, sigma_):
+            return fv(sigma) | fv(sigma_)
+        case _:
+            return set()
 
 
 def render(tau: Type) -> str:

@@ -28,10 +28,10 @@
 \and
 \inferrule*[lab={\ruleName{simple-alias}}]
 {
-  \bind{x}{\TypeAlias{\seq{\alpha}}{\tau}} \in \Gamma
+  \bind{x}{\TypeAlias[\Gamma']{q}{\seq{\chi}}{i}} \in \Gamma
 }
 {
-  \Gamma \vdash x : \TypeAlias{\seq{\alpha}}{\tau}
+  \Gamma \vdash x : \TypeAlias[\Gamma']{q}{\seq{\chi}}{i}
 }
 \and
 \inferrule*[lab={\ruleName{simple-scheme}}]

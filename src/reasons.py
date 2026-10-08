@@ -139,6 +139,14 @@ class NotPredefinedName:
 
 
 @dataclass(frozen=True)
+class CyclicTypeAlias:
+    x: Var
+
+    def message(self) -> str:
+        return f"type alias '{self.x}' is cyclic"
+
+
+@dataclass(frozen=True)
 class RangePattern:
     def message(self) -> str:
         return "'range' not permitted in a constructor pattern"
@@ -535,6 +543,7 @@ type Reason = (
     | PatternArityMismatch
     | NotClass
     | RangePattern
+    | CyclicTypeAlias
     | ClassArityMismatch
     | TypeAliasArityMismatch
     | NotPredefinedName

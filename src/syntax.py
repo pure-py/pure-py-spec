@@ -231,7 +231,7 @@ def check_syntax_stmt(node: ast.stmt) -> None:
         case ast.Nonlocal():
             raise Prohibited(node, "nonlocal")
         case ast.ClassDef():
-            raise Prohibited(node, "class declaration outside the module top level")
+            raise Prohibited(node, "class definition outside the module top level")
         case ast.TypeAlias():
             raise Prohibited(node, "type statement outside the module top level")
         case ast.Match():
