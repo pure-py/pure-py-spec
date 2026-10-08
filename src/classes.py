@@ -71,19 +71,21 @@ def class_table(gamma: Context, q: Name, chis: tuple[TypeDefinition, ...], i: in
 
 
 def class_definition(Sigma: ClassTable, c: ClassName) -> ast.ClassDef:
-    """Class definition of c, from Sigma"""
-    entry = Sigma[c]
-    chi = entry.chis[entry.i]
-    assert isinstance(chi, ast.ClassDef)
-    return chi
+    """Class definition chi_i of c, for Sigma(c) = ClassDef_gamma(q, chis, i)"""
+    match Sigma[c]:
+        case ClassDef(chis=chis, i=i):
+            chi = chis[i]
+            assert isinstance(chi, ast.ClassDef)
+            return chi
 
 
 def definition_context(Sigma: ClassTable, c: ClassName) -> ModuleContext:
-    """Module context for resolving annotations of class c, under type-context of its class table
-    entry and class table Sigma. Module map empty, because resolving a type never imports a module."""
-    entry = Sigma[c]
-    gamma = type_context(entry.gamma, entry.q, entry.chis, entry.i)
-    return ModuleContext(gamma=gamma, M={}, q=entry.q, Sigma=Sigma)
+    """Module context for resolving annotations of class c: type-context(gamma, q, chis, i) for
+    Sigma(c) = ClassDef_gamma(q, chis, i), with class table Sigma. Module map empty, because resolving a
+    type never imports a module."""
+    match Sigma[c]:
+        case ClassDef(gamma, q, chis, i):
+            return ModuleContext(gamma=type_context(gamma, q, chis, i), M={}, q=q, Sigma=Sigma)
 
 
 def type_params(Sigma: ClassTable, c: ClassName) -> tuple[Var, ...]:
