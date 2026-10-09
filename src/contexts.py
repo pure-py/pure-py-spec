@@ -176,6 +176,7 @@ PREDEFINED_MEMBERS: dict[str, Context] = {
         "print": CallableType((Primitive.OBJECT,), Primitive.NONE),
         "len": CallableType((Primitive.SIZED,), Primitive.INT),
         "range": RANGE,
+        "round": FLOAT_TO_INT,
         Primitive.NONE.value: PredefinedName(),
         Primitive.OBJECT.value: PredefinedName(),
         Primitive.BOOL.value: PredefinedName(),

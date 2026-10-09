@@ -9,6 +9,9 @@
  & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
  & & $\quad \primFn(\seq{u}) = \aborts{\errType}$ & otherwise \\
  & \pyinline{range} & \multicolumn{2}{l}{$\Type{\clsRange}$} \\
+ & \pyinline{round} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
+ & & $\quad \primFn(n) = \val{n'}$ & if $n'$ nearest integer to $n$, ties to even \\
+ & & $\quad \primFn(n) = \undefinedResult$ & otherwise \\
  & \pyinline{None} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{None}}$} \\
  & \pyinline{object} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{object}}$} \\
  & \pyinline{bool} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{bool}}$} \\
