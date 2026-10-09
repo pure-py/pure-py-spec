@@ -4,8 +4,7 @@
 \PurePy is a subset of Python chosen so that its programs are well-behaved and broadly \emph{pure}, yet run
 unchanged under a standard Python interpreter and compute the same result. \secref{purity} makes the purity
 claim precise and sets out the excluded features, grouped by the discipline that each one protects;
-\figref{prevented-errors} summarises the Python runtime errors ruled out by the type system\deleted{, and
-\figref{roadmap} lists planned additions and features under consideration}.
+\figref{prevented-errors} summarises the Python runtime errors ruled out by the type system.
 
 \subsection{Python compatibility}
 \label{sec:python-compatibility}
@@ -225,52 +224,4 @@ meanings given in \secref{operational-semantics}.
 \label{sec:runtime-errors}
 
 \input{spec/exclusions/prevented-errors}
-
-\begin{figure}
-\begin{DeletedBlock}
-\small
-\begin{center}
-\begin{minipage}[t]{0.4\textwidth}
-\vspace{0pt}
-\begin{tabular}{ll}
-\textbf{To do} & \\
-Reserved words & \issue{9} \\
-\deleted{Set expressions} & \deleted{\issue{147}} \\
-Identity operator (\pyinline{is}) & \issue{81} \\
-\deleted{Chained comparison} & \deleted{\issue{82}} \\
-\deleted{Enums} & \deleted{\issue{86}} \\
-Aliased imports\added{ and multi-imports} & \issue{135} \\
-\deleted{Case guards} & \deleted{\issue{190}} \\
-Ints and floats & \issue{156} \\
-\added{Frozen dataclasses} & \added{\issue{199}} \\
-\added{Command-line arguments} & \added{\issue{97}} \\
-\added{Destructuring assignment} & \added{\issue{54}} \\
-\end{tabular}
-\end{minipage}\hspace{2em}
-\begin{minipage}[t]{0.4\textwidth}
-\vspace{0pt}
-\begin{tabular}{ll}
-\textbf{Under consideration} & \\
-\deleted{Destructuring assignment} & \deleted{\issue{54}} \\
-\deleted{f-strings} & \deleted{\issue{55}} \\
-\deleted{Default arguments} & \deleted{\issue{56}} \\
-\deleted{\pyinline{*args} and \pyinline{**kwargs}} & \deleted{\issue{57}} \\
-\deleted{Slicing} & \deleted{\issue{59}} \\
-\deleted{Star patterns} & \deleted{\issue{84}} \\
-\deleted{Or patterns} & \deleted{\issue{85}} \\
-\deleted{Relative imports} & \deleted{\issue{126}} \\
-\deleted{Wildcard imports} & \deleted{\issue{105}} \\
-\deleted{Function keyword arguments} & \deleted{\issue{127}} \\
-\deleted{Postponed annotation evaluation} & \deleted{\issue{128}} \\
-\deleted{Primitive operations} & \deleted{\issue{132}} \\
-\deleted{Annotated lambdas and generator targets} & \deleted{\issue{178}} \\
-\deleted{Members for built-in types} & \deleted{\issue{181}} \\
-& \\
-\end{tabular}
-\end{minipage}
-\end{center}
-\caption{\todo{Planned additions and features under consideration}}
-\label{fig:roadmap}
-\end{DeletedBlock}
-\end{figure}
 
