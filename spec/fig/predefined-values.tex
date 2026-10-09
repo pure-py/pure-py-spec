@@ -9,6 +9,9 @@
  & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = u_1 \cons \ldots \cons u_n$ \\
  & & $\quad \primFn(\seq{u}) = \aborts{\errType}$ & otherwise \\
  & \pyinline{range} & \multicolumn{2}{l}{$\Type{\clsRange}$} \\
+ & \added{\pyinline{round}} & \multicolumn{2}{l}{\added{$\primVal{\primFn}$ where}} \\
+ & & \added{$\quad \primFn(n) = \val{n'}$} & \added{if $n'$ nearest integer to $n$, ties to even} \\
+ & & \added{$\quad \primFn(n) = \undefinedResult$} & \added{otherwise} \\
  & \pyinline{None} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{None}}$} \\
  & \pyinline{object} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{object}}$} \\
  & \pyinline{bool} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{bool}}$} \\
@@ -18,16 +21,16 @@
  & \pyinline{list} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{list}}$} \\
  & \pyinline{dict} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{dict}}$} \\
  & \pyinline{tuple} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{tuple}}$} \\
-\pyinline{math} & \pyinline{pi} & & \\
- & \pyinline{e} & & \\
- & \pyinline{sqrt} & & \\
- & \pyinline{exp} & & \\
- & \pyinline{log} & & \\
- & \pyinline{sin} & & \\
- & \pyinline{cos} & & \\
- & \pyinline{tan} & & \\
- & \pyinline{floor} & & \\
- & \pyinline{ceil} & & \\
+\deleted{\pyinline{math}} & \deleted{\pyinline{pi}} & & \\
+ & \deleted{\pyinline{e}} & & \\
+ & \deleted{\pyinline{sqrt}} & & \\
+ & \deleted{\pyinline{exp}} & & \\
+ & \deleted{\pyinline{log}} & & \\
+ & \deleted{\pyinline{sin}} & & \\
+ & \deleted{\pyinline{cos}} & & \\
+ & \deleted{\pyinline{tan}} & & \\
+ & \deleted{\pyinline{floor}} & & \\
+ & \deleted{\pyinline{ceil}} & & \\
 \pyinline{sys} & \pyinline{argv} & & \\
  & \pyinline{exit} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
  & & $\quad \primFn(n) = \aborts{\errExit{n}}$ & \\

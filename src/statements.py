@@ -849,11 +849,17 @@ def dataclass(node: ast.ClassDef, mod_ctx: ModuleContext) -> None:
         raise IllFormedModule(node, reasons.NotPredefinedName("dataclass"))
     own = tuple((x, resolve_type(psi, node, mod_ctx)) for x, psi in own_fields(node))
     base = None if len(node.bases) == 0 else base_class(node, mod_ctx)
-    inherited = () if base is None else field_names(mod_ctx.Sigma, base.c)
-    names = inherited + tuple(x for x, _ in own)
-    dup = next((x for i, x in enumerate(names) if x in names[:i]), None)
+    xs = tuple(x for x, _ in own)
+    dup = next((x for i, x in enumerate(xs) if x in xs[:i]), None)
     if dup is not None:
         raise IllFormedModule(node, reasons.DuplicateField(dup, node.name))
+    if base is not None:
+        inherited = field_names(mod_ctx.Sigma, base.c)
+        clash = next((x for x in xs if x in inherited), None)
+        if clash is not None:
+            raise IllFormedModule(
+                node, reasons.InheritedField(clash, node.name, short_name(base.c))
+            )
 
 
 def type_alias(node: ast.TypeAlias, mod_ctx: ModuleContext) -> None:
@@ -863,9 +869,12 @@ def type_alias(node: ast.TypeAlias, mod_ctx: ModuleContext) -> None:
 def base_class(node: ast.ClassDef, mod_ctx: ModuleContext) -> ClassType:
     psi = parse_annotation(node.bases[0])
     assert isinstance(psi, TypeName)
-    if isinstance(resolve_name(psi.q, mod_ctx), TypeAlias):
-        raise IllFormedModule(node, reasons.NotClass(psi.q))
-    tau = resolve_type(psi, node, mod_ctx)
-    if not isinstance(tau, ClassType):
-        raise IllFormedModule(node, reasons.NotClass(psi.q))
-    return tau
+    match resolve_name(psi.q, mod_ctx):
+        case Unbound():
+            raise IllFormedModule(node, reasons.UnboundName(str(psi.q)))
+        case ClassName():
+            tau = resolve_type(psi, node, mod_ctx)
+            assert isinstance(tau, ClassType)
+            return tau
+        case _:
+            raise IllFormedModule(node, reasons.NotClass(psi.q))
