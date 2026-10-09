@@ -119,7 +119,7 @@ A \emph{type definition} $\chi$ is a class definition or \pyinline{type} stateme
 A \emph{top-level statement} $t$ is a statement or mutual type region, also sequenced by juxtaposition; the body of a
 module after its imports is a top-level statement, so type definitions occur only at the top level of a
 module. A \pyinline{type} statement declares a \emph{type alias}. Function definitions, class definitions and
-\pyinline{type} statements bind \emph{type parameters} $\seq{\alpha}$, written in brackets after the name as in
+\pyinline{type} statements bind \added{distinct }\emph{type parameters} $\seq{\alpha}$, written in brackets after the name as in
 Python 3.12. A \emph{mutual def region} $d_1 \ldots d_{n+1}$ is a maximal contiguous block of \pyinline{def} statements: any other statement separates mutual
 def regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single mutual def region. A \emph{mutual type region} $\chi_1 \ldots \chi_{n+1}$ is a
