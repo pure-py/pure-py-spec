@@ -18,12 +18,16 @@ Commit messages, issue titles and bulleted lists are telegraphic:
 
 ## Commits
 
+- Work on a new branch when starting a new issue
+- Push with `-u` to set up tracking: `git push -u origin <branch-name>`
 - Fix a committed mistake with a new commit; never amend, and never `git stash`
 
 ## Permissions
 
 - When an action is refused for lack of permission, stop and report it; never work around the refusal
   with another account, another token or a bypass flag
+- Never run `gh auth refresh` or `gh auth login` without `--with-token`, which would overwrite the
+  fine-grained PAT with an OAuth token that lacks private repo access
 
 ## Referring to an issue
 
