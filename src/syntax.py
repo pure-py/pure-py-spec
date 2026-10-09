@@ -477,16 +477,12 @@ def check_syntax_import(node: ast.stmt) -> None:
                 raise NotYetSupported(node, "multi-target import (import a, b)", 135)
             if node.names[0].asname is not None:
                 raise NotYetSupported(node, "import-as", 135)
-            if node.names[0].name.split(".")[0] == "math":
-                raise NotYetSupported(node, "math module", 227)
         case ast.ImportFrom():
             if len(node.names) == 0:
                 raise Prohibited(node, "empty name list")
             if node.level > 0:
                 raise NotYetSupported(node, "relative imports", 126)
             assert node.module is not None  # absent only in a relative import
-            if node.module.split(".")[0] == "math":
-                raise NotYetSupported(node, "math module", 227)
             for alias in node.names:
                 if alias.name == "*":
                     raise NotYetSupported(node, "from M import *", 105)
