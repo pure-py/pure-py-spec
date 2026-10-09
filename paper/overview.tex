@@ -4,8 +4,8 @@
 \PurePy is a subset of Python chosen so that its programs are well-behaved and broadly \emph{pure}, yet run
 unchanged under a standard Python interpreter and compute the same result. \secref{purity} makes the purity
 claim precise and sets out the excluded features, grouped by the discipline that each one protects;
-\figref{prevented-errors} summarises the Python runtime errors ruled out by the type system, and
-\figref{roadmap} lists planned additions and features under consideration.
+\figref{prevented-errors} summarises the Python runtime errors ruled out by the type system\deleted{, and
+\figref{roadmap} lists planned additions and features under consideration}.
 
 \subsection{Python compatibility}
 \label{sec:python-compatibility}
@@ -227,6 +227,7 @@ meanings given in \secref{operational-semantics}.
 \input{spec/exclusions/prevented-errors}
 
 \begin{figure}
+\begin{DeletedBlock}
 \small
 \begin{center}
 \begin{minipage}[t]{0.4\textwidth}
@@ -270,5 +271,6 @@ Ints and floats & \issue{156} \\
 \end{center}
 \caption{\todo{Planned additions and features under consideration}}
 \label{fig:roadmap}
+\end{DeletedBlock}
 \end{figure}
 
