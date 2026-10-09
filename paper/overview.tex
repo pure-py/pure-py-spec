@@ -4,8 +4,7 @@
 \PurePy is a subset of Python chosen so that its programs are well-behaved and broadly \emph{pure}, yet run
 unchanged under a standard Python interpreter and compute the same result. \secref{purity} makes the purity
 claim precise and sets out the excluded features, grouped by the discipline that each one protects;
-\figref{prevented-errors} summarises the Python runtime errors ruled out by the type system, and
-\figref{roadmap} lists planned additions and features under consideration.
+\figref{prevented-errors} summarises the Python runtime errors ruled out by the type system.
 
 \subsection{Python compatibility}
 \label{sec:python-compatibility}
@@ -225,47 +224,4 @@ meanings given in \secref{operational-semantics}.
 \label{sec:runtime-errors}
 
 \input{spec/exclusions/prevented-errors}
-
-\begin{figure}
-\small
-\begin{center}
-\begin{minipage}[t]{0.4\textwidth}
-\vspace{0pt}
-\begin{tabular}{ll}
-\textbf{To do} & \\
-Reserved words & \issue{9} \\
-Set expressions & \issue{147} \\
-Identity operator (\pyinline{is}) & \issue{81} \\
-Chained comparison & \issue{82} \\
-Enums & \issue{86} \\
-Aliased imports & \issue{135} \\
-Case guards & \issue{190} \\
-Ints and floats & \issue{156} \\
-\end{tabular}
-\end{minipage}\hspace{2em}
-\begin{minipage}[t]{0.4\textwidth}
-\vspace{0pt}
-\begin{tabular}{ll}
-\textbf{Under consideration} & \\
-Destructuring assignment & \issue{54} \\
-f-strings & \issue{55} \\
-Default arguments & \issue{56} \\
-\pyinline{*args} and \pyinline{**kwargs} & \issue{57} \\
-Slicing & \issue{59} \\
-Star patterns & \issue{84} \\
-Or patterns & \issue{85} \\
-Relative imports & \issue{126} \\
-Wildcard imports & \issue{105} \\
-Function keyword arguments & \issue{127} \\
-Postponed annotation evaluation & \issue{128} \\
-Primitive operations & \issue{132} \\
-Annotated lambdas and generator targets & \issue{178} \\
-Members for built-in types & \issue{181} \\
-& \\
-\end{tabular}
-\end{minipage}
-\end{center}
-\caption{\todo{Planned additions and features under consideration}}
-\label{fig:roadmap}
-\end{figure}
 
