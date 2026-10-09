@@ -166,7 +166,6 @@ class Assigns:
 type StaticOutcome = Returns | Assigns
 
 
-FLOAT_TO_FLOAT = CallableType((Primitive.FLOAT,), Primitive.FLOAT)
 FLOAT_TO_INT = CallableType((Primitive.FLOAT,), Primitive.INT)
 
 # The type of each predefined member, with PredefinedName for the members
@@ -186,18 +185,6 @@ PREDEFINED_MEMBERS: dict[str, Context] = {
         TypeConstructor.LIST.value: PredefinedName(),
         TypeConstructor.DICT.value: PredefinedName(),
         TypeConstructor.TUPLE.value: PredefinedName(),
-    },
-    "math": {
-        "pi": Primitive.FLOAT,
-        "e": Primitive.FLOAT,
-        "sqrt": FLOAT_TO_FLOAT,
-        "exp": FLOAT_TO_FLOAT,
-        "log": FLOAT_TO_FLOAT,
-        "sin": FLOAT_TO_FLOAT,
-        "cos": FLOAT_TO_FLOAT,
-        "tan": FLOAT_TO_FLOAT,
-        "floor": FLOAT_TO_INT,
-        "ceil": FLOAT_TO_INT,
     },
     "sys": {
         "argv": ListType(Primitive.STR),

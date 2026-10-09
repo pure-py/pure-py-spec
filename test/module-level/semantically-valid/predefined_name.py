@@ -1,3 +1,3 @@
 # rule: predefined
-import math
-print(math.__name__)
+import sys
+print(sys.__name__)
