@@ -1,1 +1,1 @@
-duplicate field 'x' in class 'Sub'
+field 'x' of class 'Sub' is also a field of base class 'Base'

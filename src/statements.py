@@ -853,10 +853,13 @@ def dataclass(node: ast.ClassDef, mod_ctx: ModuleContext) -> None:
     dup = next((x for i, x in enumerate(xs) if x in xs[:i]), None)
     if dup is not None:
         raise IllFormedModule(node, reasons.DuplicateField(dup, node.name))
-    inherited = () if base is None else field_names(mod_ctx.Sigma, base.c)
-    clash = next((x for x in xs if x in inherited), None)
-    if clash is not None:
-        raise IllFormedModule(node, reasons.DuplicateField(clash, node.name))
+    if base is not None:
+        inherited = field_names(mod_ctx.Sigma, base.c)
+        clash = next((x for x in xs if x in inherited), None)
+        if clash is not None:
+            raise IllFormedModule(
+                node, reasons.InheritedField(clash, node.name, short_name(base.c))
+            )
 
 
 def type_alias(node: ast.TypeAlias, mod_ctx: ModuleContext) -> None:

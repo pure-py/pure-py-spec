@@ -1,1 +1,1 @@
-duplicate field 'x' in class 'C'
+field 'x' of class 'C' is also a field of base class 'B'

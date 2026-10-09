@@ -14,6 +14,16 @@ class DuplicateField:
 
 
 @dataclass(frozen=True)
+class InheritedField:
+    x: Var
+    c: Var
+    d: Var
+
+    def message(self) -> str:
+        return f"field '{self.x}' of class '{self.c}' is also a field of base class '{self.d}'"
+
+
+@dataclass(frozen=True)
 class UndefinedVariable:
     x: Var
 
@@ -528,6 +538,7 @@ class MissingReturnMatchPartial:
 
 type Reason = (
     DuplicateField
+    | InheritedField
     | UnassignedVariable
     | PossiblyUnassigned
     | UndefinedVariable
