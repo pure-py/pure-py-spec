@@ -103,11 +103,11 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 The fields of a class $C$ form a field scheme $\fields{\Sigma}(C)$ over its type parameters, with one binding $\bind{x}{\tau}$ per
 field: the fields of its base class first, recursively and instantiated at the type arguments of the base, then the fields declared by $C$ itself, each at its
 declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the instantiation $\tyInst{\fields{\Sigma}(C)}{\seq{\tau}}$. The order matters, because a constructor call pairs positional arguments with fields by
-position. A constructor call $\exConstr{q}{a}$ pairs each argument with a field using $\fieldMap{\Sigma}$ and
+position. \replaced{A call $\exCall{q}{a}$ whose callee denotes a class is a constructor call, which}{A constructor call $\exCall{q}{a}$} pairs each argument with a field using $\fieldMap{\Sigma}$ and
 infers type arguments $\seq{\tau}'$ for the class $C$ that $q$ resolves to, using $\typeArgs{\Sigma}$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) over the arguments that synthesise, as
 in \ruleName{callee-scheme} (\ruleName{constr}). The arguments are checked against the field types instantiated at
-$\seq{\tau}'$, and the call synthesises $C[\seq{\tau}']$. A constructor call of the form $\exConstr{q[\seq{\psi}]}{a}$ takes
+$\seq{\tau}'$, and the call synthesises $C[\seq{\tau}']$. A constructor call of the form $\exCall{q[\seq{\psi}]}{a}$ takes
 the type arguments denoted by $\seq{\psi}$ instead (\ruleName{constr-explicit}). An attribute reference $\exAttr{e}{x}$ has the type of the field $x$ of the class synthesised by $e$
 (\ruleName{attr-object}). The signature of a predefined module binds
 $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type given in \figref{predefined-signatures}
@@ -189,7 +189,7 @@ each iteration.
 
 \input{spec/fig/operator-overloads}
 
-Each operator is overloaded as specified in \figref{operator-overloads}.
+Each operator is overloaded as specified in \figref{operator-overloads}. \added{The operator \pyinline{|} has no overloads, so it is well-formed only within a type expression (\figref{resolve-type}).}
 
 \begin{specdefinition}{Resolved overload}
 A \emph{resolved overload}
