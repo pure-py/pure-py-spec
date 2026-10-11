@@ -363,6 +363,22 @@ class NoBinaryOverload:
 
 
 @dataclass(frozen=True)
+class SubscriptIndices:
+    n: int
+
+    def message(self) -> str:
+        return f"subscript with {self.n} indices"
+
+
+@dataclass(frozen=True)
+class NotTypeExpression:
+    e: str
+
+    def message(self) -> str:
+        return f"'{self.e}' is not a type expression"
+
+
+@dataclass(frozen=True)
 class NoUnaryOverload:
     op: str
     sigma: Type
@@ -539,6 +555,8 @@ class MissingReturnMatchPartial:
 type Reason = (
     DuplicateField
     | InheritedField
+    | SubscriptIndices
+    | NotTypeExpression
     | UnassignedVariable
     | PossiblyUnassigned
     | UndefinedVariable

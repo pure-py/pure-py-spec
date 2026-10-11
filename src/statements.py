@@ -77,7 +77,7 @@ from operators import (
 from reasons import IllFormedModule, MypyCompatibility
 from shapes import Shapes, shapes
 from subtyping import equivalent, join_seq, subtype, type_args_seq
-from syntax import render_pattern
+from syntax import UnparenthesisedTuple, render_pattern
 from type_syntax import (
     RANGE,
     CallableType,
@@ -96,6 +96,7 @@ from type_syntax import (
     base_type,
     literal_type,
     parse_annotation,
+    subscript_args,
     substitute,
 )
 
@@ -505,6 +506,8 @@ def attribute_type(obj: Type, e: ast.Attribute, mod_ctx: ModuleContext) -> Type:
 
 
 def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) -> Type:
+    if isinstance(e.slice, UnparenthesisedTuple):
+        raise IllFormedModule(e, reasons.SubscriptIndices(len(e.slice.elts)))
     if base_type(container) == Primitive.STR:
         check_expr(e.slice, Primitive.INT, mod_ctx)
         return Primitive.STR
@@ -612,7 +615,12 @@ def constr(c: ClassName, e: ast.Call, mod_ctx: ModuleContext) -> Type:
 
 
 def constr_explicit(e: ast.Call, mod_ctx: ModuleContext) -> Type:
-    tau = resolve_type(type_expr(e.func), e, mod_ctx)
+    assert isinstance(e.func, ast.Subscript)
+    psi = parse_annotation(e.func)
+    if psi is None:
+        arg = next(a for a in subscript_args(e.func.slice) if parse_annotation(a) is None)
+        raise IllFormedModule(arg, reasons.NotTypeExpression(ast.unparse(arg)))
+    tau = resolve_type(psi, e, mod_ctx)
     assert isinstance(tau, ClassType)
     for x, arg in constructor_args(tau.c, e, mod_ctx).items():
         check_expr(arg, declared_type(mod_ctx.Sigma, tau, x), mod_ctx)

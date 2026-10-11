@@ -372,6 +372,7 @@ def check_syntax_expr(node: ast.expr) -> None:
                 ast.FloorDiv,
                 ast.Mod,
                 ast.Pow,
+                ast.BitOr,
             )
             if not isinstance(node.op, allowed):
                 sym = OP_SYMBOLS.get(type(node.op), type(node.op).__name__)
@@ -399,11 +400,7 @@ def check_syntax_expr(node: ast.expr) -> None:
             for c in node.comparators:
                 check_syntax_expr(c)
         case ast.Call():
-            match node.func:
-                case ast.Subscript(value=e_) if isinstance(parse_annotation(node.func), TypeName):
-                    check_syntax_expr(e_)
-                case _:
-                    check_syntax_expr(node.func)
+            check_syntax_expr(node.func)
             for a in node.args:
                 check_syntax_expr(a)
             for k in node.keywords:
@@ -435,7 +432,12 @@ def check_syntax_expr(node: ast.expr) -> None:
             check_syntax_expr(node.value)
         case ast.Subscript():
             check_syntax_expr(node.value)
-            check_syntax_expr(node.slice)
+            match node.slice:
+                case UnparenthesisedTuple(elts=es):
+                    for e_ in es:
+                        check_syntax_expr(e_)
+                case _:
+                    check_syntax_expr(node.slice)
         case ast.ListComp():
             check_syntax_expr(node.elt)
             for g in node.generators:
