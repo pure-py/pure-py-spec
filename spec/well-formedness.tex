@@ -44,7 +44,7 @@ each of its disjuncts and below every type that is above all of them. A tuple ty
 same length when each of its components is below the corresponding component. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{pierce2002}. Lists and
 dictionaries are related only when their components are equivalent, since both are invariant in mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}). A callable type is contravariant in its parameters
 and covariant in its result, following mypy. The types with a length, namely lists, dictionaries,
-strings, tuples and $\replaced{\clsRange[]}{\clsRange}$, are below \pyinline{Sized}. An \pyinline{int} is a \pyinline{float}, as PEP~484
+strings, tuples and $\clsRange[]$, are below \pyinline{Sized}. An \pyinline{int} is a \pyinline{float}, as PEP~484
 requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
 Python treats it as one.
 
@@ -103,7 +103,7 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 The fields of a class $C$ form a field scheme $\fields{\Sigma}(C)$ over its type parameters, with one binding $\bind{x}{\tau}$ per
 field: the fields of its base class first, recursively and instantiated at the type arguments of the base, then the fields declared by $C$ itself, each at its
 declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the instantiation $\tyInst{\fields{\Sigma}(C)}{\seq{\tau}}$. The order matters, because a constructor call pairs positional arguments with fields by
-position. \replaced{A call $\exCall{q}{a}$ is a constructor call if $q$ denotes a class. A constructor call}{A constructor call $\exCall{q}{a}$} pairs each argument with a field using $\fieldMap{\Sigma}$ and
+position. A call $\exCall{q}{a}$ is a constructor call if $q$ denotes a class. A constructor call pairs each argument with a field using $\fieldMap{\Sigma}$ and
 infers type arguments $\seq{\tau}'$ for the class $C$ that $q$ resolves to, using $\typeArgs{\Sigma}$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) over the arguments that synthesise, as
 in \ruleName{callee-scheme} (\ruleName{constr}). The arguments are checked against the field types instantiated at
@@ -189,7 +189,7 @@ each iteration.
 
 \input{spec/fig/operator-overloads}
 
-Each operator is overloaded as specified in \figref{operator-overloads}. \added{The operator \pyinline{|} has no overloads, so an expression $\exBinOp{e}{\pyinline{|}}{e'}$ does not synthesise a type; the operator occurs only within type expressions, where $\tyUnion{\psi}{\psi'}$ denotes a union (\ruleName{ty-union}).}
+Each operator is overloaded as specified in \figref{operator-overloads}. The operator \pyinline{|} has no overloads, so an expression $\exBinOp{e}{\pyinline{|}}{e'}$ does not synthesise a type; the operator occurs only within type expressions, where $\tyUnion{\psi}{\psi'}$ denotes a union (\ruleName{ty-union}).
 
 \begin{specdefinition}{Resolved overload}
 A \emph{resolved overload}
