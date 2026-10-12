@@ -103,7 +103,7 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 The fields of a class $C$ form a field scheme $\fields{\Sigma}(C)$ over its type parameters, with one binding $\bind{x}{\tau}$ per
 field: the fields of its base class first, recursively and instantiated at the type arguments of the base, then the fields declared by $C$ itself, each at its
 declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the instantiation $\tyInst{\fields{\Sigma}(C)}{\seq{\tau}}$. The order matters, because a constructor call pairs positional arguments with fields by
-position. \replaced{A call $\exCall{q}{a}$ whose callee denotes a class is a constructor call, which}{A constructor call $\exCall{q}{a}$} pairs each argument with a field using $\fieldMap{\Sigma}$ and
+position. \replaced{A call $\exCall{q}{a}$ is a constructor call if $q$ denotes a class. A constructor call}{A constructor call $\exCall{q}{a}$} pairs each argument with a field using $\fieldMap{\Sigma}$ and
 infers type arguments $\seq{\tau}'$ for the class $C$ that $q$ resolves to, using $\typeArgs{\Sigma}$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) over the arguments that synthesise, as
 in \ruleName{callee-scheme} (\ruleName{constr}). The arguments are checked against the field types instantiated at
@@ -189,7 +189,7 @@ each iteration.
 
 \input{spec/fig/operator-overloads}
 
-Each operator is overloaded as specified in \figref{operator-overloads}. \added{The operator \pyinline{|} has no overloads, so it is well-formed only within a type expression (\figref{resolve-type}).}
+Each operator is overloaded as specified in \figref{operator-overloads}. \added{The operator \pyinline{|} has no overloads, so an expression $\exBinOp{e}{\pyinline{|}}{e'}$ does not synthesise a type; the operator occurs only within type expressions, where $\tyUnion{\psi}{\psi'}$ denotes a union (\ruleName{ty-union}).}
 
 \begin{specdefinition}{Resolved overload}
 A \emph{resolved overload}
