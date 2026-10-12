@@ -444,6 +444,8 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
                     raise IllFormedModule(e, reasons.SubmoduleNotImported(q))
                 case _:
                     return attribute_type(synth_expr(e_, mod_ctx), e, mod_ctx)
+        case ast.Subscript(slice=UnparenthesisedTuple(elts=es)):
+            raise IllFormedModule(e, reasons.SubscriptIndices(len(es)))
         case ast.Subscript(value=e_):
             return subscript_type(synth_expr(e_, mod_ctx), e, mod_ctx)
         case ast.Tuple(elts=es):
@@ -506,8 +508,6 @@ def attribute_type(obj: Type, e: ast.Attribute, mod_ctx: ModuleContext) -> Type:
 
 
 def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) -> Type:
-    if isinstance(e.slice, UnparenthesisedTuple):
-        raise IllFormedModule(e, reasons.SubscriptIndices(len(e.slice.elts)))
     if base_type(container) == Primitive.STR:
         check_expr(e.slice, Primitive.INT, mod_ctx)
         return Primitive.STR
