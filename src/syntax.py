@@ -67,7 +67,7 @@ class UnparenthesisedTuple(ast.Tuple):
     pass
 
 
-# Indices of subscript with several indices
+# Indices of subscript, one or more
 class Indices(ast.Tuple):
     pass
 
@@ -152,9 +152,10 @@ def classify_sequence(source: str) -> Callable[[ast.AST], ast.AST]:
                 if segment.startswith("("):
                     return node
                 return ast.copy_location(UnparenthesisedTuple(elts=es, ctx=ctx), node)
-            case ast.Subscript(value=e, slice=UnparenthesisedTuple(elts=es, ctx=ctx), ctx=ctx_):
-                indices = ast.copy_location(Indices(elts=es, ctx=ctx), node.slice)
-                return ast.copy_location(ast.Subscript(value=e, slice=indices, ctx=ctx_), node)
+            case ast.Subscript(value=e, slice=s, ctx=ctx):
+                es = s.elts if isinstance(s, UnparenthesisedTuple) else [s]
+                indices = ast.copy_location(Indices(elts=es, ctx=ast.Load()), s)
+                return ast.copy_location(ast.Subscript(value=e, slice=indices, ctx=ctx), node)
             case _:
                 return node
 
@@ -437,14 +438,10 @@ def check_syntax_expr(node: ast.expr) -> None:
             raise NotYetSupported(node, "set literals", 147)
         case ast.Attribute():
             check_syntax_expr(node.value)
-        case ast.Subscript():
-            check_syntax_expr(node.value)
-            match node.slice:
-                case Indices(elts=es):
-                    for e_ in es:
-                        check_syntax_expr(e_)
-                case _:
-                    check_syntax_expr(node.slice)
+        case ast.Subscript(value=e_, slice=Indices(elts=es)):
+            check_syntax_expr(e_)
+            for index in es:
+                check_syntax_expr(index)
         case ast.ListComp():
             check_syntax_expr(node.elt)
             for g in node.generators:

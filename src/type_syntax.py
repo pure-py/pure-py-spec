@@ -314,11 +314,20 @@ def dotted_name(e: ast.expr) -> Name | None:
 
 def parse_subscript(e: ast.Subscript) -> TypeExpr | None:
     head = e.value.id if isinstance(e.value, ast.Name) else None
+    indices = subscript_args(e.slice)
     if head == TypeConstructor.LITERAL.value:
-        return literal_type(e.slice)
+        return literal_type(indices[0]) if len(indices) == 1 else None
     if head == TypeConstructor.CALLABLE.value:
-        return parse_callable(subscript_args(e.slice))
-    args = parse_annotations(subscript_args(e.slice))
+        return parse_callable(indices)
+    # Empty tuple type written tuple[()], since brackets need an element
+    if (
+        head == TypeConstructor.TUPLE.value
+        and len(indices) == 1
+        and isinstance(indices[0], ast.Tuple)
+        and len(indices[0].elts) == 0
+    ):
+        return TupleExpr(())
+    args = parse_annotations(indices)
     if args is None:
         return None
     if head == TypeConstructor.LIST.value:
@@ -353,7 +362,8 @@ def parse_callable(args: tuple[ast.expr, ...]) -> TypeExpr | None:
 
 
 def subscript_args(s: ast.expr) -> tuple[ast.expr, ...]:
-    return tuple(s.elts) if isinstance(s, ast.Tuple) else (s,)
+    assert isinstance(s, ast.Tuple)
+    return tuple(s.elts)
 
 
 def parse_annotations(es: Sequence[ast.expr]) -> tuple[TypeExpr, ...] | None:
