@@ -11,8 +11,8 @@ Direct, factual, conventional prose: state the thing and stop.
 
 - No pithy constructions pivoting on a comma from assertion to contrast: "It's yours, not a leftover."
 - No verbless clause tacked on after a comma to qualify the preceding noun: "the class table entries,
-  empty for a type statement". Give it a verb ("which are empty for a type statement") or a sentence of
-  its own.
+  empty for a type statement". Give it a verb ("which are empty for a type statement") or a separate
+  sentence.
 - Spell out logical connectives; prefer "because X" or "so that X" over a bare colon-assertion.
   - Before: "The Boolean Jacobian instead records 1: disjunction cannot cancel."
   - After: "The Boolean Jacobian instead records 1, because dependency information combines by disjunction and disjunction cannot cancel."
@@ -71,7 +71,7 @@ Direct, factual, conventional prose: state the thing and stop.
   each such pattern) and in lists, where items are plural noun phrases.
 - Do not repeat an article across the items of an enumeration that share it: "the residual and
   remaining type", not "the residual and the remaining type".
-- Name things with nouns, not free relative clauses: "matched shapes", not "what it matches"; "the residual", not "what is left over".
+- Name things with nouns rather than free relative clauses: "matched shapes", not "what it matches"; "the residual", not "what is left over".
 - A symbol must be bound in the sentence or by a judgement form stated just before it; otherwise name the thing.
   - Before: "A return checks its expression against τ" (nothing in the paragraph binds τ).
   - After: "A return checks its expression against the return type."
@@ -96,14 +96,14 @@ Direct, factual, conventional prose: state the thing and stop.
 ## Terminology and notation
 
 - Introduce a term before relying on it; if it first appears mid-argument ("orthogonality", "specialising", "De Morgan dual"), move its introduction to where the concept first appears. Italicise on first definition only, and drop italics that add nothing.
-- Qualify a noun that the document uses for more than one kind of thing wherever the bare noun could be misread: a context entry or a class entry, not "entry".
+- Qualify a noun used by the document for more than one kind of thing wherever the bare noun could be misread: a context entry or a class entry, not "entry".
 - Do not shorten a compound term to its head noun: "hash table", never "table" on its own, even on a
   second mention in the same paragraph.
 - Keep variable sorts consistent within a section (a, b for scalars; x, y for semimodule elements).
 - Use every metavariable of a sort before reaching for a prime: two types are sigma and tau, not tau and tau prime. A prime is for the third of a sort, or where the two are the same thing at different stages.
 - One notation per object across the paper: S² rather than a mix of S ⊕ S and 𝕀; follow whichever convention earlier sections established.
 - Write a structure out as a tuple at first use if its components matter.
-- Prefer prose quantification ("changes by at most δ") over symbols the text will not reuse (δx).
+- Prefer prose quantification ("changes by at most δ") over symbols not reused by the text (δx).
 - In double-blind submissions: "earlier work on X", never "our earlier work".
 
 ## Telegraphic text
@@ -115,12 +115,12 @@ Direct, factual, conventional prose: state the thing and stop.
 - Check a date or time against the clock or the record before stating it, including "yesterday" and "today".
 - Code comments: see the coding-conventions skill.
 - Checklists and issues: state the task directly ("Move X here; add Y"), no scene-setting.
-- Meta-commentary about the document (what moved where, what supersedes what) belongs in the issue tracker, never in the text — including inside change markup.
+- Meta-commentary about the document (moves, supersessions) belongs in the issue tracker, never in the text, including inside change markup.
 - State the current design and nothing about how it evolved; never contrast it with a superseded design
   ("an earlier design allocated addresses"). When the design changes, delete superseded claims rather than
   annotating them as outdated.
-- When reporting what remains of a list of tasks or issues, give the remaining items only; do not
-  mention items already resolved, removed or deferred, even to explain why they no longer appear.
+- When reporting the remaining items of a list of tasks or issues, give those items only; do not
+  mention items already resolved, removed or deferred, even to explain their absence.
 
 ## Structure
 
@@ -130,9 +130,9 @@ Direct, factual, conventional prose: state the thing and stop.
 
 ## LaTeX
 
-- Name a source file after the definitions it contains, and rename it when they change. A figure label
+- Name a source file after the definitions in it, and rename it when they change. A figure label
   follows the file name.
-- A macro is named after what it renders (\baseType for base-type, not \widen), and is renamed when the
+- A macro is named after its rendering (\baseType for base-type, not \widen), and is renamed when the
   rendered name changes.
 - After a build, render each changed page and look at it: no figure, rule, table or definition row may run
   off the page or noticeably into the margin.
