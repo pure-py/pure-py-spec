@@ -152,7 +152,7 @@ The metavariable $\odot$ ranges over the supported binary operators other than \
 operators, both enumerated in \figref{precedence}. The operators \pyinline{and} and \pyinline{or} are distinct
 expression forms, since they need not evaluate both operands. The grammar of \figref{syntax-expr} is intentionally ambiguous
 on operator forms; disambiguation is by the precedence and associativity given in \figref{precedence},
-which follow Python. \added{It is ambiguous in the same way on tuples and tuple patterns, which are written with grouping parentheses where Python's grammar requires them; the empty tuple is written \pyinline{()} and a one-element tuple with a trailing comma, as in \pyinline{(1,)}.}
+which follow Python. \added{It is ambiguous in the same way on tuples and tuple patterns, which are written with grouping parentheses where Python's grammar requires them; the empty tuple is written \pyinline{()}, one-element tuples carry a trailing comma, \pyinline{(1,)}, and trailing commas are permitted wherever Python's grammar permits them.}
 
 \input{spec/fig/precedence}
 
