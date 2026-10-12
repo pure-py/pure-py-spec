@@ -46,7 +46,7 @@ that are used within a closure (see \secref{local-assignment}), and an \emph{env
 which maps variable names to open term types. Finally, a \emph{frame stack} $\Delta$ holds the nested
 scoping frames.
 
-Figures~\ref{fig:open-stmts-type-rules} and \ref{fig:open-expr-type-rules} illustrate the typing relation for statements
+\figrefTwo{open-stmts-type-rules}{open-expr-type-rules} illustrate the typing relation for statements
 and expressions respectively. Both have the same shape, where a statement or an expression evaluates under a
 stack $\Delta$ to an open type $\tau$ and an updated stack $\Delta'$. Statements can change the stack by introducing
 new bindings in $\Gamma$ through assignments at the top-most frame, while expressions can change the set of closure 
