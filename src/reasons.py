@@ -367,7 +367,7 @@ class SubscriptIndices:
     n: int
 
     def message(self) -> str:
-        return f"subscript with {self.n} indices"
+        return f"subscript expects 1 index, given {self.n}"
 
 
 @dataclass(frozen=True)
