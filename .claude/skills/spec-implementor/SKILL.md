@@ -26,7 +26,10 @@ correspondence, checked in both directions, not when their verdicts agree.
    name for both).
 4. Diagnostics may refine the spec's single failure mode into specific reasons;
    that is a sanctioned refinement. Name each reason after the prohibition or
-   premise it enforces.
+   premise it enforces. Its message is prose under the technical-authoring skill,
+   telegraphic like a table cell, in the same form as the existing messages ("call
+   expects 1 arguments, given 2"), and states what the premise required and what
+   was found, so that the user can act on it.
 5. Run the inventory comparison even when all tests pass; verdict checks miss
    misnamed functions, displaced terminology, dead helpers and stale taxonomy.
 
