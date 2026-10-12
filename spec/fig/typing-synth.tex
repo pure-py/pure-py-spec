@@ -65,7 +65,7 @@
   \Sigma; \Gamma \vdash \seq{e} \checks \subst{\seq{\tau}'}{\seq{\alpha}}{\seq{\sigma}}
 }
 {
-  \Sigma; \Gamma \vdash \exConstr{q}{a} \synth C[\seq{\tau}']
+  \Sigma; \Gamma \vdash \exCall{q}{a} \synth C[\seq{\tau}']
 }
 \and
 \inferrule*[lab={\ruleName{constr-explicit}}]
@@ -77,7 +77,7 @@
   \Sigma; \Gamma \vdash \seq{e} \checks \subst{\seq{\tau}}{\seq{\alpha}}{\seq{\sigma}}
 }
 {
-  \Sigma; \Gamma \vdash \exConstr{q[\seq{\psi}]}{a} \synth C[\seq{\tau}]
+  \Sigma; \Gamma \vdash \exCall{q[\seq{\psi}]}{a} \synth C[\seq{\tau}]
 }
 \and
 \inferrule*[lab={\ruleName{binop}}]

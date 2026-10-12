@@ -9,7 +9,6 @@ from type_syntax import (
 )
 
 OP_SYMBOLS: dict[type, str] = {
-    ast.BitOr: "|",
     ast.BitAnd: "&",
     ast.BitXor: "^",
     ast.LShift: "<<",
@@ -61,10 +60,6 @@ class PatList(ast.MatchSequence):
 
 
 class PatTuple(ast.MatchSequence):
-    pass
-
-
-class UnparenthesisedTuple(ast.Tuple):
     pass
 
 
@@ -129,8 +124,7 @@ def fold_negative(node: ast.AST) -> ast.AST:
 
 
 def classify_sequence(source: str) -> Callable[[ast.AST], ast.AST]:
-    """AST doesn't record brackets or parentheses; classify sequence patterns and tuples by source
-    text."""
+    """AST doesn't record brackets or parentheses; classify sequence patterns by source text."""
 
     def classify(node: ast.AST) -> ast.AST:
         match node:
@@ -139,15 +133,7 @@ def classify_sequence(source: str) -> Callable[[ast.AST], ast.AST]:
                 assert segment is not None
                 if segment.startswith("["):
                     return ast.copy_location(PatList(patterns=ps), node)
-                if segment.startswith("("):
-                    return ast.copy_location(PatTuple(patterns=ps), node)
-                return node
-            case ast.Tuple(elts=es, ctx=ctx):
-                segment = ast.get_source_segment(source, node)
-                assert segment is not None
-                if segment.startswith("("):
-                    return node
-                return ast.copy_location(UnparenthesisedTuple(elts=es, ctx=ctx), node)
+                return ast.copy_location(PatTuple(patterns=ps), node)
             case _:
                 return node
 
@@ -334,8 +320,6 @@ def check_syntax_pattern(node: ast.pattern) -> None:
         case PatList() | PatTuple():
             for p in node.patterns:
                 check_syntax_pattern(p)
-        case ast.MatchSequence():
-            raise Prohibited(node, "sequence pattern without brackets or parentheses")
         case ast.MatchClass():
             for p in list(node.patterns) + list(node.kwd_patterns):
                 check_syntax_pattern(p)
@@ -372,6 +356,7 @@ def check_syntax_expr(node: ast.expr) -> None:
                 ast.FloorDiv,
                 ast.Mod,
                 ast.Pow,
+                ast.BitOr,
             )
             if not isinstance(node.op, allowed):
                 sym = OP_SYMBOLS.get(type(node.op), type(node.op).__name__)
@@ -399,11 +384,7 @@ def check_syntax_expr(node: ast.expr) -> None:
             for c in node.comparators:
                 check_syntax_expr(c)
         case ast.Call():
-            match node.func:
-                case ast.Subscript(value=e_) if isinstance(parse_annotation(node.func), TypeName):
-                    check_syntax_expr(e_)
-                case _:
-                    check_syntax_expr(node.func)
+            check_syntax_expr(node.func)
             for a in node.args:
                 check_syntax_expr(a)
             for k in node.keywords:
@@ -417,8 +398,6 @@ def check_syntax_expr(node: ast.expr) -> None:
         case ast.Lambda():
             check_syntax_arguments(node.args)
             check_syntax_expr(node.body)
-        case UnparenthesisedTuple():
-            raise Prohibited(node, "tuple without parentheses")
         case ast.List() | ast.Tuple():
             for e in node.elts:
                 check_syntax_expr(e)

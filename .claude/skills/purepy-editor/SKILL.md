@@ -7,7 +7,7 @@ description: PurePy-specific additions to the technical-authoring, coding-conven
 
 ## Style
 
-- Nouns the spec uses for more than one kind of thing: "entry" is generic enough to need qualifying always (a context entry or a class entry); "outcome" needs it where static and evaluation outcomes are both in play; "signature" rarely, since a module signature and a function signature seldom share a paragraph.
+- Nouns used by the spec for more than one kind of thing need qualifying: "entry" always (a context entry or a class entry); "outcome" when static and evaluation outcomes are both in play; "signature" rarely, since a module signature and a function signature seldom share a paragraph.
 
 ## GitHub issues
 

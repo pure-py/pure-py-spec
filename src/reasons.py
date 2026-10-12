@@ -363,6 +363,14 @@ class NoBinaryOverload:
 
 
 @dataclass(frozen=True)
+class NotTypeExpression:
+    e: str
+
+    def message(self) -> str:
+        return f"'{self.e}' is not a type expression"
+
+
+@dataclass(frozen=True)
 class NoUnaryOverload:
     op: str
     sigma: Type
@@ -539,6 +547,7 @@ class MissingReturnMatchPartial:
 type Reason = (
     DuplicateField
     | InheritedField
+    | NotTypeExpression
     | UnassignedVariable
     | PossiblyUnassigned
     | UndefinedVariable

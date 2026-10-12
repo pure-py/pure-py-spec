@@ -5,11 +5,10 @@ description: Discipline for keeping the checker (and other implementations) in o
 
 # Spec implementor
 
-Load the coding-conventions skill first; it holds the comment, identifier and commit rules shared
-with other implementations.
+Load the coding-conventions skill first, which holds the shared comment, identifier and commit rules.
 
-A sync is complete only when the spec and the implementation are in one-to-one
-correspondence, checked in both directions, not when their verdicts agree.
+A sync is complete when the spec and the implementation are in one-to-one correspondence,
+checked in both directions; agreement of verdicts is not enough.
 
 ## Method
 
@@ -21,28 +20,29 @@ correspondence, checked in both directions, not when their verdicts agree.
      spec means a function called `wraps` in the checker);
    - **delete** as dead code or a displaced term (unused macros, stale labels,
      helpers with no callers).
-3. Watch for the same name meaning different things on the two sides (the spec
-   distinguishes override from extend; the implementation must not use one
-   name for both).
+3. One name must not mean different things on the two sides: the spec
+   distinguishes override from extend, so the implementation does too.
 4. Diagnostics may refine the spec's single failure mode into specific reasons;
    that is a sanctioned refinement. Name each reason after the prohibition or
-   premise it enforces.
+   premise it enforces. Its message follows the technical-authoring skill,
+   telegraphic like a table cell and in the form of the existing messages, and
+   states the expectation and the finding ("call expects 1 arguments, given 2").
 5. Run the inventory comparison even when all tests pass; verdict checks miss
    misnamed functions, displaced terminology, dead helpers and stale taxonomy.
 
 ## Sequential check against the spec
 
-Check in both directions, in order, rather than jumping to the parts you suspect.
+Check both directions in order, rather than the suspected parts first.
 
 Start with the specification and read it top down. For each judgement, rule and metafunction, find the
 definition in the implementation that carries the same name and serves the same purpose.
 
-Then read the implementation the same way. For each definition, find the construct in the
-specification of the same or a similar name that it implements. A definition that implements no single
-construct is renamed, moved to the construct it belongs to, or deleted.
+Then read the implementation the same way. For each definition, find the construct of the same or a
+similar name in the specification. A definition without a single corresponding construct is renamed,
+moved to its construct, or deleted.
 
-Act at the point the walk reaches, not before, so that whatever breaks is traceable to the one
-definition you changed.
+Act at the point reached by the walk, so that any failure is traceable to the one changed
+definition.
 
 ## Order of work
 
@@ -53,7 +53,7 @@ adjust the failing test before touching the checker.
 
 Write the checker in PurePy-like Python: no reassignment of a variable once bound, no in-place
 mutation, no loops that accumulate into a variable. Build each value in one expression, by
-comprehension, recursion or `functools.reduce`, so that a definition reads like the rule it implements.
+comprehension, recursion or `functools.reduce`, so that a definition reads like its rule.
 
 ## Testing
 
@@ -70,22 +70,22 @@ else is tested.
   repeat an import. Verdict and output must not change.
 - **Differing pairs**: when the spec says a difference matters (a biased
   operation, a law noted not to hold), the two programs must come out
-  differently; the spec's own counterexample is usually the pair to use.
+  differently; the counterexample in the spec is usually the pair to use.
 - **Minimal pairs**: for each condition in a rule, two programs differing as
   little as possible, one just meeting it and one just missing it. Error
   messages are not the unit of coverage; one message can arise from several
-  unrelated situations, each needing its own pair.
+  unrelated situations, each needing a pair.
 - **Whole-program conditions**: test both sides of the boundary, the smallest
   broken case and the largest legal case that resembles one (a self-import
   and a two-module cycle against a diamond).
 - **Spec prose**: every worked example, counterexample and justifying sentence
   describes a program; each should exist as a test.
-- Use programs large enough that recursive rules actually recurse; a
-  one-level example can pass for the wrong reason.
+- Use programs large enough that recursive rules recurse; a one-level
+  example can pass for the wrong reason.
 - Audit the suite by mutation: weaken the implementation deliberately and
   confirm a test fails.
 
 ## Tooling
 
 Point checkers at whole directories rather than named files, and occasionally
-verify that every checker still sees everything it should.
+verify that every checker still sees every file.

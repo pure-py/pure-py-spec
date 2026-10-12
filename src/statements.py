@@ -96,6 +96,7 @@ from type_syntax import (
     base_type,
     literal_type,
     parse_annotation,
+    subscript_args,
     substitute,
 )
 
@@ -443,8 +444,8 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
                     raise IllFormedModule(e, reasons.SubmoduleNotImported(q))
                 case _:
                     return attribute_type(synth_expr(e_, mod_ctx), e, mod_ctx)
-        case ast.Subscript(value=e_):
-            return subscript_type(synth_expr(e_, mod_ctx), e, mod_ctx)
+        case ast.Subscript(value=e_, slice=index):
+            return subscript_type(synth_expr(e_, mod_ctx), e, index, mod_ctx)
         case ast.Tuple(elts=es):
             return TupleType(tuple(synth_expr(e_, mod_ctx) for e_ in es))
         case ast.List(elts=es):
@@ -504,24 +505,26 @@ def attribute_type(obj: Type, e: ast.Attribute, mod_ctx: ModuleContext) -> Type:
             raise IllFormedModule(e, reasons.NoAttributes(obj))
 
 
-def subscript_type(container: Type, e: ast.Subscript, mod_ctx: ModuleContext) -> Type:
+def subscript_type(
+    container: Type, e: ast.Subscript, index: ast.expr, mod_ctx: ModuleContext
+) -> Type:
     if base_type(container) == Primitive.STR:
-        check_expr(e.slice, Primitive.INT, mod_ctx)
+        check_expr(index, Primitive.INT, mod_ctx)
         return Primitive.STR
     match container:
         case UnionType(sigma, tau):
             return join_seq(
                 mod_ctx.Sigma,
-                [subscript_type(sigma, e, mod_ctx), subscript_type(tau, e, mod_ctx)],
+                [subscript_type(sigma, e, index, mod_ctx), subscript_type(tau, e, index, mod_ctx)],
             )
         case ListType(tau):
-            check_expr(e.slice, Primitive.INT, mod_ctx)
+            check_expr(index, Primitive.INT, mod_ctx)
             return tau
         case DictType(tau):
-            check_expr(e.slice, Primitive.STR, mod_ctx)
+            check_expr(index, Primitive.STR, mod_ctx)
             return tau
         case TupleType():
-            return tuple_subscript_type(container, e.slice, mod_ctx)
+            return tuple_subscript_type(container, index, mod_ctx)
         case _:
             raise IllFormedModule(e, reasons.NotSubscriptable(container))
 
@@ -612,7 +615,12 @@ def constr(c: ClassName, e: ast.Call, mod_ctx: ModuleContext) -> Type:
 
 
 def constr_explicit(e: ast.Call, mod_ctx: ModuleContext) -> Type:
-    tau = resolve_type(type_expr(e.func), e, mod_ctx)
+    assert isinstance(e.func, ast.Subscript)
+    psi = parse_annotation(e.func)
+    if psi is None:
+        arg = next(a for a in subscript_args(e.func.slice) if parse_annotation(a) is None)
+        raise IllFormedModule(arg, reasons.NotTypeExpression(ast.unparse(arg)))
+    tau = resolve_type(psi, e, mod_ctx)
     assert isinstance(tau, ClassType)
     for x, arg in constructor_args(tau.c, e, mod_ctx).items():
         check_expr(arg, declared_type(mod_ctx.Sigma, tau, x), mod_ctx)

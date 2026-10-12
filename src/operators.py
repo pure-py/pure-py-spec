@@ -150,6 +150,7 @@ def power_int(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | N
 BINARY_OVERLOADS: dict[str, tuple[BinaryOverload, ...]] = {
     "==": (equality,),
     "!=": (equality,),
+    "|": (),
     "in": (membership_list, membership_tuple, membership_str, membership_dict),
     "not in": (membership_list, membership_tuple, membership_str, membership_dict),
     "<": (ordering_number, ordering_str),
@@ -199,6 +200,7 @@ BINARY_NAMES: dict[type[ast.AST], str] = {
     ast.FloorDiv: "//",
     ast.Mod: "%",
     ast.Pow: "**",
+    ast.BitOr: "|",
     ast.Eq: "==",
     ast.NotEq: "!=",
     ast.Lt: "<",

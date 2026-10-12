@@ -10,7 +10,7 @@ description: Conventions for commits, GitHub issues, pull requests, the project 
 Commit messages, issue titles and bulleted lists are telegraphic:
 
 - Drop articles and filler ("Rebinds variable", not "Rebinds a variable")
-- Titles and task-list items are noun phrases naming the thing, not the action ("Syntax of types", not "Define the syntax of types")
+- Titles and task-list items are noun phrases naming the thing rather than the action ("Syntax of types", not "Define the syntax of types")
 - One point per bullet, no framing or hedging clauses
 - No weasel-words ("honest", "clean", "obvious", "simply")
 - No trailing period on a bullet or a title
@@ -39,7 +39,7 @@ Commit messages, issue titles and bulleted lists are telegraphic:
 - Before starting work on an issue, assign it to the user and to the account you run as (`gh api user --jq .login`)
 - Check with the user before creating an issue, unless explicitly instructed to create one
 - Add content to an issue (body, comment, closing comment) only when asked; otherwise create, edit or close it and nothing more
-- Link an external resource inline where the body mentions it, not in a **See also** paragraph
+- Link an external resource inline where the body mentions it, rather than in a **See also** paragraph
 - When an issue references other issues, end with a **See also** paragraph:
 
   ```

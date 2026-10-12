@@ -314,11 +314,12 @@ def dotted_name(e: ast.expr) -> Name | None:
 
 def parse_subscript(e: ast.Subscript) -> TypeExpr | None:
     head = e.value.id if isinstance(e.value, ast.Name) else None
+    indices = subscript_args(e.slice)
     if head == TypeConstructor.LITERAL.value:
-        return literal_type(e.slice)
+        return literal_type(indices[0]) if len(indices) == 1 else None
     if head == TypeConstructor.CALLABLE.value:
-        return parse_callable(subscript_args(e.slice))
-    args = parse_annotations(subscript_args(e.slice))
+        return parse_callable(indices)
+    args = parse_annotations(indices)
     if args is None:
         return None
     if head == TypeConstructor.LIST.value:
