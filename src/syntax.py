@@ -526,6 +526,9 @@ def check_syntax_generator(node: ast.comprehension) -> None:
 def check_syntax_annotation(node: ast.expr | None) -> None:
     if node is None:
         return
+    match node:
+        case ast.Subscript(value=ast.Name(id="tuple"), slice=Indices(elts=[ast.List(elts=[])])):
+            raise Prohibited(node, "expected tuple[()] for empty tuple type, given tuple[[]]")
     psi = parse_annotation(node)
     if psi is None:
         raise Prohibited(node, "annotation that is not a type expression")

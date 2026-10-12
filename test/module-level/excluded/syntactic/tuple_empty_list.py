@@ -1,0 +1,2 @@
+t: tuple[[]] = ()
+print(t)
