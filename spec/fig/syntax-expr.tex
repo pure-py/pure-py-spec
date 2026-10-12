@@ -9,7 +9,7 @@ $e$ & $::=$ & $x$ & (Var) \\
     & \deleted{$\mid$} & \deleted{$\exCall{q[\seq{\psi}]}{a}$} & \deleted{(Constr)} \\
     & $\mid$ & $\exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}}$ & (Dict) \\
     & $\mid$ & $\exAttr{e}{x}$ & (Attribute) \\
-    & $\mid$ & $\replaced{\exSubscript{e}{e_1, \ldots, e_n}}{\exSubscript{e}{e'}}$ & (Subscript) \\
+    & $\mid$ & $\replaced{\exSubscript{e}{e_1, \ldots, e_{n+1}}}{\exSubscript{e}{e'}}$ & (Subscript) \\
     & $\mid$ & $\exBinOp{e}{\odot}{e'}$ & (BinOp) \\
     & $\mid$ & $\exUnOp{\ominus}{e}$ & (UnOp) \\
     & $\mid$ & $\exAnd{e}{e'}$ & (And) \\
