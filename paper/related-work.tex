@@ -47,6 +47,26 @@ Static Python~\cite{lu2023} is a gradually typed dialect of Python
 combining concrete and transient enforcement so that typed code is sound. \PurePy adopts a static
 type system that accepts only programs accepted by mypy, leaving gradual typing to a later release.
 
+\begin{AddedBlock}
+\subsection{Languages as targets for generated code}
+
+Language models generate Python more accurately than languages with less training data. The MultiPL-E
+benchmark~\cite{cassano2023} measures the gap across 18 languages, and MultiPL-T~\cite{cassano2024} narrows
+it for OCaml and Racket by fine-tuning on Python programs translated into those languages and filtered by a
+compiler and by tests. \PurePy shares Python's syntax, so a model targeting it needs no such transfer, and
+the \PurePy checker plays the role of the compiler filter. Type-constrained decoding~\cite{mundler2025}
+uses a type system to constrain generation and reduces compilation errors in generated TypeScript; a
+decidable well-formedness check with a formal static semantics is the prerequisite for such a technique.
+At the fully specified end of the spectrum, models synthesise verified Dafny methods from
+specifications~\cite{misu2024}; \PurePy addresses the common case in which no specification exists, and
+provides determinism, typing and the absence of the errors of \figref{prevented-errors} unconditionally.
+Benchmarks of research coding tasks~\cite{tian2024,chen2025} and of computational
+reproducibility~\cite{siegel2024} measure the current reliability of generated scientific code.
+\citet{welsh2023} argues that programming languages lose relevance as models execute tasks directly; we
+argue the converse in \secref{introduction}, that the value of a language shifts from convenience to
+guarantees.
+\end{AddedBlock}
+
 \subsection{Pattern matching}
 
 Checking that the cases of a match are reachable and exhaustive goes back to the usefulness algorithm for

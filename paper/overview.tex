@@ -1,10 +1,12 @@
 \section{Overview}
 \label{sec:overview}
 
-\PurePy is a subset of Python chosen so that its programs are well-behaved and broadly \emph{pure}, yet run
+\Replaced{This section states the guarantee relating \PurePy to Python (\secref{python-compatibility}), then makes
+the purity claim precise and sets out the excluded features (\secref{purity}); \figref{prevented-errors}
+summarises the Python runtime errors ruled out by the type system.}{\PurePy is a subset of Python chosen so that its programs are well-behaved and broadly \emph{pure}, yet run
 unchanged under a standard Python interpreter and compute the same result. \secref{purity} makes the purity
 claim precise and sets out the excluded features, grouped by the discipline that each one protects;
-\figref{prevented-errors} summarises the Python runtime errors ruled out by the type system.
+\figref{prevented-errors} summarises the Python runtime errors ruled out by the type system.}
 
 \subsection{Python compatibility}
 \label{sec:python-compatibility}
@@ -38,16 +40,23 @@ claim precise and sets out the excluded features, grouped by the discipline that
 \subsection{Purity}
 \label{sec:purity}
 
-\PurePy is not semantically ``pure'' in the sense of providing a guarantee that every program terminates with
+\Replaced{\PurePy is pure in the senses that matter for reasoning. Every name has a unique lexical scope; a variable,
+once definitely assigned, denotes a fixed value; a module's members are fixed once the module has loaded.
+There is no mutation, nor can evaluation order change the meaning of a name. Python operates largely outside
+this discipline, and the goal of \PurePy is to characterise a suitably large subset of Python that stays
+within it.}{\PurePy is not semantically ``pure'' in the sense of providing a guarantee that every program terminates with
 a unique value. No practical programming language is pure in this sense. Real programs may fail to terminate,
 or abort with errors such as division-by-zero or index-out-of-bounds, even in languages regarded as (mostly)
-pure, like Haskell.
+pure, like Haskell.}
 
-We do, however, claim that \PurePy is pure in the senses that matter. Every name has a unique lexical scope; a
+\Replaced{\PurePy is not pure in the stronger sense of guaranteeing that every program terminates with a unique value.
+No practical programming language is pure in this sense. Real programs may fail to terminate, or abort with
+errors such as division-by-zero or index-out-of-bounds, even in languages regarded as (mostly) pure, like
+Haskell.}{We do, however, claim that \PurePy is pure in the senses that matter. Every name has a unique lexical scope; a
 variable, once definitely assigned, denotes a fixed value; a module's members are fixed once the module has
 loaded. There is no mutation, nor can evaluation order change the meaning of a name. Python operates largely
 outside this discipline, and the goal of \PurePy is to characterise a suitably large subset of Python that
-stays within it.
+stays within it.}
 
 A non-trivial component of the \PurePy specification concerns module loading, in the form of well-formedness
 rules which rule out programs which depend on Python's load-order-sensitive behaviours
