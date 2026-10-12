@@ -77,7 +77,7 @@ from operators import (
 from reasons import IllFormedModule, MypyCompatibility
 from shapes import Shapes, shapes
 from subtyping import equivalent, join_seq, subtype, type_args_seq
-from syntax import UnparenthesisedTuple, render_pattern
+from syntax import Indices, render_pattern
 from type_syntax import (
     RANGE,
     CallableType,
@@ -444,7 +444,7 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
                     raise IllFormedModule(e, reasons.SubmoduleNotImported(q))
                 case _:
                     return attribute_type(synth_expr(e_, mod_ctx), e, mod_ctx)
-        case ast.Subscript(slice=UnparenthesisedTuple(elts=es)):
+        case ast.Subscript(slice=Indices(elts=es)):
             raise IllFormedModule(e, reasons.SubscriptIndices(len(es)))
         case ast.Subscript(value=e_):
             return subscript_type(synth_expr(e_, mod_ctx), e, mod_ctx)

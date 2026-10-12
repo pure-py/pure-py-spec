@@ -67,6 +67,11 @@ class UnparenthesisedTuple(ast.Tuple):
     pass
 
 
+# Indices of subscript with several indices
+class Indices(ast.Tuple):
+    pass
+
+
 def render_pattern(p: ast.pattern) -> str:
     match p:
         case ast.MatchValue(value=e):
@@ -147,6 +152,9 @@ def classify_sequence(source: str) -> Callable[[ast.AST], ast.AST]:
                 if segment.startswith("("):
                     return node
                 return ast.copy_location(UnparenthesisedTuple(elts=es, ctx=ctx), node)
+            case ast.Subscript(value=e, slice=UnparenthesisedTuple(elts=es, ctx=ctx), ctx=ctx_):
+                indices = ast.copy_location(Indices(elts=es, ctx=ctx), node.slice)
+                return ast.copy_location(ast.Subscript(value=e, slice=indices, ctx=ctx_), node)
             case _:
                 return node
 
@@ -432,7 +440,7 @@ def check_syntax_expr(node: ast.expr) -> None:
         case ast.Subscript():
             check_syntax_expr(node.value)
             match node.slice:
-                case UnparenthesisedTuple(elts=es):
+                case Indices(elts=es):
                     for e_ in es:
                         check_syntax_expr(e_)
                 case _:
