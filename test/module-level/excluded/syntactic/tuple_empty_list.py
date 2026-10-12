@@ -1,2 +1,0 @@
-t: tuple[[]] = ()
-print(t)
