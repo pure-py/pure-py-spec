@@ -54,7 +54,7 @@
 \and
 \inferrule*[lab={\ruleName{subty-sized}}]
 {
-  \tau \text{ a list, dictionary, string or tuple type, or } \clsRange
+  \tau \text{ a list, dictionary, string or tuple type, or } \replaced{\clsRange[]}{\clsRange}
 }
 {
   \Sigma \vdash \tau \subty \tySized
