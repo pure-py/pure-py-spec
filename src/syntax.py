@@ -9,7 +9,6 @@ from type_syntax import (
 )
 
 OP_SYMBOLS: dict[type, str] = {
-    ast.BitOr: "|",
     ast.BitAnd: "&",
     ast.BitXor: "^",
     ast.LShift: "<<",
