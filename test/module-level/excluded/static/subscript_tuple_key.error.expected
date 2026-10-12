@@ -1,0 +1,1 @@
+expected type str, given tuple[Literal['a'], Literal['b']]

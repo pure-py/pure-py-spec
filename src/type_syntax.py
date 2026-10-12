@@ -319,14 +319,6 @@ def parse_subscript(e: ast.Subscript) -> TypeExpr | None:
         return literal_type(indices[0]) if len(indices) == 1 else None
     if head == TypeConstructor.CALLABLE.value:
         return parse_callable(indices)
-    # Empty tuple type written tuple[()], since brackets need an element
-    if (
-        head == TypeConstructor.TUPLE.value
-        and len(indices) == 1
-        and isinstance(indices[0], ast.Tuple)
-        and len(indices[0].elts) == 0
-    ):
-        return TupleExpr(())
     args = parse_annotations(indices)
     if args is None:
         return None
@@ -362,8 +354,7 @@ def parse_callable(args: tuple[ast.expr, ...]) -> TypeExpr | None:
 
 
 def subscript_args(s: ast.expr) -> tuple[ast.expr, ...]:
-    assert isinstance(s, ast.Tuple)
-    return tuple(s.elts)
+    return tuple(s.elts) if isinstance(s, ast.Tuple) else (s,)
 
 
 def parse_annotations(es: Sequence[ast.expr]) -> tuple[TypeExpr, ...] | None:

@@ -363,14 +363,6 @@ class NoBinaryOverload:
 
 
 @dataclass(frozen=True)
-class SubscriptIndices:
-    n: int
-
-    def message(self) -> str:
-        return f"subscript expects 1 index, given {self.n}"
-
-
-@dataclass(frozen=True)
 class NotTypeExpression:
     e: str
 
@@ -555,7 +547,6 @@ class MissingReturnMatchPartial:
 type Reason = (
     DuplicateField
     | InheritedField
-    | SubscriptIndices
     | NotTypeExpression
     | UnassignedVariable
     | PossiblyUnassigned
