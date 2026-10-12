@@ -38,10 +38,15 @@ at the surface, and a research language that targets \PurePy inherits a large an
 \begin{AddedBlock}
 Scientific results are increasingly computed by programs written with AI coding assistants or generated
 outright by language models. Most new users of GitHub now try a coding assistant within their first
-week~\cite{github2025}. Studies of research coding tasks curated by scientists~\cite{tian2024,chen2025} and of
-the reproduction of published computational results~\cite{siegel2024} report that current models and agents
-fail on most tasks. Scientific results that rest on generated programs therefore need assurance that the
-programs work as intended. More broadly, assurance that AI systems work as intended is now a stated priority
+week~\cite{github2025}. Benchmarks measure the reliability of generated scientific code. Their results date
+quickly as models improve, so we give the model and year with each figure. On SciCode, research coding
+problems curated by scientists, the best model tested in 2024, Claude 3.5 Sonnet, solved 4.6\% of the main
+problems in the most realistic setting~\cite{tian2024}. On ScienceAgentBench, 102 data-analysis tasks drawn
+from peer-reviewed publications, the best agent tested in 2024 solved 32.4\% of the tasks unaided, and OpenAI
+o1-preview reached 42.2\%~\cite{chen2025}. On CORE-Bench, in which agents reproduce published computational
+results, the best agent tested in 2024, built on GPT-4o, achieved 21\% accuracy on the hardest
+tasks~\cite{siegel2024}. Scientific results that rest on generated programs therefore need assurance that
+the programs work as intended. More broadly, assurance that AI systems work as intended is now a stated priority
 of UK policy~\cite{clifford2025,dbt2025}. Verification against a formal specification provides such assurance
 in principle, but the scientist who asks for a program rarely has a specification to verify it against.
 
