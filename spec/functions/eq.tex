@@ -1,8 +1,9 @@
-\eqOp{\Sigma}(n, n') &{}= \padTo{\val{\pyinline{False}}}{\val{\pyinline{True}}} \quad \text{if } n = n' \text{ and } n \text{ is not } \pyinline{nan} \\*
-\eqOp{\Sigma}(n, n') &{}= \padTo{\val{\pyinline{False}}}{\val{\pyinline{False}}} \quad \text{if } n \neq n' \\*
-\eqOp{\Sigma}(n, n) &{}= \padTo{\val{\pyinline{False}}}{\undefinedResult} \quad \text{if } n \text{ is } \pyinline{nan} \\*
-\eqOp{\Sigma}(w, w') &{}= \padTo{\val{\pyinline{False}}}{\val{\pyinline{True}}} \quad \text{if } w = w' \\*
-\eqOp{\Sigma}(w, w') &{}= \padTo{\val{\pyinline{False}}}{\val{\pyinline{False}}} \quad \text{if } w \neq w' \\*
+\setPadWidth{\eqElems{\Sigma}(\seq{v}, \delta'(\seq{w}))}%
+\eqOp{\Sigma}(n, n') &{}= \padded{\val{\pyinline{True}}} \quad \text{if } n = n' \text{ and } n \text{ is not } \pyinline{nan} \\*
+\eqOp{\Sigma}(n, n') &{}= \padded{\val{\pyinline{False}}} \quad \text{if } n \neq n' \\*
+\eqOp{\Sigma}(n, n) &{}= \padded{\undefinedResult} \quad \text{if } n \text{ is } \pyinline{nan} \\*
+\eqOp{\Sigma}(w, w') &{}= \padded{\val{\pyinline{True}}} \quad \text{if } w = w' \\*
+\eqOp{\Sigma}(w, w') &{}= \padded{\val{\pyinline{False}}} \quad \text{if } w \neq w' \\*
 \eqOp{\Sigma}(\pyinline{True}, \pyinline{True}) &{}= \eqOp{\Sigma}(\pyinline{False}, \pyinline{False}) = \val{\pyinline{True}} \\*
 \eqOp{\Sigma}(\pyinline{True}, \pyinline{False}) &{}= \eqOp{\Sigma}(\pyinline{False}, \pyinline{True}) = \val{\pyinline{False}} \\*
 \eqOp{\Sigma}(\pyinline{None}, \pyinline{None}) &{}= \val{\pyinline{True}} \\*
@@ -12,10 +13,8 @@
 \eqOp{\Sigma}(\exList{\seq{v}}, \exList{\seq{v}\,'}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*
 \eqOp{\Sigma}(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*
 \\
-\eqOp{\Sigma}(\bind{\seq{w}}{\seq{v}}, \delta') &{}= \eqElems{\Sigma}(\seq{v}, \delta'(\seq{w})) \\*
-&\qquad \text{if } \set{\seq{w}} = \dom(\delta') \\*
-\eqOp{\Sigma}(\delta, \delta') &{}= \val{\pyinline{False}} \\*
-&\qquad \text{if } \dom(\delta) \neq \dom(\delta') \\*
+\eqOp{\Sigma}(\bind{\seq{w}}{\seq{v}}, \delta') &{}= \padded{\eqElems{\Sigma}(\seq{v}, \delta'(\seq{w}))} \quad \text{if } \set{\seq{w}} = \dom(\delta') \\*
+\eqOp{\Sigma}(\delta, \delta') &{}= \padded{\val{\pyinline{False}}} \quad \text{if } \dom(\delta) \neq \dom(\delta') \\*
 \\
 \eqOp{\Sigma}(\exObj{C}{\bind{\seq{x}}{\seq{v}}}, \exObj{C}{\bind{\seq{x}}{\seq{v}\,'}}) &{}= \eqElems{\Sigma}(\iterOp(\exObj{C}{\bind{\seq{x}}{\seq{v}}}), \iterOp(\exObj{C}{\bind{\seq{x}}{\seq{v}\,'}})) \\*
 &\qquad \text{if } C = \clsRange \\*

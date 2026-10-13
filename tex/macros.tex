@@ -323,7 +323,9 @@
 % Pad expression #2 to the width of expression #1, so that side conditions following results of
 % different widths align without a separate alignment column.
 \newlength{\padWidth}
-\newcommand*{\padTo}[2]{\settowidth{\padWidth}{$#1$}\makebox[\padWidth][l]{$#2$}}
+\newcommand*{\setPadWidth}[1]{\settowidth{\padWidth}{$#1$}\global\padWidth=\padWidth}
+\newcommand*{\padded}[1]{\makebox[\padWidth][l]{$#1$}}
+\newcommand*{\padTo}[2]{\setPadWidth{#1}\padded{#2}}
 
 \newcommand*{\funccases}[1]{%
   \begingroup\lineskiplimit=-\baselineskip

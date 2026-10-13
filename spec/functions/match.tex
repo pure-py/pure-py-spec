@@ -1,5 +1,6 @@
-\matchOp{\Sigma}(\rho, \ell, v) &{}= \padTo{\undefinedResult}{\matchOk{\varnothing}} \quad \text{if } \eqOp{\Sigma}(\ell, v) = \val{\pyinline{True}} \\
-\matchOp{\Sigma}(\rho, \ell, v) &{}= \padTo{\undefinedResult}{\noMatch} \quad \text{if } \eqOp{\Sigma}(\ell, v) = \val{\pyinline{False}} \\
+\setPadWidth{\undefinedResult}%
+\matchOp{\Sigma}(\rho, \ell, v) &{}= \padded{\matchOk{\varnothing}} \quad \text{if } \eqOp{\Sigma}(\ell, v) = \val{\pyinline{True}} \\
+\matchOp{\Sigma}(\rho, \ell, v) &{}= \padded{\noMatch} \quad \text{if } \eqOp{\Sigma}(\ell, v) = \val{\pyinline{False}} \\
 \matchOp{\Sigma}(\rho, \ell, v) &{}= \undefinedResult \quad \text{if } \eqOp{\Sigma}(\ell, v) = \undefinedResult \\
 \matchOp{\Sigma}(\rho, x, v) &{}= \matchOk{\set{\bind{x}{v}}} \\
 \matchOp{\Sigma}(\rho, \patWild, v) &{}= \matchOk{\varnothing} \\
