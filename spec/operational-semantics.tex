@@ -4,10 +4,13 @@
 \subsection{Values and environments}
 
 Values, environments, outcomes and results are given in \figref{values}. A class value $\Type{C}$ is the
-context entry of the class, and an object $\exObj{C}{\replaced{\bind{\seq{x}}{\seq{v}}}{\rho}}$ records its class by name\added{ and its fields in the order given by $\fields{\Sigma}(C)$}; the value $\Unbound$
+context entry of the class, and an object $\exObj{C}{\replaced{\bind{\seq{x}}{\seq{v}}}{\rho}}$ records its class by name\added{ and its fields in the order given by $\fields{\Sigma}(C)$}\replaced{. The value $\Unbound$
+marks a variable of the current scope before its declaration is reached, which Python reports as an unbound
+local. An environment binds a variable to $\Unbound$ wherever the corresponding context binds the variable to
+the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible.}{; the value $\Unbound$
 marks a variable of the current scope before its declaration is reached, a state reported by Python as an unbound
 local, and an environment binds a variable to $\Unbound$ wherever the corresponding context binds the variable to
-the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible. Throughout this section, $\Sigma$ is the class table produced by module checking of the program
+the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible. } Throughout this section, $\Sigma$ is the class table produced by module checking of the program
 (\secref{well-formedness-modules}) and, like $\mathcal{M}$ and $\mathcal{P}$, is ambient. For a statement $s$, the outcome
 $\assigns{\rho}$ represents $s$ running to its end, with accumulated environment $\rho$; the outcome
 $\returns{v}$ represents $s$ returning the value $v$; and the outcome $\aborts{\kappa}$ represents the whole run
