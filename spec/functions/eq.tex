@@ -12,13 +12,13 @@
 \eqOp{\Sigma}(\exList{\seq{v}}, \exList{\seq{v}\,'}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*
 \eqOp{\Sigma}(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*
 \\
-\eqOp{\Sigma}(\delta, \delta') &{}= \eqElems{\Sigma}(v_1 \cons \ldots \cons v_n, \delta'(w_1) \cons \ldots \cons \delta'(w_n)) \\*
-&\qquad \text{if } \dom(\delta) = \dom(\delta') \text{ and } \delta = \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n} \\*
+\eqOp{\Sigma}(\replaced{\bind{\seq{w}}{\seq{v}}}{\delta}, \delta') &{}= \replaced{\eqElems{\Sigma}(\seq{v}, \delta'(\seq{w}))}{\eqElems{\Sigma}(v_1 \cons \ldots \cons v_n, \delta'(w_1) \cons \ldots \cons \delta'(w_n))} \\*
+&\qquad \text{if } \replaced{\set{\seq{w}} = \dom(\delta')}{\dom(\delta) = \dom(\delta') \text{ and } \delta = \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}} \\*
 \eqOp{\Sigma}(\delta, \delta') &{}= \val{\pyinline{False}} \\*
 &\qquad \text{if } \dom(\delta) \neq \dom(\delta') \\*
 \\
-\eqOp{\Sigma}(v, v') &{}= \eqElems{\Sigma}(\iterOp(v), \iterOp(v')) \\*
-&\qquad \text{if } v \text{ and } v' \text{ are values of } \clsRange \\*
+\eqOp{\Sigma}(\replaced{\exObj{C}{\bind{\seq{x}}{\seq{v}}}}{v}, \replaced{\exObj{C}{\bind{\seq{x}}{\seq{v}\,'}}}{v'}) &{}= \eqElems{\Sigma}(\iterOp(\replaced{\exObj{C}{\bind{\seq{x}}{\seq{v}}}}{v}), \iterOp(\replaced{\exObj{C}{\bind{\seq{x}}{\seq{v}\,'}}}{v'})) \\*
+&\qquad \text{if } \replaced{C = \clsRange}{v \text{ and } v' \text{ are values of } \clsRange} \\*
 \eqOp{\Sigma}(\exObj{C}{\replaced{\bind{\seq{x}}{\seq{v}}}{\rho}}, \exObj{C}{\replaced{\bind{\seq{x}}{\seq{v}\,'}}{\rho'}}) &{}= \replaced{\eqElems{\Sigma}(\seq{v}, \seq{v}\,')}{\eqElems{\Sigma}(\rho(x_1) \cons \ldots \cons \rho(x_n), \rho'(x_1) \cons \ldots \cons \rho'(x_n))} \\*
 &\qquad \text{if } \deleted{\fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \text{ and }} C \neq \clsRange \\*
 \\
