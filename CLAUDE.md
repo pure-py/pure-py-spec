@@ -4,7 +4,8 @@ See README.md for project structure, build, test, and release docs.
 
 ## Writing conventions
 
-@.claude/skills/technical-authoring/SKILL.md
-@.claude/skills/coding-conventions/SKILL.md
-@.claude/skills/github/SKILL.md
+Before writing code, prose, commits, issues or pull requests, load the `conventions:coding-conventions`,
+`conventions:technical-authoring` and `conventions:github` skills, and `conventions:spec-implementor` when
+working on the reference checker.
+
 @.claude/skills/purepy-editor/SKILL.md
