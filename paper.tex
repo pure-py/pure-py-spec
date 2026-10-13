@@ -95,7 +95,7 @@
 \renewcommand{\shortauthors}{Antensteiner et al.}
 
 \begin{abstract}
-\replaced{Python is the primary language of scientific computing, and scientific work increasingly relies on Python
+Python is the primary language of scientific computing, and scientific work increasingly relies on Python
 programs written by AI coding tools. Such programs need assurance that they work as intended, usually without a
 formal specification to check them against. Real-world Python lacks an official formal semantics, and mutable
 state, dynamic binding and subtle module-loading semantics make Python programs hard to reason about even given
@@ -115,14 +115,7 @@ problems in \PurePy, in Python and in OCaml, and translate existing Python solut
 often the checker rejects a first attempt, how many rounds of feedback are needed to reach a well-formed
 solution and how often the final solution passes the tests. To show the use of \PurePy as a platform for
 language research, we present two research languages for scientific computing based on \PurePy, with guarantees
-grounded in the \PurePy semantics.}{\PurePy is a pure, side-effect-free subset of Python: a functional language whose programs are referentially
-transparent, reproducible, and easy to reason about, yet remain ordinary Python. Every well-formed \PurePy
-program is valid Python, and where \PurePy gives a run a result, Python gives the same one, so the same source
-runs under a standard Python interpreter and under any conforming implementation. This paper specifies \PurePy as a versioned standard, with a
-formal grammar, a type system that accepts only programs accepted by mypy, and an operational semantics
-that agrees with Python on every run it defines. A reference checker decides well-formedness, and a conformance test suite is exercised on CPython, GraalPy, and Pyodide. Aimed first at researchers in programming languages and pedagogy, \PurePy
-is intended to grow into a common language for scientific computing, supporting portable applications in
-modelling, data processing, analysis, and visualisation. }
+grounded in the \PurePy semantics.
 \end{abstract}
 
 \maketitle
