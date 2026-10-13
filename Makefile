@@ -19,11 +19,19 @@ endef
 $(PYTHON_VERSION_TEX): .python-version
 	printf '\\newcommand*{\\pythonVersion}{%s}\n' "$$(cat $<)" > $@
 
+# FINAL=1 renders the clean version, with change markup accepted; switching modes needs a forced
+# rebuild (make -B).
+ifdef FINAL
+latex-source = -jobname=$* "\\def\\finalmode{}\\input{$<}"
+else
+latex-source = $<
+endif
+
 %.pdf: %.tex $(TEXFILES)
-	$(PDFLATEX) $<
+	$(PDFLATEX) $(latex-source)
 	bibtex "$*"
-	$(PDFLATEX) $<
-	$(PDFLATEX) $<
+	$(PDFLATEX) $(latex-source)
+	$(PDFLATEX) $(latex-source)
 	$(call check-log,$*)
 	rm -f $(BUILD_AUX)
 
