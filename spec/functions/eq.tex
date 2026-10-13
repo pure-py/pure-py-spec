@@ -19,8 +19,8 @@
 \\
 \eqOp{\Sigma}(v, v') &{}= \eqElems{\Sigma}(\iterOp(v), \iterOp(v')) \\*
 &\qquad \text{if } v \text{ and } v' \text{ are values of } \clsRange \\*
-\eqOp{\Sigma}(\exObj{C}{\rho}, \exObj{C}{\rho'}) &{}= \eqElems{\Sigma}(\rho(x_1) \cons \ldots \cons \rho(x_n), \rho'(x_1) \cons \ldots \cons \rho'(x_n)) \\*
-&\qquad \text{if } \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \text{ and } C \neq \clsRange \\*
+\eqOp{\Sigma}(\exObj{C}{\bind{\seq{x}}{\seq{v}}}, \exObj{C}{\bind{\seq{x}}{\seq{v}\,'}}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*
+&\qquad \text{if } C \neq \clsRange \\*
 \\
 \eqOp{\Sigma}(v, v') &{}= \undefinedResult \\*
 &\qquad \text{if } v \text{ and } v' \text{ are closures or primitives} \\*

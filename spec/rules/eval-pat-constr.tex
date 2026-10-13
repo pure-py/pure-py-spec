@@ -2,9 +2,9 @@
 {
   \resolve(\rho, q) = \Type{C} \\
   C \in \ancestors{\Sigma}(D) \\
-  \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
-  \rho, \fieldMap{\Sigma}(C, \seq{p})(x_i), \rho'(x_i) \matches m_i \quad (\forall i)
+  \rho, p_i, v_i \matches m_i \quad (1 \leq i \leq n) \\
+  \rho, p_{n+j}, v_l \matches m_{n+j} \quad (1 \leq j \leq m \text{, } y_j = x_l)
 }
 {
-  \rho, \patConstr{q}{\seq{p}}, \exObj{D}{\rho'} \matches m_1 \override \ldots \override m_n
+  \rho, \patConstr{q}{p_1, \ldots, p_n, y_1 \mathord{=} p_{n+1}, \ldots, y_m \mathord{=} p_{n+m}}, \exObj{D}{\bind{\seq{x}}{\seq{v}}} \matches m_1 \override \ldots \override m_{n+m}
 }
