@@ -96,24 +96,29 @@
 
 \begin{abstract}
 Python is the primary language of scientific computing, and scientific work increasingly relies on Python
-programs written by AI coding tools. Such programs need assurance that they work as intended, usually without a
-formal specification to check them against. Real-world Python lacks an official formal semantics, and mutable
+programs written by AI coding tools. Such programs need assurance that they work as intended, usually without
+\replaced{formal specifications}{a formal specification } to check them against. Real-world Python lacks an official formal semantics, and \replaced{even with a formal semantics, mutable state,
+dynamic binding and subtle module loading make Python programs hard to reason about}{mutable
 state, dynamic binding and subtle module-loading semantics make Python programs hard to reason about even given
-a semantics. \PurePy is a statically typed, immutable subset of Python with a formal static and dynamic
-semantics that agrees with Python: every well-formed \PurePy program is a valid Python program, and \PurePy and
+a semantics}. \PurePy is a statically typed, immutable subset of Python with a formal static and dynamic
+semantics that agrees with Python: every well-formed \PurePy program is \replaced{valid Python and evaluates to the same result
+under Python's own interpreter as under any conforming \PurePy implementation}{a valid Python program, and \PurePy and
 Python assign the same result to every run defined by \PurePy, so a \PurePy program runs unchanged under a
-standard Python interpreter and under any conforming implementation. \PurePy is intended both as a target for
-generative AI and as a platform for programming-language research, on which analyses and research languages
-are grounded in a semantics that agrees with the Python actually run. \PurePy is lightly opinionated, requiring
+standard Python interpreter and under any conforming implementation}. \PurePy is intended both as a target for
+generative AI and as a platform for programming-language research, \replaced{since research languages and program
+analyses built on \PurePy inherit a formal semantics and, with it, compatibility with Python}{on which analyses and research languages
+are grounded in a semantics that agrees with the Python actually run}. \PurePy is lightly opinionated, requiring
 variable declarations and type annotations and excluding Python idioms that would break purity. The type system
 is designed so that every well-formed program is also well typed under mypy, which lets \PurePy programs be
 checked by the toolchain already used by Python programmers. We define \PurePy as a versioned standard, giving
 the grammar, type system and operational semantics, and accompany the standard with a reference checker, which
 decides well-formedness, and a conformance suite, which tests agreement with Python on CPython, GraalPy and
-Pyodide. To assess \PurePy as a target for generative AI, we have AI coding tools solve standard benchmark
+Pyodide. To assess \PurePy as a target for generative AI, we \replaced{ask whether AI coding tools can write
+well-formed \PurePy, whether the restrictions of \PurePy are a barrier to generation, and whether they improve the
+correctness of the generated code, comparing generation into \PurePy, Python and OCaml on standard benchmarks}{have AI coding tools solve standard benchmark
 problems in \PurePy, in Python and in OCaml, and translate existing Python solutions into \PurePy, measuring how
 often the checker rejects a first attempt, how many rounds of feedback are needed to reach a well-formed
-solution and how often the final solution passes the tests. To show the use of \PurePy as a platform for
+solution and how often the final solution passes the tests}. \replaced{Finally, to demonstrate}{To show } the use of \PurePy as a platform for
 language research, we present two research languages for scientific computing based on \PurePy, with guarantees
 grounded in the \PurePy semantics.
 \end{abstract}
