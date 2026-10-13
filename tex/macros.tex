@@ -320,6 +320,11 @@
 % Cases defining an auxiliary function, from spec/functions. Uniform line height: a negative
 % \lineskiplimit stops TeX adding interline glue for a taller case, such as one carrying an accent. That
 % also puts a full \baselineskip before the first case, which the display skip takes back.
+% Pad expression #2 to the width of expression #1, so that side conditions following results of
+% different widths align without a separate alignment column.
+\newlength{\padWidth}
+\newcommand*{\padTo}[2]{\settowidth{\padWidth}{$#1$}\makebox[\padWidth][l]{$#2$}}
+
 \newcommand*{\funccases}[1]{%
   \begingroup\lineskiplimit=-\baselineskip
   \setlength{\abovedisplayskip}{\dimexpr\abovedisplayskip - \baselineskip\relax}%
