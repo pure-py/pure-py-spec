@@ -36,8 +36,8 @@ at the surface, and a research language that targets \PurePy inherits a large an
 \end{DeletedBlock}
 
 \begin{AddedBlock}
-Scientific results are increasingly computed by programs written with AI coding assistants or generated
-outright by language models. Most new users of GitHub now try a coding assistant within their first
+Scientific results are increasingly computed by programs written with, or generated outright by, AI coding
+tools. Most new users of GitHub now try a coding assistant within their first
 week~\cite{github2025}, and the reliability of generated scientific code is an open question with benchmarks
 of its own~\cite{tian2024,chen2025,siegel2024}. Whatever the success rate of the current models, scientific
 results that rest on generated programs need assurance that the programs work as intended. Verification
@@ -46,10 +46,11 @@ the strength of its output, because the scientist who asked for it rarely has a 
 against. More broadly, assurance that AI systems work as intended is now a stated priority of UK
 policy~\cite{clifford2025,dbt2025}.
 
-Python is the default language for this code. Python is the most used language on GitHub in AI and data
+Python is the usual language for this code. Python is the most used language on GitHub in AI and data
 science~\cite{github2025}, and scientific computing is among the fields driving its use~\cite{github2024}.
-Language models choose Python by default when a task leaves the choice open~\cite{twist2026}, and most of the
-code-generation benchmarks surveyed by \citet{siddiq2024} are in Python. Models also generate Python more
+AI coding tools favour Python when a task leaves the choice open, choosing it in most cases even where another
+language would serve better~\cite{twist2026}, and most of the code-generation benchmarks surveyed by
+\citet{siddiq2024} are in Python. They also generate Python more
 accurately than languages with less training data, such as OCaml and Racket~\cite{cassano2023}. Fine-tuning
 closes the gap only in part~\cite{cassano2024}.
 
@@ -77,13 +78,13 @@ pure.
 
 We take the position that machine-generated code changes the economics of language design. Features that
 spare human authors effort, such as mutation in place, implicit coercion and late binding, have a cost in
-reasoning that is paid by whoever must trust the result. When the author is a model, the effort saved is worth
+reasoning that is paid by whoever must trust the result. When the author is a machine, the effort saved is worth
 little and the cost remains, so strictness and formal guarantees gain value. A stricter language that departs
 from Python's syntax, however, forfeits Python's training data and benchmarks. A subset of Python keeps the
 training data and benchmarks, because its programs are Python programs. The evaluation of \secref{evaluation}
-measures the cost of this strictness to a language model. It compares code generation into \PurePy with
+measures the cost of this strictness to a code generator. It compares code generation into \PurePy with
 generation into Python and into OCaml on standard benchmarks, and reports how often the checker rejects a
-first attempt, how many rounds a model needs to reach a well-formed program and how often the final program
+first attempt, how many rounds a generator needs to reach a well-formed program and how often the final program
 passes the tests.
 
 \PurePy is also intended as a foundation for programming-language research on generated code, in two roles.
@@ -131,8 +132,7 @@ CPython, GraalPy and Pyodide (\secref{reference-implementation});
 \item two conservative extensions to the core language, namely partial application and piecewise function
 definitions (\secref{extensions});
 \item two research languages built on \PurePy (\secref{case-studies});
-\item an evaluation of code generation by language models into \PurePy, compared with generation into Python
-and OCaml, on standard benchmarks (\secref{evaluation}).
+\item an evaluation of AI code generation into \PurePy, compared with generation into Python and OCaml, on standard benchmarks (\secref{evaluation}).
 \end{itemize}
 \secref{related-work} discusses related work and \secref{conclusion} concludes.
 \end{AddedBlock}
