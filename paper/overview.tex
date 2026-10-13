@@ -178,16 +178,12 @@ Here \pyinline{helper} is never imported, so \pyinline{pkg.sub} never loads, and
 main module denotes the assignment. Now let the main module also import \pyinline{helper}, which it does not
 otherwise use:
 
-\begin{center}
-\begin{minipage}[t]{0.55\textwidth}
 \begin{python}
 # __main__
 import helper
 import pkg
 print(pkg.sub) # <module 'pkg.sub'>
 \end{python}
-\end{minipage}
-\end{center}
 
 Loading \pyinline{pkg.sub}, wherever in the program it happens, sets it as an attribute of the shared
 \pyinline{pkg} object, so the extra import changes the meaning of \pyinline{pkg.sub} in the main module, which does
