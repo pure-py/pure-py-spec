@@ -56,10 +56,11 @@
 \and
 \inferrule*[lab={\ruleName{val-obj}}]
 {
-  \vdash \rho(x) : \tau \quad (\forall \bind{x}{\tau} \in \fields{\Sigma}(C))
+  \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} \\
+  \vdash v_i : \tau_i \quad (\forall i)
 }
 {
-  \vdash \exObj{C}{\rho} : C
+  \vdash \exObj{C}{\bind{\seq{x}}{\seq{v}}} : C
 }
 \and
 \inferrule*[lab={\ruleName{val-sub}}]
