@@ -1,15 +1,4 @@
-\begin{DeletedBlock}
-For example, a list pattern matches a list of the same length elementwise, composing the match results of the sub-patterns,
-and fails to match a list of another length or a value that is neither a list nor a tuple:
-\begin{mathpar}
-\input{spec/rules/eval-pat-list}
-\and
-\input{spec/rules/eval-pat-list-no}
-\end{mathpar}
-Neither rule applies when the value is a tuple: a list pattern against a tuple has no derivation, and
-the run has no result.
-\end{DeletedBlock}
-\begin{AddedBlock}
+
 For example, a list pattern matches a list of the same length elementwise, composing the match results of the
 sub-patterns, and is undefined against a tuple, which Python would match as a sequence (\secref{no-coercions}):
 \begin{defalign}
@@ -17,4 +6,4 @@ sub-patterns, and is undefined against a tuple, which Python would match as a se
 \end{defalign}
 A list of another length, or a value that is neither a list nor a tuple, falls to the final case of the
 function, which gives $\noMatch$.
-\end{AddedBlock}
+

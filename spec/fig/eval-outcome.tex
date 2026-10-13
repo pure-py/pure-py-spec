@@ -347,11 +347,11 @@
 \and
 \inferrule*[lab={\ruleName{eval-attr-object}}]
 {
-  \rho, e \Rightarrow \val{\exObj{C}{\replaced{\bind{\seq{x}}{\seq{v}}}{\rho'}}} \\
-  \added{x = x_i}
+  \rho, e \Rightarrow \val{\exObj{C}{\bind{\seq{x}}{\seq{v}}}} \\
+  x = x_i
 }
 {
-  \rho, \exAttr{e}{x} \Rightarrow \val{\replaced{v_i}{\rho'(x)}}
+  \rho, \exAttr{e}{x} \Rightarrow \val{v_i}
 }
 \and
 \inferrule*[lab={\ruleName{eval-constr}}]
@@ -359,11 +359,11 @@
   e \in \set{q, \exSubscript{q}{\seq{\psi}}} \\
   \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \val{(v_1 \cons \ldots \cons v_{n+m})} \\
   \resolve(\rho, q) = \Type{C} \\
-  \added{\fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}}} \\
-  \added{\fieldMap{\Sigma}(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m})) = \set{\bind{\seq{x}}{\seq{u}}}}
+  \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
+  \fieldMap{\Sigma}(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m})) = \set{\bind{\seq{x}}{\seq{u}}}
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{C}{\replaced{\bind{\seq{x}}{\seq{u}}}{\fieldMap{\Sigma}(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m}))}}}
+  \rho, \exCall{e}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{C}{\bind{\seq{x}}{\seq{u}}}}
 }
 \end{mathpar}
 \caption{Expression $e$ evaluates to result $r$ under environment $\rho : \Gamma$}
@@ -662,8 +662,8 @@
 \small
 \inferrule*[lab={\ruleName{eval-attr-missing}}]
 {
-  \rho, e \Rightarrow \val{\exObj{C}{\replaced{\bind{\seq{x}}{\seq{v}}}{\rho'}}} \\
-  x \notin \replaced{\set{\seq{x}}}{\dom(\rho')}
+  \rho, e \Rightarrow \val{\exObj{C}{\bind{\seq{x}}{\seq{v}}}} \\
+  x \notin \set{\seq{x}}
 }
 {
   \rho, \exAttr{e}{x} \Rightarrow \aborts{\errAttr}

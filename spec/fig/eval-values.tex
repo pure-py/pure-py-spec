@@ -9,7 +9,7 @@ $v$ & $::=$ & $\ell$ & (Literal) \\
     & $\mid$ & $\exDict{\delta}$ & (Dict) \\
     & $\mid$ & $\exLamClosure[\Gamma]{\rho}{\seq{x}}{e}$ & (LambdaClosure) \\
     & $\mid$ & $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$ & (DefClosure) \\
-    & $\mid$ & $\exObj{C}{\replaced{\bind{x_1}{v_1} \cons \ldots \cons \bind{x_n}{v_n}}{\rho}}$ & (Object) \\
+    & $\mid$ & $\exObj{C}{\bind{x_1}{v_1} \cons \ldots \cons \bind{x_n}{v_n}}$ & (Object) \\
     & $\mid$ & $\modStub{q}$ & (ModuleStub) \\
     & $\mid$ & $\modLoaded{q}{\rho}$ & (LoadedModule) \\
     & $\mid$ & $\Type{C}$ & (Class) \\
@@ -37,7 +37,7 @@ $r$ & $::=$ & $\val{v}$ & (Val) \\
 \grammarGroup{Match results} \\
 $m$ & $::=$ & $\matchOk{\rho}$ & (Match) \\
   & $\mid$ & $\noMatch$ & (NoMatch) \\
-  & \added{$\mid$} & $\added{\undefinedResult}$ & \added{(Undefined)}
+  & $\mid$ & $\undefinedResult$ & (Undefined)
    \\[3mm]
 \grammarGroup{Termination kinds} \\
 $\kappa$ & $::=$ & $\errType \mid \errIndex \mid \errKey \mid \errZeroDiv$ &  \\
