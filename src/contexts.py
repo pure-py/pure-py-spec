@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from aux import TypeDefinition, declares, type_param_names
+from reasons import MypyCompatibility
 from type_syntax import (
     RANGE,
     CallableType,
@@ -158,9 +159,11 @@ class Returns:
     pass
 
 
+# mypy_only: falls through only for compatibility with mypy, failing with this error if it ends a function body
 @dataclass(frozen=True)
 class Assigns:
     delta: Context
+    mypy_only: MypyCompatibility | None = None
 
 
 type StaticOutcome = Returns | Assigns
@@ -242,7 +245,11 @@ def merge_outcomes(rs: list[StaticOutcome], declared: set[Var]) -> StaticOutcome
     if len(assigns_branches) == 0:
         return Returns()
     delta = assigns_branches[0].delta
-    return Assigns(fold_merge(delta, assigns_branches[1:], declared))
+    mypy_only = [r.mypy_only for r in assigns_branches]
+    return Assigns(
+        fold_merge(delta, assigns_branches[1:], declared),
+        mypy_only[0] if None not in mypy_only else None,
+    )
 
 
 def fold_merge(delta: Context, rs: list[Assigns], declared: set[Var]) -> Context:
@@ -261,8 +268,11 @@ def override_outcomes(r: StaticOutcome, r_: StaticOutcome) -> StaticOutcome:
             return r
         case (_, Returns()):
             return r_
-        case (Assigns(delta), Assigns(delta_)):
-            return Assigns(override_context(delta, delta_))
+        case (Assigns(delta, mypy_only), Assigns(delta_, mypy_only_)):
+            # a statement after a mypy-only fall-through is unreachable without the restriction
+            return Assigns(
+                override_context(delta, delta_), mypy_only_ if mypy_only is None else None
+            )
 
 
 def extend_entry(theta: ContextEntry | None, theta_: ContextEntry | None) -> ContextEntry:

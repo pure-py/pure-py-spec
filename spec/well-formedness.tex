@@ -236,7 +236,7 @@ $\resolveOp{\Sigma}(\ominus, \sigma)$.
 
 \begin{specdefinition}{Static outcome}
 A well-typed statement has a \emph{static outcome} $R$: either $\Returns$, when the statement \emph{definitely
-returns}, or $\Assigns{\Delta}$ for a context $\Delta$ with an entry for any variable declared or assigned by the
+returns}\added{ or fails an assertion of \pyinline{False} in a function body}, or $\Assigns{\Delta}$ for a context $\Delta$ with an entry for any variable declared or assigned by the
 statement (Definition~\ref{def:context}), recording whether the variable is definitely assigned, definitely
 unassigned or possibly unassigned after the statement.
 \end{specdefinition}
@@ -283,7 +283,8 @@ definitions and modules introduce the variables of the scope as unbound, using t
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:scope}}).
 
 The conditions of \pyinline{if} and \pyinline{assert}
-check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}).
+check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}). \added{In a function body, an assertion of the literal \pyinline{False} has outcome $\Returns$ (\ruleName{assert-false},
+\ruleName{assert-false-msg}); the rules are syntactic, following mypy, which treats only the literal as ending a branch.}
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}), which threads

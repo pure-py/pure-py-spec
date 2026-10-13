@@ -534,6 +534,15 @@ class MissingReturn:
 
 
 @dataclass(frozen=True)
+class MissingReturnAssertion:
+    def message(self) -> str:
+        return (
+            "assertion of expression of type Literal[False] other than False, "
+            "so the function does not always return"
+        )
+
+
+@dataclass(frozen=True)
 class MissingReturnMatchPartial:
     remaining: Type
 
@@ -600,6 +609,7 @@ type Reason = (
     | TupleIndexOutOfRange
     | BareReturn
     | MissingReturn
+    | MissingReturnAssertion
     | MissingReturnMatchPartial
     | NotIterable
     | SequenceKindMismatch

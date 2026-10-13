@@ -55,7 +55,8 @@
 \and
 \inferrule*[lab={\ruleName{assert}}]
 {
-  \Sigma; \Gamma \vdash e \checks \tyBool
+  \Sigma; \Gamma \vdash e \checks \tyBool \\
+  \added{\zeta = \varepsilon \text{ or } e \neq \pyinline{False}}
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exAssert{e} : \Assigns{\varnothing}
@@ -64,10 +65,27 @@
 \inferrule*[lab={\ruleName{assert-msg}}]
 {
   \Sigma; \Gamma \vdash e \checks \tyBool \\
-  \Sigma; \Gamma \vdash e' \checks \tyStr
+  \Sigma; \Gamma \vdash e' \checks \tyStr \\
+  \added{\zeta = \varepsilon \text{ or } e \neq \pyinline{False}}
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exAssertMsg{e}{e'} : \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{assert-false}}]
+{
+  \strut
+}
+{
+  \added{\Sigma; \Gamma; \tau \vdash \exAssert{\pyinline{False}} : \Returns}
+}
+\and
+\inferrule*[lab={\ruleName{assert-false-msg}}]
+{
+  \added{\Sigma; \Gamma \vdash e' \checks \tyStr}
+}
+{
+  \added{\Sigma; \Gamma; \tau \vdash \exAssertMsg{\pyinline{False}}{e'} : \Returns}
 }
 \and
 \inferrule*[lab={\ruleName{return-none}}]
