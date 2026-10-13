@@ -1,9 +1,19 @@
 name: Litmus tests
 
+# Run only when the checker, the tests or their environment change; the paper and
+# specification have their own Build workflow.
 on:
   push:
     branches: ["main"]
+    paths: &paths
+      - src/**
+      - test/**
+      - pyproject.toml
+      - uv.lock
+      - .python-version
+      - .github/workflows/litmus-tests.yml
   pull_request:
+    paths: *paths
 
 jobs:
   test:
