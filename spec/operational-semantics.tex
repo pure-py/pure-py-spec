@@ -4,7 +4,7 @@
 \subsection{Values and environments}
 
 Values, environments, outcomes and results are given in \figref{values}. A class value $\Type{C}$ is the
-context entry of the class, and an object $\exObj{C}{\bind{\seq{x}}{\seq{v}}}$ records its class by name and its fields in the order given by $\fields{\Sigma}(C)$; the value $\Unbound$
+context entry of the class, and an object $\exObj{C}{\replaced{\bind{\seq{x}}{\seq{v}}}{\rho}}$ records its class by name\added{ and its fields in the order given by $\fields{\Sigma}(C)$}; the value $\Unbound$
 marks a variable of the current scope before its declaration is reached, a state reported by Python as an unbound
 local, and an environment binds a variable to $\Unbound$ wherever the corresponding context binds the variable to
 the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible. Throughout this section, $\Sigma$ is the class table produced by module checking of the program
@@ -106,9 +106,9 @@ whose class has the pattern's class among its ancestors, and its sub-patterns bi
 pattern's class\paperonly{:}\speconly{.}
 \paperinput{paper/operational-semantics/pattern-constr}%
 Since an object records its class by name, the class test in \ruleName{eval-pat-constr} is a comparison of
-fully-qualified names. Positional sub-patterns match the leading fields of the object in order, and keyword
+fully-qualified names.\added{ Positional sub-patterns match the leading fields of the object in order, and keyword
 sub-patterns match fields by name. The leading fields of the object are the fields of the pattern's class,
-because the fields of a class begin with those of its base class (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:fields}}).
+because the fields of a class begin with those of its base class (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:fields}}).}
 
 \specinput{spec/fig/pattern-matching/eval-pat}
 
