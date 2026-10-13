@@ -227,7 +227,7 @@
 \newcommand*{\typeArgs}[1]{\mathrm{type\text{-}args}_{#1}}
 
 % Outcomes (draft, \secref{errors})
-\newcommand*{\aborts}[1]{\mathsf{aborts}\;#1}
+\newcommand*{\aborts}[1]{\mathsf{aborts}(#1)}
 \newcommand*{\errAssert}[1]{\errAssertNoMsg(#1)}
 \newcommand*{\errAssertNoMsg}{\mathsf{AssertionError}}
 \newcommand*{\errAttr}{\mathsf{AttributeError}}
@@ -238,13 +238,13 @@
 \newcommand*{\errZeroDiv}{\mathsf{ZeroDivisionError}}
 \newcommand*{\mlet}[3]{\mathsf{let}\;#1 \leftarrow #2\;\mathsf{in}\;#3}
 \newcommand*{\undefinedResult}{\mathsf{undefined}}
-\newcommand*{\val}[1]{\mathsf{val}\;#1}
+\newcommand*{\val}[1]{\mathsf{val}(#1)}
 
 % Result types and results
 \newcommand*{\Assigns}[1]{\mathsf{Assigns}(#1)}
 \newcommand{\assigns}[1]{\mathsf{assigns}(#1)}
 \newcommand*{\Returns}{\mathsf{Returns}}
-\newcommand{\returns}[1]{\mathsf{returns}\;#1}
+\newcommand{\returns}[1]{\mathsf{returns}(#1)}
 
 % Metafunctions: syntactic analyses
 \newcommand*{\assignsS}{\mathrm{assigns}}
@@ -295,7 +295,7 @@
 \newcommand{\carrow}[1]{\xrightarrow{\; #1\; }}
 \newcommand*{\importsR}{\mathrel{\mathsf{imports}}}
 \newcommand*{\matches}{\rightsquigarrow}
-\newcommand*{\matchOk}[1]{\mathsf{match}\;#1}
+\newcommand*{\matchOk}[1]{\mathsf{match}(#1)}
 \newcommand*{\noMatch}{\mathsf{no}\text{-}\mathsf{match}}
 \newcommand*{\notmatches}{\not\rightsquigarrow}
 \newcommand*{\prefixOf}{\preceq}
