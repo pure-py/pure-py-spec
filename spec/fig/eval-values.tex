@@ -36,7 +36,8 @@ $r$ & $::=$ & $\val{v}$ & (Val) \\
    \\[3mm]
 \grammarGroup{Match results} \\
 $m$ & $::=$ & $\matchOk{\rho}$ & (Match) \\
-  & $\mid$ & $\noMatch$ & (NoMatch)
+  & $\mid$ & $\noMatch$ & (NoMatch) \\
+  & \added{$\mid$} & $\added{\undefinedResult}$ & \added{(Undefined)}
    \\[3mm]
 \grammarGroup{Termination kinds} \\
 $\kappa$ & $::=$ & $\errType \mid \errIndex \mid \errKey \mid \errZeroDiv$ &  \\

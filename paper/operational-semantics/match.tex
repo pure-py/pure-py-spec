@@ -3,7 +3,7 @@ outcome of the statement, so pattern variables remain bound after the match (\se
 \begin{mathpar}
 \input{spec/rules/eval-match}
 \end{mathpar}
-Here $\dispatch$ tries the cases in order under the pattern-matching judgement, and yields \pyinline{pass}
+Here $\dispatch$ tries the cases in order \replaced{with the matching function $\matchOp{\Sigma}$ (\figref{auxiliary-functions})}{under the pattern-matching judgement}, and yields \pyinline{pass}
 with no bindings if no pattern matches:
 \begin{defalign}
 \input{spec/functions/dispatch}

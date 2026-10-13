@@ -1,0 +1,19 @@
+\matchOp{\Sigma}(\rho, \ell, v) &{}= \matchOk{\varnothing} \\*
+&\qquad \text{if } \eqOp{\Sigma}(\ell, v) = \val{\pyinline{True}} \\*
+\matchOp{\Sigma}(\rho, \ell, v) &{}= \noMatch \\*
+&\qquad \text{if } \eqOp{\Sigma}(\ell, v) = \val{\pyinline{False}} \\*
+\matchOp{\Sigma}(\rho, \ell, v) &{}= \undefinedResult \\*
+&\qquad \text{if } \eqOp{\Sigma}(\ell, v) = \undefinedResult \\*
+\matchOp{\Sigma}(\rho, x, v) &{}= \matchOk{\set{\bind{x}{v}}} \\*
+\matchOp{\Sigma}(\rho, \patWild, v) &{}= \matchOk{\varnothing} \\*
+\matchOp{\Sigma}(\rho, p\;\pyinline{as}\;x, v) &{}= \matchOp{\Sigma}(\rho, p, v) \override \matchOk{\set{\bind{x}{v}}} \\*
+\\
+\input{spec/functions/match-list} \\*
+\matchOp{\Sigma}(\rho, \patTuple{p_1, \ldots, p_n}, \exTuple{v_1, \ldots, v_n}) &{}= \matchOp{\Sigma}(\rho, p_1, v_1) \override \ldots \override \matchOp{\Sigma}(\rho, p_n, v_n) \\*
+\matchOp{\Sigma}(\rho, \patTuple{\seq{p}}, \exList{\seq{v}}) &{}= \undefinedResult \\*
+\matchOp{\Sigma}(\rho, \patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}}, \delta) &{}= \matchOp{\Sigma}(\rho, p_1, \delta(w_1)) \override \ldots \override \matchOp{\Sigma}(\rho, p_n, \delta(w_n)) \\*
+&\qquad \text{if } w_i \in \dom(\delta) \text{ for each } i \\*
+\\
+\input{spec/functions/match-constr} \\*
+\\
+\matchOp{\Sigma}(\rho, p, v) &{}= \noMatch \quad \text{(otherwise)}
