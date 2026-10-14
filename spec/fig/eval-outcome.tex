@@ -200,7 +200,7 @@
   \rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\kappa}
 }
 \and
-\inferrule*[lab={\ruleName{eval-match-undefined}}]
+\inferrule*[lab={\ruleName{eval-match-undef}}]
 {
   \added{\rho, e \Rightarrow \val{v}} \\
   \added{\dispatch(\rho, v, \seq{p}, \seq{s}) = \aborts{\errUndef}}
@@ -701,7 +701,7 @@
 \and
 \input{spec/rules/eval-call-nonfun}
 \and
-\inferrule*[lab={\ruleName{eval-call-prim-undefined}}]
+\inferrule*[lab={\ruleName{eval-call-prim-undef}}]
 {
   \added{\rho, e \Rightarrow \val{\primVal{\primFn}}} \\
   \added{\rho, \seq{e} \Rightarrow \val{\seq{u}}} \\
@@ -711,7 +711,7 @@
   \added{\rho, \exCall{e}{\seq{e}} \Rightarrow \aborts{\errUndef}}
 }
 \and
-\inferrule*[lab={\ruleName{eval-attr-undefined}}]
+\inferrule*[lab={\ruleName{eval-attr-undef}}]
 {
   \added{\rho, e \Rightarrow \val{v}} \\
   \added{v \text{ neither loaded module nor object}}
