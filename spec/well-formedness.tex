@@ -296,7 +296,7 @@ branch reaches \pyinline{assert False}, and mypy accepts both. A module whose bo
 \pyinline{assert False} is ill-formed, because the \ruleName{top-seq} and \ruleName{module} rules require outcome
 $\Assigns{\Delta}$. An assertion of any other expression has outcome $\Assigns{\varnothing}$, even at type
 \pyinline{Literal[False]}. Here mypy is more precise, and also treats the code after an assertion as unreachable when
-the asserted expression is built from \pyinline{False} and \pyinline{0} with \pyinline{not}, \pyinline{and} and
+the asserted expression is built from \pyinline{False} with \pyinline{not}, \pyinline{and} and
 \pyinline{or}, or has the declared type \pyinline{Literal[False]}. A rule based on the type would accept more
 than mypy, however, because mypy reports a missing return after \pyinline{assert (False,)[0]} (\paperonly{\secref{python-compatibility}}\speconly{\figref{mypy-restrictions}}).}
 
