@@ -57,6 +57,7 @@ from type_syntax import (
     Type,
     UnionType,
     Var,
+    float_literal,
     instantiate,
     literal,
 )
@@ -70,6 +71,8 @@ def match(k: Shape, p: ast.pattern, mod_ctx: ModuleContext) -> Match | None:
     match p:
         case ast.MatchAs():
             return match_as(k, p, mod_ctx)
+        case ast.MatchValue() if float_literal(literal_of(p)):
+            return match_literal_float(mod_ctx.Sigma, k, literal_of(p))
         case ast.MatchValue() | ast.MatchSingleton():
             result = match_literal(k, literal_of(p))
         case PatTuple():
@@ -109,6 +112,16 @@ def match_literal(k: Shape, ell: Literal) -> Match | None:
             if tau == LiteralType(ell):
                 assert len(hs) == 0
                 return (k,), ()
+            return None
+        case _:
+            return None
+
+
+def match_literal_float(Sigma: ClassTable, k: Shape, n: Literal) -> Match | None:
+    match k:
+        case Rest(tau, hs):
+            if n not in hs and subtype(Sigma, Primitive.FLOAT, tau):
+                return (k,), (Rest(tau, hs | {n}),)
             return None
         case _:
             return None
@@ -443,6 +456,8 @@ def matched_as(tau: Type, p: ast.pattern, mod_ctx: ModuleContext) -> Type:
             return tau
         case _, ast.MatchAs(pattern=ast.pattern() as q):
             return matched_as(tau, q, mod_ctx)
+        case _, ast.MatchValue() if float_literal(literal_of(p)):
+            return meet(Sigma, Primitive.FLOAT, tau)
         case _, ast.MatchValue() | ast.MatchSingleton():
             return meet(Sigma, LiteralType(literal_of(p)), tau)
         case TupleType(taus), PatTuple(patterns=ps) if len(taus) == len(ps):
@@ -469,7 +484,9 @@ def remaining(tau: Type, p: ast.pattern, mod_ctx: ModuleContext) -> Type:
             return remaining(tau, q, mod_ctx)
         case _, ast.MatchValue() | ast.MatchSingleton():
             ell = literal_of(p)
-            if tau == LiteralType(ell) or (tau == Primitive.NONE and ell == Literal(None)):
+            if (isinstance(tau, LiteralType) and tau.ell == ell) or (
+                tau == Primitive.NONE and ell == Literal(None)
+            ):
                 return Primitive.NEVER
             if tau == Primitive.BOOL and isinstance(ell.value, bool):
                 return LiteralType(Literal(not ell.value))

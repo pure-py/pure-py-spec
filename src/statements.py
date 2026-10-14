@@ -85,6 +85,7 @@ from type_syntax import (
     ClassType,
     DictType,
     ListType,
+    Literal,
     LiteralType,
     Name,
     Primitive,
@@ -94,7 +95,8 @@ from type_syntax import (
     UnionType,
     Var,
     base_type,
-    literal_type,
+    float_literal,
+    literal,
     parse_annotation,
     subscript_args,
     substitute,
@@ -111,11 +113,10 @@ def def_signature(d: ast.FunctionDef, mod_ctx: ModuleContext) -> CallableType | 
     return tau if len(alphas) == 0 else TypeScheme(alphas, tau)
 
 
-# tail: the body ends a function body, so a fall-through is a missing return
 def check_body(
-    body: list[ast.stmt], mod_ctx: ModuleContext, returns: Type | None = None, tail: bool = False
+    body: list[ast.stmt], mod_ctx: ModuleContext, returns: Type | None = None
 ) -> StaticOutcome:
-    return check_seq(statements(body), mod_ctx, returns, tail)
+    return check_seq(statements(body), mod_ctx, returns)
 
 
 def check_top_seq(ts: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
@@ -123,7 +124,9 @@ def check_top_seq(ts: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
         return mod_ctx
     t, t_ = ts[0], ts[1:]
     r, Sigma = check_top_statement(t, mod_ctx)
-    assert isinstance(r, Assigns)
+    if not isinstance(r, Assigns):  # top-seq and module require Assigns
+        assert isinstance(t, ast.stmt)  # type definitions have outcome Assigns
+        raise IllFormedModule(t, reasons.TopLevelAssertFalse())
     delta = r.delta
     mod_ctx_after = override_gamma(replace(mod_ctx, Sigma=Sigma), delta)
     if len(t_) == 0:
@@ -164,27 +167,25 @@ def check_type_definition(chi: TypeDefinition, mod_ctx: ModuleContext) -> None:
 
 
 def check_seq(
-    ss: list[Statement], mod_ctx: ModuleContext, returns: Type | None = None, tail: bool = False
+    ss: list[Statement], mod_ctx: ModuleContext, returns: Type | None = None
 ) -> StaticOutcome:
     if len(ss) == 0:
         return Assigns({})
     s, s_ = ss[0], ss[1:]
-    r = check_statement(s, mod_ctx, returns, tail and len(s_) == 0)
+    r = check_statement(s, mod_ctx, returns)
     if len(s_) == 0:
         return r
     if isinstance(r, Returns):
         stmt: ast.AST = s_[0][0] if isinstance(s_[0], list) else s_[0]
         raise IllFormedModule(stmt, reasons.UnreachableStatement())
-    r_ = check_seq(s_, override_gamma(mod_ctx, r.delta), returns, tail)
+    r_ = check_seq(s_, override_gamma(mod_ctx, r.delta), returns)
     return override_outcomes(r, r_)
 
 
-def check_statement(
-    s: Statement, mod_ctx: ModuleContext, returns: Type | None, tail: bool = False
-) -> StaticOutcome:
+def check_statement(s: Statement, mod_ctx: ModuleContext, returns: Type | None) -> StaticOutcome:
     if isinstance(s, list):
         return check_defs(cast(list[ast.FunctionDef], s), mod_ctx)
-    return check_stmt(s, mod_ctx, returns, tail)
+    return check_stmt(s, mod_ctx, returns)
 
 
 def check_defs(ds: list[ast.FunctionDef], mod_ctx: ModuleContext) -> Assigns:
@@ -203,8 +204,10 @@ def def_body(d: ast.FunctionDef, pi: CallableType | TypeScheme, mod_ctx: ModuleC
     params = dict(zip(xs, tau.params, strict=True))
     type_vars = {alpha: TypeVar() for alpha in alphas}
     body_ctx = override_gamma(mod_ctx, {**type_vars, **params, **scope(set(xs), d.body)})
-    r = check_body(d.body, body_ctx, tau.result, tail=True)
+    r = check_body(d.body, body_ctx, tau.result)
     if not isinstance(r, Returns) and not equivalent(mod_ctx.Sigma, tau.result, Primitive.NONE):
+        if r.mypy_only is not None:
+            raise r.mypy_only
         raise mypy_only_if(subtype(mod_ctx.Sigma, Primitive.NONE, tau.result))(
             d, reasons.MissingReturn(d.name, tau.result)
         )
@@ -251,9 +254,7 @@ def check_assignments_declared(body: list[ast.stmt], bound: set[Var]) -> None:
             raise IllFormedModule(node, reasons.UndeclaredAssignment(x))
 
 
-def check_stmt(
-    s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None, tail: bool = False
-) -> StaticOutcome:
+def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> StaticOutcome:
     match s:
         case ast.Pass():
             return Assigns({})
@@ -307,40 +308,48 @@ def check_stmt(
             return Returns()
         case ast.If(test=e, body=ss, orelse=ss_):
             check_expr(e, Primitive.BOOL, mod_ctx)
-            branches = [check_body(ss, mod_ctx, returns, tail)]
-            branches.append(check_body(ss_, mod_ctx, returns, tail) if ss_ else Assigns({}))
+            branches = [check_body(ss, mod_ctx, returns)]
+            branches.append(check_body(ss_, mod_ctx, returns) if ss_ else Assigns({}))
             return merge_outcomes(branches, {x for x, _ in declares(s)})
         case ast.Assert(test=e, msg=e_):
-            check_expr(e, Primitive.BOOL, mod_ctx)
+            assert_false = isinstance(e, ast.Constant) and e.value is False
+            if not assert_false:
+                check_expr(e, Primitive.BOOL, mod_ctx)
             if e_ is not None:
                 check_expr(e_, Primitive.STR, mod_ctx)
-            return Assigns({})
+            if assert_false:
+                return Returns()
+            false_typed = (
+                returns is not None
+                and synthesises(e)
+                and synth_expr(e, mod_ctx) == LiteralType(Literal(False))
+            )
+            return Assigns(
+                {}, MypyCompatibility(s, reasons.MissingReturnAssertion()) if false_typed else None
+            )
         case ast.Match(subject=e):
             tau = synth_expr(e, mod_ctx)
-            return check_match_cases(s, tau, mod_ctx, returns, tail)
+            return check_match_cases(s, tau, mod_ctx, returns)
         case _:
             raise AssertionError(f"unexpected statement: {type(s).__name__}")
 
 
 def check_match_cases(
-    match: ast.Match, tau: Type, mod_ctx: ModuleContext, returns: Type | None, tail: bool
+    match: ast.Match, tau: Type, mod_ctx: ModuleContext, returns: Type | None
 ) -> StaticOutcome:
     deltas, rest, residual = match_cases(match, tau, mod_ctx)
     branches = [
-        check_case(case, delta, mod_ctx, returns, tail) for case, delta in zip(match.cases, deltas)
+        check_case(case, delta, mod_ctx, returns) for case, delta in zip(match.cases, deltas)
     ]
-    partial = rest != Primitive.NEVER
-    if (
-        partial
-        and tail
-        and returns is not None
-        and not equivalent(mod_ctx.Sigma, returns, Primitive.NONE)
-        and len(residual) == 0
-        and all(isinstance(r, Returns) for r in branches)
-    ):
-        raise MypyCompatibility(match, reasons.MissingReturnMatchPartial(rest))
+    # with an empty residual, the unmatched path falls through only for mypy compatibility
+    unmatched = Assigns(
+        {},
+        MypyCompatibility(match, reasons.MissingReturnMatchPartial(rest))
+        if len(residual) == 0
+        else None,
+    )
     return merge_outcomes(
-        branches + ([Assigns({})] if partial else []), {x for x, _ in declares(match)}
+        branches + ([unmatched] if rest != Primitive.NEVER else []), {x for x, _ in declares(match)}
     )
 
 
@@ -369,10 +378,9 @@ def check_case(
     delta: VarContext,
     mod_ctx: ModuleContext,
     returns: Type | None,
-    tail: bool,
 ) -> StaticOutcome:
     return override_outcomes(
-        Assigns(delta), check_body(case.body, override_gamma(mod_ctx, delta), returns, tail)
+        Assigns(delta), check_body(case.body, override_gamma(mod_ctx, delta), returns)
     )
 
 
@@ -406,9 +414,9 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             assert tau is not None
             return tau
         case ast.Constant():
-            tau = literal_type(e)
-            assert tau is not None
-            return tau
+            ell = literal(e)
+            assert ell is not None
+            return Primitive.FLOAT if float_literal(ell) else LiteralType(ell)
         case ast.Lambda():
             raise IllFormedModule(e, reasons.NotSynthesised())
         case ast.Call(func=ast.Subscript(value=e_)) if class_of_name(e_, mod_ctx) is not None:

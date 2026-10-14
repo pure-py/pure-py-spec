@@ -1,6 +1,7 @@
 \begin{figure}
 \small
 \setlength{\jot}{2pt}
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma; \Gamma \vdash k, p \matches K, L$}
 \begin{mathpar}
 \small
@@ -45,6 +46,16 @@
   \Sigma; \Gamma \vdash \shapeAny{\tyLiteral{\ell}}{\varnothing}, \ell \matches \set{\shapeAny{\tyLiteral{\ell}}{\varnothing}}, \varnothing
 }
 \and
+\inferrule*[lab={\ruleName{pat-literal-float}}]
+{
+  n \text{ a float literal} \\
+  n \notin H \\
+  \Sigma \vdash \tyFloat \subty \tau
+}
+{
+  \Sigma; \Gamma \vdash \shapeAny{\tau}{H}, n \matches \set{\shapeAny{\tau}{H}}, \set{\shapeAny{\tau}{(H \cup \set{n})}}
+}
+\and
 \inferrule*[lab={\ruleName{pat-tuple}}]
 {
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L
@@ -85,9 +96,13 @@
   \Sigma; \Gamma \vdash \shapeAny{\patConstr{C[\seq{\tau}]}{\seq{k}}}{H}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{C[\seq{\tau}]}{\seq{k}\,'}}{H} \mid \seq{k}\,' \in K}, \set{\shapeAny{\patConstr{C[\seq{\tau}]}{\seq{l}}}{H} \mid \seq{l} \in L}
 }
 \end{mathpar}
+\subcaption{Pattern $p$ matches shape $k$, giving matched shapes $K$ and residual $L$}
+\label{fig:typing-pat-shape}
+\end{subfigure}
 
 \vspace{2mm}
 
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L$}
 \begin{mathpar}
 \small
@@ -108,9 +123,13 @@
   \Sigma; \Gamma \vdash k \cons \seq{k}, p \cons \seq{p} \matches K \times K', (L \times \set{\seq{k}}) \disjunion (K \times L')
 }
 \end{mathpar}
+\subcaption{Patterns $\seq{p}$ match shapes $\seq{k}$, giving matched shapes $K$ and residual $L$}
+\label{fig:typing-pat-seq}
+\end{subfigure}
 
 \vspace{2mm}
 
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma; \Gamma \vdash L, p \matches K, L'$}
 \begin{mathpar}
 \small
@@ -123,6 +142,9 @@
   \Sigma; \Gamma \vdash L, p \matches \textstyle\bigdisjunion_{k \in L'} K_k, \; \textstyle\bigdisjunion_{k \in L'} L_k \disjunion (L \setminus L')
 }
 \end{mathpar}
-\caption{Pattern $p$ matches shape $k$, giving matched shapes $K$ and residual $L$; lifted to sequences and ordered sets of shapes}
+\subcaption{Pattern $p$ matches ordered set of shapes $L$, giving matched shapes $K$ and residual $L'$}
+\label{fig:typing-pat-set}
+\end{subfigure}
+\caption{Matching patterns against shapes}
 \label{fig:typing-pat}
 \end{figure}

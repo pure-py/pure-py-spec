@@ -55,7 +55,8 @@
 \and
 \inferrule*[lab={\ruleName{assert}}]
 {
-  \Sigma; \Gamma \vdash e \checks \tyBool
+  \Sigma; \Gamma \vdash e \checks \tyBool \\
+  e \neq \pyinline{False}
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exAssert{e} : \Assigns{\varnothing}
@@ -64,10 +65,27 @@
 \inferrule*[lab={\ruleName{assert-msg}}]
 {
   \Sigma; \Gamma \vdash e \checks \tyBool \\
-  \Sigma; \Gamma \vdash e' \checks \tyStr
+  \Sigma; \Gamma \vdash e' \checks \tyStr \\
+  e \neq \pyinline{False}
 }
 {
   \Sigma; \Gamma; \zeta \vdash \exAssertMsg{e}{e'} : \Assigns{\varnothing}
+}
+\and
+\inferrule*[lab={\ruleName{assert-false}}]
+{
+  \strut
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exAssert{\pyinline{False}} : \Returns
+}
+\and
+\inferrule*[lab={\ruleName{assert-false-msg}}]
+{
+  \Sigma; \Gamma \vdash e' \checks \tyStr
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exAssertMsg{\pyinline{False}}{e'} : \Returns
 }
 \and
 \inferrule*[lab={\ruleName{return-none}}]

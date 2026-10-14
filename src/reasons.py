@@ -259,6 +259,12 @@ class TopLevelReturn:
 
 
 @dataclass(frozen=True)
+class TopLevelAssertFalse:
+    def message(self) -> str:
+        return "module body definitely reaches 'assert False'"
+
+
+@dataclass(frozen=True)
 class UnknownModule:
     q: Name
 
@@ -534,6 +540,15 @@ class MissingReturn:
 
 
 @dataclass(frozen=True)
+class MissingReturnAssertion:
+    def message(self) -> str:
+        return (
+            "assertion of expression of type Literal[False] other than False, "
+            "so the function does not always return"
+        )
+
+
+@dataclass(frozen=True)
 class MissingReturnMatchPartial:
     remaining: Type
 
@@ -583,6 +598,7 @@ type Reason = (
     | DuplicateDictKey
     | NonlinearPattern
     | TopLevelReturn
+    | TopLevelAssertFalse
     | DuplicateMember
     | SubmoduleNotImported
     | ImportOfContainedModule
@@ -600,6 +616,7 @@ type Reason = (
     | TupleIndexOutOfRange
     | BareReturn
     | MissingReturn
+    | MissingReturnAssertion
     | MissingReturnMatchPartial
     | NotIterable
     | SequenceKindMismatch

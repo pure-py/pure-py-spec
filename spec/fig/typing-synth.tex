@@ -18,6 +18,14 @@
   \Sigma; \Gamma \vdash \ell \synth \tyLiteral{\ell}
 }
 \and
+\inferrule*[lab={\ruleName{literal-float}}]
+{
+  n \text{ a float literal}
+}
+{
+  \Sigma; \Gamma \vdash n \synth \tyFloat
+}
+\and
 \inferrule*[lab={\ruleName{attr-module}}]
 {
   \Gamma \vdash \exAttr{e}{x} : \tau

@@ -58,7 +58,7 @@ def equality_type(Sigma: ClassTable, tau: Type) -> bool:
         case Primitive() | LiteralType():
             return True
         case TypeVariable():
-            raise AssertionError
+            return False
 
 
 def membership_list(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:
