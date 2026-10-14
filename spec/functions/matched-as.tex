@@ -3,7 +3,7 @@
 \matchedAs{\Sigma}(\Gamma, \tau, \patWild) &{}= \tau \\*
 \matchedAs{\Sigma}(\Gamma, \tau, p\;\pyinline{as}\;x) &{}= \matchedAs{\Sigma}(\Gamma, \tau, p) \\*
 \added{\matchedAs{\Sigma}(\Gamma, \tau, n)} &\added{{}= \meetTy{\Sigma}{\tyFloat}{\tau}} \\*
-&\qquad \rlap{\added{$\text{if } n \text{ is a float literal}$}} \\*
+&\qquad \rlap{\added{$\text{if } n \text{ a float literal}$}} \\*
 \matchedAs{\Sigma}(\Gamma, \tau, \ell) &{}= \meetTy{\Sigma}{\tyLiteral{\ell}}{\tau} \\*
 \matchedAs{\Sigma}(\Gamma, \tyTuple{\tau_1, \ldots, \tau_n}, \patTuple{p_1, \ldots, p_n}) &{}= \tyTuple{\sigma_1, \ldots, \sigma_n} \\*
 &\qquad \rlap{$\text{where } \sigma_i = \matchedAs{\Sigma}(\Gamma, \tau_i, p_i) \quad (\forall i)$} \\*
