@@ -62,7 +62,7 @@ The outcome under PurePy is one of:
 
 - `parser/`: rejected by the parser
 - `type-checker/`: rejected by the type checker
-- `undefined/`: well-formed, and the run aborts with termination kind undefined
+- `undefined/`: well-formed, and the run aborts with termination kind `undef`
 - `result/`: well-formed, and the run yields the same result as under Python, including the same exception
 
 Two directories under `no-exception/result/` hold tests with a further expectation:

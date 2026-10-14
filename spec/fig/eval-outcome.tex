@@ -203,10 +203,10 @@
 \inferrule*[lab={\ruleName{eval-match-undefined}}]
 {
   \added{\rho, e \Rightarrow \val{v}} \\
-  \added{\dispatch(\rho, v, \seq{p}, \seq{s}) = \aborts{\errUndefined}}
+  \added{\dispatch(\rho, v, \seq{p}, \seq{s}) = \aborts{\errUndef}}
 }
 {
-  \added{\rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\errUndefined}}
+  \added{\rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\errUndef}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-seq-fail}}]
@@ -708,7 +708,7 @@
   \added{\primFn(\seq{u}) \text{ undefined}}
 }
 {
-  \added{\rho, \exCall{e}{\seq{e}} \Rightarrow \aborts{\errUndefined}}
+  \added{\rho, \exCall{e}{\seq{e}} \Rightarrow \aborts{\errUndef}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-attr-undefined}}]
@@ -717,7 +717,7 @@
   \added{v \text{ neither loaded module nor object}}
 }
 {
-  \added{\rho, \exAttr{e}{x} \Rightarrow \aborts{\errUndefined}}
+  \added{\rho, \exAttr{e}{x} \Rightarrow \aborts{\errUndef}}
 }
 \end{mathpar}
 \caption{Expression evaluation, continued (aborting cases)}

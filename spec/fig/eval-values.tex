@@ -37,11 +37,11 @@ $r$ & $::=$ & $\val{v}$ & (Val) \\
 \grammarGroup{Match results} \\
 $m$ & $::=$ & $\matchOk{\rho}$ & (Match) \\
   & $\mid$ & $\noMatch$ & (NoMatch) \\
-  & $\mid$ & $\replaced{\aborts{\errUndefined}}{\undefinedResult}$ & (Undefined)
+  & $\mid$ & $\replaced{\aborts{\errUndef}}{\undefinedResult}$ & (Undefined)
    \\[3mm]
 \grammarGroup{Termination kinds} \\
 $\kappa$ & $::=$ & $\errType \mid \errIndex \mid \errKey \mid \errZeroDiv$ &  \\
-    & $\mid$ & $\errAssertNoMsg \mid \errAssert{w} \mid \errAttr \mid \errExit{n} \added{\mid \errUndefined}$ &
+    & $\mid$ & $\errAssertNoMsg \mid \errAssert{w} \mid \errAttr \mid \errExit{n} \added{\mid \errUndef}$ &
 \end{tabular}
 \end{center}
 \caption{Values, environments, outcomes and results}
