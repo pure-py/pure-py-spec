@@ -284,10 +284,10 @@ definitions and modules introduce the variables of the scope as unbound, using t
 
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}). \added{In a function body, an assertion of the literal \pyinline{False} has outcome $\Returns$,
-like a \pyinline{return} statement (\ruleName{assert-false}, \ruleName{assert-false-msg}). A path through a function
-body may therefore end in \pyinline{assert False} in place of a \pyinline{return} statement, which mypy also
+like a \pyinline{return} (\ruleName{assert-false}, \ruleName{assert-false-msg}). A path through a function
+body may therefore end in \pyinline{assert False} in place of a \pyinline{return}, which mypy also
 accepts. A path ending in an assertion of any other expression of type \pyinline{Literal[False]} is rejected,
-because mypy recognises only the literal and reports a missing return (\figref{mypy-restrictions}).}
+following mypy (\figref{mypy-restrictions}).}
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}), which threads
