@@ -498,7 +498,7 @@ and the residual $L$ is the shape $k$ with that head excluded as well. The \rule
 the pattern against $K$ and adds $L$ to the residual. Only the forms
 with an excluded set split, and no head types at a tuple type, so the excluded set of a tuple shape is
 empty and \ruleName{split-tuple} leaves the empty residual. \added{Literal types do not include floats, so a float
-literal pattern matches a rest shape directly (\ruleName{pat-literal-float}) rather than splitting it. The matched shape
+literal pattern matches a rest shape directly (\ruleName{pat-literal-float}) rather than splitting it; the matched shape
 is the whole shape, and the residual is the shape with the literal excluded. The matched shape therefore includes values
 which are not equal to the literal. Those values are also in the residual, so the residual of an enclosing pattern is the
 same as if the matched shape contained only the literal.}
