@@ -257,7 +257,9 @@ def check_mypy_compatibility(r: Runner) -> None:
         ]
         # mypy reports paths relative to its working directory
         relative = [str(path.relative_to(ROOT)) for path in paths]
-        known_bug = {str(path.relative_to(ROOT)) for path in paths if Stage.MYPY_BUG in path.parts}
+        reported_bug = {
+            str(path.relative_to(ROOT)) for path in paths if Stage.MYPY_BUG in path.parts
+        }
         proc = run(
             [
                 "mypy",
@@ -274,10 +276,10 @@ def check_mypy_compatibility(r: Runner) -> None:
         rejected = {
             line.split(":", 1)[0] for line in proc.stdout.splitlines() if ": error:" in line
         }
-        for path in sorted(rejected - known_bug):
+        for path in sorted(rejected - reported_bug):
             r.fail(f"{path} rejected by mypy")
-        for path in sorted(known_bug - rejected):
-            r.fail(f"{path} accepted by mypy; known bug fixed")
+        for path in sorted(reported_bug - rejected):
+            r.fail(f"{path} accepted by mypy; reported bug fixed")
 
 
 def main() -> None:
