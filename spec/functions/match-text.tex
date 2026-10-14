@@ -1,6 +1,5 @@
 Result of matching pattern $p$ against value $v$ under environment $\rho$: the bindings of the pattern
-variables if $p$ matches $v$, and $\noMatch$ if it does not. The result is $\replaced{\errUndef}{\undefinedResult}$ for a list
+variables if $p$ matches $v$, and $\noMatch$ if it does not. The result is $\errUndef$ for a list
 pattern against a tuple or a tuple pattern against a list, which Python matches as sequences and which are
-excluded statically by \PurePy (\figref{coercions}), and for a literal pattern \replaced{if the equality of the literal and the value is undefined}{whose comparison with the value
-is undefined }. Sub-patterns are matched left to right, their results composing with $\override$
+excluded statically by \PurePy (\figref{coercions}), and for a literal pattern if the equality of the literal and the value is undefined. Sub-patterns are matched left to right, their results composing with $\override$
 (\secref{eval-patterns}).

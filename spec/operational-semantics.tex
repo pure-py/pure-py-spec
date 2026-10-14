@@ -28,12 +28,12 @@ to sequential composition of static outcomes:
 \input{spec/fig/eval-values}
 
 A \emph{termination
-kind} $\kappa$ records how a run ends; all but $\errExit{n}$ \added{and $\errUndef$ }are named after the exceptions raised by the same program
-under Python in the same circumstances. \added{A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, such as a
-comparison of two functions (\secref{no-coercions}).} A primitive
-$\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a \replaced{function}{partial map } from
+kind} $\kappa$ records how a run ends; all but $\errExit{n}$ and $\errUndef$ are named after the exceptions raised by the same program
+under Python in the same circumstances. A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, such as a
+comparison of two functions (\secref{no-coercions}). A primitive
+$\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a function from
 arguments to results (\figref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
-$\primFn(\seq{u})$\deleted{, and no derivation if $\primFn(\seq{u})$ is undefined}.
+$\primFn(\seq{u})$.
 
 The rules are given in a monadic metalanguage over results (\figref{values}), in which
 $\mlet{v}{r}{\ldots}$ binds the value of a result; for example, \ruleName{eval-binop} concludes
@@ -72,9 +72,9 @@ function $\iterOp$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux
 list, tuple or string, and the keys of a dictionary, as in Python. Subscripting, given by the auxiliary
 function $\getitem$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:getitem}}), indexes a list, tuple or
 string by an integer, counting from the end when negative, and a dictionary by a string key,
-aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name\replaced{, and with $\errType$ for}{;} a
-dictionary subscripted by a value other than a string\deleted{ is undefined}. \replaced{An}{Likewise an } attribute reference on a
-value other than a module or object \replaced{aborts with $\errAttr$ (\ruleName{eval-attr-nonobject});}{has no derivation:} \replaced{this version of \PurePy does not support the attributes given to other values by Python, such as the methods of a string}{the attributes of built-in values are undefined }.
+aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name, and with $\errType$ for a
+dictionary subscripted by a value other than a string. An attribute reference on a
+value other than a module or object aborts with $\errAttr$ (\ruleName{eval-attr-nonobject}); this version of \PurePy does not support the attributes given to other values by Python, such as the methods of a string.
 
 \input{spec/fig/well-formed-values}
 
@@ -90,16 +90,16 @@ $\dispatch$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:dispat
 Whether a pattern matches is determined by the auxiliary function $\matchOp{\Sigma}(\rho, p, v)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:match}}). A \emph{match result} $m$ is
 $\matchOk{\rho'}$, a match, where $\rho'$ binds the variables of the pattern to the values that they matched,
-$\noMatch$, a failure to match, or $\replaced{\errUndef}{\undefinedResult}$, for a pattern and a value that are not comparable, such
-as a list pattern against a tuple, and for a literal pattern \replaced{if the equality of the literal and the value is undefined}{whose comparison with the value is undefined}. When
-a match result is undefined, \replaced{the value of $\dispatch$ is also undefined, and the run has undefined behaviour (\ruleName{eval-match-undef})}{$\dispatch$ has no value and the run has no result}.
+$\noMatch$, a failure to match, or $\errUndef$, for a pattern and a value that are not comparable, such
+as a list pattern against a tuple, and for a literal pattern if the equality of the literal and the value is undefined. When
+a match result is undefined, the value of $\dispatch$ is also undefined, and the run has undefined behaviour (\ruleName{eval-match-undef}).
 \begin{specdefinition}{Composition of match results}
 The match results of sub-patterns compose with
 $\override$, matching sequentially, so that the first failure or undefined result decides:
 \begin{defalign}
 \matchOk{\rho} \override \matchOk{\rho'} & {}= \matchOk{(\rho \disjunion \rho')} \\
 \matchOk{\rho} \override \noMatch = \noMatch \override m & {}= \noMatch \\
-\replaced{\matchOk{\rho} \override \errUndef = \errUndef \override m}{\matchOk{\rho} \override \undefinedResult = \undefinedResult \override m} & {}= \replaced{\errUndef}{\undefinedResult}
+\matchOk{\rho} \override \errUndef = \errUndef \override m & {}= \errUndef
 \end{defalign}
 
 \noindent with $\matchOk{\varnothing}$ as left and right unit.
@@ -136,7 +136,7 @@ unbound, mirroring \ruleName{module} (\secref{well-formedness-modules})\paperonl
 A program evaluates to a termination kind (\figref{values}): $\errExit{0}$ if the main module
 loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exited with status $n$\paperonly{:}\speconly{.}
 \paperinput{paper/operational-semantics/program}%
-An implementation must agree with the semantics on the termination kind of every run\added{ with defined behaviour}; the form in
+An implementation must agree with the semantics on the termination kind of every run with defined behaviour; the form in
 which the kind is reported is not prescribed.
 
 \specinput{spec/fig/eval-modules}
