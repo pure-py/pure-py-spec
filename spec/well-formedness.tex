@@ -237,7 +237,7 @@ $\resolveOp{\Sigma}(\ominus, \sigma)$.
 
 \begin{specdefinition}{Static outcome}
 A well-typed statement has a \emph{static outcome} $R$: either $\Returns$, when the statement \emph{definitely
-returns}\added{ or fails an assertion of \pyinline{False} in a function body}, or $\Assigns{\Delta}$ for a context $\Delta$ with an entry for any variable declared or assigned by the
+returns}\added{ or, in a function body, definitely reaches \pyinline{assert False}}, or $\Assigns{\Delta}$ for a context $\Delta$ with an entry for any variable declared or assigned by the
 statement (Definition~\ref{def:context}), recording whether the variable is definitely assigned, definitely
 unassigned or possibly unassigned after the statement.
 \end{specdefinition}
