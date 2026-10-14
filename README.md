@@ -9,7 +9,7 @@ languages and programming pedagogy, and in the longer term as a common language 
 supporting efficient, portable applications in modelling, data processing, data analysis and visualisation.
 
 The specification defines a versioned formal grammar and a formal semantics for the language, and `src/`
-holds a reference checker. A PurePy-compliant language accepts every valid PurePy program and is expected
+holds a reference type checker. A PurePy-compliant language accepts every valid PurePy program and is expected
 to conform to the formal semantics.
 
 ## Project structure
@@ -22,7 +22,7 @@ to conform to the formal semantics.
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
 - `agda/`: Agda mechanisation of the distributivity proof
 - `isabelle-purepy/`: Isabelle/HOL mechanisation, a submodule of the `isabelle-purepy` repository
-- `src/`: reference checker, built on Python's `ast` and organised to mirror the sections of the specification
+- `src/`: reference type checker, built on Python's `ast` and organised to mirror the sections of the specification
 - `test/`: litmus tests
 
 `\paperinput{file}` at a point in a specification source includes the file in the paper only, and
@@ -67,7 +67,7 @@ The outcome under PurePy is one of:
 
 Two directories under `no-exception/result/` hold tests with a further expectation:
 
-- `pending/`: not yet accepted by the checker
+- `pending/`: not yet accepted by the type checker
 - `mypy-bug/`: rejected by mypy because of a behaviour reported as a mypy bug; the runner fails a test once mypy accepts it
 
 Every other test in `no-exception/result/` also type-checks under mypy (`test/mypy.ini`). The tests in
@@ -78,7 +78,7 @@ A test has `.expected` under `no-exception/` and `.exception.expected` elsewhere
 under `syntax-error/`, so a misfiled test fails. A test that exits with a nonzero status through `sys.exit`
 states the status in `.status.expected`.
 
-Another checker can be run over the suite with `--checker`; `run-all.py --help` lists the options.
+Another type checker can be run over the suite with `--checker`; `run-all.py --help` lists the options.
 
 ## Development
 
@@ -97,7 +97,7 @@ uv run --locked ruff format ./src ./test/run-all.py
 After changing dependencies or metadata in `pyproject.toml`, run `uv lock` and commit `pyproject.toml` and
 `uv.lock`.
 
-## Reference checker (`src/`)
+## Reference type checker (`src/`)
 
 Check a single module, or a whole program from the entry module:
 
