@@ -33,7 +33,7 @@ under Python in the same circumstances. \added{A run aborts with $\errUndef$ whe
 comparison of two functions (\secref{no-coercions}).} A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a partial map from
 arguments to results (\figref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
-$\primFn(\seq{u})$, and \replaced{$\aborts{\errUndef}$}{no derivation} if $\primFn(\seq{u})$ is undefined\added{ (\ruleName{eval-call-prim-undef})}.
+$\primFn(\seq{u})$\deleted{, and no derivation if $\primFn(\seq{u})$ is undefined}.
 
 The rules are given in a monadic metalanguage over results (\figref{values}), in which
 $\mlet{v}{r}{\ldots}$ binds the value of a result; for example, \ruleName{eval-binop} concludes
