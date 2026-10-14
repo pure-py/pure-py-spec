@@ -2,7 +2,7 @@ Concretely, \ruleName{eval-binop} evaluates both operands and binds the result o
 \begin{mathpar}
 \input{spec/rules/eval-binop}
 \end{mathpar}
-The meaning $\hat{\odot}(v, v')$ of the operator is likewise a partial map from operands to results, with
+The meaning $\hat{\odot}(v, v')$ of the operator is likewise a \replaced{function}{partial map } from operands to results, with
 an abort if Python raises an exception\replaced{, and $\aborts{\errUndef}$ at a dynamically excluded comparison.}{; an expression whose operator meaning is undefined has no
 derivation. } An abort from the first operand is propagated by a separate rule:
 \begin{mathpar}
