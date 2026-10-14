@@ -2,32 +2,36 @@
 \centering
 \newcommand*{\testdir}[1]{{\scriptsize\texttt{#1}}}
 \begin{tikzpicture}[font=\footnotesize, x=1cm, y=1cm, every node/.style={anchor=north west, align=left}]
-  % Columns: PurePy outcome 0--3, Python raises exception 3--6.8, Python evaluates without error 6.8--12.
-  % Rows: other result 0--1.8, undefined 1.8--3.2, type checker 3.2--4.6, parser 4.6--5.8, header 5.8--6.5.
-  \fill[black!6] (3,3.2) rectangle (6.8,5.8) (3,0) rectangle (6.8,1.8);
-  \fill[cyan!60, fill opacity=0.13] (6.8,1.8) rectangle (12,5.8);
-  \fill[green!14] (6.8,0) rectangle (12,1.8);
-  \draw[black!33] (0,0) rectangle (12,6.5) (3,0) -- (3,6.5) (6.8,0) -- (6.8,6.5)
-    (0,1.8) -- (12,1.8) (0,3.2) -- (12,3.2) (0,4.6) -- (12,4.6) (0,5.8) -- (12,5.8) (6.8,0.45) -- (12,0.45);
-  \node[font=\footnotesize\bfseries] at (0.1,6.45) {\PurePy};
-  \node[font=\footnotesize\bfseries] at (3.1,6.45) {Python raises exception};
-  \node[font=\footnotesize\bfseries] at (6.9,6.45) {Python evaluates without error};
-  \node at (0.1,5.75) {Rejected by\\parser};
-  \node at (0.1,4.55) {Rejected by\\type checker};
-  \node at (0.1,3.15) {Well-formed,\\yields $\undefinedResult$};
-  \node at (0.1,1.75) {Well-formed,\\yields other result};
-  \node at (3.1,5.75) {\testdir{python-error/syntactic/}};
-  \node at (6.9,5.75) {Syntactically excluded\\\testdir{excluded/syntactic/}};
-  \node at (3.1,4.55) {Python runtime error\\(\figref{prevented-errors})\\\testdir{python-error/static/}};
-  \node at (6.9,4.55) {Statically excluded\\(\figref{coercions})\\\testdir{excluded/static/}};
-  \node at (6.9,3.15) {Dynamically excluded\\(\figref{coercions})\\\testdir{excluded/dynamic/}};
-  \node at (3.1,1.75) {Same exception as Python\\\testdir{python-error/dynamic/}};
-  \node at (6.9,1.75) {Same result as Python\\\testdir{semantically-valid/}};
-  \node at (6.9,0.43) {\testdir{mypy-bug/}};
+  % Columns: Python outcome 0--2.9; PurePy: parser 2.9--5.5, type checker 5.5--8.1, undefined 8.1--10.7,
+  % other result 10.7--13.6. Rows: does not raise exception 0--1.8, exception 1.8--3.2, SyntaxError 3.2--4.1,
+  % column headers 4.1--5.5, PurePy 5.5--6.
+  \fill[black!6] (2.9,3.2) rectangle (8.1,4.1) (5.5,1.8) rectangle (8.1,3.2) (10.7,1.8) rectangle (13.6,3.2);
+  \fill[pattern=north east lines, pattern color=black!30] (8.1,3.2) rectangle (13.6,4.1);
+  \fill[cyan!60, fill opacity=0.13] (2.9,0) rectangle (10.7,1.8);
+  \fill[green!14] (10.7,0) rectangle (13.6,1.8);
+  \draw[black!33] (0,0) rectangle (13.6,6) (2.9,0) -- (2.9,6) (2.9,5.5) -- (13.6,5.5)
+    (5.5,0) -- (5.5,5.5) (8.1,0) -- (8.1,5.5) (10.7,0) -- (10.7,5.5)
+    (0,1.8) -- (13.6,1.8) (0,3.2) -- (13.6,3.2) (0,4.1) -- (13.6,4.1) (10.7,0.4) -- (13.6,0.4);
+  \node[font=\footnotesize\bfseries] at (3.0,5.95) {\PurePy};
+  \node[font=\footnotesize\bfseries] at (0.1,5.45) {Python};
+  \node at (3.0,5.45) {Rejected by\\parser\\\testdir{parser/}};
+  \node at (5.6,5.45) {Rejected by\\type checker\\\testdir{type-checker/}};
+  \node at (8.2,5.45) {Well-formed,\\yields $\undefinedResult$\\\testdir{undefined/}};
+  \node at (10.8,5.45) {Well-formed,\\yields other result\\\testdir{result/}};
+  \node at (0.1,4.05) {Raises SyntaxError\\\testdir{syntax-error/}};
+  \node at (0.1,3.15) {Raises other\\exception\\\testdir{exception/}};
+  \node at (0.1,1.75) {Does not raise\\exception\\\testdir{no-exception/}};
+  \node at (5.6,3.15) {Python runtime\\error\\(\figref{prevented-errors})};
+  \node at (10.8,3.15) {Same exception\\as Python};
+  \node at (3.0,1.75) {Syntactically\\excluded};
+  \node at (5.6,1.75) {Statically\\excluded\\(\figref{coercions})};
+  \node at (8.2,1.75) {Dynamically\\excluded\\(\figref{coercions})};
+  \node at (10.8,1.75) {Same result\\as Python};
+  \node at (10.8,0.38) {\testdir{mypy-bug/}};
   \draw[densely dotted, orange!85!black, line width=0.9pt]
-    (3.08,0.08) -- (6.8,0.08) -- (6.8,0.52) -- (11.92,0.52) -- (11.92,3.12) -- (3.08,3.12) -- cycle;
-  \node[anchor=north east, text=orange!85!black, font=\footnotesize\bfseries] at (12,-0.05) {Well typed under mypy};
+    (8.16,0.06) -- (10.7,0.06) -- (10.7,0.46) -- (13.54,0.46) -- (13.54,3.14) -- (8.16,3.14) -- cycle;
+  \node[anchor=north east, text=orange!85!black, font=\footnotesize\bfseries] at (13.6,-0.05) {Well typed under mypy};
 \end{tikzpicture}
-\caption{Programs and runs, classified by \PurePy and by Python, with test directories}
+\caption{Programs and runs, classified by Python and by \PurePy, with test directories}
 \label{fig:taxonomy}
 \end{figure}
