@@ -1,6 +1,6 @@
 
 For example, a list pattern matches a list of the same length elementwise, composing the match results of the
-sub-patterns, and is undefined against a tuple, which Python would match as a sequence (\secref{no-coercions}):
+sub-patterns, and \replaced{yields $\aborts{\errUndef}$}{is undefined } against a tuple, which Python would match as a sequence (\secref{no-coercions}):
 \begin{defalign}
 \input{spec/functions/match-list}
 \end{defalign}

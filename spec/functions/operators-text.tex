@@ -1,8 +1,8 @@
 The comparisons \pyinline{==}, \pyinline{!=}, \pyinline{in} and \pyinline{not in} are given in terms of
 structural equality $\eqOp{\Sigma}$ and membership $\contains{\Sigma}$. When defined, the
 operators agree with Python, yielding $\aborts{\kappa}$ when Python raises an
-exception. When \replaced{equality is undefined}{undefined}\paperonly{ (\secref{no-coercions})}, \replaced{the comparison yields $\aborts{\errUndef}$}{evaluation of the expression has no derivation}, and an
+exception. \replaced{At a dynamically excluded comparison}{When undefined }\paperonly{ (\secref{no-coercions})}, \replaced{equality yields $\aborts{\errUndef}$}{evaluation of the expression has no derivation }, and an
 implementation may abort or produce the result that Python gives (\paperonly{\secref{python-compatibility}}\speconly{\secref{conformance}}). Because
 equality is partial, the order in which elements are compared is observable: equality and membership short-circuit
-at the first element that decides the result, so an undefined comparison later in a sequence does not make
-the whole comparison undefined.
+at the first element that decides the result, so \replaced{a dynamically excluded comparison}{an undefined comparison } later in a sequence does not make
+the whole comparison \replaced{abort with $\errUndef$}{undefined }.

@@ -29,8 +29,8 @@ to sequential composition of static outcomes:
 
 A \emph{termination
 kind} $\kappa$ records how a run ends; all but $\errExit{n}$ \added{and $\errUndef$ }are named after the exceptions raised by the same program
-under Python in the same circumstances. \added{A run aborts with $\errUndef$ when it reaches an operation which the
-semantics leaves undefined, such as a dynamically excluded comparison (\secref{no-coercions}).} A primitive
+under Python in the same circumstances. \added{A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, such as a
+comparison of two functions (\secref{no-coercions}).} A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a partial map from
 arguments to results (\figref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
 $\primFn(\seq{u})$, and \replaced{$\aborts{\errUndef}$}{no derivation} if $\primFn(\seq{u})$ is undefined\added{ (\ruleName{eval-call-prim-undefined})}.
@@ -74,7 +74,7 @@ function $\getitem$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{au
 string by an integer, counting from the end when negative, and a dictionary by a string key,
 aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name; a
 dictionary subscripted by a value other than a string \replaced{aborts with $\errUndef$}{is undefined}. Likewise an attribute reference on a
-value other than a module or object \replaced{aborts with $\errUndef$, because}{has no derivation:} the attributes of built-in values are undefined\added{ (\ruleName{eval-attr-undefined})}.
+value other than a module or object \replaced{aborts with $\errUndef$, because}{has no derivation:} \replaced{\PurePy does not define the attributes of built-in values}{the attributes of built-in values are undefined }\added{ (\ruleName{eval-attr-undefined})}.
 
 \input{spec/fig/well-formed-values}
 
@@ -91,11 +91,11 @@ Whether a pattern matches is determined by the auxiliary function $\matchOp{\Sig
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:match}}). A \emph{match result} $m$ is
 $\matchOk{\rho'}$, a match, where $\rho'$ binds the variables of the pattern to the values that they matched,
 $\noMatch$, a failure to match, or $\replaced{\aborts{\errUndef}}{\undefinedResult}$, for a pattern and a value that are not comparable, such
-as a list pattern against a tuple, and for a literal pattern whose comparison with the value is undefined. When
-a match result is undefined, \replaced{so is the value of $\dispatch$, and the run aborts with $\errUndef$ (\ruleName{eval-match-undefined})}{$\dispatch$ has no value and the run has no result}.
+as a list pattern against a tuple, and for a literal pattern \replaced{if the equality of the literal and the value yields $\aborts{\errUndef}$}{whose comparison with the value is undefined}. When
+a match result is \replaced{$\aborts{\errUndef}$}{undefined}, \replaced{so is the value of $\dispatch$, and the run aborts with $\errUndef$ (\ruleName{eval-match-undefined})}{$\dispatch$ has no value and the run has no result}.
 \begin{specdefinition}{Composition of match results}
 The match results of sub-patterns compose with
-$\override$, matching sequentially, so that the first failure or undefined result decides:
+$\override$, matching sequentially, so that the first failure or \replaced{abort}{undefined result } decides:
 \begin{defalign}
 \matchOk{\rho} \override \matchOk{\rho'} & {}= \matchOk{(\rho \disjunion \rho')} \\
 \matchOk{\rho} \override \noMatch = \noMatch \override m & {}= \noMatch \\
