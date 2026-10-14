@@ -81,9 +81,9 @@ is the least upper bound of $\sigma$ and $\tau$, $\meetTy{\Sigma}{\sigma}{\tau}$
 \label{sec:expression-typing}
 
 Within an expression the typing judgement gives each subexpression a type, and
-is bidirectional. \emph{Synthesis} $\Sigma; \Gamma \vdash e \synth \tau$ reads a type out of an expression (\figrefThree{typing-synth}{typing-synth-elim}{typing-synth-ctd}),
+is bidirectional. \emph{Synthesis} $\Sigma; \Gamma \vdash e \synth \tau$ reads a type out of an expression\speconly{ (\figrefThree{typing-synth}{typing-synth-elim}{typing-synth-ctd})},
 and \emph{checking} $\Sigma; \Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
-surroundings (\figref{typing-check}). The division follows the usual recipe for bidirectional
+surroundings\speconly{ (\figref{typing-check})}. The division follows the usual recipe for bidirectional
 systems~\cite{davies2000,dunfield2021}: introduction forms check, since a lambda's parameters cannot be
 annotated and an empty list does not determine its element type, and elimination forms synthesise, since a call, a subscript or an attribute
 reference starts from a subterm whose type is known. Type systems that follow the recipe strictly usually
@@ -98,7 +98,7 @@ The \ruleName{var} rule applies whenever $\Gamma(x)$ is a type, so a variable th
 assigned, or a name bound at a type scheme, does not synthesise a type. A
 literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$.
 
-\input{spec/fig/typing-synth}
+\specinput{spec/fig/typing-synth}
 
 The fields of a class $C$ form a field scheme $\fields{\Sigma}(C)$ over its type parameters, with one binding $\bind{x}{\tau}$ per
 field: the fields of its base class first, recursively and instantiated at the type arguments of the base, then the fields declared by $C$ itself, each at its
@@ -128,8 +128,10 @@ such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts'
 \citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form.
 
+\paperinput{paper/well-formedness/synth-rules}%
+
 The \ruleName{call} rule for a call $\exCall{e}{\seq{e}}$ uses the auxiliary
-judgement $\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$ (\figref{typing-callee}), which determines parameter
+judgement $\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$\speconly{ (\figref{typing-callee})}, which determines parameter
 types $\seq{\sigma}$ and result type $\sigma$ from the callee along with its arguments. The remaining premises check
 the arguments against $\seq{\sigma}$, and the call synthesises $\sigma$. The auxiliary judgement has two rules. A callee that synthesises a
 \pyinline{Callable} type gives the parameter and result types of that type (\ruleName{callee}). A name bound at a
@@ -141,6 +143,8 @@ unknowns: a type parameter takes the type found at the same
 position in the synthesised type, with one found at several positions taking the join of those types.
 Arguments that do not synthesise, such as lambdas, are left out. The parameter and result types are
 instantiated at the type arguments given by the context, which must bind every type parameter.
+
+\paperinput{paper/well-formedness/callee-scheme}%
 
 Lambdas, applied lambdas, lists, tuples, dictionaries, conditional expressions and comprehensions check
 (\ruleName{lambda}, \ruleName{call-lambda}, \ruleName{list}, \ruleName{tuple}, \ruleName{dict}, \ruleName{cond},
@@ -155,7 +159,7 @@ syntax-directed and an expression has at most one derivation in each.\speconly{ 
 do not apply to names bound at \pyinline{Callable} types, although they would conclude the same as \ruleName{callee} and
 \ruleName{check-syn}.}
 
-\input{spec/fig/typing-check}
+\specinput{spec/fig/typing-check}
 
 The forms that synthesise are conditional expressions when a branch
 synthesises, at the join of the two types when both branches synthesise and otherwise at the
@@ -174,8 +178,8 @@ lambda must be distinct, as for a function. A non-empty list has both, and the
 checking rule is still needed when the expected element type is wider than the type synthesised by the
 elements, since \pyinline{list} is invariant.
 
-Typing a comprehension types its qualifiers, which bind the variables that can be used in the body
-(\figref{typing-check}). A generator's variable is bound at $\elemTy{\Sigma}$ of the type synthesised by the
+Typing a comprehension types its qualifiers, which bind the variables that can be used in the body\speconly{
+(\figref{typing-check})}. A generator's variable is bound at $\elemTy{\Sigma}$ of the type synthesised by the
 iterated expression (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:elem-type}}). A
 tuple is iterated at the join of the base types of its components.
 A lambda within a comprehension may not capture a generator variable, a side condition of
@@ -198,7 +202,7 @@ with a result type; the judgements of the figure relate operand
 types to the resolved overloads of an operator.
 \end{specdefinition}
 
-The \ruleName{binop} and \ruleName{unop} rules (\figref{typing-synth}) take the result type
+The \ruleName{binop} and \ruleName{unop} rules\speconly{ (\figref{typing-synth})} take the result type
 of the most specific overload at the operand types, $\resolveOp{\Sigma}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:resolve-op}}), so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
@@ -243,7 +247,7 @@ unassigned or possibly unassigned after the statement.
 
 \input{spec/fig/typing-stmt}
 \input{spec/fig/typing-def}
-\input{spec/fig/pattern-matching/typing-cases}
+\specinput{spec/fig/pattern-matching/typing-cases}
 \input{spec/fig/typing-top-level}
 
 Context operations $\override$ and $\merge$ lift to a right semiring over static outcomes $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge$ and zero for $\override$.
@@ -286,7 +290,7 @@ The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}).
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
-auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}), which threads
+auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$\speconly{ (\figref{typing-cases})}, which threads
 a remaining type, starting from $\sigma$, and a residual $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
 through the cases, merging their outcomes into $S$. The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
 exhaustive; the \ruleName{match-partial} rule applies otherwise and also merges in $\Assigns{\varnothing}$, the
@@ -362,7 +366,7 @@ arguments (\ruleName{ty-alias}), here \pyinline{tuple[int, int]}, so types never
 \label{sec:well-formedness-patterns}
 
 To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement
-$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}) threads a \emph{remaining type}
+$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$\speconly{ (\figref{typing-cases})} threads a \emph{remaining type}
 $\tau$ and a \emph{residual} $L$ through the cases, both over-approximations of the values of $\sigma$ which are not
 matched by any of the earlier cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a
 set of values of a single type, and starts from the shapes of $\sigma$; the remaining type is coarser, a type rather

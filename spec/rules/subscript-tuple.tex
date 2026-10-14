@@ -1,0 +1,9 @@
+\inferrule*[lab={\ruleName{subscript-tuple}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_m} \\
+  \Sigma; \Gamma \vdash e' \synth \tyLiteral{n} \\
+  0 \leq n < m
+}
+{
+  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{n+1}
+}

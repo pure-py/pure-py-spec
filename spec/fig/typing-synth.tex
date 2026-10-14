@@ -166,15 +166,7 @@
   \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau
 }
 \and
-\inferrule*[lab={\ruleName{subscript-tuple}}]
-{
-  \Sigma; \Gamma \vdash e \synth \tyTuple{\tau_1, \ldots, \tau_m} \\
-  \Sigma; \Gamma \vdash e' \synth \tyLiteral{n} \\
-  0 \leq n < m
-}
-{
-  \Sigma; \Gamma \vdash \exSubscript{e}{e'} \synth \tau_{n+1}
-}
+\input{spec/rules/subscript-tuple}
 \and
 \inferrule*[lab={\ruleName{subscript-tuple-neg}}]
 {
@@ -217,16 +209,7 @@
   \Sigma; \Gamma \vdash \exAttr{e}{x} \synth \joinTy{\Sigma}{\tau}{\tau'}
 }
 \and
-\inferrule*[lab={\ruleName{call-union}}]
-{
-  \Sigma; \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
-  \Sigma; \Gamma \override \set{\bind{y}{\sigma}} \vdash \exCall{y}{\seq{e}} \synth \tau \\
-  \Sigma; \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exCall{y}{\seq{e}} \synth \tau' \\
-  y \notin \fv(\seq{e})
-}
-{
-  \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \joinTy{\Sigma}{\tau}{\tau'}
-}
+\input{spec/rules/call-union}
 \end{mathpar}
 \caption{Expression synthesis: subscripts, and elimination at a union}
 \label{fig:typing-synth-elim}
