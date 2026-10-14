@@ -237,7 +237,7 @@ $\resolveOp{\Sigma}(\ominus, \sigma)$.
 
 \begin{specdefinition}{Static outcome}
 A well-typed statement has a \emph{static outcome} $R$: either $\Returns$, when the statement \emph{definitely
-returns}\added{ or, in a function body, definitely reaches \pyinline{assert False}}, or $\Assigns{\Delta}$ for a context $\Delta$ with an entry for any variable declared or assigned by the
+returns}\added{ or definitely reaches \pyinline{assert False}}, or $\Assigns{\Delta}$ for a context $\Delta$ with an entry for any variable declared or assigned by the
 statement (Definition~\ref{def:context}), recording whether the variable is definitely assigned, definitely
 unassigned or possibly unassigned after the statement.
 \end{specdefinition}
@@ -284,10 +284,13 @@ definitions and modules introduce the variables of the scope as unbound, using t
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:scope}}).
 
 The conditions of \pyinline{if} and \pyinline{assert}
-check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}). \added{In a function body, an assertion of the literal \pyinline{False} has outcome $\Returns$,
-like a \pyinline{return} (\ruleName{assert-false}, \ruleName{assert-false-msg}). A function body therefore has
-outcome $\Returns$ if each of its branches ends in a \pyinline{return} or in \pyinline{assert False}, which mypy
-also accepts. An assertion of any other expression has outcome $\Assigns{\varnothing}$, even at type
+check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}). \added{An assertion of the literal \pyinline{False} has outcome $\Returns$, like a \pyinline{return}
+(\ruleName{assert-false}, \ruleName{assert-false-msg}). A function body therefore has outcome $\Returns$ if each of its
+branches ends in a \pyinline{return} or in \pyinline{assert False}, and in both module and function bodies, a
+variable assigned in one branch of an \pyinline{if} is definitely assigned after the \pyinline{if} when the other
+branch reaches \pyinline{assert False}. The type checker mypy accepts both. A module whose body definitely reaches
+\pyinline{assert False} is ill-formed, because the \ruleName{top-seq} and \ruleName{module} rules require outcome
+$\Assigns{\Delta}$. An assertion of any other expression has outcome $\Assigns{\varnothing}$, even at type
 \pyinline{Literal[False]}. The type checker mypy treats the code after an assertion as unreachable only if the
 asserted expression is built from \pyinline{False} and \pyinline{0} with \pyinline{not}, \pyinline{and} and
 \pyinline{or}, or has the declared type \pyinline{Literal[False]}, and so reports a missing return after

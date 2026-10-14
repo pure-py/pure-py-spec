@@ -259,6 +259,12 @@ class TopLevelReturn:
 
 
 @dataclass(frozen=True)
+class TopLevelAssertFalse:
+    def message(self) -> str:
+        return "module body definitely reaches 'assert False'"
+
+
+@dataclass(frozen=True)
 class UnknownModule:
     q: Name
 
@@ -592,6 +598,7 @@ type Reason = (
     | DuplicateDictKey
     | NonlinearPattern
     | TopLevelReturn
+    | TopLevelAssertFalse
     | DuplicateMember
     | SubmoduleNotImported
     | ImportOfContainedModule

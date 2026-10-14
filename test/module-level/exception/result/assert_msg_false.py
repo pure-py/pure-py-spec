@@ -1,2 +1,6 @@
 # rule: eval-assert-msg-false
-assert False, "boom"
+def f() -> int:
+    assert False, "boom"
+
+
+f()

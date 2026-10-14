@@ -1,1 +1,1 @@
-assert False, "pkg"
+assert 1 == 0, "pkg"

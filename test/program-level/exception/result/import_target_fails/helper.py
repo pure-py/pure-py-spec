@@ -1,1 +1,1 @@
-assert False
+assert 1 == 0

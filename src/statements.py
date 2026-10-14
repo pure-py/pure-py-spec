@@ -124,7 +124,9 @@ def check_top_seq(ts: list[Statement], mod_ctx: ModuleContext) -> ModuleContext:
         return mod_ctx
     t, t_ = ts[0], ts[1:]
     r, Sigma = check_top_statement(t, mod_ctx)
-    assert isinstance(r, Assigns)
+    if not isinstance(r, Assigns):  # top-seq and module require Assigns
+        assert isinstance(t, ast.stmt)  # type definitions have outcome Assigns
+        raise IllFormedModule(t, reasons.TopLevelAssertFalse())
     delta = r.delta
     mod_ctx_after = override_gamma(replace(mod_ctx, Sigma=Sigma), delta)
     if len(t_) == 0:
@@ -310,7 +312,7 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
             branches.append(check_body(ss_, mod_ctx, returns) if ss_ else Assigns({}))
             return merge_outcomes(branches, {x for x, _ in declares(s)})
         case ast.Assert(test=e, msg=e_):
-            assert_false = returns is not None and isinstance(e, ast.Constant) and e.value is False
+            assert_false = isinstance(e, ast.Constant) and e.value is False
             if not assert_false:
                 check_expr(e, Primitive.BOOL, mod_ctx)
             if e_ is not None:

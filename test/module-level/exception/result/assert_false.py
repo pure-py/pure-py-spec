@@ -1,2 +1,6 @@
 # rule: eval-assert-false
-assert False
+def f() -> int:
+    assert False
+
+
+f()
