@@ -31,7 +31,7 @@ A \emph{termination
 kind} $\kappa$ records how a run ends; all but $\errExit{n}$ \added{and $\errUndef$ }are named after the exceptions raised by the same program
 under Python in the same circumstances. \added{A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, such as a
 comparison of two functions (\secref{no-coercions}).} A primitive
-$\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a partial map from
+$\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a \replaced{function}{partial map } from
 arguments to results (\figref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
 $\primFn(\seq{u})$\deleted{, and no derivation if $\primFn(\seq{u})$ is undefined}.
 
