@@ -236,10 +236,14 @@ $\resolveOp{\Sigma}(\ominus, \sigma)$.
 \label{sec:well-formedness-statements}
 
 \begin{specdefinition}{Static outcome}
-A well-typed statement has a \emph{static outcome} $R$: either $\Returns$, when the statement \emph{definitely
-returns}\added{ or definitely reaches \pyinline{assert False}}, or $\Assigns{\Delta}$ for a context $\Delta$ with an entry for any variable declared or assigned by the
+\replaced{A well-typed statement has a \emph{static outcome} $R$, which is either $\Returns$ or $\Assigns{\Delta}$. The
+outcome is $\Returns$ when the statement \emph{definitely returns} or definitely reaches \pyinline{assert False}.
+Otherwise it is $\Assigns{\Delta}$, where $\Delta$ is a context with an entry for each variable declared or assigned
+by the statement (Definition~\ref{def:context}), recording whether the variable is definitely assigned, definitely
+unassigned or possibly unassigned after the statement.}{A well-typed statement has a \emph{static outcome} $R$: either $\Returns$, when the statement \emph{definitely
+returns}, or $\Assigns{\Delta}$ for a context $\Delta$ with an entry for any variable declared or assigned by the
 statement (Definition~\ref{def:context}), recording whether the variable is definitely assigned, definitely
-unassigned or possibly unassigned after the statement.
+unassigned or possibly unassigned after the statement. }
 \end{specdefinition}
 
 \input{spec/fig/typing-stmt}
