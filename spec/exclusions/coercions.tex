@@ -1,5 +1,6 @@
 Python accepts several implicit coercions and lax matches. \figref{coercions} lists those excluded by
-\PurePy, and records at which stage each exclusion takes effect. A dynamically excluded operation leaves
-the run without a result, so the program runs under Python but not under \PurePy.
+\PurePy, and records at which stage each exclusion takes effect. A dynamically excluded operation \replaced{yields $\aborts{\errUndef}$, so the program runs under Python but aborts under
+\PurePy}{leaves
+the run without a result, so the program runs under Python but not under \PurePy }.
 
 \input{spec/fig/coercions}
