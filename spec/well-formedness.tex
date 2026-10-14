@@ -246,10 +246,10 @@ statement (Definition~\ref{def:context}), recording whether the variable is defi
 unassigned or possibly unassigned after the statement.
 \end{specdefinition}
 
-\input{spec/fig/typing-stmt}
-\input{spec/fig/typing-def}
+\specinput{spec/fig/typing-stmt}
+\specinput{spec/fig/typing-def}
 \specinput{spec/fig/pattern-matching/typing-cases}
-\input{spec/fig/typing-top-level}
+\specinput{spec/fig/typing-top-level}
 
 Context operations $\override$ and $\merge$ lift to a right semiring over static outcomes $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge$ and zero for $\override$.
 
@@ -265,10 +265,8 @@ R \override \Returns = \Returns \override R & = \Returns
 
 \noindent The $\Returns \override R$ case never arises because statement typing excludes unreachable statements\paperonly{ (\secref{unreachable})}.
 
-\paperinput{paper/well-formedness/match-cases}%
-
 The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\Gamma$ and
-optional return type $\zeta$, statement $s$ has static outcome $R$ (\figref{typing-stmt}); every rule passes $\zeta$ down unchanged.
+optional return type $\zeta$, statement $s$ has static outcome $R$\speconly{ (\figref{typing-stmt})}; every rule passes $\zeta$ down unchanged.
 A sequence $s\;s'$ (\ruleName{seq}) types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
 by $s$. A conditional combines its
 branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch (\ruleName{if}, \ruleName{if-else}).
@@ -298,9 +296,11 @@ exhaustive; the \ruleName{match-partial} rule applies otherwise and also merges 
 outcome of the path on which the scrutinee is not matched by any of the cases. The remaining type, the residual, reachability and exhaustiveness are the subject of
 \secref{well-formedness-patterns}.
 
+\paperinput{paper/well-formedness/match}%
+
 \speconly{\subsubsection{Function definitions}\label{sec:well-formedness-defs}}%
-The \ruleName{defs} rule for a mutual def region of function definitions synthesises a type scheme for each definition
-(\figref{typing-def}), binds all the function names of the mutual def region at the synthesised type schemes, and checks each
+The \ruleName{defs} rule for a mutual def region of function definitions synthesises a type scheme for each definition\speconly{
+(\figref{typing-def})}, binds all the function names of the mutual def region at the synthesised type schemes, and checks each
 definition against its scheme. For a definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$,
 the auxiliary judgements $\Sigma; \Gamma \vdash d \synth \pi$ and $\Sigma; \Gamma \vdash d \checks \pi$ synthesise the type
 scheme from the annotations (\ruleName{def-signature}) and check the body $s$ (\ruleName{def-body}). Both rules extend the
@@ -309,6 +309,8 @@ function without type parameters as a variable of that type. The type schemes of
 at a call, by the argument types (\ruleName{callee-scheme}), and when checked against a \pyinline{Callable} type, by that
 type (\ruleName{var-scheme}). Since annotations denote types, not type schemes, declarations and
 assignments never bind variables at type schemes, only at types.
+
+\paperinput{paper/well-formedness/defs}%
 
 In the body, the parameters $\seq{x}$ are bound at the types denoted by $\seq{\psi}$; variables declared or
 assigned in $s$ start unbound, emulating Python's scoping of function bodies, which
@@ -325,7 +327,7 @@ does not exempt the body from returning, nor permit a bare \pyinline{return}, fo
 
 \speconly{\subsubsection{Top-level statements}\label{sec:well-formedness-top-level}}%
 Top-level statements are checked by a separate
-judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, a mutual type region of class
+judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$\speconly{ (\figref{typing-top-level})}: a sequence composes in the same way as a statement sequence, a mutual type region of class
 definitions and \pyinline{type} statements is a top-level form, checked by the \ruleName{types} rule, and a plain statement is checked with no return type
 (\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level.
 
@@ -339,7 +341,7 @@ of annotations.} Recursive datatypes are therefore declared with their aliases b
 \pyinline{Expr}. A cyclic alias such as \pyinline{type T = list[T]} has no derivation, because resolving its body
 resolves the alias again.
 
-The \ruleName{types} rule (\figref{typing-top-level}) binds the names of a mutual type region $\seq{\chi}$ and adds
+The \ruleName{types} rule\speconly{ (\figref{typing-top-level})} binds the names of a mutual type region $\seq{\chi}$ and adds
 its classes to the class table before checking its definitions. The context entry bound to the name declared by $\chi_i$ is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-entry}}): the class
 $\Type{q.c}$ if $\chi_i$ is a class definition, and the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ if it is a \pyinline{type} statement.
 The class table is extended with $\classTable{\Gamma}(q, \seq{\chi})$

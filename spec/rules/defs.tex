@@ -1,0 +1,9 @@
+\inferrule*[lab={\ruleName{defs}}]
+{
+  \Sigma; \Gamma \vdash d_i \synth \pi_i \quad (\forall i) \\
+  \Delta' = \set{\bind{\declaresS(\seq{d})}{\seq{\pi}}} \\
+  \Sigma; \Gamma \override \Delta' \vdash d_i \checks \pi_i \quad (\forall i)
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \seq{d} : \Assigns{\Delta'}
+}

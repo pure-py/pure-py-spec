@@ -1,0 +1,9 @@
+\inferrule*[lab={\ruleName{match-partial}}]
+{
+  \Sigma; \Gamma \vdash e \synth \sigma \\
+  \Sigma; \Gamma; \zeta \vdash \sigma, \shapes{\Sigma}(\sigma, \varnothing), \seq{b} : S, \tau, L \\
+  \tau \neq \tyNever
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exMatch{e}{\seq{b}} : S \merge \Assigns{\varnothing}
+}
