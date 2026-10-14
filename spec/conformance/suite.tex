@@ -2,5 +2,5 @@
 \label{sec:conformance-suite}
 
 The conformance suite pairs each test with the verdict given by Python itself, and runs on CPython,
-GraalPy, and Pyodide. \added{Each test lies in the directory given by its row and column of \figref{taxonomy}. The tests in \pyinline{syntactic-only/} are not classified by the figure. Each builds an abstract syntax tree for a form which cannot be expressed in Python source, and checks that \PurePy rejects the form.} \todo{Reference interpreter, needed
+GraalPy, and Pyodide. \added{The directory of a test names the outcome of the program under Python, a row of \figref{taxonomy}, followed by the outcome under \PurePy, a column. The tests in \pyinline{syntactic-only/} are not classified by the figure. Each builds an abstract syntax tree for a form which cannot be expressed in Python source, and checks that \PurePy rejects the form.} \todo{Reference interpreter, needed
 to detect dynamically excluded operations (\issue{64}).}
