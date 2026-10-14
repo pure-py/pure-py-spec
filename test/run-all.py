@@ -210,7 +210,8 @@ def compare_known_failures(failed: list[str], known_failures: pathlib.Path, upda
 
 
 def tests() -> Iterator[tuple[pathlib.Path, bool]]:
-    """Tests of both levels in path order, each with whether it is a program."""
+    """Module-level tests, then program-level tests, each sorted by path and paired with whether it is
+    program-level."""
     for level, program in ((MODULE_LEVEL, False), (PROGRAM_LEVEL, True)):
         found = (TEST / level).rglob(MAIN if program else "*.py")
         paths = [
