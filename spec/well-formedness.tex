@@ -285,11 +285,13 @@ definitions and modules introduce the variables of the scope as unbound, using t
 
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}). \added{In a function body, an assertion of the literal \pyinline{False} has outcome $\Returns$,
-like a \pyinline{return} (\ruleName{assert-false}, \ruleName{assert-false-msg}). A path through a function
-body may therefore end in \pyinline{assert False} in place of a \pyinline{return}, which mypy also
-accepts. An assertion of any other expression has outcome $\Assigns{\varnothing}$, even at type
-\pyinline{Literal[False]}, because mypy rejects some such assertions, such as \pyinline{assert (False,)[0]}
-(\paperonly{\secref{python-compatibility}}\speconly{\figref{mypy-restrictions}}).}
+like a \pyinline{return} (\ruleName{assert-false}, \ruleName{assert-false-msg}). A function body therefore has
+outcome $\Returns$ if each of its branches ends in a \pyinline{return} or in \pyinline{assert False}, which mypy
+also accepts. An assertion of any other expression has outcome $\Assigns{\varnothing}$, even at type
+\pyinline{Literal[False]}. The type checker mypy treats the code after an assertion as unreachable only if the
+asserted expression is built from \pyinline{False} and \pyinline{0} with \pyinline{not}, \pyinline{and} and
+\pyinline{or}, or has the declared type \pyinline{Literal[False]}, and so reports a missing return after
+\pyinline{assert (False,)[0]} (\paperonly{\secref{python-compatibility}}\speconly{\figref{mypy-restrictions}}).}
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}), which threads
