@@ -289,7 +289,7 @@ like a \pyinline{return} (\ruleName{assert-false}, \ruleName{assert-false-msg}).
 body may therefore end in \pyinline{assert False} in place of a \pyinline{return}, which mypy also
 accepts. An assertion of any other expression has outcome $\Assigns{\varnothing}$, even at type
 \pyinline{Literal[False]}, because mypy rejects some such assertions, such as \pyinline{assert (False,)[0]}
-(\figref{mypy-restrictions}).}
+(\paperonly{\secref{python-compatibility}}\speconly{\figref{mypy-restrictions}}).}
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}), which threads
