@@ -12,10 +12,18 @@
 \and
 \inferrule*[lab={\ruleName{literal}}]
 {
-  \strut
+  \added{\ell \text{ not a float literal}}
 }
 {
   \Sigma; \Gamma \vdash \ell \synth \tyLiteral{\ell}
+}
+\and
+\inferrule*[lab={\ruleName{literal-float}}]
+{
+  \added{n \text{ a float literal}}
+}
+{
+  \added{\Sigma; \Gamma \vdash n \synth \tyFloat}
 }
 \and
 \inferrule*[lab={\ruleName{attr-module}}]

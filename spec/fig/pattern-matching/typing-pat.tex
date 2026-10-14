@@ -45,6 +45,16 @@
   \Sigma; \Gamma \vdash \shapeAny{\tyLiteral{\ell}}{\varnothing}, \ell \matches \set{\shapeAny{\tyLiteral{\ell}}{\varnothing}}, \varnothing
 }
 \and
+\inferrule*[lab={\ruleName{pat-literal-float}}]
+{
+  \added{n \text{ a float literal}} \\
+  \added{n \notin H} \\
+  \added{\Sigma \vdash \tyFloat \subty \tau}
+}
+{
+  \added{\Sigma; \Gamma \vdash \shapeAny{\tau}{H}, n \matches \set{\shapeAny{\tau}{H}}, \set{\shapeAny{\tau}{H \cup \set{n}}}}
+}
+\and
 \inferrule*[lab={\ruleName{pat-tuple}}]
 {
   \Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L
