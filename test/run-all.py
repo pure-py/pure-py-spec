@@ -159,9 +159,9 @@ class Runner:
                 self.fail(f"run: expected {name}, got: {proc.stderr.strip()}")
 
     def run_test(self, test: pathlib.Path, program: bool) -> None:
-        """Path under tier: <Python outcome>/<PurePy outcome>[/<subset>]/.../<test>.py, or
-        .../<test>/main.py for a program; or syntactic-only/<test>.py, a script which builds an
-        AST that Python source cannot express and checks that PurePy rejects it."""
+        """Path below module-level/ or program-level/: <Python outcome>/<PurePy outcome>[/<subset>]/.../
+        <test>.py, or .../<test>/main.py for a program; or syntactic-only/<test>.py, for a script which
+        builds an AST which cannot be expressed in Python source."""
         dirs = test.relative_to(TEST).parts[1:-1]
         if dirs[0] == SYNTACTIC_ONLY:
             expected = Expectation(None, False, PythonOutcome.NO_EXCEPTION)
@@ -210,9 +210,9 @@ def compare_known_failures(failed: list[str], known_failures: pathlib.Path, upda
 
 
 def tests() -> Iterator[tuple[pathlib.Path, bool]]:
-    """Tests of both tiers in path order, each with whether it is a program."""
-    for tier, program in ((MODULE_LEVEL, False), (PROGRAM_LEVEL, True)):
-        found = (TEST / tier).rglob(MAIN if program else "*.py")
+    """Tests of both levels in path order, each with whether it is a program."""
+    for level, program in ((MODULE_LEVEL, False), (PROGRAM_LEVEL, True)):
+        found = (TEST / level).rglob(MAIN if program else "*.py")
         paths = [
             path.parent if program else path
             for path in found

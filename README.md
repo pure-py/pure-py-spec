@@ -46,7 +46,7 @@ uv run --locked ./test/run-all.sh
 The command creates the project environment, installs the locked development dependencies and runs the suite,
 which begins with mypy and ruff over `src/`.
 
-Tests are organised by tier, `module-level/` and `program-level/`, then by the outcome under Python and the
+Tests are organised by level, `module-level/` and `program-level/`, then by the outcome under Python and the
 outcome under PurePy, following the grid in the conformance section of the specification; the runner derives
 every assertion from the path. A module-level test is a `.py` file with expectation files as siblings
 (`.expected`, `.error.expected`, `.exception.expected`, `.status.expected`); a program-level test is a
