@@ -92,7 +92,7 @@ Whether a pattern matches is determined by the auxiliary function $\matchOp{\Sig
 $\matchOk{\rho'}$, a match, where $\rho'$ binds the variables of the pattern to the values that they matched,
 $\noMatch$, a failure to match, or $\replaced{\errUndef}{\undefinedResult}$, for a pattern and a value that are not comparable, such
 as a list pattern against a tuple, and for a literal pattern \replaced{if the equality of the literal and the value is undefined}{whose comparison with the value is undefined}. When
-a match result is undefined, \replaced{so are the value of $\dispatch$ and the run (\ruleName{eval-match-undef})}{$\dispatch$ has no value and the run has no result}.
+a match result is undefined, \replaced{the value of $\dispatch$ is also undefined, and the run has undefined behaviour (\ruleName{eval-match-undef})}{$\dispatch$ has no value and the run has no result}.
 \begin{specdefinition}{Composition of match results}
 The match results of sub-patterns compose with
 $\override$, matching sequentially, so that the first failure or undefined result decides:
