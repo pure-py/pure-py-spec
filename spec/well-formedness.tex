@@ -484,9 +484,9 @@ A pattern matches a shape directly if the shape has the head tested by the patte
 is first \emph{split} by the auxiliary judgement $\Sigma; \Gamma \vdash k, p \splits K, L$ (\figref{split}):
 the shapes $K$ have the head tested by $p$, with the shapes of the component types drawn from $\shapes{\Sigma}$,
 and the residual $L$ is the shape $k$ with that head excluded as well. The \ruleName{pat-split} rule matches
-the pattern against $K$ and adds $L$ to the residual. \added{A float literal has no literal type, so a float literal
-pattern matches a rest shape directly (\ruleName{pat-literal-float}), giving the whole shape as the matched shape and
-the shape with the literal excluded as the residual. The matched shape then also denotes values which are not equal to
+the pattern against $K$ and adds $L$ to the residual. \added{Literal types do not include floats, so a float literal
+pattern matches a rest shape directly (\ruleName{pat-literal-float}) rather than splitting it. The matched shape is the
+whole shape, and the residual is the shape with the literal excluded. The matched shape then also denotes values which are not equal to
 the literal, but those values lie in the residual as well, so the residual of an enclosing pattern is unchanged.} Only the forms
 with an excluded set split, and no head types at a tuple type, so the excluded set of a tuple shape is
 empty and \ruleName{split-tuple} leaves the empty residual.
