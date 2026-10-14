@@ -1,7 +1,7 @@
 \setPadWidth{\eqElems{\Sigma}(\seq{v}, \delta'(\seq{w}))}%
-\eqOp{\Sigma}(n, n') &{}= \padded{\val{\pyinline{True}}} \quad \text{if } n = n' \text{ and } n \replaced{\text{ not }}{\text{ is not }} \pyinline{nan} \\*
+\eqOp{\Sigma}(n, n') &{}= \padded{\val{\pyinline{True}}} \quad \text{if } n = n' \text{ and } n \text{ not } \pyinline{nan} \\*
 \eqOp{\Sigma}(n, n') &{}= \padded{\val{\pyinline{False}}} \quad \text{if } n \neq n' \\*
-\eqOp{\Sigma}(n, n) &{}= \padded{\undefinedResult} \quad \text{if } n \replaced{\text{ }}{\text{ is }} \pyinline{nan} \\*
+\eqOp{\Sigma}(n, n) &{}= \padded{\undefinedResult} \quad \text{if } n \text{ } \pyinline{nan} \\*
 \eqOp{\Sigma}(w, w') &{}= \padded{\val{\pyinline{True}}} \quad \text{if } w = w' \\*
 \eqOp{\Sigma}(w, w') &{}= \padded{\val{\pyinline{False}}} \quad \text{if } w \neq w' \\*
 \eqOp{\Sigma}(\pyinline{True}, \pyinline{True}) &{}= \eqOp{\Sigma}(\pyinline{False}, \pyinline{False}) = \val{\pyinline{True}} \\*
@@ -22,5 +22,5 @@
 &\qquad \text{if }  C \neq \clsRange \\*
 \\
 \eqOp{\Sigma}(v, v') &{}= \undefinedResult \\*
-&\qquad \text{if } v \text{ and } v' \replaced{\text{ closures or primitives}}{\text{ are closures or primitives }} \\*
+&\qquad \text{if } v \text{ and } v' \text{ closures or primitives} \\*
 \eqOp{\Sigma}(v, v') &{}= \val{\pyinline{False}} \quad \text{(otherwise)}

@@ -7,7 +7,7 @@
 \rowcolor{grammarheadcolor}Construct & mypy & Mechanism \\
 Call returning \pyinline{None} as an expression & Rejects any use of the value & \ruleName{call} requires a result other than \pyinline{None}; the call is a statement (\ruleName{call-stmt}) \\\rowgap
 Body that may fall through at a return type such as \pyinline{int | None} & Reports a missing return & \ruleName{def-body} requires outcome $\Returns$ unless the return type is equivalent to \pyinline{None} \\\rowgap
-\added{Assertion of expression of type \pyinline{Literal[False]} other than \pyinline{False}, such as \pyinline{(False,)[0]}} & \added{Types \pyinline{(False,)[0]} at \pyinline{bool}, so reports a missing return} & \added{\ruleName{assert-false} applies to the literal \pyinline{False} only} \\\rowgap
+Assertion of expression of type \pyinline{Literal[False]} other than \pyinline{False}, such as \pyinline{(False,)[0]} & Types \pyinline{(False,)[0]} at \pyinline{bool}, so reports a missing return & \ruleName{assert-false} applies to the literal \pyinline{False} only \\\rowgap
 Bare \pyinline{return} at such a return type & Reports a missing return value & \ruleName{return-none} requires the return type equivalent to \pyinline{None} \\\rowgap
 Match whose cases cover a class field by field & Narrows the scrutinee by whole classes, so reports a missing return & Exhaustiveness decided by the remaining type (\ruleName{match}) \\\rowgap
 Pattern variable after a case excluding a field value & Binds at the field type & Bindings taken from the remaining type (\ruleName{match-case}, \ruleName{check-var}) \\\rowgap
