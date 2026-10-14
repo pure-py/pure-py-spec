@@ -1,7 +1,7 @@
 \section{Syntax}
 \label{sec:syntax}
 
-The syntax of \PurePy is given in \figrefThree{syntax-stmt}{syntax-expr}{syntax-types}. \figref{metavariables} summarises the metavariables used throughout.
+The syntax of \PurePy is given in \figrefThree{syntax-stmt}{syntax-expr}{syntax-types}.\speconly{ \figref{metavariables} summarises the metavariables used throughout.}
 A sequence $\seq{x}$ denotes $x_1, \ldots, x_n$ for some $n$; inside the brackets of a tuple, list, type
 application or argument list it stands for the comma-separated elements, so $\exTuple{\seq{e}}$ is
 $\exTuple{e_1, \ldots, e_n}$. The sequence $x \cons \seq{x}$ has head $x$ and tail $\seq{x}$, and
@@ -16,7 +16,6 @@ $X \setminus Y$ keeps the surviving elements of $X$ in their order; $X \disjunio
 and $Y$ are disjoint, appends the elements of $Y$ to those of $X$; $X \cup Y$ appends the elements of
 $Y$ not in $X$; and a product of ordered sets is ordered lexicographically.
 
-\paperinput{spec/fig/metavariables}
 
 \subsection{Lexical syntax}
 \label{sec:lexical}
@@ -180,7 +179,7 @@ definitions that follow.
 \begin{definition}[Predefined contexts and environments]
 \label{def:predefined}
 $\mathcal{P}$ takes each module $q$ of \figref{predefined-values} to a pair $(\Gamma, \rho)$, where $\Gamma$
-binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \figref{predefined-signatures}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value
+binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \speconly{\figref{predefined-signatures}}\paperonly{\specification}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value
 (\figref{predefined-values}). A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
 the predefined signatures. The class table $\SigmaPredef$ of the predefined modules is
@@ -188,7 +187,7 @@ $\set{\bind{\clsRange}{\ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}}}$, where
 \pyinline{@dataclass class range: start: int; stop: int} and $\Gamma$ is the signature of \pyinline{builtins}.
 \end{definition}
 
-\input{spec/fig/predefined-signatures}
+\specinput{spec/fig/predefined-signatures}
 
 \input{spec/fig/predefined-values}
 

@@ -110,7 +110,7 @@ in \ruleName{callee-scheme} (\ruleName{constr}). The arguments are checked again
 $\seq{\tau}'$, and the call synthesises $C[\seq{\tau}']$. A constructor call of the form $\exCall{q[\seq{\psi}]}{a}$ takes
 the type arguments denoted by $\seq{\psi}$ instead (\ruleName{constr-explicit}). An attribute reference $\exAttr{e}{x}$ has the type of the field $x$ of the class synthesised by $e$
 (\ruleName{attr-object}). The signature of a predefined module binds
-$\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type given in \figref{predefined-signatures}
+$\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type given in \speconly{\figref{predefined-signatures}}\paperonly{\specification}
 (Definition~\ref{def:predefined}). A module attribute reference
 $\exAttr{e}{x}$ resolves as a qualified name to a definitely assigned member
 (\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}. A variable bound to a module or
@@ -351,7 +351,7 @@ every name of the type region for a \pyinline{type} statement and only the earli
 
 The judgement $\Sigma; \Gamma \vdash \chi$ checks a class definition by resolving the field annotations, which may mention the type parameters of the class, and requiring the fields it declares to be distinct and, when it extends
 another class, the base class to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
-(\ruleName{class}, \ruleName{class-extend}). Class definitions also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
+(\ruleName{class}, \ruleName{class-extend}). Class definitions also require the predefined name \pyinline{dataclass}\speconly{ (\figref{predefined-signatures})} to be in
 scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement $\exTypeAlias{x[\seq{\alpha}]}{\psi}$, such as \pyinline{type Pair[T] = tuple[T, T]},
 declares $x$ as an alias of the type denoted by $\psi$ with the type parameters $\seq{\alpha}$ in scope
 (\ruleName{type-alias}). An application of the alias such as \pyinline{Pair[int]} denotes that type at the given
