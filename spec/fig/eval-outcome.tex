@@ -203,7 +203,7 @@
 \inferrule*[lab={\ruleName{eval-match-undef}}]
 {
   \added{\rho, e \Rightarrow \val{v}} \\
-  \added{\dispatch(\rho, v, \seq{p}, \seq{s}) = \aborts{\errUndef}}
+  \added{\dispatch(\rho, v, \seq{p}, \seq{s}) = \errUndef}
 }
 {
   \added{\rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\errUndef}}

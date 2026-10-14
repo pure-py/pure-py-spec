@@ -90,16 +90,16 @@ $\dispatch$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:dispat
 Whether a pattern matches is determined by the auxiliary function $\matchOp{\Sigma}(\rho, p, v)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:match}}). A \emph{match result} $m$ is
 $\matchOk{\rho'}$, a match, where $\rho'$ binds the variables of the pattern to the values that they matched,
-$\noMatch$, a failure to match, or $\replaced{\aborts{\errUndef}}{\undefinedResult}$, for a pattern and a value that are not comparable, such
+$\noMatch$, a failure to match, or $\replaced{\errUndef}{\undefinedResult}$, for a pattern and a value that are not comparable, such
 as a list pattern against a tuple, and for a literal pattern \replaced{if the equality of the literal and the value is undefined}{whose comparison with the value is undefined}. When
 a match result is undefined, \replaced{so are the value of $\dispatch$ and the run (\ruleName{eval-match-undef})}{$\dispatch$ has no value and the run has no result}.
 \begin{specdefinition}{Composition of match results}
 The match results of sub-patterns compose with
-$\override$, matching sequentially, so that the first failure or \replaced{abort}{undefined result } decides:
+$\override$, matching sequentially, so that the first failure or undefined result decides:
 \begin{defalign}
 \matchOk{\rho} \override \matchOk{\rho'} & {}= \matchOk{(\rho \disjunion \rho')} \\
 \matchOk{\rho} \override \noMatch = \noMatch \override m & {}= \noMatch \\
-\replaced{\matchOk{\rho} \override \aborts{\errUndef} = \aborts{\errUndef} \override m}{\matchOk{\rho} \override \undefinedResult = \undefinedResult \override m} & {}= \replaced{\aborts{\errUndef}}{\undefinedResult}
+\replaced{\matchOk{\rho} \override \errUndef = \errUndef \override m}{\matchOk{\rho} \override \undefinedResult = \undefinedResult \override m} & {}= \replaced{\errUndef}{\undefinedResult}
 \end{defalign}
 
 \noindent with $\matchOk{\varnothing}$ as left and right unit.
