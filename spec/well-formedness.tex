@@ -295,10 +295,10 @@ variable assigned in one branch of an \pyinline{if} is definitely assigned after
 branch reaches \pyinline{assert False}, and mypy accepts both. A module whose body definitely reaches
 \pyinline{assert False} is ill-formed, because the \ruleName{top-seq} and \ruleName{module} rules require outcome
 $\Assigns{\Delta}$. An assertion of any other expression has outcome $\Assigns{\varnothing}$, even at type
-\pyinline{Literal[False]}. For mypy, the code after an assertion is unreachable only if the
-asserted expression is built from \pyinline{False} and \pyinline{0} with \pyinline{not}, \pyinline{and} and
-\pyinline{or}, or has the declared type \pyinline{Literal[False]}, so mypy reports a missing return after
-\pyinline{assert (False,)[0]} (\paperonly{\secref{python-compatibility}}\speconly{\figref{mypy-restrictions}}).}
+\pyinline{Literal[False]}. Here mypy is more precise, and also treats the code after an assertion as unreachable when
+the asserted expression is built from \pyinline{False} and \pyinline{0} with \pyinline{not}, \pyinline{and} and
+\pyinline{or}, or has the declared type \pyinline{Literal[False]}. A rule based on the type would accept more
+than mypy, however, because mypy reports a missing return after \pyinline{assert (False,)[0]} (\paperonly{\secref{python-compatibility}}\speconly{\figref{mypy-restrictions}}).}
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}), which threads
