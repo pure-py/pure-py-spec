@@ -287,7 +287,8 @@ check against \pyinline{bool}, and an assertion message against \pyinline{str} (
 like a \pyinline{return} (\ruleName{assert-false}, \ruleName{assert-false-msg}). A path through a function
 body may therefore end in \pyinline{assert False} in place of a \pyinline{return}, which mypy also
 accepts. An assertion of any other expression has outcome $\Assigns{\varnothing}$, even at type
-\pyinline{Literal[False]}, since mypy types some such expressions as \pyinline{bool} (\figref{mypy-restrictions}).}
+\pyinline{Literal[False]}, because mypy rejects some such assertions, such as \pyinline{assert (False,)[0]}
+(\figref{mypy-restrictions}).}
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}), which threads
