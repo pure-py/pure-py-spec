@@ -74,7 +74,7 @@ function $\getitem$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{au
 string by an integer, counting from the end when negative, and a dictionary by a string key,
 aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name; a
 dictionary subscripted by a value other than a string is undefined. Likewise an attribute reference on a
-value other than a module or object \replaced{is undefined, because}{has no derivation:} \replaced{\PurePy does not define the attributes of built-in values}{the attributes of built-in values are undefined }\added{ (\ruleName{eval-attr-undef})}.
+value other than a module or object \replaced{is undefined, because}{has no derivation:} \replaced{the attributes given to other values by Python, such as the methods of a string, are not supported by this version of \PurePy}{the attributes of built-in values are undefined }\added{ (\ruleName{eval-attr-undef})}.
 
 \input{spec/fig/well-formed-values}
 
