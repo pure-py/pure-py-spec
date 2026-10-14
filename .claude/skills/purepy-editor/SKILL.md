@@ -17,5 +17,9 @@ description: PurePy-specific additions to the technical-authoring, coding-conven
 
 ## LaTeX
 
+- Make edits to specification prose and rules in change markup, using the macros of `tex/change-tracking.tex`: `\added`, `\deleted` and `\replaced{new}{old}` inline, the capitalised variants for a margin change bar, and `AddedBlock` and `DeletedBlock` for whole paragraphs or display material. Rewrite a section body as a `DeletedBlock` of the old text followed by an `AddedBlock` of the new.
+- End the old text inside `\replaced` with a space, so that the grey and green runs do not abut.
+- Markup is accepted later, in a commit titled "Change markup accepted"; `make -B paper.pdf FINAL=1` (or `PurePy-spec.pdf`) builds the clean version.
+- When redrafting the abstract or introduction of the paper with the author commenting live, edit without markup and commit as you go.
 - Rebuild the paper after every change to verify that it builds without errors.
 - Put primes outside `\vec`, not inside: `\vec{e}'`, not `\vec{e'}`.
