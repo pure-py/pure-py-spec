@@ -2,7 +2,7 @@
 \centering
 \newcommand*{\testdir}[1]{{\scriptsize\texttt{#1}}}
 \begin{tikzpicture}[font=\footnotesize, x=1cm, y=1cm, every node/.style={anchor=north west, align=left}]
-  % Columns: PurePy outcome 0--3, Python raises error 3--6.8, Python evaluates without error 6.8--12.
+  % Columns: PurePy outcome 0--3, Python raises exception 3--6.8, Python evaluates without error 6.8--12.
   % Rows: other result 0--1.8, undefined 1.8--3.2, type checker 3.2--4.6, parser 4.6--5.8, header 5.8--6.5.
   \fill[black!6] (3,3.2) rectangle (6.8,5.8) (3,0) rectangle (6.8,1.8);
   \fill[cyan!60, fill opacity=0.13] (6.8,1.8) rectangle (12,5.8);
@@ -10,7 +10,7 @@
   \draw[black!33] (0,0) rectangle (12,6.5) (3,0) -- (3,6.5) (6.8,0) -- (6.8,6.5)
     (0,1.8) -- (12,1.8) (0,3.2) -- (12,3.2) (0,4.6) -- (12,4.6) (0,5.8) -- (12,5.8) (6.8,0.45) -- (12,0.45);
   \node[font=\footnotesize\bfseries] at (0.1,6.45) {\PurePy};
-  \node[font=\footnotesize\bfseries] at (3.1,6.45) {Python raises error};
+  \node[font=\footnotesize\bfseries] at (3.1,6.45) {Python raises exception};
   \node[font=\footnotesize\bfseries] at (6.9,6.45) {Python evaluates without error};
   \node at (0.1,5.75) {Rejected by\\parser};
   \node at (0.1,4.55) {Rejected by\\type checker};
