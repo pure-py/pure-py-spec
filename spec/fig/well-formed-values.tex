@@ -1,4 +1,5 @@
 \begin{figure}
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\vdash v : \theta$}
 \begin{mathpar}
 \small
@@ -146,9 +147,13 @@
   \vdash v : \PU{\tau}
 }
 \end{mathpar}
+\subcaption{Value $v$ is well-formed at context entry $\theta$}
+\label{fig:well-formed-value}
+\end{subfigure}
 
 \vspace{2mm}
 
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\vdash \rho : \Gamma$}
 \begin{mathpar}
 \small
@@ -169,6 +174,9 @@
   \vdash \set{\bind{x}{v}} \override \rho : \set{\bind{x}{\theta}} \override \Gamma
 }
 \end{mathpar}
+\subcaption{Environment $\rho$ is well-formed at context $\Gamma$}
+\label{fig:well-formed-env}
+\end{subfigure}
 \caption{Value and environment well-formedness}
 \label{fig:well-formed-values}
 \end{figure}
