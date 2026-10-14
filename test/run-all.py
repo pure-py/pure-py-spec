@@ -32,19 +32,26 @@ CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
 CHECK, CHECK_PROGRAM = "check_module.py", "check_program.py"
 
 
-class Verdict(StrEnum):
-    SEMANTICALLY_VALID = "semantically-valid"
-    EXCLUDED = "excluded"
-    PYTHON_ERROR = "python-error"
+class PythonOutcome(StrEnum):
+    SYNTAX_ERROR = "syntax-error"
+    EXCEPTION = "exception"
+    NO_EXCEPTION = "no-exception"
 
 
-class Stage(StrEnum):
-    SYNTACTIC = "syntactic"
-    STATIC = "static"
-    DYNAMIC = "dynamic"
-    SYNTACTIC_ONLY = "syntactic-only"
+class PurePyOutcome(StrEnum):
+    PARSER = "parser"
+    TYPE_CHECKER = "type-checker"
+    UNDEFINED = "undefined"
+    RESULT = "result"
+
+
+class Subset(StrEnum):
     PENDING = "pending"
     MYPY_BUG = "mypy-bug"
+
+
+SYNTACTIC_ONLY = "syntactic-only"
+SYNTAX_ERROR = "SyntaxError"
 
 
 class Exit(IntEnum):
@@ -58,21 +65,23 @@ class Exit(IntEnum):
 class Expectation(NamedTuple):
     exit: Exit | None  # None: checker not run
     error_checked: bool  # checker output contains .error.expected
-    python_accepts: bool | None  # None: not run under Python
+    python: PythonOutcome | None  # None: not run under Python
 
 
-EXPECTATIONS: dict[tuple[Verdict, Stage | None], Expectation] = {
-    (Verdict.SEMANTICALLY_VALID, None): Expectation(Exit.OK, False, True),
-    (Verdict.SEMANTICALLY_VALID, Stage.PENDING): Expectation(Exit.NOT_YET, False, None),
-    (Verdict.SEMANTICALLY_VALID, Stage.MYPY_BUG): Expectation(Exit.OK, False, True),
-    (Verdict.EXCLUDED, Stage.SYNTACTIC): Expectation(Exit.PROHIBITED, True, True),
-    (Verdict.EXCLUDED, Stage.STATIC): Expectation(Exit.ILL_FORMED, True, True),
-    (Verdict.EXCLUDED, Stage.DYNAMIC): Expectation(Exit.OK, False, True),
-    (Verdict.PYTHON_ERROR, Stage.SYNTACTIC): Expectation(Exit.PROHIBITED, True, False),
-    (Verdict.PYTHON_ERROR, Stage.STATIC): Expectation(Exit.ILL_FORMED, True, False),
-    (Verdict.PYTHON_ERROR, Stage.DYNAMIC): Expectation(Exit.OK, False, False),
-    (Verdict.PYTHON_ERROR, Stage.SYNTACTIC_ONLY): Expectation(None, False, True),
+# Checker verdict for each PurePy outcome; a pending test is not yet accepted
+CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
+    PurePyOutcome.PARSER: (Exit.PROHIBITED, True),
+    PurePyOutcome.TYPE_CHECKER: (Exit.ILL_FORMED, True),
+    PurePyOutcome.UNDEFINED: (Exit.OK, False),
+    PurePyOutcome.RESULT: (Exit.OK, False),
 }
+
+
+def expectation(python: PythonOutcome, purepy: PurePyOutcome, subset: Subset | None) -> Expectation:
+    if subset == Subset.PENDING:
+        return Expectation(Exit.NOT_YET, False, None)
+    exit, error_checked = CHECKER[purepy]
+    return Expectation(exit, error_checked, python)
 
 
 def run(cmd: list[str], cwd: pathlib.Path | None = None) -> "subprocess.CompletedProcess[str]":
@@ -119,8 +128,9 @@ class Runner:
             elif error.read_text().strip() not in output:
                 self.fail(f"check: expected {error.read_text().strip()!r}, got: {output.strip()}")
 
-    def python(self, path: pathlib.Path, accepts: bool) -> None:
+    def python(self, path: pathlib.Path, outcome: PythonOutcome) -> None:
         assert self.interpreter is not None
+        accepts = outcome == PythonOutcome.NO_EXCEPTION
         expected = path.with_suffix(EXPECTED)
         exception = path.with_suffix(EXCEPTION_EXPECTED)
         if expected.exists() == exception.exists():
@@ -141,27 +151,34 @@ class Runner:
                 self.fail("run: output mismatch")
         else:
             name = exception.read_text().strip()
-            if proc.returncode == 0:
+            if (outcome == PythonOutcome.SYNTAX_ERROR) != name.startswith(SYNTAX_ERROR):
+                self.fail(f"run: misfiled, expects {name}")
+            elif proc.returncode == 0:
                 self.fail(f"run: expected {name} but script succeeded")
             elif name not in proc.stderr:
                 self.fail(f"run: expected {name}, got: {proc.stderr.strip()}")
 
     def run_test(self, test: pathlib.Path, program: bool) -> None:
-        """Path under tier: <verdict>[/<stage>]/.../<test>.py or .../<test>/main.py (program)."""
+        """Path under tier: <Python outcome>/<PurePy outcome>[/<subset>]/.../<test>.py, or
+        .../<test>/main.py for a program; or syntactic-only/<test>.py, a script which builds an
+        AST that Python source cannot express and checks that PurePy rejects it."""
         dirs = test.relative_to(TEST).parts[1:-1]
-        verdict = Verdict(dirs[0])
-        stage = Stage(dirs[1]) if len(dirs) > 1 and dirs[1] in Stage else None
-        if stage == Stage.PENDING and self.checker is not None:
-            # spec doesn't define pending forms, so only the reference checker is held to them
-            self.skipped.append(str(test.relative_to(ROOT)))
-            return
+        if dirs[0] == SYNTACTIC_ONLY:
+            expected = Expectation(None, False, PythonOutcome.NO_EXCEPTION)
+        else:
+            subset = Subset(dirs[2]) if len(dirs) > 2 and dirs[2] in Subset else None
+            if subset == Subset.PENDING and self.checker is not None:
+                # spec doesn't define pending forms, so only the reference checker is held to them
+                self.skipped.append(str(test.relative_to(ROOT)))
+                return
+            expected = expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]), subset)
         with self.test(test.relative_to(ROOT)):
-            exit, error_checked, python_accepts = EXPECTATIONS[verdict, stage]
+            exit, error_checked, python = expected
             path = test / MAIN if program else test
             if exit is not None:
                 self.check(path, program, exit, error_checked)
-            if python_accepts is not None and self.interpreter is not None:
-                self.python(path, python_accepts)
+            if python is not None and self.interpreter is not None:
+                self.python(path, python)
 
     def summary(self) -> None:
         total = self.passed + len(self.failed)
@@ -252,13 +269,17 @@ def check_mypy_compatibility(r: Runner) -> None:
     with r.test("mypy compatibility"):
         paths = [
             path
-            for path in sorted((TEST / MODULE_LEVEL / Verdict.SEMANTICALLY_VALID).rglob("*.py"))
-            if Stage.PENDING not in path.parts
+            for path in sorted(
+                (TEST / MODULE_LEVEL / PythonOutcome.NO_EXCEPTION / PurePyOutcome.RESULT).rglob(
+                    "*.py"
+                )
+            )
+            if Subset.PENDING not in path.parts
         ]
         # mypy reports paths relative to its working directory
         relative = [str(path.relative_to(ROOT)) for path in paths]
         reported_bug = {
-            str(path.relative_to(ROOT)) for path in paths if Stage.MYPY_BUG in path.parts
+            str(path.relative_to(ROOT)) for path in paths if Subset.MYPY_BUG in path.parts
         }
         proc = run(
             [

@@ -46,20 +46,37 @@ uv run --locked ./test/run-all.sh
 The command creates the project environment, installs the locked development dependencies and runs the suite,
 which begins with mypy and ruff over `src/`.
 
-Tests are organised by tier, `module-level/` and `program-level/`, then by verdict and stage; the runner
-derives every assertion from the path. A module-level test is a `.py` file with expectation files as siblings
+Tests are organised by tier, `module-level/` and `program-level/`, then by the outcome under Python and the
+outcome under PurePy, following the grid in the conformance section of the specification; the runner derives
+every assertion from the path. A module-level test is a `.py` file with expectation files as siblings
 (`.expected`, `.error.expected`, `.exception.expected`, `.status.expected`); a program-level test is a
 directory holding `main.py`, the expectation files of `main.py` and the other modules of the program.
 
-- `semantically-valid/`: accepted by PurePy; runs under Python with the expected output and type-checks under mypy (`test/mypy.ini`)
-- `excluded/`: accepted by Python but excluded by PurePy, in `syntactic/` at parse, in `static/` at check and in `dynamic/` at run time
-- `python-error/`: rejected by both languages, with stages as above plus `syntactic-only/`, whose tests construct the form as an AST because Python source cannot express the form
-- `semantically-valid/pending/`: not yet accepted by the checker
-- `semantically-valid/mypy-bug/`: semantically valid, but rejected by mypy because of a behaviour reported as a mypy bug; the runner fails a test once mypy accepts it
+The outcome under Python is one of:
 
-The runner requires an `excluded` test to run under Python and a `python-error` test to raise, so a test has
-either `.expected` or `.exception.expected` and a misfiled test fails. A test that exits with a nonzero status
-through `sys.exit` states the status in `.status.expected`.
+- `syntax-error/`: Python raises `SyntaxError` before running the program
+- `exception/`: Python raises another exception while running the program
+- `no-exception/`: Python runs the program with the expected output
+
+The outcome under PurePy is one of:
+
+- `parser/`: rejected by the parser
+- `type-checker/`: rejected by the type checker
+- `undefined/`: well-formed, and the run yields undefined
+- `result/`: well-formed, and the run yields the same result as under Python, including the same exception
+
+Two directories under `no-exception/result/` hold tests with a further expectation:
+
+- `pending/`: not yet accepted by the checker
+- `mypy-bug/`: rejected by mypy because of a behaviour reported as a mypy bug; the runner fails a test once mypy accepts it
+
+Every other test in `no-exception/result/` also type-checks under mypy (`test/mypy.ini`). The tests in
+`module-level/syntactic-only/` construct a form as an AST, because Python source cannot express the form, and
+check that PurePy rejects it.
+
+A test has `.expected` under `no-exception/` and `.exception.expected` elsewhere, naming `SyntaxError` exactly
+under `syntax-error/`, so a misfiled test fails. A test that exits with a nonzero status through `sys.exit`
+states the status in `.status.expected`.
 
 Another checker can be run over the suite with `--checker`; `run-all.py --help` lists the options.
 

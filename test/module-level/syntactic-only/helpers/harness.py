@@ -4,7 +4,7 @@ import ast
 import pathlib
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parents[5]
+ROOT = pathlib.Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(ROOT / "src"))
 
 from check_module import PREDEFINED_MODULES, check_module
