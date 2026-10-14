@@ -283,11 +283,11 @@ definitions and modules introduce the variables of the scope as unbound, using t
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:scope}}).
 
 The conditions of \pyinline{if} and \pyinline{assert}
-check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}). \added{In a function body, an assertion of the literal \pyinline{False} has outcome $\Returns$ (\ruleName{assert-false},
-\ruleName{assert-false-msg}), so that such an assertion may end a path through the function in place of a
-\pyinline{return}. The two rules
-apply only to the literal and not to other expressions of type \pyinline{Literal[False]}, following mypy, which does
-not treat an assertion of any other expression as ending a path through the function (\figref{mypy-restrictions}).}
+check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}). \added{An assertion of the literal \pyinline{False} always fails, so control does not pass
+beyond it. In a function body the assertion therefore has outcome $\Returns$, the same outcome as a
+\pyinline{return} statement (\ruleName{assert-false}, \ruleName{assert-false-msg}). An assertion of any other
+expression of type \pyinline{Literal[False]} has outcome $\Assigns{\varnothing}$ (\ruleName{assert}), following mypy
+(\figref{mypy-restrictions}).}
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\figref{typing-cases}), which threads
