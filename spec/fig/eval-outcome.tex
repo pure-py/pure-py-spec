@@ -701,13 +701,13 @@
 \and
 \input{spec/rules/eval-call-nonfun}
 \and
-\inferrule*[lab={\ruleName{eval-attr-undef}}]
+\inferrule*[lab={\ruleName{eval-attr-nonobject}}]
 {
   \added{\rho, e \Rightarrow \val{v}} \\
   \added{v \text{ neither loaded module nor object}}
 }
 {
-  \added{\rho, \exAttr{e}{x} \Rightarrow \aborts{\errUndef}}
+  \added{\rho, \exAttr{e}{x} \Rightarrow \aborts{\errAttr}}
 }
 \end{mathpar}
 \caption{Expression evaluation, continued (aborting cases)}

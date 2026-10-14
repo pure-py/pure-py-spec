@@ -72,9 +72,9 @@ function $\iterOp$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux
 list, tuple or string, and the keys of a dictionary, as in Python. Subscripting, given by the auxiliary
 function $\getitem$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:getitem}}), indexes a list, tuple or
 string by an integer, counting from the end when negative, and a dictionary by a string key,
-aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name; a
-dictionary subscripted by a value other than a string is undefined. Likewise an attribute reference on a
-value other than a module or object \replaced{is undefined (\ruleName{eval-attr-undef});}{has no derivation:} \replaced{this version of \PurePy does not support the attributes given to other values by Python, such as the methods of a string}{the attributes of built-in values are undefined }.
+aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name\replaced{, and with $\errType$ for}{;} a
+dictionary subscripted by a value other than a string\deleted{ is undefined}. \replaced{An}{Likewise an } attribute reference on a
+value other than a module or object \replaced{aborts with $\errAttr$ (\ruleName{eval-attr-nonobject});}{has no derivation:} \replaced{this version of \PurePy does not support the attributes given to other values by Python, such as the methods of a string}{the attributes of built-in values are undefined }.
 
 \input{spec/fig/well-formed-values}
 
