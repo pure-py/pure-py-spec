@@ -5,7 +5,7 @@ verdict and the rule that enforces it.
 \input{spec/fig/mypy-restrictions}
 
 \begin{AddedBlock}
-mypy may also reject a well-formed program because of a known bug in mypy. In mypy~2.3.1 there is one such bug,
+mypy may also reject a well-formed program because of a known bug in mypy. There is one such bug,
 python/mypy\#22202.\footnote{\url{https://github.com/python/mypy/issues/22202}} When deciding whether a match is
 exhaustive, mypy does not use a Boolean value known from literals in the scrutinee, such as \pyinline{False} or
 \pyinline{(False,)[0]}, although it uses an integer or string value known in the same way. It therefore reports a

@@ -1,7 +1,8 @@
 INPUTS := $(wildcard tex/*.tex spec/*.tex spec/*/*.tex spec/*/*/*.tex paper/*.tex paper/*/*.tex)
 BIBFILES := $(wildcard tex/*.bib)
 PYTHON_VERSION_TEX := tex/python-version.tex
-TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX)
+MYPY_VERSION_TEX := tex/mypy-version.tex
+TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
 BUILD_AUX := *.aux *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
 AUX := $(BUILD_AUX) *.bbl
@@ -18,6 +19,10 @@ endef
 
 $(PYTHON_VERSION_TEX): .python-version
 	printf '\\newcommand*{\\pythonVersion}{%s}\n' "$$(cat $<)" > $@
+
+$(MYPY_VERSION_TEX): uv.lock
+	printf '\\newcommand*{\\mypyVersion}{%s}\n' \
+		"$$(sed -n '/^name = "mypy"$$/{n;s/^version = "\(.*\)"$$/\1/p;}' $<)" > $@
 
 %.pdf: %.tex $(TEXFILES)
 	$(PDFLATEX) $<
