@@ -2,5 +2,5 @@
 \label{sec:conformance-suite}
 
 The conformance suite pairs each test with the verdict given by Python itself, and runs on CPython,
-GraalPy, and Pyodide. \todo{Diagram showing the various kinds of test.} \todo{Reference interpreter, needed
+GraalPy, and Pyodide. \added{\figref{taxonomy} gives the directory holding the tests of each class of program. Tests of programs which are not syntactically valid Python are in \pyinline{python-error/syntactic/} and \pyinline{python-error/syntactic-only/}.} \todo{Reference interpreter, needed
 to detect dynamically excluded operations (\issue{64}).}
