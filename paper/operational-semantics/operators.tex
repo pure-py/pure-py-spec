@@ -5,7 +5,7 @@
 
 Structural equality $\eqOp{\Sigma}$ compares literals by value, lists and tuples elementwise, dictionaries with
 the same keys by their values, and objects of the same class by their fields. Values of different forms, such
-as a number and a string or a list and a tuple, are unequal. Equality \replaced{yields $\aborts{\errUndef}$}{is undefined } between a Boolean and a
+as a number and a string or a list and a tuple, are unequal. Equality is undefined between a Boolean and a
 number, which Python compares numerically, between functions, which Python compares by identity, and between
 two \pyinline{nan}s inside a container. Compared directly, \pyinline{nan == nan} is \pyinline{False} in both languages,
 but Python compares container elements by identity before equality, so two lists holding \pyinline{nan}s

@@ -73,8 +73,8 @@ list, tuple or string, and the keys of a dictionary, as in Python. Subscripting,
 function $\getitem$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:getitem}}), indexes a list, tuple or
 string by an integer, counting from the end when negative, and a dictionary by a string key,
 aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name; a
-dictionary subscripted by a value other than a string \replaced{aborts with $\errUndef$}{is undefined}. Likewise an attribute reference on a
-value other than a module or object \replaced{aborts with $\errUndef$, because}{has no derivation:} \replaced{\PurePy does not define the attributes of built-in values}{the attributes of built-in values are undefined }\added{ (\ruleName{eval-attr-undef})}.
+dictionary subscripted by a value other than a string is undefined. Likewise an attribute reference on a
+value other than a module or object \replaced{is undefined, because}{has no derivation:} \replaced{\PurePy does not define the attributes of built-in values}{the attributes of built-in values are undefined }\added{ (\ruleName{eval-attr-undef})}.
 
 \input{spec/fig/well-formed-values}
 
@@ -91,8 +91,8 @@ Whether a pattern matches is determined by the auxiliary function $\matchOp{\Sig
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:match}}). A \emph{match result} $m$ is
 $\matchOk{\rho'}$, a match, where $\rho'$ binds the variables of the pattern to the values that they matched,
 $\noMatch$, a failure to match, or $\replaced{\aborts{\errUndef}}{\undefinedResult}$, for a pattern and a value that are not comparable, such
-as a list pattern against a tuple, and for a literal pattern \replaced{if the equality of the literal and the value yields $\aborts{\errUndef}$}{whose comparison with the value is undefined}. When
-a match result is \replaced{$\aborts{\errUndef}$}{undefined}, \replaced{so is the value of $\dispatch$, and the run aborts with $\errUndef$ (\ruleName{eval-match-undef})}{$\dispatch$ has no value and the run has no result}.
+as a list pattern against a tuple, and for a literal pattern \replaced{if the equality of the literal and the value is undefined}{whose comparison with the value is undefined}. When
+a match result is undefined, \replaced{so are the value of $\dispatch$ and the run (\ruleName{eval-match-undef})}{$\dispatch$ has no value and the run has no result}.
 \begin{specdefinition}{Composition of match results}
 The match results of sub-patterns compose with
 $\override$, matching sequentially, so that the first failure or \replaced{abort}{undefined result } decides:
@@ -136,7 +136,7 @@ unbound, mirroring \ruleName{module} (\secref{well-formedness-modules})\paperonl
 A program evaluates to a termination kind (\figref{values}): $\errExit{0}$ if the main module
 loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exited with status $n$\paperonly{:}\speconly{.}
 \paperinput{paper/operational-semantics/program}%
-An implementation must agree with the semantics on the termination kind of every run\added{ that does not abort with $\errUndef$}; the form in
+An implementation must agree with the semantics on the termination kind of every run\added{ with defined behaviour}; the form in
 which the kind is reported is not prescribed.
 
 \specinput{spec/fig/eval-modules}
