@@ -7,7 +7,9 @@
 $\Sigma \vdash h : \tau$ & head $h$ has type $\tau$ & \figref{head-typing} \\
 $\Sigma \vdash k : \tau$ & shape $k$ has type $\tau$ & \figref{shape-typing} \\
 $\Sigma; \Gamma \vdash k, p \splits K, L$ & shape $k$ splits at the head tested by $p$, giving $K$ and $L$ & \figref{split} \\
-$\Sigma; \Gamma \vdash k, p \matches K, L$ & pattern $p$ matches shapes $K$ of $k$, leaving $L$ & \figref{typing-pat} \\
+$\Sigma; \Gamma \vdash k, p \matches K, L$ & pattern $p$ matches shapes $K$ of $k$, leaving $L$ & \figref{typing-pat-shape} \\
+$\Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L$ & patterns $\seq{p}$ match shapes $K$ of $\seq{k}$, leaving $L$ & \figref{typing-pat-seq} \\
+$\Sigma; \Gamma \vdash L, p \matches K, L'$ & pattern $p$ matches shapes $K$ of $L$, leaving $L'$ & \figref{typing-pat-set} \\
 $\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$ & $C[\seq{\sigma}]$ is the instance of $C$ at $\tau$ & \figref{instance} \\
 $\Sigma; \Gamma \vdash p \checks \tau \binding \Delta$ & pattern $p$ checks against type $\tau$, binding $\Delta$ & \figref{checking-pat} \\
 $\Gamma \vdash q : \theta$ & name $q$ denotes context entry $\theta$ & \figref{resolve-name} \\
