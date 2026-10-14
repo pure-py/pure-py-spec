@@ -2,5 +2,5 @@
 \label{sec:conformance-suite}
 
 The conformance suite pairs each test with the verdict given by Python itself, and runs on CPython,
-GraalPy, and Pyodide. \added{A test in \texttt{exception/type-checker/}, for example, is a program which raises an exception other than \pyinline{SyntaxError} under Python and is rejected by the \PurePy type checker; the directory of a test names the row of \figref{taxonomy} for the outcome under Python, followed by the column for the outcome under \PurePy. The tests in \texttt{syntactic-only/} have no row in the figure; each builds an abstract syntax tree for a form which cannot be expressed in Python source and checks that \PurePy rejects the form.} \todo{Reference interpreter, needed
+GraalPy, and Pyodide. \added{A test in \texttt{exception/type-checker/}, for example, is a program which raises an exception other than \pyinline{SyntaxError} under Python and is rejected by the \PurePy type checker; the directory of a test names the row of \figref{taxonomy} for the outcome under Python, followed by the column for the outcome under \PurePy. The tests in \texttt{syntactic-only/} have no row in the figure; each builds an abstract syntax tree for a form which cannot be expressed in Python source, and checks that \PurePy rejects the form.} \todo{Reference interpreter, needed
 to detect dynamically excluded operations (\issue{64}).}
