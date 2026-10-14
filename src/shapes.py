@@ -17,6 +17,7 @@ from type_syntax import (
     TupleType,
     Type,
     UnionType,
+    float_literal,
 )
 
 # A head: a literal, a class, or a length n standing for the head list_n.
@@ -104,6 +105,8 @@ def head_typed(Sigma: ClassTable, h: Head, tau: Type) -> bool:
     match h:
         case ClassName():
             return instance_below(Sigma, h, tau) is not None
+        case Literal() if float_literal(h):
+            return subtype(Sigma, Primitive.FLOAT, tau)
         case Literal():
             return subtype(Sigma, LiteralType(h), tau)
         case int():

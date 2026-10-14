@@ -83,9 +83,16 @@ class Literal:
         return hash((type(self.value).__name__, self.value))
 
 
+def float_literal(ell: Literal) -> bool:
+    return isinstance(ell.value, float)
+
+
 @dataclass(frozen=True)
 class LiteralType:
     ell: Literal
+
+    def __post_init__(self) -> None:
+        assert not float_literal(self.ell)
 
 
 @dataclass(frozen=True)
@@ -342,7 +349,7 @@ def literal(e: ast.expr) -> Literal | None:
 
 def literal_type(e: ast.expr) -> LiteralType | None:
     ell = literal(e)
-    return None if ell is None else LiteralType(ell)
+    return None if ell is None or float_literal(ell) else LiteralType(ell)
 
 
 def parse_callable(args: tuple[ast.expr, ...]) -> TypeExpr | None:

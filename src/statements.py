@@ -95,7 +95,8 @@ from type_syntax import (
     UnionType,
     Var,
     base_type,
-    literal_type,
+    float_literal,
+    literal,
     parse_annotation,
     subscript_args,
     substitute,
@@ -411,9 +412,9 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             assert tau is not None
             return tau
         case ast.Constant():
-            tau = literal_type(e)
-            assert tau is not None
-            return tau
+            ell = literal(e)
+            assert ell is not None
+            return Primitive.FLOAT if float_literal(ell) else LiteralType(ell)
         case ast.Lambda():
             raise IllFormedModule(e, reasons.NotSynthesised())
         case ast.Call(func=ast.Subscript(value=e_)) if class_of_name(e_, mod_ctx) is not None:
