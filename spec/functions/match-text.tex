@@ -1,5 +1,5 @@
 Result of matching pattern $p$ against value $v$ under environment $\rho$: the bindings of the pattern
 variables if $p$ matches $v$, and $\noMatch$ if it does not. The result is $\errUndef$ for\deleted{ a list
 pattern against a tuple or a tuple pattern against a list, which Python matches as sequences and which are
-excluded statically by \PurePy (\figref{coercions}), and for} a \added{number }literal pattern if the equality of the literal and the value is undefined.\added{ A Boolean literal pattern does not match a number, since Python compares the value with the literal by identity.} Sub-patterns are matched left to right, their results composing with $\override$
+excluded statically by \PurePy (\figref{coercions}), and for} a \added{numeric }literal pattern if the equality of the literal and the value is undefined.\added{ A Boolean literal pattern does not match a number, since Python compares the value with the literal by identity.} Sub-patterns are matched left to right, their results composing with $\override$
 (\secref{eval-patterns}).

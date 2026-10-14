@@ -113,7 +113,7 @@ def map_tree(f: Callable[[ast.AST], ast.AST], node: ast.AST) -> ast.AST:
 
 
 def fold_negative(node: ast.AST) -> ast.AST:
-    """Unary minus applied to a number literal is a literal."""
+    """Unary minus applied to a numeric literal is a literal."""
     match node:
         case ast.UnaryOp(op=ast.USub(), operand=ast.Constant(value=n)) if isinstance(
             n, (int, float)
