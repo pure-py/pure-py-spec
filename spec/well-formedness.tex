@@ -216,7 +216,7 @@ The values of an \emph{equality type} are compared by structural equality, which
 \end{specdefinition}
 
 \noindent A callable type is not an equality type, and neither is any type with a callable component, so
-comparing two functions is rejected statically. The final rule of each table closes the
+comparing two functions is rejected statically. \added{A type variable is also not an equality type, because it may stand for any type.} The final rule of each table closes the
 judgement under base-typing, letting \pyinline{1 == 0} use the equality overload at \pyinline{int}, since
 two distinct literal types are not comparable; \pyinline{2 ** 3} is still an \pyinline{int}, since the
 direct instance's bounds $(\tyInt, \tyLiteral{3})$ lie below the base instance's
