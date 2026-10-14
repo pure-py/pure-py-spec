@@ -32,16 +32,16 @@ $o$ & $::=$ & $\assigns{\rho}$ & (Assigns) \\
 \grammarGroup{Results} \\
 $r$ & $::=$ & $\val{v}$ & (Val) \\
   & $\mid$ & $\aborts{\kappa}$ & (Aborts) \\
-  & $\mid$ & $\undefinedResult$ & (Undefined)
+  & \deleted{$\mid$} & \deleted{$\undefinedResult$} & \deleted{(Undefined)}
    \\[3mm]
 \grammarGroup{Match results} \\
 $m$ & $::=$ & $\matchOk{\rho}$ & (Match) \\
   & $\mid$ & $\noMatch$ & (NoMatch) \\
-  & $\mid$ & $\undefinedResult$ & (Undefined)
+  & $\mid$ & $\replaced{\aborts{\errUndefined}}{\undefinedResult}$ & (Undefined)
    \\[3mm]
 \grammarGroup{Termination kinds} \\
 $\kappa$ & $::=$ & $\errType \mid \errIndex \mid \errKey \mid \errZeroDiv$ &  \\
-    & $\mid$ & $\errAssertNoMsg \mid \errAssert{w} \mid \errAttr \mid \errExit{n}$ &
+    & $\mid$ & $\errAssertNoMsg \mid \errAssert{w} \mid \errAttr \mid \errExit{n} \added{\mid \errUndefined}$ &
 \end{tabular}
 \end{center}
 \caption{Values, environments, outcomes and results}
