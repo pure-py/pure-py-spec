@@ -187,9 +187,9 @@ each iteration.
 \speconly{\subsubsection{Operators}\label{sec:well-formedness-operators}}%
 \paperonly{\paragraph{Operators.}}
 
-\input{spec/fig/operator-overloads}
+\specinput{spec/fig/operator-overloads}
 
-Each operator is overloaded as specified in \figref{operator-overloads}. The operator \pyinline{|} has no overloads, so an expression $\exBinOp{e}{\pyinline{|}}{e'}$ does not synthesise a type; the operator occurs only within type expressions, where $\tyUnion{\psi}{\psi'}$ denotes a union (\ruleName{ty-union}).
+Each operator is overloaded as specified in \speconly{\figref{operator-overloads}}\paperonly{\specification}. The operator \pyinline{|} has no overloads, so an expression $\exBinOp{e}{\pyinline{|}}{e'}$ does not synthesise a type; the operator occurs only within type expressions, where $\tyUnion{\psi}{\psi'}$ denotes a union (\ruleName{ty-union}).
 
 \begin{specdefinition}{Resolved overload}
 A \emph{resolved overload}
@@ -216,13 +216,13 @@ The values of an \emph{equality type} are compared by structural equality, which
 \end{specdefinition}
 
 \noindent A callable type is not an equality type, and neither is any type with a callable component, so
-comparing two functions is rejected statically. The final rule of each table closes the
+comparing two functions is rejected statically.\speconly{ The final rule of each table closes the
 judgement under base-typing, letting \pyinline{1 == 0} use the equality overload at \pyinline{int}, since
 two distinct literal types are not comparable; \pyinline{2 ** 3} is still an \pyinline{int}, since the
 direct instance's bounds $(\tyInt, \tyLiteral{3})$ lie below the base instance's
 $(\tyFloat, \tyFloat)$. For this operator the \ruleName{binop} rule is more precise than mypy, whose
 overloads give \pyinline{Any} whenever the exponent is not a literal, whereas the most specific overload resolves to
-\pyinline{float}.
+\pyinline{float}.}
 
 \begin{lemma}[Most specific overload]
 \label{lem:most-specific-overload}
