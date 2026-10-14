@@ -1,5 +1,5 @@
 % Rows of the auxiliary-functions index; the auxindex environment supplies the table.
-\auxgroup{Syntactic analyses}
+\auxgroup{Functions on syntax}
 \auxrow{$\assignsS(t)$}{set of variables}{variables declared or assigned in $t$, not descending into nested functions}{aux:assigns}
 \auxrow{$\declaresS(t)$, $\declaresS(\seq{\iota})$}{sequence of variables}{names declared in $t$, or bound by imports $\seq{\iota}$, in order and with repeats, not descending into nested functions}{aux:declares}
 \auxrow{$\typeEntry{\Gamma}(q, \seq{\chi}, i)$, $\typeEntry{\Gamma}(q, \seq{\chi})$}{context entry, or sequence of context entries}{context entry associated with definition $\chi_i$ of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$, or with each definition of $\seq{\chi}$}{aux:type-entry}
@@ -11,7 +11,7 @@
 \auxrow{$\captures(\seq{g})$}{set of variables}{variables of enclosing scope captured by lambdas in qualifiers $\seq{g}$}{aux:captures}
 \specauxrow{$\fv(e)$, $\fv(\seq{e})$, $\fv(\tau)$}{set of variables}{free variables of expression $e$, or of each expression in $\seq{e}$; type variables of type $\tau$}{aux:fv}
 \noalign{\vskip 2mm}
-\auxgroup{Types}
+\auxgroup{Functions on types and shapes}
 \auxrow{$\baseType(\ell)$, $\baseType(\tau)$}{type}{base type of literal $\ell$, or of type $\tau$}{aux:base-type}
 \auxrow{$\joinTy{\Sigma}{\sigma}{\tau}$, $\bigJoinTy{\Sigma}{\seq{\tau}}$}{type}{larger type if comparable, and union otherwise}{aux:join}
 \auxrow{$\meetTy{\Sigma}{\sigma}{\tau}$}{type}{greatest type below both}{aux:meet}
