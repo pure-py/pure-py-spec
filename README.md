@@ -55,6 +55,7 @@ directory holding `main.py`, the expectation files of `main.py` and the other mo
 - `excluded/`: accepted by Python but excluded by PurePy, in `syntactic/` at parse, in `static/` at check and in `dynamic/` at run time
 - `python-error/`: rejected by both languages, with stages as above plus `syntactic-only/`, whose tests construct the form as an AST because Python source cannot express the form
 - `semantically-valid/pending/`: not yet accepted by the checker
+- `semantically-valid/mypy-bug/`: semantically valid, but rejected by mypy because of a known mypy bug; the runner fails a test once mypy accepts it
 
 The runner requires an `excluded` test to run under Python and a `python-error` test to raise, so a test has
 either `.expected` or `.exception.expected` and a misfiled test fails. A test that exits with a nonzero status
