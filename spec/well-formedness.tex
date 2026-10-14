@@ -284,7 +284,8 @@ definitions and modules introduce the variables of the scope as unbound, using t
 
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}). \added{In a function body, an assertion of the literal \pyinline{False} has outcome $\Returns$ (\ruleName{assert-false},
-\ruleName{assert-false-msg}), so that a path ending in such an assertion needs no \pyinline{return}. The two rules
+\ruleName{assert-false-msg}), so that such an assertion may end a path through the function in place of a
+\pyinline{return}. The two rules
 apply only to the literal and not to other expressions of type \pyinline{Literal[False]}, following mypy, which does
 not treat an assertion of any other expression as ending a path through the function (\figref{mypy-restrictions}).}
 
