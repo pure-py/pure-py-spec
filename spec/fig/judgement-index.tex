@@ -4,8 +4,8 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.55\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}}
 \textbf{Judgement} & \textbf{Reading} & \textbf{Defined in} \\[1mm]
 \metaGroup{Well-formedness} \\
-$\Sigma \vdash h : \tau$ & head $h$ has type $\tau$ & \figref{shapes} \\
-$\Sigma \vdash k : \tau$ & shape $k$ has type $\tau$ & \figref{shapes} \\
+$\Sigma \vdash h : \tau$ & head $h$ has type $\tau$ & \figref{head-typing} \\
+$\Sigma \vdash k : \tau$ & shape $k$ has type $\tau$ & \figref{shape-typing} \\
 $\Sigma; \Gamma \vdash k, p \splits K, L$ & shape $k$ splits at the head tested by $p$, giving $K$ and $L$ & \figref{split} \\
 $\Sigma; \Gamma \vdash k, p \matches K, L$ & pattern $p$ matches shapes $K$ of $k$, leaving $L$ & \figref{typing-pat} \\
 $\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$ & $C[\seq{\sigma}]$ is the instance of $C$ at $\tau$ & \figref{instance} \\
