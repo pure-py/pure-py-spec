@@ -90,8 +90,7 @@ $\dispatch$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:dispat
 Whether a pattern matches is determined by the auxiliary function $\matchOp{\Sigma}(\rho, p, v)$
 (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:match}}). A \emph{match result} $m$ is
 $\matchOk{\rho'}$, a match, where $\rho'$ binds the variables of the pattern to the values that they matched,
-$\noMatch$, a failure to match, or $\errUndef$, for\deleted{ a pattern and a value that are not comparable, such
-as a list pattern against a tuple, and for} a \added{numeric }literal pattern if the equality of the literal and the value is undefined. When
+$\noMatch$, a failure to match, or $\errUndef$, for a numeric literal pattern if the equality of the literal and the value is undefined. When
 a match result is undefined, the value of $\dispatch$ is also undefined, and the run has undefined behaviour (\ruleName{eval-match-undef}).
 \begin{specdefinition}{Composition of match results}
 The match results of sub-patterns compose with

@@ -1,9 +1,9 @@
 
 For example, a list pattern matches a list of the same length elementwise, composing the match results of the
-sub-patterns\deleted{, and is undefined against a tuple, which Python would match as a sequence (\secref{no-coercions})}:
+sub-patterns:
 \begin{defalign}
 \input{spec/functions/match-list}
 \end{defalign}
-A list of another length, or \replaced{any other value}{a value that is neither a list nor a tuple }, falls to the final case of the
+A list of another length, or any other value, falls to the final case of the
 function, which gives $\noMatch$.
 
