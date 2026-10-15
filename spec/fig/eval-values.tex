@@ -1,48 +1,9 @@
 \begin{figure}
 \small
+\paperonly{\footnotesize}
 \begin{center}
-\begin{tabular}{rcll}
-\grammarGroup{Values} \\
-$v$ & $::=$ & $\ell$ & (Literal) \\
-    & $\mid$ & $\exList{v_1, \ldots, v_n}$ & (List) \\
-    & $\mid$ & $\exTuple{v_1, \ldots, v_n}$ & (Tuple) \\
-    & $\mid$ & $\exDict{\delta}$ & (Dict) \\
-    & $\mid$ & $\exLamClosure[\Gamma]{\rho}{\seq{x}}{e}$ & (LambdaClosure) \\
-    & $\mid$ & $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$ & (DefClosure) \\
-    & $\mid$ & $\exObj{C}{\bind{x_1}{v_1} \cons \ldots \cons \bind{x_n}{v_n}}$ & (Object) \\
-    & $\mid$ & $\modStub{q}$ & (ModuleStub) \\
-    & $\mid$ & $\modLoaded{q}{\rho}$ & (LoadedModule) \\
-    & $\mid$ & $\Type{C}$ & (Class) \\
-    & $\mid$ & $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ & (TypeAlias) \\
-    & $\mid$ & $\Unbound$ & (Unbound) \\
-    & $\mid$ & $\primVal{\primFn}$ & (Primitive) \\
-    & $\mid$ & $\opaqueVal{q.x}$ & (Opaque)
-   \\[3mm]
-\grammarGroup{Environments} \\
-$\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & 
-   \\[3mm]
-\grammarGroup{Dictionary entries} \\
-$\delta$ & $::=$ & $\bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}$ &
-   \\[3mm]
-\grammarGroup{Outcomes} \\
-$o$ & $::=$ & $\assigns{\rho}$ & (Assigns) \\
-  & $\mid$ & $\returns{v}$ & (Returns) \\
-  & $\mid$ & $\aborts{\kappa}$ & (Aborts)
-   \\[3mm]
-\grammarGroup{Results} \\
-$r$ & $::=$ & $\val{v}$ & (Val) \\
-  & $\mid$ & $\aborts{\kappa}$ & (Aborts) \\
-  &  &  & 
-   \\[3mm]
-\grammarGroup{Match results} \\
-$m$ & $::=$ & $\matchOk{\rho}$ & (Match) \\
-  & $\mid$ & $\noMatch$ & (NoMatch) \\
-  & $\mid$ & $\errUndef$ & (Undefined)
-   \\[3mm]
-\grammarGroup{Termination kinds} \\
-$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \errKey \mid \errZeroDiv$ &  \\
-    & $\mid$ & $\errAssertNoMsg \mid \errAssert{w} \mid \errAttr \mid \errExit{n} \mid \errUndef$ &
-\end{tabular}
+\input{spec/grammar/values}\paperonly{\hfill}\speconly{\\[3mm]}
+\input{spec/grammar/results}
 \end{center}
 \caption{Values, environments, outcomes and results}
 \label{fig:values}

@@ -1,0 +1,23 @@
+\begin{tabular}[t]{rcll}
+\grammarGroup{Values} \\
+$v$ & $::=$ & $\ell$ & \speconly{(Literal)} \\
+    & $\mid$ & $\exList{v_1, \ldots, v_n}$ & \speconly{(List)} \\
+    & $\mid$ & $\exTuple{v_1, \ldots, v_n}$ & \speconly{(Tuple)} \\
+    & $\mid$ & $\exDict{\delta}$ & \speconly{(Dict)} \\
+    & $\mid$ & $\exLamClosure[\Gamma]{\rho}{\seq{x}}{e}$ & \speconly{(LambdaClosure)} \\
+    & $\mid$ & $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$ & \speconly{(DefClosure)} \\
+    & $\mid$ & $\exObj{C}{\bind{x_1}{v_1} \cons \ldots \cons \bind{x_n}{v_n}}$ & \speconly{(Object)} \\
+    & $\mid$ & $\modStub{q}$ & \speconly{(ModuleStub)} \\
+    & $\mid$ & $\modLoaded{q}{\rho}$ & \speconly{(LoadedModule)} \\
+    & $\mid$ & $\Type{C}$ & \speconly{(Class)} \\
+    & $\mid$ & $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ & \speconly{(TypeAlias)} \\
+    & $\mid$ & $\Unbound$ & \speconly{(Unbound)} \\
+    & $\mid$ & $\primVal{\primFn}$ & \speconly{(Primitive)} \\
+    & $\mid$ & $\opaqueVal{q.x}$ & \speconly{(Opaque)}
+   \\[3mm]
+\grammarGroup{Environments} \\
+$\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & 
+   \\[3mm]
+\grammarGroup{Dictionary entries} \\
+$\delta$ & $::=$ & $\bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}$ &
+\end{tabular}
