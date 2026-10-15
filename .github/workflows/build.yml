@@ -3,8 +3,11 @@ name: Build
 on:
   workflow_dispatch:
   push:
+    # A change to the paper alone is built by the Paper workflow.
     paths-ignore:
       - README.md
+      - paper.tex
+      - paper/**
 
 concurrency:
   group: build-${{ github.ref }}
