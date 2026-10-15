@@ -75,7 +75,8 @@
   \newcommand*{\specification}{the \PurePy specification\xspace}
   \newcommand*{\specificationavailability}{accompanies this paper}
 \fi
-% References from the paper into the specification, numbered with the prefix \specmark. The numbers come from the specification's labels, read by
+% References from the paper into the specification, marked by the external-link icon \specmark after the number. The
+% numbers come from the specification's labels, read by
 % xr-hyper under the prefix S-; each link opens the released PDF at the destination named after the label
 % (hyperref's destlabel option). The anonymised paper does not link, since the release URL names the project.
 \newcommand*{\specurl}{https://github.com/pure-py/pure-py-spec/releases/download/v\versionstring/PurePy-spec.pdf}
@@ -84,12 +85,12 @@
 \else
   \newcommand*{\speclink}[2]{\href{\specurl\##1}{#2}}
 \fi
-% Prefix marking a number as the specification's, as in Figure S2.4
-\newcommand*{\specmark}{\textsf{\textbf{S}}}
-\newcommand*{\specfigref}[1]{\speclink{fig:#1}{Figure~\specmark\ref*{S-fig:#1}}}
-\newcommand*{\specfigrefTwo}[2]{Figures~\speclink{fig:#1}{\specmark\ref*{S-fig:#1}} and \speclink{fig:#2}{\specmark\ref*{S-fig:#2}}}
+% Icon marking a number as the specification's (fontawesome5, loaded by the paper)
+\newcommand*{\specmark}{\,{\scriptsize\faExternalLink*}}
+\newcommand*{\specfigref}[1]{\speclink{fig:#1}{Figure~\ref*{S-fig:#1}\specmark}}
+\newcommand*{\specfigrefTwo}[2]{Figures~\speclink{fig:#1}{\ref*{S-fig:#1}\specmark} and \speclink{fig:#2}{\ref*{S-fig:#2}\specmark}}
 % A section, chapter or annex of the specification, by its full label
-\newcommand*{\specref}[1]{\speclink{#1}{\S\specmark\ref*{S-#1}}}
+\newcommand*{\specref}[1]{\speclink{#1}{\S\ref*{S-#1}\specmark}}
 \newcommand*{\version}[3]{%
   \gdef\versionstring{#1.#2.#3}%
 }
