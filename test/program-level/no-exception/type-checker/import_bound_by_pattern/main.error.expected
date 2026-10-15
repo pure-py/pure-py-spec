@@ -1,1 +1,1 @@
-main.py: 'x' is already declared
+main.py:4:0: 'x' is already declared

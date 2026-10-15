@@ -1,9 +1,9 @@
 import ast
-import sys
 from collections.abc import Callable
 
 from .syntax_utils import is_import, split_imports
 from .type_syntax import (
+    Name,
     TypeName,
     parse_annotation,
 )
@@ -21,6 +21,7 @@ OP_SYMBOLS: dict[type, str] = {
 class Unsupported(Exception):
     exit_code: int  # overridden by subclass
     msg: str
+    module: Name | None = None
 
     def __init__(self, node: ast.AST, msg: str):
         self.line: int | None = getattr(node, "lineno", None)
@@ -522,32 +523,9 @@ def check_syntax_module(node: ast.Module) -> Unsupported | None:
         return e
 
 
-def check_file(filename: str) -> Unsupported | None:
-    with open(filename) as f:
-        source = f.read()
-    return check_syntax_module(parse(source, filename))
-
-
 def format_result(result: Unsupported | None, filename: str) -> str:
     if result is None:
         return f"{filename}: ok"
     if result.line is not None:
         return f"{filename}:{result.line}:{result.col}: {result.msg}"
     return f"{filename}: {result.msg}"
-
-
-def main() -> None:
-    if len(sys.argv) < 2:
-        print("Usage: syntax.py <file.py> [<file.py> ...]")
-        sys.exit(1)
-    exit_code = 0
-    for filename in sys.argv[1:]:
-        result = check_file(filename)
-        print(format_result(result, filename))
-        if result is not None:
-            exit_code = result.exit_code
-    sys.exit(exit_code)
-
-
-if __name__ == "__main__":
-    main()

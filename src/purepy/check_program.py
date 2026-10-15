@@ -3,7 +3,7 @@ import pathlib
 from collections.abc import Iterator, Mapping
 
 from . import syntax
-from .check_module import check_module
+from .check_module import check_module, format_result
 from .classes import PREDEFINED_CLASSES
 from .contexts import MAIN, PREDEFINED_MODULES
 from .reasons import IllFormed, IllFormedModule
@@ -25,12 +25,9 @@ def parse(path: pathlib.Path) -> ast.Module:
     try:
         m = syntax.parse(source, str(path))
     except SyntaxError as e:
-        error = syntax.ParseError(e)
-        error.msg = f"{path}: {error.msg}"
-        raise error from e
+        raise syntax.ParseError(e) from e
     unsupported = syntax.check_syntax_module(m)
     if unsupported is not None:
-        unsupported.msg = f"{path}: {unsupported.msg}"
         raise unsupported
     return m
 
@@ -70,7 +67,11 @@ class Program(Mapping[Name, ast.Module]):
         if q not in self.names:
             raise KeyError(q)
         if q not in self.parsed:
-            self.parsed[q] = parse(self.path(q))
+            try:
+                self.parsed[q] = parse(self.path(q))
+            except syntax.Unsupported as e:
+                e.module = q
+                raise
         return self.parsed[q]
 
     def __iter__(self) -> Iterator[Name]:
@@ -85,8 +86,22 @@ def check_program(entry_path: pathlib.Path) -> IllFormed | syntax.Unsupported | 
     try:
         check_module(program[MAIN], program, MAIN, PREDEFINED_CLASSES)
         return None
-    except IllFormedModule as e:
-        e.msg = f"{program.path(e.module or MAIN)}: {e.msg}"
-        return e
     except (IllFormed, syntax.Unsupported) as e:
         return e
+
+
+# File of the module at fault, or of the entry module for a program-level error
+def error_path(result: IllFormed | syntax.Unsupported, entry_path: pathlib.Path) -> pathlib.Path:
+    q = result.module if isinstance(result, (IllFormedModule, syntax.Unsupported)) else None
+    if q is None or q == MAIN:
+        return entry_path
+    path = module_path(q, entry_path.parent)
+    assert path is not None
+    return path
+
+
+def format_program_result(
+    result: IllFormed | syntax.Unsupported | None, entry_path: pathlib.Path
+) -> str:
+    path = entry_path if result is None else error_path(result, entry_path)
+    return format_result(result, str(path))

@@ -3,7 +3,7 @@ import pathlib
 import sys
 
 from .check_module import check_file, format_result
-from .check_program import check_program
+from .check_program import check_program, format_program_result
 
 
 def main() -> None:
@@ -22,7 +22,7 @@ def main() -> None:
         print(format_result(result, str(args.path)))
     else:
         result = check_program(args.path)
-        print(f"{args.path}: ok" if result is None else result.msg)
+        print(format_program_result(result, args.path))
 
     sys.exit(0 if result is None else result.exit_code)
 
