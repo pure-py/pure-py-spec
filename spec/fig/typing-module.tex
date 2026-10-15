@@ -107,17 +107,7 @@
   \Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma
 }
 \and
-\inferrule*[lab={\ruleName{module}}]
-{
-  \mathcal{M}(q) = \seq{\iota}\;t \\
-  \mathcal{P}(\pyinline{builtins}) = (\Gamma, \rho) \\
-  \Sigma; q \vdash \seq{\iota} : \Gamma' \binding \Sigma^\dagger \\
-  \Sigma^\dagger; q; \Gamma \override \Gamma' \mathbin{\override} \scopeS(\set{\declaresS(\seq{\iota})}, t) \vdash t : \Assigns{\Delta} \binding \Sigma' \\
-  (\dom(\Gamma') \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
-}
-{
-  \Sigma \vdash_{\mathsf{mod}} q : \submods(q) \override \Delta \binding \Sigma'
-}
+\input{spec/rules/module}
 \end{mathpar}
 
 \flushleft \shadebox{$\vdash \mathcal{M}$}

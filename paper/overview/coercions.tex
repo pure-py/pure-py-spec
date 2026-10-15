@@ -4,9 +4,8 @@ The test of an \pyinline{if} or \pyinline{assert} must be a \pyinline{bool}, an 
 \pyinline{str}, and dictionary keys must be strings, whereas Python accepts any value in each of these
 positions. The operands of \pyinline{==} and \pyinline{!=} must have comparable types, so \pyinline{1 == "1"} is
 rejected rather than giving \pyinline{False}. The types \pyinline{bool} and \pyinline{int} are not comparable,
-so \pyinline{True == 1} is also rejected, although Python compares Booleans as numbers. Callable types are not
-equality types, so comparisons of functions are rejected; Python compares functions by identity, so two
-textually identical lambdas are unequal. A list pattern at a tuple type does not match any value, and its case
+so \pyinline{True == 1} is also rejected, although Python compares Booleans as numbers. Python compares functions by identity, so two textually
+identical lambdas are unequal, and \PurePy rejects comparisons of functions. A list pattern at a tuple type does not match any value, and its case
 is rejected as unreachable, although Python matches list and tuple patterns against both lists and tuples; the
 same holds for a tuple pattern at a list type. A class pattern must give a sub-pattern for each field of the
 class, whereas Python ignores the remaining fields.

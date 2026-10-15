@@ -100,7 +100,7 @@ literal $\ell$ synthesises the literal type $\tyLiteral{\ell}$, except for a flo
 
 \specinput{spec/fig/typing-synth}
 
-The fields of a class $C$ form a field scheme $\fields{\Sigma}(C)$ over its type parameters, with one binding $\bind{x}{\tau}$ per
+\speconly{The fields of a class $C$ form a field scheme $\fields{\Sigma}(C)$ over its type parameters, with one binding $\bind{x}{\tau}$ per
 field: the fields of its base class first, recursively and instantiated at the type arguments of the base, then the fields declared by $C$ itself, each at its
 declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the instantiation $\tyInst{\fields{\Sigma}(C)}{\seq{\tau}}$. The order matters, because a constructor call pairs positional arguments with fields by
 position. A call $\exCall{q}{a}$ is a constructor call if $q$ denotes a class. A constructor call pairs each argument with a field using $\fieldMap{\Sigma}$ and
@@ -116,7 +116,7 @@ $\exAttr{e}{x}$ resolves as a qualified name to a definitely assigned member
 (\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}. A variable bound to a module or
 class is not an expression on its own, and occurs only as the head of a qualified
 name\paperonly{ (\secref{no-first-class})}.
-In a subscript $\exSubscript{e}{e'}$ there is a rule for each container that $e$ can synthesise: a list
+}In a subscript $\exSubscript{e}{e'}$ there is a rule for each container that $e$ can synthesise: a list
 (\ruleName{subscript-list}) or string (\ruleName{subscript-str}) with $e'$ of type \pyinline{int}, and a
 dictionary with $e'$ of type \pyinline{str} (\ruleName{subscript-dict}). Tuples have three rules: an index
 that synthesises a literal type gives the component type at that position, counting from the end when the index
@@ -142,8 +142,7 @@ by a one-way unification of each parameter type with the synthesised type, in wh
 unknowns: a type parameter takes the type found at the same
 position in the synthesised type, with one found at several positions taking the join of those types.
 Arguments that do not synthesise, such as lambdas, are left out. The parameter and result types are
-instantiated at the type arguments given by the context, which must bind every type parameter.
-
+instantiated at the type arguments given by the context, which must bind every type parameter\paperonly{\added{:}}\speconly{.}
 \paperinput{paper/well-formedness/callee-scheme}%
 
 Lambdas, applied lambdas, lists, tuples, dictionaries, conditional expressions and comprehensions check
@@ -162,7 +161,7 @@ do not apply to names bound at \pyinline{Callable} types, although they would co
 \paperinput{paper/well-formedness/lambda}%
 \specinput{spec/fig/typing-check}
 
-The forms that synthesise are conditional expressions when a branch
+\speconly{The forms that synthesise are conditional expressions when a branch
 synthesises, at the join of the two types when both branches synthesise and otherwise at the
 synthesising branch's type, the other branch checking against it (\ruleName{cond-syn});
 tuples when every component synthesises (\ruleName{syn-tuple}); comprehensions when the body
@@ -177,9 +176,9 @@ exception, since the arguments give the parameter types, and the call then synth
 or checks the body against an expected type (\ruleName{call-lambda-syn}, \ruleName{call-lambda}). The parameters of a
 lambda must be distinct, as for a function. A non-empty list has both, and the
 checking rule is still needed when the expected element type is wider than the type synthesised by the
-elements, since \pyinline{list} is invariant.
+elements, since \pyinline{list} is invariant.}
 
-Typing a comprehension types its qualifiers, which bind the variables that can be used in the body\speconly{
+\speconly{Typing a comprehension types its qualifiers, which bind the variables that can be used in the body\speconly{
 (\figref{typing-check})}. A generator's variable is bound at $\elemTy{\Sigma}$ of the type synthesised by the
 iterated expression\speconly{ (\S\ref{aux:elem-type})}. A
 tuple is iterated at the join of the base types of its components.
@@ -187,27 +186,27 @@ A lambda within a comprehension may not capture a generator variable, a side con
 \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}. Python closures are
 late-binding and the comprehension rebinds the variable on each iteration, so the lambda would see the
 variable's final value; in \PurePy a lambda is only able to see the value of the generator variable at
-each iteration.
+each iteration.}
 
 \speconly{\subsubsection{Operators}\label{sec:well-formedness-operators}}%
 \paperonly{\paragraph{Operators.}}
 
 \specinput{spec/fig/operator-overloads}
 
-Each operator is overloaded as specified in \speconly{\figref{operator-overloads}}\paperonly{\added{\specification}}. The operator \pyinline{|} has no overloads, so an expression $\exBinOp{e}{\pyinline{|}}{e'}$ does not synthesise a type; the operator occurs only within type expressions, where $\tyUnion{\psi}{\psi'}$ denotes a union (\ruleName{ty-union}).
+Each operator is overloaded as specified in \speconly{\figref{operator-overloads}}\paperonly{\added{\specification}}. \speconly{The operator \pyinline{|} has no overloads, so an expression $\exBinOp{e}{\pyinline{|}}{e'}$ does not synthesise a type; the operator occurs only within type expressions, where $\tyUnion{\psi}{\psi'}$ denotes a union (\ruleName{ty-union}).}
 
-\begin{specdefinition}{Resolved overload}
+\speconly{\begin{specdefinition}{Resolved overload}
 A \emph{resolved overload}
 $((\tau_1, \tau_2), \tau)$ pairs operand \emph{bounds}
 with a result type; the judgements of the figure relate operand
 types to the resolved overloads of an operator.
-\end{specdefinition}
+\end{specdefinition}}
 
 The \ruleName{binop} and \ruleName{unop} rules\speconly{ (\figref{typing-synth})} take the result type
 of the most specific overload at the operand types, $\resolveOp{\Sigma}$\speconly{ (\S\ref{aux:resolve-op})}, so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
-\begin{specdefinition}{Equality type}
+\speconly{\begin{specdefinition}{Equality type}
 The values of an \emph{equality type} are compared by structural equality, which is defined except at the dynamically excluded comparisons (\secref{no-coercions}):
 \begin{defalign}
 & \Sigma \vdash \nu \eqType \\
@@ -218,10 +217,10 @@ The values of an \emph{equality type} are compared by structural equality, which
 & \Sigma \vdash \tyUnion{\sigma}{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \sigma \eqType \text{ and } \Sigma \vdash \tau \eqType \\
 & \Sigma \vdash C[\seq{\sigma}] \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \tyInst{\fields{\Sigma}(C)}{\seq{\sigma}}
 \end{defalign}
-\end{specdefinition}
+\end{specdefinition}}
 
-\noindent Callable types are not equality types, and neither are types with a callable component, so
-comparisons of functions are rejected statically. Type variables are not equality types either, since they may stand for any type.\speconly{ The final rule of each table closes the
+\speconly{\noindent Callable types are not equality types, and neither are types with a callable component, so
+comparisons of functions are rejected statically. Type variables are not equality types either, since they may stand for any type.}\speconly{ The final rule of each table closes the
 judgement under base-typing, letting \pyinline{1 == 0} use the equality overload at \pyinline{int}, since
 two distinct literal types are not comparable; \pyinline{2 ** 3} is still an \pyinline{int}, since the
 direct instance's bounds $(\tyInt, \tyLiteral{3})$ lie below the base instance's
@@ -229,12 +228,12 @@ $(\tyFloat, \tyFloat)$. For this operator the \ruleName{binop} rule is more prec
 overloads give \pyinline{Any} whenever the exponent is not a literal, whereas the most specific overload resolves to
 \pyinline{float}.}
 
-\begin{lemma}[Most specific overload]
+\speconly{\begin{lemma}[Most specific overload]
 \label{lem:most-specific-overload}
 If neither $\sigma_1$ nor $\sigma_2$ is a subtype of \pyinline{Never} and some overload of $\odot$ applies at
 $(\sigma_1, \sigma_2)$, then $\resolveOp{\Sigma}(\odot, \sigma_1, \sigma_2)$ is defined, and similarly for
 $\resolveOp{\Sigma}(\ominus, \sigma)$.
-\end{lemma}
+\end{lemma}}
 
 \subsection{Statements}
 \label{sec:well-formedness-statements}
@@ -271,22 +270,22 @@ optional return type $\zeta$, statement $s$ has static outcome $R$\speconly{ (\f
 A sequence $s\;s'$ (\ruleName{seq}) types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
 by $s$. A conditional combines its
 branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch (\ruleName{if}, \ruleName{if-else}).
-A
+\speconly{A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
 \pyinline{return} requires $\tau$ to be equivalent to \pyinline{None} (\ruleName{return}, \ruleName{return-none}). An expression statement synthesises a type and discards it
 (\ruleName{expr-stmt}). A call to a callable with result \tyNone{} is not an expression, because
 \ruleName{call} requires a result other than \tyNone, and is typed as a statement (\ruleName{call-stmt}).
-The restriction is for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).
+The restriction is for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).}
 
-A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
+\speconly{A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment $\exAssign{x}{e}$ requires $x$ to be a declared but unassigned variable, and
 checks $e$ against its declared type (\ruleName{assign}); the form $\exAssign{x\exAnnot{\psi}}{e}$ declares and
 assigns $x$ at once (\ruleName{declare-assign}). A declaration does not check
 whether its name is already declared; that check is made once for the whole scope, when the rules for function
 definitions and modules introduce the variables of the scope as unbound, using the function $\scopeS(Y, s)$\speconly{
-(\S\ref{aux:scope})}.
+(\S\ref{aux:scope})}.}
 
-The conditions of \pyinline{if} and \pyinline{assert}
+\speconly{The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}). An assertion of the literal \pyinline{False} has outcome $\Returns$, like a \pyinline{return}
 (\ruleName{assert-false}, \ruleName{assert-false-msg}). A function body therefore has outcome $\Returns$ if each of its
 branches ends in a \pyinline{return} or in \pyinline{assert False}, and in both module and function bodies, a
@@ -298,7 +297,7 @@ $\Assigns{\Delta}$. An assertion of any other expression has outcome $\Assigns{\
 the asserted expression is built from \pyinline{False} with \pyinline{not}, \pyinline{and} and
 \pyinline{or}, or has the declared type \pyinline{Literal[False]}. Giving outcome $\Returns$ to every assertion at type \pyinline{Literal[False]} would accept more than mypy,
 however. The expression \pyinline{(False,)[0]} synthesises \pyinline{Literal[False]}, from the type of the first
-component, whereas mypy types it at \pyinline{bool} (\paperonly{\secref{python-compatibility}}\speconly{\figref{mypy-restrictions}}).
+component, whereas mypy types it at \pyinline{bool} (\paperonly{\secref{python-compatibility}}\speconly{\figref{mypy-restrictions}}).}
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$\speconly{ (\figref{typing-cases})}, which threads
@@ -324,13 +323,13 @@ at a call, by the argument types (\ruleName{callee-scheme}), and when checked ag
 type (\ruleName{var-scheme}). Since annotations denote types, not type schemes, declarations and
 assignments never bind variables at type schemes, only at types.
 
-In the body, the parameters $\seq{x}$ are bound at the types denoted by $\seq{\psi}$; variables declared or
+\speconly{In the body, the parameters $\seq{x}$ are bound at the types denoted by $\seq{\psi}$; variables declared or
 assigned in $s$ start unbound, emulating Python's scoping of function bodies, which
 prefers a locally bound name to one visible in an enclosing scope. A variable of the
 enclosing scope referenced by the body must be definitely assigned at the point at which the function is defined,
 whereas Python resolves the reference only when the body runs. As with any scope, the names declared in the function, including
 the parameters $\seq{x}$, must be distinct from one another and from any pattern variables in $s$. The function names of the mutual def region are
-declared in the enclosing scope rather than in the function, and must be distinct from the other names declared in that scope.
+declared in the enclosing scope rather than in the function, and must be distinct from the other names declared in that scope.}
 
 The body $s$ is checked with the
 return type denoted by $\psi$, and must have static outcome $\Returns$ unless that type is equivalent to \pyinline{None},
@@ -338,12 +337,12 @@ so a function that declares a result definitely returns one. A return type such 
 does not exempt the body from returning, nor permit a bare \pyinline{return}, for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}).
 
 \speconly{\subsubsection{Top-level statements}\label{sec:well-formedness-top-level}}%
-Top-level statements are checked by a separate
+\speconly{Top-level statements are checked by a separate
 judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$\speconly{ (\figref{typing-top-level})}: a sequence composes in the same way as a statement sequence, a mutual type region of class
 definitions and \pyinline{type} statements is a top-level form, checked by the \ruleName{types} rule, and a plain statement is checked with no return type
-(\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level.
+(\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level.}
 
-Within a mutual type region, a \pyinline{type} statement may name any class or alias of the type region, in any
+\speconly{Within a mutual type region, a \pyinline{type} statement may name any class or alias of the type region, in any
 order, but a class definition may name only earlier classes and aliases, because Python~\pythonVersion{} evaluates the
 field annotations and base class of a class when the class statement runs, but evaluates the body of a \pyinline{type}
 statement only when the alias is first used.\footnote{\PurePy does
@@ -351,9 +350,9 @@ not support \pyinline{from __future__ import annotations}, under which Python~\p
 of annotations.} Recursive datatypes are therefore declared with their aliases before their classes, as in
 \pyinline{type Expr = Num | Add} followed by definitions of \pyinline{Num} and of \pyinline{Add} with fields of type
 \pyinline{Expr}. A cyclic alias such as \pyinline{type T = list[T]} has no derivation, because resolving its body
-resolves the alias again.
+resolves the alias again.}
 
-The \ruleName{types} rule\speconly{ (\figref{typing-top-level})} binds the names of a mutual type region $\seq{\chi}$ and adds
+\speconly{The \ruleName{types} rule\speconly{ (\figref{typing-top-level})} binds the names of a mutual type region $\seq{\chi}$ and adds
 its classes to the class table before checking its definitions. The context entry bound to the name declared by $\chi_i$ is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$\speconly{ (\S\ref{aux:type-entry})}: the class
 $\Type{q.c}$ if $\chi_i$ is a class definition, and the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ if it is a \pyinline{type} statement.
 The class table is extended with $\classTable{\Gamma}(q, \seq{\chi})$\speconly{
@@ -366,15 +365,15 @@ defining context $\Gamma$, because alias bodies, field annotations and base clas
 type region is checked.
 Each definition $\chi_i$ is checked under the extended class table and the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$\speconly{
 (\S\ref{aux:type-context})}, by the auxiliary judgement $\Sigma; \Gamma \vdash \chi$, which binds
-every name of the type region for a \pyinline{type} statement and only the earlier names for a class definition, as above.
+every name of the type region for a \pyinline{type} statement and only the earlier names for a class definition, as above.}
 
-The judgement $\Sigma; \Gamma \vdash \chi$ checks a class definition by resolving the field annotations, which may mention the type parameters of the class, and requiring the fields it declares to be distinct and, when it extends
+\speconly{The judgement $\Sigma; \Gamma \vdash \chi$ checks a class definition by resolving the field annotations, which may mention the type parameters of the class, and requiring the fields it declares to be distinct and, when it extends
 another class, the base class to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class definitions also require the predefined name \pyinline{dataclass}\speconly{ (\figref{predefined-signatures})} to be in
 scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement $\exTypeAlias{x[\seq{\alpha}]}{\psi}$, such as \pyinline{type Pair[T] = tuple[T, T]},
 declares $x$ as an alias of the type denoted by $\psi$ with the type parameters $\seq{\alpha}$ in scope
 (\ruleName{type-alias}). An application of the alias such as \pyinline{Pair[int]} denotes that type at the given
-arguments (\ruleName{ty-alias}), here \pyinline{tuple[int, int]}, so types never mention aliases.
+arguments (\ruleName{ty-alias}), here \pyinline{tuple[int, int]}, so types never mention aliases.}
 
 \subsection{Pattern matching}
 \label{sec:exhaustiveness}
@@ -430,18 +429,18 @@ although each covers only part of the type.
 \label{sec:well-formedness-modules}
 
 \emph{Module checking} types a module's body and computes its signature $\Gamma$, the judgement
-$\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$ (\figref{typing-module}); it mirrors loading at run time
+$\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$\speconly{ (\figref{typing-module})}; it mirrors loading at run time
 (\secref{operational-semantics}). The \ruleName{module} rule types the body as a top-level statement, and
 the \ruleName{predefined} rule gives a predefined module the signature of
 Definition~\ref{def:predefined}.
-Both import forms check their target, together with its containing modules
+\speconly{Both import forms check their target, together with its containing modules
 (\figref{typing-import-prefix}). A plain import checks the root and then each module
 along the chain of names, recording each as a member of its parent (\ruleName{submodules-cons}), so that the binding for the root gives attribute
-access along the whole chain.\added{ Two imports with the same root, such as \pyinline{a.b} and \pyinline{a.c}, both
+access along the whole chain.}\speconly{\added{ Two imports with the same root, such as \pyinline{a.b} and \pyinline{a.c}, both
 bind the root, and their bindings combine by \emph{context extension} $\Gamma \extend \Delta$ rather than shadow
 one another. Extension is defined pointwise, like override, and combines module entries for the same module
-recursively, preferring checked modules to stubs:}
-\begin{AddedBlock}
+recursively, preferring checked modules to stubs:}}
+\speconly{\begin{AddedBlock}
 \begin{specdefinition}{Extension of context entries}
 \begin{defalign}
 \modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} & = \modLoaded{q}{\Gamma \extend \Gamma'} \\
@@ -450,28 +449,30 @@ recursively, preferring checked modules to stubs:}
 \theta \extend \theta' & = \theta' \quad \text{(otherwise)}
 \end{defalign}
 \end{specdefinition}
-\end{AddedBlock}
-\noindent A from-import also checks any imported name that denotes a submodule, and the
+\end{AddedBlock}}
+\noindent \speconly{A from-import also checks any imported name that denotes a submodule, and the
 names it imports must be distinct. A
 containing module of the target is exempt from checking if it is the importing module or one of its
 containing modules\speconly{ (\S\ref{aux:containing})}, because at runtime it may still be loading when the import executes. The exemption applies only to from-imports, because
 for a plain import
 the only containing module that could never load first is the importing module itself, and an import naming a
-module contained in the importing module is excluded outright\paperonly{ (\secref{no-load-dependent})}. Module checking is defined inductively, so a program with an import cycle is ill-formed. Program
-well-formedness (\figref{typing-module}) requires the main module to be well typed and hence,
+module contained in the importing module is excluded outright\paperonly{ (\secref{no-load-dependent})}.} Module checking is defined inductively, so a program with an import cycle is ill-formed. Program
+well-formedness\speconly{ (\figref{typing-module})} requires the main module to be well typed and hence,
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
 overridden by the imported context and then, as in \ruleName{def-body}, by an unbound entry for each name
-declared in the body or bound by a pattern in it. The members of \pyinline{builtins} are thus in scope unqualified, and a name bound by the body
+declared in the body or bound by a pattern in it\paperonly{\added{:}}\speconly{.}
+\paperinput{paper/well-formedness/module}%
+The members of \pyinline{builtins} are thus in scope unqualified, and a name bound by the body
 shadows a builtin throughout the module, so a use of the name before its declaration is rejected. Under mypy such a
 use instead resolves to the builtin, following Python's run-time lookup. As with any scope, the names declared in the
 module, including its imported names, must be distinct from one another and from any pattern variables in its
 body. Since every module declares \pyinline{__name__} (\secref{modules-programs}), a module is ill-formed if its body
 declares that name again, imports it, or binds it in a pattern.
 
-\input{spec/fig/typing-module}
+\specinput{spec/fig/typing-module}
 
-The signature $\Gamma$ produced by module checking (\figref{typing-module}) comprises the classes, type aliases
+The signature $\Gamma$ produced by module checking\speconly{ (\figref{typing-module})} comprises the classes, type aliases
 and variables defined by a module, together with its intrinsic \pyinline{__name__} and a stub for each submodule,
 but not the names that it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
 name is a private dependency, not re-exported as part of the interface. Submodule stubs and the bindings of the module
