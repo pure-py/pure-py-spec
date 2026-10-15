@@ -320,7 +320,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-dict}}]
 {
-  \rho, e_1 \cons e_1' \cons \ldots \cons e_n \cons e_n' \Rightarrow \replaced{\val{w_1 \cons v_1 \cons \ldots \cons w_n \cons v_n}}{\val{(w_1 \cons v_1 \cons \ldots \cons w_n \cons v_n)}\ }
+  \rho, e_1 \cons e_1' \cons \ldots \cons e_n \cons e_n' \Rightarrow \val{w_1 \cons v_1 \cons \ldots \cons w_n \cons v_n}
 }
 {
   \rho, \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \Rightarrow \val{\exDict{\update(\varepsilon, \bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n})}}
@@ -366,7 +366,7 @@
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   e \in \set{q, \exSubscript{q}{\seq{\psi}}} \\
-  \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \replaced{\val{v_1 \cons \ldots \cons v_{n+m}}}{\val{(v_1 \cons \ldots \cons v_{n+m})}\ } \\
+  \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \val{v_1 \cons \ldots \cons v_{n+m}} \\
   \resolve(\rho, q) = \Type{C} \\
   \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
   \fieldMap{\Sigma}(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m})) = \set{\bind{\seq{x}}{\seq{u}}}
@@ -499,7 +499,7 @@
   \rho, \seq{e} \Rightarrow r
 }
 {
-  \rho, e \cons \seq{e} \Rightarrow \mlet{\seq{v}}{r}{\replaced{\val{v \cons \seq{v}}}{\val{(v \cons \seq{v})}\ }}
+  \rho, e \cons \seq{e} \Rightarrow \mlet{\seq{v}}{r}{\val{v \cons \seq{v}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-exprs-fail}}]
@@ -759,7 +759,7 @@
   \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i)
 }
 {
-  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \replaced{\val{\seq{\rho}_1 \mathbin{\concat} \ldots \mathbin{\concat} \seq{\rho}_n}}{\val{(\seq{\rho}_1 \mathbin{\concat} \ldots \mathbin{\concat} \seq{\rho}_n)}\ }
+  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \val{\seq{\rho}_1 \mathbin{\concat} \ldots \mathbin{\concat} \seq{\rho}_n}
 }
 \and
 \inferrule*[lab={\ruleName{eval-qual-generator-fail}}]

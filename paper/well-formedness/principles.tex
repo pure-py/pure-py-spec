@@ -109,7 +109,6 @@ the cases with $\merge$ as the \ruleName{if} rules do, so a variable is definite
 only if every case binds it or returns. A match whose cases leave some value of the scrutinee type
 unmatched may fall through:
 
-\begin{AddedBlock}
 \begin{python}
 v: tuple[int, int] | None = (1, 2)
 match v:
@@ -117,14 +116,12 @@ match v:
         print(x + y)
 print(x)  # error: x not definitely assigned
 \end{python}
-\end{AddedBlock}
 
 \noindent Python prints \pyinline{1}, the binding having escaped the match. Within a pattern the
 variables must be distinct, as in Python. Every case must also be reachable: the matching judgement rejects a case
 that can match only values already matched by an earlier case (\secref{well-formedness-patterns}), which
 Python leaves silently unreachable:
 
-\begin{AddedBlock}
 \begin{python}
 v: tuple[int, int] = (1, 2)
 match v:
@@ -133,7 +130,6 @@ match v:
     case (1, 2):  # error: the previous case matches every pair
         print(0)
 \end{python}
-\end{AddedBlock}
 
 \subsubsection{Reachability}
 \label{sec:unreachable}

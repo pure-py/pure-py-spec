@@ -22,14 +22,12 @@ once definitely assigned, denotes a fixed value. The members of a module are fix
 There is no mutation, nor can evaluation order change the meaning of a name. Python programs in general do not
 satisfy these properties, and \PurePy characterises a large subset of Python within which all of them hold.
 
-\begin{AddedBlock}
 \PurePy is not pure in the stronger sense of guaranteeing that every program terminates with a unique value: as in
 Haskell, a program may fail to terminate, or abort with an error such as division by zero. Errors of different kinds
 are reported differently, so a program with two possible failures reveals which it reaches first. The order of
 evaluation, including the order in which modules load, is therefore part of the semantics, and a failing program fails
 in the same way under every implementation (\secref{no-load-dependent}). \PurePy also has \pyinline{print},
 following Python, as Haskell has \pyinline{trace}; printing reports on a computation without influencing its result.
-\end{AddedBlock}
 
 \subsubsection{Mutable state}
 \label{sec:no-mutable-state}
@@ -46,7 +44,7 @@ that update a value in place, such as \pyinline{list.append}, are unavailable, b
 attributes. A Python closure captures a binding rather than a value, so a change to the binding is visible through
 the closure. Excluding reassignment removes such changes, a discipline Java imposes on captured locals, which must
 be effectively final~\cite[\S15.27.2]{gosling2025}. One case remains: Python implements a comprehension by updating
-its generator variables in place on each iteration, so \PurePy forbids a lambda \added{in the body or in a later qualifier of a comprehension} from
+its generator variables in place on each iteration, so \PurePy forbids a lambda in the body or in a later qualifier of a comprehension from
 capturing a generator variable, since the updates would otherwise be visible through the lambda:
 
 \begin{python}
@@ -60,7 +58,6 @@ capturing a generator variable, since the updates would otherwise be visible thr
 \subsubsection{Scope}
 \label{sec:scope}
 
-\begin{AddedBlock}
 Compatibility with mypy (\secref{python-compatibility}) settles the scoping of names in \PurePy. As in Python, a
 scope is the body of a module, function, lambda or comprehension, and the builtins enclose every module. Python
 does not distinguish definition from assignment, but mypy treats an annotation as a definition, and rejects a
@@ -77,7 +74,6 @@ len: int = 2
 \end{python}
 \noindent A pattern introduces its variables rather than assigning them, so a pattern cannot bind a name declared
 in its scope either, although several cases of one match may bind the same variable.
-\end{AddedBlock}
 
 \subsubsection{Control flow and effects}
 \label{sec:no-effects}
@@ -101,8 +97,8 @@ effect-free.
 
 A name's meaning in \PurePy must not depend on the order in which modules load or on runtime state, so several
 of Python's import and module behaviours are excluded. Imports must appear at the start of a module, never
-inside a function body or branch, nor after a statement\added{, so that the dependencies of a module are known before
-any of its statements runs}. Wildcard imports (\pyinline{from q import
+inside a function body or branch, nor after a statement, so that the dependencies of a module are known before
+any of its statements runs. Wildcard imports (\pyinline{from q import
 *}) are excluded, since the names introduced are not explicit; PEP 8 recommends against
 them.\footnote{\url{https://peps.python.org/pep-0008/}} A submodule may not import itself through its parent
 (\pyinline{from a import b} inside module \pyinline{a.b}): \PurePy treats the from-imported submodule as a
@@ -110,7 +106,6 @@ dependency, so this is an import cycle. An \pyinline{import} (as opposed to a fr
 module contained in the importing module (\pyinline{import x.y} inside module \pyinline{x}), since the binding for
 the head would denote the still-loading module.
 
-\begin{AddedBlock}
 A qualified reference must resolve through the imports of the referring module to a definitely assigned
 member. A submodule is not an attribute of its parent until it is loaded, so
 \pyinline{import pkg} followed by \pyinline{pkg.sub.y} is rejected unless the module also imports
@@ -138,7 +133,6 @@ which the main module does not otherwise use, and Python raises \pyinline{Attrib
 same for a reference to a module member never assigned by the body, such as \pyinline{lib.x} where
 \pyinline{lib} assigns \pyinline{x} only on a branch that is not taken. \PurePy rejects all three programs
 statically (\secref{well-formedness-modules}).
-\end{AddedBlock}
 
 A module may not bind a name that is also the name of one of its submodules. In Python an attribute of a
 module can be set both by an assignment in the module body and by loading a same-named submodule, each
