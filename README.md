@@ -65,10 +65,8 @@ The outcome under PurePy is one of:
 - `undefined/`: well-formed, and the run aborts with termination kind `undef`
 - `result/`: well-formed, and the run yields the same result as under Python, including the same exception
 
-Two directories under `no-exception/result/` hold tests with a further expectation:
-
-- `pending/`: not yet accepted by the type checker
-- `mypy-bug/`: rejected by mypy because of a behaviour reported as a mypy bug; the runner fails a test once mypy accepts it
+The directory `no-exception/result/mypy-bug/` holds tests rejected by mypy because of a behaviour reported as a
+mypy bug; the runner fails a test if mypy accepts it.
 
 Every other test in `no-exception/result/` also type-checks under mypy (`test/mypy.ini`). The tests in
 `module-level/syntactic-only/` construct a form as an AST, because Python source cannot express the form, and
