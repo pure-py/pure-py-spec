@@ -22,28 +22,14 @@ once definitely assigned, denotes a fixed value. The members of a module are fix
 There is no mutation, nor can evaluation order change the meaning of a name. Python programs in general do not
 satisfy these properties, and \PurePy characterises a large subset of Python within which all of them hold.
 
-\PurePy is not pure in the stronger sense of guaranteeing that every program terminates with a unique value.
-Practical programming languages are not pure in this sense. Real programs may fail to terminate, or abort with
-errors such as division by zero or an index out of bounds, even in languages regarded as pure, such as Haskell.
-
-A non-trivial component of the \PurePy specification concerns module loading, in the form of well-formedness
-rules which rule out programs which depend on Python's load-order-sensitive behaviours
-(\secref{no-load-dependent}). One might wonder why a language which is mutation-free even needs to concern
-itself with loading order. If the result of a program is all that can be observed, the order in which
-subexpressions are evaluated cannot affect that result, and so cannot meaningfully be part of the
-specification. However runtime errors, at least if they can be distinguished, remove that freedom: if
-division-by-zero reports differently from index-out-of-bounds, a program with two possible failures reveals
-which was reached first, and implementations which choose different orders might disagree about the outcome of
-such a program. \PurePy aims to serve as a template for practical implementation, not as an idealised calculus,
-and practical implementations need to be able to report on different kinds of error, since those reports are
-important to users. The sequential semantics of module loading therefore remains an important part of the
-specification so that programs which fail do so deterministically under every implementation.
-
-Real-world languages, including the ``pure'' ones, also support logging to a terminal. Haskell has
-\pyinline{trace}; \PurePy has \pyinline{print}, following Python. This too is a computational effect, but one
-that is not only indispensable but benign; printing can only report on a computation and cannot influence its
-result. Moreover with loading order already part of the specification, printing is a low-cost, high-utility
-feature that leaves the core purity benefits of \PurePy untouched.
+\begin{AddedBlock}
+\PurePy is not pure in the stronger sense of guaranteeing that every program terminates with a unique value: as in
+Haskell, a program may fail to terminate, or abort with an error such as division by zero. Errors of different kinds
+are reported differently, so a program with two possible failures reveals which it reaches first. The order of
+evaluation, including the order in which modules load, is therefore part of the semantics, and a failing program fails
+in the same way under every implementation (\secref{no-load-dependent}). \PurePy also has \pyinline{print},
+following Python, as Haskell has \pyinline{trace}; printing reports on a computation without influencing its result.
+\end{AddedBlock}
 
 \subsubsection{Mutable state}
 \label{sec:no-mutable-state}
@@ -74,31 +60,24 @@ capturing a generator variable, since the updates would otherwise be visible thr
 \subsubsection{Scope}
 \label{sec:scope}
 
-Compatibility with mypy (\secref{python-compatibility}) settles the scoping of names in \PurePy. A notion of scope
-usually determines the parts of a program within which names must be unique, so that a scope declares a name at
-most once. Two choices then remain to a language: how a program decomposes into scopes, and whether a scope may
-shadow a name of an enclosing scope. A \PurePy program is a Python program, so a scope is the body of a module,
-function, lambda or comprehension, and the builtins enclose every module. Python itself does not distinguish
-definition from assignment: a name is defined by assigning it, and assigning it again reassigns the existing
-variable. mypy, by contrast, treats an annotation as a definition, and rejects a declaration whose name is already
-that of a parameter, imported name, pattern variable or declaration of the same scope. On the second choice mypy
-permits shadowing, and so does \PurePy. A function body, for example, is a single scope, so it cannot declare a
-name twice, whether on one path or in different branches, nor redeclare one of its parameters; since shadowing is
-permitted, it may declare a name of an enclosing body or a builtin. Since a name denotes one variable throughout
-a scope, a declaration hides the enclosing variable everywhere in the scope, so a use before the declaration is
-rejected as unbound rather than referring to the enclosing variable. mypy agrees, with one exception: at module
-level a use before the declaration of a builtin name refers to the builtin, as it does when Python runs the
-module. \PurePy treats the builtins as an enclosing scope like any other, and therefore rejects a use of a builtin
-name if the module later declares that name\added{:}
 \begin{AddedBlock}
+Compatibility with mypy (\secref{python-compatibility}) settles the scoping of names in \PurePy. As in Python, a
+scope is the body of a module, function, lambda or comprehension, and the builtins enclose every module. Python
+does not distinguish definition from assignment, but mypy treats an annotation as a definition, and rejects a
+declaration of a name already declared in the same scope, including as a parameter, imported name or pattern
+variable. \PurePy follows mypy, so a function body, for example, cannot declare a name twice, whether on one path
+or in different branches, nor redeclare one of its parameters. Like mypy, \PurePy permits shadowing: a scope may
+declare a name of an enclosing scope, and the declaration then hides the enclosing variable throughout the scope,
+so a use before the declaration is rejected as unbound. The one exception in mypy is a use at module level of a
+builtin name before its declaration, which refers to the builtin, as when Python runs the module. \PurePy treats
+the builtins as an enclosing scope like any other, and rejects the use:
 \begin{python}
 n: int = len([1])  # error: len is bound by the module
 len: int = 2
 \end{python}
+\noindent A pattern introduces its variables rather than assigning them, so a pattern cannot bind a name declared
+in its scope either, although several cases of one match may bind the same variable.
 \end{AddedBlock}
-\noindent A pattern introduces its variables rather than assigning them, so a
-pattern cannot bind a name declared in its scope either, although several cases of one match may bind the same
-variable.
 
 \subsubsection{Control flow and effects}
 \label{sec:no-effects}
