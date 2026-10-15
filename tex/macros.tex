@@ -58,8 +58,15 @@
 \newcommand*{\auxrows}[1]{\@@input spec/fig/auxiliary-index-#1.tex }
 \makeatother
 
-% Inline definitions: align* with tighter row spacing than a standalone figure.
-\newenvironment{defalign}{\setlength{\jot}{1pt}\csname alignat*\endcsname{2}}{\csname endalignat*\endcsname}
+% Inline definitions: align* in small type, like the inline rules, with tighter row spacing than a standalone
+% figure. The baseline skip of the surrounding text is kept, since the lines of a paragraph before a display are
+% set with the skip in force when the display starts.
+\makeatletter
+\newenvironment{defalign}
+  {\edef\defalign@baselineskip{\the\baselineskip}\small\baselineskip=\defalign@baselineskip
+   \setlength{\jot}{1pt}\csname alignat*\endcsname{2}}
+  {\csname endalignat*\endcsname}
+\makeatother
 % How the paper refers to the specification document.
 \ifdefined\anonmode
   \newcommand*{\specification}{the supplementary material\xspace}
