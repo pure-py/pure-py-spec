@@ -4,7 +4,7 @@
 \subsection{Values and environments}
 
 Values, environments, outcomes and results are given in \figref{values}. A class value $\Type{C}$ is the
-context entry of the class, and an object $\exObj{C}{\bind{\seq{x}}{\seq{v}}}$ records its class by name and its fields in the order given by $\fields{\Sigma}(C)$. The value $\Unbound$
+context entry of the class, and an object $\exObj{C}{\bind{\seq{x}}{\seq{v}}}$ records its class by name and \deleted{its }fields in the order given by $\fields{\Sigma}(C)$. The value $\Unbound$
 marks a variable of the current scope before its declaration is reached, which Python reports as an unbound
 local. An environment binds a variable to $\Unbound$ wherever the corresponding context binds the variable to
 the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible. Throughout this section, $\Sigma$ is the class table produced by module checking of the program
