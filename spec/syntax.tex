@@ -1,7 +1,7 @@
 \section{Syntax}
 \label{sec:syntax}
 
-The syntax of \PurePy is given in \figrefThree{syntax-stmt}{syntax-expr}{syntax-types}.\speconly{ \figref{metavariables} summarises the metavariables used throughout.}
+The syntax of \PurePy is given in \speconly{\figrefThree{syntax-stmt}{syntax-expr}{syntax-types}}\paperonly{\added{\figrefTwo{syntax-stmt}{syntax-types}}}.\speconly{ \figref{metavariables} summarises the metavariables used throughout.}
 A sequence $\seq{x}$ denotes $x_1, \ldots, x_n$ for some $n$; inside the brackets of a tuple, list, type
 application or argument list it stands for the comma-separated elements, so $\exTuple{\seq{e}}$ is
 $\exTuple{e_1, \ldots, e_n}$. The sequence $x \cons \seq{x}$ has head $x$ and tail $\seq{x}$, and
@@ -23,7 +23,7 @@ $Y$ not in $X$; and a product of ordered sets is ordered lexicographically.
 The grammar of \PurePy is an abstract syntax, so its metavariables $n$ and $w$ range over numbers and strings rather than over the numerals and string literals of the source text. Python writes a
 negative number as unary minus applied to a numeric literal; the translation to abstract syntax folds the minus
 into the literal, so a number may be negative. The translation of
-source text into abstract syntax otherwise maps each form of Python's grammar to the form of the same shape in \figrefTwo{syntax-stmt}{syntax-expr}, including the indentation that delimits blocks. The translation depends on the source text alone. In particular, a call $\exCall{q}{a}$ or $\exCall{q[e]}{a}$ is translated in the same way whether or not $q$ denotes a class; the well-formedness rules treat such a call as a constructor call when $q$ denotes a class (\secref{well-formedness}). A list of type parameters is always present in the abstract syntax and may be empty; in source an empty list is omitted, because in Python's grammar the list is optional and, when present, has at least one element.
+source text into abstract syntax otherwise maps each form of Python's grammar to the form of the same shape in \speconly{\figrefTwo{syntax-stmt}{syntax-expr}}\paperonly{\added{\figref{syntax-stmt}}}, including the indentation that delimits blocks. The translation depends on the source text alone. In particular, a call $\exCall{q}{a}$ or $\exCall{q[e]}{a}$ is translated in the same way whether or not $q$ denotes a class; the well-formedness rules treat such a call as a constructor call when $q$ denotes a class (\secref{well-formedness}). A list of type parameters is always present in the abstract syntax and may be empty; in source an empty list is omitted, because in Python's grammar the list is optional and, when present, has at least one element.
 
 \subsection{Contexts}
 \label{sec:contexts}

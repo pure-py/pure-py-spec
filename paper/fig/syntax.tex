@@ -8,27 +8,20 @@
 \begin{minipage}[t]{0.42\textwidth}
 \input{spec/grammar/expressions}
 \end{minipage}
+\caption{Statements and expressions}
+\label{fig:syntax-stmt}
+\label{fig:syntax-expr}
+\end{figure}
 
-\begin{minipage}[t]{0.56\textwidth}
-\subcaption{Modules and statements}\label{fig:syntax-stmt}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.42\textwidth}
-\subcaption{Expressions and patterns}\label{fig:syntax-expr}
-\end{minipage}
-
-\vspace{2mm}
-
-\begin{subfigure}{\textwidth}
+\begin{figure}
+\footnotesize
+\renewcommand{\arraystretch}{0.92}
 \centering
 \input{spec/grammar/primitive-types}
 \qquad
 \input{spec/grammar/types}
 \qquad
 \input{spec/grammar/schemes}
-\subcaption{Types and schemes}
+\caption{Types and schemes}
 \label{fig:syntax-types}
-\end{subfigure}
-\caption{Syntax}
-\label{fig:syntax}
 \end{figure}
