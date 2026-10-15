@@ -1,0 +1,22 @@
+\begin{tabular}[t]{rcll}
+\speconly{\grammarGroup{Type expressions} \\
+$\psi$ & $::=$ & $\nu$ & \speconly{(Primitive)} \\
+    & $\mid$ & $\tyList{\psi}$ & \speconly{(List)} \\
+    & $\mid$ & $\tyTuple{\psi_1, \ldots, \psi_n}$ & \speconly{(Tuple)} \\
+    & $\mid$ & $\tyDict{\psi}$ & \speconly{(Dict)} \\
+    & $\mid$ & $\tyCallable{\psi_1, \ldots, \psi_n}{\psi}$ & \speconly{(Callable)} \\
+    & $\mid$ & $\tyLiteral{\ell}$ & \speconly{(Literal, $\ell$ not a float literal)} \\
+    & $\mid$ & $q[\psi_1, \ldots, \psi_n]$ & \speconly{(TypeName)} \\
+    & $\mid$ & $\tyUnion{\psi}{\psi'}$ & \speconly{(Union)}
+   \\[3mm]}
+\grammarGroup{Types} \\
+$\tau$ & $::=$ & $\nu$ & \speconly{(Primitive)} \\
+    & $\mid$ & $\tyList{\tau}$ & \speconly{(List)} \\
+    & $\mid$ & $\tyTuple{\tau_1, \ldots, \tau_n}$ & \speconly{(Tuple)} \\
+    & $\mid$ & $\tyDict{\tau}$ & \speconly{(Dict)} \\
+    & $\mid$ & $\tyCallable{\tau_1, \ldots, \tau_n}{\tau}$ & \speconly{(Callable)} \\
+    & $\mid$ & $\tyLiteral{\ell}$ & \speconly{(Literal, $\ell$ not a float literal)} \\
+    & $\mid$ & $\alpha$ & \speconly{(TypeVar)} \\
+    & $\mid$ & $C[\tau_1, \ldots, \tau_n]$ & \speconly{(Class)} \\
+    & $\mid$ & $\tyUnion{\sigma}{\tau}$ & \speconly{(Union)}
+\end{tabular}

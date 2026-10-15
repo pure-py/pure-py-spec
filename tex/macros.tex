@@ -1,12 +1,14 @@
 % Document metadata
 \ifdefined\anonmode
   \newcommand*{\PurePy}{OurLang\xspace}
-  \newcommand*{\Fluid}{a related functional language\xspace}
-  \newcommand*{\Fortl}{another related language\xspace}
+  \newcommand*{\Fluid}{[PyProv]\xspace}
+  \newcommand*{\Fortl}{[PySci]\xspace}
+  \newcommand*{\anononly}[1]{#1}
 \else
   \newcommand*{\PurePy}{PurePy\xspace}
   \newcommand*{\Fluid}{Fluid\xspace}
   \newcommand*{\Fortl}{Fortl\xspace}
+  \newcommand*{\anononly}[1]{}
 \fi
 \newcommand*{\versionstring}{}
 \input{tex/python-version}

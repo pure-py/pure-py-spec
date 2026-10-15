@@ -1,0 +1,68 @@
+\paragraph{Pattern checking.}
+Checking a pattern against the remaining type (\ruleName{match-case}) rejects a tuple pattern at a type
+with list values and a list pattern at a type with tuple values, because matching either form of pattern
+against the other kind of sequence is undefined (\secref{eval-patterns}). It also rejects a constructor
+pattern at a type which does not determine the type arguments omitted by the pattern.
+
+\paragraph{Shapes.}
+\input{paper/fig/shapes}%
+A shape (\figref{shapes}) denotes a set of values of a single type. A head is a literal, a class or a list
+length, and denotes the values with that outermost form. The rest shape $\shapeAny{\tau}{H}$ denotes the
+values of type $\tau$ whose head is not in the excluded set $H$. The other forms are constructor, tuple, list
+and dictionary shapes, with shapes in place of sub-patterns; a constructor shape also has an excluded set,
+containing the subclasses already matched. The auxiliary function $\shapes{\Sigma}(\tau, H)$ gives the
+shapes of $\tau$ once the heads in $H$ are excluded.
+
+\paragraph{Matching.}
+The judgement $\Sigma; \Gamma \vdash L, p \matches K, L'$ matches a pattern $p$ against an ordered set of
+shapes $L$, giving matched shapes $K$ and residual $L'$, and the judgement $\Sigma; \Gamma \vdash k, p
+\matches K, L$ matches a pattern against a single shape $k$:
+\begin{mathpar}
+\small
+\input{spec/rules/pat-shapes}
+\and
+\input{spec/rules/pat-split}
+\\
+\input{spec/rules/split-class}
+\\
+\input{spec/rules/pat-constr}
+\end{mathpar}
+The \ruleName{pat-shapes} rule matches the pattern against each shape of $L$. A case is reachable only if
+its pattern matches at least one of the shapes, and the shapes which are not matched by the pattern pass into
+the residual unchanged. A pattern matches a shape directly if the shape has the head tested by the pattern.
+Otherwise \ruleName{pat-split} first splits the shape, by the judgement $\Sigma; \Gamma \vdash k, p \splits
+K, L$, into shapes $K$ with that head and a residual $L$ with the head excluded. Splitting a rest shape at a
+class $C$ (\ruleName{split-class}) gives constructor shapes for the instance of $C$ at the type of the shape,
+with the shapes of the field types as components, and excludes $C$ from the residual; the instance
+judgement, defined in \specification, recovers the type arguments omitted by the pattern. Shapes are split
+only when a pattern requires it, because a class may refer to itself through its fields, and expanding every
+shape in advance would not terminate. The \ruleName{pat-constr} rule matches a pattern for a class $D$
+against a constructor shape for a subclass $C$ of $D$, matching the sub-patterns, with wildcards for omitted
+fields, against the field shapes position by position.
+
+The residual and the remaining type can differ. In the following program, the two cases between them match
+every value of \pyinline{C}:
+
+\begin{python}
+@dataclass
+class C:
+    p: tuple[int, int] | None
+
+def f(c: C) -> int:  # error: f does not always return
+    match c:
+        case C(None):
+            return 0
+        case C((a, b)):
+            return a + b
+\end{python}
+
+\noindent The residual starts as the rest shape of \pyinline{C}. The first case splits it into a shape of
+\pyinline{C} with a tuple field and a shape of \pyinline{C} with a \pyinline{None} field, and matches the
+shape with the \pyinline{None} field. The second case matches the shape with the tuple field, leaving the
+empty residual, so a third case would be unreachable.
+Neither case matches every value of \pyinline{C}, however, so the remaining type is still \pyinline{C},
+\ruleName{match-partial} applies, and the function is rejected as not always returning, following mypy. If
+the second case were \pyinline{C(q)} instead, the remaining type after it would be $\tyNever$, but
+\pyinline{q} would be bound at \pyinline{tuple[int, int] | None} rather than at \pyinline{tuple[int, int]},
+because pattern checking uses the remaining type.
+

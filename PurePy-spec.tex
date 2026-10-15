@@ -40,7 +40,10 @@
 \usepackage{placeins}
 \usepackage{xspace}
 \usepackage{enumitem}
+% \finalmode renders the clean version, without change markup.
+\ifdefined\finalmode\newcommand{\acceptchanges}{}\fi
 \usepackage{changebar}
+\ifdefined\finalmode\nochangebars\fi
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage[colorlinks,allcolors=blue!50!black]{hyperref}
 

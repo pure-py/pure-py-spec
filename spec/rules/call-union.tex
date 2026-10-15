@@ -1,0 +1,10 @@
+\inferrule*[lab={\ruleName{call-union}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
+  \Sigma; \Gamma \override \set{\bind{y}{\sigma}} \vdash \exCall{y}{\seq{e}} \synth \tau \\
+  \Sigma; \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exCall{y}{\seq{e}} \synth \tau' \\
+  y \notin \fv(\seq{e})
+}
+{
+  \Sigma; \Gamma \vdash \exCall{e}{\seq{e}} \synth \joinTy{\Sigma}{\tau}{\tau'}
+}

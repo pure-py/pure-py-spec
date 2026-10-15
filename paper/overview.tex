@@ -1,10 +1,9 @@
 \section{Overview}
 \label{sec:overview}
 
-\PurePy is a subset of Python chosen so that its programs are well-behaved and broadly \emph{pure}, yet run
-unchanged under a standard Python interpreter and compute the same result. \secref{purity} makes the purity
-claim precise and sets out the excluded features, grouped by the discipline that each one protects;
-\figref{prevented-errors} summarises the Python runtime errors ruled out by the type system.
+This section states the guarantee relating \PurePy to Python (\secref{python-compatibility}), then describes
+the senses in which \PurePy is pure and sets out the excluded features and the Python runtime errors ruled out by the type
+system (\secref{purity}).
 
 \subsection{Python compatibility}
 \label{sec:python-compatibility}
@@ -18,16 +17,14 @@ claim precise and sets out the excluded features, grouped by the discipline that
 \subsection{Purity}
 \label{sec:purity}
 
-\PurePy is not semantically ``pure'' in the sense of providing a guarantee that every program terminates with
-a unique value. No practical programming language is pure in this sense. Real programs may fail to terminate,
-or abort with errors such as division-by-zero or index-out-of-bounds, even in languages regarded as (mostly)
-pure, like Haskell.
+\PurePy is pure in the senses that matter for reasoning. Every name has a unique lexical scope. A variable,
+once definitely assigned, denotes a fixed value. The members of a module are fixed once the module has loaded.
+There is no mutation, nor can evaluation order change the meaning of a name. Python programs in general do not
+satisfy these properties, and \PurePy characterises a large subset of Python within which all of them hold.
 
-We do, however, claim that \PurePy is pure in the senses that matter. Every name has a unique lexical scope; a
-variable, once definitely assigned, denotes a fixed value; a module's members are fixed once the module has
-loaded. There is no mutation, nor can evaluation order change the meaning of a name. Python operates largely
-outside this discipline, and the goal of \PurePy is to characterise a suitably large subset of Python that
-stays within it.
+\PurePy is not pure in the stronger sense of guaranteeing that every program terminates with a unique value.
+Practical programming languages are not pure in this sense. Real programs may fail to terminate, or abort with
+errors such as division by zero or an index out of bounds, even in languages regarded as pure, such as Haskell.
 
 A non-trivial component of the \PurePy specification concerns module loading, in the form of well-formedness
 rules which rule out programs which depend on Python's load-order-sensitive behaviours
@@ -57,7 +54,10 @@ version 3.6 (PEP 526\footnote{\url{https://peps.python.org/pep-0526/}}). A varia
 assignment never introduces a variable nor reassigns one (\secref{local-assignment}). A variable therefore denotes
 a fixed value once assigned, and features associated with mutation and shared state are excluded: \pyinline{global} and \pyinline{nonlocal}, which direct assignments to a variable of an enclosing scope;
 \pyinline{del}, which removes a binding; augmented assignment (\pyinline{+=}, \pyinline{-=}, and so on); and
-the walrus operator (\pyinline{:=}), which assigns within an expression. A Python closure captures a binding rather than a value, so a change to the binding is visible through
+the walrus operator (\pyinline{:=}), which assigns within an expression. Assignment targets are variables, so item
+assignment such as \pyinline{xs[0] = v} and attribute assignment such as \pyinline{p.x = v} are excluded, and methods
+that update a value in place, such as \pyinline{list.append}, are unavailable, because only objects and modules have
+attributes. A Python closure captures a binding rather than a value, so a change to the binding is visible through
 the closure. Excluding reassignment removes such changes, a discipline Java imposes on captured locals, which must
 be effectively final~\cite[\S15.27.2]{gosling2025}. One case remains: Python implements a comprehension by updating
 its generator variables in place on each iteration, so \PurePy forbids a lambda within a comprehension from
@@ -70,7 +70,6 @@ capturing a generator variable, since the updates would otherwise be visible thr
 \noindent Here each lambda computes \pyinline{x**3} in Python, since all three share the one binding of
 \pyinline{i}.
 
-\input{spec/exclusions/mutable-state}
 
 \subsubsection{Scope}
 \label{sec:scope}
@@ -109,7 +108,7 @@ effect-free.
 \subsubsection{Implicit coercions}
 \label{sec:no-coercions}
 
-\input{spec/exclusions/coercions}
+\input{paper/overview/coercions}
 
 \subsubsection{Load-dependent meaning}
 \label{sec:no-load-dependent}
@@ -161,16 +160,12 @@ Here \pyinline{helper} is never imported, so \pyinline{pkg.sub} never loads, and
 main module denotes the assignment. Now let the main module also import \pyinline{helper}, which it does not
 otherwise use:
 
-\begin{center}
-\begin{minipage}[t]{0.55\textwidth}
 \begin{python}
 # __main__
 import helper
 import pkg
 print(pkg.sub) # <module 'pkg.sub'>
 \end{python}
-\end{minipage}
-\end{center}
 
 Loading \pyinline{pkg.sub}, wherever in the program it happens, sets it as an attribute of the shared
 \pyinline{pkg} object, so the extra import changes the meaning of \pyinline{pkg.sub} in the main module, which does
@@ -203,5 +198,5 @@ meanings given in \secref{operational-semantics}.
 \subsubsection{Runtime errors}
 \label{sec:runtime-errors}
 
-\input{spec/exclusions/prevented-errors}
+\input{paper/overview/runtime-errors}
 

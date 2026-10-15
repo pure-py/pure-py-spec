@@ -96,14 +96,24 @@
 \renewcommand{\shortauthors}{Antensteiner et al.}
 
 \begin{abstract}
-\PurePy is a pure, side-effect-free subset of Python: a functional language whose programs are referentially
-transparent, reproducible, and easy to reason about, yet remain ordinary Python. Every well-formed \PurePy
-program is valid Python, and where \PurePy gives a run a result, Python gives the same one, so the same source
-runs under a standard Python interpreter and under any conforming implementation. This paper specifies \PurePy as a versioned standard, with a
-formal grammar, a type system that accepts only programs accepted by mypy, and an operational semantics
-that agrees with Python on every run it defines. A reference checker decides well-formedness, and a conformance test suite is exercised on CPython, GraalPy, and Pyodide. Aimed first at researchers in programming languages and pedagogy, \PurePy
-is intended to grow into a common language for scientific computing, supporting portable applications in
-modelling, data processing, analysis, and visualisation.
+Python is the primary language of scientific computing, and scientific work increasingly relies on Python
+programs written by AI coding tools. Such programs need assurance that they work as intended, usually without
+formal specifications to check them against. Real-world Python lacks an official formal semantics, and even with such a semantics, complex features like
+mutable state, dynamic binding and subtle module loading make Python programs hard to reason about. \PurePy is a statically typed, immutable subset of Python with a formal static and dynamic
+semantics that agrees with Python: every well-formed \PurePy program is valid Python and evaluates to the same result
+under Python's own interpreter as under any conforming \PurePy implementation. \PurePy is intended both as a target for
+generative AI and as a platform for programming-language research, since research languages and program
+analyses built on \PurePy inherit a formal semantics and, with it, compatibility with Python. \PurePy is lightly opinionated, requiring
+variable declarations and type annotations and excluding Python idioms that would break purity. The type system
+is designed so that every well-formed program is also well typed under mypy, which allows \PurePy programs to be
+checked by the toolchain already used by Python programmers. We define \PurePy as a versioned standard, giving
+a formal grammar, type system and operational semantics, and accompany the standard with a reference checker, which
+decides well-formedness, and a conformance suite, which tests agreement with Python on CPython, GraalPy and
+Pyodide. To assess \PurePy as a target for generative AI, we ask whether AI coding tools can write
+well-formed \PurePy, the extent to which the restrictions of \PurePy hinder generation, and whether the same
+discipline makes the generated code more likely to be correct, comparing generation into \PurePy, Python and OCaml on standard benchmarks. Finally, to demonstrate the use of \PurePy as a platform for
+language research, we present two research languages for scientific computing based on \PurePy, with guarantees
+grounded in the \PurePy semantics.
 \end{abstract}
 
 \maketitle
@@ -114,7 +124,6 @@ modelling, data processing, analysis, and visualisation.
 \input{spec/well-formedness}
 \input{spec/operational-semantics}
 \input{paper/reference-implementation}
-\input{paper/extensions}
 \input{paper/case-studies}
 \input{paper/evaluation}
 \input{paper/related-work}

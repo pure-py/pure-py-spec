@@ -1,9 +1,10 @@
 The rule \ruleName{eval-match} passes the bindings of the selected case both to its body and into the
 outcome of the statement, so pattern variables remain bound after the match (\secref{pattern-binding}):
 \begin{mathpar}
+\small
 \input{spec/rules/eval-match}
 \end{mathpar}
-Here $\dispatch$ tries the cases in order with the matching function $\matchOp{\Sigma}$ (\figref{auxiliary-functions}), and yields \pyinline{pass}
+Here $\dispatch$ tries the cases in order with the matching function $\matchOp{\Sigma}$, and yields \pyinline{pass}
 with no bindings if no pattern matches:
 \begin{defalign}
 \input{spec/functions/dispatch}

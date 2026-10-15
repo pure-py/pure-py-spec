@@ -1,0 +1,8 @@
+\inferrule*[lab={\ruleName{pat-shapes}}]
+{
+  L' = \set{k \in L \mid \Sigma; \Gamma \vdash k, p \matches K_k, L_k} \\
+  L' \neq \varnothing
+}
+{
+  \Sigma; \Gamma \vdash L, p \matches \textstyle\bigdisjunion_{k \in L'} K_k, \; \textstyle\bigdisjunion_{k \in L'} L_k \disjunion (L \setminus L')
+}

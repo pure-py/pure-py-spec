@@ -1,0 +1,8 @@
+\inferrule*[lab={\ruleName{lambda}}]
+{
+  \seq{x} \text{ distinct} \\
+  \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\tau}}} \vdash e \checks \tau
+}
+{
+  \Sigma; \Gamma \vdash \exLambda{\seq{x}}{e} \checks \tyCallable{\seq{\tau}}{\tau}
+}

@@ -44,7 +44,11 @@
 \makeatother
 \newcommand*{\pyinlinestyle}{\renewcommand\ttdefault{cmtt}\ttfamily}
 
-\lstnewenvironment{python}[1][]{\lstset{style=base16python,#1}}{}
+% A listing opening a top-aligned minipage already sits a line below the preceding text, so its space above
+% is replaced by a small negative skip, measured to leave the same gap above as below.
+\makeatletter
+\lstnewenvironment{python}[1][]{\lstset{style=base16python}\if@minipage\lstset{aboveskip=-3pt}\fi\lstset{#1}}{}
+\makeatother
 
 % Colour of inline code: base05, or the markup colour inside change markup (tex/change-tracking.tex)
 \providecommand*{\codecolor}{base05}

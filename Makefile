@@ -23,12 +23,19 @@ $(PYTHON_VERSION_TEX): .python-version
 $(MYPY_VERSION_TEX): uv.lock
 	printf '\\newcommand*{\\mypyVersion}{%s}\n' \
 		"$$(sed -n '/^name = "mypy"$$/{n;s/^version = "\(.*\)"$$/\1/p;}' $<)" > $@
+# FINAL=1 renders the clean version, with change markup accepted; switching modes needs a forced
+# rebuild (make -B).
+ifdef FINAL
+latex-source = -jobname=$* "\\def\\finalmode{}\\input{$<}"
+else
+latex-source = $<
+endif
 
 %.pdf: %.tex $(TEXFILES)
-	$(PDFLATEX) $<
+	$(PDFLATEX) $(latex-source)
 	bibtex "$*"
-	$(PDFLATEX) $<
-	$(PDFLATEX) $<
+	$(PDFLATEX) $(latex-source)
+	$(PDFLATEX) $(latex-source)
 	$(call check-log,$*)
 	rm -f $(BUILD_AUX)
 

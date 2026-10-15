@@ -1,7 +1,7 @@
 \section{Case studies}
 \label{sec:case-studies}
 
-This section reports two research languages for scientific computing built on \PurePy: \Fortl and \Fluid. \todo{Is there a way to do this without deanonymising the paper?}
+This section reports two research languages for scientific computing built on \PurePy: \Fortl and \Fluid\anononly{, with their names withheld for anonymous review}.
 
 \subsection{\Fortl}
 \label{sec:case-study-fortl}
@@ -19,5 +19,86 @@ relationship to \PurePy}
 
 \Fluid is a pure, Pythonic, provenance-aware functional language for transparent research outputs. It is built
 on \PurePy, adding a runtime that records fine-grained dependencies between the inputs and outputs of a
-computation, so that a figure or summary can be linked back to the underlying data. \Fluid implements the
-partial-application and piecewise extensions of \secref{extensions}.
+computation, so that a figure or summary can be linked back to the underlying data. \Fluid extends the core
+language in two ways, each preserving purity. Partial application is a semantic extension, giving a meaning to
+programs rejected by the core; piecewise function definitions are a syntactic extension, desugared to the
+core.
+
+\subsubsection{Partial application}
+\label{sec:extension-partial-application}
+
+A function applied to fewer arguments than it declares returns a function of the remaining arguments:
+
+\begin{python}
+from typing import Callable
+
+def add(x: int, y: int) -> int:
+    return x + y
+
+inc: Callable[[int], int] = add(1)
+inc(5)     # 6
+add(1)(2)  # 3
+\end{python}
+
+\noindent The syntax is valid Python, but Python raises a \pyinline{TypeError} at run time, because
+\pyinline{add(1)} is missing an argument. Core \PurePy rejects such a call statically, since the
+\ruleName{call} rule (\secref{expression-typing}) checks the arguments against every parameter of the callee. The
+extension therefore gives a meaning to programs rejected by the core without changing the meaning of any
+program accepted by the core. Statically, a callee of type $\tyCallable{\sigma_1, \ldots, \sigma_n}{\tau}$
+applied to $k < n$ arguments synthesises the type of a function of the remaining parameters:
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{call-partial}}]
+{
+  \Sigma; \Gamma \vdash e, e_1, \ldots, e_k \synth \sigma_1, \ldots, \sigma_n, \tau \\
+  k < n \\
+  \Sigma; \Gamma \vdash e_i \checks \sigma_i \quad (1 \leq i \leq k)
+}
+{
+  \Sigma; \Gamma \vdash \exCall{e}{e_1, \ldots, e_k} \synth \tyCallable{\sigma_{k+1}, \ldots, \sigma_n}{\tau}
+}
+\end{mathpar}
+\noindent Dynamically, the call evaluates to a partial application, a value pairing the function with the
+arguments supplied, and applying a partial application appends the new arguments and applies the function
+once the declared arity is reached. \Fluid also applies a function called with more arguments than it
+declares to the first $n$ of them and the result to the rest, which is well typed only when the result type
+is itself a \pyinline{Callable}: given \pyinline{def adder(x: int) -> Callable[[int], int]}, the call
+\pyinline{adder(1, 2)} applies the function returned by \pyinline{adder(1)} to \pyinline{2}.
+
+\subsubsection{Piecewise function definitions}
+\label{sec:extension-piecewise}
+
+A function may be defined by several clauses whose parameters are patterns, in place of a single definition
+with an explicit \pyinline{match}. Python has no such form, because a parameter cannot be a pattern, so the
+extension is syntactic and needs no notation to distinguish it from an ordinary \pyinline{def}. The clauses
+of one function must be contiguous, forming a mutual def region (\secref{mutual-recursion}), must agree in
+their number of parameters and in their parameter and return annotations, and desugar to a single definition.
+A parameter column holding the same variable in every clause becomes a parameter of that name; each remaining
+column becomes a parameter named after its position and is matched by the clauses' patterns, as a tuple when
+there are several such columns. On the left a definition with one shared and one matched column, and on the
+right its desugaring:
+
+\noindent
+\begin{minipage}[t]{0.47\textwidth}
+\begin{python}
+def f(k: int, [x]: list[int]) -> int:
+    return k * x
+def f(k: int, xs: list[int]) -> int:
+    return 0
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.47\textwidth}
+\begin{python}
+def f(k: int, $2: list[int]) -> int:
+    match $2:
+        case [x]:
+            return k * x
+        case xs:
+            return 0
+\end{python}
+\end{minipage}
+
+\noindent The synthesised name \pyinline{$2} is not a Python identifier, so it cannot clash with a variable
+of the source program; the desugared definition is a term of the abstract syntax (\secref{syntax}) rather
+than a source program, and is checked and evaluated by the core rules.

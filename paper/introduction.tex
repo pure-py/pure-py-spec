@@ -1,52 +1,80 @@
 \section{Introduction}
+\label{sec:introduction}
 
-Python is among the most widely used languages in scientific computing, data analysis, and teaching, valued for
-an accessible surface syntax and a large ecosystem. That reach comes with a large and permissive language.
-Programs mutate state freely, depend on side effects and dynamic binding, and allow many implicit coercions, so
-they can be hard to reason about, hard to reproduce, and hard to target with formal tools or with
-implementations other than the reference interpreter. A researcher in programming languages or in pedagogy who
-wants a well-behaved functional language faces a trade-off: such a language is easy to reason about but
-unfamiliar, whereas Python is familiar but unruly.
+Scientific results are increasingly computed by programs written with, or generated outright by, AI coding
+tools. Most new users of GitHub now try a coding assistant within their first
+week~\cite{github2025}, and the reliability of generated scientific code is an open question with benchmarks
+of its own~\cite{tian2024,chen2025,siegel2024}. Whatever the success rate of the current models, scientific
+results that rest on generated programs need assurance that the programs work as intended. Verification
+against a formal specification provides such assurance in principle, but a generated program is accepted on
+the strength of its output, because the scientist who asked for it rarely has a specification to verify it
+against. More broadly, assurance that AI systems work as intended is now a stated priority of UK
+policy~\cite{clifford2025,dbt2025}.
 
-\PurePy carves out a pure, side-effect-free subset of Python that is well-behaved and easy to reason about, yet
-remains ordinary Python. Every well-formed \PurePy program is valid Python, and when \PurePy gives a run a
-result, a standard interpreter gives the same one, so one artifact serves two roles: a program that a scientist can run today, and a
-common target that a research language or tool can produce and consume. Purity makes programs referentially
-transparent, deterministic, and reproducible, the properties that scientific computing and formal reasoning
-both want.
+Python is the usual language for this code. Python is the most used language on GitHub in AI and data
+science~\cite{github2025}, and scientific computing is among the fields driving its use~\cite{github2024}.
+AI coding tools favour Python when a task leaves the choice open, choosing it in most cases even where another
+language would serve better~\cite{twist2026}, and most of the code-generation benchmarks surveyed by
+\citet{siddiq2024} are in Python. They also generate Python more
+accurately than languages with less training data, such as OCaml and Racket~\cite{cassano2023}. Fine-tuning
+closes the gap only in part~\cite{cassano2024}.
 
-This paper defines \PurePy as a versioned formal standard\footnote{This paper describes version
-\versionstring{} of the \PurePy language specification, which \specificationavailability.}: a formal grammar, a type system that accepts only
-programs accepted by mypy, and an operational semantics that agrees with Python on every run that it defines. A reference type checker decides well-formedness, and a conformance test suite exercises the
-standard against CPython,  GraalPy, and Pyodide. The guarantee is precise: well-formedness is decidable, and
-\PurePy either gives a run Python's result or gives it no result at all.
+Assurance is hard to obtain for Python. The language has not been given an official formal semantics, and the
+formalisations constructed by researchers~\cite{guth2013,kohl2021,politz2013,melancon2023} model the behaviour
+of the full language rather than delimiting a subset within which reasoning is tractable. Even given a
+semantics, three aspects of the language make Python programs hard to reason about. Under mutable state, the
+value of a variable depends on every assignment that may run before a use. Under dynamic binding, the referent
+of a name is fixed only when the name is evaluated. Under load-order dependence, the meaning of a qualified
+name can depend on which modules have loaded elsewhere in the program (\secref{no-load-dependent}).
 
-The design is deliberately conservative. Rather than reconstruct Python's full behaviour, \PurePy chooses a
-simple, well-behaved core and excludes the idioms that would break it, among them mutable state, effectful
-control, implicit coercions, and constructs whose meaning depends on module load order
-(\secref{overview}). The standard is versioned, so the subset can grow as features earn their place
-without disturbing programs written against an earlier version.
+\PurePy is a statically typed, immutable subset of Python with a formal static and dynamic semantics. Every
+well-formed \PurePy program is a valid Python program, and every terminating run with defined behaviour under \PurePy
+produces the same result under Python. This guarantee, which we call agreement, is stated in
+\secref{python-compatibility} and tested by a conformance suite on CPython, GraalPy and Pyodide
+(\secref{reference-implementation}). The guarantee is unproven (\secref{agreement}); the metatheory of
+\secref{metatheory} concerns the well-formedness of environments. Every function and dataclass field is
+annotated, so that types are given rather than inferred. The type system accepts only programs accepted by
+mypy, so that \PurePy programs are checked by the toolchain already used by Python programmers. \PurePy
+excludes Python idioms that would break purity, compatibility with mypy or deterministic failure, under which
+a failing program fails in the same way under every implementation (\secref{purity}). Several of the excluded
+idioms, such as wildcard imports, are also discouraged by PEP 8,\footnote{\url{https://peps.python.org/pep-0008/}}
+so the exclusions partly follow established Python practice and the subset is lightly opinionated as well as
+pure.
 
-\PurePy is aimed first at researchers in programming languages and in pedagogy, and is intended to grow into a
-common language for scientific computing, supporting portable applications in modelling, data processing,
-analysis, and visualisation. Because every \PurePy program is also a Python program, adopting it costs nothing
-at the surface, and a research language that targets \PurePy inherits a large and familiar runtime.
+We take the position that machine-generated code changes the economics of language design. Features that
+spare human authors effort, such as mutation in place, implicit coercion and late binding, have a cost in
+reasoning that is paid by whoever must trust the result. When the author is a machine, the effort saved is worth
+little and the cost remains, so strictness and formal guarantees gain value. A stricter language that departs
+from Python's syntax, however, forfeits Python's training data and benchmarks. A subset of Python keeps the
+training data and benchmarks, because its programs are Python programs. The evaluation of \secref{evaluation}
+measures the cost of this strictness to a code generator. It compares code generation into \PurePy with
+generation into Python and into OCaml on standard benchmarks, and reports how often the type checker rejects a
+first attempt, how many rounds a generator needs to reach a well-formed program and how often the final program
+passes the tests.
+
+\PurePy is also intended as a foundation for programming-language research on generated code, in two roles.
+In the first, a research language compiles to \PurePy, so that the properties enforced by its type system
+hold by construction for the compiled programs and its remaining guarantees can be stated against the \PurePy
+semantics. The two case studies of \secref{case-studies}, a language with units of measure and a language
+with provenance tracking, take this role, compiling to \PurePy by type erasure and by desugaring respectively.
+In the second, analyses grounded in the \PurePy semantics check generated programs in place, with no
+translation between the checked program and the program run by the scientist. \PurePy does not yet cover the
+array and dataframe libraries on which scientific computing in Python rests; \secref{conclusion} discusses
+pure counterparts.
 
 \subsection{Contributions}
 
-After setting out the problem addressed by \PurePy in \secref{overview}, we make the following
-contributions:
+After an overview of the design and its exclusions (\secref{overview}), we make the following contributions:
 \begin{itemize}
-\item a definition of \PurePy as a versioned standard, with a formal grammar, a type system
-(\secref{well-formedness}) and an operational semantics that agrees with Python on
-every run that it defines (\secref{operational-semantics});
-\item a reference type checker that decides well-formedness, validated by a conformance test suite
-exercised on CPython,  GraalPy, and Pyodide (\secref{reference-implementation});
-\item conservative extensions to the core language, including partial application and piecewise function
-definitions (\secref{extensions});
-\item case studies that use \PurePy as a common functional language (\secref{case-studies});
-\item an experimental evaluation of how well AI agents generate \PurePy and translate existing Python into it
-(\secref{evaluation}).
+\item a definition of \PurePy as a versioned standard\footnote{This paper describes version
+\versionstring{} of the \PurePy language specification, which \specificationavailability.}, with a formal
+grammar (\secref{syntax}), a type system (\secref{well-formedness}) and an operational semantics designed so
+that every terminating run with defined behaviour under \PurePy{} produces the same result under Python
+(\secref{operational-semantics});
+\item a reference type checker that decides well-formedness, and a conformance suite that tests agreement on
+CPython, GraalPy and Pyodide (\secref{reference-implementation});
+\item two research languages built on \PurePy, one of which extends the core language with partial application
+and piecewise function definitions (\secref{case-studies});
+\item an evaluation of AI code generation into \PurePy, compared with generation into Python and OCaml, on standard benchmarks (\secref{evaluation}).
 \end{itemize}
-\secref{related-work} summarises related efforts, and \secref{conclusion} presents our conclusions
-and discusses future work.
+\secref{related-work} discusses related work and \secref{conclusion} concludes.

@@ -13,14 +13,7 @@
   \Sigma; \Gamma \vdash e \checks \tau
 }
 \and
-\inferrule*[lab={\ruleName{lambda}}]
-{
-  \seq{x} \text{ distinct} \\
-  \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\tau}}} \vdash e \checks \tau
-}
-{
-  \Sigma; \Gamma \vdash \exLambda{\seq{x}}{e} \checks \tyCallable{\seq{\tau}}{\tau}
-}
+\input{spec/rules/lambda}
 \and
 \inferrule*[lab={\ruleName{var-scheme}}]
 {
