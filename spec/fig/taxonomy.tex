@@ -25,10 +25,10 @@
   \node at (0.1,3.25) {Raises other\\exception\\\testdir{exception/}};
   \node at (0.1,1.85) {Does not raise\\exception\\\testdir{no-exception/}};
   \node at (3.3,3.25) {No tests yet};
-  \node at (5.9,3.25) {Python runtime\\error\\(\figref{prevented-errors})};
+  \node at (5.9,3.25) {Python runtime\\error\\(\speconly{\figref{prevented-errors}}\paperonly{\added{\secref{runtime-errors}}})};
   \node at (3.3,1.85) {Syntactically\\excluded};
-  \node at (5.9,1.85) {Statically\\excluded\\(\figref{coercions})};
-  \node at (8.5,1.85) {Dynamically\\excluded\\(\figref{coercions})};
+  \node at (5.9,1.85) {Statically\\excluded\\(\speconly{\figref{coercions}}\paperonly{\added{\secref{no-coercions}}})};
+  \node at (8.5,1.85) {Dynamically\\excluded\\(\speconly{\figref{coercions}}\paperonly{\added{\secref{no-coercions}}})};
   \node at (11.1,0.48) {\testdir{mypy-bug/}};
   \draw[mypy] (8.46,0.06) -- (11,0.06) -- (11,0.56) -- (13.84,0.56) -- (13.84,3.24) -- (8.46,3.24) -- cycle;
   % Key, in two rows

@@ -33,8 +33,8 @@ Function signatures, assignments and dataclass fields are annotated with type ex
 type expression denotes a type under a context and class table\speconly{ (\figref{resolve-type})}. Every definition carries an
 annotation for its parameters and return type, so the type of a definition is given rather than
 inferred from its body. Within a type expression, a class name applied to as many type arguments as the class has parameters resolves to an instantiated class, an alias name applied to type arguments resolves to the instantiation of its alias, type parameters in scope denote the type variables of those names, and all other names must be predefined names\speconly{ (\figref{resolve-type})}. The function $\baseType(\tau)$ discards the precision of a
-literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as the identity
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:base-type}}).
+literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as the identity\speconly{
+(\S\ref{aux:base-type})}.
 
 \speconly{\subsubsection{Subtyping}\label{sec:subtyping}}%
 \paperonly{\paragraph{Subtyping.}}
@@ -65,7 +65,7 @@ meet of incomparable types distributes over a union, takes tuples componentwise 
 parameters joined and results combined using meet, and is \pyinline{Never} otherwise, since no value belongs to both types.
 So joining a type with itself gives that type, joining a class with its base class gives the base class, and
 joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$. A sequence of types is joined by
-folding binary join over the sequence, with \pyinline{Never} as the unit (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:join}}).
+folding binary join over the sequence, with \pyinline{Never} as the unit\speconly{ (\S\ref{aux:join})}.
 \end{specdefinition}
 
 \begin{lemma}[Types form a lattice]
@@ -104,8 +104,8 @@ The fields of a class $C$ form a field scheme $\fields{\Sigma}(C)$ over its type
 field: the fields of its base class first, recursively and instantiated at the type arguments of the base, then the fields declared by $C$ itself, each at its
 declared type; the fields of an instantiated class $C[\seq{\tau}]$ are the instantiation $\tyInst{\fields{\Sigma}(C)}{\seq{\tau}}$. The order matters, because a constructor call pairs positional arguments with fields by
 position. A call $\exCall{q}{a}$ is a constructor call if $q$ denotes a class. A constructor call pairs each argument with a field using $\fieldMap{\Sigma}$ and
-infers type arguments $\seq{\tau}'$ for the class $C$ that $q$ resolves to, using $\typeArgs{\Sigma}$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) over the arguments that synthesise, as
+infers type arguments $\seq{\tau}'$ for the class $C$ that $q$ resolves to, using $\typeArgs{\Sigma}$\speconly{
+(\S\ref{aux:type-args})} over the arguments that synthesise, as
 in \ruleName{callee-scheme} (\ruleName{constr}). The arguments are checked against the field types instantiated at
 $\seq{\tau}'$, and the call synthesises $C[\seq{\tau}']$. A constructor call of the form $\exCall{q[\seq{\psi}]}{a}$ takes
 the type arguments denoted by $\seq{\psi}$ instead (\ruleName{constr-explicit}). An attribute reference $\exAttr{e}{x}$ has the type of the field $x$ of the class synthesised by $e$
@@ -136,8 +136,8 @@ types $\seq{\sigma}$ and result type $\sigma$ from the callee along with its arg
 the arguments against $\seq{\sigma}$, and the call synthesises $\sigma$. The auxiliary judgement has two rules. A callee that synthesises a
 \pyinline{Callable} type gives the parameter and result types of that type (\ruleName{callee}). A name bound at a
 type scheme $\scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}$ instantiates the type parameters from the arguments
-(\ruleName{callee-scheme}). The type arguments are collected by $\typeArgs{\Sigma}$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-args}}) over the arguments that synthesise,
+(\ruleName{callee-scheme}). The type arguments are collected by $\typeArgs{\Sigma}$\speconly{
+(\S\ref{aux:type-args})} over the arguments that synthesise,
 by a one-way unification of each parameter type with the synthesised type, in which the type parameters $\seq{\alpha}$ are the
 unknowns: a type parameter takes the type found at the same
 position in the synthesised type, with one found at several positions taking the join of those types.
@@ -181,7 +181,7 @@ elements, since \pyinline{list} is invariant.
 
 Typing a comprehension types its qualifiers, which bind the variables that can be used in the body\speconly{
 (\figref{typing-check})}. A generator's variable is bound at $\elemTy{\Sigma}$ of the type synthesised by the
-iterated expression (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:elem-type}}). A
+iterated expression\speconly{ (\S\ref{aux:elem-type})}. A
 tuple is iterated at the join of the base types of its components.
 A lambda within a comprehension may not capture a generator variable, a side condition of
 \ruleName{list-comp}, \ruleName{dict-comp} and \ruleName{qual-generator}. Python closures are
@@ -204,7 +204,7 @@ types to the resolved overloads of an operator.
 \end{specdefinition}
 
 The \ruleName{binop} and \ruleName{unop} rules\speconly{ (\figref{typing-synth})} take the result type
-of the most specific overload at the operand types, $\resolveOp{\Sigma}$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:resolve-op}}), so \pyinline{1 + 2} is an
+of the most specific overload at the operand types, $\resolveOp{\Sigma}$\speconly{ (\S\ref{aux:resolve-op})}, so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
 \begin{specdefinition}{Equality type}
@@ -283,8 +283,8 @@ A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $
 checks $e$ against its declared type (\ruleName{assign}); the form $\exAssign{x\exAnnot{\psi}}{e}$ declares and
 assigns $x$ at once (\ruleName{declare-assign}). A declaration does not check
 whether its name is already declared; that check is made once for the whole scope, when the rules for function
-definitions and modules introduce the variables of the scope as unbound, using the function $\scopeS(Y, s)$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:scope}}).
+definitions and modules introduce the variables of the scope as unbound, using the function $\scopeS(Y, s)$\speconly{
+(\S\ref{aux:scope})}.
 
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}). An assertion of the literal \pyinline{False} has outcome $\Returns$, like a \pyinline{return}
@@ -354,18 +354,18 @@ of annotations.} Recursive datatypes are therefore declared with their aliases b
 resolves the alias again.
 
 The \ruleName{types} rule\speconly{ (\figref{typing-top-level})} binds the names of a mutual type region $\seq{\chi}$ and adds
-its classes to the class table before checking its definitions. The context entry bound to the name declared by $\chi_i$ is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-entry}}): the class
+its classes to the class table before checking its definitions. The context entry bound to the name declared by $\chi_i$ is $\typeEntry{\Gamma}(q, \seq{\chi}, i)$\speconly{ (\S\ref{aux:type-entry})}: the class
 $\Type{q.c}$ if $\chi_i$ is a class definition, and the alias $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ if it is a \pyinline{type} statement.
-The class table is extended with $\classTable{\Gamma}(q, \seq{\chi})$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:class-table}}), a class table defining all the classes of the type region. A class thus has three static forms, as a function has: the
+The class table is extended with $\classTable{\Gamma}(q, \seq{\chi})$\speconly{
+(\S\ref{aux:class-table})}, a class table defining all the classes of the type region. A class thus has three static forms, as a function has: the
 class statement $\chi_i$, which defines it; the context entry $\Type{q.c}$, by which a variable refers to it by name; and
 $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$ in the class table, the class statement together with its type region and defining
 context, from which its fields and base class are read. For a function the three are the \pyinline{def} statement, the
 type scheme bound to its name and the closure $\exDefClosure[\Gamma]{\rho}{\seq{d}}{i}$. Aliases and class definitions under their defining contexts carry the type region and
 defining context $\Gamma$, because alias bodies, field annotations and base classes are resolved at each use rather than when the
 type region is checked.
-Each definition $\chi_i$ is checked under the extended class table and the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:type-context}}), by the auxiliary judgement $\Sigma; \Gamma \vdash \chi$, which binds
+Each definition $\chi_i$ is checked under the extended class table and the context $\typeContext{\Gamma}(q, \seq{\chi}, i)$\speconly{
+(\S\ref{aux:type-context})}, by the auxiliary judgement $\Sigma; \Gamma \vdash \chi$, which binds
 every name of the type region for a \pyinline{type} statement and only the earlier names for a class definition, as above.
 
 The judgement $\Sigma; \Gamma \vdash \chi$ checks a class definition by resolving the field annotations, which may mention the type parameters of the class, and requiring the fields it declares to be distinct and, when it extends
@@ -385,8 +385,8 @@ $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$\speconly{ (\figre
 $\tau$ and a \emph{residual} $L$ through the cases, both over-approximations of the values of $\sigma$ which are not
 matched by any of the earlier cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a
 set of values of a single type, and starts from the shapes of $\sigma$; the remaining type is coarser, a type rather
-than a set of shapes, and starts from $\sigma$ itself. Two auxiliary functions narrow a type $\tau$ by a pattern $p$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:matched-as}}): $\matchedAs{\Sigma}(\Gamma, \tau, p)$ is
+than a set of shapes, and starts from $\sigma$ itself. Two auxiliary functions narrow a type $\tau$ by a pattern $p$\speconly{
+(\S\ref{aux:matched-as})}: $\matchedAs{\Sigma}(\Gamma, \tau, p)$ is
 the type to which $\tau$ is narrowed if $p$ matches, and $\remaining{\Sigma}(\Gamma, \tau, p)$ is the type remaining if
 $p$ fails. Each case's pattern is checked against the remaining type\speconly{
 (\secref{pattern-checking})}, binding its pattern variables, and matched

@@ -68,9 +68,9 @@ result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figre
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, like the
 \pyinline{if} statement (\ruleName{eval-if}). A comprehension evaluates its body once for each binding produced by its qualifiers, and
 concatenates the results; a generator draws its bindings from the elements of a value, given by the auxiliary
-function $\iterOp$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:iter}}): the elements of a
+function $\iterOp$\speconly{ (\S\ref{aux:iter})}: the elements of a
 list, tuple or string, and the keys of a dictionary, as in Python. Subscripting, given by the auxiliary
-function $\getitem$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:getitem}}), indexes a list, tuple or
+function $\getitem$\speconly{ (\S\ref{aux:getitem})}, indexes a list, tuple or
 string by an integer, counting from the end when negative, and a dictionary by a string key,
 aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name, and with $\errType$ for a
 dictionary subscripted by a value other than a string. An attribute reference on a
@@ -85,10 +85,10 @@ value other than a module or object aborts with $\errAttr$ (\ruleName{eval-attr-
 
 A \pyinline{match} statement takes the first case whose pattern matches the value, running its body under
 the bindings produced by the pattern, and does nothing if no case matches; the auxiliary function
-$\dispatch$ (\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:dispatch}}) selects the matching case.
+$\dispatch$\speconly{ (\S\ref{aux:dispatch})} selects the matching case.
 \paperinput{paper/operational-semantics/match}%
-Whether a pattern matches is determined by the auxiliary function $\matchOp{\Sigma}(\rho, p, v)$
-(\paperonly{\figref{auxiliary-functions}}\speconly{\S\ref{aux:match}}). A \emph{match result} $m$ is
+Whether a pattern matches is determined by the auxiliary function $\matchOp{\Sigma}(\rho, p, v)$\speconly{
+(\S\ref{aux:match})}. A \emph{match result} $m$ is
 $\matchOk{\rho'}$, a match, where $\rho'$ binds the variables of the pattern to the values that they matched,
 $\noMatch$, a failure to match, or $\errUndef$, for a numeric literal pattern if the equality of the literal and the value is undefined. When
 a match result is undefined, the value of $\dispatch$ is also undefined, and the run has undefined behaviour (\ruleName{eval-match-undef}).

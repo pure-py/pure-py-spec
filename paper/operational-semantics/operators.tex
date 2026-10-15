@@ -10,7 +10,7 @@ number, which Python compares numerically, between functions, which Python compa
 two \pyinline{nan}s inside a container. Compared directly, \pyinline{nan == nan} is \pyinline{False} in both languages,
 but Python compares container elements by identity before equality, so two lists holding \pyinline{nan}s
 are equal or not according to whether they hold the same object, a distinction that \PurePy cannot make.
-Python gives an answer in each case (\figref{coercions}), so each is a dynamically excluded comparison. Comparison short-circuits at the first element that
+Python gives an answer in each case (\added{\secref{no-coercions}}), so each is a dynamically excluded comparison. Comparison short-circuits at the first element that
 decides the result, so the comparison order is observable:
 
 \begin{python}
