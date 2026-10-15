@@ -17,12 +17,11 @@ makes the variable definitely assigned, so that $\Gamma(x)$ is a type, as the \r
 annotated assignment does both at once; and the \ruleName{if} rules combine the branches with $\merge$, so
 that a variable is definitely assigned after a conditional only if each branch either assigns it or definitely
 returns, and is otherwise possibly unassigned, $\PU{\tau}$ (\secref{well-formedness-statements}). Branch-local variables are therefore permitted, but using one after the
-conditional is not, nor is completing a partial assignment\added{, as in the program on the left below. The
+conditional is not, nor is completing a partial assignment, as in the program on the left below. The
 \ruleName{def-body} rule introduces every variable declared or assigned by the body at $\Unbound$ before checking
 the body, so a reference before the declaration is rejected statically, as on the right, whereas Python fails at
-run time with \pyinline{UnboundLocalError}}:
+run time with \pyinline{UnboundLocalError}:
 
-\begin{AddedBlock}
 \begin{listingrow}
 \begin{listingcol}{0.48\textwidth}
 \begin{python}
@@ -46,13 +45,12 @@ def f() -> int:
 \end{python}
 \end{listingcol}
 \end{listingrow}
-\end{AddedBlock}
 
-\noindent \added{On the left, }Python assigns \pyinline{x} twice when \pyinline{b} is true, so no pure reading of the program
+\noindent On the left, Python assigns \pyinline{x} twice when \pyinline{b} is true, so no pure reading of the program
 agrees with Python: under shadowing, \pyinline{return x} would refer to a different variable from the one
-assigned in the branch. \added{On the right, \pyinline{y} is local to \pyinline{f} because of its declaration in
-\pyinline{f}. The set $\assignsS(s)$ of variables introduced by the \ruleName{def-body} rule contains the variables}
-declared or assigned anywhere in \added{the body} $s$, not descending into nested function definitions, which have their own scope.
+assigned in the branch. On the right, \pyinline{y} is local to \pyinline{f} because of its declaration in
+\pyinline{f}. The set $\assignsS(s)$ of variables introduced by the \ruleName{def-body} rule contains the variables
+declared or assigned anywhere in the body $s$, not descending into nested function definitions, which have their own scope.
 
 A function defined in a branch can also be used only within that branch; its name is possibly unassigned after the
 conditional, and no other branch can complete the definition, because a definition is also a declaration and a scope
@@ -70,19 +68,26 @@ context in which every name of the mutual def region is definitely assigned, so 
 to any other, and requires the names to be distinct. Self-recursion is the special case of a singleton
 mutual def region. Any other statement between two definitions separates them into different mutual def regions:
 
-\begin{python}
+\begin{listingrow*}
+\begin{listingcol}{0.5\textwidth}
+\begin{python}[numbers=left, xleftmargin=1.5em]
 def even(n: int) -> bool:
     if n == 0:
         return True
-    return odd(n - 1)  # error: odd is not yet bound
-
-x: bool = even(0)  # intervening statement separates the mutual def regions
-
+    # error: odd not yet bound
+    return odd(n - 1)
+\end{python}
+\end{listingcol}
+\begin{listingcol}{0.44\textwidth}
+\begin{python}[numbers=left, firstnumber=6, xleftmargin=1.5em]
+x: bool = even(0)
 def odd(n: int) -> bool:
     if n == 0:
         return False
     return even(n - 1)
 \end{python}
+\end{listingcol}
+\end{listingrow*}
 
 \noindent This is rejected statically: \pyinline{even} forms a mutual def region by itself, in which \pyinline{odd}
 is not yet bound, so the reference fails the \ruleName{var} rule. Python accepts the program, since the
@@ -112,29 +117,35 @@ assignment of the variables it binds, which must not be declared already. The se
 \ruleName{match} rule checks each body in a context in which they are definitely assigned, and combines
 the cases with $\merge$ as the \ruleName{if} rules do, so a variable is definitely assigned after the match
 only if every case binds it or returns. A match whose cases leave some value of the scrutinee type
-unmatched may fall through:
+unmatched may fall through, as in the program on the left below. Within a pattern the variables must be distinct,
+as in Python. Every case must also be reachable: the matching judgement rejects a case that can match only values
+already matched by an earlier case (\secref{well-formedness-patterns}), as on the right, which Python leaves
+silently unreachable:
 
+\begin{listingrow}
+\begin{listingcol}{0.48\textwidth}
 \begin{python}
 v: tuple[int, int] | None = (1, 2)
 match v:
     case (x, y):
         print(x + y)
-print(x)  # error: x not definitely assigned
+print(x)  # error: x possibly unassigned
 \end{python}
-
-\noindent Python prints \pyinline{1}, the binding having escaped the match. Within a pattern the
-variables must be distinct, as in Python. Every case must also be reachable: the matching judgement rejects a case
-that can match only values already matched by an earlier case (\secref{well-formedness-patterns}), which
-Python leaves silently unreachable:
-
+\end{listingcol}
+\begin{listingcol}{0.45\textwidth}
 \begin{python}
 v: tuple[int, int] = (1, 2)
 match v:
     case (a, b):
         print(a + b)
-    case (1, 2):  # error: the previous case matches every pair
+    # error: unreachable
+    case (1, 2):
         print(0)
 \end{python}
+\end{listingcol}
+\end{listingrow}
+
+\noindent On the left, Python prints \pyinline{1}, the binding having escaped the match.
 
 \subsubsection{Reachability}
 \label{sec:unreachable}

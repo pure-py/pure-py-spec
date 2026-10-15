@@ -53,14 +53,17 @@
 \makeatother
 
 % Listings side by side: each listingcol is a top-aligned minipage, and listingrow separates the columns by
-% faint dotted rules spanning the tallest column.
+% faint dotted rules spanning the tallest column; listingrow* sets one listing in columns, without rules.
 \makeatletter
 \newcount\listing@cols
 \newdimen\listing@ht
 \newdimen\listing@dp
 \@for\listing@i:={1,2,3,4}\do{\expandafter\newbox\csname listing@box\listing@i\endcsname}
 \newcommand*{\listing@box}[1]{\csname listing@box#1\endcsname}
-\newenvironment{listingrow}{\par\global\listing@cols=0\relax}{%
+\newif\iflisting@rule
+\newenvironment{listingrow}{\par\global\listing@cols=0\relax\listing@ruletrue}{\listing@typeset}
+\newenvironment{listingrow*}{\par\global\listing@cols=0\relax\listing@rulefalse}{\listing@typeset}
+\newcommand*{\listing@typeset}{%
   \listing@ht=0pt\relax \listing@dp=0pt\relax
   \count@=0\relax
   \loop\ifnum\count@<\listing@cols \advance\count@ 1\relax
@@ -69,12 +72,12 @@
   \repeat
   \noindent\count@=0\relax
   \loop\ifnum\count@<\listing@cols \advance\count@ 1\relax
-    \ifnum\count@>1 \hfill\listing@rule\hfill\fi
+    \ifnum\count@>1 \hfill\iflisting@rule\listing@rule\hfill\fi\fi
     \box\listing@box{\the\count@}%
   \repeat
   \par\medskip}
 \newcommand*{\listing@rule}{%
-  \tikz[baseline=0pt]\draw[base03, densely dotted, line width=0.3pt]
+  \tikz[baseline=0pt]\draw[base03, densely dotted, line width=0.5pt]
     (0pt,\the\listing@ht) -- (0pt,-\the\listing@dp);}
 \newenvironment{listingcol}[1]
   {\global\advance\listing@cols 1\relax

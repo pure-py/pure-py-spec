@@ -34,7 +34,7 @@ Otherwise \ruleName{pat-split} first splits the shape, by the judgement $\Sigma;
 K, L$, into shapes $K$ with that head and a residual $L$ with the head excluded. Splitting a rest shape at a
 class $C$ (\ruleName{split-class}) gives constructor shapes for the instance of $C$ at the type of the shape,
 with the shapes of the field types as components, and excludes $C$ from the residual; the instance
-judgement, defined in \added{\specfigref{instance}}, recovers the type arguments omitted by the pattern. Shapes are split
+judgement, defined in \specfigref{instance}, recovers the type arguments omitted by the pattern. Shapes are split
 only when a pattern requires it, because a class may refer to itself through its fields, and expanding every
 shape in advance would not terminate. The \ruleName{pat-constr} rule matches a pattern for a class $D$
 against a constructor shape for a subclass $C$ of $D$, matching the sub-patterns, with wildcards for omitted
