@@ -1,9 +1,9 @@
 import ast
 from collections.abc import Callable, Sequence
 
-from classes import ClassTable, fields
-from subtyping import comparable, join_seq, subtype
-from type_syntax import (
+from .classes import ClassTable, fields
+from .subtyping import comparable, join_seq, subtype
+from .type_syntax import (
     CallableType,
     ClassType,
     DictType,

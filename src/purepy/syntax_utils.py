@@ -1,7 +1,7 @@
 import ast
 from itertools import dropwhile, takewhile
 
-from type_syntax import (
+from .type_syntax import (
     Name,
     TypeExpr,
     Var,

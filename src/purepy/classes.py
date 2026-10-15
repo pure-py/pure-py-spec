@@ -2,9 +2,8 @@ import ast
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
-import reasons
-from aux import TypeDefinition, own_fields, type_expr, type_param_names
-from contexts import (
+from . import reasons
+from .contexts import (
     BUILTINS,
     Context,
     ModuleContext,
@@ -16,8 +15,9 @@ from contexts import (
     resolve_name,
     type_context,
 )
-from reasons import IllFormedModule
-from type_syntax import (
+from .reasons import IllFormedModule
+from .syntax_utils import TypeDefinition, own_fields, type_expr, type_param_names
+from .type_syntax import (
     RANGE,
     CallableExpr,
     CallableType,

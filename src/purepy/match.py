@@ -2,9 +2,8 @@ import ast
 from collections.abc import Callable, Iterable, Sequence
 from itertools import product
 
-import reasons
-from aux import binds, name_of
-from classes import (
+from . import reasons
+from .classes import (
     ArityMismatch,
     ClassTable,
     RepeatedKeywordArg,
@@ -16,7 +15,7 @@ from classes import (
     no_field_map,
     short_name,
 )
-from contexts import (
+from .contexts import (
     DU,
     PU,
     ModuleContext,
@@ -26,8 +25,8 @@ from contexts import (
     class_of_name,
     disjoint_union,
 )
-from reasons import IllFormedModule
-from shapes import (
+from .reasons import IllFormedModule
+from .shapes import (
     Constr,
     Dict,
     List,
@@ -42,9 +41,10 @@ from shapes import (
     shapes_seq,
     typed_heads,
 )
-from subtyping import Undetermined, disjuncts, instance, join, join_seq, meet, subtype
-from syntax import PatList, PatTuple
-from type_syntax import (
+from .subtyping import Undetermined, disjuncts, instance, join, join_seq, meet, subtype
+from .syntax import PatList, PatTuple
+from .syntax_utils import binds, name_of
+from .type_syntax import (
     RANGE,
     ClassName,
     ClassType,

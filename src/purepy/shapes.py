@@ -4,9 +4,9 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product
 
-from classes import ClassTable, ancestors
-from subtyping import instance_below, subtype
-from type_syntax import (
+from .classes import ClassTable, ancestors
+from .subtyping import instance_below, subtype
+from .type_syntax import (
     ClassName,
     ClassType,
     DictType,

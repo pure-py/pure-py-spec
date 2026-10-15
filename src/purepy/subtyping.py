@@ -2,8 +2,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product
 
-from classes import ClassTable, ancestors, base, type_params
-from type_syntax import (
+from .classes import ClassTable, ancestors, base, type_params
+from .type_syntax import (
     RANGE,
     CallableType,
     ClassName,

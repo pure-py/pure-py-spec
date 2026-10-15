@@ -5,9 +5,9 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from aux import TypeDefinition, declares, type_param_names
-from reasons import MypyCompatibility
-from type_syntax import (
+from .reasons import MypyCompatibility
+from .syntax_utils import TypeDefinition, declares, type_param_names
+from .type_syntax import (
     RANGE,
     CallableType,
     ClassName,
@@ -25,7 +25,7 @@ from type_syntax import (
 )
 
 if TYPE_CHECKING:
-    from classes import ClassTable
+    from .classes import ClassTable
 
 
 @dataclass(frozen=True)

@@ -1,23 +1,34 @@
+# LaTeX build artifacts
 *.aux
 *.bbl
 *.blg
-*.fdb_latexmk
-*.fls
-*.log
-*.pdf
-*.zip
-*.out
-agda/_build/
-.venv/
-__pycache__/
-
-.claude/settings.local.json
 *.cb
 *.cb2
+*.cut
+*.fdb_latexmk
+*.fls
 *.loc
+*.log
+*.out
+*.pdf
 *.soc
 *.toc
-*.cut
+*.zip
+
+# Agda build artifacts
+agda/_build/
+
+# Python build and environment artifacts
+.venv/
+__pycache__/
+dist/
+
+# Local tool settings
+.claude/settings.local.json
+
+# macOS
 .DS_Store
+
+# Generated version macros
 tex/python-version.tex
 tex/mypy-version.tex

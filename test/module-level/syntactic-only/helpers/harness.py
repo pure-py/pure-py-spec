@@ -1,16 +1,11 @@
 """Build ASTs which ast.parse can't produce and check PurePy rejects them."""
 
 import ast
-import pathlib
-import sys
 
-ROOT = pathlib.Path(__file__).resolve().parents[4]
-sys.path.insert(0, str(ROOT / "src"))
-
-from check_module import PREDEFINED_MODULES, check_module
-from reasons import IllFormed
-from syntax import Unsupported, check_syntax_module
-from type_syntax import Name
+from purepy.check_module import PREDEFINED_MODULES, check_module
+from purepy.reasons import IllFormed
+from purepy.syntax import Unsupported, check_syntax_module
+from purepy.type_syntax import Name
 
 
 def expect_rejected(m: ast.Module, msg_contains: str = "") -> None:

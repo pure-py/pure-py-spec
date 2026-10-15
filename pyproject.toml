@@ -1,7 +1,14 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "pure-py-reference-checker"
+name = "purepy"
 version = "0.21.0"
 requires-python = ">=3.12"
+
+[project.scripts]
+purepy = "purepy.__main__:main"
 
 [dependency-groups]
 dev = [
@@ -14,3 +21,6 @@ strict = true
 
 [tool.ruff]
 line-length = 100
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/purepy"]

@@ -75,10 +75,14 @@ jobs:
 
       - name: Run tests with GraalPy
         if: matrix.runtime == 'GraalPy'
+        env:
+          PYTHONPATH: ${{ github.workspace }}/src
         run: |
           test/run-all.sh python --no-mypy
 
       - name: Run tests with Pyodide
         if: matrix.runtime == 'Pyodide'
+        env:
+          PYTHONPATH: ${{ github.workspace }}/src
         run: |
           test/run-all.sh "$PYODIDE_PYTHON" --no-mypy

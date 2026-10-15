@@ -1,19 +1,10 @@
 import ast
-import sys
 from collections.abc import Mapping
 from dataclasses import replace
 
-import reasons
-import syntax
-from aux import (
-    assigns_body,
-    assigns_stmt,
-    declares_body,
-    split_imports,
-    statements,
-)
-from classes import PREDEFINED_CLASSES, ClassTable
-from contexts import (
+from . import reasons, syntax
+from .classes import PREDEFINED_CLASSES, ClassTable
+from .contexts import (
     BUILTINS,
     DU,
     MAIN,
@@ -29,9 +20,16 @@ from contexts import (
     override_context,
     predefined_context,
 )
-from reasons import IllFormed, IllFormedModule, IllFormedProgram
-from statements import check_assignments_declared, check_top_seq, scope
-from type_syntax import (
+from .reasons import IllFormed, IllFormedModule, IllFormedProgram
+from .statements import check_assignments_declared, check_top_seq, scope
+from .syntax_utils import (
+    assigns_body,
+    assigns_stmt,
+    declares_body,
+    split_imports,
+    statements,
+)
+from .type_syntax import (
     Name,
     Var,
     parse_name,
@@ -293,20 +291,3 @@ def format_result(result: IllFormed | syntax.Unsupported | None, filename: str) 
             return f"{filename}:{result.line}:{result.col}: {result.msg}"
         case _:
             return f"{filename}: {result.msg}"
-
-
-def main() -> None:
-    if len(sys.argv) < 2:
-        print("Usage: check_module.py <file.py> [<file.py> ...]")
-        sys.exit(1)
-    exit_code = 0
-    for filename in sys.argv[1:]:
-        result = check_file(filename)
-        print(format_result(result, filename))
-        if result is not None:
-            exit_code = result.exit_code
-    sys.exit(exit_code)
-
-
-if __name__ == "__main__":
-    main()
