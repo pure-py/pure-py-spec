@@ -87,7 +87,9 @@
 % Prefix marking a number as the specification's, as in Figure S2.4
 \newcommand*{\specmark}{\textsf{\textbf{S}}}
 \newcommand*{\specfigref}[1]{\speclink{fig:#1}{Figure~\specmark\ref*{S-fig:#1}}}
-\newcommand*{\specsecref}[1]{\speclink{sec:#1}{\S\specmark\ref*{S-sec:#1}}}
+\newcommand*{\specfigrefTwo}[2]{Figures~\speclink{fig:#1}{\specmark\ref*{S-fig:#1}} and \speclink{fig:#2}{\specmark\ref*{S-fig:#2}}}
+% A section, chapter or annex of the specification, by its full label
+\newcommand*{\specref}[1]{\speclink{#1}{\S\specmark\ref*{S-#1}}}
 \newcommand*{\version}[3]{%
   \gdef\versionstring{#1.#2.#3}%
 }

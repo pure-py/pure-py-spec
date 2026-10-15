@@ -49,10 +49,10 @@ results of the same form, carrying an outcome, a sequence of values or an enviro
 
 \subsection{Expressions and statements}
 
-A value is well-formed at a context entry, and an environment at a context\speconly{ (\figref{well-formed-values})}\paperonly{, as defined in \specification}.
+A value is well-formed at a context entry, and an environment at a context\speconly{ (\figref{well-formed-values})}\paperonly{ (\added{\specfigref{well-formed-values}})}.
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any statement $s$ with
 $\Gamma \vdash s : R$, the statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
-to outcome $o$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Top-level statements
+to outcome $o$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(\added{\specfigrefTwo{eval-block-outcome}{eval-block-fails}})}. Top-level statements
 are evaluated by a separate judgement, $q, \rho, t \Rightarrow o$\speconly{ (\figref{eval-top-level})}, mirroring the static
 judgement\speconly{ (\figref{typing-top-level})}: a sequence composes in the same way as a statement sequence, a mutual type region binds each of its names to $\typeEntry{\Gamma}(q, \seq{\chi}, i)$\speconly{ (\ruleName{eval-types})}, since
 class and alias entries are also values, and a plain statement is evaluated by the statement judgement\speconly{
@@ -115,7 +115,7 @@ fully-qualified names.
 \subsection{Modules and programs}
 
 \speconly{Module and program evaluation are given in \figref{eval-modules}; import evaluation in \figref{eval-import-prefix}; importing names from a loaded module in
-\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specification.}\speconly{ Context extension (\secref{well-formedness-modules}) applies to environments as well, with the same equations on values in place of context entries, except that a loaded module value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a context.} \emph{Loading}, the judgement $q \Rightarrow_{\mathsf{mod}} r$, evaluates the import prefix
+\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \added{\specfigref{eval-modules}}.}\speconly{ Context extension (\secref{well-formedness-modules}) applies to environments as well, with the same equations on values in place of context entries, except that a loaded module value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a context.} \emph{Loading}, the judgement $q \Rightarrow_{\mathsf{mod}} r$, evaluates the import prefix
 of $q$ and then its statement, mirroring module checking $\vdash_{\mathsf{mod}} q : \Gamma$\speconly{
 (\figref{typing-module})}; as with the static rules, the mutual
 recursion between loading and evaluation is grounded by program well-formedness, which rules out
