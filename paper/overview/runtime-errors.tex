@@ -1,4 +1,3 @@
-\begin{AddedBlock}
 Well-formedness rules out several Python runtime errors. A variable may be referenced only where it is
 definitely assigned, and the fields and base class of a class may name only earlier type definitions, so
 \pyinline{NameError} and \pyinline{UnboundLocalError} do not arise. An import requires its target to be a module
@@ -7,4 +6,3 @@ cycles are rejected, so \pyinline{ModuleNotFoundError} and \pyinline{ImportError
 attribute must resolve to a definitely assigned member, which rules out \pyinline{AttributeError} on modules,
 and a constructor call or class pattern must match the arity of the class exactly, which rules out the
 \pyinline{TypeError} raised by Python for excess arguments or sub-patterns.
-\end{AddedBlock}

@@ -53,14 +53,14 @@ Language models generate Python more accurately than languages with less trainin
 benchmark~\cite{cassano2023} measures the gap across 18 languages. MultiPL-T~\cite{cassano2024} narrows the
 gap for OCaml and Racket by fine-tuning on Python programs translated into those languages and filtered by a
 compiler and by tests. Because \PurePy shares Python's syntax, a model targeting \PurePy needs no such
-fine-tuning, and the \PurePy \added{type }checker can serve as the filter in place of the compiler.
+fine-tuning, and the \PurePy type checker can serve as the filter in place of the compiler.
 
 Type-constrained decoding~\cite{mundler2025} uses a type system to constrain generation and reduces
 compilation errors in generated TypeScript. Such a technique requires a decidable well-formedness check with
-a formal static semantics, and the \PurePy \added{type }checker meets both requirements. Where a formal specification
+a formal static semantics, and the \PurePy type checker meets both requirements. Where a formal specification
 exists, models can synthesise verified Dafny methods from it~\cite{misu2024}. \PurePy addresses the case in
 which a specification is not available, and guarantees determinism, typing and freedom from the runtime
-errors \added{listed in \secref{runtime-errors}} for every well-formed program. Studies of research coding
+errors listed in \secref{runtime-errors} for every well-formed program. Studies of research coding
 tasks~\cite{tian2024,chen2025} and of computational reproducibility~\cite{siegel2024} measure the current
 reliability of generated scientific code. \citet{welsh2023} argues that programming languages lose relevance
 as models execute tasks directly. We argue in \secref{introduction} that the value of languages lies

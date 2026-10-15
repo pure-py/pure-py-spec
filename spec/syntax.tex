@@ -78,19 +78,15 @@ classes, and we write ``class $C$'' for the class named $C$. A class is also the
 \label{def:class-table}
 A class table $\Sigma$ is a finite map from class names to class definitions under their defining contexts, with $\Sigma(C)$ of the form
 $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$: the class definition $\chi_i$ of mutual type region $\seq{\chi}$ of module $q$
-(\figref{syntax-stmt}), which defines $C$, under the context $\Gamma$ in which the type region appears.\deleted{ The
-type parameters, fields and base class of $C$ are read from $\Sigma(C)$ by auxiliary functions
-$\typeParams{\Sigma}$, $\fields{\Sigma}$ and $\base{\Sigma}$\speconly{ (\S\ref{sec:auxiliary-classes})}, the latter two resolving
-the field annotations and base class of the definition under the context given by $\typeContext{\Gamma}(q, \seq{\chi}, i)$\speconly{
-(\S\ref{aux:type-context})}.} Every class named in a definition of $\Sigma$ is in $\dom(\Sigma)$, and the
+(\figref{syntax-stmt}), which defines $C$, under the context $\Gamma$ in which the type region appears. Every class named in a definition of $\Sigma$ is in $\dom(\Sigma)$, and the
 relation taking each class of $\Sigma$ to its base class is acyclic.
 \end{definition}
 
-\noindent \added{The
+\noindent The
 type parameters, fields and base class of $C$ are read from $\Sigma(C)$ by auxiliary functions
 $\typeParams{\Sigma}$, $\fields{\Sigma}$ and $\base{\Sigma}$\speconly{ (\S\ref{sec:auxiliary-classes})}, the latter two resolving
 the field annotations and base class of the definition under the context given by $\typeContext{\Gamma}(q, \seq{\chi}, i)$\speconly{
-(\S\ref{aux:type-context})}. }The class table is similar to the class table of Featherweight Java~\cite{igarashi2001}; the well-formedness rules build it while checking the class definitions of the program\speconly{ (\figref{typing-top-level})}.
+(\S\ref{aux:type-context})}. The class table is similar to the class table of Featherweight Java~\cite{igarashi2001}; the well-formedness rules build it while checking the class definitions of the program\speconly{ (\figref{typing-top-level})}.
 
 \subsubsection{Context operations}
 \label{sec:context-operations}
@@ -98,14 +94,12 @@ the field annotations and base class of the definition under the context given b
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
 an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
-distributivity does not hold. Both are defined pointwise\speconly{\deleted{ (\figref{context-ops})}}\added{, by $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$
-for each operation $\cdot$, from operations on context entries}: override is right-biased
+distributivity does not hold. Both are defined pointwise, by $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$
+for each operation $\cdot$, from operations on context entries: override is right-biased
 and has $\bot$ as both left and right unit, whereas merge has no unit, since a variable bound on one side
 only is possibly unassigned. Override is defined in the same way on any finite map with $\bot$ for
 undefined, such as an environment or class table.
-\specinput{spec/fig/context-ops}
 
-\begin{AddedBlock}
 \begin{specdefinition}{Override and merge of context entries}
 \begin{defalign}
 \bot \override \theta = \theta \override \bot & = \theta \\
@@ -115,14 +109,6 @@ undefined, such as an environment or class table.
 \theta \merge \theta' & = \PU{\scheme{\seq{\alpha}}{\tau}} && \text{if } \theta \neq \theta' \in \set{\scheme{\seq{\alpha}}{\tau}, \PU{\scheme{\seq{\alpha}}{\tau}}, \bot}
 \end{defalign}
 \end{specdefinition}
-\end{AddedBlock}
-
-\speconly{\begin{DeletedBlock}
-A third operation, \emph{context extension} $\Gamma \extend \Delta$ (also \figref{context-ops}),
-combines module references for the same module recursively, preferring checked modules to stubs, and is
-otherwise right-biased like override. It is used in processing an import prefix, in which two imports with the same root, such as
-\pyinline{a.b} and \pyinline{a.c}, both bind the root and must combine rather than shadow.
-\end{DeletedBlock}}
 
 \subsection{Expressions and statements}
 \label{sec:expressions-statements}
@@ -164,9 +150,9 @@ may be annotated (\figref{syntax-types}). A type expression is an expression (\f
 
 The metavariable $\odot$ ranges over the supported binary operators other than \pyinline{and} and
 \pyinline{or}, and $\ominus$ over the supported unary
-operators, both enumerated in \speconly{\figref{precedence}}\paperonly{\added{\specification}}. The operators \pyinline{and} and \pyinline{or} are distinct
+operators, both enumerated in \speconly{\figref{precedence}}\paperonly{\specification}. The operators \pyinline{and} and \pyinline{or} are distinct
 expression forms, since they need not evaluate both operands. The grammar of \figref{syntax-expr} is intentionally ambiguous
-on operator forms; disambiguation is by the precedence and associativity given in \speconly{\figref{precedence}}\paperonly{\added{\specification}},
+on operator forms; disambiguation is by the precedence and associativity given in \speconly{\figref{precedence}}\paperonly{\specification},
 which follow Python. It is ambiguous in the same way on tuples and tuple patterns, which are written with grouping parentheses where Python's grammar requires them. The empty tuple is written \pyinline{()}, one-element tuples carry a trailing comma, \pyinline{(1,)}, and trailing commas are permitted wherever Python's grammar permits them.
 
 \specinput{spec/fig/precedence}
@@ -186,7 +172,7 @@ loads (\secref{well-formedness-modules}).
 \end{specdefinition}
 
 A second map $\mathcal{P}$ gives the
-predefined modules\speconly{ of \figref{predefined-values}}\paperonly{\added{ \pyinline{builtins}, \pyinline{dataclasses}, \pyinline{sys} and \pyinline{typing}}}, which have no body\paperonly{\added{ and provide selected members of the Python modules of the same names}}: $\mathcal{P}$ takes each such name to its
+predefined modules\speconly{ of \figref{predefined-values}}\paperonly{ \pyinline{builtins}, \pyinline{dataclasses}, \pyinline{sys} and \pyinline{typing}}, which have no body\paperonly{ and provide selected members of the Python modules of the same names}: $\mathcal{P}$ takes each such name to its
 environment and context (Definition~\ref{def:predefined}). The two domains are disjoint, and their union is
 prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$ is itself in
 $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: its modules are the \texttt{.py} files and the
@@ -198,9 +184,9 @@ definitions that follow.
 
 \begin{definition}[Predefined contexts and environments]
 \label{def:predefined}
-$\mathcal{P}$ takes each \speconly{module $q$ of \figref{predefined-values}}\paperonly{\added{predefined module $q$}} to a pair $(\Gamma, \rho)$, where $\Gamma$
-binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \speconly{\figref{predefined-signatures}}\paperonly{\added{\specification}}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value\speconly{
-(\figref{predefined-values})}\paperonly{\added{ given in \specification}}. A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
+$\mathcal{P}$ takes each \speconly{module $q$ of \figref{predefined-values}}\paperonly{predefined module $q$} to a pair $(\Gamma, \rho)$, where $\Gamma$
+binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \speconly{\figref{predefined-signatures}}\paperonly{\specification}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value\speconly{
+(\figref{predefined-values})}\paperonly{ given in \specification}. A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
 the predefined signatures. The class table $\SigmaPredef$ of the predefined modules is
 $\set{\bind{\clsRange}{\ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}}}$, where $\chi$ is the definition

@@ -1,4 +1,3 @@
-\begin{AddedBlock}
 \paragraph{Pattern checking.}
 Checking a pattern against the remaining type (\ruleName{match-case}) rejects a tuple pattern at a type
 with list values and a list pattern at a type with tuple values, because matching either form of pattern
@@ -67,4 +66,3 @@ the second case were \pyinline{C(q)} instead, the remaining type after it would 
 \pyinline{q} would be bound at \pyinline{tuple[int, int] | None} rather than at \pyinline{tuple[int, int]},
 because pattern checking uses the remaining type.
 
-\end{AddedBlock}

@@ -2,8 +2,8 @@
 \label{sec:overview}
 
 This section states the guarantee relating \PurePy to Python (\secref{python-compatibility}), then describes
-the senses in which \PurePy is pure and sets out the excluded features\added{ and the Python runtime errors ruled out by the type
-system} (\secref{purity}).
+the senses in which \PurePy is pure and sets out the excluded features and the Python runtime errors ruled out by the type
+system (\secref{purity}).
 
 \subsection{Python compatibility}
 \label{sec:python-compatibility}
@@ -54,10 +54,10 @@ version 3.6 (PEP 526\footnote{\url{https://peps.python.org/pep-0526/}}). A varia
 assignment never introduces a variable nor reassigns one (\secref{local-assignment}). A variable therefore denotes
 a fixed value once assigned, and features associated with mutation and shared state are excluded: \pyinline{global} and \pyinline{nonlocal}, which direct assignments to a variable of an enclosing scope;
 \pyinline{del}, which removes a binding; augmented assignment (\pyinline{+=}, \pyinline{-=}, and so on); and
-the walrus operator (\pyinline{:=}), which assigns within an expression.\added{ Assignment targets are variables, so item
+the walrus operator (\pyinline{:=}), which assigns within an expression. Assignment targets are variables, so item
 assignment such as \pyinline{xs[0] = v} and attribute assignment such as \pyinline{p.x = v} are excluded, and methods
 that update a value in place, such as \pyinline{list.append}, are unavailable, because only objects and modules have
-attributes.} A Python closure captures a binding rather than a value, so a change to the binding is visible through
+attributes. A Python closure captures a binding rather than a value, so a change to the binding is visible through
 the closure. Excluding reassignment removes such changes, a discipline Java imposes on captured locals, which must
 be effectively final~\cite[\S15.27.2]{gosling2025}. One case remains: Python implements a comprehension by updating
 its generator variables in place on each iteration, so \PurePy forbids a lambda within a comprehension from

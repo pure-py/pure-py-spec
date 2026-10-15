@@ -42,7 +42,7 @@ add(1)(2)  # 3
 
 \noindent The syntax is valid Python, but Python raises a \pyinline{TypeError} at run time, because
 \pyinline{add(1)} is missing an argument. Core \PurePy rejects such a call statically, since the
-\ruleName{call} rule (\added{\secref{expression-typing}}) checks the arguments against every parameter of the callee. The
+\ruleName{call} rule (\secref{expression-typing}) checks the arguments against every parameter of the callee. The
 extension therefore gives a meaning to programs rejected by the core without changing the meaning of any
 program accepted by the core. Statically, a callee of type $\tyCallable{\sigma_1, \ldots, \sigma_n}{\tau}$
 applied to $k < n$ arguments synthesises the type of a function of the remaining parameters:
