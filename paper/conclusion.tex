@@ -15,7 +15,7 @@ question is notational, because effect information must fit within annotations t
 already accept. A return type such as \pyinline{IO[int]} tracks effects as an ordinary generic type, in
 the Haskell style, although chaining is awkward in a language of statements without dedicated syntax.
 \pyinline{Annotated[int, Console]} (PEP 593) attaches effect metadata that mypy ignores and the \PurePy
-checker can read. The lightest option is a decorator: with effects the default, \pyinline{@pure} marks functions in
+type checker can read. The lightest option is a decorator: with effects the default, \pyinline{@pure} marks functions in
 which printing and other effects are rejected, and unannotated code keeps its current meaning. Under any
 of these, existing support for printing is not an obstacle, since printing can be reinterpreted as a typed
 output effect or kept native with essentially equivalent semantics, printed output never influencing a

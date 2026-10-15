@@ -200,6 +200,15 @@
   \rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\kappa}
 }
 \and
+\inferrule*[lab={\ruleName{eval-match-undef}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  \dispatch(\rho, v, \seq{p}, \seq{s}) = \errUndef
+}
+{
+  \rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\errUndef}
+}
+\and
 \inferrule*[lab={\ruleName{eval-seq-fail}}]
 {
   \rho, s \Rightarrow \aborts{\kappa}
@@ -691,6 +700,15 @@
 }
 \and
 \input{spec/rules/eval-call-nonfun}
+\and
+\inferrule*[lab={\ruleName{eval-attr-nonobject}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  v \text{ neither loaded module nor object}
+}
+{
+  \rho, \exAttr{e}{x} \Rightarrow \aborts{\errAttr}
+}
 \end{mathpar}
 \caption{Expression evaluation, continued (aborting cases)}
 \label{fig:eval-fails}

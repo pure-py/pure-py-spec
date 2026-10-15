@@ -2,14 +2,14 @@
 
 [![build](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml)
 
-## [v0.19.1](https://github.com/pure-py/pure-py-spec/releases/download/v0.19.1/PurePy-spec.pdf)
+## [v0.20.0](https://github.com/pure-py/pure-py-spec/releases/download/v0.20.0/PurePy-spec.pdf)
 
 PurePy is a pure (side-effect free) subset of Python, intended initially for researchers in programming
 languages and programming pedagogy, and in the longer term as a common language for scientific computing,
 supporting efficient, portable applications in modelling, data processing, data analysis and visualisation.
 
 The specification defines a versioned formal grammar and a formal semantics for the language, and `src/`
-holds a reference checker. A PurePy-compliant language accepts every valid PurePy program and is expected
+holds a reference type checker. A PurePy-compliant language accepts every valid PurePy program and is expected
 to conform to the formal semantics.
 
 ## Project structure
@@ -22,7 +22,7 @@ to conform to the formal semantics.
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
 - `agda/`: Agda mechanisation of the distributivity proof
 - `isabelle-purepy/`: Isabelle/HOL mechanisation, a submodule of the `isabelle-purepy` repository
-- `src/`: reference checker, built on Python's `ast` and organised to mirror the sections of the specification
+- `src/`: reference type checker, built on Python's `ast` and organised to mirror the sections of the specification
 - `test/`: litmus tests
 
 `\paperinput{file}` at a point in a specification source includes the file in the paper only, and
@@ -46,21 +46,39 @@ uv run --locked ./test/run-all.sh
 The command creates the project environment, installs the locked development dependencies and runs the suite,
 which begins with mypy and ruff over `src/`.
 
-Tests are organised by tier, `module-level/` and `program-level/`, then by verdict and stage; the runner
-derives every assertion from the path. A module-level test is a `.py` file with expectation files as siblings
+Tests are organised by level, `module-level/` and `program-level/`, then by the outcome under Python and the
+outcome under PurePy, following the grid in the conformance section of the specification; the runner derives
+every assertion from the path. A module-level test is a `.py` file with expectation files as siblings
 (`.expected`, `.error.expected`, `.exception.expected`, `.status.expected`); a program-level test is a
 directory holding `main.py`, the expectation files of `main.py` and the other modules of the program.
 
-- `semantically-valid/`: accepted by PurePy; runs under Python with the expected output and type-checks under mypy (`test/mypy.ini`)
-- `excluded/`: accepted by Python but excluded by PurePy, in `syntactic/` at parse, in `static/` at check and in `dynamic/` at run time
-- `python-error/`: rejected by both languages, with stages as above plus `syntactic-only/`, whose tests construct the form as an AST because Python source cannot express the form
-- `semantically-valid/pending/`: not yet accepted by the checker
+The outcome under Python is one of:
 
-The runner requires an `excluded` test to run under Python and a `python-error` test to raise, so a test has
-either `.expected` or `.exception.expected` and a misfiled test fails. A test that exits with a nonzero status
-through `sys.exit` states the status in `.status.expected`.
+- `syntax-error/`: Python raises `SyntaxError` before running the program
+- `exception/`: Python raises another exception while running the program
+- `no-exception/`: Python runs the program with the expected output
 
-Another checker can be run over the suite with `--checker`; `run-all.py --help` lists the options.
+The outcome under PurePy is one of:
+
+- `parser/`: rejected by the parser
+- `type-checker/`: rejected by the type checker
+- `undefined/`: well-formed, and the run aborts with termination kind `undef`
+- `result/`: well-formed, and the run yields the same result as under Python, including the same exception
+
+Two directories under `no-exception/result/` hold tests with a further expectation:
+
+- `pending/`: not yet accepted by the type checker
+- `mypy-bug/`: rejected by mypy because of a behaviour reported as a mypy bug; the runner fails a test once mypy accepts it
+
+Every other test in `no-exception/result/` also type-checks under mypy (`test/mypy.ini`). The tests in
+`module-level/syntactic-only/` construct a form as an AST, because Python source cannot express the form, and
+check that PurePy rejects it.
+
+A test has `.expected` under `no-exception/` and `.exception.expected` elsewhere, naming `SyntaxError` exactly
+under `syntax-error/`, so a misfiled test fails. A test that exits with a nonzero status through `sys.exit`
+states the status in `.status.expected`.
+
+Another type checker can be run over the suite with `--checker`; `run-all.py --help` lists the options.
 
 ## Development
 
@@ -79,7 +97,7 @@ uv run --locked ruff format ./src ./test/run-all.py
 After changing dependencies or metadata in `pyproject.toml`, run `uv lock` and commit `pyproject.toml` and
 `uv.lock`.
 
-## Reference checker (`src/`)
+## Reference type checker (`src/`)
 
 Check a single module, or a whole program from the entry module:
 

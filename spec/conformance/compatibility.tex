@@ -1,9 +1,7 @@
-Well-formedness is a property of the program, decided by \PurePy's static checks. Semantic validity is
-a property of a run rather than a program, because some of the Python behaviours excluded by \PurePy cannot be rejected
-statically\paperonly{ (\secref{no-coercions})}\speconly{ (summarised in the informative \annexref{exclusions})}. An implementation conforms if it accepts exactly the well-formed programs and, on every valid run,
-produces the Python result; on any other run it may abort at the dynamically excluded operation, or simply
-produce the Python result. The conformance suite
-(\paperonly{\secref{reference-implementation}}\speconly{\secref{conformance-suite}}) organises its tests by verdict: semantically valid \PurePy, excluded by
-\PurePy (syntactically, statically or dynamically), or failing under Python.\paperonly{ \PurePy is also
+Well-formedness is a property of the program, decided by \PurePy's static checks. Some of the operations excluded by \PurePy, such as comparison of two functions, cannot be rejected
+statically\paperonly{ (\secref{no-coercions})}\speconly{ (summarised in the informative \annexref{exclusions})}. A run which reaches one of these
+\emph{dynamically excluded} operations has undefined behaviour, and result $\aborts{\errUndef}$. An implementation conforms if it accepts exactly the well-formed programs and, on every run with defined behaviour,
+produces the Python result; on any other run it may either abort or produce the Python result. The conformance suite
+(\paperonly{\secref{reference-implementation}}\speconly{\secref{conformance-suite}}) organises its tests by their outcomes under Python and under \PurePy (\figref{taxonomy}).\paperonly{ \PurePy is also
 designed so that every well-formed program is well typed under the mypy type checker, a requirement that
-constrains the rules for variables, in particular how names are scoped (\secref{scope}).}
+constrains the rules for variables, in particular how names are scoped (\secref{scope}). The only exceptions are programs rejected by mypy because of a behaviour reported as a bug, which are listed in \specification.}

@@ -1,6 +1,7 @@
 \begin{figure}
 \small
 \setlength{\jot}{2pt}
+\begin{subfigure}{\textwidth}
 \begin{center}
 \begin{tabular}{rcll}
 \grammarGroup{Heads} \\
@@ -18,9 +19,13 @@ $k$ & $::=$ & $\shapeAny{\tau}{H}$ & (Rest) \\
 $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
 \end{tabular}
 \end{center}
+\subcaption{Heads and shapes}
+\label{fig:shapes-syntax}
+\end{subfigure}
 
 \vspace{2mm}
 
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma \vdash h : \tau$}
 \begin{mathpar}
 \small
@@ -30,6 +35,15 @@ $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
 }
 {
   \Sigma \vdash \ell : \tau
+}
+\and
+\inferrule*[lab={\ruleName{head-literal-float}}]
+{
+  n \text{ a float literal} \\
+  \Sigma \vdash \tyFloat \subty \tau
+}
+{
+  \Sigma \vdash n : \tau
 }
 \and
 \inferrule*[lab={\ruleName{head-class}}]
@@ -48,9 +62,13 @@ $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
   \Sigma \vdash \headList{n} : \tyList{\tau}
 }
 \end{mathpar}
+\subcaption{Head $h$ has type $\tau$}
+\label{fig:head-typing}
+\end{subfigure}
 
 \vspace{2mm}
 
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma \vdash k : \tau$}
 \begin{mathpar}
 \small
@@ -108,6 +126,9 @@ $K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
   \Sigma \vdash \shapeDict{\tau}{\beta}{H} : \tyDict{\tau}
 }
 \end{mathpar}
+\subcaption{Shape $k$ has type $\tau$}
+\label{fig:shape-typing}
+\end{subfigure}
 \caption{Shapes and shape typing}
 \label{fig:shapes}
 \end{figure}

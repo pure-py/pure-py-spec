@@ -37,6 +37,13 @@
   moredelim=[l][\color{base0B}]{@},
 }
 
+% Inline code at 95% of the surrounding text, so that it scales in table cells and captions; the size is set
+% outside the listing, which applies its basic style more than once
+\makeatletter
+\newcommand*{\pyinlinesize}{\fontsize{\strip@pt\dimexpr\f@size pt*19/20\relax}{\f@baselineskip}\selectfont}
+\makeatother
+\newcommand*{\pyinlinestyle}{\renewcommand\ttdefault{cmtt}\ttfamily}
+
 % A listing opening a top-aligned minipage already sits a line below the preceding text, so its space above
 % is replaced by a small negative skip, measured to leave the same gap above as below.
 \makeatletter
@@ -64,9 +71,9 @@
 \newcommand{\pyinline}[1]{%
   \ifmmode \pymath{#1}\else
     \ifcodeinmarkup
-      \mbox{\lstinline[style=base16python,basicstyle={\renewcommand\ttdefault{cmtt}\ttfamily\small\color{\codecolor}},keywordstyle=\color{\codecolor},stringstyle=\color{\codecolor},identifierstyle=\color{\codecolor}]{#1}}%
+      {\pyinlinesize\mbox{\lstinline[style=base16python,basicstyle={\pyinlinestyle\color{\codecolor}},keywordstyle=\color{\codecolor},stringstyle=\color{\codecolor},identifierstyle=\color{\codecolor}]{#1}}}%
     \else
-      \mbox{\lstinline[style=base16python]{#1}}%
+      {\pyinlinesize\mbox{\lstinline[style=base16python,basicstyle={\pyinlinestyle\color{base05}}]{#1}}}%
     \fi
   \fi
 }

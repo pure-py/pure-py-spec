@@ -16,7 +16,7 @@ decides the result, so the comparison order is observable:
 \begin{python}
 x: float = 1e400 - 1e400  # nan
 print([1.0, x] == [2.0, x])  # False, decided at the first element
-print([1.0, x] == [1.0, x])  # undefined: nan against nan
+print([1.0, x] == [1.0, x])  # undef: nan against nan
 \end{python}
 
 \noindent Dictionaries are compared in the key order of the left operand for the same reason. The membership

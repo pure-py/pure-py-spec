@@ -6,6 +6,8 @@
 % Fonts and layout
 \usepackage[T1]{fontenc}
 \usepackage{libertinus-type1}
+% Inconsolata for typewriter text, as in the paper's document class.
+\usepackage[varqu,scaled=0.9]{zi4}
 \usepackage{libertinust1math}
 \usepackage{microtype}
 % libertinust1math replaces amssymb; declare the one AMS symbol the rules use that it lacks.
@@ -24,6 +26,8 @@
 \DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
 \usepackage{mathpartir}
 \usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
 \usepackage{subcaption}
 \usepackage{float}
 % Keep figures near their text: allow placement at the input point, and let large floats share a page with text.
@@ -62,7 +66,7 @@
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[chapter]
 
-\version{0}{19}{1}
+\version{0}{20}{0}
 
 \begin{document}
 
