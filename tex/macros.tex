@@ -75,6 +75,17 @@
   \newcommand*{\specification}{the \PurePy specification\xspace}
   \newcommand*{\specificationavailability}{accompanies this paper}
 \fi
+% References from the paper into the specification. The numbers come from the specification's labels, read by
+% xr-hyper under the prefix S-; each link opens the released PDF at the destination named after the label
+% (hyperref's destlabel option). The anonymised paper does not link, since the release URL names the project.
+\newcommand*{\specurl}{https://github.com/pure-py/pure-py-spec/releases/download/v\versionstring/PurePy-spec.pdf}
+\ifdefined\anonmode
+  \newcommand*{\speclink}[2]{#2}
+\else
+  \newcommand*{\speclink}[2]{\href{\specurl\##1}{#2}}
+\fi
+\newcommand*{\specfigref}[1]{\speclink{fig:#1}{Figure~\ref*{S-fig:#1}} of \specification}
+\newcommand*{\specsecref}[1]{\speclink{sec:#1}{\S\ref*{S-sec:#1}} of \specification}
 \newcommand*{\version}[3]{%
   \gdef\versionstring{#1.#2.#3}%
 }

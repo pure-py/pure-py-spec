@@ -1,3 +1,5 @@
+% xr-hyper, for references into the specification (\specfigref), must load before hyperref, which acmart loads.
+\RequirePackage{xr-hyper}
 % \anonmode adds the acmart anonymous option and an anonymised title.
 \ifdefined\anonmode
   \documentclass[acmsmall,anonymous]{acmart}
@@ -24,6 +26,7 @@
 \ifdefined\finalmode\nochangebars\fi
 
 \input{tex/macros}
+\externaldocument[S-]{xref/PurePy-spec}
 \input{tex/listings}
 
 \newtheorem{theorem}{Theorem}
