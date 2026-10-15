@@ -125,7 +125,7 @@ functions after the conditional subject to the usual definite assignment rules (
 
 A \pyinline{case} pattern binds variables, and Python scopes them as it does assignments: they remain in
 scope after the \pyinline{match} statement. \PurePy follows: each case is treated as a branch, and its pattern as an
-assignment of the variables it binds, which must not be declared already (\ruleName{pat-var}). The set of variables a pattern $p$ introduces is $\binds(p)$; the
+assignment of the variables it binds, which must not be declared already. The set of variables a pattern $p$ introduces is $\binds(p)$; the
 \ruleName{match} rule checks each body in a context in which they are definitely assigned, and combines
 the cases with $\merge$ as the \ruleName{if} rules do, so a variable is definitely assigned after the match
 only if every case binds it or returns. A match whose cases leave some value of the scrutinee type
@@ -181,7 +181,7 @@ signature, and the \ruleName{import} and \ruleName{from-import} rules check each
 containing modules first, so an import cycle has no derivation. A module may not bind a name that is also the name of one of its
 submodules, a side condition of \ruleName{module}, since Python resolves the clash by load order. A
 qualified reference must resolve through the imports of the referring module to a definitely assigned
-member (\ruleName{attr-module}). A submodule is not an attribute of its parent until it is loaded, so
+member. A submodule is not an attribute of its parent until it is loaded, so
 \pyinline{import pkg} followed by \pyinline{pkg.sub.y} is rejected unless the module also imports
 \pyinline{pkg.sub}, whereas Python permits the reference whenever some earlier import, anywhere in the
 program, happens to have loaded \pyinline{pkg.sub}:
