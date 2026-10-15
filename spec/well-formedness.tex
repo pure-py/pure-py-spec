@@ -30,16 +30,16 @@ hiding it throughout the scope.}
 \specinput{spec/fig/resolve-type}
 
 Function signatures, assignments and dataclass fields are annotated with type expressions, and a
-type expression denotes a type under a context and class table\speconly{ (\figref{resolve-type})}. Every definition carries an
+type expression denotes a type under a context and class table (\specfigref{resolve-type}). Every definition carries an
 annotation for its parameters and return type, so the type of a definition is given rather than
-inferred from its body. Within a type expression, a class name applied to as many type arguments as the class has parameters resolves to an instantiated class, an alias name applied to type arguments resolves to the instantiation of its alias, type parameters in scope denote the type variables of those names, and all other names must be predefined names\speconly{ (\figref{resolve-type})}. The function $\baseType(\tau)$ discards the precision of a
+inferred from its body. Within a type expression, a class name applied to as many type arguments as the class has parameters resolves to an instantiated class, an alias name applied to type arguments resolves to the instantiation of its alias, type parameters in scope denote the type variables of those names, and all other names must be predefined names (\specfigref{resolve-type}). The function $\baseType(\tau)$ discards the precision of a
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as the identity\speconly{
 (\S\ref{aux:base-type})}.
 
 \speconly{\subsubsection{Subtyping}\label{sec:subtyping}}%
 \paperonly{\paragraph{Subtyping.}}
 
-Subtyping\speconly{ (\figref{subtyping})} has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base\speconly{ (\ruleName{subty-class-extend})}, and below $C[\seq{\sigma}]$ when $\seq{\tau}$ and $\seq{\sigma}$ are equivalent\speconly{ (\ruleName{subty-class})}, so that type arguments are invariant, as for lists and dictionaries; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. A type that is not a union has one \emph{disjunct}, the type itself; the disjuncts of a union $\tyUnion{\sigma}{\tau}$ are the disjuncts of $\sigma$ together with the disjuncts of $\tau$. A union is above
+Subtyping (\specfigref{subtyping}) has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base\speconly{ (\ruleName{subty-class-extend})}, and below $C[\seq{\sigma}]$ when $\seq{\tau}$ and $\seq{\sigma}$ are equivalent\speconly{ (\ruleName{subty-class})}, so that type arguments are invariant, as for lists and dictionaries; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. A type that is not a union has one \emph{disjunct}, the type itself; the disjuncts of a union $\tyUnion{\sigma}{\tau}$ are the disjuncts of $\sigma$ together with the disjuncts of $\tau$. A union is above
 each of its disjuncts and below every type that is above all of them. A tuple type is covariant, below another of the
 same length when each of its components is below the corresponding component. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{pierce2002}. Lists and
 dictionaries are related only when their components are equivalent, since both are invariant in mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}). A callable type is contravariant in its parameters
@@ -81,9 +81,9 @@ is the least upper bound of $\sigma$ and $\tau$, $\meetTy{\Sigma}{\sigma}{\tau}$
 \label{sec:expression-typing}
 
 Within an expression the typing judgement gives each subexpression a type, and
-is bidirectional. \emph{Synthesis} $\Sigma; \Gamma \vdash e \synth \tau$ reads a type out of an expression\speconly{ (\figrefThree{typing-synth}{typing-synth-elim}{typing-synth-ctd})},
+is bidirectional. \emph{Synthesis} $\Sigma; \Gamma \vdash e \synth \tau$ reads a type out of an expression (\specfigrefThree{typing-synth}{typing-synth-elim}{typing-synth-ctd}),
 and \emph{checking} $\Sigma; \Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
-surroundings\speconly{ (\figref{typing-check})}. The division follows the usual recipe for bidirectional
+surroundings (\specfigref{typing-check}). The division follows the usual recipe for bidirectional
 systems~\cite{davies2000,dunfield2021}: introduction forms check, since a lambda's parameters cannot be
 annotated and an empty list does not determine its element type, and elimination forms synthesise, since a call, a subscript or an attribute
 reference starts from a subterm whose type is known. Python has no annotation form
@@ -131,7 +131,7 @@ stated separately for each elimination form.
 
 
 The \ruleName{call} rule for a call $\exCall{e}{\seq{e}}$ uses the auxiliary
-judgement $\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$\speconly{ (\figref{typing-callee})}, which determines parameter
+judgement $\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$ (\specfigref{typing-callee}), which determines parameter
 types $\seq{\sigma}$ and result type $\sigma$ from the callee along with its arguments. The remaining premises check
 the arguments against $\seq{\sigma}$, and the call synthesises $\sigma$. The auxiliary judgement has two rules. A callee that synthesises a
 \pyinline{Callable} type gives the parameter and result types of that type\speconly{ (\ruleName{callee})}. A name bound at a
@@ -203,7 +203,7 @@ with a result type; the judgements of the figure relate operand
 types to the resolved overloads of an operator.
 \end{specdefinition}}
 
-The \ruleName{binop} and \ruleName{unop} rules\speconly{ (\figref{typing-synth})} take the result type
+The \ruleName{binop} and \ruleName{unop} rules (\specfigref{typing-synth}) take the result type
 of the most specific overload at the operand types, $\resolveOp{\Sigma}$\speconly{ (\S\ref{aux:resolve-op})}, so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
@@ -267,7 +267,7 @@ R \override \Returns = \Returns \override R & = \Returns
 \noindent The $\Returns \override R$ case never arises because statement typing excludes unreachable statements\paperonly{ (\secref{unreachable})}.
 
 The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\Gamma$ and
-optional return type $\zeta$, statement $s$ has static outcome $R$\speconly{ (\figref{typing-stmt})}; every rule passes $\zeta$ down unchanged.
+optional return type $\zeta$, statement $s$ has static outcome $R$ (\specfigref{typing-stmt}); every rule passes $\zeta$ down unchanged.
 A sequence $s\;s'$\speconly{ (\ruleName{seq})} types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
 by $s$. A conditional combines its
 branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch\speconly{ (\ruleName{if}, \ruleName{if-else})}.
@@ -301,7 +301,7 @@ however. The expression \pyinline{(False,)[0]} synthesises \pyinline{Literal[Fal
 component, whereas mypy types it at \pyinline{bool} (\paperonly{\secref{python-compatibility}}\speconly{\figref{mypy-restrictions}}).}
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
-auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$\speconly{ (\figref{typing-cases})}, which threads
+auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}), which threads
 a remaining type, starting from $\sigma$, and a residual $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
 through the cases, merging their outcomes into $S$. The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
 exhaustive; the \ruleName{match-partial} rule applies otherwise and also merges in $\Assigns{\varnothing}$, the
@@ -311,8 +311,8 @@ The remaining type, the residual, reachability and exhaustiveness are the subjec
 \secref{well-formedness-patterns}.
 
 \speconly{\subsubsection{Function definitions}\label{sec:well-formedness-defs}}%
-The \ruleName{defs} rule for a mutual def region of function definitions synthesises a type scheme for each definition\speconly{
-(\figref{typing-def})}, binds all the function names of the mutual def region at the synthesised type schemes, and checks each
+The \ruleName{defs} rule for a mutual def region of function definitions synthesises a type scheme for each definition
+(\specfigref{typing-def}), binds all the function names of the mutual def region at the synthesised type schemes, and checks each
 definition against its scheme\paperonly{:}\speconly{.}
 \paperinput{paper/well-formedness/defs}%
 For a definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$,
@@ -381,7 +381,7 @@ arguments (\ruleName{ty-alias}), here \pyinline{tuple[int, int]}, so types never
 \label{sec:well-formedness-patterns}
 
 To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement
-$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$\speconly{ (\figref{typing-cases})} threads a \emph{remaining type}
+$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}) threads a \emph{remaining type}
 $\tau$ and a \emph{residual} $L$ through the cases, both over-approximations of the values of $\sigma$ which are not
 matched by any of the earlier cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a
 set of values of a single type, and starts from the shapes of $\sigma$; the remaining type is coarser, a type rather
@@ -430,7 +430,7 @@ although each covers only part of the type.
 \label{sec:well-formedness-modules}
 
 \emph{Module checking} types a module's body and computes its signature $\Gamma$, the judgement
-$\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$\speconly{ (\figref{typing-module})}; it mirrors loading at run time
+$\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$ (\specfigref{typing-module}); it mirrors loading at run time
 (\secref{operational-semantics}). The \ruleName{module} rule types the body as a top-level statement\speconly{, and
 the \ruleName{predefined} rule gives a predefined module the signature of
 Definition~\ref{def:predefined}}.
@@ -457,7 +457,7 @@ containing modules\speconly{ (\S\ref{aux:containing})}, because at runtime it ma
 for a plain import
 the only containing module that could never load first is the importing module itself, and an import naming a
 module contained in the importing module is excluded outright\paperonly{ (\secref{no-load-dependent})}.} Module checking is defined inductively, so a program with an import cycle is ill-formed. Program
-well-formedness\speconly{ (\figref{typing-module})} requires the main module to be well typed and hence,
+well-formedness (\specfigref{typing-module}) requires the main module to be well typed and hence,
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
 overridden by the imported context and then, as in \ruleName{def-body}, by an unbound entry for each name
@@ -472,7 +472,7 @@ declares that name again, imports it, or binds it in a pattern.
 
 \specinput{spec/fig/typing-module}
 
-The signature $\Gamma$ produced by module checking\speconly{ (\figref{typing-module})} comprises the classes, type aliases
+The signature $\Gamma$ produced by module checking (\specfigref{typing-module}) comprises the classes, type aliases
 and variables defined by a module, together with its intrinsic \pyinline{__name__} and a stub for each submodule\speconly{,
 but not the names that it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
 name is a private dependency, not re-exported as part of the interface. Submodule stubs and the bindings of the module

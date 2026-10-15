@@ -75,22 +75,33 @@
   \newcommand*{\specification}{the \PurePy specification\xspace}
   \newcommand*{\specificationavailability}{accompanies this paper}
 \fi
-% References from the paper into the specification, marked by the external-link icon \specmark after the number. The
-% numbers come from the specification's labels, read by
-% xr-hyper under the prefix S-; each link opens the released PDF at the destination named after the label
-% (hyperref's destlabel option). The anonymised paper does not link, since the release URL names the project.
+% References to the specification's figures and sections. In the specification these are ordinary references. In
+% the paper each is marked by the external-link icon \specmark after the number and links to the released PDF at the
+% destination named after the label (hyperref's destlabel option); the numbers come from the specification's labels,
+% read by xr-hyper under the prefix S-. The anonymised paper does not link, since the release URL names the project.
 \newcommand*{\specurl}{https://github.com/pure-py/pure-py-spec/releases/download/v\versionstring/PurePy-spec.pdf}
 \ifdefined\anonmode
   \newcommand*{\speclink}[2]{#2}
+  \newcommand*{\specdoclink}[1]{#1}
 \else
   \newcommand*{\speclink}[2]{\href{\specurl\##1}{#2}}
+  \newcommand*{\specdoclink}[1]{\href{\specurl}{#1}}
 \fi
 % Icon marking a number as the specification's (fontawesome5, loaded by the paper)
 \newcommand*{\specmark}{\,{\scriptsize\faExternalLink*}}
-\newcommand*{\specfigref}[1]{\speclink{fig:#1}{Figure~\ref*{S-fig:#1}\specmark}}
-\newcommand*{\specfigrefTwo}[2]{Figures~\speclink{fig:#1}{\ref*{S-fig:#1}\specmark} and \speclink{fig:#2}{\ref*{S-fig:#2}\specmark}}
-% A section, chapter or annex of the specification, by its full label
-\newcommand*{\specref}[1]{\speclink{#1}{\S\ref*{S-#1}\specmark}}
+\newcommand*{\specnum}[1]{\speclink{#1}{\ref*{S-#1}\specmark}}
+\ifdefined\specmode
+  \newcommand*{\specfigref}[1]{\figref{#1}}
+  \newcommand*{\specfigrefTwo}[2]{\figrefTwo{#1}{#2}}
+  \newcommand*{\specfigrefThree}[3]{\figrefThree{#1}{#2}{#3}}
+  \newcommand*{\specref}[1]{\S\ref{#1}}
+\else
+  \newcommand*{\specfigref}[1]{Figure~\specnum{fig:#1}}
+  \newcommand*{\specfigrefTwo}[2]{Figures~\specnum{fig:#1} and \specnum{fig:#2}}
+  \newcommand*{\specfigrefThree}[3]{Figures~\specnum{fig:#1}, \specnum{fig:#2} and \specnum{fig:#3}}
+  % A section, chapter or annex of the specification, by its full label
+  \newcommand*{\specref}[1]{\S\specnum{#1}}
+\fi
 \newcommand*{\version}[3]{%
   \gdef\versionstring{#1.#2.#3}%
 }

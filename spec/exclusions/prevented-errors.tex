@@ -1,6 +1,6 @@
 A well-formed \PurePy program avoids the Python runtime errors listed in
 \figref{prevented-errors}, under the conditions noted there. Typing also excludes the errors raised by
 ill-typed operations, such as wrong operand types, calling a non-function, calling a function with the
-wrong number of arguments, or attribute access on a value lacking the attribute. The semantics still gives each of these errors a termination kind and a rule\speconly{ (\figref{eval-fails})}, so that type soundness can be stated, as the conjecture that no run of a well-formed program aborts with one of these errors.
+wrong number of arguments, or attribute access on a value lacking the attribute. The semantics still gives each of these errors a termination kind and a rule (\specfigref{eval-fails}), so that type soundness can be stated, as the conjecture that no run of a well-formed program aborts with one of these errors.
 
 \input{spec/fig/prevented-errors}
