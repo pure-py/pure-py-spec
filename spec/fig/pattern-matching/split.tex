@@ -40,18 +40,7 @@
   \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{H}, \patDict{\bind{\seq{w}}{\seq{p}}} \splits \set{\shapeDict{\tau}{\beta \override \set{\bind{w_i}{k}}}{H} \mid k \in \shapes{\Sigma}(\tau, \varnothing)}, \set{\shapeDict{\tau}{\beta}{(H \cup \set{w_i})}}
 }
 \and
-\inferrule*[lab={\ruleName{split-class}}]
-{
-  \Gamma \vdash q : \Type{C} \\
-  \ancestors{\Sigma}(C) \cap H = \varnothing \\
-  \Sigma \vdash C[\seq{\tau}'] \instanceAt \tau \\
-  \meetTy{\Sigma}{\tau}{C[\seq{\tau}']} = D[\seq{\sigma}] \\
-  \tyInst{\fields{\Sigma}(D)}{\seq{\sigma}} = \bind{\seq{x}}{\seq{\sigma}'} \\
-  H' = \set{h \in H \mid \Sigma \vdash h : D[\seq{\sigma}]}
-}
-{
-  \Sigma; \Gamma \vdash \shapeAny{\tau}{H}, \patConstr{q}{a} \splits \set{\shapeAny{\patConstr{D[\seq{\sigma}]}{\seq{k}}}{H'} \mid \seq{k} \in \shapes{\Sigma}(\seq{\sigma}')}, \shapes{\Sigma}(\tau, H \cup \set{C})
-}
+\input{spec/rules/split-class}
 \and
 \inferrule*[lab={\ruleName{split-subclass}}]
 {

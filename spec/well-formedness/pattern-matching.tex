@@ -1,0 +1,103 @@
+\subsubsection{Pattern checking}\label{sec:pattern-checking}
+
+\input{spec/fig/pattern-matching/checking-pat}
+
+A pattern must \emph{check} against the remaining type, $\Sigma; \Gamma \vdash p \checks \tau \binding \Delta$ (\figref{checking-pat}), before it is matched against the residual (\ruleName{match-case}). The bindings $\Delta$ give the types of the pattern variables. The judgement holds when every tuple pattern in $p$ is at a type which has no list values, every list pattern is at a type which has no tuple values, and every constructor pattern is at a type with at most one comparable instantiation of its class, up to equivalence. List values and tuple values are defined by subtyping:
+\begin{defalign}
+\tau \text{ has list values} & {}\iff \Sigma \vdash \tyList{\sigma} \subty \tau \text{ for some } \sigma \text{, or a disjunct of } \tau \text{ is a type variable} \\
+\tau \text{ has tuple values} & {}\iff \Sigma \vdash \tyTuple{\seq{\sigma}} \subty \tau \text{ for some } \seq{\sigma} \text{, or a disjunct of } \tau \text{ is a type variable}
+\end{defalign}
+So list types, $\tySized$ and $\tyObject$ have list values; tuple types, $\tySized$ and $\tyObject$ have tuple values; and a type variable, which may stand for any type, has both. The rules check a sub-pattern at the type of its position, a tuple component, list element, dictionary value or field, and a pattern at a union at each of its disjuncts. A variable pattern binds at the type at which it is checked, and a pattern named by \pyinline{as} is bound at $\matchedAs{\Sigma}(\Gamma, \tau, p)$; the bindings of sub-patterns compose by disjoint union, so a pattern that binds a name twice is ill-formed, and at a union the bindings of the disjuncts are joined. A pattern also checks against a type which has no disjunct of the form matched by the pattern: a tuple pattern when no disjunct is a tuple type of the pattern's length, a list pattern when no disjunct is a list type, a dictionary pattern when no disjunct is a dictionary type, or a constructor pattern when its class has no comparable instantiation (\ruleName{check-tuple-none}, \ruleName{check-list-none}, \ruleName{check-dict-none}, \ruleName{check-constr-none}). Such a pattern matches no shape of the type and binds its variables at $\tyNever$, the unit of the join. At one disjunct of a union it therefore leaves the values of that disjunct to later cases, and a case with a pattern matching no shape at all is unreachable.
+
+The conditions on tuple and list patterns ensure that pattern matching always has a result. Under the evaluation rules, matching a tuple pattern against a list or a list pattern against a tuple is undefined (\S\ref{aux:match}), although Python permits both. Both forms of pattern therefore fail at $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$, at $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$, and at a type variable.
+
+A constructor pattern cannot name $\clsRange$, because Python does not support positional sub-patterns
+on that class (\ruleName{pat-constr}). The condition on constructor patterns supplies the type arguments omitted by the pattern: they are recovered by the judgement $\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$ from the type $\tau$ at which the pattern is checked, the \emph{instance} of $C$ at $\tau$ being the instantiation of $C$ above $\tau$, or the instantiation below $\tau$, when there is one up to equivalence (\ruleName{instance-above}, \ruleName{instance-below}). Below $C$ the base classes of the type determine the instance: at \pyinline{IntLeaf}, a subclass of \pyinline{Leaf[int]}, the instance of \pyinline{Leaf} is \pyinline{Leaf[int]}. Above $C$ the base arguments of $C$ determine it: at \pyinline{Tree[int]} the instance of \pyinline{Leaf} is \pyinline{Leaf[int]}, because \pyinline{Leaf[T]} extends \pyinline{Tree[T]}, whereas at \tyObject{} a class with type parameters has no instance, since every instantiation lies below \tyObject.
+The instance judgement is decided as follows. A pattern is checked at the disjuncts of a union separately
+(\ruleName{check-union}), so the type $\tau$ at which an instance is taken is never a union. If $\tau$ is an
+instantiated class $D[\seq{\sigma}]$ with $C$ an ancestor of $D$, the instance is the instantiation of $C$ reached
+from $D[\seq{\sigma}]$ along the base classes, which is unique because type arguments are invariant
+(\ruleName{instance-above}). If $\tau$ is $D[\seq{\sigma}]$ with $D$ an ancestor of $C$, the instantiations of $C$
+below $\tau$ are the $C[\seq{\tau}]$ for which the instantiation of $D$ reached from $C[\seq{\tau}]$ along the base
+classes has arguments equivalent to $\seq{\sigma}$, and Lemma~\ref{lem:instantiation-candidates} bounds the instantiations
+to be examined to finitely many instantiation candidates: one instantiation candidate up to equivalence gives the instance
+(\ruleName{instance-below}), none means that $C$ has no instance at $\tau$, and two that are not equivalent mean
+that $C$ has an instantiation comparable with $\tau$ but no instance, so that a constructor pattern at $\tau$ is
+ill-formed. At \tyObject{} and at \tyNever{} every instantiation of $C$ is comparable with $\tau$, so $C$ has an
+instance only if it has no type parameters. At any other type $C$ has no instantiation comparable with $\tau$, and no instance.
+\begin{specdefinition}{Instantiation candidate}
+Suppose $D \in \ancestors{\Sigma}(C)$. An \emph{instantiation candidate} for $C$ at $D[\seq{\sigma}]$ is an instantiation $C[\seq{\tau}]$ in
+which each $\tau_i$ is the join of a subset of $\subterms(\seq{\sigma}) \cup \set{\tyObject}$
+(\S\ref{aux:subterms}).
+\end{specdefinition}
+
+\begin{lemma}[Sufficiency of instantiation candidates]
+\label{lem:instantiation-candidates}
+Suppose $D \in \ancestors{\Sigma}(C)$. If any instantiation of $C$ is below
+$D[\seq{\sigma}]$, then some instantiation candidate is below $D[\seq{\sigma}]$; and if two instantiations of $C$ that are not equivalent
+are below $D[\seq{\sigma}]$, then two instantiation candidates below $D[\seq{\sigma}]$ are not equivalent.
+\end{lemma}
+
+\subsubsection{Shapes and shape typing}\label{sec:shapes}
+
+\input{spec/fig/pattern-matching/shapes}
+
+A shape $k$ (\figref{shapes})
+denotes a set of values of its type $\shapeTy(k)$ (\S\ref{aux:shape-type}). The form $\shapeAny{\tau}{H}$ denotes the
+values of type $\tau$ whose outermost head is not among those in $H$; the other forms are constructor,
+tuple, list and dictionary shapes, each with shapes in place of sub-patterns. A list shape also records its
+element type, which the element shapes do not determine. A constructor shape also carries an excluded
+set: $\shapeAny{\patConstr{C[\seq{\tau}]}{\seq{k}}}{H}$ denotes the instances of $C[\seq{\tau}]$, or of any subclass not below a
+class of $H$, whose fields, those of $C$, have shapes $\seq{k}$. A rest shape at a class type denotes
+the same values as the constructor shape with a rest shape at each field, and is expanded into that
+form only by splitting (\figref{split}): a class may refer to itself through its fields, so expanding
+in advance would not terminate.
+
+A head itself denotes a set of values: a literal its value, a class its instances, and $\headList{n}$
+the lists of length $n$. Head typing $\Sigma \vdash h : \tau$ holds when the values of $h$ lie within
+$\tau$. Shape typing $\Sigma \vdash k : \tau$ holds when $\shapeTy(k)$ is a subtype of $\tau$ and $k$ is
+well-formed: each excluded head is typed at the type of the shape (at $\tyStr$, for the keys of a
+dictionary shape) and each component shape at the type of that component.
+
+The auxiliary function $\shapes{\Sigma}(\tau, H)$ (\S\ref{aux:shapes}) gives the shapes of $\tau$
+once the heads in $H$ are excluded. A union contributes the shapes of its disjuncts and a dictionary type
+the dictionary form; every other type contributes the single shape $\shapeAny{\tau}{H}$, or no shape at
+all when $H$ exhausts $\tau$. The rest form therefore never carries a union or dictionary type, and
+\ruleName{shape-rest} states this restriction as a side condition.
+
+\subsubsection{Matching}\label{sec:matching}
+
+\input{spec/fig/pattern-matching/typing-pat}
+
+\emph{Matching} (\figref{typing-pat}) has three forms. The form on a single shape $k$ matches a pattern against that
+shape, giving matched shapes $K$ and residual $L$. The form
+on sequences matches the sub-patterns of a tuple, list, dictionary or constructor pattern against the
+component shapes position by position. The form on
+an ordered set of shapes $L$, used by the match rules, matches each shape of $L$ in turn. The pattern need not match every shape of $L$, so \ruleName{pat-shapes} takes the shapes of $L$
+matched by the pattern, of which there must be at least one, and passes the unmatched shapes into the
+residual untouched.
+
+\input{spec/fig/pattern-matching/split}
+
+A pattern matches a shape directly if the shape has the head tested by the pattern. Otherwise the shape
+is first \emph{split} by the auxiliary judgement $\Sigma; \Gamma \vdash k, p \splits K, L$ (\figref{split}):
+the shapes $K$ have the head tested by $p$, with the shapes of the component types drawn from $\shapes{\Sigma}$,
+and the residual $L$ is the shape $k$ with that head excluded as well. The \ruleName{pat-split} rule matches
+the pattern against $K$ and adds $L$ to the residual. Only the forms
+with an excluded set split, and no head types at a tuple type, so the excluded set of a tuple shape is
+empty and \ruleName{split-tuple} leaves the empty residual. Literal types do not include floats, so a float
+literal pattern matches a rest shape directly (\ruleName{pat-literal-float}) rather than splitting it; the matched shape
+is the whole shape, and the residual is the shape with the literal excluded. The matched shape therefore includes values
+which are not equal to the literal. Those values are also in the residual, so the residual of an enclosing pattern is the
+same as if the matched shape contained only the literal.
+A constructor pattern whose class lies below a
+class of the excluded set matches nothing, because an earlier case for the superclass has already
+matched every instance. A constructor pattern matches the instance of its class at the type of the shape (\figref{instance}): a pattern \pyinline{Leaf(v)} at \pyinline{Tree[int]} matches \pyinline{Leaf[int]} and binds \pyinline{v} at \pyinline{int}.
+
+A dictionary shape has a separate form,
+$\shapeDict{\tau}{\beta}{H}$, standing for the dictionaries that hold each key $w$ in the domain of
+$\beta$ with a value of shape $\beta(w)$, but that hold no key of $H$. A dictionary pattern takes its keys in order, with no key occurring twice. A key in
+neither $\beta$ nor $H$ splits the shape at that key (\ruleName{split-dict}), adding to the residual the
+dictionaries that lack the key; once every key of the pattern is in $\beta$ the keys match as a sequence
+(\ruleName{pat-dict}), each key $w$ against $\beta(w)$. The empty dictionary pattern matches every
+dictionary and leaves the empty residual.

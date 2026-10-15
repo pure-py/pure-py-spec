@@ -8,7 +8,7 @@
 \pyinline{ModuleNotFoundError} & Always: an import requires its target to be a module of the program. & \figref{typing-import-prefix} \\\rowgap
 \pyinline{ImportError} & Always: a from-import requires each imported name to be a member of the source module, and import cycles are rejected. (A Python cycle may run or fail, depending on where the cycle is entered.) & \figref{typing-imports}, \figref{typing-module} \\\rowgap
 \pyinline{AttributeError} & The reference is a module attribute, which must resolve to a definitely assigned member.  & \speconly{\figref{typing-synth}}\paperonly{\secref{expression-typing}} \\\rowgap
-\pyinline{TypeError} & The operation is a constructor call or class pattern, which must match the arity of the class exactly. (Only excess sub-patterns are a Python error; a pattern with fewer sub-patterns is excluded even though Python permits it.) & \speconly{\figref{typing-synth}}\paperonly{\secref{expression-typing}}, \figref{typing-pat-shape}
+\pyinline{TypeError} & The operation is a constructor call or class pattern, which must match the arity of the class exactly. (Only excess sub-patterns are a Python error; a pattern with fewer sub-patterns is excluded even though Python permits it.) & \speconly{\figref{typing-synth}, \figref{typing-pat-shape}}\paperonly{\secref{expression-typing}, \secref{well-formedness-patterns}}
 \end{tabular}
 \caption{Python errors prevented by well-formedness}
 \label{fig:prevented-errors}

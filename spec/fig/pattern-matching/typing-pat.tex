@@ -29,14 +29,7 @@
   \Sigma; \Gamma \vdash k, p\;\pyinline{as}\;x \matches K, L
 }
 \and
-\inferrule*[lab={\ruleName{pat-split}}]
-{
-  \Sigma; \Gamma \vdash k, p \splits K, L \\
-  \Sigma; \Gamma \vdash K, p \matches K', L'
-}
-{
-  \Sigma; \Gamma \vdash k, p \matches K', L \disjunion L'
-}
+\input{spec/rules/pat-split}
 \and
 \inferrule*[lab={\ruleName{pat-literal}}]
 {
@@ -82,19 +75,7 @@
   \Sigma; \Gamma \vdash \shapeDict{\tau}{\beta}{H}, \patDict{\bind{\seq{w}}{\seq{p}}} \matches \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{k}\,'}}}{H} \mid \seq{k}\,' \in K}, \set{\shapeDict{\tau}{\beta \override \set{\bind{\seq{w}}{\seq{l}}}}{H} \mid \seq{l} \in L}
 }
 \and
-\inferrule*[lab={\ruleName{pat-constr}}]
-{
-  \Gamma \vdash q : \Type{D} \\
-  D \neq \clsRange \\
-  D \in \ancestors{\Sigma}(C) \\
-  \fields{\Sigma}(D) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
-  \fieldMap{\Sigma}(D, a) = \set{\bind{\seq{x}}{\seq{p}}} \\
-  p'_i = \patWild \quad (\forall i) \\
-  \Sigma; \Gamma \vdash \seq{k}, \seq{p} \mathbin{\concat} \seq{p}\,' \matches K, L
-}
-{
-  \Sigma; \Gamma \vdash \shapeAny{\patConstr{C[\seq{\tau}]}{\seq{k}}}{H}, \patConstr{q}{a} \matches \set{\shapeAny{\patConstr{C[\seq{\tau}]}{\seq{k}\,'}}{H} \mid \seq{k}\,' \in K}, \set{\shapeAny{\patConstr{C[\seq{\tau}]}{\seq{l}}}{H} \mid \seq{l} \in L}
-}
+\input{spec/rules/pat-constr}
 \end{mathpar}
 \subcaption{Pattern $p$ matches shape $k$, giving matched shapes $K$ and residual $L$}
 \label{fig:typing-pat-shape}
@@ -133,14 +114,7 @@
 \flushleft \shadebox{$\Sigma; \Gamma \vdash L, p \matches K, L'$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{pat-shapes}}]
-{
-  L' = \set{k \in L \mid \Sigma; \Gamma \vdash k, p \matches K_k, L_k} \\
-  L' \neq \varnothing
-}
-{
-  \Sigma; \Gamma \vdash L, p \matches \textstyle\bigdisjunion_{k \in L'} K_k, \; \textstyle\bigdisjunion_{k \in L'} L_k \disjunion (L \setminus L')
-}
+\input{spec/rules/pat-shapes}
 \end{mathpar}
 \subcaption{Pattern $p$ matches ordered set of shapes $L$, giving matched shapes $K$ and residual $L'$}
 \label{fig:typing-pat-set}
