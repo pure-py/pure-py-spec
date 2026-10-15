@@ -84,7 +84,7 @@
   \newcommand*{\speclink}[2]{#2}
   \newcommand*{\specdoclink}[1]{#1}
 \else
-  \newcommand*{\speclink}[2]{\href{\specurl\##1}{#2}}
+  \newcommand*{\speclink}[2]{\href{\specurl\#nameddest=#1}{#2}}
   \newcommand*{\specdoclink}[1]{\href{\specurl}{#1}}
 \fi
 % Icon marking a number as the specification's (fontawesome5, loaded by the paper)
