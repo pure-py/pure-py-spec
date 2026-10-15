@@ -3,11 +3,14 @@ name: Build
 on:
   workflow_dispatch:
   push:
-    # A change to the paper alone is built by the Paper workflow.
+    # A change to the paper or specification alone is built by the Documents workflow.
     paths-ignore:
       - README.md
       - paper.tex
       - paper/**
+      - PurePy-spec.tex
+      - spec/**
+      - tex/**
 
 concurrency:
   group: build-${{ github.ref }}

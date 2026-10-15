@@ -1,23 +1,27 @@
-name: Paper
+name: Documents
 
-# Build only the paper when only the paper changes; any other change runs the full Build workflow.
+# Build only the paper and specification when only their sources change; any other change runs the full Build
+# workflow.
 on:
   workflow_dispatch:
   push:
     paths:
       - paper.tex
       - paper/**
-      - .github/workflows/paper.yml
+      - PurePy-spec.tex
+      - spec/**
+      - tex/**
+      - .github/workflows/documents.yml
 
 concurrency:
-  group: paper-${{ github.ref }}
+  group: documents-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
-  paper:
+  documents:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -32,5 +36,5 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Build paper
-        run: make paper.pdf paper-anon.pdf
+      - name: Build paper and specification
+        run: make paper.pdf paper-anon.pdf PurePy-spec.pdf spec-anon.pdf
