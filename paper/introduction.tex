@@ -28,7 +28,7 @@ of a name is fixed only when the name is evaluated. Under load-order dependence,
 name can depend on which modules have loaded elsewhere in the program (\secref{no-load-dependent}).
 
 \PurePy is a statically typed, immutable subset of Python with a formal static and dynamic semantics. Every
-well-formed \PurePy program is a valid Python program, and every terminating run with defined behaviour under \PurePy
+well-formed \PurePy program is a valid Python program, and \added{every terminating run with defined behaviour under \PurePy}
 produces the same result under Python. This guarantee, which we call agreement, is stated in
 \secref{python-compatibility} and tested by a conformance suite on CPython, GraalPy and Pyodide
 (\secref{reference-implementation}). The guarantee is unproven (\secref{agreement}); the metatheory of
@@ -48,7 +48,7 @@ little and the cost remains, so strictness and formal guarantees gain value. A s
 from Python's syntax, however, forfeits Python's training data and benchmarks. A subset of Python keeps the
 training data and benchmarks, because its programs are Python programs. The evaluation of \secref{evaluation}
 measures the cost of this strictness to a code generator. It compares code generation into \PurePy with
-generation into Python and into OCaml on standard benchmarks, and reports how often the type checker rejects a
+generation into Python and into OCaml on standard benchmarks, and reports how often the \added{type }checker rejects a
 first attempt, how many rounds a generator needs to reach a well-formed program and how often the final program
 passes the tests.
 
@@ -69,9 +69,9 @@ After an overview of the design and its exclusions (\secref{overview}), we make 
 \item a definition of \PurePy as a versioned standard\footnote{This paper describes version
 \versionstring{} of the \PurePy language specification, which \specificationavailability.}, with a formal
 grammar (\secref{syntax}), a type system (\secref{well-formedness}) and an operational semantics designed so
-that every terminating run with defined behaviour under \PurePy{} produces the same result under Python
+that \added{every terminating run with defined behaviour under \PurePy{}} produces the same result under Python
 (\secref{operational-semantics});
-\item a reference type checker that decides well-formedness, and a conformance suite that tests agreement on
+\item a reference \added{type }checker that decides well-formedness, and a conformance suite that tests agreement on
 CPython, GraalPy and Pyodide (\secref{reference-implementation});
 \item two research languages built on \PurePy, one of which extends the core language with partial application
 and piecewise function definitions (\secref{case-studies});

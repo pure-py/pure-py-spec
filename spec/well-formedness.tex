@@ -110,7 +110,7 @@ in \ruleName{callee-scheme} (\ruleName{constr}). The arguments are checked again
 $\seq{\tau}'$, and the call synthesises $C[\seq{\tau}']$. A constructor call of the form $\exCall{q[\seq{\psi}]}{a}$ takes
 the type arguments denoted by $\seq{\psi}$ instead (\ruleName{constr-explicit}). An attribute reference $\exAttr{e}{x}$ has the type of the field $x$ of the class synthesised by $e$
 (\ruleName{attr-object}). The signature of a predefined module binds
-$\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type given in \speconly{\figref{predefined-signatures}}\paperonly{\specification}
+$\pymath{\_\_name\_\_}$ at $\tyStr$ and each member at the type given in \speconly{\figref{predefined-signatures}}\paperonly{\added{\specification}}
 (Definition~\ref{def:predefined}). A module attribute reference
 $\exAttr{e}{x}$ resolves as a qualified name to a definitely assigned member
 (\ruleName{attr-module})\paperonly{; see \secref{no-load-dependent}}. A variable bound to a module or
@@ -194,7 +194,7 @@ each iteration.
 
 \specinput{spec/fig/operator-overloads}
 
-Each operator is overloaded as specified in \speconly{\figref{operator-overloads}}\paperonly{\specification}. The operator \pyinline{|} has no overloads, so an expression $\exBinOp{e}{\pyinline{|}}{e'}$ does not synthesise a type; the operator occurs only within type expressions, where $\tyUnion{\psi}{\psi'}$ denotes a union (\ruleName{ty-union}).
+Each operator is overloaded as specified in \speconly{\figref{operator-overloads}}\paperonly{\added{\specification}}. The operator \pyinline{|} has no overloads, so an expression $\exBinOp{e}{\pyinline{|}}{e'}$ does not synthesise a type; the operator occurs only within type expressions, where $\tyUnion{\psi}{\psi'}$ denotes a union (\ruleName{ty-union}).
 
 \begin{specdefinition}{Resolved overload}
 A \emph{resolved overload}
