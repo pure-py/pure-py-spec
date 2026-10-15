@@ -88,7 +88,7 @@
   \newcommand*{\specdoclink}[1]{\href{\specurl}{#1}}
 \fi
 % Icon marking a number as the specification's (fontawesome5, loaded by the paper)
-\newcommand*{\specmark}{\,{\scriptsize\faExternalLink*}}
+\newcommand*{\specmark}{\,\raisebox{0.3ex}{\scriptsize\faExternalLink*}}
 \newcommand*{\specnum}[1]{\speclink{#1}{\ref*{S-#1}\specmark}}
 \ifdefined\specmode
   \newcommand*{\specfigref}[1]{\figref{#1}}
