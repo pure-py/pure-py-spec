@@ -28,7 +28,7 @@
   \newcommand*{\speconly}[1]{}
   \newcommand*{\paperinput}[1]{\input{#1}}
   \newcommand*{\specinput}[1]{}
-  \newenvironment{specdefinition}[1]{}{}
+  \newenvironment{specdefinition}[1]{\ignorespaces}{\unskip}
 \fi
 % Rows of the auxiliary-functions table: the section column exists only in the specification, and
 % \specauxrow rows appear only there.
@@ -58,8 +58,20 @@
 \newcommand*{\auxrows}[1]{\@@input spec/fig/auxiliary-index-#1.tex }
 \makeatother
 
-% Inline definitions: align* with tighter row spacing than a standalone figure.
-\newenvironment{defalign}{\setlength{\jot}{1pt}\csname alignat*\endcsname{2}}{\csname endalignat*\endcsname}
+% Inline definitions: align* in small type, like the inline rules, with tighter row spacing than a standalone
+% figure. The baseline skip of the surrounding text is kept, since the lines of a paragraph before a display are
+% set with the skip in force when the display starts.
+\makeatletter
+\newenvironment{defalign}
+  {\edef\defalign@baselineskip{\the\baselineskip}\small\baselineskip=\defalign@baselineskip
+   \setlength{\jot}{1pt}\csname alignat*\endcsname{2}}
+  {\csname endalignat*\endcsname}
+% The same, with the number of column pairs as argument, for definitions set side by side
+\newenvironment{defalignat}[1]
+  {\edef\defalign@baselineskip{\the\baselineskip}\small\baselineskip=\defalign@baselineskip
+   \setlength{\jot}{1pt}\csname alignat*\endcsname{#1}}
+  {\csname endalignat*\endcsname}
+\makeatother
 % How the paper refers to the specification document.
 \ifdefined\anonmode
   \newcommand*{\specification}{the supplementary material\xspace}
@@ -67,6 +79,33 @@
 \else
   \newcommand*{\specification}{the \PurePy specification\xspace}
   \newcommand*{\specificationavailability}{accompanies this paper}
+\fi
+% References to the specification's figures and sections. In the specification these are ordinary references. In
+% the paper each is marked by the external-link icon \specmark after the number and links to the released PDF, served by GitHub Pages, at the
+% destination named after the label (hyperref's destlabel option); the numbers come from the specification's labels,
+% read by xr-hyper under the prefix S-. The anonymised paper does not link, since the release URL names the project.
+\newcommand*{\specurl}{https://pure-py.github.io/pure-py-spec/v\versionstring/PurePy-spec.pdf}
+\ifdefined\anonmode
+  \newcommand*{\speclink}[2]{#2}
+  \newcommand*{\specdoclink}[1]{#1}
+\else
+  \newcommand*{\speclink}[2]{\href{\specurl\#nameddest=#1}{#2}}
+  \newcommand*{\specdoclink}[1]{\href{\specurl}{#1}}
+\fi
+% Icon marking a number as the specification's (fontawesome5, loaded by the paper)
+\newcommand*{\specmark}{\,\raisebox{0.15ex}{\scriptsize\faExternalLink*}}
+\newcommand*{\specnum}[1]{\speclink{#1}{\ref*{S-#1}\specmark}}
+\ifdefined\specmode
+  \newcommand*{\specfigref}[1]{\figref{#1}}
+  \newcommand*{\specfigrefTwo}[2]{\figrefTwo{#1}{#2}}
+  \newcommand*{\specfigrefThree}[3]{\figrefThree{#1}{#2}{#3}}
+  \newcommand*{\specref}[1]{\S\ref{#1}}
+\else
+  \newcommand*{\specfigref}[1]{Figure~\specnum{fig:#1}}
+  \newcommand*{\specfigrefTwo}[2]{Figures~\specnum{fig:#1} and \specnum{fig:#2}}
+  \newcommand*{\specfigrefThree}[3]{Figures~\specnum{fig:#1}, \specnum{fig:#2} and \specnum{fig:#3}}
+  % A section, chapter or annex of the specification, by its full label
+  \newcommand*{\specref}[1]{\S\specnum{#1}}
 \fi
 \newcommand*{\version}[3]{%
   \gdef\versionstring{#1.#2.#3}%

@@ -4,7 +4,7 @@
 \subsection{Values and environments}
 
 Values, environments, outcomes and results are given in \figref{values}. A class value $\Type{C}$ is the
-context entry of the class, and an object $\exObj{C}{\bind{\seq{x}}{\seq{v}}}$ records its class by name and its fields in the order given by $\fields{\Sigma}(C)$. The value $\Unbound$
+context entry of the class, and an object $\exObj{C}{\bind{\seq{x}}{\seq{v}}}$ records its class by name and fields in the order given by $\fields{\Sigma}(C)$. The value $\Unbound$
 marks a variable of the current scope before its declaration is reached, which Python reports as an unbound
 local. An environment binds a variable to $\Unbound$ wherever the corresponding context binds the variable to
 the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible. Throughout this section, $\Sigma$ is the class table produced by module checking of the program
@@ -32,7 +32,7 @@ kind} $\kappa$ records how a run ends; all but $\errExit{n}$ and $\errUndef$ are
 under Python in the same circumstances. A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, such as a
 comparison of two functions (\secref{no-coercions}). A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a function from
-arguments to results\speconly{ (\figref{predefined-values})}. Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
+arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
 $\primFn(\seq{u})$.
 
 The rules are given in a monadic metalanguage over results (\figref{values}), in which
@@ -40,7 +40,7 @@ $\mlet{v}{r}{\ldots}$ binds the value of a result; for example, \ruleName{eval-b
 $\mlet{v'}{r}{\hat{\odot}(v, v')}$, which is $\hat{\odot}(v, v')$ when $r$ is $\val{v'}$, and
 $\aborts{\kappa}$ when $r$ is $\aborts{\kappa}$. A final
 premise needs no propagation rule; earlier premises have one each, recording the subexpressions evaluated
-before the failing one\speconly{ (\figref{eval-fails})}. The statement, sequence and module judgements use
+before the failing one (\specfigref{eval-fails}). The statement, sequence and module judgements use
 results of the same form, carrying an outcome, a sequence of values or an environment in place of a value.
 \paperinput{paper/operational-semantics/evaluation-example}
 
@@ -49,24 +49,24 @@ results of the same form, carrying an outcome, a sequence of values or an enviro
 
 \subsection{Expressions and statements}
 
-A value is well-formed at a context entry, and an environment at a context\speconly{ (\figref{well-formed-values})}\paperonly{, as defined in \specification}.
+A value is well-formed at a context entry, and an environment at a context (\specfigref{well-formed-values}).
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any statement $s$ with
 $\Gamma \vdash s : R$, the statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
-to outcome $o$ in $\rho$ \speconly{(\figrefTwo{eval-block-outcome}{eval-block-fails})}\paperonly{(given in full in \specification)}. Top-level statements
-are evaluated by a separate judgement, $q, \rho, t \Rightarrow o$\speconly{ (\figref{eval-top-level})}, mirroring the static
-judgement\speconly{ (\figref{typing-top-level})}: a sequence composes in the same way as a statement sequence, a mutual type region binds each of its names to $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\ruleName{eval-types}), since
-class and alias entries are also values, and a plain statement is evaluated by the statement judgement
-(\ruleName{eval-top-stmt}). Function definitions delimit
+to outcome $o$ in $\rho$ (\specfigrefTwo{eval-block-outcome}{eval-block-fails}). Top-level statements
+are evaluated by a separate judgement, $q, \rho, t \Rightarrow o$ (\specfigref{eval-top-level}), mirroring the static
+judgement (\specfigref{typing-top-level}): a sequence composes in the same way as a statement sequence, a mutual type region binds each of its names to $\typeEntry{\Gamma}(q, \seq{\chi}, i)$\speconly{ (\ruleName{eval-types})}, since
+class and alias entries are also values, and a plain statement is evaluated by the statement judgement\speconly{
+(\ruleName{eval-top-stmt})}. Function definitions delimit
 the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\result$\speconly{ (\S\ref{aux:result})} reads the outcome of a statement as
 the result of a call\speconly{; if the statement completes without returning, the result is $\val{\pyinline{None}}$.}\paperonly{:}
 \paperinput{paper/operational-semantics/result}
 
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with $\Gamma \vdash e \synth
-\tau$, the expression evaluation judgement $\rho, e \Rightarrow r$\speconly{ (\figrefTwo{eval-result}{eval-result-ctd})} says that $e$ evaluates to
+\tau$, the expression evaluation judgement $\rho, e \Rightarrow r$ (\specfigrefTwo{eval-result}{eval-result-ctd}) says that $e$ evaluates to
 result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, like the
-\pyinline{if} statement (\ruleName{eval-if}). A comprehension evaluates its body once for each binding produced by its qualifiers, and
+\pyinline{if} statement\speconly{ (\ruleName{eval-if})}. A comprehension evaluates its body once for each binding produced by its qualifiers, and
 concatenates the results; a generator draws its bindings from the elements of a value, given by the auxiliary
 function $\iterOp$\speconly{ (\S\ref{aux:iter})}: the elements of a
 list, tuple or string, and the keys of a dictionary, as in Python. Subscripting, given by the auxiliary
@@ -74,7 +74,7 @@ function $\getitem$\speconly{ (\S\ref{aux:getitem})}, indexes a list, tuple or
 string by an integer, counting from the end when negative, and a dictionary by a string key,
 aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name, and with $\errType$ for a
 dictionary subscripted by a value other than a string. An attribute reference on a
-value other than a module or object aborts with $\errAttr$ (\ruleName{eval-attr-nonobject}); this version of \PurePy does not support the attributes given to other values by Python, such as the methods of a string.
+value other than a module or object aborts with $\errAttr$\speconly{ (\ruleName{eval-attr-nonobject})}; this version of \PurePy does not support the attributes given to other values by Python, such as the methods of a string.
 
 \specinput{spec/fig/well-formed-values}
 
@@ -91,7 +91,7 @@ Whether a pattern matches is determined by the auxiliary function $\matchOp{\Sig
 (\S\ref{aux:match})}. A \emph{match result} $m$ is
 $\matchOk{\rho'}$, a match, where $\rho'$ binds the variables of the pattern to the values that they matched,
 $\noMatch$, a failure to match, or $\errUndef$, for a numeric literal pattern if the equality of the literal and the value is undefined. When
-a match result is undefined, the value of $\dispatch$ is also undefined, and the run has undefined behaviour (\ruleName{eval-match-undef}).
+a match result is undefined, the value of $\dispatch$ is also undefined, and the run has undefined behaviour\speconly{ (\ruleName{eval-match-undef})}.
 \begin{specdefinition}{Composition of match results}
 The match results of sub-patterns compose with
 $\override$, matching sequentially, so that the first failure or undefined result decides:
@@ -115,9 +115,9 @@ fully-qualified names.
 \subsection{Modules and programs}
 
 \speconly{Module and program evaluation are given in \figref{eval-modules}; import evaluation in \figref{eval-import-prefix}; importing names from a loaded module in
-\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specification.}\speconly{ Context extension (\secref{well-formedness-modules}) applies to environments as well, with the same equations on values in place of context entries, except that a loaded module value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a context.} \emph{Loading}, the judgement $q \Rightarrow_{\mathsf{mod}} r$, evaluates the import prefix
-of $q$ and then its statement, mirroring module checking $\vdash_{\mathsf{mod}} q : \Gamma$\speconly{
-(\figref{typing-module})}; as with the static rules, the mutual
+\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specfigref{eval-modules}.}\speconly{ Context extension (\secref{well-formedness-modules}) applies to environments as well, with the same equations on values in place of context entries, except that a loaded module value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a context.} \emph{Loading}, the judgement $q \Rightarrow_{\mathsf{mod}} r$, evaluates the import prefix
+of $q$ and then its statement, mirroring module checking $\vdash_{\mathsf{mod}} q : \Gamma$
+(\specfigref{typing-module}); as with the static rules, the mutual
 recursion between loading and evaluation is grounded by program well-formedness, which rules out
 import cycles (\secref{modules-programs}).
 Loading takes a single module; an import loads the modules containing its target from the root down, each
@@ -128,10 +128,9 @@ not loaded.
 Since
 imports precede statements, every module that a statement can reference is loaded before the statement runs, and
 loading is deterministic, so the semantics needs no cache
-of loaded modules. The rule \ruleName{eval-module} runs a module body in $\mathcal{P}(\pyinline{builtins})$ overridden by
+of loaded modules. Loading runs\speconly{ (\ruleName{eval-module})} a module body in $\mathcal{P}(\pyinline{builtins})$ overridden by
 the environment of its imports, with each name declared in the body or bound by a pattern in it starting
-unbound, mirroring \ruleName{module} (\secref{well-formedness-modules})\paperonly{:}\speconly{.}
-\paperinput{paper/operational-semantics/module}%
+unbound, mirroring the \ruleName{module} rule (\secref{well-formedness-modules}).
 A program evaluates to a termination kind (\figref{values}): $\errExit{0}$ if the main module
 loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exited with status $n$\paperonly{:}\speconly{.}
 \paperinput{paper/operational-semantics/program}%

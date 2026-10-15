@@ -1,3 +1,5 @@
+% xr-hyper, for references into the specification (\specfigref), must load before hyperref, which acmart loads.
+\RequirePackage{xr-hyper}
 % \anonmode adds the acmart anonymous option and an anonymised title.
 \ifdefined\anonmode
   \documentclass[acmsmall,anonymous]{acmart}
@@ -10,6 +12,7 @@
 \usepackage{colortbl}
 \DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
 \usepackage{mathpartir}
+\usepackage{fontawesome5}
 \usepackage{listings}
 \usepackage{subcaption}
 \usepackage{float}
@@ -24,6 +27,7 @@
 \ifdefined\finalmode\nochangebars\fi
 
 \input{tex/macros}
+\externaldocument[S-]{xref/PurePy-spec}
 \input{tex/listings}
 
 \newtheorem{theorem}{Theorem}
@@ -53,13 +57,25 @@
 \else
   \title{\PurePy: A Functional Subset of Python for Scientific Computing}
 \fi
-\version{0}{20}{0}
+\version{0}{21}{0}
 
 \author{Tobias Antensteiner}
 \affiliation{%
   \department{Institute of Theoretical Informatics}
   \institution{Karlsruhe Institute of Technology}
   \country{Germany}}
+
+\author{Cristina David}
+\affiliation{%
+  \department{School of Computer Science}
+  \institution{University of Bristol}
+  \country{UK}}
+
+\author{Weilin He}
+\affiliation{%
+  \department{School of Computer Science}
+  \institution{University of Bristol}
+  \country{UK}}
 
 \author{Nikolaus Huber}
 \affiliation{%

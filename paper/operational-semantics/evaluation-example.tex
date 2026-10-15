@@ -1,18 +1,17 @@
-Concretely, \ruleName{eval-binop} evaluates both operands and binds the result of the second:
+Concretely, \ruleName{eval-binop} evaluates both operands and binds the result of the second, and
+\ruleName{eval-binop-fail} propagates an abort from the first operand:
 \begin{mathpar}
 \small
 \input{spec/rules/eval-binop}
-\end{mathpar}
-The meaning $\hat{\odot}(v, v')$ of the operator is likewise a function from operands to results, with
-an abort if Python raises an exception, and $\aborts{\errUndef}$ at a dynamically excluded comparison. An abort from the first operand is propagated by a separate rule:
-\begin{mathpar}
-\small
+\and
 \input{spec/rules/eval-binop-fail}
 \end{mathpar}
+The meaning $\hat{\odot}(v, v')$ of the operator is likewise a function from operands to results, with
+an abort if Python raises an exception, and $\aborts{\errUndef}$ at a dynamically excluded comparison.
 An abort may also originate in a rule rather than be propagated from a premise. Calling a value that is
 neither closure nor primitive aborts with $\errType$, because Python raises \pyinline{TypeError}:
 \begin{mathpar}
 \small
 \input{spec/rules/eval-call-nonfun}
 \end{mathpar}
-The remaining rules are of the same form and are given in full in \specification.
+The remaining rules are of the same form and are given in full in \specref{sec:operational-semantics}.

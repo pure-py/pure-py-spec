@@ -48,13 +48,6 @@ class ParseError(Unsupported):
         Exception.__init__(self, self.msg)
 
 
-class NotYetSupported(Unsupported):
-    exit_code = 2
-
-    def __init__(self, node: ast.AST, feature: str, issue: int):
-        super().__init__(node, f"{feature} not yet supported (#{issue})")
-
-
 class PatList(ast.MatchSequence):
     pass
 
@@ -163,7 +156,7 @@ def check_syntax_stmt(node: ast.stmt) -> None:
                 case ast.Name():
                     check_syntax_expr(node.value)
                 case _:
-                    raise NotYetSupported(node, "destructuring assignment", 54)
+                    raise Prohibited(node, "destructuring assignment")
         case ast.Return():
             if node.value is not None:
                 check_syntax_expr(node.value)
@@ -175,7 +168,7 @@ def check_syntax_stmt(node: ast.stmt) -> None:
             check_syntax_type_params(node)
             check_syntax_arguments(node.args)
             if len(node.decorator_list) > 0:
-                raise NotYetSupported(node, "decorators", 58)
+                raise Prohibited(node, "decorators")
             if any(a.annotation is None for a in node.args.args):
                 raise Prohibited(node, "unannotated parameter")
             if node.returns is None:
@@ -224,7 +217,7 @@ def check_syntax_stmt(node: ast.stmt) -> None:
             check_syntax_expr(node.subject)
             for case in node.cases:
                 if case.guard is not None:
-                    raise NotYetSupported(case, "case guards", 190)
+                    raise Prohibited(case, "case guards")
                 check_syntax_pattern(case.pattern)
                 check_syntax_body(case.body)
         case ast.Break():
@@ -237,7 +230,7 @@ def check_syntax_stmt(node: ast.stmt) -> None:
 
 def check_syntax_classdef(node: ast.ClassDef) -> None:
     if any(isinstance(b, ast.Name) and b.id == "Enum" for b in node.bases):
-        raise NotYetSupported(node, "enum classes", 86)
+        raise Prohibited(node, "enum classes")
     check_syntax_type_params(node)
     if len(node.decorator_list) == 0:
         raise Prohibited(node, "undecorated class")
@@ -310,7 +303,7 @@ def check_syntax_pattern(node: ast.pattern) -> None:
                     if isinstance(v.value, (int, float, str)):
                         return
                 case ast.Attribute():
-                    raise NotYetSupported(node, "attribute value patterns", 86)
+                    raise Prohibited(node, "attribute value patterns")
             raise Prohibited(node, "complex and bytes literal patterns")
         case ast.MatchSingleton():
             pass
@@ -325,16 +318,16 @@ def check_syntax_pattern(node: ast.pattern) -> None:
                 check_syntax_pattern(p)
         case ast.MatchMapping():
             if node.rest is not None:
-                raise NotYetSupported(node, "rest capture in dict patterns", 84)
+                raise Prohibited(node, "rest capture in dict patterns")
             for key in node.keys:
                 if not (isinstance(key, ast.Constant) and isinstance(key.value, str)):
                     raise Prohibited(key, "dict pattern key other than a string literal")
             for sub in node.patterns:
                 check_syntax_pattern(sub)
         case ast.MatchOr():
-            raise NotYetSupported(node, "or-patterns", 85)
+            raise Prohibited(node, "or-patterns")
         case ast.MatchStar():
-            raise NotYetSupported(node, "star patterns", 84)
+            raise Prohibited(node, "star patterns")
         case _:
             raise Prohibited(node, f"{type(node).__name__} pattern")
 
@@ -371,15 +364,15 @@ def check_syntax_expr(node: ast.expr) -> None:
             raise Prohibited(node, f"unary operator '{sym}'")
         case ast.BoolOp():
             if len(node.values) > 2:
-                raise NotYetSupported(node, "chained boolean operator", 82)
+                raise Prohibited(node, "chained boolean operator")
             for v in node.values:
                 check_syntax_expr(v)
         case ast.Compare():
             if len(node.ops) > 1:
-                raise NotYetSupported(node, "chained comparison", 82)
+                raise Prohibited(node, "chained comparison")
             for op in node.ops:
                 if isinstance(op, (ast.Is, ast.IsNot)):
-                    raise NotYetSupported(node, "identity operator (is/is not)", 81)
+                    raise Prohibited(node, "identity operator (is/is not)")
             check_syntax_expr(node.left)
             for c in node.comparators:
                 check_syntax_expr(c)
@@ -409,7 +402,7 @@ def check_syntax_expr(node: ast.expr) -> None:
             for v in node.values:
                 check_syntax_expr(v)
         case ast.Set():
-            raise NotYetSupported(node, "set literals", 147)
+            raise Prohibited(node, "set literals")
         case ast.Attribute():
             check_syntax_expr(node.value)
         case ast.Subscript():
@@ -425,9 +418,9 @@ def check_syntax_expr(node: ast.expr) -> None:
             for g in node.generators:
                 check_syntax_generator(g)
         case ast.SetComp():
-            raise NotYetSupported(node, "set comprehensions", 147)
+            raise Prohibited(node, "set comprehensions")
         case ast.Slice():
-            raise NotYetSupported(node, "slicing", 59)
+            raise Prohibited(node, "slicing")
         case ast.GeneratorExp():
             raise Prohibited(node, "generator expressions")
         case ast.NamedExpr():
@@ -439,7 +432,7 @@ def check_syntax_expr(node: ast.expr) -> None:
         case ast.Yield() | ast.YieldFrom():
             raise Prohibited(node, "yield")
         case ast.JoinedStr() | ast.FormattedValue():
-            raise NotYetSupported(node, "f-strings", 55)
+            raise Prohibited(node, "f-strings")
         case _:
             raise Prohibited(node, f"{type(node).__name__} expression")
 
@@ -453,20 +446,20 @@ def check_syntax_import(node: ast.stmt) -> None:
     match node:
         case ast.Import():
             if len(node.names) != 1:
-                raise NotYetSupported(node, "multi-target import (import a, b)", 135)
+                raise Prohibited(node, "multi-target import (import a, b)")
             if node.names[0].asname is not None:
-                raise NotYetSupported(node, "import-as", 135)
+                raise Prohibited(node, "import-as")
         case ast.ImportFrom():
             if len(node.names) == 0:
                 raise Prohibited(node, "empty name list")
             if node.level > 0:
-                raise NotYetSupported(node, "relative imports", 126)
+                raise Prohibited(node, "relative imports")
             assert node.module is not None  # absent only in a relative import
             for alias in node.names:
                 if alias.name == "*":
-                    raise NotYetSupported(node, "from M import *", 105)
+                    raise Prohibited(node, "from M import *")
                 if alias.asname is not None:
-                    raise NotYetSupported(node, "from-import-as", 135)
+                    raise Prohibited(node, "from-import-as")
         case _:
             raise AssertionError(f"unexpected statement: {type(node).__name__}")
 
@@ -490,7 +483,7 @@ def check_syntax_generator(node: ast.comprehension) -> None:
     if node.is_async:
         raise Prohibited(node, "async comprehensions")
     if not isinstance(node.target, ast.Name):
-        raise NotYetSupported(node, "destructuring in comprehensions", 54)
+        raise Prohibited(node, "destructuring in comprehensions")
     check_syntax_expr(node.iter)
     for i in node.ifs:
         check_syntax_expr(i)
@@ -506,15 +499,15 @@ def check_syntax_annotation(node: ast.expr | None) -> None:
 
 def check_syntax_arguments(node: ast.arguments) -> None:
     if node.vararg is not None:
-        raise NotYetSupported(node, "*args", 57)
+        raise Prohibited(node, "*args")
     if node.kwarg is not None:
-        raise NotYetSupported(node, "**kwargs", 57)
+        raise Prohibited(node, "**kwargs")
     if len(node.kwonlyargs) > 0:
         raise Prohibited(node, "keyword-only arguments")
     if len(node.defaults) > 0:
-        raise NotYetSupported(node, "default arguments", 56)
+        raise Prohibited(node, "default arguments")
     if len(node.kw_defaults) > 0:
-        raise NotYetSupported(node, "default arguments", 56)
+        raise Prohibited(node, "default arguments")
     if len(node.posonlyargs) > 0:
         raise Prohibited(node, "positional-only arguments")
     for a in node.args:

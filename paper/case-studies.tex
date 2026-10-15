@@ -29,16 +29,22 @@ core.
 
 A function applied to fewer arguments than it declares returns a function of the remaining arguments:
 
-\begin{python}
+\begin{listingrow*}
+\begin{listingcol}{0.44\textwidth}
+\begin{python}[numbers=left, xleftmargin=1.5em]
 from typing import Callable
-
 def add(x: int, y: int) -> int:
     return x + y
-
+\end{python}
+\end{listingcol}
+\begin{listingcol}{0.51\textwidth}
+\begin{python}[numbers=left, firstnumber=4, xleftmargin=1.5em]
 inc: Callable[[int], int] = add(1)
 inc(5)     # 6
 add(1)(2)  # 3
 \end{python}
+\end{listingcol}
+\end{listingrow*}
 
 \noindent The syntax is valid Python, but Python raises a \pyinline{TypeError} at run time, because
 \pyinline{add(1)} is missing an argument. Core \PurePy rejects such a call statically, since the
@@ -78,17 +84,16 @@ column becomes a parameter named after its position and is matched by the clause
 there are several such columns. On the left a definition with one shared and one matched column, and on the
 right its desugaring:
 
-\noindent
-\begin{minipage}[t]{0.47\textwidth}
+\begin{listingrow}
+\begin{listingcol}{0.47\textwidth}
 \begin{python}
 def f(k: int, [x]: list[int]) -> int:
     return k * x
 def f(k: int, xs: list[int]) -> int:
     return 0
 \end{python}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.47\textwidth}
+\end{listingcol}
+\begin{listingcol}{0.47\textwidth}
 \begin{python}
 def f(k: int, $2: list[int]) -> int:
     match $2:
@@ -97,7 +102,8 @@ def f(k: int, $2: list[int]) -> int:
         case xs:
             return 0
 \end{python}
-\end{minipage}
+\end{listingcol}
+\end{listingrow}
 
 \noindent The synthesised name \pyinline{$2} is not a Python identifier, so it cannot clash with a variable
 of the source program; the desugared definition is a term of the abstract syntax (\secref{syntax}) rather

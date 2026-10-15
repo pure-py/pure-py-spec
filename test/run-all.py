@@ -44,7 +44,6 @@ class PurePyOutcome(StrEnum):
 
 
 class Subset(StrEnum):
-    PENDING = "pending"
     MYPY_BUG = "mypy-bug"
 
 
@@ -55,7 +54,6 @@ SYNTAX_ERROR = "SyntaxError"
 class Exit(IntEnum):
     OK = 0
     PROHIBITED = 1
-    NOT_YET = 2
     ILL_FORMED = 3
     ILL_FORMED_PROGRAM = 4
 
@@ -66,7 +64,7 @@ class Expectation(NamedTuple):
     python: PythonOutcome | None  # None: not run under Python
 
 
-# Checker verdict for each PurePy outcome; a pending test is not yet accepted
+# Checker verdict for each PurePy outcome
 CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
     PurePyOutcome.PARSER: (Exit.PROHIBITED, True),
     PurePyOutcome.TYPE_CHECKER: (Exit.ILL_FORMED, True),
@@ -75,9 +73,7 @@ CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
 }
 
 
-def expectation(python: PythonOutcome, purepy: PurePyOutcome, subset: Subset | None) -> Expectation:
-    if subset == Subset.PENDING:
-        return Expectation(Exit.NOT_YET, False, None)
+def expectation(python: PythonOutcome, purepy: PurePyOutcome) -> Expectation:
     exit, error_checked = CHECKER[purepy]
     return Expectation(exit, error_checked, python)
 
@@ -92,7 +88,6 @@ class Runner:
         self.checker = checker  # command given the test path; None: the reference checker
         self.passed = 0
         self.failed: list[str] = []
-        self.skipped: list[str] = []
         self.failures: list[str] = []
 
     @contextlib.contextmanager
@@ -173,12 +168,7 @@ class Runner:
         if dirs[0] == SYNTACTIC_ONLY:
             expected = Expectation(None, False, PythonOutcome.NO_EXCEPTION)
         else:
-            subset = Subset(dirs[2]) if len(dirs) > 2 and dirs[2] in Subset else None
-            if subset == Subset.PENDING and self.checker is not None:
-                # spec doesn't define pending forms, so only the reference checker is held to them
-                self.skipped.append(str(test.relative_to(ROOT)))
-                return
-            expected = expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]), subset)
+            expected = expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]))
         with self.test(test.relative_to(ROOT)):
             exit, error_checked, python = expected
             path = test / MAIN if program else test
@@ -190,8 +180,6 @@ class Runner:
     def summary(self) -> None:
         total = self.passed + len(self.failed)
         print()
-        if self.skipped:
-            print(f"{len(self.skipped)} pending tests skipped: {', '.join(self.skipped)}")
         if self.failed:
             print(f"{RED}✗ {self.passed}/{total} passed, {len(self.failed)} failed{RESET}")
         else:
@@ -275,15 +263,9 @@ def check_lint(r: Runner) -> None:
 
 def check_mypy_compatibility(r: Runner) -> None:
     with r.test("mypy compatibility"):
-        paths = [
-            path
-            for path in sorted(
-                (TEST / MODULE_LEVEL / PythonOutcome.NO_EXCEPTION / PurePyOutcome.RESULT).rglob(
-                    "*.py"
-                )
-            )
-            if Subset.PENDING not in path.parts
-        ]
+        paths = sorted(
+            (TEST / MODULE_LEVEL / PythonOutcome.NO_EXCEPTION / PurePyOutcome.RESULT).rglob("*.py")
+        )
         # mypy reports paths relative to its working directory
         relative = [str(path.relative_to(ROOT)) for path in paths]
         reported_bug = {
@@ -321,7 +303,7 @@ def main() -> None:
     parser.add_argument(
         "--checker",
         help="command run on the path of each test in place of the reference checker, with the same "
-        "exit codes; error messages are not compared and pending tests are skipped",
+        "exit codes; error messages are not compared",
     )
     parser.add_argument(
         "--known-failures",

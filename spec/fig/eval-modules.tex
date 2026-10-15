@@ -55,7 +55,7 @@
   q, \seq{\iota} \Rightarrow r
 }
 {
-  q, \exImport{q'} \cons \seq{\iota} \Rightarrow \mlet{\rho'}{r}{\val{(\set{\bind{x}{v}} \extend \rho')}}
+  q, \exImport{q'} \cons \seq{\iota} \Rightarrow \mlet{\rho'}{r}{\val{\set{\bind{x}{v}} \extend \rho'}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-import-fail}}]
@@ -86,7 +86,7 @@
   q, \seq{\iota} \Rightarrow r
 }
 {
-  q, \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \mlet{\rho^\dagger}{r}{\val{(\set{\bind{x_1}{v_1}, \ldots, \bind{x_{n+1}}{v_{n+1}}} \extend \rho^\dagger)}}
+  q, \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \mlet{\rho^\dagger}{r}{\val{\set{\bind{x_1}{v_1}, \ldots, \bind{x_{n+1}}{v_{n+1}}} \extend \rho^\dagger}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail}}]

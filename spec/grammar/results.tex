@@ -1,0 +1,20 @@
+\begin{tabular}[t]{rcll}
+\grammarGroup{Outcomes} \\
+$o$ & $::=$ & $\assigns{\rho}$ & \speconly{(Assigns)} \\
+  & $\mid$ & $\returns{v}$ & \speconly{(Returns)} \\
+  & $\mid$ & $\aborts{\kappa}$ & \speconly{(Aborts)}
+   \\[3mm]
+\grammarGroup{Results} \\
+$r$ & $::=$ & $\val{v}$ & \speconly{(Val)} \\
+  & $\mid$ & $\aborts{\kappa}$ & \speconly{(Aborts)}
+   \\[3mm]
+\grammarGroup{Match results} \\
+$m$ & $::=$ & $\matchOk{\rho}$ & \speconly{(Match)} \\
+  & $\mid$ & $\noMatch$ & \speconly{(NoMatch)} \\
+  & $\mid$ & $\errUndef$ & \speconly{(Undefined)}
+   \\[3mm]
+\grammarGroup{Termination kinds} \\
+$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \errKey$ & \\
+    & $\mid$ & $\errZeroDiv \mid \errAssertNoMsg \mid \errAssert{w}$ & \\
+    & $\mid$ & $\errAttr \mid \errExit{n} \mid \errUndef$ &
+\end{tabular}
