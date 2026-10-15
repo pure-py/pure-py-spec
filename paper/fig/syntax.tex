@@ -1,17 +1,21 @@
 \begin{figure}
 \footnotesize
 \renewcommand{\arraystretch}{0.92}
-\begin{subfigure}[b]{0.56\textwidth}
+\begin{minipage}[t]{0.56\textwidth}
 \input{spec/grammar/statements}
-\subcaption{Modules and statements}
-\label{fig:syntax-stmt}
-\end{subfigure}%
+\end{minipage}%
 \hfill
-\begin{subfigure}[b]{0.42\textwidth}
+\begin{minipage}[t]{0.42\textwidth}
 \input{spec/grammar/expressions}
-\subcaption{Expressions and patterns}
-\label{fig:syntax-expr}
-\end{subfigure}
+\end{minipage}
+
+\begin{minipage}[t]{0.56\textwidth}
+\subcaption{Modules and statements}\label{fig:syntax-stmt}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.42\textwidth}
+\subcaption{Expressions and patterns}\label{fig:syntax-expr}
+\end{minipage}
 
 \vspace{2mm}
 
