@@ -35,6 +35,7 @@ Metavariables $x$, $f$, $c$ and $\alpha$ range over \emph{variables}; idiomatica
 A context $\Gamma$ (or $\Delta$) is a finite map from variables to \emph{context entries} $\theta$, which
 take the following forms:
 
+\begin{DeletedBlock}
 {\normalfont
 \begin{center}
 \small
@@ -52,14 +53,33 @@ predefined name & $\predefName$ & name usable only in annotation or as decorator
 \end{tabular}
 \end{center}
 }
+\end{DeletedBlock}
+\begin{AddedBlock}
+{\normalfont
+\begin{center}
+\small
+\begin{tabular}{rcll}
+$\theta$ & $::=$ & $\tau \mid \DU{\tau} \mid \PU{\tau} \mid \Unbound$ & (Variable) \\
+    & $\mid$ & $\modStub{q}$ & (Module stub) \\
+    & $\mid$ & $\modLoaded{q}{\Gamma}$ & (Checked module, with signature $\Gamma$) \\
+    & $\mid$ & $\Type{C}$ & (Class) \\
+    & $\mid$ & $\TypeVar$ & (Type parameter) \\
+    & $\mid$ & $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ & (Type alias) \\
+    & $\mid$ & $\scheme{\seq{\alpha}}{\tau} \mid \PU{\scheme{\seq{\alpha}}{\tau}}$ & (Type scheme, $\seq{\alpha}$ non-empty) \\
+    & $\mid$ & $\predefName$ & (Predefined name)
+\end{tabular}
+\end{center}
+}
+\end{AddedBlock}
 \end{definition}
 
-\noindent A predefined name is a member of a predefined module whose meaning is fixed by \replaced{\PurePy}{the \thisdoc }, such as \pyinline{list} or
+\noindent A predefined name is a member of a predefined module whose meaning is fixed by \replaced{\PurePy}{the \thisdoc{} }, such as \pyinline{list} or
 \pyinline{dataclass}; its entry records only that it is in scope, and it does not denote a value, so it cannot appear in
 an expression. A type parameter or type alias denotes a type rather than a value, so it too can be mentioned only by a type
 expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ are
 named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \pyinline{typing.TypeAliasType} of
-the objects denoted by a class name, type parameter or alias at run time.
+the objects denoted by a class name, type parameter or alias at run time.\added{ The entry $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ records the alias declared by the $i$-th
+definition of the mutual type region $\seq{\chi}$ of module $q$, resolved under $\Gamma$.}
 
 The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
 and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
