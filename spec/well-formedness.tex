@@ -473,9 +473,9 @@ declares that name again, imports it, or binds it in a pattern.
 \specinput{spec/fig/typing-module}
 
 The signature $\Gamma$ produced by module checking\speconly{ (\figref{typing-module})} comprises the classes, type aliases
-and variables defined by a module, together with its intrinsic \pyinline{__name__} and a stub for each submodule,
+and variables defined by a module, together with its intrinsic \pyinline{__name__} and a stub for each submodule\speconly{,
 but not the names that it imports: following PEP 484\footnote{\url{https://peps.python.org/pep-0484/}}, an imported
 name is a private dependency, not re-exported as part of the interface. Submodule stubs and the bindings of the module
 body are disjoint, because the module rules exclude a module that binds a name that is also the name of
-a submodule\paperonly{ (\secref{no-load-dependent})}.
+a submodule}.
 
