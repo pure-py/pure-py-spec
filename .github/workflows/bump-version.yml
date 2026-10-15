@@ -38,7 +38,7 @@ jobs:
           TAG="v$VERSION"
 
           sed -i "s/\\\\version{[0-9]*}{[0-9]*}{[0-9]*}/\\\\version{$MAJOR}{$MINOR}{$PATCH}/" paper.tex PurePy-spec.tex
-          sed -i "s|## \[v[0-9]*\.[0-9]*\.[0-9]*\](https://github.com/pure-py/pure-py-spec/releases/download/v[0-9]*\.[0-9]*\.[0-9]*/PurePy-spec.pdf)|## [$TAG](https://github.com/pure-py/pure-py-spec/releases/download/$TAG/PurePy-spec.pdf)|" README.md
+          sed -i "s|## \[v[0-9]*\.[0-9]*\.[0-9]*\](https://pure-py.github.io/pure-py-spec/v[0-9]*\.[0-9]*\.[0-9]*/PurePy-spec.pdf)|## [$TAG](https://pure-py.github.io/pure-py-spec/$TAG/PurePy-spec.pdf)|" README.md
 
           uv version "$VERSION"
 
@@ -77,8 +77,26 @@ jobs:
         with:
           root_file: PurePy-spec.tex
 
-      - name: Create release and upload PDF
+      # The PDF is served from GitHub Pages rather than attached to the release, since GitHub serves release files
+      # as downloads, which drops the destination named in a link such as PurePy-spec.pdf#fig:typing-synth.
+      - name: Publish PDF to GitHub Pages
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages:refs/remotes/origin/gh-pages
+          git worktree add -B gh-pages pages origin/gh-pages
+          mkdir -p "pages/$TAG" pages/latest
+          cp PurePy-spec.pdf "pages/$TAG/"
+          cp PurePy-spec.pdf pages/latest/
+          cd pages
+          bash ../.github/scripts/pages-index.sh
+          git add -A
+          git commit -m "Specification $TAG"
+          git push origin gh-pages
+
+      - name: Create release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          files: PurePy-spec.pdf
+          body: "Specification: https://pure-py.github.io/pure-py-spec/${{ steps.version.outputs.tag }}/PurePy-spec.pdf"
