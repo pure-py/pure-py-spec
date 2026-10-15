@@ -22,8 +22,7 @@ def main() -> None:
         print(format_result(result, str(args.path)))
     else:
         result = check_program(args.path)
-        if result is not None:
-            print(result.msg)
+        print(f"{args.path}: ok" if result is None else result.msg)
 
     sys.exit(0 if result is None else result.exit_code)
 

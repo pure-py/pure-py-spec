@@ -1,5 +1,4 @@
 import ast
-import sys
 from collections.abc import Mapping
 from dataclasses import replace
 
@@ -292,20 +291,3 @@ def format_result(result: IllFormed | syntax.Unsupported | None, filename: str) 
             return f"{filename}:{result.line}:{result.col}: {result.msg}"
         case _:
             return f"{filename}: {result.msg}"
-
-
-def main() -> None:
-    if len(sys.argv) < 2:
-        print("Usage: check_module.py <file.py> [<file.py> ...]")
-        sys.exit(1)
-    exit_code = 0
-    for filename in sys.argv[1:]:
-        result = check_file(filename)
-        print(format_result(result, filename))
-        if result is not None:
-            exit_code = result.exit_code
-    sys.exit(exit_code)
-
-
-if __name__ == "__main__":
-    main()

@@ -1,6 +1,5 @@
 import ast
 import pathlib
-import sys
 from collections.abc import Iterator, Mapping
 
 from . import syntax
@@ -91,20 +90,3 @@ def check_program(entry_path: pathlib.Path) -> IllFormed | syntax.Unsupported | 
         return e
     except (IllFormed, syntax.Unsupported) as e:
         return e
-
-
-def main() -> None:
-    if len(sys.argv) != 2:
-        print("Usage: check_program.py <entry-file>")
-        sys.exit(1)
-    entry = pathlib.Path(sys.argv[1])
-    result = check_program(entry)
-    if result is None:
-        print(f"{entry}: ok")
-        sys.exit(0)
-    print(result.msg)
-    sys.exit(result.exit_code)
-
-
-if __name__ == "__main__":
-    main()

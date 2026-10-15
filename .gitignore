@@ -2,12 +2,21 @@
 *.aux
 *.bbl
 *.blg
+*.cb
+*.cb2
+*.cut
 *.fdb_latexmk
 *.fls
+*.loc
 *.log
-*.pdf
-*.zip
 *.out
+*.pdf
+*.soc
+*.toc
+*.zip
+
+# Agda build artifacts
+agda/_build/
 
 # Python build and environment artifacts
 .venv/
@@ -16,14 +25,6 @@ dist/
 
 # Local tool settings
 .claude/settings.local.json
-
-# Isabelle session artifacts
-*.cb
-*.cb2
-*.loc
-*.soc
-*.toc
-*.cut
 
 # macOS
 .DS_Store
