@@ -121,17 +121,23 @@ class is not an expression on its own, and occurs only as the head of a qualifie
 name\paperonly{ (\secref{no-first-class})}.
 }In a subscript $\exSubscript{e}{e'}$ there is a rule for each container that $e$ can synthesise: a list\speconly{
 (\ruleName{subscript-list})} or string\speconly{ (\ruleName{subscript-str})} with $e'$ of type \pyinline{int}, and a
-dictionary with $e'$ of type \pyinline{str}\speconly{ (\ruleName{subscript-dict})}. Tuples have three rules: an index
+dictionary with $e'$ of type \pyinline{str}\speconly{ (\ruleName{subscript-dict})}. Tuples have three rules: \speconly{\deleted{an index
 that synthesises a literal type gives the component type at that position, counting from the end when the index
-is negative\speconly{ (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg})}\paperonly{ (\ruleName{subscript-tuple})}, and any other index of type
-\pyinline{int} gives the join of the component types\speconly{ (\ruleName{subscript-tuple-int})}. A subscript, attribute reference or call whose subject
+is negative (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg}), and any other index of type
+\pyinline{int} gives the join of the component types (\ruleName{subscript-tuple-int}). }}\added{an index of type \pyinline{int} gives
+the join of the component types\speconly{ (\ruleName{subscript-tuple-int})}, unless it synthesises a literal type, in which case it
+gives the component type at that position, counting from the end when the index is negative\speconly{
+(\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg})}}\paperonly{\added{:}}\speconly{\added{.}}
+\paperinput{paper/well-formedness/subscript-tuple}%
+A subscript, attribute reference or call whose subject
 synthesises a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
-join of the results\speconly{ (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union})}\paperonly{ (\ruleName{call-union})}; generators need no
-such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts' element types.
+join of the results\speconly{ (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union})}\speconly{\deleted{; generators need no
+such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts' element types.}}\paperonly{\added{:}}\speconly{\added{.}}
+\paperinput{paper/well-formedness/call-union}%
+\added{Generators need no such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts' element types.}
 \citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form.
 
-\paperinput{paper/well-formedness/synth-rules}%
 
 The \ruleName{call} rule for a call $\exCall{e}{\seq{e}}$ uses the auxiliary
 judgement $\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$\speconly{ (\figref{typing-callee})}, which determines parameter
