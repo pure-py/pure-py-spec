@@ -102,19 +102,19 @@ $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$: the class definition $\chi_i$ of mutual t
 relation taking each class of $\Sigma$ to its base class is acyclic.
 \end{definition}
 
-\noindent The
+\noindent \speconly{The
 type parameters, fields and base class of $C$ are read from $\Sigma(C)$ by auxiliary functions
-$\typeParams{\Sigma}$, $\fields{\Sigma}$ and $\base{\Sigma}$\speconly{ (\S\ref{sec:auxiliary-classes})}, the latter two resolving
-the field annotations and base class of the definition under the context given by $\typeContext{\Gamma}(q, \seq{\chi}, i)$\speconly{
-(\S\ref{aux:type-context})}. The class table is similar to the class table of Featherweight Java~\cite{igarashi2001}; the well-formedness rules build it while checking the class definitions of the program\speconly{ (\figref{typing-top-level})}.
+$\typeParams{\Sigma}$, $\fields{\Sigma}$ and $\base{\Sigma}$ (\S\ref{sec:auxiliary-classes}), the latter two resolving
+the field annotations and base class of the definition under the context given by $\typeContext{\Gamma}(q, \seq{\chi}, i)$
+(\S\ref{aux:type-context}). }The class table is similar to the class table of Featherweight Java~\cite{igarashi2001}; the well-formedness rules build it while checking the class definitions of the program\speconly{ (\figref{typing-top-level})}.
 
 \subsubsection{Context operations}
 \label{sec:context-operations}
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
-an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). Together these form a
+an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). \speconly{Together these form a
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
-distributivity does not hold. Both are defined pointwise, by $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$
+distributivity does not hold.} Both are defined pointwise, by $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$
 for each operation $\cdot$, from operations on context entries: override is right-biased
 and has $\bot$ as both left and right unit, whereas merge has no unit, since a variable bound on one side
 only is possibly unassigned. Override is defined in the same way on any finite map with $\bot$ for
