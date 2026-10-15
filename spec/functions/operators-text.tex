@@ -1,8 +1,8 @@
-The comparisons \pyinline{==}, \pyinline{!=}, \pyinline{in} and \pyinline{not in} are given in terms of
-structural equality $\eqOp{\Sigma}$ and membership $\contains{\Sigma}$. When defined, the
-operators agree with Python, yielding $\aborts{\kappa}$ when Python raises an
-exception. At a dynamically excluded comparison\paperonly{ (\secref{no-coercions})}, equality is undefined, and an
-implementation may abort or produce the result that Python gives (\paperonly{\secref{python-compatibility}}\speconly{\secref{conformance}}). Because
-equality is partial, the order in which elements are compared is observable: equality and membership short-circuit
-at the first element that decides the result, so an undefined comparison later in a sequence does not make
-the whole comparison undefined.
+The comparisons \pyinline{==}, \pyinline{!=}, \pyinline{in} and \pyinline{not in} compare values
+structurally\speconly{, by structural equality $\eqOp{\Sigma}$ and membership $\contains{\Sigma}$}, and agree with Python
+except at the comparisons left undefined by \PurePy\paperonly{, described in \secref{no-coercions}}\speconly{
+(\secref{no-coercions})}: between a Boolean and a number, between two functions, and between two \pyinline{nan}
+values inside a container. A run that reaches one of these comparisons has undefined behaviour, so an
+implementation may abort or produce the result given by Python (\paperonly{\secref{python-compatibility}}\speconly{\secref{conformance}}).
+Equality and membership compare the elements of a sequence in order and stop at the first element that decides
+the result, so an undefined comparison later in the sequence does not make the whole comparison undefined.

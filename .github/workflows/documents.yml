@@ -1,0 +1,40 @@
+name: Documents
+
+# Build only the paper and specification when only their sources change; any other change runs the full Build
+# workflow.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - paper.tex
+      - paper/**
+      - PurePy-spec.tex
+      - spec/**
+      - tex/**
+      - .github/workflows/documents.yml
+
+concurrency:
+  group: documents-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  documents:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Install packages
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends \
+            make \
+            texlive-latex-extra texlive-fonts-extra texlive-science \
+            texlive-publishers texlive-bibtex-extra texlive-plain-generic
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Build paper and specification
+        run: make paper.pdf paper-anon.pdf PurePy-spec.pdf spec-anon.pdf

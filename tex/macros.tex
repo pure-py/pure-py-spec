@@ -58,8 +58,15 @@
 \newcommand*{\auxrows}[1]{\@@input spec/fig/auxiliary-index-#1.tex }
 \makeatother
 
-% Inline definitions: align* with tighter row spacing than a standalone figure.
-\newenvironment{defalign}{\setlength{\jot}{1pt}\csname alignat*\endcsname{2}}{\csname endalignat*\endcsname}
+% Inline definitions: align* in small type, like the inline rules, with tighter row spacing than a standalone
+% figure. The baseline skip of the surrounding text is kept, since the lines of a paragraph before a display are
+% set with the skip in force when the display starts.
+\makeatletter
+\newenvironment{defalign}
+  {\edef\defalign@baselineskip{\the\baselineskip}\small\baselineskip=\defalign@baselineskip
+   \setlength{\jot}{1pt}\csname alignat*\endcsname{2}}
+  {\csname endalignat*\endcsname}
+\makeatother
 % How the paper refers to the specification document.
 \ifdefined\anonmode
   \newcommand*{\specification}{the supplementary material\xspace}
@@ -68,6 +75,19 @@
   \newcommand*{\specification}{the \PurePy specification\xspace}
   \newcommand*{\specificationavailability}{accompanies this paper}
 \fi
+% References from the paper into the specification, numbered with the prefix \specmark. The numbers come from the specification's labels, read by
+% xr-hyper under the prefix S-; each link opens the released PDF at the destination named after the label
+% (hyperref's destlabel option). The anonymised paper does not link, since the release URL names the project.
+\newcommand*{\specurl}{https://github.com/pure-py/pure-py-spec/releases/download/v\versionstring/PurePy-spec.pdf}
+\ifdefined\anonmode
+  \newcommand*{\speclink}[2]{#2}
+\else
+  \newcommand*{\speclink}[2]{\href{\specurl\##1}{#2}}
+\fi
+% Prefix marking a number as the specification's, as in Figure S2.4
+\newcommand*{\specmark}{\textsf{\textbf{S}}}
+\newcommand*{\specfigref}[1]{\speclink{fig:#1}{Figure~\specmark\ref*{S-fig:#1}}}
+\newcommand*{\specsecref}[1]{\speclink{sec:#1}{\S\specmark\ref*{S-sec:#1}}}
 \newcommand*{\version}[3]{%
   \gdef\versionstring{#1.#2.#3}%
 }

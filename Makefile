@@ -2,6 +2,7 @@ INPUTS := $(wildcard tex/*.tex spec/*.tex spec/*/*.tex spec/*/*/*.tex paper/*.te
 BIBFILES := $(wildcard tex/*.bib)
 PYTHON_VERSION_TEX := tex/python-version.tex
 MYPY_VERSION_TEX := tex/mypy-version.tex
+SPEC_LABELS := xref/PurePy-spec.aux
 TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
 BUILD_AUX := *.aux *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
@@ -37,7 +38,15 @@ endif
 	$(PDFLATEX) $(latex-source)
 	$(PDFLATEX) $(latex-source)
 	$(call check-log,$*)
+	$(if $(filter PurePy-spec,$*),mkdir -p $(dir $(SPEC_LABELS)) && cp $*.aux $(SPEC_LABELS))
 	rm -f $(BUILD_AUX)
+
+# Labels of the specification, kept for the paper's references into it (xr-hyper), outside the directory
+# cleared of auxiliary files after each build.
+$(SPEC_LABELS): PurePy-spec.pdf
+	@test -f $@ || $(MAKE) -B PurePy-spec.pdf
+
+paper.pdf paper-anon.pdf: $(SPEC_LABELS)
 
 # Draft notes on gradual typing, not part of the 1.0 specification or paper.
 GRADUALITY_INPUTS := $(wildcard graduality/*.tex graduality/*/*.tex)
@@ -92,5 +101,6 @@ paper-arXiv.zip: paper.pdf
 
 clean:
 	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX)
+	rm -rf $(dir $(SPEC_LABELS))
 
 .PHONY: default all paper-submission clean check-mechanisation check-tests

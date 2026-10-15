@@ -3,15 +3,7 @@
 
 \input{spec/functions/operators-text}
 
-Structural equality $\eqOp{\Sigma}$ compares literals by value, lists and tuples elementwise, dictionaries with
-the same keys by their values, and objects of the same class by their fields. Values of different forms, such
-as a number and a string or a list and a tuple, are unequal. Equality is undefined between a Boolean and a
-number, which Python compares numerically, between functions, which Python compares by identity, and between
-two \pyinline{nan}s inside a container. Compared directly, \pyinline{nan == nan} is \pyinline{False} in both languages,
-but Python compares container elements by identity before equality, so two lists holding \pyinline{nan}s
-are equal or not according to whether they hold the same object, a distinction that \PurePy cannot make.
-Python gives an answer in each case (\secref{no-coercions}), so each is a dynamically excluded comparison. Comparison short-circuits at the first element that
-decides the result, so the comparison order is observable:
+For example, two lists holding the same \pyinline{nan} are compared element by element:
 
 \begin{python}
 x: float = 1e400 - 1e400  # nan
@@ -19,8 +11,6 @@ print([1.0, x] == [2.0, x])  # False, decided at the first element
 print([1.0, x] == [1.0, x])  # undef: nan against nan
 \end{python}
 
-\noindent Dictionaries are compared in the key order of the left operand for the same reason. The membership
-function $\contains{\Sigma}$ tests for a key of a dictionary, a substring of a string, or an element of a list or tuple,
-the last by structural equality with the same short-circuiting. The strict operators are given by
-$\hat{\odot}$ and $\hat{\ominus}$; the definitions of all of these are given in
-\specification.
+\noindent Python gives \pyinline{True} for the second comparison, because it compares container elements by
+identity before equality, a distinction that \PurePy does not make. Because the order of comparison is observable,
+dictionaries are compared in the key order of the left operand. The meanings of all the operators are given in \specification.
