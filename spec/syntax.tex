@@ -78,8 +78,8 @@ $\theta$ & $::=$ & $\tau \mid \DU{\tau} \mid \PU{\tau} \mid \Unbound$ & (Variabl
 an expression. A type parameter or type alias denotes a type rather than a value, so it too can be mentioned only by a type
 expression. The entries $\Type{C}$, $\TypeVar$ and $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ are
 named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \pyinline{typing.TypeAliasType} of
-the objects denoted by a class name, type parameter or alias at run time.\added{ The entry $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ records the alias declared by the $i$-th
-definition of the mutual type region $\seq{\chi}$ of module $q$, resolved under $\Gamma$.}
+the objects denoted by a class name, type parameter or alias at run time.\added{ The entry $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ records the alias declared by $\chi_i$ in
+the mutual type region $\seq{\chi}$ of module $q$, resolved under $\Gamma$.}
 
 The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
 and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
