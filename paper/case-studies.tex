@@ -47,6 +47,7 @@ extension therefore gives a meaning to programs rejected by the core without cha
 program accepted by the core. Statically, a callee of type $\tyCallable{\sigma_1, \ldots, \sigma_n}{\tau}$
 applied to $k < n$ arguments synthesises the type of a function of the remaining parameters:
 \begin{mathpar}
+\small
 \inferrule*[lab={\ruleName{call-partial}}]
 {
   \Sigma; \Gamma \vdash e, e_1, \ldots, e_k \synth \sigma_1, \ldots, \sigma_n, \tau \\

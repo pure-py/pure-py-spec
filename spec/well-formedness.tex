@@ -305,15 +305,17 @@ auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L
 a remaining type, starting from $\sigma$, and a residual $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
 through the cases, merging their outcomes into $S$. The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
 exhaustive; the \ruleName{match-partial} rule applies otherwise and also merges in $\Assigns{\varnothing}$, the
-outcome of the path on which the scrutinee is not matched by any of the cases. The remaining type, the residual, reachability and exhaustiveness are the subject of
-\secref{well-formedness-patterns}.
-
+outcome of the path on which the scrutinee is not matched by any of the cases\paperonly{\added{:}}\speconly{.}
 \paperinput{paper/well-formedness/match}%
+The remaining type, the residual, reachability and exhaustiveness are the subject of
+\secref{well-formedness-patterns}.
 
 \speconly{\subsubsection{Function definitions}\label{sec:well-formedness-defs}}%
 The \ruleName{defs} rule for a mutual def region of function definitions synthesises a type scheme for each definition\speconly{
 (\figref{typing-def})}, binds all the function names of the mutual def region at the synthesised type schemes, and checks each
-definition against its scheme. For a definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$,
+definition against its scheme\paperonly{\added{:}}\speconly{.}
+\paperinput{paper/well-formedness/defs}%
+For a definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$,
 the auxiliary judgements $\Sigma; \Gamma \vdash d \synth \pi$ and $\Sigma; \Gamma \vdash d \checks \pi$ synthesise the type
 scheme from the annotations (\ruleName{def-signature}) and check the body $s$ (\ruleName{def-body}). Both rules extend the
 context with $\TypeVar$ entries for the type parameters $\seq{\alpha}$. A type scheme without type parameters is identical to its \pyinline{Callable} type, so the \ruleName{defs} rule binds the name of a
@@ -321,8 +323,6 @@ function without type parameters as a variable of that type. The type schemes of
 at a call, by the argument types (\ruleName{callee-scheme}), and when checked against a \pyinline{Callable} type, by that
 type (\ruleName{var-scheme}). Since annotations denote types, not type schemes, declarations and
 assignments never bind variables at type schemes, only at types.
-
-\paperinput{paper/well-formedness/defs}%
 
 In the body, the parameters $\seq{x}$ are bound at the types denoted by $\seq{\psi}$; variables declared or
 assigned in $s$ start unbound, emulating Python's scoping of function bodies, which
@@ -394,7 +394,8 @@ against the residual\speconly{ (\secref{matching})}. Reachability is decided by 
 residual: a case is \emph{reachable} if its pattern matches at least one shape of the residual, and a match with an
 unreachable case is ill-formed. For a reachable case, the body is checked under the bindings and its outcome merged
 into $S$; the shapes left after matching and the type remaining if the pattern fails become the residual and remaining
-type for the case that follows.
+type for the case that follows\paperonly{\added{:}}\speconly{.}
+\paperinput{paper/well-formedness/match-cases}%
 
 A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. Exhaustiveness is decided by
 the final remaining type, which the \ruleName{match} rule requires to be $\tyNever$, with \ruleName{match-partial}
@@ -436,7 +437,21 @@ Definition~\ref{def:predefined}.
 Both import forms check their target, together with its containing modules
 (\figref{typing-import-prefix}). A plain import checks the root and then each module
 along the chain of names, recording each as a member of its parent (\ruleName{submodules-cons}), so that the binding for the root gives attribute
-access along the whole chain. A from-import also checks any imported name that denotes a submodule, and the
+access along the whole chain.\added{ Two imports with the same root, such as \pyinline{a.b} and \pyinline{a.c}, both
+bind the root, and their bindings combine by \emph{context extension} $\Gamma \extend \Delta$ rather than shadow
+one another. Extension is defined pointwise, like override, and combines module entries for the same module
+recursively, preferring checked modules to stubs:}
+\begin{AddedBlock}
+\begin{specdefinition}{Extension of context entries}
+\begin{defalign}
+\modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} & = \modLoaded{q}{\Gamma \extend \Gamma'} \\
+\modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} & = \modLoaded{q}{\Gamma} \\
+\bot \extend \theta = \theta \extend \bot & = \theta \\
+\theta \extend \theta' & = \theta' \quad \text{(otherwise)}
+\end{defalign}
+\end{specdefinition}
+\end{AddedBlock}
+\noindent A from-import also checks any imported name that denotes a submodule, and the
 names it imports must be distinct. A
 containing module of the target is exempt from checking if it is the importing module or one of its
 containing modules\speconly{ (\S\ref{aux:containing})}, because at runtime it may still be loading when the import executes. The exemption applies only to from-imports, because
