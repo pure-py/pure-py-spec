@@ -52,6 +52,36 @@
 \lstnewenvironment{python}[1][]{\lstset{style=base16python}\if@minipage\lstset{aboveskip=-3pt}\fi\lstset{#1}}{}
 \makeatother
 
+% Listings side by side: each listingcol is a top-aligned minipage, and listingrow separates the columns by
+% faint dotted rules spanning the tallest column.
+\makeatletter
+\newcount\listing@cols
+\newdimen\listing@ht
+\newdimen\listing@dp
+\@for\listing@i:={1,2,3,4}\do{\expandafter\newbox\csname listing@box\listing@i\endcsname}
+\newcommand*{\listing@box}[1]{\csname listing@box#1\endcsname}
+\newenvironment{listingrow}{\par\global\listing@cols=0\relax}{%
+  \listing@ht=0pt\relax \listing@dp=0pt\relax
+  \count@=0\relax
+  \loop\ifnum\count@<\listing@cols \advance\count@ 1\relax
+    \ifdim\ht\listing@box{\the\count@}>\listing@ht \listing@ht=\ht\listing@box{\the\count@}\fi
+    \ifdim\dp\listing@box{\the\count@}>\listing@dp \listing@dp=\dp\listing@box{\the\count@}\fi
+  \repeat
+  \noindent\count@=0\relax
+  \loop\ifnum\count@<\listing@cols \advance\count@ 1\relax
+    \ifnum\count@>1 \hfill\listing@rule\hfill\fi
+    \box\listing@box{\the\count@}%
+  \repeat
+  \par\medskip}
+\newcommand*{\listing@rule}{%
+  \tikz[baseline=0pt]\draw[base03, densely dotted, line width=0.3pt]
+    (0pt,\the\listing@ht) -- (0pt,-\the\listing@dp);}
+\newenvironment{listingcol}[1]
+  {\global\advance\listing@cols 1\relax
+   \global\setbox\listing@box{\the\listing@cols}=\hbox\bgroup\begin{minipage}[t]{#1}}
+  {\end{minipage}\egroup}
+\makeatother
+
 % Colour of inline code: base05, or the markup colour inside change markup (tex/change-tracking.tex)
 \providecommand*{\codecolor}{base05}
 

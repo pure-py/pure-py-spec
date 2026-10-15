@@ -28,7 +28,7 @@ source text into abstract syntax otherwise maps each form of Python's grammar to
 \subsection{Contexts}
 \label{sec:contexts}
 
-Metavariables $x$, $f$, $c$ and $\alpha$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function, $c$ when it is expected to denote a class, and $\alpha$ when it is a type parameter. A \emph{name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}): a variable is a \emph{simple name}, and a name with at least one dot is \emph{qualified}. A name is \emph{fully qualified} when it is read from the root of the module hierarchy; modules (\secref{modules-programs}) and classes (Definition~\ref{def:class}) are identified by fully-qualified name.
+Metavariables $x$, $f$, $c$ and $\alpha$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function, $c$ when it is expected to denote a class, and $\alpha$ when it is a type parameter. A \emph{name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}): a variable is a \emph{simple name}, and a name with at least one dot is \emph{qualified}. A name is \emph{fully qualified} when it is read from the root of the module hierarchy; modules (\secref{modules-programs}) and classes\speconly{ (Definition~\ref{def:class})} are identified by fully-qualified name.
 
 \begin{definition}[Context]
 \label{def:context}
@@ -66,22 +66,26 @@ is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on 
 with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
 
-\begin{definition}[Class name]
+\begin{specdefinition}{Class name}
 \label{def:class}
-A class name $C$ is a fully-qualified name $q.c$: a module $q$ and the unqualified name $c$ under which the
+\speconly{\deleted{A class name $C$ is a fully-qualified name $q.c$: a module $q$ and the unqualified name $c$ under which the
 class is defined in $q$. A module defines each unqualified name at most once, so class names identify
-classes, and we write ``class $C$'' for the class named $C$. A class name is also the type of the instances of the class.
-\end{definition}
-
-\begin{definition}[Class table]
-\label{def:class-table}
-A class table $\Sigma$ is a finite map from class names to class definitions under their defining contexts, with $\Sigma(C)$ of the form
+classes, and we write ``class $C$'' for the class named $C$. }}\added{\emph{Class names} $C$ are fully-qualified names
+$q.c$, where $c$ is the name under which the class is defined in module $q$. A module defines each name at most
+once, so class names identify classes\speconly{, and we write ``class $C$'' for the class named $C$}. }A class name is also the type of the instances of the class.
+\end{specdefinition}\paperonly{\quad}%
+\begin{specdefinition}{Class table}%
+\label{def:class-table}%
+\speconly{\deleted{A class table $\Sigma$ is a finite map from class names to class definitions under their defining contexts, with $\Sigma(C)$ of the form
 $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$: the class definition $\chi_i$ of mutual type region $\seq{\chi}$ of module $q$
 (\figref{syntax-stmt}), which defines $C$, under the context $\Gamma$ in which the type region appears. Every class named in a definition of $\Sigma$ is in $\dom(\Sigma)$, and the
-relation taking each class of $\Sigma$ to its base class is acyclic.
-\end{definition}
-
-\noindent \speconly{The
+relation taking each class of $\Sigma$ to its base class is acyclic.}}\added{A \emph{class table} $\Sigma$ maps each
+class name $C$ in its domain to a class entry $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$, which records the class
+definition $\chi_i$ of mutual type region $\seq{\chi}$ of module $q$ defining $C$, and the context $\Gamma$ in which
+the region appears. Every class named in $\Sigma$ is in $\dom(\Sigma)$, and the base-class relation on
+$\dom(\Sigma)$ is acyclic.}%
+\end{specdefinition}
+\speconly{The
 type parameters, fields and base class of $C$ are read from $\Sigma(C)$ by auxiliary functions
 $\typeParams{\Sigma}$, $\fields{\Sigma}$ and $\base{\Sigma}$ (\S\ref{sec:auxiliary-classes}), the latter two resolving
 the field annotations and base class of the definition under the context given by $\typeContext{\Gamma}(q, \seq{\chi}, i)$
@@ -100,9 +104,9 @@ only is possibly unassigned. Override is defined in the same way on any finite m
 undefined, such as an environment or class table.
 \begin{specdefinition}{Override and merge of context entries}
 \begin{defalignat}{3}
-\theta \merge \theta & = \theta &&& \qquad \bot \override \theta = \theta \override \bot & = \theta \\
-\theta \merge \theta' & = \PU{\tau} && \quad \text{if } \theta \neq \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}, \bot} & \qquad \theta \override \theta' & = \theta' \quad \text{(otherwise)} \\
-\theta \merge \theta' & = \PU{\scheme{\seq{\alpha}}{\tau}} && \quad \text{if } \theta \neq \theta' \in \set{\scheme{\seq{\alpha}}{\tau}, \PU{\scheme{\seq{\alpha}}{\tau}}, \bot}
+\theta \merge \theta & = \theta &&& \qquad \bot \override \theta & = \theta \\
+\theta \merge \theta' & = \PU{\tau} && \quad \text{if } \theta \neq \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}, \bot} & \qquad \theta \override \bot & = \theta \\
+\theta \merge \theta' & = \PU{\scheme{\seq{\alpha}}{\tau}} && \quad \text{if } \theta \neq \theta' \in \set{\scheme{\seq{\alpha}}{\tau}, \PU{\scheme{\seq{\alpha}}{\tau}}, \bot} & \qquad \theta \override \theta' & = \theta' \quad \text{(otherwise)}
 \end{defalignat}
 \end{specdefinition}
 
