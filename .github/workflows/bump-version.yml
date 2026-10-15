@@ -104,4 +104,6 @@ jobs:
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           body: "Specification: https://pure-py.github.io/pure-py-spec/${{ steps.version.outputs.tag }}/PurePy-spec.pdf"
-          files: dist/*
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
