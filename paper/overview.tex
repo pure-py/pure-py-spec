@@ -60,8 +60,8 @@ that update a value in place, such as \pyinline{list.append}, are unavailable, b
 attributes. A Python closure captures a binding rather than a value, so a change to the binding is visible through
 the closure. Excluding reassignment removes such changes, a discipline Java imposes on captured locals, which must
 be effectively final~\cite[\S15.27.2]{gosling2025}. One case remains: Python implements a comprehension by updating
-its generator variables in place on each iteration, so \PurePy forbids a lambda within a comprehension from
-capturing a generator variable, since the updates would otherwise be visible through the lambda (\secref{captured-variables}):
+its generator variables in place on each iteration, so \PurePy forbids a lambda \added{in the body or in a later qualifier of a comprehension} from
+capturing a generator variable, since the updates would otherwise be visible through the lambda:
 
 \begin{python}
 [lambda x: x**i for i in [1, 2, 3]] # error: lambda captures i
@@ -89,7 +89,14 @@ a scope, a declaration hides the enclosing variable everywhere in the scope, so 
 rejected as unbound rather than referring to the enclosing variable. mypy agrees, with one exception: at module
 level a use before the declaration of a builtin name refers to the builtin, as it does when Python runs the
 module. \PurePy treats the builtins as an enclosing scope like any other, and therefore rejects a use of a builtin
-name if the module later declares that name. A pattern introduces its variables rather than assigning them, so a
+name if the module later declares that name\added{:}
+\begin{AddedBlock}
+\begin{python}
+n: int = len([1])  # error: len is bound by the module
+len: int = 2
+\end{python}
+\end{AddedBlock}
+\noindent A pattern introduces its variables rather than assigning them, so a
 pattern cannot bind a name declared in its scope either, although several cases of one match may bind the same
 variable.
 
@@ -115,13 +122,44 @@ effect-free.
 
 A name's meaning in \PurePy must not depend on the order in which modules load or on runtime state, so several
 of Python's import and module behaviours are excluded. Imports must appear at the start of a module, never
-inside a function body or branch, nor after a statement. Wildcard imports (\pyinline{from q import
+inside a function body or branch, nor after a statement\added{, so that the dependencies of a module are known before
+any of its statements runs}. Wildcard imports (\pyinline{from q import
 *}) are excluded, since the names introduced are not explicit; PEP 8 recommends against
 them.\footnote{\url{https://peps.python.org/pep-0008/}} A submodule may not import itself through its parent
 (\pyinline{from a import b} inside module \pyinline{a.b}): \PurePy treats the from-imported submodule as a
 dependency, so this is an import cycle. An \pyinline{import} (as opposed to a from-import) may not name a
 module contained in the importing module (\pyinline{import x.y} inside module \pyinline{x}), since the binding for
 the head would denote the still-loading module.
+
+\begin{AddedBlock}
+A qualified reference must resolve through the imports of the referring module to a definitely assigned
+member. A submodule is not an attribute of its parent until it is loaded, so
+\pyinline{import pkg} followed by \pyinline{pkg.sub.y} is rejected unless the module also imports
+\pyinline{pkg.sub}, whereas Python permits the reference whenever some earlier import, anywhere in the
+program, happens to have loaded \pyinline{pkg.sub}:
+
+\begin{minipage}[t]{0.25\textwidth}
+\begin{python}
+# a
+import pkg.sub
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.72\textwidth}
+\begin{python}
+# __main__
+import pkg
+import a
+print(pkg.sub.y)  # error: pkg.sub is not imported here
+\end{python}
+\end{minipage}
+
+\noindent Python accepts this because importing \pyinline{a} loads \pyinline{pkg.sub}; remove that import,
+which the main module does not otherwise use, and Python raises \pyinline{AttributeError}. It raises the
+same for a reference to a module member never assigned by the body, such as \pyinline{lib.x} where
+\pyinline{lib} assigns \pyinline{x} only on a branch that is not taken. \PurePy rejects all three programs
+statically (\secref{well-formedness-modules}).
+\end{AddedBlock}
 
 A module may not bind a name that is also the name of one of its submodules. In Python an attribute of a
 module can be set both by an assignment in the module body and by loading a same-named submodule, each
