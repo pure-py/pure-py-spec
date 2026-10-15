@@ -156,8 +156,9 @@ instantiated at the type arguments given by the context, which must bind every t
 
 Lambdas, applied lambdas, lists, tuples, dictionaries, conditional expressions and comprehensions check\speconly{
 (\ruleName{lambda}, \ruleName{call-lambda}, \ruleName{list}, \ruleName{tuple}, \ruleName{dict}, \ruleName{cond},
-\ruleName{list-comp}, \ruleName{dict-comp})}\paperonly{
-(\ruleName{lambda})}. A name bound at a type scheme $\scheme{\seq{\alpha}}{\sigma}$ checks against a type $\tau$
+\ruleName{list-comp}, \ruleName{dict-comp})}.
+\paperinput{paper/well-formedness/lambda}%
+A name bound at a type scheme $\scheme{\seq{\alpha}}{\sigma}$ checks against a type $\tau$
 by instantiating $\seq{\alpha}$ at the type arguments collected by $\typeArgs{\Sigma}$ from $\sigma$ and $\tau$, provided the
 instantiated $\sigma$ is below $\tau$\speconly{ (\ruleName{var-scheme})}, so a function with type parameters can be passed where a \pyinline{Callable} type is expected.
 An expression that synthesises $\sigma$ checks against any supertype
@@ -168,7 +169,6 @@ syntax-directed and an expression has at most one derivation in each.\speconly{ 
 do not apply to names bound at \pyinline{Callable} types, although they would conclude the same as \ruleName{callee} and
 \ruleName{check-syn}.}
 
-\paperinput{paper/well-formedness/lambda}%
 \specinput{spec/fig/typing-check}
 
 \speconly{The forms that synthesise are conditional expressions when a branch
