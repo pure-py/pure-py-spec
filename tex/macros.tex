@@ -66,6 +66,11 @@
   {\edef\defalign@baselineskip{\the\baselineskip}\small\baselineskip=\defalign@baselineskip
    \setlength{\jot}{1pt}\csname alignat*\endcsname{2}}
   {\csname endalignat*\endcsname}
+% The same, with the number of column pairs as argument, for definitions set side by side
+\newenvironment{defalignat}[1]
+  {\edef\defalign@baselineskip{\the\baselineskip}\small\baselineskip=\defalign@baselineskip
+   \setlength{\jot}{1pt}\csname alignat*\endcsname{#1}}
+  {\csname endalignat*\endcsname}
 \makeatother
 % How the paper refers to the specification document.
 \ifdefined\anonmode

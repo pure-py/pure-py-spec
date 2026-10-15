@@ -99,13 +99,11 @@ and has $\bot$ as both left and right unit, whereas merge has no unit, since a v
 only is possibly unassigned. Override is defined in the same way on any finite map with $\bot$ for
 undefined, such as an environment or class table.
 \begin{specdefinition}{Override and merge of context entries}
-\begin{defalign}
-\bot \override \theta = \theta \override \bot & = \theta \\
-\theta \override \theta' & = \theta' \quad \text{(otherwise)} \\[2mm]
-\theta \merge \theta & = \theta \\
-\theta \merge \theta' & = \PU{\tau} && \text{if } \theta \neq \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}, \bot} \\
-\theta \merge \theta' & = \PU{\scheme{\seq{\alpha}}{\tau}} && \text{if } \theta \neq \theta' \in \set{\scheme{\seq{\alpha}}{\tau}, \PU{\scheme{\seq{\alpha}}{\tau}}, \bot}
-\end{defalign}
+\begin{defalignat}{3}
+\theta \merge \theta & = \theta &&& \qquad \bot \override \theta = \theta \override \bot & = \theta \\
+\theta \merge \theta' & = \PU{\tau} && \quad \text{if } \theta \neq \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}, \bot} & \qquad \theta \override \theta' & = \theta' \quad \text{(otherwise)} \\
+\theta \merge \theta' & = \PU{\scheme{\seq{\alpha}}{\tau}} && \quad \text{if } \theta \neq \theta' \in \set{\scheme{\seq{\alpha}}{\tau}, \PU{\scheme{\seq{\alpha}}{\tau}}, \bot}
+\end{defalignat}
 \end{specdefinition}
 
 \subsection{Expressions and statements}
@@ -113,10 +111,11 @@ undefined, such as an environment or class table.
 
 Statements are sequenced by
 juxtaposition, $s\;s'$; a function body, branch of a conditional and body of a case are statements.
-A \emph{type definition} $\chi$ is a class definition or \pyinline{type} statement.
-A \emph{top-level statement} $t$ is a statement or mutual type region, also sequenced by juxtaposition; the body of a
+\speconly{\deleted{A \emph{type definition} $\chi$ is a class definition or \pyinline{type} statement.
+A \emph{top-level statement} $t$ is a statement or mutual type region, }}\added{\emph{Type definitions} $\chi$ are class definitions or
+\pyinline{type} statements. \emph{Top-level statements} $t$ are statements or mutual type regions, }also sequenced by juxtaposition; the body of a
 module after its imports is a top-level statement, so type definitions occur only at the top level of a
-module. A \pyinline{type} statement declares a \emph{type alias}. Function definitions, class definitions and
+module. \speconly{\deleted{A \pyinline{type} statement declares a \emph{type alias}. }}\added{\emph{Type aliases} are declared by \pyinline{type} statements. }Function definitions, class definitions and
 \pyinline{type} statements bind distinct \emph{type parameters} $\seq{\alpha}$, written in brackets after the name as in
 Python 3.12. A \emph{mutual def region} $d_1 \ldots d_{n+1}$ is a maximal contiguous block of \pyinline{def} statements: any other statement separates mutual
 def regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
