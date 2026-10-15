@@ -1,0 +1,47 @@
+\begin{tabular}{rcll}
+\grammarGroup{Statements} \\
+$s$ & $::=$ & $s\;s'$ & \speconly{(Seq)} \\
+\speconly{    & $\mid$ & $\exPass$ & (Pass) \\}
+    & $\mid$ & $x\exAnnot{\psi}$ & \speconly{(Declare)} \\
+    & $\mid$ & $\exAssign{x}{e}$ & \speconly{(Assign)} \\
+    & $\mid$ & $\exAssign{x\exAnnot{\psi}}{e}$ & \speconly{(DeclareAssign)} \\
+    & $\mid$ & $e$ & \speconly{(ExprStmt)} \\
+\speconly{    & $\mid$ & $\exAssert{e}$ & (Assert) \\}
+    & $\mid$ & $\exAssertMsg{e}{e'}$ & \speconly{(AssertMsg)} \\
+\speconly{    & $\mid$ & $\exReturnNone$ & (ReturnNone) \\}
+    & $\mid$ & $\exReturn{e}$ & \speconly{(Return)} \\
+\speconly{    & $\mid$ & $\exIf{e}{s}{\exElif{e_1}{s_1}\;\ldots\;\exElif{e_n}{s_n}}$ & (If) \\}
+    & $\mid$ & $\exIfElse{e}{s}{\exElif{e_1}{s_1}\;\ldots\;\exElif{e_n}{s_n}}{s'}$ & \speconly{(IfElse)} \\
+    & $\mid$ & $\exMatch{e}{b_1 \;\ldots\; b_{n+1}}$ & \speconly{(Match)} \\
+    & $\mid$ & $d_1 \;\ldots\; d_{n+1}$ & \speconly{(MutualDefRegion)}
+   \\[3mm]
+\grammarGroup{Top-level statements} \\
+$t$ & $::=$ & $s$ & \speconly{(Stmt)} \\
+    & $\mid$ & $t\;t'$ & \speconly{(TopSeq)} \\
+    & $\mid$ & $\chi_1 \;\ldots\; \chi_{n+1}$ & \speconly{(MutualTypeRegion)}
+   \\[3mm]
+\grammarGroup{Type definitions} \\
+$\chi$ & $::=$ & $\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}$ & \speconly{(DataclassExtend)} \\
+\speconly{    & $\mid$ & $\exDataclass{c[\seq{\alpha}]}{\phi}$ & (Dataclass) \\}
+    & $\mid$ & $\exTypeAlias{x[\seq{\alpha}]}{\psi}$ & \speconly{(TypeAlias)}
+   \\[3mm]
+\grammarGroup{Imports} \\
+$\iota$ & $::=$ & $\exImport{q}$ & \speconly{(Import)} \\
+    & $\mid$ & $\exFromImport{q}{x_1, \ldots, x_{n+1}}$ & \speconly{(FromImport)}
+   \\[3mm]
+\grammarGroup{Cases} \\
+$b$ & $::=$ & $\exCase{p}{s}$ & \speconly{(Case)}
+   \\[3mm]
+\grammarGroup{Field lists} \\
+$\phi$ & $::=$ & $\exField{x_1}{\psi_1} \;\ldots\; \exField{x_{n+1}}{\psi_{n+1}}$ & \speconly{(FieldList) \\
+    & $\mid$ & $\pyinline{pass}$ & (EmptyFieldList)}
+   \\[3mm]
+\grammarGroup{Module bodies} \\
+$\mu$ & $::=$ & $\iota_1 \;\ldots\; \iota_n \;\; t$ & \speconly{(ModuleBody)}
+   \\[3mm]
+\grammarGroup{Names} \\
+$q$ & $::=$ & $x_1.\cdots.x_{n+1}$ & \speconly{(Name)}
+   \\[3mm]
+\grammarGroup{Function definitions} \\
+$d$ & $::=$ & $\exDef{f[\seq{\alpha}]}{\bind{x_1}{\psi_1}, \ldots, \bind{x_n}{\psi_n}}{\exRetAnnot{\psi}}{s}$ & \speconly{(Def)}
+\end{tabular}

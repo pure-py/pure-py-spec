@@ -1,0 +1,29 @@
+\begin{figure}
+\footnotesize
+\renewcommand{\arraystretch}{0.92}
+\begin{subfigure}[t]{0.5\textwidth}
+\centering
+\input{spec/grammar/statements}
+\subcaption{Modules and statements}
+\label{fig:syntax-stmt}
+\end{subfigure}%
+\begin{subfigure}[t]{0.5\textwidth}
+\centering
+\input{spec/grammar/expressions}
+\subcaption{Expressions and patterns}
+\label{fig:syntax-expr}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\centering
+\input{spec/grammar/primitive-types}
+\qquad
+\input{spec/grammar/types}
+\subcaption{Types and schemes}
+\label{fig:syntax-types}
+\end{subfigure}
+\caption{Syntax}
+\label{fig:syntax}
+\end{figure}
