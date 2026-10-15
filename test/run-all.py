@@ -29,8 +29,6 @@ RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
 RULE_DEF = re.compile(r"lab=\{\\ruleName\{([a-z0-9-]+)\}\}")
 CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
 
-CHECK, CHECK_PROGRAM = "check_module.py", "check_program.py"
-
 
 class PythonOutcome(StrEnum):
     SYNTAX_ERROR = "syntax-error"
@@ -112,8 +110,17 @@ class Runner:
         self.failures.append(msg)
 
     def check(self, path: pathlib.Path, program: bool, exit: Exit, error_checked: bool) -> None:
-        reference = ["python3", str(ROOT / "src" / (CHECK_PROGRAM if program else CHECK))]
-        proc = run([*(self.checker or reference), str(path)])
+        reference = [
+            sys.executable,
+            "-m",
+            "purepy",
+            "--check",
+            *([] if program else ["--module"]),
+        ]
+        proc = run(
+            [*(self.checker or reference), str(path)],
+            cwd=ROOT,
+        )
         exits = {exit, Exit.ILL_FORMED_PROGRAM} if program and exit == Exit.ILL_FORMED else {exit}
         if proc.returncode not in exits:
             output = (proc.stdout + proc.stderr).strip().split("\n", 1)[0]
@@ -252,7 +259,7 @@ def check_rule_attribution(r: Runner) -> None:
 
 def check_lint(r: Runner) -> None:
     with r.test("checker type-checks"):
-        sources = sorted(str(path) for path in (ROOT / "src").glob("*.py")) + [
+        sources = sorted(str(path) for path in (ROOT / "src").rglob("*.py")) + [
             str(TEST / "run-all.py")
         ]
         for tool in (
@@ -335,7 +342,7 @@ def main() -> None:
     check_rule_attribution(r)
 
     if not args.no_mypy:
-        print("mypy and ruff over src/")
+        print("mypy and ruff over src/purepy")
         check_lint(r)
         check_mypy_compatibility(r)
 

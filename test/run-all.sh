@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-exec python3 "$(dirname "$0")/run-all.py" "$@"
+cd "$(dirname "$0")/.." || exit 1
+exec python3 test/run-all.py "$@"

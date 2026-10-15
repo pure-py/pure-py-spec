@@ -4,27 +4,8 @@ from dataclasses import replace
 from functools import reduce
 from typing import cast
 
-import reasons
-from aux import (
-    Statement,
-    TypeDefinition,
-    assign_targets,
-    assigns_body,
-    binds_quals,
-    captures_list,
-    captures_quals,
-    declares,
-    declares_body,
-    dict_keys,
-    name_of,
-    own_fields,
-    pattern_bound,
-    statements,
-    target_name,
-    type_expr,
-    type_param_names,
-)
-from classes import (
+from . import reasons
+from .classes import (
     ArityMismatch,
     ClassTable,
     RepeatedKeywordArg,
@@ -39,7 +20,7 @@ from classes import (
     resolve_type,
     short_name,
 )
-from contexts import (
+from .contexts import (
     DU,
     PU,
     Assigns,
@@ -67,18 +48,37 @@ from contexts import (
     type_context,
     type_entry,
 )
-from match import check_pattern, match_shapes, remaining
-from operators import (
+from .match import check_pattern, match_shapes, remaining
+from .operators import (
     BINARY_NAMES,
     UNARY_NAMES,
     resolve_op_binary,
     resolve_op_unary,
 )
-from reasons import IllFormedModule, MypyCompatibility
-from shapes import Shapes, shapes
-from subtyping import equivalent, join_seq, subtype, type_args_seq
-from syntax import render_pattern
-from type_syntax import (
+from .reasons import IllFormedModule, MypyCompatibility
+from .shapes import Shapes, shapes
+from .subtyping import equivalent, join_seq, subtype, type_args_seq
+from .syntax import render_pattern
+from .syntax_utils import (
+    Statement,
+    TypeDefinition,
+    assign_targets,
+    assigns_body,
+    binds_quals,
+    captures_list,
+    captures_quals,
+    declares,
+    declares_body,
+    dict_keys,
+    name_of,
+    own_fields,
+    pattern_bound,
+    statements,
+    target_name,
+    type_expr,
+    type_param_names,
+)
+from .type_syntax import (
     RANGE,
     CallableType,
     ClassName,

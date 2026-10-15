@@ -1,3 +1,4 @@
+# LaTeX build artifacts
 *.aux
 *.bbl
 *.blg
@@ -7,17 +8,26 @@
 *.pdf
 *.zip
 *.out
-agda/_build/
+
+# Python build and environment artifacts
 .venv/
 __pycache__/
+dist/
 
+# Local tool settings
 .claude/settings.local.json
+
+# Isabelle session artifacts
 *.cb
 *.cb2
 *.loc
 *.soc
 *.toc
 *.cut
+
+# macOS
 .DS_Store
+
+# Generated version macros
 tex/python-version.tex
 tex/mypy-version.tex

@@ -3,12 +3,12 @@ import pathlib
 import sys
 from collections.abc import Iterator, Mapping
 
-import syntax
-from check_module import check_module
-from classes import PREDEFINED_CLASSES
-from contexts import MAIN, PREDEFINED_MODULES
-from reasons import IllFormed, IllFormedModule
-from type_syntax import Name, proper_prefixes
+from . import syntax
+from .check_module import check_module
+from .classes import PREDEFINED_CLASSES
+from .contexts import MAIN, PREDEFINED_MODULES
+from .reasons import IllFormed, IllFormedModule
+from .type_syntax import Name, proper_prefixes
 
 
 def module_path(q: Name, base_dir: pathlib.Path) -> pathlib.Path | None:

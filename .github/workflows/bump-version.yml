@@ -77,8 +77,13 @@ jobs:
         with:
           root_file: PurePy-spec.tex
 
-      - name: Create release and upload PDF
+      - name: Build wheel and source distribution
+        run: uv build
+
+      - name: Create release and upload PDF and distributions
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          files: PurePy-spec.pdf
+          files: |
+            PurePy-spec.pdf
+            dist/*

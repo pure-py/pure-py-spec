@@ -8,9 +8,9 @@ PurePy is a pure (side-effect free) subset of Python, intended initially for res
 languages and programming pedagogy, and in the longer term as a common language for scientific computing,
 supporting efficient, portable applications in modelling, data processing, data analysis and visualisation.
 
-The specification defines a versioned formal grammar and a formal semantics for the language, and `src/`
-holds a reference type checker. A PurePy-compliant language accepts every valid PurePy program and is expected
-to conform to the formal semantics.
+The specification defines a versioned formal grammar and a formal semantics for the language, and `src/purepy/`
+holds the `purepy` reference type checker. A PurePy-compliant language accepts every valid PurePy program and is
+expected to conform to the formal semantics.
 
 ## Project structure
 
@@ -22,7 +22,7 @@ to conform to the formal semantics.
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
 - `agda/`: Agda mechanisation of the distributivity proof
 - `isabelle-purepy/`: Isabelle/HOL mechanisation, a submodule of the `isabelle-purepy` repository
-- `src/`: reference type checker, built on Python's `ast` and organised to mirror the sections of the specification
+- `src/purepy/`: the `purepy` reference type checker package, built on Python's `ast` and organised to mirror the sections of the specification
 - `test/`: litmus tests
 
 `\paperinput{file}` at a point in a specification source includes the file in the paper only, and
@@ -44,7 +44,7 @@ uv run --locked ./test/run-all.sh
 ```
 
 The command creates the project environment, installs the locked development dependencies and runs the suite,
-which begins with mypy and ruff over `src/`.
+which begins with mypy and ruff over `src/purepy/`.
 
 Tests are organised by level, `module-level/` and `program-level/`, then by the outcome under Python and the
 outcome under PurePy, following the grid in the conformance section of the specification; the runner derives
@@ -91,19 +91,39 @@ uv sync --locked
 Format the sources:
 
 ```bash
-uv run --locked ruff format ./src ./test/run-all.py
+uv run --locked ruff format ./src/purepy ./test/run-all.py
 ```
 
 After changing dependencies or metadata in `pyproject.toml`, run `uv lock` and commit `pyproject.toml` and
 `uv.lock`.
 
-## Reference type checker (`src/`)
+To build a distributable wheel and source archive:
+
+```bash
+uv build
+```
+
+## Reference type checker (`purepy`)
 
 Check a single module, or a whole program from the entry module:
 
 ```bash
-uv run --locked python src/check_module.py path/to/module.py
-uv run --locked python src/check_program.py path/to/main.py
+uv run --locked python -m purepy --check --module path/to/module.py
+uv run --locked python -m purepy --check path/to/main.py
+```
+
+After installing the project as a standalone command-line tool, the same checks are available through the
+`purepy` command:
+
+```bash
+purepy --check --module path/to/module.py
+purepy --check path/to/main.py
+```
+
+Install the checker from the repository root with:
+
+```bash
+uv tool install .
 ```
 
 ## PLDI 2027 submission
@@ -146,5 +166,5 @@ PurePy-compliant language which does not accept non-PurePy Python features (such
 ```python
 [x, *xs]
 ```
-since `xs` is always copied. In a pure language with no assignment, this can be efficiently implemented by sharing `xs` into the new list. But encouraging users of PurePy to write list-manipulating code in this FP style might not be a good idea, since taking that style back to standard Python would result in non-idiomatic, unperformant code. Neverthless, we think a pure dialect of Python is a fruitful direction to explore, potentially enabling a flourishing of new language
+since `xs` is always copied. In a pure language with no assignment, this can be efficiently implemented by sharing `xs` into the new list. But encouraging users of PurePy to write list-manipulating code in this FP style might not be a good idea, since taking that style back to standard Python would result in non-idiomatic, unperformant code. Nevertheless, we think a pure dialect of Python is a fruitful direction to explore, potentially enabling a flourishing of new language
 ideas to benefit science in a way that reduces friction and barriers to entry.

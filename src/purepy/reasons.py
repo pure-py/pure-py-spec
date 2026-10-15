@@ -1,7 +1,7 @@
 import ast
 from dataclasses import dataclass
 
-from type_syntax import Name, Type, Var, render
+from .type_syntax import Name, Type, Var, render
 
 
 @dataclass(frozen=True)

@@ -2,8 +2,8 @@ import ast
 import sys
 from collections.abc import Callable
 
-from aux import is_import, split_imports
-from type_syntax import (
+from .syntax_utils import is_import, split_imports
+from .type_syntax import (
     TypeName,
     parse_annotation,
 )
