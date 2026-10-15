@@ -173,7 +173,7 @@ loads (\secref{well-formedness-modules}).
 
 A second map $\mathcal{P}$ gives the
 predefined modules\speconly{ of \figref{predefined-values}}\paperonly{ \pyinline{builtins}, \pyinline{dataclasses}, \pyinline{sys} and \pyinline{typing}}, which have no body\paperonly{ and provide selected members of the Python modules of the same names}: $\mathcal{P}$ takes each such name to its
-environment and context (Definition~\ref{def:predefined}). The two domains are disjoint, and their union is
+environment and context\speconly{ (Definition~\ref{def:predefined})}. The two domains are disjoint, and their union is
 prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$ is itself in
 $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: its modules are the \texttt{.py} files and the
 directories, each named by its path, so the domain is prefix-closed by construction. The statement of a module is
@@ -182,26 +182,31 @@ $\pymath{\_\_name\_\_}$ assignment; a directory without an \texttt{\_\_init\_\_.
 PEP 420, \url{https://peps.python.org/pep-0420/}) contributes that assignment alone.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
 definitions that follow.
 
-\begin{definition}[Predefined contexts and environments]
+\speconly{\begin{definition}[Predefined contexts and environments]
 \label{def:predefined}
-$\mathcal{P}$ takes each \speconly{module $q$ of \figref{predefined-values}}\paperonly{predefined module $q$} to a pair $(\Gamma, \rho)$, where $\Gamma$
-binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \speconly{\figref{predefined-signatures}}\paperonly{\specification}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value\speconly{
-(\figref{predefined-values})}\paperonly{ given in \specification}. A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
+$\mathcal{P}$ takes each module $q$ of \figref{predefined-values} to a pair $(\Gamma, \rho)$, where $\Gamma$
+binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \figref{predefined-signatures}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value
+(\figref{predefined-values}).\deleted{ A callable type fixes the number of arguments, so \pyinline{sys.exit} requires a status argument. These signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in the union of
 the predefined signatures. The class table $\SigmaPredef$ of the predefined modules is
 $\set{\bind{\clsRange}{\ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}}}$, where $\chi$ is the definition
-\pyinline{@dataclass class range: start: int; stop: int} and $\Gamma$ is the signature of \pyinline{builtins}.
-\end{definition}
+\pyinline{@dataclass class range: start: int; stop: int} and $\Gamma$ is the signature of \pyinline{builtins}.}
+\end{definition}}
+
+\speconly{\noindent \added{The predefined signatures name types
+that are themselves members, sometimes of another predefined module, so each is well-formed in their union. The class table $\SigmaPredef$ of the predefined modules is
+$\set{\bind{\clsRange}{\ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}}}$, where $\chi$ is the definition
+\pyinline{@dataclass class range: start: int; stop: int} and $\Gamma$ is the signature of \pyinline{builtins}.}}
 
 \specinput{spec/fig/predefined-signatures}
 
 \specinput{spec/fig/predefined-values}
 
-\begin{specdefinition}{Containing modules}
+\speconly{\begin{specdefinition}{Containing modules}
 Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' = q.q^\dagger$ for some $q^\dagger$, and $\properPrefixOf$ for
 the strict order; the proper prefixes of a module name are its \emph{containing modules}, and it is
 \emph{contained} in each of them.
-\end{specdefinition}
+\end{specdefinition}}
 
 \speconly{The metafunctions
 on modules and classes are defined in \secref{auxiliary-classes}.}

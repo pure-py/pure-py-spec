@@ -431,9 +431,9 @@ although each covers only part of the type.
 
 \emph{Module checking} types a module's body and computes its signature $\Gamma$, the judgement
 $\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$\speconly{ (\figref{typing-module})}; it mirrors loading at run time
-(\secref{operational-semantics}). The \ruleName{module} rule types the body as a top-level statement, and
+(\secref{operational-semantics}). The \ruleName{module} rule types the body as a top-level statement\speconly{, and
 the \ruleName{predefined} rule gives a predefined module the signature of
-Definition~\ref{def:predefined}.
+Definition~\ref{def:predefined}}.
 \speconly{Both import forms check their target, together with its containing modules
 (\figref{typing-import-prefix}). A plain import checks the root and then each module
 along the chain of names, recording each as a member of its parent (\ruleName{submodules-cons}), so that the binding for the root gives attribute
