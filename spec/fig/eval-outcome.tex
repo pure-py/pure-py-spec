@@ -148,6 +148,14 @@
 {
   \rho, s\;s' \Rightarrow \assigns{\rho'} \override o
 }
+\and
+\inferrule*[lab={\ruleName{eval-seq-return}}]
+{
+  \rho, s \Rightarrow \returns{v}
+}
+{
+  \rho, s\;s' \Rightarrow \returns{v}
+}
 \end{mathpar}
 \caption{Statement $s$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
 \label{fig:eval-block-outcome}
