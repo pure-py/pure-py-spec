@@ -41,7 +41,6 @@ jobs:
 
           sed -i "s/\\\\version{[0-9]*}{[0-9]*}{[0-9]*}/\\\\version{$MAJOR}{$MINOR}{$PATCH}/" paper.tex PurePy-spec.tex
           sed -i "s|## \[v[0-9]*\.[0-9]*\.[0-9]*\](https://pure-py.github.io/pure-py-spec/v[0-9]*\.[0-9]*\.[0-9]*/PurePy-spec.pdf)|## [$TAG](https://pure-py.github.io/pure-py-spec/$TAG/PurePy-spec.pdf)|" README.md
-          sed -i "s|\[v[0-9]*\.[0-9]*\.[0-9]*\](https://pure-py.github.io/pure-py-spec/v[0-9]*\.[0-9]*\.[0-9]*/mechanisation.pdf)|[$TAG](https://pure-py.github.io/pure-py-spec/$TAG/mechanisation.pdf)|" README.md
 
           uv version "$VERSION"
 
@@ -111,9 +110,3 @@ jobs:
             dist/*.whl
             dist/*.tar.gz
 
-  mechanisation-document:
-    needs: bump-version
-    uses: ./.github/workflows/mechanisation-document.yml
-    with:
-      tag: ${{ needs.bump-version.outputs.tag }}
-    secrets: inherit
