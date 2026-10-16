@@ -36,12 +36,10 @@ $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a functi
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
 $\primFn(\seq{u})$.
 
-The rules are given in a monadic metalanguage over results (\figref{values})\replaced{. The term
-$\mlet{v}{r}{t}$ stands for $t$ when $r$ is $\val{v}$, and for $\aborts{\kappa}$ when $r$ is
-$\aborts{\kappa}$. The body $t$ is a term of the sort of the rule's conclusion, a result in the expression
-rules and an outcome in the statement rules, each of which has an aborting form. For example,
-\ruleName{eval-binop} concludes $\mlet{v'}{r}{\hat{\odot}(v, v')}$, and \ruleName{eval-assign} concludes
-$\mlet{v}{r}{\assigns{\set{\bind{x}{v}}}}$.}{, in which
+The rules are given in a monadic metalanguage over results (\figref{values})\replaced{. If $r$ is
+$\val{v}$, then $\mlet{v}{r}{\ldots}$ is the body with $v$ bound to that value; if $r$ is
+$\aborts{\kappa}$, it is $\aborts{\kappa}$. The body is a result in the expression rules and an outcome in
+the statement rules.}{, in which
 $\mlet{v}{r}{\ldots}$ binds the value of a result; for example, \ruleName{eval-binop} concludes
 $\mlet{v'}{r}{\hat{\odot}(v, v')}$, which is $\hat{\odot}(v, v')$ when $r$ is $\val{v'}$, and
 $\aborts{\kappa}$ when $r$ is $\aborts{\kappa}$. } A final
