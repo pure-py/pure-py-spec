@@ -36,13 +36,19 @@ $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a functi
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
 $\primFn(\seq{u})$.
 
-The rules are given in a monadic metalanguage over results (\figref{values}), in which
+The rules are given in a monadic metalanguage over results (\figref{values})\replaced{. The term
+$\mlet{v}{r}{t}$ stands for $t$ when $r$ is $\val{v}$, and for $\aborts{\kappa}$ when $r$ is
+$\aborts{\kappa}$. The body $t$ is a term of the sort of the rule's conclusion, a result in the expression
+rules and an outcome in the statement rules, each of which has an aborting form. For example,
+\ruleName{eval-binop} concludes $\mlet{v'}{r}{\hat{\odot}(v, v')}$, and \ruleName{eval-assign} concludes
+$\mlet{v}{r}{\assigns{\set{\bind{x}{v}}}}$.}{, in which
 $\mlet{v}{r}{\ldots}$ binds the value of a result; for example, \ruleName{eval-binop} concludes
 $\mlet{v'}{r}{\hat{\odot}(v, v')}$, which is $\hat{\odot}(v, v')$ when $r$ is $\val{v'}$, and
-$\aborts{\kappa}$ when $r$ is $\aborts{\kappa}$. A final
+$\aborts{\kappa}$ when $r$ is $\aborts{\kappa}$. } A final
 premise needs no propagation rule; earlier premises have one each, recording the subexpressions evaluated
-before the failing one (\specfigref{eval-fails}). The statement, sequence and module judgements use
-results of the same form, carrying an outcome, a sequence of values or an environment in place of a value.
+before the failing one (\specfigref{eval-fails}). The \replaced{sequence and module judgements use
+results carrying a sequence of values or an environment in place of a value.}{statement, sequence and module judgements use
+results of the same form, carrying an outcome, a sequence of values or an environment in place of a value. }
 \paperinput{paper/operational-semantics/evaluation-example}
 
 \specinput{spec/operational-semantics/auxiliary}
