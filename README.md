@@ -4,11 +4,6 @@
 
 ## [v0.22.2](https://pure-py.github.io/pure-py-spec/v0.22.2/PurePy-spec.pdf)
 
-<<<<<<< HEAD
-=======
-Isabelle mechanisation: [v0.22.2](https://pure-py.github.io/pure-py-spec/v0.22.2/mechanisation.pdf)
-
->>>>>>> origin/main
 PurePy is a pure (side-effect free) subset of Python, intended initially for researchers in programming
 languages and programming pedagogy, and in the longer term as a common language for scientific computing,
 supporting efficient, portable applications in modelling, data processing, data analysis and visualisation.
