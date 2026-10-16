@@ -25,7 +25,8 @@ expected to conform to the formal semantics.
 - `agda/`: Agda mechanisation of the distributivity proof
 - `isabelle-purepy/`: Isabelle/HOL mechanisation, a submodule of the `isabelle-purepy` repository
 - `src/purepy/`: the `purepy` reference type checker package, built on Python's `ast` and organised to mirror the sections of the specification
-- `test/`: litmus tests
+- `src/purepy/conformance-suite/`: the conformance suite, shipped in the package
+- `test/`: runner for the conformance suite and checks of the repository
 
 `\paperinput{file}` at a point in a specification source includes the file in the paper only, and
 `\specinput{file}` in the specification only; `\paperonly{...}` and `\speconly{...}` restrict a phrase to
@@ -45,10 +46,10 @@ workflows, mypy and the specification; `pyproject.toml` gives only the lower bou
 uv run --locked ./test/run-all.sh
 ```
 
-The command creates the project environment, installs the locked development dependencies and runs the suite,
-which begins with mypy and ruff over `src/purepy/`.
+The command creates the project environment, installs the locked development dependencies, checks rule
+cross-references, runs mypy and ruff over `src/purepy/` and runs the conformance suite.
 
-Tests are organised by level, `module-level/` and `program-level/`, then by the outcome under Python and the
+Tests in `src/purepy/conformance-suite/` are organised by level, `module-level/` and `program-level/`, then by the outcome under Python and the
 outcome under PurePy, following the grid in the conformance section of the specification; the runner derives
 every assertion from the path. A module-level test is a `.py` file with expectation files as siblings
 (`.expected`, `.error.expected`, `.exception.expected`, `.status.expected`); a program-level test is a
@@ -78,7 +79,15 @@ A test has `.expected` under `no-exception/` and `.exception.expected` elsewhere
 under `syntax-error/`, so a misfiled test fails. A test that exits with a nonzero status through `sys.exit`
 states the status in `.status.expected`.
 
-Another type checker can be run over the suite with `--checker`; `run-all.py --help` lists the options.
+Another type checker can be run over the suite installed with the `purepy` package, by passing a command
+which takes the path of a test and exits with the codes of the reference checker:
+
+```bash
+purepy-conformance --no-run --checker CMD --known-failures FILE
+```
+
+The run passes if its failures are exactly those listed in the file; `--update` rewrites the file, and
+`purepy-conformance --help` lists the other options.
 
 ## Development
 
