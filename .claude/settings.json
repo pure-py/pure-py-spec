@@ -4,7 +4,8 @@
       "source": {
         "source": "github",
         "repo": "fluid-org/claude-plugins"
-      }
+      },
+      "autoUpdate": true
     }
   },
   "enabledPlugins": {
