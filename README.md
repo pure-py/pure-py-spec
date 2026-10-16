@@ -147,8 +147,9 @@ Run the `Bump version` GitHub Action manually with a version in the form `x.y.z`
 action updates and commits the version numbers on `main` and creates and pushes the tag `v0.1.4`. It then builds
 `PurePy-spec.pdf` and publishes it to GitHub Pages under `v0.1.4/` and `latest/`
 (https://pure-py.github.io/pure-py-spec/), and creates the GitHub Release for the tag, with the wheel and source
-distribution of the `purepy` package attached. A second job builds the Isabelle mechanisation at the tag and
-publishes its document beside the specification as `mechanisation.pdf`.
+distribution of the `purepy` package attached. It then runs the `Mechanisation document` workflow, which builds the
+Isabelle mechanisation at the tag and publishes its document beside the specification as `mechanisation.pdf`; that
+workflow can also be run by hand for a tag.
 
 ### Zotero export settings
 

@@ -1,0 +1,79 @@
+name: Mechanisation document
+
+# Builds the mechanisation at a tag and publishes its document beside the specification on GitHub Pages.
+# Called by the Bump version workflow, and runnable by hand for a tag whose document is missing.
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (vx.y.z)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      isabelle: ${{ steps.read.outputs.isabelle }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
+          submodules: recursive
+          token: ${{ secrets.PURE_PY_ISABELLE }}
+      - id: read
+        run: echo "isabelle=$(cat isabelle-purepy/.isabelle-version)" >> "$GITHUB_OUTPUT"
+
+  publish:
+    needs: version
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      # Official image, with HOL prebuilt, at the release the mechanisation is checked with. Runs as root so
+      # that checkout and apt can write.
+      image: makarius/isabelle:${{ needs.version.outputs.isabelle }}
+      options: --user root
+    steps:
+      - name: Install packages
+        run: |
+          apt-get update -q
+          apt-get install -y -q --no-install-recommends \
+            git make ca-certificates texlive-latex-base texlive-latex-recommended texlive-fonts-recommended \
+            texlive-plain-generic lmodern
+
+      - name: Checkout tagged commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
+          submodules: recursive
+          token: ${{ secrets.PURE_PY_ISABELLE }}
+          persist-credentials: false
+
+      - name: Build mechanisation and its document
+        run: make -C isabelle-purepy build ISABELLE=/home/isabelle/Isabelle/bin/isabelle
+
+      # The checkout is owned by another user than root, so git must be told the directory is safe.
+      - name: Publish document to GitHub Pages
+        run: |
+          TAG="${{ inputs.tag }}"
+          git config --global --add safe.directory '*'
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages:refs/remotes/origin/gh-pages
+          git worktree add -B gh-pages pages origin/gh-pages
+          mkdir -p "pages/$TAG" pages/latest
+          cp isabelle-purepy/output/document.pdf "pages/$TAG/mechanisation.pdf"
+          cp isabelle-purepy/output/document.pdf pages/latest/mechanisation.pdf
+          cd pages
+          bash ../.github/scripts/pages-index.sh
+          git add -A
+          git commit -m "Mechanisation $TAG"
+          git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
