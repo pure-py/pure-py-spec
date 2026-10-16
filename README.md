@@ -2,9 +2,9 @@
 
 [![build](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml)
 
-## [v0.22.1](https://pure-py.github.io/pure-py-spec/v0.22.1/PurePy-spec.pdf)
+## [v0.22.2](https://pure-py.github.io/pure-py-spec/v0.22.2/PurePy-spec.pdf)
 
-Isabelle mechanisation: [v0.22.1](https://pure-py.github.io/pure-py-spec/v0.22.1/mechanisation.pdf)
+Isabelle mechanisation: [v0.22.2](https://pure-py.github.io/pure-py-spec/v0.22.2/mechanisation.pdf)
 
 PurePy is a pure (side-effect free) subset of Python, intended initially for researchers in programming
 languages and programming pedagogy, and in the longer term as a common language for scientific computing,
