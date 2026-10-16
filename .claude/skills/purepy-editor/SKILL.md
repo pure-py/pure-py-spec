@@ -18,5 +18,4 @@ description: PurePy-specific additions to the technical-authoring, coding-conven
 ## LaTeX
 
 - Rebuild the paper after every change to verify that it builds without errors.
-- Final build mode: `make -B paper.pdf FINAL=1`, likewise `PurePy-spec.pdf`.
 - Put primes outside `\vec`, not inside: `\vec{e}'`, not `\vec{e'}`.
