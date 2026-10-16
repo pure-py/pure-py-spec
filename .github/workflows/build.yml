@@ -20,12 +20,26 @@ permissions:
   contents: read
 
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      isabelle: ${{ steps.read.outputs.isabelle }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          token: ${{ secrets.PURE_PY_ISABELLE }}
+      - id: read
+        run: echo "isabelle=$(cat isabelle-purepy/.isabelle-version)" >> "$GITHUB_OUTPUT"
+
   submit:
+    needs: version
     runs-on: ubuntu-latest
     timeout-minutes: 60
     container:
-      # Official image, with HOL prebuilt. Runs as root so that checkout and apt can write.
-      image: makarius/isabelle:Isabelle2025-2
+      # Official image, with HOL prebuilt, at the release the mechanisation is checked with. Runs as root so
+      # that checkout and apt can write.
+      image: makarius/isabelle:${{ needs.version.outputs.isabelle }}
       options: --user root
     steps:
       - name: Install packages

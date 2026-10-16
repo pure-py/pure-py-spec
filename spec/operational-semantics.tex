@@ -14,15 +14,16 @@ $\returns{v}$ represents $s$ returning the value $v$; and the outcome $\aborts{\
 aborting, with termination kind $\kappa$.
 
 \begin{specdefinition}{Composition of outcomes}
-Composing statements sequentially composes their outcomes according to the following partial monoid, analogous
+Composing statements sequentially composes their outcomes according to the following \Replaced{monoid}{partial monoid }, analogous
 to sequential composition of static outcomes:
 \begin{defalign}
 \assigns{\rho} \override \assigns{\rho'} & = \assigns{\rho \override \rho'} \\
-\assigns{\rho} \override \returns{v} & = \returns{v} \\
-\assigns{\rho} \override \aborts{\kappa} & = \aborts{\kappa}
+\assigns{\rho} \override \replaced{o}{\returns{v}} & = \replaced{o \quad (\text{otherwise})}{\returns{v}} \\
+\replaced{\returns{v} \override o}{\assigns{\rho} \override \aborts{\kappa}} & = \replaced{\returns{v}}{\aborts{\kappa}} \\
+\added{\aborts{\kappa} \override o} & \added{{} = \aborts{\kappa}}
 \end{defalign}
 
-\noindent with $\assigns{\varnothing}$ as left and right unit.
+\noindent with $\assigns{\varnothing}$ as left and right unit\Added{, and $\returns{v}$ and $\aborts{\kappa}$ as left zeros}.
 \end{specdefinition}
 
 \input{spec/fig/eval-values}
