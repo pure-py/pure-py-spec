@@ -1,4 +1,5 @@
 import argparse
+import concurrent.futures
 import contextlib
 import importlib.resources
 import pathlib
@@ -82,17 +83,22 @@ class Runner:
     def test(self, label: object) -> Iterator[None]:
         self.failures = []
         yield
-        if self.failures:
-            self.failed.append(f"{label} ({'; '.join(self.failures)})")
+        self.record(label, self.failures)
+
+    def fail(self, msg: str) -> None:
+        self.failures.append(msg)
+
+    def record(self, label: object, failures: list[str]) -> None:
+        if failures:
+            self.failed.append(f"{label} ({'; '.join(failures)})")
             print(f"  {RED}✗{RESET} {self.failed[-1]}")
         else:
             self.passed += 1
             print(f"  {GREEN}✓{RESET} {label}")
 
-    def fail(self, msg: str) -> None:
-        self.failures.append(msg)
-
-    def check(self, path: pathlib.Path, program: bool, exit: Exit, error_checked: bool) -> None:
+    def check(
+        self, path: pathlib.Path, program: bool, exit: Exit, error_checked: bool
+    ) -> list[str]:
         reference = [
             sys.executable,
             "-m",
@@ -102,74 +108,79 @@ class Runner:
         ]
         proc = run([*(self.checker or reference), str(path)])
         exits = {exit, Exit.ILL_FORMED_PROGRAM} if program and exit == Exit.ILL_FORMED else {exit}
+        output = proc.stdout + proc.stderr
+        error = path.with_suffix(ERROR_EXPECTED)
         if proc.returncode not in exits:
-            output = (proc.stdout + proc.stderr).strip().split("\n", 1)[0]
-            self.fail(
-                f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}: {output}"
-            )
-        elif error_checked and self.checker is None:  # messages are the reference checker's
-            error = path.with_suffix(ERROR_EXPECTED)
-            output = proc.stdout + proc.stderr
-            if not error.exists():
-                self.fail(f"check: missing {error.name}")
-            elif error.read_text().strip() not in output:
-                self.fail(f"check: expected {error.read_text().strip()!r}, got: {output.strip()}")
+            first = output.strip().split("\n", 1)[0]
+            return [f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}: {first}"]
+        if not error_checked or self.checker is not None:  # messages are the reference checker's
+            return []
+        if not error.exists():
+            return [f"check: missing {error.name}"]
+        if error.read_text().strip() not in output:
+            return [f"check: expected {error.read_text().strip()!r}, got: {output.strip()}"]
+        return []
 
-    def python(self, path: pathlib.Path, outcome: PythonOutcome) -> None:
+    def python(self, path: pathlib.Path, outcome: PythonOutcome) -> list[str]:
         assert self.interpreter is not None
         accepts = outcome == PythonOutcome.NO_EXCEPTION
         expected = path.with_suffix(EXPECTED)
         exception = path.with_suffix(EXCEPTION_EXPECTED)
         if expected.exists() == exception.exists():
-            self.fail(f"run: needs exactly one of {expected.name} and {exception.name}")
-            return
+            return [f"run: needs exactly one of {expected.name} and {exception.name}"]
         if accepts != expected.exists():
-            self.fail(
-                f"run: misfiled, has {expected.name if expected.exists() else exception.name}"
-            )
-            return
+            return [f"run: misfiled, has {expected.name if expected.exists() else exception.name}"]
         proc = run([self.interpreter, path.name], cwd=path.parent)
         if accepts:
             status_path = path.with_suffix(STATUS_EXPECTED)
             status = int(status_path.read_text()) if status_path.exists() else 0
             if proc.returncode != status:
-                self.fail(f"run: exit {proc.returncode}, expected {status}: {proc.stderr.strip()}")
-            elif proc.stdout != expected.read_text():
-                self.fail("run: output mismatch")
-        else:
-            name = exception.read_text().strip()
-            if (outcome == PythonOutcome.SYNTAX_ERROR) != name.startswith(SYNTAX_ERROR):
-                self.fail(f"run: misfiled, expects {name}")
-            elif proc.returncode == 0:
-                self.fail(f"run: expected {name} but script succeeded")
-            elif name not in proc.stderr:
-                self.fail(f"run: expected {name}, got: {proc.stderr.strip()}")
+                return [f"run: exit {proc.returncode}, expected {status}: {proc.stderr.strip()}"]
+            if proc.stdout != expected.read_text():
+                return ["run: output mismatch"]
+            return []
+        name = exception.read_text().strip()
+        if (outcome == PythonOutcome.SYNTAX_ERROR) != name.startswith(SYNTAX_ERROR):
+            return [f"run: misfiled, expects {name}"]
+        if proc.returncode == 0:
+            return [f"run: expected {name} but script succeeded"]
+        if name not in proc.stderr:
+            return [f"run: expected {name}, got: {proc.stderr.strip()}"]
+        return []
 
-    def run_test(self, suite: pathlib.Path, test: pathlib.Path, program: bool) -> None:
-        """Path below module-level/ or program-level/ of suite: <Python outcome>/<PurePy outcome>
-        [/<subset>]/.../<test>.py, or .../<test>/main.py for a program; or syntactic-only/<test>.py,
-        for a script which builds an AST which cannot be expressed in Python source."""
+    def run_test(self, suite: pathlib.Path, test: pathlib.Path, program: bool) -> list[str]:
+        """Failures of a test at a path below module-level/ or program-level/ of suite: <Python
+        outcome>/<PurePy outcome>[/<subset>]/.../<test>.py, or .../<test>/main.py for a program; or
+        syntactic-only/<test>.py, for a script which builds an AST which cannot be expressed in
+        Python source."""
         dirs = test.relative_to(suite).parts[1:-1]
-        if dirs[0] == SYNTACTIC_ONLY:
-            expected = Expectation(None, False, PythonOutcome.NO_EXCEPTION)
-        else:
-            expected = expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]))
-        with self.test(test.relative_to(suite)):
-            exit, error_checked, python = expected
-            path = test / MAIN if program else test
-            if exit is not None:
-                self.check(path, program, exit, error_checked)
-            if python is not None and self.interpreter is not None:
+        exit, error_checked, python = (
+            Expectation(None, False, PythonOutcome.NO_EXCEPTION)
+            if dirs[0] == SYNTACTIC_ONLY
+            else expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]))
+        )
+        path = test / MAIN if program else test
+        return [
+            *(self.check(path, program, exit, error_checked) if exit is not None else []),
+            *(
                 self.python(path, python)
+                if python is not None and self.interpreter is not None
+                else []
+            ),
+        ]
 
-    def run_suite(self, suite: pathlib.Path) -> None:
-        last = None
-        for test, program in tests(suite):
-            header = test.parent.relative_to(suite)
-            if header != last:
-                print(header)
-                last = header
-            self.run_test(suite, test, program)
+    def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
+        """Tests run in parallel on jobs threads (default: one per core), reported in order."""
+        found = list(tests(suite))
+        with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
+            results = pool.map(lambda entry: self.run_test(suite, *entry), found)
+            last = None
+            for (test, _), failures in zip(found, results):
+                header = test.parent.relative_to(suite)
+                if header != last:
+                    print(header)
+                    last = header
+                self.record(test.relative_to(suite), failures)
 
     def summary(self) -> None:
         total = self.passed + len(self.failed)
@@ -237,13 +248,16 @@ def main() -> None:
     parser.add_argument(
         "--update", action="store_true", help="rewrite the known failures file from this run"
     )
+    parser.add_argument(
+        "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
+    )
     args = parser.parse_args()
     r = Runner(
         None if args.no_run else args.interpreter,
         shlex.split(args.checker) if args.checker else None,
     )
     with suite() as path:
-        r.run_suite(path)
+        r.run_suite(path, args.jobs)
     r.summary()
     ok = not r.failed
     if args.known_failures is not None:

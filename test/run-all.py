@@ -105,6 +105,9 @@ def main() -> None:
     parser.add_argument(
         "--no-run", action="store_true", help="check the tests without running them"
     )
+    parser.add_argument(
+        "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
+    )
     args = parser.parse_args()
     r = Runner(None if args.no_run else args.interpreter, None)
 
@@ -117,7 +120,7 @@ def main() -> None:
         check_lint(r)
         check_mypy_compatibility(r)
 
-    r.run_suite(SRC / SUITE)
+    r.run_suite(SRC / SUITE, args.jobs)
     r.summary()
     sys.exit(1 if r.failed else 0)
 
