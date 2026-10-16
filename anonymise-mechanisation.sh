@@ -13,7 +13,7 @@ mkdir -p "$DEST/$NAME"
 git -C "$SRC" archive --format=tar HEAD | tar -x -C "$DEST/$NAME"
 cd "$DEST/$NAME"
 
-# All three name the repository or its organisation.
+# Both name the repository or its organisation.
 rm -rf .github .claude
 grep -vE 'badge\.svg|\.github/workflows' README.md > README.tmp && mv README.tmp README.md
 
