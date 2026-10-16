@@ -14,6 +14,8 @@ permissions:
 jobs:
   bump-version:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -39,6 +41,7 @@ jobs:
 
           sed -i "s/\\\\version{[0-9]*}{[0-9]*}{[0-9]*}/\\\\version{$MAJOR}{$MINOR}{$PATCH}/" paper.tex PurePy-spec.tex
           sed -i "s|## \[v[0-9]*\.[0-9]*\.[0-9]*\](https://pure-py.github.io/pure-py-spec/v[0-9]*\.[0-9]*\.[0-9]*/PurePy-spec.pdf)|## [$TAG](https://pure-py.github.io/pure-py-spec/$TAG/PurePy-spec.pdf)|" README.md
+          sed -i "s|\[v[0-9]*\.[0-9]*\.[0-9]*\](https://pure-py.github.io/pure-py-spec/v[0-9]*\.[0-9]*\.[0-9]*/mechanisation.pdf)|[$TAG](https://pure-py.github.io/pure-py-spec/$TAG/mechanisation.pdf)|" README.md
 
           uv version "$VERSION"
 
@@ -107,3 +110,61 @@ jobs:
           files: |
             dist/*.whl
             dist/*.tar.gz
+
+  mechanisation-version:
+    needs: bump-version
+    runs-on: ubuntu-latest
+    outputs:
+      isabelle: ${{ steps.read.outputs.isabelle }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.bump-version.outputs.tag }}
+          submodules: recursive
+          token: ${{ secrets.PURE_PY_ISABELLE }}
+      - id: read
+        run: echo "isabelle=$(cat isabelle-purepy/.isabelle-version)" >> "$GITHUB_OUTPUT"
+
+  mechanisation:
+    needs: [bump-version, mechanisation-version]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      # Official image, with HOL prebuilt, at the release the mechanisation is checked with. Runs as root so
+      # that checkout and apt can write.
+      image: makarius/isabelle:${{ needs.mechanisation-version.outputs.isabelle }}
+      options: --user root
+    steps:
+      - name: Install packages
+        run: |
+          apt-get update -q
+          apt-get install -y -q --no-install-recommends \
+            git make ca-certificates texlive-latex-base texlive-latex-recommended texlive-fonts-recommended \
+            texlive-plain-generic lmodern
+
+      - name: Checkout tagged commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.bump-version.outputs.tag }}
+          submodules: recursive
+          token: ${{ secrets.PURE_PY_ISABELLE }}
+          persist-credentials: false
+
+      - name: Build mechanisation and its document
+        run: make -C isabelle-purepy build ISABELLE=/home/isabelle/Isabelle/bin/isabelle
+
+      - name: Publish document to GitHub Pages
+        run: |
+          TAG="${{ needs.bump-version.outputs.tag }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages:refs/remotes/origin/gh-pages
+          git worktree add -B gh-pages pages origin/gh-pages
+          mkdir -p "pages/$TAG" pages/latest
+          cp isabelle-purepy/output/document.pdf "pages/$TAG/mechanisation.pdf"
+          cp isabelle-purepy/output/document.pdf pages/latest/
+          cd pages
+          bash ../.github/scripts/pages-index.sh
+          git add -A
+          git commit -m "Mechanisation $TAG"
+          git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
