@@ -2,8 +2,9 @@ INPUTS := $(wildcard tex/*.tex spec/*.tex spec/*/*.tex spec/*/*/*.tex paper/*.te
 BIBFILES := $(wildcard tex/*.bib)
 PYTHON_VERSION_TEX := tex/python-version.tex
 MYPY_VERSION_TEX := tex/mypy-version.tex
+ANON_NAME_TEX := tex/anon-name.tex
 SPEC_LABELS := xref/PurePy-spec.aux
-TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX)
+TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
 BUILD_AUX := *.aux *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
 AUX := $(BUILD_AUX) *.bbl
@@ -20,6 +21,9 @@ endef
 
 $(PYTHON_VERSION_TEX): .python-version
 	printf '\\newcommand*{\\pythonVersion}{%s}\n' "$$(cat $<)" > $@
+
+$(ANON_NAME_TEX): .anon-name
+	printf '\\newcommand*{\\anonName}{%s}\n' "$$(cat $<)" > $@
 
 $(MYPY_VERSION_TEX): uv.lock
 	printf '\\newcommand*{\\mypyVersion}{%s}\n' \
@@ -85,7 +89,7 @@ supplementary.zip: spec-anon.pdf check-mechanisation
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
 	./anonymise-mechanisation.sh .submission
-	cd .submission && zip -q -9 -r ../$@ mechanisation
+	cd .submission && zip -q -9 -r ../$@ mechanisation -x 'mechanisation/output/document/*'
 	rm -rf .submission
 
 # Paper examples are tests.
@@ -97,10 +101,10 @@ paper-submission: check-tests paper-anon.pdf supplementary.zip
 # arXiv runs pdflatex without bibtex, so include the .bbl.
 paper-arXiv.zip: paper.pdf
 	rm -f $@
-	zip -q -9 $@ paper.tex paper.bbl $(sort $(INPUTS) $(PYTHON_VERSION_TEX))
+	zip -q -9 $@ paper.tex paper.bbl $(sort $(INPUTS) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX))
 
 clean:
-	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX)
+	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX)
 	rm -rf $(dir $(SPEC_LABELS))
 
 .PHONY: default all paper-submission clean check-mechanisation check-tests

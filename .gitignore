@@ -32,3 +32,4 @@ dist/
 # Generated version macros
 tex/python-version.tex
 tex/mypy-version.tex
+tex/anon-name.tex
