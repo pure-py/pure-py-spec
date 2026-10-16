@@ -18,12 +18,8 @@ rm -rf .github .claude
 grep -vE 'badge\.svg|\.github/workflows' README.md > README.tmp && mv README.tmp README.md
 
 # Language and repository names.
-for f in README.md ROOT document/root.tex; do
+for f in README.md ROOT; do
   sed -e "s/isabelle-purepy/$NAME/g" -e "s/pure-py/$ANON_SLUG/g" -e "s/PurePy/$ANON_NAME/g" \
     "$f" > "$f.tmp" && mv "$f.tmp" "$f"
 done
-sed -e 's/\\author{nhuber}/\\author{Anonymous}/' \
-    -e "s/\\\\title{$NAME}/\\\\title{$ANON_NAME mechanisation in Isabelle\\/HOL}/" \
-  document/root.tex > root.tmp && mv root.tmp document/root.tex
-
 make build

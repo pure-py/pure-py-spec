@@ -4,8 +4,6 @@
 
 ## [v0.22.2](https://pure-py.github.io/pure-py-spec/v0.22.2/PurePy-spec.pdf)
 
-Isabelle mechanisation: [v0.22.2](https://pure-py.github.io/pure-py-spec/v0.22.2/mechanisation.pdf)
-
 PurePy is a pure (side-effect free) subset of Python, intended initially for researchers in programming
 languages and programming pedagogy, and in the longer term as a common language for scientific computing,
 supporting efficient, portable applications in modelling, data processing, data analysis and visualisation.
@@ -156,9 +154,7 @@ Run the `Bump version` GitHub Action manually with a version in the form `x.y.z`
 action updates and commits the version numbers on `main` and creates and pushes the tag `v0.1.4`. It then builds
 `PurePy-spec.pdf` and publishes it to GitHub Pages under `v0.1.4/` and `latest/`
 (https://pure-py.github.io/pure-py-spec/), and creates the GitHub Release for the tag, with the wheel and source
-distribution of the `purepy` package attached. It then runs the `Mechanisation document` workflow, which builds the
-Isabelle mechanisation at the tag and publishes its document beside the specification as `mechanisation.pdf`; that
-workflow can also be run by hand for a tag.
+distribution of the `purepy` package attached.
 
 ### Zotero export settings
 
