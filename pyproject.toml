@@ -4,11 +4,12 @@ build-backend = "hatchling.build"
 
 [project]
 name = "purepy"
-version = "0.22.1"
+version = "0.22.2"
 requires-python = ">=3.12"
 
 [project.scripts]
 purepy = "purepy.__main__:main"
+purepy-conformance = "purepy.conformance:main"
 
 [dependency-groups]
 dev = [
@@ -21,6 +22,7 @@ strict = true
 
 [tool.ruff]
 line-length = 100
+extend-exclude = ["src/purepy/conformance-suite"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/purepy"]

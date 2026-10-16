@@ -1,0 +1,255 @@
+import argparse
+import contextlib
+import importlib.resources
+import pathlib
+import shlex
+import subprocess
+import sys
+from collections.abc import Iterator
+from enum import IntEnum, StrEnum
+from typing import NamedTuple
+
+SUITE = "conformance-suite"
+GREEN, RED, RESET = "\033[32m", "\033[31m", "\033[0m"
+
+EXPECTED = ".expected"
+EXCEPTION_EXPECTED = f".exception{EXPECTED}"
+ERROR_EXPECTED = f".error{EXPECTED}"
+STATUS_EXPECTED = f".status{EXPECTED}"
+
+MODULE_LEVEL, PROGRAM_LEVEL = "module-level", "program-level"
+HELPERS = "helpers"
+MAIN = "main.py"
+
+
+class PythonOutcome(StrEnum):
+    SYNTAX_ERROR = "syntax-error"
+    EXCEPTION = "exception"
+    NO_EXCEPTION = "no-exception"
+
+
+class PurePyOutcome(StrEnum):
+    PARSER = "parser"
+    TYPE_CHECKER = "type-checker"
+    UNDEFINED = "undefined"
+    RESULT = "result"
+
+
+SYNTACTIC_ONLY = "syntactic-only"
+SYNTAX_ERROR = "SyntaxError"
+
+
+class Exit(IntEnum):
+    OK = 0
+    PROHIBITED = 1
+    ILL_FORMED = 3
+    ILL_FORMED_PROGRAM = 4
+
+
+class Expectation(NamedTuple):
+    exit: Exit | None  # None: checker not run
+    error_checked: bool  # checker output contains .error.expected
+    python: PythonOutcome | None  # None: not run under Python
+
+
+# Checker verdict for each PurePy outcome
+CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
+    PurePyOutcome.PARSER: (Exit.PROHIBITED, True),
+    PurePyOutcome.TYPE_CHECKER: (Exit.ILL_FORMED, True),
+    PurePyOutcome.UNDEFINED: (Exit.OK, False),
+    PurePyOutcome.RESULT: (Exit.OK, False),
+}
+
+
+def expectation(python: PythonOutcome, purepy: PurePyOutcome) -> Expectation:
+    exit, error_checked = CHECKER[purepy]
+    return Expectation(exit, error_checked, python)
+
+
+def run(cmd: list[str], cwd: pathlib.Path | None = None) -> "subprocess.CompletedProcess[str]":
+    return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=False)
+
+
+class Runner:
+    def __init__(self, interpreter: str | None, checker: list[str] | None) -> None:
+        self.interpreter = interpreter  # None: tests not run
+        self.checker = checker  # command given the test path; None: the reference checker
+        self.passed = 0
+        self.failed: list[str] = []
+        self.failures: list[str] = []
+
+    @contextlib.contextmanager
+    def test(self, label: object) -> Iterator[None]:
+        self.failures = []
+        yield
+        if self.failures:
+            self.failed.append(f"{label} ({'; '.join(self.failures)})")
+            print(f"  {RED}✗{RESET} {self.failed[-1]}")
+        else:
+            self.passed += 1
+            print(f"  {GREEN}✓{RESET} {label}")
+
+    def fail(self, msg: str) -> None:
+        self.failures.append(msg)
+
+    def check(self, path: pathlib.Path, program: bool, exit: Exit, error_checked: bool) -> None:
+        reference = [
+            sys.executable,
+            "-m",
+            "purepy",
+            "--check",
+            *([] if program else ["--module"]),
+        ]
+        proc = run([*(self.checker or reference), str(path)])
+        exits = {exit, Exit.ILL_FORMED_PROGRAM} if program and exit == Exit.ILL_FORMED else {exit}
+        if proc.returncode not in exits:
+            output = (proc.stdout + proc.stderr).strip().split("\n", 1)[0]
+            self.fail(
+                f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}: {output}"
+            )
+        elif error_checked and self.checker is None:  # messages are the reference checker's
+            error = path.with_suffix(ERROR_EXPECTED)
+            output = proc.stdout + proc.stderr
+            if not error.exists():
+                self.fail(f"check: missing {error.name}")
+            elif error.read_text().strip() not in output:
+                self.fail(f"check: expected {error.read_text().strip()!r}, got: {output.strip()}")
+
+    def python(self, path: pathlib.Path, outcome: PythonOutcome) -> None:
+        assert self.interpreter is not None
+        accepts = outcome == PythonOutcome.NO_EXCEPTION
+        expected = path.with_suffix(EXPECTED)
+        exception = path.with_suffix(EXCEPTION_EXPECTED)
+        if expected.exists() == exception.exists():
+            self.fail(f"run: needs exactly one of {expected.name} and {exception.name}")
+            return
+        if accepts != expected.exists():
+            self.fail(
+                f"run: misfiled, has {expected.name if expected.exists() else exception.name}"
+            )
+            return
+        proc = run([self.interpreter, path.name], cwd=path.parent)
+        if accepts:
+            status_path = path.with_suffix(STATUS_EXPECTED)
+            status = int(status_path.read_text()) if status_path.exists() else 0
+            if proc.returncode != status:
+                self.fail(f"run: exit {proc.returncode}, expected {status}: {proc.stderr.strip()}")
+            elif proc.stdout != expected.read_text():
+                self.fail("run: output mismatch")
+        else:
+            name = exception.read_text().strip()
+            if (outcome == PythonOutcome.SYNTAX_ERROR) != name.startswith(SYNTAX_ERROR):
+                self.fail(f"run: misfiled, expects {name}")
+            elif proc.returncode == 0:
+                self.fail(f"run: expected {name} but script succeeded")
+            elif name not in proc.stderr:
+                self.fail(f"run: expected {name}, got: {proc.stderr.strip()}")
+
+    def run_test(self, suite: pathlib.Path, test: pathlib.Path, program: bool) -> None:
+        """Path below module-level/ or program-level/ of suite: <Python outcome>/<PurePy outcome>
+        [/<subset>]/.../<test>.py, or .../<test>/main.py for a program; or syntactic-only/<test>.py,
+        for a script which builds an AST which cannot be expressed in Python source."""
+        dirs = test.relative_to(suite).parts[1:-1]
+        if dirs[0] == SYNTACTIC_ONLY:
+            expected = Expectation(None, False, PythonOutcome.NO_EXCEPTION)
+        else:
+            expected = expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]))
+        with self.test(test.relative_to(suite)):
+            exit, error_checked, python = expected
+            path = test / MAIN if program else test
+            if exit is not None:
+                self.check(path, program, exit, error_checked)
+            if python is not None and self.interpreter is not None:
+                self.python(path, python)
+
+    def run_suite(self, suite: pathlib.Path) -> None:
+        last = None
+        for test, program in tests(suite):
+            header = test.parent.relative_to(suite)
+            if header != last:
+                print(header)
+                last = header
+            self.run_test(suite, test, program)
+
+    def summary(self) -> None:
+        total = self.passed + len(self.failed)
+        print()
+        if self.failed:
+            print(f"{RED}✗ {self.passed}/{total} passed, {len(self.failed)} failed{RESET}")
+        else:
+            print(f"{GREEN}✓ {total}/{total} passed{RESET}")
+
+
+def compare_known_failures(failed: list[str], known_failures: pathlib.Path, update: bool) -> bool:
+    """Whether the failures are exactly those listed; with update, rewrite the list instead."""
+    if update:
+        known_failures.write_text("".join(line + "\n" for line in sorted(failed)))
+        print(f"{len(failed)} failures written to {known_failures}")
+        return True
+    known = set(known_failures.read_text().splitlines()) if known_failures.exists() else set()
+    for line in sorted(set(failed) - known):
+        print(f"{RED}unexpected:{RESET} {line}")
+    for line in sorted(known - set(failed)):
+        print(f"{GREEN}fixed:{RESET} {line}")
+    if set(failed) != known:
+        print(f"{RED}✗ {known_failures} out of date; rerun with --update{RESET}")
+        return False
+    print(f"{GREEN}✓ failures as listed in {known_failures}{RESET}")
+    return True
+
+
+def tests(suite: pathlib.Path) -> Iterator[tuple[pathlib.Path, bool]]:
+    """Module-level tests, then program-level tests, each sorted by path and paired with whether it is
+    program-level."""
+    for level, program in ((MODULE_LEVEL, False), (PROGRAM_LEVEL, True)):
+        found = (suite / level).rglob(MAIN if program else "*.py")
+        paths = [
+            path.parent if program else path
+            for path in found
+            if HELPERS not in path.parts and "__pycache__" not in path.parts
+        ]
+        for test in sorted(paths, key=lambda test: (test.parent.as_posix(), test.name)):
+            yield test, program
+
+
+@contextlib.contextmanager
+def suite() -> Iterator[pathlib.Path]:
+    with importlib.resources.as_file(importlib.resources.files("purepy") / SUITE) as path:
+        yield path
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(prog="purepy-conformance")
+    parser.add_argument("interpreter", nargs="?", default="python3")
+    parser.add_argument(
+        "--no-run", action="store_true", help="check the tests without running them"
+    )
+    parser.add_argument(
+        "--checker",
+        help="command run on the path of each test in place of the reference checker, with the same "
+        "exit codes; error messages are not compared",
+    )
+    parser.add_argument(
+        "--known-failures",
+        type=pathlib.Path,
+        help="file listing the expected failures; the run passes if its failures are exactly these",
+    )
+    parser.add_argument(
+        "--update", action="store_true", help="rewrite the known failures file from this run"
+    )
+    args = parser.parse_args()
+    r = Runner(
+        None if args.no_run else args.interpreter,
+        shlex.split(args.checker) if args.checker else None,
+    )
+    with suite() as path:
+        r.run_suite(path)
+    r.summary()
+    ok = not r.failed
+    if args.known_failures is not None:
+        ok = compare_known_failures(r.failed, args.known_failures, args.update)
+    sys.exit(0 if ok else 1)
+
+
+if __name__ == "__main__":
+    main()
