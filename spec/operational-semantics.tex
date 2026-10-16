@@ -14,16 +14,16 @@ $\returns{v}$ represents $s$ returning the value $v$; and the outcome $\aborts{\
 aborting, with termination kind $\kappa$.
 
 \begin{specdefinition}{Composition of outcomes}
-Composing statements sequentially composes their outcomes according to the following \Replaced{monoid}{partial monoid }, analogous
+Composing statements sequentially composes their outcomes according to the following monoid, analogous
 to sequential composition of static outcomes:
 \begin{defalign}
 \assigns{\rho} \override \assigns{\rho'} & = \assigns{\rho \override \rho'} \\
-\assigns{\rho} \override \replaced{o}{\returns{v}} & = \replaced{o \quad (\text{otherwise})}{\returns{v}} \\
-\replaced{\returns{v} \override o}{\assigns{\rho} \override \aborts{\kappa}} & = \replaced{\returns{v}}{\aborts{\kappa}} \\
-\added{\aborts{\kappa} \override o} & \added{{} = \aborts{\kappa}}
+\assigns{\rho} \override o & = o \quad (\text{otherwise}) \\
+\returns{v} \override o & = \returns{v} \\
+\aborts{\kappa} \override o & = \aborts{\kappa}
 \end{defalign}
 
-\noindent with $\assigns{\varnothing}$ as left and right unit\Added{, and $\returns{v}$ and $\aborts{\kappa}$ as left zeros}.
+\noindent with $\assigns{\varnothing}$ as left and right unit, and $\returns{v}$ and $\aborts{\kappa}$ as left zeros.
 \end{specdefinition}
 
 \input{spec/fig/eval-values}
@@ -36,17 +36,13 @@ $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a functi
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
 $\primFn(\seq{u})$.
 
-The rules are given in a monadic metalanguage over results (\figref{values})\replaced{. If $r$ is
+The rules are given in a monadic metalanguage over results (\figref{values}). If $r$ is
 $\val{v}$, then $\mlet{v}{r}{\ldots}$ is the body with $v$ bound to that value; if $r$ is
 $\aborts{\kappa}$, it is $\aborts{\kappa}$. The body is a result in the expression rules and an outcome in
-the statement rules.}{, in which
-$\mlet{v}{r}{\ldots}$ binds the value of a result; for example, \ruleName{eval-binop} concludes
-$\mlet{v'}{r}{\hat{\odot}(v, v')}$, which is $\hat{\odot}(v, v')$ when $r$ is $\val{v'}$, and
-$\aborts{\kappa}$ when $r$ is $\aborts{\kappa}$. } A final
+the statement rules. A final
 premise needs no propagation rule; earlier premises have one each, recording the subexpressions evaluated
-before the failing one (\specfigref{eval-fails}). The \replaced{sequence and module judgements use
-results carrying a sequence of values or an environment in place of a value.}{statement, sequence and module judgements use
-results of the same form, carrying an outcome, a sequence of values or an environment in place of a value. }
+before the failing one (\specfigref{eval-fails}). The sequence and module judgements use
+results carrying a sequence of values or an environment in place of a value.
 \paperinput{paper/operational-semantics/evaluation-example}
 
 \specinput{spec/operational-semantics/auxiliary}
