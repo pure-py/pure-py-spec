@@ -68,7 +68,8 @@ result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figre
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, \Added{and abort with $\errType$ when the first is
 neither \pyinline{True} nor \pyinline{False}\speconly{ (\ruleName{eval-and-nonbool}, \ruleName{eval-or-nonbool})},} and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, like the
-\pyinline{if} statement\speconly{ (\ruleName{eval-if})}. A comprehension evaluates its body once for each binding produced by its qualifiers, and
+\pyinline{if} statement\speconly{ (\ruleName{eval-if})}\Added{, and aborts with $\errType$ otherwise\speconly{
+(\ruleName{eval-cond-nonbool})}}. A comprehension evaluates its body once for each binding produced by its qualifiers, and
 concatenates the results; a generator draws its bindings from the elements of a value, given by the auxiliary
 function $\iterOp$\speconly{ (\S\ref{aux:iter})}: the elements of a
 list, tuple or string, and the keys of a dictionary, as in Python. Subscripting, given by the auxiliary

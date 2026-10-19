@@ -727,6 +727,15 @@
   \rho, \exOr{e}{e'} \Rightarrow \aborts{\errType}
 }}
 \and
+\Added{\inferrule*[lab={\ruleName{eval-cond-nonbool}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  v \notin \{ \pyinline{True}, \pyinline{False} \}
+}
+{
+  \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow \aborts{\errType}
+}}
+\and
 \inferrule*[lab={\ruleName{eval-attr-nonobject}}]
 {
   \rho, e \Rightarrow \val{v} \\
