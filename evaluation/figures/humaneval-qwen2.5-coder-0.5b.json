@@ -1,0 +1,621 @@
+{
+  "benchmark": "HumanEval",
+  "model": "qwen2.5-coder:0.5b",
+  "manifest": {
+    "benchmark": "HumanEval",
+    "revision": "6d43fb980f9fee3c892a914eda09951f772ad10d",
+    "url": "https://raw.githubusercontent.com/openai/human-eval/6d43fb980f9fee3c892a914eda09951f772ad10d/data/HumanEval.jsonl.gz",
+    "sha256": "b796127e635a67f93fb35c04f4cb03cf06f38c8072ee7cee8833d7bee06979ef",
+    "total_problems": 164,
+    "eligible_problems": 29,
+    "seed": 20261009,
+    "scope": "Frozen typed-interface-compatible pilot; not a random sample of all 164 problems.",
+    "task_ids": [
+      "HumanEval/2",
+      "HumanEval/3",
+      "HumanEval/4",
+      "HumanEval/6",
+      "HumanEval/7",
+      "HumanEval/10",
+      "HumanEval/11",
+      "HumanEval/12",
+      "HumanEval/13",
+      "HumanEval/14",
+      "HumanEval/15",
+      "HumanEval/17",
+      "HumanEval/18",
+      "HumanEval/20",
+      "HumanEval/21",
+      "HumanEval/24",
+      "HumanEval/25",
+      "HumanEval/26",
+      "HumanEval/27",
+      "HumanEval/28"
+    ],
+    "selected_problems": 20,
+    "evaluated_problems": 2
+  },
+  "tasks": {
+    "HumanEval/2": {
+      "name": "truncate_number",
+      "question": "\n\ndef truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n",
+      "signature": "def truncate_number(number: float) -> float:",
+      "task_id": "HumanEval/2",
+      "python": {
+        "code": "def truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n    # Calculate the integer part of the number\n    integer_part = int(number)\n    \n    # Calculate the decimal part by subtracting the integer part from the original number\n    decimal_part = number - integer_part\n    \n    return decimal_part",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:11:4: 'integer_part' is assigned but never declared",
+          "exit_code": 3,
+          "tooling_error": false,
+          "command": [
+            "purepy",
+            "--check",
+            "--module",
+            "solution.py"
+          ],
+          "failure_mode": {
+            "category": "excluded_by_design",
+            "restriction": "variable_declaration"
+          }
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null,
+          "tooling_error": false
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-927",
+          "response_model": "qwen2.5-coder:0.5b",
+          "usage": {
+            "prompt_tokens": 175,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            },
+            "completion_tokens": 133,
+            "total_tokens": 308
+          }
+        },
+        "prompt": "Solve this task in Python.\nPreserve the required function name, parameters, return behaviour and input domain. Include necessary imports and helpers. Return one complete Python source file only, with no Markdown, explanation, comments, test runner or example calls.\n\n\nTask:\n\n\ndef truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n\n\nRequired function interface:\ndef truncate_number(number: float) -> float:",
+        "attempts": [
+          {
+            "code": "def truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n    # Calculate the integer part of the number\n    integer_part = int(number)\n    \n    # Calculate the decimal part by subtracting the integer part from the original number\n    decimal_part = number - integer_part\n    \n    return decimal_part",
+            "raw_response": "```python\ndef truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n    # Calculate the integer part of the number\n    integer_part = int(number)\n    \n    # Calculate the decimal part by subtracting the integer part from the original number\n    decimal_part = number - integer_part\n    \n    return decimal_part\n```",
+            "generation": {
+              "status": "complete",
+              "stop_reason": "stop",
+              "response_id": "chatcmpl-927",
+              "response_model": "qwen2.5-coder:0.5b",
+              "usage": {
+                "prompt_tokens": 175,
+                "prompt_tokens_details": {
+                  "cached_tokens": 0
+                },
+                "completion_tokens": 133,
+                "total_tokens": 308
+              }
+            },
+            "round": 0,
+            "messages": [
+              {
+                "role": "user",
+                "content": "Solve this task in Python.\nPreserve the required function name, parameters, return behaviour and input domain. Include necessary imports and helpers. Return one complete Python source file only, with no Markdown, explanation, comments, test runner or example calls.\n\n\nTask:\n\n\ndef truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n\n\nRequired function interface:\ndef truncate_number(number: float) -> float:"
+              }
+            ],
+            "prompt_sha256": "e090f2c9c4df9ac3b7b74f91bd01829d7ffe57e4e702385a5fb47d384a39d441",
+            "checker": {
+              "passed": false,
+              "error": "solution.py:11:4: 'integer_part' is assigned but never declared",
+              "exit_code": 3,
+              "tooling_error": false,
+              "command": [
+                "purepy",
+                "--check",
+                "--module",
+                "solution.py"
+              ],
+              "failure_mode": {
+                "category": "excluded_by_design",
+                "restriction": "variable_declaration"
+              }
+            },
+            "official_tests": {
+              "passed": true,
+              "error": null,
+              "tooling_error": false
+            }
+          }
+        ],
+        "rejections": 1,
+        "rounds_to_acceptance": null
+      },
+      "purepy": {
+        "code": "from typing import *\nfrom collections import *\n\ndef truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n    # Calculate the integer part\n    integer_part = int(number)\n    \n    # Calculate the decimal part\n    decimal_part = number - integer_part\n    \n    return decimal_part",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:1:0: from M import * prohibited",
+          "exit_code": 1,
+          "tooling_error": false,
+          "command": [
+            "purepy",
+            "--check",
+            "--module",
+            "solution.py"
+          ],
+          "failure_mode": {
+            "category": "syntax_restriction_review",
+            "restriction": "from M import * prohibited",
+            "review_required": true
+          }
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null,
+          "tooling_error": false
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-534",
+          "response_model": "qwen2.5-coder:0.5b",
+          "usage": {
+            "prompt_tokens": 910,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            },
+            "completion_tokens": 128,
+            "total_tokens": 1038
+          }
+        },
+        "prompt": "Solve this task in PurePy.\nPreserve the required function name, parameters, return behaviour and input domain. Include necessary imports and helpers. Return one complete Python source file only, with no Markdown, explanation, comments, test runner or example calls.\n\nWrite PurePy v0.22.3, a statically checked functional subset of Python 3.12.\nOnly the following differences from Python matter here.\n\nExcluded:\n- No for/while statements, generator expressions, yield, async, try/raise, with,\n  global/nonlocal, assignment expressions, or mutation of objects/containers.\n- No rebinding an assigned variable, augmented assignment, destructuring\n  assignment, slicing, sets, f-strings, identity tests, or chained comparisons.\n- No default/variadic/keyword-only parameters. Call functions positionally.\n  Keyword arguments are supported only for dataclass constructors.\n- No built-in container/string methods, conversion calls, or arbitrary libraries.\n  In particular, sum, min, max, abs, sorted, enumerate, zip and math are unavailable.\n\nRequired:\n- Annotate every function parameter and return type. Declare every local variable\n  with a type annotation before or when assigning it, and assign it only once.\n  Comprehension and pattern variables are bound by their construct.\n- Conditions must be bool, not implicit truth tests of integers or containers.\n- Use recursion, list/dict comprehensions, helpers and fresh values instead of\n  loops and mutation. Avoid linear recursion depth on large inputs.\n- Use int, float, bool, str, None, object, list[T], dict[str, T], fixed-length\n  tuple[...] and unions as types. Import Callable, Literal, Never or Sized from\n  typing when needed. A class must be a supported @dataclass with typed fields\n  and no methods or field defaults.\n- Imports must precede other statements. Predefined runtime calls are len(x),\n  range(start, stop), round(float_value), print(x) and sys.exit(int_value).\n  range(n), conversion constructors such as int(x), and extra call arguments\n  are unavailable. Prefer no I/O for these tasks.\n\nReplace a loop that appends squared values with:\n\n```python\ndef squares(xs: list[int]) -> list[int]:\n    return [x * x for x in xs]\n```\n\nReplace an updating accumulator with a recursive helper:\n\n```python\ndef total_from(xs: list[int], i: int) -> int:\n    if i == len(xs):\n        return 0\n    return xs[i] + total_from(xs, i + 1)\n\ndef total(xs: list[int]) -> int:\n    return total_from(xs, 0)\n```\n\nDeclare fresh names rather than updating an existing one:\n\n```python\ndef advance(x: int) -> int:\n    next_x: int = x + 1\n    return next_x\n```\n\nTask:\n\n\ndef truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n\n\nRequired function interface:\ndef truncate_number(number: float) -> float:",
+        "attempts": [
+          {
+            "code": "from typing import *\nfrom collections import *\n\ndef truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n    # Calculate the integer part\n    integer_part = int(number)\n    \n    # Calculate the decimal part\n    decimal_part = number - integer_part\n    \n    return decimal_part",
+            "raw_response": "```python\nfrom typing import *\nfrom collections import *\n\ndef truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n    # Calculate the integer part\n    integer_part = int(number)\n    \n    # Calculate the decimal part\n    decimal_part = number - integer_part\n    \n    return decimal_part\n```",
+            "generation": {
+              "status": "complete",
+              "stop_reason": "stop",
+              "response_id": "chatcmpl-801",
+              "response_model": "qwen2.5-coder:0.5b",
+              "usage": {
+                "prompt_tokens": 721,
+                "prompt_tokens_details": {
+                  "cached_tokens": 0
+                },
+                "completion_tokens": 128,
+                "total_tokens": 849
+              }
+            },
+            "round": 0,
+            "messages": [
+              {
+                "role": "user",
+                "content": "Solve this task in PurePy.\nPreserve the required function name, parameters, return behaviour and input domain. Include necessary imports and helpers. Return one complete Python source file only, with no Markdown, explanation, comments, test runner or example calls.\n\nWrite PurePy v0.22.3, a statically checked functional subset of Python 3.12.\nOnly the following differences from Python matter here.\n\nExcluded:\n- No for/while statements, generator expressions, yield, async, try/raise, with,\n  global/nonlocal, assignment expressions, or mutation of objects/containers.\n- No rebinding an assigned variable, augmented assignment, destructuring\n  assignment, slicing, sets, f-strings, identity tests, or chained comparisons.\n- No default/variadic/keyword-only parameters. Call functions positionally.\n  Keyword arguments are supported only for dataclass constructors.\n- No built-in container/string methods, conversion calls, or arbitrary libraries.\n  In particular, sum, min, max, abs, sorted, enumerate, zip and math are unavailable.\n\nRequired:\n- Annotate every function parameter and return type. Declare every local variable\n  with a type annotation before or when assigning it, and assign it only once.\n  Comprehension and pattern variables are bound by their construct.\n- Conditions must be bool, not implicit truth tests of integers or containers.\n- Use recursion, list/dict comprehensions, helpers and fresh values instead of\n  loops and mutation. Avoid linear recursion depth on large inputs.\n- Use int, float, bool, str, None, object, list[T], dict[str, T], fixed-length\n  tuple[...] and unions as types. Import Callable, Literal, Never or Sized from\n  typing when needed. A class must be a supported @dataclass with typed fields\n  and no methods or field defaults.\n- Imports must precede other statements. Predefined runtime calls are len(x),\n  range(start, stop), round(float_value), print(x) and sys.exit(int_value).\n  range(n), conversion constructors such as int(x), and extra call arguments\n  are unavailable. Prefer no I/O for these tasks.\n\nReplace a loop that appends squared values with:\n\n```python\ndef squares(xs: list[int]) -> list[int]:\n    return [x * x for x in xs]\n```\n\nReplace an updating accumulator with a recursive helper:\n\n```python\ndef total_from(xs: list[int], i: int) -> int:\n    if i == len(xs):\n        return 0\n    return xs[i] + total_from(xs, i + 1)\n\ndef total(xs: list[int]) -> int:\n    return total_from(xs, 0)\n```\n\nDeclare fresh names rather than updating an existing one:\n\n```python\ndef advance(x: int) -> int:\n    next_x: int = x + 1\n    return next_x\n```\n\nTask:\n\n\ndef truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n\n\nRequired function interface:\ndef truncate_number(number: float) -> float:"
+              }
+            ],
+            "prompt_sha256": "84caae0e15fa37f18fcdd441b3fb89d09fe91b6e637fd93daf79d59f9f9f2f95",
+            "checker": {
+              "passed": false,
+              "error": "solution.py:1:0: from M import * prohibited",
+              "exit_code": 1,
+              "tooling_error": false,
+              "command": [
+                "purepy",
+                "--check",
+                "--module",
+                "solution.py"
+              ],
+              "failure_mode": {
+                "category": "syntax_restriction_review",
+                "restriction": "from M import * prohibited",
+                "review_required": true
+              }
+            },
+            "official_tests": {
+              "passed": true,
+              "error": null,
+              "tooling_error": false
+            },
+            "next_round_clears_reported_feature": false
+          },
+          {
+            "code": "from typing import *\nfrom collections import *\n\ndef truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n    # Calculate the integer part\n    integer_part = int(number)\n    \n    # Calculate the decimal part\n    decimal_part = number - integer_part\n    \n    return decimal_part",
+            "raw_response": "```python\nfrom typing import *\nfrom collections import *\n\ndef truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n    # Calculate the integer part\n    integer_part = int(number)\n    \n    # Calculate the decimal part\n    decimal_part = number - integer_part\n    \n    return decimal_part\n```",
+            "generation": {
+              "status": "complete",
+              "stop_reason": "stop",
+              "response_id": "chatcmpl-534",
+              "response_model": "qwen2.5-coder:0.5b",
+              "usage": {
+                "prompt_tokens": 910,
+                "prompt_tokens_details": {
+                  "cached_tokens": 0
+                },
+                "completion_tokens": 128,
+                "total_tokens": 1038
+              }
+            },
+            "round": 1,
+            "messages": [
+              {
+                "role": "user",
+                "content": "Solve this task in PurePy.\nPreserve the required function name, parameters, return behaviour and input domain. Include necessary imports and helpers. Return one complete Python source file only, with no Markdown, explanation, comments, test runner or example calls.\n\nWrite PurePy v0.22.3, a statically checked functional subset of Python 3.12.\nOnly the following differences from Python matter here.\n\nExcluded:\n- No for/while statements, generator expressions, yield, async, try/raise, with,\n  global/nonlocal, assignment expressions, or mutation of objects/containers.\n- No rebinding an assigned variable, augmented assignment, destructuring\n  assignment, slicing, sets, f-strings, identity tests, or chained comparisons.\n- No default/variadic/keyword-only parameters. Call functions positionally.\n  Keyword arguments are supported only for dataclass constructors.\n- No built-in container/string methods, conversion calls, or arbitrary libraries.\n  In particular, sum, min, max, abs, sorted, enumerate, zip and math are unavailable.\n\nRequired:\n- Annotate every function parameter and return type. Declare every local variable\n  with a type annotation before or when assigning it, and assign it only once.\n  Comprehension and pattern variables are bound by their construct.\n- Conditions must be bool, not implicit truth tests of integers or containers.\n- Use recursion, list/dict comprehensions, helpers and fresh values instead of\n  loops and mutation. Avoid linear recursion depth on large inputs.\n- Use int, float, bool, str, None, object, list[T], dict[str, T], fixed-length\n  tuple[...] and unions as types. Import Callable, Literal, Never or Sized from\n  typing when needed. A class must be a supported @dataclass with typed fields\n  and no methods or field defaults.\n- Imports must precede other statements. Predefined runtime calls are len(x),\n  range(start, stop), round(float_value), print(x) and sys.exit(int_value).\n  range(n), conversion constructors such as int(x), and extra call arguments\n  are unavailable. Prefer no I/O for these tasks.\n\nReplace a loop that appends squared values with:\n\n```python\ndef squares(xs: list[int]) -> list[int]:\n    return [x * x for x in xs]\n```\n\nReplace an updating accumulator with a recursive helper:\n\n```python\ndef total_from(xs: list[int], i: int) -> int:\n    if i == len(xs):\n        return 0\n    return xs[i] + total_from(xs, i + 1)\n\ndef total(xs: list[int]) -> int:\n    return total_from(xs, 0)\n```\n\nDeclare fresh names rather than updating an existing one:\n\n```python\ndef advance(x: int) -> int:\n    next_x: int = x + 1\n    return next_x\n```\n\nTask:\n\n\ndef truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n\n\nRequired function interface:\ndef truncate_number(number: float) -> float:"
+              },
+              {
+                "role": "assistant",
+                "content": "```python\nfrom typing import *\nfrom collections import *\n\ndef truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n    # Calculate the integer part\n    integer_part = int(number)\n    \n    # Calculate the decimal part\n    decimal_part = number - integer_part\n    \n    return decimal_part\n```"
+              },
+              {
+                "role": "user",
+                "content": "The PurePy v0.22.3 checker rejected this source:\nsolution.py:1:0: from M import * prohibited\nReturn a corrected complete source file only. Preserve the task interface and behaviour. Do not include explanations, comments or Markdown."
+              }
+            ],
+            "prompt_sha256": "a670ff2b92a54ade46a3e5de470e6e168ed44b4d6b0d5386bdaa1ff60035296b",
+            "checker": {
+              "passed": false,
+              "error": "solution.py:1:0: from M import * prohibited",
+              "exit_code": 1,
+              "tooling_error": false,
+              "command": [
+                "purepy",
+                "--check",
+                "--module",
+                "solution.py"
+              ],
+              "failure_mode": {
+                "category": "syntax_restriction_review",
+                "restriction": "from M import * prohibited",
+                "review_required": true
+              }
+            },
+            "official_tests": {
+              "passed": true,
+              "error": null,
+              "tooling_error": false
+            }
+          }
+        ],
+        "rejections": 2,
+        "rounds_to_acceptance": null
+      }
+    },
+    "HumanEval/3": {
+      "name": "below_zero",
+      "question": "from typing import List\n\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account fallls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n",
+      "signature": "def below_zero(operations: list[int]) -> bool:",
+      "task_id": "HumanEval/3",
+      "python": {
+        "code": "from typing import List\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account falls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n    balance = 0\n    for operation in operations:\n        balance += operation\n        if balance < 0:\n            return True\n    return False",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:13:4: for loops prohibited",
+          "exit_code": 1,
+          "tooling_error": false,
+          "command": [
+            "purepy",
+            "--check",
+            "--module",
+            "solution.py"
+          ],
+          "failure_mode": {
+            "category": "excluded_by_design",
+            "restriction": "loop"
+          }
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null,
+          "tooling_error": false
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-946",
+          "response_model": "qwen2.5-coder:0.5b",
+          "usage": {
+            "prompt_tokens": 211,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            },
+            "completion_tokens": 149,
+            "total_tokens": 360
+          }
+        },
+        "prompt": "Solve this task in Python.\nPreserve the required function name, parameters, return behaviour and input domain. Include necessary imports and helpers. Return one complete Python source file only, with no Markdown, explanation, comments, test runner or example calls.\n\n\nTask:\nfrom typing import List\n\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account fallls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n\n\nRequired function interface:\ndef below_zero(operations: list[int]) -> bool:",
+        "attempts": [
+          {
+            "code": "from typing import List\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account falls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n    balance = 0\n    for operation in operations:\n        balance += operation\n        if balance < 0:\n            return True\n    return False",
+            "raw_response": "```python\nfrom typing import List\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account falls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n    balance = 0\n    for operation in operations:\n        balance += operation\n        if balance < 0:\n            return True\n    return False\n```",
+            "generation": {
+              "status": "complete",
+              "stop_reason": "stop",
+              "response_id": "chatcmpl-946",
+              "response_model": "qwen2.5-coder:0.5b",
+              "usage": {
+                "prompt_tokens": 211,
+                "prompt_tokens_details": {
+                  "cached_tokens": 0
+                },
+                "completion_tokens": 149,
+                "total_tokens": 360
+              }
+            },
+            "round": 0,
+            "messages": [
+              {
+                "role": "user",
+                "content": "Solve this task in Python.\nPreserve the required function name, parameters, return behaviour and input domain. Include necessary imports and helpers. Return one complete Python source file only, with no Markdown, explanation, comments, test runner or example calls.\n\n\nTask:\nfrom typing import List\n\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account fallls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n\n\nRequired function interface:\ndef below_zero(operations: list[int]) -> bool:"
+              }
+            ],
+            "prompt_sha256": "f369780a103a39a31898336314f27ced20ee3bb268b89885e25a825fc903a974",
+            "checker": {
+              "passed": false,
+              "error": "solution.py:13:4: for loops prohibited",
+              "exit_code": 1,
+              "tooling_error": false,
+              "command": [
+                "purepy",
+                "--check",
+                "--module",
+                "solution.py"
+              ],
+              "failure_mode": {
+                "category": "excluded_by_design",
+                "restriction": "loop"
+              }
+            },
+            "official_tests": {
+              "passed": true,
+              "error": null,
+              "tooling_error": false
+            }
+          }
+        ],
+        "rejections": 1,
+        "rounds_to_acceptance": null
+      },
+      "purepy": {
+        "code": "from typing import List\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account falls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n    balance = 0\n    for operation in operations:\n        balance += operation\n        if balance < 0:\n            return True\n    return False",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:13:4: for loops prohibited",
+          "exit_code": 1,
+          "tooling_error": false,
+          "command": [
+            "purepy",
+            "--check",
+            "--module",
+            "solution.py"
+          ],
+          "failure_mode": {
+            "category": "excluded_by_design",
+            "restriction": "loop"
+          }
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null,
+          "tooling_error": false
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-510",
+          "response_model": "qwen2.5-coder:0.5b",
+          "usage": {
+            "prompt_tokens": 966,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            },
+            "completion_tokens": 149,
+            "total_tokens": 1115
+          }
+        },
+        "prompt": "Solve this task in PurePy.\nPreserve the required function name, parameters, return behaviour and input domain. Include necessary imports and helpers. Return one complete Python source file only, with no Markdown, explanation, comments, test runner or example calls.\n\nWrite PurePy v0.22.3, a statically checked functional subset of Python 3.12.\nOnly the following differences from Python matter here.\n\nExcluded:\n- No for/while statements, generator expressions, yield, async, try/raise, with,\n  global/nonlocal, assignment expressions, or mutation of objects/containers.\n- No rebinding an assigned variable, augmented assignment, destructuring\n  assignment, slicing, sets, f-strings, identity tests, or chained comparisons.\n- No default/variadic/keyword-only parameters. Call functions positionally.\n  Keyword arguments are supported only for dataclass constructors.\n- No built-in container/string methods, conversion calls, or arbitrary libraries.\n  In particular, sum, min, max, abs, sorted, enumerate, zip and math are unavailable.\n\nRequired:\n- Annotate every function parameter and return type. Declare every local variable\n  with a type annotation before or when assigning it, and assign it only once.\n  Comprehension and pattern variables are bound by their construct.\n- Conditions must be bool, not implicit truth tests of integers or containers.\n- Use recursion, list/dict comprehensions, helpers and fresh values instead of\n  loops and mutation. Avoid linear recursion depth on large inputs.\n- Use int, float, bool, str, None, object, list[T], dict[str, T], fixed-length\n  tuple[...] and unions as types. Import Callable, Literal, Never or Sized from\n  typing when needed. A class must be a supported @dataclass with typed fields\n  and no methods or field defaults.\n- Imports must precede other statements. Predefined runtime calls are len(x),\n  range(start, stop), round(float_value), print(x) and sys.exit(int_value).\n  range(n), conversion constructors such as int(x), and extra call arguments\n  are unavailable. Prefer no I/O for these tasks.\n\nReplace a loop that appends squared values with:\n\n```python\ndef squares(xs: list[int]) -> list[int]:\n    return [x * x for x in xs]\n```\n\nReplace an updating accumulator with a recursive helper:\n\n```python\ndef total_from(xs: list[int], i: int) -> int:\n    if i == len(xs):\n        return 0\n    return xs[i] + total_from(xs, i + 1)\n\ndef total(xs: list[int]) -> int:\n    return total_from(xs, 0)\n```\n\nDeclare fresh names rather than updating an existing one:\n\n```python\ndef advance(x: int) -> int:\n    next_x: int = x + 1\n    return next_x\n```\n\nTask:\nfrom typing import List\n\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account fallls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n\n\nRequired function interface:\ndef below_zero(operations: list[int]) -> bool:",
+        "attempts": [
+          {
+            "code": "from typing import List\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account falls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n    balance = 0\n    for operation in operations:\n        balance += operation\n        if balance < 0:\n            return True\n    return False",
+            "raw_response": "```python\nfrom typing import List\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account falls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n    balance = 0\n    for operation in operations:\n        balance += operation\n        if balance < 0:\n            return True\n    return False\n```",
+            "generation": {
+              "status": "complete",
+              "stop_reason": "stop",
+              "response_id": "chatcmpl-998",
+              "response_model": "qwen2.5-coder:0.5b",
+              "usage": {
+                "prompt_tokens": 757,
+                "prompt_tokens_details": {
+                  "cached_tokens": 0
+                },
+                "completion_tokens": 149,
+                "total_tokens": 906
+              }
+            },
+            "round": 0,
+            "messages": [
+              {
+                "role": "user",
+                "content": "Solve this task in PurePy.\nPreserve the required function name, parameters, return behaviour and input domain. Include necessary imports and helpers. Return one complete Python source file only, with no Markdown, explanation, comments, test runner or example calls.\n\nWrite PurePy v0.22.3, a statically checked functional subset of Python 3.12.\nOnly the following differences from Python matter here.\n\nExcluded:\n- No for/while statements, generator expressions, yield, async, try/raise, with,\n  global/nonlocal, assignment expressions, or mutation of objects/containers.\n- No rebinding an assigned variable, augmented assignment, destructuring\n  assignment, slicing, sets, f-strings, identity tests, or chained comparisons.\n- No default/variadic/keyword-only parameters. Call functions positionally.\n  Keyword arguments are supported only for dataclass constructors.\n- No built-in container/string methods, conversion calls, or arbitrary libraries.\n  In particular, sum, min, max, abs, sorted, enumerate, zip and math are unavailable.\n\nRequired:\n- Annotate every function parameter and return type. Declare every local variable\n  with a type annotation before or when assigning it, and assign it only once.\n  Comprehension and pattern variables are bound by their construct.\n- Conditions must be bool, not implicit truth tests of integers or containers.\n- Use recursion, list/dict comprehensions, helpers and fresh values instead of\n  loops and mutation. Avoid linear recursion depth on large inputs.\n- Use int, float, bool, str, None, object, list[T], dict[str, T], fixed-length\n  tuple[...] and unions as types. Import Callable, Literal, Never or Sized from\n  typing when needed. A class must be a supported @dataclass with typed fields\n  and no methods or field defaults.\n- Imports must precede other statements. Predefined runtime calls are len(x),\n  range(start, stop), round(float_value), print(x) and sys.exit(int_value).\n  range(n), conversion constructors such as int(x), and extra call arguments\n  are unavailable. Prefer no I/O for these tasks.\n\nReplace a loop that appends squared values with:\n\n```python\ndef squares(xs: list[int]) -> list[int]:\n    return [x * x for x in xs]\n```\n\nReplace an updating accumulator with a recursive helper:\n\n```python\ndef total_from(xs: list[int], i: int) -> int:\n    if i == len(xs):\n        return 0\n    return xs[i] + total_from(xs, i + 1)\n\ndef total(xs: list[int]) -> int:\n    return total_from(xs, 0)\n```\n\nDeclare fresh names rather than updating an existing one:\n\n```python\ndef advance(x: int) -> int:\n    next_x: int = x + 1\n    return next_x\n```\n\nTask:\nfrom typing import List\n\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account fallls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n\n\nRequired function interface:\ndef below_zero(operations: list[int]) -> bool:"
+              }
+            ],
+            "prompt_sha256": "e69ae3be621d868008c86c8ac0a58a5cd19d35c1dba0d48c7edec1f598c238b8",
+            "checker": {
+              "passed": false,
+              "error": "solution.py:13:4: for loops prohibited",
+              "exit_code": 1,
+              "tooling_error": false,
+              "command": [
+                "purepy",
+                "--check",
+                "--module",
+                "solution.py"
+              ],
+              "failure_mode": {
+                "category": "excluded_by_design",
+                "restriction": "loop"
+              }
+            },
+            "official_tests": {
+              "passed": true,
+              "error": null,
+              "tooling_error": false
+            },
+            "next_round_clears_reported_feature": false
+          },
+          {
+            "code": "from typing import List\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account falls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n    balance = 0\n    for operation in operations:\n        balance += operation\n        if balance < 0:\n            return True\n    return False",
+            "raw_response": "```python\nfrom typing import List\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account falls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n    balance = 0\n    for operation in operations:\n        balance += operation\n        if balance < 0:\n            return True\n    return False\n```",
+            "generation": {
+              "status": "complete",
+              "stop_reason": "stop",
+              "response_id": "chatcmpl-510",
+              "response_model": "qwen2.5-coder:0.5b",
+              "usage": {
+                "prompt_tokens": 966,
+                "prompt_tokens_details": {
+                  "cached_tokens": 0
+                },
+                "completion_tokens": 149,
+                "total_tokens": 1115
+              }
+            },
+            "round": 1,
+            "messages": [
+              {
+                "role": "user",
+                "content": "Solve this task in PurePy.\nPreserve the required function name, parameters, return behaviour and input domain. Include necessary imports and helpers. Return one complete Python source file only, with no Markdown, explanation, comments, test runner or example calls.\n\nWrite PurePy v0.22.3, a statically checked functional subset of Python 3.12.\nOnly the following differences from Python matter here.\n\nExcluded:\n- No for/while statements, generator expressions, yield, async, try/raise, with,\n  global/nonlocal, assignment expressions, or mutation of objects/containers.\n- No rebinding an assigned variable, augmented assignment, destructuring\n  assignment, slicing, sets, f-strings, identity tests, or chained comparisons.\n- No default/variadic/keyword-only parameters. Call functions positionally.\n  Keyword arguments are supported only for dataclass constructors.\n- No built-in container/string methods, conversion calls, or arbitrary libraries.\n  In particular, sum, min, max, abs, sorted, enumerate, zip and math are unavailable.\n\nRequired:\n- Annotate every function parameter and return type. Declare every local variable\n  with a type annotation before or when assigning it, and assign it only once.\n  Comprehension and pattern variables are bound by their construct.\n- Conditions must be bool, not implicit truth tests of integers or containers.\n- Use recursion, list/dict comprehensions, helpers and fresh values instead of\n  loops and mutation. Avoid linear recursion depth on large inputs.\n- Use int, float, bool, str, None, object, list[T], dict[str, T], fixed-length\n  tuple[...] and unions as types. Import Callable, Literal, Never or Sized from\n  typing when needed. A class must be a supported @dataclass with typed fields\n  and no methods or field defaults.\n- Imports must precede other statements. Predefined runtime calls are len(x),\n  range(start, stop), round(float_value), print(x) and sys.exit(int_value).\n  range(n), conversion constructors such as int(x), and extra call arguments\n  are unavailable. Prefer no I/O for these tasks.\n\nReplace a loop that appends squared values with:\n\n```python\ndef squares(xs: list[int]) -> list[int]:\n    return [x * x for x in xs]\n```\n\nReplace an updating accumulator with a recursive helper:\n\n```python\ndef total_from(xs: list[int], i: int) -> int:\n    if i == len(xs):\n        return 0\n    return xs[i] + total_from(xs, i + 1)\n\ndef total(xs: list[int]) -> int:\n    return total_from(xs, 0)\n```\n\nDeclare fresh names rather than updating an existing one:\n\n```python\ndef advance(x: int) -> int:\n    next_x: int = x + 1\n    return next_x\n```\n\nTask:\nfrom typing import List\n\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account fallls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n\n\nRequired function interface:\ndef below_zero(operations: list[int]) -> bool:"
+              },
+              {
+                "role": "assistant",
+                "content": "```python\nfrom typing import List\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account falls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n    balance = 0\n    for operation in operations:\n        balance += operation\n        if balance < 0:\n            return True\n    return False\n```"
+              },
+              {
+                "role": "user",
+                "content": "The PurePy v0.22.3 checker rejected this source:\nsolution.py:13:4: for loops prohibited\nReturn a corrected complete source file only. Preserve the task interface and behaviour. Do not include explanations, comments or Markdown."
+              }
+            ],
+            "prompt_sha256": "7bf82b17a2457dc36f7a8599631ff5ad79661975058d67b7a352f89fe3b8f6ea",
+            "checker": {
+              "passed": false,
+              "error": "solution.py:13:4: for loops prohibited",
+              "exit_code": 1,
+              "tooling_error": false,
+              "command": [
+                "purepy",
+                "--check",
+                "--module",
+                "solution.py"
+              ],
+              "failure_mode": {
+                "category": "excluded_by_design",
+                "restriction": "loop"
+              }
+            },
+            "official_tests": {
+              "passed": true,
+              "error": null,
+              "tooling_error": false
+            }
+          }
+        ],
+        "rejections": 2,
+        "rounds_to_acceptance": null
+      }
+    }
+  },
+  "protocol": {
+    "checker_version": "0.22.3",
+    "wheel_sha256": "cd59f9e8656d2b617954caaf60bdb89d91ccc9cbee830d63977e8abf8a857c27",
+    "definition_sha256": "f466c0b4c4bb50b89a45df87cb61b5db9b25156ece27557bebaf915b9ae492b5",
+    "python": "3.12.14",
+    "platform": "darwin",
+    "provider": "openai",
+    "base_url": "http://127.0.0.1:11435/v1",
+    "max_tokens": 1024,
+    "repair_rounds": 1,
+    "feedback": "checker diagnostics only",
+    "automatic_retries": 0,
+    "started_at": "2026-10-19T14:59:26.169404+00:00",
+    "finished_at": "2026-10-19T14:59:35.897837+00:00"
+  },
+  "status": "complete",
+  "summary": {
+    "problems": 2,
+    "benchmark_total": 164,
+    "scope": "Frozen typed-interface-compatible pilot; not a random sample of all 164 problems.",
+    "conditions": {
+      "python": {
+        "initial": {
+          "outputs": 2,
+          "checker_accepts": 0,
+          "tests_pass": 2,
+          "joint_pass": 0,
+          "checker_unknown": 0,
+          "tests_unknown": 0,
+          "generation_status": {
+            "complete": 2
+          }
+        },
+        "final": {
+          "outputs": 2,
+          "checker_accepts": 0,
+          "tests_pass": 2,
+          "joint_pass": 0,
+          "checker_unknown": 0,
+          "tests_unknown": 0,
+          "generation_status": {
+            "complete": 2
+          }
+        },
+        "checker_rejections": {
+          "excluded_by_design": 2
+        },
+        "rounds_to_acceptance": {
+          "None": 2
+        }
+      },
+      "purepy": {
+        "initial": {
+          "outputs": 2,
+          "checker_accepts": 0,
+          "tests_pass": 2,
+          "joint_pass": 0,
+          "checker_unknown": 0,
+          "tests_unknown": 0,
+          "generation_status": {
+            "complete": 2
+          }
+        },
+        "final": {
+          "outputs": 2,
+          "checker_accepts": 0,
+          "tests_pass": 2,
+          "joint_pass": 0,
+          "checker_unknown": 0,
+          "tests_unknown": 0,
+          "generation_status": {
+            "complete": 2
+          }
+        },
+        "checker_rejections": {
+          "syntax_restriction_review": 2,
+          "excluded_by_design": 2
+        },
+        "rounds_to_acceptance": {
+          "None": 2
+        }
+      }
+    },
+    "rq3": {
+      "initial": {
+        "python_minus_purepy_tests_pp": 0.0,
+        "python_tests_minus_valid_purepy_pp": 100.0
+      },
+      "final": {
+        "python_minus_purepy_tests_pp": 0.0,
+        "python_tests_minus_valid_purepy_pp": 100.0
+      }
+    }
+  }
+}
