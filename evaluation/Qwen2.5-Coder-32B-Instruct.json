@@ -1,0 +1,1081 @@
+{
+  "model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+  "tasks": {
+    "HumanEval/2": {
+      "name": "truncate_number",
+      "question": "def truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n",
+      "signature": "def truncate_number(number: float) -> float:",
+      "python": {
+        "code": "import math\n\ndef truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    an integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    \"\"\"\n    integer_part = math.floor(number)\n    decimal_part = number - integer_part\n    return decimal_part",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:10:4: 'integer_part' is assigned but never declared"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-9fa2ee7f942dceb6",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 191,
+            "total_tokens": 285,
+            "completion_tokens": 94,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "def truncate_number(number: float) -> float:\n    integer_part: int = int(number)\n    decimal_part: float = number - integer_part\n    return decimal_part",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:2:24: 'int' is usable only in annotations or as a decorator"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-ba922eef82bcde45",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2923,
+            "total_tokens": 2963,
+            "completion_tokens": 40,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/3": {
+      "name": "below_zero",
+      "question": "def below_zero(operations: list[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account fallls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n",
+      "signature": "def below_zero(operations: list[int]) -> bool:",
+      "python": {
+        "code": "def below_zero(operations: list[int]) -> bool:\n    balance = 0\n    for operation in operations:\n        balance += operation\n        if balance < 0:\n            return True\n    return False",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-bf33d6e7d4b307d0",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 222,
+            "total_tokens": 271,
+            "completion_tokens": 49,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "def below_zero(operations: list[int]) -> bool:\n    balance: int = 0\n    for operation in operations:\n        balance = balance + operation\n        if balance < 0:\n            return True\n    return False",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-bb8a1999437a8546",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2954,
+            "total_tokens": 3007,
+            "completion_tokens": 53,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/4": {
+      "name": "mean_absolute_deviation",
+      "question": "def mean_absolute_deviation(numbers: list[float]) -> float:\n    \"\"\" For a given list of input numbers, calculate Mean Absolute Deviation\n    around the mean of this dataset.\n    Mean Absolute Deviation is the average absolute difference between each\n    element and a centerpoint (mean in this case):\n    MAD = average | x - x_mean |\n    >>> mean_absolute_deviation([1.0, 2.0, 3.0, 4.0])\n    1.0\n    \"\"\"\n",
+      "signature": "def mean_absolute_deviation(numbers: list[float]) -> float:",
+      "python": {
+        "code": "def mean_absolute_deviation(numbers: list[float]) -> float:\n    \"\"\" For a given list of input numbers, calculate Mean Absolute Deviation\n    around the mean of this dataset.\n    Mean Absolute Deviation is the average absolute difference between each\n    element and a centerpoint (mean in this case):\n    MAD = average | x - x_mean |\n    \"\"\"\n    if not numbers:\n        return 0.0\n    \n    mean = sum(numbers) / len(numbers)\n    absolute_deviations = [abs(x - mean) for x in numbers]\n    mad = sum(absolute_deviations) / len(absolute_deviations)\n    \n    return mad",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:11:4: 'mean' is assigned but never declared"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-8f12fd0b0539aea2",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 221,
+            "total_tokens": 362,
+            "completion_tokens": 141,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "import math\nfrom typing import Callable, List\n\ndef mean_absolute_deviation(numbers: List[float]) -> float:\n    if len(numbers) == 0:\n        return 0.0\n\n    mean: float = sum(numbers) / len(numbers)\n    absolute_deviations: List[float] = [abs(x - mean) for x in numbers]\n    mad: float = sum(absolute_deviations) / len(absolute_deviations)\n    return mad",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:2:0: module 'typing' has no member 'List'"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-b49390bf3e67b3a7",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2953,
+            "total_tokens": 3054,
+            "completion_tokens": 101,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/6": {
+      "name": "parse_nested_parens",
+      "question": "def parse_nested_parens(paren_string: str) -> list[int]:\n    \"\"\" Input to this function is a string represented multiple groups for nested parentheses separated by spaces.\n    For each of the group, output the deepest level of nesting of parentheses.\n    E.g. (()()) has maximum two levels of nesting while ((())) has three.\n\n    >>> parse_nested_parens('(()()) ((())) () ((())()())')\n    [2, 3, 1, 3]\n    \"\"\"\n",
+      "signature": "def parse_nested_parens(paren_string: str) -> list[int]:",
+      "python": {
+        "code": "def parse_nested_parens(paren_string: str) -> list[int]:\n    \"\"\" Input to this function is a string represented multiple groups for nested parentheses separated by spaces.\n    For each of the group, output the deepest level of nesting of parentheses.\n    E.g. (()()) has maximum two levels of nesting while ((())) has three.\n    \"\"\"\n    def max_nesting_level(s: str) -> int:\n        max_level = 0\n        current_level = 0\n        for char in s:\n            if char == '(':\n                current_level += 1\n                if current_level > max_level:\n                    max_level = current_level\n            elif char == ')':\n                current_level -= 1\n        return max_level\n\n    return [max_nesting_level(group) for group in paren_string.split()]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:9:8: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-8c7d0f113cd8b69d",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 218,
+            "total_tokens": 388,
+            "completion_tokens": 170,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "import sys\nfrom typing import Callable, List\n\ndef parse_nested_parens(paren_string: str) -> List[int]:\n    def max_nesting_level(s: str) -> int:\n        max_level: int = 0\n        current_level: int = 0\n        for char in s:\n            if char == '(':\n                current_level = current_level + 1\n                if current_level > max_level:\n                    max_level = current_level\n            elif char == ')':\n                current_level = current_level - 1\n        return max_level\n\n    groups: List[str] = paren_string.split()\n    return [max_nesting_level(group) for group in groups]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:8:8: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-98072d8a8995b30c",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2950,
+            "total_tokens": 3094,
+            "completion_tokens": 144,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/7": {
+      "name": "filter_by_substring",
+      "question": "def filter_by_substring(strings: list[str], substring: str) -> list[str]:\n    \"\"\" Filter an input list of strings only for ones that contain given substring\n    >>> filter_by_substring([], 'a')\n    []\n    >>> filter_by_substring(['abc', 'bacd', 'cde', 'array'], 'a')\n    ['abc', 'bacd', 'array']\n    \"\"\"\n",
+      "signature": "def filter_by_substring(strings: list[str], substring: str) -> list[str]:",
+      "python": {
+        "code": "def filter_by_substring(strings: list[str], substring: str) -> list[str]:\n    \"\"\" Filter an input list of strings only for ones that contain given substring \"\"\"\n    return [s for s in strings if substring in s]",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-9c60e9ae90ea1e66",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 202,
+            "total_tokens": 254,
+            "completion_tokens": 52,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "from typing import Callable\n\ndef filter_by_substring(strings: list[str], substring: str) -> list[str]:\n    def contains_substring(s: str) -> bool:\n        return substring in s\n\n    filtered_strings: list[str] = [s for s in strings if contains_substring(s)]\n    return filtered_strings",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-86168600aae7b021",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2934,
+            "total_tokens": 3005,
+            "completion_tokens": 71,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/10": {
+      "name": "make_palindrome",
+      "question": "def is_palindrome(string: str) -> bool:\n    \"\"\" Test if given string is a palindrome \"\"\"\n    return string == string[::-1]\n\ndef make_palindrome(string: str) -> str:\n    \"\"\" Find the shortest palindrome that begins with a supplied string.\n    Algorithm idea is simple:\n    - Find the longest postfix of supplied string that is a palindrome.\n    - Append to the end of the string reverse of a string prefix that comes before the palindromic suffix.\n    >>> make_palindrome('')\n    ''\n    >>> make_palindrome('cat')\n    'catac'\n    >>> make_palindrome('cata')\n    'catac'\n    \"\"\"\n",
+      "signature": "def make_palindrome(string: str) -> str:",
+      "python": {
+        "code": "def is_palindrome(string: str) -> bool:\n    \"\"\" Test if given string is a palindrome \"\"\"\n    return string == string[::-1]\n\ndef make_palindrome(string: str) -> str:\n    \"\"\" Find the shortest palindrome that begins with a supplied string.\n    Algorithm idea is simple:\n    - Find the longest postfix of supplied string that is a palindrome.\n    - Append to the end of the string reverse of a string prefix that comes before the palindromic suffix.\n    \"\"\"\n    if not string:\n        return string\n    \n    for i in range(len(string)):\n        if is_palindrome(string[i:]):\n            return string + string[:i][::-1]\n    \n    return string",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:28: slicing not yet supported (#59)"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-bf923f8397e40e32",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 249,
+            "total_tokens": 395,
+            "completion_tokens": 146,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "import math\n\ndef is_palindrome(string: str) -> bool:\n    \"\"\" Test if given string is a palindrome \"\"\"\n    return string == string[::-1]\n\ndef make_palindrome(string: str) -> str:\n    \"\"\" Find the shortest palindrome that begins with a supplied string.\n    Algorithm idea is simple:\n    - Find the longest postfix of supplied string that is a palindrome.\n    - Append to the end of the string reverse of a string prefix that comes before the palindromic suffix.\n    \"\"\"\n    n: int = len(string)\n    if n == 0:\n        return string\n    for i in range(n):\n        if is_palindrome(string[i:]):\n            return string + string[:i][::-1]\n    return string",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:5:28: slicing not yet supported (#59)"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-963394ab6c4924aa",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2981,
+            "total_tokens": 3138,
+            "completion_tokens": 157,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/11": {
+      "name": "string_xor",
+      "question": "def string_xor(a: str, b: str) -> str:\n    \"\"\" Input are two strings a and b consisting only of 1s and 0s.\n    Perform binary XOR on these inputs and return result also as a string.\n    >>> string_xor('010', '110')\n    '100'\n    \"\"\"\n",
+      "signature": "def string_xor(a: str, b: str) -> str:",
+      "python": {
+        "code": "def string_xor(a: str, b: str) -> str:\n    \"\"\" Input are two strings a and b consisting only of 1s and 0s.\n    Perform binary XOR on these inputs and return result also as a string.\n    \"\"\"\n    return ''.join('1' if x != y else '0' for x, y in zip(a, b))",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:5:18: generator expressions prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-85a5a4413ae88be0",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 187,
+            "total_tokens": 268,
+            "completion_tokens": 81,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "import math\n\ndef string_xor(a: str, b: str) -> str:\n    def xor_char(x: str, y: str) -> str:\n        return '1' if x != y else '0'\n    \n    result: str = ''.join(xor_char(a[i], b[i]) for i in range(len(a)))\n    return result",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:7:25: generator expressions prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-98b40172188d8312",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2919,
+            "total_tokens": 2997,
+            "completion_tokens": 78,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/12": {
+      "name": "longest",
+      "question": "def longest(strings: list[str]) -> str | None:\n    \"\"\" Out of list of strings, return the longest one. Return the first one in case of multiple\n    strings of the same length. Return None in case the input list is empty.\n    >>> longest([])\n\n    >>> longest(['a', 'b', 'c'])\n    'a'\n    >>> longest(['a', 'bb', 'ccc'])\n    'ccc'\n    \"\"\"\n",
+      "signature": "def longest(strings: list[str]) -> str | None:",
+      "python": {
+        "code": "def longest(strings: list[str]) -> str | None:\n    \"\"\" Out of list of strings, return the longest one. Return the first one in case of multiple\n    strings of the same length. Return None in case the input list is empty.\n    \"\"\"\n    if not strings:\n        return None\n    longest_string = strings[0]\n    for string in strings[1:]:\n        if len(string) > len(longest_string):\n            longest_string = string\n    return longest_string",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:8:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-81f7d743f3048cda",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 204,
+            "total_tokens": 309,
+            "completion_tokens": 105,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "from typing import Callable\n\ndef longest(strings: list[str]) -> str | None:\n    if len(strings) == 0:\n        return None\n    \n    longest_string: str = strings[0]\n    max_length: int = len(longest_string)\n    \n    for s in strings[1:]:\n        if len(s) > max_length:\n            longest_string = s\n            max_length = len(s)\n    \n    return longest_string",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:10:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-a8509a50b6e6860a",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2936,
+            "total_tokens": 3029,
+            "completion_tokens": 93,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/13": {
+      "name": "greatest_common_divisor",
+      "question": "def greatest_common_divisor(a: int, b: int) -> int:\n    \"\"\" Return a greatest common divisor of two integers a and b\n    >>> greatest_common_divisor(3, 5)\n    1\n    >>> greatest_common_divisor(25, 15)\n    5\n    \"\"\"\n",
+      "signature": "def greatest_common_divisor(a: int, b: int) -> int:",
+      "python": {
+        "code": "def greatest_common_divisor(a: int, b: int) -> int:\n    \"\"\" Return a greatest common divisor of two integers a and b \"\"\"\n    while b != 0:\n        a, b = b, a % b\n    return abs(a)",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:4: while loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-b606fcebdd016311",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 184,
+            "total_tokens": 242,
+            "completion_tokens": 58,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "def greatest_common_divisor(a: int, b: int) -> int:\n    while b != 0:\n        a, b = b, a % b\n    return abs(a)",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:2:4: while loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-b5cce4e414a8efe4",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2916,
+            "total_tokens": 2960,
+            "completion_tokens": 44,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/14": {
+      "name": "all_prefixes",
+      "question": "def all_prefixes(string: str) -> list[str]:\n    \"\"\" Return list of all prefixes from shortest to longest of the input string\n    >>> all_prefixes('abc')\n    ['a', 'ab', 'abc']\n    \"\"\"\n",
+      "signature": "def all_prefixes(string: str) -> list[str]:",
+      "python": {
+        "code": "def all_prefixes(string: str) -> list[str]:\n    \"\"\" Return list of all prefixes from shortest to longest of the input string \"\"\"\n    return [string[:i] for i in range(1, len(string) + 1)]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:19: slicing not yet supported (#59)"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-a6e71886be7d2883",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 162,
+            "total_tokens": 216,
+            "completion_tokens": 54,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "def all_prefixes(string: str) -> list[str]:\n    prefixes: list[str] = []\n    for i in range(1, len(string) + 1):\n        prefixes = prefixes + [string[0:i]]\n    return prefixes",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-8bd1878eb184a2f2",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2894,
+            "total_tokens": 2949,
+            "completion_tokens": 55,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/15": {
+      "name": "string_sequence",
+      "question": "def string_sequence(n: int) -> str:\n    \"\"\" Return a string containing space-delimited numbers starting from 0 upto n inclusive.\n    >>> string_sequence(0)\n    '0'\n    >>> string_sequence(5)\n    '0 1 2 3 4 5'\n    \"\"\"\n",
+      "signature": "def string_sequence(n: int) -> str:",
+      "python": {
+        "code": "def string_sequence(n: int) -> str:\n    \"\"\" Return a string containing space-delimited numbers starting from 0 up to n inclusive. \"\"\"\n    return ' '.join(map(str, range(n + 1)))",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:11: values of type Literal[' '] have no attributes"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-a1ef5fd12d4443ef",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 174,
+            "total_tokens": 223,
+            "completion_tokens": 49,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "def string_sequence(n: int) -> str:\n    result: str = \"\"\n    for i in range(0, n + 1):\n        if i == 0:\n            result = str(i)\n        else:\n            result = result + \" \" + str(i)\n    return result",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-8982cbf87bd4010b",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2906,
+            "total_tokens": 2971,
+            "completion_tokens": 65,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/17": {
+      "name": "parse_music",
+      "question": "def parse_music(music_string: str) -> list[int]:\n    \"\"\" Input to this function is a string representing musical notes in a special ASCII format.\n    Your task is to parse this string and return list of integers corresponding to how many beats does each\n    not last.\n\n    Here is a legend:\n    'o' - whole note, lasts four beats\n    'o|' - half note, lasts two beats\n    '.|' - quater note, lasts one beat\n\n    >>> parse_music('o o| .| o| o| .| .| .| .| o o')\n    [4, 2, 1, 2, 2, 1, 1, 1, 1, 4, 4]\n    \"\"\"\n",
+      "signature": "def parse_music(music_string: str) -> list[int]:",
+      "python": {
+        "code": "def parse_music(music_string: str) -> list[int]:\n    \"\"\" Input to this function is a string representing musical notes in a special ASCII format.\n    Your task is to parse this string and return list of integers corresponding to how many beats does each\n    not last.\n\n    Here is a legend:\n    'o' - whole note, lasts four beats\n    'o|' - half note, lasts two beats\n    '.|' - quater note, lasts one beat\n\n    >>> parse_music('o o| .| o| o| .| .| .| .| o o')\n    [4, 2, 1, 2, 2, 1, 1, 1, 1, 4, 4]\n    \"\"\"\n    note_durations = {\n        'o': 4,\n        'o|': 2,\n        '.|': 1\n    }\n    \n    notes = music_string.split()\n    beats = [note_durations[note] for note in notes]\n    \n    return beats",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:14:4: 'note_durations' is assigned but never declared"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-b5b5ba70c2fab993",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 276,
+            "total_tokens": 500,
+            "completion_tokens": 224,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "import sys\nfrom typing import Callable, List\n\ndef parse_music(music_string: str) -> List[int]:\n    def parse_note(note: str) -> int:\n        if note == 'o':\n            return 4\n        elif note == 'o|':\n            return 2\n        elif note == '.|':\n            return 1\n        else:\n            print(f\"Unknown note: {note}\")\n            sys.exit(1)\n\n    notes: List[str] = music_string.split()\n    beats: List[int] = [parse_note(note) for note in notes]\n    return beats",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:13:18: f-strings not yet supported (#55)"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-88df28e4cf8ea71f",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 3008,
+            "total_tokens": 3135,
+            "completion_tokens": 127,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/18": {
+      "name": "how_many_times",
+      "question": "def how_many_times(string: str, substring: str) -> int:\n    \"\"\" Find how many times a given substring can be found in the original string. Count overlaping cases.\n    >>> how_many_times('', 'a')\n    0\n    >>> how_many_times('aaa', 'a')\n    3\n    >>> how_many_times('aaaa', 'aa')\n    3\n    \"\"\"\n",
+      "signature": "def how_many_times(string: str, substring: str) -> int:",
+      "python": {
+        "code": "def how_many_times(string: str, substring: str) -> int:\n    \"\"\" Find how many times a given substring can be found in the original string. Count overlapping cases. \"\"\"\n    count = 0\n    start = 0\n    while start <= len(string) - len(substring):\n        pos = string.find(substring, start)\n        if pos != -1:\n            count += 1\n            start = pos + 1\n        else:\n            break\n    return count",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:5:4: while loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-b8ed40742a67445d",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 199,
+            "total_tokens": 306,
+            "completion_tokens": 107,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "def how_many_times(string: str, substring: str) -> int:\n    count: int = 0\n    index: int = 0\n    while index <= len(string) - len(substring):\n        if string[index:index + len(substring)] == substring:\n            count = count + 1\n        index = index + 1\n    return count",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:4:4: while loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-9a865f0ac84dd0ac",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2931,
+            "total_tokens": 3012,
+            "completion_tokens": 81,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/20": {
+      "name": "find_closest_elements",
+      "question": "def find_closest_elements(numbers: list[float]) -> tuple[float, float]:\n    \"\"\" From a supplied list of numbers (of length at least two) select and return two that are the closest to each\n    other and return them in order (smaller number, larger number).\n    >>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.2])\n    (2.0, 2.2)\n    >>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.0])\n    (2.0, 2.0)\n    \"\"\"\n",
+      "signature": "def find_closest_elements(numbers: list[float]) -> tuple[float, float]:",
+      "python": {
+        "code": "def find_closest_elements(numbers: list[float]) -> tuple[float, float]:\n    \"\"\" From a supplied list of numbers (of length at least two) select and return two that are the closest to each\n    other and return them in order (smaller number, larger number).\n    \"\"\"\n    if len(numbers) < 2:\n        raise ValueError(\"The list must contain at least two numbers.\")\n    \n    numbers.sort()\n    closest_pair = (numbers[0], numbers[1])\n    min_diff = abs(numbers[1] - numbers[0])\n    \n    for i in range(1, len(numbers) - 1):\n        diff = abs(numbers[i + 1] - numbers[i])\n        if diff < min_diff:\n            min_diff = diff\n            closest_pair = (numbers[i], numbers[i + 1])\n    \n    return closest_pair",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:6:8: raise prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-8ba970233822041f",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 271,
+            "total_tokens": 452,
+            "completion_tokens": 181,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "import math\n\ndef find_closest_elements(numbers: list[float]) -> tuple[float, float]:\n    if len(numbers) < 2:\n        raise ValueError(\"The list must contain at least two numbers.\")\n    \n    min_distance: float = math.inf\n    closest_pair: tuple[float, float] = (0.0, 0.0)\n    \n    for i: int in range(len(numbers)):\n        for j: int in range(i + 1, len(numbers)):\n            num1: float = numbers[i]\n            num2: float = numbers[j]\n            distance: float = abs(num1 - num2)\n            \n            if distance < min_distance:\n                min_distance = distance\n                closest_pair = (min(num1, num2), max(num1, num2))\n    \n    return closest_pair",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:10:9: parse error: invalid syntax"
+        },
+        "official_tests": {
+          "passed": false,
+          "error": "invalid syntax (<unknown>, line 10)"
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-992ec0d98dd7d1b0",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 3003,
+            "total_tokens": 3174,
+            "completion_tokens": 171,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/21": {
+      "name": "rescale_to_unit",
+      "question": "def rescale_to_unit(numbers: list[float]) -> list[float]:\n    \"\"\" Given list of numbers (of at least two elements), apply a linear transform to that list,\n    such that the smallest number will become 0 and the largest will become 1\n    >>> rescale_to_unit([1.0, 2.0, 3.0, 4.0, 5.0])\n    [0.0, 0.25, 0.5, 0.75, 1.0]\n    \"\"\"\n",
+      "signature": "def rescale_to_unit(numbers: list[float]) -> list[float]:",
+      "python": {
+        "code": "def rescale_to_unit(numbers: list[float]) -> list[float]:\n    \"\"\" Given list of numbers (of at least two elements), apply a linear transform to that list,\n    such that the smallest number will become 0 and the largest will become 1\n    \"\"\"\n    if len(numbers) < 2:\n        raise ValueError(\"The list must contain at least two elements.\")\n    \n    min_num = min(numbers)\n    max_num = max(numbers)\n    \n    if min_num == max_num:\n        raise ValueError(\"All numbers in the list are the same. Cannot rescale to unit range.\")\n    \n    return [(num - min_num) / (max_num - min_num) for num in numbers]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:6:8: raise prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-b08de99152e5d8ad",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 230,
+            "total_tokens": 378,
+            "completion_tokens": 148,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "import math\n\ndef rescale_to_unit(numbers: list[float]) -> list[float]:\n    min_num: float = min(numbers)\n    max_num: float = max(numbers)\n    range_num: float = max_num - min_num\n    if range_num == 0:\n        return [0.0 for _ in numbers]\n    return [(num - min_num) / range_num for num in numbers]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:4:21: 'min' is not defined"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-941933a9d4d18ffa",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2962,
+            "total_tokens": 3049,
+            "completion_tokens": 87,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/24": {
+      "name": "largest_divisor",
+      "question": "def largest_divisor(n: int) -> int:\n    \"\"\" For a given number n, find the largest number that divides n evenly, smaller than n\n    >>> largest_divisor(15)\n    5\n    \"\"\"\n",
+      "signature": "def largest_divisor(n: int) -> int:",
+      "python": {
+        "code": "def largest_divisor(n: int) -> int:\n    \"\"\" For a given number n, find the largest number that divides n evenly, smaller than n \"\"\"\n    for i in range(n - 1, 0, -1):\n        if n % i == 0:\n            return i",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-912ae0fd563a0fc6",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 160,
+            "total_tokens": 226,
+            "completion_tokens": 66,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "def largest_divisor(n: int) -> int:\n    i: int = n - 1\n    while i > 0:\n        if n % i == 0:\n            return i\n        i = i - 1\n    return 1",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:4: while loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-85e15937d5fa9f93",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2892,
+            "total_tokens": 2951,
+            "completion_tokens": 59,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/25": {
+      "name": "factorize",
+      "question": "def factorize(n: int) -> list[int]:\n    \"\"\" Return list of prime factors of given integer in the order from smallest to largest.\n    Each of the factors should be listed number of times corresponding to how many times it appeares in factorization.\n    Input number should be equal to the product of all factors\n    >>> factorize(8)\n    [2, 2, 2]\n    >>> factorize(25)\n    [5, 5]\n    >>> factorize(70)\n    [2, 5, 7]\n    \"\"\"\n",
+      "signature": "def factorize(n: int) -> list[int]:",
+      "python": {
+        "code": "def factorize(n: int) -> list[int]:\n    \"\"\" Return list of prime factors of given integer in the order from smallest to largest.\n    Each of the factors should be listed number of times corresponding to how many times it appeares in factorization.\n    Input number should be equal to the product of all factors\n    \"\"\"\n    def is_prime(num):\n        if num <= 1:\n            return False\n        if num <= 3:\n            return True\n        if num % 2 == 0 or num % 3 == 0:\n            return False\n        i = 5\n        while i * i <= num:\n            if num % i == 0 or num % (i + 2) == 0:\n                return False\n            i += 6\n        return True\n\n    factors = []\n    # Check for number of 2s that divide n\n    while n % 2 == 0:\n        factors.append(2)\n        n //= 2\n    # n must be odd at this point, so a skip of 2 (i.e., i = i + 2) can be used\n    for i in range(3, int(n**0.5) + 1, 2):\n        # While i divides n, append i and divide n\n        while n % i == 0:\n            factors.append(i)\n            n //= i\n    # This condition is to check if n is a prime number greater than 2\n    if n > 2:\n        factors.append(n)\n    return factors",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:6:4: unannotated parameter prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-81bba4b4424e24ea",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 230,
+            "total_tokens": 559,
+            "completion_tokens": 329,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "import math\n\ndef factorize(n: int) -> list[int]:\n    factors: list[int] = []\n    divisor: int = 2\n    while n > 1:\n        while n % divisor == 0:\n            factors.append(divisor)\n            n = n // divisor\n        divisor = divisor + 1\n        if divisor * divisor > n:\n            if n > 1:\n                factors.append(n)\n                break\n    return factors",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:6:4: while loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-9e728181af8d33e6",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2962,
+            "total_tokens": 3061,
+            "completion_tokens": 99,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/26": {
+      "name": "remove_duplicates",
+      "question": "def remove_duplicates(numbers: list[int]) -> list[int]:\n    \"\"\" From a list of integers, remove all elements that occur more than once.\n    Keep order of elements left the same as in the input.\n    >>> remove_duplicates([1, 2, 3, 2, 4])\n    [1, 3, 4]\n    \"\"\"\n",
+      "signature": "def remove_duplicates(numbers: list[int]) -> list[int]:",
+      "python": {
+        "code": "def remove_duplicates(numbers: list[int]) -> list[int]:\n    \"\"\" From a list of integers, remove all elements that occur more than once.\n    Keep order of elements left the same as in the input.\n    \"\"\"\n    from collections import Counter\n    \n    # Count the occurrences of each number in the list\n    counts = Counter(numbers)\n    \n    # Filter the list to include only numbers that occur exactly once\n    return [num for num in numbers if counts[num] == 1]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:5:4: import outside the module top level prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-966dd9061bc6cbe9",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 187,
+            "total_tokens": 291,
+            "completion_tokens": 104,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "from typing import Callable, List, Dict\n\ndef remove_duplicates(numbers: List[int]) -> List[int]:\n    count: Dict[int, int] = {}\n    for number in numbers:\n        if number in count:\n            count[number] = count[number] + 1\n        else:\n            count[number] = 1\n\n    result: List[int] = []\n    for number in numbers:\n        if count[number] == 1:\n            result = result + [number]\n\n    return result",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:5:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-aeb1f110dd52d756",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2919,
+            "total_tokens": 3025,
+            "completion_tokens": 106,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/27": {
+      "name": "flip_case",
+      "question": "def flip_case(string: str) -> str:\n    \"\"\" For a given string, flip lowercase characters to uppercase and uppercase to lowercase.\n    >>> flip_case('Hello')\n    'hELLO'\n    \"\"\"\n",
+      "signature": "def flip_case(string: str) -> str:",
+      "python": {
+        "code": "def flip_case(string: str) -> str:\n    \"\"\" For a given string, flip lowercase characters to uppercase and uppercase to lowercase. \"\"\"\n    return ''.join(char.lower() if char.isupper() else char.upper() for char in string)",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:18: generator expressions prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-9550c070c20af948",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 154,
+            "total_tokens": 208,
+            "completion_tokens": 54,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "import string\n\ndef flip_case(string: str) -> str:\n    result: str = ''\n    for char in string:\n        if char in string.ascii_lowercase:\n            result = result + char.upper()\n        elif char in string.ascii_uppercase:\n            result = result + char.lower()\n        else:\n            result = result + char\n    return result",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:5:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": false,
+          "error": "Traceback (most recent call last):\n  File \"<string>\", line 12, in <module>\n  File \"solution_and_official_tests.py\", line 34, in <module>\n  File \"solution_and_official_tests.py\", line 31, in check\n  File \"solution_and_official_tests.py\", line 14, in flip_case\nAttributeError: 'str' object has no attribute 'ascii_lowercase'"
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-85d4631ce71cd1aa",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2886,
+            "total_tokens": 2963,
+            "completion_tokens": 77,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    },
+    "HumanEval/28": {
+      "name": "concatenate",
+      "question": "def concatenate(strings: list[str]) -> str:\n    \"\"\" Concatenate list of strings into a single string\n    >>> concatenate([])\n    ''\n    >>> concatenate(['a', 'b', 'c'])\n    'abc'\n    \"\"\"\n",
+      "signature": "def concatenate(strings: list[str]) -> str:",
+      "python": {
+        "code": "def concatenate(strings: list[str]) -> str:\n    \"\"\" Concatenate list of strings into a single string \"\"\"\n    return ''.join(strings)",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:11: values of type Literal[''] have no attributes"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-94f2e787abd2b1c1",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 158,
+            "total_tokens": 191,
+            "completion_tokens": 33,
+            "prompt_tokens_details": null
+          }
+        }
+      },
+      "purepy": {
+        "code": "def concatenate(strings: list[str]) -> str:\n    result: str = ''\n    for s in strings:\n        result = result + s\n    return result",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "chatcmpl-962fed99c49c7d5f",
+          "response_model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+          "usage": {
+            "prompt_tokens": 2890,
+            "total_tokens": 2928,
+            "completion_tokens": 38,
+            "prompt_tokens_details": null
+          }
+        }
+      }
+    }
+  },
+  "runtime": {
+    "model_revision": "381fc969f78efac66bc87ff7ddeadb7e73c218a7",
+    "model_path": "/lus/lfs1aip2/projects/b6bt/hf_cache/hub/models--Qwen--Qwen2.5-Coder-32B-Instruct/snapshots/381fc969f78efac66bc87ff7ddeadb7e73c218a7",
+    "job_id": "7532430",
+    "python_version": "3.12.13 (main, May 10 2026, 19:27:23) [Clang 22.1.3 ]",
+    "packages": {
+      "vllm": "0.15.1",
+      "torch": "2.9.1+cu129",
+      "transformers": "4.57.6"
+    },
+    "server_command": [
+      "/projects/public/brics/tutorials/distributed_vllm/.venv/bin/python",
+      "-m",
+      "vllm.entrypoints.openai.api_server",
+      "--model",
+      "/lus/lfs1aip2/projects/b6bt/hf_cache/hub/models--Qwen--Qwen2.5-Coder-32B-Instruct/snapshots/381fc969f78efac66bc87ff7ddeadb7e73c218a7",
+      "--served-model-name",
+      "Qwen/Qwen2.5-Coder-32B-Instruct",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "51923",
+      "--dtype",
+      "bfloat16",
+      "--tensor-parallel-size",
+      "1",
+      "--max-model-len",
+      "16384",
+      "--max-num-seqs",
+      "2",
+      "--gpu-memory-utilization",
+      "0.85",
+      "--generation-config",
+      "vllm",
+      "--seed",
+      "0",
+      "--enforce-eager"
+    ]
+  },
+  "experiment": {
+    "provider": "openai",
+    "api_url": "http://127.0.0.1:51923/v1",
+    "checker_commit": "68486f84cf80cbc6a4a954dc5d3953951e37b9e3",
+    "dataset_sha256": "b796127e635a67f93fb35c04f4cb03cf06f38c8072ee7cee8833d7bee06979ef",
+    "prompts_sha256": "6216d1961bc942e3f3caf559fd315de6cd4605add217d67142dce10f424afe51",
+    "request_settings": {
+      "temperature": 0,
+      "top_p": 1,
+      "seed": 0,
+      "max_tokens": 4096,
+      "n": 1
+    },
+    "samples_per_condition": 1,
+    "repair_rounds": 0,
+    "automatic_retries": 0
+  }
+}

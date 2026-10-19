@@ -1,0 +1,1346 @@
+{
+  "model": "deepseek-v4-pro",
+  "tasks": {
+    "HumanEval/2": {
+      "name": "truncate_number",
+      "question": "def truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n",
+      "signature": "def truncate_number(number: float) -> float:",
+      "python": {
+        "code": "def truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n    return number - int(number)",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:10:20: 'int' is usable only in annotations or as a decorator"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "45697d16-67fe-4a06-a68f-9d6b597b9a5e",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 246,
+            "completion_tokens": 276,
+            "total_tokens": 522,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 189
+            },
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 246
+          }
+        }
+      },
+      "purepy": {
+        "code": "import math\n\ndef truncate_number(number: float) -> float:\n    return number - math.floor(number)",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "6f43e17f-8ca2-4ab2-a6fe-b6065aedd78a",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3068,
+            "completion_tokens": 565,
+            "total_tokens": 3633,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 542
+            },
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 3068
+          }
+        }
+      }
+    },
+    "HumanEval/3": {
+      "name": "below_zero",
+      "question": "def below_zero(operations: list[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account fallls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n",
+      "signature": "def below_zero(operations: list[int]) -> bool:",
+      "python": {
+        "code": "def below_zero(operations: list[int]) -> bool:\n    balance = 0\n    for operation in operations:\n        balance += operation\n        if balance < 0:\n            return True\n    return False",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "5024260b-709a-4b26-b814-11ee4699f1df",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 276,
+            "completion_tokens": 315,
+            "total_tokens": 591,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 271
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 148
+          }
+        }
+      },
+      "purepy": {
+        "code": "def below_zero(operations: list[int]) -> bool:\n    def check(i: int, balance: int) -> bool:\n        if i == len(operations):\n            return False\n        new_balance: int = balance + operations[i]\n        if new_balance < 0:\n            return True\n        return check(i + 1, new_balance)\n    return check(0, 0)",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "97291e7a-9766-411d-bfa9-25302d888aeb",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3098,
+            "completion_tokens": 1101,
+            "total_tokens": 4199,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 1016
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 154
+          }
+        }
+      }
+    },
+    "HumanEval/4": {
+      "name": "mean_absolute_deviation",
+      "question": "def mean_absolute_deviation(numbers: list[float]) -> float:\n    \"\"\" For a given list of input numbers, calculate Mean Absolute Deviation\n    around the mean of this dataset.\n    Mean Absolute Deviation is the average absolute difference between each\n    element and a centerpoint (mean in this case):\n    MAD = average | x - x_mean |\n    >>> mean_absolute_deviation([1.0, 2.0, 3.0, 4.0])\n    1.0\n    \"\"\"\n",
+      "signature": "def mean_absolute_deviation(numbers: list[float]) -> float:",
+      "python": {
+        "code": "def mean_absolute_deviation(numbers: list[float]) -> float:\n    \"\"\"For a given list of input numbers, calculate Mean Absolute Deviation\n    around the mean of this dataset.\n    Mean Absolute Deviation is the average absolute difference between each\n    element and a centerpoint (mean in this case):\n    MAD = average | x - x_mean |\n    \"\"\"\n    if not numbers:\n        return 0.0\n\n    mean = sum(numbers) / len(numbers)\n    return sum(abs(number - mean) for number in numbers) / len(numbers)",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:12:14: generator expressions prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "8982b286-f894-4ab4-8779-3cfa77a5081b",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 277,
+            "completion_tokens": 523,
+            "total_tokens": 800,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 409
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 149
+          }
+        }
+      },
+      "purepy": {
+        "code": "def sum_from(values: list[float], i: int) -> float:\n    if i == len(values):\n        return 0.0\n    return values[i] + sum_from(values, i + 1)\n\n\ndef sum_abs_dev_from(numbers: list[float], i: int, center: float) -> float:\n    if i == len(numbers):\n        return 0.0\n    diff: float = numbers[i] - center\n    abs_diff: float = diff if diff >= 0.0 else -diff\n    return abs_diff + sum_abs_dev_from(numbers, i + 1, center)\n\n\ndef mean_absolute_deviation(numbers: list[float]) -> float:\n    if len(numbers) == 0:\n        return 0.0\n    center: float = sum_from(numbers, 0) / len(numbers)\n    total_deviation: float = sum_abs_dev_from(numbers, 0, center)\n    return total_deviation / len(numbers)",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "6b53065f-96f1-4529-9793-4cae847f9de9",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3099,
+            "completion_tokens": 6460,
+            "total_tokens": 9559,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 6254
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 155
+          }
+        }
+      }
+    },
+    "HumanEval/6": {
+      "name": "parse_nested_parens",
+      "question": "def parse_nested_parens(paren_string: str) -> list[int]:\n    \"\"\" Input to this function is a string represented multiple groups for nested parentheses separated by spaces.\n    For each of the group, output the deepest level of nesting of parentheses.\n    E.g. (()()) has maximum two levels of nesting while ((())) has three.\n\n    >>> parse_nested_parens('(()()) ((())) () ((())()())')\n    [2, 3, 1, 3]\n    \"\"\"\n",
+      "signature": "def parse_nested_parens(paren_string: str) -> list[int]:",
+      "python": {
+        "code": "def parse_nested_parens(paren_string: str) -> list[int]:\n    depths = []\n    for group in paren_string.split():\n        current_depth = 0\n        max_depth = 0\n        for char in group:\n            if char == '(':\n                current_depth += 1\n                if current_depth > max_depth:\n                    max_depth = current_depth\n            elif char == ')':\n                current_depth -= 1\n        depths.append(max_depth)\n    return depths",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "a15bec78-b2b7-497c-92bf-0c24bcaca3fe",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 278,
+            "completion_tokens": 406,
+            "total_tokens": 684,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 306
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 150
+          }
+        }
+      },
+      "purepy": {
+        "code": "",
+        "checker": {
+          "passed": null,
+          "error": "no generated code to check"
+        },
+        "official_tests": {
+          "passed": null,
+          "error": "no generated code to test"
+        },
+        "generation": {
+          "status": "incomplete",
+          "stop_reason": "length",
+          "response_id": "20d85edc-7570-47d3-8c56-a867e3ab19ce",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3100,
+            "completion_tokens": 8192,
+            "total_tokens": 11292,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 8192
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 156
+          }
+        }
+      }
+    },
+    "HumanEval/7": {
+      "name": "filter_by_substring",
+      "question": "def filter_by_substring(strings: list[str], substring: str) -> list[str]:\n    \"\"\" Filter an input list of strings only for ones that contain given substring\n    >>> filter_by_substring([], 'a')\n    []\n    >>> filter_by_substring(['abc', 'bacd', 'cde', 'array'], 'a')\n    ['abc', 'bacd', 'array']\n    \"\"\"\n",
+      "signature": "def filter_by_substring(strings: list[str], substring: str) -> list[str]:",
+      "python": {
+        "code": "def filter_by_substring(strings: list[str], substring: str) -> list[str]:\n    \"\"\" Filter an input list of strings only for ones that contain given substring\n    >>> filter_by_substring([], 'a')\n    []\n    >>> filter_by_substring(['abc', 'bacd', 'cde', 'array'], 'a')\n    ['abc', 'bacd', 'array']\n    \"\"\"\n    return [s for s in strings if substring in s]",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "d01b96c7-ad64-4608-abcb-e670967cfd57",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 259,
+            "completion_tokens": 371,
+            "total_tokens": 630,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 273
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 131
+          }
+        }
+      },
+      "purepy": {
+        "code": "def filter_by_substring(strings: list[str], substring: str) -> list[str]:\n    return [s for s in strings if substring in s]",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "85951bb6-9376-46af-941a-518b601e1763",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3081,
+            "completion_tokens": 307,
+            "total_tokens": 3388,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 274
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 137
+          }
+        }
+      }
+    },
+    "HumanEval/10": {
+      "name": "make_palindrome",
+      "question": "def is_palindrome(string: str) -> bool:\n    \"\"\" Test if given string is a palindrome \"\"\"\n    return string == string[::-1]\n\ndef make_palindrome(string: str) -> str:\n    \"\"\" Find the shortest palindrome that begins with a supplied string.\n    Algorithm idea is simple:\n    - Find the longest postfix of supplied string that is a palindrome.\n    - Append to the end of the string reverse of a string prefix that comes before the palindromic suffix.\n    >>> make_palindrome('')\n    ''\n    >>> make_palindrome('cat')\n    'catac'\n    >>> make_palindrome('cata')\n    'catac'\n    \"\"\"\n",
+      "signature": "def make_palindrome(string: str) -> str:",
+      "python": {
+        "code": "def is_palindrome(string: str) -> bool:\n    \"\"\" Test if given string is a palindrome \"\"\"\n    return string == string[::-1]\n\n\ndef make_palindrome(string: str) -> str:\n    \"\"\" Find the shortest palindrome that begins with a supplied string.\n    Algorithm idea is simple:\n    - Find the longest postfix of supplied string that is a palindrome.\n    - Append to the end of the string reverse of a string prefix that comes before the palindromic suffix.\n    >>> make_palindrome('')\n    ''\n    >>> make_palindrome('cat')\n    'catac'\n    >>> make_palindrome('cata')\n    'catac'\n    \"\"\"\n    for i in range(len(string) + 1):\n        if is_palindrome(string[i:]):\n            return string + string[:i][::-1]\n    return string",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:28: slicing not yet supported (#59)"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "dfe70bde-01f6-472d-a364-dd4c3467ebf9",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 308,
+            "completion_tokens": 2448,
+            "total_tokens": 2756,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 2271
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 180
+          }
+        }
+      },
+      "purepy": {
+        "code": "",
+        "checker": {
+          "passed": null,
+          "error": "no generated code to check"
+        },
+        "official_tests": {
+          "passed": null,
+          "error": "no generated code to test"
+        },
+        "generation": {
+          "status": "incomplete",
+          "stop_reason": "length",
+          "response_id": "02df54b2-7323-4c61-ad07-fdf3f1067964",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3130,
+            "completion_tokens": 8192,
+            "total_tokens": 11322,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 8192
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 186
+          }
+        }
+      }
+    },
+    "HumanEval/11": {
+      "name": "string_xor",
+      "question": "def string_xor(a: str, b: str) -> str:\n    \"\"\" Input are two strings a and b consisting only of 1s and 0s.\n    Perform binary XOR on these inputs and return result also as a string.\n    >>> string_xor('010', '110')\n    '100'\n    \"\"\"\n",
+      "signature": "def string_xor(a: str, b: str) -> str:",
+      "python": {
+        "code": "from itertools import zip_longest\n\ndef string_xor(a: str, b: str) -> str:\n    \"\"\" Input are two strings a and b consisting only of 1s and 0s.\n    Perform binary XOR on these inputs and return result also as a string.\n    >>> string_xor('010', '110')\n    '100'\n    \"\"\"\n    return ''.join('0' if x == y else '1' for x, y in zip_longest(a, b, fillvalue='0'))",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:9:18: generator expressions prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "b981ab87-dbaf-443b-b2f0-debefb7b5259",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 238,
+            "completion_tokens": 963,
+            "total_tokens": 1201,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 856
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 110
+          }
+        }
+      },
+      "purepy": {
+        "code": "def string_xor(a: str, b: str) -> str:\n    def xor_from(i: int) -> str:\n        if i == len(a):\n            return \"\"\n        ch: str = \"0\" if a[i] == b[i] else \"1\"\n        rest: str = xor_from(i + 1)\n        return ch + rest\n    return xor_from(0)",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "28e6c31f-c6a4-4b0e-ad72-f43979df39c3",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3060,
+            "completion_tokens": 3916,
+            "total_tokens": 6976,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 3834
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 116
+          }
+        }
+      }
+    },
+    "HumanEval/12": {
+      "name": "longest",
+      "question": "def longest(strings: list[str]) -> str | None:\n    \"\"\" Out of list of strings, return the longest one. Return the first one in case of multiple\n    strings of the same length. Return None in case the input list is empty.\n    >>> longest([])\n\n    >>> longest(['a', 'b', 'c'])\n    'a'\n    >>> longest(['a', 'bb', 'ccc'])\n    'ccc'\n    \"\"\"\n",
+      "signature": "def longest(strings: list[str]) -> str | None:",
+      "python": {
+        "code": "def longest(strings: list[str]) -> str | None:\n    \"\"\" Out of list of strings, return the longest one. Return the first one in case of multiple\n    strings of the same length. Return None in case the input list is empty.\n    \"\"\"\n    if not strings:\n        return None\n\n    longest_str = strings[0]\n    for s in strings[1:]:\n        if len(s) > len(longest_str):\n            longest_str = s\n\n    return longest_str",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:9:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "2bbf9f3e-9445-496e-8c24-96349da371de",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 260,
+            "completion_tokens": 536,
+            "total_tokens": 796,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 434
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 132
+          }
+        }
+      },
+      "purepy": {
+        "code": "def longest(strings: list[str]) -> str | None:\n    if len(strings) == 0:\n        return None\n\n    def helper(index: int, best: str) -> str:\n        if index == len(strings):\n            return best\n        candidate: str = strings[index]\n        next_best: str = candidate if len(candidate) > len(best) else best\n        return helper(index + 1, next_best)\n\n    return helper(1, strings[0])",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "925d0d03-c77f-434f-8e52-33cede3ee541",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3082,
+            "completion_tokens": 5084,
+            "total_tokens": 8166,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 4979
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 138
+          }
+        }
+      }
+    },
+    "HumanEval/13": {
+      "name": "greatest_common_divisor",
+      "question": "def greatest_common_divisor(a: int, b: int) -> int:\n    \"\"\" Return a greatest common divisor of two integers a and b\n    >>> greatest_common_divisor(3, 5)\n    1\n    >>> greatest_common_divisor(25, 15)\n    5\n    \"\"\"\n",
+      "signature": "def greatest_common_divisor(a: int, b: int) -> int:",
+      "python": {
+        "code": "def greatest_common_divisor(a: int, b: int) -> int:\n    \"\"\" Return a greatest common divisor of two integers a and b\n    >>> greatest_common_divisor(3, 5)\n    1\n    >>> greatest_common_divisor(25, 15)\n    5\n    \"\"\"\n    a = abs(a)\n    b = abs(b)\n    while b:\n        a, b = b, a % b\n    return a",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:10:4: while loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "3db2a9ae-ff1e-42ff-b32a-f27f4a5472a1",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 238,
+            "completion_tokens": 719,
+            "total_tokens": 957,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 623
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 110
+          }
+        }
+      },
+      "purepy": {
+        "code": "def greatest_common_divisor(a: int, b: int) -> int:\n    \"\"\"Return a greatest common divisor of two integers a and b.\"\"\"\n    if a < 0:\n        return greatest_common_divisor(-a, b)\n    if b < 0:\n        return greatest_common_divisor(a, -b)\n    if b == 0:\n        return a\n    return greatest_common_divisor(b, a % b)",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "fa3bff6b-2ce4-4e23-b7a3-c092ac094771",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3060,
+            "completion_tokens": 1850,
+            "total_tokens": 4910,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 1756
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 116
+          }
+        }
+      }
+    },
+    "HumanEval/14": {
+      "name": "all_prefixes",
+      "question": "def all_prefixes(string: str) -> list[str]:\n    \"\"\" Return list of all prefixes from shortest to longest of the input string\n    >>> all_prefixes('abc')\n    ['a', 'ab', 'abc']\n    \"\"\"\n",
+      "signature": "def all_prefixes(string: str) -> list[str]:",
+      "python": {
+        "code": "def all_prefixes(string: str) -> list[str]:\n    \"\"\" Return list of all prefixes from shortest to longest of the input string\n    >>> all_prefixes('abc')\n    ['a', 'ab', 'abc']\n    \"\"\"\n    return [string[:i] for i in range(1, len(string) + 1)]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:6:19: slicing not yet supported (#59)"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "5c133f8d-068d-41f5-bd8d-bea5d5f95b66",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 216,
+            "completion_tokens": 305,
+            "total_tokens": 521,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 235
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 88
+          }
+        }
+      },
+      "purepy": {
+        "code": "def _prefix(string: str, length: int) -> str:\n    if length == 0:\n        return \"\"\n    return _prefix(string, length - 1) + string[length - 1]\n\n\ndef all_prefixes(string: str) -> list[str]:\n    return [_prefix(string, i) for i in range(1, len(string) + 1)]",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "7d4c5ac1-6a22-4412-8415-d3e26d15808b",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3038,
+            "completion_tokens": 1989,
+            "total_tokens": 5027,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 1911
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 94
+          }
+        }
+      }
+    },
+    "HumanEval/15": {
+      "name": "string_sequence",
+      "question": "def string_sequence(n: int) -> str:\n    \"\"\" Return a string containing space-delimited numbers starting from 0 upto n inclusive.\n    >>> string_sequence(0)\n    '0'\n    >>> string_sequence(5)\n    '0 1 2 3 4 5'\n    \"\"\"\n",
+      "signature": "def string_sequence(n: int) -> str:",
+      "python": {
+        "code": "def string_sequence(n: int) -> str:\n    \"\"\" Return a string containing space-delimited numbers starting from 0 upto n inclusive.\n    >>> string_sequence(0)\n    '0'\n    >>> string_sequence(5)\n    '0 1 2 3 4 5'\n    \"\"\"\n    return \" \".join(str(i) for i in range(n + 1))",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:8:19: generator expressions prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "94244c02-abe4-418a-abf4-1cdd3cd5b36f",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 233,
+            "completion_tokens": 533,
+            "total_tokens": 766,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 449
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 105
+          }
+        }
+      },
+      "purepy": {
+        "code": "",
+        "checker": {
+          "passed": null,
+          "error": "no generated code to check"
+        },
+        "official_tests": {
+          "passed": null,
+          "error": "no generated code to test"
+        },
+        "generation": {
+          "status": "incomplete",
+          "stop_reason": "length",
+          "response_id": "b32fc5fc-8f89-4459-aa7f-827ee3394a40",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3055,
+            "completion_tokens": 8192,
+            "total_tokens": 11247,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 8192
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 111
+          }
+        }
+      }
+    },
+    "HumanEval/17": {
+      "name": "parse_music",
+      "question": "def parse_music(music_string: str) -> list[int]:\n    \"\"\" Input to this function is a string representing musical notes in a special ASCII format.\n    Your task is to parse this string and return list of integers corresponding to how many beats does each\n    not last.\n\n    Here is a legend:\n    'o' - whole note, lasts four beats\n    'o|' - half note, lasts two beats\n    '.|' - quater note, lasts one beat\n\n    >>> parse_music('o o| .| o| o| .| .| .| .| o o')\n    [4, 2, 1, 2, 2, 1, 1, 1, 1, 4, 4]\n    \"\"\"\n",
+      "signature": "def parse_music(music_string: str) -> list[int]:",
+      "python": {
+        "code": "def parse_music(music_string: str) -> list[int]:\n    beats = {\n        'o': 4,\n        'o|': 2,\n        '.|': 1\n    }\n    return [beats[note] for note in music_string.split()]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:2:4: 'beats' is assigned but never declared"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "2760474d-eda8-4049-aa03-5b89030a668e",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 333,
+            "completion_tokens": 512,
+            "total_tokens": 845,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 453
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 205
+          }
+        }
+      },
+      "purepy": {
+        "code": "",
+        "checker": {
+          "passed": null,
+          "error": "no generated code to check"
+        },
+        "official_tests": {
+          "passed": null,
+          "error": "no generated code to test"
+        },
+        "generation": {
+          "status": "incomplete",
+          "stop_reason": "length",
+          "response_id": "3d0f5604-bd8c-4292-a45d-9291df8d7c79",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3155,
+            "completion_tokens": 8192,
+            "total_tokens": 11347,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 8192
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 211
+          }
+        }
+      }
+    },
+    "HumanEval/18": {
+      "name": "how_many_times",
+      "question": "def how_many_times(string: str, substring: str) -> int:\n    \"\"\" Find how many times a given substring can be found in the original string. Count overlaping cases.\n    >>> how_many_times('', 'a')\n    0\n    >>> how_many_times('aaa', 'a')\n    3\n    >>> how_many_times('aaaa', 'aa')\n    3\n    \"\"\"\n",
+      "signature": "def how_many_times(string: str, substring: str) -> int:",
+      "python": {
+        "code": "def how_many_times(string: str, substring: str) -> int:\n    \"\"\" Find how many times a given substring can be found in the original string. Count overlaping cases.\n    >>> how_many_times('', 'a')\n    0\n    >>> how_many_times('aaa', 'a')\n    3\n    >>> how_many_times('aaaa', 'aa')\n    3\n    \"\"\"\n    if substring == \"\":\n        return len(string) + 1\n\n    count = 0\n    start = 0\n    while True:\n        index = string.find(substring, start)\n        if index == -1:\n            break\n        count += 1\n        start = index + 1\n    return count",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:15:4: while loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "931f225c-b15c-4591-b265-8e66da471b89",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 261,
+            "completion_tokens": 6381,
+            "total_tokens": 6642,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 6224
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 133
+          }
+        }
+      },
+      "purepy": {
+        "code": "def matches_at(string: str, substring: str, i: int) -> bool:\n    return len([j for j in range(0, len(substring)) if string[i + j] != substring[j]]) == 0\n\n\ndef how_many_times(string: str, substring: str) -> int:\n    return len([i for i in range(0, len(string) - len(substring) + 1) if matches_at(string, substring, i)])",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "8a16acde-4662-4be6-adee-033535b08761",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3083,
+            "completion_tokens": 3644,
+            "total_tokens": 6727,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 3544
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 139
+          }
+        }
+      }
+    },
+    "HumanEval/20": {
+      "name": "find_closest_elements",
+      "question": "def find_closest_elements(numbers: list[float]) -> tuple[float, float]:\n    \"\"\" From a supplied list of numbers (of length at least two) select and return two that are the closest to each\n    other and return them in order (smaller number, larger number).\n    >>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.2])\n    (2.0, 2.2)\n    >>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.0])\n    (2.0, 2.0)\n    \"\"\"\n",
+      "signature": "def find_closest_elements(numbers: list[float]) -> tuple[float, float]:",
+      "python": {
+        "code": "def find_closest_elements(numbers: list[float]) -> tuple[float, float]:\n    \"\"\" From a supplied list of numbers (of length at least two) select and return two that are the closest to each\n    other and return them in order (smaller number, larger number).\n    >>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.2])\n    (2.0, 2.2)\n    >>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.0])\n    (2.0, 2.0)\n    \"\"\"\n    ordered = sorted(numbers)\n    return min(zip(ordered, ordered[1:]), key=lambda pair: pair[1] - pair[0])",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:10:36: slicing not yet supported (#59)"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "df99423b-e58e-4d88-9d74-8c5cbafd9660",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 333,
+            "completion_tokens": 1381,
+            "total_tokens": 1714,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 1190
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 205
+          }
+        }
+      },
+      "purepy": {
+        "code": "",
+        "checker": {
+          "passed": null,
+          "error": "no generated code to check"
+        },
+        "official_tests": {
+          "passed": null,
+          "error": "no generated code to test"
+        },
+        "generation": {
+          "status": "incomplete",
+          "stop_reason": "length",
+          "response_id": "e1a00108-4a0c-4c86-b772-3cdde8639732",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3155,
+            "completion_tokens": 8192,
+            "total_tokens": 11347,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 8192
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 211
+          }
+        }
+      }
+    },
+    "HumanEval/21": {
+      "name": "rescale_to_unit",
+      "question": "def rescale_to_unit(numbers: list[float]) -> list[float]:\n    \"\"\" Given list of numbers (of at least two elements), apply a linear transform to that list,\n    such that the smallest number will become 0 and the largest will become 1\n    >>> rescale_to_unit([1.0, 2.0, 3.0, 4.0, 5.0])\n    [0.0, 0.25, 0.5, 0.75, 1.0]\n    \"\"\"\n",
+      "signature": "def rescale_to_unit(numbers: list[float]) -> list[float]:",
+      "python": {
+        "code": "def rescale_to_unit(numbers: list[float]) -> list[float]:\n    \"\"\" Given list of numbers (of at least two elements), apply a linear transform to that list,\n    such that the smallest number will become 0 and the largest will become 1\n    >>> rescale_to_unit([1.0, 2.0, 3.0, 4.0, 5.0])\n    [0.0, 0.25, 0.5, 0.75, 1.0]\n    \"\"\"\n    min_num = min(numbers)\n    max_num = max(numbers)\n\n    if max_num == min_num:\n        return [0.0] * len(numbers)\n\n    return [(x - min_num) / (max_num - min_num) for x in numbers]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:7:4: 'min_num' is assigned but never declared"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "4a1a756f-e746-4f3c-9359-1cfd5dd3f81a",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 286,
+            "completion_tokens": 3285,
+            "total_tokens": 3571,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 3116
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 158
+          }
+        }
+      },
+      "purepy": {
+        "code": "def min_from(numbers: list[float], idx: int, current: float) -> float:\n    if idx == len(numbers):\n        return current\n    val: float = numbers[idx]\n    next_current: float = val if val < current else current\n    return min_from(numbers, idx + 1, next_current)\n\n\ndef max_from(numbers: list[float], idx: int, current: float) -> float:\n    if idx == len(numbers):\n        return current\n    val: float = numbers[idx]\n    next_current: float = val if val > current else current\n    return max_from(numbers, idx + 1, next_current)\n\n\ndef rescale_to_unit(numbers: list[float]) -> list[float]:\n    min_val: float = min_from(numbers, 1, numbers[0])\n    max_val: float = max_from(numbers, 1, numbers[0])\n    span: float = max_val - min_val\n    return [(numbers[i] - min_val) / span for i in range(0, len(numbers))]",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "9ecbbd29-212a-4b43-8a24-96a95eef691a",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3108,
+            "completion_tokens": 7284,
+            "total_tokens": 10392,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 7065
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 164
+          }
+        }
+      }
+    },
+    "HumanEval/24": {
+      "name": "largest_divisor",
+      "question": "def largest_divisor(n: int) -> int:\n    \"\"\" For a given number n, find the largest number that divides n evenly, smaller than n\n    >>> largest_divisor(15)\n    5\n    \"\"\"\n",
+      "signature": "def largest_divisor(n: int) -> int:",
+      "python": {
+        "code": "def largest_divisor(n: int) -> int:\n    \"\"\" For a given number n, find the largest number that divides n evenly, smaller than n\n    >>> largest_divisor(15)\n    5\n    \"\"\"\n    if n % 2 == 0:\n        return n // 2\n\n    d = 3\n    while d * d <= n:\n        if n % d == 0:\n            return n // d\n        d += 2\n\n    return 1",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:10:4: while loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "f59cc027-1a87-4465-9115-7bd98ee5bfda",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 212,
+            "completion_tokens": 5756,
+            "total_tokens": 5968,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 5654
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 84
+          }
+        }
+      },
+      "purepy": {
+        "code": "",
+        "checker": {
+          "passed": null,
+          "error": "no generated code to check"
+        },
+        "official_tests": {
+          "passed": null,
+          "error": "no generated code to test"
+        },
+        "generation": {
+          "status": "interrupted_storage",
+          "error": "local disk exhausted after the request began; response could not be saved; not retried"
+        }
+      }
+    },
+    "HumanEval/25": {
+      "name": "factorize",
+      "question": "def factorize(n: int) -> list[int]:\n    \"\"\" Return list of prime factors of given integer in the order from smallest to largest.\n    Each of the factors should be listed number of times corresponding to how many times it appeares in factorization.\n    Input number should be equal to the product of all factors\n    >>> factorize(8)\n    [2, 2, 2]\n    >>> factorize(25)\n    [5, 5]\n    >>> factorize(70)\n    [2, 5, 7]\n    \"\"\"\n",
+      "signature": "def factorize(n: int) -> list[int]:",
+      "python": {
+        "code": "def factorize(n: int) -> list[int]:\n    \"\"\"\n    Return list of prime factors of given integer in the order from smallest to largest.\n    Each factor is listed as many times as it appears in the factorization.\n    \"\"\"\n    if n <= 0:\n        raise ValueError(\"n must be a positive integer\")\n\n    factors = []\n    d = 2\n    while d * d <= n:\n        while n % d == 0:\n            factors.append(d)\n            n //= d\n        d += 1\n\n    if n > 1:\n        factors.append(n)\n\n    return factors",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:7:8: raise prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "44c79f11-4501-4b0b-970f-526cb27baa45",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 281,
+            "completion_tokens": 3602,
+            "total_tokens": 3883,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 3477
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 153
+          }
+        }
+      },
+      "purepy": {
+        "code": "",
+        "checker": {
+          "passed": null,
+          "error": "no generated code to check"
+        },
+        "official_tests": {
+          "passed": null,
+          "error": "no generated code to test"
+        },
+        "generation": {
+          "status": "incomplete",
+          "stop_reason": "length",
+          "response_id": "fcdec9f3-e6f2-4ba5-aefe-4d5eb13473ef",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3103,
+            "completion_tokens": 8192,
+            "total_tokens": 11295,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 8192
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 159
+          }
+        }
+      }
+    },
+    "HumanEval/26": {
+      "name": "remove_duplicates",
+      "question": "def remove_duplicates(numbers: list[int]) -> list[int]:\n    \"\"\" From a list of integers, remove all elements that occur more than once.\n    Keep order of elements left the same as in the input.\n    >>> remove_duplicates([1, 2, 3, 2, 4])\n    [1, 3, 4]\n    \"\"\"\n",
+      "signature": "def remove_duplicates(numbers: list[int]) -> list[int]:",
+      "python": {
+        "code": "from collections import Counter\n\ndef remove_duplicates(numbers: list[int]) -> list[int]:\n    counts = Counter(numbers)\n    return [num for num in numbers if counts[num] == 1]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:1:0: unknown module 'collections'"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "eaf56b56-1d8d-4a66-8165-b9266d43a3bd",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 247,
+            "completion_tokens": 230,
+            "total_tokens": 477,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 188
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 119
+          }
+        }
+      },
+      "purepy": {
+        "code": "def count_occurrences(numbers: list[int], target: int) -> int:\n    return len([y for y in numbers if y == target])\n\n\ndef remove_duplicates(numbers: list[int]) -> list[int]:\n    \"\"\" From a list of integers, remove all elements that occur more than once.\n    Keep order of elements left the same as in the input.\n    >>> remove_duplicates([1, 2, 3, 2, 4])\n    [1, 3, 4]\n    \"\"\"\n    return [x for x in numbers if count_occurrences(numbers, x) == 1]",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "b0827906-86ac-4f11-9c6a-1c5701ed75ba",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3069,
+            "completion_tokens": 4707,
+            "total_tokens": 7776,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 4576
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 125
+          }
+        }
+      }
+    },
+    "HumanEval/27": {
+      "name": "flip_case",
+      "question": "def flip_case(string: str) -> str:\n    \"\"\" For a given string, flip lowercase characters to uppercase and uppercase to lowercase.\n    >>> flip_case('Hello')\n    'hELLO'\n    \"\"\"\n",
+      "signature": "def flip_case(string: str) -> str:",
+      "python": {
+        "code": "def flip_case(string: str) -> str:\n    \"\"\" For a given string, flip lowercase characters to uppercase and uppercase to lowercase.\n    >>> flip_case('Hello')\n    'hELLO'\n    \"\"\"\n    return string.swapcase()",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:6:11: values of type str have no attributes"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "034b7888-9ab0-4017-a2a4-3561fb37eaec",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 208,
+            "completion_tokens": 296,
+            "total_tokens": 504,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 246
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 80
+          }
+        }
+      },
+      "purepy": {
+        "code": "",
+        "checker": {
+          "passed": null,
+          "error": "no generated code to check"
+        },
+        "official_tests": {
+          "passed": null,
+          "error": "no generated code to test"
+        },
+        "generation": {
+          "status": "incomplete",
+          "stop_reason": "length",
+          "response_id": "eae5fcc9-3a19-4520-83ff-b9c2262195da",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3030,
+            "completion_tokens": 8192,
+            "total_tokens": 11222,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 8192
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 86
+          }
+        }
+      }
+    },
+    "HumanEval/28": {
+      "name": "concatenate",
+      "question": "def concatenate(strings: list[str]) -> str:\n    \"\"\" Concatenate list of strings into a single string\n    >>> concatenate([])\n    ''\n    >>> concatenate(['a', 'b', 'c'])\n    'abc'\n    \"\"\"\n",
+      "signature": "def concatenate(strings: list[str]) -> str:",
+      "python": {
+        "code": "def concatenate(strings: list[str]) -> str:\n    \"\"\" Concatenate list of strings into a single string\n    >>> concatenate([])\n    ''\n    >>> concatenate(['a', 'b', 'c'])\n    'abc'\n    \"\"\"\n    return ''.join(strings)",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:8:11: values of type Literal[''] have no attributes"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "0fd35cbf-790e-46ee-9f28-4502ec7dedf6",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 220,
+            "completion_tokens": 354,
+            "total_tokens": 574,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 294
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 92
+          }
+        }
+      },
+      "purepy": {
+        "code": "from builtins import len\n\ndef concatenate(strings: list[str]) -> str:\n    def helper(i: int, acc: str) -> str:\n        if i == len(strings):\n            return acc\n        else:\n            return helper(i + 1, acc + strings[i])\n    return helper(0, \"\")",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "stop",
+          "response_id": "01b958ba-972a-494a-bc70-18d65a99b24b",
+          "response_model": "deepseek-v4-pro",
+          "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+          "usage": {
+            "prompt_tokens": 3042,
+            "completion_tokens": 3052,
+            "total_tokens": 6094,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 2984
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 98
+          }
+        }
+      }
+    }
+  },
+  "experiment": {
+    "provider": "deepseek",
+    "api_url": "https://api.deepseek.com",
+    "checker_commit": "68486f84cf80cbc6a4a954dc5d3953951e37b9e3",
+    "dataset_sha256": "b796127e635a67f93fb35c04f4cb03cf06f38c8072ee7cee8833d7bee06979ef",
+    "prompts_sha256": "6216d1961bc942e3f3caf559fd315de6cd4605add217d67142dce10f424afe51",
+    "request_settings": {
+      "max_tokens": 8192,
+      "thinking": {
+        "type": "enabled"
+      },
+      "reasoning_effort": "high"
+    },
+    "samples_per_condition": 1,
+    "repair_rounds": 0,
+    "automatic_retries": 0
+  }
+}

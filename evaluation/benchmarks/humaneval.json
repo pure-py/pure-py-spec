@@ -1,0 +1,17 @@
+{
+  "benchmark": "HumanEval",
+  "revision": "6d43fb980f9fee3c892a914eda09951f772ad10d",
+  "url": "https://raw.githubusercontent.com/openai/human-eval/6d43fb980f9fee3c892a914eda09951f772ad10d/data/HumanEval.jsonl.gz",
+  "sha256": "b796127e635a67f93fb35c04f4cb03cf06f38c8072ee7cee8833d7bee06979ef",
+  "total_problems": 164,
+  "eligible_problems": 29,
+  "seed": 20261009,
+  "scope": "Frozen typed-interface-compatible pilot; not a random sample of all 164 problems.",
+  "task_ids": [
+    "HumanEval/2", "HumanEval/3", "HumanEval/4", "HumanEval/6",
+    "HumanEval/7", "HumanEval/10", "HumanEval/11", "HumanEval/12",
+    "HumanEval/13", "HumanEval/14", "HumanEval/15", "HumanEval/17",
+    "HumanEval/18", "HumanEval/20", "HumanEval/21", "HumanEval/24",
+    "HumanEval/25", "HumanEval/26", "HumanEval/27", "HumanEval/28"
+  ]
+}

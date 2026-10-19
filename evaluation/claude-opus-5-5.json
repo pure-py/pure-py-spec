@@ -1,0 +1,1444 @@
+{
+  "model": "claude-opus-5-5",
+  "tasks": {
+    "HumanEval/2": {
+      "name": "truncate_number",
+      "question": "def truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n",
+      "signature": "def truncate_number(number: float) -> float:",
+      "python": {
+        "code": "def truncate_number(number: float) -> float:\n    \"\"\" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    \"\"\"\n    return number % 1.0",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69k7ShKUudSurZAaAkk",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 244,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 121,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "import math\n\n\ndef truncate_number(number: float) -> float:\n    result: float = number - math.floor(number)\n    return result",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69kKunB43YMD3RuLdoM",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4610,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 141,
+            "output_tokens_details": {
+              "thinking_tokens": 102
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/3": {
+      "name": "below_zero",
+      "question": "def below_zero(operations: list[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account fallls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n",
+      "signature": "def below_zero(operations: list[int]) -> bool:",
+      "python": {
+        "code": "def below_zero(operations: list[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account fallls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n    balance = 0\n    for op in operations:\n        balance += op\n        if balance < 0:\n            return True\n    return False",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:11:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69kjoxgCR7vxt4nREbK",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 286,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 188,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def below_zero(operations: list[int]) -> bool:\n    def stats(lo: int, hi: int) -> tuple[int, int]:\n        if hi - lo == 1:\n            return (operations[lo], operations[lo])\n        mid: int = (lo + hi) // 2\n        left: tuple[int, int] = stats(lo, mid)\n        right: tuple[int, int] = stats(mid, hi)\n        total: int = left[0] + right[0]\n        cand: int = left[0] + right[1]\n        m: int = left[1] if left[1] < cand else cand\n        return (total, m)\n\n    n: int = len(operations)\n    if n == 0:\n        return False\n    result: tuple[int, int] = stats(0, n)\n    return result[1] < 0",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69kuk1Zew7kvS8nUXGg",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4652,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 612,
+            "output_tokens_details": {
+              "thinking_tokens": 362
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/4": {
+      "name": "mean_absolute_deviation",
+      "question": "def mean_absolute_deviation(numbers: list[float]) -> float:\n    \"\"\" For a given list of input numbers, calculate Mean Absolute Deviation\n    around the mean of this dataset.\n    Mean Absolute Deviation is the average absolute difference between each\n    element and a centerpoint (mean in this case):\n    MAD = average | x - x_mean |\n    >>> mean_absolute_deviation([1.0, 2.0, 3.0, 4.0])\n    1.0\n    \"\"\"\n",
+      "signature": "def mean_absolute_deviation(numbers: list[float]) -> float:",
+      "python": {
+        "code": "def mean_absolute_deviation(numbers: list[float]) -> float:\n    \"\"\" For a given list of input numbers, calculate Mean Absolute Deviation\n    around the mean of this dataset.\n    Mean Absolute Deviation is the average absolute difference between each\n    element and a centerpoint (mean in this case):\n    MAD = average | x - x_mean |\n    >>> mean_absolute_deviation([1.0, 2.0, 3.0, 4.0])\n    1.0\n    \"\"\"\n    n = len(numbers)\n    if n == 0:\n        return 0.0\n    mean = sum(numbers) / n\n    return sum(abs(x - mean) for x in numbers) / n",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:14:14: generator expressions prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69mQjY2CfYZd27EbhoH",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 307,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 227,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def abs_float(x: float) -> float:\n    if x >= 0.0:\n        return x\n    return -x\n\n\ndef sum_acc(xs: list[float], i: int, acc: float) -> float:\n    if i >= len(xs):\n        return acc\n    return sum_acc(xs, i + 1, acc + xs[i])\n\n\ndef sum_floats(xs: list[float]) -> float:\n    return sum_acc(xs, 0, 0.0)\n\n\ndef mean_absolute_deviation(numbers: list[float]) -> float:\n    mean: float = sum_floats(numbers) / len(numbers)\n    deviations: list[float] = [abs_float(x - mean) for x in numbers]\n    return sum_floats(deviations) / len(numbers)",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69mdEs43yEQaWFToLRQ",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4673,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 607,
+            "output_tokens_details": {
+              "thinking_tokens": 363
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/6": {
+      "name": "parse_nested_parens",
+      "question": "def parse_nested_parens(paren_string: str) -> list[int]:\n    \"\"\" Input to this function is a string represented multiple groups for nested parentheses separated by spaces.\n    For each of the group, output the deepest level of nesting of parentheses.\n    E.g. (()()) has maximum two levels of nesting while ((())) has three.\n\n    >>> parse_nested_parens('(()()) ((())) () ((())()())')\n    [2, 3, 1, 3]\n    \"\"\"\n",
+      "signature": "def parse_nested_parens(paren_string: str) -> list[int]:",
+      "python": {
+        "code": "def parse_nested_parens(paren_string: str) -> list[int]:\n    \"\"\" Input to this function is a string represented multiple groups for nested parentheses separated by spaces.\n    For each of the group, output the deepest level of nesting of parentheses.\n    E.g. (()()) has maximum two levels of nesting while ((())) has three.\n\n    >>> parse_nested_parens('(()()) ((())) () ((())()())')\n    [2, 3, 1, 3]\n    \"\"\"\n    def max_depth(group: str) -> int:\n        depth = 0\n        best = 0\n        for c in group:\n            if c == '(':\n                depth += 1\n                if depth > best:\n                    best = depth\n            elif c == ')':\n                depth -= 1\n        return best\n\n    return [max_depth(g) for g in paren_string.split() if g]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:12:8: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69n7Hp5Q6nnCkwszYG1",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 299,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 269,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def go(s: str, i: int, depth: int, mx: int, in_group: bool, acc: list[int]) -> list[int]:\n    if i == len(s):\n        if in_group:\n            return acc + [mx]\n        return acc\n    c: str = s[i]\n    if c == ' ':\n        if in_group:\n            return go(s, i + 1, 0, 0, False, acc + [mx])\n        return go(s, i + 1, 0, 0, False, acc)\n    if c == '(':\n        d: int = depth + 1\n        nm: int = d if d > mx else mx\n        return go(s, i + 1, d, nm, True, acc)\n    if c == ')':\n        return go(s, i + 1, depth - 1, mx, True, acc)\n    return go(s, i + 1, depth, mx, True, acc)\n\n\ndef parse_nested_parens(paren_string: str) -> list[int]:\n    empty: list[int] = []\n    return go(paren_string, 0, 0, 0, False, empty)",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69nLYYod8SqHMqiMFE3",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4665,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 789,
+            "output_tokens_details": {
+              "thinking_tokens": 463
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/7": {
+      "name": "filter_by_substring",
+      "question": "def filter_by_substring(strings: list[str], substring: str) -> list[str]:\n    \"\"\" Filter an input list of strings only for ones that contain given substring\n    >>> filter_by_substring([], 'a')\n    []\n    >>> filter_by_substring(['abc', 'bacd', 'cde', 'array'], 'a')\n    ['abc', 'bacd', 'array']\n    \"\"\"\n",
+      "signature": "def filter_by_substring(strings: list[str], substring: str) -> list[str]:",
+      "python": {
+        "code": "def filter_by_substring(strings: list[str], substring: str) -> list[str]:\n    \"\"\" Filter an input list of strings only for ones that contain given substring\n    >>> filter_by_substring([], 'a')\n    []\n    >>> filter_by_substring(['abc', 'bacd', 'cde', 'array'], 'a')\n    ['abc', 'bacd', 'array']\n    \"\"\"\n    return [s for s in strings if substring in s]",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69nwS1twcWSprER7rMv",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 276,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 147,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def matches_at(s: str, sub: str, i: int, j: int) -> bool:\n    if j == len(sub):\n        return True\n    if s[i + j] != sub[j]:\n        return False\n    return matches_at(s, sub, i, j + 1)\n\n\ndef contains(s: str, sub: str, i: int) -> bool:\n    if i + len(sub) > len(s):\n        return False\n    if matches_at(s, sub, i, 0):\n        return True\n    return contains(s, sub, i + 1)\n\n\ndef filter_by_substring(strings: list[str], substring: str) -> list[str]:\n    \"\"\" Filter an input list of strings only for ones that contain given substring\n    >>> filter_by_substring([], 'a')\n    []\n    >>> filter_by_substring(['abc', 'bacd', 'cde', 'array'], 'a')\n    ['abc', 'bacd', 'array']\n    \"\"\"\n    return [x for x in strings if contains(x, substring, 0)]",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69o9R6LNX2Jrs3fG4yM",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4642,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 659,
+            "output_tokens_details": {
+              "thinking_tokens": 342
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/10": {
+      "name": "make_palindrome",
+      "question": "def is_palindrome(string: str) -> bool:\n    \"\"\" Test if given string is a palindrome \"\"\"\n    return string == string[::-1]\n\ndef make_palindrome(string: str) -> str:\n    \"\"\" Find the shortest palindrome that begins with a supplied string.\n    Algorithm idea is simple:\n    - Find the longest postfix of supplied string that is a palindrome.\n    - Append to the end of the string reverse of a string prefix that comes before the palindromic suffix.\n    >>> make_palindrome('')\n    ''\n    >>> make_palindrome('cat')\n    'catac'\n    >>> make_palindrome('cata')\n    'catac'\n    \"\"\"\n",
+      "signature": "def make_palindrome(string: str) -> str:",
+      "python": {
+        "code": "def is_palindrome(string: str) -> bool:\n    \"\"\" Test if given string is a palindrome \"\"\"\n    return string == string[::-1]\n\n\ndef make_palindrome(string: str) -> str:\n    \"\"\" Find the shortest palindrome that begins with a supplied string.\n    Algorithm idea is simple:\n    - Find the longest postfix of supplied string that is a palindrome.\n    - Append to the end of the string reverse of a string prefix that comes before the palindromic suffix.\n    \"\"\"\n    if not string:\n        return ''\n    n = len(string)\n    for i in range(n):\n        if is_palindrome(string[i:]):\n            return string + string[:i][::-1]\n    return string + string[:-1][::-1]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:3:28: slicing not yet supported (#59)"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69obdvaqMoB1FuDSFe6",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 352,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 233,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def is_pal_range(s: str, i: int, j: int) -> bool:\n    if i >= j:\n        return True\n    if s[i] != s[j]:\n        return False\n    return is_pal_range(s, i + 1, j - 1)\n\n\ndef is_palindrome(string: str) -> bool:\n    \"\"\" Test if given string is a palindrome \"\"\"\n    return is_pal_range(string, 0, len(string) - 1)\n\n\ndef find_start(s: str, start: int) -> int:\n    if start >= len(s):\n        return start\n    if is_pal_range(s, start, len(s) - 1):\n        return start\n    return find_start(s, start + 1)\n\n\ndef rev_prefix(s: str, k: int) -> str:\n    if k <= 0:\n        return \"\"\n    return s[k - 1] + rev_prefix(s, k - 1)\n\n\ndef make_palindrome(string: str) -> str:\n    \"\"\" Find the shortest palindrome that begins with a supplied string.\n    Algorithm idea is simple:\n    - Find the longest postfix of supplied string that is a palindrome.\n    - Append to the end of the string reverse of a string prefix that comes before the palindromic suffix.\n    >>> make_palindrome('')\n    ''\n    >>> make_palindrome('cat')\n    'catac'\n    >>> make_palindrome('cata')\n    'catac'\n    \"\"\"\n    if len(string) == 0:\n        return \"\"\n    start: int = find_start(string, 0)\n    return string + rev_prefix(string, start)",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69oojwRa2LnjMEfNDMJ",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4718,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 952,
+            "output_tokens_details": {
+              "thinking_tokens": 465
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/11": {
+      "name": "string_xor",
+      "question": "def string_xor(a: str, b: str) -> str:\n    \"\"\" Input are two strings a and b consisting only of 1s and 0s.\n    Perform binary XOR on these inputs and return result also as a string.\n    >>> string_xor('010', '110')\n    '100'\n    \"\"\"\n",
+      "signature": "def string_xor(a: str, b: str) -> str:",
+      "python": {
+        "code": "def string_xor(a: str, b: str) -> str:\n    \"\"\" Input are two strings a and b consisting only of 1s and 0s.\n    Perform binary XOR on these inputs and return result also as a string.\n    >>> string_xor('010', '110')\n    '100'\n    \"\"\"\n    return ''.join('0' if x == y else '1' for x, y in zip(a, b))",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:7:18: generator expressions prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69pR2Drjmh6NH2mFQ4V",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 227,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 122,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def _xor_range(a: str, b: str, lo: int, hi: int) -> str:\n    if hi - lo <= 0:\n        return \"\"\n    if hi - lo == 1:\n        return \"0\" if a[lo] == b[lo] else \"1\"\n    mid: int = (lo + hi) // 2\n    return _xor_range(a, b, lo, mid) + _xor_range(a, b, mid, hi)\n\n\ndef string_xor(a: str, b: str) -> str:\n    \"\"\" Input are two strings a and b consisting only of 1s and 0s.\n    Perform binary XOR on these inputs and return result also as a string.\n    >>> string_xor('010', '110')\n    '100'\n    \"\"\"\n    n: int = len(a) if len(a) < len(b) else len(b)\n    return _xor_range(a, b, 0, n)",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69paTG5VrZg2v8fDz6u",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4593,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 621,
+            "output_tokens_details": {
+              "thinking_tokens": 351
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/12": {
+      "name": "longest",
+      "question": "def longest(strings: list[str]) -> str | None:\n    \"\"\" Out of list of strings, return the longest one. Return the first one in case of multiple\n    strings of the same length. Return None in case the input list is empty.\n    >>> longest([])\n\n    >>> longest(['a', 'b', 'c'])\n    'a'\n    >>> longest(['a', 'bb', 'ccc'])\n    'ccc'\n    \"\"\"\n",
+      "signature": "def longest(strings: list[str]) -> str | None:",
+      "python": {
+        "code": "from typing import Optional\n\n\ndef longest(strings: list[str]) -> Optional[str]:\n    \"\"\" Out of list of strings, return the longest one. Return the first one in case of multiple\n    strings of the same length. Return None in case the input list is empty.\n    >>> longest([])\n\n    >>> longest(['a', 'b', 'c'])\n    'a'\n    >>> longest(['a', 'bb', 'ccc'])\n    'ccc'\n    \"\"\"\n    if not strings:\n        return None\n    best = strings[0]\n    for s in strings[1:]:\n        if len(s) > len(best):\n            best = s\n    return best",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:17:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69pypgbS4gpQPMsW2ob",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 272,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 201,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "from typing import Callable\n\n\ndef _pick(strings: list[str], lo: int, hi: int) -> int:\n    if hi - lo == 1:\n        return lo\n    mid: int = (lo + hi) // 2\n    a: int = _pick(strings, lo, mid)\n    b: int = _pick(strings, mid, hi)\n    if len(strings[b]) > len(strings[a]):\n        return b\n    return a\n\n\ndef longest(strings: list[str]) -> str | None:\n    \"\"\" Out of list of strings, return the longest one. Return the first one in case of multiple\n    strings of the same length. Return None in case the input list is empty.\n    >>> longest([])\n\n    >>> longest(['a', 'b', 'c'])\n    'a'\n    >>> longest(['a', 'bb', 'ccc'])\n    'ccc'\n    \"\"\"\n    if len(strings) == 0:\n        return None\n    idx: int = _pick(strings, 0, len(strings))\n    return strings[idx]",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69qBLEYcVdRAsSDdhVj",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4638,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 743,
+            "output_tokens_details": {
+              "thinking_tokens": 424
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/13": {
+      "name": "greatest_common_divisor",
+      "question": "def greatest_common_divisor(a: int, b: int) -> int:\n    \"\"\" Return a greatest common divisor of two integers a and b\n    >>> greatest_common_divisor(3, 5)\n    1\n    >>> greatest_common_divisor(25, 15)\n    5\n    \"\"\"\n",
+      "signature": "def greatest_common_divisor(a: int, b: int) -> int:",
+      "python": {
+        "code": "def greatest_common_divisor(a: int, b: int) -> int:\n    \"\"\" Return a greatest common divisor of two integers a and b\n    >>> greatest_common_divisor(3, 5)\n    1\n    >>> greatest_common_divisor(25, 15)\n    5\n    \"\"\"\n    while b:\n        a, b = b, a % b\n    return abs(a)",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:8:4: while loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69qfPT5jCyHoTbFAxza",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 235,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 119,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def greatest_common_divisor(a: int, b: int) -> int:\n    if b == 0:\n        return a\n    return greatest_common_divisor(b, a % b)",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69qpV9QFnsdUrQ4oAb1",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4601,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 186,
+            "output_tokens_details": {
+              "thinking_tokens": 130
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/14": {
+      "name": "all_prefixes",
+      "question": "def all_prefixes(string: str) -> list[str]:\n    \"\"\" Return list of all prefixes from shortest to longest of the input string\n    >>> all_prefixes('abc')\n    ['a', 'ab', 'abc']\n    \"\"\"\n",
+      "signature": "def all_prefixes(string: str) -> list[str]:",
+      "python": {
+        "code": "def all_prefixes(string: str) -> list[str]:\n    \"\"\" Return list of all prefixes from shortest to longest of the input string\n    >>> all_prefixes('abc')\n    ['a', 'ab', 'abc']\n    \"\"\"\n    return [string[:i] for i in range(1, len(string) + 1)]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:6:19: slicing not yet supported (#59)"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69rAG2PaTGMVwUyhYzu",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 215,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 104,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def build_prefixes(s: str, i: int, acc: list[str], cur: str) -> list[str]:\n    if i >= len(s):\n        return acc\n    else:\n        nxt: str = cur + s[i]\n        return build_prefixes(s, i + 1, acc + [nxt], nxt)\n\n\ndef all_prefixes(string: str) -> list[str]:\n    \"\"\" Return list of all prefixes from shortest to longest of the input string\n    >>> all_prefixes('abc')\n    ['a', 'ab', 'abc']\n    \"\"\"\n    empty: list[str] = []\n    return build_prefixes(string, 0, empty, \"\")",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69rKRgdHKp5yfTANLoM",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4581,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 499,
+            "output_tokens_details": {
+              "thinking_tokens": 290
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/15": {
+      "name": "string_sequence",
+      "question": "def string_sequence(n: int) -> str:\n    \"\"\" Return a string containing space-delimited numbers starting from 0 upto n inclusive.\n    >>> string_sequence(0)\n    '0'\n    >>> string_sequence(5)\n    '0 1 2 3 4 5'\n    \"\"\"\n",
+      "signature": "def string_sequence(n: int) -> str:",
+      "python": {
+        "code": "def string_sequence(n: int) -> str:\n    \"\"\" Return a string containing space-delimited numbers starting from 0 upto n inclusive.\n    >>> string_sequence(0)\n    '0'\n    >>> string_sequence(5)\n    '0 1 2 3 4 5'\n    \"\"\"\n    return ' '.join(str(i) for i in range(n + 1))",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:8:19: generator expressions prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69rjNM4pTrqKpx2L27y",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 230,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 121,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def digit_str(d: int) -> str:\n    digits: str = \"0123456789\"\n    return digits[d]\n\n\ndef int_to_str(k: int) -> str:\n    if k < 0:\n        return \"-\" + int_to_str(0 - k)\n    if k < 10:\n        return digit_str(k)\n    return int_to_str(k // 10) + digit_str(k % 10)\n\n\ndef join_range(lo: int, hi: int) -> str:\n    if lo == hi:\n        return int_to_str(lo)\n    mid: int = (lo + hi) // 2\n    return join_range(lo, mid) + \" \" + join_range(mid + 1, hi)\n\n\ndef string_sequence(n: int) -> str:\n    if n < 0:\n        return \"\"\n    return join_range(0, n)",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69rthBAxU4PekFAXqDC",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4596,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 634,
+            "output_tokens_details": {
+              "thinking_tokens": 384
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/17": {
+      "name": "parse_music",
+      "question": "def parse_music(music_string: str) -> list[int]:\n    \"\"\" Input to this function is a string representing musical notes in a special ASCII format.\n    Your task is to parse this string and return list of integers corresponding to how many beats does each\n    not last.\n\n    Here is a legend:\n    'o' - whole note, lasts four beats\n    'o|' - half note, lasts two beats\n    '.|' - quater note, lasts one beat\n\n    >>> parse_music('o o| .| o| o| .| .| .| .| o o')\n    [4, 2, 1, 2, 2, 1, 1, 1, 1, 4, 4]\n    \"\"\"\n",
+      "signature": "def parse_music(music_string: str) -> list[int]:",
+      "python": {
+        "code": "def parse_music(music_string: str) -> list[int]:\n    note_map = {'o': 4, 'o|': 2, '.|': 1}\n    return [note_map[x] for x in music_string.split() if x in note_map]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:2:4: 'note_map' is assigned but never declared"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69sLH4KPADTkLFAcGkt",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 343,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 75,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def is_start(s: str, i: int) -> bool:\n    if s[i] == ' ':\n        return False\n    if i == 0:\n        return True\n    return s[i - 1] == ' '\n\n\ndef note_value(s: str, i: int) -> int:\n    if s[i] == 'o':\n        if (i + 1 < len(s)) and (s[i + 1] == '|'):\n            return 2\n        return 4\n    return 1\n\n\ndef parse_music(music_string: str) -> list[int]:\n    result: list[int] = [note_value(music_string, i) for i in range(0, len(music_string)) if is_start(music_string, i)]\n    return result",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69sUi4Hu1tpJkHngURJ",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4709,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 872,
+            "output_tokens_details": {
+              "thinking_tokens": 666
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/18": {
+      "name": "how_many_times",
+      "question": "def how_many_times(string: str, substring: str) -> int:\n    \"\"\" Find how many times a given substring can be found in the original string. Count overlaping cases.\n    >>> how_many_times('', 'a')\n    0\n    >>> how_many_times('aaa', 'a')\n    3\n    >>> how_many_times('aaaa', 'aa')\n    3\n    \"\"\"\n",
+      "signature": "def how_many_times(string: str, substring: str) -> int:",
+      "python": {
+        "code": "def how_many_times(string: str, substring: str) -> int:\n    \"\"\" Find how many times a given substring can be found in the original string. Count overlaping cases.\n    >>> how_many_times('', 'a')\n    0\n    >>> how_many_times('aaa', 'a')\n    3\n    >>> how_many_times('aaaa', 'aa')\n    3\n    \"\"\"\n    times = 0\n    n = len(substring)\n    for i in range(len(string) - n + 1):\n        if string[i:i + n] == substring:\n            times += 1\n    return times",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:12:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69tBpqE4879u5aMtuWz",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 257,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 232,
+            "output_tokens_details": {
+              "thinking_tokens": 55
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def matches_at(string: str, substring: str, i: int) -> bool:\n    m: int = len(substring)\n    mismatches: list[int] = [j for j in range(0, m) if string[i + j] != substring[j]]\n    return len(mismatches) == 0\n\n\ndef how_many_times(string: str, substring: str) -> int:\n    n: int = len(string)\n    m: int = len(substring)\n    hits: list[int] = [i for i in range(0, n - m + 1) if matches_at(string, substring, i)]\n    return len(hits)",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69tNexkQZ9kbCLJ7VDn",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4623,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 452,
+            "output_tokens_details": {
+              "thinking_tokens": 275
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/20": {
+      "name": "find_closest_elements",
+      "question": "def find_closest_elements(numbers: list[float]) -> tuple[float, float]:\n    \"\"\" From a supplied list of numbers (of length at least two) select and return two that are the closest to each\n    other and return them in order (smaller number, larger number).\n    >>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.2])\n    (2.0, 2.2)\n    >>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.0])\n    (2.0, 2.0)\n    \"\"\"\n",
+      "signature": "def find_closest_elements(numbers: list[float]) -> tuple[float, float]:",
+      "python": {
+        "code": "def find_closest_elements(numbers: list[float]) -> tuple[float, float]:\n    \"\"\" From a supplied list of numbers (of length at least two) select and return two that are the closest to each\n    other and return them in order (smaller number, larger number).\n    \"\"\"\n    s = sorted(numbers)\n    best = None\n    best_pair = (s[0], s[1])\n    for i in range(len(s) - 1):\n        d = s[i + 1] - s[i]\n        if best is None or d < best:\n            best = d\n            best_pair = (s[i], s[i + 1])\n    return best_pair",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:8:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69tkfY7omNUakkEmrvH",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 338,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 190,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def abs_diff(a: float, b: float) -> float:\n    if a >= b:\n        return a - b\n    return b - a\n\n\ndef ordered_pair(a: float, b: float) -> tuple[float, float]:\n    if a <= b:\n        return (a, b)\n    return (b, a)\n\n\ndef scan_inner(numbers: list[float], i: int, j: int, best: tuple[float, float, float]) -> tuple[float, float, float]:\n    if j >= len(numbers):\n        return best\n    a: float = numbers[i]\n    b: float = numbers[j]\n    d: float = abs_diff(a, b)\n    nb: tuple[float, float, float]\n    if d < best[0]:\n        p: tuple[float, float] = ordered_pair(a, b)\n        nb = (d, p[0], p[1])\n    else:\n        nb = best\n    return scan_inner(numbers, i, j + 1, nb)\n\n\ndef scan_outer(numbers: list[float], i: int, best: tuple[float, float, float]) -> tuple[float, float, float]:\n    if i >= len(numbers):\n        return best\n    return scan_outer(numbers, i + 1, scan_inner(numbers, i, i + 1, best))\n\n\ndef find_closest_elements(numbers: list[float]) -> tuple[float, float]:\n    \"\"\" From a supplied list of numbers (of length at least two) select and return two that are the closest to each\n    other and return them in order (smaller number, larger number).\n    >>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.2])\n    (2.0, 2.2)\n    >>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.0])\n    (2.0, 2.0)\n    \"\"\"\n    p0: tuple[float, float] = ordered_pair(numbers[0], numbers[1])\n    init: tuple[float, float, float] = (abs_diff(numbers[0], numbers[1]), p0[0], p0[1])\n    r: tuple[float, float, float] = scan_outer(numbers, 0, init)\n    return (r[1], r[2])",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69txecGKYUA52bPX65R",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4704,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 1544,
+            "output_tokens_details": {
+              "thinking_tokens": 837
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/21": {
+      "name": "rescale_to_unit",
+      "question": "def rescale_to_unit(numbers: list[float]) -> list[float]:\n    \"\"\" Given list of numbers (of at least two elements), apply a linear transform to that list,\n    such that the smallest number will become 0 and the largest will become 1\n    >>> rescale_to_unit([1.0, 2.0, 3.0, 4.0, 5.0])\n    [0.0, 0.25, 0.5, 0.75, 1.0]\n    \"\"\"\n",
+      "signature": "def rescale_to_unit(numbers: list[float]) -> list[float]:",
+      "python": {
+        "code": "def rescale_to_unit(numbers: list[float]) -> list[float]:\n    \"\"\" Given list of numbers (of at least two elements), apply a linear transform to that list,\n    such that the smallest number will become 0 and the largest will become 1\n    >>> rescale_to_unit([1.0, 2.0, 3.0, 4.0, 5.0])\n    [0.0, 0.25, 0.5, 0.75, 1.0]\n    \"\"\"\n    min_number = min(numbers)\n    max_number = max(numbers)\n    span = max_number - min_number\n    if span == 0:\n        return [0.0 for _ in numbers]\n    return [(x - min_number) / span for x in numbers]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:7:4: 'min_number' is assigned but never declared"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69uzMq3v3owy5gLJhCc",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 291,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 314,
+            "output_tokens_details": {
+              "thinking_tokens": 87
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def range_min(xs: list[float], lo: int, hi: int) -> float:\n    if hi - lo == 1:\n        return xs[lo]\n    mid: int = (lo + hi) // 2\n    a: float = range_min(xs, lo, mid)\n    b: float = range_min(xs, mid, hi)\n    if a < b:\n        return a\n    return b\n\n\ndef range_max(xs: list[float], lo: int, hi: int) -> float:\n    if hi - lo == 1:\n        return xs[lo]\n    mid: int = (lo + hi) // 2\n    a: float = range_max(xs, lo, mid)\n    b: float = range_max(xs, mid, hi)\n    if a > b:\n        return a\n    return b\n\n\ndef rescale_to_unit(numbers: list[float]) -> list[float]:\n    n: int = len(numbers)\n    mn: float = range_min(numbers, 0, n)\n    mx: float = range_max(numbers, 0, n)\n    return [(x - mn) / (mx - mn) for x in numbers]",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69vGZeXw9ZLj8hvdyJp",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4657,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 662,
+            "output_tokens_details": {
+              "thinking_tokens": 321
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/24": {
+      "name": "largest_divisor",
+      "question": "def largest_divisor(n: int) -> int:\n    \"\"\" For a given number n, find the largest number that divides n evenly, smaller than n\n    >>> largest_divisor(15)\n    5\n    \"\"\"\n",
+      "signature": "def largest_divisor(n: int) -> int:",
+      "python": {
+        "code": "import math\n\n\ndef largest_divisor(n: int) -> int:\n    \"\"\" For a given number n, find the largest number that divides n evenly, smaller than n\n    >>> largest_divisor(15)\n    5\n    \"\"\"\n    if n <= 1:\n        return 1\n    for i in range(2, math.isqrt(n) + 1):\n        if n % i == 0:\n            return n // i\n    return 1",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:11:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69vjoFMb4hyJNacUCG2",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 199,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 463,
+            "output_tokens_details": {
+              "thinking_tokens": 337
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def smallest_factor(n: int, d: int) -> int:\n    if d * d > n:\n        return n\n    if n % d == 0:\n        return d\n    return smallest_factor(n, d + 1)\n\n\ndef largest_divisor(n: int) -> int:\n    \"\"\" For a given number n, find the largest number that divides n evenly, smaller than n\n    >>> largest_divisor(15)\n    5\n    \"\"\"\n    if n <= 1:\n        return 1\n    d: int = smallest_factor(n, 2)\n    if d == n:\n        return 1\n    return n // d",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69wEuUGLjFkAoh4k3Dv",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4565,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 549,
+            "output_tokens_details": {
+              "thinking_tokens": 368
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/25": {
+      "name": "factorize",
+      "question": "def factorize(n: int) -> list[int]:\n    \"\"\" Return list of prime factors of given integer in the order from smallest to largest.\n    Each of the factors should be listed number of times corresponding to how many times it appeares in factorization.\n    Input number should be equal to the product of all factors\n    >>> factorize(8)\n    [2, 2, 2]\n    >>> factorize(25)\n    [5, 5]\n    >>> factorize(70)\n    [2, 5, 7]\n    \"\"\"\n",
+      "signature": "def factorize(n: int) -> list[int]:",
+      "python": {
+        "code": "import math\nimport random\n\n\ndef _is_prime(n: int) -> bool:\n    if n < 2:\n        return False\n    small_primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]\n    for p in small_primes:\n        if n % p == 0:\n            return n == p\n    d = n - 1\n    s = 0\n    while d % 2 == 0:\n        d //= 2\n        s += 1\n    for a in small_primes:\n        if a % n == 0:\n            continue\n        x = pow(a, d, n)\n        if x == 1 or x == n - 1:\n            continue\n        for _ in range(s - 1):\n            x = x * x % n\n            if x == n - 1:\n                break\n        else:\n            return False\n    return True\n\n\ndef _pollard_rho(n: int) -> int:\n    if n % 2 == 0:\n        return 2\n    if n % 3 == 0:\n        return 3\n    while True:\n        c = random.randrange(1, n)\n        f = lambda x: (x * x + c) % n\n        x = random.randrange(2, n)\n        y = x\n        d = 1\n        while d == 1:\n            x = f(x)\n            y = f(f(y))\n            d = math.gcd(abs(x - y), n)\n        if d != n:\n            return d\n\n\ndef _factor(n: int, out: list) -> None:\n    if n == 1:\n        return\n    if _is_prime(n):\n        out.append(n)\n        return\n    d = _pollard_rho(n)\n    _factor(d, out)\n    _factor(n // d, out)\n\n\ndef factorize(n: int) -> list[int]:\n    factors = []\n    if n is None or n < 2:\n        return factors\n    # trial division for small factors\n    for p in (2, 3, 5):\n        while n % p == 0:\n            factors.append(p)\n            n //= p\n    i = 7\n    limit = 10000\n    while i <= limit and i * i <= n:\n        while n % i == 0:\n            factors.append(i)\n            n //= i\n        i += 2\n    if n > 1:\n        if i * i > n:\n            factors.append(n)\n        else:\n            rest = []\n            _factor(n, rest)\n            factors.extend(rest)\n    factors.sort()\n    return factors",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:9:4: for loops prohibited"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69wjJGBzifDPrRfLAHB",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 292,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 797,
+            "output_tokens_details": {
+              "thinking_tokens": 71
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "import math\n\n\ndef smallest_divisor(n: int, lo: int, hi: int) -> int:\n    if hi - lo <= 0:\n        return 0\n    if hi - lo == 1:\n        return lo if n % lo == 0 else 0\n    mid: int = (lo + hi) // 2\n    a: int = smallest_divisor(n, lo, mid)\n    if a != 0:\n        return a\n    return smallest_divisor(n, mid, hi)\n\n\ndef factor_from(n: int, d: int) -> list[int]:\n    if n < 2:\n        return []\n    lim: int = math.floor(math.sqrt(n)) + 2\n    f: int = smallest_divisor(n, d, lim)\n    if f == 0:\n        return [n]\n    return [f] + factor_from(n // f, f)\n\n\ndef factorize(n: int) -> list[int]:\n    \"\"\" Return list of prime factors of given integer in the order from smallest to largest.\n    Each of the factors should be listed number of times corresponding to how many times it appeares in factorization.\n    Input number should be equal to the product of all factors\n    >>> factorize(8)\n    [2, 2, 2]\n    >>> factorize(25)\n    [5, 5]\n    >>> factorize(70)\n    [2, 5, 7]\n    \"\"\"\n    return factor_from(n, 2)",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69xKAjA4PJjnDfq3KAx",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4658,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 1409,
+            "output_tokens_details": {
+              "thinking_tokens": 977
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/26": {
+      "name": "remove_duplicates",
+      "question": "def remove_duplicates(numbers: list[int]) -> list[int]:\n    \"\"\" From a list of integers, remove all elements that occur more than once.\n    Keep order of elements left the same as in the input.\n    >>> remove_duplicates([1, 2, 3, 2, 4])\n    [1, 3, 4]\n    \"\"\"\n",
+      "signature": "def remove_duplicates(numbers: list[int]) -> list[int]:",
+      "python": {
+        "code": "from collections import Counter\n\n\ndef remove_duplicates(numbers: list[int]) -> list[int]:\n    \"\"\" From a list of integers, remove all elements that occur more than once.\n    Keep order of elements left the same as in the input.\n    >>> remove_duplicates([1, 2, 3, 2, 4])\n    [1, 3, 4]\n    \"\"\"\n    counts = Counter(numbers)\n    return [n for n in numbers if counts[n] == 1]",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:1:0: unknown module 'collections'"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69yGyY8o3cHGAjX3nJp",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 250,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 150,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def remove_duplicates(numbers: list[int]) -> list[int]:\n    \"\"\" From a list of integers, remove all elements that occur more than once.\n    Keep order of elements left the same as in the input.\n    >>> remove_duplicates([1, 2, 3, 2, 4])\n    [1, 3, 4]\n    \"\"\"\n    return [x for x in numbers if len([y for y in numbers if y == x]) == 1]",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69ySL7Gqhx1hpS8NNbv",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4616,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 385,
+            "output_tokens_details": {
+              "thinking_tokens": 246
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/27": {
+      "name": "flip_case",
+      "question": "def flip_case(string: str) -> str:\n    \"\"\" For a given string, flip lowercase characters to uppercase and uppercase to lowercase.\n    >>> flip_case('Hello')\n    'hELLO'\n    \"\"\"\n",
+      "signature": "def flip_case(string: str) -> str:",
+      "python": {
+        "code": "def flip_case(string: str) -> str:\n    \"\"\" For a given string, flip lowercase characters to uppercase and uppercase to lowercase.\n    >>> flip_case('Hello')\n    'hELLO'\n    \"\"\"\n    return string.swapcase()",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:6:11: values of type str have no attributes"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69yj5ffnoVeLUKuWG2U",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 205,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 84,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "from dataclasses import dataclass\n\n\ndef concat_range(parts: list[str], lo: int, hi: int) -> str:\n    if hi - lo <= 0:\n        return \"\"\n    if hi - lo == 1:\n        return parts[lo]\n    mid: int = (lo + hi) // 2\n    return concat_range(parts, lo, mid) + concat_range(parts, mid, hi)\n\n\ndef flip_case(string: str) -> str:\n    lower: str = \"abcdefghijklmnopqrstuvwxyz\"\n    upper: str = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\"\n    src: str = lower + upper\n    dst: str = upper + lower\n    mapping: dict[str, str] = {src[i]: dst[i] for i in range(0, len(src))}\n    parts: list[str] = [mapping[c] if c in src else c for c in string]\n    return concat_range(parts, 0, len(parts))",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69yyX5gVmTBrqpqzqdV",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4571,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 831,
+            "output_tokens_details": {
+              "thinking_tokens": 516
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    },
+    "HumanEval/28": {
+      "name": "concatenate",
+      "question": "def concatenate(strings: list[str]) -> str:\n    \"\"\" Concatenate list of strings into a single string\n    >>> concatenate([])\n    ''\n    >>> concatenate(['a', 'b', 'c'])\n    'abc'\n    \"\"\"\n",
+      "signature": "def concatenate(strings: list[str]) -> str:",
+      "python": {
+        "code": "def concatenate(strings: list[str]) -> str:\n    \"\"\" Concatenate list of strings into a single string\n    >>> concatenate([])\n    ''\n    >>> concatenate(['a', 'b', 'c'])\n    'abc'\n    \"\"\"\n    return ''.join(strings)",
+        "checker": {
+          "passed": false,
+          "error": "solution.py:8:11: values of type Literal[''] have no attributes"
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69zZPnotmMkWg7myMg2",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 218,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 94,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      },
+      "purepy": {
+        "code": "def concat_range(strings: list[str], lo: int, hi: int) -> str:\n    if hi - lo <= 0:\n        return \"\"\n    if hi - lo == 1:\n        return strings[lo]\n    mid: int = (lo + hi) // 2\n    return concat_range(strings, lo, mid) + concat_range(strings, mid, hi)\n\n\ndef concatenate(strings: list[str]) -> str:\n    \"\"\" Concatenate list of strings into a single string\n    >>> concatenate([])\n    ''\n    >>> concatenate(['a', 'b', 'c'])\n    'abc'\n    \"\"\"\n    return concat_range(strings, 0, len(strings))",
+        "checker": {
+          "passed": true,
+          "error": null
+        },
+        "official_tests": {
+          "passed": true,
+          "error": null
+        },
+        "generation": {
+          "status": "complete",
+          "stop_reason": "end_turn",
+          "response_id": "msg_011Cg69zppyVQy6L2GG7wv1a",
+          "response_model": "claude-opus-5-5",
+          "usage": {
+            "input_tokens": 4584,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 453,
+            "output_tokens_details": {
+              "thinking_tokens": 235
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          }
+        }
+      }
+    }
+  },
+  "experiment": {
+    "provider": "anthropic",
+    "api_url": "https://api.anthropic.com/v1",
+    "checker_commit": "68486f84cf80cbc6a4a954dc5d3953951e37b9e3",
+    "dataset_sha256": "b796127e635a67f93fb35c04f4cb03cf06f38c8072ee7cee8833d7bee06979ef",
+    "prompts_sha256": "6216d1961bc942e3f3caf559fd315de6cd4605add217d67142dce10f424afe51",
+    "request_settings": {
+      "max_tokens": 4096,
+      "thinking": {
+        "type": "adaptive"
+      },
+      "output_config": {
+        "effort": "high"
+      }
+    },
+    "samples_per_condition": 1,
+    "repair_rounds": 0,
+    "automatic_retries": 0
+  }
+}

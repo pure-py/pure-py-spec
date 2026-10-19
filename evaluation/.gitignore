@@ -1,3 +1,9 @@
 .cache/
+__pycache__/
 *.json.tmp
+.DS_Store
 .Rhistory
+.venv/
+results/
+.env
+.env.*
