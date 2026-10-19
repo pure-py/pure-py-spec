@@ -64,7 +64,8 @@ the result of a call\speconly{; if the statement completes without returning, th
 
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with $\Gamma \vdash e \synth
 \tau$, the expression evaluation judgement $\rho, e \Rightarrow r$ (\specfigrefTwo{eval-result}{eval-result-ctd}) says that $e$ evaluates to
-result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). The operators
+result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). \Added{A variable
+not bound in $\rho$ aborts with $\errName$\speconly{ (\ruleName{eval-var-unknown})}.} The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, \Added{and abort with $\errType$ when the first is
 neither \pyinline{True} nor \pyinline{False}\speconly{ (\ruleName{eval-and-nonbool}, \ruleName{eval-or-nonbool})},} and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, like the

@@ -677,6 +677,14 @@
 \flushleft \shadebox{$\rho, e \Rightarrow r$ (continued)}
 \begin{mathpar}
 \small
+\Added{\inferrule*[lab={\ruleName{eval-var-unknown}}]
+{
+  x \notin \dom(\rho)
+}
+{
+  \rho, x \Rightarrow \aborts{\errName}
+}}
+\and
 \inferrule*[lab={\ruleName{eval-attr-missing}}]
 {
   \rho, e \Rightarrow \val{\exObj{C}{\bind{\seq{x}}{\seq{v}}}} \\
