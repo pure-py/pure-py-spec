@@ -709,6 +709,15 @@
 \and
 \input{spec/rules/eval-call-nonfun}
 \and
+\Added{\inferrule*[lab={\ruleName{eval-and-type-error}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  v \notin \{ \pyinline{True}, \pyinline{False} \}
+}
+{
+  \rho, \exAnd{e}{e'} \Rightarrow \aborts{\errType}
+}}
+\and
 \inferrule*[lab={\ruleName{eval-attr-nonobject}}]
 {
   \rho, e \Rightarrow \val{v} \\
