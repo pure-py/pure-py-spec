@@ -61,7 +61,8 @@ $\Gamma \vdash s : R$, the statement evaluation judgement $\rho, s \Rightarrow o
 to outcome $o$ in $\rho$ (\specfigrefTwo{eval-block-outcome}{eval-block-fails}). \Added{An \pyinline{if} or
 \pyinline{assert} statement aborts with $\errExcluded$ when a condition evaluates to a value other than \pyinline{True}
 or \pyinline{False}\speconly{ (\ruleName{eval-if-nonbool}, \ruleName{eval-if-else-nonbool}, \ruleName{eval-assert-nonbool},
-\ruleName{eval-assert-msg-nonbool})}.} Top-level statements
+\ruleName{eval-assert-msg-nonbool})}, and a failing \pyinline{assert} statement also aborts with $\errExcluded$ when
+its message is not a string\speconly{ (\ruleName{eval-assert-msg-nonstr})}.} Top-level statements
 are evaluated by a separate judgement, $q, \rho, t \Rightarrow o$ (\specfigref{eval-top-level}), mirroring the static
 judgement (\specfigref{typing-top-level}): a sequence composes in the same way as a statement sequence, a mutual type region binds each of its names to $\typeEntry{\Gamma}(q, \seq{\chi}, i)$\speconly{ (\ruleName{eval-types})}, since
 class and alias entries are also values, and a plain statement is evaluated by the statement judgement\speconly{

@@ -200,6 +200,16 @@
   \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\errExcluded}
 }}
 \and
+\added{\inferrule*[lab={\ruleName{eval-assert-msg-nonstr}}]
+{
+  \rho, e \Rightarrow \val{\pyinline{False}} \\
+  \rho, e' \Rightarrow \val{v} \\
+  v \text{ not a string}
+}
+{
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\errExcluded}
+}}
+\and
 \inferrule*[lab={\ruleName{eval-if-fail}}]
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
