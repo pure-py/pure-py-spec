@@ -7,4 +7,5 @@
 \\
 \contains{\Sigma}(w', w) &{}= \val{\pyinline{True}} && \quad \text{if } w' = w_1 \concat w \concat w_2 \text{ for some } w_1, w_2 \\*
 \contains{\Sigma}(w', w) &{}= \val{\pyinline{False}} && \quad \text{if there are no such } w_1, w_2 \\*
+\added{\contains{\Sigma}(\exObj{\clsRange}{\bind{\seq{x}}{\seq{v}}}, v)} &\added{{}= \aborts{\errExcluded}} \\*
 \contains{\Sigma}(v, v') &{}= \aborts{\errType} && \quad \text{otherwise}

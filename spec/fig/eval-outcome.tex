@@ -818,7 +818,7 @@
   v \text{ neither loaded module nor object}
 }
 {
-  \rho, \exAttr{e}{x} \Rightarrow \aborts{\errAttr}
+  \rho, \exAttr{e}{x} \Rightarrow \aborts{\replaced{\errExcluded}{\errAttr\ }}
 }
 \and
 \added{\inferrule*[lab={\ruleName{eval-dict-unhashable}}]
