@@ -364,7 +364,9 @@ def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> VarConte
             return {}
         case PatTuple(patterns=ps):
             if has_list_values(Sigma, tau):
-                raise IllFormedModule(p, reasons.SequenceKindMismatch("tuple", tau))
+                raise IllFormedModule(p, reasons.SequenceKindMismatch("tuple", tau, "list"))
+            if has_range_values(Sigma, tau):
+                raise IllFormedModule(p, reasons.SequenceKindMismatch("tuple", tau, "range"))
             return bindings_at(
                 tau,
                 p,
@@ -377,7 +379,9 @@ def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> VarConte
             )
         case PatList(patterns=ps):
             if has_tuple_values(Sigma, tau):
-                raise IllFormedModule(p, reasons.SequenceKindMismatch("list", tau))
+                raise IllFormedModule(p, reasons.SequenceKindMismatch("list", tau, "tuple"))
+            if has_range_values(Sigma, tau):
+                raise IllFormedModule(p, reasons.SequenceKindMismatch("list", tau, "range"))
             return bindings_at(
                 tau,
                 p,
@@ -534,6 +538,10 @@ def has_tuple_values(Sigma: ClassTable, tau: Type) -> bool:
         isinstance(sigma, TupleType) or subtype(Sigma, TupleType(()), sigma)
         for sigma in disjuncts(tau)
     )
+
+
+def has_range_values(Sigma: ClassTable, tau: Type) -> bool:
+    return any(subtype(Sigma, ClassType(RANGE, ()), sigma) for sigma in disjuncts(tau))
 
 
 def pattern_bindings(deltas: list[VarContext], node: ast.AST) -> VarContext:

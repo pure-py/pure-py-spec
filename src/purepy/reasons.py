@@ -479,10 +479,10 @@ class PatternClassUndetermined:
 class SequenceKindMismatch:
     kind: str
     tau: Type
+    other: str
 
     def message(self) -> str:
-        other = "list" if self.kind == "tuple" else "tuple"
-        return f"{self.kind} pattern at {render(self.tau)}, which has {other} values"
+        return f"{self.kind} pattern at {render(self.tau)}, which has {self.other} values"
 
 
 @dataclass(frozen=True)
