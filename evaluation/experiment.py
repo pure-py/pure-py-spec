@@ -82,7 +82,7 @@ def sandbox_profile(directory, read_paths=()):
     extra = " ".join(f"(literal {json.dumps(str(path.resolve()))})" for path in read_paths)
     return f'''(version 1)
     (deny default)
-    (allow process-exec (literal {json.dumps(str(Path(sys.executable).resolve()))}))
+    (allow process-exec (subpath {json.dumps(str(runtime))}) (literal {json.dumps(str(Path(sys.executable).resolve()))}))
     (allow sysctl-read)
     (allow mach-lookup)
     (allow signal (target self))
