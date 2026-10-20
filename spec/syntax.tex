@@ -93,13 +93,15 @@ Contexts admit a non-commutative monoid of sequential composition $\Gamma \overr
 \added{up to type equivalence, }an idempotent commutative semigroup of parallel composition \replaced{$\Gamma \merge_{\Sigma} \Delta$}{$\merge$} (``merge''). \speconly{Together these form a
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
 distributivity does not hold.} Both are defined pointwise, by $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$
-for each operation $\cdot$, from operations on context entries: override is right-biased
-and has $\bot$ as both left and right unit, whereas merge has no unit, since a variable bound on one side
-only is possibly unassigned.\added{ Merge takes the join of the types of each variable, which differ only for pattern variables bound in
-several branches. Merge is undefined if any function has different schemes in the two contexts. The rules merge
-only the outcomes of branches, which necessarily agree on the scheme of each function, since a scope declares a
-function at most once.} Override is defined in the same way on any finite map with $\bot$ for
-undefined, such as an environment or class table.
+for each operation $\cdot$, from operations on context entries\replaced{. Override is right-biased and has $\bot$
+as both left and right unit, and is defined in the same way on any finite map with $\bot$ for undefined, such as an
+environment or class table. Merge has no unit, since a variable bound on one side only is possibly unassigned. A
+scope declares each name at most once, so the schemes of functions agree across branches. Merge is undefined if any
+function has different schemes in the two contexts. The types of declared variables also agree across branches,
+whereas a pattern binds a variable without a declaration, at a type which may differ between branches. Merge takes
+the join of the types of a variable.}{: override is right-biased and has $\bot$ as both left and right unit, whereas merge has no unit, since a
+variable bound on one side only is possibly unassigned. Override is defined in the same way on any finite map with
+$\bot$ for undefined, such as an environment or class table. }
 \begin{specdefinition}{Override and merge of context entries}
 \begin{defalignat}{5}
 \theta & {}\merge_{\added{\Sigma}} \theta && {}= \theta &&& \qquad \bot & {}\override \theta && {}= \theta \\
