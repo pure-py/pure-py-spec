@@ -96,8 +96,8 @@ distributivity does not hold.} Both are defined pointwise, by $(\Gamma \cdot \De
 for each operation $\cdot$, from operations on context entries\replaced{. Override is right-biased and has $\bot$
 as both left and right unit, and is defined in the same way on any finite map with $\bot$ for undefined, such as an
 environment or class table. Merge has no unit, since a variable defined in only one of the two contexts is possibly unassigned after the
-merge. A scope declares each name at most once, so the schemes of functions agree across branches; merge is undefined if any
-function has different schemes in the two contexts. The types of declared variables also agree across branches,
+merge. Merge of different schemes is undefined; a scope declares each name at most once, so the schemes of functions
+agree across branches and the case does not arise. The types of declared variables also agree across branches,
 whereas a pattern binds a variable without a declaration, at a type which may differ between branches. Merge takes
 the join of the types of a variable.}{: override is right-biased and has $\bot$ as both left and right unit, whereas merge has no unit, since a
 variable bound on one side only is possibly unassigned. Override is defined in the same way on any finite map with
@@ -106,7 +106,10 @@ $\bot$ for undefined, such as an environment or class table. }
 \begin{defalignat}{5}
 \theta & {}\merge_{\added{\Sigma}} \theta && {}= \theta &&& \qquad \bot & {}\override \theta && {}= \theta \\
 \added{\sigma} & \added{{}\merge_{\Sigma} \tau} && \added{{}= \joinTy{\Sigma}{\sigma}{\tau}} && \quad \added{\text{if } \sigma \neq \tau} & \qquad \theta & {}\override \bot && {}= \theta \\
-\theta & {}\merge_{\added{\Sigma}} \theta' && {}= \PU{\replaced{\joinTy{\Sigma}{\sigma}{\tau}}{\tau}} && \quad \text{if } \theta \neq \theta' \text{ and } \theta \in \set{\added{\sigma, \DU{\sigma}, \PU{\sigma}, \bot}}, \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}, \bot} & \qquad \theta & {}\override \theta' && {}= \theta' \quad \text{(otherwise)} \\
+\deleted{\theta} & \deleted{{}\merge \theta'} && \deleted{{}= \PU{\tau}} && \quad \deleted{\text{if } \theta \neq \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}, \bot}} & \qquad \theta & {}\override \theta' && {}= \theta' \quad \text{(otherwise)} \\
+\added{\theta} & \added{{}\merge_{\Sigma} \theta'} && \added{{}= \PU{\joinTy{\Sigma}{\sigma}{\tau}}} && \quad \added{\text{if } \theta \neq \theta' \text{ and } \theta \in \set{\DU{\sigma}, \PU{\sigma}}, \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}}} \\
+\added{\sigma} & \added{{}\merge_{\Sigma} \theta} && \added{{}= \PU{\joinTy{\Sigma}{\sigma}{\tau}}} && \quad \added{\text{if } \theta \in \set{\DU{\tau}, \PU{\tau}}} \\
+\added{\bot} & \added{{}\merge_{\Sigma} \theta} && \added{{}= \theta \merge_{\Sigma} \bot = \PU{\tau}} && \quad \added{\text{if } \theta \in \set{\tau, \DU{\tau}, \PU{\tau}}} \\
 \theta & {}\merge_{\added{\Sigma}} \theta' && {}= \PU{\scheme{\seq{\alpha}}{\tau}} && \quad \text{if } \theta \neq \theta' \in \set{\scheme{\seq{\alpha}}{\tau}, \PU{\scheme{\seq{\alpha}}{\tau}}, \bot}
 \end{defalignat}
 \end{specdefinition}
