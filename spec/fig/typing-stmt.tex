@@ -110,7 +110,7 @@
   \Sigma; \Gamma; \zeta \vdash s_i : R_i \quad (\forall i)
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \merge \ldots \merge R_{n+1} \: \merge \Assigns{\varnothing}
+  \Sigma; \Gamma; \zeta \vdash \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} : R_1 \merge_{\added{\Sigma}} \ldots \merge_{\added{\Sigma}} R_{n+1} \: \merge_{\added{\Sigma}} \Assigns{\varnothing}
 }
 \and
 \inferrule*[lab={\ruleName{if-else}}]
@@ -119,7 +119,7 @@
   \Sigma; \Gamma; \zeta \vdash s_i : R_i \quad (\forall i)
 }
 {
-  \Sigma; \Gamma; \zeta \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \merge \ldots \merge R_{n+2}
+  \Sigma; \Gamma; \zeta \vdash \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} : R_1 \merge_{\added{\Sigma}} \ldots \merge_{\added{\Sigma}} R_{n+2}
 }
 \and
 \inferrule*[lab={\ruleName{seq}}]

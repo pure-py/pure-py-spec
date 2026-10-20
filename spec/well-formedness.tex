@@ -252,12 +252,12 @@ unassigned or possibly unassigned after the statement.
 \specinput{spec/fig/pattern-matching/typing-cases}
 \specinput{spec/fig/typing-top-level}
 
-Context operations $\override$ and $\merge$ lift to a right semiring over static outcomes $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge$ and zero for $\override$.
+Context operations $\override$ and \replaced{$\merge_{\Sigma}$}{$\merge$} lift to a right semiring over static outcomes $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for \replaced{$\merge_{\Sigma}$}{$\merge$} and zero for $\override$.
 
 \begin{definition}[Override and merge on static outcomes]
 \begin{defalign}
-\Assigns{\Delta} \merge \Assigns{\Delta'} & = \Assigns{\Delta \merge \Delta'} \\
-R \merge \Returns = \Returns \merge R & = R \\
+\Assigns{\Delta} \merge_{\added{\Sigma}} \Assigns{\Delta'} & = \Assigns{\Delta \merge_{\added{\Sigma}} \Delta'} \\
+R \merge_{\added{\Sigma}} \Returns = \Returns \merge_{\added{\Sigma}} R & = R \\
 \\
 \Assigns{\Delta} \override \Assigns{\Delta'} & = \Assigns{\Delta \override \Delta'} \\
 R \override \Returns = \Returns \override R & = \Returns
@@ -270,7 +270,7 @@ The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\G
 optional return type $\zeta$, statement $s$ has static outcome $R$ (\specfigref{typing-stmt}); every rule passes $\zeta$ down unchanged.
 A sequence $s\;s'$\speconly{ (\ruleName{seq})} types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
 by $s$. A conditional combines its
-branches with $\merge$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch\speconly{ (\ruleName{if}, \ruleName{if-else})}.
+branches with \replaced{$\merge_{\Sigma}$}{$\merge$}, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch\speconly{ (\ruleName{if}, \ruleName{if-else})}.
 \speconly{A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
 \pyinline{return} requires $\tau$ to be equivalent to \pyinline{None} (\ruleName{return}, \ruleName{return-none}). \replaced{An expression statement is typed by one of two rules. If its expression synthesises a type, the
