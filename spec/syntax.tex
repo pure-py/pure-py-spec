@@ -95,20 +95,15 @@ an idempotent commutative semigroup\added{, up to type equivalence,} of parallel
 distributivity does not hold.} Both are defined pointwise, by $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$
 for each operation $\cdot$, from operations on context entries: override is right-biased
 and has $\bot$ as both left and right unit, whereas merge has no unit, since a variable bound on one side
-only is possibly unassigned.\added{ Merge is defined on contexts of variables and functions that give the same scheme
-to every function bound in both, as is the case for the outcomes of the branches of a statement, since a scope
-declares each name at most once. On the types of a variable, merge takes their join in $\Sigma$. A declared
-variable has its declared type in every entry, so the join matters only for a pattern variable bound in more than
-one branch, for which it acts as an implicit declaration.} Override is defined in the same way on any finite map with $\bot$ for
+only is possibly unassigned.\added{ Merge joins the types of a variable, which differ only for a pattern variable bound in several
+branches, and is undefined on two functions of different schemes, which a scope never binds.} Override is defined in the same way on any finite map with $\bot$ for
 undefined, such as an environment or class table.
 \begin{specdefinition}{Override and merge of context entries}
 \begin{defalignat}{5}
 \theta & {}\merge_{\added{\Sigma}} \theta && {}= \theta &&& \qquad \bot & {}\override \theta && {}= \theta \\
-\theta & {}\merge_{\added{\Sigma}} \theta' && {}= \PU{\tau} && \quad \text{if } \theta \neq \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}, \bot} & \qquad \theta & {}\override \bot && {}= \theta \\
-\theta & {}\merge_{\added{\Sigma}} \theta' && {}= \PU{\scheme{\seq{\alpha}}{\tau}} && \quad \text{if } \theta \neq \theta' \in \set{\scheme{\seq{\alpha}}{\tau}, \PU{\scheme{\seq{\alpha}}{\tau}}, \bot} & \qquad \theta & {}\override \theta' && {}= \theta' \quad \text{(otherwise)} \\
-\added{\sigma} & \added{{}\merge_{\Sigma} \tau} && \added{{}= \joinTy{\Sigma}{\sigma}{\tau}} && \quad \added{\text{if } \sigma \neq \tau} \\
-\added{\theta} & \added{{}\merge_{\Sigma} \theta'} && \added{{}= \PU{\joinTy{\Sigma}{\sigma}{\tau}}} && \quad \rlap{\added{$\text{if } \theta \in \set{\sigma, \DU{\sigma}, \PU{\sigma}}, \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}}$,}} \\
-& && && \quad \rlap{\added{$\phantom{\text{if }} \sigma \neq \tau \text{ and } \theta, \theta' \text{ not both types}$}}
+\added{\sigma} & \added{{}\merge_{\Sigma} \tau} && \added{{}= \joinTy{\Sigma}{\sigma}{\tau}} && \quad \added{\text{if } \sigma \neq \tau} & \qquad \theta & {}\override \bot && {}= \theta \\
+\theta & {}\merge_{\added{\Sigma}} \theta' && {}= \PU{\replaced{\joinTy{\Sigma}{\sigma}{\tau}}{\tau}} && \quad \text{if } \theta \neq \theta' \text{ and } \theta \in \set{\added{\sigma, \DU{\sigma}, \PU{\sigma}, \bot}}, \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}, \bot} & \qquad \theta & {}\override \theta' && {}= \theta' \quad \text{(otherwise)} \\
+\theta & {}\merge_{\added{\Sigma}} \theta' && {}= \PU{\scheme{\seq{\alpha}}{\tau}} && \quad \text{if } \theta \neq \theta' \in \set{\scheme{\seq{\alpha}}{\tau}, \PU{\scheme{\seq{\alpha}}{\tau}}, \bot}
 \end{defalignat}
 \end{specdefinition}
 
