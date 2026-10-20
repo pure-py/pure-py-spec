@@ -753,6 +753,17 @@
   \rho, \exCall{e}{\seq{e}} \Rightarrow \aborts{\errType}
 }
 \and
+\added{\inferrule*[lab={\ruleName{eval-constr-arity}}]
+{
+  e \in \set{q, \exSubscript{q}{\seq{\psi}}} \\
+  \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \val{v_1 \cons \ldots \cons v_{n+m}} \\
+  \resolve(\rho, q) = \Type{C} \\
+  \fieldMap{\Sigma}(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m})) \text{ undefined}
+}
+{
+  \rho, \exCall{e}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \aborts{\errType}
+}}
+\and
 \input{spec/rules/eval-call-nonfun}
 \and
 \Added{\inferrule*[lab={\ruleName{eval-and-nonbool}}]
