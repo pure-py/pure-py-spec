@@ -29,9 +29,10 @@ to sequential composition of static outcomes:
 \input{spec/fig/eval-values}
 
 A \emph{termination
-kind} $\kappa$ records how a run ends; all but $\errExit{n}$ and $\errUndef$ are named after the exceptions raised by the same program
+kind} $\kappa$ records how a run ends; all but \replaced{$\errExit{n}$, $\errUndef$ and $\errWrong$}{$\errExit{n}$ and $\errUndef$ } are named after the exceptions raised by the same program
 under Python in the same circumstances. A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, such as a
-comparison of two functions (\secref{no-coercions}). A primitive
+comparison of two functions (\secref{no-coercions}). \Added{A run aborts with $\errWrong$ when it reaches an operation ruled
+out by typing and allowed by Python, such as a condition which evaluates to a value other than a Boolean.} A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a function from
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
 $\primFn(\seq{u})$.
@@ -66,10 +67,10 @@ For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with 
 \tau$, the expression evaluation judgement $\rho, e \Rightarrow r$ (\specfigrefTwo{eval-result}{eval-result-ctd}) says that $e$ evaluates to
 result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). \Added{A variable
 not bound in $\rho$ aborts with $\errName$\speconly{ (\ruleName{eval-var-unknown})}.} The operators
-\pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, \Added{and abort with $\errType$ when the first is
+\pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, \Added{and abort with $\errWrong$ when the first is
 neither \pyinline{True} nor \pyinline{False}\speconly{ (\ruleName{eval-and-nonbool}, \ruleName{eval-or-nonbool})},} and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, like the
-\pyinline{if} statement\speconly{ (\ruleName{eval-if})}\Added{, and aborts with $\errType$ otherwise\speconly{
+\pyinline{if} statement\speconly{ (\ruleName{eval-if})}\Added{, and aborts with $\errWrong$ otherwise\speconly{
 (\ruleName{eval-cond-nonbool})}}. A comprehension evaluates its body once for each binding produced by its qualifiers, and
 concatenates the results; a generator draws its bindings from the elements of a value, given by the auxiliary
 function $\iterOp$\speconly{ (\S\ref{aux:iter})}: the elements of a
