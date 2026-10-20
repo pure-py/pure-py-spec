@@ -1,4 +1,11 @@
 \matchOp{\Sigma}(\rho, \patConstr{q}{a}, \exObj{D}{\bind{\seq{y}}{\seq{v}}}) &{}= \matchOp{\Sigma}(\rho, p_1, v_{j_1}) \override \ldots \override \matchOp{\Sigma}(\rho, p_n, v_{j_n}) \\*
 &\qquad \text{if } \resolve(\rho, q) = \Type{C} \text{ and } C \in \ancestors{\Sigma}(D) \\*
 &\qquad \text{where } \fieldMap{\Sigma}(C, a) = \set{\bind{x_1}{p_1}, \ldots, \bind{x_n}{p_n}} \\*
-&\qquad \text{and } x_i = y_{j_i} \text{ for each } i
+&\qquad \text{and } x_i = y_{j_i} \text{ for each } i \\*
+\added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, \exObj{D}{\bind{\seq{y}}{\seq{v}}})} &\added{{}= \errType} \\*
+&\added{\qquad \text{if } \resolve(\rho, q) = \Type{C} \text{ and } C \in \ancestors{\Sigma}(D),} \\*
+&\added{\qquad \text{and } a \text{ has more positional sub-patterns than } C \text{ has fields,}} \\*
+&\added{\qquad \text{or two sub-patterns for one field}} \\*
+\added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, \exObj{D}{\bind{\seq{y}}{\seq{v}}})} &\added{{}= \errExcluded} \\*
+&\added{\qquad \text{if } \resolve(\rho, q) = \Type{C} \text{ and } C \in \ancestors{\Sigma}(D),} \\*
+&\added{\qquad \text{and } \fieldMap{\Sigma}(C, a) \text{ otherwise undefined}}

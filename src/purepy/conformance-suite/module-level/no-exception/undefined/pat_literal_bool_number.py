@@ -1,4 +1,4 @@
-# rule: eval-match-undef
+# rule: eval-match-abort
 x: object = True
 match x:
     case 1:
