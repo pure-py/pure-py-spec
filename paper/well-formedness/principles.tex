@@ -116,7 +116,7 @@ scope after the \pyinline{match} statement. \PurePy follows: each case is treate
 assignment of the variables it binds, which must not be declared already. The set of variables a pattern $p$ introduces is $\binds(p)$; the
 \ruleName{match} rule checks each body in a context in which they are definitely assigned, and combines
 the cases with $\merge$ as the \ruleName{if} rules do, so a variable is definitely assigned after the match
-only if every case binds it or returns.\added{ After the match, a variable bound by several cases has the join of its
+only if every case binds it or returns.\added{ After the match, variables bound by several cases have the join of their
 types in those cases, as if declared at that join.} A match whose cases leave some value of the scrutinee type
 unmatched may fall through, as in the program on the left below. Within a pattern the variables must be distinct,
 as in Python. Every case must also be reachable: the matching judgement rejects a case that can match only values

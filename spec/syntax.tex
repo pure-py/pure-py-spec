@@ -90,13 +90,15 @@ the field annotations and base class of the definition under the context given b
 \label{sec:context-operations}
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
-an idempotent commutative semigroup\added{, up to type equivalence,} of parallel composition \replaced{$\Gamma \merge_{\Sigma} \Delta$}{$\merge$} (``merge''). \speconly{Together these form a
+\added{up to type equivalence, }an idempotent commutative semigroup of parallel composition \replaced{$\Gamma \merge_{\Sigma} \Delta$}{$\merge$} (``merge''). \speconly{Together these form a
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
 distributivity does not hold.} Both are defined pointwise, by $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$
 for each operation $\cdot$, from operations on context entries: override is right-biased
 and has $\bot$ as both left and right unit, whereas merge has no unit, since a variable bound on one side
-only is possibly unassigned.\added{ Merge joins the types of each variable, which differ only for pattern variables bound in several
-branches. Merge is undefined on contexts giving any function different schemes, since a scope declares a function at most once.} Override is defined in the same way on any finite map with $\bot$ for
+only is possibly unassigned.\added{ Merge takes the join of the types of each variable, which differ only for pattern variables bound in
+several branches. Merge is undefined when some function has different schemes in the two contexts. The rules merge
+only the outcomes of the branches of a statement, which agree on the scheme of each function, since a scope declares a
+function at most once.} Override is defined in the same way on any finite map with $\bot$ for
 undefined, such as an environment or class table.
 \begin{specdefinition}{Override and merge of context entries}
 \begin{defalignat}{5}
