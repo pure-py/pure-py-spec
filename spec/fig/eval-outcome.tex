@@ -723,7 +723,7 @@
   v \notin \{ \pyinline{True}, \pyinline{False} \}
 }
 {
-  \rho, \exAnd{e}{e'} \Rightarrow \aborts{\errWrong}
+  \rho, \exAnd{e}{e'} \Rightarrow \aborts{\errExcluded}
 }}
 \and
 \Added{\inferrule*[lab={\ruleName{eval-or-nonbool}}]
@@ -732,7 +732,7 @@
   v \notin \{ \pyinline{True}, \pyinline{False} \}
 }
 {
-  \rho, \exOr{e}{e'} \Rightarrow \aborts{\errWrong}
+  \rho, \exOr{e}{e'} \Rightarrow \aborts{\errExcluded}
 }}
 \and
 \Added{\inferrule*[lab={\ruleName{eval-cond-nonbool}}]
@@ -741,7 +741,7 @@
   v \notin \{ \pyinline{True}, \pyinline{False} \}
 }
 {
-  \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow \aborts{\errWrong}
+  \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow \aborts{\errExcluded}
 }}
 \and
 \inferrule*[lab={\ruleName{eval-attr-nonobject}}]
