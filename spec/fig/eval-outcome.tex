@@ -182,6 +182,24 @@
   \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\kappa}
 }
 \and
+\added{\inferrule*[lab={\ruleName{eval-assert-nonbool}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  v \notin \set{\pyinline{True}, \pyinline{False}}
+}
+{
+  \rho, \exAssert{e} \Rightarrow \aborts{\errExcluded}
+}}
+\and
+\added{\inferrule*[lab={\ruleName{eval-assert-msg-nonbool}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  v \notin \set{\pyinline{True}, \pyinline{False}}
+}
+{
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\errExcluded}
+}}
+\and
 \inferrule*[lab={\ruleName{eval-if-fail}}]
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
@@ -199,6 +217,26 @@
 {
   \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow \aborts{\kappa}
 }
+\and
+\added{\inferrule*[lab={\ruleName{eval-if-nonbool}}]
+{
+  \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
+  \rho, e_i \Rightarrow \val{v} \\
+  v \notin \set{\pyinline{True}, \pyinline{False}}
+}
+{
+  \rho, \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\errExcluded}
+}}
+\and
+\added{\inferrule*[lab={\ruleName{eval-if-else-nonbool}}]
+{
+  \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
+  \rho, e_i \Rightarrow \val{v} \\
+  v \notin \set{\pyinline{True}, \pyinline{False}}
+}
+{
+  \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow \aborts{\errExcluded}
+}}
 \and
 \inferrule*[lab={\ruleName{eval-match-fail}}]
 {
@@ -720,7 +758,7 @@
 \Added{\inferrule*[lab={\ruleName{eval-and-nonbool}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  v \notin \{ \pyinline{True}, \pyinline{False} \}
+  v \notin \set{\pyinline{True}, \pyinline{False}}
 }
 {
   \rho, \exAnd{e}{e'} \Rightarrow \aborts{\errExcluded}
@@ -729,7 +767,7 @@
 \Added{\inferrule*[lab={\ruleName{eval-or-nonbool}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  v \notin \{ \pyinline{True}, \pyinline{False} \}
+  v \notin \set{\pyinline{True}, \pyinline{False}}
 }
 {
   \rho, \exOr{e}{e'} \Rightarrow \aborts{\errExcluded}
@@ -738,7 +776,7 @@
 \Added{\inferrule*[lab={\ruleName{eval-cond-nonbool}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  v \notin \{ \pyinline{True}, \pyinline{False} \}
+  v \notin \set{\pyinline{True}, \pyinline{False}}
 }
 {
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow \aborts{\errExcluded}
@@ -794,6 +832,15 @@
 {
   \rho, \qualGuard{e} \cons \seq{g} \Rightarrow \aborts{\kappa}
 }
+\and
+\added{\inferrule*[lab={\ruleName{eval-qual-guard-nonbool}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  v \notin \set{\pyinline{True}, \pyinline{False}}
+}
+{
+  \rho, \qualGuard{e} \cons \seq{g} \Rightarrow \aborts{\errExcluded}
+}}
 \and
 \inferrule*[lab={\ruleName{eval-qual-generator}}]
 {
