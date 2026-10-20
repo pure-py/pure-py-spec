@@ -316,7 +316,8 @@
 \small
 \inferrule*[lab={\ruleName{eval-var}}]
 {
-  \bind{x}{v} \in \rho
+  \bind{x}{v} \in \rho\added{ \\
+  v \neq \Unbound}
 }
 {
   \rho, x \Rightarrow \val{v}
@@ -718,6 +719,14 @@
 \Added{\inferrule*[lab={\ruleName{eval-var-unknown}}]
 {
   x \notin \dom(\rho)
+}
+{
+  \rho, x \Rightarrow \aborts{\errName}
+}}
+\and
+\added{\inferrule*[lab={\ruleName{eval-var-unbound}}]
+{
+  \bind{x}{\Unbound} \in \rho
 }
 {
   \rho, x \Rightarrow \aborts{\errName}
