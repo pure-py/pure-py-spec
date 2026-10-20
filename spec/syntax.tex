@@ -96,7 +96,7 @@ distributivity does not hold.} Both are defined pointwise, by $(\Gamma \cdot \De
 for each operation $\cdot$, from operations on context entries\replaced{. Override is right-biased and has $\bot$
 as both left and right unit, and is defined in the same way on any finite map with $\bot$ for undefined, such as an
 environment or class table. Merge has no unit, since a variable bound on one side only is possibly unassigned. A
-scope declares each name at most once, so the schemes of functions agree across branches. Merge is undefined if any
+scope declares each name at most once, so the schemes of functions agree across branches; merge is undefined if any
 function has different schemes in the two contexts. The types of declared variables also agree across branches,
 whereas a pattern binds a variable without a declaration, at a type which may differ between branches. Merge takes
 the join of the types of a variable.}{: override is right-biased and has $\bot$ as both left and right unit, whereas merge has no unit, since a
