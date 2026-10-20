@@ -5,7 +5,8 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.29\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Construct & Python & Exclusion & Mechanism \\
-Non-Boolean test of \pyinline{if} or \pyinline{assert} & Coerced to \pyinline{bool} & Static & Test checked against \pyinline{bool} (\ruleName{if}, \ruleName{assert}) \\\rowgap
+Non-Boolean test of \pyinline{if} or \pyinline{assert}\added{, conditional expression, comprehension guard, first operand of \pyinline{and} or \pyinline{or}, or operand of \pyinline{not}} & Coerced to \pyinline{bool} & Static & Test checked against \pyinline{bool} (\ruleName{if}, \ruleName{assert}\added{, \ruleName{cond}, \ruleName{qual-guard}, \ruleName{and}, \ruleName{or}, \ruleName{unop}}) \\\rowgap
+\added{Boolean operand of arithmetic or ordering} & \added{Treated as the integer 0 or 1} & \added{Static} & \added{\pyinline{bool} not a subtype of \pyinline{int} (\ruleName{binop}, \ruleName{unop})} \\\rowgap
 List pattern at tuple, or tuple pattern at list & Matches, since list and tuple patterns both match lists and tuples & Static & Pattern does not match any value; case unreachable (\ruleName{check-list-none}, \ruleName{check-tuple-none}) \\\rowgap
 Positional class pattern with fewer sub-patterns than fields & Matches, ignoring remaining fields & Static & Arguments cover fields exactly ($\fieldMap{\Sigma}$) \\\rowgap
 Non-string dictionary key & Any hashable value accepted, with \pyinline{1}, \pyinline{1.0} and \pyinline{True} equivalent as keys & Syntactic in patterns, static in expressions & Keys are string literals in patterns, of type \pyinline{str} in expressions (\ruleName{dict}) \\\rowgap
