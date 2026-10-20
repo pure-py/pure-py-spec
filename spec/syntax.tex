@@ -96,7 +96,7 @@ distributivity does not hold.} Both are defined pointwise, by $(\Gamma \cdot \De
 for each operation $\cdot$, from operations on context entries: override is right-biased
 and has $\bot$ as both left and right unit, whereas merge has no unit, since a variable bound on one side
 only is possibly unassigned.\added{ Merge joins the types of a variable, which differ only for a pattern variable bound in several
-branches, and is undefined on two functions of different schemes, which a scope never binds.} Override is defined in the same way on any finite map with $\bot$ for
+branches. It is undefined on two functions of different schemes, since a scope declares a function at most once.} Override is defined in the same way on any finite map with $\bot$ for
 undefined, such as an environment or class table.
 \begin{specdefinition}{Override and merge of context entries}
 \begin{defalignat}{5}
