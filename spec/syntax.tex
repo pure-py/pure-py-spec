@@ -98,7 +98,7 @@ as both left and right unit, and is defined in the same way on any finite map wi
 environment or class table. Merge has no unit, since a variable defined in only one of the two contexts is possibly unassigned after the
 merge. Merge of different schemes is undefined; a scope declares each name at most once, so the schemes of functions
 agree across branches and the case does not arise. The types of declared variables also agree across branches,
-but a pattern binds a variable without a declared type, at a type which may differ between branches. Merge therefore
+but patterns bind variables without declared types, at types which may differ between branches. Merge therefore
 takes the join of the two types.}{: override is right-biased and has $\bot$ as both left and right unit, whereas merge has no unit, since a
 variable bound on one side only is possibly unassigned. Override is defined in the same way on any finite map with
 $\bot$ for undefined, such as an environment or class table. }
