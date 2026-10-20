@@ -310,7 +310,7 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
             check_expr(e, Primitive.BOOL, mod_ctx)
             branches = [check_body(ss, mod_ctx, returns)]
             branches.append(check_body(ss_, mod_ctx, returns) if ss_ else Assigns({}))
-            return merge_outcomes(branches, {x for x, _ in declares(s)})
+            return merge_outcomes(mod_ctx.Sigma, branches, {x for x, _ in declares(s)})
         case ast.Assert(test=e, msg=e_):
             assert_false = isinstance(e, ast.Constant) and e.value is False
             if not assert_false:
@@ -349,7 +349,9 @@ def check_match_cases(
         else None,
     )
     return merge_outcomes(
-        branches + ([unmatched] if rest != Primitive.NEVER else []), {x for x, _ in declares(match)}
+        mod_ctx.Sigma,
+        branches + ([unmatched] if rest != Primitive.NEVER else []),
+        {x for x, _ in declares(match)},
     )
 
 

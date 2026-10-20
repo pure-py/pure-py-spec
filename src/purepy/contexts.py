@@ -212,20 +212,34 @@ def predefined_context(q: Name) -> Context:
 
 
 def merge_entry(
-    theta: ContextEntry | None, theta_: ContextEntry | None, declared_in_branch: bool
+    Sigma: ClassTable,
+    theta: ContextEntry | None,
+    theta_: ContextEntry | None,
+    declared_in_branch: bool,
 ) -> ContextEntry:
+    from .subtyping import join
+
     if theta == theta_:
         assert theta is not None
         return theta
-    assert theta is None or theta_ is None or declared_type_of(theta) == declared_type_of(theta_)
-    present = theta if theta is not None else theta_
-    assert present is not None
-    return PU(declared_type_of(present), declared_in_branch)
+    if theta is None or theta_ is None:
+        present = theta if theta is not None else theta_
+        assert present is not None
+        return PU(declared_type_of(present), declared_in_branch)
+    sigma, tau = declared_type_of(theta), declared_type_of(theta_)
+    if isinstance(sigma, TypeScheme) or isinstance(tau, TypeScheme):
+        assert sigma == tau
+        return PU(sigma, declared_in_branch)
+    if isinstance(theta, (DU, PU)) or isinstance(theta_, (DU, PU)):
+        return PU(join(Sigma, sigma, tau), declared_in_branch)
+    return join(Sigma, sigma, tau)
 
 
-def merge_context(delta: Context, delta_: Context, declared: set[Var]) -> Context:
+def merge_context(
+    Sigma: ClassTable, delta: Context, delta_: Context, declared: set[Var]
+) -> Context:
     return {
-        x: merge_entry(delta.get(x), delta_.get(x), x in declared)
+        x: merge_entry(Sigma, delta.get(x), delta_.get(x), x in declared)
         for x in delta.keys() | delta_.keys()
     }
 
@@ -241,22 +255,22 @@ def declared_type_of(theta: ContextEntry) -> Type | TypeScheme:
             return theta
 
 
-def merge_outcomes(rs: list[StaticOutcome], declared: set[Var]) -> StaticOutcome:
+def merge_outcomes(Sigma: ClassTable, rs: list[StaticOutcome], declared: set[Var]) -> StaticOutcome:
     assigns_branches = [r for r in rs if isinstance(r, Assigns)]
     if len(assigns_branches) == 0:
         return Returns()
     delta = assigns_branches[0].delta
     mypy_only = [r.mypy_only for r in assigns_branches]
     return Assigns(
-        fold_merge(delta, assigns_branches[1:], declared),
+        fold_merge(Sigma, delta, assigns_branches[1:], declared),
         mypy_only[0] if None not in mypy_only else None,
     )
 
 
-def fold_merge(delta: Context, rs: list[Assigns], declared: set[Var]) -> Context:
+def fold_merge(Sigma: ClassTable, delta: Context, rs: list[Assigns], declared: set[Var]) -> Context:
     if len(rs) == 0:
         return delta
-    return fold_merge(merge_context(delta, rs[0].delta, declared), rs[1:], declared)
+    return fold_merge(Sigma, merge_context(Sigma, delta, rs[0].delta, declared), rs[1:], declared)
 
 
 def override_context(gamma: Context, delta: Context) -> Context:
