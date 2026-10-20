@@ -21,12 +21,14 @@
       "python": {
         "code": "def maxFreeTime(eventTime: int, k: int, startTime: list[int], endTime: list[int]) -> int:\n    n = len(startTime)\n\n    gaps = [0] * (n + 1)\n    gaps[0] = startTime[0]\n    for i in range(1, n):\n        gaps[i] = startTime[i] - endTime[i - 1]\n    gaps[n] = eventTime - endTime[-1]\n\n    window = k + 1\n    cur = sum(gaps[:window])\n    best = cur\n\n    for i in range(window, n + 1):\n        cur += gaps[i] - gaps[i - window]\n        if cur > best:\n            best = cur\n\n    return best",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": false,
+          "error": "solution.py:5:4: item assignment prohibited"
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null,
+          "tests_passed": 43,
+          "tests_total": 43
         },
         "generation": {
           "status": "complete",
@@ -52,12 +54,14 @@
       "purepy": {
         "code": "def prefix_sums(xs: list[int], lo: int, hi: int) -> tuple[int, list[int]]:\n    if hi == lo:\n        return (0, [0])\n    if hi - lo == 1:\n        return (xs[lo], [0, xs[lo]])\n    mid: int = (lo + hi) // 2\n    left_pair: tuple[int, list[int]] = prefix_sums(xs, lo, mid)\n    left_total: int = left_pair[0]\n    left_pref: list[int] = left_pair[1]\n    right_pair: tuple[int, list[int]] = prefix_sums(xs, mid, hi)\n    right_total: int = right_pair[0]\n    right_pref: list[int] = right_pair[1]\n    shifted_tail: list[int] = [left_total + right_pref[t] for t in range(1, len(right_pref))]\n    new_total: int = left_total + right_total\n    new_pref: list[int] = left_pref + shifted_tail\n    return (new_total, new_pref)\n\n\ndef max_window_sum(prefix: list[int], w: int, lo: int, hi: int) -> int:\n    if hi == lo:\n        return 0\n    if hi - lo == 1:\n        t: int = lo\n        return prefix[t + w] - prefix[t]\n    mid: int = (lo + hi) // 2\n    a: int = max_window_sum(prefix, w, lo, mid)\n    b: int = max_window_sum(prefix, w, mid, hi)\n    if a >= b:\n        return a\n    return b\n\n\ndef maxFreeTime(eventTime: int, k: int, startTime: list[int], endTime: list[int]) -> int:\n    n: int = len(startTime)\n    gaps: list[int] = [startTime[0]] + [startTime[i] - endTime[i - 1] for i in range(1, n)] + [eventTime - endTime[n - 1]]\n    m: int = n + 1\n    w: int = k + 1\n    prefix_pair: tuple[int, list[int]] = prefix_sums(gaps, 0, m)\n    prefix: list[int] = prefix_pair[1]\n    return max_window_sum(prefix, w, 0, m - w + 1)",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null,
+          "tests_passed": 43,
+          "tests_total": 43
         },
         "generation": {
           "status": "complete",
@@ -99,12 +103,14 @@
       "python": {
         "code": "from bisect import bisect_left\n\ndef _lis_len(points):\n    points.sort(key=lambda p: (p[0], -p[1]))\n    tails = []\n    for _, y in points:\n        pos = bisect_left(tails, y)\n        if pos == len(tails):\n            tails.append(y)\n        else:\n            tails[pos] = y\n    return len(tails)\n\n\ndef maxPathLength(coordinates: list[list[int]], k: int) -> int:\n    px, py = coordinates[k]\n\n    left = [(x, y) for x, y in coordinates if x < px and y < py]\n    right = [(x, y) for x, y in coordinates if x > px and y > py]\n\n    return _lis_len(left) + 1 + _lis_len(right)",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": false,
+          "error": "solution.py:3:0: unannotated parameter prohibited"
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null,
+          "tests_passed": 42,
+          "tests_total": 42
         },
         "generation": {
           "status": "complete",
@@ -130,12 +136,14 @@
       "purepy": {
         "code": "from dataclasses import dataclass\nfrom typing import Callable\n\n@dataclass\nclass Node:\n    key: int\n    val: int\n    left: object\n    right: object\n    height: int\n    best: int\n\ntype State = tuple[object, int]\ntype Processor = Callable[[State], State]\n\ndef max_int(a: int, b: int) -> int:\n    if a >= b:\n        return a\n    return b\n\ndef tree_height(tree: object) -> int:\n    match tree:\n        case None:\n            return 0\n        case Node(_, _, _, _, h, _):\n            return h\n        case _:\n            return 0\n\ndef tree_best(tree: object) -> int:\n    match tree:\n        case None:\n            return 0\n        case Node(_, _, _, _, _, b):\n            return b\n        case _:\n            return 0\n\ndef make_node(key: int, val: int, left: object, right: object) -> object:\n    h: int = 1 + max_int(tree_height(left), tree_height(right))\n    b: int = max_int(val, max_int(tree_best(left), tree_best(right)))\n    return Node(key, val, left, right, h, b)\n\ndef balance(node: object) -> object:\n    match node:\n        case Node(k, v, left, right, _, _):\n            hl: int = tree_height(left)\n            hr: int = tree_height(right)\n            if hl - hr > 1:\n                match left:\n                    case Node(lk, lv, ll, lr, _, _):\n                        if tree_height(ll) >= tree_height(lr):\n                            return make_node(lk, lv, ll, make_node(k, v, lr, right))\n                        else:\n                            match lr:\n                                case Node(lrk, lrv, lrl, lrr, _, _):\n                                    return make_node(lrk, lrv, make_node(lk, lv, ll, lrl), make_node(k, v, lrr, right))\n                                case _:\n                                    return node\n                    case _:\n                        return node\n            elif hr - hl > 1:\n                match right:\n                    case Node(rk, rv, rl, rr, _, _):\n                        if tree_height(rr) >= tree_height(rl):\n                            return make_node(rk, rv, make_node(k, v, left, rl), rr)\n                        else:\n                            match rl:\n                                case Node(rlk, rlv, rll, rlr, _, _):\n                                    return make_node(rlk, rlv, make_node(k, v, left, rll), make_node(rk, rv, rlr, rr))\n                                case _:\n                                    return node\n                    case _:\n                        return node\n            return node\n        case _:\n            return node\n\ndef insert(tree: object, key: int, val: int) -> object:\n    match tree:\n        case None:\n            return make_node(key, val, None, None)\n        case Node(k, v, left, right, _, _):\n            if key == k:\n                return make_node(k, max_int(v, val), left, right)\n            elif key < k:\n                new_left: object = insert(left, key, val)\n                return balance(make_node(k, v, new_left, right))\n            else:\n                new_right: object = insert(right, key, val)\n                return balance(make_node(k, v, left, new_right))\n        case _:\n            return tree\n\ndef query(tree: object, y: int) -> int:\n    match tree:\n        case None:\n            return 0\n        case Node(k, v, left, right, _, _):\n            if y <= k:\n                return query(left, y)\n            else:\n                return max_int(max_int(v, tree_best(left)), query(right, y))\n        case _:\n            return 0\n\ndef lsd_sort_pairs(pairs: list[tuple[int, list[int]]], bit: int, divisor: int) -> list[tuple[int, list[int]]]:\n    if bit == 60:\n        return pairs\n    return lsd_sort_pairs(\n        [pair for pair in pairs if (pair[0] // divisor) % 2 == 0]\n        + [pair for pair in pairs if (pair[0] // divisor) % 2 == 1],\n        bit + 1,\n        divisor * 2\n    )\n\ndef sort_pairs(points: list[list[int]]) -> list[tuple[int, list[int]]]:\n    base: int = 1000000001\n    max_y: int = 1000000000\n    pairs: list[tuple[int, list[int]]] = [(p[0] * base + (max_y - p[1]), p) for p in points]\n    return lsd_sort_pairs(pairs, 0, 1)\n\ndef make_processor(points: list[list[int]], start: int, end: int) -> Processor:\n    if start == end:\n        def empty_processor(state: State) -> State:\n            return state\n        return empty_processor\n    elif end - start == 1:\n        def step(state: State) -> State:\n            tree: object = state[0]\n            best: int = state[1]\n            y: int = points[start][1]\n            previous: int = query(tree, y)\n            new_len: int = previous + 1\n            new_tree: object = insert(tree, y, new_len)\n            new_best: int = max_int(best, new_len)\n            return (new_tree, new_best)\n        return step\n    else:\n        mid: int = (start + end) // 2\n        left_proc: Processor = make_processor(points, start, mid)\n        right_proc: Processor = make_processor(points, mid, end)\n        def combined(state: State) -> State:\n            return right_proc(left_proc(state))\n        return combined\n\ndef lis_length(points: list[list[int]]) -> int:\n    initial: State = (None, 0)\n    processor: Processor = make_processor(points, 0, len(points))\n    final: State = processor(initial)\n    return final[1]\n\ndef maxPathLength(coordinates: list[list[int]], k: int) -> int:\n    sorted_pairs: list[tuple[int, list[int]]] = sort_pairs(coordinates)\n    xk: int = coordinates[k][0]\n    yk: int = coordinates[k][1]\n    left_points: list[list[int]] = [pair[1] for pair in sorted_pairs if (pair[1][0] < xk) and (pair[1][1] < yk)]\n    right_points: list[list[int]] = [pair[1] for pair in sorted_pairs if (pair[1][0] > xk) and (pair[1][1] > yk)]\n    left_len: int = lis_length(left_points)\n    right_len: int = lis_length(right_points)\n    return left_len + 1 + right_len",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null,
+          "tests_passed": 42,
+          "tests_total": 42
         },
         "generation": {
           "status": "complete",
@@ -176,12 +184,14 @@
       "python": {
         "code": "def minOperations(nums: list[int]) -> int:\n    n = len(nums)\n    if n < 3:\n        return 0 if all(nums) else -1\n\n    a = nums[:]\n    ans = 0\n\n    for i in range(n - 2):\n        if a[i] == 0:\n            a[i] ^= 1\n            a[i + 1] ^= 1\n            a[i + 2] ^= 1\n            ans += 1\n\n    if a[-2] == 1 and a[-1] == 1:\n        return ans\n    return -1",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": false,
+          "error": "solution.py:6:13: slicing not yet supported (#59)"
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null,
+          "tests_passed": 37,
+          "tests_total": 37
         },
         "generation": {
           "status": "complete",
@@ -207,12 +217,14 @@
       "purepy": {
         "code": "type Trans = tuple[tuple[int, int, int], tuple[int, int, int], tuple[int, int, int], tuple[int, int, int]]\n\ndef minOperations(nums: list[int]) -> int:\n    n: int = len(nums)\n    m: int = n - 2\n\n    def leaf_transform(i: int) -> Trans:\n        val: int = 1 - nums[i]\n        flipped: int = (val + 1) % 2\n        return (\n            (val, val, 0),\n            (flipped, flipped, 0),\n            (flipped, flipped, 1),\n            (val, val, 1)\n        )\n\n    def compose_state(left: Trans, right: Trans, s: int) -> tuple[int, int, int]:\n        left_rec: tuple[int, int, int] = left[s]\n        count_left: int = left_rec[0]\n        out1_left: int = left_rec[1]\n        out2_left: int = left_rec[2]\n        next_s: int = out1_left * 2 + out2_left\n        right_rec: tuple[int, int, int] = right[next_s]\n        count_right: int = right_rec[0]\n        out1_right: int = right_rec[1]\n        out2_right: int = right_rec[2]\n        return (count_left + count_right, out1_right, out2_right)\n\n    def combine(left: Trans, right: Trans) -> Trans:\n        return (\n            compose_state(left, right, 0),\n            compose_state(left, right, 1),\n            compose_state(left, right, 2),\n            compose_state(left, right, 3)\n        )\n\n    def transform(l: int, r: int) -> Trans:\n        if r - l == 1:\n            return leaf_transform(l)\n        mid: int = (l + r) // 2\n        left: Trans = transform(l, mid)\n        right: Trans = transform(mid, r)\n        return combine(left, right)\n\n    t: Trans = transform(0, m)\n    rec: tuple[int, int, int] = t[0]\n    total: int = rec[0]\n    x_last: int = rec[1]\n    x_prev: int = rec[2]\n    target_next_last: int = 1 - nums[n - 2]\n    target_last: int = 1 - nums[n - 1]\n    if (target_next_last == ((x_prev + x_last) % 2)) and (target_last == x_last):\n        return total\n    else:\n        return -1",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null,
+          "tests_passed": 37,
+          "tests_total": 37
         },
         "generation": {
           "status": "complete",
@@ -254,12 +266,14 @@
       "python": {
         "code": "MOD = 10**9 + 7\n\n\ndef count_leq(s: str) -> int:\n    # Counts stepping numbers from 1 to s inclusive, using digit DP.\n    dp = {(1, 0, -1): 1}  # (tight, started, previous_digit)\n\n    for ch in s:\n        digit = int(ch)\n        ndp = {}\n        for (tight, started, prev), cnt in dp.items():\n            limit = digit if tight else 9\n            for d in range(limit + 1):\n                new_tight = 1 if tight and d == digit else 0\n\n                if not started:\n                    if d == 0:\n                        new_started = 0\n                        new_prev = -1\n                    else:\n                        new_started = 1\n                        new_prev = d\n                else:\n                    if abs(d - prev) != 1:\n                        continue\n                    new_started = 1\n                    new_prev = d\n\n                key = (new_tight, new_started, new_prev)\n                ndp[key] = (ndp.get(key, 0) + cnt) % MOD\n\n        dp = ndp\n\n    total = 0\n    for (_, started, _), cnt in dp.items():\n        if started:\n            total = (total + cnt) % MOD\n\n    return total\n\n\ndef is_stepping(num: str) -> bool:\n    for i in range(len(num) - 1):\n        if abs(int(num[i]) - int(num[i + 1])) != 1:\n            return False\n    return True\n\n\ndef countSteppingNumbers(low: str, high: str) -> int:\n    return (count_leq(high) - count_leq(low) + (1 if is_stepping(low) else 0)) % MOD",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": false,
+          "error": "solution.py:8:4: for loops prohibited"
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null,
+          "tests_passed": 14,
+          "tests_total": 14
         },
         "generation": {
           "status": "complete",
@@ -285,12 +299,14 @@
       "purepy": {
         "code": "MOD: int = 1000000007\n\ndef char_to_int(c: str) -> int:\n    if c == \"0\":\n        return 0\n    elif c == \"1\":\n        return 1\n    elif c == \"2\":\n        return 2\n    elif c == \"3\":\n        return 3\n    elif c == \"4\":\n        return 4\n    elif c == \"5\":\n        return 5\n    elif c == \"6\":\n        return 6\n    elif c == \"7\":\n        return 7\n    elif c == \"8\":\n        return 8\n    else:\n        return 9\n\ndef abs_diff(a: int, b: int) -> int:\n    if a < b:\n        return b - a\n    return a - b\n\ndef dp_len(length: int) -> list[int]:\n    if length == 1:\n        return [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]\n    prev_row: list[int] = dp_len(length - 1)\n    return [((prev_row[d - 1] if d > 0 else 0) + (prev_row[d + 1] if d < 9 else 0)) % MOD for d in range(0, 10)]\n\ndef count_length(length: int) -> int:\n    row: list[int] = dp_len(length)\n    def sum_d(d: int) -> int:\n        if d > 9:\n            return 0\n        return (row[d] + sum_d(d + 1)) % MOD\n    return sum_d(1)\n\ndef count_suffix(rem: int, first: int) -> int:\n    return dp_len(rem)[first]\n\ndef count_same_bound(s: str, inclusive: bool) -> int:\n    n: int = len(s)\n\n    def sum_less(i: int, prev: int, limit: int, rem: int) -> int:\n        start: int = 1 if i == 0 else 0\n        def iter_d(d: int) -> int:\n            if d >= limit:\n                return 0\n            if (i == 0) or (abs_diff(d, prev) == 1):\n                return (count_suffix(rem, d) + iter_d(d + 1)) % MOD\n            return iter_d(d + 1)\n        return iter_d(start)\n\n    def go(i: int, prev: int) -> int:\n        if i == n:\n            return 1 if inclusive else 0\n        limit: int = char_to_int(s[i])\n        rem: int = n - i\n        total: int = sum_less(i, prev, limit, rem)\n        if (i == 0) or (abs_diff(limit, prev) == 1):\n            return (total + go(i + 1, limit)) % MOD\n        return total\n\n    return go(0, 0)\n\ndef count_bound(s: str, inclusive: bool) -> int:\n    if s == \"0\":\n        return 0\n    n: int = len(s)\n    def sum_lengths(L: int) -> int:\n        if L >= n:\n            return 0\n        return (count_length(L) + sum_lengths(L + 1)) % MOD\n    same: int = count_same_bound(s, inclusive)\n    return (sum_lengths(1) + same) % MOD\n\ndef countSteppingNumbers(low: str, high: str) -> int:\n    upper: int = count_bound(high, True)\n    lower: int = count_bound(low, False)\n    return (upper - lower) % MOD",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null,
+          "tests_passed": 14,
+          "tests_total": 14
         },
         "generation": {
           "status": "complete",
@@ -331,12 +347,14 @@
       "python": {
         "code": "import heapq\n\ndef minTimeToReach(moveTime: list[list[int]]) -> int:\n    n = len(moveTime)\n    m = len(moveTime[0])\n    INF = 10**30\n\n    dist = [[INF] * m for _ in range(n)]\n    dist[0][0] = 0\n\n    pq = [(0, 0, 0)]\n    dirs = ((1, 0), (-1, 0), (0, 1), (0, -1))\n\n    while pq:\n        t, r, c = heapq.heappop(pq)\n\n        if t != dist[r][c]:\n            continue\n\n        if r == n - 1 and c == m - 1:\n            return t\n\n        for dr, dc in dirs:\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < n and 0 <= nc < m:\n                nt = max(t, moveTime[nr][nc]) + 1\n                if nt < dist[nr][nc]:\n                    dist[nr][nc] = nt\n                    heapq.heappush(pq, (nt, nr, nc))\n\n    return dist[n - 1][m - 1]",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": false,
+          "error": "solution.py:9:4: item assignment prohibited"
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null,
+          "tests_passed": 43,
+          "tests_total": 43
         },
         "generation": {
           "status": "complete",
@@ -362,12 +380,14 @@
       "purepy": {
         "code": "from typing import Callable\n\ntype State = tuple[list[int], list[bool]]\n\ndef power(func: Callable[[State], State], n: int) -> Callable[[State], State]:\n    if n == 0:\n        def identity(x: State) -> State:\n            return x\n        return identity\n    if n % 2 == 0:\n        half: Callable[[State], State] = power(func, n // 2)\n        def twice(x: State) -> State:\n            return half(half(x))\n        return twice\n    else:\n        prev: Callable[[State], State] = power(func, n - 1)\n        def odd(x: State) -> State:\n            return func(prev(x))\n        return odd\n\ndef min_index(dist: list[int], visited: list[bool], lo: int, hi: int) -> int:\n    if lo + 1 == hi:\n        if visited[lo]:\n            return -1\n        return lo\n    mid: int = (lo + hi) // 2\n    left: int = min_index(dist, visited, lo, mid)\n    right: int = min_index(dist, visited, mid, hi)\n    if left == -1:\n        return right\n    if right == -1:\n        return left\n    if dist[left] <= dist[right]:\n        return left\n    return right\n\ndef minTimeToReach(moveTime: list[list[int]]) -> int:\n    n: int = len(moveTime)\n    m: int = len(moveTime[0])\n    V: int = n * m\n    flat_move: list[int] = [moveTime[i // m][i % m] for i in range(0, V)]\n    INF: int = 10 ** 18\n\n    def step(state: State) -> State:\n        dist: list[int] = state[0]\n        visited: list[bool] = state[1]\n        u: int = min_index(dist, visited, 0, V)\n        u_row: int = u // m\n        u_col: int = u % m\n\n        def new_val(i: int) -> int:\n            cand: int = (dist[u] if dist[u] >= flat_move[i] else flat_move[i]) + 1\n            neighbor: bool = (\n                ((i == (u - m)) and (u_row > 0)) or\n                ((i == (u + m)) and (u_row < (n - 1))) or\n                ((i == (u - 1)) and (u_col > 0)) or\n                ((i == (u + 1)) and (u_col < (m - 1)))\n            )\n            if neighbor and (cand < dist[i]):\n                return cand\n            return dist[i]\n\n        new_dist: list[int] = [new_val(i) for i in range(0, V)]\n        new_visited: list[bool] = [True if i == u else visited[i] for i in range(0, V)]\n        return (new_dist, new_visited)\n\n    initial_dist: list[int] = [0 if i == 0 else INF for i in range(0, V)]\n    initial_visited: list[bool] = [False for i in range(0, V)]\n    initial: State = (initial_dist, initial_visited)\n    final: State = power(step, V)(initial)\n    target: int = (n - 1) * m + (m - 1)\n    return final[0][target]",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": false,
+          "error": "solution.py:54:16: chained boolean operator not yet supported (#82)"
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null,
+          "tests_passed": 43,
+          "tests_total": 43
         },
         "generation": {
           "status": "complete",
@@ -411,12 +431,14 @@
       "python": {
         "code": "from functools import lru_cache\n\ndef count(num1: str, num2: str, min_sum: int, max_sum: int) -> int:\n    MOD = 10**9 + 7\n\n    def count_leq(s: str) -> int:\n        n = len(s)\n\n        @lru_cache(maxsize=None)\n        def dfs(pos: int, tight: bool, digit_sum: int) -> int:\n            if digit_sum > max_sum:\n                return 0\n            if pos == n:\n                return 1 if min_sum <= digit_sum <= max_sum else 0\n\n            limit = int(s[pos]) if tight else 9\n            total = 0\n            for d in range(limit + 1):\n                total += dfs(\n                    pos + 1,\n                    tight and d == limit,\n                    digit_sum + d\n                )\n            return total % MOD\n\n        return dfs(0, True, 0)\n\n    lower_value = int(num1) - 1\n    return (count_leq(num2) - count_leq(str(lower_value))) % MOD",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": false,
+          "error": "solution.py:10:8: decorators not yet supported (#58)"
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null,
+          "tests_passed": 14,
+          "tests_total": 14
         },
         "generation": {
           "status": "complete",
@@ -442,12 +464,14 @@
       "purepy": {
         "code": "from builtins import len, range\n\nMOD: int = 1000000007\n\ndef char_to_int(c: str) -> int:\n    if c == \"0\":\n        return 0\n    if c == \"1\":\n        return 1\n    if c == \"2\":\n        return 2\n    if c == \"3\":\n        return 3\n    if c == \"4\":\n        return 4\n    if c == \"5\":\n        return 5\n    if c == \"6\":\n        return 6\n    if c == \"7\":\n        return 7\n    if c == \"8\":\n        return 8\n    if c == \"9\":\n        return 9\n    return -1\n\ndef parse_digits(s: str) -> list[int]:\n    return [char_to_int(s[i]) for i in range(0, len(s))]\n\ndef sum_prev(prev: list[int], s: int, d: int) -> int:\n    if d == 10:\n        return 0\n    idx: int = s - d\n    if (0 <= idx) and (idx < len(prev)):\n        return (prev[idx] + sum_prev(prev, s, d + 1)) % MOD\n    return sum_prev(prev, s, d + 1)\n\ndef dist(n: int) -> list[int]:\n    if n == 0:\n        return [1]\n    prev: list[int] = dist(n - 1)\n    return [sum_prev(prev, s, 0) for s in range(0, 9 * n + 1)]\n\ndef sum_upto(xs: list[int], idx: int) -> int:\n    if idx < 0:\n        return 0\n    return (xs[idx] + sum_upto(xs, idx - 1)) % MOD\n\ndef prefix_sum(xs: list[int], S: int) -> int:\n    if S < 0:\n        return 0\n    if len(xs) == 0:\n        return 0\n    last: int = len(xs) - 1\n    if S >= last:\n        return sum_upto(xs, last)\n    return sum_upto(xs, S)\n\ndef free_count(rem: int, S: int) -> int:\n    if S < 0:\n        return 0\n    if rem == 0:\n        return 1\n    coeffs: list[int] = dist(rem)\n    return prefix_sum(coeffs, S) % MOD\n\ndef sum_less_digits(limit: int, rem: int, remaining: int) -> int:\n    if limit == 0:\n        return 0\n    d: int = limit - 1\n    count_choice: int = free_count(rem, remaining - d)\n    return (count_choice + sum_less_digits(limit - 1, rem, remaining)) % MOD\n\ndef count_le_at(digits: list[int], pos: int, remaining: int) -> int:\n    if remaining < 0:\n        return 0\n    if pos == len(digits):\n        return 1\n    limit: int = digits[pos]\n    rem: int = len(digits) - pos - 1\n    less_count: int = sum_less_digits(limit, rem, remaining)\n    equal_count: int = count_le_at(digits, pos + 1, remaining - limit)\n    return (less_count + equal_count) % MOD\n\ndef count_lt_at(digits: list[int], pos: int, remaining: int) -> int:\n    if remaining < 0:\n        return 0\n    if pos == len(digits):\n        return 0\n    limit: int = digits[pos]\n    rem: int = len(digits) - pos - 1\n    less_count: int = sum_less_digits(limit, rem, remaining)\n    equal_count: int = count_lt_at(digits, pos + 1, remaining - limit)\n    return (less_count + equal_count) % MOD\n\ndef count_leq_sum(s: str, S: int) -> int:\n    if S < 0:\n        return 0\n    digits: list[int] = parse_digits(s)\n    return count_le_at(digits, 0, S)\n\ndef count_lt_sum(s: str, S: int) -> int:\n    if S < 0:\n        return 0\n    digits: list[int] = parse_digits(s)\n    return count_lt_at(digits, 0, S)\n\ndef count_good_leq(s: str, low: int, high: int) -> int:\n    return (count_leq_sum(s, high) - count_leq_sum(s, low - 1)) % MOD\n\ndef count_good_lt(s: str, low: int, high: int) -> int:\n    return (count_lt_sum(s, high) - count_lt_sum(s, low - 1)) % MOD\n\ndef count(num1: str, num2: str, min_sum: int, max_sum: int) -> int:\n    return (count_good_leq(num2, min_sum, max_sum) - count_good_lt(num1, min_sum, max_sum)) % MOD",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null,
+          "tests_passed": 14,
+          "tests_total": 14
         },
         "generation": {
           "status": "complete",
@@ -489,12 +513,14 @@
       "python": {
         "code": "def countComponents(nums: list[int], threshold: int) -> int:\n    t = threshold\n    present = [False] * (t + 1)\n    for x in nums:\n        if x <= t:\n            present[x] = True\n\n    parent = list(range(t + 1))\n    size = [1] * (t + 1)\n\n    def find(x: int) -> int:\n        while parent[x] != x:\n            parent[x] = parent[parent[x]]\n            x = parent[x]\n        return x\n\n    def union(a: int, b: int) -> None:\n        ra = find(a)\n        rb = find(b)\n        if ra == rb:\n            return\n        if size[ra] < size[rb]:\n            ra, rb = rb, ra\n        parent[rb] = ra\n        size[ra] += size[rb]\n\n    rep = [0] * (t + 1)\n\n    for v in range(1, t + 1):\n        if not present[v]:\n            continue\n        for m in range(v, t + 1, v):\n            if rep[m] == 0:\n                rep[m] = v\n            else:\n                union(v, rep[m])\n\n    roots = set()\n    isolated = 0\n    for x in nums:\n        if x <= t:\n            roots.add(find(x))\n        else:\n            isolated += 1\n\n    return len(roots) + isolated",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": false,
+          "error": "solution.py:4:4: for loops prohibited"
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null,
+          "tests_passed": 42,
+          "tests_total": 42
         },
         "generation": {
           "status": "complete",
@@ -520,12 +546,14 @@
       "purepy": {
         "code": "def countComponents(nums: list[int], threshold: int) -> int:\n    parent = list(range(threshold + 1))\n    rank = [0] * (threshold + 1)\n\n    def find(x: int) -> int:\n        while parent[x] != x:\n            parent[x] = parent[parent[x]]\n            x = parent[x]\n        return x\n\n    def union(a: int, b: int) -> None:\n        ra = find(a)\n        rb = find(b)\n        if ra == rb:\n            return\n        if rank[ra] < rank[rb]:\n            ra, rb = rb, ra\n        parent[rb] = ra\n        if rank[ra] == rank[rb]:\n            rank[ra] += 1\n\n    present = [False] * (threshold + 1)\n    isolated_large = 0\n\n    for x in nums:\n        if x <= threshold:\n            present[x] = True\n        else:\n            isolated_large += 1\n\n    first = [0] * (threshold + 1)\n\n    for d in range(1, threshold + 1):\n        if not present[d]:\n            continue\n        for m in range(d, threshold + 1, d):\n            if first[m] == 0:\n                first[m] = d\n            else:\n                union(d, first[m])\n\n    components = isolated_large\n    for x in nums:\n        if x <= threshold and find(x) == x:\n            components += 1\n\n    return components",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": false,
+          "error": "solution.py:6:8: while loops prohibited"
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": true,
+          "error": null,
+          "tests_passed": 42,
+          "tests_total": 42
         },
         "generation": {
           "status": "complete",
@@ -566,12 +594,14 @@
       "python": {
         "code": "from __future__ import annotations\n\ndef maxSubarraySum(nums: list[int]) -> int:\n    n = len(nums)\n    NEG = -10**18\n\n    size = 1\n    while size < n:\n        size <<= 1\n\n    total = [0] * (2 * size)\n    pref = [NEG] * (2 * size)\n    suff = [NEG] * (2 * size)\n    best = [NEG] * (2 * size)\n\n    for i, v in enumerate(nums):\n        idx = size + i\n        total[idx] = pref[idx] = suff[idx] = best[idx] = v\n\n    for idx in range(size - 1, 0, -1):\n        l = idx << 1\n        r = l + 1\n\n        tl = total[l]\n        tr = total[r]\n        total[idx] = tl + tr\n\n        pl = pref[l]\n        pr = pref[r]\n        tmp = tl + pr\n        pref[idx] = pl if pl >= tmp else tmp\n\n        sl = suff[l]\n        sr = suff[r]\n        tmp = tr + sl\n        suff[idx] = sr if sr >= tmp else tmp\n\n        bl = best[l]\n        br = best[r]\n        cross = sl + pr\n        best[idx] = bl if bl >= br and bl >= cross else (br if br >= cross else cross)\n\n    def update(pos, value, total=total, pref=pref, suff=suff, best=best, size=size):\n        idx = size + pos\n        total[idx] = pref[idx] = suff[idx] = best[idx] = value\n        idx >>= 1\n        while idx:\n            l = idx << 1\n            r = l + 1\n\n            tl = total[l]\n            tr = total[r]\n            total[idx] = tl + tr\n\n            pl = pref[l]\n            pr = pref[r]\n            tmp = tl + pr\n            pref[idx] = pl if pl >= tmp else tmp\n\n            sl = suff[l]\n            sr = suff[r]\n            tmp = tr + sl\n            suff[idx] = sr if sr >= tmp else tmp\n\n            bl = best[l]\n            br = best[r]\n            cross = sl + pr\n            best[idx] = bl if bl >= br and bl >= cross else (br if br >= cross else cross)\n\n            idx >>= 1\n\n    ans = best[1]\n\n    groups = {}\n    max1 = NEG\n    max2 = NEG\n\n    for i, v in enumerate(nums):\n        if v > max1:\n            max2 = max1\n            max1 = v\n        elif v > max2 and v != max1:\n            max2 = v\n\n        if v < 0:\n            groups.setdefault(v, []).append(i)\n\n    for x, positions in groups.items():\n        if len(positions) == n:\n            continue\n\n        for idx in positions:\n            update(idx, 0)\n\n        q = best[1]\n\n        if q == 0:\n            max_non_x = max2 if x == max1 else max1\n            if max_non_x < 0:\n                q = max_non_x\n\n        if q > ans:\n            ans = q\n\n        for idx in positions:\n            update(idx, x)\n\n    return ans",
         "checker": {
-          "passed": null,
-          "error": "not run"
+          "passed": false,
+          "error": "solution.py:8:4: while loops prohibited"
         },
         "official_tests": {
-          "passed": null,
-          "error": "not run"
+          "passed": false,
+          "error": "{\"error_code\": -4, \"error_message\": \"Error during testing: from __future__ imports must occur at the beginning of the file (<string>, line 38)\"}",
+          "tests_passed": 0,
+          "tests_total": 42
         },
         "generation": {
           "status": "complete",
@@ -1865,5 +1895,16 @@
     "automatic_retries": 0,
     "benchmark": "LiveCodeBench",
     "selection_sha256": "0fb36aa46632f23a8b401f87abea06c7b919e013c84d8ce21147990ddda0cf7f"
+  },
+  "verification": {
+    "checker_version": "0.19.0",
+    "checker_commit": "68486f84cf80cbc6a4a954dc5d3953951e37b9e3",
+    "harness_revision": "28fef95ea8c9f7a547c8329f2cd3d32b92c1fa24",
+    "recorded_at": "2026-10-19T01:39:30.468937+00:00",
+    "raw_results_sha256": "01d5dadef305b0bea4bf8fdc9f72ca01c976f547974e88f97d15d526c5e3e89c",
+    "generation_sha256": "95cea42650f63b2110f86fd49a0902f65175d5a74cc70d41a7057374ae28ef3a",
+    "checker_evaluated": 15,
+    "tests_evaluated": 15,
+    "note": "Recorded Harbor verification of existing outputs; no new generation or v0.22.3 re-evaluation. Missing outputs remain unknown."
   }
 }

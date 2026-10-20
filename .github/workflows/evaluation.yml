@@ -1,7 +1,5 @@
 name: Evaluation pipeline
 
-# Runs the evaluation pipeline end to end on both platforms with a small local model.
-# Model output varies between runs, so only the pipeline is checked, not the results.
 on:
   push:
     paths: &paths

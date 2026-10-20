@@ -32,6 +32,28 @@ class EvaluationTests(unittest.TestCase):
         self.assertNotIn("python", self.task)
         self.assertNotIn("purepy", self.task)
 
+    def test_recorded_verification_preserves_generation_fingerprints(self):
+        for path in (e.ROOT / "livecodebench").glob("*.json"):
+            data = json.loads(path.read_text())
+            if "verification" not in data:
+                continue
+            generation = [[task_id, condition, task[condition]["code"], task[condition].get("generation")]
+                          for task_id, task in data["tasks"].items() for condition in e.CONDITIONS]
+            fingerprint = e.sha(json.dumps(generation, sort_keys=True, ensure_ascii=False).encode())
+            self.assertEqual(fingerprint, data["verification"]["generation_sha256"])
+            for metric in ("checker", "official_tests"):
+                evaluated = 0
+                for task in data["tasks"].values():
+                    for condition in e.CONDITIONS:
+                        solution = task[condition]
+                        if solution["code"]:
+                            self.assertIsInstance(solution[metric]["passed"], bool)
+                            evaluated += 1
+                        else:
+                            self.assertIsNone(solution[metric]["passed"])
+                count = "checker_evaluated" if metric == "checker" else "tests_evaluated"
+                self.assertEqual(evaluated, data["verification"][count])
+
     def test_checker_and_official_tests_are_independent(self):
         self.assertTrue(e.check(GOOD)["passed"])
         self.assertFalse(e.check(BAD)["passed"])
@@ -165,6 +187,49 @@ class EvaluationTests(unittest.TestCase):
             result = e.attempt_solution(args, self.task, "purepy")
         self.assertEqual(request.call_count, 1)
         self.assertEqual(len(result["attempts"]), 1)
+        self.assertIsNone(result["checker"]["passed"])
+        self.assertIsNone(result["official_tests"]["passed"])
+        self.assertEqual(result["rejections"], 0)
+
+    def test_api_error_does_not_evaluate_partial_content(self):
+        args = argparse.Namespace(base_url="http://127.0.0.1:1/v1", provider="openai", model="fake",
+                                  max_tokens=100, benchmark="humaneval", repair_rounds=3)
+        with patch("evaluation.request", return_value={"code": BAD, "generation": {"status": "api_error"}}), patch(
+                "evaluation.check") as checker, patch("evaluation.official_tests") as tests:
+            result = e.attempt_solution(args, self.task, "purepy")
+        checker.assert_not_called()
+        tests.assert_not_called()
+        self.assertEqual(result["code"], BAD)
+        self.assertEqual(result["rejections"], 0)
+
+    def test_empty_output_stays_unevaluated(self):
+        self.assertIsNone(e.check("")["passed"])
+        self.assertIsNone(e.official_tests("", self.task, "humaneval")["passed"])
+
+    def test_api_errors_have_unknown_rates_and_saved_reports(self):
+        (e.ROOT / "results").mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="api-error-", dir=e.ROOT / "results") as folder:
+            path = Path(folder) / "fake.json"
+            args = argparse.Namespace(benchmark="humaneval", model="fake", provider="openai",
+                base_url="http://127.0.0.1:1/v1", max_tokens=100, repair_rounds=3,
+                limit=1, difficulty=None, output=path)
+            with patch("evaluation.validate_backend"), patch("evaluation.request", return_value={
+                    "code": "", "generation": {"status": "api_error", "http_status": 401}}):
+                with self.assertRaisesRegex(RuntimeError, "infrastructure failed"):
+                    e.run(args)
+            data = json.loads(path.read_text())
+            self.assertEqual(data["status"], "infrastructure_failed")
+            for condition in e.CONDITIONS:
+                stages = data["summary"]["conditions"][condition]
+                self.assertEqual(stages["checker_rejections"], {})
+                for stage in ("initial", "final"):
+                    self.assertEqual(stages[stage]["checker_unknown"], 1)
+                    self.assertEqual(stages[stage]["tests_unknown"], 1)
+            for gaps in data["summary"]["rq3"].values():
+                self.assertTrue(all(value is None for value in gaps.values()))
+            self.assertIn("unknown percentage points", path.with_suffix(".md").read_text())
+            e.compare([path], Path(folder) / "comparison.json")
+            self.assertIn("unknown", (Path(folder) / "comparison.md").read_text())
 
     def test_pipeline_fails_when_checker_cannot_run(self):
         (e.ROOT / "results").mkdir(exist_ok=True)

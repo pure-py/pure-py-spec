@@ -200,6 +200,8 @@ def failure_category(code, diagnostic, exit_code):
 
 
 def check(code):
+    if not code.strip():
+        return {"passed": None, "error": "no generated code to check", "tooling_error": False}
     with tempfile.TemporaryDirectory(prefix="purepy-check-") as directory:
         path = Path(directory) / "solution.py"
         path.write_text(code)
@@ -224,6 +226,8 @@ def check(code):
 
 
 def official_tests(code, task, benchmark):
+    if not code.strip():
+        return {"passed": None, "error": "no generated code to test", "tooling_error": False}
     try:
         tree = ast.parse(code)
         if not any(isinstance(n, ast.FunctionDef) and n.name == task["name"] for n in tree.body):
@@ -312,8 +316,13 @@ def attempt_solution(args, task, condition, persist=None):
         attempts.append(answer)
         if persist:
             persist(pack_solution(attempts, initial_prompt))
-        answer["checker"] = check(answer["code"])
-        answer["official_tests"] = official_tests(answer["code"], task, args.benchmark)
+        if answer["generation"]["status"] == "api_error":
+            for metric in ("checker", "official_tests"):
+                answer[metric] = {"passed": None, "error": "not evaluated because generation failed",
+                                  "tooling_error": False}
+        else:
+            answer["checker"] = check(answer["code"])
+            answer["official_tests"] = official_tests(answer["code"], task, args.benchmark)
         if persist:
             persist(pack_solution(attempts, initial_prompt))
         if (answer["generation"]["status"] != "complete" or answer["checker"]["passed"] is not False
@@ -350,9 +359,19 @@ def summarize(data):
         python = summary["conditions"]["python"][stage]
         purepy = summary["conditions"]["purepy"][stage]
         summary["rq3"][stage] = {
-            "python_minus_purepy_tests_pp": 100 * (python["tests_pass"] - purepy["tests_pass"]) / n,
-            "python_tests_minus_valid_purepy_pp": 100 * (python["tests_pass"] - purepy["joint_pass"]) / n}
+            "python_minus_purepy_tests_pp": (
+                100 * (python["tests_pass"] - purepy["tests_pass"]) / n
+                if python["outputs"] == purepy["outputs"] == n
+                and not (python["tests_unknown"] or purepy["tests_unknown"]) else None),
+            "python_tests_minus_valid_purepy_pp": (
+                100 * (python["tests_pass"] - purepy["joint_pass"]) / n
+                if python["outputs"] == purepy["outputs"] == n
+                and not (python["tests_unknown"] or purepy["checker_unknown"] or purepy["tests_unknown"]) else None)}
     return summary
+
+
+def format_gap(value):
+    return "unknown" if value is None else f"{value:.1f}"
 
 
 def export_code(path, task_id, condition, solution):
@@ -378,8 +397,15 @@ def plot(data, summary, destinations):
         counts = [v[metric] for v in values]
         if metric == "joint_pass":
             counts[0] = values[0]["tests_pass"]
+        unknown = [v["tests_unknown"] or v["outputs"] != summary["problems"]
+                   or metric == "joint_pass" and i > 0 and v["checker_unknown"]
+                   for i, v in enumerate(values)]
         bars = axis.bar(labels, [100 * c / n for c in counts], color=["#5b7386", "#d8973c", "#367c65"])
-        axis.bar_label(bars, labels=[f"{c}/{summary['problems']}" for c in counts], padding=3)
+        for bar, missing in zip(bars, unknown):
+            if missing:
+                bar.set_hatch("//")
+        axis.bar_label(bars, labels=[f"{c}/{summary['problems']} (incomplete)" if missing
+                                    else f"{c}/{summary['problems']}" for c, missing in zip(counts, unknown)], padding=3)
         axis.set_ylim(0, 112)
         axis.set_ylabel("Passing Problems (%)")
         axis.set_title(title)
@@ -406,15 +432,18 @@ def report(path):
              f"Problems: {summary['problems']} of {summary['benchmark_total']}",
              f"Scope: {summary['scope']}", f"PurePy checker: {data['protocol']['checker_version']}",
              f"Maximum checker-feedback repair rounds: {data['protocol']['repair_rounds']}", "",
-             "| Condition | Stage | Checker Accepts | Official Tests Pass | Both Pass |",
-             "|---|---|---:|---:|---:|"]
+             "| Condition | Stage | Checker Accepts | Official Tests Pass | Both Pass | Checker Unknown | Tests Unknown |",
+             "|---|---|---:|---:|---:|---:|---:|"]
     for condition, stages in summary["conditions"].items():
         for stage in ("initial", "final"):
             s = stages[stage]
             lines.append(f"| {condition} | {stage} | {s['checker_accepts']}/{s['outputs']} | "
-                         f"{s['tests_pass']}/{s['outputs']} | {s['joint_pass']}/{s['outputs']} |")
+                         f"{s['tests_pass']}/{s['outputs']} | {s['joint_pass']}/{s['outputs']} | "
+                         f"{s['checker_unknown']} | {s['tests_unknown']} |")
     lines.extend(["", "Initial and repaired results are separate. Python has no checker-feedback repairs.",
-                  "A checker rejection or wrong answer is not an infrastructure failure.", "",
+                  "A checker rejection or wrong answer is not an infrastructure failure.",
+                  "API errors and outputs without code remain unevaluated and do not count as checker rejections.",
+                  "Pass counts are confirmed successes; unknown verdicts do not count as failures.", "",
                   "## Checker Rejections", ""])
     for condition, stages in summary["conditions"].items():
         lines.append(f"{condition}: {json.dumps(stages['checker_rejections'], sort_keys=True)}")
@@ -424,8 +453,8 @@ def report(path):
                   "Closed-model parameter counts are not inferred from capability.", ""])
     for stage, gaps in summary["rq3"].items():
         lines.append(f"{stage}: Python minus PurePy official-test pass rate = "
-                     f"{gaps['python_minus_purepy_tests_pp']:.1f} percentage points; "
-                     f"Python tests minus valid PurePy = {gaps['python_tests_minus_valid_purepy_pp']:.1f} percentage points.")
+                     f"{format_gap(gaps['python_minus_purepy_tests_pp'])} percentage points; "
+                     f"Python tests minus valid PurePy = {format_gap(gaps['python_tests_minus_valid_purepy_pp'])} percentage points.")
     lines.extend(["", "## Per-Solution Outcomes", "",
                   "| Task | Condition | Generation | Initial Checker | Final Checker | Initial Tests | Final Tests | Repairs To Acceptance |",
                   "|---|---|---|---|---|---|---|---|"])
@@ -505,7 +534,8 @@ def compare(paths, destination):
                 gaps = summary["rq3"][stage]
                 lines.append(f"| {model['model']} | {model['model_size_b']} | {stage} | {p['tests_pass']}/{summary['problems']} | "
                              f"{q['tests_pass']}/{summary['problems']} | {q['joint_pass']}/{summary['problems']} | "
-                             f"{gaps['python_minus_purepy_tests_pp']:.1f} | {gaps['python_tests_minus_valid_purepy_pp']:.1f} | {model['status']} |")
+                             f"{format_gap(gaps['python_minus_purepy_tests_pp'])} | "
+                             f"{format_gap(gaps['python_tests_minus_valid_purepy_pp'])} | {model['status']} |")
     destination.with_suffix(".md").write_text("\n".join(lines) + "\n")
     print(f"Comparison: {destination}", flush=True)
 

@@ -115,8 +115,62 @@ def case_path(task_id):
     return CACHE / "cases" / (hashlib.sha256(task_id.encode()).hexdigest()[:24] + ".json")
 
 
+def ensure_cases(tasks):
+    import pyarrow.parquet as pq
+    missing = set()
+    for task_id, task in tasks.items():
+        path = case_path(task_id)
+        if not path.exists():
+            missing.add(task_id)
+        elif hashlib.sha256(path.read_bytes()).hexdigest() != task["tests_sha256"]:
+            raise RuntimeError(f"cached official tests changed: {task_id}")
+    if not missing:
+        return
+    for filename in FILES:
+        with parquet_source(filename) as source:
+            parquet = pq.ParquetFile(source)
+            for group_index in range(parquet.num_row_groups):
+                rows = parquet.read_row_group(group_index, columns=[
+                    "platform", "question_id", "starter_code", "metadata"]).to_pylist()
+                selected = [(i, row, "LiveCodeBench/" + row["platform"] + "/" + row["question_id"])
+                            for i, row in enumerate(rows)
+                            if "LiveCodeBench/" + row["platform"] + "/" + row["question_id"] in missing]
+                if not selected:
+                    continue
+                print(f"Downloading official tests for {len(selected)} frozen tasks from {filename}", flush=True)
+                table = parquet.read_row_group(group_index, columns=["public_test_cases", "private_test_cases"])
+                for index, row, task_id in selected:
+                    task = tasks[task_id]
+                    if interface(row) != (task["name"], task["parameters"], task["signature"]):
+                        raise RuntimeError(f"official test interface changed: {task_id}")
+                    public = json.loads(table["public_test_cases"][index].as_py())
+                    private = decode_private(table["private_test_cases"][index].as_py())
+                    tests = public + private
+                    if not tests or not all(test["testtype"] == "functional" for test in tests):
+                        raise RuntimeError(f"official tests are not functional: {task_id}")
+                    fixture = {"sample": {"input_output": json.dumps({
+                        "inputs": [test["input"] for test in tests],
+                        "outputs": [test["output"] for test in tests], "fn_name": task["name"]})},
+                        "public_count": len(public), "private_count": len(private)}
+                    raw = (json.dumps(fixture, ensure_ascii=False, indent=2) + "\n").encode()
+                    if (len(tests) != task["test_count"]
+                            or hashlib.sha256(raw).hexdigest() != task["tests_sha256"]):
+                        raise RuntimeError(f"downloaded official tests changed: {task_id}")
+                    dump(case_path(task_id), fixture)
+                    missing.remove(task_id)
+                del table
+        if not missing:
+            return
+    raise RuntimeError("official tests not found for frozen tasks: " + ", ".join(sorted(missing)))
+
+
 def prepare():
     if TASKS.exists():
+        frozen = json.loads(TASKS.read_text())
+        if (frozen["manifest"]["dataset_revision"] != DATASET_REVISION
+                or frozen["manifest"]["harness_revision"] != HARNESS_REVISION):
+            raise RuntimeError("frozen LiveCodeBench revisions changed")
+        ensure_cases(frozen["tasks"])
         print(f"Using the frozen selection: {TASKS}")
         return
     sys.path.insert(0, str(ROOT / ".cache/lcb-deps"))

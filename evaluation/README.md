@@ -43,6 +43,9 @@ Every raw answer, rejection, token usage, code revision and verdict is retained.
 Repair stops at checker acceptance or the configured budget, not test success.
 API failures and truncated responses are recorded, not automatically repaired.
 Python receives no feedback; reports distinguish initial and repaired results.
+API failures and outputs without code have unknown checker and test verdicts.
+They do not count as checker rejections. Reports show unknown counts explicitly,
+and leave RQ3 gaps unknown when either condition has unevaluated outputs.
 
 ## Data And Results
 
@@ -57,6 +60,16 @@ are downloaded from the pinned release_v6 dataset. The pinned official grader
 and unchanged tests use the same external Solution wrapper for both conditions.
 The release has 1055 problems; the eligible pools are 207 medium and 102 hard.
 No contamination-free claim is made.
+On a fresh checkout, missing official test fixtures are downloaded for the frozen
+task IDs. Their function interfaces, test counts and SHA-256 hashes must match
+the selection. Cached fixtures are verified before reuse, and preparation does
+not resample tasks or rewrite `livecodebench/tasks.json`.
+
+The historical `livecodebench/deepseek-v4-pro.json` includes the recorded Harbor
+checker and official-test verdicts for its 15 existing outputs. Its verification
+metadata records PurePy v0.19.0 and a generation fingerprint. Code and generation
+metadata are unchanged; missing outputs remain unknown. This is not a new model
+run or an evaluation under v0.22.3.
 
 Each run creates a new directory under `results/`. Its model-named JSON contains
 all generated code, per-round checker and official-test outcomes, failure modes,
