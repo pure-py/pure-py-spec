@@ -690,7 +690,7 @@
 \inferrule*[lab={\ruleName{eval-dict-comp-fail-key}}]
 {
   \rho, \seq{g} \Rightarrow \val{\seq{\rho}} \\
-  \rho_i, e \Rightarrow \val{w_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
+  \rho_i, e \Rightarrow \val{\replaced{u_i}{w_i\ }} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
   \rho_j, e \Rightarrow \aborts{\kappa}
 }
 {
@@ -700,8 +700,8 @@
 \inferrule*[lab={\ruleName{eval-dict-comp-fail-value}}]
 {
   \rho, \seq{g} \Rightarrow \val{\seq{\rho}} \\
-  \rho_i, e \Rightarrow \val{w_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
-  \rho_j, e \Rightarrow \val{w_j} \\
+  \rho_i, e \Rightarrow \val{\replaced{u_i}{w_i\ }} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
+  \rho_j, e \Rightarrow \val{\replaced{u_j}{w_j\ }} \\
   \rho_j, e' \Rightarrow \aborts{\kappa}
 }
 {
@@ -820,6 +820,47 @@
 {
   \rho, \exAttr{e}{x} \Rightarrow \aborts{\errAttr}
 }
+\and
+\added{\inferrule*[lab={\ruleName{eval-dict-unhashable}}]
+{
+  \rho, e_1 \cons e_1' \cons \ldots \cons e_n \cons e_n' \Rightarrow \val{u_1 \cons v_1 \cons \ldots \cons u_n \cons v_n} \\
+  u_j \text{ not hashable}
+}
+{
+  \rho, \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \Rightarrow \aborts{\errType}
+}}
+\and
+\added{\inferrule*[lab={\ruleName{eval-dict-nonstr}}]
+{
+  \rho, e_1 \cons e_1' \cons \ldots \cons e_n \cons e_n' \Rightarrow \val{u_1 \cons v_1 \cons \ldots \cons u_n \cons v_n} \\
+  u_i \text{ hashable} \quad (\forall i) \\
+  u_j \text{ not a string}
+}
+{
+  \rho, \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \Rightarrow \aborts{\errExcluded}
+}}
+\and
+\added{\inferrule*[lab={\ruleName{eval-dict-comp-unhashable}}]
+{
+  \rho, \seq{g} \Rightarrow \val{\seq{\rho}} \\
+  \rho_i, e \Rightarrow \val{u_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i \leq j) \\
+  u_i \text{ hashable} \quad (\forall i < j) \\
+  u_j \text{ not hashable}
+}
+{
+  \rho, \exDictComp{e}{e'}{\seq{g}} \Rightarrow \aborts{\errType}
+}}
+\and
+\added{\inferrule*[lab={\ruleName{eval-dict-comp-nonstr}}]
+{
+  \rho, \seq{g} \Rightarrow \val{\seq{\rho}} \\
+  \rho_i, e \Rightarrow \val{u_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i) \\
+  u_i \text{ hashable} \quad (\forall i) \\
+  u_j \text{ not a string}
+}
+{
+  \rho, \exDictComp{e}{e'}{\seq{g}} \Rightarrow \aborts{\errExcluded}
+}}
 \end{mathpar}
 \caption{Expression evaluation, continued (aborting cases)}
 \label{fig:eval-fails}

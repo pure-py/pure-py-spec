@@ -85,11 +85,17 @@ concatenates the results; a generator draws its bindings from the elements of a 
 function $\iterOp$\speconly{ (\S\ref{aux:iter})}: the elements of a
 list, tuple or string, and the keys of a dictionary, as in Python. \Added{A guard aborts with $\errExcluded$ when it
 evaluates to a value other than \pyinline{True} or \pyinline{False}\speconly{ (\ruleName{eval-qual-guard-nonbool})}.}
+\Added{Following Python, a value is \emph{hashable} unless it is a list, a dictionary, an object of a class other than
+$\clsRange$, or a tuple with a component which is not hashable. A dictionary display or comprehension with a key other
+than a string aborts with $\errType$ when the key is not hashable, since Python raises \pyinline{TypeError}, and with
+$\errExcluded$ otherwise\speconly{ (\ruleName{eval-dict-unhashable}, \ruleName{eval-dict-nonstr},
+\ruleName{eval-dict-comp-unhashable}, \ruleName{eval-dict-comp-nonstr})}.}
 Subscripting, given by the auxiliary
 function $\getitem$\speconly{ (\S\ref{aux:getitem})}, indexes a list, tuple or
 string by an integer, counting from the end when negative, and a dictionary by a string key,
-aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name, and with $\errType$ for a
-dictionary subscripted by a value other than a string. An attribute reference on a
+aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name\added{, so a dictionary subscripted by a key other than a string aborts
+with $\errKey$ when the key is hashable and with $\errType$ otherwise}\deleted{, and with $\errType$ for a
+dictionary subscripted by a value other than a string}. An attribute reference on a
 value other than a module or object aborts with $\errAttr$\speconly{ (\ruleName{eval-attr-nonobject})}; this version of \PurePy does not support the attributes given to other values by Python, such as the methods of a string.
 
 \specinput{spec/fig/well-formed-values}
