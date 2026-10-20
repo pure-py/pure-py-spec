@@ -30,7 +30,8 @@ to sequential composition of static outcomes:
 
 A \emph{termination
 kind} $\kappa$ records how a run ends; all but \replaced{$\errExit{n}$, $\errUndef$ and $\errExcluded$}{$\errExit{n}$ and $\errUndef$ } are named after the exceptions raised by the same program
-under Python in the same circumstances. A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, such as a
+under Python in the same circumstances. A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, \added{which is allowed by Python
+but not defined by \PurePy,} such as a
 comparison of two functions (\secref{no-coercions}). \Added{A run aborts with $\errExcluded$ when it reaches a statically excluded
 operation, which is allowed by Python but ruled out by typing, such as a condition which evaluates to a value other
 than a Boolean.} A primitive

@@ -14,7 +14,7 @@ $m$ & $::=$ & $\matchOk{\rho}$ & \speconly{(Match)} \\
   & $\mid$ & $\errUndef$ & \speconly{(Undefined)}
    \\[3mm]
 \grammarGroup{Termination kinds} \\
-$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \errKey$ & \\
+$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \errKey \added{{} \mid \errOverflow \mid \errValue}$ & \\
     & $\mid$ & $\errZeroDiv \mid \errAssertNoMsg \mid \errAssert{w}$ & \\
     & $\mid$ & $\errAttr \mid \added{\errName \mid {}} \errExit{n} \mid \errUndef \added{{} \mid \errExcluded}$ &
 \end{tabular}
