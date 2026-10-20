@@ -217,6 +217,7 @@ def merge_entry(
     if theta == theta_:
         assert theta is not None
         return theta
+    assert theta is None or theta_ is None or declared_type_of(theta) == declared_type_of(theta_)
     present = theta if theta is not None else theta_
     assert present is not None
     return PU(declared_type_of(present), declared_in_branch)
