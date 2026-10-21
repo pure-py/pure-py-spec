@@ -87,7 +87,7 @@ list, tuple or string, and the keys of a dictionary, as in Python. \Added{A guar
 evaluates to a non-Boolean\speconly{ (\ruleName{eval-qual-guard-nonbool})}.}
 \Added{Dictionary expressions and comprehensions with keys other than strings abort with
 $\errExcluded$\speconly{ (\ruleName{eval-dict-nonstr}, \ruleName{eval-dict-comp-nonstr})}; Python raises
-\pyinline{TypeError} only for keys which it cannot hash, such as lists, but the \PurePy semantics has no notion of
+\pyinline{TypeError} only for keys which it cannot hash, such as lists. The \PurePy semantics has no notion of
 hashing and so cannot distinguish them from other keys.}
 Subscripting, given by the auxiliary
 function $\getitem$\speconly{ (\S\ref{aux:getitem})}, indexes a list, tuple or
