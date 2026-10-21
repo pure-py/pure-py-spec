@@ -117,7 +117,7 @@ $\noMatch$, a failure to match\replaced{;}{, } or \replaced{a termination kind $
 \replaced{matching aborts with $\kappa$ before any pattern matches, $\dispatch$ gives $\kappa$, and the run aborts with $\kappa$}{a match result is undefined, the value of $\dispatch$ is also undefined, and the run has undefined behaviour }\speconly{ (\ruleName{eval-match-abort})}.
 \begin{specdefinition}{Composition of match results}
 The match results of sub-patterns compose with
-$\override$, matching sequentially, so that the first failure or \replaced{abort}{undefined result } decides:
+$\override$, matching sequentially, so that the first failure or \replaced{abort determines the result}{undefined result decides }:
 \begin{defalign}
 \matchOk{\rho} \override \matchOk{\rho'} & {}= \matchOk{(\rho \disjunion \rho')} \\
 \matchOk{\rho} \override \noMatch = \noMatch \override m & {}= \noMatch \\
