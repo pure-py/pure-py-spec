@@ -47,6 +47,35 @@ API failures and outputs without code have unknown checker and test verdicts.
 They do not count as checker rejections. Reports show unknown counts explicitly,
 and leave RQ3 gaps unknown when either condition has unevaluated outputs.
 
+## Tagged Output
+
+New runs use the `tagged-code-v1` prompt and extraction protocol for every
+provider. Python responses must contain one `<python>...</python>` pair;
+PurePy responses must contain one `<purepy>...</purepy>` pair. Initial prompts
+and PurePy checker-feedback prompts require source code inside these tags,
+without explanations, Markdown fences or text outside the tags.
+
+The checker and official tests receive only extracted source. A unique complete
+pair with outside text is evaluated, but its format is recorded as noncompliant.
+Missing, mismatched, nested or repeated tags, empty blocks, and Markdown fences
+inside blocks are format failures; source is not guessed or repaired. Such
+responses have unknown checker and test verdicts, and do not count as PurePy
+language rejections. API failures and truncated responses are also unevaluated,
+even when a partial response contains a complete tagged block. Format failures
+do not trigger extra model calls.
+
+Each attempt retains its original `raw_response`, extracted `code`, and separate
+`output_format` status. JSON and Markdown reports show format compliance alongside
+generation status, checker acceptance and official-test outcomes. Test pass counts
+are not evidence that PurePy improves algorithmic correctness when format
+compliance differs between conditions.
+
+Historical prompts and results, including the legacy Harbor generation path,
+remain unchanged. Run new tagged generations through `scripts/evaluate.sh`, then
+import their recorded outcomes into Harbor. Comparisons separate prompt and
+extraction versions; existing responses are not retroactively re-extracted or
+combined with new tagged runs. This change does not rerun any hosted models.
+
 ## Data And Results
 
 HumanEval problems and official tests are downloaded from a fixed upstream

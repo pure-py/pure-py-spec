@@ -25,6 +25,7 @@ CHECKER_VERSION = "0.22.3"
 CHECKER_SHA = "cd59f9e8656d2b617954caaf60bdb89d91ccc9cbee830d63977e8abf8a857c27"
 HARNESS_SHA = "b7cb6a8a69807bb868150a61742e25d7bb5328bbe01d514471b6ec43c9fa9ed2"
 CONDITIONS = ("python", "purepy")
+OUTPUT_FORMAT_VERSION = "tagged-code-v1"
 
 
 def sha(raw):
@@ -95,14 +96,42 @@ def load_problems(benchmark, limit=None, difficulty=None):
     return chosen, {**manifest, "evaluated_problems": len(chosen)}
 
 
+def output_instruction(condition):
+    language = "PurePy" if condition == "purepy" else "Python"
+    return (f"Output only the complete {language} source code inside <{condition}>...</{condition}> tags. "
+            "Use exactly one pair of these tags. Do not include explanations or any text outside the tags. "
+            "Do not include Markdown fences, comments, a test runner or example calls.")
+
+
 def prompt(task, condition):
     common = ("Preserve the required function name, parameters, return behaviour and input domain. "
-              "Include necessary imports and helpers. Return one complete Python source file only, "
-              "with no Markdown, explanation, comments, test runner or example calls.\n\n")
+              "Include necessary imports and helpers.\n\n")
     definition = (ROOT / "prompts/purepy-v0.22.3.md").read_text() if condition == "purepy" else ""
     return (("Solve this task in PurePy.\n" if condition == "purepy" else "Solve this task in Python.\n")
             + common + definition + "\nTask:\n" + task["question"]
-            + "\n\nRequired function interface:\n" + task["signature"])
+            + "\n\nRequired function interface:\n" + task["signature"]
+            + "\n\n" + output_instruction(condition))
+
+
+def extract_code(raw, condition):
+    opening, closing = f"<{condition}>", f"</{condition}>"
+    tags = re.findall(r"</?(?:python|purepy)\b[^>]*>", raw)
+    match = re.search(re.escape(opening) + r"(.*?)" + re.escape(closing), raw, re.DOTALL)
+    code = ""
+    if not tags:
+        status, error = "missing_tags", f"expected {opening} and {closing}"
+    elif tags != [opening, closing] or match is None:
+        status, error = "invalid_tags", "expected exactly one complete pair of condition-matching tags"
+    elif not match[1].strip():
+        status, error = "empty_code", "tagged source is empty"
+    elif re.search(r"^\s*```", match[1], re.MULTILINE):
+        status, error = "markdown_fence", "Markdown fences inside source tags are prohibited"
+    else:
+        code = match[1].strip()
+        outside = (raw[:match.start()] + raw[match.end():]).strip()
+        status, error = ("outside_text", "text outside source tags") if outside else ("valid", None)
+    return {"code": code, "output_format": {"version": OUTPUT_FORMAT_VERSION, "tag": condition,
+            "status": status, "compliant": status == "valid", "error": error}}
 
 
 def validate_api_url(base_url):
@@ -164,10 +193,8 @@ def request(base_url, provider, model, messages, max_tokens):
         raw = body["choices"][0]["message"].get("content") or ""
         stop = body["choices"][0]["finish_reason"]
         complete = stop == "stop"
-    lines = raw.strip().splitlines()
-    code = "\n".join(lines[1:-1]) if len(lines) >= 3 and lines[0] in ("```", "```python") and lines[-1] == "```" else raw.strip()
-    return {"code": code, "raw_response": raw,
-            "generation": {"status": "complete" if complete and code else "incomplete",
+    return {"code": raw, "raw_response": raw,
+            "generation": {"status": "complete" if complete and raw.strip() else "incomplete",
                            "stop_reason": stop, "response_id": body.get("id"),
                            "response_model": body.get("model"), "usage": body.get("usage", {})}}
 
@@ -281,8 +308,8 @@ def repair_messages(messages, attempt):
     return [*messages, {"role": "assistant", "content": attempt["raw_response"]},
             {"role": "user", "content":
              "The PurePy v0.22.3 checker rejected this source:\n" + attempt["checker"]["error"]
-             + "\nReturn a corrected complete source file only. Preserve the task interface and behaviour. "
-             "Do not include explanations, comments or Markdown."}]
+             + "\nCorrect the source while preserving the task interface and behaviour. "
+             + output_instruction("purepy")}]
 
 
 def pack_solution(attempts, initial_prompt):
@@ -299,6 +326,7 @@ def pack_solution(attempts, initial_prompt):
     final = attempts[-1]
     return {"code": final["code"], "checker": final["checker"], "official_tests": final["official_tests"],
             "generation": final["generation"], "prompt": initial_prompt, "attempts": attempts,
+            "output_format": final.get("output_format"),
             "rejections": sum(a["checker"]["passed"] is False for a in attempts),
             "rounds_to_acceptance": next((a["round"] for a in attempts if a["checker"]["passed"] is True), None)}
 
@@ -309,6 +337,12 @@ def attempt_solution(args, task, condition, persist=None):
     attempts = []
     for round_index in range(1 + (args.repair_rounds if condition == "purepy" else 0)):
         answer = request(args.base_url, args.provider, args.model, messages, args.max_tokens)
+        if answer["generation"]["status"] == "api_error":
+            answer["output_format"] = {"version": OUTPUT_FORMAT_VERSION, "tag": condition,
+                                       "status": "not_evaluated", "compliant": None,
+                                       "error": "generation failed"}
+        else:
+            answer.update(extract_code(answer["raw_response"], condition))
         answer.update(round=round_index, messages=messages,
                       prompt_sha256=sha(json.dumps(messages, sort_keys=True).encode()))
         answer["checker"] = {"passed": None, "error": "awaiting checker", "tooling_error": False}
@@ -316,9 +350,12 @@ def attempt_solution(args, task, condition, persist=None):
         attempts.append(answer)
         if persist:
             persist(pack_solution(attempts, initial_prompt))
-        if answer["generation"]["status"] == "api_error":
+        if answer["generation"]["status"] != "complete" or not answer["code"]:
+            reason = ("generation " + answer["generation"]["status"]
+                      if answer["generation"]["status"] != "complete" else
+                      "output format: " + answer["output_format"]["status"])
             for metric in ("checker", "official_tests"):
-                answer[metric] = {"passed": None, "error": "not evaluated because generation failed",
+                answer[metric] = {"passed": None, "error": "not evaluated because " + reason,
                                   "tooling_error": False}
         else:
             answer["checker"] = check(answer["code"])
@@ -347,6 +384,11 @@ def summarize(data):
                 "joint_pass": sum(a["checker"]["passed"] is True and a["official_tests"]["passed"] is True for a in attempts),
                 "checker_unknown": sum(a["checker"]["passed"] is None for a in attempts),
                 "tests_unknown": sum(a["official_tests"]["passed"] is None for a in attempts),
+                "format_compliant": sum((a.get("output_format") or {}).get("compliant") is True for a in attempts),
+                "format_noncompliant": sum((a.get("output_format") or {}).get("compliant") is False for a in attempts),
+                "format_unknown": sum((a.get("output_format") or {}).get("compliant") is None for a in attempts),
+                "format_status": dict(Counter((a.get("output_format") or {}).get("status", "legacy_unrecorded")
+                                              for a in attempts)),
                 "generation_status": dict(Counter(a["generation"]["status"] for a in attempts))}
         failures = [a["checker"].get("failure_mode", {}) for s in solutions for a in s["attempts"]
                     if a["checker"]["passed"] is False]
@@ -432,6 +474,7 @@ def report(path):
              f"Problems: {summary['problems']} of {summary['benchmark_total']}",
              f"Scope: {summary['scope']}", f"PurePy checker: {data['protocol']['checker_version']}",
              f"Maximum checker-feedback repair rounds: {data['protocol']['repair_rounds']}", "",
+             f"Output format: {data['protocol'].get('output_format', 'legacy-plain-or-fenced-v1')}", "",
              "| Condition | Stage | Checker Accepts | Official Tests Pass | Both Pass | Checker Unknown | Tests Unknown |",
              "|---|---|---:|---:|---:|---:|---:|"]
     for condition, stages in summary["conditions"].items():
@@ -443,8 +486,18 @@ def report(path):
     lines.extend(["", "Initial and repaired results are separate. Python has no checker-feedback repairs.",
                   "A checker rejection or wrong answer is not an infrastructure failure.",
                   "API errors and outputs without code remain unevaluated and do not count as checker rejections.",
+                  "Truncated responses and missing, malformed or empty code tags remain unevaluated.",
+                  "Unambiguous tagged code is evaluated even with outside text; format noncompliance is recorded separately.",
                   "Pass counts are confirmed successes; unknown verdicts do not count as failures.", "",
-                  "## Checker Rejections", ""])
+                  "## Output Format", "",
+                  "| Condition | Stage | Compliant | Noncompliant | Unknown | Details |",
+                  "|---|---|---:|---:|---:|---|"])
+    for condition, stages in summary["conditions"].items():
+        for stage in ("initial", "final"):
+            s = stages[stage]
+            lines.append(f"| {condition} | {stage} | {s['format_compliant']} | {s['format_noncompliant']} | "
+                         f"{s['format_unknown']} | {json.dumps(s['format_status'], sort_keys=True)} |")
+    lines.extend(["", "## Checker Rejections", ""])
     for condition, stages in summary["conditions"].items():
         lines.append(f"{condition}: {json.dumps(stages['checker_rejections'], sort_keys=True)}")
     lines.extend(["", "## RQ3 Gaps", "",
@@ -456,8 +509,8 @@ def report(path):
                      f"{format_gap(gaps['python_minus_purepy_tests_pp'])} percentage points; "
                      f"Python tests minus valid PurePy = {format_gap(gaps['python_tests_minus_valid_purepy_pp'])} percentage points.")
     lines.extend(["", "## Per-Solution Outcomes", "",
-                  "| Task | Condition | Generation | Initial Checker | Final Checker | Initial Tests | Final Tests | Repairs To Acceptance |",
-                  "|---|---|---|---|---|---|---|---|"])
+                  "| Task | Condition | Generation | Initial Format | Final Format | Initial Checker | Final Checker | Initial Tests | Final Tests | Repairs To Acceptance |",
+                  "|---|---|---|---|---|---|---|---|---|---|"])
     for task_id, task in data["tasks"].items():
         for condition in CONDITIONS:
             if condition not in task:
@@ -465,7 +518,9 @@ def report(path):
             solution = task[condition]
             export_code(path, task_id, condition, solution)
             first, last = solution["attempts"][0], solution["attempts"][-1]
-            values = [task_id, condition, last["generation"]["status"], first["checker"]["passed"],
+            values = [task_id, condition, last["generation"]["status"],
+                      (first.get("output_format") or {}).get("status", "legacy_unrecorded"),
+                      (last.get("output_format") or {}).get("status", "legacy_unrecorded"), first["checker"]["passed"],
                       last["checker"]["passed"], first["official_tests"]["passed"],
                       last["official_tests"]["passed"], solution["rounds_to_acceptance"]]
             lines.append("| " + " | ".join(map(str, values)) + " |")
@@ -510,6 +565,8 @@ def compare(paths, destination):
                                 for task_id, task in data["tasks"].items()},
                     "checker_version": protocol["checker_version"], "wheel_sha256": protocol["wheel_sha256"],
                     "definition_sha256": protocol["definition_sha256"], "repair_rounds": protocol["repair_rounds"],
+                    "prompt_version": protocol.get("prompt_version", "code-only-v1"),
+                    "output_format": protocol.get("output_format", "legacy-plain-or-fenced-v1"),
                     "platform": protocol["platform"], "python": protocol["python"]}
         key = sha(json.dumps(identity, sort_keys=True).encode())[:16]
         group = groups.setdefault(key, {"protocol": identity, "models": []})
@@ -563,6 +620,7 @@ def run(args):
             "model": args.model, "manifest": manifest, "tasks": {},
             "protocol": {"checker_version": CHECKER_VERSION, "wheel_sha256": CHECKER_SHA,
                          "definition_sha256": sha((ROOT / "prompts/purepy-v0.22.3.md").read_bytes()),
+                         "prompt_version": OUTPUT_FORMAT_VERSION, "output_format": OUTPUT_FORMAT_VERSION,
                          "python": sys.version.split()[0], "platform": sys.platform,
                          "provider": args.provider, "base_url": args.base_url, "max_tokens": args.max_tokens,
                          "model_size_b": getattr(args, "model_size", None),

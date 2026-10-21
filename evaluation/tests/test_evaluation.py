@@ -83,6 +83,40 @@ class EvaluationTests(unittest.TestCase):
         unsupported = e.failure_category(GOOD, "keyword arguments in a call other than a constructor call", 3)
         self.assertEqual(unsupported["category"], "unsupported_feature")
 
+    def test_prompt_requires_condition_specific_tags(self):
+        for condition in e.CONDITIONS:
+            prompt = e.prompt(self.task, condition)
+            self.assertIn(f"<{condition}>...</{condition}>", prompt)
+            self.assertIn("Do not include explanations or any text outside the tags", prompt)
+            self.assertIn(self.task["signature"], prompt)
+
+    def test_tagged_source_extraction(self):
+        for condition in e.CONDITIONS:
+            tagged = f"<{condition}>\n{GOOD}</{condition}>"
+            cases = [(tagged, "valid", GOOD.strip()),
+                     (" \n" + tagged + "\n ", "valid", GOOD.strip()),
+                     ("Here is the solution:\n" + tagged + "\nExplanation.", "outside_text", GOOD.strip()),
+                     (GOOD, "missing_tags", ""),
+                     ("```python\n" + GOOD + "```", "missing_tags", ""),
+                     (f"<{condition}>" + GOOD, "invalid_tags", ""),
+                     (tagged + tagged, "invalid_tags", ""),
+                     (f"<{condition}></{condition}>", "empty_code", ""),
+                     (f"<{condition}>```python\n{GOOD}```</{condition}>", "markdown_fence", ""),
+                     (f'<{condition}>marker = "```"</{condition}>', "valid", 'marker = "```"'),
+                     (f"<{condition}>not valid Python!</{condition}>", "valid", "not valid Python!")]
+            other = "purepy" if condition == "python" else "python"
+            cases.extend([(f"<{other}>{GOOD}</{other}>", "invalid_tags", ""),
+                          (f"<{condition}>{GOOD}</{other}>", "invalid_tags", ""),
+                          (f"<{condition}><{condition}>{GOOD}</{condition}></{condition}>", "invalid_tags", ""),
+                          (f'<{condition} language="python">{GOOD}</{condition}>', "invalid_tags", "")])
+            for raw, status, code in cases:
+                with self.subTest(condition=condition, status=status, raw=raw):
+                    result = e.extract_code(raw, condition)
+                    self.assertEqual(result["code"], code)
+                    self.assertEqual(result["output_format"]["status"], status)
+                    self.assertEqual(result["output_format"]["compliant"], status == "valid")
+                    self.assertEqual(result["output_format"]["version"], e.OUTPUT_FORMAT_VERSION)
+
     def test_native_auth_headers_and_optional_openai_key(self):
         class Response:
             def __enter__(self):
@@ -115,7 +149,9 @@ class EvaluationTests(unittest.TestCase):
                 requests.append(body)
                 purepy = "Solve this task in PurePy" in body["messages"][0]["content"]
                 code = GOOD if len(body["messages"]) > 1 else BAD if purepy else GOOD.replace("number % 1.0", "0.0")
-                raw = json.dumps({"choices": [{"message": {"content": code}, "finish_reason": "stop"}],
+                condition = "purepy" if purepy else "python"
+                response = f"<{condition}>\n{code}</{condition}>"
+                raw = json.dumps({"choices": [{"message": {"content": response}, "finish_reason": "stop"}],
                                   "id": "offline-test", "model": "fake", "usage": {"completion_tokens": 10}}).encode()
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
@@ -140,6 +176,9 @@ class EvaluationTests(unittest.TestCase):
                 data = json.loads(path.read_text())
                 self.assertEqual(data["status"], "complete")
                 solution = data["tasks"]["HumanEval/2"]["purepy"]
+                self.assertEqual(data["protocol"]["output_format"], e.OUTPUT_FORMAT_VERSION)
+                self.assertEqual(solution["output_format"]["status"], "valid")
+                self.assertEqual(solution["attempts"][0]["raw_response"], f"<purepy>\n{BAD}</purepy>")
                 self.assertEqual(len(solution["attempts"]), 2)
                 self.assertEqual(solution["attempts"][0]["code"], BAD.strip())
                 self.assertEqual(solution["rounds_to_acceptance"], 1)
@@ -148,6 +187,7 @@ class EvaluationTests(unittest.TestCase):
                 self.assertEqual(len(requests), 3)
                 feedback = requests[-1]["messages"][-1]["content"]
                 self.assertIn("prohibited", feedback)
+                self.assertIn("<purepy>...</purepy>", feedback)
                 self.assertNotIn(self.task["official"]["test"], feedback)
                 self.assertNotIn("test-only-secret", path.read_text())
                 for suffix in (".md", ".svg", ".pdf", ".tex"):
@@ -157,6 +197,8 @@ class EvaluationTests(unittest.TestCase):
                 report = path.with_suffix(".md").read_text()
                 self.assertIn("| HumanEval/2 | python | complete |", report)
                 self.assertIn("| HumanEval/2 | purepy | complete |", report)
+                self.assertIn("## Output Format", report)
+                self.assertEqual(data["summary"]["conditions"]["purepy"]["final"]["format_compliant"], 1)
                 code_folder = Path(folder) / "solutions/fake/HumanEval-2"
                 self.assertEqual((code_folder / "purepy.py").read_text(), GOOD)
                 self.assertEqual((code_folder / "purepy.round-0.py").read_text(), BAD)
@@ -167,6 +209,11 @@ class EvaluationTests(unittest.TestCase):
                 e.compare([path, Path(folder) / "other.json"], Path(folder) / "compare.json")
                 comparison = json.loads((Path(folder) / "compare.json").read_text())
                 self.assertEqual(len(comparison["groups"]), 1)
+                second["protocol"]["output_format"] = "different-format"
+                e.save(Path(folder) / "other.json", second)
+                e.compare([path, Path(folder) / "other.json"], Path(folder) / "format-separated.json")
+                self.assertEqual(len(json.loads((Path(folder) / "format-separated.json").read_text())["groups"]), 2)
+                second["protocol"]["output_format"] = e.OUTPUT_FORMAT_VERSION
                 second["protocol"]["checker_version"] = "different-version"
                 e.save(Path(folder) / "other.json", second)
                 e.compare([path, Path(folder) / "other.json"], Path(folder) / "separate.json")
@@ -239,7 +286,8 @@ class EvaluationTests(unittest.TestCase):
                 base_url="http://127.0.0.1:1/v1", max_tokens=100, repair_rounds=0,
                 limit=1, difficulty=None, output=path)
             with patch("evaluation.validate_backend"), patch("evaluation.request", return_value={
-                    "code": GOOD, "raw_response": GOOD, "generation": {"status": "complete"}}), patch(
+                    "code": GOOD, "raw_response": f"<purepy>{GOOD}</purepy>",
+                    "generation": {"status": "complete"}}), patch(
                     "evaluation.check", return_value={"passed": None, "tooling_error": True, "error": "checker missing"}):
                 with self.assertRaisesRegex(RuntimeError, "infrastructure failed"):
                     e.run(args)
@@ -251,11 +299,63 @@ class EvaluationTests(unittest.TestCase):
     def test_truncated_output_is_not_automatically_repaired(self):
         args = argparse.Namespace(base_url="http://127.0.0.1:1/v1", provider="openai", model="fake",
                                   max_tokens=100, benchmark="humaneval", repair_rounds=3)
-        with patch("evaluation.request", return_value={"code": BAD, "raw_response": BAD,
-                   "generation": {"status": "incomplete"}}) as request:
+        raw = f"<purepy>{BAD}</purepy>"
+        with patch("evaluation.request", return_value={"code": raw, "raw_response": raw,
+                   "generation": {"status": "incomplete"}}) as request, patch(
+                   "evaluation.check") as checker, patch("evaluation.official_tests") as tests:
             result = e.attempt_solution(args, self.task, "purepy")
         self.assertEqual(request.call_count, 1)
-        self.assertEqual(result["code"], BAD)
+        self.assertEqual(result["code"], BAD.strip())
+        self.assertEqual(result["attempts"][0]["raw_response"], raw)
+        checker.assert_not_called()
+        tests.assert_not_called()
+        self.assertEqual(result["rejections"], 0)
+        self.assertIsNone(result["official_tests"]["passed"])
+
+    def test_unextractable_format_has_unknown_verdicts_and_no_repairs(self):
+        (e.ROOT / "results").mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="format-", dir=e.ROOT / "results") as folder:
+            path = Path(folder) / "fake.json"
+            args = argparse.Namespace(benchmark="humaneval", model="fake", provider="openai",
+                base_url="http://127.0.0.1:1/v1", max_tokens=100, repair_rounds=3,
+                limit=1, difficulty=None, output=path)
+            with patch("evaluation.validate_backend"), patch("evaluation.request", return_value={
+                    "code": GOOD, "raw_response": GOOD, "generation": {"status": "complete"}}) as request, patch(
+                    "evaluation.check") as checker, patch("evaluation.official_tests") as tests:
+                e.run(args)
+            checker.assert_not_called()
+            tests.assert_not_called()
+            self.assertEqual(request.call_count, 2)
+            data = json.loads(path.read_text())
+            self.assertEqual(data["status"], "complete")
+            for condition in e.CONDITIONS:
+                solution = data["tasks"]["HumanEval/2"][condition]
+                self.assertEqual(solution["attempts"][0]["raw_response"], GOOD)
+                self.assertEqual(solution["output_format"]["status"], "missing_tags")
+                self.assertEqual(solution["rejections"], 0)
+                self.assertEqual(solution["code"], "")
+                for stage in ("initial", "final"):
+                    summary = data["summary"]["conditions"][condition][stage]
+                    self.assertEqual(summary["format_noncompliant"], 1)
+                    self.assertEqual(summary["tests_unknown"], 1)
+                    self.assertEqual(summary["checker_unknown"], 1)
+            self.assertIn("missing_tags", path.with_suffix(".md").read_text())
+            for gaps in data["summary"]["rq3"].values():
+                self.assertTrue(all(value is None for value in gaps.values()))
+
+    def test_outside_prose_does_not_become_source_or_hide_format_violation(self):
+        args = argparse.Namespace(base_url="http://127.0.0.1:1/v1", provider="openai", model="fake",
+                                  max_tokens=100, benchmark="humaneval", repair_rounds=0)
+        for condition in e.CONDITIONS:
+            raw = f"Here is the solution:\n<{condition}>{GOOD}</{condition}>\nExplanation."
+            with patch("evaluation.request", return_value={"code": raw, "raw_response": raw,
+                       "generation": {"status": "complete"}}):
+                result = e.attempt_solution(args, self.task, condition)
+            self.assertTrue(result["checker"]["passed"])
+            self.assertTrue(result["official_tests"]["passed"])
+            self.assertEqual(result["output_format"]["status"], "outside_text")
+            self.assertFalse(result["output_format"]["compliant"])
+            self.assertEqual(result["attempts"][0]["raw_response"], raw)
 
     def test_bad_api_url_cannot_be_saved(self):
         with self.assertRaisesRegex(RuntimeError, "credentials"):
