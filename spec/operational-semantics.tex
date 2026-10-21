@@ -96,7 +96,7 @@ aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the except
 dictionary subscripted by a value other than a string}. \Added{Any attempt to subscript a range aborts with $\errExcluded$, since
 no subscript rule applies to ranges, although Python allows it. Dictionaries subscripted by keys
 other than strings also abort with $\errExcluded$, although Python raises \pyinline{KeyError}, or \pyinline{TypeError}
-for keys it cannot hash, since the \PurePy semantics has no notion of hashing and so cannot distinguish the two.} An attribute reference on a
+for keys it cannot hash, since \PurePy has no notion of hashing and so cannot distinguish the two.} An attribute reference on a
 value other than a module or object aborts with \replaced{$\errExcluded$}{$\errAttr$ }\speconly{ (\ruleName{eval-attr-nonobject})}; this version of \PurePy does not support the attributes given to other values by Python, such as the methods of a string\added{, and the \PurePy semantics does not record which attributes Python provides, so an attribute reference which Python rejects with \pyinline{AttributeError} also aborts with $\errExcluded$}.
 
 \specinput{spec/fig/well-formed-values}
