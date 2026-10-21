@@ -55,6 +55,7 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.PURE_PY_ISABELLE }}
+          fetch-depth: 0
 
       - name: Fetch mechanisation main for the ancestor check
         run: git -C isabelle-purepy fetch -q origin main
