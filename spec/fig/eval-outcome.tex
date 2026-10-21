@@ -539,41 +539,6 @@
 
 \begin{figure}
 \small
-\flushleft \shadebox{$\rho, \seq{e} \Rightarrow r$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{eval-exprs-nil}}]
-{
-  \strut
-}
-{
-  \rho, \varepsilon \Rightarrow \val{\varepsilon}
-}
-\and
-\inferrule*[lab={\ruleName{eval-exprs-cons}}]
-{
-  \rho, e \Rightarrow \val{v} \\
-  \rho, \seq{e} \Rightarrow r
-}
-{
-  \rho, e \cons \seq{e} \Rightarrow \mlet{\seq{v}}{r}{\val{v \cons \seq{v}}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-exprs-fail}}]
-{
-  \rho, e \Rightarrow \aborts{\kappa}
-}
-{
-  \rho, e \cons \seq{e} \Rightarrow \aborts{\kappa}
-}
-\end{mathpar}
-\caption{Expression sequence $\seq{e}$ evaluates left to right to result $r$ under environment $\rho :
-\Gamma$}
-\label{fig:eval-seq}
-\end{figure}
-
-\begin{figure}
-\small
 \flushleft \shadebox{$\rho, e \Rightarrow r$ (continued)}
 \begin{mathpar}
 \small
@@ -842,6 +807,41 @@
 \end{mathpar}
 \caption{Expression evaluation, continued (aborting cases)}
 \label{fig:eval-fails}
+\end{figure}
+
+\begin{figure}
+\small
+\flushleft \shadebox{$\rho, \seq{e} \Rightarrow r$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-exprs-nil}}]
+{
+  \strut
+}
+{
+  \rho, \varepsilon \Rightarrow \val{\varepsilon}
+}
+\and
+\inferrule*[lab={\ruleName{eval-exprs-cons}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  \rho, \seq{e} \Rightarrow r
+}
+{
+  \rho, e \cons \seq{e} \Rightarrow \mlet{\seq{v}}{r}{\val{v \cons \seq{v}}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-exprs-fail}}]
+{
+  \rho, e \Rightarrow \aborts{\kappa}
+}
+{
+  \rho, e \cons \seq{e} \Rightarrow \aborts{\kappa}
+}
+\end{mathpar}
+\caption{Expression sequence $\seq{e}$ evaluates left to right to result $r$ under environment $\rho :
+\Gamma$}
+\label{fig:eval-seq}
 \end{figure}
 
 \begin{figure}
