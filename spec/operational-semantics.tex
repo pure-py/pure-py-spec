@@ -85,7 +85,7 @@ concatenates the results; a generator draws its bindings from the elements of a 
 function $\iterOp$\speconly{ (\S\ref{aux:iter})}: the elements of a
 list, tuple or string, and the keys of a dictionary, as in Python. \Added{A guard aborts with $\errExcluded$ if it
 evaluates to a non-Boolean\speconly{ (\ruleName{eval-qual-guard-nonbool})}.}
-\Added{A dictionary expression or comprehension with a key other than a string aborts with
+\Added{Dictionary expressions and comprehensions with keys other than strings abort with
 $\errExcluded$\speconly{ (\ruleName{eval-dict-nonstr}, \ruleName{eval-dict-comp-nonstr})}; Python raises
 \pyinline{TypeError} only for keys which it cannot hash, such as lists, but the \PurePy semantics has no notion of
 hashing and so cannot distinguish them from other keys.}
