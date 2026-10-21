@@ -38,7 +38,7 @@ comparison of two functions (\secref{no-coercions}). \Added{A run aborts with $\
 ruled out by the type system but which Python executes without failing, such as a condition which evaluates to a non-Boolean.
 Attribute references and dictionary keys ruled out by the type system also abort with $\errExcluded$, even though Python
 sometimes rejects them; to be more precise here would require the semantics to model the attributes Python assigns to a
-value, and the keys which Python can hash (\secref{eval-expressions}).} A primitive
+value, and the keys which Python considers hashable (\secref{eval-expressions}).} A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a function from
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
 $\primFn(\seq{u})$.
