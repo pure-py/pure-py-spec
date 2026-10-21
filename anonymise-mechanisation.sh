@@ -17,9 +17,12 @@ cd "$DEST/$NAME"
 rm -rf .github .claude
 grep -vE 'badge\.svg|\.github/workflows' README.md > README.tmp && mv README.tmp README.md
 
+for f in $(grep -rl 'isabelle-purepy' .); do
+  sed -e "s/isabelle-purepy/$NAME/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done
+
 # Language and repository names.
 for f in README.md ROOT; do
-  sed -e "s/isabelle-purepy/$NAME/g" -e "s/pure-py/$ANON_SLUG/g" -e "s/PurePy/$ANON_NAME/g" \
-    "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+  sed -e "s/pure-py/$ANON_SLUG/g" -e "s/PurePy/$ANON_NAME/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
 done
 make build
