@@ -318,7 +318,7 @@ The remaining type, the residual, reachability and exhaustiveness are the subjec
 \speconly{\subsubsection{Function definitions}\label{sec:well-formedness-defs}}%
 The \ruleName{defs} rule for a mutual def region of function definitions synthesises a type scheme for each definition
 (\specfigref{typing-def}), binds all the function names of the mutual def region at the synthesised type schemes, and checks each
-definition against its scheme\paperonly{:}\speconly{.}
+definition against its \replaced{type scheme}{scheme }\paperonly{:}\speconly{.}
 \paperinput{paper/well-formedness/defs}%
 For a definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$,
 the auxiliary judgements $\Sigma; \Gamma \vdash d \synth \pi$ and $\Sigma; \Gamma \vdash d \checks \pi$ synthesise the type
