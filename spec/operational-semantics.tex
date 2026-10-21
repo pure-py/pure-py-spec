@@ -78,14 +78,16 @@ not bound in $\rho$, or bound to $\Unbound$, aborts with $\errName$\speconly{ (\
 not a Boolean\speconly{ (\ruleName{eval-and-nonbool}, \ruleName{eval-or-nonbool})},} and
 a conditional expression requires its condition to be \replaced{a Boolean}{\pyinline{True} or \pyinline{False} }, like the
 \pyinline{if} statement\speconly{ (\ruleName{eval-if})}\Added{, aborting with $\errExcluded$ otherwise\speconly{
-(\ruleName{eval-cond-nonbool})}}. A comprehension evaluates its body once for each binding produced by its qualifiers, and
+(\ruleName{eval-cond-nonbool})}}.
+
+A comprehension evaluates its body once for each binding produced by its qualifiers, and
 concatenates the results; a generator draws its bindings from the elements of a value, given by the auxiliary
 function $\iterOp$\speconly{ (\S\ref{aux:iter})}: the elements of a
 list, tuple or string, and the keys of a dictionary, as in Python. \Added{A guard aborts with $\errExcluded$ when it
 evaluates to a non-Boolean\speconly{ (\ruleName{eval-qual-guard-nonbool})}.}
 \Added{A dictionary expression or comprehension with a key other than a string aborts with
 $\errExcluded$\speconly{ (\ruleName{eval-dict-nonstr}, \ruleName{eval-dict-comp-nonstr})}; Python raises
-\pyinline{TypeError} only for a key which it cannot hash, such as a list, a distinction which the \PurePy semantics
+\pyinline{TypeError} only for keys which it cannot hash, such as lists, a distinction which the \PurePy semantics
 does not record.}
 Subscripting, given by the auxiliary
 function $\getitem$\speconly{ (\S\ref{aux:getitem})}, indexes a list, tuple or
