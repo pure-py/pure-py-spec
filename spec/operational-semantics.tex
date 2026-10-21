@@ -40,8 +40,7 @@ ruled out by the type system but which Python executes without failing, such as 
 Attribute references, dictionary keys and constructor patterns headed by a built-in class, when ruled out by the type
 system, also abort with $\errExcluded$, even though Python sometimes rejects them; to be more precise here would require the
 semantics to model the attributes Python assigns to a value, the keys which Python considers hashable, and whether a value
-is an instance of a built-in class such as \pyinline{int}, which is an opaque value (\secref{eval-expressions},
-\secref{eval-patterns}).} A primitive
+is an instance of an opaque class such as \pyinline{int} (\secref{eval-expressions}, \secref{eval-patterns}).} A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a function from
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\replaced{\seq{v}}{\seq{u} }$ has result
 $\primFn(\replaced{\seq{v}}{\seq{u} })$.
