@@ -432,13 +432,13 @@
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   e \in \set{q, \exSubscript{q}{\seq{\psi}}} \\
-  \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \val{v_1 \cons \ldots \cons v_{n+m}} \\
+  \rho, \seq{e} \concat \seq{e}' \Rightarrow \val{\seq{v} \concat \seq{v}'} \\
   \resolve(\rho, q) = \Type{C} \\
   \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
-  \fieldMap{\Sigma}(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m})) = \set{\bind{\seq{x}}{\seq{u}}}
+  \fieldMap{\Sigma}(C, (\seq{v}, \seq{y} \mathord{=} \seq{v}')) = \set{\bind{\seq{x}}{\seq{u}}}
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{C}{\bind{\seq{x}}{\seq{u}}}}
+  \rho, \exCall{e}{\seq{e}, \seq{y} \mathord{=} \seq{e}'} \Rightarrow \val{\exObj{C}{\bind{\seq{x}}{\seq{u}}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-lambda}}]
@@ -646,7 +646,7 @@
 \inferrule*[lab={\ruleName{eval-dict-comp-fail-key}}]
 {
   \rho, \seq{g} \Rightarrow \val{\seq{\rho}} \\
-  \rho_i, e \Rightarrow \val{\replaced{u_i}{w_i\ }} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
+  \rho_i, e \Rightarrow \val{w_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
   \rho_j, e \Rightarrow \aborts{\kappa}
 }
 {
@@ -656,8 +656,8 @@
 \inferrule*[lab={\ruleName{eval-dict-comp-fail-value}}]
 {
   \rho, \seq{g} \Rightarrow \val{\seq{\rho}} \\
-  \rho_i, e \Rightarrow \val{\replaced{u_i}{w_i\ }} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
-  \rho_j, e \Rightarrow \val{\replaced{u_j}{w_j\ }} \\
+  \rho_i, e \Rightarrow \val{w_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
+  \rho_j, e \Rightarrow \val{w_j} \\
   \rho_j, e' \Rightarrow \aborts{\kappa}
 }
 {
@@ -667,10 +667,10 @@
 \inferrule*[lab={\ruleName{eval-constr-fail}}]
 {
   e \in \set{q, \exSubscript{q}{\seq{\psi}}} \\
-  \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \aborts{\kappa}
+  \rho, \seq{e} \concat \seq{e}' \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \aborts{\kappa}
+  \rho, \exCall{e}{\seq{e}, \seq{y} \mathord{=} \seq{e}'} \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
 \caption{Expression evaluation, continued (propagation rules)}
@@ -731,12 +731,12 @@
 \added{\inferrule*[lab={\ruleName{eval-constr-arity}}]
 {
   e \in \set{q, \exSubscript{q}{\seq{\psi}}} \\
-  \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \val{v_1 \cons \ldots \cons v_{n+m}} \\
+  \rho, \seq{e} \concat \seq{e}' \Rightarrow \val{\seq{v} \concat \seq{v}'} \\
   \resolve(\rho, q) = \Type{C} \\
-  \fieldMap{\Sigma}(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m})) \text{ undefined}
+  \fieldMap{\Sigma}(C, (\seq{v}, \seq{y} \mathord{=} \seq{v}')) \text{ undefined}
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \aborts{\errType}
+  \rho, \exCall{e}{\seq{e}, \seq{y} \mathord{=} \seq{e}'} \Rightarrow \aborts{\errType}
 }}
 \and
 \input{spec/rules/eval-call-nonfun}
@@ -789,7 +789,8 @@
 \added{\inferrule*[lab={\ruleName{eval-dict-comp-nonstr}}]
 {
   \rho, \seq{g} \Rightarrow \val{\seq{\rho}} \\
-  \rho_i, e \Rightarrow \val{u_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i) \\
+  \rho_i, e \Rightarrow \val{w_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
+  \rho_j, e \Rightarrow \val{u_j} \\
   u_j \text{ not a string}
 }
 {
