@@ -185,7 +185,7 @@
 \added{\inferrule*[lab={\ruleName{eval-assert-nonbool}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  v \notin \set{\pyinline{True}, \pyinline{False}}
+  v \text{ not a Boolean}
 }
 {
   \rho, \exAssert{e} \Rightarrow \aborts{\errExcluded}
@@ -194,7 +194,7 @@
 \added{\inferrule*[lab={\ruleName{eval-assert-msg-nonbool}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  v \notin \set{\pyinline{True}, \pyinline{False}}
+  v \text{ not a Boolean}
 }
 {
   \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\errExcluded}
@@ -232,7 +232,7 @@
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
   \rho, e_i \Rightarrow \val{v} \\
-  v \notin \set{\pyinline{True}, \pyinline{False}}
+  v \text{ not a Boolean}
 }
 {
   \rho, \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\errExcluded}
@@ -242,7 +242,7 @@
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
   \rho, e_i \Rightarrow \val{v} \\
-  v \notin \set{\pyinline{True}, \pyinline{False}}
+  v \text{ not a Boolean}
 }
 {
   \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow \aborts{\errExcluded}
@@ -744,7 +744,7 @@
 \added{\inferrule*[lab={\ruleName{eval-and-nonbool}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  v \notin \set{\pyinline{True}, \pyinline{False}}
+  v \text{ not a Boolean}
 }
 {
   \rho, \exAnd{e}{e'} \Rightarrow \aborts{\errExcluded}
@@ -753,7 +753,7 @@
 \added{\inferrule*[lab={\ruleName{eval-or-nonbool}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  v \notin \set{\pyinline{True}, \pyinline{False}}
+  v \text{ not a Boolean}
 }
 {
   \rho, \exOr{e}{e'} \Rightarrow \aborts{\errExcluded}
@@ -762,7 +762,7 @@
 \added{\inferrule*[lab={\ruleName{eval-cond-nonbool}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  v \notin \set{\pyinline{True}, \pyinline{False}}
+  v \text{ not a Boolean}
 }
 {
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow \aborts{\errExcluded}
@@ -779,8 +779,8 @@
 \and
 \added{\inferrule*[lab={\ruleName{eval-dict-nonstr}}]
 {
-  \rho, e_1 \cons e_1' \cons \ldots \cons e_n \cons e_n' \Rightarrow \val{u_1 \cons v_1 \cons \ldots \cons u_n \cons v_n} \\
-  u_j \text{ not a string}
+  \rho, e_1 \cons e_1' \cons \ldots \cons e_n \cons e_n' \Rightarrow \val{v_1 \cons v_1' \cons \ldots \cons v_n \cons v_n'} \\
+  v_j \text{ not a string}
 }
 {
   \rho, \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \Rightarrow \aborts{\errExcluded}
@@ -790,8 +790,8 @@
 {
   \rho, \seq{g} \Rightarrow \val{\seq{\rho}} \\
   \rho_i, e \Rightarrow \val{w_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
-  \rho_j, e \Rightarrow \val{u_j} \\
-  u_j \text{ not a string}
+  \rho_j, e \Rightarrow \val{v} \\
+  v \text{ not a string}
 }
 {
   \rho, \exDictComp{e}{e'}{\seq{g}} \Rightarrow \aborts{\errExcluded}
@@ -877,7 +877,7 @@
 \added{\inferrule*[lab={\ruleName{eval-qual-guard-nonbool}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  v \notin \set{\pyinline{True}, \pyinline{False}}
+  v \text{ not a Boolean}
 }
 {
   \rho, \qualGuard{e} \cons \seq{g} \Rightarrow \aborts{\errExcluded}
@@ -886,8 +886,8 @@
 \inferrule*[lab={\ruleName{eval-qual-generator}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \iterOp(v) = u_1 \cons \ldots \cons u_n \\
-  \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i)
+  \iterOp(v) = \replaced{v_1 \cons \ldots \cons v_n}{u_1 \cons \ldots \cons u_n } \\
+  \rho \override \set{\bind{x}{\replaced{v_i}{u_i}}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i)
 }
 {
   \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \val{\seq{\rho}_1 \mathbin{\concat} \ldots \mathbin{\concat} \seq{\rho}_n}
@@ -913,9 +913,9 @@
 \inferrule*[lab={\ruleName{eval-qual-generator-fail-body}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \iterOp(v) = u_1 \cons \ldots \cons u_n \\
-  \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i < j) \\
-  \rho \override \set{\bind{x}{u_j}}, \seq{g} \Rightarrow \aborts{\kappa}
+  \iterOp(v) = \replaced{v_1 \cons \ldots \cons v_n}{u_1 \cons \ldots \cons u_n } \\
+  \rho \override \set{\bind{x}{\replaced{v_i}{u_i}}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i < j) \\
+  \rho \override \set{\bind{x}{\replaced{v_j}{u_j}}}, \seq{g} \Rightarrow \aborts{\kappa}
 }
 {
   \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \aborts{\kappa}
