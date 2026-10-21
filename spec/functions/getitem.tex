@@ -4,5 +4,6 @@
 \getitem(v, n) &{}= \val{v_{n+1}} && \quad \text{if } \elems(v) = v_1 \cons \ldots \cons v_m\added{, n \text{ integer}} \text{ and } 0 \leq n < m \\*
 \getitem(v, n) &{}= \val{v_{m+n+1}} && \quad \text{if } \elems(v) = v_1 \cons \ldots \cons v_m\added{, n \text{ integer}} \text{ and } {-m} \leq n < 0 \\*
 \getitem(v, n) &{}= \aborts{\errIndex} && \quad \text{if } \elems(v) = v_1 \cons \ldots \cons v_m\added{, n \text{ integer}} \text{ and } (n < -m \text{ or } n \geq m) \\*
+\added{\getitem(v, v')} &\added{{}= \aborts{\errExcluded}} && \added{\quad \text{if } v \text{ a list, tuple or string and } v' \text{ a Boolean}} \\*
 \added{\getitem(v, v')} &\added{{}= \aborts{\errExcluded}} && \added{\quad \text{if } v \text{ a range}} \\*
 \getitem(v, v') &{}= \aborts{\errType} && \quad \text{otherwise}

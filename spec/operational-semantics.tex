@@ -41,7 +41,10 @@ sometimes rejects them; to be more precise here would require the semantics to m
 value, and the keys which Python considers hashable (\secref{eval-expressions}).} A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a function from
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
-$\primFn(\seq{u})$.
+$\primFn(\seq{u})$. \Added{The meaning of \pyinline{round} aborts with $\errExcluded$ for a Boolean argument, which Python
+rounds as the integer 0 or 1, and for a second argument giving the number of digits, and the meaning of
+\pyinline{sys.exit} for no argument or an argument other than an integer, for which Python exits with status 0 for
+\pyinline{None} and otherwise prints the argument and exits with status 1.}
 
 The rules are given in a monadic metalanguage over results (\figref{values}). If $r$ is
 $\val{v}$, then $\mlet{v}{r}{\ldots}$ is the body with $v$ bound to that value; if $r$ is
@@ -100,7 +103,8 @@ $\errExcluded$\speconly{ (\ruleName{eval-dict-nonstr}, \ruleName{eval-dict-comp-
 membership with such a key; Python raises \pyinline{TypeError} only for keys it cannot hash, such as lists, but \PurePy
 has no notion of hashing and cannot distinguish them from other keys.}
 \replaced{Subscripting is given by the auxiliary function $\getitem$, and membership by
-$\contains{\Sigma}$\speconly{ (\S\ref{aux:getitem}, \S\ref{aux:contains})}; both abort with $\errExcluded$ for a range.}{Subscripting, given by the auxiliary
+$\contains{\Sigma}$\speconly{ (\S\ref{aux:getitem}, \S\ref{aux:contains})}; both abort with $\errExcluded$ for a range, as does
+subscripting for a Boolean index, which Python treats as the integer 0 or 1.}{Subscripting, given by the auxiliary
 function $\getitem$\speconly{ (\S\ref{aux:getitem})}, indexes a list, tuple or
 string by an integer, counting from the end when negative, and a dictionary by a string key,
 aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name, and with $\errType$ for a
