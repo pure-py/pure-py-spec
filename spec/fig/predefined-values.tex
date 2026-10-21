@@ -11,7 +11,8 @@
  & \pyinline{range} & \multicolumn{2}{l}{$\Type{\clsRange}$} \\
  & \pyinline{round} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
  & & $\quad \primFn(n) = \val{n'}$ & if $n'$ nearest integer to $n$, ties to even \\
- & & $\quad \primFn(n) = \replaced{\aborts{\errOverflow}}{\aborts{\errUndef}\ }$ & if $n$ \replaced{infinite}{not finite } \\
+ & & \deleted{$\quad \primFn(n) = \aborts{\errUndef}$} & \deleted{if $n$ not finite} \\
+ & & \added{$\quad \primFn(n) = \aborts{\errOverflow}$} & \added{if $n$ infinite} \\
  & & \added{$\quad \primFn(n) = \aborts{\errValue}$} & \added{if $n$ \pyinline{nan}} \\
  & & $\quad \primFn(\seq{u}) = \aborts{\errType}$ & otherwise \\
  & \pyinline{None} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{None}}$} \\

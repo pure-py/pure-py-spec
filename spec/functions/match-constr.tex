@@ -4,8 +4,8 @@
 &\qquad \text{and } x_i = y_{j_i} \text{ for each } i \\*
 \added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, \exObj{D}{\bind{\seq{y}}{\seq{v}}})} &\added{{}= \errType} \\*
 &\added{\qquad \text{if } \resolve(\rho, q) = \Type{C} \text{ and } C \in \ancestors{\Sigma}(D),} \\*
-&\added{\qquad \text{and } a \text{ has more positional sub-patterns than } C \text{ has fields,}} \\*
-&\added{\qquad \text{or two sub-patterns for one field}} \\*
+&\added{\qquad \text{and } a \text{ has more positional sub-patterns}} \\*
+&\added{\qquad \text{than } C \text{ has fields, or two sub-patterns for one field}} \\*
 \added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, \exObj{D}{\bind{\seq{y}}{\seq{v}}})} &\added{{}= \errExcluded} \\*
 &\added{\qquad \text{if } \resolve(\rho, q) = \Type{C} \text{ and } C \in \ancestors{\Sigma}(D),} \\*
 &\added{\qquad \text{and } \fieldMap{\Sigma}(C, a) \text{ otherwise undefined}}

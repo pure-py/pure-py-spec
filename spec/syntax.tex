@@ -196,8 +196,8 @@ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context 
 
 \speconly{\noindent The predefined signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in their union. The class table $\SigmaPredef$ of the predefined modules is
-$\set{\bind{\clsRange}{\ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}}}$, where $\chi$ is the definition
-\pyinline{@dataclass class range: start: int; stop: int} and $\Gamma$ is the signature of \pyinline{builtins}.}
+$\set{\bind{\clsRange}{\ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}}}$, where $\chi$ \replaced{defines the dataclass \pyinline{range} with fields \pyinline{start: int} and
+\pyinline{stop: int}}{is the definition \pyinline{@dataclass} \pyinline{class range:} \pyinline{start: int;} \pyinline{stop: int} } and $\Gamma$ is the signature of \pyinline{builtins}.}
 
 \specinput{spec/fig/predefined-signatures}
 
