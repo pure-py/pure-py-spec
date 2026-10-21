@@ -41,8 +41,8 @@ system, also abort with $\errExcluded$, even though Python sometimes rejects the
 semantics to model the attributes Python assigns to a value, the keys which Python considers hashable, and the instances
 of the predefined classes (\secref{eval-expressions}, \secref{eval-patterns}).} A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a function from
-arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
-$\primFn(\seq{u})$. \Added{An opaque value $\opaqueVal{q.x}$ is the
+arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\replaced{\seq{v}}{\seq{u} }$ has result
+$\primFn(\replaced{\seq{v}}{\seq{u} })$. \Added{An opaque value $\opaqueVal{q.x}$ is the
 value of a predefined member used only in type expressions, such as \pyinline{int} or \pyinline{Callable}; the semantics gives
 it no meaning beyond its name.}
 
