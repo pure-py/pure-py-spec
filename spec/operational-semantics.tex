@@ -70,7 +70,7 @@ the result of a call\speconly{; if the statement completes without returning, th
 \paperinput{paper/operational-semantics/result}
 
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with $\Gamma \vdash e \synth
-\tau$, the expression evaluation judgement $\rho, e \Rightarrow r$ (\specfigrefTwo{eval-result}{eval-result-ctd}) says that $e$ evaluates to
+\tau$, the expression evaluation judgement $\rho, e \Rightarrow r$ (\specfigref{eval-result}) says that $e$ evaluates to
 result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). \Added{A variable
 not bound in $\rho$, or bound to $\Unbound$, aborts with $\errName$\speconly{ (\ruleName{eval-var-unknown},
 \ruleName{eval-var-unbound})}.} The operators

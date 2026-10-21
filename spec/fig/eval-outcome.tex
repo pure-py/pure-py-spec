@@ -411,6 +411,15 @@
   \rho, \exAttr{e}{x} \Rightarrow \val{v}
 }
 \and
+\inferrule*[lab={\ruleName{eval-subscript}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  \rho, e' \Rightarrow r
+}
+{
+  \rho, \exSubscript{e}{e'} \Rightarrow \mlet{v'}{r}{\getitem(v, v')}
+}
+\and
 \inferrule*[lab={\ruleName{eval-attr-object}}]
 {
   \rho, e \Rightarrow \val{\exObj{C}{\bind{\seq{x}}{\seq{v}}}} \\
@@ -430,24 +439,6 @@
 }
 {
   \rho, \exCall{e}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{C}{\bind{\seq{x}}{\seq{u}}}}
-}
-\end{mathpar}
-\caption{Expression $e$ evaluates to result $r$ under environment $\rho : \Gamma$}
-\label{fig:eval-result}
-\end{figure}
-
-\begin{figure}
-\small
-\flushleft \shadebox{$\rho, e \Rightarrow r$ (continued)}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{eval-subscript}}]
-{
-  \rho, e \Rightarrow \val{v} \\
-  \rho, e' \Rightarrow r
-}
-{
-  \rho, \exSubscript{e}{e'} \Rightarrow \mlet{v'}{r}{\getitem(v, v')}
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-lambda}}]
@@ -533,8 +524,8 @@
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow r
 }
 \end{mathpar}
-\caption{Expression evaluation, continued}
-\label{fig:eval-result-ctd}
+\caption{Expression $e$ evaluates to result $r$ under environment $\rho : \Gamma$}
+\label{fig:eval-result}
 \end{figure}
 
 \begin{figure}
