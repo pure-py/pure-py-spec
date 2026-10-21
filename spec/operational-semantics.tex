@@ -35,8 +35,7 @@ Python raises \pyinline{UnboundLocalError}, a subclass of \pyinline{NameError}; 
 the environment to record whether unbound variables belong to functions or modules.} A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, \added{namely an operation allowed by Python
 but not defined by \PurePy,} such as a
 comparison of two functions (\secref{no-coercions}). \Added{A run aborts with $\errExcluded$ when it reaches an operation
-ruled out by the type system but which Python executes without failing, such as a condition which evaluates to a value other
-than a Boolean.} A primitive
+ruled out by the type system but which Python executes without failing, such as a condition which evaluates to a non-Boolean.} A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a function from
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
 $\primFn(\seq{u})$.
@@ -59,8 +58,7 @@ A value is well-formed at a context entry, and an environment at a context (\spe
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any statement $s$ with
 $\Gamma \vdash s : R$, the statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
 to outcome $o$ in $\rho$ (\specfigrefTwo{eval-block-outcome}{eval-block-fails}). \Added{An \pyinline{if} or
-\pyinline{assert} statement aborts with $\errExcluded$ when a condition evaluates to a value other than a
-Boolean\speconly{ (\ruleName{eval-if-nonbool}, \ruleName{eval-if-else-nonbool}, \ruleName{eval-assert-nonbool},
+\pyinline{assert} statement aborts with $\errExcluded$ when a condition evaluates to a non-Boolean\speconly{ (\ruleName{eval-if-nonbool}, \ruleName{eval-if-else-nonbool}, \ruleName{eval-assert-nonbool},
 \ruleName{eval-assert-msg-nonbool})}, and a failing \pyinline{assert} statement also aborts with $\errExcluded$ when
 its message is not a string\speconly{ (\ruleName{eval-assert-msg-nonstr})}.} Top-level statements
 are evaluated by a separate judgement, $q, \rho, t \Rightarrow o$ (\specfigref{eval-top-level}), mirroring the static
@@ -84,7 +82,7 @@ a conditional expression requires its condition to be \replaced{a Boolean}{\pyin
 concatenates the results; a generator draws its bindings from the elements of a value, given by the auxiliary
 function $\iterOp$\speconly{ (\S\ref{aux:iter})}: the elements of a
 list, tuple or string, and the keys of a dictionary, as in Python. \Added{A guard aborts with $\errExcluded$ when it
-evaluates to a value other than a Boolean\speconly{ (\ruleName{eval-qual-guard-nonbool})}.}
+evaluates to a non-Boolean\speconly{ (\ruleName{eval-qual-guard-nonbool})}.}
 \Added{A dictionary expression or comprehension with a key other than a string aborts with
 $\errExcluded$\speconly{ (\ruleName{eval-dict-nonstr}, \ruleName{eval-dict-comp-nonstr})}; Python accepts such a
 key, or raises \pyinline{TypeError} for a key which it cannot hash, such as a list, a distinction which the semantics does
