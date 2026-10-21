@@ -91,7 +91,7 @@ $\errExcluded$\speconly{ (\ruleName{eval-dict-nonstr}, \ruleName{eval-dict-comp-
 does not record.}
 Subscripting, given by the auxiliary
 function $\getitem$\speconly{ (\S\ref{aux:getitem})}, indexes a list, tuple or
-string by an integer, counting from the end when negative, and a dictionary by a string key,
+string by an integer, counting from the end when negative, and \added{indexes }a dictionary by a string key,
 aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name\added{, and with $\errExcluded$ for a range, which Python indexes as a
 sequence, and for a dictionary subscripted by a key other than a string, where Python raises \pyinline{KeyError}, or
 \pyinline{TypeError} for a key which it cannot hash}\deleted{, and with $\errType$ for a
