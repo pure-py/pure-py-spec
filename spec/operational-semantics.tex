@@ -97,7 +97,7 @@ dictionary subscripted by a value other than a string}. \Added{Any attempt to su
 no subscript rule applies to ranges, although Python allows it. Dictionaries subscripted by keys
 other than strings also abort with $\errExcluded$, although Python raises \pyinline{KeyError}, or \pyinline{TypeError}
 for keys it cannot hash, since \PurePy has no notion of hashing and cannot distinguish the two.} An attribute reference on a
-value other than a module or object aborts with \replaced{$\errExcluded$}{$\errAttr$ }\speconly{ (\ruleName{eval-attr-nonobject})}; this version of \PurePy does not support the attributes given to other values by Python, such as the methods of a string\added{, or distinguish a reference to such an attribute from a reference to an attribute the value lacks, which Python rejects with \pyinline{AttributeError}}.
+value other than a module or object aborts with \replaced{$\errExcluded$}{$\errAttr$ }\speconly{ (\ruleName{eval-attr-nonobject})}\replaced{. In this version of \PurePy such values have no attributes, whereas in Python a string, for example, has methods; a reference which Python rejects with \pyinline{AttributeError} aborts with $\errExcluded$ too, since \PurePy does not keep track of which attributes Python provides.}{; this version of \PurePy does not support the attributes given to other values by Python, such as the methods of a string. }
 
 \specinput{spec/fig/well-formed-values}
 
