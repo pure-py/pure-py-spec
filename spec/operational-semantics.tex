@@ -45,7 +45,7 @@ $\val{v}$, then $\mlet{v}{r}{\ldots}$ is the body with $v$ bound to that value; 
 $\aborts{\kappa}$, it is $\aborts{\kappa}$. The body is a result in the expression rules and an outcome in
 the statement rules. A final
 premise needs no propagation rule; earlier premises have one each, recording the subexpressions evaluated
-before the failing one (\specfigref{eval-fails}). The sequence and module judgements use
+before the failing one (\specfigref{eval-propagation}). The sequence and module judgements use
 results carrying a sequence of values or an environment in place of a value.
 \paperinput{paper/operational-semantics/evaluation-example}
 
