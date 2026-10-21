@@ -2,5 +2,16 @@
 &\deleted{\qquad \text{if } \resolve(\rho, q) = \Type{C} \text{ and } C \in \ancestors{\Sigma}(D)} \\*
 &\deleted{\qquad \text{where } \fieldMap{\Sigma}(C, a) = \set{\bind{x_1}{p_1}, \ldots, \bind{x_n}{p_n}}} \\*
 &\deleted{\qquad \text{and } x_i = y_{j_i} \text{ for each } i} \\*
+\added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, v)} &\added{{}= \errName} \\*
+&\added{\qquad \text{if } x_1 \notin \dom(\rho) \text{ or } \rho(x_1) = \Unbound} \\*
+&\added{\qquad \text{where } q = x_1.\cdots.x_{n+1}} \\*
+\added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, v)} &\added{{}= \errAttr} \\*
+&\added{\qquad \text{if } \resolve(\rho, q) \text{ undefined, } x_1 \in \dom(\rho)} \\*
+&\added{\qquad \text{and } \rho(x_1) \neq \Unbound} \\*
+\added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, v)} &\added{{}= \errExcluded} \\*
+&\added{\qquad \text{if } \resolve(\rho, q) = \opaqueVal{\pyinline{builtins}.x}} \\*
+\added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, v)} &\added{{}= \errType} \\*
+&\added{\qquad \text{if } \resolve(\rho, q) \text{ neither } \Type{C}} \\*
+&\added{\qquad \text{nor } \opaqueVal{\pyinline{builtins}.x}} \\*
 \added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, \exObj{D}{\bind{\seq{z}}{\seq{v}}})} &\added{{}= \matchFields{\Sigma}(\rho, C, a, \bind{\seq{z}}{\seq{v}})} \\*
 &\added{\qquad \text{if } \resolve(\rho, q) = \Type{C} \text{ and } C \in \ancestors{\Sigma}(D)}

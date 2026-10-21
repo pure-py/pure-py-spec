@@ -36,15 +36,18 @@ the environment to record whether unbound variables belong to functions or modul
 but not defined by \PurePy,} such as a
 comparison of two functions (\secref{no-coercions}). \Added{A run aborts with $\errExcluded$ when it reaches an operation
 ruled out by the type system but which Python executes without failing, such as a condition which evaluates to a non-Boolean.
-Attribute references and dictionary keys ruled out by the type system also abort with $\errExcluded$, even though Python
-sometimes rejects them; to be more precise here would require the semantics to model the attributes Python assigns to a
-value, and the keys which Python considers hashable (\secref{eval-expressions}).} A primitive
+Attribute references, dictionary keys and constructor patterns headed by a predefined class, when ruled out by the type
+system, also abort with $\errExcluded$, even though Python sometimes rejects them; to be more precise here would require the
+semantics to model the attributes Python assigns to a value, the keys which Python considers hashable, and the instances
+of the predefined classes (\secref{eval-expressions}, \secref{eval-patterns}).} A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a function from
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
 $\primFn(\seq{u})$. \Added{The meaning of \pyinline{round} aborts with $\errExcluded$ for a Boolean argument, which Python
 rounds as the integer 0 or 1, and for a second argument giving the number of digits, and the meaning of
 \pyinline{sys.exit} for no argument or an argument other than an integer, for which Python exits with status 0 for
-\pyinline{None} and otherwise prints the argument and exits with status 1.}
+\pyinline{None} and otherwise prints the argument and exits with status 1.} \Added{An opaque value $\opaqueVal{q.x}$ is the
+value of a predefined member used only in type expressions, such as \pyinline{int} or \pyinline{Callable}; the semantics gives
+it no meaning beyond its name.}
 
 The rules are given in a monadic metalanguage over results (\figref{values}). If $r$ is
 $\val{v}$, then $\mlet{v}{r}{\ldots}$ is the body with $v$ bound to that value; if $r$ is
@@ -129,7 +132,9 @@ $\noMatch$, a failure to match\replaced{;}{, } or \replaced{a termination kind $
 \replaced{matching aborts with $\kappa$ before any pattern matches, $\dispatch$ gives $\kappa$, and the run aborts with $\kappa$}{a match result is undefined, the value of $\dispatch$ is also undefined, and the run has undefined behaviour }\speconly{ (\ruleName{eval-match-abort})}.
 \speconly{\Added{Matching a list pattern against a tuple, a tuple pattern against a list, or either against a range
 aborts with $\errExcluded$ (\S\ref{aux:match}); a constructor pattern against an object aborts with $\errType$ or
-$\errExcluded$ when the sub-patterns do not cover the fields of the class (\S\ref{aux:match-fields}).}}
+$\errExcluded$ when the sub-patterns do not cover the fields of the class (\S\ref{aux:match-fields}). A constructor pattern
+whose head does not denote a class aborts with $\errName$, $\errAttr$ or $\errType$, as in Python, or with $\errExcluded$
+for a predefined class such as \pyinline{int}, which Python matches by an instance test (\S\ref{aux:match}).}}
 \begin{specdefinition}{Composition of match results}
 The match results of sub-patterns compose with
 $\override$, matching sequentially, so that the first failure or \replaced{abort determines the result}{undefined result decides }:

@@ -2,3 +2,5 @@ Result of matching the sub-patterns of $a$ against the fields $\bind{\seq{z}}{\s
 among its ancestors: the sub-patterns match the fields of $C$ named by $\fieldMap{\Sigma}(C, a)$, composing with
 $\override$; $\errType$ if $a$ has more positional sub-patterns than $C$ has fields, or two sub-patterns for one field,
 as in Python; and $\errExcluded$ if $a$ otherwise does not cover the fields of $C$ exactly, which Python allows.
+For the class $\clsRange$, for which Python does not support positional sub-patterns, a positional sub-pattern gives
+$\errType$, and the keyword form, which Python matches, gives $\errExcluded$.

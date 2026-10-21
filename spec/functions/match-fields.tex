@@ -1,6 +1,8 @@
 \matchFields{\Sigma}(\rho, C, a, \bind{\seq{z}}{\seq{v}}) &{}= \matchOp{\Sigma}(\rho, p_1, v_{j_1}) \override \ldots \override \matchOp{\Sigma}(\rho, p_n, v_{j_n}) \\*
 &\qquad \text{if } \fieldMap{\Sigma}(C, a) = \set{\bind{x_1}{p_1}, \ldots, \bind{x_n}{p_n}} \\*
-&\qquad \text{and } x_i = z_{j_i} \text{ for each } i \\*
+&\qquad \text{and } x_i = z_{j_i} \text{ for each } i \text{, and } C \neq \clsRange \\*
+\matchFields{\Sigma}(\rho, C, (\seq{p}, \seq{y} \mathord{=} \seq{p}\,'), \bind{\seq{z}}{\seq{v}}) &{}= \errType \\*
+&\qquad \text{if } C = \clsRange \text{ and } |\seq{p}| \geq 1 \\*
 \matchFields{\Sigma}(\rho, C, (\seq{p}, \seq{y} \mathord{=} \seq{p}\,'), \bind{\seq{z}}{\seq{v}}) &{}= \errType \\*
 &\qquad \text{if } \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \text{, and } |\seq{p}| > |\seq{x}| \text{,} \\*
 &\qquad \text{or } y_i = y_j \text{ for some } i \neq j \text{, or } y_i = x_j \text{ for some } j \leq |\seq{p}| \\*
