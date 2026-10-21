@@ -78,7 +78,7 @@ not bound in $\rho$, or bound to $\Unbound$, aborts with $\errName$\speconly{ (\
 \ruleName{eval-var-unbound})}.} The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, \Added{aborting with $\errExcluded$ if the first operand is
 not a Boolean\speconly{ (\ruleName{eval-and-nonbool}, \ruleName{eval-or-nonbool})},} and
-a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, like the
+a conditional expression requires its condition to be \replaced{a Boolean}{\pyinline{True} or \pyinline{False} }, like the
 \pyinline{if} statement\speconly{ (\ruleName{eval-if})}\Added{, aborting with $\errExcluded$ otherwise\speconly{
 (\ruleName{eval-cond-nonbool})}}. A comprehension evaluates its body once for each binding produced by its qualifiers, and
 concatenates the results; a generator draws its bindings from the elements of a value, given by the auxiliary
