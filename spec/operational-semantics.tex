@@ -29,8 +29,8 @@ to sequential composition of static outcomes:
 \input{spec/fig/eval-values}
 
 A \emph{termination
-kind} $\kappa$ records how a run ends; all but \replaced{$\errExit{n}$, $\errUndef$ and $\errExcluded$}{$\errExit{n}$ and $\errUndef$ } are named after the exceptions raised by the same program
-under Python in the same circumstances. \Added{A variable read before its assignment aborts with $\errName$ also where
+kind} $\kappa$ records how a run ends; all but \replaced{$\errUndef$ and $\errExcluded$}{$\errExit{n}$ and $\errUndef$ } are named after the exceptions raised by the same program
+under Python in the same circumstances\added{, except that $\errExit{0}$ also records a run which completes normally}. \Added{A variable read before its assignment aborts with $\errName$ also where
 Python raises \pyinline{UnboundLocalError}, which is a subclass of \pyinline{NameError}, since the semantics does not
 distinguish a local variable of a function from a variable of a module.} A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, \added{which is allowed by Python
 but not defined by \PurePy,} such as a
