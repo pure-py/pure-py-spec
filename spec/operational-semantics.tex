@@ -42,10 +42,7 @@ semantics to model the attributes Python assigns to a value, the keys which Pyth
 of the predefined classes (\secref{eval-expressions}, \secref{eval-patterns}).} A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a function from
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
-$\primFn(\seq{u})$. \Added{The meaning of \pyinline{round} aborts with $\errExcluded$ for a Boolean argument, which Python
-rounds as the integer 0 or 1, and for a second argument giving the number of digits, and the meaning of
-\pyinline{sys.exit} for no argument or an argument other than an integer, for which Python exits with status 0 for
-\pyinline{None} and otherwise prints the argument and exits with status 1.} \Added{An opaque value $\opaqueVal{q.x}$ is the
+$\primFn(\seq{u})$. \Added{An opaque value $\opaqueVal{q.x}$ is the
 value of a predefined member used only in type expressions, such as \pyinline{int} or \pyinline{Callable}; the semantics gives
 it no meaning beyond its name.}
 
