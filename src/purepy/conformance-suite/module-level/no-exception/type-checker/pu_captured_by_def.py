@@ -1,4 +1,4 @@
-# rule: if
+# rule: var
 def f(b: bool) -> int:
     x: int
     if b:

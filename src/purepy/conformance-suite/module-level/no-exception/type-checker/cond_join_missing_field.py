@@ -1,4 +1,4 @@
-# rule: cond-syn
+# rule: attr-union
 from dataclasses import dataclass
 
 @dataclass

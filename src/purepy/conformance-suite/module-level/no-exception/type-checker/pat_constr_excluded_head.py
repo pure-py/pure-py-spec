@@ -1,4 +1,4 @@
-# rule: head-class
+# rule: pat-shapes
 from dataclasses import dataclass
 
 

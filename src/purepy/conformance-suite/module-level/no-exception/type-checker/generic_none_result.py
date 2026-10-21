@@ -1,3 +1,4 @@
+# rule: call
 def show[T](x: T) -> None:
     print(x)
 

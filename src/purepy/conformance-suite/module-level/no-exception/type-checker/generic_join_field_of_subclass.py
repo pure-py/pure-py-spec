@@ -1,4 +1,4 @@
-# rule: cond-syn
+# rule: attr-object
 from dataclasses import dataclass
 
 @dataclass

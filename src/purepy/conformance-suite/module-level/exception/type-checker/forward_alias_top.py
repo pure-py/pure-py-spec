@@ -1,4 +1,4 @@
-# rule: type-alias
+# rule: ty-alias
 n: Num = 1
 
 type Num = int

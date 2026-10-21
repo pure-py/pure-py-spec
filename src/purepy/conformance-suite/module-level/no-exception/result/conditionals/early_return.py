@@ -1,3 +1,4 @@
+# rule: if-else
 def foo(a: int, b: int) -> str:
     comp: str
     if a < b:

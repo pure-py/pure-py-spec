@@ -1,4 +1,4 @@
-# rule: if
+# rule: var
 b: bool = True
 
 if b:

@@ -1,3 +1,4 @@
+# rule: ty-class
 from dataclasses import dataclass
 
 

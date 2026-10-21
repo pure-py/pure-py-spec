@@ -1,3 +1,3 @@
-# rule: subty-int-float
+# rule: check-syn
 x: int = 1.5
 print(x)

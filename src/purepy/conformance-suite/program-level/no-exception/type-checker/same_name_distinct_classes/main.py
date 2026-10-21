@@ -1,4 +1,4 @@
-# rule: subty-class
+# rule: check-syn
 import a
 import b
 

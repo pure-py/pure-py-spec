@@ -1,4 +1,4 @@
-# rule: pat-constr
+# rule: pat-shapes
 from dataclasses import dataclass
 
 @dataclass

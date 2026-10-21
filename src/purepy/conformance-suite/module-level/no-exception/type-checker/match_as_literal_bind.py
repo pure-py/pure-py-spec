@@ -1,4 +1,4 @@
-# rule: pat-as
+# rule: check-syn
 def f(v: int) -> str:
     match v:
         case 1 as y:

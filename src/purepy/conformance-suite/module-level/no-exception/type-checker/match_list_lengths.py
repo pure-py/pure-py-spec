@@ -1,4 +1,4 @@
-# rule: split-list
+# rule: def-body
 def f(xs: list[int]) -> int:
     match xs:
         case []:

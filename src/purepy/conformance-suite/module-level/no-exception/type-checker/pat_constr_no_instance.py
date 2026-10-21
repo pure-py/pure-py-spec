@@ -1,4 +1,4 @@
-# rule: check-constr-none
+# rule: pat-shapes
 from dataclasses import dataclass
 
 

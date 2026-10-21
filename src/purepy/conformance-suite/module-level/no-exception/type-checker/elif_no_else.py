@@ -1,4 +1,4 @@
-# rule: if
+# rule: var
 x: int = 1
 y: int
 if x == 0:

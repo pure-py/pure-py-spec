@@ -1,4 +1,4 @@
-# rule: pat-wild
+# rule: pat-shapes
 v: int = 1
 match v:
     case _:

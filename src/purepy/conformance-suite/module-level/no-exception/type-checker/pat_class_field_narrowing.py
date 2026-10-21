@@ -1,4 +1,4 @@
-# rule: check-constr
+# rule: binop
 from dataclasses import dataclass
 
 @dataclass

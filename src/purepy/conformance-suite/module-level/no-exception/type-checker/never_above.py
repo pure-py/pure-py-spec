@@ -1,4 +1,4 @@
-# rule: subty-never
+# rule: check-syn
 from typing import Never
 
 def f() -> Never:

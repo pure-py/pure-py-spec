@@ -1,4 +1,4 @@
-# rule: match-partial
+# rule: var
 def f(t: tuple[bool, bool]) -> int:
     r: int
     match t:

@@ -1,4 +1,4 @@
-# rule: check-dict-none
+# rule: pat-shapes
 def f(o: object) -> int:
     match o:
         case {"a": x}:

@@ -1,3 +1,4 @@
+# rule: pat-shapes
 d: dict[str, int] = {"a": 1}
 match d:
     case {"a": x}:

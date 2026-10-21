@@ -1,4 +1,4 @@
-# rule: check-tuple-none
+# rule: pat-shapes
 def f(t: tuple[int, int]) -> int:
     match t:
         case (a, b, c):

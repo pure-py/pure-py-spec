@@ -1,3 +1,4 @@
+# rule: var
 def f(v: list[int]) -> None:
     match v:
         case [x]:

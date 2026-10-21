@@ -1,4 +1,4 @@
-# rule: match-partial
+# rule: var
 v: int = 1
 y: int
 match v:

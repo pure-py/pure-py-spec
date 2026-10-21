@@ -1,3 +1,4 @@
+# rule: callee-scheme
 from typing import Callable
 from dataclasses import dataclass
 

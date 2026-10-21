@@ -1,3 +1,4 @@
+# rule: check-constr
 import mod
 
 def f(v: int) -> int:

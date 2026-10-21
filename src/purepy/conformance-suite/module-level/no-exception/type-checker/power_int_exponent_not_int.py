@@ -1,4 +1,4 @@
-# rule: binop
+# rule: check-syn
 def f(n: int) -> int:
     return 2 ** n
 

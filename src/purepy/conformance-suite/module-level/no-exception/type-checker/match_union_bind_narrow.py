@@ -1,4 +1,4 @@
-# rule: pat-shapes
+# rule: check-syn
 def f(xs: list[int] | list[str]) -> int:
     match xs:
         case [a]:

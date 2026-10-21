@@ -1,3 +1,4 @@
+# rule: pat-shapes
 v: int = 1
 match v:
     case x:

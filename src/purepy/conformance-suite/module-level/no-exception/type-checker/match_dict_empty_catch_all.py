@@ -1,4 +1,4 @@
-# rule: pat-dict
+# rule: pat-shapes
 def f(d: dict[str, int]) -> int:
     match d:
         case {}:

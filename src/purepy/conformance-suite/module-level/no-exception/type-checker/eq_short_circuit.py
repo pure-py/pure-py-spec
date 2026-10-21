@@ -1,3 +1,4 @@
+# rule: binop
 from typing import Callable
 
 def f(n: int) -> int:
