@@ -31,8 +31,8 @@ to sequential composition of static outcomes:
 A \emph{termination
 kind} $\kappa$ records how a run ends; all but \replaced{$\errUndef$ and $\errExcluded$}{$\errExit{n}$ and $\errUndef$ } are named after the exceptions raised by the same program
 under Python in the same circumstances\added{, except that $\errExit{0}$ also records a run which completes normally}. \Added{A variable read before its assignment aborts with $\errName$ also where
-Python raises \pyinline{UnboundLocalError}, which is a subclass of \pyinline{NameError}, since the semantics does not
-distinguish a local variable of a function from a variable of a module.} A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, \added{which is allowed by Python
+Python raises \pyinline{UnboundLocalError}, a subclass of \pyinline{NameError}; distinguishing the two would require
+the environment to record whether an unbound variable belongs to a function or a module.} A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, \added{which is allowed by Python
 but not defined by \PurePy,} such as a
 comparison of two functions (\secref{no-coercions}). \Added{A run aborts with $\errExcluded$ when it reaches an operation which is
 ruled out by typing and which Python performs without failing, such as a condition which evaluates to a value other
