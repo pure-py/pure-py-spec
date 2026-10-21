@@ -76,7 +76,7 @@ For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with 
 result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). \Added{A variable
 not bound in $\rho$, or bound to $\Unbound$, aborts with $\errName$\speconly{ (\ruleName{eval-var-unknown},
 \ruleName{eval-var-unbound})}.} The operators
-\pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, \Added{aborting with $\errExcluded$ when the first is
+\pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, \Added{aborting with $\errExcluded$ if the first operand is
 not a Boolean\speconly{ (\ruleName{eval-and-nonbool}, \ruleName{eval-or-nonbool})},} and
 a conditional expression requires its condition to be \pyinline{True} or \pyinline{False}, like the
 \pyinline{if} statement\speconly{ (\ruleName{eval-if})}\Added{, aborting with $\errExcluded$ otherwise\speconly{
