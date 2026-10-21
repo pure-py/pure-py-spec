@@ -89,12 +89,13 @@ evaluates to a non-Boolean\speconly{ (\ruleName{eval-qual-guard-nonbool})}.}
 $\errExcluded$\speconly{ (\ruleName{eval-dict-nonstr}, \ruleName{eval-dict-comp-nonstr})}; Python raises
 \pyinline{TypeError} only for keys it cannot hash, such as lists. \PurePy has no notion of
 hashing and cannot distinguish them from other keys.}
-Subscripting, given by the auxiliary
+\replaced{Subscripting is given by the auxiliary function $\getitem$, and membership by
+$\contains{\Sigma}$\speconly{ (\S\ref{aux:getitem}, \S\ref{aux:contains})}; both abort with $\errExcluded$ for a range, or a dictionary
+with a key other than a string.}{Subscripting, given by the auxiliary
 function $\getitem$\speconly{ (\S\ref{aux:getitem})}, indexes a list, tuple or
-string by an integer, counting from the end when negative, and \added{indexes }a dictionary by a string key,
-aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name\deleted{, and with $\errType$ for a
-dictionary subscripted by a value other than a string}. \Added{Subscripting a range, or a dictionary by a key other than a string, aborts with
-$\errExcluded$, as does membership, given by the auxiliary function $\contains{\Sigma}$\speconly{ (\S\ref{aux:contains})}.} An attribute reference on a
+string by an integer, counting from the end when negative, and a dictionary by a string key,
+aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name, and with $\errType$ for a
+dictionary subscripted by a value other than a string. } An attribute reference on a
 value other than a module or object aborts with \replaced{$\errExcluded$}{$\errAttr$ }\speconly{ (\ruleName{eval-attr-nonobject})}\replaced{. In this version of \PurePy such values have no attributes, whereas in Python a string, for example, has methods; a reference which Python rejects with \pyinline{AttributeError} aborts with $\errExcluded$ too, since \PurePy does not keep track of which attributes Python provides}{; this version of \PurePy does not support the attributes given to other values by Python, such as the methods of a string }.
 
 \specinput{spec/fig/well-formed-values}
