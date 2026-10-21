@@ -34,8 +34,8 @@ under Python in the same circumstances\added{, except that $\errExit{0}$ also re
 Python raises \pyinline{UnboundLocalError}, a subclass of \pyinline{NameError}; distinguishing the two would require
 the environment to record whether unbound variables belong to functions or modules.} A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, \added{namely an operation allowed by Python
 but not defined by \PurePy,} such as a
-comparison of two functions (\secref{no-coercions}). \Added{A run aborts with $\errExcluded$ when it reaches an operation which is
-ruled out by typing and which Python performs without failing, such as a condition which evaluates to a value other
+comparison of two functions (\secref{no-coercions}). \Added{A run aborts with $\errExcluded$ when it reaches an operation
+ruled out by the type system but which Python executes without failing, such as a condition which evaluates to a value other
 than a Boolean.} A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a function from
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result

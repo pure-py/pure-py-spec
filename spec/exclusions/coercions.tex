@@ -1,6 +1,6 @@
 Python accepts several implicit coercions and lax matches. \figref{coercions} lists those excluded by
 \PurePy, and records at which stage each exclusion takes effect. A program which reaches a dynamically excluded operation runs under Python but has undefined behaviour under
-\PurePy. \Added{A run which reaches an operation which is ruled out by typing, and which Python performs without failing,
+\PurePy. \Added{A run which reaches an operation ruled out by the type system but which Python executes without failing
 aborts with $\errExcluded$, so that type soundness can rule it out (\secref{runtime-errors}).}
 
 \input{spec/fig/coercions}
