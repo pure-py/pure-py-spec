@@ -276,7 +276,7 @@ branches with \replaced{$\merge_{\Sigma}$}{$\merge$}, merging in $\Assigns{\varn
 \pyinline{return} requires $\tau$ to be equivalent to \pyinline{None} (\ruleName{return}, \ruleName{return-none}). \replaced{An expression statement is typed by one of two rules. If its expression synthesises a type, the
 type is discarded (\ruleName{expr-stmt}). A call to a callable with result \tyNone{} does not synthesise a
 type, following mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}), which
-rejects such a call wherever a value is required. \replaced{Such calls are}{The call is } typed instead by \ruleName{call-stmt}, which
+rejects such a call wherever a value is required\replaced{; such calls are}{. The call is } typed instead by \ruleName{call-stmt}, which
 checks the arguments against the parameter types. Both rules give the static outcome
 $\Assigns{\varnothing}$.}{An expression statement synthesises a type and discards it
 (\ruleName{expr-stmt}). A call to a callable with result \tyNone{} is not an expression, because
