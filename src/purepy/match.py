@@ -55,6 +55,7 @@ from .type_syntax import (
     Primitive,
     TupleType,
     Type,
+    TypeVariable,
     UnionType,
     Var,
     float_literal,
@@ -527,7 +528,8 @@ def remaining(tau: Type, p: ast.pattern, mod_ctx: ModuleContext) -> Type:
 def has_list_values(Sigma: ClassTable, tau: Type) -> bool:
     # A disjunct other than a list type is above every list type or none, so list[object] stands for all
     return any(
-        isinstance(sigma, ListType) or subtype(Sigma, ListType(Primitive.OBJECT), sigma)
+        isinstance(sigma, ListType | TypeVariable)
+        or subtype(Sigma, ListType(Primitive.OBJECT), sigma)
         for sigma in disjuncts(tau)
     )
 
@@ -535,13 +537,16 @@ def has_list_values(Sigma: ClassTable, tau: Type) -> bool:
 def has_tuple_values(Sigma: ClassTable, tau: Type) -> bool:
     # A disjunct other than a tuple type is above every tuple type or none, so tuple[()] stands for all
     return any(
-        isinstance(sigma, TupleType) or subtype(Sigma, TupleType(()), sigma)
+        isinstance(sigma, TupleType | TypeVariable) or subtype(Sigma, TupleType(()), sigma)
         for sigma in disjuncts(tau)
     )
 
 
 def has_range_values(Sigma: ClassTable, tau: Type) -> bool:
-    return any(subtype(Sigma, ClassType(RANGE, ()), sigma) for sigma in disjuncts(tau))
+    return any(
+        isinstance(sigma, TypeVariable) or subtype(Sigma, ClassType(RANGE, ()), sigma)
+        for sigma in disjuncts(tau)
+    )
 
 
 def pattern_bindings(deltas: list[VarContext], node: ast.AST) -> VarContext:
