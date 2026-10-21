@@ -1,0 +1,4 @@
+Result of matching the sub-patterns of $a$ against the fields $\bind{\seq{z}}{\seq{v}}$ of an object whose class has $C$
+among its ancestors: the sub-patterns match the fields of $C$ named by $\fieldMap{\Sigma}(C, a)$, composing with
+$\override$; $\errType$ if $a$ has more positional sub-patterns than $C$ has fields, or two sub-patterns for one field,
+as in Python; and $\errExcluded$ if $a$ otherwise does not cover the fields of $C$ exactly, which Python allows.
