@@ -36,10 +36,11 @@ the environment to record whether unbound variables belong to functions or modul
 but not defined by \PurePy,} such as a
 comparison of two functions (\secref{no-coercions}). \Added{A run aborts with $\errExcluded$ when it reaches an operation
 ruled out by the type system but which Python executes without failing, such as a condition which evaluates to a non-Boolean.
-Attribute references, dictionary keys and constructor patterns headed by a predefined class, when ruled out by the type
+Attribute references, dictionary keys and constructor patterns headed by a built-in class, when ruled out by the type
 system, also abort with $\errExcluded$, even though Python sometimes rejects them; to be more precise here would require the
-semantics to model the attributes Python assigns to a value, the keys which Python considers hashable, and the instances
-of the predefined classes (\secref{eval-expressions}, \secref{eval-patterns}).} A primitive
+semantics to model the attributes Python assigns to a value, the keys which Python considers hashable, and whether a value
+is an instance of a built-in class such as \pyinline{int}, which the semantics represents only by its name
+(\secref{eval-expressions}, \secref{eval-patterns}).} A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a function from
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\replaced{\seq{v}}{\seq{u} }$ has result
 $\primFn(\replaced{\seq{v}}{\seq{u} })$. \Added{An opaque value $\opaqueVal{q.x}$ is the
