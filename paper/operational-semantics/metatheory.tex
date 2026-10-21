@@ -20,6 +20,6 @@ If $\vdash \rho : \Gamma$ and $\Sigma; \Gamma \vdash x \synth \tau$ then $\rho(x
 \end{lemma}
 
 \noindent The \ruleName{var} rule requires $x$ to be definitely assigned, and no value other than $\Unbound$ is
-well-formed at $\Unbound$ or $\DU{\tau}$, so a well-formed program never raises Python's
+well-formed at $\Unbound$ or $\DU{\tau}$, so a well-formed program never \replaced{aborts with $\errName$ (\ruleName{eval-var-unbound}), where Python raises}{raises Python's }
 \pyinline{UnboundLocalError}. \todo{Unproven.}
 

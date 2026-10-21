@@ -5,7 +5,7 @@ outcome of the statement, so pattern variables remain bound after the match (\se
 \input{spec/rules/eval-match}
 \end{mathpar}
 Here $\dispatch$ tries the cases in order with the matching function $\matchOp{\Sigma}$, and yields \pyinline{pass}
-with no bindings if no pattern matches:
+with no bindings if no pattern matches\added{, and the termination kind if matching aborts}:
 \begin{defalign}
 \input{spec/functions/dispatch}
 \end{defalign}

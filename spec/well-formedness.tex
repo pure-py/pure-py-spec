@@ -121,8 +121,8 @@ the join of the component types\speconly{ (\ruleName{subscript-tuple-int})}, unl
 gives the component type at that position, counting from the end when the index is negative\speconly{
 (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg})}\paperonly{:}\speconly{.}
 \paperinput{paper/well-formedness/subscript-tuple}%
-A subscript, attribute reference or call whose subject
-synthesises a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
+A subscript, attribute reference or call \replaced{with a subject synthesising}{whose subject
+synthesises } a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
 join of the results\speconly{ (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union})}\paperonly{:}\speconly{.}
 \paperinput{paper/well-formedness/call-union}%
 Generators need no such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts' element types.
@@ -252,7 +252,7 @@ unassigned or possibly unassigned after the statement.
 \specinput{spec/fig/pattern-matching/typing-cases}
 \specinput{spec/fig/typing-top-level}
 
-Context operations $\override$ and \replaced{$\merge_{\Sigma}$}{$\merge$} lift to a right semiring over static outcomes $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for \replaced{$\merge_{\Sigma}$}{$\merge$} and zero for $\override$.
+Context operations $\override$ and \replaced{$\merge_{\Sigma}$}{$\merge$ } lift to a right semiring over static outcomes $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for \replaced{$\merge_{\Sigma}$}{$\merge$ } and zero for $\override$.
 
 \begin{definition}[Override and merge on static outcomes]
 \begin{defalign}
@@ -270,7 +270,7 @@ The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\G
 optional return type $\zeta$, statement $s$ has static outcome $R$ (\specfigref{typing-stmt}); every rule passes $\zeta$ down unchanged.
 A sequence $s\;s'$\speconly{ (\ruleName{seq})} types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
 by $s$. A conditional combines its
-branches with \replaced{$\merge_{\Sigma}$}{$\merge$}, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch\speconly{ (\ruleName{if}, \ruleName{if-else})}.
+branches with \replaced{$\merge_{\Sigma}$}{$\merge$ }, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch\speconly{ (\ruleName{if}, \ruleName{if-else})}.
 \speconly{A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
 \pyinline{return} requires $\tau$ to be equivalent to \pyinline{None} (\ruleName{return}, \ruleName{return-none}). \replaced{An expression statement is typed by one of two rules. If its expression synthesises a type, the

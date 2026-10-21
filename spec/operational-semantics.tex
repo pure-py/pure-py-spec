@@ -70,10 +70,14 @@ the result of a call\speconly{; if the statement completes without returning, th
 \paperinput{paper/operational-semantics/result}
 
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with $\Gamma \vdash e \synth
-\tau$, the expression evaluation judgement $\rho, e \Rightarrow r$ (\specfigref{eval-result}) says that $e$ evaluates to
+\tau$, the expression evaluation judgement $\rho, e \Rightarrow r$ (\replaced{\specfigrefTwo{eval-result}{eval-fails}}{\specfigref{eval-result} }) says that $e$ evaluates to
 result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). \Added{A variable
 not bound in $\rho$, or bound to $\Unbound$, aborts with $\errName$\speconly{ (\ruleName{eval-var-unknown},
-\ruleName{eval-var-unbound})}.} The operators
+\ruleName{eval-var-unbound})}. A call of a value other than a closure or primitive, a call with the wrong number
+of arguments and a constructor call with arguments which do not cover the fields of the class abort with
+$\errType$\speconly{ (\ruleName{eval-call-nonfun}, \ruleName{eval-call-lambda-arity}, \ruleName{eval-call-def-arity},
+\ruleName{eval-constr-arity})}, and a reference to an attribute absent from an object with $\errAttr$\speconly{
+(\ruleName{eval-attr-missing})}, as in Python.} The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, \Added{aborting with $\errExcluded$ if the first operand is
 not a Boolean\speconly{ (\ruleName{eval-and-nonbool}, \ruleName{eval-or-nonbool})},} and
 a conditional expression requires its condition to be \replaced{a Boolean}{\pyinline{True} or \pyinline{False} }, like the
@@ -83,19 +87,21 @@ a conditional expression requires its condition to be \replaced{a Boolean}{\pyin
 A comprehension evaluates its body once for each binding produced by its qualifiers, and
 concatenates the results; a generator draws its bindings from the elements of a value, given by the auxiliary
 function $\iterOp$\speconly{ (\S\ref{aux:iter})}: the elements of a
-list, tuple or string, and the keys of a dictionary, as in Python. \Added{A guard aborts with $\errExcluded$ if it
+list, tuple or string, and the keys of a dictionary\added{ and the numbers of a range}, as in Python. \Added{A generator over a
+value other than a list, tuple, string, dictionary or range aborts with $\errType$\speconly{
+(\ruleName{eval-qual-generator-nonseq})}, as in Python, and a guard aborts with $\errExcluded$ if it
 evaluates to a non-Boolean\speconly{ (\ruleName{eval-qual-guard-nonbool})}.}
 \Added{Dictionary expressions and comprehensions with keys other than strings abort with
 $\errExcluded$\speconly{ (\ruleName{eval-dict-nonstr}, \ruleName{eval-dict-comp-nonstr})}, as do subscripting and
 membership with such a key; Python raises \pyinline{TypeError} only for keys it cannot hash, such as lists, but \PurePy
 has no notion of hashing and cannot distinguish them from other keys.}
 \replaced{Subscripting is given by the auxiliary function $\getitem$, and membership by
-$\contains{\Sigma}$\speconly{ (\S\ref{aux:getitem})}; both abort with $\errExcluded$ for a range.}{Subscripting, given by the auxiliary
+$\contains{\Sigma}$\speconly{ (\S\ref{aux:getitem}, \S\ref{aux:contains})}; both abort with $\errExcluded$ for a range.}{Subscripting, given by the auxiliary
 function $\getitem$\speconly{ (\S\ref{aux:getitem})}, indexes a list, tuple or
 string by an integer, counting from the end when negative, and a dictionary by a string key,
 aborting with $\errIndex$, $\errKey$ or $\errType$ when Python raises the exception of that name, and with $\errType$ for a
 dictionary subscripted by a value other than a string. } An attribute reference on a
-value other than a module or object aborts with \replaced{$\errExcluded$}{$\errAttr$ }\speconly{ (\ruleName{eval-attr-nonobject})}\replaced{. In this version of \PurePy such values have no attributes, whereas in Python a string, for example, has methods; a reference which Python rejects with \pyinline{AttributeError} aborts with $\errExcluded$ too, since \PurePy does not keep track of which attributes Python provides}{; this version of \PurePy does not support the attributes given to other values by Python, such as the methods of a string }.
+value other than a module or object aborts with \replaced{$\errExcluded$}{$\errAttr$ }\speconly{ (\ruleName{eval-attr-nonobject})}\replaced{. In this version of \PurePy such values have no attributes, whereas in Python a string, for example, has methods; a reference rejected by Python with \pyinline{AttributeError} also aborts with $\errExcluded$, since \PurePy does not keep track of which attributes Python provides}{; this version of \PurePy does not support the attributes given to other values by Python, such as the methods of a string }.
 
 \specinput{spec/fig/well-formed-values}
 
@@ -113,6 +119,9 @@ Whether a pattern matches is determined by the auxiliary function $\matchOp{\Sig
 $\matchOk{\rho'}$, a match, where $\rho'$ binds the variables of the pattern to the values that they matched\replaced{;}{, }
 $\noMatch$, a failure to match\replaced{;}{, } or \replaced{a termination kind $\kappa$, if matching aborts, such as $\errUndef$}{$\errUndef$, } for a numeric literal pattern if the equality of the literal and the value is undefined. When
 \replaced{matching aborts with $\kappa$ before any pattern matches, $\dispatch$ gives $\kappa$, and the run aborts with $\kappa$}{a match result is undefined, the value of $\dispatch$ is also undefined, and the run has undefined behaviour }\speconly{ (\ruleName{eval-match-abort})}.
+\speconly{\Added{Matching a list pattern against a tuple, a tuple pattern against a list, or either against a range
+aborts with $\errExcluded$ (\S\ref{aux:match}); a constructor pattern against an object aborts with $\errType$ or
+$\errExcluded$ when the sub-patterns do not cover the fields of the class (\S\ref{aux:match-fields}).}}
 \begin{specdefinition}{Composition of match results}
 The match results of sub-patterns compose with
 $\override$, matching sequentially, so that the first failure or \replaced{abort determines the result}{undefined result decides }:

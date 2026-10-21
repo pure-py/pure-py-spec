@@ -1,3 +1,3 @@
 Subscripting: the value under key $v'$ of a dictionary, or the element at index $v'$ of a sequence,
-counting from the end when the index is negative. Aborts with $\errKey$,
-$\errIndex$ or $\errType$ when Python raises the exception of that name\added{, and with $\errExcluded$ for any attempt to subscript a range, since no typing rule for subscripts accepts a range, although Python allows it; and for a dictionary subscripted by a key other than a string (\secref{operational-semantics})}\deleted{, and with $\errType$ for a dictionary subscripted by a value other than a string}.
+counting from the end when the index is negative. Aborts with $\errKey$\replaced{ or}{,}
+$\errIndex$ \deleted{or $\errType$ }when Python raises the exception of that name\added{, with $\errExcluded$ for any attempt to subscript a range, since no typing rule for subscripts accepts a range, although Python allows it, and for a dictionary subscripted by a key other than a string (\secref{operational-semantics}), and with $\errType$ for any other pair of values}\deleted{, and with $\errType$ for a dictionary subscripted by a value other than a string}.

@@ -29,7 +29,7 @@
 
 \flushleft \shadebox{$\Sigma \vdash \ominus(\sigma) : (\tau, \tau')$}
 \begin{defalign}
-& \pyinline{not}(\sigma) : (\tyBool, \tyBool) && \quad \text{if } \Sigma \vdash \sigma \subty \tyBool \\
+& \added{\Sigma \vdash {}} \pyinline{not}(\sigma) : (\tyBool, \tyBool) && \quad \text{if } \Sigma \vdash \sigma \subty \tyBool \\
 & \Sigma \vdash \ominus(\sigma) : (\tyInt, \tyInt) && \quad \text{if } \ominus \in \set{\pyinline{+}, \pyinline{-}} \text{ and } \Sigma \vdash \sigma \subty \tyInt \\
 & \Sigma \vdash \ominus(\sigma) : (\tyFloat, \tyFloat) && \quad \text{if } \ominus \in \set{\pyinline{+}, \pyinline{-}} \text{ and } \Sigma \vdash \sigma \subty \tyFloat \\
 & \Sigma \vdash \ominus(\sigma) : (\tau, \tau') && \quad \text{if } \text{\added{$\sigma$ a literal type and }} \Sigma \vdash {\ominus}(\baseType(\sigma)) : (\tau, \tau')

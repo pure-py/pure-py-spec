@@ -3,6 +3,9 @@ definitely assigned, and the fields and base class of a class may name only earl
 \pyinline{NameError} and \pyinline{UnboundLocalError} do not arise. An import requires its target to be a module
 of the program, a from-import requires each imported name to be a member of the source module, and import
 cycles are rejected, so \pyinline{ModuleNotFoundError} and \pyinline{ImportError} do not arise either. A module
-attribute must resolve to a definitely assigned member, which rules out \pyinline{AttributeError} on modules,
+attribute must resolve to a definitely assigned member\replaced{ and an object attribute must be a field of the class, which together rule out \pyinline{AttributeError}}{, which rules out \pyinline{AttributeError} on modules },
 and a constructor call or class pattern must match the arity of the class exactly, which rules out the
-\pyinline{TypeError} raised by Python for excess arguments or sub-patterns.
+\pyinline{TypeError} raised by Python for excess arguments or sub-patterns. \Added{The semantics gives $\errName$,
+$\errAttr$ and $\errType$ to the runtime errors ruled out by typing, and $\errExcluded$ to the statically excluded
+behaviours (\secref{no-coercions}); type soundness, the conjecture that no run of a well-formed program aborts with
+one of these kinds, is stated in \specref{sec:runtime-errors}.}

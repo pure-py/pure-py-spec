@@ -4,5 +4,5 @@ sub-patterns:
 \begin{defalign}
 \input{spec/functions/match-list}
 \end{defalign}
-A list of another length, or any other value\added{ except a tuple}, falls to the final case of the
-function, which gives $\noMatch$\added{. A tuple gives $\errExcluded$, because typing rules out a list pattern for a tuple, although Python matches it}.
+A list of another length, or any other value\added{ except a tuple or range}, falls to the final case of the
+function, which gives $\noMatch$\added{. A tuple or range gives $\errExcluded$, because typing rules out a list pattern for either, although Python matches both}.

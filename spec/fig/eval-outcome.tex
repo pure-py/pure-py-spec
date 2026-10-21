@@ -326,8 +326,8 @@
 \small
 \inferrule*[lab={\ruleName{eval-var}}]
 {
-  \bind{x}{v} \in \rho\added{ \\
-  v \neq \Unbound}
+  \bind{x}{v} \in \rho \\
+  \added{v \neq \Unbound}
 }
 {
   \rho, x \Rightarrow \val{v}
@@ -682,7 +682,7 @@
 \flushleft \shadebox{$\rho, e \Rightarrow r$ (continued)}
 \begin{mathpar}
 \small
-\Added{\inferrule*[lab={\ruleName{eval-var-unknown}}]
+\added{\inferrule*[lab={\ruleName{eval-var-unknown}}]
 {
   x \notin \dom(\rho)
 }
@@ -741,7 +741,7 @@
 \and
 \input{spec/rules/eval-call-nonfun}
 \and
-\Added{\inferrule*[lab={\ruleName{eval-and-nonbool}}]
+\added{\inferrule*[lab={\ruleName{eval-and-nonbool}}]
 {
   \rho, e \Rightarrow \val{v} \\
   v \notin \set{\pyinline{True}, \pyinline{False}}
@@ -750,7 +750,7 @@
   \rho, \exAnd{e}{e'} \Rightarrow \aborts{\errExcluded}
 }}
 \and
-\Added{\inferrule*[lab={\ruleName{eval-or-nonbool}}]
+\added{\inferrule*[lab={\ruleName{eval-or-nonbool}}]
 {
   \rho, e \Rightarrow \val{v} \\
   v \notin \set{\pyinline{True}, \pyinline{False}}
@@ -759,7 +759,7 @@
   \rho, \exOr{e}{e'} \Rightarrow \aborts{\errExcluded}
 }}
 \and
-\Added{\inferrule*[lab={\ruleName{eval-cond-nonbool}}]
+\added{\inferrule*[lab={\ruleName{eval-cond-nonbool}}]
 {
   \rho, e \Rightarrow \val{v} \\
   v \notin \set{\pyinline{True}, \pyinline{False}}
@@ -924,3 +924,5 @@
 \caption{Comprehension qualifiers $\seq{g}$ evaluate to result $r$ under environment $\rho : \Gamma$}
 \label{fig:eval-quals-result}
 \end{figure}
+
+\FloatBarrier

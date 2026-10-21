@@ -11,7 +11,7 @@ $r$ & $::=$ & $\val{v}$ & \speconly{(Val)} \\
 \grammarGroup{Match results} \\
 $m$ & $::=$ & $\matchOk{\rho}$ & \speconly{(Match)} \\
   & $\mid$ & $\noMatch$ & \speconly{(NoMatch)} \\
-  & $\mid$ & $\replaced{\kappa}{\errUndef\ }$ & \speconly{(\replaced{Aborts}{Undefined })}
+  & $\mid$ & $\replaced{\kappa}{\errUndef\ }$ & \speconly{(\replaced{Kind}{Undefined })}
    \\[3mm]
 \grammarGroup{Termination kinds} \\
 $\kappa$ & $::=$ & $\errType \mid \errIndex \mid \errKey \added{{} \mid \errOverflow \mid \errValue}$ & \\
