@@ -35,7 +35,10 @@ Python raises \pyinline{UnboundLocalError}, a subclass of \pyinline{NameError}; 
 the environment to record whether unbound variables belong to functions or modules.} A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, \added{namely an operation allowed by Python
 but not defined by \PurePy,} such as a
 comparison of two functions (\secref{no-coercions}). \Added{A run aborts with $\errExcluded$ when it reaches an operation
-ruled out by the type system but which Python executes without failing, such as a condition which evaluates to a non-Boolean.} A primitive
+ruled out by the type system but which Python executes without failing, such as a condition which evaluates to a non-Boolean.
+Attribute references and dictionary keys ruled out by the type system also abort with $\errExcluded$, even though Python
+sometimes rejects them, because the semantics does not currently model which attributes Python assigns to a value, or
+which keys Python can hash (\secref{eval-expressions}).} A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a function from
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{u}$ has result
 $\primFn(\seq{u})$.
@@ -53,6 +56,7 @@ results carrying a sequence of values or an environment in place of a value.
 \paperinput{paper/operational-semantics/operators}
 
 \subsection{Expressions and statements}
+\label{sec:eval-expressions}
 
 A value is well-formed at a context entry, and an environment at a context (\specfigref{well-formed-values}).
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any statement $s$ with
