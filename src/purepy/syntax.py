@@ -224,7 +224,7 @@ def check_syntax_stmt(node: ast.stmt) -> None:
                 if case.guard is not None:
                     raise NotAllowed(case, "case guards")
                 check_syntax_pattern(case.pattern)
-                dup = repeated(bound(case.pattern))
+                dup = duplicate(bound(case.pattern))
                 if dup is not None:
                     raise NotAllowed(case.pattern, f"duplicate variable {dup} in pattern")
                 check_syntax_body(case.body)
@@ -268,13 +268,13 @@ def check_syntax_type_alias(node: ast.TypeAlias) -> None:
     check_syntax_annotation(node.value)
 
 
-def repeated[T](xs: Sequence[T]) -> T | None:
-    """First element occurring earlier in xs"""
+def duplicate[T](xs: Sequence[T]) -> T | None:
+    """An element occurring twice in xs, if any"""
     return next((x for i, x in enumerate(xs) if x in xs[:i]), None)
 
 
 def check_syntax_type_params(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlias) -> None:
-    dup = repeated(
+    dup = duplicate(
         [
             param.name
             for param in node.type_params
@@ -330,7 +330,7 @@ def check_syntax_pattern(node: ast.pattern) -> None:
         case ast.MatchClass():
             for p in list(node.patterns) + list(node.kwd_patterns):
                 check_syntax_pattern(p)
-            dup = repeated(node.kwd_attrs)
+            dup = duplicate(node.kwd_attrs)
             if dup is not None:
                 raise NotAllowed(node, f"duplicate keyword {dup} in constructor pattern")
         case ast.MatchMapping():
@@ -339,7 +339,7 @@ def check_syntax_pattern(node: ast.pattern) -> None:
             for key in node.keys:
                 if not (isinstance(key, ast.Constant) and isinstance(key.value, str)):
                     raise NotAllowed(key, "dictionary pattern key other than a string literal")
-            dup = repeated(
+            dup = duplicate(
                 [
                     key.value
                     for key in node.keys
@@ -410,7 +410,7 @@ def check_syntax_expr(node: ast.expr) -> None:
                 if k.arg is None:
                     raise NotAllowed(k, "dictionary unpacking in argument list")
                 check_syntax_expr(k.value)
-            dup = repeated([k.arg for k in node.keywords])
+            dup = duplicate([k.arg for k in node.keywords])
             if dup is not None:
                 raise NotAllowed(node, f"duplicate keyword argument {dup}")
         case ast.IfExp():
@@ -556,7 +556,7 @@ def check_syntax_arguments(node: ast.arguments) -> None:
         raise NotAllowed(node, "positional-only arguments")
     for a in node.args:
         check_syntax_annotation(a.annotation)
-    dup = repeated([a.arg for a in node.args])
+    dup = duplicate([a.arg for a in node.args])
     if dup is not None:
         raise NotAllowed(node, f"duplicate parameter {dup}")
 
