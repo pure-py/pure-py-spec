@@ -3,11 +3,9 @@
 &\deleted{\qquad \text{where } \fieldMap{\Sigma}(C, a) = \set{\bind{x_1}{p_1}, \ldots, \bind{x_n}{p_n}}} \\*
 &\deleted{\qquad \text{and } x_i = y_{j_i} \text{ for each } i} \\*
 \added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, v)} &\added{{}= \errName} \\*
-&\added{\qquad \text{if } x_1 \notin \dom(\rho) \text{ or } \rho(x_1) = \Unbound} \\*
-&\added{\qquad \text{where } q = x_1.\cdots.x_{n+1}} \\*
+&\added{\qquad \text{if } \rho(x) \in \set{\bot, \Unbound} \text{ where } q = x \cons \seq{x}} \\*
 \added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, v)} &\added{{}= \errAttr} \\*
-&\added{\qquad \text{if } \resolve(\rho, q) \text{ undefined, } x_1 \in \dom(\rho)} \\*
-&\added{\qquad \text{and } \rho(x_1) \neq \Unbound} \\*
+&\added{\qquad \text{if } \resolve(\rho, q) \text{ undefined and } \rho(x) \notin \set{\bot, \Unbound}} \\*
 \added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, v)} &\added{{}= \errExcluded} \\*
 &\added{\qquad \text{if } \resolve(\rho, q) = \opaqueVal{\pyinline{builtins}.x}} \\*
 \added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, v)} &\added{{}= \errType} \\*
