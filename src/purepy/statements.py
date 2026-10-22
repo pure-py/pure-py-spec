@@ -658,10 +658,18 @@ def call(e: ast.Call, mod_ctx: ModuleContext) -> Type:
 
 
 def call_stmt(e: ast.Call, mod_ctx: ModuleContext) -> None:
-    match callee(e, mod_ctx):
+    call_stmt_at(callee(e, mod_ctx), e, mod_ctx)
+
+
+def call_stmt_at(fn: Type, e: ast.Call, mod_ctx: ModuleContext) -> None:
+    """Call statement e at callee type fn"""
+    match fn:
+        case UnionType(sigma, tau):
+            call_stmt_at(sigma, e, mod_ctx)
+            call_stmt_at(tau, e, mod_ctx)
         case CallableType(sigmas, Primitive.NONE):
             check_args(e, sigmas, mod_ctx)
-        case fn:
+        case _:
             result_type(fn, e, mod_ctx)
 
 

@@ -1,4 +1,4 @@
-# rule: call-stmt
+# rule: call-stmt-union
 from typing import Callable
 
 def foo() -> None:
