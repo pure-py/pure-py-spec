@@ -5,7 +5,8 @@
 \declaresS(\chi_1 \ldots \chi_{n+1}) &{}= \declaresS(\chi_1) \mathbin{\concat} \cdots \mathbin{\concat} \declaresS(\chi_{n+1}) \\*
 \declaresS(\exDataclass{c[\seq{\alpha}]}{\phi}) &{}= c \\*
 \declaresS(\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}) &{}= c \\*
-\declaresS(\exTypeAlias{x[\seq{\alpha}]}{\psi}) &= x \\*
+\declaresS(\exTypeAlias{x[\seq{\alpha}]}{\psi}) &= x \\
+\\
 \deleted{\declaresS(\exImport{q} \cons \seq{\iota})} &\deleted{{}= x \cons \declaresS(\seq{\iota}) \quad \text{where } q = x \cons \seq{x}} \\*
 \added{\declaresS(\exImport{(x \cons \seq{x})} \cons \seq{\iota})} &\added{{}= \declaresS(\seq{\iota})} \\*
 &\added{\qquad \text{if } \exImport{(x \cons \seq{x}\,')} \in \seq{\iota} \text{ for some } \seq{x}\,'} \\*
