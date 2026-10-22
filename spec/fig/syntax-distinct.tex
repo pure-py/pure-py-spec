@@ -1,0 +1,20 @@
+\begin{figure}
+\begin{AddedBlock}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.5\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Form & Pairwise distinct \\
+Class definition\speconly{ (DataclassExtend, Dataclass)}, type alias\speconly{ (TypeAlias)}, function definition\speconly{ (Def)} & type parameters $\seq{\alpha}$ \\\rowgap
+Function definition\speconly{ (Def)} & parameters $\seq{x}$ \\\rowgap
+Lambda\speconly{ (Lambda)} & parameters $x_1, \ldots, x_n$ \\\rowgap
+Argument list\speconly{ (Args)} & keyword arguments $\seq{x}$ \\\rowgap
+Dictionary pattern\speconly{ (PatDict)} & keys $w_1, \ldots, w_n$ \\\rowgap
+Case\speconly{ (Case)} & variables bound by the pattern $p$ \\
+\hline
+\end{tabular}
+\caption{Additional distinctness conditions, so every \PurePy program is syntactically valid Python}
+\label{fig:syntax-distinct}
+\end{AddedBlock}
+\end{figure}
