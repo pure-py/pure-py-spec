@@ -202,7 +202,9 @@ def def_body(d: ast.FunctionDef, pi: CallableType | TypeScheme, mod_ctx: ModuleC
     check_assignments_declared(d.body, set(xs))
     params = dict(zip(xs, tau.params, strict=True))
     type_vars = {alpha: TypeVar() for alpha in alphas}
-    body_ctx = override_gamma(mod_ctx, {**type_vars, **params, **scope(set(xs), d.body)})
+    body_ctx = override_gamma(
+        mod_ctx, {**type_vars, **params, **scope([(x, d) for x in xs], d.body)}
+    )
     r = check_body(d.body, body_ctx, tau.result)
     if not isinstance(r, Returns) and not equivalent(mod_ctx.Sigma, tau.result, Primitive.NONE):
         if r.mypy_only is not None:
@@ -228,16 +230,20 @@ def mypy_only_if(otherwise_well_formed: bool) -> type[IllFormedModule]:
     return MypyCompatibility if otherwise_well_formed else IllFormedModule
 
 
-def scope(ys: set[Var], body: list[ast.stmt]) -> VarContext:
+def scope(ys: Sequence[tuple[Var, ast.AST]], body: list[ast.stmt]) -> VarContext:
+    names = [y for y, _ in ys]
+    for i, (y, node) in enumerate(ys):
+        if y in names[:i]:
+            raise IllFormedModule(node, reasons.DuplicateImportedName(y))
     patterns = pattern_bound(body)
-    seen = set(ys)
+    seen = set(names)
     for x, node in declares_body(body):
         if x in seen or x in patterns:
             raise IllFormedModule(node, reasons.Redeclaration(x))
         seen.add(x)
-    for x in sorted(ys & patterns.keys()):
+    for x in sorted(set(names) & patterns.keys()):
         raise IllFormedModule(patterns[x], reasons.Redeclaration(x))
-    return {x: Unbound() for x in assigns_body(body) if x not in ys}
+    return {x: Unbound() for x in assigns_body(body) if x not in names}
 
 
 def check_assignments_declared(body: list[ast.stmt], bound: set[Var]) -> None:

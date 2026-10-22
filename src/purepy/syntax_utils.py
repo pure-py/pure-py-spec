@@ -248,6 +248,24 @@ def declares_body(body: list[ast.stmt]) -> list[tuple[Var, ast.stmt]]:
     return [d for s in body for d in declares(s)]
 
 
+def declares_imports(iotas: list[ast.stmt]) -> list[tuple[Var, ast.stmt]]:
+    """Names bound by the import prefix, with their nodes, the root of a plain import listed once"""
+    match iotas:
+        case []:
+            return []
+        case [ast.Import() as s, *rest]:
+            x = root(parse_name(s.names[0].name))
+            later = any(
+                isinstance(s_, ast.Import) and root(parse_name(s_.names[0].name)) == x
+                for s_ in rest
+            )
+            return ([] if later else [(x, s)]) + declares_imports(rest)
+        case [s, *rest]:
+            return declares(s) + declares_imports(rest)
+        case _:
+            raise AssertionError
+
+
 def assign_targets(body: list[ast.stmt]) -> list[tuple[Var, ast.stmt]]:
     """Targets of the unannotated assignments in `body`, in textual order, not descending into defs."""
     out: list[tuple[Var, ast.stmt]] = []
