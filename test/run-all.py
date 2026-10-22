@@ -5,17 +5,20 @@ import re
 import sys
 
 from purepy.conformance import (
-    MODULE_LEVEL,
+    MAIN,
     SUITE,
+    SYNTACTIC_ONLY,
     PurePyOutcome,
     PythonOutcome,
     Runner,
     run,
+    tests,
 )
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TEST = ROOT / "test"
 SRC = ROOT / "src" / "purepy"
+SUITE_DIR = SRC / SUITE
 MYPY_INI = "mypy.ini"
 MYPY_BUG = "mypy-bug"
 PYTHON_VERSION = (ROOT / ".python-version").read_text().strip()
@@ -38,18 +41,25 @@ def check_unique_rule_names(r: Runner) -> None:
 
 
 def check_rule_attribution(r: Runner) -> None:
+    """Every test rejected by the type checker, undefined or agreeing cites a rule of the spec on its first
+    line; a test rejected by the parser cites none."""
     with r.test("rule attribution"):
         spec = {
             m
             for f in sorted((ROOT / "spec").rglob("*.tex"))
             for m in RULE_NAME.findall(f.read_text(encoding="utf-8"))
         }
-        for path in sorted((SRC / SUITE).rglob("*.py")):
-            if "__pycache__" in path.parts:
-                continue
+        for test in tests(SUITE_DIR):
+            path = test / MAIN if test.is_dir() else test
+            dirs = test.relative_to(SUITE_DIR).parts
+            cites = dirs[0] != SYNTACTIC_ONLY and dirs[1] != PurePyOutcome.PARSER_REJECTS
             cited = CITATION.match(path.read_text(encoding="utf-8").split("\n", 1)[0])
-            if cited is not None and cited.group(1) not in spec:
-                r.fail(f"{path.relative_to(SRC / SUITE)} cites {cited.group(1)}")
+            if cited is None and cites:
+                r.fail(f"{path.relative_to(SUITE_DIR)} cites no rule")
+            elif cited is not None and not cites:
+                r.fail(f"{path.relative_to(SUITE_DIR)} cites {cited.group(1)}")
+            elif cited is not None and cited.group(1) not in spec:
+                r.fail(f"{path.relative_to(SUITE_DIR)} cites {cited.group(1)}, not in the spec")
 
 
 def check_lint(r: Runner) -> None:
@@ -66,32 +76,35 @@ def check_lint(r: Runner) -> None:
                 break
 
 
+def mypy_errors(paths: list[str], cwd: pathlib.Path) -> set[str]:
+    """Paths of the files mypy reports errors in, relative to cwd"""
+    proc = run(
+        [
+            "mypy",
+            "--python-version",
+            PYTHON_VERSION,
+            "--config-file",
+            str(TEST / MYPY_INI),
+            "--no-error-summary",
+            "--no-color-output",
+            *paths,
+        ],
+        cwd=cwd,
+    )
+    return {line.split(":", 1)[0] for line in proc.stdout.splitlines() if ": error:" in line}
+
+
 def check_mypy_compatibility(r: Runner) -> None:
     with r.test("mypy compatibility"):
-        paths = sorted(
-            (SRC / SUITE / MODULE_LEVEL / PythonOutcome.NO_EXCEPTION / PurePyOutcome.RESULT).rglob(
-                "*.py"
-            )
-        )
-        # mypy reports paths relative to its working directory
-        relative = [str(path.relative_to(ROOT)) for path in paths]
-        reported_bug = {str(path.relative_to(ROOT)) for path in paths if MYPY_BUG in path.parts}
-        proc = run(
-            [
-                "mypy",
-                "--python-version",
-                PYTHON_VERSION,
-                "--config-file",
-                str(pathlib.Path("test") / MYPY_INI),
-                "--no-error-summary",
-                "--no-color-output",
-                *relative,
-            ],
-            cwd=ROOT,
-        )
-        rejected = {
-            line.split(":", 1)[0] for line in proc.stdout.splitlines() if ": error:" in line
-        }
+        agrees = SUITE_DIR / PythonOutcome.SUCCEEDS / PurePyOutcome.AGREES
+        found = [test for test in tests(SUITE_DIR) if agrees in test.parents]
+        modules = [str(test.relative_to(ROOT)) for test in found if test.is_file()]
+        reported_bug = {str(test.relative_to(ROOT)) for test in found if MYPY_BUG in test.parts}
+        rejected = mypy_errors(modules, ROOT)
+        # A program is checked from its own directory, so that its modules resolve
+        for program in (test for test in found if test.is_dir()):
+            if len(mypy_errors([MAIN], program)) > 0:
+                rejected.add(str(program.relative_to(ROOT)))
         for path in sorted(rejected - reported_bug):
             r.fail(f"{path} rejected by mypy")
         for path in sorted(reported_bug - rejected):
@@ -120,7 +133,7 @@ def main() -> None:
         check_lint(r)
         check_mypy_compatibility(r)
 
-    r.run_suite(SRC / SUITE, args.jobs)
+    r.run_suite(SUITE_DIR, args.jobs)
     r.summary()
     sys.exit(1 if r.failed else 0)
 

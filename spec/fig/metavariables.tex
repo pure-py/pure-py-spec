@@ -3,13 +3,14 @@
 \begin{center}
 \begin{tabular}{rll}
 \metaGroup{Names and literals} \\
-$x$, $f$, $c$, $\alpha$ & variable; idiomatically $f$ a function, $c$ a class and $\alpha$ a type parameter & \secref{contexts} \\
+$x$, $y$, $z$ & variable & \secref{contexts} \\
+$f$, $c$, $\alpha$ & variable; idiomatically $f$ a function, $c$ a class and $\alpha$ a type parameter & \secref{contexts} \\
 $q$ & name of a module, class, type alias or type parameter & \figref{syntax-stmt} \\
 $n$ & number; also sequence length and exit status, both integers & \figref{syntax-expr} \\
 $w$ & string & \figref{syntax-expr} \\
 $\ell$ & literal & \figref{syntax-expr} \\
 $\odot$, $\ominus$ & binary and unary operator & \figref{precedence}
-   \\[2mm]
+   \\[1mm]
 \metaGroup{Syntax} \\
 $e$ & expression & \figref{syntax-expr} \\
 $p$ & pattern & \figref{syntax-expr} \\
@@ -28,11 +29,11 @@ $\chi$ & type definition & \figref{syntax-stmt} \\
 $\mu$ & module body & \figref{syntax-stmt} \\
 $u$ & argument: an expression, pattern or value & \secref{syntax} \\
 $a$ & argument list & \figref{syntax-expr}
-   \\[2mm]
+   \\[1mm]
 \metaGroup{Programs} \\
 $\mathcal{M}$ & program, a finite map from module names to bodies & \secref{modules-programs} \\
 $\mathcal{P}$ & predefined modules, each with its environment and context & \secref{modules-programs}
-   \\[2mm]
+   \\[1mm]
 \metaGroup{Contexts} \\
 $\Gamma$, $\Delta$ & context, a finite map from variables to context entries & Definition~\ref{def:context} \\
 $\theta$ & context entry & Definition~\ref{def:context} \\
@@ -46,12 +47,11 @@ $H$ & finite set of heads excluded by a shape & \figref{shapes-syntax} \\
 $h$ & head, a literal, class or list of length $n$ & \figref{shapes-syntax} \\
 $\beta$ & bindings of a dictionary shape, a finite map from keys to shapes & \figref{shapes-syntax} \\
 $K$, $L$ & ordered sets of shapes, idiomatically $K$ matched and $L$ residual & \figref{shapes-syntax}
-   \\[2mm]
+   \\[1mm]
 \metaGroup{Values and results} \\
 $v$ & value & \figref{values} \\
 $\rho$ & environment, a finite map from variables to values & \figref{values} \\
 $\delta$ & dictionary entries & \figref{values} \\
-$r$ & result of statement evaluation & \figref{values} \\
 $o$ & outcome of statement evaluation & \figref{values} \\
 $r$ & result of expression evaluation & \figref{values} \\
 $m$ & match result & \figref{values} \\

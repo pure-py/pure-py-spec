@@ -182,6 +182,34 @@
   \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\kappa}
 }
 \and
+\inferrule*[lab={\ruleName{eval-assert-nonbool}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  v \text{ not a Boolean}
+}
+{
+  \rho, \exAssert{e} \Rightarrow \aborts{\errExcluded}
+}
+\and
+\inferrule*[lab={\ruleName{eval-assert-msg-nonbool}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  v \text{ not a Boolean}
+}
+{
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\errExcluded}
+}
+\and
+\inferrule*[lab={\ruleName{eval-assert-msg-nonstr}}]
+{
+  \rho, e \Rightarrow \val{\pyinline{False}} \\
+  \rho, e' \Rightarrow \val{v} \\
+  v \text{ not a string}
+}
+{
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\errExcluded}
+}
+\and
 \inferrule*[lab={\ruleName{eval-if-fail}}]
 {
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
@@ -200,6 +228,26 @@
   \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow \aborts{\kappa}
 }
 \and
+\inferrule*[lab={\ruleName{eval-if-nonbool}}]
+{
+  \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
+  \rho, e_i \Rightarrow \val{v} \\
+  v \text{ not a Boolean}
+}
+{
+  \rho, \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\errExcluded}
+}
+\and
+\inferrule*[lab={\ruleName{eval-if-else-nonbool}}]
+{
+  \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j < i) \\
+  \rho, e_i \Rightarrow \val{v} \\
+  v \text{ not a Boolean}
+}
+{
+  \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow \aborts{\errExcluded}
+}
+\and
 \inferrule*[lab={\ruleName{eval-match-fail}}]
 {
   \rho, e \Rightarrow \aborts{\kappa}
@@ -208,13 +256,13 @@
   \rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\kappa}
 }
 \and
-\inferrule*[lab={\ruleName{eval-match-undef}}]
+\inferrule*[lab={\ruleName{eval-match-abort}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \dispatch(\rho, v, \seq{p}, \seq{s}) = \errUndef
+  \dispatch(\rho, v, \seq{p}, \seq{s}) = \kappa
 }
 {
-  \rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\errUndef}
+  \rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-seq-fail}}]
@@ -225,7 +273,7 @@
   \rho, s\;s' \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
-\caption{Statement evaluation, continued (aborting cases)}
+\caption{Statement evaluation, continued (propagation rules and aborting cases)}
 \label{fig:eval-block-fails}
 \end{figure}
 
@@ -278,7 +326,8 @@
 \small
 \inferrule*[lab={\ruleName{eval-var}}]
 {
-  \bind{x}{v} \in \rho
+  \bind{x}{v} \in \rho \\
+  v \neq \Unbound
 }
 {
   \rho, x \Rightarrow \val{v}
@@ -362,6 +411,15 @@
   \rho, \exAttr{e}{x} \Rightarrow \val{v}
 }
 \and
+\inferrule*[lab={\ruleName{eval-subscript}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  \rho, e' \Rightarrow r
+}
+{
+  \rho, \exSubscript{e}{e'} \Rightarrow \mlet{v'}{r}{\getitem(v, v')}
+}
+\and
 \inferrule*[lab={\ruleName{eval-attr-object}}]
 {
   \rho, e \Rightarrow \val{\exObj{C}{\bind{\seq{x}}{\seq{v}}}} \\
@@ -374,31 +432,13 @@
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
   e \in \set{q, \exSubscript{q}{\seq{\psi}}} \\
-  \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \val{v_1 \cons \ldots \cons v_{n+m}} \\
+  \rho, \seq{e} \concat \seq{e}' \Rightarrow \val{\seq{v} \concat \seq{v}'} \\
   \resolve(\rho, q) = \Type{C} \\
   \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
-  \fieldMap{\Sigma}(C, (v_1, \ldots, v_n, y_1 \mathord{=} v_{n+1}, \ldots, y_m \mathord{=} v_{n+m})) = \set{\bind{\seq{x}}{\seq{u}}}
+  \fieldMap{\Sigma}(C, (\seq{v}, \seq{y} \mathord{=} \seq{v}')) = \set{\bind{\seq{x}}{\seq{u}}}
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \val{\exObj{C}{\bind{\seq{x}}{\seq{u}}}}
-}
-\end{mathpar}
-\caption{Expression $e$ evaluates to result $r$ under environment $\rho : \Gamma$}
-\label{fig:eval-result}
-\end{figure}
-
-\begin{figure}
-\small
-\flushleft \shadebox{$\rho, e \Rightarrow r$ (continued)}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{eval-subscript}}]
-{
-  \rho, e \Rightarrow \val{v} \\
-  \rho, e' \Rightarrow r
-}
-{
-  \rho, \exSubscript{e}{e'} \Rightarrow \mlet{v'}{r}{\getitem(v, v')}
+  \rho, \exCall{e}{\seq{e}, \seq{y} \mathord{=} \seq{e}'} \Rightarrow \val{\exObj{C}{\bind{\seq{x}}{\seq{u}}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-lambda}}]
@@ -417,7 +457,7 @@
   d_j = \exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s} \\
   v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
-  \rho' \override \set{\bind{\declaresS(\seq{d})}{\seq{v}}} \override \set{\bind{\seq{x}}{\seq{u}}} \override \scopeS(\set{\seq{x}}, s), s \Rightarrow o
+  \rho' \override \set{\bind{\declaresS(\seq{d})}{\seq{v}}} \override \set{\bind{\seq{x}}{\seq{u}}} \override \scopeS(\seq{x}, s), s \Rightarrow o
 }
 {
   \rho, \exCall{e}{\seq{e}} \Rightarrow \result(o)
@@ -484,43 +524,8 @@
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow r
 }
 \end{mathpar}
-\caption{Expression evaluation, continued}
-\label{fig:eval-result-ctd}
-\end{figure}
-
-\begin{figure}
-\small
-\flushleft \shadebox{$\rho, \seq{e} \Rightarrow r$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{eval-exprs-nil}}]
-{
-  \strut
-}
-{
-  \rho, \varepsilon \Rightarrow \val{\varepsilon}
-}
-\and
-\inferrule*[lab={\ruleName{eval-exprs-cons}}]
-{
-  \rho, e \Rightarrow \val{v} \\
-  \rho, \seq{e} \Rightarrow r
-}
-{
-  \rho, e \cons \seq{e} \Rightarrow \mlet{\seq{v}}{r}{\val{v \cons \seq{v}}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-exprs-fail}}]
-{
-  \rho, e \Rightarrow \aborts{\kappa}
-}
-{
-  \rho, e \cons \seq{e} \Rightarrow \aborts{\kappa}
-}
-\end{mathpar}
-\caption{Expression sequence $\seq{e}$ evaluates left to right to result $r$ under environment $\rho :
-\Gamma$}
-\label{fig:eval-seq}
+\caption{Expression $e$ evaluates to result $r$ under environment $\rho : \Gamma$}
+\label{fig:eval-result}
 \end{figure}
 
 \begin{figure}
@@ -662,13 +667,13 @@
 \inferrule*[lab={\ruleName{eval-constr-fail}}]
 {
   e \in \set{q, \exSubscript{q}{\seq{\psi}}} \\
-  \rho, e_1 \cons \ldots \cons e_{n+m} \Rightarrow \aborts{\kappa}
+  \rho, \seq{e} \concat \seq{e}' \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exCall{e}{e_1, \ldots, e_n, y_1 \mathord{=} e_{n+1}, \ldots, y_m \mathord{=} e_{n+m}} \Rightarrow \aborts{\kappa}
+  \rho, \exCall{e}{\seq{e}, \seq{y} \mathord{=} \seq{e}'} \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
-\caption{Expression evaluation, continued (propagation from subexpressions)}
+\caption{Expression evaluation, continued (propagation rules)}
 \label{fig:eval-propagation}
 \end{figure}
 
@@ -677,6 +682,22 @@
 \flushleft \shadebox{$\rho, e \Rightarrow r$ (continued)}
 \begin{mathpar}
 \small
+\inferrule*[lab={\ruleName{eval-var-unknown}}]
+{
+  x \notin \dom(\rho)
+}
+{
+  \rho, x \Rightarrow \aborts{\errName}
+}
+\and
+\inferrule*[lab={\ruleName{eval-var-unbound}}]
+{
+  \bind{x}{\Unbound} \in \rho
+}
+{
+  \rho, x \Rightarrow \aborts{\errName}
+}
+\and
 \inferrule*[lab={\ruleName{eval-attr-missing}}]
 {
   \rho, e \Rightarrow \val{\exObj{C}{\bind{\seq{x}}{\seq{v}}}} \\
@@ -707,7 +728,45 @@
   \rho, \exCall{e}{\seq{e}} \Rightarrow \aborts{\errType}
 }
 \and
+\inferrule*[lab={\ruleName{eval-constr-arity}}]
+{
+  e \in \set{q, \exSubscript{q}{\seq{\psi}}} \\
+  \rho, \seq{e} \concat \seq{e}' \Rightarrow \val{\seq{v} \concat \seq{v}'} \\
+  \resolve(\rho, q) = \Type{C} \\
+  \fieldMap{\Sigma}(C, (\seq{v}, \seq{y} \mathord{=} \seq{v}')) \text{ undefined}
+}
+{
+  \rho, \exCall{e}{\seq{e}, \seq{y} \mathord{=} \seq{e}'} \Rightarrow \aborts{\errType}
+}
+\and
 \input{spec/rules/eval-call-nonfun}
+\and
+\inferrule*[lab={\ruleName{eval-and-nonbool}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  v \text{ not a Boolean}
+}
+{
+  \rho, \exAnd{e}{e'} \Rightarrow \aborts{\errExcluded}
+}
+\and
+\inferrule*[lab={\ruleName{eval-or-nonbool}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  v \text{ not a Boolean}
+}
+{
+  \rho, \exOr{e}{e'} \Rightarrow \aborts{\errExcluded}
+}
+\and
+\inferrule*[lab={\ruleName{eval-cond-nonbool}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  v \text{ not a Boolean}
+}
+{
+  \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow \aborts{\errExcluded}
+}
 \and
 \inferrule*[lab={\ruleName{eval-attr-nonobject}}]
 {
@@ -715,11 +774,66 @@
   v \text{ neither loaded module nor object}
 }
 {
-  \rho, \exAttr{e}{x} \Rightarrow \aborts{\errAttr}
+  \rho, \exAttr{e}{x} \Rightarrow \aborts{\errExcluded}
+}
+\and
+\inferrule*[lab={\ruleName{eval-dict-nonstr}}]
+{
+  \rho, e_1 \cons e_1' \cons \ldots \cons e_n \cons e_n' \Rightarrow \val{v_1 \cons v_1' \cons \ldots \cons v_n \cons v_n'} \\
+  v_j \text{ not a string}
+}
+{
+  \rho, \exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}} \Rightarrow \aborts{\errExcluded}
+}
+\and
+\inferrule*[lab={\ruleName{eval-dict-comp-nonstr}}]
+{
+  \rho, \seq{g} \Rightarrow \val{\seq{\rho}} \\
+  \rho_i, e \Rightarrow \val{w_i} \quad \rho_i, e' \Rightarrow \val{v_i} \quad (\forall i < j) \\
+  \rho_j, e \Rightarrow \val{v} \\
+  v \text{ not a string}
+}
+{
+  \rho, \exDictComp{e}{e'}{\seq{g}} \Rightarrow \aborts{\errExcluded}
 }
 \end{mathpar}
 \caption{Expression evaluation, continued (aborting cases)}
 \label{fig:eval-fails}
+\end{figure}
+
+\begin{figure}
+\small
+\flushleft \shadebox{$\rho, \seq{e} \Rightarrow r$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-exprs-nil}}]
+{
+  \strut
+}
+{
+  \rho, \varepsilon \Rightarrow \val{\varepsilon}
+}
+\and
+\inferrule*[lab={\ruleName{eval-exprs-cons}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  \rho, \seq{e} \Rightarrow r
+}
+{
+  \rho, e \cons \seq{e} \Rightarrow \mlet{\seq{v}}{r}{\val{v \cons \seq{v}}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-exprs-fail}}]
+{
+  \rho, e \Rightarrow \aborts{\kappa}
+}
+{
+  \rho, e \cons \seq{e} \Rightarrow \aborts{\kappa}
+}
+\end{mathpar}
+\caption{Expression sequence $\seq{e}$ evaluates left to right to result $r$ under environment $\rho :
+\Gamma$}
+\label{fig:eval-seq}
 \end{figure}
 
 \begin{figure}
@@ -760,11 +874,20 @@
   \rho, \qualGuard{e} \cons \seq{g} \Rightarrow \aborts{\kappa}
 }
 \and
+\inferrule*[lab={\ruleName{eval-qual-guard-nonbool}}]
+{
+  \rho, e \Rightarrow \val{v} \\
+  v \text{ not a Boolean}
+}
+{
+  \rho, \qualGuard{e} \cons \seq{g} \Rightarrow \aborts{\errExcluded}
+}
+\and
 \inferrule*[lab={\ruleName{eval-qual-generator}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \iterOp(v) = u_1 \cons \ldots \cons u_n \\
-  \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i)
+  \iterOp(v) = v_1 \cons \ldots \cons v_n \\
+  \rho \override \set{\bind{x}{v_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i)
 }
 {
   \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \val{\seq{\rho}_1 \mathbin{\concat} \ldots \mathbin{\concat} \seq{\rho}_n}
@@ -790,9 +913,9 @@
 \inferrule*[lab={\ruleName{eval-qual-generator-fail-body}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \iterOp(v) = u_1 \cons \ldots \cons u_n \\
-  \rho \override \set{\bind{x}{u_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i < j) \\
-  \rho \override \set{\bind{x}{u_j}}, \seq{g} \Rightarrow \aborts{\kappa}
+  \iterOp(v) = v_1 \cons \ldots \cons v_n \\
+  \rho \override \set{\bind{x}{v_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i < j) \\
+  \rho \override \set{\bind{x}{v_j}}, \seq{g} \Rightarrow \aborts{\kappa}
 }
 {
   \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \aborts{\kappa}
@@ -801,3 +924,5 @@
 \caption{Comprehension qualifiers $\seq{g}$ evaluate to result $r$ under environment $\rho : \Gamma$}
 \label{fig:eval-quals-result}
 \end{figure}
+
+\FloatBarrier

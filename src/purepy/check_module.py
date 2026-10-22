@@ -25,7 +25,7 @@ from .statements import check_assignments_declared, check_top_seq, scope
 from .syntax_utils import (
     assigns_body,
     assigns_stmt,
-    declares_body,
+    declares_imports,
     split_imports,
     statements,
 )
@@ -87,9 +87,6 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
             assert iota.module is not None
             q = parse_name(iota.module)
             xs = [a.name for a in iota.names]
-            dup = next((x for i, x in enumerate(xs) if x in xs[:i]), None)
-            if dup is not None:
-                raise IllFormedModule(iota, reasons.DuplicateImportedName(dup))
             delta, Sigma = check_imported(q, iota, mod_ctx)
             Sigma = check_containing(containing(mod_ctx.q, q), replace(mod_ctx, Sigma=Sigma))
             return imports_seq(
@@ -209,7 +206,7 @@ def check_module_(
     if q in PREDEFINED_MODULES:
         return predefined_context(q), Sigma
     iotas, stmts = split_imports(m.body)
-    imported = {x for x, _ in declares_body(iotas)}
+    imported = declares_imports(iotas)
     gamma, Sigma = check_imports_prefix(iotas, ModuleContext(gamma={}, M=M, q=q, Sigma=Sigma))
     body = [name_declaration(q), *stmts]
     bound = scope(imported, body)

@@ -11,10 +11,10 @@ $r$ & $::=$ & $\val{v}$ & \speconly{(Val)} \\
 \grammarGroup{Match results} \\
 $m$ & $::=$ & $\matchOk{\rho}$ & \speconly{(Match)} \\
   & $\mid$ & $\noMatch$ & \speconly{(NoMatch)} \\
-  & $\mid$ & $\errUndef$ & \speconly{(Undefined)}
+  & $\mid$ & $\kappa$ & \speconly{(Kind)}
    \\[3mm]
 \grammarGroup{Termination kinds} \\
-$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \errKey$ & \\
+$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \errKey {} \mid \errOverflow \mid \errValue$ & \\
     & $\mid$ & $\errZeroDiv \mid \errAssertNoMsg \mid \errAssert{w}$ & \\
-    & $\mid$ & $\errAttr \mid \errExit{n} \mid \errUndef$ &
+    & $\mid$ & $\errAttr \mid \errName \mid {} \errExit{n} \mid \errUndef {} \mid \errExcluded$ &
 \end{tabular}

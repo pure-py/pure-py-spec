@@ -18,22 +18,21 @@ EXCEPTION_EXPECTED = f".exception{EXPECTED}"
 ERROR_EXPECTED = f".error{EXPECTED}"
 STATUS_EXPECTED = f".status{EXPECTED}"
 
-MODULE_LEVEL, PROGRAM_LEVEL = "module-level", "program-level"
 HELPERS = "helpers"
 MAIN = "main.py"
 
 
 class PythonOutcome(StrEnum):
-    SYNTAX_ERROR = "syntax-error"
-    EXCEPTION = "exception"
-    NO_EXCEPTION = "no-exception"
+    REJECTS = "python-rejects"
+    RAISES = "python-raises"
+    SUCCEEDS = "python-succeeds"
 
 
 class PurePyOutcome(StrEnum):
-    PARSER = "parser"
-    TYPE_CHECKER = "type-checker"
+    PARSER_REJECTS = "parser-rejects"
+    TYPING_REJECTS = "typing-rejects"
     UNDEFINED = "undefined"
-    RESULT = "result"
+    AGREES = "agrees"
 
 
 SYNTACTIC_ONLY = "syntactic-only"
@@ -42,7 +41,7 @@ SYNTAX_ERROR = "SyntaxError"
 
 class Exit(IntEnum):
     OK = 0
-    PROHIBITED = 1
+    NOT_ALLOWED = 1
     ILL_FORMED = 3
     ILL_FORMED_PROGRAM = 4
 
@@ -55,10 +54,10 @@ class Expectation(NamedTuple):
 
 # Checker verdict for each PurePy outcome
 CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
-    PurePyOutcome.PARSER: (Exit.PROHIBITED, True),
-    PurePyOutcome.TYPE_CHECKER: (Exit.ILL_FORMED, True),
+    PurePyOutcome.PARSER_REJECTS: (Exit.NOT_ALLOWED, True),
+    PurePyOutcome.TYPING_REJECTS: (Exit.ILL_FORMED, True),
     PurePyOutcome.UNDEFINED: (Exit.OK, False),
-    PurePyOutcome.RESULT: (Exit.OK, False),
+    PurePyOutcome.AGREES: (Exit.OK, False),
 }
 
 
@@ -96,18 +95,10 @@ class Runner:
             self.passed += 1
             print(f"  {GREEN}✓{RESET} {label}")
 
-    def check(
-        self, path: pathlib.Path, program: bool, exit: Exit, error_checked: bool
-    ) -> list[str]:
-        reference = [
-            sys.executable,
-            "-m",
-            "purepy",
-            "--check",
-            *([] if program else ["--module"]),
-        ]
+    def check(self, path: pathlib.Path, exit: Exit, error_checked: bool) -> list[str]:
+        reference = [sys.executable, "-m", "purepy", "--check"]
         proc = run([*(self.checker or reference), str(path)])
-        exits = {exit, Exit.ILL_FORMED_PROGRAM} if program and exit == Exit.ILL_FORMED else {exit}
+        exits = {exit, Exit.ILL_FORMED_PROGRAM} if exit == Exit.ILL_FORMED else {exit}
         output = proc.stdout + proc.stderr
         error = path.with_suffix(ERROR_EXPECTED)
         if proc.returncode not in exits:
@@ -123,7 +114,7 @@ class Runner:
 
     def python(self, path: pathlib.Path, outcome: PythonOutcome) -> list[str]:
         assert self.interpreter is not None
-        accepts = outcome == PythonOutcome.NO_EXCEPTION
+        accepts = outcome == PythonOutcome.SUCCEEDS
         expected = path.with_suffix(EXPECTED)
         exception = path.with_suffix(EXCEPTION_EXPECTED)
         if expected.exists() == exception.exists():
@@ -140,7 +131,7 @@ class Runner:
                 return ["run: output mismatch"]
             return []
         name = exception.read_text().strip()
-        if (outcome == PythonOutcome.SYNTAX_ERROR) != name.startswith(SYNTAX_ERROR):
+        if (outcome == PythonOutcome.REJECTS) != name.startswith(SYNTAX_ERROR):
             return [f"run: misfiled, expects {name}"]
         if proc.returncode == 0:
             return [f"run: expected {name} but script succeeded"]
@@ -148,20 +139,19 @@ class Runner:
             return [f"run: expected {name}, got: {proc.stderr.strip()}"]
         return []
 
-    def run_test(self, suite: pathlib.Path, test: pathlib.Path, program: bool) -> list[str]:
-        """Failures of a test at a path below module-level/ or program-level/ of suite: <Python
-        outcome>/<PurePy outcome>[/<subset>]/.../<test>.py, or .../<test>/main.py for a program; or
-        syntactic-only/<test>.py, for a script which builds an AST which cannot be expressed in
-        Python source."""
-        dirs = test.relative_to(suite).parts[1:-1]
+    def run_test(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
+        """Failures of a test at a path below suite: <Python outcome>/<PurePy outcome>[/<subset>]/...
+        /<test>.py, or .../<test>/main.py for a program of several modules; or syntactic-only/<test>.py,
+        for a script which builds an AST which cannot be expressed in Python source."""
+        dirs = test.relative_to(suite).parts[:-1]
         exit, error_checked, python = (
-            Expectation(None, False, PythonOutcome.NO_EXCEPTION)
+            Expectation(None, False, PythonOutcome.SUCCEEDS)
             if dirs[0] == SYNTACTIC_ONLY
             else expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]))
         )
-        path = test / MAIN if program else test
+        path = test / MAIN if test.is_dir() else test
         return [
-            *(self.check(path, program, exit, error_checked) if exit is not None else []),
+            *(self.check(path, exit, error_checked) if exit is not None else []),
             *(
                 self.python(path, python)
                 if python is not None and self.interpreter is not None
@@ -173,9 +163,9 @@ class Runner:
         """Tests run in parallel on jobs threads (default: one per core), reported in order."""
         found = list(tests(suite))
         with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
-            results = pool.map(lambda entry: self.run_test(suite, *entry), found)
+            results = pool.map(lambda test: self.run_test(suite, test), found)
             last = None
-            for (test, _), failures in zip(found, results):
+            for test, failures in zip(found, results):
                 header = test.parent.relative_to(suite)
                 if header != last:
                     print(header)
@@ -209,18 +199,17 @@ def compare_known_failures(failed: list[str], known_failures: pathlib.Path, upda
     return True
 
 
-def tests(suite: pathlib.Path) -> Iterator[tuple[pathlib.Path, bool]]:
-    """Module-level tests, then program-level tests, each sorted by path and paired with whether it is
-    program-level."""
-    for level, program in ((MODULE_LEVEL, False), (PROGRAM_LEVEL, True)):
-        found = (suite / level).rglob(MAIN if program else "*.py")
-        paths = [
-            path.parent if program else path
-            for path in found
-            if HELPERS not in path.parts and "__pycache__" not in path.parts
-        ]
-        for test in sorted(paths, key=lambda test: (test.parent.as_posix(), test.name)):
-            yield test, program
+def tests(suite: pathlib.Path) -> Iterator[pathlib.Path]:
+    """Tests sorted by path: a module as a .py file, or a program as the directory holding its main
+    module."""
+    found = [
+        path
+        for path in suite.rglob("*.py")
+        if HELPERS not in path.parts and "__pycache__" not in path.parts
+    ]
+    programs = {path.parent for path in found if path.name == MAIN}
+    modules = [path for path in found if not any(d in programs for d in path.parents)]
+    yield from sorted([*programs, *modules], key=lambda test: (test.parent.as_posix(), test.name))
 
 
 @contextlib.contextmanager

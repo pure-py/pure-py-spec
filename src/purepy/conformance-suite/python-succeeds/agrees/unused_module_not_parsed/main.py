@@ -1,0 +1,2 @@
+# rule: program
+print("ok")

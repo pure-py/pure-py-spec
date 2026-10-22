@@ -1,4 +1,4 @@
 \dispatch(\rho, v, \varepsilon, \varepsilon) &= (\varnothing, \exPass)\vphantom{\seq{p}} \\*
 \dispatch(\rho, v, p \cons \seq{p}, s \cons \seq{s}) &= (\rho', s) && \quad \text{if } \matchOp{\Sigma}(\rho, p, v) = \matchOk{\rho'} \\*
 \dispatch(\rho, v, p \cons \seq{p}, s \cons \seq{s}) &= \dispatch(\rho, v, \seq{p}, \seq{s}) && \quad \text{if } \matchOp{\Sigma}(\rho, p, v) = \noMatch \\*
-\dispatch(\rho, v, p \cons \seq{p}, s \cons \seq{s}) &= \errUndef && \quad \text{if } \matchOp{\Sigma}(\rho, p, v) = \errUndef
+\dispatch(\rho, v, p \cons \seq{p}, s \cons \seq{s}) &= \kappa && \quad \text{if } \matchOp{\Sigma}(\rho, p, v) = \kappa
