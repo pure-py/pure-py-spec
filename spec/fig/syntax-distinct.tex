@@ -4,11 +4,11 @@
 \footnotesize
 \setlength{\tabcolsep}{4pt}
 \speconly{%
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.3\textwidth}>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.3\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}>{\raggedright\arraybackslash}p{0.3\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Form & Production & Pairwise distinct \\
-Class definition, type alias, function definition & DataclassExtend, Dataclass, TypeAlias, Def & type parameters $\seq{\alpha}$ \\\rowgap
-Function definition & Def & parameters $\seq{x}$ \\\rowgap
+Class definition, type alias & DataclassExtend, Dataclass, TypeAlias & type parameters $\seq{\alpha}$ \\\rowgap
+Function definition & Def & type parameters $\seq{\alpha}$; parameters $\seq{x}$ \\\rowgap
 Lambda & Lambda & parameters $x_1, \ldots, x_n$ \\\rowgap
 Argument list & Args & keyword arguments $\seq{x}$ \\\rowgap
 Dictionary pattern & PatDict & keys $w_1, \ldots, w_n$ \\\rowgap
@@ -19,15 +19,15 @@ Case & Case & variables bound by the pattern $p$ \\
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.4\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Form & Pairwise distinct \\
-Class definition, type alias, function definition & type parameters $\seq{\alpha}$ \\\rowgap
-Function definition & parameters $\seq{x}$ \\\rowgap
+Class definition, type alias & type parameters $\seq{\alpha}$ \\\rowgap
+Function definition & type parameters $\seq{\alpha}$; parameters $\seq{x}$ \\\rowgap
 Lambda & parameters $x_1, \ldots, x_n$ \\\rowgap
 Argument list & keyword arguments $\seq{x}$ \\\rowgap
 Dictionary pattern & keys $w_1, \ldots, w_n$ \\\rowgap
 Case & variables bound by the pattern $p$ \\
 \hline
 \end{tabular}}
-\caption{Additional distinctness conditions, so every \PurePy program is syntactically valid Python}
+\caption{Additional distinctness conditions ensuring every \PurePy program is syntactically valid Python}
 \label{fig:syntax-distinct}
 \end{AddedBlock}
 \end{figure}
