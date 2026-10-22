@@ -3,17 +3,30 @@
 \centering
 \footnotesize
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.5\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}}
+\speconly{%
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.3\textwidth}>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.3\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Form & Production & Pairwise distinct \\
+Class definition, type alias, function definition & DataclassExtend, Dataclass, TypeAlias, Def & type parameters $\seq{\alpha}$ \\\rowgap
+Function definition & Def & parameters $\seq{x}$ \\\rowgap
+Lambda & Lambda & parameters $x_1, \ldots, x_n$ \\\rowgap
+Argument list & Args & keyword arguments $\seq{x}$ \\\rowgap
+Dictionary pattern & PatDict & keys $w_1, \ldots, w_n$ \\\rowgap
+Case & Case & variables bound by the pattern $p$ \\
+\hline
+\end{tabular}}%
+\paperonly{%
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.4\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Form & Pairwise distinct \\
-Class definition\speconly{ (DataclassExtend, Dataclass)}, type alias\speconly{ (TypeAlias)}, function definition\speconly{ (Def)} & type parameters $\seq{\alpha}$ \\\rowgap
-Function definition\speconly{ (Def)} & parameters $\seq{x}$ \\\rowgap
-Lambda\speconly{ (Lambda)} & parameters $x_1, \ldots, x_n$ \\\rowgap
-Argument list\speconly{ (Args)} & keyword arguments $\seq{x}$ \\\rowgap
-Dictionary pattern\speconly{ (PatDict)} & keys $w_1, \ldots, w_n$ \\\rowgap
-Case\speconly{ (Case)} & variables bound by the pattern $p$ \\
+Class definition, type alias, function definition & type parameters $\seq{\alpha}$ \\\rowgap
+Function definition & parameters $\seq{x}$ \\\rowgap
+Lambda & parameters $x_1, \ldots, x_n$ \\\rowgap
+Argument list & keyword arguments $\seq{x}$ \\\rowgap
+Dictionary pattern & keys $w_1, \ldots, w_n$ \\\rowgap
+Case & variables bound by the pattern $p$ \\
 \hline
-\end{tabular}
+\end{tabular}}
 \caption{Additional distinctness conditions, so every \PurePy program is syntactically valid Python}
 \label{fig:syntax-distinct}
 \end{AddedBlock}
