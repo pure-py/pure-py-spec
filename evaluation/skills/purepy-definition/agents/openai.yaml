@@ -1,4 +1,0 @@
-interface:
-  display_name: "PurePy Definition"
-  short_description: "Generate and review code against PurePy v0.19.0"
-  default_prompt: "Use $purepy-definition to write or review code against the pinned PurePy language definition."

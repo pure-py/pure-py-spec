@@ -1,97 +1,45 @@
-# Harbor Experiments
+# Harbor
 
-Harbor manages trials, configuration and logs. The existing `experiment.py`
-and `livecodebench.py` still define the generation and evaluation protocol.
-Python 3.12, the checker revision, prompts, first-response extraction, official
-tests, and timeouts are unchanged. There is one sample and no repair or retry.
+Harbor records every run of the evaluation pipeline as trials, one per problem
+and condition, and shows them in its viewer. Each trial keeps the prompt, the
+answer and its repair rounds, the checker and official-test verdicts, token usage,
+and the rewards below. Harbor never calls a model and never re-runs code: the
+pipeline is the only place where generation and evaluation happen.
 
-## Setup
+## Import a run
 
 ```sh
-uv venv --python 3.12 .cache/harbor-venv
-uv pip sync --python .cache/harbor-venv/bin/python harbor/requirements.lock
+bash scripts/harbor-import.sh --file results/RUN/MODEL.json
 ```
 
-## Import And Verify Existing Results
+This creates the pinned Harbor environment in `.cache/harbor-venv` from
+`harbor/requirements.lock` when it is missing, records the run under
+`.cache/harbor/jobs/`, and writes `results/RUN/harbor/MODEL.json`: the result
+file plus a `harbor` section naming the job. `--output` chooses another export
+path; `--concurrency` sets the number of trials recorded at once. Importing the
+same file again reuses its frozen task bundle. The CI workflow imports the smoke
+run on both platforms.
+
+## View
 
 ```sh
-.cache/harbor-venv/bin/python harbor_runner.py migrate
-.cache/harbor-venv/bin/python harbor_runner.py migrate --file livecodebench/Qwen2.5-Coder-32B-Instruct.json --verify --limit 5
 .cache/harbor-venv/bin/python harbor_runner.py view
 ```
 
-Import makes no model calls. By default it runs the original checker and tests
-again; `--recorded-only` preserves historical verdicts without re-execution.
-`--limit` writes a separate parity report
-under `.cache/harbor/parity/`, not a replacement for the full exported result.
-Pending and in-flight legacy requests are not launched or counted as failures.
-Refresh an import with `migrate` after the original experiment advances. Existing
-completed Harbor trials are reused when their frozen inputs have not changed.
+`harbor_runner.py export JOB` rewrites the export of an existing job.
 
-An already-running legacy generator can be adopted without restarting it:
+## Rewards
 
-```sh
-.cache/harbor-venv/bin/python harbor_runner.py follow --file livecodebench/deepseek-v4-pro.json --pid GENERATOR_PID
-```
+- `checker_evaluated`, `tests_evaluated`: 1 when the verdict is known
+- `checker_passed`, `official_tests_passed`, `joint_passed`: present only when evaluated
+- `attempts`, `rejections`, `rounds_to_acceptance`: the repair loop as recorded
 
-This only reads the producer's atomically saved answers, checks them and updates
-the Harbor export. It never calls a model. If the producer exits, unsaved or
-unattempted outputs remain unknown; they are not retried or counted as wrong.
-The same output is locked against overlapping generators/imports.
+## GPU runs with Slurm
 
-Simple, model-named JSON exports are in `harbor/results/<benchmark>/`.
-Detailed Harbor tasks, configuration and trial logs are in `.cache/harbor/`.
-Original root-level and `livecodebench/` JSON files are never overwritten.
-Imported API usage is historical metadata; replay incurs zero new model cost.
-Unknown verdicts stay `null`, not `false`; Harbor pass metrics omit unknowns
-and also report `checker_evaluated` and `tests_evaluated` counts.
-
-## New One-Shot Experiments
-
-```sh
-.cache/harbor-venv/bin/python harbor_runner.py generate --benchmark livecodebench --provider deepseek --model deepseek-v4-pro --max-tokens 393216 --output harbor/results/new-run/deepseek-v4-pro.json
-```
-
-Keys are entered through hidden input, never stored in task/config/result files.
-The adapter sends the same prompt to the native provider API through the existing
-generator. It does not use a coding agent, tools, feedback or extra system prompts.
-By default failed, interrupted, and truncated attempts are preserved and never resampled.
-Use a new output path when changing prompt or sampling settings.
-
-An explicitly requested completion round can target only incomplete outputs:
-
-```sh
-.cache/harbor-venv/bin/python harbor_runner.py generate --benchmark livecodebench --provider deepseek --model deepseek-v4-pro --max-tokens 393216 --difficulty hard --retry-incomplete --output harbor/results/livecodebench/deepseek-v4-pro.json
-```
-
-This preserves a full pre-round snapshot in `.cache/harbor/retries/`, records the
-selected outputs in `manual_retry_rounds`, and leaves completed answers unchanged,
-including completed answers that failed tests or the checker. Each selected output
-gets at most one new request in this invocation; there are no automatic retries or
-repair feedback. Updated scores include a completion round, not first-attempt
-scores. `--difficulty hard` leaves all medium outputs untouched. Original root and
-`livecodebench/` results are still read-only. Keys can also be supplied through
-`ANTHROPIC_API_KEY` or `DEEPSEEK_API_KEY`; they are never saved in result files.
-
-Qwen accepts an accessible vLLM OpenAI-compatible endpoint via `--provider openai
---api-url http://127.0.0.1:PORT/v1`. GPU inference must remain inside a Slurm
-allocation; this adapter never allocates GPUs on a login node. On a Linux GPU
-node, use `--generation-only`, then transfer the result and import it on the Mac
-with `migrate --file PATH --verify`. Existing submitted GPU jobs are not changed.
-
-`harbor/qwen.sbatch` starts vLLM in the unchanged shared inference environment
-and runs the Harbor client in its separate environment. Set `MODEL_ID` and the
-pinned `MODEL_REVISION` before submission. It uses the existing 32K LCB context,
-BF16, seed 0, temperature 0 and one answer per condition. GPU results are saved
-remotely in `harbor/results/livecodebench/`; transfer them to the Mac before
-verification. Do not resubmit completed experiments merely to migrate them.
-
-## Execution Boundary
-
-The `EvaluationFiles` backend is a restricted file-only integration, not a
-general-purpose container. Shell/tool execution is disabled. Only the trusted
-custom verifier invokes the original macOS OS-sandbox workers on generated code.
-Candidate workers do not receive model keys or access to project/user files.
-Verification fails closed on non-macOS systems; generation-only mode does not
-execute candidates. Docker, cloud sandboxes and automatic Slurm provisioning
-are not installed or claimed by this migration. Harbor telemetry is disabled.
+`harbor/qwen.sbatch` runs a local model on a GPU node: it starts a vLLM
+OpenAI-compatible server for the pinned snapshot, runs `scripts/evaluate.sh`
+against it, and imports the result. Set `MODEL_ID` and `MODEL_REVISION`;
+`BENCHMARK`, `DIFFICULTY`, `MAX_TOKENS`, `REPAIR_ROUNDS` and `MAX_MODEL_LEN`
+are optional. The node needs `uv` and `bubblewrap`, since the pipeline runs the
+official tests in a sandbox and stops if none is available. Results are written
+to `results/slurm-JOBID/`.
