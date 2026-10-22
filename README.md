@@ -79,7 +79,7 @@ states the status in `.status.expected`.
 
 The first line of a test may cite a rule of the specification as `# rule: name`: for a test rejected by the type
 checker, the rule with a premise or side condition that fails for the program, and for a test that runs, the rule
-yielding its result; a test rejected by the parser cites no rule.
+yielding its result. A test rejected by the parser has no rule line, since the grammar has no rules.
 
 Another type checker can be run over the suite installed with the `purepy` package, by passing a command
 which takes the path of a test and exits with the codes of the reference checker:
