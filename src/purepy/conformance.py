@@ -102,7 +102,7 @@ class Runner:
         output = proc.stdout + proc.stderr
         error = path.with_suffix(ERROR_EXPECTED)
         if proc.returncode not in exits:
-            first = output.strip().split("\n", 1)[0]
+            first = output.strip().split("\n", 1)[0].replace(str(path), path.name)
             return [f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}: {first}"]
         if not error_checked or self.checker is not None:  # messages are the reference checker's
             return []
