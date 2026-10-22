@@ -6,6 +6,7 @@
 &\added{\qquad \text{if } \rho(x) \in \set{\bot, \Unbound} \text{ where } q = x \cons \seq{x}} \\*
 \added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, v)} &\added{{}= \errAttr} \\*
 &\added{\qquad \text{if } \resolve(\rho, q) \text{ undefined and } \rho(x) \notin \set{\bot, \Unbound}} \\*
+&\added{\qquad \text{where } q = x \cons \seq{x}} \\*
 \added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, v)} &\added{{}= \errExcluded} \\*
 &\added{\qquad \text{if } \resolve(\rho, q) = \opaqueVal{\pyinline{builtins}.x}} \\*
 \added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, v)} &\added{{}= \errType} \\*
