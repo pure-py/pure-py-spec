@@ -162,6 +162,13 @@ class EvaluationTests(unittest.TestCase):
                 self.assertEqual(solution["rounds_to_acceptance"], 1)
                 self.assertEqual(data["summary"]["conditions"]["purepy"]["initial"]["joint_pass"], 0)
                 self.assertEqual(data["summary"]["conditions"]["purepy"]["final"]["joint_pass"], 1)
+                accepted = data["summary"]["rq3_accepted"]
+                self.assertEqual(accepted["initial"]["problems"], 0)
+                self.assertIsNone(accepted["initial"]["python_minus_purepy_pp"])
+                self.assertEqual(accepted["final"]["problems"], 1)
+                self.assertEqual(accepted["final"]["purepy_tests_pass"], 1)
+                self.assertEqual(accepted["final"]["python_tests_pass"], 0)
+                self.assertEqual(accepted["final"]["python_minus_purepy_pp"], -100.0)
                 self.assertEqual(len(requests), 3)
                 feedback = requests[-1]["messages"][-1]["content"]
                 self.assertIn("prohibited", feedback)
@@ -176,6 +183,7 @@ class EvaluationTests(unittest.TestCase):
                 self.assertIn("| HumanEval/2 | python | complete |", report)
                 self.assertIn("| HumanEval/2 | purepy | complete |", report)
                 self.assertIn("## Output Format", report)
+                self.assertIn("final: 1 accepted problems; PurePy passes 1/1 (100.0%), Python passes 0/1 (0.0%)", report)
                 self.assertEqual(data["summary"]["conditions"]["purepy"]["final"]["format_compliant"], 1)
                 code_folder = Path(folder) / "solutions/fake/HumanEval-2"
                 self.assertEqual((code_folder / "purepy.py").read_text(), GOOD)

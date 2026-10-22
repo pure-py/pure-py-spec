@@ -103,8 +103,11 @@ uv run --locked python evaluation.py compare results/RUN1/MODEL1.json results/RU
 
 The comparison groups runs by benchmark, tasks, prompts, checker, repair budget
 and platform, and reports the Python-minus-PurePy gaps for initial and final
-answers. Positive means Python leads. Provider settings and token budgets are
-listed but not controlled. `--model-size` records a known parameter count.
+answers. Positive means Python leads. Both reports also restrict the comparison
+to the problems whose PurePy answer the checker accepted, giving the pass rates
+of the PurePy and Python answers on those problems and their gap. Provider
+settings and token budgets are listed but not controlled. `--model-size` records
+a known parameter count.
 
 The plot alone can be rendered from any result file:
 

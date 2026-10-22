@@ -441,6 +441,24 @@ def summarize(data):
                 100 * (python["tests_pass"] - purepy["joint_pass"]) / n
                 if python["outputs"] == purepy["outputs"] == n
                 and not (python["tests_unknown"] or purepy["checker_unknown"] or purepy["tests_unknown"]) else None)}
+    summary["rq3_accepted"] = {}
+    for stage in ("initial", "final"):
+        index = 0 if stage == "initial" else -1
+        pairs = [(t["purepy"]["attempts"][index], t["python"]["attempts"][index])
+                 for t in data["tasks"].values() if "purepy" in t and "python" in t]
+        accepted = [(q, p) for q, p in pairs if q["checker"]["passed"] is True]
+        count = len(accepted)
+        purepy_pass = sum(q["official_tests"]["passed"] is True for q, p in accepted)
+        python_pass = sum(p["official_tests"]["passed"] is True for q, p in accepted)
+        unknown = sum(q["official_tests"]["passed"] is None or p["official_tests"]["passed"] is None
+                      for q, p in accepted)
+        known = count > 0 and not unknown
+        summary["rq3_accepted"][stage] = {
+            "problems": count, "purepy_tests_pass": purepy_pass, "python_tests_pass": python_pass,
+            "tests_unknown": unknown,
+            "purepy_rate_pct": 100 * purepy_pass / count if known else None,
+            "python_rate_pct": 100 * python_pass / count if known else None,
+            "python_minus_purepy_pp": 100 * (python_pass - purepy_pass) / count if known else None}
     return summary
 
 
@@ -532,7 +550,7 @@ def report(path):
     lines.extend(["", "## Checker Rejections", ""])
     for condition, stages in summary["conditions"].items():
         lines.append(f"{condition}: {json.dumps(stages['checker_rejections'], sort_keys=True)}")
-    lines.extend(["", "## RQ3 Gaps", "",
+    lines.extend(["", "## RQ3", "",
                   "Positive values mean Python leads; negative values mean PurePy leads.",
                   "The hypothesis that gaps close with model capability requires matched cross-model runs, not a single run.",
                   "Closed-model parameter counts are not inferred from capability.", ""])
@@ -540,6 +558,16 @@ def report(path):
         lines.append(f"{stage}: Python minus PurePy official-test pass rate = "
                      f"{format_gap(gaps['python_minus_purepy_tests_pp'])} percentage points; "
                      f"Python tests minus valid PurePy = {format_gap(gaps['python_tests_minus_valid_purepy_pp'])} percentage points.")
+    lines.extend(["", "On the problems whose PurePy answer the checker accepted, both conditions' official-test pass rates "
+                  "measure the restrictions' effect on correctness.", ""])
+    for stage, accepted in summary["rq3_accepted"].items():
+        if not accepted["problems"]:
+            lines.append(f"{stage}: no accepted PurePy answers.")
+            continue
+        lines.append(f"{stage}: {accepted['problems']} accepted problems; PurePy passes "
+                     f"{accepted['purepy_tests_pass']}/{accepted['problems']} ({format_gap(accepted['purepy_rate_pct'])}%), "
+                     f"Python passes {accepted['python_tests_pass']}/{accepted['problems']} ({format_gap(accepted['python_rate_pct'])}%); "
+                     f"Python minus PurePy = {format_gap(accepted['python_minus_purepy_pp'])} percentage points.")
     lines.extend(["", "## Per-Solution Outcomes", "",
                   "| Task | Condition | Generation | Initial Format | Final Format | Initial Checker | Final Checker | Initial Tests | Final Tests | Repairs To Acceptance |",
                   "|---|---|---|---|---|---|---|---|---|---|"])
@@ -614,17 +642,22 @@ def compare(paths, destination):
              "Do Python-PurePy gaps shrink as models become more capable? This report describes evidence; it does not establish causation.", ""]
     for key, group in groups.items():
         lines.extend([f"## Matched Protocol {key}", "",
-                      "| Model | Size (B) | Stage | Python Tests | PurePy Tests | Valid PurePy | Test Gap (pp) | Validity Gap (pp) | Status |",
-                      "|---|---:|---|---:|---:|---:|---:|---:|---|"])
+                      "| Model | Size (B) | Stage | Python Tests | PurePy Tests | Valid PurePy | Test Gap (pp) | Validity Gap (pp) "
+                      "| Accepted | PurePy Pass On Accepted | Python Pass On Accepted | Gap On Accepted (pp) | Status |",
+                      "|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|"])
         for model in group["models"]:
             for stage in ("initial", "final"):
                 summary = model["summary"]
                 p, q = summary["conditions"]["python"][stage], summary["conditions"]["purepy"][stage]
                 gaps = summary["rq3"][stage]
+                accepted = summary["rq3_accepted"][stage]
                 lines.append(f"| {model['model']} | {model['model_size_b']} | {stage} | {p['tests_pass']}/{summary['problems']} | "
                              f"{q['tests_pass']}/{summary['problems']} | {q['joint_pass']}/{summary['problems']} | "
                              f"{format_gap(gaps['python_minus_purepy_tests_pp'])} | "
-                             f"{format_gap(gaps['python_tests_minus_valid_purepy_pp'])} | {model['status']} |")
+                             f"{format_gap(gaps['python_tests_minus_valid_purepy_pp'])} | "
+                             f"{accepted['problems']} | {accepted['purepy_tests_pass']}/{accepted['problems']} | "
+                             f"{accepted['python_tests_pass']}/{accepted['problems']} | "
+                             f"{format_gap(accepted['python_minus_purepy_pp'])} | {model['status']} |")
     destination.with_suffix(".md").write_text("\n".join(lines) + "\n")
     print(f"Comparison: {destination}", flush=True)
 
