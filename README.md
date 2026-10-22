@@ -47,11 +47,11 @@ uv run --locked ./test/run-all.sh
 The command creates the project environment, installs the locked development dependencies, checks rule
 cross-references, runs mypy and ruff over `src/purepy/` and runs the conformance suite.
 
-Tests in `src/purepy/conformance-suite/` are organised by level, `module-level/` and `program-level/`, then by the outcome under Python and the
-outcome under PurePy, following the grid in the conformance section of the specification; the runner derives
-every assertion from the path. A module-level test is a `.py` file with expectation files as siblings
-(`.expected`, `.error.expected`, `.exception.expected`, `.status.expected`); a program-level test is a
-directory holding `main.py`, the expectation files of `main.py` and the other modules of the program.
+Tests in `src/purepy/conformance-suite/` are organised by the outcome under Python and the outcome under
+PurePy, following the grid in the conformance section of the specification; the runner derives every
+assertion from the path. A test of one module is a `.py` file with expectation files as siblings
+(`.expected`, `.error.expected`, `.exception.expected`, `.status.expected`); a test of a program of several
+modules is a directory holding `main.py`, the expectation files of `main.py` and the other modules.
 
 The outcome under Python is one of:
 
@@ -70,7 +70,7 @@ The directory `python-succeeds/agrees/mypy-bug/` holds tests rejected by mypy be
 mypy bug; the runner fails a test if mypy accepts it.
 
 Every other test in `python-succeeds/agrees/` also type-checks under mypy (`test/mypy.ini`). The tests in
-`module-level/syntactic-only/` construct a form as an AST, because Python source cannot express the form, and
+`syntactic-only/` construct a form as an AST, because Python source cannot express the form, and
 check that PurePy rejects it.
 
 A test has `.expected` under `python-succeeds/` and `.exception.expected` elsewhere, naming `SyntaxError` exactly

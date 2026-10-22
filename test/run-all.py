@@ -6,13 +6,12 @@ import sys
 
 from purepy.conformance import (
     MAIN,
-    MODULE_LEVEL,
-    PROGRAM_LEVEL,
     SUITE,
     PurePyOutcome,
     PythonOutcome,
     Runner,
     run,
+    tests,
 )
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -88,14 +87,13 @@ def mypy_errors(paths: list[str], cwd: pathlib.Path) -> set[str]:
 
 def check_mypy_compatibility(r: Runner) -> None:
     with r.test("mypy compatibility"):
-        agrees = SRC / SUITE / MODULE_LEVEL / PythonOutcome.SUCCEEDS / PurePyOutcome.AGREES
-        modules = sorted(agrees.rglob("*.py"))
-        relative = [str(path.relative_to(ROOT)) for path in modules]
-        reported_bug = {str(path.relative_to(ROOT)) for path in modules if MYPY_BUG in path.parts}
-        rejected = mypy_errors(relative, ROOT)
+        agrees = SRC / SUITE / PythonOutcome.SUCCEEDS / PurePyOutcome.AGREES
+        found = [test for test in tests(SRC / SUITE) if agrees in test.parents]
+        modules = [str(test.relative_to(ROOT)) for test in found if test.is_file()]
+        reported_bug = {str(test.relative_to(ROOT)) for test in found if MYPY_BUG in test.parts}
+        rejected = mypy_errors(modules, ROOT)
         # A program is checked from its own directory, so that its modules resolve
-        programs = SRC / SUITE / PROGRAM_LEVEL / PythonOutcome.SUCCEEDS / PurePyOutcome.AGREES
-        for program in sorted(p for p in programs.iterdir() if (p / MAIN).exists()):
+        for program in (test for test in found if test.is_dir()):
             if len(mypy_errors([MAIN], program)) > 0:
                 rejected.add(str(program.relative_to(ROOT)))
         for path in sorted(rejected - reported_bug):
