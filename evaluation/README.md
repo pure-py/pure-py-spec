@@ -92,8 +92,8 @@ the initial answer and each repair. The JSON is the complete record.
 Every checker rejection keeps its full diagnostic and a category: features
 excluded by design, such as loops and mutation; features not yet supported, such
 as function keyword arguments; and cases flagged for manual review. The checker
-reports one diagnostic per invocation, so a different diagnostic in the next
-round is not taken as proof that the earlier feature was cleared.
+reports one diagnostic per run, so the next round's diagnostic may name a
+different feature.
 
 Runs with matched tasks and protocol can be compared across models:
 

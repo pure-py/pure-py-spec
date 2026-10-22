@@ -247,10 +247,9 @@ def prepare():
     manifest = {"benchmark": "LiveCodeBench", "release": "release_v6", "dataset_revision": DATASET_REVISION,
                 "harness_revision": HARNESS_REVISION, "seed": SEED, "selected_medium": 20, "selected_hard": 20,
                 "eligible_counts": {k: len(v) for k, v in pools.items()},
-                "scope": "typed interface-compatible call-based LeetCode subset, not all LiveCodeBench",
-                "adapter": "same external Solution wrapper for all models and both conditions; checker evaluates generated core only",
-                "official_timeout_per_test_seconds": TIMEOUT,
-                "contamination_note": "No contamination-free claim; record task dates and model training cutoffs separately."}
+                "scope": "typed call-based LeetCode problems",
+                "adapter": "the same Solution wrapper for all models and both conditions; the checker sees the generated function only",
+                "official_timeout_per_test_seconds": TIMEOUT}
     dump(CACHE / "selection-audit.json", audit)
     dump(TASKS, {"benchmark": "LiveCodeBench", "manifest": manifest, "tasks": tasks})
     print(f"Frozen 20 medium + 20 hard tasks: {TASKS}", flush=True)

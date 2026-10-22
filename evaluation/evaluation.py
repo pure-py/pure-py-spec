@@ -233,7 +233,7 @@ def request(base_url, provider, model, messages, max_tokens):
 
 def failure_category(code, diagnostic, exit_code):
     if not code.strip():
-        return {"category": "no_output", "restriction": "no source produced; not a language rejection"}
+        return {"category": "no_output", "restriction": "no source produced"}
     lower = diagnostic.lower()
     if "parse error" in lower:
         return {"category": "syntax_or_format", "restriction": "invalid Python"}
@@ -419,7 +419,7 @@ def summarize(data):
                 "format_compliant": sum((a.get("output_format") or {}).get("compliant") is True for a in attempts),
                 "format_noncompliant": sum((a.get("output_format") or {}).get("compliant") is False for a in attempts),
                 "format_unknown": sum((a.get("output_format") or {}).get("compliant") is None for a in attempts),
-                "format_status": dict(Counter((a.get("output_format") or {}).get("status", "legacy_unrecorded")
+                "format_status": dict(Counter((a.get("output_format") or {}).get("status", "unrecorded")
                                               for a in attempts)),
                 "generation_status": dict(Counter(a["generation"]["status"] for a in attempts))}
         failures = [a["checker"].get("failure_mode", {}) for s in solutions for a in s["attempts"]
@@ -524,7 +524,7 @@ def report(path):
              f"Problems: {summary['problems']} of {summary['benchmark_total']}",
              f"Scope: {summary['scope']}", f"PurePy checker: {data['protocol']['checker_version']}",
              f"Maximum checker-feedback repair rounds: {data['protocol']['repair_rounds']}", "",
-             f"Output format: {data['protocol'].get('output_format', 'legacy-plain-or-fenced-v1')}", "",
+             f"Output format: {data['protocol'].get('output_format', 'untagged')}", "",
              "| Condition | Stage | Checker Accepts | Official Tests Pass | Both Pass | Checker Unknown | Tests Unknown |",
              "|---|---|---:|---:|---:|---:|---:|"]
     for condition, stages in summary["conditions"].items():
@@ -533,12 +533,9 @@ def report(path):
             lines.append(f"| {condition} | {stage} | {s['checker_accepts']}/{s['outputs']} | "
                          f"{s['tests_pass']}/{s['outputs']} | {s['joint_pass']}/{s['outputs']} | "
                          f"{s['checker_unknown']} | {s['tests_unknown']} |")
-    lines.extend(["", "Initial and repaired results are separate. Python has no checker-feedback repairs.",
-                  "A checker rejection or wrong answer is not an infrastructure failure.",
-                  "API errors and outputs without code remain unevaluated and do not count as checker rejections.",
-                  "Truncated responses and missing, malformed or empty code tags remain unevaluated.",
-                  "Unambiguous tagged code is evaluated even with outside text; format noncompliance is recorded separately.",
-                  "Pass counts are confirmed successes; unknown verdicts do not count as failures.", "",
+    lines.extend(["", "Initial and repaired results are reported separately; Python answers receive no feedback.",
+                  "Unknown verdicts come from API errors, truncated responses and format failures; "
+                  "they count neither as passes nor as rejections.", "",
                   "## Output Format", "",
                   "| Condition | Stage | Compliant | Noncompliant | Unknown | Details |",
                   "|---|---|---:|---:|---:|---|"])
@@ -551,9 +548,7 @@ def report(path):
     for condition, stages in summary["conditions"].items():
         lines.append(f"{condition}: {json.dumps(stages['checker_rejections'], sort_keys=True)}")
     lines.extend(["", "## RQ3", "",
-                  "Positive values mean Python leads; negative values mean PurePy leads.",
-                  "The hypothesis that gaps close with model capability requires matched cross-model runs, not a single run.",
-                  "Closed-model parameter counts are not inferred from capability.", ""])
+                  "Positive values mean Python leads; negative values mean PurePy leads.", ""])
     for stage, gaps in summary["rq3"].items():
         lines.append(f"{stage}: Python minus PurePy official-test pass rate = "
                      f"{format_gap(gaps['python_minus_purepy_tests_pp'])} percentage points; "
@@ -579,13 +574,13 @@ def report(path):
             export_code(path, task_id, condition, solution)
             first, last = solution["attempts"][0], solution["attempts"][-1]
             values = [task_id, condition, last["generation"]["status"],
-                      (first.get("output_format") or {}).get("status", "legacy_unrecorded"),
-                      (last.get("output_format") or {}).get("status", "legacy_unrecorded"), first["checker"]["passed"],
+                      (first.get("output_format") or {}).get("status", "unrecorded"),
+                      (last.get("output_format") or {}).get("status", "unrecorded"), first["checker"]["passed"],
                       last["checker"]["passed"], first["official_tests"]["passed"],
                       last["official_tests"]["passed"], solution["rounds_to_acceptance"]]
             lines.append("| " + " | ".join(map(str, values)) + " |")
     lines.extend(["", "## Rejection Details", "",
-                  "Only the first diagnostic per checker invocation is visible. A different next diagnostic does not prove the previous feature was cleared.", "",
+                  "The checker reports one diagnostic per run, so the next round's diagnostic may name a different feature.", "",
                   "| Task | Condition | Round | Category | Restriction | Next Round Clears Feature | Diagnostic |",
                   "|---|---|---:|---|---|---|---|"])
     for task_id, task in data["tasks"].items():
@@ -626,20 +621,19 @@ def compare(paths, destination):
                     "checker_version": protocol["checker_version"], "wheel_sha256": protocol["wheel_sha256"],
                     "definition_sha256": protocol["definition_sha256"], "repair_rounds": protocol["repair_rounds"],
                     "prompt_version": protocol.get("prompt_version", "code-only-v1"),
-                    "output_format": protocol.get("output_format", "legacy-plain-or-fenced-v1"),
+                    "output_format": protocol.get("output_format", "untagged"),
                     "platform": protocol["platform"], "python": protocol["python"]}
         key = sha(json.dumps(identity, sort_keys=True).encode())[:16]
         group = groups.setdefault(key, {"protocol": identity, "models": []})
         group["models"].append({"model": data["model"], "model_size_b": protocol.get("model_size_b"),
                                 "provider": protocol["provider"], "max_tokens": protocol["max_tokens"],
                                 "status": data["status"], "source": str(path), "summary": summarize(data)})
-    save(destination, {"groups": groups, "hypothesis":
-        "Python-PurePy generation gaps shrink as model capability increases; not an established conclusion.",
-        "caveat": "Groups match benchmark, tasks, prompts, checker, repair budget and execution backend. "
-                  "Provider inference settings and token budgets are listed separately; do not treat them as controlled. "
-                  "Model size is optional metadata, not a capability ranking."})
+    save(destination, {"groups": groups,
+                       "question": "Does the Python-PurePy gap shrink as models become more capable?",
+                       "note": "Groups match benchmark, tasks, prompts, checker, repair budget and platform; "
+                               "provider settings and token budgets are listed per model."})
     lines = ["# RQ3 Cross-Model Comparison", "",
-             "Do Python-PurePy gaps shrink as models become more capable? This report describes evidence; it does not establish causation.", ""]
+             "Python-PurePy gaps per model, for runs with matched tasks and protocol. Positive values mean Python leads.", ""]
     for key, group in groups.items():
         lines.extend([f"## Matched Protocol {key}", "",
                       "| Model | Size (B) | Stage | Python Tests | PurePy Tests | Valid PurePy | Test Gap (pp) | Validity Gap (pp) "

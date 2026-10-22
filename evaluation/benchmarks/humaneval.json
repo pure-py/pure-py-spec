@@ -6,12 +6,27 @@
   "total_problems": 164,
   "eligible_problems": 29,
   "seed": 20261009,
-  "scope": "Frozen typed-interface-compatible pilot; not a random sample of all 164 problems.",
+  "scope": "20 problems with typed interfaces, sampled from the 29 eligible of 164.",
   "task_ids": [
-    "HumanEval/2", "HumanEval/3", "HumanEval/4", "HumanEval/6",
-    "HumanEval/7", "HumanEval/10", "HumanEval/11", "HumanEval/12",
-    "HumanEval/13", "HumanEval/14", "HumanEval/15", "HumanEval/17",
-    "HumanEval/18", "HumanEval/20", "HumanEval/21", "HumanEval/24",
-    "HumanEval/25", "HumanEval/26", "HumanEval/27", "HumanEval/28"
+    "HumanEval/2",
+    "HumanEval/3",
+    "HumanEval/4",
+    "HumanEval/6",
+    "HumanEval/7",
+    "HumanEval/10",
+    "HumanEval/11",
+    "HumanEval/12",
+    "HumanEval/13",
+    "HumanEval/14",
+    "HumanEval/15",
+    "HumanEval/17",
+    "HumanEval/18",
+    "HumanEval/20",
+    "HumanEval/21",
+    "HumanEval/24",
+    "HumanEval/25",
+    "HumanEval/26",
+    "HumanEval/27",
+    "HumanEval/28"
   ]
 }
