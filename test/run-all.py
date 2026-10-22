@@ -5,7 +5,9 @@ import re
 import sys
 
 from purepy.conformance import (
+    MAIN,
     MODULE_LEVEL,
+    PROGRAM_LEVEL,
     SUITE,
     PurePyOutcome,
     PythonOutcome,
@@ -66,32 +68,36 @@ def check_lint(r: Runner) -> None:
                 break
 
 
+def mypy_errors(paths: list[str], cwd: pathlib.Path) -> set[str]:
+    """Paths of the files mypy reports errors in, relative to cwd"""
+    proc = run(
+        [
+            "mypy",
+            "--python-version",
+            PYTHON_VERSION,
+            "--config-file",
+            str(TEST / MYPY_INI),
+            "--no-error-summary",
+            "--no-color-output",
+            *paths,
+        ],
+        cwd=cwd,
+    )
+    return {line.split(":", 1)[0] for line in proc.stdout.splitlines() if ": error:" in line}
+
+
 def check_mypy_compatibility(r: Runner) -> None:
     with r.test("mypy compatibility"):
-        paths = sorted(
-            (SRC / SUITE / MODULE_LEVEL / PythonOutcome.SUCCEEDS / PurePyOutcome.AGREES).rglob(
-                "*.py"
-            )
-        )
-        # mypy reports paths relative to its working directory
-        relative = [str(path.relative_to(ROOT)) for path in paths]
-        reported_bug = {str(path.relative_to(ROOT)) for path in paths if MYPY_BUG in path.parts}
-        proc = run(
-            [
-                "mypy",
-                "--python-version",
-                PYTHON_VERSION,
-                "--config-file",
-                str(pathlib.Path("test") / MYPY_INI),
-                "--no-error-summary",
-                "--no-color-output",
-                *relative,
-            ],
-            cwd=ROOT,
-        )
-        rejected = {
-            line.split(":", 1)[0] for line in proc.stdout.splitlines() if ": error:" in line
-        }
+        agrees = SRC / SUITE / MODULE_LEVEL / PythonOutcome.SUCCEEDS / PurePyOutcome.AGREES
+        modules = sorted(agrees.rglob("*.py"))
+        relative = [str(path.relative_to(ROOT)) for path in modules]
+        reported_bug = {str(path.relative_to(ROOT)) for path in modules if MYPY_BUG in path.parts}
+        rejected = mypy_errors(relative, ROOT)
+        # A program is checked from its own directory, so that its modules resolve
+        programs = SRC / SUITE / PROGRAM_LEVEL / PythonOutcome.SUCCEEDS / PurePyOutcome.AGREES
+        for program in sorted(p for p in programs.iterdir() if (p / MAIN).exists()):
+            if len(mypy_errors([MAIN], program)) > 0:
+                rejected.add(str(program.relative_to(ROOT)))
         for path in sorted(rejected - reported_bug):
             r.fail(f"{path} rejected by mypy")
         for path in sorted(reported_bug - rejected):
