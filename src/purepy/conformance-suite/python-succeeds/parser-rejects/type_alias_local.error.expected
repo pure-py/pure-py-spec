@@ -1,1 +1,1 @@
-type statement outside the module top level prohibited
+type statement outside the module top level not allowed in PurePy

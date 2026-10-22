@@ -30,11 +30,15 @@ class Unsupported(Exception):
         super().__init__(msg)
 
 
-class Prohibited(Unsupported):
+def not_allowed(construct: str) -> str:
+    return f"{construct} not allowed in PurePy"
+
+
+class NotAllowed(Unsupported):
     exit_code = 1
 
     def __init__(self, node: ast.AST, construct: str):
-        super().__init__(node, f"{construct} prohibited")
+        super().__init__(node, not_allowed(construct))
 
 
 class ParseError(Unsupported):
@@ -147,17 +151,17 @@ def check_syntax_stmt(node: ast.stmt) -> None:
             pass
         case ast.Assign():
             if len(node.targets) != 1:
-                raise Prohibited(node, "multiple assignment targets")
+                raise NotAllowed(node, "multiple assignment targets")
             target = node.targets[0]
             match target:
                 case ast.Subscript():
-                    raise Prohibited(node, "item assignment")
+                    raise NotAllowed(node, "item assignment")
                 case ast.Attribute():
-                    raise Prohibited(node, "attribute assignment")
+                    raise NotAllowed(node, "attribute assignment")
                 case ast.Name():
                     check_syntax_expr(node.value)
                 case _:
-                    raise Prohibited(node, "destructuring assignment")
+                    raise NotAllowed(node, "unpacking assignment")
         case ast.Return():
             if node.value is not None:
                 check_syntax_expr(node.value)
@@ -169,11 +173,11 @@ def check_syntax_stmt(node: ast.stmt) -> None:
             check_syntax_type_params(node)
             check_syntax_arguments(node.args)
             if len(node.decorator_list) > 0:
-                raise Prohibited(node, "decorators")
+                raise NotAllowed(node, "decorators")
             if any(a.annotation is None for a in node.args.args):
-                raise Prohibited(node, "unannotated parameter")
+                raise NotAllowed(node, "unannotated parameter")
             if node.returns is None:
-                raise Prohibited(node, "unannotated return type")
+                raise NotAllowed(node, "unannotated return type")
             check_syntax_annotation(node.returns)
             check_syntax_body(node.body)
         case ast.Expr():
@@ -183,77 +187,77 @@ def check_syntax_stmt(node: ast.stmt) -> None:
             if node.msg is not None:
                 check_syntax_expr(node.msg)
         case ast.AugAssign():
-            raise Prohibited(node, "augmented assignment (+=, etc.)")
+            raise NotAllowed(node, "augmented assignment (+=, etc.)")
         case ast.AnnAssign():
             if not isinstance(node.target, ast.Name):
-                raise Prohibited(node, "assignment target other than a simple name")
+                raise NotAllowed(node, "assignment target other than a simple name")
             check_syntax_annotation(node.annotation)
             if node.value is not None:
                 check_syntax_expr(node.value)
         case ast.Delete():
-            raise Prohibited(node, "del")
+            raise NotAllowed(node, "del")
         case ast.For():
-            raise Prohibited(node, "for loops")
+            raise NotAllowed(node, "for loops")
         case ast.While():
-            raise Prohibited(node, "while loops")
+            raise NotAllowed(node, "while loops")
         case ast.With():
-            raise Prohibited(node, "with statements")
+            raise NotAllowed(node, "with statements")
         case ast.AsyncFunctionDef() | ast.AsyncFor() | ast.AsyncWith():
-            raise Prohibited(node, "async")
+            raise NotAllowed(node, "async")
         case ast.Raise():
-            raise Prohibited(node, "raise")
+            raise NotAllowed(node, "raise")
         case ast.Try() | ast.TryStar():
-            raise Prohibited(node, "try/except")
+            raise NotAllowed(node, "try/except")
         case ast.Import() | ast.ImportFrom():
-            raise Prohibited(node, "import outside the module top level")
+            raise NotAllowed(node, "import outside the module top level")
         case ast.Global():
-            raise Prohibited(node, "global")
+            raise NotAllowed(node, "global")
         case ast.Nonlocal():
-            raise Prohibited(node, "nonlocal")
+            raise NotAllowed(node, "nonlocal")
         case ast.ClassDef():
-            raise Prohibited(node, "class definition outside the module top level")
+            raise NotAllowed(node, "class definition outside the module top level")
         case ast.TypeAlias():
-            raise Prohibited(node, "type statement outside the module top level")
+            raise NotAllowed(node, "type statement outside the module top level")
         case ast.Match():
             check_syntax_expr(node.subject)
             for case in node.cases:
                 if case.guard is not None:
-                    raise Prohibited(case, "case guards")
+                    raise NotAllowed(case, "case guards")
                 check_syntax_pattern(case.pattern)
                 dup = repeated(bound(case.pattern))
                 if dup is not None:
-                    raise Prohibited(case.pattern, f"duplicate variable {dup} in pattern")
+                    raise NotAllowed(case.pattern, f"duplicate variable {dup} in pattern")
                 check_syntax_body(case.body)
         case ast.Break():
-            raise Prohibited(node, "break")
+            raise NotAllowed(node, "break")
         case ast.Continue():
-            raise Prohibited(node, "continue")
+            raise NotAllowed(node, "continue")
         case _:
-            raise Prohibited(node, f"{type(node).__name__} statement")
+            raise NotAllowed(node, f"{type(node).__name__} statement")
 
 
 def check_syntax_classdef(node: ast.ClassDef) -> None:
     if any(isinstance(b, ast.Name) and b.id == "Enum" for b in node.bases):
-        raise Prohibited(node, "enum classes")
+        raise NotAllowed(node, "enum classes")
     check_syntax_type_params(node)
     if len(node.decorator_list) == 0:
-        raise Prohibited(node, "undecorated class")
+        raise NotAllowed(node, "undecorated class")
     if len(node.decorator_list) > 1:
-        raise Prohibited(node, "multiple class decorators")
+        raise NotAllowed(node, "multiple class decorators")
     deco = node.decorator_list[0]
     if not (isinstance(deco, ast.Name) and deco.id == "dataclass"):
-        raise Prohibited(node, "class decorator other than @dataclass")
+        raise NotAllowed(node, "class decorator other than @dataclass")
     if len(node.bases) > 1:
-        raise Prohibited(node, "multiple inheritance")
+        raise NotAllowed(node, "multiple inheritance")
     if len(node.bases) > 0:
         base = node.bases[0]
         if not isinstance(parse_annotation(base), TypeName):
-            raise Prohibited(
+            raise NotAllowed(
                 base, "base class other than a name, optionally applied to type arguments"
             )
         check_syntax_annotation(base)
     if len(node.keywords) > 0:
-        raise Prohibited(node, "class keyword arguments")
+        raise NotAllowed(node, "class keyword arguments")
     if not (len(node.body) == 1 and isinstance(node.body[0], ast.Pass)):
         for stmt in node.body:
             check_syntax_field(stmt)
@@ -278,29 +282,29 @@ def check_syntax_type_params(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlia
         ]
     )
     if dup is not None:
-        raise Prohibited(node, f"duplicate type parameter {dup}")
+        raise NotAllowed(node, f"duplicate type parameter {dup}")
     for param in node.type_params:
         match param:
             case ast.TypeVar():
                 if isinstance(param.bound, ast.Tuple):
-                    raise Prohibited(param, f"constraints on type parameter {param.name}")
+                    raise NotAllowed(param, f"constraints on type parameter {param.name}")
                 if param.bound is not None:
-                    raise Prohibited(param, f"bound on type parameter {param.name}")
+                    raise NotAllowed(param, f"bound on type parameter {param.name}")
             case ast.ParamSpec():
-                raise Prohibited(param, f"ParamSpec type parameter **{param.name}")
+                raise NotAllowed(param, f"ParamSpec type parameter **{param.name}")
             case ast.TypeVarTuple():
-                raise Prohibited(param, f"TypeVarTuple type parameter *{param.name}")
+                raise NotAllowed(param, f"TypeVarTuple type parameter *{param.name}")
             case _:
                 raise AssertionError(f"unexpected type parameter: {type(param).__name__}")
 
 
 def check_syntax_field(stmt: ast.stmt) -> None:
     if not isinstance(stmt, ast.AnnAssign):
-        raise Prohibited(stmt, "dataclass member other than a field declaration")
+        raise NotAllowed(stmt, "dataclass member other than a field declaration")
     if not isinstance(stmt.target, ast.Name):
-        raise Prohibited(stmt, "field target other than a simple name")
+        raise NotAllowed(stmt, "field target other than a simple name")
     if stmt.value is not None:
-        raise Prohibited(stmt, "field default values")
+        raise NotAllowed(stmt, "field default values")
     check_syntax_annotation(stmt.annotation)
 
 
@@ -313,8 +317,8 @@ def check_syntax_pattern(node: ast.pattern) -> None:
                     if isinstance(v.value, (int, float, str)):
                         return
                 case ast.Attribute():
-                    raise Prohibited(node, "attribute value patterns")
-            raise Prohibited(node, "complex and bytes literal patterns")
+                    raise NotAllowed(node, "attribute value patterns")
+            raise NotAllowed(node, "complex and bytes literal patterns")
         case ast.MatchSingleton():
             pass
         case ast.MatchAs():
@@ -328,13 +332,13 @@ def check_syntax_pattern(node: ast.pattern) -> None:
                 check_syntax_pattern(p)
             dup = repeated(node.kwd_attrs)
             if dup is not None:
-                raise Prohibited(node, f"duplicate keyword {dup} in constructor pattern")
+                raise NotAllowed(node, f"duplicate keyword {dup} in constructor pattern")
         case ast.MatchMapping():
             if node.rest is not None:
-                raise Prohibited(node, "rest capture in dict patterns")
+                raise NotAllowed(node, "rest capture in dictionary patterns")
             for key in node.keys:
                 if not (isinstance(key, ast.Constant) and isinstance(key.value, str)):
-                    raise Prohibited(key, "dict pattern key other than a string literal")
+                    raise NotAllowed(key, "dictionary pattern key other than a string literal")
             dup = repeated(
                 [
                     key.value
@@ -343,15 +347,15 @@ def check_syntax_pattern(node: ast.pattern) -> None:
                 ]
             )
             if dup is not None:
-                raise Prohibited(node, f"duplicate key '{dup}' in dictionary pattern")
+                raise NotAllowed(node, f"duplicate key '{dup}' in dictionary pattern")
             for sub in node.patterns:
                 check_syntax_pattern(sub)
         case ast.MatchOr():
-            raise Prohibited(node, "or-patterns")
+            raise NotAllowed(node, "or-patterns")
         case ast.MatchStar():
-            raise Prohibited(node, "star patterns")
+            raise NotAllowed(node, "star patterns")
         case _:
-            raise Prohibited(node, f"{type(node).__name__} pattern")
+            raise NotAllowed(node, f"{type(node).__name__} pattern")
 
 
 def check_syntax_expr(node: ast.expr) -> None:
@@ -359,7 +363,7 @@ def check_syntax_expr(node: ast.expr) -> None:
         case ast.Constant():
             if isinstance(node.value, (int, float, str, bool, type(None))):
                 return
-            raise Prohibited(node, f"{type(node.value).__name__} literal")
+            raise NotAllowed(node, f"{type(node.value).__name__} literal")
         case ast.Name():
             pass
         case ast.BinOp():
@@ -375,7 +379,7 @@ def check_syntax_expr(node: ast.expr) -> None:
             )
             if not isinstance(node.op, allowed):
                 sym = OP_SYMBOLS.get(type(node.op), type(node.op).__name__)
-                raise Prohibited(node, f"binary operator '{sym}'")
+                raise NotAllowed(node, f"binary operator '{sym}'")
             check_syntax_expr(node.left)
             check_syntax_expr(node.right)
         case ast.UnaryOp():
@@ -383,18 +387,18 @@ def check_syntax_expr(node: ast.expr) -> None:
                 check_syntax_expr(node.operand)
                 return
             sym = OP_SYMBOLS.get(type(node.op), type(node.op).__name__)
-            raise Prohibited(node, f"unary operator '{sym}'")
+            raise NotAllowed(node, f"unary operator '{sym}'")
         case ast.BoolOp():
             if len(node.values) > 2:
-                raise Prohibited(node, "chained boolean operator")
+                raise NotAllowed(node, "chained boolean operator")
             for v in node.values:
                 check_syntax_expr(v)
         case ast.Compare():
             if len(node.ops) > 1:
-                raise Prohibited(node, "chained comparison")
+                raise NotAllowed(node, "chained comparison")
             for op in node.ops:
                 if isinstance(op, (ast.Is, ast.IsNot)):
-                    raise Prohibited(node, "identity operator (is/is not)")
+                    raise NotAllowed(node, "identity operator (is/is not)")
             check_syntax_expr(node.left)
             for c in node.comparators:
                 check_syntax_expr(c)
@@ -404,11 +408,11 @@ def check_syntax_expr(node: ast.expr) -> None:
                 check_syntax_expr(a)
             for k in node.keywords:
                 if k.arg is None:
-                    raise Prohibited(k, "dict unpacking in argument list")
+                    raise NotAllowed(k, "dictionary unpacking in argument list")
                 check_syntax_expr(k.value)
             dup = repeated([k.arg for k in node.keywords])
             if dup is not None:
-                raise Prohibited(node, f"duplicate keyword argument {dup}")
+                raise NotAllowed(node, f"duplicate keyword argument {dup}")
         case ast.IfExp():
             check_syntax_expr(node.test)
             check_syntax_expr(node.body)
@@ -422,12 +426,12 @@ def check_syntax_expr(node: ast.expr) -> None:
         case ast.Dict():
             for key in node.keys:
                 if key is None:
-                    raise Prohibited(node, "dict unpacking")
+                    raise NotAllowed(node, "dictionary unpacking")
                 check_syntax_expr(key)
             for v in node.values:
                 check_syntax_expr(v)
         case ast.Set():
-            raise Prohibited(node, "set literals")
+            raise NotAllowed(node, "set literals")
         case ast.Attribute():
             check_syntax_expr(node.value)
         case ast.Subscript():
@@ -443,23 +447,23 @@ def check_syntax_expr(node: ast.expr) -> None:
             for g in node.generators:
                 check_syntax_generator(g)
         case ast.SetComp():
-            raise Prohibited(node, "set comprehensions")
+            raise NotAllowed(node, "set comprehensions")
         case ast.Slice():
-            raise Prohibited(node, "slicing")
+            raise NotAllowed(node, "slicing")
         case ast.GeneratorExp():
-            raise Prohibited(node, "generator expressions")
+            raise NotAllowed(node, "generator expressions")
         case ast.NamedExpr():
-            raise Prohibited(node, "walrus operator (:=)")
+            raise NotAllowed(node, "walrus operator (:=)")
         case ast.Starred():
-            raise Prohibited(node, "starred expressions")
+            raise NotAllowed(node, "starred expressions")
         case ast.Await():
-            raise Prohibited(node, "async")
+            raise NotAllowed(node, "async")
         case ast.Yield() | ast.YieldFrom():
-            raise Prohibited(node, "yield")
+            raise NotAllowed(node, "yield")
         case ast.JoinedStr() | ast.FormattedValue():
-            raise Prohibited(node, "f-strings")
+            raise NotAllowed(node, "f-strings")
         case _:
-            raise Prohibited(node, f"{type(node).__name__} expression")
+            raise NotAllowed(node, f"{type(node).__name__} expression")
 
 
 def check_syntax_body(stmts: list[ast.stmt]) -> None:
@@ -471,20 +475,20 @@ def check_syntax_import(node: ast.stmt) -> None:
     match node:
         case ast.Import():
             if len(node.names) != 1:
-                raise Prohibited(node, "multi-target import (import a, b)")
+                raise NotAllowed(node, "multi-target import (import a, b)")
             if node.names[0].asname is not None:
-                raise Prohibited(node, "import-as")
+                raise NotAllowed(node, "import-as")
         case ast.ImportFrom():
             if len(node.names) == 0:
-                raise Prohibited(node, "empty name list")
+                raise NotAllowed(node, "empty name list")
             if node.level > 0:
-                raise Prohibited(node, "relative imports")
+                raise NotAllowed(node, "relative imports")
             assert node.module is not None  # absent only in a relative import
             for alias in node.names:
                 if alias.name == "*":
-                    raise Prohibited(node, "from M import *")
+                    raise NotAllowed(node, "from M import *")
                 if alias.asname is not None:
-                    raise Prohibited(node, "from-import-as")
+                    raise NotAllowed(node, "from-import-as")
         case _:
             raise AssertionError(f"unexpected statement: {type(node).__name__}")
 
@@ -495,10 +499,10 @@ def check_syntax_top_level(body: list[ast.stmt]) -> None:
         check_syntax_import(iota)
     for s in stmts:
         if is_import(s):
-            raise Prohibited(s, "import after another statement")
+            raise NotAllowed(s, "import after another statement")
         ret = return_outside_function(s)
         if ret is not None:
-            raise Prohibited(ret, "return outside a function")
+            raise NotAllowed(ret, "return outside a function")
         if isinstance(s, ast.ClassDef):
             check_syntax_classdef(s)
         elif isinstance(s, ast.TypeAlias):
@@ -531,9 +535,9 @@ def return_outside_function(s: ast.stmt) -> ast.Return | None:
 
 def check_syntax_generator(node: ast.comprehension) -> None:
     if node.is_async:
-        raise Prohibited(node, "async comprehensions")
+        raise NotAllowed(node, "async comprehensions")
     if not isinstance(node.target, ast.Name):
-        raise Prohibited(node, "destructuring in comprehensions")
+        raise NotAllowed(node, "unpacking in comprehensions")
     check_syntax_expr(node.iter)
     for i in node.ifs:
         check_syntax_expr(i)
@@ -544,27 +548,27 @@ def check_syntax_annotation(node: ast.expr | None) -> None:
         return
     psi = parse_annotation(node)
     if psi is None:
-        raise Prohibited(node, "annotation that is not a type expression")
+        raise NotAllowed(node, "annotation that is not a type expression")
 
 
 def check_syntax_arguments(node: ast.arguments) -> None:
     if node.vararg is not None:
-        raise Prohibited(node, "*args")
+        raise NotAllowed(node, "*args")
     if node.kwarg is not None:
-        raise Prohibited(node, "**kwargs")
+        raise NotAllowed(node, "**kwargs")
     if len(node.kwonlyargs) > 0:
-        raise Prohibited(node, "keyword-only arguments")
+        raise NotAllowed(node, "keyword-only arguments")
     if len(node.defaults) > 0:
-        raise Prohibited(node, "default arguments")
+        raise NotAllowed(node, "default arguments")
     if len(node.kw_defaults) > 0:
-        raise Prohibited(node, "default arguments")
+        raise NotAllowed(node, "default arguments")
     if len(node.posonlyargs) > 0:
-        raise Prohibited(node, "positional-only arguments")
+        raise NotAllowed(node, "positional-only arguments")
     for a in node.args:
         check_syntax_annotation(a.annotation)
     dup = repeated([a.arg for a in node.args])
     if dup is not None:
-        raise Prohibited(node, f"duplicate parameter {dup}")
+        raise NotAllowed(node, f"duplicate parameter {dup}")
 
 
 def check_syntax_module(node: ast.Module) -> Unsupported | None:

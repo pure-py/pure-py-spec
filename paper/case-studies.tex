@@ -67,7 +67,7 @@ applied to $k < n$ arguments synthesises the type of a function of the remaining
 \noindent Dynamically, the call evaluates to a partial application, a value pairing the function with the
 arguments supplied, and applying a partial application appends the new arguments and applies the function
 once the declared arity is reached. \Fluid also applies a function called with more arguments than it
-declares to the first $n$ of them and the result to the rest, which is well typed only when the result type
+declares to the first $n$ of them and the result to the rest, which is well typed only when the \replaced{return}{result } type
 is itself a \pyinline{Callable}: given \pyinline{def adder(x: int) -> Callable[[int], int]}, the call
 \pyinline{adder(1, 2)} applies the function returned by \pyinline{adder(1)} to \pyinline{2}.
 

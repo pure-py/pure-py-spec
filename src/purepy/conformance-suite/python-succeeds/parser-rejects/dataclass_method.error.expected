@@ -1,1 +1,1 @@
-dataclass member other than a field declaration prohibited
+dataclass member other than a field declaration not allowed in PurePy

@@ -41,7 +41,7 @@ SYNTAX_ERROR = "SyntaxError"
 
 class Exit(IntEnum):
     OK = 0
-    PROHIBITED = 1
+    NOT_ALLOWED = 1
     ILL_FORMED = 3
     ILL_FORMED_PROGRAM = 4
 
@@ -54,7 +54,7 @@ class Expectation(NamedTuple):
 
 # Checker verdict for each PurePy outcome
 CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
-    PurePyOutcome.PARSER_REJECTS: (Exit.PROHIBITED, True),
+    PurePyOutcome.PARSER_REJECTS: (Exit.NOT_ALLOWED, True),
     PurePyOutcome.TYPING_REJECTS: (Exit.ILL_FORMED, True),
     PurePyOutcome.UNDEFINED: (Exit.OK, False),
     PurePyOutcome.AGREES: (Exit.OK, False),

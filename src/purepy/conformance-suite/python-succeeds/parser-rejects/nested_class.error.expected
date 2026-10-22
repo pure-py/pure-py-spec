@@ -1,1 +1,1 @@
-class definition outside the module top level prohibited
+class definition outside the module top level not allowed in PurePy

@@ -1,1 +1,1 @@
-class decorator other than @dataclass prohibited
+class decorator other than @dataclass not allowed in PurePy

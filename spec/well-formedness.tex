@@ -132,16 +132,16 @@ stated separately for each elimination form.
 
 The \ruleName{call} rule for a call $\exCall{e}{\seq{e}}$ uses the auxiliary
 judgement $\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$ (\specfigref{typing-callee}), which determines parameter
-types $\seq{\sigma}$ and result type $\sigma$ from the callee along with its arguments. The remaining premises check
+types $\seq{\sigma}$ \replaced{and return type $\sigma$ from the callee}{and result type $\sigma$ from the callee } along with its arguments. The remaining premises check
 the arguments against $\seq{\sigma}$, and the call synthesises $\sigma$. The auxiliary judgement has two rules. A callee that synthesises a
-\pyinline{Callable} type gives the parameter and result types of that type\speconly{ (\ruleName{callee})}. A name bound at a
+\pyinline{Callable} type \replaced{gives the parameter and return types of that type}{gives the parameter and result types of that type }\speconly{ (\ruleName{callee})}. A name bound at a
 type scheme $\scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}$ instantiates the type parameters from the arguments
 (\ruleName{callee-scheme}). The type arguments are collected by $\typeArgs{\Sigma}$\speconly{
 (\S\ref{aux:type-args})} over the arguments that synthesise,
 by a one-way unification of each parameter type with the synthesised type, in which the type parameters $\seq{\alpha}$ are the
 unknowns: a type parameter takes the type found at the same
 position in the synthesised type, with one found at several positions taking the join of those types.
-Arguments that do not synthesise, such as lambdas, are left out. The parameter and result types are
+Arguments that do not synthesise, such as lambdas, are left out. \replaced{The parameter and return types are}{The parameter and result types are }
 instantiated at the type arguments given by the context, which must bind every type parameter\paperonly{:}\speconly{.}
 \paperinput{paper/well-formedness/callee-scheme}%
 
@@ -199,11 +199,11 @@ Each operator is overloaded as specified in \specfigref{operator-overloads}. \sp
 \speconly{\begin{specdefinition}{Resolved overload}
 A \emph{resolved overload}
 $((\tau_1, \tau_2), \tau)$ pairs operand \emph{bounds}
-with a result type; the judgements of the figure relate operand
+\replaced{with a return type; the judgements}{with a result type; the judgements } of the figure relate operand
 types to the resolved overloads of an operator.
 \end{specdefinition}}
 
-The \ruleName{binop} and \ruleName{unop} rules (\specfigref{typing-synth}) take the result type
+The \ruleName{binop} and \ruleName{unop} rules (\specfigref{typing-synth}) \replaced{take the return type}{take the result type }
 of the most specific overload at the operand types, $\resolveOp{\Sigma}$\speconly{ (\S\ref{aux:resolve-op})}, so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
