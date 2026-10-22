@@ -53,6 +53,17 @@
   \Sigma; \Gamma; \zeta \vdash \exCall{e}{\seq{e}} : \Assigns{\varnothing}
 }
 \and
+\added{\inferrule*[lab={\ruleName{call-stmt-union}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
+  \Sigma; \Gamma \override \set{\bind{y}{\sigma}}; \zeta \vdash \exCall{y}{\seq{e}} : \Assigns{\varnothing} \\
+  \Sigma; \Gamma \override \set{\bind{y}{\sigma'}}; \zeta \vdash \exCall{y}{\seq{e}} : \Assigns{\varnothing} \\
+  y \notin \fv(\seq{e})
+}
+{
+  \Sigma; \Gamma; \zeta \vdash \exCall{e}{\seq{e}} : \Assigns{\varnothing}
+}}
+\and
 \inferrule*[lab={\ruleName{assert}}]
 {
   \Sigma; \Gamma \vdash e \checks \tyBool \\
@@ -130,12 +141,6 @@
 {
   \Sigma; \Gamma; \zeta \vdash s\;s' : \Assigns{\Delta} \override R
 }
-\and
-\input{spec/rules/defs}
-\and
-\input{spec/rules/match}
-\and
-\input{spec/rules/match-partial}
 \end{mathpar}
 \caption{Given optional return type $\zeta$, statement $s$ has static outcome $R$}
 \label{fig:typing-stmt}
