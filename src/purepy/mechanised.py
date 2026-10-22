@@ -17,12 +17,14 @@ import Syntax
 import Typing
 
 from . import syntax
-from .check_program import parse
+from .check_module import name_declaration
+from .check_program import format_program_result, module_names, module_path, parse
 from .conformance import Exit
-from .contexts import BUILTINS, Context, ContextEntry, PredefinedName, predefined_context
+from .contexts import MAIN
 from .syntax_utils import (
     Statement,
     dict_keys,
+    own_fields,
     split_imports,
     statements,
     target_name,
@@ -31,37 +33,17 @@ from .syntax_utils import (
 )
 from .type_syntax import (
     CallableExpr,
-    CallableType,
-    ClassName,
-    ClassType,
     DictExpr,
-    DictType,
     ListExpr,
-    ListType,
     LiteralType,
     Name,
     Primitive,
     TupleExpr,
-    TupleType,
-    Type,
     TypeExpr,
     TypeName,
-    TypeVariable,
     UnionExpr,
-    UnionType,
     dotted_name,
-)
-
-TYPES = (
-    Primitive,
-    ListType,
-    TupleType,
-    DictType,
-    CallableType,
-    LiteralType,
-    TypeVariable,
-    ClassType,
-    UnionType,
+    parse_name,
 )
 
 OUTSIDE_FRAGMENT = 5
@@ -321,90 +303,125 @@ def item_stmt(item: Statement) -> Any:
         case [ast.FunctionDef(), *_]:
             return Syntax.StmtMutualRegion([func(d) for d in item])
         case _:
-            raise OutsideFragment("type definitions")
+            raise AssertionError("type definition outside the module top level")
 
 
 def func(d: ast.stmt) -> Any:
     assert isinstance(d, ast.FunctionDef)  # a region of function definitions holds nothing else
     return Syntax.Def(
         string(d.name),
-        [string(alpha) for alpha in type_param_names(d)],
+        type_params(d),
         [(string(a.arg), annotation(a.annotation)) for a in d.args.args],
         annotation(d.returns),
         seq(d.body),
     )
 
 
-def module_stmt(m: ast.Module) -> Any:
-    """Body of a module as a statement; the generated code has only the constructs the checker reaches,
-    which leaves out imports, type definitions and the module body itself"""
-    iotas, stmts = split_imports(m.body)
-    if len(iotas) > 0:
-        raise OutsideFragment("module checking")
-    if len(stmts) == 0:
-        raise OutsideFragment("empty module")
-    return seq(stmts)
+def type_params(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlias) -> list[Any]:
+    return [string(alpha) for alpha in type_param_names(node)]
 
 
-def ty(tau: Type) -> Any:
-    match tau:
-        case Primitive():
-            return Syntax.TyPrim(PRIM_TY[tau]())
-        case ListType(elem):
-            return Syntax.TyList(ty(elem))
-        case TupleType(components):
-            return Syntax.TyTuple([ty(c) for c in components])
-        case DictType(value):
-            return Syntax.TyDict(ty(value))
-        case CallableType(params, result):
-            return Syntax.TyCallable([ty(p) for p in params], ty(result))
-        case LiteralType(ell):
-            return Syntax.TyLiteral(lit(ell.value))
-        case TypeVariable(alpha):
-            return Syntax.TyVar(string(alpha))
-        case ClassType(c, args):
-            return Syntax.TyClass(name(c.name), [ty(a) for a in args])
-        case UnionType(left, right):
-            return Syntax.TyUnion(ty(left), ty(right))
-
-
-def cxt_entry(theta: ContextEntry) -> Any | None:
-    """Mechanised context entry, or None for a class entry, since the mechanisation has no class table"""
-    match theta:
-        case PredefinedName():
-            return Typing.PredefName()
-        case ClassName():
-            return None
+def type_def(chi: ast.stmt) -> Any:
+    match chi:
+        case ast.ClassDef(name=c, bases=bases):
+            fields = [(string(x), ty_expr(psi)) for x, psi in own_fields(chi)]
+            return Syntax.Dataclass(string(c), type_params(chi), extends(bases), fields)
+        case ast.TypeAlias(name=ast.Name(id=x), value=psi):
+            return Syntax.TypeAlias(string(x), type_params(chi), annotation(psi))
         case _:
-            assert isinstance(theta, TYPES)  # the predefined context binds only these
-            return Typing.Ty(ty(theta))
+            raise AssertionError(f"unexpected type definition: {type(chi).__name__}")
 
 
-def context(gamma: Context) -> Any:
-    entries = [(x, cxt_entry(theta)) for x, theta in gamma.items()]
+def extends(bases: list[ast.expr]) -> Any:
+    match bases:
+        case []:
+            return Option.Nonea()
+        case [b]:
+            psi = type_expr(b)
+            assert isinstance(psi, TypeName)  # other base classes rejected by the parser
+            return Option.Some((name(psi.q), [ty_expr(a) for a in psi.args]))
+        case _:
+            raise AssertionError("multiple inheritance")
+
+
+def top_stmt(items: list[Statement]) -> Any:
+    match items:
+        case [item]:
+            return top_item(item)
+        case [item, *rest]:
+            return Syntax.TopSeq(top_item(item), top_stmt(rest))
+        case _:
+            raise AssertionError("empty module body")
+
+
+def top_item(item: Statement) -> Any:
+    match item:
+        case [ast.ClassDef() | ast.TypeAlias(), *_]:
+            return Syntax.TypeDefs([type_def(chi) for chi in item])
+        case _:
+            return Syntax.Stmt(item_stmt(item))
+
+
+def import_(iota: ast.stmt) -> Any:
+    match iota:
+        case ast.Import(names=[alias]):
+            return Syntax.Import(name(parse_name(alias.name)))
+        case ast.ImportFrom(module=str(q), names=aliases):
+            return Syntax.FromImport(name(parse_name(q)), [string(a.name) for a in aliases])
+        case _:
+            raise AssertionError(f"unexpected import: {type(iota).__name__}")
+
+
+def module_body(q: Name, m: ast.Module) -> Any:
+    """Body of module q, beginning with the declaration of its name as the spec defines a module body"""
+    iotas, stmts = split_imports(m.body)
+    imports = [import_(iota) for iota in iotas]
+    return Syntax.ModuleBody(imports, top_stmt(statements([name_declaration(q), *stmts])))
+
+
+def module_table(entry_path: pathlib.Path) -> Any:
+    """Program of the entry module and every module under its directory, each parsed up front"""
+    names = sorted(module_names(entry_path.parent) | {MAIN}, key=str)
     return Finite_Map.fmap_of_list(
-        [(string(x), theta) for x, theta in entries if theta is not None]
+        [(name(q), module_body(q, parse_module(q, entry_path))) for q in names]
     )
 
 
-def check(s: Any) -> bool:
-    result = Typing.check_stmt(context(predefined_context(BUILTINS)), Option.Nonea(), s)
-    return isinstance(result, Option.Some)
+def parse_module(q: Name, entry_path: pathlib.Path) -> ast.Module:
+    try:
+        return parse(path_of(q, entry_path))
+    except syntax.Unsupported as e:
+        e.module = q
+        raise
+
+
+def path_of(q: Name, entry_path: pathlib.Path) -> pathlib.Path:
+    if q == MAIN:
+        return entry_path
+    path = module_path(q, entry_path.parent)
+    assert path is not None  # every other name is that of a file or directory under the entry's
+    return path
+
+
+def check(M: Any) -> bool:
+    accepted = Typing.check_program(M)
+    assert isinstance(accepted, bool)
+    return accepted
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="purepy-mechanised",
-        description="Check a module with the type checker generated from the mechanisation, with the "
-        "generated code on PYTHONPATH; exits with the codes of the reference checker, or with "
-        f"{OUTSIDE_FRAGMENT} for a module outside the mechanised fragment",
+        description="Check a program from its entry module with the type checker generated from the "
+        "mechanisation, with the generated code on PYTHONPATH; exits with the codes of the reference "
+        f"checker, or with {OUTSIDE_FRAGMENT} for a program outside the mechanised fragment",
     )
     parser.add_argument("path", type=pathlib.Path)
     args = parser.parse_args()
     try:
-        ok = check(module_stmt(parse(args.path)))
+        ok = check(module_table(args.path))
     except syntax.Unsupported as e:
-        print(syntax.format_result(e, str(args.path)))
+        print(format_program_result(e, args.path))
         sys.exit(e.exit_code)
     except OutsideFragment as e:
         print(f"{args.path}: outside the mechanised fragment: {e}")

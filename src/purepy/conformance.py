@@ -4,8 +4,10 @@ import contextlib
 import importlib.resources
 import pathlib
 import shlex
+import shutil
 import subprocess
 import sys
+import tempfile
 from collections.abc import Iterator
 from enum import IntEnum, StrEnum
 from typing import NamedTuple
@@ -96,13 +98,17 @@ class Runner:
             print(f"  {GREEN}✓{RESET} {label}")
 
     def check(self, path: pathlib.Path, exit: Exit, error_checked: bool) -> list[str]:
+        """A test of one module is checked as a program of that module alone, away from its siblings
+        in the suite."""
         reference = [sys.executable, "-m", "purepy", "--check"]
-        proc = run([*(self.checker or reference), str(path)])
+        with tempfile.TemporaryDirectory() as alone:
+            checked = path if path.name == MAIN else pathlib.Path(shutil.copy(path, alone))
+            proc = run([*(self.checker or reference), str(checked)])
         exits = {exit, Exit.ILL_FORMED_PROGRAM} if exit == Exit.ILL_FORMED else {exit}
         output = proc.stdout + proc.stderr
         error = path.with_suffix(ERROR_EXPECTED)
         if proc.returncode not in exits:
-            first = output.strip().split("\n", 1)[0].replace(str(path), path.name)
+            first = output.strip().split("\n", 1)[0].replace(f"{checked.parent}/", "")
             return [f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}: {first}"]
         if not error_checked or self.checker is not None:  # messages are the reference checker's
             return []

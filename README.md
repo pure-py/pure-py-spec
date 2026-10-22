@@ -91,11 +91,13 @@ purepy-conformance --no-run --checker CMD --known-failures FILE
 The run passes if its failures are exactly those listed in the file; `--update` rewrites the file, and
 `purepy-conformance --help` lists the other options.
 
-The type checker generated from the Isabelle mechanisation is such a checker. `purepy-mechanised` parses a
-module with the reference parser, translates it into the mechanised syntax and checks it with the generated
-code, which `make build` in `isabelle-purepy/` writes under `python/python_out/` and which must be on
-`PYTHONPATH`. A module outside the mechanised fragment, such as one with imports or type definitions, exits
-with code 5. The failures of the suite under the generated checker are listed in
+The type checker generated from the Isabelle mechanisation is such a checker. `purepy-mechanised` parses
+the program of an entry module with the reference parser, every module under the entry's directory up
+front as the module table of the specification, translates it into the mechanised syntax and checks it
+with the generated code, which `make build` in `isabelle-purepy/` writes under `python/python_out/` and
+which must be on `PYTHONPATH`. A program outside the mechanised fragment, such as one with a float literal
+outside the reals, exits with code 5. The runner checks a test of one module as a program of that module
+alone, away from its siblings. The failures of the suite under the generated checker are listed in
 `test/mechanised-failures.txt`, so the list measures the fragment; `make check-mechanised-checker` builds
 the mechanisation and runs the suite against the list, as the Build workflow does.
 
