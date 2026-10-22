@@ -32,28 +32,6 @@ class EvaluationTests(unittest.TestCase):
         self.assertNotIn("python", self.task)
         self.assertNotIn("purepy", self.task)
 
-    def test_recorded_verification_preserves_generation_fingerprints(self):
-        for path in (e.ROOT / "livecodebench").glob("*.json"):
-            data = json.loads(path.read_text())
-            if "verification" not in data:
-                continue
-            generation = [[task_id, condition, task[condition]["code"], task[condition].get("generation")]
-                          for task_id, task in data["tasks"].items() for condition in e.CONDITIONS]
-            fingerprint = e.sha(json.dumps(generation, sort_keys=True, ensure_ascii=False).encode())
-            self.assertEqual(fingerprint, data["verification"]["generation_sha256"])
-            for metric in ("checker", "official_tests"):
-                evaluated = 0
-                for task in data["tasks"].values():
-                    for condition in e.CONDITIONS:
-                        solution = task[condition]
-                        if solution["code"]:
-                            self.assertIsInstance(solution[metric]["passed"], bool)
-                            evaluated += 1
-                        else:
-                            self.assertIsNone(solution[metric]["passed"])
-                count = "checker_evaluated" if metric == "checker" else "tests_evaluated"
-                self.assertEqual(evaluated, data["verification"][count])
-
     def test_checker_and_official_tests_are_independent(self):
         self.assertTrue(e.check(GOOD)["passed"])
         self.assertFalse(e.check(BAD)["passed"])

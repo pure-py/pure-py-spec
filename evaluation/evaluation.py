@@ -644,7 +644,7 @@ def run(args):
     if path.exists():
         raise RuntimeError("results already exist; choose a new output file to preserve the original run")
     if not path.is_relative_to((ROOT / "results").resolve()):
-        raise RuntimeError("new results must be under results/; historical experiment files are read-only")
+        raise RuntimeError("new results must be under results/")
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("x") as stream:
         stream.write("{}\n")

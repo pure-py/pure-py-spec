@@ -9,9 +9,7 @@ import json
 from pathlib import Path
 import pickle
 import random
-import subprocess
 import sys
-import tempfile
 import zlib
 
 
@@ -20,7 +18,6 @@ CACHE = ROOT / ".cache/lcb-data"
 TASKS = ROOT / "livecodebench/tasks.json"
 DATASET_REVISION = "175d0ac20500fd7aa0813f7a2e6ae7ecad3c76c9"
 HARNESS_REVISION = "28fef95ea8c9f7a547c8329f2cd3d32b92c1fa24"
-HARNESS = ROOT / ".cache/livecodebench/lcb_runner/evaluation/testing_util.py"
 SEED = 20261018
 TIMEOUT = 6
 FILES = [f"release_v6/test-{i:05d}-of-00009.parquet" for i in range(9)]
@@ -257,64 +254,6 @@ def prepare():
     dump(CACHE / "selection-audit.json", audit)
     dump(TASKS, {"benchmark": "LiveCodeBench", "manifest": manifest, "tasks": tasks})
     print(f"Frozen 20 medium + 20 hard tasks: {TASKS}", flush=True)
-
-
-WORKER = '''
-import contextlib, io, json, resource, runpy, sys, tempfile, traceback
-import numpy as np
-payload = json.load(sys.stdin)
-sys.dont_write_bytecode = True
-resource.setrlimit(resource.RLIMIT_FSIZE, (1048576, 1048576))
-try:
-    grader = runpy.run_path(payload["harness"])["run_test"]
-    with tempfile.TemporaryFile(mode="w+", dir=payload["directory"]) as capture:
-        with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(capture):
-            results, metadata = grader(payload["sample"], test=payload["code"], timeout=payload["timeout"])
-    results = [r.item(0) if isinstance(r, np.ndarray) else r for r in results]
-    results = [bool(r) if isinstance(r, np.bool_) else r for r in results]
-    passed = len(results) == payload["test_count"] and all(r > 0 for r in results)
-    result = {"passed": passed, "error": None if passed else json.dumps(metadata, default=str),
-              "tests_passed": int(sum(r > 0 for r in results)), "tests_total": payload["test_count"]}
-except BaseException:
-    result = {"passed": None, "error": "official grader tooling error: " + traceback.format_exc().strip()}
-print(json.dumps(result))
-'''
-
-
-def evaluate_solution(code, task_id, task):
-    import experiment as e
-    try:
-        parsed = ast.parse(code)
-        if not any(isinstance(n, ast.FunctionDef) and n.name == task["name"] for n in parsed.body):
-            return {"passed": False, "error": "required top-level function is missing"}
-    except SyntaxError as error:
-        return {"passed": False, "error": str(error)}
-    path = case_path(task_id)
-    if hashlib.sha256(path.read_bytes()).hexdigest() != task["tests_sha256"]:
-        raise RuntimeError("official test fixture changed")
-    fixture = json.loads(path.read_text())
-    alias = "_lcb_core_" + hashlib.sha256(task_id.encode()).hexdigest()[:12]
-    arguments = ", ".join(task["parameters"])
-    parameters = "self" + (", " + arguments if arguments else "")
-    adapted = code + f"\n{alias} = {task['name']}\nclass Solution:\n    def {task['name']}({parameters}):\n        return {alias}({arguments})\n"
-    payload = {"harness": str(HARNESS), "sample": fixture["sample"], "code": adapted,
-               "timeout": TIMEOUT, "test_count": task["test_count"]}
-    with tempfile.TemporaryDirectory() as directory:
-        payload["directory"] = directory
-        profile = e.sandbox_profile(directory, read_paths=[HARNESS])
-        command = ["/usr/bin/sandbox-exec", "-p", profile, str(Path(sys.executable).resolve()), "-I", "-c", WORKER]
-        try:
-            result = subprocess.run(command, input=json.dumps(payload), capture_output=True, text=True,
-                                    timeout=(TIMEOUT + 1) * task["test_count"] + 30, cwd=directory,
-                                    env={"PATH": "/usr/bin:/bin", "OPENBLAS_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"})
-        except subprocess.TimeoutExpired:
-            return {"passed": False, "error": "official grader exceeded outer wall-clock limit"}
-        if result.returncode != 0:
-            return e.not_run(f"sandbox worker error: {result.stderr.strip() or result.returncode}")
-        try:
-            return json.loads(result.stdout)
-        except ValueError:
-            return e.not_run("official grader returned no JSON verdict")
 
 
 if __name__ == "__main__":
