@@ -81,7 +81,7 @@ def string(s: str) -> list[Any]:
 def real(x: float) -> Any:
     """Float as the real it denotes, since floats are reals in the mechanisation"""
     if not math.isfinite(x):
-        raise OutsideFragment(f"float {x}")
+        raise OutsideFragment(f"float {x} outside the reals")
     return Real.Ratreal(Rat.Frct(x.as_integer_ratio()))
 
 
@@ -340,7 +340,7 @@ def module_stmt(m: ast.Module) -> Any:
     which leaves out imports, type definitions and the module body itself"""
     iotas, stmts = split_imports(m.body)
     if len(iotas) > 0:
-        raise OutsideFragment("imports")
+        raise OutsideFragment("module checking")
     if len(stmts) == 0:
         raise OutsideFragment("empty module")
     return seq(stmts)
