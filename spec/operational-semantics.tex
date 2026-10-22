@@ -93,7 +93,7 @@ a conditional expression requires its condition to be \replaced{a Boolean}{\pyin
 A comprehension evaluates its body once for each binding produced by its qualifiers, and
 concatenates the results; a generator draws its bindings from the elements of a value, given by the auxiliary
 function $\iterOp$\speconly{ (\S\ref{aux:iter})}: the elements of a
-list, tuple or string, \replaced{the keys of a dictionary, and the integers in a range}{and the keys of a dictionary }, as in Python. \Added{A generator over a
+list, tuple\replaced{, string or range}{ or string }, and the keys of a dictionary, as in Python. \Added{A generator over a
 value other than a list, tuple, string, dictionary or range aborts with $\errType$\speconly{
 (\ruleName{eval-qual-generator-nonseq})}, as in Python, and a guard aborts with $\errExcluded$ if it
 evaluates to a non-Boolean\speconly{ (\ruleName{eval-qual-guard-nonbool})}.}
