@@ -17,6 +17,7 @@ from purepy.conformance import (
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TEST = ROOT / "test"
 SRC = ROOT / "src" / "purepy"
+SUITE_DIR = SUITE_DIR
 MYPY_INI = "mypy.ini"
 MYPY_BUG = "mypy-bug"
 PYTHON_VERSION = (ROOT / ".python-version").read_text().strip()
@@ -45,12 +46,12 @@ def check_rule_attribution(r: Runner) -> None:
             for f in sorted((ROOT / "spec").rglob("*.tex"))
             for m in RULE_NAME.findall(f.read_text(encoding="utf-8"))
         }
-        for path in sorted((SRC / SUITE).rglob("*.py")):
+        for path in sorted(SUITE_DIR.rglob("*.py")):
             if "__pycache__" in path.parts:
                 continue
             cited = CITATION.match(path.read_text(encoding="utf-8").split("\n", 1)[0])
             if cited is not None and cited.group(1) not in spec:
-                r.fail(f"{path.relative_to(SRC / SUITE)} cites {cited.group(1)}")
+                r.fail(f"{path.relative_toSUITE_DIR} cites {cited.group(1)}")
 
 
 def check_lint(r: Runner) -> None:
@@ -87,8 +88,8 @@ def mypy_errors(paths: list[str], cwd: pathlib.Path) -> set[str]:
 
 def check_mypy_compatibility(r: Runner) -> None:
     with r.test("mypy compatibility"):
-        agrees = SRC / SUITE / PythonOutcome.SUCCEEDS / PurePyOutcome.AGREES
-        found = [test for test in tests(SRC / SUITE) if agrees in test.parents]
+        agrees = SUITE_DIR / PythonOutcome.SUCCEEDS / PurePyOutcome.AGREES
+        found = [test for test in testsSUITE_DIR if agrees in test.parents]
         modules = [str(test.relative_to(ROOT)) for test in found if test.is_file()]
         reported_bug = {str(test.relative_to(ROOT)) for test in found if MYPY_BUG in test.parts}
         rejected = mypy_errors(modules, ROOT)
@@ -124,7 +125,7 @@ def main() -> None:
         check_lint(r)
         check_mypy_compatibility(r)
 
-    r.run_suite(SRC / SUITE, args.jobs)
+    r.run_suite(SUITE_DIR, args.jobs)
     r.summary()
     sys.exit(1 if r.failed else 0)
 
