@@ -5,4 +5,4 @@ except at the comparisons left undefined by \PurePy\paperonly{, described in \se
 values inside a container. A run that reaches one of these comparisons has undefined behaviour, so an
 implementation may abort or produce the result given by Python (\paperonly{\secref{python-compatibility}}\speconly{\secref{conformance}}).
 Equality and membership compare the elements of a sequence in order and stop at the first element that decides
-the result, so an undefined comparison later in the sequence does not make the whole comparison undefined. \added{Membership in a range, or of a key other than a string in a dictionary, is ruled out by typing and aborts with $\errExcluded$\speconly{ (\S\ref{aux:contains})}.}
+the result, so an undefined comparison later in the sequence does not make the whole comparison undefined. Membership in a range, or of a key other than a string in a dictionary, is ruled out by typing and aborts with $\errExcluded$\speconly{ (\S\ref{aux:contains})}.

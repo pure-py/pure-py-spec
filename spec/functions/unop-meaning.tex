@@ -1,7 +1,7 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.62\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}$\ominus$ & $\hat{\ominus}(v)$ \\
-\pyinline{not} & $\val{\pyinline{True}}$ if $v = \pyinline{False}$, $\val{\pyinline{False}}$ if $v = \pyinline{True}$, and \replaced{$\aborts{\errExcluded}$}{$\aborts{\errType}$ } otherwise \\
-\pyinline{+} & $\val{v}$ if $v$ is a number, \added{$\aborts{\errExcluded}$ if $v$ is a Boolean,} and $\aborts{\errType}$ otherwise \\
-\pyinline{-} & $\val{-v}$ if $v$ is a number, \added{$\aborts{\errExcluded}$ if $v$ is a Boolean,} and $\aborts{\errType}$ otherwise
+\pyinline{not} & $\val{\pyinline{True}}$ if $v = \pyinline{False}$, $\val{\pyinline{False}}$ if $v = \pyinline{True}$, and $\aborts{\errExcluded}$ otherwise \\
+\pyinline{+} & $\val{v}$ if $v$ is a number, $\aborts{\errExcluded}$ if $v$ is a Boolean, and $\aborts{\errType}$ otherwise \\
+\pyinline{-} & $\val{-v}$ if $v$ is a number, $\aborts{\errExcluded}$ if $v$ is a Boolean, and $\aborts{\errType}$ otherwise
 \end{tabular}

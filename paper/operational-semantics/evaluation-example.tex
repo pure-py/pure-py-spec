@@ -7,9 +7,9 @@ Concretely, \ruleName{eval-binop} evaluates both operands and binds the result o
 \input{spec/rules/eval-binop-fail}
 \end{mathpar}
 The meaning $\hat{\odot}(v, v')$ of the operator is likewise a function from operands to results, with
-an abort if Python raises an exception, \added{$\aborts{\errExcluded}$ at a Boolean operand of an arithmetic or ordering operator, }and $\aborts{\errUndef}$ at a dynamically excluded comparison.
+an abort if Python raises an exception, $\aborts{\errExcluded}$ at a Boolean operand of an arithmetic or ordering operator, and $\aborts{\errUndef}$ at a dynamically excluded comparison.
 An abort may also originate in a rule rather than be propagated from a premise. Calling a value that is
-neither closure\replaced{, primitive nor class}{ nor primitive } aborts with $\errType$, because Python raises \pyinline{TypeError}:
+neither closure, primitive nor class aborts with $\errType$, because Python raises \pyinline{TypeError}:
 \begin{mathpar}
 \small
 \input{spec/rules/eval-call-nonfun}

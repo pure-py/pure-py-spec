@@ -4,9 +4,7 @@ The test of an \pyinline{if} or \pyinline{assert} must be a \pyinline{bool}, an 
 positions. The operands of \pyinline{==} and \pyinline{!=} must have comparable types, so \pyinline{1 == "1"} is
 rejected rather than giving \pyinline{False}. The types \pyinline{bool} and \pyinline{int} are not comparable,
 so \pyinline{True == 1} is also rejected, although Python compares Booleans as numbers. Python compares functions by identity, so two textually
-identical lambdas are unequal, and \PurePy rejects comparisons of functions. A list pattern at a tuple\added{ or range} type \replaced{is rejected, as is a tuple pattern at a list or range type}{does not match any value, and its case
-is rejected as unreachable}, although Python matches list and tuple patterns against both lists and tuples\added{, and against ranges}\deleted{; the
-same holds for a tuple pattern at a list type}. \replaced{A constructor pattern must give}{A class pattern must give } a sub-pattern for each field of the
+identical lambdas are unequal, and \PurePy rejects comparisons of functions. A list pattern at a tuple or range type is rejected, as is a tuple pattern at a list or range type, although Python matches list and tuple patterns against both lists and tuples, and against ranges. A constructor pattern must give a sub-pattern for each field of the
 class, whereas Python ignores the remaining fields.
 
 Three exclusions are dynamic, because the types of the operands do not determine them. At type

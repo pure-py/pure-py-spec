@@ -21,7 +21,7 @@
 & \Sigma \vdash \pyinline{*}(\sigma_1, \tyList{\tau}) : ((\tyInt, \tyList{\tau}), \tyList{\tau}) && \quad \text{if } \Sigma \vdash \sigma_1 \subty \tyInt \\
 & \Sigma \vdash \pyinline{**}(\sigma_1, \tyLiteral{n}) : ((\tyInt, \tyLiteral{n}), \tyInt) && \quad \text{if } \Sigma \vdash \sigma_1 \subty \tyInt \text{ and } n \text{ a non-negative integer} \\
 & \Sigma \vdash \pyinline{**}(\sigma_1, \tyLiteral{n}) : ((\tyInt, \tyLiteral{n}), \tyFloat) && \quad \text{if } \Sigma \vdash \sigma_1 \subty \tyInt \text{ and } n \text{ a negative integer} \\
-& \Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau) && \quad \text{if } \text{\added{$\sigma_1$ or $\sigma_2$ a literal type and}} \\
+& \Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau) && \quad \text{if } \text{$\sigma_1$ or $\sigma_2$ a literal type and} \\
 & && \quad \phantom{\text{if }} \Sigma \vdash {\odot}(\baseType(\sigma_1), \baseType(\sigma_2)) : ((\tau_1, \tau_2), \tau)
 \end{defalign}
 
@@ -29,10 +29,10 @@
 
 \flushleft \shadebox{$\Sigma \vdash \ominus(\sigma) : (\tau, \tau')$}
 \begin{defalign}
-& \added{\Sigma \vdash {}} \pyinline{not}(\sigma) : (\tyBool, \tyBool) && \quad \text{if } \Sigma \vdash \sigma \subty \tyBool \\
+& \Sigma \vdash {} \pyinline{not}(\sigma) : (\tyBool, \tyBool) && \quad \text{if } \Sigma \vdash \sigma \subty \tyBool \\
 & \Sigma \vdash \ominus(\sigma) : (\tyInt, \tyInt) && \quad \text{if } \ominus \in \set{\pyinline{+}, \pyinline{-}} \text{ and } \Sigma \vdash \sigma \subty \tyInt \\
 & \Sigma \vdash \ominus(\sigma) : (\tyFloat, \tyFloat) && \quad \text{if } \ominus \in \set{\pyinline{+}, \pyinline{-}} \text{ and } \Sigma \vdash \sigma \subty \tyFloat \\
-& \Sigma \vdash \ominus(\sigma) : (\tau, \tau') && \quad \text{if } \text{\added{$\sigma$ a literal type and }} \Sigma \vdash {\ominus}(\baseType(\sigma)) : (\tau, \tau')
+& \Sigma \vdash \ominus(\sigma) : (\tau, \tau') && \quad \text{if } \text{$\sigma$ a literal type and } \Sigma \vdash {\ominus}(\baseType(\sigma)) : (\tau, \tau')
 \end{defalign}
 \caption{Operator overloads}
 \label{fig:operator-overloads}

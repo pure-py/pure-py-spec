@@ -121,27 +121,25 @@ the join of the component types\speconly{ (\ruleName{subscript-tuple-int})}, unl
 gives the component type at that position, counting from the end when the index is negative\speconly{
 (\ruleName{subscript-tuple}, \ruleName{subscript-tuple-neg})}\paperonly{:}\speconly{.}
 \paperinput{paper/well-formedness/subscript-tuple}%
-A subscript, attribute reference or call \replaced{with a subject synthesising}{whose subject
-synthesises } a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
+A subscript, attribute reference or call with a subject synthesising a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
 join of the results\speconly{ (\ruleName{subscript-union}, \ruleName{attr-union}, \ruleName{call-union})}\paperonly{:}\speconly{.}
 \paperinput{paper/well-formedness/call-union}%
 Generators need no such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts' element types.
 \citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form.
 
-
 The \ruleName{call} rule for a call $\exCall{e}{\seq{e}}$ uses the auxiliary
 judgement $\Sigma; \Gamma \vdash e, \seq{e} \synth \seq{\sigma}, \sigma$ (\specfigref{typing-callee}), which determines parameter
-types $\seq{\sigma}$ \replaced{and return type $\sigma$ from the callee}{and result type $\sigma$ from the callee } along with its arguments. The remaining premises check
+types $\seq{\sigma}$ and return type $\sigma$ from the callee along with its arguments. The remaining premises check
 the arguments against $\seq{\sigma}$, and the call synthesises $\sigma$. The auxiliary judgement has two rules. A callee that synthesises a
-\pyinline{Callable} type \replaced{gives the parameter and return types of that type}{gives the parameter and result types of that type }\speconly{ (\ruleName{callee})}. A name bound at a
+\pyinline{Callable} type gives the parameter and return types of that type\speconly{ (\ruleName{callee})}. A name bound at a
 type scheme $\scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}$ instantiates the type parameters from the arguments
 (\ruleName{callee-scheme}). The type arguments are collected by $\typeArgs{\Sigma}$\speconly{
 (\S\ref{aux:type-args})} over the arguments that synthesise,
 by a one-way unification of each parameter type with the synthesised type, in which the type parameters $\seq{\alpha}$ are the
 unknowns: a type parameter takes the type found at the same
 position in the synthesised type, with one found at several positions taking the join of those types.
-Arguments that do not synthesise, such as lambdas, are left out. \replaced{The parameter and return types are}{The parameter and result types are }
+Arguments that do not synthesise, such as lambdas, are left out. The parameter and return types are
 instantiated at the type arguments given by the context, which must bind every type parameter\paperonly{:}\speconly{.}
 \paperinput{paper/well-formedness/callee-scheme}%
 
@@ -199,11 +197,11 @@ Each operator is overloaded as specified in \specfigref{operator-overloads}. \sp
 \speconly{\begin{specdefinition}{Resolved overload}
 A \emph{resolved overload}
 $((\tau_1, \tau_2), \tau)$ pairs operand \emph{bounds}
-\replaced{with a return type; the judgements}{with a result type; the judgements } of the figure relate operand
+with a return type; the judgements of the figure relate operand
 types to the resolved overloads of an operator.
 \end{specdefinition}}
 
-The \ruleName{binop} and \ruleName{unop} rules (\specfigref{typing-synth}) \replaced{take the return type}{take the result type }
+The \ruleName{binop} and \ruleName{unop} rules (\specfigref{typing-synth}) take the return type
 of the most specific overload at the operand types, $\resolveOp{\Sigma}$\speconly{ (\S\ref{aux:resolve-op})}, so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
@@ -253,12 +251,12 @@ unassigned or possibly unassigned after the statement.
 \specinput{spec/fig/pattern-matching/typing-cases}
 \specinput{spec/fig/typing-top-level}
 
-Context operations $\override$ and \replaced{$\merge_{\Sigma}$}{$\merge$ } lift to a right semiring over static outcomes $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for \replaced{$\merge_{\Sigma}$}{$\merge$ } and zero for $\override$.
+Context operations $\override$ and $\merge_{\Sigma}$ lift to a right semiring over static outcomes $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge_{\Sigma}$ and zero for $\override$.
 
 \begin{definition}[Override and merge on static outcomes]
 \begin{defalign}
-\Assigns{\Delta} \merge_{\added{\Sigma}} \Assigns{\Delta'} & = \Assigns{\Delta \merge_{\added{\Sigma}} \Delta'} \\
-R \merge_{\added{\Sigma}} \Returns = \Returns \merge_{\added{\Sigma}} R & = R \\
+\Assigns{\Delta} \merge_{\Sigma} \Assigns{\Delta'} & = \Assigns{\Delta \merge_{\Sigma} \Delta'} \\
+R \merge_{\Sigma} \Returns = \Returns \merge_{\Sigma} R & = R \\
 \\
 \Assigns{\Delta} \override \Assigns{\Delta'} & = \Assigns{\Delta \override \Delta'} \\
 R \override \Returns = \Returns \override R & = \Returns
@@ -271,26 +269,23 @@ The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\G
 optional return type $\zeta$, statement $s$ has static outcome $R$ (\specfigref{typing-stmt}); every rule passes $\zeta$ down unchanged.
 A sequence $s\;s'$\speconly{ (\ruleName{seq})} types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
 by $s$. A conditional combines its
-branches with \replaced{$\merge_{\Sigma}$}{$\merge$ }, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch\speconly{ (\ruleName{if}, \ruleName{if-else})}.
+branches with $\merge_{\Sigma}$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch\speconly{ (\ruleName{if}, \ruleName{if-else})}.
 \speconly{A
 \pyinline{return} checks its expression against $\zeta$, which must be of the form $\tau$, and a bare
-\pyinline{return} requires $\tau$ to be equivalent to \pyinline{None} (\ruleName{return}, \ruleName{return-none}). \replaced{An expression statement is typed by one of two rules. If its expression synthesises a type, the
+\pyinline{return} requires $\tau$ to be equivalent to \pyinline{None} (\ruleName{return}, \ruleName{return-none}). An expression statement is typed by one of two rules. If its expression synthesises a type, the
 type is discarded (\ruleName{expr-stmt}). A call to a callable with result \tyNone{} does not synthesise a
 type, following mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}), which
-rejects such a call wherever a value is required\replaced{; such calls are}{. The call is } typed instead by \ruleName{call-stmt}, which
-\added{just }checks the arguments against the parameter types. Both rules give the static outcome
-$\Assigns{\varnothing}$.}{An expression statement synthesises a type and discards it
-(\ruleName{expr-stmt}). A call to a callable with result \tyNone{} is not an expression, because
-\ruleName{call} requires a result other than \tyNone, and is typed as a statement (\ruleName{call-stmt}).
-The restriction is for compatibility with mypy (\paperonly{\secref{python-compatibility}}\speconly{\secref{mypy-restrictions}}). }} \added{A call statement with a callee synthesising a union is typed
-once per disjunct (\ruleName{call-stmt-union}), following \ruleName{call-union} for a call expression.}
+rejects such a call wherever a value is required; such calls are typed instead by \ruleName{call-stmt}, which
+just checks the arguments against the parameter types. Both rules give the static outcome
+$\Assigns{\varnothing}$.} A call statement with a callee synthesising a union is typed
+once per disjunct (\ruleName{call-stmt-union}), following \ruleName{call-union} for a call expression.
 
 \speconly{A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment $\exAssign{x}{e}$ requires $x$ to be a declared but unassigned variable, and
 checks $e$ against its declared type (\ruleName{assign}); the form $\exAssign{x\exAnnot{\psi}}{e}$ declares and
 assigns $x$ at once (\ruleName{declare-assign}). A declaration does not check
 whether its name is already declared; that check is made once for the whole scope, when the rules for function
-definitions and modules introduce the variables of the scope as unbound, using the function $\scopeS(\replaced{\seq{y}}{Y }, s)$\speconly{
+definitions and modules introduce the variables of the scope as unbound, using the function $\scopeS(\seq{y}, s)$\speconly{
 (\S\ref{aux:scope})}.}
 
 \speconly{The conditions of \pyinline{if} and \pyinline{assert}
@@ -320,7 +315,7 @@ The remaining type, the residual, reachability and exhaustiveness are the subjec
 \speconly{\subsubsection{Function definitions}\label{sec:well-formedness-defs}}%
 The \ruleName{defs} rule for a mutual def region of function definitions synthesises a type scheme for each definition
 (\specfigref{typing-def}), binds all the function names of the mutual def region at the synthesised type schemes, and checks each
-definition against its \replaced{type scheme}{scheme }\paperonly{:}\speconly{.}
+definition against its type scheme\paperonly{:}\speconly{.}
 \paperinput{paper/well-formedness/defs}%
 For a definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$,
 the auxiliary judgements $\Sigma; \Gamma \vdash d \synth \pi$ and $\Sigma; \Gamma \vdash d \checks \pi$ synthesise the type

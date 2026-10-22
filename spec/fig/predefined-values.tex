@@ -6,18 +6,17 @@
 \rowcolor{grammarheadcolor}Module & Member & \multicolumn{2}{l}{Value} \\
 \textup{\pyinline{builtins}} & \pyinline{print} & & \\
  & \pyinline{len} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
- & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = \replaced{v_1 \cons \ldots \cons v_n}{u_1 \cons \ldots \cons u_n }$ \\
- & & $\quad \primFn(\replaced{\seq{v}}{\seq{u}}) = \aborts{\errType}$ & otherwise \\
+ & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = v_1 \cons \ldots \cons v_n$ \\
+ & & $\quad \primFn(\seq{v}) = \aborts{\errType}$ & otherwise \\
  & \pyinline{range} & \multicolumn{2}{l}{$\Type{\clsRange}$} \\
  & \pyinline{round} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
  & & $\quad \primFn(n) = \val{n'}$ & if $n'$ nearest integer to $n$, ties to even \\
- & & \deleted{$\quad \primFn(n) = \aborts{\errUndef}$} & \deleted{if $n$ not finite} \\
- & & \added{$\quad \primFn(n) = \aborts{\errOverflow}$} & \added{if $n$ infinite} \\
- & & \added{$\quad \primFn(n) = \aborts{\errValue}$} & \added{if $n$ \pyinline{nan}} \\
- & & \added{$\quad \primFn(v) = \aborts{\errExcluded}$} & \added{if $v$ Boolean} \\
- & & \added{$\quad \primFn(v, v') = \aborts{\errExcluded}$} & \added{if $v$ number or Boolean,} \\
- & & & \added{and $v'$ integer, Boolean or \pyinline{None}} \\
- & & $\quad \primFn(\replaced{\seq{v}}{\seq{u}}) = \aborts{\errType}$ & otherwise \\
+ & & $\quad \primFn(n) = \aborts{\errOverflow}$ & if $n$ infinite \\
+ & & $\quad \primFn(n) = \aborts{\errValue}$ & if $n$ \pyinline{nan} \\
+ & & $\quad \primFn(v) = \aborts{\errExcluded}$ & if $v$ Boolean \\
+ & & $\quad \primFn(v, v') = \aborts{\errExcluded}$ & if $v$ number or Boolean, \\
+ & & & and $v'$ integer, Boolean or \pyinline{None} \\
+ & & $\quad \primFn(\seq{v}) = \aborts{\errType}$ & otherwise \\
  & \pyinline{None} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{None}}$} \\
  & \pyinline{object} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{object}}$} \\
  & \pyinline{bool} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{bool}}$} \\
@@ -30,9 +29,9 @@
 \pyinline{sys} & \pyinline{argv} & & \\
  & \pyinline{exit} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
  & & $\quad \primFn(n) = \aborts{\errExit{n}}$ & if $n$ integer \\
- & & \added{$\quad \primFn() = \aborts{\errExcluded}$} & \\
- & & \added{$\quad \primFn(v) = \aborts{\errExcluded}$} & \added{if $v$ not an integer} \\
- & & $\quad \primFn(\replaced{\seq{v}}{\seq{u}}) = \aborts{\errType}$ & otherwise \\
+ & & $\quad \primFn() = \aborts{\errExcluded}$ & \\
+ & & $\quad \primFn(v) = \aborts{\errExcluded}$ & if $v$ not an integer \\
+ & & $\quad \primFn(\seq{v}) = \aborts{\errType}$ & otherwise \\
 \pyinline{typing} & \pyinline{Callable} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Callable}}$} \\
  & \pyinline{Literal} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Literal}}$} \\
  & \pyinline{Never} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Never}}$} \\

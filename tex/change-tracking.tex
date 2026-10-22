@@ -35,9 +35,9 @@
   \newenvironment{DeletedBlock}{\setbox0\vbox\bgroup}{\egroup}
   \newenvironment{AddedBlock}{\par}{\par}
 \else
-  \newcommand{\Added}[1]{\leavevmode\protect\cbstart\added{#1}\protect\cbend\xspace}
-  \newcommand{\Deleted}[1]{\leavevmode\protect\cbstart\deleted{#1}\protect\cbend\xspace}
-  \newcommand{\Replaced}[2]{\leavevmode\protect\cbstart\replaced{#1}{#2\ }\protect\cbend\xspace}
+  \newcommand{\Added}[1]{\leavevmode\protect\cbstart#1\protect\cbend\xspace}
+  \newcommand{\Deleted}[1]{\leavevmode\protect\cbstart\protect\cbend\xspace}
+  \newcommand{\Replaced}[2]{\leavevmode\protect\cbstart#1\protect\cbend\xspace}
   \newenvironment{DeletedBlock}{\par\cbstart\color{deletedcolor}\codeinmarkuptrue\renewcommand*{\codecolor}{deletedcolor}}{\cbend\par}
   \newenvironment{AddedBlock}{\par\cbstart\color{addedcolor}\codeinmarkuptrue\renewcommand*{\codecolor}{addedcolor}}{\cbend\par}
 \fi

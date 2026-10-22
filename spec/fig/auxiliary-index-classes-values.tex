@@ -14,14 +14,14 @@
 \auxgroup{Functions on values}
 \auxrow{$\eqOp{\Sigma}(v, v')$}{result}{structural equality; $\aborts{\errUndef}$ between functions, between Boolean and number, and between two \pyinline{nan} values in container}{aux:eq}
 \specauxrow{$\eqElems{\Sigma}(\seq{v}, \seq{v}\,')$}{result}{elementwise equality of value sequences}{aux:eq-elems}
-\auxrow{$\contains{\Sigma}(v, v')$}{result}{whether $v'$ is element of $v$\added{; $\errExcluded$ for range or non-string key, $\errType$ otherwise}}{aux:contains}
+\auxrow{$\contains{\Sigma}(v, v')$}{result}{whether $v'$ is element of $v$; $\errExcluded$ for range or non-string key, $\errType$ otherwise}{aux:contains}
 \specauxrow{$\containsElems{\Sigma}(\seq{v}, v)$}{result}{whether $\seq{v}$ has element equal to $v$}{aux:contains-elems}
 \specauxrow{$\elems(v)$}{sequence of values}{elements of list, tuple or string}{aux:elems}
 \auxrow{$\iterOp(v)$}{sequence of values}{sequence drawn from $v$ by generator; keys if $v$ is dictionary, $m, \ldots, n - 1$ if $v$ is range with start $m$ and stop $n$}{aux:iter}
-\auxrow{$\getitem(v, v')$}{\replaced{result}{value or abort }}{subscripting; $\errIndex$ for index out of range, $\errKey$ for missing key, \added{$\errExcluded$ for range, Boolean index or non-string key, }$\errType$ otherwise}{aux:getitem}
-\auxrow{$\result(o)$}{\replaced{result}{value or abort }}{statement outcome as result: returned value, \pyinline{None} if statement completes without returning, abort unchanged}{aux:result}
-\auxrow{$\matchOp{\Sigma}(\rho, p, v)$}{match result}{bindings of pattern variables if $p$ matches $v$, $\noMatch$ if not, $\errUndef$ if equality of numeric literal pattern $p$ and $v$ undefined\added{, $\errExcluded$ for list or tuple pattern against the other or a range, $\matchFields{\Sigma}$ for constructor pattern}}{aux:match}
-\specauxrow{\added{$\matchFields{\Sigma}(\rho, C, a, \bind{\seq{z}}{\seq{v}})$}}{\added{match result}}{\added{sub-patterns of $a$ against object fields; $\errType$ for excess sub-patterns, $\errExcluded$ if fields not covered}}{aux:match-fields}
-\auxrow{$\dispatch(\rho, v, \seq{p}, \seq{s})$}{bindings and statement}{case taken by \pyinline{match}\added{, or termination kind if matching aborts}}{aux:dispatch}
+\auxrow{$\getitem(v, v')$}{result}{subscripting; $\errIndex$ for index out of range, $\errKey$ for missing key, $\errExcluded$ for range, Boolean index or non-string key, $\errType$ otherwise}{aux:getitem}
+\auxrow{$\result(o)$}{result}{statement outcome as result: returned value, \pyinline{None} if statement completes without returning, abort unchanged}{aux:result}
+\auxrow{$\matchOp{\Sigma}(\rho, p, v)$}{match result}{bindings of pattern variables if $p$ matches $v$, $\noMatch$ if not, $\errUndef$ if equality of numeric literal pattern $p$ and $v$ undefined, $\errExcluded$ for list or tuple pattern against the other or a range, $\matchFields{\Sigma}$ for constructor pattern}{aux:match}
+\specauxrow{$\matchFields{\Sigma}(\rho, C, a, \bind{\seq{z}}{\seq{v}})$}{match result}{sub-patterns of $a$ against object fields; $\errType$ for excess sub-patterns, $\errExcluded$ if fields not covered}{aux:match-fields}
+\auxrow{$\dispatch(\rho, v, \seq{p}, \seq{s})$}{bindings and statement}{case taken by \pyinline{match}, or termination kind if matching aborts}{aux:dispatch}
 \specauxrow{$\update(\delta, \delta')$}{dictionary entries}{$\delta$ updated by $\delta'$ in order, later replacing earlier}{aux:update}
 \specauxrow{$\setitem(\delta, w, v)$}{dictionary entries}{$\delta$ with $w$ bound to $v$, replacing earlier binding}{aux:setitem}
