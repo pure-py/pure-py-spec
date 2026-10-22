@@ -6,9 +6,9 @@
 \added{\matchOp{\Sigma}(\rho, \patConstr{(x \cons \seq{x})}{a}, v)} &\added{{}= \errAttr} \\*
 &\added{\qquad \text{if } \resolve(\rho, x \cons \seq{x}) \text{ undefined and } \rho(x) \notin \set{\bot, \Unbound}} \\*
 \added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, v)} &\added{{}= \errExcluded} \\*
-&\added{\qquad \text{if } \resolve(\rho, q) = \opaqueVal{\pyinline{builtins}.y}} \\*
+&\added{\qquad \text{if } \resolve(\rho, q) \text{ of the form } \opaqueVal{\pyinline{builtins}.y}} \\*
 \added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, v)} &\added{{}= \errType} \\*
-&\added{\qquad \text{if } \resolve(\rho, q) \text{ neither } \Type{C}} \\*
-&\added{\qquad \text{nor } \opaqueVal{\pyinline{builtins}.y}} \\*
+&\added{\qquad \text{if } \resolve(\rho, q) \text{ defined and not of the form}} \\*
+&\added{\qquad \Type{C} \text{ or } \opaqueVal{\pyinline{builtins}.y}} \\*
 \added{\matchOp{\Sigma}(\rho, \patConstr{q}{a}, \exObj{D}{\bind{\seq{z}}{\seq{v}}})} &\added{{}= \matchFields{\Sigma}(\rho, C, a, \bind{\seq{z}}{\seq{v}})} \\*
 &\added{\qquad \text{if } \resolve(\rho, q) = \Type{C} \text{ and } C \in \ancestors{\Sigma}(D)}
