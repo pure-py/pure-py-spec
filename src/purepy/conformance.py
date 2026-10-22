@@ -24,16 +24,16 @@ MAIN = "main.py"
 
 
 class PythonOutcome(StrEnum):
-    SYNTAX_ERROR = "syntax-error"
-    EXCEPTION = "exception"
-    NO_EXCEPTION = "no-exception"
+    REJECTS = "python-rejects"
+    RAISES = "python-raises"
+    SUCCEEDS = "python-succeeds"
 
 
 class PurePyOutcome(StrEnum):
-    PARSER = "parser"
-    TYPE_CHECKER = "type-checker"
+    PARSER_REJECTS = "parser-rejects"
+    TYPING_REJECTS = "typing-rejects"
     UNDEFINED = "undefined"
-    RESULT = "result"
+    AGREES = "agrees"
 
 
 SYNTACTIC_ONLY = "syntactic-only"
@@ -55,10 +55,10 @@ class Expectation(NamedTuple):
 
 # Checker verdict for each PurePy outcome
 CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
-    PurePyOutcome.PARSER: (Exit.PROHIBITED, True),
-    PurePyOutcome.TYPE_CHECKER: (Exit.ILL_FORMED, True),
+    PurePyOutcome.PARSER_REJECTS: (Exit.PROHIBITED, True),
+    PurePyOutcome.TYPING_REJECTS: (Exit.ILL_FORMED, True),
     PurePyOutcome.UNDEFINED: (Exit.OK, False),
-    PurePyOutcome.RESULT: (Exit.OK, False),
+    PurePyOutcome.AGREES: (Exit.OK, False),
 }
 
 
@@ -123,7 +123,7 @@ class Runner:
 
     def python(self, path: pathlib.Path, outcome: PythonOutcome) -> list[str]:
         assert self.interpreter is not None
-        accepts = outcome == PythonOutcome.NO_EXCEPTION
+        accepts = outcome == PythonOutcome.SUCCEEDS
         expected = path.with_suffix(EXPECTED)
         exception = path.with_suffix(EXCEPTION_EXPECTED)
         if expected.exists() == exception.exists():
@@ -140,7 +140,7 @@ class Runner:
                 return ["run: output mismatch"]
             return []
         name = exception.read_text().strip()
-        if (outcome == PythonOutcome.SYNTAX_ERROR) != name.startswith(SYNTAX_ERROR):
+        if (outcome == PythonOutcome.REJECTS) != name.startswith(SYNTAX_ERROR):
             return [f"run: misfiled, expects {name}"]
         if proc.returncode == 0:
             return [f"run: expected {name} but script succeeded"]
@@ -155,7 +155,7 @@ class Runner:
         Python source."""
         dirs = test.relative_to(suite).parts[1:-1]
         exit, error_checked, python = (
-            Expectation(None, False, PythonOutcome.NO_EXCEPTION)
+            Expectation(None, False, PythonOutcome.SUCCEEDS)
             if dirs[0] == SYNTACTIC_ONLY
             else expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]))
         )

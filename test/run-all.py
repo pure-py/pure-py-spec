@@ -69,7 +69,7 @@ def check_lint(r: Runner) -> None:
 def check_mypy_compatibility(r: Runner) -> None:
     with r.test("mypy compatibility"):
         paths = sorted(
-            (SRC / SUITE / MODULE_LEVEL / PythonOutcome.NO_EXCEPTION / PurePyOutcome.RESULT).rglob(
+            (SRC / SUITE / MODULE_LEVEL / PythonOutcome.SUCCEEDS / PurePyOutcome.AGREES).rglob(
                 "*.py"
             )
         )

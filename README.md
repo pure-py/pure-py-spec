@@ -55,26 +55,26 @@ directory holding `main.py`, the expectation files of `main.py` and the other mo
 
 The outcome under Python is one of:
 
-- `syntax-error/`: Python raises `SyntaxError` before running the program
-- `exception/`: Python raises another exception while running the program
-- `no-exception/`: Python runs the program with the expected output
+- `python-rejects/`: Python raises `SyntaxError` before running the program
+- `python-raises/`: Python raises another exception while running the program
+- `python-succeeds/`: Python runs the program with the expected output
 
 The outcome under PurePy is one of:
 
-- `parser/`: rejected by the parser
-- `type-checker/`: rejected by the type checker
+- `parser-rejects/`: rejected by the parser
+- `typing-rejects/`: rejected by the type checker
 - `undefined/`: well-formed, and the run aborts with termination kind `undef`
-- `result/`: well-formed, and the run yields the same result as under Python, including the same exception
+- `agrees/`: well-formed, and the run yields the same result as under Python, including the same exception
 
-The directory `no-exception/result/mypy-bug/` holds tests rejected by mypy because of a behaviour reported as a
+The directory `python-succeeds/agrees/mypy-bug/` holds tests rejected by mypy because of a behaviour reported as a
 mypy bug; the runner fails a test if mypy accepts it.
 
-Every other test in `no-exception/result/` also type-checks under mypy (`test/mypy.ini`). The tests in
+Every other test in `python-succeeds/agrees/` also type-checks under mypy (`test/mypy.ini`). The tests in
 `module-level/syntactic-only/` construct a form as an AST, because Python source cannot express the form, and
 check that PurePy rejects it.
 
-A test has `.expected` under `no-exception/` and `.exception.expected` elsewhere, naming `SyntaxError` exactly
-under `syntax-error/`, so a misfiled test fails. A test that exits with a nonzero status through `sys.exit`
+A test has `.expected` under `python-succeeds/` and `.exception.expected` elsewhere, naming `SyntaxError` exactly
+under `python-rejects/`, so a misfiled test fails. A test that exits with a nonzero status through `sys.exit`
 states the status in `.status.expected`.
 
 The first line of a test may cite a rule of the specification as `# rule: name`: for a test rejected by the type
