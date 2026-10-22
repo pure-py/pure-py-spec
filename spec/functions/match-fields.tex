@@ -4,6 +4,6 @@
 \matchFields{\Sigma}(\rho, C, (\seq{p}, \seq{y} \mathord{=} \seq{p}\,'), \bind{\seq{z}}{\seq{v}}) &{}= \errType \\*
 &\qquad \text{if } C = \clsRange \text{ and } |\seq{p}| \geq 1 \\*
 \matchFields{\Sigma}(\rho, C, (\seq{p}, \seq{y} \mathord{=} \seq{p}\,'), \bind{\seq{z}}{\seq{v}}) &{}= \errType \\*
-&\qquad \text{if } \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \text{, and } |\seq{p}| > |\seq{x}| \text{,} \\*
-&\qquad \text{or } y_i = x_j \text{ for some } j \leq |\seq{p}| \\*
+&\qquad \text{if } \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \text{, and either } |\seq{p}| > |\seq{x}| \\*
+&\qquad \text{or } y_i = x_j \text{ for some } i \text{ and some } j \leq |\seq{p}| \\*
 \matchFields{\Sigma}(\rho, C, a, \bind{\seq{z}}{\seq{v}}) &{}= \errExcluded \quad \text{(otherwise)}
