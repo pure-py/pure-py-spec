@@ -80,7 +80,7 @@ For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with 
 result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). \Added{A variable
 not bound in $\rho$, or bound to $\Unbound$, aborts with $\errName$\speconly{ (\ruleName{eval-var-unknown},
 \ruleName{eval-var-unbound})}. A call of a value other than a closure or primitive, a call with the wrong number
-of arguments and a constructor call with arguments which do not cover the fields of the class abort with
+of arguments, and a constructor call with arguments which do not cover the fields of the class, abort with
 $\errType$\speconly{ (\ruleName{eval-call-nonfun}, \ruleName{eval-call-lambda-arity}, \ruleName{eval-call-def-arity},
 \ruleName{eval-constr-arity})}, and a reference to an attribute absent from an object with $\errAttr$\speconly{
 (\ruleName{eval-attr-missing})}, as in Python.} The operators
