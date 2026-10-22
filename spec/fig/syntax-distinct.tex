@@ -3,31 +3,19 @@
 \centering
 \footnotesize
 \setlength{\tabcolsep}{4pt}
-\speconly{%
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}>{\raggedright\arraybackslash}p{0.3\textwidth}}
-\arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}Form & Production & Pairwise distinct \\
-Class definition, type alias & DataclassExtend, Dataclass, TypeAlias & type parameters $\seq{\alpha}$ \\\rowgap
-Function definition & Def & type parameters $\seq{\alpha}$; parameters $\seq{x}$ \\\rowgap
-Lambda & Lambda & parameters $x_1, \ldots, x_n$ \\\rowgap
-Argument list & Args & keyword arguments $\seq{x}$ \\\rowgap
-Dictionary pattern & PatDict & keys $w_1, \ldots, w_n$ \\\rowgap
-Case & Case & variables bound by the pattern $p$ \\
-\hline
-\end{tabular}}%
-\paperonly{%
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.4\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.58\textwidth}>{\raggedright\arraybackslash}p{0.3\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Form & Pairwise distinct \\
-Class definition, type alias & type parameters $\seq{\alpha}$ \\\rowgap
-Function definition & type parameters $\seq{\alpha}$; parameters $\seq{x}$ \\\rowgap
-Lambda & parameters $x_1, \ldots, x_n$ \\\rowgap
-Argument list & keyword arguments $\seq{x}$ \\\rowgap
-Dictionary pattern & keys $w_1, \ldots, w_n$ \\\rowgap
-Case & variables bound by the pattern $p$ \\
+$\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}$\speconly{, $\exDataclass{c[\seq{\alpha}]}{\phi}$} & type parameters $\seq{\alpha}$ \\\rowgap
+$\exTypeAlias{x[\seq{\alpha}]}{\psi}$ & type parameters $\seq{\alpha}$ \\\rowgap
+$\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$ & type parameters $\seq{\alpha}$; parameters $\seq{x}$ \\\rowgap
+$\exLambda{\seq{x}}{e}$ & parameters $\seq{x}$ \\\rowgap
+$\seq{u}, \seq{x} \mathord{=} \seq{u}'$ & keyword arguments $\seq{x}$ \\\rowgap
+$\patDict{\bind{\seq{w}}{\seq{p}}}$ & keys $\seq{w}$ \\\rowgap
+$\exCase{p}{s}$ & variables bound by the pattern $p$ \\
 \hline
-\end{tabular}}
-\caption{Additional distinctness conditions ensuring every \PurePy program is syntactically valid Python}
+\end{tabular}
+\caption{Distinctness conditions ensuring every program is syntactically valid Python}
 \label{fig:syntax-distinct}
 \end{AddedBlock}
 \end{figure}
