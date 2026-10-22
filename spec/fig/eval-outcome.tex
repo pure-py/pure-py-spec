@@ -457,7 +457,7 @@
   d_j = \exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s} \\
   v_i = \exDefClosure[\Delta]{\rho'}{\seq{d}}{i} \quad (\forall i) \\
   \rho, \seq{e} \Rightarrow \val{\seq{u}} \\
-  \rho' \override \set{\bind{\declaresS(\seq{d})}{\seq{v}}} \override \set{\bind{\seq{x}}{\seq{u}}} \override \scopeS(\set{\seq{x}}, s), s \Rightarrow o
+  \rho' \override \set{\bind{\declaresS(\seq{d})}{\seq{v}}} \override \set{\bind{\seq{x}}{\seq{u}}} \override \scopeS(\replaced{\seq{x}}{\set{\seq{x}} }, s), s \Rightarrow o
 }
 {
   \rho, \exCall{e}{\seq{e}} \Rightarrow \result(o)

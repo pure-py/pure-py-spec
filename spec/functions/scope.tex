@@ -1,2 +1,4 @@
-\scopeS(Y, s) &{}= \set{\bind{x}{\Unbound} \mid x \in \assignsS(s) \setminus Y} \\*
-&\qquad \text{if } \declaresS(s) \text{ distinct and } Y, \set{\declaresS(s)}, \binds(s) \text{ pairwise disjoint}
+\scopeS(\replaced{\seq{y}}{Y }, s) &{}= \set{\bind{x}{\Unbound} \mid x \in \assignsS(s) \setminus \replaced{\set{\seq{y}}}{Y }} \\*
+&\deleted{\qquad \text{if } \declaresS(s) \text{ distinct and } Y, \set{\declaresS(s)}, \binds(s) \text{ pairwise disjoint}} \\*
+&\added{\qquad \text{if } \seq{y} \text{ distinct, } \declaresS(s) \text{ distinct,}} \\*
+&\added{\qquad \text{and } \set{\seq{y}}, \set{\declaresS(s)}, \binds(s) \text{ pairwise disjoint}}

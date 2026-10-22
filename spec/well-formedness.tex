@@ -288,7 +288,7 @@ The restriction is for compatibility with mypy (\paperonly{\secref{python-compat
 checks $e$ against its declared type (\ruleName{assign}); the form $\exAssign{x\exAnnot{\psi}}{e}$ declares and
 assigns $x$ at once (\ruleName{declare-assign}). A declaration does not check
 whether its name is already declared; that check is made once for the whole scope, when the rules for function
-definitions and modules introduce the variables of the scope as unbound, using the function $\scopeS(Y, s)$\speconly{
+definitions and modules introduce the variables of the scope as unbound, using the function $\scopeS(\replaced{\seq{y}}{Y }, s)$\speconly{
 (\S\ref{aux:scope})}.}
 
 \speconly{The conditions of \pyinline{if} and \pyinline{assert}
