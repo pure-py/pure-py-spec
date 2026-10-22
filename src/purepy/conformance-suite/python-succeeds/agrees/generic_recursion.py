@@ -1,3 +1,4 @@
+# rule: callee-scheme
 def last[T](x: T, n: int) -> T:
     return x if n == 0 else last(x, n - 1)
 

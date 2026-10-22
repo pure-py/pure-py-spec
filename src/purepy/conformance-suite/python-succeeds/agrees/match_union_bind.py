@@ -1,3 +1,4 @@
+# rule: check-union
 def f(xs: list[int] | list[str]) -> int | str:
     match xs:
         case [a]:

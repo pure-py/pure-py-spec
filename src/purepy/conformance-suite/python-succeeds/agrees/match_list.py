@@ -1,3 +1,4 @@
+# rule: pat-list
 def f(v: list[int]) -> int:
     match v:
         case [a, b]:

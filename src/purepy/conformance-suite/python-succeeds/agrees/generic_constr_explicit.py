@@ -1,3 +1,4 @@
+# rule: constr-explicit
 from dataclasses import dataclass
 
 

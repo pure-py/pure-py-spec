@@ -1,3 +1,4 @@
+# rule: imp-member
 import lib
 from lib import first
 

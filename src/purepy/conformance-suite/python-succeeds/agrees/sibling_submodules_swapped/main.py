@@ -1,3 +1,4 @@
+# rule: submodules-cons
 import pkg.b
 import pkg.a
 print(pkg.a.u)

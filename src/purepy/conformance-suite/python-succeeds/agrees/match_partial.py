@@ -1,3 +1,4 @@
+# rule: match-partial
 def f(v: tuple[int, int] | int) -> int:
     match v:
         case (x, y):

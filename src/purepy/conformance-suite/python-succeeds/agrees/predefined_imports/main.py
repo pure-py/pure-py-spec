@@ -1,3 +1,4 @@
+# rule: predefined
 import builtins
 import sys
 from dataclasses import dataclass

@@ -1,1 +1,2 @@
+# rule: program
 print("ok")

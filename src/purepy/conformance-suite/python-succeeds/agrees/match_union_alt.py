@@ -1,3 +1,4 @@
+# rule: pat-shapes
 def f(xs: list[int] | list[str]) -> int:
     match xs:
         case ["a"]:

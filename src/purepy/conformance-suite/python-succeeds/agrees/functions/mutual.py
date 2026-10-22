@@ -1,3 +1,4 @@
+# rule: defs
 def even(n: int) -> bool:
     if n == 0:
         return True

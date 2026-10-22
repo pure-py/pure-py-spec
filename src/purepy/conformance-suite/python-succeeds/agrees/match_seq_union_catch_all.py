@@ -1,3 +1,4 @@
+# rule: check-var
 def f(s: list[int] | tuple[int, int]) -> int:
     match s:
         case t:

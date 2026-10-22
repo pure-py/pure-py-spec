@@ -1,3 +1,4 @@
+# rule: split-literal
 def f(x: int) -> str:
     match x:
         case -3:

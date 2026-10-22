@@ -223,7 +223,7 @@ def assigns_body(body: list[ast.stmt]) -> set[Var]:
 
 
 def declares(s: ast.stmt) -> list[tuple[Var, ast.stmt]]:
-    """Names declared in `s`, or bound by import `s`, with their nodes, in textual order and
+    """Names declared in `s`, or bound by import `s`, with their AST nodes, in textual order and
     with repeats."""
     match s:
         case ast.AnnAssign():
@@ -249,7 +249,7 @@ def declares_body(body: list[ast.stmt]) -> list[tuple[Var, ast.stmt]]:
 
 
 def declares_imports(iotas: list[ast.stmt]) -> list[tuple[Var, ast.stmt]]:
-    """Names bound by the import prefix, with their nodes, the root of a plain import listed once"""
+    """Names bound by the import prefix, with their AST nodes, the root of a plain import listed once"""
     match iotas:
         case []:
             return []

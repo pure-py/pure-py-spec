@@ -1,3 +1,4 @@
+# rule: eval-call-def
 from typing import Callable
 def outer(x: int) -> Callable[[int], Callable[[int], int]]:
     def middle(y: int) -> Callable[[int], int]:

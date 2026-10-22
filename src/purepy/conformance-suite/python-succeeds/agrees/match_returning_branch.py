@@ -1,3 +1,4 @@
+# rule: match-cases
 def f(v: tuple[int, int] | int) -> int:
     r: int
     match v:

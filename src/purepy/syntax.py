@@ -500,8 +500,7 @@ def check_syntax_top_level(body: list[ast.stmt]) -> None:
     for s in stmts:
         if is_import(s):
             raise NotAllowed(s, "import after another statement")
-        ret = return_outside_function(s)
-        if ret is not None:
+        for ret in returns_outside_function(s):
             raise NotAllowed(ret, "return outside a function")
         if isinstance(s, ast.ClassDef):
             check_syntax_classdef(s)
@@ -511,26 +510,17 @@ def check_syntax_top_level(body: list[ast.stmt]) -> None:
             check_syntax_stmt(s)
 
 
-def return_outside_function(s: ast.stmt) -> ast.Return | None:
+def returns_outside_function(s: ast.stmt) -> list[ast.Return]:
+    """Return statements of a top-level statement s, which Python rejects when compiling a module"""
     match s:
         case ast.Return():
-            return s
+            return [s]
         case ast.If(body=ss, orelse=ss_):
-            return next(
-                (r for s_ in ss + ss_ if (r := return_outside_function(s_)) is not None), None
-            )
+            return [r for s_ in ss + ss_ for r in returns_outside_function(s_)]
         case ast.Match(cases=cases):
-            return next(
-                (
-                    r
-                    for case in cases
-                    for s_ in case.body
-                    if (r := return_outside_function(s_)) is not None
-                ),
-                None,
-            )
+            return [r for case in cases for s_ in case.body for r in returns_outside_function(s_)]
         case _:
-            return None
+            return []
 
 
 def check_syntax_generator(node: ast.comprehension) -> None:

@@ -1,3 +1,4 @@
+# rule: ty-alias
 from dataclasses import dataclass
 
 type Tree[T] = Leaf[T] | Node[T]

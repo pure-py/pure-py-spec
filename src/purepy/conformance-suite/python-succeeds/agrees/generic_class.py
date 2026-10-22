@@ -1,3 +1,4 @@
+# rule: class
 from dataclasses import dataclass
 
 

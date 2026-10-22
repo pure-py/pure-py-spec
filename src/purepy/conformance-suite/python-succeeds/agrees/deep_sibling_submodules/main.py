@@ -1,3 +1,4 @@
+# rule: import
 import pkg.sub.x
 import pkg.sub.y
 print(pkg.sub.x.u)

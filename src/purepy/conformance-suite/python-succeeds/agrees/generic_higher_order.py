@@ -1,3 +1,4 @@
+# rule: var-scheme
 from typing import Callable
 
 

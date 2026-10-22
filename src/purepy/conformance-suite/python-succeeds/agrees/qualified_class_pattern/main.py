@@ -1,3 +1,4 @@
+# rule: qualified
 import shapes
 p: shapes.Point = shapes.Point(5, 6)
 match p:

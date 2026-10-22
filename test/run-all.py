@@ -7,6 +7,7 @@ import sys
 from purepy.conformance import (
     MAIN,
     SUITE,
+    SYNTACTIC_ONLY,
     PurePyOutcome,
     PythonOutcome,
     Runner,
@@ -40,18 +41,25 @@ def check_unique_rule_names(r: Runner) -> None:
 
 
 def check_rule_attribution(r: Runner) -> None:
+    """Every test rejected by the type checker, undefined or agreeing cites a rule of the spec on its first
+    line; a test rejected by the parser cites none."""
     with r.test("rule attribution"):
         spec = {
             m
             for f in sorted((ROOT / "spec").rglob("*.tex"))
             for m in RULE_NAME.findall(f.read_text(encoding="utf-8"))
         }
-        for path in sorted(SUITE_DIR.rglob("*.py")):
-            if "__pycache__" in path.parts:
-                continue
+        for test in tests(SUITE_DIR):
+            path = test / MAIN if test.is_dir() else test
+            dirs = test.relative_to(SUITE_DIR).parts
+            cites = dirs[0] != SYNTACTIC_ONLY and dirs[1] != PurePyOutcome.PARSER_REJECTS
             cited = CITATION.match(path.read_text(encoding="utf-8").split("\n", 1)[0])
-            if cited is not None and cited.group(1) not in spec:
+            if cited is None and cites:
+                r.fail(f"{path.relative_to(SUITE_DIR)} cites no rule")
+            elif cited is not None and not cites:
                 r.fail(f"{path.relative_to(SUITE_DIR)} cites {cited.group(1)}")
+            elif cited is not None and cited.group(1) not in spec:
+                r.fail(f"{path.relative_to(SUITE_DIR)} cites {cited.group(1)}, not in the spec")
 
 
 def check_lint(r: Runner) -> None:

@@ -1,3 +1,4 @@
+# rule: imp-member
 from shapes import Derived
 
 d: Derived = Derived(1, 2)

@@ -1,3 +1,4 @@
+# rule: match
 n: int = 42
 match n:
     case 42:

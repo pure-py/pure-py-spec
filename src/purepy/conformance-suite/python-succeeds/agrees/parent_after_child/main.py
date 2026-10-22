@@ -1,3 +1,4 @@
+# rule: import
 import pkg.sub
 import pkg
 print(pkg.sub.y)

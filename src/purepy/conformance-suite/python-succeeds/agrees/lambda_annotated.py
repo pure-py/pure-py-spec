@@ -1,3 +1,4 @@
+# rule: lambda
 from typing import Callable
 
 f: Callable[[int], int] = lambda x: x + 1

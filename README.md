@@ -77,9 +77,9 @@ A test has `.expected` under `python-succeeds/` and `.exception.expected` elsewh
 under `python-rejects/`, so a misfiled test fails. A test that exits with a nonzero status through `sys.exit`
 states the status in `.status.expected`.
 
-A test may name a rule of the specification on its first line, as `# rule: name`. Under `typing-rejects/` the rule is
-the one with a premise or side condition that fails for the program. Under `undefined/` and `agrees/` the rule is the
-one yielding the result.
+Every test under `typing-rejects/`, `undefined/` and `agrees/` names a rule of the specification on its first line,
+as `# rule: name`. Under `typing-rejects/` the rule is the one with a premise or side condition that fails for the
+program. Under `undefined/` and `agrees/` the rule is the one yielding the result.
 
 Another type checker can be run over the suite installed with the `purepy` package, by passing a command
 which takes the path of a test and exits with the codes of the reference checker:

@@ -1,3 +1,4 @@
+# rule: if-else
 def foo(b: bool) -> int:
     z: int = 6
     x: int

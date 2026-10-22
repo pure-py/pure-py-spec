@@ -1,3 +1,4 @@
+# rule: type-alias
 type Pair = tuple[Elem, Elem]
 type Elem = int | str
 

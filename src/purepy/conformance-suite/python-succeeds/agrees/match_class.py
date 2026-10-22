@@ -1,3 +1,4 @@
+# rule: pat-constr
 from dataclasses import dataclass
 
 @dataclass

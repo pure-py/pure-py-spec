@@ -1,3 +1,4 @@
+# rule: callee-scheme
 def f[T](x: T | None, n: int) -> int:
     if n == 0:
         return 0

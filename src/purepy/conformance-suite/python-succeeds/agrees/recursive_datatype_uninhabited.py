@@ -1,3 +1,4 @@
+# rule: type-alias
 from dataclasses import dataclass
 
 type Stream = Cons

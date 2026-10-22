@@ -1,3 +1,4 @@
+# rule: match-cases
 from dataclasses import dataclass
 
 @dataclass

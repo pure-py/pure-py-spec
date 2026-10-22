@@ -1,3 +1,4 @@
+# rule: list-comp
 from typing import Callable
 
 n: int = 3

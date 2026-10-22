@@ -1,3 +1,4 @@
+# rule: class-extend
 from dataclasses import dataclass
 import base
 

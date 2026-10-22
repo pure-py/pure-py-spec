@@ -1,3 +1,4 @@
+# rule: pat-tuple
 v: tuple[int, list[int]] = (1, [2, 3])
 match v:
     case (a, [b, c]):

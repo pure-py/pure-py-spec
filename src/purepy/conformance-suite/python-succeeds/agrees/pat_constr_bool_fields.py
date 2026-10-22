@@ -1,3 +1,4 @@
+# rule: match
 from dataclasses import dataclass
 
 @dataclass
