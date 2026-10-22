@@ -96,13 +96,8 @@ module with the reference parser, translates it into the mechanised syntax and c
 code, which `make build` in `isabelle-purepy/` writes under `python/python_out/` and which must be on
 `PYTHONPATH`. A module outside the mechanised fragment, such as one with imports or type definitions, exits
 with code 5. The failures of the suite under the generated checker are listed in
-`test/mechanised-failures.txt`, so the list measures the fragment:
-
-```bash
-PYTHONPATH=isabelle-purepy/python/python_out/isabelle-purepy-python.Codegen/code \
-  uv run --locked purepy-conformance --no-run --checker "uv run --locked purepy-mechanised" \
-  --known-failures test/mechanised-failures.txt
-```
+`test/mechanised-failures.txt`, so the list measures the fragment; `make check-mechanised-checker` builds
+the mechanisation and runs the suite against the list, as the Build workflow does.
 
 ## Development
 
