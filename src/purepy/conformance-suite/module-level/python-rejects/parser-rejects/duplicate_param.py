@@ -1,4 +1,3 @@
-# rule: def-body
 def f(x: int, x: int) -> int:
     return x
 

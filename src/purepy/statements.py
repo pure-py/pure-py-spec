@@ -8,7 +8,6 @@ from . import reasons
 from .classes import (
     ArityMismatch,
     ClassTable,
-    RepeatedKeywordArg,
     UnknownKeywordArgs,
     class_table,
     declared_type,
@@ -199,7 +198,7 @@ def check_defs(ds: list[ast.FunctionDef], mod_ctx: ModuleContext) -> Assigns:
 def def_body(d: ast.FunctionDef, pi: CallableType | TypeScheme, mod_ctx: ModuleContext) -> None:
     alphas, tau = (pi.params, pi.tau) if isinstance(pi, TypeScheme) else ((), pi)
     assert isinstance(tau, CallableType)
-    xs = parameter_names(d.args, d, d.name)
+    xs = parameter_names(d.args)
     check_assignments_declared(d.body, set(xs))
     params = dict(zip(xs, tau.params, strict=True))
     type_vars = {alpha: TypeVar() for alpha in alphas}
@@ -213,12 +212,8 @@ def def_body(d: ast.FunctionDef, pi: CallableType | TypeScheme, mod_ctx: ModuleC
         )
 
 
-def parameter_names(args: ast.arguments, node: ast.AST, f: Var | None) -> list[Var]:
-    xs = [a.arg for a in args.args]
-    dup = next((x for i, x in enumerate(xs) if x in xs[:i]), None)
-    if dup is not None:
-        raise IllFormedModule(node, reasons.DuplicateParameter(dup, f))
-    return xs
+def parameter_names(args: ast.arguments) -> list[Var]:
+    return [a.arg for a in args.args]
 
 
 def check_returns_none(Sigma: ClassTable, s: ast.Return, declared: Type) -> None:
@@ -299,8 +294,7 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
             synth_expr(e, mod_ctx)
             return Assigns({})
         case ast.Return(value=e):
-            if returns is None:  # no return rule with empty return type
-                raise IllFormedModule(s, reasons.TopLevelReturn())
+            assert returns is not None  # return outside a function rejected by the parser
             if e is None:
                 check_returns_none(mod_ctx.Sigma, s, returns)
             else:
@@ -648,8 +642,6 @@ def constructor_args(c: ClassName, e: ast.Call, mod_ctx: ModuleContext) -> dict[
                 raise IllFormedModule(e, reasons.ConstructorArityMismatch(name, expected, given))
             case UnknownKeywordArgs(xs):
                 raise IllFormedModule(e, reasons.UnknownConstructorKeyword(name, xs))
-            case RepeatedKeywordArg():
-                raise AssertionError  # a syntax error in Python
     return args
 
 
@@ -730,7 +722,7 @@ def applied_lambda(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> Type:
 
 
 def lambda_arguments(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> VarContext:
-    params = parameter_names(f.args, f, None)
+    params = parameter_names(f.args)
     if len(e.keywords) > 0:
         raise IllFormedModule(e, reasons.KeywordArgumentsNotConstructor())
     if len(params) != len(e.args):
@@ -789,7 +781,7 @@ def check_expr(e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
 
 
 def check_lambda(e: ast.Lambda, expected: Type, mod_ctx: ModuleContext) -> None:
-    params = parameter_names(e.args, e, None)
+    params = parameter_names(e.args)
     if not isinstance(expected, CallableType):
         raise IllFormedModule(e, reasons.LambdaTypeMismatch(expected, None))
     if len(params) != len(expected.params):

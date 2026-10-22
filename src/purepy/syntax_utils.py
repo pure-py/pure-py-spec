@@ -55,19 +55,23 @@ def extend_type_region(region: list[TypeDefinition], rest: list[ast.stmt]) -> li
     return [region] + statements(rest)
 
 
-def binds(pattern: ast.pattern) -> set[Var]:
+def bound(pattern: ast.pattern) -> list[Var]:
+    """Variables bound by pattern, in order and with repetitions"""
     match pattern:
         case ast.MatchValue() | ast.MatchSingleton():
-            return set()
+            return []
         case ast.MatchAs(pattern=p, name=x):
-            sub = binds(p) if p is not None else set()
-            return sub | ({x} if x else set())
+            return (bound(p) if p is not None else []) + ([x] if x else [])
         case ast.MatchSequence(patterns=ps) | ast.MatchMapping(patterns=ps):
-            return set().union(*(binds(p) for p in ps))
+            return [x for p in ps for x in bound(p)]
         case ast.MatchClass(patterns=ps, kwd_patterns=ps_):
-            return set().union(*(binds(p) for p in list(ps) + list(ps_)))
+            return [x for p in list(ps) + list(ps_) for x in bound(p)]
         case _:
             raise AssertionError(f"unexpected pattern: {type(pattern).__name__}")
+
+
+def binds(pattern: ast.pattern) -> set[Var]:
+    return set(bound(pattern))
 
 
 def fv(e: ast.expr) -> set[Var]:

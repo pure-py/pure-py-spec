@@ -1,12 +1,12 @@
 import ast
 from collections.abc import Callable, Iterable, Sequence
+from functools import reduce
 from itertools import product
 
 from . import reasons
 from .classes import (
     ArityMismatch,
     ClassTable,
-    RepeatedKeywordArg,
     UnknownKeywordArgs,
     ancestors,
     field_map,
@@ -133,7 +133,7 @@ def match_tuple(k: Shape, p: PatTuple, mod_ctx: ModuleContext) -> Match | None:
     match k:
         case Tuple(ks):
             if len(ks) == len(ps):
-                return map_seq_match(Tuple, match_seq(ks, ps, p, mod_ctx))
+                return map_seq_match(Tuple, match_seq(ks, ps, mod_ctx))
             return None
         case _:
             return None
@@ -144,7 +144,7 @@ def match_list(k: Shape, p: PatList, mod_ctx: ModuleContext) -> Match | None:
     match k:
         case List(tau, ks):
             if len(ks) == len(ps):
-                return map_seq_match(lambda ks_: List(tau, ks_), match_seq(ks, ps, p, mod_ctx))
+                return map_seq_match(lambda ks_: List(tau, ks_), match_seq(ks, ps, mod_ctx))
             return None
         case _:
             return None
@@ -155,14 +155,11 @@ def match_dict(k: Shape, p: ast.MatchMapping, mod_ctx: ModuleContext) -> Match |
         case Dict():
             ws = key_patterns(p)
             keys = tuple(w for w, _ in ws)
-            repeated = [w for i, w in enumerate(keys) if w in keys[:i]]
-            if len(repeated) > 0:
-                raise IllFormedModule(p, reasons.DuplicateDictKey(repeated[0]))
             beta = dict(k.beta)
             if any(w not in beta for w in keys):
                 return None
             ks = tuple(beta[w] for w in keys)
-            result = match_seq(ks, tuple(q for _, q in ws), p, mod_ctx)
+            result = match_seq(ks, tuple(q for _, q in ws), mod_ctx)
             return map_seq_match(lambda ks_: with_keys(k, keys, ks_), result)
         case _:
             return None
@@ -174,7 +171,7 @@ def match_constr(k: Shape, p: ast.MatchClass, mod_ctx: ModuleContext) -> Match |
     match k:
         case Constr(tau, ks, hs):
             if c in ancestors(mod_ctx.Sigma, tau.c):
-                result = match_seq(ks, padded(ps, len(ks)), p, mod_ctx)
+                result = match_seq(ks, padded(ps, len(ks)), mod_ctx)
                 return map_seq_match(lambda ks_: Constr(tau, ks_, hs), result)
             return None
         case _:
@@ -312,16 +309,12 @@ def pattern_seq(Sigma: ClassTable, c: ClassName, p: ast.MatchClass) -> tuple[ast
         match no_field_map(Sigma, c, len(p.patterns), p.kwd_attrs):
             case ArityMismatch(expected, given):
                 raise IllFormedModule(p, reasons.PatternArityMismatch(name, expected, given))
-            case RepeatedKeywordArg():
-                raise IllFormedModule(p, reasons.DuplicatePatternKeyword(name))
             case UnknownKeywordArgs(xs):
                 raise IllFormedModule(p, reasons.UnknownFieldInPattern(name, xs))
     return tuple(args[x] for x in field_names(Sigma, c))
 
 
-def match_seq(
-    ks: ShapeSeq, ps: tuple[ast.pattern, ...], node: ast.pattern, mod_ctx: ModuleContext
-) -> SeqMatch | None:
+def match_seq(ks: ShapeSeq, ps: tuple[ast.pattern, ...], mod_ctx: ModuleContext) -> SeqMatch | None:
     results = [match(k, p, mod_ctx) for k, p in zip(ks, ps)]
     if any(result is None for result in results):
         return None
@@ -360,7 +353,7 @@ def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> VarConte
         case ast.MatchAs(pattern=ast.pattern() as q, name=str() as x):
             check_unbound(x, p, mod_ctx)
             delta = check_pattern(q, tau, mod_ctx)
-            return pattern_bindings([delta, {x: matched_as(tau, q, mod_ctx)}], p)
+            return pattern_bindings([delta, {x: matched_as(tau, q, mod_ctx)}])
         case ast.MatchValue() | ast.MatchSingleton():
             return {}
         case PatTuple(patterns=ps):
@@ -373,7 +366,7 @@ def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> VarConte
                 p,
                 mod_ctx,
                 lambda sigma: (
-                    check_seq(ps, sigma.components, p, mod_ctx)
+                    check_seq(ps, sigma.components, mod_ctx)
                     if isinstance(sigma, TupleType) and len(sigma.components) == len(ps)
                     else None
                 ),
@@ -388,7 +381,7 @@ def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> VarConte
                 p,
                 mod_ctx,
                 lambda sigma: (
-                    check_seq(ps, [sigma.elem] * len(ps), p, mod_ctx)
+                    check_seq(ps, [sigma.elem] * len(ps), mod_ctx)
                     if isinstance(sigma, ListType)
                     else None
                 ),
@@ -399,7 +392,7 @@ def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> VarConte
                 p,
                 mod_ctx,
                 lambda sigma: (
-                    check_seq(ps, [sigma.value] * len(ps), p, mod_ctx)
+                    check_seq(ps, [sigma.value] * len(ps), mod_ctx)
                     if isinstance(sigma, DictType)
                     else None
                 ),
@@ -419,7 +412,7 @@ def check_pattern(p: ast.pattern, tau: Type, mod_ctx: ModuleContext) -> VarConte
                         return None
                     case cls:
                         sigmas = [sigma_ for _, sigma_ in instantiate(fields(Sigma, c), cls.args)]
-                        return check_seq(qs, sigmas, p, mod_ctx)
+                        return check_seq(qs, sigmas, mod_ctx)
 
             return bindings_at(tau, p, mod_ctx, at_disjunct)
         case _:
@@ -432,12 +425,9 @@ def check_unbound(x: Var, p: ast.pattern, mod_ctx: ModuleContext) -> None:
 
 
 def check_seq(
-    ps: tuple[ast.pattern, ...] | list[ast.pattern],
-    taus: Sequence[Type],
-    node: ast.pattern,
-    mod_ctx: ModuleContext,
+    ps: tuple[ast.pattern, ...] | list[ast.pattern], taus: Sequence[Type], mod_ctx: ModuleContext
 ) -> VarContext:
-    return pattern_bindings([check_pattern(q, sigma, mod_ctx) for q, sigma in zip(ps, taus)], node)
+    return pattern_bindings([check_pattern(q, sigma, mod_ctx) for q, sigma in zip(ps, taus)])
 
 
 # Bindings joined over the disjuncts (check-union); a disjunct the pattern can't match binds at Never
@@ -549,14 +539,8 @@ def has_range_values(Sigma: ClassTable, tau: Type) -> bool:
     )
 
 
-def pattern_bindings(deltas: list[VarContext], node: ast.AST) -> VarContext:
-    merged: VarContext = {}
-    for delta in deltas:
-        repeated = sorted(merged.keys() & delta.keys())
-        if len(repeated) > 0:
-            raise IllFormedModule(node, reasons.NonlinearPattern(repeated[0]))
-        merged = disjoint_union(merged, delta)
-    return merged
+def pattern_bindings(deltas: list[VarContext]) -> VarContext:
+    return reduce(disjoint_union, deltas, {})
 
 
 def union(kss: Iterable[Shapes]) -> Shapes:

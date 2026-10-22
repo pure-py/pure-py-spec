@@ -1,4 +1,3 @@
-# rule: check-dict
 d: dict[str, int] = {"a": 1, "b": 2}
 match d:
     case {"a": x, "b": x}:

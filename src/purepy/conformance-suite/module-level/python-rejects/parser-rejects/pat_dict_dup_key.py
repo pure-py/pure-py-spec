@@ -1,4 +1,3 @@
-# rule: pat-dict
 d: dict[str, int] = {"a": 1}
 match d:
     case {"a": x, "a": y}:

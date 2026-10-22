@@ -1,4 +1,3 @@
-# rule: constr
 from dataclasses import dataclass
 
 

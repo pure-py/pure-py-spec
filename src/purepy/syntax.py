@@ -1,7 +1,7 @@
 import ast
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 
-from .syntax_utils import is_import, split_imports
+from .syntax_utils import bound, is_import, split_imports
 from .type_syntax import (
     Name,
     TypeName,
@@ -220,6 +220,9 @@ def check_syntax_stmt(node: ast.stmt) -> None:
                 if case.guard is not None:
                     raise Prohibited(case, "case guards")
                 check_syntax_pattern(case.pattern)
+                dup = repeated(bound(case.pattern))
+                if dup is not None:
+                    raise Prohibited(case.pattern, f"duplicate variable {dup} in pattern")
                 check_syntax_body(case.body)
         case ast.Break():
             raise Prohibited(node, "break")
@@ -261,13 +264,19 @@ def check_syntax_type_alias(node: ast.TypeAlias) -> None:
     check_syntax_annotation(node.value)
 
 
+def repeated[T](xs: Sequence[T]) -> T | None:
+    """First element occurring earlier in xs"""
+    return next((x for i, x in enumerate(xs) if x in xs[:i]), None)
+
+
 def check_syntax_type_params(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlias) -> None:
-    names = [
-        param.name
-        for param in node.type_params
-        if isinstance(param, (ast.TypeVar, ast.ParamSpec, ast.TypeVarTuple))
-    ]
-    dup = next((x for i, x in enumerate(names) if x in names[:i]), None)
+    dup = repeated(
+        [
+            param.name
+            for param in node.type_params
+            if isinstance(param, (ast.TypeVar, ast.ParamSpec, ast.TypeVarTuple))
+        ]
+    )
     if dup is not None:
         raise Prohibited(node, f"duplicate type parameter {dup}")
     for param in node.type_params:
@@ -317,12 +326,24 @@ def check_syntax_pattern(node: ast.pattern) -> None:
         case ast.MatchClass():
             for p in list(node.patterns) + list(node.kwd_patterns):
                 check_syntax_pattern(p)
+            dup = repeated(node.kwd_attrs)
+            if dup is not None:
+                raise Prohibited(node, f"duplicate keyword {dup} in constructor pattern")
         case ast.MatchMapping():
             if node.rest is not None:
                 raise Prohibited(node, "rest capture in dict patterns")
             for key in node.keys:
                 if not (isinstance(key, ast.Constant) and isinstance(key.value, str)):
                     raise Prohibited(key, "dict pattern key other than a string literal")
+            dup = repeated(
+                [
+                    key.value
+                    for key in node.keys
+                    if isinstance(key, ast.Constant) and isinstance(key.value, str)
+                ]
+            )
+            if dup is not None:
+                raise Prohibited(node, f"duplicate key '{dup}' in dictionary pattern")
             for sub in node.patterns:
                 check_syntax_pattern(sub)
         case ast.MatchOr():
@@ -385,6 +406,9 @@ def check_syntax_expr(node: ast.expr) -> None:
                 if k.arg is None:
                     raise Prohibited(k, "dict unpacking in argument list")
                 check_syntax_expr(k.value)
+            dup = repeated([k.arg for k in node.keywords])
+            if dup is not None:
+                raise Prohibited(node, f"duplicate keyword argument {dup}")
         case ast.IfExp():
             check_syntax_expr(node.test)
             check_syntax_expr(node.body)
@@ -472,12 +496,37 @@ def check_syntax_top_level(body: list[ast.stmt]) -> None:
     for s in stmts:
         if is_import(s):
             raise Prohibited(s, "import after another statement")
+        ret = return_outside_function(s)
+        if ret is not None:
+            raise Prohibited(ret, "return outside a function")
         if isinstance(s, ast.ClassDef):
             check_syntax_classdef(s)
         elif isinstance(s, ast.TypeAlias):
             check_syntax_type_alias(s)
         else:
             check_syntax_stmt(s)
+
+
+def return_outside_function(s: ast.stmt) -> ast.Return | None:
+    match s:
+        case ast.Return():
+            return s
+        case ast.If(body=ss, orelse=ss_):
+            return next(
+                (r for s_ in ss + ss_ if (r := return_outside_function(s_)) is not None), None
+            )
+        case ast.Match(cases=cases):
+            return next(
+                (
+                    r
+                    for case in cases
+                    for s_ in case.body
+                    if (r := return_outside_function(s_)) is not None
+                ),
+                None,
+            )
+        case _:
+            return None
 
 
 def check_syntax_generator(node: ast.comprehension) -> None:
@@ -513,6 +562,9 @@ def check_syntax_arguments(node: ast.arguments) -> None:
         raise Prohibited(node, "positional-only arguments")
     for a in node.args:
         check_syntax_annotation(a.annotation)
+    dup = repeated([a.arg for a in node.args])
+    if dup is not None:
+        raise Prohibited(node, f"duplicate parameter {dup}")
 
 
 def check_syntax_module(node: ast.Module) -> Unsupported | None:
