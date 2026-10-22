@@ -24,7 +24,7 @@ The grammar of \PurePy is an abstract syntax, so its metavariables $n$ and $w$ r
 negative number as unary minus applied to a numeric literal; the translation to abstract syntax folds the minus
 into the literal, so a number may be negative. The translation of
 source text into abstract syntax otherwise maps each form of Python's grammar to the form of the same shape in \speconly{\figrefTwo{syntax-stmt}{syntax-expr}}\paperonly{\figref{syntax-stmt}}, including the indentation that delimits blocks. The translation depends on the source text alone. In particular, a call $\exCall{q}{a}$ or $\exCall{q[e]}{a}$ is translated in the same way whether or not $q$ denotes a class; the well-formedness rules treat such a call as a constructor call when $q$ denotes a class (\secref{well-formedness}). A list of type parameters is always present in the abstract syntax and may be empty; in source an empty list is omitted, because in Python's grammar the list is optional and, when present, has at least one element. \Added{The grammar as
-written admits some programs which Python refuses to compile, such as a function with two parameters of the same
+written admits some programs which Python rejects as syntax errors, such as a function with two parameters of the same
 name. \figref{syntax-distinct} lists the conditions which rule out these programs.}
 
 \subsection{Contexts}
