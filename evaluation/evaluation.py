@@ -142,6 +142,39 @@ def validate_api_url(base_url):
         raise RuntimeError("remote API connections require HTTPS")
 
 
+def read_completion_stream(response):
+    content = []
+    result = {"choices": [{"message": {"content": ""}, "finish_reason": None}]}
+    for line in response:
+        if not line.startswith(b"data:"):
+            continue
+        event = line[5:].strip()
+        if event == b"[DONE]":
+            if result["choices"][0]["finish_reason"] is None or "usage" not in result:
+                raise RuntimeError("API stream is missing its final verdict or token usage; not retried")
+            result["choices"][0]["message"]["content"] = "".join(content)
+            return result
+        if not event:
+            continue
+        chunk = json.loads(event)
+        if "error" in chunk:
+            raise RuntimeError("API returned a streaming error; no automatic retry was made")
+        for field in ("id", "model", "system_fingerprint"):
+            if chunk.get(field) is not None:
+                result[field] = chunk[field]
+        if chunk.get("usage") is not None:
+            result["usage"] = chunk["usage"]
+        for choice in chunk.get("choices", []):
+            if choice.get("index", 0) != 0:
+                raise RuntimeError("expected exactly one generated answer")
+            text = choice.get("delta", {}).get("content")
+            if text:
+                content.append(text)
+            if choice.get("finish_reason") is not None:
+                result["choices"][0]["finish_reason"] = choice["finish_reason"]
+    raise RuntimeError("API stream disconnected before [DONE]; no automatic retry was made")
+
+
 def request(base_url, provider, model, messages, max_tokens):
     validate_api_url(base_url)
     key_name = {"anthropic": "ANTHROPIC_API_KEY", "deepseek": "DEEPSEEK_API_KEY",
@@ -174,8 +207,7 @@ def request(base_url, provider, model, messages, max_tokens):
     try:
         with urllib.request.urlopen(call, timeout=1800) as response:
             if payload.get("stream"):
-                import experiment
-                body = experiment.read_completion_stream(response)
+                body = read_completion_stream(response)
             else:
                 body = json.load(response)
     except urllib.error.HTTPError as error:

@@ -13,14 +13,32 @@ import tempfile
 import traceback
 
 
+def sandbox_profile(directory, read_paths=()):
+    directory = str(Path(directory).resolve())
+    runtime = Path(sys.executable).resolve().parent.parent
+    extra = " ".join(f"(literal {json.dumps(str(path.resolve()))})" for path in read_paths)
+    return f'''(version 1)
+    (deny default)
+    (allow process-exec (subpath {json.dumps(str(runtime))}) (literal {json.dumps(str(Path(sys.executable).resolve()))}))
+    (allow sysctl-read)
+    (allow mach-lookup)
+    (allow signal (target self))
+    (allow file-read-metadata)
+    (allow file-read*
+      (require-all (require-not (subpath "/Users")) (require-not (subpath "/Volumes"))
+                   (require-not (subpath "/private/var/folders")))
+      (subpath {json.dumps(str(runtime))}) (subpath {json.dumps(directory)}) {extra})
+    (allow file-write* (subpath {json.dumps(directory)}) (literal "/dev/null"))
+    '''
+
+
 def command(directory):
     python = str(Path(sys.executable).absolute())
     worker = str(Path(__file__).resolve())
     runtime = str(Path(sys.base_prefix).resolve())
     environment = str(Path(sys.prefix).resolve())
     if sys.platform == "darwin":
-        import experiment
-        profile = experiment.sandbox_profile(directory, [Path(worker)])
+        profile = sandbox_profile(directory, [Path(worker)])
         profile += f"\n(allow file-read* (subpath {json.dumps(environment)}))\n"
         return ["/usr/bin/sandbox-exec", "-p", profile, python, "-I", worker]
     if sys.platform == "linux":
