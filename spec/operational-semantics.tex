@@ -33,10 +33,10 @@ A \emph{termination
 kind} $\kappa$ records how a run ends; all but \replaced{$\errUndef$ and $\errExcluded$}{$\errExit{n}$ and $\errUndef$ } are named after the exceptions raised by the same program
 under Python in the same circumstances\added{, except that $\errExit{0}$ also records a run which completes normally}. \Added{A variable read before its assignment aborts with $\errName$ where
 Python raises \pyinline{UnboundLocalError}, a subclass of \pyinline{NameError}; distinguishing the two would require
-the environment to record whether unbound variables belong to functions or modules.} A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, \added{namely an operation allowed by Python
-but not defined by \PurePy,} such as a
+the environment to record whether unbound variables belong to functions or modules.} \added{Two termination kinds record operations which Python executes without an error.} A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, \added{one which the type system cannot rule out
+and \PurePy leaves undefined,} such as a
 comparison of two functions (\secref{no-coercions}). \Added{A run aborts with $\errExcluded$ when it reaches an operation
-ruled out by the type system but which Python executes without failing, such as a condition which evaluates to a non-Boolean.
+ruled out by the type system, such as a condition which evaluates to a non-Boolean.
 Attribute references, dictionary keys and constructor patterns headed by a built-in class, when ruled out by the type
 system, also abort with $\errExcluded$, even though Python sometimes rejects them; to be more precise here would require the
 semantics to model the attributes Python assigns to a value, the keys which Python considers hashable, and whether a value
