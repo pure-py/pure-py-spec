@@ -1,16 +1,15 @@
 # PurePy Evaluation
 
-The current pipeline uses Python 3.12 and the hash-pinned PurePy v0.22.3 release
-wheel in `pyproject.toml`. Dependencies are fixed in `uv.lock`. Historical v0.19.0
-experiments remain unchanged and must not be pooled with this protocol.
+The pipeline uses Python 3.12 and the PurePy v0.22.3 release wheel pinned by
+hash in `pyproject.toml`; dependencies are fixed in `uv.lock`.
 
 ## Run
 
-Install `uv`. On Linux, also install `bubblewrap`. Both macOS and Linux execute
-generated code in an OS sandbox without provider credentials, network access,
-or access to project files. The pipeline fails closed if isolation is unavailable.
+Install `uv`. On Linux, also install `bubblewrap`. Generated code runs in an OS
+sandbox without provider credentials, network access or access to project files;
+a run stops if no sandbox is available.
 
-For a self-contained, free infrastructure smoke test:
+For a self-contained smoke test:
 
 ```bash
 bash scripts/smoke.sh
@@ -18,7 +17,7 @@ bash scripts/smoke.sh
 
 This downloads a checksum-verified Ollama release and a small local model into
 `.cache/`, starts a private local server, runs two HumanEval problems, writes
-results and plots, and stops the server. It does not use hosted-model keys.
+results and plots, and stops the server.
 
 With an existing Ollama server:
 
@@ -26,86 +25,58 @@ With an existing Ollama server:
 bash scripts/evaluate.sh --model qwen2.5-coder:0.5b --limit 2 --repair-rounds 1
 ```
 
-For a hosted model, set the appropriate key in the local environment. Do not put
-keys in source files, arguments, result files, or chat. OpenAI-compatible endpoints
-use `OPENAI_API_KEY` when set; this also supports OpenRouter via `--base-url`.
-Native Anthropic and DeepSeek endpoints use their provider-specific environment
-variables. There are no automatic API retries.
+For a hosted model, set the provider's key in the environment, never in files or
+arguments. OpenAI-compatible endpoints use `OPENAI_API_KEY` when set, which also
+covers OpenRouter via `--base-url`; the native Anthropic and DeepSeek endpoints
+use `ANTHROPIC_API_KEY` and `DEEPSEEK_API_KEY`.
 
 ```bash
 bash scripts/evaluate.sh --provider deepseek --model deepseek-v4-pro --max-tokens 393216 --repair-rounds 3
 bash scripts/evaluate.sh --provider anthropic --model claude-opus-5-5 --max-tokens 16384 --benchmark livecodebench --difficulty hard
 ```
 
-`--repair-rounds 0` is the single-shot default. When enabled, only PurePy checker
-rejections are fed back to the model, never official tests or their diagnostics.
-Every raw answer, rejection, token usage, code revision and verdict is retained.
-Repair stops at checker acceptance or the configured budget, not test success.
-API failures and truncated responses are recorded, not automatically repaired.
-Python receives no feedback; reports distinguish initial and repaired results.
-API failures and outputs without code have unknown checker and test verdicts.
-They do not count as checker rejections. Reports show unknown counts explicitly,
-and leave RQ3 gaps unknown when either condition has unevaluated outputs.
+Select `--benchmark humaneval` or `--benchmark livecodebench`, optionally with
+`--difficulty medium` or `--difficulty hard`. `--repair-rounds 0`, the default,
+is single-shot. With repair rounds, PurePy checker rejections are fed back to
+the model, never test outcomes; repair stops at acceptance or the budget. Python
+answers get no feedback. Every raw answer, extracted source, verdict, rejection
+and token count is kept, and reports distinguish initial from repaired results.
 
-## Tagged Output
+## Output Format
 
-New runs use the `tagged-code-v1` prompt and extraction protocol for every
-provider. Python responses must contain one `<python>...</python>` pair;
-PurePy responses must contain one `<purepy>...</purepy>` pair. Initial prompts
-and PurePy checker-feedback prompts require source code inside these tags,
-without explanations, Markdown fences or text outside the tags.
+Prompts and the extraction protocol are versioned as `tagged-code-v1`. A Python
+answer must contain one `<python>...</python>` pair and a PurePy answer one
+`<purepy>...</purepy>` pair, with source only inside the tags. Only extracted
+source reaches the checker and the tests. A single complete pair with text
+outside it is evaluated, and its format is recorded as noncompliant. Missing,
+mismatched, nested or repeated tags, empty blocks and Markdown fences inside a
+block are format failures. Each attempt keeps its `raw_response`, its extracted
+`code` and its `output_format` status, and the reports show format compliance
+next to the checker and test outcomes.
 
-The checker and official tests receive only extracted source. A unique complete
-pair with outside text is evaluated, but its format is recorded as noncompliant.
-Missing, mismatched, nested or repeated tags, empty blocks, and Markdown fences
-inside blocks are format failures; source is not guessed or repaired. Such
-responses have unknown checker and test verdicts, and do not count as PurePy
-language rejections. API failures and truncated responses are also unevaluated,
-even when a partial response contains a complete tagged block. Format failures
-do not trigger extra model calls.
-
-Each attempt retains its original `raw_response`, extracted `code`, and separate
-`output_format` status. JSON and Markdown reports show format compliance alongside
-generation status, checker acceptance and official-test outcomes. Test pass counts
-are not evidence that PurePy improves algorithmic correctness when format
-compliance differs between conditions.
-
-Historical prompts and results, including the legacy Harbor generation path,
-remain unchanged. Run new tagged generations through `scripts/evaluate.sh`, then
-import their recorded outcomes into Harbor. Comparisons separate prompt and
-extraction versions; existing responses are not retroactively re-extracted or
-combined with new tagged runs. This change does not rerun any hosted models.
+An answer is left unevaluated, with unknown checker and test verdicts, after an
+API error, a truncated response or a format failure. Unknown verdicts never
+count as failures or as checker rejections: reports show them separately and
+leave a gap unknown when either condition has unevaluated answers.
 
 ## Data And Results
 
 HumanEval problems and official tests are downloaded from a fixed upstream
-revision and verified by SHA-256. `benchmarks/humaneval.json` contains only the
-frozen selection and provenance, not generated answers. The original pilot is
-20 of 164 HumanEval problems, sampled from 29 interface-compatible problems.
+revision and verified by SHA-256. `benchmarks/humaneval.json` holds the frozen
+selection: 20 of 164 problems, sampled from the 29 whose interfaces are typed.
 
-LiveCodeBench uses the frozen 20 medium and 20 hard typed call-based problems
-in `livecodebench/tasks.json`, independently of any model result. Missing fixtures
-are downloaded from the pinned release_v6 dataset. The pinned official grader
-and unchanged tests use the same external Solution wrapper for both conditions.
-The release has 1055 problems; the eligible pools are 207 medium and 102 hard.
-No contamination-free claim is made.
-On a fresh checkout, missing official test fixtures are downloaded for the frozen
-task IDs. Their function interfaces, test counts and SHA-256 hashes must match
-the selection. Cached fixtures are verified before reuse, and preparation does
-not resample tasks or rewrite `livecodebench/tasks.json`.
+LiveCodeBench uses the 20 medium and 20 hard typed call-based problems frozen in
+`livecodebench/tasks.json`, out of 207 and 102 eligible in release_v6. Missing
+official tests are downloaded from the pinned dataset for the frozen task IDs and
+must match the recorded interfaces, counts and hashes; preparation never resamples
+tasks. The pinned official grader runs unchanged tests through the same external
+`Solution` wrapper for both conditions.
 
-The historical `livecodebench/deepseek-v4-pro.json` includes the recorded Harbor
-checker and official-test verdicts for its 15 existing outputs. Its verification
-metadata records PurePy v0.19.0 and a generation fingerprint. Code and generation
-metadata are unchanged; missing outputs remain unknown. This is not a new model
-run or an evaluation under v0.22.3.
-
-Each run creates a new directory under `results/`. Its model-named JSON contains
-all generated code, per-round checker and official-test outcomes, failure modes,
-and first-round/final totals. Matching `.md`, `.pdf`, `.svg` and `.tex` files are
-generated by the same pipeline. Existing results are never overwritten.
-
-Code is also exported as ordinary `.py` files, one problem/condition per file:
+Each run creates a new directory under `results/`. Its model-named JSON holds the
+generated code, the per-round checker and test outcomes, the failure modes and
+the initial and final totals; `.md`, `.pdf`, `.svg` and `.tex` files are written
+beside it. Existing results are never overwritten. Code is also exported as
+ordinary `.py` files, one per problem, condition and round:
 
 ```text
 results/RUN/MODEL.json
@@ -115,36 +86,25 @@ results/RUN/solutions/MODEL/HumanEval-2/purepy.round-0.py
 results/RUN/solutions/MODEL/HumanEval-2/purepy.round-1.py
 ```
 
-`python.py` and `purepy.py` are the latest answer; round-numbered files preserve
-the initial answer and each repair. The JSON remains the authoritative complete
-record. Generated answers are not rewritten to remove comments or change syntax.
+`python.py` and `purepy.py` are the final answer; the round-numbered files keep
+the initial answer and each repair. The JSON is the complete record.
 
-Select `--benchmark humaneval` or `--benchmark livecodebench`, optionally with
-`--difficulty medium` or `--difficulty hard`. Any model ID supported by the
-selected provider can be supplied with `--model`; the script has no hard-coded
-four-model restriction. Qwen can use Ollama or an OpenAI-compatible vLLM server;
-Claude and DeepSeek also have native API adapters. MBPP, EvalPlus, OCaml and
-unchecked PurePy are not implemented, and are not presented as completed work.
+Every checker rejection keeps its full diagnostic and a category: features
+excluded by design, such as loops and mutation; features not yet supported, such
+as function keyword arguments; and cases flagged for manual review. The checker
+reports one diagnostic per invocation, so a different diagnostic in the next
+round is not taken as proof that the earlier feature was cleared.
 
-For the refined RQ3 hypothesis, compare runs with matched tasks and protocol:
+Runs with matched tasks and protocol can be compared across models:
 
 ```bash
 uv run --locked python evaluation.py compare results/RUN1/MODEL1.json results/RUN2/MODEL2.json --output results/comparison.json
 ```
 
-The comparison separates incompatible checker, prompt, repair-budget or backend
-versions. It reports signed Python-minus-PurePy test-rate gaps and Python-tests
-minus checker-valid-PurePy gaps, for initial and final answers separately.
-Positive means Python leads; negative means PurePy leads. Provider settings and
-token budgets remain potential confounders. Use `--model-size 14` only for a
-known parameter count; closed-model sizes are left unknown, not guessed.
-
-Every checker rejection retains its full diagnostic and a reviewable category.
-Known deliberate exclusions such as loops and mutation are separated from
-function keyword arguments, which the advisor identified as desired but not yet
-supported. Ambiguous restrictions are explicitly flagged for manual review.
-Only one diagnostic is exposed per checker invocation: a different diagnostic
-next round is not treated as proof that the earlier feature was cleared.
+The comparison groups runs by benchmark, tasks, prompts, checker, repair budget
+and platform, and reports the Python-minus-PurePy gaps for initial and final
+answers. Positive means Python leads. Provider settings and token budgets are
+listed but not controlled. `--model-size` records a known parameter count.
 
 The plot alone can be rendered from any result file:
 
@@ -154,34 +114,25 @@ uv run --locked python evaluation.py figure results/RUN/MODEL.json --output figu
 
 The paper's evaluation section includes `paper/fig/evaluation-generation.pdf`,
 which `make paper.pdf` in the repository root regenerates with this command from
-`figures/humaneval-qwen2.5-coder-0.5b.json`. That committed file is the pipeline's
-smoke run, so the paper build checks the figure code; replace it with the result
-file of the full experiment. The evaluation workflow also compiles a standalone
-document containing the generated `.tex` fragment.
+`figures/humaneval-qwen2.5-coder-0.5b.json`. That file is the smoke run for now.
 
 ## CI And Harbor
 
-The repository workflow `.github/workflows/evaluation.yml` runs in this directory
-and calls the same Bash entry points on macOS and Linux whenever evaluation code
-changes. It runs the unit tests, the smoke test, the Harbor import and the figure
-compilation. It checks infrastructure, not a target model accuracy. Incorrect code
-and checker rejections are legitimate experimental outcomes. API errors,
-unavailable checker/tests, and broken sandboxes fail the job. Reports are uploaded
-even if the run fails. No paid credentials are needed in CI.
+The workflow `.github/workflows/evaluation.yml` runs in this directory on macOS
+and Linux whenever evaluation code changes: unit tests, the smoke test, the
+Harbor import and the compilation of the generated figure. It checks that the
+pipeline works, not what the model answers: wrong code and checker rejections
+are ordinary outcomes, while API errors, an unavailable checker or grader, and a
+broken sandbox fail the job. Reports are uploaded even when the job fails.
 
-Harbor remains the experiment viewer and orchestration layer for historical runs.
-Import new-version results without evaluating them with the old checker:
+Harbor records each run as trials, one per problem and condition, and shows them
+in its viewer:
 
 ```bash
-bash scripts/harbor-import.sh --file results/RUN/MODEL.json --output results/RUN/harbor/MODEL.json
+bash scripts/harbor-import.sh --file results/RUN/MODEL.json
 ```
 
-This creates the pinned Harbor environment in `.cache/harbor-venv` when missing.
-Without `--output` the export goes to `harbor/results/`. See `harbor/README.md`
-for the viewer and for the historical one-shot experiments.
-
-The current repair loop is script-controlled. Letting a tool-using agent run the
-checker itself is a separate experimental condition, deferred for discussion.
+See `harbor/README.md` for the viewer, the rewards and the Slurm job for GPU runs.
 
 ## Validate
 
