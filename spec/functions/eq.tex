@@ -8,15 +8,15 @@
 \eqOp{\Sigma}(\pyinline{True}, \pyinline{False}) &{}= \eqOp{\Sigma}(\pyinline{False}, \pyinline{True}) = \val{\pyinline{False}} \\*
 \eqOp{\Sigma}(\pyinline{None}, \pyinline{None}) &{}= \val{\pyinline{True}} \\*
 \eqOp{\Sigma}(\pyinline{True}, n) &{}= \eqOp{\Sigma}(\pyinline{False}, n) = \aborts{\errUndef} \\*
-\eqOp{\Sigma}(n, \pyinline{True}) &{}= \eqOp{\Sigma}(n, \pyinline{False}) = \aborts{\errUndef} \\*[2mm]
+\eqOp{\Sigma}(n, \pyinline{True}) &{}= \eqOp{\Sigma}(n, \pyinline{False}) = \aborts{\errUndef} \clausegap
 \eqOp{\Sigma}(\exList{\seq{v}}, \exList{\seq{v}\,'}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*
-\eqOp{\Sigma}(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*[2mm]
+\eqOp{\Sigma}(\exTuple{\seq{v}}, \exTuple{\seq{v}\,'}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \clausegap
 \eqOp{\Sigma}(\bind{\seq{w}}{\seq{v}}, \delta') &{}= \padded{\eqElems{\Sigma}(\seq{v}, \delta'(\seq{w}))} \quad \text{if } \set{\seq{w}} = \dom(\delta') \\*
-\eqOp{\Sigma}(\delta, \delta') &{}= \padded{\val{\pyinline{False}}} \quad \text{if } \dom(\delta) \neq \dom(\delta') \\*[2mm]
+\eqOp{\Sigma}(\delta, \delta') &{}= \padded{\val{\pyinline{False}}} \quad \text{if } \dom(\delta) \neq \dom(\delta') \clausegap
 \eqOp{\Sigma}(\exObj{C}{\bind{\seq{x}}{\seq{v}}}, \exObj{C}{\bind{\seq{x}}{\seq{v}\,'}}) &{}= \eqElems{\Sigma}(\iterOp(\exObj{C}{\bind{\seq{x}}{\seq{v}}}), \iterOp(\exObj{C}{\bind{\seq{x}}{\seq{v}\,'}})) \\*
 &\qquad \text{if } C = \clsRange \\*
 \eqOp{\Sigma}(\exObj{C}{\bind{\seq{x}}{\seq{v}}}, \exObj{C}{\bind{\seq{x}}{\seq{v}\,'}}) &{}= \eqElems{\Sigma}(\seq{v}, \seq{v}\,') \\*
-&\qquad \text{if }  C \neq \clsRange \\*[2mm]
+&\qquad \text{if }  C \neq \clsRange \clausegap
 \eqOp{\Sigma}(v, v') &{}= \aborts{\errUndef} \\*
 &\qquad \text{if } v \text{ and } v' \text{ closures or primitives} \\*
 \eqOp{\Sigma}(v, v') &{}= \val{\pyinline{False}} \quad \text{(otherwise)}
