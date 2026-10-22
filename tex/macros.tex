@@ -47,7 +47,7 @@
   \begin{center}\small
   \setlength{\tabcolsep}{4pt}
   \ifdefined\specmode
-    \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.08\textwidth}}
+    \begin{tabular}{>{\raggedright\arraybackslash}p{0.25\textwidth}>{\raggedright\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.42\textwidth}>{\raggedright\arraybackslash}p{0.07\textwidth}}
   \else
     \begin{tabular}{>{\raggedright\arraybackslash}p{0.21\textwidth}>{\raggedright\arraybackslash}p{0.2\textwidth}>{\raggedright\arraybackslash}p{0.54\textwidth}}
   \fi
@@ -274,11 +274,15 @@
 \newcommand*{\errAssert}[1]{\errAssertNoMsg(#1)}
 \newcommand*{\errAssertNoMsg}{\mathsf{AssertionError}}
 \newcommand*{\errAttr}{\mathsf{AttributeError}}
+\newcommand*{\errExcluded}{\mathsf{excluded}}
 \newcommand*{\errExit}[1]{\mathsf{SystemExit}(#1)}
 \newcommand*{\errIndex}{\mathsf{IndexError}}
 \newcommand*{\errKey}{\mathsf{KeyError}}
+\newcommand*{\errName}{\mathsf{NameError}}
+\newcommand*{\errOverflow}{\mathsf{OverflowError}}
 \newcommand*{\errType}{\mathsf{TypeError}}
 \newcommand*{\errUndef}{\mathsf{undef}}
+\newcommand*{\errValue}{\mathsf{ValueError}}
 \newcommand*{\errZeroDiv}{\mathsf{ZeroDivisionError}}
 \newcommand*{\mlet}[3]{\mathsf{let}\;#1 \leftarrow #2\;\mathsf{in}\;#3}
 \newcommand*{\val}[1]{\mathsf{val}(#1)}
@@ -314,6 +318,7 @@
 \newcommand*{\nameOf}{\mathrm{name}}
 % Gap between table rows; \\[1mm] only deepens the last cell and is lost when another cell is taller
 \newcommand*{\rowgap}{\noalign{\vskip 1mm}}
+\newcommand*{\clausegap}{\\*[2mm]}
 \newcommand*{\submods}{\mathrm{submods}}
 
 % Metafunctions: lists, tuples, and dictionaries
@@ -329,6 +334,7 @@
 \newcommand*{\eqElems}[1]{\mathrm{eq\text{-}elems}_{#1}}
 \newcommand*{\eqOp}[1]{\mathrm{eq}_{#1}}
 \newcommand*{\matchOp}[1]{\mathrm{match}_{#1}}
+\newcommand*{\matchFields}[1]{\mathrm{match\text{-}fields}_{#1}}
 
 % Metafunctions: evaluation
 \newcommand*{\dispatch}{\mathrm{dispatch}}

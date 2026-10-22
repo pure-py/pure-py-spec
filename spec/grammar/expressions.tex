@@ -15,7 +15,7 @@ $e$ & $::=$ & $x$ & \speconly{(Var)} \\
     & $\mid$ & $e_1, \ldots, e_n$ & \speconly{(Tuple)} \\
     & $\mid$ & $\exListComp{e}{g_1\;\ldots\;g_n}$ & \speconly{(ListComp)} \\
     & $\mid$ & $\exDictComp{e}{e'}{g_1\;\ldots\;g_n}$ & \speconly{(DictComp)} \\
-    & $\mid$ & $\exLambda{x_1, \ldots, x_n}{e}$ & \speconly{(Lambda)}
+    & $\mid$ & $\exLambda{\seq{x}}{e}$ & \speconly{(Lambda)}
    \\[3mm]
 \grammarGroup{Comprehension qualifiers} \\
 $g$ & $::=$ & $\qualGuard{e}$ & \speconly{(Guard)} \\
@@ -38,6 +38,6 @@ $p$ & $::=$ & $\ell$ & \speconly{(PatLiteral)} \\
     & $\mid$ & $\patList{p_1, \ldots, p_n}$ & \speconly{(PatList)} \\
     & $\mid$ & $p_1, \ldots, p_n$ & \speconly{(PatTuple)} \\
     & $\mid$ & $\patConstr{q}{a}$ & \speconly{(PatConstr)} \\
-    & $\mid$ & $\patDict{\bind{w_1}{p_1}, \ldots, \bind{w_n}{p_n}}$ & \speconly{(PatDict)} \\
+    & $\mid$ & $\patDict{\bind{\seq{w}}{\seq{p}}}$ & \speconly{(PatDict)} \\
     & $\mid$ & $p\;\pyinline{as}\;x$ & \speconly{(PatAs)}
 \end{tabular}

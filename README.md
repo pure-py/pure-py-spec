@@ -2,7 +2,7 @@
 
 [![build](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml)
 
-## [v0.22.3](https://pure-py.github.io/pure-py-spec/v0.22.3/PurePy-spec.pdf)
+## [v0.23.0](https://pure-py.github.io/pure-py-spec/v0.23.0/PurePy-spec.pdf)
 
 PurePy is a pure (side-effect free) subset of Python, intended initially for researchers in programming
 languages and programming pedagogy, and in the longer term as a common language for scientific computing,
@@ -47,35 +47,39 @@ uv run --locked ./test/run-all.sh
 The command creates the project environment, installs the locked development dependencies, checks rule
 cross-references, runs mypy and ruff over `src/purepy/` and runs the conformance suite.
 
-Tests in `src/purepy/conformance-suite/` are organised by level, `module-level/` and `program-level/`, then by the outcome under Python and the
-outcome under PurePy, following the grid in the conformance section of the specification; the runner derives
-every assertion from the path. A module-level test is a `.py` file with expectation files as siblings
-(`.expected`, `.error.expected`, `.exception.expected`, `.status.expected`); a program-level test is a
-directory holding `main.py`, the expectation files of `main.py` and the other modules of the program.
+Tests in `src/purepy/conformance-suite/` are organised by the outcome under Python and the outcome under
+PurePy, following the grid in the conformance section of the specification; the runner derives every
+assertion from the path. A test of one module is a `.py` file with expectation files as siblings
+(`.expected`, `.error.expected`, `.exception.expected`, `.status.expected`); a test of a program of several
+modules is a directory holding `main.py`, the expectation files of `main.py` and the other modules.
 
 The outcome under Python is one of:
 
-- `syntax-error/`: Python raises `SyntaxError` before running the program
-- `exception/`: Python raises another exception while running the program
-- `no-exception/`: Python runs the program with the expected output
+- `python-rejects/`: Python raises `SyntaxError` before running the program
+- `python-raises/`: Python raises another exception while running the program
+- `python-succeeds/`: Python runs the program with the expected output
 
 The outcome under PurePy is one of:
 
-- `parser/`: rejected by the parser
-- `type-checker/`: rejected by the type checker
+- `parser-rejects/`: rejected by the parser
+- `typing-rejects/`: rejected by the type checker
 - `undefined/`: well-formed, and the run aborts with termination kind `undef`
-- `result/`: well-formed, and the run yields the same result as under Python, including the same exception
+- `agrees/`: well-formed, and the run yields the same result as under Python, including the same exception
 
-The directory `no-exception/result/mypy-bug/` holds tests rejected by mypy because of a behaviour reported as a
+The directory `python-succeeds/agrees/mypy-bug/` holds tests rejected by mypy because of a behaviour reported as a
 mypy bug; the runner fails a test if mypy accepts it.
 
-Every other test in `no-exception/result/` also type-checks under mypy (`test/mypy.ini`). The tests in
-`module-level/syntactic-only/` construct a form as an AST, because Python source cannot express the form, and
+Every other test in `python-succeeds/agrees/` also type-checks under mypy (`test/mypy.ini`). The tests in
+`syntactic-only/` construct a form as an AST, because Python source cannot express the form, and
 check that PurePy rejects it.
 
-A test has `.expected` under `no-exception/` and `.exception.expected` elsewhere, naming `SyntaxError` exactly
-under `syntax-error/`, so a misfiled test fails. A test that exits with a nonzero status through `sys.exit`
+A test has `.expected` under `python-succeeds/` and `.exception.expected` elsewhere, naming `SyntaxError` exactly
+under `python-rejects/`, so a misfiled test fails. A test that exits with a nonzero status through `sys.exit`
 states the status in `.status.expected`.
+
+Every test under `typing-rejects/`, `undefined/` and `agrees/` names a rule of the specification on its first line,
+as `# rule: name`. Under `typing-rejects/` the rule is the one with a premise or side condition that fails for the
+program. Under `undefined/` and `agrees/` the rule is the one yielding the result.
 
 Another type checker can be run over the suite installed with the `purepy` package, by passing a command
 which takes the path of a test and exits with the codes of the reference checker:

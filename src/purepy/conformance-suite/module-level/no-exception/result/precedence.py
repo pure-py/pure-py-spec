@@ -1,6 +1,0 @@
-print(2 ** 3 ** 2)
-print(-2 ** 2)
-print(2 - 1 - 1)
-print(not True == False)
-print(1 + 2 * 3)
-print(7 // 2 * 2)

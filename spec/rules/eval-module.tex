@@ -3,7 +3,7 @@
   \mathcal{M}(q) = \seq{\iota}\;t \\
   \mathcal{P}(\pyinline{builtins}) = (\Gamma, \rho) \\
   q, \seq{\iota} \Rightarrow \val{\rho'} \\
-  q, \rho \mathbin{\override} \rho' \mathbin{\override} \scopeS(\set{\declaresS(\seq{\iota})}, t), t \Rightarrow \assigns{\rho^\dagger}
+  q, \rho \mathbin{\override} \rho' \mathbin{\override} \scopeS(\declaresS(\seq{\iota}), t), t \Rightarrow \assigns{\rho^\dagger}
 }
 {
   q \Rightarrow_{\mathsf{mod}} \val{\submods(q) \override \rho^\dagger}

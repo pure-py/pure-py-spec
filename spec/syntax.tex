@@ -16,19 +16,20 @@ $X \setminus Y$ keeps the surviving elements of $X$ in their order; $X \disjunio
 and $Y$ are disjoint, appends the elements of $Y$ to those of $X$; $X \cup Y$ appends the elements of
 $Y$ not in $X$; and a product of ordered sets is ordered lexicographically.
 
-
 \subsection{Lexical syntax}
 \label{sec:lexical}
 
 The grammar of \PurePy is an abstract syntax, so its metavariables $n$ and $w$ range over numbers and strings rather than over the numerals and string literals of the source text. Python writes a
 negative number as unary minus applied to a numeric literal; the translation to abstract syntax folds the minus
 into the literal, so a number may be negative. The translation of
-source text into abstract syntax otherwise maps each form of Python's grammar to the form of the same shape in \speconly{\figrefTwo{syntax-stmt}{syntax-expr}}\paperonly{\figref{syntax-stmt}}, including the indentation that delimits blocks. The translation depends on the source text alone. In particular, a call $\exCall{q}{a}$ or $\exCall{q[e]}{a}$ is translated in the same way whether or not $q$ denotes a class; the well-formedness rules treat such a call as a constructor call when $q$ denotes a class (\secref{well-formedness}). A list of type parameters is always present in the abstract syntax and may be empty; in source an empty list is omitted, because in Python's grammar the list is optional and, when present, has at least one element.
+source text into abstract syntax otherwise maps each form of Python's grammar to the form of the same shape in \speconly{\figrefTwo{syntax-stmt}{syntax-expr}}\paperonly{\figref{syntax-stmt}}, including the indentation that delimits blocks. The translation depends on the source text alone. In particular, a call $\exCall{q}{a}$ or $\exCall{q[e]}{a}$ is translated in the same way whether or not $q$ denotes a class; the well-formedness rules treat such a call as a constructor call when $q$ denotes a class (\secref{well-formedness}). A list of type parameters is always present in the abstract syntax and may be empty; in source an empty list is omitted, because in Python's grammar the list is optional and, when present, has at least one element. The grammar as
+written admits some programs which Python rejects as syntax errors, such as a function with two parameters of the same
+name. \figref{syntax-distinct} lists the conditions which rule out these programs.
 
 \subsection{Contexts}
 \label{sec:contexts}
 
-Metavariables $x$, $f$, $c$ and $\alpha$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function, $c$ when it is expected to denote a class, and $\alpha$ when it is a type parameter. A \emph{name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}): a variable is a \emph{simple name}, and a name with at least one dot is \emph{qualified}. A name is \emph{fully qualified} when it is read from the root of the module hierarchy; modules (\secref{modules-programs}) and classes\speconly{ (Definition~\ref{def:class})} are identified by fully-qualified name.
+Metavariables $x$, $y$, $z$, $f$, $c$ and $\alpha$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function, $c$ when it is expected to denote a class and $\alpha$ when it is a type parameter. A \emph{name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}): a variable is a \emph{simple name}, and a name with at least one dot is \emph{qualified}. A name is \emph{fully qualified} when it is read from the root of the module hierarchy; modules (\secref{modules-programs}) and classes\speconly{ (Definition~\ref{def:class})} are identified by fully-qualified name.
 
 \begin{definition}[Context]
 \label{def:context}
@@ -90,18 +91,26 @@ the field annotations and base class of the definition under the context given b
 \label{sec:context-operations}
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
-an idempotent commutative semigroup of parallel composition $\merge$ (``merge''). \speconly{Together these form a
+up to type equivalence, an idempotent commutative semigroup of parallel composition $\Gamma \merge_{\Sigma} \Delta$ (``merge''). \speconly{Together these form a
 \emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
 distributivity does not hold.} Both are defined pointwise, by $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$
-for each operation $\cdot$, from operations on context entries: override is right-biased
-and has $\bot$ as both left and right unit, whereas merge has no unit, since a variable bound on one side
-only is possibly unassigned. Override is defined in the same way on any finite map with $\bot$ for
-undefined, such as an environment or class table.
+for each operation $\cdot$, from operations on context entries. Override is right-biased and has $\bot$
+as both left and right unit, and is defined in the same way on any finite map with $\bot$ for undefined, such as an
+environment or class table. Merge has no unit, since a variable defined in only one of the two contexts is possibly
+unassigned after the merge. Merge of different type schemes is undefined; a scope declares each name at most once,
+so the type schemes of functions agree across branches and the case does not arise. The types of declared variables
+also agree across branches, but patterns bind variables without declared types, at types which may differ between
+branches. When both entries of a variable are defined, merge therefore gives an entry at the join of the two types,
+definitely assigned if both entries are definitely assigned and possibly unassigned otherwise.
 \begin{specdefinition}{Override and merge of context entries}
 \begin{defalignat}{5}
-\theta & {}\merge \theta && {}= \theta &&& \qquad \bot & {}\override \theta && {}= \theta \\
-\theta & {}\merge \theta' && {}= \PU{\tau} && \quad \text{if } \theta \neq \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}, \bot} & \qquad \theta & {}\override \bot && {}= \theta \\
-\theta & {}\merge \theta' && {}= \PU{\scheme{\seq{\alpha}}{\tau}} && \quad \text{if } \theta \neq \theta' \in \set{\scheme{\seq{\alpha}}{\tau}, \PU{\scheme{\seq{\alpha}}{\tau}}, \bot} & \qquad \theta & {}\override \theta' && {}= \theta' \quad \text{(otherwise)}
+\theta & {}\merge_{\Sigma} \theta && {}= \theta &&& \qquad \bot & {}\override \theta && {}= \theta \\
+\sigma & {}\merge_{\Sigma} \tau && {}= \joinTy{\Sigma}{\sigma}{\tau} && \quad \text{if } \sigma \neq \tau & \qquad \theta & {}\override \bot && {}= \theta \\
+ &  &&  && \quad  & \qquad \theta & {}\override \theta' && {}= \theta' \quad \text{(otherwise)} \\
+\theta & {}\merge_{\Sigma} \theta' && {}= \PU{\joinTy{\Sigma}{\sigma}{\tau}} && \quad \text{if } \theta \neq \theta' \text{ and } \theta \in \set{\DU{\sigma}, \PU{\sigma}}, \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}} \\
+\sigma & {}\merge_{\Sigma} \theta && {}= \PU{\joinTy{\Sigma}{\sigma}{\tau}} && \quad \text{if } \theta \in \set{\DU{\tau}, \PU{\tau}} \\
+\bot & {}\merge_{\Sigma} \theta && {}= \theta \merge_{\Sigma} \bot = \PU{\tau} && \quad \text{if } \theta \in \set{\tau, \DU{\tau}, \PU{\tau}} \\
+\theta & {}\merge_{\Sigma} \theta' && {}= \PU{\scheme{\seq{\alpha}}{\tau}} && \quad \text{if } \theta \neq \theta' \in \set{\scheme{\seq{\alpha}}{\tau}, \PU{\scheme{\seq{\alpha}}{\tau}}, \bot}
 \end{defalignat}
 \end{specdefinition}
 
@@ -125,11 +134,12 @@ mutual def region and each mutual type region as one mutually-recursive binding\
 \specinput{spec/fig/syntax-expr}
 \specinput{spec/fig/syntax-types}
 \paperinput{paper/fig/syntax}
+\input{spec/fig/syntax-distinct}
 
 An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by
 keyword arguments $x = u$, where an argument $u$ is an expression in a call and a pattern in a
 constructor pattern. A constructor call may also pass type arguments to the class; a constructor pattern
-cannot, since Python does not permit type arguments in a class pattern. The auxiliary function $\fieldMap{\Sigma}$\speconly{
+cannot, since Python does not permit type arguments in a constructor pattern. The auxiliary function $\fieldMap{\Sigma}$\speconly{
 (\S\ref{aux:field-map})} pairs each field of the class
 with an argument: the positional arguments fill the leading fields in order, and a keyword argument $x = u$
 fills the field $x$. It is defined only if every field receives exactly one argument.
@@ -160,7 +170,7 @@ A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualifie
 (\figref{syntax-stmt}) to \emph{module bodies} $\mu$, of which one is a distinguished \emph{main module} named
 $\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
 $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
-$\seq{\iota}$, its \emph{import prefix}, followed by a top-level statement $t$; since imports are not statements, they can appear neither
+$\seq{\iota}$, its \emph{import prefix}, each a \emph{plain import} $\exImport{q}$ or a \emph{from-import} $\exFromImport{q}{\seq{x}}$, followed by a top-level statement $t$; since imports are not statements, they can appear neither
 within a statement nor after it. The statement begins with the
 declaration $\exAssign{\pymath{\_\_name\_\_}\exAnnot{\tyStr}}{\nameOf(q)}$, which binds the name of the module when the module
 loads (\secref{well-formedness-modules}).
@@ -186,8 +196,8 @@ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context 
 
 \speconly{\noindent The predefined signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in their union. The class table $\SigmaPredef$ of the predefined modules is
-$\set{\bind{\clsRange}{\ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}}}$, where $\chi$ is the definition
-\pyinline{@dataclass class range: start: int; stop: int} and $\Gamma$ is the signature of \pyinline{builtins}.}
+$\set{\bind{\clsRange}{\ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}}}$, where $\chi$ defines the dataclass \pyinline{range} with fields \pyinline{start: int} and
+\pyinline{stop: int} and $\Gamma$ is the signature of \pyinline{builtins}.}
 
 \specinput{spec/fig/predefined-signatures}
 

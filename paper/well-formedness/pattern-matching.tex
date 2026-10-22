@@ -1,7 +1,7 @@
 \paragraph{Pattern checking.}
 Checking a pattern against the remaining type (\ruleName{match-case}) rejects a tuple pattern at a type
-with list values and a list pattern at a type with tuple values, because matching either form of pattern
-against the other kind of sequence is undefined (\secref{eval-patterns}). It also rejects a constructor
+with list values and a list pattern at a type with tuple values, and either at a type with range values, because matching either form of pattern
+against the other kind of sequence or a range aborts with $\errExcluded$ (\secref{eval-patterns}). It also rejects a constructor
 pattern at a type which does not determine the type arguments omitted by the pattern.
 
 \paragraph{Shapes.}

@@ -11,6 +11,6 @@
 \typeArgs{\Sigma}(\seq{\alpha}, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \varnothing \\*
 &\qquad \rlap{$\text{if } \Sigma \vdash \tau \subty \sigma' \text{ and } \fv(\sigma') \cap \set{\seq{\alpha}} = \varnothing$} \\*
 \typeArgs{\Sigma}(\seq{\alpha}, \tyUnion{\sigma}{\sigma'}, \tau) &{}= \joinTy{\Sigma}{\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau)}{\typeArgs{\Sigma}(\seq{\alpha}, \sigma', \tau)} \quad \text{(otherwise)} \\*
-\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau) &{}= \varnothing \quad \text{(otherwise)} \\*[2mm]
+\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau) &{}= \varnothing \quad \text{(otherwise)} \clausegap
 \typeArgs{\Sigma}(\seq{\alpha}, \varepsilon, \varepsilon) &{}= \varnothing \\*
 \typeArgs{\Sigma}(\seq{\alpha}, \sigma \cons \seq{\sigma}, \tau \cons \seq{\tau}) &{}= \joinTy{\Sigma}{\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau)}{\typeArgs{\Sigma}(\seq{\alpha}, \seq{\sigma}, \seq{\tau})}

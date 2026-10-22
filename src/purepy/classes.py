@@ -227,7 +227,7 @@ def field_map[T](
 ) -> dict[Var, T] | None:
     xs = field_names(Sigma, c)
     n = len(positional)
-    if n + len(kwd_names) != len(xs) or len(set(kwd_names)) != len(kwd_names):
+    if n + len(kwd_names) != len(xs):
         return None
     if set(kwd_names) != set(xs[n:]):
         return None
@@ -241,16 +241,11 @@ class ArityMismatch:
 
 
 @dataclass(frozen=True)
-class RepeatedKeywordArg:
-    pass
-
-
-@dataclass(frozen=True)
 class UnknownKeywordArgs:
     xs: tuple[Var, ...]
 
 
-type FieldMapFailure = ArityMismatch | RepeatedKeywordArg | UnknownKeywordArgs
+type FieldMapFailure = ArityMismatch | UnknownKeywordArgs
 
 
 def no_field_map(
@@ -260,8 +255,6 @@ def no_field_map(
     xs = field_names(Sigma, c)
     if n + len(kwd_names) != len(xs):
         return ArityMismatch(len(xs), n + len(kwd_names))
-    if len(set(kwd_names)) != len(kwd_names):
-        return RepeatedKeywordArg()
     return UnknownKeywordArgs(tuple(sorted(set(xs[n:]))))
 
 

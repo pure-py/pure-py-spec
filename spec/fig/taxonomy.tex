@@ -8,27 +8,27 @@
   % Columns: Python outcome 0--3.2; PurePy: parser 3.2--5.8, type checker 5.8--8.4, undefined 8.4--11,
   % other result 11--13.9. Rows: does not raise exception 0--1.9, exception 1.9--3.3, SyntaxError 3.3--4.2,
   % column headers 4.2--6, PurePy 6--6.5.
-  \fill[raises] (3.2,3.3) rectangle (8.4,4.2) (3.2,1.9) rectangle (11,3.3);
+  \fill[raises] (3.2,3.3) rectangle (8.4,4.2) (5.8,1.9) rectangle (8.4,3.3);
   \fill[impossible] (8.4,3.3) rectangle (13.9,4.2);
-  \fill[excluded] (3.2,0) rectangle (11,1.9);
+  \fill[excluded] (3.2,0) rectangle (5.8,3.3) (5.8,0) rectangle (8.4,1.9) (8.4,0) rectangle (11,3.3);
   \fill[agree] (11,0) rectangle (13.9,3.3);
   \draw[black!33] (0,0) rectangle (13.9,6.5) (3.2,0) -- (3.2,6.5) (3.2,6) -- (13.9,6)
     (5.8,0) -- (5.8,6) (8.4,0) -- (8.4,6) (11,0) -- (11,6)
-    (0,1.9) -- (13.9,1.9) (0,3.3) -- (13.9,3.3) (0,4.2) -- (13.9,4.2) (11,0.5) -- (13.9,0.5);
+    (0,1.9) -- (3.2,1.9) (5.8,1.9) -- (8.4,1.9) (11,1.9) -- (13.9,1.9) (0,3.3) -- (13.9,3.3) (0,4.2) -- (13.9,4.2) (11,0.5) -- (13.9,0.5);
   \node at (3.3,6.45) {\textbf{\PurePy} (subdirectory)};
   \node at (0.1,5.95) {\textbf{Python}\\(directory)};
-  \node at (3.3,5.95) {Rejected by\\parser\\\testdir{parser/}};
-  \node at (5.9,5.95) {Rejected by\\type checker\\\testdir{type-checker/}};
+  \node at (3.3,5.95) {Rejected by\\parser\\\testdir{parser-rejects/}};
+  \node at (5.9,5.95) {Rejected by\\type checker\\\testdir{typing-rejects/}};
   \node at (8.5,5.95) {Well-formed,\\yields\\$\aborts{\errUndef}$\\\testdir{undefined/}};
-  \node at (11.1,5.95) {Well-formed,\\yields other result\\\testdir{result/}};
-  \node at (0.1,4.15) {Raises \pyinline{SyntaxError}\\\testdir{syntax-error/}};
-  \node at (0.1,3.25) {Raises other\\exception\\\testdir{exception/}};
-  \node at (0.1,1.85) {Does not raise\\exception\\\testdir{no-exception/}};
-  \node at (3.3,3.25) {No tests yet};
+  \node at (11.1,5.95) {Well-formed,\\yields other result\\\testdir{agrees/}};
+  \node at (0.1,4.15) {Raises \pyinline{SyntaxError}\\\testdir{python-rejects/}};
+  \node at (0.1,3.25) {Raises other\\exception\\\testdir{python-raises/}};
+  \node at (0.1,1.85) {Does not raise\\exception\\\testdir{python-succeeds/}};
+  \node at (3.3,4.15) {Rejected by both};
   \node at (5.9,3.25) {Python runtime\\error\\(\speconly{\figref{prevented-errors}}\paperonly{\secref{runtime-errors}})};
-  \node at (3.3,1.85) {Syntactically\\excluded};
+  \node at (3.3,2.05) {Syntactically\\excluded};
   \node at (5.9,1.85) {Statically\\excluded\\(\speconly{\figref{coercions}}\paperonly{\secref{no-coercions}})};
-  \node at (8.5,1.85) {Dynamically\\excluded\\(\speconly{\figref{coercions}}\paperonly{\secref{no-coercions}})};
+  \node at (8.5,2.2) {Dynamically\\excluded\\(\speconly{\figref{coercions}}\paperonly{\secref{no-coercions}})};
   \node at (11.1,0.48) {\testdir{mypy-bug/}};
   \draw[mypy] (8.46,0.06) -- (11,0.06) -- (11,0.56) -- (13.84,0.56) -- (13.84,3.24) -- (8.46,3.24) -- cycle;
   % Key, in two rows

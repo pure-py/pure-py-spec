@@ -84,7 +84,7 @@
 \and
 \inferrule*[lab={\ruleName{check-tuple-none}}]
 {
-  \tau \text{ has no list values} \\
+  \tau \text{ has no list or range values} \\
   \text{no disjunct of } \tau \text{ a tuple type of length } |\seq{p}|
 }
 {
@@ -101,7 +101,7 @@
 \and
 \inferrule*[lab={\ruleName{check-list-none}}]
 {
-  \tau \text{ has no tuple values} \\
+  \tau \text{ has no tuple or range values} \\
   \text{no disjunct of } \tau \text{ a list type}
 }
 {

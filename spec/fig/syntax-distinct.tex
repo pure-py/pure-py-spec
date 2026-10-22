@@ -1,0 +1,19 @@
+\begin{figure}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.58\textwidth}>{\raggedright\arraybackslash}p{0.3\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}\textit{Form} & \textit{Pairwise distinct} \\
+$\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}$\speconly{, $\exDataclass{c[\seq{\alpha}]}{\phi}$} & type parameters $\seq{\alpha}$ \\\rowgap
+$\exTypeAlias{x[\seq{\alpha}]}{\psi}$ & type parameters $\seq{\alpha}$ \\\rowgap
+$\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$ & type parameters $\seq{\alpha}$; parameters $\seq{x}$ \\\rowgap
+$\exLambda{\seq{x}}{e}$ & parameters $\seq{x}$ \\\rowgap
+$\seq{u}, \seq{x} \mathord{=} \seq{u}'$ & keyword arguments $\seq{x}$ \\\rowgap
+$\patDict{\bind{\seq{w}}{\seq{p}}}$ & keys $\seq{w}$ \\\rowgap
+$\exCase{p}{s}$ & variables bound by pattern $p$ \\
+\hline
+\end{tabular}
+\caption{Distinctness conditions ensuring every program is syntactically valid Python}
+\label{fig:syntax-distinct}
+\end{figure}

@@ -200,30 +200,6 @@ class UnknownFieldInPattern:
 
 
 @dataclass(frozen=True)
-class DuplicatePatternKeyword:
-    c: Var
-
-    def message(self) -> str:
-        return f"duplicate keyword in pattern for '{self.c}'"
-
-
-@dataclass(frozen=True)
-class DuplicateDictKey:
-    w: str
-
-    def message(self) -> str:
-        return f"duplicate key '{self.w}' in dict pattern"
-
-
-@dataclass(frozen=True)
-class NonlinearPattern:
-    x: Var
-
-    def message(self) -> str:
-        return f"repeated variable '{self.x}' in pattern"
-
-
-@dataclass(frozen=True)
 class DuplicateMember:
     x: Var
     q: Name
@@ -250,12 +226,6 @@ class UnassignedMember:
 
     def message(self) -> str:
         return f"member '{self.x}' of module '{self.q}' is not definitely assigned"
-
-
-@dataclass(frozen=True)
-class TopLevelReturn:
-    def message(self) -> str:
-        return "top-level return not allowed (module body must not return)"
 
 
 @dataclass(frozen=True)
@@ -400,16 +370,6 @@ class KeywordArgumentsNotConstructor:
 
 
 @dataclass(frozen=True)
-class DuplicateParameter:
-    x: Var
-    f: Var | None
-
-    def message(self) -> str:
-        where = "lambda" if self.f is None else f"function '{self.f}'"
-        return f"duplicate parameter '{self.x}' in {where}"
-
-
-@dataclass(frozen=True)
 class CallArityMismatch:
     expected: int
     given: int
@@ -479,10 +439,10 @@ class PatternClassUndetermined:
 class SequenceKindMismatch:
     kind: str
     tau: Type
+    other: str
 
     def message(self) -> str:
-        other = "list" if self.kind == "tuple" else "tuple"
-        return f"{self.kind} pattern at {render(self.tau)}, which has {other} values"
+        return f"{self.kind} pattern at {render(self.tau)}, which has {self.other} values"
 
 
 @dataclass(frozen=True)
@@ -583,7 +543,6 @@ type Reason = (
     | TypeAliasArityMismatch
     | NotPredefinedName
     | UnknownFieldInPattern
-    | DuplicatePatternKeyword
     | UnknownModule
     | DuplicateImportedName
     | UnknownMember
@@ -595,9 +554,6 @@ type Reason = (
     | NoTypeArgument
     | TypeAliasAsValue
     | UnknownConstructorKeyword
-    | DuplicateDictKey
-    | NonlinearPattern
-    | TopLevelReturn
     | TopLevelAssertFalse
     | DuplicateMember
     | SubmoduleNotImported
@@ -608,7 +564,6 @@ type Reason = (
     | NotCallable
     | CallArityMismatch
     | KeywordArgumentsNotConstructor
-    | DuplicateParameter
     | NoneResult
     | TypeMismatch
     | LambdaTypeMismatch

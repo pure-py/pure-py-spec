@@ -50,7 +50,7 @@ cases are stated with each.
 \funccases{class-table-region}
 \end{auxfunction}
 
-\begin{auxfunction}{\scopeS(Y, s)}{context}{aux:scope}
+\begin{auxfunction}{\scopeS(\seq{y}, s)}{context}{aux:scope}
 \input{spec/functions/scope-text}
 \funccases{scope}
 \end{auxfunction}
@@ -251,7 +251,12 @@ The functions on values used by the evaluation rules.
 \funccases{match}
 \end{auxfunction}
 
-\begin{auxfunction}{\dispatch(\rho, v, \seq{p}, \seq{s})}{bindings and statement}{aux:dispatch}
+\begin{auxfunction}{\matchFields{\Sigma}(\rho, C, a, \bind{\seq{z}}{\seq{v}})}{match result}{aux:match-fields}
+\input{spec/functions/match-fields-text}
+\funccases{match-fields}
+\end{auxfunction}
+
+\begin{auxfunction}{\dispatch(\rho, v, \seq{p}, \seq{s})}{bindings and statement, or termination kind}{aux:dispatch}
 \input{spec/functions/dispatch-text}
 \funccases{dispatch}
 \end{auxfunction}
