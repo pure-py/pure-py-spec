@@ -9,6 +9,22 @@ We evaluate \PurePy empirically along two axes, both concerning the ability of A
 How effectively can AI agents generate \PurePy solutions to standard functional-programming problems? This
 measures the ease of targeting the subset from a problem statement alone.
 
+The evaluation pipeline in \texttt{evaluation/} gives a model the same problems in Python and in \PurePy, runs
+the \PurePy checker and the benchmark's official tests on each answer, feeds checker rejections back to the model
+for a bounded number of repair rounds, and produces \figref{evaluation-generation} from the recorded outcomes.
+The figure reports how many of the selected problems pass the official tests, and how many are both accepted by
+the checker and pass the tests, for the initial answer and after repair. \todo{The committed result file is the
+pipeline's smoke run on two problems with a small local model; replace it with the full experiment.}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{paper/fig/evaluation-generation}
+\caption{Outcomes of the generation experiment, produced by the evaluation pipeline. Left: problems whose final
+program passes the official tests. Right: problems whose program is also accepted by the \PurePy checker; the Python
+condition is shown by its test outcome only, as it is not checked.}
+\label{fig:evaluation-generation}
+\end{figure}
+
 \subsection{Translating Python to \PurePy}
 \label{sec:evaluation-translating}
 
