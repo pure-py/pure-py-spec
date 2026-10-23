@@ -1,5 +1,5 @@
 """Translation of parsed modules into the mechanised syntax, and the type checker generated from the
-mechanisation as a checker command; the generated code is on PYTHONPATH"""
+mechanisation as a type checker command; the generated code is on PYTHONPATH"""
 
 import argparse
 import ast
@@ -413,7 +413,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         prog="purepy-mechanised",
         description="Check a program from its entry module with the type checker generated from the "
-        "mechanisation, with the generated code on PYTHONPATH; exits with the codes of the reference "
+        "mechanisation, with the generated code on PYTHONPATH; exits with the codes of the reference type "
         f"checker, or with {OUTSIDE_FRAGMENT} for a program outside the mechanised fragment",
     )
     parser.add_argument("path", type=pathlib.Path)

@@ -63,7 +63,7 @@ def check_rule_attribution(r: Runner) -> None:
 
 
 def check_lint(r: Runner) -> None:
-    with r.test("checker type-checks"):
+    with r.test("type checker passes mypy and ruff"):
         sources = sorted(str(path) for path in SRC.glob("*.py")) + [str(TEST / "run-all.py")]
         for tool in (
             ["mypy", "--strict", "--python-version", PYTHON_VERSION],

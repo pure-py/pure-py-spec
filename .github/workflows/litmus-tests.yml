@@ -1,6 +1,6 @@
 name: Litmus tests
 
-# Run only when the checker, the tests or their environment change; the paper and
+# Run only when the type checker, the tests or their environment change; the paper and
 # specification have their own Build workflow.
 on:
   push:
