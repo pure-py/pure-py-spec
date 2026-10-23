@@ -455,7 +455,7 @@ recursively, preferring checked modules to stubs:}%
 \noindent \speconly{A from-import also checks any imported name that denotes a submodule, and the
 names it imports must be distinct. A
 containing module of the target is exempt from checking if it is the importing module or one of its
-containing modules\speconly{ (\S\ref{aux:containing})}, because at runtime it may still be loading when the import executes. The exemption applies only to from-imports, because
+containing modules\speconly{ (\S\ref{aux:unique-to})}, because at runtime it may still be loading when the import executes. The exemption applies only to from-imports, because
 for a plain import
 the only containing module that could never load first is the importing module itself, and an import naming a
 module contained in the importing module is excluded outright\paperonly{ (\secref{no-load-dependent})}.} Module checking is defined inductively, so a program with an import cycle is ill-formed. Program
