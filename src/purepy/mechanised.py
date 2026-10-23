@@ -379,7 +379,7 @@ def module_body(q: Name, m: ast.Module) -> Any:
     return Syntax.ModuleBody(imports, top_stmt(statements([name_declaration(q), *stmts])))
 
 
-def module_table(entry_path: pathlib.Path) -> Any:
+def program(entry_path: pathlib.Path) -> Any:
     """Program of the entry module and every module under its directory, each parsed up front"""
     names = sorted(module_names(entry_path.parent) | {MAIN}, key=str)
     return Finite_Map.fmap_of_list(
@@ -419,7 +419,7 @@ def main() -> None:
     parser.add_argument("path", type=pathlib.Path)
     args = parser.parse_args()
     try:
-        ok = check(module_table(args.path))
+        ok = check(program(args.path))
     except syntax.Unsupported as e:
         print(format_program_result(e, args.path))
         sys.exit(e.exit_code)
