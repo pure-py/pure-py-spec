@@ -11,7 +11,7 @@ AUX := $(BUILD_AUX) *.bbl
 
 default: paper.pdf
 
-all: PurePy-spec.pdf paper.pdf graduality.pdf paper-arXiv.zip paper-submission check-mechanised-type-checker
+all: PurePy-spec.pdf paper.pdf graduality.pdf paper-arXiv.zip paper-submission conformance-generated-checker
 
 # Unresolved references are only warnings to pdflatex.
 define check-log
@@ -74,7 +74,7 @@ spec-anon.pdf: $(TEXFILES)
 
 ISABELLE := isabelle-purepy
 
-check-mechanisation:
+isabelle-purepy:
 	@test -e $(ISABELLE)/ROOT || \
 		{ echo "$(ISABELLE) not checked out: git submodule update --init"; exit 1; }
 	@test -z "$$(git -C $(ISABELLE) status --porcelain)" || \
@@ -88,11 +88,11 @@ check-mechanisation:
 # Conformance suite under the type checker generated from the mechanisation; passes if the failures are
 # exactly those listed, which measures the mechanised fragment.
 GENERATED := $(ISABELLE)/python/python_out/isabelle-purepy-python.Codegen/code
-check-mechanised-type-checker: check-mechanisation
+conformance-generated-checker: isabelle-purepy
 	PYTHONPATH=$(GENERATED) uv run --locked purepy-conformance --no-run \
 		--type-checker "uv run --locked purepy-mechanised" --known-failures test/mechanised-failures.txt
 
-supplementary.zip: spec-anon.pdf check-mechanisation
+supplementary.zip: spec-anon.pdf isabelle-purepy
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
 	./anonymise-mechanisation.sh .submission
@@ -114,4 +114,4 @@ clean:
 	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX)
 	rm -rf $(dir $(SPEC_LABELS))
 
-.PHONY: default all paper-submission clean check-mechanisation check-mechanised-type-checker check-tests
+.PHONY: default all paper-submission clean isabelle-purepy conformance-generated-checker check-tests
