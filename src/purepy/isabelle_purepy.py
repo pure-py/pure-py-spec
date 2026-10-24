@@ -418,7 +418,10 @@ def main() -> None:
         f"checker, or with {OUTSIDE_FRAGMENT} for a program outside the mechanised fragment",
     )
     parser.add_argument("path", type=pathlib.Path)
+    parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
+    if not args.check:
+        parser.error("running programs is not supported yet; use --check")
     try:
         ok = check(program(args.path))
     except syntax.Unsupported as e:
