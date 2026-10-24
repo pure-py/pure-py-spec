@@ -100,8 +100,8 @@ class Runner:
             print(f"  {GREEN}✓{RESET} {label}")
 
     def check(self, path: pathlib.Path, exit: Exit, error_checked: bool) -> list[str]:
-        """A test of one module is checked as a program of that module alone, away from its siblings
-        in the suite."""
+        """A single-module test is checked from an empty directory, since the checker takes every module in
+        the test's directory as part of the program."""
         reference = [sys.executable, "-m", "purepy", "--check"]
         with tempfile.TemporaryDirectory() as alone:
             checked = path if path.name == MAIN else pathlib.Path(shutil.copy(path, alone))
