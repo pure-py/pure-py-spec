@@ -79,7 +79,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-from-import}}]
 {
-  \seq{q}^\dagger = \containing(q, q') \\
+  \seq{q}^\dagger = \replaced{\uniqueTo(q', q)}{\containing(q, q') } \\
   q^\dagger_j \Rightarrow_{\mathsf{mod}} \val{\rho_j} \quad (\forall j) \\
   q' \Rightarrow_{\mathsf{mod}} \val{\rho} \\
   \rho, x_i \importsR \val{v_i} \quad (\forall i) \\
@@ -91,7 +91,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail}}]
 {
-  \seq{q}^\dagger = \containing(q, q') \\
+  \seq{q}^\dagger = \replaced{\uniqueTo(q', q)}{\containing(q, q') } \\
   q^\dagger_j \Rightarrow_{\mathsf{mod}} \val{\rho_j} \quad (\forall j) \\
   q' \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
 }
@@ -101,7 +101,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail-containing}}]
 {
-  \seq{q}^\dagger = \containing(q, q') \\
+  \seq{q}^\dagger = \replaced{\uniqueTo(q', q)}{\containing(q, q') } \\
   q^\dagger_j \Rightarrow_{\mathsf{mod}} \aborts{\kappa} \\
   q^\dagger_k \Rightarrow_{\mathsf{mod}} \val{\rho_k} \quad (\forall k < j)
 }
@@ -111,7 +111,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail-member}}]
 {
-  \seq{q}^\dagger = \containing(q, q') \\
+  \seq{q}^\dagger = \replaced{\uniqueTo(q', q)}{\containing(q, q') } \\
   q^\dagger_k \Rightarrow_{\mathsf{mod}} \val{\rho_k} \quad (\forall k) \\
   q' \Rightarrow_{\mathsf{mod}} \val{\rho} \\
   \rho, x_i \importsR \val{v_i} \quad (\forall i < j) \\

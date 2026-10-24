@@ -82,10 +82,10 @@ as `# rule: name`. Under `typing-rejects/` the rule is the one with a premise or
 program. Under `undefined/` and `agrees/` the rule is the one yielding the result.
 
 Another type checker can be run over the suite installed with the `purepy` package, by passing a command
-which takes the path of a test and exits with the codes of the reference checker:
+which takes the path of a test and exits with the codes of the reference type checker:
 
 ```bash
-purepy-conformance --no-run --checker CMD --known-failures FILE
+purepy-conformance --no-run --type-checker CMD --known-failures FILE
 ```
 
 The run passes if its failures are exactly those listed in the file; `--update` rewrites the file, and
@@ -131,7 +131,7 @@ purepy --check --module path/to/module.py
 purepy --check path/to/main.py
 ```
 
-Install the checker from the repository root with:
+Install the type checker from the repository root with:
 
 ```bash
 uv tool install .
