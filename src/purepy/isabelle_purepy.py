@@ -13,7 +13,6 @@ import Finite_Map
 import Option
 import Rat
 import Real
-import String
 import Syntax
 import Typing
 
@@ -54,11 +53,11 @@ class OutsideFragment(Exception):
     pass
 
 
-def string(s: str) -> list[Any]:
-    """Isabelle string: list of eight-bit characters, least significant bit first"""
+def string(s: str) -> list[str]:
+    """Isabelle string: list of one-character strings, each Latin-1"""
     if any(ord(c) > 255 for c in s):
         raise OutsideFragment(f"string {s!r} with a character outside Latin-1")
-    return [String.Char(*(((ord(c) >> i) & 1) == 1 for i in range(8))) for c in s]
+    return list(s)
 
 
 def real(x: float) -> Any:
@@ -89,17 +88,17 @@ def name(q: Name) -> Any:
 
 
 def option(x: Any) -> Any:
-    return Option.Nonea() if x is None else Option.Some(x)
+    return Option.None_() if x is None else Option.Some(x)
 
 
 PRIM_TY = {
-    Primitive.OBJECT: Syntax.object,
+    Primitive.OBJECT: Syntax.object_,
     Primitive.NEVER: Syntax.Never,
     Primitive.NONE: Syntax.NoneType,
-    Primitive.BOOL: Syntax.bool,
-    Primitive.INT: Syntax.int,
-    Primitive.FLOAT: Syntax.float,
-    Primitive.STR: Syntax.str,
+    Primitive.BOOL: Syntax.bool_,
+    Primitive.INT: Syntax.int_,
+    Primitive.FLOAT: Syntax.float_,
+    Primitive.STR: Syntax.str_,
     Primitive.SIZED: Syntax.Sized,
 }
 
@@ -250,7 +249,7 @@ def stmt(s: ast.stmt) -> Any:
         case ast.Pass():
             return Syntax.StmtPass()
         case ast.Assign(targets=[ast.Name(id=x)], value=e):
-            return Syntax.StmtAssign(string(x), Option.Nonea(), expr(e))
+            return Syntax.StmtAssign(string(x), Option.None_(), expr(e))
         case ast.AnnAssign(target=ast.Name(id=x), annotation=a, value=None):
             return Syntax.StmtDeclare(string(x), annotation(a))
         case ast.AnnAssign(target=ast.Name(id=x), annotation=a, value=ast.expr() as e):
@@ -275,7 +274,7 @@ def branches(col: int, orelse: list[ast.stmt]) -> tuple[list[Any], Any]:
     as an if statement alone in the else branch, at the same column"""
     match orelse:
         case []:
-            return [], Option.Nonea()
+            return [], Option.None_()
         case [ast.If(test=e, body=ss, orelse=ss_) as s] if s.col_offset == col:
             elifs, else_ = branches(col, ss_)
             return [(expr(e), seq(ss)), *elifs], else_
@@ -336,7 +335,7 @@ def type_def(chi: ast.stmt) -> Any:
 def extends(bases: list[ast.expr]) -> Any:
     match bases:
         case []:
-            return Option.Nonea()
+            return Option.None_()
         case [b]:
             psi = type_expr(b)
             assert isinstance(psi, TypeName)  # other base classes rejected by the parser
