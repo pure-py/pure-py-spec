@@ -21,7 +21,7 @@ dev = [
 [tool.mypy]
 strict = true
 
-# Code generated from the mechanisation, untyped
+# Code generated from the mechanisation, currently untyped
 [[tool.mypy.overrides]]
 module = ["Finite_Map", "Option", "Rat", "Real", "String", "Syntax", "Typing"]
 ignore_missing_imports = true
