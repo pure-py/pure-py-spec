@@ -1,5 +1,6 @@
-"""Translation of parsed modules into the mechanised syntax, and the type checker generated from the
-mechanisation as a type checker command; the generated code is on PYTHONPATH"""
+"""Type check a program with the code generated from isabelle-purepy, which must be on PYTHONPATH.
+The parsed modules are first translated into the Python types generated from the Isabelle AST
+definitions."""
 
 import argparse
 import ast
