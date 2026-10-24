@@ -412,7 +412,7 @@ def check(M: Any) -> bool:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        prog="isabelle-purepy",
+        prog="purepy-generated",
         description="Check a program from its entry module with the type checker generated from the "
         "mechanisation, with the generated code on PYTHONPATH; exits with the codes of the reference type "
         f"checker, or with {OUTSIDE_FRAGMENT} for a program outside the mechanised fragment",

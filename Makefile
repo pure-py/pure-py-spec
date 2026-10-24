@@ -90,7 +90,7 @@ isabelle-purepy:
 GENERATED := $(ISABELLE)/python/python_out/isabelle-purepy-python.Codegen/code
 conformance-isabelle-purepy: isabelle-purepy
 	PYTHONPATH=$(GENERATED) uv run --locked purepy-conformance --no-run \
-		--type-checker "uv run --locked isabelle-purepy" --known-failures test/isabelle-purepy-failures.txt
+		--type-checker "uv run --locked purepy-generated" --known-failures test/isabelle-purepy-failures.txt
 
 supplementary.zip: spec-anon.pdf isabelle-purepy
 	rm -f $@ && rm -rf .submission

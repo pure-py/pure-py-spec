@@ -10,7 +10,7 @@ requires-python = ">=3.12"
 [project.scripts]
 purepy = "purepy.__main__:main"
 purepy-conformance = "purepy.conformance:main"
-isabelle-purepy = "purepy.isabelle_purepy:main"
+purepy-generated = "purepy.isabelle_purepy:main"
 
 [dependency-groups]
 dev = [
