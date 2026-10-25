@@ -524,6 +524,8 @@ def from_reason(r: Any) -> reasons.Reason:
             return reasons.TypeParameterAsValue(from_string(x))
         case Reasons.TypeSchemeAsValue(q):
             return reasons.TypeSchemeAsValue(from_name(q))
+        case Reasons.NoTypeArgument(alpha):
+            return reasons.NoTypeArgument(from_string(alpha))
         case Reasons.ClassAsValue(q):
             return reasons.ClassAsValue(from_name(q))
         case Reasons.TypeAliasAsValue(q):
