@@ -17,11 +17,13 @@ import Real
 import Syntax
 import Typing
 
-from . import syntax
+from . import reasons, syntax
 from .check_module import name_declaration
-from .check_program import format_program_result, module_names, module_path, parse
+from .check_program import error_path, format_program_result, module_names, module_path, parse
 from .conformance import Exit
 from .contexts import MAIN
+from .operators import BINARY_NAMES, UNARY_NAMES
+from .reasons import IllFormed, IllFormedModule, IllFormedProgram, MypyCompatibility
 from .syntax_utils import (
     Statement,
     dict_keys,
@@ -34,15 +36,25 @@ from .syntax_utils import (
 )
 from .type_syntax import (
     CallableExpr,
+    CallableType,
+    ClassName,
+    ClassType,
     DictExpr,
+    DictType,
     ListExpr,
+    ListType,
+    Literal,
     LiteralType,
     Name,
     Primitive,
     TupleExpr,
+    TupleType,
+    Type,
     TypeExpr,
     TypeName,
+    TypeVariable,
     UnionExpr,
+    UnionType,
     dotted_name,
     parse_name,
 )
@@ -391,10 +403,174 @@ def path_of(q: Name, entry_path: pathlib.Path) -> pathlib.Path:
     return path
 
 
-def check(M: Any) -> bool:
-    accepted = Typing.check_program(M)
-    assert isinstance(accepted, bool)
-    return accepted
+def from_string(s: list[str]) -> str:
+    return "".join(s)
+
+
+def from_name(q: Any) -> Name:
+    x, xs = q
+    return Name((from_string(x), *map(from_string, xs)))
+
+
+def from_lit(ell: Any) -> Literal:
+    match ell:
+        case Syntax.LitInt(v) | Syntax.LitBool(v):
+            return Literal(v)
+        case Syntax.LitFloat(Real.Ratreal(Rat.Frct((n, d)))):
+            return Literal(n / d)
+        case Syntax.LitString(s):
+            return Literal(from_string(s))
+        case Syntax.LitNone():
+            return Literal(None)
+        case _:
+            raise AssertionError(f"unexpected literal: {ell}")
+
+
+PRIMITIVE = {c: nu for nu, c in PRIM_TY.items()}
+
+
+def from_ty(tau: Any) -> Type:
+    match tau:
+        case Syntax.TyPrim(nu):
+            return PRIMITIVE[type(nu)]
+        case Syntax.TyList(tau_):
+            return ListType(from_ty(tau_))
+        case Syntax.TyTuple(taus):
+            return TupleType(tuple(from_ty(tau_) for tau_ in taus))
+        case Syntax.TyDict(tau_):
+            return DictType(from_ty(tau_))
+        case Syntax.TyCallable(sigmas, tau_):
+            return CallableType(tuple(from_ty(sigma) for sigma in sigmas), from_ty(tau_))
+        case Syntax.TyLiteral(ell):
+            return LiteralType(from_lit(ell))
+        case Syntax.TyVar(alpha):
+            return TypeVariable(from_string(alpha))
+        case Syntax.TyClass(c, taus):
+            return ClassType(ClassName(from_name(c)), tuple(from_ty(tau_) for tau_ in taus))
+        case Syntax.TyUnion(sigma, tau_):
+            return UnionType(from_ty(sigma), from_ty(tau_))
+        case _:
+            raise AssertionError(f"unexpected type: {tau}")
+
+
+BINARY = {c: BINARY_NAMES[op] for op, c in BOP.items()}
+UNARY = {c: UNARY_NAMES[op] for op, c in UOP.items()}
+
+
+def from_reason(r: Any) -> reasons.Reason:
+    match r:
+        case Typing.UndefinedVariable(x):
+            return reasons.UndefinedVariable(from_string(x))
+        case Typing.UnassignedVariable(x):
+            return reasons.UnassignedVariable(from_string(x))
+        case Typing.PossiblyUnassigned(x):
+            return reasons.PossiblyUnassigned(from_string(x), False)
+        case Typing.UnboundName(x):
+            return reasons.UnboundName(from_string(x))
+        case Typing.Redeclaration(x):
+            return reasons.Redeclaration(from_string(x))
+        case Typing.UndeclaredAssignment(x):
+            return reasons.UndeclaredAssignment(from_string(x))
+        case Typing.AssignmentBeforeDeclaration(x):
+            return reasons.AssignmentBeforeDeclaration(from_string(x))
+        case Typing.Reassignment(x):
+            return reasons.Reassignment(from_string(x))
+        case Typing.MaybeAssigned(x):
+            return reasons.MaybeAssigned(from_string(x))
+        case Typing.CapturedGeneratorVariable(x):
+            return reasons.CapturedGeneratorVariable(from_string(x))
+        case Typing.UnreachableStatement():
+            return reasons.UnreachableStatement()
+        case Typing.NotPredefinedName(x):
+            return reasons.NotPredefinedName(from_string(x))
+        case Typing.NotClass(q):
+            return reasons.NotClass(from_name(q))
+        case Typing.DuplicateMember(x, q):
+            return reasons.DuplicateMember(from_string(x), from_name(q))
+        case Typing.SubmoduleNotImported(q):
+            return reasons.SubmoduleNotImported(from_name(q))
+        case Typing.UnassignedMember(x, q):
+            return reasons.UnassignedMember(from_string(x), from_name(q))
+        case Typing.TopLevelAssertFalse():
+            return reasons.TopLevelAssertFalse()
+        case Typing.UnknownModule(q):
+            return reasons.UnknownModule(from_name(q))
+        case Typing.DuplicateImportedName(x):
+            return reasons.DuplicateImportedName(from_string(x))
+        case Typing.UnknownMember(x, q):
+            return reasons.UnknownMember(from_string(x), from_name(q))
+        case Typing.ModuleAsValue(q):
+            return reasons.ModuleAsValue(from_name(q))
+        case Typing.ImportOfContainedModule(q, q_):
+            return reasons.ImportOfContainedModule(from_name(q), from_name(q_))
+        case Typing.PredefinedNameAsValue(q):
+            return reasons.PredefinedNameAsValue(from_name(q))
+        case Typing.TypeParameterAsValue(x):
+            return reasons.TypeParameterAsValue(from_string(x))
+        case Typing.TypeSchemeAsValue(q):
+            return reasons.TypeSchemeAsValue(from_name(q))
+        case Typing.ClassAsValue(q):
+            return reasons.ClassAsValue(from_name(q))
+        case Typing.NoBinaryOverload(op, sigma, sigma_):
+            return reasons.NoBinaryOverload(BINARY[type(op)], from_ty(sigma), from_ty(sigma_))
+        case Typing.NoUnaryOverload(op, sigma):
+            return reasons.NoUnaryOverload(UNARY[type(op)], from_ty(sigma))
+        case Typing.NotCallable(tau):
+            return reasons.NotCallable(from_ty(tau))
+        case Typing.KeywordArgumentsNotConstructor():
+            return reasons.KeywordArgumentsNotConstructor()
+        case Typing.CallArityMismatch(m, n):
+            return reasons.CallArityMismatch(m, n)
+        case Typing.NoneResult():
+            return reasons.NoneResult()
+        case Typing.TypeMismatch(tau, sigma):
+            return reasons.TypeMismatch(from_ty(tau), from_ty(sigma))
+        case Typing.LambdaTypeMismatch(tau, Option.Some(n)):
+            return reasons.LambdaTypeMismatch(from_ty(tau), n)
+        case Typing.LambdaTypeMismatch(tau, Option.None_()):
+            return reasons.LambdaTypeMismatch(from_ty(tau), None)
+        case Typing.NotSubscriptable(tau):
+            return reasons.NotSubscriptable(from_ty(tau))
+        case Typing.TupleIndexOutOfRange(i, n):
+            return reasons.TupleIndexOutOfRange(i, n)
+        case Typing.NotIterable(tau):
+            return reasons.NotIterable(from_ty(tau))
+        case Typing.NotSynthesised():
+            return reasons.NotSynthesised()
+        case Typing.NoAttributes(tau):
+            return reasons.NoAttributes(from_ty(tau))
+        case Typing.BareReturn(tau):
+            return reasons.BareReturn(from_ty(tau))
+        case Typing.MissingReturn(x, tau):
+            return reasons.MissingReturn(from_string(x), from_ty(tau))
+        case _:
+            raise AssertionError(f"unexpected reason: {r}")
+
+
+NO_POSITION = ast.AST()
+
+
+def ill_formed(q: Any, r: Any) -> IllFormed:
+    """Failure for reason r in module q"""
+    match r:
+        case Typing.ImportCycle(qs):
+            return IllFormedProgram(reasons.ImportCycle(tuple(map(from_name, qs))).message())
+        case Typing.MypyCompatibility(r_):
+            e: IllFormedModule = MypyCompatibility(NO_POSITION, from_reason(r_))
+        case _:
+            e = IllFormedModule(NO_POSITION, from_reason(r))
+    e.module = from_name(q)
+    return e
+
+
+def check(M: Any) -> IllFormed | None:
+    match Typing.check_program(M):
+        case Option.None_():
+            return None
+        case Option.Some((q, r)):
+            return ill_formed(q, r)
+        case result:
+            raise AssertionError(f"unexpected result: {result}")
 
 
 def main() -> None:
@@ -405,15 +581,18 @@ def main() -> None:
     if not args.check:
         parser.error("running programs not yet implemented")
     try:
-        ok = check(program(args.path))
+        result = check(program(args.path))
     except syntax.Unsupported as e:
         print(format_program_result(e, args.path))
         sys.exit(e.exit_code)
     except Unrepresentable as e:
         print(f"{args.path}: {e}")
         sys.exit(UNREPRESENTABLE)
-    print(f"{args.path}: {'ok' if ok else 'ill-formed'}")
-    sys.exit(Exit.OK if ok else Exit.ILL_FORMED)
+    if result is None:
+        print(f"{args.path}: ok")
+        sys.exit(Exit.OK)
+    print(f"{error_path(result, args.path)}: {result.msg}")
+    sys.exit(result.exit_code)
 
 
 if __name__ == "__main__":

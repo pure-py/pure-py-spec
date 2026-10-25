@@ -75,7 +75,7 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
             if proper_prefix_of(mod_ctx.q, q):
                 raise IllFormedModule(
                     iota,
-                    reasons.ImportOfContainedModule(q, mod_ctx.q, f"from {q} import <name>"),
+                    reasons.ImportOfContainedModule(q, mod_ctx.q),
                 )
             x = Name((root(q),))
             delta, Sigma = check_imported(x, iota, mod_ctx)
@@ -167,8 +167,8 @@ def check_module(
     if gamma is not None:
         return gamma, Sigma
     if key in _checking:
-        cycle = [str(q_) for _, q_ in _checking[_checking.index(key) :]] + [str(q)]
-        raise IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
+        cycle = (*(q_ for _, q_ in _checking[_checking.index(key) :]), q)
+        raise IllFormedProgram(reasons.ImportCycle(cycle).message())
     _checking.append(key)
     try:
         gamma, Sigma = check_module_(m, M, q, Sigma)

@@ -122,7 +122,7 @@ def main() -> None:
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
     )
     args = parser.parse_args()
-    r = Runner(None if args.no_run else args.interpreter, None)
+    r = Runner(None if args.no_run else args.interpreter, None, False)
 
     print("cross-references")
     check_unique_rule_names(r)

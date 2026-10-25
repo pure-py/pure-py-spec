@@ -73,11 +73,14 @@ def run(cmd: list[str], cwd: pathlib.Path | None = None) -> "subprocess.Complete
 
 
 class Runner:
-    def __init__(self, interpreter: str | None, type_checker: list[str] | None) -> None:
+    def __init__(
+        self, interpreter: str | None, type_checker: list[str] | None, messages: bool
+    ) -> None:
         self.interpreter = interpreter  # None: tests not run
         self.type_checker = (
             type_checker  # command given the test path; None: the reference type checker
         )
+        self.messages = messages  # type checker reports the reference type checker's messages
         self.passed = 0
         self.failed: list[str] = []
         self.failures: list[str] = []
@@ -112,14 +115,13 @@ class Runner:
         if proc.returncode not in exits:
             first = output.strip().split("\n", 1)[0].replace(f"{checked.parent}/", "")
             return [f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}: {first}"]
-        if (
-            not error_checked or self.type_checker is not None
-        ):  # messages are the reference type checker's
+        if not error_checked or (self.type_checker is not None and not self.messages):
             return []
         if not error.exists():
             return [f"check: missing {error.name}"]
         if error.read_text().strip() not in output:
-            return [f"check: expected {error.read_text().strip()!r}, got: {output.strip()}"]
+            got = output.strip().replace(f"{checked.parent}/", "")
+            return [f"check: expected {error.read_text().strip()!r}, got: {got}"]
         return []
 
     def python(self, path: pathlib.Path, outcome: PythonOutcome) -> list[str]:
@@ -237,7 +239,12 @@ def main() -> None:
     parser.add_argument(
         "--type-checker",
         help="command run on the path of each test in place of the reference type checker, with the same "
-        "exit codes; error messages are not compared",
+        "exit codes; error messages are compared only with --messages",
+    )
+    parser.add_argument(
+        "--messages",
+        action="store_true",
+        help="compare the error messages of the type checker command with the expected messages",
     )
     parser.add_argument(
         "--known-failures",
@@ -254,6 +261,7 @@ def main() -> None:
     r = Runner(
         None if args.no_run else args.interpreter,
         shlex.split(args.type_checker) if args.type_checker else None,
+        args.messages,
     )
     with suite() as path:
         r.run_suite(path, args.jobs)

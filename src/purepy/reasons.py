@@ -271,12 +271,11 @@ class ModuleAsValue:
 class ImportOfContainedModule:
     q: Name
     q_: Name
-    from_import: str
 
     def message(self) -> str:
         return (
             f"'{self.q}' is contained in importing module '{self.q_}'; "
-            f"plain import not allowed, write '{self.from_import}'"
+            f"plain import not allowed, write 'from {self.q} import <name>'"
         )
 
 
@@ -517,6 +516,14 @@ class MissingReturnMatchPartial:
             f"cases leave remaining type {render(self.remaining)}, "
             "so the function does not always return"
         )
+
+
+@dataclass(frozen=True)
+class ImportCycle:
+    qs: tuple[Name, ...]
+
+    def message(self) -> str:
+        return f"import cycle: {' -> '.join(str(q) for q in self.qs)}"
 
 
 type Reason = (
