@@ -361,14 +361,12 @@ def import_(iota: ast.stmt) -> Any:
 
 
 def module_body(q: Name, m: ast.Module) -> Any:
-    """Body of module q, beginning with the declaration of its name as the spec defines a module body"""
     iotas, stmts = split_imports(m.body)
     imports = [import_(iota) for iota in iotas]
     return Syntax.ModuleBody(imports, top_stmt([name_declaration(q), *stmts]))
 
 
 def program(entry_path: pathlib.Path) -> Any:
-    """Program of the entry module and every module under its directory, each parsed up front"""
     names = sorted(module_names(entry_path.parent) | {MAIN}, key=str)
     return Finite_Map.fmap_of_list(
         [(name(q), module_body(q, parse_module(q, entry_path))) for q in names]
@@ -387,7 +385,9 @@ def path_of(q: Name, entry_path: pathlib.Path) -> pathlib.Path:
     if q == MAIN:
         return entry_path
     path = module_path(q, entry_path.parent)
-    assert path is not None  # every other name is that of a file or directory under the entry's
+    assert (
+        path is not None
+    )  # other names come from files and directories under the entry module's directory
     return path
 
 
