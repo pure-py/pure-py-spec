@@ -7,6 +7,7 @@ import ast
 import math
 import pathlib
 import sys
+from functools import reduce
 from typing import Any
 
 import Finite_Map
@@ -280,17 +281,10 @@ def branches(col: int, orelse: list[ast.stmt]) -> tuple[list[Any], Any]:
 
 
 def seq(body: list[ast.stmt]) -> Any:
-    return seq_items(statements(body))
-
-
-def seq_items(items: list[Statement]) -> Any:
-    match items:
-        case [item]:
-            return item_stmt(item)
-        case [item, *rest]:
-            return Syntax.StmtSeq(item_stmt(item), seq_items(rest))
-        case _:
-            raise AssertionError("empty body")
+    *items, item = statements(body)
+    return reduce(
+        lambda s, item_: Syntax.StmtSeq(item_stmt(item_), s), reversed(items), item_stmt(item)
+    )
 
 
 def item_stmt(item: Statement) -> Any:
@@ -341,14 +335,11 @@ def extends(bases: list[ast.expr]) -> Any:
             raise AssertionError("multiple inheritance")
 
 
-def top_stmt(items: list[Statement]) -> Any:
-    match items:
-        case [item]:
-            return top_item(item)
-        case [item, *rest]:
-            return Syntax.TopSeq(top_item(item), top_stmt(rest))
-        case _:
-            raise AssertionError("empty module body")
+def top_stmt(body: list[ast.stmt]) -> Any:
+    *items, item = statements(body)
+    return reduce(
+        lambda s, item_: Syntax.TopSeq(top_item(item_), s), reversed(items), top_item(item)
+    )
 
 
 def top_item(item: Statement) -> Any:
@@ -373,7 +364,7 @@ def module_body(q: Name, m: ast.Module) -> Any:
     """Body of module q, beginning with the declaration of its name as the spec defines a module body"""
     iotas, stmts = split_imports(m.body)
     imports = [import_(iota) for iota in iotas]
-    return Syntax.ModuleBody(imports, top_stmt(statements([name_declaration(q), *stmts])))
+    return Syntax.ModuleBody(imports, top_stmt([name_declaration(q), *stmts]))
 
 
 def program(entry_path: pathlib.Path) -> Any:
