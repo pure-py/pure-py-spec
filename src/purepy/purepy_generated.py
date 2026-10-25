@@ -401,7 +401,7 @@ def main() -> None:
         prog="purepy-generated",
         description="Check a program from its entry module with the type checker generated from the "
         "mechanisation, with the generated code on PYTHONPATH; exits with the codes of the reference type "
-        f"checker, or with {UNREPRESENTABLE} for a program with a float or string unrepresentable in Isabelle",
+        "checker",
     )
     parser.add_argument("path", type=pathlib.Path)
     parser.add_argument("--check", action="store_true")
