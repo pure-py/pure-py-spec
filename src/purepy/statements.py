@@ -462,11 +462,11 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
         case ast.Tuple(elts=es):
             return TupleType(tuple(synth_expr(e_, mod_ctx) for e_ in es))
         case ast.List(elts=es):
-            return list_type(e, es, mod_ctx)
+            return ListType(elements_join(e, es, mod_ctx))
         case ast.Dict(values=es):
             for k in dict_keys(e):
                 check_expr(k, Primitive.STR, mod_ctx)
-            return dict_type(e, es, mod_ctx)
+            return DictType(elements_join(e, es, mod_ctx))
         case ast.ListComp(elt=e_, generators=gs):
             return ListType(base_type(synth_expr(e_, qual_context([e_], gs, mod_ctx))))
         case ast.DictComp():
@@ -575,7 +575,7 @@ def branch_type(e: ast.IfExp, mod_ctx: ModuleContext) -> Type:
     return tau
 
 
-def list_type(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> ListType:
+def elements_join(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> Type:
     taus = [base_type(synth_expr(e, mod_ctx)) for e in es if synthesises(e)]
     if len(taus) == 0:
         raise IllFormedModule(node, reasons.NotSynthesised())
@@ -583,7 +583,7 @@ def list_type(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> Lis
     for e in es:
         if not synthesises(e):
             check_expr(e, tau, mod_ctx)
-    return ListType(tau)
+    return tau
 
 
 def synthesises(e: ast.expr) -> bool:
@@ -604,10 +604,6 @@ def synthesises(e: ast.expr) -> bool:
             return synthesises(e_) and all(synthesises(a) for a in es)
         case _:
             return True
-
-
-def dict_type(node: ast.expr, es: list[ast.expr], mod_ctx: ModuleContext) -> DictType:
-    return DictType(list_type(node, es, mod_ctx).elem)
 
 
 def constr(c: ClassName, e: ast.Call, mod_ctx: ModuleContext) -> Type:
