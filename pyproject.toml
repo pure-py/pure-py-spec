@@ -23,7 +23,7 @@ strict = true
 
 # Generated code, not on mypy's path until it's typed
 [[tool.mypy.overrides]]
-module = ["Finite_Map", "Option", "Rat", "Real", "String", "Syntax", "Typing"]
+module = ["Finite_Map", "Option", "Programs", "Rat", "Real", "Reasons", "String", "Syntax"]
 ignore_missing_imports = true
 
 [tool.ruff]

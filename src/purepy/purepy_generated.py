@@ -12,10 +12,11 @@ from typing import Any
 
 import Finite_Map
 import Option
+import Programs
 import Rat
 import Real
+import Reasons
 import Syntax
-import Typing
 
 from . import reasons, syntax
 from .check_module import name_declaration
@@ -459,103 +460,103 @@ UNARY = {c: UNARY_NAMES[op] for op, c in UOP.items()}
 
 def from_reason(r: Any) -> reasons.Reason:
     match r:
-        case Typing.DuplicateField(x, c):
+        case Reasons.DuplicateField(x, c):
             return reasons.DuplicateField(from_string(x), from_string(c))
-        case Typing.InheritedField(x, c, d):
+        case Reasons.InheritedField(x, c, d):
             return reasons.InheritedField(from_string(x), from_string(c), from_string(d))
-        case Typing.UndefinedVariable(x):
+        case Reasons.UndefinedVariable(x):
             return reasons.UndefinedVariable(from_string(x))
-        case Typing.UnassignedVariable(x):
+        case Reasons.UnassignedVariable(x):
             return reasons.UnassignedVariable(from_string(x))
-        case Typing.PossiblyUnassigned(x):
+        case Reasons.PossiblyUnassigned(x):
             return reasons.PossiblyUnassigned(from_string(x), False)
-        case Typing.UnboundName(x):
+        case Reasons.UnboundName(x):
             return reasons.UnboundName(from_string(x))
-        case Typing.Redeclaration(x):
+        case Reasons.Redeclaration(x):
             return reasons.Redeclaration(from_string(x))
-        case Typing.UndeclaredAssignment(x):
+        case Reasons.UndeclaredAssignment(x):
             return reasons.UndeclaredAssignment(from_string(x))
-        case Typing.AssignmentBeforeDeclaration(x):
+        case Reasons.AssignmentBeforeDeclaration(x):
             return reasons.AssignmentBeforeDeclaration(from_string(x))
-        case Typing.Reassignment(x):
+        case Reasons.Reassignment(x):
             return reasons.Reassignment(from_string(x))
-        case Typing.PossibleReassignment(x):
+        case Reasons.PossibleReassignment(x):
             return reasons.PossibleReassignment(from_string(x))
-        case Typing.CapturedGeneratorVariable(x):
+        case Reasons.CapturedGeneratorVariable(x):
             return reasons.CapturedGeneratorVariable(from_string(x))
-        case Typing.UnreachableStatement():
+        case Reasons.UnreachableStatement():
             return reasons.UnreachableStatement()
-        case Typing.ConstructorArityMismatch(c, m, n):
+        case Reasons.ConstructorArityMismatch(c, m, n):
             return reasons.ConstructorArityMismatch(from_string(c), m, n)
-        case Typing.UnknownConstructorKeyword(c, xs):
+        case Reasons.UnknownConstructorKeyword(c, xs):
             return reasons.UnknownConstructorKeyword(from_string(c), tuple(map(from_string, xs)))
-        case Typing.NotPredefinedName(x):
+        case Reasons.NotPredefinedName(x):
             return reasons.NotPredefinedName(from_string(x))
-        case Typing.NotClass(q):
+        case Reasons.NotClass(q):
             return reasons.NotClass(from_name(q))
-        case Typing.ClassArityMismatch(q, m, n):
+        case Reasons.ClassArityMismatch(q, m, n):
             return reasons.ClassArityMismatch(from_name(q), m, n)
-        case Typing.DuplicateMember(x, q):
+        case Reasons.DuplicateMember(x, q):
             return reasons.DuplicateMember(from_string(x), from_name(q))
-        case Typing.SubmoduleNotImported(q):
+        case Reasons.SubmoduleNotImported(q):
             return reasons.SubmoduleNotImported(from_name(q))
-        case Typing.UnassignedMember(x, q):
+        case Reasons.UnassignedMember(x, q):
             return reasons.UnassignedMember(from_string(x), from_name(q))
-        case Typing.TopLevelAssertFalse():
+        case Reasons.TopLevelAssertFalse():
             return reasons.TopLevelAssertFalse()
-        case Typing.UnknownModule(q):
+        case Reasons.UnknownModule(q):
             return reasons.UnknownModule(from_name(q))
-        case Typing.DuplicateImportedName(x):
+        case Reasons.DuplicateImportedName(x):
             return reasons.DuplicateImportedName(from_string(x))
-        case Typing.UnknownMember(x, q):
+        case Reasons.UnknownMember(x, q):
             return reasons.UnknownMember(from_string(x), from_name(q))
-        case Typing.ModuleAsValue(q):
+        case Reasons.ModuleAsValue(q):
             return reasons.ModuleAsValue(from_name(q))
-        case Typing.ImportOfContainedModule(q, q_):
+        case Reasons.ImportOfContainedModule(q, q_):
             return reasons.ImportOfContainedModule(from_name(q), from_name(q_))
-        case Typing.PredefinedNameAsValue(q):
+        case Reasons.PredefinedNameAsValue(q):
             return reasons.PredefinedNameAsValue(from_name(q))
-        case Typing.TypeParameterAsValue(x):
+        case Reasons.TypeParameterAsValue(x):
             return reasons.TypeParameterAsValue(from_string(x))
-        case Typing.TypeSchemeAsValue(q):
+        case Reasons.TypeSchemeAsValue(q):
             return reasons.TypeSchemeAsValue(from_name(q))
-        case Typing.ClassAsValue(q):
+        case Reasons.ClassAsValue(q):
             return reasons.ClassAsValue(from_name(q))
-        case Typing.TypeAliasAsValue(q):
+        case Reasons.TypeAliasAsValue(q):
             return reasons.TypeAliasAsValue(from_name(q))
-        case Typing.NoBinaryOverload(op, sigma, sigma_):
+        case Reasons.NoBinaryOverload(op, sigma, sigma_):
             return reasons.NoBinaryOverload(BINARY[type(op)], from_ty(sigma), from_ty(sigma_))
-        case Typing.NoUnaryOverload(op, sigma):
+        case Reasons.NoUnaryOverload(op, sigma):
             return reasons.NoUnaryOverload(UNARY[type(op)], from_ty(sigma))
-        case Typing.NotCallable(tau):
+        case Reasons.NotCallable(tau):
             return reasons.NotCallable(from_ty(tau))
-        case Typing.KeywordArgumentsNotConstructor():
+        case Reasons.KeywordArgumentsNotConstructor():
             return reasons.KeywordArgumentsNotConstructor()
-        case Typing.CallArityMismatch(m, n):
+        case Reasons.CallArityMismatch(m, n):
             return reasons.CallArityMismatch(m, n)
-        case Typing.NoneResult():
+        case Reasons.NoneResult():
             return reasons.NoneResult()
-        case Typing.TypeMismatch(tau, sigma):
+        case Reasons.TypeMismatch(tau, sigma):
             return reasons.TypeMismatch(from_ty(tau), from_ty(sigma))
-        case Typing.LambdaTypeMismatch(tau, Option.Some(n)):
+        case Reasons.LambdaTypeMismatch(tau, Option.Some(n)):
             return reasons.LambdaTypeMismatch(from_ty(tau), n)
-        case Typing.LambdaTypeMismatch(tau, Option.None_()):
+        case Reasons.LambdaTypeMismatch(tau, Option.None_()):
             return reasons.LambdaTypeMismatch(from_ty(tau), None)
-        case Typing.NotSubscriptable(tau):
+        case Reasons.NotSubscriptable(tau):
             return reasons.NotSubscriptable(from_ty(tau))
-        case Typing.TupleIndexOutOfRange(i, n):
+        case Reasons.TupleIndexOutOfRange(i, n):
             return reasons.TupleIndexOutOfRange(i, n)
-        case Typing.NotIterable(tau):
+        case Reasons.NotIterable(tau):
             return reasons.NotIterable(from_ty(tau))
-        case Typing.NotSynthesised():
+        case Reasons.NotSynthesised():
             return reasons.NotSynthesised()
-        case Typing.UnknownField(c, x):
+        case Reasons.UnknownField(c, x):
             return reasons.UnknownField(from_string(c), from_string(x))
-        case Typing.NoAttributes(tau):
+        case Reasons.NoAttributes(tau):
             return reasons.NoAttributes(from_ty(tau))
-        case Typing.BareReturn(tau):
+        case Reasons.BareReturn(tau):
             return reasons.BareReturn(from_ty(tau))
-        case Typing.MissingReturn(x, tau):
+        case Reasons.MissingReturn(x, tau):
             return reasons.MissingReturn(from_string(x), from_ty(tau))
         case _:
             raise AssertionError(f"unexpected reason: {r}")
@@ -567,9 +568,9 @@ NO_POSITION = ast.AST()
 def ill_formed(q: Any, r: Any) -> IllFormed:
     """Failure for reason r in module q"""
     match r:
-        case Typing.ImportCycle(qs):
+        case Reasons.ImportCycle(qs):
             return IllFormedProgram(reasons.ImportCycle(tuple(map(from_name, qs))).message())
-        case Typing.MypyCompatibility(r_):
+        case Reasons.MypyCompatibility(r_):
             e: IllFormedModule = MypyCompatibility(NO_POSITION, from_reason(r_))
         case _:
             e = IllFormedModule(NO_POSITION, from_reason(r))
@@ -578,7 +579,7 @@ def ill_formed(q: Any, r: Any) -> IllFormed:
 
 
 def check(M: Any) -> IllFormed | None:
-    match Typing.check_program(M):
+    match Programs.check_program(M):
         case Option.None_():
             return None
         case Option.Some((q, r)):
