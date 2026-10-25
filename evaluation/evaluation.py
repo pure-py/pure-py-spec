@@ -396,6 +396,28 @@ def validate_backend(benchmark):
             raise RuntimeError("official LiveCodeBench grader health check failed")
 
 
+def reference_solution(task, benchmark):
+    if benchmark == "humaneval":
+        return task["official"]["prompt"] + task["official"]["canonical_solution"]
+    if benchmark in EVALPLUS:
+        return task["official"]["reference"]
+    return None
+
+
+def validate_problems(problems, benchmark):
+    for task_id, task in problems.items():
+        task = {**task, "task_id": task_id}
+        reference = reference_solution(task, benchmark)
+        if reference is not None:
+            verdict = official_tests(reference, task, benchmark)
+            if verdict["passed"] is not True:
+                raise RuntimeError(f"the reference solution of {task_id} fails its tests: {verdict['error']}")
+        wrong = official_tests(f"def {task['name']}(*args):\n    return None\n", task, benchmark)
+        if wrong["passed"] is not False:
+            raise RuntimeError(f"the tests of {task_id} accept an answer that returns None")
+    print(f"Validated the tests of {len(problems)} problems", flush=True)
+
+
 def repair_messages(messages, attempt):
     return [*messages, {"role": "assistant", "content": attempt["raw_response"]},
             {"role": "user", "content":
@@ -722,6 +744,7 @@ def run(args):
     if not problems:
         raise RuntimeError("the selection contains no problems")
     validate_backend(args.benchmark)
+    validate_problems(problems, args.benchmark)
     if not args.base_url:
         args.base_url = {"openai": "http://127.0.0.1:11434/v1", "deepseek": "https://api.deepseek.com",
                          "anthropic": "https://api.anthropic.com/v1"}[args.provider]
@@ -745,6 +768,7 @@ def run(args):
                          "provider": args.provider, "base_url": args.base_url, "max_tokens": args.max_tokens,
                          "model_size_b": getattr(args, "model_size", None),
                          "repair_rounds": args.repair_rounds, "feedback": "checker diagnostics only",
+                         "problem_checks": "reference solution passes; an answer returning None fails",
                          "automatic_retries": 0, "started_at": datetime.now(timezone.utc).isoformat()},
             "status": "running"}
     save(path, data)

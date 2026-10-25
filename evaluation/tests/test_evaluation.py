@@ -321,7 +321,8 @@ class EvaluationTests(unittest.TestCase):
             args = argparse.Namespace(benchmark="humaneval", model="fake", provider="openai",
                 base_url="http://127.0.0.1:1/v1", max_tokens=100, repair_rounds=3,
                 limit=1, difficulty=None, output=path)
-            with patch("evaluation.validate_backend"), patch("evaluation.request", return_value={
+            with patch("evaluation.validate_backend"), patch("evaluation.validate_problems"), patch(
+                    "evaluation.request", return_value={
                     "code": GOOD, "raw_response": GOOD, "generation": {"status": "complete"}}) as request, patch(
                     "evaluation.check") as checker, patch("evaluation.official_tests") as tests:
                 e.run(args)

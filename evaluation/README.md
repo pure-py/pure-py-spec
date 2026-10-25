@@ -42,7 +42,10 @@ bash scripts/evaluate.sh --provider anthropic --model claude-opus-5-5 --max-toke
 hard`. HumanEval and HumanEval+ run the frozen 20-problem selection unless
 `--all-problems` is given; MBPP+ runs all 378 problems. Each problem records
 whether its interface is fully annotated with types PurePy can express, so results
-can be split by that property. `--repair-rounds 0`, the default,
+can be split by that property. Before any model call, a run checks the
+pinned checker and the sandbox, and then every selected problem: its reference
+solution must pass the official tests and an answer returning `None` must fail
+them. `--repair-rounds 0`, the default,
 is single-shot. With repair rounds, PurePy checker rejections are fed back to
 the model, never test outcomes; repair stops at acceptance or the budget. Python
 answers get no feedback. Every raw answer, extracted source, verdict, rejection
