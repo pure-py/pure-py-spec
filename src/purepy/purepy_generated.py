@@ -407,7 +407,7 @@ def main() -> None:
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     if not args.check:
-        parser.error("running programs is not supported yet; use --check")
+        parser.error("running programs not yet implemented")
     try:
         ok = check(program(args.path))
     except syntax.Unsupported as e:
