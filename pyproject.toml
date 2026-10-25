@@ -9,8 +9,8 @@ requires-python = ">=3.12"
 
 [project.scripts]
 purepy = "purepy.__main__:main"
-purepy-conformance = "purepy.conformance:main"
 purepy-generated = "purepy.purepy_generated:main"
+purepy-conformance = "purepy.conformance:main"
 
 [dependency-groups]
 dev = [
