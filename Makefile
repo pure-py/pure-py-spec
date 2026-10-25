@@ -85,8 +85,6 @@ isabelle-purepy:
 		{ echo "isabelle not on PATH: needed to check $(ISABELLE)"; exit 1; }
 	$(MAKE) -C $(ISABELLE) build
 
-# Conformance suite under the type checker generated from the mechanisation; passes if the failures are
-# exactly those listed, which measures the mechanised fragment.
 GENERATED := $(ISABELLE)/python/python_out/isabelle-purepy-python.Codegen/code
 check-tests-generated: isabelle-purepy
 	PYTHONPATH=$(GENERATED) uv run --locked purepy-conformance --no-run \
