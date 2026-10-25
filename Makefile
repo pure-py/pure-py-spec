@@ -95,7 +95,10 @@ isabelle-purepy:
 	$(MAKE) -C $(ISABELLE) build
 
 GENERATED := $(ISABELLE)/python/python_out/isabelle-purepy-python.Codegen/code
+CODEGEN_PYTHON_VERSION := $(ISABELLE)/python/isabelle-python-codegen/.python-version
 check-tests-generated: isabelle-purepy
+	@cmp -s .python-version $(CODEGEN_PYTHON_VERSION) || \
+		{ echo "code generator targets Python $$(cat $(CODEGEN_PYTHON_VERSION)), not $$(cat .python-version)"; exit 1; }
 	PYTHONPATH=$(GENERATED) uv run --locked purepy-conformance --no-run \
 		--type-checker "uv run --locked purepy-generated --check" --known-failures test/purepy-generated-failures.txt
 
