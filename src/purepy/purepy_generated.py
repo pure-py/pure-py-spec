@@ -267,8 +267,8 @@ def stmt(s: ast.stmt) -> Any:
 
 
 def branches(col: int, orelse: list[ast.stmt]) -> tuple[list[Any], Any]:
-    """Elif branches and else branch of an if statement at column col; Python's AST represents an elif
-    as an if statement alone in the else branch, at the same column"""
+    """Recover the elifs, which Python parses as nested ifs. A nested if at the same column as the
+    outer if is an elif."""
     match orelse:
         case []:
             return [], Option.None_()
