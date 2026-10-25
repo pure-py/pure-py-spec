@@ -216,6 +216,7 @@ The values of an \emph{equality type} are compared by structural equality, which
 & \Sigma \vdash \tyUnion{\sigma}{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \sigma \eqType \text{ and } \Sigma \vdash \tau \eqType \\
 & \Sigma \vdash C[\seq{\sigma}] \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \tyInst{\fields{\Sigma}(C)}{\seq{\sigma}}
 \end{defalign}
+\added{These conditions define the judgement coinductively, since the type of a field can mention its own class through a type alias.}
 \end{specdefinition}}
 
 \speconly{\noindent Callable types are not equality types, and neither are types with a callable component, so
