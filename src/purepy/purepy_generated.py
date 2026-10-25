@@ -398,12 +398,7 @@ def check(M: Any) -> bool:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        prog="purepy-generated",
-        description="Check a program from its entry module with the type checker generated from the "
-        "mechanisation, with the generated code on PYTHONPATH; exits with the codes of the reference type "
-        "checker",
-    )
+    parser = argparse.ArgumentParser(prog="purepy-generated")
     parser.add_argument("path", type=pathlib.Path)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
