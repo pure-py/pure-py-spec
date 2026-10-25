@@ -52,7 +52,8 @@ UNREPRESENTABLE = 5
 
 
 class Unrepresentable(Exception):
-    pass
+    def __init__(self, reason: str):
+        super().__init__(f"unrepresentable in Isabelle: {reason}")
 
 
 def string(s: str) -> list[str]:
@@ -414,7 +415,7 @@ def main() -> None:
         print(format_program_result(e, args.path))
         sys.exit(e.exit_code)
     except Unrepresentable as e:
-        print(f"{args.path}: unrepresentable in Isabelle: {e}")
+        print(f"{args.path}: {e}")
         sys.exit(UNREPRESENTABLE)
     print(f"{args.path}: {'ok' if ok else 'ill-formed'}")
     sys.exit(Exit.OK if ok else Exit.ILL_FORMED)
