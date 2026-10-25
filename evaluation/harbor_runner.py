@@ -42,7 +42,7 @@ def digest(value):
 
 
 def benchmark(data):
-    return "livecodebench" if data.get("benchmark") == "LiveCodeBench" else "humaneval"
+    return data["benchmark"].lower().replace("+", "-plus")
 
 
 class EvaluationFiles(BaseEnvironment):

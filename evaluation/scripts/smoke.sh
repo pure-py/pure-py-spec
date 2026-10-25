@@ -57,6 +57,11 @@ if [ "$ready" -ne 1 ]; then
 fi
 model="${SMOKE_MODEL:-qwen2.5-coder:0.5b}"
 "$ollama" pull "$model"
-env -u OPENAI_API_KEY -u ANTHROPIC_API_KEY -u DEEPSEEK_API_KEY bash scripts/evaluate.sh \
-  --model "$model" --base-url http://127.0.0.1:11435/v1 \
-  --limit "${SMOKE_LIMIT:-2}" --max-tokens 1024 --repair-rounds 1 "$@"
+name=$(printf '%s' "$model" | tr -c 'A-Za-z0-9_.-' '-')
+output_dir="${SMOKE_OUTPUT_DIR:-results/smoke-$(date -u +%Y%m%dT%H%M%SZ)}"
+for benchmark in ${SMOKE_BENCHMARKS:-humaneval}; do
+  env -u OPENAI_API_KEY -u ANTHROPIC_API_KEY -u DEEPSEEK_API_KEY bash scripts/evaluate.sh \
+    --model "$model" --base-url http://127.0.0.1:11435/v1 --benchmark "$benchmark" \
+    --limit "${SMOKE_LIMIT:-2}" --max-tokens 1024 --repair-rounds 1 \
+    --output "$output_dir/$benchmark/$name.json" "$@"
+done

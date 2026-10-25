@@ -32,6 +32,22 @@ class EvaluationTests(unittest.TestCase):
         self.assertNotIn("python", self.task)
         self.assertNotIn("purepy", self.task)
 
+    def test_evalplus_references_pass_and_wrong_answers_fail(self):
+        for benchmark in e.EVALPLUS:
+            problems, manifest = e.load_problems(benchmark, 2)
+            self.assertEqual(manifest["evaluated_problems"], 2)
+            for task_id, task in problems.items():
+                with self.subTest(task=task_id):
+                    reference = e.official_tests(task["official"]["reference"], task, benchmark)
+                    self.assertTrue(reference["passed"], reference["error"])
+                    self.assertEqual(reference["tests_passed"], len(task["official"]["inputs"]))
+                    wrong = e.official_tests(f"def {task['name']}(*args):\n    return None\n", task, benchmark)
+                    self.assertFalse(wrong["passed"])
+                    self.assertFalse(wrong["tooling_error"])
+        problems, manifest = e.load_problems("humaneval", all_problems=True)
+        self.assertEqual(len(problems), 164)
+        self.assertEqual(manifest["typed_interfaces"], 29)
+
     def test_checker_and_official_tests_are_independent(self):
         self.assertTrue(e.check(GOOD)["passed"])
         self.assertFalse(e.check(BAD)["passed"])

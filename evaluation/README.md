@@ -17,7 +17,9 @@ bash scripts/smoke.sh
 
 This downloads a checksum-verified Ollama release and a small local model into
 `.cache/`, starts a private local server, runs two HumanEval problems, writes
-results and plots, and stops the server.
+results and plots, and stops the server. `SMOKE_BENCHMARKS` lists the benchmarks
+to run, `SMOKE_LIMIT` the problems per benchmark and `SMOKE_OUTPUT_DIR` the
+results directory; CI runs one problem of each benchmark.
 
 With an existing Ollama server:
 
@@ -35,8 +37,12 @@ bash scripts/evaluate.sh --provider deepseek --model deepseek-v4-pro --max-token
 bash scripts/evaluate.sh --provider anthropic --model claude-opus-5-5 --max-tokens 16384 --benchmark livecodebench --difficulty hard
 ```
 
-Select `--benchmark humaneval` or `--benchmark livecodebench`, optionally with
-`--difficulty medium` or `--difficulty hard`. `--repair-rounds 0`, the default,
+`--benchmark` selects `humaneval`, `humaneval-plus`, `mbpp-plus` or
+`livecodebench`; LiveCodeBench also takes `--difficulty medium` or `--difficulty
+hard`. HumanEval and HumanEval+ run the frozen 20-problem selection unless
+`--all-problems` is given; MBPP+ runs all 378 problems. Each problem records
+whether its interface is fully annotated with types PurePy can express, so results
+can be split by that property. `--repair-rounds 0`, the default,
 is single-shot. With repair rounds, PurePy checker rejections are fed back to
 the model, never test outcomes; repair stops at acceptance or the budget. Python
 answers get no feedback. Every raw answer, extracted source, verdict, rejection
@@ -64,6 +70,10 @@ leave a gap unknown when either condition has unevaluated answers.
 HumanEval problems and official tests are downloaded from a fixed upstream
 revision and verified by SHA-256. `benchmarks/humaneval.json` holds the frozen
 selection: 20 of 164 problems, sampled from the 29 whose interfaces are typed.
+HumanEval+ and MBPP+ come from the pinned EvalPlus releases listed in
+`benchmarks/`. Their tests are the EvalPlus inputs: the reference solution
+computes the expected output for each input inside the sandbox, and the answer
+passes when every output matches, with EvalPlus's tolerance for floats.
 
 LiveCodeBench uses the 20 medium and 20 hard typed call-based problems frozen in
 `livecodebench/tasks.json`, out of 207 and 102 eligible in release_v6. Missing
@@ -122,8 +132,8 @@ which `make paper.pdf` in the repository root regenerates with this command from
 ## CI And Harbor
 
 The workflow `.github/workflows/evaluation.yml` runs in this directory on macOS
-and Linux whenever evaluation code changes: unit tests, the smoke test, the
-Harbor import and the compilation of the generated figure. It checks that the
+and Linux whenever evaluation code changes: unit tests, a one-problem smoke run
+of every benchmark, the Harbor import and the compilation of the generated figure. It checks that the
 pipeline works, not what the model answers: wrong code and checker rejections
 are ordinary outcomes, while API errors, an unavailable checker or grader, and a
 broken sandbox fail the job. Reports are uploaded even when the job fails.

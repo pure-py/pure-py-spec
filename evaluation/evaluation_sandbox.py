@@ -92,6 +92,65 @@ def run(payload, timeout):
             return {"passed": None, "error": "sandbox did not return a valid verdict", "tooling_error": True}
 
 
+def floats(value):
+    if isinstance(value, float):
+        return True
+    return isinstance(value, (list, tuple)) and bool(value) and all(isinstance(item, float) for item in value)
+
+
+def matches(output, expected, atol):
+    try:
+        if output == expected:
+            return True
+    except Exception:
+        return False
+    if atol == 0 and floats(expected):
+        atol = 1e-6
+    if atol == 0 or type(output) is not type(expected):
+        return False
+    if isinstance(expected, (list, tuple)) and len(output) != len(expected):
+        return False
+    import numpy as np
+    try:
+        return bool(np.allclose(output, expected, rtol=1e-7, atol=atol))
+    except (TypeError, ValueError):
+        return False
+
+
+def evalplus(payload):
+    import copy
+
+    def load(source):
+        namespace = {}
+        exec(compile(source, "solution.py", "exec"), namespace)
+        return namespace[payload["name"]]
+
+    try:
+        reference = load(payload["reference"])
+        expected = [reference(*copy.deepcopy(arguments)) for arguments in payload["inputs"]]
+    except BaseException:
+        return {"passed": None, "error": "reference solution failed: " + traceback.format_exc().strip()[-500:],
+                "tooling_error": True}
+    try:
+        candidate = load(payload["candidate"])
+    except BaseException:
+        return {"passed": False, "error": traceback.format_exc().strip()[-1000:], "tooling_error": False,
+                "tests_passed": 0, "tests_total": len(expected)}
+    passed, first = 0, None
+    for index, (arguments, want) in enumerate(zip(payload["inputs"], expected)):
+        try:
+            got = candidate(*copy.deepcopy(arguments))
+            ok = matches(got, want, payload["atol"])
+        except BaseException as error:
+            got, ok = f"{type(error).__name__}: {error}", False
+        if ok:
+            passed += 1
+        elif first is None:
+            first = f"input {index}: {arguments!r:.200} expected {want!r:.200} got {got!r:.200}"
+    return {"passed": passed == len(expected), "error": first, "tooling_error": False,
+            "tests_passed": passed, "tests_total": len(expected)}
+
+
 def worker():
     payload = json.load(sys.stdin)
     limit = float(payload["timeout"])
@@ -123,6 +182,10 @@ def worker():
                       "error": None if all(r > 0 for r in outcomes) else json.dumps(metadata, default=str),
                       "tests_passed": int(sum(r > 0 for r in outcomes)), "tests_total": payload["test_count"],
                       "tooling_error": False}
+        elif payload["benchmark"] == "EvalPlus":
+            with tempfile.TemporaryFile(mode="w+", dir=payload["directory"]) as capture:
+                with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(capture):
+                    result = evalplus(payload)
         else:
             with tempfile.TemporaryFile(mode="w+", dir=payload["directory"]) as capture:
                 with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(capture):

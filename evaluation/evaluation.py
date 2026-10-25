@@ -15,6 +15,7 @@ import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
+import warnings
 
 import evaluation_sandbox
 
@@ -26,6 +27,10 @@ CHECKER_SHA = "cd59f9e8656d2b617954caaf60bdb89d91ccc9cbee830d63977e8abf8a857c27"
 HARNESS_SHA = "b7cb6a8a69807bb868150a61742e25d7bb5328bbe01d514471b6ec43c9fa9ed2"
 CONDITIONS = ("python", "purepy")
 OUTPUT_FORMAT_VERSION = "tagged-code-v1"
+BENCHMARKS = {"humaneval": "HumanEval", "humaneval-plus": "HumanEval+", "mbpp-plus": "MBPP+",
+              "livecodebench": "LiveCodeBench"}
+EVALPLUS = ("humaneval-plus", "mbpp-plus")
+SIMPLE_TYPES = {"int", "float", "bool", "str", "object"}
 
 
 def sha(raw):
@@ -55,45 +60,88 @@ def download(url, path, expected):
     return path
 
 
-def load_problems(benchmark, limit=None, difficulty=None):
-    if benchmark == "humaneval":
-        manifest = json.loads((ROOT / "benchmarks/humaneval.json").read_text())
-        path = download(manifest["url"], CACHE / "HumanEval.jsonl.gz", manifest["sha256"])
-        with gzip.open(path, "rt") as source:
-            official = {p["task_id"]: p for p in map(json.loads, source)}
-        if len(official) != manifest["total_problems"]:
-            raise RuntimeError("HumanEval benchmark size changed")
-        problems = {}
-        for task_id in manifest["task_ids"]:
-            problem = official[task_id]
-            node = next(n for n in ast.parse(problem["prompt"]).body
-                        if isinstance(n, ast.FunctionDef) and n.name == problem["entry_point"])
-            signature = ast.unparse(node).splitlines()[0]
-            signature = re.sub(r"\b(List|Tuple|Dict)\b", lambda m: m[0].lower(), signature)
-            problems[task_id] = {"name": problem["entry_point"], "question": problem["prompt"],
-                                 "signature": signature, "official": problem}
-        manifest = {**manifest, "selected_problems": len(problems)}
-    else:
+def expressible(node):
+    if isinstance(node, ast.Name):
+        return node.id in SIMPLE_TYPES
+    if isinstance(node, ast.Constant):
+        return node.value is None
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.BitOr):
+        return expressible(node.left) and expressible(node.right)
+    if isinstance(node, ast.Subscript) and isinstance(node.value, ast.Name):
+        name = node.value.id
+        if name in ("List", "list", "Optional"):
+            return expressible(node.slice)
+        if name in ("Dict", "dict") and isinstance(node.slice, ast.Tuple) and len(node.slice.elts) == 2:
+            key, value = node.slice.elts
+            return isinstance(key, ast.Name) and key.id == "str" and expressible(value)
+        if name in ("Tuple", "tuple") and isinstance(node.slice, ast.Tuple):
+            return all(expressible(item) for item in node.slice.elts)
+    return False
+
+
+def function_signature(source, name):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", SyntaxWarning)
+        module = ast.parse(source)
+    node = next(n for n in module.body if isinstance(n, ast.FunctionDef) and n.name == name)
+    annotations = [argument.annotation for argument in node.args.args] + [node.returns]
+    typed = all(annotation is not None and expressible(annotation) for annotation in annotations)
+    signature = ast.unparse(node).splitlines()[0]
+    return re.sub(r"\b(List|Tuple|Dict)\b", lambda m: m[0].lower(), signature), typed
+
+
+def load_rows(manifest):
+    path = download(manifest["url"], CACHE / manifest["url"].rsplit("/", 1)[1], manifest["sha256"])
+    with gzip.open(path, "rt") as source:
+        rows = {row["task_id"]: row for row in map(json.loads, source)}
+    if len(rows) != manifest["total_problems"]:
+        raise RuntimeError(f"{manifest['benchmark']} benchmark size changed")
+    return rows
+
+
+def load_problems(benchmark, limit=None, difficulty=None, all_problems=False):
+    if benchmark == "livecodebench":
         import livecodebench as lcb
-        lcb.prepare()
+        lcb.prepare(set())
         data = json.loads(lcb.TASKS.read_text())
-        if data["manifest"]["dataset_revision"] != lcb.DATASET_REVISION:
-            raise RuntimeError("LiveCodeBench dataset revision changed")
-        if data["manifest"]["harness_revision"] != lcb.HARNESS_REVISION:
-            raise RuntimeError("LiveCodeBench harness revision changed")
         download("https://raw.githubusercontent.com/LiveCodeBench/LiveCodeBench/"
                  + lcb.HARNESS_REVISION + "/lcb_runner/evaluation/testing_util.py",
                  CACHE / "lcb-grader.py", HARNESS_SHA)
-        problems = {k: v for k, v in data["tasks"].items()
+        problems = {k: {**v, "typed_interface": True} for k, v in data["tasks"].items()
                     if not difficulty or v["difficulty"] == difficulty}
         manifest = {**data["manifest"], "selection_sha256": sha(lcb.TASKS.read_bytes()),
                     "total_problems": 1055, "selected_problems": len(problems),
                     "scope": "Typed call-based subset of release_v6; 1055 release problems in total."}
-        for task_id, task in problems.items():
+        chosen = dict(list(problems.items())[:limit])
+        lcb.prepare(set(chosen))
+        for task_id, task in chosen.items():
             if sha(lcb.case_path(task_id).read_bytes()) != task["tests_sha256"]:
                 raise RuntimeError("LiveCodeBench test fixture checksum mismatch")
-    chosen = dict(list(problems.items())[:limit])
-    return chosen, {**manifest, "evaluated_problems": len(chosen)}
+    else:
+        manifest = json.loads((ROOT / f"benchmarks/{benchmark}.json").read_text())
+        rows = load_rows(manifest)
+        task_ids = list(rows) if all_problems or not manifest.get("task_ids") else manifest["task_ids"]
+        problems = {}
+        for task_id in task_ids:
+            row = rows[task_id]
+            if benchmark == "mbpp-plus":
+                signature, typed = function_signature(row["canonical_solution"], row["entry_point"])
+            else:
+                signature, typed = function_signature(row["prompt"], row["entry_point"])
+            if benchmark == "humaneval":
+                official = row
+            else:
+                reference = row["canonical_solution"] if benchmark == "mbpp-plus" else row["prompt"] + row["canonical_solution"]
+                inputs = [list(group.values()) if isinstance(group, dict) else group
+                          for group in (row["base_input"], row["plus_input"])]
+                official = {"reference": reference, "inputs": inputs[0] + inputs[1], "atol": row["atol"]}
+            problems[task_id] = {"name": row["entry_point"], "question": row["prompt"], "signature": signature,
+                                 "typed_interface": typed, "official": official}
+        manifest = {**manifest, "selected_problems": len(problems),
+                    "typed_interfaces": sum(p["typed_interface"] for p in problems.values())}
+        chosen = dict(list(problems.items())[:limit])
+    return chosen, {**manifest, "evaluated_problems": len(chosen),
+                    "evaluated_typed_interfaces": sum(p["typed_interface"] for p in chosen.values())}
 
 
 def output_instruction(condition):
@@ -297,6 +345,10 @@ def official_tests(code, task, benchmark):
         problem = task["official"]
         program = problem["prompt"] + "\n" + code + "\n" + problem["test"] + "\ncheck(" + task["name"] + ")\n"
         return evaluation_sandbox.run({"benchmark": "HumanEval", "program": program}, 3)
+    if benchmark in EVALPLUS:
+        official = task["official"]
+        return evaluation_sandbox.run({"benchmark": "EvalPlus", "reference": official["reference"], "candidate": code,
+                                       "name": task["name"], "inputs": official["inputs"], "atol": official["atol"]}, 60)
     import livecodebench as lcb
     fixture = json.loads(lcb.case_path(task["task_id"]).read_text())
     alias = "_lcb_core_" + sha(task["task_id"].encode())[:12]
@@ -327,6 +379,14 @@ def validate_backend(benchmark):
         + f"assert not os.access({str(ROOT / 'pyproject.toml')!r}, os.R_OK)\n"}, 3)
     if isolation["passed"] is not True:
         raise RuntimeError("sandbox isolation check failed")
+    if benchmark in EVALPLUS:
+        identity = "def probe(x):\n    return x\n"
+        probe = {"benchmark": "EvalPlus", "reference": identity, "candidate": identity, "name": "probe",
+                 "inputs": [[1], [2.5], [[1, 2]]], "atol": 0}
+        wrong = {**probe, "candidate": "def probe(x):\n    return None\n"}
+        if (evaluation_sandbox.run(probe, 10)["passed"] is not True
+                or evaluation_sandbox.run(wrong, 10)["passed"] is not False):
+            raise RuntimeError("EvalPlus test runner health check failed")
     if benchmark == "livecodebench":
         probe = evaluation_sandbox.run({"benchmark": "LiveCodeBench",
             "grader_source": (CACHE / "lcb-grader.py").read_text(),
@@ -522,6 +582,7 @@ def report(path):
     save(path, data)
     lines = [f"# {data['model']}", "", f"Benchmark: {data['benchmark']}",
              f"Problems: {summary['problems']} of {summary['benchmark_total']}",
+             f"Typed interfaces: {data['manifest'].get('evaluated_typed_interfaces', 'unrecorded')} of {summary['problems']}",
              f"Scope: {summary['scope']}", f"PurePy checker: {data['protocol']['checker_version']}",
              f"Maximum checker-feedback repair rounds: {data['protocol']['repair_rounds']}", "",
              f"Output format: {data['protocol'].get('output_format', 'untagged')}", "",
@@ -657,7 +718,7 @@ def compare(paths, destination):
 
 
 def run(args):
-    problems, manifest = load_problems(args.benchmark, args.limit, args.difficulty)
+    problems, manifest = load_problems(args.benchmark, args.limit, args.difficulty, getattr(args, "all_problems", False))
     if not problems:
         raise RuntimeError("the selection contains no problems")
     validate_backend(args.benchmark)
@@ -675,7 +736,7 @@ def run(args):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("x") as stream:
         stream.write("{}\n")
-    data = {"benchmark": "HumanEval" if args.benchmark == "humaneval" else "LiveCodeBench",
+    data = {"benchmark": BENCHMARKS[args.benchmark],
             "model": args.model, "manifest": manifest, "tasks": {},
             "protocol": {"checker_version": CHECKER_VERSION, "wheel_sha256": CHECKER_SHA,
                          "definition_sha256": sha((ROOT / "prompts/purepy-v0.22.3.md").read_bytes()),
@@ -730,7 +791,8 @@ def main():
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="action", required=True)
     execution = sub.add_parser("run")
-    execution.add_argument("--benchmark", choices=["humaneval", "livecodebench"], default="humaneval")
+    execution.add_argument("--benchmark", choices=list(BENCHMARKS), default="humaneval")
+    execution.add_argument("--all-problems", action="store_true", help="every problem of the benchmark instead of the frozen selection")
     execution.add_argument("--model", default="qwen2.5-coder:0.5b")
     execution.add_argument("--provider", choices=["openai", "anthropic", "deepseek"], default="openai")
     execution.add_argument("--base-url")
@@ -764,6 +826,8 @@ def main():
         parser.error("--model-size must be positive when supplied")
     if args.difficulty and args.benchmark != "livecodebench":
         parser.error("difficulty filtering applies only to LiveCodeBench")
+    if args.all_problems and args.benchmark == "livecodebench":
+        parser.error("LiveCodeBench runs its frozen selection only")
     try:
         run(args)
     except RuntimeError as error:
