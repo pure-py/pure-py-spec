@@ -130,10 +130,10 @@ def resolve_type(
 
     match psi:
         case Primitive():
-            check_in_scope(psi.value, node, mod_ctx)
+            check_predefined(psi.value, node, mod_ctx)
             return psi
         case LiteralType():
-            check_in_scope(TypeConstructor.LITERAL.value, node, mod_ctx)
+            check_predefined(TypeConstructor.LITERAL.value, node, mod_ctx)
             return psi
         case TypeName(q, args):
             match resolve_name(q, mod_ctx):
@@ -148,17 +148,17 @@ def resolve_type(
                 case _:
                     raise IllFormedModule(node, reasons.NotClass(q))
         case ListExpr(psi_):
-            check_in_scope(TypeConstructor.LIST.value, node, mod_ctx)
+            check_predefined(TypeConstructor.LIST.value, node, mod_ctx)
             return ListType(resolve(psi_))
         case DictExpr(psi_):
-            check_in_scope(TypeConstructor.DICT.value, node, mod_ctx)
-            check_in_scope(Primitive.STR.value, node, mod_ctx)
+            check_predefined(TypeConstructor.DICT.value, node, mod_ctx)
+            check_predefined(Primitive.STR.value, node, mod_ctx)
             return DictType(resolve(psi_))
         case TupleExpr(psis):
-            check_in_scope(TypeConstructor.TUPLE.value, node, mod_ctx)
+            check_predefined(TypeConstructor.TUPLE.value, node, mod_ctx)
             return TupleType(tuple(map(resolve, psis)))
         case CallableExpr(psis, psi_):
-            check_in_scope(TypeConstructor.CALLABLE.value, node, mod_ctx)
+            check_predefined(TypeConstructor.CALLABLE.value, node, mod_ctx)
             return CallableType(tuple(map(resolve, psis)), resolve(psi_))
         case UnionExpr():
             return UnionType(resolve(psi.left), resolve(psi.right))
@@ -199,7 +199,7 @@ def ty_class(
     return ClassType(c, taus)
 
 
-def check_in_scope(x: Var, node: ast.AST, mod_ctx: ModuleContext) -> None:
+def check_predefined(x: Var, node: ast.AST, mod_ctx: ModuleContext) -> None:
     if not isinstance(mod_ctx.gamma.get(x), PredefinedName):
         raise IllFormedModule(node, reasons.NotPredefinedName(x))
 
