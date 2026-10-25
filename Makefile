@@ -11,7 +11,7 @@ AUX := $(BUILD_AUX) *.bbl
 
 default: paper.pdf
 
-all: PurePy-spec.pdf paper.pdf graduality.pdf paper-arXiv.zip paper-submission
+all: PurePy-spec.pdf paper.pdf graduality.pdf paper-arXiv.zip paper-submission check-tests-generated
 
 # Unresolved references are only warnings to pdflatex.
 define check-log
@@ -83,7 +83,7 @@ spec-anon.pdf: $(TEXFILES)
 
 ISABELLE := isabelle-purepy
 
-check-mechanisation:
+isabelle-purepy:
 	@test -e $(ISABELLE)/ROOT || \
 		{ echo "$(ISABELLE) not checked out: git submodule update --init"; exit 1; }
 	@test -z "$$(git -C $(ISABELLE) status --porcelain)" || \
@@ -94,7 +94,12 @@ check-mechanisation:
 		{ echo "isabelle not on PATH: needed to check $(ISABELLE)"; exit 1; }
 	$(MAKE) -C $(ISABELLE) build
 
-supplementary.zip: spec-anon.pdf check-mechanisation
+GENERATED := $(ISABELLE)/python/python_out/isabelle-purepy-python.Codegen/code
+check-tests-generated: isabelle-purepy
+	PYTHONPATH=$(GENERATED) uv run --locked purepy-conformance --no-run \
+		--type-checker "uv run --locked purepy-generated --check" --known-failures test/purepy-generated-failures.txt
+
+supplementary.zip: spec-anon.pdf isabelle-purepy
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
 	./anonymise-mechanisation.sh .submission
@@ -116,4 +121,4 @@ clean:
 	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-.PHONY: default all paper-submission clean check-mechanisation check-tests
+.PHONY: default all paper-submission clean isabelle-purepy check-tests-generated check-tests

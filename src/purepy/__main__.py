@@ -15,7 +15,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if not args.check:
-        parser.error("running programs is not supported yet; use --check")
+        parser.error("running programs not yet implemented")
 
     if args.module:
         result = check_file(str(args.path))

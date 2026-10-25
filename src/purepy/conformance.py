@@ -4,8 +4,10 @@ import contextlib
 import importlib.resources
 import pathlib
 import shlex
+import shutil
 import subprocess
 import sys
+import tempfile
 from collections.abc import Iterator
 from enum import IntEnum, StrEnum
 from typing import NamedTuple
@@ -47,13 +49,13 @@ class Exit(IntEnum):
 
 
 class Expectation(NamedTuple):
-    exit: Exit | None  # None: checker not run
-    error_checked: bool  # checker output contains .error.expected
+    exit: Exit | None  # None: type checker not run
+    error_checked: bool  # type checker output contains .error.expected
     python: PythonOutcome | None  # None: not run under Python
 
 
-# Checker verdict for each PurePy outcome
-CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
+# Type checker verdict for each PurePy outcome
+TYPE_CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
     PurePyOutcome.PARSER_REJECTS: (Exit.NOT_ALLOWED, True),
     PurePyOutcome.TYPING_REJECTS: (Exit.ILL_FORMED, True),
     PurePyOutcome.UNDEFINED: (Exit.OK, False),
@@ -62,7 +64,7 @@ CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
 
 
 def expectation(python: PythonOutcome, purepy: PurePyOutcome) -> Expectation:
-    exit, error_checked = CHECKER[purepy]
+    exit, error_checked = TYPE_CHECKER[purepy]
     return Expectation(exit, error_checked, python)
 
 
@@ -71,9 +73,11 @@ def run(cmd: list[str], cwd: pathlib.Path | None = None) -> "subprocess.Complete
 
 
 class Runner:
-    def __init__(self, interpreter: str | None, checker: list[str] | None) -> None:
+    def __init__(self, interpreter: str | None, type_checker: list[str] | None) -> None:
         self.interpreter = interpreter  # None: tests not run
-        self.checker = checker  # command given the test path; None: the reference checker
+        self.type_checker = (
+            type_checker  # command given the test path; None: the reference type checker
+        )
         self.passed = 0
         self.failed: list[str] = []
         self.failures: list[str] = []
@@ -96,15 +100,21 @@ class Runner:
             print(f"  {GREEN}✓{RESET} {label}")
 
     def check(self, path: pathlib.Path, exit: Exit, error_checked: bool) -> list[str]:
+        """Each test is checked in a separate directory, so other tests can't interfere. Single-module tests
+        are copied to a new directory before running."""
         reference = [sys.executable, "-m", "purepy", "--check"]
-        proc = run([*(self.checker or reference), str(path)])
+        with tempfile.TemporaryDirectory() as alone:
+            checked = path if path.name == MAIN else pathlib.Path(shutil.copy(path, alone))
+            proc = run([*(self.type_checker or reference), str(checked)])
         exits = {exit, Exit.ILL_FORMED_PROGRAM} if exit == Exit.ILL_FORMED else {exit}
         output = proc.stdout + proc.stderr
         error = path.with_suffix(ERROR_EXPECTED)
         if proc.returncode not in exits:
-            first = output.strip().split("\n", 1)[0]
+            first = output.strip().split("\n", 1)[0].replace(f"{checked.parent}/", "")
             return [f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}: {first}"]
-        if not error_checked or self.checker is not None:  # messages are the reference checker's
+        if (
+            not error_checked or self.type_checker is not None
+        ):  # messages are the reference type checker's
             return []
         if not error.exists():
             return [f"check: missing {error.name}"]
@@ -225,8 +235,8 @@ def main() -> None:
         "--no-run", action="store_true", help="check the tests without running them"
     )
     parser.add_argument(
-        "--checker",
-        help="command run on the path of each test in place of the reference checker, with the same "
+        "--type-checker",
+        help="command run on the path of each test in place of the reference type checker, with the same "
         "exit codes; error messages are not compared",
     )
     parser.add_argument(
@@ -243,7 +253,7 @@ def main() -> None:
     args = parser.parse_args()
     r = Runner(
         None if args.no_run else args.interpreter,
-        shlex.split(args.checker) if args.checker else None,
+        shlex.split(args.type_checker) if args.type_checker else None,
     )
     with suite() as path:
         r.run_suite(path, args.jobs)
