@@ -46,24 +46,25 @@ from .type_syntax import (
     parse_name,
 )
 
-OUTSIDE_FRAGMENT = 5
+# Float or string unrepresentable in Isabelle; delete with https://github.com/pure-py/isabelle-purepy/issues/11
+UNREPRESENTABLE = 5
 
 
-class OutsideFragment(Exception):
+class Unrepresentable(Exception):
     pass
 
 
 def string(s: str) -> list[str]:
-    """Isabelle string: list of one-character strings, each Latin-1"""
+    """Isabelle string, if Latin-1"""
     if any(ord(c) > 255 for c in s):
-        raise OutsideFragment(f"string {s!r} with a character outside Latin-1")
+        raise Unrepresentable(f"string {s!r} with a character outside Latin-1")
     return list(s)
 
 
 def real(x: float) -> Any:
-    """Float as the real it denotes, since floats are reals in the mechanisation"""
+    """Isabelle real, if finite"""
     if not math.isfinite(x):
-        raise OutsideFragment(f"float {x} outside the reals")
+        raise Unrepresentable(f"float {x} outside the reals")
     return Real.Ratreal(Rat.Frct(x.as_integer_ratio()))
 
 
@@ -146,7 +147,11 @@ BOP = {
     ast.NotIn: Syntax.BOpNotIn,
 }
 
-UOP = {ast.Not: Syntax.UOpNot, ast.UAdd: Syntax.UOpPos, ast.USub: Syntax.UOpNeg}
+UOP = {
+    ast.Not: Syntax.UOpNot,
+    ast.UAdd: Syntax.UOpPos,
+    ast.USub: Syntax.UOpNeg,
+}
 
 
 def expr(e: ast.expr) -> Any:
@@ -414,7 +419,7 @@ def main() -> None:
         prog="purepy-generated",
         description="Check a program from its entry module with the type checker generated from the "
         "mechanisation, with the generated code on PYTHONPATH; exits with the codes of the reference type "
-        f"checker, or with {OUTSIDE_FRAGMENT} for a program outside the mechanised fragment",
+        f"checker, or with {UNREPRESENTABLE} for a program with a float or string unrepresentable in Isabelle",
     )
     parser.add_argument("path", type=pathlib.Path)
     parser.add_argument("--check", action="store_true")
@@ -426,9 +431,9 @@ def main() -> None:
     except syntax.Unsupported as e:
         print(format_program_result(e, args.path))
         sys.exit(e.exit_code)
-    except OutsideFragment as e:
-        print(f"{args.path}: outside the mechanised fragment: {e}")
-        sys.exit(OUTSIDE_FRAGMENT)
+    except Unrepresentable as e:
+        print(f"{args.path}: unrepresentable in Isabelle: {e}")
+        sys.exit(UNREPRESENTABLE)
     print(f"{args.path}: {'ok' if ok else 'ill-formed'}")
     sys.exit(Exit.OK if ok else Exit.ILL_FORMED)
 
