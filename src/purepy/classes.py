@@ -11,6 +11,7 @@ from .contexts import (
     TypeAlias,
     TypeVar,
     Unbound,
+    lookup,
     predefined_context,
     resolve_name,
     type_context,
@@ -135,18 +136,16 @@ def resolve_type(
         case LiteralType():
             check_predefined(TypeConstructor.LITERAL.value, node, mod_ctx)
             return psi
+        case TypeName(Name((alpha,)), ()) if isinstance(mod_ctx.gamma.get(alpha), TypeVar):
+            return TypeVariable(alpha)
         case TypeName(q, args):
-            match resolve_name(q, mod_ctx):
-                case Unbound():
-                    raise IllFormedModule(node, reasons.UnboundName(str(q)))
-                case TypeVar() if len(args) == 0:
-                    return TypeVariable(str(q))
+            match resolve_name(q, mod_ctx.gamma):
                 case TypeAlias() as theta:
                     return ty_alias(theta, q, tuple(map(resolve, args)), node, mod_ctx, resolving)
                 case ClassName() as c:
                     return ty_class(c, q, tuple(map(resolve, args)), node, mod_ctx)
                 case _:
-                    raise IllFormedModule(node, reasons.NotClass(q))
+                    raise IllFormedModule(node, not_type_name(q, mod_ctx.gamma))
         case ListExpr(psi_):
             check_predefined(TypeConstructor.LIST.value, node, mod_ctx)
             return ListType(resolve(psi_))
@@ -162,6 +161,14 @@ def resolve_type(
             return CallableType(tuple(map(resolve, psis)), resolve(psi_))
         case UnionExpr():
             return UnionType(resolve(psi.left), resolve(psi.right))
+
+
+def not_type_name(q: Name, gamma: Context) -> reasons.Reason:
+    return (
+        reasons.UnboundName(str(q))
+        if isinstance(lookup(q, gamma), Unbound)
+        else reasons.NotClass(q)
+    )
 
 
 def ty_alias(

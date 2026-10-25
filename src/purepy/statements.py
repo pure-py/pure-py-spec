@@ -16,6 +16,7 @@ from .classes import (
     field_type,
     fields,
     no_field_map,
+    not_type_name,
     resolve_type,
     short_name,
 )
@@ -39,6 +40,7 @@ from .contexts import (
     class_of_name,
     entry_of,
     is_assigned,
+    lookup,
     merge_outcomes,
     module_of,
     override_gamma,
@@ -94,6 +96,7 @@ from .type_syntax import (
     UnionType,
     Var,
     base_type,
+    dotted_name,
     float_literal,
     literal,
     parse_annotation,
@@ -447,13 +450,13 @@ def synth_expr(e: ast.expr, mod_ctx: ModuleContext) -> Type:
             return branch_type(e, mod_ctx)
         case ast.Attribute(value=e_, attr=x):
             parent = entry_of(e_, mod_ctx)
-            match parent:
-                case ModuleChecked():
-                    return attr_module(parent, x, e)
-                case ModuleStub(q):
-                    raise IllFormedModule(e, reasons.SubmoduleNotImported(q))
-                case _:
-                    return attribute_type(synth_expr(e_, mod_ctx), e, mod_ctx)
+            if isinstance(parent, ModuleChecked):
+                return attr_module(parent, x, e)
+            q = dotted_name(e_)
+            stub = None if q is None else lookup(q, mod_ctx.gamma)
+            if isinstance(stub, ModuleStub):
+                raise IllFormedModule(e, reasons.SubmoduleNotImported(stub.q))
+            return attribute_type(synth_expr(e_, mod_ctx), e, mod_ctx)
         case ast.Subscript(value=e_, slice=index):
             return subscript_type(synth_expr(e_, mod_ctx), e, index, mod_ctx)
         case ast.Tuple(elts=es):
@@ -893,12 +896,8 @@ def type_alias(node: ast.TypeAlias, mod_ctx: ModuleContext) -> None:
 def base_class(node: ast.ClassDef, mod_ctx: ModuleContext) -> ClassType:
     psi = parse_annotation(node.bases[0])
     assert isinstance(psi, TypeName)
-    match resolve_name(psi.q, mod_ctx):
-        case Unbound():
-            raise IllFormedModule(node, reasons.UnboundName(str(psi.q)))
-        case ClassName():
-            tau = resolve_type(psi, node, mod_ctx)
-            assert isinstance(tau, ClassType)
-            return tau
-        case _:
-            raise IllFormedModule(node, reasons.NotClass(psi.q))
+    if not isinstance(resolve_name(psi.q, mod_ctx.gamma), ClassName):
+        raise IllFormedModule(node, not_type_name(psi.q, mod_ctx.gamma))
+    tau = resolve_type(psi, node, mod_ctx)
+    assert isinstance(tau, ClassType)
+    return tau

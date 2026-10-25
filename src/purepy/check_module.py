@@ -6,19 +6,17 @@ from . import reasons, syntax
 from .classes import PREDEFINED_CLASSES, ClassTable
 from .contexts import (
     BUILTINS,
-    DU,
     MAIN,
     PREDEFINED_MODULES,
-    PU,
     Context,
     ContextEntry,
     ModuleChecked,
     ModuleContext,
     ModuleStub,
-    Unbound,
     extend_context,
     override_context,
     predefined_context,
+    resolve_name,
 )
 from .reasons import IllFormed, IllFormedModule, IllFormedProgram
 from .statements import check_assignments_declared, check_top_seq, scope
@@ -142,14 +140,15 @@ def imports(
     iota: ast.stmt, x: Var, q: Name, gamma: Context, mod_ctx: ModuleContext
 ) -> tuple[ContextEntry, ClassTable]:
     theta = gamma.get(x)
-    if theta is None:
-        raise IllFormedModule(iota, reasons.UnknownMember(x, q))
     if isinstance(theta, ModuleStub):
         members, Sigma = check_module(mod_ctx.M[theta.q], mod_ctx.M, theta.q, mod_ctx.Sigma)
         return ModuleChecked(theta.q, members), Sigma
-    if isinstance(theta, (Unbound, DU, PU)):
-        raise IllFormedModule(iota, reasons.UnassignedMember(x, q))
-    return theta, mod_ctx.Sigma
+    resolved = resolve_name(Name((x,)), gamma)
+    if resolved is None:
+        raise IllFormedModule(
+            iota, reasons.UnknownMember(x, q) if theta is None else reasons.UnassignedMember(x, q)
+        )
+    return resolved, mod_ctx.Sigma
 
 
 _signatures: dict[tuple[int, Name], Context] = {}
