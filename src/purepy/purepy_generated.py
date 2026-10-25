@@ -298,7 +298,7 @@ def item_stmt(item: Statement) -> Any:
 
 
 def func(d: ast.stmt) -> Any:
-    assert isinstance(d, ast.FunctionDef)  # a region of function definitions holds nothing else
+    assert isinstance(d, ast.FunctionDef)  # mutual def regions hold only def statements
     return Syntax.Def(
         string(d.name),
         type_params(d),
