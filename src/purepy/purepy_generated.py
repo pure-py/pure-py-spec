@@ -385,9 +385,8 @@ def path_of(q: Name, entry_path: pathlib.Path) -> pathlib.Path:
     if q == MAIN:
         return entry_path
     path = module_path(q, entry_path.parent)
-    assert (
-        path is not None
-    )  # other names come from files and directories under the entry module's directory
+    # other names come from files and directories under the entry module's directory
+    assert path is not None
     return path
 
 
