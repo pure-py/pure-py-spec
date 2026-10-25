@@ -1,0 +1,66 @@
+\begin{figure}
+\begin{AddedBlock}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Sigma; \seq{\alpha} \vdash \tau \eqType$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eq-prim}}]
+{ \strut }
+{ \Sigma; \seq{\alpha} \vdash \nu \eqType }
+\and
+\inferrule*[lab={\ruleName{eq-literal}}]
+{ \strut }
+{ \Sigma; \seq{\alpha} \vdash \tyLiteral{\ell} \eqType }
+\and
+\inferrule*[lab={\ruleName{eq-var}}]
+{ \alpha \in \set{\seq{\alpha}} }
+{ \Sigma; \seq{\alpha} \vdash \alpha \eqType }
+\and
+\inferrule*[lab={\ruleName{eq-list}}]
+{ \Sigma; \seq{\alpha} \vdash \tau \eqType }
+{ \Sigma; \seq{\alpha} \vdash \tyList{\tau} \eqType }
+\and
+\inferrule*[lab={\ruleName{eq-dict}}]
+{ \Sigma; \seq{\alpha} \vdash \tau \eqType }
+{ \Sigma; \seq{\alpha} \vdash \tyDict{\tau} \eqType }
+\and
+\inferrule*[lab={\ruleName{eq-tuple}}]
+{ \Sigma; \seq{\alpha} \vdash \tau_i \eqType \quad (\forall i) }
+{ \Sigma; \seq{\alpha} \vdash \tyTuple{\seq{\tau}} \eqType }
+\and
+\inferrule*[lab={\ruleName{eq-union}}]
+{ \Sigma; \seq{\alpha} \vdash \sigma \eqType \\ \Sigma; \seq{\alpha} \vdash \tau \eqType }
+{ \Sigma; \seq{\alpha} \vdash \tyUnion{\sigma}{\tau} \eqType }
+\and
+\inferrule*[lab={\ruleName{eq-instance}}]
+{
+  \Sigma \vdash C \eqClass \\
+  \fields{\Sigma}(C) = \scheme{\seq{\beta}}{\bind{\seq{x}}{\seq{\tau}}} \\
+  \Sigma; \seq{\alpha} \vdash \sigma_i \eqType \quad (\forall i.\ \beta_i \in \fv(\seq{\tau}))
+}
+{ \Sigma; \seq{\alpha} \vdash C[\seq{\sigma}] \eqType }
+\end{mathpar}
+\subcaption{Type $\tau$ is an equality type, with type variables $\seq{\alpha}$ assumed to be (inductive)}
+\label{fig:equality-type}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Sigma \vdash C \eqClass$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eq-class}}]
+{
+  \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} \\
+  \Sigma; \seq{\alpha} \vdash \tau_i \eqType \quad (\forall i)
+}
+{ \Sigma \vdash C \eqClass }
+\end{mathpar}
+\subcaption{Class $C$ is an equality class (coinductive)}
+\label{fig:equality-class}
+\end{subfigure}
+\caption{Equality types and classes}
+\label{fig:equality-types}
+\end{AddedBlock}
+\end{figure}

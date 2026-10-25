@@ -205,7 +205,10 @@ The \ruleName{binop} and \ruleName{unop} rules (\specfigref{typing-synth}) take 
 of the most specific overload at the operand types, $\resolveOp{\Sigma}$\speconly{ (\S\ref{aux:resolve-op})}, so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
-\speconly{\begin{specdefinition}{Equality type}
+\speconly{\specinput{spec/fig/equality-types}}
+
+\speconly{\begin{DeletedBlock}
+\begin{specdefinition}{Equality type}
 The values of an \emph{equality type} are compared by structural equality, which is defined except at the dynamically excluded comparisons (\secref{no-coercions}):
 \begin{defalign}
 & \Sigma \vdash \nu \eqType \\
@@ -214,12 +217,14 @@ The values of an \emph{equality type} are compared by structural equality, which
 & \Sigma \vdash \tyDict{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \\
 & \Sigma \vdash \tyTuple{\seq{\tau}} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau_i \eqType \quad (\forall i) \\
 & \Sigma \vdash \tyUnion{\sigma}{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \sigma \eqType \text{ and } \Sigma \vdash \tau \eqType \\
-& \deleted{\Sigma \vdash C[\seq{\sigma}] \eqType} && \qquad\quad \deleted{\text{if } \Sigma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \tyInst{\fields{\Sigma}(C)}{\seq{\sigma}}} \\
-& \added{\Sigma \vdash C[\seq{\sigma}] \eqType} && \qquad\quad \added{\text{if } \Sigma \vdash C \eqClass \text{ and } \Sigma \vdash \sigma_i \eqType \text{ for each } \alpha_i \in \fv(\seq{\tau})} \\
-&&& \qquad\quad \added{\text{where } \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}}
+& \Sigma \vdash C[\seq{\sigma}] \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \tyInst{\fields{\Sigma}(C)}{\seq{\sigma}}
 \end{defalign}
-\added{A class $C$ with $\fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}$ is an \emph{equality class}, $\Sigma \vdash C \eqClass$, if each $\tau_i$ is an equality type when each $\alpha_i$ is taken to be an equality type. The equality classes are the greatest set of classes closed under this condition, since the type of a field can mention its own class through a type alias; the field types are examined uninstantiated, so a class is an equality class at all of its instantiations or at none.}
-\end{specdefinition}}
+\end{specdefinition}
+\end{DeletedBlock}}
+
+\speconly{\begin{AddedBlock}
+The values of an \emph{equality type} are compared by structural equality, which is defined except at the dynamically excluded comparisons (\secref{no-coercions}). The judgement $\Sigma; \seq{\alpha} \vdash \tau \eqType$ (\figref{equality-type}) says that $\tau$ is an equality type when the type variables $\seq{\alpha}$ are assumed to be equality types; an instantiated class $C[\seq{\sigma}]$ is an equality type when $C$ is an \emph{equality class} and the type arguments for the type parameters that its fields mention are equality types. The judgement $\Sigma \vdash C \eqClass$ (\figref{equality-class}) says that the field types of $C$ are equality types when its type parameters are. The type of a field can mention its own class through a type alias, so the \ruleName{eq-class} rule is read coinductively: the equality classes are the largest set of classes satisfying it. The field types are examined uninstantiated, so a class is an equality class at all of its instantiations or at none.
+\end{AddedBlock}}
 
 \speconly{\noindent Callable types are not equality types, and neither are types with a callable component, so
 comparisons of functions are rejected statically. Type variables are not equality types either, since they may stand for any type.}\speconly{ The final rule of each table closes the

@@ -15,9 +15,9 @@ from .type_syntax import (
     Type,
     TypeVariable,
     UnionType,
+    Var,
     base_type,
     fv,
-    instantiate,
 )
 
 type ResolvedOverload = tuple[tuple[Type, ...], Type]
@@ -43,40 +43,42 @@ def equality(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | No
     return (sigma, tau), Primitive.BOOL
 
 
-def equality_type(Sigma: ClassTable, tau: Type, V: frozenset[ClassName] = frozenset()) -> bool:
-    """V: classes assumed to be equality classes, those whose fields are being examined"""
+def equality_type(
+    Sigma: ClassTable,
+    tau: Type,
+    alphas: Sequence[Var] = (),
+    V: frozenset[ClassName] = frozenset(),
+) -> bool:
+    """alphas: type variables assumed to be equality types; V: classes assumed to be equality classes,
+    those whose fields are being examined"""
     match tau:
         case CallableType():
             return False
         case ListType(sigma) | DictType(sigma):
-            return equality_type(Sigma, sigma, V)
+            return equality_type(Sigma, sigma, alphas, V)
         case TupleType(taus):
-            return all(equality_type(Sigma, c, V) for c in taus)
+            return all(equality_type(Sigma, c, alphas, V) for c in taus)
         case UnionType(sigma, tau_):
-            return equality_type(Sigma, sigma, V) and equality_type(Sigma, tau_, V)
+            return equality_type(Sigma, sigma, alphas, V) and equality_type(Sigma, tau_, alphas, V)
         case ClassType(c, taus):
             pi = fields(Sigma, c)
             used = set().union(*(fv(sigma) for _, sigma in pi.fields))
             return equality_class(Sigma, c, V) and all(
-                alpha not in used or equality_type(Sigma, sigma, V)
-                for alpha, sigma in zip(pi.type_params, taus)
+                beta not in used or equality_type(Sigma, sigma, alphas, V)
+                for beta, sigma in zip(pi.type_params, taus)
             )
         case Primitive() | LiteralType():
             return True
-        case TypeVariable():
-            return False
+        case TypeVariable(alpha):
+            return alpha in alphas
 
 
 def equality_class(Sigma: ClassTable, c: ClassName, V: frozenset[ClassName]) -> bool:
-    """Whether the fields of c are equality types, with its type parameters taken to be equality types
-    by instantiating them at object; coinductive through V"""
+    """Coinductive through V"""
     if c in V:
         return True
     pi = fields(Sigma, c)
-    return all(
-        equality_type(Sigma, sigma, V | {c})
-        for _, sigma in instantiate(pi, [Primitive.OBJECT] * len(pi.type_params))
-    )
+    return all(equality_type(Sigma, sigma, pi.type_params, V | {c}) for _, sigma in pi.fields)
 
 
 def membership_list(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:
