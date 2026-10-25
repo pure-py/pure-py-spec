@@ -161,7 +161,7 @@ def expr(e: ast.expr) -> Any:
         case ast.Constant(value=v):
             return Syntax.ExprLiteral(lit(v))
         case ast.Call(func=f, args=es, keywords=ks):
-            return Syntax.ExprCall(expr(f), (exprs(es), [keyword(k) for k in ks]))
+            return Syntax.ExprCall(expr(f), ([expr(e_) for e_ in es], [keyword(k) for k in ks]))
         case ast.Dict(values=vs):
             return Syntax.ExprDict([(expr(k), expr(v)) for k, v in zip(dict_keys(e), vs)])
         case ast.Attribute(value=e_, attr=x):
@@ -181,9 +181,9 @@ def expr(e: ast.expr) -> Any:
         case ast.IfExp(test=e_, body=e1, orelse=e2):
             return Syntax.ExprCond(expr(e1), expr(e_), expr(e2))
         case ast.List(elts=es):
-            return Syntax.ExprList(exprs(es))
+            return Syntax.ExprList([expr(e_) for e_ in es])
         case ast.Tuple(elts=es):
-            return Syntax.ExprTuple(exprs(es))
+            return Syntax.ExprTuple([expr(e_) for e_ in es])
         case ast.ListComp(elt=e_, generators=gs):
             return Syntax.ExprListComp(expr(e_), qualifiers(gs))
         case ast.DictComp(key=e_, value=e__, generators=gs):
@@ -192,10 +192,6 @@ def expr(e: ast.expr) -> Any:
             return Syntax.ExprLambda([string(a.arg) for a in args.args], expr(e_))
         case _:
             raise AssertionError(f"unexpected expression: {type(e).__name__}")
-
-
-def exprs(es: list[ast.expr]) -> list[Any]:
-    return [expr(e) for e in es]
 
 
 def keyword(k: ast.keyword) -> tuple[Any, Any]:
@@ -225,23 +221,19 @@ def pat(p: ast.pattern) -> Any:
         case ast.MatchAs(pattern=ast.pattern() as p_, name=str(x)):
             return Syntax.PatAs(pat(p_), string(x))
         case syntax.PatList(patterns=ps):
-            return Syntax.PatList(pats(ps))
+            return Syntax.PatList([pat(p_) for p_ in ps])
         case syntax.PatTuple(patterns=ps):
-            return Syntax.PatTuple(pats(ps))
+            return Syntax.PatTuple([pat(p_) for p_ in ps])
         case ast.MatchClass(cls=c, patterns=ps, kwd_attrs=xs, kwd_patterns=qs):
             q = dotted_name(c)
             assert q is not None  # other heads rejected by Python
             return Syntax.PatConstr(
-                name(q), (pats(ps), [(string(x), pat(q_)) for x, q_ in zip(xs, qs)])
+                name(q), ([pat(p_) for p_ in ps], [(string(x), pat(q_)) for x, q_ in zip(xs, qs)])
             )
         case ast.MatchMapping(keys=ks, patterns=ps):
             return Syntax.PatDict([(string(key(k)), pat(q)) for k, q in zip(ks, ps)])
         case _:
             raise AssertionError(f"unexpected pattern: {type(p).__name__}")
-
-
-def pats(ps: list[ast.pattern]) -> list[Any]:
-    return [pat(p) for p in ps]
 
 
 def key(k: ast.expr) -> str:
