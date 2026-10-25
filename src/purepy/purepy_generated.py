@@ -475,8 +475,8 @@ def from_reason(r: Any) -> reasons.Reason:
             return reasons.AssignmentBeforeDeclaration(from_string(x))
         case Typing.Reassignment(x):
             return reasons.Reassignment(from_string(x))
-        case Typing.MaybeAssigned(x):
-            return reasons.MaybeAssigned(from_string(x))
+        case Typing.PossibleReassignment(x):
+            return reasons.PossibleReassignment(from_string(x))
         case Typing.CapturedGeneratorVariable(x):
             return reasons.CapturedGeneratorVariable(from_string(x))
         case Typing.UnreachableStatement():

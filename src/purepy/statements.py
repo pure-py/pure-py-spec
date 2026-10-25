@@ -271,7 +271,7 @@ def check_stmt(s: ast.stmt, mod_ctx: ModuleContext, returns: Type | None) -> Sta
                     check_expr(s.value, tau, mod_ctx)
                     return Assigns({x: tau})
                 case PU():
-                    raise IllFormedModule(s, reasons.MaybeAssigned(x))
+                    raise IllFormedModule(s, reasons.PossibleReassignment(x))
                 case Unbound():
                     raise IllFormedModule(s, reasons.AssignmentBeforeDeclaration(x))
                 case (

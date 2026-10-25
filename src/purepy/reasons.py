@@ -90,7 +90,7 @@ class Reassignment:
 
 
 @dataclass(frozen=True)
-class MaybeAssigned:
+class PossibleReassignment:
     x: Var
 
     def message(self) -> str:
@@ -538,7 +538,7 @@ type Reason = (
     | Redeclaration
     | UndeclaredAssignment
     | Reassignment
-    | MaybeAssigned
+    | PossibleReassignment
     | CapturedGeneratorVariable
     | UnreachableStatement
     | ConstructorArityMismatch
