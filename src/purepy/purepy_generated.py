@@ -496,6 +496,10 @@ def from_reason(r: Any) -> reasons.Reason:
             return reasons.NotClass(from_name(q))
         case Reasons.ClassArityMismatch(q, m, n):
             return reasons.ClassArityMismatch(from_name(q), m, n)
+        case Reasons.TypeAliasArityMismatch(q, m, n):
+            return reasons.TypeAliasArityMismatch(from_name(q), m, n)
+        case Reasons.CyclicTypeAlias(x):
+            return reasons.CyclicTypeAlias(from_string(x))
         case Reasons.DuplicateMember(x, q):
             return reasons.DuplicateMember(from_string(x), from_name(q))
         case Reasons.SubmoduleNotImported(q):
