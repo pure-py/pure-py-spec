@@ -459,6 +459,10 @@ UNARY = {c: UNARY_NAMES[op] for op, c in UOP.items()}
 
 def from_reason(r: Any) -> reasons.Reason:
     match r:
+        case Typing.DuplicateField(x, c):
+            return reasons.DuplicateField(from_string(x), from_string(c))
+        case Typing.InheritedField(x, c, d):
+            return reasons.InheritedField(from_string(x), from_string(c), from_string(d))
         case Typing.UndefinedVariable(x):
             return reasons.UndefinedVariable(from_string(x))
         case Typing.UnassignedVariable(x):
@@ -481,6 +485,10 @@ def from_reason(r: Any) -> reasons.Reason:
             return reasons.CapturedGeneratorVariable(from_string(x))
         case Typing.UnreachableStatement():
             return reasons.UnreachableStatement()
+        case Typing.ConstructorArityMismatch(c, m, n):
+            return reasons.ConstructorArityMismatch(from_string(c), m, n)
+        case Typing.UnknownConstructorKeyword(c, xs):
+            return reasons.UnknownConstructorKeyword(from_string(c), tuple(map(from_string, xs)))
         case Typing.NotPredefinedName(x):
             return reasons.NotPredefinedName(from_string(x))
         case Typing.NotClass(q):
@@ -541,6 +549,8 @@ def from_reason(r: Any) -> reasons.Reason:
             return reasons.NotIterable(from_ty(tau))
         case Typing.NotSynthesised():
             return reasons.NotSynthesised()
+        case Typing.UnknownField(c, x):
+            return reasons.UnknownField(from_string(c), from_string(x))
         case Typing.NoAttributes(tau):
             return reasons.NoAttributes(from_ty(tau))
         case Typing.BareReturn(tau):
