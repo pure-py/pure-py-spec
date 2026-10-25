@@ -331,7 +331,7 @@ def type_def(chi: ast.stmt) -> Any:
             fields = [(string(x), ty_expr(psi)) for x, psi in own_fields(chi)]
             return Syntax.Dataclass(string(c), type_params(chi), extends(bases), fields)
         case ast.TypeAlias(name=ast.Name(id=x), value=psi):
-            return Syntax.TypeAlias(string(x), type_params(chi), annotation(psi))
+            return Syntax.TypeStmt(string(x), type_params(chi), annotation(psi))
         case _:
             raise AssertionError(f"unexpected type definition: {type(chi).__name__}")
 
@@ -485,6 +485,8 @@ def from_reason(r: Any) -> reasons.Reason:
             return reasons.NotPredefinedName(from_string(x))
         case Typing.NotClass(q):
             return reasons.NotClass(from_name(q))
+        case Typing.ClassArityMismatch(q, m, n):
+            return reasons.ClassArityMismatch(from_name(q), m, n)
         case Typing.DuplicateMember(x, q):
             return reasons.DuplicateMember(from_string(x), from_name(q))
         case Typing.SubmoduleNotImported(q):
@@ -511,6 +513,8 @@ def from_reason(r: Any) -> reasons.Reason:
             return reasons.TypeSchemeAsValue(from_name(q))
         case Typing.ClassAsValue(q):
             return reasons.ClassAsValue(from_name(q))
+        case Typing.TypeAliasAsValue(q):
+            return reasons.TypeAliasAsValue(from_name(q))
         case Typing.NoBinaryOverload(op, sigma, sigma_):
             return reasons.NoBinaryOverload(BINARY[type(op)], from_ty(sigma), from_ty(sigma_))
         case Typing.NoUnaryOverload(op, sigma):
