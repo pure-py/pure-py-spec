@@ -87,9 +87,9 @@ checker, documentation and tests; programs, signatures, examples and diagnostics
 the setting, and a program in ML-style syntax is printed as Python for testing. Difficulty is measured by
 first-attempt acceptance, and by the rounds and tokens to a program which is accepted by the type checker and
 passes the tests.
-\todo{Implementation needed: a parser and printer for the ML-style syntax; printing of problem fragments,
-documentation and diagnostics in that syntax; selection of problems with code fragments within \PurePy;
-LiveCodeBench problems published after the training cutoff of each model, to separate familiarity from
+\todo{Implementation needed: parser and printer for ML-style syntax; selection of problems with all statement
+code (signatures, examples) within \PurePy; printing of that code, documentation and diagnostics in ML-style
+syntax; LiveCodeBench problems published after training cutoff of each model, to separate familiarity from
 memorised solutions.}
 
 \subsection{Cost of the restrictions to the generator (RQ2)}
@@ -107,8 +107,11 @@ RQ3 asks how the restrictions of \PurePy affect the generated program, in its co
 For correctness, we compare the pass rate of the final program in \PurePy and in Python. A third setting,
 unchecked \PurePy, keeps the grammar of \PurePy, with annotations optional, and drops the well-formedness rules.
 Comparing unchecked \PurePy with \PurePy measures the effect of the well-formedness rules, and comparing it with
-Python measures the effect of the grammar. Pass rates are reported over all problems and over the problems with
-a known \PurePy solution, namely those with a reference solution translated successfully in RQ4.
+Python measures the effect of the grammar. Some problems have no \PurePy solution, or only one which is hard
+to find. Their tests may pass sets or dictionaries with non-string keys, which have no \PurePy type; a natural
+solution may need a library module such as \pyinline{re}; or recursion over large inputs may exceed the
+recursion limit of Python. Pass rates are therefore reported over all problems and over the problems with a
+known \PurePy solution, namely those with a reference solution translated successfully in RQ4.
 \figref{evaluation-generation} reports the pass rates of the \PurePy and Python settings. For length, we
 compare the final \PurePy program, in non-blank lines and in tokens, with the model's Python answer and, for
 HumanEval+ and MBPP+, with the benchmark's reference solution.
