@@ -707,10 +707,10 @@ def inferred_type_args(
     )
     if failure is not None and any(alpha not in gamma for alpha in alphas):
         raise failure
-    return type_arguments(gamma, alphas, node)
+    return type_args_of(gamma, alphas, node)
 
 
-def type_arguments(gamma: dict[Var, Type], alphas: Sequence[Var], node: ast.AST) -> list[Type]:
+def type_args_of(gamma: dict[Var, Type], alphas: Sequence[Var], node: ast.AST) -> list[Type]:
     """Context applied to the sequence of type parameters"""
     missing = next((alpha for alpha in alphas if alpha not in gamma), None)
     if missing is not None:
@@ -721,7 +721,7 @@ def type_arguments(gamma: dict[Var, Type], alphas: Sequence[Var], node: ast.AST)
 def var_scheme(pi: TypeScheme, e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
     alphas, tau = pi.params, pi.tau
     gamma = type_args_seq(mod_ctx.Sigma, alphas, [tau], [expected])
-    actual = substitute(type_arguments(gamma, alphas, e), alphas, tau)
+    actual = substitute(type_args_of(gamma, alphas, e), alphas, tau)
     if not subtype(mod_ctx.Sigma, actual, expected):
         raise IllFormedModule(e, reasons.TypeMismatch(expected, actual))
 
@@ -752,10 +752,10 @@ def check_args(e: ast.Call, sigmas: Sequence[Type], mod_ctx: ModuleContext) -> N
 
 
 def applied_lambda(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> Type:
-    return synth_expr(f.body, override_gamma(mod_ctx, lambda_arguments(f, e, mod_ctx)))
+    return synth_expr(f.body, override_gamma(mod_ctx, lambda_args(f, e, mod_ctx)))
 
 
-def lambda_arguments(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> VarContext:
+def lambda_args(f: ast.Lambda, e: ast.Call, mod_ctx: ModuleContext) -> VarContext:
     params = parameter_names(f.args)
     if len(e.keywords) > 0:
         raise IllFormedModule(e, reasons.KeywordArgumentsNotConstructor())
@@ -770,7 +770,7 @@ def check_expr(e: ast.expr, expected: Type, mod_ctx: ModuleContext) -> None:
             check_expr(
                 f.body,
                 expected,
-                override_gamma(mod_ctx, lambda_arguments(f, e, mod_ctx)),
+                override_gamma(mod_ctx, lambda_args(f, e, mod_ctx)),
             )
             return
         case ast.List(elts=es), ListType(tau):
