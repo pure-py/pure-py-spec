@@ -4,13 +4,14 @@
 We evaluate empirically the suitability of \PurePy as a target language for generated code, with a language
 model as the code generator. The evaluation asks four research questions.
 \begin{description}
-\item[RQ1] How does \PurePy compare with other functional languages as a target for code generation?
+\item[RQ1] How does the familiarity of Python syntax affect the difficulty of generating functional programs?
 \item[RQ2] What do the restrictions of \PurePy cost the generator, in rejections, repair rounds and tokens?
 \item[RQ3] How do the restrictions of \PurePy affect the generated program, in correctness and in length?
-\item[RQ4] How well does a model translate existing Python into \PurePy?
+\item[RQ4] How well does a model translate existing Python into \PurePy, and which restrictions make translation
+difficult?
 \end{description}
 \secref{evaluation-setup} describes the setup shared by the four questions, and
-\secref{evaluation-languages} to \secref{evaluation-translating} take the questions in turn.
+\secref{evaluation-syntax} to \secref{evaluation-translating} take the questions in turn.
 
 \subsection{Experimental setup}
 \label{sec:evaluation-setup}
@@ -36,13 +37,19 @@ returned to model for repair}
 \small
 \begin{tabular}{llll}
 \toprule
-Task & Target language & Static check & Questions \\
+Question & Task & Target language & Static check \\
 \midrule
-Generation & \PurePy & \PurePy type checker & RQ1, RQ2, RQ3 \\
-Generation & Python & None & RQ3 \\
-Generation & Unchecked \PurePy & \PurePy parser & RQ3 \\
-Generation & OCaml, pure subset & OCaml compiler and purity checker & RQ1 \\
-Translation from Python & \PurePy & \PurePy type checker & RQ4 \\
+RQ1 & Generation & \PurePy & \PurePy type checker \\
+& Generation & \PurePy, ML-style syntax & \PurePy type checker \\
+& Generation & \PurePy, invented syntax & \PurePy type checker \\
+\addlinespace
+RQ2 & Generation & \PurePy & \PurePy type checker \\
+\addlinespace
+RQ3 & Generation & \PurePy & \PurePy type checker \\
+& Generation & Unchecked \PurePy & \PurePy parser \\
+& Generation & Python & None \\
+\addlinespace
+RQ4 & Translation from Python & \PurePy & \PurePy type checker \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -58,7 +65,7 @@ settings, and produces \figref{evaluation-generation} from the recorded outcomes
 figure reports how many of the selected problems pass the official tests, and how many are both accepted by
 the checker and pass the tests, for the initial answer and after repair. \todo{The committed result file is
 the pipeline's smoke run on two problems with a small local model; replace it with the full experiment.}
-\todo{The settings introduced by RQ1, RQ3 and RQ4, and the classification of rejections by rule, are not yet
+\todo{The settings introduced by RQ3 and RQ4, and the classification of rejections by rule, are not yet
 implemented.}
 
 \begin{figure}[t]
@@ -70,18 +77,37 @@ setting is shown by its test outcome only, as it is not checked.}
 \label{fig:evaluation-generation}
 \end{figure}
 
-\subsection{Comparison with other functional languages}
-\label{sec:evaluation-languages}
+\subsection{Familiarity of Python syntax}
+\label{sec:evaluation-syntax}
 
-RQ1 asks how \PurePy compares with other functional languages as a target for code generation. Language models generate Python more accurately than languages with less training data.
+RQ1 asks how the familiarity of Python syntax affects the difficulty of generating functional programs.
+Language models generate Python more accurately than languages with less training data.
 MultiPL-T~\cite{cassano2024} measures how much worse models do in OCaml and Racket, and closes part of the gap
 by fine-tuning on Python programs translated into those languages. Because \PurePy programs are Python
-programs, a model trained on Python is already trained on \PurePy, and we conjecture that this spares \PurePy
-the gap without fine-tuning. The comparison language is OCaml, restricted to its pure subset, with no references
-or mutable fields, so that it differs from \PurePy mainly in syntax; MultiPL-E~\cite{cassano2023} provides the
-benchmarks translated into OCaml. We compare \PurePy with OCaml on how often the static check accepts the first
-attempt, how often the final program passes the tests, and the number of rounds to an accepted program. A clear
-gap in \PurePy's favour would support the conjecture; a small gap would mean that the argument needs rethinking.
+programs, a model trained on Python is already trained on \PurePy, and we conjecture that functional programs
+are therefore easier to generate in \PurePy than in a language with unfamiliar syntax.
+
+A comparison with another functional language would mix the familiarity of its syntax with differences in type
+system, standard library and diagnostics. To isolate familiarity, we hold the language fixed and vary only its
+surface syntax. Two further settings present \PurePy in an ML-style syntax and in a syntax which is invented for
+the experiment and resembles no existing language. The three syntaxes share the abstract syntax, type checker,
+documentation and tests of \PurePy. Programs, signatures, examples and diagnostics are printed in the syntax of
+the setting, and a program in an alternative syntax is printed as Python for testing. Effort is measured by
+first-attempt acceptance, and by the rounds and tokens to a program which is accepted by the type checker and
+passes the tests; a problem is unsolved if the budget runs out. Comparisons are paired by problem, with
+McNemar's test for solved problems and the Wilcoxon signed-rank test for rounds and tokens, and are repeated
+over several models. If familiarity helps, effort rises from Python syntax to ML-style syntax to the invented
+syntax.
+
+Three threats need control. A model may have memorised Python solutions to HumanEval and MBPP problems, which
+favours Python syntax for a reason other than familiarity; LiveCodeBench problems published after the training
+cutoff of a model separate the two. The code fragments of a problem, such as its signature and the examples in
+its docstring, can be printed in an alternative syntax only if they lie within \PurePy, so problems with other
+fragments are reported separately. The invented syntax must be about as concise as the others, so that token
+counts remain comparable.
+\todo{Implementation needed: a parser and printer for each alternative syntax over the abstract syntax of
+\PurePy; printing of problem fragments, documentation and diagnostics in each syntax; selection of problems with
+code fragments within \PurePy.}
 
 \subsection{Cost of the restrictions to the generator}
 \label{sec:evaluation-cost}
@@ -107,6 +133,13 @@ revealed only by the tests, and the model may write better code when it must sta
 cost of the restrictions in rejections, rounds and tokens, and RQ3 their benefit in correctness.
 \figref{evaluation-generation} reports the pass rates of the \PurePy and Python settings.
 
+Some problems may have no solution in \PurePy, for example when the tests pass values which are not described by
+any \PurePy type, and others may have only a solution which is hard to find. Such problems count against
+\PurePy for reasons unrelated to the effect of the restrictions on generation. The translations of RQ4 identify
+them: a problem has a known \PurePy solution if the translation of its reference solution is accepted by the
+type checker and passes the tests. We report pass rates over all problems and over the problems with a known
+\PurePy solution.
+
 For length, a program confined to a functional style may be more concise, although a shorter program is not
 necessarily a better one. We compare the length of the final \PurePy program, in non-blank lines and in
 tokens, with the model's Python answer to the same problem, which holds the author constant, and with the
@@ -115,9 +148,13 @@ benchmark's reference solution, which HumanEval+ and MBPP+ provide but LiveCodeB
 \subsection{Translation of existing Python}
 \label{sec:evaluation-translating}
 
-RQ4 asks how well a model translates existing Python programs into \PurePy. The model is given the
-benchmark's reference solution to each problem and asked for a \PurePy version, under the same loop as for
-generation: the checker on the translation, the tests under CPython and the rounds recorded. We report how often
-translation succeeds. A breakdown of the failed translations by forbidden feature can follow from the
-diagnostics on the final attempt. \todo{Unclear whether this question can be answered without libraries being
+RQ4 asks how well a model translates existing Python programs into \PurePy, and which restrictions make
+translation difficult. The model is given the benchmark's reference solution to each problem and asked for a
+\PurePy version, under the same loop as for generation: the checker on the translation, the tests under CPython
+and the rounds recorded. We report how often translation succeeds. Reference solutions are idiomatic Python,
+often with loops and mutation, so the restrictions show more directly in translation than in generation. Each
+rejection is classified by the rule it breaks, and the rules fall into three groups. The first concerns types,
+such as missing annotations, the second loops and mutation, and the third features outside the subset, such as
+library modules. The classification separates difficulties with types from difficulties with restructuring
+imperative code. \todo{Unclear whether this question can be answered without libraries being
 part of the specification.}
