@@ -458,6 +458,41 @@ BINARY = {c: BINARY_NAMES[op] for op, c in BOP.items()}
 UNARY = {c: UNARY_NAMES[op] for op, c in UOP.items()}
 
 
+SEQUENCE_KIND = {
+    Reasons.TupleKind(): "tuple",
+    Reasons.ListKind(): "list",
+    Reasons.RangeKind(): "range",
+}
+
+
+def render_pat(p: Any) -> str:
+    match p:
+        case Syntax.PatLiteral(ell):
+            return ast.unparse(ast.Constant(from_lit(ell).value))
+        case Syntax.PatVar(x):
+            return from_string(x)
+        case Syntax.PatWildcard():
+            return "_"
+        case Syntax.PatAs(p_, x):
+            return f"{render_pat(p_)} as {from_string(x)}"
+        case Syntax.PatList(ps):
+            return "[" + ", ".join(map(render_pat, ps)) + "]"
+        case Syntax.PatTuple(ps):
+            return "(" + ", ".join(map(render_pat, ps)) + ")"
+        case Syntax.PatDict(kps):
+            items = (
+                f"{ast.unparse(ast.Constant(from_string(w)))}: {render_pat(q)}" for w, q in kps
+            )
+            return "{" + ", ".join(items) + "}"
+        case Syntax.PatConstr(q, (ps, kps)):
+            args = [render_pat(p_) for p_ in ps] + [
+                f"{from_string(x)}={render_pat(p_)}" for x, p_ in kps
+            ]
+            return f"{from_name(q)}({', '.join(args)})"
+        case _:
+            raise AssertionError(f"unexpected pattern: {p}")
+
+
 def from_reason(r: Any) -> reasons.Reason:
     match r:
         case Reasons.DuplicateField(x, c):
@@ -490,6 +525,20 @@ def from_reason(r: Any) -> reasons.Reason:
             return reasons.ConstructorArityMismatch(from_string(c), m, n)
         case Reasons.UnknownConstructorKeyword(c, xs):
             return reasons.UnknownConstructorKeyword(from_string(c), tuple(map(from_string, xs)))
+        case Reasons.PatternArityMismatch(c, m, n):
+            return reasons.PatternArityMismatch(from_string(c), m, n)
+        case Reasons.UnknownFieldInPattern(c, xs):
+            return reasons.UnknownFieldInPattern(from_string(c), tuple(map(from_string, xs)))
+        case Reasons.RangePattern():
+            return reasons.RangePattern()
+        case Reasons.PatternClassUndetermined(c, tau):
+            return reasons.PatternClassUndetermined(from_string(c), from_ty(tau))
+        case Reasons.SequenceKindMismatch(kind, tau, other):
+            return reasons.SequenceKindMismatch(
+                SEQUENCE_KIND[kind], from_ty(tau), SEQUENCE_KIND[other]
+            )
+        case Reasons.UnreachableCase(p):
+            return reasons.UnreachableCase(render_pat(p))
         case Reasons.NotPredefinedName(x):
             return reasons.NotPredefinedName(from_string(x))
         case Reasons.NotClass(q):
