@@ -106,9 +106,9 @@ HumanEval+ and MBPP+, with the benchmark's reference solution.
 \label{sec:evaluation-translating}
 
 \rqref{translation} asks how well a model translates existing Python programs into \PurePy, and which
-restrictions make translation difficult. The model is given the benchmark's reference solution to each problem
-and asked for a \PurePy version, under the same loop as for generation. A translation succeeds if the type
-checker accepts it and it passes the tests. We report how often translation succeeds, and classify each
-rejection by the rule named in its diagnostic. The rules are grouped into restrictions of \PurePy and features
-which do not yet form part of the specification, such as sets and library modules. \todo{Unclear whether
-question can be answered without libraries in specification}
+restrictions make translation difficult. The setup is that of \rqref{effort}, with the benchmark's reference
+solution added to the prompt and a \PurePy version requested. A translation succeeds if the type checker accepts
+it and it passes the tests. We report how often translation succeeds, and measure effort as in \rqref{effort},
+with rejections classified by rule and attributed either to the design of \PurePy or to features which are not
+yet part of the specification. \todo{Unclear whether question can be answered without libraries in
+specification}
