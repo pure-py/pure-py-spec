@@ -1,11 +1,28 @@
 \section{Evaluation}
 \label{sec:evaluation}
 
+\begin{DeletedBlock}
 We evaluate \PurePy empirically along two axes, both concerning the ability of AI agents to work with the subset.
+\end{DeletedBlock}
 
-\subsection{Generating \PurePy}
-\label{sec:evaluation-generating}
+\begin{AddedBlock}
+We evaluate \PurePy empirically as a target language for generated code, with a language model as the code
+generator. The evaluation asks four research questions.
+\begin{description}
+\item[RQ1] Does Python syntax help a model write correct programs?
+\item[RQ2] Are the restrictions of \PurePy a barrier to generation?
+\item[RQ3] Do the restrictions of \PurePy improve the correctness of generated programs?
+\item[RQ4] Can a model translate existing Python into \PurePy?
+\end{description}
+\secref{evaluation-setup} describes the setup shared by the four questions, and
+\secref{evaluation-syntax} to \secref{evaluation-translating} take the questions in turn.
+\todo{The research questions are in draft form.}
+\end{AddedBlock}
 
+\subsection{\replaced{Experimental setup}{Generating \PurePy}}
+\label{sec:evaluation-setup}
+
+\begin{DeletedBlock}
 How effectively can AI agents generate \PurePy solutions to standard functional-programming problems? This
 measures the ease of targeting the subset from a problem statement alone.
 
@@ -15,6 +32,38 @@ for a bounded number of repair rounds, and produces \figref{evaluation-generatio
 The figure reports how many of the selected problems pass the official tests, and how many are both accepted by
 the checker and pass the tests, for the initial answer and after repair. \todo{The committed result file is the
 pipeline's smoke run on two problems with a small local model; replace it with the full experiment.}
+\end{DeletedBlock}
+
+\begin{AddedBlock}
+A model is given the same problems under several conditions, each with equivalent documentation: \PurePy,
+unchecked \PurePy, Python, OCaml, and translation of the benchmark's reference solution into \PurePy.
+Unchecked \PurePy keeps the grammar of \PurePy, with annotations optional, and drops the well-formedness
+rules, so an answer is checked for syntax only and run by CPython. OCaml is restricted to its pure subset,
+with no references or mutable fields, so that it differs from \PurePy mainly in syntax.
+
+For each problem, the model is prompted, the answer is checked statically and run against the benchmark's
+official tests, and the number of rounds is recorded. Rejections by the checker are fed back to the model for a
+bounded number of repair rounds, and repair stops at acceptance or at the budget. Test outcomes are not fed
+back, so a pass measures generation from the problem statement and the checker's diagnostics alone. A \PurePy
+answer is a Python program, so the benchmark's Python tests run unchanged against it under CPython, and the
+benchmarks are usable as they are.
+
+The benchmarks are HumanEval+ and MBPP+~\cite{liu2023}, which extend HumanEval~\cite{chen2021} and
+MBPP~\cite{austin2021} with many more tests per problem, and LiveCodeBench~\cite{jain2025}. HumanEval problems
+are small functions over the standard library, so most fall within the \PurePy subset.
+MultiPL-E~\cite{cassano2023} provides HumanEval and MBPP translated into OCaml. The self-repair scenario of
+LiveCodeBench, in which the model fixes a solution given failing test output, is the nearest precedent for the
+repair loop.
+
+The evaluation pipeline in \texttt{evaluation/} implements the \PurePy and Python conditions. It gives a model
+the same problems in both, runs the \PurePy checker and the benchmark's official tests on each answer, feeds
+checker rejections back to the model for a bounded number of repair rounds, and produces
+\figref{evaluation-generation} from the recorded outcomes. The figure reports how many of the selected problems
+pass the official tests, and how many are both accepted by the checker and pass the tests, for the initial
+answer and after repair. \todo{The committed result file is the pipeline's smoke run on two problems with a
+small local model; replace it with the full experiment.} \todo{The unchecked \PurePy, OCaml and translation
+conditions are not yet implemented, and nor is the classification of rejections by rule.}
+\end{AddedBlock}
 
 \begin{figure}[t]
 \centering
@@ -25,8 +74,47 @@ condition is shown by its test outcome only, as it is not checked.}
 \label{fig:evaluation-generation}
 \end{figure}
 
+\begin{AddedBlock}
+\subsection{Python syntax}
+\label{sec:evaluation-syntax}
+
+RQ1 asks whether Python syntax helps a model write correct programs. Language models generate Python more
+accurately than languages with less training data. MultiPL-T~\cite{cassano2024} measures how much worse models
+do in OCaml and Racket, and closes part of the gap by fine-tuning on Python programs translated into those
+languages. Because \PurePy programs are Python programs, a model trained on Python is already trained on
+\PurePy, and RQ1 asks whether this spares \PurePy the gap without fine-tuning. We compare \PurePy with OCaml
+on how often the static check accepts the first attempt, how often the final program passes the tests, and
+the number of rounds to an accepted program. A clear gap in \PurePy's favour would support the claim; a small
+gap would mean that the argument needs rethinking.
+
+\subsection{Cost of the restrictions}
+\label{sec:evaluation-cost}
+
+RQ2 asks whether the restrictions of \PurePy are a barrier to generation. Over all rounds, we count
+rejections per forbidden feature. Each diagnostic of the checker is named after the rule it enforces, so a
+rejection is classified by its diagnostic. For each rejection, we record whether the next round clears the
+feature, and the number of rounds to acceptance. The restrictions are not a barrier if violations are rare and
+are cleared in a round or two from the diagnostic alone.
+
+\subsection{Benefit of the restrictions}
+\label{sec:evaluation-benefit}
+
+RQ3 asks whether the restrictions of \PurePy improve the correctness of generated programs. We compare the
+pass rate of the final program in \PurePy and in Python; the gap is the effect of the restrictions as a whole.
+Comparing \PurePy with unchecked \PurePy measures the effect of the well-formedness rules, and comparing
+unchecked \PurePy with Python measures the effect of the grammar. Types may catch errors otherwise revealed
+only by the tests, and the model may write better code when it must state types. RQ2 measures the cost of
+the restrictions in rejections and rounds, and RQ3 their benefit in correctness.
+\figref{evaluation-generation} reports the pass rates of the \PurePy and Python conditions.
+\end{AddedBlock}
+
 \subsection{Translating Python to \PurePy}
 \label{sec:evaluation-translating}
 
-How effectively can AI agents translate existing Python programs into the \PurePy subset? \todo{Not sure about
-this one without libraries being part of the spec too.}
+\replaced{RQ4 asks whether a model can translate existing Python programs into \PurePy. The model is given the
+benchmark's reference solution to each problem and asked for a \PurePy version, under the same loop as for
+generation: the checker on the translation, the tests under CPython and the rounds recorded. We report how often
+translation succeeds. A breakdown of the failed translations by forbidden feature can follow from the
+diagnostics on the final attempt. \todo{Unclear whether this question can be answered without libraries being
+part of the specification.}}{How effectively can AI agents translate existing Python programs into the \PurePy
+subset? \todo{Not sure about this one without libraries being part of the spec too.} }
