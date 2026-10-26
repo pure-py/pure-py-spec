@@ -23,14 +23,14 @@ A language model is given the same problems from these benchmarks in each of the
 procedure is as follows.
 \begin{enumerate}
 \item Prompt model with problem and documentation for setting
-\\item Extract program from response
+\item Extract program from response
 \item Check program statically, except in Python setting
 \item If static check rejects program and repair rounds remain, return diagnostics to model and continue from step 2
 \item Run final program against benchmark's official tests
 \item Record outcome of every round
 \end{enumerate}
-The model never sees test outcomes. A \\PurePy solution is a Python program, so the benchmark's Python tests run
-unchanged against it under CPython.
+The model never sees test outcomes. The benchmark's tests run unchanged against \PurePy solutions under CPython,
+because every \PurePy program is a Python program.
 
 \begin{table}[h]
 \caption{Settings of evaluation}
@@ -81,7 +81,7 @@ setting is shown by its test outcome only, as it is not checked.}
 \label{sec:evaluation-effort}
 
 \rqref{effort} asks how much effort a \PurePy solution takes to generate, compared with Python. Effort is
-measured in rejections, repair rounds and tokens; a Python solution is not checked, so it takes one round. Over
+measured in rejections, repair rounds and tokens; Python solutions are not checked and so take one round. Over
 all rounds, we count rejections by the rule named in each diagnostic. For each rejection, we record whether the
 next round removes the violation, and the number of rounds to acceptance. We also count the input and output
 tokens per problem, up to acceptance or the budget, in \PurePy and in Python.
