@@ -6,7 +6,8 @@ generator. The evaluation asks four research questions.
 \begin{description}
 \item[RQ1] Does Python syntax help a model write correct programs?
 \item[RQ2] Are the restrictions of \PurePy a barrier to generation?
-\item[RQ3] Do the restrictions of \PurePy improve the correctness of generated programs?
+\item[RQ3a] Do the restrictions of \PurePy improve the correctness of generated programs?
+\item[RQ3b] Do the restrictions of \PurePy make generated programs shorter?
 \item[RQ4] Can a model translate existing Python into \PurePy?
 \end{description}
 \secref{evaluation-setup} describes the setup shared by the four questions, and
@@ -75,16 +76,22 @@ rejection is classified by its diagnostic. For each rejection, we record whether
 feature, and the number of rounds to acceptance. The restrictions are not a barrier if violations are rare and
 are cleared in a round or two from the diagnostic alone.
 
-\subsection{Benefit of the restrictions}
-\label{sec:evaluation-benefit}
+\subsection{Effect of the restrictions on the program}
+\label{sec:evaluation-effect}
 
-RQ3 asks whether the restrictions of \PurePy improve the correctness of generated programs. We compare the
+RQ3a asks whether the restrictions of \PurePy improve the correctness of generated programs. We compare the
 pass rate of the final program in \PurePy and in Python; the gap is the effect of the restrictions as a whole.
 Comparing \PurePy with unchecked \PurePy measures the effect of the well-formedness rules, and comparing
 unchecked \PurePy with Python measures the effect of the grammar. Types may catch errors otherwise revealed
 only by the tests, and the model may write better code when it must state types. RQ2 measures the cost of
-the restrictions in rejections and rounds, and RQ3 their benefit in correctness.
+the restrictions in rejections and rounds, and RQ3a their benefit in correctness.
 \figref{evaluation-generation} reports the pass rates of the \PurePy and Python conditions.
+
+RQ3b asks whether the restrictions make generated programs shorter. A program confined to a functional style
+may be more concise, although a shorter program is not necessarily a better one. We compare the length of
+the final \PurePy program, in non-blank lines and in tokens, with the model's Python answer to the same
+problem, which holds the author constant, and with the benchmark's reference solution, which HumanEval+ and
+MBPP+ provide but LiveCodeBench lacks.
 
 \subsection{Translating Python to \PurePy}
 \label{sec:evaluation-translating}
