@@ -611,13 +611,10 @@ def constr(c: ClassName, e: ast.Call, mod_ctx: ModuleContext) -> Type:
     pi = fields(mod_ctx.Sigma, c)
     alphas = pi.type_params
     sigmas = dict(pi.fields)
-    synthesising = [
-        (sigmas[x], synth_expr(arg, mod_ctx)) for x, arg in args.items() if synthesises(arg)
-    ]
-    gamma = type_args_seq(
-        mod_ctx.Sigma, alphas, [s for s, _ in synthesising], [t for _, t in synthesising]
+    results = [synth_result(arg, mod_ctx) for arg in args.values()]
+    tau = ClassType(
+        c, tuple(inferred_type_args(alphas, [sigmas[x] for x in args], results, e, mod_ctx))
     )
-    tau = ClassType(c, tuple(type_arguments(gamma, alphas, e)))
     for x, arg in args.items():
         check_expr(arg, declared_type(mod_ctx.Sigma, tau, x), mod_ctx)
     return tau
@@ -678,15 +675,39 @@ def callee(e: ast.Call, mod_ctx: ModuleContext) -> Type:
         return synth_expr(e.func, mod_ctx)
     alphas, tau = pi.params, pi.tau
     assert isinstance(tau, CallableType)
-    synthesising = [
-        (sigma, synth_expr(arg, mod_ctx))
-        for sigma, arg in zip(tau.params, e.args)
-        if synthesises(arg)
-    ]
+    results = [synth_result(arg, mod_ctx) for arg in e.args]
+    return substitute(inferred_type_args(alphas, tau.params, results, e, mod_ctx), alphas, tau)
+
+
+def synth_result(e: ast.expr, mod_ctx: ModuleContext) -> Type | IllFormedModule:
+    try:
+        return synth_expr(e, mod_ctx)
+    except IllFormedModule as failure:
+        return failure
+
+
+def inferred_type_args(
+    alphas: Sequence[Var],
+    sigmas: Sequence[Type],
+    results: Sequence[Type | IllFormedModule],
+    node: ast.AST,
+    mod_ctx: ModuleContext,
+) -> list[Type]:
+    synthesised = [(s, t) for s, t in zip(sigmas, results) if not isinstance(t, IllFormedModule)]
     gamma = type_args_seq(
-        mod_ctx.Sigma, alphas, [s for s, _ in synthesising], [t for _, t in synthesising]
+        mod_ctx.Sigma, alphas, [s for s, _ in synthesised], [t for _, t in synthesised]
     )
-    return substitute(type_arguments(gamma, alphas, e), alphas, tau)
+    failure = next(
+        (
+            t
+            for t in results
+            if isinstance(t, IllFormedModule) and not isinstance(t.reason, reasons.NotSynthesised)
+        ),
+        None,
+    )
+    if failure is not None and any(alpha not in gamma for alpha in alphas):
+        raise failure
+    return type_arguments(gamma, alphas, node)
 
 
 def type_arguments(gamma: dict[Var, Type], alphas: Sequence[Var], node: ast.AST) -> list[Type]:

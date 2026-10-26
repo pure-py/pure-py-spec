@@ -601,6 +601,7 @@ class IllFormedModule(IllFormed):
     def __init__(self, node: ast.AST, reason: Reason):
         self.line: int | None = getattr(node, "lineno", None)
         self.col: int | None = getattr(node, "col_offset", None)
+        self.reason = reason
         self.msg = reason.message()
         self.module: Name | None = None
         super().__init__(self.msg)
