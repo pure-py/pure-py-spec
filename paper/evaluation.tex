@@ -16,12 +16,20 @@ model as the code generator. The evaluation asks four research questions.
 \label{sec:evaluation-setup}
 
 A model is given the same problems under several conditions, with equivalent documentation for each.
-\tabref{evaluation-conditions} lists the conditions and the questions which use them. For each problem, the model is prompted, the answer is checked
-statically and run against the benchmark's official tests, and the number of rounds is recorded. Rejections by
-the checker are fed back to the model for a bounded number of repair rounds, and repair stops at acceptance or
-at the budget. Test outcomes are not fed back, so a pass measures generation from the problem statement and
-the checker's diagnostics alone. A \PurePy answer is a Python program, so the benchmark's Python tests run
-unchanged against it under CPython, and the benchmarks are usable as they are.
+\tabref{evaluation-conditions} lists the conditions and the questions which use them. For each problem and
+condition, the procedure is as follows.
+\begin{enumerate}
+\item The model is given the problem and the documentation for the condition.
+\item The program is extracted from the answer.
+\item The program is checked statically, unless the condition is Python.
+\item If the check rejects the program and repair rounds remain, the diagnostics are returned to the model, which
+answers again, and the procedure continues from step 2.
+\item The final program is run against the benchmark's official tests.
+\item The outcome of every round is recorded.
+\end{enumerate}
+Test outcomes are not fed back, so a pass measures generation from the problem statement and the checker's
+diagnostics alone. A \PurePy answer is a Python program, so the benchmark's Python tests run unchanged against it
+under CPython.
 
 The benchmarks are HumanEval+ and MBPP+~\cite{liu2023}, which extend HumanEval~\cite{chen2021} and
 MBPP~\cite{austin2021} with many more tests per problem, and LiveCodeBench~\cite{jain2025}. HumanEval problems
@@ -29,9 +37,8 @@ are small functions over the standard library, so most fall within the \PurePy s
 scenario of LiveCodeBench, in which the model fixes a solution given failing test output, is the nearest
 precedent for the repair loop.
 
-The evaluation pipeline in \texttt{evaluation/} implements the \PurePy and Python conditions, runs the \PurePy
-checker and the benchmark's official tests on each answer, feeds checker rejections back to the model for a
-bounded number of repair rounds, and produces \figref{evaluation-generation} from the recorded outcomes. The
+The evaluation pipeline in \filename{evaluation/} implements this procedure for the \PurePy and Python
+conditions, and produces \figref{evaluation-generation} from the recorded outcomes. The
 figure reports how many of the selected problems pass the official tests, and how many are both accepted by
 the checker and pass the tests, for the initial answer and after repair. \todo{The committed result file is
 the pipeline's smoke run on two problems with a small local model; replace it with the full experiment.}
