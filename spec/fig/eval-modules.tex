@@ -51,11 +51,11 @@
 {
   q' = x \cons \seq{x} \\
   x \Rightarrow_{\mathsf{mod}} \val{\rho} \\
-  \modLoaded{x}{\rho}, \seq{x} \Rightarrow_{\mathsf{sub}} \val{v} \\
+  \replaced{x, \rho}{\modLoaded{x}{\rho} }, \seq{x} \Rightarrow_{\mathsf{sub}} \val{\replaced{\rho''}{v }} \\
   q, \seq{\iota} \Rightarrow r
 }
 {
-  q, \exImport{q'} \cons \seq{\iota} \Rightarrow \mlet{\rho'}{r}{\val{\set{\bind{x}{v}} \extend \rho'}}
+  q, \exImport{q'} \cons \seq{\iota} \Rightarrow \mlet{\rho'}{r}{\val{\set{\bind{x}{\replaced{\modLoaded{x}{\rho''}}{v }}} \extend \rho'}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-import-fail}}]
@@ -71,7 +71,7 @@
 {
   q' = x \cons \seq{x} \\
   x \Rightarrow_{\mathsf{mod}} \val{\rho} \\
-  \modLoaded{x}{\rho}, \seq{x} \Rightarrow_{\mathsf{sub}} \aborts{\kappa}
+  \replaced{x, \rho}{\modLoaded{x}{\rho} }, \seq{x} \Rightarrow_{\mathsf{sub}} \aborts{\kappa}
 }
 {
   q, \exImport{q'} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
@@ -128,7 +128,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$v, \seq{x} \Rightarrow_{\mathsf{sub}} r$}
+\flushleft \shadebox{$\replaced{q, \rho}{v }, \seq{x} \Rightarrow_{\mathsf{sub}} r$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-submodules-nil}}]
@@ -136,16 +136,17 @@
   \strut
 }
 {
-  v, \varepsilon \Rightarrow_{\mathsf{sub}} \val{v}
+  \replaced{q, \rho}{v }, \varepsilon \Rightarrow_{\mathsf{sub}} \val{\replaced{\rho}{v }}
 }
 \and
 \inferrule*[lab={\ruleName{eval-submodules-cons}}]
 {
   q.x \Rightarrow_{\mathsf{mod}} \val{\rho'} \\
-  \modLoaded{q.x}{\rho'}, \seq{x} \Rightarrow_{\mathsf{sub}} r
+  \replaced{q.x, \rho'}{\modLoaded{q.x}{\rho'} }, \seq{x} \Rightarrow_{\mathsf{sub}} r
 }
 {
-  \modLoaded{q}{\rho}, x \cons \seq{x} \Rightarrow_{\mathsf{sub}} \mlet{v}{r}{\val{\modLoaded{q}{\rho \extend \set{\bind{x}{v}}}}}
+  \replaced{q, \rho}{\modLoaded{q}{\rho} }, x \cons \seq{x} \Rightarrow_{\mathsf{sub}}
+  \replaced{\mlet{\rho''}{r}{\val{\rho \extend \set{\bind{x}{\modLoaded{q.x}{\rho''}}}}}}{\mlet{v}{r}{\val{\modLoaded{q}{\rho \extend \set{\bind{x}{v}}}}} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-submodules-fail}}]
@@ -153,7 +154,7 @@
   q.x \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
 }
 {
-  \modLoaded{q}{\rho}, x \cons \seq{x} \Rightarrow_{\mathsf{sub}} \aborts{\kappa}
+  \replaced{q, \rho}{\modLoaded{q}{\rho} }, x \cons \seq{x} \Rightarrow_{\mathsf{sub}} \aborts{\kappa}
 }
 \end{mathpar}
 \subcaption{Loaded module $v$ with submodule chain $\seq{x}$ loads to result $r$}
