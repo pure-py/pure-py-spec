@@ -80,77 +80,45 @@ setting is shown by its test outcome only, as it is not checked.}
 \label{sec:evaluation-syntax}
 
 RQ1 asks how the familiarity of Python syntax affects the difficulty of generating functional programs.
-Language models generate Python more accurately than languages with less training data.
-MultiPL-T~\cite{cassano2024} measures how much worse models do in OCaml and Racket, and closes part of the gap
-by fine-tuning on Python programs translated into those languages. Because \PurePy programs are Python
-programs, a model trained on Python is already trained on \PurePy, and we conjecture that functional programs
-are therefore easier to generate in \PurePy than in a language with unfamiliar syntax.
-
-A comparison with another functional language would mix the familiarity of its syntax with differences in type
-system, standard library and diagnostics. To isolate familiarity, we hold the language fixed and vary only its
-surface syntax. A further setting presents \PurePy in an ML-style syntax. The two syntaxes share the abstract
-syntax, type checker, documentation and tests of \PurePy. Programs, signatures, examples and diagnostics are
-printed in the syntax of the setting, and a program in ML-style syntax is printed as Python for testing. Effort is measured by
+Language models generate Python more accurately than languages with less training
+data~\cite{cassano2023,cassano2024}. To separate familiarity from other differences between languages, we
+compare \PurePy in Python syntax with \PurePy in an ML-style syntax. The two share the abstract syntax, type
+checker, documentation and tests; programs, signatures, examples and diagnostics are printed in the syntax of
+the setting, and a program in ML-style syntax is printed as Python for testing. Difficulty is measured by
 first-attempt acceptance, and by the rounds and tokens to a program which is accepted by the type checker and
-passes the tests; a problem is unsolved if the budget runs out. Comparisons are paired by problem, with
-McNemar's test for solved problems and the Wilcoxon signed-rank test for rounds and tokens, and are repeated
-over several models. If familiarity helps, effort is lower in Python syntax than in ML-style syntax.
-
-Two threats need control. A model may have memorised Python solutions to HumanEval and MBPP problems, which
-favours Python syntax for a reason other than familiarity; LiveCodeBench problems published after the training
-cutoff of a model separate the two. The code fragments of a problem, such as its signature and the examples in
-its docstring, can be printed in ML-style syntax only if they lie within \PurePy, so problems with other
-fragments are reported separately.
-\todo{Implementation needed: a parser and printer for the ML-style syntax over the abstract syntax of \PurePy;
-printing of problem fragments, documentation and diagnostics in that syntax; selection of problems with
-code fragments within \PurePy.}
+passes the tests.
+\todo{Implementation needed: a parser and printer for the ML-style syntax; printing of problem fragments,
+documentation and diagnostics in that syntax; selection of problems with code fragments within \PurePy;
+LiveCodeBench problems published after the training cutoff of each model, to separate familiarity from
+memorised solutions.}
 
 \subsection{Cost of the restrictions to the generator (RQ2)}
 \label{sec:evaluation-cost}
 
-RQ2 asks what the restrictions of \PurePy cost the generator. Over all rounds, we count rejections per
-forbidden feature. Each diagnostic of the checker is named after the rule it enforces, so a rejection is
-classified by its diagnostic. For each rejection, we record whether the next round clears the feature, and
-the number of rounds to acceptance. Because each repair round sends the whole conversation again, rounds
-alone understate the cost, so we also count the input and output tokens per problem, up to acceptance or the
-budget, and compare \PurePy with Python. The restrictions are not a barrier if violations are rare and are
-cleared in a round or two from the diagnostic alone.
+RQ2 asks what the restrictions of \PurePy cost the generator. Over all rounds, we count rejections by the rule
+named in each diagnostic. For each rejection, we record whether the next round removes the violation, and the
+number of rounds to acceptance. We also count the input and output tokens per problem, up to acceptance or the
+budget, in \PurePy and in Python.
 
 \subsection{Effect of the restrictions on the program (RQ3)}
 \label{sec:evaluation-effect}
 
 RQ3 asks how the restrictions of \PurePy affect the generated program, in its correctness and in its length.
-For correctness, we compare the pass rate of the final program in \PurePy and in Python; the gap is the effect
-of the restrictions as a whole. A third setting, unchecked \PurePy, keeps the grammar of \PurePy, with
-annotations optional, and drops the well-formedness rules, so an answer is checked for syntax only and run by
-CPython. Comparing \PurePy with unchecked \PurePy measures the effect of the well-formedness rules, and
-comparing unchecked \PurePy with Python measures the effect of the grammar. Types may catch errors otherwise
-revealed only by the tests, and the model may write better code when it must state types. RQ2 measures the
-cost of the restrictions in rejections, rounds and tokens, and RQ3 their benefit in correctness.
-\figref{evaluation-generation} reports the pass rates of the \PurePy and Python settings.
-
-Some problems may have no solution in \PurePy, for example when the tests pass values which are not described by
-any \PurePy type, and others may have only a solution which is hard to find. Such problems count against
-\PurePy for reasons unrelated to the effect of the restrictions on generation. The translations of RQ4 identify
-them: a problem has a known \PurePy solution if the translation of its reference solution is accepted by the
-type checker and passes the tests. We report pass rates over all problems and over the problems with a known
-\PurePy solution.
-
-For length, a program confined to a functional style may be more concise, although a shorter program is not
-necessarily a better one. We compare the length of the final \PurePy program, in non-blank lines and in
-tokens, with the model's Python answer to the same problem, which holds the author constant, and with the
-benchmark's reference solution, which HumanEval+ and MBPP+ provide but LiveCodeBench lacks.
+For correctness, we compare the pass rate of the final program in \PurePy and in Python. A third setting,
+unchecked \PurePy, keeps the grammar of \PurePy, with annotations optional, and drops the well-formedness rules.
+Comparing unchecked \PurePy with \PurePy measures the effect of the well-formedness rules, and comparing it with
+Python measures the effect of the grammar. Pass rates are reported over all problems and over the problems with
+a known \PurePy solution, namely those with a reference solution translated successfully in RQ4.
+\figref{evaluation-generation} reports the pass rates of the \PurePy and Python settings. For length, we
+compare the final \PurePy program, in non-blank lines and in tokens, with the model's Python answer and, for
+HumanEval+ and MBPP+, with the benchmark's reference solution.
 
 \subsection{Translation of existing Python (RQ4)}
 \label{sec:evaluation-translating}
 
 RQ4 asks how well a model translates existing Python programs into \PurePy, and which restrictions make
 translation difficult. The model is given the benchmark's reference solution to each problem and asked for a
-\PurePy version, under the same loop as for generation: the checker on the translation, the tests under CPython
-and the rounds recorded. We report how often translation succeeds. Reference solutions are idiomatic Python,
-often with loops and mutation, so the restrictions show more directly in translation than in generation. Each
-rejection is classified by the rule it breaks, and the rules fall into three groups. The first concerns types,
-such as missing annotations, the second loops and mutation, and the third features outside the subset, such as
-library modules. The classification separates difficulties with types from difficulties with restructuring
-imperative code. \todo{Unclear whether this question can be answered without libraries being
-part of the specification.}
+\PurePy version, under the same loop as for generation. A translation succeeds if the type checker accepts it
+and it passes the tests. We report how often translation succeeds, and classify each rejection by the rule
+named in its diagnostic. \todo{Unclear whether this question can be answered without libraries being part of
+the specification.}
