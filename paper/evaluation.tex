@@ -44,7 +44,7 @@ Question & Task & Target language & Static check \\
 & Generation & Python & None \\
 \addlinespace
 \rqref{solutions} & Generation & \PurePy & \PurePy type checker \\
-& Generation & Unchecked \PurePy & \PurePy parser \\
+& Generation & Typed Python & mypy, strict mode \\
 & Generation & Python & None \\
 \addlinespace
 \rqref{translation} & Translation from Python & \PurePy & \PurePy type checker \\
@@ -94,12 +94,13 @@ tokens per problem, up to acceptance or the budget, in \PurePy and in Python.
 \label{sec:evaluation-solutions}
 
 \rqref{solutions} asks how \PurePy solutions compare with Python solutions in correctness and size. For
-correctness, we compare the pass rate of the final program in \PurePy and in Python. A third setting, unchecked
-\PurePy, keeps the grammar of \PurePy, with annotations optional, and drops the well-formedness rules. Comparing
-unchecked \PurePy with \PurePy measures the effect of the well-formedness rules, and comparing it with Python
-measures the effect of the grammar. \figref{evaluation-generation} reports the pass rates of the \PurePy and
-Python settings. For size, we compare the final \PurePy program, in non-blank lines and in tokens, with the
-model's Python solution and, for HumanEval+ and MBPP+, with the benchmark's reference solution.
+correctness, we compare the pass rate of the final program in \PurePy and in Python. A third setting, typed
+Python, requires type annotations and checks them with mypy in strict mode, returning its diagnostics to the
+model as for \PurePy. Comparing typed Python with Python measures the effect of types, and comparing \PurePy
+with typed Python measures the effect of the restrictions of \PurePy beyond types.
+\figref{evaluation-generation} reports the pass rates of the \PurePy and Python settings. For size, we compare
+the final \PurePy program, in non-blank lines and in tokens, with the model's Python solution and, for
+HumanEval+ and MBPP+, with the benchmark's reference solution.
 
 \subsection{Translation of existing Python\texorpdfstring{ (\rqref{translation})}{}}
 \label{sec:evaluation-translating}
