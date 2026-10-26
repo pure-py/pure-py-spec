@@ -23,13 +23,13 @@ A language model is given the same problems from these benchmarks in each of the
 procedure is as follows.
 \begin{enumerate}
 \item Prompt model with problem and documentation for setting
-\item Extract program from answer
+\\item Extract program from response
 \item Check program statically, except in Python setting
 \item If static check rejects program and repair rounds remain, return diagnostics to model and continue from step 2
 \item Run final program against benchmark's official tests
 \item Record outcome of every round
 \end{enumerate}
-The model never sees test outcomes. A \PurePy answer is a Python program, so the benchmark's Python tests run
+The model never sees test outcomes. A \\PurePy solution is a Python program, so the benchmark's Python tests run
 unchanged against it under CPython.
 
 \begin{table}[h]
@@ -63,7 +63,7 @@ their own.
 The evaluation pipeline in \filename{evaluation/} implements this procedure for the \PurePy and Python
 settings, and produces \figref{evaluation-generation} from the recorded outcomes. The
 figure reports how many of the selected problems pass the official tests, and how many are both accepted by
-the checker and pass the tests, for the initial answer and after repair. \todo{The committed result file is
+the checker and pass the tests, for the initial solution and after repair. \todo{The committed result file is
 the pipeline's smoke run on two problems with a small local model; replace it with the full experiment.}
 \todo{The settings introduced by \rqref{solutions} and \rqref{translation}, and the classification of rejections by
 rule, are not yet implemented.}
@@ -81,10 +81,10 @@ setting is shown by its test outcome only, as it is not checked.}
 \label{sec:evaluation-effort}
 
 \rqref{effort} asks how much effort a \PurePy solution takes to generate, compared with Python. Effort is
-measured in rejections, repair rounds and tokens; Python answers are not checked, so a Python solution takes one
-round. Over all rounds, we count rejections by the rule named in each diagnostic. For each rejection, we record
-whether the next round removes the violation, and the number of rounds to acceptance. We also count the input
-and output tokens per problem, up to acceptance or the budget, in \PurePy and in Python.
+measured in rejections, repair rounds and tokens; a Python solution is not checked, so it takes one round. Over
+all rounds, we count rejections by the rule named in each diagnostic. For each rejection, we record whether the
+next round removes the violation, and the number of rounds to acceptance. We also count the input and output
+tokens per problem, up to acceptance or the budget, in \PurePy and in Python.
 
 \subsection{Correctness and size of \PurePy solutions\texorpdfstring{ (\rqref{solutions})}{}}
 \label{sec:evaluation-solutions}
@@ -95,7 +95,7 @@ correctness, we compare the pass rate of the final program in \PurePy and in Pyt
 unchecked \PurePy with \PurePy measures the effect of the well-formedness rules, and comparing it with Python
 measures the effect of the grammar. \figref{evaluation-generation} reports the pass rates of the \PurePy and
 Python settings. For size, we compare the final \PurePy program, in non-blank lines and in tokens, with the
-model's Python answer and, for HumanEval+ and MBPP+, with the benchmark's reference solution.
+model's Python solution and, for HumanEval+ and MBPP+, with the benchmark's reference solution.
 
 \subsection{Translation of existing Python\texorpdfstring{ (\rqref{translation})}{}}
 \label{sec:evaluation-translating}
