@@ -40,7 +40,7 @@ class EvaluationTests(unittest.TestCase):
                 with self.subTest(task=task_id):
                     reference = e.official_tests(task["official"]["reference"], task, benchmark)
                     self.assertTrue(reference["passed"], reference["error"])
-                    self.assertEqual(reference["tests_passed"], len(task["official"]["inputs"]))
+                    self.assertEqual(reference["tests_passed"], task["official"]["test_count"])
                     wrong = e.official_tests(f"def {task['name']}(*args):\n    return None\n", task, benchmark)
                     self.assertFalse(wrong["passed"])
                     self.assertFalse(wrong["tooling_error"])

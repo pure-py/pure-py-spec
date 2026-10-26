@@ -1,6 +1,8 @@
 import argparse
 import ast
+import base64
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 import gzip
 import hashlib
@@ -8,6 +10,7 @@ from importlib.metadata import version
 import json
 import os
 from pathlib import Path
+import pickle
 import re
 import subprocess
 import sys
@@ -30,6 +33,8 @@ OUTPUT_FORMAT_VERSION = "tagged-code-v1"
 BENCHMARKS = {"humaneval": "HumanEval", "humaneval-plus": "HumanEval+", "mbpp-plus": "MBPP+",
               "livecodebench": "LiveCodeBench"}
 EVALPLUS = ("humaneval-plus", "mbpp-plus")
+MBPP_OUTPUT_NOT_NONE_TASKS = ("check_str", "text_match_three", "text_starta_endb")
+ACCEPTS_ANY_ANSWER = ("are_equivalent",)
 SIMPLE_TYPES = {"int", "float", "bool", "str", "object"}
 
 
@@ -92,8 +97,13 @@ def function_signature(source, name):
 
 def load_rows(manifest):
     path = download(manifest["url"], CACHE / manifest["url"].rsplit("/", 1)[1], manifest["sha256"])
-    with gzip.open(path, "rt") as source:
-        rows = {row["task_id"]: row for row in map(json.loads, source)}
+    if manifest["benchmark"] == "HumanEval":
+        with gzip.open(path, "rt") as source:
+            rows = {row["task_id"]: row for row in map(json.loads, source)}
+    else:
+        os.environ["HUMANEVAL_OVERRIDE_PATH" if manifest["benchmark"] == "HumanEval+" else "MBPP_OVERRIDE_PATH"] = str(path)
+        from evalplus.data import get_human_eval_plus, get_mbpp_plus
+        rows = get_human_eval_plus() if manifest["benchmark"] == "HumanEval+" else get_mbpp_plus()
     if len(rows) != manifest["total_problems"]:
         raise RuntimeError(f"{manifest['benchmark']} benchmark size changed")
     return rows
@@ -121,6 +131,7 @@ def load_problems(benchmark, limit=None, difficulty=None, all_problems=False):
         manifest = json.loads((ROOT / f"benchmarks/{benchmark}.json").read_text())
         rows = load_rows(manifest)
         task_ids = list(rows) if all_problems or not manifest.get("task_ids") else manifest["task_ids"]
+        task_ids = [task_id for task_id in task_ids if task_id not in manifest.get("excluded", {})]
         problems = {}
         for task_id in task_ids:
             row = rows[task_id]
@@ -131,10 +142,13 @@ def load_problems(benchmark, limit=None, difficulty=None, all_problems=False):
             if benchmark == "humaneval":
                 official = row
             else:
-                reference = row["canonical_solution"] if benchmark == "mbpp-plus" else row["prompt"] + row["canonical_solution"]
                 inputs = [list(group.values()) if isinstance(group, dict) else group
                           for group in (row["base_input"], row["plus_input"])]
-                official = {"reference": reference, "inputs": inputs[0] + inputs[1], "atol": row["atol"]}
+                official = {"reference": row["prompt"] + row["canonical_solution"], "atol": row["atol"],
+                            "dataset": "mbpp" if benchmark == "mbpp-plus" else "humaneval",
+                            "inputs": base64.b64encode(pickle.dumps(inputs[0] + inputs[1])).decode(),
+                            "test_count": len(inputs[0]) + len(inputs[1]),
+                            "output_not_none": row["entry_point"] in MBPP_OUTPUT_NOT_NONE_TASKS}
             problems[task_id] = {"name": row["entry_point"], "question": row["prompt"], "signature": signature,
                                  "typed_interface": typed, "official": official}
         manifest = {**manifest, "selected_problems": len(problems),
@@ -346,9 +360,8 @@ def official_tests(code, task, benchmark):
         program = problem["prompt"] + "\n" + code + "\n" + problem["test"] + "\ncheck(" + task["name"] + ")\n"
         return evaluation_sandbox.run({"benchmark": "HumanEval", "program": program}, 3)
     if benchmark in EVALPLUS:
-        official = task["official"]
-        return evaluation_sandbox.run({"benchmark": "EvalPlus", "reference": official["reference"], "candidate": code,
-                                       "name": task["name"], "inputs": official["inputs"], "atol": official["atol"]}, 60)
+        return evaluation_sandbox.run({"benchmark": "EvalPlus", "candidate": code, "name": task["name"],
+                                       **task["official"]}, 90)
     import livecodebench as lcb
     fixture = json.loads(lcb.case_path(task["task_id"]).read_text())
     alias = "_lcb_core_" + sha(task["task_id"].encode())[:12]
@@ -382,7 +395,8 @@ def validate_backend(benchmark):
     if benchmark in EVALPLUS:
         identity = "def probe(x):\n    return x\n"
         probe = {"benchmark": "EvalPlus", "reference": identity, "candidate": identity, "name": "probe",
-                 "inputs": [[1], [2.5], [[1, 2]]], "atol": 0}
+                 "inputs": base64.b64encode(pickle.dumps([[1], [2.5], [(1, 2)]])).decode(), "atol": 0,
+                 "dataset": "humaneval", "output_not_none": False}
         wrong = {**probe, "candidate": "def probe(x):\n    return None\n"}
         if (evaluation_sandbox.run(probe, 10)["passed"] is not True
                 or evaluation_sandbox.run(wrong, 10)["passed"] is not False):
@@ -404,17 +418,22 @@ def reference_solution(task, benchmark):
     return None
 
 
+def validate_problem(task_id, task, benchmark):
+    task = {**task, "task_id": task_id}
+    reference = reference_solution(task, benchmark)
+    if reference is not None:
+        verdict = official_tests(reference, task, benchmark)
+        if verdict["passed"] is not True:
+            raise RuntimeError(f"the reference solution of {task_id} fails its tests: {verdict['error']}")
+    wrong = official_tests(f"def {task['name']}(*args):\n    return None\n", task, benchmark)
+    if wrong["passed"] is not False and task["name"] not in ACCEPTS_ANY_ANSWER:
+        raise RuntimeError(f"the tests of {task_id} accept an answer that returns None")
+
+
 def validate_problems(problems, benchmark):
-    for task_id, task in problems.items():
-        task = {**task, "task_id": task_id}
-        reference = reference_solution(task, benchmark)
-        if reference is not None:
-            verdict = official_tests(reference, task, benchmark)
-            if verdict["passed"] is not True:
-                raise RuntimeError(f"the reference solution of {task_id} fails its tests: {verdict['error']}")
-        wrong = official_tests(f"def {task['name']}(*args):\n    return None\n", task, benchmark)
-        if wrong["passed"] is not False:
-            raise RuntimeError(f"the tests of {task_id} accept an answer that returns None")
+    with ThreadPoolExecutor(max_workers=min(8, os.cpu_count() or 1)) as pool:
+        for outcome in pool.map(lambda item: validate_problem(item[0], item[1], benchmark), problems.items()):
+            pass
     print(f"Validated the tests of {len(problems)} problems", flush=True)
 
 

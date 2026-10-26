@@ -22,6 +22,8 @@ def sandbox_profile(directory, read_paths=()):
     (allow process-exec (subpath {json.dumps(str(runtime))}) (literal {json.dumps(str(Path(sys.executable).resolve()))}))
     (allow sysctl-read)
     (allow mach-lookup)
+    (allow process-fork)
+    (allow ipc-posix-sem)
     (allow signal (target self))
     (allow file-read-metadata)
     (allow file-read*
@@ -92,63 +94,30 @@ def run(payload, timeout):
             return {"passed": None, "error": "sandbox did not return a valid verdict", "tooling_error": True}
 
 
-def floats(value):
-    if isinstance(value, float):
-        return True
-    return isinstance(value, (list, tuple)) and bool(value) and all(isinstance(item, float) for item in value)
-
-
-def matches(output, expected, atol):
-    try:
-        if output == expected:
-            return True
-    except Exception:
-        return False
-    if atol == 0 and floats(expected):
-        atol = 1e-6
-    if atol == 0 or type(output) is not type(expected):
-        return False
-    if isinstance(expected, (list, tuple)) and len(output) != len(expected):
-        return False
-    import numpy as np
-    try:
-        return bool(np.allclose(output, expected, rtol=1e-7, atol=atol))
-    except (TypeError, ValueError):
-        return False
-
-
 def evalplus(payload):
-    import copy
-
-    def load(source):
-        namespace = {}
-        exec(compile(source, "solution.py", "exec"), namespace)
-        return namespace[payload["name"]]
-
+    import base64
+    import multiprocessing
+    import pickle
+    from evalplus.eval import untrusted_check
+    from evalplus.gen.util import trusted_exec
+    multiprocessing.set_start_method("fork", force=True)
+    if sys.platform == "darwin":
+        os.environ["EVALPLUS_MAX_MEMORY_BYTES"] = "-1"
+    inputs = pickle.loads(base64.b64decode(payload["inputs"]))
     try:
-        reference = load(payload["reference"])
-        expected = [reference(*copy.deepcopy(arguments)) for arguments in payload["inputs"]]
+        expected, times = trusted_exec(payload["reference"], inputs, payload["name"], record_time=True,
+                                       output_not_none=payload["output_not_none"])
     except BaseException:
         return {"passed": None, "error": "reference solution failed: " + traceback.format_exc().strip()[-500:],
                 "tooling_error": True}
-    try:
-        candidate = load(payload["candidate"])
-    except BaseException:
-        return {"passed": False, "error": traceback.format_exc().strip()[-1000:], "tooling_error": False,
-                "tests_passed": 0, "tests_total": len(expected)}
-    passed, first = 0, None
-    for index, (arguments, want) in enumerate(zip(payload["inputs"], expected)):
-        try:
-            got = candidate(*copy.deepcopy(arguments))
-            ok = matches(got, want, payload["atol"])
-        except BaseException as error:
-            got, ok = f"{type(error).__name__}: {error}", False
-        if ok:
-            passed += 1
-        elif first is None:
-            first = f"input {index}: {arguments!r:.200} expected {want!r:.200} got {got!r:.200}"
-    return {"passed": passed == len(expected), "error": first, "tooling_error": False,
-            "tests_passed": passed, "tests_total": len(expected)}
+    status, details = untrusted_check(payload["dataset"], payload["candidate"], inputs, payload["name"],
+                                      expected, payload["atol"], times)
+    passed = sum(bool(d) for d in details)
+    failed = next((i for i, d in enumerate(details) if not d), None)
+    error = None if status == "pass" else (
+        f"{status}: input {failed} {inputs[failed]!r:.200}" if failed is not None else status)
+    return {"passed": status == "pass", "error": error, "tooling_error": False,
+            "tests_passed": passed, "tests_total": len(inputs)}
 
 
 def worker():
@@ -183,6 +152,7 @@ def worker():
                       "tests_passed": int(sum(r > 0 for r in outcomes)), "tests_total": payload["test_count"],
                       "tooling_error": False}
         elif payload["benchmark"] == "EvalPlus":
+            tempfile.tempdir = payload["directory"]
             with tempfile.TemporaryFile(mode="w+", dir=payload["directory"]) as capture:
                 with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(capture):
                     result = evalplus(payload)

@@ -74,9 +74,14 @@ HumanEval problems and official tests are downloaded from a fixed upstream
 revision and verified by SHA-256. `benchmarks/humaneval.json` holds the frozen
 selection: 20 of 164 problems, sampled from the 29 whose interfaces are typed.
 HumanEval+ and MBPP+ come from the pinned EvalPlus releases listed in
-`benchmarks/`. Their tests are the EvalPlus inputs: the reference solution
-computes the expected output for each input inside the sandbox, and the answer
-passes when every output matches, with EvalPlus's tolerance for floats.
+`benchmarks/` and are graded by the pinned `evalplus` package inside the
+sandbox: it restores the input types the dataset serialises (tuples, sets,
+complex numbers), computes the expected outputs with the reference solution,
+applies its per-problem oracles and float tolerances, and gives each input the
+time limit it would get in an EvalPlus run. The package is installed without
+its model-provider clients, which the pipeline does not use. Problems the
+package cannot grade are listed under `excluded` in the manifest with the
+reason and are skipped; at present that is HumanEval/32 in HumanEval+.
 
 LiveCodeBench uses the 20 medium and 20 hard typed call-based problems frozen in
 `livecodebench/tasks.json`, out of 207 and 102 eligible in release_v6. Missing

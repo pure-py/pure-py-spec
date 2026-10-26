@@ -28,5 +28,8 @@
     "HumanEval/26",
     "HumanEval/27",
     "HumanEval/28"
-  ]
+  ],
+  "excluded": {
+    "HumanEval/32": "evalplus 0.3.1 records no outcome for find_zero, so no answer can pass"
+  }
 }
