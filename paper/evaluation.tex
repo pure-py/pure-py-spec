@@ -52,13 +52,13 @@ Question & Task & Target language & Static check \\
 \end{tabular}
 \end{table}
 
-Some problems have no \PurePy solution, because their tests pass or expect values with no \PurePy type, such
-as sets. These problems are detected from the test values and excluded. Problems which use a library module
-missing from \PurePy, such as \pyinline{re}, are kept and reported separately, because a solution without the
-module may exist. Without loops, a \PurePy program must use recursion to accumulate a result over its input,
-since comprehensions only map and filter. CPython has no tail-call optimisation, so recursion over large
-inputs can exceed its recursion limit; such failures count against \PurePy and are reported as a category of
-their own.
+Some problems depend on Python features which are compatible with the design of \PurePy but not yet implemented.
+When the interface of a problem needs such a feature, as when its tests pass sets, no \PurePy solution exists,
+and the problem is excluded. When only the natural solution needs such a feature, as with the module
+\pyinline{re} or the built-in \pyinline{sum}, the problem is kept and reported separately. Without loops, a
+\PurePy program must use recursion to accumulate a result over its input, since comprehensions only map and
+filter. CPython has no tail-call optimisation, so recursion over large inputs can exceed its recursion limit;
+such failures count against \PurePy and are reported as a category of their own.
 
 The evaluation pipeline in \filename{evaluation/} implements this procedure for the \PurePy and Python
 settings, and produces \figref{evaluation-generation} from the recorded outcomes. The
@@ -104,6 +104,6 @@ model's Python solution and, for HumanEval+ and MBPP+, with the benchmark's refe
 restrictions make translation difficult. The model is given the benchmark's reference solution to each problem
 and asked for a \PurePy version, under the same loop as for generation. A translation succeeds if the type
 checker accepts it and it passes the tests. We report how often translation succeeds, and classify each
-rejection by the rule named in its diagnostic. The rules are grouped into the restrictions of \PurePy and the
-features missing from its current version, such as sets and library modules. \todo{Unclear whether this question
-can be answered without libraries being part of the specification.}
+rejection by the rule named in its diagnostic. The rules are grouped into restrictions of \PurePy and
+features not yet implemented, such as sets and library modules. \todo{Unclear whether this question can be
+answered without libraries being part of the specification.}
