@@ -29,9 +29,8 @@ procedure is as follows.
 \item Run final program against benchmark's official tests
 \item Record outcome of every round
 \end{enumerate}
-Test outcomes are not fed back, so a pass measures generation from the problem statement and the checker's
-diagnostics alone. A \PurePy answer is a Python program, so the benchmark's Python tests run unchanged against it
-under CPython.
+The model never sees test outcomes. A \PurePy answer is a Python program, so the benchmark's Python tests run
+unchanged against it under CPython.
 
 \begin{table}[h]
 \caption{Settings of evaluation}
