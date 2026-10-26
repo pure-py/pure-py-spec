@@ -41,7 +41,6 @@ Question & Task & Target language & Static check \\
 \midrule
 RQ1 & Generation & \PurePy & \PurePy type checker \\
 & Generation & \PurePy, ML-style syntax & \PurePy type checker \\
-& Generation & \PurePy, invented syntax & \PurePy type checker \\
 \addlinespace
 RQ2 & Generation & \PurePy & \PurePy type checker \\
 \addlinespace
@@ -89,24 +88,21 @@ are therefore easier to generate in \PurePy than in a language with unfamiliar s
 
 A comparison with another functional language would mix the familiarity of its syntax with differences in type
 system, standard library and diagnostics. To isolate familiarity, we hold the language fixed and vary only its
-surface syntax. Two further settings present \PurePy in an ML-style syntax and in a syntax which is invented for
-the experiment and resembles no existing language. The three syntaxes share the abstract syntax, type checker,
-documentation and tests of \PurePy. Programs, signatures, examples and diagnostics are printed in the syntax of
-the setting, and a program in an alternative syntax is printed as Python for testing. Effort is measured by
+surface syntax. A further setting presents \PurePy in an ML-style syntax. The two syntaxes share the abstract
+syntax, type checker, documentation and tests of \PurePy. Programs, signatures, examples and diagnostics are
+printed in the syntax of the setting, and a program in ML-style syntax is printed as Python for testing. Effort is measured by
 first-attempt acceptance, and by the rounds and tokens to a program which is accepted by the type checker and
 passes the tests; a problem is unsolved if the budget runs out. Comparisons are paired by problem, with
 McNemar's test for solved problems and the Wilcoxon signed-rank test for rounds and tokens, and are repeated
-over several models. If familiarity helps, effort rises from Python syntax to ML-style syntax to the invented
-syntax.
+over several models. If familiarity helps, effort is lower in Python syntax than in ML-style syntax.
 
-Three threats need control. A model may have memorised Python solutions to HumanEval and MBPP problems, which
+Two threats need control. A model may have memorised Python solutions to HumanEval and MBPP problems, which
 favours Python syntax for a reason other than familiarity; LiveCodeBench problems published after the training
 cutoff of a model separate the two. The code fragments of a problem, such as its signature and the examples in
-its docstring, can be printed in an alternative syntax only if they lie within \PurePy, so problems with other
-fragments are reported separately. The invented syntax must be about as concise as the others, so that token
-counts remain comparable.
-\todo{Implementation needed: a parser and printer for each alternative syntax over the abstract syntax of
-\PurePy; printing of problem fragments, documentation and diagnostics in each syntax; selection of problems with
+its docstring, can be printed in ML-style syntax only if they lie within \PurePy, so problems with other
+fragments are reported separately.
+\todo{Implementation needed: a parser and printer for the ML-style syntax over the abstract syntax of \PurePy;
+printing of problem fragments, documentation and diagnostics in that syntax; selection of problems with
 code fragments within \PurePy.}
 
 \subsection{Cost of the restrictions to the generator}
