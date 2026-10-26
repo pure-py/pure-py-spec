@@ -25,8 +25,8 @@ procedure is as follows.
 \item Prompt model with problem and documentation for setting
 \item Extract program from response
 \item Check program statically, except in Python setting
+\item Run program against benchmark's official tests
 \item If static check rejects program and repair rounds remain, return diagnostics to model and continue from step 2
-\item Run final program against benchmark's official tests
 \item Record outcome of every round
 \end{enumerate}
 The model never sees test outcomes. The benchmark's tests run unchanged against \PurePy solutions under CPython,
