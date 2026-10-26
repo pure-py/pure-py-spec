@@ -4,8 +4,7 @@
 We evaluate empirically the suitability of \PurePy as a target language for generated code, with a language
 model as the code generator. The evaluation asks four research questions.
 \begin{description}
-\item[RQ1] How suitable is \PurePy as a target for code generation, compared with established functional
-languages?
+\item[RQ1] How does \PurePy compare with other functional languages as a target for code generation?
 \item[RQ2] What do the restrictions of \PurePy cost the generator, in rejections and repair rounds?
 \item[RQ3] How do the restrictions of \PurePy affect the generated program, in correctness and in length?
 \item[RQ4] How well does a model translate existing Python into \PurePy?
@@ -16,8 +15,8 @@ languages?
 \subsection{Experimental setup}
 \label{sec:evaluation-setup}
 
-A model is given the same problems in \PurePy and in Python, with equivalent documentation for each, and each
-question adds the conditions it needs. For each problem, the model is prompted, the answer is checked
+A model is given the same problems under several conditions, with equivalent documentation for each.
+\tabref{evaluation-conditions} lists the conditions and the questions which use them. For each problem, the model is prompted, the answer is checked
 statically and run against the benchmark's official tests, and the number of rounds is recorded. Rejections by
 the checker are fed back to the model for a bounded number of repair rounds, and repair stops at acceptance or
 at the budget. Test outcomes are not fed back, so a pass measures generation from the problem statement and
@@ -39,6 +38,22 @@ the pipeline's smoke run on two problems with a small local model; replace it wi
 \todo{The conditions introduced by RQ1, RQ3 and RQ4, and the classification of rejections by rule, are not yet
 implemented.}
 
+\begin{table}[b]
+\caption{Conditions of the evaluation}
+\label{tab:evaluation-conditions}
+\begin{tabular}{lll}
+\toprule
+Condition & Static check & Questions \\
+\midrule
+\PurePy & \PurePy checker & RQ1, RQ2, RQ3 \\
+Python & None & RQ3 \\
+Unchecked \PurePy & Syntax of \PurePy & RQ3 \\
+OCaml, pure subset & OCaml compiler and purity check & RQ1 \\
+Translation into \PurePy & \PurePy checker & RQ4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{paper/fig/evaluation-generation}
@@ -48,11 +63,10 @@ condition is shown by its test outcome only, as it is not checked.}
 \label{fig:evaluation-generation}
 \end{figure}
 
-\subsection{Suitability as a generation target against other functional languages}
+\subsection{Comparison with other functional languages}
 \label{sec:evaluation-languages}
 
-RQ1 asks how suitable \PurePy is as a target for code generation, compared with established functional
-languages. Language models generate Python more accurately than languages with less training data.
+RQ1 asks how \PurePy compares with other functional languages as a target for code generation. Language models generate Python more accurately than languages with less training data.
 MultiPL-T~\cite{cassano2024} measures how much worse models do in OCaml and Racket, and closes part of the gap
 by fine-tuning on Python programs translated into those languages. Because \PurePy programs are Python
 programs, a model trained on Python is already trained on \PurePy, and we conjecture that this spares \PurePy
