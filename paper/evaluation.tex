@@ -20,13 +20,12 @@ check, or a translation task, with equivalent documentation for each.
 \tabref{evaluation-conditions} lists the conditions and the questions which use them. For each problem and
 condition, the procedure is as follows.
 \begin{enumerate}
-\item The model is given the problem and the documentation for the condition.
-\item The program is extracted from the answer.
-\item The program is checked statically, unless the condition is Python.
-\item If the check rejects the program and repair rounds remain, the diagnostics are returned to the model, which
-answers again, and the procedure continues from step 2.
-\item The final program is run against the benchmark's official tests.
-\item The outcome of every round is recorded.
+\item Prompt model with problem and documentation for condition
+\item Extract program from answer
+\item Check program statically, except in Python condition
+\item If check rejects program and repair rounds remain, return diagnostics to model and continue from step 2
+\item Run final program against benchmark's official tests
+\item Record outcome of every round
 \end{enumerate}
 Test outcomes are not fed back, so a pass measures generation from the problem statement and the checker's
 diagnostics alone. A \PurePy answer is a Python program, so the benchmark's Python tests run unchanged against it
