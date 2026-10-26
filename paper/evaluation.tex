@@ -61,7 +61,10 @@ the feature may exist, and the resulting rejections are counted separately from 
 restrictions of \PurePy. Without loops, a \PurePy program must use recursion to accumulate a result over its
 input, since comprehensions only map and filter. CPython has no tail-call optimisation, so recursion over large
 inputs can exceed its recursion limit; such failures count against \PurePy and are reported as a category of
-their own.
+their own. Only rejections and recursion errors identify their cause, so attribution to a restriction or to a
+feature outside the specification covers only these failures. \todo{Decide for each diagnostic whether it
+reflects a restriction of \PurePy or a feature outside the specification; library functions need case-by-case
+decisions, made as the experiment runs.}
 
 The evaluation pipeline in \filename{evaluation/} implements this procedure for the \PurePy and Python
 settings, and produces \figref{evaluation-generation} from the recorded outcomes. The
