@@ -2,14 +2,13 @@
 \label{sec:evaluation}
 
 We evaluate empirically the suitability of \PurePy as a target language for generated code, with a language
-model as the code generator. The evaluation asks four research questions.
-\begin{description}
-\item[RQ1] How does the familiarity of Python syntax affect the difficulty of generating functional programs?
-\item[RQ2] What do the restrictions of \PurePy cost the generator, in rejections, repair rounds and tokens?
-\item[RQ3] How do the restrictions of \PurePy affect the generated program, in correctness and in length?
-\item[RQ4] How well does a model translate existing Python into \PurePy, and which restrictions make translation
-difficult?
-\end{description}
+model as the code generator. The evaluation asks three research questions.
+\begin{enumerate}[label=\textbf{RQ\arabic*},ref=RQ\arabic*,leftmargin=*]
+\item\label{rq:cost} What do the restrictions of \PurePy cost the generator, in rejections, repair rounds and tokens?
+\item\label{rq:effect} How do the restrictions of \PurePy affect the generated program, in correctness and in length?
+\item\label{rq:translation} How well does a model translate existing Python into \PurePy, and which restrictions make
+translation difficult?
+\end{enumerate}
 
 \subsection{Experimental setup}
 \label{sec:evaluation-setup}
@@ -42,16 +41,13 @@ under CPython.
 \toprule
 Question & Task & Target language & Static check \\
 \midrule
-RQ1 & Generation & \PurePy & \PurePy type checker \\
-& Generation & \PurePy, ML-style syntax & \PurePy type checker \\
+\rqref{cost} & Generation & \PurePy & \PurePy type checker \\
 \addlinespace
-RQ2 & Generation & \PurePy & \PurePy type checker \\
-\addlinespace
-RQ3 & Generation & \PurePy & \PurePy type checker \\
+\rqref{effect} & Generation & \PurePy & \PurePy type checker \\
 & Generation & Unchecked \PurePy & \PurePy parser \\
 & Generation & Python & None \\
 \addlinespace
-RQ4 & Translation from Python & \PurePy & \PurePy type checker \\
+\rqref{translation} & Translation from Python & \PurePy & \PurePy type checker \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -69,8 +65,8 @@ settings, and produces \figref{evaluation-generation} from the recorded outcomes
 figure reports how many of the selected problems pass the official tests, and how many are both accepted by
 the checker and pass the tests, for the initial answer and after repair. \todo{The committed result file is
 the pipeline's smoke run on two problems with a small local model; replace it with the full experiment.}
-\todo{The settings introduced by RQ3 and RQ4, and the classification of rejections by rule, are not yet
-implemented.}
+\todo{The settings introduced by \rqref{effect} and \rqref{translation}, and the classification of rejections by
+rule, are not yet implemented.}
 
 \begin{figure}[t]
 \centering
@@ -81,48 +77,33 @@ setting is shown by its test outcome only, as it is not checked.}
 \label{fig:evaluation-generation}
 \end{figure}
 
-\subsection{Familiarity of Python syntax (RQ1)}
-\label{sec:evaluation-syntax}
-
-Language models generate Python more accurately than languages with less training
-data~\cite{cassano2023,cassano2024}. RQ1 asks how the familiarity of Python syntax affects the difficulty of
-generating functional programs. To separate familiarity from other differences between languages, we
-compare \PurePy in Python syntax with \PurePy in an ML-style syntax. The two share the abstract syntax, type
-checker, documentation and tests; programs, signatures, examples and diagnostics are printed in the syntax of
-the setting, and a program in ML-style syntax is printed as Python for testing. Difficulty is measured by
-first-attempt acceptance, and by the rounds and tokens to a program which is accepted by the type checker and
-passes the tests.
-\todo{RQ1 needs substantial implementation work: parser and printer for ML-style syntax;
-printing of problem statements, documentation and diagnostics in ML-style syntax; LiveCodeBench problems
-published after training cutoff of each model, to separate familiarity from memorised solutions.}
-
-\subsection{Cost of the restrictions to the generator (RQ2)}
+\subsection{Cost of the restrictions to the generator\texorpdfstring{ (\rqref{cost})}{}}
 \label{sec:evaluation-cost}
 
-RQ2 asks what the restrictions of \PurePy cost the generator. Over all rounds, we count rejections by the rule
-named in each diagnostic. For each rejection, we record whether the next round removes the violation, and the
-number of rounds to acceptance. We also count the input and output tokens per problem, up to acceptance or the
-budget, in \PurePy and in Python.
+\rqref{cost} asks what the restrictions of \PurePy cost the generator. Over all rounds, we count rejections by
+the rule named in each diagnostic. For each rejection, we record whether the next round removes the violation,
+and the number of rounds to acceptance. We also count the input and output tokens per problem, up to acceptance
+or the budget, in \PurePy and in Python.
 
-\subsection{Effect of the restrictions on the program (RQ3)}
+\subsection{Effect of the restrictions on the program\texorpdfstring{ (\rqref{effect})}{}}
 \label{sec:evaluation-effect}
 
-RQ3 asks how the restrictions of \PurePy affect the generated program, in its correctness and in its length.
-For correctness, we compare the pass rate of the final program in \PurePy and in Python. A third setting,
-unchecked \PurePy, keeps the grammar of \PurePy, with annotations optional, and drops the well-formedness rules.
-Comparing unchecked \PurePy with \PurePy measures the effect of the well-formedness rules, and comparing it with
-Python measures the effect of the grammar.
-\figref{evaluation-generation} reports the pass rates of the \PurePy and Python settings. For length, we
-compare the final \PurePy program, in non-blank lines and in tokens, with the model's Python answer and, for
-HumanEval+ and MBPP+, with the benchmark's reference solution.
+\rqref{effect} asks how the restrictions of \PurePy affect the generated program, in its correctness and in its
+length. For correctness, we compare the pass rate of the final program in \PurePy and in Python. A third
+setting, unchecked \PurePy, keeps the grammar of \PurePy, with annotations optional, and drops the
+well-formedness rules. Comparing unchecked \PurePy with \PurePy measures the effect of the well-formedness
+rules, and comparing it with Python measures the effect of the grammar. \figref{evaluation-generation} reports
+the pass rates of the \PurePy and Python settings. For length, we compare the final \PurePy program, in
+non-blank lines and in tokens, with the model's Python answer and, for HumanEval+ and MBPP+, with the
+benchmark's reference solution.
 
-\subsection{Translation of existing Python (RQ4)}
+\subsection{Translation of existing Python\texorpdfstring{ (\rqref{translation})}{}}
 \label{sec:evaluation-translating}
 
-RQ4 asks how well a model translates existing Python programs into \PurePy, and which restrictions make
-translation difficult. The model is given the benchmark's reference solution to each problem and asked for a
-\PurePy version, under the same loop as for generation. A translation succeeds if the type checker accepts it
-and it passes the tests. We report how often translation succeeds, and classify each rejection by the rule
-named in its diagnostic. The rules are grouped into the restrictions of \PurePy and the features missing from its
-current version, such as sets and library modules. \todo{Unclear whether this question can be answered without libraries being part of
-the specification.}
+\rqref{translation} asks how well a model translates existing Python programs into \PurePy, and which
+restrictions make translation difficult. The model is given the benchmark's reference solution to each problem
+and asked for a \PurePy version, under the same loop as for generation. A translation succeeds if the type
+checker accepts it and it passes the tests. We report how often translation succeeds, and classify each
+rejection by the rule named in its diagnostic. The rules are grouped into the restrictions of \PurePy and the
+features missing from its current version, such as sets and library modules. \todo{Unclear whether this question
+can be answered without libraries being part of the specification.}
