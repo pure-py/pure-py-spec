@@ -1,5 +1,5 @@
 \shapeTy(\shapeAny{\tau}{H}) &{}= \tau \\*
-\shapeTy(\shapeAny{\patConstr{C}{\seq{k}}}{H}) &{}= C \\*
+\shapeTy(\shapeAny{\patConstr{\replaced{C[\seq{\tau}]}{C }}{\seq{k}}}{H}) &{}= \replaced{C[\seq{\tau}]}{C } \\*
 \shapeTy(\patTuple{\seq{k}}) &{}= \tyTuple{\shapeTy(k_1), \ldots, \shapeTy(k_n)} \\*
 \shapeTy(\shapeList{\tau}{\seq{k}}) &{}= \tyList{\tau} \\*
 \shapeTy(\shapeDict{\tau}{\beta}{H}) &{}= \tyDict{\tau}
