@@ -10,14 +10,17 @@ model as the code generator. The evaluation asks four research questions.
 \item[RQ4] How well does a model translate existing Python into \PurePy, and which restrictions make translation
 difficult?
 \end{description}
-\secref{evaluation-setup} describes the setup shared by the four questions, and
-\secref{evaluation-syntax} to \secref{evaluation-translating} take the questions in turn.
 
 \subsection{Experimental setup}
 \label{sec:evaluation-setup}
 
-A model is given the same problems in each of the settings listed in \tabref{evaluation-settings}, with
-equivalent documentation in each. For each problem and setting, the procedure is as follows.
+The benchmarks are HumanEval+ and MBPP+~\cite{liu2023}, which extend HumanEval~\cite{chen2021} and
+MBPP~\cite{austin2021} with many more tests per problem, and LiveCodeBench~\cite{jain2025}. HumanEval problems
+are small functions over the standard library, so most fall within the \PurePy subset.
+
+A language model is given the same problems from these benchmarks in each of the settings listed in
+\tabref{evaluation-settings}, with equivalent documentation in each. For each problem and setting, the
+procedure is as follows.
 \begin{enumerate}
 \item Prompt model with problem and documentation for setting
 \item Extract program from answer
@@ -28,7 +31,8 @@ equivalent documentation in each. For each problem and setting, the procedure is
 \end{enumerate}
 Test outcomes are not fed back, so a pass measures generation from the problem statement and the checker's
 diagnostics alone. A \PurePy answer is a Python program, so the benchmark's Python tests run unchanged against it
-under CPython.
+under CPython. The self-repair scenario of LiveCodeBench, in which the model fixes a solution given failing
+test output, is the nearest precedent for the repair loop.
 
 \begin{table}[h]
 \caption{Settings of evaluation; every answer run against benchmark's tests, and diagnostics of static check
@@ -52,12 +56,6 @@ RQ4 & Translation from Python & \PurePy & \PurePy type checker \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-The benchmarks are HumanEval+ and MBPP+~\cite{liu2023}, which extend HumanEval~\cite{chen2021} and
-MBPP~\cite{austin2021} with many more tests per problem, and LiveCodeBench~\cite{jain2025}. HumanEval problems
-are small functions over the standard library, so most fall within the \PurePy subset. The self-repair
-scenario of LiveCodeBench, in which the model fixes a solution given failing test output, is the nearest
-precedent for the repair loop.
 
 Some problems have no \PurePy solution, or only one which is hard to find, for reasons unrelated to the
 restrictions of \PurePy. Their tests may pass sets or dictionaries with non-string keys, which have no type in
