@@ -1,11 +1,6 @@
 \section{Evaluation}
 \label{sec:evaluation}
 
-\begin{DeletedBlock}
-We evaluate \PurePy empirically along two axes, both concerning the ability of AI agents to work with the subset.
-\end{DeletedBlock}
-
-\begin{AddedBlock}
 We evaluate \PurePy empirically as a target language for generated code, with a language model as the code
 generator. The evaluation asks four research questions.
 \begin{description}
@@ -17,24 +12,10 @@ generator. The evaluation asks four research questions.
 \secref{evaluation-setup} describes the setup shared by the four questions, and
 \secref{evaluation-syntax} to \secref{evaluation-translating} take the questions in turn.
 \todo{The research questions are in draft form.}
-\end{AddedBlock}
 
-\subsection{\replaced{Experimental setup}{Generating \PurePy}}
+\subsection{Experimental setup}
 \label{sec:evaluation-setup}
 
-\begin{DeletedBlock}
-How effectively can AI agents generate \PurePy solutions to standard functional-programming problems? This
-measures the ease of targeting the subset from a problem statement alone.
-
-The evaluation pipeline in \texttt{evaluation/} gives a model the same problems in Python and in \PurePy, runs
-the \PurePy checker and the benchmark's official tests on each answer, feeds checker rejections back to the model
-for a bounded number of repair rounds, and produces \figref{evaluation-generation} from the recorded outcomes.
-The figure reports how many of the selected problems pass the official tests, and how many are both accepted by
-the checker and pass the tests, for the initial answer and after repair. \todo{The committed result file is the
-pipeline's smoke run on two problems with a small local model; replace it with the full experiment.}
-\end{DeletedBlock}
-
-\begin{AddedBlock}
 A model is given the same problems under several conditions, each with equivalent documentation: \PurePy,
 unchecked \PurePy, Python, OCaml, and translation of the benchmark's reference solution into \PurePy.
 Unchecked \PurePy keeps the grammar of \PurePy, with annotations optional, and drops the well-formedness
@@ -63,7 +44,6 @@ pass the official tests, and how many are both accepted by the checker and pass 
 answer and after repair. \todo{The committed result file is the pipeline's smoke run on two problems with a
 small local model; replace it with the full experiment.} \todo{The unchecked \PurePy, OCaml and translation
 conditions are not yet implemented, and nor is the classification of rejections by rule.}
-\end{AddedBlock}
 
 \begin{figure}[t]
 \centering
@@ -74,7 +54,6 @@ condition is shown by its test outcome only, as it is not checked.}
 \label{fig:evaluation-generation}
 \end{figure}
 
-\begin{AddedBlock}
 \subsection{Python syntax}
 \label{sec:evaluation-syntax}
 
@@ -106,15 +85,13 @@ unchecked \PurePy with Python measures the effect of the grammar. Types may catc
 only by the tests, and the model may write better code when it must state types. RQ2 measures the cost of
 the restrictions in rejections and rounds, and RQ3 their benefit in correctness.
 \figref{evaluation-generation} reports the pass rates of the \PurePy and Python conditions.
-\end{AddedBlock}
 
 \subsection{Translating Python to \PurePy}
 \label{sec:evaluation-translating}
 
-\replaced{RQ4 asks whether a model can translate existing Python programs into \PurePy. The model is given the
+RQ4 asks whether a model can translate existing Python programs into \PurePy. The model is given the
 benchmark's reference solution to each problem and asked for a \PurePy version, under the same loop as for
 generation: the checker on the translation, the tests under CPython and the rounds recorded. We report how often
 translation succeeds. A breakdown of the failed translations by forbidden feature can follow from the
 diagnostics on the final attempt. \todo{Unclear whether this question can be answered without libraries being
-part of the specification.}}{How effectively can AI agents translate existing Python programs into the \PurePy
-subset? \todo{Not sure about this one without libraries being part of the spec too.} }
+part of the specification.}
