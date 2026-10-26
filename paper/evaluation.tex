@@ -15,15 +15,13 @@ model as the code generator. The evaluation asks four research questions.
 \subsection{Experimental setup}
 \label{sec:evaluation-setup}
 
-A model is given the same problems in several \emph{settings}. A setting fixes the task (generation or
-translation), target language and static check of the answer, and the model is given equivalent documentation
-in every setting. \tabref{evaluation-settings} shows which settings are used by each research
-question. For each problem and setting, the procedure is as follows.
+A model is given the same problems in each of the settings listed in \tabref{evaluation-settings}, with
+equivalent documentation in each. For each problem and setting, the procedure is as follows.
 \begin{enumerate}
 \item Prompt model with problem and documentation for setting
 \item Extract program from answer
 \item Check program statically, except in Python setting
-\item If check rejects program and repair rounds remain, return diagnostics to model and continue from step 2
+\item If static check rejects program and repair rounds remain, return diagnostics to model and continue from step 2
 \item Run final program against benchmark's official tests
 \item Record outcome of every round
 \end{enumerate}
@@ -32,17 +30,19 @@ diagnostics alone. A \PurePy answer is a Python program, so the benchmark's Pyth
 under CPython.
 
 \begin{table}[h]
-\caption{Settings of the evaluation}
+\caption{Settings of evaluation; every answer run against benchmark's tests, and diagnostics of static check
+returned to model for repair}
 \label{tab:evaluation-settings}
-\begin{tabular}{lll}
+\small
+\begin{tabular}{llll}
 \toprule
-Setting & Static check & Questions \\
+Task & Target language & Static check & Questions \\
 \midrule
-\PurePy & \PurePy checker & RQ1, RQ2, RQ3 \\
-Python & None & RQ3 \\
-Unchecked \PurePy & Syntax of \PurePy & RQ3 \\
-OCaml, pure subset & OCaml compiler and purity check & RQ1 \\
-Translation into \PurePy & \PurePy checker & RQ4 \\
+Generation & \PurePy & \PurePy type checker & RQ1, RQ2, RQ3 \\
+Generation & Python & None & RQ3 \\
+Generation & Unchecked \PurePy & \PurePy parser & RQ3 \\
+Generation & OCaml, pure subset & OCaml compiler and purity checker & RQ1 \\
+Translation from Python & \PurePy & \PurePy type checker & RQ4 \\
 \bottomrule
 \end{tabular}
 \end{table}
