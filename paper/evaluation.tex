@@ -5,7 +5,7 @@ We evaluate empirically the suitability of \PurePy as a target language for gene
 model as the code generator. The evaluation asks three research questions.
 \begin{enumerate}[label=\textbf{RQ\arabic*},ref=RQ\arabic*,leftmargin=*]
 \item\label{rq:cost} What do the restrictions of \PurePy cost the generator, in rejections, repair rounds and tokens?
-\item\label{rq:effect} How do the restrictions of \PurePy affect the generated program, in correctness and in length?
+\item\label{rq:effect} How do the restrictions of \PurePy affect the correctness and length of generated programs?
 \item\label{rq:translation} How well does a model translate existing Python into \PurePy, and which restrictions make
 translation difficult?
 \end{enumerate}
@@ -77,7 +77,7 @@ setting is shown by its test outcome only, as it is not checked.}
 \label{fig:evaluation-generation}
 \end{figure}
 
-\subsection{Cost of the \PurePy restrictions to the generator\texorpdfstring{ (\rqref{cost})}{}}
+\subsection{Cost of \PurePy restrictions to generator\texorpdfstring{ (\rqref{cost})}{}}
 \label{sec:evaluation-cost}
 
 \rqref{cost} asks what the restrictions of \PurePy cost the generator. Over all rounds, we count rejections by
@@ -85,17 +85,16 @@ the rule named in each diagnostic. For each rejection, we record whether the nex
 and the number of rounds to acceptance. We also count the input and output tokens per problem, up to acceptance
 or the budget, in \PurePy and in Python.
 
-\subsection{Effect of the restrictions on the program\texorpdfstring{ (\rqref{effect})}{}}
+\subsection{Effect of \PurePy restrictions on generated programs\texorpdfstring{ (\rqref{effect})}{}}
 \label{sec:evaluation-effect}
 
-\rqref{effect} asks how the restrictions of \PurePy affect the generated program, in its correctness and in its
-length. For correctness, we compare the pass rate of the final program in \PurePy and in Python. A third
-setting, unchecked \PurePy, keeps the grammar of \PurePy, with annotations optional, and drops the
-well-formedness rules. Comparing unchecked \PurePy with \PurePy measures the effect of the well-formedness
-rules, and comparing it with Python measures the effect of the grammar. \figref{evaluation-generation} reports
-the pass rates of the \PurePy and Python settings. For length, we compare the final \PurePy program, in
-non-blank lines and in tokens, with the model's Python answer and, for HumanEval+ and MBPP+, with the
-benchmark's reference solution.
+\rqref{effect} asks how the restrictions of \PurePy affect the correctness and length of generated programs. For
+correctness, we compare the pass rate of the final program in \PurePy and in Python. A third setting, unchecked
+\PurePy, keeps the grammar of \PurePy, with annotations optional, and drops the well-formedness rules. Comparing
+unchecked \PurePy with \PurePy measures the effect of the well-formedness rules, and comparing it with Python
+measures the effect of the grammar. \figref{evaluation-generation} reports the pass rates of the \PurePy and
+Python settings. For length, we compare the final \PurePy program, in non-blank lines and in tokens, with the
+model's Python answer and, for HumanEval+ and MBPP+, with the benchmark's reference solution.
 
 \subsection{Translation of existing Python\texorpdfstring{ (\rqref{translation})}{}}
 \label{sec:evaluation-translating}
