@@ -539,6 +539,10 @@ def from_reason(r: Any) -> reasons.Reason:
             )
         case Reasons.UnreachableCase(p):
             return reasons.UnreachableCase(render_pat(p))
+        case Reasons.MissingReturnMatchPartial(tau):
+            return reasons.MissingReturnMatchPartial(from_ty(tau))
+        case Reasons.MissingReturnAssertion():
+            return reasons.MissingReturnAssertion()
         case Reasons.NotPredefinedName(x):
             return reasons.NotPredefinedName(from_string(x))
         case Reasons.NotClass(q):
