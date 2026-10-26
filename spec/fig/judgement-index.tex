@@ -28,7 +28,7 @@ $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ & top-level statement $t$ of m
 $\Sigma; \Gamma \vdash \chi$ & type definition $\chi$ is well-formed & \figref{typing-top-level-decl} \\
 $\Sigma \vdash \Gamma, x \importsR \theta \binding \Sigma'$ & name $x$ imported from module signature $\Gamma$ has context entry $\theta$ & \figref{typing-imports} \\
 $\Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma'$ & imports $\seq{\iota}$ of module $q$ yield context $\Gamma$ & \figref{typing-import-prefix} \\
-$\Sigma \vdash_{\mathsf{sub}} \replaced{q, \Gamma}{\theta }, \seq{x} : \replaced{\Gamma'}{\theta' } \binding \Sigma'$ & checked module $\theta$ extended along chain $\seq{x}$ of submodule names gives context entry $\theta'$ & \figref{typing-import-prefix} \\
+$\Sigma \vdash_{\mathsf{sub}} \replaced{q, \Gamma}{\theta }, \seq{x} : \replaced{\Gamma'}{\theta' } \binding \Sigma'$ & \replaced{submodule chain $\seq{x}$ extends signature $\Gamma$ of module $q$ to $\Gamma'$}{checked module $\theta$ extended along chain $\seq{x}$ of submodule names gives context entry $\theta'$ } & \figref{typing-import-prefix} \\
 $\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$ & module $q$ checks with signature $\Gamma$ & \figref{typing-module} \\
 $\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{typing-module}
    \\[2mm]
@@ -42,7 +42,7 @@ $\rho, \seq{e} \Rightarrow r$ & expressions $\seq{e}$ evaluate, left to right, t
 $\rho, \seq{g} \Rightarrow r$ & comprehension qualifiers $\seq{g}$ evaluate to result $r$ & \figref{eval-quals-result} \\
 $\rho, x \importsR r$ & name $x$ imported from module environment $\rho$ has result $r$ & \figref{eval-imports} \\
 $q, \seq{\iota} \Rightarrow r$ & imports $\seq{\iota}$ of module $q$ evaluate to result $r$ & \figref{eval-import-prefix} \\
-$\replaced{q, \rho}{v }, \seq{x} \Rightarrow_{\mathsf{sub}} r$ & loaded module $v$ extended along chain $\seq{x}$ of submodule names gives result $r$ & \figref{eval-import-prefix} \\
+$\replaced{q, \rho}{v }, \seq{x} \Rightarrow_{\mathsf{sub}} r$ & \replaced{submodule chain $\seq{x}$ extends environment $\rho$ of module $q$, giving result $r$}{loaded module $v$ extended along chain $\seq{x}$ of submodule names gives result $r$ } & \figref{eval-import-prefix} \\
 $q \Rightarrow_{\mathsf{mod}} r$ & module $q$ loads to result $r$ & \figref{eval-modules} \\
 $\mathcal{M} \Rightarrow \kappa$ & program $\mathcal{M}$ evaluates to termination kind $\kappa$ & \figref{eval-modules}
 \end{tabular}
