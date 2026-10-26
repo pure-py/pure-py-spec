@@ -4,7 +4,7 @@
 We evaluate empirically the suitability of \PurePy as a target language for generated code, with a language
 model as the code generator. The evaluation asks three research questions.
 \begin{enumerate}[label=\textbf{RQ\arabic*},ref=RQ\arabic*,leftmargin=*]
-\item\label{rq:cost} What do the restrictions of \PurePy cost the generator, in rejections, repair rounds and tokens?
+\item\label{rq:effort} How much effort does a \PurePy solution take to generate, compared with a Python solution?
 \item\label{rq:solutions} How do \PurePy solutions compare with Python solutions in correctness and size?
 \item\label{rq:translation} How well does a model translate existing Python into \PurePy, and which restrictions make
 translation difficult?
@@ -41,7 +41,8 @@ under CPython.
 \toprule
 Question & Task & Target language & Static check \\
 \midrule
-\rqref{cost} & Generation & \PurePy & \PurePy type checker \\
+\rqref{effort} & Generation & \PurePy & \PurePy type checker \\
+& Generation & Python & None \\
 \addlinespace
 \rqref{solutions} & Generation & \PurePy & \PurePy type checker \\
 & Generation & Unchecked \PurePy & \PurePy parser \\
@@ -77,13 +78,14 @@ setting is shown by its test outcome only, as it is not checked.}
 \label{fig:evaluation-generation}
 \end{figure}
 
-\subsection{Cost of \PurePy restrictions to generator\texorpdfstring{ (\rqref{cost})}{}}
-\label{sec:evaluation-cost}
+\subsection{Effort of generating \PurePy solutions\texorpdfstring{ (\rqref{effort})}{}}
+\label{sec:evaluation-effort}
 
-\rqref{cost} asks what the restrictions of \PurePy cost the generator. Over all rounds, we count rejections by
-the rule named in each diagnostic. For each rejection, we record whether the next round removes the violation,
-and the number of rounds to acceptance. We also count the input and output tokens per problem, up to acceptance
-or the budget, in \PurePy and in Python.
+\rqref{effort} asks how much effort a \PurePy solution takes to generate, compared with a Python solution.
+Effort is measured in rejections, repair rounds and tokens; Python answers are not checked, so a Python solution
+takes one round. Over all rounds, we count rejections by the rule named in each diagnostic. For each rejection,
+we record whether the next round removes the violation, and the number of rounds to acceptance. We also count
+the input and output tokens per problem, up to acceptance or the budget, in \PurePy and in Python.
 
 \subsection{Correctness and size of \PurePy solutions\texorpdfstring{ (\rqref{solutions})}{}}
 \label{sec:evaluation-solutions}
