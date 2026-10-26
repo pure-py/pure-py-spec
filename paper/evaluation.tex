@@ -76,7 +76,7 @@ setting is shown by its test outcome only, as it is not checked.}
 \label{fig:evaluation-generation}
 \end{figure}
 
-\subsection{Familiarity of Python syntax}
+\subsection{Familiarity of Python syntax (RQ1)}
 \label{sec:evaluation-syntax}
 
 RQ1 asks how the familiarity of Python syntax affects the difficulty of generating functional programs.
@@ -105,7 +105,7 @@ fragments are reported separately.
 printing of problem fragments, documentation and diagnostics in that syntax; selection of problems with
 code fragments within \PurePy.}
 
-\subsection{Cost of the restrictions to the generator}
+\subsection{Cost of the restrictions to the generator (RQ2)}
 \label{sec:evaluation-cost}
 
 RQ2 asks what the restrictions of \PurePy cost the generator. Over all rounds, we count rejections per
@@ -116,7 +116,7 @@ alone understate the cost, so we also count the input and output tokens per prob
 budget, and compare \PurePy with Python. The restrictions are not a barrier if violations are rare and are
 cleared in a round or two from the diagnostic alone.
 
-\subsection{Effect of the restrictions on the program}
+\subsection{Effect of the restrictions on the program (RQ3)}
 \label{sec:evaluation-effect}
 
 RQ3 asks how the restrictions of \PurePy affect the generated program, in its correctness and in its length.
@@ -141,7 +141,7 @@ necessarily a better one. We compare the length of the final \PurePy program, in
 tokens, with the model's Python answer to the same problem, which holds the author constant, and with the
 benchmark's reference solution, which HumanEval+ and MBPP+ provide but LiveCodeBench lacks.
 
-\subsection{Translation of existing Python}
+\subsection{Translation of existing Python (RQ4)}
 \label{sec:evaluation-translating}
 
 RQ4 asks how well a model translates existing Python programs into \PurePy, and which restrictions make
