@@ -59,6 +59,13 @@ are small functions over the standard library, so most fall within the \PurePy s
 scenario of LiveCodeBench, in which the model fixes a solution given failing test output, is the nearest
 precedent for the repair loop.
 
+Some problems have no \PurePy solution, or only one which is hard to find, for reasons unrelated to the
+restrictions of \PurePy. Their tests may pass sets or dictionaries with non-string keys, which have no type in
+the current version of \PurePy; a natural solution may need a library module such as \pyinline{re}, which the
+current version lacks; or recursion over large inputs may exceed the recursion limit of CPython. RQ1 to RQ3
+therefore use only the problems with a known \PurePy solution, namely those with a reference solution translated
+successfully in RQ4. The translations of RQ4 run first.
+
 The evaluation pipeline in \filename{evaluation/} implements this procedure for the \PurePy and Python
 settings, and produces \figref{evaluation-generation} from the recorded outcomes. The
 figure reports how many of the selected problems pass the official tests, and how many are both accepted by
@@ -107,11 +114,7 @@ RQ3 asks how the restrictions of \PurePy affect the generated program, in its co
 For correctness, we compare the pass rate of the final program in \PurePy and in Python. A third setting,
 unchecked \PurePy, keeps the grammar of \PurePy, with annotations optional, and drops the well-formedness rules.
 Comparing unchecked \PurePy with \PurePy measures the effect of the well-formedness rules, and comparing it with
-Python measures the effect of the grammar. Some problems have no \PurePy solution, or only one which is hard
-to find. Their tests may pass sets or dictionaries with non-string keys, which have no \PurePy type; a natural
-solution may need a library module such as \pyinline{re}; or recursion over large inputs may exceed the
-recursion limit of Python. Pass rates are therefore reported over all problems and over the problems with a
-known \PurePy solution, namely those with a reference solution translated successfully in RQ4.
+Python measures the effect of the grammar.
 \figref{evaluation-generation} reports the pass rates of the \PurePy and Python settings. For length, we
 compare the final \PurePy program, in non-blank lines and in tokens, with the model's Python answer and, for
 HumanEval+ and MBPP+, with the benchmark's reference solution.
@@ -123,5 +126,6 @@ RQ4 asks how well a model translates existing Python programs into \PurePy, and 
 translation difficult. The model is given the benchmark's reference solution to each problem and asked for a
 \PurePy version, under the same loop as for generation. A translation succeeds if the type checker accepts it
 and it passes the tests. We report how often translation succeeds, and classify each rejection by the rule
-named in its diagnostic. \todo{Unclear whether this question can be answered without libraries being part of
+named in its diagnostic. The rules are grouped into the restrictions of \PurePy and the features missing from its
+current version, such as sets and library modules. \todo{Unclear whether this question can be answered without libraries being part of
 the specification.}
