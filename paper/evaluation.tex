@@ -56,11 +56,12 @@ Some problems depend on Python features which are compatible with the design of 
 of the specification. If the inputs or expected outputs in the tests of a problem include values of a type
 outside the specification, for example sets, complex numbers or dictionaries with integer keys, no \PurePy
 solution exists, and the problem is excluded. If a solution uses another feature outside the specification, for
-example the module \pyinline{re} or the built-in \pyinline{sum}, the problem is kept, and the resulting
-rejections are counted separately from rejections caused by the restrictions of \PurePy. Without loops, a
-\PurePy program must use recursion to accumulate a result over its input, since comprehensions only map and
-filter. CPython has no tail-call optimisation, so recursion over large inputs can exceed its recursion limit;
-such failures count against \PurePy and are reported as a category of their own.
+example the module \pyinline{re} or the built-in \pyinline{sum}, the problem is kept, because a solution without
+the feature may exist, and the resulting rejections are counted separately from rejections caused by the
+restrictions of \PurePy. Without loops, a \PurePy program must use recursion to accumulate a result over its
+input, since comprehensions only map and filter. CPython has no tail-call optimisation, so recursion over large
+inputs can exceed its recursion limit; such failures count against \PurePy and are reported as a category of
+their own.
 
 The evaluation pipeline in \filename{evaluation/} implements this procedure for the \PurePy and Python
 settings, and produces \figref{evaluation-generation} from the recorded outcomes. The
