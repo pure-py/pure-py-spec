@@ -56,12 +56,13 @@ RQ4 & Translation from Python & \PurePy & \PurePy type checker \\
 \end{tabular}
 \end{table}
 
-Some problems have no \PurePy solution, or only one which is hard to find, for reasons unrelated to the
-restrictions of \PurePy. Their tests may pass sets or dictionaries with non-string keys, which have no type in
-the current version of \PurePy; a natural solution may need a library module such as \pyinline{re}, which the
-current version lacks; or recursion over large inputs may exceed the recursion limit of CPython. RQ1 to RQ3
-therefore use only the problems with a known \PurePy solution, namely those with a reference solution translated
-successfully in RQ4. The translations of RQ4 run first.
+Some problems have no \PurePy solution, because their tests pass or expect values with no \PurePy type, such
+as sets. These problems are detected from the test values and excluded. Problems which use a library module
+missing from \PurePy, such as \pyinline{re}, are kept and reported separately, because a solution without the
+module may exist. Without loops, a \PurePy program must use recursion to accumulate a result over its input,
+since comprehensions only map and filter. CPython has no tail-call optimisation, so recursion over large
+inputs can exceed its recursion limit; such failures count against \PurePy and are reported as a category of
+their own.
 
 The evaluation pipeline in \filename{evaluation/} implements this procedure for the \PurePy and Python
 settings, and produces \figref{evaluation-generation} from the recorded outcomes. The
