@@ -116,19 +116,20 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--no-mypy", action="store_true")
     args, conformance_args = parser.parse_known_args()
-    r = Results()
+    consistency = Results()
 
+    print("internal consistency checks")
     print("cross-references")
-    check_unique_rule_names(r)
-    check_rule_attribution(r)
+    check_unique_rule_names(consistency)
+    check_rule_attribution(consistency)
 
     if not args.no_mypy:
         print("mypy and ruff over src/purepy")
-        check_lint(r)
-        check_mypy_compatibility(r)
+        check_lint(consistency)
+        check_mypy_compatibility(consistency)
 
-    r.summary()
-    if r.failed:
+    consistency.summary()
+    if consistency.failed:
         sys.exit(1)
     conformance.main(conformance_args)
 
