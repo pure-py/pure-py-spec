@@ -138,16 +138,27 @@ class EvaluationTests(unittest.TestCase):
 
     def test_pipeline_and_repair_feedback_with_local_fake_api(self):
         requests = []
+        scenario = "repair"
 
         class Handler(BaseHTTPRequestHandler):
             def do_POST(self):
                 body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
                 requests.append(body)
+                if scenario == "api_error":
+                    self.send_response(401)
+                    self.end_headers()
+                    return
                 purepy = "Solve this task in PurePy" in body["messages"][0]["content"]
-                code = GOOD if len(body["messages"]) > 1 else BAD if purepy else GOOD.replace("number % 1.0", "0.0")
+                code = (GOOD if scenario != "repair" or len(body["messages"]) > 1 else
+                        BAD if purepy else GOOD.replace("number % 1.0", "0.0"))
                 condition = "purepy" if purepy else "python"
                 response = f"<{condition}>\n{code}</{condition}>"
-                raw = json.dumps({"choices": [{"message": {"content": response}, "finish_reason": "stop"}],
+                if scenario == "untagged":
+                    response = code
+                elif scenario == "outside_text":
+                    response = "Here is the solution:\n" + response + "\nExplanation."
+                raw = json.dumps({"choices": [{"message": {"content": response},
+                                  "finish_reason": "length" if scenario == "truncated" else "stop"}],
                                   "id": "offline-test", "model": "fake", "usage": {"completion_tokens": 10}}).encode()
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
@@ -226,6 +237,27 @@ class EvaluationTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, "already exist"):
                     e.run(args)
                 self.assertEqual(path.read_bytes(), original)
+                for scenario in ("api_error", "truncated", "untagged", "outside_text"):
+                    with self.subTest(scenario=scenario), patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-secret"}):
+                        args.output = Path(folder) / (scenario + ".json")
+                        before = len(requests)
+                        if scenario == "api_error":
+                            with self.assertRaisesRegex(RuntimeError, "infrastructure failed"):
+                                e.run(args)
+                        else:
+                            e.run(args)
+                        self.assertEqual(len(requests) - before, 2)
+                        report = args.output.with_suffix(".md").read_text()
+                        for condition in e.CONDITIONS:
+                            for stage in ("initial", "final"):
+                                counts = "1/1 | 1/1 | 1/1 | 0 | 0" if scenario == "outside_text" else "0/1 | 0/1 | 0/1 | 1 | 1"
+                                self.assertIn(f"| {condition} | {stage} | {counts} |", report)
+                        self.assertIn({"api_error": "api_error", "truncated": "incomplete",
+                                       "untagged": "missing_tags", "outside_text": "outside_text"}[scenario], report)
+                        if scenario != "outside_text":
+                            self.assertIn("unknown percentage points", report)
+                        self.assertIn("python: {}", report)
+                        self.assertIn("purepy: {}", report)
         finally:
             server.shutdown()
             server.server_close()
@@ -369,14 +401,14 @@ class EvaluationTests(unittest.TestCase):
             e.validate_api_url("http://example.com/v1")
 
     def test_unknown_diagnostic_does_not_claim_feature_cleared(self):
-        first = e.Attempt(code=BAD, checker=e.Verdict(False, None, False,
+        first = e.Attempt(code=BAD, checker=e.Verdict(False, None, False, exit_code=1,
                  failure_mode={"category": "excluded_by_design", "restriction": "loop"}),
                  official_tests=e.Verdict(True, None, False), generation={"status": "complete"},
                  round=0, messages=[], prompt_sha256="")
         following = copy.deepcopy(first)
         following.round = 1
         following.checker.failure_mode["restriction"] = "mutation"
-        result = e.pack_solution([first, following], "prompt")
+        result = e.pack_solution([first, following], "prompt", "purepy", 1)
         self.assertIsNone(result["attempts"][0].next_round_clears_reported_feature)
 
     def test_attempt_json_roundtrip_preserves_optional_fields(self):
@@ -399,6 +431,78 @@ class EvaluationTests(unittest.TestCase):
                     self.assertNotIn("next_round_clears_reported_feature", encoded)
                 else:
                     self.assertIs(encoded["next_round_clears_reported_feature"], clearance)
+
+    def test_invalid_attempt_cannot_replace_a_result(self):
+        accepted = e.check(GOOD)
+        valid = e.Attempt(round=0, code=GOOD, generation={"status": "complete"}, messages=[],
+                          prompt_sha256="", checker=accepted, official_tests=e.Verdict(True, None, False))
+        cases = [
+            {"generation": {"status": "api_error"}},
+            {"generation": {"status": "incomplete"}},
+            {"generation": {"status": "api_error"}, "checker": e.Verdict(None, None, False)},
+            {"code": ""},
+            {"checker": e.Verdict(False, "rejected", False)},
+            {"checker": e.Verdict(False, "rejected", False, exit_code=0)},
+            {"checker": e.Verdict(True, None, False, exit_code=1)},
+            {"checker": e.Verdict(False, "failed", True, exit_code=1)},
+            {"official_tests": e.Verdict(False, "failed", True)},
+            {"checker": e.Verdict(0, "invalid", False, exit_code=1)},
+            {"official_tests": e.Verdict(0, "invalid", False)},
+            {"round": -1},
+            {"round": True},
+        ]
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "result.json"
+            e.save(path, {"attempt": valid})
+            original = path.read_bytes()
+            for changes in cases:
+                with self.subTest(changes=changes):
+                    attempt = copy.deepcopy(valid)
+                    for name, value in changes.items():
+                        setattr(attempt, name, value)
+                    with self.assertRaises(RuntimeError):
+                        e.save(path, {"attempt": attempt})
+                    self.assertEqual(path.read_bytes(), original)
+                    self.assertFalse(path.with_suffix(".json.tmp").exists())
+
+    def test_attempt_history_enforces_stopping_and_budget(self):
+        accepted, rejected = e.check(GOOD), e.check(BAD)
+        first = e.Attempt(round=0, code=BAD, generation={"status": "complete"}, messages=[],
+                          prompt_sha256="", checker=rejected, official_tests=e.Verdict(True, None, False))
+        second = copy.deepcopy(first)
+        second.round = 1
+        accepted_first = copy.deepcopy(first)
+        accepted_first.code, accepted_first.checker = GOOD, accepted
+        interrupted = copy.deepcopy(first)
+        interrupted.generation = {"status": "api_error"}
+        interrupted.checker = e.Verdict(None, "generation failed", False)
+        interrupted.official_tests = e.Verdict(None, "generation failed", False)
+        tool_failure = copy.deepcopy(first)
+        tool_failure.official_tests = e.Verdict(None, "grader missing", True)
+        cases = [([], "purepy", 1), ([second], "purepy", 1),
+                 ([first, second], "purepy", 0), ([first, second], "python", 3),
+                 ([accepted_first, second], "purepy", 1), ([interrupted, second], "purepy", 1),
+                 ([tool_failure, second], "purepy", 1),
+                 ([first], "purepy", 1)]
+        for attempts, condition, budget in cases:
+            with self.subTest(condition=condition, budget=budget, attempts=attempts):
+                with self.assertRaises(RuntimeError):
+                    e.pack_solution(attempts, "prompt", condition, budget)
+        pending = e.Attempt(round=1, code=GOOD, generation={"status": "complete"},
+                            messages=[], prompt_sha256="")
+        solution = e.pack_solution([first, pending], "prompt", "purepy", 1, pending=True)
+        self.assertEqual(solution["rejections"], 1)
+        self.assertIsNone(solution["rounds_to_acceptance"])
+        with self.assertRaisesRegex(RuntimeError, "pending"):
+            e.pack_solution([first, pending], "prompt", "purepy", 1)
+        pending.checker = accepted
+        e.pack_solution([first, pending], "prompt", "purepy", 1, pending=True)
+        with self.assertRaisesRegex(RuntimeError, "official tests verdict is still pending"):
+            e.pack_solution([first, pending], "prompt", "purepy", 1)
+        pending.official_tests = e.Verdict(True, None, False)
+        solution = e.pack_solution([first, pending], "prompt", "purepy", 1)
+        self.assertEqual(solution["rounds_to_acceptance"], 1)
+        self.assertEqual(solution["rejections"], 1)
 
     def test_generated_prompt_examples_pass_checker(self):
         text = (e.ROOT / "prompts/purepy-v0.22.3.md").read_text()

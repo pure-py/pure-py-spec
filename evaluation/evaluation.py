@@ -51,8 +51,32 @@ class Attempt:
                       "official_tests": Verdict(**record["official_tests"])})
 
     def to_dict(self):
+        self.validate()
         return {f.name: getattr(self, f.name) for f in fields(self)
                 if getattr(self, f.name) is not Unrecorded.VALUE}
+
+    def validate(self, *, finished=False):
+        if type(self.round) is not int or self.round < 0:
+            raise RuntimeError("attempt rounds must be nonnegative integers")
+        evaluable = self.generation["status"] == "complete" and bool(self.code.strip())
+        for name, verdict in (("checker", self.checker), ("official tests", self.official_tests)):
+            if verdict.passed is not None and type(verdict.passed) is not bool:
+                raise RuntimeError(f"{name} verdict must be true, false or unknown")
+            if verdict.tooling_error and verdict.passed is not None:
+                raise RuntimeError(f"{name} tooling errors must have unknown verdicts")
+            if not evaluable and verdict.passed is not None:
+                raise RuntimeError("unevaluated answers must have unknown verdicts")
+            if finished and evaluable and verdict.passed is None and not verdict.tooling_error:
+                raise RuntimeError(f"{name} verdict is still pending")
+        if self.checker.passed is not None:
+            expected = (0,) if self.checker.passed else (1, 2, 3, 4)
+            if type(self.checker.exit_code) is not int or self.checker.exit_code not in expected:
+                raise RuntimeError("checker verdict requires a matching completed checker exit status")
+
+    @property
+    def repairable(self):
+        return (self.generation["status"] == "complete" and self.checker.passed is False
+                and not self.checker.tooling_error and not self.official_tests.tooling_error)
 
     @property
     def format_status(self):
@@ -324,7 +348,20 @@ def repair_messages(messages, attempt: Attempt):
              + output_instruction("purepy")}]
 
 
-def pack_solution(attempts: list[Attempt], initial_prompt):
+def pack_solution(attempts: list[Attempt], initial_prompt, condition, repair_rounds, *, pending=False):
+    if condition not in CONDITIONS or type(repair_rounds) is not int or repair_rounds < 0:
+        raise RuntimeError("invalid condition or repair budget")
+    budget = repair_rounds if condition == "purepy" else 0
+    if not attempts or len(attempts) > budget + 1:
+        raise RuntimeError("attempt history is empty or exceeds the repair budget")
+    for index, attempt in enumerate(attempts):
+        attempt.validate(finished=index < len(attempts) - 1 or not pending)
+        if attempt.round != index:
+            raise RuntimeError("attempt rounds must be consecutive, starting at zero")
+        if index and not attempts[index - 1].repairable:
+            raise RuntimeError("repair continued after acceptance or another stopping condition")
+    if not pending and attempts[-1].repairable and len(attempts) < budget + 1:
+        raise RuntimeError("repair stopped before acceptance or the repair limit")
     for current, following in zip(attempts, attempts[1:]):
         if current.checker.passed is not False:
             continue
@@ -359,7 +396,7 @@ def attempt_solution(args, task: Problem, condition, persist=None):
                           prompt_sha256=sha(json.dumps(messages, sort_keys=True).encode()))
         attempts.append(attempt)
         if persist:
-            persist(pack_solution(attempts, initial_prompt))
+            persist(pack_solution(attempts, initial_prompt, condition, args.repair_rounds, pending=True))
         if attempt.generation["status"] != "complete" or not attempt.code:
             reason = ("generation " + attempt.generation["status"]
                       if attempt.generation["status"] != "complete" else
@@ -369,13 +406,13 @@ def attempt_solution(args, task: Problem, condition, persist=None):
         else:
             attempt.checker = check(attempt.code)
             attempt.official_tests = args.benchmark.grade(attempt.code, task)
+        attempt.validate(finished=True)
         if persist:
-            persist(pack_solution(attempts, initial_prompt))
-        if (attempt.generation["status"] != "complete" or attempt.checker.passed is not False
-                or attempt.checker.tooling_error or attempt.official_tests.tooling_error):
+            persist(pack_solution(attempts, initial_prompt, condition, args.repair_rounds, pending=True))
+        if not attempt.repairable:
             break
         messages = repair_messages(messages, attempt)
-    return pack_solution(attempts, initial_prompt)
+    return pack_solution(attempts, initial_prompt, condition, args.repair_rounds)
 
 
 def summarize(data):
