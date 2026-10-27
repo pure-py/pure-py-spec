@@ -141,12 +141,17 @@ def is_assigned(mod_ctx: ModuleContext, x: Var) -> bool:
     return assigned_type(mod_ctx, x) is not None
 
 
-def resolve_name(q: Name, mod_ctx: ModuleContext) -> ContextEntry | None:
+def lookup(q: Name, gamma: Context) -> ContextEntry | None:
     q_ = parent(q)
     if q_ is None:
-        return mod_ctx.gamma.get(root(q))
-    theta = resolve_name(q_, mod_ctx)
+        return gamma.get(root(q))
+    theta = lookup(q_, gamma)
     return theta.members.get(q.parts[-1]) if isinstance(theta, ModuleChecked) else None
+
+
+def resolve_name(q: Name, gamma: Context) -> ContextEntry | None:
+    theta = lookup(q, gamma)
+    return None if isinstance(theta, (Unbound, DU, PU, TypeVar, ModuleStub)) else theta
 
 
 def module_of(mod_ctx: ModuleContext, x: Var) -> ModuleStub | ModuleChecked | None:
@@ -334,7 +339,7 @@ def extend_context(gamma: Context, gamma_: Context) -> Context:
 
 def entry_of(e: ast.expr, mod_ctx: ModuleContext) -> ContextEntry | None:
     q = dotted_name(e)
-    return None if q is None else resolve_name(q, mod_ctx)
+    return None if q is None else resolve_name(q, mod_ctx.gamma)
 
 
 def class_of_name(e: ast.expr, mod_ctx: ModuleContext) -> ClassName | None:

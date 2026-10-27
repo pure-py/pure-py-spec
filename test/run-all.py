@@ -4,13 +4,14 @@ import pathlib
 import re
 import sys
 
+from purepy import conformance
 from purepy.conformance import (
     MAIN,
     SUITE,
     SYNTACTIC_ONLY,
     PurePyOutcome,
     PythonOutcome,
-    Runner,
+    Results,
     run,
     tests,
 )
@@ -28,7 +29,7 @@ RULE_DEF = re.compile(r"lab=\{\\ruleName\{([a-z0-9-]+)\}\}")
 CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
 
 
-def check_unique_rule_names(r: Runner) -> None:
+def check_unique_rule_names(r: Results) -> None:
     with r.test("unique rule names"):
         where: dict[str, list[str]] = {}
         for source in ("spec", "paper"):
@@ -40,7 +41,7 @@ def check_unique_rule_names(r: Runner) -> None:
                 r.fail(f"{name} in {', '.join(files)}")
 
 
-def check_rule_attribution(r: Runner) -> None:
+def check_rule_attribution(r: Results) -> None:
     """Every test rejected by the type checker, undefined or agreeing cites a rule of the spec on its first
     line; a test rejected by the parser cites none."""
     with r.test("rule attribution"):
@@ -62,8 +63,8 @@ def check_rule_attribution(r: Runner) -> None:
                 r.fail(f"{path.relative_to(SUITE_DIR)} cites {cited.group(1)}, not in the spec")
 
 
-def check_lint(r: Runner) -> None:
-    with r.test("checker type-checks"):
+def check_lint(r: Results) -> None:
+    with r.test("type checker passes mypy and ruff"):
         sources = sorted(str(path) for path in SRC.glob("*.py")) + [str(TEST / "run-all.py")]
         for tool in (
             ["mypy", "--strict", "--python-version", PYTHON_VERSION],
@@ -94,7 +95,7 @@ def mypy_errors(paths: list[str], cwd: pathlib.Path) -> set[str]:
     return {line.split(":", 1)[0] for line in proc.stdout.splitlines() if ": error:" in line}
 
 
-def check_mypy_compatibility(r: Runner) -> None:
+def check_mypy_compatibility(r: Results) -> None:
     with r.test("mypy compatibility"):
         agrees = SUITE_DIR / PythonOutcome.SUCCEEDS / PurePyOutcome.AGREES
         found = [test for test in tests(SUITE_DIR) if agrees in test.parents]
@@ -113,29 +114,24 @@ def check_mypy_compatibility(r: Runner) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("interpreter", nargs="?", default="python3")
     parser.add_argument("--no-mypy", action="store_true")
-    parser.add_argument(
-        "--no-run", action="store_true", help="check the tests without running them"
-    )
-    parser.add_argument(
-        "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
-    )
-    args = parser.parse_args()
-    r = Runner(None if args.no_run else args.interpreter, None)
+    args, conformance_args = parser.parse_known_args()
+    consistency = Results()
 
+    print("internal consistency checks")
     print("cross-references")
-    check_unique_rule_names(r)
-    check_rule_attribution(r)
+    check_unique_rule_names(consistency)
+    check_rule_attribution(consistency)
 
     if not args.no_mypy:
         print("mypy and ruff over src/purepy")
-        check_lint(r)
-        check_mypy_compatibility(r)
+        check_lint(consistency)
+        check_mypy_compatibility(consistency)
 
-    r.run_suite(SUITE_DIR, args.jobs)
-    r.summary()
-    sys.exit(1 if r.failed else 0)
+    consistency.summary()
+    if consistency.failed:
+        sys.exit(1)
+    conformance.main(conformance_args)
 
 
 if __name__ == "__main__":

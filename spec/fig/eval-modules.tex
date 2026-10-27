@@ -51,11 +51,11 @@
 {
   q' = x \cons \seq{x} \\
   x \Rightarrow_{\mathsf{mod}} \val{\rho} \\
-  \modLoaded{x}{\rho}, \seq{x} \Rightarrow_{\mathsf{sub}} \val{v} \\
+  x, \rho, \seq{x} \Rightarrow_{\mathsf{sub}} \val{\rho^\dagger} \\
   q, \seq{\iota} \Rightarrow r
 }
 {
-  q, \exImport{q'} \cons \seq{\iota} \Rightarrow \mlet{\rho'}{r}{\val{\set{\bind{x}{v}} \extend \rho'}}
+  q, \exImport{q'} \cons \seq{\iota} \Rightarrow \mlet{\rho'}{r}{\val{\set{\bind{x}{\modLoaded{x}{\rho^\dagger}}} \extend \rho'}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-import-fail}}]
@@ -71,7 +71,7 @@
 {
   q' = x \cons \seq{x} \\
   x \Rightarrow_{\mathsf{mod}} \val{\rho} \\
-  \modLoaded{x}{\rho}, \seq{x} \Rightarrow_{\mathsf{sub}} \aborts{\kappa}
+  x, \rho, \seq{x} \Rightarrow_{\mathsf{sub}} \aborts{\kappa}
 }
 {
   q, \exImport{q'} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
@@ -79,7 +79,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-from-import}}]
 {
-  \seq{q}^\dagger = \containing(q, q') \\
+  \seq{q}^\dagger = \uniqueTo(q', q) \\
   q^\dagger_j \Rightarrow_{\mathsf{mod}} \val{\rho_j} \quad (\forall j) \\
   q' \Rightarrow_{\mathsf{mod}} \val{\rho} \\
   \rho, x_i \importsR \val{v_i} \quad (\forall i) \\
@@ -91,7 +91,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail}}]
 {
-  \seq{q}^\dagger = \containing(q, q') \\
+  \seq{q}^\dagger = \uniqueTo(q', q) \\
   q^\dagger_j \Rightarrow_{\mathsf{mod}} \val{\rho_j} \quad (\forall j) \\
   q' \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
 }
@@ -101,7 +101,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail-containing}}]
 {
-  \seq{q}^\dagger = \containing(q, q') \\
+  \seq{q}^\dagger = \uniqueTo(q', q) \\
   q^\dagger_j \Rightarrow_{\mathsf{mod}} \aborts{\kappa} \\
   q^\dagger_k \Rightarrow_{\mathsf{mod}} \val{\rho_k} \quad (\forall k < j)
 }
@@ -111,7 +111,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-from-import-fail-member}}]
 {
-  \seq{q}^\dagger = \containing(q, q') \\
+  \seq{q}^\dagger = \uniqueTo(q', q) \\
   q^\dagger_k \Rightarrow_{\mathsf{mod}} \val{\rho_k} \quad (\forall k) \\
   q' \Rightarrow_{\mathsf{mod}} \val{\rho} \\
   \rho, x_i \importsR \val{v_i} \quad (\forall i < j) \\
@@ -128,7 +128,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$v, \seq{x} \Rightarrow_{\mathsf{sub}} r$}
+\flushleft \shadebox{$q, \rho, \seq{x} \Rightarrow_{\mathsf{sub}} r$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{eval-submodules-nil}}]
@@ -136,16 +136,17 @@
   \strut
 }
 {
-  v, \varepsilon \Rightarrow_{\mathsf{sub}} \val{v}
+  q, \rho, \varepsilon \Rightarrow_{\mathsf{sub}} \val{\rho}
 }
 \and
 \inferrule*[lab={\ruleName{eval-submodules-cons}}]
 {
   q.x \Rightarrow_{\mathsf{mod}} \val{\rho'} \\
-  \modLoaded{q.x}{\rho'}, \seq{x} \Rightarrow_{\mathsf{sub}} r
+  q.x, \rho', \seq{x} \Rightarrow_{\mathsf{sub}} r
 }
 {
-  \modLoaded{q}{\rho}, x \cons \seq{x} \Rightarrow_{\mathsf{sub}} \mlet{v}{r}{\val{\modLoaded{q}{\rho \extend \set{\bind{x}{v}}}}}
+  q, \rho, x \cons \seq{x} \Rightarrow_{\mathsf{sub}}
+  \mlet{\rho^\dagger}{r}{\val{\rho \extend \set{\bind{x}{\modLoaded{q.x}{\rho^\dagger}}}}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-submodules-fail}}]
@@ -153,10 +154,10 @@
   q.x \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
 }
 {
-  \modLoaded{q}{\rho}, x \cons \seq{x} \Rightarrow_{\mathsf{sub}} \aborts{\kappa}
+  q, \rho, x \cons \seq{x} \Rightarrow_{\mathsf{sub}} \aborts{\kappa}
 }
 \end{mathpar}
-\subcaption{Loaded module $v$ with submodule chain $\seq{x}$ loads to result $r$}
+\subcaption{Submodule chain $\seq{x}$ extends environment $\rho$ of module $q$, giving result $r$}
 \end{subfigure}
 \caption{Import evaluation}
 \label{fig:eval-import-prefix}

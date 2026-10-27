@@ -1,10 +1,11 @@
 import ast
 from collections.abc import Callable, Sequence
 
-from .classes import ClassTable, fields
+from .classes import ClassTable, fields, type_params
 from .subtyping import comparable, join_seq, subtype
 from .type_syntax import (
     CallableType,
+    ClassName,
     ClassType,
     DictType,
     ListType,
@@ -14,8 +15,9 @@ from .type_syntax import (
     Type,
     TypeVariable,
     UnionType,
+    Var,
     base_type,
-    instantiate,
+    fv,
 )
 
 type ResolvedOverload = tuple[tuple[Type, ...], Type]
@@ -42,23 +44,39 @@ def equality(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | No
 
 
 def equality_type(Sigma: ClassTable, tau: Type) -> bool:
+    return not any(needs_eq(Sigma, tau, xi) for xi in fv(tau) | {None})
+
+
+type Xi = Var | None
+type Deriving = frozenset[tuple[ClassName, Xi]]
+
+
+def needs_eq(Sigma: ClassTable, tau: Type, xi: Xi, deriving: Deriving = frozenset()) -> bool:
+    """deriving: class judgements being derived, at which a circular derivation stops"""
     match tau:
+        case TypeVariable(alpha):
+            return xi == alpha
         case CallableType():
-            return False
+            return xi is None
         case ListType(sigma) | DictType(sigma):
-            return equality_type(Sigma, sigma)
+            return needs_eq(Sigma, sigma, xi, deriving)
         case TupleType(taus):
-            return all(equality_type(Sigma, c) for c in taus)
+            return any(needs_eq(Sigma, sigma, xi, deriving) for sigma in taus)
         case UnionType(sigma, tau_):
-            return equality_type(Sigma, sigma) and equality_type(Sigma, tau_)
-        case ClassType(c, taus):
-            return all(
-                equality_type(Sigma, sigma) for _, sigma in instantiate(fields(Sigma, c), taus)
+            return needs_eq(Sigma, sigma, xi, deriving) or needs_eq(Sigma, tau_, xi, deriving)
+        case ClassType(c, sigmas):
+            return (xi is None and needs_eq_class(Sigma, c, None, deriving)) or any(
+                needs_eq_class(Sigma, c, alpha, deriving) and needs_eq(Sigma, sigma, xi, deriving)
+                for alpha, sigma in zip(type_params(Sigma, c), sigmas)
             )
         case Primitive() | LiteralType():
-            return True
-        case TypeVariable():
             return False
+
+
+def needs_eq_class(Sigma: ClassTable, c: ClassName, xi: Xi, deriving: Deriving) -> bool:
+    return (c, xi) not in deriving and any(
+        needs_eq(Sigma, tau, xi, deriving | {(c, xi)}) for _, tau in fields(Sigma, c).fields
+    )
 
 
 def membership_list(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:

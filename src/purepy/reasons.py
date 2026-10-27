@@ -90,7 +90,7 @@ class Reassignment:
 
 
 @dataclass(frozen=True)
-class MaybeAssigned:
+class PossibleReassignment:
     x: Var
 
     def message(self) -> str:
@@ -271,12 +271,11 @@ class ModuleAsValue:
 class ImportOfContainedModule:
     q: Name
     q_: Name
-    from_import: str
 
     def message(self) -> str:
         return (
             f"'{self.q}' is contained in importing module '{self.q_}'; "
-            f"plain import not allowed, write '{self.from_import}'"
+            f"plain import not allowed, write 'from {self.q} import <name>'"
         )
 
 
@@ -519,6 +518,14 @@ class MissingReturnMatchPartial:
         )
 
 
+@dataclass(frozen=True)
+class ImportCycle:
+    qs: tuple[Name, ...]
+
+    def message(self) -> str:
+        return f"import cycle: {' -> '.join(str(q) for q in self.qs)}"
+
+
 type Reason = (
     DuplicateField
     | InheritedField
@@ -531,7 +538,7 @@ type Reason = (
     | Redeclaration
     | UndeclaredAssignment
     | Reassignment
-    | MaybeAssigned
+    | PossibleReassignment
     | CapturedGeneratorVariable
     | UnreachableStatement
     | ConstructorArityMismatch
@@ -594,6 +601,7 @@ class IllFormedModule(IllFormed):
     def __init__(self, node: ast.AST, reason: Reason):
         self.line: int | None = getattr(node, "lineno", None)
         self.col: int | None = getattr(node, "col_offset", None)
+        self.reason = reason
         self.msg = reason.message()
         self.module: Name | None = None
         super().__init__(self.msg)

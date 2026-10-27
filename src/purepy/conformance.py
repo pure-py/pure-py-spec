@@ -4,9 +4,11 @@ import contextlib
 import importlib.resources
 import pathlib
 import shlex
+import shutil
 import subprocess
 import sys
-from collections.abc import Iterator
+import tempfile
+from collections.abc import Iterator, Sequence
 from enum import IntEnum, StrEnum
 from typing import NamedTuple
 
@@ -47,13 +49,13 @@ class Exit(IntEnum):
 
 
 class Expectation(NamedTuple):
-    exit: Exit | None  # None: checker not run
-    error_checked: bool  # checker output contains .error.expected
+    exit: Exit | None  # None: type checker not run
+    error_checked: bool  # type checker output contains .error.expected
     python: PythonOutcome | None  # None: not run under Python
 
 
-# Checker verdict for each PurePy outcome
-CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
+# Type checker verdict for each PurePy outcome
+TYPE_CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
     PurePyOutcome.PARSER_REJECTS: (Exit.NOT_ALLOWED, True),
     PurePyOutcome.TYPING_REJECTS: (Exit.ILL_FORMED, True),
     PurePyOutcome.UNDEFINED: (Exit.OK, False),
@@ -62,7 +64,7 @@ CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
 
 
 def expectation(python: PythonOutcome, purepy: PurePyOutcome) -> Expectation:
-    exit, error_checked = CHECKER[purepy]
+    exit, error_checked = TYPE_CHECKER[purepy]
     return Expectation(exit, error_checked, python)
 
 
@@ -70,10 +72,8 @@ def run(cmd: list[str], cwd: pathlib.Path | None = None) -> "subprocess.Complete
     return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=False)
 
 
-class Runner:
-    def __init__(self, interpreter: str | None, checker: list[str] | None) -> None:
-        self.interpreter = interpreter  # None: tests not run
-        self.checker = checker  # command given the test path; None: the reference checker
+class Results:
+    def __init__(self) -> None:
         self.passed = 0
         self.failed: list[str] = []
         self.failures: list[str] = []
@@ -95,21 +95,46 @@ class Runner:
             self.passed += 1
             print(f"  {GREEN}✓{RESET} {label}")
 
+    def summary(self) -> None:
+        total = self.passed + len(self.failed)
+        print()
+        if self.failed:
+            print(f"{RED}✗ {self.passed}/{total} passed, {len(self.failed)} failed{RESET}")
+        else:
+            print(f"{GREEN}✓ {total}/{total} passed{RESET}")
+
+
+class Runner(Results):
+    def __init__(
+        self, interpreter: str | None, type_checker: list[str] | None, messages: bool
+    ) -> None:
+        super().__init__()
+        self.interpreter = interpreter  # None: tests not run
+        self.type_checker = (
+            type_checker  # command given the test path; None: the reference type checker
+        )
+        self.messages = messages  # type checker reports the reference type checker's messages
+
     def check(self, path: pathlib.Path, exit: Exit, error_checked: bool) -> list[str]:
+        """Each test is checked in a separate directory, so other tests can't interfere. Single-module tests
+        are copied to a new directory before running."""
         reference = [sys.executable, "-m", "purepy", "--check"]
-        proc = run([*(self.checker or reference), str(path)])
+        with tempfile.TemporaryDirectory() as alone:
+            checked = path if path.name == MAIN else pathlib.Path(shutil.copy(path, alone))
+            proc = run([*(self.type_checker or reference), str(checked)])
         exits = {exit, Exit.ILL_FORMED_PROGRAM} if exit == Exit.ILL_FORMED else {exit}
         output = proc.stdout + proc.stderr
         error = path.with_suffix(ERROR_EXPECTED)
         if proc.returncode not in exits:
-            first = output.strip().split("\n", 1)[0]
+            first = output.strip().split("\n", 1)[0].replace(f"{checked.parent}/", "")
             return [f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}: {first}"]
-        if not error_checked or self.checker is not None:  # messages are the reference checker's
+        if not error_checked or (self.type_checker is not None and not self.messages):
             return []
         if not error.exists():
             return [f"check: missing {error.name}"]
         if error.read_text().strip() not in output:
-            return [f"check: expected {error.read_text().strip()!r}, got: {output.strip()}"]
+            got = output.strip().replace(f"{checked.parent}/", "")
+            return [f"check: expected {error.read_text().strip()!r}, got: {got}"]
         return []
 
     def python(self, path: pathlib.Path, outcome: PythonOutcome) -> list[str]:
@@ -172,14 +197,6 @@ class Runner:
                     last = header
                 self.record(test.relative_to(suite), failures)
 
-    def summary(self) -> None:
-        total = self.passed + len(self.failed)
-        print()
-        if self.failed:
-            print(f"{RED}✗ {self.passed}/{total} passed, {len(self.failed)} failed{RESET}")
-        else:
-            print(f"{GREEN}✓ {total}/{total} passed{RESET}")
-
 
 def compare_known_failures(failed: list[str], known_failures: pathlib.Path, update: bool) -> bool:
     """Whether the failures are exactly those listed; with update, rewrite the list instead."""
@@ -218,16 +235,21 @@ def suite() -> Iterator[pathlib.Path]:
         yield path
 
 
-def main() -> None:
+def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="purepy-conformance")
     parser.add_argument("interpreter", nargs="?", default="python3")
     parser.add_argument(
         "--no-run", action="store_true", help="check the tests without running them"
     )
     parser.add_argument(
-        "--checker",
-        help="command run on the path of each test in place of the reference checker, with the same "
-        "exit codes; error messages are not compared",
+        "--type-checker",
+        help="command run on the path of each test in place of the reference type checker, with the same "
+        "exit codes; error messages are compared only with --messages",
+    )
+    parser.add_argument(
+        "--messages",
+        action="store_true",
+        help="compare the error messages of the type checker command with the expected messages",
     )
     parser.add_argument(
         "--known-failures",
@@ -240,10 +262,11 @@ def main() -> None:
     parser.add_argument(
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     r = Runner(
         None if args.no_run else args.interpreter,
-        shlex.split(args.checker) if args.checker else None,
+        shlex.split(args.type_checker) if args.type_checker else None,
+        args.messages,
     )
     with suite() as path:
         r.run_suite(path, args.jobs)

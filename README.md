@@ -1,6 +1,6 @@
 # PurePy - A Pure Functional Subset of Python
 
-[![build](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/build.yml)
+[![mechanisation](https://github.com/pure-py/pure-py-spec/actions/workflows/mechanisation.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/mechanisation.yml)
 
 ## [v0.23.0](https://pure-py.github.io/pure-py-spec/v0.23.0/PurePy-spec.pdf)
 
@@ -82,10 +82,10 @@ as `# rule: name`. Under `typing-rejects/` the rule is the one with a premise or
 program. Under `undefined/` and `agrees/` the rule is the one yielding the result.
 
 Another type checker can be run over the suite installed with the `purepy` package, by passing a command
-which takes the path of a test and exits with the codes of the reference checker:
+which takes the path of a test and exits with the codes of the reference type checker:
 
 ```bash
-purepy-conformance --no-run --checker CMD --known-failures FILE
+purepy-conformance --no-run --type-checker CMD --known-failures FILE
 ```
 
 The run passes if its failures are exactly those listed in the file; `--update` rewrites the file, and
@@ -131,7 +131,7 @@ purepy --check --module path/to/module.py
 purepy --check path/to/main.py
 ```
 
-Install the checker from the repository root with:
+Install the type checker from the repository root with:
 
 ```bash
 uv tool install .
@@ -149,8 +149,9 @@ git submodule update --init
 ```
 
 The mechanisation is type checked before packaging, so `isabelle` must be on `PATH`; the README of the
-submodule gives the required version and installation steps. The `Build` GitHub Action runs `make all`, which
-includes the submission target, on every push, but the submission is always built locally.
+submodule gives the required version and installation steps. The submission is always built locally; the
+`Mechanisation` GitHub Action checks the mechanisation and runs the conformance suite under the generated type
+checker, and the `Documents` action builds the paper and specification.
 
 ## Release workflow
 

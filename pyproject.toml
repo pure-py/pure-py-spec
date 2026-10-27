@@ -9,6 +9,7 @@ requires-python = ">=3.12"
 
 [project.scripts]
 purepy = "purepy.__main__:main"
+purepy-generated = "purepy.purepy_generated:main"
 purepy-conformance = "purepy.conformance:main"
 
 [dependency-groups]
@@ -19,6 +20,11 @@ dev = [
 
 [tool.mypy]
 strict = true
+
+# Generated code, not on mypy's path until it's typed
+[[tool.mypy.overrides]]
+module = ["Finite_Map", "Option", "Programs", "Rat", "Real", "Reasons", "String", "Syntax"]
+ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 100

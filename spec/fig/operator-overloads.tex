@@ -3,7 +3,8 @@
 \setlength{\jot}{2pt}
 \flushleft \shadebox{$\Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tau_1, \tau_2), \tau)$}
 \begin{defalign}
-& \Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\sigma_1, \sigma_2), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{==}, \pyinline{!=}} \text{ and } \sigma_1, \sigma_2 \text{ comparable equality types} \\
+& \Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\sigma_1, \sigma_2), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{==}, \pyinline{!=}} \text{ and } \sigma_1, \sigma_2 \text{ comparable} \\
+& && \quad \phantom{\text{if }} \text{and } \Sigma \nvdash \sigma_i \needsEq \xi \quad (\forall i, \xi) \\
 & \Sigma \vdash \odot(\sigma_1, \tyList{\tau}) : ((\sigma_1, \tyList{\tau}), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{in}, \pyinline{not in}} \text{ and } \sigma_1, \tau \text{ comparable} \\
 & \Sigma \vdash \odot(\sigma_1, \tyTuple{\seq{\tau}}) : ((\sigma_1, \tyTuple{\seq{\tau}}), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{in}, \pyinline{not in}} \text{ and } \sigma_1, \bigJoinTy{\Sigma}{\seq{\tau}} \text{ comparable} \\
 & \Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tyStr, \tyStr), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{in}, \pyinline{not in}} \text{ and } \Sigma \vdash \sigma_1, \sigma_2 \subty \tyStr \\

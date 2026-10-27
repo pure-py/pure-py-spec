@@ -205,21 +205,11 @@ The \ruleName{binop} and \ruleName{unop} rules (\specfigref{typing-synth}) take 
 of the most specific overload at the operand types, $\resolveOp{\Sigma}$\speconly{ (\S\ref{aux:resolve-op})}, so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
-\speconly{\begin{specdefinition}{Equality type}
-The values of an \emph{equality type} are compared by structural equality, which is defined except at the dynamically excluded comparisons (\secref{no-coercions}):
-\begin{defalign}
-& \Sigma \vdash \nu \eqType \\
-& \Sigma \vdash \tyLiteral{\ell} \eqType \\
-& \Sigma \vdash \tyList{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \\
-& \Sigma \vdash \tyDict{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \\
-& \Sigma \vdash \tyTuple{\seq{\tau}} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau_i \eqType \quad (\forall i) \\
-& \Sigma \vdash \tyUnion{\sigma}{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \sigma \eqType \text{ and } \Sigma \vdash \tau \eqType \\
-& \Sigma \vdash C[\seq{\sigma}] \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \tyInst{\fields{\Sigma}(C)}{\seq{\sigma}}
-\end{defalign}
-\end{specdefinition}}
+\speconly{\specinput{spec/fig/needs-eq}}
 
-\speconly{\noindent Callable types are not equality types, and neither are types with a callable component, so
-comparisons of functions are rejected statically. Type variables are not equality types either, since they may stand for any type.}\speconly{ The final rule of each table closes the
+\speconly{The judgement $\Sigma \vdash \tau \needsEq \xi$ (\figref{needs-eq-type}) states that equality at $\tau$ needs equality at type variable $\xi$, or at a callable type when $\xi$ is $\varepsilon$. The judgement $\Sigma \vdash C \needsEq \xi$ (\figref{needs-eq-class}) states the same of class $C$, where $\xi$ is a type parameter of $C$ or $\varepsilon$, by the field types of $C$. The overloads of \pyinline{==} and \pyinline{!=} (\figref{operator-overloads}) require operand types $\tau$ with $\Sigma \nvdash \tau \needsEq \xi$ for every $\xi$, the \emph{equality types}: comparing two values of type $\tau$ never reaches a type variable, whose instantiation is unknown, or a callable type, whose values cannot be compared. For example, a class $C$ with type parameter $\alpha$ and a single field of type $\tyUnion{C[\alpha]}{\tyNone}$, which mentions $C$ through a type alias, does not need equality at $\alpha$ or at a callable type, so $C[\sigma]$ is an equality type for every $\sigma$. Comparisons of functions are therefore rejected statically, and values of an equality type are compared by structural equality, which is defined except at the dynamically excluded comparisons (\secref{no-coercions}).}
+
+\speconly{The final rule of each table closes the
 judgement under base-typing, letting \pyinline{1 == 0} use the equality overload at \pyinline{int}, since
 two distinct literal types are not comparable; \pyinline{2 ** 3} is still an \pyinline{int}, since the
 direct instance's bounds $(\tyInt, \tyLiteral{3})$ lie below the base instance's
@@ -455,7 +445,7 @@ recursively, preferring checked modules to stubs:}%
 \noindent \speconly{A from-import also checks any imported name that denotes a submodule, and the
 names it imports must be distinct. A
 containing module of the target is exempt from checking if it is the importing module or one of its
-containing modules\speconly{ (\S\ref{aux:containing})}, because at runtime it may still be loading when the import executes. The exemption applies only to from-imports, because
+containing modules\speconly{ (\S\ref{aux:unique-to})}, because at runtime it may still be loading when the import executes. The exemption applies only to from-imports, because
 for a plain import
 the only containing module that could never load first is the importing module itself, and an import naming a
 module contained in the importing module is excluded outright\paperonly{ (\secref{no-load-dependent})}.} Module checking is defined inductively, so a program with an import cycle is ill-formed. Program

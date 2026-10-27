@@ -6,19 +6,17 @@ from . import reasons, syntax
 from .classes import PREDEFINED_CLASSES, ClassTable
 from .contexts import (
     BUILTINS,
-    DU,
     MAIN,
     PREDEFINED_MODULES,
-    PU,
     Context,
     ContextEntry,
     ModuleChecked,
     ModuleContext,
     ModuleStub,
-    Unbound,
     extend_context,
     override_context,
     predefined_context,
+    resolve_name,
 )
 from .reasons import IllFormed, IllFormedModule, IllFormedProgram
 from .statements import check_assignments_declared, check_top_seq, scope
@@ -75,7 +73,7 @@ def check_import(iota: ast.stmt, mod_ctx: ModuleContext) -> tuple[Context, Class
             if proper_prefix_of(mod_ctx.q, q):
                 raise IllFormedModule(
                     iota,
-                    reasons.ImportOfContainedModule(q, mod_ctx.q, f"from {q} import <name>"),
+                    reasons.ImportOfContainedModule(q, mod_ctx.q),
                 )
             x = Name((root(q),))
             delta, Sigma = check_imported(x, iota, mod_ctx)
@@ -142,14 +140,15 @@ def imports(
     iota: ast.stmt, x: Var, q: Name, gamma: Context, mod_ctx: ModuleContext
 ) -> tuple[ContextEntry, ClassTable]:
     theta = gamma.get(x)
-    if theta is None:
-        raise IllFormedModule(iota, reasons.UnknownMember(x, q))
     if isinstance(theta, ModuleStub):
         members, Sigma = check_module(mod_ctx.M[theta.q], mod_ctx.M, theta.q, mod_ctx.Sigma)
         return ModuleChecked(theta.q, members), Sigma
-    if isinstance(theta, (Unbound, DU, PU)):
-        raise IllFormedModule(iota, reasons.UnassignedMember(x, q))
-    return theta, mod_ctx.Sigma
+    resolved = resolve_name(Name((x,)), gamma)
+    if resolved is None:
+        raise IllFormedModule(
+            iota, reasons.UnknownMember(x, q) if theta is None else reasons.UnassignedMember(x, q)
+        )
+    return resolved, mod_ctx.Sigma
 
 
 _signatures: dict[tuple[int, Name], Context] = {}
@@ -167,8 +166,8 @@ def check_module(
     if gamma is not None:
         return gamma, Sigma
     if key in _checking:
-        cycle = [str(q_) for _, q_ in _checking[_checking.index(key) :]] + [str(q)]
-        raise IllFormedProgram(f"import cycle: {' -> '.join(cycle)}")
+        cycle = (*(q_ for _, q_ in _checking[_checking.index(key) :]), q)
+        raise IllFormedProgram(reasons.ImportCycle(cycle).message())
     _checking.append(key)
     try:
         gamma, Sigma = check_module_(m, M, q, Sigma)

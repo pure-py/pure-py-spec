@@ -7,6 +7,7 @@ from itertools import product
 from .classes import ClassTable, ancestors
 from .subtyping import instance_below, subtype
 from .type_syntax import (
+    RANGE,
     ClassName,
     ClassType,
     DictType,
@@ -103,6 +104,8 @@ def shapes(Sigma: ClassTable, tau: Type, hs: Heads) -> Shapes:
 
 def head_typed(Sigma: ClassTable, h: Head, tau: Type) -> bool:
     match h:
+        case ClassName() if tau == Primitive.SIZED:
+            return h == RANGE
         case ClassName():
             return instance_below(Sigma, h, tau) is not None
         case Literal() if float_literal(h):
