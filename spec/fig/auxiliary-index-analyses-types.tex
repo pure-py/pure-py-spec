@@ -23,3 +23,4 @@
 \auxrow{$\matchedAs{\Sigma}(\Gamma, \tau, p)$}{type}{type $\tau$ is matched as by pattern $p$}{aux:matched-as}
 \auxrow{$\remaining{\Sigma}(\Gamma, \tau, p)$}{type}{type remaining from $\tau$ if pattern $p$ fails to match}{aux:remaining}
 \auxrow{$\resolveOp{\Sigma}(\odot, \sigma_1, \sigma_2)$, $\resolveOp{\Sigma}(\ominus, \sigma)$}{type}{return type of most specific overload at the operand types}{aux:resolve-op}
+\specauxrow{\added{$\eqVars{\Sigma}(\tau)$, $\eqVars{\Sigma}(C)$}}{\added{set of type variables, or $\top$}}{\added{type variables of $\tau$, or type parameters of class $C$, which must be equality types for $\tau$ or an instance of $C$ to be an equality type; $\top$ if not an equality type at any instantiation}}{aux:eq-vars}
