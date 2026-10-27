@@ -51,11 +51,11 @@
 {
   q' = x \cons \seq{x} \\
   x \Rightarrow_{\mathsf{mod}} \val{\rho} \\
-  \replaced{x, \rho}{\modLoaded{x}{\rho} }, \seq{x} \Rightarrow_{\mathsf{sub}} \val{\replaced{\rho''}{v }} \\
+  \replaced{x, \rho}{\modLoaded{x}{\rho} }, \seq{x} \Rightarrow_{\mathsf{sub}} \val{\replaced{\rho^\dagger}{v }} \\
   q, \seq{\iota} \Rightarrow r
 }
 {
-  q, \exImport{q'} \cons \seq{\iota} \Rightarrow \mlet{\rho'}{r}{\val{\set{\bind{x}{\replaced{\modLoaded{x}{\rho''}}{v }}} \extend \rho'}}
+  q, \exImport{q'} \cons \seq{\iota} \Rightarrow \mlet{\rho'}{r}{\val{\set{\bind{x}{\replaced{\modLoaded{x}{\rho^\dagger}}{v }}} \extend \rho'}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-import-fail}}]
@@ -146,7 +146,7 @@
 }
 {
   \replaced{q, \rho}{\modLoaded{q}{\rho} }, x \cons \seq{x} \Rightarrow_{\mathsf{sub}}
-  \replaced{\mlet{\rho''}{r}{\val{\rho \extend \set{\bind{x}{\modLoaded{q.x}{\rho''}}}}}}{\mlet{v}{r}{\val{\modLoaded{q}{\rho \extend \set{\bind{x}{v}}}}} }
+  \replaced{\mlet{\rho^\dagger}{r}{\val{\rho \extend \set{\bind{x}{\modLoaded{q.x}{\rho^\dagger}}}}}}{\mlet{v}{r}{\val{\modLoaded{q}{\rho \extend \set{\bind{x}{v}}}}} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-submodules-fail}}]
