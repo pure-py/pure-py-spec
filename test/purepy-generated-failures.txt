@@ -5,6 +5,8 @@ python-succeeds/agrees/eq_mutually_recursive_generic_classes.py (check: exit 3, 
 python-succeeds/agrees/eq_nan_decided_early.py (check: exit 5, expected [0]: eq_nan_decided_early.py: unrepresentable in Isabelle: float inf outside the reals)
 python-succeeds/agrees/eq_nan_direct.py (check: exit 5, expected [0]: eq_nan_direct.py: unrepresentable in Isabelle: float inf outside the reals)
 python-succeeds/agrees/eq_recursive_generic_class.py (check: exit 3, expected [0]: eq_recursive_generic_class.py: no overload of '==' at operand types __main__.P[Callable[[int], int]] and __main__.P[Callable[[int], int]])
+python-succeeds/agrees/identifier_outside_latin1.py (check: exit 5, expected [0]: identifier_outside_latin1.py: unrepresentable in Isabelle: string 'δ' with a character outside Latin-1)
+python-succeeds/agrees/string_literal_outside_latin1.py (check: exit 5, expected [0]: string_literal_outside_latin1.py: unrepresentable in Isabelle: string 'αβγ' with a character outside Latin-1)
 python-succeeds/agrees/unused_module_not_parsed (check: exit 1, expected [0]: unused.py:1:0: while loops not allowed in PurePy)
 python-succeeds/typing-rejects/constr_type_arg_not_type.py (check: exit 1, expected [3, 4]: Traceback (most recent call last):)
 python-succeeds/typing-rejects/declared_in_branch_use.py (check: expected "'x' is not definitely assigned: declared in a branch", got: declared_in_branch_use.py: 'x' is not definitely assigned)
