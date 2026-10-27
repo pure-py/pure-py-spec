@@ -22,7 +22,7 @@ BAD = "def truncate_number(number: float) -> float:\n    for i in range(0, 1):\n
 class EvaluationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.benchmark = e.HumanEval()
+        cls.benchmark = e.BENCHMARKS["humaneval-plus"]()
         cls.problems, cls.manifest = cls.benchmark.load(1)
         cls.task = next(iter(cls.problems.values()))
 
@@ -46,9 +46,6 @@ class EvaluationTests(unittest.TestCase):
                     wrong = benchmark.grade(f"def {task.name}(*args):\n    return None\n", task)
                     self.assertFalse(wrong.passed)
                     self.assertFalse(wrong.tooling_error)
-        problems, manifest = self.benchmark.load(all_problems=True)
-        self.assertEqual(len(problems), 164)
-        self.assertEqual(manifest["typed_interfaces"], 29)
 
     def test_checker_and_official_tests_are_independent(self):
         self.assertTrue(e.check(GOOD).passed)
@@ -195,7 +192,7 @@ class EvaluationTests(unittest.TestCase):
                 feedback = requests[-1]["messages"][-1]["content"]
                 self.assertIn("prohibited", feedback)
                 self.assertIn("<purepy>...</purepy>", feedback)
-                self.assertNotIn(self.task.test, feedback)
+                self.assertNotIn(self.benchmark.reference(self.task), feedback)
                 self.assertNotIn("test-only-secret", path.read_text())
                 for suffix in (".md", ".svg", ".pdf", ".tex"):
                     self.assertTrue(path.with_suffix(suffix).exists())

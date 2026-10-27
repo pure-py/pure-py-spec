@@ -17,7 +17,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from evaluation_benchmarks import BENCHMARKS, HumanEval, Problem, Verdict, encode_verdict
+from evaluation_benchmarks import BENCHMARKS, Problem, Verdict, encode_verdict
+import evaluation_sandbox
 
 
 ROOT = Path(__file__).resolve().parent
@@ -324,10 +325,10 @@ def validate_backend(benchmark, definition=None):
     if rejected.passed is not False:
         raise RuntimeError("checker health check failed")
     program = "def probe():\n    return 1\nassert probe() == 1\n"
-    sandbox = HumanEval().sandbox({"program": program}, 3)
+    sandbox = evaluation_sandbox.run({"probe": program}, 3)
     if sandbox.passed is not True:
         raise RuntimeError("sandbox health check failed: " + str(sandbox.error))
-    isolation = HumanEval().sandbox({"program":
+    isolation = evaluation_sandbox.run({"probe":
         "import os, socket\nassert 'ANTHROPIC_API_KEY' not in os.environ\n"
         "assert 'DEEPSEEK_API_KEY' not in os.environ\n"
         "try:\n    socket.create_connection(('1.1.1.1', 443), timeout=1)\n"
@@ -762,7 +763,7 @@ def main():
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="action", required=True)
     execution = sub.add_parser("run")
-    execution.add_argument("--benchmark", choices=list(BENCHMARKS), default="humaneval")
+    execution.add_argument("--benchmark", choices=list(BENCHMARKS), default="humaneval-plus")
     execution.add_argument("--all-problems", action="store_true", help="every problem of the benchmark instead of the frozen selection")
     execution.add_argument("--model", default="qwen2.5-coder:0.5b")
     execution.add_argument("--provider", choices=["openai", "anthropic", "deepseek"], default="openai")

@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 import ast
 import base64
 from dataclasses import asdict, dataclass, fields
-import gzip
 import hashlib
 import json
 import os
@@ -39,11 +38,6 @@ class Problem:
 @dataclass(frozen=True)
 class ReferenceProblem(Problem):
     canonical_solution: str
-
-
-@dataclass(frozen=True)
-class HumanEvalProblem(ReferenceProblem):
-    test: str
 
 
 @dataclass(frozen=True)
@@ -218,29 +212,6 @@ class JsonlBenchmark(Benchmark):
         return task.question + task.canonical_solution
 
 
-class HumanEval(JsonlBenchmark):
-    key = "humaneval"
-    name = "HumanEval"
-
-    def load_rows(self, manifest):
-        path = download(manifest["url"], CACHE / manifest["url"].rsplit("/", 1)[1], manifest["sha256"])
-        with gzip.open(path, "rt") as source:
-            return {row["task_id"]: row for row in map(json.loads, source)}
-
-    def problem(self, task_id, row, signature, typed) -> HumanEvalProblem:
-        return HumanEvalProblem(task_id=task_id, name=row["entry_point"], question=row["prompt"],
-                                signature=signature, typed_interface=typed,
-                                canonical_solution=row["canonical_solution"], test=row["test"])
-
-    def _grade(self, code, task) -> Verdict:
-        program = task.question + "\n" + code + "\n" + task.test + "\ncheck(" + task.name + ")\n"
-        return self.sandbox({"program": program}, 3)
-
-    def execute(self, payload, grader) -> Verdict:
-        exec(compile(payload["program"], "solution_and_official_tests.py", "exec"), {})
-        return Verdict(True, None, False)
-
-
 class EvalPlus(JsonlBenchmark):
     def load_rows(self, manifest):
         path = download(manifest["url"], CACHE / manifest["url"].rsplit("/", 1)[1], manifest["sha256"])
@@ -384,4 +355,4 @@ class LiveCodeBench(Benchmark):
                        tests_passed=int(sum(r > 0 for r in outcomes)), tests_total=payload["test_count"])
 
 
-BENCHMARKS = {benchmark.key: benchmark for benchmark in (HumanEval, HumanEvalPlus, MBPPPlus, LiveCodeBench)}
+BENCHMARKS = {benchmark.key: benchmark for benchmark in (HumanEvalPlus, MBPPPlus, LiveCodeBench)}

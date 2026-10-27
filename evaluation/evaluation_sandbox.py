@@ -109,20 +109,24 @@ def worker():
     signal.signal(signal.SIGALRM, expired)
     signal.setitimer(signal.ITIMER_REAL, limit)
     module = runpy.run_path(str(Path(payload["directory"]) / "evaluation_benchmarks.py"))
-    benchmark = module["BENCHMARKS"][payload["benchmark"]]()
+    benchmark = None if "probe" in payload else module["BENCHMARKS"][payload["benchmark"]]()
     Verdict = module["Verdict"]
     encode_verdict = module["encode_verdict"]
     try:
-        grader = benchmark.prepare_worker(payload)
+        grader = benchmark.prepare_worker(payload) if benchmark is not None else None
     except BaseException:
         print(json.dumps(Verdict(None, "official grader could not load", True), default=encode_verdict))
         return
     try:
         with tempfile.TemporaryFile(mode="w+", dir=payload["directory"]) as capture:
             with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(capture):
-                result = benchmark.execute(payload, grader)
+                if benchmark is None:
+                    exec(compile(payload["probe"], "sandbox_probe.py", "exec"), {})
+                    result = Verdict(True, None, False)
+                else:
+                    result = benchmark.execute(payload, grader)
     except BaseException:
-        tooling = benchmark.worker_tooling_errors
+        tooling = benchmark is None or benchmark.worker_tooling_errors
         result = Verdict(None if tooling else False, traceback.format_exc().strip(), tooling)
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)

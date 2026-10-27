@@ -16,7 +16,7 @@ bash scripts/smoke.sh
 ```
 
 This downloads a checksum-verified Ollama release and a small local model into
-`.cache/`, starts a private local server, runs two HumanEval problems, writes
+`.cache/`, starts a private local server, runs two HumanEval+ problems, writes
 results and plots, and stops the server. `SMOKE_BENCHMARKS` lists the benchmarks
 to run, `SMOKE_LIMIT` the problems per benchmark and `SMOKE_OUTPUT_DIR` the
 results directory; CI runs one problem of each benchmark.
@@ -37,9 +37,9 @@ bash scripts/evaluate.sh --provider deepseek --model deepseek-v4-pro --max-token
 bash scripts/evaluate.sh --provider anthropic --model claude-opus-5-5 --max-tokens 16384 --benchmark livecodebench --difficulty hard
 ```
 
-`--benchmark` selects `humaneval`, `humaneval-plus`, `mbpp-plus` or
+`--benchmark` selects `humaneval-plus` (the default), `mbpp-plus` or
 `livecodebench`; LiveCodeBench also takes `--difficulty medium` or `--difficulty
-hard`. HumanEval and HumanEval+ run the frozen 20-problem selection unless
+hard`. HumanEval+ runs the frozen 20-problem selection unless
 `--all-problems` is given; MBPP+ runs all 378 problems. Each problem records
 whether its interface is fully annotated with types PurePy can express, so results
 can be split by that property. Before any model call, a run checks the
@@ -70,18 +70,19 @@ leave a gap unknown when either condition has unevaluated answers.
 
 ## Data And Results
 
-HumanEval problems and official tests are downloaded from a fixed upstream
-revision and verified by SHA-256. `benchmarks/humaneval.json` holds the frozen
-selection: 20 of 164 problems, sampled from the 29 whose interfaces are typed.
 HumanEval+ and MBPP+ come from the pinned EvalPlus releases listed in
-`benchmarks/` and are graded by the pinned `evalplus` package inside the
-sandbox: it restores the input types the dataset serialises (tuples, sets,
+`benchmarks/`, verified by SHA-256, and are graded by the pinned `evalplus`
+package inside the sandbox: it restores the input types the dataset serialises (tuples, sets,
 complex numbers), computes the expected outputs with the reference solution,
 applies its per-problem oracles and float tolerances, and gives each input the
 time limit it would get in an EvalPlus run. The package is installed without
 its model-provider clients, which the pipeline does not use. Problems the
 package cannot grade are listed under `excluded` in the manifest with the
 reason and are skipped; at present that is HumanEval/32 in HumanEval+.
+HumanEval+ keeps the frozen 20-problem selection in
+`benchmarks/humaneval-plus.json`. Original HumanEval is no longer a run option;
+its historical result files remain readable without changing their benchmark
+labels or scores.
 
 LiveCodeBench uses the 20 medium and 20 hard typed call-based problems frozen in
 `livecodebench/tasks.json`, out of 207 and 102 eligible in release_v6. Missing
@@ -135,7 +136,8 @@ uv run --locked python evaluation.py figure results/RUN/MODEL.json --output figu
 
 The paper's evaluation section includes `paper/fig/evaluation-generation.pdf`,
 which `make paper.pdf` in the repository root regenerates with this command from
-`figures/humaneval-qwen2.5-coder-0.5b.json`. That file is the smoke run for now.
+`figures/humaneval-qwen2.5-coder-0.5b.json`. That file is an archived original
+HumanEval smoke run, kept for reproducibility; it is not a HumanEval+ result.
 
 ## CI And Harbor
 

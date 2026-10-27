@@ -57,19 +57,19 @@ jobs:
 
       - name: Run the pipeline with a local model on every benchmark
         env:
-          SMOKE_BENCHMARKS: humaneval humaneval-plus mbpp-plus livecodebench
+          SMOKE_BENCHMARKS: humaneval-plus mbpp-plus livecodebench
           SMOKE_LIMIT: 1
           SMOKE_OUTPUT_DIR: results/ci/${{ runner.os }}
         run: bash scripts/smoke.sh
 
-      - name: Import the HumanEval run into Harbor
-        run: bash scripts/harbor-import.sh --file "results/ci/${{ runner.os }}/humaneval/qwen2.5-coder-0.5b.json"
+      - name: Import the HumanEval+ run into Harbor
+        run: bash scripts/harbor-import.sh --file "results/ci/${{ runner.os }}/humaneval-plus/qwen2.5-coder-0.5b.json"
 
       - name: Compile the generated figure
         if: runner.os == 'Linux'
         run: |
           sudo apt-get install -y --no-install-recommends texlive-latex-base texlive-latex-recommended
-          bash scripts/check-figure.sh "results/ci/${{ runner.os }}/humaneval/qwen2.5-coder-0.5b.tex"
+          bash scripts/check-figure.sh "results/ci/${{ runner.os }}/humaneval-plus/qwen2.5-coder-0.5b.tex"
 
       - name: Upload reports
         uses: actions/upload-artifact@v4
