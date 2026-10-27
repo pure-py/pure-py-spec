@@ -459,9 +459,9 @@ UNARY = {c: UNARY_NAMES[op] for op, c in UOP.items()}
 
 
 SEQUENCE_KIND = {
-    Reasons.TupleKind(): "tuple",
-    Reasons.ListKind(): "list",
-    Reasons.RangeKind(): "range",
+    Syntax.TupleKind(): "tuple",
+    Syntax.ListKind(): "list",
+    Syntax.RangeKind(): "range",
 }
 
 
