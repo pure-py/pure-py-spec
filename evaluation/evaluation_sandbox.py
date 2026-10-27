@@ -62,11 +62,13 @@ def command(directory):
     raise RuntimeError("only macOS and Linux sandbox backends are supported")
 
 
-def run(payload, timeout):
+def run(payload, timeout, files=None):
     with tempfile.TemporaryDirectory(prefix="purepy-evaluation-") as directory:
         payload = {**payload, "directory": directory, "timeout": timeout}
-        if payload.get("benchmark") == "LiveCodeBench":
-            (Path(directory) / "grader.py").write_text(payload.pop("grader_source"))
+        module = Path(__file__).with_name("evaluation_benchmarks.py")
+        (Path(directory) / module.name).write_text(module.read_text())
+        for name, source in (files or {}).items():
+            (Path(directory) / name).write_text(source)
         try:
             process = subprocess.Popen(command(directory), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                        stderr=subprocess.PIPE, text=True, cwd=directory, start_new_session=True,
@@ -94,32 +96,6 @@ def run(payload, timeout):
             return {"passed": None, "error": "sandbox did not return a valid verdict", "tooling_error": True}
 
 
-def evalplus(payload):
-    import base64
-    import multiprocessing
-    import pickle
-    from evalplus.eval import untrusted_check
-    from evalplus.gen.util import trusted_exec
-    multiprocessing.set_start_method("fork", force=True)
-    if sys.platform == "darwin":
-        os.environ["EVALPLUS_MAX_MEMORY_BYTES"] = "-1"
-    inputs = pickle.loads(base64.b64decode(payload["inputs"]))
-    try:
-        expected, times = trusted_exec(payload["reference"], inputs, payload["name"], record_time=True,
-                                       output_not_none=payload["output_not_none"])
-    except BaseException:
-        return {"passed": None, "error": "reference solution failed: " + traceback.format_exc().strip()[-500:],
-                "tooling_error": True}
-    status, details = untrusted_check(payload["dataset"], payload["candidate"], inputs, payload["name"],
-                                      expected, payload["atol"], times)
-    passed = sum(bool(d) for d in details)
-    failed = next((i for i, d in enumerate(details) if not d), None)
-    error = None if status == "pass" else (
-        f"{status}: input {failed} {inputs[failed]!r:.200}" if failed is not None else status)
-    return {"passed": status == "pass", "error": error, "tooling_error": False,
-            "tests_passed": passed, "tests_total": len(inputs)}
-
-
 def worker():
     payload = json.load(sys.stdin)
     limit = float(payload["timeout"])
@@ -132,37 +108,19 @@ def worker():
 
     signal.signal(signal.SIGALRM, expired)
     signal.setitimer(signal.ITIMER_REAL, limit)
-    grader = None
-    if payload["benchmark"] == "LiveCodeBench":
-        try:
-            import numpy as np
-            grader = runpy.run_path(str(Path(payload["directory"]) / "grader.py"))["run_test"]
-        except BaseException:
-            print(json.dumps({"passed": None, "error": "official grader could not load",
-                              "tooling_error": True}))
-            return
+    benchmarks = runpy.run_path(str(Path(payload["directory"]) / "evaluation_benchmarks.py"))["BENCHMARKS"]
+    benchmark = benchmarks[payload["benchmark"]]()
     try:
-        if payload["benchmark"] == "LiveCodeBench":
-            with tempfile.TemporaryFile(mode="w+", dir=payload["directory"]) as capture:
-                with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(capture):
-                    outcomes, metadata = grader(payload["sample"], test=payload["code"], timeout=6)
-            outcomes = [r.item(0) if isinstance(r, np.ndarray) else r for r in outcomes]
-            result = {"passed": len(outcomes) == payload["test_count"] and all(r > 0 for r in outcomes),
-                      "error": None if all(r > 0 for r in outcomes) else json.dumps(metadata, default=str),
-                      "tests_passed": int(sum(r > 0 for r in outcomes)), "tests_total": payload["test_count"],
-                      "tooling_error": False}
-        elif payload["benchmark"] == "EvalPlus":
-            tempfile.tempdir = payload["directory"]
-            with tempfile.TemporaryFile(mode="w+", dir=payload["directory"]) as capture:
-                with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(capture):
-                    result = evalplus(payload)
-        else:
-            with tempfile.TemporaryFile(mode="w+", dir=payload["directory"]) as capture:
-                with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(capture):
-                    exec(compile(payload["program"], "solution_and_official_tests.py", "exec"), {})
-            result = {"passed": True, "error": None, "tooling_error": False}
+        grader = benchmark.prepare_worker(payload)
     except BaseException:
-        tooling = payload["benchmark"] == "LiveCodeBench"
+        print(json.dumps({"passed": None, "error": "official grader could not load", "tooling_error": True}))
+        return
+    try:
+        with tempfile.TemporaryFile(mode="w+", dir=payload["directory"]) as capture:
+            with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(capture):
+                result = benchmark.execute(payload, grader)
+    except BaseException:
+        tooling = benchmark.worker_tooling_errors
         result = {"passed": None if tooling else False, "error": traceback.format_exc().strip(),
                   "tooling_error": tooling}
     finally:

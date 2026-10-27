@@ -22,7 +22,8 @@ BAD = "def truncate_number(number: float) -> float:\n    for i in range(0, 1):\n
 class EvaluationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.problems, cls.manifest = e.load_problems("humaneval", 1)
+        cls.benchmark = e.HumanEval()
+        cls.problems, cls.manifest = cls.benchmark.load(1)
         cls.task = next(iter(cls.problems.values()))
 
     def test_benchmark_provenance(self):
@@ -33,26 +34,27 @@ class EvaluationTests(unittest.TestCase):
         self.assertNotIn("purepy", self.task)
 
     def test_evalplus_references_pass_and_wrong_answers_fail(self):
-        for benchmark in e.EVALPLUS:
-            problems, manifest = e.load_problems(benchmark, 2)
+        for name in ("humaneval-plus", "mbpp-plus"):
+            benchmark = e.BENCHMARKS[name]()
+            problems, manifest = benchmark.load(2)
             self.assertEqual(manifest["evaluated_problems"], 2)
             for task_id, task in problems.items():
                 with self.subTest(task=task_id):
-                    reference = e.official_tests(task["official"]["reference"], task, benchmark)
+                    reference = benchmark.grade(task["official"]["reference"], task)
                     self.assertTrue(reference["passed"], reference["error"])
                     self.assertEqual(reference["tests_passed"], task["official"]["test_count"])
-                    wrong = e.official_tests(f"def {task['name']}(*args):\n    return None\n", task, benchmark)
+                    wrong = benchmark.grade(f"def {task['name']}(*args):\n    return None\n", task)
                     self.assertFalse(wrong["passed"])
                     self.assertFalse(wrong["tooling_error"])
-        problems, manifest = e.load_problems("humaneval", all_problems=True)
+        problems, manifest = self.benchmark.load(all_problems=True)
         self.assertEqual(len(problems), 164)
         self.assertEqual(manifest["typed_interfaces"], 29)
 
     def test_checker_and_official_tests_are_independent(self):
         self.assertTrue(e.check(GOOD)["passed"])
         self.assertFalse(e.check(BAD)["passed"])
-        self.assertTrue(e.official_tests(BAD, self.task, "humaneval")["passed"])
-        self.assertFalse(e.official_tests(GOOD.replace("number % 1.0", "0.0"), self.task, "humaneval")["passed"])
+        self.assertTrue(self.benchmark.grade(BAD, self.task)["passed"])
+        self.assertFalse(self.benchmark.grade(GOOD.replace("number % 1.0", "0.0"), self.task)["passed"])
 
     def test_missing_checker_is_tool_failure(self):
         with patch("evaluation.subprocess.run", side_effect=FileNotFoundError):
@@ -61,7 +63,7 @@ class EvaluationTests(unittest.TestCase):
         self.assertTrue(result["tooling_error"])
 
     def test_sandbox_isolation(self):
-        e.validate_backend("humaneval")
+        e.validate_backend(self.benchmark)
 
     def test_linux_command_has_no_credentials_or_home_bind(self):
         with patch("evaluation_sandbox.sys.platform", "linux"), patch("evaluation_sandbox.shutil.which", return_value="/usr/bin/bwrap"):
@@ -162,7 +164,7 @@ class EvaluationTests(unittest.TestCase):
         try:
             with tempfile.TemporaryDirectory(prefix="unit-", dir=e.ROOT / "results") as folder:
                 path = Path(folder) / "fake.json"
-                args = argparse.Namespace(benchmark="humaneval", model="fake", provider="openai",
+                args = argparse.Namespace(benchmark=self.benchmark, model="fake", provider="openai",
                     base_url=f"http://127.0.0.1:{server.server_port}/v1", max_tokens=1024, repair_rounds=1,
                     limit=1, difficulty=None, output=path)
                 with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-secret"}):
@@ -231,7 +233,7 @@ class EvaluationTests(unittest.TestCase):
 
     def test_api_error_has_no_automatic_retry(self):
         args = argparse.Namespace(base_url="http://127.0.0.1:1/v1", provider="openai", model="fake",
-                                  max_tokens=100, benchmark="humaneval", repair_rounds=3)
+                                  max_tokens=100, benchmark=self.benchmark, repair_rounds=3)
         with patch("evaluation.request", return_value={"code": "", "generation": {"status": "api_error"}}) as request:
             result = e.attempt_solution(args, self.task, "purepy")
         self.assertEqual(request.call_count, 1)
@@ -242,9 +244,9 @@ class EvaluationTests(unittest.TestCase):
 
     def test_api_error_does_not_evaluate_partial_content(self):
         args = argparse.Namespace(base_url="http://127.0.0.1:1/v1", provider="openai", model="fake",
-                                  max_tokens=100, benchmark="humaneval", repair_rounds=3)
+                                  max_tokens=100, benchmark=self.benchmark, repair_rounds=3)
         with patch("evaluation.request", return_value={"code": BAD, "generation": {"status": "api_error"}}), patch(
-                "evaluation.check") as checker, patch("evaluation.official_tests") as tests:
+                "evaluation.check") as checker, patch.object(self.benchmark, "grade") as tests:
             result = e.attempt_solution(args, self.task, "purepy")
         checker.assert_not_called()
         tests.assert_not_called()
@@ -253,13 +255,13 @@ class EvaluationTests(unittest.TestCase):
 
     def test_empty_output_stays_unevaluated(self):
         self.assertIsNone(e.check("")["passed"])
-        self.assertIsNone(e.official_tests("", self.task, "humaneval")["passed"])
+        self.assertIsNone(self.benchmark.grade("", self.task)["passed"])
 
     def test_api_errors_have_unknown_rates_and_saved_reports(self):
         (e.ROOT / "results").mkdir(exist_ok=True)
         with tempfile.TemporaryDirectory(prefix="api-error-", dir=e.ROOT / "results") as folder:
             path = Path(folder) / "fake.json"
-            args = argparse.Namespace(benchmark="humaneval", model="fake", provider="openai",
+            args = argparse.Namespace(benchmark=self.benchmark, model="fake", provider="openai",
                 base_url="http://127.0.0.1:1/v1", max_tokens=100, repair_rounds=3,
                 limit=1, difficulty=None, output=path)
             with patch("evaluation.validate_backend"), patch("evaluation.request", return_value={
@@ -284,7 +286,7 @@ class EvaluationTests(unittest.TestCase):
         (e.ROOT / "results").mkdir(exist_ok=True)
         with tempfile.TemporaryDirectory(prefix="failure-", dir=e.ROOT / "results") as folder:
             path = Path(folder) / "fake.json"
-            args = argparse.Namespace(benchmark="humaneval", model="fake", provider="openai",
+            args = argparse.Namespace(benchmark=self.benchmark, model="fake", provider="openai",
                 base_url="http://127.0.0.1:1/v1", max_tokens=100, repair_rounds=0,
                 limit=1, difficulty=None, output=path)
             with patch("evaluation.validate_backend"), patch("evaluation.request", return_value={
@@ -300,11 +302,11 @@ class EvaluationTests(unittest.TestCase):
 
     def test_truncated_output_is_not_automatically_repaired(self):
         args = argparse.Namespace(base_url="http://127.0.0.1:1/v1", provider="openai", model="fake",
-                                  max_tokens=100, benchmark="humaneval", repair_rounds=3)
+                                  max_tokens=100, benchmark=self.benchmark, repair_rounds=3)
         raw = f"<purepy>{BAD}</purepy>"
         with patch("evaluation.request", return_value={"code": raw, "raw_response": raw,
                    "generation": {"status": "incomplete"}}) as request, patch(
-                   "evaluation.check") as checker, patch("evaluation.official_tests") as tests:
+                   "evaluation.check") as checker, patch.object(self.benchmark, "grade") as tests:
             result = e.attempt_solution(args, self.task, "purepy")
         self.assertEqual(request.call_count, 1)
         self.assertEqual(result["code"], BAD.strip())
@@ -318,13 +320,13 @@ class EvaluationTests(unittest.TestCase):
         (e.ROOT / "results").mkdir(exist_ok=True)
         with tempfile.TemporaryDirectory(prefix="format-", dir=e.ROOT / "results") as folder:
             path = Path(folder) / "fake.json"
-            args = argparse.Namespace(benchmark="humaneval", model="fake", provider="openai",
+            args = argparse.Namespace(benchmark=self.benchmark, model="fake", provider="openai",
                 base_url="http://127.0.0.1:1/v1", max_tokens=100, repair_rounds=3,
                 limit=1, difficulty=None, output=path)
             with patch("evaluation.validate_backend"), patch("evaluation.validate_problems"), patch(
                     "evaluation.request", return_value={
                     "code": GOOD, "raw_response": GOOD, "generation": {"status": "complete"}}) as request, patch(
-                    "evaluation.check") as checker, patch("evaluation.official_tests") as tests:
+                    "evaluation.check") as checker, patch.object(self.benchmark, "grade") as tests:
                 e.run(args)
             checker.assert_not_called()
             tests.assert_not_called()
@@ -348,7 +350,7 @@ class EvaluationTests(unittest.TestCase):
 
     def test_outside_prose_does_not_become_source_or_hide_format_violation(self):
         args = argparse.Namespace(base_url="http://127.0.0.1:1/v1", provider="openai", model="fake",
-                                  max_tokens=100, benchmark="humaneval", repair_rounds=0)
+                                  max_tokens=100, benchmark=self.benchmark, repair_rounds=0)
         for condition in e.CONDITIONS:
             raw = f"Here is the solution:\n<{condition}>{GOOD}</{condition}>\nExplanation."
             with patch("evaluation.request", return_value={"code": raw, "raw_response": raw,

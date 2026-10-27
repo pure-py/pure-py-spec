@@ -1,16 +1,12 @@
 import argparse
-import ast
-import base64
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
-import gzip
 import hashlib
 from importlib.metadata import version
 import json
 import os
 from pathlib import Path
-import pickle
 import re
 import subprocess
 import sys
@@ -18,24 +14,16 @@ import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
-import warnings
 
-import evaluation_sandbox
+from evaluation_benchmarks import BENCHMARKS, HumanEval
 
 
 ROOT = Path(__file__).resolve().parent
-CACHE = ROOT / ".cache/evaluation"
 CHECKER_VERSION = "0.22.3"
 CHECKER_SHA = "cd59f9e8656d2b617954caaf60bdb89d91ccc9cbee830d63977e8abf8a857c27"
-HARNESS_SHA = "b7cb6a8a69807bb868150a61742e25d7bb5328bbe01d514471b6ec43c9fa9ed2"
 CONDITIONS = ("python", "purepy")
 OUTPUT_FORMAT_VERSION = "tagged-code-v1"
-BENCHMARKS = {"humaneval": "HumanEval", "humaneval-plus": "HumanEval+", "mbpp-plus": "MBPP+",
-              "livecodebench": "LiveCodeBench"}
-EVALPLUS = ("humaneval-plus", "mbpp-plus")
-MBPP_OUTPUT_NOT_NONE_TASKS = ("check_str", "text_match_three", "text_starta_endb")
 ACCEPTS_ANY_ANSWER = ("are_equivalent",)
-SIMPLE_TYPES = {"int", "float", "bool", "str", "object"}
 
 
 def sha(raw):
@@ -48,114 +36,6 @@ def save(path, data):
     temporary = path.with_suffix(path.suffix + ".tmp")
     temporary.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
     temporary.replace(path)
-
-
-def download(url, path, expected):
-    path = Path(path)
-    if path.exists() and sha(path.read_bytes()) == expected:
-        return path
-    with urllib.request.urlopen(url, timeout=120) as response:
-        raw = response.read()
-    if sha(raw) != expected:
-        raise RuntimeError("download checksum mismatch")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".download")
-    temporary.write_bytes(raw)
-    temporary.replace(path)
-    return path
-
-
-def expressible(node):
-    if isinstance(node, ast.Name):
-        return node.id in SIMPLE_TYPES
-    if isinstance(node, ast.Constant):
-        return node.value is None
-    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.BitOr):
-        return expressible(node.left) and expressible(node.right)
-    if isinstance(node, ast.Subscript) and isinstance(node.value, ast.Name):
-        name = node.value.id
-        if name in ("List", "list", "Optional"):
-            return expressible(node.slice)
-        if name in ("Dict", "dict") and isinstance(node.slice, ast.Tuple) and len(node.slice.elts) == 2:
-            key, value = node.slice.elts
-            return isinstance(key, ast.Name) and key.id == "str" and expressible(value)
-        if name in ("Tuple", "tuple") and isinstance(node.slice, ast.Tuple):
-            return all(expressible(item) for item in node.slice.elts)
-    return False
-
-
-def function_signature(source, name):
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", SyntaxWarning)
-        module = ast.parse(source)
-    node = next(n for n in module.body if isinstance(n, ast.FunctionDef) and n.name == name)
-    annotations = [argument.annotation for argument in node.args.args] + [node.returns]
-    typed = all(annotation is not None and expressible(annotation) for annotation in annotations)
-    signature = ast.unparse(node).splitlines()[0]
-    return re.sub(r"\b(List|Tuple|Dict)\b", lambda m: m[0].lower(), signature), typed
-
-
-def load_rows(manifest):
-    path = download(manifest["url"], CACHE / manifest["url"].rsplit("/", 1)[1], manifest["sha256"])
-    if manifest["benchmark"] == "HumanEval":
-        with gzip.open(path, "rt") as source:
-            rows = {row["task_id"]: row for row in map(json.loads, source)}
-    else:
-        os.environ["HUMANEVAL_OVERRIDE_PATH" if manifest["benchmark"] == "HumanEval+" else "MBPP_OVERRIDE_PATH"] = str(path)
-        from evalplus.data import get_human_eval_plus, get_mbpp_plus
-        rows = get_human_eval_plus() if manifest["benchmark"] == "HumanEval+" else get_mbpp_plus()
-    if len(rows) != manifest["total_problems"]:
-        raise RuntimeError(f"{manifest['benchmark']} benchmark size changed")
-    return rows
-
-
-def load_problems(benchmark, limit=None, difficulty=None, all_problems=False):
-    if benchmark == "livecodebench":
-        import livecodebench as lcb
-        lcb.prepare(set())
-        data = json.loads(lcb.TASKS.read_text())
-        download("https://raw.githubusercontent.com/LiveCodeBench/LiveCodeBench/"
-                 + lcb.HARNESS_REVISION + "/lcb_runner/evaluation/testing_util.py",
-                 CACHE / "lcb-grader.py", HARNESS_SHA)
-        problems = {k: {**v, "typed_interface": True} for k, v in data["tasks"].items()
-                    if not difficulty or v["difficulty"] == difficulty}
-        manifest = {**data["manifest"], "selection_sha256": sha(lcb.TASKS.read_bytes()),
-                    "total_problems": 1055, "selected_problems": len(problems),
-                    "scope": "Typed call-based subset of release_v6; 1055 release problems in total."}
-        chosen = dict(list(problems.items())[:limit])
-        lcb.prepare(set(chosen))
-        for task_id, task in chosen.items():
-            if sha(lcb.case_path(task_id).read_bytes()) != task["tests_sha256"]:
-                raise RuntimeError("LiveCodeBench test fixture checksum mismatch")
-    else:
-        manifest = json.loads((ROOT / f"benchmarks/{benchmark}.json").read_text())
-        rows = load_rows(manifest)
-        task_ids = list(rows) if all_problems or not manifest.get("task_ids") else manifest["task_ids"]
-        task_ids = [task_id for task_id in task_ids if task_id not in manifest.get("excluded", {})]
-        problems = {}
-        for task_id in task_ids:
-            row = rows[task_id]
-            if benchmark == "mbpp-plus":
-                signature, typed = function_signature(row["canonical_solution"], row["entry_point"])
-            else:
-                signature, typed = function_signature(row["prompt"], row["entry_point"])
-            if benchmark == "humaneval":
-                official = row
-            else:
-                inputs = [list(group.values()) if isinstance(group, dict) else group
-                          for group in (row["base_input"], row["plus_input"])]
-                official = {"reference": row["prompt"] + row["canonical_solution"], "atol": row["atol"],
-                            "dataset": "mbpp" if benchmark == "mbpp-plus" else "humaneval",
-                            "inputs": base64.b64encode(pickle.dumps(inputs[0] + inputs[1])).decode(),
-                            "test_count": len(inputs[0]) + len(inputs[1]),
-                            "output_not_none": row["entry_point"] in MBPP_OUTPUT_NOT_NONE_TASKS}
-            problems[task_id] = {"name": row["entry_point"], "question": row["prompt"], "signature": signature,
-                                 "typed_interface": typed, "official": official}
-        manifest = {**manifest, "selected_problems": len(problems),
-                    "typed_interfaces": sum(p["typed_interface"] for p in problems.values())}
-        chosen = dict(list(problems.items())[:limit])
-    return chosen, {**manifest, "evaluated_problems": len(chosen),
-                    "evaluated_typed_interfaces": sum(p["typed_interface"] for p in chosen.values())}
 
 
 def output_instruction(condition):
@@ -346,33 +226,6 @@ def check(code):
         return verdict
 
 
-def official_tests(code, task, benchmark):
-    if not code.strip():
-        return {"passed": None, "error": "no generated code to test", "tooling_error": False}
-    try:
-        tree = ast.parse(code)
-        if not any(isinstance(n, ast.FunctionDef) and n.name == task["name"] for n in tree.body):
-            return {"passed": False, "error": "required top-level function is missing", "tooling_error": False}
-    except SyntaxError as error:
-        return {"passed": False, "error": str(error), "tooling_error": False}
-    if benchmark == "humaneval":
-        problem = task["official"]
-        program = problem["prompt"] + "\n" + code + "\n" + problem["test"] + "\ncheck(" + task["name"] + ")\n"
-        return evaluation_sandbox.run({"benchmark": "HumanEval", "program": program}, 3)
-    if benchmark in EVALPLUS:
-        return evaluation_sandbox.run({"benchmark": "EvalPlus", "candidate": code, "name": task["name"],
-                                       **task["official"]}, 90)
-    import livecodebench as lcb
-    fixture = json.loads(lcb.case_path(task["task_id"]).read_text())
-    alias = "_lcb_core_" + sha(task["task_id"].encode())[:12]
-    parameters = ", ".join(task["parameters"])
-    signature = "self" + (", " + parameters if parameters else "")
-    adapted = code + f"\n{alias} = {task['name']}\nclass Solution:\n    def {task['name']}({signature}):\n        return {alias}({parameters})\n"
-    payload = {"benchmark": "LiveCodeBench", "sample": fixture["sample"], "code": adapted,
-               "test_count": task["test_count"], "grader_source": (CACHE / "lcb-grader.py").read_text()}
-    return evaluation_sandbox.run(payload, 7 * task["test_count"] + 30)
-
-
 def validate_backend(benchmark):
     if sys.version_info[:2] != (3, 12) or version("purepy") != CHECKER_VERSION:
         raise RuntimeError("the pipeline requires Python 3.12 and the pinned PurePy wheel")
@@ -381,10 +234,10 @@ def validate_backend(benchmark):
     if accepted["passed"] is not True or rejected["passed"] is not False:
         raise RuntimeError("checker health check failed")
     program = "def probe():\n    return 1\nassert probe() == 1\n"
-    sandbox = evaluation_sandbox.run({"benchmark": "HumanEval", "program": program}, 3)
+    sandbox = HumanEval().sandbox({"program": program}, 3)
     if sandbox["passed"] is not True:
         raise RuntimeError("sandbox health check failed: " + str(sandbox["error"]))
-    isolation = evaluation_sandbox.run({"benchmark": "HumanEval", "program":
+    isolation = HumanEval().sandbox({"program":
         "import os, socket\nassert 'ANTHROPIC_API_KEY' not in os.environ\n"
         "assert 'DEEPSEEK_API_KEY' not in os.environ\n"
         "try:\n    socket.create_connection(('1.1.1.1', 443), timeout=1)\n"
@@ -392,40 +245,17 @@ def validate_backend(benchmark):
         + f"assert not os.access({str(ROOT / 'pyproject.toml')!r}, os.R_OK)\n"}, 3)
     if isolation["passed"] is not True:
         raise RuntimeError("sandbox isolation check failed")
-    if benchmark in EVALPLUS:
-        identity = "def probe(x):\n    return x\n"
-        probe = {"benchmark": "EvalPlus", "reference": identity, "candidate": identity, "name": "probe",
-                 "inputs": base64.b64encode(pickle.dumps([[1], [2.5], [(1, 2)]])).decode(), "atol": 0,
-                 "dataset": "humaneval", "output_not_none": False}
-        wrong = {**probe, "candidate": "def probe(x):\n    return None\n"}
-        if (evaluation_sandbox.run(probe, 10)["passed"] is not True
-                or evaluation_sandbox.run(wrong, 10)["passed"] is not False):
-            raise RuntimeError("EvalPlus test runner health check failed")
-    if benchmark == "livecodebench":
-        probe = evaluation_sandbox.run({"benchmark": "LiveCodeBench",
-            "grader_source": (CACHE / "lcb-grader.py").read_text(),
-            "sample": {"input_output": json.dumps({"inputs": ["1"], "outputs": ["1"], "fn_name": "probe"})},
-            "code": "class Solution:\n    def probe(self, x):\n        return x\n", "test_count": 1}, 15)
-        if probe["passed"] is not True:
-            raise RuntimeError("official LiveCodeBench grader health check failed")
-
-
-def reference_solution(task, benchmark):
-    if benchmark == "humaneval":
-        return task["official"]["prompt"] + task["official"]["canonical_solution"]
-    if benchmark in EVALPLUS:
-        return task["official"]["reference"]
-    return None
+    benchmark.health_check()
 
 
 def validate_problem(task_id, task, benchmark):
     task = {**task, "task_id": task_id}
-    reference = reference_solution(task, benchmark)
+    reference = benchmark.reference(task)
     if reference is not None:
-        verdict = official_tests(reference, task, benchmark)
+        verdict = benchmark.grade(reference, task)
         if verdict["passed"] is not True:
             raise RuntimeError(f"the reference solution of {task_id} fails its tests: {verdict['error']}")
-    wrong = official_tests(f"def {task['name']}(*args):\n    return None\n", task, benchmark)
+    wrong = benchmark.grade(f"def {task['name']}(*args):\n    return None\n", task)
     if wrong["passed"] is not False and task["name"] not in ACCEPTS_ANY_ANSWER:
         raise RuntimeError(f"the tests of {task_id} accept an answer that returns None")
 
@@ -492,7 +322,7 @@ def attempt_solution(args, task, condition, persist=None):
                                   "tooling_error": False}
         else:
             answer["checker"] = check(answer["code"])
-            answer["official_tests"] = official_tests(answer["code"], task, args.benchmark)
+            answer["official_tests"] = args.benchmark.grade(answer["code"], task)
         if persist:
             persist(pack_solution(attempts, initial_prompt))
         if (answer["generation"]["status"] != "complete" or answer["checker"]["passed"] is not False
@@ -759,7 +589,7 @@ def compare(paths, destination):
 
 
 def run(args):
-    problems, manifest = load_problems(args.benchmark, args.limit, args.difficulty, getattr(args, "all_problems", False))
+    problems, manifest = args.benchmark.load(args.limit, args.difficulty, getattr(args, "all_problems", False))
     if not problems:
         raise RuntimeError("the selection contains no problems")
     validate_backend(args.benchmark)
@@ -778,7 +608,7 @@ def run(args):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("x") as stream:
         stream.write("{}\n")
-    data = {"benchmark": BENCHMARKS[args.benchmark],
+    data = {"benchmark": args.benchmark.name,
             "model": args.model, "manifest": manifest, "tasks": {},
             "protocol": {"checker_version": CHECKER_VERSION, "wheel_sha256": CHECKER_SHA,
                          "definition_sha256": sha((ROOT / "prompts/purepy-v0.22.3.md").read_bytes()),
@@ -871,6 +701,7 @@ def main():
         parser.error("difficulty filtering applies only to LiveCodeBench")
     if args.all_problems and args.benchmark == "livecodebench":
         parser.error("LiveCodeBench runs its frozen selection only")
+    args.benchmark = BENCHMARKS[args.benchmark]()
     try:
         run(args)
     except RuntimeError as error:
