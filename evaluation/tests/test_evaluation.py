@@ -310,7 +310,7 @@ class EvaluationTests(unittest.TestCase):
             result = e.attempt_solution(args, self.task, "purepy")
         self.assertEqual(request.call_count, 1)
         self.assertEqual(result["code"], BAD.strip())
-        self.assertEqual(result["attempts"][0]["raw_response"], raw)
+        self.assertEqual(result["attempts"][0].raw_response, raw)
         checker.assert_not_called()
         tests.assert_not_called()
         self.assertEqual(result["rejections"], 0)
@@ -360,7 +360,7 @@ class EvaluationTests(unittest.TestCase):
             self.assertTrue(result["official_tests"].passed)
             self.assertEqual(result["output_format"]["status"], "outside_text")
             self.assertFalse(result["output_format"]["compliant"])
-            self.assertEqual(result["attempts"][0]["raw_response"], raw)
+            self.assertEqual(result["attempts"][0].raw_response, raw)
 
     def test_bad_api_url_cannot_be_saved(self):
         with self.assertRaisesRegex(RuntimeError, "credentials"):
@@ -369,14 +369,36 @@ class EvaluationTests(unittest.TestCase):
             e.validate_api_url("http://example.com/v1")
 
     def test_unknown_diagnostic_does_not_claim_feature_cleared(self):
-        first = {"code": BAD, "checker": e.Verdict(False, None, False,
+        first = e.Attempt(code=BAD, checker=e.Verdict(False, None, False,
                  failure_mode={"category": "excluded_by_design", "restriction": "loop"}),
-                 "official_tests": e.Verdict(True, None, False), "generation": {"status": "complete"}, "round": 0}
+                 official_tests=e.Verdict(True, None, False), generation={"status": "complete"},
+                 round=0, messages=[], prompt_sha256="")
         following = copy.deepcopy(first)
-        following["round"] = 1
-        following["checker"].failure_mode["restriction"] = "mutation"
+        following.round = 1
+        following.checker.failure_mode["restriction"] = "mutation"
         result = e.pack_solution([first, following], "prompt")
-        self.assertIsNone(result["attempts"][0]["next_round_clears_reported_feature"])
+        self.assertIsNone(result["attempts"][0].next_round_clears_reported_feature)
+
+    def test_attempt_json_roundtrip_preserves_optional_fields(self):
+        attempt = e.Attempt(round=0, code="", generation={"status": "api_error"},
+                            messages=[], prompt_sha256="")
+        original = json.loads(json.dumps(attempt, default=e.encode_result))
+        self.assertNotIn("raw_response", original)
+        self.assertNotIn("output_format", original)
+        self.assertNotIn("next_round_clears_reported_feature", original)
+        for clearance in (e.Unrecorded.VALUE, None, False, True):
+            with self.subTest(clearance=clearance):
+                attempt.next_round_clears_reported_feature = clearance
+                encoded = json.loads(json.dumps(attempt, default=e.encode_result))
+                restored = e.Attempt.from_dict(encoded)
+                self.assertEqual(restored, attempt)
+                self.assertIsInstance(restored.checker, e.Verdict)
+                self.assertIsInstance(restored.official_tests, e.Verdict)
+                self.assertEqual(json.loads(json.dumps(restored, default=e.encode_result)), encoded)
+                if clearance is e.Unrecorded.VALUE:
+                    self.assertNotIn("next_round_clears_reported_feature", encoded)
+                else:
+                    self.assertIs(encoded["next_round_clears_reported_feature"], clearance)
 
     def test_generated_prompt_examples_pass_checker(self):
         text = (e.ROOT / "prompts/purepy-v0.22.3.md").read_text()

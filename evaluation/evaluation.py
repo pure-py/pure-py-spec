@@ -1,7 +1,9 @@
 import argparse
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field, fields
 from datetime import datetime, timezone
+from enum import Enum
 import hashlib
 from importlib.metadata import version
 import json
@@ -26,6 +28,45 @@ OUTPUT_FORMAT_VERSION = "tagged-code-v1"
 ACCEPTS_ANY_ANSWER = ("are_equivalent",)
 
 
+class Unrecorded(Enum):
+    VALUE = "unrecorded"
+
+
+@dataclass
+class Attempt:
+    round: int
+    code: str
+    generation: dict[str, object]
+    messages: list[dict[str, str]]
+    prompt_sha256: str
+    checker: Verdict = field(default_factory=lambda: Verdict(None, "awaiting checker", False))
+    official_tests: Verdict = field(default_factory=lambda: Verdict(None, "awaiting tests", False))
+    raw_response: str | Unrecorded = Unrecorded.VALUE
+    output_format: dict[str, object] | None | Unrecorded = Unrecorded.VALUE
+    next_round_clears_reported_feature: bool | None | Unrecorded = Unrecorded.VALUE
+
+    @classmethod
+    def from_dict(cls, record):
+        return cls(**{**record, "checker": Verdict(**record["checker"]),
+                      "official_tests": Verdict(**record["official_tests"])})
+
+    def to_dict(self):
+        return {f.name: getattr(self, f.name) for f in fields(self)
+                if getattr(self, f.name) is not Unrecorded.VALUE}
+
+    @property
+    def format_status(self):
+        return self.output_format.get("status", "unrecorded") if isinstance(self.output_format, dict) else "unrecorded"
+
+    @property
+    def format_compliant(self):
+        return self.output_format.get("compliant") if isinstance(self.output_format, dict) else None
+
+
+def encode_result(value):
+    return value.to_dict() if isinstance(value, Attempt) else encode_verdict(value)
+
+
 def sha(raw):
     return hashlib.sha256(raw).hexdigest()
 
@@ -34,7 +75,7 @@ def save(path, data):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(data, indent=2, ensure_ascii=False, default=encode_verdict) + "\n")
+    temporary.write_text(json.dumps(data, indent=2, ensure_ascii=False, default=encode_result) + "\n")
     temporary.replace(path)
 
 
@@ -45,9 +86,9 @@ def read_result(path):
             if condition not in task:
                 continue
             solution = task[condition]
-            for record in (solution, *solution["attempts"]):
-                for metric in ("checker", "official_tests"):
-                    record[metric] = Verdict(**record[metric])
+            for metric in ("checker", "official_tests"):
+                solution[metric] = Verdict(**solution[metric])
+            solution["attempts"] = [Attempt.from_dict(record) for record in solution["attempts"]]
     return data
 
 
@@ -275,31 +316,31 @@ def validate_problems(problems, benchmark):
     print(f"Validated the tests of {len(problems)} problems", flush=True)
 
 
-def repair_messages(messages, attempt):
-    return [*messages, {"role": "assistant", "content": attempt["raw_response"]},
+def repair_messages(messages, attempt: Attempt):
+    return [*messages, {"role": "assistant", "content": attempt.raw_response},
             {"role": "user", "content":
-             "The PurePy v0.22.3 checker rejected this source:\n" + attempt["checker"].error
+             "The PurePy v0.22.3 checker rejected this source:\n" + attempt.checker.error
              + "\nCorrect the source while preserving the task interface and behaviour. "
              + output_instruction("purepy")}]
 
 
-def pack_solution(attempts, initial_prompt):
+def pack_solution(attempts: list[Attempt], initial_prompt):
     for current, following in zip(attempts, attempts[1:]):
-        if current["checker"].passed is not False:
+        if current.checker.passed is not False:
             continue
-        mode = current["checker"].failure_mode or {}
-        next_mode = following["checker"].failure_mode or {}
-        current["next_round_clears_reported_feature"] = (
-            True if following["checker"].passed is True else
-            False if following["checker"].passed is False
+        mode = current.checker.failure_mode or {}
+        next_mode = following.checker.failure_mode or {}
+        current.next_round_clears_reported_feature = (
+            True if following.checker.passed is True else
+            False if following.checker.passed is False
             and (mode.get("category"), mode.get("restriction"))
             == (next_mode.get("category"), next_mode.get("restriction")) else None)
     final = attempts[-1]
-    return {"code": final["code"], "checker": final["checker"], "official_tests": final["official_tests"],
-            "generation": final["generation"], "prompt": initial_prompt, "attempts": attempts,
-            "output_format": final.get("output_format"),
-            "rejections": sum(a["checker"].passed is False for a in attempts),
-            "rounds_to_acceptance": next((a["round"] for a in attempts if a["checker"].passed is True), None)}
+    return {"code": final.code, "checker": final.checker, "official_tests": final.official_tests,
+            "generation": final.generation, "prompt": initial_prompt, "attempts": attempts,
+            "output_format": None if final.output_format is Unrecorded.VALUE else final.output_format,
+            "rejections": sum(a.checker.passed is False for a in attempts),
+            "rounds_to_acceptance": next((a.round for a in attempts if a.checker.passed is True), None)}
 
 
 def attempt_solution(args, task: Problem, condition, persist=None):
@@ -314,28 +355,26 @@ def attempt_solution(args, task: Problem, condition, persist=None):
                                        "error": "generation failed"}
         else:
             answer.update(extract_code(answer["raw_response"], condition))
-        answer.update(round=round_index, messages=messages,
-                      prompt_sha256=sha(json.dumps(messages, sort_keys=True).encode()))
-        answer["checker"] = Verdict(None, "awaiting checker", False)
-        answer["official_tests"] = Verdict(None, "awaiting tests", False)
-        attempts.append(answer)
+        attempt = Attempt(**answer, round=round_index, messages=messages,
+                          prompt_sha256=sha(json.dumps(messages, sort_keys=True).encode()))
+        attempts.append(attempt)
         if persist:
             persist(pack_solution(attempts, initial_prompt))
-        if answer["generation"]["status"] != "complete" or not answer["code"]:
-            reason = ("generation " + answer["generation"]["status"]
-                      if answer["generation"]["status"] != "complete" else
-                      "output format: " + answer["output_format"]["status"])
-            for metric in ("checker", "official_tests"):
-                answer[metric] = Verdict(None, "not evaluated because " + reason, False)
+        if attempt.generation["status"] != "complete" or not attempt.code:
+            reason = ("generation " + attempt.generation["status"]
+                      if attempt.generation["status"] != "complete" else
+                      "output format: " + attempt.format_status)
+            attempt.checker = Verdict(None, "not evaluated because " + reason, False)
+            attempt.official_tests = Verdict(None, "not evaluated because " + reason, False)
         else:
-            answer["checker"] = check(answer["code"])
-            answer["official_tests"] = args.benchmark.grade(answer["code"], task)
+            attempt.checker = check(attempt.code)
+            attempt.official_tests = args.benchmark.grade(attempt.code, task)
         if persist:
             persist(pack_solution(attempts, initial_prompt))
-        if (answer["generation"]["status"] != "complete" or answer["checker"].passed is not False
-                or answer["checker"].tooling_error or answer["official_tests"].tooling_error):
+        if (attempt.generation["status"] != "complete" or attempt.checker.passed is not False
+                or attempt.checker.tooling_error or attempt.official_tests.tooling_error):
             break
-        messages = repair_messages(messages, answer)
+        messages = repair_messages(messages, attempt)
     return pack_solution(attempts, initial_prompt)
 
 
@@ -349,19 +388,18 @@ def summarize(data):
             attempts = [s["attempts"][0 if stage == "initial" else -1] for s in solutions]
             rows[stage] = {
                 "outputs": len(attempts),
-                "checker_accepts": sum(a["checker"].passed is True for a in attempts),
-                "tests_pass": sum(a["official_tests"].passed is True for a in attempts),
-                "joint_pass": sum(a["checker"].passed is True and a["official_tests"].passed is True for a in attempts),
-                "checker_unknown": sum(a["checker"].passed is None for a in attempts),
-                "tests_unknown": sum(a["official_tests"].passed is None for a in attempts),
-                "format_compliant": sum((a.get("output_format") or {}).get("compliant") is True for a in attempts),
-                "format_noncompliant": sum((a.get("output_format") or {}).get("compliant") is False for a in attempts),
-                "format_unknown": sum((a.get("output_format") or {}).get("compliant") is None for a in attempts),
-                "format_status": dict(Counter((a.get("output_format") or {}).get("status", "unrecorded")
-                                              for a in attempts)),
-                "generation_status": dict(Counter(a["generation"]["status"] for a in attempts))}
-        failures = [a["checker"].failure_mode or {} for s in solutions for a in s["attempts"]
-                    if a["checker"].passed is False]
+                "checker_accepts": sum(a.checker.passed is True for a in attempts),
+                "tests_pass": sum(a.official_tests.passed is True for a in attempts),
+                "joint_pass": sum(a.checker.passed is True and a.official_tests.passed is True for a in attempts),
+                "checker_unknown": sum(a.checker.passed is None for a in attempts),
+                "tests_unknown": sum(a.official_tests.passed is None for a in attempts),
+                "format_compliant": sum(a.format_compliant is True for a in attempts),
+                "format_noncompliant": sum(a.format_compliant is False for a in attempts),
+                "format_unknown": sum(a.format_compliant is None for a in attempts),
+                "format_status": dict(Counter(a.format_status for a in attempts)),
+                "generation_status": dict(Counter(a.generation["status"] for a in attempts))}
+        failures = [a.checker.failure_mode or {} for s in solutions for a in s["attempts"]
+                    if a.checker.passed is False]
         rows["checker_rejections"] = dict(Counter(f.get("category", "unclassified") for f in failures))
         rows["rounds_to_acceptance"] = dict(Counter(str(s["rounds_to_acceptance"]) for s in solutions))
         summary["conditions"][condition] = rows
@@ -384,11 +422,11 @@ def summarize(data):
         index = 0 if stage == "initial" else -1
         pairs = [(t["purepy"]["attempts"][index], t["python"]["attempts"][index])
                  for t in data["tasks"].values() if "purepy" in t and "python" in t]
-        accepted = [(q, p) for q, p in pairs if q["checker"].passed is True]
+        accepted = [(q, p) for q, p in pairs if q.checker.passed is True]
         count = len(accepted)
-        purepy_pass = sum(q["official_tests"].passed is True for q, p in accepted)
-        python_pass = sum(p["official_tests"].passed is True for q, p in accepted)
-        unknown = sum(q["official_tests"].passed is None or p["official_tests"].passed is None
+        purepy_pass = sum(q.official_tests.passed is True for q, p in accepted)
+        python_pass = sum(p.official_tests.passed is True for q, p in accepted)
+        unknown = sum(q.official_tests.passed is None or p.official_tests.passed is None
                       for q, p in accepted)
         known = count > 0 and not unknown
         summary["rq3_accepted"][stage] = {
@@ -410,7 +448,7 @@ def export_code(path, task_id, condition, solution):
     folder.mkdir(parents=True, exist_ok=True)
     (folder / (condition + ".py")).write_text(solution["code"] + "\n")
     for attempt in solution["attempts"]:
-        (folder / f"{condition}.round-{attempt['round']}.py").write_text(attempt["code"] + "\n")
+        (folder / f"{condition}.round-{attempt.round}.py").write_text(attempt.code + "\n")
 
 
 def plot(data, summary, destinations):
@@ -512,11 +550,9 @@ def report(path):
             solution = task[condition]
             export_code(path, task_id, condition, solution)
             first, last = solution["attempts"][0], solution["attempts"][-1]
-            values = [task_id, condition, last["generation"]["status"],
-                      (first.get("output_format") or {}).get("status", "unrecorded"),
-                      (last.get("output_format") or {}).get("status", "unrecorded"), first["checker"].passed,
-                      last["checker"].passed, first["official_tests"].passed,
-                      last["official_tests"].passed, solution["rounds_to_acceptance"]]
+            values = [task_id, condition, last.generation["status"], first.format_status,
+                      last.format_status, first.checker.passed, last.checker.passed, first.official_tests.passed,
+                      last.official_tests.passed, solution["rounds_to_acceptance"]]
             lines.append("| " + " | ".join(map(str, values)) + " |")
     lines.extend(["", "## Rejection Details", "",
                   "The checker reports one diagnostic per run, so the next round's diagnostic may name a different feature.", "",
@@ -525,11 +561,12 @@ def report(path):
     for task_id, task in data["tasks"].items():
         for condition in CONDITIONS:
             for attempt in task.get(condition, {}).get("attempts", []):
-                if attempt["checker"].passed is not False:
+                if attempt.checker.passed is not False:
                     continue
-                mode = attempt["checker"].failure_mode
-                values = [task_id, condition, attempt["round"], mode["category"], mode["restriction"],
-                          attempt.get("next_round_clears_reported_feature"), attempt["checker"].error]
+                mode = attempt.checker.failure_mode
+                clears = attempt.next_round_clears_reported_feature
+                values = [task_id, condition, attempt.round, mode["category"], mode["restriction"],
+                          None if clears is Unrecorded.VALUE else clears, attempt.checker.error]
                 lines.append("| " + " | ".join(str(v).replace("|", "\\|").replace("\n", " ") for v in values) + " |")
     path.with_suffix(".md").write_text("\n".join(lines) + "\n")
     plot(data, summary, [path.with_suffix(".pdf"), path.with_suffix(".svg")])
@@ -644,8 +681,8 @@ def run(args):
                 save(path, data)
                 print(f"{task_id} {condition}: checker={solution['checker'].passed} "
                       f"tests={solution['official_tests'].passed} status={solution['generation']['status']}", flush=True)
-                if any(a["checker"].tooling_error or a["official_tests"].tooling_error
-                       or a["generation"]["status"] == "api_error" for a in solution["attempts"]):
+                if any(a.checker.tooling_error or a.official_tests.tooling_error
+                       or a.generation["status"] == "api_error" for a in solution["attempts"]):
                     failed = True
     except BaseException as error:
         data["status"] = "interrupted"
