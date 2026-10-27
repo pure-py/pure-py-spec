@@ -15,7 +15,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from evaluation_benchmarks import BENCHMARKS, HumanEval, Verdict, encode_verdict
+from evaluation_benchmarks import BENCHMARKS, HumanEval, Problem, Verdict, encode_verdict
 
 
 ROOT = Path(__file__).resolve().parent
@@ -58,13 +58,13 @@ def output_instruction(condition):
             "Do not include Markdown fences, comments, a test runner or example calls.")
 
 
-def prompt(task, condition):
+def prompt(task: Problem, condition):
     common = ("Preserve the required function name, parameters, return behaviour and input domain. "
               "Include necessary imports and helpers.\n\n")
     definition = (ROOT / "prompts/purepy-v0.22.3.md").read_text() if condition == "purepy" else ""
     return (("Solve this task in PurePy.\n" if condition == "purepy" else "Solve this task in Python.\n")
-            + common + definition + "\nTask:\n" + task["question"]
-            + "\n\nRequired function interface:\n" + task["signature"]
+            + common + definition + "\nTask:\n" + task.question
+            + "\n\nRequired function interface:\n" + task.signature
             + "\n\n" + output_instruction(condition))
 
 
@@ -257,21 +257,20 @@ def validate_backend(benchmark):
     benchmark.health_check()
 
 
-def validate_problem(task_id, task, benchmark):
-    task = {**task, "task_id": task_id}
+def validate_problem(task: Problem, benchmark):
     reference = benchmark.reference(task)
     if reference is not None:
         verdict = benchmark.grade(reference, task)
         if verdict.passed is not True:
-            raise RuntimeError(f"the reference solution of {task_id} fails its tests: {verdict.error}")
-    wrong = benchmark.grade(f"def {task['name']}(*args):\n    return None\n", task)
-    if wrong.passed is not False and task["name"] not in ACCEPTS_ANY_ANSWER:
-        raise RuntimeError(f"the tests of {task_id} accept an answer that returns None")
+            raise RuntimeError(f"the reference solution of {task.task_id} fails its tests: {verdict.error}")
+    wrong = benchmark.grade(f"def {task.name}(*args):\n    return None\n", task)
+    if wrong.passed is not False and task.name not in ACCEPTS_ANY_ANSWER:
+        raise RuntimeError(f"the tests of {task.task_id} accept an answer that returns None")
 
 
 def validate_problems(problems, benchmark):
     with ThreadPoolExecutor(max_workers=min(8, os.cpu_count() or 1)) as pool:
-        for outcome in pool.map(lambda item: validate_problem(item[0], item[1], benchmark), problems.items()):
+        for outcome in pool.map(lambda task: validate_problem(task, benchmark), problems.values()):
             pass
     print(f"Validated the tests of {len(problems)} problems", flush=True)
 
@@ -303,7 +302,7 @@ def pack_solution(attempts, initial_prompt):
             "rounds_to_acceptance": next((a["round"] for a in attempts if a["checker"].passed is True), None)}
 
 
-def attempt_solution(args, task, condition, persist=None):
+def attempt_solution(args, task: Problem, condition, persist=None):
     initial_prompt = prompt(task, condition)
     messages = [{"role": "user", "content": initial_prompt}]
     attempts = []
@@ -631,9 +630,9 @@ def run(args):
     save(path, data)
     failed = False
     try:
-        for task_id, task in problems.items():
-            task = {**task, "task_id": task_id}
-            data["tasks"][task_id] = {k: v for k, v in task.items() if k != "official"}
+        for task in problems.values():
+            task_id = task.task_id
+            data["tasks"][task_id] = task.to_record()
             for condition in CONDITIONS:
                 def persist(solution):
                     data["tasks"][task_id][condition] = solution

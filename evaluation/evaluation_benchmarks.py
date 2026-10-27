@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import ast
 import base64
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 import gzip
 import hashlib
 import json
@@ -22,6 +22,54 @@ CACHE = ROOT / ".cache/evaluation"
 HARNESS_SHA = "b7cb6a8a69807bb868150a61742e25d7bb5328bbe01d514471b6ec43c9fa9ed2"
 MBPP_OUTPUT_NOT_NONE_TASKS = ("check_str", "text_match_three", "text_starta_endb")
 SIMPLE_TYPES = {"int", "float", "bool", "str", "object"}
+
+
+@dataclass(frozen=True)
+class Problem:
+    task_id: str
+    name: str
+    question: str
+    signature: str
+    typed_interface: bool
+
+    def to_record(self) -> dict[str, object]:
+        return {field.name: getattr(self, field.name) for field in fields(Problem)}
+
+
+@dataclass(frozen=True)
+class ReferenceProblem(Problem):
+    canonical_solution: str
+
+
+@dataclass(frozen=True)
+class HumanEvalProblem(ReferenceProblem):
+    test: str
+
+
+@dataclass(frozen=True)
+class EvalPlusProblem(ReferenceProblem):
+    inputs: list[list[object] | tuple[object, ...]]
+    atol: float
+    output_not_none: bool
+
+    @property
+    def test_count(self) -> int:
+        return len(self.inputs)
+
+
+@dataclass(frozen=True)
+class LiveCodeBenchProblem(Problem):
+    parameters: list[str]
+    difficulty: str
+    contest_date: str
+    source_title: str
+    platform: str
+    original_starter_code: str
+    tests_sha256: str
+    test_count: int
+
+    def to_record(self) -> dict[str, object]:
+        return asdict(self)
 
 
 @dataclass(frozen=True)
@@ -99,15 +147,15 @@ class Benchmark(ABC):
     worker_tooling_errors = False
 
     @abstractmethod
-    def load(self, limit=None, difficulty=None, all_problems=False):
+    def load(self, limit=None, difficulty=None, all_problems=False) -> tuple[dict[str, Problem], dict]:
         raise NotImplementedError
 
-    def grade(self, code, task) -> Verdict:
+    def grade(self, code, task: Problem) -> Verdict:
         if not code.strip():
             return Verdict(None, "no generated code to test", False)
         try:
             tree = ast.parse(code)
-            if not any(isinstance(n, ast.FunctionDef) and n.name == task["name"] for n in tree.body):
+            if not any(isinstance(n, ast.FunctionDef) and n.name == task.name for n in tree.body):
                 return Verdict(False, "required top-level function is missing", False)
         except SyntaxError as error:
             return Verdict(False, str(error), False)
@@ -118,7 +166,7 @@ class Benchmark(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def reference(self, task):
+    def reference(self, task) -> str | None:
         raise NotImplementedError
 
     def sandbox(self, payload, timeout, files=None) -> Verdict:
@@ -145,7 +193,7 @@ class JsonlBenchmark(Benchmark):
         return row["prompt"]
 
     @abstractmethod
-    def official(self, row):
+    def problem(self, task_id, row, signature, typed) -> ReferenceProblem:
         raise NotImplementedError
 
     def load(self, limit=None, difficulty=None, all_problems=False):
@@ -159,13 +207,15 @@ class JsonlBenchmark(Benchmark):
         for task_id in task_ids:
             row = rows[task_id]
             signature, typed = function_signature(self.interface_source(row), row["entry_point"])
-            problems[task_id] = {"name": row["entry_point"], "question": row["prompt"], "signature": signature,
-                                 "typed_interface": typed, "official": self.official(row)}
+            problems[task_id] = self.problem(task_id, row, signature, typed)
         manifest = {**manifest, "selected_problems": len(problems),
-                    "typed_interfaces": sum(p["typed_interface"] for p in problems.values())}
+                    "typed_interfaces": sum(p.typed_interface for p in problems.values())}
         chosen = dict(list(problems.items())[:limit])
         return chosen, {**manifest, "evaluated_problems": len(chosen),
-                        "evaluated_typed_interfaces": sum(p["typed_interface"] for p in chosen.values())}
+                        "evaluated_typed_interfaces": sum(p.typed_interface for p in chosen.values())}
+
+    def reference(self, task) -> str:
+        return task.question + task.canonical_solution
 
 
 class HumanEval(JsonlBenchmark):
@@ -177,16 +227,14 @@ class HumanEval(JsonlBenchmark):
         with gzip.open(path, "rt") as source:
             return {row["task_id"]: row for row in map(json.loads, source)}
 
-    def official(self, row):
-        return row
+    def problem(self, task_id, row, signature, typed) -> HumanEvalProblem:
+        return HumanEvalProblem(task_id=task_id, name=row["entry_point"], question=row["prompt"],
+                                signature=signature, typed_interface=typed,
+                                canonical_solution=row["canonical_solution"], test=row["test"])
 
     def _grade(self, code, task) -> Verdict:
-        problem = task["official"]
-        program = problem["prompt"] + "\n" + code + "\n" + problem["test"] + "\ncheck(" + task["name"] + ")\n"
+        program = task.question + "\n" + code + "\n" + task.test + "\ncheck(" + task.name + ")\n"
         return self.sandbox({"program": program}, 3)
-
-    def reference(self, task):
-        return task["official"]["prompt"] + task["official"]["canonical_solution"]
 
     def execute(self, payload, grader) -> Verdict:
         exec(compile(payload["program"], "solution_and_official_tests.py", "exec"), {})
@@ -203,20 +251,19 @@ class EvalPlus(JsonlBenchmark):
     def dataset_rows(self):
         raise NotImplementedError
 
-    def official(self, row):
+    def problem(self, task_id, row, signature, typed) -> EvalPlusProblem:
         inputs = [list(group.values()) if isinstance(group, dict) else group
                   for group in (row["base_input"], row["plus_input"])]
-        return {"reference": row["prompt"] + row["canonical_solution"], "atol": row["atol"],
-                "dataset": self.dataset,
-                "inputs": base64.b64encode(pickle.dumps(inputs[0] + inputs[1])).decode(),
-                "test_count": len(inputs[0]) + len(inputs[1]),
-                "output_not_none": row["entry_point"] in MBPP_OUTPUT_NOT_NONE_TASKS}
+        return EvalPlusProblem(task_id=task_id, name=row["entry_point"], question=row["prompt"],
+                               signature=signature, typed_interface=typed,
+                               canonical_solution=row["canonical_solution"], inputs=inputs[0] + inputs[1],
+                               atol=row["atol"], output_not_none=row["entry_point"] in MBPP_OUTPUT_NOT_NONE_TASKS)
 
     def _grade(self, code, task) -> Verdict:
-        return self.sandbox({"candidate": code, "name": task["name"], **task["official"]}, 90)
-
-    def reference(self, task):
-        return task["official"]["reference"]
+        return self.sandbox({"candidate": code, "name": task.name, "reference": self.reference(task),
+                             "dataset": self.dataset, "atol": task.atol,
+                             "inputs": base64.b64encode(pickle.dumps(task.inputs)).decode(),
+                             "test_count": task.test_count, "output_not_none": task.output_not_none}, 90)
 
     def health_check(self):
         identity = "def probe(x):\n    return x\n"
@@ -290,7 +337,7 @@ class LiveCodeBench(Benchmark):
         download("https://raw.githubusercontent.com/LiveCodeBench/LiveCodeBench/"
                  + lcb.HARNESS_REVISION + "/lcb_runner/evaluation/testing_util.py",
                  CACHE / "lcb-grader.py", HARNESS_SHA)
-        problems = {k: {**v, "typed_interface": True} for k, v in data["tasks"].items()
+        problems = {k: LiveCodeBenchProblem(task_id=k, typed_interface=True, **v) for k, v in data["tasks"].items()
                     if not difficulty or v["difficulty"] == difficulty}
         manifest = {**data["manifest"], "selection_sha256": sha(lcb.TASKS.read_bytes()),
                     "total_problems": 1055, "selected_problems": len(problems),
@@ -298,23 +345,23 @@ class LiveCodeBench(Benchmark):
         chosen = dict(list(problems.items())[:limit])
         lcb.prepare(set(chosen))
         for task_id, task in chosen.items():
-            if sha(lcb.case_path(task_id).read_bytes()) != task["tests_sha256"]:
+            if sha(lcb.case_path(task_id).read_bytes()) != task.tests_sha256:
                 raise RuntimeError("LiveCodeBench test fixture checksum mismatch")
         return chosen, {**manifest, "evaluated_problems": len(chosen),
-                        "evaluated_typed_interfaces": sum(p["typed_interface"] for p in chosen.values())}
+                        "evaluated_typed_interfaces": sum(p.typed_interface for p in chosen.values())}
 
     def _grade(self, code, task) -> Verdict:
         import livecodebench as lcb
-        fixture = json.loads(lcb.case_path(task["task_id"]).read_text())
-        alias = "_lcb_core_" + sha(task["task_id"].encode())[:12]
-        parameters = ", ".join(task["parameters"])
+        fixture = json.loads(lcb.case_path(task.task_id).read_text())
+        alias = "_lcb_core_" + sha(task.task_id.encode())[:12]
+        parameters = ", ".join(task.parameters)
         signature = "self" + (", " + parameters if parameters else "")
-        adapted = code + f"\n{alias} = {task['name']}\nclass Solution:\n    def {task['name']}({signature}):\n        return {alias}({parameters})\n"
-        payload = {"sample": fixture["sample"], "code": adapted, "test_count": task["test_count"]}
-        return self.sandbox(payload, 7 * task["test_count"] + 30,
+        adapted = code + f"\n{alias} = {task.name}\nclass Solution:\n    def {task.name}({signature}):\n        return {alias}({parameters})\n"
+        payload = {"sample": fixture["sample"], "code": adapted, "test_count": task.test_count}
+        return self.sandbox(payload, 7 * task.test_count + 30,
                             {"grader.py": (CACHE / "lcb-grader.py").read_text()})
 
-    def reference(self, task):
+    def reference(self, task) -> None:
         return None
 
     def health_check(self):

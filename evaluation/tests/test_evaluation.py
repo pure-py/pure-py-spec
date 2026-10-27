@@ -30,8 +30,8 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(list(self.problems), ["HumanEval/2"])
         self.assertEqual(self.manifest["total_problems"], 164)
         self.assertEqual(self.manifest["evaluated_problems"], 1)
-        self.assertNotIn("python", self.task)
-        self.assertNotIn("purepy", self.task)
+        self.assertNotIn("python", self.task.to_record())
+        self.assertNotIn("purepy", self.task.to_record())
 
     def test_evalplus_references_pass_and_wrong_answers_fail(self):
         for name in ("humaneval-plus", "mbpp-plus"):
@@ -40,10 +40,10 @@ class EvaluationTests(unittest.TestCase):
             self.assertEqual(manifest["evaluated_problems"], 2)
             for task_id, task in problems.items():
                 with self.subTest(task=task_id):
-                    reference = benchmark.grade(task["official"]["reference"], task)
+                    reference = benchmark.grade(benchmark.reference(task), task)
                     self.assertTrue(reference.passed, reference.error)
-                    self.assertEqual(reference.tests_passed, task["official"]["test_count"])
-                    wrong = benchmark.grade(f"def {task['name']}(*args):\n    return None\n", task)
+                    self.assertEqual(reference.tests_passed, task.test_count)
+                    wrong = benchmark.grade(f"def {task.name}(*args):\n    return None\n", task)
                     self.assertFalse(wrong.passed)
                     self.assertFalse(wrong.tooling_error)
         problems, manifest = self.benchmark.load(all_problems=True)
@@ -84,7 +84,7 @@ class EvaluationTests(unittest.TestCase):
             prompt = e.prompt(self.task, condition)
             self.assertIn(f"<{condition}>...</{condition}>", prompt)
             self.assertIn("Do not include explanations or any text outside the tags", prompt)
-            self.assertIn(self.task["signature"], prompt)
+            self.assertIn(self.task.signature, prompt)
 
     def test_tagged_source_extraction(self):
         for condition in e.CONDITIONS:
@@ -191,7 +191,7 @@ class EvaluationTests(unittest.TestCase):
                 feedback = requests[-1]["messages"][-1]["content"]
                 self.assertIn("prohibited", feedback)
                 self.assertIn("<purepy>...</purepy>", feedback)
-                self.assertNotIn(self.task["official"]["test"], feedback)
+                self.assertNotIn(self.task.test, feedback)
                 self.assertNotIn("test-only-secret", path.read_text())
                 for suffix in (".md", ".svg", ".pdf", ".tex"):
                     self.assertTrue(path.with_suffix(suffix).exists())
