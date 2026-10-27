@@ -17,6 +17,7 @@ from .type_syntax import (
     UnionType,
     Var,
     base_type,
+    fv,
 )
 
 type ResolvedOverload = tuple[tuple[Type, ...], Type]
@@ -43,53 +44,39 @@ def equality(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | No
 
 
 def equality_type(Sigma: ClassTable, tau: Type) -> bool:
-    return len(needs_eq(Sigma, needs_eq_class(Sigma), tau)) == 0
+    return not any(needs_eq(Sigma, tau, xi) for xi in fv(tau) | {None})
 
 
 type Xi = Var | None
-type NeedsEqClass = frozenset[tuple[ClassName, Xi]]
+type Deriving = frozenset[tuple[ClassName, Xi]]
 
 
-def needs_eq(Sigma: ClassTable, R: NeedsEqClass, tau: Type) -> frozenset[Xi]:
+def needs_eq(Sigma: ClassTable, tau: Type, xi: Xi, deriving: Deriving = frozenset()) -> bool:
+    """deriving: class judgements being derived, at which a circular derivation stops"""
     match tau:
         case TypeVariable(alpha):
-            return frozenset({alpha})
+            return xi == alpha
         case CallableType():
-            return frozenset({None})
+            return xi is None
         case ListType(sigma) | DictType(sigma):
-            return needs_eq(Sigma, R, sigma)
+            return needs_eq(Sigma, sigma, xi, deriving)
         case TupleType(taus):
-            return frozenset[Xi]().union(*(needs_eq(Sigma, R, sigma) for sigma in taus))
+            return any(needs_eq(Sigma, sigma, xi, deriving) for sigma in taus)
         case UnionType(sigma, tau_):
-            return needs_eq(Sigma, R, sigma) | needs_eq(Sigma, R, tau_)
+            return needs_eq(Sigma, sigma, xi, deriving) or needs_eq(Sigma, tau_, xi, deriving)
         case ClassType(c, sigmas):
-            return frozenset[Xi]({None} if (c, None) in R else ()).union(
-                *(
-                    needs_eq(Sigma, R, sigma)
-                    for alpha, sigma in zip(type_params(Sigma, c), sigmas)
-                    if (c, alpha) in R
-                )
+            return (xi is None and needs_eq_class(Sigma, c, None, deriving)) or any(
+                needs_eq_class(Sigma, c, alpha, deriving) and needs_eq(Sigma, sigma, xi, deriving)
+                for alpha, sigma in zip(type_params(Sigma, c), sigmas)
             )
         case Primitive() | LiteralType():
-            return frozenset()
+            return False
 
 
-def needs_eq_class(Sigma: ClassTable) -> NeedsEqClass:
-    def step(R: NeedsEqClass) -> NeedsEqClass:
-        return frozenset(
-            (c, xi)
-            for c in Sigma
-            for _, tau in fields(Sigma, c).fields
-            for xi in needs_eq(Sigma, R, tau)
-        )
-
-    return lfp(step, frozenset())
-
-
-def lfp[T](f: Callable[[T], T], x: T) -> T:
-    """Least fixed point of monotone f above x, by iteration"""
-    y = f(x)
-    return x if y == x else lfp(f, y)
+def needs_eq_class(Sigma: ClassTable, c: ClassName, xi: Xi, deriving: Deriving) -> bool:
+    return (c, xi) not in deriving and any(
+        needs_eq(Sigma, tau, xi, deriving | {(c, xi)}) for _, tau in fields(Sigma, c).fields
+    )
 
 
 def membership_list(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:
