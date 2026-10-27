@@ -10,7 +10,7 @@
 \and
 \inferrule*[lab={\ruleName{compares-callable}}]
 { \strut }
-{ \Sigma \vdash \tyCallable{\seq{\tau}}{\tau} \compares \pyinline{Callable} }
+{ \Sigma \vdash \tyCallable{\seq{\tau}}{\tau} \compares \varepsilon }
 \and
 \inferrule*[lab={\ruleName{compares-list}}]
 { \Sigma \vdash \tau \compares \xi }
@@ -37,10 +37,10 @@
 { \Sigma \vdash C[\seq{\sigma}] \compares \xi }
 \and
 \inferrule*[lab={\ruleName{compares-instance-callable}}]
-{ \Sigma \vdash C \compares \pyinline{Callable} }
-{ \Sigma \vdash C[\seq{\sigma}] \compares \pyinline{Callable} }
+{ \Sigma \vdash C \compares \varepsilon }
+{ \Sigma \vdash C[\seq{\sigma}] \compares \varepsilon }
 \end{mathpar}
-\subcaption{Type $\tau$ compares type variable $\xi$, or functions when $\xi$ is \pyinline{Callable}}
+\subcaption{Structural equality on values of type $\tau$ compares values of type variable $\xi$, or functions when $\xi$ is $\varepsilon$}
 \label{fig:compares-type}
 \end{subfigure}
 
@@ -54,10 +54,10 @@
 { \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} \\ \Sigma \vdash \tau_i \compares \xi }
 { \Sigma \vdash C \compares \xi }
 \end{mathpar}
-\subcaption{Class $C$ compares type parameter $\xi$, or functions when $\xi$ is \pyinline{Callable}}
+\subcaption{Structural equality on instances of class $C$ compares values of type parameter $\xi$, or functions when $\xi$ is $\varepsilon$}
 \label{fig:compares-class}
 \end{subfigure}
-\caption{Comparisons by structural equality}
+\caption{Types compared by structural equality}
 \label{fig:compares}
 \end{AddedBlock}
 \end{figure}
