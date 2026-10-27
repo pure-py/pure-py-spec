@@ -40,7 +40,7 @@
 { \Sigma \vdash C \compares \varepsilon }
 { \Sigma \vdash C[\seq{\sigma}] \compares \varepsilon }
 \end{mathpar}
-\subcaption{Equality at type $\tau$ compares values of type variable $\xi$, or functions if $\xi$ is $\varepsilon$}
+\subcaption{Equality at type $\tau$ depends on equality at type variable $\xi$, or at a callable type if $\xi$ is $\varepsilon$}
 \label{fig:compares-type}
 \end{subfigure}
 
@@ -54,7 +54,7 @@
 { \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} \\ \Sigma \vdash \tau_i \compares \xi }
 { \Sigma \vdash C \compares \xi }
 \end{mathpar}
-\subcaption{Equality at class $C$ compares values of its type parameter $\xi$, or functions if $\xi$ is $\varepsilon$}
+\subcaption{Equality at class $C$ depends on equality at its type parameter $\xi$, or at a callable type if $\xi$ is $\varepsilon$}
 \label{fig:compares-class}
 \end{subfigure}
 \caption{Types compared by structural equality}
