@@ -1,7 +1,7 @@
 import ast
 from collections.abc import Callable, Sequence
 
-from .classes import ClassTable, fields
+from .classes import ClassTable, fields, type_params
 from .subtyping import comparable, join_seq, subtype
 from .type_syntax import (
     CallableType,
@@ -17,7 +17,6 @@ from .type_syntax import (
     UnionType,
     Var,
     base_type,
-    fv,
 )
 
 type ResolvedOverload = tuple[tuple[Type, ...], Type]
@@ -43,42 +42,54 @@ def equality(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | No
     return (sigma, tau), Primitive.BOOL
 
 
-def equality_type(
-    Sigma: ClassTable,
-    tau: Type,
-    alphas: Sequence[Var] = (),
-    V: frozenset[ClassName] = frozenset(),
-) -> bool:
-    """alphas: type variables assumed to be equality types; V: classes assumed to be equality classes,
-    those whose fields are being examined"""
+def equality_type(Sigma: ClassTable, tau: Type) -> bool:
+    return len(needs_eq(Sigma, needs_eq_class(Sigma), tau)) == 0
+
+
+type Xi = Var | None
+type NeedsEqClass = frozenset[tuple[ClassName, Xi]]
+
+
+def needs_eq(Sigma: ClassTable, R: NeedsEqClass, tau: Type) -> frozenset[Xi]:
     match tau:
+        case TypeVariable(alpha):
+            return frozenset({alpha})
         case CallableType():
-            return False
+            return frozenset({None})
         case ListType(sigma) | DictType(sigma):
-            return equality_type(Sigma, sigma, alphas, V)
+            return needs_eq(Sigma, R, sigma)
         case TupleType(taus):
-            return all(equality_type(Sigma, c, alphas, V) for c in taus)
+            return frozenset[Xi]().union(*(needs_eq(Sigma, R, sigma) for sigma in taus))
         case UnionType(sigma, tau_):
-            return equality_type(Sigma, sigma, alphas, V) and equality_type(Sigma, tau_, alphas, V)
-        case ClassType(c, taus):
-            pi = fields(Sigma, c)
-            used = set().union(*(fv(sigma) for _, sigma in pi.fields))
-            return equality_class(Sigma, c, V) and all(
-                beta not in used or equality_type(Sigma, sigma, alphas, V)
-                for beta, sigma in zip(pi.type_params, taus)
+            return needs_eq(Sigma, R, sigma) | needs_eq(Sigma, R, tau_)
+        case ClassType(c, sigmas):
+            return frozenset[Xi]({None} if (c, None) in R else ()).union(
+                *(
+                    needs_eq(Sigma, R, sigma)
+                    for alpha, sigma in zip(type_params(Sigma, c), sigmas)
+                    if (c, alpha) in R
+                )
             )
         case Primitive() | LiteralType():
-            return True
-        case TypeVariable(alpha):
-            return alpha in alphas
+            return frozenset()
 
 
-def equality_class(Sigma: ClassTable, c: ClassName, V: frozenset[ClassName]) -> bool:
-    """Coinductive through V"""
-    if c in V:
-        return True
-    pi = fields(Sigma, c)
-    return all(equality_type(Sigma, sigma, pi.type_params, V | {c}) for _, sigma in pi.fields)
+def needs_eq_class(Sigma: ClassTable) -> NeedsEqClass:
+    def step(R: NeedsEqClass) -> NeedsEqClass:
+        return frozenset(
+            (c, xi)
+            for c in Sigma
+            for _, tau in fields(Sigma, c).fields
+            for xi in needs_eq(Sigma, R, tau)
+        )
+
+    return lfp(step, frozenset())
+
+
+def lfp[T](f: Callable[[T], T], x: T) -> T:
+    """Least fixed point of monotone f above x, by iteration"""
+    y = f(x)
+    return x if y == x else lfp(f, y)
 
 
 def membership_list(Sigma: ClassTable, sigma: Type, tau: Type) -> ResolvedOverload | None:
