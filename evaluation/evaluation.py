@@ -15,7 +15,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from evaluation_benchmarks import BENCHMARKS, HumanEval
+from evaluation_benchmarks import BENCHMARKS, HumanEval, Verdict, encode_verdict
 
 
 ROOT = Path(__file__).resolve().parent
@@ -34,8 +34,21 @@ def save(path, data):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
+    temporary.write_text(json.dumps(data, indent=2, ensure_ascii=False, default=encode_verdict) + "\n")
     temporary.replace(path)
+
+
+def read_result(path):
+    data = json.loads(path.read_text())
+    for task in data["tasks"].values():
+        for condition in CONDITIONS:
+            if condition not in task:
+                continue
+            solution = task[condition]
+            for record in (solution, *solution["attempts"]):
+                for metric in ("checker", "official_tests"):
+                    record[metric] = Verdict(**record[metric])
+    return data
 
 
 def output_instruction(condition):
@@ -200,9 +213,9 @@ def failure_category(code, diagnostic, exit_code):
             "review_required": True, "exit_code": exit_code}
 
 
-def check(code):
+def check(code) -> Verdict:
     if not code.strip():
-        return {"passed": None, "error": "no generated code to check", "tooling_error": False}
+        return Verdict(None, "no generated code to check", False)
     with tempfile.TemporaryDirectory(prefix="purepy-check-") as directory:
         path = Path(directory) / "solution.py"
         path.write_text(code)
@@ -212,18 +225,14 @@ def check(code):
                                     capture_output=True, text=True, timeout=30,
                                     env={"PATH": "/usr/bin:/bin"})
         except (OSError, subprocess.TimeoutExpired) as error:
-            return {"passed": None, "error": type(error).__name__, "tooling_error": True}
+            return Verdict(None, type(error).__name__, True)
         diagnostic = (result.stdout + result.stderr).strip().replace(str(path), "solution.py")
         tooling = result.returncode not in (0, 1, 2, 3, 4) or "Traceback (most recent call last)" in diagnostic
-        verdict = {"passed": None if tooling else result.returncode == 0 and bool(code.strip()),
-                   "error": diagnostic if result.returncode or not code.strip() else None,
-                   "exit_code": result.returncode, "tooling_error": tooling,
-                   "command": ["purepy", "--check", "--module", "solution.py"]}
-        if not code.strip():
-            verdict["error"] = "no generated code"
-        if verdict["passed"] is False:
-            verdict["failure_mode"] = failure_category(code, verdict["error"], result.returncode)
-        return verdict
+        passed = None if tooling else result.returncode == 0
+        error = diagnostic if result.returncode else None
+        return Verdict(passed, error, tooling, exit_code=result.returncode,
+                       command=["purepy", "--check", "--module", "solution.py"],
+                       failure_mode=failure_category(code, error, result.returncode) if passed is False else None)
 
 
 def validate_backend(benchmark):
@@ -231,19 +240,19 @@ def validate_backend(benchmark):
         raise RuntimeError("the pipeline requires Python 3.12 and the pinned PurePy wheel")
     accepted = check("def probe(x: int) -> int:\n    return x\n")
     rejected = check("def probe(x: int) -> int:\n    for i in range(0, x):\n        pass\n    return x\n")
-    if accepted["passed"] is not True or rejected["passed"] is not False:
+    if accepted.passed is not True or rejected.passed is not False:
         raise RuntimeError("checker health check failed")
     program = "def probe():\n    return 1\nassert probe() == 1\n"
     sandbox = HumanEval().sandbox({"program": program}, 3)
-    if sandbox["passed"] is not True:
-        raise RuntimeError("sandbox health check failed: " + str(sandbox["error"]))
+    if sandbox.passed is not True:
+        raise RuntimeError("sandbox health check failed: " + str(sandbox.error))
     isolation = HumanEval().sandbox({"program":
         "import os, socket\nassert 'ANTHROPIC_API_KEY' not in os.environ\n"
         "assert 'DEEPSEEK_API_KEY' not in os.environ\n"
         "try:\n    socket.create_connection(('1.1.1.1', 443), timeout=1)\n"
         "except OSError:\n    pass\nelse:\n    raise AssertionError('network was accessible')\n"
         + f"assert not os.access({str(ROOT / 'pyproject.toml')!r}, os.R_OK)\n"}, 3)
-    if isolation["passed"] is not True:
+    if isolation.passed is not True:
         raise RuntimeError("sandbox isolation check failed")
     benchmark.health_check()
 
@@ -253,10 +262,10 @@ def validate_problem(task_id, task, benchmark):
     reference = benchmark.reference(task)
     if reference is not None:
         verdict = benchmark.grade(reference, task)
-        if verdict["passed"] is not True:
-            raise RuntimeError(f"the reference solution of {task_id} fails its tests: {verdict['error']}")
+        if verdict.passed is not True:
+            raise RuntimeError(f"the reference solution of {task_id} fails its tests: {verdict.error}")
     wrong = benchmark.grade(f"def {task['name']}(*args):\n    return None\n", task)
-    if wrong["passed"] is not False and task["name"] not in ACCEPTS_ANY_ANSWER:
+    if wrong.passed is not False and task["name"] not in ACCEPTS_ANY_ANSWER:
         raise RuntimeError(f"the tests of {task_id} accept an answer that returns None")
 
 
@@ -270,28 +279,28 @@ def validate_problems(problems, benchmark):
 def repair_messages(messages, attempt):
     return [*messages, {"role": "assistant", "content": attempt["raw_response"]},
             {"role": "user", "content":
-             "The PurePy v0.22.3 checker rejected this source:\n" + attempt["checker"]["error"]
+             "The PurePy v0.22.3 checker rejected this source:\n" + attempt["checker"].error
              + "\nCorrect the source while preserving the task interface and behaviour. "
              + output_instruction("purepy")}]
 
 
 def pack_solution(attempts, initial_prompt):
     for current, following in zip(attempts, attempts[1:]):
-        if current["checker"]["passed"] is not False:
+        if current["checker"].passed is not False:
             continue
-        mode = current["checker"].get("failure_mode", {})
-        next_mode = following["checker"].get("failure_mode", {})
+        mode = current["checker"].failure_mode or {}
+        next_mode = following["checker"].failure_mode or {}
         current["next_round_clears_reported_feature"] = (
-            True if following["checker"]["passed"] is True else
-            False if following["checker"]["passed"] is False
+            True if following["checker"].passed is True else
+            False if following["checker"].passed is False
             and (mode.get("category"), mode.get("restriction"))
             == (next_mode.get("category"), next_mode.get("restriction")) else None)
     final = attempts[-1]
     return {"code": final["code"], "checker": final["checker"], "official_tests": final["official_tests"],
             "generation": final["generation"], "prompt": initial_prompt, "attempts": attempts,
             "output_format": final.get("output_format"),
-            "rejections": sum(a["checker"]["passed"] is False for a in attempts),
-            "rounds_to_acceptance": next((a["round"] for a in attempts if a["checker"]["passed"] is True), None)}
+            "rejections": sum(a["checker"].passed is False for a in attempts),
+            "rounds_to_acceptance": next((a["round"] for a in attempts if a["checker"].passed is True), None)}
 
 
 def attempt_solution(args, task, condition, persist=None):
@@ -308,8 +317,8 @@ def attempt_solution(args, task, condition, persist=None):
             answer.update(extract_code(answer["raw_response"], condition))
         answer.update(round=round_index, messages=messages,
                       prompt_sha256=sha(json.dumps(messages, sort_keys=True).encode()))
-        answer["checker"] = {"passed": None, "error": "awaiting checker", "tooling_error": False}
-        answer["official_tests"] = {"passed": None, "error": "awaiting tests", "tooling_error": False}
+        answer["checker"] = Verdict(None, "awaiting checker", False)
+        answer["official_tests"] = Verdict(None, "awaiting tests", False)
         attempts.append(answer)
         if persist:
             persist(pack_solution(attempts, initial_prompt))
@@ -318,15 +327,14 @@ def attempt_solution(args, task, condition, persist=None):
                       if answer["generation"]["status"] != "complete" else
                       "output format: " + answer["output_format"]["status"])
             for metric in ("checker", "official_tests"):
-                answer[metric] = {"passed": None, "error": "not evaluated because " + reason,
-                                  "tooling_error": False}
+                answer[metric] = Verdict(None, "not evaluated because " + reason, False)
         else:
             answer["checker"] = check(answer["code"])
             answer["official_tests"] = args.benchmark.grade(answer["code"], task)
         if persist:
             persist(pack_solution(attempts, initial_prompt))
-        if (answer["generation"]["status"] != "complete" or answer["checker"]["passed"] is not False
-                or answer["checker"]["tooling_error"] or answer["official_tests"]["tooling_error"]):
+        if (answer["generation"]["status"] != "complete" or answer["checker"].passed is not False
+                or answer["checker"].tooling_error or answer["official_tests"].tooling_error):
             break
         messages = repair_messages(messages, answer)
     return pack_solution(attempts, initial_prompt)
@@ -342,19 +350,19 @@ def summarize(data):
             attempts = [s["attempts"][0 if stage == "initial" else -1] for s in solutions]
             rows[stage] = {
                 "outputs": len(attempts),
-                "checker_accepts": sum(a["checker"]["passed"] is True for a in attempts),
-                "tests_pass": sum(a["official_tests"]["passed"] is True for a in attempts),
-                "joint_pass": sum(a["checker"]["passed"] is True and a["official_tests"]["passed"] is True for a in attempts),
-                "checker_unknown": sum(a["checker"]["passed"] is None for a in attempts),
-                "tests_unknown": sum(a["official_tests"]["passed"] is None for a in attempts),
+                "checker_accepts": sum(a["checker"].passed is True for a in attempts),
+                "tests_pass": sum(a["official_tests"].passed is True for a in attempts),
+                "joint_pass": sum(a["checker"].passed is True and a["official_tests"].passed is True for a in attempts),
+                "checker_unknown": sum(a["checker"].passed is None for a in attempts),
+                "tests_unknown": sum(a["official_tests"].passed is None for a in attempts),
                 "format_compliant": sum((a.get("output_format") or {}).get("compliant") is True for a in attempts),
                 "format_noncompliant": sum((a.get("output_format") or {}).get("compliant") is False for a in attempts),
                 "format_unknown": sum((a.get("output_format") or {}).get("compliant") is None for a in attempts),
                 "format_status": dict(Counter((a.get("output_format") or {}).get("status", "unrecorded")
                                               for a in attempts)),
                 "generation_status": dict(Counter(a["generation"]["status"] for a in attempts))}
-        failures = [a["checker"].get("failure_mode", {}) for s in solutions for a in s["attempts"]
-                    if a["checker"]["passed"] is False]
+        failures = [a["checker"].failure_mode or {} for s in solutions for a in s["attempts"]
+                    if a["checker"].passed is False]
         rows["checker_rejections"] = dict(Counter(f.get("category", "unclassified") for f in failures))
         rows["rounds_to_acceptance"] = dict(Counter(str(s["rounds_to_acceptance"]) for s in solutions))
         summary["conditions"][condition] = rows
@@ -377,11 +385,11 @@ def summarize(data):
         index = 0 if stage == "initial" else -1
         pairs = [(t["purepy"]["attempts"][index], t["python"]["attempts"][index])
                  for t in data["tasks"].values() if "purepy" in t and "python" in t]
-        accepted = [(q, p) for q, p in pairs if q["checker"]["passed"] is True]
+        accepted = [(q, p) for q, p in pairs if q["checker"].passed is True]
         count = len(accepted)
-        purepy_pass = sum(q["official_tests"]["passed"] is True for q, p in accepted)
-        python_pass = sum(p["official_tests"]["passed"] is True for q, p in accepted)
-        unknown = sum(q["official_tests"]["passed"] is None or p["official_tests"]["passed"] is None
+        purepy_pass = sum(q["official_tests"].passed is True for q, p in accepted)
+        python_pass = sum(p["official_tests"].passed is True for q, p in accepted)
+        unknown = sum(q["official_tests"].passed is None or p["official_tests"].passed is None
                       for q, p in accepted)
         known = count > 0 and not unknown
         summary["rq3_accepted"][stage] = {
@@ -440,14 +448,14 @@ def plot(data, summary, destinations):
 
 
 def figure(source, destination):
-    data = json.loads(source.read_text())
+    data = read_result(source)
     destination.parent.mkdir(parents=True, exist_ok=True)
     plot(data, summarize(data), [destination])
     print(f"Figure: {destination}", flush=True)
 
 
 def report(path):
-    data = json.loads(path.read_text())
+    data = read_result(path)
     summary = summarize(data)
     data["summary"] = summary
     save(path, data)
@@ -507,9 +515,9 @@ def report(path):
             first, last = solution["attempts"][0], solution["attempts"][-1]
             values = [task_id, condition, last["generation"]["status"],
                       (first.get("output_format") or {}).get("status", "unrecorded"),
-                      (last.get("output_format") or {}).get("status", "unrecorded"), first["checker"]["passed"],
-                      last["checker"]["passed"], first["official_tests"]["passed"],
-                      last["official_tests"]["passed"], solution["rounds_to_acceptance"]]
+                      (last.get("output_format") or {}).get("status", "unrecorded"), first["checker"].passed,
+                      last["checker"].passed, first["official_tests"].passed,
+                      last["official_tests"].passed, solution["rounds_to_acceptance"]]
             lines.append("| " + " | ".join(map(str, values)) + " |")
     lines.extend(["", "## Rejection Details", "",
                   "The checker reports one diagnostic per run, so the next round's diagnostic may name a different feature.", "",
@@ -518,11 +526,11 @@ def report(path):
     for task_id, task in data["tasks"].items():
         for condition in CONDITIONS:
             for attempt in task.get(condition, {}).get("attempts", []):
-                if attempt["checker"]["passed"] is not False:
+                if attempt["checker"].passed is not False:
                     continue
-                mode = attempt["checker"]["failure_mode"]
+                mode = attempt["checker"].failure_mode
                 values = [task_id, condition, attempt["round"], mode["category"], mode["restriction"],
-                          attempt.get("next_round_clears_reported_feature"), attempt["checker"]["error"]]
+                          attempt.get("next_round_clears_reported_feature"), attempt["checker"].error]
                 lines.append("| " + " | ".join(str(v).replace("|", "\\|").replace("\n", " ") for v in values) + " |")
     path.with_suffix(".md").write_text("\n".join(lines) + "\n")
     plot(data, summary, [path.with_suffix(".pdf"), path.with_suffix(".svg")])
@@ -544,7 +552,7 @@ def compare(paths, destination):
         raise RuntimeError("comparison already exists; choose a new destination")
     groups = {}
     for path in paths:
-        data = json.loads(path.read_text())
+        data = read_result(path)
         protocol = data["protocol"]
         identity = {"benchmark": data["benchmark"], "manifest": data["manifest"],
                     "task_ids": sorted(data["tasks"]),
@@ -635,9 +643,9 @@ def run(args):
                 solution = attempt_solution(args, task, condition, persist)
                 data["tasks"][task_id][condition] = solution
                 save(path, data)
-                print(f"{task_id} {condition}: checker={solution['checker']['passed']} "
-                      f"tests={solution['official_tests']['passed']} status={solution['generation']['status']}", flush=True)
-                if any(a["checker"]["tooling_error"] or a["official_tests"]["tooling_error"]
+                print(f"{task_id} {condition}: checker={solution['checker'].passed} "
+                      f"tests={solution['official_tests'].passed} status={solution['generation']['status']}", flush=True)
+                if any(a["checker"].tooling_error or a["official_tests"].tooling_error
                        or a["generation"]["status"] == "api_error" for a in solution["attempts"]):
                     failed = True
     except BaseException as error:

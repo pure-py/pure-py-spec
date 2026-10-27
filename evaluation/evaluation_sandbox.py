@@ -63,6 +63,7 @@ def command(directory):
 
 
 def run(payload, timeout, files=None):
+    from evaluation_benchmarks import Verdict
     with tempfile.TemporaryDirectory(prefix="purepy-evaluation-") as directory:
         payload = {**payload, "directory": directory, "timeout": timeout}
         module = Path(__file__).with_name("evaluation_benchmarks.py")
@@ -75,25 +76,24 @@ def run(payload, timeout, files=None):
                                        env={"PATH": "/usr/bin:/bin", "OPENBLAS_NUM_THREADS": "1",
                                             "OMP_NUM_THREADS": "1", "PYTHONHASHSEED": "0"})
         except (OSError, RuntimeError) as error:
-            return {"passed": None, "error": str(error), "tooling_error": True}
+            return Verdict(None, str(error), True)
         try:
             stdout, stderr = process.communicate(json.dumps(payload), timeout=timeout + 5)
         except subprocess.TimeoutExpired:
             os.killpg(process.pid, signal.SIGKILL)
             process.communicate()
-            return {"passed": False, "error": "candidate exceeded wall-clock limit", "tooling_error": False}
+            return Verdict(False, "candidate exceeded wall-clock limit", False)
         if process.returncode != 0:
-            return {"passed": None, "error": f"sandbox worker failed: {stderr[:2000] or process.returncode}",
-                    "tooling_error": True}
+            return Verdict(None, f"sandbox worker failed: {stderr[:2000] or process.returncode}", True)
         try:
             verdict = json.loads(stdout)
             if not isinstance(verdict.get("passed"), bool) and verdict.get("passed") is not None:
                 raise ValueError("invalid verdict")
             if "passed" not in verdict or "tooling_error" not in verdict:
                 raise ValueError("missing verdict fields")
-            return verdict
+            return Verdict(**verdict)
         except (ValueError, TypeError):
-            return {"passed": None, "error": "sandbox did not return a valid verdict", "tooling_error": True}
+            return Verdict(None, "sandbox did not return a valid verdict", True)
 
 
 def worker():
@@ -108,12 +108,14 @@ def worker():
 
     signal.signal(signal.SIGALRM, expired)
     signal.setitimer(signal.ITIMER_REAL, limit)
-    benchmarks = runpy.run_path(str(Path(payload["directory"]) / "evaluation_benchmarks.py"))["BENCHMARKS"]
-    benchmark = benchmarks[payload["benchmark"]]()
+    module = runpy.run_path(str(Path(payload["directory"]) / "evaluation_benchmarks.py"))
+    benchmark = module["BENCHMARKS"][payload["benchmark"]]()
+    Verdict = module["Verdict"]
+    encode_verdict = module["encode_verdict"]
     try:
         grader = benchmark.prepare_worker(payload)
     except BaseException:
-        print(json.dumps({"passed": None, "error": "official grader could not load", "tooling_error": True}))
+        print(json.dumps(Verdict(None, "official grader could not load", True), default=encode_verdict))
         return
     try:
         with tempfile.TemporaryFile(mode="w+", dir=payload["directory"]) as capture:
@@ -121,11 +123,10 @@ def worker():
                 result = benchmark.execute(payload, grader)
     except BaseException:
         tooling = benchmark.worker_tooling_errors
-        result = {"passed": None if tooling else False, "error": traceback.format_exc().strip(),
-                  "tooling_error": tooling}
+        result = Verdict(None if tooling else False, traceback.format_exc().strip(), tooling)
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)
-    print(json.dumps(result))
+    print(json.dumps(result, default=encode_verdict))
 
 
 if __name__ == "__main__":

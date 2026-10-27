@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import ast
 import base64
+from dataclasses import asdict, dataclass
 import gzip
 import hashlib
 import json
@@ -21,6 +22,28 @@ CACHE = ROOT / ".cache/evaluation"
 HARNESS_SHA = "b7cb6a8a69807bb868150a61742e25d7bb5328bbe01d514471b6ec43c9fa9ed2"
 MBPP_OUTPUT_NOT_NONE_TASKS = ("check_str", "text_match_three", "text_starta_endb")
 SIMPLE_TYPES = {"int", "float", "bool", "str", "object"}
+
+
+@dataclass(frozen=True)
+class Verdict:
+    passed: bool | None
+    error: str | None
+    tooling_error: bool
+    exit_code: int | None = None
+    command: list[str] | None = None
+    failure_mode: dict[str, object] | None = None
+    tests_passed: int | None = None
+    tests_total: int | None = None
+
+    def to_dict(self):
+        return {key: value for key, value in asdict(self).items()
+                if key in ("passed", "error", "tooling_error") or value is not None}
+
+
+def encode_verdict(value):
+    if isinstance(value, Verdict):
+        return value.to_dict()
+    raise TypeError(f"{type(value).__name__} is not JSON serializable")
 
 
 def sha(raw):
@@ -79,26 +102,26 @@ class Benchmark(ABC):
     def load(self, limit=None, difficulty=None, all_problems=False):
         raise NotImplementedError
 
-    def grade(self, code, task):
+    def grade(self, code, task) -> Verdict:
         if not code.strip():
-            return {"passed": None, "error": "no generated code to test", "tooling_error": False}
+            return Verdict(None, "no generated code to test", False)
         try:
             tree = ast.parse(code)
             if not any(isinstance(n, ast.FunctionDef) and n.name == task["name"] for n in tree.body):
-                return {"passed": False, "error": "required top-level function is missing", "tooling_error": False}
+                return Verdict(False, "required top-level function is missing", False)
         except SyntaxError as error:
-            return {"passed": False, "error": str(error), "tooling_error": False}
+            return Verdict(False, str(error), False)
         return self._grade(code, task)
 
     @abstractmethod
-    def _grade(self, code, task):
+    def _grade(self, code, task) -> Verdict:
         raise NotImplementedError
 
     @abstractmethod
     def reference(self, task):
         raise NotImplementedError
 
-    def sandbox(self, payload, timeout, files=None):
+    def sandbox(self, payload, timeout, files=None) -> Verdict:
         import evaluation_sandbox
         return evaluation_sandbox.run({"benchmark": self.key, **payload}, timeout, files)
 
@@ -109,7 +132,7 @@ class Benchmark(ABC):
         return None
 
     @abstractmethod
-    def execute(self, payload, grader):
+    def execute(self, payload, grader) -> Verdict:
         raise NotImplementedError
 
 
@@ -157,7 +180,7 @@ class HumanEval(JsonlBenchmark):
     def official(self, row):
         return row
 
-    def _grade(self, code, task):
+    def _grade(self, code, task) -> Verdict:
         problem = task["official"]
         program = problem["prompt"] + "\n" + code + "\n" + problem["test"] + "\ncheck(" + task["name"] + ")\n"
         return self.sandbox({"program": program}, 3)
@@ -165,9 +188,9 @@ class HumanEval(JsonlBenchmark):
     def reference(self, task):
         return task["official"]["prompt"] + task["official"]["canonical_solution"]
 
-    def execute(self, payload, grader):
+    def execute(self, payload, grader) -> Verdict:
         exec(compile(payload["program"], "solution_and_official_tests.py", "exec"), {})
-        return {"passed": True, "error": None, "tooling_error": False}
+        return Verdict(True, None, False)
 
 
 class EvalPlus(JsonlBenchmark):
@@ -189,7 +212,7 @@ class EvalPlus(JsonlBenchmark):
                 "test_count": len(inputs[0]) + len(inputs[1]),
                 "output_not_none": row["entry_point"] in MBPP_OUTPUT_NOT_NONE_TASKS}
 
-    def _grade(self, code, task):
+    def _grade(self, code, task) -> Verdict:
         return self.sandbox({"candidate": code, "name": task["name"], **task["official"]}, 90)
 
     def reference(self, task):
@@ -201,14 +224,14 @@ class EvalPlus(JsonlBenchmark):
                  "inputs": base64.b64encode(pickle.dumps([[1], [2.5], [(1, 2)]])).decode(), "atol": 0,
                  "dataset": "humaneval", "output_not_none": False}
         wrong = {**probe, "candidate": "def probe(x):\n    return None\n"}
-        if (self.sandbox(probe, 10)["passed"] is not True
-                or self.sandbox(wrong, 10)["passed"] is not False):
+        if (self.sandbox(probe, 10).passed is not True
+                or self.sandbox(wrong, 10).passed is not False):
             raise RuntimeError("EvalPlus test runner health check failed")
 
     def prepare_worker(self, payload):
         tempfile.tempdir = payload["directory"]
 
-    def execute(self, payload, grader):
+    def execute(self, payload, grader) -> Verdict:
         import multiprocessing
         from evalplus.eval import untrusted_check
         from evalplus.gen.util import trusted_exec
@@ -220,16 +243,14 @@ class EvalPlus(JsonlBenchmark):
             expected, times = trusted_exec(payload["reference"], inputs, payload["name"], record_time=True,
                                            output_not_none=payload["output_not_none"])
         except BaseException:
-            return {"passed": None, "error": "reference solution failed: " + traceback.format_exc().strip()[-500:],
-                    "tooling_error": True}
+            return Verdict(None, "reference solution failed: " + traceback.format_exc().strip()[-500:], True)
         status, details = untrusted_check(payload["dataset"], payload["candidate"], inputs, payload["name"],
                                           expected, payload["atol"], times)
         passed = sum(bool(d) for d in details)
         failed = next((i for i, d in enumerate(details) if not d), None)
         error = None if status == "pass" else (
             f"{status}: input {failed} {inputs[failed]!r:.200}" if failed is not None else status)
-        return {"passed": status == "pass", "error": error, "tooling_error": False,
-                "tests_passed": passed, "tests_total": len(inputs)}
+        return Verdict(status == "pass", error, False, tests_passed=passed, tests_total=len(inputs))
 
 
 class HumanEvalPlus(EvalPlus):
@@ -282,7 +303,7 @@ class LiveCodeBench(Benchmark):
         return chosen, {**manifest, "evaluated_problems": len(chosen),
                         "evaluated_typed_interfaces": sum(p["typed_interface"] for p in chosen.values())}
 
-    def _grade(self, code, task):
+    def _grade(self, code, task) -> Verdict:
         import livecodebench as lcb
         fixture = json.loads(lcb.case_path(task["task_id"]).read_text())
         alias = "_lcb_core_" + sha(task["task_id"].encode())[:12]
@@ -301,20 +322,19 @@ class LiveCodeBench(Benchmark):
             "sample": {"input_output": json.dumps({"inputs": ["1"], "outputs": ["1"], "fn_name": "probe"})},
             "code": "class Solution:\n    def probe(self, x):\n        return x\n", "test_count": 1}, 15,
             {"grader.py": (CACHE / "lcb-grader.py").read_text()})
-        if probe["passed"] is not True:
+        if probe.passed is not True:
             raise RuntimeError("official LiveCodeBench grader health check failed")
 
     def prepare_worker(self, payload):
         return runpy.run_path(str(Path(payload["directory"]) / "grader.py"))["run_test"]
 
-    def execute(self, payload, grader):
+    def execute(self, payload, grader) -> Verdict:
         import numpy as np
         outcomes, metadata = grader(payload["sample"], test=payload["code"], timeout=6)
         outcomes = [r.item(0) if isinstance(r, np.ndarray) else r for r in outcomes]
-        return {"passed": len(outcomes) == payload["test_count"] and all(r > 0 for r in outcomes),
-                "error": None if all(r > 0 for r in outcomes) else json.dumps(metadata, default=str),
-                "tests_passed": int(sum(r > 0 for r in outcomes)), "tests_total": payload["test_count"],
-                "tooling_error": False}
+        return Verdict(len(outcomes) == payload["test_count"] and all(r > 0 for r in outcomes),
+                       None if all(r > 0 for r in outcomes) else json.dumps(metadata, default=str), False,
+                       tests_passed=int(sum(r > 0 for r in outcomes)), tests_total=payload["test_count"])
 
 
 BENCHMARKS = {benchmark.key: benchmark for benchmark in (HumanEval, HumanEvalPlus, MBPPPlus, LiveCodeBench)}

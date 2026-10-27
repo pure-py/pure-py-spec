@@ -41,26 +41,26 @@ class EvaluationTests(unittest.TestCase):
             for task_id, task in problems.items():
                 with self.subTest(task=task_id):
                     reference = benchmark.grade(task["official"]["reference"], task)
-                    self.assertTrue(reference["passed"], reference["error"])
-                    self.assertEqual(reference["tests_passed"], task["official"]["test_count"])
+                    self.assertTrue(reference.passed, reference.error)
+                    self.assertEqual(reference.tests_passed, task["official"]["test_count"])
                     wrong = benchmark.grade(f"def {task['name']}(*args):\n    return None\n", task)
-                    self.assertFalse(wrong["passed"])
-                    self.assertFalse(wrong["tooling_error"])
+                    self.assertFalse(wrong.passed)
+                    self.assertFalse(wrong.tooling_error)
         problems, manifest = self.benchmark.load(all_problems=True)
         self.assertEqual(len(problems), 164)
         self.assertEqual(manifest["typed_interfaces"], 29)
 
     def test_checker_and_official_tests_are_independent(self):
-        self.assertTrue(e.check(GOOD)["passed"])
-        self.assertFalse(e.check(BAD)["passed"])
-        self.assertTrue(self.benchmark.grade(BAD, self.task)["passed"])
-        self.assertFalse(self.benchmark.grade(GOOD.replace("number % 1.0", "0.0"), self.task)["passed"])
+        self.assertTrue(e.check(GOOD).passed)
+        self.assertFalse(e.check(BAD).passed)
+        self.assertTrue(self.benchmark.grade(BAD, self.task).passed)
+        self.assertFalse(self.benchmark.grade(GOOD.replace("number % 1.0", "0.0"), self.task).passed)
 
     def test_missing_checker_is_tool_failure(self):
         with patch("evaluation.subprocess.run", side_effect=FileNotFoundError):
             result = e.check(GOOD)
-        self.assertIsNone(result["passed"])
-        self.assertTrue(result["tooling_error"])
+        self.assertIsNone(result.passed)
+        self.assertTrue(result.tooling_error)
 
     def test_sandbox_isolation(self):
         e.validate_backend(self.benchmark)
@@ -238,8 +238,8 @@ class EvaluationTests(unittest.TestCase):
             result = e.attempt_solution(args, self.task, "purepy")
         self.assertEqual(request.call_count, 1)
         self.assertEqual(len(result["attempts"]), 1)
-        self.assertIsNone(result["checker"]["passed"])
-        self.assertIsNone(result["official_tests"]["passed"])
+        self.assertIsNone(result["checker"].passed)
+        self.assertIsNone(result["official_tests"].passed)
         self.assertEqual(result["rejections"], 0)
 
     def test_api_error_does_not_evaluate_partial_content(self):
@@ -254,8 +254,8 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(result["rejections"], 0)
 
     def test_empty_output_stays_unevaluated(self):
-        self.assertIsNone(e.check("")["passed"])
-        self.assertIsNone(self.benchmark.grade("", self.task)["passed"])
+        self.assertIsNone(e.check("").passed)
+        self.assertIsNone(self.benchmark.grade("", self.task).passed)
 
     def test_api_errors_have_unknown_rates_and_saved_reports(self):
         (e.ROOT / "results").mkdir(exist_ok=True)
@@ -292,7 +292,7 @@ class EvaluationTests(unittest.TestCase):
             with patch("evaluation.validate_backend"), patch("evaluation.request", return_value={
                     "code": GOOD, "raw_response": f"<purepy>{GOOD}</purepy>",
                     "generation": {"status": "complete"}}), patch(
-                    "evaluation.check", return_value={"passed": None, "tooling_error": True, "error": "checker missing"}):
+                    "evaluation.check", return_value=e.Verdict(None, "checker missing", True)):
                 with self.assertRaisesRegex(RuntimeError, "infrastructure failed"):
                     e.run(args)
             data = json.loads(path.read_text())
@@ -314,7 +314,7 @@ class EvaluationTests(unittest.TestCase):
         checker.assert_not_called()
         tests.assert_not_called()
         self.assertEqual(result["rejections"], 0)
-        self.assertIsNone(result["official_tests"]["passed"])
+        self.assertIsNone(result["official_tests"].passed)
 
     def test_unextractable_format_has_unknown_verdicts_and_no_repairs(self):
         (e.ROOT / "results").mkdir(exist_ok=True)
@@ -356,8 +356,8 @@ class EvaluationTests(unittest.TestCase):
             with patch("evaluation.request", return_value={"code": raw, "raw_response": raw,
                        "generation": {"status": "complete"}}):
                 result = e.attempt_solution(args, self.task, condition)
-            self.assertTrue(result["checker"]["passed"])
-            self.assertTrue(result["official_tests"]["passed"])
+            self.assertTrue(result["checker"].passed)
+            self.assertTrue(result["official_tests"].passed)
             self.assertEqual(result["output_format"]["status"], "outside_text")
             self.assertFalse(result["output_format"]["compliant"])
             self.assertEqual(result["attempts"][0]["raw_response"], raw)
@@ -369,18 +369,19 @@ class EvaluationTests(unittest.TestCase):
             e.validate_api_url("http://example.com/v1")
 
     def test_unknown_diagnostic_does_not_claim_feature_cleared(self):
-        first = {"code": BAD, "checker": {"passed": False, "failure_mode": {"category": "excluded_by_design", "restriction": "loop"}},
-                 "official_tests": {"passed": True}, "generation": {"status": "complete"}, "round": 0}
+        first = {"code": BAD, "checker": e.Verdict(False, None, False,
+                 failure_mode={"category": "excluded_by_design", "restriction": "loop"}),
+                 "official_tests": e.Verdict(True, None, False), "generation": {"status": "complete"}, "round": 0}
         following = copy.deepcopy(first)
         following["round"] = 1
-        following["checker"]["failure_mode"]["restriction"] = "mutation"
+        following["checker"].failure_mode["restriction"] = "mutation"
         result = e.pack_solution([first, following], "prompt")
         self.assertIsNone(result["attempts"][0]["next_round_clears_reported_feature"])
 
     def test_generated_prompt_examples_pass_checker(self):
         text = (e.ROOT / "prompts/purepy-v0.22.3.md").read_text()
         for part in text.split("```python\n")[1:]:
-            self.assertTrue(e.check(part.split("```", 1)[0])["passed"])
+            self.assertTrue(e.check(part.split("```", 1)[0]).passed)
 
     def test_no_python_code_comments(self):
         for path in [*e.ROOT.glob("*.py"), *Path(__file__).parent.glob("*.py")]:
