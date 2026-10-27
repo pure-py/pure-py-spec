@@ -42,4 +42,4 @@ jobs:
           enable-cache: true
 
       - name: Build paper and specification
-        run: make paper.pdf paper-anon.pdf PurePy-spec.pdf spec-anon.pdf
+        run: make paper.pdf paper-anon.pdf PurePy-spec.pdf spec-anon.pdf graduality.pdf

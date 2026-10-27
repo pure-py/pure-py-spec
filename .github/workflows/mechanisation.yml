@@ -1,4 +1,4 @@
-name: Build
+name: Mechanisation
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ on:
       - tex/**
 
 concurrency:
-  group: build-${{ github.ref }}
+  group: mechanisation-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -46,9 +46,7 @@ jobs:
         run: |
           apt-get update -q
           apt-get install -y -q --no-install-recommends \
-            git zip make ca-certificates \
-            texlive-latex-extra texlive-fonts-extra texlive-science \
-            texlive-publishers texlive-bibtex-extra texlive-plain-generic
+            git make ca-certificates
 
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -68,5 +66,5 @@ jobs:
       - name: Add Isabelle to PATH
         run: echo "/home/isabelle/Isabelle/bin" >> "$GITHUB_PATH"
 
-      - name: Build everything
-        run: make all
+      - name: Run the conformance suite under the generated type checker
+        run: make check-tests-generated
