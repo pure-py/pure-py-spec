@@ -1,19 +1,22 @@
-name: Litmus tests
+name: Conformance suite
 
-# Run only when the type checker, the tests or their environment change; the paper and
-# specification have their own Build workflow.
+# Run only when the type checker, the suite or their environment change; the paper and specification have
+# their own Build workflow. The path filter applies to each push, so a pull request which touches the type
+# checker does not rerun the suite for a push which does not.
 on:
+  workflow_dispatch:
   push:
-    branches: ["main"]
-    paths: &paths
+    paths:
       - src/**
       - test/**
       - pyproject.toml
       - uv.lock
       - .python-version
-      - .github/workflows/litmus-tests.yml
-  pull_request:
-    paths: *paths
+      - .github/workflows/conformance-suite.yml
+
+concurrency:
+  group: conformance-suite-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
