@@ -1,32 +1,113 @@
-\section{Evaluation}
+\section{Experimental evaluation}
 \label{sec:evaluation}
 
-We evaluate \PurePy empirically along two axes, both concerning the ability of AI agents to work with the subset.
+We evaluate empirically the suitability of \PurePy as a target language for generated code, with a language
+model as the code generator. The evaluation asks three research questions.
+\begin{enumerate}[label=\textbf{RQ\arabic*},ref=RQ\arabic*,leftmargin=*]
+\item\label{rq:effort} How much effort does a \PurePy solution take to generate, compared with Python?
+\item\label{rq:solutions} How do \PurePy solutions compare with Python solutions in correctness and size?
+\item\label{rq:translation} How well does a model translate existing Python into \PurePy, and which restrictions make
+translation difficult?
+\end{enumerate}
 
-\subsection{Generating \PurePy}
-\label{sec:evaluation-generating}
+\subsection{Experimental setup}
+\label{sec:evaluation-setup}
 
-How effectively can AI agents generate \PurePy solutions to standard functional-programming problems? This
-measures the ease of targeting the subset from a problem statement alone.
+The benchmarks are three standard Python code-generation benchmarks: HumanEval+ and MBPP+~\cite{liu2023},
+which extend HumanEval~\cite{chen2021} and MBPP~\cite{austin2021} with many more tests per problem, and
+LiveCodeBench~\cite{jain2025}, which has an official harness for Python solutions. HumanEval problems
+are small functions over the standard library, so most fall within the \PurePy subset.
 
-The evaluation pipeline in \texttt{evaluation/} gives a model the same problems in Python and in \PurePy, runs
-the \PurePy checker and the benchmark's official tests on each answer, feeds checker rejections back to the model
-for a bounded number of repair rounds, and produces \figref{evaluation-generation} from the recorded outcomes.
-The figure reports how many of the selected problems pass the official tests, and how many are both accepted by
-the checker and pass the tests, for the initial answer and after repair. \todo{The committed result file is the
-pipeline's smoke run on two problems with a small local model; replace it with the full experiment.}
+A language model is given the same problems from these benchmarks in each of the settings listed in
+\tabref{evaluation-settings}, with equivalent documentation in each. For each problem and setting, the
+procedure is as follows.
+\begin{enumerate}
+\item Prompt model with problem and documentation for setting
+\item Extract program from response
+\item Check program statically, except in Python setting
+\item Run program against benchmark's official tests
+\item If static check rejects program and repair rounds remain, return diagnostics to model and continue from step 2
+\item Record outcome of every round
+\end{enumerate}
+The model never sees test outcomes. The benchmark's tests run unchanged against \PurePy solutions under CPython,
+because every \PurePy program is a Python program.
+
+\begin{table}[h]
+\caption{Settings of evaluation}
+\label{tab:evaluation-settings}
+\small
+\begin{tabular}{llll}
+\toprule
+Question & Task & Target language & Static check \\
+\midrule
+\rqref{effort} & Generation & \PurePy & \PurePy type checker \\
+& Generation & Python & None \\
+\addlinespace
+\rqref{solutions} & Generation & \PurePy & \PurePy type checker \\
+& Generation & Typed Python & mypy, strict mode \\
+& Generation & Python & None \\
+\addlinespace
+\rqref{translation} & Translation from Python & \PurePy & \PurePy type checker \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Some problems depend on Python features which are compatible with the design of \PurePy but do not yet form part
+of the specification. If the inputs or expected outputs in the tests of a problem include values of a type
+outside the specification, for example sets, complex numbers or dictionaries with integer keys, no \PurePy
+solution exists, and the problem is excluded. If a solution uses another feature outside the specification, for
+example the module \pyinline{re} or the built-in \pyinline{sum}, the problem is kept, because a solution without
+the feature may exist, and the resulting rejections are counted separately from rejections caused by the
+restrictions of \PurePy. Without loops, a \PurePy program must use recursion to accumulate a result over its
+input, since comprehensions only map and filter. CPython has no tail-call optimisation, so recursion over large
+inputs can exceed its recursion limit; such failures count against \PurePy and are reported as a category of
+their own. Only rejections and recursion errors identify their cause, so only these failures can be attributed
+either to the design of \PurePy or to features which are not yet part of the specification. \todo{Classify each
+diagnostic as restriction of \PurePy or feature outside specification; library functions need case-by-case
+decisions during experiment}
+
+Our evaluation pipeline implements this procedure for the \PurePy and Python settings, and produces
+\figref{evaluation-generation} from the recorded outcomes. The figure reports how many of the selected problems
+pass the official tests, and how many are both accepted by the checker and pass the tests, for the initial
+solution and after repair. \todo{Committed result file is pipeline's smoke run on two problems with small local
+model; replace with full experiment}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{paper/fig/evaluation-generation}
 \caption{Outcomes of the generation experiment, produced by the evaluation pipeline. Left: problems whose final
 program passes the official tests. Right: problems whose program is also accepted by the \PurePy checker; the Python
-condition is shown by its test outcome only, as it is not checked.}
+setting is shown by its test outcome only, as it is not checked.}
 \label{fig:evaluation-generation}
 \end{figure}
 
-\subsection{Translating Python to \PurePy}
+\subsection{Effort of generating \PurePy solutions\texorpdfstring{ (\rqref{effort})}{}}
+\label{sec:evaluation-effort}
+
+\rqref{effort} asks how much effort a \PurePy solution takes to generate, compared with Python. Effort is
+measured in rejections, repair rounds and tokens; Python solutions are not checked and so take one round. Over
+all rounds, we count rejections by the rule named in each diagnostic. For each rejection, we record whether the
+next round removes the violation, and the number of rounds to acceptance. We also count the input and output
+tokens per problem, up to acceptance or the budget, in \PurePy and in Python.
+
+\subsection{Correctness and size of \PurePy solutions\texorpdfstring{ (\rqref{solutions})}{}}
+\label{sec:evaluation-solutions}
+
+\rqref{solutions} asks how \PurePy solutions compare with Python solutions in correctness and size. For
+correctness, we compare the pass rate of the final program in \PurePy and in Python. A third setting, typed
+Python, requires type annotations and checks them with mypy in strict mode, returning its diagnostics to the
+model as for \PurePy. Comparing typed Python with Python measures the effect of types, and comparing \PurePy
+with typed Python measures the effect of the restrictions of \PurePy beyond types.
+\figref{evaluation-generation} reports the pass rates of the \PurePy and Python settings. For size, we compare
+the final \PurePy program, in non-blank lines and in tokens, with the model's Python solution and, for
+HumanEval+ and MBPP+, with the benchmark's reference solution.
+
+\subsection{Translation of existing Python\texorpdfstring{ (\rqref{translation})}{}}
 \label{sec:evaluation-translating}
 
-How effectively can AI agents translate existing Python programs into the \PurePy subset? \todo{Not sure about
-this one without libraries being part of the spec too.}
+\rqref{translation} asks how well a model translates existing Python programs into \PurePy, and which
+restrictions make translation difficult. The setup is that of \rqref{effort}, with the benchmark's reference
+solution added to the prompt and a \PurePy version requested. A translation succeeds if the type checker accepts
+it and it passes the tests. We report how often translation succeeds, and measure effort as in \rqref{effort},
+with rejections classified by rule and attributed either to the design of \PurePy or to features which are not
+yet part of the specification.

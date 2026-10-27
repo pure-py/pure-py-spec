@@ -48,7 +48,7 @@ little and the cost remains, so strictness and formal guarantees gain value. A s
 from Python's syntax, however, forfeits Python's training data and benchmarks. A subset of Python keeps the
 training data and benchmarks, because its programs are Python programs. The evaluation of \secref{evaluation}
 measures the cost of this strictness to a code generator. It compares code generation into \PurePy with
-generation into Python and into OCaml on standard benchmarks, and reports how often the type checker rejects a
+generation into Python on standard benchmarks, and reports how often the type checker rejects a
 first attempt, how many rounds a generator needs to reach a well-formed program and how often the final program
 passes the tests.
 
@@ -76,6 +76,6 @@ that every terminating run with defined behaviour under \PurePy{} produces the s
 CPython, GraalPy and Pyodide (\secref{reference-implementation});
 \item two research languages built on \PurePy, one of which extends the core language with partial application
 and piecewise function definitions (\secref{case-studies});
-\item an evaluation of AI code generation into \PurePy, compared with generation into Python and OCaml, on standard benchmarks (\secref{evaluation}).
+\item an evaluation of AI code generation into \PurePy, compared with generation into Python, on standard benchmarks (\secref{evaluation}).
 \end{itemize}
 \secref{related-work} discusses related work and \secref{conclusion} concludes.
