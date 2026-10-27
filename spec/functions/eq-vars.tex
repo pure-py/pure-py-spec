@@ -7,5 +7,5 @@
 \eqVars{\Sigma}(\tyUnion{\sigma}{\tau}) &{}= \eqVars{\Sigma}(\sigma) \cup \eqVars{\Sigma}(\tau) \\*
 \eqVars{\Sigma}(C[\seq{\sigma}]) &{}= \textstyle\bigcup \set{\eqVars{\Sigma}(\sigma_i) \mid \beta_i \in \eqVars{\Sigma}(C)} \\*
 &\qquad \rlap{$\text{if } \eqVars{\Sigma}(C) \neq \top, \text{ where } \typeParams{\Sigma}(C) = \seq{\beta}$} \\*
-\eqVars{\Sigma}(\tau) &{}= \top && \quad (\text{otherwise}) \\*
+\eqVars{\Sigma}(\tau) &{}= \top && \quad (\text{otherwise}) \clausegap
 \eqVars{\Sigma}(C) &{}= \textstyle\bigcup_i \eqVars{\Sigma}(\tau_i) && \quad \text{where } \fields{\Sigma}(C) = \scheme{\seq{\beta}}{\bind{\seq{x}}{\seq{\tau}}}
