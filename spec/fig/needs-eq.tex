@@ -1,0 +1,63 @@
+\begin{figure}
+\begin{AddedBlock}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Sigma \vdash \tau \needsEq \xi$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{needs-eq-var}}]
+{ \strut }
+{ \Sigma \vdash \alpha \needsEq \alpha }
+\and
+\inferrule*[lab={\ruleName{needs-eq-callable}}]
+{ \strut }
+{ \Sigma \vdash \tyCallable{\seq{\tau}}{\tau} \needsEq \varepsilon }
+\and
+\inferrule*[lab={\ruleName{needs-eq-list}}]
+{ \Sigma \vdash \tau \needsEq \xi }
+{ \Sigma \vdash \tyList{\tau} \needsEq \xi }
+\and
+\inferrule*[lab={\ruleName{needs-eq-dict}}]
+{ \Sigma \vdash \tau \needsEq \xi }
+{ \Sigma \vdash \tyDict{\tau} \needsEq \xi }
+\and
+\inferrule*[lab={\ruleName{needs-eq-tuple}}]
+{ \Sigma \vdash \tau_i \needsEq \xi }
+{ \Sigma \vdash \tyTuple{\seq{\tau}} \needsEq \xi }
+\and
+\inferrule*[lab={\ruleName{needs-eq-union-left}}]
+{ \Sigma \vdash \sigma \needsEq \xi }
+{ \Sigma \vdash \tyUnion{\sigma}{\tau} \needsEq \xi }
+\and
+\inferrule*[lab={\ruleName{needs-eq-union-right}}]
+{ \Sigma \vdash \tau \needsEq \xi }
+{ \Sigma \vdash \tyUnion{\sigma}{\tau} \needsEq \xi }
+\and
+\inferrule*[lab={\ruleName{needs-eq-instance}}]
+{ \typeParams{\Sigma}(C) = \seq{\alpha} \\ \Sigma \vdash C \needsEq \alpha_i \\ \Sigma \vdash \sigma_i \needsEq \xi }
+{ \Sigma \vdash C[\seq{\sigma}] \needsEq \xi }
+\and
+\inferrule*[lab={\ruleName{needs-eq-instance-callable}}]
+{ \Sigma \vdash C \needsEq \varepsilon }
+{ \Sigma \vdash C[\seq{\sigma}] \needsEq \varepsilon }
+\end{mathpar}
+\subcaption{Equality at type $\tau$ needs equality at type variable $\xi$, or at a callable type if $\xi$ is $\varepsilon$}
+\label{fig:needs-eq-type}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Sigma \vdash C \needsEq \xi$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{needs-eq-class}}]
+{ \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} \\ \Sigma \vdash \tau_i \needsEq \xi }
+{ \Sigma \vdash C \needsEq \xi }
+\end{mathpar}
+\subcaption{Equality at class $C$ needs equality at its type parameter $\xi$, or at a callable type if $\xi$ is $\varepsilon$}
+\label{fig:needs-eq-class}
+\end{subfigure}
+\caption{Types compared by structural equality}
+\label{fig:needs-eq}
+\end{AddedBlock}
+\end{figure}

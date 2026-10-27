@@ -11,8 +11,8 @@ $\Sigma; \Gamma \vdash k, p \matches K, L$ & pattern $p$ matches shapes $K$ of $
 $\Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L$ & patterns $\seq{p}$ match shapes $K$ of $\seq{k}$, leaving $L$ & \figref{typing-pat-seq} \\
 $\Sigma; \Gamma \vdash L, p \matches K, L'$ & pattern $p$ matches shapes $K$ of $L$, leaving $L'$ & \figref{typing-pat-set} \\
 $\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$ & $C[\seq{\sigma}]$ is the instance of $C$ at $\tau$ & \figref{instance} \\
-\added{$\Sigma \vdash \tau \compares \xi$} & \added{equality at $\tau$ depends on equality at type variable $\xi$, or at a callable type if $\xi$ is $\varepsilon$} & \added{\figref{compares-type}} \\
-\added{$\Sigma \vdash C \compares \xi$} & \added{equality at class $C$ depends on equality at its type parameter $\xi$, or at a callable type if $\xi$ is $\varepsilon$} & \added{\figref{compares-class}} \\
+\added{$\Sigma \vdash \tau \needsEq \xi$} & \added{equality at $\tau$ needs equality at type variable $\xi$, or at a callable type if $\xi$ is $\varepsilon$} & \added{\figref{needs-eq-type}} \\
+\added{$\Sigma \vdash C \needsEq \xi$} & \added{equality at class $C$ needs equality at its type parameter $\xi$, or at a callable type if $\xi$ is $\varepsilon$} & \added{\figref{needs-eq-class}} \\
 $\Sigma; \Gamma \vdash p \checks \tau \binding \Delta$ & pattern $p$ checks against type $\tau$, binding $\Delta$ & \figref{checking-pat} \\
 $\Gamma \vdash q : \theta$ & name $q$ denotes context entry $\theta$ & \figref{resolve-name} \\
 $\Sigma; \Gamma \vdash \psi \synth \tau$ & type expression $\psi$ denotes type $\tau$ & \figref{resolve-type} \\
