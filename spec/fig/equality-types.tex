@@ -1,0 +1,63 @@
+\begin{figure}
+\begin{AddedBlock}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Sigma \vdash \tau \compares \xi$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{compares-var}}]
+{ \strut }
+{ \Sigma \vdash \alpha \compares \alpha }
+\and
+\inferrule*[lab={\ruleName{compares-callable}}]
+{ \strut }
+{ \Sigma \vdash \tyCallable{\seq{\tau}}{\tau} \compares \pyinline{Callable} }
+\and
+\inferrule*[lab={\ruleName{compares-list}}]
+{ \Sigma \vdash \tau \compares \xi }
+{ \Sigma \vdash \tyList{\tau} \compares \xi }
+\and
+\inferrule*[lab={\ruleName{compares-dict}}]
+{ \Sigma \vdash \tau \compares \xi }
+{ \Sigma \vdash \tyDict{\tau} \compares \xi }
+\and
+\inferrule*[lab={\ruleName{compares-tuple}}]
+{ \Sigma \vdash \tau_i \compares \xi }
+{ \Sigma \vdash \tyTuple{\seq{\tau}} \compares \xi }
+\and
+\inferrule*[lab={\ruleName{compares-union-left}}]
+{ \Sigma \vdash \sigma \compares \xi }
+{ \Sigma \vdash \tyUnion{\sigma}{\tau} \compares \xi }
+\and
+\inferrule*[lab={\ruleName{compares-union-right}}]
+{ \Sigma \vdash \tau \compares \xi }
+{ \Sigma \vdash \tyUnion{\sigma}{\tau} \compares \xi }
+\and
+\inferrule*[lab={\ruleName{compares-instance}}]
+{ \typeParams{\Sigma}(C) = \seq{\alpha} \\ \Sigma \vdash C \compares \alpha_i \\ \Sigma \vdash \sigma_i \compares \xi }
+{ \Sigma \vdash C[\seq{\sigma}] \compares \xi }
+\and
+\inferrule*[lab={\ruleName{compares-instance-callable}}]
+{ \Sigma \vdash C \compares \pyinline{Callable} }
+{ \Sigma \vdash C[\seq{\sigma}] \compares \pyinline{Callable} }
+\end{mathpar}
+\subcaption{Type $\tau$ compares type variable $\xi$, or functions when $\xi$ is \pyinline{Callable} (inductive)}
+\label{fig:compares-type}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Sigma \vdash C \compares \xi$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{compares-class}}]
+{ \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} \\ \Sigma \vdash \tau_i \compares \xi }
+{ \Sigma \vdash C \compares \xi }
+\end{mathpar}
+\subcaption{Class $C$ compares type parameter $\xi$, or functions when $\xi$ is \pyinline{Callable} (inductive)}
+\label{fig:compares-class}
+\end{subfigure}
+\caption{Comparisons by structural equality}
+\label{fig:compares}
+\end{AddedBlock}
+\end{figure}
