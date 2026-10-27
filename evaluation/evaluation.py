@@ -21,6 +21,7 @@ from evaluation_benchmarks import BENCHMARKS, HumanEval, Problem, Verdict, encod
 
 
 ROOT = Path(__file__).resolve().parent
+DEFINITION_PATH = ROOT / "prompts/purepy-v0.22.3.md"
 CHECKER_VERSION = "0.22.3"
 CHECKER_SHA = "cd59f9e8656d2b617954caaf60bdb89d91ccc9cbee830d63977e8abf8a857c27"
 CONDITIONS = ("python", "purepy")
@@ -123,10 +124,13 @@ def output_instruction(condition):
             "Do not include Markdown fences, comments, a test runner or example calls.")
 
 
-def prompt(task: Problem, condition):
+def prompt(task: Problem, condition, definition=None):
     common = ("Preserve the required function name, parameters, return behaviour and input domain. "
               "Include necessary imports and helpers.\n\n")
-    definition = (ROOT / "prompts/purepy-v0.22.3.md").read_text() if condition == "purepy" else ""
+    if condition == "purepy":
+        definition = DEFINITION_PATH.read_text() if definition is None else definition
+    else:
+        definition = ""
     return (("Solve this task in PurePy.\n" if condition == "purepy" else "Solve this task in Python.\n")
             + common + definition + "\nTask:\n" + task.question
             + "\n\nRequired function interface:\n" + task.signature
@@ -300,12 +304,24 @@ def check(code) -> Verdict:
                        failure_mode=failure_category(code, error, result.returncode) if passed is False else None)
 
 
-def validate_backend(benchmark):
+def validate_prompt_examples(definition):
+    examples = re.findall(r"^```python[ \t]*\n(.*?)^```[ \t]*$", definition, re.MULTILINE | re.DOTALL)
+    openings = re.findall(r"^```python[ \t]*$", definition, re.MULTILINE)
+    if not examples or len(examples) != len(openings):
+        raise RuntimeError("PurePy definition must contain complete Python code examples")
+    for index, source in enumerate(examples, 1):
+        verdict = check(source)
+        if verdict.passed is not True or verdict.tooling_error:
+            raise RuntimeError(f"PurePy prompt example {index} fails the checker: {verdict.error}")
+    print(f"Validated {len(examples)} PurePy prompt examples", flush=True)
+
+
+def validate_backend(benchmark, definition=None):
     if sys.version_info[:2] != (3, 12) or version("purepy") != CHECKER_VERSION:
         raise RuntimeError("the pipeline requires Python 3.12 and the pinned PurePy wheel")
-    accepted = check("def probe(x: int) -> int:\n    return x\n")
+    validate_prompt_examples(DEFINITION_PATH.read_text() if definition is None else definition)
     rejected = check("def probe(x: int) -> int:\n    for i in range(0, x):\n        pass\n    return x\n")
-    if accepted.passed is not True or rejected.passed is not False:
+    if rejected.passed is not False:
         raise RuntimeError("checker health check failed")
     program = "def probe():\n    return 1\nassert probe() == 1\n"
     sandbox = HumanEval().sandbox({"program": program}, 3)
@@ -380,8 +396,8 @@ def pack_solution(attempts: list[Attempt], initial_prompt, condition, repair_rou
             "rounds_to_acceptance": next((a.round for a in attempts if a.checker.passed is True), None)}
 
 
-def attempt_solution(args, task: Problem, condition, persist=None):
-    initial_prompt = prompt(task, condition)
+def attempt_solution(args, task: Problem, condition, persist=None, *, definition=None):
+    initial_prompt = prompt(task, condition, definition)
     messages = [{"role": "user", "content": initial_prompt}]
     attempts = []
     for round_index in range(1 + (args.repair_rounds if condition == "purepy" else 0)):
@@ -673,7 +689,8 @@ def run(args):
     problems, manifest = args.benchmark.load(args.limit, args.difficulty, getattr(args, "all_problems", False))
     if not problems:
         raise RuntimeError("the selection contains no problems")
-    validate_backend(args.benchmark)
+    definition = DEFINITION_PATH.read_text()
+    validate_backend(args.benchmark, definition)
     validate_problems(problems, args.benchmark)
     if not args.base_url:
         args.base_url = {"openai": "http://127.0.0.1:11434/v1", "deepseek": "https://api.deepseek.com",
@@ -692,7 +709,7 @@ def run(args):
     data = {"benchmark": args.benchmark.name,
             "model": args.model, "manifest": manifest, "tasks": {},
             "protocol": {"checker_version": CHECKER_VERSION, "wheel_sha256": CHECKER_SHA,
-                         "definition_sha256": sha((ROOT / "prompts/purepy-v0.22.3.md").read_bytes()),
+                         "definition_sha256": sha(definition.encode()),
                          "prompt_version": OUTPUT_FORMAT_VERSION, "output_format": OUTPUT_FORMAT_VERSION,
                          "python": sys.version.split()[0], "platform": sys.platform,
                          "provider": args.provider, "base_url": args.base_url, "max_tokens": args.max_tokens,
@@ -713,7 +730,7 @@ def run(args):
                     save(path, data)
                     export_code(path, task_id, condition, solution)
 
-                solution = attempt_solution(args, task, condition, persist)
+                solution = attempt_solution(args, task, condition, persist, definition=definition)
                 data["tasks"][task_id][condition] = solution
                 save(path, data)
                 print(f"{task_id} {condition}: checker={solution['checker'].passed} "

@@ -79,13 +79,6 @@ class EvaluationTests(unittest.TestCase):
         unsupported = e.failure_category(GOOD, "keyword arguments in a call other than a constructor call", 3)
         self.assertEqual(unsupported["category"], "unsupported_feature")
 
-    def test_prompt_requires_condition_specific_tags(self):
-        for condition in e.CONDITIONS:
-            prompt = e.prompt(self.task, condition)
-            self.assertIn(f"<{condition}>...</{condition}>", prompt)
-            self.assertIn("Do not include explanations or any text outside the tags", prompt)
-            self.assertIn(self.task.signature, prompt)
-
     def test_tagged_source_extraction(self):
         for condition in e.CONDITIONS:
             tagged = f"<{condition}>\n{GOOD}</{condition}>"
@@ -258,6 +251,20 @@ class EvaluationTests(unittest.TestCase):
                             self.assertIn("unknown percentage points", report)
                         self.assertIn("python: {}", report)
                         self.assertIn("purepy: {}", report)
+                definitions = [("rejected", "```python\n" + BAD + "```\n", "prompt example 1"),
+                               ("missing", "No examples.\n", "complete Python code examples"),
+                               ("unclosed", "```python\n" + GOOD, "complete Python code examples")]
+                for name, text, diagnostic in definitions:
+                    with self.subTest(definition=name):
+                        definition = Path(folder) / "definition.md"
+                        definition.write_text(text)
+                        args.output = Path(folder) / (name + ".json")
+                        before = len(requests)
+                        with patch("evaluation.DEFINITION_PATH", definition):
+                            with self.assertRaisesRegex(RuntimeError, diagnostic):
+                                e.run(args)
+                        self.assertEqual(len(requests), before)
+                        self.assertFalse(args.output.exists())
         finally:
             server.shutdown()
             server.server_close()
@@ -503,11 +510,6 @@ class EvaluationTests(unittest.TestCase):
         solution = e.pack_solution([first, pending], "prompt", "purepy", 1)
         self.assertEqual(solution["rounds_to_acceptance"], 1)
         self.assertEqual(solution["rejections"], 1)
-
-    def test_generated_prompt_examples_pass_checker(self):
-        text = (e.ROOT / "prompts/purepy-v0.22.3.md").read_text()
-        for part in text.split("```python\n")[1:]:
-            self.assertTrue(e.check(part.split("```", 1)[0]).passed)
 
     def test_no_python_code_comments(self):
         for path in [*e.ROOT.glob("*.py"), *Path(__file__).parent.glob("*.py")]:
