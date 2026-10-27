@@ -8,7 +8,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 from enum import IntEnum, StrEnum
 from typing import NamedTuple
 
@@ -72,15 +72,8 @@ def run(cmd: list[str], cwd: pathlib.Path | None = None) -> "subprocess.Complete
     return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=False)
 
 
-class Runner:
-    def __init__(
-        self, interpreter: str | None, type_checker: list[str] | None, messages: bool
-    ) -> None:
-        self.interpreter = interpreter  # None: tests not run
-        self.type_checker = (
-            type_checker  # command given the test path; None: the reference type checker
-        )
-        self.messages = messages  # type checker reports the reference type checker's messages
+class Results:
+    def __init__(self) -> None:
         self.passed = 0
         self.failed: list[str] = []
         self.failures: list[str] = []
@@ -101,6 +94,26 @@ class Runner:
         else:
             self.passed += 1
             print(f"  {GREEN}✓{RESET} {label}")
+
+    def summary(self) -> None:
+        total = self.passed + len(self.failed)
+        print()
+        if self.failed:
+            print(f"{RED}✗ {self.passed}/{total} passed, {len(self.failed)} failed{RESET}")
+        else:
+            print(f"{GREEN}✓ {total}/{total} passed{RESET}")
+
+
+class Runner(Results):
+    def __init__(
+        self, interpreter: str | None, type_checker: list[str] | None, messages: bool
+    ) -> None:
+        super().__init__()
+        self.interpreter = interpreter  # None: tests not run
+        self.type_checker = (
+            type_checker  # command given the test path; None: the reference type checker
+        )
+        self.messages = messages  # type checker reports the reference type checker's messages
 
     def check(self, path: pathlib.Path, exit: Exit, error_checked: bool) -> list[str]:
         """Each test is checked in a separate directory, so other tests can't interfere. Single-module tests
@@ -184,14 +197,6 @@ class Runner:
                     last = header
                 self.record(test.relative_to(suite), failures)
 
-    def summary(self) -> None:
-        total = self.passed + len(self.failed)
-        print()
-        if self.failed:
-            print(f"{RED}✗ {self.passed}/{total} passed, {len(self.failed)} failed{RESET}")
-        else:
-            print(f"{GREEN}✓ {total}/{total} passed{RESET}")
-
 
 def compare_known_failures(failed: list[str], known_failures: pathlib.Path, update: bool) -> bool:
     """Whether the failures are exactly those listed; with update, rewrite the list instead."""
@@ -230,7 +235,7 @@ def suite() -> Iterator[pathlib.Path]:
         yield path
 
 
-def main() -> None:
+def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="purepy-conformance")
     parser.add_argument("interpreter", nargs="?", default="python3")
     parser.add_argument(
@@ -257,7 +262,7 @@ def main() -> None:
     parser.add_argument(
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     r = Runner(
         None if args.no_run else args.interpreter,
         shlex.split(args.type_checker) if args.type_checker else None,
