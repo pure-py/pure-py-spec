@@ -205,26 +205,9 @@ The \ruleName{binop} and \ruleName{unop} rules (\specfigref{typing-synth}) take 
 of the most specific overload at the operand types, $\resolveOp{\Sigma}$\speconly{ (\S\ref{aux:resolve-op})}, so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
 
-\speconly{\begin{DeletedBlock}
-\begin{specdefinition}{Equality type}
-The values of an \emph{equality type} are compared by structural equality, which is defined except at the dynamically excluded comparisons (\secref{no-coercions}):
-\begin{defalign}
-& \Sigma \vdash \nu \eqType \\
-& \Sigma \vdash \tyLiteral{\ell} \eqType \\
-& \Sigma \vdash \tyList{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \\
-& \Sigma \vdash \tyDict{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \\
-& \Sigma \vdash \tyTuple{\seq{\tau}} \eqType && \qquad\quad \text{if } \Sigma \vdash \tau_i \eqType \quad (\forall i) \\
-& \Sigma \vdash \tyUnion{\sigma}{\tau} \eqType && \qquad\quad \text{if } \Sigma \vdash \sigma \eqType \text{ and } \Sigma \vdash \tau \eqType \\
-& \Sigma \vdash C[\seq{\sigma}] \eqType && \qquad\quad \text{if } \Sigma \vdash \tau \eqType \text{ for each } \bind{x}{\tau} \in \tyInst{\fields{\Sigma}(C)}{\seq{\sigma}}
-\end{defalign}
-\end{specdefinition}
-\end{DeletedBlock}}
-
 \speconly{\specinput{spec/fig/needs-eq}}
 
-\speconly{\begin{AddedBlock}
-The values of an \emph{equality type} are compared by structural equality, which is defined except at the dynamically excluded comparisons (\secref{no-coercions}). The judgement $\Sigma \vdash \tau \needsEq \xi$ (\figref{needs-eq-type}) states that equality at $\tau$ needs equality at type variable $\xi$, or at a callable type when $\xi$ is $\varepsilon$. A type $\tau$ is an equality type if $\Sigma \vdash \tau \needsEq \xi$ does not hold for any $\xi$. The judgement $\Sigma \vdash C \needsEq \xi$ (\figref{needs-eq-class}) states the same of class $C$, where $\xi$ is a type parameter of $C$ or $\varepsilon$, by the field types of $C$. For example, a class $C$ with type parameter $\alpha$ and a single field of type $\tyUnion{C[\alpha]}{\tyNone}$, which mentions $C$ through a type alias, does not need equality at $\alpha$ or at a callable type, so $C[\sigma]$ is an equality type for every $\sigma$.
-\end{AddedBlock}}
+\speconly{The values of an \emph{equality type} are compared by structural equality, which is defined except at the dynamically excluded comparisons (\secref{no-coercions}). The judgement $\Sigma \vdash \tau \needsEq \xi$ (\figref{needs-eq-type}) states that equality at $\tau$ needs equality at type variable $\xi$, or at a callable type when $\xi$ is $\varepsilon$. A type $\tau$ is an equality type if $\Sigma \vdash \tau \needsEq \xi$ does not hold for any $\xi$. The judgement $\Sigma \vdash C \needsEq \xi$ (\figref{needs-eq-class}) states the same of class $C$, where $\xi$ is a type parameter of $C$ or $\varepsilon$, by the field types of $C$. For example, a class $C$ with type parameter $\alpha$ and a single field of type $\tyUnion{C[\alpha]}{\tyNone}$, which mentions $C$ through a type alias, does not need equality at $\alpha$ or at a callable type, so $C[\sigma]$ is an equality type for every $\sigma$.}
 
 \speconly{Callable types are not equality types, and neither are types with a callable component, so
 comparisons of functions are rejected statically. Type variables are not equality types either, since they may stand for any type.}\speconly{ The final rule of each table closes the

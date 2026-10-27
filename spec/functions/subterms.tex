@@ -4,5 +4,5 @@
 \subterms(\tyTuple{\seq{\tau}}) &{}= \set{\tyTuple{\seq{\tau}}} \cup \subterms(\seq{\tau}) \\*
 \subterms(\tyCallable{\seq{\tau}}{\tau}) &{}= \set{\tyCallable{\seq{\tau}}{\tau}} \cup \subterms(\seq{\tau}) \cup \subterms(\tau) \\*
 \subterms(C[\seq{\tau}]) &{}= \set{C[\seq{\tau}]} \cup \subterms(\seq{\tau}) \\*
-\subterms(\tau) &{}= \set{\tau} && \quad \replaced{(\text{otherwise})}{\text{otherwise} } \clausegap
+\subterms(\tau) &{}= \set{\tau} && \quad (\text{otherwise}) \clausegap
 \subterms(\seq{\tau}) &{}= \subterms(\tau_1) \cup \cdots \cup \subterms(\tau_n)

@@ -5,6 +5,6 @@
 \shapes{\Sigma}(\tyNone, H) &{}= \varnothing && \quad \text{if } \pyinline{None} \in H \\*
 \shapes{\Sigma}(C[\seq{\tau}], H) &{}= \varnothing && \quad \text{if } H \cap \ancestors{\Sigma}(C) \neq \varnothing \\*
 \shapes{\Sigma}(\tyNever, H) &{}= \varnothing \\*
-\shapes{\Sigma}(\tyDict{\tau}, H) &{}= \set{\shapeDict{\tau}{\varnothing}{\replaced{\varnothing}{H }}} \\*
+\shapes{\Sigma}(\tyDict{\tau}, H) &{}= \set{\shapeDict{\tau}{\varnothing}{\varnothing}} \\*
 \shapes{\Sigma}(\tau, H) &{}= \set{\shapeAny{\tau}{H}} && \quad \text{otherwise} \clausegap
 \shapes{\Sigma}(\seq{\tau}) &{}= \shapes{\Sigma}(\tau_1, \varnothing) \times \cdots \times \shapes{\Sigma}(\tau_n, \varnothing)

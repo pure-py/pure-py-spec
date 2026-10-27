@@ -42,18 +42,18 @@
   q' = x \cons \seq{x} \\
   q \not\properPrefixOf q' \\
   \Sigma \vdash_{\mathsf{mod}} x : \Delta \binding \Sigma_1 \\
-  \Sigma_1 \vdash_{\mathsf{sub}} \replaced{x, \Delta}{\modLoaded{x}{\Delta} }, \seq{x} : \replaced{\Delta'}{\theta } \binding \Sigma_2 \\
+  \Sigma_1 \vdash_{\mathsf{sub}} x, \Delta, \seq{x} : \Delta' \binding \Sigma_2 \\
   \Sigma_2; q \vdash \seq{\iota} : \Gamma \binding \Sigma'
 }
 {
-  \Sigma; q \vdash \exImport{q'} \cons \seq{\iota} : \set{\bind{x}{\replaced{\modLoaded{x}{\Delta'}}{\theta }}} \extend \Gamma \binding \Sigma'
+  \Sigma; q \vdash \exImport{q'} \cons \seq{\iota} : \set{\bind{x}{\modLoaded{x}{\Delta'}}} \extend \Gamma \binding \Sigma'
 }
 \and
 \inferrule*[lab={\ruleName{from-import}}]
 {
   x_1, \ldots, x_{n+1} \text{ distinct} \\
   \Sigma \vdash_{\mathsf{mod}} q' : \Delta \binding \Sigma_0 \\
-  q^\dagger_1 \cons \cdots \cons q^\dagger_m = \replaced{\uniqueTo(q', q)}{\containing(q, q') } \\
+  q^\dagger_1 \cons \cdots \cons q^\dagger_m = \uniqueTo(q', q) \\
   \Sigma_{j-1} \vdash_{\mathsf{mod}} q^\dagger_j : \Delta_j \binding \Sigma_j \quad (\forall j) \\
   \Sigma_{m+i-1} \vdash \Delta, x_i \importsR \theta_i \binding \Sigma_{m+i} \quad (\forall i) \\
   \Sigma_{m+n+1}; q \vdash \seq{\iota} : \Gamma \binding \Sigma'
@@ -69,7 +69,7 @@
 \vspace{2mm}
 
 \begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Sigma \vdash_{\mathsf{sub}} \replaced{q, \Gamma}{\theta }, \seq{x} : \replaced{\Gamma'}{\theta' } \binding \Sigma'$}
+\flushleft \shadebox{$\Sigma \vdash_{\mathsf{sub}} q, \Gamma, \seq{x} : \Gamma' \binding \Sigma'$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{submodules-nil}}]
@@ -77,19 +77,19 @@
   \strut
 }
 {
-  \Sigma \vdash_{\mathsf{sub}} \replaced{q, \Gamma}{\theta }, \varepsilon : \replaced{\Gamma}{\theta } \binding \Sigma
+  \Sigma \vdash_{\mathsf{sub}} q, \Gamma, \varepsilon : \Gamma \binding \Sigma
 }
 \and
 \inferrule*[lab={\ruleName{submodules-cons}}]
 {
-  \Sigma \vdash_{\mathsf{mod}} q.x : \replaced{\Delta}{\Gamma' } \binding \Sigma^\dagger \\
-  \Sigma^\dagger \vdash_{\mathsf{sub}} \replaced{q.x, \Delta}{\modLoaded{q.x}{\Gamma'} }, \seq{x} : \replaced{\Delta'}{\theta' } \binding \Sigma'
+  \Sigma \vdash_{\mathsf{mod}} q.x : \Delta \binding \Sigma^\dagger \\
+  \Sigma^\dagger \vdash_{\mathsf{sub}} q.x, \Delta, \seq{x} : \Delta' \binding \Sigma'
 }
 {
-  \Sigma \vdash_{\mathsf{sub}} \replaced{q, \Gamma}{\modLoaded{q}{\Gamma} }, x \cons \seq{x} : \replaced{\Gamma \extend \set{\bind{x}{\modLoaded{q.x}{\Delta'}}}}{\modLoaded{q}{\Gamma \extend \set{\bind{x}{\theta'}}} } \binding \Sigma'
+  \Sigma \vdash_{\mathsf{sub}} q, \Gamma, x \cons \seq{x} : \Gamma \extend \set{\bind{x}{\modLoaded{q.x}{\Delta'}}} \binding \Sigma'
 }
 \end{mathpar}
-\subcaption{\replaced{Submodule chain $\seq{x}$ extends signature $\Gamma$ of module $q$ to $\Gamma'$}{Checked module $\theta$ with submodule chain $\seq{x}$ gives $\theta'$ }}
+\subcaption{Submodule chain $\seq{x}$ extends signature $\Gamma$ of module $q$ to $\Gamma'$}
 \end{subfigure}
 \caption{Import typing}
 \label{fig:typing-import-prefix}
