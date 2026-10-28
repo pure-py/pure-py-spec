@@ -143,11 +143,11 @@ variables $\alpha$; the rules of \specfigref{resolve-type} resolve type expressi
 types and dataclass fields are annotated with type expressions, and so are variable declarations
 $x\exAnnot{\psi}$, with or without an initial assignment; later assignments to a declared variable are not
 annotated. \emph{Schemes} $\pi$ (\figref{syntax-types}) bind type parameters $\seq{\alpha}$: a \emph{type scheme} binds
-them in a type, for functions, and a \emph{field scheme} in a sequence of typed fields, for classes. Schemes are
+type parameters in a type, for functions, and a \emph{field scheme} in a sequence of typed fields, for classes. Schemes are
 instantiated by substituting types for the type parameters (\specref{sec:type-annotations}), and schemes without
 type parameters are their bodies. Metavariables $\odot$ and $\ominus$ range over binary and unary operators,
 whose precedence and associativity are given in \specfigref{precedence}; \pyinline{and} and \pyinline{or} are
-separate expression forms, since they need not evaluate both operands.
+dedicated expression forms, since they need not evaluate both operands.
 \end{AddedBlock}
 
 \subsection{Modules and programs}
