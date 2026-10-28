@@ -138,8 +138,9 @@ corresponding field.
 
 \paragraph{Types and schemes.}
 
-\figref{syntax-types} gives the syntax of types $\tau$, familiar from mypy, and of schemes $\pi$.
-\emph{Type expressions} $\psi$ are expressions which denote types; they have the form of types, except that where types have \emph{instantiated classes} $C[\seq{\tau}]$ and type variables $\alpha$,
+\figref{syntax-types} gives the syntax of types $\tau$, familiar from the Python typing specification, and of
+schemes $\pi$. \emph{Type expressions} $\psi$, omitted from the figure, are expressions which denote types; they
+have the form of types, except that where types have \emph{instantiated classes} $C[\seq{\tau}]$ and type variables $\alpha$,
 type expressions have qualified names applied to type arguments, $q[\seq{\psi}]$, naming a class, type alias or type
 parameter; the rules of \specfigref{resolve-type} resolve type expressions to types. Parameters, return
 types and dataclass fields are annotated with type expressions, and so are variable declarations
