@@ -45,8 +45,9 @@ whether its interface is fully annotated with types PurePy can express, so resul
 can be split by that property. Before any model call, a run checks the
 pinned checker and the sandbox, and then every selected problem: its reference
 solution must pass the official tests and an answer returning `None` must fail
-them. `--repair-rounds 0`, the default,
-is single-shot. With repair rounds, PurePy checker rejections are fed back to
+them. `scripts/evaluate.sh` also runs the retained tests before starting the
+experiment; a test failure stops it before the experiment's model calls.
+`--repair-rounds 0`, the default, is single-shot. With repair rounds, PurePy checker rejections are fed back to
 the model, never test outcomes; repair stops at acceptance or the budget. Python
 answers get no feedback. Every raw answer, extracted source, verdict, rejection
 and token count is kept, and reports distinguish initial from repaired results.

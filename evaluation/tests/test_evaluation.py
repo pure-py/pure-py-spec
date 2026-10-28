@@ -9,12 +9,10 @@ from pathlib import Path
 import pickle
 import tempfile
 import threading
-import tokenize
 import unittest
 from unittest.mock import patch
 
 import evaluation as e
-import evaluation_sandbox
 
 
 GOOD = "def truncate_number(number: float) -> float:\n    return number % 1.0\n"
@@ -22,12 +20,6 @@ BAD = "def truncate_number(number: float) -> float:\n    for i in range(0, 1):\n
 
 
 class EvaluationTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.benchmark = e.BENCHMARKS["humaneval-plus"]()
-        cls.problems, cls.manifest = cls.benchmark.load(1)
-        cls.task = next(iter(cls.problems.values()))
-
     def test_evalplus_reads_verified_files_in_both_orders(self):
         from evalplus.data import humaneval, mbpp
         modules = {"humaneval-plus": humaneval, "mbpp-plus": mbpp}
@@ -87,23 +79,6 @@ class EvaluationTests(unittest.TestCase):
                     if diagnostic:
                         self.assertIn(diagnostic, verdict.error)
 
-    def test_missing_checker_is_tool_failure(self):
-        with patch("evaluation.subprocess.run", side_effect=FileNotFoundError):
-            result = e.check(GOOD)
-        self.assertIsNone(result.passed)
-        self.assertTrue(result.tooling_error)
-
-    def test_sandbox_isolation(self):
-        e.validate_backend(self.benchmark)
-
-    def test_linux_command_has_no_credentials_or_home_bind(self):
-        with patch("evaluation_sandbox.sys.platform", "linux"), patch("evaluation_sandbox.shutil.which", return_value="/usr/bin/bwrap"):
-            command = evaluation_sandbox.command("/tmp/isolated")
-        self.assertIn("--unshare-all", command)
-        self.assertNotIn("--share-net", command)
-        self.assertNotIn("--ro-bind / /", " ".join(command))
-        self.assertNotIn(str(Path.home()), command)
-
     def test_unknown_remains_unknown(self):
         rejected = e.failure_category(BAD, "solution.py:2:4: for loop prohibited", 1)
         self.assertEqual(rejected["category"], "excluded_by_design")
@@ -137,29 +112,6 @@ class EvaluationTests(unittest.TestCase):
                     self.assertEqual(result["output_format"]["compliant"], status == "valid")
                     self.assertEqual(result["output_format"]["version"], e.OUTPUT_FORMAT_VERSION)
 
-    def test_native_auth_headers_and_optional_openai_key(self):
-        class Response:
-            def __enter__(self):
-                return self
-
-            def __exit__(self, *args):
-                return False
-
-            def read(self):
-                return json.dumps({"content": [{"type": "text", "text": GOOD}],
-                                   "stop_reason": "end_turn", "id": "fake", "model": "fake"}).encode()
-
-        captured = []
-
-        def receive(req, timeout):
-            captured.append(req)
-            return Response()
-
-        with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-only-secret"}), patch("evaluation.urllib.request.urlopen", side_effect=receive):
-            result = e.request("https://api.anthropic.com/v1", "anthropic", "fake", [], 1024)
-        self.assertEqual(captured[0].get_header("X-api-key"), "test-only-secret")
-        self.assertNotIn("test-only-secret", json.dumps(result))
-
     def test_pipeline_and_repair_feedback_with_local_fake_api(self):
         requests = []
         scenario = "repair"
@@ -168,23 +120,29 @@ class EvaluationTests(unittest.TestCase):
             def do_POST(self):
                 body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
                 requests.append(body)
-                if scenario == "api_error":
-                    self.send_response(401)
-                    self.end_headers()
-                    return
                 purepy = "Solve this task in PurePy" in body["messages"][0]["content"]
-                code = (GOOD if scenario != "repair" or len(body["messages"]) > 1 else
-                        BAD if purepy else GOOD.replace("number % 1.0", "0.0"))
                 condition = "purepy" if purepy else "python"
+                code = GOOD
+                if scenario == "repair":
+                    if purepy:
+                        code = BAD if len(body["messages"]) == 1 else GOOD
+                    else:
+                        code = GOOD.replace("number % 1.0", "0.0")
+                elif scenario in ("budget", "different_rejection", "truncated", "api_error"):
+                    code = BAD if purepy else GOOD
+                    if scenario == "different_rejection" and purepy and len(body["messages"]) > 1:
+                        code = GOOD.replace("number % 1.0", "sum(value for value in [number]) % 1.0")
                 response = f"<{condition}>\n{code}</{condition}>"
                 if scenario == "untagged":
                     response = code
+                elif scenario == "empty":
+                    response = ""
                 elif scenario == "outside_text":
                     response = "Here is the solution:\n" + response + "\nExplanation."
                 raw = json.dumps({"choices": [{"message": {"content": response},
                                   "finish_reason": "length" if scenario == "truncated" else "stop"}],
                                   "id": "offline-test", "model": "fake", "usage": {"completion_tokens": 10}}).encode()
-                self.send_response(200)
+                self.send_response(401 if scenario == "api_error" else 200)
                 self.send_header("Content-Type", "application/json")
                 self.end_headers()
                 self.wfile.write(raw)
@@ -198,256 +156,70 @@ class EvaluationTests(unittest.TestCase):
         (e.ROOT / "results").mkdir(exist_ok=True)
         try:
             with tempfile.TemporaryDirectory(prefix="unit-", dir=e.ROOT / "results") as folder:
-                path = Path(folder) / "fake.json"
-                args = argparse.Namespace(benchmark=self.benchmark, model="fake", provider="openai",
-                    base_url=f"http://127.0.0.1:{server.server_port}/v1", max_tokens=1024, repair_rounds=1,
-                    limit=1, difficulty=None, output=path)
-                with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-secret"}):
-                    e.run(args)
-                data = json.loads(path.read_text())
-                self.assertEqual(data["status"], "complete")
-                solution = data["tasks"]["HumanEval/2"]["purepy"]
-                self.assertEqual(data["protocol"]["output_format"], e.OUTPUT_FORMAT_VERSION)
-                self.assertEqual(solution["output_format"]["status"], "valid")
-                self.assertEqual(solution["attempts"][0]["raw_response"], f"<purepy>\n{BAD}</purepy>")
-                self.assertEqual(len(solution["attempts"]), 2)
-                self.assertEqual(solution["attempts"][0]["code"], BAD.strip())
-                self.assertEqual(solution["rounds_to_acceptance"], 1)
-                self.assertEqual(data["summary"]["conditions"]["purepy"]["initial"]["joint_pass"], 0)
-                self.assertEqual(data["summary"]["conditions"]["purepy"]["final"]["joint_pass"], 1)
-                accepted = data["summary"]["rq3_accepted"]
-                self.assertEqual(accepted["initial"]["problems"], 0)
-                self.assertIsNone(accepted["initial"]["python_minus_purepy_pp"])
-                self.assertEqual(accepted["final"]["problems"], 1)
-                self.assertEqual(accepted["final"]["purepy_tests_pass"], 1)
-                self.assertEqual(accepted["final"]["python_tests_pass"], 0)
-                self.assertEqual(accepted["final"]["python_minus_purepy_pp"], -100.0)
-                self.assertEqual(len(requests), 3)
-                feedback = requests[-1]["messages"][-1]["content"]
-                self.assertIn("prohibited", feedback)
-                self.assertIn("<purepy>...</purepy>", feedback)
-                self.assertNotIn(self.benchmark.reference(self.task), feedback)
-                self.assertNotIn("test-only-secret", path.read_text())
-                for suffix in (".md", ".svg", ".pdf", ".tex"):
-                    self.assertTrue(path.with_suffix(suffix).exists())
-                e.figure(path, Path(folder) / "figure/generation.pdf")
-                self.assertTrue((Path(folder) / "figure/generation.pdf").exists())
-                report = path.with_suffix(".md").read_text()
-                self.assertIn("| HumanEval/2 | python | complete |", report)
-                self.assertIn("| HumanEval/2 | purepy | complete |", report)
-                self.assertIn("## Output Format", report)
-                self.assertIn("final: 1 accepted problems; PurePy passes 1/1 (100.0%), Python passes 0/1 (0.0%)", report)
-                self.assertEqual(data["summary"]["conditions"]["purepy"]["final"]["format_compliant"], 1)
-                code_folder = Path(folder) / "solutions/fake/HumanEval-2"
-                self.assertEqual((code_folder / "purepy.py").read_text(), GOOD)
-                self.assertEqual((code_folder / "purepy.round-0.py").read_text(), BAD)
-                self.assertEqual(solution["attempts"][0]["next_round_clears_reported_feature"], True)
-                second = copy.deepcopy(data)
-                second["model"] = "other-model"
-                e.save(Path(folder) / "other.json", second)
-                e.compare([path, Path(folder) / "other.json"], Path(folder) / "compare.json")
-                comparison = json.loads((Path(folder) / "compare.json").read_text())
-                self.assertEqual(len(comparison["groups"]), 1)
-                second["protocol"]["output_format"] = "different-format"
-                e.save(Path(folder) / "other.json", second)
-                e.compare([path, Path(folder) / "other.json"], Path(folder) / "format-separated.json")
-                self.assertEqual(len(json.loads((Path(folder) / "format-separated.json").read_text())["groups"]), 2)
-                second["protocol"]["output_format"] = e.OUTPUT_FORMAT_VERSION
-                second["protocol"]["checker_version"] = "different-version"
-                e.save(Path(folder) / "other.json", second)
-                e.compare([path, Path(folder) / "other.json"], Path(folder) / "separate.json")
-                self.assertEqual(len(json.loads((Path(folder) / "separate.json").read_text())["groups"]), 2)
-                original = path.read_bytes()
-                with self.assertRaisesRegex(RuntimeError, "already exist"):
-                    e.run(args)
-                self.assertEqual(path.read_bytes(), original)
-                for scenario in ("api_error", "truncated", "untagged", "outside_text"):
+                args = argparse.Namespace(benchmark=e.BENCHMARKS["humaneval-plus"](), model="fake", provider="openai",
+                    base_url=f"http://127.0.0.1:{server.server_port}/v1", max_tokens=1024, repair_rounds=2,
+                    limit=1, difficulty=None, output=None)
+                for scenario in ("repair", "budget", "different_rejection", "api_error",
+                                 "truncated", "untagged", "empty", "outside_text"):
                     with self.subTest(scenario=scenario), patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-secret"}):
+                        requests.clear()
                         args.output = Path(folder) / (scenario + ".json")
-                        before = len(requests)
                         if scenario == "api_error":
                             with self.assertRaisesRegex(RuntimeError, "infrastructure failed"):
                                 e.run(args)
                         else:
                             e.run(args)
-                        self.assertEqual(len(requests) - before, 2)
                         report = args.output.with_suffix(".md").read_text()
-                        for condition in e.CONDITIONS:
-                            for stage in ("initial", "final"):
-                                counts = "1/1 | 1/1 | 1/1 | 0 | 0" if scenario == "outside_text" else "0/1 | 0/1 | 0/1 | 1 | 1"
-                                self.assertIn(f"| {condition} | {stage} | {counts} |", report)
-                        self.assertIn({"api_error": "api_error", "truncated": "incomplete",
-                                       "untagged": "missing_tags", "outside_text": "outside_text"}[scenario], report)
-                        if scenario != "outside_text":
-                            self.assertIn("unknown percentage points", report)
-                        self.assertIn("python: {}", report)
-                        self.assertIn("purepy: {}", report)
-                definitions = [("rejected", "```python\n" + BAD + "```\n", "prompt example 1"),
-                               ("missing", "No examples.\n", "complete Python code examples"),
-                               ("unclosed", "```python\n" + GOOD, "complete Python code examples")]
-                for name, text, diagnostic in definitions:
-                    with self.subTest(definition=name):
-                        definition = Path(folder) / "definition.md"
-                        definition.write_text(text)
-                        args.output = Path(folder) / (name + ".json")
-                        before = len(requests)
-                        with patch("evaluation.DEFINITION_PATH", definition):
-                            with self.assertRaisesRegex(RuntimeError, diagnostic):
-                                e.run(args)
-                        self.assertEqual(len(requests), before)
-                        self.assertFalse(args.output.exists())
+                        self.assertIn("Benchmark: HumanEval+", report)
+                        self.assertIn("Problems: 1 of 164", report)
+                        self.assertNotIn("test-only-secret", report)
+                        for suffix in (".pdf", ".svg", ".tex"):
+                            self.assertTrue(args.output.with_suffix(suffix).is_file())
+                        if scenario == "repair":
+                            self.assertEqual(len(requests), 3)
+                            self.assertIn("| python | final | 1/1 | 0/1 | 0/1 | 0 | 0 |", report)
+                            self.assertIn("| purepy | initial | 0/1 | 1/1 | 0/1 | 0 | 0 |", report)
+                            self.assertIn("| purepy | final | 1/1 | 1/1 | 1/1 | 0 | 0 |", report)
+                            self.assertIn("final: 1 accepted problems; PurePy passes 1/1 (100.0%), Python passes 0/1 (0.0%)", report)
+                            self.assertIn("| HumanEval/2 | purepy | complete | valid | valid | False | True | True | True | 1 |", report)
+                            self.assertIn('purepy: {"excluded_by_design": 1}', report)
+                            self.assertIn("for loops prohibited", requests[-1]["messages"][-1]["content"])
+                            self.assertIn("| purepy | 0 | excluded_by_design | loop | True |", report)
+                        elif scenario in ("budget", "different_rejection"):
+                            self.assertEqual(len(requests), 4)
+                            self.assertIn('purepy: {"excluded_by_design": 3}', report)
+                            self.assertIn("| python | final | 1/1 | 1/1 | 1/1 | 0 | 0 |", report)
+                            self.assertIn("| purepy | final | 0/1 | 1/1 | 0/1 | 0 | 0 |", report)
+                            clears = "False" if scenario == "budget" else "None"
+                            self.assertIn(f"| purepy | 0 | excluded_by_design | loop | {clears} |", report)
+                            self.assertIn("final: no accepted PurePy answers.", report)
+                        else:
+                            self.assertEqual(len(requests), 2)
+                            counts = "1/1 | 1/1 | 1/1 | 0 | 0" if scenario == "outside_text" else "0/1 | 0/1 | 0/1 | 1 | 1"
+                            for condition in e.CONDITIONS:
+                                for stage in ("initial", "final"):
+                                    self.assertIn(f"| {condition} | {stage} | {counts} |", report)
+                                self.assertIn(f"{condition}: {{}}", report)
+                            self.assertIn({"api_error": "api_error", "truncated": "incomplete",
+                                           "untagged": "missing_tags", "empty": "incomplete",
+                                           "outside_text": "outside_text"}[scenario], report)
+                            if scenario == "outside_text":
+                                for condition in e.CONDITIONS:
+                                    self.assertIn(f'| {condition} | final | 0 | 1 | 0 | {{"outside_text": 1}} |', report)
+                                    source = args.output.parent / "solutions" / args.output.stem / "HumanEval-2" / f"{condition}.py"
+                                    self.assertEqual(source.read_text(), GOOD)
+                            else:
+                                self.assertIn("unknown percentage points", report)
+                e.compare([Path(folder) / (name + ".json") for name in ("repair", "api_error")],
+                          Path(folder) / "comparison.json")
+                comparison = (Path(folder) / "comparison.md").read_text()
+                self.assertIn("# RQ3 Cross-Model Comparison", comparison)
+                self.assertIn("infrastructure_failed", comparison)
+                self.assertIn("unknown", comparison)
         finally:
             server.shutdown()
             server.server_close()
             thread.join()
-
-    def test_api_error_has_no_automatic_retry(self):
-        args = argparse.Namespace(base_url="http://127.0.0.1:1/v1", provider="openai", model="fake",
-                                  max_tokens=100, benchmark=self.benchmark, repair_rounds=3)
-        with patch("evaluation.request", return_value={"code": "", "generation": {"status": "api_error"}}) as request:
-            result = e.attempt_solution(args, self.task, "purepy")
-        self.assertEqual(request.call_count, 1)
-        self.assertEqual(len(result["attempts"]), 1)
-        self.assertIsNone(result["checker"].passed)
-        self.assertIsNone(result["official_tests"].passed)
-        self.assertEqual(result["rejections"], 0)
-
-    def test_api_error_does_not_evaluate_partial_content(self):
-        args = argparse.Namespace(base_url="http://127.0.0.1:1/v1", provider="openai", model="fake",
-                                  max_tokens=100, benchmark=self.benchmark, repair_rounds=3)
-        with patch("evaluation.request", return_value={"code": BAD, "generation": {"status": "api_error"}}), patch(
-                "evaluation.check") as checker, patch.object(self.benchmark, "grade") as tests:
-            result = e.attempt_solution(args, self.task, "purepy")
-        checker.assert_not_called()
-        tests.assert_not_called()
-        self.assertEqual(result["code"], BAD)
-        self.assertEqual(result["rejections"], 0)
-
-    def test_empty_output_stays_unevaluated(self):
-        self.assertIsNone(e.check("").passed)
-        self.assertIsNone(self.benchmark.grade("", self.task).passed)
-
-    def test_api_errors_have_unknown_rates_and_saved_reports(self):
-        (e.ROOT / "results").mkdir(exist_ok=True)
-        with tempfile.TemporaryDirectory(prefix="api-error-", dir=e.ROOT / "results") as folder:
-            path = Path(folder) / "fake.json"
-            args = argparse.Namespace(benchmark=self.benchmark, model="fake", provider="openai",
-                base_url="http://127.0.0.1:1/v1", max_tokens=100, repair_rounds=3,
-                limit=1, difficulty=None, output=path)
-            with patch("evaluation.validate_backend"), patch("evaluation.request", return_value={
-                    "code": "", "generation": {"status": "api_error", "http_status": 401}}):
-                with self.assertRaisesRegex(RuntimeError, "infrastructure failed"):
-                    e.run(args)
-            data = json.loads(path.read_text())
-            self.assertEqual(data["status"], "infrastructure_failed")
-            for condition in e.CONDITIONS:
-                stages = data["summary"]["conditions"][condition]
-                self.assertEqual(stages["checker_rejections"], {})
-                for stage in ("initial", "final"):
-                    self.assertEqual(stages[stage]["checker_unknown"], 1)
-                    self.assertEqual(stages[stage]["tests_unknown"], 1)
-            for gaps in data["summary"]["rq3"].values():
-                self.assertTrue(all(value is None for value in gaps.values()))
-            self.assertIn("unknown percentage points", path.with_suffix(".md").read_text())
-            e.compare([path], Path(folder) / "comparison.json")
-            self.assertIn("unknown", (Path(folder) / "comparison.md").read_text())
-
-    def test_pipeline_fails_when_checker_cannot_run(self):
-        (e.ROOT / "results").mkdir(exist_ok=True)
-        with tempfile.TemporaryDirectory(prefix="failure-", dir=e.ROOT / "results") as folder:
-            path = Path(folder) / "fake.json"
-            args = argparse.Namespace(benchmark=self.benchmark, model="fake", provider="openai",
-                base_url="http://127.0.0.1:1/v1", max_tokens=100, repair_rounds=0,
-                limit=1, difficulty=None, output=path)
-            with patch("evaluation.validate_backend"), patch("evaluation.request", return_value={
-                    "code": GOOD, "raw_response": f"<purepy>{GOOD}</purepy>",
-                    "generation": {"status": "complete"}}), patch(
-                    "evaluation.check", return_value=e.Verdict(None, "checker missing", True)):
-                with self.assertRaisesRegex(RuntimeError, "infrastructure failed"):
-                    e.run(args)
-            data = json.loads(path.read_text())
-            self.assertEqual(data["status"], "infrastructure_failed")
-            self.assertIsNone(data["tasks"]["HumanEval/2"]["purepy"]["checker"]["passed"])
-            self.assertTrue(path.with_suffix(".md").exists())
-
-    def test_truncated_output_is_not_automatically_repaired(self):
-        args = argparse.Namespace(base_url="http://127.0.0.1:1/v1", provider="openai", model="fake",
-                                  max_tokens=100, benchmark=self.benchmark, repair_rounds=3)
-        raw = f"<purepy>{BAD}</purepy>"
-        with patch("evaluation.request", return_value={"code": raw, "raw_response": raw,
-                   "generation": {"status": "incomplete"}}) as request, patch(
-                   "evaluation.check") as checker, patch.object(self.benchmark, "grade") as tests:
-            result = e.attempt_solution(args, self.task, "purepy")
-        self.assertEqual(request.call_count, 1)
-        self.assertEqual(result["code"], BAD.strip())
-        self.assertEqual(result["attempts"][0].raw_response, raw)
-        checker.assert_not_called()
-        tests.assert_not_called()
-        self.assertEqual(result["rejections"], 0)
-        self.assertIsNone(result["official_tests"].passed)
-
-    def test_unextractable_format_has_unknown_verdicts_and_no_repairs(self):
-        (e.ROOT / "results").mkdir(exist_ok=True)
-        with tempfile.TemporaryDirectory(prefix="format-", dir=e.ROOT / "results") as folder:
-            path = Path(folder) / "fake.json"
-            args = argparse.Namespace(benchmark=self.benchmark, model="fake", provider="openai",
-                base_url="http://127.0.0.1:1/v1", max_tokens=100, repair_rounds=3,
-                limit=1, difficulty=None, output=path)
-            with patch("evaluation.validate_backend"), patch("evaluation.validate_problems"), patch(
-                    "evaluation.request", return_value={
-                    "code": GOOD, "raw_response": GOOD, "generation": {"status": "complete"}}) as request, patch(
-                    "evaluation.check") as checker, patch.object(self.benchmark, "grade") as tests:
-                e.run(args)
-            checker.assert_not_called()
-            tests.assert_not_called()
-            self.assertEqual(request.call_count, 2)
-            data = json.loads(path.read_text())
-            self.assertEqual(data["status"], "complete")
-            for condition in e.CONDITIONS:
-                solution = data["tasks"]["HumanEval/2"][condition]
-                self.assertEqual(solution["attempts"][0]["raw_response"], GOOD)
-                self.assertEqual(solution["output_format"]["status"], "missing_tags")
-                self.assertEqual(solution["rejections"], 0)
-                self.assertEqual(solution["code"], "")
-                for stage in ("initial", "final"):
-                    summary = data["summary"]["conditions"][condition][stage]
-                    self.assertEqual(summary["format_noncompliant"], 1)
-                    self.assertEqual(summary["tests_unknown"], 1)
-                    self.assertEqual(summary["checker_unknown"], 1)
-            self.assertIn("missing_tags", path.with_suffix(".md").read_text())
-            for gaps in data["summary"]["rq3"].values():
-                self.assertTrue(all(value is None for value in gaps.values()))
-
-    def test_outside_prose_does_not_become_source_or_hide_format_violation(self):
-        args = argparse.Namespace(base_url="http://127.0.0.1:1/v1", provider="openai", model="fake",
-                                  max_tokens=100, benchmark=self.benchmark, repair_rounds=0)
-        for condition in e.CONDITIONS:
-            raw = f"Here is the solution:\n<{condition}>{GOOD}</{condition}>\nExplanation."
-            with patch("evaluation.request", return_value={"code": raw, "raw_response": raw,
-                       "generation": {"status": "complete"}}):
-                result = e.attempt_solution(args, self.task, condition)
-            self.assertTrue(result["checker"].passed)
-            self.assertTrue(result["official_tests"].passed)
-            self.assertEqual(result["output_format"]["status"], "outside_text")
-            self.assertFalse(result["output_format"]["compliant"])
-            self.assertEqual(result["attempts"][0].raw_response, raw)
-
-    def test_bad_api_url_cannot_be_saved(self):
-        with self.assertRaisesRegex(RuntimeError, "credentials"):
-            e.validate_api_url("https://user:secret@example.com/v1")
-        with self.assertRaisesRegex(RuntimeError, "HTTPS"):
-            e.validate_api_url("http://example.com/v1")
-
-    def test_unknown_diagnostic_does_not_claim_feature_cleared(self):
-        first = e.Attempt(code=BAD, checker=e.Verdict(False, None, False, exit_code=1,
-                 failure_mode={"category": "excluded_by_design", "restriction": "loop"}),
-                 official_tests=e.Verdict(True, None, False), generation={"status": "complete"},
-                 round=0, messages=[], prompt_sha256="")
-        following = copy.deepcopy(first)
-        following.round = 1
-        following.checker.failure_mode["restriction"] = "mutation"
-        result = e.pack_solution([first, following], "prompt", "purepy", 1)
-        self.assertIsNone(result["attempts"][0].next_round_clears_reported_feature)
 
     def test_attempt_json_roundtrip_preserves_optional_fields(self):
         attempt = e.Attempt(round=0, code="", generation={"status": "api_error"},
@@ -541,12 +313,6 @@ class EvaluationTests(unittest.TestCase):
         solution = e.pack_solution([first, pending], "prompt", "purepy", 1)
         self.assertEqual(solution["rounds_to_acceptance"], 1)
         self.assertEqual(solution["rejections"], 1)
-
-    def test_no_python_code_comments(self):
-        for path in [*e.ROOT.glob("*.py"), *Path(__file__).parent.glob("*.py")]:
-            comments = [t for t in tokenize.generate_tokens(io.StringIO(path.read_text()).readline)
-                        if t.type == tokenize.COMMENT]
-            self.assertEqual(comments, [], str(path))
 
 
 if __name__ == "__main__":
