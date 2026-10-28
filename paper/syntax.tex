@@ -42,23 +42,34 @@ and \emph{definitely unassigned}, like a blank final in Java before its assignme
 is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A function name with entry $\PU{\scheme{\seq{\alpha}}{\tau}}$ is bound at the type scheme $\scheme{\seq{\alpha}}{\tau}$ on some paths but not on all. A variable
 with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
-\end{DeletedBlock}
-\begin{AddedBlock}
-\noindent A predefined name is a member of a predefined module, such as \pyinline{list} or \pyinline{dataclass};
-its entry records only that the name is in scope. Type parameters and type aliases denote types rather than
-values, so they can be mentioned only by type expressions.
-
-The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type
-is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$ and \emph{definitely
-unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$ is declared at
-$\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A variable with entry
-$\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local. We write
-$\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$,
-$\dom(\Gamma)$ for the set of variables with an entry in $\Gamma$, and $\varnothing$ for the empty context.
-\end{AddedBlock}
-
 \input{spec/syntax/class-table}
 The class table is similar to the class table of Featherweight Java~\cite{igarashi2001}; the well-formedness rules build it while checking the class definitions of the program (\specfigref{typing-top-level}).
+\end{DeletedBlock}
+\begin{AddedBlock}
+\noindent The first four forms of entry record the assignment state of a variable, in the definite-assignment
+terminology of Java~\cite[\S16]{gosling2025}. A variable bound to a type $\tau$ is \emph{definitely assigned}:
+every path to the current point has assigned it, so it may be used. A variable with entry $\DU{\tau}$ is
+declared at $\tau$ but \emph{definitely unassigned}, like a blank final in Java before its assignment, so it
+may be assigned but not used. A variable with entry $\PU{\tau}$ is \emph{possibly unassigned}, because it is
+assigned on some paths but not on all, so it may be neither used nor assigned. A variable with entry $\Unbound$
+is declared later in its scope, and a use of it is reported by Python at run time as an unbound local. A
+function with type parameters is bound at a type scheme rather than a type, and is likewise possibly
+unassigned when defined in only one branch of a conditional. An imported module is bound at a stub
+$\modStub{q}$ until it has been checked, and then at $\modLoaded{q}{\Gamma}$, which carries its signature
+$\Gamma$. The remaining forms denote types rather than values: a class, a type parameter, and a type alias
+together with the mutual type region declaring it and the context in which it is resolved. A predefined name
+such as \pyinline{list} or \pyinline{dataclass}, with a meaning fixed by \PurePy, has an entry recording only that
+the name is in scope. We write $\Gamma, \bind{x}{\theta}$ for $\Gamma$ with its entry for $x$ replaced by
+$\theta$, $\dom(\Gamma)$ for the set of variables with an entry in $\Gamma$, and $\varnothing$ for the empty
+context.
+
+Classes are identified by fully-qualified name, and a class name $C$ is also the type of the instances of
+$C$. A \emph{class table} $\Sigma$ maps each class name to a class entry (\figref{context-entries}) recording
+the definition that introduces the class, together with the mutual type region and the context in which the
+definition appears, from which the fields and base class of the class are resolved. The well-formedness rules
+build the class table while checking the type definitions of a program (\specfigref{typing-top-level}); it
+plays the role of the class table of Featherweight Java~\cite{igarashi2001}.
+\end{AddedBlock}
 
 \subsubsection{Context operations}
 \label{sec:context-operations}
