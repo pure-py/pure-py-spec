@@ -42,10 +42,10 @@ equivalent.
 \end{DeletedBlock}
 \begin{AddedBlock}
 The typing rules compare types by subtyping and combine them by join and meet, both defined in this subsection.
-Types arise from the type expressions in annotations (\secref{types-schemes}), which resolve to types during
-type checking: a class or alias name
-applied to type arguments resolves to the instantiated class or alias, and a type parameter to the type variable of
-that name (\specfigref{resolve-type}). Every definition carries annotations for its parameters and return type, so
+Types arise from the type expressions in annotations (\secref{types-schemes}), resolved during type checking
+(\specfigref{resolve-type}): a class name applied to as many type arguments as the class has type parameters
+resolves to the instantiated class, an alias name to the body of the alias with the arguments substituted, a type
+parameter to the type variable of that name, and any other name must be predefined. Every definition carries annotations for its parameters and return type, so
 the type of a definition is given rather than inferred from its body.
 
 \paragraph{Subtyping.}
