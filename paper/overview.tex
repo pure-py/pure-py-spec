@@ -122,7 +122,7 @@ or in different branches, nor redeclare one of its parameters. Like mypy, \PureP
 declare a name of an enclosing scope, and the declaration then hides the enclosing variable throughout the scope,
 so a use before the declaration is rejected as unbound\replaced{, where Python fails at run time with
 \pyinline{UnboundLocalError}, as on the left below.}{. } The one exception in mypy is a use at module level of a
-builtin name before its declaration, which \replaced{mypy, following Python's run-time lookup, resolves to the builtin.}{refers to the builtin, as when Python runs the module. } \PurePy treats
+builtin name before its declaration, which \replaced{mypy accepts as a use of the builtin.}{refers to the builtin, as when Python runs the module. } \PurePy treats
 the builtins as an enclosing scope like any other, and rejects the use\added{, as on the right}:
 \begin{AddedBlock}
 \begin{listingrow}
