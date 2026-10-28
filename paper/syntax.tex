@@ -143,7 +143,7 @@ specification~\cite{typingcouncil2025}, and of schemes $\pi$. \emph{Type express
 have the form of types, except that where types have \emph{instantiated classes} $C[\seq{\tau}]$ and type variables $\alpha$,
 type expressions have qualified names applied to type arguments, $q[\seq{\psi}]$, naming a class, type alias or type
 parameter; type expressions resolve to types during type checking, by the rules of \specfigref{resolve-type}. Parameters, return
-types and dataclass fields are annotated with type expressions, and so are variable declarations
+types and dataclass fields are annotated with type expressions, as are variable declarations
 $x\exAnnot{\psi}$, with or without an initial assignment; later assignments to a declared variable are not
 annotated. \emph{Schemes} $\pi$ bind type parameters $\seq{\alpha}$: a \emph{type scheme} binds
 type parameters in a type, for functions, and a \emph{field scheme} in a sequence of typed fields, for classes. Schemes are
