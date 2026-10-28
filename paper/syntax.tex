@@ -89,10 +89,10 @@ mutual def region and each mutual type region as one mutually-recursive binding 
 \end{DeletedBlock}
 \begin{AddedBlock}
 Statements are sequenced by juxtaposition, $\exSeq{s}{s'}$; a function body, branch of a conditional and body of a
-case are statements. \emph{Type definitions} $\chi$ are class definitions and \pyinline{type} statements,
-which declare \emph{type aliases}. \emph{Top-level statements} $t$ are statements and mutual type regions, also
-sequenced by juxtaposition; module bodies, after their imports, are top-level statements, so type definitions
-occur only at the top level of modules. Function definitions, class definitions and
+case are statements. \emph{Type definitions} $\chi$ are either class definitions or \pyinline{type}
+statements, which declare \emph{type aliases}. \emph{Top-level statements} $t$ are either statements or mutual
+type regions, also sequenced by juxtaposition; module bodies consist of imports followed by top-level
+statements, so type definitions occur only at the top level of a module. Function definitions, class definitions and
 \pyinline{type} statements bind distinct \emph{type parameters} $\seq{\alpha}$, written in brackets after the
 name as in Python 3.12. \emph{Mutual def regions} $d_1 \ldots d_{n+1}$ are maximal contiguous blocks of
 \pyinline{def} statements, and \emph{mutual type regions} $\chi_1 \ldots \chi_{n+1}$ maximal contiguous blocks
