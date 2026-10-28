@@ -138,8 +138,8 @@ corresponding field.
 
 \emph{Type expressions} $\psi$ are expressions which denote types (\figref{syntax-types}); they have the form of
 types, except that where types have \emph{instantiated classes} $C[\seq{\tau}]$ and type variables $\alpha$,
-type expressions have qualified names applied to type arguments, $q[\seq{\psi}]$, naming a class, a type alias or
-a type parameter; the rules of \specfigref{resolve-type} resolve type expressions to types. Parameters, return
+type expressions have qualified names applied to type arguments, $q[\seq{\psi}]$, naming a class, type alias or type
+parameter; the rules of \specfigref{resolve-type} resolve type expressions to types. Parameters, return
 types and dataclass fields are annotated with type expressions, and so are variable declarations
 $x\exAnnot{\psi}$, with or without an initial assignment; later assignments to a declared variable are not
 annotated. \emph{Schemes} $\pi$ (\figref{syntax-types}) bind type parameters $\seq{\alpha}$: a \emph{type scheme} binds
