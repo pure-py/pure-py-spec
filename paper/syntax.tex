@@ -138,11 +138,11 @@ corresponding field.
 
 \paragraph{Types and schemes.}
 
-\figref{syntax-types} gives the syntax of types $\tau$, familiar from the Python typing specification, and of
-schemes $\pi$. \emph{Type expressions} $\psi$, omitted from the figure, are expressions which denote types; they
+\figref{syntax-types} gives the syntax of types $\tau$, familiar from the Python typing
+specification~\cite{typingcouncil2025}, and of schemes $\pi$. \emph{Type expressions} $\psi$, omitted from the figure, are expressions which denote types; they
 have the form of types, except that where types have \emph{instantiated classes} $C[\seq{\tau}]$ and type variables $\alpha$,
 type expressions have qualified names applied to type arguments, $q[\seq{\psi}]$, naming a class, type alias or type
-parameter; the rules of \specfigref{resolve-type} resolve type expressions to types. Parameters, return
+parameter; type expressions resolve to types during type checking, by the rules of \specfigref{resolve-type}. Parameters, return
 types and dataclass fields are annotated with type expressions, and so are variable declarations
 $x\exAnnot{\psi}$, with or without an initial assignment; later assignments to a declared variable are not
 annotated. \emph{Schemes} $\pi$ bind type parameters $\seq{\alpha}$: a \emph{type scheme} binds
