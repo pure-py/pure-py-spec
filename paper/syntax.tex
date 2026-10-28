@@ -79,7 +79,7 @@ definitely assigned if both entries are definitely assigned and possibly unassig
 \begin{AddedBlock}
 Contexts compose sequentially by \emph{override}, $\Gamma \override \Delta$, and in parallel by \emph{merge},
 $\Gamma \merge_{\Sigma} \Delta$, both defined pointwise from operations on context entries
-(Definition~\specnum{def:context-operations}). Override is right-biased, so an entry of $\Delta$ replaces the
+(Definitions~\specnum{def:override} and \specnum{def:merge}). Override is right-biased, so an entry of $\Delta$ replaces the
 entry of $\Gamma$ for the same variable, and has the empty context as unit. Merge combines the contexts of two
 branches. A variable with the same entry in both keeps it, a variable defined or definitely assigned in only
 one branch is possibly unassigned after the merge, and a variable bound at different types in the two
