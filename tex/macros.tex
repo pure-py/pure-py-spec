@@ -373,12 +373,19 @@
   \setlength{\abovedisplayshortskip}{\dimexpr\abovedisplayshortskip - \baselineskip\relax}%
   \begin{align*}\input{spec/functions/#1}\end{align*}\endgroup}
 
-% Production symbol of the grammar figures: mathtools' centred colons, closed up by kerns that a document may
-% set before loading this file, since the colon's side bearings vary between fonts. The defaults are those of
-% mathtools' \Coloneqq.
-\RequirePackage{mathtools}
+% Production symbol of the grammar figures: two colons raised so that their centre is that of the equals
+% sign, closed up by kerns that a document may set before loading this file, since the colon's side bearings
+% vary between fonts. The defaults are those of mathtools' \Coloneqq.
 \providecommand*{\coloncolonkern}{0.9mu}
 \providecommand*{\colonequalskern}{0mu}
-\newcommand*{\coloncolonequals}{\mathrel{\vcentcolon\mkern-\coloncolonkern\vcentcolon\mkern-\colonequalskern=}}
+\makeatletter
+\newcommand*{\coloncolon@raised}{%
+  \settoheight{\dimen@}{$=$}\settodepth{\dimen@ii}{$=$}%
+  \@tempdima=\dimexpr(\dimen@-\dimen@ii)/2\relax
+  \settoheight{\dimen@}{$:$}\settodepth{\dimen@ii}{$:$}%
+  \@tempdimb=\dimexpr(\dimen@-\dimen@ii)/2\relax
+  \raisebox{\dimexpr\@tempdima-\@tempdimb\relax}{$:\mkern-\coloncolonkern:$}}
+\newcommand*{\coloncolonequals}{\mathrel{\coloncolon@raised\mkern-\colonequalskern{=}}}
+\makeatother
 \newcommand*{\grammarGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{4}{l}{#1}}
 \newcommand*{\metaGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{#1}}
