@@ -128,10 +128,11 @@ which follow Python. It is ambiguous in the same way on tuples and tuple pattern
 \end{DeletedBlock}
 \begin{AddedBlock}
 \emph{Argument lists} $a$ (\figref{syntax-expr}) occur in calls and in constructor patterns, and consist of
-positional arguments $\seq{u}$ followed by keyword arguments $\seq{x} \mathord{=} \seq{u}'$, where each argument is an
-expression in a call and a pattern in a constructor pattern. In a constructor call or pattern, the arguments
-supply the fields of the class, which a dataclass declares in a fixed order. The auxiliary function
-$\fieldMap{\Sigma}$ resolves each positional argument to the field at the same position and each keyword argument
+positional arguments $\seq{u}$ followed by keyword arguments $\seq{x} \mathord{=} \seq{u}'$, where each argument is either an
+expression (when the argument list occurs in a call) or a pattern (when the argument list occurs in a
+constructor pattern). In a constructor call or pattern, the arguments supply the fields of the class, which
+dataclasses declare in a fixed order. The auxiliary function $\fieldMap{\Sigma}$ resolves each positional
+argument to the field at that position and each keyword argument
 to the field of the same name, so that the rules for constructor calls and patterns check each argument against
 the type of the corresponding field.
 
