@@ -61,9 +61,10 @@ signature $\Gamma$ of the module.
 
 The remaining forms denote types rather than values: classes, type parameters, and type aliases together
 with the mutual type region $\seq{\chi}$ declaring them (\figref{syntax-stmt}) and the context in which they are
-resolved. The predefined names are those of the built-in types, of the type constructors of \pyinline{typing} and
-of the decorator \pyinline{dataclass}; their entries record only that the name is in scope, since these names
-have no meaning as values in \PurePy.
+resolved. The predefined names are the names that occur in type expressions, such as \pyinline{int}, \pyinline{list} and
+\pyinline{Callable}, together with the decorator \pyinline{dataclass}. Their entries record only that the name is
+in scope, as required to resolve type expressions and type-check class definitions; use of such names as
+expressions is rejected statically.
 
 Classes are identified by fully-qualified name, and class names $C$ are also the types of their instances. A
 \emph{class table} $\Sigma$, following Featherweight Java~\cite{igarashi2001}, maps each class name to a class
