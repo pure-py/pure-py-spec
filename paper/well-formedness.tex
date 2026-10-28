@@ -45,7 +45,7 @@ Well-formedness is checked relative to a context $\Gamma$, recording what each n
 class table $\Sigma$, recording the classes defined so far (\secref{contexts}). Programs mention types only
 through the type expressions in annotations (\secref{types-schemes}), so each typing rule must resolve these to
 types by looking up the names in $\Gamma$. Class names applied to type arguments resolve to
-instantiated classes, alias names to the bodies of the aliases at the type arguments, and type parameters to type
+instantiated classes, alias names to the bodies of the aliases at their type arguments, and type parameters to type
 variables; the full definition is given in \specfigref{resolve-type}.
 
 \paragraph{Subtyping.}
