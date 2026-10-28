@@ -1,0 +1,21 @@
+\begin{specdefinition}{Static outcome}
+A well-typed statement has a \emph{static outcome} $R$, which is either $\Returns$ or $\Assigns{\Delta}$. The
+outcome is $\Returns$ when the statement \emph{definitely returns} or definitely reaches \pyinline{assert False}.
+Otherwise it is $\Assigns{\Delta}$, where $\Delta$ is a context with an entry for each variable declared or assigned
+by the statement (Definition~\ref{def:context}), recording whether the variable is definitely assigned, definitely
+unassigned or possibly unassigned after the statement.
+\end{specdefinition}
+
+Context operations $\override$ and $\merge_{\Sigma}$ lift to a right semiring over static outcomes $R$, with $\Assigns{\varnothing}$ as left and right unit for $\override$ and $\Returns$ as unit for $\merge_{\Sigma}$ and zero for $\override$.
+
+\begin{definition}[Override and merge on static outcomes]
+\begin{defalign}
+\Assigns{\Delta} \merge_{\Sigma} \Assigns{\Delta'} & = \Assigns{\Delta \merge_{\Sigma} \Delta'} \\
+R \merge_{\Sigma} \Returns = \Returns \merge_{\Sigma} R & = R \\
+\\
+\Assigns{\Delta} \override \Assigns{\Delta'} & = \Assigns{\Delta \override \Delta'} \\
+R \override \Returns = \Returns \override R & = \Returns
+\end{defalign}
+\end{definition}
+
+\noindent The $\Returns \override R$ case never arises because statement typing excludes unreachable statements\paperonly{ (\secref{unreachable})}.

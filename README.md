@@ -16,8 +16,8 @@ expected to conform to the formal semantics.
 
 - `paper.tex`: the paper
 - `PurePy-spec.tex`: the language specification, a standalone document
-- `spec/`: sources of the specification, from which the paper is also assembled
-- `paper/`: material belonging only to the paper
+- `spec/`: sources of the specification, including the figures, rules, definitions and lemmas shared with the paper
+- `paper/`: sources of the paper's own prose
 - `tex/`: macros and bibliography shared by both documents
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
 - `agda/`: Agda mechanisation of the distributivity proof
@@ -26,10 +26,12 @@ expected to conform to the formal semantics.
 - `src/purepy/conformance-suite/`: the conformance suite, shipped in the package
 - `test/`: runner for the conformance suite and checks of the repository
 
-`\paperinput{file}` at a point in a specification source includes the file in the paper only, and
-`\specinput{file}` in the specification only; `\paperonly{...}` and `\speconly{...}` restrict a phrase to
-one document. Rules included individually in the paper are defined in `spec/rules/`, so that each rule has
-one source; all other rules are defined in the figures.
+Each section has separate prose in the two documents, `paper/<section>.tex` and `spec/<section>.tex`, and
+the technical material has one source: figures in `spec/fig/`, rules included individually in the paper in
+`spec/rules/`, and definitions and lemmas in `spec/<section>/`, input by both documents. Within a shared
+source, `\paperonly{...}` and `\speconly{...}` restrict a phrase to one document. The syntax and operational
+semantics sections are still assembled from one source each, in which `\paperinput{file}` includes a file in
+the paper only and `\specinput{file}` in the specification only.
 
 ## Building
 
