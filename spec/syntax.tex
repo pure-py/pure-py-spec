@@ -45,7 +45,7 @@ The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling202
 and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
 is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A function name with entry $\PU{\scheme{\seq{\alpha}}{\tau}}$ is bound at the type scheme $\scheme{\seq{\alpha}}{\tau}$ on some paths but not on all. A variable
 with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
-It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
+It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}.
 
 \input{spec/syntax/class-table}
 \noindent The

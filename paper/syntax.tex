@@ -59,19 +59,18 @@ unassigned when defined in only one branch of a conditional. Imported
 modules are bound at a stub $\modStub{q}$ until checked, and then at $\modLoaded{q}{\Gamma}$, which carries the
 signature $\Gamma$ of the module.
 
-The remaining forms denote types rather than values: a class, a type parameter, and a type alias
-together with the mutual type region declaring it and the context in which it is resolved. A predefined name
-such as \pyinline{list} or \pyinline{dataclass}, with a meaning fixed by \PurePy, has an entry recording only that
-the name is in scope. We write $\Gamma, \bind{x}{\theta}$ for $\Gamma$ with its entry for $x$ replaced by
-$\theta$, $\dom(\Gamma)$ for the set of variables with an entry in $\Gamma$, and $\varnothing$ for the empty
-context.
+The remaining forms denote types rather than values: classes, type parameters, and type aliases together
+with the mutual type region $\seq{\chi}$ declaring them (\figref{syntax-stmt}) and the context in which they are
+resolved. The predefined names are those of the built-in types, of the type constructors of \pyinline{typing} and
+of the decorator \pyinline{dataclass}; their entries record only that the name is in scope, since these names
+have no meaning as values in \PurePy.
 
-Classes are identified by fully-qualified name, and a class name $C$ is also the type of the instances of
-$C$. A \emph{class table} $\Sigma$ maps each class name to a class entry (\figref{context-entries}) recording
-the definition that introduces the class, together with the mutual type region and the context in which the
-definition appears, from which the fields and base class of the class are resolved. The well-formedness rules
-build the class table while checking the type definitions of a program (\specfigref{typing-top-level}); it
-plays the role of the class table of Featherweight Java~\cite{igarashi2001}.
+Classes are identified by fully-qualified name, and class names $C$ are also the types of their instances. A
+\emph{class table} $\Sigma$, following Featherweight Java~\cite{igarashi2001}, maps each class name to a class
+entry (\figref{context-entries}) recording the definition that introduces the class, together with the mutual
+type region $\seq{\chi}$ and the context in which the definition appears, from which the fields and base class
+of the class are resolved. The well-formedness rules build the class table while checking type definitions
+(\specfigref{typing-top-level}).
 \end{AddedBlock}
 
 \subsubsection{Context operations}
