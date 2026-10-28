@@ -73,6 +73,8 @@ subtyping. Both operations are defined pointwise on entries
 \subsection{Statements and expressions}
 \label{sec:expressions-statements}
 
+\subsubsection{Statements}
+
 \figref{syntax-stmt} gives the syntax of statements $s$, which are sequenced by juxtaposition, $\exSeq{s}{s'}$; function bodies, branches of conditionals and bodies of
 cases are statements. \emph{Type definitions} $\chi$ are either class definitions or \pyinline{type}
 statements; the latter declare \emph{type aliases}. \emph{Top-level statements} $t$ are either statements or mutual
@@ -86,7 +88,7 @@ Python's late binding (\secref{mutual-recursion}).
 
 \input{paper/fig/syntax}
 
-\paragraph{Expressions.}
+\subsubsection{Expressions}
 
 \figref{syntax-expr} also gives the syntax of expressions $e$, the subset of Python expressions supported by \PurePy: variables, literals, calls, attribute access and
 subscripting, operator applications, conditional expressions, list, tuple and dictionary displays, comprehensions
@@ -103,7 +105,7 @@ positional argument to the field at that position and each keyword argument to t
 the rules for constructor calls and patterns are able to check each argument against the type of the
 corresponding field.
 
-\paragraph{Types and schemes.}
+\subsubsection{Types and schemes}
 
 \figref{syntax-types} gives the syntax of types $\tau$, familiar from the Python typing
 specification~\cite{typingcouncil2025}, and of schemes $\pi$. \emph{Type expressions} $\psi$, omitted from the figure, are expressions which denote types; they
