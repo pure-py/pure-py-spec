@@ -146,8 +146,8 @@ parameter; type expressions resolve to types during type checking, by the rules 
 types and dataclass fields are annotated with type expressions, as are variable declarations
 $x\exAnnot{\psi}$, with or without an initial assignment; later assignments to a declared variable are not
 annotated. \emph{Schemes} $\pi$ bind type parameters $\seq{\alpha}$, and are either a \emph{type scheme},
-binding type parameters in a type, for functions, or a \emph{field scheme}, binding type parameters in a sequence
-of typed fields, for classes. Schemes are
+binding type parameters in a type, for a function, or a \emph{field scheme}, binding type parameters in a sequence
+of typed fields, for a class. Schemes are
 instantiated by substituting types for the type parameters (\specref{sec:type-annotations}), and a scheme without
 type parameters is identified with its body. Metavariables $\odot$ and $\ominus$ range over binary and unary operators,
 whose precedence and associativity are given in \specfigref{precedence}; \pyinline{and} and \pyinline{or} are
