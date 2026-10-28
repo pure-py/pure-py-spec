@@ -488,9 +488,9 @@ def from_expr_node(e: Any) -> ast.expr:
         case Syntax.ExprTuple(es):
             return ast.Tuple([from_expr(e_) for e_ in es])
         case Syntax.ExprListComp(e_, qs):
-            return ast.ListComp(from_expr(e_), reduce(add_qualifier, qs, []))
+            return ast.ListComp(from_expr(e_), from_qualifiers(qs))
         case Syntax.ExprDictComp(e_, e__, qs):
-            return ast.DictComp(from_expr(e_), from_expr(e__), reduce(add_qualifier, qs, []))
+            return ast.DictComp(from_expr(e_), from_expr(e__), from_qualifiers(qs))
         case Syntax.ExprLambda(xs, e_):
             args = ast.arguments(
                 posonlyargs=[],
@@ -504,16 +504,20 @@ def from_expr_node(e: Any) -> ast.expr:
             raise AssertionError(f"unexpected expression: {e}")
 
 
-# Generator starts a comprehension; guard joins the last
-def add_qualifier(gs: list[ast.comprehension], q: Any) -> list[ast.comprehension]:
-    match node(q):
-        case Syntax.Generator(x, e):
-            return [*gs, ast.comprehension(ast.Name(x), from_expr(e), [], 0)]
-        case Syntax.Guard(e):
-            *gs_, g = gs
-            return [*gs_, ast.comprehension(g.target, g.iter, [*g.ifs, from_expr(e)], 0)]
-        case _:
-            raise AssertionError(f"unexpected qualifier: {q}")
+def from_qualifiers(qs: list[Any]) -> list[ast.comprehension]:
+    """Comprehension nodes of the qualifiers qs: a generator starts one, a guard joins the last"""
+
+    def add(gs: list[ast.comprehension], q: Any) -> list[ast.comprehension]:
+        match node(q):
+            case Syntax.Generator(x, e):
+                return [*gs, ast.comprehension(ast.Name(x), from_expr(e), [], 0)]
+            case Syntax.Guard(e):
+                *gs_, g = gs
+                return [*gs_, ast.comprehension(g.target, g.iter, [*g.ifs, from_expr(e)], 0)]
+            case _:
+                raise AssertionError(f"unexpected qualifier: {q}")
+
+    return reduce(add, qs, [])
 
 
 def from_ty(tau: Any) -> Type:
