@@ -124,7 +124,7 @@ of the most specific overload at the operand types, $\resolveOp{\Sigma}$, so \py
 
 The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\Gamma$ and
 optional return type $\zeta$, statement $s$ has static outcome $R$ (\specfigref{typing-stmt}); every rule passes $\zeta$ down unchanged.
-A sequence $s\;s'$ types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
+A sequence $\exSeq{s}{s'}$ types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
 by $s$. A conditional combines its
 branches with $\merge_{\Sigma}$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
 A call statement with a callee synthesising a union is typed

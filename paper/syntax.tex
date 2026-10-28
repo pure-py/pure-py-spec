@@ -59,7 +59,7 @@ of the class are resolved. The well-formedness rules build the class table while
 \label{sec:context-operations}
 
 Contexts compose in two ways. \emph{Override}, $\Gamma \override \Delta$, is sequential composition: the entries
-of $\Delta$ replace those of $\Gamma$ for the same variables, so for a sequence of statements $s\,s'$ the statement $s'$ is typed
+of $\Delta$ replace those of $\Gamma$ for the same variables, so for a sequence of statements $\exSeq{s}{s'}$ the statement $s'$ is typed
 under the context for $s$ overridden by the assignments made by $s$. \emph{Merge},
 $\Gamma \merge_{\Sigma} \Delta$, is parallel composition, combining the contexts produced by the two branches of
 a conditional into the context after the conditional. A variable with the same entry in both branches keeps
@@ -73,8 +73,9 @@ subtyping. Both operations are defined pointwise on entries
 \subsection{Expressions and statements}
 \label{sec:expressions-statements}
 
+\begin{DeletedBlock}
 Statements are sequenced by
-juxtaposition, $s\;s'$; a function body, branch of a conditional and body of a case are statements.
+juxtaposition, $\exSeq{s}{s'}$; a function body, branch of a conditional and body of a case are statements.
 \emph{Type definitions} $\chi$ are class definitions or
 \pyinline{type} statements. \emph{Top-level statements} $t$ are statements or mutual type regions, also sequenced by juxtaposition; the body of a
 module after its imports is a top-level statement, so type definitions occur only at the top level of a
@@ -85,8 +86,23 @@ def regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; 
 grouping consecutive \pyinline{def}s into a single mutual def region. A \emph{mutual type region} $\chi_1 \ldots \chi_{n+1}$ is a
 maximal contiguous block of type definitions, grouped by the parser in the same way. The well-formedness rules treat each
 mutual def region and each mutual type region as one mutually-recursive binding (see \secref{mutual-recursion}).
+\end{DeletedBlock}
+\begin{AddedBlock}
+Statements are sequenced by juxtaposition, $\exSeq{s}{s'}$; a function body, branch of a conditional and body of a
+case are statements. \emph{Type definitions} $\chi$ are class definitions and \pyinline{type} statements,
+which declare \emph{type aliases}. \emph{Top-level statements} $t$ are statements and mutual type regions, also
+sequenced by juxtaposition; module bodies, after their imports, are top-level statements, so type definitions
+occur only at the top level of modules. Function definitions, class definitions and
+\pyinline{type} statements bind distinct \emph{type parameters} $\seq{\alpha}$, written in brackets after the
+name as in Python 3.12. \emph{Mutual def regions} $d_1 \ldots d_{n+1}$ are maximal contiguous blocks of
+\pyinline{def} statements, and \emph{mutual type regions} $\chi_1 \ldots \chi_{n+1}$ maximal contiguous blocks
+of type definitions; the well-formedness rules treat each as one mutually recursive binding
+(\secref{mutual-recursion}).
+\end{AddedBlock}
 
 \input{paper/fig/syntax}
+
+\begin{DeletedBlock}
 
 An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by
 keyword arguments $x = u$, where an argument $u$ is an expression in a call and a pattern in a
@@ -109,6 +125,25 @@ operators, both enumerated in \specfigref{precedence}. The operators \pyinline{a
 expression forms, since they need not evaluate both operands. The grammar of \figref{syntax-expr} is intentionally ambiguous
 on operator forms; disambiguation is by the precedence and associativity given in \specfigref{precedence},
 which follow Python. It is ambiguous in the same way on tuples and tuple patterns, which are written with grouping parentheses where Python's grammar requires them. The empty tuple is written \pyinline{()}, one-element tuples carry a trailing comma, \pyinline{(1,)}, and trailing commas are permitted wherever Python's grammar permits them.
+\end{DeletedBlock}
+\begin{AddedBlock}
+An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by keyword
+arguments $x = u$, where an argument $u$ is an expression in a call and a pattern in a constructor pattern.
+Dataclasses name their fields in a fixed order, and the auxiliary function $\fieldMap{\Sigma}$ pairs the fields
+of a class with the arguments supplied for them, positionally or by keyword, so that the rules for constructor
+calls and patterns do not depend on the split between the two kinds of argument.
+
+Parameters, returns and dataclass fields are annotated with \emph{type expressions} $\psi$, and an assignment
+may be annotated. Type expressions are expressions (\figref{syntax-expr}) denoting types $\tau$
+(\figref{syntax-types}). Types have the forms of type expressions, except that where type expressions name
+classes and type aliases by qualified names applied to type arguments, $q[\seq{\psi}]$, types have
+\emph{instantiated classes} $C[\seq{\tau}]$ and type variables $\alpha$. \emph{Schemes} $\pi$
+(\figref{syntax-types}) bind type parameters $\seq{\alpha}$ in a type, for functions, or in a sequence of typed
+fields, for classes, and are instantiated by substituting types for the type parameters; schemes without type
+parameters are their bodies. The metavariables $\odot$ and $\ominus$ range over the binary and unary operators,
+whose precedence and associativity follow Python (\specfigref{precedence}); \pyinline{and} and \pyinline{or} are
+separate expression forms, since they need not evaluate both operands.
+\end{AddedBlock}
 
 \subsection{Modules and programs}
 \label{sec:modules-programs}

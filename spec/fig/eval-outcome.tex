@@ -146,7 +146,7 @@
   \rho \override \rho', s' \Rightarrow o
 }
 {
-  \rho, s\;s' \Rightarrow \assigns{\rho'} \override o
+  \rho, \exSeq{s}{s'} \Rightarrow \assigns{\rho'} \override o
 }
 \and
 \inferrule*[lab={\ruleName{eval-seq-return}}]
@@ -154,7 +154,7 @@
   \rho, s \Rightarrow \returns{v}
 }
 {
-  \rho, s\;s' \Rightarrow \returns{v}
+  \rho, \exSeq{s}{s'} \Rightarrow \returns{v}
 }
 \end{mathpar}
 \caption{Statement $s$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
@@ -270,7 +270,7 @@
   \rho, s \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, s\;s' \Rightarrow \aborts{\kappa}
+  \rho, \exSeq{s}{s'} \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
 \caption{Statement evaluation, continued (propagation rules and aborting cases)}
