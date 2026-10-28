@@ -17,10 +17,10 @@ import Reasons
 import Syntax
 
 from . import reasons, syntax
-from .check_module import containing, name_declaration
-from .check_program import format_program_result, module_names, module_path, parse
+from .check_module import name_declaration
+from .check_program import format_program_result, parse_program
 from .conformance import Exit
-from .contexts import MAIN
+from .contexts import PREDEFINED_MODULES
 from .operators import BINARY_NAMES, UNARY_NAMES
 from .reasons import IllFormed, IllFormedModule, IllFormedProgram, MypyCompatibility
 from .syntax_utils import (
@@ -56,8 +56,6 @@ from .type_syntax import (
     Var,
     dotted_name,
     parse_name,
-    proper_prefixes,
-    qualified,
 )
 
 
@@ -422,61 +420,13 @@ def module_body(q: Name, m: ast.Module) -> Any:
 
 
 def program(entry_path: pathlib.Path) -> Any:
-    names = module_names(entry_path.parent) | {MAIN}
-    parsed = parse_reachable(MAIN, {}, names, entry_path)
-    # modules not reached by imports are left unparsed, with an empty body
     return Finite_Map.fmap_of_list(
         [
-            (name(q), module_body(q, parsed.get(q, ast.Module(body=[], type_ignores=[]))))
-            for q in sorted(names, key=str)
+            (name(q), module_body(q, m))
+            for q, m in parse_program(entry_path).items()
+            if q not in PREDEFINED_MODULES
         ]
     )
-
-
-def parse_reachable(
-    q: Name, parsed: dict[Name, ast.Module], names: set[Name], entry_path: pathlib.Path
-) -> dict[Name, ast.Module]:
-    """Modules parsed when q is imported, in the order the reference checker parses them"""
-    if q not in names or q in parsed:
-        return parsed
-    m = parse_module(q, entry_path)
-    iotas, _ = split_imports(m.body)
-    return reduce(
-        lambda parsed_, q_: parse_reachable(q_, parsed_, names, entry_path),
-        [q_ for iota in iotas for q_ in modules_checked(q, iota, names)],
-        {**parsed, q: m},
-    )
-
-
-def modules_checked(q: Name, iota: ast.stmt, names: set[Name]) -> list[Name]:
-    """Modules checked by an import statement of module q, in order"""
-    match iota:
-        case ast.Import(names=[alias]):
-            q_ = parse_name(alias.name)
-            return [*proper_prefixes(q_), q_]
-        case ast.ImportFrom(module=str(q_s), names=aliases):
-            q_ = parse_name(q_s)
-            submodules = [p for a in aliases for p in [qualified(q_, a.name)] if p in names]
-            return [q_, *containing(q, q_), *submodules]
-        case _:
-            raise AssertionError(f"unexpected import: {type(iota).__name__}")
-
-
-def parse_module(q: Name, entry_path: pathlib.Path) -> ast.Module:
-    try:
-        return parse(path_of(q, entry_path))
-    except syntax.Unsupported as e:
-        e.module = q
-        raise
-
-
-def path_of(q: Name, entry_path: pathlib.Path) -> pathlib.Path:
-    if q == MAIN:
-        return entry_path
-    path = module_path(q, entry_path.parent)
-    # other names come from files and directories under the entry module's directory
-    assert path is not None
-    return path
 
 
 def from_name(q: Any) -> Name:
