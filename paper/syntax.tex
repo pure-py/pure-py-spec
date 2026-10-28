@@ -74,9 +74,6 @@ of the class are resolved. The well-formedness rules build the class table while
 (\specfigref{typing-top-level}).
 \end{AddedBlock}
 
-\subsubsection{Context operations}
-\label{sec:context-operations}
-
 \begin{DeletedBlock}
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
 up to type equivalence, an idempotent commutative semigroup of parallel composition $\Gamma \merge_{\Sigma} \Delta$ (``merge'').  Both are defined pointwise, by $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$
@@ -90,14 +87,21 @@ branches. When both entries of a variable are defined, merge therefore gives an 
 definitely assigned if both entries are definitely assigned and possibly unassigned otherwise.
 \input{spec/syntax/context-operations}
 \end{DeletedBlock}
+\subsubsection{Context operations}
+\label{sec:context-operations}
+
 \begin{AddedBlock}
-Contexts compose sequentially by \emph{override}, $\Gamma \override \Delta$, and in parallel by \emph{merge},
-$\Gamma \merge_{\Sigma} \Delta$, both defined pointwise from operations on context entries
-(Definitions~\specnum{def:override} and \specnum{def:merge}). Override is right-biased, so an entry of $\Delta$ replaces the
-entry of $\Gamma$ for the same variable, and has the empty context as unit. Merge combines the contexts of two
-branches. A variable with the same entry in both keeps it, a variable defined or definitely assigned in only
-one branch is possibly unassigned after the merge, and a variable bound at different types in the two
-branches, as a pattern variable may be, is merged at the join of the types (\secref{types}).
+Contexts compose in two ways. \emph{Override}, $\Gamma \override \Delta$, is sequential composition: the entries
+of $\Delta$ replace those of $\Gamma$ for the same variables, so the context after a statement sequence is the
+context before the sequence overridden by the assignments made by the sequence. \emph{Merge},
+$\Gamma \merge_{\Sigma} \Delta$, is parallel composition, combining the contexts produced by the two branches of
+a conditional into the context after the conditional. A variable with the same entry in both branches keeps
+that entry. A variable declared in both branches but assigned in only one, or declared in only one, becomes
+possibly unassigned. A variable bound in the two branches at different types, which happens when the branches
+are cases of a \pyinline{match} binding the same pattern variable, is bound at the join of the two types, the
+least type above both (Lemma~\ref{lem:lattice}); the join depends on the subtyping between classes, so merge
+takes the class table $\Sigma$. Both operations are defined pointwise on entries
+(Definitions~\specnum{def:override} and \specnum{def:merge}).
 \end{AddedBlock}
 
 \subsection{Expressions and statements}
