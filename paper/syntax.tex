@@ -136,8 +136,10 @@ positional argument to the field at that position and each keyword argument to t
 the rules for constructor calls and patterns are able to check each argument against the type of the
 corresponding field.
 
-\emph{Type expressions} $\psi$ are expressions which denote types (\figref{syntax-types}); they have the form of
-types, except that where types have \emph{instantiated classes} $C[\seq{\tau}]$ and type variables $\alpha$,
+\paragraph{Types and schemes.}
+
+\figref{syntax-types} gives the syntax of types $\tau$, familiar from mypy, and of schemes $\pi$.
+\emph{Type expressions} $\psi$ are expressions which denote types; they have the form of types, except that where types have \emph{instantiated classes} $C[\seq{\tau}]$ and type variables $\alpha$,
 type expressions have qualified names applied to type arguments, $q[\seq{\psi}]$, naming a class, type alias or type
 parameter; the rules of \specfigref{resolve-type} resolve type expressions to types. Parameters, return
 types and dataclass fields are annotated with type expressions, and so are variable declarations
