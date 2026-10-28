@@ -96,8 +96,8 @@ statements, so type definitions occur only at the top level of a module. Functio
 \pyinline{type} statements bind distinct \emph{type parameters} $\seq{\alpha}$, written in brackets after the
 name as in Python 3.12. \emph{Mutual def regions} $d_1 \ldots d_{n+1}$ are maximal contiguous blocks of
 \pyinline{def} statements, and \emph{mutual type regions} $\chi_1 \ldots \chi_{n+1}$ maximal contiguous blocks
-of type definitions; the well-formedness rules treat each as one mutually recursive binding
-(\secref{mutual-recursion}).
+of type definitions; the well-formedness rules treat each as one mutually recursive binding, which replaces
+Python's late binding (\secref{mutual-recursion}).
 \end{AddedBlock}
 
 \input{paper/fig/syntax}
