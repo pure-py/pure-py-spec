@@ -250,18 +250,18 @@ class EvalPlus(JsonlBenchmark):
         tempfile.tempdir = payload["directory"]
 
     def execute(self, payload, grader) -> Verdict:
-        import multiprocessing
-        from evalplus.eval import untrusted_check
-        from evalplus.gen.util import trusted_exec
-        multiprocessing.set_start_method("fork", force=True)
-        if sys.platform == "darwin":
-            os.environ["EVALPLUS_MAX_MEMORY_BYTES"] = "-1"
-        inputs = pickle.loads(base64.b64decode(payload["inputs"]))
         try:
+            import multiprocessing
+            from evalplus.eval import untrusted_check
+            from evalplus.gen.util import trusted_exec
+            multiprocessing.set_start_method("fork", force=True)
+            if sys.platform == "darwin":
+                os.environ["EVALPLUS_MAX_MEMORY_BYTES"] = "-1"
+            inputs = pickle.loads(base64.b64decode(payload["inputs"]))
             expected, times = trusted_exec(payload["reference"], inputs, payload["name"], record_time=True,
                                            output_not_none=payload["output_not_none"])
         except BaseException:
-            return Verdict(None, "reference solution failed: " + traceback.format_exc().strip()[-500:], True)
+            return Verdict(None, "EvalPlus preparation failed: " + traceback.format_exc().strip()[-500:], True)
         status, details = untrusted_check(payload["dataset"], payload["candidate"], inputs, payload["name"],
                                           expected, payload["atol"], times)
         passed = sum(bool(d) for d in details)

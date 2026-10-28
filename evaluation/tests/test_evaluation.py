@@ -1,10 +1,12 @@
 import argparse
+import base64
 import copy
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import io
 import json
 import os
 from pathlib import Path
+import pickle
 import tempfile
 import threading
 import tokenize
@@ -46,6 +48,36 @@ class EvaluationTests(unittest.TestCase):
                     wrong = benchmark.grade(f"def {task.name}(*args):\n    return None\n", task)
                     self.assertFalse(wrong.passed)
                     self.assertFalse(wrong.tooling_error)
+
+    def test_evalplus_distinguishes_preparation_and_candidate_failures(self):
+        identity = "def probe(x):\n    return x\n"
+        payload = {"candidate": identity, "reference": identity, "name": "probe", "dataset": "humaneval",
+                   "inputs": base64.b64encode(pickle.dumps([[1]])).decode(), "atol": 0,
+                   "output_not_none": False, "test_count": 1}
+        module = (e.ROOT / "evaluation_benchmarks.py").read_text()
+        cases = [
+            ("valid", {}, None, True, False, None),
+            ("wrong", {"candidate": "def probe(x):\n    return None\n"}, None, False, False, "fail"),
+            ("exception", {"candidate": "def probe(x):\n    raise RuntimeError('candidate failed')\n"},
+             None, False, False, "fail"),
+            ("call_timeout", {"candidate": "def probe(x):\n    while True:\n        pass\n"},
+             None, False, False, "fail"),
+            ("decode", {"inputs": base64.b64encode(b"not a pickle").decode()},
+             None, None, True, "UnpicklingError"),
+            ("import", {}, {"evaluation_benchmarks.py": module + "\nsys.modules['evalplus.eval'] = None\n"},
+             None, True, "ModuleNotFoundError"),
+            ("reference", {"reference": "def probe(x):\n    raise RuntimeError('reference failed')\n"},
+             None, None, True, "reference failed"),
+        ]
+        for name in ("humaneval-plus", "mbpp-plus"):
+            benchmark = e.BENCHMARKS[name]()
+            for label, changes, files, passed, tooling, diagnostic in cases:
+                with self.subTest(benchmark=name, case=label):
+                    verdict = benchmark.sandbox({**payload, "dataset": benchmark.dataset, **changes}, 10, files)
+                    self.assertIs(verdict.passed, passed)
+                    self.assertIs(verdict.tooling_error, tooling)
+                    if diagnostic:
+                        self.assertIn(diagnostic, verdict.error)
 
     def test_checker_and_official_tests_are_independent(self):
         self.assertTrue(e.check(GOOD).passed)
