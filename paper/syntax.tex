@@ -88,8 +88,8 @@ maximal contiguous block of type definitions, grouped by the parser in the same 
 mutual def region and each mutual type region as one mutually-recursive binding (see \secref{mutual-recursion}).
 \end{DeletedBlock}
 \begin{AddedBlock}
-\figref{syntax-stmt} gives the syntax of statements $s$, which are sequenced by juxtaposition, $\exSeq{s}{s'}$; a function body, branch of a conditional and body of a
-case are statements. \emph{Type definitions} $\chi$ are either class definitions or \pyinline{type}
+\figref{syntax-stmt} gives the syntax of statements $s$, which are sequenced by juxtaposition, $\exSeq{s}{s'}$; function bodies, branches of conditionals and bodies of
+cases are statements. \emph{Type definitions} $\chi$ are either class definitions or \pyinline{type}
 statements, which declare \emph{type aliases}. \emph{Top-level statements} $t$ are either statements or mutual
 type regions, also sequenced by juxtaposition; module bodies consist of imports followed by top-level
 statements, so type definitions occur only at the top level of a module. Function definitions, class definitions and
