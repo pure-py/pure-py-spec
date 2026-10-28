@@ -448,6 +448,7 @@ UOP_AST = {uop: op for op, uop in UOP.items()}
 
 
 def from_expr(e: Any) -> ast.expr:
+    """Syntax tree of e, so that a message can quote e by unparsing it"""
     return from_expr_node(node(e))
 
 
