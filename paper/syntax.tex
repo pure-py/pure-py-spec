@@ -52,11 +52,14 @@ every path to the current point has assigned it, so it may be used. A variable w
 declared at $\tau$ but \emph{definitely unassigned}, like a blank final in Java before its assignment, so it
 may be assigned but not used. A variable with entry $\PU{\tau}$ is \emph{possibly unassigned}, because it is
 assigned on some paths but not on all, so it may be neither used nor assigned. A variable with entry $\Unbound$
-is declared later in its scope, and a use of it is reported by Python at run time as an unbound local. A
+is declared later in its scope; uses are rejected statically, where Python would fail at run time with
+\pyinline{UnboundLocalError}. A
 function with type parameters is bound at a type scheme rather than a type, and is likewise possibly
-unassigned when defined in only one branch of a conditional. An imported module is bound at a stub
-$\modStub{q}$ until it has been checked, and then at $\modLoaded{q}{\Gamma}$, which carries its signature
-$\Gamma$. The remaining forms denote types rather than values: a class, a type parameter, and a type alias
+unassigned when defined in only one branch of a conditional. Imported
+modules are bound at a stub $\modStub{q}$ until checked, and then at $\modLoaded{q}{\Gamma}$, which carries the
+signature $\Gamma$ of the module.
+
+The remaining forms denote types rather than values: a class, a type parameter, and a type alias
 together with the mutual type region declaring it and the context in which it is resolved. A predefined name
 such as \pyinline{list} or \pyinline{dataclass}, with a meaning fixed by \PurePy, has an entry recording only that
 the name is in scope. We write $\Gamma, \bind{x}{\theta}$ for $\Gamma$ with its entry for $x$ replaced by
