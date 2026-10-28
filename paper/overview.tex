@@ -150,8 +150,8 @@ n: int = len([1])  # error: len is bound by the module
 len: int = 2
 \end{python}
 \end{DeletedBlock}
-\noindent A pattern introduces its variables rather than assigning them, so a pattern cannot bind a name declared
-in its scope either, although several cases of one match may bind the same variable.
+\noindent A pattern \replaced{both declares and assigns its variables, so it}{introduces its variables rather than assigning them, so a pattern } cannot bind a name \added{already }declared
+in its scope\deleted{ either}, although several cases of one match may bind the same variable.
 
 \subsubsection{Control flow and effects}
 \label{sec:no-effects}
