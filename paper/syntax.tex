@@ -1,27 +1,12 @@
 \section{Syntax}
 \label{sec:syntax}
 
-The syntax of \PurePy is given in \figrefTwo{syntax-stmt}{syntax-types}. \Added{Throughout the paper, a sequence $\seq{x}$ denotes $x_1, \ldots, x_n$ for some $n$. Inside the brackets of a tuple, list, type
+The syntax of \PurePy is given in \figrefTwo{syntax-stmt}{syntax-types}. Throughout the paper, a sequence $\seq{x}$ denotes $x_1, \ldots, x_n$ for some $n$. Inside the brackets of a tuple, list, type
 application or argument list, $\seq{e}$ stands for the comma-separated elements, so $\exTuple{\seq{e}}$ is
 $\exTuple{e_1, \ldots, e_n}$. The sequence $x \cons \seq{x}$ has head $x$ and tail $\seq{x}$. Comma-separated
 elements inside set braces are pairwise distinct. Two sequences of equal length paired by a colon,
 $\bind{\seq{x}}{\seq{\psi}}$, denote the sequence of pairs $\bind{x_1}{\psi_1}, \ldots, \bind{x_n}{\psi_n}$, and a
-judgement applied to sequences of equal length holds pointwise.}
-\begin{DeletedBlock}
-A sequence $\seq{x}$ denotes $x_1, \ldots, x_n$ for some $n$; inside the brackets of a tuple, list, type
-application or argument list it stands for the comma-separated elements, so $\exTuple{\seq{e}}$ is
-$\exTuple{e_1, \ldots, e_n}$. The sequence $x \cons \seq{x}$ has head $x$ and tail $\seq{x}$, and
-$\seq{x} \mathbin{\concat} \seq{y}$ is concatenation.
-Comma-separated elements inside set braces are pairwise distinct, so $\set{x_1, \ldots, x_n}$ has $n$
-elements; the set of the elements of a sequence, $\set{\seq{x}}$, assumes no distinctness. A sequence
-comprehension $(x_i \mid i \in I)$, where the finite index set $I$ carries a total order, denotes the
-sequence of the $x_i$ in that order. Two sequences of equal length paired by a colon, $\bind{\seq{x}}{\seq{\psi}}$, denote the sequence of pairs $\bind{x_1}{\psi_1}, \ldots, \bind{x_n}{\psi_n}$. A judgement applied to sequences of equal length holds pointwise, so that
-$\Sigma; \Gamma \vdash \seq{\psi} \synth \seq{\tau}$ abbreviates $\Sigma; \Gamma \vdash \psi_i \synth \tau_i$ for each $i$. When the order of its elements matters, a set $\set{x_1, \ldots, x_n}$ is
-\emph{ordered} by position. A comprehension over an ordered set preserves the order of its source;
-$X \setminus Y$ keeps the surviving elements of $X$ in their order; $X \disjunion Y$, defined when $X$
-and $Y$ are disjoint, appends the elements of $Y$ to those of $X$; $X \cup Y$ appends the elements of
-$Y$ not in $X$; and a product of ordered sets is ordered lexicographically.
-\end{DeletedBlock}
+judgement applied to sequences of equal length holds pointwise.
 
 \subsection{Lexical syntax}
 \label{sec:lexical}
