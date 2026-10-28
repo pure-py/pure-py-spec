@@ -136,10 +136,7 @@ statically (\secref{well-formedness-modules}).
 
 A module may not bind a name that is also the name of one of its submodules. In Python an attribute of a
 module can be set both by an assignment in the module body and by loading a same-named submodule, each
-overwriting the other, so the value of the attribute depends on load order. \Added{The name has no
-load-order-independent meaning, so \PurePy excludes the clash outright. \specref{sec:no-load-dependent} lists the
-exclusions of this section with the stage at which each takes effect, and gives a program in which importing a
-module that is never used changes the value printed by the main module.}
+overwriting the other, so the value of the attribute depends on load order. \Added{\specref{sec:no-load-dependent} lists these exclusions, with an example.}
 \begin{DeletedBlock}
 Consider a program with four modules:
 

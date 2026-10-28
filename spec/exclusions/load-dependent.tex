@@ -53,6 +53,5 @@ print(pkg.sub) # <module 'pkg.sub'>
 \end{python}
 
 Loading \pyinline{pkg.sub}, wherever in the program it happens, sets it as an attribute of the shared
-\pyinline{pkg} object, so the extra import changes the meaning of \pyinline{pkg.sub} in the main module, which does
-not import \pyinline{pkg.sub}. The name has no load-order-independent meaning, so \PurePy excludes the clash
-outright.
+\pyinline{pkg} object, so the extra import changes the meaning of \pyinline{pkg.sub} in the main module, even though
+it does not import \pyinline{pkg.sub}. \PurePy rejects \pyinline{pkg}, because it binds the name of its submodule.
