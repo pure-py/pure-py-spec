@@ -4,7 +4,6 @@ definitions."""
 
 import argparse
 import ast
-import math
 import pathlib
 import sys
 from functools import reduce
@@ -13,8 +12,6 @@ from typing import Any
 import Finite_Map
 import Option
 import Programs
-import Rat
-import Real
 import Reasons
 import Syntax
 
@@ -60,28 +57,6 @@ from .type_syntax import (
     parse_name,
 )
 
-# Float or string unrepresentable in Isabelle; delete with https://github.com/pure-py/isabelle-purepy/issues/11
-UNREPRESENTABLE = 5
-
-
-class Unrepresentable(Exception):
-    def __init__(self, reason: str):
-        super().__init__(f"unrepresentable in Isabelle: {reason}")
-
-
-def string(s: str) -> list[str]:
-    """Isabelle string, if Latin-1"""
-    if any(ord(c) > 255 for c in s):
-        raise Unrepresentable(f"string {s!r} with a character outside Latin-1")
-    return list(s)
-
-
-def real(x: float) -> Any:
-    """Isabelle real, if finite"""
-    if not math.isfinite(x):
-        raise Unrepresentable(f"float {x} outside the reals")
-    return Real.Ratreal(Rat.Frct(x.as_integer_ratio()))
-
 
 def lit(v: object) -> Any:
     match v:
@@ -90,9 +65,9 @@ def lit(v: object) -> Any:
         case int():
             return Syntax.LitInt(v)
         case float():
-            return Syntax.LitFloat(real(v))
+            return Syntax.LitFloat(v)
         case str():
-            return Syntax.LitString(string(v))
+            return Syntax.LitString(v)
         case None:
             return Syntax.LitNone()
         case _:
@@ -100,7 +75,7 @@ def lit(v: object) -> Any:
 
 
 def name(q: Name) -> Any:
-    return (string(q.parts[0]), [string(x) for x in q.parts[1:]])
+    return (q.parts[0], list(q.parts[1:]))
 
 
 def option(x: Any) -> Any:
@@ -172,7 +147,7 @@ UOP = {
 def expr(e: ast.expr) -> Any:
     match e:
         case ast.Name(id=x):
-            return Syntax.ExprVar(string(x))
+            return Syntax.ExprVar(x)
         case ast.Constant(value=v):
             return Syntax.ExprLiteral(lit(v))
         case ast.Call(func=f, args=es, keywords=ks):
@@ -180,7 +155,7 @@ def expr(e: ast.expr) -> Any:
         case ast.Dict(values=vs):
             return Syntax.ExprDict([(expr(k), expr(v)) for k, v in zip(dict_keys(e), vs)])
         case ast.Attribute(value=e_, attr=x):
-            return Syntax.ExprAttribute(expr(e_), string(x))
+            return Syntax.ExprAttribute(expr(e_), x)
         case ast.Subscript(value=e_, slice=e__):
             return Syntax.ExprSubscript(expr(e_), expr(e__))
         case ast.BinOp(left=e_, op=op, right=e__):
@@ -204,14 +179,14 @@ def expr(e: ast.expr) -> Any:
         case ast.DictComp(key=e_, value=e__, generators=gs):
             return Syntax.ExprDictComp(expr(e_), expr(e__), qualifiers(gs))
         case ast.Lambda(args=args, body=e_):
-            return Syntax.ExprLambda([string(a.arg) for a in args.args], expr(e_))
+            return Syntax.ExprLambda([a.arg for a in args.args], expr(e_))
         case _:
             raise AssertionError(f"unexpected expression: {type(e).__name__}")
 
 
 def keyword(k: ast.keyword) -> tuple[Any, Any]:
     assert k.arg is not None  # dictionary unpacking rejected by the parser
-    return (string(k.arg), expr(k.value))
+    return (k.arg, expr(k.value))
 
 
 def qualifiers(gs: list[ast.comprehension]) -> list[Any]:
@@ -219,7 +194,7 @@ def qualifiers(gs: list[ast.comprehension]) -> list[Any]:
         q
         for g in gs
         for q in [
-            Syntax.Generator(string(target_name(g)), expr(g.iter)),
+            Syntax.Generator(target_name(g), expr(g.iter)),
             *(Syntax.Guard(expr(c)) for c in g.ifs),
         ]
     ]
@@ -232,9 +207,9 @@ def pat(p: ast.pattern) -> Any:
         case ast.MatchAs(pattern=None, name=None):
             return Syntax.PatWildcard()
         case ast.MatchAs(pattern=None, name=str(x)):
-            return Syntax.PatVar(string(x))
+            return Syntax.PatVar(x)
         case ast.MatchAs(pattern=ast.pattern() as p_, name=str(x)):
-            return Syntax.PatAs(pat(p_), string(x))
+            return Syntax.PatAs(pat(p_), x)
         case syntax.PatList(patterns=ps):
             return Syntax.PatList([pat(p_) for p_ in ps])
         case syntax.PatTuple(patterns=ps):
@@ -243,10 +218,10 @@ def pat(p: ast.pattern) -> Any:
             q = dotted_name(c)
             assert q is not None  # other heads rejected by Python
             return Syntax.PatConstr(
-                name(q), ([pat(p_) for p_ in ps], [(string(x), pat(q_)) for x, q_ in zip(xs, qs)])
+                name(q), ([pat(p_) for p_ in ps], [(x, pat(q_)) for x, q_ in zip(xs, qs)])
             )
         case ast.MatchMapping(keys=ks, patterns=ps):
-            return Syntax.PatDict([(string(key(k)), pat(q)) for k, q in zip(ks, ps)])
+            return Syntax.PatDict([(key(k), pat(q)) for k, q in zip(ks, ps)])
         case _:
             raise AssertionError(f"unexpected pattern: {type(p).__name__}")
 
@@ -261,11 +236,11 @@ def stmt(s: ast.stmt) -> Any:
         case ast.Pass():
             return Syntax.StmtPass()
         case ast.Assign(targets=[ast.Name(id=x)], value=e):
-            return Syntax.StmtAssign(string(x), Option.None_(), expr(e))
+            return Syntax.StmtAssign(x, Option.None_(), expr(e))
         case ast.AnnAssign(target=ast.Name(id=x), annotation=a, value=None):
-            return Syntax.StmtDeclare(string(x), annotation(a))
+            return Syntax.StmtDeclare(x, annotation(a))
         case ast.AnnAssign(target=ast.Name(id=x), annotation=a, value=ast.expr() as e):
-            return Syntax.StmtAssign(string(x), Option.Some(annotation(a)), expr(e))
+            return Syntax.StmtAssign(x, Option.Some(annotation(a)), expr(e))
         case ast.Expr(value=e):
             return Syntax.StmtExpr(expr(e))
         case ast.Assert(test=e, msg=e_):
@@ -314,25 +289,25 @@ def item_stmt(item: Statement) -> Any:
 def func(d: ast.stmt) -> Any:
     assert isinstance(d, ast.FunctionDef)  # mutual def regions hold only def statements
     return Syntax.Def(
-        string(d.name),
+        d.name,
         type_params(d),
-        [(string(a.arg), annotation(a.annotation)) for a in d.args.args],
+        [(a.arg, annotation(a.annotation)) for a in d.args.args],
         annotation(d.returns),
         seq(d.body),
     )
 
 
 def type_params(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlias) -> list[Any]:
-    return [string(alpha) for alpha in type_param_names(node)]
+    return [alpha for alpha in type_param_names(node)]
 
 
 def type_def(chi: ast.stmt) -> Any:
     match chi:
         case ast.ClassDef(name=c, bases=bases):
-            fields = [(string(x), ty_expr(psi)) for x, psi in own_fields(chi)]
-            return Syntax.Dataclass(string(c), type_params(chi), extends(bases), fields)
+            fields = [(x, ty_expr(psi)) for x, psi in own_fields(chi)]
+            return Syntax.Dataclass(c, type_params(chi), extends(bases), fields)
         case ast.TypeAlias(name=ast.Name(id=x), value=psi):
-            return Syntax.TypeStmt(string(x), type_params(chi), annotation(psi))
+            return Syntax.TypeStmt(x, type_params(chi), annotation(psi))
         case _:
             raise AssertionError(f"unexpected type definition: {type(chi).__name__}")
 
@@ -369,7 +344,7 @@ def import_(iota: ast.stmt) -> Any:
         case ast.Import(names=[alias]):
             return Syntax.Import(name(parse_name(alias.name)))
         case ast.ImportFrom(module=str(q), names=aliases):
-            return Syntax.FromImport(name(parse_name(q)), [string(a.name) for a in aliases])
+            return Syntax.FromImport(name(parse_name(q)), [a.name for a in aliases])
         case _:
             raise AssertionError(f"unexpected import: {type(iota).__name__}")
 
@@ -404,23 +379,19 @@ def path_of(q: Name, entry_path: pathlib.Path) -> pathlib.Path:
     return path
 
 
-def from_string(s: list[str]) -> str:
-    return "".join(s)
-
-
 def from_name(q: Any) -> Name:
     x, xs = q
-    return Name((from_string(x), *map(from_string, xs)))
+    return Name((x, *xs))
 
 
 def from_lit(ell: Any) -> Literal:
     match ell:
         case Syntax.LitInt(v) | Syntax.LitBool(v):
             return Literal(v)
-        case Syntax.LitFloat(Real.Ratreal(Rat.Frct((n, d)))):
-            return Literal(n / d)
+        case Syntax.LitFloat(x):
+            return Literal(x)
         case Syntax.LitString(s):
-            return Literal(from_string(s))
+            return Literal(s)
         case Syntax.LitNone():
             return Literal(None)
         case _:
@@ -445,7 +416,7 @@ def from_ty(tau: Any) -> Type:
         case Syntax.TyLiteral(ell):
             return LiteralType(from_lit(ell))
         case Syntax.TyVar(alpha):
-            return TypeVariable(from_string(alpha))
+            return TypeVariable(alpha)
         case Syntax.TyClass(c, taus):
             return ClassType(ClassName(from_name(c)), tuple(from_ty(tau_) for tau_ in taus))
         case Syntax.TyUnion(sigma, tau_):
@@ -470,24 +441,20 @@ def render_pat(p: Any) -> str:
         case Syntax.PatLiteral(ell):
             return ast.unparse(ast.Constant(from_lit(ell).value))
         case Syntax.PatVar(x):
-            return from_string(x)
+            return str(x)
         case Syntax.PatWildcard():
             return "_"
         case Syntax.PatAs(p_, x):
-            return f"{render_pat(p_)} as {from_string(x)}"
+            return f"{render_pat(p_)} as {x}"
         case Syntax.PatList(ps):
             return "[" + ", ".join(map(render_pat, ps)) + "]"
         case Syntax.PatTuple(ps):
             return "(" + ", ".join(map(render_pat, ps)) + ")"
         case Syntax.PatDict(kps):
-            items = (
-                f"{ast.unparse(ast.Constant(from_string(w)))}: {render_pat(q)}" for w, q in kps
-            )
+            items = (f"{ast.unparse(ast.Constant(w))}: {render_pat(q)}" for w, q in kps)
             return "{" + ", ".join(items) + "}"
         case Syntax.PatConstr(q, (ps, kps)):
-            args = [render_pat(p_) for p_ in ps] + [
-                f"{from_string(x)}={render_pat(p_)}" for x, p_ in kps
-            ]
+            args = [render_pat(p_) for p_ in ps] + [f"{x}={render_pat(p_)}" for x, p_ in kps]
             return f"{from_name(q)}({', '.join(args)})"
         case _:
             raise AssertionError(f"unexpected pattern: {p}")
@@ -496,43 +463,43 @@ def render_pat(p: Any) -> str:
 def from_reason(r: Any) -> reasons.Reason:
     match r:
         case Reasons.DuplicateField(x, c):
-            return reasons.DuplicateField(from_string(x), from_string(c))
+            return reasons.DuplicateField(x, c)
         case Reasons.InheritedField(x, c, d):
-            return reasons.InheritedField(from_string(x), from_string(c), from_string(d))
+            return reasons.InheritedField(x, c, d)
         case Reasons.UndefinedVariable(x):
-            return reasons.UndefinedVariable(from_string(x))
+            return reasons.UndefinedVariable(x)
         case Reasons.UnassignedVariable(x):
-            return reasons.UnassignedVariable(from_string(x))
+            return reasons.UnassignedVariable(x)
         case Reasons.PossiblyUnassigned(x):
-            return reasons.PossiblyUnassigned(from_string(x), False)
+            return reasons.PossiblyUnassigned(x, False)
         case Reasons.UnboundName(x):
-            return reasons.UnboundName(from_string(x))
+            return reasons.UnboundName(x)
         case Reasons.Redeclaration(x):
-            return reasons.Redeclaration(from_string(x))
+            return reasons.Redeclaration(x)
         case Reasons.UndeclaredAssignment(x):
-            return reasons.UndeclaredAssignment(from_string(x))
+            return reasons.UndeclaredAssignment(x)
         case Reasons.AssignmentBeforeDeclaration(x):
-            return reasons.AssignmentBeforeDeclaration(from_string(x))
+            return reasons.AssignmentBeforeDeclaration(x)
         case Reasons.Reassignment(x):
-            return reasons.Reassignment(from_string(x))
+            return reasons.Reassignment(x)
         case Reasons.PossibleReassignment(x):
-            return reasons.PossibleReassignment(from_string(x))
+            return reasons.PossibleReassignment(x)
         case Reasons.CapturedGeneratorVariable(x):
-            return reasons.CapturedGeneratorVariable(from_string(x))
+            return reasons.CapturedGeneratorVariable(x)
         case Reasons.UnreachableStatement():
             return reasons.UnreachableStatement()
         case Reasons.ConstructorArityMismatch(c, m, n):
-            return reasons.ConstructorArityMismatch(from_string(c), m, n)
+            return reasons.ConstructorArityMismatch(c, m, n)
         case Reasons.UnknownConstructorKeyword(c, xs):
-            return reasons.UnknownConstructorKeyword(from_string(c), tuple(map(from_string, xs)))
+            return reasons.UnknownConstructorKeyword(c, tuple(xs))
         case Reasons.PatternArityMismatch(c, m, n):
-            return reasons.PatternArityMismatch(from_string(c), m, n)
+            return reasons.PatternArityMismatch(c, m, n)
         case Reasons.UnknownFieldInPattern(c, xs):
-            return reasons.UnknownFieldInPattern(from_string(c), tuple(map(from_string, xs)))
+            return reasons.UnknownFieldInPattern(c, tuple(xs))
         case Reasons.RangePattern():
             return reasons.RangePattern()
         case Reasons.PatternClassUndetermined(c, tau):
-            return reasons.PatternClassUndetermined(from_string(c), from_ty(tau))
+            return reasons.PatternClassUndetermined(c, from_ty(tau))
         case Reasons.SequenceKindMismatch(kind, tau, other):
             return reasons.SequenceKindMismatch(
                 SEQUENCE_KIND[kind], from_ty(tau), SEQUENCE_KIND[other]
@@ -544,7 +511,7 @@ def from_reason(r: Any) -> reasons.Reason:
         case Reasons.MissingReturnAssertion():
             return reasons.MissingReturnAssertion()
         case Reasons.NotPredefinedName(x):
-            return reasons.NotPredefinedName(from_string(x))
+            return reasons.NotPredefinedName(x)
         case Reasons.NotClass(q):
             return reasons.NotClass(from_name(q))
         case Reasons.ClassArityMismatch(q, m, n):
@@ -552,21 +519,21 @@ def from_reason(r: Any) -> reasons.Reason:
         case Reasons.TypeAliasArityMismatch(q, m, n):
             return reasons.TypeAliasArityMismatch(from_name(q), m, n)
         case Reasons.CyclicTypeAlias(x):
-            return reasons.CyclicTypeAlias(from_string(x))
+            return reasons.CyclicTypeAlias(x)
         case Reasons.DuplicateMember(x, q):
-            return reasons.DuplicateMember(from_string(x), from_name(q))
+            return reasons.DuplicateMember(x, from_name(q))
         case Reasons.SubmoduleNotImported(q):
             return reasons.SubmoduleNotImported(from_name(q))
         case Reasons.UnassignedMember(x, q):
-            return reasons.UnassignedMember(from_string(x), from_name(q))
+            return reasons.UnassignedMember(x, from_name(q))
         case Reasons.TopLevelAssertFalse():
             return reasons.TopLevelAssertFalse()
         case Reasons.UnknownModule(q):
             return reasons.UnknownModule(from_name(q))
         case Reasons.DuplicateImportedName(x):
-            return reasons.DuplicateImportedName(from_string(x))
+            return reasons.DuplicateImportedName(x)
         case Reasons.UnknownMember(x, q):
-            return reasons.UnknownMember(from_string(x), from_name(q))
+            return reasons.UnknownMember(x, from_name(q))
         case Reasons.ModuleAsValue(q):
             return reasons.ModuleAsValue(from_name(q))
         case Reasons.ImportOfContainedModule(q, q_):
@@ -574,11 +541,11 @@ def from_reason(r: Any) -> reasons.Reason:
         case Reasons.PredefinedNameAsValue(q):
             return reasons.PredefinedNameAsValue(from_name(q))
         case Reasons.TypeParameterAsValue(x):
-            return reasons.TypeParameterAsValue(from_string(x))
+            return reasons.TypeParameterAsValue(x)
         case Reasons.TypeSchemeAsValue(q):
             return reasons.TypeSchemeAsValue(from_name(q))
         case Reasons.NoTypeArgument(alpha):
-            return reasons.NoTypeArgument(from_string(alpha))
+            return reasons.NoTypeArgument(alpha)
         case Reasons.ClassAsValue(q):
             return reasons.ClassAsValue(from_name(q))
         case Reasons.TypeAliasAsValue(q):
@@ -610,13 +577,13 @@ def from_reason(r: Any) -> reasons.Reason:
         case Reasons.NotSynthesised():
             return reasons.NotSynthesised()
         case Reasons.UnknownField(c, x):
-            return reasons.UnknownField(from_string(c), from_string(x))
+            return reasons.UnknownField(c, x)
         case Reasons.NoAttributes(tau):
             return reasons.NoAttributes(from_ty(tau))
         case Reasons.BareReturn(tau):
             return reasons.BareReturn(from_ty(tau))
         case Reasons.MissingReturn(x, tau):
-            return reasons.MissingReturn(from_string(x), from_ty(tau))
+            return reasons.MissingReturn(x, from_ty(tau))
         case _:
             raise AssertionError(f"unexpected reason: {r}")
 
@@ -659,9 +626,6 @@ def main() -> None:
     except syntax.Unsupported as e:
         print(format_program_result(e, args.path))
         sys.exit(e.exit_code)
-    except Unrepresentable as e:
-        print(f"{args.path}: {e}")
-        sys.exit(UNREPRESENTABLE)
     if result is None:
         print(f"{args.path}: ok")
         sys.exit(Exit.OK)
