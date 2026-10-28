@@ -16,11 +16,16 @@
 \definecolor{base0E}{HTML}{8959a8} % Purple
 \definecolor{base0F}{HTML}{a3685a} % Brown
 
+% Displayed listings at 90% of \small, with the line spacing scaled alike
+\makeatletter
+\newcommand*{\pylistingsize}{\small\fontsize{\strip@pt\dimexpr\f@size pt*9/10\relax}{\strip@pt\dimexpr\f@baselineskip*9/10\relax}\selectfont}
+\makeatother
+
 \lstdefinestyle{base16python}{
   language=Python,
   morekeywords={pass} % doesn't seem to work..
   backgroundcolor=\color{base00},
-  basicstyle={\renewcommand\ttdefault{cmtt}\ttfamily\small\color{base05}},
+  basicstyle={\renewcommand\ttdefault{cmtt}\ttfamily\pylistingsize\color{base05}},
   keywordstyle=\color{base0E},
   commentstyle=\color{base03},
   stringstyle=\color{base0B},
