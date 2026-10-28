@@ -26,6 +26,7 @@ from .reasons import IllFormed, IllFormedModule, IllFormedProgram, MypyCompatibi
 from .syntax_utils import (
     Statement,
     dict_keys,
+    own_fields,
     split_imports,
     statements,
     target_name,
@@ -53,7 +54,6 @@ from .type_syntax import (
     TypeVariable,
     UnionExpr,
     UnionType,
-    Var,
     dotted_name,
     parse_name,
 )
@@ -354,20 +354,12 @@ def type_def(chi: ast.stmt) -> Any:
 def type_def_node(chi: ast.stmt) -> Any:
     match chi:
         case ast.ClassDef(name=c, bases=bases):
-            fields = [(x, annotation(t.annotation)) for x, t in field_statements(chi)]
+            fields = [(x, ty_expr(psi)) for x, psi in own_fields(chi)]
             return Syntax.Dataclass(c, type_params(chi), extends(bases), fields)
         case ast.TypeAlias(name=ast.Name(id=x), value=psi):
             return Syntax.TypeStmt(x, type_params(chi), annotation(psi))
         case _:
             raise AssertionError(f"unexpected type definition: {type(chi).__name__}")
-
-
-def field_statements(chi: ast.ClassDef) -> list[tuple[Var, ast.AnnAssign]]:
-    return [
-        (t.target.id, t)
-        for t in chi.body
-        if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)
-    ]
 
 
 def extends(bases: list[ast.expr]) -> Any:
