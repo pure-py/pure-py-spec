@@ -11,7 +11,7 @@ compatibility with mypy.}
 
 \emph{Definite assignment} enforces the discipline of \secref{no-mutable-state}: a variable may be referenced only
 where an assignment covers every path to the reference, and assigned only where no path has assigned it
-already\replaced{, as Java requires of blank finals~\cite[\S16]{gosling2025}.}{. Java imposes similar conditions on blank finals~\cite[\S16]{gosling2025}. } The \ruleName{declare} rule binds the variable at $\DU{\tau}$, declared at $\tau$ and
+already\replaced{, similar to how ``blank finals'' are treated in Java~\cite[\S16]{gosling2025}.}{. Java imposes similar conditions on blank finals~\cite[\S16]{gosling2025}. } The \ruleName{declare} rule binds the variable at $\DU{\tau}$, declared at $\tau$ and
 definitely unassigned; the \ruleName{assign} rule requires that entry, checks the expression against $\tau$ and
 makes the variable definitely assigned, so that $\Gamma(x)$ is a type, as the \ruleName{var} rule requires; \Deleted{an
 annotated assignment does both at once; }and the \ruleName{if} rules combine the branches with $\merge$, so
