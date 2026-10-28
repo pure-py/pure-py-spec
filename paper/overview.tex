@@ -137,7 +137,8 @@ def f() -> int:
 \end{listingcol}
 \begin{listingcol}{0.45\textwidth}
 \begin{python}
-n: int = len([1])  # error: len bound by module
+# error: len is bound by the module
+n: int = len([1])
 len: int = 2
 \end{python}
 \end{listingcol}
