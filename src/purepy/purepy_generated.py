@@ -11,6 +11,7 @@ from typing import Any
 
 import Finite_Map
 import Option
+import Positions
 import Programs
 import Reasons
 import Syntax
@@ -90,12 +91,12 @@ def position(node: ast.expr | ast.stmt | ast.pattern) -> tuple[int, int]:
 
 def at(node: ast.expr | ast.stmt | ast.pattern, term: Any) -> Any:
     """Term located at node"""
-    return Syntax.At(position(node), term)
+    return Positions.At(position(node), term)
 
 
 def located_at(t: Any) -> tuple[int, int]:
     match t:
-        case Syntax.At((line, col), _):
+        case Positions.At((line, col), _):
             return (line, col)
         case _:
             raise AssertionError(f"unlocated term: {t}")
@@ -103,7 +104,7 @@ def located_at(t: Any) -> tuple[int, int]:
 
 def node(t: Any) -> Any:
     match t:
-        case Syntax.At(_, u):
+        case Positions.At(_, u):
             return u
         case _:
             raise AssertionError(f"unlocated term: {t}")
@@ -317,7 +318,7 @@ def seq(body: list[ast.stmt]) -> Any:
 
 # Sequence at the position of its first statement
 def seq_stmt(s: Any, s_: Any) -> Any:
-    return Syntax.At(located_at(s), Syntax.StmtSeq(s, s_))
+    return Positions.At(located_at(s), Syntax.StmtSeq(s, s_))
 
 
 def item_stmt(item: Statement) -> Any:
