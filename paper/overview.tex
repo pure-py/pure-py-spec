@@ -37,7 +37,8 @@ A variable in \PurePy is introduced by a declaration, or as a parameter, importe
 or generator variable; a declaration is a type annotation such as \pyinline{x: int}, a form allowed in Python since
 version 3.6 (PEP 526\footnote{\url{https://peps.python.org/pep-0526/}}). \replaced{Following Java's rules for blank
 finals~\cite[\S16]{gosling2025}, variables may be assigned only if unassigned on every path to the assignment, and
-referenced only if assigned on every path to the reference.}{A variable is assigned at most once on any path, either in its declaration or afterwards, and an
+referenced only if assigned on every path to the reference (\emph{definite assignment},
+\secref{well-formedness-statements}).}{A variable is assigned at most once on any path, either in its declaration or afterwards, and an
 assignment never introduces a variable nor reassigns one (\secref{local-assignment}). }
 
 \begin{AddedBlock}
@@ -47,8 +48,8 @@ already. Java imposes similar conditions on blank finals~\cite[\S16]{gosling2025
 definitely unassigned; the \ruleName{assign} rule requires that entry, checks the expression against $\tau$ and
 makes the variable definitely assigned, so that $\Gamma(x)$ is a type, as the \ruleName{var} rule requires; an
 annotated assignment does both at once; and the \ruleName{if} rules combine the branches with $\merge$, so
-that} \added{This discipline of \emph{definite assignment} is enforced statically (\secref{well-formedness-statements}):} a variable is definitely assigned after a conditional only if each branch either assigns it or definitely
-returns, and is otherwise possibly unassigned\deleted{, $\PU{\tau}$ (\secref{well-formedness-statements})}. Branch-local variables are therefore permitted, but using one after the
+that} \added{After a conditional,} a variable is \added{therefore} definitely assigned \deleted{after a conditional }only if \replaced{every branch assigns it or returns}{each branch either assigns it or definitely
+returns}, and \deleted{is }otherwise possibly unassigned\deleted{, $\PU{\tau}$ (\secref{well-formedness-statements})}. Branch-local variables are \deleted{therefore }permitted, but using one after the
 conditional is not, nor is completing a partial assignment\replaced{:}{, as in the program on the left below. The
 \ruleName{def-body} rule introduces every variable declared or assigned by the body at $\Unbound$ before checking
 the body, so a reference before the declaration is rejected statically, as on the right, whereas Python fails at
