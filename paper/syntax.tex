@@ -20,14 +20,15 @@ written admits some programs which Python rejects as syntax errors, such as a fu
 name. \figref{syntax-distinct} lists the conditions which rule out these programs.
 \end{DeletedBlock}
 \begin{AddedBlock}
-The grammar of \PurePy is an abstract syntax: its metavariables $n$ and $w$ range over numbers and strings
-rather than over the numerals and string literals of the source text, and each form of Python's grammar is
-translated to the form of the same shape in \figref{syntax-stmt}. The translation depends on the source text
-alone, so a call $\exCall{q}{a}$ is translated in the same way whether or not $q$ denotes a class; the
-well-formedness rules treat the call as a constructor call when $q$ denotes a class
-(\secref{well-formedness}). The grammar admits some programs which Python rejects as syntax errors, such as a
-function with two parameters of the same name; \specfigref{syntax-distinct} lists the conditions which rule
-out these programs.
+The grammar of \PurePy is an abstract syntax. The translation from Python's concrete grammar, including its
+lexical syntax, comments and indentation-sensitivity, lies outside the specification, which assumes only that
+each form of the concrete grammar is translated to the form of the same shape in \figref{syntax-stmt}; the
+metavariables $n$ and $w$, for example, range over numbers and strings rather than over numerals and string
+literals. The abstract syntax has one form of call, $\exCall{q}{a}$, whether $q$ denotes a function or a class;
+the two cases are distinguished during type checking (\secref{well-formedness}). The grammar also admits some
+programs which Python rejects as syntax errors, each a duplicated name or key within one form, such as a
+function with two parameters of the same name. These exclusions from the grammar are summarised in
+\specfigref{syntax-distinct}.
 \end{AddedBlock}
 
 \subsection{Contexts}
