@@ -92,15 +92,15 @@ definitely assigned if both entries are definitely assigned and possibly unassig
 
 \begin{AddedBlock}
 Contexts compose in two ways. \emph{Override}, $\Gamma \override \Delta$, is sequential composition: the entries
-of $\Delta$ replace those of $\Gamma$ for the same variables, so for a sequence $s\;s'$ the statement $s'$ is typed
+of $\Delta$ replace those of $\Gamma$ for the same variables, so for a sequence of statements $s\,s'$ the statement $s'$ is typed
 under the context for $s$ overridden by the assignments made by $s$. \emph{Merge},
 $\Gamma \merge_{\Sigma} \Delta$, is parallel composition, combining the contexts produced by the two branches of
 a conditional into the context after the conditional. A variable with the same entry in both branches keeps
 that entry. A variable declared in both branches but assigned in only one, or declared in only one, becomes
 possibly unassigned. A variable bound in the two branches at different types, which happens when the branches
 are cases of a \pyinline{match} binding the same pattern variable, is bound at the join of the two types, their
-least upper bound (Lemma~\ref{lem:lattice}); merge takes the class table $\Sigma$ because the join depends on the
-subtyping between classes. Both operations are defined pointwise on entries
+least upper bound (Lemma~\ref{lem:lattice}); merge takes the class table $\Sigma$ because the join depends on
+subtyping. Both operations are defined pointwise on entries
 (Definitions~\specnum{def:override} and \specnum{def:merge}).
 \end{AddedBlock}
 
