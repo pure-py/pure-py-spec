@@ -6,5 +6,5 @@ $\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$}. \speconly{We identi
 $\seq{\iota}$, \speconly{its \emph{import prefix}, }\paperonly{\Deleted{its \emph{import prefix}, }}each a \emph{plain import} $\exImport{q}$ or a \emph{from-import} $\exFromImport{q}{\seq{x}}$, followed by a top-level statement $t$; since imports are not statements, they can appear neither
 within a statement nor after it. The statement begins with the
 declaration $\exAssign{\pymath{\_\_name\_\_}\exAnnot{\tyStr}}{\nameOf(q)}$, \Added{where $\nameOf(q)$ is the string
-literal naming $q$, }which binds the name of the module when the module loads (\secref{well-formedness-modules}).
+literal naming $q$,} \replaced{binding}{which binds }the name of the module when the module loads (\secref{well-formedness-modules}).
 \end{specdefinition}
