@@ -505,7 +505,7 @@ def from_expr_node(e: Any) -> ast.expr:
 
 
 def from_qualifiers(qs: list[Any]) -> list[ast.comprehension]:
-    """Comprehension nodes of the qualifiers qs, one per generator, holding the guards that follow it"""
+    """Comprehension nodes of the qualifiers qs, one per generator, holding the guards that follow that generator"""
 
     def add(gs: list[ast.comprehension], q: Any) -> list[ast.comprehension]:
         match node(q):
