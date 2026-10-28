@@ -26,6 +26,8 @@
 \usepackage{changebar}
 \ifdefined\finalmode\nochangebars\fi
 
+% Raise of the production symbol's colons for the paper's fonts; see tex/macros.tex.
+\newcommand*{\colonequalsraise}{0.05em}
 \input{tex/macros}
 \externaldocument[S-]{xref/PurePy-spec}
 \input{tex/listings}

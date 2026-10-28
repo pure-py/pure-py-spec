@@ -378,13 +378,15 @@
 % vary between fonts. The defaults are those of mathtools' \Coloneqq.
 \providecommand*{\coloncolonkern}{0.9mu}
 \providecommand*{\colonequalskern}{0mu}
+% Correction to the raise of the colons, for fonts whose glyph boxes do not centre on the ink.
+\providecommand*{\colonequalsraise}{0pt}
 \makeatletter
 \newcommand*{\coloncolon@raised}{%
   \settoheight{\dimen@}{$=$}\settodepth{\dimen@ii}{$=$}%
   \@tempdima=\dimexpr(\dimen@-\dimen@ii)/2\relax
   \settoheight{\dimen@}{$:$}\settodepth{\dimen@ii}{$:$}%
   \@tempdimb=\dimexpr(\dimen@-\dimen@ii)/2\relax
-  \raisebox{\dimexpr\@tempdima-\@tempdimb\relax}{$:\mkern-\coloncolonkern:$}}
+  \raisebox{\dimexpr\@tempdima-\@tempdimb+\colonequalsraise\relax}{$:\mkern-\coloncolonkern:$}}
 \newcommand*{\coloncolonequals}{\mathrel{\coloncolon@raised\mkern-\colonequalskern{=}}}
 \makeatother
 \newcommand*{\grammarGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{4}{l}{#1}}
