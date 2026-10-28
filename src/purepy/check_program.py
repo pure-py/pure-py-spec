@@ -1,6 +1,5 @@
 import ast
 import pathlib
-from collections.abc import Iterator, Mapping
 
 from . import syntax
 from .check_module import check_module, format_result
@@ -10,12 +9,13 @@ from .reasons import IllFormed, IllFormedModule
 from .type_syntax import Name, proper_prefixes
 
 
-def module_path(q: Name, base_dir: pathlib.Path) -> pathlib.Path | None:
+def module_path(q: Name, base_dir: pathlib.Path) -> pathlib.Path:
     stem = pathlib.Path(*q.parts)
     for candidate in (base_dir / f"{stem}.py", base_dir / stem / "__init__.py"):
         if candidate.exists():
             return candidate
-    return base_dir / stem if (base_dir / stem).is_dir() else None
+    assert (base_dir / stem).is_dir()
+    return base_dir / stem
 
 
 def parse(path: pathlib.Path) -> ast.Module:
@@ -45,46 +45,29 @@ def module_names(base_dir: pathlib.Path) -> set[Name]:
     return {p for q in names if q is not None for p in [q, *proper_prefixes(q)]}
 
 
-class Program(Mapping[Name, ast.Module]):
-    """Modules by name; each parsed on first access"""
+def parse_program(entry_path: pathlib.Path) -> dict[Name, ast.Module]:
+    """Modules by name, every module of the source tree parsed, the main module first"""
+    base_dir = entry_path.parent
+    names = sorted(module_names(base_dir), key=str)
+    return {
+        **{q: ast.Module(body=[], type_ignores=[]) for q in PREDEFINED_MODULES},
+        MAIN: parse_module(MAIN, entry_path),
+        **{q: parse_module(q, module_path(q, base_dir)) for q in names},
+    }
 
-    def __init__(self, entry_path: pathlib.Path) -> None:
-        self.base_dir = entry_path.parent
-        self.paths: dict[Name, pathlib.Path] = {MAIN: entry_path}
-        self.parsed: dict[Name, ast.Module] = {
-            q: ast.Module(body=[], type_ignores=[]) for q in PREDEFINED_MODULES
-        }
-        self.names = set(self.parsed) | set(self.paths) | module_names(self.base_dir)
 
-    def path(self, q: Name) -> pathlib.Path:
-        if q not in self.paths:
-            found = module_path(q, self.base_dir)
-            assert found is not None
-            self.paths[q] = found
-        return self.paths[q]
-
-    def __getitem__(self, q: Name) -> ast.Module:
-        if q not in self.names:
-            raise KeyError(q)
-        if q not in self.parsed:
-            try:
-                self.parsed[q] = parse(self.path(q))
-            except syntax.Unsupported as e:
-                e.module = q
-                raise
-        return self.parsed[q]
-
-    def __iter__(self) -> Iterator[Name]:
-        return iter(self.names)
-
-    def __len__(self) -> int:
-        return len(self.names)
+def parse_module(q: Name, path: pathlib.Path) -> ast.Module:
+    try:
+        return parse(path)
+    except syntax.Unsupported as e:
+        e.module = q
+        raise
 
 
 def check_program(entry_path: pathlib.Path) -> IllFormed | syntax.Unsupported | None:
-    program = Program(entry_path)
     try:
-        check_module(program[MAIN], program, MAIN, PREDEFINED_CLASSES)
+        M = parse_program(entry_path)
+        check_module(M[MAIN], M, MAIN, PREDEFINED_CLASSES)
         return None
     except (IllFormed, syntax.Unsupported) as e:
         return e
@@ -93,11 +76,7 @@ def check_program(entry_path: pathlib.Path) -> IllFormed | syntax.Unsupported | 
 # File of the module at fault, or of the entry module for a program-level error
 def error_path(result: IllFormed | syntax.Unsupported, entry_path: pathlib.Path) -> pathlib.Path:
     q = result.module if isinstance(result, (IllFormedModule, syntax.Unsupported)) else None
-    if q is None or q == MAIN:
-        return entry_path
-    path = module_path(q, entry_path.parent)
-    assert path is not None
-    return path
+    return entry_path if q is None or q == MAIN else module_path(q, entry_path.parent)
 
 
 def format_program_result(
