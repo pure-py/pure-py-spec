@@ -128,13 +128,13 @@ which follow Python. It is ambiguous in the same way on tuples and tuple pattern
 \end{DeletedBlock}
 \begin{AddedBlock}
 \emph{Argument lists} $a$ (\figref{syntax-expr}) occur in calls and in constructor patterns, and consist of
-positional arguments $\seq{u}$ followed by keyword arguments $\seq{x} \mathord{=} \seq{u}'$, where each argument is either an
-expression (when the argument list occurs in a call) or a pattern (when the argument list occurs in a
-constructor pattern). In a constructor call or pattern, the arguments supply the fields of the class, which
-dataclasses declare in a fixed order. The auxiliary function $\fieldMap{\Sigma}$ resolves each positional
-argument to the field at that position and each keyword argument
-to the field of the same name, so that the rules for constructor calls and patterns check each argument against
-the type of the corresponding field.
+positional arguments $\seq{u}$ followed by keyword arguments $\seq{x} \mathord{=} \seq{u}'$, where each argument $u$ is either an
+expression (if the argument list occurs in a call) or a pattern (if the argument list occurs in a constructor
+pattern). In a constructor call or pattern, the arguments supply the fields of the class, which dataclasses
+declare in a fixed order. The auxiliary function $\fieldMap{\Sigma}$ (\specref{aux:field-map}) resolves each
+positional argument to the field at that position and each keyword argument to the field of that name, so that
+the rules for constructor calls and patterns are able to check each argument against the type of the
+corresponding field.
 
 Parameters, returns and dataclass fields are annotated with \emph{type expressions} $\psi$, and an assignment
 may be annotated. Type expressions are expressions (\figref{syntax-expr}) denoting types $\tau$
