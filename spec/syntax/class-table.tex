@@ -1,0 +1,14 @@
+\begin{specdefinition}{Class name}
+\label{def:class}
+\emph{Class names} $C$ are fully-qualified names
+$q.c$, where $c$ is the name under which the class is defined in module $q$. A module defines each name at most
+once, so class names identify classes\speconly{, and we write ``class $C$'' for the class named $C$}. A class name is also the type of the instances of the class.
+\end{specdefinition}\paperonly{\quad}%
+\begin{specdefinition}{Class table}%
+\label{def:class-table}%
+A \emph{class table} $\Sigma$ maps each
+class name $C$ in its domain to a class entry $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$, which records the class
+definition $\chi_i$ of mutual type region $\seq{\chi}$ of module $q$ defining $C$, and the context $\Gamma$ in which
+the region appears. Every class named in $\Sigma$ is in $\dom(\Sigma)$, and the base-class relation on
+$\dom(\Sigma)$ is acyclic.%
+\end{specdefinition}
