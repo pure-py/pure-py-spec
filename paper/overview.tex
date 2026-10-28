@@ -35,14 +35,16 @@ following Python, as Haskell has \pyinline{trace}; printing reports on a computa
 
 A variable in \PurePy is introduced by a declaration, or as a parameter, imported name, pattern variable
 or generator variable; a declaration is a type annotation such as \pyinline{x: int}, a form allowed in Python since
-version 3.6 (PEP 526\footnote{\url{https://peps.python.org/pep-0526/}}). An assignment never introduces a variable
+version 3.6 (PEP 526\footnote{\url{https://peps.python.org/pep-0526/}}). \replaced{An assignment never introduces a variable
 nor reassigns one: a variable may be assigned only where no path has assigned it already, either in its declaration
 or afterwards, and referenced only where an assignment covers every path to the reference, similar to how ``blank
 finals'' are treated in Java~\cite[\S16]{gosling2025}. This discipline of \emph{definite assignment} is enforced
 statically (\secref{well-formedness-statements}): after a conditional, a variable is definitely assigned only if each
 branch either assigns it or definitely returns, and is otherwise possibly unassigned. Branch-local variables are
-therefore permitted, but using one after the conditional is not, nor is completing a partial assignment:
+therefore permitted, but using one after the conditional is not, nor is completing a partial assignment:}{A variable is assigned at most once on any path, either in its declaration or afterwards, and an
+assignment never introduces a variable nor reassigns one (\secref{local-assignment}). }
 
+\begin{AddedBlock}
 \begin{python}
 def foo(b: bool) -> int:
     x: int
@@ -56,7 +58,10 @@ def foo(b: bool) -> int:
 
 \noindent Python assigns \pyinline{x} twice when \pyinline{b} is true, so no pure reading of the program agrees with
 Python: under shadowing, \pyinline{return x} would refer to a different variable from the one assigned in the
-branch. A variable denotes a fixed value once assigned, and features associated with mutation and shared state are excluded: \pyinline{global} and \pyinline{nonlocal}, which direct assignments to a variable of an enclosing scope;
+branch.
+\end{AddedBlock}
+\noindent A variable \deleted{therefore }denotes
+a fixed value once assigned, and features associated with mutation and shared state are excluded: \pyinline{global} and \pyinline{nonlocal}, which direct assignments to a variable of an enclosing scope;
 \pyinline{del}, which removes a binding; augmented assignment (\pyinline{+=}, \pyinline{-=}, and so on); and
 the walrus operator (\pyinline{:=}), which assigns within an expression. Assignment targets are variables, so item
 assignment such as \pyinline{xs[0] = v} and attribute assignment such as \pyinline{p.x = v} are excluded, and methods
@@ -84,8 +89,9 @@ declaration of a name already declared in the same scope, including as a paramet
 variable. \PurePy follows mypy, so a function body, for example, cannot declare a name twice, whether on one path
 or in different branches, nor redeclare one of its parameters. Like mypy, \PurePy permits shadowing: a scope may
 declare a name of an enclosing scope, and the declaration then hides the enclosing variable throughout the scope,
-so a use before the declaration is rejected as unbound, where Python fails at run time with
-\pyinline{UnboundLocalError}:
+so a use before the declaration is rejected as unbound\replaced{, where Python fails at run time with
+\pyinline{UnboundLocalError}:}{. }
+\begin{AddedBlock}
 \begin{python}
 y: int = 7
 def f() -> int:
@@ -93,9 +99,17 @@ def f() -> int:
     y: int = 8
     return x
 \end{python}
-\noindent The one exception in mypy is a use at module level of a builtin name before its declaration, which refers
-to the builtin, as when Python runs the module. \PurePy treats the builtins as an enclosing scope like any other,
-and rejects the use. A pattern introduces its variables rather than assigning them, so a pattern cannot bind a name declared
+\end{AddedBlock}
+\noindent The one exception in mypy is a use at module level of a
+builtin name before its declaration, which refers to the builtin, as when Python runs the module. \PurePy treats
+the builtins as an enclosing scope like any other, and rejects the use\replaced{.}{: }
+\begin{DeletedBlock}
+\begin{python}
+n: int = len([1])  # error: len is bound by the module
+len: int = 2
+\end{python}
+\end{DeletedBlock}
+\noindent A pattern introduces its variables rather than assigning them, so a pattern cannot bind a name declared
 in its scope either, although several cases of one match may bind the same variable.
 
 \subsubsection{Control flow and effects}
