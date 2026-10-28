@@ -1,10 +1,10 @@
 \begin{specdefinition}{Program}
 A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
 (\figref{syntax-stmt}) to \emph{module bodies} $\mu$, of which one is a distinguished \emph{main module} named
-$\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
-$\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
+$\pymath{\_\_main\_\_}$\Deleted{; here $\nameOf(q)$ is the string literal naming $q$, so
+$\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$}. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
 $\seq{\iota}$, its \emph{import prefix}, each a \emph{plain import} $\exImport{q}$ or a \emph{from-import} $\exFromImport{q}{\seq{x}}$, followed by a top-level statement $t$; since imports are not statements, they can appear neither
 within a statement nor after it. The statement begins with the
-declaration $\exAssign{\pymath{\_\_name\_\_}\exAnnot{\tyStr}}{\nameOf(q)}$, which binds the name of the module when the module
-loads (\secref{well-formedness-modules}).
+declaration $\exAssign{\pymath{\_\_name\_\_}\exAnnot{\tyStr}}{\nameOf(q)}$, \Added{where $\nameOf(q)$ is the string
+literal naming $q$, }which binds the name of the module when the module loads (\secref{well-formedness-modules}).
 \end{specdefinition}
