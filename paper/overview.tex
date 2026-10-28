@@ -36,7 +36,7 @@ following Python, as Haskell has \pyinline{trace}; printing reports on a computa
 A variable in \PurePy is introduced by a declaration, or as a parameter, imported name, pattern variable
 or generator variable; a declaration is a type annotation such as \pyinline{x: int}, a form allowed in Python since
 version 3.6 (PEP 526\footnote{\url{https://peps.python.org/pep-0526/}}). \replaced{An assignment never introduces a variable
-nor reassigns one: a variable may be assigned only where no path has assigned it already, either in its declaration
+or reassigns one: a variable may be assigned only where no path has assigned it already, either in its declaration
 or afterwards, and referenced only where an assignment covers every path to the reference, similar to how ``blank
 finals'' are treated in Java~\cite[\S16]{gosling2025}. This discipline of \emph{definite assignment} is enforced
 statically (\secref{well-formedness-statements}): after a conditional, a variable is definitely assigned only if each
