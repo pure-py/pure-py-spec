@@ -2,26 +2,27 @@
 \label{sec:principles}
 
 This section introduces the concepts underlying the rules, each illustrated by admitted and rejected
-programs; the rules follow in \secref{expression-typing} to \secref{well-formedness-modules}. The rules for
+programs; the rules follow in \secref{expression-typing} to \secref{well-formedness-modules}. \Deleted{The rules for
 variables serve the two aims of \secref{no-mutable-state} and \secref{python-compatibility}, no mutable state and
-compatibility with mypy.
+compatibility with mypy.}
 
 \subsubsection{Variable declaration and definite assignment}
 \label{sec:local-assignment}
 
 \emph{Definite assignment} enforces the discipline of \secref{no-mutable-state}: a variable may be referenced only
 where an assignment covers every path to the reference, and assigned only where no path has assigned it
-already. Java imposes similar conditions on blank finals~\cite[\S16]{gosling2025}. The \ruleName{declare} rule binds the variable at $\DU{\tau}$, declared at $\tau$ and
+already\replaced{, as Java requires of blank finals~\cite[\S16]{gosling2025}.}{. Java imposes similar conditions on blank finals~\cite[\S16]{gosling2025}. } The \ruleName{declare} rule binds the variable at $\DU{\tau}$, declared at $\tau$ and
 definitely unassigned; the \ruleName{assign} rule requires that entry, checks the expression against $\tau$ and
-makes the variable definitely assigned, so that $\Gamma(x)$ is a type, as the \ruleName{var} rule requires; an
-annotated assignment does both at once; and the \ruleName{if} rules combine the branches with $\merge$, so
+makes the variable definitely assigned, so that $\Gamma(x)$ is a type, as the \ruleName{var} rule requires; \Deleted{an
+annotated assignment does both at once; }and the \ruleName{if} rules combine the branches with $\merge$, so
 that a variable is definitely assigned after a conditional only if each branch either assigns it or definitely
 returns, and is otherwise possibly unassigned, $\PU{\tau}$ (\secref{well-formedness-statements}). Branch-local variables are therefore permitted, but using one after the
-conditional is not, nor is completing a partial assignment, as in the program on the left below. The
+conditional is not, nor is completing a partial assignment\replaced{:}{, as in the program on the left below. The
 \ruleName{def-body} rule introduces every variable declared or assigned by the body at $\Unbound$ before checking
 the body, so a reference before the declaration is rejected statically, as on the right, whereas Python fails at
-run time with \pyinline{UnboundLocalError}:
+run time with \pyinline{UnboundLocalError}: }
 
+\begin{DeletedBlock}
 \begin{listingrow}
 \begin{listingcol}{0.48\textwidth}
 \begin{python}
@@ -45,17 +46,35 @@ def f() -> int:
 \end{python}
 \end{listingcol}
 \end{listingrow}
+\end{DeletedBlock}
+\begin{AddedBlock}
+\begin{python}
+def foo(b: bool) -> int:
+    x: int
+    if b:
+        x = 3
+        y: int = x + 1
+        print(y)
+    x = 0  # error: x possibly assigned
+    return x
+\end{python}
+\end{AddedBlock}
 
-\noindent On the left, Python assigns \pyinline{x} twice when \pyinline{b} is true, so no pure reading of the program
+\noindent \Deleted{On the left, }Python assigns \pyinline{x} twice when \pyinline{b} is true, so no pure reading of the program
 agrees with Python: under shadowing, \pyinline{return x} would refer to a different variable from the one
-assigned in the branch. On the right, \pyinline{y} is local to \pyinline{f} because of its declaration in
+assigned in the branch. \Deleted{On the right, \pyinline{y} is local to \pyinline{f} because of its declaration in
 \pyinline{f}. The set $\assignsS(s)$ of variables introduced by the \ruleName{def-body} rule contains the variables
-declared or assigned anywhere in the body $s$, not descending into nested function definitions, which have their own scope.
+declared or assigned anywhere in the body $s$, not descending into nested function definitions, which have their own scope.}
+\Added{The \ruleName{def-body} rule introduces every variable declared or assigned in the body at $\Unbound$ before
+checking the body, not descending into nested function definitions, so a use before the declaration is rejected
+statically (\secref{scope}), where Python fails at run time with \pyinline{UnboundLocalError}.}
 
+\begin{DeletedBlock}
 A function defined in a branch can also be used only within that branch; its name is possibly unassigned after the
 conditional, and no other branch can complete the definition, because a definition is also a declaration and a scope
 declares a name at most once. A variable of \pyinline{Callable} type, declared before the conditional and assigned in
 each branch, can be used if the function is needed after the conditional.
+\end{DeletedBlock}
 
 \subsubsection{Mutual def regions}
 \label{sec:mutual-recursion}
@@ -92,8 +111,9 @@ def odd(n: int) -> bool:
 \noindent This is rejected statically: \pyinline{even} forms a mutual def region by itself, in which \pyinline{odd}
 is not yet bound, so the reference fails the \ruleName{var} rule. Python accepts the program, since the
 call \pyinline{even(0)} never reaches \pyinline{odd}. A mutual def region with two definitions of the same name is
-rejected by the distinct-names condition:
+rejected by the distinct-names condition\replaced{, where Python treats the second definition as a reassignment.}{: }
 
+\begin{DeletedBlock}
 \begin{python}
 def g() -> int:
     return 0
@@ -107,6 +127,7 @@ def g() -> int:  # error: g defined twice in the same mutual def region
 \noindent Python accepts this too, treating the second \pyinline{def g} as a reassignment of \pyinline{g},
 which late binding then makes the target of the call in \pyinline{f}. Finally, the branches of a conditional may contain mutual def regions, with any use of those
 functions after the conditional subject to the usual definite assignment rules (\secref{local-assignment}).
+\end{DeletedBlock}
 
 \subsubsection{Pattern binding and reachability}
 \label{sec:pattern-binding}
@@ -118,11 +139,13 @@ assignment of the variables it binds, which must not be declared already. The se
 the cases with $\merge$ as the \ruleName{if} rules do, so a variable is definitely assigned after the match
 only if every case binds it or returns. After the match, variables bound by several cases have the join of their
 types in those cases, as if declared at that join. A match whose cases leave some value of the scrutinee type
-unmatched may fall through, as in the program on the left below. Within a pattern the variables must be distinct,
+unmatched may fall through\replaced{, so a variable bound by the match is then possibly unassigned after it, where Python
+leaves the binding in scope.}{, as in the program on the left below. } Within a pattern the variables must be distinct,
 as in Python. Every case must also be reachable: the matching judgement rejects a case that can match only values
-already matched by an earlier case (\secref{well-formedness-patterns}), as on the right, which Python leaves
+already matched by an earlier case (\secref{well-formedness-patterns}), \replaced{which}{as on the right, which } Python leaves
 silently unreachable:
 
+\begin{DeletedBlock}
 \begin{listingrow}
 \begin{listingcol}{0.48\textwidth}
 \begin{python}
@@ -147,7 +170,23 @@ match v:
 \end{listingrow}
 
 \noindent On the left, Python prints \pyinline{1}, the binding having escaped the match.
+\end{DeletedBlock}
+\begin{AddedBlock}
+\begin{python}
+v: tuple[int, int] = (1, 2)
+match v:
+    case (a, b):
+        print(a + b)
+    case (1, 2):  # error: unreachable
+        print(0)
+\end{python}
 
+\noindent Statements are subject to the same discipline: the \ruleName{seq} rule requires every statement but the last
+of a sequence to have static outcome $\Assigns{\Delta}$ (\secref{well-formedness-statements}), so a statement after
+a \pyinline{return} has no derivation, where Python accepts code that can never run.
+\end{AddedBlock}
+
+\begin{DeletedBlock}
 \subsubsection{Reachability}
 \label{sec:unreachable}
 
@@ -162,3 +201,4 @@ def foo(x: int) -> int:
     return x + 1
     return x  # error: unreachable
 \end{python}
+\end{DeletedBlock}
