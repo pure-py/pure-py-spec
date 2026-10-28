@@ -1,0 +1,58 @@
+A name's meaning in \PurePy must not depend on the order in which modules load or on runtime state.
+\figref{load-dependent} lists the import and module behaviours of Python excluded for this reason, and says
+how and when \PurePy excludes each.
+
+\input{spec/fig/load-dependent}
+
+The last three exclusions rule out programs whose meaning under Python changes when a module elsewhere in
+the program is loaded. A submodule is not an attribute of its parent until it is loaded, so after
+\pyinline{import pkg} alone, Python resolves \pyinline{pkg.sub.y} if some earlier import, anywhere in the
+program, has loaded \pyinline{pkg.sub}, and raises \pyinline{AttributeError} otherwise. An attribute of a
+module can be set both by an assignment in the module body and by loading a same-named submodule, each
+overwriting the other, so the value of the attribute depends on load order. Consider a program with four
+modules:
+
+\begin{minipage}[t]{0.2\textwidth}
+\begin{python}
+# pkg
+sub: int = 1
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\begin{python}
+# pkg.sub
+# (empty)
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.25\textwidth}
+\begin{python}
+# helper
+import pkg.sub
+\end{python}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.28\textwidth}
+\begin{python}
+# __main__
+import pkg
+print(pkg.sub) # 1
+\end{python}
+\end{minipage}
+
+Here \pyinline{helper} is never imported, so \pyinline{pkg.sub} never loads, and \pyinline{pkg.sub} in the
+main module denotes the assignment. Now let the main module also import \pyinline{helper}, which it does not
+otherwise use:
+
+\begin{python}
+# __main__
+import helper
+import pkg
+print(pkg.sub) # <module 'pkg.sub'>
+\end{python}
+
+Loading \pyinline{pkg.sub}, wherever in the program it happens, sets it as an attribute of the shared
+\pyinline{pkg} object, so the extra import changes the meaning of \pyinline{pkg.sub} in the main module, which does
+not import \pyinline{pkg.sub}. The name has no load-order-independent meaning, so \PurePy excludes the clash
+outright.
