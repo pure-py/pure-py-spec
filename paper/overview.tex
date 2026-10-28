@@ -60,7 +60,8 @@ def foo(b: bool) -> int:
 Python: under shadowing, \pyinline{return x} would refer to a different variable from the one assigned in the
 branch.
 \end{AddedBlock}
-\noindent A variable \deleted{therefore }denotes
+
+A variable \deleted{therefore }denotes
 a fixed value once assigned, and features associated with mutation and shared state are excluded: \pyinline{global} and \pyinline{nonlocal}, which direct assignments to a variable of an enclosing scope;
 \pyinline{del}, which removes a binding; augmented assignment (\pyinline{+=}, \pyinline{-=}, and so on); and
 the walrus operator (\pyinline{:=}), which assigns within an expression. Assignment targets are variables, so item
