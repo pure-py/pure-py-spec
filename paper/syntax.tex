@@ -1,7 +1,7 @@
 \section{Syntax}
 \label{sec:syntax}
 
-The syntax of \PurePy is given in \figrefTwo{syntax-stmt}{syntax-types}. Throughout the paper, a sequence $\seq{x}$ denotes $x_1, \ldots, x_n$ for some $n$. Inside the brackets of a tuple, list, type
+The syntax of \PurePy is given in \figrefTwo{syntax-types}{syntax-stmt}. Throughout the paper, a sequence $\seq{x}$ denotes $x_1, \ldots, x_n$ for some $n$. Inside the brackets of a tuple, list, type
 application or argument list, $\seq{e}$ stands for the comma-separated elements, so $\exTuple{\seq{e}}$ is
 $\exTuple{e_1, \ldots, e_n}$. The sequence $x \cons \seq{x}$ has head $x$ and tail $\seq{x}$. Comma-separated
 elements inside set braces are pairwise distinct. Two sequences of equal length paired by a colon,
@@ -20,6 +20,24 @@ the two cases are distinguished during type checking (\secref{well-formedness}).
 programs which Python rejects as syntax errors, each a duplicated name or key within one form, such as a
 function with two parameters of the same name. These exclusions from the grammar are summarised in
 \specfigref{syntax-distinct}.
+
+\subsection{Types and schemes}
+\label{sec:types-schemes}
+
+\figref{syntax-types} gives the syntax of types $\tau$, familiar from the Python typing
+specification~\cite{typingcouncil2025}, and of schemes $\pi$. \emph{Type expressions} $\psi$, omitted from the figure, are expressions which denote types; they
+have the form of types, except that where types have \emph{instantiated classes} $C[\seq{\tau}]$ and type variables $\alpha$,
+type expressions have qualified names applied to type arguments, $q[\seq{\psi}]$, naming a class, type alias or type
+parameter\replaced{, and are resolved to types during type checking (\secref{types}).}{; type expressions resolve to types during type checking, by the rules of \specfigref{resolve-type}. } Parameters, return
+types and dataclass fields are annotated with type expressions, as are variable declarations
+$x\exAnnot{\psi}$, with or without an initial assignment; later assignments to a declared variable are not
+annotated. A \emph{scheme} $\pi$ binds type parameters $\seq{\alpha}$, and is either a \emph{type scheme},
+binding type parameters in a type, for a function, or a \emph{field scheme}, binding type parameters in a sequence
+of typed fields, for a class. Schemes are
+instantiated by substituting types for the type parameters (\specref{sec:type-annotations}), and a scheme without
+any type parameters is identified with its body.
+
+\input{paper/fig/syntax-types}
 
 \subsection{Contexts}
 \label{sec:contexts}
@@ -86,7 +104,7 @@ name as in Python 3.12. \emph{Mutual def regions} $d_1 \ldots d_{n+1}$ are maxim
 of type definitions; the well-formedness rules treat each as one mutually recursive binding, which replaces
 Python's late binding (\secref{mutual-recursion}).
 
-\input{paper/fig/syntax}
+\input{paper/fig/syntax-stmt}
 
 \subsubsection{Expressions}
 
@@ -104,22 +122,6 @@ declare in a fixed order. The auxiliary function $\fieldMap{\Sigma}$ (\specref{a
 positional argument to the field at that position and each keyword argument to the field of that name, so that
 the rules for constructor calls and patterns are able to check each argument against the type of the
 corresponding field.
-
-\subsubsection{Types and schemes}
-\label{sec:types-schemes}
-
-\figref{syntax-types} gives the syntax of types $\tau$, familiar from the Python typing
-specification~\cite{typingcouncil2025}, and of schemes $\pi$. \emph{Type expressions} $\psi$, omitted from the figure, are expressions which denote types; they
-have the form of types, except that where types have \emph{instantiated classes} $C[\seq{\tau}]$ and type variables $\alpha$,
-type expressions have qualified names applied to type arguments, $q[\seq{\psi}]$, naming a class, type alias or type
-parameter; type expressions resolve to types during type checking, by the rules of \specfigref{resolve-type}. Parameters, return
-types and dataclass fields are annotated with type expressions, as are variable declarations
-$x\exAnnot{\psi}$, with or without an initial assignment; later assignments to a declared variable are not
-annotated. A \emph{scheme} $\pi$ binds type parameters $\seq{\alpha}$, and is either a \emph{type scheme},
-binding type parameters in a type, for a function, or a \emph{field scheme}, binding type parameters in a sequence
-of typed fields, for a class. Schemes are
-instantiated by substituting types for the type parameters (\specref{sec:type-annotations}), and a scheme without
-any type parameters is identified with its body.
 
 \subsection{Modules and programs}
 \label{sec:modules-programs}
