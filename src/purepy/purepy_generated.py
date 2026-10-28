@@ -16,7 +16,7 @@ import Reasons
 import Syntax
 
 from . import reasons, syntax
-from .check_module import name_declaration
+from .check_module import containing, name_declaration
 from .check_program import error_path, format_program_result, module_names, module_path, parse
 from .conformance import Exit
 from .contexts import MAIN
@@ -55,6 +55,8 @@ from .type_syntax import (
     UnionType,
     dotted_name,
     parse_name,
+    proper_prefixes,
+    qualified,
 )
 
 
@@ -118,7 +120,7 @@ def annotation(e: ast.expr | None) -> Any:
     return ty_expr(type_expr(e))
 
 
-BOP = {
+BOP: dict[type[ast.operator | ast.cmpop], Any] = {
     ast.BitOr: Syntax.BOpBitOr,
     ast.Eq: Syntax.BOpEq,
     ast.NotEq: Syntax.BOpNeq,
@@ -137,7 +139,7 @@ BOP = {
     ast.NotIn: Syntax.BOpNotIn,
 }
 
-UOP = {
+UOP: dict[type[ast.unaryop], Any] = {
     ast.Not: Syntax.UOpNot,
     ast.UAdd: Syntax.UOpPos,
     ast.USub: Syntax.UOpNeg,
@@ -356,10 +358,44 @@ def module_body(q: Name, m: ast.Module) -> Any:
 
 
 def program(entry_path: pathlib.Path) -> Any:
-    names = sorted(module_names(entry_path.parent) | {MAIN}, key=str)
+    names = module_names(entry_path.parent) | {MAIN}
+    parsed = parse_reachable(MAIN, {}, names, entry_path)
+    # modules not reached by imports are left unparsed, with an empty body
     return Finite_Map.fmap_of_list(
-        [(name(q), module_body(q, parse_module(q, entry_path))) for q in names]
+        [
+            (name(q), module_body(q, parsed.get(q, ast.Module(body=[], type_ignores=[]))))
+            for q in sorted(names, key=str)
+        ]
     )
+
+
+def parse_reachable(
+    q: Name, parsed: dict[Name, ast.Module], names: set[Name], entry_path: pathlib.Path
+) -> dict[Name, ast.Module]:
+    """Modules parsed when q is imported, in the order the reference checker parses them"""
+    if q not in names or q in parsed:
+        return parsed
+    m = parse_module(q, entry_path)
+    iotas, _ = split_imports(m.body)
+    return reduce(
+        lambda parsed_, q_: parse_reachable(q_, parsed_, names, entry_path),
+        [q_ for iota in iotas for q_ in modules_checked(q, iota, names)],
+        {**parsed, q: m},
+    )
+
+
+def modules_checked(q: Name, iota: ast.stmt, names: set[Name]) -> list[Name]:
+    """Modules checked by an import statement of module q, in order"""
+    match iota:
+        case ast.Import(names=[alias]):
+            q_ = parse_name(alias.name)
+            return [*proper_prefixes(q_), q_]
+        case ast.ImportFrom(module=str(q_s), names=aliases):
+            q_ = parse_name(q_s)
+            submodules = [p for a in aliases for p in [qualified(q_, a.name)] if p in names]
+            return [q_, *containing(q, q_), *submodules]
+        case _:
+            raise AssertionError(f"unexpected import: {type(iota).__name__}")
 
 
 def parse_module(q: Name, entry_path: pathlib.Path) -> ast.Module:
@@ -399,6 +435,74 @@ def from_lit(ell: Any) -> Literal:
 
 
 PRIMITIVE = {c: nu for nu, c in PRIM_TY.items()}
+
+
+BOP_AST = {bop: op for op, bop in BOP.items()}
+UOP_AST = {uop: op for op, uop in UOP.items()}
+
+
+def from_expr(e: Any) -> ast.expr:
+    match e:
+        case Syntax.ExprVar(x):
+            return ast.Name(x)
+        case Syntax.ExprLiteral(ell):
+            return ast.Constant(from_lit(ell).value)
+        case Syntax.ExprCall(f, (es, kws)):
+            return ast.Call(
+                from_expr(f),
+                [from_expr(e_) for e_ in es],
+                [ast.keyword(x, from_expr(e_)) for x, e_ in kws],
+            )
+        case Syntax.ExprDict(kvs):
+            return ast.Dict([from_expr(k) for k, _ in kvs], [from_expr(v) for _, v in kvs])
+        case Syntax.ExprAttribute(e_, x):
+            return ast.Attribute(from_expr(e_), x)
+        case Syntax.ExprSubscript(e_, e__):
+            return ast.Subscript(from_expr(e_), from_expr(e__))
+        case Syntax.ExprBinOp(op, e_, e__):
+            op_ = BOP_AST[type(op)]
+            if issubclass(op_, ast.cmpop):
+                return ast.Compare(from_expr(e_), [op_()], [from_expr(e__)])
+            return ast.BinOp(from_expr(e_), op_(), from_expr(e__))
+        case Syntax.ExprUnOp(op, e_):
+            return ast.UnaryOp(UOP_AST[type(op)](), from_expr(e_))
+        case Syntax.ExprAnd(e_, e__):
+            return ast.BoolOp(ast.And(), [from_expr(e_), from_expr(e__)])
+        case Syntax.ExprOr(e_, e__):
+            return ast.BoolOp(ast.Or(), [from_expr(e_), from_expr(e__)])
+        case Syntax.ExprCond(e_, e__, e___):
+            return ast.IfExp(from_expr(e__), from_expr(e_), from_expr(e___))
+        case Syntax.ExprList(es):
+            return ast.List([from_expr(e_) for e_ in es])
+        case Syntax.ExprTuple(es):
+            return ast.Tuple([from_expr(e_) for e_ in es])
+        case Syntax.ExprListComp(e_, qs):
+            return ast.ListComp(from_expr(e_), reduce(add_qualifier, qs, []))
+        case Syntax.ExprDictComp(e_, e__, qs):
+            return ast.DictComp(from_expr(e_), from_expr(e__), reduce(add_qualifier, qs, []))
+        case Syntax.ExprLambda(xs, e_):
+            args = ast.arguments(
+                posonlyargs=[],
+                args=[ast.arg(x) for x in xs],
+                kwonlyargs=[],
+                kw_defaults=[],
+                defaults=[],
+            )
+            return ast.Lambda(args, from_expr(e_))
+        case _:
+            raise AssertionError(f"unexpected expression: {e}")
+
+
+# Generator starts a comprehension; guard joins the last
+def add_qualifier(gs: list[ast.comprehension], q: Any) -> list[ast.comprehension]:
+    match q:
+        case Syntax.Generator(x, e):
+            return [*gs, ast.comprehension(ast.Name(x), from_expr(e), [], 0)]
+        case Syntax.Guard(e):
+            *gs_, g = gs
+            return [*gs_, ast.comprehension(g.target, g.iter, [*g.ifs, from_expr(e)], 0)]
+        case _:
+            raise AssertionError(f"unexpected qualifier: {q}")
 
 
 def from_ty(tau: Any) -> Type:
@@ -470,8 +574,8 @@ def from_reason(r: Any) -> reasons.Reason:
             return reasons.UndefinedVariable(x)
         case Reasons.UnassignedVariable(x):
             return reasons.UnassignedVariable(x)
-        case Reasons.PossiblyUnassigned(x):
-            return reasons.PossiblyUnassigned(x, False)
+        case Reasons.PossiblyUnassigned(x, b):
+            return reasons.PossiblyUnassigned(x, b)
         case Reasons.UnboundName(x):
             return reasons.UnboundName(x)
         case Reasons.Redeclaration(x):
@@ -512,6 +616,8 @@ def from_reason(r: Any) -> reasons.Reason:
             return reasons.MissingReturnAssertion()
         case Reasons.NotPredefinedName(x):
             return reasons.NotPredefinedName(x)
+        case Reasons.NotTypeExpression(e):
+            return reasons.NotTypeExpression(ast.unparse(from_expr(e)))
         case Reasons.NotClass(q):
             return reasons.NotClass(from_name(q))
         case Reasons.ClassArityMismatch(q, m, n):
