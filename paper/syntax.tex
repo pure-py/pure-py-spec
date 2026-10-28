@@ -28,13 +28,12 @@ function with two parameters of the same name. These exclusions from the grammar
 specification~\cite{typingcouncil2025}, and of schemes $\pi$. \emph{Type expressions} $\psi$, omitted from the figure, are expressions which denote types; they
 have the form of types, except that where types have \emph{instantiated classes} $C[\seq{\tau}]$ and type variables $\alpha$,
 type expressions have qualified names applied to type arguments, $q[\seq{\psi}]$, naming a class, type alias or type
-parameter\replaced{, and are resolved to types during type checking (\secref{types}).}{; type expressions resolve to types during type checking, by the rules of \specfigref{resolve-type}. } Parameters, return
+parameter, and are resolved to types during type checking (\secref{types}). Parameters, return
 types and dataclass fields are annotated with type expressions, as are variable declarations
 $x\exAnnot{\psi}$, with or without an initial assignment; later assignments to a declared variable are not
 annotated. A \emph{scheme} $\pi$ binds type parameters $\seq{\alpha}$, and is either a \emph{type scheme},
 binding type parameters in a type, for a function, or a \emph{field scheme}, binding type parameters in a sequence
-of typed fields, for a class. \replaced{A}{Schemes are
-instantiated by substituting types for the type parameters (\specref{sec:type-annotations}), and a} scheme without
+of typed fields, for a class. A scheme without
 any type parameters is identified with its body.
 
 \input{paper/fig/syntax-types}

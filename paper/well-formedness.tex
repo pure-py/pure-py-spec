@@ -16,31 +16,6 @@ counterpart.
 \subsection{Types}
 \label{sec:types}
 
-\begin{DeletedBlock}
-Function signatures, assignments and dataclass fields are annotated with type expressions, and a
-type expression denotes a type under a context and class table (\specfigref{resolve-type}). Every definition carries an
-annotation for its parameters and return type, so the type of a definition is given rather than
-inferred from its body. Within a type expression, a class name applied to as many type arguments as the class has parameters resolves to an instantiated class, an alias name applied to type arguments resolves to the instantiation of its alias, type parameters in scope denote the type variables of those names, and all other names must be predefined names (\specfigref{resolve-type}). The function $\baseType(\tau)$ discards the precision of a
-literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as the identity.
-
-\paragraph{Subtyping.}
-
-Subtyping (\specfigref{subtyping}) has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base, and below $C[\seq{\sigma}]$ when $\seq{\tau}$ and $\seq{\sigma}$ are equivalent, so that type arguments are invariant, as for lists and dictionaries; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. A type that is not a union has one \emph{disjunct}, the type itself; the disjuncts of a union $\tyUnion{\sigma}{\tau}$ are the disjuncts of $\sigma$ together with the disjuncts of $\tau$. A union is above
-each of its disjuncts and below every type that is above all of them. A tuple type is covariant, below another of the
-same length when each of its components is below the corresponding component. Two types are \emph{equivalent}, $\sigma \tyEquiv \tau$, when each is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{pierce2002}. Lists and
-dictionaries are related only when their components are equivalent, since both are invariant in mypy (\secref{python-compatibility}). A callable type is contravariant in its parameters
-and covariant in its result, following mypy. The types with a length, namely lists, dictionaries,
-strings, tuples and $\clsRange[]$, are below \pyinline{Sized}. An \pyinline{int} is a \pyinline{float}, as PEP~484
-requires, so \pyinline{x: float = 0} is well typed. A \pyinline{bool} is not an \pyinline{int}, although
-Python treats it as one.
-
-\input{spec/well-formedness/subtyping-transitive}
-
-\noindent Subtyping is therefore a preorder: reflexive and transitive but not antisymmetric,
-because distinct types such as $\tyUnion{\sigma}{\tau}$ and $\tyUnion{\tau}{\sigma}$ are
-equivalent.
-\end{DeletedBlock}
-\begin{AddedBlock}
 Well-formedness is checked relative to a context $\Gamma$, recording what each name in scope denotes, and a
 class table $\Sigma$, recording the classes defined so far (\secref{contexts}). Programs mention types only
 through the type expressions in annotations (\secref{types-schemes}), so each typing rule must resolve these to
@@ -59,7 +34,6 @@ each of its disjuncts and below every type above all of them; \pyinline{Never} i
 types such as $\tyUnion{\sigma}{\tau}$ and $\tyUnion{\tau}{\sigma}$ \emph{equivalent}, $\sigma \tyEquiv \tau$, when each
 is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{pierce2002}.
 
-\end{AddedBlock}
 \input{spec/well-formedness/join-meet}
 
 \subsection{Expressions}
@@ -132,7 +106,7 @@ syntax-directed and an expression has at most one derivation in each.
 
 \paragraph{Operators.}
 
-Each operator is overloaded as specified in \specfigref{operator-overloads}. 
+Each operator is overloaded as specified in \specfigref{operator-overloads}.
 
 The \ruleName{binop} and \ruleName{unop} rules (\specfigref{typing-synth}) take the return type
 of the most specific overload at the operand types, $\resolveOp{\Sigma}$, so \pyinline{1 + 2} is an
