@@ -35,6 +35,35 @@ class EvaluationTests(unittest.TestCase):
         self.assertNotIn("python", self.task.to_record())
         self.assertNotIn("purepy", self.task.to_record())
 
+    def test_evalplus_reads_verified_files_in_both_orders(self):
+        from evalplus.data import humaneval, mbpp
+        modules = {"humaneval-plus": humaneval, "mbpp-plus": mbpp}
+        for order in (tuple(modules), tuple(reversed(modules))):
+            with self.subTest(order=order), patch.dict(os.environ), \
+                    patch.object(humaneval, "HUMANEVAL_OVERRIDE_PATH", None), \
+                    patch.object(mbpp, "MBPP_OVERRIDE_PATH", None):
+                for name in order:
+                    manifest = json.loads((e.ROOT / f"benchmarks/{name}.json").read_text())
+                    path = e.ROOT / ".cache/evaluation" / manifest["url"].rsplit("/", 1)[1]
+                    module = modules[name]
+                    with patch.object(module, "stream_jsonl", wraps=module.stream_jsonl) as read_rows, \
+                            patch.object(module, "make_cache", side_effect=AssertionError("unverified EvalPlus cache fallback")):
+                        rows = e.BENCHMARKS[name]().load_rows(manifest)
+                    read_rows.assert_called_once_with(str(path))
+                    self.assertEqual(len(rows), manifest["total_problems"])
+
+    def test_evalplus_rejects_unverified_downloads(self):
+        from evalplus.data import humaneval, mbpp
+        for name, module in (("humaneval-plus", humaneval), ("mbpp-plus", mbpp)):
+            manifest = json.loads((e.ROOT / f"benchmarks/{name}.json").read_text())
+            with self.subTest(benchmark=name), tempfile.TemporaryDirectory() as folder, \
+                    patch("evaluation_benchmarks.CACHE", Path(folder)), \
+                    patch("evaluation_benchmarks.urllib.request.urlopen", return_value=io.BytesIO(b"unverified dataset")), \
+                    patch.object(module, "stream_jsonl") as read_rows:
+                with self.assertRaisesRegex(RuntimeError, "download checksum mismatch"):
+                    e.BENCHMARKS[name]().load_rows(manifest)
+                read_rows.assert_not_called()
+
     def test_evalplus_references_pass_and_wrong_answers_fail(self):
         for name in ("humaneval-plus", "mbpp-plus"):
             benchmark = e.BENCHMARKS[name]()

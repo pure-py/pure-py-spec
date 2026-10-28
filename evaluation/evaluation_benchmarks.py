@@ -215,11 +215,10 @@ class JsonlBenchmark(Benchmark):
 class EvalPlus(JsonlBenchmark):
     def load_rows(self, manifest):
         path = download(manifest["url"], CACHE / manifest["url"].rsplit("/", 1)[1], manifest["sha256"])
-        os.environ[self.override_path] = str(path)
-        return self.dataset_rows()
+        return self.dataset_rows(path)
 
     @abstractmethod
-    def dataset_rows(self):
+    def dataset_rows(self, path):
         raise NotImplementedError
 
     def problem(self, task_id, row, signature, typed) -> EvalPlusProblem:
@@ -275,22 +274,22 @@ class HumanEvalPlus(EvalPlus):
     key = "humaneval-plus"
     name = "HumanEval+"
     dataset = "humaneval"
-    override_path = "HUMANEVAL_OVERRIDE_PATH"
 
-    def dataset_rows(self):
-        from evalplus.data import get_human_eval_plus
-        return get_human_eval_plus()
+    def dataset_rows(self, path):
+        from evalplus.data import humaneval
+        humaneval.HUMANEVAL_OVERRIDE_PATH = str(path)
+        return humaneval.get_human_eval_plus()
 
 
 class MBPPPlus(EvalPlus):
     key = "mbpp-plus"
     name = "MBPP+"
     dataset = "mbpp"
-    override_path = "MBPP_OVERRIDE_PATH"
 
-    def dataset_rows(self):
-        from evalplus.data import get_mbpp_plus
-        return get_mbpp_plus()
+    def dataset_rows(self, path):
+        from evalplus.data import mbpp
+        mbpp.MBPP_OVERRIDE_PATH = str(path)
+        return mbpp.get_mbpp_plus()
 
     def interface_source(self, row):
         return row["canonical_solution"]
