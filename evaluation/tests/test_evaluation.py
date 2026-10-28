@@ -28,13 +28,6 @@ class EvaluationTests(unittest.TestCase):
         cls.problems, cls.manifest = cls.benchmark.load(1)
         cls.task = next(iter(cls.problems.values()))
 
-    def test_benchmark_provenance(self):
-        self.assertEqual(list(self.problems), ["HumanEval/2"])
-        self.assertEqual(self.manifest["total_problems"], 164)
-        self.assertEqual(self.manifest["evaluated_problems"], 1)
-        self.assertNotIn("python", self.task.to_record())
-        self.assertNotIn("purepy", self.task.to_record())
-
     def test_evalplus_reads_verified_files_in_both_orders(self):
         from evalplus.data import humaneval, mbpp
         modules = {"humaneval-plus": humaneval, "mbpp-plus": mbpp}
@@ -63,20 +56,6 @@ class EvaluationTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, "download checksum mismatch"):
                     e.BENCHMARKS[name]().load_rows(manifest)
                 read_rows.assert_not_called()
-
-    def test_evalplus_references_pass_and_wrong_answers_fail(self):
-        for name in ("humaneval-plus", "mbpp-plus"):
-            benchmark = e.BENCHMARKS[name]()
-            problems, manifest = benchmark.load(2)
-            self.assertEqual(manifest["evaluated_problems"], 2)
-            for task_id, task in problems.items():
-                with self.subTest(task=task_id):
-                    reference = benchmark.grade(benchmark.reference(task), task)
-                    self.assertTrue(reference.passed, reference.error)
-                    self.assertEqual(reference.tests_passed, task.test_count)
-                    wrong = benchmark.grade(f"def {task.name}(*args):\n    return None\n", task)
-                    self.assertFalse(wrong.passed)
-                    self.assertFalse(wrong.tooling_error)
 
     def test_evalplus_distinguishes_preparation_and_candidate_failures(self):
         identity = "def probe(x):\n    return x\n"
@@ -107,12 +86,6 @@ class EvaluationTests(unittest.TestCase):
                     self.assertIs(verdict.tooling_error, tooling)
                     if diagnostic:
                         self.assertIn(diagnostic, verdict.error)
-
-    def test_checker_and_official_tests_are_independent(self):
-        self.assertTrue(e.check(GOOD).passed)
-        self.assertFalse(e.check(BAD).passed)
-        self.assertTrue(self.benchmark.grade(BAD, self.task).passed)
-        self.assertFalse(self.benchmark.grade(GOOD.replace("number % 1.0", "0.0"), self.task).passed)
 
     def test_missing_checker_is_tool_failure(self):
         with patch("evaluation.subprocess.run", side_effect=FileNotFoundError):

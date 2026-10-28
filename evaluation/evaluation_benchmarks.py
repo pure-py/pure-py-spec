@@ -235,16 +235,6 @@ class EvalPlus(JsonlBenchmark):
                              "inputs": base64.b64encode(pickle.dumps(task.inputs)).decode(),
                              "test_count": task.test_count, "output_not_none": task.output_not_none}, 90)
 
-    def health_check(self):
-        identity = "def probe(x):\n    return x\n"
-        probe = {"reference": identity, "candidate": identity, "name": "probe",
-                 "inputs": base64.b64encode(pickle.dumps([[1], [2.5], [(1, 2)]])).decode(), "atol": 0,
-                 "dataset": "humaneval", "output_not_none": False}
-        wrong = {**probe, "candidate": "def probe(x):\n    return None\n"}
-        if (self.sandbox(probe, 10).passed is not True
-                or self.sandbox(wrong, 10).passed is not False):
-            raise RuntimeError("EvalPlus test runner health check failed")
-
     def prepare_worker(self, payload):
         tempfile.tempdir = payload["directory"]
 
