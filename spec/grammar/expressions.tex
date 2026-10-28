@@ -1,6 +1,6 @@
 \begin{tabular}[t]{rcll}
 \grammarGroup{Expressions} \\
-$e$ & $::=$ & $x$ & \speconly{(Var)} \\
+$e$ & $\coloncolonequals$ & $x$ & \speconly{(Var)} \\
     & $\mid$ & $\ell$ & \speconly{(Literal)} \\
     & $\mid$ & $\exCall{e}{a}$ & \speconly{(Call)} \\
     & $\mid$ & $\exDict{\bind{e_1}{e_1'}, \ldots, \bind{e_n}{e_n'}}$ & \speconly{(Dict)} \\
@@ -18,21 +18,21 @@ $e$ & $::=$ & $x$ & \speconly{(Var)} \\
     & $\mid$ & $\exLambda{\seq{x}}{e}$ & \speconly{(Lambda)}
    \\[3mm]
 \grammarGroup{Comprehension qualifiers} \\
-$g$ & $::=$ & $\qualGuard{e}$ & \speconly{(Guard)} \\
+$g$ & $\coloncolonequals$ & $\qualGuard{e}$ & \speconly{(Guard)} \\
     & $\mid$ & $\qualGenerator{x}{e}$ & \speconly{(Generator)}
    \\[3mm]
 \grammarGroup{Literals} \\
-$\ell$ & $::=$ & $n$ & \speconly{(Number)} \\
+$\ell$ & $\coloncolonequals$ & $n$ & \speconly{(Number)} \\
     & $\mid$ & $w$ & \speconly{(String)} \\
     & $\mid$ & $\pyinline{True}$ & \speconly{(True)} \\
     & $\mid$ & $\pyinline{False}$ & \speconly{(False)} \\
     & $\mid$ & $\pyinline{None}$ & \speconly{(None)}
    \\[3mm]
 \grammarGroup{Argument lists} \\
-$a$ & $::=$ & $\seq{u}, \seq{x} \mathord{=} \seq{u}'$ & \speconly{(Args)}
+$a$ & $\coloncolonequals$ & $\seq{u}, \seq{x} \mathord{=} \seq{u}'$ & \speconly{(Args)}
    \\[3mm]
 \grammarGroup{Patterns} \\
-$p$ & $::=$ & $\ell$ & \speconly{(PatLiteral)} \\
+$p$ & $\coloncolonequals$ & $\ell$ & \speconly{(PatLiteral)} \\
     & $\mid$ & $x$ & \speconly{(PatVar)} \\
     & $\mid$ & $\patWild$ & \speconly{(PatWildcard)} \\
     & $\mid$ & $\patList{p_1, \ldots, p_n}$ & \speconly{(PatList)} \\

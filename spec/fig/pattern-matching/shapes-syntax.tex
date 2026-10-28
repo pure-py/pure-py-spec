@@ -1,17 +1,17 @@
 \begin{tabular}[t]{rcll}
 \grammarGroup{Heads} \\
-$h$ & $::=$ & $\ell$ & (Literal) \\
+$h$ & $\coloncolonequals$ & $\ell$ & (Literal) \\
     & $\mid$ & $C$ & (Class) \\
     & $\mid$ & $\headList{n}$ & (List of length $n$) \\
-$H$ & $::=$ & $\set{h_1, \ldots, h_n}$ & (Excluded heads)
+$H$ & $\coloncolonequals$ & $\set{h_1, \ldots, h_n}$ & (Excluded heads)
 \end{tabular}
 \hfill
 \begin{tabular}[t]{rcll}
 \grammarGroup{Shapes} \\
-$k$ & $::=$ & $\shapeAny{\tau}{H}$ & (Rest) \\
+$k$ & $\coloncolonequals$ & $\shapeAny{\tau}{H}$ & (Rest) \\
     & $\mid$ & $\shapeAny{\patConstr{C[\seq{\tau}]}{k_1, \ldots, k_n}}{H}$ & (Constr) \\
     & $\mid$ & $\patTuple{k_1, \ldots, k_n}$ & (Tuple) \\
     & $\mid$ & $\shapeList{\tau}{k_1, \ldots, k_n}$ & (List) \\
     & $\mid$ & $\shapeDict{\tau}{\beta}{H}$ & (Dict) \\
-$K$, $L$ & $::=$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
+$K$, $L$ & $\coloncolonequals$ & $\set{k_1, \ldots, k_n}$ & (Shape set)
 \end{tabular}

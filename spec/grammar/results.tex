@@ -1,20 +1,20 @@
 \begin{tabular}[t]{rcll}
 \grammarGroup{Outcomes} \\
-$o$ & $::=$ & $\assigns{\rho}$ & \speconly{(Assigns)} \\
+$o$ & $\coloncolonequals$ & $\assigns{\rho}$ & \speconly{(Assigns)} \\
   & $\mid$ & $\returns{v}$ & \speconly{(Returns)} \\
   & $\mid$ & $\aborts{\kappa}$ & \speconly{(Aborts)}
    \\[3mm]
 \grammarGroup{Results} \\
-$r$ & $::=$ & $\val{v}$ & \speconly{(Val)} \\
+$r$ & $\coloncolonequals$ & $\val{v}$ & \speconly{(Val)} \\
   & $\mid$ & $\aborts{\kappa}$ & \speconly{(Aborts)}
    \\[3mm]
 \grammarGroup{Match results} \\
-$m$ & $::=$ & $\matchOk{\rho}$ & \speconly{(Match)} \\
+$m$ & $\coloncolonequals$ & $\matchOk{\rho}$ & \speconly{(Match)} \\
   & $\mid$ & $\noMatch$ & \speconly{(NoMatch)} \\
   & $\mid$ & $\kappa$ & \speconly{(Kind)}
    \\[3mm]
 \grammarGroup{Termination kinds} \\
-$\kappa$ & $::=$ & $\errType \mid \errIndex \mid \errKey {} \mid \errOverflow \mid \errValue$ & \\
+$\kappa$ & $\coloncolonequals$ & $\errType \mid \errIndex \mid \errKey {} \mid \errOverflow \mid \errValue$ & \\
     & $\mid$ & $\errZeroDiv \mid \errAssertNoMsg \mid \errAssert{w}$ & \\
     & $\mid$ & $\errAttr \mid \errName \mid {} \errExit{n} \mid \errUndef {} \mid \errExcluded$ &
 \end{tabular}

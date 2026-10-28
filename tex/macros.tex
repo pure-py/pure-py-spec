@@ -373,5 +373,8 @@
   \setlength{\abovedisplayshortskip}{\dimexpr\abovedisplayshortskip - \baselineskip\relax}%
   \begin{align*}\input{spec/functions/#1}\end{align*}\endgroup}
 
+% Production symbol of the grammar figures, set tightly by mathtools.
+\RequirePackage{mathtools}
+\newcommand*{\coloncolonequals}{\Coloneqq}
 \newcommand*{\grammarGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{4}{l}{#1}}
 \newcommand*{\metaGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{#1}}

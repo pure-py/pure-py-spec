@@ -1,6 +1,6 @@
 \begin{tabular}[t]{rcll}
 \grammarGroup{Values} \\
-$v$ & $::=$ & $\ell$ & \speconly{(Literal)} \\
+$v$ & $\coloncolonequals$ & $\ell$ & \speconly{(Literal)} \\
     & $\mid$ & $\exList{v_1, \ldots, v_n}$ & \speconly{(List)} \\
     & $\mid$ & $\exTuple{v_1, \ldots, v_n}$ & \speconly{(Tuple)} \\
     & $\mid$ & $\exDict{\delta}$ & \speconly{(Dict)} \\
@@ -16,8 +16,8 @@ $v$ & $::=$ & $\ell$ & \speconly{(Literal)} \\
     & $\mid$ & $\opaqueVal{q.x}$ & \speconly{(Opaque)}
    \\[3mm]
 \grammarGroup{Environments} \\
-$\rho$ & $::=$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & 
+$\rho$ & $\coloncolonequals$ & $\set{\bind{x_1}{v_1}, \ldots, \bind{x_n}{v_n}}$ & 
    \\[3mm]
 \grammarGroup{Dictionary entries} \\
-$\delta$ & $::=$ & $\bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}$ &
+$\delta$ & $\coloncolonequals$ & $\bind{w_1}{v_1} \cons \ldots \cons \bind{w_n}{v_n}$ &
 \end{tabular}
