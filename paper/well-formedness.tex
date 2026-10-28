@@ -16,6 +16,7 @@ counterpart.
 \subsection{Types}
 \label{sec:types}
 
+\begin{DeletedBlock}
 Function signatures, assignments and dataclass fields are annotated with type expressions, and a
 type expression denotes a type under a context and class table (\specfigref{resolve-type}). Every definition carries an
 annotation for its parameters and return type, so the type of a definition is given rather than
@@ -38,7 +39,26 @@ Python treats it as one.
 \noindent Subtyping is therefore a preorder: reflexive and transitive but not antisymmetric,
 because distinct types such as $\tyUnion{\sigma}{\tau}$ and $\tyUnion{\tau}{\sigma}$ are
 equivalent.
+\end{DeletedBlock}
+\begin{AddedBlock}
+Type expressions resolve to types during type checking (\secref{expressions-statements}): a class or alias name
+applied to type arguments resolves to the instantiated class or alias, and a type parameter to the type variable of
+that name (\specfigref{resolve-type}). Every definition carries annotations for its parameters and return type, so
+the type of a definition is given rather than inferred from its body.
 
+\paragraph{Subtyping.}
+
+Subtyping (\specfigref{subtyping}) is structural, and each of its design decisions follows mypy
+(\secref{python-compatibility}). Instantiated classes are below their base classes, with type arguments invariant, as
+are lists and dictionaries; tuples are covariant, and callables are contravariant in their parameters and covariant
+in their results. A literal type is below its base type, and \pyinline{int} is below \pyinline{float}, as PEP~484
+requires, whereas \pyinline{bool} is not below \pyinline{int}, although Python treats it as one. A union is above
+each of its disjuncts and below every type above all of them; \pyinline{Never} is the least type and
+\pyinline{object} the greatest. Subtyping is a preorder (Lemma~\specnum{lem:subtyping-transitive}), with distinct
+types such as $\tyUnion{\sigma}{\tau}$ and $\tyUnion{\tau}{\sigma}$ \emph{equivalent}, $\sigma \tyEquiv \tau$, when each
+is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{pierce2002}.
+
+\end{AddedBlock}
 \input{spec/well-formedness/join-meet}
 
 \subsection{Expressions}

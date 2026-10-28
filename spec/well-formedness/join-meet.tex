@@ -9,7 +9,7 @@ joining \pyinline{int} with \pyinline{str} gives $\tyUnion{\tyInt}{\tyStr}$. A s
 folding binary join over the sequence, with \pyinline{Never} as the unit\speconly{ (\S\ref{aux:join})}.
 \end{specdefinition}
 
-\begin{lemma}[Types form a lattice]
+\begin{lemma}[Type lattice]
 \label{lem:lattice}
 Types ordered by subtyping in $\Sigma$, up to equivalence, form a bounded distributive lattice: $\joinTy{\Sigma}{\sigma}{\tau}$
 is the least upper bound of $\sigma$ and $\tau$, $\meetTy{\Sigma}{\sigma}{\tau}$ is their greatest lower bound,
