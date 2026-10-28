@@ -88,7 +88,7 @@ maximal contiguous block of type definitions, grouped by the parser in the same 
 mutual def region and each mutual type region as one mutually-recursive binding (see \secref{mutual-recursion}).
 \end{DeletedBlock}
 \begin{AddedBlock}
-Statements are sequenced by juxtaposition, $\exSeq{s}{s'}$; a function body, branch of a conditional and body of a
+Statements $s$ (\figref{syntax-stmt}) are sequenced by juxtaposition, $\exSeq{s}{s'}$; a function body, branch of a conditional and body of a
 case are statements. \emph{Type definitions} $\chi$ are either class definitions or \pyinline{type}
 statements, which declare \emph{type aliases}. \emph{Top-level statements} $t$ are either statements or mutual
 type regions, also sequenced by juxtaposition; module bodies consist of imports followed by top-level
@@ -129,7 +129,7 @@ which follow Python. It is ambiguous in the same way on tuples and tuple pattern
 \begin{AddedBlock}
 \paragraph{Expressions.}
 
-Expressions $e$ (\figref{syntax-expr}) are a subset of Python's: variables, literals, calls, attribute access and
+\figref{syntax-expr} gives the syntax of expressions $e$, a subset of Python's: variables, literals, calls, attribute access and
 subscripting, operator applications, conditional expressions, list, tuple and dictionary displays, comprehensions
 and lambdas; each form is typed in \secref{well-formedness} and evaluated in \secref{operational-semantics}. Metavariables $\odot$ and $\ominus$ range over binary and unary operators, whose
 precedence and associativity are given in \specfigref{precedence}; dedicated expression forms are provided for
