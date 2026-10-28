@@ -1,5 +1,3 @@
-python-succeeds/agrees/eq_mutually_recursive_generic_classes.py (check: exit 3, expected [0]: eq_mutually_recursive_generic_classes.py: no overload of '==' at operand types __main__.A[Callable[[int], int]] and __main__.A[Callable[[int], int]])
-python-succeeds/agrees/eq_recursive_generic_class.py (check: exit 3, expected [0]: eq_recursive_generic_class.py: no overload of '==' at operand types __main__.P[Callable[[int], int]] and __main__.P[Callable[[int], int]])
 python-succeeds/typing-rejects/import_bound_by_pattern (check: expected "main.py:4:0: 'x' is already declared", got: main.py: 'x' is already declared)
 python-succeeds/typing-rejects/import_redeclared (check: expected "main.py:7:0: 'C' is already declared", got: main.py: 'C' is already declared)
 python-succeeds/typing-rejects/imported_module_rejected (check: expected "helper.py:3:0: 'f' is already declared", got: helper.py: 'f' is already declared)
