@@ -42,16 +42,13 @@ equivalent.
 \end{DeletedBlock}
 \begin{AddedBlock}
 The typing rules compare types by subtyping and combine them by join and meet, both defined in this subsection.
-Types arise from the type expressions in annotations (\secref{types-schemes}), resolved during type checking
-(\specfigref{resolve-type}): a class name applied to as many type arguments as the class has type parameters
-resolves to the instantiated class, an alias name to the body of the alias with the arguments substituted, a type
-parameter to the type variable of that name, and any other name must be predefined. Every definition carries annotations for its parameters and return type, so
-the type of a definition is given rather than inferred from its body.
+Types arise by resolving the type expressions in annotations (\secref{types-schemes}) under the context: a class
+name applied to the required number of type arguments denotes the instantiated class, an alias name denotes the body
+of the alias at the type arguments, and a type parameter denotes a type variable.
 
 \paragraph{Subtyping.}
 
-Subtyping (\specfigref{subtyping}) is structural, and each of its design decisions follows mypy
-(\secref{python-compatibility}). Instantiated classes are below their base classes, with type arguments invariant, as
+Subtyping (\specfigref{subtyping}) is structural and follows mypy (\secref{python-compatibility}). Instantiated classes are below their base classes, with type arguments invariant, as
 are lists and dictionaries; tuples are covariant, and callables are contravariant in their parameters and covariant
 in their results. A literal type is below its base type, and \pyinline{int} is below \pyinline{float}, as PEP~484
 requires, whereas \pyinline{bool} is not below \pyinline{int}, although Python treats it as one. A union is above
