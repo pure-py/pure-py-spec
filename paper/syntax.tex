@@ -20,8 +20,8 @@ written admits some programs which Python rejects as syntax errors, such as a fu
 name. \figref{syntax-distinct} lists the conditions which rule out these programs.
 \end{DeletedBlock}
 \begin{AddedBlock}
-The grammar of \PurePy is an abstract syntax. The translation from Python's concrete grammar, including its
-lexical syntax, comments and indentation-sensitivity, lies outside the specification, which assumes only that
+The grammar of \PurePy is an abstract syntax. The translation from Python's concrete grammar, including
+lexical syntax, comments and indentation sensitivity, lies outside the specification, which assumes only that
 each form of the concrete grammar is translated to the form of the same shape in \figref{syntax-stmt}; the
 metavariables $n$ and $w$, for example, range over numbers and strings rather than over numerals and string
 literals. The abstract syntax has one form of call, $\exCall{q}{a}$, whether $q$ denotes a function or a class;
