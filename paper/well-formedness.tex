@@ -41,10 +41,12 @@ because distinct types such as $\tyUnion{\sigma}{\tau}$ and $\tyUnion{\tau}{\sig
 equivalent.
 \end{DeletedBlock}
 \begin{AddedBlock}
-Types arise by resolving the type expressions in annotations (\secref{types-schemes}) under the context: class
-names applied to the required number of type arguments resolve to instantiated classes, alias names to the bodies of
-the aliases at the type arguments, and type parameters to type variables; the full definition is given in
-\specfigref{resolve-type}.
+Well-formedness is checked relative to a context $\Gamma$, which records what each name in scope denotes, and a
+class table $\Sigma$, which records the classes defined so far (\secref{contexts}). Programs mention types only
+through the type expressions in annotations (\secref{types-schemes}), so each typing rule must resolve these to
+types by looking up the names in $\Gamma$: class names applied to the required number of type arguments resolve to
+instantiated classes, alias names to the bodies of the aliases at the type arguments, and type parameters to type
+variables; the full definition is given in \specfigref{resolve-type}.
 
 \paragraph{Subtyping.}
 
