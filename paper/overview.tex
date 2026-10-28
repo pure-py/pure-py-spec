@@ -121,8 +121,12 @@ variable. \PurePy follows mypy, so a function body, for example, cannot declare 
 or in different branches, nor redeclare one of its parameters. Like mypy, \PurePy permits shadowing: a scope may
 declare a name of an enclosing scope, and the declaration then hides the enclosing variable throughout the scope,
 so a use before the declaration is rejected as unbound\replaced{, where Python fails at run time with
-\pyinline{UnboundLocalError}:}{. }
+\pyinline{UnboundLocalError}, as on the left below.}{. } The one exception in mypy is a use at module level of a
+builtin name before its declaration, which refers to the builtin, as when Python runs the module. \PurePy treats
+the builtins as an enclosing scope like any other, and rejects the use\added{, as on the right}:
 \begin{AddedBlock}
+\begin{listingrow}
+\begin{listingcol}{0.48\textwidth}
 \begin{python}
 y: int = 7
 def f() -> int:
@@ -130,10 +134,15 @@ def f() -> int:
     y: int = 8
     return x
 \end{python}
+\end{listingcol}
+\begin{listingcol}{0.45\textwidth}
+\begin{python}
+n: int = len([1])  # error: len is bound by the module
+len: int = 2
+\end{python}
+\end{listingcol}
+\end{listingrow}
 \end{AddedBlock}
-\noindent The one exception in mypy is a use at module level of a
-builtin name before its declaration, which refers to the builtin, as when Python runs the module. \PurePy treats
-the builtins as an enclosing scope like any other, and rejects the use\replaced{.}{: }
 \begin{DeletedBlock}
 \begin{python}[basicstyle={\renewcommand\ttdefault{cmtt}\ttfamily\pylistingsize\color{deletedcolor}},keywordstyle=\color{deletedcolor},commentstyle=\color{deletedcolor},stringstyle=\color{deletedcolor},identifierstyle=\color{deletedcolor}]
 n: int = len([1])  # error: len is bound by the module
