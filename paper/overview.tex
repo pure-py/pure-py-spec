@@ -54,7 +54,6 @@ capturing a generator variable, since the updates would otherwise be visible thr
 \noindent Here each lambda computes \pyinline{x**3} in Python, since all three share the one binding of
 \pyinline{i}.
 
-
 \subsubsection{Scope}
 \label{sec:scope}
 
@@ -98,9 +97,7 @@ effect-free.
 A name's meaning in \PurePy must not depend on the order in which modules load or on runtime state, so several
 of Python's import and module behaviours are excluded. Imports must appear at the start of a module, never
 inside a function body or branch, nor after a statement, so that the dependencies of a module are known before
-any of its statements runs. \Deleted{Wildcard imports (\pyinline{from q import
-*}) are excluded, since the names introduced are not explicit; PEP 8 recommends against
-them.\footnote{\url{https://peps.python.org/pep-0008/}}} A submodule may not import itself through its parent
+any of its statements runs. A submodule may not import itself through its parent
 (\pyinline{from a import b} inside module \pyinline{a.b}): \PurePy treats the from-imported submodule as a
 dependency, so this is an import cycle. An \pyinline{import} (as opposed to a from-import) may not name a
 module contained in the importing module (\pyinline{import x.y} inside module \pyinline{x}), since the binding for
@@ -136,55 +133,7 @@ statically (\secref{well-formedness-modules}).
 
 A module may not bind a name that is also the name of one of its submodules. In Python an attribute of a
 module can be set both by an assignment in the module body and by loading a same-named submodule, each
-overwriting the other, so the value of the attribute depends on load order. \Added{\specref{sec:no-load-dependent} lists these exclusions, with an example.}
-\begin{DeletedBlock}
-Consider a program with four modules:
-
-\begin{minipage}[t]{0.2\textwidth}
-\begin{python}
-# pkg
-sub: int = 1
-\end{python}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\begin{python}
-# pkg.sub
-# (empty)
-\end{python}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.25\textwidth}
-\begin{python}
-# helper
-import pkg.sub
-\end{python}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.28\textwidth}
-\begin{python}
-# __main__
-import pkg
-print(pkg.sub) # 1
-\end{python}
-\end{minipage}
-
-Here \pyinline{helper} is never imported, so \pyinline{pkg.sub} never loads, and \pyinline{pkg.sub} in the
-main module denotes the assignment. Now let the main module also import \pyinline{helper}, which it does not
-otherwise use:
-
-\begin{python}
-# __main__
-import helper
-import pkg
-print(pkg.sub) # <module 'pkg.sub'>
-\end{python}
-
-Loading \pyinline{pkg.sub}, wherever in the program it happens, sets it as an attribute of the shared
-\pyinline{pkg} object, so the extra import changes the meaning of \pyinline{pkg.sub} in the main module, which does
-not import \pyinline{pkg.sub}. The name has no load-order-independent meaning, so \PurePy excludes the clash
-outright.
-\end{DeletedBlock}
+overwriting the other, so the value of the attribute depends on load order. \specref{sec:no-load-dependent} lists these exclusions, with an example.
 
 \subsubsection{Modules and classes are not first-class}
 \label{sec:no-first-class}
@@ -201,9 +150,9 @@ through its existing instances.
 \subsubsection{Other restrictions}
 \label{sec:other-restrictions}
 
-A few remaining restrictions do not fit the groups above. \Added{Wildcard imports (\pyinline{from q import *})
+A few remaining restrictions do not fit the groups above. Wildcard imports (\pyinline{from q import *})
 are excluded, since the names introduced are not explicit; PEP 8 recommends against
-them.\footnote{\url{https://peps.python.org/pep-0008/}}} Every function definition annotates each
+them.\footnote{\url{https://peps.python.org/pep-0008/}} Every function definition annotates each
 parameter and its return type, and every dataclass field carries a type expression, so the type of a
 definition is given rather than inferred (\secref{well-formedness}); Python requires neither. A
 \pyinline{class} definition must be a dataclass, and a dataclass body declares fields and nothing else. \PurePy therefore supports none of Python's
