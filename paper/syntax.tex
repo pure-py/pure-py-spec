@@ -28,6 +28,7 @@ Metavariables $x$, $y$, $z$, $f$, $c$ and $\alpha$ range over \emph{variables}; 
 
 \input{spec/syntax/context}
 
+\begin{DeletedBlock}
 \noindent A predefined name is a member of a predefined module whose meaning is fixed by \PurePy, such as \pyinline{list} or
 \pyinline{dataclass}; its entry records only that it is in scope, and it does not denote a value, so it cannot appear in
 an expression. A type parameter or type alias denotes a type rather than a value, so it too can be mentioned only by a type
@@ -41,6 +42,20 @@ and \emph{definitely unassigned}, like a blank final in Java before its assignme
 is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A function name with entry $\PU{\scheme{\seq{\alpha}}{\tau}}$ is bound at the type scheme $\scheme{\seq{\alpha}}{\tau}$ on some paths but not on all. A variable
 with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
 It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
+\end{DeletedBlock}
+\begin{AddedBlock}
+\noindent A predefined name is a member of a predefined module, such as \pyinline{list} or \pyinline{dataclass};
+its entry records only that the name is in scope. Type parameters and type aliases denote types rather than
+values, so they can be mentioned only by type expressions.
+
+The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type
+is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$ and \emph{definitely
+unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$ is declared at
+$\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A variable with entry
+$\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local. We write
+$\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$,
+$\dom(\Gamma)$ for the set of variables with an entry in $\Gamma$, and $\varnothing$ for the empty context.
+\end{AddedBlock}
 
 \input{spec/syntax/class-table}
 The class table is similar to the class table of Featherweight Java~\cite{igarashi2001}; the well-formedness rules build it while checking the class definitions of the program (\specfigref{typing-top-level}).
@@ -48,6 +63,7 @@ The class table is similar to the class table of Featherweight Java~\cite{igaras
 \subsubsection{Context operations}
 \label{sec:context-operations}
 
+\begin{DeletedBlock}
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
 up to type equivalence, an idempotent commutative semigroup of parallel composition $\Gamma \merge_{\Sigma} \Delta$ (``merge'').  Both are defined pointwise, by $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$
 for each operation $\cdot$, from operations on context entries. Override is right-biased and has $\bot$
@@ -59,6 +75,16 @@ also agree across branches, but patterns bind variables without declared types, 
 branches. When both entries of a variable are defined, merge therefore gives an entry at the join of the two types,
 definitely assigned if both entries are definitely assigned and possibly unassigned otherwise.
 \input{spec/syntax/context-operations}
+\end{DeletedBlock}
+\begin{AddedBlock}
+Contexts compose sequentially by \emph{override}, $\Gamma \override \Delta$, and in parallel by \emph{merge},
+$\Gamma \merge_{\Sigma} \Delta$, both defined pointwise from operations on context entries
+(Definition~\specnum{def:context-operations}). Override is right-biased, so an entry of $\Delta$ replaces the
+entry of $\Gamma$ for the same variable, and has the empty context as unit. Merge combines the contexts of two
+branches. A variable with the same entry in both keeps it, a variable defined or definitely assigned in only
+one branch is possibly unassigned after the merge, and a variable bound at different types in the two
+branches, as a pattern variable may be, is merged at the join of the types (\secref{types}).
+\end{AddedBlock}
 
 \subsection{Expressions and statements}
 \label{sec:expressions-statements}
