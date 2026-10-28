@@ -27,7 +27,6 @@ CHECKER_VERSION = "0.22.3"
 CHECKER_SHA = "cd59f9e8656d2b617954caaf60bdb89d91ccc9cbee830d63977e8abf8a857c27"
 CONDITIONS = ("python", "purepy")
 OUTPUT_FORMAT_VERSION = "tagged-code-v1"
-ACCEPTS_ANY_ANSWER = ("are_equivalent",)
 
 
 class Unrecorded(Enum):
@@ -346,7 +345,7 @@ def validate_problem(task: Problem, benchmark):
         if verdict.passed is not True:
             raise RuntimeError(f"the reference solution of {task.task_id} fails its tests: {verdict.error}")
     wrong = benchmark.grade(f"def {task.name}(*args):\n    return None\n", task)
-    if wrong.passed is not False and task.name not in ACCEPTS_ANY_ANSWER:
+    if wrong.passed is not False:
         raise RuntimeError(f"the tests of {task.task_id} accept an answer that returns None")
 
 
