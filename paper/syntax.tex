@@ -73,21 +73,6 @@ subtyping. Both operations are defined pointwise on entries
 \subsection{Expressions and statements}
 \label{sec:expressions-statements}
 
-\begin{DeletedBlock}
-Statements are sequenced by
-juxtaposition, $\exSeq{s}{s'}$; a function body, branch of a conditional and body of a case are statements.
-\emph{Type definitions} $\chi$ are class definitions or
-\pyinline{type} statements. \emph{Top-level statements} $t$ are statements or mutual type regions, also sequenced by juxtaposition; the body of a
-module after its imports is a top-level statement, so type definitions occur only at the top level of a
-module. \emph{Type aliases} are declared by \pyinline{type} statements. Function definitions, class definitions and
-\pyinline{type} statements bind distinct \emph{type parameters} $\seq{\alpha}$, written in brackets after the name as in
-Python 3.12. A \emph{mutual def region} $d_1 \ldots d_{n+1}$ is a maximal contiguous block of \pyinline{def} statements: any other statement separates mutual
-def regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
-grouping consecutive \pyinline{def}s into a single mutual def region. A \emph{mutual type region} $\chi_1 \ldots \chi_{n+1}$ is a
-maximal contiguous block of type definitions, grouped by the parser in the same way. The well-formedness rules treat each
-mutual def region and each mutual type region as one mutually-recursive binding (see \secref{mutual-recursion}).
-\end{DeletedBlock}
-\begin{AddedBlock}
 \figref{syntax-stmt} gives the syntax of statements $s$, which are sequenced by juxtaposition, $\exSeq{s}{s'}$; function bodies, branches of conditionals and bodies of
 cases are statements. \emph{Type definitions} $\chi$ are either class definitions or \pyinline{type}
 statements; the latter declare \emph{type aliases}. \emph{Top-level statements} $t$ are either statements or mutual
@@ -98,35 +83,9 @@ name as in Python 3.12. \emph{Mutual def regions} $d_1 \ldots d_{n+1}$ are maxim
 \pyinline{def} statements, and \emph{mutual type regions} $\chi_1 \ldots \chi_{n+1}$ maximal contiguous blocks
 of type definitions; the well-formedness rules treat each as one mutually recursive binding, which replaces
 Python's late binding (\secref{mutual-recursion}).
-\end{AddedBlock}
 
 \input{paper/fig/syntax}
 
-\begin{DeletedBlock}
-
-An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by
-keyword arguments $x = u$, where an argument $u$ is an expression in a call and a pattern in a
-constructor pattern. A constructor call may also pass type arguments to the class; a constructor pattern
-cannot, since Python does not permit type arguments in a constructor pattern. The auxiliary function $\fieldMap{\Sigma}$ pairs each field of the class
-with an argument: the positional arguments fill the leading fields in order, and a keyword argument $x = u$
-fills the field $x$. It is defined only if every field receives exactly one argument.
-
-\paragraph{Type annotations.}
-
-Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
-may be annotated. A type expression is an expression (\figref{syntax-expr}) denoting a type $\tau$ (\figref{syntax-types}). Type expressions and types have the same forms, except that a type expression has a type-name form $q[\seq{\psi}]$, in place of which a type has two forms: \emph{instantiated classes} $C[\seq{\tau}]$, which are classes applied to type arguments, and type variables $\alpha$. A primitive type is a name, or the literal \pyinline{None}; \pyinline{list}, \pyinline{tuple}, \pyinline{dict}, \pyinline{Callable} and \pyinline{Literal} are names. A union $\tyUnion{\psi}{\psi'}$ applies the binary operator \pyinline{|}. A dataclass specifies its base class by a type expression of the form $q[\seq{\psi}]$. Resolution takes $q[\seq{\psi}]$ to $C[\seq{\tau}]$ when $q$ denotes the class $C$, to the type variable $\alpha$ when $q$ is a type parameter $\alpha$ and there are no arguments, and to the instantiation of the alias when $q$ denotes a type alias. The substitution $\subst{\seq{\tau}}{\seq{\alpha}}{\sigma}$ replaces each occurrence of $\alpha_i$ in $\sigma$ by $\tau_i$, a plain replacement, since every type variable in a type is free, and is defined only if $\seq{\tau}$ and $\seq{\alpha}$ have the same length. A \emph{scheme} $\pi$ (\figref{syntax-types}) binds type parameters $\seq{\alpha}$ in its body. Schemes are identified up to renaming of their type parameters. The body of a \emph{type scheme} $\scheme{\seq{\alpha}}{\tau}$ is a type; the body of a \emph{field scheme} $\scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}$ is a sequence of fields $\seq{x}$ with their types $\seq{\tau}$. The \emph{instantiation} of $\pi$ at $\seq{\sigma}$, written $\tyInst{\pi}{\seq{\sigma}}$, substitutes $\seq{\sigma}$ for $\seq{\alpha}$ in the body: $\subst{\seq{\sigma}}{\seq{\alpha}}{\tau}$ for a type scheme and $\bind{\seq{x}}{\subst{\seq{\sigma}}{\seq{\alpha}}{\seq{\tau}}}$ for a field scheme. A scheme without type parameters is its body, with the $\forall\seq{\alpha}$ omitted. The fields of a class form a field scheme.
-
-\subsubsection{Operators}
-\label{sec:syntax-operators}
-
-The metavariable $\odot$ ranges over the supported binary operators other than \pyinline{and} and
-\pyinline{or}, and $\ominus$ over the supported unary
-operators, both enumerated in \specfigref{precedence}. The operators \pyinline{and} and \pyinline{or} are distinct
-expression forms, since they need not evaluate both operands. The grammar of \figref{syntax-expr} is intentionally ambiguous
-on operator forms; disambiguation is by the precedence and associativity given in \specfigref{precedence},
-which follow Python. It is ambiguous in the same way on tuples and tuple patterns, which are written with grouping parentheses where Python's grammar requires them. The empty tuple is written \pyinline{()}, one-element tuples carry a trailing comma, \pyinline{(1,)}, and trailing commas are permitted wherever Python's grammar permits them.
-\end{DeletedBlock}
-\begin{AddedBlock}
 \paragraph{Expressions.}
 
 \figref{syntax-expr} also gives the syntax of expressions $e$, the subset of Python expressions supported by \PurePy: variables, literals, calls, attribute access and
@@ -158,7 +117,6 @@ binding type parameters in a type, for a function, or a \emph{field scheme}, bin
 of typed fields, for a class. Schemes are
 instantiated by substituting types for the type parameters (\specref{sec:type-annotations}), and a scheme without
 any type parameters is identified with its body.
-\end{AddedBlock}
 
 \subsection{Modules and programs}
 \label{sec:modules-programs}
