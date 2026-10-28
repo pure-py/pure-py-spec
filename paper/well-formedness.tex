@@ -42,9 +42,10 @@ equivalent.
 \end{DeletedBlock}
 \begin{AddedBlock}
 The typing rules compare types by subtyping and combine them by join and meet, both defined in this subsection.
-Types arise by resolving the type expressions in annotations (\secref{types-schemes}) under the context: a class
-name applied to the required number of type arguments denotes the instantiated class, an alias name denotes the body
-of the alias at the type arguments, and a type parameter denotes a type variable.
+Types arise by resolving the type expressions in annotations (\secref{types-schemes}) under the context: class
+names applied to the required number of type arguments resolve to instantiated classes, alias names to the bodies of
+the aliases at the type arguments, and type parameters to type variables; the full definition is given in
+\specfigref{resolve-type}.
 
 \paragraph{Subtyping.}
 
