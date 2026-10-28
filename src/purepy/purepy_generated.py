@@ -17,7 +17,7 @@ import Syntax
 
 from . import reasons, syntax
 from .check_module import containing, name_declaration
-from .check_program import error_path, format_program_result, module_names, module_path, parse
+from .check_program import format_program_result, module_names, module_path, parse
 from .conformance import Exit
 from .contexts import MAIN
 from .operators import BINARY_NAMES, UNARY_NAMES
@@ -25,7 +25,6 @@ from .reasons import IllFormed, IllFormedModule, IllFormedProgram, MypyCompatibi
 from .syntax_utils import (
     Statement,
     dict_keys,
-    own_fields,
     split_imports,
     statements,
     target_name,
@@ -53,6 +52,7 @@ from .type_syntax import (
     TypeVariable,
     UnionExpr,
     UnionType,
+    Var,
     dotted_name,
     parse_name,
     proper_prefixes,
@@ -84,6 +84,31 @@ def option(x: Any) -> Any:
     return Option.None_() if x is None else Option.Some(x)
 
 
+def position(node: ast.expr | ast.stmt | ast.pattern) -> tuple[int, int]:
+    return (node.lineno, node.col_offset)
+
+
+def at(node: ast.expr | ast.stmt | ast.pattern, term: Any) -> Any:
+    """Term located at node"""
+    return Syntax.At(position(node), term)
+
+
+def located_at(t: Any) -> tuple[int, int]:
+    match t:
+        case Syntax.At((line, col), _):
+            return (line, col)
+        case _:
+            raise AssertionError(f"unlocated term: {t}")
+
+
+def node(t: Any) -> Any:
+    match t:
+        case Syntax.At(_, u):
+            return u
+        case _:
+            raise AssertionError(f"unlocated term: {t}")
+
+
 PRIM_TY = {
     Primitive.OBJECT: Syntax.object_,
     Primitive.NEVER: Syntax.Never,
@@ -107,7 +132,7 @@ def ty_expr(psi: TypeExpr) -> Any:
         case DictExpr(value):
             return Syntax.TyExprDict(ty_expr(value))
         case CallableExpr(params, result):
-            return Syntax.TyExprCallable([ty_expr(p) for p in params], ty_expr(result))
+            return Syntax.TyExprCallable([ty_expr(q) for q in params], ty_expr(result))
         case LiteralType(ell):
             return Syntax.TyExprLiteral(lit(ell.value))
         case TypeName(q, args):
@@ -117,6 +142,7 @@ def ty_expr(psi: TypeExpr) -> Any:
 
 
 def annotation(e: ast.expr | None) -> Any:
+    assert e is not None  # missing annotations rejected by the parser
     return ty_expr(type_expr(e))
 
 
@@ -147,6 +173,10 @@ UOP: dict[type[ast.unaryop], Any] = {
 
 
 def expr(e: ast.expr) -> Any:
+    return at(e, expr_node(e))
+
+
+def expr_node(e: ast.expr) -> Any:
     match e:
         case ast.Name(id=x):
             return Syntax.ExprVar(x)
@@ -191,18 +221,23 @@ def keyword(k: ast.keyword) -> tuple[Any, Any]:
     return (k.arg, expr(k.value))
 
 
+# A generator is located at its target, since the parsed form has no position for the generator itself
 def qualifiers(gs: list[ast.comprehension]) -> list[Any]:
     return [
         q
         for g in gs
         for q in [
-            Syntax.Generator(target_name(g), expr(g.iter)),
-            *(Syntax.Guard(expr(c)) for c in g.ifs),
+            at(g.target, Syntax.Generator(target_name(g), expr(g.iter))),
+            *(at(c, Syntax.Guard(expr(c))) for c in g.ifs),
         ]
     ]
 
 
 def pat(p: ast.pattern) -> Any:
+    return at(p, pat_node(p))
+
+
+def pat_node(p: ast.pattern) -> Any:
     match p:
         case ast.MatchValue(value=ast.Constant(value=v)) | ast.MatchSingleton(value=v):
             return Syntax.PatLiteral(lit(v))
@@ -234,6 +269,10 @@ def key(k: ast.expr) -> str:
 
 
 def stmt(s: ast.stmt) -> Any:
+    return at(s, stmt_node(s))
+
+
+def stmt_node(s: ast.stmt) -> Any:
     match s:
         case ast.Pass():
             return Syntax.StmtPass()
@@ -273,29 +312,35 @@ def branches(col: int, orelse: list[ast.stmt]) -> tuple[list[Any], Any]:
 
 def seq(body: list[ast.stmt]) -> Any:
     *items, item = statements(body)
-    return reduce(
-        lambda s, item_: Syntax.StmtSeq(item_stmt(item_), s), reversed(items), item_stmt(item)
-    )
+    return reduce(lambda s, item_: seq_stmt(item_stmt(item_), s), reversed(items), item_stmt(item))
+
+
+# Sequence at the position of its first statement
+def seq_stmt(s: Any, s_: Any) -> Any:
+    return Syntax.At(located_at(s), Syntax.StmtSeq(s, s_))
 
 
 def item_stmt(item: Statement) -> Any:
     match item:
         case ast.stmt():
             return stmt(item)
-        case [ast.FunctionDef(), *_]:
-            return Syntax.StmtMutualRegion([func(d) for d in item])
+        case [ast.FunctionDef() as d, *_]:
+            return at(d, Syntax.StmtMutualRegion([func(d_) for d_ in item]))
         case _:
             raise AssertionError("type definition outside the module top level")
 
 
 def func(d: ast.stmt) -> Any:
     assert isinstance(d, ast.FunctionDef)  # mutual def regions hold only def statements
-    return Syntax.Def(
-        d.name,
-        type_params(d),
-        [(a.arg, annotation(a.annotation)) for a in d.args.args],
-        annotation(d.returns),
-        seq(d.body),
+    return at(
+        d,
+        Syntax.Def(
+            d.name,
+            type_params(d),
+            [(a.arg, annotation(a.annotation)) for a in d.args.args],
+            annotation(d.returns),
+            seq(d.body),
+        ),
     )
 
 
@@ -304,14 +349,26 @@ def type_params(node: ast.FunctionDef | ast.ClassDef | ast.TypeAlias) -> list[An
 
 
 def type_def(chi: ast.stmt) -> Any:
+    return at(chi, type_def_node(chi))
+
+
+def type_def_node(chi: ast.stmt) -> Any:
     match chi:
         case ast.ClassDef(name=c, bases=bases):
-            fields = [(x, ty_expr(psi)) for x, psi in own_fields(chi)]
+            fields = [(x, annotation(t.annotation)) for x, t in field_statements(chi)]
             return Syntax.Dataclass(c, type_params(chi), extends(bases), fields)
         case ast.TypeAlias(name=ast.Name(id=x), value=psi):
             return Syntax.TypeStmt(x, type_params(chi), annotation(psi))
         case _:
             raise AssertionError(f"unexpected type definition: {type(chi).__name__}")
+
+
+def field_statements(chi: ast.ClassDef) -> list[tuple[Var, ast.AnnAssign]]:
+    return [
+        (t.target.id, t)
+        for t in chi.body
+        if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)
+    ]
 
 
 def extends(bases: list[ast.expr]) -> Any:
@@ -342,6 +399,10 @@ def top_item(item: Statement) -> Any:
 
 
 def import_(iota: ast.stmt) -> Any:
+    return at(iota, import_node(iota))
+
+
+def import_node(iota: ast.stmt) -> Any:
     match iota:
         case ast.Import(names=[alias]):
             return Syntax.Import(name(parse_name(alias.name)))
@@ -354,7 +415,9 @@ def import_(iota: ast.stmt) -> Any:
 def module_body(q: Name, m: ast.Module) -> Any:
     iotas, stmts = split_imports(m.body)
     imports = [import_(iota) for iota in iotas]
-    return Syntax.ModuleBody(imports, top_stmt([name_declaration(q), *stmts]))
+    return Syntax.ModuleBody(
+        imports, top_stmt([ast.fix_missing_locations(name_declaration(q)), *stmts])
+    )
 
 
 def program(entry_path: pathlib.Path) -> Any:
@@ -442,6 +505,10 @@ UOP_AST = {uop: op for op, uop in UOP.items()}
 
 
 def from_expr(e: Any) -> ast.expr:
+    return from_expr_node(node(e))
+
+
+def from_expr_node(e: Any) -> ast.expr:
     match e:
         case Syntax.ExprVar(x):
             return ast.Name(x)
@@ -495,7 +562,7 @@ def from_expr(e: Any) -> ast.expr:
 
 # Generator starts a comprehension; guard joins the last
 def add_qualifier(gs: list[ast.comprehension], q: Any) -> list[ast.comprehension]:
-    match q:
+    match node(q):
         case Syntax.Generator(x, e):
             return [*gs, ast.comprehension(ast.Name(x), from_expr(e), [], 0)]
         case Syntax.Guard(e):
@@ -541,6 +608,10 @@ SEQUENCE_KIND = {
 
 
 def render_pat(p: Any) -> str:
+    return render_pat_node(node(p))
+
+
+def render_pat_node(p: Any) -> str:
     match p:
         case Syntax.PatLiteral(ell):
             return ast.unparse(ast.Constant(from_lit(ell).value))
@@ -697,15 +768,29 @@ def from_reason(r: Any) -> reasons.Reason:
 NO_POSITION = ast.AST()
 
 
+def position_node(p: tuple[int, int]) -> ast.AST:
+    """Syntax tree node standing for the construct at p"""
+    line, col = p
+    return ast.Pass(lineno=line, col_offset=col, end_lineno=line, end_col_offset=col)
+
+
 def ill_formed(q: Any, r: Any) -> IllFormed:
     """Failure for reason r in module q"""
+    match r:
+        case Reasons.Located(p, r_):
+            return ill_formed_at(q, position_node(p), r_)
+        case _:
+            return ill_formed_at(q, NO_POSITION, r)
+
+
+def ill_formed_at(q: Any, node_: ast.AST, r: Any) -> IllFormed:
     match r:
         case Reasons.ImportCycle(qs):
             return IllFormedProgram(reasons.ImportCycle(tuple(map(from_name, qs))).message())
         case Reasons.MypyCompatibility(r_):
-            e: IllFormedModule = MypyCompatibility(NO_POSITION, from_reason(r_))
+            e: IllFormedModule = MypyCompatibility(node_, from_reason(r_))
         case _:
-            e = IllFormedModule(NO_POSITION, from_reason(r))
+            e = IllFormedModule(node_, from_reason(r))
     e.module = from_name(q)
     return e
 
@@ -732,11 +817,8 @@ def main() -> None:
     except syntax.Unsupported as e:
         print(format_program_result(e, args.path))
         sys.exit(e.exit_code)
-    if result is None:
-        print(f"{args.path}: ok")
-        sys.exit(Exit.OK)
-    print(f"{error_path(result, args.path)}: {result.msg}")
-    sys.exit(result.exit_code)
+    print(format_program_result(result, args.path))
+    sys.exit(Exit.OK if result is None else result.exit_code)
 
 
 if __name__ == "__main__":
