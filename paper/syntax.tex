@@ -127,10 +127,10 @@ on operator forms; disambiguation is by the precedence and associativity given i
 which follow Python. It is ambiguous in the same way on tuples and tuple patterns, which are written with grouping parentheses where Python's grammar requires them. The empty tuple is written \pyinline{()}, one-element tuples carry a trailing comma, \pyinline{(1,)}, and trailing commas are permitted wherever Python's grammar permits them.
 \end{DeletedBlock}
 \begin{AddedBlock}
-An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by keyword
-arguments $x = u$, where an argument $u$ is an expression in a call and a pattern in a constructor pattern.
-Dataclasses name their fields in a fixed order, and the auxiliary function $\fieldMap{\Sigma}$ pairs the fields
-of a class with the arguments supplied for them, positionally or by keyword, so that the rules for constructor
+An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments $\seq{u}$ followed by
+keyword arguments $\seq{x} \mathord{=} \seq{u}'$, where each argument is an expression in a call and a pattern in a
+constructor pattern. Dataclasses name their fields in a fixed order, and the auxiliary function $\fieldMap{\Sigma}$ matches the
+arguments supplied, positionally or by keyword, to the fields of the class, so that the rules for constructor
 calls and patterns do not depend on the split between the two kinds of argument.
 
 Parameters, returns and dataclass fields are annotated with \emph{type expressions} $\psi$, and an assignment
