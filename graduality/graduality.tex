@@ -197,7 +197,7 @@ motivates constraints over shared witnesses in place of judgements of fixed arit
 \label{def:constraints}
 Let $x$, $y$ and $z$ range over variables, and $t$ and $u$ over terms:
 \[
-t, u \mathrel{::=} x \mid \sigma \mid \tyList{t} \mid \tyDict{t} \mid \tyTuple{t_1, \ldots, t_n}
+t, u \coloncolonequals x \mid \sigma \mid \tyList{t} \mid \tyDict{t} \mid \tyTuple{t_1, \ldots, t_n}
   \mid \tyCallable{t_1, \ldots, t_n}{t} \mid \tyUnion{t}{u}
 \]
 where $\sigma$ is atomic, with neither a constructor nor a union at the root. A constraint is

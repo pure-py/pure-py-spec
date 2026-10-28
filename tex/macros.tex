@@ -373,8 +373,12 @@
   \setlength{\abovedisplayshortskip}{\dimexpr\abovedisplayshortskip - \baselineskip\relax}%
   \begin{align*}\input{spec/functions/#1}\end{align*}\endgroup}
 
-% Production symbol of the grammar figures, set tightly by mathtools.
+% Production symbol of the grammar figures: mathtools' centred colons, closed up by kerns that a document may
+% set before loading this file, since the colon's side bearings vary between fonts. The defaults are those of
+% mathtools' \Coloneqq.
 \RequirePackage{mathtools}
-\newcommand*{\coloncolonequals}{\Coloneqq}
+\providecommand*{\coloncolonkern}{0.9mu}
+\providecommand*{\colonequalskern}{0mu}
+\newcommand*{\coloncolonequals}{\mathrel{\vcentcolon\mkern-\coloncolonkern\vcentcolon\mkern-\colonequalskern=}}
 \newcommand*{\grammarGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{4}{l}{#1}}
 \newcommand*{\metaGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{#1}}
