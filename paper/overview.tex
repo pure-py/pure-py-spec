@@ -48,8 +48,8 @@ already. Java imposes similar conditions on blank finals~\cite[\S16]{gosling2025
 definitely unassigned; the \ruleName{assign} rule requires that entry, checks the expression against $\tau$ and
 makes the variable definitely assigned, so that $\Gamma(x)$ is a type, as the \ruleName{var} rule requires; an
 annotated assignment does both at once; and the \ruleName{if} rules combine the branches with $\merge$, so
-that} \added{After a conditional,} a variable is \added{therefore} definitely assigned \deleted{after a conditional }only if \replaced{every branch assigns it or returns}{each branch either assigns it or definitely
-returns}, and \deleted{is }otherwise possibly unassigned\deleted{, $\PU{\tau}$ (\secref{well-formedness-statements})}. Branch-local variables are \deleted{therefore }permitted, but using one after the
+that} \added{After a conditional,} a variable is definitely assigned \deleted{after a conditional }only if \replaced{every branch assigns it or returns}{each branch either assigns it or definitely
+returns}, and \deleted{is }otherwise possibly unassigned\deleted{, $\PU{\tau}$ (\secref{well-formedness-statements})}. Branch-local variables are therefore permitted, but using one after the
 conditional is not, nor is completing a partial assignment\replaced{:}{, as in the program on the left below. The
 \ruleName{def-body} rule introduces every variable declared or assigned by the body at $\Unbound$ before checking
 the body, so a reference before the declaration is rejected statically, as on the right, whereas Python fails at
