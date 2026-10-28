@@ -90,7 +90,7 @@ mutual def region and each mutual type region as one mutually-recursive binding 
 \begin{AddedBlock}
 \figref{syntax-stmt} gives the syntax of statements $s$, which are sequenced by juxtaposition, $\exSeq{s}{s'}$; function bodies, branches of conditionals and bodies of
 cases are statements. \emph{Type definitions} $\chi$ are either class definitions or \pyinline{type}
-statements, which declare \emph{type aliases}. \emph{Top-level statements} $t$ are either statements or mutual
+statements; the latter declare \emph{type aliases}. \emph{Top-level statements} $t$ are either statements or mutual
 type regions, also sequenced by juxtaposition; module bodies consist of imports followed by top-level
 statements, so type definitions occur only at the top level of a module. Function definitions, class definitions and
 \pyinline{type} statements bind distinct \emph{type parameters} $\seq{\alpha}$, written in brackets after the
