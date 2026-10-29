@@ -1,2 +1,0 @@
-# rule: check-syn
-print([])

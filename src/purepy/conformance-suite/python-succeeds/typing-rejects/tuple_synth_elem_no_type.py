@@ -1,2 +1,0 @@
-# rule: syn-tuple
-print(([],))

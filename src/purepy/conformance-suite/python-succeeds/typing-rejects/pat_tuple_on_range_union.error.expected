@@ -1,1 +1,0 @@
-tuple pattern at tuple[int, int] | builtins.range, which has range values

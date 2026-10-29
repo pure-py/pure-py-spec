@@ -1,1 +1,0 @@
-no overload of '==' at operand types __main__.Box[Callable[[int], int]] and __main__.Box[Callable[[int], int]]
