@@ -24,6 +24,7 @@ expected to conform to the formal semantics.
 - `src/purepy/`: the `purepy` reference type checker package, built on Python's `ast` and organised to mirror the sections of the specification
 - `src/purepy/conformance-suite/`: the conformance suite, shipped in the package
 - `test/`: runner for the conformance suite and checks of the repository
+- `script/`: project board integrity check, run weekly by CI and at the start of each Claude session
 
 Each section has separate prose in the two documents, `paper/<section>.tex` and `spec/<section>.tex`, and
 the technical material has one source: figures in `spec/fig/`, rules included individually in the paper in
