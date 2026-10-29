@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+import inspect
 import pathlib
 import re
 import sys
 import tomllib
 
+import purepy_conformance
 from purepy_conformance import (
     MAIN,
     PurePyOutcome,
@@ -70,10 +72,7 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
 
 def check_lint(r: Results) -> None:
     with r.test("this script passes mypy and ruff"):
-        sources = [
-            str(TEST / "consistency.py"),
-            str(ROOT / "src" / "purepy_conformance" / "__init__.py"),
-        ]
+        sources = [str(TEST / "consistency.py"), inspect.getfile(purepy_conformance)]
         for tool in (
             ["mypy", "--strict", "--python-version", PYTHON_VERSION],
             ["ruff", "check"],
