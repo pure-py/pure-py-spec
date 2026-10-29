@@ -41,11 +41,9 @@
   moredelim=[l][\color{base0B}]{@},
 }
 
-% Inline code at 95% of the surrounding text, so that it scales in table cells and captions; the size is set
-% outside the listing, which applies its basic style more than once
-\makeatletter
+% Size adjustment for inline code, none at present; applied outside the listing, which applies its basic
+% style more than once
 \newcommand*{\pyinlinesize}{}
-\makeatother
 \newcommand*{\pyinlinestyle}{\renewcommand\ttdefault{cmtt}\ttfamily}
 % File and directory names, in the size and font of inline code
 \newcommand*{\filename}[1]{{\pyinlinesize\pyinlinestyle #1}}
