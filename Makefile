@@ -88,7 +88,6 @@ check-consistency:
 # Release of purepy the specification depends on, as the tag in its wheel URL
 PUREPY_RELEASE := $(shell sed -n 's|.*/isabelle-purepy/releases/download/\(v[0-9.]*\)/.*|\1|p' pyproject.toml)
 
-# Anonymised specification, with the mechanisation at the purepy release
 supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
