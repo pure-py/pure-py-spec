@@ -1,0 +1,19 @@
+name: check-project-integrity
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # Weekly on Monday at 08:00 UTC
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ./.github/actions/check-project-integrity
+      with:
+        org: fluid-org
+        repo: fluid
+        project: 1
+        active-statuses: In Progress,Paused,Awaiting Decision
+        token: ${{ secrets.PROJECT_PAT }}
