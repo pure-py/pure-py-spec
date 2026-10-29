@@ -33,3 +33,6 @@ dist/
 tex/python-version.tex
 tex/mypy-version.tex
 tex/anon-name.tex
+
+# mypy cache, written beside the files it checks
+.mypy_cache/

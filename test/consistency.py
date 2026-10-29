@@ -3,7 +3,7 @@ import pathlib
 import re
 import sys
 
-from purepy.conformance import (
+from purepy_conformance import (
     MAIN,
     SYNTACTIC_ONLY,
     PurePyOutcome,
@@ -61,7 +61,10 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
 
 def check_lint(r: Results) -> None:
     with r.test("this script passes mypy and ruff"):
-        sources = [str(TEST / "consistency.py")]
+        sources = [
+            str(TEST / "consistency.py"),
+            str(ROOT / "src" / "purepy_conformance" / "__init__.py"),
+        ]
         for tool in (
             ["mypy", "--strict", "--python-version", PYTHON_VERSION],
             ["ruff", "check"],

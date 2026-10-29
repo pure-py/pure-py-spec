@@ -244,20 +244,9 @@ wheels = [
 ]
 
 [[package]]
-name = "purepy"
-version = "0.24.0"
-source = { url = "https://github.com/pure-py/isabelle-purepy/releases/download/v0.24.0/purepy-0.24.0-py3-none-any.whl" }
-wheels = [
-    { url = "https://github.com/pure-py/isabelle-purepy/releases/download/v0.24.0/purepy-0.24.0-py3-none-any.whl", hash = "sha256:1dce40e4b762f562a21cfa7425609eee17cedce34fad94e5455097d1b3f9b3b2" },
-]
-
-[[package]]
-name = "purepy-spec"
+name = "purepy-conformance"
 version = "0.23.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "purepy" },
-]
+source = { editable = "." }
 
 [package.dev-dependencies]
 dev = [
@@ -266,7 +255,6 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "purepy", url = "https://github.com/pure-py/isabelle-purepy/releases/download/v0.24.0/purepy-0.24.0-py3-none-any.whl" }]
 
 [package.metadata.requires-dev]
 dev = [

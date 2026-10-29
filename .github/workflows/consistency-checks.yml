@@ -1,7 +1,7 @@
 name: Consistency checks
 
-# Check the specification against the conformance suite of the purepy release in uv.lock. The paper and
-# specification are built by the Documents workflow.
+# Check the specification against the conformance suite, and build the wheel of the suite and its runner. The
+# paper and specification are built by the Documents workflow.
 on:
   workflow_dispatch:
   push:
@@ -23,5 +23,5 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Run the checks
-        run: make check-consistency
+      - name: Run the checks and build the wheel
+        run: make wheel

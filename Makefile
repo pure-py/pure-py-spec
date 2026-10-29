@@ -81,13 +81,17 @@ paper-anon.pdf: $(TEXFILES)
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 
-# Specification against the conformance suite of the purepy release in uv.lock
+# Specification against the conformance suite, and the suite against mypy
 check-consistency:
 	uv run --locked python test/consistency.py
 
+# Wheel of the conformance suite and its runner
+wheel: check-consistency
+	rm -rf dist && uv build --wheel
+
 PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
-# Release of purepy, as the tag in its wheel URL
-PUREPY_RELEASE := $(shell sed -n 's|.*$(PUREPY_REPO)/releases/download/\(v[0-9.]*\)/.*|\1|p' pyproject.toml)
+# Release of the mechanisation included in the submission
+PUREPY_RELEASE := $(shell cat .mechanisation-version)
 
 supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
@@ -108,4 +112,4 @@ clean:
 	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-.PHONY: default all paper-submission clean check-consistency
+.PHONY: default all paper-submission clean check-consistency wheel
