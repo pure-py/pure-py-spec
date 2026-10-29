@@ -79,7 +79,10 @@ For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with 
 \tau$, the expression evaluation judgement $\rho, e \Rightarrow r$ (\specfigrefTwo{eval-result}{eval-fails}) says that $e$ evaluates to
 result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). A variable
 not bound in $\rho$, or bound to $\Unbound$, aborts with $\errName$\speconly{ (\ruleName{eval-var-unknown},
-\ruleName{eval-var-unbound})}. A call of a value other than a closure or primitive, a call with the wrong number
+\ruleName{eval-var-unbound})}. Function calls and constructor calls share one syntactic form, as do subscripting a container and applying a class to
+type arguments; the semantics distinguishes them by the value of the callee or subject. A call whose
+callee evaluates to a class is a constructor call, and a subscript expression whose subject evaluates to a class evaluates to the
+class itself, since values carry no type arguments\speconly{ (\ruleName{eval-constr}, \ruleName{eval-class-type-args})}. A call of a value other than a closure, primitive or class, a call with the wrong number
 of arguments, and a constructor call with arguments which do not cover the fields of the class, abort with
 $\errType$\speconly{ (\ruleName{eval-call-nonfun}, \ruleName{eval-call-lambda-arity}, \ruleName{eval-call-def-arity},
 \ruleName{eval-constr-arity})}, and a reference to an attribute absent from an object or a loaded module aborts with $\errAttr$\speconly{

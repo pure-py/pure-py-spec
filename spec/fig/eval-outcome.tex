@@ -414,10 +414,19 @@
 \inferrule*[lab={\ruleName{eval-subscript}}]
 {
   \rho, e \Rightarrow \val{v} \\
+  v \text{ not a class} \\
   \rho, e' \Rightarrow r
 }
 {
   \rho, \exSubscript{e}{e'} \Rightarrow \mlet{v'}{r}{\getitem(v, v')}
+}
+\and
+\inferrule*[lab={\ruleName{eval-class-type-args}}]
+{
+  \rho, e \Rightarrow \val{\Type{C}}
+}
+{
+  \rho, \exSubscript{e}{\seq{\psi}} \Rightarrow \val{\Type{C}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-attr-object}}]
@@ -431,9 +440,8 @@
 \and
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
-  e \in \set{q, \exSubscript{q}{\seq{\psi}}} \\
+  \rho, e \Rightarrow \val{\Type{C}} \\
   \rho, \seq{e} \concat \seq{e}' \Rightarrow \val{\seq{v} \concat \seq{v}'} \\
-  \resolve(\rho, q) = \Type{C} \\
   \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
   \fieldMap{\Sigma}(C, (\seq{v}, \seq{y} \mathord{=} \seq{v}')) = \set{\bind{\seq{x}}{\seq{u}}}
 }
@@ -581,7 +589,7 @@
   \rho, e \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exCall{e}{\seq{e}} \Rightarrow \aborts{\kappa}
+  \rho, \exCall{e}{\seq{e}, \seq{y} \mathord{=} \seq{e}'} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-fail-args}}]
@@ -666,7 +674,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-constr-fail}}]
 {
-  e \in \set{q, \exSubscript{q}{\seq{\psi}}} \\
+  \rho, e \Rightarrow \val{\Type{C}} \\
   \rho, \seq{e} \concat \seq{e}' \Rightarrow \aborts{\kappa}
 }
 {
@@ -739,9 +747,8 @@
 \and
 \inferrule*[lab={\ruleName{eval-constr-arity}}]
 {
-  e \in \set{q, \exSubscript{q}{\seq{\psi}}} \\
+  \rho, e \Rightarrow \val{\Type{C}} \\
   \rho, \seq{e} \concat \seq{e}' \Rightarrow \val{\seq{v} \concat \seq{v}'} \\
-  \resolve(\rho, q) = \Type{C} \\
   \fieldMap{\Sigma}(C, (\seq{v}, \seq{y} \mathord{=} \seq{v}')) \text{ undefined}
 }
 {
