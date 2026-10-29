@@ -86,7 +86,7 @@ check-consistency:
 	uv run --locked python test/consistency.py
 
 PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
-# Release of purepy the specification depends on, as the tag in its wheel URL
+# Release of purepy, as the tag in its wheel URL
 PUREPY_RELEASE := $(shell sed -n 's|.*$(PUREPY_REPO)/releases/download/\(v[0-9.]*\)/.*|\1|p' pyproject.toml)
 
 supplementary.zip: spec-anon.pdf
