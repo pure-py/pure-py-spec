@@ -10,9 +10,7 @@ supporting efficient, portable applications in modelling, data processing, data 
 
 The specification defines a versioned formal grammar and a formal semantics for the language, and the
 `purepy-conformance` package holds the conformance suite and its runner, which checks an implementation against
-the suite. The `purepy` type checker is generated from the Isabelle mechanisation in the
-[isabelle-purepy](https://github.com/pure-py/isabelle-purepy) repository and checked against the suite there.
-A PurePy-compliant language accepts every valid PurePy program and is expected to conform to the formal
+the suite. A PurePy-compliant language accepts every valid PurePy program and is expected to conform to the formal
 semantics.
 
 ## Project structure
