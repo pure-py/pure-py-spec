@@ -105,7 +105,7 @@ check-tests:
 		{ echo "$(GENERATED) not found: git submodule update --init"; exit 1; }
 	@cmp -s .python-version $(MECHANISATION)/.python-version || \
 		{ echo "mechanisation targets Python $$(cat $(MECHANISATION)/.python-version), not $$(cat .python-version)"; exit 1; }
-	PYTHONPATH=$(GENERATED) uv run --locked ./test/run-all.sh
+	PYTHONPATH=$(abspath $(GENERATED)) uv run --locked ./test/run-all.sh
 
 supplementary.zip: spec-anon.pdf isabelle-purepy
 	rm -f $@ && rm -rf .submission
