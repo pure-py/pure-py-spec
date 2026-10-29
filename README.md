@@ -64,8 +64,7 @@ To take a new `purepy` release, change the wheel URL in `pyproject.toml`, run `u
 
 `make paper-submission` builds the anonymised paper and `supplementary.zip`, which carries the anonymised
 specification and the Isabelle mechanisation, cloned from the `isabelle-purepy` repository at the `purepy`
-release named in `pyproject.toml`, so a submission never ships a working copy. The archive is not checked after
-anonymisation (#292).
+release named in `pyproject.toml`. The archive is not checked after anonymisation (#292).
 
 The submission is always built locally; the `Consistency checks` GitHub Action runs the consistency script,
 the `Documents` action builds the paper and specification, and the mechanisation and
