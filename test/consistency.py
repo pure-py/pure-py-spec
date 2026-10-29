@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""Consistency of the specification with the conformance suite: rule names unique, cited rules defined, and
-the mypy claims of the conformance section upheld"""
-
 import pathlib
 import re
 import sys
