@@ -8,10 +8,9 @@ PurePy is a pure (side-effect free) subset of Python, intended initially for res
 languages and programming pedagogy, and in the longer term as a common language for scientific computing,
 supporting efficient, portable applications in modelling, data processing, data analysis and visualisation.
 
-The specification defines a versioned formal grammar and a formal semantics for the language. The `purepy` type
-checker is generated from the Isabelle mechanisation in the
-[isabelle-purepy](https://github.com/pure-py/isabelle-purepy) repository, which also holds the conformance suite.
-A PurePy-compliant language accepts every valid PurePy program and is expected to conform to the formal
+The specification defines a versioned formal grammar and a formal semantics for the language, and the
+`purepy-conformance` package holds the conformance suite and its runner, which checks an implementation against
+the suite. A PurePy-compliant language accepts every valid PurePy program and is expected to conform to the formal
 semantics.
 
 ## Project structure
@@ -22,8 +21,8 @@ semantics.
 - `paper/`: material belonging only to the paper
 - `tex/`: macros and bibliography shared by both documents
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
-- `agda/`: Agda mechanisation of the distributivity proof
-- `test/`: consistency of the specification with the conformance suite of the `purepy` release in `uv.lock`
+- `src/purepy_conformance/`: the conformance suite, as package data, and its runner, the `purepy-conformance` command
+- `test/`: consistency of the specification with the conformance suite, and of the suite with mypy
 
 `\paperinput{file}` at a point in a specification source includes the file in the paper only, and
 `\specinput{file}` in the specification only; `\paperonly{...}` and `\speconly{...}` restrict a phrase to
@@ -34,13 +33,22 @@ one source; all other rules are defined in the figures.
 
 See the Makefile.
 
-## Consistency checks
+## Conformance suite
 
 Install [uv](https://docs.astral.sh/uv/). The Python version in `.python-version` is read by uv, the
-workflows, mypy and the specification. From the repository root:
+workflows, mypy and the specification. From the repository root, check that every test cites a rule of the
+specification and that mypy accepts the agreeing tests, then build the wheel:
 
 ```bash
-make check-consistency
+make wheel
+```
+
+An implementation runs the suite with the `purepy-conformance` command of the installed package, giving the
+command which type-checks the module at the path appended to it and, optionally, the Python interpreter which
+runs the tests:
+
+```bash
+purepy-conformance --type-checker "purepy --check" python3
 ```
 
 ## Development
@@ -54,17 +62,14 @@ uv sync --locked
 Format the script:
 
 ```bash
-uv run --locked ruff format ./test/consistency.py
+uv run --locked ruff format ./test/consistency.py ./src/purepy_conformance
 ```
-
-To take a new `purepy` release, change the wheel URL in `pyproject.toml`, run `uv lock` and commit
-`pyproject.toml` and `uv.lock`.
 
 ## PLDI 2027 submission
 
 `make paper-submission` builds the anonymised paper and `supplementary.zip`, which carries the anonymised
 specification and the Isabelle mechanisation, cloned from the `isabelle-purepy` repository at the `purepy`
-release named in `pyproject.toml`. The archive is not checked after anonymisation (#292).
+release of the same version, which is the release checked against this specification. The archive is not checked after anonymisation (#292).
 
 The submission is always built locally; the `Consistency checks` GitHub Action runs the consistency script,
 the `Documents` action builds the paper and specification, and the mechanisation and
@@ -75,8 +80,8 @@ type checker are checked by the `build` action of their repository.
 Run the `Bump version` GitHub Action manually with a version in the form `x.y.z` (for example, `0.1.4`). The
 action updates and commits the version numbers on `main` and creates and pushes the tag `v0.1.4`. It then builds
 `PurePy-spec.pdf` and publishes it to GitHub Pages under `v0.1.4/` and `latest/`
-(https://pure-py.github.io/pure-py-spec/), and creates the GitHub Release for the tag. The `purepy` package is
-released from the `isabelle-purepy` repository.
+(https://pure-py.github.io/pure-py-spec/), builds the `purepy-conformance` wheel and creates the GitHub Release
+for the tag with the wheel attached. The `purepy` package is released from the `isabelle-purepy` repository.
 
 ### Zotero export settings
 

@@ -1,3 +1,0 @@
-name: pure-py-spec
-depend: standard-library-2.3
-include: .

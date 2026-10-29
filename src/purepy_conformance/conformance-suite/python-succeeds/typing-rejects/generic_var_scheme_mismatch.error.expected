@@ -1,0 +1,1 @@
+expected type Callable[[str], int], given Callable[[int | str], int | str]

@@ -1,0 +1,2 @@
+# rule: check-syn
+print([])

@@ -15,12 +15,10 @@
 *.toc
 *.zip
 
-# Agda build artifacts
-agda/_build/
-
 # Python build and environment artifacts
 .venv/
 __pycache__/
+.mypy_cache/
 dist/
 
 # Local tool settings

@@ -1,10 +1,14 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "purepy-spec"
+name = "purepy-conformance"
 version = "0.23.0"
 requires-python = ">=3.12"
-dependencies = [
-    "purepy @ https://github.com/pure-py/isabelle-purepy/releases/download/v0.24.0/purepy-0.24.0-py3-none-any.whl",
-]
+
+[project.scripts]
+purepy-conformance = "purepy_conformance:main"
 
 [dependency-groups]
 dev = [
@@ -17,3 +21,7 @@ strict = true
 
 [tool.ruff]
 line-length = 100
+extend-exclude = ["src/purepy_conformance/conformance-suite"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/purepy_conformance"]

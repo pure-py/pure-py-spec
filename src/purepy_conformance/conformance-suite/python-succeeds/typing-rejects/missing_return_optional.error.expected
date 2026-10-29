@@ -1,0 +1,1 @@
+'f' declares result type int | None but does not always return (mypy compatibility)

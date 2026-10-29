@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
+import inspect
 import pathlib
 import re
 import sys
+import tomllib
 
-from purepy.conformance import (
+import purepy_conformance
+from purepy_conformance import (
     MAIN,
-    SYNTACTIC_ONLY,
     PurePyOutcome,
     PythonOutcome,
     Results,
@@ -23,6 +25,15 @@ PYTHON_VERSION = (ROOT / ".python-version").read_text().strip()
 RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
 RULE_DEF = re.compile(r"lab=\{\\ruleName\{([a-z0-9-]+)\}\}")
 CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
+
+
+def check_python_version(r: Results) -> None:
+    with r.test("package requires the pinned Python version"):
+        project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+        if project["requires-python"] != f">={PYTHON_VERSION}":
+            r.fail(
+                f"requires-python is {project['requires-python']}, .python-version is {PYTHON_VERSION}"
+            )
 
 
 def check_unique_rule_names(r: Results) -> None:
@@ -49,7 +60,7 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
         for test in tests(suite_dir):
             path = test / MAIN if test.is_dir() else test
             dirs = test.relative_to(suite_dir).parts
-            cites = dirs[0] != SYNTACTIC_ONLY and dirs[1] != PurePyOutcome.PARSER_REJECTS
+            cites = dirs[1] != PurePyOutcome.PARSER_REJECTS
             cited = CITATION.match(path.read_text(encoding="utf-8").split("\n", 1)[0])
             if cited is None and cites:
                 r.fail(f"{path.relative_to(suite_dir)} cites no rule")
@@ -61,7 +72,7 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
 
 def check_lint(r: Results) -> None:
     with r.test("this script passes mypy and ruff"):
-        sources = [str(TEST / "consistency.py")]
+        sources = [str(TEST / "consistency.py"), inspect.getfile(purepy_conformance)]
         for tool in (
             ["mypy", "--strict", "--python-version", PYTHON_VERSION],
             ["ruff", "check"],
@@ -112,6 +123,7 @@ def check_mypy_compatibility(r: Results, suite_dir: pathlib.Path) -> None:
 
 def main() -> None:
     consistency = Results()
+    check_python_version(consistency)
     check_unique_rule_names(consistency)
     with suite() as suite_dir:
         check_rule_attribution(consistency, suite_dir)
