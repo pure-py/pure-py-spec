@@ -104,9 +104,9 @@ class Results:
 
 
 class Runner(Results):
-    def __init__(self, checker: list[str], interpreter: str | None) -> None:
+    def __init__(self, type_checker: list[str], interpreter: str | None) -> None:
         super().__init__()
-        self.checker = checker
+        self.type_checker = type_checker
         self.interpreter = interpreter  # None: tests not run
 
     def check(self, path: pathlib.Path, exit: Exit, error_checked: bool) -> list[str]:
@@ -114,7 +114,7 @@ class Runner(Results):
         are copied to a new directory before running."""
         with tempfile.TemporaryDirectory() as alone:
             checked = path if path.name == MAIN else pathlib.Path(shutil.copy(path, alone))
-            proc = run([*self.checker, str(checked)])
+            proc = run([*self.type_checker, str(checked)])
         exits = {exit, Exit.ILL_FORMED_PROGRAM} if exit == Exit.ILL_FORMED else {exit}
         output = proc.stdout + proc.stderr
         error = path.with_suffix(ERROR_EXPECTED)
@@ -205,7 +205,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="purepy-conformance")
     parser.add_argument("interpreter", nargs="?", default="python3")
     parser.add_argument(
-        "--checker",
+        "--type-checker",
         default="purepy --check",
         help="command which type-checks the module at the path appended to it (default: purepy --check)",
     )
@@ -216,7 +216,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
     )
     args = parser.parse_args(argv)
-    r = Runner(shlex.split(args.checker), None if args.no_run else args.interpreter)
+    r = Runner(shlex.split(args.type_checker), None if args.no_run else args.interpreter)
     with suite() as path:
         r.run_suite(path, args.jobs)
     r.summary()

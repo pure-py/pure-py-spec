@@ -48,7 +48,7 @@ command which type-checks the module at the path appended to it and, optionally,
 runs the tests:
 
 ```bash
-purepy-conformance --checker "purepy --check" python3
+purepy-conformance --type-checker "purepy --check" python3
 ```
 
 ## Development
