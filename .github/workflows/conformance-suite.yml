@@ -9,6 +9,8 @@ on:
     paths:
       - src/**
       - test/**
+      - isabelle-purepy
+      - Makefile
       - pyproject.toml
       - uv.lock
       - .python-version
@@ -35,8 +37,12 @@ jobs:
           - runtime: Pyodide
 
     steps:
+      # The submodule holds the generated type checker
       - name: Checkout code
         uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          token: ${{ secrets.PURE_PY_ISABELLE }}
 
       - name: Set up CPython
         if: matrix.runtime == 'CPython'
@@ -73,19 +79,18 @@ jobs:
 
       - name: Run tests with CPython
         if: matrix.runtime == 'CPython'
-        run: |
-          uv run --locked ./test/run-all.sh python
+        run: make check-tests
 
       - name: Run tests with GraalPy
         if: matrix.runtime == 'GraalPy'
         env:
-          PYTHONPATH: ${{ github.workspace }}/src
+          PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}/isabelle-purepy/python/generated
         run: |
           test/run-all.sh python --no-mypy
 
       - name: Run tests with Pyodide
         if: matrix.runtime == 'Pyodide'
         env:
-          PYTHONPATH: ${{ github.workspace }}/src
+          PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}/isabelle-purepy/python/generated
         run: |
           test/run-all.sh "$PYODIDE_PYTHON" --no-mypy

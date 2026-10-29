@@ -1,6 +1,6 @@
 # PurePy - A Pure Functional Subset of Python
 
-[![mechanisation](https://github.com/pure-py/pure-py-spec/actions/workflows/mechanisation.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/mechanisation.yml)
+[![conformance suite](https://github.com/pure-py/pure-py-spec/actions/workflows/conformance-suite.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/conformance-suite.yml)
 
 ## [v0.23.0](https://pure-py.github.io/pure-py-spec/v0.23.0/PurePy-spec.pdf)
 
@@ -21,7 +21,7 @@ every valid PurePy program and is expected to conform to the formal semantics.
 - `tex/`: macros and bibliography shared by both documents
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
 - `agda/`: Agda mechanisation of the distributivity proof
-- `isabelle-purepy/`: Isabelle/HOL mechanisation, a submodule of the `isabelle-purepy` repository
+- `isabelle-purepy/`: Isabelle/HOL mechanisation, a submodule of the `isabelle-purepy` repository, with the type checker it generates committed under `python/generated/`
 - `src/purepy/`: the `purepy` type checker package: the parser, built on Python's `ast`, and the translation into the syntax generated from the mechanisation, around the type checker generated from it
 - `src/purepy/conformance-suite/`: the conformance suite, shipped in the package
 - `test/`: runner for the conformance suite and checks of the repository
@@ -44,10 +44,11 @@ workflows, mypy and the specification; `pyproject.toml` gives only the lower bou
 make check-tests
 ```
 
-The target builds the mechanisation, which generates the type checker, so `isabelle` must be on `PATH`. It then
-runs `test/run-all.sh` with the generated code on `PYTHONPATH`, which creates the project environment, installs
-the locked development dependencies, checks rule cross-references, runs mypy and ruff over `src/purepy/` and
-runs the conformance suite.
+The target needs the `isabelle-purepy` submodule checked out (`git submodule update --init`), for the generated
+type checker, and runs `test/run-all.sh` with the generated code on `PYTHONPATH`; `MECHANISATION=<path>` runs
+the suite under the generated code of another checkout of the mechanisation instead. The script creates the
+project environment, installs the locked development dependencies, checks rule cross-references, runs mypy and
+ruff over `src/purepy/` and runs the conformance suite.
 
 Tests in `src/purepy/conformance-suite/` are organised by the outcome under Python and the outcome under
 PurePy, following the grid in the conformance section of the specification; the runner derives every
@@ -111,8 +112,9 @@ uv build
 
 ## Type checker (`purepy`)
 
-The type checker is the Python generated from the mechanisation by `make check-tests`, which must be on
-`PYTHONPATH`; `src/purepy/` parses a program, translates it into the generated syntax and reports the result.
+The type checker is the Python generated from the mechanisation, committed in the submodule, which must be on
+`PYTHONPATH` as in `make check-tests`; `src/purepy/` parses a program, translates it into the generated syntax
+and reports the result.
 Check a single module, or a whole program from the entry module:
 
 ```bash
@@ -147,8 +149,8 @@ git submodule update --init
 
 The mechanisation is type checked before packaging, so `isabelle` must be on `PATH`; the README of the
 submodule gives the required version and installation steps. The submission is always built locally; the
-`Mechanisation` GitHub Action checks the mechanisation and runs the conformance suite under the generated type
-checker, and the `Documents` action builds the paper and specification.
+`Conformance suite` GitHub Action runs the suite under the generated type checker, the `Documents` action
+builds the paper and specification, and the mechanisation is checked by the `build` action of its repository.
 
 ## Release workflow
 
