@@ -14,10 +14,6 @@ on:
       - .python-version
       - .github/workflows/consistency-checks.yml
 
-concurrency:
-  group: consistency-checks-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   check:
     runs-on: ubuntu-latest
