@@ -1,12 +1,12 @@
 {
-  "benchmark": "HumanEval",
-  "revision": "6d43fb980f9fee3c892a914eda09951f772ad10d",
-  "url": "https://raw.githubusercontent.com/openai/human-eval/6d43fb980f9fee3c892a914eda09951f772ad10d/data/HumanEval.jsonl.gz",
-  "sha256": "b796127e635a67f93fb35c04f4cb03cf06f38c8072ee7cee8833d7bee06979ef",
+  "benchmark": "HumanEval+",
+  "release": "v0.1.10",
+  "url": "https://github.com/evalplus/humanevalplus_release/releases/download/v0.1.10/HumanEvalPlus.jsonl.gz",
+  "sha256": "272720b90ac375502c8ed23cd791c2a93dfb22a911641a494da74a426c09f101",
   "total_problems": 164,
   "eligible_problems": 29,
   "seed": 20261009,
-  "scope": "20 problems with typed interfaces, sampled from the 29 eligible of 164.",
+  "scope": "The HumanEval selection, with the extra EvalPlus tests; --all-problems runs all 164.",
   "task_ids": [
     "HumanEval/2",
     "HumanEval/3",
@@ -28,5 +28,8 @@
     "HumanEval/26",
     "HumanEval/27",
     "HumanEval/28"
-  ]
+  ],
+  "excluded": {
+    "HumanEval/32": "evalplus 0.3.1 records no outcome for find_zero, so no answer can pass"
+  }
 }

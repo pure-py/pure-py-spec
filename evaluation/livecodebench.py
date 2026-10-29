@@ -161,14 +161,15 @@ def ensure_cases(tasks):
     raise RuntimeError("official tests not found for frozen tasks: " + ", ".join(sorted(missing)))
 
 
-def prepare():
+def prepare(task_ids=None):
     if TASKS.exists():
         frozen = json.loads(TASKS.read_text())
         if (frozen["manifest"]["dataset_revision"] != DATASET_REVISION
                 or frozen["manifest"]["harness_revision"] != HARNESS_REVISION):
             raise RuntimeError("frozen LiveCodeBench revisions changed")
-        ensure_cases(frozen["tasks"])
-        print(f"Using the frozen selection: {TASKS}")
+        ensure_cases({k: v for k, v in frozen["tasks"].items() if task_ids is None or k in task_ids})
+        if task_ids is None:
+            print(f"Using the frozen selection: {TASKS}")
         return
     sys.path.insert(0, str(ROOT / ".cache/lcb-deps"))
     import pyarrow.parquet as pq
