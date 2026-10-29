@@ -2,6 +2,7 @@
 import pathlib
 import re
 import sys
+import tomllib
 
 from purepy_conformance import (
     MAIN,
@@ -22,6 +23,15 @@ PYTHON_VERSION = (ROOT / ".python-version").read_text().strip()
 RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
 RULE_DEF = re.compile(r"lab=\{\\ruleName\{([a-z0-9-]+)\}\}")
 CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
+
+
+def check_python_version(r: Results) -> None:
+    with r.test("package requires the pinned Python version"):
+        project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+        if project["requires-python"] != f">={PYTHON_VERSION}":
+            r.fail(
+                f"requires-python is {project['requires-python']}, .python-version is {PYTHON_VERSION}"
+            )
 
 
 def check_unique_rule_names(r: Results) -> None:
@@ -114,6 +124,7 @@ def check_mypy_compatibility(r: Results, suite_dir: pathlib.Path) -> None:
 
 def main() -> None:
     consistency = Results()
+    check_python_version(consistency)
     check_unique_rule_names(consistency)
     with suite() as suite_dir:
         check_rule_attribution(consistency, suite_dir)
