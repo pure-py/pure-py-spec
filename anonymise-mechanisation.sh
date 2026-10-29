@@ -20,7 +20,10 @@ for f in $(grep -rl "$REPO" .); do
   sed -e "s/$REPO/$NAME/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
 done
 
-# Language and repository names.
-for f in $(grep -rlE 'pure-py|PurePy' .); do
-  sed -e "s/pure-py/$ANON_SLUG/g" -e "s/PurePy/$ANON_NAME/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+# Language, repository and package names, in file contents and in paths.
+for f in $(grep -rlE 'pure-py|PurePy|purepy' .); do
+  sed -e "s/pure-py/$ANON_SLUG/g" -e "s/PurePy/$ANON_NAME/g" -e "s/purepy/$ANON_SLUG/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done
+for f in $(find . -depth -name '*purepy*'); do
+  mv "$f" "${f%purepy*}$ANON_SLUG${f##*purepy}"
 done
