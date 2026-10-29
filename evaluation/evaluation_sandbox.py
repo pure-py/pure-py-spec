@@ -22,6 +22,8 @@ def sandbox_profile(directory, read_paths=()):
     (allow process-exec (subpath {json.dumps(str(runtime))}) (literal {json.dumps(str(Path(sys.executable).resolve()))}))
     (allow sysctl-read)
     (allow mach-lookup)
+    (allow process-fork)
+    (allow ipc-posix-sem)
     (allow signal (target self))
     (allow file-read-metadata)
     (allow file-read*
@@ -60,36 +62,38 @@ def command(directory):
     raise RuntimeError("only macOS and Linux sandbox backends are supported")
 
 
-def run(payload, timeout):
+def run(payload, timeout, files=None):
+    from evaluation_benchmarks import Verdict
     with tempfile.TemporaryDirectory(prefix="purepy-evaluation-") as directory:
         payload = {**payload, "directory": directory, "timeout": timeout}
-        if payload.get("benchmark") == "LiveCodeBench":
-            (Path(directory) / "grader.py").write_text(payload.pop("grader_source"))
+        module = Path(__file__).with_name("evaluation_benchmarks.py")
+        (Path(directory) / module.name).write_text(module.read_text())
+        for name, source in (files or {}).items():
+            (Path(directory) / name).write_text(source)
         try:
             process = subprocess.Popen(command(directory), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                        stderr=subprocess.PIPE, text=True, cwd=directory, start_new_session=True,
                                        env={"PATH": "/usr/bin:/bin", "OPENBLAS_NUM_THREADS": "1",
                                             "OMP_NUM_THREADS": "1", "PYTHONHASHSEED": "0"})
         except (OSError, RuntimeError) as error:
-            return {"passed": None, "error": str(error), "tooling_error": True}
+            return Verdict(None, str(error), True)
         try:
             stdout, stderr = process.communicate(json.dumps(payload), timeout=timeout + 5)
         except subprocess.TimeoutExpired:
             os.killpg(process.pid, signal.SIGKILL)
             process.communicate()
-            return {"passed": False, "error": "candidate exceeded wall-clock limit", "tooling_error": False}
+            return Verdict(False, "candidate exceeded wall-clock limit", False)
         if process.returncode != 0:
-            return {"passed": None, "error": f"sandbox worker failed: {stderr[:2000] or process.returncode}",
-                    "tooling_error": True}
+            return Verdict(None, f"sandbox worker failed: {stderr[:2000] or process.returncode}", True)
         try:
             verdict = json.loads(stdout)
             if not isinstance(verdict.get("passed"), bool) and verdict.get("passed") is not None:
                 raise ValueError("invalid verdict")
             if "passed" not in verdict or "tooling_error" not in verdict:
                 raise ValueError("missing verdict fields")
-            return verdict
+            return Verdict(**verdict)
         except (ValueError, TypeError):
-            return {"passed": None, "error": "sandbox did not return a valid verdict", "tooling_error": True}
+            return Verdict(None, "sandbox did not return a valid verdict", True)
 
 
 def worker():
@@ -104,37 +108,29 @@ def worker():
 
     signal.signal(signal.SIGALRM, expired)
     signal.setitimer(signal.ITIMER_REAL, limit)
-    grader = None
-    if payload["benchmark"] == "LiveCodeBench":
-        try:
-            import numpy as np
-            grader = runpy.run_path(str(Path(payload["directory"]) / "grader.py"))["run_test"]
-        except BaseException:
-            print(json.dumps({"passed": None, "error": "official grader could not load",
-                              "tooling_error": True}))
-            return
+    module = runpy.run_path(str(Path(payload["directory"]) / "evaluation_benchmarks.py"))
+    benchmark = None if "probe" in payload else module["BENCHMARKS"][payload["benchmark"]]()
+    Verdict = module["Verdict"]
+    encode_verdict = module["encode_verdict"]
     try:
-        if payload["benchmark"] == "LiveCodeBench":
-            with tempfile.TemporaryFile(mode="w+", dir=payload["directory"]) as capture:
-                with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(capture):
-                    outcomes, metadata = grader(payload["sample"], test=payload["code"], timeout=6)
-            outcomes = [r.item(0) if isinstance(r, np.ndarray) else r for r in outcomes]
-            result = {"passed": len(outcomes) == payload["test_count"] and all(r > 0 for r in outcomes),
-                      "error": None if all(r > 0 for r in outcomes) else json.dumps(metadata, default=str),
-                      "tests_passed": int(sum(r > 0 for r in outcomes)), "tests_total": payload["test_count"],
-                      "tooling_error": False}
-        else:
-            with tempfile.TemporaryFile(mode="w+", dir=payload["directory"]) as capture:
-                with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(capture):
-                    exec(compile(payload["program"], "solution_and_official_tests.py", "exec"), {})
-            result = {"passed": True, "error": None, "tooling_error": False}
+        grader = benchmark.prepare_worker(payload) if benchmark is not None else None
     except BaseException:
-        tooling = payload["benchmark"] == "LiveCodeBench"
-        result = {"passed": None if tooling else False, "error": traceback.format_exc().strip(),
-                  "tooling_error": tooling}
+        print(json.dumps(Verdict(None, "official grader could not load", True), default=encode_verdict))
+        return
+    try:
+        with tempfile.TemporaryFile(mode="w+", dir=payload["directory"]) as capture:
+            with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(capture):
+                if benchmark is None:
+                    exec(compile(payload["probe"], "sandbox_probe.py", "exec"), {})
+                    result = Verdict(True, None, False)
+                else:
+                    result = benchmark.execute(payload, grader)
+    except BaseException:
+        tooling = benchmark is None or benchmark.worker_tooling_errors
+        result = Verdict(None if tooling else False, traceback.format_exc().strip(), tooling)
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)
-    print(json.dumps(result))
+    print(json.dumps(result, default=encode_verdict))
 
 
 if __name__ == "__main__":

@@ -1,8 +1,9 @@
 import argparse
-import ast
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field, fields
 from datetime import datetime, timezone
-import gzip
+from enum import Enum
 import hashlib
 from importlib.metadata import version
 import json
@@ -16,16 +17,79 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+from evaluation_benchmarks import BENCHMARKS, Problem, Verdict, encode_verdict
 import evaluation_sandbox
 
 
 ROOT = Path(__file__).resolve().parent
-CACHE = ROOT / ".cache/evaluation"
+DEFINITION_PATH = ROOT / "prompts/purepy-v0.22.3.md"
 CHECKER_VERSION = "0.22.3"
 CHECKER_SHA = "cd59f9e8656d2b617954caaf60bdb89d91ccc9cbee830d63977e8abf8a857c27"
-HARNESS_SHA = "b7cb6a8a69807bb868150a61742e25d7bb5328bbe01d514471b6ec43c9fa9ed2"
 CONDITIONS = ("python", "purepy")
 OUTPUT_FORMAT_VERSION = "tagged-code-v1"
+
+
+class Unrecorded(Enum):
+    VALUE = "unrecorded"
+
+
+@dataclass
+class Attempt:
+    round: int
+    code: str
+    generation: dict[str, object]
+    messages: list[dict[str, str]]
+    prompt_sha256: str
+    checker: Verdict = field(default_factory=lambda: Verdict(None, "awaiting checker", False))
+    official_tests: Verdict = field(default_factory=lambda: Verdict(None, "awaiting tests", False))
+    raw_response: str | Unrecorded = Unrecorded.VALUE
+    output_format: dict[str, object] | None | Unrecorded = Unrecorded.VALUE
+    next_round_clears_reported_feature: bool | None | Unrecorded = Unrecorded.VALUE
+
+    @classmethod
+    def from_dict(cls, record):
+        return cls(**{**record, "checker": Verdict(**record["checker"]),
+                      "official_tests": Verdict(**record["official_tests"])})
+
+    def to_dict(self):
+        self.validate()
+        return {f.name: getattr(self, f.name) for f in fields(self)
+                if getattr(self, f.name) is not Unrecorded.VALUE}
+
+    def validate(self, *, finished=False):
+        if type(self.round) is not int or self.round < 0:
+            raise RuntimeError("attempt rounds must be nonnegative integers")
+        evaluable = self.generation["status"] == "complete" and bool(self.code.strip())
+        for name, verdict in (("checker", self.checker), ("official tests", self.official_tests)):
+            if verdict.passed is not None and type(verdict.passed) is not bool:
+                raise RuntimeError(f"{name} verdict must be true, false or unknown")
+            if verdict.tooling_error and verdict.passed is not None:
+                raise RuntimeError(f"{name} tooling errors must have unknown verdicts")
+            if not evaluable and verdict.passed is not None:
+                raise RuntimeError("unevaluated answers must have unknown verdicts")
+            if finished and evaluable and verdict.passed is None and not verdict.tooling_error:
+                raise RuntimeError(f"{name} verdict is still pending")
+        if self.checker.passed is not None:
+            expected = (0,) if self.checker.passed else (1, 2, 3, 4)
+            if type(self.checker.exit_code) is not int or self.checker.exit_code not in expected:
+                raise RuntimeError("checker verdict requires a matching completed checker exit status")
+
+    @property
+    def repairable(self):
+        return (self.generation["status"] == "complete" and self.checker.passed is False
+                and not self.checker.tooling_error and not self.official_tests.tooling_error)
+
+    @property
+    def format_status(self):
+        return self.output_format.get("status", "unrecorded") if isinstance(self.output_format, dict) else "unrecorded"
+
+    @property
+    def format_compliant(self):
+        return self.output_format.get("compliant") if isinstance(self.output_format, dict) else None
+
+
+def encode_result(value):
+    return value.to_dict() if isinstance(value, Attempt) else encode_verdict(value)
 
 
 def sha(raw):
@@ -36,64 +100,21 @@ def save(path, data):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
+    temporary.write_text(json.dumps(data, indent=2, ensure_ascii=False, default=encode_result) + "\n")
     temporary.replace(path)
 
 
-def download(url, path, expected):
-    path = Path(path)
-    if path.exists() and sha(path.read_bytes()) == expected:
-        return path
-    with urllib.request.urlopen(url, timeout=120) as response:
-        raw = response.read()
-    if sha(raw) != expected:
-        raise RuntimeError("download checksum mismatch")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".download")
-    temporary.write_bytes(raw)
-    temporary.replace(path)
-    return path
-
-
-def load_problems(benchmark, limit=None, difficulty=None):
-    if benchmark == "humaneval":
-        manifest = json.loads((ROOT / "benchmarks/humaneval.json").read_text())
-        path = download(manifest["url"], CACHE / "HumanEval.jsonl.gz", manifest["sha256"])
-        with gzip.open(path, "rt") as source:
-            official = {p["task_id"]: p for p in map(json.loads, source)}
-        if len(official) != manifest["total_problems"]:
-            raise RuntimeError("HumanEval benchmark size changed")
-        problems = {}
-        for task_id in manifest["task_ids"]:
-            problem = official[task_id]
-            node = next(n for n in ast.parse(problem["prompt"]).body
-                        if isinstance(n, ast.FunctionDef) and n.name == problem["entry_point"])
-            signature = ast.unparse(node).splitlines()[0]
-            signature = re.sub(r"\b(List|Tuple|Dict)\b", lambda m: m[0].lower(), signature)
-            problems[task_id] = {"name": problem["entry_point"], "question": problem["prompt"],
-                                 "signature": signature, "official": problem}
-        manifest = {**manifest, "selected_problems": len(problems)}
-    else:
-        import livecodebench as lcb
-        lcb.prepare()
-        data = json.loads(lcb.TASKS.read_text())
-        if data["manifest"]["dataset_revision"] != lcb.DATASET_REVISION:
-            raise RuntimeError("LiveCodeBench dataset revision changed")
-        if data["manifest"]["harness_revision"] != lcb.HARNESS_REVISION:
-            raise RuntimeError("LiveCodeBench harness revision changed")
-        download("https://raw.githubusercontent.com/LiveCodeBench/LiveCodeBench/"
-                 + lcb.HARNESS_REVISION + "/lcb_runner/evaluation/testing_util.py",
-                 CACHE / "lcb-grader.py", HARNESS_SHA)
-        problems = {k: v for k, v in data["tasks"].items()
-                    if not difficulty or v["difficulty"] == difficulty}
-        manifest = {**data["manifest"], "selection_sha256": sha(lcb.TASKS.read_bytes()),
-                    "total_problems": 1055, "selected_problems": len(problems),
-                    "scope": "Typed call-based subset of release_v6; 1055 release problems in total."}
-        for task_id, task in problems.items():
-            if sha(lcb.case_path(task_id).read_bytes()) != task["tests_sha256"]:
-                raise RuntimeError("LiveCodeBench test fixture checksum mismatch")
-    chosen = dict(list(problems.items())[:limit])
-    return chosen, {**manifest, "evaluated_problems": len(chosen)}
+def read_result(path):
+    data = json.loads(path.read_text())
+    for task in data["tasks"].values():
+        for condition in CONDITIONS:
+            if condition not in task:
+                continue
+            solution = task[condition]
+            for metric in ("checker", "official_tests"):
+                solution[metric] = Verdict(**solution[metric])
+            solution["attempts"] = [Attempt.from_dict(record) for record in solution["attempts"]]
+    return data
 
 
 def output_instruction(condition):
@@ -103,13 +124,16 @@ def output_instruction(condition):
             "Do not include Markdown fences, comments, a test runner or example calls.")
 
 
-def prompt(task, condition):
+def prompt(task: Problem, condition, definition=None):
     common = ("Preserve the required function name, parameters, return behaviour and input domain. "
               "Include necessary imports and helpers.\n\n")
-    definition = (ROOT / "prompts/purepy-v0.22.3.md").read_text() if condition == "purepy" else ""
+    if condition == "purepy":
+        definition = DEFINITION_PATH.read_text() if definition is None else definition
+    else:
+        definition = ""
     return (("Solve this task in PurePy.\n" if condition == "purepy" else "Solve this task in Python.\n")
-            + common + definition + "\nTask:\n" + task["question"]
-            + "\n\nRequired function interface:\n" + task["signature"]
+            + common + definition + "\nTask:\n" + task.question
+            + "\n\nRequired function interface:\n" + task.signature
             + "\n\n" + output_instruction(condition))
 
 
@@ -258,9 +282,9 @@ def failure_category(code, diagnostic, exit_code):
             "review_required": True, "exit_code": exit_code}
 
 
-def check(code):
+def check(code) -> Verdict:
     if not code.strip():
-        return {"passed": None, "error": "no generated code to check", "tooling_error": False}
+        return Verdict(None, "no generated code to check", False)
     with tempfile.TemporaryDirectory(prefix="purepy-check-") as directory:
         path = Path(directory) / "solution.py"
         path.write_text(code)
@@ -270,101 +294,110 @@ def check(code):
                                     capture_output=True, text=True, timeout=30,
                                     env={"PATH": "/usr/bin:/bin"})
         except (OSError, subprocess.TimeoutExpired) as error:
-            return {"passed": None, "error": type(error).__name__, "tooling_error": True}
+            return Verdict(None, type(error).__name__, True)
         diagnostic = (result.stdout + result.stderr).strip().replace(str(path), "solution.py")
         tooling = result.returncode not in (0, 1, 2, 3, 4) or "Traceback (most recent call last)" in diagnostic
-        verdict = {"passed": None if tooling else result.returncode == 0 and bool(code.strip()),
-                   "error": diagnostic if result.returncode or not code.strip() else None,
-                   "exit_code": result.returncode, "tooling_error": tooling,
-                   "command": ["purepy", "--check", "--module", "solution.py"]}
-        if not code.strip():
-            verdict["error"] = "no generated code"
-        if verdict["passed"] is False:
-            verdict["failure_mode"] = failure_category(code, verdict["error"], result.returncode)
-        return verdict
+        passed = None if tooling else result.returncode == 0
+        error = diagnostic if result.returncode else None
+        return Verdict(passed, error, tooling, exit_code=result.returncode,
+                       command=["purepy", "--check", "--module", "solution.py"],
+                       failure_mode=failure_category(code, error, result.returncode) if passed is False else None)
 
 
-def official_tests(code, task, benchmark):
-    if not code.strip():
-        return {"passed": None, "error": "no generated code to test", "tooling_error": False}
-    try:
-        tree = ast.parse(code)
-        if not any(isinstance(n, ast.FunctionDef) and n.name == task["name"] for n in tree.body):
-            return {"passed": False, "error": "required top-level function is missing", "tooling_error": False}
-    except SyntaxError as error:
-        return {"passed": False, "error": str(error), "tooling_error": False}
-    if benchmark == "humaneval":
-        problem = task["official"]
-        program = problem["prompt"] + "\n" + code + "\n" + problem["test"] + "\ncheck(" + task["name"] + ")\n"
-        return evaluation_sandbox.run({"benchmark": "HumanEval", "program": program}, 3)
-    import livecodebench as lcb
-    fixture = json.loads(lcb.case_path(task["task_id"]).read_text())
-    alias = "_lcb_core_" + sha(task["task_id"].encode())[:12]
-    parameters = ", ".join(task["parameters"])
-    signature = "self" + (", " + parameters if parameters else "")
-    adapted = code + f"\n{alias} = {task['name']}\nclass Solution:\n    def {task['name']}({signature}):\n        return {alias}({parameters})\n"
-    payload = {"benchmark": "LiveCodeBench", "sample": fixture["sample"], "code": adapted,
-               "test_count": task["test_count"], "grader_source": (CACHE / "lcb-grader.py").read_text()}
-    return evaluation_sandbox.run(payload, 7 * task["test_count"] + 30)
+def validate_prompt_examples(definition):
+    examples = re.findall(r"^```python[ \t]*\n(.*?)^```[ \t]*$", definition, re.MULTILINE | re.DOTALL)
+    openings = re.findall(r"^```python[ \t]*$", definition, re.MULTILINE)
+    if not examples or len(examples) != len(openings):
+        raise RuntimeError("PurePy definition must contain complete Python code examples")
+    for index, source in enumerate(examples, 1):
+        verdict = check(source)
+        if verdict.passed is not True or verdict.tooling_error:
+            raise RuntimeError(f"PurePy prompt example {index} fails the checker: {verdict.error}")
+    print(f"Validated {len(examples)} PurePy prompt examples", flush=True)
 
 
-def validate_backend(benchmark):
+def validate_backend(benchmark, definition=None):
     if sys.version_info[:2] != (3, 12) or version("purepy") != CHECKER_VERSION:
         raise RuntimeError("the pipeline requires Python 3.12 and the pinned PurePy wheel")
-    accepted = check("def probe(x: int) -> int:\n    return x\n")
+    validate_prompt_examples(DEFINITION_PATH.read_text() if definition is None else definition)
     rejected = check("def probe(x: int) -> int:\n    for i in range(0, x):\n        pass\n    return x\n")
-    if accepted["passed"] is not True or rejected["passed"] is not False:
+    if rejected.passed is not False:
         raise RuntimeError("checker health check failed")
     program = "def probe():\n    return 1\nassert probe() == 1\n"
-    sandbox = evaluation_sandbox.run({"benchmark": "HumanEval", "program": program}, 3)
-    if sandbox["passed"] is not True:
-        raise RuntimeError("sandbox health check failed: " + str(sandbox["error"]))
-    isolation = evaluation_sandbox.run({"benchmark": "HumanEval", "program":
+    sandbox = evaluation_sandbox.run({"probe": program}, 3)
+    if sandbox.passed is not True:
+        raise RuntimeError("sandbox health check failed: " + str(sandbox.error))
+    isolation = evaluation_sandbox.run({"probe":
         "import os, socket\nassert 'ANTHROPIC_API_KEY' not in os.environ\n"
         "assert 'DEEPSEEK_API_KEY' not in os.environ\n"
         "try:\n    socket.create_connection(('1.1.1.1', 443), timeout=1)\n"
         "except OSError:\n    pass\nelse:\n    raise AssertionError('network was accessible')\n"
         + f"assert not os.access({str(ROOT / 'pyproject.toml')!r}, os.R_OK)\n"}, 3)
-    if isolation["passed"] is not True:
+    if isolation.passed is not True:
         raise RuntimeError("sandbox isolation check failed")
-    if benchmark == "livecodebench":
-        probe = evaluation_sandbox.run({"benchmark": "LiveCodeBench",
-            "grader_source": (CACHE / "lcb-grader.py").read_text(),
-            "sample": {"input_output": json.dumps({"inputs": ["1"], "outputs": ["1"], "fn_name": "probe"})},
-            "code": "class Solution:\n    def probe(self, x):\n        return x\n", "test_count": 1}, 15)
-        if probe["passed"] is not True:
-            raise RuntimeError("official LiveCodeBench grader health check failed")
+    benchmark.health_check()
 
 
-def repair_messages(messages, attempt):
-    return [*messages, {"role": "assistant", "content": attempt["raw_response"]},
+def validate_problem(task: Problem, benchmark):
+    reference = benchmark.reference(task)
+    if reference is not None:
+        verdict = benchmark.grade(reference, task)
+        if verdict.passed is not True:
+            raise RuntimeError(f"the reference solution of {task.task_id} fails its tests: {verdict.error}")
+    wrong = benchmark.grade(f"def {task.name}(*args):\n    return None\n", task)
+    if wrong.passed is not False:
+        raise RuntimeError(f"the tests of {task.task_id} accept an answer that returns None")
+
+
+def validate_problems(problems, benchmark):
+    with ThreadPoolExecutor(max_workers=min(8, os.cpu_count() or 1)) as pool:
+        for outcome in pool.map(lambda task: validate_problem(task, benchmark), problems.values()):
+            pass
+    print(f"Validated the tests of {len(problems)} problems", flush=True)
+
+
+def repair_messages(messages, attempt: Attempt):
+    return [*messages, {"role": "assistant", "content": attempt.raw_response},
             {"role": "user", "content":
-             "The PurePy v0.22.3 checker rejected this source:\n" + attempt["checker"]["error"]
+             "The PurePy v0.22.3 checker rejected this source:\n" + attempt.checker.error
              + "\nCorrect the source while preserving the task interface and behaviour. "
              + output_instruction("purepy")}]
 
 
-def pack_solution(attempts, initial_prompt):
+def pack_solution(attempts: list[Attempt], initial_prompt, condition, repair_rounds, *, pending=False):
+    if condition not in CONDITIONS or type(repair_rounds) is not int or repair_rounds < 0:
+        raise RuntimeError("invalid condition or repair budget")
+    budget = repair_rounds if condition == "purepy" else 0
+    if not attempts or len(attempts) > budget + 1:
+        raise RuntimeError("attempt history is empty or exceeds the repair budget")
+    for index, attempt in enumerate(attempts):
+        attempt.validate(finished=index < len(attempts) - 1 or not pending)
+        if attempt.round != index:
+            raise RuntimeError("attempt rounds must be consecutive, starting at zero")
+        if index and not attempts[index - 1].repairable:
+            raise RuntimeError("repair continued after acceptance or another stopping condition")
+    if not pending and attempts[-1].repairable and len(attempts) < budget + 1:
+        raise RuntimeError("repair stopped before acceptance or the repair limit")
     for current, following in zip(attempts, attempts[1:]):
-        if current["checker"]["passed"] is not False:
+        if current.checker.passed is not False:
             continue
-        mode = current["checker"].get("failure_mode", {})
-        next_mode = following["checker"].get("failure_mode", {})
-        current["next_round_clears_reported_feature"] = (
-            True if following["checker"]["passed"] is True else
-            False if following["checker"]["passed"] is False
+        mode = current.checker.failure_mode or {}
+        next_mode = following.checker.failure_mode or {}
+        current.next_round_clears_reported_feature = (
+            True if following.checker.passed is True else
+            False if following.checker.passed is False
             and (mode.get("category"), mode.get("restriction"))
             == (next_mode.get("category"), next_mode.get("restriction")) else None)
     final = attempts[-1]
-    return {"code": final["code"], "checker": final["checker"], "official_tests": final["official_tests"],
-            "generation": final["generation"], "prompt": initial_prompt, "attempts": attempts,
-            "output_format": final.get("output_format"),
-            "rejections": sum(a["checker"]["passed"] is False for a in attempts),
-            "rounds_to_acceptance": next((a["round"] for a in attempts if a["checker"]["passed"] is True), None)}
+    return {"code": final.code, "checker": final.checker, "official_tests": final.official_tests,
+            "generation": final.generation, "prompt": initial_prompt, "attempts": attempts,
+            "output_format": None if final.output_format is Unrecorded.VALUE else final.output_format,
+            "rejections": sum(a.checker.passed is False for a in attempts),
+            "rounds_to_acceptance": next((a.round for a in attempts if a.checker.passed is True), None)}
 
 
-def attempt_solution(args, task, condition, persist=None):
-    initial_prompt = prompt(task, condition)
+def attempt_solution(args, task: Problem, condition, persist=None, *, definition=None):
+    initial_prompt = prompt(task, condition, definition)
     messages = [{"role": "user", "content": initial_prompt}]
     attempts = []
     for round_index in range(1 + (args.repair_rounds if condition == "purepy" else 0)):
@@ -375,30 +408,27 @@ def attempt_solution(args, task, condition, persist=None):
                                        "error": "generation failed"}
         else:
             answer.update(extract_code(answer["raw_response"], condition))
-        answer.update(round=round_index, messages=messages,
-                      prompt_sha256=sha(json.dumps(messages, sort_keys=True).encode()))
-        answer["checker"] = {"passed": None, "error": "awaiting checker", "tooling_error": False}
-        answer["official_tests"] = {"passed": None, "error": "awaiting tests", "tooling_error": False}
-        attempts.append(answer)
+        attempt = Attempt(**answer, round=round_index, messages=messages,
+                          prompt_sha256=sha(json.dumps(messages, sort_keys=True).encode()))
+        attempts.append(attempt)
         if persist:
-            persist(pack_solution(attempts, initial_prompt))
-        if answer["generation"]["status"] != "complete" or not answer["code"]:
-            reason = ("generation " + answer["generation"]["status"]
-                      if answer["generation"]["status"] != "complete" else
-                      "output format: " + answer["output_format"]["status"])
-            for metric in ("checker", "official_tests"):
-                answer[metric] = {"passed": None, "error": "not evaluated because " + reason,
-                                  "tooling_error": False}
+            persist(pack_solution(attempts, initial_prompt, condition, args.repair_rounds, pending=True))
+        if attempt.generation["status"] != "complete" or not attempt.code:
+            reason = ("generation " + attempt.generation["status"]
+                      if attempt.generation["status"] != "complete" else
+                      "output format: " + attempt.format_status)
+            attempt.checker = Verdict(None, "not evaluated because " + reason, False)
+            attempt.official_tests = Verdict(None, "not evaluated because " + reason, False)
         else:
-            answer["checker"] = check(answer["code"])
-            answer["official_tests"] = official_tests(answer["code"], task, args.benchmark)
+            attempt.checker = check(attempt.code)
+            attempt.official_tests = args.benchmark.grade(attempt.code, task)
+        attempt.validate(finished=True)
         if persist:
-            persist(pack_solution(attempts, initial_prompt))
-        if (answer["generation"]["status"] != "complete" or answer["checker"]["passed"] is not False
-                or answer["checker"]["tooling_error"] or answer["official_tests"]["tooling_error"]):
+            persist(pack_solution(attempts, initial_prompt, condition, args.repair_rounds, pending=True))
+        if not attempt.repairable:
             break
-        messages = repair_messages(messages, answer)
-    return pack_solution(attempts, initial_prompt)
+        messages = repair_messages(messages, attempt)
+    return pack_solution(attempts, initial_prompt, condition, args.repair_rounds)
 
 
 def summarize(data):
@@ -411,19 +441,18 @@ def summarize(data):
             attempts = [s["attempts"][0 if stage == "initial" else -1] for s in solutions]
             rows[stage] = {
                 "outputs": len(attempts),
-                "checker_accepts": sum(a["checker"]["passed"] is True for a in attempts),
-                "tests_pass": sum(a["official_tests"]["passed"] is True for a in attempts),
-                "joint_pass": sum(a["checker"]["passed"] is True and a["official_tests"]["passed"] is True for a in attempts),
-                "checker_unknown": sum(a["checker"]["passed"] is None for a in attempts),
-                "tests_unknown": sum(a["official_tests"]["passed"] is None for a in attempts),
-                "format_compliant": sum((a.get("output_format") or {}).get("compliant") is True for a in attempts),
-                "format_noncompliant": sum((a.get("output_format") or {}).get("compliant") is False for a in attempts),
-                "format_unknown": sum((a.get("output_format") or {}).get("compliant") is None for a in attempts),
-                "format_status": dict(Counter((a.get("output_format") or {}).get("status", "unrecorded")
-                                              for a in attempts)),
-                "generation_status": dict(Counter(a["generation"]["status"] for a in attempts))}
-        failures = [a["checker"].get("failure_mode", {}) for s in solutions for a in s["attempts"]
-                    if a["checker"]["passed"] is False]
+                "checker_accepts": sum(a.checker.passed is True for a in attempts),
+                "tests_pass": sum(a.official_tests.passed is True for a in attempts),
+                "joint_pass": sum(a.checker.passed is True and a.official_tests.passed is True for a in attempts),
+                "checker_unknown": sum(a.checker.passed is None for a in attempts),
+                "tests_unknown": sum(a.official_tests.passed is None for a in attempts),
+                "format_compliant": sum(a.format_compliant is True for a in attempts),
+                "format_noncompliant": sum(a.format_compliant is False for a in attempts),
+                "format_unknown": sum(a.format_compliant is None for a in attempts),
+                "format_status": dict(Counter(a.format_status for a in attempts)),
+                "generation_status": dict(Counter(a.generation["status"] for a in attempts))}
+        failures = [a.checker.failure_mode or {} for s in solutions for a in s["attempts"]
+                    if a.checker.passed is False]
         rows["checker_rejections"] = dict(Counter(f.get("category", "unclassified") for f in failures))
         rows["rounds_to_acceptance"] = dict(Counter(str(s["rounds_to_acceptance"]) for s in solutions))
         summary["conditions"][condition] = rows
@@ -446,11 +475,11 @@ def summarize(data):
         index = 0 if stage == "initial" else -1
         pairs = [(t["purepy"]["attempts"][index], t["python"]["attempts"][index])
                  for t in data["tasks"].values() if "purepy" in t and "python" in t]
-        accepted = [(q, p) for q, p in pairs if q["checker"]["passed"] is True]
+        accepted = [(q, p) for q, p in pairs if q.checker.passed is True]
         count = len(accepted)
-        purepy_pass = sum(q["official_tests"]["passed"] is True for q, p in accepted)
-        python_pass = sum(p["official_tests"]["passed"] is True for q, p in accepted)
-        unknown = sum(q["official_tests"]["passed"] is None or p["official_tests"]["passed"] is None
+        purepy_pass = sum(q.official_tests.passed is True for q, p in accepted)
+        python_pass = sum(p.official_tests.passed is True for q, p in accepted)
+        unknown = sum(q.official_tests.passed is None or p.official_tests.passed is None
                       for q, p in accepted)
         known = count > 0 and not unknown
         summary["rq3_accepted"][stage] = {
@@ -472,7 +501,7 @@ def export_code(path, task_id, condition, solution):
     folder.mkdir(parents=True, exist_ok=True)
     (folder / (condition + ".py")).write_text(solution["code"] + "\n")
     for attempt in solution["attempts"]:
-        (folder / f"{condition}.round-{attempt['round']}.py").write_text(attempt["code"] + "\n")
+        (folder / f"{condition}.round-{attempt.round}.py").write_text(attempt.code + "\n")
 
 
 def plot(data, summary, destinations):
@@ -509,19 +538,20 @@ def plot(data, summary, destinations):
 
 
 def figure(source, destination):
-    data = json.loads(source.read_text())
+    data = read_result(source)
     destination.parent.mkdir(parents=True, exist_ok=True)
     plot(data, summarize(data), [destination])
     print(f"Figure: {destination}", flush=True)
 
 
 def report(path):
-    data = json.loads(path.read_text())
+    data = read_result(path)
     summary = summarize(data)
     data["summary"] = summary
     save(path, data)
     lines = [f"# {data['model']}", "", f"Benchmark: {data['benchmark']}",
              f"Problems: {summary['problems']} of {summary['benchmark_total']}",
+             f"Typed interfaces: {data['manifest'].get('evaluated_typed_interfaces', 'unrecorded')} of {summary['problems']}",
              f"Scope: {summary['scope']}", f"PurePy checker: {data['protocol']['checker_version']}",
              f"Maximum checker-feedback repair rounds: {data['protocol']['repair_rounds']}", "",
              f"Output format: {data['protocol'].get('output_format', 'untagged')}", "",
@@ -573,11 +603,9 @@ def report(path):
             solution = task[condition]
             export_code(path, task_id, condition, solution)
             first, last = solution["attempts"][0], solution["attempts"][-1]
-            values = [task_id, condition, last["generation"]["status"],
-                      (first.get("output_format") or {}).get("status", "unrecorded"),
-                      (last.get("output_format") or {}).get("status", "unrecorded"), first["checker"]["passed"],
-                      last["checker"]["passed"], first["official_tests"]["passed"],
-                      last["official_tests"]["passed"], solution["rounds_to_acceptance"]]
+            values = [task_id, condition, last.generation["status"], first.format_status,
+                      last.format_status, first.checker.passed, last.checker.passed, first.official_tests.passed,
+                      last.official_tests.passed, solution["rounds_to_acceptance"]]
             lines.append("| " + " | ".join(map(str, values)) + " |")
     lines.extend(["", "## Rejection Details", "",
                   "The checker reports one diagnostic per run, so the next round's diagnostic may name a different feature.", "",
@@ -586,11 +614,12 @@ def report(path):
     for task_id, task in data["tasks"].items():
         for condition in CONDITIONS:
             for attempt in task.get(condition, {}).get("attempts", []):
-                if attempt["checker"]["passed"] is not False:
+                if attempt.checker.passed is not False:
                     continue
-                mode = attempt["checker"]["failure_mode"]
-                values = [task_id, condition, attempt["round"], mode["category"], mode["restriction"],
-                          attempt.get("next_round_clears_reported_feature"), attempt["checker"]["error"]]
+                mode = attempt.checker.failure_mode
+                clears = attempt.next_round_clears_reported_feature
+                values = [task_id, condition, attempt.round, mode["category"], mode["restriction"],
+                          None if clears is Unrecorded.VALUE else clears, attempt.checker.error]
                 lines.append("| " + " | ".join(str(v).replace("|", "\\|").replace("\n", " ") for v in values) + " |")
     path.with_suffix(".md").write_text("\n".join(lines) + "\n")
     plot(data, summary, [path.with_suffix(".pdf"), path.with_suffix(".svg")])
@@ -612,7 +641,7 @@ def compare(paths, destination):
         raise RuntimeError("comparison already exists; choose a new destination")
     groups = {}
     for path in paths:
-        data = json.loads(path.read_text())
+        data = read_result(path)
         protocol = data["protocol"]
         identity = {"benchmark": data["benchmark"], "manifest": data["manifest"],
                     "task_ids": sorted(data["tasks"]),
@@ -657,10 +686,12 @@ def compare(paths, destination):
 
 
 def run(args):
-    problems, manifest = load_problems(args.benchmark, args.limit, args.difficulty)
+    problems, manifest = args.benchmark.load(args.limit, args.difficulty, getattr(args, "all_problems", False))
     if not problems:
         raise RuntimeError("the selection contains no problems")
-    validate_backend(args.benchmark)
+    definition = DEFINITION_PATH.read_text()
+    validate_backend(args.benchmark, definition)
+    validate_problems(problems, args.benchmark)
     if not args.base_url:
         args.base_url = {"openai": "http://127.0.0.1:11434/v1", "deepseek": "https://api.deepseek.com",
                          "anthropic": "https://api.anthropic.com/v1"}[args.provider]
@@ -675,36 +706,37 @@ def run(args):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("x") as stream:
         stream.write("{}\n")
-    data = {"benchmark": "HumanEval" if args.benchmark == "humaneval" else "LiveCodeBench",
+    data = {"benchmark": args.benchmark.name,
             "model": args.model, "manifest": manifest, "tasks": {},
             "protocol": {"checker_version": CHECKER_VERSION, "wheel_sha256": CHECKER_SHA,
-                         "definition_sha256": sha((ROOT / "prompts/purepy-v0.22.3.md").read_bytes()),
+                         "definition_sha256": sha(definition.encode()),
                          "prompt_version": OUTPUT_FORMAT_VERSION, "output_format": OUTPUT_FORMAT_VERSION,
                          "python": sys.version.split()[0], "platform": sys.platform,
                          "provider": args.provider, "base_url": args.base_url, "max_tokens": args.max_tokens,
                          "model_size_b": getattr(args, "model_size", None),
                          "repair_rounds": args.repair_rounds, "feedback": "checker diagnostics only",
+                         "problem_checks": "reference solution passes; an answer returning None fails",
                          "automatic_retries": 0, "started_at": datetime.now(timezone.utc).isoformat()},
             "status": "running"}
     save(path, data)
     failed = False
     try:
-        for task_id, task in problems.items():
-            task = {**task, "task_id": task_id}
-            data["tasks"][task_id] = {k: v for k, v in task.items() if k != "official"}
+        for task in problems.values():
+            task_id = task.task_id
+            data["tasks"][task_id] = task.to_record()
             for condition in CONDITIONS:
                 def persist(solution):
                     data["tasks"][task_id][condition] = solution
                     save(path, data)
                     export_code(path, task_id, condition, solution)
 
-                solution = attempt_solution(args, task, condition, persist)
+                solution = attempt_solution(args, task, condition, persist, definition=definition)
                 data["tasks"][task_id][condition] = solution
                 save(path, data)
-                print(f"{task_id} {condition}: checker={solution['checker']['passed']} "
-                      f"tests={solution['official_tests']['passed']} status={solution['generation']['status']}", flush=True)
-                if any(a["checker"]["tooling_error"] or a["official_tests"]["tooling_error"]
-                       or a["generation"]["status"] == "api_error" for a in solution["attempts"]):
+                print(f"{task_id} {condition}: checker={solution['checker'].passed} "
+                      f"tests={solution['official_tests'].passed} status={solution['generation']['status']}", flush=True)
+                if any(a.checker.tooling_error or a.official_tests.tooling_error
+                       or a.generation["status"] == "api_error" for a in solution["attempts"]):
                     failed = True
     except BaseException as error:
         data["status"] = "interrupted"
@@ -730,7 +762,8 @@ def main():
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="action", required=True)
     execution = sub.add_parser("run")
-    execution.add_argument("--benchmark", choices=["humaneval", "livecodebench"], default="humaneval")
+    execution.add_argument("--benchmark", choices=list(BENCHMARKS), default="humaneval-plus")
+    execution.add_argument("--all-problems", action="store_true", help="every problem of the benchmark instead of the frozen selection")
     execution.add_argument("--model", default="qwen2.5-coder:0.5b")
     execution.add_argument("--provider", choices=["openai", "anthropic", "deepseek"], default="openai")
     execution.add_argument("--base-url")
@@ -764,6 +797,9 @@ def main():
         parser.error("--model-size must be positive when supplied")
     if args.difficulty and args.benchmark != "livecodebench":
         parser.error("difficulty filtering applies only to LiveCodeBench")
+    if args.all_problems and args.benchmark == "livecodebench":
+        parser.error("LiveCodeBench runs its frozen selection only")
+    args.benchmark = BENCHMARKS[args.benchmark]()
     try:
         run(args)
     except RuntimeError as error:

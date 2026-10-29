@@ -7,9 +7,25 @@ dependencies = [
     "matplotlib==3.10.7",
     "numpy==1.26.4",
     "pyarrow==19.0.1",
-    "fsspec==2025.3.2",
+    "fsspec==2025.3.0",
     "aiohttp==3.12.15",
+    "evalplus==0.3.1",
+    "datasets==3.6.0",
 ]
 
 [tool.uv]
 package = false
+environments = ["sys_platform == 'darwin'", "sys_platform == 'linux'"]
+override-dependencies = [
+    "openai; sys_platform == 'never'",
+    "anthropic; sys_platform == 'never'",
+    "google-generativeai; sys_platform == 'never'",
+    "transformers; sys_platform == 'never'",
+    "stop-sequencer; sys_platform == 'never'",
+    "tree-sitter; sys_platform == 'never'",
+    "tree-sitter-python; sys_platform == 'never'",
+    "fire; sys_platform == 'never'",
+    "rich; sys_platform == 'never'",
+    "termcolor; sys_platform == 'never'",
+    "multipledispatch; sys_platform == 'never'",
+]
