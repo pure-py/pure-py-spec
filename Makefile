@@ -97,7 +97,7 @@ mechanisation:
 
 # Specification against the conformance suite of the purepy release in uv.lock
 check-consistency:
-	uv run --locked ./test/run-all.sh
+	uv run --locked python test/consistency.py
 
 supplementary.zip: spec-anon.pdf mechanisation
 	rm -f $@ && rm -rf .submission

@@ -23,7 +23,7 @@ semantics.
 - `tex/`: macros and bibliography shared by both documents
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
 - `agda/`: Agda mechanisation of the distributivity proof
-- `test/`: checks of the specification against the conformance suite of the `purepy` release in `uv.lock`
+- `test/`: consistency of the specification with the conformance suite of the `purepy` release in `uv.lock`
 
 `\paperinput{file}` at a point in a specification source includes the file in the paper only, and
 `\specinput{file}` in the specification only; `\paperonly{...}` and `\speconly{...}` restrict a phrase to
@@ -44,8 +44,8 @@ make check-consistency
 ```
 
 The target creates the project environment, with the `purepy` release named in `pyproject.toml` and the locked
-development dependencies, and runs `test/run-all.sh`. The script checks that rule names are unique across the
-specification and paper, that every test of the conformance suite cites a rule of the specification as its
+development dependencies, and runs `test/consistency.py`. The script checks that rule names are unique across
+the specification and paper, that every test of the conformance suite cites a rule of the specification as its
 README describes, and that the tests under `python-succeeds/agrees/` type-check under mypy (`test/mypy.ini`),
 except those under `mypy-bug/`, which mypy must reject.
 
@@ -57,10 +57,10 @@ Synchronise the project environment and install the development dependencies:
 uv sync --locked
 ```
 
-Format the test runner:
+Format the script:
 
 ```bash
-uv run --locked ruff format ./test/run-all.py
+uv run --locked ruff format ./test/consistency.py
 ```
 
 To take a new `purepy` release, change the wheel URL in `pyproject.toml`, run `uv lock` and commit
@@ -75,7 +75,7 @@ no uncommitted changes and sits at a commit on `origin/main`, so a submission ne
 
 The mechanisation is type checked before packaging, so `isabelle` must be on `PATH`; the README of
 `isabelle-purepy` gives the required version and installation steps. The submission is always built locally;
-the `Consistency checks` GitHub Action checks the specification against the suite, the `Documents` action builds the paper and specification, and the mechanisation and
+the `Consistency checks` GitHub Action runs the consistency script, the `Documents` action builds the paper and specification, and the mechanisation and
 type checker are checked by the `build` action of their repository.
 
 ## Release workflow

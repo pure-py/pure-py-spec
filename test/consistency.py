@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Checks of the specification against the conformance suite of the installed purepy package"""
+"""Consistency of the specification with the conformance suite: rule names unique, cited rules defined, and
+the mypy claims of the conformance section upheld"""
 
 import pathlib
 import re
@@ -62,8 +63,8 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
 
 
 def check_lint(r: Results) -> None:
-    with r.test("test runner passes mypy and ruff"):
-        sources = [str(TEST / "run-all.py")]
+    with r.test("this script passes mypy and ruff"):
+        sources = [str(TEST / "consistency.py")]
         for tool in (
             ["mypy", "--strict", "--python-version", PYTHON_VERSION],
             ["ruff", "check"],
