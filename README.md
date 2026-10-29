@@ -37,7 +37,7 @@ See the Makefile.
 ## Consistency checks
 
 Install [uv](https://docs.astral.sh/uv/). The Python version in `.python-version` is read by uv, the
-workflows, mypy and the specification; `pyproject.toml` gives only the lower bound. From the repository root:
+workflows, mypy and the specification. From the repository root:
 
 ```bash
 make check-consistency
