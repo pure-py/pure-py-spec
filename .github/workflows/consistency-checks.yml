@@ -1,6 +1,6 @@
 name: Consistency checks
 
-# Checks the specification against the conformance suite of the purepy release in uv.lock. The paper and
+# Check the specification against the conformance suite of the purepy release in uv.lock. The paper and
 # specification are built by the Documents workflow.
 on:
   workflow_dispatch:
