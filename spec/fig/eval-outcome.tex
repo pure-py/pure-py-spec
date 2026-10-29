@@ -414,20 +414,20 @@
 \inferrule*[lab={\ruleName{eval-subscript}}]
 {
   \rho, e \Rightarrow \val{v} \\
-  \added{v \text{ not a class}} \\
+  v \text{ not a class} \\
   \rho, e' \Rightarrow r
 }
 {
   \rho, \exSubscript{e}{e'} \Rightarrow \mlet{v'}{r}{\getitem(v, v')}
 }
 \and
-\added{\inferrule*[lab={\ruleName{eval-class-type-args}}]
+\inferrule*[lab={\ruleName{eval-class-type-args}}]
 {
   \rho, e \Rightarrow \val{\Type{C}}
 }
 {
   \rho, \exSubscript{e}{\seq{\psi}} \Rightarrow \val{\Type{C}}
-}}
+}
 \and
 \inferrule*[lab={\ruleName{eval-attr-object}}]
 {
@@ -440,7 +440,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-constr}}]
 {
-  \replaced{\rho, e \Rightarrow \val{\Type{C}}}{e \in \set{q, \exSubscript{q}{\seq{\psi}}} \quad \resolve(\rho, q) = \Type{C}} \\
+  \rho, e \Rightarrow \val{\Type{C}} \\
   \rho, \seq{e} \concat \seq{e}' \Rightarrow \val{\seq{v} \concat \seq{v}'} \\
   \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\sigma}}} \\
   \fieldMap{\Sigma}(C, (\seq{v}, \seq{y} \mathord{=} \seq{v}')) = \set{\bind{\seq{x}}{\seq{u}}}
@@ -589,7 +589,7 @@
   \rho, e \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exCall{e}{\seq{e}\added{, \seq{y} \mathord{=} \seq{e}'}} \Rightarrow \aborts{\kappa}
+  \rho, \exCall{e}{\seq{e}, \seq{y} \mathord{=} \seq{e}'} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-call-fail-args}}]
@@ -674,7 +674,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-constr-fail}}]
 {
-  \replaced{\rho, e \Rightarrow \val{\Type{C}}}{e \in \set{q, \exSubscript{q}{\seq{\psi}}}} \\
+  \rho, e \Rightarrow \val{\Type{C}} \\
   \rho, \seq{e} \concat \seq{e}' \Rightarrow \aborts{\kappa}
 }
 {
@@ -747,7 +747,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-constr-arity}}]
 {
-  \replaced{\rho, e \Rightarrow \val{\Type{C}}}{e \in \set{q, \exSubscript{q}{\seq{\psi}}} \quad \resolve(\rho, q) = \Type{C}} \\
+  \rho, e \Rightarrow \val{\Type{C}} \\
   \rho, \seq{e} \concat \seq{e}' \Rightarrow \val{\seq{v} \concat \seq{v}'} \\
   \fieldMap{\Sigma}(C, (\seq{v}, \seq{y} \mathord{=} \seq{v}')) \text{ undefined}
 }
