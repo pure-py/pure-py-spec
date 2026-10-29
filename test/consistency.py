@@ -112,7 +112,6 @@ def check_mypy_compatibility(r: Results, suite_dir: pathlib.Path) -> None:
 
 def main() -> None:
     consistency = Results()
-    print("specification against the conformance suite")
     check_unique_rule_names(consistency)
     with suite() as suite_dir:
         check_rule_attribution(consistency, suite_dir)
