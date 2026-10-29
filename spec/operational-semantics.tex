@@ -80,7 +80,7 @@ For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with 
 result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). A variable
 not bound in $\rho$, or bound to $\Unbound$, aborts with $\errName$\speconly{ (\ruleName{eval-var-unknown},
 \ruleName{eval-var-unbound})}. \added{Function calls and constructor calls share one syntactic form, as do subscripting a container and applying a class to
-type arguments. The semantics distinguishes them by the value of the callee or subject. A call whose
+type arguments; the semantics distinguishes them by the value of the callee or subject. A call whose
 callee evaluates to a class is a constructor call, and a subscript whose subject evaluates to a class evaluates to the class
 itself\speconly{ (\ruleName{eval-constr}, \ruleName{eval-class-type-args})}. }A call of a value other than a closure\replaced{, primitive or class}{ or primitive}, a call with the wrong number
 of arguments, and a constructor call with arguments which do not cover the fields of the class, abort with
