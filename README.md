@@ -69,13 +69,12 @@ To take a new `purepy` release, change the wheel URL in `pyproject.toml`, run `u
 ## PLDI 2027 submission
 
 `make paper-submission` builds the anonymised paper and `supplementary.zip`, which carries the anonymised
-specification and the Isabelle mechanisation, taken from a checkout of the `isabelle-purepy` repository
-alongside this one (`MECHANISATION=<path>` names another). The target refuses to build unless the checkout has
-no uncommitted changes and sits at a commit on `origin/main`, so a submission never ships a working copy.
+specification and the Isabelle mechanisation, cloned from the `isabelle-purepy` repository at the release the
+specification depends on, so a submission never ships a working copy. The archive is not checked after
+anonymisation (pure-py/pure-py.github.io#7).
 
-The mechanisation is type checked before packaging, so `isabelle` must be on `PATH`; the README of
-`isabelle-purepy` gives the required version and installation steps. The submission is always built locally;
-the `Consistency checks` GitHub Action runs the consistency script, the `Documents` action builds the paper and specification, and the mechanisation and
+The submission is always built locally; the `Consistency checks` GitHub Action runs the consistency script,
+the `Documents` action builds the paper and specification, and the mechanisation and
 type checker are checked by the `build` action of their repository.
 
 ## Release workflow

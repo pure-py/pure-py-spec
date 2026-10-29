@@ -24,4 +24,3 @@ done
 for f in $(grep -rlE 'pure-py|PurePy' .); do
   sed -e "s/pure-py/$ANON_SLUG/g" -e "s/PurePy/$ANON_NAME/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
 done
-make build

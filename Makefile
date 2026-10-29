@@ -81,28 +81,19 @@ paper-anon.pdf: $(TEXFILES)
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 
-# Checkout of the isabelle-purepy repository, for the submission
-MECHANISATION ?= ../isabelle-purepy
-
-mechanisation:
-	@test -e $(MECHANISATION)/ROOT || \
-		{ echo "$(MECHANISATION) not found: clone isabelle-purepy alongside this repository, or set MECHANISATION"; exit 1; }
-	@test -z "$$(git -C $(MECHANISATION) status --porcelain)" || \
-		{ echo "$(MECHANISATION) has uncommitted changes"; exit 1; }
-	@git -C $(MECHANISATION) fetch -q origin main && git -C $(MECHANISATION) merge-base --is-ancestor HEAD origin/main || \
-		{ echo "$(MECHANISATION) HEAD is not in origin/main: push and merge first"; exit 1; }
-	@command -v isabelle >/dev/null || \
-		{ echo "isabelle not on PATH: needed to check $(MECHANISATION)"; exit 1; }
-	$(MAKE) -C $(MECHANISATION) build
-
 # Specification against the conformance suite of the purepy release in uv.lock
 check-consistency:
 	uv run --locked python test/consistency.py
 
-supplementary.zip: spec-anon.pdf mechanisation
+# Release of isabelle-purepy the specification depends on, as the tag in the wheel URL
+MECHANISATION_TAG := $(shell sed -n 's|.*/isabelle-purepy/releases/download/\(v[0-9.]*\)/.*|\1|p' pyproject.toml)
+
+# Anonymised specification and mechanisation, the latter at $(MECHANISATION_TAG)
+supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
-	./anonymise-mechanisation.sh $(MECHANISATION) .submission
+	git clone -q --depth 1 --branch $(MECHANISATION_TAG) https://github.com/pure-py/isabelle-purepy.git .submission/isabelle-purepy
+	./anonymise-mechanisation.sh .submission/isabelle-purepy .submission
 	cd .submission && zip -q -9 -r ../$@ mechanisation
 	rm -rf .submission
 
@@ -117,4 +108,4 @@ clean:
 	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-.PHONY: default all paper-submission clean mechanisation check-consistency
+.PHONY: default all paper-submission clean check-consistency
