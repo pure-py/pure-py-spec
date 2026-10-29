@@ -5,7 +5,6 @@ import sys
 
 from purepy_conformance import (
     MAIN,
-    SYNTACTIC_ONLY,
     PurePyOutcome,
     PythonOutcome,
     Results,
@@ -49,7 +48,7 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
         for test in tests(suite_dir):
             path = test / MAIN if test.is_dir() else test
             dirs = test.relative_to(suite_dir).parts
-            cites = dirs[0] != SYNTACTIC_ONLY and dirs[1] != PurePyOutcome.PARSER_REJECTS
+            cites = dirs[1] != PurePyOutcome.PARSER_REJECTS
             cited = CITATION.match(path.read_text(encoding="utf-8").split("\n", 1)[0])
             if cited is None and cites:
                 r.fail(f"{path.relative_to(suite_dir)} cites no rule")

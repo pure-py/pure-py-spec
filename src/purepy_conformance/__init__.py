@@ -37,7 +37,6 @@ class PurePyOutcome(StrEnum):
     AGREES = "agrees"
 
 
-SYNTACTIC_ONLY = "syntactic-only"
 SYNTAX_ERROR = "SyntaxError"
 
 
@@ -49,9 +48,9 @@ class Exit(IntEnum):
 
 
 class Expectation(NamedTuple):
-    exit: Exit | None  # None: type checker not run
+    exit: Exit
     error_checked: bool  # type checker output contains .error.expected
-    python: PythonOutcome | None  # None: not run under Python
+    python: PythonOutcome
 
 
 # Type checker verdict for each PurePy outcome
@@ -160,22 +159,13 @@ class Runner(Results):
 
     def run_test(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
         """Failures of a test at a path below suite: <Python outcome>/<PurePy outcome>[/<subset>]/...
-        /<test>.py, or .../<test>/main.py for a program of several modules; or syntactic-only/<test>.py,
-        for a script which builds an AST which cannot be expressed in Python source."""
+        /<test>.py, or .../<test>/main.py for a program of several modules."""
         dirs = test.relative_to(suite).parts[:-1]
-        exit, error_checked, python = (
-            Expectation(None, False, PythonOutcome.SUCCEEDS)
-            if dirs[0] == SYNTACTIC_ONLY
-            else expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]))
-        )
+        exit, error_checked, python = expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]))
         path = test / MAIN if test.is_dir() else test
         return [
-            *(self.check(path, exit, error_checked) if exit is not None else []),
-            *(
-                self.python(path, python)
-                if python is not None and self.interpreter is not None
-                else []
-            ),
+            *self.check(path, exit, error_checked),
+            *(self.python(path, python) if self.interpreter is not None else []),
         ]
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
