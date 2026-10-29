@@ -5,14 +5,6 @@ name: Consistency checks
 on:
   workflow_dispatch:
   push:
-    paths:
-      - spec/**
-      - paper/**
-      - test/**
-      - pyproject.toml
-      - uv.lock
-      - .python-version
-      - .github/workflows/consistency-checks.yml
 
 jobs:
   check:
