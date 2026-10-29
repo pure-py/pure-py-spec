@@ -43,12 +43,6 @@ workflows, mypy and the specification; `pyproject.toml` gives only the lower bou
 make check-consistency
 ```
 
-The target creates the project environment, with the `purepy` release named in `pyproject.toml` and the locked
-development dependencies, and runs `test/consistency.py`. The script checks that rule names are unique across
-the specification and paper, that every test of the conformance suite cites a rule of the specification as its
-README describes, and that the tests under `python-succeeds/agrees/` type-check under mypy (`test/mypy.ini`),
-except those under `mypy-bug/`, which mypy must reject.
-
 ## Development
 
 Synchronise the project environment and install the development dependencies:
