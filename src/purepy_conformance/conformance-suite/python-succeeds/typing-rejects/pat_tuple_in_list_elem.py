@@ -1,0 +1,10 @@
+# rule: check-tuple-none
+def f(xs: list[list[int] | tuple[int, int]]) -> int:
+    match xs:
+        case [(a, b)]:
+            return a
+        case _:
+            return 0
+
+
+print(f([[1, 2]]))

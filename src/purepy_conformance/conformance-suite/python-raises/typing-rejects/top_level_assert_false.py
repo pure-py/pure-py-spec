@@ -1,0 +1,2 @@
+# rule: module
+assert False

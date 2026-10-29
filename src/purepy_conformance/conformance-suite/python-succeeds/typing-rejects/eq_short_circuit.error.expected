@@ -1,0 +1,1 @@
+no overload of '==' at operand types tuple[int, Callable[[int], int]] and tuple[int, Callable[[int], int]]

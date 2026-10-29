@@ -1,0 +1,11 @@
+# rule: if-else
+def foo(a: int, b: int) -> str:
+    comp: str
+    if a < b:
+        return "smaller"
+    else:
+        comp = "bigger"
+    return comp
+
+print(foo(1, 2))
+print(foo(2, 1))

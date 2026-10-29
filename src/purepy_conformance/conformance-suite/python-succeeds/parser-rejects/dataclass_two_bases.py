@@ -1,0 +1,13 @@
+from dataclasses import dataclass
+
+@dataclass
+class A:
+    pass
+
+@dataclass
+class B:
+    pass
+
+@dataclass
+class C(A, B):
+    pass

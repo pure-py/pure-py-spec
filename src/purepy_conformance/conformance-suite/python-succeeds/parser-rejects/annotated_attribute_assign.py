@@ -1,0 +1,11 @@
+from dataclasses import dataclass
+
+
+@dataclass
+class P:
+    x: int
+
+
+p: P = P(1)
+p.x: int = 2
+print(p.x)

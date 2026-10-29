@@ -1,0 +1,16 @@
+# rule: pat-constr
+from dataclasses import dataclass
+
+@dataclass
+class Triple:
+    x: int
+    y: int
+    z: int
+
+t: Triple = Triple(1, 2, 3)
+match t:
+    case Triple(1, z=zz, y=yy):
+        print(yy)
+        print(zz)
+    case _:
+        print("other")
