@@ -707,6 +707,15 @@
   \rho, \exAttr{e}{x} \Rightarrow \aborts{\errAttr}
 }
 \and
+\inferrule*[lab={\ruleName{eval-attr-module-missing}}]
+{
+  \rho, e \Rightarrow \val{\modLoaded{q'}{\rho'}} \\
+  x \notin \dom(\rho')
+}
+{
+  \rho, \exAttr{e}{x} \Rightarrow \aborts{\errAttr}
+}
+\and
 \inferrule*[lab={\ruleName{eval-call-lambda-arity}}]
 {
   \rho, e \Rightarrow \val{\exLamClosure[\Delta]{\rho'}{\seq{x}}{e'}} \\
