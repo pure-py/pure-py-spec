@@ -24,7 +24,6 @@ semantics.
 - `agda/`: Agda mechanisation of the distributivity proof
 - `src/purepy_conformance/`: the conformance suite, as package data, and its runner, the `purepy-conformance` command
 - `test/`: consistency of the specification with the conformance suite, and of the suite with mypy
-- `.mechanisation-version`: release of `isabelle-purepy` included in the submission archive
 
 `\paperinput{file}` at a point in a specification source includes the file in the paper only, and
 `\specinput{file}` in the specification only; `\paperonly{...}` and `\speconly{...}` restrict a phrase to
@@ -70,8 +69,8 @@ uv run --locked ruff format ./test/consistency.py ./src/purepy_conformance
 ## PLDI 2027 submission
 
 `make paper-submission` builds the anonymised paper and `supplementary.zip`, which carries the anonymised
-specification and the Isabelle mechanisation, cloned from the `isabelle-purepy` repository at the release
-named in `.mechanisation-version`. The archive is not checked after anonymisation (#292).
+specification and the Isabelle mechanisation, cloned from the `isabelle-purepy` repository at the `purepy`
+release of the same version, which is the release checked against this specification. The archive is not checked after anonymisation (#292).
 
 The submission is always built locally; the `Consistency checks` GitHub Action runs the consistency script,
 the `Documents` action builds the paper and specification, and the mechanisation and
