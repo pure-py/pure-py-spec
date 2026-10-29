@@ -15,8 +15,6 @@
 *.toc
 *.zip
 
-# Agda build artifacts
-agda/_build/
 
 # Python build and environment artifacts
 .venv/

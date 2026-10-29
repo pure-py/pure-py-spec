@@ -20,7 +20,6 @@ expected to conform to the formal semantics.
 - `paper/`: sources of the paper's own prose
 - `tex/`: macros and bibliography shared by both documents
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
-- `agda/`: Agda mechanisation of the distributivity proof
 - `isabelle-purepy/`: Isabelle/HOL mechanisation, a submodule of the `isabelle-purepy` repository
 - `src/purepy/`: the `purepy` reference type checker package, built on Python's `ast` and organised to mirror the sections of the specification
 - `src/purepy/conformance-suite/`: the conformance suite, shipped in the package
