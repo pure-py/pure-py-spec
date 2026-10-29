@@ -85,14 +85,14 @@ spec-anon.pdf: $(TEXFILES)
 check-consistency:
 	uv run --locked python test/consistency.py
 
-# Release of isabelle-purepy the specification depends on, as the tag in the wheel URL
-MECHANISATION_TAG := $(shell sed -n 's|.*/isabelle-purepy/releases/download/\(v[0-9.]*\)/.*|\1|p' pyproject.toml)
+# Release of purepy the specification depends on, as the tag in its wheel URL
+PUREPY_RELEASE := $(shell sed -n 's|.*/isabelle-purepy/releases/download/\(v[0-9.]*\)/.*|\1|p' pyproject.toml)
 
-# Anonymised specification and mechanisation, the latter at $(MECHANISATION_TAG)
+# Anonymised specification, with the mechanisation at the purepy release
 supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
-	git clone -q --depth 1 --branch $(MECHANISATION_TAG) https://github.com/pure-py/isabelle-purepy.git .submission/isabelle-purepy
+	git clone -q --depth 1 --branch $(PUREPY_RELEASE) https://github.com/pure-py/isabelle-purepy.git .submission/isabelle-purepy
 	./anonymise-mechanisation.sh .submission/isabelle-purepy .submission
 	cd .submission && zip -q -9 -r ../$@ mechanisation
 	rm -rf .submission
