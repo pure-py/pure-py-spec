@@ -1,16 +1,10 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
-name = "purepy"
+name = "purepy-spec"
 version = "0.23.0"
 requires-python = ">=3.12"
-
-[project.scripts]
-purepy = "purepy.__main__:main"
-purepy-generated = "purepy.purepy_generated:main"
-purepy-conformance = "purepy.conformance:main"
+dependencies = [
+    "purepy @ https://github.com/pure-py/isabelle-purepy/releases/download/v0.24.0/purepy-0.24.0-py3-none-any.whl",
+]
 
 [dependency-groups]
 dev = [
@@ -21,14 +15,5 @@ dev = [
 [tool.mypy]
 strict = true
 
-# Generated code, not on mypy's path until it's typed
-[[tool.mypy.overrides]]
-module = ["Finite_Map", "Option", "Positions", "Programs", "Rat", "Real", "Reasons", "String", "Syntax"]
-ignore_missing_imports = true
-
 [tool.ruff]
 line-length = 100
-extend-exclude = ["src/purepy/conformance-suite"]
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/purepy"]

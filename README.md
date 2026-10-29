@@ -1,6 +1,6 @@
 # PurePy - A Pure Functional Subset of Python
 
-[![mechanisation](https://github.com/pure-py/pure-py-spec/actions/workflows/mechanisation.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/mechanisation.yml)
+[![consistency checks](https://github.com/pure-py/pure-py-spec/actions/workflows/consistency-checks.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/consistency-checks.yml)
 
 ## [v0.23.0](https://pure-py.github.io/pure-py-spec/v0.23.0/PurePy-spec.pdf)
 
@@ -8,9 +8,11 @@ PurePy is a pure (side-effect free) subset of Python, intended initially for res
 languages and programming pedagogy, and in the longer term as a common language for scientific computing,
 supporting efficient, portable applications in modelling, data processing, data analysis and visualisation.
 
-The specification defines a versioned formal grammar and a formal semantics for the language, and `src/purepy/`
-holds the `purepy` reference type checker. A PurePy-compliant language accepts every valid PurePy program and is
-expected to conform to the formal semantics.
+The specification defines a versioned formal grammar and a formal semantics for the language. The `purepy` type
+checker is generated from the Isabelle mechanisation in the
+[isabelle-purepy](https://github.com/pure-py/isabelle-purepy) repository, which also holds the conformance suite.
+A PurePy-compliant language accepts every valid PurePy program and is expected to conform to the formal
+semantics.
 
 ## Project structure
 
@@ -21,10 +23,7 @@ expected to conform to the formal semantics.
 - `tex/`: macros and bibliography shared by both documents
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
 - `agda/`: Agda mechanisation of the distributivity proof
-- `isabelle-purepy/`: Isabelle/HOL mechanisation, a submodule of the `isabelle-purepy` repository
-- `src/purepy/`: the `purepy` reference type checker package, built on Python's `ast` and organised to mirror the sections of the specification
-- `src/purepy/conformance-suite/`: the conformance suite, shipped in the package
-- `test/`: runner for the conformance suite and checks of the repository
+- `test/`: consistency of the specification with the conformance suite of the `purepy` release in `uv.lock`
 
 `\paperinput{file}` at a point in a specification source includes the file in the paper only, and
 `\specinput{file}` in the specification only; `\paperonly{...}` and `\speconly{...}` restrict a phrase to
@@ -35,61 +34,14 @@ one source; all other rules are defined in the figures.
 
 See the Makefile.
 
-## Tests
+## Consistency checks
 
 Install [uv](https://docs.astral.sh/uv/). The Python version in `.python-version` is read by uv, the
-workflows, mypy and the specification; `pyproject.toml` gives only the lower bound. From the repository root:
+workflows, mypy and the specification. From the repository root:
 
 ```bash
-uv run --locked ./test/run-all.sh
+make check-consistency
 ```
-
-The command creates the project environment, installs the locked development dependencies, checks rule
-cross-references, runs mypy and ruff over `src/purepy/` and runs the conformance suite.
-
-Tests in `src/purepy/conformance-suite/` are organised by the outcome under Python and the outcome under
-PurePy, following the grid in the conformance section of the specification; the runner derives every
-assertion from the path. A test of one module is a `.py` file with expectation files as siblings
-(`.expected`, `.error.expected`, `.exception.expected`, `.status.expected`); a test of a program of several
-modules is a directory holding `main.py`, the expectation files of `main.py` and the other modules.
-
-The outcome under Python is one of:
-
-- `python-rejects/`: Python raises `SyntaxError` before running the program
-- `python-raises/`: Python raises another exception while running the program
-- `python-succeeds/`: Python runs the program with the expected output
-
-The outcome under PurePy is one of:
-
-- `parser-rejects/`: rejected by the parser
-- `typing-rejects/`: rejected by the type checker
-- `undefined/`: well-formed, and the run aborts with termination kind `undef`
-- `agrees/`: well-formed, and the run yields the same result as under Python, including the same exception
-
-The directory `python-succeeds/agrees/mypy-bug/` holds tests rejected by mypy because of a behaviour reported as a
-mypy bug; the runner fails a test if mypy accepts it.
-
-Every other test in `python-succeeds/agrees/` also type-checks under mypy (`test/mypy.ini`). The tests in
-`syntactic-only/` construct a form as an AST, because Python source cannot express the form, and
-check that PurePy rejects it.
-
-A test has `.expected` under `python-succeeds/` and `.exception.expected` elsewhere, naming `SyntaxError` exactly
-under `python-rejects/`, so a misfiled test fails. A test that exits with a nonzero status through `sys.exit`
-states the status in `.status.expected`.
-
-Every test under `typing-rejects/`, `undefined/` and `agrees/` names a rule of the specification on its first line,
-as `# rule: name`. Under `typing-rejects/` the rule is the one with a premise or side condition that fails for the
-program. Under `undefined/` and `agrees/` the rule is the one yielding the result.
-
-Another type checker can be run over the suite installed with the `purepy` package, by passing a command
-which takes the path of a test and exits with the codes of the reference type checker:
-
-```bash
-purepy-conformance --no-run --type-checker CMD --known-failures FILE
-```
-
-The run passes if its failures are exactly those listed in the file; `--update` rewrites the file, and
-`purepy-conformance --help` lists the other options.
 
 ## Development
 
@@ -99,67 +51,32 @@ Synchronise the project environment and install the development dependencies:
 uv sync --locked
 ```
 
-Format the sources:
+Format the script:
 
 ```bash
-uv run --locked ruff format ./src/purepy ./test/run-all.py
+uv run --locked ruff format ./test/consistency.py
 ```
 
-After changing dependencies or metadata in `pyproject.toml`, run `uv lock` and commit `pyproject.toml` and
-`uv.lock`.
-
-To build a distributable wheel and source archive:
-
-```bash
-uv build
-```
-
-## Reference type checker (`purepy`)
-
-Check a single module, or a whole program from the entry module:
-
-```bash
-uv run --locked python -m purepy --check --module path/to/module.py
-uv run --locked python -m purepy --check path/to/main.py
-```
-
-After installing the project as a standalone command-line tool, the same checks are available through the
-`purepy` command:
-
-```bash
-purepy --check --module path/to/module.py
-purepy --check path/to/main.py
-```
-
-Install the type checker from the repository root with:
-
-```bash
-uv tool install .
-```
+To take a new `purepy` release, change the wheel URL in `pyproject.toml`, run `uv lock` and commit
+`pyproject.toml` and `uv.lock`.
 
 ## PLDI 2027 submission
 
 `make paper-submission` builds the anonymised paper and `supplementary.zip`, which carries the anonymised
-specification and the Isabelle mechanisation. The target refuses to build unless the `isabelle-purepy`
-submodule is checked out, has no uncommitted changes and sits at a commit on `origin/main`, so a submission
-never ships a working copy. Check the submodule out with:
+specification and the Isabelle mechanisation, cloned from the `isabelle-purepy` repository at the `purepy`
+release named in `pyproject.toml`. The archive is not checked after anonymisation (#292).
 
-```bash
-git submodule update --init
-```
-
-The mechanisation is type checked before packaging, so `isabelle` must be on `PATH`; the README of the
-submodule gives the required version and installation steps. The submission is always built locally; the
-`Mechanisation` GitHub Action checks the mechanisation and runs the conformance suite under the generated type
-checker, and the `Documents` action builds the paper and specification.
+The submission is always built locally; the `Consistency checks` GitHub Action runs the consistency script,
+the `Documents` action builds the paper and specification, and the mechanisation and
+type checker are checked by the `build` action of their repository.
 
 ## Release workflow
 
 Run the `Bump version` GitHub Action manually with a version in the form `x.y.z` (for example, `0.1.4`). The
 action updates and commits the version numbers on `main` and creates and pushes the tag `v0.1.4`. It then builds
 `PurePy-spec.pdf` and publishes it to GitHub Pages under `v0.1.4/` and `latest/`
-(https://pure-py.github.io/pure-py-spec/), and creates the GitHub Release for the tag, with the wheel and source
-distribution of the `purepy` package attached.
+(https://pure-py.github.io/pure-py-spec/), and creates the GitHub Release for the tag. The `purepy` package is
+released from the `isabelle-purepy` repository.
 
 ### Zotero export settings
 

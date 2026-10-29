@@ -1,9 +1,0 @@
-from dataclasses import dataclass
-
-@dataclass
-class Base:
-    x: int
-
-@dataclass
-class Derived(Base):
-    y: int
