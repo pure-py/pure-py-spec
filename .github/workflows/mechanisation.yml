@@ -67,4 +67,4 @@ jobs:
         run: echo "/home/isabelle/Isabelle/bin" >> "$GITHUB_PATH"
 
       - name: Run the conformance suite under the generated type checker
-        run: make check-tests-generated
+        run: make check-tests

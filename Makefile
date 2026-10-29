@@ -11,7 +11,7 @@ AUX := $(BUILD_AUX) *.bbl
 
 default: paper.pdf
 
-all: PurePy-spec.pdf paper.pdf graduality.pdf paper-arXiv.zip paper-submission check-tests-generated
+all: PurePy-spec.pdf paper.pdf graduality.pdf paper-arXiv.zip paper-submission check-tests
 
 # Unresolved references are only warnings to pdflatex.
 define check-log
@@ -96,12 +96,11 @@ isabelle-purepy:
 
 GENERATED := $(ISABELLE)/python/python_out/isabelle-purepy-python.Codegen/code
 CODEGEN_PYTHON_VERSION := $(ISABELLE)/python/isabelle-python-codegen/.python-version
-check-tests-generated: isabelle-purepy
+# Paper examples are tests.
+check-tests: isabelle-purepy
 	@cmp -s .python-version $(CODEGEN_PYTHON_VERSION) || \
 		{ echo "code generator targets Python $$(cat $(CODEGEN_PYTHON_VERSION)), not $$(cat .python-version)"; exit 1; }
-	PYTHONPATH=$(GENERATED) uv run --locked ./test/run-all.sh --no-run \
-		--type-checker "uv run --locked purepy-generated --check" --messages \
-		--known-failures test/purepy-generated-failures.txt
+	PYTHONPATH=$(GENERATED) uv run --locked ./test/run-all.sh
 
 supplementary.zip: spec-anon.pdf isabelle-purepy
 	rm -f $@ && rm -rf .submission
@@ -109,10 +108,6 @@ supplementary.zip: spec-anon.pdf isabelle-purepy
 	./anonymise-mechanisation.sh .submission
 	cd .submission && zip -q -9 -r ../$@ mechanisation
 	rm -rf .submission
-
-# Paper examples are tests.
-check-tests:
-	uv run --locked ./test/run-all.sh
 
 paper-submission: check-tests paper-anon.pdf supplementary.zip
 
@@ -125,4 +120,4 @@ clean:
 	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-.PHONY: default all paper-submission clean isabelle-purepy check-tests-generated check-tests
+.PHONY: default all paper-submission clean isabelle-purepy check-tests

@@ -9,8 +9,8 @@ languages and programming pedagogy, and in the longer term as a common language 
 supporting efficient, portable applications in modelling, data processing, data analysis and visualisation.
 
 The specification defines a versioned formal grammar and a formal semantics for the language, and `src/purepy/`
-holds the `purepy` reference type checker. A PurePy-compliant language accepts every valid PurePy program and is
-expected to conform to the formal semantics.
+holds the `purepy` type checker, generated from the Isabelle mechanisation. A PurePy-compliant language accepts
+every valid PurePy program and is expected to conform to the formal semantics.
 
 ## Project structure
 
@@ -22,7 +22,7 @@ expected to conform to the formal semantics.
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
 - `agda/`: Agda mechanisation of the distributivity proof
 - `isabelle-purepy/`: Isabelle/HOL mechanisation, a submodule of the `isabelle-purepy` repository
-- `src/purepy/`: the `purepy` reference type checker package, built on Python's `ast` and organised to mirror the sections of the specification
+- `src/purepy/`: the `purepy` type checker package: the parser, built on Python's `ast`, and the translation into the syntax generated from the mechanisation, around the type checker generated from it
 - `src/purepy/conformance-suite/`: the conformance suite, shipped in the package
 - `test/`: runner for the conformance suite and checks of the repository
 
@@ -41,11 +41,13 @@ Install [uv](https://docs.astral.sh/uv/). The Python version in `.python-version
 workflows, mypy and the specification; `pyproject.toml` gives only the lower bound. From the repository root:
 
 ```bash
-uv run --locked ./test/run-all.sh
+make check-tests
 ```
 
-The command creates the project environment, installs the locked development dependencies, checks rule
-cross-references, runs mypy and ruff over `src/purepy/` and runs the conformance suite.
+The target builds the mechanisation, which generates the type checker, so `isabelle` must be on `PATH`. It then
+runs `test/run-all.sh` with the generated code on `PYTHONPATH`, which creates the project environment, installs
+the locked development dependencies, checks rule cross-references, runs mypy and ruff over `src/purepy/` and
+runs the conformance suite.
 
 Tests in `src/purepy/conformance-suite/` are organised by the outcome under Python and the outcome under
 PurePy, following the grid in the conformance section of the specification; the runner derives every
@@ -81,15 +83,8 @@ Every test under `typing-rejects/`, `undefined/` and `agrees/` names a rule of t
 as `# rule: name`. Under `typing-rejects/` the rule is the one with a premise or side condition that fails for the
 program. Under `undefined/` and `agrees/` the rule is the one yielding the result.
 
-Another type checker can be run over the suite installed with the `purepy` package, by passing a command
-which takes the path of a test and exits with the codes of the reference type checker:
-
-```bash
-purepy-conformance --no-run --type-checker CMD --known-failures FILE
-```
-
-The run passes if its failures are exactly those listed in the file; `--update` rewrites the file, and
-`purepy-conformance --help` lists the other options.
+The suite installed with the `purepy` package runs with `purepy-conformance`; `purepy-conformance --help` lists
+its options.
 
 ## Development
 
@@ -114,8 +109,10 @@ To build a distributable wheel and source archive:
 uv build
 ```
 
-## Reference type checker (`purepy`)
+## Type checker (`purepy`)
 
+The type checker is the Python generated from the mechanisation by `make check-tests`, which must be on
+`PYTHONPATH`; `src/purepy/` parses a program, translates it into the generated syntax and reports the result.
 Check a single module, or a whole program from the entry module:
 
 ```bash
