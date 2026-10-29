@@ -82,8 +82,8 @@ not bound in $\rho$, or bound to $\Unbound$, aborts with $\errName$\speconly{ (\
 \ruleName{eval-var-unbound})}. A call of a value other than a closure or primitive, a call with the wrong number
 of arguments, and a constructor call with arguments which do not cover the fields of the class, abort with
 $\errType$\speconly{ (\ruleName{eval-call-nonfun}, \ruleName{eval-call-lambda-arity}, \ruleName{eval-call-def-arity},
-\ruleName{eval-constr-arity})}, and a reference to an attribute absent from an object \added{or a loaded module aborts }with $\errAttr$\speconly{
-(\ruleName{\replaced{eval-attr-object-missing}{eval-attr-missing}}\added{, \ruleName{eval-attr-module-missing}})}, as in Python. The operators
+\ruleName{eval-constr-arity})}, and a reference to an attribute absent from an object or a loaded module aborts with $\errAttr$\speconly{
+(\ruleName{eval-attr-object-missing}, \ruleName{eval-attr-module-missing})}, as in Python. The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, aborting with $\errExcluded$ if the first operand is
 not a Boolean\speconly{ (\ruleName{eval-and-nonbool}, \ruleName{eval-or-nonbool})}, and
 a conditional expression requires its condition to be a Boolean, like the
