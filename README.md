@@ -21,7 +21,6 @@ semantics.
 - `paper/`: material belonging only to the paper
 - `tex/`: macros and bibliography shared by both documents
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
-- `agda/`: Agda mechanisation of the distributivity proof
 - `src/purepy_conformance/`: the conformance suite, as package data, and its runner, the `purepy-conformance` command
 - `test/`: consistency of the specification with the conformance suite, and of the suite with mypy
 
