@@ -698,7 +698,7 @@
   \rho, x \Rightarrow \aborts{\errName}
 }
 \and
-\inferrule*[lab={\ruleName{eval-attr-missing}}]
+\inferrule*[lab={\ruleName{\replaced{eval-attr-object-missing}{eval-attr-missing}}}]
 {
   \rho, e \Rightarrow \val{\exObj{C}{\bind{\seq{x}}{\seq{v}}}} \\
   x \notin \set{\seq{x}}
