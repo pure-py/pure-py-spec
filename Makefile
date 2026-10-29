@@ -11,7 +11,7 @@ AUX := $(BUILD_AUX) *.bbl
 
 default: paper.pdf
 
-all: PurePy-spec.pdf paper.pdf graduality.pdf paper-arXiv.zip paper-submission check-tests-generated
+all: PurePy-spec.pdf paper.pdf graduality.pdf paper-arXiv.zip paper-submission check-consistency
 
 # Unresolved references are only warnings to pdflatex.
 define check-log
@@ -81,40 +81,23 @@ paper-anon.pdf: $(TEXFILES)
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 
-ISABELLE := isabelle-purepy
+# Specification against the conformance suite of the purepy release in uv.lock
+check-consistency:
+	uv run --locked python test/consistency.py
 
-isabelle-purepy:
-	@test -e $(ISABELLE)/ROOT || \
-		{ echo "$(ISABELLE) not checked out: git submodule update --init"; exit 1; }
-	@test -z "$$(git -C $(ISABELLE) status --porcelain)" || \
-		{ echo "$(ISABELLE) has uncommitted changes"; exit 1; }
-	@git -C $(ISABELLE) merge-base --is-ancestor HEAD origin/main || \
-		{ echo "$(ISABELLE) HEAD is not in origin/main: push and merge first"; exit 1; }
-	@command -v isabelle >/dev/null || \
-		{ echo "isabelle not on PATH: needed to check $(ISABELLE)"; exit 1; }
-	$(MAKE) -C $(ISABELLE) build
+PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
+# Release of purepy, as the tag in its wheel URL
+PUREPY_RELEASE := $(shell sed -n 's|.*$(PUREPY_REPO)/releases/download/\(v[0-9.]*\)/.*|\1|p' pyproject.toml)
 
-GENERATED := $(ISABELLE)/python/python_out/isabelle-purepy-python.Codegen/code
-CODEGEN_PYTHON_VERSION := $(ISABELLE)/python/isabelle-python-codegen/.python-version
-check-tests-generated: isabelle-purepy
-	@cmp -s .python-version $(CODEGEN_PYTHON_VERSION) || \
-		{ echo "code generator targets Python $$(cat $(CODEGEN_PYTHON_VERSION)), not $$(cat .python-version)"; exit 1; }
-	PYTHONPATH=$(GENERATED) uv run --locked ./test/run-all.sh --no-run \
-		--type-checker "uv run --locked purepy-generated --check" --messages \
-		--known-failures test/purepy-generated-failures.txt
-
-supplementary.zip: spec-anon.pdf isabelle-purepy
+supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
-	./anonymise-mechanisation.sh .submission
+	git clone -q --depth 1 --branch $(PUREPY_RELEASE) $(PUREPY_REPO).git .submission/src
+	./anonymise-mechanisation.sh .submission/src .submission
 	cd .submission && zip -q -9 -r ../$@ mechanisation
 	rm -rf .submission
 
-# Paper examples are tests.
-check-tests:
-	uv run --locked ./test/run-all.sh
-
-paper-submission: check-tests paper-anon.pdf supplementary.zip
+paper-submission: check-consistency paper-anon.pdf supplementary.zip
 
 # arXiv runs pdflatex without bibtex, so include the .bbl.
 paper-arXiv.zip: paper.pdf
@@ -125,4 +108,4 @@ clean:
 	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-.PHONY: default all paper-submission clean isabelle-purepy check-tests-generated check-tests
+.PHONY: default all paper-submission clean check-consistency

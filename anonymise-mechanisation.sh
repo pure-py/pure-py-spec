@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Anonymised copy of the mechanisation under <dest-dir>.
+# Anonymised copy of the mechanisation checked out at <src-dir>, under <dest-dir>.
 set -euo pipefail
 
-SRC=isabelle-purepy
-DEST="${1:?usage: anonymise-mechanisation.sh <dest-dir>}"
+SRC="${1:?usage: anonymise-mechanisation.sh <src-dir> <dest-dir>}"
+DEST="${2:?usage: anonymise-mechanisation.sh <src-dir> <dest-dir>}"
+REPO=isabelle-purepy
 NAME=mechanisation
 ANON_NAME="$(cat .anon-name)"
 ANON_SLUG="$(tr '[:upper:]' '[:lower:]' <<< "$ANON_NAME")"
@@ -15,12 +16,14 @@ cd "$DEST/$NAME"
 
 grep -vE 'badge\.svg|\.github/workflows' README.md > README.tmp && mv README.tmp README.md
 
-for f in $(grep -rl "$SRC" .); do
-  sed -e "s/$SRC/$NAME/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+for f in $(grep -rl "$REPO" .); do
+  sed -e "s/$REPO/$NAME/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
 done
 
-# Language and repository names.
-for f in $(grep -rlE 'pure-py|PurePy' .); do
-  sed -e "s/pure-py/$ANON_SLUG/g" -e "s/PurePy/$ANON_NAME/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+# Language, repository and package names, in file contents and in paths.
+for f in $(grep -rlE 'pure-py|PurePy|purepy' .); do
+  sed -e "s/pure-py/$ANON_SLUG/g" -e "s/PurePy/$ANON_NAME/g" -e "s/purepy/$ANON_SLUG/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
 done
-make build
+for f in $(find . -depth -name '*purepy*'); do
+  mv "$f" "${f%purepy*}$ANON_SLUG${f##*purepy}"
+done

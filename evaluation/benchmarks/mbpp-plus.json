@@ -1,0 +1,8 @@
+{
+  "benchmark": "MBPP+",
+  "release": "v0.2.0",
+  "url": "https://github.com/evalplus/mbppplus_release/releases/download/v0.2.0/MbppPlus.jsonl.gz",
+  "sha256": "af43697e8791c4c149bdfd6b489d8b5412507551ac20e28a439f650b8225db63",
+  "total_problems": 378,
+  "scope": "All 378 MBPP+ problems, in dataset order; interfaces are unannotated."
+}

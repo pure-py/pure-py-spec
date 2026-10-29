@@ -1,0 +1,35 @@
+{
+  "benchmark": "HumanEval+",
+  "release": "v0.1.10",
+  "url": "https://github.com/evalplus/humanevalplus_release/releases/download/v0.1.10/HumanEvalPlus.jsonl.gz",
+  "sha256": "272720b90ac375502c8ed23cd791c2a93dfb22a911641a494da74a426c09f101",
+  "total_problems": 164,
+  "eligible_problems": 29,
+  "seed": 20261009,
+  "scope": "The HumanEval selection, with the extra EvalPlus tests; --all-problems runs all 164.",
+  "task_ids": [
+    "HumanEval/2",
+    "HumanEval/3",
+    "HumanEval/4",
+    "HumanEval/6",
+    "HumanEval/7",
+    "HumanEval/10",
+    "HumanEval/11",
+    "HumanEval/12",
+    "HumanEval/13",
+    "HumanEval/14",
+    "HumanEval/15",
+    "HumanEval/17",
+    "HumanEval/18",
+    "HumanEval/20",
+    "HumanEval/21",
+    "HumanEval/24",
+    "HumanEval/25",
+    "HumanEval/26",
+    "HumanEval/27",
+    "HumanEval/28"
+  ],
+  "excluded": {
+    "HumanEval/32": "evalplus 0.3.1 records no outcome for find_zero, so no answer can pass"
+  }
+}
