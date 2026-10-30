@@ -6,6 +6,7 @@ $s$ & $\coloncolonequals$ & $\exSeq{s}{s'}$ & \speconly{(Seq)} \\
     & $\mid$ & $\exAssign{x}{e}$ & \speconly{(Assign)} \\
     & $\mid$ & $\exAssign{x\exAnnot{\psi}}{e}$ & \speconly{(DeclareAssign)} \\
     & $\mid$ & $e$ & \speconly{(ExprStmt)} \\
+    & \added{$\mid$} & \added{$\exPrint{e}$} & \speconly{\added{(Print)}} \\
 \speconly{    & $\mid$ & $\exAssert{e}$ & (Assert) \\}
     & $\mid$ & $\exAssertMsg{e}{e'}$ & \speconly{(AssertMsg)} \\
 \speconly{    & $\mid$ & $\exReturnNone$ & (ReturnNone) \\}

@@ -43,6 +43,14 @@
   \rho, e \Rightarrow \mlet{v}{r}{\assigns{\varnothing}}
 }
 \and
+\added{\inferrule*[lab={\ruleName{eval-print}}]
+{
+  \rho, e \Rightarrow r
+}
+{
+  \rho, \exPrint{e} \Rightarrow \mlet{v}{r}{\prints{v}{\assigns{\varnothing}}}
+}}
+\and
 \inferrule*[lab={\ruleName{eval-return}}]
 {
   \rho, e \Rightarrow r
@@ -142,19 +150,19 @@
 \and
 \inferrule*[lab={\ruleName{eval-seq}}]
 {
-  \rho, s \Rightarrow \assigns{\rho'} \\
+  \rho, s \Rightarrow \replaced{\prints{\seq{u}}{\assigns{\rho'}}}{\assigns{\rho'}} \\
   \rho \override \rho', s' \Rightarrow o
 }
 {
-  \rho, \exSeq{s}{s'} \Rightarrow \assigns{\rho'} \override o
+  \rho, \exSeq{s}{s'} \Rightarrow \replaced{\prints{\seq{u}}{\assigns{\rho'} \override o}}{\assigns{\rho'} \override o}
 }
 \and
 \inferrule*[lab={\ruleName{eval-seq-return}}]
 {
-  \rho, s \Rightarrow \returns{v}
+  \rho, s \Rightarrow \replaced{\prints{\seq{u}}{\returns{v}}}{\returns{v}}
 }
 {
-  \rho, \exSeq{s}{s'} \Rightarrow \returns{v}
+  \rho, \exSeq{s}{s'} \Rightarrow \replaced{\prints{\seq{u}}{\returns{v}}}{\returns{v}}
 }
 \end{mathpar}
 \caption{Statement $s$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
@@ -267,10 +275,10 @@
 \and
 \inferrule*[lab={\ruleName{eval-seq-fail}}]
 {
-  \rho, s \Rightarrow \aborts{\kappa}
+  \rho, s \Rightarrow \replaced{\prints{\seq{u}}{\aborts{\kappa}}}{\aborts{\kappa}}
 }
 {
-  \rho, \exSeq{s}{s'} \Rightarrow \aborts{\kappa}
+  \rho, \exSeq{s}{s'} \Rightarrow \replaced{\prints{\seq{u}}{\aborts{\kappa}}}{\aborts{\kappa}}
 }
 \end{mathpar}
 \caption{Statement evaluation, continued (propagation rules and aborting cases)}
@@ -292,19 +300,19 @@
 \and
 \inferrule*[lab={\ruleName{eval-top-seq}}]
 {
-  q, \rho, t \Rightarrow \assigns{\rho'} \\
+  q, \rho, t \Rightarrow \replaced{\prints{\seq{u}}{\assigns{\rho'}}}{\assigns{\rho'}} \\
   q, \rho \override \rho', t' \Rightarrow o
 }
 {
-  q, \rho, t\;t' \Rightarrow \assigns{\rho'} \override o
+  q, \rho, t\;t' \Rightarrow \replaced{\prints{\seq{u}}{\assigns{\rho'} \override o}}{\assigns{\rho'} \override o}
 }
 \and
 \inferrule*[lab={\ruleName{eval-top-seq-fail}}]
 {
-  q, \rho, t \Rightarrow \aborts{\kappa}
+  q, \rho, t \Rightarrow \replaced{\prints{\seq{u}}{\aborts{\kappa}}}{\aborts{\kappa}}
 }
 {
-  q, \rho, t\;t' \Rightarrow \aborts{\kappa}
+  q, \rho, t\;t' \Rightarrow \replaced{\prints{\seq{u}}{\aborts{\kappa}}}{\aborts{\kappa}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-types}}]
