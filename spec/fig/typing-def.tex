@@ -25,7 +25,6 @@
 \small
 \inferrule*[lab={\ruleName{def-body}}]
 {
-  \deleted{\seq{x} \text{ distinct}} \\
   \Gamma' = \Gamma \override \set{\bind{\alpha_1}{\TypeVar}, \ldots, \bind{\alpha_n}{\TypeVar}} \\
   \Sigma; \Gamma' \override \set{\bind{\seq{x}}{\seq{\sigma}}} \override \scopeS(\seq{x}, s); \tau \vdash s : R \\
   R = \Returns \text{ or } \Sigma \vdash \tau \tyEquiv \tyNone

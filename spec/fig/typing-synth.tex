@@ -55,7 +55,6 @@
 \and
 \inferrule*[lab={\ruleName{call-lambda-syn}}]
 {
-  \deleted{\seq{x} \text{ distinct}} \\
   \Sigma; \Gamma \vdash \seq{e} \synth \seq{\tau} \\
   \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\tau}}} \vdash e \synth \tau
 }
@@ -217,7 +216,7 @@
 \and
 \input{spec/rules/call-union}
 \and
-\added{\inferrule*[lab={\ruleName{binop-union-left}}]
+\inferrule*[lab={\ruleName{binop-union-left}}]
 {
   \Sigma; \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
   \Sigma; \Gamma \vdash e' \synth \rho \\
@@ -228,9 +227,9 @@
 }
 {
   \Sigma; \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \joinTy{\Sigma}{\tau}{\tau'}
-}}
+}
 \and
-\added{\inferrule*[lab={\ruleName{binop-union-right}}]
+\inferrule*[lab={\ruleName{binop-union-right}}]
 {
   \Sigma; \Gamma \vdash e \synth \rho \\
   \rho \text{ not a union} \\
@@ -242,7 +241,7 @@
 }
 {
   \Sigma; \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \joinTy{\Sigma}{\tau}{\tau'}
-}}
+}
 \end{mathpar}
 \caption{Expression synthesis: subscripts, and elimination at a union}
 \label{fig:typing-synth-elim}

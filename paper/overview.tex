@@ -34,7 +34,7 @@ following Python, as Haskell has \pyinline{trace}; printing reports on a computa
 \label{sec:local-assignment}
 
 A variable in \PurePy is introduced by a declaration, or as a parameter, imported name, pattern variable
-or generator variable; a declaration is a type annotation such as \replaced{$\pyinline{x}\exAnnot{\tyInt}$}{\pyinline{x: int}}, a form allowed in Python since
+or generator variable; a declaration is a type annotation such as $\pyinline{x}\exAnnot{\tyInt}$, a form allowed in Python since
 version 3.6 (PEP 526\footnote{\url{https://peps.python.org/pep-0526/}}). Following Java's rules for blank
 finals~\citep[\S16]{gosling2025}, variables may be assigned only if unassigned on every path to the assignment, and
 referenced only if assigned on every path to the reference (\emph{definite assignment},
@@ -54,14 +54,14 @@ def foo(b: bool) -> int:
 \end{python}
 
 \noindent Python assigns \pyinline{x} twice when \pyinline{b} is true, so no pure reading of the program
-agrees with Python: under shadowing, \replaced{$\exReturn{\pyinline{x}}$}{\pyinline{return x}} would refer to a different variable from the one
+agrees with Python: under shadowing, $\exReturn{\pyinline{x}}$ would refer to a different variable from the one
 assigned in the branch.
 
 A variable therefore denotes
 a fixed value once assigned, and features associated with mutation and shared state are excluded: \pyinline{global} and \pyinline{nonlocal}, which direct assignments to a variable of an enclosing scope;
 \pyinline{del}, which removes a binding; augmented assignment (\pyinline{+=}, \pyinline{-=}, and so on); and
 the walrus operator (\pyinline{:=}), which assigns within an expression. Assignment targets are variables, so item
-assignment such as \replaced{$\exAssign{\exSubscript{\pyinline{xs}}{\pyinline{0}}}{\pyinline{v}}$}{\pyinline{xs[0] = v}} and attribute assignment such as \replaced{$\exAssign{\exAttr{\pyinline{p}}{\pyinline{x}}}{\pyinline{v}}$}{\pyinline{p.x = v}} are excluded, and methods
+assignment such as $\exAssign{\exSubscript{\pyinline{xs}}{\pyinline{0}}}{\pyinline{v}}$ and attribute assignment such as $\exAssign{\exAttr{\pyinline{p}}{\pyinline{x}}}{\pyinline{v}}$ are excluded, and methods
 that update a value in place, such as \pyinline{list.append}, are unavailable, because only objects and modules have
 attributes. A Python closure captures a binding rather than a value, so a change to the binding is visible through
 the closure. Excluding reassignment removes such changes, a discipline Java imposes on captured locals, which must
@@ -135,14 +135,14 @@ A name's meaning in \PurePy must not depend on the order in which modules load o
 of Python's import and module behaviours are excluded. Imports must appear at the start of a module, never
 inside a function body or branch, nor after a statement, so that the dependencies of a module are known before
 any of its statements runs. A submodule may not import itself through its parent
-(\replaced{$\exFromImport{\pyinline{a}}{\pyinline{b}}$}{\pyinline{from a import b}} inside module \pyinline{a.b}): \PurePy treats the from-imported submodule as a
+($\exFromImport{\pyinline{a}}{\pyinline{b}}$ inside module \pyinline{a.b}): \PurePy treats the from-imported submodule as a
 dependency, so this is an import cycle. An \pyinline{import} (as opposed to a from-import) may not name a
-module contained in the importing module (\replaced{$\exImport{\pyinline{x.y}}$}{\pyinline{import x.y}} inside module \pyinline{x}), since the binding for
+module contained in the importing module ($\exImport{\pyinline{x.y}}$ inside module \pyinline{x}), since the binding for
 the head would denote the still-loading module.
 
 A qualified reference must resolve through the imports of the referring module to a definitely assigned
 member. A submodule is not an attribute of its parent until it is loaded, so
-\replaced{$\exImport{\pyinline{pkg}}$}{\pyinline{import pkg}} followed by \pyinline{pkg.sub.y} is rejected unless the module also imports
+$\exImport{\pyinline{pkg}}$ followed by \pyinline{pkg.sub.y} is rejected unless the module also imports
 \pyinline{pkg.sub}, whereas Python permits the reference whenever some earlier import, anywhere in the
 program, happens to have loaded \pyinline{pkg.sub}:
 
@@ -187,7 +187,7 @@ through its existing instances.
 \subsubsection{Other restrictions}
 \label{sec:other-restrictions}
 
-A few remaining restrictions do not fit the groups above. Wildcard imports (\replaced{$\exFromImport{\pyinline{q}}{\pyinline{*}}$}{\pyinline{from q import *}})
+A few remaining restrictions do not fit the groups above. Wildcard imports ($\exFromImport{\pyinline{q}}{\pyinline{*}}$)
 are excluded, since the names introduced are not explicit; PEP 8 recommends against
 them.\footnote{\url{https://peps.python.org/pep-0008/}} Every function definition annotates each
 parameter and its return type, and every dataclass field carries a type expression, so the type of a
