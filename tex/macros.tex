@@ -261,7 +261,7 @@
 \newcommand*{\typeArgs}[1]{\mathrm{type\text{-}args}_{#1}}
 
 % Outcomes (draft, \secref{errors})
-\newcommand*{\aborts}[1]{\mathsf{aborts}(#1)}
+\NewDocumentCommand{\aborts}{o m}{\mathsf{aborts}(\IfValueT{#1}{#1, }#2)}  % optional printed values
 \newcommand*{\errAssert}[1]{\errAssertNoMsg(#1)}
 \newcommand*{\errAssertNoMsg}{\mathsf{AssertionError}}
 \newcommand*{\errAttr}{\mathsf{AttributeError}}
@@ -280,10 +280,9 @@
 
 % Result types and results
 \newcommand*{\Assigns}[1]{\mathsf{Assigns}(#1)}
-\newcommand{\assigns}[1]{\mathsf{assigns}(#1)}
+\NewDocumentCommand{\assigns}{o m}{\mathsf{assigns}(\IfValueT{#1}{#1, }#2)}  % optional printed values
 \newcommand*{\Returns}{\mathsf{Returns}}
-\newcommand{\returns}[1]{\mathsf{returns}(#1)}
-\newcommand{\prints}[2]{\mathsf{prints}(#1, #2)}
+\NewDocumentCommand{\returns}{o m}{\mathsf{returns}(\IfValueT{#1}{#1, }#2)}  % optional printed values
 
 % Metafunctions: syntactic analyses
 \newcommand*{\assignsS}{\mathrm{assigns}}

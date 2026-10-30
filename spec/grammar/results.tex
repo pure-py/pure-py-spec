@@ -1,9 +1,8 @@
 \begin{tabular}[t]{rcll}
 \grammarGroup{Outcomes} \\
-\added{$o$} & \added{$\coloncolonequals$} & \added{$\prints{\seq{v}}{\omega}$} & \speconly{\added{(Prints)}} \\
-\replaced{$\omega$}{$o$} & $\coloncolonequals$ & $\assigns{\rho}$ & \speconly{(Assigns)} \\
-  & $\mid$ & $\returns{v}$ & \speconly{(Returns)} \\
-  & $\mid$ & $\aborts{\kappa}$ & \speconly{(Aborts)}
+$o$ & $\coloncolonequals$ & \replaced{$\assigns[\seq{v}]{\rho}$}{$\assigns{\rho}$} & \speconly{(Assigns)} \\
+  & $\mid$ & \replaced{$\returns[\seq{v}]{v}$}{$\returns{v}$} & \speconly{(Returns)} \\
+  & $\mid$ & \replaced{$\aborts[\seq{v}]{\kappa}$}{$\aborts{\kappa}$} & \speconly{(Aborts)}
    \\[3mm]
 \grammarGroup{Results} \\
 $r$ & $\coloncolonequals$ & $\val{v}$ & \speconly{(Val)} \\

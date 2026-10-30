@@ -8,7 +8,7 @@
   \strut
 }
 {
-  \rho, \exPass \Rightarrow \assigns{\varnothing}
+  \rho, \exPass \Rightarrow \replaced{\assigns[\varepsilon]{\varnothing}}{\assigns{\varnothing} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-assign}}]
@@ -16,7 +16,7 @@
   \rho, e \Rightarrow r
 }
 {
-  \rho, \exAssign{x}{e} \Rightarrow \mlet{v}{r}{\assigns{\set{\bind{x}{v}}}}
+  \rho, \exAssign{x}{e} \Rightarrow \mlet{v}{r}{\replaced{\assigns[\varepsilon]{\set{\bind{x}{v}}}}{\assigns{\set{\bind{x}{v}}} }}
 }
 \and
 \inferrule*[lab={\ruleName{eval-declare-assign}}]
@@ -24,7 +24,7 @@
   \rho, e \Rightarrow r
 }
 {
-  \rho, \exAssign{x\exAnnot{\psi}}{e} \Rightarrow \mlet{v}{r}{\assigns{\set{\bind{x}{v}}}}
+  \rho, \exAssign{x\exAnnot{\psi}}{e} \Rightarrow \mlet{v}{r}{\replaced{\assigns[\varepsilon]{\set{\bind{x}{v}}}}{\assigns{\set{\bind{x}{v}}} }}
 }
 \and
 \inferrule*[lab={\ruleName{eval-declare}}]
@@ -32,7 +32,7 @@
   \strut
 }
 {
-  \rho, x\exAnnot{\psi} \Rightarrow \assigns{\varnothing}
+  \rho, x\exAnnot{\psi} \Rightarrow \replaced{\assigns[\varepsilon]{\varnothing}}{\assigns{\varnothing} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-expr-stmt}}]
@@ -40,7 +40,7 @@
   \rho, e \Rightarrow r
 }
 {
-  \rho, e \Rightarrow \mlet{v}{r}{\assigns{\varnothing}}
+  \rho, e \Rightarrow \mlet{v}{r}{\replaced{\assigns[\varepsilon]{\varnothing}}{\assigns{\varnothing} }}
 }
 \and
 \added{\inferrule*[lab={\ruleName{eval-print}}]
@@ -48,7 +48,7 @@
   \rho, e \Rightarrow r
 }
 {
-  \rho, \exPrint{e} \Rightarrow \mlet{v}{r}{\prints{v}{\assigns{\varnothing}}}
+  \rho, \exPrint{e} \Rightarrow \mlet{v}{r}{\assigns[v]{\varnothing}}
 }}
 \and
 \inferrule*[lab={\ruleName{eval-return}}]
@@ -56,7 +56,7 @@
   \rho, e \Rightarrow r
 }
 {
-  \rho, \exReturn{e} \Rightarrow \mlet{v}{r}{\returns{v}}
+  \rho, \exReturn{e} \Rightarrow \mlet{v}{r}{\replaced{\returns[\varepsilon]{v}}{\returns{v} }}
 }
 \and
 \inferrule*[lab={\ruleName{eval-return-none}}]
@@ -64,7 +64,7 @@
   \strut
 }
 {
-  \rho, \exReturnNone \Rightarrow \returns{\pyinline{None}}
+  \rho, \exReturnNone \Rightarrow \replaced{\returns[\varepsilon]{\pyinline{None}}}{\returns{\pyinline{None}} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-defs}}]
@@ -73,7 +73,7 @@
   v_i = \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} \quad (\forall i)
 }
 {
-  \rho, \seq{d} \Rightarrow \assigns{\set{\bind{\seq{f}}{\seq{v}}}}
+  \rho, \seq{d} \Rightarrow \replaced{\assigns[\varepsilon]{\set{\bind{\seq{f}}{\seq{v}}}}}{\assigns{\set{\bind{\seq{f}}{\seq{v}}}} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-assert}}]
@@ -81,7 +81,7 @@
   \rho, e \Rightarrow \val{\pyinline{True}}
 }
 {
-  \rho, \exAssert{e} \Rightarrow \assigns{\varnothing}
+  \rho, \exAssert{e} \Rightarrow \replaced{\assigns[\varepsilon]{\varnothing}}{\assigns{\varnothing} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-assert-msg}}]
@@ -89,7 +89,7 @@
   \rho, e \Rightarrow \val{\pyinline{True}}
 }
 {
-  \rho, \exAssertMsg{e}{e'} \Rightarrow \assigns{\varnothing}
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \replaced{\assigns[\varepsilon]{\varnothing}}{\assigns{\varnothing} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-assert-false}}]
@@ -97,7 +97,7 @@
   \rho, e \Rightarrow \val{\pyinline{False}}
 }
 {
-  \rho, \exAssert{e} \Rightarrow \aborts{\errAssertNoMsg}
+  \rho, \exAssert{e} \Rightarrow \replaced{\aborts[\varepsilon]{\errAssertNoMsg}}{\aborts{\errAssertNoMsg} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-assert-msg-false}}]
@@ -106,7 +106,7 @@
   \rho, e' \Rightarrow r
 }
 {
-  \rho, \exAssertMsg{e}{e'} \Rightarrow \mlet{w}{r}{\aborts{\errAssert{w}}}
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \mlet{w}{r}{\replaced{\aborts[\varepsilon]{\errAssert{w}}}{\aborts{\errAssert{w}} }}
 }
 \and
 \inferrule*[lab={\ruleName{eval-if}}]
@@ -124,7 +124,7 @@
   \rho, e_j \Rightarrow \val{\pyinline{False}} \quad (\forall j \in \set{1, \ldots, n+1})
 }
 {
-  \rho, \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} \Rightarrow \assigns{\varnothing}
+  \rho, \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} \Rightarrow \replaced{\assigns[\varepsilon]{\varnothing}}{\assigns{\varnothing} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-if-else}}]
@@ -150,19 +150,19 @@
 \and
 \inferrule*[lab={\ruleName{eval-seq}}]
 {
-  \rho, s \Rightarrow \replaced{\prints{\seq{u}}{\assigns{\rho'}}}{\assigns{\rho'}} \\
+  \rho, s \Rightarrow \replaced{\assigns[\seq{u}]{\rho'}}{\assigns{\rho'}} \\
   \rho \override \rho', s' \Rightarrow o
 }
 {
-  \rho, \exSeq{s}{s'} \Rightarrow \replaced{\prints{\seq{u}}{\assigns{\rho'}} \override o}{\assigns{\rho'} \override o}
+  \rho, \exSeq{s}{s'} \Rightarrow \replaced{\assigns[\seq{u}]{\rho'}}{\assigns{\rho'}} \override o
 }
 \and
 \inferrule*[lab={\ruleName{eval-seq-return}}]
 {
-  \rho, s \Rightarrow \replaced{\prints{\seq{u}}{\returns{v}}}{\returns{v}}
+  \rho, s \Rightarrow \replaced{\returns[\seq{u}]{v}}{\returns{v}}
 }
 {
-  \rho, \exSeq{s}{s'} \Rightarrow \replaced{\prints{\seq{u}}{\returns{v}}}{\returns{v}}
+  \rho, \exSeq{s}{s'} \Rightarrow \replaced{\returns[\seq{u}]{v}}{\returns{v}}
 }
 \end{mathpar}
 \caption{Statement $s$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
@@ -179,7 +179,7 @@
   \rho, e \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exAssert{e} \Rightarrow \aborts{\kappa}
+  \rho, \exAssert{e} \Rightarrow \replaced{\aborts[\varepsilon]{\kappa}}{\aborts{\kappa} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-assert-msg-fail}}]
@@ -187,7 +187,7 @@
   \rho, e \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\kappa}
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \replaced{\aborts[\varepsilon]{\kappa}}{\aborts{\kappa} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-assert-nonbool}}]
@@ -196,7 +196,7 @@
   v \text{ not a Boolean}
 }
 {
-  \rho, \exAssert{e} \Rightarrow \aborts{\errExcluded}
+  \rho, \exAssert{e} \Rightarrow \replaced{\aborts[\varepsilon]{\errExcluded}}{\aborts{\errExcluded} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-assert-msg-nonbool}}]
@@ -205,7 +205,7 @@
   v \text{ not a Boolean}
 }
 {
-  \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\errExcluded}
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \replaced{\aborts[\varepsilon]{\errExcluded}}{\aborts{\errExcluded} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-assert-msg-nonstr}}]
@@ -215,7 +215,7 @@
   v \text{ not a string}
 }
 {
-  \rho, \exAssertMsg{e}{e'} \Rightarrow \aborts{\errExcluded}
+  \rho, \exAssertMsg{e}{e'} \Rightarrow \replaced{\aborts[\varepsilon]{\errExcluded}}{\aborts{\errExcluded} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-if-fail}}]
@@ -224,7 +224,7 @@
   \rho, e_i \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\kappa}
+  \rho, \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} \Rightarrow \replaced{\aborts[\varepsilon]{\kappa}}{\aborts{\kappa} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-if-else-fail}}]
@@ -233,7 +233,7 @@
   \rho, e_i \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow \aborts{\kappa}
+  \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow \replaced{\aborts[\varepsilon]{\kappa}}{\aborts{\kappa} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-if-nonbool}}]
@@ -243,7 +243,7 @@
   v \text{ not a Boolean}
 }
 {
-  \rho, \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\errExcluded}
+  \rho, \exIf{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}} \Rightarrow \replaced{\aborts[\varepsilon]{\errExcluded}}{\aborts{\errExcluded} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-if-else-nonbool}}]
@@ -253,7 +253,7 @@
   v \text{ not a Boolean}
 }
 {
-  \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow \aborts{\errExcluded}
+  \rho, \exIfElse{e_1}{s_1}{\exElif{e_2}{s_2}\;\ldots\;\exElif{e_{n+1}}{s_{n+1}}}{s_{n+2}} \Rightarrow \replaced{\aborts[\varepsilon]{\errExcluded}}{\aborts{\errExcluded} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-match-fail}}]
@@ -261,7 +261,7 @@
   \rho, e \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\kappa}
+  \rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \replaced{\aborts[\varepsilon]{\kappa}}{\aborts{\kappa} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-match-abort}}]
@@ -270,15 +270,15 @@
   \dispatch(\rho, v, \seq{p}, \seq{s}) = \kappa
 }
 {
-  \rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \aborts{\kappa}
+  \rho, \exMatch{e}{\exCase{p_1}{s_1}\;\ldots\;\exCase{p_{n+1}}{s_{n+1}}} \Rightarrow \replaced{\aborts[\varepsilon]{\kappa}}{\aborts{\kappa} }
 }
 \and
 \inferrule*[lab={\ruleName{eval-seq-fail}}]
 {
-  \rho, s \Rightarrow \replaced{\prints{\seq{u}}{\aborts{\kappa}}}{\aborts{\kappa}}
+  \rho, s \Rightarrow \replaced{\aborts[\seq{u}]{\kappa}}{\aborts{\kappa}}
 }
 {
-  \rho, \exSeq{s}{s'} \Rightarrow \replaced{\prints{\seq{u}}{\aborts{\kappa}}}{\aborts{\kappa}}
+  \rho, \exSeq{s}{s'} \Rightarrow \replaced{\aborts[\seq{u}]{\kappa}}{\aborts{\kappa}}
 }
 \end{mathpar}
 \caption{Statement evaluation, continued (propagation rules and aborting cases)}
@@ -300,19 +300,19 @@
 \and
 \inferrule*[lab={\ruleName{eval-top-seq}}]
 {
-  q, \rho, t \Rightarrow \replaced{\prints{\seq{u}}{\assigns{\rho'}}}{\assigns{\rho'}} \\
+  q, \rho, t \Rightarrow \replaced{\assigns[\seq{u}]{\rho'}}{\assigns{\rho'}} \\
   q, \rho \override \rho', t' \Rightarrow o
 }
 {
-  q, \rho, t\;t' \Rightarrow \replaced{\prints{\seq{u}}{\assigns{\rho'}} \override o}{\assigns{\rho'} \override o}
+  q, \rho, t\;t' \Rightarrow \replaced{\assigns[\seq{u}]{\rho'}}{\assigns{\rho'}} \override o
 }
 \and
 \inferrule*[lab={\ruleName{eval-top-seq-fail}}]
 {
-  q, \rho, t \Rightarrow \replaced{\prints{\seq{u}}{\aborts{\kappa}}}{\aborts{\kappa}}
+  q, \rho, t \Rightarrow \replaced{\aborts[\seq{u}]{\kappa}}{\aborts{\kappa}}
 }
 {
-  q, \rho, t\;t' \Rightarrow \replaced{\prints{\seq{u}}{\aborts{\kappa}}}{\aborts{\kappa}}
+  q, \rho, t\;t' \Rightarrow \replaced{\aborts[\seq{u}]{\kappa}}{\aborts{\kappa}}
 }
 \and
 \inferrule*[lab={\ruleName{eval-types}}]
@@ -320,7 +320,7 @@
   \rho' = \set{\bind{\declaresS(\seq{\chi})}{\typeEntry{\Gamma}(q, \seq{\chi})}}
 }
 {
-  q, \rho, \seq{\chi} \Rightarrow \assigns{\rho'}
+  q, \rho, \seq{\chi} \Rightarrow \replaced{\assigns[\varepsilon]{\rho'}}{\assigns{\rho'} }
 }
 \end{mathpar}
 \caption{Top-level statement $t$ of module $q$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
