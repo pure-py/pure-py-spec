@@ -24,7 +24,7 @@ negative number as unary minus applied to a numeric literal; the translation to 
 into the literal, so a number may be negative. The translation of
 source text into abstract syntax otherwise maps each form of Python's grammar to the form of the same shape in \figrefTwo{syntax-stmt}{syntax-expr}, including the indentation that delimits blocks. The translation depends on the source text alone. In particular, a call $\exCall{q}{a}$ or $\exCall{q[e]}{a}$ is translated in the same way whether or not $q$ denotes a class; the well-formedness rules treat such a call as a constructor call when $q$ denotes a class (\secref{well-formedness}). A list of type parameters is always present in the abstract syntax and may be empty; in source an empty list is omitted, because in Python's grammar the list is optional and, when present, has at least one element. The grammar as
 written admits some programs which Python rejects as syntax errors, such as a function with two parameters of the same
-name. \figref{syntax-distinct} lists the conditions which rule out these programs.
+name. \figref{syntax-validity} lists the conditions which rule out these programs.
 
 \subsection{Contexts}
 \label{sec:contexts}
@@ -90,7 +90,7 @@ mutual def region and each mutual type region as one mutually-recursive binding.
 \input{spec/fig/syntax-stmt}
 \input{spec/fig/syntax-expr}
 \input{spec/fig/syntax-types}
-\input{spec/fig/syntax-distinct}
+\input{spec/fig/syntax-validity}
 
 An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by
 keyword arguments $x = u$, where an argument $u$ is an expression in a call and a pattern in a
