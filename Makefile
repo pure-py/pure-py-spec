@@ -89,7 +89,6 @@ check-consistency:
 wheel: check-consistency
 	rm -rf dist && uv build --wheel
 
-# Dependencies between the organisation's repositories, from clones alongside this one
 dependencies.svg:
 	uv run --locked python script/dependency-diagram.py .. | d2 - $@
 
