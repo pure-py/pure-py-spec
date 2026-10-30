@@ -1,7 +1,7 @@
 name: Consistency checks
 
-# Check the specification against the conformance suite, and build the wheel of the suite and its runner. The
-# paper and specification are built by the Documents workflow.
+# Specification against the conformance suite, and wheel of the suite and its runner; paper and specification
+# built by the Documents workflow
 on:
   workflow_dispatch:
   push:

@@ -90,8 +90,7 @@ wheel: check-consistency
 	rm -rf dist && uv build --wheel
 
 PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
-# The mechanisation included in the submission is the purepy release which conforms to this specification, so
-# the two share a version
+# Mechanisation at the purepy release conforming to this specification, which shares its version
 PUREPY_RELEASE := v$(shell uv version --short --color never)
 
 supplementary.zip: spec-anon.pdf
