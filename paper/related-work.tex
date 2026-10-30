@@ -5,63 +5,63 @@
 
 Although the syntax of mainstream languages is usually described precisely, few define their behaviour
 formally, so well-defined subsets have been constructed to equip languages with formal, often mechanised,
-semantics. Examples include Java~\cite{igarashi2001}, OCaml~\cite{seassau2025},
-JavaScript~\cite{bodin2014,guha2010,park2015,politz2012}, PHP~\cite{filaretti2014},
-Rust~\cite{jung2020,jung2018}, and lower-level languages such as WebAssembly~\cite{watt2021a,watt2021,watt2023}
-and LLVM-IR~\cite{zakowski2021,zhao2012}. A notable success is Clight~\cite{blazy2009}, a substantial subset of
-C that underpins a verified compiler~\cite{leroy2009}; likewise the CakeML project~\cite{kumar2014} produced a
-verified implementation of a fragment of ML~\cite{milner1997}, building on earlier mechanisations~\cite{lee2007}.
+semantics. Examples include Java~\citep{igarashi2001}, OCaml~\citep{seassau2025},
+JavaScript~\citep{bodin2014,guha2010,park2015,politz2012}, PHP~\citep{filaretti2014},
+Rust~\citep{jung2020,jung2018}, and lower-level languages such as WebAssembly~\citep{watt2021a,watt2021,watt2023}
+and LLVM-IR~\citep{zakowski2021,zhao2012}. A notable success is Clight~\citep{blazy2009}, a substantial subset of
+C that underpins a verified compiler~\citep{leroy2009}; likewise the CakeML project~\citep{kumar2014} produced a
+verified implementation of a fragment of ML~\citep{milner1997}, building on earlier mechanisations~\citep{lee2007}.
 
 \subsection{Formal semantics of Python}
 
-Several efforts formalise Python itself: an embedding~\cite{guth2013} in the $\mathbb{K}$
-framework~\cite{rosu2010}, a structural operational semantics~\cite{kohl2021}, a reduction of much of the
-language to a core calculus~\cite{politz2013}, an executable semantics aimed at optimising
-compilers~\cite{melancon2023}, and a skeletal semantics of a fragment~\cite{andrieux}. \PurePy differs in
+Several efforts formalise Python itself: an embedding~\citep{guth2013} in the $\mathbb{K}$
+framework~\citep{rosu2010}, a structural operational semantics~\citep{kohl2021}, a reduction of much of the
+language to a core calculus~\citep{politz2013}, an executable semantics aimed at optimising
+compilers~\citep{melancon2023}, and a skeletal semantics of a fragment~\citep{andrieux}. \PurePy differs in
 restricting the language to a well-behaved subset rather than modelling Python in full; relating our semantics
 to these is future work (\secref{agreement}).
 
 \subsection{Purpose-specific language subsets}
 
-A separate line of work delineates subsets for a particular use. The \emph{Source} family~\cite{anderson2021}
+A separate line of work delineates subsets for a particular use. The \emph{Source} family~\citep{anderson2021}
 comprises progressively larger subsets of JavaScript for teaching first-year students the foundations of
-computing, following a JavaScript edition of a classic text~\cite{abelson2022}; the choice of JavaScript was
+computing, following a JavaScript edition of a classic text~\citep{abelson2022}; the choice of JavaScript was
 pragmatic, since industrial relevance weighs heavily in language choice for introductory
-courses~\cite{simon2018}. For Python, ChocoPy~\cite{padhye2019} is a statically-typed subset used as the source
-language in compiler-construction courses, and Restricted Python (RPython)~\cite{ancona2007} is a statically
-typed subset that the PyPy project~\cite{rigo2006} compiles to common runtimes.
+courses~\citep{simon2018}. For Python, ChocoPy~\citep{padhye2019} is a statically-typed subset used as the source
+language in compiler-construction courses, and Restricted Python (RPython)~\citep{ancona2007} is a statically
+typed subset that the PyPy project~\citep{rigo2006} compiles to common runtimes.
 
 \subsection{Functional Python}
 
-We are aware of one other functional subset of Python~\cite{sunderraman2025}, intended for teaching; \PurePy
+We are aware of one other functional subset of Python~\citep{sunderraman2025}, intended for teaching; \PurePy
 encloses more of the language, since that work omits control structures such as conditionals. Related efforts
 sit outside the subset discipline: Coconut\footnote{\url{https://coconut-lang.org}} is a functional language that compiles to Python, and
-functional pipelines have been proposed for scientific computation in Python~\cite{zhang2024}. Although \PurePy does not aim to make Python
+functional pipelines have been proposed for scientific computation in Python~\citep{zhang2024}. Although \PurePy does not aim to make Python
 more functional, the community has moved in that direction, from lambda expressions in Python~1.0 to a recent
-proposal for deeply immutable objects~\cite{johnson2025}. Typed treatments of effects in functional languages,
+proposal for deeply immutable objects~\citep{johnson2025}. Typed treatments of effects in functional languages,
 such as Prism,\footnote{\url{https://www.stephendiehl.com/posts/prism/}} are relevant to the structured effects \PurePy may add in a later release.
 
 \subsection{Typed Python}
 
-Static Python~\cite{lu2023} is a gradually typed dialect of Python
+Static Python~\citep{lu2023} is a gradually typed dialect of Python
 combining concrete and transient enforcement so that typed code is sound. \PurePy adopts a static
 type system that accepts only programs accepted by mypy, leaving gradual typing to a later release.
 
 \subsection{Languages as targets for generated code}
 
 Language models generate Python more accurately than languages with less training data. The MultiPL-E
-benchmark~\cite{cassano2023} measures the gap across 18 languages. MultiPL-T~\cite{cassano2024} narrows the
+benchmark~\citep{cassano2023} measures the gap across 18 languages. MultiPL-T~\citep{cassano2024} narrows the
 gap for OCaml and Racket by fine-tuning on Python programs translated into those languages and filtered by a
 compiler and by tests. Because \PurePy shares Python's syntax, a model targeting \PurePy needs no such
 fine-tuning, and the \PurePy type checker can serve as the filter in place of the compiler.
 
-Type-constrained decoding~\cite{mundler2025} uses a type system to constrain generation and reduces
+Type-constrained decoding~\citep{mundler2025} uses a type system to constrain generation and reduces
 compilation errors in generated TypeScript. Such a technique requires a decidable well-formedness check with
 a formal static semantics, and the \PurePy type checker meets both requirements. Where a formal specification
-exists, models can synthesise verified Dafny methods from it~\cite{misu2024}. \PurePy addresses the case in
+exists, models can synthesise verified Dafny methods from it~\citep{misu2024}. \PurePy addresses the case in
 which a specification is not available, and guarantees determinism, typing and freedom from the runtime
 errors listed in \secref{runtime-errors} for every well-formed program. Studies of research coding
-tasks~\cite{tian2024,chen2025} and of computational reproducibility~\cite{siegel2024} measure the current
+tasks~\citep{tian2024,chen2025} and of computational reproducibility~\citep{siegel2024} measure the current
 reliability of generated scientific code. \citet{welsh2023} argues that programming languages lose relevance
 as models execute tasks directly. We argue in \secref{introduction} that the value of languages lies
 increasingly in their guarantees rather than in convenience for human authors.
@@ -69,7 +69,7 @@ increasingly in their guarantees rather than in convenience for human authors.
 \subsection{Pattern matching}
 
 Checking that the cases of a match are reachable and exhaustive goes back to the usefulness algorithm for
-ML~\cite{maranget2007}, which decides whether a pattern matches some value not matched by any preceding
+ML~\citep{maranget2007}, which decides whether a pattern matches some value not matched by any preceding
 pattern, and to the term descriptions of \citet{sestoft1996}, which record the constructors established and
 excluded at each position of the scrutinee as match compilation proceeds. \PurePy computes
 both from a residual, the set of values that no earlier case has matched, and seeds that residual from the

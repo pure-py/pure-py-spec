@@ -71,6 +71,6 @@ empty residual, so a third case would be unreachable.
 Neither case matches every value of \pyinline{C}, however, so the remaining type is still \pyinline{C},
 \ruleName{match-partial} applies, and the function is rejected as not always returning, following mypy. If
 the second case were \pyinline{C(q)} instead, the remaining type after it would be $\tyNever$, but
-\pyinline{q} would be bound at \pyinline{tuple[int, int] | None} rather than at \pyinline{tuple[int, int]},
+\pyinline{q} would be bound at $\tyUnion{\tyTuple{\tyInt, \tyInt}}{\tyNone}$ rather than at $\tyTuple{\tyInt, \tyInt}$,
 because pattern checking uses the remaining type.
 

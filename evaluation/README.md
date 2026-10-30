@@ -142,7 +142,7 @@ HumanEval smoke run, kept for reproducibility; it is not a HumanEval+ result.
 
 ## CI And Harbor
 
-The workflow `.github/workflows/evaluation.yml` runs in this directory on macOS
+The evaluation job of the workflow `.github/workflows/paper.yml` runs in this directory on macOS
 and Linux whenever evaluation code changes: unit tests, a one-problem smoke run
 of every benchmark, the Harbor import and the compilation of the generated figure. It checks that the
 pipeline works, not what the model answers: wrong code and checker rejections

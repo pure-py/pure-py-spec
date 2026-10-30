@@ -1,0 +1,139 @@
+\section{Syntax}
+\label{sec:syntax}
+
+The syntax of \PurePy is given in \figrefTwo{syntax-types}{syntax-stmt}. Throughout the paper, a sequence $\seq{x}$ denotes $x_1, \ldots, x_n$ for some $n$. Inside the brackets of a tuple, list, type
+application or argument list, $\seq{e}$ stands for the comma-separated elements, so $\exTuple{\seq{e}}$ is
+$\exTuple{e_1, \ldots, e_n}$. The sequence $x \cons \seq{x}$ has head $x$ and tail $\seq{x}$. Comma-separated
+elements inside set braces are pairwise distinct. Two sequences of equal length paired by a colon,
+$\bind{\seq{x}}{\seq{\psi}}$, denote the sequence of pairs $\bind{x_1}{\psi_1}, \ldots, \bind{x_n}{\psi_n}$, and a
+judgement applied to sequences of equal length holds pointwise.
+
+\subsection{Lexical syntax}
+\label{sec:lexical}
+
+The grammar of \PurePy is an abstract syntax. The translation from Python's concrete grammar, including
+lexical syntax, comments and indentation sensitivity, lies outside the specification, which assumes only that
+each form of the concrete grammar is translated to the form of the same shape in \figref{syntax-stmt}; the
+metavariables $n$ and $w$, for example, range over numbers and strings rather than over numerals and string
+literals. The abstract syntax has one form of call, $\exCall{q}{a}$, whether $q$ denotes a function or a class;
+the two cases are distinguished during type checking (\secref{well-formedness}). The grammar also admits some
+programs which Python rejects as syntax errors, each a duplicated name or key within one form, such as a
+function with two parameters of the same name. These exclusions from the grammar are summarised in
+\specfigref{syntax-distinct}.
+
+\subsection{Types and type schemes}
+\label{sec:types-schemes}
+
+\figref{syntax-types} gives the syntax of types $\tau$, familiar from the Python typing
+specification~\citep{typingcouncil2025}, and of schemes $\pi$. \emph{Type expressions} $\psi$, omitted from the figure, are expressions which denote types; they
+have the form of types, except that where types have \emph{instantiated classes} $C[\seq{\tau}]$ and type variables $\alpha$,
+type expressions have qualified names applied to type arguments, $q[\seq{\psi}]$, naming a class, type alias or type
+parameter, and are resolved to types during type checking (\secref{types}). Parameters, return
+types and dataclass fields are annotated with type expressions, as are variable declarations
+$x\exAnnot{\psi}$, with or without an initial assignment; later assignments to a declared variable are not
+annotated. A \emph{scheme} $\pi$ binds type parameters $\seq{\alpha}$, and is either a \emph{type scheme},
+binding type parameters in a type, for a function, or a \emph{field scheme}, binding type parameters in a sequence
+of typed fields, for a class. A scheme without
+any type parameters is identified with its body.
+
+\input{paper/fig/syntax-types}
+
+\subsection{Contexts}
+\label{sec:contexts}
+
+Metavariables $x$, $y$, $z$, $f$, $c$ and $\alpha$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function, $c$ when it is expected to denote a class and $\alpha$ when it is a type parameter. A \emph{name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}): a variable is a \emph{simple name}, and a name with at least one dot is \emph{qualified}. A name is \emph{fully qualified} when it is read from the root of the module hierarchy; modules (\secref{modules-programs}) and classes are identified by fully-qualified name.
+
+\input{spec/syntax/context}
+
+\noindent The first four forms of entry record the assignment state of a variable, in the definite-assignment
+terminology of Java~\citep[\S16]{gosling2025}. A variable bound to a type $\tau$ is \emph{definitely assigned}:
+every path to the current point has assigned it, so it may be used. A variable with entry $\DU{\tau}$ is
+declared at $\tau$ but \emph{definitely unassigned}, like a blank final in Java before its assignment, so it
+may be assigned but not used. A variable with entry $\PU{\tau}$ is \emph{possibly unassigned}, because it is
+assigned on some paths but not on all, so it may be neither used nor assigned. A variable with entry $\Unbound$
+is declared later in its scope; uses are rejected statically, where Python would fail at run time with
+\pyinline{UnboundLocalError}. A
+function with type parameters is bound at a type scheme rather than a type, and is likewise possibly
+unassigned when defined in only one branch of a conditional. Imported
+modules are bound at a stub $\modStub{q}$ until checked, and then at $\modLoaded{q}{\Gamma}$, which carries the
+signature $\Gamma$ of the module.
+
+The remaining forms denote types rather than values: classes, type parameters, and type aliases together
+with the mutual type region $\seq{\chi}$ declaring them (\figref{syntax-stmt}) and the context in which they are
+resolved. The predefined names are the names that occur in type expressions, such as \pyinline{int}, \pyinline{list} and
+\pyinline{Callable}, together with the decorator \pyinline{dataclass}. Their entries record only that the name is
+in scope, as required to resolve type expressions and type-check class definitions; use of such names as
+expressions is rejected statically.
+
+Classes are identified by fully-qualified name, and class names $C$ are also the types of their instances. A
+\emph{class table} $\Sigma$, following Featherweight Java~\citep{igarashi2001}, maps each class name to a class
+entry (\figref{context-entries}) recording the definition that introduces the class, together with the mutual
+type region $\seq{\chi}$ and the context in which the definition appears, from which the fields and base class
+of the class are resolved. The well-formedness rules build the class table while checking type definitions
+(\specfigref{typing-top-level}).
+
+\subsubsection{Context operations}
+\label{sec:context-operations}
+
+Contexts compose in two ways. \emph{Override}, $\Gamma \override \Delta$, is sequential composition: the entries
+of $\Delta$ replace those of $\Gamma$ for the same variables, so for a sequence of statements $\exSeq{s}{s'}$ the statement $s'$ is typed
+under the context for $s$ overridden by the assignments made by $s$. \emph{Merge},
+$\Gamma \merge_{\Sigma} \Delta$, is parallel composition, combining the contexts produced by the two branches of
+a conditional into the context after the conditional. A variable with the same entry in both branches keeps
+that entry. A variable declared in both branches but assigned in only one, or declared in only one, becomes
+possibly unassigned. A variable bound in the two branches at different types, which happens when the branches
+are cases of a \pyinline{match} binding the same pattern variable, is bound at the join of the two types, their
+least upper bound (Lemma~\ref{lem:lattice}); merge takes the class table $\Sigma$ because the join depends on
+subtyping. Both operations are defined pointwise on entries
+(Definitions~\specnum{def:override} and \specnum{def:merge}).
+
+\subsection{Statements and expressions}
+\label{sec:expressions-statements}
+
+\subsubsection{Statements}
+
+\figref{syntax-stmt} gives the syntax of statements $s$, which are sequenced by juxtaposition, $\exSeq{s}{s'}$; function bodies, branches of conditionals and bodies of
+cases are statements. \emph{Type definitions} $\chi$ are either class definitions or \pyinline{type}
+statements; the latter declare \emph{type aliases}. \emph{Top-level statements} $t$ are either statements or mutual
+type regions, also sequenced by juxtaposition; module bodies consist of imports followed by top-level
+statements, so type definitions occur only at the top level of a module. Function definitions, class definitions and
+\pyinline{type} statements bind distinct \emph{type parameters} $\seq{\alpha}$, written in brackets after the
+name as in Python 3.12. \emph{Mutual def regions} $d_1 \ldots d_{n+1}$ are maximal contiguous blocks of
+\pyinline{def} statements, and \emph{mutual type regions} $\chi_1 \ldots \chi_{n+1}$ maximal contiguous blocks
+of type definitions; the well-formedness rules treat each as one mutually recursive binding, which replaces
+Python's late binding (\secref{mutual-recursion}).
+
+\input{paper/fig/syntax-stmt}
+
+\subsubsection{Expressions}
+
+\figref{syntax-expr} also gives the syntax of expressions $e$, the subset of Python expressions supported by \PurePy: variables, literals, calls, attribute access and
+subscripting, operator applications, conditional expressions, lists, tuples and dictionaries, comprehensions
+and lambdas. Metavariables $\odot$ and $\ominus$ range over binary and unary operators, whose
+precedence and associativity are given in \specfigref{precedence}; dedicated expression forms are provided for
+\pyinline{and} and \pyinline{or}, since they do not always evaluate both operands.
+
+\emph{Argument lists} $a$ occur in calls and in constructor patterns, and consist of
+positional arguments $\seq{u}$ followed by keyword arguments $\seq{x} \mathord{=} \seq{u}'$, where each argument $u$ is either an
+expression (if the argument list occurs in a call) or a pattern (if the argument list occurs in a constructor
+pattern). In a constructor call or pattern, the arguments supply the fields of the class, which dataclasses
+declare in a fixed order. The auxiliary function $\fieldMap{\Sigma}$ (\specref{aux:field-map}) resolves each
+positional argument to the field at that position and each keyword argument to the field of that name, so that
+the rules for constructor calls and patterns are able to check each argument against the type of the
+corresponding field.
+
+\subsection{Modules and programs}
+\label{sec:modules-programs}
+
+\input{spec/syntax/program}
+
+A second map $\mathcal{P}$ gives the
+predefined modules \pyinline{builtins}, \pyinline{dataclasses}, \pyinline{sys} and \pyinline{typing}, which have no body and provide selected members of the Python modules of the same names: $\mathcal{P}$ takes each such name to its
+environment and context. The two domains are disjoint, and their union is
+prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$ is itself in
+$\dom(\mathcal{M}) \cup \dom(\mathcal{P})$. In a typical implementation, a source tree
+encodes the map $\mathcal{M}$: the \filename{.py} files and directories are the modules, each named by its path, so the
+domain is prefix-closed by construction, and the body of the module of a directory is its
+\filename{\_\_init\_\_.py} file. The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
+definitions that follow.
+

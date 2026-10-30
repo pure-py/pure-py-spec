@@ -3,24 +3,24 @@
 
 Scientific results are increasingly computed by programs written with, or generated outright by, AI coding
 tools. Most new users of GitHub now try a coding assistant within their first
-week~\cite{github2025}, and the reliability of generated scientific code is an open question with benchmarks
-of its own~\cite{tian2024,chen2025,siegel2024}. Whatever the success rate of the current models, scientific
+week~\citep{github2025}, and the reliability of generated scientific code is an open question with benchmarks
+of its own~\citep{tian2024,chen2025,siegel2024}. Whatever the success rate of the current models, scientific
 results that rest on generated programs need assurance that the programs work as intended. Verification
 against a formal specification provides such assurance in principle, but a generated program is accepted on
 the strength of its output, because the scientist who asked for it rarely has a specification to verify it
 against. More broadly, assurance that AI systems work as intended is now a stated priority of UK
-policy~\cite{clifford2025,dbt2025}.
+policy~\citep{clifford2025,dbt2025}.
 
 Python is the usual language for this code. Python is the most used language on GitHub in AI and data
-science~\cite{github2025}, and scientific computing is among the fields driving its use~\cite{github2024}.
+science~\citep{github2025}, and scientific computing is among the fields driving its use~\citep{github2024}.
 AI coding tools favour Python when a task leaves the choice open, choosing it in most cases even where another
-language would serve better~\cite{twist2026}, and most of the code-generation benchmarks surveyed by
+language would serve better~\citep{twist2026}, and most of the code-generation benchmarks surveyed by
 \citet{siddiq2024} are in Python. They also generate Python more
-accurately than languages with less training data, such as OCaml and Racket~\cite{cassano2023}. Fine-tuning
-closes the gap only in part~\cite{cassano2024}.
+accurately than languages with less training data, such as OCaml and Racket~\citep{cassano2023}. Fine-tuning
+closes the gap only in part~\citep{cassano2024}.
 
 Assurance is hard to obtain for Python. The language has not been given an official formal semantics, and the
-formalisations constructed by researchers~\cite{guth2013,kohl2021,politz2013,melancon2023} model the behaviour
+formalisations constructed by researchers~\citep{guth2013,kohl2021,politz2013,melancon2023} model the behaviour
 of the full language rather than delimiting a subset within which reasoning is tractable. Even given a
 semantics, three aspects of the language make Python programs hard to reason about. Under mutable state, the
 value of a variable depends on every assignment that may run before a use. Under dynamic binding, the referent

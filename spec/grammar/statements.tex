@@ -1,6 +1,6 @@
 \begin{tabular}[t]{rcll}
 \grammarGroup{Statements} \\
-$s$ & $::=$ & $s\;s'$ & \speconly{(Seq)} \\
+$s$ & $\coloncolonequals$ & $\exSeq{s}{s'}$ & \speconly{(Seq)} \\
 \speconly{    & $\mid$ & $\exPass$ & (Pass) \\}
     & $\mid$ & $x\exAnnot{\psi}$ & \speconly{(Declare)} \\
     & $\mid$ & $\exAssign{x}{e}$ & \speconly{(Assign)} \\
@@ -16,32 +16,32 @@ $s$ & $::=$ & $s\;s'$ & \speconly{(Seq)} \\
     & $\mid$ & $d_1 \;\ldots\; d_{n+1}$ & \speconly{(MutualDefRegion)}
    \\[3mm]
 \grammarGroup{Top-level statements} \\
-$t$ & $::=$ & $s$ & \speconly{(Stmt)} \\
+$t$ & $\coloncolonequals$ & $s$ & \speconly{(Stmt)} \\
     & $\mid$ & $t\;t'$ & \speconly{(TopSeq)} \\
     & $\mid$ & $\chi_1 \;\ldots\; \chi_{n+1}$ & \speconly{(MutualTypeRegion)}
    \\[3mm]
 \grammarGroup{Type definitions} \\
-$\chi$ & $::=$ & $\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}$ & \speconly{(DataclassExtend)} \\
+$\chi$ & $\coloncolonequals$ & $\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}$ & \speconly{(DataclassExtend)} \\
 \speconly{    & $\mid$ & $\exDataclass{c[\seq{\alpha}]}{\phi}$ & (Dataclass) \\}
     & $\mid$ & $\exTypeAlias{x[\seq{\alpha}]}{\psi}$ & \speconly{(TypeAlias)}
    \\[3mm]
 \grammarGroup{Imports} \\
-$\iota$ & $::=$ & $\exImport{q}$ & \speconly{(PlainImport)} \\
+$\iota$ & $\coloncolonequals$ & $\exImport{q}$ & \speconly{(PlainImport)} \\
     & $\mid$ & $\exFromImport{q}{x_1, \ldots, x_{n+1}}$ & \speconly{(FromImport)}
    \\[3mm]
 \grammarGroup{Cases} \\
-$b$ & $::=$ & $\exCase{p}{s}$ & \speconly{(Case)}
+$b$ & $\coloncolonequals$ & $\exCase{p}{s}$ & \speconly{(Case)}
    \\[3mm]
 \grammarGroup{Field lists} \\
-$\phi$ & $::=$ & $\exField{x_1}{\psi_1} \;\ldots\; \exField{x_{n+1}}{\psi_{n+1}}$ & \speconly{(FieldList) \\
+$\phi$ & $\coloncolonequals$ & $\exField{x_1}{\psi_1} \;\ldots\; \exField{x_{n+1}}{\psi_{n+1}}$ & \speconly{(FieldList) \\
     & $\mid$ & $\pyinline{pass}$ & (EmptyFieldList)}
    \\[3mm]
 \grammarGroup{Module bodies} \\
-$\mu$ & $::=$ & $\iota_1 \;\ldots\; \iota_n \;\; t$ & \speconly{(ModuleBody)}
+$\mu$ & $\coloncolonequals$ & $\iota_1 \;\ldots\; \iota_n \;\; t$ & \speconly{(ModuleBody)}
    \\[3mm]
 \grammarGroup{Names} \\
-$q$ & $::=$ & $x_1.\cdots.x_{n+1}$ & \speconly{(Name)}
+$q$ & $\coloncolonequals$ & $x_1.\cdots.x_{n+1}$ & \speconly{(Name)}
    \\[3mm]
 \grammarGroup{Function definitions} \\
-$d$ & $::=$ & $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$ & \speconly{(Def)}
+$d$ & $\coloncolonequals$ & $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$ & \speconly{(Def)}
 \end{tabular}

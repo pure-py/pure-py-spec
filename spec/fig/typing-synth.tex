@@ -55,7 +55,6 @@
 \and
 \inferrule*[lab={\ruleName{call-lambda-syn}}]
 {
-  \seq{x} \text{ distinct} \\
   \Sigma; \Gamma \vdash \seq{e} \synth \seq{\tau} \\
   \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\tau}}} \vdash e \synth \tau
 }
@@ -216,6 +215,33 @@
 }
 \and
 \input{spec/rules/call-union}
+\and
+\inferrule*[lab={\ruleName{binop-union-left}}]
+{
+  \Sigma; \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
+  \Sigma; \Gamma \vdash e' \synth \rho \\
+  \resolveOp{\Sigma}(\odot, \tyUnion{\sigma}{\sigma'}, \rho) \text{ undefined} \\\\
+  \Sigma; \Gamma \override \set{\bind{y}{\sigma}} \vdash \exBinOp{y}{\odot}{e'} \synth \tau \\
+  \Sigma; \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exBinOp{y}{\odot}{e'} \synth \tau' \\
+  y \notin \fv(e')
+}
+{
+  \Sigma; \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \joinTy{\Sigma}{\tau}{\tau'}
+}
+\and
+\inferrule*[lab={\ruleName{binop-union-right}}]
+{
+  \Sigma; \Gamma \vdash e \synth \rho \\
+  \rho \text{ not a union} \\
+  \Sigma; \Gamma \vdash e' \synth \tyUnion{\sigma}{\sigma'} \\
+  \resolveOp{\Sigma}(\odot, \rho, \tyUnion{\sigma}{\sigma'}) \text{ undefined} \\\\
+  \Sigma; \Gamma \override \set{\bind{y}{\sigma}} \vdash \exBinOp{e}{\odot}{y} \synth \tau \\
+  \Sigma; \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exBinOp{e}{\odot}{y} \synth \tau' \\
+  y \notin \fv(e)
+}
+{
+  \Sigma; \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \joinTy{\Sigma}{\tau}{\tau'}
+}
 \end{mathpar}
 \caption{Expression synthesis: subscripts, and elimination at a union}
 \label{fig:typing-synth-elim}

@@ -17,17 +17,16 @@ semantics.
 
 - `paper.tex`: the paper
 - `PurePy-spec.tex`: the language specification, a standalone document
-- `spec/`: sources of the specification, from which the paper is also assembled
-- `paper/`: material belonging only to the paper
+- `spec/`: sources of the specification, including the figures, rules, definitions and lemmas shared with the paper
+- `paper/`: sources of the paper's own prose
 - `tex/`: macros and bibliography shared by both documents
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
 - `src/purepy_conformance/`: the conformance suite, as package data, and its runner, the `purepy-conformance` command
-- `test/`: consistency of the specification with the conformance suite, and of the suite with mypy
+- `test/`: consistency of the specification with the conformance suite
+- `script/`: project board integrity check, run daily by CI
 
-`\paperinput{file}` at a point in a specification source includes the file in the paper only, and
-`\specinput{file}` in the specification only; `\paperonly{...}` and `\speconly{...}` restrict a phrase to
-one document. Rules included individually in the paper are defined in `spec/rules/`, so that each rule has
-one source; all other rules are defined in the figures.
+Each section has separate prose in the two documents, and material shared by both lives under `spec/` and is
+input by each. Within a shared source, `\paperonly{...}` and `\speconly{...}` restrict a phrase to one document.
 
 ## Building
 
@@ -37,7 +36,7 @@ See the Makefile.
 
 Install [uv](https://docs.astral.sh/uv/). The Python version in `.python-version` is read by uv, the
 workflows, mypy and the specification. From the repository root, check that every test cites a rule of the
-specification and that mypy accepts the agreeing tests, then build the wheel:
+specification, run the suite against Python with mypy as type checker, and build the wheel:
 
 ```bash
 make wheel
@@ -72,16 +71,12 @@ specification and the Isabelle mechanisation, cloned from the `isabelle-purepy` 
 release of the same version, which is the release checked against this specification. The archive is not checked after anonymisation (#292).
 
 The submission is always built locally; the `Consistency checks` GitHub Action runs the consistency script,
-the `Documents` action builds the paper and specification, and the mechanisation and
+the `Paper` action builds the paper and specification and runs the evaluation pipeline, and the mechanisation and
 type checker are checked by the `build` action of their repository.
 
 ## Release workflow
 
-Run the `Bump version` GitHub Action manually with a version in the form `x.y.z` (for example, `0.1.4`). The
-action updates and commits the version numbers on `main` and creates and pushes the tag `v0.1.4`. It then builds
-`PurePy-spec.pdf` and publishes it to GitHub Pages under `v0.1.4/` and `latest/`
-(https://pure-py.github.io/pure-py-spec/), builds the `purepy-conformance` wheel and creates the GitHub Release
-for the tag with the wheel attached. The `purepy` package is released from the `isabelle-purepy` repository.
+Run the `Bump version` GitHub Action manually with a version in the form `x.y.z`.
 
 ### Zotero export settings
 

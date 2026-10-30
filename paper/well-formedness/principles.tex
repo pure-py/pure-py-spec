@@ -6,57 +6,6 @@ programs; the rules follow in \secref{expression-typing} to \secref{well-formedn
 variables serve the two aims of \secref{no-mutable-state} and \secref{python-compatibility}, no mutable state and
 compatibility with mypy.
 
-\subsubsection{Variable declaration and definite assignment}
-\label{sec:local-assignment}
-
-\emph{Definite assignment} enforces the discipline of \secref{no-mutable-state}: a variable may be referenced only
-where an assignment covers every path to the reference, and assigned only where no path has assigned it
-already. Java imposes similar conditions on blank finals~\cite[\S16]{gosling2025}. The \ruleName{declare} rule binds the variable at $\DU{\tau}$, declared at $\tau$ and
-definitely unassigned; the \ruleName{assign} rule requires that entry, checks the expression against $\tau$ and
-makes the variable definitely assigned, so that $\Gamma(x)$ is a type, as the \ruleName{var} rule requires; an
-annotated assignment does both at once; and the \ruleName{if} rules combine the branches with $\merge$, so
-that a variable is definitely assigned after a conditional only if each branch either assigns it or definitely
-returns, and is otherwise possibly unassigned, $\PU{\tau}$ (\secref{well-formedness-statements}). Branch-local variables are therefore permitted, but using one after the
-conditional is not, nor is completing a partial assignment, as in the program on the left below. The
-\ruleName{def-body} rule introduces every variable declared or assigned by the body at $\Unbound$ before checking
-the body, so a reference before the declaration is rejected statically, as on the right, whereas Python fails at
-run time with \pyinline{UnboundLocalError}:
-
-\begin{listingrow}
-\begin{listingcol}{0.48\textwidth}
-\begin{python}
-def foo(b: bool) -> int:
-    x: int
-    if b:
-        x = 3
-        y: int = x + 1
-        print(y)
-    x = 0  # error: x possibly assigned
-    return x
-\end{python}
-\end{listingcol}
-\begin{listingcol}{0.45\textwidth}
-\begin{python}
-y: int = 7
-def f() -> int:
-    x: int = y  # error: y is local
-    y: int = 8
-    return x
-\end{python}
-\end{listingcol}
-\end{listingrow}
-
-\noindent On the left, Python assigns \pyinline{x} twice when \pyinline{b} is true, so no pure reading of the program
-agrees with Python: under shadowing, \pyinline{return x} would refer to a different variable from the one
-assigned in the branch. On the right, \pyinline{y} is local to \pyinline{f} because of its declaration in
-\pyinline{f}. The set $\assignsS(s)$ of variables introduced by the \ruleName{def-body} rule contains the variables
-declared or assigned anywhere in the body $s$, not descending into nested function definitions, which have their own scope.
-
-A function defined in a branch can also be used only within that branch; its name is possibly unassigned after the
-conditional, and no other branch can complete the definition, because a definition is also a declaration and a scope
-declares a name at most once. A variable of \pyinline{Callable} type, declared before the conditional and assigned in
-each branch, can be used if the function is needed after the conditional.
-
 \subsubsection{Mutual def regions}
 \label{sec:mutual-recursion}
 
@@ -106,7 +55,7 @@ def g() -> int:  # error: g defined twice in the same mutual def region
 
 \noindent Python accepts this too, treating the second \pyinline{def g} as a reassignment of \pyinline{g},
 which late binding then makes the target of the call in \pyinline{f}. Finally, the branches of a conditional may contain mutual def regions, with any use of those
-functions after the conditional subject to the usual definite assignment rules (\secref{local-assignment}).
+functions after the conditional subject to the usual definite assignment rules (\secref{no-mutable-state}).
 
 \subsubsection{Pattern binding and reachability}
 \label{sec:pattern-binding}

@@ -9,7 +9,6 @@ import purepy_conformance
 from purepy_conformance import (
     MAIN,
     PurePyOutcome,
-    PythonOutcome,
     Results,
     run,
     suite,
@@ -18,8 +17,6 @@ from purepy_conformance import (
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TEST = ROOT / "test"
-MYPY_INI = "mypy.ini"
-MYPY_BUG = "mypy-bug"
 PYTHON_VERSION = (ROOT / ".python-version").read_text().strip()
 
 RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
@@ -84,43 +81,6 @@ def check_lint(r: Results) -> None:
                 break
 
 
-def mypy_errors(paths: list[str], cwd: pathlib.Path) -> set[str]:
-    """Paths of the files mypy reports errors in, relative to cwd"""
-    proc = run(
-        [
-            "mypy",
-            "--python-version",
-            PYTHON_VERSION,
-            "--config-file",
-            str(TEST / MYPY_INI),
-            "--no-error-summary",
-            "--no-color-output",
-            *paths,
-        ],
-        cwd=cwd,
-    )
-    return {line.split(":", 1)[0] for line in proc.stdout.splitlines() if ": error:" in line}
-
-
-def check_mypy_compatibility(r: Results, suite_dir: pathlib.Path) -> None:
-    with r.test("mypy compatibility"):
-        agrees = suite_dir / PythonOutcome.SUCCEEDS / PurePyOutcome.AGREES
-        found = [test for test in tests(suite_dir) if agrees in test.parents]
-        modules = [str(test.relative_to(suite_dir)) for test in found if test.is_file()]
-        reported_bug = {
-            str(test.relative_to(suite_dir)) for test in found if MYPY_BUG in test.parts
-        }
-        rejected = mypy_errors(modules, suite_dir)
-        # A program is checked from its own directory, so that its modules resolve
-        for program in (test for test in found if test.is_dir()):
-            if len(mypy_errors([MAIN], program)) > 0:
-                rejected.add(str(program.relative_to(suite_dir)))
-        for path in sorted(rejected - reported_bug):
-            r.fail(f"{path} rejected by mypy")
-        for path in sorted(reported_bug - rejected):
-            r.fail(f"{path} accepted by mypy; reported bug fixed")
-
-
 def main() -> None:
     consistency = Results()
     check_python_version(consistency)
@@ -128,7 +88,6 @@ def main() -> None:
     with suite() as suite_dir:
         check_rule_attribution(consistency, suite_dir)
         check_lint(consistency)
-        check_mypy_compatibility(consistency, suite_dir)
     consistency.summary()
     sys.exit(1 if consistency.failed else 0)
 

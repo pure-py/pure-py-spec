@@ -1,7 +1,7 @@
 \section{Syntax}
 \label{sec:syntax}
 
-The syntax of \PurePy is given in \speconly{\figrefThree{syntax-stmt}{syntax-expr}{syntax-types}}\paperonly{\figrefTwo{syntax-stmt}{syntax-types}}.\speconly{ \figref{metavariables} summarises the metavariables used throughout.}
+The syntax of \PurePy is given in \figrefThree{syntax-stmt}{syntax-expr}{syntax-types}. \figref{metavariables} summarises the metavariables used throughout.
 A sequence $\seq{x}$ denotes $x_1, \ldots, x_n$ for some $n$; inside the brackets of a tuple, list, type
 application or argument list it stands for the comma-separated elements, so $\exTuple{\seq{e}}$ is
 $\exTuple{e_1, \ldots, e_n}$. The sequence $x \cons \seq{x}$ has head $x$ and tail $\seq{x}$, and
@@ -22,36 +22,16 @@ $Y$ not in $X$; and a product of ordered sets is ordered lexicographically.
 The grammar of \PurePy is an abstract syntax, so its metavariables $n$ and $w$ range over numbers and strings rather than over the numerals and string literals of the source text. Python writes a
 negative number as unary minus applied to a numeric literal; the translation to abstract syntax folds the minus
 into the literal, so a number may be negative. The translation of
-source text into abstract syntax otherwise maps each form of Python's grammar to the form of the same shape in \speconly{\figrefTwo{syntax-stmt}{syntax-expr}}\paperonly{\figref{syntax-stmt}}, including the indentation that delimits blocks. The translation depends on the source text alone. In particular, a call $\exCall{q}{a}$ or $\exCall{q[e]}{a}$ is translated in the same way whether or not $q$ denotes a class; the well-formedness rules treat such a call as a constructor call when $q$ denotes a class (\secref{well-formedness}). A list of type parameters is always present in the abstract syntax and may be empty; in source an empty list is omitted, because in Python's grammar the list is optional and, when present, has at least one element. The grammar as
+source text into abstract syntax otherwise maps each form of Python's grammar to the form of the same shape in \figrefTwo{syntax-stmt}{syntax-expr}, including the indentation that delimits blocks. The translation depends on the source text alone. In particular, a call $\exCall{q}{a}$ or $\exCall{q[e]}{a}$ is translated in the same way whether or not $q$ denotes a class; the well-formedness rules treat such a call as a constructor call when $q$ denotes a class (\secref{well-formedness}). A list of type parameters is always present in the abstract syntax and may be empty; in source an empty list is omitted, because in Python's grammar the list is optional and, when present, has at least one element. The grammar as
 written admits some programs which Python rejects as syntax errors, such as a function with two parameters of the same
 name. \figref{syntax-distinct} lists the conditions which rule out these programs.
 
 \subsection{Contexts}
 \label{sec:contexts}
 
-Metavariables $x$, $y$, $z$, $f$, $c$ and $\alpha$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function, $c$ when it is expected to denote a class and $\alpha$ when it is a type parameter. A \emph{name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}): a variable is a \emph{simple name}, and a name with at least one dot is \emph{qualified}. A name is \emph{fully qualified} when it is read from the root of the module hierarchy; modules (\secref{modules-programs}) and classes\speconly{ (Definition~\ref{def:class})} are identified by fully-qualified name.
+Metavariables $x$, $y$, $z$, $f$, $c$ and $\alpha$ range over \emph{variables}; idiomatically $f$ is used when the variable is expected to denote a function, $c$ when it is expected to denote a class and $\alpha$ when it is a type parameter. A \emph{name} $q$ is a non-empty sequence of variables separated by dots (\figref{syntax-stmt}): a variable is a \emph{simple name}, and a name with at least one dot is \emph{qualified}. A name is \emph{fully qualified} when it is read from the root of the module hierarchy; modules (\secref{modules-programs}) and classes (Definition~\ref{def:class}) are identified by fully-qualified name.
 
-\begin{definition}[Context]
-\label{def:context}
-A context $\Gamma$ (or $\Delta$) is a finite map from variables to \emph{context entries} $\theta$, which
-take the following forms:
-
-{\normalfont
-\begin{center}
-\small
-\begin{tabular}{rcll}
-$\theta$ & $::=$ & $\tau \mid \DU{\tau} \mid \PU{\tau} \mid \Unbound$ & (Variable) \\
-    & $\mid$ & $\modStub{q}$ & (Module stub) \\
-    & $\mid$ & $\modLoaded{q}{\Gamma}$ & (Checked module, with signature $\Gamma$) \\
-    & $\mid$ & $\Type{C}$ & (Class) \\
-    & $\mid$ & $\TypeVar$ & (Type parameter) \\
-    & $\mid$ & $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ & (Type alias) \\
-    & $\mid$ & $\scheme{\seq{\alpha}}{\tau} \mid \PU{\scheme{\seq{\alpha}}{\tau}}$ & (Type scheme, $\seq{\alpha}$ non-empty) \\
-    & $\mid$ & $\predefName$ & (Predefined name)
-\end{tabular}
-\end{center}
-}
-\end{definition}
+\input{spec/syntax/context}
 
 \noindent A predefined name is a member of a predefined module whose meaning is fixed by \PurePy, such as \pyinline{list} or
 \pyinline{dataclass}; its entry records only that it is in scope, and it does not denote a value, so it cannot appear in
@@ -61,39 +41,26 @@ named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \p
 the objects denoted by a class name, type parameter or alias at run time. The entry $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ records the alias declared by $\chi_i$ in
 the mutual type region $\seq{\chi}$ of module $q$, resolved under $\Gamma$.
 
-The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
+The definite-assignment terminology is borrowed from Java~\citep[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
 and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
 is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A function name with entry $\PU{\scheme{\seq{\alpha}}{\tau}}$ is bound at the type scheme $\scheme{\seq{\alpha}}{\tau}$ on some paths but not on all. A variable
 with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
-It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}. We write $\Gamma, \bind{x}{\theta}$ for the context that sends $x$ to $\theta$ and otherwise agrees with $\Gamma$, define $\dom(\Gamma) = \set{x \mid \Gamma(x) \neq \bot}$, and write $\varnothing$ for the context in which all variables are undefined.
+It is useful to represent contexts as total functions on the set of all variables by extending the codomain with $\bot$ to indicate \emph{undefined}.
 
-\begin{specdefinition}{Class name}
-\label{def:class}
-\emph{Class names} $C$ are fully-qualified names
-$q.c$, where $c$ is the name under which the class is defined in module $q$. A module defines each name at most
-once, so class names identify classes\speconly{, and we write ``class $C$'' for the class named $C$}. A class name is also the type of the instances of the class.
-\end{specdefinition}\paperonly{\quad}%
-\begin{specdefinition}{Class table}%
-\label{def:class-table}%
-A \emph{class table} $\Sigma$ maps each
-class name $C$ in its domain to a class entry $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$, which records the class
-definition $\chi_i$ of mutual type region $\seq{\chi}$ of module $q$ defining $C$, and the context $\Gamma$ in which
-the region appears. Every class named in $\Sigma$ is in $\dom(\Sigma)$, and the base-class relation on
-$\dom(\Sigma)$ is acyclic.%
-\end{specdefinition}
-\speconly{\noindent The
+\input{spec/syntax/class-table}
+\noindent The
 type parameters, fields and base class of $C$ are read from $\Sigma(C)$ by auxiliary functions
 $\typeParams{\Sigma}$, $\fields{\Sigma}$ and $\base{\Sigma}$ (\S\ref{sec:auxiliary-classes}), the latter two resolving
 the field annotations and base class of the definition under the context given by $\typeContext{\Gamma}(q, \seq{\chi}, i)$
-(\S\ref{aux:type-context}). }The class table is similar to the class table of Featherweight Java~\cite{igarashi2001}; the well-formedness rules build it while checking the class definitions of the program (\specfigref{typing-top-level}).
+(\S\ref{aux:type-context}). The class table is similar to the class table of Featherweight Java~\citep{igarashi2001}; the well-formedness rules build it while checking the class definitions of the program (\specfigref{typing-top-level}).
 
 \subsubsection{Context operations}
 \label{sec:context-operations}
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
-up to type equivalence, an idempotent commutative semigroup of parallel composition $\Gamma \merge_{\Sigma} \Delta$ (``merge''). \speconly{Together these form a
-\emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
-distributivity does not hold.} Both are defined pointwise, by $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$
+up to type equivalence, an idempotent commutative semigroup of parallel composition $\Gamma \merge_{\Sigma} \Delta$ (``merge''). Together these form a
+\emph{right near-semiring}~\citep{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
+distributivity does not hold. Both are defined pointwise, by $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$
 for each operation $\cdot$, from operations on context entries. Override is right-biased and has $\bot$
 as both left and right unit, and is defined in the same way on any finite map with $\bot$ for undefined, such as an
 environment or class table. Merge has no unit, since a variable defined in only one of the two contexts is possibly
@@ -102,23 +69,13 @@ so the type schemes of functions agree across branches and the case does not ari
 also agree across branches, but patterns bind variables without declared types, at types which may differ between
 branches. When both entries of a variable are defined, merge therefore gives an entry at the join of the two types,
 definitely assigned if both entries are definitely assigned and possibly unassigned otherwise.
-\begin{specdefinition}{Override and merge of context entries}
-\begin{defalignat}{5}
-\theta & {}\merge_{\Sigma} \theta && {}= \theta &&& \qquad \bot & {}\override \theta && {}= \theta \\
-\sigma & {}\merge_{\Sigma} \tau && {}= \joinTy{\Sigma}{\sigma}{\tau} && \quad \text{if } \sigma \neq \tau & \qquad \theta & {}\override \bot && {}= \theta \\
- &  &&  && \quad  & \qquad \theta & {}\override \theta' && {}= \theta' \quad \text{(otherwise)} \\
-\theta & {}\merge_{\Sigma} \theta' && {}= \PU{\joinTy{\Sigma}{\sigma}{\tau}} && \quad \text{if } \theta \neq \theta' \text{ and } \theta \in \set{\DU{\sigma}, \PU{\sigma}}, \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}} \\
-\sigma & {}\merge_{\Sigma} \theta && {}= \PU{\joinTy{\Sigma}{\sigma}{\tau}} && \quad \text{if } \theta \in \set{\DU{\tau}, \PU{\tau}} \\
-\bot & {}\merge_{\Sigma} \theta && {}= \theta \merge_{\Sigma} \bot = \PU{\tau} && \quad \text{if } \theta \in \set{\tau, \DU{\tau}, \PU{\tau}} \\
-\theta & {}\merge_{\Sigma} \theta' && {}= \PU{\scheme{\seq{\alpha}}{\tau}} && \quad \text{if } \theta \neq \theta' \in \set{\scheme{\seq{\alpha}}{\tau}, \PU{\scheme{\seq{\alpha}}{\tau}}, \bot}
-\end{defalignat}
-\end{specdefinition}
+\input{spec/syntax/context-operations}
 
-\subsection{Expressions and statements}
+\subsection{Statements and expressions}
 \label{sec:expressions-statements}
 
 Statements are sequenced by
-juxtaposition, $s\;s'$; a function body, branch of a conditional and body of a case are statements.
+juxtaposition, $\exSeq{s}{s'}$; a function body, branch of a conditional and body of a case are statements.
 \emph{Type definitions} $\chi$ are class definitions or
 \pyinline{type} statements. \emph{Top-level statements} $t$ are statements or mutual type regions, also sequenced by juxtaposition; the body of a
 module after its imports is a top-level statement, so type definitions occur only at the top level of a
@@ -128,27 +85,25 @@ Python 3.12. A \emph{mutual def region} $d_1 \ldots d_{n+1}$ is a maximal contig
 def regions. Maximality is not enforced by the grammar in \figref{syntax-stmt}; the parser is responsible for
 grouping consecutive \pyinline{def}s into a single mutual def region. A \emph{mutual type region} $\chi_1 \ldots \chi_{n+1}$ is a
 maximal contiguous block of type definitions, grouped by the parser in the same way. The well-formedness rules treat each
-mutual def region and each mutual type region as one mutually-recursive binding\paperonly{ (see \secref{mutual-recursion})}.
+mutual def region and each mutual type region as one mutually-recursive binding.
 
-\specinput{spec/fig/syntax-stmt}
-\specinput{spec/fig/syntax-expr}
-\specinput{spec/fig/syntax-types}
-\paperinput{paper/fig/syntax}
+\input{spec/fig/syntax-stmt}
+\input{spec/fig/syntax-expr}
+\input{spec/fig/syntax-types}
 \input{spec/fig/syntax-distinct}
 
 An \emph{argument list} $a$ (\figref{syntax-expr}) is a sequence of positional arguments followed by
 keyword arguments $x = u$, where an argument $u$ is an expression in a call and a pattern in a
 constructor pattern. A constructor call may also pass type arguments to the class; a constructor pattern
-cannot, since Python does not permit type arguments in a constructor pattern. The auxiliary function $\fieldMap{\Sigma}$\speconly{
-(\S\ref{aux:field-map})} pairs each field of the class
+cannot, since Python does not permit type arguments in a constructor pattern. The auxiliary function $\fieldMap{\Sigma}$
+(\S\ref{aux:field-map}) pairs each field of the class
 with an argument: the positional arguments fill the leading fields in order, and a keyword argument $x = u$
 fills the field $x$. It is defined only if every field receives exactly one argument.
 
-\speconly{\subsubsection{Type annotations}\label{sec:type-annotations}}%
-\paperonly{\paragraph{Type annotations.}}
+\subsubsection{Type annotations}\label{sec:type-annotations}%
 
 Parameters, returns and dataclass fields are annotated with type expressions $\psi$, and an assignment
-may be annotated. A type expression is an expression (\figref{syntax-expr}) denoting a type $\tau$ (\figref{syntax-types}). Type expressions and types have the same forms, except that a type expression has a type-name form $q[\seq{\psi}]$, in place of which a type has two forms: \emph{instantiated classes} $C[\seq{\tau}]$, which are classes applied to type arguments, and type variables $\alpha$. A primitive type is a name, or the literal \pyinline{None}; \pyinline{list}, \pyinline{tuple}, \pyinline{dict}, \pyinline{Callable} and \pyinline{Literal} are names.\speconly{ Following Python's typing module, a single type argument stands for the one-element tuple; when there are no type arguments the subscript is omitted, unless the type takes a variable number of type arguments, in which case the empty tuple must be supplied. The only such type is \pyinline{tuple}, so the empty tuple type is \pyinline{tuple[()]}. The parameter list of a \pyinline{Callable} type is a list. In a literal type $\tyLiteral{\ell}$, the literal $\ell$ may not be a float; floats are excluded from literals by the Python typing specification.\footnote{\url{https://typing.python.org/en/latest/spec/literal.html}}} A union $\tyUnion{\psi}{\psi'}$ applies the binary operator \pyinline{|}. A dataclass specifies its base class by a type expression of the form $q[\seq{\psi}]$. Resolution\speconly{ (\secref{types})} takes $q[\seq{\psi}]$ to $C[\seq{\tau}]$ when $q$ denotes the class $C$, to the type variable $\alpha$ when $q$ is a type parameter $\alpha$ and there are no arguments, and to the instantiation of the alias when $q$ denotes a type alias. The substitution $\subst{\seq{\tau}}{\seq{\alpha}}{\sigma}$ replaces each occurrence of $\alpha_i$ in $\sigma$ by $\tau_i$, a plain replacement, since every type variable in a type is free, and is defined only if $\seq{\tau}$ and $\seq{\alpha}$ have the same length. A \emph{scheme} $\pi$ (\figref{syntax-types}) binds type parameters $\seq{\alpha}$ in its body. Schemes are identified up to renaming of their type parameters. The body of a \emph{type scheme} $\scheme{\seq{\alpha}}{\tau}$ is a type; the body of a \emph{field scheme} $\scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}$ is a sequence of fields $\seq{x}$ with their types $\seq{\tau}$. The \emph{instantiation} of $\pi$ at $\seq{\sigma}$, written $\tyInst{\pi}{\seq{\sigma}}$, substitutes $\seq{\sigma}$ for $\seq{\alpha}$ in the body: $\subst{\seq{\sigma}}{\seq{\alpha}}{\tau}$ for a type scheme and $\bind{\seq{x}}{\subst{\seq{\sigma}}{\seq{\alpha}}{\seq{\tau}}}$ for a field scheme. A scheme without type parameters is its body, with the $\forall\seq{\alpha}$ omitted. The fields of a class\speconly{ (\S\ref{aux:fields})} form a field scheme.
+may be annotated. A type expression is an expression (\figref{syntax-expr}) denoting a type $\tau$ (\figref{syntax-types}). Type expressions and types have the same forms, except that a type expression has a type-name form $q[\seq{\psi}]$, in place of which a type has two forms: \emph{instantiated classes} $C[\seq{\tau}]$, which are classes applied to type arguments, and type variables $\alpha$. A primitive type is a name, or the literal \pyinline{None}; \pyinline{list}, \pyinline{tuple}, \pyinline{dict}, \pyinline{Callable} and \pyinline{Literal} are names. Following Python's typing module, a single type argument stands for the one-element tuple; when there are no type arguments the subscript is omitted, unless the type takes a variable number of type arguments, in which case the empty tuple must be supplied. The only such type is \pyinline{tuple}, so the empty tuple type is \pyinline{tuple[()]}. The parameter list of a \pyinline{Callable} type is a list. In a literal type $\tyLiteral{\ell}$, the literal $\ell$ may not be a float; floats are excluded from literals by the Python typing specification.\footnote{\url{https://typing.python.org/en/latest/spec/literal.html}} A union $\tyUnion{\psi}{\psi'}$ applies the binary operator \pyinline{|}. A dataclass specifies its base class by a type expression of the form $q[\seq{\psi}]$. Resolution (\secref{types}) takes $q[\seq{\psi}]$ to $C[\seq{\tau}]$ when $q$ denotes the class $C$, to the type variable $\alpha$ when $q$ is a type parameter $\alpha$ and there are no arguments, and to the instantiation of the alias when $q$ denotes a type alias. The substitution $\subst{\seq{\tau}}{\seq{\alpha}}{\sigma}$ replaces each occurrence of $\alpha_i$ in $\sigma$ by $\tau_i$, a plain replacement, since every type variable in a type is free, and is defined only if $\seq{\tau}$ and $\seq{\alpha}$ have the same length. A \emph{scheme} $\pi$ (\figref{syntax-types}) binds type parameters $\seq{\alpha}$ in its body. Schemes are identified up to renaming of their type parameters. The body of a \emph{type scheme} $\scheme{\seq{\alpha}}{\tau}$ is a type; the body of a \emph{field scheme} $\scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}$ is a sequence of fields $\seq{x}$ with their types $\seq{\tau}$. The \emph{instantiation} of $\pi$ at $\seq{\sigma}$, written $\tyInst{\pi}{\seq{\sigma}}$, substitutes $\seq{\sigma}$ for $\seq{\alpha}$ in the body: $\subst{\seq{\sigma}}{\seq{\alpha}}{\tau}$ for a type scheme and $\bind{\seq{x}}{\subst{\seq{\sigma}}{\seq{\alpha}}{\seq{\tau}}}$ for a field scheme. A scheme without type parameters is its body, with the $\forall\seq{\alpha}$ omitted. The fields of a class (\S\ref{aux:fields}) form a field scheme.
 
 \subsubsection{Operators}
 \label{sec:syntax-operators}
@@ -160,25 +115,16 @@ expression forms, since they need not evaluate both operands. The grammar of \fi
 on operator forms; disambiguation is by the precedence and associativity given in \specfigref{precedence},
 which follow Python. It is ambiguous in the same way on tuples and tuple patterns, which are written with grouping parentheses where Python's grammar requires them. The empty tuple is written \pyinline{()}, one-element tuples carry a trailing comma, \pyinline{(1,)}, and trailing commas are permitted wherever Python's grammar permits them.
 
-\specinput{spec/fig/precedence}
+\input{spec/fig/precedence}
 
 \subsection{Modules and programs}
 \label{sec:modules-programs}
 
-\begin{specdefinition}{Program}
-A \PurePy \emph{program} is a finite map $\mathcal{M}$ from \emph{fully-qualified module names}
-(\figref{syntax-stmt}) to \emph{module bodies} $\mu$, of which one is a distinguished \emph{main module} named
-$\pymath{\_\_main\_\_}$; here $\nameOf(q)$ is the string literal naming $q$, so
-$\nameOf(\pymath{\_\_main\_\_}) = \pymath{"\_\_main\_\_"}$. We identify a module with its fully-qualified name, writing ``module $q$'' for the module named $q$. A module body is a sequence of imports
-$\seq{\iota}$, its \emph{import prefix}, each a \emph{plain import} $\exImport{q}$ or a \emph{from-import} $\exFromImport{q}{\seq{x}}$, followed by a top-level statement $t$; since imports are not statements, they can appear neither
-within a statement nor after it. The statement begins with the
-declaration $\exAssign{\pymath{\_\_name\_\_}\exAnnot{\tyStr}}{\nameOf(q)}$, which binds the name of the module when the module
-loads (\secref{well-formedness-modules}).
-\end{specdefinition}
+\input{spec/syntax/program}
 
 A second map $\mathcal{P}$ gives the
-predefined modules\speconly{ of \figref{predefined-values}}\paperonly{ \pyinline{builtins}, \pyinline{dataclasses}, \pyinline{sys} and \pyinline{typing}}, which have no body\paperonly{ and provide selected members of the Python modules of the same names}: $\mathcal{P}$ takes each such name to its
-environment and context\speconly{ (Definition~\ref{def:predefined})}. The two domains are disjoint, and their union is
+predefined modules of \figref{predefined-values}, which have no body: $\mathcal{P}$ takes each such name to its
+environment and context (Definition~\ref{def:predefined}). The two domains are disjoint, and their union is
 prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$ is itself in
 $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such an $\mathcal{M}$: its modules are the \filename{.py} files and the
 directories, each named by its path, so the domain is prefix-closed by construction. The statement of a module is
@@ -187,28 +133,27 @@ $\pymath{\_\_name\_\_}$ assignment; a directory without an \filename{\_\_init\_\
 PEP 420, \url{https://peps.python.org/pep-0420/}) contributes that assignment alone.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
 definitions that follow.
 
-\speconly{\begin{definition}[Predefined contexts and environments]
+\begin{definition}[Predefined contexts and environments]
 \label{def:predefined}
 $\mathcal{P}$ takes each module $q$ of \figref{predefined-values} to a pair $(\Gamma, \rho)$, where $\Gamma$
 binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \figref{predefined-signatures}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value
 (\figref{predefined-values}).
-\end{definition}}
+\end{definition}
 
-\speconly{\noindent The predefined signatures name types
+\noindent The predefined signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in their union. The class table $\SigmaPredef$ of the predefined modules is
 $\set{\bind{\clsRange}{\ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}}}$, where $\chi$ defines the dataclass \pyinline{range} with fields \pyinline{start: int} and
-\pyinline{stop: int} and $\Gamma$ is the signature of \pyinline{builtins}.}
+\pyinline{stop: int} and $\Gamma$ is the signature of \pyinline{builtins}.
 
-\specinput{spec/fig/predefined-signatures}
+\input{spec/fig/predefined-signatures}
 
-\specinput{spec/fig/predefined-values}
+\input{spec/fig/predefined-values}
 
-\speconly{\begin{specdefinition}{Containing modules}
+\begin{specdefinition}{Containing modules}
 Write $q \prefixOf q'$ (\emph{prefix}) when $q' = q$ or $q' = q.q^\dagger$ for some $q^\dagger$, and $\properPrefixOf$ for
 the strict order; the proper prefixes of a module name are its \emph{containing modules}, and it is
 \emph{contained} in each of them.
-\end{specdefinition}}
+\end{specdefinition}
 
-\speconly{The metafunctions
-on modules and classes are defined in \secref{auxiliary-classes}.}
-\paperinput{paper/syntax/classes}
+The metafunctions
+on modules and classes are defined in \secref{auxiliary-classes}.

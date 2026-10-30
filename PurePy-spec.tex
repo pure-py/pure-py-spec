@@ -1,6 +1,6 @@
 % The PurePy language specification, built separately from the paper (paper.tex).
 % \anonmode anonymises the language name, including in the copyright notice, as for the paper.
-\documentclass[a4paper,11pt,DIV=12,twoside=false,numbers=noenddot,appendixprefix=true]{scrreprt}
+\documentclass[a4paper,10pt,DIV=12,twoside=false,numbers=noenddot,appendixprefix=true]{scrreprt}
 \AtBeginDocument{\renewcommand*{\appendixname}{Annex}}
 
 % Fonts and layout
@@ -44,13 +44,17 @@
 \ifdefined\finalmode\newcommand{\acceptchanges}{}\fi
 \usepackage{changebar}
 \ifdefined\finalmode\nochangebars\fi
-\usepackage[numbers,sort&compress]{natbib}
+\usepackage[authoryear]{natbib}
 \usepackage[colorlinks,allcolors=blue!50!black,destlabel]{hyperref}
 
 \newcommand{\specmode}{}
 % The paper's top-level sections are chapters here.
 \newcommand*{\seckind}{chapter}
 \newcommand*{\thisdoc}{specification}
+% Kerns of the production symbol for libertinust1math, whose colon has wide side bearings.
+\newcommand*{\coloncolonkern}{3mu}
+\newcommand*{\colonequalskern}{2mu}
+\newcommand*{\colonequalsraise}{0.015em}
 \input{tex/macros}
 \input{tex/listings}
 

@@ -22,6 +22,7 @@ STATUS_EXPECTED = f".status{EXPECTED}"
 
 HELPERS = "helpers"
 MAIN = "main.py"
+MYPY_BUG = "mypy-bug"
 
 
 class PythonOutcome(StrEnum):
@@ -44,7 +45,6 @@ class Exit(IntEnum):
     OK = 0
     NOT_ALLOWED = 1
     ILL_FORMED = 3
-    ILL_FORMED_PROGRAM = 4
 
 
 class Expectation(NamedTuple):
@@ -104,10 +104,13 @@ class Results:
 
 
 class Runner(Results):
-    def __init__(self, type_checker: list[str], interpreter: str | None) -> None:
+    def __init__(self, type_checker: list[str], interpreter: str | None, python: bool) -> None:
         super().__init__()
         self.type_checker = type_checker
         self.interpreter = interpreter  # None: tests not run
+        self.python = python  # Implementation under test is Python itself
+        self.type_checked = 0
+        self.run_only = 0
 
     def check(self, path: pathlib.Path, exit: Exit, error_checked: bool) -> list[str]:
         """Each test is checked in a separate directory, so other tests can't interfere. Single-module tests
@@ -115,12 +118,11 @@ class Runner(Results):
         with tempfile.TemporaryDirectory() as alone:
             checked = path if path.name == MAIN else pathlib.Path(shutil.copy(path, alone))
             proc = run([*self.type_checker, str(checked)])
-        exits = {exit, Exit.ILL_FORMED_PROGRAM} if exit == Exit.ILL_FORMED else {exit}
         output = proc.stdout + proc.stderr
         error = path.with_suffix(ERROR_EXPECTED)
-        if proc.returncode not in exits:
+        if proc.returncode != exit:
             first = output.strip().split("\n", 1)[0].replace(f"{checked.parent}/", "")
-            return [f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}: {first}"]
+            return [f"check: exit {proc.returncode}, expected {int(exit)}: {first}"]
         if not error_checked:
             return []
         if not error.exists():
@@ -130,7 +132,26 @@ class Runner(Results):
             return [f"check: expected {error.read_text().strip()!r}, got: {got}"]
         return []
 
-    def python(self, path: pathlib.Path, outcome: PythonOutcome) -> list[str]:
+    def accepts(self, test: pathlib.Path) -> list[str]:
+        """Failures of the type checker to accept a test, a module or the directory of a program, or to
+        reject it if the test is filed under a reported mypy bug. The test is copied to a new directory and
+        checked from there, so that its modules resolve and nothing is written into the suite."""
+        with tempfile.TemporaryDirectory() as alone:
+            copy = pathlib.Path(alone) / test.name
+            if test.is_dir():
+                shutil.copytree(test, copy)
+                proc = run([*self.type_checker, MAIN], cwd=copy)
+            else:
+                shutil.copy(test, copy)
+                proc = run([*self.type_checker, test.name], cwd=copy.parent)
+        reported_bug = MYPY_BUG in test.parts
+        if proc.returncode == 0 and reported_bug:
+            return ["check: accepted, but filed as a reported mypy bug"]
+        if proc.returncode != 0 and not reported_bug:
+            return [f"check: rejected: {(proc.stdout + proc.stderr).strip().split(chr(10), 1)[0]}"]
+        return []
+
+    def run_python(self, path: pathlib.Path, outcome: PythonOutcome) -> list[str]:
         assert self.interpreter is not None
         accepts = outcome == PythonOutcome.SUCCEEDS
         expected = path.with_suffix(EXPECTED)
@@ -163,14 +184,21 @@ class Runner(Results):
         dirs = test.relative_to(suite).parts[:-1]
         exit, error_checked, python = expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]))
         path = test / MAIN if test.is_dir() else test
+        if self.python:
+            return [
+                *(self.accepts(test) if exit == Exit.OK else []),
+                *(self.run_python(path, python) if self.interpreter is not None else []),
+            ]
         return [
             *self.check(path, exit, error_checked),
-            *(self.python(path, python) if self.interpreter is not None else []),
+            *(self.run_python(path, python) if self.interpreter is not None else []),
         ]
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
         """Tests run in parallel on jobs threads (default: one per core), reported in order."""
         found = list(tests(suite))
+        self.type_checked = sum(1 for test in found if not self.python or well_formed(suite, test))
+        self.run_only = len(found) - self.type_checked
         with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
             results = pool.map(lambda test: self.run_test(suite, test), found)
             last = None
@@ -180,6 +208,10 @@ class Runner(Results):
                     print(header)
                     last = header
                 self.record(test.relative_to(suite), failures)
+
+
+def well_formed(suite: pathlib.Path, test: pathlib.Path) -> bool:
+    return TYPE_CHECKER[PurePyOutcome(test.relative_to(suite).parts[1])][0] == Exit.OK
 
 
 def tests(suite: pathlib.Path) -> Iterator[pathlib.Path]:
@@ -213,13 +245,22 @@ def main(argv: Sequence[str] | None = None) -> None:
         "--no-run", action="store_true", help="check the tests without running them"
     )
     parser.add_argument(
+        "--python",
+        action="store_true",
+        help="test Python itself: run every test, and type-check only the tests well-formed in PurePy, which must be accepted",
+    )
+    parser.add_argument(
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
     )
     args = parser.parse_args(argv)
-    r = Runner(shlex.split(args.type_checker), None if args.no_run else args.interpreter)
+    r = Runner(
+        shlex.split(args.type_checker), None if args.no_run else args.interpreter, args.python
+    )
     with suite() as path:
         r.run_suite(path, args.jobs)
     r.summary()
+    if args.python:
+        print(f"Python mode: {r.type_checked} tests type-checked and run, {r.run_only} run only")
     sys.exit(0 if not r.failed else 1)
 
 
