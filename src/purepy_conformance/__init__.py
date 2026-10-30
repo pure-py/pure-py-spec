@@ -258,7 +258,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         r.run_suite(path, args.jobs)
     r.summary()
     if args.python:
-        print(f"{r.type_checked} tests type-checked and run, {r.run_only} run only")
+        print(f"Python mode: {r.type_checked} tests type-checked and run, {r.run_only} run only")
     sys.exit(0 if not r.failed else 1)
 
 
