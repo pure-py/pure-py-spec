@@ -51,7 +51,7 @@ $(e \mathbin{:} \tau)$, by which such systems usually let a checking form occur 
 \PurePy gives each introduction form a synthesis rule wherever its parts determine the type, an approach also taken
 by Swift, Kotlin and Scala~\citep{swift2025,kotlin2025,odersky2025}. \added{Lambdas and empty lists have only checking rules, since Python does not allow lambda
 parameters to be annotated, and an empty list fails to determine its element type.} \added{Literals other
-than floats synthesise their literal types, such as $\tyLiteral{\pyinline{3}}$, and list displays synthesise the join of
+than floats synthesise their literal types, such as $\tyLiteral{\pyinline{3}}$, and lists synthesise the join of
 the base types of their elements, since \pyinline{list} is invariant and a literal element type would rule out every other
 element. Expressions that synthesise $\sigma$ check against any supertype of $\sigma$ by subsumption, which applies only
 when no other rule concludes $\Sigma; \Gamma \vdash e \checks \tau$, so both judgements are syntax-directed and
