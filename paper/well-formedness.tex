@@ -75,8 +75,9 @@ join of the results:}
 \input{spec/rules/call-union}
 \end{mathpar}
 \deleted{Generators need no such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts' element types.
-}\citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
-stated separately for each elimination form.
+}\citet{dunfield2004} state union elimination once, for an arbitrary evaluation context\replaced{, which leaves open
+the subterm at which it applies; stating it for each elimination form keeps both judgements syntax-directed.}{; here union elimination is
+stated separately for each elimination form.}
 
 \begin{DeletedBlock}
 The \ruleName{call} rule for a call $\exCall{e}{\seq{e}}$ uses the auxiliary
