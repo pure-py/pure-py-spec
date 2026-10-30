@@ -116,10 +116,10 @@ ys: list[int] = keep(lambda x: x > 0, [1, -2, 3])
 \end{python}
 
 \noindent The call fixes \pyinline{T} at \pyinline{int} from the list, and the lambda is then checked against
-\pyinline{Callable[[int], bool]}. Checking an argument never yields type arguments, so a call is rejected if a type
-parameter does not occur in the type of any synthesising argument. The Python typing
+\pyinline{Callable[[int], bool]}. Checking an argument never yields type arguments, which keeps instantiation to a
+single premise, so a call is rejected if a type parameter does not occur in the type of any synthesising argument. The Python typing
 specification does not define how type arguments are inferred in calls at all; mypy accepts such a call by typing
-the lambda once the other type arguments are known. The restriction keeps instantiation to a single premise.
+the lambda once the other type arguments are known.
 \end{AddedBlock}
 
 \deleted{Lambdas, applied lambdas, lists, tuples, dictionaries, conditional expressions and comprehensions check.
@@ -129,7 +129,7 @@ the lambda once the other type arguments are known. The restriction keeps instan
 \input{spec/rules/lambda}
 \end{mathpar}
 A name bound at a type scheme \deleted{$\scheme{\seq{\alpha}}{\sigma}$ }checks against a type $\tau$
-by instantiating \replaced{its type parameters from $\tau$ in the same way, provided the instance is below $\tau$}{$\seq{\alpha}$ at the type arguments collected by $\typeArgs{\Sigma}$ from $\sigma$ and $\tau$, provided the
+by instantiating \replaced{its type parameters from $\tau$ in the same way, provided the instantiated type is a subtype of $\tau$}{$\seq{\alpha}$ at the type arguments collected by $\typeArgs{\Sigma}$ from $\sigma$ and $\tau$, provided the
 instantiated $\sigma$ is below $\tau$}, so a function with type parameters can be passed where a \pyinline{Callable} type is expected.
 An expression that synthesises $\sigma$ checks against any supertype
 of $\sigma$, which applies only when no other rule concludes $\Sigma; \Gamma \vdash e \checks
