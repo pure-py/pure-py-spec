@@ -45,8 +45,9 @@ and \emph{checking} $\Sigma; \Gamma \vdash e \checks \tau$ tests an expression a
 surroundings (\specfigref{typing-check}). The division follows the usual recipe for bidirectional
 systems~\cite{davies2000,dunfield2021}\replaced{, in which introduction forms check and elimination forms synthesise, since an elimination form starts from a subterm whose type is known.}{: introduction forms check, since a lambda's parameters cannot be
 annotated and an empty list does not determine its element type, and elimination forms synthesise, since a call, a subscript or an attribute
-reference starts from a subterm whose type is known.} Python has no annotation form
-$(e \mathbin{:} \tau)$, by which such systems usually let a checking form occur where synthesis is required, so
+reference starts from a subterm whose type is known.} \replaced{Such systems usually provide an annotation form $(e \mathbin{:} \tau)$, which lets a checking form occur
+where synthesis is required. Python does not have an annotation form, so}{Python has no annotation form
+$(e \mathbin{:} \tau)$, by which such systems usually let a checking form occur where synthesis is required, so}
 \PurePy gives each introduction form a synthesis rule wherever its parts determine the type, an approach also taken
 by Swift, Kotlin and Scala~\cite{swift2025,kotlin2025,odersky2025}. \added{Lambdas and empty lists have only checking rules, since lambda parameters
 cannot be annotated and an empty list does not determine its element type.}
