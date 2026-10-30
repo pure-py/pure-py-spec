@@ -1,0 +1,47 @@
+name: Dependency diagram
+
+# Dependencies between the organisation's repositories, from their pins, published to GitHub Pages
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 8 * * *'  # Daily at 08:00 UTC
+  push:
+    branches: [main]
+    paths:
+      - script/dependency-diagram.py
+      - .github/workflows/dependency-diagram.yml
+
+permissions:
+  contents: write
+
+jobs:
+  diagram:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Clone repositories of the organisation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh repo list pure-py --no-archived --json name --jq '.[].name' |
+            xargs -I{} git clone -q --depth 1 https://github.com/pure-py/{}.git repos/{}
+
+      - name: Install D2
+        run: curl -fsSL https://d2lang.com/install.sh | sh -s -- --version v0.9.0
+
+      - name: Draw diagram
+        run: python3 script/dependency-diagram.py repos | d2 - dependencies.svg
+
+      - name: Publish diagram to GitHub Pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages:refs/remotes/origin/gh-pages
+          git worktree add -B gh-pages pages origin/gh-pages
+          cp dependencies.svg pages/
+          cd pages
+          git add -A
+          git diff --quiet --cached || { git commit -m "Dependency diagram"; git push origin gh-pages; }

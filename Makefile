@@ -89,6 +89,10 @@ check-consistency:
 wheel: check-consistency
 	rm -rf dist && uv build --wheel
 
+# Dependencies between the organisation's repositories, from clones alongside this one
+dependencies.svg:
+	uv run --locked python script/dependency-diagram.py .. | d2 - $@
+
 # tracks: tag of same version
 PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
 # The mechanisation included in the submission is the purepy release which conforms to this specification, so
@@ -114,4 +118,4 @@ clean:
 	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-.PHONY: default all paper-submission clean check-consistency wheel
+.PHONY: default all paper-submission clean check-consistency wheel dependencies.svg
