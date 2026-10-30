@@ -131,8 +131,9 @@ $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$.\footnote{A source tree encodes such 
 directories, each named by its path, so the domain is prefix-closed by construction. The statement of a module is
 the statement sequence of its \filename{.py} file, or of its \filename{\_\_init\_\_.py} for a directory, preceded by the
 $\pymath{\_\_name\_\_}$ assignment; a directory without an \filename{\_\_init\_\_.py} (a namespace package,
-PEP 420, \url{https://peps.python.org/pep-0420/}) contributes that assignment alone.} The maps $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all
-definitions that follow.
+PEP 420, \url{https://peps.python.org/pep-0420/}) contributes that assignment alone.} A sequence of strings $\mathcal{A}$, beginning with the name of the
+file of the main module, gives the program's command-line arguments, as Python's \pyinline{sys.argv} does. The maps
+$\mathcal{M}$ and $\mathcal{P}$ and the arguments $\mathcal{A}$ are fixed and ambient in all definitions that follow.
 
 \begin{definition}[Predefined contexts and environments]
 \label{def:predefined}
