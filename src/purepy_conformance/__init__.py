@@ -44,7 +44,6 @@ class Exit(IntEnum):
     OK = 0
     NOT_ALLOWED = 1
     ILL_FORMED = 3
-    ILL_FORMED_PROGRAM = 4
 
 
 class Expectation(NamedTuple):
@@ -115,12 +114,11 @@ class Runner(Results):
         with tempfile.TemporaryDirectory() as alone:
             checked = path if path.name == MAIN else pathlib.Path(shutil.copy(path, alone))
             proc = run([*self.type_checker, str(checked)])
-        exits = {exit, Exit.ILL_FORMED_PROGRAM} if exit == Exit.ILL_FORMED else {exit}
         output = proc.stdout + proc.stderr
         error = path.with_suffix(ERROR_EXPECTED)
-        if proc.returncode not in exits:
+        if proc.returncode != exit:
             first = output.strip().split("\n", 1)[0].replace(f"{checked.parent}/", "")
-            return [f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}: {first}"]
+            return [f"check: exit {proc.returncode}, expected {int(exit)}: {first}"]
         if not error_checked:
             return []
         if not error.exists():
