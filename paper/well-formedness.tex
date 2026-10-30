@@ -50,7 +50,7 @@ where synthesis is required. Python does not have an annotation form, so}{Python
 $(e \mathbin{:} \tau)$, by which such systems usually let a checking form occur where synthesis is required, so}
 \PurePy gives each introduction form a synthesis rule wherever its parts determine the type, an approach also taken
 by Swift, Kotlin and Scala~\citep{swift2025,kotlin2025,odersky2025}. \added{Lambdas and empty lists have only checking rules, since Python does not allow lambda
-parameters to be annotated, and an empty list fails to determine its element type. Lambdas take their parameter types
+parameters to be annotated, and empty lists fail to determine their element types. Lambdas take their parameter types
 from the expected \pyinline{Callable} type, and their bodies check against the return type:
 \begin{mathpar}
 \small
