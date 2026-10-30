@@ -33,6 +33,7 @@ jobs:
         run: curl -fsSL https://d2lang.com/install.sh | sh -s -- --version v0.9.0
 
       - name: Draw diagram
+        shell: bash  # Fails the step when the script fails, since bash then sets pipefail
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 script/dependency-diagram.py repos | d2 - dependencies.svg
