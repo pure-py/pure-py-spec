@@ -1,7 +1,9 @@
 \inferrule*[lab={\ruleName{eval-program}}]
 {
-  \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{mod}} \val{\rho}
+  \added{\loadOrder(\mathcal{M}) = q_1 \cons \cdots \cons q_n} \\
+  \added{q_i \Rightarrow_{\mathsf{body}} \prints{{\seq{u}}_i}{\assigns{\rho_i}} \quad (\forall i)} \\
+  \deleted{\pymath{\_\_main\_\_} \Rightarrow_{\mathsf{mod}} \val{\rho}}
 }
 {
-  \mathcal{M} \Rightarrow \errExit{0}
+  \mathcal{M} \Rightarrow \added{{\seq{u}}_1 \concat \cdots \concat {\seq{u}}_n, }\errExit{0}
 }

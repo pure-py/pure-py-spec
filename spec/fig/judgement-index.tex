@@ -44,6 +44,7 @@ $\rho, x \importsR r$ & name $x$ imported from module environment $\rho$ has res
 $q, \seq{\iota} \Rightarrow r$ & imports $\seq{\iota}$ of module $q$ evaluate to result $r$ & \figref{eval-import-prefix} \\
 $q, \rho, \seq{x} \Rightarrow_{\mathsf{sub}} r$ & submodule chain $\seq{x}$ extends environment $\rho$ of module $q$, giving result $r$ & \figref{eval-import-prefix} \\
 $q \Rightarrow_{\mathsf{mod}} r$ & module $q$ loads to result $r$ & \figref{eval-modules} \\
-$\mathcal{M} \Rightarrow \kappa$ & program $\mathcal{M}$ evaluates to termination kind $\kappa$ & \figref{eval-modules}
+\added{$q \Rightarrow_{\mathsf{body}} o$} & \added{body of module $q$, after its imports, evaluates to outcome $o$} & \added{\figref{eval-modules}} \\
+$\mathcal{M} \Rightarrow \replaced{\seq{u}, \kappa}{\kappa}$ & program $\mathcal{M}$ \replaced{prints $\seq{u}$ and ends with}{evaluates to} termination kind $\kappa$ & \figref{eval-modules}
 \end{tabular}
 \end{center}

@@ -169,13 +169,19 @@ not loaded.
 Since
 imports precede statements, every module that a statement can reference is loaded before the statement runs, and
 loading is deterministic, so the semantics needs no cache
-of loaded modules. Loading runs\speconly{ (\ruleName{eval-module})} a module body in $\mathcal{P}(\pyinline{builtins})$ overridden by
+of loaded modules\added{ to compute environments}. Loading runs\speconly{ (\ruleName{eval-module})} a module body in $\mathcal{P}(\pyinline{builtins})$ overridden by
 the environment of its imports, with each name declared in the body or bound by a pattern in it starting
 unbound, mirroring the \ruleName{module} rule (\secref{well-formedness-modules}).
-A program evaluates to a termination kind (\figref{values}): $\errExit{0}$ if the main module
-loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exited with status $n$\paperonly{:}\speconly{.}
+\replaced{Printing, however, happens once per module, when its body first runs, so a program runs the body of each of
+its modules once, in load order (\specref{aux:loads}), and its output is the concatenation of the values printed by
+those bodies. Since imports precede statements, a body runs only after every module it imports has loaded, so the
+load order is fixed by the import prefixes alone. A program evaluates to its output and a termination kind
+(\figref{values}): $\errExit{0}$ if every body runs to its end, and otherwise the kind of the first body to abort,
+after whose output nothing more is printed.}{A program evaluates to a termination kind (\figref{values}): $\errExit{0}$ if the main module
+loads, and otherwise the kind it aborted with.} $\errExit{n}$ is a run that exited with status $n$\paperonly{:}\speconly{.}
 \paperinput{paper/operational-semantics/program}%
-An implementation must agree with the semantics on the termination kind of every run with defined behaviour; the form in
+An implementation must agree with the semantics on the termination kind of every run with defined behaviour\added{, and
+on its output, each value written as by Python's \pyinline{str} followed by a newline}; the form in
 which the kind is reported is not prescribed.
 
 \specinput{spec/fig/eval-modules}
