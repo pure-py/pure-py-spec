@@ -127,10 +127,10 @@ classes: {{
 {nodes}{links}key: Key {{
   near: bottom-center
   direction: right
-  style: {{ fill: "#ffffff"; stroke: "#cccccc"; border-radius: 8; font-size: 18; bold: true }}
-  x1 -> y1: Pin, moved by hand {{class: pinned}}
-  x2 -> y2: Follows target {{class: tracking}}
-  x3 -> y3: Pin behind latest release {{class: behind}}
+  style: {{ fill: "#ffffff"; stroke: "#cccccc"; border-radius: 8; font-size: 13; bold: true }}
+  x1 -> y1: Pin, moved by hand {{class: pinned; style.font-size: 11}}
+  x2 -> y2: Follows target {{class: tracking; style.font-size: 11}}
+  x3 -> y3: Pin behind latest release {{class: behind; style.font-size: 11}}
   x1.class: hidden; y1.class: hidden; x2.class: hidden; y2.class: hidden; x3.class: hidden; y3.class: hidden
 }}
 """

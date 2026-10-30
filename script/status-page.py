@@ -20,7 +20,7 @@ REVIEW = {
 }
 STYLE = """
 body { font-family: system-ui, sans-serif; max-width: 70em; margin: 2em auto; padding: 0 1em; }
-img { max-width: 100%; }
+img { width: 36em; max-width: 100%; }
 table { border-collapse: collapse; }
 th, td { text-align: left; padding: 0.3em 0.8em; border-bottom: 1px solid #ccc; white-space: nowrap; }
 td:nth-child(2) { white-space: normal; }
