@@ -67,7 +67,9 @@ gives the component type at that position, counting from the end when the index 
 \input{spec/rules/subscript-tuple}
 \end{mathpar}
 \end{DeletedBlock}
-\replaced{Union types need dedicated rules at elimination forms. A call in which the callee synthesises a union is typed at each disjunct, as a call of a fresh variable of that type, and synthesises the
+\added{Operators are overloaded, as specified in \specfigref{operator-overloads}, and the \ruleName{binop} and
+\ruleName{unop} rules synthesise the return type of the most specific overload at the operand types, so
+\pyinline{1 + 2} is an \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}. }\replaced{Union types need dedicated rules at elimination forms. A call in which the callee synthesises a union is typed at each disjunct, as a call of a fresh variable of that type, and synthesises the
 join of the two results; subscripts and attribute references have analogous rules, as do binary operators when overload
 resolution fails at an operand of union type:}{A subscript, attribute reference or call with a subject synthesising a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
 join of the results:}
@@ -136,6 +138,7 @@ of $\sigma$, which applies only when no other rule concludes $\Sigma; \Gamma \vd
 \tau$, so both judgements are
 syntax-directed and an expression has at most one derivation in each.
 
+\begin{DeletedBlock}
 \paragraph{Operators.}
 
 Each operator is overloaded as specified in \specfigref{operator-overloads}.
@@ -143,6 +146,7 @@ Each operator is overloaded as specified in \specfigref{operator-overloads}.
 The \ruleName{binop} and \ruleName{unop} rules (\specfigref{typing-synth}) take the return type
 of the most specific overload at the operand types, $\resolveOp{\Sigma}$, so \pyinline{1 + 2} is an
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}.
+\end{DeletedBlock}
 
 \subsection{Statements}
 \label{sec:well-formedness-statements}
