@@ -134,8 +134,7 @@ ys: list[int] = keep(lambda x: x > 0, [1, -2, 3])
 $\tyCallable{\tyInt}{\tyBool}$. Checking an argument never yields type arguments, which lets all type arguments
 be determined in one step, before any argument is checked, so a call is rejected if a type parameter occurs only in the types of parameters with arguments that do not
 synthesise, such as lambdas. These calls are accepted by mypy, which types each lambda once the other type arguments are known; the
-Python typing specification leaves the inference of type arguments in calls of generic functions entirely
-unspecified. Generic functions check against a type $\tau$ by
+Python typing specification does not specify how type arguments are inferred in calls of generic functions. Generic functions check against a type $\tau$ by
 instantiating their type parameters from $\tau$ in the same way, provided the instantiated type is a subtype of $\tau$,
 so they can be passed where \pyinline{Callable} types are expected.
 \end{AddedBlock}
