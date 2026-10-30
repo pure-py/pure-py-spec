@@ -50,12 +50,12 @@ where synthesis is required. Python does not have an annotation form, so}{Python
 $(e \mathbin{:} \tau)$, by which such systems usually let a checking form occur where synthesis is required, so}
 \PurePy gives each introduction form a synthesis rule wherever its parts determine the type, an approach also taken
 by Swift, Kotlin and Scala~\citep{swift2025,kotlin2025,odersky2025}. \added{Lambdas and empty lists have only checking rules, since Python does not allow lambda
-parameters to be annotated, and an empty list fails to determine its element type.} \added{A literal other
-than a float synthesises its literal type, such as $\tyLiteral{\pyinline{3}}$, and a list display synthesises the join of
-the base types of its elements, since \pyinline{list} is invariant and a literal element type would rule out every other
-element. An expression that synthesises $\sigma$ checks against any supertype of $\sigma$, which applies only when no
-other rule concludes $\Sigma; \Gamma \vdash e \checks \tau$, so both judgements are syntax-directed and an expression
-has at most one derivation in each.}
+parameters to be annotated, and an empty list fails to determine its element type.} \added{Literals other
+than floats synthesise their literal types, such as $\tyLiteral{\pyinline{3}}$, and list displays synthesise the join of
+the base types of their elements, since \pyinline{list} is invariant and a literal element type would rule out every other
+element. Expressions that synthesise $\sigma$ check against any supertype of $\sigma$ by subsumption, which applies only
+when no other rule concludes $\Sigma; \Gamma \vdash e \checks \tau$, so both judgements are syntax-directed and
+expressions have at most one derivation in each.}
 
 \begin{DeletedBlock}
 Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise.
@@ -75,8 +75,8 @@ gives the component type at that position, counting from the end when the index 
 \added{Operators are overloaded, as specified in \specfigref{operator-overloads}, and the \ruleName{binop} and
 \ruleName{unop} rules synthesise the return type of the most specific overload at the operand types. }\replaced{Union types need dedicated rules at elimination forms, operators included: with \pyinline{x} of type
 $\tyUnion{\tyInt}{\tyStr}$, no overload of \pyinline{*} applies at $\exBinOp{\pyinline{x}}{\pyinline{*}}{\pyinline{2}}$, which is
-instead typed at \pyinline{int} and at \pyinline{str} and synthesises $\tyUnion{\tyInt}{\tyStr}$. A call in which the callee
-synthesises a union is typed at each disjunct, as a call of a fresh variable of that type, and synthesises the join of
+instead typed at \pyinline{int} and at \pyinline{str} and synthesises $\tyUnion{\tyInt}{\tyStr}$. Calls in which the callee
+synthesises a union are typed at each disjunct, as calls of a fresh variable of that type, and synthesise the join of
 the two results; subscripts and attribute references have analogous rules:}{A subscript, attribute reference or call with a subject synthesising a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
 join of the results:}
 \begin{mathpar}
@@ -100,9 +100,9 @@ types $\seq{\sigma}$ and return type $\sigma$ from the callee along with its arg
 the arguments against $\seq{\sigma}$, and the call synthesises $\sigma$. The auxiliary judgement has two rules. A callee that synthesises a
 \pyinline{Callable} type gives the parameter and return types of that type.
 \end{DeletedBlock}
-\added{A generic function, bound in the context at a type scheme rather than a type, does not have a type on its own,
-and is typed only at a call or against an expected type. A call of a generic function }\deleted{A name bound at a
-type scheme $\scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}$ }instantiates the type parameters from the arguments\deleted{
+\added{Generic functions, bound in the context at type schemes rather than types, do not have types on their own,
+and are typed only at calls or against expected types. Calls of generic functions }\deleted{A name bound at a
+type scheme $\scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}$ }\replaced{instantiate}{instantiates} the type parameters from the arguments\deleted{
 (\ruleName{callee-scheme})}. The type arguments are \replaced{determined by matching each parameter type against the type synthesised by the corresponding argument}{collected by $\typeArgs{\Sigma}$ over the arguments that synthesise,
 by a one-way unification of each parameter type with the synthesised type, in which the type parameters $\seq{\alpha}$ are the
 unknowns: a type parameter takes the type found at the same
@@ -127,13 +127,13 @@ ys: list[int] = keep(lambda x: x > 0, [1, -2, 3])
 $\tyCallable{\tyInt}{\tyBool}$. Checking an argument never yields type arguments, which keeps instantiation to a
 single premise, so a call is rejected if a type parameter does not occur in the type of any synthesising argument. The Python typing
 specification does not define how type arguments are inferred in calls at all; mypy accepts such a call by typing
-the lambda once the other type arguments are known. A generic function checks against a type $\tau$ by
-instantiating its type parameters from $\tau$ in the same way, provided the instantiated type is a subtype of $\tau$, so
-it can be passed where a \pyinline{Callable} type is expected.
+the lambda once the other type arguments are known. Generic functions check against a type $\tau$ by
+instantiating their type parameters from $\tau$ in the same way, provided the instantiated type is a subtype of $\tau$,
+so they can be passed where \pyinline{Callable} types are expected.
 \end{AddedBlock}
 
 \deleted{Lambdas, applied lambdas, lists, tuples, dictionaries, conditional expressions and comprehensions check.
-}A lambda takes its parameter types from the expected \pyinline{Callable} type, and its body checks against the return type:
+}\replaced{Lambdas take their parameter types from the expected \pyinline{Callable} type, and their bodies check against the return type:}{A lambda takes its parameter types from the expected \pyinline{Callable} type, and its body checks against the return type: }
 \begin{mathpar}
 \small
 \input{spec/rules/lambda}
