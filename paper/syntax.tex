@@ -130,7 +130,7 @@ corresponding field.
 
 A second map $\mathcal{P}$ gives the
 predefined modules \pyinline{builtins}, \pyinline{dataclasses}, \pyinline{sys} and \pyinline{typing}, which have no body and provide selected members of the Python modules of the same names: $\mathcal{P}$ takes each such name to its
-\replaced{context}{environment and context}. The two domains are disjoint, and their union is
+\replaced{signature}{environment and context}. The two domains are disjoint, and their union is
 prefix-closed: the parent of any module in $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$ is itself in
 $\dom(\mathcal{M}) \cup \dom(\mathcal{P})$. In a typical implementation, a source tree
 encodes the map $\mathcal{M}$: the \filename{.py} files and directories are the modules, each named by its path, so the
