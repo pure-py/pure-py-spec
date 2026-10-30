@@ -227,8 +227,8 @@ rejects such a call wherever a value is required; such calls are typed instead b
 just checks the arguments against the parameter types. Both rules give the static outcome
 $\Assigns{\varnothing}$. A call statement with a callee synthesising a union is typed
 once per disjunct (\ruleName{call-stmt-union}), following \ruleName{call-union} for a call expression.
-\added{A print statement requires its argument to synthesise a type, and is typed only with no return type, so only
-outside function bodies (\ruleName{print}).}
+\added{A print statement requires its argument to synthesise a type, and is typed only when the return type $\zeta$ is
+absent, which excludes print statements from function bodies (\ruleName{print}).}
 
 A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment $\exAssign{x}{e}$ requires $x$ to be a declared but unassigned variable, and
