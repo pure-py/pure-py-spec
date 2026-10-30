@@ -84,14 +84,14 @@ join of the results:}
 \input{spec/rules/call-union}
 \end{mathpar}
 \deleted{Generators need no such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts' element types.
-}\replaced{Subscripts and attribute references have analogous rules. These rules are stated separately for each
-elimination form so that both judgements remain
-syntax-directed. A single rule for an arbitrary evaluation context~\citep{dunfield2004} can eliminate a union at any
-subterm in evaluation position, including an argument, but type checking must then search over the decompositions of a
-term~\citep{dunfield2011}. That rule accepts more programs only where a function of intersection type is applied to an
-argument of union type, each disjunct needing a different conjunct of the function type. \PurePy does not have
-intersection types, and the rules above cover overloaded operators, which are the closest analogue of intersection
-types.}{\citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
+}\replaced{Subscripts and attribute references have analogous rules. A rule for an arbitrary evaluation
+context~\citep{dunfield2004} can instead eliminate a union at any subterm in evaluation position, including an argument.
+This has the advantage of accepting programs in which a function of intersection type is applied to an argument of union
+type, each disjunct needing a different conjunct of the function type. In return, type checking must search over the
+decompositions of a term~\citep{dunfield2011}. \PurePy does not have intersection types, and the rules above cover
+overloaded operators, which are the closest analogue of intersection types. Stating union elimination separately for
+each elimination form therefore keeps both judgements syntax-directed without rejecting any program which the rule of
+\citet{dunfield2004} would accept.}{\citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form. }
 
 \begin{DeletedBlock}
