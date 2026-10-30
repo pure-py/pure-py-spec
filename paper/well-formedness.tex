@@ -83,13 +83,15 @@ types $\seq{\sigma}$ and return type $\sigma$ from the callee along with its arg
 the arguments against $\seq{\sigma}$, and the call synthesises $\sigma$. The auxiliary judgement has two rules. A callee that synthesises a
 \pyinline{Callable} type gives the parameter and return types of that type.
 \end{DeletedBlock}
-\added{A name bound at a type scheme does not synthesise a type; a call of such a name }\deleted{A name bound at a
+\added{A generic function, bound in the context at a type scheme rather than a type, does not have a type on its own,
+and is typed only at a call or against an expected type. A call of a generic function }\deleted{A name bound at a
 type scheme $\scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}$ }instantiates the type parameters from the arguments\deleted{
 (\ruleName{callee-scheme})}. The type arguments are \replaced{determined by matching each parameter type against the type synthesised by the corresponding argument}{collected by $\typeArgs{\Sigma}$ over the arguments that synthesise,
 by a one-way unification of each parameter type with the synthesised type, in which the type parameters $\seq{\alpha}$ are the
 unknowns: a type parameter takes the type found at the same
-position in the synthesised type}, with \replaced{a type parameter}{one} found at several positions taking the join of those types.
-Arguments that do not synthesise, such as lambdas, \replaced{contribute nothing, so every type parameter must be determined by the remaining arguments:}{are left out. The parameter and return types are
+position in the synthesised type}, with \replaced{a type parameter}{one} found at several positions taking the join of those types\added{,
+and every argument is then checked against its instantiated parameter type:}\deleted{.
+Arguments that do not synthesise, such as lambdas, are left out. The parameter and return types are
 instantiated at the type arguments given by the context, which must bind every type parameter:}
 \begin{DeletedBlock}
 \begin{mathpar}
@@ -101,14 +103,14 @@ instantiated at the type arguments given by the context, which must bind every t
 \begin{python}
 def keep[T](p: Callable[[T], bool], xs: list[T]) -> list[T]:
     return [x for x in xs if p(x)]
-def apply[T, U](f: Callable[[T], U], x: T) -> U:
-    return f(x)
 ys: list[int] = keep(lambda x: x > 0, [1, -2, 3])
-y: int = apply(lambda x: x + 1, 2)  # error: U has no type argument
 \end{python}
 
-\noindent The call of \pyinline{keep} fixes \pyinline{T} at \pyinline{int} from the list, and the lambda is then checked
-against \pyinline{Callable[[int], bool]}; the call of \pyinline{apply} is rejected, since only the lambda could determine \pyinline{U}.
+\noindent The call fixes \pyinline{T} at \pyinline{int} from the list, and the lambda is then checked against
+\pyinline{Callable[[int], bool]}. Checking an argument never yields type arguments, so a call is rejected if a type
+parameter does not occur in the type of any synthesising argument. The Python typing
+specification does not define how type arguments are inferred at a call, and mypy accepts such a call by typing
+the lambda once the other type arguments are known; the restriction keeps instantiation to a single premise.
 \end{AddedBlock}
 
 \deleted{Lambdas, applied lambdas, lists, tuples, dictionaries, conditional expressions and comprehensions check.
