@@ -43,11 +43,13 @@ make wheel
 ```
 
 An implementation runs the suite with the `purepy-conformance` command of the installed package, giving the
-command which type-checks the module at the path appended to it and, optionally, the Python interpreter which
-runs the tests:
+command which type-checks the module at the path appended to it and, optionally, the command which runs it. The
+type checker checks every test; the interpreter runs each test on which PurePy agrees with Python, which must
+have the outcome of Python, and with `--run-undefined` also each test undefined in PurePy. CPython (the default
+`python3`) is one such interpreter.
 
 ```bash
-purepy-conformance --type-checker "purepy --check" python3
+purepy-conformance --type-checker "purepy --check" purepy
 ```
 
 ## Development
