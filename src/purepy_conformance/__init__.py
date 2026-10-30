@@ -178,7 +178,7 @@ class Runner(Results):
         if name not in proc.stderr:
             return [f"run: expected {name}, got: {proc.stderr.strip()}"]
         output = path.with_suffix(OUTPUT_EXPECTED)
-        if output.exists() and proc.stdout != output.read_text():
+        if proc.stdout != (output.read_text() if output.exists() else ""):
             return ["run: output before the exception mismatch"]
         return []
 
