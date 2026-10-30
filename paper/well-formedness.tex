@@ -28,8 +28,8 @@ variables; the full definition is given in \specfigref{resolve-type}.
 Subtyping (\specfigref{subtyping}) is structural and follows mypy (\secref{python-compatibility}). Instantiated classes are below their base classes, with type arguments invariant, as
 are lists and dictionaries; tuples are covariant, and callables are contravariant in their parameters and covariant
 in their results. A literal type is below its base type, and \pyinline{int} is below \pyinline{float}, as PEP~484
-requires, whereas \pyinline{bool} is not below \pyinline{int}, although in Python \pyinline{bool} is a subclass of \pyinline{int}. A union is above
-each of its disjuncts and below every type above all of them; \pyinline{Never} is the least type and
+requires, whereas \pyinline{bool} is not below \pyinline{int}, although in Python \pyinline{bool} is a subclass of \pyinline{int}. \replaced{A union $\tyUnion{\sigma}{\tau}$ is a least upper bound of its \emph{disjuncts} $\sigma$ and $\tau$}{A union is above
+each of its disjuncts and below every type above all of them}; \pyinline{Never} is the least type and
 \pyinline{object} the greatest. Subtyping is a preorder (Lemma~\specnum{lem:subtyping-transitive}), with distinct
 types such as $\tyUnion{\sigma}{\tau}$ and $\tyUnion{\tau}{\sigma}$ \emph{equivalent}, $\sigma \tyEquiv \tau$, when each
 is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{pierce2002}.
@@ -67,7 +67,7 @@ gives the component type at that position, counting from the end when the index 
 \input{spec/rules/subscript-tuple}
 \end{mathpar}
 \end{DeletedBlock}
-\replaced{A call whose callee synthesises a union is typed once at each disjunct, as a call of a fresh variable of that type, and synthesises the
+\replaced{Union types need dedicated rules at elimination forms. A call in which the callee synthesises a union is typed once at each disjunct, as a call of a fresh variable of that type, and synthesises the
 join of the two results; subscripts and attribute references have analogous rules:}{A subscript, attribute reference or call with a subject synthesising a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
 join of the results:}
 \begin{mathpar}
