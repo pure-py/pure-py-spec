@@ -1,7 +1,6 @@
 name: Paper
 
-# Paper and specification, and the evaluation pipeline, as one status; documents rebuilt for any change not known to
-# be irrelevant, evaluation smoke only for evaluation changes
+# Paper, specification and evaluation pipeline as one status
 on:
   workflow_dispatch:
   push:
