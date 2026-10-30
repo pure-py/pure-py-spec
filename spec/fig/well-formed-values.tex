@@ -83,9 +83,9 @@
 \and
 \inferrule*[lab={\ruleName{val-prim}}]
 {
-  \mathcal{P}(q) = (\Gamma, \rho) \\
+  \replaced{\mathcal{E}(\seq{w})(q) = \rho}{\mathcal{P}(q) = (\Gamma, \rho) } \\
   \rho(x) = \primVal{\primFn} \\
-  \Gamma(x) = \theta
+  \replaced{\mathcal{P}(q)(x) = \theta}{\Gamma(x) = \theta }
 }
 {
   \vdash \primVal{\primFn} : \theta

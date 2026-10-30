@@ -45,6 +45,6 @@ $\rho, \seq{g} \Rightarrow r$ & comprehension qualifiers $\seq{g}$ evaluate to r
 \deleted{$q, \rho, \seq{x} \Rightarrow_{\mathsf{sub}} r$} & \deleted{submodule chain $\seq{x}$ extends environment $\rho$ of module $q$, giving result $r$} & \deleted{\figref{eval-import-prefix}} \\
 \deleted{$q \Rightarrow_{\mathsf{mod}} r$} & \deleted{module $q$ loads to result $r$} & \deleted{\figref{eval-modules}} \\
 \added{$q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$} & \added{body of module $q$ evaluates to outcome $o$ given environments $\mathcal{L}$ of loaded modules} & \added{\figref{eval-modules}} \\
-$\mathcal{M} \Rightarrow \replaced{\seq{v}, \kappa}{\kappa}$ & program $\mathcal{M}$ \replaced{prints $\seq{v}$ and ends with}{evaluates to} termination kind $\kappa$ & \figref{eval-modules}
+$\mathcal{M}\added{, \seq{w}} \Rightarrow \replaced{\seq{v}, \kappa}{\kappa}$ & program $\mathcal{M}$\added{ run with arguments $\seq{w}$} \replaced{prints $\seq{v}$ and ends with}{evaluates to} termination kind $\kappa$ & \figref{eval-modules}
 \end{tabular}
 \end{center}

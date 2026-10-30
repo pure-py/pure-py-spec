@@ -220,8 +220,7 @@
 \inferrule*[lab={\ruleName{eval-module}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;t \\
-  \mathcal{P}(\pyinline{builtins}) = (\Gamma, \rho) \\
-  q, \rho \mathbin{\override} \importEnv(\seq{\iota}, \mathcal{L}) \mathbin{\override} \scopeS(\declaresS(\seq{\iota}), t), t \Rightarrow o
+  q, \mathcal{L}(\pyinline{builtins}) \mathbin{\override} \importEnv(\seq{\iota}, \mathcal{L}) \mathbin{\override} \scopeS(\declaresS(\seq{\iota}), t), t \Rightarrow o
 }
 {
   q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o
@@ -229,7 +228,7 @@
 \end{mathpar}
 \end{AddedBlock}
 
-\flushleft \shadebox{$\mathcal{M} \Rightarrow \replaced{\seq{v}, \kappa}{\kappa}$}
+\flushleft \shadebox{$\mathcal{M}\added{, \seq{w}} \Rightarrow \replaced{\seq{v}, \kappa}{\kappa}$}
 \begin{mathpar}
 \small
 \input{spec/rules/eval-program}
