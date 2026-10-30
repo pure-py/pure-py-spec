@@ -31,3 +31,6 @@ dist/
 tex/python-version.tex
 tex/mypy-version.tex
 tex/anon-name.tex
+
+# Generated diagram
+dependencies.svg
