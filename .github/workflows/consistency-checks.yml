@@ -23,5 +23,5 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Run the checks and build the wheel
+      - name: Run checks and build wheel
         run: make wheel
