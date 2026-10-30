@@ -94,8 +94,7 @@ dependencies.svg:
 
 # tracks: tag of same version
 PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
-# The mechanisation included in the submission is the purepy release which conforms to this specification, so
-# the two share a version
+# Release of the mechanisation conforming to this specification
 PUREPY_RELEASE := v$(shell uv version --short --color never)
 
 supplementary.zip: spec-anon.pdf
