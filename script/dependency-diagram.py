@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 """D2 diagram of dependencies between repositories of the organisation, from a directory holding a clone of
-each, written to standard output
-
-An edge is a reference in one repository to a release, pages or git URL of another. A reference to a
-release asset or to the latest pages names its own version; any other reference needs a comment on the
-same or preceding line, "pin: <label>" for a version bumped by hand or "tracks: <label>" for one that
-follows the target. Links to repositories, issues and pull requests aren't dependencies. Each repository
-with a release shows its latest, and a pin of an earlier release is highlighted."""
+each, written to standard output"""
 
 import pathlib
 import re
