@@ -289,7 +289,7 @@ does not exempt the body from returning, nor permit a bare \pyinline{return}, fo
 Top-level statements are checked by a separate
 judgement, $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ (\figref{typing-top-level}): a sequence composes in the same way as a statement sequence, a mutual type region of class
 definitions and \pyinline{type} statements is a top-level form, checked by the \ruleName{types} rule, and a plain statement is checked with no return type
-(\ruleName{top-stmt}), so a \pyinline{return} has no derivation at the top level.
+(\ruleName{top-stmt})\replaced{, a \pyinline{return} outside a function being excluded syntactically (\figref{syntax-validity}).}{, so a \pyinline{return} has no derivation at the top level.}
 
 Within a mutual type region, a \pyinline{type} statement may name any class or alias of the type region, in any
 order, but a class definition may name only earlier classes and aliases, because Python~\pythonVersion{} evaluates the
