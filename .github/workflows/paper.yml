@@ -1,17 +1,19 @@
 name: Paper
 
-# Paper and specification, and the evaluation pipeline, as one status; each job runs only when its sources change
+# Paper and specification, and the evaluation pipeline, as one status; documents rebuilt for any change not known to
+# be irrelevant, evaluation smoke only for evaluation changes
 on:
   workflow_dispatch:
   push:
-    paths:
-      - paper.tex
-      - paper/**
-      - PurePy-spec.tex
-      - spec/**
-      - tex/**
-      - evaluation/**
-      - .github/workflows/paper.yml
+    paths-ignore:
+      - src/purepy_conformance/**
+      - test/**
+      - script/**
+      - .claude/**
+      - '**/README.md'
+      - .github/workflows/bump-version.yml
+      - .github/workflows/check-project-integrity.yml
+      - .github/workflows/consistency-checks.yml
 
 concurrency:
   group: paper-${{ github.ref }}
@@ -43,9 +45,12 @@ jobs:
             changed=$(git diff --name-only "$BEFORE" "$GITHUB_SHA")
           fi
           workflow='^\.github/workflows/paper\.yml$'
-          has() { grep -qE "$1|$workflow" <<< "$changed" && echo true || echo false; }
-          echo "documents=$(has '^(paper\.tex|paper/|PurePy-spec\.tex|spec/|tex/)')" >> "$GITHUB_OUTPUT"
-          echo "evaluation=$(has '^evaluation/')" >> "$GITHUB_OUTPUT"
+          irrelevant='^(src/purepy_conformance/|test/|script/|\.claude/|(.*/)?README\.md$|\.github/workflows/(bump-version|check-project-integrity|consistency-checks)\.yml$)'
+          relevant=$(grep -vE "$irrelevant" <<< "$changed" || true)
+          documents=$([ -n "$relevant" ] && echo true || echo false)
+          evaluation=$(grep -qE "^evaluation/|$workflow" <<< "$relevant" && echo true || echo false)
+          echo "documents=$documents" >> "$GITHUB_OUTPUT"
+          echo "evaluation=$evaluation" >> "$GITHUB_OUTPUT"
 
   documents:
     needs: changes
