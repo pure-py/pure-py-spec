@@ -1,21 +1,22 @@
-name: Dependency diagram
+name: Status page
 
-# Dependencies between the organisation's repositories, published to GitHub Pages
+# Dependency diagram and open pull requests of the organisation's repositories, published to GitHub Pages
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 8 * * *'  # Daily at 08:00 UTC
+    - cron: '0 * * * *'  # Hourly
   push:
     branches: [main]
     paths:
       - script/dependency-diagram.py
-      - .github/workflows/dependency-diagram.yml
+      - script/status-page.py
+      - .github/workflows/status.yml
 
 permissions:
   contents: write
 
 jobs:
-  diagram:
+  status:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -36,15 +37,21 @@ jobs:
         shell: bash  # Fails the step when the script fails, since bash then sets pipefail
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 script/dependency-diagram.py repos | d2 - dependencies.svg
+        run: python3 script/dependency-diagram.py repos | d2 --pad 16 - dependencies.svg
 
-      - name: Publish diagram to GitHub Pages
+      - name: Build page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 script/status-page.py repos > status.html
+
+      # Committed only when something other than the update time changes
+      - name: Publish to GitHub Pages
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git fetch origin gh-pages:refs/remotes/origin/gh-pages
           git worktree add -B gh-pages pages origin/gh-pages
-          cp dependencies.svg pages/
+          cp dependencies.svg status.html pages/
           cd pages
           git add -A
-          git diff --quiet --cached || { git commit -m "Dependency diagram"; git push origin gh-pages; }
+          git diff --quiet --cached -I '<time>' || { git commit -m "Status page"; git push origin gh-pages; }
