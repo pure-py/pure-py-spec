@@ -50,7 +50,13 @@ where synthesis is required. Python does not have an annotation form, so}{Python
 $(e \mathbin{:} \tau)$, by which such systems usually let a checking form occur where synthesis is required, so}
 \PurePy gives each introduction form a synthesis rule wherever its parts determine the type, an approach also taken
 by Swift, Kotlin and Scala~\citep{swift2025,kotlin2025,odersky2025}. \added{Lambdas and empty lists have only checking rules, since Python does not allow lambda
-parameters to be annotated, and an empty list fails to determine its element type.} \added{Literals other
+parameters to be annotated, and an empty list fails to determine its element type. Lambdas take their parameter types
+from the expected \pyinline{Callable} type, and their bodies check against the return type:
+\begin{mathpar}
+\small
+\input{spec/rules/lambda}
+\end{mathpar}
+}\added{Literals other
 than floats synthesise their literal types, such as $\tyLiteral{\pyinline{3}}$, and lists synthesise the join of
 the base types of their elements, since \pyinline{list} is invariant and a literal element type would rule out every other
 element. Expressions that synthesise $\sigma$ check against any supertype of $\sigma$ by subsumption, which applies only
@@ -135,11 +141,7 @@ so they can be passed where \pyinline{Callable} types are expected.
 \end{AddedBlock}
 
 \deleted{Lambdas, applied lambdas, lists, tuples, dictionaries, conditional expressions and comprehensions check.
-}\replaced{Lambdas take their parameter types from the expected \pyinline{Callable} type, and their bodies check against the return type:}{A lambda takes its parameter types from the expected \pyinline{Callable} type, and its body checks against the return type: }
-\begin{mathpar}
-\small
-\input{spec/rules/lambda}
-\end{mathpar}
+}\deleted{A lambda takes its parameter types from the expected \pyinline{Callable} type, and its body checks against the return type:}
 \deleted{A name bound at a type scheme $\scheme{\seq{\alpha}}{\sigma}$ checks against a type $\tau$
 by instantiating $\seq{\alpha}$ at the type arguments collected by $\typeArgs{\Sigma}$ from $\sigma$ and $\tau$, provided the
 instantiated $\sigma$ is below $\tau$, so a function with type parameters can be passed where a \pyinline{Callable} type is expected.
