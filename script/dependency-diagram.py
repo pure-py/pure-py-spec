@@ -116,23 +116,24 @@ def d2(repos: list[pathlib.Path]) -> str:
     links = "".join(
         link(e) for repo in repos for e in sorted(edges(repo), key=lambda e: (e.target, e.label))
     )
-    return f"""vars: {{
-  d2-config: {{ layout-engine: elk }}
-  d2-legend: Key {{
-    x -> y: Pin, moved by hand {{ class: pinned }}
-    x -> y: Follows target {{ class: tracking }}
-    x -> y: Pin behind latest release {{ class: behind }}
-    x.style.opacity: 0
-    y.style.opacity: 0
-  }}
-}}
+    return f"""vars: {{ d2-config: {{ layout-engine: elk }} }}
 direction: right
 classes: {{
   pinned: {{ style.stroke: "#333333" }}
   tracking: {{ style.stroke: "#333333"; style.stroke-dash: 4 }}
   behind: {{ style.stroke: "#b00020" }}
+  hidden: {{ style.opacity: 0; width: 1; height: 1; label: "" }}
 }}
-{nodes}{links}"""
+{nodes}{links}key: Key {{
+  near: bottom-center
+  direction: right
+  style: {{ fill: "#ffffff"; stroke: "#cccccc"; border-radius: 8; font-size: 18; bold: true }}
+  x1 -> y1: Pin, moved by hand {{class: pinned}}
+  x2 -> y2: Follows target {{class: tracking}}
+  x3 -> y3: Pin behind latest release {{class: behind}}
+  x1.class: hidden; y1.class: hidden; x2.class: hidden; y2.class: hidden; x3.class: hidden; y3.class: hidden
+}}
+"""
 
 
 def main() -> None:
