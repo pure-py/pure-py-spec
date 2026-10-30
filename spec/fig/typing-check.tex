@@ -27,7 +27,7 @@
 \and
 \inferrule*[lab={\ruleName{call-lambda}}]
 {
-  \seq{x} \text{ distinct} \\
+  \deleted{\seq{x} \text{ distinct}} \\
   \Sigma; \Gamma \vdash \seq{e} \synth \seq{\tau} \\
   \Sigma; \Gamma \override \set{\bind{\seq{x}}{\seq{\tau}}} \vdash e \checks \tau
 }
