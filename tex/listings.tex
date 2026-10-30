@@ -51,7 +51,7 @@
 % A listing opening a top-aligned minipage already sits a line below the preceding text, so its space above
 % is replaced by a small negative skip, measured to leave the same gap above as below.
 \makeatletter
-\lstnewenvironment{python}[1][]{\lstset{style=base16python}\if@minipage\lstset{aboveskip=-3pt}\fi\lstset{#1}}{}
+\lstnewenvironment{python}[1][]{\lstset{style=base16python}\if@minipage\lstset{aboveskip=-3pt}\else\lstset{xleftmargin=\parindent}\fi\lstset{#1}}{}
 \makeatother
 
 % Listings side by side: each listingcol is a top-aligned minipage, and listingrow separates the columns by
