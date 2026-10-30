@@ -79,9 +79,10 @@ join of the results:}
 }\replaced{These rules are stated separately for each elimination form so that both judgements remain
 syntax-directed. A single rule for an arbitrary evaluation context~\citep{dunfield2004} can eliminate a union at any
 subterm in evaluation position, including an argument, but type checking must then search over the decompositions of a
-term~\citep{dunfield2011}. The programs accepted by that rule and rejected by the rules of \PurePy are programs in
-which an argument of union type selects one part of a function of intersection type. \PurePy does not have
-intersection types, and the rules above cover overloaded operators, the closest analogue.}{\citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
+term~\citep{dunfield2011}. That rule accepts more programs only where a function of intersection type is applied to an
+argument of union type, each disjunct needing a different conjunct of the function type. \PurePy does not have
+intersection types, and the rules above cover overloaded operators, which are the closest analogue of intersection
+types.}{\citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form. }
 
 \begin{DeletedBlock}
